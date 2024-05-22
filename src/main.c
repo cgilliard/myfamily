@@ -29,7 +29,14 @@ int main(int argc, char **argv) {
 		}
 
 		while(next_token(&strm, &next)) {
-			printf("token_type=%i,token_name=%s\n", next.token_type, next.ident->value);
+			if(next.token_type == IdentType) {
+				printf("token_type=Ident,token_name=%s\n", next.ident->value);
+			} else if(next.token_type == PunctType) {
+				printf("token_type=PunctType,token_ch='%c'\n", next.punct->ch);
+			} else if(next.token_type == LiteralType) {
+				printf("token_type=LiteralType,token_literal='%s'\n", next.literal->literal);
+			}
+
 
 			free_token_tree(&next);
 		}
