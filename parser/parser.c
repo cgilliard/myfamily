@@ -41,6 +41,7 @@ int parse(char *file_name, TokenStream *strm) {
 
 	fclose(file);
 	strm->pos = 0;
+	strm->len = file_size;
 
 	return 0;
 }
@@ -72,7 +73,7 @@ int is_ident_secondary(char ch) {
 }
 
 int next_token(TokenStream *strm, TokenTree *next) {
-	int len = strlen(strm->bytes);
+	int len = strm->len;
 	int ret;
 
 	if(strm->pos >= len) {
@@ -97,8 +98,41 @@ int next_token(TokenStream *strm, TokenTree *next) {
 	if (strm->pos < len && !is_ident_start(strm->bytes[strm->pos])) {
 		// it's either a literal, group or punct
 		int is_literal = 0;
-		if(strm->bytes[strm->pos] == '\"') {
-			printf("dquote\n");
+		int is_group = 0;
+		int start_group_pos = 0;
+		int end_group_pos = 0;
+		Delimiter delimiter = Parenthesis;
+		if(strm->bytes[strm->pos] == '(') {
+			delimiter = Parenthesis;
+			is_group = 1;
+			start_group_pos = strm->pos + 1;
+			// TODO: deal with nested groups and literals
+			while(strm->pos < len && strm->bytes[strm->pos] != ')') {
+				strm->pos += 1;
+			}
+			end_group_pos = strm->pos;
+			strm->pos += 1;
+		} else if(strm->bytes[strm->pos] == '[') {
+			delimiter = Bracket;
+			is_group = 1;
+			start_group_pos = strm->pos + 1;
+			// TODO: deal with nested groups and literals
+			while(strm->pos < len && strm->bytes[strm->pos] != ']') {
+                                strm->pos += 1;
+                        }
+			end_group_pos = strm->pos;
+                        strm->pos += 1;
+		} else if(strm->bytes[strm->pos] == '{') {
+			delimiter = Brace;
+			is_group = 1;
+			start_group_pos = strm->pos + 1;
+			// TODO: deal with nested groups and literals
+			while(strm->pos < len && strm->bytes[strm->pos] != '}') {
+                                strm->pos += 1;
+                        }
+			end_group_pos = strm->pos;
+                        strm->pos += 1;
+		} else if(strm->bytes[strm->pos] == '\"') {
 			is_literal = 1;
 			next_token[itt] = strm->bytes[strm->pos];
 			itt += 1;
@@ -144,13 +178,23 @@ int next_token(TokenStream *strm, TokenTree *next) {
 			is_literal = 1;
 		}
 
-		if(is_literal) {
+		if(is_group) {
+			next->token_type = GroupType;
+			next->group = malloc(sizeof(Group));
+			next->group->delimiter = delimiter;
+			next->group->strm = malloc(sizeof(TokenStream));
+			next->group->strm->pos = 0;
+			int group_len = end_group_pos - start_group_pos;
+			next->group->strm->bytes = malloc(sizeof(char) * group_len);
+			memcpy(next->group->strm->bytes, strm->bytes + start_group_pos, group_len);
+			next->group->strm->len = group_len;
+
+		} else if(is_literal) {
 			next->token_type = LiteralType;
 			next->literal = malloc(sizeof(Literal));
 			next->literal->literal = malloc(sizeof(char) * itt);
 			strcpy(next->literal->literal, next_token);
 		} else {
-			printf("ch=%i\n", strm->bytes[strm->pos]);
 			next->token_type = PunctType;
 			next->punct = malloc(sizeof(Punct));
 			next->punct->ch = strm->bytes[strm->pos];
@@ -189,6 +233,18 @@ int free_token_stream(TokenStream *strm) {
 }
 
 int free_token_tree(TokenTree *tree) {
+	if(tree->token_type == IdentType) {
+		free(tree->ident->value);
+		free(tree->ident);
+	} else if(tree->token_type == PunctType) {
+		free(tree->punct);
+	} else if(tree->token_type == LiteralType) {
+		free(tree->literal->literal);
+		free(tree->literal);
+	} else if(tree->token_type == GroupType) {
+		free(tree->group->strm);
+		free(tree->group);
+	}
 	return 0;
 }
 

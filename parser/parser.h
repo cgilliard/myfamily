@@ -18,6 +18,7 @@
 // TokenStream - a representation of a stream of tokens
 struct TokenStream {
 	char *bytes;
+	int len;
 	int pos;
 };
 typedef struct TokenStream TokenStream;
