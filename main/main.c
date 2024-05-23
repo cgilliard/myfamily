@@ -18,7 +18,10 @@
 
 int process_token(TokenStream strm, TokenTree token) {
 	if(token.token_type == IdentType) {
-		printf("ident='%s'\n", token.ident->value);
+		printf("ident='%s' [file_off=%i]\n",
+			token.ident->value, token.span.offset
+		);
+		display_span(&token.span, Warning, "invalid format");
 	} else if(token.token_type == PunctType) {
 		printf("punct='%c", token.punct->ch);
 		if(token.punct->second_ch != 0) {
@@ -28,8 +31,11 @@ int process_token(TokenStream strm, TokenTree token) {
                         printf("%c", token.punct->third_ch);
                 }
 		printf("'\n");
+
+		 //display_span(&token.span, Error, "bad punct");
 	} else if(token.token_type == LiteralType) {
 		printf("literal='%s'\n", token.literal->literal);
+		//display_span(&token.span, Error, "illegal state, no literal");
 	} else if(token.token_type == GroupType) {
 		if(token.group->delimiter == Parenthesis)
 			printf("group delimiter = Parenthesis\n");
@@ -53,6 +59,8 @@ int process_token(TokenStream strm, TokenTree token) {
                         printf("end group delimiter = Bracket\n");
                 else if(token.group->delimiter == Brace)
                         printf("end group delimiter = Brace\n");
+
+		//display_span(&token.span, Warning, "warning about this group");
 	}
 	return 0;
 }

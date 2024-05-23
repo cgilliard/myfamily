@@ -28,15 +28,6 @@
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 int parse(char *file_name, TokenStream *strm) {
-	/*
-	printf(ANSI_COLOR_RED     "This text is RED!"     ANSI_COLOR_RESET "\n");
-  	printf(ANSI_COLOR_GREEN   "This text is GREEN!"   ANSI_COLOR_RESET "\n");
-  	printf(ANSI_COLOR_YELLOW  "This text is YELLOW!"  ANSI_COLOR_RESET "\n");
-  	printf(ANSI_COLOR_BLUE    "This text is BLUE!"    ANSI_COLOR_RESET "\n");
-  	printf(ANSI_COLOR_MAGENTA "This text is MAGENTA!" ANSI_COLOR_RESET "\n");
-  	printf(ANSI_COLOR_CYAN    "This text is CYAN!"    ANSI_COLOR_RESET "\n");
-	*/
-
 	FILE *file = fopen(file_name, "r");
 	if (file == NULL) {
 		return -1;
@@ -59,9 +50,14 @@ int parse(char *file_name, TokenStream *strm) {
 
 	fclose(file);
 	strm->pos = 0;
+	strm->line_num = 1;
 	strm->start_doc = -1;
 	strm->end_doc = -1;
 	strm->len = file_size;
+	strm->file_path = malloc(sizeof(char)*(strlen(file_name) + 1));
+	strcpy(strm->file_path, file_name);
+	strm->parent = NULL;
+	strm->pos_offset = 0;
 
 	return 0;
 }
@@ -98,8 +94,75 @@ int is_joint_possible(char ch) {
 	}
 }
 
-// TODO: handle errors
-// TODO: spans
+int display_span(Span *span, ErrorLevel level, char *message) {
+	TokenStream *file_stream = span->strm;
+	while(file_stream->parent != NULL) {
+		file_stream = file_stream->parent;
+	}
+	int start = span->offset;
+	int end = span->offset;
+	int tab_count = 0;
+	while(1) {
+		if(start == 0 || file_stream->bytes[start-1] == '\n') {
+			break;
+		}
+		if(file_stream->bytes[start-1] == '\t')
+                        tab_count += 1;
+		start -= 1;
+	}
+	while(1) {
+		if(end >= file_stream->len || file_stream->bytes[end] == '\n') {
+			break;
+		}
+		end += 1;
+	}
+
+	int span_len = end - start;
+	char *display_str = malloc(sizeof(char) * (span_len + 1));
+	memcpy(display_str, file_stream->bytes + start, span_len);
+	display_str[span_len] = 0;
+	if(level == Error) { // ERROR
+		printf(
+			"\e[1m%s:%i:%i:\e[m " ANSI_COLOR_RED "error:" ANSI_COLOR_RESET " %s\n%s\n",
+			file_stream->file_path,
+			span->offset,
+			span->line_num,
+			message,
+			display_str
+		);
+	} else { // WARNING
+		printf(         
+                        "\e[1m%s:%i:%i:\e[m " ANSI_COLOR_MAGENTA "warning:" ANSI_COLOR_RESET " %s\n%s\n",
+                        file_stream->file_path,
+                        span->offset,   
+                        span->line_num,
+                        message,        
+                        display_str
+                );
+	}
+	char *spacing_and_up_arrow = malloc(sizeof(char) * (span->offset - start) + 2);
+
+	int cur = 0;
+	for(int i=start; i<span->offset; i++) {
+		if(file_stream->bytes[i] == '\t')
+			spacing_and_up_arrow[cur] = '\t';
+		else
+			spacing_and_up_arrow[cur] = ' ';
+		cur += 1;
+	}
+	spacing_and_up_arrow[cur] = '^';
+	spacing_and_up_arrow[cur+1] = 0;
+
+	//printf("tab_count=%i,other=%i,first='%c',span_offset=%i,cur=%i,start=%i\n", tab_count, (span->offset-start)-tab_count, file_stream->bytes[start], span->offset, cur, start);
+
+	printf(ANSI_COLOR_GREEN "%s\n" ANSI_COLOR_RESET, spacing_and_up_arrow);
+	//printf("012345678901234567890\n");
+
+	free(display_str);
+
+	return 0;
+}
+
 int next_token(TokenStream *strm, TokenTree *next) {
 	int len = strm->len;
 	int ret;
@@ -109,7 +172,11 @@ int next_token(TokenStream *strm, TokenTree *next) {
                 next->group = malloc(sizeof(Group));
                 next->group->delimiter = Bracket;
                 next->group->strm = malloc(sizeof(TokenStream));
+		next->group->strm->parent = strm;
+		next->group->strm->pos_offset = strm->start_doc + strm->pos_offset;
+		next->group->strm->file_path = NULL;
                 next->group->strm->pos = 0;
+		next->group->strm->line_num = strm->line_num;
                 int group_len = (strm->end_doc - strm->start_doc) + 6;
                 next->group->strm->bytes = malloc(sizeof(char) * group_len);
 		next->group->strm->bytes[0] = 'd';
@@ -120,6 +187,11 @@ int next_token(TokenStream *strm, TokenTree *next) {
                 memcpy(next->group->strm->bytes + 5, strm->bytes + strm->start_doc, group_len - 6);
 		next->group->strm->bytes[group_len-1] = '\"';
                 next->group->strm->len = group_len;
+
+		next->span.line_num = strm->line_num;
+		//next->span.offset = strm->start_doc + strm->pos_offset;
+		next->span.offset = strm->start_doc + strm->pos_offset;
+		next->span.strm = strm;
 
 		strm->start_doc = -1;
 		strm->end_doc = -1;
@@ -142,6 +214,9 @@ int next_token(TokenStream *strm, TokenTree *next) {
 			if (!is_white_space(strm->bytes[strm->pos])) {
 				break;
 			}
+			if(strm->bytes[strm->pos] == '\n'){
+				strm->line_num += 1;
+			}
 			strm->pos += 1;
 		}
 
@@ -162,6 +237,9 @@ int next_token(TokenStream *strm, TokenTree *next) {
 					if(strm->start_doc > 0) {
 						strm->end_doc += 1;
 					}
+					if(strm->bytes[strm->pos] == '\n'){
+                                		strm->line_num += 1;
+                        		}
 					strm->pos += 1;
 				}
 
@@ -171,11 +249,20 @@ int next_token(TokenStream *strm, TokenTree *next) {
                         		next->punct->ch = '#';
                         		next->punct->second_ch = 0;
                         		next->punct->third_ch = 0;
+					next->span.strm = strm;
+					next->span.line_num = strm->line_num;
+        				next->span.offset = strm->pos + strm->pos_offset;
 					return 1;
 				}
 			} else {
 				while(strm->pos < len && (strm->bytes[strm->pos-1] != '*' || strm->bytes[strm->pos] != '/')) {
+					if(strm->bytes[strm->pos] == '\n'){
+                                		strm->line_num += 1;
+                        		}
                                 	strm->pos += 1;
+                        	}
+				if(strm->bytes[strm->pos] == '\n'){
+                                	strm->line_num += 1;
                         	}
 				strm->pos += 1;
 			}
@@ -184,6 +271,10 @@ int next_token(TokenStream *strm, TokenTree *next) {
 			break;
 		}
 	}
+
+	next->span.line_num = strm->line_num;
+	next->span.offset = strm->pos + strm->pos_offset;
+	next->span.strm = strm;
 
 	// if we're not an ident start we must be another type
 	if (strm->pos < len && !is_ident_start(strm->bytes[strm->pos])) {
@@ -307,6 +398,10 @@ int next_token(TokenStream *strm, TokenTree *next) {
 			next->group = malloc(sizeof(Group));
 			next->group->delimiter = delimiter;
 			next->group->strm = malloc(sizeof(TokenStream));
+			next->group->strm->parent = strm;
+			next->group->strm->pos_offset = start_group_pos + strm->pos_offset;
+			next->group->strm->file_path = NULL;
+			next->group->strm->line_num = strm->line_num;
 			next->group->strm->pos = 0;
 			int group_len = end_group_pos - start_group_pos;
 			next->group->strm->bytes = malloc(sizeof(char) * group_len);
@@ -420,6 +515,8 @@ int next_token(TokenStream *strm, TokenTree *next) {
 
 int free_token_stream(TokenStream *strm) {
 	free(strm->bytes);
+	if(strm->file_path != NULL)
+		free(strm->file_path);
 	return 0;
 }
 

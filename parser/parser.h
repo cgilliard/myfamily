@@ -20,10 +20,29 @@ struct TokenStream {
 	char *bytes;
 	int len;
 	int pos;
+	int line_num;
+	char *file_path;
 	int start_doc;
 	int end_doc;
+	struct TokenStream *parent;
+	int pos_offset;
 };
 typedef struct TokenStream TokenStream;
+
+// Span - A region of source code, along with information needed to display an error.
+struct Span {
+        TokenStream *strm;
+	int offset;
+	int line_num;
+};
+typedef struct Span Span;
+
+// Error Level for displaying a Span
+enum ErrorLevel {
+	Error = 0,
+	Warning = 1,
+};
+typedef enum ErrorLevel ErrorLevel;
 
 // Delimiters for a group
 enum Delimiter {
@@ -81,6 +100,7 @@ struct TokenTree {
 	Group *group;
 	Punct *punct;
 	Literal *literal;
+	Span span;
 };
 typedef struct TokenTree TokenTree;
 
@@ -88,5 +108,6 @@ int parse(char *file, TokenStream *strm);
 int next_token(TokenStream *strm, TokenTree *next);
 int free_token_stream(TokenStream *strm);
 int free_token_tree(TokenTree *tree);
+int display_span(Span *span, ErrorLevel level, char *message);
 
 #endif // PARSER_H_
