@@ -1,0 +1,24 @@
+fn main() {
+    println!("hello!");
+    let x = 0;
+    let xx = 1;
+    let xxx = 2.2;
+    /*
+     *
+     *
+     *
+     * ok
+     */
+    a /= 3;
+    x := "hi}hihi";
+       v >>= 1;
+       ..=
+           // ok ok ok
+           // test
+           // hmmm
+           /// ok ok ok$
+           /// v
+    if x == 0 {
+        println!("ok");
+    }
+}

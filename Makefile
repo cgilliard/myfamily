@@ -3,7 +3,7 @@ CC_FLAGS=
 MAKE=make
 SUBDIRS := main parser
 all: $(SUBDIRS)
-	$(CC) $(CC_FLAGS) -o bin/rustc main/*.o parser/*.o
+	$(CC) $(CC_FLAGS) -o bin/fam main/*.o parser/*.o
 clean:
 	rm -rf */*.o
 	rm -rf bin/*

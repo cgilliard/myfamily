@@ -20,7 +20,14 @@ int process_token(TokenStream strm, TokenTree token) {
 	if(token.token_type == IdentType) {
 		printf("ident='%s'\n", token.ident->value);
 	} else if(token.token_type == PunctType) {
-		printf("punct='%c'\n", token.punct->ch);
+		printf("punct='%c", token.punct->ch);
+		if(token.punct->second_ch != 0) {
+			printf("%c", token.punct->second_ch);
+		}
+		if(token.punct->third_ch != 0) {
+                        printf("%c", token.punct->third_ch);
+                }
+		printf("'\n");
 	} else if(token.token_type == LiteralType) {
 		printf("literal='%s'\n", token.literal->literal);
 	} else if(token.token_type == GroupType) {

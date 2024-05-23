@@ -20,6 +20,8 @@ struct TokenStream {
 	char *bytes;
 	int len;
 	int pos;
+	int start_doc;
+	int end_doc;
 };
 typedef struct TokenStream TokenStream;
 
@@ -61,6 +63,8 @@ typedef struct Group Group;
 
 struct Punct {
 	char ch;
+	char second_ch;
+	char third_ch;
 	Spacing spacing;
 };
 typedef struct Punct Punct;
