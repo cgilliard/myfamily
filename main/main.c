@@ -21,7 +21,7 @@ int process_token(TokenStream strm, TokenTree token) {
 		printf("ident='%s' [file_off=%i]\n",
 			token.ident->value, token.span.offset
 		);
-		display_span(&token.span, Warning, "invalid format");
+		//display_span(&token.span, Warning, "invalid format");
 	} else if(token.token_type == PunctType) {
 		printf("punct='%c", token.punct->ch);
 		if(token.punct->second_ch != 0) {
@@ -46,7 +46,11 @@ int process_token(TokenStream strm, TokenTree token) {
 
 		TokenTree grp_next;
 
-                while(next_token(token.group->strm, &grp_next)) {
+		int v;
+                while((v=next_token(token.group->strm, &grp_next))) {
+			if (v == 2) {
+                                exit(-1);
+                        }
 			process_token(*(token.group->strm), grp_next);
                         free_token_tree(&grp_next);
                 }
@@ -77,7 +81,11 @@ int main(int argc, char **argv) {
 			exit(1);
 		}
 
-		while(next_token(&strm, &next)) {
+		int v;
+		while((v=next_token(&strm, &next))) {
+			if (v == 2) {
+				exit(-1);
+			}
 			process_token(strm, next);
 			free_token_tree(&next);
 		}

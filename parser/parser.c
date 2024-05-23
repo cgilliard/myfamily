@@ -121,12 +121,13 @@ int display_span(Span *span, ErrorLevel level, char *message) {
 	char *display_str = malloc(sizeof(char) * (span_len + 1));
 	memcpy(display_str, file_stream->bytes + start, span_len);
 	display_str[span_len] = 0;
+	int indent = 1 + (span->offset - start);
 	if(level == Error) { // ERROR
 		printf(
 			"\e[1m%s:%i:%i:\e[m " ANSI_COLOR_RED "error:" ANSI_COLOR_RESET " %s\n%s\n",
 			file_stream->file_path,
-			span->offset,
 			span->line_num,
+			indent,
 			message,
 			display_str
 		);
@@ -134,8 +135,8 @@ int display_span(Span *span, ErrorLevel level, char *message) {
 		printf(         
                         "\e[1m%s:%i:%i:\e[m " ANSI_COLOR_MAGENTA "warning:" ANSI_COLOR_RESET " %s\n%s\n",
                         file_stream->file_path,
-                        span->offset,   
                         span->line_num,
+			indent,
                         message,        
                         display_str
                 );
@@ -152,12 +153,7 @@ int display_span(Span *span, ErrorLevel level, char *message) {
 	}
 	spacing_and_up_arrow[cur] = '^';
 	spacing_and_up_arrow[cur+1] = 0;
-
-	//printf("tab_count=%i,other=%i,first='%c',span_offset=%i,cur=%i,start=%i\n", tab_count, (span->offset-start)-tab_count, file_stream->bytes[start], span->offset, cur, start);
-
 	printf(ANSI_COLOR_GREEN "%s\n" ANSI_COLOR_RESET, spacing_and_up_arrow);
-	//printf("012345678901234567890\n");
-
 	free(display_str);
 
 	return 0;
@@ -189,7 +185,6 @@ int next_token(TokenStream *strm, TokenTree *next) {
                 next->group->strm->len = group_len;
 
 		next->span.line_num = strm->line_num;
-		//next->span.offset = strm->start_doc + strm->pos_offset;
 		next->span.offset = strm->start_doc + strm->pos_offset;
 		next->span.strm = strm;
 
@@ -252,7 +247,7 @@ int next_token(TokenStream *strm, TokenTree *next) {
 					next->span.strm = strm;
 					next->span.line_num = strm->line_num;
         				next->span.offset = strm->pos + strm->pos_offset;
-					return 1;
+					return ret;
 				}
 			} else {
 				while(strm->pos < len && (strm->bytes[strm->pos-1] != '*' || strm->bytes[strm->pos] != '/')) {
@@ -290,17 +285,30 @@ int next_token(TokenStream *strm, TokenTree *next) {
 			strm->pos += 1;
 			start_group_pos = strm->pos;
 			int inner_char_count = 0;
+			int in_lit = 0;
                         while(strm->pos < len) {
-				if(strm->bytes[strm->pos] == ')' && inner_char_count == 0) {
-					break;
-				}
-                                if(strm->bytes[strm->pos] == '(') {
+				if(strm->bytes[strm->pos] == ')' && inner_char_count == 0 && !in_lit) {
+                                        break;
+                                }
+                                if(strm->bytes[strm->pos] == '(' && !in_lit) {
                                         inner_char_count += 1;
-                                } else if(strm->bytes[strm->pos] == ')') {
+                                } else if(strm->bytes[strm->pos] == ')' && !in_lit) {
                                         inner_char_count -= 1;
+                                } else if((strm->bytes[strm->pos] == '\"' || strm->bytes[strm->pos] == '\'') && !in_lit) {
+                                        in_lit = 1;
+                                } else if((strm->bytes[strm->pos] == '\"' || strm->bytes[strm->pos] == '\'') && in_lit) {
+                                        in_lit = 0;
+                                }
+                                if(strm->bytes[strm->pos] == '\n') {
+                                        strm->line_num += 1;
                                 }
                                 strm->pos += 1;
                         }
+			if(strm->pos == len) {
+				next->span.line_num = strm->line_num;
+				display_span(&next->span, Error, "parse error: file ended with unclosed '{'");
+				ret = 2;
+			}
 			end_group_pos = strm->pos;
 			strm->pos += 1;
 		} else if(strm->bytes[strm->pos] == '[') {
@@ -309,16 +317,29 @@ int next_token(TokenStream *strm, TokenTree *next) {
 			strm->pos += 1;
 			start_group_pos = strm->pos;
 			int inner_char_count = 0;
+			int in_lit = 0;
                         while(strm->pos < len) {
-				if(strm->bytes[strm->pos] == ']' && inner_char_count == 0) {
+				if(strm->bytes[strm->pos] == ']' && inner_char_count == 0 && !in_lit) {
                                         break;
-				}
-                                if(strm->bytes[strm->pos] == '[') {
+                                }
+                                if(strm->bytes[strm->pos] == '[' && !in_lit) {
                                         inner_char_count += 1;
-                                } else if(strm->bytes[strm->pos] == ']') {
+                                } else if(strm->bytes[strm->pos] == ']' && !in_lit) {
                                         inner_char_count -= 1;
+                                } else if((strm->bytes[strm->pos] == '\"' || strm->bytes[strm->pos] == '\'') && !in_lit) {
+                                        in_lit = 1;
+                                } else if((strm->bytes[strm->pos] == '\"' || strm->bytes[strm->pos] == '\'') && in_lit) {
+                                        in_lit = 0;
+                                }
+                                if(strm->bytes[strm->pos] == '\n') {
+                                        strm->line_num += 1;
                                 }
                                 strm->pos += 1;
+                        }
+			if(strm->pos == len) {
+                                next->span.line_num = strm->line_num;
+                                display_span(&next->span, Error, "parse error: file ended with unclosed '['");
+                                ret = 2;
                         }
 			end_group_pos = strm->pos;
                         strm->pos += 1;
@@ -342,7 +363,15 @@ int next_token(TokenStream *strm, TokenTree *next) {
 				} else if((strm->bytes[strm->pos] == '\"' || strm->bytes[strm->pos] == '\'') && in_lit) {
                                         in_lit = 0;
                                 }
+				if(strm->bytes[strm->pos] == '\n') {
+                                        strm->line_num += 1;
+                                }
                                 strm->pos += 1;
+                        }
+			if(strm->pos == len) {
+                                next->span.line_num = strm->line_num;
+                                display_span(&next->span, Error, "parse error: file ended with unclosed '{'");
+                                ret = 2;
                         }
 			end_group_pos = strm->pos;
                         strm->pos += 1;
@@ -414,6 +443,17 @@ int next_token(TokenStream *strm, TokenTree *next) {
 			next->literal->literal = malloc(sizeof(char) * itt);
 			strcpy(next->literal->literal, next_token);
 		} else {
+			// punct
+
+			char ch = strm->bytes[strm->pos];
+			if(ch == ')' || ch == ']' || ch == '}') {
+				char err[100];
+                                next->span.line_num = strm->line_num;
+				sprintf(err, "parse error: unexpected token, '%c'", ch);
+                                display_span(&next->span, Error, err);
+                                ret = 2;
+                        }
+
 			next->token_type = PunctType;
 			next->punct = malloc(sizeof(Punct));
 			next->punct->ch = strm->bytes[strm->pos];

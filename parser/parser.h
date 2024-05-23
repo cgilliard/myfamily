@@ -62,13 +62,6 @@ enum TokenTreeType {
 };
 typedef enum TokenTreeType TokenTreeType;
 
-// Spacing - for punct
-enum Spacing {
-	Joint = 0,
-	Alone = 1
-};
-typedef enum Spacing Spacing;
-
 struct Ident {
 	char *value;
 };
@@ -84,7 +77,6 @@ struct Punct {
 	char ch;
 	char second_ch;
 	char third_ch;
-	Spacing spacing;
 };
 typedef struct Punct Punct;
 

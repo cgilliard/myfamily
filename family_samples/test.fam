@@ -3,7 +3,13 @@ MyObject {
 	let x = 0;
 			/// abcdef
 	abc(&a, usize xyz, f64 x);
-	let m = "hi}ok";
+	let m = ("hi}ok";)
 		// zzz
-   	def() {}
+   	def( { })
 }
+
+((((({{}{=4
+(x)}})))))
+
+{}
+()
