@@ -8,8 +8,16 @@ clean:
 $(SUBDIRS):
 	$(MAKE) -C $@
 test: $(SUBDIRS)
+	ERROR="0"; \
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir test; \
-	done
+		if [ $$? -ne "0" ]; then \
+		ERROR="1"; \
+		echo "error!"; \
+		fi; \
+	done; \
+	if [ $$ERROR -ne "0" ]; then \
+		$$? = 1; \
+	fi
 .PHONY: all $(SUBDIRS)
 .PHONY: test $(SUBDIRS)
