@@ -5,3 +5,5 @@
 **/*.gcda
 /bin/*
 /doxygen.out/*
+Makefile
+Makefile.config
