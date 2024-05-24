@@ -14,28 +14,33 @@ Test(test, parser) {
 	cr_assert_eq(next.token_type, IdentType);
 	cr_assert_eq(strcmp(next.ident->value, "x"), 0);
 	display_span(&next.span, Warning, "test123");
+	free_token_tree(&next);
 
 	// = - punct
 	value = next_token(&strm, &next);
         cr_assert_eq(value, 1);
         cr_assert_eq(next.token_type, PunctType);
         cr_assert_eq(next.punct->ch, '=');
+	free_token_tree(&next);
 
 	// 0 - literal
 	value = next_token(&strm, &next);
         cr_assert_eq(value, 1);
         cr_assert_eq(next.token_type, LiteralType);
         cr_assert_eq(strcmp(next.literal->literal, "0"), 0);
+	free_token_tree(&next);
 
 	// semicolon
 	value = next_token(&strm, &next);
         cr_assert_eq(value, 1);
         cr_assert_eq(next.token_type, PunctType);
         cr_assert_eq(next.punct->ch, ';');
+	free_token_tree(&next);
 
 	// end of the token stream
 	value = next_token(&strm, &next);
 	cr_assert_eq(value, 0);
+	free_token_tree(&next);
 
 	free_token_stream(&strm);
 	cr_assert_eq(parsev, 0);
