@@ -7,6 +7,10 @@ all: $(SUBDIRS)
 clean:
 	rm -rf */*.o
 	rm -rf bin/*
+test: $(SUBDIRS)
+	make -C main test
+	make -C parser test
+	make -C util test
 $(SUBDIRS):
 	$(MAKE) -C $@
 
