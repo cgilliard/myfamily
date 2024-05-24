@@ -1,3 +1,3 @@
 #!/bin/bash
 
-make COVERAGE=--coverage test
+make COVERAGE=--coverage clean test
