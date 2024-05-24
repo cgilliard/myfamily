@@ -30,3 +30,5 @@ install:
 	cp bin/fam /usr/local/bin
 .PHONY: all $(SUBDIRS)
 .PHONY: test $(SUBDIRS)
+.PHONY: doc
+
