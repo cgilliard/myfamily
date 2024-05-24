@@ -97,9 +97,26 @@ struct TokenTree {
 typedef struct TokenTree TokenTree;
 
 int parse(char *file, TokenStream *strm);
+
+/**
+ * Retrieve the next token from the specified TokenStream.
+ * @param strm A pointer to the token stream to retrieve the
+ * next token from.
+ * @param next A pointer to the TokenTree to store the next
+ * token in.
+ * @return 1 if there are more tokens to be read, 0 if there are no
+ * more tokens in this stream, and 2 if an error has occurred.
+ * @see [parse]
+ * @see [free_token_tree]
+ * @see [free_token_stream]
+ */
 int next_token(TokenStream *strm, TokenTree *next);
-int free_token_stream(TokenStream *strm);
-int free_token_tree(TokenTree *tree);
+
+/**
+ * Free a token stream
+ */
+void free_token_stream(TokenStream *strm);
+void free_token_tree(TokenTree *tree);
 int display_span(Span *span, ErrorLevel level, char *message);
 
 #endif // PARSER_H_

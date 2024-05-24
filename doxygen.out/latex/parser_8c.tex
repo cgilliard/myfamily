@@ -1,0 +1,89 @@
+\doxysection{parser/parser.c File Reference}
+\hypertarget{parser_8c}{}\label{parser_8c}\index{parser/parser.c@{parser/parser.c}}
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$parser/parser.\+h$>$}\newline
+{\ttfamily \#include $<$util/constants.\+h$>$}\newline
+{\ttfamily \#include $<$util/misc.\+h$>$}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{parser_8c_adc479d9be563a9804bb4d3f1a7290ca4}{parse}} (char \texorpdfstring{$\ast$}{*}file\+\_\+name, \mbox{\hyperlink{struct_token_stream}{Token\+Stream}} \texorpdfstring{$\ast$}{*}strm)
+\item 
+int \mbox{\hyperlink{parser_8c_afdb68260a7cd06ebc6961b8ce8d78caf}{display\+\_\+span}} (\mbox{\hyperlink{struct_span}{Span}} \texorpdfstring{$\ast$}{*}span, \mbox{\hyperlink{parser_8h_a88f6d947bf467e369055535af5907aa1}{Error\+Level}} level, char \texorpdfstring{$\ast$}{*}message)
+\item 
+void \mbox{\hyperlink{parser_8c_ab8940abef0e72a56f2aa13dc0d2cd4f2}{process\+\_\+doc}} (\mbox{\hyperlink{struct_token_stream}{Token\+Stream}} \texorpdfstring{$\ast$}{*}strm, \mbox{\hyperlink{struct_token_tree}{Token\+Tree}} \texorpdfstring{$\ast$}{*}next)
+\item 
+int \mbox{\hyperlink{parser_8c_a559d29bbc04f3381ae910fefdf4d738e}{skip\+\_\+comments\+\_\+and\+\_\+white\+\_\+space}} (\mbox{\hyperlink{struct_token_stream}{Token\+Stream}} \texorpdfstring{$\ast$}{*}strm, \mbox{\hyperlink{struct_token_tree}{Token\+Tree}} \texorpdfstring{$\ast$}{*}next, int len)
+\item 
+int \mbox{\hyperlink{parser_8c_a5ee4beb36905da3ffda6adc67a557426}{next\+\_\+token}} (\mbox{\hyperlink{struct_token_stream}{Token\+Stream}} \texorpdfstring{$\ast$}{*}strm, \mbox{\hyperlink{struct_token_tree}{Token\+Tree}} \texorpdfstring{$\ast$}{*}next)
+\item 
+void \mbox{\hyperlink{parser_8c_a488ed34756d1179fe98ff2ae90822ddc}{free\+\_\+token\+\_\+stream}} (\mbox{\hyperlink{struct_token_stream}{Token\+Stream}} \texorpdfstring{$\ast$}{*}strm)
+\item 
+void \mbox{\hyperlink{parser_8c_af59f5da69db97d4998bc686db898b3e7}{free\+\_\+token\+\_\+tree}} (\mbox{\hyperlink{struct_token_tree}{Token\+Tree}} \texorpdfstring{$\ast$}{*}tree)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{parser_8c_afdb68260a7cd06ebc6961b8ce8d78caf}\index{parser.c@{parser.c}!display\_span@{display\_span}}
+\index{display\_span@{display\_span}!parser.c@{parser.c}}
+\doxysubsubsection{\texorpdfstring{display\_span()}{display\_span()}}
+{\footnotesize\ttfamily \label{parser_8c_afdb68260a7cd06ebc6961b8ce8d78caf} 
+int display\+\_\+span (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_span}{Span}} \texorpdfstring{$\ast$}{*}}]{span}{, }\item[{\mbox{\hyperlink{parser_8h_a88f6d947bf467e369055535af5907aa1}{Error\+Level}}}]{level}{, }\item[{char \texorpdfstring{$\ast$}{*}}]{message}{}\end{DoxyParamCaption})}
+
+\Hypertarget{parser_8c_a488ed34756d1179fe98ff2ae90822ddc}\index{parser.c@{parser.c}!free\_token\_stream@{free\_token\_stream}}
+\index{free\_token\_stream@{free\_token\_stream}!parser.c@{parser.c}}
+\doxysubsubsection{\texorpdfstring{free\_token\_stream()}{free\_token\_stream()}}
+{\footnotesize\ttfamily \label{parser_8c_a488ed34756d1179fe98ff2ae90822ddc} 
+void free\+\_\+token\+\_\+stream (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_token_stream}{Token\+Stream}} \texorpdfstring{$\ast$}{*}}]{strm}{}\end{DoxyParamCaption})}
+
+Free a token stream \Hypertarget{parser_8c_af59f5da69db97d4998bc686db898b3e7}\index{parser.c@{parser.c}!free\_token\_tree@{free\_token\_tree}}
+\index{free\_token\_tree@{free\_token\_tree}!parser.c@{parser.c}}
+\doxysubsubsection{\texorpdfstring{free\_token\_tree()}{free\_token\_tree()}}
+{\footnotesize\ttfamily \label{parser_8c_af59f5da69db97d4998bc686db898b3e7} 
+void free\+\_\+token\+\_\+tree (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_token_tree}{Token\+Tree}} \texorpdfstring{$\ast$}{*}}]{tree}{}\end{DoxyParamCaption})}
+
+\Hypertarget{parser_8c_a5ee4beb36905da3ffda6adc67a557426}\index{parser.c@{parser.c}!next\_token@{next\_token}}
+\index{next\_token@{next\_token}!parser.c@{parser.c}}
+\doxysubsubsection{\texorpdfstring{next\_token()}{next\_token()}}
+{\footnotesize\ttfamily \label{parser_8c_a5ee4beb36905da3ffda6adc67a557426} 
+int next\+\_\+token (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_token_stream}{Token\+Stream}} \texorpdfstring{$\ast$}{*}}]{strm}{, }\item[{\mbox{\hyperlink{struct_token_tree}{Token\+Tree}} \texorpdfstring{$\ast$}{*}}]{next}{}\end{DoxyParamCaption})}
+
+Retrieve the next token from the specified \doxylink{struct_token_stream}{Token\+Stream}. 
+\begin{DoxyParams}{Parameters}
+{\em strm} & A pointer to the token stream to retrieve the next token from. \\
+\hline
+{\em next} & A pointer to the \doxylink{struct_token_tree}{Token\+Tree} to store the next token in. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 if there are more tokens to be read, 0 if there are no more tokens in this stream, and 2 if an error has occurred. 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\mbox{[}\doxylink{parser_8h_a6ddb7687e66b8ade8bea791307242499}{parse}\mbox{]} 
+
+\mbox{[}\doxylink{parser_8h_af59f5da69db97d4998bc686db898b3e7}{free\+\_\+token\+\_\+tree}\mbox{]} 
+
+\mbox{[}\doxylink{parser_8h_a488ed34756d1179fe98ff2ae90822ddc}{free\+\_\+token\+\_\+stream}\mbox{]} 
+\end{DoxySeeAlso}
+\Hypertarget{parser_8c_adc479d9be563a9804bb4d3f1a7290ca4}\index{parser.c@{parser.c}!parse@{parse}}
+\index{parse@{parse}!parser.c@{parser.c}}
+\doxysubsubsection{\texorpdfstring{parse()}{parse()}}
+{\footnotesize\ttfamily \label{parser_8c_adc479d9be563a9804bb4d3f1a7290ca4} 
+int parse (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{file\+\_\+name}{, }\item[{\mbox{\hyperlink{struct_token_stream}{Token\+Stream}} \texorpdfstring{$\ast$}{*}}]{strm}{}\end{DoxyParamCaption})}
+
+\Hypertarget{parser_8c_ab8940abef0e72a56f2aa13dc0d2cd4f2}\index{parser.c@{parser.c}!process\_doc@{process\_doc}}
+\index{process\_doc@{process\_doc}!parser.c@{parser.c}}
+\doxysubsubsection{\texorpdfstring{process\_doc()}{process\_doc()}}
+{\footnotesize\ttfamily \label{parser_8c_ab8940abef0e72a56f2aa13dc0d2cd4f2} 
+void process\+\_\+doc (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_token_stream}{Token\+Stream}} \texorpdfstring{$\ast$}{*}}]{strm}{, }\item[{\mbox{\hyperlink{struct_token_tree}{Token\+Tree}} \texorpdfstring{$\ast$}{*}}]{next}{}\end{DoxyParamCaption})}
+
+\Hypertarget{parser_8c_a559d29bbc04f3381ae910fefdf4d738e}\index{parser.c@{parser.c}!skip\_comments\_and\_white\_space@{skip\_comments\_and\_white\_space}}
+\index{skip\_comments\_and\_white\_space@{skip\_comments\_and\_white\_space}!parser.c@{parser.c}}
+\doxysubsubsection{\texorpdfstring{skip\_comments\_and\_white\_space()}{skip\_comments\_and\_white\_space()}}
+{\footnotesize\ttfamily \label{parser_8c_a559d29bbc04f3381ae910fefdf4d738e} 
+int skip\+\_\+comments\+\_\+and\+\_\+white\+\_\+space (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{struct_token_stream}{Token\+Stream}} \texorpdfstring{$\ast$}{*}}]{strm}{, }\item[{\mbox{\hyperlink{struct_token_tree}{Token\+Tree}} \texorpdfstring{$\ast$}{*}}]{next}{, }\item[{int}]{len}{}\end{DoxyParamCaption})}
+

@@ -1,10 +1,10 @@
 CC=gcc
-CC_FLAGS = 
+CC_FLAGS=-I..
 SOURCES := $(patsubst %.c,%.o,$(wildcard *.c))
-HEADERS := $(wildcard *.h)
+HEADERS := $(wildcard *.h) $(wildcard parser/*.h) $(wildcard util/*.h)
 
 %.o : %.c $(HEADERS)
-	$(CC) $(CCFLAGS) -c -o $@ $<
+	$(CC) $(CC_FLAGS) -c -o $@ $<
 all: $(OBJS)
 clean:
 	rm -rf *.o

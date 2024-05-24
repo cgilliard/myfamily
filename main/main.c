@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../parser/parser.h"
+#include <parser/parser.h>
 
 int process_token(TokenStream strm, TokenTree token) {
 	if(token.token_type == IdentType) {
@@ -49,6 +49,7 @@ int process_token(TokenStream strm, TokenTree token) {
 		int v;
                 while((v=next_token(token.group->strm, &grp_next))) {
 			if (v == 2) {
+				printf("1 error generated.\n");
                                 exit(-1);
                         }
 			process_token(*(token.group->strm), grp_next);
@@ -72,18 +73,19 @@ int process_token(TokenStream strm, TokenTree token) {
 int main(int argc, char **argv) {
 	if (argc < 2) {
 		printf("No input file specified!\n");
-		exit(1);
+		exit(-1);
 	} else {
 		TokenStream strm;
 		TokenTree next;
 		if(parse(argv[1], &strm)) {
 			printf("error parsing file!\n");
-			exit(1);
+			exit(-1);
 		}
 
 		int v;
 		while((v=next_token(&strm, &next))) {
 			if (v == 2) {
+				printf("1 error generated.\n");
 				exit(-1);
 			}
 			process_token(strm, next);
