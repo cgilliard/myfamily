@@ -19,7 +19,6 @@ test: $(SUBDIRS)
 		$(MAKE) -C $$dir test; \
 		if [ $$? -ne "0" ]; then \
 		ERROR="1"; \
-		echo "error!"; \
 		fi; \
 	done; \
 	if [ $$ERROR -ne "0" ]; then \
