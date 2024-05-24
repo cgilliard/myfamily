@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo $1;
+cp Makefile.in Makefile
+cp Makefile.config.in Makefile.config
+export include=$1;
+export lib=$2;
+perl -pi -e 's/REPLACE_CRITERION_INCLUDE/$ENV{include}/g' Makefile.config
+perl -pi -e 's/REPLACE_CRITERION_LIB/$ENV{lib}/g' Makefile.config
+

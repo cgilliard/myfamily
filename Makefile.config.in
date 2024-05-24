@@ -1,6 +1,8 @@
 CC=gcc
 CC_FLAGS=-I.. $(COVERAGE)
-CC_TEST_FLAGS=-lcriterion -L/Users/christophergilliard/homebrew/Cellar/criterion/2.4.2/lib -I/Users/christophergilliard/homebrew/Cellar/criterion/2.4.2/include -I.. $(COVERAGE)
+CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
+CRITERION_LIB=-LREPLACE_CRITERION_LIB
+CC_TEST_FLAGS=-lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB) -I.. $(COVERAGE)
 MAKE=make
 SUBDIRS := main parser util
 ALL_OBJS=main/*.o parser/*.o util/*.o
