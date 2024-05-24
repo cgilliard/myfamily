@@ -6,5 +6,6 @@ Test(test, parser) {
 	cr_assert_eq(hello1, 0);
 	TokenStream strm;
 	TokenTree next;
-	parse("./resources/test.fam", &strm);
+	int parsev = parse("./resources/test.fam", &strm);
+	cr_assert_eq(parsev, 0);
 }

@@ -1,17 +1,15 @@
-CC=gcc
-CC_FLAGS=
-MAKE=make
-SUBDIRS := main parser util
+include Makefile.config
+
 all: $(SUBDIRS)
-	$(CC) $(CC_FLAGS) -o bin/fam main/*.o parser/*.o util/*.o
+	$(CC) $(CC_FLAGS) -o bin/fam $(ALL_OBJS)
 clean:
 	rm -rf */*.o
 	rm -rf bin/*
-test: $(SUBDIRS)
-	make -C main test
-	make -C parser test
-	make -C util test
 $(SUBDIRS):
 	$(MAKE) -C $@
-
+test: $(SUBDIRS)
+	for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir test; \
+	done
 .PHONY: all $(SUBDIRS)
+.PHONY: test $(SUBDIRS)

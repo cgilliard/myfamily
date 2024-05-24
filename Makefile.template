@@ -1,8 +1,5 @@
-CC=gcc
-CC_FLAGS=-I..
-CC_TEST_FLAGS=-lcriterion -L/Users/christophergilliard/homebrew/Cellar/criterion/2.4.2/lib -I/Users/christophergilliard/homebrew/Cellar/criterion/2.4.2/include -I..
+include ../Makefile.config
 SOURCES := $(patsubst %.c,%.o,$(wildcard *.c))
-HEADERS := $(wildcard *.h) $(wildcard parser/*.h) $(wildcard util/*.h)
 
 %.o : %.c $(HEADERS)
 	$(CC) $(CC_FLAGS) -c -o $@ $<
