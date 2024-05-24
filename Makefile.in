@@ -26,5 +26,7 @@ test: $(SUBDIRS)
 	fi
 doc:
 	doxygen doxygen.cfg
+install:
+	cp bin/fam /usr/local/bin
 .PHONY: all $(SUBDIRS)
 .PHONY: test $(SUBDIRS)
