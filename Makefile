@@ -8,6 +8,9 @@ clean:
 	rm -rf */*.gcno
 	rm -rf */*.gcda
 	rm -rf */*.gcov
+	rm -rf *.gcno
+	rm -rf *.gcda
+	rm -rf *.gcov
 $(SUBDIRS):
 	$(MAKE) -C $@
 test: $(SUBDIRS)
