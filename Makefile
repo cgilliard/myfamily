@@ -24,5 +24,7 @@ test: $(SUBDIRS)
 	if [ $$ERROR -ne "0" ]; then \
 		$$? = 1; \
 	fi
+doc:
+	doxygen doxygen.cfg
 .PHONY: all $(SUBDIRS)
 .PHONY: test $(SUBDIRS)

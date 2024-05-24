@@ -74,7 +74,6 @@ Test(test, parser2) {
 	cr_assert_eq(value, 1);
 
 	free_token_tree(&group_token);
-
 	free_token_tree(&next);
 
 	value = next_token(&strm, &next);
