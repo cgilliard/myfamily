@@ -5,6 +5,9 @@ all: $(SUBDIRS)
 clean:
 	rm -rf */*.o
 	rm -rf bin/*
+	rm -rf */*.gcno
+	rm -rf */*.gcda
+	rm -rf */*.gcov
 $(SUBDIRS):
 	$(MAKE) -C $@
 test: $(SUBDIRS)

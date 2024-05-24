@@ -12,3 +12,7 @@ test: test.c
 	rm -rf bin
 clean:
 	rm -rf *.o
+	rm -rf bin
+	rm -rf *.gcov
+	rm -rf *.gcno
+	rm -rf *.gcda
