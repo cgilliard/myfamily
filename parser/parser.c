@@ -55,7 +55,7 @@ int parse(char *file_name, TokenStream *strm, int debug_flags) {
 	return 0;
 }
 
-int display_span(Span *span, ErrorLevel level, char *message) {
+void display_span(Span *span, ErrorLevel level, char *message) {
 	TokenStream *file_stream = span->strm;
         int start = span->offset;
         int end = span->offset;
@@ -105,8 +105,6 @@ int display_span(Span *span, ErrorLevel level, char *message) {
 	spacing_and_up_arrow[cur] = '^';
 	spacing_and_up_arrow[cur+1] = 0;
 	printf(ANSI_COLOR_GREEN "%s\n" ANSI_COLOR_RESET, spacing_and_up_arrow);
-
-	return 0;
 }
 
 void process_doc(TokenStream *strm, TokenTree *next) {

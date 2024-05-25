@@ -72,6 +72,8 @@ typedef enum Delimiter Delimiter;
 
 /**
  * The type of the token tree.
+ * @see [TokenTree]
+ * @see [TokenStream]
  */
 enum TokenTreeType {
 	IdentType = 0,
@@ -81,11 +83,21 @@ enum TokenTreeType {
 };
 typedef enum TokenTreeType TokenTreeType;
 
+/**
+ * A representation of a ident token.
+ * @see [TokenTree]
+ * @see [TokenStream]
+ */
 struct Ident {
 	char *value;
 };
 typedef struct Ident Ident;
 
+/**
+ * A representation of a group token.
+ * @see [TokenTree]
+ * @see [TokenStream]
+ */
 struct Group {
 	TokenStream *strm;
 	Delimiter delimiter;
@@ -94,6 +106,8 @@ typedef struct Group Group;
 
 /**
  * A representation of a punctuation token.
+ * @see [TokenTree]
+ * @see [TokenStream]
  */
 struct Punct {
 	char ch;
@@ -104,6 +118,8 @@ typedef struct Punct Punct;
 
 /**
  * A representation of a literal token.
+ * @see [TokenTree]
+ * @see [TokenStream]
  */
 struct Literal {
 	char *literal;
@@ -125,6 +141,18 @@ struct TokenTree {
 };
 typedef struct TokenTree TokenTree;
 
+/**
+ * Parse the specified file as a [TokenStream] represented by `strm`.
+ * @param file The file to parse.
+ * @param strm A pointer to the [TokenStream] to store the results in.
+ * @param debug_flags flags used in testing. These should always be set to 0
+ * in a non-testing environment.
+ * @return -1 if an error occurs, otherwise return 0. If an error occurs
+ * a message will be printed to stderr indicated what error occurred.
+ * @see [TokenStream]
+ * @see [next_token]
+ * @see [free_token_stream]
+ */
 int parse(char *file, TokenStream *strm, int debug_flags);
 
 /**
@@ -143,17 +171,25 @@ int next_token(TokenStream *strm, TokenTree *next);
 
 /**
  * Free a token stream releasing all of its allocated memory to the OS.
+ * @param strm the [TokenStream] to free.
+ * @see [TokenStream]
  */
 void free_token_stream(TokenStream *strm);
 
 /**
  * Free a token tree releasing all of its allocated memory to the OS.
+ * @param tree the [TokenTree] to free.
+ * @see [TokenTree]
  */
 void free_token_tree(TokenTree *tree);
 
 /**
  * Display the specified span with a message at the specified error level.
+ * @param span the span to display.
+ * @param level the [ErrorLevel] to display at.
+ * @param message the message to display with this span/error.
+ * @see [Span]
  */
-int display_span(Span *span, ErrorLevel level, char *message);
+void display_span(Span *span, ErrorLevel level, char *message);
 
 #endif // PARSER_H_
