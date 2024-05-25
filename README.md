@@ -1,6 +1,6 @@
 # myfamily
 
-My family is a compiler. More to come.
+My family is a work in progress. More to come.
 
 # Build
 
