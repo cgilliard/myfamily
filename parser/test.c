@@ -199,6 +199,193 @@ Test(test, parser_oom) {
 	cr_assert_eq(parsev, -1);
 }
 
+Test(test, parser_puncts) {
+TokenStream strm;
+        TokenTree next;
+
+        // parse a test file
+        int parsev = parse("./resources/test_punct.fam", &strm, 0);
+        cr_assert_eq(parsev, 0);
+	int value;
+
+        // =>
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '=');
+	cr_assert_eq(next.punct->second_ch, '>');
+        free_token_tree(&next);
+
+	// <=
+	value = next_token(&strm, &next);
+	cr_assert_eq(value, 1);
+	cr_assert_eq(next.token_type, PunctType);
+	cr_assert_eq(next.punct->ch, '<');
+	cr_assert_eq(next.punct->second_ch, '=');
+	free_token_tree(&next);
+
+	// &=
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '&');
+        cr_assert_eq(next.punct->second_ch, '=');
+        free_token_tree(&next);
+
+	// !=
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '!');
+        cr_assert_eq(next.punct->second_ch, '=');
+        free_token_tree(&next);
+
+	// *=
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '*');
+        cr_assert_eq(next.punct->second_ch, '=');
+        free_token_tree(&next);
+
+	// -=
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '-');
+        cr_assert_eq(next.punct->second_ch, '=');
+        free_token_tree(&next);
+
+	// +=
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '+');
+        cr_assert_eq(next.punct->second_ch, '=');
+        free_token_tree(&next);
+
+	// /=
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '/');
+        cr_assert_eq(next.punct->second_ch, '=');
+        free_token_tree(&next);
+
+	// %=
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '%');
+        cr_assert_eq(next.punct->second_ch, '=');
+        free_token_tree(&next);
+
+	// |=
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '|');
+        cr_assert_eq(next.punct->second_ch, '=');
+        free_token_tree(&next);
+
+	// ^=
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '^');
+        cr_assert_eq(next.punct->second_ch, '=');
+        free_token_tree(&next);
+
+	// <<=
+	value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '<');
+        cr_assert_eq(next.punct->second_ch, '<');
+	cr_assert_eq(next.punct->third_ch, '=');
+        free_token_tree(&next);
+
+	 // >>=
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '>');
+        cr_assert_eq(next.punct->second_ch, '>');
+        cr_assert_eq(next.punct->third_ch, '=');
+        free_token_tree(&next);
+
+	// ...
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '.');
+        cr_assert_eq(next.punct->second_ch, '.');
+        cr_assert_eq(next.punct->third_ch, '.');
+        free_token_tree(&next);
+
+	// ( unclosed
+	value = next_token(&strm, &next);
+	// this returns 2 indicating err
+        cr_assert_eq(value, 2);
+
+	free_token_stream(&strm);
+
+}
+
+Test(test, test_unexpected_close_bracket) {
+	TokenStream strm;
+        TokenTree next;
+
+        // parse a test file
+        int parsev = parse("./resources/test_unexpected_close_bracket.fam", &strm, 0);
+        cr_assert_eq(parsev, 0);
+
+	int value;
+
+	value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, IdentType);
+        cr_assert_eq(strcmp(next.ident->value, "abc"), 0);
+        free_token_tree(&next);
+
+	value = next_token(&strm, &next);
+	// unexpected close bracket err
+        cr_assert_eq(value, 2);
+
+	free_token_stream(&strm);
+}
+
+Test(test, test_inner_lit) {
+	TokenStream strm;
+        TokenTree next;
+	TokenTree group_token;
+	TokenTree group2_token;
+
+        // parse a test file
+        int parsev = parse("./resources/test_inner_lit.fam", &strm, 0);
+        cr_assert_eq(parsev, 0);
+
+        int value;
+
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, GroupType);
+        cr_assert_eq(next.group->delimiter, Parenthesis);
+
+	value = next_token(next.group->strm, &group_token);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(group_token.token_type, GroupType);
+
+	value = next_token(group_token.group->strm, &group2_token);
+	cr_assert_eq(value, 1);
+	cr_assert_eq(group2_token.token_type, LiteralType);
+
+	free_token_tree(&group_token);
+        free_token_tree(&next);
+
+        free_token_stream(&strm);
+}
+
 Test(test, parser_other_groups) {
 	TokenStream strm;
         TokenTree next;
@@ -265,3 +452,4 @@ Test(test, parser_other_groups) {
 
 	free_token_stream(&strm);
 }
+
