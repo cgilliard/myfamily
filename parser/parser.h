@@ -15,7 +15,12 @@
 #ifndef PARSER_H_
 #define PARSER_H_
 
-// TokenStream - a representation of a stream of tokens
+/**
+ * Structure that represents a stream of tokens.
+ * @see [next_token]
+ * @see [free_token_stream]
+ * @see [parse]
+ */
 struct TokenStream {
 	char *bytes;
 	int len;
@@ -29,7 +34,9 @@ struct TokenStream {
 };
 typedef struct TokenStream TokenStream;
 
-// Span - A region of source code, along with information needed to display an error.
+/**
+ * A region of source code, along with information needed to display an error.
+ */
 struct Span {
         TokenStream *strm;
 	int offset;
@@ -37,14 +44,24 @@ struct Span {
 };
 typedef struct Span Span;
 
-// Error Level for displaying a Span
+/**
+ * Error Level for displaying a Span/Error message.
+ */
 enum ErrorLevel {
 	Error = 0,
 	Warning = 1,
 };
 typedef enum ErrorLevel ErrorLevel;
 
-// Delimiters for a group
+/**
+ * Delimiters for a group.
+ * Option | Opening | Closing | Value
+ * -------|---------|---------|------
+ *  Parenthesis | '(' | ')' | 0
+ *  Brace | '{' | '}' | 1
+ *  Bracket | '[' | ']' | 2
+ *  None (Not currently used) | - | - | 3
+ */
 enum Delimiter {
 	Parenthesis = 0,
 	Brace = 1,
@@ -53,7 +70,9 @@ enum Delimiter {
 };
 typedef enum Delimiter Delimiter;
 
-// TokenTree - type of token tree
+/**
+ * The type of the token tree.
+ */
 enum TokenTreeType {
 	IdentType = 0,
 	GroupType = 1,
@@ -73,6 +92,9 @@ struct Group {
 };
 typedef struct Group Group;
 
+/**
+ * A representation of a punctuation token.
+ */
 struct Punct {
 	char ch;
 	char second_ch;
@@ -80,12 +102,19 @@ struct Punct {
 };
 typedef struct Punct Punct;
 
+/**
+ * A representation of a literal token.
+ */
 struct Literal {
 	char *literal;
 };
 typedef struct Literal Literal;
 
-// TokenTree - a tree structure representation of a token
+/**
+ * Structure that represents a token tree.
+ * @see [next_token]
+ * @see [free_token_tree]
+ */
 struct TokenTree {
 	TokenTreeType token_type;
 	Ident *ident;
@@ -113,10 +142,18 @@ int parse(char *file, TokenStream *strm, int debug_flags);
 int next_token(TokenStream *strm, TokenTree *next);
 
 /**
- * Free a token stream
+ * Free a token stream releasing all of its allocated memory to the OS.
  */
 void free_token_stream(TokenStream *strm);
+
+/**
+ * Free a token tree releasing all of its allocated memory to the OS.
+ */
 void free_token_tree(TokenTree *tree);
+
+/**
+ * Display the specified span with a message at the specified error level.
+ */
 int display_span(Span *span, ErrorLevel level, char *message);
 
 #endif // PARSER_H_
