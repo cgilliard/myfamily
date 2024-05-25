@@ -32,24 +32,21 @@ int parse(char *file_name, TokenStream *strm) {
        	file_size = ftell(file); // find size of file by checking end
        	rewind(file); // back to the beginning for reading
     	char buffer[16]; // We will read the file 16 bytes at a time
-    	strm->bytes = malloc(file_size + 1);
-	if (strm->bytes == NULL) {
+    	strm->bytes = malloc(file_size);
+	if(strm->bytes == NULL) {
 		fputs("Could not allocate enough memory", stderr);
 		fclose(file);
 		return -1;
     	}
 
-    	while (fgets(buffer, 16, file) != NULL) {
-        	strncat(strm->bytes, buffer, 16);
-    	}
-
+	int ret = fread(strm->bytes, file_size, 1, file);
+	strm->len = file_size;
 	fclose(file);
 	strm->pos = 0;
 	strm->line_num = 1;
 	strm->start_doc = -1;
 	strm->end_doc = -1;
-	strm->len = file_size;
-	strm->file_path = malloc(sizeof(char)*(strlen(file_name) + 1));
+	strm->file_path = malloc(sizeof(char)*(strlen(file_name)+1));
 	strcpy(strm->file_path, file_name);
 	strm->parent = NULL;
 	strm->pos_offset = 0;
