@@ -170,12 +170,9 @@ int skip_comments_and_white_space(TokenStream *strm, TokenTree *next, int len) {
                                         if(strm->start_doc > 0) {
                                                 strm->end_doc += 1;
                                         }
-                                        if(strm->bytes[strm->pos] == '\n'){
-                                                strm->line_num += 1;
-                                        }
                                         strm->pos += 1;
                                 }
-			if(strm->start_doc > 0) {
+				if(strm->start_doc > 0) {
                                         next->token_type = PunctType;
                                         next->punct = malloc(sizeof(Punct));
                                         next->punct->ch = '#';
@@ -192,9 +189,6 @@ int skip_comments_and_white_space(TokenStream *strm, TokenTree *next, int len) {
                                                 strm->line_num += 1;
                                         }
                                         strm->pos += 1;
-                                }
-                                if(strm->bytes[strm->pos] == '\n'){
-                                        strm->line_num += 1;
                                 }
                                 strm->pos += 1;
                         }
