@@ -1,9 +1,9 @@
 steps:
   - script: |
-    make clean test
+      make clean test
     displayName: macOS Test
     condition: eq( variables['Agent.OS'], 'Darwin' )
   - script: |
-    make clean test
+      make clean test
     displayName: Linux Test
     condition: eq( variables['Agent.OS'], 'Linux' )
