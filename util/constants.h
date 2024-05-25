@@ -19,3 +19,5 @@
 #define ANSI_COLOR_ERROR_BG "\x1b[41m"
 #define ANSI_COLOR_WARNING_BG "\x1b[43m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
+
+#define DEBUG_FLAG_OOM 0x1

@@ -96,7 +96,7 @@ struct TokenTree {
 };
 typedef struct TokenTree TokenTree;
 
-int parse(char *file, TokenStream *strm);
+int parse(char *file, TokenStream *strm, int debug_flags);
 
 /**
  * Retrieve the next token from the specified TokenStream.

@@ -21,7 +21,7 @@
 #include <util/constants.h>
 #include <util/misc.h>
 
-int parse(char *file_name, TokenStream *strm) {
+int parse(char *file_name, TokenStream *strm, int debug_flags) {
 	FILE *file = fopen(file_name, "r");
 	if (file == NULL) {
 		fputs("File not found", stderr);
@@ -33,7 +33,8 @@ int parse(char *file_name, TokenStream *strm) {
        	rewind(file); // back to the beginning for reading
     	char buffer[16]; // We will read the file 16 bytes at a time
     	strm->bytes = malloc(file_size);
-	if(strm->bytes == NULL) {
+
+	if(strm->bytes == NULL || (debug_flags & DEBUG_FLAG_OOM) != 0) {
 		fputs("Could not allocate enough memory", stderr);
 		fclose(file);
 		return -1;

@@ -64,8 +64,6 @@ int process_token(TokenStream strm, TokenTree token) {
                         printf("end group delimiter = Bracket\n");
                 else if(token.group->delimiter == Brace)
                         printf("end group delimiter = Brace\n");
-
-		//display_span(&token.span, Warning, "warning about this group");
 	}
 	return 0;
 }
@@ -77,7 +75,7 @@ int main(int argc, char **argv) {
 	} else {
 		TokenStream strm;
 		TokenTree next;
-		if(parse(argv[1], &strm)) {
+		if(parse(argv[1], &strm, 0)) {
 			printf("error parsing file!\n");
 			exit(-1);
 		}

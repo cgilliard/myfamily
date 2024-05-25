@@ -1,12 +1,13 @@
 #include <criterion/criterion.h>
 #include <parser/parser.h>
+#include <util/constants.h>
 
 Test(test, parser) {
 	TokenStream strm;
 	TokenTree next;
 
 	// parse a test file
-	int parsev = parse("./resources/test.fam", &strm);
+	int parsev = parse("./resources/test.fam", &strm, 0);
 	cr_assert_eq(parsev, 0);
 
 	// x - ident
@@ -28,7 +29,7 @@ Test(test, parser) {
 	value = next_token(&strm, &next);
         cr_assert_eq(value, 1);
         cr_assert_eq(next.token_type, LiteralType);
-        cr_assert_eq(strcmp(next.literal->literal, "0"), 0);
+        cr_assert_eq(strcmp(next.literal->literal, "120"), 0);
 	free_token_tree(&next);
 
 	// semicolon
@@ -56,7 +57,7 @@ Test(test, parser2) {
         TokenTree next;
 
         // parse a test file
-        int parsev = parse("./resources/test2.fam", &strm);
+        int parsev = parse("./resources/test2.fam", &strm, 0);
 	cr_assert_eq(parsev, 0);
 
 	// MyObject - ident
@@ -93,7 +94,7 @@ Test(test, parser_file_not_found) {
 	TokenStream strm;
 
         // parse a test file
-        int parsev = parse("./resources/testx.fam", &strm);
+        int parsev = parse("./resources/testx.fam", &strm, DEBUG_FLAG_OOM);
         cr_assert_eq(parsev, -1);
 }
 
@@ -102,7 +103,7 @@ Test(test, parser_doc) {
 	TokenTree next;
 
 	// parse a test file
-        int parsev = parse("./resources/test_doc.fam", &strm);
+        int parsev = parse("./resources/test_doc.fam", &strm, 0);
 	cr_assert_eq(parsev, 0);
 
 	// # - punct (like rust /// is turned into #[doc=""])
@@ -147,12 +148,63 @@ Test(test, parser_doc) {
 	free_token_stream(&strm);
 }
 
+Test(test, parser_single_quote) {
+	TokenStream strm;
+        TokenTree next;
+
+        // parse a test file
+        int parsev = parse("./resources/test_single_quote_str.fam", &strm, 0);
+        cr_assert_eq(parsev, 0);
+
+	// x - ident
+        int value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, IdentType);
+        cr_assert_eq(strcmp(next.ident->value, "x"), 0);
+        display_span(&next.span, Warning, "test123");
+        free_token_tree(&next);
+
+	// = - punct
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, '=');
+        free_token_tree(&next);
+
+	// = - literal
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, LiteralType);
+        cr_assert_eq(strcmp(next.literal->literal, "\'abcd\'"), 0);
+        free_token_tree(&next);
+
+	// = - punct
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 1);
+        cr_assert_eq(next.token_type, PunctType);
+        cr_assert_eq(next.punct->ch, ';');
+        free_token_tree(&next);
+
+	// end of the token stream
+        value = next_token(&strm, &next);
+        cr_assert_eq(value, 0);
+        free_token_tree(&next);
+
+	free_token_stream(&strm);
+}
+
+Test(test, parser_oom) {
+	TokenStream strm;
+	int parsev = parse("./resources/test_other_groups.fam", &strm, DEBUG_FLAG_OOM);
+	cr_assert_eq(parsev, -1);
+}
+
 Test(test, parser_other_groups) {
 	TokenStream strm;
         TokenTree next;
         
         // parse a test file
-        int parsev = parse("./resources/test_other_groups.fam", &strm);
+        int parsev = parse("./resources/test_other_groups.fam", &strm, 0);
         cr_assert_eq(parsev, 0); 
 
 	// x - ident
