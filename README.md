@@ -46,3 +46,37 @@ This might look something like this:
 # sudo make install
 ```
 
+# Documentation
+
+To build the documentation run the following command:
+
+```
+# make doc
+```
+
+Documentation will be placed in the /doc directory.
+
+# Tests
+
+To run the tests, use the following command:
+
+```
+# make test
+```
+
+# Code coverage
+
+For code coverage, run the following command:
+
+```
+./coverage.sh
+```
+
+To view coverage of a specific file cd into it's directory and run the gcov command. For example, for parser.c:
+
+```
+# cd parser
+# gcov parser.c
+```
+
+The result will be stored in the parser.c.gcov file.
