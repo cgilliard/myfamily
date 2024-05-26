@@ -24,7 +24,7 @@
 int parse(char *file_name, TokenStream *strm, int debug_flags) {
 	FILE *file = fopen(file_name, "r");
 	if (file == NULL) {
-		fputs("File not found", stderr);
+		fputs("File not found\n", stderr);
 		return -1;
 	}
     	long long file_size = 0; // File size to zero before byte check
@@ -35,7 +35,7 @@ int parse(char *file_name, TokenStream *strm, int debug_flags) {
     	strm->bytes = malloc(file_size);
 
 	if(strm->bytes == NULL || (debug_flags & DEBUG_FLAG_OOM) != 0) {
-		fputs("Could not allocate enough memory", stderr);
+		fputs("Could not allocate enough memory\n", stderr);
 		fclose(file);
 		return -1;
     	}
@@ -289,6 +289,9 @@ int process_punct(TokenStream *strm, TokenTree *next, int len, int ret) {
 			next->punct->second_ch = cur;
 			strm->pos += 1;
 		} else if(next->punct->ch == '=' && (cur == '>' || cur == '=')) {
+			next->punct->second_ch = cur;
+			strm->pos += 1;
+		} else if(next->punct->ch == ':' && cur == ':') {
 			next->punct->second_ch = cur;
 			strm->pos += 1;
 		} else if(next->punct->ch == '<' && (cur == '<' || cur == '=')) {

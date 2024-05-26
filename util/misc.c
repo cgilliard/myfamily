@@ -41,7 +41,7 @@ int is_ident_secondary(char ch) {
 int is_joint_possible(char ch) {
         if (ch == '.' || ch == '=' || ch == '/' || ch == '+' || ch == '&' || ch == '<' ||
                 ch == '-' || ch == '%' || ch == '^' || ch == '*' || ch == '>' || ch == '|' ||
-		ch == '!') {
+		ch == '!' || ch == ':') {
                 return TRUE;
         } else {
                 return FALSE;

@@ -12,13 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define TRUE 1
-#define FALSE 0
+#include <parser/parser.h>
 
-#define ANSI_COLOR_GREEN   "\x1b[32m"
-#define ANSI_COLOR_ERROR_BG "\x1b[41m"
-#define ANSI_COLOR_WARNING_BG "\x1b[43m"
-#define ANSI_COLOR_RESET   "\x1b[0m"
+struct Class {
+	char *name;
+	char *impl_name;
+};
+typedef struct Class Class;
 
-#define DEBUG_FLAG_OOM          0x1
-#define DEBUG_FLAG_PRINT_TOKENS 0x1 << 1
+enum State {
+	StateExpectClassName = 1,
+	StateAfterClassName = 2,
+	StateExpectReturnTypeOrAttribute= 3,
+	StateExpectAttributeBracket = 4,
+	StateExpectClassBrace = 5,
+	StateInAttribute = 6,
+	StateExpectImplName = 7,
+};
+typedef enum State State;
+
+struct StateMachine {
+	State state;
+	TokenStream strm;
+	Class *class_array;
+	int class_count;
+	int in_class;
+};
+typedef struct StateMachine StateMachine;
+
+int build_state(char *file, StateMachine *sm, int debug_flags);
+

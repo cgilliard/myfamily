@@ -1,0 +1,45 @@
+Animal {
+	// ok test
+	void speak(&s);
+	/// doc test
+	u32 fn2(&me, u32 x) {
+		/* some comments
+		 * here
+		 */
+		
+		10
+	}
+}
+
+#[derive(Something)]
+Cat {
+	#[something("ok", "ok")]
+	Cat new() {
+		Cat {}
+	}
+}
+
+Cat::Animal {
+	void speak(&s) {
+		// cat speak
+	}
+}
+
+Dog {
+	Dog new() {
+		Dog {}
+	}
+}
+
+Dog::Animal {
+	void speak(&s) {
+		// dog speak
+	}
+}
+
+Main {
+	i32 main(char [][] argv) {
+		Dog dog = Dog::new();
+		dog.speak();
+	}
+}
