@@ -14,9 +14,18 @@
 
 #include <parser/parser.h>
 
+struct Fn {
+	char *name;
+	int is_implemented;
+	char *ret_type;
+};
+typedef struct Fn Fn;
+
 struct Class {
 	char *name;
 	char *impl_name;
+	Fn *fn_array;
+	int fn_count;
 };
 typedef struct Class Class;
 
@@ -28,6 +37,9 @@ enum State {
 	StateExpectClassBrace = 5,
 	StateInAttribute = 6,
 	StateExpectImplName = 7,
+	StateExpectFnName = 8,
+	StateExpectParameterList = 9,
+	StateExpectFnBlockOrSemi = 10,
 };
 typedef enum State State;
 
@@ -36,7 +48,8 @@ struct StateMachine {
 	TokenStream strm;
 	Class *class_array;
 	int class_count;
-	int in_class;
+	int scope;
+	int in_param_list;
 };
 typedef struct StateMachine StateMachine;
 

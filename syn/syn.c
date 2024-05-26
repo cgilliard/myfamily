@@ -23,10 +23,12 @@ int process_syn_ident(StateMachine *sm, Ident *ident, int debug_flags) {
 	if(sm->state == StateExpectClassName) {
 		if(sm->class_count == 0) {
 			sm->class_array = malloc(sizeof(Class));
+			sm->class_array[sm->class_count].fn_count = 0;
 			sm->class_count += 1;
 		} else {
 			sm->class_count += 1;
 			sm->class_array = realloc(sm->class_array, sm->class_count * sizeof(Class));
+			sm->class_array[sm->class_count-1].fn_count = 0;
 		}	
 		if(sm->class_array == NULL) {
                         fputs("Error: could not allocate memory in process_syn_ident\n", stderr);
@@ -39,10 +41,48 @@ int process_syn_ident(StateMachine *sm, Ident *ident, int debug_flags) {
 		strcpy(sm->class_array[sm->class_count-1].name, ident->value);
 		sm->state = StateAfterClassName;
 	} else if(sm->state == StateExpectImplName) {
-		printf("ident->value='%s'", ident->value);
+		printf("ident->value='%s'\n", ident->value);
 		sm->class_array[sm->class_count-1].impl_name = malloc(sizeof(char) * (strlen(ident->value)+ 1));
 		strcpy(sm->class_array[sm->class_count-1].impl_name, ident->value);
 		sm->state = StateExpectClassBrace;
+	} else if(sm->state == StateExpectReturnTypeOrAttribute) {
+		printf("got a return type: %s\n", ident->value);
+		sm->state = StateExpectFnName;
+
+/*
+if(sm->class_count == 0) {
+                        sm->class_array = malloc(sizeof(Class));
+                        sm->class_array[sm->class_count].fn_count = 0;
+                        sm->class_count += 1;
+                } else {
+                        sm->class_count += 1;
+                        sm->class_array = realloc(sm->class_array, sm->class_count * sizeof(Class));
+                        sm->class_array[sm->class_count-1].fn_count = 0;
+                }  
+
+ *
+ */
+		if(sm->class_array[sm->class_count-1].fn_count == 0) {
+			sm->class_array[sm->class_count-1].fn_array = malloc(sizeof(Fn));
+			sm->class_array[sm->class_count-1].fn_count += 1;
+		} else {
+			sm->class_array[sm->class_count-1].fn_count += 1;
+			sm->class_array[sm->class_count-1].fn_array = realloc(
+				sm->class_array[sm->class_count-1].fn_array,
+				sm->class_array[sm->class_count-1].fn_count * sizeof(Fn)
+			);
+		}
+		int cur = (sm->class_array[sm->class_count-1].fn_count) - 1;
+		printf("cur fn = %i\n", cur);
+		sm->class_array[sm->class_count-1].fn_array[cur].name = malloc(sizeof(char) * (strlen(ident->value) + 1));
+		strcpy(sm->class_array[sm->class_count-1].fn_array[cur].name, ident->value);
+	} else if(sm->state == StateExpectFnName) {
+		printf("got a fn name: %s\n", ident->value);
+		int cur = (sm->class_array[sm->class_count-1].fn_count) - 1;
+		sm->class_array[sm->class_count-1].fn_array[cur].ret_type = malloc(sizeof(char) * (strlen(ident->value) + 1));
+                strcpy(sm->class_array[sm->class_count-1].fn_array[cur].ret_type, ident->value);
+		sm->class_array[sm->class_count-1].fn_array[cur].is_implemented = 1;
+		sm->state = StateExpectParameterList;
 	} else {
 		
 	}
@@ -70,6 +110,12 @@ int process_syn_punct(StateMachine *sm, Punct *punct, int debug_flags) {
                         sm->state = StateExpectAttributeBracket;
                 } else {
                 }
+	} else if(sm->state == StateExpectFnBlockOrSemi) {
+		if(punct->ch == ';' && sm->scope == 1) {
+			sm->state = StateExpectReturnTypeOrAttribute;
+			int cur = (sm->class_array[sm->class_count-1].fn_count) - 1;
+			sm->class_array[sm->class_count-1].fn_array[cur].is_implemented = 0;
+		}
 	}
 	return 0;
 }
@@ -79,10 +125,12 @@ int process_syn_literal(StateMachine *sm, Literal *literal, int debug_flags) {
 }
 
 int process_syn_begin_group(StateMachine *sm, Delimiter delimiter, int debug_flags) {
+	if(delimiter == Brace) {
+		sm->scope += 1;
+	}
 	if(sm->state == StateAfterClassName || sm->state == StateExpectClassBrace) {
 		if(delimiter == Brace) {
 			sm->state = StateExpectReturnTypeOrAttribute;
-			sm->in_class = TRUE;
 		} else {
 		}
 	} else if(sm->state == StateExpectAttributeBracket) {
@@ -90,6 +138,9 @@ int process_syn_begin_group(StateMachine *sm, Delimiter delimiter, int debug_fla
 			sm->state = StateInAttribute;
 		} else {
 		}
+	} else if(sm->state == StateExpectParameterList) {
+		sm->in_param_list = TRUE;
+
 	} else {
 	}
 	return 0;
@@ -98,10 +149,27 @@ int process_syn_begin_group(StateMachine *sm, Delimiter delimiter, int debug_fla
 int process_syn_end_group(StateMachine *sm, Delimiter delimiter, int debug_flags) {
 	if(delimiter == Brace) {
 		sm->state = StateExpectClassName;
-		sm->in_class = FALSE;
+		sm->scope -= 1;
+		printf("end scope. Scope is now %i\n", sm->scope);
+		if(sm->scope < 0) {
+			// err
+		} else if(sm->scope == 1) {
+			sm->state = StateExpectReturnTypeOrAttribute;
+		}
 	} else if(delimiter == Bracket) {
-		if(!sm->in_class) {
+		printf("got end bracket scope = %i, in_param_list = %i\n", sm->scope, sm->in_param_list);
+		if(sm->scope == 0) {
 			sm->state = StateExpectClassName;
+		} else if(sm->scope == 1 && !sm->in_param_list) {
+			printf("expect ret or attr\n");
+			sm->state = StateExpectReturnTypeOrAttribute;
+		}
+	} else if(delimiter == Parenthesis) {
+		if(sm->scope == 1) {
+                	sm->in_param_list = FALSE;
+                }
+		if(sm->state == StateExpectParameterList) {
+			sm->state = StateExpectFnBlockOrSemi;
 		}
 	}
 	return 0;
@@ -170,7 +238,9 @@ int build_state(char *file, StateMachine *sm, int debug_flags) {
 	sm->state = StateExpectClassName;
 	sm->class_array = NULL;
 	sm->class_count = 0;
-	sm->in_class = FALSE;
+	sm->scope = 0;
+	sm->in_param_list = FALSE;
+
 	if(parse(file, &sm->strm, debug_flags) != 0) {
 		fputs("Error parsing file\n", stderr);
 		return -1;
