@@ -2,6 +2,8 @@
 
 My family is a work in progress. More to come.
 
+[![Build Status](https://dev.azure.com/mwc-project/bitcoinmw/_apis/build/status/cgilliard.myfamily?branchName=main)](https://dev.azure.com/mwc-project/bitcoinmw/_build?definitionId=14)
+
 # Build
 
 1.) Prereqs
