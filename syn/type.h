@@ -33,7 +33,7 @@ typedef struct ArrayTypeInfo ArrayTypeInfo;
 
 struct TupleTypeInfo {
 	int len;
-	Type **type;
+	Type *type;
 };
 typedef struct TupleTypeInfo TupleTypeInfo;
 
@@ -52,7 +52,24 @@ struct Type {
 	SliceTypeInfo *slice_type_info;
 };
 
-int init_type(Type *type, char *name, int is_ref, int is_mut);
+int init_type(
+        Type *type,
+        char *name,
+        int is_ref,
+        int is_mut,
+        ArrayTypeInfo *array_type_info,
+        TupleTypeInfo *tuple_type_info,
+        SliceTypeInfo *slice_type_info
+);
 void free_type(Type *type);
+
+int init_array_type_info(ArrayTypeInfo *arr_type, Type *type, int len);
+void free_array_type_info(ArrayTypeInfo *arr_type);
+
+int init_slice_type_info(SliceTypeInfo *slice_type, Type *type);
+void free_slice_type_info(SliceTypeInfo *slice_type);
+
+int init_tuple_type_info(TupleTypeInfo *tuple_type, Type *type, int len);
+void free_tuple_type_info(TupleTypeInfo *tuple_type);
 
 #endif /* SYN_TYPES */
