@@ -49,19 +49,6 @@ int process_syn_ident(StateMachine *sm, Ident *ident, int debug_flags) {
 		printf("got a return type: %s\n", ident->value);
 		sm->state = StateExpectFnName;
 
-/*
-if(sm->class_count == 0) {
-                        sm->class_array = malloc(sizeof(Class));
-                        sm->class_array[sm->class_count].fn_count = 0;
-                        sm->class_count += 1;
-                } else {
-                        sm->class_count += 1;
-                        sm->class_array = realloc(sm->class_array, sm->class_count * sizeof(Class));
-                        sm->class_array[sm->class_count-1].fn_count = 0;
-                }  
-
- *
- */
 		if(sm->class_array[sm->class_count-1].fn_count == 0) {
 			sm->class_array[sm->class_count-1].fn_array = malloc(sizeof(Fn));
 			sm->class_array[sm->class_count-1].fn_count += 1;

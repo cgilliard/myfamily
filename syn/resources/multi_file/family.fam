@@ -1,0 +1,5 @@
+Main {
+	i32 main(char [][] argv) {
+		0
+	}
+}

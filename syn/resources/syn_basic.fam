@@ -43,3 +43,8 @@ Main {
 		dog.speak();
 	}
 }
+
+// return type can be a type as above, a tuple (i32, u32) for example or an array char[][] or Dog[] for example.
+// Also a reference is possible &Dog for instance. Also muts &mut Cat, etc.
+// Parameter list: (&self, &mut Dog mydog, Cat mycat, char[][] char_array)
+

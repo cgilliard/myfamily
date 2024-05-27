@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef SYN_SYN_H_
+#define SYN_SYN_H_
+
 #include <parser/parser.h>
 
 struct Fn {
@@ -55,3 +58,4 @@ typedef struct StateMachine StateMachine;
 
 int build_state(char *file, StateMachine *sm, int debug_flags);
 
+#endif /* SYN_SYN_H */
