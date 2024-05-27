@@ -5,5 +5,5 @@
 **/*.gcda
 /bin/*
 /doc/*
-Makefile
-Makefile.config
+/Makefile
+/Makefile.config
