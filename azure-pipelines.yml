@@ -43,7 +43,7 @@ jobs:
   steps:
     - script: |
         uname -a
-        apt-get install libcriterion-dev
+        sudo apt-get install libcriterion-dev
       displayName: Linux Test Dependencies
     - template: '.ci/all.yml'
 - job: macos
