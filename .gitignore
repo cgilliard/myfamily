@@ -4,5 +4,6 @@
 **/*.gcno
 **/*.gcda
 /bin/*
+/doc/*
 /Makefile
 /Makefile.config
