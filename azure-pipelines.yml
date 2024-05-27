@@ -43,7 +43,8 @@ jobs:
   steps:
     - script: |
         uname -a
-      displayName: Linux print out version
+        apt-get install libcriterion-dev
+      displayName: Linux Test Dependencies
     - template: '.ci/all.yml'
 - job: macos
   pool:
@@ -56,5 +57,6 @@ jobs:
   steps:
     - script: |
         sw_vers
-      displayName: macOS print out os version
+        brew install criterion
+      displayName: MacOS Test Dependencies
     - template: '.ci/all.yml'
