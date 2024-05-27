@@ -83,4 +83,4 @@ To view coverage of a specific file cd into it's directory and run the gcov comm
 # gcov parser.c
 ```
 
-The result will be stored in the parser.c.gcov file.
+The result will be stored in the parser.c.gcov file. Additional code coverage reporting will be available shortly.
