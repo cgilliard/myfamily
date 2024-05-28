@@ -12,4 +12,4 @@ steps:
   - script: |
       ./scripts/build_docs.sh
     displayName: Documentation
-    condition: and(succeeded(), eq( variables['Agent.OS'], 'Linux' ))
+    condition: and(succeeded(), in(variables['Build.Reason'], 'Manual', 'Scheduled'))
