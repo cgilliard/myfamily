@@ -335,6 +335,12 @@ int next_token(TokenStream *strm, TokenTree *next) {
 	int itt = 0;
 	int ret;
 
+	// set each variant to NULL so we don't free random data later
+	next->ident = NULL;
+	next->group = NULL;
+	next->punct = NULL;
+	next->literal = NULL;
+
 	if(strm->start_doc > 0) {
 		process_doc(strm, next);
 		return 1;
@@ -493,6 +499,7 @@ void free_token_tree(TokenTree *tree) {
 		free(tree->literal->literal);
 		free(tree->literal);
 	} else if(tree->token_type == GroupType) {
+		free_token_stream(tree->group->strm);
 		free(tree->group->strm);
 		free(tree->group);
 	}
