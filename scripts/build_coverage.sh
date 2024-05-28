@@ -70,3 +70,7 @@ perl -pi -e 's/REPLACECOVERAGE_SINGLE/$ENV{codecov}/g' docs/code_coverage.html
 perl -pi -e 's/REPLACECOVERAGE/$ENV{coverage}/g' docs/code_coverage.html
 perl -pi -e 's/REPLACETIMESTAMP/$ENV{timestampsv}/g' docs/code_coverage.html
 perl -pi -e 's/REPLACESUMMARY/$ENV{summary}/g' docs/code_coverage.html
+
+# update README
+cp README.md.template README.md
+perl -pi -e 's/CODE_COVERAGE/$ENV{codecov}/g' README.md
