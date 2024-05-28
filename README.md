@@ -79,7 +79,7 @@ To run the tests, use the following command:
 For code coverage, run the following command:
 
 ```
-./coverage.sh
+./scripts/coverage.sh
 ```
 
 To view coverage of a specific file cd into it's directory and run the gcov command. For example, for parser.c:

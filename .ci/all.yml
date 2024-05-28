@@ -5,7 +5,11 @@ steps:
     displayName: macOS Test
     condition: eq( variables['Agent.OS'], 'Darwin' )
   - script: |
-     ./configure
+      ./configure
       make clean test
     displayName: Linux Test
     condition: eq( variables['Agent.OS'], 'Linux' )
+  - script: |
+      ./scripts/build_docs.sh
+    displayName: Documentation
+    condition: and(succeeded(), eq( variables['Agent.OS'], 'Linux' ))
