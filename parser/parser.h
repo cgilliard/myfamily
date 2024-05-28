@@ -16,7 +16,7 @@
 #define PARSER_H_
 
 /**
- * Structure that represents a stream of tokens.
+ * Data structure that represents a stream of tokens.
  * @see [next_token]
  * @see [free_token_stream]
  * @see [parse]
