@@ -79,6 +79,14 @@ $(function() {
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:af6880a5416804600e5cf3182b1c51292"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8c.html#af6880a5416804600e5cf3182b1c51292">copy_type</a> (<a class="el" href="structType.html">Type</a> *dst, <a class="el" href="structType.html">Type</a> *src)</td></tr>
+<tr class="separator:af6880a5416804600e5cf3182b1c51292"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8a2435dea2b3754ba2801e8dc842be2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8c.html#ad8a2435dea2b3754ba2801e8dc842be2">copy_array_type_info</a> (<a class="el" href="structArrayTypeInfo.html">ArrayTypeInfo</a> *dst, <a class="el" href="structArrayTypeInfo.html">ArrayTypeInfo</a> *src)</td></tr>
+<tr class="separator:ad8a2435dea2b3754ba2801e8dc842be2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb7208764a6fa2ec3a64678f1c0c3e4e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8c.html#acb7208764a6fa2ec3a64678f1c0c3e4e">copy_tuple_type_info</a> (<a class="el" href="structTupleTypeInfo.html">TupleTypeInfo</a> *dst, <a class="el" href="structTupleTypeInfo.html">TupleTypeInfo</a> *src)</td></tr>
+<tr class="separator:acb7208764a6fa2ec3a64678f1c0c3e4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb1e31fe89b070f5c7da1fd155aa3420"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8c.html#adb1e31fe89b070f5c7da1fd155aa3420">copy_slice_type_info</a> (<a class="el" href="structSliceTypeInfo.html">SliceTypeInfo</a> *dst, <a class="el" href="structSliceTypeInfo.html">SliceTypeInfo</a> *src)</td></tr>
+<tr class="separator:adb1e31fe89b070f5c7da1fd155aa3420"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60ec2da207f93fb3ae0c8672db0d6dfa"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8c.html#a60ec2da207f93fb3ae0c8672db0d6dfa">init_type</a> (<a class="el" href="structType.html">Type</a> *type, char *name, int is_ref, int is_mut, <a class="el" href="structArrayTypeInfo.html">ArrayTypeInfo</a> *array_type_info, <a class="el" href="structTupleTypeInfo.html">TupleTypeInfo</a> *tuple_type_info, <a class="el" href="structSliceTypeInfo.html">SliceTypeInfo</a> *slice_type_info)</td></tr>
 <tr class="separator:a60ec2da207f93fb3ae0c8672db0d6dfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61bb4c2cdc456ce25ea78221543ee68c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8c.html#a61bb4c2cdc456ce25ea78221543ee68c">free_type</a> (<a class="el" href="structType.html">Type</a> *type)</td></tr>
@@ -97,6 +105,118 @@ Functions</h2></td></tr>
 <tr class="separator:a120c4aef14610e299e50b787eabb57d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="ad8a2435dea2b3754ba2801e8dc842be2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8a2435dea2b3754ba2801e8dc842be2">&#9670;&nbsp;</a></span>copy_array_type_info()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int copy_array_type_info </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structArrayTypeInfo.html">ArrayTypeInfo</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structArrayTypeInfo.html">ArrayTypeInfo</a> *&#160;</td>
+          <td class="paramname"><em>src</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adb1e31fe89b070f5c7da1fd155aa3420"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb1e31fe89b070f5c7da1fd155aa3420">&#9670;&nbsp;</a></span>copy_slice_type_info()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int copy_slice_type_info </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structSliceTypeInfo.html">SliceTypeInfo</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structSliceTypeInfo.html">SliceTypeInfo</a> *&#160;</td>
+          <td class="paramname"><em>src</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acb7208764a6fa2ec3a64678f1c0c3e4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acb7208764a6fa2ec3a64678f1c0c3e4e">&#9670;&nbsp;</a></span>copy_tuple_type_info()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int copy_tuple_type_info </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structTupleTypeInfo.html">TupleTypeInfo</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structTupleTypeInfo.html">TupleTypeInfo</a> *&#160;</td>
+          <td class="paramname"><em>src</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af6880a5416804600e5cf3182b1c51292"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6880a5416804600e5cf3182b1c51292">&#9670;&nbsp;</a></span>copy_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int copy_type </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structType.html">Type</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structType.html">Type</a> *&#160;</td>
+          <td class="paramname"><em>src</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aa847a0b855ff2b8db779792dce932061"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa847a0b855ff2b8db779792dce932061">&#9670;&nbsp;</a></span>free_array_type_info()</h2>
 
