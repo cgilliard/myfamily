@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		 <p align="center">
-                        Code Coverage is currently 85.57%.
+                        Code Coverage is currently 86.81%.
                 </p>
 		<center>
 			<div class="chart">
@@ -67,7 +67,8 @@
 0.00,
 0.00,
 85.57,
-85.57,];
+85.57,
+86.81,];
 			let labels = [format_date(1716876818 * 1000 ),
 format_date(1716876822 * 1000 ),
 format_date(1716904488 * 1000 ),
@@ -82,7 +83,8 @@ format_date(1716907183 * 1000 ),
 format_date(1716907441 * 1000 ),
 format_date(1716907910 * 1000 ),
 format_date(1716908379 * 1000 ),
-format_date(1716909018 * 1000 ),];
+format_date(1716909018 * 1000 ),
+format_date(1716909696 * 1000 ),];
 
 			const data = {
 				labels: labels,
@@ -112,7 +114,8 @@ format_date(1716909018 * 1000 ),];
 			<textarea readonly class="textarea" rows="50" cols="100">        -:    0:Source:parser.c
         -:    0:Graph:./parser.gcno
         -:    0:Data:./parser.gcda
-        -:    0:Runs:14
+        -:    0:Runs:11
+        -:    0:Programs:1
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -168,7 +171,7 @@ format_date(1716909018 * 1000 ),];
         9:   53:	strm->pos_offset = 0;
         -:   54:
         9:   55:	return 0;
-        -:   56:}
+       11:   56:}
         -:   57:
         5:   58:void display_span(Span *span, ErrorLevel level, char *message) {
         5:   59:	TokenStream *file_stream = span->strm;
@@ -191,19 +194,19 @@ format_date(1716909018 * 1000 ),];
         5:   76:	if(level == Error) { // ERROR
         3:   77:		printf(
         -:   78:			"\e[1m%s:%i:%i:\e[m " ANSI_COLOR_ERROR_BG "Error" ANSI_COLOR_RESET ": %s\n%s\n",
-        -:   79:			file_stream->file_path,
-        -:   80:			span->line_num,
-        -:   81:			indent,
-        -:   82:			message,
+        3:   79:			file_stream->file_path,
+        3:   80:			span->line_num,
+        3:   81:			indent,
+        3:   82:			message,
         -:   83:			display_str
         -:   84:		);
-        -:   85:	} else { // WARNING
+        3:   85:	} else { // WARNING
         2:   86:		printf(         
         -:   87:                        "\e[1m%s:%i:%i:\e[m " ANSI_COLOR_WARNING_BG "Warning" ANSI_COLOR_RESET ": %s\n%s\n",
-        -:   88:                        file_stream->file_path,
-        -:   89:                        span->line_num,
-        -:   90:			indent,
-        -:   91:                        message,        
+        2:   88:                        file_stream->file_path,
+        2:   89:                        span->line_num,
+        2:   90:			indent,
+        2:   91:                        message,        
         -:   92:                        display_str
         -:   93:                );
         -:   94:	}
@@ -216,7 +219,7 @@ format_date(1716909018 * 1000 ),];
         -:  101:		else
         1:  102:			spacing_and_up_arrow[cur] = ' ';
         2:  103:		cur += 1;
-        -:  104:	}
+        2:  104:	}
         5:  105:	spacing_and_up_arrow[cur] = '^';
         5:  106:	spacing_and_up_arrow[cur+1] = 0;
         5:  107:	printf(ANSI_COLOR_GREEN "%s\n" ANSI_COLOR_RESET, spacing_and_up_arrow);
@@ -251,8 +254,8 @@ format_date(1716909018 * 1000 ),];
         2:  136:	strm->end_doc = -1;
         2:  137:}
         -:  138:
-      181:  139:int skip_comments_and_white_space(TokenStream *strm, TokenTree *next, int len) {
-        -:  140:	while(TRUE) {
+      172:  139:int skip_comments_and_white_space(TokenStream *strm, TokenTree *next, int len) {
+      181:  140:	while(TRUE) {
         -:  141:                // first loop until we're not in white space
       331:  142:                while(strm->pos < len) {
       296:  143:                        if (!is_white_space(strm->bytes[strm->pos])) {
@@ -260,12 +263,12 @@ format_date(1716909018 * 1000 ),];
         -:  145:                        }
       150:  146:                        if(strm->bytes[strm->pos] == '\n'){
        76:  147:                                strm->line_num += 1;
-        -:  148:                        }
+       76:  148:                        }
       150:  149:                        strm->pos += 1;
         -:  150:                }
         -:  151:
         -:  152:                // next check if we're at the begining of a comment
-      181:  153:                if (strm->pos < len-1 && strm->bytes[strm->pos] == '/' &&
+      184:  153:                if (strm->pos < len-1 && strm->bytes[strm->pos] == '/' &&
        12:  154:                        (strm->bytes[strm->pos+1] == '/' ||
         3:  155:                         strm->bytes[strm->pos+1] == '*')) {
         -:  156:                        // we're in a comment see which kind
@@ -275,12 +278,12 @@ format_date(1716909018 * 1000 ),];
         9:  160:                                        if(strm->bytes[strm->pos+2] == '/' && strm->bytes[strm->pos+3] == ' ') {
         2:  161:                                                strm->start_doc = strm->pos+4;
         2:  162:                                                strm->end_doc = strm->pos;
-        -:  163:                                        }
-        -:  164:                                }
+        2:  163:                                        }
+        9:  164:                                }
       359:  165:                                while(strm->pos < len && strm->bytes[strm->pos] != '\n') {
       350:  166:                                        if(strm->start_doc > 0) {
        37:  167:                                                strm->end_doc += 1;
-        -:  168:                                        }
+       37:  168:                                        }
       350:  169:                                        strm->pos += 1;
         -:  170:                                }
         9:  171:				if(strm->start_doc > 0) {
@@ -294,23 +297,23 @@ format_date(1716909018 * 1000 ),];
         2:  179:                                        next->span.offset = strm->pos + strm->pos_offset;
         2:  180:                                        return TRUE;
         -:  181:                                }
-        -:  182:                        } else {
-       57:  183:                                while(strm->pos < len && (strm->bytes[strm->pos-1] != '*' || strm->bytes[strm->pos] != '/')) {
+        7:  182:                        } else {
+      114:  183:                                while(strm->pos < len && (strm->bytes[strm->pos-1] != '*' || strm->bytes[strm->pos] != '/')) {
        55:  184:                                        if(strm->bytes[strm->pos] == '\n'){
         4:  185:                                                strm->line_num += 1;
-        -:  186:                                        }
+        4:  186:                                        }
        55:  187:                                        strm->pos += 1;
         -:  188:                                }
         2:  189:                                strm->pos += 1;
         -:  190:                        }
         -:  191:
-        -:  192:                } else {
-        -:  193:                        break;
+        9:  192:                } else {
+      170:  193:                        break;
         -:  194:                }
         -:  195:	}
         -:  196:
       170:  197:	return FALSE;
-        -:  198:}
+      172:  198:}
         -:  199:
        35:  200:int process_group(TokenStream *strm, TokenTree *next, int ret, int len, Delimiter delimiter) {
         -:  201:	char open_ch;
@@ -319,13 +322,13 @@ format_date(1716909018 * 1000 ),];
        35:  204:	if(delimiter == Parenthesis) {
        15:  205:		open_ch = '(';
        15:  206:		close_ch = ')';
-       20:  207:	} else if(delimiter == Bracket) {
+       35:  207:	} else if(delimiter == Bracket) {
         5:  208:		open_ch = '[';
         5:  209:                close_ch = ']';
-       15:  210:	} else if(delimiter == Brace) {
+       20:  210:	} else if(delimiter == Brace) {
        15:  211:		open_ch = '{';
        15:  212:		close_ch = '}';
-        -:  213:	}
+       15:  213:	}
         -:  214:
        35:  215:	strm->pos += 1;
        35:  216:	int inner_char_count = 0;
@@ -351,7 +354,7 @@ format_date(1716909018 * 1000 ),];
         1:  236:		sprintf(msg, "parse error: file ended with unclosed '%c'", open_ch);
         1:  237:		display_span(&next->span, Error, msg);
         1:  238:		ret = 2;
-        -:  239:	}
+        1:  239:	}
        35:  240:	strm->pos += 1;
         -:  241:
        35:  242:	return ret;
@@ -365,7 +368,7 @@ format_date(1716909018 * 1000 ),];
         1:  250:		sprintf(err, "parse error: unexpected token, '%c'", ch);
         1:  251:		display_span(&next->span, Error, err);
         1:  252:		ret = 2;
-        -:  253:	}
+        1:  253:	}
         -:  254:
        41:  255:	next->token_type = PunctType;
        41:  256:	next->punct = malloc(sizeof(Punct));
@@ -379,37 +382,37 @@ format_date(1716909018 * 1000 ),];
        29:  264:		if(next->punct->ch == '!' && cur == '=') {
         1:  265:			next->punct->second_ch = cur;
         1:  266:			strm->pos += 1;
-       28:  267:		} else if(next->punct->ch == '%' && cur == '=') {
+       29:  267:		} else if(next->punct->ch == '%' && cur == '=') {
         1:  268:			next->punct->second_ch = cur;
         1:  269:			strm->pos += 1;
-       27:  270:		} else if(next->punct->ch == '&' && (cur == '&' || cur == '=')) {
+       28:  270:		} else if(next->punct->ch == '&' && (cur == '&' || cur == '=')) {
         1:  271:			next->punct->second_ch = cur;
         1:  272:			strm->pos += 1;
-       26:  273:		} else if(next->punct->ch == '*' && cur == '=') {
+       27:  273:		} else if(next->punct->ch == '*' && cur == '=') {
         1:  274:			next->punct->second_ch = cur;
         1:  275:			strm->pos += 1;
-       25:  276:		} else if(next->punct->ch == '+' && cur == '=') {
+       26:  276:		} else if(next->punct->ch == '+' && cur == '=') {
         1:  277:			next->punct->second_ch = cur;
         1:  278:			strm->pos += 1;
-      24*:  279:		} else if(next->punct->ch == '-' && (cur == '=' || cur == '>')) {
+       25:  279:		} else if(next->punct->ch == '-' && (cur == '=' || cur == '>')) {
         1:  280:			next->punct->second_ch = cur;
         1:  281:			strm->pos += 1;
-       23:  282:		} else if(next->punct->ch == '/' && cur == '=') {
+       24:  282:		} else if(next->punct->ch == '/' && cur == '=') {
         1:  283:			next->punct->second_ch = cur;
         1:  284:			strm->pos += 1;
-       22:  285:		} else if(next->punct->ch == '^' && cur == '=') {
+       23:  285:		} else if(next->punct->ch == '^' && cur == '=') {
         1:  286:			next->punct->second_ch = cur;
         1:  287:			strm->pos += 1;
-      21*:  288:		} else if(next->punct->ch == '|' && (cur == '=' || cur == '|')) {
+       22:  288:		} else if(next->punct->ch == '|' && (cur == '=' || cur == '|')) {
         1:  289:			next->punct->second_ch = cur;
         1:  290:			strm->pos += 1;
-       20:  291:		} else if(next->punct->ch == '=' && (cur == '>' || cur == '=')) {
+       21:  291:		} else if(next->punct->ch == '=' && (cur == '>' || cur == '=')) {
         1:  292:			next->punct->second_ch = cur;
         1:  293:			strm->pos += 1;
-       19:  294:		} else if(next->punct->ch == ':' && cur == ':') {
+       20:  294:		} else if(next->punct->ch == ':' && cur == ':') {
         3:  295:			next->punct->second_ch = cur;
         3:  296:			strm->pos += 1;
-       16:  297:		} else if(next->punct->ch == '<' && (cur == '<' || cur == '=')) {
+       19:  297:		} else if(next->punct->ch == '<' && (cur == '<' || cur == '=')) {
         2:  298:			next->punct->second_ch = cur;
         2:  299:			strm->pos += 1;
         2:  300:			if(strm->pos < len && cur == '<') {
@@ -417,9 +420,9 @@ format_date(1716909018 * 1000 ),];
         1:  302:				if(cur == '=') {
         1:  303:					next->punct->third_ch = cur;
         1:  304:					strm->pos += 1;
-        -:  305:				}
-        -:  306:			}
-      14*:  307:		} else if(next->punct->ch == '>' && (cur == '>' || cur == '=')) {
+        1:  305:				}
+        1:  306:			}
+       16:  307:		} else if(next->punct->ch == '>' && (cur == '>' || cur == '=')) {
         1:  308:			next->punct->second_ch = cur;
         1:  309:			strm->pos += 1;
         1:  310:			if(strm->pos < len && cur == '>') {
@@ -427,20 +430,20 @@ format_date(1716909018 * 1000 ),];
         1:  312:				if(cur == '=') {
         1:  313:					next->punct->third_ch = cur;
         1:  314:					strm->pos += 1;
-        -:  315:				}
-        -:  316:			}
-       13:  317:		} else if(next->punct->ch == '.' && cur == '.') {
+        1:  315:				}
+        1:  316:			}
+       14:  317:		} else if(next->punct->ch == '.' && cur == '.') {
         1:  318:			next->punct->second_ch = cur;
         1:  319:			strm->pos += 1;
         1:  320:			if(strm->pos < len) {
         1:  321:				cur = strm->bytes[strm->pos];
-       1*:  322:				if(cur == '.' || cur == '=') {
+        1:  322:				if(cur == '.' || cur == '=') {
         1:  323:					next->punct->third_ch = cur;
         1:  324:					strm->pos += 1;
-        -:  325:				}
-        -:  326:			}
-        -:  327:		}
-        -:  328:	}
+        1:  325:				}
+        1:  326:			}
+        1:  327:		}
+       29:  328:	}
        41:  329:	return ret;
         -:  330:}
         -:  331:
@@ -457,7 +460,7 @@ format_date(1716909018 * 1000 ),];
         -:  342:
       172:  343:	if(strm->pos >= len) {
        19:  344:                ret = 0;
-        -:  345:        } else {
+       19:  345:        } else {
       153:  346:                ret = 1;
         -:  347:        }
         -:  348:
@@ -469,7 +472,7 @@ format_date(1716909018 * 1000 ),];
       170:  354:	next->span.strm = strm;
         -:  355:
         -:  356:	// if we're not an ident start we must be another type
-      254:  357:	if (strm->pos < len && !is_ident_start(strm->bytes[strm->pos])) {
+      170:  357:	if (strm->pos < len && !is_ident_start(strm->bytes[strm->pos])) {
         -:  358:		// it's either a literal, group or punct
        84:  359:		int is_literal = 0;
        84:  360:		int is_group = 0;
@@ -482,19 +485,19 @@ format_date(1716909018 * 1000 ),];
        15:  367:			start_group_pos = strm->pos + 1;
        15:  368:			ret = process_group(strm, next, ret, len, delimiter);
        15:  369:			end_group_pos = strm->pos - 1;
-       69:  370:		} else if(strm->bytes[strm->pos] == '[') {
+       84:  370:		} else if(strm->bytes[strm->pos] == '[') {
         5:  371:			delimiter = Bracket;
         5:  372:                        is_group = 1;
         5:  373:                        start_group_pos = strm->pos + 1;
         5:  374:                        ret = process_group(strm, next, ret, len, delimiter);
         5:  375:                        end_group_pos = strm->pos - 1;
-       64:  376:		} else if(strm->bytes[strm->pos] == '{') {
+       69:  376:		} else if(strm->bytes[strm->pos] == '{') {
        15:  377:			delimiter = Brace;
        15:  378:                        is_group = 1;
        15:  379:                        start_group_pos = strm->pos + 1;
        15:  380:                        ret = process_group(strm, next, ret, len, delimiter);
        15:  381:                        end_group_pos = strm->pos - 1;
-       49:  382:		} else if(strm->bytes[strm->pos] == '\"') {
+       64:  382:		} else if(strm->bytes[strm->pos] == '\"') {
         5:  383:			is_literal = 1;
         5:  384:			next_token[itt] = strm->bytes[strm->pos];
         5:  385:			itt += 1;
@@ -509,12 +512,12 @@ format_date(1716909018 * 1000 ),];
         5:  394:			next_token[itt] = '\"';
         5:  395:			itt++;
         5:  396:			next_token[itt] = 0;
-       44:  397:		} else if (strm->bytes[strm->pos] >= '0' && strm->bytes[strm->pos] <= '9') {
+       49:  397:		} else if (strm->bytes[strm->pos] >= '0' && strm->bytes[strm->pos] <= '9') {
         2:  398:			is_literal = 1;
         2:  399:			next_token[itt] = strm->bytes[strm->pos];
         2:  400:			itt += 1;
         2:  401:                        strm->pos += 1;
-        2:  402:                        while(strm->pos < len &&
+        7:  402:                        while(strm->pos < len &&
         5:  403:				(strm->bytes[strm->pos] >= '0' && strm->bytes[strm->pos] <= '9') ||
         2:  404:				strm->bytes[strm->pos] == '.') {
         3:  405:                                next_token[itt] = strm->bytes[strm->pos];
@@ -524,7 +527,7 @@ format_date(1716909018 * 1000 ),];
         -:  409:                        }
         -:  410:
         2:  411:			next_token[itt] = 0;
-       42:  412:		} else if (strm->bytes[strm->pos] == '\'') {
+       44:  412:		} else if (strm->bytes[strm->pos] == '\'') {
         1:  413:			next_token[itt] = strm->bytes[strm->pos];
         1:  414:			itt += 1;
         1:  415:                        strm->pos += 1;
@@ -539,7 +542,7 @@ format_date(1716909018 * 1000 ),];
         1:  424:                        itt++;
         1:  425:			next_token[itt] = 0;
         1:  426:			is_literal = 1;
-        -:  427:		}
+        1:  427:		}
         -:  428:
        84:  429:		if(is_group) {
        35:  430:			next->token_type = GroupType;
@@ -556,16 +559,16 @@ format_date(1716909018 * 1000 ),];
        35:  441:			memcpy(next->group->strm->bytes, strm->bytes + start_group_pos, group_len);
        35:  442:			next->group->strm->len = group_len;
         -:  443:
-       49:  444:		} else if(is_literal) {
+       84:  444:		} else if(is_literal) {
         8:  445:			next->token_type = LiteralType;
         8:  446:			next->literal = malloc(sizeof(Literal));
         8:  447:			next->literal->literal = malloc(sizeof(char) * itt);
         8:  448:			strcpy(next->literal->literal, next_token);
-        -:  449:		} else {
+        8:  449:		} else {
         -:  450:			// punct
        41:  451:			ret = process_punct(strm, next, len, ret);
         -:  452:		}
-        -:  453:	} else {
+       84:  453:	} else {
         -:  454:		// ident start
       264:  455:		while(strm->pos < len) {
       223:  456:			next_token[itt] = strm->bytes[strm->pos];
@@ -580,7 +583,7 @@ format_date(1716909018 * 1000 ),];
         -:  465:
        86:  466:		if(itt == 0) {
        35:  467:			ret = 0;
-        -:  468:		}
+       35:  468:		}
         -:  469:
        86:  470:		next_token[itt] = 0;
        86:  471:		next->token_type = IdentType;
@@ -590,7 +593,7 @@ format_date(1716909018 * 1000 ),];
         -:  475:	}
         -:  476:
       170:  477:	return ret;
-        -:  478:}
+      174:  478:}
         -:  479:
         9:  480:void free_token_stream(TokenStream *strm) {
         9:  481:	free(strm->bytes);
@@ -602,21 +605,22 @@ format_date(1716909018 * 1000 ),];
       140:  487:	if(tree->token_type == IdentType) {
        55:  488:		free(tree->ident->value);
        55:  489:		free(tree->ident);
-       85:  490:	} else if(tree->token_type == PunctType) {
+      140:  490:	} else if(tree->token_type == PunctType) {
        42:  491:		free(tree->punct);
-       43:  492:	} else if(tree->token_type == LiteralType) {
+       85:  492:	} else if(tree->token_type == LiteralType) {
         7:  493:		free(tree->literal->literal);
         7:  494:		free(tree->literal);
-       36:  495:	} else if(tree->token_type == GroupType) {
+       43:  495:	} else if(tree->token_type == GroupType) {
        36:  496:		free(tree->group->strm);
        36:  497:		free(tree->group);
-        -:  498:	}
+       36:  498:	}
       140:  499:}
         -:  500:
         -:    0:Source:expr.c
         -:    0:Graph:./expr.gcno
         -:    0:Data:./expr.gcda
-        -:    0:Runs:3
+        -:    0:Runs:1
+        -:    0:Programs:1
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -639,7 +643,8 @@ format_date(1716909018 * 1000 ),];
         -:    0:Source:file.c
         -:    0:Graph:./file.gcno
         -:    0:Data:./file.gcda
-        -:    0:Runs:3
+        -:    0:Runs:1
+        -:    0:Programs:1
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -662,7 +667,8 @@ format_date(1716909018 * 1000 ),];
         -:    0:Source:item.c
         -:    0:Graph:./item.gcno
         -:    0:Data:./item.gcda
-        -:    0:Runs:3
+        -:    0:Runs:1
+        -:    0:Programs:1
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -686,6 +692,7 @@ format_date(1716909018 * 1000 ),];
         -:    0:Graph:./syn.gcno
         -:    0:Data:./syn.gcda
         -:    0:Runs:3
+        -:    0:Programs:1
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -713,7 +720,7 @@ format_date(1716909018 * 1000 ),];
         1:   25:			sm->class_array = malloc(sizeof(Class));
         1:   26:			sm->class_array[sm->class_count].fn_count = 0;
         1:   27:			sm->class_count += 1;
-        -:   28:		} else {
+        1:   28:		} else {
         5:   29:			sm->class_count += 1;
         5:   30:			sm->class_array = realloc(sm->class_array, sm->class_count * sizeof(Class));
         5:   31:			sm->class_array[sm->class_count-1].fn_count = 0;
@@ -728,19 +735,19 @@ format_date(1716909018 * 1000 ),];
         6:   40:		sm->class_array[sm->class_count-1].impl_name = NULL;
         6:   41:		strcpy(sm->class_array[sm->class_count-1].name, ident->value);
         6:   42:		sm->state = StateAfterClassName;
-       36:   43:	} else if(sm->state == StateExpectImplName) {
+       42:   43:	} else if(sm->state == StateExpectImplName) {
         2:   44:		printf("ident->value='%s'\n", ident->value);
         2:   45:		sm->class_array[sm->class_count-1].impl_name = malloc(sizeof(char) * (strlen(ident->value)+ 1));
         2:   46:		strcpy(sm->class_array[sm->class_count-1].impl_name, ident->value);
         2:   47:		sm->state = StateExpectClassBrace;
-       34:   48:	} else if(sm->state == StateExpectReturnTypeOrAttribute) {
+       36:   48:	} else if(sm->state == StateExpectReturnTypeOrAttribute) {
         7:   49:		printf("got a return type: %s\n", ident->value);
         7:   50:		sm->state = StateExpectFnName;
         -:   51:
         7:   52:		if(sm->class_array[sm->class_count-1].fn_count == 0) {
         6:   53:			sm->class_array[sm->class_count-1].fn_array = malloc(sizeof(Fn));
         6:   54:			sm->class_array[sm->class_count-1].fn_count += 1;
-        -:   55:		} else {
+        6:   55:		} else {
         1:   56:			sm->class_array[sm->class_count-1].fn_count += 1;
         1:   57:			sm->class_array[sm->class_count-1].fn_array = realloc(
         1:   58:				sm->class_array[sm->class_count-1].fn_array,
@@ -751,19 +758,19 @@ format_date(1716909018 * 1000 ),];
         7:   63:		printf("cur fn = %i\n", cur);
         7:   64:		sm->class_array[sm->class_count-1].fn_array[cur].name = malloc(sizeof(char) * (strlen(ident->value) + 1));
         7:   65:		strcpy(sm->class_array[sm->class_count-1].fn_array[cur].name, ident->value);
-       27:   66:	} else if(sm->state == StateExpectFnName) {
+       34:   66:	} else if(sm->state == StateExpectFnName) {
         7:   67:		printf("got a fn name: %s\n", ident->value);
         7:   68:		int cur = (sm->class_array[sm->class_count-1].fn_count) - 1;
         7:   69:		sm->class_array[sm->class_count-1].fn_array[cur].ret_type = malloc(sizeof(char) * (strlen(ident->value) + 1));
         7:   70:                strcpy(sm->class_array[sm->class_count-1].fn_array[cur].ret_type, ident->value);
         7:   71:		sm->class_array[sm->class_count-1].fn_array[cur].is_implemented = 1;
         7:   72:		sm->state = StateExpectParameterList;
-        -:   73:	} else {
+        7:   73:	} else {
         -:   74:		
         -:   75:	}
         -:   76:
        42:   77:	return 0;
-        -:   78:}
+       42:   78:}
         -:   79:
        18:   80:int process_syn_punct(StateMachine *sm, Punct *punct, int debug_flags) {
        18:   81:	if(sm->state == StateAfterClassName) {
@@ -771,27 +778,27 @@ format_date(1716909018 * 1000 ),];
         2:   83:		if(punct->ch == ':' && punct->second_ch == ':' && punct->third_ch == 0) {
         2:   84:			printf("impl block\n");
         2:   85:			sm->state = StateExpectImplName;
-        -:   86:		} else {
+        2:   86:		} else {
         -:   87:		}
-       16:   88:	} else if(sm->state == StateExpectReturnTypeOrAttribute) {
+       18:   88:	} else if(sm->state == StateExpectReturnTypeOrAttribute) {
         -:   89:		// doc
         2:   90:		if(punct->ch == '#') {
         2:   91:			sm->state = StateExpectAttributeBracket;
-        -:   92:		} else {
+        2:   92:		} else {
         -:   93:		}
         -:   94:
-       14:   95:	} else if(sm->state == StateExpectClassName) {
+       16:   95:	} else if(sm->state == StateExpectClassName) {
         1:   96:		 if(punct->ch == '#') {
         1:   97:                        sm->state = StateExpectAttributeBracket;
-        -:   98:                } else {
+        1:   98:                } else {
         -:   99:                }
-       13:  100:	} else if(sm->state == StateExpectFnBlockOrSemi) {
+       14:  100:	} else if(sm->state == StateExpectFnBlockOrSemi) {
         6:  101:		if(punct->ch == ';' && sm->scope == 1) {
         1:  102:			sm->state = StateExpectReturnTypeOrAttribute;
         1:  103:			int cur = (sm->class_array[sm->class_count-1].fn_count) - 1;
         1:  104:			sm->class_array[sm->class_count-1].fn_array[cur].is_implemented = 0;
-        -:  105:		}
-        -:  106:	}
+        1:  105:		}
+        6:  106:	}
        18:  107:	return 0;
         -:  108:}
         -:  109:
@@ -802,21 +809,21 @@ format_date(1716909018 * 1000 ),];
        30:  114:int process_syn_begin_group(StateMachine *sm, Delimiter delimiter, int debug_flags) {
        30:  115:	if(delimiter == Brace) {
        14:  116:		sm->scope += 1;
-        -:  117:	}
+       14:  117:	}
        30:  118:	if(sm->state == StateAfterClassName || sm->state == StateExpectClassBrace) {
         6:  119:		if(delimiter == Brace) {
         6:  120:			sm->state = StateExpectReturnTypeOrAttribute;
-        -:  121:		} else {
+        6:  121:		} else {
         -:  122:		}
-       24:  123:	} else if(sm->state == StateExpectAttributeBracket) {
+       30:  123:	} else if(sm->state == StateExpectAttributeBracket) {
         3:  124:		if(delimiter == Bracket) {
         3:  125:			sm->state = StateInAttribute;
-        -:  126:		} else {
+        3:  126:		} else {
         -:  127:		}
-       21:  128:	} else if(sm->state == StateExpectParameterList) {
+       24:  128:	} else if(sm->state == StateExpectParameterList) {
         9:  129:		sm->in_param_list = TRUE;
         -:  130:
-        -:  131:	} else {
+        9:  131:	} else {
         -:  132:	}
        30:  133:	return 0;
         -:  134:}
@@ -830,23 +837,23 @@ format_date(1716909018 * 1000 ),];
         -:  142:			// err
        14:  143:		} else if(sm->scope == 1) {
         6:  144:			sm->state = StateExpectReturnTypeOrAttribute;
-        -:  145:		}
-       16:  146:	} else if(delimiter == Bracket) {
+        6:  145:		}
+       30:  146:	} else if(delimiter == Bracket) {
         5:  147:		printf("got end bracket scope = %i, in_param_list = %i\n", sm->scope, sm->in_param_list);
         5:  148:		if(sm->scope == 0) {
         1:  149:			sm->state = StateExpectClassName;
-        4:  150:		} else if(sm->scope == 1 && !sm->in_param_list) {
+        5:  150:		} else if(sm->scope == 1 && !sm->in_param_list) {
         2:  151:			printf("expect ret or attr\n");
         2:  152:			sm->state = StateExpectReturnTypeOrAttribute;
-        -:  153:		}
-       11:  154:	} else if(delimiter == Parenthesis) {
+        2:  153:		}
+       16:  154:	} else if(delimiter == Parenthesis) {
        11:  155:		if(sm->scope == 1) {
         8:  156:                	sm->in_param_list = FALSE;
-        -:  157:                }
+        8:  157:                }
        11:  158:		if(sm->state == StateExpectParameterList) {
         7:  159:			sm->state = StateExpectFnBlockOrSemi;
-        -:  160:		}
-        -:  161:	}
+        7:  160:		}
+       11:  161:	}
        30:  162:	return 0;
         -:  163:}
         -:  164:
@@ -855,7 +862,7 @@ format_date(1716909018 * 1000 ),];
        42:  167:		if((debug_flags & DEBUG_FLAG_PRINT_TOKENS) != 0)
     #####:  168:			printf("ident[%s]\n", tree->ident->value);
        42:  169:		process_syn_ident(sm, tree->ident, debug_flags);
-       52:  170:	} else if(tree->token_type == PunctType) {
+       94:  170:	} else if(tree->token_type == PunctType) {
         -:  171:		char punct[4];
        18:  172:		punct[0] = tree->punct->ch;
        18:  173:		if(tree->punct->second_ch != 0) {
@@ -863,10 +870,10 @@ format_date(1716909018 * 1000 ),];
         3:  175:			if(tree->punct->third_ch != 0) {
     #####:  176:				punct[2] = tree->punct->third_ch;
     #####:  177:				punct[3] = 0;
-        -:  178:			} else {
+    #####:  178:			} else {
         3:  179:				punct[2] = 0;
         -:  180:			}
-        -:  181:		} else {
+        3:  181:		} else {
        15:  182:			punct[1] = 0;
         -:  183:		}
        18:  184:		if((debug_flags & DEBUG_FLAG_PRINT_TOKENS) != 0)
@@ -874,18 +881,18 @@ format_date(1716909018 * 1000 ),];
        18:  186:		if(process_syn_punct(sm, tree->punct, debug_flags)) {
     #####:  187:			return -1;
         -:  188:		}
-       34:  189:	} else if(tree->token_type == LiteralType) {
+       52:  189:	} else if(tree->token_type == LiteralType) {
         4:  190:		if((debug_flags & DEBUG_FLAG_PRINT_TOKENS) != 0)
     #####:  191:			printf("literal[%s]\n", tree->literal->literal);
         4:  192:		process_syn_literal(sm, tree->literal, debug_flags);
-        -:  193:	} else { // GroupType
+        4:  193:	} else { // GroupType
         -:  194:		TokenTree group_tree;
         -:  195:		int v;
        30:  196:		int err = 0;
        30:  197:		if((debug_flags & DEBUG_FLAG_PRINT_TOKENS) != 0)
     #####:  198:			printf("group[%u]\n", tree->group->delimiter);
        30:  199:		process_syn_begin_group(sm, tree->group->delimiter, debug_flags);
-        -:  200:		while(TRUE) {
+      106:  200:		while(TRUE) {
       106:  201:			v = next_token(tree->group->strm, &group_tree);
       106:  202:			if(v == 0)
        30:  203:				break;
@@ -907,7 +914,7 @@ format_date(1716909018 * 1000 ),];
        30:  219:		process_syn_end_group(sm, tree->group->delimiter, debug_flags);
         -:  220:	}
        94:  221:	return 0;
-        -:  222:}
+       94:  222:}
         -:  223:
         1:  224:int build_state(char *file, StateMachine *sm, int debug_flags) {
         1:  225:	sm->state = StateExpectClassName;
@@ -923,7 +930,7 @@ format_date(1716909018 * 1000 ),];
         -:  235:
         -:  236:	TokenTree tree;
         -:  237:	int v;
-        -:  238:	while(TRUE) {
+       19:  238:	while(TRUE) {
        19:  239:		v = next_token(&sm->strm, &tree);
        19:  240:		if(v == 0)
         1:  241:			break;
@@ -943,11 +950,12 @@ format_date(1716909018 * 1000 ),];
         -:  255:
         -:  256:
         1:  257:	return 0;
-        -:  258:}
+        1:  258:}
         -:    0:Source:type.c
         -:    0:Graph:./type.gcno
         -:    0:Data:./type.gcda
-        -:    0:Runs:3
+        -:    0:Runs:1
+        -:    0:Programs:1
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -981,27 +989,27 @@ format_date(1716909018 * 1000 ),];
         6:   31:	if(slice_type_info) {
         1:   32:		type->type = TypeSlice;
         1:   33:		non_null_count += 1;
-        -:   34:	}
+        1:   34:	}
         6:   35:	if(tuple_type_info) {
         1:   36:		type->type = TypeTuple;
         1:   37:		non_null_count += 1;
-        -:   38:	}
+        1:   38:	}
         6:   39:	if(array_type_info) {
         1:   40:		type->type = TypeArray;
         1:   41:		non_null_count += 1;
-        -:   42:	}
+        1:   42:	}
         -:   43:
         6:   44:	if(non_null_count > 1) {
     #####:   45:		fputs(
         -:   46:		"ERROR: no more than one of ArrayTypeInfo, TupleTypeInfo, SliceTypeInfo must be specified.\n",
-        -:   47:		stderr
+    #####:   47:		stderr
         -:   48:		);
     #####:   49:		return -1;
         -:   50:	}
         -:   51:
         6:   52:	if(name == NULL) {
         3:   53:		type->name = NULL;
-        -:   54:	} else {
+        3:   54:	} else {
         3:   55:		type->name = malloc(sizeof(char) * (strlen(name) + 1));
         -:   56:	
         3:   57:		if(type->name == NULL) {
@@ -1019,7 +1027,7 @@ format_date(1716909018 * 1000 ),];
     #####:   69:			return -1;
         -:   70:		}
         1:   71:		memcpy(type->array_type_info, array_type_info, sizeof(ArrayTypeInfo));
-        -:   72:	} else {
+        1:   72:	} else {
         5:   73:		type->array_type_info = NULL;
         -:   74:	}
         6:   75:	if(tuple_type_info) {
@@ -1030,7 +1038,7 @@ format_date(1716909018 * 1000 ),];
     #####:   80:                        return -1;
         -:   81:                }
         1:   82:		memcpy(type->tuple_type_info, tuple_type_info, sizeof(TupleTypeInfo));
-        -:   83:	} else {
+        1:   83:	} else {
         5:   84:		type->tuple_type_info = NULL;
         -:   85:	}
         6:   86:	if(slice_type_info) {
@@ -1041,7 +1049,7 @@ format_date(1716909018 * 1000 ),];
     #####:   91:                        return -1;
         -:   92:                }
         1:   93:		memcpy(type->slice_type_info, slice_type_info, sizeof(SliceTypeInfo));
-        -:   94:	} else {
+        1:   94:	} else {
         5:   95:		type->slice_type_info = NULL;
         -:   96:	}
         -:   97:
@@ -1049,18 +1057,18 @@ format_date(1716909018 * 1000 ),];
         6:   99:	type->is_ref = is_ref;
         -:  100:
         6:  101:	return 0;
-        -:  102:}
+        6:  102:}
         -:  103:
         6:  104:void free_type(Type *type) {
         6:  105:	if(type->array_type_info) {
         1:  106:		free(type->array_type_info);
-        -:  107:	}
+        1:  107:	}
         6:  108:        if(type->tuple_type_info) {
         1:  109:		free(type->tuple_type_info);
-        -:  110:	}
+        1:  110:	}
         6:  111:        if(type->slice_type_info) {
         1:  112:		free(type->slice_type_info);
-        -:  113:	}
+        1:  113:	}
         6:  114:	free(type->name);
         6:  115:}
         -:  116:
@@ -1073,7 +1081,7 @@ format_date(1716909018 * 1000 ),];
         1:  123:	memcpy(arr_type->type, type, sizeof(Type));
         1:  124:	arr_type->len = len;
         1:  125:	return 0;
-        -:  126:}
+        1:  126:}
         -:  127:
         1:  128:void free_array_type_info(ArrayTypeInfo *arr_type) {
         1:  129:	free(arr_type->type);
@@ -1087,7 +1095,7 @@ format_date(1716909018 * 1000 ),];
         -:  137:        }
         1:  138:        memcpy(slice_type->type, type, sizeof(Type));
         1:  139:	return 0;
-        -:  140:}
+        1:  140:}
         1:  141:void free_slice_type_info(SliceTypeInfo *slice_type) {
         1:  142:	free(slice_type->type);
         1:  143:}
@@ -1101,15 +1109,16 @@ format_date(1716909018 * 1000 ),];
         1:  151:	memcpy(tuple_type->type, type, sizeof(Type) * len);
         1:  152:	tuple_type->len = len;
         1:  153:        return 0;
-        -:  154:}
+        1:  154:}
         -:  155:
-    #####:  156:void free_tuple_type_info(TupleTypeInfo *tuple_type) {
-    #####:  157:	free(tuple_type->type);
-    #####:  158:}
+        1:  156:void free_tuple_type_info(TupleTypeInfo *tuple_type) {
+        1:  157:	free(tuple_type->type);
+        1:  158:}
         -:    0:Source:main.c
         -:    0:Graph:./main.gcno
         -:    0:Data:-
         -:    0:Runs:0
+        -:    0:Programs:0
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1138,10 +1147,10 @@ format_date(1716909018 * 1000 ),];
     #####:   26:		printf("punct='%c", token.punct->ch);
     #####:   27:		if(token.punct->second_ch != 0) {
     #####:   28:			printf("%c", token.punct->second_ch);
-        -:   29:		}
+    #####:   29:		}
     #####:   30:		if(token.punct->third_ch != 0) {
     #####:   31:                        printf("%c", token.punct->third_ch);
-        -:   32:                }
+    #####:   32:                }
     #####:   33:		printf("'\n");
         -:   34:
         -:   35:		 //display_span(&token.span, Error, "bad punct");
@@ -1176,7 +1185,7 @@ format_date(1716909018 * 1000 ),];
     #####:   64:                        printf("end group delimiter = Bracket\n");
     #####:   65:                else if(token.group->delimiter == Brace)
     #####:   66:                        printf("end group delimiter = Brace\n");
-        -:   67:	}
+    #####:   67:	}
     #####:   68:	return 0;
         -:   69:}
         -:   70:
@@ -1211,7 +1220,8 @@ format_date(1716909018 * 1000 ),];
         -:    0:Source:misc.c
         -:    0:Graph:./misc.gcno
         -:    0:Data:./misc.gcda
-        -:    0:Runs:14
+        -:    0:Runs:1
+        -:    0:Programs:1
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://              
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1234,15 +1244,15 @@ format_date(1716909018 * 1000 ),];
       150:   20:                return TRUE;
         -:   21:        else
       146:   22:                return FALSE;
-        -:   23:}
+      296:   23:}
         -:   24:
-      358:   25:int is_ident_start(char ch) {
-      358:   26:        if ((ch <= 'Z' && ch >= 'A') || (ch <= 'z' && ch >= 'a') || ch == '_') {
-      222:   27:                return TRUE;
+      824:   25:int is_ident_start(char ch) {
+      824:   26:        if ((ch <= 'Z' && ch >= 'A') || (ch <= 'z' && ch >= 'a') || ch == '_') {
+      688:   27:                return TRUE;
         -:   28:        } else {
       136:   29:                return FALSE;
         -:   30:        }
-        -:   31:}
+      358:   31:}
         -:   32:
       223:   33:int is_ident_secondary(char ch) {
       223:   34:        if (is_ident_start(ch) || (ch <= '9' && ch >= '0')) {
@@ -1250,17 +1260,17 @@ format_date(1716909018 * 1000 ),];
         -:   36:        } else {
        45:   37:                return FALSE;
         -:   38:        }
-        -:   39:}
+      223:   39:}
         -:   40:
        41:   41:int is_joint_possible(char ch) {
-       41:   42:        if (ch == '.' || ch == '=' || ch == '/' || ch == '+' || ch == '&' || ch == '<' ||
-       21:   43:                ch == '-' || ch == '%' || ch == '^' || ch == '*' || ch == '>' || ch == '|' ||
-       15:   44:		ch == '!' || ch == ':') {
+       56:   42:        if (ch == '.' || ch == '=' || ch == '/' || ch == '+' || ch == '&' || ch == '<' ||
+       22:   43:                ch == '-' || ch == '%' || ch == '^' || ch == '*' || ch == '>' || ch == '|' ||
+       16:   44:		ch == '!' || ch == ':') {
        29:   45:                return TRUE;
         -:   46:        } else {
        12:   47:                return FALSE;
         -:   48:        }
-        -:   49:}</textarea>
+       41:   49:}</textarea>
 		</p>
 	</body>
 </html>

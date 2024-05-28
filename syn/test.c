@@ -170,6 +170,7 @@ Test(test, types) {
 	cr_assert_eq(mytuple.tuple_type_info->len, 3);
 
 	free_type(&mytuple);
+	free_tuple_type_info(&tt);
 
 	free_type(&u32_type);
 	free_type(&u64_type);
