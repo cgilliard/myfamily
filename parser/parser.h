@@ -32,6 +32,9 @@ struct TokenStream {
 	struct TokenStream *parent;
 	int pos_offset;
 };
+/**
+ * @see [struct TokenStream]
+ */
 typedef struct TokenStream TokenStream;
 
 /**
@@ -42,6 +45,10 @@ struct Span {
 	int offset;
 	int line_num;
 };
+
+/**
+ * @see [struct Span]
+ */
 typedef struct Span Span;
 
 /**
@@ -51,6 +58,9 @@ enum ErrorLevel {
 	Error = 0,
 	Warning = 1,
 };
+/**
+ * @see [enum ErrorLevel]
+ */
 typedef enum ErrorLevel ErrorLevel;
 
 /**
@@ -68,6 +78,9 @@ enum Delimiter {
 	Bracket = 2,
 	None = 3,
 };
+/**
+ * @see [enum Delimiter]
+ */
 typedef enum Delimiter Delimiter;
 
 /**
@@ -81,6 +94,9 @@ enum TokenTreeType {
 	PunctType = 2,
 	LiteralType = 3
 };
+/**
+ * @see [enum TokenTreeType]
+ */
 typedef enum TokenTreeType TokenTreeType;
 
 /**
@@ -91,6 +107,9 @@ typedef enum TokenTreeType TokenTreeType;
 struct Ident {
 	char *value;
 };
+/**
+ * @see [struct Ident]
+ */
 typedef struct Ident Ident;
 
 /**
@@ -102,6 +121,9 @@ struct Group {
 	TokenStream *strm;
 	Delimiter delimiter;
 };
+/**
+ * @see [struct Group]
+ */
 typedef struct Group Group;
 
 /**
@@ -114,6 +136,9 @@ struct Punct {
 	char second_ch;
 	char third_ch;
 };
+/**
+ * @see [struct Punct]
+ */
 typedef struct Punct Punct;
 
 /**
@@ -124,6 +149,9 @@ typedef struct Punct Punct;
 struct Literal {
 	char *literal;
 };
+/**
+ * @see [struct Literal]
+ */
 typedef struct Literal Literal;
 
 /**
@@ -139,6 +167,9 @@ struct TokenTree {
 	Literal *literal;
 	Span span;
 };
+/**
+ * @see [struct TokenTree]
+ */
 typedef struct TokenTree TokenTree;
 
 /**
