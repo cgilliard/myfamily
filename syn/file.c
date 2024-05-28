@@ -13,3 +13,7 @@
 // limitations under the License.
 
 #include <syn/file.h>
+
+int file_placeholder() {
+        return 0;
+}

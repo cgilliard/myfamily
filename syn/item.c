@@ -13,3 +13,7 @@
 // limitations under the License.
 
 #include <syn/item.h>
+
+int item_placeholder() {
+	return 0;
+}

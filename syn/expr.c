@@ -13,3 +13,7 @@
 // limitations under the License.
 
 #include <syn/expr.h>
+
+int expr_placeholder() {
+        return 0;
+}
