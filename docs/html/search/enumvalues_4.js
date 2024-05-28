@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['literaltype_278',['LiteralType',['../parser_8h.html#aa0ffcf18b340b4863a5aaf658cb6a810a957664bd797efd4cfa6b361258a0771b',1,'parser.h']]]
+  ['literaltype_284',['LiteralType',['../parser_8h.html#aa0ffcf18b340b4863a5aaf658cb6a810a957664bd797efd4cfa6b361258a0771b',1,'parser.h']]]
 ];
