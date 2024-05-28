@@ -8,6 +8,8 @@ cd myfamilydocs
 rm -rf docs/html/*
 cp -rp ../doc/html/* docs/html
 
+
+./configure
 ./scripts/build_coverage.sh
 
 git config user.name "Pipelines-Bot"
