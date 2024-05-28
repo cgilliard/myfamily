@@ -147,7 +147,12 @@ int init_type(
                         fputs("ERROR: could not allocate memory to init_type", stderr);
                         return -1;
                 }
-		copy_array_type_info(type->array_type_info, array_type_info);
+		if(copy_array_type_info(type->array_type_info, array_type_info)) {
+			free(type->name);
+			free_array_type_info(type->array_type_info);
+                        fputs("ERROR: could not allocate memory to init_type", stderr);
+			return -1;
+		}
 	}
 	else
 		type->array_type_info = NULL;
@@ -158,7 +163,12 @@ int init_type(
                         fputs("ERROR: could not allocate memory to init_type", stderr);
                         return -1;
                 }
-		copy_tuple_type_info(type->tuple_type_info, tuple_type_info);
+		if(copy_tuple_type_info(type->tuple_type_info, tuple_type_info)) {
+			free(type->name);
+			free_tuple_type_info(type->tuple_type_info);
+                        fputs("ERROR: could not allocate memory to init_type", stderr);
+			return -1;
+		}
 	} else {
 		type->tuple_type_info = NULL;
 	}
@@ -169,7 +179,12 @@ int init_type(
                         fputs("ERROR: could not allocate memory to init_type", stderr);
                         return -1;
                 }
-		copy_slice_type_info(type->slice_type_info, slice_type_info);
+		if(copy_slice_type_info(type->slice_type_info, slice_type_info)) {
+			free(type->name);
+                        free_slice_type_info(type->slice_type_info);
+                        fputs("ERROR: could not allocate memory to init_type", stderr);
+			return -1;
+		}
 	} else {
 		type->slice_type_info = NULL;
 	}
@@ -184,16 +199,22 @@ void free_type(Type *type) {
 	if(type->array_type_info) {
 		free_array_type_info(type->array_type_info);
 		free(type->array_type_info);
+		type->array_type_info = NULL;
 	}
         if(type->tuple_type_info) {
 		free_tuple_type_info(type->tuple_type_info);
 		free(type->tuple_type_info);
+		type->tuple_type_info = NULL;
 	}
         if(type->slice_type_info) {
 		free_slice_type_info(type->slice_type_info);
 		free(type->slice_type_info);
+		type->slice_type_info = NULL;
 	}
-	free(type->name);
+	if(type->name) {
+		free(type->name);
+		type->name = NULL;
+	}
 }
 
 int init_array_type_info(ArrayTypeInfo *arr_type, Type *type, int len) {
@@ -211,6 +232,7 @@ void free_array_type_info(ArrayTypeInfo *arr_type) {
 	if(arr_type->type != NULL) {
 		free_type(arr_type->type);
 		free(arr_type->type);
+		arr_type->type = NULL;
 	}
 }
 
@@ -227,6 +249,7 @@ void free_slice_type_info(SliceTypeInfo *slice_type) {
 	if(slice_type->type != NULL) {
                 free_type(slice_type->type);
                 free(slice_type->type);
+		slice_type->type = NULL;
         }  
 }
 
@@ -245,7 +268,10 @@ int init_tuple_type_info(TupleTypeInfo *tuple_type, Type *type, int len) {
 
 void free_tuple_type_info(TupleTypeInfo *tuple_type) {
 	if(tuple_type->type != NULL) {
-                free_type(tuple_type->type);
+		for(int i=0; i<tuple_type->len; i++) {
+                	free_type(&tuple_type->type[i]);
+		}
                 free(tuple_type->type);
+		tuple_type->type = NULL;
         }
 }

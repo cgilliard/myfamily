@@ -26,6 +26,46 @@ Test(test, syn) {
 	}
 }
 
+Test(test, syn_early_free) {
+	Type arr;
+        // u32 y;
+        Type u32_type;
+        init_type(
+                &u32_type,
+                "u32",
+                FALSE,
+                FALSE,
+                NULL,
+                NULL,
+                NULL
+        );
+        ArrayTypeInfo art;
+        init_array_type_info(&art, &u32_type, 3);
+        init_type(&arr, NULL, FALSE, FALSE, &art, NULL, NULL);
+	free_array_type_info(&art);
+
+	cr_assert_eq(strcmp(u32_type.name, "u32"), 0);
+        cr_assert_eq(u32_type.is_ref, FALSE);
+        cr_assert_eq(u32_type.is_mut, FALSE);
+        cr_assert_eq(u32_type.array_type_info, NULL);
+        cr_assert_eq(u32_type.type, TypeRegular);
+	free_type(&u32_type);
+
+        cr_assert_eq(arr.name, NULL);
+        cr_assert_eq(arr.is_ref, FALSE);
+        cr_assert_eq(arr.is_mut, FALSE);
+        cr_assert_neq(arr.array_type_info, NULL);
+        cr_assert_eq(arr.type, TypeArray);
+        cr_assert_eq(arr.array_type_info->len, 3);
+        cr_assert_eq(strcmp(arr.array_type_info->type->name, "u32"), 0);
+        cr_assert_eq(arr.array_type_info->type->is_ref, FALSE);
+        cr_assert_eq(arr.array_type_info->type->is_mut, FALSE);
+        cr_assert_eq(arr.array_type_info->type->type, TypeRegular);
+        cr_assert_eq(arr.array_type_info->type->array_type_info, NULL);
+
+	free_type(&arr);
+}
+
 Test(test, types) {
 	// u32[3] x;
 	Type arr;
