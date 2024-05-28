@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		 <p align="center">
-                        Code Coverage is currently 86.81%.
+                        Code Coverage is currently 84.76%.
                 </p>
 		<center>
 			<div class="chart">
@@ -68,7 +68,8 @@
 0.00,
 85.57,
 85.57,
-86.81,];
+86.81,
+84.76,];
 			let labels = [format_date(1716876818 * 1000 ),
 format_date(1716876822 * 1000 ),
 format_date(1716904488 * 1000 ),
@@ -84,7 +85,8 @@ format_date(1716907441 * 1000 ),
 format_date(1716907910 * 1000 ),
 format_date(1716908379 * 1000 ),
 format_date(1716909018 * 1000 ),
-format_date(1716909696 * 1000 ),];
+format_date(1716909696 * 1000 ),
+format_date(1716920268 * 1000 ),];
 
 			const data = {
 				labels: labels,
@@ -114,8 +116,7 @@ format_date(1716909696 * 1000 ),];
 			<textarea readonly class="textarea" rows="50" cols="100">        -:    0:Source:parser.c
         -:    0:Graph:./parser.gcno
         -:    0:Data:./parser.gcda
-        -:    0:Runs:11
-        -:    0:Programs:1
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -171,7 +172,7 @@ format_date(1716909696 * 1000 ),];
         9:   53:	strm->pos_offset = 0;
         -:   54:
         9:   55:	return 0;
-       11:   56:}
+        -:   56:}
         -:   57:
         5:   58:void display_span(Span *span, ErrorLevel level, char *message) {
         5:   59:	TokenStream *file_stream = span->strm;
@@ -194,19 +195,19 @@ format_date(1716909696 * 1000 ),];
         5:   76:	if(level == Error) { // ERROR
         3:   77:		printf(
         -:   78:			"\e[1m%s:%i:%i:\e[m " ANSI_COLOR_ERROR_BG "Error" ANSI_COLOR_RESET ": %s\n%s\n",
-        3:   79:			file_stream->file_path,
-        3:   80:			span->line_num,
-        3:   81:			indent,
-        3:   82:			message,
+        -:   79:			file_stream->file_path,
+        -:   80:			span->line_num,
+        -:   81:			indent,
+        -:   82:			message,
         -:   83:			display_str
         -:   84:		);
-        3:   85:	} else { // WARNING
+        -:   85:	} else { // WARNING
         2:   86:		printf(         
         -:   87:                        "\e[1m%s:%i:%i:\e[m " ANSI_COLOR_WARNING_BG "Warning" ANSI_COLOR_RESET ": %s\n%s\n",
-        2:   88:                        file_stream->file_path,
-        2:   89:                        span->line_num,
-        2:   90:			indent,
-        2:   91:                        message,        
+        -:   88:                        file_stream->file_path,
+        -:   89:                        span->line_num,
+        -:   90:			indent,
+        -:   91:                        message,        
         -:   92:                        display_str
         -:   93:                );
         -:   94:	}
@@ -219,7 +220,7 @@ format_date(1716909696 * 1000 ),];
         -:  101:		else
         1:  102:			spacing_and_up_arrow[cur] = ' ';
         2:  103:		cur += 1;
-        2:  104:	}
+        -:  104:	}
         5:  105:	spacing_and_up_arrow[cur] = '^';
         5:  106:	spacing_and_up_arrow[cur+1] = 0;
         5:  107:	printf(ANSI_COLOR_GREEN "%s\n" ANSI_COLOR_RESET, spacing_and_up_arrow);
@@ -254,8 +255,8 @@ format_date(1716909696 * 1000 ),];
         2:  136:	strm->end_doc = -1;
         2:  137:}
         -:  138:
-      172:  139:int skip_comments_and_white_space(TokenStream *strm, TokenTree *next, int len) {
-      181:  140:	while(TRUE) {
+      181:  139:int skip_comments_and_white_space(TokenStream *strm, TokenTree *next, int len) {
+        -:  140:	while(TRUE) {
         -:  141:                // first loop until we're not in white space
       331:  142:                while(strm->pos < len) {
       296:  143:                        if (!is_white_space(strm->bytes[strm->pos])) {
@@ -263,12 +264,12 @@ format_date(1716909696 * 1000 ),];
         -:  145:                        }
       150:  146:                        if(strm->bytes[strm->pos] == '\n'){
        76:  147:                                strm->line_num += 1;
-       76:  148:                        }
+        -:  148:                        }
       150:  149:                        strm->pos += 1;
         -:  150:                }
         -:  151:
         -:  152:                // next check if we're at the begining of a comment
-      184:  153:                if (strm->pos < len-1 && strm->bytes[strm->pos] == '/' &&
+      181:  153:                if (strm->pos < len-1 && strm->bytes[strm->pos] == '/' &&
        12:  154:                        (strm->bytes[strm->pos+1] == '/' ||
         3:  155:                         strm->bytes[strm->pos+1] == '*')) {
         -:  156:                        // we're in a comment see which kind
@@ -278,12 +279,12 @@ format_date(1716909696 * 1000 ),];
         9:  160:                                        if(strm->bytes[strm->pos+2] == '/' && strm->bytes[strm->pos+3] == ' ') {
         2:  161:                                                strm->start_doc = strm->pos+4;
         2:  162:                                                strm->end_doc = strm->pos;
-        2:  163:                                        }
-        9:  164:                                }
+        -:  163:                                        }
+        -:  164:                                }
       359:  165:                                while(strm->pos < len && strm->bytes[strm->pos] != '\n') {
       350:  166:                                        if(strm->start_doc > 0) {
        37:  167:                                                strm->end_doc += 1;
-       37:  168:                                        }
+        -:  168:                                        }
       350:  169:                                        strm->pos += 1;
         -:  170:                                }
         9:  171:				if(strm->start_doc > 0) {
@@ -297,23 +298,23 @@ format_date(1716909696 * 1000 ),];
         2:  179:                                        next->span.offset = strm->pos + strm->pos_offset;
         2:  180:                                        return TRUE;
         -:  181:                                }
-        7:  182:                        } else {
-      114:  183:                                while(strm->pos < len && (strm->bytes[strm->pos-1] != '*' || strm->bytes[strm->pos] != '/')) {
+        -:  182:                        } else {
+       57:  183:                                while(strm->pos < len && (strm->bytes[strm->pos-1] != '*' || strm->bytes[strm->pos] != '/')) {
        55:  184:                                        if(strm->bytes[strm->pos] == '\n'){
         4:  185:                                                strm->line_num += 1;
-        4:  186:                                        }
+        -:  186:                                        }
        55:  187:                                        strm->pos += 1;
         -:  188:                                }
         2:  189:                                strm->pos += 1;
         -:  190:                        }
         -:  191:
-        9:  192:                } else {
-      170:  193:                        break;
+        -:  192:                } else {
+        -:  193:                        break;
         -:  194:                }
         -:  195:	}
         -:  196:
       170:  197:	return FALSE;
-      172:  198:}
+        -:  198:}
         -:  199:
        35:  200:int process_group(TokenStream *strm, TokenTree *next, int ret, int len, Delimiter delimiter) {
         -:  201:	char open_ch;
@@ -322,13 +323,13 @@ format_date(1716909696 * 1000 ),];
        35:  204:	if(delimiter == Parenthesis) {
        15:  205:		open_ch = '(';
        15:  206:		close_ch = ')';
-       35:  207:	} else if(delimiter == Bracket) {
+       20:  207:	} else if(delimiter == Bracket) {
         5:  208:		open_ch = '[';
         5:  209:                close_ch = ']';
-       20:  210:	} else if(delimiter == Brace) {
+       15:  210:	} else if(delimiter == Brace) {
        15:  211:		open_ch = '{';
        15:  212:		close_ch = '}';
-       15:  213:	}
+        -:  213:	}
         -:  214:
        35:  215:	strm->pos += 1;
        35:  216:	int inner_char_count = 0;
@@ -354,7 +355,7 @@ format_date(1716909696 * 1000 ),];
         1:  236:		sprintf(msg, "parse error: file ended with unclosed '%c'", open_ch);
         1:  237:		display_span(&next->span, Error, msg);
         1:  238:		ret = 2;
-        1:  239:	}
+        -:  239:	}
        35:  240:	strm->pos += 1;
         -:  241:
        35:  242:	return ret;
@@ -368,7 +369,7 @@ format_date(1716909696 * 1000 ),];
         1:  250:		sprintf(err, "parse error: unexpected token, '%c'", ch);
         1:  251:		display_span(&next->span, Error, err);
         1:  252:		ret = 2;
-        1:  253:	}
+        -:  253:	}
         -:  254:
        41:  255:	next->token_type = PunctType;
        41:  256:	next->punct = malloc(sizeof(Punct));
@@ -382,37 +383,37 @@ format_date(1716909696 * 1000 ),];
        29:  264:		if(next->punct->ch == '!' && cur == '=') {
         1:  265:			next->punct->second_ch = cur;
         1:  266:			strm->pos += 1;
-       29:  267:		} else if(next->punct->ch == '%' && cur == '=') {
+       28:  267:		} else if(next->punct->ch == '%' && cur == '=') {
         1:  268:			next->punct->second_ch = cur;
         1:  269:			strm->pos += 1;
-       28:  270:		} else if(next->punct->ch == '&' && (cur == '&' || cur == '=')) {
+       27:  270:		} else if(next->punct->ch == '&' && (cur == '&' || cur == '=')) {
         1:  271:			next->punct->second_ch = cur;
         1:  272:			strm->pos += 1;
-       27:  273:		} else if(next->punct->ch == '*' && cur == '=') {
+       26:  273:		} else if(next->punct->ch == '*' && cur == '=') {
         1:  274:			next->punct->second_ch = cur;
         1:  275:			strm->pos += 1;
-       26:  276:		} else if(next->punct->ch == '+' && cur == '=') {
+       25:  276:		} else if(next->punct->ch == '+' && cur == '=') {
         1:  277:			next->punct->second_ch = cur;
         1:  278:			strm->pos += 1;
-       25:  279:		} else if(next->punct->ch == '-' && (cur == '=' || cur == '>')) {
+      24*:  279:		} else if(next->punct->ch == '-' && (cur == '=' || cur == '>')) {
         1:  280:			next->punct->second_ch = cur;
         1:  281:			strm->pos += 1;
-       24:  282:		} else if(next->punct->ch == '/' && cur == '=') {
+       23:  282:		} else if(next->punct->ch == '/' && cur == '=') {
         1:  283:			next->punct->second_ch = cur;
         1:  284:			strm->pos += 1;
-       23:  285:		} else if(next->punct->ch == '^' && cur == '=') {
+       22:  285:		} else if(next->punct->ch == '^' && cur == '=') {
         1:  286:			next->punct->second_ch = cur;
         1:  287:			strm->pos += 1;
-       22:  288:		} else if(next->punct->ch == '|' && (cur == '=' || cur == '|')) {
+      21*:  288:		} else if(next->punct->ch == '|' && (cur == '=' || cur == '|')) {
         1:  289:			next->punct->second_ch = cur;
         1:  290:			strm->pos += 1;
-       21:  291:		} else if(next->punct->ch == '=' && (cur == '>' || cur == '=')) {
+       20:  291:		} else if(next->punct->ch == '=' && (cur == '>' || cur == '=')) {
         1:  292:			next->punct->second_ch = cur;
         1:  293:			strm->pos += 1;
-       20:  294:		} else if(next->punct->ch == ':' && cur == ':') {
+       19:  294:		} else if(next->punct->ch == ':' && cur == ':') {
         3:  295:			next->punct->second_ch = cur;
         3:  296:			strm->pos += 1;
-       19:  297:		} else if(next->punct->ch == '<' && (cur == '<' || cur == '=')) {
+       16:  297:		} else if(next->punct->ch == '<' && (cur == '<' || cur == '=')) {
         2:  298:			next->punct->second_ch = cur;
         2:  299:			strm->pos += 1;
         2:  300:			if(strm->pos < len && cur == '<') {
@@ -420,9 +421,9 @@ format_date(1716909696 * 1000 ),];
         1:  302:				if(cur == '=') {
         1:  303:					next->punct->third_ch = cur;
         1:  304:					strm->pos += 1;
-        1:  305:				}
-        1:  306:			}
-       16:  307:		} else if(next->punct->ch == '>' && (cur == '>' || cur == '=')) {
+        -:  305:				}
+        -:  306:			}
+      14*:  307:		} else if(next->punct->ch == '>' && (cur == '>' || cur == '=')) {
         1:  308:			next->punct->second_ch = cur;
         1:  309:			strm->pos += 1;
         1:  310:			if(strm->pos < len && cur == '>') {
@@ -430,20 +431,20 @@ format_date(1716909696 * 1000 ),];
         1:  312:				if(cur == '=') {
         1:  313:					next->punct->third_ch = cur;
         1:  314:					strm->pos += 1;
-        1:  315:				}
-        1:  316:			}
-       14:  317:		} else if(next->punct->ch == '.' && cur == '.') {
+        -:  315:				}
+        -:  316:			}
+       13:  317:		} else if(next->punct->ch == '.' && cur == '.') {
         1:  318:			next->punct->second_ch = cur;
         1:  319:			strm->pos += 1;
         1:  320:			if(strm->pos < len) {
         1:  321:				cur = strm->bytes[strm->pos];
-        1:  322:				if(cur == '.' || cur == '=') {
+       1*:  322:				if(cur == '.' || cur == '=') {
         1:  323:					next->punct->third_ch = cur;
         1:  324:					strm->pos += 1;
-        1:  325:				}
-        1:  326:			}
-        1:  327:		}
-       29:  328:	}
+        -:  325:				}
+        -:  326:			}
+        -:  327:		}
+        -:  328:	}
        41:  329:	return ret;
         -:  330:}
         -:  331:
@@ -460,7 +461,7 @@ format_date(1716909696 * 1000 ),];
         -:  342:
       172:  343:	if(strm->pos >= len) {
        19:  344:                ret = 0;
-       19:  345:        } else {
+        -:  345:        } else {
       153:  346:                ret = 1;
         -:  347:        }
         -:  348:
@@ -472,7 +473,7 @@ format_date(1716909696 * 1000 ),];
       170:  354:	next->span.strm = strm;
         -:  355:
         -:  356:	// if we're not an ident start we must be another type
-      170:  357:	if (strm->pos < len && !is_ident_start(strm->bytes[strm->pos])) {
+      254:  357:	if (strm->pos < len && !is_ident_start(strm->bytes[strm->pos])) {
         -:  358:		// it's either a literal, group or punct
        84:  359:		int is_literal = 0;
        84:  360:		int is_group = 0;
@@ -485,19 +486,19 @@ format_date(1716909696 * 1000 ),];
        15:  367:			start_group_pos = strm->pos + 1;
        15:  368:			ret = process_group(strm, next, ret, len, delimiter);
        15:  369:			end_group_pos = strm->pos - 1;
-       84:  370:		} else if(strm->bytes[strm->pos] == '[') {
+       69:  370:		} else if(strm->bytes[strm->pos] == '[') {
         5:  371:			delimiter = Bracket;
         5:  372:                        is_group = 1;
         5:  373:                        start_group_pos = strm->pos + 1;
         5:  374:                        ret = process_group(strm, next, ret, len, delimiter);
         5:  375:                        end_group_pos = strm->pos - 1;
-       69:  376:		} else if(strm->bytes[strm->pos] == '{') {
+       64:  376:		} else if(strm->bytes[strm->pos] == '{') {
        15:  377:			delimiter = Brace;
        15:  378:                        is_group = 1;
        15:  379:                        start_group_pos = strm->pos + 1;
        15:  380:                        ret = process_group(strm, next, ret, len, delimiter);
        15:  381:                        end_group_pos = strm->pos - 1;
-       64:  382:		} else if(strm->bytes[strm->pos] == '\"') {
+       49:  382:		} else if(strm->bytes[strm->pos] == '\"') {
         5:  383:			is_literal = 1;
         5:  384:			next_token[itt] = strm->bytes[strm->pos];
         5:  385:			itt += 1;
@@ -512,12 +513,12 @@ format_date(1716909696 * 1000 ),];
         5:  394:			next_token[itt] = '\"';
         5:  395:			itt++;
         5:  396:			next_token[itt] = 0;
-       49:  397:		} else if (strm->bytes[strm->pos] >= '0' && strm->bytes[strm->pos] <= '9') {
+       44:  397:		} else if (strm->bytes[strm->pos] >= '0' && strm->bytes[strm->pos] <= '9') {
         2:  398:			is_literal = 1;
         2:  399:			next_token[itt] = strm->bytes[strm->pos];
         2:  400:			itt += 1;
         2:  401:                        strm->pos += 1;
-        7:  402:                        while(strm->pos < len &&
+        2:  402:                        while(strm->pos < len &&
         5:  403:				(strm->bytes[strm->pos] >= '0' && strm->bytes[strm->pos] <= '9') ||
         2:  404:				strm->bytes[strm->pos] == '.') {
         3:  405:                                next_token[itt] = strm->bytes[strm->pos];
@@ -527,7 +528,7 @@ format_date(1716909696 * 1000 ),];
         -:  409:                        }
         -:  410:
         2:  411:			next_token[itt] = 0;
-       44:  412:		} else if (strm->bytes[strm->pos] == '\'') {
+       42:  412:		} else if (strm->bytes[strm->pos] == '\'') {
         1:  413:			next_token[itt] = strm->bytes[strm->pos];
         1:  414:			itt += 1;
         1:  415:                        strm->pos += 1;
@@ -542,7 +543,7 @@ format_date(1716909696 * 1000 ),];
         1:  424:                        itt++;
         1:  425:			next_token[itt] = 0;
         1:  426:			is_literal = 1;
-        1:  427:		}
+        -:  427:		}
         -:  428:
        84:  429:		if(is_group) {
        35:  430:			next->token_type = GroupType;
@@ -559,16 +560,16 @@ format_date(1716909696 * 1000 ),];
        35:  441:			memcpy(next->group->strm->bytes, strm->bytes + start_group_pos, group_len);
        35:  442:			next->group->strm->len = group_len;
         -:  443:
-       84:  444:		} else if(is_literal) {
+       49:  444:		} else if(is_literal) {
         8:  445:			next->token_type = LiteralType;
         8:  446:			next->literal = malloc(sizeof(Literal));
         8:  447:			next->literal->literal = malloc(sizeof(char) * itt);
         8:  448:			strcpy(next->literal->literal, next_token);
-        8:  449:		} else {
+        -:  449:		} else {
         -:  450:			// punct
        41:  451:			ret = process_punct(strm, next, len, ret);
         -:  452:		}
-       84:  453:	} else {
+        -:  453:	} else {
         -:  454:		// ident start
       264:  455:		while(strm->pos < len) {
       223:  456:			next_token[itt] = strm->bytes[strm->pos];
@@ -583,7 +584,7 @@ format_date(1716909696 * 1000 ),];
         -:  465:
        86:  466:		if(itt == 0) {
        35:  467:			ret = 0;
-       35:  468:		}
+        -:  468:		}
         -:  469:
        86:  470:		next_token[itt] = 0;
        86:  471:		next->token_type = IdentType;
@@ -593,7 +594,7 @@ format_date(1716909696 * 1000 ),];
         -:  475:	}
         -:  476:
       170:  477:	return ret;
-      174:  478:}
+        -:  478:}
         -:  479:
         9:  480:void free_token_stream(TokenStream *strm) {
         9:  481:	free(strm->bytes);
@@ -605,22 +606,21 @@ format_date(1716909696 * 1000 ),];
       140:  487:	if(tree->token_type == IdentType) {
        55:  488:		free(tree->ident->value);
        55:  489:		free(tree->ident);
-      140:  490:	} else if(tree->token_type == PunctType) {
+       85:  490:	} else if(tree->token_type == PunctType) {
        42:  491:		free(tree->punct);
-       85:  492:	} else if(tree->token_type == LiteralType) {
+       43:  492:	} else if(tree->token_type == LiteralType) {
         7:  493:		free(tree->literal->literal);
         7:  494:		free(tree->literal);
-       43:  495:	} else if(tree->token_type == GroupType) {
+       36:  495:	} else if(tree->token_type == GroupType) {
        36:  496:		free(tree->group->strm);
        36:  497:		free(tree->group);
-       36:  498:	}
+        -:  498:	}
       140:  499:}
         -:  500:
         -:    0:Source:expr.c
         -:    0:Graph:./expr.gcno
         -:    0:Data:./expr.gcda
-        -:    0:Runs:1
-        -:    0:Programs:1
+        -:    0:Runs:3
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -643,8 +643,7 @@ format_date(1716909696 * 1000 ),];
         -:    0:Source:file.c
         -:    0:Graph:./file.gcno
         -:    0:Data:./file.gcda
-        -:    0:Runs:1
-        -:    0:Programs:1
+        -:    0:Runs:3
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -667,8 +666,7 @@ format_date(1716909696 * 1000 ),];
         -:    0:Source:item.c
         -:    0:Graph:./item.gcno
         -:    0:Data:./item.gcda
-        -:    0:Runs:1
-        -:    0:Programs:1
+        -:    0:Runs:3
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -692,7 +690,6 @@ format_date(1716909696 * 1000 ),];
         -:    0:Graph:./syn.gcno
         -:    0:Data:./syn.gcda
         -:    0:Runs:3
-        -:    0:Programs:1
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -720,7 +717,7 @@ format_date(1716909696 * 1000 ),];
         1:   25:			sm->class_array = malloc(sizeof(Class));
         1:   26:			sm->class_array[sm->class_count].fn_count = 0;
         1:   27:			sm->class_count += 1;
-        1:   28:		} else {
+        -:   28:		} else {
         5:   29:			sm->class_count += 1;
         5:   30:			sm->class_array = realloc(sm->class_array, sm->class_count * sizeof(Class));
         5:   31:			sm->class_array[sm->class_count-1].fn_count = 0;
@@ -735,19 +732,19 @@ format_date(1716909696 * 1000 ),];
         6:   40:		sm->class_array[sm->class_count-1].impl_name = NULL;
         6:   41:		strcpy(sm->class_array[sm->class_count-1].name, ident->value);
         6:   42:		sm->state = StateAfterClassName;
-       42:   43:	} else if(sm->state == StateExpectImplName) {
+       36:   43:	} else if(sm->state == StateExpectImplName) {
         2:   44:		printf("ident->value='%s'\n", ident->value);
         2:   45:		sm->class_array[sm->class_count-1].impl_name = malloc(sizeof(char) * (strlen(ident->value)+ 1));
         2:   46:		strcpy(sm->class_array[sm->class_count-1].impl_name, ident->value);
         2:   47:		sm->state = StateExpectClassBrace;
-       36:   48:	} else if(sm->state == StateExpectReturnTypeOrAttribute) {
+       34:   48:	} else if(sm->state == StateExpectReturnTypeOrAttribute) {
         7:   49:		printf("got a return type: %s\n", ident->value);
         7:   50:		sm->state = StateExpectFnName;
         -:   51:
         7:   52:		if(sm->class_array[sm->class_count-1].fn_count == 0) {
         6:   53:			sm->class_array[sm->class_count-1].fn_array = malloc(sizeof(Fn));
         6:   54:			sm->class_array[sm->class_count-1].fn_count += 1;
-        6:   55:		} else {
+        -:   55:		} else {
         1:   56:			sm->class_array[sm->class_count-1].fn_count += 1;
         1:   57:			sm->class_array[sm->class_count-1].fn_array = realloc(
         1:   58:				sm->class_array[sm->class_count-1].fn_array,
@@ -758,19 +755,19 @@ format_date(1716909696 * 1000 ),];
         7:   63:		printf("cur fn = %i\n", cur);
         7:   64:		sm->class_array[sm->class_count-1].fn_array[cur].name = malloc(sizeof(char) * (strlen(ident->value) + 1));
         7:   65:		strcpy(sm->class_array[sm->class_count-1].fn_array[cur].name, ident->value);
-       34:   66:	} else if(sm->state == StateExpectFnName) {
+       27:   66:	} else if(sm->state == StateExpectFnName) {
         7:   67:		printf("got a fn name: %s\n", ident->value);
         7:   68:		int cur = (sm->class_array[sm->class_count-1].fn_count) - 1;
         7:   69:		sm->class_array[sm->class_count-1].fn_array[cur].ret_type = malloc(sizeof(char) * (strlen(ident->value) + 1));
         7:   70:                strcpy(sm->class_array[sm->class_count-1].fn_array[cur].ret_type, ident->value);
         7:   71:		sm->class_array[sm->class_count-1].fn_array[cur].is_implemented = 1;
         7:   72:		sm->state = StateExpectParameterList;
-        7:   73:	} else {
+        -:   73:	} else {
         -:   74:		
         -:   75:	}
         -:   76:
        42:   77:	return 0;
-       42:   78:}
+        -:   78:}
         -:   79:
        18:   80:int process_syn_punct(StateMachine *sm, Punct *punct, int debug_flags) {
        18:   81:	if(sm->state == StateAfterClassName) {
@@ -778,27 +775,27 @@ format_date(1716909696 * 1000 ),];
         2:   83:		if(punct->ch == ':' && punct->second_ch == ':' && punct->third_ch == 0) {
         2:   84:			printf("impl block\n");
         2:   85:			sm->state = StateExpectImplName;
-        2:   86:		} else {
+        -:   86:		} else {
         -:   87:		}
-       18:   88:	} else if(sm->state == StateExpectReturnTypeOrAttribute) {
+       16:   88:	} else if(sm->state == StateExpectReturnTypeOrAttribute) {
         -:   89:		// doc
         2:   90:		if(punct->ch == '#') {
         2:   91:			sm->state = StateExpectAttributeBracket;
-        2:   92:		} else {
+        -:   92:		} else {
         -:   93:		}
         -:   94:
-       16:   95:	} else if(sm->state == StateExpectClassName) {
+       14:   95:	} else if(sm->state == StateExpectClassName) {
         1:   96:		 if(punct->ch == '#') {
         1:   97:                        sm->state = StateExpectAttributeBracket;
-        1:   98:                } else {
+        -:   98:                } else {
         -:   99:                }
-       14:  100:	} else if(sm->state == StateExpectFnBlockOrSemi) {
+       13:  100:	} else if(sm->state == StateExpectFnBlockOrSemi) {
         6:  101:		if(punct->ch == ';' && sm->scope == 1) {
         1:  102:			sm->state = StateExpectReturnTypeOrAttribute;
         1:  103:			int cur = (sm->class_array[sm->class_count-1].fn_count) - 1;
         1:  104:			sm->class_array[sm->class_count-1].fn_array[cur].is_implemented = 0;
-        1:  105:		}
-        6:  106:	}
+        -:  105:		}
+        -:  106:	}
        18:  107:	return 0;
         -:  108:}
         -:  109:
@@ -809,21 +806,21 @@ format_date(1716909696 * 1000 ),];
        30:  114:int process_syn_begin_group(StateMachine *sm, Delimiter delimiter, int debug_flags) {
        30:  115:	if(delimiter == Brace) {
        14:  116:		sm->scope += 1;
-       14:  117:	}
+        -:  117:	}
        30:  118:	if(sm->state == StateAfterClassName || sm->state == StateExpectClassBrace) {
         6:  119:		if(delimiter == Brace) {
         6:  120:			sm->state = StateExpectReturnTypeOrAttribute;
-        6:  121:		} else {
+        -:  121:		} else {
         -:  122:		}
-       30:  123:	} else if(sm->state == StateExpectAttributeBracket) {
+       24:  123:	} else if(sm->state == StateExpectAttributeBracket) {
         3:  124:		if(delimiter == Bracket) {
         3:  125:			sm->state = StateInAttribute;
-        3:  126:		} else {
+        -:  126:		} else {
         -:  127:		}
-       24:  128:	} else if(sm->state == StateExpectParameterList) {
+       21:  128:	} else if(sm->state == StateExpectParameterList) {
         9:  129:		sm->in_param_list = TRUE;
         -:  130:
-        9:  131:	} else {
+        -:  131:	} else {
         -:  132:	}
        30:  133:	return 0;
         -:  134:}
@@ -837,23 +834,23 @@ format_date(1716909696 * 1000 ),];
         -:  142:			// err
        14:  143:		} else if(sm->scope == 1) {
         6:  144:			sm->state = StateExpectReturnTypeOrAttribute;
-        6:  145:		}
-       30:  146:	} else if(delimiter == Bracket) {
+        -:  145:		}
+       16:  146:	} else if(delimiter == Bracket) {
         5:  147:		printf("got end bracket scope = %i, in_param_list = %i\n", sm->scope, sm->in_param_list);
         5:  148:		if(sm->scope == 0) {
         1:  149:			sm->state = StateExpectClassName;
-        5:  150:		} else if(sm->scope == 1 && !sm->in_param_list) {
+        4:  150:		} else if(sm->scope == 1 && !sm->in_param_list) {
         2:  151:			printf("expect ret or attr\n");
         2:  152:			sm->state = StateExpectReturnTypeOrAttribute;
-        2:  153:		}
-       16:  154:	} else if(delimiter == Parenthesis) {
+        -:  153:		}
+       11:  154:	} else if(delimiter == Parenthesis) {
        11:  155:		if(sm->scope == 1) {
         8:  156:                	sm->in_param_list = FALSE;
-        8:  157:                }
+        -:  157:                }
        11:  158:		if(sm->state == StateExpectParameterList) {
         7:  159:			sm->state = StateExpectFnBlockOrSemi;
-        7:  160:		}
-       11:  161:	}
+        -:  160:		}
+        -:  161:	}
        30:  162:	return 0;
         -:  163:}
         -:  164:
@@ -862,7 +859,7 @@ format_date(1716909696 * 1000 ),];
        42:  167:		if((debug_flags & DEBUG_FLAG_PRINT_TOKENS) != 0)
     #####:  168:			printf("ident[%s]\n", tree->ident->value);
        42:  169:		process_syn_ident(sm, tree->ident, debug_flags);
-       94:  170:	} else if(tree->token_type == PunctType) {
+       52:  170:	} else if(tree->token_type == PunctType) {
         -:  171:		char punct[4];
        18:  172:		punct[0] = tree->punct->ch;
        18:  173:		if(tree->punct->second_ch != 0) {
@@ -870,10 +867,10 @@ format_date(1716909696 * 1000 ),];
         3:  175:			if(tree->punct->third_ch != 0) {
     #####:  176:				punct[2] = tree->punct->third_ch;
     #####:  177:				punct[3] = 0;
-    #####:  178:			} else {
+        -:  178:			} else {
         3:  179:				punct[2] = 0;
         -:  180:			}
-        3:  181:		} else {
+        -:  181:		} else {
        15:  182:			punct[1] = 0;
         -:  183:		}
        18:  184:		if((debug_flags & DEBUG_FLAG_PRINT_TOKENS) != 0)
@@ -881,18 +878,18 @@ format_date(1716909696 * 1000 ),];
        18:  186:		if(process_syn_punct(sm, tree->punct, debug_flags)) {
     #####:  187:			return -1;
         -:  188:		}
-       52:  189:	} else if(tree->token_type == LiteralType) {
+       34:  189:	} else if(tree->token_type == LiteralType) {
         4:  190:		if((debug_flags & DEBUG_FLAG_PRINT_TOKENS) != 0)
     #####:  191:			printf("literal[%s]\n", tree->literal->literal);
         4:  192:		process_syn_literal(sm, tree->literal, debug_flags);
-        4:  193:	} else { // GroupType
+        -:  193:	} else { // GroupType
         -:  194:		TokenTree group_tree;
         -:  195:		int v;
        30:  196:		int err = 0;
        30:  197:		if((debug_flags & DEBUG_FLAG_PRINT_TOKENS) != 0)
     #####:  198:			printf("group[%u]\n", tree->group->delimiter);
        30:  199:		process_syn_begin_group(sm, tree->group->delimiter, debug_flags);
-      106:  200:		while(TRUE) {
+        -:  200:		while(TRUE) {
       106:  201:			v = next_token(tree->group->strm, &group_tree);
       106:  202:			if(v == 0)
        30:  203:				break;
@@ -914,7 +911,7 @@ format_date(1716909696 * 1000 ),];
        30:  219:		process_syn_end_group(sm, tree->group->delimiter, debug_flags);
         -:  220:	}
        94:  221:	return 0;
-       94:  222:}
+        -:  222:}
         -:  223:
         1:  224:int build_state(char *file, StateMachine *sm, int debug_flags) {
         1:  225:	sm->state = StateExpectClassName;
@@ -930,7 +927,7 @@ format_date(1716909696 * 1000 ),];
         -:  235:
         -:  236:	TokenTree tree;
         -:  237:	int v;
-       19:  238:	while(TRUE) {
+        -:  238:	while(TRUE) {
        19:  239:		v = next_token(&sm->strm, &tree);
        19:  240:		if(v == 0)
         1:  241:			break;
@@ -950,12 +947,11 @@ format_date(1716909696 * 1000 ),];
         -:  255:
         -:  256:
         1:  257:	return 0;
-        1:  258:}
+        -:  258:}
         -:    0:Source:type.c
         -:    0:Graph:./type.gcno
         -:    0:Data:./type.gcda
-        -:    0:Runs:1
-        -:    0:Programs:1
+        -:    0:Runs:3
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -975,150 +971,242 @@ format_date(1716909696 * 1000 ),];
         -:   17:#include <string.h>
         -:   18:#include <syn/type.h>
         -:   19:
-        6:   20:int init_type(
-        -:   21:        Type *type,
-        -:   22:        char *name,
-        -:   23:        int is_ref,
-        -:   24:        int is_mut,
-        -:   25:        ArrayTypeInfo *array_type_info,
-        -:   26:        TupleTypeInfo *tuple_type_info,
-        -:   27:        SliceTypeInfo *slice_type_info
-        -:   28:) {
-        6:   29:	int non_null_count = 0;
-        6:   30:	type->type = TypeRegular;
-        6:   31:	if(slice_type_info) {
-        1:   32:		type->type = TypeSlice;
-        1:   33:		non_null_count += 1;
-        1:   34:	}
-        6:   35:	if(tuple_type_info) {
-        1:   36:		type->type = TypeTuple;
-        1:   37:		non_null_count += 1;
-        1:   38:	}
-        6:   39:	if(array_type_info) {
-        1:   40:		type->type = TypeArray;
-        1:   41:		non_null_count += 1;
-        1:   42:	}
-        -:   43:
-        6:   44:	if(non_null_count > 1) {
-    #####:   45:		fputs(
-        -:   46:		"ERROR: no more than one of ArrayTypeInfo, TupleTypeInfo, SliceTypeInfo must be specified.\n",
-    #####:   47:		stderr
-        -:   48:		);
-    #####:   49:		return -1;
-        -:   50:	}
-        -:   51:
-        6:   52:	if(name == NULL) {
-        3:   53:		type->name = NULL;
-        3:   54:	} else {
-        3:   55:		type->name = malloc(sizeof(char) * (strlen(name) + 1));
-        -:   56:	
-        3:   57:		if(type->name == NULL) {
-    #####:   58:			fputs("ERROR: could not allocate memory to init_type", stderr);
-    #####:   59:			return -1;
-        -:   60:		}
-        3:   61:		strcpy(type->name, name);
-        -:   62:	}
-        -:   63:
-        6:   64:	if(array_type_info) {
-        1:   65:		type->array_type_info = malloc(sizeof(ArrayTypeInfo));
-        1:   66:		if(type->array_type_info == NULL) {
-    #####:   67:			free(type->name);
-    #####:   68:			fputs("ERROR: could not allocate memory to init_type", stderr);
-    #####:   69:			return -1;
-        -:   70:		}
-        1:   71:		memcpy(type->array_type_info, array_type_info, sizeof(ArrayTypeInfo));
-        1:   72:	} else {
-        5:   73:		type->array_type_info = NULL;
-        -:   74:	}
-        6:   75:	if(tuple_type_info) {
-        1:   76:		type->tuple_type_info = malloc(sizeof(TupleTypeInfo));
-        1:   77:		if(type->tuple_type_info == NULL) {
-    #####:   78:                        free(type->name);
-    #####:   79:                        fputs("ERROR: could not allocate memory to init_type", stderr);
-    #####:   80:                        return -1;
-        -:   81:                }
-        1:   82:		memcpy(type->tuple_type_info, tuple_type_info, sizeof(TupleTypeInfo));
-        1:   83:	} else {
-        5:   84:		type->tuple_type_info = NULL;
-        -:   85:	}
-        6:   86:	if(slice_type_info) {
-        1:   87:		type->slice_type_info = malloc(sizeof(SliceTypeInfo));
-        1:   88:		if(type->slice_type_info == NULL) {
-    #####:   89:                        free(type->name);
-    #####:   90:                        fputs("ERROR: could not allocate memory to init_type", stderr);
-    #####:   91:                        return -1;
-        -:   92:                }
-        1:   93:		memcpy(type->slice_type_info, slice_type_info, sizeof(SliceTypeInfo));
-        1:   94:	} else {
-        5:   95:		type->slice_type_info = NULL;
-        -:   96:	}
-        -:   97:
-        6:   98:	type->is_mut = is_mut;
-        6:   99:	type->is_ref = is_ref;
-        -:  100:
-        6:  101:	return 0;
-        6:  102:}
-        -:  103:
-        6:  104:void free_type(Type *type) {
-        6:  105:	if(type->array_type_info) {
-        1:  106:		free(type->array_type_info);
-        1:  107:	}
-        6:  108:        if(type->tuple_type_info) {
-        1:  109:		free(type->tuple_type_info);
-        1:  110:	}
-        6:  111:        if(type->slice_type_info) {
-        1:  112:		free(type->slice_type_info);
-        1:  113:	}
-        6:  114:	free(type->name);
-        6:  115:}
-        -:  116:
-        1:  117:int init_array_type_info(ArrayTypeInfo *arr_type, Type *type, int len) {
-        1:  118:	arr_type->type = malloc(sizeof(Type));
-        1:  119:	if(arr_type->type == NULL) {
-    #####:  120:		fputs("ERROR: could not allocate memory to init_array_type_info", stderr);
-    #####:  121:		return -1;
-        -:  122:	}
-        1:  123:	memcpy(arr_type->type, type, sizeof(Type));
-        1:  124:	arr_type->len = len;
-        1:  125:	return 0;
-        1:  126:}
-        -:  127:
-        1:  128:void free_array_type_info(ArrayTypeInfo *arr_type) {
-        1:  129:	free(arr_type->type);
-        1:  130:}
-        -:  131:
-        1:  132:int init_slice_type_info(SliceTypeInfo *slice_type, Type *type) {
-        1:  133:	slice_type->type = malloc(sizeof(Type));
-        1:  134:	if(slice_type->type == NULL) {
-    #####:  135:                fputs("ERROR: could not allocate memory to init_slice_type_info", stderr);
-    #####:  136:                return -1;
-        -:  137:        }
-        1:  138:        memcpy(slice_type->type, type, sizeof(Type));
-        1:  139:	return 0;
-        1:  140:}
-        1:  141:void free_slice_type_info(SliceTypeInfo *slice_type) {
-        1:  142:	free(slice_type->type);
-        1:  143:}
-        -:  144:
-        1:  145:int init_tuple_type_info(TupleTypeInfo *tuple_type, Type *type, int len) {
-        1:  146:	tuple_type->type = malloc(sizeof(Type) * len);
-        1:  147:	if(tuple_type->type == NULL) {
-    #####:  148:		fputs("ERROR: could not allocate memory to init_tuple_type_info", stderr);
-    #####:  149:		return -1;
-        -:  150:	}
-        1:  151:	memcpy(tuple_type->type, type, sizeof(Type) * len);
-        1:  152:	tuple_type->len = len;
-        1:  153:        return 0;
-        1:  154:}
-        -:  155:
-        1:  156:void free_tuple_type_info(TupleTypeInfo *tuple_type) {
-        1:  157:	free(tuple_type->type);
-        1:  158:}
+        -:   20:int copy_type(Type *dst, Type *src);
+        -:   21:
+        1:   22:int copy_array_type_info(ArrayTypeInfo *dst, ArrayTypeInfo *src) {
+        1:   23:	if(src != NULL) {
+        1:   24:		dst->len = src->len;
+        1:   25:		dst->type = malloc(sizeof(Type));
+        1:   26:                if(dst->type == NULL)
+    #####:   27:                        return -1;
+        -:   28:
+        1:   29:		if(copy_type(dst->type, src->type))
+    #####:   30:			return -1;
+        -:   31:	}
+        1:   32:	return 0;
+        -:   33:}
+        -:   34:
+        1:   35:int copy_tuple_type_info(TupleTypeInfo *dst, TupleTypeInfo *src) {
+        1:   36:	if(src != NULL) {
+        1:   37:                dst->len = src->len;
+        1:   38:                dst->type = malloc(src->len * sizeof(Type));
+        1:   39:                if(dst->type == NULL)
+    #####:   40:                        return -1;
+        -:   41:
+        4:   42:		for(int i=0; i<src->len; i++) {
+        3:   43:                	if(copy_type(&dst->type[i], &src->type[i]))
+    #####:   44:                        	return -1;
+        -:   45:		}
+        -:   46:        }
+        1:   47:        return 0;
+        -:   48:}
+        -:   49:
+        1:   50:int copy_slice_type_info(SliceTypeInfo *dst, SliceTypeInfo *src) {
+        1:   51:	if(src != NULL) {
+        1:   52:                dst->type = malloc(sizeof(Type));
+        1:   53:                if(dst->type == NULL)
+    #####:   54:                        return -1;
+        -:   55:
+        1:   56:                if(copy_type(dst->type, src->type))
+    #####:   57:                        return -1;
+        -:   58:        }
+        1:   59:        return 0;
+        -:   60:}
+        -:   61:
+       10:   62:int copy_type(Type *dst, Type *src) {
+       10:   63:	if(src->array_type_info) {
+    #####:   64:		dst->array_type_info = malloc(sizeof(ArrayTypeInfo));
+    #####:   65:		if(copy_array_type_info(dst->array_type_info, src->array_type_info))
+    #####:   66:			return -1;
+        -:   67:	} else {
+       10:   68:		dst->array_type_info = NULL;
+        -:   69:	}
+       10:   70:	if(src->slice_type_info) {
+    #####:   71:		dst->slice_type_info = malloc(sizeof(SliceTypeInfo));
+    #####:   72:		if(copy_slice_type_info(dst->slice_type_info, src->slice_type_info))
+    #####:   73:			return -1;
+        -:   74:	} else {
+       10:   75:		dst->slice_type_info = NULL;
+        -:   76:	}
+       10:   77:	if(src->tuple_type_info) {
+    #####:   78:		dst->tuple_type_info = malloc(sizeof(TupleTypeInfo));
+    #####:   79:                if(copy_tuple_type_info(dst->tuple_type_info, src->tuple_type_info))
+    #####:   80:			return -1;
+        -:   81:        } else {
+       10:   82:		dst->tuple_type_info = NULL;
+        -:   83:	}
+        -:   84:
+       10:   85:	if(src->name != NULL) {
+       10:   86:		dst->name = malloc(sizeof(char) * (strlen(src->name) + 1));
+       10:   87:		if(dst->name == NULL)
+    #####:   88:			return -1;
+       10:   89:		strcpy(dst->name, src->name);
+        -:   90:	} else {
+    #####:   91:		dst->name = NULL;
+        -:   92:	}
+       10:   93:	dst->is_ref = src->is_ref;
+       10:   94:	dst->is_mut = src->is_mut;
+       10:   95:	dst->type = src->type;
+       10:   96:	return 0;
+        -:   97:}
+        -:   98:
+        6:   99:int init_type(
+        -:  100:        Type *type,
+        -:  101:        char *name,
+        -:  102:        int is_ref,
+        -:  103:        int is_mut,
+        -:  104:        ArrayTypeInfo *array_type_info,
+        -:  105:        TupleTypeInfo *tuple_type_info,
+        -:  106:        SliceTypeInfo *slice_type_info
+        -:  107:) {
+        6:  108:	int non_null_count = 0;
+        6:  109:	type->type = TypeRegular;
+        6:  110:	if(slice_type_info) {
+        1:  111:		type->type = TypeSlice;
+        1:  112:		non_null_count += 1;
+        -:  113:	}
+        6:  114:	if(tuple_type_info) {
+        1:  115:		type->type = TypeTuple;
+        1:  116:		non_null_count += 1;
+        -:  117:	}
+        6:  118:	if(array_type_info) {
+        1:  119:		type->type = TypeArray;
+        1:  120:		non_null_count += 1;
+        -:  121:	}
+        -:  122:
+        6:  123:	if(non_null_count > 1) {
+    #####:  124:		fputs(
+        -:  125:		"ERROR: no more than one of ArrayTypeInfo, TupleTypeInfo, SliceTypeInfo must be specified.\n",
+        -:  126:		stderr
+        -:  127:		);
+    #####:  128:		return -1;
+        -:  129:	}
+        -:  130:
+        6:  131:	if(name == NULL) {
+        3:  132:		type->name = NULL;
+        -:  133:	} else {
+        3:  134:		type->name = malloc(sizeof(char) * (strlen(name) + 1));
+        -:  135:	
+        3:  136:		if(type->name == NULL) {
+    #####:  137:			fputs("ERROR: could not allocate memory to init_type", stderr);
+    #####:  138:			return -1;
+        -:  139:		}
+        3:  140:		strcpy(type->name, name);
+        -:  141:	}
+        -:  142:
+        6:  143:	if(array_type_info != NULL) {
+        1:  144:		type->array_type_info = malloc(sizeof(ArrayTypeInfo));
+        1:  145:                if(type->array_type_info == NULL) {
+    #####:  146:                        free(type->name);
+    #####:  147:                        fputs("ERROR: could not allocate memory to init_type", stderr);
+    #####:  148:                        return -1;
+        -:  149:                }
+        1:  150:		copy_array_type_info(type->array_type_info, array_type_info);
+        -:  151:	}
+        -:  152:	else
+        5:  153:		type->array_type_info = NULL;
+        6:  154:	if(tuple_type_info) {
+        1:  155:		type->tuple_type_info = malloc(sizeof(TupleTypeInfo));
+        1:  156:		if(type->tuple_type_info == NULL) {
+    #####:  157:                        free(type->name);
+    #####:  158:                        fputs("ERROR: could not allocate memory to init_type", stderr);
+    #####:  159:                        return -1;
+        -:  160:                }
+        1:  161:		copy_tuple_type_info(type->tuple_type_info, tuple_type_info);
+        -:  162:	} else {
+        5:  163:		type->tuple_type_info = NULL;
+        -:  164:	}
+        6:  165:	if(slice_type_info) {
+        1:  166:		type->slice_type_info = malloc(sizeof(SliceTypeInfo));
+        1:  167:		if(type->slice_type_info == NULL) {
+    #####:  168:                        free(type->name);
+    #####:  169:                        fputs("ERROR: could not allocate memory to init_type", stderr);
+    #####:  170:                        return -1;
+        -:  171:                }
+        1:  172:		copy_slice_type_info(type->slice_type_info, slice_type_info);
+        -:  173:	} else {
+        5:  174:		type->slice_type_info = NULL;
+        -:  175:	}
+        -:  176:
+        6:  177:	type->is_mut = is_mut;
+        6:  178:	type->is_ref = is_ref;
+        -:  179:
+        6:  180:	return 0;
+        -:  181:}
+        -:  182:
+       12:  183:void free_type(Type *type) {
+       12:  184:	if(type->array_type_info) {
+        1:  185:		free_array_type_info(type->array_type_info);
+        1:  186:		free(type->array_type_info);
+        -:  187:	}
+       12:  188:        if(type->tuple_type_info) {
+        1:  189:		free_tuple_type_info(type->tuple_type_info);
+        1:  190:		free(type->tuple_type_info);
+        -:  191:	}
+       12:  192:        if(type->slice_type_info) {
+        1:  193:		free_slice_type_info(type->slice_type_info);
+        1:  194:		free(type->slice_type_info);
+        -:  195:	}
+       12:  196:	free(type->name);
+       12:  197:}
+        -:  198:
+        1:  199:int init_array_type_info(ArrayTypeInfo *arr_type, Type *type, int len) {
+        1:  200:	arr_type->type = malloc(sizeof(Type));
+        1:  201:	if(arr_type->type == NULL) {
+    #####:  202:		fputs("ERROR: could not allocate memory to init_array_type_info", stderr);
+    #####:  203:		return -1;
+        -:  204:	}
+        1:  205:	copy_type(arr_type->type, type);
+        1:  206:	arr_type->len = len;
+        1:  207:	return 0;
+        -:  208:}
+        -:  209:
+        2:  210:void free_array_type_info(ArrayTypeInfo *arr_type) {
+        2:  211:	if(arr_type->type != NULL) {
+        2:  212:		free_type(arr_type->type);
+        2:  213:		free(arr_type->type);
+        -:  214:	}
+        2:  215:}
+        -:  216:
+        1:  217:int init_slice_type_info(SliceTypeInfo *slice_type, Type *type) {
+        1:  218:	slice_type->type = malloc(sizeof(Type));
+        1:  219:	if(slice_type->type == NULL) {
+    #####:  220:                fputs("ERROR: could not allocate memory to init_slice_type_info", stderr);
+    #####:  221:                return -1;
+        -:  222:        }
+        1:  223:	copy_type(slice_type->type, type);
+        1:  224:	return 0;
+        -:  225:}
+        2:  226:void free_slice_type_info(SliceTypeInfo *slice_type) {
+        2:  227:	if(slice_type->type != NULL) {
+        2:  228:                free_type(slice_type->type);
+        2:  229:                free(slice_type->type);
+        -:  230:        }  
+        2:  231:}
+        -:  232:
+        1:  233:int init_tuple_type_info(TupleTypeInfo *tuple_type, Type *type, int len) {
+        1:  234:	tuple_type->type = malloc(sizeof(Type) * len);
+        1:  235:	if(tuple_type->type == NULL) {
+    #####:  236:		fputs("ERROR: could not allocate memory to init_tuple_type_info", stderr);
+    #####:  237:		return -1;
+        -:  238:	}
+        4:  239:	for(int i=0; i<len; i++) {
+        3:  240:		copy_type(&tuple_type->type[i], &type[i]);
+        -:  241:	}
+        1:  242:	tuple_type->len = len;
+        1:  243:        return 0;
+        -:  244:}
+        -:  245:
+        2:  246:void free_tuple_type_info(TupleTypeInfo *tuple_type) {
+        2:  247:	if(tuple_type->type != NULL) {
+        2:  248:                free_type(tuple_type->type);
+        2:  249:                free(tuple_type->type);
+        -:  250:        }
+        2:  251:}
         -:    0:Source:main.c
         -:    0:Graph:./main.gcno
         -:    0:Data:-
         -:    0:Runs:0
-        -:    0:Programs:0
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1147,10 +1235,10 @@ format_date(1716909696 * 1000 ),];
     #####:   26:		printf("punct='%c", token.punct->ch);
     #####:   27:		if(token.punct->second_ch != 0) {
     #####:   28:			printf("%c", token.punct->second_ch);
-    #####:   29:		}
+        -:   29:		}
     #####:   30:		if(token.punct->third_ch != 0) {
     #####:   31:                        printf("%c", token.punct->third_ch);
-    #####:   32:                }
+        -:   32:                }
     #####:   33:		printf("'\n");
         -:   34:
         -:   35:		 //display_span(&token.span, Error, "bad punct");
@@ -1185,7 +1273,7 @@ format_date(1716909696 * 1000 ),];
     #####:   64:                        printf("end group delimiter = Bracket\n");
     #####:   65:                else if(token.group->delimiter == Brace)
     #####:   66:                        printf("end group delimiter = Brace\n");
-    #####:   67:	}
+        -:   67:	}
     #####:   68:	return 0;
         -:   69:}
         -:   70:
@@ -1220,8 +1308,7 @@ format_date(1716909696 * 1000 ),];
         -:    0:Source:misc.c
         -:    0:Graph:./misc.gcno
         -:    0:Data:./misc.gcda
-        -:    0:Runs:1
-        -:    0:Programs:1
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://              
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1244,15 +1331,15 @@ format_date(1716909696 * 1000 ),];
       150:   20:                return TRUE;
         -:   21:        else
       146:   22:                return FALSE;
-      296:   23:}
+        -:   23:}
         -:   24:
-      824:   25:int is_ident_start(char ch) {
-      824:   26:        if ((ch <= 'Z' && ch >= 'A') || (ch <= 'z' && ch >= 'a') || ch == '_') {
-      688:   27:                return TRUE;
+      358:   25:int is_ident_start(char ch) {
+      358:   26:        if ((ch <= 'Z' && ch >= 'A') || (ch <= 'z' && ch >= 'a') || ch == '_') {
+      222:   27:                return TRUE;
         -:   28:        } else {
       136:   29:                return FALSE;
         -:   30:        }
-      358:   31:}
+        -:   31:}
         -:   32:
       223:   33:int is_ident_secondary(char ch) {
       223:   34:        if (is_ident_start(ch) || (ch <= '9' && ch >= '0')) {
@@ -1260,17 +1347,17 @@ format_date(1716909696 * 1000 ),];
         -:   36:        } else {
        45:   37:                return FALSE;
         -:   38:        }
-      223:   39:}
+        -:   39:}
         -:   40:
        41:   41:int is_joint_possible(char ch) {
-       56:   42:        if (ch == '.' || ch == '=' || ch == '/' || ch == '+' || ch == '&' || ch == '<' ||
-       22:   43:                ch == '-' || ch == '%' || ch == '^' || ch == '*' || ch == '>' || ch == '|' ||
-       16:   44:		ch == '!' || ch == ':') {
+       41:   42:        if (ch == '.' || ch == '=' || ch == '/' || ch == '+' || ch == '&' || ch == '<' ||
+       21:   43:                ch == '-' || ch == '%' || ch == '^' || ch == '*' || ch == '>' || ch == '|' ||
+       15:   44:		ch == '!' || ch == ':') {
        29:   45:                return TRUE;
         -:   46:        } else {
        12:   47:                return FALSE;
         -:   48:        }
-       41:   49:}</textarea>
+        -:   49:}</textarea>
 		</p>
 	</body>
 </html>

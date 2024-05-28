@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['expr_5fplaceholder_184',['expr_placeholder',['../expr_8c.html#ae155a35793868cc431718ffda887a375',1,'expr.c']]]
+  ['display_5fspan_191',['display_span',['../parser_8c.html#af6d84e73e994bc5bee7bf10699b1662b',1,'display_span(Span *span, ErrorLevel level, char *message):&#160;parser.c'],['../parser_8h.html#af6d84e73e994bc5bee7bf10699b1662b',1,'display_span(Span *span, ErrorLevel level, char *message):&#160;parser.c']]]
 ];
