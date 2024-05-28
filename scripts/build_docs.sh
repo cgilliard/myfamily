@@ -11,5 +11,5 @@ git checkout main
 git config --global user.email "pipelinesbot.noreply@example.com"
 git config --global user.name "Pipelines-Bot"
 git add --all
-git commit -m"Pipelines-Bot: Updated repo (via build_docs script) Source Version is $2";
+git commit -am "Pipelines-Bot: Updated repo (via build_docs script) Source Version is $2";
 git push https://$1@github.com/cgilliard/myfamily.git
