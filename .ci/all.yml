@@ -12,4 +12,4 @@ steps:
   - script: |
       ./scripts/build_docs.sh $(MyFamilyPat) $(Build.SourceVersion)
     displayName: Documentation
-    condition: and(eq( variables['Agent.OS'], 'Linux' ), and(succeeded(), in(variables['Build.Reason'], 'Manual', 'Scheduled')))
+    condition: and(eq( variables['Agent.OS'], 'Linux' ), and(succeeded(), in(variables['Build.Reason'], 'Manual', 'Schedule')))
