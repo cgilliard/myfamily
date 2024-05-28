@@ -17,8 +17,8 @@ for f in $FILES
 do
 	if [ $f != "./test.c" ]; then
 		echo "calling gcov for $f"
-		percent=`gcov $f | grep "^Lines" | cut -f2 -d ' ' | cut -f2 -d ':' | cut -f1 -d '%'`;
-		lines=`gcov $f | grep "^Lines" | cut -f4 -d ' '`;
+		percent=`gcov $f | grep "^Lines" | cut -f2 -d ' ' | cut -f2 -d ':' | cut -f1 -d '%' | tr -d \\n`;
+		lines=`gcov $f | grep "^Lines" | cut -f4 -d ' ' | tr -d \\n`;
 		v=100;
 		echo $percent;
 		ratio=`awk "BEGIN {print $percent / 100}"`;
