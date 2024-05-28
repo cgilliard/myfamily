@@ -13,7 +13,7 @@
 # limitations under the License.
 
 schedules:
-- cron: "44 2 * * *"
+- cron: "0 7 * * *"
   displayName: Daily midnight build
   branches:
     include:
