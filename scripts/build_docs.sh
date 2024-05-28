@@ -2,7 +2,6 @@
 
 echo "Building docs";
 make doc
-git pull
 git clone https://anything:$1@github.com/cgilliard/myfamily.git myfamilydocs
 cd myfamilydocs
 rm -rf docs/html
