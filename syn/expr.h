@@ -15,4 +15,32 @@
 #ifndef SYN_EXPR
 #define SYN_EXPR
 
+enum ExprEnum {
+	ExprSlice = 1, // slice literal [1, 2, 3, 4]
+	ExprAssign = 2, // a = test()
+	ExprBlock = 3, // { ... }
+	ExprBinary = 4, // a + b, a += b
+	ExprBreak = 5, // break c-style break only
+	ExprCall = 6, // function call test(1)
+	ExprClosure = 7, // |a, b| a + b
+	ExprConst = 8, // const { ... }
+	ExprContinue = 9, // continue c-style continue only
+	ExprField = 10, // Access of a named struct field (obj.k) or unnamed tuple struct field (obj.0).
+	ExprForLoop = 11, // for pattern in expr { ... }
+	ExprIf = 12, // if { ... } else { ... }
+	ExprIndex = 13, // v[3]
+	ExprInfer = 14, // _
+	ExprDefine = 15, // u32 x = 1
+	ExprLit = 16, // literal "abc def", 4
+	ExprWhile = 17, // while expr { ... }
+	
+
+};
+typedef enum ExprEnum ExprEnum;
+
+struct Expr {
+
+};
+typedef struct Expr Expr;
+
 #endif /* SYN_EXPR */
