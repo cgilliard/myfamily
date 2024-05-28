@@ -10,6 +10,6 @@ steps:
     displayName: Linux Test
     condition: eq( variables['Agent.OS'], 'Linux' )
   - script: |
-      ./scripts/build_docs.sh
+      ./scripts/build_docs.sh $(GithubPat) $(Build.SourceVersion)
     displayName: Documentation
     condition: and(eq( variables['Agent.OS'], 'Linux' ), and(succeeded(), in(variables['Build.Reason'], 'Manual', 'Scheduled')))

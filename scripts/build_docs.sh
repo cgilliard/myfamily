@@ -3,11 +3,14 @@
 echo "Building docs";
 make doc
 git pull
-git clone https://anything:$(GithubPat)@github.com/cgilliard/myfamily.git myfamilydocs
+git clone https://anything:$1@github.com/cgilliard/myfamily.git myfamilydocs
+git pull
 cd myfamilydocs
 rm -rf docs/html
 cp -rp ../doc/html/* docs/html
 git config user.name "Pipelines-Bot"
 git config --global user.email "pipelinesbot.noreply@example.com"
 git config --global user.name "Pipelines-Bot"
-git push https://$(GithubPat)@github.com/cgilliard/myfamily.git
+git add --all
+git commit -m"Pipelines-Bot: Updated repo (via build_docs script) Source Version is $2";
+git push https://$1@github.com/cgilliard/myfamily.git
