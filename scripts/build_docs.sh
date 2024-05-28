@@ -4,8 +4,12 @@ echo "Building docs";
 make doc
 git clone https://anything:$1@github.com/cgilliard/myfamily.git myfamilydocs
 cd myfamilydocs
+
 rm -rf docs/html/*
 cp -rp ../doc/html/* docs/html
+
+./scripts/build_coverage.sh
+
 git config user.name "Pipelines-Bot"
 git checkout main
 git config --global user.email "pipelinesbot.noreply@example.com"
