@@ -1,9 +1,6 @@
 var searchData=
 [
-  ['ident_235',['ident',['../structTokenTree.html#a1b24912ff1501f4f00ca57494e13648a',1,'TokenTree']]],
-  ['impl_5fname_236',['impl_name',['../structClass.html#a3efcb0a554b4c2750c4353e3d5ade8b9',1,'Class']]],
-  ['in_5fparam_5flist_237',['in_param_list',['../structStateMachine.html#aa3de14eecb87e02a8d38eff0acffd39c',1,'StateMachine']]],
-  ['is_5fimplemented_238',['is_implemented',['../structFn.html#a0b8e6fab3ae675d26dc2fee9dcde09ad',1,'Fn']]],
-  ['is_5fmut_239',['is_mut',['../structType.html#ad973a9cecc542cca9d70e5767f31e29d',1,'Type']]],
-  ['is_5fref_240',['is_ref',['../structType.html#af43fcaa4ade56050a6e14c90875b1170',1,'Type']]]
+  ['len_143',['len',['../structTokenStream.html#a88b5dad283cef0a5aa8dcd8c2a43cfca',1,'TokenStream']]],
+  ['line_5fnum_144',['line_num',['../structTokenStream.html#ab9aeeb66495c9341b3cb5b527b80b983',1,'TokenStream::line_num()'],['../structSpan.html#af9cb8c73c0f88b7a86b143b8706a4677',1,'Span::line_num()']]],
+  ['literal_145',['literal',['../structLiteral.html#a278078ffbeddd5e77630ad7076e9e0c8',1,'Literal::literal()'],['../structTokenTree.html#a8155afba79b9ce6f0918280141675be1',1,'TokenTree::literal()']]]
 ];

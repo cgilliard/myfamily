@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['arraytypeinfo_153',['ArrayTypeInfo',['../structArrayTypeInfo.html',1,'']]]
+  ['group_93',['Group',['../structGroup.html',1,'']]]
 ];

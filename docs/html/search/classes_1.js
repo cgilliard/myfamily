@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['class_154',['Class',['../structClass.html',1,'']]]
+  ['ident_94',['Ident',['../structIdent.html',1,'']]]
 ];

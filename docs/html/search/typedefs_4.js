@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['fn_267',['Fn',['../syn_8h.html#ab922daeee88571c1dad3b7a6d544b6b5',1,'syn.h']]]
+  ['literal_162',['Literal',['../parser_8h.html#aef9f6af29d875d6e6dc44eaf80dc0507',1,'parser.h']]]
 ];
