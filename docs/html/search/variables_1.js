@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['bytes_225',['bytes',['../structTokenStream.html#a5d0ca87e9079720b539b0958b6baf22a',1,'TokenStream']]]
+  ['ch_137',['ch',['../structPunct.html#acc15c82931faff1c92ca4696bcba4979',1,'Punct']]]
 ];

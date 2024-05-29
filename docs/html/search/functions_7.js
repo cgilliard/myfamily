@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['next_5ftoken_210',['next_token',['../parser_8c.html#a5ee4beb36905da3ffda6adc67a557426',1,'next_token(TokenStream *strm, TokenTree *next):&#160;parser.c'],['../parser_8h.html#a5ee4beb36905da3ffda6adc67a557426',1,'next_token(TokenStream *strm, TokenTree *next):&#160;parser.c']]]
+  ['skip_5fcomments_5fand_5fwhite_5fspace_134',['skip_comments_and_white_space',['../parser_8c.html#a559d29bbc04f3381ae910fefdf4d738e',1,'parser.c']]]
 ];

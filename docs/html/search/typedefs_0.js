@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['arraytypeinfo_263',['ArrayTypeInfo',['../type_8h.html#a18dac6749e4b0a4d9502bc6f551e873d',1,'type.h']]]
+  ['delimiter_158',['Delimiter',['../parser_8h.html#ad8143e8727a998f6a9af0ba82d22c073',1,'parser.h']]]
 ];

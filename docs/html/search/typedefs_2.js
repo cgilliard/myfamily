@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['delimiter_265',['Delimiter',['../parser_8h.html#ad8143e8727a998f6a9af0ba82d22c073',1,'parser.h']]]
+  ['group_160',['Group',['../parser_8h.html#a767ad4b36d0f63a8c54259903f116e65',1,'parser.h']]]
 ];
