@@ -18,10 +18,40 @@
 #include <stdlib.h>
 #include <base/types.h>
 
+/**
+ * Returns a random i8 value using the operating systems' getentropy function.
+ * @param v A pointer to the location to store the value in.
+ * @return the value returned by the getentropy function.
+ * @see [rand_u32]
+ * @see [rand_bytes]
+ */
 int rand_i8(i8 *v);
+
+/**
+ * Returns a random u8 value using the operating systems' getentropy function.
+ * @param v A pointer to the location to store the value in.
+ * @return the value returned by the getentropy function.
+ * @see [rand_u32]
+ * @see [rand_bytes]
+ */
 int rand_u8(u8 *v);
 
+/**
+ * Returns a random i16 value using the operating systems' getentropy function.
+ * @param v A pointer to the location to store the value in.
+ * @return the value returned by the getentropy function.
+ * @see [rand_u32]
+ * @see [rand_bytes]
+ */
 int rand_i16(i16 *v);
+
+/**
+ * Returns a random u16 value using the operating systems' getentropy function.
+ * @param v A pointer to the location to store the value in.
+ * @return the value returned by the getentropy function.
+ * @see [rand_u32]
+ * @see [rand_bytes]
+ */
 int rand_u16(u16 *v);
 
 /**
