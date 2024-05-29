@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _RAND_BASE__
-#define _RAND_BASE__
+#ifndef _CONFIG_BASE__
+#define _CONFIG_BASE__
 
-#include <stdint.h>
-#include <stdlib.h>
+#include <stdbool.h>
 #include <base/types.h>
 
-int rand_i32(i32 *v);
-int rand_u32(u32 *v);
-int rand_i64(i64 *v);
-int rand_u64(u64 *v);
-int rand_i128(i128 *v);
-int rand_u128(u128 *v);
-int rand_bytes(void *buf, size_t length);
 
-#endif /* _RAND_BASE__ */
+void configure_bool(bool *value, bool *configured, bool d);
+void configure_u8(u8 *value, u8 *configured, u8 d);
+void configure_u16(u16 *value, u16 *configured, u16 d);
+void configure_u32(u32 *value, u32 *configured, u32 d);
+void configure_u64(u64 *value, u64 *configured, u64 d);
+void configure_u128(u128 *value, u128 *configured, u128 d);
+void configure_string(char *value, char *configured, char *d, int len);
+
+
+#endif /* _CONFIG_BASE__ */
