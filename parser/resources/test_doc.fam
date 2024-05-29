@@ -1,6 +1,0 @@
-/// This is a doc comment
-// regular comment
-/* C style comment
- *
- */
-abc = 1;

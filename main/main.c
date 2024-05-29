@@ -13,86 +13,9 @@
 // limitations under the License.
 
 #include <stdio.h>
-#include <stdlib.h>
-#include <parser/parser.h>
-
-int process_token(TokenStream strm, TokenTree token) {
-	if(token.token_type == IdentType) {
-		printf("ident='%s' [file_off=%i]\n",
-			token.ident->value, token.span.offset
-		);
-		//display_span(&token.span, Warning, "invalid format");
-	} else if(token.token_type == PunctType) {
-		printf("punct='%c", token.punct->ch);
-		if(token.punct->second_ch != 0) {
-			printf("%c", token.punct->second_ch);
-		}
-		if(token.punct->third_ch != 0) {
-                        printf("%c", token.punct->third_ch);
-                }
-		printf("'\n");
-
-		 //display_span(&token.span, Error, "bad punct");
-	} else if(token.token_type == LiteralType) {
-		printf("literal='%s'\n", token.literal->literal);
-		//display_span(&token.span, Error, "illegal state, no literal");
-	} else if(token.token_type == GroupType) {
-		if(token.group->delimiter == Parenthesis)
-			printf("group delimiter = Parenthesis\n");
-		else if(token.group->delimiter == Bracket)
-			printf("group delimiter = Bracket\n");
-		else if(token.group->delimiter == Brace)
-			printf("group delimiter = Brace\n");
-
-		TokenTree grp_next;
-
-		int v;
-                while((v=next_token(token.group->strm, &grp_next))) {
-			if (v == 2) {
-				printf("1 error generated.\n");
-                                exit(-1);
-                        }
-			process_token(*(token.group->strm), grp_next);
-                        free_token_tree(&grp_next);
-                }
-
-		free_token_stream(token.group->strm);
-
-		if(token.group->delimiter == Parenthesis)
-                        printf("end group delimiter = Parenthesis\n");
-                else if(token.group->delimiter == Bracket)
-                        printf("end group delimiter = Bracket\n");
-                else if(token.group->delimiter == Brace)
-                        printf("end group delimiter = Brace\n");
-	}
-	return 0;
-}
 
 int main(int argc, char **argv) {
-	if (argc < 2) {
-		printf("No input file specified!\n");
-		exit(-1);
-	} else {
-		TokenStream strm;
-		TokenTree next;
-		if(parse(argv[1], &strm, 0)) {
-			printf("error parsing file!\n");
-			exit(-1);
-		}
-
-		int v;
-		while((v=next_token(&strm, &next))) {
-			if (v == 2) {
-				printf("1 error generated.\n");
-				exit(-1);
-			}
-			process_token(strm, next);
-			free_token_tree(&next);
-		}
-
-		free_token_stream(&strm);
-	}
-
+	printf("main doesn't currently do anything\n");
 	return 0;
 }
 
