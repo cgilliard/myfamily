@@ -41,6 +41,11 @@ int parse(char *file_name, TokenStream *strm, int debug_flags) {
     	}
 
 	int ret = fread(strm->bytes, file_size, 1, file);
+	if(ret != 1) {
+		fclose(file);
+		free(strm->bytes);
+		return -1;
+	}
 	strm->len = file_size;
 	fclose(file);
 	strm->pos = 0;
@@ -48,6 +53,10 @@ int parse(char *file_name, TokenStream *strm, int debug_flags) {
 	strm->start_doc = -1;
 	strm->end_doc = -1;
 	strm->file_path = malloc(sizeof(char)*(strlen(file_name)+1));
+	if(strm->file_path == NULL) {
+		free(strm->bytes);
+		return -1;
+	}
 	strcpy(strm->file_path, file_name);
 	strm->parent = NULL;
 	strm->pos_offset = 0;
@@ -107,11 +116,18 @@ void display_span(Span *span, ErrorLevel level, char *message) {
 	printf(ANSI_COLOR_GREEN "%s\n" ANSI_COLOR_RESET, spacing_and_up_arrow);
 }
 
-void process_doc(TokenStream *strm, TokenTree *next) {
+int process_doc(TokenStream *strm, TokenTree *next) {
 	next->token_type = GroupType;
 	next->group = malloc(sizeof(Group));
+	if(next->group == NULL) {
+		return 2;
+	}
 	next->group->delimiter = Bracket;
 	next->group->strm = malloc(sizeof(TokenStream));
+	if(next->group->strm == NULL) {
+		free(next->group);
+		return 2;
+	}
 	next->group->strm->parent = strm;
 	next->group->strm->pos_offset = strm->start_doc + strm->pos_offset;
 	next->group->strm->file_path = NULL;
@@ -119,6 +135,11 @@ void process_doc(TokenStream *strm, TokenTree *next) {
 	next->group->strm->line_num = strm->line_num;
 	int group_len = (strm->end_doc - strm->start_doc) + 6;
 	next->group->strm->bytes = malloc(sizeof(char) * group_len);
+	if(next->group->strm->bytes == NULL) {
+		free(next->group->strm);
+		free(next->group);
+		return 2;
+	}
 	next->group->strm->bytes[0] = 'd';
 	next->group->strm->bytes[1] = 'o';
 	next->group->strm->bytes[2] = 'c';
@@ -134,6 +155,7 @@ void process_doc(TokenStream *strm, TokenTree *next) {
 
 	strm->start_doc = -1;
 	strm->end_doc = -1;
+	return 0;
 }
 
 int skip_comments_and_white_space(TokenStream *strm, TokenTree *next, int len) {
@@ -171,6 +193,9 @@ int skip_comments_and_white_space(TokenStream *strm, TokenTree *next, int len) {
 				if(strm->start_doc > 0) {
                                         next->token_type = PunctType;
                                         next->punct = malloc(sizeof(Punct));
+					if(next->punct == NULL) {
+						return 2;
+					}
                                         next->punct->ch = '#';
                                         next->punct->second_ch = 0;
                                         next->punct->third_ch = 0;
@@ -254,6 +279,9 @@ int process_punct(TokenStream *strm, TokenTree *next, int len, int ret) {
 
 	next->token_type = PunctType;
 	next->punct = malloc(sizeof(Punct));
+	if(next->punct == NULL) {
+		return 2;
+	}
 	next->punct->ch = strm->bytes[strm->pos];
 	next->punct->second_ch = 0;
 	next->punct->third_ch = 0;
@@ -342,7 +370,8 @@ int next_token(TokenStream *strm, TokenTree *next) {
 	next->literal = NULL;
 
 	if(strm->start_doc > 0) {
-		process_doc(strm, next);
+		if(process_doc(strm, next) == 2)
+			return 2;
 		return 1;
 	}
 
@@ -352,8 +381,10 @@ int next_token(TokenStream *strm, TokenTree *next) {
                 ret = 1;
         }
 
-	if(skip_comments_and_white_space(strm, next, len))
-		return ret;
+	int v = skip_comments_and_white_space(strm, next, len);
+	if(v) {
+		return v;
+	}
 
 	next->span.line_num = strm->line_num;
 	next->span.offset = strm->pos + strm->pos_offset;
@@ -435,8 +466,14 @@ int next_token(TokenStream *strm, TokenTree *next) {
 		if(is_group) {
 			next->token_type = GroupType;
 			next->group = malloc(sizeof(Group));
+			if(next->group == NULL)
+				return 2;
 			next->group->delimiter = delimiter;
 			next->group->strm = malloc(sizeof(TokenStream));
+			if(next->group->strm == NULL) {
+				free(next->group);
+				return 2;
+			}
 			next->group->strm->parent = strm;
 			next->group->strm->pos_offset = start_group_pos + strm->pos_offset;
 			next->group->strm->file_path = NULL;
@@ -444,13 +481,24 @@ int next_token(TokenStream *strm, TokenTree *next) {
 			next->group->strm->pos = 0;
 			int group_len = end_group_pos - start_group_pos;
 			next->group->strm->bytes = malloc(sizeof(char) * group_len);
+			if(next->group->strm->bytes == NULL) {
+				free(next->group->strm);
+				free(next->group);
+				return 2;
+			}
 			memcpy(next->group->strm->bytes, strm->bytes + start_group_pos, group_len);
 			next->group->strm->len = group_len;
 
 		} else if(is_literal) {
 			next->token_type = LiteralType;
 			next->literal = malloc(sizeof(Literal));
+			if(next->literal == NULL)
+				return 2;
 			next->literal->literal = malloc(sizeof(char) * itt);
+			if(next->literal->literal == NULL) {
+				free(next->literal);
+				return 2;
+			}
 			strcpy(next->literal->literal, next_token);
 		} else {
 			// punct
@@ -476,7 +524,14 @@ int next_token(TokenStream *strm, TokenTree *next) {
 		next_token[itt] = 0;
 		next->token_type = IdentType;
 		next->ident = malloc(sizeof(Ident));
+		if(next->ident == NULL) {
+			return 2;
+		}
 		next->ident->value = malloc(sizeof(char) * itt);
+		if(next->ident->value == NULL) {
+			free(next->ident);
+			return 2;
+		}
 		strcpy(next->ident->value, next_token);
 	}
 
