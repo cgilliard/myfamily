@@ -15,16 +15,77 @@
 #ifndef _RAND_BASE__
 #define _RAND_BASE__
 
-#include <stdint.h>
 #include <stdlib.h>
 #include <base/types.h>
 
+int rand_i8(i8 *v);
+int rand_u8(u8 *v);
+
+int rand_i16(i16 *v);
+int rand_u16(u16 *v);
+
+/**
+ * Returns a random i32 value using the operating systems' getentropy function.
+ * @param v A pointer to the location to store the value in.
+ * @return the value returned by the getentropy function.
+ * @see [rand_u32]
+ * @see [rand_bytes]
+ */
 int rand_i32(i32 *v);
+
+/**
+ * Returns a random u32 value using the operating systems' getentropy function.
+ * @param v A pointer to the location to store the value in.
+ * @return the value returned by the getentropy function.
+ * @see [rand_i32]
+ * @see [rand_bytes]
+ */
 int rand_u32(u32 *v);
+
+/**
+ * Returns a random i64 value using the operating systems' getentropy function.
+ * @param v A pointer to the location to store the value in.
+ * @return the value returned by the getentropy function.
+ * @see [rand_u64]
+ * @see [rand_bytes]
+ */
 int rand_i64(i64 *v);
+
+/**
+ * Returns a random u64 value using the operating systems' getentropy function.
+ * @param v A pointer to the location to store the value in.
+ * @return the value returned by the getentropy function.
+ * @see [rand_i64]
+ * @see [rand_bytes]
+ */
 int rand_u64(u64 *v);
+
+/**
+ * Returns a random i128 value using the operating systems' getentropy function.
+ * @param v A pointer to the location to store the value in.
+ * @return the value returned by the getentropy function.
+ * @see [rand_u128]
+ * @see [rand_bytes]
+ */
 int rand_i128(i128 *v);
+
+/**
+ * Returns a random u128 value using the operating systems' getentropy function.
+ * @param v A pointer to the location to store the value in.
+ * @return the value returned by the getentropy function.
+ * @see [rand_i128]
+ * @see [rand_bytes]
+ */
 int rand_u128(u128 *v);
+
+/**
+ * Returns random bytes of the specified length using the operating systems' getentropy function.
+ * @param buf A pointer to the location to store the value in.
+ * @param length the number of bytes to write to the buffer.
+ * @return the value returned by the getentropy function.
+ * @see [rand_i64]
+ * @see [rand_u128]
+ */
 int rand_bytes(void *buf, size_t length);
 
 #endif /* _RAND_BASE__ */

@@ -15,6 +15,34 @@
 #include <base/rand.h>
 #include <sys/random.h>
 
+int rand_i8(i8 *v) {
+	char buf[1];
+        int ret = getentropy(buf, 1);
+        *v = (i8)buf[0];
+        return ret;
+}
+
+int rand_u8(u8 *v) {
+	char buf[1];
+        int ret = getentropy(buf, 1);
+        *v = (u8)buf[0];
+        return ret;
+}
+
+int rand_i16(i16 *v) {
+	char buf[2];
+        int ret = getentropy(buf, 2);
+        *v = ((i16)buf[0] << 8) + (i16)buf[1];
+        return ret;
+}
+
+int rand_u16(u16 *v) {
+	char buf[2];
+        int ret = getentropy(buf, 2);
+        *v = ((u16)buf[0] << 8) + (u16)buf[1];
+        return ret;
+}
+
 int rand_i32(int32_t *v) {
 	char buf[4];
 	int ret = getentropy(buf, 4);

@@ -15,17 +15,90 @@
 #ifndef _CONFIG_BASE__
 #define _CONFIG_BASE__
 
-#include <stdbool.h>
 #include <base/types.h>
 
-
+/**
+ * Configure the bool value pointed to by value with either the configured value or a default.
+ * @param value a pointer to the value being configured.
+ * @param configured a pointer to the desired configured value. If this pointer is NULL
+ * the default `d` will be used.
+ * @param d the default value to use if configured is NULL.
+ * @see [configure_u8]
+ * @see [configure_u64]
+ * @see [configure_string]
+ */
 void configure_bool(bool *value, bool *configured, bool d);
-void configure_u8(u8 *value, u8 *configured, u8 d);
-void configure_u16(u16 *value, u16 *configured, u16 d);
-void configure_u32(u32 *value, u32 *configured, u32 d);
-void configure_u64(u64 *value, u64 *configured, u64 d);
-void configure_u128(u128 *value, u128 *configured, u128 d);
-void configure_string(char *value, char *configured, char *d, int len);
 
+/**
+ * Configure the u8 value pointed to by value with either the configured value or a default.
+ * @param value a pointer to the value being configured.
+ * @param configured a pointer to the desired configured value. If this pointer is NULL
+ * the default d will be used.
+ * @param d the default value to use if configured is NULL.
+ * @see [configure_bool]
+ * @see [configure_u64]
+ * @see [configure_string]
+ */
+void configure_u8(u8 *value, u8 *configured, u8 d);
+
+/**
+ * Configure the u16 value pointed to by value with either the configured value or a default.
+ * @param value a pointer to the value being configured.
+ * @param configured a pointer to the desired configured value. If this pointer is NULL
+ * the default d will be used.
+ * @param d the default value to use if configured is NULL.
+ * @see [configure_bool]
+ * @see [configure_u64]
+ * @see [configure_string]
+ */
+void configure_u16(u16 *value, u16 *configured, u16 d);
+
+/**
+ * Configure the u32 value pointed to by value with either the configured value or a default.
+ * @param value a pointer to the value being configured.
+ * @param configured a pointer to the desired configured value. If this pointer is NULL
+ * the default d will be used.
+ * @param d the default value to use if configured is NULL.
+ * @see [configure_bool]
+ * @see [configure_u64]
+ * @see [configure_string]
+ */
+void configure_u32(u32 *value, u32 *configured, u32 d);
+
+/**
+ * Configure the u64 value pointed to by value with either the configured value or a default.
+ * @param value a pointer to the value being configured.
+ * @param configured a pointer to the desired configured value. If this pointer is NULL
+ * the default d will be used.
+ * @param d the default value to use if configured is NULL.
+ * @see [configure_bool]
+ * @see [configure_u32]
+ * @see [configure_string]
+ */
+void configure_u64(u64 *value, u64 *configured, u64 d);
+
+/**
+ * Configure the u128 value pointed to by value with either the configured value or a default.
+ * @param value a pointer to the value being configured.
+ * @param configured a pointer to the desired configured value. If this pointer is NULL
+ * the default d will be used.
+ * @param d the default value to use if configured is NULL.
+ * @see [configure_bool]
+ * @see [configure_u64]
+ * @see [configure_string]
+ */
+void configure_u128(u128 *value, u128 *configured, u128 d);
+
+/**
+ * Configure the string value pointed to by value with either the configured value or a default.
+ * @param value a pointer to the value being configured.
+ * @param configured a pointer to the desired configured value. If this pointer is NULL
+ * the default d will be used.
+ * @param d the default value to use if configured is NULL.
+ * @see [configure_bool]
+ * @see [configure_u64]
+ * @see [configure_u128]
+ */
+void configure_string(char *value, char *configured, char *d, int len);
 
 #endif /* _CONFIG_BASE__ */

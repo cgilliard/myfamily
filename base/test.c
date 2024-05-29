@@ -14,6 +14,7 @@
 
 #include <criterion/criterion.h>
 #include <stdio.h>
+#include <base/types.h>
 #include <base/rand.h>
 #include <base/config.h>
 #include <inttypes.h>
@@ -66,6 +67,44 @@ Test(base, rand) {
         rand_u32(&u32_2);
 
         cr_assert_neq(u32_1, u32_2);
+
+	i8 vi8, vi8_2, vi8_3, vi8_4;
+	i16 vi16, vi16_2, vi16_3, vi16_4;
+	u8 vu8, vu8_2, vu8_3, vu8_4;
+	u16 vu16, vu16_2, vu16_3, vu16_4;
+
+	rand_i8(&vi8);
+	rand_u8(&vu8);
+	rand_i16(&vi16);
+        rand_u16(&vu16);
+
+	rand_i8(&vi8_2);
+        rand_u8(&vu8_2);
+        rand_i16(&vi16_2);
+        rand_u16(&vu16_2);
+
+        rand_i8(&vi8_3);
+        rand_u8(&vu8_3);
+        rand_i16(&vi16_3);
+        rand_u16(&vu16_3);
+
+        rand_i8(&vi8_4);
+        rand_u8(&vu8_4);
+        rand_i16(&vi16_4);
+        rand_u16(&vu16_4);
+
+	bool i8_eq = vi8 == vi8_2 && vi8_2 == vi8_3 && vi8_4;
+	bool u8_eq = vu8 == vu8_2 && vu8_2 == vu8_3 && vu8_4;
+	bool i16_eq = vi16 == vi16_2 && vi16_2 == vi16_3 && vi16_4;
+	bool u16_eq = vu16 == vu16_2 && vu16_2 == vu16_3 && vu16_4;
+
+	// very unlikely to happen
+	cr_assert_eq(i8_eq, false);
+	cr_assert_eq(u8_eq, false);
+	cr_assert_eq(i16_eq, false);
+	cr_assert_eq(u16_eq, false);
+
+	printf("vi8=%i,vu8=%i,vi16=%i,vu16=%i\n", vi8, vu8, vi16, vu16);
 
 }
 
