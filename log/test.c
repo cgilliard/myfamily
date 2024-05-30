@@ -14,6 +14,9 @@
 
 #include <criterion/criterion.h>
 #include <log/log.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 Test(log, basic) {
 	Log log;
@@ -45,13 +48,15 @@ Test(log, basic) {
 	free_log_config_option(&opt1);
 	free_log_config_option(&opt2);
 
-	log_config_option_log_file_path(&opt1, "./log.log");
+	mkdir("./.log_basic.fam", 0700);
+
+	log_config_option_log_file_path(&opt1, "./.log_basic.fam/log_basic.log");
 	log_config_option_file_header(&opt2, "myheader");
 	log_config_option_show_millis(&opt3, true);
 
 	free_log(&log);
 	logger(&log, 3, opt1, opt2, opt3);
-	cr_assert_eq(strcmp(log.path, "./log.log"), 0);
+	cr_assert_eq(strcmp(log.path, "./.log_basic.fam/log_basic.log"), 0);
 
 	init(&log);
 	log_line(&log, Trace, "this is a test1");
@@ -60,6 +65,10 @@ Test(log, basic) {
 	log_line(&log, Warn, "this is a test4");
 	log_line(&log, Error, "this is a test5");
 	log_line(&log, Fatal, "this is a test6");
+	log_close(&log);
+
+	remove("./.log_basic.fam/log_basic.log");
+	rmdir("./.log_basic.fam/");
 
 	free_log_config_option(&opt1);
 	free_log_config_option(&opt2);
@@ -74,3 +83,34 @@ Test(log, basic) {
 
 	free_log(&log);
 }
+
+Test(log, output) {
+	char buf[100];
+	Log log;
+	LogConfigOption opt1, opt2;
+
+	mkdir("./.log_output.fam", 0700);
+	log_config_option_log_file_path(&opt1, "./.log_output.fam/log_output.log");
+	log_config_option_show_millis(&opt2, false);
+
+	logger(&log, 2, opt1, opt2);
+	init(&log);
+	log_line(&log, Info, "this is a test1");
+	log_close(&log);
+
+	FILE *fp = fopen("./.log_output.fam/log_output.log", "r");
+	fgets(buf, 100, fp);
+	printf("s=%s\n", buf);
+	cr_assert_neq(strstr(buf, "(INFO): this is a test1"), NULL);
+	fclose(fp);
+
+	remove("./.log_output.fam/log_output.log");
+        rmdir("./.log_output.fam/");
+
+
+	free_log_config_option(&opt2);
+	free_log_config_option(&opt1);
+	free_log(&log);
+
+}
+

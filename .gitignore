@@ -3,6 +3,7 @@
 **/*.gcov
 **/*.gcno
 **/*.gcda
+**/*.fam
 /bin/*
 /doc/*
 /Makefile

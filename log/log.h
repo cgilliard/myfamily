@@ -86,7 +86,7 @@ int rotate(Log *log);
 bool need_rotate(Log *log);
 int set_log_level(Log *log, LogLevel level);
 int init(Log *log);
-int close_log(Log *log);
+int log_close(Log *log);
 void free_log(Log *log);
 int set_config_option(Log *log, LogConfigOption option);
 

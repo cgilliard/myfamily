@@ -94,6 +94,7 @@ int logger(Log *log, int num, ...) {
 int get_format(Log *log, LogLevel level, char *buf) {
 	char milli_buf[10];
 	char log_level_buf[10];
+	char dt_buf[30];
 	time_t t = time(NULL);
   	struct tm tm = *localtime(&t);
 
@@ -127,19 +128,28 @@ int get_format(Log *log, LogLevel level, char *buf) {
 		strcpy(log_level_buf, "");
 	}
 
+	if(log->show_timestamp) {
+		sprintf(
+			dt_buf,
+			"[%d-%02d-%02d %02d:%02d:%02d%s]",
+			tm.tm_year + 1900,
+                	tm.tm_mon + 1,
+                	tm.tm_mday,
+                	tm.tm_hour,
+                	tm.tm_min,
+                	tm.tm_sec,
+                	milli_buf
+		);
+	} else {
+		strcpy(dt_buf, "");
+	}
+
 	sprintf(
 		buf,
-		"[%d-%02d-%02d %02d:%02d:%02d%s]%s: ",
-		tm.tm_year + 1900,
-		tm.tm_mon + 1,
-		tm.tm_mday,
-		tm.tm_hour,
-		tm.tm_min,
-		tm.tm_sec,
-		milli_buf,
+		"%s%s: ",
+		dt_buf,
 		log_level_buf
 	);
-	//strcat(buf,%d-02-24 13:52:24.123]: (INFO) [..ibconcord/src/main.rs:128]: ", tm.tm_year + 1900);
 	return 0;
 }
 
@@ -171,6 +181,13 @@ int init(Log *log) {
 			fprintf(log->fp,"%s\n",log->file_header);
 		}
 		fseek(log->fp, 0, SEEK_END);
+	}
+	return 0;
+}
+
+int log_close(Log *log) {
+	if(log->fp) {
+		fclose(log->fp);
 	}
 	return 0;
 }
