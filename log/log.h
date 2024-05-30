@@ -17,19 +17,28 @@
 
 #include <base/types.h>
 
+#define ANSI_COLOR_DIMMED     "\x1b[2m"
+#define ANSI_COLOR_RED        "\x1b[31m"
+#define ANSI_COLOR_BRIGHT_RED "\x1b[91m"
+#define ANSI_COLOR_GREEN      "\x1b[32m"
+#define ANSI_COLOR_YELLOW     "\x1b[33m"
+#define ANSI_COLOR_BLUE       "\x1b[34m"
+#define ANSI_COLOR_MAGENTA    "\x1b[35m"
+#define ANSI_COLOR_CYAN       "\x1b[36m"
+#define ANSI_COLOR_RESET      "\x1b[0m"
+
 enum LogConfigOptionType {
         ShowColors        = 0, // value is bool *
 	ShowStdout        = 1, // value is bool *
 	ShowTimestamp     = 2, // value is bool *
 	ShowMillis        = 3, // value is bool *
-	ShowLineNum       = 4, // value is bool *
-	ShowLogLevel      = 5, // value is bool *
-	AutoRotate        = 6, // value is bool *
-	DeleteRotation    = 7, // value is bool *
-	MaxSizeBytes      = 8, // value is u64 *
-	MaxAgeMillis      = 9, // value is u64 *
-	LogFilePath       = 10, // value is char *
-	FileHeader        = 11, // value is char *
+	ShowLogLevel      = 4, // value is bool *
+	AutoRotate        = 5, // value is bool *
+	DeleteRotation    = 6, // value is bool *
+	MaxSizeBytes      = 7, // value is u64 *
+	MaxAgeMillis      = 8, // value is u64 *
+	LogFilePath       = 9, // value is char *
+	FileHeader        = 10, // value is char *
 };
 typedef enum LogConfigOptionType LogConfigOptionType;
 

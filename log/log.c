@@ -92,9 +92,10 @@ int logger(Log *log, int num, ...) {
 }
 
 int get_format(Log *log, LogLevel level, char *buf) {
-	char milli_buf[10];
-	char log_level_buf[10];
-	char dt_buf[30];
+	char milli_buf[14];
+	char log_level_buf[20];
+	char dt_buf[40];
+	char spacing[2];
 	time_t t = time(NULL);
   	struct tm tm = *localtime(&t);
 
@@ -107,19 +108,49 @@ int get_format(Log *log, LogLevel level, char *buf) {
 		strcpy(milli_buf, "");
 	}
 
+	if(log->show_timestamp) {
+		strcpy(spacing, " ");
+	} else {
+		strcpy(spacing, "");
+	}
+
 	if(log->show_log_level) {
 		if(level == Trace) {
-			strcpy(log_level_buf, " (TRACE)");
+			if(log->show_colors) {
+				sprintf(log_level_buf, "%s(" ANSI_COLOR_YELLOW "TRACE" ANSI_COLOR_RESET ")", spacing);
+			} else {
+				sprintf(log_level_buf, "%s(TRACE)", spacing);
+			}
 		} else if(level == Debug) {
-			strcpy(log_level_buf, " (DEBUG)");
+			if(log->show_colors) {
+				sprintf(log_level_buf, "%s(" ANSI_COLOR_CYAN "DEBUG" ANSI_COLOR_RESET ")", spacing);
+			} else {
+				sprintf(log_level_buf, "%s(DEBUG)", spacing);
+			}
 		} else if(level == Info) {
-                        strcpy(log_level_buf, " (INFO)");
+			if(log->show_colors) {
+				sprintf(log_level_buf, "%s(" ANSI_COLOR_GREEN "INFO" ANSI_COLOR_RESET ")", spacing);
+			} else {
+				sprintf(log_level_buf, "%s(INFO)", spacing);
+			}
                 } else if(level == Warn) {
-                        strcpy(log_level_buf, " (WARN)");
+			if(log->show_colors) {
+                                sprintf(log_level_buf, "%s(" ANSI_COLOR_MAGENTA "WARN" ANSI_COLOR_RESET ")", spacing);
+                        } else {
+                                sprintf(log_level_buf, "%s(WARN)", spacing);
+                        }
                 } else if(level == Error) {
-                        strcpy(log_level_buf, " (ERROR)");
+			if(log->show_colors) {
+                                sprintf(log_level_buf, "%s(" ANSI_COLOR_RED "ERROR" ANSI_COLOR_RESET ")", spacing);
+                        } else {
+                                sprintf(log_level_buf, "%s(ERROR)", spacing);
+                        }
                 } else if(level == Fatal) {
-                        strcpy(log_level_buf, " (FATAL)");
+			if(log->show_colors) {
+                                sprintf(log_level_buf, "%s(" ANSI_COLOR_BRIGHT_RED "FATAL" ANSI_COLOR_RESET ")", spacing);
+                        } else {
+                                sprintf(log_level_buf, "%s(FATAL)", spacing);
+                        }
                 } else {
 			strcpy(log_level_buf, "");
 		}
@@ -129,26 +160,53 @@ int get_format(Log *log, LogLevel level, char *buf) {
 	}
 
 	if(log->show_timestamp) {
-		sprintf(
-			dt_buf,
-			"[%d-%02d-%02d %02d:%02d:%02d%s]",
-			tm.tm_year + 1900,
-                	tm.tm_mon + 1,
-                	tm.tm_mday,
-                	tm.tm_hour,
-                	tm.tm_min,
-                	tm.tm_sec,
-                	milli_buf
-		);
+		if(log->show_colors) {
+			sprintf(
+				dt_buf,
+				"["
+				ANSI_COLOR_DIMMED
+				"%d-%02d-%02d %02d:%02d:%02d%s"
+				ANSI_COLOR_RESET
+				"]",
+				tm.tm_year + 1900,
+                		tm.tm_mon + 1,
+                		tm.tm_mday,
+                		tm.tm_hour,
+                		tm.tm_min,
+                		tm.tm_sec,
+                		milli_buf
+			);
+		} else {
+                        sprintf(
+                                dt_buf,
+                                "["
+                                "%d-%02d-%02d %02d:%02d:%02d%s"
+                                "]",
+                                tm.tm_year + 1900,
+                                tm.tm_mon + 1,
+                                tm.tm_mday,
+                                tm.tm_hour,
+                                tm.tm_min,
+                                tm.tm_sec,
+                                milli_buf
+                        );
+		}
 	} else {
 		strcpy(dt_buf, "");
 	}
 
+	if((level == Info || level == Warn) && log->show_log_level) {
+		strcpy(spacing, " ");
+	} else {
+		strcpy(spacing, "");
+	}
+
 	sprintf(
 		buf,
-		"%s%s: ",
+		"%s%s: %s",
 		dt_buf,
-		log_level_buf
+		log_level_buf,
+		spacing
 	);
 	return 0;
 }
