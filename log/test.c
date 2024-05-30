@@ -1,0 +1,76 @@
+// Copyright (c) 2024, The MyFamily Developers
+//              
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//                      
+//     http://www.apache.org/licenses/LICENSE-2.0
+//                      
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <criterion/criterion.h>
+#include <log/log.h>
+
+Test(log, basic) {
+	Log log;
+	LogConfigOption opt1, opt2, opt3;
+
+	log.show_colors = false;
+	log.show_stdout = false;
+
+	log_config_option_show_colors(&opt1, true);
+	log_config_option_show_stdout(&opt2, true);
+	logger(&log, 2, opt1, opt2);
+
+	cr_assert_eq(log.show_colors, true);
+	cr_assert_eq(log.show_stdout, true);
+
+	free_log_config_option(&opt1);
+        free_log_config_option(&opt2);
+
+	log_config_option_show_colors(&opt1, true);
+        log_config_option_show_stdout(&opt2, false);
+
+	free_log(&log);
+	logger(&log, 2, opt1, opt2);
+
+        cr_assert_eq(log.show_colors, true);
+        cr_assert_eq(log.show_stdout, false);
+	cr_assert_eq(log.path, NULL);
+
+	free_log_config_option(&opt1);
+	free_log_config_option(&opt2);
+
+	log_config_option_log_file_path(&opt1, "./log.log");
+	log_config_option_file_header(&opt2, "myheader");
+	log_config_option_show_millis(&opt3, true);
+
+	free_log(&log);
+	logger(&log, 3, opt1, opt2, opt3);
+	cr_assert_eq(strcmp(log.path, "./log.log"), 0);
+
+	init(&log);
+	log_line(&log, Trace, "this is a test1");
+	log_line(&log, Debug, "this is a test2");
+	log_line(&log, Info, "this is a test3");
+	log_line(&log, Warn, "this is a test4");
+	log_line(&log, Error, "this is a test5");
+	log_line(&log, Fatal, "this is a test6");
+
+	free_log_config_option(&opt1);
+	free_log_config_option(&opt2);
+
+	log_config_option_file_header(&opt1, "header");
+	free_log(&log);
+        logger(&log, 1, opt1);
+        cr_assert_eq(strcmp(log.file_header, "header"), 0);
+	init(&log);
+
+        free_log_config_option(&opt1);
+
+	free_log(&log);
+}

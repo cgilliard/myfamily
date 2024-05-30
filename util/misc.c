@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <util/misc.h>
-#include <util/constants.h>
+#include <base/constants.h>
 
 int is_white_space(char ch) {
         if (ch == '\n' || ch == '\t' || ch == '\r' || ch == '\v' || ch == '\f' || ch == ' ')

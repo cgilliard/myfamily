@@ -1,0 +1,104 @@
+// Copyright (c) 2024, The MyFamily Developers
+//              
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//                      
+//     http://www.apache.org/licenses/LICENSE-2.0
+//                      
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#ifndef __LOG_LOG_
+#define __LOG_LOG_
+
+#include <base/types.h>
+
+enum LogConfigOptionType {
+        ShowColors        = 0, // value is bool *
+	ShowStdout        = 1, // value is bool *
+	ShowTimestamp     = 2, // value is bool *
+	ShowMillis        = 3, // value is bool *
+	ShowLineNum       = 4, // value is bool *
+	ShowLogLevel      = 5, // value is bool *
+	ShowBacktrace     = 6, // value is bool *
+	AutoRotate        = 7, // value is bool *
+	DeleteRotation    = 8, // value is bool *
+	MaxSizeBytes      = 9, // value is u64 *
+	MaxAgeMillis      = 10, // value is u64 *
+	LineNumDataMaxLen = 11, // value is u64 *
+	LogFilePath       = 12, // value is char *
+	FileHeader        = 13, // value is char *
+};
+typedef enum LogConfigOptionType LogConfigOptionType;
+
+struct LogConfigOption {
+	LogConfigOptionType type;
+	void *value;
+};
+typedef struct LogConfigOption LogConfigOption;
+
+enum LogLevel {
+	Trace = 0,
+	Debug = 1,
+	Info  = 2,
+	Warn  = 3,
+	Error = 4,
+	Fatal = 5,
+};
+typedef enum LogLevel LogLevel;
+
+struct Log {
+	FILE *fp;
+	bool show_colors;
+	bool show_stdout;
+	bool show_timestamp;
+	bool show_millis;
+	bool show_line_num;
+	bool show_log_level;
+	bool show_backtrace;
+	bool auto_rotate;
+	bool delete_rotation;
+	bool max_size_bytes;
+	bool max_age_millis;
+	bool line_num_data_max_len;
+
+	char *path;
+	char *file_header;
+};
+typedef struct Log Log;
+
+int log_config_option_show_colors(LogConfigOption *option, bool value);
+int log_config_option_show_stdout(LogConfigOption *option, bool value);
+int log_config_option_show_timestamp(LogConfigOption *option, bool value);
+int log_config_option_show_millis(LogConfigOption *option, bool value);
+int log_config_option_show_line_num(LogConfigOption *option, bool value);
+int log_config_option_show_log_level(LogConfigOption *option, bool value);
+int log_config_option_show_backtrace(LogConfigOption *option, bool value);
+int log_config_option_auto_rotate(LogConfigOption *option, bool value);
+int log_config_option_delete_rotation(LogConfigOption *option, bool value);
+int log_config_option_max_size_bytes(LogConfigOption *option, u64 value);
+int log_config_option_max_age_millis(LogConfigOption *option, u64 value);
+int log_config_option_line_num_data_max_len(LogConfigOption *option, u64 value);
+int log_config_option_log_file_path(LogConfigOption *option, char *value);
+int log_config_option_file_header(LogConfigOption *option, char *value);
+void free_log_config_option(LogConfigOption *option);
+
+int log_line(Log *log, LogLevel level, char *line);
+int log_all(Log *log, LogLevel level, char *line);
+int log_plain(Log *log, LogLevel level, char *line);
+int rotate(Log *log);
+bool need_rotate(Log *log);
+int set_log_level(Log *log, LogLevel level);
+int init(Log *log);
+int close_log(Log *log);
+void free_log(Log *log);
+int set_config_option(Log *log, LogConfigOption option);
+
+int logger(Log *log, int num, ...);
+
+#endif /* __LOG_LOG_ */
+
