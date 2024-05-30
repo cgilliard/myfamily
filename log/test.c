@@ -112,7 +112,7 @@ Test(log, output) {
 	printf("s=%s\n", buf);
 	cr_assert_eq(strstr(buf, "]")-buf, 20);
 	cr_assert_neq(strstr(buf, "[20"), NULL);
-	cr_assert_neq(strstr(buf, "(INFO):  this is a test1"), NULL);
+	cr_assert_neq(strstr(buf, "(INFO) : this is a test1"), NULL);
 	fclose(fp);
 
 	remove("./.log_output.fam/log_output.log");
@@ -148,7 +148,7 @@ Test(log, configurations) {
         fgets(buf, 100, fp);
 	cr_assert_eq(strstr(buf, "]")-buf, 24);
 	cr_assert_neq(strstr(buf, "]"), NULL);
-        cr_assert_neq(strstr(buf, "(INFO):  this is a test"), NULL);
+        cr_assert_neq(strstr(buf, "(INFO) : this is a test"), NULL);
         fclose(fp);
 
         remove("./.log_configurations.fam/log_output.log");
@@ -171,8 +171,8 @@ Test(log, configurations) {
         fp = fopen("./.log_configurations.fam/log_output.log", "r");
         fgets(buf, 100, fp);
         cr_assert_eq(strstr(buf, "]"), NULL);
-        cr_assert_neq(strstr(buf, "(INFO):  this is a test"), NULL);
-	cr_assert_eq(strstr(buf, "(INFO):  this is a test"), buf);
+        cr_assert_neq(strstr(buf, "(INFO) : this is a test"), NULL);
+	cr_assert_eq(strstr(buf, "(INFO) : this is a test"), buf);
         fclose(fp);
 	remove("./.log_configurations.fam/log_output.log");
 	free_log_config_option(&opt2);

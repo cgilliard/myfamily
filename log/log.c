@@ -203,7 +203,7 @@ int get_format(Log *log, LogLevel level, char *buf) {
 
 	sprintf(
 		buf,
-		"%s%s: %s",
+		"%s%s%s: ",
 		dt_buf,
 		log_level_buf,
 		spacing
