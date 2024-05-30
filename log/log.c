@@ -212,23 +212,30 @@ int get_format(Log *log, LogLevel level, char *buf) {
 }
 
 int log_line(Log *log, LogLevel level, char *line) {
-	int len = strlen(line);
-	char fline[len+100];
+	if(level >= log->level) {
+		int len = strlen(line);
+		char fline[len+100];
 
-	get_format(log, level, fline);
-	strcat(fline, line);
-	strcat(fline, "\n");
+		get_format(log, level, fline);
+		strcat(fline, line);
+		strcat(fline, "\n");
 
-	if(log->show_stdout) {
-		printf("%s", fline);
-	}
-	if(log->fp) {
-		fprintf(log->fp, "%s", fline);
+		if(log->show_stdout) {
+			printf("%s", fline);
+		}
+		if(log->fp) {
+			fprintf(log->fp, "%s", fline);
+		}
 	}
 	return 0;
 }
 
-int init(Log *log) {
+int log_set_level(Log *log, LogLevel level) {
+	log->level = level;
+	return 0;
+}
+
+int log_init(Log *log) {
 	if(log->path) {
 		bool write_header = false;
 		if(log->file_header && access(log->path, F_OK) != 0) {
@@ -370,12 +377,12 @@ int log_config_option_file_header(LogConfigOption *option, char *value) {
         return 0;
 }
 
-void free_log_config_option(LogConfigOption *option) {
+void log_config_option_free(LogConfigOption *option) {
 	if(option->value != NULL)
 		free(option->value);
 }
 
-void free_log(Log *log) {
+void log_free(Log *log) {
 	if(log->path)
 		free(log->path);
 	if(log->file_header)

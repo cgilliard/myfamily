@@ -72,32 +72,35 @@ struct Log {
 
 	char *path;
 	char *file_header;
+
+	int offset;
+	LogLevel level;
 };
 typedef struct Log Log;
 
-int log_config_option_show_colors(LogConfigOption *option, bool value);
-int log_config_option_show_stdout(LogConfigOption *option, bool value);
-int log_config_option_show_timestamp(LogConfigOption *option, bool value);
-int log_config_option_show_millis(LogConfigOption *option, bool value);
-int log_config_option_show_log_level(LogConfigOption *option, bool value);
-int log_config_option_auto_rotate(LogConfigOption *option, bool value);
-int log_config_option_delete_rotation(LogConfigOption *option, bool value);
-int log_config_option_max_size_bytes(LogConfigOption *option, u64 value);
-int log_config_option_max_age_millis(LogConfigOption *option, u64 value);
-int log_config_option_log_file_path(LogConfigOption *option, char *value);
-int log_config_option_file_header(LogConfigOption *option, char *value);
-void free_log_config_option(LogConfigOption *option);
+int  log_config_option_show_colors(LogConfigOption *option, bool value);
+int  log_config_option_show_stdout(LogConfigOption *option, bool value);
+int  log_config_option_show_timestamp(LogConfigOption *option, bool value);
+int  log_config_option_show_millis(LogConfigOption *option, bool value);
+int  log_config_option_show_log_level(LogConfigOption *option, bool value);
+int  log_config_option_auto_rotate(LogConfigOption *option, bool value);
+int  log_config_option_delete_rotation(LogConfigOption *option, bool value);
+int  log_config_option_max_size_bytes(LogConfigOption *option, u64 value);
+int  log_config_option_max_age_millis(LogConfigOption *option, u64 value);
+int  log_config_option_log_file_path(LogConfigOption *option, char *value);
+int  log_config_option_file_header(LogConfigOption *option, char *value);
+void log_config_option_free(LogConfigOption *option);
 
-int log_line(Log *log, LogLevel level, char *line);
-int log_all(Log *log, LogLevel level, char *line);
-int log_plain(Log *log, LogLevel level, char *line);
-int rotate(Log *log);
-bool need_rotate(Log *log);
-int set_log_level(Log *log, LogLevel level);
-int init(Log *log);
-int log_close(Log *log);
-void free_log(Log *log);
-int set_config_option(Log *log, LogConfigOption option);
+int  log_line(Log *log, LogLevel level, char *line);
+int  log_all(Log *log, LogLevel level, char *line);
+int  log_plain(Log *log, LogLevel level, char *line);
+int  log_rotate(Log *log);
+bool log_need_rotate(Log *log);
+int  log_set_level(Log *log, LogLevel level);
+int  log_init(Log *log);
+int  log_close(Log *log);
+void log_free(Log *log);
+int  log_config_option(Log *log, LogConfigOption option);
 
 int logger(Log *log, int num, ...);
 
