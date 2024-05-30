@@ -211,23 +211,39 @@ int get_format(Log *log, LogLevel level, char *buf) {
 	return 0;
 }
 
+int do_log(Log *log, LogLevel level, char *line, bool is_plain, bool is_all) {
+        if(level >= log->level) {
+                int len = strlen(line);
+                char fline[len+100];
+
+		if(is_plain) {
+			strcpy(fline, "");
+		} else {
+                	get_format(log, level, fline);
+		}
+                strcat(fline, line);
+                strcat(fline, "\n");
+
+                if(log->show_stdout || is_all) {
+                        printf("%s", fline);
+                }
+                if(log->fp) {
+                        fprintf(log->fp, "%s", fline);
+                }
+        }
+        return 0;
+}
+
+int log_all(Log *log, LogLevel level, char *line) {
+	return do_log(log, level, line, false, true);
+}
+
+int log_plain(Log *log, LogLevel level, char *line) {
+	return do_log(log, level, line, true, false);
+}
+
 int log_line(Log *log, LogLevel level, char *line) {
-	if(level >= log->level) {
-		int len = strlen(line);
-		char fline[len+100];
-
-		get_format(log, level, fline);
-		strcat(fline, line);
-		strcat(fline, "\n");
-
-		if(log->show_stdout) {
-			printf("%s", fline);
-		}
-		if(log->fp) {
-			fprintf(log->fp, "%s", fline);
-		}
-	}
-	return 0;
+	return do_log(log, level, line, false, false);
 }
 
 int log_set_level(Log *log, LogLevel level) {

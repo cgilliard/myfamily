@@ -240,3 +240,77 @@ Test(log, configurations) {
 	rmdir("./.log_configurations.fam/");
 
 }
+
+Test(log, plain) {
+	char buf[100];
+        Log log;
+        LogConfigOption opt1, opt2, opt3;
+
+        remove("./.log_plain.fam/log_plain.log");
+        rmdir("./.log_plain.fam/");
+
+        mkdir("./.log_plain.fam", 0700);
+        log_config_option_log_file_path(&opt1, "./.log_plain.fam/log_plain.log");
+        log_config_option_show_millis(&opt2, false);
+        log_config_option_show_colors(&opt3, false);
+
+        logger(&log, 3, opt1, opt2, opt3);
+        log_init(&log);
+        log_plain(&log, Info, "this is a test1");
+        log_close(&log);
+
+        FILE *fp = fopen("./.log_plain.fam/log_plain.log", "r");
+        fgets(buf, 100, fp);
+        printf("s=%s\n", buf);
+        cr_assert_eq(strstr(buf, "]"), NULL);
+        cr_assert_eq(strstr(buf, "[20"), NULL);
+        cr_assert_eq(strstr(buf, "this is a test1"), buf);
+        fclose(fp);
+
+        remove("./.log_plain.fam/log_plain.log");
+        rmdir("./.log_plain.fam/");
+
+
+        log_config_option_free(&opt3);
+        log_config_option_free(&opt2);
+        log_config_option_free(&opt1);
+        log_free(&log);	
+}
+
+Test(log, all) {
+        char buf[100];
+        Log log;
+        LogConfigOption opt1, opt2, opt3, opt4;
+
+        remove("./.log_all.fam/log_all.log");
+        rmdir("./.log_all.fam/");
+
+        mkdir("./.log_all.fam", 0700);
+        log_config_option_log_file_path(&opt1, "./.log_all.fam/log_all.log");
+        log_config_option_show_millis(&opt2, false);
+        log_config_option_show_colors(&opt3, false);
+	log_config_option_show_stdout(&opt4, false);
+
+        logger(&log, 4, opt1, opt2, opt3, opt4);
+        log_init(&log);
+        log_all(&log, Info, "---log_all---");
+        log_close(&log);
+
+        FILE *fp = fopen("./.log_all.fam/log_all.log", "r");
+        fgets(buf, 100, fp);
+        printf("s=%s\n", buf);
+        cr_assert_neq(strstr(buf, "]"), NULL);
+        cr_assert_neq(strstr(buf, "[20"), NULL);
+        cr_assert_neq(strstr(buf, "---log all---"), buf);
+        fclose(fp);
+
+        remove("./.log_all.fam/log_all.log");
+        rmdir("./.log_all.fam/");
+
+
+        log_config_option_free(&opt3);
+        log_config_option_free(&opt2);
+        log_config_option_free(&opt1);
+        log_free(&log);
+}
+
