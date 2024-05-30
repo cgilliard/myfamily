@@ -30,14 +30,11 @@ int logger(Log *log, int num, ...) {
 	log->show_stdout = true;
 	log->show_timestamp = true;
 	log->show_millis = true;
-	log->show_line_num = true;
 	log->show_log_level = true;
-	log->show_backtrace = false;
 	log->auto_rotate = false;
 	log->delete_rotation = false;
 	log->max_size_bytes = ULONG_MAX;
 	log->max_age_millis = ULONG_MAX;
-	log->line_num_data_max_len = 30;
 	log->path = NULL;
 	log->file_header = NULL;
 
@@ -54,12 +51,8 @@ int logger(Log *log, int num, ...) {
 			log->show_timestamp = *((bool*)next.value);
 		} else if(next.type == ShowMillis) {
                         log->show_millis = *((bool*)next.value);
-                } else if(next.type == ShowLineNum) {
-                        log->show_line_num =  *((bool*)next.value);
                 } else if(next.type == ShowLogLevel) {
                         log->show_log_level = *((bool*)next.value);
-                } else if(next.type == ShowBacktrace) {
-                        log->show_backtrace = *((bool*)next.value);
                 } else if(next.type == AutoRotate) {
                         log->auto_rotate = *((bool*)next.value);
                 } else if(next.type == DeleteRotation) {
@@ -68,8 +61,6 @@ int logger(Log *log, int num, ...) {
 			log->max_size_bytes = *((u64*)next.value);
 		} else if(next.type == MaxAgeMillis) {
                         log->max_age_millis = *((u64*)next.value);
-                } else if(next.type == LineNumDataMaxLen) {
-                        log->line_num_data_max_len = *((u64*)next.value);
                 } else if(next.type == LogFilePath) {
 			char *buf = ((char*)next.value);
 			int len = strlen(buf);
@@ -100,25 +91,6 @@ int logger(Log *log, int num, ...) {
 	return 0;
 }
 
-int get_backtrace() {
-	void *array[100];
-	char **strings;
-	int size, i;
-
-	size = backtrace (array, 100);
-	strings = backtrace_symbols (array, size);
-	if (strings != NULL)
-	{
-
-		printf ("Obtained %d stack frames.\n", size);
-		for (i = 0; i < size; i++)
-			printf ("%s\n", strings[i]);
-	}
-
-  	free (strings);
-	return 0;
-}
-
 int get_format(Log *log, LogLevel level, char *buf) {
 	char milli_buf[10];
 	char log_level_buf[10];
@@ -128,12 +100,12 @@ int get_format(Log *log, LogLevel level, char *buf) {
 	if(log->show_millis) {
 		struct timeval time;
   		gettimeofday(&time, NULL);
-		sprintf(milli_buf, ".%03ld", time.tv_usec / 1000);
+		int millis = time.tv_usec / 1000;
+		sprintf(milli_buf, ".%03d", millis);
 	} else {
 		strcpy(milli_buf, "");
 	}
 
-	get_backtrace();
 	if(log->show_log_level) {
 		if(level == Trace) {
 			strcpy(log_level_buf, " (TRACE)");
@@ -173,7 +145,7 @@ int get_format(Log *log, LogLevel level, char *buf) {
 
 int log_line(Log *log, LogLevel level, char *line) {
 	int len = strlen(line);
-	char fline[len+100+log->line_num_data_max_len];
+	char fline[len+100];
 
 	get_format(log, level, fline);
 	strcat(fline, line);
@@ -243,28 +215,8 @@ int log_config_option_show_millis(LogConfigOption *option, bool value) {
         return 0;
 }
 
-int log_config_option_show_line_num(LogConfigOption *option, bool value) {
-        option->type = ShowLineNum;
-        option->value = malloc(sizeof(bool));
-        if(option->value == NULL) {
-                return -1;
-        }
-        *((bool *)option->value) = value;
-        return 0;
-}
-
 int log_config_option_show_log_level(LogConfigOption *option, bool value) {
         option->type = ShowLogLevel;
-        option->value = malloc(sizeof(bool));
-        if(option->value == NULL) {
-                return -1;
-        }
-        *((bool *)option->value) = value;
-        return 0;
-}
-
-int log_config_option_show_backtrace(LogConfigOption *option, bool value) {
-        option->type = ShowBacktrace;
         option->value = malloc(sizeof(bool));
         if(option->value == NULL) {
                 return -1;
@@ -305,16 +257,6 @@ int log_config_option_max_size_bytes(LogConfigOption *option, u64 value) {
 
 int log_config_option_max_age_millis(LogConfigOption *option, u64 value) {
         option->type = MaxAgeMillis;
-        option->value = malloc(sizeof(u64));
-        if(option->value == NULL) {
-                return -1;
-        }
-        *((u64 *)option->value) = value;
-        return 0;
-}
-
-int log_config_option_line_num_data_max_len(LogConfigOption *option, u64 value) {
-        option->type = LineNumDataMaxLen;
         option->value = malloc(sizeof(u64));
         if(option->value == NULL) {
                 return -1;

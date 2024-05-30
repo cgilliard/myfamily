@@ -24,14 +24,12 @@ enum LogConfigOptionType {
 	ShowMillis        = 3, // value is bool *
 	ShowLineNum       = 4, // value is bool *
 	ShowLogLevel      = 5, // value is bool *
-	ShowBacktrace     = 6, // value is bool *
-	AutoRotate        = 7, // value is bool *
-	DeleteRotation    = 8, // value is bool *
-	MaxSizeBytes      = 9, // value is u64 *
-	MaxAgeMillis      = 10, // value is u64 *
-	LineNumDataMaxLen = 11, // value is u64 *
-	LogFilePath       = 12, // value is char *
-	FileHeader        = 13, // value is char *
+	AutoRotate        = 6, // value is bool *
+	DeleteRotation    = 7, // value is bool *
+	MaxSizeBytes      = 8, // value is u64 *
+	MaxAgeMillis      = 9, // value is u64 *
+	LogFilePath       = 10, // value is char *
+	FileHeader        = 11, // value is char *
 };
 typedef enum LogConfigOptionType LogConfigOptionType;
 
@@ -57,14 +55,11 @@ struct Log {
 	bool show_stdout;
 	bool show_timestamp;
 	bool show_millis;
-	bool show_line_num;
 	bool show_log_level;
-	bool show_backtrace;
 	bool auto_rotate;
 	bool delete_rotation;
 	bool max_size_bytes;
 	bool max_age_millis;
-	bool line_num_data_max_len;
 
 	char *path;
 	char *file_header;
@@ -75,14 +70,11 @@ int log_config_option_show_colors(LogConfigOption *option, bool value);
 int log_config_option_show_stdout(LogConfigOption *option, bool value);
 int log_config_option_show_timestamp(LogConfigOption *option, bool value);
 int log_config_option_show_millis(LogConfigOption *option, bool value);
-int log_config_option_show_line_num(LogConfigOption *option, bool value);
 int log_config_option_show_log_level(LogConfigOption *option, bool value);
-int log_config_option_show_backtrace(LogConfigOption *option, bool value);
 int log_config_option_auto_rotate(LogConfigOption *option, bool value);
 int log_config_option_delete_rotation(LogConfigOption *option, bool value);
 int log_config_option_max_size_bytes(LogConfigOption *option, u64 value);
 int log_config_option_max_age_millis(LogConfigOption *option, u64 value);
-int log_config_option_line_num_data_max_len(LogConfigOption *option, u64 value);
 int log_config_option_log_file_path(LogConfigOption *option, char *value);
 int log_config_option_file_header(LogConfigOption *option, char *value);
 void free_log_config_option(LogConfigOption *option);
