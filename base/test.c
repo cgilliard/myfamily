@@ -21,6 +21,7 @@
 #include <stdbool.h>
 
 Test(base, rand) {
+	int v;
 	i32 v32;
 	rand_i32(&v32);
 	printf("v=%d\n", v32);
@@ -28,7 +29,8 @@ Test(base, rand) {
 	rand_i64(&v64);
 	printf("v=%" PRId64 "\n", v64);
 	u128 ru128;
-       	int v = rand_u128(&ru128);
+       	v = rand_u128(&ru128);
+	printf("v=%i\n", v);
 	u64 high = (ru128 >> 64);
 	u64 low = ru128 & 0xFFFFFFFFFFFFFFFF;
 	printf("x=%" PRIu64, high);

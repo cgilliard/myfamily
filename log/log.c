@@ -128,7 +128,7 @@ int get_format(Log *log, LogLevel level, char *buf) {
 	if(log->show_millis) {
 		struct timeval time;
   		gettimeofday(&time, NULL);
-		sprintf(milli_buf, ".%03d", time.tv_usec / 1000);
+		sprintf(milli_buf, ".%03ld", time.tv_usec / 1000);
 	} else {
 		strcpy(milli_buf, "");
 	}
