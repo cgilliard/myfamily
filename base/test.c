@@ -122,28 +122,28 @@ Test(base, config) {
         u16 u16_1 = 1, u16_2 = 2;
         configure_u16(&u16_1, NULL, 3);
         cr_assert_eq(u16_1, 3);
- 
+
         configure_u16(&u16_1, &u16_2, 3);
         cr_assert_eq(u16_1, 2);
 
         u32 u32_1 = 1, u32_2 = 2;
         configure_u32(&u32_1, NULL, 3);
         cr_assert_eq(u32_1, 3);
-        
+
         configure_u32(&u32_1, &u32_2, 3);
         cr_assert_eq(u32_1, 2);
 
         u64 u64_1 = 1, u64_2 = 2;
         configure_u64(&u64_1, NULL, 3);
         cr_assert_eq(u64_1, 3);
-        
+
         configure_u64(&u64_1, &u64_2, 3);
         cr_assert_eq(u64_1, 2);
 
         u128 u128_1 = 1, u128_2 = 2;
         configure_u128(&u128_1, NULL, 3);
         cr_assert_eq(u128_1, 3);
-        
+
         configure_u128(&u128_1, &u128_2, 3);
         cr_assert_eq(u128_1, 2);
 

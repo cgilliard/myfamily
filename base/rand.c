@@ -71,7 +71,7 @@ int rand_i64(int64_t *v) {
 int rand_u64(uint64_t *v) {
 	char buf[8];
         int ret = getentropy(buf, 8);
-        *v = 
+        *v =
                 ((uint64_t)buf[0] << 56) + ((uint64_t)buf[1] << 48) +
                 ((uint64_t)buf[2] << 40) + ((uint64_t)buf[3] << 32) +
                 ((uint64_t)buf[4] << 24) + ((uint64_t)buf[5] << 16) +
@@ -82,7 +82,7 @@ int rand_u64(uint64_t *v) {
 int rand_i128(i128 *v) {
 	char buf[16];
 	int ret = getentropy(buf, 16);
- 	*v = 
+ 	*v =
                 ((i128)buf[0] << 120) + ((i128)buf[1] << 112) +
                 ((i128)buf[2] << 104) + ((i128)buf[3] << 96) +
                 ((i128)buf[4] << 88) + ((i128)buf[5] << 80) +
