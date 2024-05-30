@@ -196,7 +196,7 @@ int get_format(Log *log, LogLevel level, char *buf) {
 	}
 
 	if((level == Info || level == Warn) && log->show_log_level) {
-		strcpy(spacing, " ");
+		strcpy(spacing, ":");
 	} else {
 		strcpy(spacing, "");
 	}
