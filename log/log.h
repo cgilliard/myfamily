@@ -91,9 +91,9 @@ int  log_config_option_log_file_path(LogConfigOption *option, char *value);
 int  log_config_option_file_header(LogConfigOption *option, char *value);
 void log_config_option_free(LogConfigOption *option);
 
-int  log_line(Log *log, LogLevel level, char *line);
-int  log_all(Log *log, LogLevel level, char *line);
-int  log_plain(Log *log, LogLevel level, char *line);
+int  log_line(Log *log, LogLevel level, char *line, ...);
+int  log_all(Log *log, LogLevel level, char *line, ...);
+int  log_plain(Log *log, LogLevel level, char *line, ...);
 int  log_rotate(Log *log);
 bool log_need_rotate(Log *log);
 int  log_set_level(Log *log, LogLevel level);

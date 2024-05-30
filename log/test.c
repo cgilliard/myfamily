@@ -314,3 +314,39 @@ Test(log, all) {
         log_free(&log);
 }
 
+Test(log, formatting) {
+	char buf[100];
+        Log log;
+        LogConfigOption opt1, opt2, opt3, opt4;
+
+        remove("./.log_fmt.fam/log_fmt.log");
+        rmdir("./.log_fmt.fam/");
+
+        mkdir("./.log_fmt.fam", 0700);
+        log_config_option_log_file_path(&opt1, "./.log_fmt.fam/log_fmt.log");
+        log_config_option_show_millis(&opt2, false);
+        log_config_option_show_colors(&opt3, false);
+        log_config_option_show_stdout(&opt4, false);
+
+        logger(&log, 4, opt1, opt2, opt3, opt4);
+        log_init(&log);
+        log_all(&log, Info, "---log_all--- %i", 7);
+        log_close(&log);
+
+        FILE *fp = fopen("./.log_fmt.fam/log_fmt.log", "r");
+        fgets(buf, 100, fp);
+        printf("s=%s\n", buf);
+        cr_assert_neq(strstr(buf, "]"), NULL);
+        cr_assert_neq(strstr(buf, "[20"), NULL);
+        cr_assert_neq(strstr(buf, "---log_all--- 7"), NULL);
+        fclose(fp);
+
+        remove("./.log_fmt.fam/log_fmt.log");
+        rmdir("./.log_fmt.fam/");
+
+
+        log_config_option_free(&opt3);
+        log_config_option_free(&opt2);
+        log_config_option_free(&opt1);
+        log_free(&log);
+}

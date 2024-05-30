@@ -211,7 +211,7 @@ int get_format(Log *log, LogLevel level, char *buf) {
 	return 0;
 }
 
-int do_log(Log *log, LogLevel level, char *line, bool is_plain, bool is_all) {
+int do_log(Log *log, LogLevel level, char *line, bool is_plain, bool is_all, va_list args) {
         if(level >= log->level) {
                 int len = strlen(line);
                 char fline[len+100];
@@ -225,25 +225,37 @@ int do_log(Log *log, LogLevel level, char *line, bool is_plain, bool is_all) {
                 strcat(fline, "\n");
 
                 if(log->show_stdout || is_all) {
-                        printf("%s", fline);
+                        vprintf(fline, args);
                 }
                 if(log->fp) {
-                        fprintf(log->fp, "%s", fline);
+                        vfprintf(log->fp, fline, args);
                 }
         }
         return 0;
 }
 
-int log_all(Log *log, LogLevel level, char *line) {
-	return do_log(log, level, line, false, true);
+int log_all(Log *log, LogLevel level, char *line, ...) {
+	va_list args;
+	va_start(args, line);
+	int ret = do_log(log, level, line, false, true, args);
+	va_end(args);
+	return ret;
 }
 
-int log_plain(Log *log, LogLevel level, char *line) {
-	return do_log(log, level, line, true, false);
+int log_plain(Log *log, LogLevel level, char *line, ...) {
+        va_list args;
+        va_start(args, line);
+	int ret = do_log(log, level, line, true, false, args);
+	va_end(args);
+	return ret;
 }
 
-int log_line(Log *log, LogLevel level, char *line) {
-	return do_log(log, level, line, false, false);
+int log_line(Log *log, LogLevel level, char *line, ...) {
+	va_list args;
+        va_start(args, line);
+	int ret = do_log(log, level, line, false, false, args);
+	va_end(args);
+	return ret;
 }
 
 int log_set_level(Log *log, LogLevel level) {
