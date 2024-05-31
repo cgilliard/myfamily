@@ -23,9 +23,12 @@
 #include <limits.h>
 #include <log/log.h>
 
+#define _FILE_OFFSET_BITS 64
+
 int logger(Log *log, int num, ...) {
 	// set defaults
 	log->fp = NULL;
+	log->level = Info;
 	log->show_colors = true;
 	log->show_stdout = true;
 	log->show_timestamp = true;
@@ -232,6 +235,7 @@ int do_log(Log *log, LogLevel level, char *line, bool is_plain, bool is_all, va_
                 }
                 if(log->fp) {
                         vfprintf(log->fp, fline, args_copy);
+			log->off = ftello(log->fp);
                 }
         }
         return 0;
@@ -279,6 +283,18 @@ int log_init(Log *log) {
 		fseek(log->fp, 0, SEEK_END);
 	}
 	return 0;
+}
+
+int log_config_option(Log *log, LogConfigOption option) {
+	return  0;
+}
+
+int log_rotate(Log *log) {
+	return 0;
+}
+
+bool log_need_rotate(Log *log) {
+	return false;
 }
 
 int log_close(Log *log) {

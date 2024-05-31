@@ -15,6 +15,8 @@
 #ifndef __LOG_LOG_
 #define __LOG_LOG_
 
+#define _FILE_OFFSET_BITS 64
+
 #include <base/types.h>
 
 #define ANSI_COLOR_DIMMED     "\x1b[2m"
@@ -69,11 +71,9 @@ struct Log {
 	bool delete_rotation;
 	bool max_size_bytes;
 	bool max_age_millis;
-
+	off_t off;
 	char *path;
 	char *file_header;
-
-	int offset;
 	LogLevel level;
 };
 typedef struct Log Log;
