@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['end_5fdoc_139',['end_doc',['../structTokenStream.html#a27a61edc887a5601dc37863b8d63d5ac',1,'TokenStream']]]
+  ['last_5frotation_206',['last_rotation',['../structLog.html#ab6f366d663913411d2a4705deb2d4dc9',1,'Log']]],
+  ['level_207',['level',['../structLog.html#ade3ee34f6644de65c47e0d979893b352',1,'Log']]]
 ];

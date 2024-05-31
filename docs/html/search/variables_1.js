@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ch_137',['ch',['../structPunct.html#acc15c82931faff1c92ca4696bcba4979',1,'Punct']]]
+  ['delete_5frotation_203',['delete_rotation',['../structLog.html#ae79116f37c947860fe970ef3784f268e',1,'Log']]]
 ];

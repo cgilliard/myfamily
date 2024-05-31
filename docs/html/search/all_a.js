@@ -1,5 +1,11 @@
 var searchData=
 [
-  ['next_5ftoken_46',['next_token',['../parser_8c.html#a5ee4beb36905da3ffda6adc67a557426',1,'next_token(TokenStream *strm, TokenTree *next):&#160;parser.c'],['../parser_8h.html#a5ee4beb36905da3ffda6adc67a557426',1,'next_token(TokenStream *strm, TokenTree *next):&#160;parser.c']]],
-  ['none_47',['None',['../parser_8h.html#aed86fbb9eba541d4ced1894c75677057ac9d3e887722f2bc482bcca9d41c512af',1,'parser.h']]]
+  ['main_84',['main',['../main_8c.html#a3c04138a5bfe5d72780bb7e82a18e627',1,'main.c']]],
+  ['main_2ec_85',['main.c',['../main_8c.html',1,'']]],
+  ['max_5fage_5fmillis_86',['max_age_millis',['../structLog.html#a14fdf21cef64610ef3fe3072e9a79192',1,'Log']]],
+  ['max_5fsize_5fbytes_87',['max_size_bytes',['../structLog.html#a83042357266cb27674d084aa21024595',1,'Log']]],
+  ['maxagemillis_88',['MaxAgeMillis',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033a417c5677912b33e4b263ca6c567f0d0a',1,'log.h']]],
+  ['maxsizebytes_89',['MaxSizeBytes',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033a1ea3c800792cd2a284c99464baf897d1',1,'log.h']]],
+  ['misc_2ec_90',['misc.c',['../misc_8c.html',1,'']]],
+  ['misc_2eh_91',['misc.h',['../misc_8h.html',1,'']]]
 ];

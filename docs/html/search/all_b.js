@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['offset_48',['offset',['../structSpan.html#a3c946ce256a5fa4d6a76c3a8a8ced80e',1,'Span']]]
+  ['off_92',['off',['../structLog.html#acb90110baa3a481fbdf12977dbc7e0f3',1,'Log']]]
 ];
