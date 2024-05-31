@@ -213,6 +213,9 @@ int get_format(Log *log, LogLevel level, char *buf) {
 
 int do_log(Log *log, LogLevel level, char *line, bool is_plain, bool is_all, va_list args) {
         if(level >= log->level) {
+		va_list args_copy;
+		va_copy(args_copy, args);
+
                 int len = strlen(line);
                 char fline[len+100];
 
@@ -228,7 +231,7 @@ int do_log(Log *log, LogLevel level, char *line, bool is_plain, bool is_all, va_
                         vprintf(fline, args);
                 }
                 if(log->fp) {
-                        vfprintf(log->fp, fline, args);
+                        vfprintf(log->fp, fline, args_copy);
                 }
         }
         return 0;
