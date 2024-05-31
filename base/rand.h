@@ -15,8 +15,8 @@
 #ifndef _RAND_BASE__
 #define _RAND_BASE__
 
-#include <stdlib.h>
 #include <base/types.h>
+#include <stdlib.h>
 
 /**
  * Returns a random i8 value using the operating systems' getentropy function.
@@ -25,7 +25,7 @@
  * @see [rand_u32]
  * @see [rand_bytes]
  */
-int rand_i8(i8 *v);
+int rand_i8(i8* v);
 
 /**
  * Returns a random u8 value using the operating systems' getentropy function.
@@ -34,7 +34,7 @@ int rand_i8(i8 *v);
  * @see [rand_u32]
  * @see [rand_bytes]
  */
-int rand_u8(u8 *v);
+int rand_u8(u8* v);
 
 /**
  * Returns a random i16 value using the operating systems' getentropy function.
@@ -43,7 +43,7 @@ int rand_u8(u8 *v);
  * @see [rand_u32]
  * @see [rand_bytes]
  */
-int rand_i16(i16 *v);
+int rand_i16(i16* v);
 
 /**
  * Returns a random u16 value using the operating systems' getentropy function.
@@ -52,7 +52,7 @@ int rand_i16(i16 *v);
  * @see [rand_u32]
  * @see [rand_bytes]
  */
-int rand_u16(u16 *v);
+int rand_u16(u16* v);
 
 /**
  * Returns a random i32 value using the operating systems' getentropy function.
@@ -61,7 +61,7 @@ int rand_u16(u16 *v);
  * @see [rand_u32]
  * @see [rand_bytes]
  */
-int rand_i32(i32 *v);
+int rand_i32(i32* v);
 
 /**
  * Returns a random u32 value using the operating systems' getentropy function.
@@ -70,7 +70,7 @@ int rand_i32(i32 *v);
  * @see [rand_i32]
  * @see [rand_bytes]
  */
-int rand_u32(u32 *v);
+int rand_u32(u32* v);
 
 /**
  * Returns a random i64 value using the operating systems' getentropy function.
@@ -79,7 +79,7 @@ int rand_u32(u32 *v);
  * @see [rand_u64]
  * @see [rand_bytes]
  */
-int rand_i64(i64 *v);
+int rand_i64(i64* v);
 
 /**
  * Returns a random u64 value using the operating systems' getentropy function.
@@ -88,7 +88,7 @@ int rand_i64(i64 *v);
  * @see [rand_i64]
  * @see [rand_bytes]
  */
-int rand_u64(u64 *v);
+int rand_u64(u64* v);
 
 /**
  * Returns a random i128 value using the operating systems' getentropy function.
@@ -97,7 +97,7 @@ int rand_u64(u64 *v);
  * @see [rand_u128]
  * @see [rand_bytes]
  */
-int rand_i128(i128 *v);
+int rand_i128(i128* v);
 
 /**
  * Returns a random u128 value using the operating systems' getentropy function.
@@ -106,7 +106,7 @@ int rand_i128(i128 *v);
  * @see [rand_i128]
  * @see [rand_bytes]
  */
-int rand_u128(u128 *v);
+int rand_u128(u128* v);
 
 /**
  * Returns random bytes of the specified length using the operating systems' getentropy function.
@@ -116,6 +116,6 @@ int rand_u128(u128 *v);
  * @see [rand_i64]
  * @see [rand_u128]
  */
-int rand_bytes(void *buf, size_t length);
+int rand_bytes(void* buf, size_t length);
 
 #endif /* _RAND_BASE__ */

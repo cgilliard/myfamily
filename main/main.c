@@ -14,8 +14,8 @@
 
 #include <stdio.h>
 
-int main(int argc, char **argv) {
-	printf("main doesn't currently do anything\n");
-	return 0;
+int main(int argc, char** argv)
+{
+    printf("main doesn't currently do anything\n");
+    return 0;
 }
-

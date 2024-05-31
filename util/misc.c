@@ -12,38 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <util/misc.h>
 #include <base/constants.h>
+#include <util/misc.h>
 
-int is_white_space(char ch) {
-        if (ch == '\n' || ch == '\t' || ch == '\r' || ch == '\v' || ch == '\f' || ch == ' ')
-                return TRUE;
-        else
-                return FALSE;
+int is_white_space(char ch)
+{
+    if (ch == '\n' || ch == '\t' || ch == '\r' || ch == '\v' || ch == '\f' || ch == ' ')
+        return TRUE;
+    else
+        return FALSE;
 }
 
-int is_ident_start(char ch) {
-        if ((ch <= 'Z' && ch >= 'A') || (ch <= 'z' && ch >= 'a') || ch == '_') {
-                return TRUE;
-        } else {
-                return FALSE;
-        }
+int is_ident_start(char ch)
+{
+    if ((ch <= 'Z' && ch >= 'A') || (ch <= 'z' && ch >= 'a') || ch == '_') {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
 }
 
-int is_ident_secondary(char ch) {
-        if (is_ident_start(ch) || (ch <= '9' && ch >= '0')) {
-                return TRUE;
-        } else {
-                return FALSE;
-        }
+int is_ident_secondary(char ch)
+{
+    if (is_ident_start(ch) || (ch <= '9' && ch >= '0')) {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
 }
 
-int is_joint_possible(char ch) {
-        if (ch == '.' || ch == '=' || ch == '/' || ch == '+' || ch == '&' || ch == '<' ||
-                ch == '-' || ch == '%' || ch == '^' || ch == '*' || ch == '>' || ch == '|' ||
-		ch == '!' || ch == ':') {
-                return TRUE;
-        } else {
-                return FALSE;
-        }
+int is_joint_possible(char ch)
+{
+    if (ch == '.' || ch == '=' || ch == '/' || ch == '+' || ch == '&' || ch == '<' || ch == '-' || ch == '%' || ch == '^' || ch == '*' || ch == '>' || ch == '|' || ch == '!' || ch == ':') {
+        return TRUE;
+    } else {
+        return FALSE;
+    }
 }
