@@ -18,6 +18,7 @@
 #define _FILE_OFFSET_BITS 64
 
 #include <base/types.h>
+#include <time.h>
 
 #define ANSI_COLOR_DIMMED     "\x1b[2m"
 #define ANSI_COLOR_RED        "\x1b[31m"
@@ -69,9 +70,10 @@ struct Log {
 	bool show_log_level;
 	bool auto_rotate;
 	bool delete_rotation;
-	bool max_size_bytes;
-	bool max_age_millis;
+	u64 max_size_bytes;
+	u64 max_age_millis;
 	off_t off;
+	clock_t last_rotation; 
 	char *path;
 	char *file_header;
 	LogLevel level;

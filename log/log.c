@@ -40,6 +40,8 @@ int logger(Log *log, int num, ...) {
 	log->max_age_millis = ULONG_MAX;
 	log->path = NULL;
 	log->file_header = NULL;
+	log->off = 0;
+	log->last_rotation = clock();
 
 	// iterate through arg list for overrides
 	va_list valist;
@@ -281,6 +283,7 @@ int log_init(Log *log) {
 			fprintf(log->fp,"%s\n",log->file_header);
 		}
 		fseek(log->fp, 0, SEEK_END);
+		log->off = ftello(log->fp);
 	}
 	return 0;
 }
@@ -293,8 +296,16 @@ int log_rotate(Log *log) {
 	return 0;
 }
 
+u64 timediff(clock_t t1, clock_t t2) {
+    u64 elapsed;
+    elapsed = ((double)t2 - t1) / CLOCKS_PER_SEC * 1000;
+    return elapsed;
+}
+
+#include <inttypes.h>
 bool log_need_rotate(Log *log) {
-	return false;
+	u64 diff = timediff(clock(), log->last_rotation);
+	return log->off > log->max_size_bytes || diff > log->max_age_millis;
 }
 
 int log_close(Log *log) {
