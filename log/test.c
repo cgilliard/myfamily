@@ -20,7 +20,6 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-
 Test(log, basic) {
 	Log log;
 	LogConfigOption opt1, opt2, opt3;
@@ -63,6 +62,7 @@ Test(log, basic) {
 
 	
 	log_init(&log);
+	log_set_level(&log, Trace);
 	
 	log_line(&log, Trace, "this is a test1");
 	log_line(&log, Debug, "this is a test2");
@@ -352,7 +352,6 @@ Test(log, formatting) {
 }
 
 Test(log, need_rotate) {
-	char buf[100];
         Log log;
         LogConfigOption opt1, opt2, opt3, opt4;
         
@@ -389,6 +388,51 @@ Test(log, need_rotate) {
         remove("./.log_rot.fam/log_rot.log");
         rmdir("./.log_rot.fam/");
         
+        log_config_option_free(&opt3);
+        log_config_option_free(&opt2);
+        log_config_option_free(&opt1);
+        log_free(&log);
+}
+
+Test(log, rotate) {
+	Log log;
+        LogConfigOption opt1, opt2, opt3, opt4;
+        
+        remove("./.log_dorot.fam/log_dorot.log");
+        rmdir("./.log_dorot.fam/");
+        
+        mkdir("./.log_dorot.fam", 0700);
+        log_config_option_log_file_path(&opt1, "./.log_dorot.fam/log_dorot.log");
+        log_config_option_max_size_bytes(&opt2, 100);
+        log_config_option_show_colors(&opt3, false);
+        log_config_option_show_stdout(&opt4, false);
+        
+        logger(&log, 4, opt1, opt2, opt3, opt4);
+        log_init(&log);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+        bool need_rotate = log_need_rotate(&log);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+        log_plain(&log, Info, "---log_all--- %i", 7);
+
+        cr_assert_eq(need_rotate, false);
+
+        need_rotate = log_need_rotate(&log);
+        cr_assert_eq(need_rotate, true);
+
+	log_rotate(&log);
+        log_close(&log);
+
+        remove("./.log_dorot.fam/log_dorot.log");
+        rmdir("./.log_dorot.fam/");
+
         log_config_option_free(&opt3);
         log_config_option_free(&opt2);
         log_config_option_free(&opt1);

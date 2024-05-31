@@ -98,7 +98,7 @@ int  log_all(Log *log, LogLevel level, char *line, ...);
 int  log_plain(Log *log, LogLevel level, char *line, ...);
 int  log_rotate(Log *log);
 bool log_need_rotate(Log *log);
-int  log_set_level(Log *log, LogLevel level);
+void log_set_level(Log *log, LogLevel level);
 int  log_init(Log *log);
 int  log_close(Log *log);
 void log_free(Log *log);
