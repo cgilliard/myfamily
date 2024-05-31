@@ -1,11 +1,13 @@
 var searchData=
 [
-  ['second_5fch_75',['second_ch',['../structPunct.html#a59d8bf8246ed5651393fb25b4657b315',1,'Punct']]],
-  ['ser_2ec_76',['ser.c',['../ser_8c.html',1,'']]],
-  ['skip_5fcomments_5fand_5fwhite_5fspace_77',['skip_comments_and_white_space',['../parser_8c.html#a559d29bbc04f3381ae910fefdf4d738e',1,'parser.c']]],
-  ['span_78',['Span',['../structSpan.html',1,'']]],
-  ['span_79',['span',['../structTokenTree.html#ac95eb2574f0e0fd3468d83ded3a18935',1,'TokenTree']]],
-  ['span_80',['Span',['../parser_8h.html#aba1dae9ddea86a6cb6d27c5b63703a10',1,'parser.h']]],
-  ['start_5fdoc_81',['start_doc',['../structTokenStream.html#a2ffae6c8d41ba2cec24a0be8252ef374',1,'TokenStream']]],
-  ['strm_82',['strm',['../structSpan.html#aa15b0df31177015db01030175da18f2a',1,'Span::strm()'],['../structGroup.html#a6ae9e4c169010fe3042f90644791dd22',1,'Group::strm()']]]
+  ['show_5fcolors_109',['show_colors',['../structLog.html#a5c7cec42a9add3bb46d1c7d200bd2255',1,'Log']]],
+  ['show_5flog_5flevel_110',['show_log_level',['../structLog.html#a5d8a40e269e070f577c4b92d8c33cef6',1,'Log']]],
+  ['show_5fmillis_111',['show_millis',['../structLog.html#aaeaeb8fc6d25d5f0ccf9c3f34931bea2',1,'Log']]],
+  ['show_5fstdout_112',['show_stdout',['../structLog.html#a891fd8c832571b4382a9cb254b30a432',1,'Log']]],
+  ['show_5ftimestamp_113',['show_timestamp',['../structLog.html#a5d2522a8e32818a0852adf691f133672',1,'Log']]],
+  ['showcolors_114',['ShowColors',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033afc6ca01edaed7b3dabb9326c9ee27fea',1,'log.h']]],
+  ['showloglevel_115',['ShowLogLevel',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033ac577940ed91ce93dc7b6cb58c3726aa1',1,'log.h']]],
+  ['showmillis_116',['ShowMillis',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033ad4e5aa743ba9cd1dc257421e58875337',1,'log.h']]],
+  ['showstdout_117',['ShowStdout',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033aa4eb15c25a39c2cff92e6831553709ea',1,'log.h']]],
+  ['showtimestamp_118',['ShowTimestamp',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033a26e4ff35c3de8e0da0825d55cda203c2',1,'log.h']]]
 ];

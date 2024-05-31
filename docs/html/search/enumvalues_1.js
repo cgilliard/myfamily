@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['error_173',['Error',['../parser_8h.html#a88f6d947bf467e369055535af5907aa1a4dfd42ec49d09d8c6555c218301cc30f',1,'parser.h']]]
+  ['debug_226',['Debug',['../log_8h.html#aca1fd1d8935433e6ba2e3918214e07f9ac909e86054cb6ad83c22bfc2b3e6e5b8',1,'log.h']]],
+  ['deleterotation_227',['DeleteRotation',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033a62fe093a843f1c65537f4be20806c1f0',1,'log.h']]]
 ];

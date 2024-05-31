@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['file_5fpath_140',['file_path',['../structTokenStream.html#a7ea26d5f68c44ffca7b3f2114f5731a5',1,'TokenStream']]]
+  ['max_5fage_5fmillis_208',['max_age_millis',['../structLog.html#a14fdf21cef64610ef3fe3072e9a79192',1,'Log']]],
+  ['max_5fsize_5fbytes_209',['max_size_bytes',['../structLog.html#a83042357266cb27674d084aa21024595',1,'Log']]]
 ];

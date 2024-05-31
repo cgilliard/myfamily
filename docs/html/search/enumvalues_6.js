@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['parenthesis_178',['Parenthesis',['../parser_8h.html#aed86fbb9eba541d4ced1894c75677057accd6bbe0b57bbec2661c9e8f18b355a9',1,'parser.h']]],
-  ['puncttype_179',['PunctType',['../parser_8h.html#aa0ffcf18b340b4863a5aaf658cb6a810a332c2ad0479f2ee3864f6a9005f349da',1,'parser.h']]]
+  ['maxagemillis_233',['MaxAgeMillis',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033a417c5677912b33e4b263ca6c567f0d0a',1,'log.h']]],
+  ['maxsizebytes_234',['MaxSizeBytes',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033a1ea3c800792cd2a284c99464baf897d1',1,'log.h']]]
 ];

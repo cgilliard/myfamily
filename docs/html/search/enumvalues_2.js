@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['grouptype_174',['GroupType',['../parser_8h.html#aa0ffcf18b340b4863a5aaf658cb6a810a7077e9e148eb6e54f8d0d320b48527f4',1,'parser.h']]]
+  ['error_228',['Error',['../log_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a4dfd42ec49d09d8c6555c218301cc30f',1,'log.h']]]
 ];

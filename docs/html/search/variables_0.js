@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['bytes_136',['bytes',['../structTokenStream.html#a5d0ca87e9079720b539b0958b6baf22a',1,'TokenStream']]]
+  ['auto_5frotate_202',['auto_rotate',['../structLog.html#a70e8dd71e4111dde172d9d8a8d4d739e',1,'Log']]]
 ];

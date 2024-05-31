@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['delimiter_168',['Delimiter',['../parser_8h.html#aed86fbb9eba541d4ced1894c75677057',1,'parser.h']]]
+  ['logconfigoptiontype_223',['LogConfigOptionType',['../log_8h.html#ab0362afeed36229e3c7babfdd6093033',1,'log.h']]],
+  ['loglevel_224',['LogLevel',['../log_8h.html#aca1fd1d8935433e6ba2e3918214e07f9',1,'log.h']]]
 ];
