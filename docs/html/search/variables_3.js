@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['last_5frotation_206',['last_rotation',['../structLog.html#ab6f366d663913411d2a4705deb2d4dc9',1,'Log']]],
-  ['level_207',['level',['../structLog.html#ade3ee34f6644de65c47e0d979893b352',1,'Log']]]
+  ['file_5fheader_244',['file_header',['../structLog.html#ac0c0d01386076b89badd7bb50fe1df9e',1,'Log']]],
+  ['fp_245',['fp',['../structLog.html#afdbe6dae87a0c7545fc788a45ff88192',1,'Log']]]
 ];

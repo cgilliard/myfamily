@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['max_5fage_5fmillis_208',['max_age_millis',['../structLog.html#a14fdf21cef64610ef3fe3072e9a79192',1,'Log']]],
-  ['max_5fsize_5fbytes_209',['max_size_bytes',['../structLog.html#a83042357266cb27674d084aa21024595',1,'Log']]]
+  ['last_5frotation_246',['last_rotation',['../structLog.html#ab6f366d663913411d2a4705deb2d4dc9',1,'Log']]],
+  ['level_247',['level',['../structLog.html#ade3ee34f6644de65c47e0d979893b352',1,'Log']]]
 ];

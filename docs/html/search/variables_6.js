@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['path_211',['path',['../structLog.html#a9ad31ffa5a8db6d7ebb8408ed48f4d0a',1,'Log']]]
+  ['off_250',['off',['../structLog.html#acb90110baa3a481fbdf12977dbc7e0f3',1,'Log']]]
 ];

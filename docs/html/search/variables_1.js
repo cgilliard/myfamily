@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['delete_5frotation_203',['delete_rotation',['../structLog.html#ae79116f37c947860fe970ef3784f268e',1,'Log']]]
+  ['auto_5frotate_242',['auto_rotate',['../structLog.html#a70e8dd71e4111dde172d9d8a8d4d739e',1,'Log']]]
 ];

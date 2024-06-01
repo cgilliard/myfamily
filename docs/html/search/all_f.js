@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['test_119',['Test',['../util_2test_8c.html#aa9687fd59f68ac8393a870aae0dc52d7',1,'Test(test, util):&#160;test.c'],['../main_2test_8c.html#a5a8c507d7faba0830e7c09d5ffd5156c',1,'Test(test, main):&#160;test.c'],['../log_2test_8c.html#a1fba5e48708b6fec4466cab9b47085fc',1,'Test(log, need_rotate):&#160;test.c'],['../log_2test_8c.html#a9eb76857721f0f1e887f80d77e9a91cd',1,'Test(log, formatting):&#160;test.c'],['../log_2test_8c.html#aac504fc8ab5b20fb47bb73bf2771f155',1,'Test(log, all):&#160;test.c'],['../base_2test_8c.html#a32f06b5636ba86531d5eb4c6473030c3',1,'Test(base, rand):&#160;test.c'],['../base_2test_8c.html#a65c1cfdfc27d7b9a7937ecc022ed412b',1,'Test(base, config):&#160;test.c'],['../log_2test_8c.html#a817fcebb2e02f122192d8a1ae7de5cb9',1,'Test(log, basic):&#160;test.c'],['../log_2test_8c.html#adde8fc6d281036620ca3985fca83924b',1,'Test(log, threshold):&#160;test.c'],['../log_2test_8c.html#a576d085b3e74f382fcf585e76ec8c5d3',1,'Test(log, output):&#160;test.c'],['../log_2test_8c.html#aada056aac6f2405ba7f6f21ed656e3fe',1,'Test(log, configurations):&#160;test.c'],['../log_2test_8c.html#a4b6828409e221e8be926416e05ee0145',1,'Test(log, plain):&#160;test.c']]],
-  ['test_2ec_120',['test.c',['../log_2test_8c.html',1,'(Global Namespace)'],['../util_2test_8c.html',1,'(Global Namespace)'],['../main_2test_8c.html',1,'(Global Namespace)'],['../base_2test_8c.html',1,'(Global Namespace)']]],
-  ['timediff_121',['timediff',['../log_8c.html#ad8b738fdd80816d8e0215e8b62ad2f67',1,'log.c']]],
-  ['trace_122',['Trace',['../log_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a8af18ff6dfbaa47fadcc947a9f12602d',1,'log.h']]],
-  ['true_123',['TRUE',['../constants_8h.html#aa8cecfc5c5c054d2875c03e77b7be15d',1,'constants.h']]],
-  ['type_124',['type',['../structLogConfigOption.html#a8e883f4a98f4163a6c043ee9c326c5d0',1,'LogConfigOption']]],
-  ['types_2eh_125',['types.h',['../types_8h.html',1,'']]]
+  ['u128_152',['u128',['../types_8h.html#a845593201b45c0e24fdab5e4152c9f40',1,'types.h']]],
+  ['u16_153',['u16',['../types_8h.html#a2b19d553290a8d4a083d3c03280ea800',1,'types.h']]],
+  ['u32_154',['u32',['../types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6',1,'types.h']]],
+  ['u64_155',['u64',['../types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0',1,'types.h']]],
+  ['u8_156',['u8',['../types_8h.html#af3b86d961da0a3575b4f99c9ffaf01fd',1,'types.h']]],
+  ['unlink_5fcb_157',['unlink_cb',['../log_2test_8c.html#ab08d76004de1e54c0d18e143bfd50947',1,'test.c']]]
 ];
