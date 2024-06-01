@@ -39,7 +39,7 @@ int rmrf(char *path)
 {
     return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 }
-/*
+
 Test(log, basic)
 {
     Log log;
@@ -570,7 +570,7 @@ Test(log, autorotate) {
     log_free(&log);
     
 }
-*/
+
 Test(log, deleterotate) {
     Log log;
     LogConfigOption opt1, opt2, opt3, opt4, opt5;
