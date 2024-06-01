@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#define _XOPEN_SOURCE 500
 #include <criterion/criterion.h>
 #include <log/log.h>
 #include <stdio.h>
