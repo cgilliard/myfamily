@@ -110,6 +110,9 @@ int logger(Log* log, int num, ...);
 // global logger
 int global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char *line, ...);
 int init_global_logger(int num, ...);
+int global_log_rotate();
+bool global_log_need_rotate();
+int global_log_config_option(LogConfigOption option);
 
 #define trace(line, ...) (global_logger(false, false, Trace, LOG_LEVEL, line, __VA_ARGS__));
 #define debug(line, ...) (global_logger(false, false, Debug, LOG_LEVEL, line, __VA_ARGS__));

@@ -571,6 +571,8 @@ int global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, c
     if(!_global_logger_is_init__) {
 	ret = logger(&_global_logger__, 0);
 	if(ret == 0)
+		ret = log_init(&_global_logger__);
+	if(ret == 0)
         	_global_logger_is_init__ = true;
     }
 
@@ -588,6 +590,8 @@ int global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, c
 }
 
 int init_global_logger(int num, ...) {
+	if(_global_logger_is_init__)
+		return -1;
 	int ret = 0;
 	pthread_mutex_lock(&_global_logger_mutex__);
 
@@ -595,6 +599,9 @@ int init_global_logger(int num, ...) {
         va_start(valist, num);
 	ret = do_logger(&_global_logger__, num, valist);
 	va_end(valist);
+
+	if(ret == 0)
+		ret = log_init(&_global_logger__);
 	if(ret == 0)
 		_global_logger_is_init__ = true;
 
@@ -602,3 +609,23 @@ int init_global_logger(int num, ...) {
 	return ret;
 }
 
+int global_log_rotate() {
+	pthread_mutex_lock(&_global_logger_mutex__);
+	int ret = log_rotate(&_global_logger__);
+	pthread_mutex_unlock(&_global_logger_mutex__);
+	return ret;
+}
+
+bool global_log_need_rotate() {
+	pthread_mutex_lock(&_global_logger_mutex__);
+        bool ret = log_rotate(&_global_logger__);
+        pthread_mutex_unlock(&_global_logger_mutex__);
+        return ret;
+}
+
+int global_log_config_option(LogConfigOption option) {
+	pthread_mutex_lock(&_global_logger_mutex__);
+	int ret = log_config_option(&_global_logger__, option);
+	pthread_mutex_unlock(&_global_logger_mutex__);
+	return ret;
+}
