@@ -26,6 +26,12 @@ int main(int argc, char** argv)
     log_config_option_show_timestamp(&opt3, false);
 
     init_global_logger(2, opt1, opt2);
+    log_config_option_free(&opt1);
+    log_config_option_free(&opt2);
     info("Main currently doesn't do %s.", "anything");
+    global_log_config_option(opt3);
+    log_config_option_free(&opt3);
+    info("Main currently doesn't do %s.", "anything");
+
     return 0;
 }
