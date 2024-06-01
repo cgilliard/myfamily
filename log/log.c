@@ -365,7 +365,7 @@ int log_rotate(Log* log)
         ret = rand_u64(&r);
         if (ret == 0) {
             sprintf(date_format,
-                "%d_%02d_%02d_%02d_%02d_%02d_%llu",
+                "%d_%02d_%02d_%02d_%02d_%02d_%lu",
                 tm.tm_year + 1900,
                 tm.tm_mon + 1,
                 tm.tm_mday,

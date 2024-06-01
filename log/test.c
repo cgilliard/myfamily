@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifdef __linux__ 
 #define _XOPEN_SOURCE 500
+#endif /* __linux__ */
 #include <criterion/criterion.h>
 #include <log/log.h>
 #include <stdio.h>
@@ -460,7 +462,7 @@ Test(log, rotate)
 
     while((dp = readdir(dfd)) != NULL) {
 	struct stat stbuf;
-	char filename_qfd[100];
+	char filename_qfd[300];
 
 	sprintf( filename_qfd , "%s/%s",dir,dp->d_name) ;
         stat(filename_qfd, &stbuf);
