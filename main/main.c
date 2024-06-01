@@ -20,8 +20,12 @@
 
 int main(int argc, char** argv)
 {
-    printf("main doesn't currently do anything\n");
-    is_white_space(' ');
-    info("this is a test %d", 3);
+    LogConfigOption opt1, opt2, opt3;
+    log_config_option_show_colors(&opt1, true);
+    log_config_option_show_stdout(&opt2, true);
+    log_config_option_show_timestamp(&opt3, false);
+
+    init_global_logger(2, opt1, opt2);
+    info("Main currently doesn't do %s.", "anything");
     return 0;
 }

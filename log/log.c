@@ -79,12 +79,11 @@ int set_option(Log* log, int type, void* value)
     return 0;
 }
 
-int logger(Log* log, int num, ...)
-{
+int do_logger(Log *log, int num, va_list valist) {
     int ret = 0;
     // set defaults
     log->fp = NULL;
-    log->level = Info;
+    log->level = Info; 
     log->show_colors = true;
     log->show_stdout = true;
     log->show_timestamp = true;
@@ -98,10 +97,8 @@ int logger(Log* log, int num, ...)
     log->file_header = NULL;
     log->off = 0;
     log->last_rotation = clock();
-
+            
     // iterate through arg list for overrides
-    va_list valist;
-    va_start(valist, num);
     for (int i = 0; i < num; i++) {
         LogConfigOption next = va_arg(valist, LogConfigOption);
         if (set_option(log, next.type, next.value)) {
@@ -113,7 +110,14 @@ int logger(Log* log, int num, ...)
             break;
         }
     }
+    return ret;
+}
 
+int logger(Log* log, int num, ...)
+{
+    va_list valist;
+    va_start(valist, num);
+    int ret = do_logger(log, num, valist);
     va_end(valist);
     return ret;
 }
@@ -561,21 +565,40 @@ Log _global_logger__;
 bool _global_logger_is_init__ = false;
 
 int global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char *line, ...) {
+    int ret = 0;
     pthread_mutex_lock(&_global_logger_mutex__);
 
     if(!_global_logger_is_init__) {
-        _global_logger_is_init__ = true;
-        logger(&_global_logger__, 0);
-        log_set_level(&_global_logger__, Debug);
+	ret = logger(&_global_logger__, 0);
+	if(ret == 0)
+        	_global_logger_is_init__ = true;
     }
 
-    log_set_level(&_global_logger__, global);
+    if(ret == 0) {
+    	log_set_level(&_global_logger__, global);
 
-    va_list args;
-    va_start(args, line);
-    int ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
-    va_end(args);
+    	va_list args;
+    	va_start(args, line);
+    	ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
+    	va_end(args);
+    }
 
     pthread_mutex_unlock(&_global_logger_mutex__);
     return ret;
 }
+
+int init_global_logger(int num, ...) {
+	int ret = 0;
+	pthread_mutex_lock(&_global_logger_mutex__);
+
+	va_list valist;
+        va_start(valist, num);
+	ret = do_logger(&_global_logger__, num, valist);
+	va_end(valist);
+	if(ret == 0)
+		_global_logger_is_init__ = true;
+
+	pthread_mutex_unlock(&_global_logger_mutex__);
+	return ret;
+}
+
