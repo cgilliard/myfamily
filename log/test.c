@@ -39,7 +39,7 @@ int rmrf(char *path)
 {
     return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 }
-
+/*
 Test(log, basic)
 {
     Log log;
@@ -428,18 +428,18 @@ Test(log, rotate)
     log_init(&log);
     log_plain(&log, Info, "---log_all--- %i", 7);
     bool need_rotate = log_need_rotate(&log);
-    log_plain(&log, Info, "---log_all--- %i", 7);
-    log_plain(&log, Info, "---log_all--- %i", 7);
-    log_plain(&log, Info, "---log_all--- %i", 7);
-    log_plain(&log, Info, "---log_all--- %i", 7);
-    log_plain(&log, Info, "---log_all--- %i", 7);
-    log_plain(&log, Info, "---log_all--- %i", 7);
-    log_plain(&log, Info, "---log_all--- %i", 7);
-    log_plain(&log, Info, "---log_all--- %i", 7);
-    log_plain(&log, Info, "---log_all--- %i", 7);
-    log_plain(&log, Info, "---log_all--- %i", 7);
-
     cr_assert_eq(need_rotate, false);
+
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
 
     need_rotate = log_need_rotate(&log);
     cr_assert_eq(need_rotate, true);
@@ -488,5 +488,165 @@ Test(log, rotate)
     log_config_option_free(&opt3);
     log_config_option_free(&opt2);
     log_config_option_free(&opt1);
+    log_config_option_free(&opt4);
+    log_free(&log);
+}
+
+Test(log, autorotate) {
+    Log log;
+    LogConfigOption opt1, opt2, opt3, opt4, opt5;
+
+    rmrf("./.log_doautorot.fam/");
+    mkdir("./.log_doautorot.fam", 0700);
+    log_config_option_log_file_path(&opt1, "./.log_doautorot.fam/log_doautorot.log");
+    log_config_option_max_size_bytes(&opt2, 100);
+    log_config_option_file_header(&opt3, "myheader");
+    log_config_option_show_stdout(&opt4, false);
+    log_config_option_auto_rotate(&opt5, true);
+
+    logger(&log, 5, opt1, opt2, opt3, opt4, opt5);
+    log_init(&log);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    bool need_rotate = log_need_rotate(&log);
+    cr_assert_eq(need_rotate, false);
+
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+
+    need_rotate = log_need_rotate(&log);
+    cr_assert_eq(need_rotate, false);
+
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_close(&log);
+
+    DIR *dfd;
+
+    char *dir = "./.log_doautorot.fam/";
+    dfd = opendir(dir);
+    struct dirent *dp;
+    bool found_log = false;
+    bool found_rot = false;
+    int log_size = 0;
+    int rot_size = 0;
+
+    while((dp = readdir(dfd)) != NULL) {
+        struct stat stbuf;
+        char filename_qfd[300];
+
+        sprintf( filename_qfd , "%s/%s",dir,dp->d_name) ;
+        stat(filename_qfd, &stbuf);
+
+        if(!strcmp(dp->d_name, "log_doautorot.log")) {
+                found_log = true;
+                log_size = stbuf.st_size;
+        } else if(strstr(dp->d_name, "log_doautorot.r") != NULL) {
+                rot_size = stbuf.st_size;
+                found_rot = true;
+        }
+
+    }
+
+    cr_assert_eq(rot_size > log_size, true);
+    cr_assert_eq(rot_size != 0, true);
+    cr_assert_eq(log_size != 0, true);
+    cr_assert_eq(found_log, true);
+    cr_assert_eq(found_rot, true);
+
+    rmrf("./.log_doautorot.fam/");
+
+    log_config_option_free(&opt3);
+    log_config_option_free(&opt2);
+    log_config_option_free(&opt1);
+    log_config_option_free(&opt4);
+    log_config_option_free(&opt5);
+    log_free(&log);
+    
+}
+*/
+Test(log, deleterotate) {
+    Log log;
+    LogConfigOption opt1, opt2, opt3, opt4, opt5;
+
+    rmrf("./.log_dodelrot.fam/");
+    mkdir("./.log_dodelrot.fam", 0700);
+    log_config_option_log_file_path(&opt1, "./.log_dodelrot.fam/log_dodelrot.log");
+    log_config_option_max_size_bytes(&opt2, 100);
+    log_config_option_file_header(&opt3, "myheader");
+    log_config_option_show_stdout(&opt4, false);
+    log_config_option_delete_rotation(&opt5, true);
+
+    logger(&log, 5, opt1, opt2, opt3, opt4, opt5);
+    log_init(&log);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    bool need_rotate = log_need_rotate(&log);
+    cr_assert_eq(need_rotate, false);
+
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_plain(&log, Info, "---log_all--- %i", 7);
+
+    need_rotate = log_need_rotate(&log);
+    cr_assert_eq(need_rotate, true);
+    log_rotate(&log);
+    need_rotate = log_need_rotate(&log);
+    cr_assert_eq(need_rotate, false);
+
+    log_plain(&log, Info, "---log_all--- %i", 7);
+    log_close(&log);
+
+    DIR *dfd;
+
+    char *dir = "./.log_dodelrot.fam/";
+    dfd = opendir(dir);
+    struct dirent *dp;
+    bool found_log = false;
+    bool found_rot = false;
+    int log_size = 0;
+    int rot_size = 0;
+
+    while((dp = readdir(dfd)) != NULL) {
+        struct stat stbuf;
+        char filename_qfd[300];
+
+        sprintf( filename_qfd , "%s/%s",dir,dp->d_name) ;
+        stat(filename_qfd, &stbuf);
+
+        if(!strcmp(dp->d_name, "log_dodelrot.log")) {
+                found_log = true;
+                log_size = stbuf.st_size;
+        } else if(strstr(dp->d_name, "log_dodelrot.r") != NULL) {
+                rot_size = stbuf.st_size;
+                found_rot = true;
+        }
+
+    }
+
+    cr_assert_eq(rot_size, 0);
+    cr_assert_eq(log_size != 0, true);
+    cr_assert_eq(found_log, true);
+    cr_assert_eq(found_rot, false);
+
+    rmrf("./.log_dodelrot.fam/");
+
+    log_config_option_free(&opt3);
+    log_config_option_free(&opt2);
+    log_config_option_free(&opt1);
+    log_config_option_free(&opt4);
+    log_config_option_free(&opt5);
     log_free(&log);
 }

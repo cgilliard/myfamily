@@ -261,6 +261,11 @@ int do_log(Log* log, LogLevel level, char* line, bool is_plain, bool is_all, va_
             vfprintf(log->fp, fline, args_copy);
             log->off = ftello(log->fp);
         }
+	if(log->auto_rotate) {
+		if(log_need_rotate(log)) {
+			log_rotate(log);
+		}
+	}
     }
     return 0;
 }
@@ -377,7 +382,11 @@ int log_rotate(Log* log)
             strcat(rotation_name, ext);
             printf("fname=%s,ext=%s,rotation_name=%s\n", fname, ext, rotation_name);
 	    fclose(log->fp);
-	    rename(log->path, rotation_name);
+	    if(log->delete_rotation) {
+		remove(log->path);
+	    } else {
+	    	rename(log->path, rotation_name);
+	    }
 
             log->fp = fopen(log->path, "w");
 	    if(log->file_header)
@@ -481,7 +490,7 @@ int log_config_option_auto_rotate(LogConfigOption* option, bool value)
     return 0;
 }
 
-int log_config_option_show_delete_rotation(LogConfigOption* option, bool value)
+int log_config_option_delete_rotation(LogConfigOption* option, bool value)
 {
     option->type = DeleteRotation;
     option->value = malloc(sizeof(bool));
