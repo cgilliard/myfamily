@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['off_210',['off',['../structLog.html#acb90110baa3a481fbdf12977dbc7e0f3',1,'Log']]]
+  ['max_5fage_5fmillis_248',['max_age_millis',['../structLog.html#a14fdf21cef64610ef3fe3072e9a79192',1,'Log']]],
+  ['max_5fsize_5fbytes_249',['max_size_bytes',['../structLog.html#a83042357266cb27674d084aa21024595',1,'Log']]]
 ];
