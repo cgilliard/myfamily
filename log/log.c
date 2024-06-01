@@ -19,6 +19,7 @@
 #include <log/log.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
@@ -320,6 +321,8 @@ int log_config_option(Log* log, LogConfigOption option)
 
 int log_rotate(Log* log)
 {
+    // format:
+    // name.log -> name.r_<mon>_<day>_<year>_<time>_<rand>.log
     int ret = 0;
     char rotation_name[strlen(log->path) + 100];
     time_t t = time(NULL);
@@ -336,8 +339,6 @@ int log_rotate(Log* log)
         else
             ret = -1;
         printf("fname=%s,orig=%s\n", fname + 1, log->path);
-        // test.log -> test.r_<mon>_<day>_<year>_<time>_<rand>.log
-        // sprintf(rotation_name, "%d-%02d-%02d %02d:%02d:%02d%s");
     }
 
     char* ext;
@@ -371,6 +372,14 @@ int log_rotate(Log* log)
             strcat(rotation_name, date_format);
             strcat(rotation_name, ext);
             printf("fname=%s,ext=%s,rotation_name=%s\n", fname, ext, rotation_name);
+	    fclose(log->fp);
+	    rename(log->path, rotation_name);
+
+            log->fp = fopen(log->path, "w");
+	    if(log->file_header)
+            	fprintf(log->fp, "%s\n", log->file_header);
+	    fseek(log->fp, 0, SEEK_END);
+            log->off = ftello(log->fp);
         }
     }
 
@@ -545,4 +554,28 @@ void log_free(Log* log)
         free(log->path);
     if (log->file_header)
         free(log->file_header);
+}
+
+pthread_mutex_t _global_logger_mutex__ = PTHREAD_MUTEX_INITIALIZER;
+Log _global_logger__;
+bool _global_logger_is_init__ = false;
+
+int global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char *line, ...) {
+    pthread_mutex_lock(&_global_logger_mutex__);
+
+    if(!_global_logger_is_init__) {
+        _global_logger_is_init__ = true;
+        logger(&_global_logger__, 0);
+        log_set_level(&_global_logger__, Debug);
+    }
+
+    log_set_level(&_global_logger__, global);
+
+    va_list args;
+    va_start(args, line);
+    int ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
+    va_end(args);
+
+    pthread_mutex_unlock(&_global_logger_mutex__);
+    return ret;
 }

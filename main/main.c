@@ -13,9 +13,15 @@
 // limitations under the License.
 
 #include <stdio.h>
+#include <log/log.h>
+#include <util/misc.h>
+
+#define LOG_LEVEL Info
 
 int main(int argc, char** argv)
 {
     printf("main doesn't currently do anything\n");
+    is_white_space(' ');
+    info("this is a test %d", 3);
     return 0;
 }

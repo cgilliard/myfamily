@@ -14,9 +14,13 @@
 
 #include <base/constants.h>
 #include <util/misc.h>
+#include <log/log.h>
+
+#define LOG_LEVEL Debug
 
 int is_white_space(char ch)
 {
+    debug("is whitespace '%c'", ch);
     if (ch == '\n' || ch == '\t' || ch == '\r' || ch == '\v' || ch == '\f' || ch == ' ')
         return TRUE;
     else

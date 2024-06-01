@@ -107,4 +107,28 @@ int log_config_option(Log* log, LogConfigOption option);
 
 int logger(Log* log, int num, ...);
 
+// global logger
+int global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char *line, ...);
+
+#define trace(line, ...) (global_logger(false, false, Trace, LOG_LEVEL, line, __VA_ARGS__));
+#define debug(line, ...) (global_logger(false, false, Debug, LOG_LEVEL, line, __VA_ARGS__));
+#define info(line, ...) (global_logger(false, false, Info, LOG_LEVEL, line, __VA_ARGS__));
+#define warn(line, ...) (global_logger(false, false, Warn, LOG_LEVEL, line, __VA_ARGS__));
+#define error(line, ...) (global_logger(false, false, Error, LOG_LEVEL, line, __VA_ARGS__));
+#define fatal(line, ...) (global_logger(false, false, Fatal, LOG_LEVEL, line, __VA_ARGS__));
+
+#define trace_plain(line, ...) (global_logger(true, false, Trace, LOG_LEVEL, line, __VA_ARGS__));
+#define debug_plain(line, ...) (global_logger(true, false, Debug, LOG_LEVEL, line, __VA_ARGS__));
+#define info_plain(line, ...) (global_logger(true, false, Info, LOG_LEVEL, line, __VA_ARGS__));
+#define warn_plain(line, ...) (global_logger(true, false, Warn, LOG_LEVEL, line, __VA_ARGS__));
+#define error_plain(line, ...) (global_logger(true, false, Error, LOG_LEVEL, line, __VA_ARGS__));
+#define fatal_plain(line, ...) (global_logger(true, false, Fatal, LOG_LEVEL, line, __VA_ARGS__));
+
+#define trace_all(line, ...) (global_logger(false, true, Trace, LOG_LEVEL, line, __VA_ARGS__));
+#define debug_all(line, ...) (global_logger(false, true, Debug, LOG_LEVEL, line, __VA_ARGS__));
+#define info_all(line, ...) (global_logger(false, true, Info, LOG_LEVEL, line, __VA_ARGS__));
+#define warn_all(line, ...) (global_logger(false, true, Warn, LOG_LEVEL, line, __VA_ARGS__));
+#define error_all(line, ...) (global_logger(false, true, Error, LOG_LEVEL, line, __VA_ARGS__));
+#define fatal_all(line, ...) (global_logger(false, true, Fatal, LOG_LEVEL, line, __VA_ARGS__));
+
 #endif /* __LOG_LOG_ */

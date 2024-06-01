@@ -16,9 +16,26 @@
 #include <log/log.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <ftw.h>
+
+int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+{
+    int rv = remove(fpath);
+
+    if (rv)
+        perror(fpath);
+
+    return rv;
+}
+
+int rmrf(char *path)
+{
+    return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
+}
 
 Test(log, basic)
 {
@@ -397,13 +414,11 @@ Test(log, rotate)
     Log log;
     LogConfigOption opt1, opt2, opt3, opt4;
 
-    remove("./.log_dorot.fam/log_dorot.log");
-    rmdir("./.log_dorot.fam/");
-
+    rmrf("./.log_dorot.fam/");
     mkdir("./.log_dorot.fam", 0700);
     log_config_option_log_file_path(&opt1, "./.log_dorot.fam/log_dorot.log");
     log_config_option_max_size_bytes(&opt2, 100);
-    log_config_option_show_colors(&opt3, false);
+    log_config_option_file_header(&opt3, "myheader");
     log_config_option_show_stdout(&opt4, false);
 
     logger(&log, 4, opt1, opt2, opt3, opt4);
@@ -427,10 +442,45 @@ Test(log, rotate)
     cr_assert_eq(need_rotate, true);
 
     log_rotate(&log);
+    need_rotate = log_need_rotate(&log);
+    cr_assert_eq(need_rotate, false);
+    log_plain(&log, Info, "---log_all--- %i", 7);
     log_close(&log);
 
-    remove("./.log_dorot.fam/log_dorot.log");
-    rmdir("./.log_dorot.fam/");
+    DIR *dfd;
+
+    char *dir = "./.log_dorot.fam/";
+    dfd = opendir(dir);
+    struct dirent *dp;
+    bool found_log = false;
+    bool found_rot = false;
+    int log_size = 0;
+    int rot_size = 0;
+
+    while((dp = readdir(dfd)) != NULL) {
+	struct stat stbuf;
+	char filename_qfd[100];
+
+	sprintf( filename_qfd , "%s/%s",dir,dp->d_name) ;
+        stat(filename_qfd, &stbuf);
+
+	if(!strcmp(dp->d_name, "log_dorot.log")) {
+		found_log = true;
+		log_size = stbuf.st_size;
+	} else if(strstr(dp->d_name, "log_dorot.r") != NULL) {
+		rot_size = stbuf.st_size;
+		found_rot = true;
+	}
+
+    }
+
+    cr_assert_eq(rot_size > log_size, true);
+    cr_assert_eq(rot_size != 0, true);
+    cr_assert_eq(log_size != 0, true);
+    cr_assert_eq(found_log, true);
+    cr_assert_eq(found_rot, true);
+
+    rmrf("./.log_dorot.fam/");
 
     log_config_option_free(&opt3);
     log_config_option_free(&opt2);
