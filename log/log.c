@@ -17,9 +17,9 @@
 #include <inttypes.h>
 #include <limits.h>
 #include <log/log.h>
+#include <pthread.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
@@ -35,7 +35,8 @@ const char PathSeparator =
 
 #define _FILE_OFFSET_BITS 64
 
-u64 log_now() {
+u64 log_now()
+{
     struct timeval tv;
     gettimeofday(&tv, NULL);
 
@@ -44,11 +45,20 @@ u64 log_now() {
     return ret;
 }
 
+int sprintf_err(char* str, const char* string, ...)
+{
+    va_list args;
+    va_start(args, string);
+    int ret = vsprintf(str, string, args);
+    va_end(args);
+    return (ret > 0) ? 0 : ret;
+}
+
 int set_option(Log* log, int type, void* value)
 {
     if (value == NULL) {
-	fputs("error: value pointer cannot be NULL\n", stderr);
-	return -1;
+        fputs("error: value pointer cannot be NULL\n", stderr);
+        return -1;
     }
     if (type == ShowColors) {
         log->show_colors = *((bool*)value);
@@ -65,28 +75,29 @@ int set_option(Log* log, int type, void* value)
     } else if (type == DeleteRotation) {
         log->delete_rotation = *((bool*)value);
     } else if (type == MaxSizeBytes) {
-	if(*((u64*)value) < 1) {
-		fputs("error: MaxSizeBytes cannot be less than 1\n", stderr);
-		return -1;
-	}
+        if (*((u64*)value) < 1) {
+            fputs("error: MaxSizeBytes cannot be less than 1\n", stderr);
+            return -1;
+        }
         log->max_size_bytes = *((u64*)value);
     } else if (type == MaxAgeMillis) {
-	if(*((u64*)value) < 1000) {
-		fputs("error: MaxAgeMillis cannot be less than 1,000\n", stderr);
-                return -1;
+        if (*((u64*)value) < 1000) {
+            fputs("error: MaxAgeMillis cannot be less than 1,000\n", stderr);
+            return -1;
         }
         log->max_age_millis = *((u64*)value);
     } else if (type == LogFilePath) {
         char* buf = ((char*)value);
         int len = strlen(buf);
-	if(len < 1) {
-		fputs("error: LogFilePath must be at least 1 bytes long\n", stderr);
-                return -1;
-	}
+        if (len < 1) {
+            fputs("error: LogFilePath must be at least 1 bytes long\n", stderr);
+            return -1;
+        }
         log->path = malloc(sizeof(char) * (len + 1));
         if (log->path == NULL || log->debug_malloc) {
-	    if(log->path) free(log->path); // if debug_malloc is set
-	    log->path = NULL;
+            if (log->path)
+                free(log->path); // if debug_malloc is set
+            log->path = NULL;
             fputs("error: Could not allocate the required memory\n", stderr);
             return -1;
         }
@@ -94,15 +105,16 @@ int set_option(Log* log, int type, void* value)
     } else if (type == FileHeader) {
         char* buf = ((char*)value);
         int len = strlen(buf);
-	if(len < 1) {
-                fputs("error: FileHeader must be at least 1 bytes long\n", stderr);
-                return -1;
+        if (len < 1) {
+            fputs("error: FileHeader must be at least 1 bytes long\n", stderr);
+            return -1;
         }
         char* tmp = malloc(sizeof(char) * (len + 1));
         if (tmp == NULL || log->debug_malloc) {
-	    if(tmp) free(tmp); // if debug_malloc is set
-	    tmp = NULL;
-	    fputs("error: Could not allocate the required memory\n", stderr);
+            if (tmp)
+                free(tmp); // if debug_malloc is set
+            tmp = NULL;
+            fputs("error: Could not allocate the required memory\n", stderr);
             return -1;
         }
         strcpy(tmp, buf);
@@ -114,12 +126,13 @@ int set_option(Log* log, int type, void* value)
     return 0;
 }
 
-int do_logger(Log *log, int num, va_list valist) {
+int do_logger(Log* log, int num, va_list valist)
+{
     int ret = 0;
 
     // set defaults
     log->fp = NULL;
-    log->level = Info; 
+    log->level = Info;
     log->show_colors = true;
     log->show_stdout = true;
     log->show_timestamp = true;
@@ -135,7 +148,7 @@ int do_logger(Log *log, int num, va_list valist) {
     log->last_rotation = log_now();
     log->is_init = false;
     log->debug_malloc = false;
-            
+
     // iterate through arg list for overrides
     for (int i = 0; i < num; i++) {
         LogConfigOption next = va_arg(valist, LogConfigOption);
@@ -144,8 +157,8 @@ int do_logger(Log *log, int num, va_list valist) {
                 free(log->file_header);
             if (log->path != NULL)
                 free(log->path);
-	    log->path = NULL;
-	    log->file_header = NULL;
+            log->path = NULL;
+            log->file_header = NULL;
             ret = -1;
             break;
         }
@@ -164,6 +177,7 @@ int logger(Log* log, int num, ...)
 
 int get_format(Log* log, LogLevel level, char* buf)
 {
+    int ret = 0;
     char milli_buf[14];
     char log_level_buf[20];
     char dt_buf[40];
@@ -175,7 +189,7 @@ int get_format(Log* log, LogLevel level, char* buf)
         struct timeval time;
         gettimeofday(&time, NULL);
         int millis = time.tv_usec / 1000;
-        sprintf(milli_buf, ".%03d", millis);
+        ret = sprintf_err(milli_buf, ".%03d", millis);
     } else {
         strcpy(milli_buf, "");
     }
@@ -186,51 +200,51 @@ int get_format(Log* log, LogLevel level, char* buf)
         strcpy(spacing, "");
     }
 
-    if (log->show_log_level) {
+    if (log->show_log_level && ret == 0) {
         if (level == Trace) {
             if (log->show_colors) {
-                sprintf(log_level_buf, "%s(" ANSI_COLOR_YELLOW "TRACE" ANSI_COLOR_RESET ")", spacing);
+                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_YELLOW "TRACE" ANSI_COLOR_RESET ")", spacing);
             } else {
-                sprintf(log_level_buf, "%s(TRACE)", spacing);
+                ret = sprintf_err(log_level_buf, "%s(TRACE)", spacing);
             }
         } else if (level == Debug) {
             if (log->show_colors) {
-                sprintf(log_level_buf, "%s(" ANSI_COLOR_CYAN "DEBUG" ANSI_COLOR_RESET ")", spacing);
+                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_CYAN "DEBUG" ANSI_COLOR_RESET ")", spacing);
             } else {
-                sprintf(log_level_buf, "%s(DEBUG)", spacing);
+                ret = sprintf_err(log_level_buf, "%s(DEBUG)", spacing);
             }
         } else if (level == Info) {
             if (log->show_colors) {
-                sprintf(log_level_buf, "%s(" ANSI_COLOR_GREEN "INFO" ANSI_COLOR_RESET ")", spacing);
+                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_GREEN "INFO" ANSI_COLOR_RESET ")", spacing);
             } else {
-                sprintf(log_level_buf, "%s(INFO)", spacing);
+                ret = sprintf_err(log_level_buf, "%s(INFO)", spacing);
             }
         } else if (level == Warn) {
             if (log->show_colors) {
-                sprintf(log_level_buf, "%s(" ANSI_COLOR_MAGENTA "WARN" ANSI_COLOR_RESET ")", spacing);
+                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_MAGENTA "WARN" ANSI_COLOR_RESET ")", spacing);
             } else {
-                sprintf(log_level_buf, "%s(WARN)", spacing);
+                ret = sprintf_err(log_level_buf, "%s(WARN)", spacing);
             }
         } else if (level == Error) {
             if (log->show_colors) {
-                sprintf(log_level_buf, "%s(" ANSI_COLOR_RED "ERROR" ANSI_COLOR_RESET ")", spacing);
+                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_RED "ERROR" ANSI_COLOR_RESET ")", spacing);
             } else {
-                sprintf(log_level_buf, "%s(ERROR)", spacing);
+                ret = sprintf_err(log_level_buf, "%s(ERROR)", spacing);
             }
         } else if (level == Fatal) {
             if (log->show_colors) {
-                sprintf(log_level_buf, "%s(" ANSI_COLOR_BRIGHT_RED "FATAL" ANSI_COLOR_RESET ")", spacing);
+                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_BRIGHT_RED "FATAL" ANSI_COLOR_RESET ")", spacing);
             } else {
-                sprintf(log_level_buf, "%s(FATAL)", spacing);
+                ret = sprintf_err(log_level_buf, "%s(FATAL)", spacing);
             }
         }
     } else {
         strcpy(log_level_buf, "");
     }
 
-    if (log->show_timestamp) {
+    if (log->show_timestamp && ret == 0) {
         if (log->show_colors) {
-            sprintf(
+            ret = sprintf_err(
                 dt_buf,
                 "[" ANSI_COLOR_DIMMED
                 "%d-%02d-%02d %02d:%02d:%02d%s" ANSI_COLOR_RESET
@@ -243,7 +257,7 @@ int get_format(Log* log, LogLevel level, char* buf)
                 tm.tm_sec,
                 milli_buf);
         } else {
-            sprintf(
+            ret = sprintf_err(
                 dt_buf,
                 "["
                 "%d-%02d-%02d %02d:%02d:%02d%s"
@@ -266,21 +280,25 @@ int get_format(Log* log, LogLevel level, char* buf)
         strcpy(spacing, "");
     }
 
-    sprintf(
-        buf,
-        "%s%s%s: ",
-        dt_buf,
-        log_level_buf,
-        spacing);
-    return 0;
+    if (ret == 0) {
+        ret = sprintf_err(
+            buf,
+            "%s%s%s: ",
+            dt_buf,
+            log_level_buf,
+            spacing);
+    }
+    return ret;
 }
 
 int do_log(Log* log, LogLevel level, char* line, bool is_plain, bool is_all, va_list args)
 {
+    int ret = 0;
     if (!log->is_init) {
-       fputs("error: log has not been initialized\n", stderr);
-       return -1;
+        fputs("error: log has not been initialized\n", stderr);
+        return -1;
     }
+
     if (level >= log->level) {
         va_list args_copy;
         va_copy(args_copy, args);
@@ -291,25 +309,28 @@ int do_log(Log* log, LogLevel level, char* line, bool is_plain, bool is_all, va_
         if (is_plain) {
             strcpy(fline, "");
         } else {
-            get_format(log, level, fline);
+            ret = get_format(log, level, fline);
         }
         strcat(fline, line);
         strcat(fline, "\n");
 
-        if (log->show_stdout || is_all) {
-            vprintf(fline, args);
+        if ((log->show_stdout || is_all) && ret == 0) {
+            int v = vprintf(fline, args);
+	    ret = (v > 0) ? 0 : v;
         }
-        if (log->fp) {
-            vfprintf(log->fp, fline, args_copy);
+
+        if (log->fp && ret == 0) {
+            int v = vfprintf(log->fp, fline, args_copy);
+	    ret = (v > 0) ? 0 : v;
             log->off = ftello(log->fp);
         }
-	if(log->auto_rotate) {
-		if(log_need_rotate(log)) {
-			log_rotate(log);
-		}
-	}
+        if (log->auto_rotate && ret == 0) {
+            if (log_need_rotate(log)) {
+                ret = log_rotate(log);
+            }
+        }
     }
-    return 0;
+    return ret;
 }
 
 int log_all(Log* log, LogLevel level, char* line, ...)
@@ -346,9 +367,9 @@ void log_set_level(Log* log, LogLevel level)
 
 int log_init(Log* log)
 {
-    if(log->is_init) {
-	fputs("error: log has already been initialized\n", stderr);
-	return -1;
+    if (log->is_init) {
+        fputs("error: log has already been initialized\n", stderr);
+        return -1;
     }
     if (log->path) {
         bool write_header = false;
@@ -368,13 +389,12 @@ int log_init(Log* log)
 
 int log_set_config_option(Log* log, LogConfigOption option)
 {
-	printf("log->debug_malloc=%d\n", log->debug_malloc);
-    if(!log->is_init) {
-	fputs("error: log has not been initialized\n", stderr);
-	return -1;
+    if (!log->is_init) {
+        fputs("error: log has not been initialized\n", stderr);
+        return -1;
     }
     if (option.type == LogFilePath && !log->debug_malloc) { // bypass this when we're debugging malloc
-	fputs("error: cannot change log file path after initialization\n", stderr);
+        fputs("error: cannot change log file path after initialization\n", stderr);
         return -1;
     }
 
@@ -395,16 +415,16 @@ int log_rotate(Log* log)
     if (fname == NULL) {
         fname = log->path;
     } else {
-	ret = -1;
+        ret = -1;
         if (strlen(fname) > 0) {
             ret = 0;
             fname = fname + 1;
-	}
+        }
     }
 
-    if(!log->is_init) {
-	fputs("error: log has not been initialized\n", stderr);
-	ret = -1;
+    if (!log->is_init) {
+        fputs("error: log has not been initialized\n", stderr);
+        ret = -1;
     }
 
     char* ext;
@@ -426,7 +446,7 @@ int log_rotate(Log* log)
         u64 r;
         ret = rand_u64(&r);
         if (ret == 0) {
-            sprintf(date_format,
+            sprintf_err(date_format,
                 "%d_%02d_%02d_%02d_%02d_%02d_%" PRIu64,
                 tm.tm_year + 1900,
                 tm.tm_mon + 1,
@@ -437,17 +457,17 @@ int log_rotate(Log* log)
                 r);
             strcat(rotation_name, date_format);
             strcat(rotation_name, ext);
-	    fclose(log->fp);
-	    if(log->delete_rotation) {
-		remove(log->path);
-	    } else {
-	    	rename(log->path, rotation_name);
-	    }
+            fclose(log->fp);
+            if (log->delete_rotation) {
+                remove(log->path);
+            } else {
+                rename(log->path, rotation_name);
+            }
 
             log->fp = fopen(log->path, "w");
-	    if(log->file_header)
-            	fprintf(log->fp, "%s\n", log->file_header);
-	    fseek(log->fp, 0, SEEK_END);
+            if (log->file_header)
+                fprintf(log->fp, "%s\n", log->file_header);
+            fseek(log->fp, 0, SEEK_END);
             log->off = ftello(log->fp);
         }
     }
@@ -470,16 +490,17 @@ int log_close(Log* log)
 {
     if (log->fp) {
         fclose(log->fp);
-	log->fp = NULL;
+        log->fp = NULL;
     }
     return 0;
 }
 
-int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug_malloc_err, void *value) {
+int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug_malloc_err, void* value)
+{
     int ret = 0;
 
     option->value = malloc(size);
-    if(option->value == NULL || debug_malloc_err) {
+    if (option->value == NULL || debug_malloc_err) {
         ret = -1;
         fputs("error: Could not allocate the required memory\n", stderr);
     }
@@ -491,7 +512,8 @@ int log_config_option_show_colors(LogConfigOption* option, bool value)
 {
     option->type = ShowColors;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
-    if(!ret) *((bool*)option->value) = value;
+    if (!ret)
+        *((bool*)option->value) = value;
     return ret;
 }
 
@@ -499,7 +521,8 @@ int log_config_option_show_stdout(LogConfigOption* option, bool value)
 {
     option->type = ShowStdout;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
-    if(!ret) *((bool*)option->value) = value;
+    if (!ret)
+        *((bool*)option->value) = value;
     return ret;
 }
 
@@ -507,7 +530,8 @@ int log_config_option_show_timestamp(LogConfigOption* option, bool value)
 {
     option->type = ShowTimestamp;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
-    if(!ret) *((bool*)option->value) = value;
+    if (!ret)
+        *((bool*)option->value) = value;
     return ret;
 }
 
@@ -515,7 +539,8 @@ int log_config_option_show_millis(LogConfigOption* option, bool value)
 {
     option->type = ShowMillis;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
-    if(!ret) *((bool*)option->value) = value;
+    if (!ret)
+        *((bool*)option->value) = value;
     return ret;
 }
 
@@ -523,7 +548,8 @@ int log_config_option_show_log_level(LogConfigOption* option, bool value)
 {
     option->type = ShowLogLevel;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
-    if(!ret) *((bool*)option->value) = value;
+    if (!ret)
+        *((bool*)option->value) = value;
     return ret;
 }
 
@@ -531,7 +557,8 @@ int log_config_option_auto_rotate(LogConfigOption* option, bool value)
 {
     option->type = AutoRotate;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
-    if(!ret) *((bool*)option->value) = value;
+    if (!ret)
+        *((bool*)option->value) = value;
     return ret;
 }
 
@@ -539,7 +566,8 @@ int log_config_option_delete_rotation(LogConfigOption* option, bool value)
 {
     option->type = DeleteRotation;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
-    if(!ret) *((bool*)option->value) = value;
+    if (!ret)
+        *((bool*)option->value) = value;
     return ret;
 }
 
@@ -547,7 +575,8 @@ int log_config_option_max_size_bytes(LogConfigOption* option, u64 value)
 {
     option->type = MaxSizeBytes;
     int ret = _log_allocate_config_option(option, sizeof(u64), false, &value);
-    if(!ret) *((u64*)option->value) = value;
+    if (!ret)
+        *((u64*)option->value) = value;
     return ret;
 }
 
@@ -555,7 +584,8 @@ int log_config_option_max_age_millis(LogConfigOption* option, u64 value)
 {
     option->type = MaxAgeMillis;
     int ret = _log_allocate_config_option(option, sizeof(u64), false, &value);
-    if(!ret) *((u64*)option->value) = value;
+    if (!ret)
+        *((u64*)option->value) = value;
     return ret;
 }
 
@@ -568,7 +598,8 @@ int log_config_option_log_file_path(LogConfigOption* option, char* value)
     } else {
         int len = strlen(value);
         ret = _log_allocate_config_option(option, sizeof(char) * (len + 1), false, &value);
-        if(!ret) strcpy(option->value, value);
+        if (!ret)
+            strcpy(option->value, value);
     }
     return ret;
 }
@@ -581,8 +612,9 @@ int log_config_option_file_header(LogConfigOption* option, char* value)
         option->value = NULL;
     } else {
         int len = strlen(value);
-    	ret = _log_allocate_config_option(option, sizeof(char) * (len + 1), false, &value);
-    	if(!ret) strcpy(option->value, value);
+        ret = _log_allocate_config_option(option, sizeof(char) * (len + 1), false, &value);
+        if (!ret)
+            strcpy(option->value, value);
     }
     return ret;
 }
@@ -605,73 +637,78 @@ pthread_mutex_t _global_logger_mutex__ = PTHREAD_MUTEX_INITIALIZER;
 Log _global_logger__;
 bool _global_logger_is_init__ = false;
 
-int global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char *line, ...) {
+int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char* line, ...)
+{
     int ret = 0;
     pthread_mutex_lock(&_global_logger_mutex__);
 
-    if(!_global_logger_is_init__) {
-	ret = logger(&_global_logger__, 0);
-	if(ret == 0)
-		ret = log_init(&_global_logger__);
-	if(ret == 0)
-        	_global_logger_is_init__ = true;
+    if (!_global_logger_is_init__) {
+        ret = logger(&_global_logger__, 0);
+        if (ret == 0)
+            ret = log_init(&_global_logger__);
+        if (ret == 0)
+            _global_logger_is_init__ = true;
     }
 
-    if(ret == 0) {
-    	log_set_level(&_global_logger__, global);
+    if (ret == 0) {
+        log_set_level(&_global_logger__, global);
 
-    	va_list args;
-    	va_start(args, line);
-    	ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
-    	va_end(args);
+        va_list args;
+        va_start(args, line);
+        ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
+        va_end(args);
     }
 
     pthread_mutex_unlock(&_global_logger_mutex__);
     return ret;
 }
 
-int init_global_logger(int num, ...) {
-	if(_global_logger_is_init__)
-		return -1;
-	int ret = 0;
-	pthread_mutex_lock(&_global_logger_mutex__);
+int init_global_logger(int num, ...)
+{
+    if (_global_logger_is_init__)
+        return -1;
+    int ret = 0;
+    pthread_mutex_lock(&_global_logger_mutex__);
 
-	va_list valist;
-        va_start(valist, num);
-	ret = do_logger(&_global_logger__, num, valist);
-	va_end(valist);
+    va_list valist;
+    va_start(valist, num);
+    ret = do_logger(&_global_logger__, num, valist);
+    va_end(valist);
 
-	if(ret == 0)
-		ret = log_init(&_global_logger__);
-	if(ret == 0)
-		_global_logger_is_init__ = true;
+    if (ret == 0)
+        ret = log_init(&_global_logger__);
+    if (ret == 0)
+        _global_logger_is_init__ = true;
 
-	pthread_mutex_unlock(&_global_logger_mutex__);
-	return ret;
+    pthread_mutex_unlock(&_global_logger_mutex__);
+    return ret;
 }
 
-int global_log_rotate() {
-	pthread_mutex_lock(&_global_logger_mutex__);
-	int ret = log_rotate(&_global_logger__);
-	pthread_mutex_unlock(&_global_logger_mutex__);
-	return ret;
+int global_log_rotate()
+{
+    pthread_mutex_lock(&_global_logger_mutex__);
+    int ret = log_rotate(&_global_logger__);
+    pthread_mutex_unlock(&_global_logger_mutex__);
+    return ret;
 }
 
-bool global_log_need_rotate() {
-	pthread_mutex_lock(&_global_logger_mutex__);
-        bool ret = log_need_rotate(&_global_logger__);
-        pthread_mutex_unlock(&_global_logger_mutex__);
-        return ret;
+bool global_log_need_rotate()
+{
+    pthread_mutex_lock(&_global_logger_mutex__);
+    bool ret = log_need_rotate(&_global_logger__);
+    pthread_mutex_unlock(&_global_logger_mutex__);
+    return ret;
 }
 
-int global_log_config_option(LogConfigOption option) {
-	pthread_mutex_lock(&_global_logger_mutex__);
-	int ret = log_set_config_option(&_global_logger__, option);
-	pthread_mutex_unlock(&_global_logger_mutex__);
-	return ret;
+int global_log_config_option(LogConfigOption option)
+{
+    pthread_mutex_lock(&_global_logger_mutex__);
+    int ret = log_set_config_option(&_global_logger__, option);
+    pthread_mutex_unlock(&_global_logger_mutex__);
+    return ret;
 }
 
-void _debug_global_logger_is_init__() {
-        _global_logger_is_init__ = false;
+void _debug_global_logger_is_init__()
+{
+    _global_logger_is_init__ = false;
 }
-

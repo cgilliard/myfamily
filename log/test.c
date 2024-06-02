@@ -12,31 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifdef __linux__ 
+#ifdef __linux__
 #define _XOPEN_SOURCE 500
 #endif /* __linux__ */
 #include <criterion/criterion.h>
+#include <dirent.h>
+#include <ftw.h>
 #include <log/log.h>
 #include <log/log_test.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <dirent.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <ftw.h>
 
-int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)
+int unlink_cb(const char* fpath, const struct stat* sb, int typeflag, struct FTW* ftwbuf)
 {
     int rv = remove(fpath);
-
     if (rv)
         perror(fpath);
-
     return rv;
 }
 
-int rmrf(char *path)
+int rmrf(char* path)
 {
     return nftw(path, unlink_cb, 64, FTW_DEPTH | FTW_PHYS);
 }
@@ -467,31 +465,30 @@ Test(log, rotate)
     log_plain(&log, Info, "---log_all--- %i", 7);
     log_close(&log);
 
-    DIR *dfd;
+    DIR* dfd;
 
-    char *dir = "./.log_dorot.fam/";
+    char* dir = "./.log_dorot.fam/";
     dfd = opendir(dir);
-    struct dirent *dp;
+    struct dirent* dp;
     bool found_log = false;
     bool found_rot = false;
     int log_size = 0;
     int rot_size = 0;
 
-    while((dp = readdir(dfd)) != NULL) {
-	struct stat stbuf;
-	char filename_qfd[300];
+    while ((dp = readdir(dfd)) != NULL) {
+        struct stat stbuf;
+        char filename_qfd[300];
 
-	sprintf( filename_qfd , "%s/%s",dir,dp->d_name) ;
+        sprintf(filename_qfd, "%s/%s", dir, dp->d_name);
         stat(filename_qfd, &stbuf);
 
-	if(!strcmp(dp->d_name, "log_dorot.log")) {
-		found_log = true;
-		log_size = stbuf.st_size;
-	} else if(strstr(dp->d_name, "log_dorot.r") != NULL) {
-		rot_size = stbuf.st_size;
-		found_rot = true;
-	}
-
+        if (!strcmp(dp->d_name, "log_dorot.log")) {
+            found_log = true;
+            log_size = stbuf.st_size;
+        } else if (strstr(dp->d_name, "log_dorot.r") != NULL) {
+            rot_size = stbuf.st_size;
+            found_rot = true;
+        }
     }
 
     cr_assert_eq(rot_size > log_size, true);
@@ -509,7 +506,8 @@ Test(log, rotate)
     log_free(&log);
 }
 
-Test(log, autorotate) {
+Test(log, autorotate)
+{
     Log log;
     LogConfigOption opt1, opt2, opt3, opt4, opt5;
 
@@ -544,31 +542,30 @@ Test(log, autorotate) {
     log_plain(&log, Info, "---log_all--- %i", 7);
     log_close(&log);
 
-    DIR *dfd;
+    DIR* dfd;
 
-    char *dir = "./.log_doautorot.fam/";
+    char* dir = "./.log_doautorot.fam/";
     dfd = opendir(dir);
-    struct dirent *dp;
+    struct dirent* dp;
     bool found_log = false;
     bool found_rot = false;
     int log_size = 0;
     int rot_size = 0;
 
-    while((dp = readdir(dfd)) != NULL) {
+    while ((dp = readdir(dfd)) != NULL) {
         struct stat stbuf;
         char filename_qfd[300];
 
-        sprintf( filename_qfd , "%s/%s",dir,dp->d_name) ;
+        sprintf(filename_qfd, "%s/%s", dir, dp->d_name);
         stat(filename_qfd, &stbuf);
 
-        if(!strcmp(dp->d_name, "log_doautorot.log")) {
-                found_log = true;
-                log_size = stbuf.st_size;
-        } else if(strstr(dp->d_name, "log_doautorot.r") != NULL) {
-                rot_size = stbuf.st_size;
-                found_rot = true;
+        if (!strcmp(dp->d_name, "log_doautorot.log")) {
+            found_log = true;
+            log_size = stbuf.st_size;
+        } else if (strstr(dp->d_name, "log_doautorot.r") != NULL) {
+            rot_size = stbuf.st_size;
+            found_rot = true;
         }
-
     }
 
     cr_assert_eq(rot_size > log_size, true);
@@ -585,10 +582,10 @@ Test(log, autorotate) {
     log_config_option_free(&opt4);
     log_config_option_free(&opt5);
     log_free(&log);
-    
 }
 
-Test(log, deleterotate) {
+Test(log, deleterotate)
+{
     Log log;
     LogConfigOption opt1, opt2, opt3, opt4, opt5;
 
@@ -626,31 +623,30 @@ Test(log, deleterotate) {
     log_plain(&log, Info, "---log_all--- %i", 7);
     log_close(&log);
 
-    DIR *dfd;
+    DIR* dfd;
 
-    char *dir = "./.log_dodelrot.fam/";
+    char* dir = "./.log_dodelrot.fam/";
     dfd = opendir(dir);
-    struct dirent *dp;
+    struct dirent* dp;
     bool found_log = false;
     bool found_rot = false;
     int log_size = 0;
     int rot_size = 0;
 
-    while((dp = readdir(dfd)) != NULL) {
+    while ((dp = readdir(dfd)) != NULL) {
         struct stat stbuf;
         char filename_qfd[300];
 
-        sprintf( filename_qfd , "%s/%s",dir,dp->d_name) ;
+        sprintf(filename_qfd, "%s/%s", dir, dp->d_name);
         stat(filename_qfd, &stbuf);
 
-        if(!strcmp(dp->d_name, "log_dodelrot.log")) {
-                found_log = true;
-                log_size = stbuf.st_size;
-        } else if(strstr(dp->d_name, "log_dodelrot.r") != NULL) {
-                rot_size = stbuf.st_size;
-                found_rot = true;
+        if (!strcmp(dp->d_name, "log_dodelrot.log")) {
+            found_log = true;
+            log_size = stbuf.st_size;
+        } else if (strstr(dp->d_name, "log_dodelrot.r") != NULL) {
+            rot_size = stbuf.st_size;
+            found_rot = true;
         }
-
     }
 
     cr_assert_eq(rot_size, 0);
@@ -668,7 +664,8 @@ Test(log, deleterotate) {
     log_free(&log);
 }
 
-Test(log, misconfig) {
+Test(log, misconfig)
+{
     Log log;
     LogConfigOption opt1, opt2, opt3, opt4, opt5, opt6;
     LogConfigOption valid1, valid2;
@@ -708,7 +705,8 @@ Test(log, misconfig) {
     log_free(&log);
 }
 
-Test(log, timerotation) {
+Test(log, timerotation)
+{
     Log log;
     LogConfigOption opt1, opt2, opt3, opt4, opt5;
 
@@ -748,7 +746,6 @@ Test(log, timerotation) {
     log_rotate(&log);
     need_rotate = log_need_rotate(&log);
     cr_assert_eq(need_rotate, false);
-    
 
     log_plain(&log, Info, "---log_all--- %i", 7);
 
@@ -764,7 +761,6 @@ Test(log, timerotation) {
     log_config_option_free(&opt4);
     log_config_option_free(&opt5);
     log_free(&log);
-
 }
 
 Test(log, changeheader)
@@ -788,38 +784,36 @@ Test(log, changeheader)
     log_rotate(&log);
     log_close(&log);
 
+    DIR* dfd;
 
-    DIR *dfd;
-
-    char *dir = "./.log_chh.fam/";
+    char* dir = "./.log_chh.fam/";
     dfd = opendir(dir);
-    struct dirent *dp;
+    struct dirent* dp;
     bool found_log = false;
     bool found_rot = false;
 
-    while((dp = readdir(dfd)) != NULL) {
+    while ((dp = readdir(dfd)) != NULL) {
         struct stat stbuf;
         char filename_qfd[300];
 
-        sprintf( filename_qfd , "%s/%s",dir,dp->d_name) ;
+        sprintf(filename_qfd, "%s/%s", dir, dp->d_name);
         stat(filename_qfd, &stbuf);
 
-        if(!strcmp(dp->d_name, "log_chh.log")) {
-		printf("name=%s\n", dp->d_name);
-                found_log = true;
-		FILE* fp = fopen(filename_qfd, "r");
-                fgets(buf, 100, fp);
-	        cr_assert_eq(strcmp(buf, "2222222\n"), 0);
-    		fclose(fp);
-        } else if(strstr(dp->d_name, "log_chh.r") != NULL) {
-		printf("name=%s\n", dp->d_name);
-		FILE* fp = fopen(filename_qfd, "r");
-                fgets(buf, 100, fp);
-		cr_assert_eq(strcmp(buf, "1111111\n"), 0);
-                fclose(fp);
-                found_rot = true;
+        if (!strcmp(dp->d_name, "log_chh.log")) {
+            printf("name=%s\n", dp->d_name);
+            found_log = true;
+            FILE* fp = fopen(filename_qfd, "r");
+            fgets(buf, 100, fp);
+            cr_assert_eq(strcmp(buf, "2222222\n"), 0);
+            fclose(fp);
+        } else if (strstr(dp->d_name, "log_chh.r") != NULL) {
+            printf("name=%s\n", dp->d_name);
+            FILE* fp = fopen(filename_qfd, "r");
+            fgets(buf, 100, fp);
+            cr_assert_eq(strcmp(buf, "1111111\n"), 0);
+            fclose(fp);
+            found_rot = true;
         }
-
     }
 
     cr_assert_eq(found_log, true);
@@ -834,7 +828,8 @@ Test(log, changeheader)
     log_free(&log);
 }
 
-Test(log, rotationnames) {
+Test(log, rotationnames)
+{
     char buf[100];
     Log log;
     LogConfigOption opt1;
@@ -853,45 +848,44 @@ Test(log, rotationnames) {
     log_config_option_free(&opt1);
     log_free(&log);
 
-    DIR *dfd;
+    DIR* dfd;
 
-    char *dir = ".";
+    char* dir = ".";
     dfd = opendir(dir);
-    struct dirent *dp;
+    struct dirent* dp;
     bool found_log = false;
     bool found_rot = false;
 
-    while((dp = readdir(dfd)) != NULL) {
+    while ((dp = readdir(dfd)) != NULL) {
         struct stat stbuf;
         char filename_qfd[300];
 
-        sprintf( filename_qfd , "%s/%s",dir,dp->d_name) ;
+        sprintf(filename_qfd, "%s/%s", dir, dp->d_name);
         stat(filename_qfd, &stbuf);
 
-        if(!strcmp(dp->d_name, "log_same_dirfam")) {
-                printf("name=%s\n", dp->d_name);
-                found_log = true;
-                FILE* fp = fopen(filename_qfd, "r");
-                fgets(buf, 100, fp);
-		remove(dp->d_name);
-                fclose(fp);
-        } else if(strstr(dp->d_name, "log_same_dirfam.r") != NULL) {
-                printf("name=%s\n", dp->d_name);
-                FILE* fp = fopen(filename_qfd, "r");
-                fgets(buf, 100, fp);
-                fclose(fp);
-                found_rot = true;
-		remove(dp->d_name);
+        if (!strcmp(dp->d_name, "log_same_dirfam")) {
+            printf("name=%s\n", dp->d_name);
+            found_log = true;
+            FILE* fp = fopen(filename_qfd, "r");
+            fgets(buf, 100, fp);
+            remove(dp->d_name);
+            fclose(fp);
+        } else if (strstr(dp->d_name, "log_same_dirfam.r") != NULL) {
+            printf("name=%s\n", dp->d_name);
+            FILE* fp = fopen(filename_qfd, "r");
+            fgets(buf, 100, fp);
+            fclose(fp);
+            found_rot = true;
+            remove(dp->d_name);
         }
-
     }
 
     cr_assert_eq(found_rot, true);
     cr_assert_eq(found_log, true);
-
 }
 
-Test(log, global_log) {
+Test(log, global_log)
+{
     char buf[100];
     LogConfigOption opt1, opt2, opt3, opt4;
 
@@ -909,7 +903,7 @@ Test(log, global_log) {
     log_config_option_free(&opt2);
     log_config_option_free(&opt3);
 
-    #define LOG_LEVEL Debug
+#define LOG_LEVEL Debug
 
     debug("this is a test %d", 1);
     debug_plain("this is a test %d", 2);
@@ -922,40 +916,38 @@ Test(log, global_log) {
 
     log_config_option_free(&opt4);
 
+    DIR* dfd;
 
-    DIR *dfd;
-
-    char *dir = "./.log_global.fam/";
+    char* dir = "./.log_global.fam/";
     dfd = opendir(dir);
-    struct dirent *dp;
+    struct dirent* dp;
     bool found_log = false;
     bool found_rot = false;
 
-    while((dp = readdir(dfd)) != NULL) {
+    while ((dp = readdir(dfd)) != NULL) {
         struct stat stbuf;
         char filename_qfd[300];
 
-        sprintf( filename_qfd , "%s/%s",dir,dp->d_name) ;
+        sprintf(filename_qfd, "%s/%s", dir, dp->d_name);
         stat(filename_qfd, &stbuf);
 
-        if(!strcmp(dp->d_name, "log_global.log")) {
-                printf("name=%s\n", dp->d_name);
-                found_log = true;
-                FILE* fp = fopen(filename_qfd, "r");
-                fgets(buf, 100, fp);
-		cr_assert_neq(strstr(buf, "test_header"), NULL);
-                remove(dp->d_name);
-                fclose(fp);
-        } else if(strstr(dp->d_name, "log_global.r") != NULL) {
-                printf("name=%s\n", dp->d_name);
-                FILE* fp = fopen(filename_qfd, "r");
-                fgets(buf, 100, fp);
-		cr_assert_eq(strstr(buf, "test_header"), NULL);
-                fclose(fp);
-                found_rot = true;
-                remove(dp->d_name);
+        if (!strcmp(dp->d_name, "log_global.log")) {
+            printf("name=%s\n", dp->d_name);
+            found_log = true;
+            FILE* fp = fopen(filename_qfd, "r");
+            fgets(buf, 100, fp);
+            cr_assert_neq(strstr(buf, "test_header"), NULL);
+            remove(dp->d_name);
+            fclose(fp);
+        } else if (strstr(dp->d_name, "log_global.r") != NULL) {
+            printf("name=%s\n", dp->d_name);
+            FILE* fp = fopen(filename_qfd, "r");
+            fgets(buf, 100, fp);
+            cr_assert_eq(strstr(buf, "test_header"), NULL);
+            fclose(fp);
+            found_rot = true;
+            remove(dp->d_name);
         }
-
     }
 
     cr_assert_eq(found_rot, true);
@@ -968,7 +960,9 @@ Test(log, global_log) {
     rmrf("./.log_global.fam/");
 }
 
-Test(log, malloc_err) {
+Test(log, malloc_err)
+{
+    char buf[100];
     bool b;
     LogConfigOption opt1;
     Log log;
@@ -991,7 +985,6 @@ Test(log, malloc_err) {
     log.debug_malloc = true;
     v = log_set_config_option(&log, opt1);
     cr_assert_neq(v, 0);
-    
+
     log_free(&log);
 }
-
