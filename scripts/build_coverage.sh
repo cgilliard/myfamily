@@ -6,7 +6,7 @@ linessum=0;
 coveredsum=0;
 rm -f /tmp/gcov_cat.txt
 
-for d in "parser" "syn" "main" "util"
+for d in "log" "base" "main" "util"
 do
 
 cd $d

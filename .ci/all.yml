@@ -11,5 +11,5 @@ steps:
     condition: eq( variables['Agent.OS'], 'Linux' )
   - script: |
       ./scripts/build_docs.sh $(MyFamilyPat) $(Build.SourceVersion)
-    displayName: Documentation
+    displayName: PipelineBot
     condition: and(eq( variables['Agent.OS'], 'Linux' ), and(succeeded(), in(variables['Build.Reason'], 'Manual', 'Schedule')))
