@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['value_259',['value',['../structLogConfigOption.html#a9f489f732d3692c90e620d708b6c63fe',1,'LogConfigOption']]]
+  ['type_264',['type',['../structLogConfigOption.html#a8e883f4a98f4163a6c043ee9c326c5d0',1,'LogConfigOption']]]
 ];
