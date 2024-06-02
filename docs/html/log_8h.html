@@ -236,8 +236,6 @@ Functions</h2></td></tr>
 <tr class="separator:a8bd99b2ebc955fa857d0c7a6392e5b69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca52d5775a6b64efc8120a64dbe3d434"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#aca52d5775a6b64efc8120a64dbe3d434">log_set_config_option</a> (<a class="el" href="structLog.html">Log</a> *log, <a class="el" href="structLogConfigOption.html">LogConfigOption</a> option)</td></tr>
 <tr class="separator:aca52d5775a6b64efc8120a64dbe3d434"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d394d5809cd5d0a3e3589ce99c76f68"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a2d394d5809cd5d0a3e3589ce99c76f68">_log_allocate_config_option</a> (<a class="el" href="structLogConfigOption.html">LogConfigOption</a> *option, size_t size, bool debug_malloc_err, void *value)</td></tr>
-<tr class="separator:a2d394d5809cd5d0a3e3589ce99c76f68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08b1d5e9ecd77ca30b50e59d6b01fdbc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a08b1d5e9ecd77ca30b50e59d6b01fdbc">logger</a> (<a class="el" href="structLog.html">Log</a> *log, int num,...)</td></tr>
 <tr class="separator:a08b1d5e9ecd77ca30b50e59d6b01fdbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08ac4b45500118573761f47b8332878a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a08ac4b45500118573761f47b8332878a">global_logger</a> (bool is_plain, bool is_all, <a class="el" href="log_8h.html#aca1fd1d8935433e6ba2e3918214e07f9">LogLevel</a> level, <a class="el" href="log_8h.html#aca1fd1d8935433e6ba2e3918214e07f9">LogLevel</a> global, char *line,...)</td></tr>
@@ -250,8 +248,6 @@ Functions</h2></td></tr>
 <tr class="separator:a04be19831334d10533337bd021de83b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace1c421b6f4dd1669021e603bf5b3fcd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#ace1c421b6f4dd1669021e603bf5b3fcd">global_log_config_option</a> (<a class="el" href="structLogConfigOption.html">LogConfigOption</a> option)</td></tr>
 <tr class="separator:ace1c421b6f4dd1669021e603bf5b3fcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcdd3291c37b6b82b4d4a32fdf2d12d2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#adcdd3291c37b6b82b4d4a32fdf2d12d2">_debug_global_logger_is_init__</a> ()</td></tr>
-<tr class="separator:adcdd3291c37b6b82b4d4a32fdf2d12d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a44d01ba0a136b8e27ad362f5a823d14e"></a>
@@ -1006,63 +1002,6 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="adcdd3291c37b6b82b4d4a32fdf2d12d2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adcdd3291c37b6b82b4d4a32fdf2d12d2">&#9670;&nbsp;</a></span>_debug_global_logger_is_init__()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void _debug_global_logger_is_init__ </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2d394d5809cd5d0a3e3589ce99c76f68"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d394d5809cd5d0a3e3589ce99c76f68">&#9670;&nbsp;</a></span>_log_allocate_config_option()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int _log_allocate_config_option </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structLogConfigOption.html">LogConfigOption</a> *&#160;</td>
-          <td class="paramname"><em>option</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>size</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>debug_malloc_err</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="ace1c421b6f4dd1669021e603bf5b3fcd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ace1c421b6f4dd1669021e603bf5b3fcd">&#9670;&nbsp;</a></span>global_log_config_option()</h2>
 
