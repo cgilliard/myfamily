@@ -79,6 +79,8 @@ struct Log {
     char* path;
     char* file_header;
     LogLevel level;
+
+    bool debug_malloc;
 };
 typedef struct Log Log;
 
@@ -105,6 +107,7 @@ int log_init(Log* log);
 int log_close(Log* log);
 void log_free(Log* log);
 int log_set_config_option(Log* log, LogConfigOption option);
+int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug_malloc_err, void *value);
 
 int logger(Log* log, int num, ...);
 

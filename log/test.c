@@ -966,3 +966,31 @@ Test(log, global_log) {
 
     rmrf("./.log_global.fam/");
 }
+
+Test(log, malloc_err) {
+    bool b;
+    LogConfigOption opt1;
+    Log log;
+    int v;
+
+    v = _log_allocate_config_option(&opt1, sizeof(bool), true, &b);
+    cr_assert_neq(v, 0);
+
+    logger(&log, 0);
+    log_init(&log);
+    log_line(&log, Debug, "test");
+
+    log_config_option_file_header(&opt1, "header");
+    log.debug_malloc = true;
+    v = log_set_config_option(&log, opt1);
+    cr_assert_neq(v, 0);
+    log_config_option_free(&opt1);
+
+    log_config_option_log_file_path(&opt1, "test.log");
+    log.debug_malloc = true;
+    v = log_set_config_option(&log, opt1);
+    cr_assert_neq(v, 0);
+    
+    log_free(&log);
+}
+

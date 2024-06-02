@@ -35,10 +35,6 @@ const char PathSeparator =
 
 #define _FILE_OFFSET_BITS 64
 
-#ifndef DEBUG_MALLOC_ERR
-	#define DEBUG_MALLOC_ERR false
-#endif /* DEBUG_MALLOC_ERR */
-
 u64 log_now() {
     struct timeval tv;
     gettimeofday(&tv, NULL);
@@ -88,7 +84,9 @@ int set_option(Log* log, int type, void* value)
                 return -1;
 	}
         log->path = malloc(sizeof(char) * (len + 1));
-        if (log->path == NULL || DEBUG_MALLOC_ERR) {
+        if (log->path == NULL || log->debug_malloc) {
+	    if(log->path) free(log->path); // if debug_malloc is set
+	    log->path = NULL;
             fputs("error: Could not allocate the required memory\n", stderr);
             return -1;
         }
@@ -101,7 +99,9 @@ int set_option(Log* log, int type, void* value)
                 return -1;
         }
         char* tmp = malloc(sizeof(char) * (len + 1));
-        if (tmp == NULL) {
+        if (tmp == NULL || log->debug_malloc) {
+	    if(tmp) free(tmp); // if debug_malloc is set
+	    tmp = NULL;
 	    fputs("error: Could not allocate the required memory\n", stderr);
             return -1;
         }
@@ -134,6 +134,7 @@ int do_logger(Log *log, int num, va_list valist) {
     log->off = 0;
     log->last_rotation = log_now();
     log->is_init = false;
+    log->debug_malloc = false;
             
     // iterate through arg list for overrides
     for (int i = 0; i < num; i++) {
@@ -367,11 +368,12 @@ int log_init(Log* log)
 
 int log_set_config_option(Log* log, LogConfigOption option)
 {
+	printf("log->debug_malloc=%d\n", log->debug_malloc);
     if(!log->is_init) {
 	fputs("error: log has not been initialized\n", stderr);
 	return -1;
     }
-    if (option.type == LogFilePath) {
+    if (option.type == LogFilePath && !log->debug_malloc) { // bypass this when we're debugging malloc
 	fputs("error: cannot change log file path after initialization\n", stderr);
         return -1;
     }
@@ -473,146 +475,116 @@ int log_close(Log* log)
     return 0;
 }
 
+int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug_malloc_err, void *value) {
+    int ret = 0;
+
+    option->value = malloc(size);
+    if(option->value == NULL || debug_malloc_err) {
+        ret = -1;
+        fputs("error: Could not allocate the required memory\n", stderr);
+    }
+
+    return ret;
+}
+
 int log_config_option_show_colors(LogConfigOption* option, bool value)
 {
     option->type = ShowColors;
-    option->value = malloc(sizeof(bool));
-    if (option->value == NULL) {
-	fputs("error: Could not allocate the required memory\n", stderr);
-        return -1;
-    }
-    *((bool*)option->value) = value;
-    return 0;
+    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
+    if(!ret) *((bool*)option->value) = value;
+    return ret;
 }
 
 int log_config_option_show_stdout(LogConfigOption* option, bool value)
 {
     option->type = ShowStdout;
-    option->value = malloc(sizeof(bool));
-    if (option->value == NULL) {
-	fputs("error: Could not allocate the required memory\n", stderr);
-        return -1;
-    }
-    *((bool*)option->value) = value;
-    return 0;
+    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
+    if(!ret) *((bool*)option->value) = value;
+    return ret;
 }
 
 int log_config_option_show_timestamp(LogConfigOption* option, bool value)
 {
     option->type = ShowTimestamp;
-    option->value = malloc(sizeof(bool));
-    if (option->value == NULL) {
-	fputs("error: Could not allocate the required memory\n", stderr);
-        return -1;
-    }
-    *((bool*)option->value) = value;
-    return 0;
+    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
+    if(!ret) *((bool*)option->value) = value;
+    return ret;
 }
 
 int log_config_option_show_millis(LogConfigOption* option, bool value)
 {
     option->type = ShowMillis;
-    option->value = malloc(sizeof(bool));
-    if (option->value == NULL) {
-	fputs("error: Could not allocate the required memory\n", stderr);
-        return -1;
-    }
-    *((bool*)option->value) = value;
-    return 0;
+    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
+    if(!ret) *((bool*)option->value) = value;
+    return ret;
 }
 
 int log_config_option_show_log_level(LogConfigOption* option, bool value)
 {
     option->type = ShowLogLevel;
-    option->value = malloc(sizeof(bool));
-    if (option->value == NULL) {
-        fputs("error: Could not allocate the required memory\n", stderr);
-        return -1;
-    }
-    *((bool*)option->value) = value;
-    return 0;
+    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
+    if(!ret) *((bool*)option->value) = value;
+    return ret;
 }
 
 int log_config_option_auto_rotate(LogConfigOption* option, bool value)
 {
     option->type = AutoRotate;
-    option->value = malloc(sizeof(bool));
-    if (option->value == NULL) {
-        fputs("error: Could not allocate the required memory\n", stderr);
-        return -1;
-    }
-    *((bool*)option->value) = value;
-    return 0;
+    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
+    if(!ret) *((bool*)option->value) = value;
+    return ret;
 }
 
 int log_config_option_delete_rotation(LogConfigOption* option, bool value)
 {
     option->type = DeleteRotation;
-    option->value = malloc(sizeof(bool));
-    if (option->value == NULL) {
-	fputs("error: Could not allocate the required memory\n", stderr);
-        return -1;
-    }
-    *((bool*)option->value) = value;
-    return 0;
+    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
+    if(!ret) *((bool*)option->value) = value;
+    return ret;
 }
 
 int log_config_option_max_size_bytes(LogConfigOption* option, u64 value)
 {
     option->type = MaxSizeBytes;
-    option->value = malloc(sizeof(u64));
-    if (option->value == NULL) {
-	fputs("error: Could not allocate the required memory\n", stderr);
-        return -1;
-    }
-    *((u64*)option->value) = value;
-    return 0;
+    int ret = _log_allocate_config_option(option, sizeof(u64), false, &value);
+    if(!ret) *((u64*)option->value) = value;
+    return ret;
 }
 
 int log_config_option_max_age_millis(LogConfigOption* option, u64 value)
 {
     option->type = MaxAgeMillis;
-    option->value = malloc(sizeof(u64));
-    if (option->value == NULL) {
-        fputs("error: Could not allocate the required memory\n", stderr);
-        return -1;
-    }
-    *((u64*)option->value) = value;
-    return 0;
+    int ret = _log_allocate_config_option(option, sizeof(u64), false, &value);
+    if(!ret) *((u64*)option->value) = value;
+    return ret;
 }
 
 int log_config_option_log_file_path(LogConfigOption* option, char* value)
 {
     option->type = LogFilePath;
+    int ret = 0;
     if (value == NULL) {
         option->value = NULL;
     } else {
         int len = strlen(value);
-        option->value = malloc(sizeof(char) * (len + 1));
-        if (option->value == NULL) {
-            fputs("error: Could not allocate the required memory\n", stderr);
-            return -1;
-        }
-        strcpy(option->value, value);
+        ret = _log_allocate_config_option(option, sizeof(char) * (len + 1), false, &value);
+        if(!ret) strcpy(option->value, value);
     }
-    return 0;
+    return ret;
 }
 
 int log_config_option_file_header(LogConfigOption* option, char* value)
 {
     option->type = FileHeader;
+    int ret = 0;
     if (value == NULL) {
         option->value = NULL;
     } else {
         int len = strlen(value);
-        option->value = malloc(sizeof(char) * (len + 1));
-        if (option->value == NULL) {
-            fputs("error: Could not allocate the required memory\n", stderr);
-            return -1;
-        }
-        strcpy(option->value, value);
+    	ret = _log_allocate_config_option(option, sizeof(char) * (len + 1), false, &value);
+    	if(!ret) strcpy(option->value, value);
     }
-    return 0;
+    return ret;
 }
 
 void log_config_option_free(LogConfigOption* option)
