@@ -71,6 +71,7 @@ struct Log {
     bool show_log_level;
     bool auto_rotate;
     bool delete_rotation;
+    bool is_init;
     u64 max_size_bytes;
     u64 max_age_millis;
     off_t off;
@@ -103,7 +104,7 @@ void log_set_level(Log* log, LogLevel level);
 int log_init(Log* log);
 int log_close(Log* log);
 void log_free(Log* log);
-int log_config_option(Log* log, LogConfigOption option);
+int log_set_config_option(Log* log, LogConfigOption option);
 
 int logger(Log* log, int num, ...);
 
@@ -114,25 +115,27 @@ int global_log_rotate();
 bool global_log_need_rotate();
 int global_log_config_option(LogConfigOption option);
 
-#define trace(line, ...) (global_logger(false, false, Trace, LOG_LEVEL, line, __VA_ARGS__));
-#define debug(line, ...) (global_logger(false, false, Debug, LOG_LEVEL, line, __VA_ARGS__));
-#define info(line, ...) (global_logger(false, false, Info, LOG_LEVEL, line, __VA_ARGS__));
-#define warn(line, ...) (global_logger(false, false, Warn, LOG_LEVEL, line, __VA_ARGS__));
-#define error(line, ...) (global_logger(false, false, Error, LOG_LEVEL, line, __VA_ARGS__));
-#define fatal(line, ...) (global_logger(false, false, Fatal, LOG_LEVEL, line, __VA_ARGS__));
+#define trace(line, ...) (global_logger(false, false, Trace, LOG_LEVEL, line, ##__VA_ARGS__));
+#define debug(line, ...) (global_logger(false, false, Debug, LOG_LEVEL, line, ##__VA_ARGS__));
+#define info(line, ...) (global_logger(false, false, Info, LOG_LEVEL, line, ##__VA_ARGS__));
+#define warn(line, ...) (global_logger(false, false, Warn, LOG_LEVEL, line, ##__VA_ARGS__));
+#define error(line, ...) (global_logger(false, false, Error, LOG_LEVEL, line, ##__VA_ARGS__));
+#define fatal(line, ...) (global_logger(false, false, Fatal, LOG_LEVEL, line, ##__VA_ARGS__));
 
-#define trace_plain(line, ...) (global_logger(true, false, Trace, LOG_LEVEL, line, __VA_ARGS__));
-#define debug_plain(line, ...) (global_logger(true, false, Debug, LOG_LEVEL, line, __VA_ARGS__));
-#define info_plain(line, ...) (global_logger(true, false, Info, LOG_LEVEL, line, __VA_ARGS__));
-#define warn_plain(line, ...) (global_logger(true, false, Warn, LOG_LEVEL, line, __VA_ARGS__));
-#define error_plain(line, ...) (global_logger(true, false, Error, LOG_LEVEL, line, __VA_ARGS__));
-#define fatal_plain(line, ...) (global_logger(true, false, Fatal, LOG_LEVEL, line, __VA_ARGS__));
+#define trace_plain(line, ...) (global_logger(true, false, Trace, LOG_LEVEL, line, ##__VA_ARGS__));
+#define debug_plain(line, ...) (global_logger(true, false, Debug, LOG_LEVEL, line, ##__VA_ARGS__));
+#define info_plain(line, ...) (global_logger(true, false, Info, LOG_LEVEL, line, ##__VA_ARGS__));
+#define warn_plain(line, ...) (global_logger(true, false, Warn, LOG_LEVEL, line, ##__VA_ARGS__));
+#define error_plain(line, ...) (global_logger(true, false, Error, LOG_LEVEL, line, ##__VA_ARGS__));
+#define fatal_plain(line, ...) (global_logger(true, false, Fatal, LOG_LEVEL, line, ##__VA_ARGS__));
 
-#define trace_all(line, ...) (global_logger(false, true, Trace, LOG_LEVEL, line, __VA_ARGS__));
-#define debug_all(line, ...) (global_logger(false, true, Debug, LOG_LEVEL, line, __VA_ARGS__));
-#define info_all(line, ...) (global_logger(false, true, Info, LOG_LEVEL, line, __VA_ARGS__));
-#define warn_all(line, ...) (global_logger(false, true, Warn, LOG_LEVEL, line, __VA_ARGS__));
-#define error_all(line, ...) (global_logger(false, true, Error, LOG_LEVEL, line, __VA_ARGS__));
-#define fatal_all(line, ...) (global_logger(false, true, Fatal, LOG_LEVEL, line, __VA_ARGS__));
+#define trace_all(line, ...) (global_logger(false, true, Trace, LOG_LEVEL, line, ##__VA_ARGS__));
+#define debug_all(line, ...) (global_logger(false, true, Debug, LOG_LEVEL, line, ##__VA_ARGS__));
+#define info_all(line, ...) (global_logger(false, true, Info, LOG_LEVEL, line, ##__VA_ARGS__));
+#define warn_all(line, ...) (global_logger(false, true, Warn, LOG_LEVEL, line, ##__VA_ARGS__));
+#define error_all(line, ...) (global_logger(false, true, Error, LOG_LEVEL, line, ##__VA_ARGS__));
+#define fatal_all(line, ...) (global_logger(false, true, Fatal, LOG_LEVEL, line, ##__VA_ARGS__));
+
+void _debug_global_logger_is_init__();
 
 #endif /* __LOG_LOG_ */

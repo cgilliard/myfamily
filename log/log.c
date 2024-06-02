@@ -35,8 +35,25 @@ const char PathSeparator =
 
 #define _FILE_OFFSET_BITS 64
 
+#ifndef DEBUG_MALLOC_ERR
+	#define DEBUG_MALLOC_ERR false
+#endif /* DEBUG_MALLOC_ERR */
+
+u64 log_now() {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
+    u64 ret = (u64)(tv.tv_sec) * 1000 + (u64)(tv.tv_usec) / 1000;
+
+    return ret;
+}
+
 int set_option(Log* log, int type, void* value)
 {
+    if (value == NULL) {
+	fputs("error: value pointer cannot be NULL\n", stderr);
+	return -1;
+    }
     if (type == ShowColors) {
         log->show_colors = *((bool*)value);
     } else if (type == ShowStdout) {
@@ -52,22 +69,40 @@ int set_option(Log* log, int type, void* value)
     } else if (type == DeleteRotation) {
         log->delete_rotation = *((bool*)value);
     } else if (type == MaxSizeBytes) {
+	if(*((u64*)value) < 1) {
+		fputs("error: MaxSizeBytes cannot be less than 1\n", stderr);
+		return -1;
+	}
         log->max_size_bytes = *((u64*)value);
     } else if (type == MaxAgeMillis) {
+	if(*((u64*)value) < 1000) {
+		fputs("error: MaxAgeMillis cannot be less than 1,000\n", stderr);
+                return -1;
+        }
         log->max_age_millis = *((u64*)value);
     } else if (type == LogFilePath) {
         char* buf = ((char*)value);
         int len = strlen(buf);
+	if(len < 1) {
+		fputs("error: LogFilePath must be at least 1 bytes long\n", stderr);
+                return -1;
+	}
         log->path = malloc(sizeof(char) * (len + 1));
-        if (log->path == NULL) {
+        if (log->path == NULL || DEBUG_MALLOC_ERR) {
+            fputs("error: Could not allocate the required memory\n", stderr);
             return -1;
         }
         strcpy(log->path, buf);
     } else if (type == FileHeader) {
         char* buf = ((char*)value);
         int len = strlen(buf);
+	if(len < 1) {
+                fputs("error: FileHeader must be at least 1 bytes long\n", stderr);
+                return -1;
+        }
         char* tmp = malloc(sizeof(char) * (len + 1));
         if (tmp == NULL) {
+	    fputs("error: Could not allocate the required memory\n", stderr);
             return -1;
         }
         strcpy(tmp, buf);
@@ -81,6 +116,7 @@ int set_option(Log* log, int type, void* value)
 
 int do_logger(Log *log, int num, va_list valist) {
     int ret = 0;
+
     // set defaults
     log->fp = NULL;
     log->level = Info; 
@@ -96,7 +132,8 @@ int do_logger(Log *log, int num, va_list valist) {
     log->path = NULL;
     log->file_header = NULL;
     log->off = 0;
-    log->last_rotation = clock();
+    log->last_rotation = log_now();
+    log->is_init = false;
             
     // iterate through arg list for overrides
     for (int i = 0; i < num; i++) {
@@ -106,6 +143,8 @@ int do_logger(Log *log, int num, va_list valist) {
                 free(log->file_header);
             if (log->path != NULL)
                 free(log->path);
+	    log->path = NULL;
+	    log->file_header = NULL;
             ret = -1;
             break;
         }
@@ -183,8 +222,6 @@ int get_format(Log* log, LogLevel level, char* buf)
             } else {
                 sprintf(log_level_buf, "%s(FATAL)", spacing);
             }
-        } else {
-            strcpy(log_level_buf, "");
         }
     } else {
         strcpy(log_level_buf, "");
@@ -239,6 +276,10 @@ int get_format(Log* log, LogLevel level, char* buf)
 
 int do_log(Log* log, LogLevel level, char* line, bool is_plain, bool is_all, va_list args)
 {
+    if (!log->is_init) {
+       fputs("error: log has not been initialized\n", stderr);
+       return -1;
+    }
     if (level >= log->level) {
         va_list args_copy;
         va_copy(args_copy, args);
@@ -304,6 +345,10 @@ void log_set_level(Log* log, LogLevel level)
 
 int log_init(Log* log)
 {
+    if(log->is_init) {
+	fputs("error: log has already been initialized\n", stderr);
+	return -1;
+    }
     if (log->path) {
         bool write_header = false;
         if (log->file_header && access(log->path, F_OK) != 0) {
@@ -316,12 +361,18 @@ int log_init(Log* log)
         fseek(log->fp, 0, SEEK_END);
         log->off = ftello(log->fp);
     }
+    log->is_init = true;
     return 0;
 }
 
-int log_config_option(Log* log, LogConfigOption option)
+int log_set_config_option(Log* log, LogConfigOption option)
 {
+    if(!log->is_init) {
+	fputs("error: log has not been initialized\n", stderr);
+	return -1;
+    }
     if (option.type == LogFilePath) {
+	fputs("error: cannot change log file path after initialization\n", stderr);
         return -1;
     }
 
@@ -332,22 +383,26 @@ int log_rotate(Log* log)
 {
     // format:
     // name.log -> name.r_<mon>_<day>_<year>_<time>_<rand>.log
+
     int ret = 0;
     char rotation_name[strlen(log->path) + 100];
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
-    printf("do rotate\n");
-
     char* fname = strrchr(log->path, PathSeparator);
     if (fname == NULL) {
         fname = log->path;
     } else {
-        if (strlen(fname) > 0)
+	ret = -1;
+        if (strlen(fname) > 0) {
+            ret = 0;
             fname = fname + 1;
-        else
-            ret = -1;
-        printf("fname=%s,orig=%s\n", fname + 1, log->path);
+	}
+    }
+
+    if(!log->is_init) {
+	fputs("error: log has not been initialized\n", stderr);
+	ret = -1;
     }
 
     char* ext;
@@ -380,7 +435,6 @@ int log_rotate(Log* log)
                 r);
             strcat(rotation_name, date_format);
             strcat(rotation_name, ext);
-            printf("fname=%s,ext=%s,rotation_name=%s\n", fname, ext, rotation_name);
 	    fclose(log->fp);
 	    if(log->delete_rotation) {
 		remove(log->path);
@@ -398,21 +452,15 @@ int log_rotate(Log* log)
 
     if (ret == 0) {
         log->off = 0;
-        log->last_rotation = clock();
+        log->last_rotation = log_now();
     }
     return ret;
 }
 
-u64 timediff(clock_t t1, clock_t t2)
-{
-    u64 elapsed;
-    elapsed = ((double)t2 - t1) / CLOCKS_PER_SEC * 1000;
-    return elapsed;
-}
-
 bool log_need_rotate(Log* log)
 {
-    u64 diff = timediff(clock(), log->last_rotation);
+    u64 now = log_now();
+    u64 diff = now - log->last_rotation;
     return log->off > log->max_size_bytes || diff > log->max_age_millis;
 }
 
@@ -420,6 +468,7 @@ int log_close(Log* log)
 {
     if (log->fp) {
         fclose(log->fp);
+	log->fp = NULL;
     }
     return 0;
 }
@@ -429,6 +478,7 @@ int log_config_option_show_colors(LogConfigOption* option, bool value)
     option->type = ShowColors;
     option->value = malloc(sizeof(bool));
     if (option->value == NULL) {
+	fputs("error: Could not allocate the required memory\n", stderr);
         return -1;
     }
     *((bool*)option->value) = value;
@@ -440,6 +490,7 @@ int log_config_option_show_stdout(LogConfigOption* option, bool value)
     option->type = ShowStdout;
     option->value = malloc(sizeof(bool));
     if (option->value == NULL) {
+	fputs("error: Could not allocate the required memory\n", stderr);
         return -1;
     }
     *((bool*)option->value) = value;
@@ -451,6 +502,7 @@ int log_config_option_show_timestamp(LogConfigOption* option, bool value)
     option->type = ShowTimestamp;
     option->value = malloc(sizeof(bool));
     if (option->value == NULL) {
+	fputs("error: Could not allocate the required memory\n", stderr);
         return -1;
     }
     *((bool*)option->value) = value;
@@ -462,6 +514,7 @@ int log_config_option_show_millis(LogConfigOption* option, bool value)
     option->type = ShowMillis;
     option->value = malloc(sizeof(bool));
     if (option->value == NULL) {
+	fputs("error: Could not allocate the required memory\n", stderr);
         return -1;
     }
     *((bool*)option->value) = value;
@@ -473,6 +526,7 @@ int log_config_option_show_log_level(LogConfigOption* option, bool value)
     option->type = ShowLogLevel;
     option->value = malloc(sizeof(bool));
     if (option->value == NULL) {
+        fputs("error: Could not allocate the required memory\n", stderr);
         return -1;
     }
     *((bool*)option->value) = value;
@@ -484,6 +538,7 @@ int log_config_option_auto_rotate(LogConfigOption* option, bool value)
     option->type = AutoRotate;
     option->value = malloc(sizeof(bool));
     if (option->value == NULL) {
+        fputs("error: Could not allocate the required memory\n", stderr);
         return -1;
     }
     *((bool*)option->value) = value;
@@ -495,6 +550,7 @@ int log_config_option_delete_rotation(LogConfigOption* option, bool value)
     option->type = DeleteRotation;
     option->value = malloc(sizeof(bool));
     if (option->value == NULL) {
+	fputs("error: Could not allocate the required memory\n", stderr);
         return -1;
     }
     *((bool*)option->value) = value;
@@ -506,6 +562,7 @@ int log_config_option_max_size_bytes(LogConfigOption* option, u64 value)
     option->type = MaxSizeBytes;
     option->value = malloc(sizeof(u64));
     if (option->value == NULL) {
+	fputs("error: Could not allocate the required memory\n", stderr);
         return -1;
     }
     *((u64*)option->value) = value;
@@ -517,6 +574,7 @@ int log_config_option_max_age_millis(LogConfigOption* option, u64 value)
     option->type = MaxAgeMillis;
     option->value = malloc(sizeof(u64));
     if (option->value == NULL) {
+        fputs("error: Could not allocate the required memory\n", stderr);
         return -1;
     }
     *((u64*)option->value) = value;
@@ -532,6 +590,7 @@ int log_config_option_log_file_path(LogConfigOption* option, char* value)
         int len = strlen(value);
         option->value = malloc(sizeof(char) * (len + 1));
         if (option->value == NULL) {
+            fputs("error: Could not allocate the required memory\n", stderr);
             return -1;
         }
         strcpy(option->value, value);
@@ -548,6 +607,7 @@ int log_config_option_file_header(LogConfigOption* option, char* value)
         int len = strlen(value);
         option->value = malloc(sizeof(char) * (len + 1));
         if (option->value == NULL) {
+            fputs("error: Could not allocate the required memory\n", stderr);
             return -1;
         }
         strcpy(option->value, value);
@@ -627,14 +687,19 @@ int global_log_rotate() {
 
 bool global_log_need_rotate() {
 	pthread_mutex_lock(&_global_logger_mutex__);
-        bool ret = log_rotate(&_global_logger__);
+        bool ret = log_need_rotate(&_global_logger__);
         pthread_mutex_unlock(&_global_logger_mutex__);
         return ret;
 }
 
 int global_log_config_option(LogConfigOption option) {
 	pthread_mutex_lock(&_global_logger_mutex__);
-	int ret = log_config_option(&_global_logger__, option);
+	int ret = log_set_config_option(&_global_logger__, option);
 	pthread_mutex_unlock(&_global_logger_mutex__);
 	return ret;
 }
+
+void _debug_global_logger_is_init__() {
+        _global_logger_is_init__ = false;
+}
+

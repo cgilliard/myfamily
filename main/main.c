@@ -32,6 +32,7 @@ int main(int argc, char** argv)
     global_log_config_option(opt3);
     log_config_option_free(&opt3);
     info("Main currently doesn't do %s.", "anything");
+    info("end");
 
     return 0;
 }
