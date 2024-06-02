@@ -17,6 +17,7 @@
 #endif /* __linux__ */
 #include <criterion/criterion.h>
 #include <log/log.h>
+#include <log/log_test.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>

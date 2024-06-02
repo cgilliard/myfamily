@@ -107,7 +107,6 @@ int log_init(Log* log);
 int log_close(Log* log);
 void log_free(Log* log);
 int log_set_config_option(Log* log, LogConfigOption option);
-int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug_malloc_err, void *value);
 
 int logger(Log* log, int num, ...);
 
@@ -138,7 +137,5 @@ int global_log_config_option(LogConfigOption option);
 #define warn_all(line, ...) (global_logger(false, true, Warn, LOG_LEVEL, line, ##__VA_ARGS__));
 #define error_all(line, ...) (global_logger(false, true, Error, LOG_LEVEL, line, ##__VA_ARGS__));
 #define fatal_all(line, ...) (global_logger(false, true, Fatal, LOG_LEVEL, line, ##__VA_ARGS__));
-
-void _debug_global_logger_is_init__();
 
 #endif /* __LOG_LOG_ */
