@@ -42,7 +42,7 @@ int rmrf(char* path)
 Test(log, basic)
 {
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4;
 
     log_config_option_show_colors(&opt4, false);
 
@@ -127,7 +127,7 @@ Test(log, threshold)
 {
     char buf[100];
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4;
 
     remove("./.log_threshold.fam/log_threshold.log");
     rmdir("./.log_threshold.fam/");
@@ -165,7 +165,7 @@ Test(log, output)
 {
     char buf[100];
     Log log;
-    LogConfigOption opt1, opt2, opt3;
+    LogConfigOptionImpl opt1, opt2, opt3;
 
     remove("./.log_output.fam/log_output.log");
     rmdir("./.log_output.fam/");
@@ -201,7 +201,7 @@ Test(log, configurations)
 {
     char buf[100];
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4;
 
     remove("./.log_configurations.fam/log_output.log");
     rmdir("./.log_configurations.fam/");
@@ -277,7 +277,7 @@ Test(log, plain)
 {
     char buf[100];
     Log log;
-    LogConfigOption opt1, opt2, opt3;
+    LogConfigOptionImpl opt1, opt2, opt3;
 
     remove("./.log_plain.fam/log_plain.log");
     rmdir("./.log_plain.fam/");
@@ -313,7 +313,7 @@ Test(log, all)
 {
     char buf[100];
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4;
 
     remove("./.log_all.fam/log_all.log");
     rmdir("./.log_all.fam/");
@@ -350,7 +350,7 @@ Test(log, formatting)
 {
     char buf[100];
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4;
 
     remove("./.log_fmt.fam/log_fmt.log");
     rmdir("./.log_fmt.fam/");
@@ -386,7 +386,7 @@ Test(log, formatting)
 Test(log, need_rotate)
 {
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4;
 
     remove("./.log_rot.fam/log_rot.log");
     rmdir("./.log_rot.fam/");
@@ -430,7 +430,7 @@ Test(log, need_rotate)
 Test(log, rotate)
 {
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4;
 
     rmrf("./.log_dorot.fam/");
     mkdir("./.log_dorot.fam", 0700);
@@ -509,7 +509,7 @@ Test(log, rotate)
 Test(log, autorotate)
 {
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4, opt5;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4, opt5;
 
     rmrf("./.log_doautorot.fam/");
     mkdir("./.log_doautorot.fam", 0700);
@@ -587,7 +587,7 @@ Test(log, autorotate)
 Test(log, deleterotate)
 {
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4, opt5;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4, opt5;
 
     rmrf("./.log_dodelrot.fam/");
     mkdir("./.log_dodelrot.fam", 0700);
@@ -667,8 +667,8 @@ Test(log, deleterotate)
 Test(log, misconfig)
 {
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4, opt5, opt6;
-    LogConfigOption valid1, valid2;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4, opt5, opt6;
+    LogConfigOptionImpl valid1, valid2;
 
     log_config_option_log_file_path(&opt1, NULL);
     log_config_option_max_size_bytes(&opt2, 0);
@@ -708,7 +708,7 @@ Test(log, misconfig)
 Test(log, timerotation)
 {
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4, opt5;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4, opt5;
 
     rmrf("./.log_dotimerot.fam/");
     mkdir("./.log_dotimerot.fam", 0700);
@@ -767,7 +767,7 @@ Test(log, changeheader)
 {
     char buf[100];
     Log log;
-    LogConfigOption opt1, opt2, opt3, opt4;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4;
 
     rmrf("./.log_chh.fam/");
 
@@ -832,7 +832,7 @@ Test(log, rotationnames)
 {
     char buf[100];
     Log log;
-    LogConfigOption opt1;
+    LogConfigOptionImpl opt1;
 
     rmrf("log_same_dirfam");
 
@@ -887,7 +887,7 @@ Test(log, rotationnames)
 Test(log, global_log)
 {
     char buf[100];
-    LogConfigOption opt1, opt2, opt3, opt4;
+    LogConfigOptionImpl opt1, opt2, opt3, opt4;
 
     rmrf("./.log_global.fam/");
     mkdir("./.log_global.fam", 0700);
@@ -964,7 +964,7 @@ Test(log, malloc_err)
 {
     char buf[100];
     bool b;
-    LogConfigOption opt1;
+    LogConfigOptionImpl opt1;
     Log log;
     int v;
 

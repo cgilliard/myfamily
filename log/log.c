@@ -151,7 +151,7 @@ int do_logger(Log* log, int num, va_list valist)
 
     // iterate through arg list for overrides
     for (int i = 0; i < num; i++) {
-        LogConfigOption next = va_arg(valist, LogConfigOption);
+        LogConfigOptionImpl next = va_arg(valist, LogConfigOptionImpl);
         if (set_option(log, next.type, next.value)) {
             if (log->file_header != NULL)
                 free(log->file_header);
@@ -387,7 +387,7 @@ int log_init(Log* log)
     return 0;
 }
 
-int log_set_config_option(Log* log, LogConfigOption option)
+int log_set_config_option(Log* log, LogConfigOptionImpl option)
 {
     if (!log->is_init) {
         fputs("error: log has not been initialized\n", stderr);
@@ -495,7 +495,7 @@ int log_close(Log* log)
     return 0;
 }
 
-int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug_malloc_err, void* value)
+int _log_allocate_config_option(LogConfigOptionImpl* option, size_t size, bool debug_malloc_err, void* value)
 {
     int ret = 0;
 
@@ -508,7 +508,7 @@ int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug
     return ret;
 }
 
-int log_config_option_show_colors(LogConfigOption* option, bool value)
+int log_config_option_show_colors(LogConfigOptionImpl* option, bool value)
 {
     option->type = ShowColors;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -517,7 +517,7 @@ int log_config_option_show_colors(LogConfigOption* option, bool value)
     return ret;
 }
 
-int log_config_option_show_stdout(LogConfigOption* option, bool value)
+int log_config_option_show_stdout(LogConfigOptionImpl* option, bool value)
 {
     option->type = ShowStdout;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -526,7 +526,7 @@ int log_config_option_show_stdout(LogConfigOption* option, bool value)
     return ret;
 }
 
-int log_config_option_show_timestamp(LogConfigOption* option, bool value)
+int log_config_option_show_timestamp(LogConfigOptionImpl* option, bool value)
 {
     option->type = ShowTimestamp;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -535,7 +535,7 @@ int log_config_option_show_timestamp(LogConfigOption* option, bool value)
     return ret;
 }
 
-int log_config_option_show_millis(LogConfigOption* option, bool value)
+int log_config_option_show_millis(LogConfigOptionImpl* option, bool value)
 {
     option->type = ShowMillis;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -544,7 +544,7 @@ int log_config_option_show_millis(LogConfigOption* option, bool value)
     return ret;
 }
 
-int log_config_option_show_log_level(LogConfigOption* option, bool value)
+int log_config_option_show_log_level(LogConfigOptionImpl* option, bool value)
 {
     option->type = ShowLogLevel;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -553,7 +553,7 @@ int log_config_option_show_log_level(LogConfigOption* option, bool value)
     return ret;
 }
 
-int log_config_option_auto_rotate(LogConfigOption* option, bool value)
+int log_config_option_auto_rotate(LogConfigOptionImpl* option, bool value)
 {
     option->type = AutoRotate;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -562,7 +562,7 @@ int log_config_option_auto_rotate(LogConfigOption* option, bool value)
     return ret;
 }
 
-int log_config_option_delete_rotation(LogConfigOption* option, bool value)
+int log_config_option_delete_rotation(LogConfigOptionImpl* option, bool value)
 {
     option->type = DeleteRotation;
     int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -571,7 +571,7 @@ int log_config_option_delete_rotation(LogConfigOption* option, bool value)
     return ret;
 }
 
-int log_config_option_max_size_bytes(LogConfigOption* option, u64 value)
+int log_config_option_max_size_bytes(LogConfigOptionImpl* option, u64 value)
 {
     option->type = MaxSizeBytes;
     int ret = _log_allocate_config_option(option, sizeof(u64), false, &value);
@@ -580,7 +580,7 @@ int log_config_option_max_size_bytes(LogConfigOption* option, u64 value)
     return ret;
 }
 
-int log_config_option_max_age_millis(LogConfigOption* option, u64 value)
+int log_config_option_max_age_millis(LogConfigOptionImpl* option, u64 value)
 {
     option->type = MaxAgeMillis;
     int ret = _log_allocate_config_option(option, sizeof(u64), false, &value);
@@ -589,7 +589,7 @@ int log_config_option_max_age_millis(LogConfigOption* option, u64 value)
     return ret;
 }
 
-int log_config_option_log_file_path(LogConfigOption* option, char* value)
+int log_config_option_log_file_path(LogConfigOptionImpl* option, char* value)
 {
     option->type = LogFilePath;
     int ret = 0;
@@ -604,7 +604,7 @@ int log_config_option_log_file_path(LogConfigOption* option, char* value)
     return ret;
 }
 
-int log_config_option_file_header(LogConfigOption* option, char* value)
+int log_config_option_file_header(LogConfigOptionImpl* option, char* value)
 {
     option->type = FileHeader;
     int ret = 0;
@@ -619,7 +619,7 @@ int log_config_option_file_header(LogConfigOption* option, char* value)
     return ret;
 }
 
-void log_config_option_free(LogConfigOption* option)
+void log_config_option_free(LogConfigOptionImpl* option)
 {
     if (option->value != NULL) {
         free(option->value);
@@ -706,7 +706,7 @@ bool global_log_need_rotate()
     return ret;
 }
 
-int global_log_config_option(LogConfigOption option)
+int global_log_config_option(LogConfigOptionImpl option)
 {
     pthread_mutex_lock(&_global_logger_mutex__);
     int ret = log_set_config_option(&_global_logger__, option);

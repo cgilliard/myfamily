@@ -35,7 +35,7 @@
 #define ANSI_COLOR_CYAN "\x1b[36m"
 #define ANSI_COLOR_RESET "\x1b[0m"
 
-enum LogConfigOptionType {
+enum LogConfigOptionImplType {
     ShowColors = 0, // value is bool *
     ShowStdout = 1, // value is bool *
     ShowTimestamp = 2, // value is bool *
@@ -48,15 +48,15 @@ enum LogConfigOptionType {
     LogFilePath = 9, // value is char *
     FileHeader = 10, // value is char *
 };
-typedef enum LogConfigOptionType LogConfigOptionType;
+typedef enum LogConfigOptionImplType LogConfigOptionImplType;
 
-struct LogConfigOption {
-    LogConfigOptionType type;
+struct LogConfigOptionImpl {
+    LogConfigOptionImplType type;
     void* value;
 };
-typedef struct LogConfigOption LogConfigOption;
+typedef struct LogConfigOptionImpl LogConfigOptionImpl;
 
-#define AutoLogConfigOption LogConfigOption CLEANUP(log_config_option_free)
+#define LogConfigOption LogConfigOptionImpl CLEANUP(log_config_option_free)
 
 enum LogLevel {
     Trace = 0,
@@ -90,6 +90,8 @@ struct Log {
 };
 typedef struct Log Log;
 
+#define Logger Log CLEANUP(log_free)
+
 /** \endcond */
 #endif // DOXYGEN_SKIP
 
@@ -105,7 +107,7 @@ typedef struct Log Log;
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -122,7 +124,7 @@ typedef struct Log Log;
  * }
  * @endcode
  */
-int log_config_option_show_colors(LogConfigOption* option, bool value);
+int log_config_option_show_colors(LogConfigOptionImpl* option, bool value);
 
 /**
  * Initialize option as a ShowStdout option with the specified value.
@@ -136,7 +138,7 @@ int log_config_option_show_colors(LogConfigOption* option, bool value);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -153,7 +155,7 @@ int log_config_option_show_colors(LogConfigOption* option, bool value);
  * }
  * @endcode
  */
-int log_config_option_show_stdout(LogConfigOption* option, bool value);
+int log_config_option_show_stdout(LogConfigOptionImpl* option, bool value);
 
 /**
  * Initialize option as a ShowTimestamp option with the specified value.
@@ -167,7 +169,7 @@ int log_config_option_show_stdout(LogConfigOption* option, bool value);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -184,7 +186,7 @@ int log_config_option_show_stdout(LogConfigOption* option, bool value);
  * }
  * @endcode
  */
-int log_config_option_show_timestamp(LogConfigOption* option, bool value);
+int log_config_option_show_timestamp(LogConfigOptionImpl* option, bool value);
 
 /**
  * Initialize option as a ShowMillis option with the specified value.
@@ -198,7 +200,7 @@ int log_config_option_show_timestamp(LogConfigOption* option, bool value);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -215,7 +217,7 @@ int log_config_option_show_timestamp(LogConfigOption* option, bool value);
  * }
  * @endcode
  */
-int log_config_option_show_millis(LogConfigOption* option, bool value);
+int log_config_option_show_millis(LogConfigOptionImpl* option, bool value);
 
 /**
  * Initialize option as a ShowLogLevel option with the specified value.
@@ -230,7 +232,7 @@ int log_config_option_show_millis(LogConfigOption* option, bool value);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -247,7 +249,7 @@ int log_config_option_show_millis(LogConfigOption* option, bool value);
  * }
  * @endcode
  */
-int log_config_option_show_log_level(LogConfigOption* option, bool value);
+int log_config_option_show_log_level(LogConfigOptionImpl* option, bool value);
 
 /**
  * Initialize option as an AutoRotate option with the specified value.
@@ -261,7 +263,7 @@ int log_config_option_show_log_level(LogConfigOption* option, bool value);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -278,7 +280,7 @@ int log_config_option_show_log_level(LogConfigOption* option, bool value);
  * }
  * @endcode
  */
-int log_config_option_auto_rotate(LogConfigOption* option, bool value);
+int log_config_option_auto_rotate(LogConfigOptionImpl* option, bool value);
 
 /**
  * Initialize option as a DeleteRotation option with the specified value.
@@ -293,7 +295,7 @@ int log_config_option_auto_rotate(LogConfigOption* option, bool value);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -310,7 +312,7 @@ int log_config_option_auto_rotate(LogConfigOption* option, bool value);
  * }
  * @endcode
  */
-int log_config_option_delete_rotation(LogConfigOption* option, bool value);
+int log_config_option_delete_rotation(LogConfigOptionImpl* option, bool value);
 
 /**
  * Initialize option as a MaxSizeBytes option with the specified value.
@@ -327,7 +329,7 @@ int log_config_option_delete_rotation(LogConfigOption* option, bool value);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option - max log size of 1 mb
@@ -344,7 +346,7 @@ int log_config_option_delete_rotation(LogConfigOption* option, bool value);
  * }
  * @endcode
  */
-int log_config_option_max_size_bytes(LogConfigOption* option, u64 value);
+int log_config_option_max_size_bytes(LogConfigOptionImpl* option, u64 value);
 
 /**
  * Initialize option as a MaxAgeMillis option with the specified value.
@@ -362,7 +364,7 @@ int log_config_option_max_size_bytes(LogConfigOption* option, u64 value);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option - 1 hr
@@ -380,7 +382,7 @@ int log_config_option_max_size_bytes(LogConfigOption* option, u64 value);
  * }
  * @endcode
  */
-int log_config_option_max_age_millis(LogConfigOption* option, u64 value);
+int log_config_option_max_age_millis(LogConfigOptionImpl* option, u64 value);
 
 /**
  * Initialize option as a LogFilePath option with the specified value.
@@ -394,7 +396,7 @@ int log_config_option_max_age_millis(LogConfigOption* option, u64 value);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -411,7 +413,7 @@ int log_config_option_max_age_millis(LogConfigOption* option, u64 value);
  * }
  * @endcode
  */
-int log_config_option_log_file_path(LogConfigOption* option, char* value);
+int log_config_option_log_file_path(LogConfigOptionImpl* option, char* value);
 
 /**
  * Initialize option as a FileHeader option with the specified value.
@@ -425,7 +427,7 @@ int log_config_option_log_file_path(LogConfigOption* option, char* value);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -442,17 +444,17 @@ int log_config_option_log_file_path(LogConfigOption* option, char* value);
  * }
  * @endcode
  */
-int log_config_option_file_header(LogConfigOption* option, char* value);
+int log_config_option_file_header(LogConfigOptionImpl* option, char* value);
 
 /**
- * Free a LogConfigOption.
+ * Free a LogConfigOptionImpl.
  * @param option the log config option to free.
  *
  * @code
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *
  *     // init a configuration option
  *     log_config_option_file_header(&option, "myheader");
@@ -464,7 +466,7 @@ int log_config_option_file_header(LogConfigOption* option, char* value);
  * }
  * @endcode
  */
-void log_config_option_free(LogConfigOption* option);
+void log_config_option_free(LogConfigOptionImpl* option);
 
 /**
  * Log a line to the specified Log at the specified LogLevel.
@@ -477,7 +479,7 @@ void log_config_option_free(LogConfigOption* option);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -516,7 +518,7 @@ int log_line(Log* log, LogLevel level, char* line, ...);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -554,7 +556,7 @@ int log_all(Log* log, LogLevel level, char* line, ...);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option;
+ *     LogConfigOptionImpl option;
  *     Log log;
  *
  *     // init a configuration option
@@ -591,7 +593,7 @@ int log_plain(Log* log, LogLevel level, char* line, ...);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option, option2;
+ *     LogConfigOptionImpl option, option2;
  *     Log log;
  *
  *     // init a configuration option
@@ -626,7 +628,7 @@ int log_rotate(Log* log);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option, option2;
+ *     LogConfigOptionImpl option, option2;
  *     Log log;
  *
  *     // init a configuration option
@@ -660,7 +662,7 @@ bool log_need_rotate(Log* log);
  * #include <log/log.h>
  *
  * int main() {
- *     LogConfigOption option, option2;
+ *     LogConfigOptionImpl option, option2;
  *     Log log;
  *
  *     // init a configuration option
@@ -704,7 +706,7 @@ int log_close(Log* log);
 void log_free(Log* log);
 
 /**
- * Set a LogConfigOption after the log has been initialized.
+ * Set a LogConfigOptionImpl after the log has been initialized.
  * This function will result in an error if the LogFilePath
  * is specified. That option may not be configured after
  * the log has been initialized.
@@ -712,7 +714,7 @@ void log_free(Log* log);
  * @param option the option to set.
  * @return 0 on on success -1 if an error occurs.
  */
-int log_set_config_option(Log* log, LogConfigOption option);
+int log_set_config_option(Log* log, LogConfigOptionImpl option);
 
 /**
  * Configure a logger based on the specified parameters.
@@ -732,7 +734,7 @@ int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, 
 #endif // DOXYGEN_SKIP
 
 /**
- * Initialize the global logger with the specified LogConfigOptions.
+ * Initialize the global logger with the specified LogConfigOptionImpls.
  *
  * @code
  * #include <log/log.h>
@@ -740,7 +742,7 @@ int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, 
  * #define LOG_LEVEL Info
  *
  * int main() {
- *     LogConfigOption option, option2;
+ *     LogConfigOptionImpl option, option2;
  *     Log log;
  *
  *     // init a configuration option
@@ -784,7 +786,7 @@ bool global_log_need_rotate();
  * This function calls log_set_config_option for the underlying global log.
  * @see [log_set_config_option].
  */
-int global_log_config_option(LogConfigOption option);
+int global_log_config_option(LogConfigOptionImpl option);
 
 /**
  * Log to the global logger at the Trace level with the specified line and arguments.

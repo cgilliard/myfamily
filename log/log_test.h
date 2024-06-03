@@ -18,7 +18,7 @@
 // doc hidden functions that tests need to access
 
 void _debug_global_logger_is_init__();
-int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug_malloc_err, void* value);
+int _log_allocate_config_option(LogConfigOptionImpl* option, size_t size, bool debug_malloc_err, void* value);
 int sprintf_err(char* str, const char* string, ...);
 
 #endif /* __LOG_LOG_TEST */
