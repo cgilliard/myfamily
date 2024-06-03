@@ -688,7 +688,7 @@ void log_set_level(Log* log, LogLevel level);
 int log_init(Log* log);
 
 /**
- * Close the log's underlying file desciptor.
+ * Close the log's underlying file desciptor / file handle.
  * @param log the log to close.
  * @return 0 on success -1 if an error occurs.
  */
