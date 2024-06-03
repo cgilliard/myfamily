@@ -1,8 +1,28 @@
 var searchData=
 [
-  ['get_5fformat_52',['get_format',['../log_8c.html#ab32fa538de059c7b8994647f4f54a1ba',1,'log.c']]],
-  ['global_5flog_5fconfig_5foption_53',['global_log_config_option',['../log_8c.html#ace1c421b6f4dd1669021e603bf5b3fcd',1,'global_log_config_option(LogConfigOption option):&#160;log.c'],['../log_8h.html#ace1c421b6f4dd1669021e603bf5b3fcd',1,'global_log_config_option(LogConfigOption option):&#160;log.c']]],
-  ['global_5flog_5fneed_5frotate_54',['global_log_need_rotate',['../log_8c.html#a04be19831334d10533337bd021de83b0',1,'global_log_need_rotate():&#160;log.c'],['../log_8h.html#a04be19831334d10533337bd021de83b0',1,'global_log_need_rotate():&#160;log.c']]],
-  ['global_5flog_5frotate_55',['global_log_rotate',['../log_8c.html#aecf7ab136f8858a9c4e9017bcb9c4fbe',1,'global_log_rotate():&#160;log.c'],['../log_8h.html#aecf7ab136f8858a9c4e9017bcb9c4fbe',1,'global_log_rotate():&#160;log.c']]],
-  ['global_5flogger_56',['global_logger',['../log_8c.html#a08ac4b45500118573761f47b8332878a',1,'global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char *line,...):&#160;log.c'],['../log_8h.html#a08ac4b45500118573761f47b8332878a',1,'global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char *line,...):&#160;log.c']]]
+  ['log_2eh_36',['log.h',['../log_8h.html',1,'']]],
+  ['log_5fall_37',['log_all',['../log_8h.html#a07e17f30d4f59f0d977db83535027b7a',1,'log.h']]],
+  ['log_5fclose_38',['log_close',['../log_8h.html#a81270f9cc387ef7be7c198f4ff837e59',1,'log.h']]],
+  ['log_5fconfig_5foption_5fauto_5frotate_39',['log_config_option_auto_rotate',['../log_8h.html#a902d325b67801ea8faaea9b455517fc3',1,'log.h']]],
+  ['log_5fconfig_5foption_5fdelete_5frotation_40',['log_config_option_delete_rotation',['../log_8h.html#a75be04f1f5d90c6649a4ec4c013ccee1',1,'log.h']]],
+  ['log_5fconfig_5foption_5ffile_5fheader_41',['log_config_option_file_header',['../log_8h.html#ad4edddd0b034378b5dc1a50742eb4333',1,'log.h']]],
+  ['log_5fconfig_5foption_5ffree_42',['log_config_option_free',['../log_8h.html#a4a7411795785f1bd796c43f70a065a3e',1,'log.h']]],
+  ['log_5fconfig_5foption_5flog_5ffile_5fpath_43',['log_config_option_log_file_path',['../log_8h.html#a3130b4aaf2968168bff71177e954d745',1,'log.h']]],
+  ['log_5fconfig_5foption_5fmax_5fage_5fmillis_44',['log_config_option_max_age_millis',['../log_8h.html#afc5545e9243288ecadd06cf90bb76412',1,'log.h']]],
+  ['log_5fconfig_5foption_5fmax_5fsize_5fbytes_45',['log_config_option_max_size_bytes',['../log_8h.html#ab6828dfb36902a999d086b4b8af3cbf6',1,'log.h']]],
+  ['log_5fconfig_5foption_5fshow_5fcolors_46',['log_config_option_show_colors',['../log_8h.html#abed7a1750e109ef1485514e35df7887a',1,'log.h']]],
+  ['log_5fconfig_5foption_5fshow_5flog_5flevel_47',['log_config_option_show_log_level',['../log_8h.html#af3df7e18bebd770683dbab8f1d43188b',1,'log.h']]],
+  ['log_5fconfig_5foption_5fshow_5fmillis_48',['log_config_option_show_millis',['../log_8h.html#ad7379d3d20c5db0f603ef03a25529aba',1,'log.h']]],
+  ['log_5fconfig_5foption_5fshow_5fstdout_49',['log_config_option_show_stdout',['../log_8h.html#aa72eb2502b1da792c79d3e6d1f0ab798',1,'log.h']]],
+  ['log_5fconfig_5foption_5fshow_5ftimestamp_50',['log_config_option_show_timestamp',['../log_8h.html#a60a0b4bcc6e0a7f7a24c0e3f74a89b3b',1,'log.h']]],
+  ['log_5ffree_51',['log_free',['../log_8h.html#a8bd99b2ebc955fa857d0c7a6392e5b69',1,'log.h']]],
+  ['log_5finit_52',['log_init',['../log_8h.html#a5a28b081e29255dbd2f9ec02d21ea813',1,'log.h']]],
+  ['log_5flevel_53',['LOG_LEVEL',['../main_8c.html#a0b87e0d3bf5853bcbb0b66a7c48fdc05',1,'LOG_LEVEL():&#160;main.c'],['../misc_8c.html#a0b87e0d3bf5853bcbb0b66a7c48fdc05',1,'LOG_LEVEL():&#160;misc.c']]],
+  ['log_5fline_54',['log_line',['../log_8h.html#af765f9c1518bb6cd4f5aceeb075b86c5',1,'log.h']]],
+  ['log_5fneed_5frotate_55',['log_need_rotate',['../log_8h.html#a72c57c35927d3da1814225d0846950c5',1,'log.h']]],
+  ['log_5fplain_56',['log_plain',['../log_8h.html#af5cb582b1c354ccca314fa4af224ef48',1,'log.h']]],
+  ['log_5frotate_57',['log_rotate',['../log_8h.html#a1cc4c7ec261c51ddef682544825d924a',1,'log.h']]],
+  ['log_5fset_5fconfig_5foption_58',['log_set_config_option',['../log_8h.html#aca52d5775a6b64efc8120a64dbe3d434',1,'log.h']]],
+  ['log_5fset_5flevel_59',['log_set_level',['../log_8h.html#a116f0c80f03e525a2053e50aa1342177',1,'log.h']]],
+  ['logger_60',['logger',['../log_8h.html#a08b1d5e9ecd77ca30b50e59d6b01fdbc',1,'log.h']]]
 ];

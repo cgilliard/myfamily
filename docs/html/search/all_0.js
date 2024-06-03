@@ -1,9 +1,12 @@
 var searchData=
 [
-  ['_5fdebug_5fglobal_5flogger_5fis_5finit_5f_5f_0',['_debug_global_logger_is_init__',['../log_8c.html#adcdd3291c37b6b82b4d4a32fdf2d12d2',1,'_debug_global_logger_is_init__():&#160;log.c'],['../log__test_8h.html#adcdd3291c37b6b82b4d4a32fdf2d12d2',1,'_debug_global_logger_is_init__():&#160;log.c']]],
-  ['_5ffile_5foffset_5fbits_1',['_FILE_OFFSET_BITS',['../log_8c.html#a44d01ba0a136b8e27ad362f5a823d14e',1,'_FILE_OFFSET_BITS():&#160;log.c'],['../log_8h.html#a44d01ba0a136b8e27ad362f5a823d14e',1,'_FILE_OFFSET_BITS():&#160;log.h']]],
-  ['_5fglobal_5flogger_5f_5f_2',['_global_logger__',['../log_8c.html#af2690e09819db5aecba8679991e6e942',1,'log.c']]],
-  ['_5fglobal_5flogger_5fis_5finit_5f_5f_3',['_global_logger_is_init__',['../log_8c.html#a16ebef1f5900c3b9fc090da6ad5b5df1',1,'log.c']]],
-  ['_5fglobal_5flogger_5fmutex_5f_5f_4',['_global_logger_mutex__',['../log_8c.html#a2a7eb052e8f81ed66cff8161dc785724',1,'log.c']]],
-  ['_5flog_5fallocate_5fconfig_5foption_5',['_log_allocate_config_option',['../log_8c.html#a2d394d5809cd5d0a3e3589ce99c76f68',1,'_log_allocate_config_option(LogConfigOption *option, size_t size, bool debug_malloc_err, void *value):&#160;log.c'],['../log__test_8h.html#a2d394d5809cd5d0a3e3589ce99c76f68',1,'_log_allocate_config_option(LogConfigOption *option, size_t size, bool debug_malloc_err, void *value):&#160;log.c']]]
+  ['config_2ec_0',['config.c',['../config_8c.html',1,'']]],
+  ['config_2eh_1',['config.h',['../config_8h.html',1,'']]],
+  ['configure_5fbool_2',['configure_bool',['../config_8c.html#adcebca1a45b1943485c44266fae578ef',1,'configure_bool(bool *value, bool *configured, bool d):&#160;config.c'],['../config_8h.html#adcebca1a45b1943485c44266fae578ef',1,'configure_bool(bool *value, bool *configured, bool d):&#160;config.c']]],
+  ['configure_5fstring_3',['configure_string',['../config_8c.html#aa11e14754114b867b2df3ca048dd23cf',1,'configure_string(char *value, char *configured, char *d, int max_len):&#160;config.c'],['../config_8h.html#aa11e14754114b867b2df3ca048dd23cf',1,'configure_string(char *value, char *configured, char *d, int max_len):&#160;config.c']]],
+  ['configure_5fu128_4',['configure_u128',['../config_8c.html#a392a42459a313fca9b1b0cff110c8e01',1,'configure_u128(__uint128_t *value, __uint128_t *configured, __uint128_t d):&#160;config.c'],['../config_8h.html#ac6273f22010508b0987a0bb5f1c07189',1,'configure_u128(u128 *value, u128 *configured, u128 d):&#160;config.h']]],
+  ['configure_5fu16_5',['configure_u16',['../config_8c.html#a36923ff3b9cbf1db9ec5331ccb0ed706',1,'configure_u16(uint16_t *value, uint16_t *configured, uint16_t d):&#160;config.c'],['../config_8h.html#a3474d1e3a19d7430e72ced067646dabb',1,'configure_u16(u16 *value, u16 *configured, u16 d):&#160;config.h']]],
+  ['configure_5fu32_6',['configure_u32',['../config_8c.html#ac6b54426159ea495c1e493dc8cc3de8c',1,'configure_u32(uint32_t *value, uint32_t *configured, uint32_t d):&#160;config.c'],['../config_8h.html#aeca08b0a0229cc06f6bd7cd327ed8561',1,'configure_u32(u32 *value, u32 *configured, u32 d):&#160;config.h']]],
+  ['configure_5fu64_7',['configure_u64',['../config_8c.html#a3f7514da8adc18bfe608b639925198a4',1,'configure_u64(uint64_t *value, uint64_t *configured, uint64_t d):&#160;config.c'],['../config_8h.html#a13ae8ab7fbaa9fca17e68f3c43242a8a',1,'configure_u64(u64 *value, u64 *configured, u64 d):&#160;config.h']]],
+  ['configure_5fu8_8',['configure_u8',['../config_8c.html#a3384eb3d8cdadcfe21007af5d841b51a',1,'configure_u8(uint8_t *value, uint8_t *configured, uint8_t d):&#160;config.c'],['../config_8h.html#aba181200e66d033fb99593d9835d6dd9',1,'configure_u8(u8 *value, u8 *configured, u8 d):&#160;config.h']]]
 ];
