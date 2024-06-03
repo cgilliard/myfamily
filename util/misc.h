@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-int is_white_space(char ch);
-int is_ident_start(char ch);
-int is_ident_secondary(char ch);
-int is_joint_possible(char ch);
+#include <base/types.h>
+
+bool is_white_space(char ch);
+bool is_ident_start(char ch);
+bool is_ident_secondary(char ch);
+bool is_joint_possible(char ch);

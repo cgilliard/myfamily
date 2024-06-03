@@ -12,44 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/constants.h>
+#include <base/types.h>
 #include <util/misc.h>
 #include <log/log.h>
 
 #define LOG_LEVEL Debug
 
-int is_white_space(char ch)
+bool is_white_space(char ch)
 {
     debug("is whitespace '%c'", ch);
     if (ch == '\n' || ch == '\t' || ch == '\r' || ch == '\v' || ch == '\f' || ch == ' ')
-        return TRUE;
+        return true;
     else
-        return FALSE;
+        return false;
 }
 
-int is_ident_start(char ch)
+bool is_ident_start(char ch)
 {
     if ((ch <= 'Z' && ch >= 'A') || (ch <= 'z' && ch >= 'a') || ch == '_') {
-        return TRUE;
+        return true;
     } else {
-        return FALSE;
+        return false;
     }
 }
 
-int is_ident_secondary(char ch)
+bool is_ident_secondary(char ch)
 {
     if (is_ident_start(ch) || (ch <= '9' && ch >= '0')) {
-        return TRUE;
+        return true;
     } else {
-        return FALSE;
+        return false;
     }
 }
 
-int is_joint_possible(char ch)
+bool is_joint_possible(char ch)
 {
     if (ch == '.' || ch == '=' || ch == '/' || ch == '+' || ch == '&' || ch == '<' || ch == '-' || ch == '%' || ch == '^' || ch == '*' || ch == '>' || ch == '|' || ch == '!' || ch == ':') {
-        return TRUE;
+        return true;
     } else {
-        return FALSE;
+        return false;
     }
 }

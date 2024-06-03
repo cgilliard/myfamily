@@ -95,10 +95,11 @@ void configure_u128(u128* value, u128* configured, u128 d);
  * @param configured a pointer to the desired configured value. If this pointer is NULL
  * the default d will be used.
  * @param d the default value to use if configured is NULL.
+ * @param max_len the length of the maximum length of value.
  * @see [configure_bool]
  * @see [configure_u64]
  * @see [configure_u128]
  */
-void configure_string(char* value, char* configured, char* d, int len);
+void configure_string(char* value, char* configured, char* d, int max_len);
 
 #endif /* _CONFIG_BASE__ */
