@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		 <p align="center">
-                        Code Coverage is currently 94.39%.
+                        Code Coverage is currently 96.83%.
                 </p>
 		<center>
 			<div class="chart">
@@ -72,7 +72,8 @@
 84.76,
 94.15,
 94.15,
-94.39,];
+94.39,
+96.83,];
 			let labels = [format_date(1716876818 * 1000 ),
 format_date(1716876822 * 1000 ),
 format_date(1716904488 * 1000 ),
@@ -92,7 +93,8 @@ format_date(1716909696 * 1000 ),
 format_date(1716920268 * 1000 ),
 format_date(1717294283 * 1000 ),
 format_date(1717311812 * 1000 ),
-format_date(1717380318 * 1000 ),];
+format_date(1717380318 * 1000 ),
+format_date(1717381641 * 1000 ),];
 
 			const data = {
 				labels: labels,
@@ -122,7 +124,7 @@ format_date(1717380318 * 1000 ),];
 			<textarea readonly class="textarea" rows="50" cols="100">        -:    0:Source:log.c
         -:    0:Graph:./log.gcno
         -:    0:Data:./log.gcda
-        -:    0:Runs:18
+        -:    0:Runs:19
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -160,37 +162,37 @@ format_date(1717380318 * 1000 ),];
         -:   35:
         -:   36:#define _FILE_OFFSET_BITS 64
         -:   37:
-       65:   38:u64 log_now()
+       66:   38:u64 log_now()
         -:   39:{
         -:   40:    struct timeval tv;
-       65:   41:    gettimeofday(&tv, NULL);
+       66:   41:    gettimeofday(&tv, NULL);
         -:   42:
-       65:   43:    u64 ret = (u64)(tv.tv_sec) * 1000 + (u64)(tv.tv_usec) / 1000;
+       66:   43:    u64 ret = (u64)(tv.tv_sec) * 1000 + (u64)(tv.tv_usec) / 1000;
         -:   44:
-       65:   45:    return ret;
+       66:   45:    return ret;
         -:   46:}
         -:   47:
-       82:   48:int sprintf_err(char* str, const char* string, ...)
+       92:   48:int sprintf_err(char* str, const char* string, ...)
         -:   49:{
         -:   50:    va_list args;
-       82:   51:    va_start(args, string);
-       82:   52:    int ret = vsprintf(str, string, args);
-       82:   53:    va_end(args);
-       82:   54:    return (ret > 0) ? 0 : ret;
+       92:   51:    va_start(args, string);
+       92:   52:    int ret = vsprintf(str, string, args);
+       92:   53:    va_end(args);
+       92:   54:    return (ret > 0) ? 0 : ret;
         -:   55:}
         -:   56:
-       79:   57:int set_option(Log* log, int type, void* value)
+       82:   57:int set_option(Log* log, int type, void* value)
         -:   58:{
-       79:   59:    if (value == NULL) {
+       82:   59:    if (value == NULL) {
         2:   60:        fputs("error: value pointer cannot be NULL\n", stderr);
         2:   61:        return -1;
         -:   62:    }
-       77:   63:    if (type == ShowColors) {
-       13:   64:        log->show_colors = *((bool*)value);
-       64:   65:    } else if (type == ShowStdout) {
-        9:   66:        log->show_stdout = *((bool*)value);
-       55:   67:    } else if (type == ShowTimestamp) {
-        2:   68:        log->show_timestamp = *((bool*)value);
+       80:   63:    if (type == ShowColors) {
+       14:   64:        log->show_colors = *((bool*)value);
+       66:   65:    } else if (type == ShowStdout) {
+       10:   66:        log->show_stdout = *((bool*)value);
+       56:   67:    } else if (type == ShowTimestamp) {
+        3:   68:        log->show_timestamp = *((bool*)value);
        53:   69:    } else if (type == ShowMillis) {
         7:   70:        log->show_millis = *((bool*)value);
        46:   71:    } else if (type == ShowLogLevel) {
@@ -248,36 +250,36 @@ format_date(1717380318 * 1000 ),];
        10:  123:        log->file_header = tmp;
         -:  124:    }
         -:  125:
-       70:  126:    return 0;
+       73:  126:    return 0;
         -:  127:}
         -:  128:
-       29:  129:int do_logger(Log* log, int num, va_list valist)
+       30:  129:int do_logger(Log* log, int num, va_list valist)
         -:  130:{
-       29:  131:    int ret = 0;
+       30:  131:    int ret = 0;
         -:  132:
         -:  133:    // set defaults
-       29:  134:    log->fp = NULL;
-       29:  135:    log->level = Info;
-       29:  136:    log->show_colors = true;
-       29:  137:    log->show_stdout = true;
-       29:  138:    log->show_timestamp = true;
-       29:  139:    log->show_millis = true;
-       29:  140:    log->show_log_level = true;
-       29:  141:    log->auto_rotate = false;
-       29:  142:    log->delete_rotation = false;
-       29:  143:    log->max_size_bytes = ULONG_MAX;
-       29:  144:    log->max_age_millis = ULONG_MAX;
-       29:  145:    log->path = NULL;
-       29:  146:    log->file_header = NULL;
-       29:  147:    log->off = 0;
-       29:  148:    log->last_rotation = log_now();
-       29:  149:    log->is_init = false;
-       29:  150:    log->debug_malloc = false;
+       30:  134:    log->fp = NULL;
+       30:  135:    log->level = Info;
+       30:  136:    log->show_colors = true;
+       30:  137:    log->show_stdout = true;
+       30:  138:    log->show_timestamp = true;
+       30:  139:    log->show_millis = true;
+       30:  140:    log->show_log_level = true;
+       30:  141:    log->auto_rotate = false;
+       30:  142:    log->delete_rotation = false;
+       30:  143:    log->max_size_bytes = ULONG_MAX;
+       30:  144:    log->max_age_millis = ULONG_MAX;
+       30:  145:    log->path = NULL;
+       30:  146:    log->file_header = NULL;
+       30:  147:    log->off = 0;
+       30:  148:    log->last_rotation = log_now();
+       30:  149:    log->is_init = false;
+       30:  150:    log->debug_malloc = false;
         -:  151:
         -:  152:    // iterate through arg list for overrides
-       96:  153:    for (int i = 0; i < num; i++) {
-       74:  154:        LogConfigOption next = va_arg(valist, LogConfigOption);
-       74:  155:        if (set_option(log, next.type, next.value)) {
+       99:  153:    for (int i = 0; i < num; i++) {
+       76:  154:        LogConfigOption next = va_arg(valist, LogConfigOption);
+       76:  155:        if (set_option(log, next.type, next.value)) {
         7:  156:            if (log->file_header != NULL)
         1:  157:                free(log->file_header);
         7:  158:            if (log->path != NULL)
@@ -288,7 +290,7 @@ format_date(1717380318 * 1000 ),];
         7:  163:            break;
         -:  164:        }
         -:  165:    }
-       29:  166:    return ret;
+       30:  166:    return ret;
         -:  167:}
         -:  168:
        28:  169:int logger(Log* log, int num, ...)
@@ -300,47 +302,47 @@ format_date(1717380318 * 1000 ),];
        28:  175:    return ret;
         -:  176:}
         -:  177:
-       20:  178:int get_format(Log* log, LogLevel level, char* buf)
+       23:  178:int get_format(Log* log, LogLevel level, char* buf)
         -:  179:{
-       20:  180:    int ret = 0;
+       23:  180:    int ret = 0;
         -:  181:    char milli_buf[14];
         -:  182:    char log_level_buf[20];
         -:  183:    char dt_buf[40];
         -:  184:    char spacing[2];
-       20:  185:    time_t t = time(NULL);
-       20:  186:    struct tm tm = *localtime(&t);
+       23:  185:    time_t t = time(NULL);
+       23:  186:    struct tm tm = *localtime(&t);
         -:  187:
-       20:  188:    if (log->show_millis) {
+       23:  188:    if (log->show_millis) {
         -:  189:        struct timeval time;
-       17:  190:        gettimeofday(&time, NULL);
-       17:  191:        int millis = time.tv_usec / 1000;
-       17:  192:        ret = sprintf_err(milli_buf, ".%03d", millis);
+       20:  190:        gettimeofday(&time, NULL);
+       20:  191:        int millis = time.tv_usec / 1000;
+       20:  192:        ret = sprintf_err(milli_buf, ".%03d", millis);
         -:  193:    } else {
         3:  194:        strcpy(milli_buf, "");
         -:  195:    }
         -:  196:
-       20:  197:    if (log->show_timestamp) {
-       18:  198:        strcpy(spacing, " ");
+       23:  197:    if (log->show_timestamp) {
+       19:  198:        strcpy(spacing, " ");
         -:  199:    } else {
-        2:  200:        strcpy(spacing, "");
+        4:  200:        strcpy(spacing, "");
         -:  201:    }
         -:  202:
-       20:  203:    if (log->show_log_level && ret == 0) {
-       19:  204:        if (level == Trace) {
+       23:  203:    if (log->show_log_level && ret == 0) {
+       22:  204:        if (level == Trace) {
         2:  205:            if (log->show_colors) {
         1:  206:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_YELLOW "TRACE" ANSI_COLOR_RESET ")", spacing);
         -:  207:            } else {
         1:  208:                ret = sprintf_err(log_level_buf, "%s(TRACE)", spacing);
         -:  209:            }
-       17:  210:        } else if (level == Debug) {
+       20:  210:        } else if (level == Debug) {
         4:  211:            if (log->show_colors) {
         1:  212:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_CYAN "DEBUG" ANSI_COLOR_RESET ")", spacing);
         -:  213:            } else {
         3:  214:                ret = sprintf_err(log_level_buf, "%s(DEBUG)", spacing);
         -:  215:            }
-       13:  216:        } else if (level == Info) {
-        7:  217:            if (log->show_colors) {
-        1:  218:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_GREEN "INFO" ANSI_COLOR_RESET ")", spacing);
+       16:  216:        } else if (level == Info) {
+       10:  217:            if (log->show_colors) {
+        4:  218:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_GREEN "INFO" ANSI_COLOR_RESET ")", spacing);
         -:  219:            } else {
         6:  220:                ret = sprintf_err(log_level_buf, "%s(INFO)", spacing);
         -:  221:            }
@@ -367,15 +369,15 @@ format_date(1717380318 * 1000 ),];
         1:  242:        strcpy(log_level_buf, "");
         -:  243:    }
         -:  244:
-       20:  245:    if (log->show_timestamp && ret == 0) {
-       18:  246:        if (log->show_colors) {
-        6:  247:            ret = sprintf_err(
+       23:  245:    if (log->show_timestamp && ret == 0) {
+       19:  246:        if (log->show_colors) {
+        7:  247:            ret = sprintf_err(
         -:  248:                dt_buf,
         -:  249:                "[" ANSI_COLOR_DIMMED
         -:  250:                "%d-%02d-%02d %02d:%02d:%02d%s" ANSI_COLOR_RESET
         -:  251:                "]",
-        6:  252:                tm.tm_year + 1900,
-        6:  253:                tm.tm_mon + 1,
+        7:  252:                tm.tm_year + 1900,
+        7:  253:                tm.tm_mon + 1,
         -:  254:                tm.tm_mday,
         -:  255:                tm.tm_hour,
         -:  256:                tm.tm_min,
@@ -396,66 +398,66 @@ format_date(1717380318 * 1000 ),];
         -:  271:                milli_buf);
         -:  272:        }
         -:  273:    } else {
-        2:  274:        strcpy(dt_buf, "");
+        4:  274:        strcpy(dt_buf, "");
         -:  275:    }
         -:  276:
-       20:  277:    if ((level == Info || level == Warn) && log->show_log_level) {
-        9:  278:        strcpy(spacing, ":");
+       23:  277:    if ((level == Info || level == Warn) && log->show_log_level) {
+       12:  278:        strcpy(spacing, ":");
         -:  279:    } else {
        11:  280:        strcpy(spacing, "");
         -:  281:    }
         -:  282:
-       20:  283:    if (ret == 0) {
-       20:  284:        ret = sprintf_err(
+       23:  283:    if (ret == 0) {
+       23:  284:        ret = sprintf_err(
         -:  285:            buf,
         -:  286:            "%s%s%s: ",
         -:  287:            dt_buf,
         -:  288:            log_level_buf,
         -:  289:            spacing);
         -:  290:    }
-       20:  291:    return ret;
+       23:  291:    return ret;
         -:  292:}
         -:  293:
-       87:  294:int do_log(Log* log, LogLevel level, char* line, bool is_plain, bool is_all, va_list args)
+       90:  294:int do_log(Log* log, LogLevel level, char* line, bool is_plain, bool is_all, va_list args)
         -:  295:{
-       87:  296:    int ret = 0;
-       87:  297:    if (!log->is_init) {
+       90:  296:    int ret = 0;
+       90:  297:    if (!log->is_init) {
         1:  298:        fputs("error: log has not been initialized\n", stderr);
         1:  299:        return -1;
         -:  300:    }
         -:  301:
-       86:  302:    if (level >= log->level) {
+       89:  302:    if (level >= log->level) {
         -:  303:        va_list args_copy;
-       81:  304:        va_copy(args_copy, args);
+       84:  304:        va_copy(args_copy, args);
         -:  305:
-       81:  306:        int len = strlen(line);
-       81:  307:        char fline[len + 100];
+       84:  306:        int len = strlen(line);
+       84:  307:        char fline[len + 100];
         -:  308:
-       81:  309:        if (is_plain) {
+       84:  309:        if (is_plain) {
        61:  310:            strcpy(fline, "");
         -:  311:        } else {
-       20:  312:            ret = get_format(log, level, fline);
+       23:  312:            ret = get_format(log, level, fline);
         -:  313:        }
-       81:  314:        strcat(fline, line);
-       81:  315:        strcat(fline, "\n");
+       84:  314:        strcat(fline, line);
+       84:  315:        strcat(fline, "\n");
         -:  316:
-       81:  317:        if ((log->show_stdout || is_all) && ret == 0) {
-       34:  318:            int v = vprintf(fline, args);
-       34:  319:	    ret = (v > 0) ? 0 : v;
+       84:  317:        if ((log->show_stdout || is_all) && ret == 0) {
+       37:  318:            int v = vprintf(fline, args);
+       37:  319:	    ret = (v > 0) ? 0 : v;
         -:  320:        }
         -:  321:
-       81:  322:        if (log->fp && ret == 0) {
+       84:  322:        if (log->fp && ret == 0) {
        81:  323:            int v = vfprintf(log->fp, fline, args_copy);
        81:  324:	    ret = (v > 0) ? 0 : v;
        81:  325:            log->off = ftello(log->fp);
         -:  326:        }
-       81:  327:        if (log->auto_rotate && ret == 0) {
+       84:  327:        if (log->auto_rotate && ret == 0) {
        12:  328:            if (log_need_rotate(log)) {
         2:  329:                ret = log_rotate(log);
         -:  330:            }
         -:  331:        }
         -:  332:    }
-       86:  333:    return ret;
+       89:  333:    return ret;
         -:  334:}
         -:  335:
         2:  336:int log_all(Log* log, LogLevel level, char* line, ...)
@@ -485,18 +487,18 @@ format_date(1717380318 * 1000 ),];
        21:  360:    return ret;
         -:  361:}
         -:  362:
-        6:  363:void log_set_level(Log* log, LogLevel level)
+        9:  363:void log_set_level(Log* log, LogLevel level)
         -:  364:{
-        6:  365:    log->level = level;
-        6:  366:}
+        9:  365:    log->level = level;
+        9:  366:}
         -:  367:
-       21:  368:int log_init(Log* log)
+       22:  368:int log_init(Log* log)
         -:  369:{
-       21:  370:    if (log->is_init) {
+       22:  370:    if (log->is_init) {
         1:  371:        fputs("error: log has already been initialized\n", stderr);
         1:  372:        return -1;
         -:  373:    }
-       20:  374:    if (log->path) {
+       21:  374:    if (log->path) {
        17:  375:        bool write_header = false;
        17:  376:        if (log->file_header && access(log->path, F_OK) != 0) {
         6:  377:            write_header = true;
@@ -508,22 +510,22 @@ format_date(1717380318 * 1000 ),];
        17:  383:        fseek(log->fp, 0, SEEK_END);
        17:  384:        log->off = ftello(log->fp);
         -:  385:    }
-       20:  386:    log->is_init = true;
-       20:  387:    return 0;
+       21:  386:    log->is_init = true;
+       21:  387:    return 0;
         -:  388:}
         -:  389:
-        8:  390:int log_set_config_option(Log* log, LogConfigOption option)
+        9:  390:int log_set_config_option(Log* log, LogConfigOption option)
         -:  391:{
-        8:  392:    if (!log->is_init) {
+        9:  392:    if (!log->is_init) {
         1:  393:        fputs("error: log has not been initialized\n", stderr);
         1:  394:        return -1;
         -:  395:    }
-        7:  396:    if (option.type == LogFilePath && !log->debug_malloc) { // bypass this when we're debugging malloc
+        8:  396:    if (option.type == LogFilePath && !log->debug_malloc) { // bypass this when we're debugging malloc
         2:  397:        fputs("error: cannot change log file path after initialization\n", stderr);
         2:  398:        return -1;
         -:  399:    }
         -:  400:
-        5:  401:    return set_option(log, option.type, option.value);
+        6:  401:    return set_option(log, option.type, option.value);
         -:  402:}
         -:  403:
         9:  404:int log_rotate(Log* log)
@@ -620,44 +622,44 @@ format_date(1717380318 * 1000 ),];
        16:  495:    return 0;
         -:  496:}
         -:  497:
-       77:  498:int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug_malloc_err, void* value)
+       80:  498:int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug_malloc_err, void* value)
         -:  499:{
-       77:  500:    int ret = 0;
+       80:  500:    int ret = 0;
         -:  501:
-       77:  502:    option->value = malloc(size);
-       77:  503:    if (option->value == NULL || debug_malloc_err) {
+       80:  502:    option->value = malloc(size);
+       80:  503:    if (option->value == NULL || debug_malloc_err) {
         1:  504:        ret = -1;
         1:  505:        fputs("error: Could not allocate the required memory\n", stderr);
         -:  506:    }
         -:  507:
-       77:  508:    return ret;
+       80:  508:    return ret;
         -:  509:}
         -:  510:
-       13:  511:int log_config_option_show_colors(LogConfigOption* option, bool value)
+       14:  511:int log_config_option_show_colors(LogConfigOption* option, bool value)
         -:  512:{
-       13:  513:    option->type = ShowColors;
-       13:  514:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
-       13:  515:    if (!ret)
-       13:  516:        *((bool*)option->value) = value;
-       13:  517:    return ret;
+       14:  513:    option->type = ShowColors;
+       14:  514:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
+       14:  515:    if (!ret)
+       14:  516:        *((bool*)option->value) = value;
+       14:  517:    return ret;
         -:  518:}
         -:  519:
-        9:  520:int log_config_option_show_stdout(LogConfigOption* option, bool value)
+       10:  520:int log_config_option_show_stdout(LogConfigOption* option, bool value)
         -:  521:{
-        9:  522:    option->type = ShowStdout;
-        9:  523:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
-        9:  524:    if (!ret)
-        9:  525:        *((bool*)option->value) = value;
-        9:  526:    return ret;
+       10:  522:    option->type = ShowStdout;
+       10:  523:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
+       10:  524:    if (!ret)
+       10:  525:        *((bool*)option->value) = value;
+       10:  526:    return ret;
         -:  527:}
         -:  528:
-        2:  529:int log_config_option_show_timestamp(LogConfigOption* option, bool value)
+        3:  529:int log_config_option_show_timestamp(LogConfigOption* option, bool value)
         -:  530:{
-        2:  531:    option->type = ShowTimestamp;
-        2:  532:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
-        2:  533:    if (!ret)
-        2:  534:        *((bool*)option->value) = value;
-        2:  535:    return ret;
+        3:  531:    option->type = ShowTimestamp;
+        3:  532:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
+        3:  533:    if (!ret)
+        3:  534:        *((bool*)option->value) = value;
+        3:  535:    return ret;
         -:  536:}
         -:  537:
         7:  538:int log_config_option_show_millis(LogConfigOption* option, bool value)
@@ -744,11 +746,11 @@ format_date(1717380318 * 1000 ),];
        13:  619:    return ret;
         -:  620:}
         -:  621:
-       69:  622:void log_config_option_free(LogConfigOption* option)
+       72:  622:void log_config_option_free(LogConfigOption* option)
         -:  623:{
-       69:  624:    if (option->value != NULL)
-       67:  625:        free(option->value);
-       69:  626:}
+       72:  624:    if (option->value != NULL)
+       70:  625:        free(option->value);
+       72:  626:}
         -:  627:
        21:  628:void log_free(Log* log)
         -:  629:{
@@ -762,12 +764,12 @@ format_date(1717380318 * 1000 ),];
         -:  637:Log _global_logger__;
         -:  638:bool _global_logger_is_init__ = false;
         -:  639:
-        4:  640:int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char* line, ...)
+        7:  640:int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char* line, ...)
         -:  641:{
-        4:  642:    int ret = 0;
-        4:  643:    pthread_mutex_lock(&_global_logger_mutex__);
+        7:  642:    int ret = 0;
+        7:  643:    pthread_mutex_lock(&_global_logger_mutex__);
         -:  644:
-        4:  645:    if (!_global_logger_is_init__) {
+        7:  645:    if (!_global_logger_is_init__) {
         1:  646:        ret = logger(&_global_logger__, 0);
         1:  647:        if (ret == 0)
         1:  648:            ret = log_init(&_global_logger__);
@@ -775,38 +777,38 @@ format_date(1717380318 * 1000 ),];
         1:  650:            _global_logger_is_init__ = true;
         -:  651:    }
         -:  652:
-        4:  653:    if (ret == 0) {
-        4:  654:        log_set_level(&_global_logger__, global);
+        7:  653:    if (ret == 0) {
+        7:  654:        log_set_level(&_global_logger__, global);
         -:  655:
         -:  656:        va_list args;
-        4:  657:        va_start(args, line);
-        4:  658:        ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
-        4:  659:        va_end(args);
+        7:  657:        va_start(args, line);
+        7:  658:        ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
+        7:  659:        va_end(args);
         -:  660:    }
         -:  661:
-        4:  662:    pthread_mutex_unlock(&_global_logger_mutex__);
-        4:  663:    return ret;
+        7:  662:    pthread_mutex_unlock(&_global_logger_mutex__);
+        7:  663:    return ret;
         -:  664:}
         -:  665:
-        2:  666:int init_global_logger(int num, ...)
+        3:  666:int init_global_logger(int num, ...)
         -:  667:{
-        2:  668:    if (_global_logger_is_init__)
+        3:  668:    if (_global_logger_is_init__)
         1:  669:        return -1;
-        1:  670:    int ret = 0;
-        1:  671:    pthread_mutex_lock(&_global_logger_mutex__);
+        2:  670:    int ret = 0;
+        2:  671:    pthread_mutex_lock(&_global_logger_mutex__);
         -:  672:
         -:  673:    va_list valist;
-        1:  674:    va_start(valist, num);
-        1:  675:    ret = do_logger(&_global_logger__, num, valist);
-        1:  676:    va_end(valist);
+        2:  674:    va_start(valist, num);
+        2:  675:    ret = do_logger(&_global_logger__, num, valist);
+        2:  676:    va_end(valist);
         -:  677:
-        1:  678:    if (ret == 0)
-        1:  679:        ret = log_init(&_global_logger__);
-        1:  680:    if (ret == 0)
-        1:  681:        _global_logger_is_init__ = true;
+        2:  678:    if (ret == 0)
+        2:  679:        ret = log_init(&_global_logger__);
+        2:  680:    if (ret == 0)
+        2:  681:        _global_logger_is_init__ = true;
         -:  682:
-        1:  683:    pthread_mutex_unlock(&_global_logger_mutex__);
-        1:  684:    return ret;
+        2:  683:    pthread_mutex_unlock(&_global_logger_mutex__);
+        2:  684:    return ret;
         -:  685:}
         -:  686:
         1:  687:int global_log_rotate()
@@ -825,12 +827,12 @@ format_date(1717380318 * 1000 ),];
         1:  700:    return ret;
         -:  701:}
         -:  702:
-        1:  703:int global_log_config_option(LogConfigOption option)
+        2:  703:int global_log_config_option(LogConfigOption option)
         -:  704:{
-        1:  705:    pthread_mutex_lock(&_global_logger_mutex__);
-        1:  706:    int ret = log_set_config_option(&_global_logger__, option);
-        1:  707:    pthread_mutex_unlock(&_global_logger_mutex__);
-        1:  708:    return ret;
+        2:  705:    pthread_mutex_lock(&_global_logger_mutex__);
+        2:  706:    int ret = log_set_config_option(&_global_logger__, option);
+        2:  707:    pthread_mutex_unlock(&_global_logger_mutex__);
+        2:  708:    return ret;
         -:  709:}
         -:  710:
         1:  711:void _debug_global_logger_is_init__()
@@ -937,7 +939,7 @@ format_date(1717380318 * 1000 ),];
         -:    0:Source:rand.c
         -:    0:Graph:./rand.gcno
         -:    0:Data:./rand.gcda
-        -:    0:Runs:21
+        -:    0:Runs:22
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1041,8 +1043,8 @@ format_date(1717380318 * 1000 ),];
         -:  101:}
         -:    0:Source:main.c
         -:    0:Graph:./main.gcno
-        -:    0:Data:-
-        -:    0:Runs:0
+        -:    0:Data:./main.gcda
+        -:    0:Runs:1
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1063,25 +1065,29 @@ format_date(1717380318 * 1000 ),];
         -:   18:
         -:   19:#define LOG_LEVEL Info
         -:   20:
-    #####:   21:int main(int argc, char** argv)
+        1:   21:int real_main(int argc, char** argv)
         -:   22:{
         -:   23:    LogConfigOption opt1, opt2, opt3;
-    #####:   24:    log_config_option_show_colors(&opt1, true);
-    #####:   25:    log_config_option_show_stdout(&opt2, true);
-    #####:   26:    log_config_option_show_timestamp(&opt3, false);
+        1:   24:    log_config_option_show_colors(&opt1, true);
+        1:   25:    log_config_option_show_stdout(&opt2, true);
+        1:   26:    log_config_option_show_timestamp(&opt3, false);
         -:   27:
-    #####:   28:    init_global_logger(2, opt1, opt2);
-    #####:   29:    log_config_option_free(&opt1);
-    #####:   30:    log_config_option_free(&opt2);
-    #####:   31:    info("Main currently doesn't do %s.", "anything");
-    #####:   32:    global_log_config_option(opt3);
-    #####:   33:    log_config_option_free(&opt3);
-    #####:   34:    info("Main currently doesn't do %s.", "anything");
-    #####:   35:    info("end");
+        1:   28:    init_global_logger(2, opt1, opt2);
+        1:   29:    log_config_option_free(&opt1);
+        1:   30:    log_config_option_free(&opt2);
+        1:   31:    info("Main currently doesn't do %s.", "anything");
+        1:   32:    global_log_config_option(opt3);
+        1:   33:    log_config_option_free(&opt3);
+        1:   34:    info("Main currently doesn't do %s.", "anything");
+        1:   35:    info("end");
         -:   36:
-    #####:   37:    return 0;
+        1:   37:    return 0;
         -:   38:}
-        -:   39: 
+        -:   39:
+        1:   40:int main(int argc, char **argv) {
+        1:   41:    return real_main(argc, argv);
+        -:   42:}
+        -:   43:
         -:    0:Source:misc.c
         -:    0:Graph:./misc.gcno
         -:    0:Data:-
