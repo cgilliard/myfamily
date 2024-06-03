@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['error_40',['error',['../log_8h.html#a7d7070fdf73d3215fef7d365c16c5bbe',1,'log.h']]],
-  ['error_41',['Error',['../log_8h.html#aca1fd1d8935433e6ba2e3918214e07f9a4dfd42ec49d09d8c6555c218301cc30f',1,'log.h']]],
-  ['error_5fall_42',['error_all',['../log_8h.html#a1e39b9676c5bd35ffc52de568ff1cdfb',1,'log.h']]],
-  ['error_5fplain_43',['error_plain',['../log_8h.html#ab9752a89203d7e5299aed6319c9aa8e5',1,'log.h']]]
+  ['global_5flog_5fconfig_5foption_18',['global_log_config_option',['../log_8h.html#ace1c421b6f4dd1669021e603bf5b3fcd',1,'log.h']]],
+  ['global_5flog_5fneed_5frotate_19',['global_log_need_rotate',['../log_8h.html#a04be19831334d10533337bd021de83b0',1,'log.h']]],
+  ['global_5flog_5frotate_20',['global_log_rotate',['../log_8h.html#aecf7ab136f8858a9c4e9017bcb9c4fbe',1,'log.h']]]
 ];

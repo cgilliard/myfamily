@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['path_118',['path',['../structLog.html#a9ad31ffa5a8db6d7ebb8408ed48f4d0a',1,'Log']]],
-  ['pathseparator_119',['PathSeparator',['../log_8c.html#a081742a3398152ceb8694674ffd21c37',1,'log.c']]]
+  ['warn_91',['warn',['../log_8h.html#a457f952f04f31b77c838fe5d2f7c74d0',1,'log.h']]],
+  ['warn_5fall_92',['warn_all',['../log_8h.html#a587a517d458e391ad709db2050bb6367',1,'log.h']]],
+  ['warn_5fplain_93',['warn_plain',['../log_8h.html#ac3c36cce02110e1246861eafcaa45b9f',1,'log.h']]]
 ];

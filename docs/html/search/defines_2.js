@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['debug_303',['debug',['../log_8h.html#a25e1dd06859fa7bb2d4bb79972446ea2',1,'log.h']]],
-  ['debug_5fall_304',['debug_all',['../log_8h.html#a78b65d83e502a52028e6fd78f88efc35',1,'log.h']]],
-  ['debug_5fflag_5foom_305',['DEBUG_FLAG_OOM',['../constants_8h.html#aa0b8e6fb9df134cb13d21b38625674ba',1,'constants.h']]],
-  ['debug_5fflag_5fprint_5ftokens_306',['DEBUG_FLAG_PRINT_TOKENS',['../constants_8h.html#a8f773f59aeb9e931b01f21ac737afa05',1,'constants.h']]],
-  ['debug_5fplain_307',['debug_plain',['../log_8h.html#afc5ef2b08266200dad700bfdd498ff3d',1,'log.h']]]
+  ['fatal_163',['fatal',['../log_8h.html#a191cbe8316c8b0b2e6a1d5c0874cb9b1',1,'log.h']]],
+  ['fatal_5fall_164',['fatal_all',['../log_8h.html#a1cfe9495780fc55deb9785428c06f57e',1,'log.h']]],
+  ['fatal_5fplain_165',['fatal_plain',['../log_8h.html#a47b44bb8257c88e6849c714e8eafad59',1,'log.h']]]
 ];
