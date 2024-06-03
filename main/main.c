@@ -18,7 +18,7 @@
 
 #define LOG_LEVEL Info
 
-int main(int argc, char** argv)
+int real_main(int argc, char** argv)
 {
     LogConfigOption opt1, opt2, opt3;
     log_config_option_show_colors(&opt1, true);
@@ -36,4 +36,8 @@ int main(int argc, char** argv)
 
     return 0;
 }
- 
+
+int main(int argc, char **argv) {
+    return real_main(argc, argv);
+}
+
