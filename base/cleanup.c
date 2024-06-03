@@ -12,18 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <criterion/criterion.h>
-#include <util/slabs.h>
-
-Test(test, util)
-{
-    int x = 1;
-    int y = 1;
-    cr_assert_eq(x, y);
-}
-
-Test(util, slabs) {
-	SlabData sd;
-
-	slab_data_init(&sd, 512 * 1024);	
-}
+#include <base/cleanup.h>

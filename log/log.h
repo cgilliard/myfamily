@@ -55,6 +55,8 @@ struct LogConfigOption {
 };
 typedef struct LogConfigOption LogConfigOption;
 
+#define AutoLogConfigOption LogConfigOption CLEANUP(log_config_option_free)
+
 enum LogLevel {
     Trace = 0,
     Debug = 1,

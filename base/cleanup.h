@@ -12,18 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <criterion/criterion.h>
-#include <util/slabs.h>
+#ifndef __CLEANUP_BASE_
+#define __CLEANUP_BASE_
 
-Test(test, util)
-{
-    int x = 1;
-    int y = 1;
-    cr_assert_eq(x, y);
-}
+// Ensure the cleanup attribute is available
+#ifdef __GNUC__
+#define CLEANUP(f) __attribute__((cleanup(f)))
+#else
+#define CLEANUP(f)
+#endif
 
-Test(util, slabs) {
-	SlabData sd;
-
-	slab_data_init(&sd, 512 * 1024);	
-}
+#endif // __CLEANUP_BASE_

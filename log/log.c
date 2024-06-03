@@ -621,8 +621,10 @@ int log_config_option_file_header(LogConfigOption* option, char* value)
 
 void log_config_option_free(LogConfigOption* option)
 {
-    if (option->value != NULL)
+    if (option->value != NULL) {
         free(option->value);
+	option->value = NULL;
+    }
 }
 
 void log_free(Log* log)
