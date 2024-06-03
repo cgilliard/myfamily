@@ -21,6 +21,7 @@
 #include <base/types.h>
 #include <stdio.h>
 #include <time.h>
+#include <base/cleanup.h>
 
 #define _FILE_OFFSET_BITS 64
 

@@ -629,10 +629,14 @@ void log_config_option_free(LogConfigOption* option)
 
 void log_free(Log* log)
 {
-    if (log->path)
+    if (log->path) {
         free(log->path);
-    if (log->file_header)
+	log->path = NULL;
+    }
+    if (log->file_header) {
         free(log->file_header);
+	log->file_header = NULL;
+    }
 }
 
 pthread_mutex_t _global_logger_mutex__ = PTHREAD_MUTEX_INITIALIZER;
