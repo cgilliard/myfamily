@@ -1,6 +1,9 @@
 var searchData=
 [
-  ['warn_92',['warn',['../log_8h.html#a457f952f04f31b77c838fe5d2f7c74d0',1,'log.h']]],
-  ['warn_5fall_93',['warn_all',['../log_8h.html#a587a517d458e391ad709db2050bb6367',1,'log.h']]],
-  ['warn_5fplain_94',['warn_plain',['../log_8h.html#ac3c36cce02110e1246861eafcaa45b9f',1,'log.h']]]
+  ['test_117',['Test',['../base_2test_8c.html#a32f06b5636ba86531d5eb4c6473030c3',1,'Test(base, rand):&#160;test.c'],['../base_2test_8c.html#a65c1cfdfc27d7b9a7937ecc022ed412b',1,'Test(base, config):&#160;test.c'],['../main_2test_8c.html#a5a8c507d7faba0830e7c09d5ffd5156c',1,'Test(test, main):&#160;test.c'],['../util_2test_8c.html#aa9687fd59f68ac8393a870aae0dc52d7',1,'Test(test, util):&#160;test.c'],['../util_2test_8c.html#ad363b5d77ae366056d568b9312b925c4',1,'Test(util, slabs):&#160;test.c']]],
+  ['test_2ec_118',['test.c',['../base_2test_8c.html',1,'(Global Namespace)'],['../main_2test_8c.html',1,'(Global Namespace)'],['../util_2test_8c.html',1,'(Global Namespace)']]],
+  ['trace_119',['trace',['../log_8h.html#a97ccf336cdfa5d81377d0bb8112257bc',1,'log.h']]],
+  ['trace_5fall_120',['trace_all',['../log_8h.html#a3a24c2abda1e079aa56511f4f44bb54b',1,'log.h']]],
+  ['trace_5fplain_121',['trace_plain',['../log_8h.html#a60ecd23b3fee80cf380b4c298b1d2bef',1,'log.h']]],
+  ['types_2eh_122',['types.h',['../types_8h.html',1,'']]]
 ];
