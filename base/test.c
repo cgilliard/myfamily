@@ -15,6 +15,7 @@
 #include <base/config.h>
 #include <base/rand.h>
 #include <base/types.h>
+#include <base/ser.h>
 #include <criterion/criterion.h>
 #include <inttypes.h>
 #include <stdbool.h>
@@ -164,3 +165,38 @@ Test(base, config)
     configure_string(s1, s2, "333", 100);
     cr_assert_eq(strcmp(s1, "test2"), 0);
 }
+
+Test(base, ser) {
+	
+	unsigned char *buffer = malloc(sizeof(unsigned char) * 16);
+	Reader reader = READER(bin_reader_read_fixed_bytes, buffer);
+        Writer writer = WRITER(bin_writer_write_fixed_bytes, buffer);
+
+	u64 x = 111001023;
+	u64 y = 222;
+	u64 a = 0;
+	u64 b = 0;
+
+	Serializable sx = SER(&x,  serialize_u64, deserialize_u64);
+	Serializable sy = SER(&y, serialize_u64, deserialize_u64);
+	Serializable sa = SER(&a, serialize_u64, deserialize_u64);
+        Serializable sb = SER(&b, serialize_u64, deserialize_u64);
+
+	serialize(&sx, &writer);
+	serialize(&sy, &writer);
+
+	deserialize(&sa, &reader);
+	deserialize(&sb, &reader);
+
+	cr_assert_eq(a, 111001023);
+        cr_assert_eq(b, 222);
+
+	int x1;
+	float f1;
+	u64 u1;
+	printf("type(int)=%s\n", TYPE_NAME(x1));
+	printf("type(float)=%s\n", TYPE_NAME(f1));
+
+	free(buffer);
+}
+

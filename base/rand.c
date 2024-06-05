@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/rand.h>
+#include <base/types.h>
 #include <sys/random.h>
 
 int rand_i8(i8* v)
@@ -47,35 +48,35 @@ int rand_u16(u16* v)
     return ret;
 }
 
-int rand_i32(int32_t* v)
+int rand_i32(i32* v)
 {
     char buf[4];
     int ret = getentropy(buf, 4);
-    *v = ((int32_t)buf[0] << 24) + ((int32_t)buf[1] << 16) + ((int32_t)buf[2] << 8) + (int32_t)buf[3];
+    *v = ((i32)buf[0] << 24) + ((i32)buf[1] << 16) + ((i32)buf[2] << 8) + (i32)buf[3];
     return ret;
 }
 
-int rand_u32(uint32_t* v)
+int rand_u32(u32* v)
 {
     char buf[4];
     int ret = getentropy(buf, 4);
-    *v = ((uint32_t)buf[0] << 24) + ((uint32_t)buf[1] << 16) + ((uint32_t)buf[2] << 8) + (uint32_t)buf[3];
+    *v = ((u32)buf[0] << 24) + ((u32)buf[1] << 16) + ((u32)buf[2] << 8) + (u32)buf[3];
     return ret;
 }
 
-int rand_i64(int64_t* v)
+int rand_i64(i64* v)
 {
     char buf[8];
     int ret = getentropy(buf, 8);
-    *v = ((int64_t)buf[0] << 56) + ((int64_t)buf[1] << 48) + ((int64_t)buf[2] << 40) + ((int64_t)buf[3] << 32) + ((int64_t)buf[4] << 24) + ((int64_t)buf[5] << 16) + ((int64_t)buf[6] << 8) + (int64_t)buf[7];
+    *v = ((i64)buf[0] << 56) + ((i64)buf[1] << 48) + ((i64)buf[2] << 40) + ((i64)buf[3] << 32) + ((i64)buf[4] << 24) + ((i64)buf[5] << 16) + ((i64)buf[6] << 8) + (i64)buf[7];
     return ret;
 }
 
-int rand_u64(uint64_t* v)
+int rand_u64(u64* v)
 {
     char buf[8];
     int ret = getentropy(buf, 8);
-    *v = ((uint64_t)buf[0] << 56) + ((uint64_t)buf[1] << 48) + ((uint64_t)buf[2] << 40) + ((uint64_t)buf[3] << 32) + ((uint64_t)buf[4] << 24) + ((uint64_t)buf[5] << 16) + ((uint64_t)buf[6] << 8) + (uint64_t)buf[7];
+    *v = ((u64)buf[0] << 56) + ((u64)buf[1] << 48) + ((u64)buf[2] << 40) + ((u64)buf[3] << 32) + ((u64)buf[4] << 24) + ((u64)buf[5] << 16) + ((u64)buf[6] << 8) + (u64)buf[7];
     return ret;
 }
 
