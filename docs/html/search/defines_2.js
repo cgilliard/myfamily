@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['fatal_165',['fatal',['../log_8h.html#a191cbe8316c8b0b2e6a1d5c0874cb9b1',1,'log.h']]],
-  ['fatal_5fall_166',['fatal_all',['../log_8h.html#a1cfe9495780fc55deb9785428c06f57e',1,'log.h']]],
-  ['fatal_5fplain_167',['fatal_plain',['../log_8h.html#a47b44bb8257c88e6849c714e8eafad59',1,'log.h']]]
+  ['error_243',['error',['../log_8h.html#a7d7070fdf73d3215fef7d365c16c5bbe',1,'log.h']]],
+  ['error_5fall_244',['error_all',['../log_8h.html#a1e39b9676c5bd35ffc52de568ff1cdfb',1,'log.h']]],
+  ['error_5fplain_245',['error_plain',['../log_8h.html#ab9752a89203d7e5299aed6319c9aa8e5',1,'log.h']]]
 ];

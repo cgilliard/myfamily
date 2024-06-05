@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		 <p align="center">
-                        Code Coverage is currently 96.83%.
+                        Code Coverage is currently 85.76%.
                 </p>
 		<center>
 			<div class="chart">
@@ -74,7 +74,8 @@
 94.15,
 94.39,
 96.83,
-96.83,];
+96.83,
+85.76,];
 			let labels = [format_date(1716876818 * 1000 ),
 format_date(1716876822 * 1000 ),
 format_date(1716904488 * 1000 ),
@@ -96,7 +97,8 @@ format_date(1717294283 * 1000 ),
 format_date(1717311812 * 1000 ),
 format_date(1717380318 * 1000 ),
 format_date(1717381641 * 1000 ),
-format_date(1717398065 * 1000 ),];
+format_date(1717398065 * 1000 ),
+format_date(1717484462 * 1000 ),];
 
 			const data = {
 				labels: labels,
@@ -126,7 +128,7 @@ format_date(1717398065 * 1000 ),];
 			<textarea readonly class="textarea" rows="50" cols="100">        -:    0:Source:log.c
         -:    0:Graph:./log.gcno
         -:    0:Data:./log.gcda
-        -:    0:Runs:19
+        -:    0:Runs:22
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -280,7 +282,7 @@ format_date(1717398065 * 1000 ),];
         -:  151:
         -:  152:    // iterate through arg list for overrides
        99:  153:    for (int i = 0; i < num; i++) {
-       76:  154:        LogConfigOption next = va_arg(valist, LogConfigOption);
+       76:  154:        LogConfigOptionImpl next = va_arg(valist, LogConfigOptionImpl);
        76:  155:        if (set_option(log, next.type, next.value)) {
         7:  156:            if (log->file_header != NULL)
         1:  157:                free(log->file_header);
@@ -516,7 +518,7 @@ format_date(1717398065 * 1000 ),];
        21:  387:    return 0;
         -:  388:}
         -:  389:
-        9:  390:int log_set_config_option(Log* log, LogConfigOption option)
+        9:  390:int log_set_config_option(Log* log, LogConfigOptionImpl option)
         -:  391:{
         9:  392:    if (!log->is_init) {
         1:  393:        fputs("error: log has not been initialized\n", stderr);
@@ -624,7 +626,7 @@ format_date(1717398065 * 1000 ),];
        16:  495:    return 0;
         -:  496:}
         -:  497:
-       80:  498:int _log_allocate_config_option(LogConfigOption* option, size_t size, bool debug_malloc_err, void* value)
+       80:  498:int _log_allocate_config_option(LogConfigOptionImpl* option, size_t size, bool debug_malloc_err, void* value)
         -:  499:{
        80:  500:    int ret = 0;
         -:  501:
@@ -637,7 +639,7 @@ format_date(1717398065 * 1000 ),];
        80:  508:    return ret;
         -:  509:}
         -:  510:
-       14:  511:int log_config_option_show_colors(LogConfigOption* option, bool value)
+       14:  511:int log_config_option_show_colors(LogConfigOptionImpl* option, bool value)
         -:  512:{
        14:  513:    option->type = ShowColors;
        14:  514:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -646,7 +648,7 @@ format_date(1717398065 * 1000 ),];
        14:  517:    return ret;
         -:  518:}
         -:  519:
-       10:  520:int log_config_option_show_stdout(LogConfigOption* option, bool value)
+       10:  520:int log_config_option_show_stdout(LogConfigOptionImpl* option, bool value)
         -:  521:{
        10:  522:    option->type = ShowStdout;
        10:  523:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -655,7 +657,7 @@ format_date(1717398065 * 1000 ),];
        10:  526:    return ret;
         -:  527:}
         -:  528:
-        3:  529:int log_config_option_show_timestamp(LogConfigOption* option, bool value)
+        3:  529:int log_config_option_show_timestamp(LogConfigOptionImpl* option, bool value)
         -:  530:{
         3:  531:    option->type = ShowTimestamp;
         3:  532:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -664,7 +666,7 @@ format_date(1717398065 * 1000 ),];
         3:  535:    return ret;
         -:  536:}
         -:  537:
-        7:  538:int log_config_option_show_millis(LogConfigOption* option, bool value)
+        7:  538:int log_config_option_show_millis(LogConfigOptionImpl* option, bool value)
         -:  539:{
         7:  540:    option->type = ShowMillis;
         7:  541:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -673,7 +675,7 @@ format_date(1717398065 * 1000 ),];
         7:  544:    return ret;
         -:  545:}
         -:  546:
-        1:  547:int log_config_option_show_log_level(LogConfigOption* option, bool value)
+        1:  547:int log_config_option_show_log_level(LogConfigOptionImpl* option, bool value)
         -:  548:{
         1:  549:    option->type = ShowLogLevel;
         1:  550:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -682,7 +684,7 @@ format_date(1717398065 * 1000 ),];
         1:  553:    return ret;
         -:  554:}
         -:  555:
-        2:  556:int log_config_option_auto_rotate(LogConfigOption* option, bool value)
+        2:  556:int log_config_option_auto_rotate(LogConfigOptionImpl* option, bool value)
         -:  557:{
         2:  558:    option->type = AutoRotate;
         2:  559:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -691,7 +693,7 @@ format_date(1717398065 * 1000 ),];
         2:  562:    return ret;
         -:  563:}
         -:  564:
-        1:  565:int log_config_option_delete_rotation(LogConfigOption* option, bool value)
+        1:  565:int log_config_option_delete_rotation(LogConfigOptionImpl* option, bool value)
         -:  566:{
         1:  567:    option->type = DeleteRotation;
         1:  568:    int ret = _log_allocate_config_option(option, sizeof(bool), false, &value);
@@ -700,7 +702,7 @@ format_date(1717398065 * 1000 ),];
         1:  571:    return ret;
         -:  572:}
         -:  573:
-        6:  574:int log_config_option_max_size_bytes(LogConfigOption* option, u64 value)
+        6:  574:int log_config_option_max_size_bytes(LogConfigOptionImpl* option, u64 value)
         -:  575:{
         6:  576:    option->type = MaxSizeBytes;
         6:  577:    int ret = _log_allocate_config_option(option, sizeof(u64), false, &value);
@@ -709,7 +711,7 @@ format_date(1717398065 * 1000 ),];
         6:  580:    return ret;
         -:  581:}
         -:  582:
-        3:  583:int log_config_option_max_age_millis(LogConfigOption* option, u64 value)
+        3:  583:int log_config_option_max_age_millis(LogConfigOptionImpl* option, u64 value)
         -:  584:{
         3:  585:    option->type = MaxAgeMillis;
         3:  586:    int ret = _log_allocate_config_option(option, sizeof(u64), false, &value);
@@ -718,7 +720,7 @@ format_date(1717398065 * 1000 ),];
         3:  589:    return ret;
         -:  590:}
         -:  591:
-       21:  592:int log_config_option_log_file_path(LogConfigOption* option, char* value)
+       21:  592:int log_config_option_log_file_path(LogConfigOptionImpl* option, char* value)
         -:  593:{
        21:  594:    option->type = LogFilePath;
        21:  595:    int ret = 0;
@@ -733,7 +735,7 @@ format_date(1717398065 * 1000 ),];
        21:  604:    return ret;
         -:  605:}
         -:  606:
-       13:  607:int log_config_option_file_header(LogConfigOption* option, char* value)
+       13:  607:int log_config_option_file_header(LogConfigOptionImpl* option, char* value)
         -:  608:{
        13:  609:    option->type = FileHeader;
        13:  610:    int ret = 0;
@@ -748,99 +750,105 @@ format_date(1717398065 * 1000 ),];
        13:  619:    return ret;
         -:  620:}
         -:  621:
-       72:  622:void log_config_option_free(LogConfigOption* option)
+       72:  622:void log_config_option_free(LogConfigOptionImpl* option)
         -:  623:{
-       72:  624:    if (option->value != NULL)
+       72:  624:    if (option->value != NULL) {
        70:  625:        free(option->value);
-       72:  626:}
-        -:  627:
-       21:  628:void log_free(Log* log)
-        -:  629:{
-       21:  630:    if (log->path)
-       16:  631:        free(log->path);
-       21:  632:    if (log->file_header)
-        7:  633:        free(log->file_header);
-       21:  634:}
-        -:  635:
-        -:  636:pthread_mutex_t _global_logger_mutex__ = PTHREAD_MUTEX_INITIALIZER;
-        -:  637:Log _global_logger__;
-        -:  638:bool _global_logger_is_init__ = false;
-        -:  639:
-        7:  640:int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char* line, ...)
-        -:  641:{
-        7:  642:    int ret = 0;
-        7:  643:    pthread_mutex_lock(&_global_logger_mutex__);
-        -:  644:
-        7:  645:    if (!_global_logger_is_init__) {
-        1:  646:        ret = logger(&_global_logger__, 0);
-        1:  647:        if (ret == 0)
-        1:  648:            ret = log_init(&_global_logger__);
-        1:  649:        if (ret == 0)
-        1:  650:            _global_logger_is_init__ = true;
-        -:  651:    }
-        -:  652:
-        7:  653:    if (ret == 0) {
-        7:  654:        log_set_level(&_global_logger__, global);
-        -:  655:
-        -:  656:        va_list args;
-        7:  657:        va_start(args, line);
-        7:  658:        ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
-        7:  659:        va_end(args);
-        -:  660:    }
+       70:  626:	option->value = NULL;
+        -:  627:    }
+       72:  628:}
+        -:  629:
+       21:  630:void log_free(Log* log)
+        -:  631:{
+       21:  632:    if (log->path) {
+       16:  633:        free(log->path);
+       16:  634:	log->path = NULL;
+        -:  635:    }
+       21:  636:    if (log->file_header) {
+        7:  637:        free(log->file_header);
+        7:  638:	log->file_header = NULL;
+        -:  639:    }
+       21:  640:}
+        -:  641:
+        -:  642:pthread_mutex_t _global_logger_mutex__ = PTHREAD_MUTEX_INITIALIZER;
+        -:  643:Log _global_logger__;
+        -:  644:bool _global_logger_is_init__ = false;
+        -:  645:
+        7:  646:int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char* line, ...)
+        -:  647:{
+        7:  648:    int ret = 0;
+        7:  649:    pthread_mutex_lock(&_global_logger_mutex__);
+        -:  650:
+        7:  651:    if (!_global_logger_is_init__) {
+        1:  652:        ret = logger(&_global_logger__, 0);
+        1:  653:        if (ret == 0)
+        1:  654:            ret = log_init(&_global_logger__);
+        1:  655:        if (ret == 0)
+        1:  656:            _global_logger_is_init__ = true;
+        -:  657:    }
+        -:  658:
+        7:  659:    if (ret == 0) {
+        7:  660:        log_set_level(&_global_logger__, global);
         -:  661:
-        7:  662:    pthread_mutex_unlock(&_global_logger_mutex__);
-        7:  663:    return ret;
-        -:  664:}
-        -:  665:
-        3:  666:int init_global_logger(int num, ...)
-        -:  667:{
-        3:  668:    if (_global_logger_is_init__)
-        1:  669:        return -1;
-        2:  670:    int ret = 0;
-        2:  671:    pthread_mutex_lock(&_global_logger_mutex__);
-        -:  672:
-        -:  673:    va_list valist;
-        2:  674:    va_start(valist, num);
-        2:  675:    ret = do_logger(&_global_logger__, num, valist);
-        2:  676:    va_end(valist);
-        -:  677:
-        2:  678:    if (ret == 0)
-        2:  679:        ret = log_init(&_global_logger__);
-        2:  680:    if (ret == 0)
-        2:  681:        _global_logger_is_init__ = true;
-        -:  682:
-        2:  683:    pthread_mutex_unlock(&_global_logger_mutex__);
-        2:  684:    return ret;
-        -:  685:}
-        -:  686:
-        1:  687:int global_log_rotate()
-        -:  688:{
-        1:  689:    pthread_mutex_lock(&_global_logger_mutex__);
-        1:  690:    int ret = log_rotate(&_global_logger__);
-        1:  691:    pthread_mutex_unlock(&_global_logger_mutex__);
-        1:  692:    return ret;
-        -:  693:}
-        -:  694:
-        1:  695:bool global_log_need_rotate()
-        -:  696:{
-        1:  697:    pthread_mutex_lock(&_global_logger_mutex__);
-        1:  698:    bool ret = log_need_rotate(&_global_logger__);
-        1:  699:    pthread_mutex_unlock(&_global_logger_mutex__);
-        1:  700:    return ret;
-        -:  701:}
-        -:  702:
-        2:  703:int global_log_config_option(LogConfigOption option)
-        -:  704:{
-        2:  705:    pthread_mutex_lock(&_global_logger_mutex__);
-        2:  706:    int ret = log_set_config_option(&_global_logger__, option);
-        2:  707:    pthread_mutex_unlock(&_global_logger_mutex__);
-        2:  708:    return ret;
-        -:  709:}
-        -:  710:
-        1:  711:void _debug_global_logger_is_init__()
-        -:  712:{
-        1:  713:    _global_logger_is_init__ = false;
-        1:  714:}
+        -:  662:        va_list args;
+        7:  663:        va_start(args, line);
+        7:  664:        ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
+        7:  665:        va_end(args);
+        -:  666:    }
+        -:  667:
+        7:  668:    pthread_mutex_unlock(&_global_logger_mutex__);
+        7:  669:    return ret;
+        -:  670:}
+        -:  671:
+        3:  672:int init_global_logger(int num, ...)
+        -:  673:{
+        3:  674:    if (_global_logger_is_init__)
+        1:  675:        return -1;
+        2:  676:    int ret = 0;
+        2:  677:    pthread_mutex_lock(&_global_logger_mutex__);
+        -:  678:
+        -:  679:    va_list valist;
+        2:  680:    va_start(valist, num);
+        2:  681:    ret = do_logger(&_global_logger__, num, valist);
+        2:  682:    va_end(valist);
+        -:  683:
+        2:  684:    if (ret == 0)
+        2:  685:        ret = log_init(&_global_logger__);
+        2:  686:    if (ret == 0)
+        2:  687:        _global_logger_is_init__ = true;
+        -:  688:
+        2:  689:    pthread_mutex_unlock(&_global_logger_mutex__);
+        2:  690:    return ret;
+        -:  691:}
+        -:  692:
+        1:  693:int global_log_rotate()
+        -:  694:{
+        1:  695:    pthread_mutex_lock(&_global_logger_mutex__);
+        1:  696:    int ret = log_rotate(&_global_logger__);
+        1:  697:    pthread_mutex_unlock(&_global_logger_mutex__);
+        1:  698:    return ret;
+        -:  699:}
+        -:  700:
+        1:  701:bool global_log_need_rotate()
+        -:  702:{
+        1:  703:    pthread_mutex_lock(&_global_logger_mutex__);
+        1:  704:    bool ret = log_need_rotate(&_global_logger__);
+        1:  705:    pthread_mutex_unlock(&_global_logger_mutex__);
+        1:  706:    return ret;
+        -:  707:}
+        -:  708:
+        2:  709:int global_log_config_option(LogConfigOptionImpl option)
+        -:  710:{
+        2:  711:    pthread_mutex_lock(&_global_logger_mutex__);
+        2:  712:    int ret = log_set_config_option(&_global_logger__, option);
+        2:  713:    pthread_mutex_unlock(&_global_logger_mutex__);
+        2:  714:    return ret;
+        -:  715:}
+        -:  716:
+        1:  717:void _debug_global_logger_is_init__()
+        -:  718:{
+        1:  719:    _global_logger_is_init__ = false;
+        1:  720:}
         -:    0:Source:config.c
         -:    0:Graph:./config.gcno
         -:    0:Data:./config.gcda
@@ -941,7 +949,7 @@ format_date(1717398065 * 1000 ),];
         -:    0:Source:rand.c
         -:    0:Graph:./rand.gcno
         -:    0:Data:./rand.gcda
-        -:    0:Runs:22
+        -:    0:Runs:25
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1069,31 +1077,28 @@ format_date(1717398065 * 1000 ),];
         -:   20:
         1:   21:int real_main(int argc, char** argv)
         -:   22:{
-        -:   23:    LogConfigOption opt1, opt2, opt3;
+        1:   23:    LogConfigOption opt1, opt2, opt3;
         1:   24:    log_config_option_show_colors(&opt1, true);
         1:   25:    log_config_option_show_stdout(&opt2, true);
         1:   26:    log_config_option_show_timestamp(&opt3, false);
         -:   27:
         1:   28:    init_global_logger(2, opt1, opt2);
-        1:   29:    log_config_option_free(&opt1);
-        1:   30:    log_config_option_free(&opt2);
+        1:   29:    info("Main currently doesn't do %s.", "anything");
+        1:   30:    global_log_config_option(opt3);
         1:   31:    info("Main currently doesn't do %s.", "anything");
-        1:   32:    global_log_config_option(opt3);
-        1:   33:    log_config_option_free(&opt3);
-        1:   34:    info("Main currently doesn't do %s.", "anything");
-        1:   35:    info("end");
+        1:   32:    info("end");
+        -:   33:
+        1:   34:    return 0;
+        -:   35:}
         -:   36:
-        1:   37:    return 0;
-        -:   38:}
-        -:   39:
-        1:   40:int main(int argc, char **argv) {
-        1:   41:    return real_main(argc, argv);
-        -:   42:}
-        -:   43:
+        1:   37:int main(int argc, char **argv) {
+        1:   38:    return real_main(argc, argv);
+        -:   39:}
+        -:   40:
         -:    0:Source:misc.c
         -:    0:Graph:./misc.gcno
-        -:    0:Data:-
-        -:    0:Runs:0
+        -:    0:Data:./misc.gcda
+        -:    0:Runs:3
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1148,7 +1153,162 @@ format_date(1717398065 * 1000 ),];
         -:   52:    } else {
     #####:   53:        return false;
         -:   54:    }
-        -:   55:}</textarea>
+        -:   55:}
+        -:    0:Source:slabs.c
+        -:    0:Graph:./slabs.gcno
+        -:    0:Data:./slabs.gcda
+        -:    0:Runs:3
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <string.h>
+        -:   16:#include <stdlib.h>
+        -:   17:#include <util/slabs.h>
+        -:   18:#include <log/log.h>
+        -:   19:
+        -:   20:#define LOG_LEVEL Debug
+        -:   21:
+        1:   22:int slab_data_init(SlabData *sd, u64 len) {
+        1:   23:	sd->data = NULL;
+        1:   24:	return slab_data_resize(sd, len);
+        -:   25:}
+        -:   26:
+    #####:   27:void *slab_data_read(SlabData *sd, u64 offset) {
+    #####:   28:	if(offset > sd->len)
+    #####:   29:		return NULL;
+    #####:   30:	return sd->data + offset;
+        -:   31:}
+        -:   32:
+    #####:   33:int slab_data_write(SlabData *sd, u64 dst_offset, void *value, u64 src_offset, u64 len) {
+    #####:   34:        int ret = 0;
+    #####:   35:	memcpy(sd->data + dst_offset, value + src_offset, len);
+    #####:   36:        return ret;
+        -:   37:}
+        -:   38:
+        1:   39:int slab_data_resize(SlabData *sd, u64 len) {
+        1:   40:	int ret = 0;
+        -:   41:
+        1:   42:	if (sd->data == NULL) {
+        1:   43:		sd->data = malloc(len);
+        1:   44:		if(sd->data == NULL) {
+    #####:   45:			error("Could not allocate the required memory.");
+    #####:   46:			ret = -1;
+        -:   47:		}
+        -:   48:	} else {
+    #####:   49:		void *tmp = realloc(sd->data, len);
+    #####:   50:		if(tmp == NULL) {
+    #####:   51:			error("Could not allocate the required memory.");
+    #####:   52:			ret = -1;
+        -:   53:		} else {
+    #####:   54:			sd->data = tmp;
+        -:   55:		}
+        -:   56:	}
+        -:   57:
+        1:   58:	return ret;
+        -:   59:}
+        -:   60:
+    #####:   61:void slab_data_free(SlabData *sd) {
+    #####:   62:	if(sd->data) {
+    #####:   63:		free(sd->data);
+    #####:   64:		sd->data = NULL;
+        -:   65:	}
+    #####:   66:}
+        -:   67:
+    #####:   68:int init_free_list(
+        -:   69:		SlabData *slab_data,
+        -:   70:		u64 size,
+        -:   71:		u64 offset
+        -:   72:		) {
+    #####:   73:	return 0;
+        -:   74:}
+        -:   75:
+        -:   76:
+        -:   77:
+    #####:   78:int slab_init(SlabAllocator *sa, int num, u64 *sizes, u64 *max_slabs, u64 slabs_per_resize, bool zeroed) {
+        -:   79:	// check that ordering is sorted and other configs are ok
+    #####:   80:	u64 last_size = 0;
+    #####:   81:	for(int i=0; i<num; i++) {
+    #####:   82:		if(sizes[i] <= last_size) {
+    #####:   83:			error("slab_allocator sizes must be sorted in ascending order.");
+    #####:   84:			return -1;
+        -:   85:		}
+    #####:   86:		last_size = sizes[i];
+    #####:   87:		if(max_slabs[i] == 0) {
+    #####:   88:			error("max_slabs must be greater than 0");
+    #####:   89:			return -1;
+        -:   90:		}
+        -:   91:	}
+        -:   92:
+    #####:   93:	if(slabs_per_resize == 0) {
+    #####:   94:		error("slabs_per_resize must be greater than 0");
+    #####:   95:		return -1;
+        -:   96:	}
+        -:   97:
+    #####:   98:	int ret = 0;
+    #####:   99:	sa->slab_data_array = NULL;
+    #####:  100:	sa->sizes = NULL;
+    #####:  101:	sa->max_slabs = NULL;
+    #####:  102:	sa->zeroed = zeroed;
+    #####:  103:	sa->slabs_per_resize = slabs_per_resize;
+    #####:  104:	sa->slab_data_array = malloc(sizeof(SlabData) * num);
+    #####:  105:	if(sa->slab_data_array == NULL) {
+    #####:  106:		ret = -1;
+    #####:  107:		error("Could not allocate the required memory.");
+        -:  108:	}
+        -:  109:	
+    #####:  110:	if(ret == 0) {
+    #####:  111:		sa->sizes = malloc(sizeof(u64) * num);
+        -:  112:
+    #####:  113:		if(sa->sizes == NULL) {
+    #####:  114:			free(sa->slab_data_array);
+    #####:  115:			sa->slab_data_array = NULL;
+    #####:  116:			ret = -1;
+    #####:  117:			error("Could not allocate the required memory.");
+        -:  118:		} else {
+    #####:  119:			sa->slab_data_array_len = num;
+    #####:  120:			memcpy(sa->sizes, sizes, num);
+        -:  121:
+    #####:  122:			for(int i=0; i<num; i++) {
+    #####:  123:				if(slab_data_init(
+    #####:  124:					&sa->slab_data_array[i],
+    #####:  125:					slabs_per_resize * sizes[i]
+        -:  126:				)) {
+    #####:  127:					ret = -1;
+    #####:  128:					break;
+        -:  129:				}
+        -:  130:			}
+        -:  131:		}
+        -:  132:
+        -:  133:	}
+        -:  134:
+    #####:  135:	if(ret == 0) {
+    #####:  136:		sa->max_slabs = malloc(sizeof(u64) * num);
+    #####:  137:		if(sa->max_slabs == NULL) {
+    #####:  138:			free(sa->slab_data_array);
+    #####:  139:                        sa->slab_data_array = NULL;
+    #####:  140:			free(sa->sizes);
+    #####:  141:			sa->sizes = NULL;
+    #####:  142:			error("Could not allocate required memory.");
+    #####:  143:			ret = -1;
+        -:  144:		} else {
+    #####:  145:			memcpy(sa->max_slabs, max_slabs, num);
+        -:  146:		}
+        -:  147:	}
+        -:  148:
+    #####:  149:	return ret;
+        -:  150:}
+        -:  151:</textarea>
 		</p>
 	</body>
 </html>
