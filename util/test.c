@@ -15,6 +15,7 @@
 #include <criterion/criterion.h>
 #include <util/slabs.h>
 #include <util/slabs_test.h>
+#include <limits.h>
 #include <log/log.h>
 
 #define LOG_LEVEL Debug
@@ -25,49 +26,69 @@ Test(util, slab_resize) {
 	SlabAllocatorConfig sc2;
 	slab_allocator_config_slabs_per_resize(&sc2, 5);
 
+	// slabs returned in order
         SlabAllocator sa;
         slab_init(&sa, 2, sc, sc2);
         u64 slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 0);
         debug("==========>slab_id=%llu", slab);
         slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 1);
         debug("==========>slab_id=%llu", slab);
         u64 to_free;
         slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 2);
         to_free = slab;
         debug("==========>slab_id=%llu", slab);
         slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 3);
         debug("==========>slab_id=%llu", slab);
         slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 4);
         debug("==========>slab_id=%llu", slab);
 	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 5);
         debug("==========>slab_id=%llu", slab);
 	slab = slab_allocate(&sa, 512);
-        debug("==========>slab_id=%llu", slab);
-	debug("==========>to_free=%llu", to_free);
-	slab_free(&sa, to_free);
-	slab = slab_allocate(&sa, 512);
-        debug("==========>slab_id=%llu", slab);
-	slab = slab_allocate(&sa, 512);
-        debug("==========>slab_id=%llu", slab);
-	slab = slab_allocate(&sa, 512);
-        debug("==========>slab_id=%llu", slab);
-	slab = slab_allocate(&sa, 512);
-        debug("==========>slab_id=%llu", slab);
-	slab = slab_allocate(&sa, 512);
-        debug("==========>slab_id=%llu", slab);
-	slab = slab_allocate(&sa, 512);
-        debug("==========>slab_id=%llu", slab);
-	slab = slab_allocate(&sa, 512);
-        debug("==========>slab_id=%llu", slab);
-	slab = slab_allocate(&sa, 512);
-        debug("==========>slab_id=%llu", slab);
-	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 6);
         debug("==========>slab_id=%llu", slab);
 	debug("==========>to_free=%llu", to_free);
 	slab_free(&sa, to_free);
 	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 2);
         debug("==========>slab_id=%llu", slab);
 	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 7);
+        debug("==========>slab_id=%llu", slab);
+	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 8);
+        debug("==========>slab_id=%llu", slab);
+	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 9);
+        debug("==========>slab_id=%llu", slab);
+	slab = slab_allocate(&sa, 512);
+	debug("v=%llu", slab);
+	cr_assert_eq(slab, 10);
+        debug("==========>slab_id=%llu", slab);
+	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, ULONG_MAX);
+        debug("==========>slab_id=%llu", slab);
+	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, ULONG_MAX);
+        debug("==========>slab_id=%llu", slab);
+	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, ULONG_MAX);
+        debug("==========>slab_id=%llu", slab);
+	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, ULONG_MAX);
+        debug("==========>slab_id=%llu", slab);
+	debug("==========>to_free=%llu", to_free);
+	slab_free(&sa, to_free);
+	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, to_free);
+        debug("==========>slab_id=%llu", slab);
+	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, ULONG_MAX);
         debug("==========>slab_id=%llu", slab);
 
 	Slab s1;
@@ -182,36 +203,47 @@ Test(util, slabs) {
 	SlabAllocator sa;
 	slab_init(&sa, 1, sc);
 	u64 slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 0);
 	debug("slab_id=%llu", slab);
 	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 1);
         debug("slab_id=%llu", slab);
 	u64 to_free;
  	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 2);
 	to_free = slab;
         debug("slab_id=%llu", slab);
 	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 3);
         debug("slab_id=%llu", slab);
 	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 4);
         debug("slab_id=%llu", slab);
 
 	debug("to_free=%llu", to_free);
 	slab_free(&sa, to_free);
 
 	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, to_free);
         debug("slab_id=%llu", slab);
 	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 5);
         debug("slab_id=%llu", slab);
 	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 6);
         debug("slab_id=%llu", slab);
 
 	debug("to_free=1");
 	slab_free(&sa, 1);
 
 	slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 1);
         debug("slab_id=%llu", slab);
         slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 7);
         debug("slab_id=%llu", slab);
         slab = slab_allocate(&sa, 512);
+	cr_assert_eq(slab, 8);
         debug("slab_id=%llu", slab);
 
 
