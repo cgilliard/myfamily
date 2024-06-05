@@ -12,24 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _TYPES_BASE__
-#define _TYPES_BASE__
+#include <base/types.h>
 
-#include <stdbool.h>
-#include <stdint.h>
+i64 saddi64(i64 a, i64 b)
+{
+    if (a > 0) {
+        if (b > INT64_MAX - a) {
+            return INT64_MAX;
+        }
+    } else if (b < INT64_MIN - a) {
+            return INT64_MIN;
+    }
 
-#define u8 uint8_t
-#define i8 int8_t
-#define u16 uint16_t
-#define i16 int16_t
-#define u32 uint32_t
-#define i32 int32_t
-#define u64 uint64_t
-#define i64 int64_t
-#define u128 __uint128_t
-#define i128 __int128_t
+    return a + b;
+}
 
-i64 saddi64(i64 a, i64 b);
-u64 saddu64(u64 a, u64 b);
-
-#endif /* _TYPES_BASE__ */
+u64 saddu64(u64 a, u64 b) {
+  return (a > 0xFFFFFFFFFFFFFFFF - b) ? 0xFFFFFFFFFFFFFFFF : a + b;
+}
