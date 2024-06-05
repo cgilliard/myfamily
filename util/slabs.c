@@ -68,6 +68,7 @@ void *slab_data_read(SlabData *sd, u64 offset) {
 
 int slab_data_write(SlabData *sd, u64 dst_offset, void *value, u64 src_offset, u64 len) {
         int ret = 0;
+	debug("=====sdw dst_offset=%llu,src_offset=%llu,len=%llu", dst_offset, src_offset, len);
 	memcpy(sd->data + dst_offset, value + src_offset, len);
         return ret;
 }
@@ -421,9 +422,11 @@ int slab_write(SlabAllocator *sa, u64 id, Slab *slab, u64 offset_slab) {
 	}
                 
         u64 offset = id_relative * (ptr_size + slab_size) + offset_slab + ptr_size;
+
+	debug("write offset = %llu", offset);
 	u64 len = slab_size - offset_slab;
 
-	slab_data_write(&sa->slab_data_array[idx], offset, slab->data, offset_slab, len);
+	slab_data_write(&sa->slab_data_array[idx], offset, slab->data, 0, len);
 
 
 	return ret;
@@ -438,6 +441,7 @@ int slab_read(SlabAllocator *sa, u64 id, Slab *slab) {
         u64 ptr_size = sa->slab_data_array[idx].sdp.ptr_size;
 
 	u64 offset = id_relative * (ptr_size + slab_size) + ptr_size;
+	debug("read offset = %llu", offset);
 	slab->data = sa->slab_data_array[idx].data + offset;
 	slab->len = slab_size;
 

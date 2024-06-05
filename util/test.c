@@ -70,6 +70,33 @@ Test(util, slab_resize) {
 	slab = slab_allocate(&sa, 512);
         debug("==========>slab_id=%llu", slab);
 
+	Slab s1;
+	slab_read(&sa, 1, &s1);
+
+	((char*)s1.data)[0] = 100;
+
+	Slab s2;
+	slab_read(&sa, 1, &s2);
+
+	cr_assert_eq(((char*)s2.data)[0], 100);
+
+	Slab s3;
+	s3.data = malloc(sizeof(char) * 512);
+	((char*)s3.data)[0] = 101;
+	s3.len = 512;
+
+	slab_write(&sa, 4, &s3, 1);
+
+	free(s3.data);
+
+	Slab s4;
+	slab_read(&sa, 4, &s4);
+	for(int i=0; i<10; i++) {
+		debug("s4.data[%d]=%d", i, ((char*)s4.data)[i]);
+	}
+	cr_assert_eq(((char*)s4.data)[1], 101);
+
+
 }
 
 Test(util, slab_index_for_size) {
@@ -240,3 +267,4 @@ Test(util, slab_allocator_init) {
 	printf("max=%llu\n", sa4.max_slabs[0]);
 	cr_assert_eq(sa4.max_slabs[0], 999);
 }
+
