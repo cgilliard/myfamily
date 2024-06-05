@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['u128_261',['u128',['../types_8h.html#a845593201b45c0e24fdab5e4152c9f40',1,'types.h']]],
-  ['u16_262',['u16',['../types_8h.html#a2b19d553290a8d4a083d3c03280ea800',1,'types.h']]],
-  ['u32_263',['u32',['../types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6',1,'types.h']]],
-  ['u64_264',['u64',['../types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0',1,'types.h']]],
-  ['u8_265',['u8',['../types_8h.html#af3b86d961da0a3575b4f99c9ffaf01fd',1,'types.h']]]
+  ['trace_293',['trace',['../log_8h.html#a97ccf336cdfa5d81377d0bb8112257bc',1,'log.h']]],
+  ['trace_5fall_294',['trace_all',['../log_8h.html#a3a24c2abda1e079aa56511f4f44bb54b',1,'log.h']]],
+  ['trace_5fplain_295',['trace_plain',['../log_8h.html#a60ecd23b3fee80cf380b4c298b1d2bef',1,'log.h']]]
 ];

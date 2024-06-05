@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ptr_5fsize_74',['ptr_size',['../structSlabDataParams.html#a851add047825b550974bf5db48e5718b',1,'SlabDataParams']]]
+  ['null_5fptr_72',['null_ptr',['../structSlabDataParams.html#a008dc36efe097e5e986a934c3a57136d',1,'SlabDataParams']]]
 ];

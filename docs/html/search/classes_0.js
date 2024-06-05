@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['slab_133',['Slab',['../structSlab.html',1,'']]],
-  ['slaballocator_134',['SlabAllocator',['../structSlabAllocator.html',1,'']]],
-  ['slabdata_135',['SlabData',['../structSlabData.html',1,'']]],
-  ['slabdataholder_136',['SlabDataHolder',['../structSlabDataHolder.html',1,'']]],
-  ['slabdataparams_137',['SlabDataParams',['../structSlabDataParams.html',1,'']]]
+  ['slab_150',['Slab',['../structSlab.html',1,'']]],
+  ['slaballocator_151',['SlabAllocator',['../structSlabAllocator.html',1,'']]],
+  ['slaballocatorconfigimpl_152',['SlabAllocatorConfigImpl',['../structSlabAllocatorConfigImpl.html',1,'']]],
+  ['slabdata_153',['SlabData',['../structSlabData.html',1,'']]],
+  ['slabdataparams_154',['SlabDataParams',['../structSlabDataParams.html',1,'']]]
 ];
