@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['trace_258',['trace',['../log_8h.html#a97ccf336cdfa5d81377d0bb8112257bc',1,'log.h']]],
-  ['trace_5fall_259',['trace_all',['../log_8h.html#a3a24c2abda1e079aa56511f4f44bb54b',1,'log.h']]],
-  ['trace_5fplain_260',['trace_plain',['../log_8h.html#a60ecd23b3fee80cf380b4c298b1d2bef',1,'log.h']]]
+  ['slaballocatorconfig_292',['SlabAllocatorConfig',['../slabs_8h.html#af6b9aa6efec284497402d6b13451d8a8',1,'slabs.h']]]
 ];

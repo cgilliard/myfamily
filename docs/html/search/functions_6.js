@@ -1,14 +1,15 @@
 var searchData=
 [
-  ['slab_5fallocate_205',['slab_allocate',['../slabs_8h.html#ad57b8d65e008f9b86e9879c0103bbaff',1,'slabs.h']]],
-  ['slab_5fallocator_5ffree_206',['slab_allocator_free',['../slabs_8h.html#ad35051de15c0a8c9d3b1847dafb7cae9',1,'slabs.h']]],
-  ['slab_5fdata_5ffree_207',['slab_data_free',['../slabs_8c.html#aa502e9512814ef6d5a635489828c4c6f',1,'slab_data_free(SlabData *sd):&#160;slabs.c'],['../slabs_8h.html#aa502e9512814ef6d5a635489828c4c6f',1,'slab_data_free(SlabData *sd):&#160;slabs.c']]],
-  ['slab_5fdata_5finit_208',['slab_data_init',['../slabs_8c.html#ad9f29132fabc2876b726e22702f0c120',1,'slab_data_init(SlabData *sd, u64 len):&#160;slabs.c'],['../slabs_8h.html#ad9f29132fabc2876b726e22702f0c120',1,'slab_data_init(SlabData *sd, u64 len):&#160;slabs.c']]],
-  ['slab_5fdata_5fread_209',['slab_data_read',['../slabs_8c.html#aa2b11607270783f0aa75020b14927350',1,'slab_data_read(SlabData *sd, u64 offset):&#160;slabs.c'],['../slabs_8h.html#aa2b11607270783f0aa75020b14927350',1,'slab_data_read(SlabData *sd, u64 offset):&#160;slabs.c']]],
-  ['slab_5fdata_5fresize_210',['slab_data_resize',['../slabs_8c.html#a9d36aa57a127a6d5e7b4c4688b84fea2',1,'slab_data_resize(SlabData *sd, u64 len):&#160;slabs.c'],['../slabs_8h.html#a9d36aa57a127a6d5e7b4c4688b84fea2',1,'slab_data_resize(SlabData *sd, u64 len):&#160;slabs.c']]],
-  ['slab_5fdata_5fwrite_211',['slab_data_write',['../slabs_8c.html#a3f24aeac07183b8fa1d33e60c6f4e0bd',1,'slab_data_write(SlabData *sd, u64 dst_offset, void *value, u64 src_offset, u64 len):&#160;slabs.c'],['../slabs_8h.html#a3f24aeac07183b8fa1d33e60c6f4e0bd',1,'slab_data_write(SlabData *sd, u64 dst_offset, void *value, u64 src_offset, u64 len):&#160;slabs.c']]],
-  ['slab_5ffree_212',['slab_free',['../slabs_8h.html#ae9420e69fded0794484a4f6a48d1a25f',1,'slabs.h']]],
-  ['slab_5finit_213',['slab_init',['../slabs_8c.html#abf6d9f14faaaf09ebb6cab56fdd6af3a',1,'slab_init(SlabAllocator *sa, int num, u64 *sizes, u64 *max_slabs, u64 slabs_per_resize, bool zeroed):&#160;slabs.c'],['../slabs_8h.html#abf6d9f14faaaf09ebb6cab56fdd6af3a',1,'slab_init(SlabAllocator *sa, int num, u64 *sizes, u64 *max_slabs, u64 slabs_per_resize, bool zeroed):&#160;slabs.c']]],
-  ['slab_5fread_214',['slab_read',['../slabs_8h.html#ac88c32166ae68c85feebc50d9dccc052',1,'slabs.h']]],
-  ['slab_5fwrite_215',['slab_write',['../slabs_8h.html#a3239aa04f52de737dfe027e33d3910ef',1,'slabs.h']]]
+  ['rand_5fbytes_212',['rand_bytes',['../rand_8h.html#a15f906b8f6d40a2446efe2db4f7977d7',1,'rand_bytes(void *buf, size_t length):&#160;rand.c'],['../rand_8c.html#a15f906b8f6d40a2446efe2db4f7977d7',1,'rand_bytes(void *buf, size_t length):&#160;rand.c']]],
+  ['rand_5fi128_213',['rand_i128',['../rand_8c.html#abf0b822d7cb549b53f7e8fac1a573a60',1,'rand_i128(i128 *v):&#160;rand.c'],['../rand_8h.html#abf0b822d7cb549b53f7e8fac1a573a60',1,'rand_i128(i128 *v):&#160;rand.c']]],
+  ['rand_5fi16_214',['rand_i16',['../rand_8c.html#a6ff8ae3c4ab647d73b934ec65cf9a846',1,'rand_i16(i16 *v):&#160;rand.c'],['../rand_8h.html#a6ff8ae3c4ab647d73b934ec65cf9a846',1,'rand_i16(i16 *v):&#160;rand.c']]],
+  ['rand_5fi32_215',['rand_i32',['../rand_8c.html#a84f6f09da34ebbd7afb56e359c5d2c58',1,'rand_i32(int32_t *v):&#160;rand.c'],['../rand_8h.html#a69e8d4fb3becb8e4b94d32390388e1ff',1,'rand_i32(i32 *v):&#160;rand.h']]],
+  ['rand_5fi64_216',['rand_i64',['../rand_8c.html#a5498f28f9f0e03d09a30c96b896884cf',1,'rand_i64(int64_t *v):&#160;rand.c'],['../rand_8h.html#a21de6963dda54ae002eb35083e32735b',1,'rand_i64(i64 *v):&#160;rand.h']]],
+  ['rand_5fi8_217',['rand_i8',['../rand_8c.html#a84bfb891f9a72c7c09bea545aa37afbc',1,'rand_i8(i8 *v):&#160;rand.c'],['../rand_8h.html#a84bfb891f9a72c7c09bea545aa37afbc',1,'rand_i8(i8 *v):&#160;rand.c']]],
+  ['rand_5fu128_218',['rand_u128',['../rand_8c.html#a4f0b41b546b31cead30280a50036e5ce',1,'rand_u128(u128 *v):&#160;rand.c'],['../rand_8h.html#a4f0b41b546b31cead30280a50036e5ce',1,'rand_u128(u128 *v):&#160;rand.c']]],
+  ['rand_5fu16_219',['rand_u16',['../rand_8c.html#a4d8bb797948a4721bc15e06e760c2b98',1,'rand_u16(u16 *v):&#160;rand.c'],['../rand_8h.html#a4d8bb797948a4721bc15e06e760c2b98',1,'rand_u16(u16 *v):&#160;rand.c']]],
+  ['rand_5fu32_220',['rand_u32',['../rand_8c.html#aef1a0c6f581f9485db8d0d37722980b8',1,'rand_u32(uint32_t *v):&#160;rand.c'],['../rand_8h.html#acf38100fd3e3392e974424c36f156462',1,'rand_u32(u32 *v):&#160;rand.h']]],
+  ['rand_5fu64_221',['rand_u64',['../rand_8c.html#a593e5337048c740875ac4a8150a0ffe5',1,'rand_u64(uint64_t *v):&#160;rand.c'],['../rand_8h.html#a9bf6a9ee76ab5092a012a77e0889f392',1,'rand_u64(u64 *v):&#160;rand.h']]],
+  ['rand_5fu8_222',['rand_u8',['../rand_8c.html#a3963a2e0d41806f017c00eff72914cf2',1,'rand_u8(u8 *v):&#160;rand.c'],['../rand_8h.html#a3963a2e0d41806f017c00eff72914cf2',1,'rand_u8(u8 *v):&#160;rand.c']]],
+  ['real_5fmain_223',['real_main',['../main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;main.c'],['../main_2test_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;main.c']]]
 ];
