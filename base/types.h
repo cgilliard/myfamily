@@ -17,6 +17,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include <base/cleanup.h>
 
 #define u8 uint8_t
 #define i8 int8_t
@@ -28,6 +29,20 @@
 #define i64 int64_t
 #define u128 __uint128_t
 #define i128 __int128_t
+#define f64 double
+#define f32 float
+
+struct StringImpl {
+	char *ptr;
+	u64 len;
+};
+typedef struct StringImpl StringImpl;
+
+void string_free(StringImpl *s);
+#define String StringImpl CLEANUP(string_free)
+
+int string_set(StringImpl *s, const char *ptr);
+
 
 i64 saddi64(i64 a, i64 b);
 u64 saddu64(u64 a, u64 b);

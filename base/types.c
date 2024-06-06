@@ -12,7 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include <base/types.h>
+
+void string_free(StringImpl *s) {
+	if(s->ptr) {
+		free(s->ptr);
+		s->ptr = NULL;
+	}
+}
+
+int string_set(StringImpl *s, const char *ptr) {
+	int ret = 0;
+	s->len = strlen(ptr);
+
+	s->ptr = malloc(sizeof(char) * (s->len + 1));
+	if(s->ptr == NULL)
+		ret = -1;
+
+	if(!ret)
+		strcpy(s->ptr, ptr);
+
+	return ret;
+}
 
 i64 saddi64(i64 a, i64 b)
 {

@@ -34,8 +34,50 @@ struct Serializable {
 };
 typedef struct Serializable Serializable;
 
+int serialize_f64(void *obj, Writer *writer);
+int deserialize_f64(void *obj, Reader *reader);
+
+int serialize_f32(void *obj, Writer *writer);
+int deserialize_f32(void *obj, Reader *reader);
+
+int serialize_u128(void *obj, Writer *writer);
+int deserialize_u128(void *obj, Reader *reader);
+
 int serialize_u64(void *obj, Writer *writer);
 int deserialize_u64(void *obj, Reader *reader);
+
+int serialize_u32(void *obj, Writer *writer);
+int deserialize_u32(void *obj, Reader *reader);
+
+int serialize_u16(void *obj, Writer *writer);
+int deserialize_u16(void *obj, Reader *reader);
+
+int serialize_u8(void *obj, Writer *writer);
+int deserialize_u8(void *obj, Reader *reader);
+
+int serialize_i128(void *obj, Writer *writer);
+int deserialize_i128(void *obj, Reader *reader);
+
+int serialize_i64(void *obj, Writer *writer);
+int deserialize_i64(void *obj, Reader *reader);
+
+int serialize_i32(void *obj, Writer *writer);
+int deserialize_i32(void *obj, Reader *reader);
+
+int serialize_i16(void *obj, Writer *writer);
+int deserialize_i16(void *obj, Reader *reader);
+
+int serialize_i8(void *obj, Writer *writer);
+int deserialize_i8(void *obj, Reader *reader);
+
+int serialize_string(void *obj, Writer *writer);
+int deserialize_string(void *obj, Reader *reader);
+
+int serialize_bool(void *obj, Writer *writer);
+int deserialize_bool(void *obj, Reader *reader);
+
+int __serialize_not_implemented_(void *obj, Reader *reader);
+int __deserialize_not_implemented_(void *obj, Writer *writer);
 
 int bin_reader_read_fixed_bytes(Reader *reader, unsigned char *buffer, u64 len);
 int bin_writer_write_fixed_bytes(Writer *writer, unsigned char *buffer, u64 len);
@@ -49,21 +91,45 @@ Writer build_writer(int (*write_fixed_bytes)(struct Writer *writer, unsigned cha
 int serialize(Serializable *s, Writer *writer);
 int deserialize(Serializable *s, Reader *reader);
 
+#define SERIALIZE_NAME(x) _Generic((x), \
+    f32: serialize_f32, \
+    f64: serialize_f64, \
+    u128: serialize_u128, \
+    u64: serialize_u64, \
+    u32: serialize_u32, \
+    u16: serialize_u16, \
+    u8: serialize_u8, \
+    i128: serialize_i128, \
+    i64: serialize_i64, \
+    i32: serialize_i32, \
+    i16: serialize_i16, \
+    i8: serialize_i8, \
+    String: serialize_string, \
+    bool: serialize_bool, \
+    default: __serialize_not_implemented_ \
+) \
+
+#define DESERIALIZE_NAME(x) _Generic((x), \
+    f32: deserialize_f32, \
+    f64: deserialize_f64, \
+    u128: deserialize_u128, \
+    u64: deserialize_u64, \
+    u32: deserialize_u32, \
+    u16: deserialize_u16, \
+    u8: deserialize_u8, \
+    i128: deserialize_i128, \
+    i64: deserialize_i64, \
+    i32: deserialize_i32, \
+    i16: deserialize_i16, \
+    i8: deserialize_i8, \
+    String: deserialize_string, \
+    bool: deserialize_bool, \
+    default: __deserialize_not_implemented_ \
+) \
+
+#define SER(x) build_serializable(&x, SERIALIZE_NAME(x), DESERIALIZE_NAME(x))
 Serializable build_serializable(void *ptr, int (*serialize)(void *obj, Writer *writer), int (*deserialize)(void *obj, Reader *reader));
-#define SER(ptr, serialize, deserialize) build_serializable(ptr, serialize, deserialize)
 
-/*
-#ifndef typeof
-#ifdef __clang__
-#define typeof(x) __typeof__(x)
-#endif
-#endif
-*/
 
-#define TYPE_NAME(x) _Generic((x), \
-    int:     "int", \
-    float:   "float", \
-    u64: "u64", \
-    default: "not_implemented")
 
 #endif // _SER_BASE__

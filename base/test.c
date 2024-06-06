@@ -166,37 +166,119 @@ Test(base, config)
     cr_assert_eq(strcmp(s1, "test2"), 0);
 }
 
-Test(base, ser) {
-	
-	unsigned char *buffer = malloc(sizeof(unsigned char) * 16);
-	Reader reader = READER(bin_reader_read_fixed_bytes, buffer);
-        Writer writer = WRITER(bin_writer_write_fixed_bytes, buffer);
+struct MyStruct {
+	u64 x;
+	u32 y;
+	u32 z;
+};
+typedef struct MyStruct MyStruct;
 
+int deserialize_my_struct(void *obj, Reader *reader) {
+	int ret = 0;
+
+	MyStruct *ptr = obj;
+
+	ret = deserialize_u64(&ptr->x, reader);
+	if(!ret)
+		ret = deserialize_u32(&ptr->y, reader);
+	if(!ret)
+		ret = deserialize_u32(&ptr->z, reader);
+
+	return ret;
+}
+
+int serialize_my_struct(void *obj, Writer *writer) {
+	int ret = 0;
+	MyStruct *ptr = obj;
+
+	ret = serialize_u64(&ptr->x, writer);
+	if(!ret)
+		ret = serialize_u32(&ptr->y, writer);
+	if(!ret)
+		ret = serialize_u32(&ptr->z, writer);
+
+	return ret;
+}
+
+Test(base, ser) {
+	unsigned char buffer[1000];
+	Reader reader = READER(bin_reader_read_fixed_bytes, &buffer);
+        Writer writer = WRITER(bin_writer_write_fixed_bytes, &buffer);
+
+	String s_in, s_out;
+	string_set(&s_in, "this is a test");
+
+	u128 r_in = 0, r_out = 0;
+	int v = rand_u128(&r_in);
+	cr_assert_eq(v, 0);
+	cr_assert_neq(r_in, 0);
+
+	bool b1 = false;
+	bool b2 = true;
+	bool b1_out, b2_out;
 	u64 x = 111001023;
 	u64 y = 222;
+	u32 z = 987;
+	MyStruct ms;
+	ms.x = 1000;
+	ms.y = 2000;
+	ms.z = 3000;
+	MyStruct ms_out;
+		
 	u64 a = 0;
 	u64 b = 0;
+	u32 c = 0;
 
-	Serializable sx = SER(&x,  serialize_u64, deserialize_u64);
-	Serializable sy = SER(&y, serialize_u64, deserialize_u64);
-	Serializable sa = SER(&a, serialize_u64, deserialize_u64);
-        Serializable sb = SER(&b, serialize_u64, deserialize_u64);
+	Serializable sb1 = SER(b1);
+	Serializable sb2 = SER(b2);
+	Serializable sb1_out = SER(b1_out);
+	Serializable sb2_out = SER(b2_out);
+	Serializable sx = SER(x);
+	Serializable sy = SER(y);
+	Serializable sz = SER(z);
+	Serializable sa = SER(a);
+	Serializable sb = SER(b);
+	Serializable sc = SER(c);
+	Serializable serin = build_serializable(&ms, serialize_my_struct, deserialize_my_struct);
+	Serializable serout = build_serializable(&ms_out, serialize_my_struct, deserialize_my_struct);
+	Serializable randin = SER(r_in);
+	Serializable randout = SER(r_out);
+	Serializable str_in = SER(s_in);
+	Serializable str_out = SER(s_out);
 
 	serialize(&sx, &writer);
+	serialize(&sb1, &writer);
+	serialize(&sb2, &writer);
+	serialize(&sz, &writer);
+	serialize(&serin, &writer);
+	serialize(&str_in, &writer);
 	serialize(&sy, &writer);
+	serialize(&randin, &writer);
 
 	deserialize(&sa, &reader);
+	deserialize(&sb1_out, &reader);
+	deserialize(&sb2_out, &reader);
+	deserialize(&sc, &reader);
+	deserialize(&serout, &reader);
+	deserialize(&str_out, &reader);
 	deserialize(&sb, &reader);
+	deserialize(&randout, &reader);
 
 	cr_assert_eq(a, 111001023);
         cr_assert_eq(b, 222);
-
-	int x1;
-	float f1;
-	u64 u1;
-	printf("type(int)=%s\n", TYPE_NAME(x1));
-	printf("type(float)=%s\n", TYPE_NAME(f1));
-
-	free(buffer);
+	cr_assert_eq(c, 987);
+	cr_assert_eq(ms_out.x, 1000);
+	cr_assert_eq(ms_out.y, 2000);
+	cr_assert_eq(ms_out.z, 3000);
+	cr_assert_eq(r_in, r_out);
+	cr_assert_eq(strcmp(s_out.ptr, "this is a test"), 0);
+	cr_assert_eq(b1_out, false);
+	cr_assert_eq(b2_out, true);
 }
 
+Test(base, StringTest) {
+	String s;
+	s.ptr = malloc(sizeof(char) * 10);
+	strcpy(s.ptr, "test");
+	s.len = 4;
+}
