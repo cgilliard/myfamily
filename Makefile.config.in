@@ -1,8 +1,8 @@
 CC=gcc
-CC_FLAGS=-Wno-attributes -Wno-ignored-attributes -I.. $(COVERAGE)
+CC_FLAGS=-Wno-format -Wno-attributes -Wno-ignored-attributes -I.. $(COVERAGE)
 CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
 CRITERION_LIB=-LREPLACE_CRITERION_LIB
-CC_TEST_FLAGS=-Wno-attributes -Wno-ignored-attributes -lcriterion -I.. $(CRITERION_INCLUDE) $(CRITERION_LIB) $(COVERAGE)
+CC_TEST_FLAGS=-Wno-format -Wno-attributes -Wno-ignored-attributes -lcriterion -I.. $(CRITERION_INCLUDE) $(CRITERION_LIB) $(COVERAGE)
 MAKE=make
 SUBDIRS := main util base log
 ALL_OBJS=main/*.o util/*.o base/*.o log/*.o
