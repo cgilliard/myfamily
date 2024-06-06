@@ -81,5 +81,7 @@ int slab_write(SlabAllocator *sa, u64 id, Slab *slab, u64 offset);
 int slab_read(SlabAllocator *sa, u64 id, Slab *slab);
 int slab_free(SlabAllocator *sa, u64 id);
 void slab_allocator_free(SlabAllocator *sa);
+#define SlabAllocatorImpl SlabAllocator CLEANUP(slab_config_free)
+
 
 #endif /* __UTIL_SLABS_ */

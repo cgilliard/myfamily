@@ -323,7 +323,7 @@ Test(util, slabio) {
 	slab_writer_seek(&writer, root, 0);
 
 	String s_in, s_out;
-        string_set(&s_in, "01234567890123456789012345678901234567890123456789");
+        string_set(&s_in, "012345678901234567890123456789012345678901234567890012345678901234567890123");
 
 	u128 r_in = 0, r_out = 0;
         int v = rand_u128(&r_in);
@@ -337,12 +337,55 @@ Test(util, slabio) {
 
 	Serializable s1 = SER(s_in);
 	Serializable s2 = SER(s_out);
+	Serializable r1 = SER(r_in);
+	Serializable r2 = SER(r_out);
 	serialize(&s1, &writer);
+	serialize(&r1, &writer);
 	deserialize(&s2, &reader);
+	deserialize(&r2, &reader);
 
 	debug("s_in.ptr=%s", s_in.ptr);
 	debug("s_out.ptr=%s", s_out.ptr);
 	cr_assert_eq(strcmp(s_in.ptr, s_out.ptr), 0);
+	cr_assert_eq(r_in, r_out);
 
 }
 
+Test(util, over_read) {
+	SlabAllocator sa;
+        SlabReader sr;
+        SlabWriter sw;
+
+        SlabAllocatorConfig sc;
+        slab_allocator_config_slab_data(&sc, 10, 52);
+
+        slab_init(&sa, 1, sc);
+        slab_reader_init(&sr, &sa);
+        slab_writer_init(&sw, &sa);
+
+        Reader reader = READER(slab_reader_read_fixed_bytes, &sr);
+        Writer writer = WRITER(slab_writer_write_fixed_bytes, &sw);
+
+        u64 root = slab_allocate(&sa, 52);
+        debug("root=%llu", root);
+        slab_reader_seek(&reader, root, 0);
+        slab_writer_seek(&writer, root, 0);
+
+	String s_in, s_out;
+        string_set(&s_in, "01234567890123456789012345678901234501234567890123456789012345678901234567890123");
+	u64 dummy_in;
+
+	Serializable s1 = SER(s_in);
+        Serializable s2 = SER(s_out);
+	Serializable dummy = SER(dummy_in);
+        serialize(&s1, &writer);
+        deserialize(&s2, &reader);
+
+	debug("over_read s_in.ptr=%s", s_in.ptr);
+        debug("over_read s_out.ptr=%s", s_out.ptr);
+        cr_assert_eq(strcmp(s_in.ptr, s_out.ptr), 0);
+
+	int v = deserialize(&dummy, &reader);
+	cr_assert_neq(v, 0);
+
+}

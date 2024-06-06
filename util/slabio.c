@@ -1,3 +1,6 @@
+// Copyright (c) 2024, The MyFamily Developers
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -20,13 +23,12 @@ int slab_reader_next_slab(SlabReader *reader, Slab *slab) {
 	int ret = 0;
 	u64 next = ULONG_MAX;
 
+	debug("next slab when cur = %llu", reader->cur_slab_id);
+
 	void *ptr = slab->data + (slab->len - SLABIO_NEXT_POINTER_SIZE);
-	for(int i=slab->len - SLABIO_NEXT_POINTER_SIZE; i<slab->len; i++) {
-		debug("slab->data[%d]=%i", i, ((char*)slab->data)[i]);
-	}
         Reader bin_reader = READER(bin_reader_read_fixed_bytes, ptr);
         ret = deserialize_u64(&next, &bin_reader);
-	debug("next=%llu", next);
+	debug("read next slab = %llu", next);
         reader->cur_slab_id = next;
         reader->cur_slab_offset = 0;
 
@@ -47,9 +49,18 @@ int slab_reader_read_fixed_bytes(Reader *reader, unsigned char *buffer, u64 len)
 
 	while(true) {
 		if(sr->cur_slab_offset >= slab_len - SLABIO_NEXT_POINTER_SIZE) {
-			slab_reader_next_slab(sr, &slab);
+			if(slab_reader_next_slab(sr, &slab)) {
+				error("Could not read next slab");
+				ret = -1;
+				break;
+			}
 		}
 		debug("cur_slab=%llu", sr->cur_slab_id);
+		if(sr->cur_slab_id == ULONG_MAX) {
+			error("tried to read past end of slabs");
+			ret = -1;
+			break;
+		}
 
 		slab_read(sr->sa, sr->cur_slab_id, &slab);
 
@@ -104,6 +115,16 @@ int slab_writer_allocate_slab(SlabWriter *writer, Slab *slab) {
 		writer->cur_slab_offset = 0;
 	}
 
+	if(!ret) {
+		u64 max = ULONG_MAX;
+		Slab nslab;
+		slab_read(writer->sa, next, &nslab);
+		void *ptr = nslab.data + (slab->len - SLABIO_NEXT_POINTER_SIZE);
+		Writer bin_writer = WRITER(bin_writer_write_fixed_bytes, ptr);
+		ret = serialize_u64(&max, &bin_writer);
+	}
+
+
 	return ret;
 }
 
@@ -119,7 +140,11 @@ int slab_writer_write_fixed_bytes(Writer *writer, unsigned char *buffer, u64 len
 	while(true) {
 		if(sw->cur_slab_offset >= slab_len - SLABIO_NEXT_POINTER_SIZE) {
 			// allocate
-			slab_writer_allocate_slab(sw, &slab);
+			if(slab_writer_allocate_slab(sw, &slab)) {
+				error("Could not allocate another slab");
+				ret = -1;
+				break;
+			}
 		}
 		slab_read(sw->sa, sw->cur_slab_id, &slab);
 
