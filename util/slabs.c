@@ -75,7 +75,7 @@ int slab_data_write(SlabData *sd, u64 dst_offset, void *value, u64 src_offset, u
 
 int slab_data_resize(SlabData *sd, u64 slabs) {
 	debug("slab_data_resize %llu", slabs);
-	u64 len = slabs * sd->sdp.slab_size;
+	u64 len = slabs * (sd->sdp.slab_size + sd->sdp.ptr_size);
 	int ret = 0;
 
 	if (sd->data == NULL) {
