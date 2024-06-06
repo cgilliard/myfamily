@@ -72,10 +72,17 @@ $(function() {
 <div class="title">types.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:af335a90b7415faccd787ba061ba4b230"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8c.html#af335a90b7415faccd787ba061ba4b230">string_free</a> (<a class="el" href="structStringImpl.html">StringImpl</a> *s)</td></tr>
+<tr class="separator:af335a90b7415faccd787ba061ba4b230"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b57e6adcb38bb0851e8478e116cd133"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8c.html#a7b57e6adcb38bb0851e8478e116cd133">string_set</a> (<a class="el" href="structStringImpl.html">StringImpl</a> *s, const char *ptr)</td></tr>
+<tr class="separator:a7b57e6adcb38bb0851e8478e116cd133"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a354c159982ab8ae6fc328bf33c3abe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aa777e5139adfca31612ec04bc2b26845">i64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8c.html#a9a354c159982ab8ae6fc328bf33c3abe">saddi64</a> (<a class="el" href="types_8h.html#aa777e5139adfca31612ec04bc2b26845">i64</a> a, <a class="el" href="types_8h.html#aa777e5139adfca31612ec04bc2b26845">i64</a> b)</td></tr>
 <tr class="separator:a9a354c159982ab8ae6fc328bf33c3abe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1206d9360972c2e2d7c24ae51811cef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8c.html#ab1206d9360972c2e2d7c24ae51811cef">saddu64</a> (<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> a, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> b)</td></tr>
@@ -127,6 +134,52 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
           <td class="paramname"><em>b</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af335a90b7415faccd787ba061ba4b230"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af335a90b7415faccd787ba061ba4b230">&#9670;&nbsp;</a></span>string_free()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void string_free </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structStringImpl.html">StringImpl</a> *&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7b57e6adcb38bb0851e8478e116cd133"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b57e6adcb38bb0851e8478e116cd133">&#9670;&nbsp;</a></span>string_set()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int string_set </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structStringImpl.html">StringImpl</a> *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>ptr</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

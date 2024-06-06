@@ -1,7 +1,25 @@
 var searchData=
 [
-  ['fatal_19',['fatal',['../log_8h.html#a191cbe8316c8b0b2e6a1d5c0874cb9b1',1,'log.h']]],
-  ['fatal_5fall_20',['fatal_all',['../log_8h.html#a1cfe9495780fc55deb9785428c06f57e',1,'log.h']]],
-  ['fatal_5fplain_21',['fatal_plain',['../log_8h.html#a47b44bb8257c88e6849c714e8eafad59',1,'log.h']]],
-  ['free_5flist_5fhead_22',['free_list_head',['../structSlabDataParams.html#a6ce549a63c8c789b25497b393068ec4a',1,'SlabDataParams']]]
+  ['data_18',['data',['../structSlab.html#a26a854401ba1c09bfe2263542eefc4e2',1,'Slab::data()'],['../structSlabData.html#a2738164088caf7d104e6948cafcd080c',1,'SlabData::data()']]],
+  ['debug_19',['debug',['../log_8h.html#a25e1dd06859fa7bb2d4bb79972446ea2',1,'log.h']]],
+  ['debug_5fall_20',['debug_all',['../log_8h.html#a78b65d83e502a52028e6fd78f88efc35',1,'log.h']]],
+  ['debug_5fplain_21',['debug_plain',['../log_8h.html#afc5ef2b08266200dad700bfdd498ff3d',1,'log.h']]],
+  ['deserialize_22',['deserialize',['../ser_8c.html#ab6a21c5318225e624c536ce8fb5eb1aa',1,'deserialize(Serializable *s, Reader *reader):&#160;ser.c'],['../ser_8h.html#ab6a21c5318225e624c536ce8fb5eb1aa',1,'deserialize(Serializable *s, Reader *reader):&#160;ser.c'],['../structSerializable.html#a25a39c9828da8f558834e930f7dc9486',1,'Serializable::deserialize()']]],
+  ['deserialize_5fbool_23',['deserialize_bool',['../ser_8c.html#a8bb03d25f306ccfdaa5ae5de1fa41d43',1,'deserialize_bool(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#a8bb03d25f306ccfdaa5ae5de1fa41d43',1,'deserialize_bool(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5ff32_24',['deserialize_f32',['../ser_8c.html#a4f85ca918d5297ca63479c3db03eba25',1,'deserialize_f32(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#a4f85ca918d5297ca63479c3db03eba25',1,'deserialize_f32(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5ff64_25',['deserialize_f64',['../ser_8c.html#a6e072c9da2dce914a4c5f7e8bcfb2644',1,'deserialize_f64(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#a6e072c9da2dce914a4c5f7e8bcfb2644',1,'deserialize_f64(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fi128_26',['deserialize_i128',['../ser_8c.html#adcd40da68c95b1715975c215aa08f962',1,'deserialize_i128(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#adcd40da68c95b1715975c215aa08f962',1,'deserialize_i128(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fi16_27',['deserialize_i16',['../ser_8c.html#adf7e6d52cb180d06d73776e6c47bafed',1,'deserialize_i16(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#adf7e6d52cb180d06d73776e6c47bafed',1,'deserialize_i16(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fi32_28',['deserialize_i32',['../ser_8h.html#af49502351859df3ead382a6e9acf5938',1,'deserialize_i32(void *obj, Reader *reader):&#160;ser.c'],['../ser_8c.html#af49502351859df3ead382a6e9acf5938',1,'deserialize_i32(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fi64_29',['deserialize_i64',['../ser_8c.html#a7859fa18d5b4637fd728b9cfb412e384',1,'deserialize_i64(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#a7859fa18d5b4637fd728b9cfb412e384',1,'deserialize_i64(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fi8_30',['deserialize_i8',['../ser_8c.html#ab371e5242163ca5e6acc1bd6f44b21b9',1,'deserialize_i8(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#ab371e5242163ca5e6acc1bd6f44b21b9',1,'deserialize_i8(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fmy_5fstruct_31',['deserialize_my_struct',['../base_2test_8c.html#a2f004bce374d88922cfcfbb18c94e456',1,'test.c']]],
+  ['deserialize_5fname_32',['DESERIALIZE_NAME',['../ser_8h.html#a87bd20f97d3837c770680347ebd07ce4',1,'ser.h']]],
+  ['deserialize_5fstring_33',['deserialize_string',['../ser_8c.html#af65f071c1b8b387a0886b0b7cec268a0',1,'deserialize_string(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#af65f071c1b8b387a0886b0b7cec268a0',1,'deserialize_string(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fu128_34',['deserialize_u128',['../ser_8h.html#a49ec7cb20455c76eabfd2f573e22ebf8',1,'deserialize_u128(void *obj, Reader *reader):&#160;ser.c'],['../ser_8c.html#a49ec7cb20455c76eabfd2f573e22ebf8',1,'deserialize_u128(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fu16_35',['deserialize_u16',['../ser_8c.html#a8a4f53365c5b327ee941d5377ccdd82a',1,'deserialize_u16(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#a8a4f53365c5b327ee941d5377ccdd82a',1,'deserialize_u16(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fu32_36',['deserialize_u32',['../ser_8c.html#a455f468388840681d1c1508995bd63d5',1,'deserialize_u32(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#a455f468388840681d1c1508995bd63d5',1,'deserialize_u32(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fu64_37',['deserialize_u64',['../ser_8c.html#a3ac5ad3cb84ccca878172dd165f1b98c',1,'deserialize_u64(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#a3ac5ad3cb84ccca878172dd165f1b98c',1,'deserialize_u64(void *obj, Reader *reader):&#160;ser.c']]],
+  ['deserialize_5fu8_38',['deserialize_u8',['../ser_8c.html#ac6e8f0e5a9df6d717184222eaee0eca1',1,'deserialize_u8(void *obj, Reader *reader):&#160;ser.c'],['../ser_8h.html#ac6e8f0e5a9df6d717184222eaee0eca1',1,'deserialize_u8(void *obj, Reader *reader):&#160;ser.c']]],
+  ['do_5fslabs_39',['do_slabs',['../slabs_8c.html#a3441aaea7b5446aae18ee20ce3608b68',1,'slabs.c']]]
 ];

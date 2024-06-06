@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['data_11',['data',['../structSlabData.html#a2738164088caf7d104e6948cafcd080c',1,'SlabData::data()'],['../structSlab.html#a26a854401ba1c09bfe2263542eefc4e2',1,'Slab::data()']]],
-  ['debug_12',['debug',['../log_8h.html#a25e1dd06859fa7bb2d4bb79972446ea2',1,'log.h']]],
-  ['debug_5fall_13',['debug_all',['../log_8h.html#a78b65d83e502a52028e6fd78f88efc35',1,'log.h']]],
-  ['debug_5fplain_14',['debug_plain',['../log_8h.html#afc5ef2b08266200dad700bfdd498ff3d',1,'log.h']]],
-  ['do_5fslabs_15',['do_slabs',['../slabs_8c.html#a3441aaea7b5446aae18ee20ce3608b68',1,'slabs.c']]]
+  ['bin_5freader_5fread_5ffixed_5fbytes_2',['bin_reader_read_fixed_bytes',['../ser_8c.html#a3402d820e429668ad86f28fdba84e138',1,'bin_reader_read_fixed_bytes(Reader *reader, unsigned char *buffer, u64 len):&#160;ser.c'],['../ser_8h.html#a3402d820e429668ad86f28fdba84e138',1,'bin_reader_read_fixed_bytes(Reader *reader, unsigned char *buffer, u64 len):&#160;ser.c']]],
+  ['bin_5fwriter_5fwrite_5ffixed_5fbytes_3',['bin_writer_write_fixed_bytes',['../ser_8c.html#a24b12fbcfad03b02fe69cd1f7d6414cc',1,'bin_writer_write_fixed_bytes(Writer *writer, unsigned char *buffer, u64 len):&#160;ser.c'],['../ser_8h.html#a24b12fbcfad03b02fe69cd1f7d6414cc',1,'bin_writer_write_fixed_bytes(Writer *writer, unsigned char *buffer, u64 len):&#160;ser.c']]],
+  ['build_5freader_4',['build_reader',['../ser_8c.html#a27444d317e82a422dcdb684b84df1c9e',1,'build_reader(int(*read_fixed_bytes)(struct Reader *reader, unsigned char *buffer, u64 len), void *ptr):&#160;ser.c'],['../ser_8h.html#a27444d317e82a422dcdb684b84df1c9e',1,'build_reader(int(*read_fixed_bytes)(struct Reader *reader, unsigned char *buffer, u64 len), void *ptr):&#160;ser.c']]],
+  ['build_5fserializable_5',['build_serializable',['../ser_8c.html#a5480327a906d7d85e8a12b1cc882be8d',1,'build_serializable(void *ptr, int(*serialize)(void *obj, Writer *writer), int(*deserialize)(void *obj, Reader *reader)):&#160;ser.c'],['../ser_8h.html#a5480327a906d7d85e8a12b1cc882be8d',1,'build_serializable(void *ptr, int(*serialize)(void *obj, Writer *writer), int(*deserialize)(void *obj, Reader *reader)):&#160;ser.c']]],
+  ['build_5fwriter_6',['build_writer',['../ser_8c.html#a8c78063659c2c3bca66d2b21d49227e5',1,'build_writer(int(*write_fixed_bytes)(struct Writer *writer, unsigned char *buffer, u64 len), void *ptr):&#160;ser.c'],['../ser_8h.html#a8c78063659c2c3bca66d2b21d49227e5',1,'build_writer(int(*write_fixed_bytes)(struct Writer *writer, unsigned char *buffer, u64 len), void *ptr):&#160;ser.c']]]
 ];

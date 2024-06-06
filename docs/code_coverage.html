@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		 <p align="center">
-                        Code Coverage is currently 90.32%.
+                        Code Coverage is currently 87.80%.
                 </p>
 		<center>
 			<div class="chart">
@@ -76,7 +76,8 @@
 96.83,
 96.83,
 85.76,
-90.32,];
+90.32,
+87.80,];
 			let labels = [format_date(1716876818 * 1000 ),
 format_date(1716876822 * 1000 ),
 format_date(1716904488 * 1000 ),
@@ -100,7 +101,8 @@ format_date(1717380318 * 1000 ),
 format_date(1717381641 * 1000 ),
 format_date(1717398065 * 1000 ),
 format_date(1717484462 * 1000 ),
-format_date(1717570913 * 1000 ),];
+format_date(1717570913 * 1000 ),
+format_date(1717657365 * 1000 ),];
 
 			const data = {
 				labels: labels,
@@ -178,13 +180,13 @@ format_date(1717570913 * 1000 ),];
        70:   45:    return ret;
         -:   46:}
         -:   47:
-     2480:   48:int sprintf_err(char* str, const char* string, ...)
+     2484:   48:int sprintf_err(char* str, const char* string, ...)
         -:   49:{
         -:   50:    va_list args;
-     2480:   51:    va_start(args, string);
-     2480:   52:    int ret = vsprintf(str, string, args);
-     2480:   53:    va_end(args);
-     2480:   54:    return (ret > 0) ? 0 : ret;
+     2484:   51:    va_start(args, string);
+     2484:   52:    int ret = vsprintf(str, string, args);
+     2484:   53:    va_end(args);
+     2484:   54:    return (ret > 0) ? 0 : ret;
         -:   55:}
         -:   56:
        82:   57:int set_option(Log* log, int type, void* value)
@@ -308,41 +310,41 @@ format_date(1717570913 * 1000 ),];
        32:  175:    return ret;
         -:  176:}
         -:  177:
-      620:  178:int get_format(Log* log, LogLevel level, char* buf)
+      621:  178:int get_format(Log* log, LogLevel level, char* buf)
         -:  179:{
-      620:  180:    int ret = 0;
+      621:  180:    int ret = 0;
         -:  181:    char milli_buf[14];
         -:  182:    char log_level_buf[20];
         -:  183:    char dt_buf[40];
         -:  184:    char spacing[2];
-      620:  185:    time_t t = time(NULL);
-      620:  186:    struct tm tm = *localtime(&t);
+      621:  185:    time_t t = time(NULL);
+      621:  186:    struct tm tm = *localtime(&t);
         -:  187:
-      620:  188:    if (log->show_millis) {
+      621:  188:    if (log->show_millis) {
         -:  189:        struct timeval time;
-      617:  190:        gettimeofday(&time, NULL);
-      617:  191:        int millis = time.tv_usec / 1000;
-      617:  192:        ret = sprintf_err(milli_buf, ".%03d", millis);
+      618:  190:        gettimeofday(&time, NULL);
+      618:  191:        int millis = time.tv_usec / 1000;
+      618:  192:        ret = sprintf_err(milli_buf, ".%03d", millis);
         -:  193:    } else {
         3:  194:        strcpy(milli_buf, "");
         -:  195:    }
         -:  196:
-      620:  197:    if (log->show_timestamp) {
-      616:  198:        strcpy(spacing, " ");
+      621:  197:    if (log->show_timestamp) {
+      617:  198:        strcpy(spacing, " ");
         -:  199:    } else {
         4:  200:        strcpy(spacing, "");
         -:  201:    }
         -:  202:
-      620:  203:    if (log->show_log_level && ret == 0) {
-      619:  204:        if (level == Trace) {
+      621:  203:    if (log->show_log_level && ret == 0) {
+      620:  204:        if (level == Trace) {
         2:  205:            if (log->show_colors) {
         1:  206:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_YELLOW "TRACE" ANSI_COLOR_RESET ")", spacing);
         -:  207:            } else {
         1:  208:                ret = sprintf_err(log_level_buf, "%s(TRACE)", spacing);
         -:  209:            }
-      617:  210:        } else if (level == Debug) {
-      601:  211:            if (log->show_colors) {
-      598:  212:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_CYAN "DEBUG" ANSI_COLOR_RESET ")", spacing);
+      618:  210:        } else if (level == Debug) {
+      602:  211:            if (log->show_colors) {
+      599:  212:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_CYAN "DEBUG" ANSI_COLOR_RESET ")", spacing);
         -:  213:            } else {
         3:  214:                ret = sprintf_err(log_level_buf, "%s(DEBUG)", spacing);
         -:  215:            }
@@ -375,15 +377,15 @@ format_date(1717570913 * 1000 ),];
         1:  242:        strcpy(log_level_buf, "");
         -:  243:    }
         -:  244:
-      620:  245:    if (log->show_timestamp && ret == 0) {
-      616:  246:        if (log->show_colors) {
-      604:  247:            ret = sprintf_err(
+      621:  245:    if (log->show_timestamp && ret == 0) {
+      617:  246:        if (log->show_colors) {
+      605:  247:            ret = sprintf_err(
         -:  248:                dt_buf,
         -:  249:                "[" ANSI_COLOR_DIMMED
         -:  250:                "%d-%02d-%02d %02d:%02d:%02d%s" ANSI_COLOR_RESET
         -:  251:                "]",
-      604:  252:                tm.tm_year + 1900,
-      604:  253:                tm.tm_mon + 1,
+      605:  252:                tm.tm_year + 1900,
+      605:  253:                tm.tm_mon + 1,
         -:  254:                tm.tm_mday,
         -:  255:                tm.tm_hour,
         -:  256:                tm.tm_min,
@@ -407,63 +409,63 @@ format_date(1717570913 * 1000 ),];
         4:  274:        strcpy(dt_buf, "");
         -:  275:    }
         -:  276:
-      620:  277:    if ((level == Info || level == Warn) && log->show_log_level) {
+      621:  277:    if ((level == Info || level == Warn) && log->show_log_level) {
        12:  278:        strcpy(spacing, ":");
         -:  279:    } else {
-      608:  280:        strcpy(spacing, "");
+      609:  280:        strcpy(spacing, "");
         -:  281:    }
         -:  282:
-      620:  283:    if (ret == 0) {
-      620:  284:        ret = sprintf_err(
+      621:  283:    if (ret == 0) {
+      621:  284:        ret = sprintf_err(
         -:  285:            buf,
         -:  286:            "%s%s%s: ",
         -:  287:            dt_buf,
         -:  288:            log_level_buf,
         -:  289:            spacing);
         -:  290:    }
-      620:  291:    return ret;
+      621:  291:    return ret;
         -:  292:}
         -:  293:
-      687:  294:int do_log(Log* log, LogLevel level, char* line, bool is_plain, bool is_all, va_list args)
+      688:  294:int do_log(Log* log, LogLevel level, char* line, bool is_plain, bool is_all, va_list args)
         -:  295:{
-      687:  296:    int ret = 0;
-      687:  297:    if (!log->is_init) {
+      688:  296:    int ret = 0;
+      688:  297:    if (!log->is_init) {
         1:  298:        fputs("error: log has not been initialized\n", stderr);
         1:  299:        return -1;
         -:  300:    }
         -:  301:
-      686:  302:    if (level >= log->level) {
+      687:  302:    if (level >= log->level) {
         -:  303:        va_list args_copy;
-      681:  304:        va_copy(args_copy, args);
+      682:  304:        va_copy(args_copy, args);
         -:  305:
-      681:  306:        int len = strlen(line);
-      681:  307:        char fline[len + 100];
+      682:  306:        int len = strlen(line);
+      682:  307:        char fline[len + 100];
         -:  308:
-      681:  309:        if (is_plain) {
+      682:  309:        if (is_plain) {
        61:  310:            strcpy(fline, "");
         -:  311:        } else {
-      620:  312:            ret = get_format(log, level, fline);
+      621:  312:            ret = get_format(log, level, fline);
         -:  313:        }
-      681:  314:        strcat(fline, line);
-      681:  315:        strcat(fline, "\n");
+      682:  314:        strcat(fline, line);
+      682:  315:        strcat(fline, "\n");
         -:  316:
-      681:  317:        if ((log->show_stdout || is_all) && ret == 0) {
-      634:  318:            int v = vprintf(fline, args);
-      634:  319:	    ret = (v > 0) ? 0 : v;
+      682:  317:        if ((log->show_stdout || is_all) && ret == 0) {
+      635:  318:            int v = vprintf(fline, args);
+      635:  319:	    ret = (v > 0) ? 0 : v;
         -:  320:        }
         -:  321:
-      681:  322:        if (log->fp && ret == 0) {
+      682:  322:        if (log->fp && ret == 0) {
        81:  323:            int v = vfprintf(log->fp, fline, args_copy);
        81:  324:	    ret = (v > 0) ? 0 : v;
        81:  325:            log->off = ftello(log->fp);
         -:  326:        }
-      681:  327:        if (log->auto_rotate && ret == 0) {
+      682:  327:        if (log->auto_rotate && ret == 0) {
        12:  328:            if (log_need_rotate(log)) {
         2:  329:                ret = log_rotate(log);
         -:  330:            }
         -:  331:        }
         -:  332:    }
-      686:  333:    return ret;
+      687:  333:    return ret;
         -:  334:}
         -:  335:
         2:  336:int log_all(Log* log, LogLevel level, char* line, ...)
@@ -493,10 +495,10 @@ format_date(1717570913 * 1000 ),];
        21:  360:    return ret;
         -:  361:}
         -:  362:
-      606:  363:void log_set_level(Log* log, LogLevel level)
+      607:  363:void log_set_level(Log* log, LogLevel level)
         -:  364:{
-      606:  365:    log->level = level;
-      606:  366:}
+      607:  365:    log->level = level;
+      607:  366:}
         -:  367:
        26:  368:int log_init(Log* log)
         -:  369:{
@@ -776,12 +778,12 @@ format_date(1717570913 * 1000 ),];
         -:  643:Log _global_logger__;
         -:  644:bool _global_logger_is_init__ = false;
         -:  645:
-      604:  646:int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char* line, ...)
+      605:  646:int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char* line, ...)
         -:  647:{
-      604:  648:    int ret = 0;
-      604:  649:    pthread_mutex_lock(&_global_logger_mutex__);
+      605:  648:    int ret = 0;
+      605:  649:    pthread_mutex_lock(&_global_logger_mutex__);
         -:  650:
-      604:  651:    if (!_global_logger_is_init__) {
+      605:  651:    if (!_global_logger_is_init__) {
         5:  652:        ret = logger(&_global_logger__, 0);
         5:  653:        if (ret == 0)
         5:  654:            ret = log_init(&_global_logger__);
@@ -789,17 +791,17 @@ format_date(1717570913 * 1000 ),];
         5:  656:            _global_logger_is_init__ = true;
         -:  657:    }
         -:  658:
-      604:  659:    if (ret == 0) {
-      604:  660:        log_set_level(&_global_logger__, global);
+      605:  659:    if (ret == 0) {
+      605:  660:        log_set_level(&_global_logger__, global);
         -:  661:
         -:  662:        va_list args;
-      604:  663:        va_start(args, line);
-      604:  664:        ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
-      604:  665:        va_end(args);
+      605:  663:        va_start(args, line);
+      605:  664:        ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
+      605:  665:        va_end(args);
         -:  666:    }
         -:  667:
-      604:  668:    pthread_mutex_unlock(&_global_logger_mutex__);
-      604:  669:    return ret;
+      605:  668:    pthread_mutex_unlock(&_global_logger_mutex__);
+      605:  669:    return ret;
         -:  670:}
         -:  671:
         3:  672:int init_global_logger(int num, ...)
@@ -854,7 +856,7 @@ format_date(1717570913 * 1000 ),];
         -:    0:Source:config.c
         -:    0:Graph:./config.gcno
         -:    0:Data:./config.gcda
-        -:    0:Runs:3
+        -:    0:Runs:5
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -951,7 +953,7 @@ format_date(1717570913 * 1000 ),];
         -:    0:Source:rand.c
         -:    0:Graph:./rand.gcno
         -:    0:Data:./rand.gcda
-        -:    0:Runs:28
+        -:    0:Runs:30
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -967,96 +969,97 @@ format_date(1717570913 * 1000 ),];
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <base/rand.h>
-        -:   16:#include <sys/random.h>
-        -:   17:
-        4:   18:int rand_i8(i8* v)
-        -:   19:{
-        -:   20:    char buf[1];
-        4:   21:    int ret = getentropy(buf, 1);
-        4:   22:    *v = (i8)buf[0];
-        4:   23:    return ret;
-        -:   24:}
-        -:   25:
-        4:   26:int rand_u8(u8* v)
-        -:   27:{
-        -:   28:    char buf[1];
-        4:   29:    int ret = getentropy(buf, 1);
-        4:   30:    *v = (u8)buf[0];
-        4:   31:    return ret;
-        -:   32:}
-        -:   33:
-        4:   34:int rand_i16(i16* v)
-        -:   35:{
-        -:   36:    char buf[2];
-        4:   37:    int ret = getentropy(buf, 2);
-        4:   38:    *v = ((i16)buf[0] << 8) + (i16)buf[1];
-        4:   39:    return ret;
-        -:   40:}
-        -:   41:
-        4:   42:int rand_u16(u16* v)
-        -:   43:{
-        -:   44:    char buf[2];
-        4:   45:    int ret = getentropy(buf, 2);
-        4:   46:    *v = ((u16)buf[0] << 8) + (u16)buf[1];
-        4:   47:    return ret;
-        -:   48:}
-        -:   49:
-        1:   50:int rand_i32(int32_t* v)
-        -:   51:{
-        -:   52:    char buf[4];
-        1:   53:    int ret = getentropy(buf, 4);
-        1:   54:    *v = ((int32_t)buf[0] << 24) + ((int32_t)buf[1] << 16) + ((int32_t)buf[2] << 8) + (int32_t)buf[3];
-        1:   55:    return ret;
-        -:   56:}
-        -:   57:
-        2:   58:int rand_u32(uint32_t* v)
-        -:   59:{
-        -:   60:    char buf[4];
-        2:   61:    int ret = getentropy(buf, 4);
-        2:   62:    *v = ((uint32_t)buf[0] << 24) + ((uint32_t)buf[1] << 16) + ((uint32_t)buf[2] << 8) + (uint32_t)buf[3];
-        2:   63:    return ret;
-        -:   64:}
-        -:   65:
-        1:   66:int rand_i64(int64_t* v)
-        -:   67:{
-        -:   68:    char buf[8];
-        1:   69:    int ret = getentropy(buf, 8);
-        1:   70:    *v = ((int64_t)buf[0] << 56) + ((int64_t)buf[1] << 48) + ((int64_t)buf[2] << 40) + ((int64_t)buf[3] << 32) + ((int64_t)buf[4] << 24) + ((int64_t)buf[5] << 16) + ((int64_t)buf[6] << 8) + (int64_t)buf[7];
-        1:   71:    return ret;
-        -:   72:}
-        -:   73:
-       10:   74:int rand_u64(uint64_t* v)
-        -:   75:{
-        -:   76:    char buf[8];
-       10:   77:    int ret = getentropy(buf, 8);
-       10:   78:    *v = ((uint64_t)buf[0] << 56) + ((uint64_t)buf[1] << 48) + ((uint64_t)buf[2] << 40) + ((uint64_t)buf[3] << 32) + ((uint64_t)buf[4] << 24) + ((uint64_t)buf[5] << 16) + ((uint64_t)buf[6] << 8) + (uint64_t)buf[7];
-       10:   79:    return ret;
-        -:   80:}
-        -:   81:
-        1:   82:int rand_i128(i128* v)
-        -:   83:{
-        -:   84:    char buf[16];
-        1:   85:    int ret = getentropy(buf, 16);
-        1:   86:    *v = ((i128)buf[0] << 120) + ((i128)buf[1] << 112) + ((i128)buf[2] << 104) + ((i128)buf[3] << 96) + ((i128)buf[4] << 88) + ((i128)buf[5] << 80) + ((i128)buf[6] << 72) + ((i128)buf[7] << 64) + ((i128)buf[8] << 56) + ((i128)buf[9] << 48) + ((i128)buf[10] << 40) + ((i128)buf[11] << 32) + ((i128)buf[12] << 24) + ((i128)buf[13] << 16) + ((i128)buf[14] << 8) + (i128)buf[15];
-        1:   87:    return ret;
-        -:   88:}
-        -:   89:
-        1:   90:int rand_u128(u128* v)
-        -:   91:{
-        -:   92:    char buf[16];
-        1:   93:    int ret = getentropy(buf, 16);
-        1:   94:    *v = ((u128)buf[0] << 120) + ((u128)buf[1] << 112) + ((u128)buf[2] << 104) + ((u128)buf[3] << 96) + ((u128)buf[4] << 88) + ((u128)buf[5] << 80) + ((u128)buf[6] << 72) + ((u128)buf[7] << 64) + ((u128)buf[8] << 56) + ((u128)buf[9] << 48) + ((u128)buf[10] << 40) + ((u128)buf[11] << 32) + ((u128)buf[12] << 24) + ((u128)buf[13] << 16) + ((u128)buf[14] << 8) + (u128)buf[15];
-        1:   95:    return ret;
-        -:   96:}
-        -:   97:
-        2:   98:int rand_bytes(void* buf, size_t length)
-        -:   99:{
-        2:  100:    return getentropy(buf, length);
-        -:  101:}
-        -:    0:Source:types.c
-        -:    0:Graph:./types.gcno
-        -:    0:Data:./types.gcda
-        -:    0:Runs:9
+        -:   16:#include <base/types.h>
+        -:   17:#include <sys/random.h>
+        -:   18:
+        4:   19:int rand_i8(i8* v)
+        -:   20:{
+        -:   21:    char buf[1];
+        4:   22:    int ret = getentropy(buf, 1);
+        4:   23:    *v = (i8)buf[0];
+        4:   24:    return ret;
+        -:   25:}
+        -:   26:
+        4:   27:int rand_u8(u8* v)
+        -:   28:{
+        -:   29:    char buf[1];
+        4:   30:    int ret = getentropy(buf, 1);
+        4:   31:    *v = (u8)buf[0];
+        4:   32:    return ret;
+        -:   33:}
+        -:   34:
+        4:   35:int rand_i16(i16* v)
+        -:   36:{
+        -:   37:    char buf[2];
+        4:   38:    int ret = getentropy(buf, 2);
+        4:   39:    *v = ((i16)buf[0] << 8) + (i16)buf[1];
+        4:   40:    return ret;
+        -:   41:}
+        -:   42:
+        4:   43:int rand_u16(u16* v)
+        -:   44:{
+        -:   45:    char buf[2];
+        4:   46:    int ret = getentropy(buf, 2);
+        4:   47:    *v = ((u16)buf[0] << 8) + (u16)buf[1];
+        4:   48:    return ret;
+        -:   49:}
+        -:   50:
+        1:   51:int rand_i32(i32* v)
+        -:   52:{
+        -:   53:    char buf[4];
+        1:   54:    int ret = getentropy(buf, 4);
+        1:   55:    *v = ((i32)buf[0] << 24) + ((i32)buf[1] << 16) + ((i32)buf[2] << 8) + (i32)buf[3];
+        1:   56:    return ret;
+        -:   57:}
+        -:   58:
+        2:   59:int rand_u32(u32* v)
+        -:   60:{
+        -:   61:    char buf[4];
+        2:   62:    int ret = getentropy(buf, 4);
+        2:   63:    *v = ((u32)buf[0] << 24) + ((u32)buf[1] << 16) + ((u32)buf[2] << 8) + (u32)buf[3];
+        2:   64:    return ret;
+        -:   65:}
+        -:   66:
+        1:   67:int rand_i64(i64* v)
+        -:   68:{
+        -:   69:    char buf[8];
+        1:   70:    int ret = getentropy(buf, 8);
+        1:   71:    *v = ((i64)buf[0] << 56) + ((i64)buf[1] << 48) + ((i64)buf[2] << 40) + ((i64)buf[3] << 32) + ((i64)buf[4] << 24) + ((i64)buf[5] << 16) + ((i64)buf[6] << 8) + (i64)buf[7];
+        1:   72:    return ret;
+        -:   73:}
+        -:   74:
+       10:   75:int rand_u64(u64* v)
+        -:   76:{
+        -:   77:    char buf[8];
+       10:   78:    int ret = getentropy(buf, 8);
+       10:   79:    *v = ((u64)buf[0] << 56) + ((u64)buf[1] << 48) + ((u64)buf[2] << 40) + ((u64)buf[3] << 32) + ((u64)buf[4] << 24) + ((u64)buf[5] << 16) + ((u64)buf[6] << 8) + (u64)buf[7];
+       10:   80:    return ret;
+        -:   81:}
+        -:   82:
+        1:   83:int rand_i128(i128* v)
+        -:   84:{
+        -:   85:    char buf[16];
+        1:   86:    int ret = getentropy(buf, 16);
+        1:   87:    *v = ((i128)buf[0] << 120) + ((i128)buf[1] << 112) + ((i128)buf[2] << 104) + ((i128)buf[3] << 96) + ((i128)buf[4] << 88) + ((i128)buf[5] << 80) + ((i128)buf[6] << 72) + ((i128)buf[7] << 64) + ((i128)buf[8] << 56) + ((i128)buf[9] << 48) + ((i128)buf[10] << 40) + ((i128)buf[11] << 32) + ((i128)buf[12] << 24) + ((i128)buf[13] << 16) + ((i128)buf[14] << 8) + (i128)buf[15];
+        1:   88:    return ret;
+        -:   89:}
+        -:   90:
+        2:   91:int rand_u128(u128* v)
+        -:   92:{
+        -:   93:    char buf[16];
+        2:   94:    int ret = getentropy(buf, 16);
+        2:   95:    *v = ((u128)buf[0] << 120) + ((u128)buf[1] << 112) + ((u128)buf[2] << 104) + ((u128)buf[3] << 96) + ((u128)buf[4] << 88) + ((u128)buf[5] << 80) + ((u128)buf[6] << 72) + ((u128)buf[7] << 64) + ((u128)buf[8] << 56) + ((u128)buf[9] << 48) + ((u128)buf[10] << 40) + ((u128)buf[11] << 32) + ((u128)buf[12] << 24) + ((u128)buf[13] << 16) + ((u128)buf[14] << 8) + (u128)buf[15];
+        2:   96:    return ret;
+        -:   97:}
+        -:   98:
+        2:   99:int rand_bytes(void* buf, size_t length)
+        -:  100:{
+        2:  101:    return getentropy(buf, length);
+        -:  102:}
+        -:    0:Source:ser.c
+        -:    0:Graph:./ser.gcno
+        -:    0:Data:./ser.gcda
+        -:    0:Runs:5
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1072,23 +1075,415 @@ format_date(1717570913 * 1000 ),];
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <base/types.h>
-        -:   16:
-    #####:   17:i64 saddi64(i64 a, i64 b)
-        -:   18:{
-    #####:   19:    if (a > 0) {
-    #####:   20:        if (b > INT64_MAX - a) {
-    #####:   21:            return INT64_MAX;
-        -:   22:        }
-    #####:   23:    } else if (b < INT64_MIN - a) {
-    #####:   24:            return INT64_MIN;
-        -:   25:    }
+        -:   16:#include <base/ser.h>
+        -:   17:#include <string.h>
+        -:   18:#include <stdlib.h>
+        -:   19:#include <stdio.h>
+        -:   20:
+        8:   21:int serialize(Serializable *s, Writer *writer) {
+        8:   22:	return s->serialize(s->ptr, writer);
+        -:   23:}
+        -:   24:
+        8:   25:int deserialize(Serializable *s, Reader *reader) {
+        8:   26:	return s->deserialize(s->ptr, reader);
+        -:   27:}
+        -:   28:
+        1:   29:Reader build_reader(int (*read_fixed_bytes)(struct Reader *reader, unsigned char *buffer, u64 len), void *ptr)
+        -:   30:{
+        -:   31:        Reader ret;
+        1:   32:        ret.ptr = ptr;
+        1:   33:        ret.read_fixed_bytes = read_fixed_bytes;
+        1:   34:        return ret;
+        -:   35:}
+        -:   36:
+       16:   37:Serializable build_serializable(
+        -:   38:	void *ptr,
+        -:   39:	int (*serialize)(void *obj, Writer *writer),
+        -:   40:	int (*deserialize)(void *obj, Reader *reader)
+        -:   41:) {
+        -:   42:	Serializable ret;
+       16:   43:	ret.ptr = ptr;
+       16:   44:	ret.serialize = serialize;
+       16:   45:	ret.deserialize = deserialize;
+       16:   46:	return ret;
+        -:   47:}
+        -:   48:
+        1:   49:Writer build_writer(int (*write_fixed_bytes)(struct Writer *writer, unsigned char *buffer, u64 len), void *ptr) {
+        -:   50:	Writer ret;
+        1:   51:	ret.ptr = ptr;
+        1:   52:	ret.write_fixed_bytes = write_fixed_bytes;
+        1:   53:	return ret;
+        -:   54:}
+        -:   55:
+       11:   56:int bin_reader_read_fixed_bytes(Reader *reader, unsigned char *buffer, u64 len) {
+       11:   57:	memcpy(buffer, reader->ptr, len);
+       11:   58:	reader->ptr += len;
+       11:   59:	return 0;
+        -:   60:}
+        -:   61:
+       11:   62:int bin_writer_write_fixed_bytes(Writer *writer, unsigned char *buffer, u64 len) {
+       11:   63:	memcpy(writer->ptr, buffer, len);
+       11:   64:	writer->ptr += len;
+       11:   65:	return 0;
+        -:   66:}
+        -:   67:
+    #####:   68:int serialize_i128(void *obj, Writer *writer) {
+    #####:   69:        return serialize_u128(obj, writer);
+        -:   70:}
+        -:   71:
+    #####:   72:int deserialize_i128(void *obj, Reader *reader) {
+    #####:   73:        return deserialize_u128(obj, reader);
+        -:   74:}
+        -:   75:
+    #####:   76:int serialize_f64(void *obj, Writer *writer) {
+    #####:   77:        return serialize_u64(obj, writer);
+        -:   78:}
+        -:   79:
+    #####:   80:int deserialize_f64(void *obj, Reader *reader) {
+    #####:   81:        return deserialize_u64(obj, reader);
+        -:   82:}
+        -:   83:
+    #####:   84:int serialize_f32(void *obj, Writer *writer) {
+    #####:   85:        return serialize_u32(obj, writer);
+        -:   86:}
+        -:   87:
+    #####:   88:int deserialize_f32(void *obj, Reader *reader) {
+    #####:   89:        return deserialize_u32(obj, reader);
+        -:   90:}
+        -:   91:
+    #####:   92:int serialize_i64(void *obj, Writer *writer) {
+    #####:   93:	return serialize_u64(obj, writer);
+        -:   94:}
+        -:   95:
+        1:   96:int deserialize_i64(void *obj, Reader *reader) {
+        1:   97:        return deserialize_u64(obj, reader);
+        -:   98:}
+        -:   99:
+    #####:  100:int serialize_i32(void *obj, Writer *writer) {
+    #####:  101:        return serialize_u32(obj, writer);
+        -:  102:}
+        -:  103:
+    #####:  104:int deserialize_i32(void *obj, Reader *reader) {
+    #####:  105:        return deserialize_u32(obj, reader);
+        -:  106:}
+        -:  107:
+    #####:  108:int serialize_i16(void *obj, Writer *writer) {
+    #####:  109:        return serialize_u16(obj, writer);
+        -:  110:}
+        -:  111:
+    #####:  112:int deserialize_i16(void *obj, Reader *reader) {
+    #####:  113:        return deserialize_u16(obj, reader);
+        -:  114:}
+        -:  115:
+    #####:  116:int serialize_i8(void *obj, Writer *writer) {
+    #####:  117:        return serialize_u8(obj, writer);
+        -:  118:}
+        -:  119:
+    #####:  120:int deserialize_i8(void *obj, Reader *reader) {
+    #####:  121:        return deserialize_u8(obj, reader);
+        -:  122:}
+        -:  123:
+        2:  124:int deserialize_bool(void *obj, Reader *reader) {
+        -:  125:	unsigned char buffer[1];
+        2:  126:        int ret = reader->read_fixed_bytes(reader, buffer, 1);
+        -:  127:
+        2:  128:        if(ret == 0) {
+        2:  129:                *((bool *)obj) = false;
+        2:  130:		if(buffer[0])
+        1:  131:			*((bool *)obj) = true;
+        -:  132:        }
+        -:  133:
+        2:  134:        return ret;
+        -:  135:}
+        -:  136:
+        2:  137:int serialize_bool(void *obj, Writer *writer) {
+        -:  138:	unsigned char buffer[1];
+        -:  139:
+        2:  140:	if(*((bool *)obj)) {
+        1:  141:		buffer[0] = 1;
+        -:  142:	} else {
+        1:  143:        	buffer[0] = 0;
+        -:  144:	}
+        -:  145:
+        2:  146:        return writer->write_fixed_bytes(writer, buffer, 1);
+        -:  147:}
+        -:  148:
+    #####:  149:int deserialize_u8(void *obj, Reader *reader) {
+        -:  150:        unsigned char buffer[1];
+    #####:  151:        int ret = reader->read_fixed_bytes(reader, buffer, 1);
+        -:  152:
+    #####:  153:        if(ret == 0) {
+    #####:  154:                *((u8 *)obj) = 0;
+    #####:  155:                *((u8 *)obj) += (u8)(buffer[0] & 0xFF);
+        -:  156:        }
+        -:  157:
+    #####:  158:        return ret;
+        -:  159:}
+        -:  160:
+    #####:  161:int serialize_u8(void *obj, Writer *writer) {
+        -:  162:        unsigned char buffer[1];
+        -:  163:
+    #####:  164:        buffer[0] = *((u8 *)obj) & 0xFF;
+        -:  165:
+    #####:  166:        return writer->write_fixed_bytes(writer, buffer, 1);
+        -:  167:}
+        -:  168:
+    #####:  169:int deserialize_u16(void *obj, Reader *reader) {
+        -:  170:        unsigned char buffer[2];
+    #####:  171:        int ret = reader->read_fixed_bytes(reader, buffer, 2);
+        -:  172:
+    #####:  173:        if(ret == 0) {
+    #####:  174:                *((u16*)obj) = 0;
+    #####:  175:                *((u16 *)obj) += (u16)(buffer[1] & 0xFF);
+    #####:  176:                *((u16 *)obj) += (u16)(buffer[0] & 0xFF) << 8;
+        -:  177:        }
+        -:  178:
+    #####:  179:        return ret;
+        -:  180:}
+        -:  181:
+    #####:  182:int serialize_u16(void *obj, Writer *writer) {
+        -:  183:        unsigned char buffer[2];
+        -:  184:
+    #####:  185:        u16  value = *((u16 *)obj);
+    #####:  186:        buffer[1] = value & 0xFF;
+    #####:  187:        value >>= 8;
+    #####:  188:        buffer[0] = value & 0xFF;
+        -:  189:
+    #####:  190:        return writer->write_fixed_bytes(writer, buffer, 2);
+        -:  191:}
+        -:  192:
+        3:  193:int deserialize_u32(void *obj, Reader *reader) {
+        -:  194:        unsigned char buffer[4];
+        3:  195:        int ret = reader->read_fixed_bytes(reader, buffer, 4);
+        -:  196:
+        3:  197:        if(ret == 0) {
+        3:  198:                *((u32 *)obj) = 0;
+        3:  199:		*((u32 *)obj) += (u32)(buffer[3] & 0xFF);
+        3:  200:                *((u32 *)obj) += (u32)(buffer[2] & 0xFF) << 8;
+        3:  201:                *((u32 *)obj) += (u32)(buffer[1] & 0xFF) << 16;
+        3:  202:                *((u32 *)obj) += (u32)(buffer[0] & 0xFF) << 24;
+        -:  203:        }
+        -:  204:
+        3:  205:        return ret;
+        -:  206:}
+        -:  207:
+        3:  208:int serialize_u32(void *obj, Writer *writer) {
+        -:  209:	unsigned char buffer[4];
+        -:  210:
+        3:  211:        u32 value = *((u32 *)obj);
+        3:  212:        buffer[3] = value & 0xFF;
+        3:  213:        value >>= 8;
+        3:  214:        buffer[2] = value & 0xFF;
+        3:  215:        value >>= 8;
+        3:  216:        buffer[1] = value & 0xFF;
+        3:  217:        value >>= 8;
+        3:  218:        buffer[0] = value & 0xFF;
+        -:  219:
+        3:  220:        return writer->write_fixed_bytes(writer, buffer, 4);
+        -:  221:}
+        -:  222:
+        4:  223:int deserialize_u64(void *obj, Reader *reader) {
+        -:  224:        unsigned char buffer[8];
+        4:  225:        int ret = reader->read_fixed_bytes(reader, buffer, 8);
+        -:  226:
+        4:  227:        if(ret == 0) {
+        4:  228:                *((u64 *)obj) = 0;
+        4:  229:                *((u64 *)obj) += (u64)(buffer[7] & 0xFF);
+        4:  230:                *((u64 *)obj) += (u64)(buffer[6] & 0xFF) << 8;
+        4:  231:                *((u64 *)obj) += (u64)(buffer[5] & 0xFF) << 16;
+        4:  232:                *((u64 *)obj) += (u64)(buffer[4] & 0xFF) << 24;
+        4:  233:                *((u64 *)obj) += (u64)(buffer[3] & 0xFF) << 32;
+        4:  234:                *((u64 *)obj) += (u64)(buffer[2] & 0xFF) << 40;
+        4:  235:                *((u64 *)obj) += (u64)(buffer[1] & 0xFF) << 48;
+        4:  236:                *((u64 *)obj) += (u64)(buffer[0] & 0xFF) << 56;
+        -:  237:        }
+        -:  238:
+        4:  239:        return ret;
+        -:  240:}
+        -:  241:
+        4:  242:int serialize_u64(void *obj, Writer *writer) {
+        -:  243:        unsigned char buffer[8];
+        -:  244:
+        4:  245:        u64 value = *((u64 *)obj);
+        4:  246:        buffer[7] = value & 0xFF;
+        4:  247:        value >>= 8;
+        4:  248:        buffer[6] = value & 0xFF;
+        4:  249:        value >>= 8;
+        4:  250:        buffer[5] = value & 0xFF;
+        4:  251:        value >>= 8;
+        4:  252:        buffer[4] = value & 0xFF;
+        4:  253:        value >>= 8;
+        4:  254:        buffer[3] = value & 0xFF;
+        4:  255:        value >>= 8;
+        4:  256:        buffer[2] = value & 0xFF;
+        4:  257:        value >>= 8;
+        4:  258:        buffer[1] = value & 0xFF;
+        4:  259:        value >>= 8;
+        4:  260:        buffer[0] = value & 0xFF;
+        -:  261:
+        4:  262:        return writer->write_fixed_bytes(writer, buffer, 8);
+        -:  263:}
+        -:  264:
+        1:  265:int deserialize_u128(void *obj, Reader *reader) {
+        -:  266:        unsigned char buffer[16];
+        1:  267:        int ret = reader->read_fixed_bytes(reader, buffer, 16);
+        -:  268:
+        1:  269:        if(ret == 0) {
+        1:  270:                *((u128 *)obj) = 0;
+        1:  271:                *((u128 *)obj) += (u128)(buffer[15] & 0xFF);
+        1:  272:		*((u128 *)obj) += (u128)(buffer[14] & 0xFF) << 8;
+        1:  273:		*((u128 *)obj) += (u128)(buffer[13] & 0xFF) << 16;
+        1:  274:		*((u128 *)obj) += (u128)(buffer[12] & 0xFF) << 24;
+        1:  275:		*((u128 *)obj) += (u128)(buffer[11] & 0xFF) << 32;
+        1:  276:		*((u128 *)obj) += (u128)(buffer[10] & 0xFF) << 40;
+        1:  277:		*((u128 *)obj) += (u128)(buffer[9] & 0xFF) << 48;
+        1:  278:		*((u128 *)obj) += (u128)(buffer[8] & 0xFF) << 56;
+        1:  279:		*((u128 *)obj) += (u128)(buffer[7] & 0xFF) << 64;
+        1:  280:		*((u128 *)obj) += (u128)(buffer[6] & 0xFF) << 72;
+        1:  281:		*((u128 *)obj) += (u128)(buffer[5] & 0xFF) << 80;
+        1:  282:		*((u128 *)obj) += (u128)(buffer[4] & 0xFF) << 88;
+        1:  283:		*((u128 *)obj) += (u128)(buffer[3] & 0xFF) << 96;
+        1:  284:		*((u128 *)obj) += (u128)(buffer[2] & 0xFF) << 104;
+        1:  285:		*((u128 *)obj) += (u128)(buffer[1] & 0xFF) << 112;
+        1:  286:		*((u128 *)obj) += (u128)(buffer[0] & 0xFF) << 120;
+        -:  287:        }
+        -:  288:
+        1:  289:        return ret;
+        -:  290:}
+        -:  291:
+        1:  292:int serialize_u128(void *obj, Writer *writer) {
+        -:  293:        unsigned char buffer[16];
+        -:  294:
+        1:  295:        u128 value = *((u128 *)obj);
+        1:  296:	buffer[15] = value & 0xFF;
+        1:  297:        value >>= 8;
+        1:  298:        buffer[14] = value & 0xFF;
+        1:  299:        value >>= 8;
+        1:  300:        buffer[13] = value & 0xFF;
+        1:  301:        value >>= 8;
+        1:  302:        buffer[12] = value & 0xFF;
+        1:  303:        value >>= 8;
+        1:  304:        buffer[11] = value & 0xFF;
+        1:  305:        value >>= 8;
+        1:  306:        buffer[10] = value & 0xFF;
+        1:  307:        value >>= 8;
+        1:  308:        buffer[9] = value & 0xFF;
+        1:  309:        value >>= 8;
+        1:  310:        buffer[8] = value & 0xFF;
+        1:  311:	value >>= 8;
+        1:  312:        buffer[7] = value & 0xFF;
+        1:  313:        value >>= 8;
+        1:  314:        buffer[6] = value & 0xFF;
+        1:  315:        value >>= 8;
+        1:  316:        buffer[5] = value & 0xFF;
+        1:  317:        value >>= 8;
+        1:  318:        buffer[4] = value & 0xFF;
+        1:  319:        value >>= 8;
+        1:  320:        buffer[3] = value & 0xFF;
+        1:  321:        value >>= 8;
+        1:  322:        buffer[2] = value & 0xFF;
+        1:  323:        value >>= 8;
+        1:  324:        buffer[1] = value & 0xFF;
+        1:  325:        value >>= 8;
+        1:  326:        buffer[0] = value & 0xFF;
+        -:  327:
+        1:  328:        return writer->write_fixed_bytes(writer, buffer, 16);
+        -:  329:}
+        -:  330:
+        1:  331:int serialize_string(void *obj, Writer *writer) {
+        1:  332:	int ret = 0;
+        1:  333:	u64 len = ((String *)obj)->len;
+        1:  334:	serialize_u64(&len, writer);
+        1:  335:	ret = writer->write_fixed_bytes(writer, (unsigned char *)((String *)obj)->ptr, len);
+        -:  336:
+        1:  337:	return ret;
+        -:  338:}
+        -:  339:
+        1:  340:int deserialize_string(void *obj, Reader *reader) {
+        1:  341:	int ret = 0;
+        1:  342:	((String *)obj)->ptr = NULL;
+        -:  343:
+        -:  344:	u64 len;
+        1:  345:	ret = deserialize_i64(&len, reader);
+        -:  346:
+        1:  347:	if(!ret) {
+        1:  348:		unsigned char *ptr = malloc(sizeof(char) * (len+1));
+        1:  349:		if(ptr == NULL)
+    #####:  350:			ret = -1;
+        -:  351:		else {
+        1:  352:			ret = reader->read_fixed_bytes(reader, ptr, len);
+        -:  353:		}
+        -:  354:
+        1:  355:		if(!ret) {
+        1:  356:                	((String *)obj)->ptr = (char *)ptr;
+        1:  357:                	((String *)obj)->len = len;
+        -:  358:        	}
+        -:  359:
+        -:  360:	}
+        -:  361:
+        1:  362:	return ret;
+        -:  363:}
+        -:  364:
+        -:    0:Source:types.c
+        -:    0:Graph:./types.gcno
+        -:    0:Data:./types.gcda
+        -:    0:Runs:11
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <stdlib.h>
+        -:   16:#include <string.h>
+        -:   17:#include <stdio.h>
+        -:   18:#include <base/types.h>
+        -:   19:
+        3:   20:void string_free(StringImpl *s) {
+        3:   21:	if(s->ptr) {
+        3:   22:		free(s->ptr);
+        3:   23:		s->ptr = NULL;
+        -:   24:	}
+        3:   25:}
         -:   26:
-    #####:   27:    return a + b;
-        -:   28:}
-        -:   29:
-       13:   30:u64 saddu64(u64 a, u64 b) {
-      13*:   31:  return (a > 0xFFFFFFFFFFFFFFFF - b) ? 0xFFFFFFFFFFFFFFFF : a + b;
-        -:   32:}
+        1:   27:int string_set(StringImpl *s, const char *ptr) {
+        1:   28:	int ret = 0;
+        1:   29:	s->len = strlen(ptr);
+        -:   30:
+        1:   31:	s->ptr = malloc(sizeof(char) * (s->len + 1));
+        1:   32:	if(s->ptr == NULL)
+    #####:   33:		ret = -1;
+        -:   34:
+        1:   35:	if(!ret)
+        1:   36:		strcpy(s->ptr, ptr);
+        -:   37:
+        1:   38:	return ret;
+        -:   39:}
+        -:   40:
+    #####:   41:i64 saddi64(i64 a, i64 b)
+        -:   42:{
+    #####:   43:    if (a > 0) {
+    #####:   44:        if (b > INT64_MAX - a) {
+    #####:   45:            return INT64_MAX;
+        -:   46:        }
+    #####:   47:    } else if (b < INT64_MIN - a) {
+    #####:   48:            return INT64_MIN;
+        -:   49:    }
+        -:   50:
+    #####:   51:    return a + b;
+        -:   52:}
+        -:   53:
+       13:   54:u64 saddu64(u64 a, u64 b) {
+      13*:   55:  return (a > 0xFFFFFFFFFFFFFFFF - b) ? 0xFFFFFFFFFFFFFFFF : a + b;
+        -:   56:}
         -:    0:Source:main.c
         -:    0:Graph:./main.gcno
         -:    0:Data:./main.gcda
@@ -1273,7 +1668,7 @@ format_date(1717570913 * 1000 ),];
         -:   75:
        15:   76:int slab_data_resize(SlabData *sd, u64 slabs) {
        15:   77:	debug("slab_data_resize %llu", slabs);
-       15:   78:	u64 len = slabs * sd->sdp.slab_size;
+       15:   78:	u64 len = slabs * (sd->sdp.slab_size + sd->sdp.ptr_size);
        15:   79:	int ret = 0;
         -:   80:
        15:   81:	if (sd->data == NULL) {

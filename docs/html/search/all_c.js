@@ -1,11 +1,23 @@
 var searchData=
 [
-  ['test_132',['Test',['../util_2test_8c.html#adeff092caad6cdda860b437dbe7f006a',1,'Test(util, slab_allocator_init):&#160;test.c'],['../util_2test_8c.html#a40b7e1f33bf7ba480a59182257b46f72',1,'Test(util, slab_allocator_config):&#160;test.c'],['../util_2test_8c.html#ad363b5d77ae366056d568b9312b925c4',1,'Test(util, slabs):&#160;test.c'],['../util_2test_8c.html#a79de0e0a50947a7e7e64f833debf4777',1,'Test(util, slab_index_for_size):&#160;test.c'],['../util_2test_8c.html#a726aa5d9a8624ef618b123789517ac95',1,'Test(util, slab_resize):&#160;test.c'],['../base_2test_8c.html#a32f06b5636ba86531d5eb4c6473030c3',1,'Test(base, rand):&#160;test.c'],['../base_2test_8c.html#a65c1cfdfc27d7b9a7937ecc022ed412b',1,'Test(base, config):&#160;test.c'],['../main_2test_8c.html#a5a8c507d7faba0830e7c09d5ffd5156c',1,'Test(test, main):&#160;test.c']]],
-  ['test_2ec_133',['test.c',['../main_2test_8c.html',1,'(Global Namespace)'],['../util_2test_8c.html',1,'(Global Namespace)'],['../base_2test_8c.html',1,'(Global Namespace)']]],
-  ['trace_134',['trace',['../log_8h.html#a97ccf336cdfa5d81377d0bb8112257bc',1,'log.h']]],
-  ['trace_5fall_135',['trace_all',['../log_8h.html#a3a24c2abda1e079aa56511f4f44bb54b',1,'log.h']]],
-  ['trace_5fplain_136',['trace_plain',['../log_8h.html#a60ecd23b3fee80cf380b4c298b1d2bef',1,'log.h']]],
-  ['type_137',['type',['../structSlabAllocatorConfigImpl.html#a52e63ed2c98ec09af7757052c81e52d6',1,'SlabAllocatorConfigImpl']]],
-  ['types_2ec_138',['types.c',['../types_8c.html',1,'']]],
-  ['types_2eh_139',['types.h',['../types_8h.html',1,'']]]
+  ['rand_2ec_102',['rand.c',['../rand_8c.html',1,'']]],
+  ['rand_2eh_103',['rand.h',['../rand_8h.html',1,'']]],
+  ['rand_5fbytes_104',['rand_bytes',['../rand_8c.html#a15f906b8f6d40a2446efe2db4f7977d7',1,'rand_bytes(void *buf, size_t length):&#160;rand.c'],['../rand_8h.html#a15f906b8f6d40a2446efe2db4f7977d7',1,'rand_bytes(void *buf, size_t length):&#160;rand.c']]],
+  ['rand_5fi128_105',['rand_i128',['../rand_8c.html#abf0b822d7cb549b53f7e8fac1a573a60',1,'rand_i128(i128 *v):&#160;rand.c'],['../rand_8h.html#abf0b822d7cb549b53f7e8fac1a573a60',1,'rand_i128(i128 *v):&#160;rand.c']]],
+  ['rand_5fi16_106',['rand_i16',['../rand_8c.html#a6ff8ae3c4ab647d73b934ec65cf9a846',1,'rand_i16(i16 *v):&#160;rand.c'],['../rand_8h.html#a6ff8ae3c4ab647d73b934ec65cf9a846',1,'rand_i16(i16 *v):&#160;rand.c']]],
+  ['rand_5fi32_107',['rand_i32',['../rand_8c.html#a69e8d4fb3becb8e4b94d32390388e1ff',1,'rand_i32(i32 *v):&#160;rand.c'],['../rand_8h.html#a69e8d4fb3becb8e4b94d32390388e1ff',1,'rand_i32(i32 *v):&#160;rand.c']]],
+  ['rand_5fi64_108',['rand_i64',['../rand_8h.html#a21de6963dda54ae002eb35083e32735b',1,'rand_i64(i64 *v):&#160;rand.c'],['../rand_8c.html#a21de6963dda54ae002eb35083e32735b',1,'rand_i64(i64 *v):&#160;rand.c']]],
+  ['rand_5fi8_109',['rand_i8',['../rand_8h.html#a84bfb891f9a72c7c09bea545aa37afbc',1,'rand_i8(i8 *v):&#160;rand.c'],['../rand_8c.html#a84bfb891f9a72c7c09bea545aa37afbc',1,'rand_i8(i8 *v):&#160;rand.c']]],
+  ['rand_5fu128_110',['rand_u128',['../rand_8c.html#a4f0b41b546b31cead30280a50036e5ce',1,'rand_u128(u128 *v):&#160;rand.c'],['../rand_8h.html#a4f0b41b546b31cead30280a50036e5ce',1,'rand_u128(u128 *v):&#160;rand.c']]],
+  ['rand_5fu16_111',['rand_u16',['../rand_8c.html#a4d8bb797948a4721bc15e06e760c2b98',1,'rand_u16(u16 *v):&#160;rand.c'],['../rand_8h.html#a4d8bb797948a4721bc15e06e760c2b98',1,'rand_u16(u16 *v):&#160;rand.c']]],
+  ['rand_5fu32_112',['rand_u32',['../rand_8c.html#acf38100fd3e3392e974424c36f156462',1,'rand_u32(u32 *v):&#160;rand.c'],['../rand_8h.html#acf38100fd3e3392e974424c36f156462',1,'rand_u32(u32 *v):&#160;rand.c']]],
+  ['rand_5fu64_113',['rand_u64',['../rand_8c.html#a9bf6a9ee76ab5092a012a77e0889f392',1,'rand_u64(u64 *v):&#160;rand.c'],['../rand_8h.html#a9bf6a9ee76ab5092a012a77e0889f392',1,'rand_u64(u64 *v):&#160;rand.c']]],
+  ['rand_5fu8_114',['rand_u8',['../rand_8c.html#a3963a2e0d41806f017c00eff72914cf2',1,'rand_u8(u8 *v):&#160;rand.c'],['../rand_8h.html#a3963a2e0d41806f017c00eff72914cf2',1,'rand_u8(u8 *v):&#160;rand.c']]],
+  ['read_5ffixed_5fbytes_115',['read_fixed_bytes',['../structReader.html#ac7b9bf005572be1eeebca0b1b77e643d',1,'Reader']]],
+  ['reader_116',['Reader',['../structReader.html',1,'']]],
+  ['reader_117',['READER',['../ser_8h.html#ae61038de08516fe907b00726404ea3c2',1,'ser.h']]],
+  ['reader_118',['Reader',['../ser_8h.html#aa6562e77bbcbaf9fd32a21a1f8dd61d2',1,'ser.h']]],
+  ['readme_119',['README',['../md_README.html',1,'']]],
+  ['readme_2emd_120',['README.md',['../README_8md.html',1,'']]],
+  ['real_5fmain_121',['real_main',['../main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;main.c'],['../main_2test_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;main.c']]]
 ];
