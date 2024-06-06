@@ -20,7 +20,7 @@
 #include <stdarg.h>
 #include <log/log.h>
 
-#define LOG_LEVEL Debug
+#define LOG_LEVEL Info
 
 int slab_data_init(SlabData *sd, u64 slab_count, u64 slab_size, u64 max_slabs) {
 	sd->data = NULL;
@@ -194,13 +194,11 @@ int do_slabs(SlabAllocator *sa, int num, va_list valist) {
                 if(next.type == SlabAllocatorConfigImplTypeSlabData) {
 			u64 slab_size = ((u64 *)next.value)[1];
 			u64 max_slabs_value = ((u64 *)next.value)[0];
-			printf("ss=%llu,max=%llu\n", slab_size, max_slabs_value);
 			sizes[counter] = slab_size;
 			max_slabs[counter] = max_slabs_value;
 			counter += 1;
 		}
         }
-	printf("counter=%d\n", counter);
 
 	// check that ordering is sorted and other configs are ok
         u64 last_size = 0;
@@ -497,7 +495,6 @@ int slab_allocator_config_slabs_per_resize(SlabAllocatorConfigImpl *sc, u64 slab
 int slab_allocator_config_slab_data(SlabAllocatorConfigImpl *sc, u64 max_slabs, u64 slab_size) {
 	int ret = 0;
 	sc->type = SlabAllocatorConfigImplTypeSlabData;
-	printf("config slab data\n");
 	sc->value = malloc(sizeof(u64) * 2);
 	if(sc->value == NULL) {
 		ret = -1;

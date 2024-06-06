@@ -102,7 +102,6 @@ Test(base, rand)
     bool i16_eq = vi16 == vi16_2 && vi16_2 == vi16_3 && vi16_4;
     bool u16_eq = vu16 == vu16_2 && vu16_2 == vu16_3 && vu16_4;
 
-    // very unlikely to happen
     cr_assert_eq(i8_eq, false);
     cr_assert_eq(u8_eq, false);
     cr_assert_eq(i16_eq, false);

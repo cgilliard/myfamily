@@ -8,7 +8,7 @@ test: test.c
 	mkdir -p bin
 	rm -rf bin/test
 	$(CC) $(CC_TEST_FLAGS) $(TEST_OBJS) -o bin/test test.c
-	./bin/test
+	./bin/test --timeout 10
 	rm -rf bin
 clean:
 	rm -rf *.o

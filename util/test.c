@@ -13,8 +13,10 @@
 // limitations under the License.
 
 #include <criterion/criterion.h>
+#include <util/slabio.h>
 #include <util/slabs.h>
 #include <util/slabs_test.h>
+#include <base/rand.h>
 #include <limits.h>
 #include <log/log.h>
 
@@ -298,5 +300,49 @@ Test(util, slab_allocator_init) {
 	cr_assert_eq(sa4.sizes[0], 888);
 	printf("max=%llu\n", sa4.max_slabs[0]);
 	cr_assert_eq(sa4.max_slabs[0], 999);
+}
+
+Test(util, slabio) {
+	SlabAllocator sa;
+	SlabReader sr;
+	SlabWriter sw;
+
+	SlabAllocatorConfig sc;
+        slab_allocator_config_slab_data(&sc, 10, 52);
+
+	slab_init(&sa, 1, sc);
+	slab_reader_init(&sr, &sa);
+	slab_writer_init(&sw, &sa);
+
+        Reader reader = READER(slab_reader_read_fixed_bytes, &sr);
+        Writer writer = WRITER(slab_writer_write_fixed_bytes, &sw);
+
+	u64 root = slab_allocate(&sa, 52);
+	debug("root=%llu", root);
+	slab_reader_seek(&reader, root, 0);
+	slab_writer_seek(&writer, root, 0);
+
+	String s_in, s_out;
+        string_set(&s_in, "01234567890123456789012345678901234567890123456789");
+
+	u128 r_in = 0, r_out = 0;
+        int v = rand_u128(&r_in);
+	u64 low = (u64)r_in;
+	char buf1[] = { "18446744073709551615" };
+	sprintf(buf1, "llu%", low);
+	u64 high = (u64)(r_in >> 64);
+	char buf2[] = { "18446744073709551615" };
+        sprintf(buf2, "llu%" , high);
+	debug("r_in=%llu%llu", high, low);
+
+	Serializable s1 = SER(s_in);
+	Serializable s2 = SER(s_out);
+	serialize(&s1, &writer);
+	deserialize(&s2, &reader);
+
+	debug("s_in.ptr=%s", s_in.ptr);
+	debug("s_out.ptr=%s", s_out.ptr);
+	cr_assert_eq(strcmp(s_in.ptr, s_out.ptr), 0);
+
 }
 
