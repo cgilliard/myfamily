@@ -20,7 +20,6 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include <base/cleanup.h>
-#include <libunwind.h>
 
 #define u8 uint8_t
 #define i8 int8_t
@@ -35,6 +34,9 @@
 #define f64 double
 #define f32 float
 
+bool option_is_some_false();
+bool option_is_some_true();
+
 typedef struct OptionImpl {
         bool (*is_some)();
         void *ref;
@@ -45,7 +47,7 @@ void option_free(OptionImpl *ptr);
 Option option_build(Option *opt, void *x, size_t size);
 void *option_unwrap(Option x);
 
-Option ONone;
+#define None { option_is_some_false, NULL }
 #define Some(opt, x) option_build(opt, &x, sizeof(x))
 #define Unwrap(x) option_unwrap(x)
 

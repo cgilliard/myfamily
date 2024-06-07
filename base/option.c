@@ -26,11 +26,9 @@ bool option_is_some_true() {
         return true;
 }
 
-Option ONone = { option_is_some_false, NULL };
-
 void *option_unwrap(Option x) {
 	if(!x.is_some()) {
-		panic("attempt to unwrap on a ONone");
+		panic("attempt to unwrap on a None");
 	} else {
 		return x.ref;
 	}
