@@ -16,7 +16,9 @@
 #include <util/slabio.h>
 #include <util/slabs.h>
 #include <util/slabs_test.h>
+#include <util/option.h>
 #include <base/rand.h>
+#include <base/types.h>
 #include <limits.h>
 #include <log/log.h>
 
@@ -388,4 +390,22 @@ Test(util, over_read) {
 	int v = deserialize(&dummy, &reader);
 	cr_assert_neq(v, 0);
 
+}
+
+Test(util, option) {
+	Option opt = None;
+	cr_assert_eq(opt.is_some(), false);
+	debug("opt.is_some=%d,ref=%i", opt.is_some(), opt.ref);
+	int x = 2;
+	Option opt2 = Some(&opt2, x);
+	cr_assert_eq(opt2.is_some(), true);
+	int *ptr = Unwrap(opt2);
+	debug("ptr_value=%i", *ptr);
+	String s;
+	string_set(&s, "this is a test");
+	Option opt3 = Some(&opt3, s);
+	cr_assert_eq(opt3.is_some(), true);
+	void *str = Unwrap(opt3);
+	debug("str='%s'", ((String*)str)->ptr);
+	cr_assert_eq(strcmp(((String*)str)->ptr, "this is a test"), 0);
 }
