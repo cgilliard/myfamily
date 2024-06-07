@@ -9,7 +9,7 @@ test: test.c
 	rm -rf bin/test
 	$(CC) $(CC_TEST_FLAGS) $(TEST_OBJS) -o bin/test test.c
 	./bin/test --timeout 10
-	#rm -rf bin
+	rm -rf bin
 clean:
 	rm -rf *.o
 	rm -rf bin
