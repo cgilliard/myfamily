@@ -77,5 +77,8 @@ Test(base, StringTest) {
 }
 
 Test(base, backtrace) {
-	backtrace();
+	String s;
+	string_set(&s, "test");
+	backtrace_to_string(&s);
+	printf("backtrace returned: '%s'\n", s.ptr);
 }
