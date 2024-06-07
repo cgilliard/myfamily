@@ -46,7 +46,7 @@ struct Slab {
 };
 typedef struct Slab Slab;
 
-struct SlabAllocator {
+struct SlabAllocatorImpl {
 	SlabData *slab_data_array;
 	u64 *sizes;
 	u64 *max_slabs;
@@ -54,7 +54,7 @@ struct SlabAllocator {
 	u64 slabs_per_resize;
 	bool zeroed;
 };
-typedef struct SlabAllocator SlabAllocator;
+typedef struct SlabAllocatorImpl SlabAllocatorImpl;
 
 enum SlabAllocatorConfigImplType {
 	SlabAllocatorConfigImplTypeZeroed = 0,
@@ -75,13 +75,13 @@ int slab_allocator_config_slabs_per_resize(SlabAllocatorConfigImpl *sc, u64 slab
 int slab_allocator_config_slab_data(SlabAllocatorConfigImpl *sc, u64 max_slabs, u64 slab_size);
 void slab_allocator_config_free(SlabAllocatorConfigImpl *sc);
 
-int slab_init(SlabAllocator *sa, int num, ...);
-u64 slab_allocate(SlabAllocator *sa, u64 size);
-int slab_write(SlabAllocator *sa, u64 id, Slab *slab, u64 offset);
-int slab_read(SlabAllocator *sa, u64 id, Slab *slab);
-int slab_free(SlabAllocator *sa, u64 id);
-void slab_allocator_free(SlabAllocator *sa);
-#define SlabAllocatorImpl SlabAllocator CLEANUP(slab_config_free)
+int slab_init(SlabAllocatorImpl *sa, int num, ...);
+u64 slab_allocate(SlabAllocatorImpl *sa, u64 size);
+int slab_write(SlabAllocatorImpl *sa, u64 id, Slab *slab, u64 offset);
+int slab_read(SlabAllocatorImpl *sa, u64 id, Slab *slab);
+int slab_free(SlabAllocatorImpl *sa, u64 id);
+void slab_allocator_free(SlabAllocatorImpl *sa);
+#define SlabAllocator SlabAllocatorImpl CLEANUP(slab_allocator_free)
 
 
 #endif /* __UTIL_SLABS_ */
