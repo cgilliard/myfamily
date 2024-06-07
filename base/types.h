@@ -45,7 +45,7 @@ void option_free(OptionImpl *ptr);
 Option option_build(Option *opt, void *x, size_t size);
 void *option_unwrap(Option x);
 
-Option None;
+Option ONone;
 #define Some(opt, x) option_build(opt, &x, sizeof(x))
 #define Unwrap(x) option_unwrap(x)
 
