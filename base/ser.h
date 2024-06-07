@@ -15,6 +15,8 @@
 #ifndef _SER_BASE__
 #define _SER_BASE__
 
+#include <base/types.h>
+
 struct Reader {
 	int (*read_fixed_bytes)(struct Reader *reader, unsigned char *buffer, u64 len);
 	void *ptr;
