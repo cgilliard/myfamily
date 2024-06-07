@@ -12,24 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <util/option.h>
+#include <base/types.h>
 #include <stdlib.h>
 #include <string.h>
 #include <base/rand.h>
-#include <log/log.h>
-#include <util/panic.h>
-
-#define LOG_LEVEL Debug
-
-Option None = { option_is_some_false, NULL };
+#include <base/panic.h>
 
 bool option_is_some_false() {
         return false;
 }
 
 bool option_is_some_true() {
-	return true;
+        return true;
 }
+
+Option None = { option_is_some_false, NULL };
 
 void *option_unwrap(Option x) {
 	if(!x.is_some()) {
@@ -40,21 +37,15 @@ void *option_unwrap(Option x) {
 }
 
 Option option_build(OptionImpl *opt, void *x, size_t size) {
-	debug("size=%i", size);
-
 	(*opt).is_some = option_is_some_true;
 	(*opt).ref = malloc(size);
-	debug("opt.ref=%i", (*opt).ref);
 	memcpy((*opt).ref, x, size);
 	return *opt;
 }
 
 void option_free(OptionImpl *ptr) {
-	debug("option free %i", ptr->ref);
 	if(ptr->ref) {
-		debug("ptr free %i", ptr->ref);
 		free(ptr->ref);
-		debug("free complete");
 		ptr->ref = NULL;
 	}
 }

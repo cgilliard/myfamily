@@ -13,24 +13,10 @@
 // limitations under the License.
 
 #include <stdio.h>
-#include <log/log.h>
-#include <util/misc.h>
-
-#define LOG_LEVEL Info
 
 int real_main(int argc, char** argv)
 {
-    LogConfigOption opt1, opt2, opt3;
-    log_config_option_show_colors(&opt1, true);
-    log_config_option_show_stdout(&opt2, true);
-    log_config_option_show_timestamp(&opt3, false);
-
-    init_global_logger(2, opt1, opt2);
-    info("Main currently doesn't do %s.", "anything");
-    global_log_config_option(opt3);
-    info("Main currently doesn't do %s.", "anything");
-    info("end");
-
+    printf("main doesn't currently do anything\n");
     return 0;
 }
 

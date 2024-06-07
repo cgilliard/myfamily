@@ -12,13 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef __LOG_LOG_TEST_
-#define __LOG_LOG_TEST_
+#include <base/types.h>
+#include <string.h>
+#include <stdlib.h>
 
-// doc hidden functions that tests need to access
+bool errorkind_equal(ErrorKind *kind1, ErrorKind *kind2) {
+	return strcmp(kind1->type_str, kind2->type_str) == 0;
+}
 
-void _debug_global_logger_is_init__();
-int _log_allocate_config_option(LogConfigOptionImpl* option, size_t size, bool debug_malloc_err, void* value);
-int sprintf_err(char* str, const char* string, ...);
+void error_free(ErrorImpl *err) {
 
-#endif /* __LOG_LOG_TEST */
+}
+
+bool error_equal(Error *e1, Error *e2) {
+	// only compare kinds of errors, not message
+	return errorkind_equal(&e1->kind, &e2->kind);
+}
+
+char *error_to_string(char *s, Error *e) {
+	strcpy(s, e->kind.type_str);
+	strcat(s, ": ");
+	strcat(s, e->msg);
+	return s;
+}

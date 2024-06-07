@@ -37,20 +37,3 @@ int string_set(StringImpl *s, const char *ptr) {
 
 	return ret;
 }
-
-i64 saddi64(i64 a, i64 b)
-{
-    if (a > 0) {
-        if (b > INT64_MAX - a) {
-            return INT64_MAX;
-        }
-    } else if (b < INT64_MIN - a) {
-            return INT64_MIN;
-    }
-
-    return a + b;
-}
-
-u64 saddu64(u64 a, u64 b) {
-  return (a > 0xFFFFFFFFFFFFFFFF - b) ? 0xFFFFFFFFFFFFFFFF : a + b;
-}

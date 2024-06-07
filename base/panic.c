@@ -12,28 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _UTIL_OPTION__
-#define _UTIL_OPTION__
+#include <base/panic.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include <base/types.h>
-#include <base/cleanup.h>
-#include <stddef.h>
-
-bool option_is_some_false();
-bool option_is_some_true();
-
-typedef struct OptionImpl {
-	bool (*is_some)();
-	void *ref;
-} OptionImpl;
-void option_free(OptionImpl *ptr);
-#define Option OptionImpl CLEANUP(option_free)
-
-Option option_build(Option *opt, void *x, size_t size);
-void *option_unwrap(Option x);
-
-Option None;
-#define Some(opt, x) option_build(opt, &x, sizeof(x))
-#define Unwrap(x) option_unwrap(x)
-
-#endif // _UTIL_OPTION__
+void panic(const char * str) {
+	printf("thread panicked: %s", str);
+	exit(-1);
+}
