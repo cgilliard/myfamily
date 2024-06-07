@@ -13,9 +13,14 @@
 // limitations under the License.
 
 #include <stdio.h>
+#include <base/backtrace.h>
 
 int real_main(int argc, char** argv)
 {
+    String s;
+    backtrace_to_string(&s);
+    printf("backtrace returned: '%s'\n", s.ptr);
+
     printf("main doesn't currently do anything\n");
     return 0;
 }
