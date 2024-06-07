@@ -408,4 +408,10 @@ Test(util, option) {
 	void *str = Unwrap(opt3);
 	debug("str='%s'", ((String*)str)->ptr);
 	cr_assert_eq(strcmp(((String*)str)->ptr, "this is a test"), 0);
+
+	char *ptr1 = opt3.is_some() ? ((String*)Unwrap(opt3))->ptr : "my default str";
+	cr_assert_eq(strcmp(ptr1, "this is a test"), 0);
+	Option opt4 = None;
+	char *ptr2 = opt4.is_some() ? ((String*)Unwrap(opt4))->ptr : "my default str";
+	cr_assert_eq(strcmp(ptr2, "my default str"), 0);
 }
