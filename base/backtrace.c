@@ -81,10 +81,9 @@ void backtrace_print(Backtrace *ptr) {
 	for(int i=0; i<ptr->count; i++) {
 		printf(
 			"#%i:\n\
-	[function_name=%s]\n\
-	[binary_path=%s]\n\
-	[address=%s]\n\
-       	[file_lineno=%s]\n",
+	[fn='%s']\n\
+	[binary='%s'] [address=%s]\n\
+       	[code='%s']\n",
 			i,
 			ptr->rows[i].function_name,
 			ptr->rows[i].bin_name,
@@ -191,6 +190,9 @@ int backtrace_generate(Backtrace *ptr, u64 max_depth) {
 			char fn_name[513];
 			strcpy(file_path, "");
 			get_file_line(bin_name, address, file_path, fn_name, 512);
+			if(!strcmp(file_path, "")) {
+                              strcpy(file_path, "Unknown");
+                        }
 			ent.file_path = file_path;
 			backtrace_add_entry(ptr, &ent);
 		#else // LINUX/WIN for now
@@ -240,6 +242,10 @@ int backtrace_generate(Backtrace *ptr, u64 max_depth) {
                       strcpy(file_path, "");
                       get_file_line(buffer, address, file_path, fn_name, 512);
 
+		      printf("fpath=%s\n", file_path);
+	              if(!strcmp(file_path, "")) {
+			      strcpy(file_path, "Unknown");
+		      }
 		      BacktraceEntry ent;
 		      ent.address = address;
 		      ent.function_name = fn_name;
@@ -255,58 +261,3 @@ int backtrace_generate(Backtrace *ptr, u64 max_depth) {
 	return ret;
 }
 
-String backtrace_to_string(String *s)
-{
-	bool response_ok = true;
-	void *array[BACKTRACE_MAX_DEPTH];
-	char **strings;
-	int size, i;
-
-	size = backtrace (array, BACKTRACE_MAX_DEPTH);
-	strings = backtrace_symbols (array, size);
-
-	int total_str_len = 0;
-	if(strings != NULL) {
-		for(int i=0; i<size; i++) {
-			int len = strlen(strings[i]);
-			if(len < 0) {
-				response_ok = false;
-				break;
-			}
-			total_str_len += len;
-		}
-	}
-
-	if(response_ok) {
-		char *responseline = malloc(sizeof(char) * (200 + total_str_len));
-		strcpy(responseline, "Backtrace:\n");
-		for(int i=0; i<size; i++) {
-			#ifdef __APPLE__
-				Dl_info info;
-				char buf[100];
-				dladdr(array[i], &info);
-				sprintf(buf, "#%i", i);
-				strcat(responseline, buf);
-				strcat(responseline, ": [");
-				strcat(responseline, info.dli_sname);
-				strcat(responseline, "] [");
-                        	strcat(responseline, info.dli_fname);
-				strcat(responseline, "] [");
-                                sprintf(buf, "%p", 0x0000000100000000 + info.dli_saddr - info.dli_fbase);
-                                strcat(responseline, buf);
-				strcat(responseline, "] [");
-				strcat(responseline, strings[i]);
-				strcat(responseline, "]\n");
-			#else // LINUX/WIN for now
-				strcat(responseline, strings[i]);
-				strcat(responseline, "\n");
-			#endif // OS Specific code
-		}
-		s->ptr = responseline;
-	}
-
-	if(strings != NULL)
-		free(strings);
-
-	return *s;
-}
