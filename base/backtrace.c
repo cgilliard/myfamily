@@ -42,24 +42,29 @@ String backtrace_to_string(String *s)
 	}
 
 	if(response_ok) {
-		Dl_info info;
 		char *responseline = malloc(sizeof(char) * (200 + total_str_len));
 		strcpy(responseline, "Backtrace:\n");
 		for(int i=0; i<size; i++) {
-			char buf1[1000], buf2[1000];
-			dladdr(array[i], &info);
-			strcat(responseline, strings[i]);
-			strcat(responseline, " ");
-			strcat(responseline, info.dli_sname);
-			strcat(responseline, " ");
-                        strcat(responseline, info.dli_fname);
-			strcat(responseline, " ");
-			sprintf(buf1, "%p", info.dli_fbase);
-                        strcat(responseline, buf1);
-			strcat(responseline, " ");
-			sprintf(buf2, "%p", info.dli_saddr);
-                        strcat(responseline, buf2);
-			strcat(responseline, "\n");
+			#ifdef __APPLE__
+				Dl_info info;
+				char buf[100];
+				dladdr(array[i], &info);
+				sprintf(buf, "#%i", i);
+				strcat(responseline, buf);
+				strcat(responseline, ": [");
+				strcat(responseline, info.dli_sname);
+				strcat(responseline, "] [");
+                        	strcat(responseline, info.dli_fname);
+				strcat(responseline, "] [");
+                                sprintf(buf, "%p", 0x0000000100000000 + info.dli_saddr - info.dli_fbase);
+                                strcat(responseline, buf);
+				strcat(responseline, "] [");
+				strcat(responseline, strings[i]);
+				strcat(responseline, "]\n");
+			#else // LINUX/WIN for now
+				strcat(responseline, strings[i]);
+				strcat(responseline, "\n");
+			#endif // OS Specific code
 		}
 		s->ptr = responseline;
 	}
