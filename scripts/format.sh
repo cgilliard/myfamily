@@ -1,3 +1,3 @@
 #!/bin/bash
 
-find . -iname '*.h' -o -iname '*.c' | xargs clang-format -i -style=Webkit
+find . -iname '*.h' -o -iname '*.c' | xargs clang-format -i -style=file

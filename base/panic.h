@@ -15,6 +15,6 @@
 #ifndef __UTIL_SLABS_
 #define __UTIL_SLABS_
 
-void panic(const char* str) __attribute__((noreturn));
+void panic(const char *str) __attribute__((noreturn));
 
 #endif // __UTIL_SLABS_

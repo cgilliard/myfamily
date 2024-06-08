@@ -17,59 +17,55 @@
 #include <criterion/criterion.h>
 #include <stdio.h>
 
-Test(base, ErrorKindTest)
-{
-    ErrorKind ekind1 = { "ArrayIndexOutOfBounds" };
-    ErrorKind ekind2 = { "IllegalState" };
-    ErrorKind ekind3 = { "ArrayIndexOutOfBounds" };
-    ErrorKind ekind4 = { "IllegalState" };
+Test(base, ErrorKindTest) {
+	ErrorKind ekind1 = {"ArrayIndexOutOfBounds"};
+	ErrorKind ekind2 = {"IllegalState"};
+	ErrorKind ekind3 = {"ArrayIndexOutOfBounds"};
+	ErrorKind ekind4 = {"IllegalState"};
 
-    cr_assert_eq(errorkind_equal(&ekind1, &ekind2), false);
-    cr_assert_eq(errorkind_equal(&ekind1, &ekind3), true);
-    cr_assert_eq(errorkind_equal(&ekind1, &ekind4), false);
-    cr_assert_eq(errorkind_equal(&ekind2, &ekind4), true);
+	cr_assert_eq(errorkind_equal(&ekind1, &ekind2), false);
+	cr_assert_eq(errorkind_equal(&ekind1, &ekind3), true);
+	cr_assert_eq(errorkind_equal(&ekind1, &ekind4), false);
+	cr_assert_eq(errorkind_equal(&ekind2, &ekind4), true);
 }
 
-Test(base, ErrorTest)
-{
-    Error err1 = { { "ArrayIndexOutOfBounds" },
-        "array index (10) was greater than array.len (8)" };
+Test(base, ErrorTest) {
+	Error err1 = {{"ArrayIndexOutOfBounds"},
+		      "array index (10) was greater than array.len (8)"};
 
-    Error err2 = { { "ArrayIndexOutOfBounds" },
-        "array index (30) was greater than array.len (18)" };
+	Error err2 = {{"ArrayIndexOutOfBounds"},
+		      "array index (30) was greater than array.len (18)"};
 
-    Error err3 = { { "IllegalState" }, "invalid state" };
+	Error err3 = {{"IllegalState"}, "invalid state"};
 
-    cr_assert_eq(error_equal(&err1, &err2), true);
-    cr_assert_eq(error_equal(&err1, &err3), false);
+	cr_assert_eq(error_equal(&err1, &err2), true);
+	cr_assert_eq(error_equal(&err1, &err3), false);
 
-    char buf[MAX_ERROR_MESSAGE_LEN];
-    error_to_string(buf, &err1);
-    cr_assert_eq(strcmp(buf, "ArrayIndexOutOfBounds: array index (10) was "
-                             "greater than array.len (8)"),
-        0);
+	char buf[MAX_ERROR_MESSAGE_LEN];
+	error_to_string(buf, &err1);
+	cr_assert_eq(strcmp(buf, "ArrayIndexOutOfBounds: array index (10) was "
+				 "greater than array.len (8)"),
+		     0);
 }
 
-Test(base, StringTest)
-{
-    void* ptr = NULL;
-    {
-        String x;
-        STRING_INIT(x, "this is a test");
-        String s;
-        s.ptr = malloc(sizeof(char) * 10);
-        ptr = &s;
-        strcpy(s.ptr, "test");
-        cr_assert_neq(((String*)ptr)->ptr, NULL);
-    }
+Test(base, StringTest) {
+	void *ptr = NULL;
+	{
+		String x;
+		STRING_INIT(x, "this is a test");
+		String s;
+		s.ptr = malloc(sizeof(char) * 10);
+		ptr = &s;
+		strcpy(s.ptr, "test");
+		cr_assert_neq(((String *)ptr)->ptr, NULL);
+	}
 
-    cr_assert_eq(((String*)ptr)->ptr, NULL);
+	cr_assert_eq(((String *)ptr)->ptr, NULL);
 }
 
-Test(base, backtrace)
-{
-    String s;
-    string_set(&s, "test");
-    backtrace_to_string(&s);
-    printf("backtrace returned: '%s'\n", s.ptr);
+Test(base, backtrace) {
+	String s;
+	string_set(&s, "test");
+	backtrace_to_string(&s);
+	printf("backtrace returned: '%s'\n", s.ptr);
 }

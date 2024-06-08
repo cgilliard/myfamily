@@ -15,21 +15,20 @@
 #include <base/backtrace.h>
 #include <stdio.h>
 
-int real_main(int argc, char** argv)
-{
-    /*
-  String s;
-  backtrace_to_string(&s);
-  printf("backtrace returned: '%s'\n", s.ptr);
-  */
-    Backtrace backtrace = EMPTY_BACKTRACE;
-    backtrace_generate(&backtrace, 100);
-    backtrace_print(&backtrace);
+int real_main(int argc, char **argv) {
+	/*
+      String s;
+      backtrace_to_string(&s);
+      printf("backtrace returned: '%s'\n", s.ptr);
+      */
+	Backtrace backtrace = EMPTY_BACKTRACE;
+	backtrace_generate(&backtrace, 100);
+	backtrace_print(&backtrace);
 
-    printf("main doesn't currently do anything\n");
-    return 0;
+	printf("main doesn't currently do anything\n");
+	return 0;
 }
 
-int sub_main(int argc, char** argv) { return real_main(argc, argv); }
+int sub_main(int argc, char **argv) { return real_main(argc, argv); }
 
-int main(int argc, char** argv) { return sub_main(argc, argv); }
+int main(int argc, char **argv) { return sub_main(argc, argv); }
