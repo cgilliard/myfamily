@@ -13,25 +13,26 @@
 // limitations under the License.
 
 #include <base/types.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-bool errorkind_equal(ErrorKind *kind1, ErrorKind *kind2) {
-	return strcmp(kind1->type_str, kind2->type_str) == 0;
+bool errorkind_equal(ErrorKind* kind1, ErrorKind* kind2)
+{
+    return strcmp(kind1->type_str, kind2->type_str) == 0;
 }
 
-void error_free(ErrorImpl *err) {
+void error_free(ErrorImpl* err) { }
 
+bool error_equal(Error* e1, Error* e2)
+{
+    // only compare kinds of errors, not message
+    return errorkind_equal(&e1->kind, &e2->kind);
 }
 
-bool error_equal(Error *e1, Error *e2) {
-	// only compare kinds of errors, not message
-	return errorkind_equal(&e1->kind, &e2->kind);
-}
-
-char *error_to_string(char *s, Error *e) {
-	strcpy(s, e->kind.type_str);
-	strcat(s, ": ");
-	strcat(s, e->msg);
-	return s;
+char* error_to_string(char* s, Error* e)
+{
+    strcpy(s, e->kind.type_str);
+    strcat(s, ": ");
+    strcat(s, e->msg);
+    return s;
 }

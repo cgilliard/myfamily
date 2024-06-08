@@ -16,7 +16,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void panic(const char * str) {
-	printf("thread panicked: %s", str);
-	exit(-1);
+void panic(const char* str)
+{
+    printf("thread panicked: %s", str);
+    exit(-1);
 }

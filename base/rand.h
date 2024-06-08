@@ -109,7 +109,8 @@ int rand_i128(i128* v);
 int rand_u128(u128* v);
 
 /**
- * Returns random bytes of the specified length using the operating systems' getentropy function.
+ * Returns random bytes of the specified length using the operating systems'
+ * getentropy function.
  * @param buf A pointer to the location to store the value in.
  * @param length the number of bytes to write to the buffer.
  * @return the value returned by the getentropy function.

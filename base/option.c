@@ -12,38 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/panic.h>
+#include <base/rand.h>
 #include <base/types.h>
 #include <stdlib.h>
 #include <string.h>
-#include <base/rand.h>
-#include <base/panic.h>
 
-bool option_is_some_false() {
-        return false;
+bool option_is_some_false() { return false; }
+
+bool option_is_some_true() { return true; }
+
+void* option_unwrap(Option x)
+{
+    if (!x.is_some()) {
+        panic("attempt to unwrap on a None");
+    } else {
+        return x.ref;
+    }
 }
 
-bool option_is_some_true() {
-        return true;
+Option option_build(OptionImpl* opt, void* x, size_t size)
+{
+    (*opt).is_some = option_is_some_true;
+    (*opt).ref = malloc(size);
+    memcpy((*opt).ref, x, size);
+    return *opt;
 }
 
-void *option_unwrap(Option x) {
-	if(!x.is_some()) {
-		panic("attempt to unwrap on a None");
-	} else {
-		return x.ref;
-	}
-}
-
-Option option_build(OptionImpl *opt, void *x, size_t size) {
-	(*opt).is_some = option_is_some_true;
-	(*opt).ref = malloc(size);
-	memcpy((*opt).ref, x, size);
-	return *opt;
-}
-
-void option_free(OptionImpl *ptr) {
-	if(ptr->ref) {
-		free(ptr->ref);
-		ptr->ref = NULL;
-	}
+void option_free(OptionImpl* ptr)
+{
+    if (ptr->ref) {
+        free(ptr->ref);
+        ptr->ref = NULL;
+    }
 }

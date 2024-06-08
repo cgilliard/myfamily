@@ -21,12 +21,13 @@ i64 saddi64(i64 a, i64 b)
             return INT64_MAX;
         }
     } else if (b < INT64_MIN - a) {
-            return INT64_MIN;
+        return INT64_MIN;
     }
 
     return a + b;
 }
 
-u64 saddu64(u64 a, u64 b) {
-  return (a > 0xFFFFFFFFFFFFFFFF - b) ? 0xFFFFFFFFFFFFFFFF : a + b;
+u64 saddu64(u64 a, u64 b)
+{
+    return (a > 0xFFFFFFFFFFFFFFFF - b) ? 0xFFFFFFFFFFFFFFFF : a + b;
 }
