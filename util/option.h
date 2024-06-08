@@ -15,8 +15,8 @@
 #ifndef _UTIL_OPTION__
 #define _UTIL_OPTION__
 
-#include <base/types.h>
 #include <base/cleanup.h>
+#include <base/types.h>
 #include <stddef.h>
 
 bool option_is_some_false();
@@ -32,8 +32,7 @@ void option_free(OptionImpl *ptr);
 Option option_build(Option *opt, void *x, size_t size);
 void *option_unwrap(Option x);
 
-Option None;
 #define Some(opt, x) option_build(opt, &x, sizeof(x))
 #define Unwrap(x) option_unwrap(x)
 
-#endif // _UTIL_OPTION__
+#endif	// _UTIL_OPTION__
