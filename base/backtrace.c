@@ -233,7 +233,6 @@ int backtrace_generate(Backtrace *ptr, u64 max_depth) {
 		strcpy(file_path, "");
 		get_file_line(buffer, address, file_path, fn_name, 512);
 
-		printf("fpath=%s\n", file_path);
 		if (!strcmp(file_path, "")) {
 			strcpy(file_path, "Unknown");
 		}
