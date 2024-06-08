@@ -105,8 +105,6 @@ int get_file_line(char *bin, char *addr, char *line_num, char *fn_name, int max_
 	sprintf(cmd, "addr2line -f -e %s %s", bin, addr);
     #endif // OS Specific code
 
-    printf("cmd=%s\n", cmd);
-
     char buffer[BUFSIZE] = {0};
     FILE *fp;
 
@@ -117,7 +115,6 @@ int get_file_line(char *bin, char *addr, char *line_num, char *fn_name, int max_
 
     int counter = 0;
     while (fgets(buffer, BUFSIZE, fp) != NULL) {
-	printf("OUTPUT: %s", buffer);
 	#ifdef __APPLE__
 	bool found_first_paren = false;
 	bool found_second_paren = false;
@@ -130,7 +127,6 @@ int get_file_line(char *bin, char *addr, char *line_num, char *fn_name, int max_
 			found_second_paren = true;
 		} else if(found_second_paren && found_first_paren) {
 			if(buffer[i] == ')') {
-				printf("break\n");
 				break;
 			}
 			line_num[line_num_itt] = buffer[i];
