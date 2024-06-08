@@ -58,8 +58,8 @@ String backtrace_to_string(String *s)
 				strcat(responseline, "] [");
                                 sprintf(buf, "%p", 0x0000000100000000 + info.dli_saddr - info.dli_fbase);
                                 strcat(responseline, buf);
-				strcat(responseline, "] [");
-				strcat(responseline, strings[i]);
+				//strcat(responseline, "] [");
+				//strcat(responseline, strings[i]);
 				strcat(responseline, "]\n");
 			#else // LINUX/WIN for now
 				strcat(responseline, strings[i]);
