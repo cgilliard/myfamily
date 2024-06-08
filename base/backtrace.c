@@ -23,7 +23,7 @@
 
 int backtrace_add_entry(Backtrace *ptr, BacktraceEntry *entry) {
 	int ret = 0;
-	if (ptr->count == 0) {
+	if (!ptr->count) {
 		ptr->rows = malloc(sizeof(BacktraceEntry));
 	} else {
 		BacktraceEntry *tmp = realloc(
