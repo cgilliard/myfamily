@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/backtrace.h>
 #include <base/types.h>
 #include <criterion/criterion.h>
 #include <stdio.h>
@@ -31,12 +30,14 @@ Test(base, ErrorKindTest) {
 
 Test(base, ErrorTest) {
 	Error err1 = {{"ArrayIndexOutOfBounds"},
-		      "array index (10) was greater than array.len (8)"};
+		      "array index (10) was greater than array.len (8)",
+		      NULL};
 
 	Error err2 = {{"ArrayIndexOutOfBounds"},
-		      "array index (30) was greater than array.len (18)"};
+		      "array index (30) was greater than array.len (18)",
+		      NULL};
 
-	Error err3 = {{"IllegalState"}, "invalid state"};
+	Error err3 = {{"IllegalState"}, "invalid state", NULL};
 
 	cr_assert_eq(error_equal(&err1, &err2), true);
 	cr_assert_eq(error_equal(&err1, &err3), false);

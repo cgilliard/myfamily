@@ -34,6 +34,26 @@
 #define f64 double
 #define f32 float
 
+typedef struct BacktraceEntry {
+	char *function_name;
+	char *bin_name;
+	char *address;
+	char *file_path;
+} BacktraceEntry;
+
+typedef struct BacktraceImpl {
+	BacktraceEntry *rows;
+	u64 count;
+} BacktraceImpl;
+
+void backtrace_free(BacktraceImpl *ptr);
+#define Backtrace BacktraceImpl CLEANUP(backtrace_free)
+#define EMPTY_BACKTRACE {NULL, 0}
+int backtrace_generate(Backtrace *ptr, u64 max_depth);
+
+// #define ERROR_PRINT_FLAG_NO_COLOR 0x1
+void backtrace_print(Backtrace *ptr, int flags);
+
 bool option_is_some_false();
 bool option_is_some_true();
 
@@ -60,12 +80,22 @@ typedef struct ErrorKind {
 
 bool errorkind_equal(ErrorKind *kind1, ErrorKind *kind2);
 
+#define ERROR_BACKTRACE_MAX_DEPTH 512
+
 typedef struct ErrorImpl {
 	ErrorKind kind;
 	char msg[MAX_ERROR_MESSAGE_LEN];
+	Backtrace backtrace;
 } ErrorImpl;
 void error_free(ErrorImpl *err);
 #define Error ErrorImpl CLEANUP(error_free)
+Error error_build(Error *err, ErrorKind kind, char *msg, ...);
+#define Err(kind, msg, ...) error_build(kind, msg, ##__VA_ARGS__)
+
+#define ERROR_PRINT_FLAG_NO_COLOR 0x1
+#define ERROR_PRINT_FLAG_NO_BACKTRACE 0x1 << 1
+
+void error_print(Error *err, int flags);
 
 bool error_equal(Error *e1, Error *e2);
 char *error_to_string(char *s, Error *e);

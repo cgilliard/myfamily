@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/backtrace.h>
+#include <base/types.h>
 #include <dlfcn.h>
 #include <execinfo.h>
 #include <stdio.h>
@@ -70,15 +70,39 @@ void backtrace_free(BacktraceImpl *ptr) {
 	free(ptr->rows);
 }
 
-void backtrace_print(Backtrace *ptr) {
+#define ANSI_COLOR_DIMMED "\x1b[2m"
+#define ANSI_COLOR_RED "\x1b[31m"
+#define ANSI_COLOR_BRIGHT_RED "\x1b[91m"
+#define ANSI_COLOR_GREEN "\x1b[32m"
+#define ANSI_COLOR_YELLOW "\x1b[33m"
+#define ANSI_COLOR_BLUE "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN "\x1b[36m"
+#define ANSI_COLOR_RESET "\x1b[0m"
+
+void backtrace_print(Backtrace *ptr, int flags) {
 	printf("Backtrace:\n");
 	for (int i = 0; i < ptr->count; i++) {
-		printf("#%i:\n\
+		if ((flags & ERROR_PRINT_FLAG_NO_COLOR) == 0)
+			printf("#%i:\n\
+        [" ANSI_COLOR_DIMMED "fn=" ANSI_COLOR_RESET "'" ANSI_COLOR_GREEN
+			       "%s" ANSI_COLOR_RESET "']\n\
+        [" ANSI_COLOR_DIMMED "binary=" ANSI_COLOR_RESET "'" ANSI_COLOR_CYAN
+			       "%s" ANSI_COLOR_RESET "'] [" ANSI_COLOR_DIMMED
+			       "address=" ANSI_COLOR_RESET "%s]\n\
+        [" ANSI_COLOR_DIMMED "code=" ANSI_COLOR_RESET "'" ANSI_COLOR_MAGENTA
+			       "%s" ANSI_COLOR_RESET "']\n",
+			       i, ptr->rows[i].function_name,
+			       ptr->rows[i].bin_name, ptr->rows[i].address,
+			       ptr->rows[i].file_path);
+		else
+			printf("#%i:\n\
 	[fn='%s']\n\
 	[binary='%s'] [address=%s]\n\
        	[code='%s']\n",
-		       i, ptr->rows[i].function_name, ptr->rows[i].bin_name,
-		       ptr->rows[i].address, ptr->rows[i].file_path);
+			       i, ptr->rows[i].function_name,
+			       ptr->rows[i].bin_name, ptr->rows[i].address,
+			       ptr->rows[i].file_path);
 	}
 }
 

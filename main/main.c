@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/backtrace.h>
+#include <base/types.h>
 #include <stdio.h>
 
 int real_main(int argc, char **argv) {
-	Backtrace backtrace = EMPTY_BACKTRACE;
-	backtrace_generate(&backtrace, 100);
-	backtrace_print(&backtrace);
+	ErrorKind kind = {"IllegalState"};
+	Error err = Err(&err, kind, "test error %d", 4);
+	error_print(&err, 0);
 
 	printf("main doesn't currently do anything\n");
 	return 0;
