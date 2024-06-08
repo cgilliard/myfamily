@@ -96,10 +96,15 @@ void backtrace_print(Backtrace *ptr) {
 
 #define BUFSIZE 10000
 
-int get_file_line(char *bin, char *addr, char *line_num, int max_len) {
+int get_file_line(char *bin, char *addr, char *line_num, char *fn_name, int max_len) {
     pid_t process_id;
     char cmd[strlen(bin) + strlen(addr) + 100];
-    sprintf(cmd, "atos --fullPath -o %s %s", bin, addr);
+    #ifdef __APPLE__
+    	sprintf(cmd, "atos --fullPath -o %s %s", bin, addr);
+    #else // LINUX/WIN for now
+	sprintf(cmd, "addr2line -f -e %s %s", bin, addr);
+    #endif // OS Specific code
+
     printf("cmd=%s\n", cmd);
 
     char buffer[BUFSIZE] = {0};
@@ -110,8 +115,10 @@ int get_file_line(char *bin, char *addr, char *line_num, int max_len) {
         return -1;
     }
 
+    int counter = 0;
     while (fgets(buffer, BUFSIZE, fp) != NULL) {
-        printf("OUTPUT: %s", buffer);
+	printf("OUTPUT: %s", buffer);
+	#ifdef __APPLE__
 	bool found_first_paren = false;
 	bool found_second_paren = false;
 	u64 len = strlen(buffer);
@@ -132,6 +139,26 @@ int get_file_line(char *bin, char *addr, char *line_num, int max_len) {
 		}
 	}
 	line_num[line_num_itt] = 0;
+	#else // Linux
+	if(counter == 0) {
+		int len = strlen(buffer);
+		for(int i=0; i<len; i++) {
+			if(buffer[i] == '\n')
+				buffer[i] = 0;
+		}
+		buffer[max_len-1] = 0;
+		strcpy(fn_name, buffer);
+	} else if(counter == 1) {
+		int len = strlen(buffer);
+		for(int i=0; i<len; i++) {
+			if(buffer[i] == '\n')
+				buffer[i] = 0;
+		}
+		buffer[max_len-1] = 0;
+		strcpy(line_num, buffer);
+	}
+	counter++;
+	#endif // OS specific code
     }
 
     if (pclose(fp)) {
@@ -165,16 +192,63 @@ int backtrace_generate(Backtrace *ptr, u64 max_depth) {
 			ent.bin_name = bin_name;
 
 			char file_path[513];
+			char fn_name[513];
 			strcpy(file_path, "");
-			get_file_line(bin_name, address, file_path, 512);
+			get_file_line(bin_name, address, file_path, fn_name, 512);
 			ent.file_path = file_path;
 			backtrace_add_entry(ptr, &ent);
 		#else // LINUX/WIN for now
+		      char buffer[2050];
+		      char address[101];
+		      int len = strlen(strings[i]);
+		      bool in_bin_name = true;
+		      bool in_address = false;
+		      int buffer_itt = 0;
+		      int address_itt = 0;
+		      for(int j=0; j<len; j++) {
+			      if(in_bin_name && strings[i][j] == '(') {
+			      	 in_bin_name = false;
+				 in_address = true;
+			      } else if(in_address && strings[i][j] == ')') {
+					in_address = false;
+					if(address_itt < 100) {
+						address[address_itt] = 0;
+					}
+			      } else if(in_bin_name) {
+					if(buffer_itt < 2048) {
+						buffer[buffer_itt] = strings[i][j];
+						buffer_itt++;
+					} else if(buffer_itt == 2048) {
+						buffer[buffer_itt] = 0;
+						buffer_itt = 0;
+					}
+			      } else if(in_address) {
+					if(address_itt < 100) {
+						address[address_itt] = strings[i][j];
+						address_itt++;
+					} else {
+						address[100] = 0;
+					}
+			      }
+		      }
+
+		      if(address_itt < 100) {
+                      	address[address_itt] = 0;
+                      }
+		      if(buffer_itt < 2048) {
+			buffer[buffer_itt] = 0;
+		      }
+
+		      char file_path[513];
+		      char fn_name[513];
+                      strcpy(file_path, "");
+                      get_file_line(buffer, address, file_path, fn_name, 512);
+
 		      BacktraceEntry ent;
-		      ent.address = "0x1234";
-		      ent.function_name = "test";
-		      ent.file_path = "myfile.c:123";
-		      ent.bin_name = "mybin";
+		      ent.address = address;
+		      ent.function_name = fn_name;
+		      ent.file_path = file_path;
+		      ent.bin_name = buffer;
 		      backtrace_add_entry(ptr, &ent);
 		#endif // OS Specific code
 	}
