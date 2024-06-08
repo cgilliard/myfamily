@@ -17,9 +17,14 @@
 
 int real_main(int argc, char** argv)
 {
+	/*
     String s;
     backtrace_to_string(&s);
     printf("backtrace returned: '%s'\n", s.ptr);
+    */
+    Backtrace backtrace = EMPTY_BACKTRACE;
+    backtrace_generate(&backtrace, 100);
+    backtrace_print(&backtrace);
 
     printf("main doesn't currently do anything\n");
     return 0;

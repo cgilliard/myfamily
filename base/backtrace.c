@@ -19,6 +19,172 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <unistd.h>
+#include <sys/types.h>
+
+int backtrace_add_entry(Backtrace *ptr, BacktraceEntry *entry) {
+	int ret = 0;
+	if(ptr->count == 0) {
+		ptr->rows = malloc(sizeof(BacktraceEntry));
+	} else {
+		BacktraceEntry *tmp = realloc(
+			ptr->rows,
+			sizeof(BacktraceEntry) * (ptr->count + 1)
+		);
+		if(tmp == NULL) {
+			ret = -1;
+		} else {
+			ptr->rows = tmp;
+		}
+	}
+
+	if(!ret) {
+		ptr->rows[ptr->count].function_name = malloc(
+			sizeof(char) * (strlen(entry->function_name) + 1)
+		);
+		strcpy(ptr->rows[ptr->count].function_name, entry->function_name);
+
+		ptr->rows[ptr->count].bin_name = malloc(
+                	sizeof(char) * (strlen(entry->bin_name) + 1)
+        	);
+        	strcpy(ptr->rows[ptr->count].bin_name, entry->bin_name);
+
+		ptr->rows[ptr->count].address = malloc(
+                	sizeof(char) * (strlen(entry->address) + 1)
+        	);
+        	strcpy(ptr->rows[ptr->count].address, entry->address);
+
+		ptr->rows[ptr->count].file_path = malloc(
+                	sizeof(char) * (strlen(entry->file_path) + 1)
+        	);
+        	strcpy(ptr->rows[ptr->count].file_path, entry->file_path);
+
+		ptr->count++;
+	}
+	return ret;
+}
+
+void backtrace_free(BacktraceImpl *ptr) {
+	for(int i=0; i<ptr->count; i++) {
+		free(ptr->rows[i].function_name);
+		free(ptr->rows[i].bin_name);
+		free(ptr->rows[i].address);
+		free(ptr->rows[i].file_path);
+	}
+
+	ptr->count = 0;
+	free(ptr->rows);
+}
+
+void backtrace_print(Backtrace *ptr) {
+	printf("Backtrace:\n");
+	for(int i=0; i<ptr->count; i++) {
+		printf(
+			"#%i:\n\
+	[function_name=%s]\n\
+	[binary_path=%s]\n\
+	[address=%s]\n\
+       	[file_lineno=%s]\n",
+			i,
+			ptr->rows[i].function_name,
+			ptr->rows[i].bin_name,
+			ptr->rows[i].address,
+			ptr->rows[i].file_path
+		);
+	}
+}
+
+#define BUFSIZE 10000
+
+int get_file_line(char *bin, char *addr, char *line_num, int max_len) {
+    pid_t process_id;
+    char cmd[strlen(bin) + strlen(addr) + 100];
+    sprintf(cmd, "atos --fullPath -o %s %s", bin, addr);
+    printf("cmd=%s\n", cmd);
+
+    char buffer[BUFSIZE] = {0};
+    FILE *fp;
+
+    if ((fp = popen(cmd, "r")) == NULL) {
+        printf("Error opening pipe!\n");
+        return -1;
+    }
+
+    while (fgets(buffer, BUFSIZE, fp) != NULL) {
+        printf("OUTPUT: %s", buffer);
+	bool found_first_paren = false;
+	bool found_second_paren = false;
+	u64 len = strlen(buffer);
+	int line_num_itt = 0;
+	for(int i=0; i<len; i++) {
+		if(!found_first_paren && buffer[i] == '(') {
+			found_first_paren = true;
+		} else if(!found_second_paren && buffer[i] == '(') {
+			found_second_paren = true;
+		} else if(found_second_paren && found_first_paren) {
+			if(buffer[i] == ')') {
+				printf("break\n");
+				break;
+			}
+			line_num[line_num_itt] = buffer[i];
+			line_num_itt++;
+			if(line_num_itt == max_len) break;
+		}
+	}
+	line_num[line_num_itt] = 0;
+    }
+
+    if (pclose(fp)) {
+        printf("Command not found or exited with error status\n");
+        return -1;
+    }
+
+    return 0;
+}
+
+int backtrace_generate(Backtrace *ptr, u64 max_depth) {
+	int ret = 0;
+	void *array[max_depth];
+	int size = backtrace(array, max_depth);
+	char **strings = backtrace_symbols(array, size);
+
+	for(int i=0; i<size; i++) {
+		#ifdef __APPLE__
+			BacktraceEntry ent;
+			char address[30];
+			Dl_info info;
+			dladdr(array[i], &info);
+			u64 addr = 0x0000000100000000 + info.dli_saddr - info.dli_fbase;
+			sprintf(address, "0x%" PRIx64 "", addr);
+			ent.address = address;
+			char function_name[strlen(info.dli_sname)+1];
+			char bin_name[strlen(info.dli_fname)+1];
+			strcpy(function_name, info.dli_sname);
+			ent.function_name = function_name;
+			strcpy(bin_name, info.dli_fname);
+			ent.bin_name = bin_name;
+
+			char file_path[513];
+			strcpy(file_path, "");
+			get_file_line(bin_name, address, file_path, 512);
+			ent.file_path = file_path;
+			backtrace_add_entry(ptr, &ent);
+		#else // LINUX/WIN for now
+		      BacktraceEntry ent;
+		      ent.address = "0x1234";
+		      ent.function_name = "test";
+		      ent.file_path = "myfile.c:123";
+		      ent.bin_name = "mybin";
+		      backtrace_add_entry(ptr, &ent);
+		#endif // OS Specific code
+	}
+
+	if(strings != NULL)
+                free(strings);
+
+	return ret;
+}
+
 String backtrace_to_string(String *s)
 {
 	bool response_ok = true;
@@ -58,8 +224,8 @@ String backtrace_to_string(String *s)
 				strcat(responseline, "] [");
                                 sprintf(buf, "%p", 0x0000000100000000 + info.dli_saddr - info.dli_fbase);
                                 strcat(responseline, buf);
-				//strcat(responseline, "] [");
-				//strcat(responseline, strings[i]);
+				strcat(responseline, "] [");
+				strcat(responseline, strings[i]);
 				strcat(responseline, "]\n");
 			#else // LINUX/WIN for now
 				strcat(responseline, strings[i]);

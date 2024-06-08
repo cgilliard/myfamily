@@ -16,8 +16,27 @@
 #define _BACKTRACE_BASE__
 
 #include <base/types.h>
+#include <base/cleanup.h>
 
 #define BACKTRACE_MAX_DEPTH 100
+
+typedef struct BacktraceEntry {
+	char *function_name;
+	char *bin_name;
+	char *address;
+	char *file_path;
+} BacktraceEntry;
+
+typedef struct BacktraceImpl {
+	BacktraceEntry *rows;
+	u64 count;
+} BacktraceImpl;
+
+void backtrace_free(BacktraceImpl *ptr);
+#define Backtrace BacktraceImpl CLEANUP(backtrace_free)
+#define EMPTY_BACKTRACE { NULL, 0 }
+int backtrace_generate(Backtrace *ptr, u64 max_depth);
+void backtrace_print(Backtrace *ptr);
 
 String backtrace_to_string(String *s);
 
