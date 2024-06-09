@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/tlmalloc.h>
 #include <base/types.h>
 #include <dlfcn.h>
 #include <execinfo.h>
@@ -24,9 +25,9 @@
 int backtrace_add_entry(Backtrace *ptr, BacktraceEntry *entry) {
 	int ret = 0;
 	if (!ptr->count) {
-		ptr->rows = malloc(sizeof(BacktraceEntry));
+		ptr->rows = tlmalloc(sizeof(BacktraceEntry));
 	} else {
-		BacktraceEntry *tmp = realloc(
+		BacktraceEntry *tmp = tlrealloc(
 		    ptr->rows, sizeof(BacktraceEntry) * (ptr->count + 1));
 		if (tmp == NULL) {
 			ret = -1;
@@ -37,20 +38,20 @@ int backtrace_add_entry(Backtrace *ptr, BacktraceEntry *entry) {
 
 	if (!ret) {
 		ptr->rows[ptr->count].function_name =
-		    malloc(sizeof(char) * (strlen(entry->function_name) + 1));
+		    tlmalloc(sizeof(char) * (strlen(entry->function_name) + 1));
 		strcpy(ptr->rows[ptr->count].function_name,
 		       entry->function_name);
 
 		ptr->rows[ptr->count].bin_name =
-		    malloc(sizeof(char) * (strlen(entry->bin_name) + 1));
+		    tlmalloc(sizeof(char) * (strlen(entry->bin_name) + 1));
 		strcpy(ptr->rows[ptr->count].bin_name, entry->bin_name);
 
 		ptr->rows[ptr->count].address =
-		    malloc(sizeof(char) * (strlen(entry->address) + 1));
+		    tlmalloc(sizeof(char) * (strlen(entry->address) + 1));
 		strcpy(ptr->rows[ptr->count].address, entry->address);
 
 		ptr->rows[ptr->count].file_path =
-		    malloc(sizeof(char) * (strlen(entry->file_path) + 1));
+		    tlmalloc(sizeof(char) * (strlen(entry->file_path) + 1));
 		strcpy(ptr->rows[ptr->count].file_path, entry->file_path);
 
 		ptr->count++;
@@ -60,14 +61,14 @@ int backtrace_add_entry(Backtrace *ptr, BacktraceEntry *entry) {
 
 void backtrace_free(BacktraceImpl *ptr) {
 	for (int i = 0; i < ptr->count; i++) {
-		free(ptr->rows[i].function_name);
-		free(ptr->rows[i].bin_name);
-		free(ptr->rows[i].address);
-		free(ptr->rows[i].file_path);
+		tlfree(ptr->rows[i].function_name);
+		tlfree(ptr->rows[i].bin_name);
+		tlfree(ptr->rows[i].address);
+		tlfree(ptr->rows[i].file_path);
 	}
 
 	ptr->count = 0;
-	free(ptr->rows);
+	tlfree(ptr->rows);
 }
 
 #define ANSI_COLOR_DIMMED "\x1b[2m"
@@ -269,6 +270,7 @@ int backtrace_generate(Backtrace *ptr, u64 max_depth) {
 #endif // OS Specific code
 	}
 
+	// use regular free because this is not allocated by tlmalloc
 	if (strings != NULL)
 		free(strings);
 

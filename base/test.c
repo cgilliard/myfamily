@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/tlmalloc.h>
 #include <base/types.h>
 #include <criterion/criterion.h>
 #include <stdio.h>
@@ -88,6 +89,7 @@ void copy_my_struct(void *dest, void *src) {
 Test(base, user_defined) {
 	MyStruct m = my_struct_build(2, 3, "test1");
 	Result r = OkC(&r, m, copy_my_struct);
+	// Result r = Ok(&r, m);
 
 	cr_assert(r.is_ok());
 
@@ -130,8 +132,11 @@ Test(base, StringTest) {
 	cr_assert_eq(((String *)ptr)->ptr, NULL);
 
 	Result r = STRING(&r, "this is a test1");
-	StringPtr *s = Unwrap1(r);
-	cr_assert(!strcmp(s->ptr, "this is a test1"));
+	String s = UNWRAP(&s, r);
+	cr_assert(!strcmp(TO_STR(s), "this is a test1"));
+
+	String s5 = STRINGP(&s5, "abc123");
+	cr_assert(!strcmp(TO_STR(s5), "abc123"));
 
 	StringPtr *s2 = Unwrap1(STRING(&r, "this is a test2"));
 	cr_assert(!strcmp(s2->ptr, "this is a test2"));
@@ -161,21 +166,26 @@ Result test_string(Result *res, int x) {
 }
 
 Test(base, result) {
+
 	void *ptr = NULL;
 	u64 x = 3;
 	Result r = Ok(&r, x);
 	cr_assert_eq(r.is_ok(), true);
+
 	u64 *ret = Unwrap1(r);
 	cr_assert_eq(*ret, 3);
-
+	printf("0\n");
 	Result r1 = test_error(&r1, 200);
 	cr_assert_eq(r1.is_ok(), true);
 	u64 *v = Unwrap1(r1);
 	cr_assert_eq(*v, 300);
 
+	printf("1\n");
 	Result r2 = test_error(&r2, 20);
 	cr_assert_eq(r2.is_ok(), false);
+
 	Error e = Unwrap_err(r2);
+
 	Error compare = ERROR(&compare, ILLEGAL_STATE, "test error2 %d", 2);
 
 	printf("Printing e:\n");
@@ -201,9 +211,12 @@ Test(base, result) {
 	StringPtr *sx3 = Unwrap1(rr3);
 	printf("s='%s'\n", sx3->ptr);
 	cr_assert(!strcmp(sx3->ptr, "test str"));
+	printf("end\n");
 
 	Result rr4 = test_string(&rr4, 1);
 	cr_assert(!rr4.is_ok());
+
+	printf("end2\n");
 }
 
 Test(base, backtrace) {}
@@ -231,3 +244,57 @@ Test(base, TestCopy) {
 	cr_assert_eq(((String *)confirm1)->ptr, NULL);
 	cr_assert_eq(((String *)confirm2)->ptr, NULL);
 }
+
+Result alloc_test_fun(Result *res) {
+	Result r;
+	r = Ok(&r, UNIT);
+	Result r2;
+	int x = 8;
+	r2 = Ok(&r2, x);
+	Error e = ERROR(&e, ILLEGAL_STATE, "ill state");
+	Result r3;
+	r3 = Ok(&r3, UNIT);
+	// r3 = Err(&r3, e);
+	return Ok(res, UNIT);
+}
+
+Test(base, alloc) {
+	u64 initial_alloc = alloc_count();
+	u64 initial_bytes_alloc = cur_bytes_alloc();
+	u64 initial_free_count = free_count();
+
+	{
+
+		printf("initial = %llu %llu %llu\n", initial_alloc,
+		       initial_bytes_alloc, initial_free_count);
+		String s = STRINGP(&s, "testing 1234");
+		cr_assert(!strcmp(TO_STR(s), "testing 1234"));
+
+		Result r;
+		String s2 = UNWRAP(&s2, STRING(&r, "abcdef"));
+		cr_assert(!strcmp(TO_STR(s2), "abcdef"));
+
+		Result r2 = alloc_test_fun(&r2);
+		cr_assert(r2.is_ok());
+		/*
+				Error e = ERROR(&e, ILLEGAL_STATE, "ill state");
+				Backtrace bt = EMPTY_BACKTRACE;
+				backtrace_generate(&bt, 100);
+				*/
+
+		// Error e2 = ERROR(&e, ILLEGAL_STATE, "ill state");
+		//  Result r = Err(&r, e);
+	}
+
+	u64 final_alloc = alloc_count();
+	u64 final_bytes_alloc = cur_bytes_alloc();
+	u64 final_free_count = free_count();
+	printf("final = %llu %llu %llu\n", final_alloc, final_bytes_alloc,
+	       final_free_count);
+
+	u64 diff_free = final_free_count - initial_free_count;
+	u64 diff_alloc = final_alloc - initial_alloc;
+
+	cr_assert_eq(diff_free, diff_alloc);
+}
+

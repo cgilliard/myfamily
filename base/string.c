@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/tlmalloc.h>
 #include <base/types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,7 +24,7 @@ static char *to_str_impl() { return "this is a test999"; }
 
 void string_free(StringPtr *s) {
 	if (s->ptr) {
-		free(s->ptr);
+		tlfree(s->ptr);
 		s->ptr = NULL;
 	}
 }
@@ -32,7 +33,7 @@ int string_set(StringPtr *s, const char *ptr) {
 	int ret = 0;
 	s->len = strlen(ptr);
 
-	s->ptr = malloc(sizeof(char) * (s->len + 1));
+	s->ptr = tlmalloc(sizeof(char) * (s->len + 1));
 	if (s->ptr == NULL)
 		ret = -1;
 

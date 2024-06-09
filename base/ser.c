@@ -349,6 +349,7 @@ int deserialize_string(void *obj, Reader *reader) {
 	ret = deserialize_i64(&len, reader);
 
 	if (!ret) {
+		// TODO: deal with this allocation go to String
 		unsigned char *ptr = malloc(sizeof(char) * (len + 1));
 		if (ptr == NULL)
 			ret = -1;

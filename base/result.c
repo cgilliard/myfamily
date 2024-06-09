@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/panic.h>
+#include <base/tlmalloc.h>
 #include <base/types.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +41,8 @@ Error result_unwrap_err(Result x) {
 
 Result result_build_ok(Result *res, Copy copy) {
 	res->is_ok = result_is_ok_true;
-	res->value.obj = malloc(copy.size);
+	res->value.obj = tlmalloc(copy.size);
+	res->error.backtrace.count = 0;
 	copy.copy(res->value.obj, copy.obj);
 
 	return *res;
@@ -58,7 +60,12 @@ Result result_build_err(Result *res, Error e) {
 
 void result_free(ResultImpl *ptr) {
 	if (ptr->value.obj) {
-		free(ptr->value.obj);
+		tlfree(ptr->value.obj);
 		ptr->value.obj = NULL;
 	}
+	// if (!ptr->is_ok()) {
+	// printf("bt free %i\n", ptr);
+	//  backtrace_free(&ptr->error.backtrace);
+	// printf("ok\n");
+	//}
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/tlmalloc.h>
 #include <base/types.h>
 #include <stdlib.h>
 #include <string.h>
@@ -35,7 +36,7 @@ void copy_f32(void *dest, void *src) { memcpy(dest, src, sizeof(f32)); }
 void copy_bool(void *dest, void *src) { memcpy(dest, src, sizeof(bool)); }
 void copy_string(void *dest, void *src) {
 	((String *)dest)->ptr =
-	    malloc(sizeof(char) * (((String *)src)->len + 1));
+	    tlmalloc(sizeof(char) * (((String *)src)->len + 1));
 	((String *)dest)->len = ((String *)src)->len;
 	strcpy(((String *)dest)->ptr, ((String *)src)->ptr);
 }

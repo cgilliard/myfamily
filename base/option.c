@@ -14,6 +14,7 @@
 
 #include <base/panic.h>
 #include <base/rand.h>
+#include <base/tlmalloc.h>
 #include <base/types.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,14 +33,14 @@ void *option_unwrap(Option x) {
 
 Option option_build(OptionImpl *opt, void *x, size_t size) {
 	(*opt).is_some = option_is_some_true;
-	(*opt).ref = malloc(size);
+	(*opt).ref = tlmalloc(size);
 	memcpy((*opt).ref, x, size);
 	return *opt;
 }
 
 void option_free(OptionImpl *ptr) {
 	if (ptr->ref) {
-		free(ptr->ref);
+		tlfree(ptr->ref);
 		ptr->ref = NULL;
 	}
 }

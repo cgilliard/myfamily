@@ -61,7 +61,7 @@ void copy_i8(void *dst, void *src);
 void copy_string(void *dst, void *src);
 void copy_bool(void *dst, void *src);
 void copy_unit(void *dst, void *src);
-void __copy_not_implemented_(void *dst, void *src);
+void __copy_default(void *dst, void *src);
 
 #define COPY_NAME(x)                                                           \
 	_Generic((x),                                                          \
@@ -80,7 +80,7 @@ void __copy_not_implemented_(void *dst, void *src);
 	    String: copy_string,                                               \
 	    bool: copy_bool,                                                   \
 	    Unit: copy_unit,                                                   \
-	    default: __copy_not_implemented_)
+	    default: __copy_default)
 
 #define COPY(c, x) build_copy(&c, &x, sizeof(x), COPY_NAME(x))
 #define COPY_CUSTOM(c, x, fn) build_copy(&c, &x, sizeof(x), fn)
