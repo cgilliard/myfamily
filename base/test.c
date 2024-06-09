@@ -16,7 +16,7 @@
 #include <criterion/criterion.h>
 #include <stdio.h>
 
-const ErrorKind ERROR_KIND_ILLEGAL_STATE = {"IllegalState"};
+const ErrorKind ILLEGAL_STATE = {"IllegalState"};
 
 Test(base, ErrorKindTest) {
 	ErrorKind ekind1 = {"ArrayIndexOutOfBounds"};
@@ -51,15 +51,60 @@ Test(base, ErrorTest) {
 		     0);
 }
 
+typedef struct MyStructPtr {
+	int x;
+	int y;
+	char *data;
+} MyStructPtr;
+
+void my_struct_free(MyStructPtr *ptr) {
+	if (ptr->data != NULL) {
+		free(ptr->data);
+		ptr->data = NULL;
+	}
+}
+
+#define MyStruct MyStructPtr CLEANUP(my_struct_free)
+
+MyStructPtr my_struct_build(int x, int y, char *data) {
+	char *data_copy = malloc(sizeof(char) * (strlen(data) + 1));
+	strcpy(data_copy, data);
+	MyStructPtr ret = {x, y, data_copy};
+	return ret;
+}
+
+void copy_my_struct(void *dest, void *src) {
+	MyStructPtr *dest_ms = dest;
+	MyStructPtr *src_ms = src;
+	dest_ms->x = src_ms->x;
+	dest_ms->y = src_ms->y;
+	if (src_ms->data != NULL) {
+		int len = strlen(src_ms->data);
+		dest_ms->data = malloc(sizeof(char) * (len + 1));
+		strcpy(dest_ms->data, src_ms->data);
+	}
+}
+
+Test(base, user_defined) {
+	MyStruct m = my_struct_build(2, 3, "test1");
+	Result r = OkC(&r, m, copy_my_struct);
+
+	cr_assert(r.is_ok());
+
+	MyStruct unwrapped = UNWRAP(&unwrapped, r);
+	cr_assert_eq(unwrapped.x, 2);
+	cr_assert_eq(unwrapped.y, 3);
+	cr_assert(!strcmp(unwrapped.data, "test1"));
+}
+
 Result test_call(Result *res) {
 	Result r;
-	StringPtr *s = Call(res, STRING(&r, "abc123"));
+	StringPtr *s = CALL(res, STRING(&r, "abc123"));
 
 	printf("svalue=%s\n", s->ptr);
 	cr_assert(!strcmp(s->ptr, "abc123"));
 
-	Unit u;
-	return Ok(res, u);
+	return Ok(res, UNIT);
 }
 
 Test(base, StringTest) {
@@ -92,8 +137,7 @@ Result test_error(Result *res, int x) {
 		int y = x + 100;
 		return Ok(res, y);
 	} else {
-		Error err =
-		    err(&err, ERROR_KIND_ILLEGAL_STATE, "test error %d", 1);
+		Error err = ERROR(&err, ILLEGAL_STATE, "test error %d", 1);
 		return Err(res, err);
 	}
 }
@@ -106,8 +150,7 @@ Result test_string(Result *res, int x) {
 		printf("post set\n");
 		return Ok(res, s);
 	} else {
-		Error err =
-		    err(&err, ERROR_KIND_ILLEGAL_STATE, "test error %d", 3);
+		Error err = ERROR(&err, ILLEGAL_STATE, "test error %d", 3);
 		return Err(res, err);
 	}
 }
@@ -128,8 +171,7 @@ Test(base, result) {
 	Result r2 = test_error(&r2, 20);
 	cr_assert_eq(r2.is_ok(), false);
 	Error e = Unwrap_err(r2);
-	Error compare =
-	    err(&compare, ERROR_KIND_ILLEGAL_STATE, "test error2 %d", 2);
+	Error compare = ERROR(&compare, ILLEGAL_STATE, "test error2 %d", 2);
 
 	printf("Printing e:\n");
 	error_print(&e, 0);
@@ -159,17 +201,9 @@ Test(base, result) {
 	cr_assert(!rr4.is_ok());
 }
 
-Test(base, backtrace) {
-	/*
-	String s;
-	string_set(&s, "test");
-	backtrace_to_string(&s);
-	printf("backtrace returned: '%s'\n", s.ptr);
-	*/
-}
+Test(base, backtrace) {}
 
 Test(base, TestCopy) {
-
 	u64 x = 3;
 	Copy test = COPY(test, x);
 	u64 dst = 1;
@@ -193,3 +227,4 @@ Test(base, TestCopy) {
 	cr_assert_eq(((String *)confirm1)->ptr, NULL);
 	cr_assert_eq(((String *)confirm2)->ptr, NULL);
 }
+

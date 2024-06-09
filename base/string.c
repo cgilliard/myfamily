@@ -29,8 +29,8 @@ void string_free(StringPtr *s) {
 Result string_build(Result *res, const char *ptr) {
 	String s;
 	if (string_set(&s, ptr)) {
-		Error err = err(&err, ERROR_KIND_OOM,
-				"Could not allocate sufficient memory");
+		Error err = ERROR(&err, ERROR_KIND_OOM,
+				  "Could not allocate sufficient memory");
 		return Err(res, err);
 	} else {
 		return Ok(res, s);

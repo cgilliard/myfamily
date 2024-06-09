@@ -18,7 +18,7 @@
 const ErrorKind ERROR_KIND_ILLEGAL_STATE = {"IllegalState"};
 
 int real_main(int argc, char **argv) {
-	Error err = err(&err, ERROR_KIND_ILLEGAL_STATE, "test error %d", 4);
+	Error err = ERROR(&err, ERROR_KIND_ILLEGAL_STATE, "test error %d", 4);
 	error_print(&err, 0);
 
 	printf("main doesn't currently do anything\n");

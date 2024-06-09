@@ -38,11 +38,7 @@
 
 typedef struct Unit {
 } Unit;
-#define UNIT                                                                   \
-	({                                                                     \
-		Unit u;                                                        \
-		u;                                                             \
-	})
+static Unit UNIT;
 
 typedef struct Copy {
 	void *obj;
@@ -87,6 +83,7 @@ void __copy_not_implemented_(void *dst, void *src);
 	    default: __copy_not_implemented_)
 
 #define COPY(c, x) build_copy(&c, &x, sizeof(x), COPY_NAME(x))
+#define COPY_CUSTOM(c, x, fn) build_copy(&c, &x, sizeof(x), fn)
 Copy build_copy(Copy *c, void *ptr, size_t size,
 		void (*copy)(void *dest, void *src));
 
@@ -147,7 +144,7 @@ void error_free(ErrorImpl *err);
 #define Error ErrorImpl CLEANUP(error_free)
 Error error_build(Error *err, ErrorKind kind, char *format, ...);
 Error verror_build(Error *err, ErrorKind kind, char *format, va_list args);
-#define err(err, kind, ...) error_build(err, kind, ##__VA_ARGS__)
+#define ERROR(err, kind, ...) error_build(err, kind, ##__VA_ARGS__)
 
 #define ERROR_PRINT_FLAG_NO_COLOR 0x1
 #define ERROR_PRINT_FLAG_NO_BACKTRACE 0x1 << 1
@@ -173,8 +170,13 @@ Error result_unwrap_err(Result x);
 Result result_build_ok(Result *r, Copy copy);
 Result result_build_err(Result *r, Error e);
 
+#define UNWRAP(x, y)                                                           \
+	*({                                                                    \
+		typeof(x) ret = result_unwrap(y);                              \
+		ret;                                                           \
+	})
 #define Unwrap1(x) result_unwrap(x)
-#define Call(res, x)                                                           \
+#define CALL(res, x)                                                           \
 	({                                                                     \
 		if (!x.is_ok()) {                                              \
 			return Err(res, Unwrap_err(x));                        \
@@ -186,6 +188,11 @@ Result result_build_err(Result *r, Error e);
 #define Ok(r, c)                                                               \
 	({                                                                     \
 		Copy cx = COPY(cx, c);                                         \
+		result_build_ok(r, cx);                                        \
+	})
+#define OkC(r, c, fn)                                                          \
+	({                                                                     \
+		Copy cx = COPY_CUSTOM(cx, c, fn);                              \
 		result_build_ok(r, cx);                                        \
 	})
 #define Err(r, e) result_build_err(r, e)
