@@ -36,28 +36,34 @@ char *error_to_string(char *s, Error *e) {
 	return s;
 }
 
-Error error_build(Error *err, ErrorKind kind, char *msg, ...) {
-	va_list args;
+Error verror_build(Error *err, ErrorKind kind, char *format, va_list args) {
 
 	// copy the message over in formatted form
-	va_start(args, msg);
 	strcpy(err->msg, "");
-	vsprintf(err->msg, msg, args);
-	va_end(args);
+	vsprintf(err->msg, format, args);
 
-	// either take the lenght of the type_str or the full array if an error
+	// either take the length of the type_str or the full array if an error
 	// occurs
 	int len = strlen(kind.type_str);
-	if (len < 0)
-		len = MAX_ERROR_KIND_LEN;
+	if (len < 0 || len >= MAX_ERROR_KIND_LEN)
+		len = MAX_ERROR_KIND_LEN - 1;
 
 	memcpy(err->kind.type_str, kind.type_str, len);
+	err->kind.type_str[len] = 0;
 
 	// generate a backtrace
 	err->backtrace.rows = NULL;
 	err->backtrace.count = 0;
 	backtrace_generate(&err->backtrace, ERROR_BACKTRACE_MAX_DEPTH);
 
+	return *err;
+}
+
+Error error_build(Error *err, ErrorKind kind, char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	verror_build(err, kind, format, args);
+	va_end(args);
 	return *err;
 }
 
@@ -74,11 +80,11 @@ Error error_build(Error *err, ErrorKind kind, char *msg, ...) {
 void error_print(Error *err, int flags) {
 	if ((flags & ERROR_PRINT_FLAG_NO_COLOR) == 0)
 		printf(ANSI_COLOR_BRIGHT_RED "%s" ANSI_COLOR_RESET
-					     ": " ANSI_COLOR_GREEN
-					     "%s" ANSI_COLOR_RESET "\n",
+					     ": \"" ANSI_COLOR_GREEN
+					     "%s" ANSI_COLOR_RESET "\"\n",
 		       err->kind.type_str, err->msg);
 	else
-		printf("%s: %s\n", err->kind.type_str, err->msg);
+		printf("%s: \"%s\"\n", err->kind.type_str, err->msg);
 	if ((flags & ERROR_PRINT_FLAG_NO_BACKTRACE) == 0)
 		backtrace_print(&err->backtrace, flags);
 }

@@ -17,14 +17,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-void string_free(StringImpl *s) {
+const ErrorKind ERROR_KIND_OOM = {"MEMORY_ALLOC"};
+
+void string_free(StringPtr *s) {
 	if (s->ptr) {
 		free(s->ptr);
 		s->ptr = NULL;
 	}
 }
 
-int string_set(StringImpl *s, const char *ptr) {
+Result string_build(Result *res, const char *ptr) {
+	String s;
+	if (string_set(&s, ptr)) {
+		Error err = err(&err, ERROR_KIND_OOM,
+				"Could not allocate sufficient memory");
+		return Err(res, err);
+	} else {
+		return Ok(res, s);
+	}
+}
+
+int string_set(StringPtr *s, const char *ptr) {
 	int ret = 0;
 	s->len = strlen(ptr);
 

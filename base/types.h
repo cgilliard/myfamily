@@ -17,9 +17,11 @@
 
 #include <base/cleanup.h>
 #include <inttypes.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #define u8 uint8_t
 #define i8 int8_t
@@ -33,6 +35,60 @@
 #define i128 __int128_t
 #define f64 double
 #define f32 float
+
+typedef struct Unit {
+} Unit;
+#define UNIT                                                                   \
+	({                                                                     \
+		Unit u;                                                        \
+		u;                                                             \
+	})
+
+typedef struct Copy {
+	void *obj;
+	u64 size;
+	void (*copy)(void *dest, void *src);
+} Copy;
+
+void copy_f32(void *dst, void *src);
+void copy_f64(void *dst, void *src);
+void copy_u128(void *dst, void *src);
+void copy_u64(void *dst, void *src);
+void copy_u32(void *dst, void *src);
+void copy_u16(void *dst, void *src);
+void copy_u8(void *dst, void *src);
+void copy_i128(void *dst, void *src);
+void copy_i64(void *dst, void *src);
+void copy_i32(void *dst, void *src);
+void copy_i16(void *dst, void *src);
+void copy_i8(void *dst, void *src);
+void copy_string(void *dst, void *src);
+void copy_bool(void *dst, void *src);
+void copy_unit(void *dst, void *src);
+void __copy_not_implemented_(void *dst, void *src);
+
+#define COPY_NAME(x)                                                           \
+	_Generic((x),                                                          \
+	    f32: copy_f32,                                                     \
+	    f64: copy_f64,                                                     \
+	    u128: copy_u128,                                                   \
+	    u64: copy_u64,                                                     \
+	    u32: copy_u32,                                                     \
+	    u16: copy_u16,                                                     \
+	    u8: copy_u8,                                                       \
+	    i128: copy_i128,                                                   \
+	    i64: copy_i64,                                                     \
+	    i32: copy_i32,                                                     \
+	    i16: copy_i16,                                                     \
+	    i8: copy_i8,                                                       \
+	    String: copy_string,                                               \
+	    bool: copy_bool,                                                   \
+	    Unit: copy_unit,                                                   \
+	    default: __copy_not_implemented_)
+
+#define COPY(c, x) build_copy(&c, &x, sizeof(x), COPY_NAME(x))
+Copy build_copy(Copy *c, void *ptr, size_t size,
+		void (*copy)(void *dest, void *src));
 
 typedef struct BacktraceEntry {
 	char *function_name;
@@ -89,8 +145,9 @@ typedef struct ErrorImpl {
 } ErrorImpl;
 void error_free(ErrorImpl *err);
 #define Error ErrorImpl CLEANUP(error_free)
-Error error_build(Error *err, ErrorKind kind, char *msg, ...);
-#define Err(kind, msg, ...) error_build(kind, msg, ##__VA_ARGS__)
+Error error_build(Error *err, ErrorKind kind, char *format, ...);
+Error verror_build(Error *err, ErrorKind kind, char *format, va_list args);
+#define err(err, kind, ...) error_build(err, kind, ##__VA_ARGS__)
 
 #define ERROR_PRINT_FLAG_NO_COLOR 0x1
 #define ERROR_PRINT_FLAG_NO_BACKTRACE 0x1 << 1
@@ -100,15 +157,50 @@ void error_print(Error *err, int flags);
 bool error_equal(Error *e1, Error *e2);
 char *error_to_string(char *s, Error *e);
 
-typedef struct StringImpl {
+typedef struct ResultImpl {
+	bool (*is_ok)();
+	Copy value;
+	Error error;
+} ResultImpl;
+
+void result_free(ResultImpl *res);
+#define Result ResultImpl CLEANUP(result_free)
+
+bool result_is_ok_false();
+bool result_is_ok_true();
+void *result_unwrap(Result x);
+Error result_unwrap_err(Result x);
+Result result_build_ok(Result *r, Copy copy);
+Result result_build_err(Result *r, Error e);
+
+#define Unwrap1(x) result_unwrap(x)
+#define Call(res, x)                                                           \
+	({                                                                     \
+		if (!x.is_ok()) {                                              \
+			return Err(res, Unwrap_err(x));                        \
+		};                                                             \
+		result_unwrap(x);                                              \
+	})
+#define Unwrap_or(r, d) rr2.is_ok() ? *((typeof(d) *)Unwrap1(r)) : d
+#define Unwrap_err(x) result_unwrap_err(x)
+#define Ok(r, c)                                                               \
+	({                                                                     \
+		Copy cx = COPY(cx, c);                                         \
+		result_build_ok(r, cx);                                        \
+	})
+#define Err(r, e) result_build_err(r, e)
+
+typedef struct StringPtr {
 	char *ptr;
 	u64 len;
-} StringImpl;
+} StringPtr;
 
-void string_free(StringImpl *s);
-#define String StringImpl CLEANUP(string_free)
+void string_free(StringPtr *s);
+#define String StringPtr CLEANUP(string_free)
 
-int string_set(StringImpl *s, const char *ptr);
+Result string_build(Result *res, const char *ptr);
+#define STRING(r, s) string_build(r, s)
+int string_set(StringPtr *s, const char *ptr);
 #define STRING_INIT(s, value) string_set(&s, value)
 
 i64 saddi64(i64 a, i64 b);

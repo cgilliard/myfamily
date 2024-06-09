@@ -87,10 +87,10 @@ void backtrace_print(Backtrace *ptr, int flags) {
 			printf("#%i:\n\
         [" ANSI_COLOR_DIMMED "fn=" ANSI_COLOR_RESET "'" ANSI_COLOR_GREEN
 			       "%s" ANSI_COLOR_RESET "']\n\
-        [" ANSI_COLOR_DIMMED "binary=" ANSI_COLOR_RESET "'" ANSI_COLOR_CYAN
+        [" ANSI_COLOR_DIMMED "binary=" ANSI_COLOR_RESET "'" ANSI_COLOR_MAGENTA
 			       "%s" ANSI_COLOR_RESET "'] [" ANSI_COLOR_DIMMED
 			       "address=" ANSI_COLOR_RESET "%s]\n\
-        [" ANSI_COLOR_DIMMED "code=" ANSI_COLOR_RESET "'" ANSI_COLOR_MAGENTA
+        [" ANSI_COLOR_DIMMED "code=" ANSI_COLOR_RESET "'" ANSI_COLOR_CYAN
 			       "%s" ANSI_COLOR_RESET "']\n",
 			       i, ptr->rows[i].function_name,
 			       ptr->rows[i].bin_name, ptr->rows[i].address,
