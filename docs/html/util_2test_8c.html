@@ -73,11 +73,15 @@ $(function() {
 <div class="title">test.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;criterion/criterion.h&gt;</code><br />
-<code>#include &lt;<a class="el" href="slabs_8h_source.html">util/slabs.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="slabs__test_8h_source.html">util/slabs_test.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="rand_8h_source.html">base/rand.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
+<code>#include &lt;criterion/criterion.h&gt;</code><br />
 <code>#include &lt;limits.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="log_8h_source.html">log/log.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="option_8h_source.html">util/option.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="slabio_8h_source.html">util/slabio.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="slabs_8h_source.html">util/slabs.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="slabs__test_8h_source.html">util/slabs_test.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
@@ -96,6 +100,12 @@ Functions</h2></td></tr>
 <tr class="separator:a40b7e1f33bf7ba480a59182257b46f72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adeff092caad6cdda860b437dbe7f006a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#adeff092caad6cdda860b437dbe7f006a">Test</a> (util, slab_allocator_init)</td></tr>
 <tr class="separator:adeff092caad6cdda860b437dbe7f006a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f844d97da7d82528dcd35b2d9ac93ba"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#a9f844d97da7d82528dcd35b2d9ac93ba">Test</a> (util, slabio)</td></tr>
+<tr class="separator:a9f844d97da7d82528dcd35b2d9ac93ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95f7b577e1a381f51041b4f14a4d9e30"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#a95f7b577e1a381f51041b4f14a4d9e30">Test</a> (util, over_read)</td></tr>
+<tr class="separator:a95f7b577e1a381f51041b4f14a4d9e30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbac02893e817deed2324dae73e49b0b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#abbac02893e817deed2324dae73e49b0b">Test</a> (util, option)</td></tr>
+<tr class="separator:abbac02893e817deed2324dae73e49b0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a0b87e0d3bf5853bcbb0b66a7c48fdc05"></a>
@@ -113,8 +123,64 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="abbac02893e817deed2324dae73e49b0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbac02893e817deed2324dae73e49b0b">&#9670;&nbsp;</a></span>Test() <span class="overload">[1/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Test </td>
+          <td>(</td>
+          <td class="paramtype">util&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">option&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a95f7b577e1a381f51041b4f14a4d9e30"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95f7b577e1a381f51041b4f14a4d9e30">&#9670;&nbsp;</a></span>Test() <span class="overload">[2/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Test </td>
+          <td>(</td>
+          <td class="paramtype">util&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">over_read&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a40b7e1f33bf7ba480a59182257b46f72"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a40b7e1f33bf7ba480a59182257b46f72">&#9670;&nbsp;</a></span>Test() <span class="overload">[1/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a40b7e1f33bf7ba480a59182257b46f72">&#9670;&nbsp;</a></span>Test() <span class="overload">[3/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -142,7 +208,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="adeff092caad6cdda860b437dbe7f006a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adeff092caad6cdda860b437dbe7f006a">&#9670;&nbsp;</a></span>Test() <span class="overload">[2/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#adeff092caad6cdda860b437dbe7f006a">&#9670;&nbsp;</a></span>Test() <span class="overload">[4/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -170,7 +236,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a79de0e0a50947a7e7e64f833debf4777"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a79de0e0a50947a7e7e64f833debf4777">&#9670;&nbsp;</a></span>Test() <span class="overload">[3/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a79de0e0a50947a7e7e64f833debf4777">&#9670;&nbsp;</a></span>Test() <span class="overload">[5/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -198,7 +264,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a726aa5d9a8624ef618b123789517ac95"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a726aa5d9a8624ef618b123789517ac95">&#9670;&nbsp;</a></span>Test() <span class="overload">[4/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a726aa5d9a8624ef618b123789517ac95">&#9670;&nbsp;</a></span>Test() <span class="overload">[6/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -225,8 +291,36 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a9f844d97da7d82528dcd35b2d9ac93ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f844d97da7d82528dcd35b2d9ac93ba">&#9670;&nbsp;</a></span>Test() <span class="overload">[7/8]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Test </td>
+          <td>(</td>
+          <td class="paramtype">util&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">slabio&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ad363b5d77ae366056d568b9312b925c4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad363b5d77ae366056d568b9312b925c4">&#9670;&nbsp;</a></span>Test() <span class="overload">[5/5]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad363b5d77ae366056d568b9312b925c4">&#9670;&nbsp;</a></span>Test() <span class="overload">[8/8]</span></h2>
 
 <div class="memitem">
 <div class="memproto">

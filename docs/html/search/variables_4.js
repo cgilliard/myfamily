@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['null_5fptr_364',['null_ptr',['../structSlabDataParams.html#a008dc36efe097e5e986a934c3a57136d',1,'SlabDataParams']]]
+  ['len_488',['len',['../structStringImpl.html#aaeaee0a89e5f854c7b37e08a77612ebb',1,'StringImpl::len()'],['../structSlab.html#af7f51cbb255117598f07b2233504a3ab',1,'Slab::len()']]]
 ];

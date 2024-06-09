@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		 <p align="center">
-                        Code Coverage is currently 87.80%.
+                        Code Coverage is currently 78.69%.
                 </p>
 		<center>
 			<div class="chart">
@@ -77,7 +77,8 @@
 96.83,
 85.76,
 90.32,
-87.80,];
+87.80,
+78.69,];
 			let labels = [format_date(1716876818 * 1000 ),
 format_date(1716876822 * 1000 ),
 format_date(1716904488 * 1000 ),
@@ -102,7 +103,8 @@ format_date(1717381641 * 1000 ),
 format_date(1717398065 * 1000 ),
 format_date(1717484462 * 1000 ),
 format_date(1717570913 * 1000 ),
-format_date(1717657365 * 1000 ),];
+format_date(1717657365 * 1000 ),
+format_date(1717916596 * 1000 ),];
 
 			const data = {
 				labels: labels,
@@ -132,7 +134,7 @@ format_date(1717657365 * 1000 ),];
 			<textarea readonly class="textarea" rows="50" cols="100">        -:    0:Source:log.c
         -:    0:Graph:./log.gcno
         -:    0:Data:./log.gcda
-        -:    0:Runs:25
+        -:    0:Runs:28
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -170,23 +172,23 @@ format_date(1717657365 * 1000 ),];
         -:   35:
         -:   36:#define _FILE_OFFSET_BITS 64
         -:   37:
-       70:   38:u64 log_now()
+       72:   38:u64 log_now()
         -:   39:{
         -:   40:    struct timeval tv;
-       70:   41:    gettimeofday(&tv, NULL);
+       72:   41:    gettimeofday(&tv, NULL);
         -:   42:
-       70:   43:    u64 ret = (u64)(tv.tv_sec) * 1000 + (u64)(tv.tv_usec) / 1000;
+       72:   43:    u64 ret = (u64)(tv.tv_sec) * 1000 + (u64)(tv.tv_usec) / 1000;
         -:   44:
-       70:   45:    return ret;
+       72:   45:    return ret;
         -:   46:}
         -:   47:
-     2484:   48:int sprintf_err(char* str, const char* string, ...)
+      348:   48:int sprintf_err(char* str, const char* string, ...)
         -:   49:{
         -:   50:    va_list args;
-     2484:   51:    va_start(args, string);
-     2484:   52:    int ret = vsprintf(str, string, args);
-     2484:   53:    va_end(args);
-     2484:   54:    return (ret > 0) ? 0 : ret;
+      348:   51:    va_start(args, string);
+      348:   52:    int ret = vsprintf(str, string, args);
+      348:   53:    va_end(args);
+      348:   54:    return (ret > 0) ? 0 : ret;
         -:   55:}
         -:   56:
        82:   57:int set_option(Log* log, int type, void* value)
@@ -261,31 +263,31 @@ format_date(1717657365 * 1000 ),];
        73:  126:    return 0;
         -:  127:}
         -:  128:
-       34:  129:int do_logger(Log* log, int num, va_list valist)
+       36:  129:int do_logger(Log* log, int num, va_list valist)
         -:  130:{
-       34:  131:    int ret = 0;
+       36:  131:    int ret = 0;
         -:  132:
         -:  133:    // set defaults
-       34:  134:    log->fp = NULL;
-       34:  135:    log->level = Info;
-       34:  136:    log->show_colors = true;
-       34:  137:    log->show_stdout = true;
-       34:  138:    log->show_timestamp = true;
-       34:  139:    log->show_millis = true;
-       34:  140:    log->show_log_level = true;
-       34:  141:    log->auto_rotate = false;
-       34:  142:    log->delete_rotation = false;
-       34:  143:    log->max_size_bytes = ULONG_MAX;
-       34:  144:    log->max_age_millis = ULONG_MAX;
-       34:  145:    log->path = NULL;
-       34:  146:    log->file_header = NULL;
-       34:  147:    log->off = 0;
-       34:  148:    log->last_rotation = log_now();
-       34:  149:    log->is_init = false;
-       34:  150:    log->debug_malloc = false;
+       36:  134:    log->fp = NULL;
+       36:  135:    log->level = Info;
+       36:  136:    log->show_colors = true;
+       36:  137:    log->show_stdout = true;
+       36:  138:    log->show_timestamp = true;
+       36:  139:    log->show_millis = true;
+       36:  140:    log->show_log_level = true;
+       36:  141:    log->auto_rotate = false;
+       36:  142:    log->delete_rotation = false;
+       36:  143:    log->max_size_bytes = ULONG_MAX;
+       36:  144:    log->max_age_millis = ULONG_MAX;
+       36:  145:    log->path = NULL;
+       36:  146:    log->file_header = NULL;
+       36:  147:    log->off = 0;
+       36:  148:    log->last_rotation = log_now();
+       36:  149:    log->is_init = false;
+       36:  150:    log->debug_malloc = false;
         -:  151:
         -:  152:    // iterate through arg list for overrides
-      103:  153:    for (int i = 0; i < num; i++) {
+      105:  153:    for (int i = 0; i < num; i++) {
        76:  154:        LogConfigOptionImpl next = va_arg(valist, LogConfigOptionImpl);
        76:  155:        if (set_option(log, next.type, next.value)) {
         7:  156:            if (log->file_header != NULL)
@@ -298,71 +300,71 @@ format_date(1717657365 * 1000 ),];
         7:  163:            break;
         -:  164:        }
         -:  165:    }
-       34:  166:    return ret;
+       36:  166:    return ret;
         -:  167:}
         -:  168:
-       32:  169:int logger(Log* log, int num, ...)
+       34:  169:int logger(Log* log, int num, ...)
         -:  170:{
         -:  171:    va_list valist;
-       32:  172:    va_start(valist, num);
-       32:  173:    int ret = do_logger(log, num, valist);
-       32:  174:    va_end(valist);
-       32:  175:    return ret;
+       34:  172:    va_start(valist, num);
+       34:  173:    int ret = do_logger(log, num, valist);
+       34:  174:    va_end(valist);
+       34:  175:    return ret;
         -:  176:}
         -:  177:
-      621:  178:int get_format(Log* log, LogLevel level, char* buf)
+       87:  178:int get_format(Log* log, LogLevel level, char* buf)
         -:  179:{
-      621:  180:    int ret = 0;
+       87:  180:    int ret = 0;
         -:  181:    char milli_buf[14];
         -:  182:    char log_level_buf[20];
         -:  183:    char dt_buf[40];
         -:  184:    char spacing[2];
-      621:  185:    time_t t = time(NULL);
-      621:  186:    struct tm tm = *localtime(&t);
+       87:  185:    time_t t = time(NULL);
+       87:  186:    struct tm tm = *localtime(&t);
         -:  187:
-      621:  188:    if (log->show_millis) {
+       87:  188:    if (log->show_millis) {
         -:  189:        struct timeval time;
-      618:  190:        gettimeofday(&time, NULL);
-      618:  191:        int millis = time.tv_usec / 1000;
-      618:  192:        ret = sprintf_err(milli_buf, ".%03d", millis);
+       84:  190:        gettimeofday(&time, NULL);
+       84:  191:        int millis = time.tv_usec / 1000;
+       84:  192:        ret = sprintf_err(milli_buf, ".%03d", millis);
         -:  193:    } else {
         3:  194:        strcpy(milli_buf, "");
         -:  195:    }
         -:  196:
-      621:  197:    if (log->show_timestamp) {
-      617:  198:        strcpy(spacing, " ");
+       87:  197:    if (log->show_timestamp) {
+       83:  198:        strcpy(spacing, " ");
         -:  199:    } else {
         4:  200:        strcpy(spacing, "");
         -:  201:    }
         -:  202:
-      621:  203:    if (log->show_log_level && ret == 0) {
-      620:  204:        if (level == Trace) {
+       87:  203:    if (log->show_log_level && ret == 0) {
+       86:  204:        if (level == Trace) {
         2:  205:            if (log->show_colors) {
         1:  206:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_YELLOW "TRACE" ANSI_COLOR_RESET ")", spacing);
         -:  207:            } else {
         1:  208:                ret = sprintf_err(log_level_buf, "%s(TRACE)", spacing);
         -:  209:            }
-      618:  210:        } else if (level == Debug) {
-      602:  211:            if (log->show_colors) {
-      599:  212:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_CYAN "DEBUG" ANSI_COLOR_RESET ")", spacing);
+       84:  210:        } else if (level == Debug) {
+       67:  211:            if (log->show_colors) {
+       64:  212:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_CYAN "DEBUG" ANSI_COLOR_RESET ")", spacing);
         -:  213:            } else {
         3:  214:                ret = sprintf_err(log_level_buf, "%s(DEBUG)", spacing);
         -:  215:            }
-       16:  216:        } else if (level == Info) {
+       17:  216:        } else if (level == Info) {
        10:  217:            if (log->show_colors) {
         4:  218:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_GREEN "INFO" ANSI_COLOR_RESET ")", spacing);
         -:  219:            } else {
         6:  220:                ret = sprintf_err(log_level_buf, "%s(INFO)", spacing);
         -:  221:            }
-        6:  222:        } else if (level == Warn) {
+        7:  222:        } else if (level == Warn) {
         2:  223:            if (log->show_colors) {
         1:  224:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_MAGENTA "WARN" ANSI_COLOR_RESET ")", spacing);
         -:  225:            } else {
         1:  226:                ret = sprintf_err(log_level_buf, "%s(WARN)", spacing);
         -:  227:            }
-        4:  228:        } else if (level == Error) {
-        2:  229:            if (log->show_colors) {
-        1:  230:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_RED "ERROR" ANSI_COLOR_RESET ")", spacing);
+        5:  228:        } else if (level == Error) {
+        3:  229:            if (log->show_colors) {
+        2:  230:                ret = sprintf_err(log_level_buf, "%s(" ANSI_COLOR_RED "ERROR" ANSI_COLOR_RESET ")", spacing);
         -:  231:            } else {
         1:  232:                ret = sprintf_err(log_level_buf, "%s(ERROR)", spacing);
         -:  233:            }
@@ -377,15 +379,15 @@ format_date(1717657365 * 1000 ),];
         1:  242:        strcpy(log_level_buf, "");
         -:  243:    }
         -:  244:
-      621:  245:    if (log->show_timestamp && ret == 0) {
-      617:  246:        if (log->show_colors) {
-      605:  247:            ret = sprintf_err(
+       87:  245:    if (log->show_timestamp && ret == 0) {
+       83:  246:        if (log->show_colors) {
+       71:  247:            ret = sprintf_err(
         -:  248:                dt_buf,
         -:  249:                "[" ANSI_COLOR_DIMMED
         -:  250:                "%d-%02d-%02d %02d:%02d:%02d%s" ANSI_COLOR_RESET
         -:  251:                "]",
-      605:  252:                tm.tm_year + 1900,
-      605:  253:                tm.tm_mon + 1,
+       71:  252:                tm.tm_year + 1900,
+       71:  253:                tm.tm_mon + 1,
         -:  254:                tm.tm_mday,
         -:  255:                tm.tm_hour,
         -:  256:                tm.tm_min,
@@ -409,63 +411,63 @@ format_date(1717657365 * 1000 ),];
         4:  274:        strcpy(dt_buf, "");
         -:  275:    }
         -:  276:
-      621:  277:    if ((level == Info || level == Warn) && log->show_log_level) {
+       87:  277:    if ((level == Info || level == Warn) && log->show_log_level) {
        12:  278:        strcpy(spacing, ":");
         -:  279:    } else {
-      609:  280:        strcpy(spacing, "");
+       75:  280:        strcpy(spacing, "");
         -:  281:    }
         -:  282:
-      621:  283:    if (ret == 0) {
-      621:  284:        ret = sprintf_err(
+       87:  283:    if (ret == 0) {
+       87:  284:        ret = sprintf_err(
         -:  285:            buf,
         -:  286:            "%s%s%s: ",
         -:  287:            dt_buf,
         -:  288:            log_level_buf,
         -:  289:            spacing);
         -:  290:    }
-      621:  291:    return ret;
+       87:  291:    return ret;
         -:  292:}
         -:  293:
-      688:  294:int do_log(Log* log, LogLevel level, char* line, bool is_plain, bool is_all, va_list args)
+      819:  294:int do_log(Log* log, LogLevel level, char* line, bool is_plain, bool is_all, va_list args)
         -:  295:{
-      688:  296:    int ret = 0;
-      688:  297:    if (!log->is_init) {
+      819:  296:    int ret = 0;
+      819:  297:    if (!log->is_init) {
         1:  298:        fputs("error: log has not been initialized\n", stderr);
         1:  299:        return -1;
         -:  300:    }
         -:  301:
-      687:  302:    if (level >= log->level) {
+      818:  302:    if (level >= log->level) {
         -:  303:        va_list args_copy;
-      682:  304:        va_copy(args_copy, args);
+      148:  304:        va_copy(args_copy, args);
         -:  305:
-      682:  306:        int len = strlen(line);
-      682:  307:        char fline[len + 100];
+      148:  306:        int len = strlen(line);
+      148:  307:        char fline[len + 100];
         -:  308:
-      682:  309:        if (is_plain) {
+      148:  309:        if (is_plain) {
        61:  310:            strcpy(fline, "");
         -:  311:        } else {
-      621:  312:            ret = get_format(log, level, fline);
+       87:  312:            ret = get_format(log, level, fline);
         -:  313:        }
-      682:  314:        strcat(fline, line);
-      682:  315:        strcat(fline, "\n");
+      148:  314:        strcat(fline, line);
+      148:  315:        strcat(fline, "\n");
         -:  316:
-      682:  317:        if ((log->show_stdout || is_all) && ret == 0) {
-      635:  318:            int v = vprintf(fline, args);
-      635:  319:	    ret = (v > 0) ? 0 : v;
+      148:  317:        if ((log->show_stdout || is_all) && ret == 0) {
+      101:  318:            int v = vprintf(fline, args);
+      101:  319:	    ret = (v > 0) ? 0 : v;
         -:  320:        }
         -:  321:
-      682:  322:        if (log->fp && ret == 0) {
+      148:  322:        if (log->fp && ret == 0) {
        81:  323:            int v = vfprintf(log->fp, fline, args_copy);
        81:  324:	    ret = (v > 0) ? 0 : v;
        81:  325:            log->off = ftello(log->fp);
         -:  326:        }
-      682:  327:        if (log->auto_rotate && ret == 0) {
+      148:  327:        if (log->auto_rotate && ret == 0) {
        12:  328:            if (log_need_rotate(log)) {
         2:  329:                ret = log_rotate(log);
         -:  330:            }
         -:  331:        }
         -:  332:    }
-      687:  333:    return ret;
+      818:  333:    return ret;
         -:  334:}
         -:  335:
         2:  336:int log_all(Log* log, LogLevel level, char* line, ...)
@@ -495,18 +497,18 @@ format_date(1717657365 * 1000 ),];
        21:  360:    return ret;
         -:  361:}
         -:  362:
-      607:  363:void log_set_level(Log* log, LogLevel level)
+      738:  363:void log_set_level(Log* log, LogLevel level)
         -:  364:{
-      607:  365:    log->level = level;
-      607:  366:}
+      738:  365:    log->level = level;
+      738:  366:}
         -:  367:
-       26:  368:int log_init(Log* log)
+       28:  368:int log_init(Log* log)
         -:  369:{
-       26:  370:    if (log->is_init) {
+       28:  370:    if (log->is_init) {
         1:  371:        fputs("error: log has already been initialized\n", stderr);
         1:  372:        return -1;
         -:  373:    }
-       25:  374:    if (log->path) {
+       27:  374:    if (log->path) {
        17:  375:        bool write_header = false;
        17:  376:        if (log->file_header && access(log->path, F_OK) != 0) {
         6:  377:            write_header = true;
@@ -518,8 +520,8 @@ format_date(1717657365 * 1000 ),];
        17:  383:        fseek(log->fp, 0, SEEK_END);
        17:  384:        log->off = ftello(log->fp);
         -:  385:    }
-       25:  386:    log->is_init = true;
-       25:  387:    return 0;
+       27:  386:    log->is_init = true;
+       27:  387:    return 0;
         -:  388:}
         -:  389:
         9:  390:int log_set_config_option(Log* log, LogConfigOptionImpl option)
@@ -778,30 +780,30 @@ format_date(1717657365 * 1000 ),];
         -:  643:Log _global_logger__;
         -:  644:bool _global_logger_is_init__ = false;
         -:  645:
-      605:  646:int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char* line, ...)
+      736:  646:int _global_logger(bool is_plain, bool is_all, LogLevel level, LogLevel global, char* line, ...)
         -:  647:{
-      605:  648:    int ret = 0;
-      605:  649:    pthread_mutex_lock(&_global_logger_mutex__);
+      736:  648:    int ret = 0;
+      736:  649:    pthread_mutex_lock(&_global_logger_mutex__);
         -:  650:
-      605:  651:    if (!_global_logger_is_init__) {
-        5:  652:        ret = logger(&_global_logger__, 0);
-        5:  653:        if (ret == 0)
-        5:  654:            ret = log_init(&_global_logger__);
-        5:  655:        if (ret == 0)
-        5:  656:            _global_logger_is_init__ = true;
+      736:  651:    if (!_global_logger_is_init__) {
+        7:  652:        ret = logger(&_global_logger__, 0);
+        7:  653:        if (ret == 0)
+        7:  654:            ret = log_init(&_global_logger__);
+        7:  655:        if (ret == 0)
+        7:  656:            _global_logger_is_init__ = true;
         -:  657:    }
         -:  658:
-      605:  659:    if (ret == 0) {
-      605:  660:        log_set_level(&_global_logger__, global);
+      736:  659:    if (ret == 0) {
+      736:  660:        log_set_level(&_global_logger__, global);
         -:  661:
         -:  662:        va_list args;
-      605:  663:        va_start(args, line);
-      605:  664:        ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
-      605:  665:        va_end(args);
+      736:  663:        va_start(args, line);
+      736:  664:        ret = do_log(&_global_logger__, level, line, is_plain, is_all, args);
+      736:  665:        va_end(args);
         -:  666:    }
         -:  667:
-      605:  668:    pthread_mutex_unlock(&_global_logger_mutex__);
-      605:  669:    return ret;
+      736:  668:    pthread_mutex_unlock(&_global_logger_mutex__);
+      736:  669:    return ret;
         -:  670:}
         -:  671:
         3:  672:int init_global_logger(int num, ...)
@@ -953,7 +955,7 @@ format_date(1717657365 * 1000 ),];
         -:    0:Source:rand.c
         -:    0:Graph:./rand.gcno
         -:    0:Data:./rand.gcda
-        -:    0:Runs:30
+        -:    0:Runs:33
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1044,12 +1046,12 @@ format_date(1717657365 * 1000 ),];
         1:   88:    return ret;
         -:   89:}
         -:   90:
-        2:   91:int rand_u128(u128* v)
+        3:   91:int rand_u128(u128* v)
         -:   92:{
         -:   93:    char buf[16];
-        2:   94:    int ret = getentropy(buf, 16);
-        2:   95:    *v = ((u128)buf[0] << 120) + ((u128)buf[1] << 112) + ((u128)buf[2] << 104) + ((u128)buf[3] << 96) + ((u128)buf[4] << 88) + ((u128)buf[5] << 80) + ((u128)buf[6] << 72) + ((u128)buf[7] << 64) + ((u128)buf[8] << 56) + ((u128)buf[9] << 48) + ((u128)buf[10] << 40) + ((u128)buf[11] << 32) + ((u128)buf[12] << 24) + ((u128)buf[13] << 16) + ((u128)buf[14] << 8) + (u128)buf[15];
-        2:   96:    return ret;
+        3:   94:    int ret = getentropy(buf, 16);
+        3:   95:    *v = ((u128)buf[0] << 120) + ((u128)buf[1] << 112) + ((u128)buf[2] << 104) + ((u128)buf[3] << 96) + ((u128)buf[4] << 88) + ((u128)buf[5] << 80) + ((u128)buf[6] << 72) + ((u128)buf[7] << 64) + ((u128)buf[8] << 56) + ((u128)buf[9] << 48) + ((u128)buf[10] << 40) + ((u128)buf[11] << 32) + ((u128)buf[12] << 24) + ((u128)buf[13] << 16) + ((u128)buf[14] << 8) + (u128)buf[15];
+        3:   96:    return ret;
         -:   97:}
         -:   98:
         2:   99:int rand_bytes(void* buf, size_t length)
@@ -1059,7 +1061,7 @@ format_date(1717657365 * 1000 ),];
         -:    0:Source:ser.c
         -:    0:Graph:./ser.gcno
         -:    0:Data:./ser.gcda
-        -:    0:Runs:5
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1080,51 +1082,51 @@ format_date(1717657365 * 1000 ),];
         -:   18:#include <stdlib.h>
         -:   19:#include <stdio.h>
         -:   20:
-        8:   21:int serialize(Serializable *s, Writer *writer) {
-        8:   22:	return s->serialize(s->ptr, writer);
+       11:   21:int serialize(Serializable *s, Writer *writer) {
+       11:   22:	return s->serialize(s->ptr, writer);
         -:   23:}
         -:   24:
-        8:   25:int deserialize(Serializable *s, Reader *reader) {
-        8:   26:	return s->deserialize(s->ptr, reader);
+       12:   25:int deserialize(Serializable *s, Reader *reader) {
+       12:   26:	return s->deserialize(s->ptr, reader);
         -:   27:}
         -:   28:
-        1:   29:Reader build_reader(int (*read_fixed_bytes)(struct Reader *reader, unsigned char *buffer, u64 len), void *ptr)
+        7:   29:Reader build_reader(int (*read_fixed_bytes)(struct Reader *reader, unsigned char *buffer, u64 len), void *ptr)
         -:   30:{
         -:   31:        Reader ret;
-        1:   32:        ret.ptr = ptr;
-        1:   33:        ret.read_fixed_bytes = read_fixed_bytes;
-        1:   34:        return ret;
+        7:   32:        ret.ptr = ptr;
+        7:   33:        ret.read_fixed_bytes = read_fixed_bytes;
+        7:   34:        return ret;
         -:   35:}
         -:   36:
-       16:   37:Serializable build_serializable(
+       23:   37:Serializable build_serializable(
         -:   38:	void *ptr,
         -:   39:	int (*serialize)(void *obj, Writer *writer),
         -:   40:	int (*deserialize)(void *obj, Reader *reader)
         -:   41:) {
         -:   42:	Serializable ret;
-       16:   43:	ret.ptr = ptr;
-       16:   44:	ret.serialize = serialize;
-       16:   45:	ret.deserialize = deserialize;
-       16:   46:	return ret;
+       23:   43:	ret.ptr = ptr;
+       23:   44:	ret.serialize = serialize;
+       23:   45:	ret.deserialize = deserialize;
+       23:   46:	return ret;
         -:   47:}
         -:   48:
-        1:   49:Writer build_writer(int (*write_fixed_bytes)(struct Writer *writer, unsigned char *buffer, u64 len), void *ptr) {
+        9:   49:Writer build_writer(int (*write_fixed_bytes)(struct Writer *writer, unsigned char *buffer, u64 len), void *ptr) {
         -:   50:	Writer ret;
-        1:   51:	ret.ptr = ptr;
-        1:   52:	ret.write_fixed_bytes = write_fixed_bytes;
-        1:   53:	return ret;
+        9:   51:	ret.ptr = ptr;
+        9:   52:	ret.write_fixed_bytes = write_fixed_bytes;
+        9:   53:	return ret;
         -:   54:}
         -:   55:
-       11:   56:int bin_reader_read_fixed_bytes(Reader *reader, unsigned char *buffer, u64 len) {
-       11:   57:	memcpy(buffer, reader->ptr, len);
-       11:   58:	reader->ptr += len;
-       11:   59:	return 0;
+       15:   56:int bin_reader_read_fixed_bytes(Reader *reader, unsigned char *buffer, u64 len) {
+       15:   57:	memcpy(buffer, reader->ptr, len);
+       15:   58:	reader->ptr += len;
+       15:   59:	return 0;
         -:   60:}
         -:   61:
-       11:   62:int bin_writer_write_fixed_bytes(Writer *writer, unsigned char *buffer, u64 len) {
-       11:   63:	memcpy(writer->ptr, buffer, len);
-       11:   64:	writer->ptr += len;
-       11:   65:	return 0;
+       17:   62:int bin_writer_write_fixed_bytes(Writer *writer, unsigned char *buffer, u64 len) {
+       17:   63:	memcpy(writer->ptr, buffer, len);
+       17:   64:	writer->ptr += len;
+       17:   65:	return 0;
         -:   66:}
         -:   67:
     #####:   68:int serialize_i128(void *obj, Writer *writer) {
@@ -1155,8 +1157,8 @@ format_date(1717657365 * 1000 ),];
     #####:   93:	return serialize_u64(obj, writer);
         -:   94:}
         -:   95:
-        1:   96:int deserialize_i64(void *obj, Reader *reader) {
-        1:   97:        return deserialize_u64(obj, reader);
+        3:   96:int deserialize_i64(void *obj, Reader *reader) {
+        3:   97:        return deserialize_u64(obj, reader);
         -:   98:}
         -:   99:
     #####:  100:int serialize_i32(void *obj, Writer *writer) {
@@ -1282,152 +1284,152 @@ format_date(1717657365 * 1000 ),];
         3:  220:        return writer->write_fixed_bytes(writer, buffer, 4);
         -:  221:}
         -:  222:
-        4:  223:int deserialize_u64(void *obj, Reader *reader) {
+       11:  223:int deserialize_u64(void *obj, Reader *reader) {
         -:  224:        unsigned char buffer[8];
-        4:  225:        int ret = reader->read_fixed_bytes(reader, buffer, 8);
+       11:  225:        int ret = reader->read_fixed_bytes(reader, buffer, 8);
         -:  226:
-        4:  227:        if(ret == 0) {
-        4:  228:                *((u64 *)obj) = 0;
-        4:  229:                *((u64 *)obj) += (u64)(buffer[7] & 0xFF);
-        4:  230:                *((u64 *)obj) += (u64)(buffer[6] & 0xFF) << 8;
-        4:  231:                *((u64 *)obj) += (u64)(buffer[5] & 0xFF) << 16;
-        4:  232:                *((u64 *)obj) += (u64)(buffer[4] & 0xFF) << 24;
-        4:  233:                *((u64 *)obj) += (u64)(buffer[3] & 0xFF) << 32;
-        4:  234:                *((u64 *)obj) += (u64)(buffer[2] & 0xFF) << 40;
-        4:  235:                *((u64 *)obj) += (u64)(buffer[1] & 0xFF) << 48;
-        4:  236:                *((u64 *)obj) += (u64)(buffer[0] & 0xFF) << 56;
+       11:  227:        if(ret == 0) {
+       10:  228:                *((u64 *)obj) = 0;
+       10:  229:                *((u64 *)obj) += (u64)(buffer[7] & 0xFF);
+       10:  230:                *((u64 *)obj) += (u64)(buffer[6] & 0xFF) << 8;
+       10:  231:                *((u64 *)obj) += (u64)(buffer[5] & 0xFF) << 16;
+       10:  232:                *((u64 *)obj) += (u64)(buffer[4] & 0xFF) << 24;
+       10:  233:                *((u64 *)obj) += (u64)(buffer[3] & 0xFF) << 32;
+       10:  234:                *((u64 *)obj) += (u64)(buffer[2] & 0xFF) << 40;
+       10:  235:                *((u64 *)obj) += (u64)(buffer[1] & 0xFF) << 48;
+       10:  236:                *((u64 *)obj) += (u64)(buffer[0] & 0xFF) << 56;
         -:  237:        }
         -:  238:
-        4:  239:        return ret;
+       11:  239:        return ret;
         -:  240:}
         -:  241:
-        4:  242:int serialize_u64(void *obj, Writer *writer) {
+       12:  242:int serialize_u64(void *obj, Writer *writer) {
         -:  243:        unsigned char buffer[8];
         -:  244:
-        4:  245:        u64 value = *((u64 *)obj);
-        4:  246:        buffer[7] = value & 0xFF;
-        4:  247:        value >>= 8;
-        4:  248:        buffer[6] = value & 0xFF;
-        4:  249:        value >>= 8;
-        4:  250:        buffer[5] = value & 0xFF;
-        4:  251:        value >>= 8;
-        4:  252:        buffer[4] = value & 0xFF;
-        4:  253:        value >>= 8;
-        4:  254:        buffer[3] = value & 0xFF;
-        4:  255:        value >>= 8;
-        4:  256:        buffer[2] = value & 0xFF;
-        4:  257:        value >>= 8;
-        4:  258:        buffer[1] = value & 0xFF;
-        4:  259:        value >>= 8;
-        4:  260:        buffer[0] = value & 0xFF;
+       12:  245:        u64 value = *((u64 *)obj);
+       12:  246:        buffer[7] = value & 0xFF;
+       12:  247:        value >>= 8;
+       12:  248:        buffer[6] = value & 0xFF;
+       12:  249:        value >>= 8;
+       12:  250:        buffer[5] = value & 0xFF;
+       12:  251:        value >>= 8;
+       12:  252:        buffer[4] = value & 0xFF;
+       12:  253:        value >>= 8;
+       12:  254:        buffer[3] = value & 0xFF;
+       12:  255:        value >>= 8;
+       12:  256:        buffer[2] = value & 0xFF;
+       12:  257:        value >>= 8;
+       12:  258:        buffer[1] = value & 0xFF;
+       12:  259:        value >>= 8;
+       12:  260:        buffer[0] = value & 0xFF;
         -:  261:
-        4:  262:        return writer->write_fixed_bytes(writer, buffer, 8);
+       12:  262:        return writer->write_fixed_bytes(writer, buffer, 8);
         -:  263:}
         -:  264:
-        1:  265:int deserialize_u128(void *obj, Reader *reader) {
+        2:  265:int deserialize_u128(void *obj, Reader *reader) {
         -:  266:        unsigned char buffer[16];
-        1:  267:        int ret = reader->read_fixed_bytes(reader, buffer, 16);
+        2:  267:        int ret = reader->read_fixed_bytes(reader, buffer, 16);
         -:  268:
-        1:  269:        if(ret == 0) {
-        1:  270:                *((u128 *)obj) = 0;
-        1:  271:                *((u128 *)obj) += (u128)(buffer[15] & 0xFF);
-        1:  272:		*((u128 *)obj) += (u128)(buffer[14] & 0xFF) << 8;
-        1:  273:		*((u128 *)obj) += (u128)(buffer[13] & 0xFF) << 16;
-        1:  274:		*((u128 *)obj) += (u128)(buffer[12] & 0xFF) << 24;
-        1:  275:		*((u128 *)obj) += (u128)(buffer[11] & 0xFF) << 32;
-        1:  276:		*((u128 *)obj) += (u128)(buffer[10] & 0xFF) << 40;
-        1:  277:		*((u128 *)obj) += (u128)(buffer[9] & 0xFF) << 48;
-        1:  278:		*((u128 *)obj) += (u128)(buffer[8] & 0xFF) << 56;
-        1:  279:		*((u128 *)obj) += (u128)(buffer[7] & 0xFF) << 64;
-        1:  280:		*((u128 *)obj) += (u128)(buffer[6] & 0xFF) << 72;
-        1:  281:		*((u128 *)obj) += (u128)(buffer[5] & 0xFF) << 80;
-        1:  282:		*((u128 *)obj) += (u128)(buffer[4] & 0xFF) << 88;
-        1:  283:		*((u128 *)obj) += (u128)(buffer[3] & 0xFF) << 96;
-        1:  284:		*((u128 *)obj) += (u128)(buffer[2] & 0xFF) << 104;
-        1:  285:		*((u128 *)obj) += (u128)(buffer[1] & 0xFF) << 112;
-        1:  286:		*((u128 *)obj) += (u128)(buffer[0] & 0xFF) << 120;
+        2:  269:        if(ret == 0) {
+        2:  270:                *((u128 *)obj) = 0;
+        2:  271:                *((u128 *)obj) += (u128)(buffer[15] & 0xFF);
+        2:  272:		*((u128 *)obj) += (u128)(buffer[14] & 0xFF) << 8;
+        2:  273:		*((u128 *)obj) += (u128)(buffer[13] & 0xFF) << 16;
+        2:  274:		*((u128 *)obj) += (u128)(buffer[12] & 0xFF) << 24;
+        2:  275:		*((u128 *)obj) += (u128)(buffer[11] & 0xFF) << 32;
+        2:  276:		*((u128 *)obj) += (u128)(buffer[10] & 0xFF) << 40;
+        2:  277:		*((u128 *)obj) += (u128)(buffer[9] & 0xFF) << 48;
+        2:  278:		*((u128 *)obj) += (u128)(buffer[8] & 0xFF) << 56;
+        2:  279:		*((u128 *)obj) += (u128)(buffer[7] & 0xFF) << 64;
+        2:  280:		*((u128 *)obj) += (u128)(buffer[6] & 0xFF) << 72;
+        2:  281:		*((u128 *)obj) += (u128)(buffer[5] & 0xFF) << 80;
+        2:  282:		*((u128 *)obj) += (u128)(buffer[4] & 0xFF) << 88;
+        2:  283:		*((u128 *)obj) += (u128)(buffer[3] & 0xFF) << 96;
+        2:  284:		*((u128 *)obj) += (u128)(buffer[2] & 0xFF) << 104;
+        2:  285:		*((u128 *)obj) += (u128)(buffer[1] & 0xFF) << 112;
+        2:  286:		*((u128 *)obj) += (u128)(buffer[0] & 0xFF) << 120;
         -:  287:        }
         -:  288:
-        1:  289:        return ret;
+        2:  289:        return ret;
         -:  290:}
         -:  291:
-        1:  292:int serialize_u128(void *obj, Writer *writer) {
+        2:  292:int serialize_u128(void *obj, Writer *writer) {
         -:  293:        unsigned char buffer[16];
         -:  294:
-        1:  295:        u128 value = *((u128 *)obj);
-        1:  296:	buffer[15] = value & 0xFF;
-        1:  297:        value >>= 8;
-        1:  298:        buffer[14] = value & 0xFF;
-        1:  299:        value >>= 8;
-        1:  300:        buffer[13] = value & 0xFF;
-        1:  301:        value >>= 8;
-        1:  302:        buffer[12] = value & 0xFF;
-        1:  303:        value >>= 8;
-        1:  304:        buffer[11] = value & 0xFF;
-        1:  305:        value >>= 8;
-        1:  306:        buffer[10] = value & 0xFF;
-        1:  307:        value >>= 8;
-        1:  308:        buffer[9] = value & 0xFF;
-        1:  309:        value >>= 8;
-        1:  310:        buffer[8] = value & 0xFF;
-        1:  311:	value >>= 8;
-        1:  312:        buffer[7] = value & 0xFF;
-        1:  313:        value >>= 8;
-        1:  314:        buffer[6] = value & 0xFF;
-        1:  315:        value >>= 8;
-        1:  316:        buffer[5] = value & 0xFF;
-        1:  317:        value >>= 8;
-        1:  318:        buffer[4] = value & 0xFF;
-        1:  319:        value >>= 8;
-        1:  320:        buffer[3] = value & 0xFF;
-        1:  321:        value >>= 8;
-        1:  322:        buffer[2] = value & 0xFF;
-        1:  323:        value >>= 8;
-        1:  324:        buffer[1] = value & 0xFF;
-        1:  325:        value >>= 8;
-        1:  326:        buffer[0] = value & 0xFF;
+        2:  295:        u128 value = *((u128 *)obj);
+        2:  296:	buffer[15] = value & 0xFF;
+        2:  297:        value >>= 8;
+        2:  298:        buffer[14] = value & 0xFF;
+        2:  299:        value >>= 8;
+        2:  300:        buffer[13] = value & 0xFF;
+        2:  301:        value >>= 8;
+        2:  302:        buffer[12] = value & 0xFF;
+        2:  303:        value >>= 8;
+        2:  304:        buffer[11] = value & 0xFF;
+        2:  305:        value >>= 8;
+        2:  306:        buffer[10] = value & 0xFF;
+        2:  307:        value >>= 8;
+        2:  308:        buffer[9] = value & 0xFF;
+        2:  309:        value >>= 8;
+        2:  310:        buffer[8] = value & 0xFF;
+        2:  311:	value >>= 8;
+        2:  312:        buffer[7] = value & 0xFF;
+        2:  313:        value >>= 8;
+        2:  314:        buffer[6] = value & 0xFF;
+        2:  315:        value >>= 8;
+        2:  316:        buffer[5] = value & 0xFF;
+        2:  317:        value >>= 8;
+        2:  318:        buffer[4] = value & 0xFF;
+        2:  319:        value >>= 8;
+        2:  320:        buffer[3] = value & 0xFF;
+        2:  321:        value >>= 8;
+        2:  322:        buffer[2] = value & 0xFF;
+        2:  323:        value >>= 8;
+        2:  324:        buffer[1] = value & 0xFF;
+        2:  325:        value >>= 8;
+        2:  326:        buffer[0] = value & 0xFF;
         -:  327:
-        1:  328:        return writer->write_fixed_bytes(writer, buffer, 16);
+        2:  328:        return writer->write_fixed_bytes(writer, buffer, 16);
         -:  329:}
         -:  330:
-        1:  331:int serialize_string(void *obj, Writer *writer) {
-        1:  332:	int ret = 0;
-        1:  333:	u64 len = ((String *)obj)->len;
-        1:  334:	serialize_u64(&len, writer);
-        1:  335:	ret = writer->write_fixed_bytes(writer, (unsigned char *)((String *)obj)->ptr, len);
+        3:  331:int serialize_string(void *obj, Writer *writer) {
+        3:  332:	int ret = 0;
+        3:  333:	u64 len = ((String *)obj)->len;
+        3:  334:	serialize_u64(&len, writer);
+        3:  335:	ret = writer->write_fixed_bytes(writer, (unsigned char *)((String *)obj)->ptr, len);
         -:  336:
-        1:  337:	return ret;
+        3:  337:	return ret;
         -:  338:}
         -:  339:
-        1:  340:int deserialize_string(void *obj, Reader *reader) {
-        1:  341:	int ret = 0;
-        1:  342:	((String *)obj)->ptr = NULL;
+        3:  340:int deserialize_string(void *obj, Reader *reader) {
+        3:  341:	int ret = 0;
+        3:  342:	((String *)obj)->ptr = NULL;
         -:  343:
         -:  344:	u64 len;
-        1:  345:	ret = deserialize_i64(&len, reader);
+        3:  345:	ret = deserialize_i64(&len, reader);
         -:  346:
-        1:  347:	if(!ret) {
-        1:  348:		unsigned char *ptr = malloc(sizeof(char) * (len+1));
-        1:  349:		if(ptr == NULL)
+        3:  347:	if(!ret) {
+        3:  348:		unsigned char *ptr = malloc(sizeof(char) * (len+1));
+        3:  349:		if(ptr == NULL)
     #####:  350:			ret = -1;
         -:  351:		else {
-        1:  352:			ret = reader->read_fixed_bytes(reader, ptr, len);
+        3:  352:			ret = reader->read_fixed_bytes(reader, ptr, len);
         -:  353:		}
         -:  354:
-        1:  355:		if(!ret) {
-        1:  356:                	((String *)obj)->ptr = (char *)ptr;
-        1:  357:                	((String *)obj)->len = len;
+        3:  355:		if(!ret) {
+        3:  356:                	((String *)obj)->ptr = (char *)ptr;
+        3:  357:                	((String *)obj)->len = len;
         -:  358:        	}
         -:  359:
         -:  360:	}
         -:  361:
-        1:  362:	return ret;
+        3:  362:	return ret;
         -:  363:}
         -:  364:
         -:    0:Source:types.c
         -:    0:Graph:./types.gcno
         -:    0:Data:./types.gcda
-        -:    0:Runs:11
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1447,25 +1449,25 @@ format_date(1717657365 * 1000 ),];
         -:   17:#include <stdio.h>
         -:   18:#include <base/types.h>
         -:   19:
-        3:   20:void string_free(StringImpl *s) {
-        3:   21:	if(s->ptr) {
-        3:   22:		free(s->ptr);
-        3:   23:		s->ptr = NULL;
+        7:   20:void string_free(StringImpl *s) {
+        7:   21:	if(s->ptr) {
+        7:   22:		free(s->ptr);
+        7:   23:		s->ptr = NULL;
         -:   24:	}
-        3:   25:}
+        7:   25:}
         -:   26:
-        1:   27:int string_set(StringImpl *s, const char *ptr) {
-        1:   28:	int ret = 0;
-        1:   29:	s->len = strlen(ptr);
+        3:   27:int string_set(StringImpl *s, const char *ptr) {
+        3:   28:	int ret = 0;
+        3:   29:	s->len = strlen(ptr);
         -:   30:
-        1:   31:	s->ptr = malloc(sizeof(char) * (s->len + 1));
-        1:   32:	if(s->ptr == NULL)
+        3:   31:	s->ptr = malloc(sizeof(char) * (s->len + 1));
+        3:   32:	if(s->ptr == NULL)
     #####:   33:		ret = -1;
         -:   34:
-        1:   35:	if(!ret)
-        1:   36:		strcpy(s->ptr, ptr);
+        3:   35:	if(!ret)
+        3:   36:		strcpy(s->ptr, ptr);
         -:   37:
-        1:   38:	return ret;
+        3:   38:	return ret;
         -:   39:}
         -:   40:
     #####:   41:i64 saddi64(i64 a, i64 b)
@@ -1481,8 +1483,8 @@ format_date(1717657365 * 1000 ),];
     #####:   51:    return a + b;
         -:   52:}
         -:   53:
-       13:   54:u64 saddu64(u64 a, u64 b) {
-      13*:   55:  return (a > 0xFFFFFFFFFFFFFFFF - b) ? 0xFFFFFFFFFFFFFFFF : a + b;
+       15:   54:u64 saddu64(u64 a, u64 b) {
+      15*:   55:  return (a > 0xFFFFFFFFFFFFFFFF - b) ? 0xFFFFFFFFFFFFFFFF : a + b;
         -:   56:}
         -:    0:Source:main.c
         -:    0:Graph:./main.gcno
@@ -1531,7 +1533,7 @@ format_date(1717657365 * 1000 ),];
         -:    0:Source:misc.c
         -:    0:Graph:./misc.gcno
         -:    0:Data:./misc.gcda
-        -:    0:Runs:6
+        -:    0:Runs:9
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1587,10 +1589,327 @@ format_date(1717657365 * 1000 ),];
     #####:   53:        return false;
         -:   54:    }
         -:   55:}
+        -:    0:Source:option.c
+        -:    0:Graph:./option.gcno
+        -:    0:Data:./option.gcda
+        -:    0:Runs:9
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <util/option.h>
+        -:   16:#include <stdlib.h>
+        -:   17:#include <string.h>
+        -:   18:#include <base/rand.h>
+        -:   19:#include <log/log.h>
+        -:   20:#include <util/panic.h>
+        -:   21:
+        -:   22:#define LOG_LEVEL Debug
+        -:   23:
+        -:   24:Option None = { option_is_some_false, NULL };
+        -:   25:
+    #####:   26:bool option_is_some_false() {
+    #####:   27:        return false;
+        -:   28:}
+        -:   29:
+    #####:   30:bool option_is_some_true() {
+    #####:   31:	return true;
+        -:   32:}
+        -:   33:
+    #####:   34:void *option_unwrap(Option x) {
+    #####:   35:	if(!x.is_some()) {
+    #####:   36:		panic("attempt to unwrap on a None");
+        -:   37:	} else {
+    #####:   38:		return x.ref;
+        -:   39:	}
+        -:   40:}
+        -:   41:
+    #####:   42:Option option_build(OptionImpl *opt, void *x, size_t size) {
+    #####:   43:	debug("size=%i", size);
+        -:   44:
+    #####:   45:	(*opt).is_some = option_is_some_true;
+    #####:   46:	(*opt).ref = malloc(size);
+    #####:   47:	debug("opt.ref=%i", (*opt).ref);
+    #####:   48:	memcpy((*opt).ref, x, size);
+    #####:   49:	return *opt;
+        -:   50:}
+        -:   51:
+    #####:   52:void option_free(OptionImpl *ptr) {
+    #####:   53:	debug("option free %i", ptr->ref);
+    #####:   54:	if(ptr->ref) {
+    #####:   55:		debug("ptr free %i", ptr->ref);
+    #####:   56:		free(ptr->ref);
+    #####:   57:		debug("free complete");
+    #####:   58:		ptr->ref = NULL;
+        -:   59:	}
+    #####:   60:}
+        -:    0:Source:panic.c
+        -:    0:Graph:./panic.gcno
+        -:    0:Data:./panic.gcda
+        -:    0:Runs:9
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <util/panic.h>
+        -:   16:#include <stdio.h>
+        -:   17:#include <stdlib.h>
+        -:   18:
+    #####:   19:void panic(const char * str) {
+    #####:   20:	printf("thread panicked: %s", str);
+    #####:   21:	exit(-1);
+        -:   22:}
+        -:    0:Source:slabio.c
+        -:    0:Graph:./slabio.gcno
+        -:    0:Data:./slabio.gcda
+        -:    0:Runs:9
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <util/slabio.h>
+        -:   16:#include <string.h>
+        -:   17:#include <log/log.h>
+        -:   18:#include <limits.h>
+        -:   19:
+        -:   20:#define LOG_LEVEL Info
+        -:   21:
+        4:   22:int slab_reader_next_slab(SlabReader *reader, Slab *slab) {
+        4:   23:	int ret = 0;
+        4:   24:	u64 next = ULONG_MAX;
+        -:   25:
+        4:   26:	debug("next slab when cur = %llu", reader->cur_slab_id);
+        -:   27:
+        4:   28:	void *ptr = slab->data + (slab->len - SLABIO_NEXT_POINTER_SIZE);
+        4:   29:        Reader bin_reader = READER(bin_reader_read_fixed_bytes, ptr);
+        4:   30:        ret = deserialize_u64(&next, &bin_reader);
+        4:   31:	debug("read next slab = %llu", next);
+        4:   32:        reader->cur_slab_id = next;
+        4:   33:        reader->cur_slab_offset = 0;
+        -:   34:
+        4:   35:	return ret;
+        -:   36:}
+        -:   37:
+        6:   38:int slab_reader_read_fixed_bytes(Reader *reader, unsigned char *buffer, u64 len) {
+        6:   39:	int ret = 0;
+        6:   40:	SlabReader *sr = reader->ptr;
+        -:   41:	Slab slab;
+        6:   42:	u64 slab_len = ULONG_MAX;
+        6:   43:	u64 len_sum = 0;
+        -:   44:
+        6:   45:	debug(
+        -:   46:		"read cur_slab=%llu,offset=%llu,len=%llu",
+        -:   47:		sr->cur_slab_id, sr->cur_slab_offset, len
+        -:   48:	);
+        -:   49:
+        4:   50:	while(true) {
+       10:   51:		if(sr->cur_slab_offset >= slab_len - SLABIO_NEXT_POINTER_SIZE) {
+        4:   52:			if(slab_reader_next_slab(sr, &slab)) {
+    #####:   53:				error("Could not read next slab");
+    #####:   54:				ret = -1;
+    #####:   55:				break;
+        -:   56:			}
+        -:   57:		}
+       10:   58:		debug("cur_slab=%llu", sr->cur_slab_id);
+       10:   59:		if(sr->cur_slab_id == ULONG_MAX) {
+        1:   60:			error("tried to read past end of slabs");
+        1:   61:			ret = -1;
+        1:   62:			break;
+        -:   63:		}
+        -:   64:
+        9:   65:		slab_read(sr->sa, sr->cur_slab_id, &slab);
+        -:   66:
+        9:   67:		slab_len = slab.len;
+        9:   68:		u64 slab_rem = (slab_len - SLABIO_NEXT_POINTER_SIZE) - sr->cur_slab_offset;
+        -:   69:		u64 wlen;
+        -:   70:
+        9:   71:		if(slab_len <= SLABIO_NEXT_POINTER_SIZE) {
+    #####:   72:                        error(
+        -:   73:                                "illegal slab size. slab_size must be greater than %llu",
+        -:   74:                                SLABIO_NEXT_POINTER_SIZE
+        -:   75:                        );
+    #####:   76:                        ret = -1;
+    #####:   77:                        break;
+        -:   78:                }
+        -:   79:
+        9:   80:		if(slab_rem > len) {
+        4:   81:                        wlen = len;
+        -:   82:                } else {
+        5:   83:                        wlen = slab_rem;
+        -:   84:                }
+        -:   85:
+        9:   86:		if(wlen > 0) {
+        8:   87:			memcpy(buffer + len_sum, slab.data + sr->cur_slab_offset, wlen);
+        8:   88:			sr->cur_slab_offset += wlen;
+        8:   89:                	len -= wlen;
+        8:   90:			len_sum += wlen;
+        -:   91:		}
+        -:   92:
+        9:   93:		if(len == 0)
+        5:   94:			break;
+        -:   95:	}
+        -:   96:
+        6:   97:	debug("read complete. Read %llu bytes.", len_sum);
+        6:   98:	return ret;
+        -:   99:}
+        -:  100:
+        3:  101:int slab_writer_allocate_slab(SlabWriter *writer, Slab *slab) {
+        3:  102:	int ret = 0;
+        -:  103:
+        3:  104:	u64 next = slab_allocate(writer->sa, slab->len);
+        3:  105:	if(next == ULONG_MAX)
+    #####:  106:		ret = -1;
+        -:  107:
+        3:  108:	debug("allocate %llu", next);
+        -:  109:
+        3:  110:	if(!ret) {
+        3:  111:		void *ptr = slab->data + (slab->len - SLABIO_NEXT_POINTER_SIZE);
+        3:  112:		Writer bin_writer = WRITER(bin_writer_write_fixed_bytes, ptr);
+        3:  113:		ret = serialize_u64(&next, &bin_writer);
+        3:  114:		writer->cur_slab_id = next;
+        3:  115:		writer->cur_slab_offset = 0;
+        -:  116:	}
+        -:  117:
+        3:  118:	if(!ret) {
+        3:  119:		u64 max = ULONG_MAX;
+        -:  120:		Slab nslab;
+        3:  121:		slab_read(writer->sa, next, &nslab);
+        3:  122:		void *ptr = nslab.data + (slab->len - SLABIO_NEXT_POINTER_SIZE);
+        3:  123:		Writer bin_writer = WRITER(bin_writer_write_fixed_bytes, ptr);
+        3:  124:		ret = serialize_u64(&max, &bin_writer);
+        -:  125:	}
+        -:  126:
+        -:  127:
+        3:  128:	return ret;
+        -:  129:}
+        -:  130:
+        5:  131:int slab_writer_write_fixed_bytes(Writer *writer, unsigned char *buffer, u64 len) {
+        5:  132:	int ret = 0;
+        5:  133:	SlabWriter *sw = writer->ptr;
+        -:  134:	Slab slab;
+        5:  135:	u64 len_sum = 0;
+        5:  136:	u64 slab_len = ULONG_MAX;
+        -:  137:
+        5:  138:	debug("write cur_slab=%llu,len=%llu", sw->cur_slab_id, len);
+        -:  139:
+        3:  140:	while(true) {
+        8:  141:		if(sw->cur_slab_offset >= slab_len - SLABIO_NEXT_POINTER_SIZE) {
+        -:  142:			// allocate
+        3:  143:			if(slab_writer_allocate_slab(sw, &slab)) {
+    #####:  144:				error("Could not allocate another slab");
+    #####:  145:				ret = -1;
+    #####:  146:				break;
+        -:  147:			}
+        -:  148:		}
+        8:  149:		slab_read(sw->sa, sw->cur_slab_id, &slab);
+        -:  150:
+        8:  151:		slab_len = slab.len;
+        8:  152:		u64 slab_rem = (slab_len - SLABIO_NEXT_POINTER_SIZE) - sw->cur_slab_offset;
+        -:  153:		u64 wlen;
+        -:  154:
+        8:  155:		if(slab_len <= SLABIO_NEXT_POINTER_SIZE) {
+    #####:  156:			error(
+        -:  157:				"illegal slab size. slab_size must be greater than %llu",
+        -:  158:				SLABIO_NEXT_POINTER_SIZE
+        -:  159:			);
+    #####:  160:			ret = -1;
+    #####:  161:			break;
+        -:  162:		}
+        -:  163:
+        8:  164:		if(slab_rem > len) {
+        4:  165:			wlen = len;
+        -:  166:		} else {
+        4:  167:			wlen = slab_rem;
+        -:  168:		}
+        -:  169:
+        8:  170:		debug("slab_len=%llu,wlen=%llu", slab_len, wlen);
+        -:  171:
+        8:  172:		if(wlen > 0) {
+        8:  173:			memcpy(slab.data + sw->cur_slab_offset, buffer + len_sum, wlen);
+        8:  174:			sw->cur_slab_offset += wlen;
+        8:  175:			len -= wlen;
+        8:  176:			len_sum += wlen;
+        -:  177:		}
+        -:  178:
+        8:  179:		if(len == 0)
+        5:  180:			break;
+        -:  181:	}
+        -:  182:
+        5:  183:	debug("slab write complete len = %llu", len_sum);
+        -:  184:
+        5:  185:	return ret;
+        -:  186:}
+        -:  187:
+        2:  188:int slab_reader_init(SlabReader *sr, SlabAllocator *sa) {
+        2:  189:	sr->sa = sa;
+        2:  190:	sr->cur_slab_id = ULONG_MAX;
+        2:  191:        sr->cur_slab_offset = 0;
+        2:  192:	return 0;
+        -:  193:}
+        -:  194:
+        2:  195:int slab_writer_init(SlabWriter *sw, SlabAllocator *sa) {
+        2:  196:	sw->sa = sa;
+        2:  197:	sw->cur_slab_id = ULONG_MAX;
+        2:  198:	sw->cur_slab_offset = 0;
+        -:  199:
+        2:  200:	return 0;
+        -:  201:}
+        -:  202:
+        2:  203:void slab_reader_seek(Reader *reader, u64 slab_id, u64 offset) {
+        2:  204:	SlabReader *sr = reader->ptr;
+        2:  205:	sr->cur_slab_id = slab_id;
+        2:  206:	sr->cur_slab_offset = offset;
+        2:  207:}
+        -:  208:
+        2:  209:void slab_writer_seek(Writer *writer, u64 slab_id, u64 offset) {
+        2:  210:	SlabWriter *sw = writer->ptr;
+        2:  211:	sw->cur_slab_id = slab_id;
+        2:  212:        sw->cur_slab_offset = offset;
+        2:  213:}
+        -:  214:
+    #####:  215:int slab_reader_skip(Reader *sr, u64 bytes) { return 0; }
+    #####:  216:int slab_writer_skiip(Writer *sw, u64 bytes) { return 0; }
+        -:  217:
+    #####:  218:u64 slab_reader_cur_id(Reader *reader) { return 0; }
+    #####:  219:u64 slab_writer_cur_id(Reader *writer) { return 0; }
+        -:  220:
+    #####:  221:u64 slab_reader_cur_offset(Reader *reader) { return 0; }
+    #####:  222:u64 slab_writer_cur_offset(Writer *writer) { return 0; }
+        -:  223:
         -:    0:Source:slabs.c
         -:    0:Graph:./slabs.gcno
         -:    0:Data:./slabs.gcda
-        -:    0:Runs:6
+        -:    0:Runs:9
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1613,34 +1932,34 @@ format_date(1717657365 * 1000 ),];
         -:   20:#include <stdarg.h>
         -:   21:#include <log/log.h>
         -:   22:
-        -:   23:#define LOG_LEVEL Debug
+        -:   23:#define LOG_LEVEL Info
         -:   24:
-       13:   25:int slab_data_init(SlabData *sd, u64 slab_count, u64 slab_size, u64 max_slabs) {
-       13:   26:	sd->data = NULL;
-       13:   27:	sd->sdp.slab_size = slab_size;
-       13:   28:	sd->sdp.slab_count = slab_count;
-       13:   29:	sd->sdp.max_slabs = max_slabs;
-       13:   30:	sd->sdp.free_list_head = 0;
+       15:   25:int slab_data_init(SlabData *sd, u64 slab_count, u64 slab_size, u64 max_slabs) {
+       15:   26:	sd->data = NULL;
+       15:   27:	sd->sdp.slab_size = slab_size;
+       15:   28:	sd->sdp.slab_count = slab_count;
+       15:   29:	sd->sdp.max_slabs = max_slabs;
+       15:   30:	sd->sdp.free_list_head = 0;
         -:   31:
-       13:   32:	sd->sdp.ptr_size = 0;
+       15:   32:	sd->sdp.ptr_size = 0;
         -:   33:        // add 2 (1 termination pointer and one for free status)
-       13:   34:        u64 x = saddu64(max_slabs, 2);
+       15:   34:        u64 x = saddu64(max_slabs, 2);
         -:   35:        while(true) {
-       28:   36:        	if(x == 0) {
-       13:   37:                	break;
+       32:   36:        	if(x == 0) {
+       15:   37:                	break;
         -:   38:                }
-       15:   39:                x >>= 8;
-       15:   40:                sd->sdp.ptr_size += 1;
+       17:   39:                x >>= 8;
+       17:   40:                sd->sdp.ptr_size += 1;
         -:   41:        }
         -:   42:
-       13:   43:	sd->sdp.null_ptr = 0;
-       13:   44:	int shft = 0;
-       28:   45:	for(int i=0; i<sd->sdp.ptr_size; i++) {
-       15:   46:		sd->sdp.null_ptr |= 0xFF << shft;
-       15:   47:		shft += 8;
+       15:   43:	sd->sdp.null_ptr = 0;
+       15:   44:	int shft = 0;
+       32:   45:	for(int i=0; i<sd->sdp.ptr_size; i++) {
+       17:   46:		sd->sdp.null_ptr |= 0xFF << shft;
+       17:   47:		shft += 8;
         -:   48:	}
         -:   49:
-       13:   50:	debug(
+       15:   50:	debug(
         -:   51:		"sd->sdp.ptr_size=%d,max_slabs=%llu,null_ptr=%llu",
         -:   52:		sd->sdp.ptr_size,
         -:   53:		max_slabs,
@@ -1648,9 +1967,9 @@ format_date(1717657365 * 1000 ),];
         -:   55:	);
         -:   56:
         -:   57:
-       13:   58:	int ret = slab_data_resize(sd, slab_count);
+       15:   58:	int ret = slab_data_resize(sd, slab_count);
         -:   59:
-       13:   60:	return ret;
+       15:   60:	return ret;
         -:   61:}
         -:   62:
     #####:   63:void *slab_data_read(SlabData *sd, u64 offset) {
@@ -1659,22 +1978,22 @@ format_date(1717657365 * 1000 ),];
     #####:   66:	return sd->data + offset;
         -:   67:}
         -:   68:
-      312:   69:int slab_data_write(SlabData *sd, u64 dst_offset, void *value, u64 src_offset, u64 len) {
-      312:   70:        int ret = 0;
-      312:   71:	debug("=====sdw dst_offset=%llu,src_offset=%llu,len=%llu", dst_offset, src_offset, len);
-      312:   72:	memcpy(sd->data + dst_offset, value + src_offset, len);
-      312:   73:        return ret;
+      332:   69:int slab_data_write(SlabData *sd, u64 dst_offset, void *value, u64 src_offset, u64 len) {
+      332:   70:        int ret = 0;
+      332:   71:	debug("=====sdw dst_offset=%llu,src_offset=%llu,len=%llu", dst_offset, src_offset, len);
+      332:   72:	memcpy(sd->data + dst_offset, value + src_offset, len);
+      332:   73:        return ret;
         -:   74:}
         -:   75:
-       15:   76:int slab_data_resize(SlabData *sd, u64 slabs) {
-       15:   77:	debug("slab_data_resize %llu", slabs);
-       15:   78:	u64 len = slabs * (sd->sdp.slab_size + sd->sdp.ptr_size);
-       15:   79:	int ret = 0;
+       17:   76:int slab_data_resize(SlabData *sd, u64 slabs) {
+       17:   77:	debug("slab_data_resize %llu", slabs);
+       17:   78:	u64 len = slabs * (sd->sdp.slab_size + sd->sdp.ptr_size);
+       17:   79:	int ret = 0;
         -:   80:
-       15:   81:	if (sd->data == NULL) {
-       13:   82:		debug("slab_data_resize malloc %llu", len);
-       13:   83:		sd->data = malloc(len);
-       13:   84:		if(sd->data == NULL) {
+       17:   81:	if (sd->data == NULL) {
+       15:   82:		debug("slab_data_resize malloc %llu", len);
+       15:   83:		sd->data = malloc(len);
+       15:   84:		if(sd->data == NULL) {
     #####:   85:			error("Could not allocate the required memory.");
     #####:   86:			ret = -1;
         -:   87:		}
@@ -1688,85 +2007,85 @@ format_date(1717657365 * 1000 ),];
         -:   95:		}
         -:   96:	}
         -:   97:
-       15:   98:	return ret;
+       17:   98:	return ret;
         -:   99:}
         -:  100:
-    #####:  101:void slab_data_free(SlabData *sd) {
-    #####:  102:	if(sd->data) {
-    #####:  103:		free(sd->data);
-    #####:  104:		sd->data = NULL;
+       15:  101:void slab_data_free(SlabData *sd) {
+       15:  102:	if(sd->data) {
+       15:  103:		free(sd->data);
+       15:  104:		sd->data = NULL;
         -:  105:	}
-    #####:  106:}
+       15:  106:}
         -:  107:
-      302:  108:void slab_write_ptr(char *bytes, u64 n, u64 ptr_size) {
-      804:  109:	for(int j=ptr_size-1; j>=0; j--) {
-      502:  110:                bytes[j] = n & 0xFF;
-      502:  111:        	n = n >> 8;
+      320:  108:void slab_write_ptr(char *bytes, u64 n, u64 ptr_size) {
+      840:  109:	for(int j=ptr_size-1; j>=0; j--) {
+      520:  110:                bytes[j] = n & 0xFF;
+      520:  111:        	n = n >> 8;
         -:  112:        }
-      302:  113:}
+      320:  113:}
         -:  114:
-       15:  115:void slab_set_max(char *bytes, u64 ptr_size) {
-       32:  116:	for(int j=0; j<ptr_size; j++)
-       17:  117:		bytes[j] = 0xFF;
-       15:  118:}
+       17:  115:void slab_set_max(char *bytes, u64 ptr_size) {
+       36:  116:	for(int j=0; j<ptr_size; j++)
+       19:  117:		bytes[j] = 0xFF;
+       17:  118:}
         -:  119:
-       34:  120:u64 slab_read_ptr(unsigned char *bytes, u64 ptr_size) {
-       34:  121:	u64 ret = 0;
-       34:  122:	debug("slab_read_ptr with ptr_size = %llu", ptr_size);
+       39:  120:u64 slab_read_ptr(unsigned char *bytes, u64 ptr_size) {
+       39:  121:	u64 ret = 0;
+       39:  122:	debug("slab_read_ptr with ptr_size = %llu", ptr_size);
         -:  123:
-       34:  124:	int shft = 0;
-       79:  125:	for(int j=ptr_size-1; j>=0; j--) {
-       45:  126:		ret += bytes[j] << shft;
-       45:  127:		shft += 8;
+       39:  124:	int shft = 0;
+       89:  125:	for(int j=ptr_size-1; j>=0; j--) {
+       50:  126:		ret += bytes[j] << shft;
+       50:  127:		shft += 8;
         -:  128:	}
         -:  129:
-       34:  130:	debug("ret=%llu", ret);
+       39:  130:	debug("ret=%llu", ret);
         -:  131:
-       34:  132:	return ret;
+       39:  132:	return ret;
         -:  133:}
         -:  134:
-       15:  135:int slab_init_free_list(SlabData *sd, u64 size, u64 offset) {
-       15:  136:	debug("init free list %llu off=%llu, size=%llu", sd->sdp.slab_size, offset, size);
-       15:  137:	int ret = 0;
-       15:  138:	u64 ptr_size = sd->sdp.ptr_size;
-       15:  139:	u64 slab_size = sd->sdp.slab_size;
+       17:  135:int slab_init_free_list(SlabData *sd, u64 size, u64 offset) {
+       17:  136:	debug("init free list %llu off=%llu, size=%llu", sd->sdp.slab_size, offset, size);
+       17:  137:	int ret = 0;
+       17:  138:	u64 ptr_size = sd->sdp.ptr_size;
+       17:  139:	u64 slab_size = sd->sdp.slab_size;
         -:  140:
-      326:  141:	for(u64 i=offset; i<offset + size; i++) {
-      311:  142:		char next_bytes[ptr_size];
-      311:  143:		if(i < (offset + size) - 1) {
-      296:  144:			u64 n = i + 1;
-      296:  145:			slab_write_ptr(next_bytes, n, ptr_size);
+      348:  141:	for(u64 i=offset; i<offset + size; i++) {
+      331:  142:		char next_bytes[ptr_size];
+      331:  143:		if(i < (offset + size) - 1) {
+      314:  144:			u64 n = i + 1;
+      314:  145:			slab_write_ptr(next_bytes, n, ptr_size);
         -:  146:		} else {
-       15:  147:			slab_set_max(next_bytes, ptr_size);
+       17:  147:			slab_set_max(next_bytes, ptr_size);
         -:  148:		}
-      311:  149:		u64 offset_next = i * (ptr_size + slab_size);
-      311:  150:		if(i < 1)
-       13:  151:			debug(
+      331:  149:		u64 offset_next = i * (ptr_size + slab_size);
+      331:  150:		if(i < 1)
+       15:  151:			debug(
         -:  152:				"writing first block at %llu,ptr_size=%llu, [0]=%d,[1]=%d",
         -:  153:				offset_next,
         -:  154:				ptr_size,
         -:  155:				next_bytes[0],
         -:  156:				next_bytes[1]
         -:  157:			);
-      311:  158:		slab_data_write(sd, offset_next, next_bytes, 0, ptr_size);
+      331:  158:		slab_data_write(sd, offset_next, next_bytes, 0, ptr_size);
         -:  159:	}
         -:  160:
         -:  161:
-       15:  162:	return ret;
+       17:  162:	return ret;
         -:  163:}
         -:  164:
-        7:  165:int do_slabs(SlabAllocator *sa, int num, va_list valist) {
+        9:  165:int do_slabs(SlabAllocator *sa, int num, va_list valist) {
         -:  166:	va_list args_copy;
-        7:  167:        va_copy(args_copy, valist);
-        7:  168:	int ret = 0;
-        7:  169:	int sd_count = 0;
-        7:  170:	u64 slabs_per_resize = 100;
-        7:  171:	bool zeroed = true;
+        9:  167:        va_copy(args_copy, valist);
+        9:  168:	int ret = 0;
+        9:  169:	int sd_count = 0;
+        9:  170:	u64 slabs_per_resize = 100;
+        9:  171:	bool zeroed = true;
         -:  172:
-       24:  173:	for(int i=0; i<num; i++) {
-       17:  174:		SlabAllocatorConfigImpl next = va_arg(valist, SlabAllocatorConfigImpl);
-       17:  175:		if(next.type == SlabAllocatorConfigImplTypeSlabData)
-       13:  176:			sd_count += 1;
+       28:  173:	for(int i=0; i<num; i++) {
+       19:  174:		SlabAllocatorConfigImpl next = va_arg(valist, SlabAllocatorConfigImpl);
+       19:  175:		if(next.type == SlabAllocatorConfigImplTypeSlabData)
+       15:  176:			sd_count += 1;
         4:  177:		else if(next.type == SlabAllocatorConfigImplTypeSlabsPerResize) {
         2:  178:			slabs_per_resize = *((u64 *)next.value);
         2:  179:		} else if(next.type == SlabAllocatorConfigImplTypeZeroed) {
@@ -1774,339 +2093,336 @@ format_date(1717657365 * 1000 ),];
         -:  181:		}
         -:  182:	}
         -:  183:
-        7:  184:	if(sd_count > 254) {
+        9:  184:	if(sd_count > 254) {
     #####:  185:		error("slab_allocator may not have more than 254 slab sizes.");
     #####:  186:		return -1;
         -:  187:	}
         -:  188:
-        7:  189:	u64 sizes[sd_count];
-        7:  190:	u64 max_slabs[sd_count];
-        7:  191:	int counter = 0;
-       24:  192:	for(int i=0; i<num; i++) {
-       17:  193:                SlabAllocatorConfigImpl next = va_arg(args_copy, SlabAllocatorConfigImpl);
-       17:  194:                if(next.type == SlabAllocatorConfigImplTypeSlabData) {
-       13:  195:			u64 slab_size = ((u64 *)next.value)[1];
-       13:  196:			u64 max_slabs_value = ((u64 *)next.value)[0];
-       13:  197:			printf("ss=%llu,max=%llu\n", slab_size, max_slabs_value);
-       13:  198:			sizes[counter] = slab_size;
-       13:  199:			max_slabs[counter] = max_slabs_value;
-       13:  200:			counter += 1;
-        -:  201:		}
-        -:  202:        }
-        7:  203:	printf("counter=%d\n", counter);
-        -:  204:
-        -:  205:	// check that ordering is sorted and other configs are ok
-        7:  206:        u64 last_size = 0;
-       20:  207:        for(int i=0; i<counter; i++) {
-       13:  208:                if(sizes[i] <= last_size) {
-    #####:  209:                        error("slab_allocator sizes must be sorted in ascending order.");
-    #####:  210:                        return -1;
-        -:  211:                }
-       13:  212:                last_size = sizes[i];
-       13:  213:                if(max_slabs[i] == 0) {
-    #####:  214:                        error("max_slabs must be greater than 0");
-    #####:  215:                        return -1;
-        -:  216:                }
-        -:  217:        }
-        -:  218:
-        7:  219:        if(slabs_per_resize == 0) {
-    #####:  220:                error("slabs_per_resize must be greater than 0");
-    #####:  221:                return -1;
-        -:  222:        }
-        -:  223:
-        7:  224:        sa->slab_data_array = NULL;
-        7:  225:        sa->sizes = NULL;
-        7:  226:        sa->max_slabs = NULL;
-        7:  227:        sa->zeroed = zeroed;
-        7:  228:        sa->slabs_per_resize = slabs_per_resize;
-        7:  229:        sa->slab_data_array = malloc(sizeof(SlabData) * counter);
-        7:  230:        if(sa->slab_data_array == NULL) {
-    #####:  231:                ret = -1;
-    #####:  232:                error("Could not allocate the required memory.");
-        -:  233:        }
-        -:  234:
-        7:  235:	        if(ret == 0) {
-        7:  236:                sa->sizes = malloc(sizeof(u64) * counter);
-        -:  237:
-        7:  238:                if(sa->sizes == NULL) {
-    #####:  239:                        free(sa->slab_data_array);
-    #####:  240:                        sa->slab_data_array = NULL;
-    #####:  241:                        ret = -1;
-    #####:  242:                        error("Could not allocate the required memory.");
-        -:  243:                } else {
-        7:  244:                        sa->slab_data_array_len = counter;
-        7:  245:                        memcpy(sa->sizes, sizes, counter * sizeof(u64));
-        -:  246:                }
+        9:  189:	u64 sizes[sd_count];
+        9:  190:	u64 max_slabs[sd_count];
+        9:  191:	int counter = 0;
+       28:  192:	for(int i=0; i<num; i++) {
+       19:  193:                SlabAllocatorConfigImpl next = va_arg(args_copy, SlabAllocatorConfigImpl);
+       19:  194:                if(next.type == SlabAllocatorConfigImplTypeSlabData) {
+       15:  195:			u64 slab_size = ((u64 *)next.value)[1];
+       15:  196:			u64 max_slabs_value = ((u64 *)next.value)[0];
+       15:  197:			sizes[counter] = slab_size;
+       15:  198:			max_slabs[counter] = max_slabs_value;
+       15:  199:			counter += 1;
+        -:  200:		}
+        -:  201:        }
+        -:  202:
+        -:  203:	// check that ordering is sorted and other configs are ok
+        9:  204:        u64 last_size = 0;
+       24:  205:        for(int i=0; i<counter; i++) {
+       15:  206:                if(sizes[i] <= last_size) {
+    #####:  207:                        error("slab_allocator sizes must be sorted in ascending order.");
+    #####:  208:                        return -1;
+        -:  209:                }
+       15:  210:                last_size = sizes[i];
+       15:  211:                if(max_slabs[i] == 0) {
+    #####:  212:                        error("max_slabs must be greater than 0");
+    #####:  213:                        return -1;
+        -:  214:                }
+        -:  215:        }
+        -:  216:
+        9:  217:        if(slabs_per_resize == 0) {
+    #####:  218:                error("slabs_per_resize must be greater than 0");
+    #####:  219:                return -1;
+        -:  220:        }
+        -:  221:
+        9:  222:        sa->slab_data_array = NULL;
+        9:  223:        sa->sizes = NULL;
+        9:  224:        sa->max_slabs = NULL;
+        9:  225:        sa->zeroed = zeroed;
+        9:  226:        sa->slabs_per_resize = slabs_per_resize;
+        9:  227:        sa->slab_data_array = malloc(sizeof(SlabData) * counter);
+        9:  228:        if(sa->slab_data_array == NULL) {
+    #####:  229:                ret = -1;
+    #####:  230:                error("Could not allocate the required memory.");
+        -:  231:        }
+        -:  232:
+        9:  233:	        if(ret == 0) {
+        9:  234:                sa->sizes = malloc(sizeof(u64) * counter);
+        -:  235:
+        9:  236:                if(sa->sizes == NULL) {
+    #####:  237:                        free(sa->slab_data_array);
+    #####:  238:                        sa->slab_data_array = NULL;
+    #####:  239:                        ret = -1;
+    #####:  240:                        error("Could not allocate the required memory.");
+        -:  241:                } else {
+        9:  242:                        sa->slab_data_array_len = counter;
+        9:  243:                        memcpy(sa->sizes, sizes, counter * sizeof(u64));
+        -:  244:                }
+        -:  245:
+        -:  246:        }
         -:  247:
-        -:  248:        }
-        -:  249:
-        7:  250:        if(ret == 0) {
-        7:  251:                sa->max_slabs = malloc(sizeof(u64) * counter);
-        7:  252:                if(sa->max_slabs == NULL) {
-    #####:  253:                        free(sa->slab_data_array);
-    #####:  254:                        sa->slab_data_array = NULL;
-    #####:  255:                        free(sa->sizes);
-    #####:  256:                        sa->sizes = NULL;
-    #####:  257:                        error("Could not allocate required memory.");
-    #####:  258:                        ret = -1;
-        -:  259:                } else {
-        7:  260:                        memcpy(sa->max_slabs, max_slabs, counter * sizeof(u64));
-        -:  261:                }
-        -:  262:        }
-        -:  263:
-        7:  264:	if(ret == 0) {
-       20:  265: 		for(int i=0; i<counter; i++) {
-       13:  266:			u64 initial_slabs = slabs_per_resize;
-       13:  267:			if(slabs_per_resize > sa->max_slabs[i]) {
-       10:  268:				initial_slabs = sa->max_slabs[i];
-        -:  269:			}
-       13:  270:			debug(
-        -:  271:				"initial_slabs=%llu,max=%llu,spr=%llu",
-        -:  272:				initial_slabs,
-        -:  273:				sa->max_slabs[i],
-        -:  274:				slabs_per_resize
-        -:  275:			);
-       13:  276:                	if(slab_data_init(
-       13:  277:                        	&sa->slab_data_array[i],
-        -:  278:                                initial_slabs,
-       13:  279:                                sa->sizes[i],
-       13:  280:                                sa->max_slabs[i]
-        -:  281:                        )) {
-    #####:  282:                        	ret = -1; 
-    #####:  283:                                break;
-        -:  284:                        }
-        -:  285:                }
-        -:  286:	}
-        -:  287:
-        7:  288:	if(ret == 0) {
-       20:  289:		for(int i=0; i<sa->slab_data_array_len; i++) {
-       13:  290:			u64 size = slabs_per_resize;
-       13:  291:			if(sa->slab_data_array[i].sdp.max_slabs < slabs_per_resize)
-       10:  292:				size = sa->slab_data_array[i].sdp.max_slabs;
-       13:  293:                	slab_init_free_list(&sa->slab_data_array[i], size, 0);
-        -:  294:                }
-        -:  295:	}
-        -:  296:
-        7:  297:        return ret;	
-        -:  298:}
-        -:  299:
-        7:  300:int slab_init(SlabAllocator *sa, int num, ...) {
-        -:  301:    va_list valist;
-        7:  302:    va_start(valist, num);
-        7:  303:    int ret = do_slabs(sa, num, valist);
-        7:  304:    va_end(valist);
-        7:  305:    return ret;
-        -:  306:}
-        -:  307:
-       60:  308:int slab_index_for_size(SlabAllocator *sa, u64 size) {
-        -:  309:	// slab sizes are sorted so we can do binary search
-       60:  310:	int slab_data_array_len = sa->slab_data_array_len;
-       60:  311:	int mid = slab_data_array_len / 2;
-       60:  312:	int min = 0;
-       60:  313:	int max = slab_data_array_len - 1;
-        -:  314:
-        -:  315:	while(true) {
-      135:  316:		if(sa->sizes[mid] == size)
-       49:  317:			return mid;
-       86:  318:		else if(sa->sizes[mid] > size) {
-       49:  319:			if(max <= min)
-        7:  320:				break;
-       42:  321:			max = mid - 1;
-        -:  322:		} else {
-       37:  323:			if(max <= min)
-        4:  324:				break;
-       33:  325:			min = mid + 1;
-        -:  326:		}
-       75:  327:		mid = (min + (max - min) / 2);
-        -:  328:	}
-        -:  329:
-       11:  330:	return -1;
-        -:  331:}
-        -:  332:
-       39:  333:u64 slab_allocate(SlabAllocator *sa, u64 size) {
-       39:  334:	int idx = slab_index_for_size(sa, size);
-       39:  335:	if(idx < 0)
-    #####:  336:		return ULONG_MAX;
-        -:  337:
-       39:  338:	u64 slab_size = sa->slab_data_array[idx].sdp.slab_size;
-       39:  339:	u64 ptr_size = sa->slab_data_array[idx].sdp.ptr_size;
-       39:  340:	u64 cur_slabs = sa->slab_data_array[idx].sdp.slab_count;
-       39:  341:	u64 max_slabs = sa->slab_data_array[idx].sdp.max_slabs;
-       39:  342:	u64 head = sa->slab_data_array[idx].sdp.free_list_head;
-        -:  343:
-       39:  344:	if(head == sa->slab_data_array[idx].sdp.null_ptr) {
-        7:  345:		if(max_slabs > cur_slabs) {
-        2:  346:			debug("resize possible for %d,max=%llu,cur=%llu", idx, max_slabs, cur_slabs);
-        2:  347:			u64 nslabs = cur_slabs + sa->slabs_per_resize;
-        2:  348:			if(nslabs > max_slabs) {
-        1:  349:				nslabs = max_slabs;
-        -:  350:			}
-        2:  351:			slab_data_resize(&sa->slab_data_array[idx], nslabs);
-        2:  352:			slab_init_free_list(&sa->slab_data_array[idx], nslabs - cur_slabs, cur_slabs);
-        2:  353:			sa->slab_data_array[idx].sdp.free_list_head = cur_slabs;
-        2:  354:			sa->slab_data_array[idx].sdp.slab_count = nslabs;
-        2:  355:			head = cur_slabs;
-        -:  356:		} else {
-        5:  357:			return ULONG_MAX;
-        -:  358:		}
-        -:  359:	}
-        -:  360:
-       68:  361:	sa->slab_data_array[idx].sdp.free_list_head = slab_read_ptr(
-       34:  362:		sa->slab_data_array[idx].data + head * (ptr_size + slab_size),
-        -:  363:		ptr_size
-        -:  364:	);
-       34:  365:	debug("reading next free list at relative id = %llu", head);
-        -:  366:
-       34:  367:	if(sa->zeroed) {
-    12472:  368:		for(int i=0; i<slab_size; i++) {
-    12438:  369:			u64 offset = head * (ptr_size + slab_size) + ptr_size + i;
-    12438:  370:			(((char*)sa->slab_data_array[idx].data)[offset]) = 0;
-        -:  371:		}
-        -:  372:	}
-        -:  373:
-       34:  374:	debug(
-        -:  375:		"head=%llu,next=%llu, ULONG_MAX=%llu",
-        -:  376:		head,
-        -:  377:		sa->slab_data_array[idx].sdp.free_list_head,
-        -:  378:		ULONG_MAX
-        -:  379:	);
-       34:  380:	u64 idx_u64 = idx;
-       34:  381:	return head | (idx_u64 << 56);
-        -:  382:}
-        -:  383:
-        6:  384:int slab_free(SlabAllocator *sa, u64 id) {
-        6:  385:	int ret = 0;
-        6:  386:	int idx = (id >> 56) & 0xFF;
-        6:  387:	u64 id_relative = id & 0x00FFFFFFFFFFFFFF;
-        -:  388:
-        6:  389:	debug("id=%llu,idx=%d,id_relative=%llu", id, idx, id_relative);
-        6:  390:	u64 head = sa->slab_data_array[idx].sdp.free_list_head;
-        6:  391:	u64 slab_size = sa->slab_data_array[idx].sdp.slab_size;
-        6:  392:	u64 ptr_size = sa->slab_data_array[idx].sdp.ptr_size;
-        -:  393:
-        6:  394:	sa->slab_data_array[idx].sdp.free_list_head = id_relative;
-        6:  395:	u64 offset = id_relative * (ptr_size + slab_size);
-        6:  396:	slab_write_ptr(sa->slab_data_array[idx].data + offset, head, ptr_size);
-        -:  397:
-        6:  398:	return ret;
-        -:  399:}
-        -:  400:
-        1:  401:int slab_write(SlabAllocator *sa, u64 id, Slab *slab, u64 offset_slab) {
-        1:  402:	int ret = 0;
-        -:  403:
-        1:  404: 	int idx = (id >> 56) & 0xFF;
-        1:  405:        u64 id_relative = id & 0x00FFFFFFFFFFFFFF;
-        -:  406:        
-        1:  407:        u64 slab_size = sa->slab_data_array[idx].sdp.slab_size;
-        1:  408:        u64 ptr_size = sa->slab_data_array[idx].sdp.ptr_size;
-        -:  409:
-        1:  410:	if(offset_slab >= slab_size) {
-    #####:  411:		error(
-        -:  412:			"offset (%llu) is greater than or equal to slab size (%llu)",
-        -:  413:			offset_slab,
-        -:  414:			slab_size
-        -:  415:		);
-    #####:  416:		return -1;
-        -:  417:	}
-        -:  418:
-        1:  419:	if(slab->len != slab_size) {
-    #####:  420:		error("slab->len (%llu) not equal to slab_size (%llu)", slab->len, slab_size);
-    #####:  421:		return -1;
-        -:  422:	}
-        -:  423:                
-        1:  424:        u64 offset = id_relative * (ptr_size + slab_size) + offset_slab + ptr_size;
-        -:  425:
-        1:  426:	debug("write offset = %llu", offset);
-        1:  427:	u64 len = slab_size - offset_slab;
+        9:  248:        if(ret == 0) {
+        9:  249:                sa->max_slabs = malloc(sizeof(u64) * counter);
+        9:  250:                if(sa->max_slabs == NULL) {
+    #####:  251:                        free(sa->slab_data_array);
+    #####:  252:                        sa->slab_data_array = NULL;
+    #####:  253:                        free(sa->sizes);
+    #####:  254:                        sa->sizes = NULL;
+    #####:  255:                        error("Could not allocate required memory.");
+    #####:  256:                        ret = -1;
+        -:  257:                } else {
+        9:  258:                        memcpy(sa->max_slabs, max_slabs, counter * sizeof(u64));
+        -:  259:                }
+        -:  260:        }
+        -:  261:
+        9:  262:	if(ret == 0) {
+       24:  263: 		for(int i=0; i<counter; i++) {
+       15:  264:			u64 initial_slabs = slabs_per_resize;
+       15:  265:			if(slabs_per_resize > sa->max_slabs[i]) {
+       12:  266:				initial_slabs = sa->max_slabs[i];
+        -:  267:			}
+       15:  268:			debug(
+        -:  269:				"initial_slabs=%llu,max=%llu,spr=%llu",
+        -:  270:				initial_slabs,
+        -:  271:				sa->max_slabs[i],
+        -:  272:				slabs_per_resize
+        -:  273:			);
+       15:  274:                	if(slab_data_init(
+       15:  275:                        	&sa->slab_data_array[i],
+        -:  276:                                initial_slabs,
+       15:  277:                                sa->sizes[i],
+       15:  278:                                sa->max_slabs[i]
+        -:  279:                        )) {
+    #####:  280:                        	ret = -1; 
+    #####:  281:                                break;
+        -:  282:                        }
+        -:  283:                }
+        -:  284:	}
+        -:  285:
+        9:  286:	if(ret == 0) {
+       24:  287:		for(int i=0; i<sa->slab_data_array_len; i++) {
+       15:  288:			u64 size = slabs_per_resize;
+       15:  289:			if(sa->slab_data_array[i].sdp.max_slabs < slabs_per_resize)
+       12:  290:				size = sa->slab_data_array[i].sdp.max_slabs;
+       15:  291:                	slab_init_free_list(&sa->slab_data_array[i], size, 0);
+        -:  292:                }
+        -:  293:	}
+        -:  294:
+        9:  295:        return ret;	
+        -:  296:}
+        -:  297:
+        9:  298:int slab_init(SlabAllocator *sa, int num, ...) {
+        -:  299:    va_list valist;
+        9:  300:    va_start(valist, num);
+        9:  301:    int ret = do_slabs(sa, num, valist);
+        9:  302:    va_end(valist);
+        9:  303:    return ret;
+        -:  304:}
+        -:  305:
+       65:  306:int slab_index_for_size(SlabAllocator *sa, u64 size) {
+        -:  307:	// slab sizes are sorted so we can do binary search
+       65:  308:	int slab_data_array_len = sa->slab_data_array_len;
+       65:  309:	int mid = slab_data_array_len / 2;
+       65:  310:	int min = 0;
+       65:  311:	int max = slab_data_array_len - 1;
+        -:  312:
+        -:  313:	while(true) {
+      140:  314:		if(sa->sizes[mid] == size)
+       54:  315:			return mid;
+       86:  316:		else if(sa->sizes[mid] > size) {
+       49:  317:			if(max <= min)
+        7:  318:				break;
+       42:  319:			max = mid - 1;
+        -:  320:		} else {
+       37:  321:			if(max <= min)
+        4:  322:				break;
+       33:  323:			min = mid + 1;
+        -:  324:		}
+       75:  325:		mid = (min + (max - min) / 2);
+        -:  326:	}
+        -:  327:
+       11:  328:	return -1;
+        -:  329:}
+        -:  330:
+       44:  331:u64 slab_allocate(SlabAllocator *sa, u64 size) {
+       44:  332:	int idx = slab_index_for_size(sa, size);
+       44:  333:	if(idx < 0)
+    #####:  334:		return ULONG_MAX;
+        -:  335:
+       44:  336:	u64 slab_size = sa->slab_data_array[idx].sdp.slab_size;
+       44:  337:	u64 ptr_size = sa->slab_data_array[idx].sdp.ptr_size;
+       44:  338:	u64 cur_slabs = sa->slab_data_array[idx].sdp.slab_count;
+       44:  339:	u64 max_slabs = sa->slab_data_array[idx].sdp.max_slabs;
+       44:  340:	u64 head = sa->slab_data_array[idx].sdp.free_list_head;
+        -:  341:
+       44:  342:	if(head == sa->slab_data_array[idx].sdp.null_ptr) {
+        7:  343:		if(max_slabs > cur_slabs) {
+        2:  344:			debug("resize possible for %d,max=%llu,cur=%llu", idx, max_slabs, cur_slabs);
+        2:  345:			u64 nslabs = cur_slabs + sa->slabs_per_resize;
+        2:  346:			if(nslabs > max_slabs) {
+        1:  347:				nslabs = max_slabs;
+        -:  348:			}
+        2:  349:			slab_data_resize(&sa->slab_data_array[idx], nslabs);
+        2:  350:			slab_init_free_list(&sa->slab_data_array[idx], nslabs - cur_slabs, cur_slabs);
+        2:  351:			sa->slab_data_array[idx].sdp.free_list_head = cur_slabs;
+        2:  352:			sa->slab_data_array[idx].sdp.slab_count = nslabs;
+        2:  353:			head = cur_slabs;
+        -:  354:		} else {
+        5:  355:			return ULONG_MAX;
+        -:  356:		}
+        -:  357:	}
+        -:  358:
+       78:  359:	sa->slab_data_array[idx].sdp.free_list_head = slab_read_ptr(
+       39:  360:		sa->slab_data_array[idx].data + head * (ptr_size + slab_size),
+        -:  361:		ptr_size
+        -:  362:	);
+       39:  363:	debug("reading next free list at relative id = %llu", head);
+        -:  364:
+       39:  365:	if(sa->zeroed) {
+    12737:  366:		for(int i=0; i<slab_size; i++) {
+    12698:  367:			u64 offset = head * (ptr_size + slab_size) + ptr_size + i;
+    12698:  368:			(((char*)sa->slab_data_array[idx].data)[offset]) = 0;
+        -:  369:		}
+        -:  370:	}
+        -:  371:
+       39:  372:	debug(
+        -:  373:		"head=%llu,next=%llu, ULONG_MAX=%llu",
+        -:  374:		head,
+        -:  375:		sa->slab_data_array[idx].sdp.free_list_head,
+        -:  376:		ULONG_MAX
+        -:  377:	);
+       39:  378:	u64 idx_u64 = idx;
+       39:  379:	return head | (idx_u64 << 56);
+        -:  380:}
+        -:  381:
+        6:  382:int slab_free(SlabAllocator *sa, u64 id) {
+        6:  383:	int ret = 0;
+        6:  384:	int idx = (id >> 56) & 0xFF;
+        6:  385:	u64 id_relative = id & 0x00FFFFFFFFFFFFFF;
+        -:  386:
+        6:  387:	debug("id=%llu,idx=%d,id_relative=%llu", id, idx, id_relative);
+        6:  388:	u64 head = sa->slab_data_array[idx].sdp.free_list_head;
+        6:  389:	u64 slab_size = sa->slab_data_array[idx].sdp.slab_size;
+        6:  390:	u64 ptr_size = sa->slab_data_array[idx].sdp.ptr_size;
+        -:  391:
+        6:  392:	sa->slab_data_array[idx].sdp.free_list_head = id_relative;
+        6:  393:	u64 offset = id_relative * (ptr_size + slab_size);
+        6:  394:	slab_write_ptr(sa->slab_data_array[idx].data + offset, head, ptr_size);
+        -:  395:
+        6:  396:	return ret;
+        -:  397:}
+        -:  398:
+        1:  399:int slab_write(SlabAllocator *sa, u64 id, Slab *slab, u64 offset_slab) {
+        1:  400:	int ret = 0;
+        -:  401:
+        1:  402: 	int idx = (id >> 56) & 0xFF;
+        1:  403:        u64 id_relative = id & 0x00FFFFFFFFFFFFFF;
+        -:  404:        
+        1:  405:        u64 slab_size = sa->slab_data_array[idx].sdp.slab_size;
+        1:  406:        u64 ptr_size = sa->slab_data_array[idx].sdp.ptr_size;
+        -:  407:
+        1:  408:	if(offset_slab >= slab_size) {
+    #####:  409:		error(
+        -:  410:			"offset (%llu) is greater than or equal to slab size (%llu)",
+        -:  411:			offset_slab,
+        -:  412:			slab_size
+        -:  413:		);
+    #####:  414:		return -1;
+        -:  415:	}
+        -:  416:
+        1:  417:	if(slab->len != slab_size) {
+    #####:  418:		error("slab->len (%llu) not equal to slab_size (%llu)", slab->len, slab_size);
+    #####:  419:		return -1;
+        -:  420:	}
+        -:  421:                
+        1:  422:        u64 offset = id_relative * (ptr_size + slab_size) + offset_slab + ptr_size;
+        -:  423:
+        1:  424:	debug("write offset = %llu", offset);
+        1:  425:	u64 len = slab_size - offset_slab;
+        -:  426:
+        1:  427:	slab_data_write(&sa->slab_data_array[idx], offset, slab->data, 0, len);
         -:  428:
-        1:  429:	slab_data_write(&sa->slab_data_array[idx], offset, slab->data, 0, len);
-        -:  430:
-        -:  431:
-        1:  432:	return ret;
-        -:  433:}
-        -:  434:
-        3:  435:int slab_read(SlabAllocator *sa, u64 id, Slab *slab) {
-        3:  436:	int ret = 0;
-        3:  437:	int idx = (id >> 56) & 0xFF;
-        3:  438:        u64 id_relative = id & 0x00FFFFFFFFFFFFFF;
-        -:  439:
-        3:  440:	u64 slab_size = sa->slab_data_array[idx].sdp.slab_size;
-        3:  441:        u64 ptr_size = sa->slab_data_array[idx].sdp.ptr_size;
-        -:  442:
-        3:  443:	u64 offset = id_relative * (ptr_size + slab_size) + ptr_size;
-        3:  444:	debug("read offset = %llu", offset);
-        3:  445:	slab->data = sa->slab_data_array[idx].data + offset;
-        3:  446:	slab->len = slab_size;
-        -:  447:
-        3:  448:	return ret;
-        -:  449:}
-        -:  450:
-    #####:  451:void slab_allocator_free(SlabAllocator *sa) {
-    #####:  452:	for(int i=0; i<sa->slab_data_array_len; i++) {
-    #####:  453:		slab_data_free(&sa->slab_data_array[i]);
-        -:  454:	}
-    #####:  455:	sa->slab_data_array_len = 0;
-        -:  456:
-    #####:  457:	if(sa->slab_data_array) {
-    #####:  458:		free(sa->slab_data_array);
-    #####:  459:		sa->slab_data_array = NULL;
-        -:  460:	}
-        -:  461:
-    #####:  462:	if(sa->sizes) {
-    #####:  463:		free(sa->sizes);
-    #####:  464:		sa->sizes = NULL;
-        -:  465:	}
-        -:  466:
-    #####:  467:	if(sa->max_slabs) {
-    #####:  468:		free(sa->max_slabs);
-    #####:  469:		sa->max_slabs = NULL;
-        -:  470:	}
-    #####:  471:}
-        -:  472:
-        3:  473:int slab_allocator_config_zeroed(SlabAllocatorConfigImpl *sc, bool zeroed) {
-        3:  474:	int ret = 0;
-        3:  475:	sc->type = SlabAllocatorConfigImplTypeZeroed;
-        3:  476:	sc->value = malloc(sizeof(bool));
-        3:  477:        if(sc->value == NULL) {
-    #####:  478:                ret = -1;
-        -:  479:        } else {
-        3:  480:                *((bool *)sc->value) = zeroed;
-        -:  481:        }
-        3:  482:	return ret;
-        -:  483:}
-        -:  484:
-        3:  485:int slab_allocator_config_slabs_per_resize(SlabAllocatorConfigImpl *sc, u64 slabs_per_resize) {
-        3:  486:	int ret = 0;
-        3:  487:	sc->type = SlabAllocatorConfigImplTypeSlabsPerResize;
-        3:  488:	sc->value = malloc(sizeof(u64));
-        3:  489:	if(sc->value == NULL) {
-    #####:  490:                ret = -1;
-        -:  491:        } else {
-        3:  492:		*((u64 *)sc->value) = slabs_per_resize;
-        -:  493:	}
-        3:  494:	return ret;
-        -:  495:}
-        -:  496:
-       14:  497:int slab_allocator_config_slab_data(SlabAllocatorConfigImpl *sc, u64 max_slabs, u64 slab_size) {
-       14:  498:	int ret = 0;
-       14:  499:	sc->type = SlabAllocatorConfigImplTypeSlabData;
-       14:  500:	printf("config slab data\n");
-       14:  501:	sc->value = malloc(sizeof(u64) * 2);
-       14:  502:	if(sc->value == NULL) {
-    #####:  503:		ret = -1;
-        -:  504:	} else {
-       14:  505:		(((u64 *)sc->value)[0]) = max_slabs;
-       14:  506:		(((u64 *)sc->value)[1]) = slab_size;
-        -:  507:	}
-       14:  508:	return ret;
-        -:  509:}
-        -:  510:
-       20:  511:void slab_allocator_config_free(SlabAllocatorConfigImpl *sc) {
-       20:  512:	if(sc->value != NULL) {
-       20:  513:		free(sc->value);
-       20:  514:		sc->value = NULL;
-        -:  515:	}
-       20:  516:}</textarea>
+        -:  429:
+        1:  430:	return ret;
+        -:  431:}
+        -:  432:
+       23:  433:int slab_read(SlabAllocator *sa, u64 id, Slab *slab) {
+       23:  434:	int ret = 0;
+       23:  435:	int idx = (id >> 56) & 0xFF;
+       23:  436:        u64 id_relative = id & 0x00FFFFFFFFFFFFFF;
+        -:  437:
+       23:  438:	u64 slab_size = sa->slab_data_array[idx].sdp.slab_size;
+       23:  439:        u64 ptr_size = sa->slab_data_array[idx].sdp.ptr_size;
+        -:  440:
+       23:  441:	u64 offset = id_relative * (ptr_size + slab_size) + ptr_size;
+       23:  442:	debug("read offset = %llu", offset);
+       23:  443:	slab->data = sa->slab_data_array[idx].data + offset;
+       23:  444:	slab->len = slab_size;
+        -:  445:
+       23:  446:	return ret;
+        -:  447:}
+        -:  448:
+        9:  449:void slab_allocator_free(SlabAllocator *sa) {
+       24:  450:	for(int i=0; i<sa->slab_data_array_len; i++) {
+       15:  451:		slab_data_free(&sa->slab_data_array[i]);
+        -:  452:	}
+        9:  453:	sa->slab_data_array_len = 0;
+        -:  454:
+        9:  455:	if(sa->slab_data_array) {
+        9:  456:		free(sa->slab_data_array);
+        9:  457:		sa->slab_data_array = NULL;
+        -:  458:	}
+        -:  459:
+        9:  460:	if(sa->sizes) {
+        9:  461:		free(sa->sizes);
+        9:  462:		sa->sizes = NULL;
+        -:  463:	}
+        -:  464:
+        9:  465:	if(sa->max_slabs) {
+        9:  466:		free(sa->max_slabs);
+        9:  467:		sa->max_slabs = NULL;
+        -:  468:	}
+        9:  469:}
+        -:  470:
+        3:  471:int slab_allocator_config_zeroed(SlabAllocatorConfigImpl *sc, bool zeroed) {
+        3:  472:	int ret = 0;
+        3:  473:	sc->type = SlabAllocatorConfigImplTypeZeroed;
+        3:  474:	sc->value = malloc(sizeof(bool));
+        3:  475:        if(sc->value == NULL) {
+    #####:  476:                ret = -1;
+        -:  477:        } else {
+        3:  478:                *((bool *)sc->value) = zeroed;
+        -:  479:        }
+        3:  480:	return ret;
+        -:  481:}
+        -:  482:
+        3:  483:int slab_allocator_config_slabs_per_resize(SlabAllocatorConfigImpl *sc, u64 slabs_per_resize) {
+        3:  484:	int ret = 0;
+        3:  485:	sc->type = SlabAllocatorConfigImplTypeSlabsPerResize;
+        3:  486:	sc->value = malloc(sizeof(u64));
+        3:  487:	if(sc->value == NULL) {
+    #####:  488:                ret = -1;
+        -:  489:        } else {
+        3:  490:		*((u64 *)sc->value) = slabs_per_resize;
+        -:  491:	}
+        3:  492:	return ret;
+        -:  493:}
+        -:  494:
+       16:  495:int slab_allocator_config_slab_data(SlabAllocatorConfigImpl *sc, u64 max_slabs, u64 slab_size) {
+       16:  496:	int ret = 0;
+       16:  497:	sc->type = SlabAllocatorConfigImplTypeSlabData;
+       16:  498:	sc->value = malloc(sizeof(u64) * 2);
+       16:  499:	if(sc->value == NULL) {
+    #####:  500:		ret = -1;
+        -:  501:	} else {
+       16:  502:		(((u64 *)sc->value)[0]) = max_slabs;
+       16:  503:		(((u64 *)sc->value)[1]) = slab_size;
+        -:  504:	}
+       16:  505:	return ret;
+        -:  506:}
+        -:  507:
+       22:  508:void slab_allocator_config_free(SlabAllocatorConfigImpl *sc) {
+       22:  509:	if(sc->value != NULL) {
+       22:  510:		free(sc->value);
+       22:  511:		sc->value = NULL;
+        -:  512:	}
+       22:  513:}</textarea>
 		</p>
 	</body>
 </html>

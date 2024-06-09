@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['free_5flist_5fhead_361',['free_list_head',['../structSlabDataParams.html#a6ce549a63c8c789b25497b393068ec4a',1,'SlabDataParams']]]
+  ['data_484',['data',['../structSlabData.html#a2738164088caf7d104e6948cafcd080c',1,'SlabData::data()'],['../structSlab.html#a26a854401ba1c09bfe2263542eefc4e2',1,'Slab::data()']]],
+  ['deserialize_485',['deserialize',['../structSerializable.html#a25a39c9828da8f558834e930f7dc9486',1,'Serializable']]]
 ];

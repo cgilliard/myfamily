@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['mystruct_214',['MyStruct',['../structMyStruct.html',1,'']]]
+  ['collection_286',['Collection',['../structCollection.html',1,'']]],
+  ['collectionconfig_287',['CollectionConfig',['../structCollectionConfig.html',1,'']]]
 ];

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['read_5ffixed_5fbytes_367',['read_fixed_bytes',['../structReader.html#ac7b9bf005572be1eeebca0b1b77e643d',1,'Reader']]]
+  ['none_490',['None',['../option_8c.html#a470d3fb08b223f1acd3c7252162252b6',1,'option.c']]],
+  ['null_5fptr_491',['null_ptr',['../structSlabDataParams.html#a008dc36efe097e5e986a934c3a57136d',1,'SlabDataParams']]]
 ];

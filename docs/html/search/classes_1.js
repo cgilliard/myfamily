@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['reader_215',['Reader',['../structReader.html',1,'']]]
+  ['iterator_288',['Iterator',['../structIterator.html',1,'']]]
 ];

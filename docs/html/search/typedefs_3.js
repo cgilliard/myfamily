@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['writer_393',['Writer',['../ser_8h.html#af51bd880557b9b7f3af54512f3351a86',1,'ser.h']]]
+  ['optionimpl_518',['OptionImpl',['../option_8h.html#a98711dafd79e93efe87c00a9b9f6db5b',1,'option.h']]]
 ];
