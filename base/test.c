@@ -95,9 +95,17 @@ Test(base, user_defined) {
 	cr_assert_eq(unwrapped.x, 2);
 	cr_assert_eq(unwrapped.y, 3);
 	cr_assert(!strcmp(unwrapped.data, "test1"));
+
+	printf("pre\n");
+	String s = STRINGP(&s, "hello");
+	printf("post\n");
+	// printf("post %s\n", s.to_str());
+	cr_assert(!strcmp(s.ptr, "hello"));
+	// cr_assert(!strcmp(s.to_str(), "this is a test999"));
 }
 
 Result test_call(Result *res) {
+
 	Result r;
 	StringPtr *s = CALL(res, STRING(&r, "abc123"));
 
@@ -110,8 +118,8 @@ Result test_call(Result *res) {
 Test(base, StringTest) {
 	void *ptr = NULL;
 	{
-		String x;
-		string_set(&x, "this is a test");
+		String x = STRINGP(&x, "this is a test44");
+		cr_assert(!strcmp(TO_STR(x), "this is a test44"));
 		String s;
 		s.ptr = malloc(sizeof(char) * 10);
 		ptr = &s;
@@ -144,10 +152,7 @@ Result test_error(Result *res, int x) {
 
 Result test_string(Result *res, int x) {
 	if (x > 100) {
-		String s;
-		printf("pre set\n");
-		string_set(&s, "test str");
-		printf("post set\n");
+		String s = STRINGP(&s, "test str");
 		return Ok(res, s);
 	} else {
 		Error err = ERROR(&err, ILLEGAL_STATE, "test error %d", 3);
@@ -213,9 +218,8 @@ Test(base, TestCopy) {
 	void *confirm1;
 	void *confirm2;
 	{
-		String s;
+		String s = STRINGP(&s, "test");
 		String s2;
-		string_set(&s, "test");
 
 		Copy stest = COPY(stest, s);
 		stest.copy(&s2, &s);
@@ -227,4 +231,3 @@ Test(base, TestCopy) {
 	cr_assert_eq(((String *)confirm1)->ptr, NULL);
 	cr_assert_eq(((String *)confirm2)->ptr, NULL);
 }
-

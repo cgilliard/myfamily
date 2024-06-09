@@ -17,23 +17,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-const ErrorKind ERROR_KIND_OOM = {"MEMORY_ALLOC"};
+const ErrorKind OOM = {"MEMORY_ALLOC"};
+
+static char *to_str_impl() { return "this is a test999"; }
 
 void string_free(StringPtr *s) {
 	if (s->ptr) {
 		free(s->ptr);
 		s->ptr = NULL;
-	}
-}
-
-Result string_build(Result *res, const char *ptr) {
-	String s;
-	if (string_set(&s, ptr)) {
-		Error err = ERROR(&err, ERROR_KIND_OOM,
-				  "Could not allocate sufficient memory");
-		return Err(res, err);
-	} else {
-		return Ok(res, s);
 	}
 }
 
@@ -50,3 +41,15 @@ int string_set(StringPtr *s, const char *ptr) {
 
 	return ret;
 }
+
+Result string_build(Result *res, const char *ptr) {
+	String s;
+	if (string_set(&s, ptr)) {
+		Error err =
+		    ERROR(&err, OOM, "Could not allocate sufficient memory");
+		return Err(res, err);
+	}
+
+	return Ok(res, s);
+}
+

@@ -206,9 +206,14 @@ void string_free(StringPtr *s);
 #define String StringPtr CLEANUP(string_free)
 
 Result string_build(Result *res, const char *ptr);
+#define TO_STR(s) s.ptr
 #define STRING(r, s) string_build(r, s)
-int string_set(StringPtr *s, const char *ptr);
-#define STRING_INIT(s, value) string_set(&s, value)
+#define STRINGP(s, schar)                                                      \
+	({                                                                     \
+		Result rs;                                                     \
+		rs = STRING(&rs, schar);                                       \
+		UNWRAP(s, rs);                                                 \
+	})
 
 i64 saddi64(i64 a, i64 b);
 u64 saddu64(u64 a, u64 b);
