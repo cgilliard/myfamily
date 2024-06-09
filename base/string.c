@@ -53,4 +53,3 @@ Result string_build(Result *res, const char *ptr) {
 
 	return Ok(res, s);
 }
-

@@ -297,4 +297,3 @@ Test(base, alloc) {
 
 	cr_assert_eq(diff_free, diff_alloc);
 }
-
