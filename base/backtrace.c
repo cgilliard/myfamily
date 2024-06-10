@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/backtrace.h>
 #include <base/tlmalloc.h>
-#include <base/types.h>
 #include <dlfcn.h>
 #include <execinfo.h>
 #include <stdio.h>
@@ -67,7 +67,7 @@ void backtrace_copy(Backtrace *dst, Backtrace *src) {
 	}
 }
 
-void backtrace_free(BacktraceImpl *ptr) {
+void backtrace_free(BacktracePtr *ptr) {
 	for (int i = 0; i < ptr->count; i++) {
 		tlfree(ptr->rows[i].function_name);
 		tlfree(ptr->rows[i].bin_name);
@@ -188,8 +188,8 @@ int get_file_line(char *bin, char *addr, char *line_num, char *fn_name,
 	return 0;
 }
 
-int backtrace_generate(Backtrace *ptr, u64 max_depth) {
-	int ret = 0;
+Backtrace backtrace_generate(u64 max_depth) {
+	BacktracePtr ptr = EMPTY_BACKTRACE;
 	void *array[max_depth];
 	int size = backtrace(array, max_depth);
 	char **strings = backtrace_symbols(array, size);
@@ -218,7 +218,7 @@ int backtrace_generate(Backtrace *ptr, u64 max_depth) {
 			strcpy(file_path, "Unknown");
 		}
 		ent.file_path = file_path;
-		backtrace_add_entry(ptr, &ent);
+		backtrace_add_entry(&ptr, &ent);
 #else  // LINUX/WIN for now
 		char buffer[2050];
 		char address[101];
@@ -274,7 +274,7 @@ int backtrace_generate(Backtrace *ptr, u64 max_depth) {
 		ent.function_name = fn_name;
 		ent.file_path = file_path;
 		ent.bin_name = buffer;
-		backtrace_add_entry(ptr, &ent);
+		backtrace_add_entry(&ptr, &ent);
 #endif // OS Specific code
 	}
 
@@ -282,5 +282,5 @@ int backtrace_generate(Backtrace *ptr, u64 max_depth) {
 	if (strings != NULL)
 		free(strings);
 
-	return ret;
+	return ptr;
 }

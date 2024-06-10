@@ -12,35 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/panic.h>
-#include <base/rand.h>
-#include <base/tlmalloc.h>
+#ifndef _BACKTRACE_BASE__
+#define _BACKTRACE_BASE__
+
 #include <base/types.h>
-#include <stdlib.h>
-#include <string.h>
 
-bool option_is_some_false() { return false; }
+typedef struct BacktraceEntry {
+	char *function_name;
+	char *bin_name;
+	char *address;
+	char *file_path;
+} BacktraceEntry;
 
-bool option_is_some_true() { return true; }
+typedef struct BacktracePtr {
+	BacktraceEntry *rows;
+	u64 count;
+} BacktracePtr;
 
-void *option_unwrap(Option x) {
-	if (!x.is_some()) {
-		panic("attempt to unwrap on a None");
-	} else {
-		return x.ref;
-	}
-}
+void backtrace_free(BacktracePtr *ptr);
+#define Backtrace BacktracePtr CLEANUP(backtrace_free)
+#define EMPTY_BACKTRACE {NULL, 0}
+Backtrace backtrace_generate(u64 max_depth);
 
-Option option_build(OptionImpl *opt, void *x, size_t size) {
-	(*opt).is_some = option_is_some_true;
-	(*opt).ref = tlmalloc(size);
-	memcpy((*opt).ref, x, size);
-	return *opt;
-}
+// #define ERROR_PRINT_FLAG_NO_COLOR 0x1
+void backtrace_print(Backtrace *ptr, int flags);
+void backtrace_copy(Backtrace *dst, Backtrace *src);
 
-void option_free(OptionImpl *ptr) {
-	if (ptr->ref) {
-		tlfree(ptr->ref);
-		ptr->ref = NULL;
-	}
-}
+#endif // _BACKTRACE_BASE__
+

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _RAND_BASE__
-#define _RAND_BASE__
+#ifndef _BASE_RAND__
+#define _BASE_RAND__
 
 #include <base/types.h>
 #include <stdlib.h>
@@ -119,4 +119,4 @@ int rand_u128(u128 *v);
  */
 int rand_bytes(void *buf, size_t length);
 
-#endif /* _RAND_BASE__ */
+#endif // _BASE_RAND__

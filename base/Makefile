@@ -1,4 +1,4 @@
-OBJS := rand.o ser.o satops.o option.o panic.o error.o backtrace.o copy.o result.o string.o tlmalloc.o
+OBJS := rand.o panic.o tlmalloc.o backtrace.o
 TEST_OBJS := $(OBJS)
 
 include ../Makefile.template

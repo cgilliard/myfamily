@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef __CLEANUP_BASE_
-#define __CLEANUP_BASE_
+#ifndef _CLEANUP_BASE__
+#define _CLEANUP_BASE__
 
 // Ensure the cleanup attribute is available
 #ifdef __GNUC__
@@ -22,4 +22,4 @@
 #define CLEANUP(f)
 #endif
 
-#endif // __CLEANUP_BASE_
+#endif // _CLEANUP_BASE__

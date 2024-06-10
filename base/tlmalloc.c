@@ -45,5 +45,4 @@ void tlfree(void *ptr) {
 u128 cur_bytes_alloc() { return THREAD_LOCAL_TLMALLOC.cur_bytes; }
 u64 alloc_count() { return THREAD_LOCAL_TLMALLOC.cur_allocs; }
 u64 realloc_count() { return THREAD_LOCAL_TLMALLOC.cur_reallocs; }
-
 u64 free_count() { return THREAD_LOCAL_TLMALLOC.cur_frees; }

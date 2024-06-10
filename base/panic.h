@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef __UTIL_SLABS_
-#define __UTIL_SLABS_
+#ifndef _TYPES_PANIC__
+#define _TYPES_PANIC__
 
 void panic(const char *str) __attribute__((noreturn));
 
-#endif // __UTIL_SLABS_
+#endif // _TYPES_PANIC__
