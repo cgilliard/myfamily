@@ -59,6 +59,14 @@ int backtrace_add_entry(Backtrace *ptr, BacktraceEntry *entry) {
 	return ret;
 }
 
+void backtrace_copy(Backtrace *dst, Backtrace *src) {
+	dst->count = 0;
+	dst->rows = NULL;
+	for (int i = 0; i < src->count; i++) {
+		backtrace_add_entry(dst, &src->rows[i]);
+	}
+}
+
 void backtrace_free(BacktraceImpl *ptr) {
 	for (int i = 0; i < ptr->count; i++) {
 		tlfree(ptr->rows[i].function_name);

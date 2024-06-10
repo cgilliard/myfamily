@@ -60,7 +60,7 @@ typedef struct MyStructPtr {
 
 void my_struct_free(MyStructPtr *ptr) {
 	if (ptr->data != NULL) {
-		free(ptr->data);
+		tlfree(ptr->data);
 		ptr->data = NULL;
 	}
 }
@@ -68,7 +68,7 @@ void my_struct_free(MyStructPtr *ptr) {
 #define MyStruct MyStructPtr CLEANUP(my_struct_free)
 
 MyStructPtr my_struct_build(int x, int y, char *data) {
-	char *data_copy = malloc(sizeof(char) * (strlen(data) + 1));
+	char *data_copy = tlmalloc(sizeof(char) * (strlen(data) + 1));
 	strcpy(data_copy, data);
 	MyStructPtr ret = {x, y, data_copy};
 	return ret;
@@ -81,7 +81,7 @@ void copy_my_struct(void *dest, void *src) {
 	dest_ms->y = src_ms->y;
 	if (src_ms->data != NULL) {
 		int len = strlen(src_ms->data);
-		dest_ms->data = malloc(sizeof(char) * (len + 1));
+		dest_ms->data = tlmalloc(sizeof(char) * (len + 1));
 		strcpy(dest_ms->data, src_ms->data);
 	}
 }
@@ -89,7 +89,6 @@ void copy_my_struct(void *dest, void *src) {
 Test(base, user_defined) {
 	MyStruct m = my_struct_build(2, 3, "test1");
 	Result r = OkC(&r, m, copy_my_struct);
-	// Result r = Ok(&r, m);
 
 	cr_assert(r.is_ok());
 
@@ -166,7 +165,6 @@ Result test_string(Result *res, int x) {
 }
 
 Test(base, result) {
-
 	void *ptr = NULL;
 	u64 x = 3;
 	Result r = Ok(&r, x);
@@ -184,7 +182,7 @@ Test(base, result) {
 	Result r2 = test_error(&r2, 20);
 	cr_assert_eq(r2.is_ok(), false);
 
-	Error e = Unwrap_err(r2);
+	Error e = Unwrap_err(&e, r2);
 
 	Error compare = ERROR(&compare, ILLEGAL_STATE, "test error2 %d", 2);
 
@@ -246,6 +244,16 @@ Test(base, TestCopy) {
 }
 
 Result alloc_test_fun(Result *res) {
+	MyStruct m = my_struct_build(5, 7, "test9");
+	Result rz = OkC(&rz, m, copy_my_struct);
+
+	cr_assert(rz.is_ok());
+
+	MyStruct unwrapped = UNWRAP(&unwrapped, rz);
+	cr_assert_eq(unwrapped.x, 5);
+	cr_assert_eq(unwrapped.y, 7);
+	cr_assert(!strcmp(unwrapped.data, "test9"));
+
 	Result r;
 	r = Ok(&r, UNIT);
 	Result r2;
@@ -253,8 +261,9 @@ Result alloc_test_fun(Result *res) {
 	r2 = Ok(&r2, x);
 	Error e = ERROR(&e, ILLEGAL_STATE, "ill state");
 	Result r3;
-	r3 = Ok(&r3, UNIT);
-	// r3 = Err(&r3, e);
+	r3 = Err(&r3, e);
+
+	Error zz = Unwrap_err(&zz, r3);
 	return Ok(res, UNIT);
 }
 
@@ -267,7 +276,9 @@ Test(base, alloc) {
 
 		printf("initial = %llu %llu %llu\n", initial_alloc,
 		       initial_bytes_alloc, initial_free_count);
+
 		String s = STRINGP(&s, "testing 1234");
+
 		cr_assert(!strcmp(TO_STR(s), "testing 1234"));
 
 		Result r;
@@ -276,14 +287,16 @@ Test(base, alloc) {
 
 		Result r2 = alloc_test_fun(&r2);
 		cr_assert(r2.is_ok());
-		/*
-				Error e = ERROR(&e, ILLEGAL_STATE, "ill state");
-				Backtrace bt = EMPTY_BACKTRACE;
-				backtrace_generate(&bt, 100);
-				*/
 
-		// Error e2 = ERROR(&e, ILLEGAL_STATE, "ill state");
-		//  Result r = Err(&r, e);
+		Error e = ERROR(&e, ILLEGAL_STATE, "ill state");
+
+		Backtrace bt = EMPTY_BACKTRACE;
+		backtrace_generate(&bt, 100);
+
+		Error e2 = ERROR(&e2, ILLEGAL_STATE, "ill state");
+		printf("err ok\n");
+		Result rx = Err(&rx, e2);
+		printf("res ok\n");
 	}
 
 	u64 final_alloc = alloc_count();

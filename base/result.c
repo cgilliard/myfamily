@@ -31,29 +31,36 @@ void *result_unwrap(Result x) {
 	}
 }
 
-Error result_unwrap_err(Result x) {
+Error result_unwrap_err(Error *e, Result x) {
 	if (x.is_ok()) {
 		panic("attempt to unwrap_err on an Ok");
 	} else {
-		return x.error;
+		error_copy(e, x.error);
+		x.error = NULL;
+		return *e;
 	}
 }
 
 Result result_build_ok(Result *res, Copy copy) {
+	printf("result build ok\n");
 	res->is_ok = result_is_ok_true;
 	res->value.obj = tlmalloc(copy.size);
-	res->error.backtrace.count = 0;
+	res->error = NULL;
 	copy.copy(res->value.obj, copy.obj);
+	printf("result build ok compl\n");
 
 	return *res;
 }
 
 Result result_build_err(Result *res, Error e) {
 	va_list args;
+	printf("build err\n");
 
 	res->is_ok = result_is_ok_false;
 	res->value.obj = NULL;
-	res->error = verror_build(&res->error, e.kind, e.msg, args);
+	res->error = tlmalloc(sizeof(Error));
+	*(res->error) = verror_build(res->error, e.kind, e.msg, args);
+	printf("berr complete\n");
 
 	return *res;
 }
@@ -62,6 +69,12 @@ void result_free(ResultImpl *ptr) {
 	if (ptr->value.obj) {
 		tlfree(ptr->value.obj);
 		ptr->value.obj = NULL;
+	}
+	if (ptr->error) {
+		printf("bt free %i\n", ptr);
+		backtrace_free(&ptr->error->backtrace);
+		tlfree(ptr->error);
+		ptr->error = NULL;
 	}
 	// if (!ptr->is_ok()) {
 	// printf("bt free %i\n", ptr);

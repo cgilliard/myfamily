@@ -106,6 +106,7 @@ int backtrace_generate(Backtrace *ptr, u64 max_depth);
 
 // #define ERROR_PRINT_FLAG_NO_COLOR 0x1
 void backtrace_print(Backtrace *ptr, int flags);
+void backtrace_copy(Backtrace *dst, Backtrace *src);
 
 bool option_is_some_false();
 bool option_is_some_true();
@@ -142,6 +143,7 @@ typedef struct ErrorImpl {
 } ErrorImpl;
 void error_free(ErrorImpl *err);
 #define Error ErrorImpl CLEANUP(error_free)
+void error_copy(Error *dst, Error *src);
 Error error_build(Error *err, ErrorKind kind, char *format, ...);
 Error verror_build(Error *err, ErrorKind kind, char *format, va_list args);
 #define ERROR(err, kind, ...) error_build(err, kind, ##__VA_ARGS__)
@@ -157,7 +159,7 @@ char *error_to_string(char *s, Error *e);
 typedef struct ResultImpl {
 	bool (*is_ok)();
 	Copy value;
-	Error error;
+	Error *error;
 } ResultImpl;
 
 void result_free(ResultImpl *res);
@@ -166,7 +168,7 @@ void result_free(ResultImpl *res);
 bool result_is_ok_false();
 bool result_is_ok_true();
 void *result_unwrap(Result x);
-Error result_unwrap_err(Result x);
+Error result_unwrap_err(Error *e, Result x);
 Result result_build_ok(Result *r, Copy copy);
 Result result_build_err(Result *r, Error e);
 
@@ -179,12 +181,13 @@ Result result_build_err(Result *r, Error e);
 #define CALL(res, x)                                                           \
 	({                                                                     \
 		if (!x.is_ok()) {                                              \
-			return Err(res, Unwrap_err(x));                        \
+			Error e;                                               \
+			return Err(res, Unwrap_err(&e, x));                    \
 		};                                                             \
 		result_unwrap(x);                                              \
 	})
 #define Unwrap_or(r, d) rr2.is_ok() ? *((typeof(d) *)Unwrap1(r)) : d
-#define Unwrap_err(x) result_unwrap_err(x)
+#define Unwrap_err(e, r) result_unwrap_err(e, r)
 #define Ok(r, c)                                                               \
 	({                                                                     \
 		Copy cx = COPY(cx, c);                                         \

@@ -22,6 +22,12 @@ bool errorkind_equal(ErrorKind *kind1, ErrorKind *kind2) {
 	return strcmp(kind1->type_str, kind2->type_str) == 0;
 }
 
+void error_copy(Error *dst, Error *src) {
+	strcpy(dst->kind.type_str, src->kind.type_str);
+	memcpy(dst->msg, src->msg, MAX_ERROR_MESSAGE_LEN);
+	backtrace_copy(&dst->backtrace, &src->backtrace);
+}
+
 void error_free(ErrorImpl *err) { backtrace_free(&err->backtrace); }
 
 bool error_equal(Error *e1, Error *e2) {
