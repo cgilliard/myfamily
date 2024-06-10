@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/types.h>
 #include <base/backtrace.h>
+#include <base/types.h>
 #include <stdio.h>
 
 // const ErrorKind ERROR_KIND_ILLEGAL_STATE = {"IllegalState"};

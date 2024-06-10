@@ -114,6 +114,19 @@ Test(base, test_cleanup) {
 }
 
 Test(base, test_error) {
-	Backtrace b = backtrace_generate(100);
-	backtrace_print(&b, 0);
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+	{
+		Backtrace b = backtrace_generate(100);
+		backtrace_print(&b, 0);
+		cr_assert(b.count > 0);
+		cr_assert(b.count <= 100);
+	}
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	cr_assert_eq(final_diff, initial_diff);
 }
