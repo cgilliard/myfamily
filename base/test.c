@@ -13,8 +13,12 @@
 // limitations under the License.
 
 #include <base/backtrace.h>
+#include <base/cleanup.h>
+#include <base/error.h>
+#include <base/panic.h>
 #include <base/tlmalloc.h>
 #include <base/types.h>
+#include <base/vtable.h>
 #include <criterion/criterion.h>
 #include <stdio.h>
 
@@ -113,7 +117,7 @@ Test(base, test_cleanup) {
 	cleanup_test_free(tmp);
 }
 
-Test(base, test_error) {
+Test(base, test_bt) {
 	u64 initial_alloc_count = alloc_count();
 	u64 initial_free_count = free_count();
 
@@ -129,4 +133,121 @@ Test(base, test_error) {
 	u64 final_diff = final_alloc_count - final_free_count;
 
 	cr_assert_eq(final_diff, initial_diff);
+}
+
+Test(base, test_error_kind) {
+	ErrorKind kind1 = EKIND("ILLEGAL_STATE");
+	ErrorKind kind2 = EKIND("ILLEGAL_ARGUMENT");
+
+	cr_assert(errorkind_equal(&kind1, &kind1));
+	cr_assert(!errorkind_equal(&kind1, &kind2));
+}
+
+Test(base, test_error) {
+	ErrorKind ILLEGAL_STATE = EKIND("ILLEGAL_STATE");
+	ErrorKind ILLEGAL_ARGUMENT = EKIND("ILLEGAL_ARGUMENT");
+	Error err1 = ERROR(ILLEGAL_STATE, "Illegal state number %i", 5);
+	cr_assert(!strcmp(err1.msg, "Illegal state number 5"));
+	cr_assert(equal(&ILLEGAL_STATE, &ILLEGAL_STATE));
+	cr_assert(equal(&(err1.kind), &ILLEGAL_STATE));
+}
+
+typedef struct {
+	Vtable *table;
+	int x;
+	int y;
+} MyStruct1Ptr;
+void cleanup_my_struct1(MyStruct1Ptr *obj) { printf("cleanup fn called\n"); }
+#define MyStruct1 MyStruct1Ptr CLEANUP(cleanup_my_struct1)
+
+void display_my_struct1(MyStruct1 *mstr) {
+	printf("x=%i,y=%i\n", mstr->x, mstr->y);
+}
+
+int ord_my_struct1(MyStruct1 *obj, MyStruct1 *other) {
+	if (obj->x == other->x)
+		return 0;
+	else if (obj->x > other->x)
+		return 1;
+	else
+		return -1;
+}
+
+bool equal_my_struct1(MyStruct1 *obj1, MyStruct1 *obj2) {
+	return obj1->x == obj2->x && obj1->y == obj2->y;
+}
+
+static Vtable MyStruct1Vtable = {3,
+				 {{"display", display_my_struct1},
+				  {"ord", ord_my_struct1},
+				  {"equal", equal_my_struct1}}};
+
+MyStruct1 my_struct1_build(int x, int y) {
+	MyStruct1Ptr ret = {&MyStruct1Vtable, x, y};
+	return ret;
+}
+
+typedef struct {
+	Vtable *table;
+	char *x;
+} MyStruct2Ptr;
+void cleanup_my_struct2(MyStruct2Ptr *obj) {
+	printf("cleanup fn called my_struct2\n");
+	if (obj->x) {
+		printf("tlfree %i\n", obj->x);
+		tlfree(obj->x);
+		obj->x = NULL;
+	}
+}
+#define MyStruct2 MyStruct2Ptr CLEANUP(cleanup_my_struct2)
+
+void display_my_struct2(MyStruct2 *mstr) { printf("x='%s'\n", mstr->x); }
+
+static Vtable MyStruct2Vtable = {1, {{"display", display_my_struct2}}};
+
+MyStruct2 my_struct2_build(char *x) {
+	char *x_copy = tlmalloc(sizeof(char) * (1 + strlen(x)));
+	strcpy(x_copy, x);
+	MyStruct2Ptr ret = {&MyStruct2Vtable, x_copy};
+	return ret;
+}
+
+void test_display(void *obj) {
+	void (*display)(Object *obj) = find_fn((Object *)obj, "display");
+	if (display)
+		display(obj);
+}
+
+int test_ord(void *obj, void *other) {
+	if (((Object *)obj)->vtable != ((Object *)other)->vtable) {
+		panic("attempt to compare values of different types");
+	}
+	int (*ord)(Object *obj, Object *other) = find_fn((Object *)obj, "ord");
+	if (ord == NULL)
+		panic("ord not implemented");
+	return ord(obj, other);
+}
+
+static Vtable AnotherVtable = {0, NULL};
+
+Test(base, test_vtable) {
+	MyStruct1 test1 = my_struct1_build(10, 20);
+	test_display(&test1);
+
+	MyStruct1 test2 = my_struct1_build(100, 200);
+	test_display(&test2);
+
+	MyStruct1 test3 = my_struct1_build(1000, 2000);
+	test_display(&test3);
+
+	printf("o1=%i\n", test_ord(&test1, &test2));
+	printf("o2=%i\n", test_ord(&test2, &test1));
+	printf("oe=%i\n", test_ord(&test1, &test1));
+
+	MyStruct2 test4 = my_struct2_build("hello!");
+	test_display(&test4);
+
+	cr_assert(equal(&test1, &test1));
+	cr_assert(!equal(&test1, &test2));
+	cr_assert(!equal(&test1, &test4));
 }

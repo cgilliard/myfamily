@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/backtrace.h>
+#include <base/colors.h>
 #include <base/tlmalloc.h>
 #include <dlfcn.h>
 #include <execinfo.h>
@@ -36,26 +37,63 @@ int backtrace_add_entry(Backtrace *ptr, BacktraceEntry *entry) {
 		}
 	}
 
+	if (ptr->rows == NULL) {
+		printf("could not allocate memory for backtrace\n");
+		ret = -1;
+	}
+
 	if (!ret) {
 		ptr->rows[ptr->count].function_name =
 		    tlmalloc(sizeof(char) * (strlen(entry->function_name) + 1));
+		if (ptr->rows[ptr->count].function_name == NULL) {
+			printf("could not allocate memory for backtrace\n");
+			ret = -1;
+		}
+	}
+
+	if (!ret) {
 		strcpy(ptr->rows[ptr->count].function_name,
 		       entry->function_name);
 
 		ptr->rows[ptr->count].bin_name =
 		    tlmalloc(sizeof(char) * (strlen(entry->bin_name) + 1));
+
+		if (ptr->rows[ptr->count].bin_name == NULL) {
+			printf("could not allocate memory for backtrace\n");
+			ret = -1;
+		}
+	}
+	if (!ret) {
 		strcpy(ptr->rows[ptr->count].bin_name, entry->bin_name);
 
 		ptr->rows[ptr->count].address =
 		    tlmalloc(sizeof(char) * (strlen(entry->address) + 1));
+
+		if (ptr->rows[ptr->count].address == NULL) {
+			printf("could not allocate memory for backtrace\n");
+			ret = -1;
+		}
+	}
+
+	if (!ret) {
 		strcpy(ptr->rows[ptr->count].address, entry->address);
 
 		ptr->rows[ptr->count].file_path =
 		    tlmalloc(sizeof(char) * (strlen(entry->file_path) + 1));
+
+		if (ptr->rows[ptr->count].file_path == NULL) {
+			printf("could not allocate memory for backtrace\n");
+			ret = -1;
+		}
 		strcpy(ptr->rows[ptr->count].file_path, entry->file_path);
 
 		ptr->count++;
 	}
+
+	if (ret) {
+		backtrace_free(ptr);
+	}
+
 	return ret;
 }
 
@@ -63,31 +101,31 @@ void backtrace_copy(Backtrace *dst, Backtrace *src) {
 	dst->count = 0;
 	dst->rows = NULL;
 	for (int i = 0; i < src->count; i++) {
-		backtrace_add_entry(dst, &src->rows[i]);
+		if (backtrace_add_entry(dst, &src->rows[i]))
+			break;
 	}
 }
 
 void backtrace_free(BacktracePtr *ptr) {
 	for (int i = 0; i < ptr->count; i++) {
-		tlfree(ptr->rows[i].function_name);
-		tlfree(ptr->rows[i].bin_name);
-		tlfree(ptr->rows[i].address);
-		tlfree(ptr->rows[i].file_path);
+		if (ptr->rows[i].function_name)
+			tlfree(ptr->rows[i].function_name);
+		if (ptr->rows[i].bin_name)
+			tlfree(ptr->rows[i].bin_name);
+		if (ptr->rows[i].address)
+			tlfree(ptr->rows[i].address);
+		if (ptr->rows[i].file_path)
+			tlfree(ptr->rows[i].file_path);
+
+		ptr->rows[i].file_path = NULL;
+		ptr->rows[i].address = NULL;
+		ptr->rows[i].bin_name = NULL;
+		ptr->rows[i].function_name = NULL;
 	}
 
 	ptr->count = 0;
 	tlfree(ptr->rows);
 }
-
-#define ANSI_COLOR_DIMMED "\x1b[2m"
-#define ANSI_COLOR_RED "\x1b[31m"
-#define ANSI_COLOR_BRIGHT_RED "\x1b[91m"
-#define ANSI_COLOR_GREEN "\x1b[32m"
-#define ANSI_COLOR_YELLOW "\x1b[33m"
-#define ANSI_COLOR_BLUE "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN "\x1b[36m"
-#define ANSI_COLOR_RESET "\x1b[0m"
 
 void backtrace_print(Backtrace *ptr, int flags) {
 	printf("Backtrace:\n");
@@ -120,18 +158,18 @@ void backtrace_print(Backtrace *ptr, int flags) {
 int get_file_line(char *bin, char *addr, char *line_num, char *fn_name,
 		  int max_len) {
 	pid_t process_id;
-	char cmd[strlen(bin) + strlen(addr) + 100];
+	int cmd_max_len = strlen(bin) + strlen(addr) + 100;
+	char cmd[cmd_max_len];
 #ifdef __APPLE__
-	sprintf(cmd, "atos --fullPath -o %s %s", bin, addr);
+	snprintf(cmd, cmd_max_len, "atos --fullPath -o %s %s", bin, addr);
 #else  // LINUX/WIN for now
-	sprintf(cmd, "addr2line -f -e %s %s", bin, addr);
+	snprintf(cmd, cmd_max_len, "addr2line -f -e %s %s", bin, addr);
 #endif // OS Specific code
 
 	char buffer[BUFSIZE] = {0};
 	FILE *fp;
 
 	if ((fp = popen(cmd, "r")) == NULL) {
-		printf("Error opening pipe!\n");
 		return -1;
 	}
 
@@ -181,7 +219,6 @@ int get_file_line(char *bin, char *addr, char *line_num, char *fn_name,
 	}
 
 	if (pclose(fp)) {
-		printf("Command not found or exited with error status\n");
 		return -1;
 	}
 
@@ -201,7 +238,7 @@ Backtrace backtrace_generate(u64 max_depth) {
 		Dl_info info;
 		dladdr(array[i], &info);
 		u64 addr = 0x0000000100000000 + info.dli_saddr - info.dli_fbase;
-		sprintf(address, "0x%" PRIx64 "", addr);
+		snprintf(address, 30, "0x%" PRIx64 "", addr);
 		ent.address = address;
 		char function_name[strlen(info.dli_sname) + 1];
 		char bin_name[strlen(info.dli_fname) + 1];
@@ -218,7 +255,8 @@ Backtrace backtrace_generate(u64 max_depth) {
 			strcpy(file_path, "Unknown");
 		}
 		ent.file_path = file_path;
-		backtrace_add_entry(&ptr, &ent);
+		if (backtrace_add_entry(&ptr, &ent))
+			break;
 #else  // LINUX/WIN for now
 		char buffer[2050];
 		char address[101];
@@ -281,7 +319,8 @@ Backtrace backtrace_generate(u64 max_depth) {
 		ent.function_name = fn_name;
 		ent.file_path = file_path;
 		ent.bin_name = buffer;
-		backtrace_add_entry(&ptr, &ent);
+		if (backtrace_add_entry(&ptr, &ent))
+			break;
 #endif // OS Specific code
 	}
 

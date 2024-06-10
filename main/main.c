@@ -13,16 +13,13 @@
 // limitations under the License.
 
 #include <base/backtrace.h>
+#include <base/error.h>
 #include <base/types.h>
 #include <stdio.h>
 
-// const ErrorKind ERROR_KIND_ILLEGAL_STATE = {"IllegalState"};
-
 int real_main(int argc, char **argv) {
-	// Error err = ERROR(&err, ERROR_KIND_ILLEGAL_STATE, "test error %d",
-	// 4); error_print(&err, 0);
-	Backtrace b = backtrace_generate(100);
-	backtrace_print(&b, 0);
+	Error err = ERROR(EKIND("IllegalState"), "test error %d", 8);
+	error_print(&err, 0);
 
 	printf("main doesn't currently do anything\n");
 	return 0;

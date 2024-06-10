@@ -13,10 +13,28 @@
 // limitations under the License.
 
 #include <base/panic.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <base/tlmalloc.h>
+#include <base/vtable.h>
+#include <string.h>
 
-void panic(const char *str) {
-	printf("thread panicked: %s\n", str);
-	exit(-1);
+void *find_fn(Object *obj, const char *trait) {
+	for (int i = 0; i < obj->vtable->len; i++) {
+		if (!strcmp(trait, obj->vtable->entries[i].name)) {
+			return obj->vtable->entries[i].fn_ptr;
+		}
+	}
+	return NULL;
 }
+
+bool equal(void *obj1, void *obj2) {
+	if (((Object *)obj1)->vtable != ((Object *)obj2)->vtable) {
+		return false;
+	}
+	int (*equal)(Object *obj1, Object *obj2) =
+	    find_fn((Object *)obj1, "equal");
+
+	if (equal == NULL)
+		panic("equal not implemented for this type");
+	return equal(obj1, obj2);
+}
+

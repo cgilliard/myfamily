@@ -12,11 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/panic.h>
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef _VTABLE_BASE__
+#define _VTABLE_BASE__
 
-void panic(const char *str) {
-	printf("thread panicked: %s\n", str);
-	exit(-1);
-}
+#include <base/types.h>
+
+typedef struct {
+	char *name;
+	void *fn_ptr;
+} VtableEntry;
+
+typedef struct {
+	u64 len;
+	VtableEntry entries[];
+} Vtable;
+
+typedef struct {
+	Vtable *vtable;
+} Object;
+
+void *find_fn(Object *obj, const char *trait);
+
+// common fns
+bool equal(void *obj1, void *obj2);
+
+#endif // _VTABLE_BASE__
