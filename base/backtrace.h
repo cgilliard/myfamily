@@ -39,4 +39,3 @@ void backtrace_print(Backtrace *ptr, int flags);
 void backtrace_copy(Backtrace *dst, Backtrace *src);
 
 #endif // _BACKTRACE_BASE__
-

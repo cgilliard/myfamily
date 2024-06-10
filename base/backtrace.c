@@ -269,6 +269,12 @@ Backtrace backtrace_generate(u64 max_depth) {
 		if (!strcmp(file_path, "")) {
 			strcpy(file_path, "Unknown");
 		}
+		if (!strcmp(file_path, "") || file_path[0] == 63 || file_path[0] == -107) {
+                        strcpy(file_path, "Unknown");
+                }
+                if (fn_name[0] == 63 || fn_name[0] == -107)
+                        strcpy(fn_name, "Unknown");
+
 		BacktraceEntry ent;
 		ent.address = address;
 		ent.function_name = fn_name;
