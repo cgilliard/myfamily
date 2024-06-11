@@ -14,9 +14,11 @@
 
 #include <base/backtrace.h>
 #include <base/cleanup.h>
+#include <base/ekinds.h>
 #include <base/error.h>
 #include <base/panic.h>
 #include <base/result.h>
+#include <base/string.h>
 #include <base/tlmalloc.h>
 #include <base/types.h>
 #include <base/vtable.h>
@@ -137,8 +139,8 @@ Test(base, test_bt) {
 }
 
 Test(base, test_error_kind) {
-	ErrorKind kind1 = EKind("ILLEGAL_STATE");
-	ErrorKind kind2 = EKind("ILLEGAL_ARGUMENT");
+	ErrorKind kind1 = ILLEGAL_STATE;
+	ErrorKind kind2 = ILLEGAL_ARGUMENT;
 
 	cr_assert(errorkind_equal(&kind1, &kind1));
 	cr_assert(!errorkind_equal(&kind1, &kind2));
@@ -336,9 +338,6 @@ Test(base, test_result) {
 	cr_assert_eq(initial_diff, final_diff);
 }
 
-static ErrorKind ILLEGAL_STATE = EKind("IllegalState");
-static ErrorKind ILLEGAL_ARGUMENT = EKind("IllegalArgument");
-
 Result my_test_fun(int x, int y) {
 	if (x > 100) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "arg not valid: %i", x);
@@ -504,3 +503,35 @@ Test(base, test_unwrap) {
 	printf("initialdiff=%llu,final_diff=%llu\n", initial_diff, final_diff);
 	cr_assert_eq(initial_diff, final_diff);
 }
+
+Test(base, test_string) {
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+
+	{
+		Result r1 = string_build("test123");
+		cr_assert(r1.is_ok());
+		StringPtr *s1 = Expect(r1);
+		cr_assert(!strcmp(to_str(s1), "test123"));
+
+		String s2 = Str("this is a test3");
+		cr_assert(!strcmp(to_str(&s2), "this is a test3"));
+
+		cr_assert(!equal(s1, &s2));
+
+		String s3 = Str("test123");
+		cr_assert(equal(s1, &s3));
+
+		String s4 = EMPTY_STRING;
+		cr_assert(!equal(s1, &s4));
+	}
+
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	printf("initialdiff=%llu,final_diff=%llu\n", initial_diff, final_diff);
+	cr_assert_eq(initial_diff, final_diff);
+}
+

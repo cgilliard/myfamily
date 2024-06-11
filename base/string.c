@@ -12,23 +12,54 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/ekinds.h>
+#include <base/panic.h>
 #include <base/string.h>
 #include <base/tlmalloc.h>
 
-void string_free(StringPtr *s) {}
-Result string_build(const char *ptr) {
-	u64 x = 0;
-	return Ok(x);
+void string_free(StringPtr *s) {
+	if (!s->no_cleanup && s->ptr) {
+		tlfree(s->ptr);
+		s->ptr = NULL;
+	}
 }
-void string_copy(String *dst, String *src) {
+Result string_build(const char *s) {
+	u64 len = strlen(s);
+	char *scopy = tlmalloc((len + 1) * sizeof(char));
+	if (scopy == NULL) {
+		Error e = ERROR(ILLEGAL_STATE, "could not allocate memory");
+		return Err(e);
+	}
+	strcpy(scopy, s);
+	String ret = {&StringVtable, scopy, len, false};
+	return Ok(ret);
+}
+
+bool string_copy(String *dst, String *src) {
 	dst->len = src->len;
+	dst->no_cleanup = false;
 
 	dst->ptr = tlmalloc(sizeof(char) * (dst->len + 1));
 	if (dst->ptr) {
 		strcpy(dst->ptr, src->ptr);
+		return true;
+	} else {
+		return false;
 	}
+
 	// TODO: handle allocation error
 }
-size_t string_size(String *s) { return 0; }
-bool string_equal(String *s1, String *s2) { return false; }
-char *string_unwrap(String *s) { return NULL; }
+size_t string_size(String *s) { return sizeof(String); }
+bool string_equal(String *s1, String *s2) {
+	return !strcmp(to_str(s1), to_str(s2));
+}
+char *string_unwrap(String *s) { return s->ptr; }
+
+String string_build_expect(const char *ptr) {
+	Result r = string_build(ptr);
+	StringPtr *p = unwrap(&r);
+	StringPtr ret = EMPTY_STRING;
+	ret.no_cleanup = false;
+	copy(&ret, p);
+	return ret;
+}

@@ -63,6 +63,13 @@ void *unwrap(void *obj) {
 	return do_unwrap(obj);
 }
 
+char *to_str(void *obj) {
+	char *(*do_to_str)(Object *obj) = find_fn((Object *)obj, "to_str");
+	if (do_to_str == NULL)
+		panic("to_str not implemented for this type");
+	return do_to_str(obj);
+}
+
 void *unwrap_err(void *obj) {
 	void *(*do_unwrap)(Object *obj) = find_fn((Object *)obj, "unwrap_err");
 	if (do_unwrap == NULL)
@@ -70,12 +77,12 @@ void *unwrap_err(void *obj) {
 	return do_unwrap(obj);
 }
 
-void copy(void *dst, void *src) {
-	void *(*do_copy)(Object *dst, Object *src) =
+bool copy(void *dst, void *src) {
+	bool *(*do_copy)(Object *dst, Object *src) =
 	    find_fn((Object *)dst, "copy");
 	if (do_copy == NULL)
 		panic("copy not implemented for this type");
-	do_copy(dst, src);
+	return do_copy(dst, src);
 }
 
 size_t size(void *obj) {

@@ -65,7 +65,7 @@ void error_free(ErrorPtr *err);
 // vtable impls
 bool error_equal(Error *e1, Error *e2);
 size_t error_size(Error *e);
-void error_copy(Error *dst, Error *src);
+bool error_copy(Error *dst, Error *src);
 
 // vtable
 static VtableEntry ErrorVtableEntries[] = {{"copy", error_copy},

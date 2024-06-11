@@ -24,21 +24,26 @@ typedef struct StringPtr {
 	Vtable *vtable;
 	char *ptr;
 	u64 len;
+	bool no_cleanup;
 } StringPtr;
 
 void string_free(StringPtr *s);
 Result string_build(const char *ptr);
-void string_copy(String *dst, String *src);
+String string_build_expect(const char *ptr);
+bool string_copy(String *dst, String *src);
 size_t string_size(String *s);
 bool string_equal(String *s1, String *s2);
 char *string_unwrap(String *s);
 
 // vtable
-static VtableEntry StringVtableEntries[] = {{"copy", string_copy},
-					    {"size", string_size},
-					    {"equal", string_equal},
-					    {"cleanup", string_free},
-					    {"unwrap", string_unwrap}};
+static VtableEntry StringVtableEntries[] = {
+    {"copy", string_copy},     {"size", string_size},
+    {"equal", string_equal},   {"cleanup", string_free},
+    {"unwrap", string_unwrap}, {"to_str", string_unwrap}};
+
 DEFINE_VTABLE(StringVtable, StringVtableEntries)
+
+#define EMPTY_STRING {&StringVtable, "", 0, true}
+#define Str(s) string_build_expect(s)
 
 #endif // _STRING_BASE__

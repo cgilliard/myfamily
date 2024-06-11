@@ -56,7 +56,12 @@ Error verror_build(ErrorKind kind, char *format, va_list args) {
 	err.vtable = &ErrorVtable;
 
 	// set error message to formatted message
-	vasprintf(&err.msg, format, args);
+	if (vasprintf(&err.msg, format, args) < 0) {
+		// couldn't allocate memory
+		err.msg = NULL;
+		// continue because we can copy the error kind over and
+		// attempte to get the backtrace
+	}
 
 	// copy kind over
 	err.kind = errorkind_build(kind.type_str);
@@ -85,6 +90,7 @@ bool error_equal(Error *e1, Error *e2) {
 }
 
 size_t error_size(Error *e) { return sizeof(Error); }
-void error_copy(Error *dst, Error *src) {
+bool error_copy(Error *dst, Error *src) {
 	*dst = error_build(src->kind, "%s", src->msg);
+	return true;
 }

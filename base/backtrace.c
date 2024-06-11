@@ -231,6 +231,9 @@ Backtrace backtrace_generate(u64 max_depth) {
 	int size = backtrace(array, max_depth);
 	char **strings = backtrace_symbols(array, size);
 
+	if (strings == NULL)
+		size = 0;
+
 	for (int i = 0; i < size; i++) {
 #ifdef __APPLE__
 		BacktraceEntry ent;

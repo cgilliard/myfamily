@@ -56,7 +56,8 @@ bool equal(void *obj1, void *obj2);
 void *unwrap(void *obj);
 void *unwrap_err(void *obj);
 size_t size(void *obj);
-void copy(void *dest, void *src);
+bool copy(void *dest, void *src);
 void cleanup(void *ptr);
+char *to_str(void *s);
 
 #endif // _VTABLE_BASE__

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/ekinds.h>
 #include <base/panic.h>
 #include <base/result.h>
 #include <base/tlmalloc.h>
@@ -55,8 +56,13 @@ Result result_build_ok(void *ref) {
 	ret.ref = tlmalloc(size(ref));
 	((Object *)ret.ref)->vtable = ((Object *)ref)->vtable;
 	ret.no_clean = false;
-	copy(ret.ref, ref);
-	return ret;
+	if (copy(ret.ref, ref)) {
+		return ret;
+	} else {
+		// error copying return err
+		Error err = ERROR(COPYING_ERROR, "could not copy to result");
+		return Err(err);
+	}
 }
 
 void result_init_prim_generic(ResultPtr *ptr, size_t size, void *ref) {
@@ -75,6 +81,9 @@ Result result_build_err(Error err) {
 	ret.ref = NULL;
 	ret.err = tlmalloc(size(&err));
 	((Object *)ret.err)->vtable = err.vtable;
+
+	// error copy always succeeds
 	copy(ret.err, &err);
+
 	return ret;
 }
