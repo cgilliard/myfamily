@@ -17,8 +17,10 @@
 #include <base/types.h>
 #include <stdio.h>
 
+static ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
+
 int real_main(int argc, char **argv) {
-	Error err = ERROR(EKIND("IllegalState"), "test error %d", 8);
+	Error err = ERROR(ILLEGAL_STATE, "test error %d", 8);
 	error_print(&err, 0);
 
 	printf("main doesn't currently do anything\n");

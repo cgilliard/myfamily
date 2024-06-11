@@ -14,6 +14,7 @@
 
 #include <base/colors.h>
 #include <base/error.h>
+#include <stdlib.h>
 #include <string.h>
 
 bool errorkind_equal(ErrorKind *kind1, ErrorKind *kind2) {
@@ -33,7 +34,15 @@ ErrorKind errorkind_build(char *type_str) {
 	return ret;
 }
 
-void error_free(ErrorPtr *err) { backtrace_free(&err->backtrace); }
+void error_free(ErrorPtr *err) {
+	if (err->msg) {
+		// don't use tlfree because this is allocated by vasprintf which
+		// uses malloc
+		free(err->msg);
+		err->msg = NULL;
+	}
+	backtrace_free(&err->backtrace);
+}
 
 Error error_build(ErrorKind kind, char *format, ...) {
 	va_list args;
@@ -47,10 +56,10 @@ Error verror_build(ErrorKind kind, char *format, va_list args) {
 	err.vtable = &ErrorVtable;
 
 	// set error message to formatted message
-	vsnprintf(err.msg, MAX_ERROR_MSG_LEN, format, args);
+	vasprintf(&err.msg, format, args);
 
 	// copy kind over
-	err.kind = EKIND(kind.type_str);
+	err.kind = errorkind_build(kind.type_str);
 
 	// generate a backtrace
 	err.backtrace = backtrace_generate(ERROR_BACKTRACE_MAX_DEPTH);
@@ -73,4 +82,9 @@ void error_print(Error *err, int flags) {
 bool error_equal(Error *e1, Error *e2) {
 	// only compare kinds of errors, not message
 	return errorkind_equal(&e1->kind, &e2->kind);
+}
+
+size_t error_size(Error *e) { return sizeof(Error); }
+void error_copy(Error *dst, Error *src) {
+	*dst = error_build(src->kind, "%s", src->msg);
 }

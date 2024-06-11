@@ -14,48 +14,75 @@
 
 #ifndef _ERROR_BASE__
 #define _ERROR_BASE__
+#define ERROR_PRINT_FLAG_NO_COLOR 0x1
+#define ERROR_PRINT_FLAG_NO_BACKTRACE 0x1 << 1
 
 #include <base/vtable.h>
 #include <string.h>
 
 #define MAX_ERROR_KIND_LEN 128
 #define MAX_ERROR_MSG_LEN 512
+#define ERROR_BACKTRACE_MAX_DEPTH 512
 
 #include <base/backtrace.h>
 #include <base/types.h>
 
-typedef struct ErrorKind {
+// ErrorKind
+
+// typedef
+typedef struct {
 	Vtable *vtable;
 	char type_str[MAX_ERROR_KIND_LEN];
 } ErrorKind;
 
+// vtable impls
 bool errorkind_equal(ErrorKind *kind1, ErrorKind *kind2);
-static Vtable ErrorKindVtable = {1, {{"equal", errorkind_equal}}};
+
+// vtable
+static Vtable ErrorKindVtable = {1, 1, {{"equal", errorkind_equal}}};
+
+// builder
 ErrorKind errorkind_build(char *type_str);
-#define EKIND(s) errorkind_build(s)
 
-#define ERROR_BACKTRACE_MAX_DEPTH 512
+// macro
+#define EKIND(s) {&ErrorKindVtable, s}
 
-typedef struct ErrorPtr {
+// Error
+
+// typedef
+typedef struct {
 	Vtable *vtable;
 	ErrorKind kind;
-	char msg[MAX_ERROR_MSG_LEN];
+	char *msg;
 	Backtrace backtrace;
 } ErrorPtr;
+
+// cleanup
 void error_free(ErrorPtr *err);
 #define Error ErrorPtr CLEANUP(error_free)
+
+// vtable impls
+bool error_equal(Error *e1, Error *e2);
+size_t error_size(Error *e);
+void error_copy(Error *dst, Error *src);
+
+// vtable
+static Vtable ErrorVtable = {4,
+			     2,
+			     {{"copy", error_copy},
+			      {"size", error_size},
+			      {"equal", error_equal},
+			      {"cleanup", error_free}}};
+
+// builders
 Error error_build(ErrorKind kind, char *format, ...);
 Error verror_build(ErrorKind kind, char *format, va_list args);
+
+// macro
 #define ERROR(kind, ...) error_build(kind, ##__VA_ARGS__)
 
-#define ERROR_PRINT_FLAG_NO_COLOR 0x1
-#define ERROR_PRINT_FLAG_NO_BACKTRACE 0x1 << 1
-
+// other functions
 void error_print(Error *err, int flags);
-
-bool error_equal(Error *e1, Error *e2);
-static Vtable ErrorVtable = {1, {{"equal", error_equal}}};
-
 char *error_to_string(char *s, Error *e);
 
 #endif // _ERROR_BASE__

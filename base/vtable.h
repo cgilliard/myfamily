@@ -24,6 +24,7 @@ typedef struct {
 
 typedef struct {
 	u64 len;
+	u128 id;
 	VtableEntry entries[];
 } Vtable;
 
@@ -33,7 +34,14 @@ typedef struct {
 
 void *find_fn(Object *obj, const char *trait);
 
+Vtable init_vtable(u64 len, VtableEntry entries[]);
+
 // common fns
 bool equal(void *obj1, void *obj2);
+void *unwrap(void *obj);
+void *unwrap_err(void *obj);
+size_t size(void *obj);
+void copy(void *dest, void *src);
+void cleanup(void *ptr);
 
 #endif // _VTABLE_BASE__

@@ -15,6 +15,7 @@
 #include <base/panic.h>
 #include <base/tlmalloc.h>
 #include <base/vtable.h>
+#include <stdlib.h>
 #include <string.h>
 
 void *find_fn(Object *obj, const char *trait) {
@@ -27,14 +28,49 @@ void *find_fn(Object *obj, const char *trait) {
 }
 
 bool equal(void *obj1, void *obj2) {
-	if (((Object *)obj1)->vtable != ((Object *)obj2)->vtable) {
+	if (((Object *)obj1)->vtable->id != ((Object *)obj2)->vtable->id) {
 		return false;
 	}
-	int (*equal)(Object *obj1, Object *obj2) =
+	bool (*do_equal)(Object *obj1, Object *obj2) =
 	    find_fn((Object *)obj1, "equal");
 
-	if (equal == NULL)
+	if (do_equal == NULL)
 		panic("equal not implemented for this type");
-	return equal(obj1, obj2);
+	return do_equal(obj1, obj2);
 }
 
+void *unwrap(void *obj) {
+	void *(*do_unwrap)(Object *obj) = find_fn((Object *)obj, "unwrap");
+	if (do_unwrap == NULL)
+		panic("unwrap not implemented for this type");
+	return do_unwrap(obj);
+}
+
+void *unwrap_err(void *obj) {
+	void *(*do_unwrap)(Object *obj) = find_fn((Object *)obj, "unwrap_err");
+	if (do_unwrap == NULL)
+		panic("unwrap_err not implemented for this type");
+	return do_unwrap(obj);
+}
+
+void copy(void *dst, void *src) {
+	void *(*do_copy)(Object *dst, Object *src) =
+	    find_fn((Object *)dst, "copy");
+	if (do_copy == NULL)
+		panic("copy not implemented for this type");
+	do_copy(dst, src);
+}
+
+size_t size(void *obj) {
+	size_t (*do_size)(Object *obj) = find_fn((Object *)obj, "size");
+	if (do_size == NULL)
+		panic("size not implemented for this type");
+	return do_size(obj);
+}
+
+void cleanup(void *ptr) {
+	bool (*do_cleanup)(Object *ptr) = find_fn((Object *)ptr, "cleanup");
+
+	if (do_cleanup != NULL)
+		do_cleanup(ptr);
+}

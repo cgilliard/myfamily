@@ -16,6 +16,7 @@
 #include <base/cleanup.h>
 #include <base/error.h>
 #include <base/panic.h>
+#include <base/result.h>
 #include <base/tlmalloc.h>
 #include <base/types.h>
 #include <base/vtable.h>
@@ -178,6 +179,7 @@ bool equal_my_struct1(MyStruct1 *obj1, MyStruct1 *obj2) {
 }
 
 static Vtable MyStruct1Vtable = {3,
+				 3,
 				 {{"display", display_my_struct1},
 				  {"ord", ord_my_struct1},
 				  {"equal", equal_my_struct1}}};
@@ -203,7 +205,7 @@ void cleanup_my_struct2(MyStruct2Ptr *obj) {
 
 void display_my_struct2(MyStruct2 *mstr) { printf("x='%s'\n", mstr->x); }
 
-static Vtable MyStruct2Vtable = {1, {{"display", display_my_struct2}}};
+static Vtable MyStruct2Vtable = {1, 4, {{"display", display_my_struct2}}};
 
 MyStruct2 my_struct2_build(char *x) {
 	char *x_copy = tlmalloc(sizeof(char) * (1 + strlen(x)));
@@ -228,7 +230,7 @@ int test_ord(void *obj, void *other) {
 	return ord(obj, other);
 }
 
-static Vtable AnotherVtable = {0, NULL};
+static Vtable AnotherVtable = {0, 5, NULL};
 
 Test(base, test_vtable) {
 	MyStruct1 test1 = my_struct1_build(10, 20);
@@ -250,4 +252,131 @@ Test(base, test_vtable) {
 	cr_assert(equal(&test1, &test1));
 	cr_assert(!equal(&test1, &test2));
 	cr_assert(!equal(&test1, &test4));
+}
+
+typedef struct {
+	Vtable *table;
+	int x;
+	int y;
+	char *z;
+} MyStructResPtr;
+
+void cleanup_my_struct_res(MyStructResPtr *msr) {
+	if (msr->z) {
+		tlfree(msr->z);
+		msr->z = NULL;
+	}
+}
+
+#define MyStructRes MyStructResPtr CLEANUP(cleanup_my_struct_res)
+
+void my_struct_res_copy(MyStructRes *dst, MyStructRes *src) {
+	dst->table = src->table;
+	dst->x = src->x;
+	dst->y = src->y;
+	dst->z = tlmalloc(sizeof(char) * (strlen(src->z) + 1));
+	strcpy(dst->z, src->z);
+}
+
+size_t my_struct_res_size(MyStructRes *obj) { return sizeof(MyStructRes); }
+
+static Vtable MyStructResVtable = {3,
+				   6,
+				   {{"size", my_struct_res_size},
+				    {"copy", my_struct_res_copy},
+				    {"cleanup", cleanup_my_struct_res}}};
+
+MyStructRes my_struct_res_build(int x, int y, char *z) {
+	MyStructResPtr ret;
+
+	ret.z = tlmalloc(sizeof(char) * (strlen(z) + 1));
+	strcpy(ret.z, z);
+	ret.x = x;
+	ret.y = y;
+	ret.table = &MyStructResVtable;
+
+	return ret;
+}
+
+static ErrorKind test_err3 = EKIND("TEST_ERR");
+static ErrorKind test_err2 = EKIND("OTHER");
+static ErrorKind test_err = EKIND("TEST_ERR");
+
+Test(base, test_result) {
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+	{
+		MyStructRes msr = my_struct_res_build(1, 2, "this is a test");
+
+		Result r1 = result_build_ok(&msr);
+
+		cr_assert(r1.is_ok());
+
+		MyStructResPtr *res = unwrap(&r1);
+
+		cr_assert_eq(res->x, 1);
+		cr_assert_eq(res->y, 2);
+
+		Error e = ERROR(test_err3, "this is a test");
+
+		Result r2 = result_build_err(e);
+
+		cr_assert(!r2.is_ok());
+		ErrorPtr *err = unwrap_err(&r2);
+		cr_assert(equal(&err->kind, &test_err));
+		cr_assert(!equal(&err->kind, &test_err2));
+	}
+
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	printf("initialdiff=%llu,final_diff=%llu\n", initial_diff, final_diff);
+	cr_assert_eq(initial_diff, final_diff);
+}
+
+static ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
+static ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
+
+Result my_test_fun(int x, int y) {
+	if (x > 100) {
+		Error e = ERROR(ILLEGAL_ARGUMENT, "arg not valid: %i", x);
+		return Err(e);
+	} else if (y > 100) {
+		Error e = ERROR(ILLEGAL_STATE, "state not valid: %i", y);
+		return Err(e);
+	} else {
+		MyStructRes msr = my_struct_res_build(x, y, "a val");
+		return Ok(msr);
+	}
+}
+
+Test(base, test_sample) {
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+	{
+		Result r1 = my_test_fun(10, 2);
+		cr_assert(r1.is_ok());
+		MyStructResPtr *msr = unwrap(&r1);
+		cr_assert_eq(msr->x, 10);
+		cr_assert_eq(msr->y, 2);
+
+		Result r2 = my_test_fun(300, 2);
+		cr_assert(!r2.is_ok());
+		ErrorPtr *e2 = unwrap_err(&r2);
+		cr_assert(equal(&e2->kind, &ILLEGAL_ARGUMENT));
+
+		Result r3 = my_test_fun(30, 200);
+		cr_assert(!r3.is_ok());
+		ErrorPtr *e3 = unwrap_err(&r3);
+		cr_assert(equal(&e3->kind, &ILLEGAL_STATE));
+	}
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	printf("initialdiff=%llu,final_diff=%llu\n", initial_diff, final_diff);
+	cr_assert_eq(initial_diff, final_diff);
 }
