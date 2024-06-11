@@ -46,8 +46,6 @@ bool string_copy(String *dst, String *src) {
 	} else {
 		return false;
 	}
-
-	// TODO: handle allocation error
 }
 size_t string_size(String *s) { return sizeof(String); }
 bool string_equal(String *s1, String *s2) {

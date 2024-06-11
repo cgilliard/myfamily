@@ -16,6 +16,7 @@
 #include <base/cleanup.h>
 #include <base/ekinds.h>
 #include <base/error.h>
+#include <base/option.h>
 #include <base/panic.h>
 #include <base/result.h>
 #include <base/string.h>
@@ -535,3 +536,59 @@ Test(base, test_string) {
 	cr_assert_eq(initial_diff, final_diff);
 }
 
+Test(base, test_option) {
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+	{
+		String v = Str("hi");
+		Option opt1 = option_build(&v);
+		cr_assert(opt1.is_some());
+		StringPtr *ptr = unwrap(&opt1);
+		cr_assert(!strcmp(to_str(ptr), "hi"));
+
+		Option opt2 = None;
+		cr_assert(!opt2.is_some());
+
+		Result r = Ok(opt2);
+		OptionPtr *opt3 = unwrap(&r);
+
+		cr_assert(!opt3->is_some());
+
+		String v2 = Str("hi2");
+		Option nopt = Some(v2);
+		cr_assert(nopt.is_some());
+		StringPtr *ptr2 = unwrap(&nopt);
+		cr_assert(!strcmp(to_str(ptr2), "hi2"));
+
+		Result r2 = Ok(nopt);
+		cr_assert(r2.is_ok());
+		OptionPtr *optout = unwrap(&r2);
+		StringPtr *s2 = unwrap(optout);
+		String compare = Str("hi2");
+		cr_assert(equal(s2, &compare));
+
+		u32 vu32 = 100;
+		Option ou32 = Some(vu32);
+		u32 *vu32_check = unwrap(&ou32);
+		cr_assert_eq(*vu32_check, 100);
+
+		Option x2 = None;
+		u32 vv1 = 123;
+		x2 = Some(vv1);
+
+		Result r3 = Ok(x2);
+		cr_assert(r3.is_ok());
+		OptionPtr *o3 = unwrap(&r3);
+		cr_assert(o3->is_some());
+		u32 *rv = unwrap(o3);
+		cr_assert_eq(*rv, 123);
+	}
+
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	printf("initialdiff=%llu,final_diff=%llu\n", initial_diff, final_diff);
+	cr_assert_eq(initial_diff, final_diff);
+}
