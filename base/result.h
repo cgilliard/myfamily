@@ -26,6 +26,7 @@ typedef struct {
 	bool (*is_ok)();
 	Error *err;
 	void *ref;
+	bool no_clean;
 } ResultPtr;
 
 // cleanup
@@ -42,9 +43,17 @@ static Vtable ResultVtable = {
 // builders
 Result result_build_ok(void *ref);
 Result result_build_err(Error err);
+Result result_build_ok_u32(void *ref);
+Result result_build_ok_u64(void *ref);
+
+#define Ok(x)                                                                  \
+	_Generic((x),                                                          \
+	    u32: result_build_ok_u32,                                          \
+	    u64: result_build_ok_u64,                                          \
+	    default: result_build_ok)(&x)
 
 // macros
-#define Ok(x) result_build_ok(&x)
+// #define Ok(x) result_build_ok(&x)
 #define Err(x) result_build_err(x)
 
 #endif // _RESULT_BASE__

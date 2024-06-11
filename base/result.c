@@ -26,7 +26,8 @@ void result_free(ResultPtr *result) {
 		result->err = NULL;
 	}
 	if (result->ref) {
-		cleanup(result->ref);
+		if (!result->no_clean)
+			cleanup(result->ref);
 		tlfree(result->ref);
 		result->ref = NULL;
 	}
@@ -53,7 +54,29 @@ Result result_build_ok(void *ref) {
 	ret.err = NULL;
 	ret.ref = tlmalloc(size(ref));
 	((Object *)ret.ref)->vtable = ((Object *)ref)->vtable;
+	ret.no_clean = false;
 	copy(ret.ref, ref);
+	return ret;
+}
+
+void result_init_prim_generic(ResultPtr *ptr, size_t size, void *ref) {
+	ptr->vtable = &ResultVtable;
+	ptr->is_ok = is_ok_true;
+	ptr->err = NULL;
+	ptr->no_clean = true;
+	ptr->ref = tlmalloc(size);
+	memcpy(ptr->ref, ref, size);
+}
+
+Result result_build_ok_u32(void *ref) {
+	ResultPtr ret;
+	result_init_prim_generic(&ret, sizeof(u32), ref);
+	return ret;
+}
+
+Result result_build_ok_u64(void *ref) {
+	ResultPtr ret;
+	result_init_prim_generic(&ret, sizeof(u64), ref);
 	return ret;
 }
 
