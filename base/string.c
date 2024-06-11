@@ -12,9 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _PANIC_BASE__
-#define _PANIC_BASE__
+#include <base/string.h>
+#include <base/tlmalloc.h>
 
-void panic(const char *str) __attribute__((noreturn));
+void string_free(StringPtr *s) {}
+Result string_build(const char *ptr) {
+	u64 x = 0;
+	return Ok(x);
+}
+void string_copy(String *dst, String *src) {
+	dst->len = src->len;
 
-#endif // _PANIC_BASE__
+	dst->ptr = tlmalloc(sizeof(char) * (dst->len + 1));
+	if (dst->ptr) {
+		strcpy(dst->ptr, src->ptr);
+	}
+	// TODO: handle allocation error
+}
+size_t string_size(String *s) { return 0; }
+bool string_equal(String *s1, String *s2) { return false; }
+char *string_unwrap(String *s) { return NULL; }

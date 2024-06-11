@@ -15,6 +15,8 @@
 #ifndef _VTABLE_BASE__
 #define _VTABLE_BASE__
 
+#define UNIQUE_ID __COUNTER__
+
 #include <base/types.h>
 
 typedef struct {
@@ -25,16 +27,29 @@ typedef struct {
 typedef struct {
 	u64 len;
 	u128 id;
-	VtableEntry entries[];
+	VtableEntry *entries;
 } Vtable;
 
 typedef struct {
 	Vtable *vtable;
 } Object;
 
-void *find_fn(Object *obj, const char *trait);
+#define EMPTY_VTABLE {0, UNIQUE_ID, NULL}
 
-Vtable init_vtable(u64 len, VtableEntry entries[]);
+void *find_fn(Object *obj, const char *trait);
+void vtable_add_entry(Vtable *table, VtableEntry entry);
+
+#define DEFINE_VTABLE(name, entries)                                           \
+	static Vtable name = EMPTY_VTABLE;                                     \
+	static void __init_##name() {                                          \
+		int count = sizeof(entries) / sizeof(VtableEntry);             \
+		if (name.len == 0) {                                           \
+			for (int i = 0; i < count; i++) {                      \
+				vtable_add_entry(&name, entries[i]);           \
+			}                                                      \
+		}                                                              \
+	}                                                                      \
+	void __attribute__((constructor)) __init_##name();
 
 // common fns
 bool equal(void *obj1, void *obj2);

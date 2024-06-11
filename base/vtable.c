@@ -27,6 +27,23 @@ void *find_fn(Object *obj, const char *trait) {
 	return NULL;
 }
 
+void vtable_add_entry(Vtable *table, VtableEntry entry) {
+	if (table->entries == NULL) {
+		table->entries =
+		    tlmalloc(sizeof(VtableEntry) * (table->len + 1));
+		if (table->entries == NULL)
+			panic("Couldn't allocate memory for vtable");
+	} else {
+		table->entries = tlrealloc(
+		    table->entries, sizeof(VtableEntry) * (table->len + 1));
+		if (table->entries == NULL)
+			panic("Couldn't allocate memory for vtable");
+	}
+
+	memcpy(&table->entries[table->len], &entry, sizeof(VtableEntry));
+	table->len += 1;
+}
+
 bool equal(void *obj1, void *obj2) {
 	if (((Object *)obj1)->vtable->id != ((Object *)obj2)->vtable->id) {
 		return false;

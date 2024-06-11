@@ -68,18 +68,6 @@ void result_init_prim_generic(ResultPtr *ptr, size_t size, void *ref) {
 	memcpy(ptr->ref, ref, size);
 }
 
-Result result_build_ok_u32(void *ref) {
-	ResultPtr ret;
-	result_init_prim_generic(&ret, sizeof(u32), ref);
-	return ret;
-}
-
-Result result_build_ok_u64(void *ref) {
-	ResultPtr ret;
-	result_init_prim_generic(&ret, sizeof(u64), ref);
-	return ret;
-}
-
 Result result_build_err(Error err) {
 	ResultPtr ret;
 	ret.vtable = &ResultVtable;

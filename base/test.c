@@ -178,11 +178,10 @@ bool equal_my_struct1(MyStruct1 *obj1, MyStruct1 *obj2) {
 	return obj1->x == obj2->x && obj1->y == obj2->y;
 }
 
-static Vtable MyStruct1Vtable = {3,
-				 3,
-				 {{"display", display_my_struct1},
-				  {"ord", ord_my_struct1},
-				  {"equal", equal_my_struct1}}};
+static VtableEntry MyStruct1VtableEntries[] = {{"display", display_my_struct1},
+					       {"ord", ord_my_struct1},
+					       {"equal", equal_my_struct1}};
+DEFINE_VTABLE(MyStruct1Vtable, MyStruct1VtableEntries)
 
 MyStruct1 my_struct1_build(int x, int y) {
 	MyStruct1Ptr ret = {&MyStruct1Vtable, x, y};
@@ -205,7 +204,8 @@ void cleanup_my_struct2(MyStruct2Ptr *obj) {
 
 void display_my_struct2(MyStruct2 *mstr) { printf("x='%s'\n", mstr->x); }
 
-static Vtable MyStruct2Vtable = {1, 4, {{"display", display_my_struct2}}};
+static VtableEntry MyStruct2VtableEntries[] = {{"display", display_my_struct2}};
+DEFINE_VTABLE(MyStruct2Vtable, MyStruct2VtableEntries)
 
 MyStruct2 my_struct2_build(char *x) {
 	char *x_copy = tlmalloc(sizeof(char) * (1 + strlen(x)));
@@ -230,7 +230,7 @@ int test_ord(void *obj, void *other) {
 	return ord(obj, other);
 }
 
-static Vtable AnotherVtable = {0, 5, NULL};
+static Vtable AnotherVtable = {0, UNIQUE_ID, NULL};
 
 Test(base, test_vtable) {
 	MyStruct1 test1 = my_struct1_build(10, 20);
@@ -280,11 +280,11 @@ void my_struct_res_copy(MyStructRes *dst, MyStructRes *src) {
 
 size_t my_struct_res_size(MyStructRes *obj) { return sizeof(MyStructRes); }
 
-static Vtable MyStructResVtable = {3,
-				   6,
-				   {{"size", my_struct_res_size},
-				    {"copy", my_struct_res_copy},
-				    {"cleanup", cleanup_my_struct_res}}};
+static VtableEntry MyStructResVtableEntries[] = {
+    {"copy", my_struct_res_copy},
+    {"size", my_struct_res_size},
+    {"cleanup", cleanup_my_struct_res}};
+DEFINE_VTABLE(MyStructResVtable, MyStructResVtableEntries)
 
 MyStructRes my_struct_res_build(int x, int y, char *z) {
 	MyStructResPtr ret;
@@ -301,7 +301,7 @@ MyStructRes my_struct_res_build(int x, int y, char *z) {
 static ErrorKind test_err3 = EKIND("TEST_ERR");
 static ErrorKind test_err2 = EKIND("OTHER");
 static ErrorKind test_err = EKIND("TEST_ERR");
-/*
+
 Test(base, test_result) {
 	u64 initial_alloc_count = alloc_count();
 	u64 initial_free_count = free_count();
@@ -335,7 +335,7 @@ Test(base, test_result) {
 	printf("initialdiff=%llu,final_diff=%llu\n", initial_diff, final_diff);
 	cr_assert_eq(initial_diff, final_diff);
 }
-*/
+
 static ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
 static ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
 
@@ -346,7 +346,6 @@ Result my_test_fun(int x, int y) {
 	} else if (y > 100) {
 		Error e = ERROR(ILLEGAL_STATE, "state not valid: %i", y);
 		return Err(e);
-		// return Err(ERROR(ILLEGAL_STATE, "state not valid: %i", y));
 	} else {
 		MyStructRes msr = my_struct_res_build(x, y, "a val");
 		return Ok(msr);
@@ -383,7 +382,7 @@ Test(base, test_sample) {
 }
 
 Result my_test_fun2() {
-	u64 x = 10;
+	f64 x = 10.9;
 	return Ok(x);
 }
 
@@ -407,6 +406,95 @@ Test(base, test_primitives) {
 		cr_assert(r3.is_ok());
 		u32 *res3 = unwrap(&r3);
 		cr_assert_eq(*res3, v2);
+
+		f32 f1 = 9.0;
+		Result r4 = Ok(f1);
+		cr_assert(r4.is_ok());
+		f32 *res4 = unwrap(&r4);
+		cr_assert_eq(*res4, f1);
+		printf("r4id=%i, test_err3.id=%i\n", r4.vtable->id,
+		       test_err3.vtable->id);
+
+		Result tr = my_test_fun2();
+		cr_assert(tr.is_ok());
+		f64 *tres = unwrap(&tr);
+		cr_assert_eq(*tres, 10.9);
+	}
+
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	printf("initialdiff=%llu,final_diff=%llu\n", initial_diff, final_diff);
+	cr_assert_eq(initial_diff, final_diff);
+}
+
+void test_vtable_fn(void *obj) {}
+void test_vtable_fn2(void *obj) {}
+
+typedef struct {
+	Vtable *vtable;
+	int x;
+	int y;
+} MyTestVtableStruct;
+
+static VtableEntry MyTestVtableStructVtableEntries[] = {
+    {"test", test_vtable_fn}, {"test2", test_vtable_fn2}};
+DEFINE_VTABLE(MyTestVtableStructTable, MyTestVtableStructVtableEntries)
+
+Test(base, test_vtable2) {
+	printf("in test\n");
+	MyTestVtableStruct mtvs = {&MyTestVtableStructTable, 0, 1};
+	cr_assert(find_fn((Object *)&mtvs, "test") != NULL);
+	cr_assert(find_fn((Object *)&mtvs, "test2") != NULL);
+	cr_assert(find_fn((Object *)&mtvs, "test3") == NULL);
+	cr_assert_eq(MyTestVtableStructTable.len, 2);
+}
+
+Result fn_test_1(u64 x) {
+	if (x > 100) {
+		Error err = ERROR(ILLEGAL_STATE, "illegal state");
+		return Err(err);
+	}
+
+	return Ok(x);
+}
+
+Result fn_test_2(u64 x) {
+	if (x > 200) {
+		Error err = ERROR(ILLEGAL_ARGUMENT, "illegal state");
+		return Err(err);
+	}
+
+	Result rr = fn_test_1(x);
+	u64 *res = Try(rr);
+	return Ok(*res);
+}
+
+Test(base, test_unwrap) {
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+	{
+		Result r1 = fn_test_2(10);
+		cr_assert(r1.is_ok());
+		u64 *res = unwrap(&r1);
+		cr_assert_eq(*res, 10);
+
+		Result r2 = fn_test_2(101);
+		cr_assert(!r2.is_ok());
+		ErrorPtr *e2 = unwrap_err(&r2);
+		cr_assert(equal(&e2->kind, &ILLEGAL_STATE));
+
+		Result r3 = fn_test_2(201);
+		cr_assert(!r3.is_ok());
+		ErrorPtr *e3 = unwrap_err(&r3);
+		cr_assert(equal(&e3->kind, &ILLEGAL_ARGUMENT));
+
+		Result r4 = fn_test_2(20);
+		cr_assert(r4.is_ok());
+		u64 *res4 = Expect(r4);
+		cr_assert_eq(*res4, 20);
 	}
 
 	u64 final_alloc_count = alloc_count();

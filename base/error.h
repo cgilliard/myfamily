@@ -39,7 +39,8 @@ typedef struct {
 bool errorkind_equal(ErrorKind *kind1, ErrorKind *kind2);
 
 // vtable
-static Vtable ErrorKindVtable = {1, 1, {{"equal", errorkind_equal}}};
+static VtableEntry ErrorKindVtableEntries[] = {{"equal", errorkind_equal}};
+DEFINE_VTABLE(ErrorKindVtable, ErrorKindVtableEntries)
 
 // builder
 ErrorKind errorkind_build(char *type_str);
@@ -67,12 +68,11 @@ size_t error_size(Error *e);
 void error_copy(Error *dst, Error *src);
 
 // vtable
-static Vtable ErrorVtable = {4,
-			     2,
-			     {{"copy", error_copy},
-			      {"size", error_size},
-			      {"equal", error_equal},
-			      {"cleanup", error_free}}};
+static VtableEntry ErrorVtableEntries[] = {{"copy", error_copy},
+					   {"size", error_size},
+					   {"equal", error_equal},
+					   {"cleanup", error_free}};
+DEFINE_VTABLE(ErrorVtable, ErrorVtableEntries)
 
 // builders
 Error error_build(ErrorKind kind, char *format, ...);
