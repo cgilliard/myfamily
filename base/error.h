@@ -46,7 +46,7 @@ DEFINE_VTABLE(ErrorKindVtable, ErrorKindVtableEntries)
 ErrorKind errorkind_build(char *type_str);
 
 // macro
-#define EKIND(s) {&ErrorKindVtable, s}
+#define EKind(s) {&ErrorKindVtable, s}
 
 // Error
 
@@ -60,7 +60,7 @@ typedef struct {
 
 // cleanup
 void error_free(ErrorPtr *err);
-#define Error ErrorPtr CLEANUP(error_free)
+#define Error ErrorPtr Cleanup(error_free)
 
 // vtable impls
 bool error_equal(Error *e1, Error *e2);

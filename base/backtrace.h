@@ -30,7 +30,7 @@ typedef struct BacktracePtr {
 } BacktracePtr;
 
 void backtrace_free(BacktracePtr *ptr);
-#define Backtrace BacktracePtr CLEANUP(backtrace_free)
+#define Backtrace BacktracePtr Cleanup(backtrace_free)
 #define EMPTY_BACKTRACE {NULL, 0}
 Backtrace backtrace_generate(u64 max_depth);
 

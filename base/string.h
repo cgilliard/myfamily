@@ -18,7 +18,7 @@
 #include <base/result.h>
 #include <base/vtable.h>
 
-#define String StringPtr CLEANUP(string_free)
+#define String StringPtr Cleanup(string_free)
 
 typedef struct StringPtr {
 	Vtable *vtable;

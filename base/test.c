@@ -77,7 +77,7 @@ void cleanup_test_free(CleanupTestPtr *ptr) {
 	}
 }
 
-#define CleanupTest CleanupTestPtr CLEANUP(cleanup_test_free)
+#define CleanupTest CleanupTestPtr Cleanup(cleanup_test_free)
 
 CleanupTest build_cleanup_test(char *s, int x) {
 
@@ -137,16 +137,16 @@ Test(base, test_bt) {
 }
 
 Test(base, test_error_kind) {
-	ErrorKind kind1 = EKIND("ILLEGAL_STATE");
-	ErrorKind kind2 = EKIND("ILLEGAL_ARGUMENT");
+	ErrorKind kind1 = EKind("ILLEGAL_STATE");
+	ErrorKind kind2 = EKind("ILLEGAL_ARGUMENT");
 
 	cr_assert(errorkind_equal(&kind1, &kind1));
 	cr_assert(!errorkind_equal(&kind1, &kind2));
 }
 
 Test(base, test_error) {
-	ErrorKind ILLEGAL_STATE = EKIND("ILLEGAL_STATE");
-	ErrorKind ILLEGAL_ARGUMENT = EKIND("ILLEGAL_ARGUMENT");
+	ErrorKind ILLEGAL_STATE = EKind("ILLEGAL_STATE");
+	ErrorKind ILLEGAL_ARGUMENT = EKind("ILLEGAL_ARGUMENT");
 	Error err1 = ERROR(ILLEGAL_STATE, "Illegal state number %i", 5);
 	cr_assert(!strcmp(err1.msg, "Illegal state number 5"));
 	cr_assert(equal(&ILLEGAL_STATE, &ILLEGAL_STATE));
@@ -159,7 +159,7 @@ typedef struct {
 	int y;
 } MyStruct1Ptr;
 void cleanup_my_struct1(MyStruct1Ptr *obj) { printf("cleanup fn called\n"); }
-#define MyStruct1 MyStruct1Ptr CLEANUP(cleanup_my_struct1)
+#define MyStruct1 MyStruct1Ptr Cleanup(cleanup_my_struct1)
 
 void display_my_struct1(MyStruct1 *mstr) {
 	printf("x=%i,y=%i\n", mstr->x, mstr->y);
@@ -200,7 +200,7 @@ void cleanup_my_struct2(MyStruct2Ptr *obj) {
 		obj->x = NULL;
 	}
 }
-#define MyStruct2 MyStruct2Ptr CLEANUP(cleanup_my_struct2)
+#define MyStruct2 MyStruct2Ptr Cleanup(cleanup_my_struct2)
 
 void display_my_struct2(MyStruct2 *mstr) { printf("x='%s'\n", mstr->x); }
 
@@ -268,7 +268,7 @@ void cleanup_my_struct_res(MyStructResPtr *msr) {
 	}
 }
 
-#define MyStructRes MyStructResPtr CLEANUP(cleanup_my_struct_res)
+#define MyStructRes MyStructResPtr Cleanup(cleanup_my_struct_res)
 
 void my_struct_res_copy(MyStructRes *dst, MyStructRes *src) {
 	dst->vtable = src->vtable;
@@ -298,9 +298,9 @@ MyStructRes my_struct_res_build(int x, int y, char *z) {
 	return ret;
 }
 
-static ErrorKind test_err3 = EKIND("TEST_ERR");
-static ErrorKind test_err2 = EKIND("OTHER");
-static ErrorKind test_err = EKIND("TEST_ERR");
+static ErrorKind test_err3 = EKind("TEST_ERR");
+static ErrorKind test_err2 = EKind("OTHER");
+static ErrorKind test_err = EKind("TEST_ERR");
 
 Test(base, test_result) {
 	u64 initial_alloc_count = alloc_count();
@@ -336,8 +336,8 @@ Test(base, test_result) {
 	cr_assert_eq(initial_diff, final_diff);
 }
 
-static ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
-static ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
+static ErrorKind ILLEGAL_STATE = EKind("IllegalState");
+static ErrorKind ILLEGAL_ARGUMENT = EKind("IllegalArgument");
 
 Result my_test_fun(int x, int y) {
 	if (x > 100) {

@@ -17,9 +17,9 @@
 
 // Ensure the cleanup attribute is available
 #ifdef __GNUC__
-#define CLEANUP(f) __attribute__((cleanup(f)))
+#define Cleanup(f) __attribute__((cleanup(f)))
 #else
-#define CLEANUP(f)
+#define Cleanup(f)
 #endif
 
 #endif // _CLEANUP_BASE__

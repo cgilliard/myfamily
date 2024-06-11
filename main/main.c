@@ -17,7 +17,7 @@
 #include <base/types.h>
 #include <stdio.h>
 
-static ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
+static ErrorKind ILLEGAL_STATE = EKind("IllegalState");
 
 int real_main(int argc, char **argv) {
 	Error err = ERROR(ILLEGAL_STATE, "test error %d", 8);

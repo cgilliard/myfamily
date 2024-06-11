@@ -36,7 +36,7 @@ typedef struct {
 
 #define EMPTY_VTABLE {0, UNIQUE_ID, NULL}
 
-void *find_fn(Object *obj, const char *trait);
+void *find_fn(Object *obj, const char *name);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
 
 #define DEFINE_VTABLE(name, entries)                                           \

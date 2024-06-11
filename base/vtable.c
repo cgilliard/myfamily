@@ -18,9 +18,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void *find_fn(Object *obj, const char *trait) {
+void *find_fn(Object *obj, const char *name) {
 	for (int i = 0; i < obj->vtable->len; i++) {
-		if (!strcmp(trait, obj->vtable->entries[i].name)) {
+		if (!strcmp(name, obj->vtable->entries[i].name)) {
 			return obj->vtable->entries[i].fn_ptr;
 		}
 	}

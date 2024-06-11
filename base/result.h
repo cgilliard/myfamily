@@ -31,7 +31,7 @@ typedef struct {
 
 // cleanup
 void result_free(ResultPtr *ptr);
-#define Result ResultPtr CLEANUP(result_free)
+#define Result ResultPtr Cleanup(result_free)
 
 void *result_unwrap(Result *result);
 Error *result_unwrap_err(Result *result);
