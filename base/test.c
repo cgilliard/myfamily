@@ -583,6 +583,26 @@ Test(base, test_option) {
 		cr_assert(o3->is_some());
 		u32 *rv = unwrap(o3);
 		cr_assert_eq(*rv, 123);
+
+		String revstr = Str("test9");
+		Result revres = Ok(revstr);
+		Option revopt = Some(revres);
+		cr_assert(revopt.is_some());
+		ResultPtr *rptr = unwrap(&revopt);
+		cr_assert(rptr->is_ok());
+		StringPtr *sptr = unwrap(rptr);
+		String exp = Str("test9");
+		cr_assert(equal(sptr, &exp));
+
+		String another_str = Str("abc");
+		Option another_some = Some(another_str);
+		Result another_res = Ok(another_some);
+
+		cr_assert(another_res.is_ok());
+		OptionPtr *another_opt_ptr = unwrap(&another_res);
+		cr_assert(another_opt_ptr->is_some());
+		StringPtr *another_str_ptr = unwrap(another_opt_ptr);
+		cr_assert(!strcmp(to_str(another_str_ptr), "abc"));
 	}
 
 	u64 final_alloc_count = alloc_count();

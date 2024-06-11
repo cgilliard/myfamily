@@ -27,8 +27,9 @@ void result_free(ResultPtr *result) {
 		result->err = NULL;
 	}
 	if (result->ref) {
-		if (!result->no_clean)
+		if (!result->is_prim) {
 			cleanup(result->ref);
+		}
 		tlfree(result->ref);
 		result->ref = NULL;
 	}
@@ -55,7 +56,7 @@ Result result_build_ok(void *ref) {
 	ret.err = NULL;
 	ret.ref = tlmalloc(size(ref));
 	((Object *)ret.ref)->vtable = ((Object *)ref)->vtable;
-	ret.no_clean = false;
+	ret.is_prim = false;
 	if (copy(ret.ref, ref)) {
 		return ret;
 	} else {
@@ -67,9 +68,10 @@ Result result_build_ok(void *ref) {
 
 void result_init_prim_generic(ResultPtr *ptr, size_t size, void *ref) {
 	ptr->vtable = &ResultVtable;
+	ptr->prim_size = size;
 	ptr->is_ok = is_ok_true;
 	ptr->err = NULL;
-	ptr->no_clean = true;
+	ptr->is_prim = true;
 	ptr->ref = tlmalloc(size);
 	memcpy(ptr->ref, ref, size);
 }
@@ -85,5 +87,29 @@ Result result_build_err(Error err) {
 	// error copy always succeeds
 	copy(ret.err, &err);
 
+	return ret;
+}
+
+size_t result_size(Result *result) { return sizeof(Result); }
+bool result_copy(Result *dst, Result *src) {
+	bool ret = true;
+	dst->vtable = &ResultVtable;
+	dst->is_ok = src->is_ok;
+	if (src->ref) {
+		if (src->is_prim) {
+			dst->ref = tlmalloc(src->prim_size);
+			memcpy(dst->ref, src->ref, src->prim_size);
+			dst->is_prim = true;
+			dst->prim_size = src->prim_size;
+		} else {
+			dst->ref = tlmalloc(size(src->ref));
+			dst->is_prim = false;
+			((Object *)dst->ref)->vtable =
+			    ((Object *)src->ref)->vtable;
+			ret = copy(dst->ref, src->ref);
+		}
+	} else {
+		dst->ref = NULL;
+	}
 	return ret;
 }

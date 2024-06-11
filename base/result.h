@@ -26,7 +26,8 @@ typedef struct {
 	bool (*is_ok)();
 	Error *err;
 	void *ref;
-	bool no_clean;
+	bool is_prim;
+	size_t prim_size;
 } ResultPtr;
 
 // cleanup
@@ -35,10 +36,15 @@ void result_free(ResultPtr *ptr);
 
 void *result_unwrap(Result *result);
 Error *result_unwrap_err(Result *result);
+size_t result_size(Result *result);
+bool result_copy(Result *dst, Result *src);
 
 // vtable
 static VtableEntry ResultVtableEntries[] = {{"unwrap", result_unwrap},
-					    {"unwrap_err", result_unwrap_err}};
+					    {"unwrap_err", result_unwrap_err},
+					    {"size", result_size},
+					    {"copy", result_copy},
+					    {"cleanup", result_free}};
 DEFINE_VTABLE(ResultVtable, ResultVtableEntries)
 
 // builders

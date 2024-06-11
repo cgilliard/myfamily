@@ -57,10 +57,12 @@ bool option_copy(Option *dst, Option *src) {
 		if (!src->is_prim) {
 			((Object *)dst->ref)->vtable =
 			    ((Object *)src->ref)->vtable;
+			dst->is_prim = false;
 			ret = copy(dst->ref, src->ref);
 		} else {
 			memcpy(dst->ref, src->ref, sz);
 			dst->is_prim = true;
+			dst->prim_size = src->prim_size;
 		}
 	} else {
 		dst->ref = NULL;
