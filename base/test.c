@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/backtrace.h>
+#include <base/class.h>
 #include <base/cleanup.h>
 #include <base/ekinds.h>
 #include <base/error.h>
@@ -652,3 +653,22 @@ Test(base, test_option) {
 	cr_assert_eq(initial_diff, final_diff);
 }
 
+// clang-format off
+CLASS(TestC,           \
+	int x;         \
+	char name[50]; \
+	float y;       \
+)
+// clang-format on
+
+Test(base, test_class) {
+	TestC c;
+	c.x = 10;
+	c.y = 20.1;
+	// printf("tc=%i\n", TRAIT_COUNT);
+	//  for (int i = 0; i < TRAIT_COUNT; i++)
+	//  printf("trait_signatures[%i]=%s\n", i, trait_signatures[i]);
+	//;
+	// char *x = result2_build_ok_u64(NULL);
+	Result r = Ok(UNIT);
+}

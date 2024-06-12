@@ -14,6 +14,6 @@
 
 #include <base/unit.h>
 
-void unit_free(Unit *u) {}
-bool unit_copy(Unit *dst, Unit *src) { return true; }
-size_t unit_size(Unit *u) { return sizeof(Unit); }
+void Unit_cleanup(Unit *u) {}
+bool Unit_copy(Unit *dst, Unit *src) { return true; }
+size_t Unit_size(Unit *u) { return sizeof(Unit); }

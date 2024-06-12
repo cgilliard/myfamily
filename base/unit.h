@@ -15,22 +15,15 @@
 #ifndef _UNIT_BASE__
 #define _UNIT_BASE__
 
-#include <base/vtable.h>
+#include <base/class.h>
 
-typedef struct Unit {
-	Vtable *vtable;
-} Unit;
-
-bool unit_copy(Unit *dst, Unit *src);
-size_t unit_size(Unit *u);
-void unit_free(Unit *u);
-
-// vtable
-static VtableEntry UnitVtableEntries[] = {
-    {"copy", unit_copy}, {"size", unit_size}, {"cleanup", unit_free}};
-
-DEFINE_VTABLE(UnitVtable, UnitVtableEntries)
+CLASS(Unit)
+IMPL(Unit, TRAIT_COPY)
+IMPL(Unit, TRAIT_CLEANUP)
+IMPL(Unit, TRAIT_SIZE)
+VTABLE(Unit)
 
 static Unit UNIT = {&UnitVtable};
 
 #endif // _UNIT_BASE__
+

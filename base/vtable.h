@@ -51,6 +51,18 @@ void vtable_add_entry(Vtable *table, VtableEntry entry);
 	}                                                                      \
 	void __attribute__((constructor)) __init_##name();
 
+#define VTABLE(name)                                                           \
+	static Vtable name##Vtable = EMPTY_VTABLE;                             \
+	static void __init_vtable_##name() {                                   \
+		if (name##Vtable.len == 0) {                                   \
+			for (int i = 0; i < name##VtableEntriesSize; i++) {    \
+				vtable_add_entry(&name##Vtable,                \
+						 name##VtableEntries[i]);      \
+			}                                                      \
+		}                                                              \
+	}                                                                      \
+	void __attribute__((constructor)) __init_vtable_##name();
+
 // common fns
 bool equal(void *obj1, void *obj2);
 void *unwrap(void *obj);
