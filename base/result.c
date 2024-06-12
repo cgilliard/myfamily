@@ -50,6 +50,7 @@ Error *result_unwrap_err(Result *result) {
 	}
 }
 Result result_build_ok(void *ref) {
+	printf("1\n");
 	ResultPtr ret;
 	ret.vtable = &ResultVtable;
 	ret.is_ok = is_ok_true;

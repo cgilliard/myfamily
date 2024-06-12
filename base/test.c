@@ -22,6 +22,7 @@
 #include <base/string.h>
 #include <base/tlmalloc.h>
 #include <base/types.h>
+#include <base/unit.h>
 #include <base/vtable.h>
 #include <criterion/criterion.h>
 #include <stdio.h>
@@ -536,6 +537,15 @@ Test(base, test_string) {
 	cr_assert_eq(initial_diff, final_diff);
 }
 
+Result test_unit(int x) {
+	if (x < 100) {
+		Error e = ERROR(ILLEGAL_STATE, "x < 100! Oh my!");
+		return Err(e);
+	} else {
+		return Ok(UNIT);
+	}
+}
+
 Test(base, test_option) {
 	u64 initial_alloc_count = alloc_count();
 	u64 initial_free_count = free_count();
@@ -603,6 +613,35 @@ Test(base, test_option) {
 		cr_assert(another_opt_ptr->is_some());
 		StringPtr *another_str_ptr = unwrap(another_opt_ptr);
 		cr_assert(!strcmp(to_str(another_str_ptr), "abc"));
+
+		bool b = false;
+		Option ob = Some(b);
+		Result rb = Ok(ob);
+
+		cr_assert(rb.is_ok());
+		OptionPtr *obptr = unwrap(&rb);
+		cr_assert(obptr->is_some());
+
+		bool *bout = unwrap(obptr);
+		cr_assert_eq(*bout, false);
+
+		u64 nv1 = 1;
+		u64 nv2 = 2;
+		u64 nv3 = 3;
+		Option n = None;
+		n = Some(nv1);
+
+		// if you reassign you need to free the previous value manually
+		// to avoid a memory leak
+		cleanup(&n);
+		n = Some(nv2);
+		cleanup(&n);
+		n = None;
+
+		Result ru1 = test_unit(200);
+		cr_assert(ru1.is_ok());
+		Unit *u = unwrap(&ru1);
+		cr_assert_eq(u->vtable, &UnitVtable);
 	}
 
 	u64 final_alloc_count = alloc_count();
@@ -612,3 +651,4 @@ Test(base, test_option) {
 	printf("initialdiff=%llu,final_diff=%llu\n", initial_diff, final_diff);
 	cr_assert_eq(initial_diff, final_diff);
 }
+

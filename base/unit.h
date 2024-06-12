@@ -12,31 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _TYPES_BASE__
-#define _TYPES_BASE__
+#ifndef _UNIT_BASE__
+#define _UNIT_BASE__
 
-#include <base/cleanup.h>
-#include <inttypes.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
+#include <base/vtable.h>
 
-#define ERROR_PRINT_FLAG_NO_COLOR 0x1
-#define ERROR_PRINT_FLAG_NO_BACKTRACE 0x1 << 1
+typedef struct Unit {
+	Vtable *vtable;
+} Unit;
 
-#define u8 uint8_t
-#define i8 int8_t
-#define u16 uint16_t
-#define i16 int16_t
-#define u32 uint32_t
-#define i32 int32_t
-#define u64 uint64_t
-#define i64 int64_t
-#define u128 __uint128_t
-#define i128 __int128_t
-#define f64 double
-#define f32 float
+bool unit_copy(Unit *dst, Unit *src);
+size_t unit_size(Unit *u);
+void unit_free(Unit *u);
 
-#endif /* _TYPES_BASE__ */
+// vtable
+static VtableEntry UnitVtableEntries[] = {
+    {"copy", unit_copy}, {"size", unit_size}, {"cleanup", unit_free}};
+
+DEFINE_VTABLE(UnitVtable, UnitVtableEntries)
+
+static Unit UNIT = {&UnitVtable};
+
+#endif // _UNIT_BASE__

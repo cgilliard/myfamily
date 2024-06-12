@@ -31,6 +31,7 @@ typedef struct {
 void option_free(OptionPtr *ptr);
 
 Option option_build(void *ref);
+Option option_build_none();
 void *option_unwrap(Option *option);
 size_t option_size(Option *option);
 bool option_copy(Option *dest, Option *src);
@@ -46,7 +47,8 @@ DEFINE_VTABLE(OptionVtable, OptionVtableEntries)
 
 static bool option_is_some_false() { return false; }
 static bool option_is_some_true() { return true; }
-#define None {&OptionVtable, option_is_some_false, NULL};
+// #define None {&OptionVtable, option_is_some_false, NULL};
+#define None option_build_none()
 
 void option_init_prim_generic(OptionPtr *ptr, size_t size, void *ref);
 

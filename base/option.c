@@ -78,3 +78,8 @@ void option_init_prim_generic(OptionPtr *ptr, size_t size, void *ref) {
 	ptr->ref = tlmalloc(size);
 	memcpy(ptr->ref, ref, size);
 }
+
+Option option_build_none() {
+	OptionPtr ret = {&OptionVtable, option_is_some_false, NULL};
+	return ret;
+}
