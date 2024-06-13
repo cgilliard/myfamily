@@ -12,22 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/backtrace.h>
+// #include <base/backtrace.h>
 #include <base/class.h>
-#include <base/cleanup.h>
-#include <base/ekinds.h>
-#include <base/error.h>
-#include <base/option.h>
-#include <base/panic.h>
-#include <base/result.h>
-#include <base/string.h>
-#include <base/tlmalloc.h>
-#include <base/types.h>
+// #include <base/cleanup.h>
+//  #include <base/ekinds.h>
+//  #include <base/error.h>
+//  #include <base/option.h>
+// #include <base/panic.h>
+//  #include <base/result.h>
+// #include <base/string.h>
+// #include <base/tlmalloc.h>
+// #include <base/types.h>
+#include <base/test_self.h>
 #include <base/unit.h>
-#include <base/vtable.h>
+// #include <base/vtable.h>
 #include <criterion/criterion.h>
 #include <stdio.h>
-
+/*
 Test(base, test_tlmalloc) {
 	u64 initial_alloc_count = alloc_count();
 	u64 initial_realloc_count = realloc_count();
@@ -652,6 +653,9 @@ Test(base, test_option) {
 	printf("initialdiff=%llu,final_diff=%llu\n", initial_diff, final_diff);
 	cr_assert_eq(initial_diff, final_diff);
 }
+*/
+
+static MEMBER_TYPE(TestSelfPtr, _x) v10 = 0;
 
 Test(base, test_class) {
 	// printf("tc=%i\n", TRAIT_COUNT);
@@ -659,7 +663,27 @@ Test(base, test_class) {
 	//  printf("trait_signatures[%i]=%s\n", i, trait_signatures[i]);
 	//;
 	// char *x = result2_build_ok_u64(NULL);
-	Result r = Ok(UNIT);
-	Unit u = BUILD(Unit);
-	UnitPtr *p = &u;
+	// Result r = Ok(UNIT);
+	Unit unit = BUILD(Unit);
+	UnitPtr *p = &unit;
+	TestSelf x = BUILD(TestSelf, 10, 30);
+	printf("x.x=%i,x.y=%i\n", *TestSelf_get_y(&x), *TestSelf_get_y(&x));
+	TestSelf_set_y(&x, 20);
+	TestSelf_set_y(&x, 40);
+	printf("x.x=%i,x.y=%i\n", *TestSelf_get_y(&x), *TestSelf_get_y(&x));
+
+	/*
+		test t;
+		t.x = 10;
+		t.y = 'a';
+
+		printf("&t=%i\n", &t);
+
+		printf("t.get_x()=%i\n", *test_get_x(&t));
+		test_set_x(&t, 20);
+		printf("t.get_x()=%i\n", *test_get_x(&t));
+		printf("t.get_x()=%i\n", *test_get_x(&t));
+		printf("t.get_x()=%i\n", *test_get_x(&t));
+		printf("t.get_x()=%i\n", *test_get_x(&t));
+		*/
 }

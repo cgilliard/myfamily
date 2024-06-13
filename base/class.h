@@ -16,21 +16,91 @@
 #define _CLASS_BASE__
 
 #include <base/cleanup.h>
+#include <base/foreach.h>
 #include <base/panic.h>
 #include <base/tlmalloc.h>
-#include <base/vtable.h>
 #include <string.h>
+
+#define UNIQUE_ID __COUNTER__
+
+typedef struct {
+	char *name;
+	void *fn_ptr;
+} VtableEntry;
+
+typedef struct {
+	u64 len;
+	u128 id;
+	VtableEntry *entries;
+} Vtable;
+
+typedef struct {
+	Vtable *vtable;
+	// reserved for other data as needed
+} Vdata;
+
+typedef struct {
+	Vdata vdata;
+} Object;
+
+void *find_fn(Object *obj, const char *name);
+void vtable_add_entry(Vtable *table, VtableEntry entry);
+
+#define END_CLASS(name)                                                        \
+	static Vtable name##Vtable = {0, UNIQUE_ID, NULL};                     \
+	static void __init_vtable_##name() {                                   \
+		if (name##Vtable.len == 0) {                                   \
+			for (int i = 0; i < name##VtableEntriesSize; i++) {    \
+				vtable_add_entry(&name##Vtable,                \
+						 name##VtableEntries[i]);      \
+			}                                                      \
+		}                                                              \
+	}                                                                      \
+	void __attribute__((constructor)) __init_vtable_##name();
 
 #define EXPAND(x) x
 #define CATI(x, y) x##y
 #define CAT(x, y) CATI(x, y)
-#define CLEANUP(x) x##Ptr Cleanup(x##_cleanup)
+#define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup)
 
-#define BUILD(name, ...) {&name##Vtable, __VA_ARGS__}
+#define BUILD(name, ...) {{&name##Vtable}, __VA_ARGS__}
+
+#define CLASS_IMPL(name, ...)
+
+// start FOR_EACH code
+
+struct a {
+	u128 a;
+	u8 bx[3];
+	int c[10];
+};
+
+#define PRN_STRUCT_OFFSETS_(structure, field)                                  \
+	printf(STRINGIZE(structure)":" STRINGIZE(field)" - offset = %d\n",     \
+						 offsetof(structure, field));
+#define PRN_STRUCT_OFFSETS(field) PRN_STRUCT_OFFSETS_(struct a, field)
+// end FOR_EACH code
+
+#define EXTERNAL_GETTERS_SETTERS(x) ;
+
+#define MEMBER_TYPE(type, member) typeof(((type *)0)->member)
+
+#define FIELD(field_type, field_name) field_type CAT(_, field_name);
+#define GETTER(name, field_name)                                               \
+	static MEMBER_TYPE(name, CAT(_, field_name)) *                         \
+	    CAT(name##_, CAT(get_, field_name))(name##Ptr * self) {            \
+		return &self->CAT(_, field_name);                              \
+	}
+#define SETTER(name, field_name)                                               \
+	static void CAT(name##_, CAT(set_, field_name))(                       \
+	    name##Ptr * self,                                                  \
+	    MEMBER_TYPE(name, CAT(_, field_name)) CAT(_, field_name)) {        \
+		self->CAT(_, field_name) = CAT(_, field_name);                 \
+	}
 
 #define CLASS(name, ...)                                                       \
 	typedef struct {                                                       \
-		Vtable *vtable;                                                \
+		Vdata vdata;                                                   \
 		__VA_ARGS__                                                    \
 	} name##Ptr;                                                           \
 	static VtableEntry *name##VtableEntries = NULL;                        \

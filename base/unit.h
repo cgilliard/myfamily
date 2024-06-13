@@ -20,8 +20,8 @@
 CLASS(Unit)
 IMPL(Unit, TRAIT_COPY)
 IMPL(Unit, TRAIT_SIZE)
-VTABLE(Unit)
-#define Unit CLEANUP(Unit)
+END_CLASS(Unit)
+#define Unit DEFINE_CLASS(Unit)
 
 static Unit UNIT = BUILD(Unit);
 
