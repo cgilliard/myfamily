@@ -19,11 +19,10 @@
 
 CLASS(Unit)
 IMPL(Unit, TRAIT_COPY)
-IMPL(Unit, TRAIT_CLEANUP)
 IMPL(Unit, TRAIT_SIZE)
 VTABLE(Unit)
+#define Unit CLEANUP(Unit)
 
-static Unit UNIT = {&UnitVtable};
+static Unit UNIT = BUILD(Unit);
 
 #endif // _UNIT_BASE__
-

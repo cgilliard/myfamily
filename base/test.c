@@ -641,7 +641,7 @@ Test(base, test_option) {
 
 		Result ru1 = test_unit(200);
 		cr_assert(ru1.is_ok());
-		Unit *u = unwrap(&ru1);
+		UnitPtr *u = unwrap(&ru1);
 		cr_assert_eq(u->vtable, &UnitVtable);
 	}
 
@@ -653,22 +653,13 @@ Test(base, test_option) {
 	cr_assert_eq(initial_diff, final_diff);
 }
 
-// clang-format off
-CLASS(TestC,           \
-	int x;         \
-	char name[50]; \
-	float y;       \
-)
-// clang-format on
-
 Test(base, test_class) {
-	TestC c;
-	c.x = 10;
-	c.y = 20.1;
 	// printf("tc=%i\n", TRAIT_COUNT);
 	//  for (int i = 0; i < TRAIT_COUNT; i++)
 	//  printf("trait_signatures[%i]=%s\n", i, trait_signatures[i]);
 	//;
 	// char *x = result2_build_ok_u64(NULL);
 	Result r = Ok(UNIT);
+	Unit u = BUILD(Unit);
+	UnitPtr *p = &u;
 }

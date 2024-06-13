@@ -15,22 +15,50 @@
 #ifndef _CLASS_BASE__
 #define _CLASS_BASE__
 
+#include <base/cleanup.h>
 #include <base/panic.h>
 #include <base/tlmalloc.h>
 #include <base/vtable.h>
 #include <string.h>
 
+#define EXPAND(x) x
+#define CATI(x, y) x##y
+#define CAT(x, y) CATI(x, y)
+#define CLEANUP(x) x##Ptr Cleanup(x##_cleanup)
+
+#define BUILD(name, ...) {&name##Vtable, __VA_ARGS__}
+
 #define CLASS(name, ...)                                                       \
 	typedef struct {                                                       \
 		Vtable *vtable;                                                \
 		__VA_ARGS__                                                    \
-	} name;                                                                \
+	} name##Ptr;                                                           \
 	static VtableEntry *name##VtableEntries = NULL;                        \
-	static u64 name##VtableEntriesSize = 0;
+	static u64 name##VtableEntriesSize = 0;                                \
+	void name##_cleanup(name##Ptr *obj);                                   \
+	static void                                                            \
+	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
+		if (name##VtableEntries == NULL) {                             \
+			name##VtableEntries = tlmalloc(sizeof(VtableEntry));   \
+			if (!name##VtableEntries)                              \
+				panic("couldn't allocate memory for vtable");  \
+			name##VtableEntriesSize += 1;                          \
+		} else {                                                       \
+			name##VtableEntriesSize += 1;                          \
+			name##VtableEntries = tlrealloc(                       \
+			    name##VtableEntries,                               \
+			    sizeof(VtableEntry) * name##VtableEntriesSize);    \
+			if (!name##VtableEntries)                              \
+				panic("couldn't allocate memory for vtable");  \
+		}                                                              \
+		char *str;                                                     \
+		asprintf(&str, "cleanup");                                     \
+		VtableEntry next = {str, name##_cleanup};                      \
+		memcpy(&name##VtableEntries[name##VtableEntriesSize - 1],      \
+		       &next, sizeof(VtableEntry));                            \
+		name##VtableEntries[name##VtableEntriesSize - 1] = next;       \
+	}
 
-#define EXPAND(x) x
-#define CATI(x, y) x##y
-#define CAT(x, y) CATI(x, y)
 #define IMPL(name, trait) EXPAND(trait(name))
 
 #define TRAIT_FN(T, R, name, ...)                                              \
@@ -57,8 +85,7 @@
 		T##VtableEntries[T##VtableEntriesSize - 1] = next;             \
 	}
 
-#define TRAIT_COPY(T) TRAIT_FN(T, bool, copy, T *dst, T *src)
-#define TRAIT_CLEANUP(T) TRAIT_FN(T, void, cleanup, T *obj)
-#define TRAIT_SIZE(T) TRAIT_FN(T, size_t, size, T *obj)
+#define TRAIT_COPY(T) TRAIT_FN(T, bool, copy, T##Ptr *dst, T##Ptr *src)
+#define TRAIT_SIZE(T) TRAIT_FN(T, size_t, size, T##Ptr *obj)
 
 #endif //_CLASS_BASE__
