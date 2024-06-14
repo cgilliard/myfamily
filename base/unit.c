@@ -14,8 +14,6 @@
 
 #include <base/unit.h>
 
-void unit_print_hi(void *obj) { printf("unit says hi\n"); }
-
 void Unit_cleanup(UnitPtr *u) {}
 bool Unit_copy(UnitPtr *dst, UnitPtr *src) { return true; }
 size_t Unit_size(UnitPtr *u) { return sizeof(UnitPtr); }
