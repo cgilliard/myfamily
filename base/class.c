@@ -43,3 +43,12 @@ void vtable_add_entry(Vtable *table, VtableEntry entry) {
 	memcpy(&table->entries[table->len], &entry, sizeof(VtableEntry));
 	table->len += 1;
 }
+
+void vtable_override(Vtable *table, VtableEntry entry) {
+	for (int i = 0; i < table->len; i++) {
+		if (!strcmp(entry.name, table->entries[i].name)) {
+			table->entries[i].fn_ptr = entry.fn_ptr;
+		}
+	}
+}
+

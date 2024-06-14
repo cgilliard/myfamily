@@ -14,6 +14,17 @@
 
 #include <base/traits.h>
 
+void default_print_hi(void *obj) { printf("hi\n"); }
+
+void print_hi(void *obj) {
+	void (*do_print_hi)(Object *) = find_fn((Object *)obj, "print_hi");
+
+	if (do_print_hi == NULL)
+		panic("print_hi not implemented for this type");
+
+	do_print_hi(obj);
+}
+
 bool equal(void *obj1, void *obj2) {
 	if (((Object *)obj1)->vdata.vtable->id !=
 	    ((Object *)obj2)->vdata.vtable->id) {

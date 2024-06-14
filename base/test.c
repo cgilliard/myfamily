@@ -14,6 +14,7 @@
 
 // #include <base/backtrace.h>
 #include <base/class.h>
+#include <base/traits.h>
 // #include <base/cleanup.h>
 //  #include <base/ekinds.h>
 //  #include <base/error.h>
@@ -672,6 +673,7 @@ size_t TestSelf_size(TestSelfPtr *ptr) { return sizeof(TestSelfPtr); }
 Test(base, test_class) {
 	Unit unit = BUILD(Unit);
 	UnitPtr *p = &unit;
+	print_hi(&unit);
 
 	TestSelf x = BUILD(TestSelf, 10, 30);
 	cr_assert_eq(*TestSelf_get_x(&x), 10);

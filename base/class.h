@@ -46,6 +46,7 @@ typedef struct {
 
 void *find_fn(Object *obj, const char *name);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
+void vtable_override(Vtable *table, VtableEntry entry);
 
 #define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup)
 
@@ -85,7 +86,24 @@ void vtable_add_entry(Vtable *table, VtableEntry entry);
 
 #define IMPL(name, trait) EXPAND(trait(name))
 
-#define TRAIT_FN(T, R, name, ...)                                              \
+#define OVERRIDE(name, trait, implfn)                                          \
+	static void                                                            \
+	    __attribute__((constructor)) ov__##name##_##trait##_vtable() {     \
+		char *str;                                                     \
+		asprintf(&str, "%s", #trait);                                  \
+		VtableEntry next = {str, implfn};                              \
+		vtable_override(&name##Vtable, next);                          \
+	}
+
+#define TRAIT_IMPL(T, name, default)                                           \
+	static void __attribute__((constructor)) add_##name##_##T##_vtable() { \
+		char *str;                                                     \
+		asprintf(&str, "%s", #name);                                   \
+		VtableEntry next = {str, default};                             \
+		vtable_add_entry(&T##Vtable, next);                            \
+	}
+
+#define TRAIT_REQUIRED(T, R, name, ...)                                        \
 	R T##_##name(__VA_ARGS__);                                             \
 	static void __attribute__((constructor)) add_##name##_##T##_vtable() { \
 		char *str;                                                     \

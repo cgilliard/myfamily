@@ -18,9 +18,12 @@
 #include <base/class.h>
 #include <base/traits.h>
 
+void unit_print_hi(void *obj);
+
 CLASS(Unit)
 IMPL(Unit, TRAIT_COPY)
 IMPL(Unit, TRAIT_SIZE)
+OVERRIDE(Unit, print_hi, unit_print_hi)
 #define Unit DEFINE_CLASS(Unit)
 static Unit UNIT = BUILD(Unit);
 
