@@ -50,7 +50,7 @@ void vtable_override(Vtable *table, VtableEntry entry);
 
 #define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup)
 
-#define BUILD(name, ...) {{&name##Vtable}, __VA_ARGS__}
+#define BUILD(name, ...) {{&name##Vtable, NULL}, __VA_ARGS__}
 
 #define CLASS_IMPL(name, ...)
 

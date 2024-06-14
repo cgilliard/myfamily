@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/backtrace.h>
 #include <base/class.h>
+#include <base/rc.h>
 #include <base/traits.h>
 #include <base/unit.h>
 #include <criterion/criterion.h>
@@ -128,4 +130,56 @@ Test(base, test_class) {
 	cr_assert_eq(favorite_number(&ts2), 4);
 	cr_assert_eq(favorite_number2(&ts2), 100);
 	cr_assert_eq(favorite_number3(&ts2), 400);
+}
+
+Test(base, test_backtrace) {
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+
+	{
+		BacktraceEntry bt = EMPTY_BACKTRACE_ENTRY;
+		bool ret = BacktraceEntry_set_backtrace_entry_values(
+		    &bt, "name", "bin_name", "address", "file_path");
+		cr_assert(ret);
+
+		cr_assert(!strcmp(*BacktraceEntry_get_name(&bt), "name"));
+		cr_assert(
+		    !strcmp(*BacktraceEntry_get_bin_name(&bt), "bin_name"));
+		cr_assert(!strcmp(*BacktraceEntry_get_address(&bt), "address"));
+		cr_assert(
+		    !strcmp(*BacktraceEntry_get_file_path(&bt), "file_path"));
+
+		BacktraceEntry btcopy = EMPTY_BACKTRACE_ENTRY;
+		ret = copy(&btcopy, &bt);
+		cr_assert(ret);
+
+		cr_assert(!strcmp(*BacktraceEntry_get_name(&btcopy), "name"));
+		cr_assert(
+		    !strcmp(*BacktraceEntry_get_bin_name(&btcopy), "bin_name"));
+		cr_assert(
+		    !strcmp(*BacktraceEntry_get_address(&btcopy), "address"));
+		cr_assert(!strcmp(*BacktraceEntry_get_file_path(&btcopy),
+				  "file_path"));
+
+		Backtrace btp = BUILD(Backtrace, NULL, 0);
+		Backtrace_generate(&btp, 100);
+		print(&btp, 0);
+	}
+
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	printf("init=%i,final=%i\n", initial_diff, final_diff);
+	cr_assert_eq(final_diff, initial_diff);
+}
+
+Test(base, test_rc) {
+	int *x = tlmalloc(sizeof(int));
+	*x = 100;
+	Rc r = BUILD(Rc, x);
+	printf("x=%i\n", *(int *)(*Rc_get_p(&r)));
+	cr_assert_eq(*(int *)(*Rc_get_p(&r)), 100);
 }

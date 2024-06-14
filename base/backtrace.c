@@ -17,141 +17,19 @@
 #include <base/tlmalloc.h>
 #include <dlfcn.h>
 #include <execinfo.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
 
-int backtrace_add_entry(Backtrace *ptr, BacktraceEntry *entry) {
-	int ret = 0;
-	if (!ptr->count) {
-		ptr->rows = tlmalloc(sizeof(BacktraceEntry));
-	} else {
-		BacktraceEntry *tmp = tlrealloc(
-		    ptr->rows, sizeof(BacktraceEntry) * (ptr->count + 1));
-		if (tmp == NULL) {
-			ret = -1;
-		} else {
-			ptr->rows = tmp;
-		}
-	}
+#define GET_NAME(bte) BacktraceEntry_get_name(bte)
+#define SET_NAME(bte, value) BacktraceEntry_set_name(bte, value)
 
-	if (ptr->rows == NULL) {
-		printf("could not allocate memory for backtrace\n");
-		ret = -1;
-	}
+#define GET_BIN_NAME(bte) BacktraceEntry_get_bin_name(bte)
+#define SET_BIN_NAME(bte, value) BacktraceEntry_set_bin_name(bte, value)
 
-	if (!ret) {
-		ptr->rows[ptr->count].function_name =
-		    tlmalloc(sizeof(char) * (strlen(entry->function_name) + 1));
-		if (ptr->rows[ptr->count].function_name == NULL) {
-			printf("could not allocate memory for backtrace\n");
-			ret = -1;
-		}
-	}
+#define GET_ADDRESS(bte) BacktraceEntry_get_address(bte)
+#define SET_ADDRESS(bte, value) BacktraceEntry_set_address(bte, value)
 
-	if (!ret) {
-		strcpy(ptr->rows[ptr->count].function_name,
-		       entry->function_name);
-
-		ptr->rows[ptr->count].bin_name =
-		    tlmalloc(sizeof(char) * (strlen(entry->bin_name) + 1));
-
-		if (ptr->rows[ptr->count].bin_name == NULL) {
-			printf("could not allocate memory for backtrace\n");
-			ret = -1;
-		}
-	}
-	if (!ret) {
-		strcpy(ptr->rows[ptr->count].bin_name, entry->bin_name);
-
-		ptr->rows[ptr->count].address =
-		    tlmalloc(sizeof(char) * (strlen(entry->address) + 1));
-
-		if (ptr->rows[ptr->count].address == NULL) {
-			printf("could not allocate memory for backtrace\n");
-			ret = -1;
-		}
-	}
-
-	if (!ret) {
-		strcpy(ptr->rows[ptr->count].address, entry->address);
-
-		ptr->rows[ptr->count].file_path =
-		    tlmalloc(sizeof(char) * (strlen(entry->file_path) + 1));
-
-		if (ptr->rows[ptr->count].file_path == NULL) {
-			printf("could not allocate memory for backtrace\n");
-			ret = -1;
-		}
-		strcpy(ptr->rows[ptr->count].file_path, entry->file_path);
-
-		ptr->count++;
-	}
-
-	if (ret) {
-		backtrace_free(ptr);
-	}
-
-	return ret;
-}
-
-void backtrace_copy(Backtrace *dst, Backtrace *src) {
-	dst->count = 0;
-	dst->rows = NULL;
-	for (int i = 0; i < src->count; i++) {
-		if (backtrace_add_entry(dst, &src->rows[i]))
-			break;
-	}
-}
-
-void backtrace_free(BacktracePtr *ptr) {
-	for (int i = 0; i < ptr->count; i++) {
-		if (ptr->rows[i].function_name)
-			tlfree(ptr->rows[i].function_name);
-		if (ptr->rows[i].bin_name)
-			tlfree(ptr->rows[i].bin_name);
-		if (ptr->rows[i].address)
-			tlfree(ptr->rows[i].address);
-		if (ptr->rows[i].file_path)
-			tlfree(ptr->rows[i].file_path);
-
-		ptr->rows[i].file_path = NULL;
-		ptr->rows[i].address = NULL;
-		ptr->rows[i].bin_name = NULL;
-		ptr->rows[i].function_name = NULL;
-	}
-
-	ptr->count = 0;
-	tlfree(ptr->rows);
-}
-
-void backtrace_print(Backtrace *ptr, int flags) {
-	printf("Backtrace:\n");
-	for (int i = 0; i < ptr->count; i++) {
-		if ((flags & ERROR_PRINT_FLAG_NO_COLOR) == 0)
-			printf("#%i:\n\
-        [" ANSI_COLOR_DIMMED "fn=" ANSI_COLOR_RESET "'" ANSI_COLOR_GREEN
-			       "%s" ANSI_COLOR_RESET "']\n\
-        [" ANSI_COLOR_DIMMED "binary=" ANSI_COLOR_RESET "'" ANSI_COLOR_MAGENTA
-			       "%s" ANSI_COLOR_RESET "'] [" ANSI_COLOR_DIMMED
-			       "address=" ANSI_COLOR_RESET "%s]\n\
-        [" ANSI_COLOR_DIMMED "code=" ANSI_COLOR_RESET "'" ANSI_COLOR_CYAN
-			       "%s" ANSI_COLOR_RESET "']\n",
-			       i, ptr->rows[i].function_name,
-			       ptr->rows[i].bin_name, ptr->rows[i].address,
-			       ptr->rows[i].file_path);
-		else
-			printf("#%i:\n\
-	[fn='%s']\n\
-	[binary='%s'] [address=%s]\n\
-       	[code='%s']\n",
-			       i, ptr->rows[i].function_name,
-			       ptr->rows[i].bin_name, ptr->rows[i].address,
-			       ptr->rows[i].file_path);
-	}
-}
+#define GET_FILE_PATH(bte) BacktraceEntry_get_file_path(bte)
+#define SET_FILE_PATH(bte, value) BacktraceEntry_set_file_path(bte, value)
 
 #define BUFSIZE 10000
 
@@ -225,30 +103,149 @@ int get_file_line(char *bin, char *addr, char *line_num, char *fn_name,
 	return 0;
 }
 
-Backtrace backtrace_generate(u64 max_depth) {
-	BacktracePtr ptr = EMPTY_BACKTRACE;
+void BacktraceEntry_cleanup(BacktraceEntry *ptr) {
+	char *name = *GET_NAME(ptr);
+	if (name) {
+		tlfree(name);
+		SET_NAME(ptr, NULL);
+	}
+
+	char *bin_name = *GET_BIN_NAME(ptr);
+	if (bin_name) {
+		tlfree(bin_name);
+		SET_BIN_NAME(ptr, NULL);
+	}
+
+	char *file_path = *GET_FILE_PATH(ptr);
+	if (file_path) {
+		tlfree(file_path);
+		SET_FILE_PATH(ptr, NULL);
+	}
+
+	char *address = *GET_ADDRESS(ptr);
+	if (address) {
+		tlfree(address);
+		SET_ADDRESS(ptr, NULL);
+	}
+}
+bool BacktraceEntry_copy(BacktraceEntry *dst, BacktraceEntry *src) {
+	return BacktraceEntry_set_backtrace_entry_values(
+	    dst, *GET_NAME(src), *GET_BIN_NAME(src), *GET_ADDRESS(src),
+	    *GET_FILE_PATH(src));
+}
+size_t BacktraceEntry_size(BacktraceEntry *ptr) {
+	return sizeof(BacktraceEntry);
+}
+
+bool BacktraceEntry_set_backtrace_entry_values(BacktraceEntry *ptr,
+					       const char *name,
+					       const char *bin_name,
+					       const char *address,
+					       const char *file_path) {
+
+	bool ret = true;
+
+	char *vname = tlmalloc(sizeof(char) * (1 + strlen(name)));
+	if (vname) {
+		strcpy(vname, name);
+		SET_NAME(ptr, vname);
+	} else {
+		ret = false;
+	}
+
+	if (ret) {
+		char *vbin_name =
+		    tlmalloc(sizeof(char) * (1 + strlen(bin_name)));
+		if (vbin_name) {
+			strcpy(vbin_name, bin_name);
+			SET_BIN_NAME(ptr, vbin_name);
+		} else {
+			ret = false;
+		}
+	}
+
+	if (ret) {
+		char *vaddress = tlmalloc(sizeof(char) * (1 + strlen(address)));
+		if (vaddress) {
+			strcpy(vaddress, address);
+			SET_ADDRESS(ptr, vaddress);
+		} else {
+			ret = false;
+		}
+	}
+
+	if (ret) {
+		char *vfile_path =
+		    tlmalloc(sizeof(char) * (1 + strlen(file_path)));
+		if (vfile_path) {
+			strcpy(vfile_path, file_path);
+			SET_FILE_PATH(ptr, vfile_path);
+		} else {
+			ret = false;
+		}
+	}
+
+	if (!ret) {
+		BacktraceEntry_cleanup(ptr);
+	}
+
+	return ret;
+}
+
+#define GET_ROWS(bt) Backtrace_get_rows(bt)
+#define SET_ROWS(bt, value) Backtrace_set_rows(bt, value)
+#define GET_COUNT(bt) *Backtrace_get_count(bt)
+#define SET_COUNT(bt, value) Backtrace_set_count(bt, value)
+
+bool Backtrace_add_entry(Backtrace *ptr, const char *name, const char *bin_name,
+			 const char *address, const char *file_path) {
+	bool ret = true;
+	u64 count = GET_COUNT(ptr);
+	BacktraceEntryPtr *rows;
+	rows = *GET_ROWS(ptr);
+	if (count == 0) {
+		rows = tlmalloc(sizeof(BacktraceEntry));
+		SET_ROWS(ptr, rows);
+	} else {
+		rows = tlrealloc(rows, sizeof(BacktraceEntry) * (count + 1));
+		SET_ROWS(ptr, rows);
+	}
+	if (rows == NULL)
+		ret = false;
+
+	if (ret) {
+		BacktraceEntry ent =
+		    BUILD(BacktraceEntry, NULL, NULL, NULL, NULL);
+		BacktraceEntry_set_backtrace_entry_values(&ent, name, bin_name,
+							  address, file_path);
+		BacktraceEntryPtr *entry_arr;
+		rows[count].vdata.vtable = &BacktraceEntryVtable;
+		copy(&rows[count], &ent);
+
+		SET_COUNT(ptr, count + 1);
+	}
+
+	return ret;
+}
+
+bool Backtrace_generate(Backtrace *ptr, u64 max_depth) {
 	void *array[max_depth];
 	int size = backtrace(array, max_depth);
 	char **strings = backtrace_symbols(array, size);
-
 	if (strings == NULL)
 		size = 0;
 
 	for (int i = 0; i < size; i++) {
 #ifdef __APPLE__
-		BacktraceEntry ent;
 		char address[30];
 		Dl_info info;
 		dladdr(array[i], &info);
 		u64 addr = 0x0000000100000000 + info.dli_saddr - info.dli_fbase;
 		snprintf(address, 30, "0x%" PRIx64 "", addr);
-		ent.address = address;
 		char function_name[strlen(info.dli_sname) + 1];
 		char bin_name[strlen(info.dli_fname) + 1];
 		strcpy(function_name, info.dli_sname);
-		ent.function_name = function_name;
 		strcpy(bin_name, info.dli_fname);
-		ent.bin_name = bin_name;
 
 		char file_path[513];
 		char fn_name[513];
@@ -257,8 +254,8 @@ Backtrace backtrace_generate(u64 max_depth) {
 		if (!strcmp(file_path, "")) {
 			strcpy(file_path, "Unknown");
 		}
-		ent.file_path = file_path;
-		if (backtrace_add_entry(&ptr, &ent))
+		if (!Backtrace_add_entry(ptr, function_name, bin_name, address,
+					 file_path))
 			break;
 #else  // LINUX/WIN for now
 		char buffer[2050];
@@ -327,9 +324,57 @@ Backtrace backtrace_generate(u64 max_depth) {
 #endif // OS Specific code
 	}
 
-	// use regular free because this is not allocated by tlmalloc
-	if (strings != NULL)
-		free(strings);
+	// Backtrace_add_entry(ptr, "name1", "bin_name", "addr", "file path");
 
-	return ptr;
+	// not generated by tlmalloc so we use free
+	if (strings)
+		free(strings);
+	return true;
+}
+
+void Backtrace_cleanup(Backtrace *ptr) {
+	u64 count = GET_COUNT(ptr);
+	BacktraceEntryPtr *rows = *GET_ROWS(ptr);
+	for (u64 i = 0; i < count; i++) {
+		BacktraceEntry_cleanup(&rows[i]);
+	}
+	SET_COUNT(ptr, 0);
+	if (rows) {
+		tlfree(rows);
+		SET_ROWS(ptr, NULL);
+	}
+}
+bool Backtrace_copy(Backtrace *dst, Backtrace *src) { return true; }
+size_t Backtrace_size(Backtrace *ptr) { return sizeof(Backtrace); }
+
+// TODO: implement with String?
+char *Backtrace_to_str(Backtrace *obj) { return NULL; }
+
+void Backtrace_print(Backtrace *ptr, u64 flags) {
+	printf("Backtrace:\n");
+	BacktraceEntryPtr *rows;
+	rows = *GET_ROWS(ptr);
+	u64 count = GET_COUNT(ptr);
+	for (int i = 0; i < count; i++) {
+		char *function_name = *GET_NAME(&rows[i]);
+		char *bin_name = *GET_BIN_NAME(&rows[i]);
+		char *address = *GET_ADDRESS(&rows[i]);
+		char *file_path = *GET_FILE_PATH(&rows[i]);
+		if ((flags & ERROR_PRINT_FLAG_NO_COLOR) == 0)
+			printf("#%i:\n\
+	[" ANSI_COLOR_DIMMED "fn=" ANSI_COLOR_RESET "'" ANSI_COLOR_GREEN
+			       "%s" ANSI_COLOR_RESET "']\n\
+	[" ANSI_COLOR_DIMMED "binary=" ANSI_COLOR_RESET "'" ANSI_COLOR_MAGENTA
+			       "%s" ANSI_COLOR_RESET "'] [" ANSI_COLOR_DIMMED
+			       "address=" ANSI_COLOR_RESET "%s]\n\
+	[" ANSI_COLOR_DIMMED "code=" ANSI_COLOR_RESET "'" ANSI_COLOR_CYAN
+			       "%s" ANSI_COLOR_RESET "']\n",
+			       i, function_name, bin_name, address, file_path);
+		else
+			printf("#%i:\n\
+	[fn='%s']\n\
+	[binary='%s'] [address=%s]\n\
+	[code='%s']\n",
+			       i, function_name, bin_name, address, file_path);
+	}
 }

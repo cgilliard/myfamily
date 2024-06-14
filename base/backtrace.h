@@ -13,29 +13,48 @@
 // limitations under the License.
 
 #ifndef _BACKTRACE_BASE__
-#define _BACKTRACE_BASE__
+#define _BAKCTRACE_BASE__
 
-#include <base/types.h>
+#include <base/class.h>
+#include <base/traits.h>
 
-typedef struct BacktraceEntry {
-	char *function_name;
-	char *bin_name;
-	char *address;
-	char *file_path;
-} BacktraceEntry;
+#define TRAIT_GENERATE_BACKTRACE(T)                                            \
+	TRAIT_REQUIRED(T, bool, generate, T##Ptr *bt, u64 max_depth)
 
-typedef struct BacktracePtr {
-	BacktraceEntry *rows;
-	u64 count;
-} BacktracePtr;
+#define TRAIT_SET_BACKTRACE_ENTRY(T)                                           \
+	TRAIT_REQUIRED(T, bool, set_backtrace_entry_values, T##Ptr *bt,        \
+		       const char *name, const char *bin_name,                 \
+		       const char *address, const char *file_path)
 
-void backtrace_free(BacktracePtr *ptr);
-#define Backtrace BacktracePtr Cleanup(backtrace_free)
-#define EMPTY_BACKTRACE {NULL, 0}
-Backtrace backtrace_generate(u64 max_depth);
+#define EMPTY_BACKTRACE_ENTRY BUILD(BacktraceEntry, NULL, NULL, NULL, NULL)
+#define EMPTY_BACKTRACE BUILD(Backtrace, NULL, 0)
 
-// #define ERROR_PRINT_FLAG_NO_COLOR 0x1
-void backtrace_print(Backtrace *ptr, int flags);
-void backtrace_copy(Backtrace *dst, Backtrace *src);
+CLASS(BacktraceEntry, FIELD(char *, name) FIELD(char *, bin_name)
+			  FIELD(char *, address) FIELD(char *, file_path))
+IMPL(BacktraceEntry, TRAIT_COPY)
+IMPL(BacktraceEntry, TRAIT_SIZE)
+IMPL(BacktraceEntry, TRAIT_SET_BACKTRACE_ENTRY)
 
-#endif // _BACKTRACE_BASE__
+#define BacktraceEntry DEFINE_CLASS(BacktraceEntry)
+GETTER(BacktraceEntry, name);
+SETTER(BacktraceEntry, name);
+GETTER(BacktraceEntry, bin_name);
+SETTER(BacktraceEntry, bin_name);
+GETTER(BacktraceEntry, address);
+SETTER(BacktraceEntry, address);
+GETTER(BacktraceEntry, file_path);
+SETTER(BacktraceEntry, file_path);
+
+CLASS(Backtrace, FIELD(BacktraceEntryPtr *, rows) FIELD(u64, count))
+IMPL(Backtrace, TRAIT_COPY)
+IMPL(Backtrace, TRAIT_SIZE)
+IMPL(Backtrace, TRAIT_GENERATE_BACKTRACE)
+IMPL(Backtrace, TRAIT_TO_STR)
+IMPL(Backtrace, TRAIT_PRINT)
+#define Backtrace DEFINE_CLASS(Backtrace)
+GETTER(Backtrace, rows);
+SETTER(Backtrace, rows);
+GETTER(Backtrace, count);
+SETTER(Backtrace, count);
+
+#endif // _UNIT_BASE__

@@ -41,6 +41,14 @@ char *to_str(void *obj) {
 	return do_to_str(obj);
 }
 
+void print(void *obj, u64 flags) {
+	char *(*do_print)(Object *obj, u64 flags) =
+	    find_fn((Object *)obj, "print");
+	if (do_print == NULL)
+		panic("print not implemented for this type");
+	do_print(obj, flags);
+}
+
 void *unwrap_err(void *obj) {
 	void *(*do_unwrap)(Object *obj) = find_fn((Object *)obj, "unwrap_err");
 	if (do_unwrap == NULL)

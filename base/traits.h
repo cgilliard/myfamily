@@ -17,8 +17,14 @@
 
 #include <base/class.h>
 
-#define TRAIT_COPY(T) TRAIT_REQUIRED(T, bool, copy, T##Ptr *dst, T##Ptr *src)
+#define TRAIT_COPY(T)                                                          \
+	TRAIT_REQUIRED(T, bool, copy, T##Ptr *dst, T##Ptr *src)                \
+	TRAIT_SUPER(T, TRAIT_SIZE)
 #define TRAIT_SIZE(T) TRAIT_REQUIRED(T, size_t, size, T##Ptr *obj)
+
+#define TRAIT_TO_STR(T) TRAIT_REQUIRED(T, char *, to_str, T##Ptr *obj)
+
+#define TRAIT_PRINT(T) TRAIT_REQUIRED(T, void, print, T##Ptr *obj, u64 flags)
 
 // trait implementations
 bool equal(void *obj1, void *obj2);
@@ -28,5 +34,6 @@ size_t size(void *obj);
 bool copy(void *dest, void *src);
 void cleanup(void *ptr);
 char *to_str(void *s);
+void print(void *ptr, u64 flags);
 
 #endif // _TRAITS_BASE__
