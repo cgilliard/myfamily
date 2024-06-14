@@ -14,6 +14,6 @@
 
 #include <base/unit.h>
 
-void Unit_cleanup(UnitPtr *u) { printf("cleanup u\n"); }
+void Unit_cleanup(UnitPtr *u) {}
 bool Unit_copy(UnitPtr *dst, UnitPtr *src) { return true; }
 size_t Unit_size(UnitPtr *u) { return sizeof(UnitPtr); }

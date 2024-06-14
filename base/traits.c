@@ -69,4 +69,3 @@ void cleanup(void *ptr) {
 	if (do_cleanup != NULL)
 		do_cleanup(ptr);
 }
-

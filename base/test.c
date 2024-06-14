@@ -23,7 +23,7 @@
 // #include <base/string.h>
 // #include <base/tlmalloc.h>
 // #include <base/types.h>
-#include <base/test_self.h>
+// #include <base/test_self.h>
 #include <base/unit.h>
 // #include <base/vtable.h>
 #include <criterion/criterion.h>
@@ -655,23 +655,32 @@ Test(base, test_option) {
 }
 */
 
-static MEMBER_TYPE(TestSelfPtr, _x) v10 = 0;
+CLASS(TestSelf, FIELD(u32, x) FIELD(u64, y))
+IMPL(TestSelf, TRAIT_SIZE)
+#define TestSelf DEFINE_CLASS(TestSelf)
+GETTER(TestSelf, y)
+SETTER(TestSelf, y)
+GETTER(TestSelf, x)
+SETTER(TestSelf, x)
+
+void TestSelf_cleanup(TestSelfPtr *ptr) {
+	printf("cleanupx.x=%i,x.y=%i\n", *TestSelf_get_x(ptr),
+	       *TestSelf_get_y(ptr));
+}
+size_t TestSelf_size(TestSelfPtr *ptr) { return sizeof(TestSelfPtr); }
 
 Test(base, test_class) {
-	// printf("tc=%i\n", TRAIT_COUNT);
-	//  for (int i = 0; i < TRAIT_COUNT; i++)
-	//  printf("trait_signatures[%i]=%s\n", i, trait_signatures[i]);
-	//;
-	// char *x = result2_build_ok_u64(NULL);
-	// Result r = Ok(UNIT);
-
 	Unit unit = BUILD(Unit);
 	UnitPtr *p = &unit;
 
 	TestSelf x = BUILD(TestSelf, 10, 30);
-	printf("x.x=%i,x.y=%i\n", *TestSelf_get_y(&x), *TestSelf_get_y(&x));
+	cr_assert_eq(*TestSelf_get_x(&x), 10);
+	cr_assert_eq(*TestSelf_get_y(&x), 30);
 
-	TestSelf_set_y(&x, 20);
+	TestSelf_set_x(&x, 20);
 	TestSelf_set_y(&x, 40);
-	printf("x.x=%i,x.y=%i\n", *TestSelf_get_y(&x), *TestSelf_get_y(&x));
+
+	cr_assert_eq(*TestSelf_get_x(&x), 20);
+	cr_assert_eq(*TestSelf_get_y(&x), 40);
+	cr_assert_eq(size(&x), sizeof(TestSelf));
 }

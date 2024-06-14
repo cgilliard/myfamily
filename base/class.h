@@ -37,6 +37,7 @@ typedef struct {
 typedef struct {
 	Vtable *vtable;
 	// reserved for other data as needed
+	void *reserved;
 } Vdata;
 
 typedef struct {
