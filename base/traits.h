@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _UNIT_BASE__
-#define _UNIT_BASE__
+#ifndef _TRAITS_BASE__
+#define _TRAITS_BASE__
 
 #include <base/class.h>
-#include <base/traits.h>
 
-CLASS(Unit)
-IMPL(Unit, TRAIT_COPY)
-IMPL(Unit, TRAIT_SIZE)
-#define Unit DEFINE_CLASS(Unit)
-static Unit UNIT = BUILD(Unit);
+#define TRAIT_COPY(T) TRAIT_FN(T, bool, copy, T##Ptr *dst, T##Ptr *src)
+#define TRAIT_SIZE(T) TRAIT_FN(T, size_t, size, T##Ptr *obj)
 
-#endif // _UNIT_BASE__
+bool equal(void *obj1, void *obj2);
+void *unwrap(void *obj);
+void *unwrap_err(void *obj);
+size_t size(void *obj);
+bool copy(void *dest, void *src);
+void cleanup(void *ptr);
+char *to_str(void *s);
+
+#endif // _TRAITS_BASE__

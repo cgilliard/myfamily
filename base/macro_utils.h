@@ -15,6 +15,10 @@
 #include <stddef.h>
 #include <stdio.h>
 
+#define EXPAND(x) x
+#define CATI(x, y) x##y
+#define CAT(x, y) CATI(x, y)
+
 #define STRINGIZE(arg) STRINGIZE1(arg)
 #define STRINGIZE1(arg) STRINGIZE2(arg)
 #define STRINGIZE2(arg) #arg

@@ -664,26 +664,14 @@ Test(base, test_class) {
 	//;
 	// char *x = result2_build_ok_u64(NULL);
 	// Result r = Ok(UNIT);
+
 	Unit unit = BUILD(Unit);
 	UnitPtr *p = &unit;
+
 	TestSelf x = BUILD(TestSelf, 10, 30);
 	printf("x.x=%i,x.y=%i\n", *TestSelf_get_y(&x), *TestSelf_get_y(&x));
+
 	TestSelf_set_y(&x, 20);
 	TestSelf_set_y(&x, 40);
 	printf("x.x=%i,x.y=%i\n", *TestSelf_get_y(&x), *TestSelf_get_y(&x));
-
-	/*
-		test t;
-		t.x = 10;
-		t.y = 'a';
-
-		printf("&t=%i\n", &t);
-
-		printf("t.get_x()=%i\n", *test_get_x(&t));
-		test_set_x(&t, 20);
-		printf("t.get_x()=%i\n", *test_get_x(&t));
-		printf("t.get_x()=%i\n", *test_get_x(&t));
-		printf("t.get_x()=%i\n", *test_get_x(&t));
-		printf("t.get_x()=%i\n", *test_get_x(&t));
-		*/
 }
