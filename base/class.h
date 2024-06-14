@@ -95,6 +95,8 @@ void vtable_override(Vtable *table, VtableEntry entry);
 		vtable_override(&name##Vtable, next);                          \
 	}
 
+#define TRAIT_SUPER(name, trait) EXPAND(trait(name))
+
 #define TRAIT_IMPL(T, name, default)                                           \
 	static void __attribute__((constructor)) add_##name##_##T##_vtable() { \
 		char *str;                                                     \
@@ -105,7 +107,7 @@ void vtable_override(Vtable *table, VtableEntry entry);
 
 #define TRAIT_REQUIRED(T, R, name, ...)                                        \
 	R T##_##name(__VA_ARGS__);                                             \
-	static void __attribute__((constructor)) add_##name##_##T##_vtable() { \
+	static void __attribute__((constructor)) CAT(add_##T, UNIQUE_ID)() {   \
 		char *str;                                                     \
 		asprintf(&str, "%s", #name);                                   \
 		VtableEntry next = {str, T##_##name};                          \

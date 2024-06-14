@@ -51,4 +51,3 @@ void vtable_override(Vtable *table, VtableEntry entry) {
 		}
 	}
 }
-

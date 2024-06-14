@@ -17,14 +17,10 @@
 
 #include <base/class.h>
 
-void default_print_hi(void *obj);
-
-#define TRAIT_COPY(T)                                                          \
-	TRAIT_REQUIRED(T, bool, copy, T##Ptr *dst, T##Ptr *src)                \
-	TRAIT_IMPL(T, print_hi, default_print_hi)
+#define TRAIT_COPY(T) TRAIT_REQUIRED(T, bool, copy, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_SIZE(T) TRAIT_REQUIRED(T, size_t, size, T##Ptr *obj)
 
-void print_hi(void *obj);
+// trait implementations
 bool equal(void *obj1, void *obj2);
 void *unwrap(void *obj);
 void *unwrap_err(void *obj);
