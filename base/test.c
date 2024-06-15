@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/backtrace.h>
 #include <base/class.h>
+#include <base/error.h>
 #include <base/rc.h>
 #include <base/traits.h>
 #include <base/unit.h>
@@ -176,10 +176,149 @@ Test(base, test_backtrace) {
 	cr_assert_eq(final_diff, initial_diff);
 }
 
+static ErrorKind ILLEGAL_STATE = BUILD(ErrorKind, "IllegalState");
+static ErrorKind ILLEGAL_STATE2 = BUILD(ErrorKind, "IllegalState");
+static ErrorKind ILLEGAL_ARGUMENT = BUILD(ErrorKind, "IllegalArgument");
+
+Test(base, test_errorkind) {
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+
+	{
+		ErrorKind x = BUILD(ErrorKind, "IllegalState");
+		cr_assert(
+		    !strcmp((char *)ErrorKind_get_kind(&x), "IllegalState"));
+
+		ErrorKind test = BUILD(ErrorKind, "IllegalState");
+		cr_assert(equal(&ILLEGAL_STATE, &test));
+		cr_assert(!equal(&ILLEGAL_STATE, &ILLEGAL_ARGUMENT));
+	}
+
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	printf("init=%i,final=%i\n", initial_diff, final_diff);
+	cr_assert_eq(final_diff, initial_diff);
+}
+
+Test(base, test_error) {
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+
+	{
+		BacktracePtr bt = BUILD(Backtrace, NULL, 0);
+
+		Backtrace_generate(&bt, 100);
+
+		Error x = BUILD(Error, ILLEGAL_STATE, "some message", bt);
+
+		BacktracePtr bt2 = BUILD(Backtrace, NULL, 0);
+		Backtrace_generate(&bt2, 100);
+
+		Error y =
+		    BUILD(Error, ILLEGAL_ARGUMENT, "another message", bt2);
+
+		cr_assert(!equal(&x, &y));
+
+		BacktracePtr bt3 = BUILD(Backtrace, NULL, 0);
+		Backtrace_generate(&bt3, 100);
+		Error z =
+		    BUILD(Error, ILLEGAL_ARGUMENT, "yet another message", bt3);
+
+		cr_assert(!equal(&x, &z));
+
+		cr_assert(equal(&y, &z));
+	}
+
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	printf("init=%i,final=%i\n", initial_diff, final_diff);
+	cr_assert_eq(final_diff, initial_diff);
+}
+
+Test(base, test_error_build) {
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+
+	{
+		Error err = ERROR(ILLEGAL_STATE, "hi there");
+		Error err2 = ERROR(ILLEGAL_STATE2, "ok");
+		Error err3 = ERROR(ILLEGAL_ARGUMENT, "test");
+		cr_assert(equal(&err, &err2));
+		cr_assert(!equal(&err, &err3));
+		cr_assert(!strcmp((char *)Error_get_message(&err), "hi there"));
+		cr_assert(!strcmp((char *)Error_get_message(&err2), "ok"));
+		cr_assert(!strcmp((char *)Error_get_message(&err3), "test"));
+
+		BacktracePtr bt = BUILD(Backtrace, NULL, 0);
+		Error err4 = {{&ErrorVtable}, {}, "abc123", bt};
+		copy(&err4, &err3);
+		printf("4 = %s, 3 = %s\n", (char *)Error_get_message(&err4),
+		       (char *)Error_get_message(&err3));
+		cr_assert(!strcmp((char *)Error_get_message(&err4), "test"));
+
+		print(&err, 0);
+		print(&err3, 0);
+		print(&err4, 0);
+	}
+
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	printf("init=%i,final=%i\n", initial_diff, final_diff);
+	cr_assert_eq(final_diff, initial_diff);
+}
+
 Test(base, test_rc) {
 	int *x = tlmalloc(sizeof(int));
 	*x = 100;
 	Rc r = BUILD(Rc, x);
 	printf("x=%i\n", *(int *)(*Rc_get_p(&r)));
 	cr_assert_eq(*(int *)(*Rc_get_p(&r)), 100);
+}
+
+Test(base, copy_bt) {
+	u64 initial_alloc_count = alloc_count();
+	u64 initial_free_count = free_count();
+
+	u64 initial_diff = initial_alloc_count - initial_free_count;
+
+	{
+		Backtrace bt1 = BUILD(Backtrace, NULL, 0);
+		Backtrace_generate(&bt1, 100);
+
+		Backtrace bt2 = BUILD(Backtrace, NULL, 0);
+		copy(&bt2, &bt1);
+		cr_assert_eq(*Backtrace_get_count(&bt1),
+			     *Backtrace_get_count(&bt2));
+		BacktraceEntryPtr *ptr1 = *Backtrace_get_rows(&bt1);
+		BacktraceEntryPtr *ptr2 = *Backtrace_get_rows(&bt2);
+
+		printf("ptr1.name=%s\n", *BacktraceEntry_get_name(&ptr1[0]));
+		printf("ptr2.name=%s\n", *BacktraceEntry_get_name(&ptr2[0]));
+		printf("ptr1.name=%s\n", *BacktraceEntry_get_name(&ptr1[1]));
+		printf("ptr2.name=%s\n", *BacktraceEntry_get_name(&ptr2[1]));
+
+		for (u64 i = 0; i < *Backtrace_get_count(&bt1); i++) {
+			cr_assert(!strcmp(*BacktraceEntry_get_name(&ptr1[i]),
+					  *BacktraceEntry_get_name(&ptr2[i])));
+		}
+	}
+
+	u64 final_alloc_count = alloc_count();
+	u64 final_free_count = free_count();
+	u64 final_diff = final_alloc_count - final_free_count;
+
+	printf("init=%i,final=%i\n", initial_diff, final_diff);
+	cr_assert_eq(final_diff, initial_diff);
 }

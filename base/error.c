@@ -14,83 +14,60 @@
 
 #include <base/colors.h>
 #include <base/error.h>
-#include <stdlib.h>
 #include <string.h>
 
-bool errorkind_equal(ErrorKind *kind1, ErrorKind *kind2) {
-	return strcmp(kind1->type_str, kind2->type_str) == 0;
+void ErrorKind_cleanup(ErrorKindPtr *obj) {}
+size_t ErrorKind_size(ErrorKind *obj) { return sizeof(ErrorKind); }
+bool ErrorKind_copy(ErrorKind *dst, ErrorKind *src) {
+	void *dst_kind = ErrorKind_get_kind(dst);
+	void *src_kind = ErrorKind_get_kind(src);
+	memcpy(dst_kind, src_kind, MAX_ERROR_KIND_LEN);
+	return true;
+}
+bool ErrorKind_equal(ErrorKind *obj1, ErrorKind *obj2) {
+	return !strcmp((char *)ErrorKind_get_kind(obj1),
+		       (char *)ErrorKind_get_kind(obj2));
 }
 
-ErrorKind errorkind_build(char *type_str) {
-	ErrorKind ret;
-	ret.vtable = &ErrorKindVtable;
-	int len = strlen(type_str);
-	if (len < MAX_ERROR_KIND_LEN) {
-		strcpy(ret.type_str, type_str);
-	} else {
-		memcpy(ret.type_str, type_str, MAX_ERROR_KIND_LEN - 1);
-		ret.type_str[MAX_ERROR_KIND_LEN - 1] = 0;
-	}
-	return ret;
+void Error_cleanup(ErrorPtr *obj) {
+	BacktracePtr *bt = Error_get_bt(obj);
+	cleanup(bt);
 }
 
-void error_free(ErrorPtr *err) {
-	if (err->msg) {
-		// don't use tlfree because this is allocated by vasprintf which
-		// uses malloc
-		free(err->msg);
-		err->msg = NULL;
-	}
-	backtrace_free(&err->backtrace);
+bool Error_copy(Error *dst, Error *src) {
+	memcpy(dst->_kind._kind, src->_kind._kind, MAX_ERROR_KIND_LEN);
+	memcpy(dst->_message, src->_message, MAX_ERROR_MESSAGE_LEN);
+	return copy(&dst->_bt, &src->_bt);
 }
 
-Error error_build(ErrorKind kind, char *format, ...) {
-	va_list args;
-	va_start(args, format);
-	ErrorPtr ret = verror_build(kind, format, args);
-	va_end(args);
-	return ret;
-}
-Error verror_build(ErrorKind kind, char *format, va_list args) {
-	ErrorPtr err;
-	err.vtable = &ErrorVtable;
+size_t Error_size(Error *obj) { return sizeof(Error); }
+void Error_print(Error *obj, u64 flags) {
+	ErrorKindPtr *kind = Error_get_kind(obj);
+	char *kind_str = (char *)ErrorKind_get_kind(kind);
+	char *msg = (char *)Error_get_message(obj);
 
-	// set error message to formatted message
-	if (vasprintf(&err.msg, format, args) < 0) {
-		// couldn't allocate memory
-		err.msg = NULL;
-		// continue because we can copy the error kind over and
-		// attempte to get the backtrace
-	}
-
-	// copy kind over
-	err.kind = errorkind_build(kind.type_str);
-
-	// generate a backtrace
-	err.backtrace = backtrace_generate(ERROR_BACKTRACE_MAX_DEPTH);
-
-	return err;
-}
-
-void error_print(Error *err, int flags) {
 	if ((flags & ERROR_PRINT_FLAG_NO_COLOR) == 0)
 		printf(ANSI_COLOR_BRIGHT_RED "%s" ANSI_COLOR_RESET
 					     ": \"" ANSI_COLOR_GREEN
 					     "%s" ANSI_COLOR_RESET "\"\n",
-		       err->kind.type_str, err->msg);
+		       kind_str, msg);
 	else
-		printf("%s: \"%s\"\n", err->kind.type_str, err->msg);
+		printf("%s: \"%s\"\n", kind_str, msg);
 	if ((flags & ERROR_PRINT_FLAG_NO_BACKTRACE) == 0)
-		backtrace_print(&err->backtrace, flags);
+		print(Error_get_bt(obj), flags);
+}
+bool Error_equal(Error *obj1, Error *obj2) {
+	return equal(Error_get_kind(obj1), Error_get_kind(obj2));
 }
 
-bool error_equal(Error *e1, Error *e2) {
-	// only compare kinds of errors, not message
-	return errorkind_equal(&e1->kind, &e2->kind);
-}
-
-size_t error_size(Error *e) { return sizeof(Error); }
-bool error_copy(Error *dst, Error *src) {
-	*dst = error_build(src->kind, "%s", src->msg);
-	return true;
+Error error_build(ErrorKind kind, char *msg) {
+	BacktracePtr bt = BUILD(Backtrace, NULL, 0);
+	Backtrace_generate(&bt, 100);
+	ErrorPtr ret = BUILD(Error, kind, {}, bt);
+	char *err_msg = (char *)Error_get_message(&ret);
+	int len = strlen(msg);
+	if (len > MAX_ERROR_MESSAGE_LEN)
+		len = MAX_ERROR_MESSAGE_LEN;
+	memcpy(err_msg, msg, len);
+	return ret;
 }

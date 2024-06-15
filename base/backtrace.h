@@ -57,4 +57,4 @@ SETTER(Backtrace, rows);
 GETTER(Backtrace, count);
 SETTER(Backtrace, count);
 
-#endif // _UNIT_BASE__
+#endif // _BACKTRACE_BASE__

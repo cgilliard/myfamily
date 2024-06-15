@@ -17,6 +17,7 @@
 
 #include <base/class.h>
 
+#define TRAIT_EQUAL(T) TRAIT_REQUIRED(T, bool, equal, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_COPY(T)                                                          \
 	TRAIT_REQUIRED(T, bool, copy, T##Ptr *dst, T##Ptr *src)                \
 	TRAIT_SUPER(T, TRAIT_SIZE)
