@@ -31,7 +31,7 @@ bool ErrorKind_equal(ErrorKind *obj1, ErrorKind *obj2) {
 
 void Error_cleanup(ErrorPtr *obj) {
 	BacktracePtr *bt = Error_get_bt(obj);
-	cleanup(bt);
+	dispose(bt);
 }
 
 bool Error_copy(Error *dst, Error *src) {

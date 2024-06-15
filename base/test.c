@@ -313,6 +313,14 @@ Test(base, copy_bt) {
 			cr_assert(!strcmp(*BacktraceEntry_get_name(&ptr1[i]),
 					  *BacktraceEntry_get_name(&ptr2[i])));
 		}
+
+		BacktracePtr bt3 = BUILD(Backtrace, NULL, 0);
+		Backtrace_generate(&bt3, 100);
+		dispose(&bt3);
+		u64 x = 10;
+		u32 y = 20;
+		dispose(&x);
+		dispose(&y);
 	}
 
 	u64 final_alloc_count = alloc_count();
@@ -321,4 +329,16 @@ Test(base, copy_bt) {
 
 	printf("init=%i,final=%i\n", initial_diff, final_diff);
 	cr_assert_eq(final_diff, initial_diff);
+}
+
+Test(base, test_copy) {
+	u64 x1 = 10, x2 = 20;
+	copy(&x1, &x2);
+	cr_assert_eq(x1, x2);
+	size_t size_u64 = size(&x1);
+	u32 x3 = 3;
+	u64 xu32 = size(&x3);
+	cr_assert_eq(xu32, 4);
+	u64 xu64 = size(&x1);
+	cr_assert_eq(xu64, 8);
 }

@@ -52,10 +52,9 @@ void vtable_override(Vtable *table, VtableEntry entry);
 
 #define BUILD(name, ...) {{&name##Vtable, NULL}, __VA_ARGS__}
 
-#define CLASS_IMPL(name, ...)
-
 #define MEMBER_TYPE(type, member) typeof(((type *)0)->member)
 
+#define FNPTR(name) name;
 #define FIELD(field_type, field_name) field_type CAT(_, field_name);
 #define GETTER(name, field_name)                                               \
 	static MEMBER_TYPE(name, CAT(_, field_name)) *                         \
