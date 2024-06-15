@@ -12,19 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
-#include <criterion/criterion.h>
+#ifndef _CLEANUP_BASE__
+#define _CLEANUP_BASE__
 
-FamSuite("base");
+// Ensure the cleanup attribute is available
+#ifdef __GNUC__
+#define Cleanup(f) __attribute__((cleanup(f)))
+#else
+#define Cleanup(f)
+#endif
 
-FamTest(base, args) {
-	cr_assert(true);
-	printf("starting args\n");
-}
-
-FamTest(base, file) {
-	printf("starting file test\n");
-	void *abc = tlmalloc(1);
-	tlfree(abc);
-	// cr_assert(false);
-}
+#endif // _CLEANUP_BASE__

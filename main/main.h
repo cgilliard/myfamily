@@ -12,19 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
-#include <criterion/criterion.h>
+#ifndef _MAIN_MAIN__
+#define _MAIN_MAIN__
 
-FamSuite("base");
+int real_main(int argc, char **argv);
 
-FamTest(base, args) {
-	cr_assert(true);
-	printf("starting args\n");
-}
-
-FamTest(base, file) {
-	printf("starting file test\n");
-	void *abc = tlmalloc(1);
-	tlfree(abc);
-	// cr_assert(false);
-}
+#endif // _MAIN_MAIN__

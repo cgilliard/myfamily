@@ -12,19 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
-#include <criterion/criterion.h>
+#ifndef _TLMALLOC_BASE__
+#define _TLMALLOC_BASE__
 
-FamSuite("base");
+#include <base/types.h>
+#include <stddef.h>
 
-FamTest(base, args) {
-	cr_assert(true);
-	printf("starting args\n");
-}
+typedef struct TLMallocStats {
+	u128 cur_bytes;
+	u64 cur_allocs;
+	u64 cur_reallocs;
+	u64 cur_frees;
+} TLMallocStats;
 
-FamTest(base, file) {
-	printf("starting file test\n");
-	void *abc = tlmalloc(1);
-	tlfree(abc);
-	// cr_assert(false);
-}
+void *tlmalloc(size_t size);
+void *tlrealloc(void *ptr, size_t size);
+void tlfree(void *ptr);
+u128 cur_bytes_alloc();
+u64 alloc_count();
+u64 realloc_count();
+u64 free_count();
+
+#endif // _TLMALLOC_BASE__

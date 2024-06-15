@@ -20,10 +20,15 @@ test: $(SUBDIRS)
 		if [ $$? -ne "0" ]; then \
 		ERROR="1"; \
 		fi; \
-	done; \
-	if [ $$ERROR -ne "0" ]; then \
-		$$? = 1; \
-	fi
+	done; 
+testnc: $(SUBDIRS)
+	ERROR="0"; \
+	for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir testnc; \
+		if [ $$? -ne "0" ]; then \
+		ERROR="1"; \
+		fi; \
+	done;
 doc:
 	doxygen doxygen.cfg
 install:
