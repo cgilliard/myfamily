@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _RC_BASE__
-#define _RC_BASE__
+#ifndef _BASE_ARGS__
+#define _BASE_ARGS__
 
-#include <base/class.h>
-
-CLASS(Rc, FIELD(void *, p))
-#define Rc DEFINE_CLASS(Rc)
-GETTER(Rc, p)
-
-#endif // _RC_BASE__
+#endif // _BASE_ARGS__

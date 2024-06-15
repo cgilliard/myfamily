@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/backtrace.h>
-#include <base/error.h>
-#include <base/types.h>
 #include <stdio.h>
 
-static ErrorKind ILLEGAL_STATE = EKind("IllegalState");
-
 int real_main(int argc, char **argv) {
-	Error err = ERROR(ILLEGAL_STATE, "test error %d", 8);
-	error_print(&err, 0);
 
 	printf("main doesn't currently do anything\n");
 	return 0;

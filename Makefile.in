@@ -1,5 +1,6 @@
 include Makefile.config
 
+.SILENT:
 all: $(SUBDIRS)
 	$(CC) $(CC_FLAGS) -o bin/fam $(ALL_OBJS)
 clean:
@@ -27,7 +28,7 @@ test: $(SUBDIRS)
 doc:
 	doxygen doxygen.cfg
 install:
-	cp bin/fam /usr/local/bin
+	cp bin/fam $(INSTALL_DIR)
 .PHONY: all $(SUBDIRS)
 .PHONY: test $(SUBDIRS)
 .PHONY: doc

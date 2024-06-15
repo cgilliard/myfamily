@@ -12,9 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _PANIC_BASE__
-#define _PANIC_BASE__
-
-void panic(const char *str) __attribute__((noreturn));
-
-#endif // _PANIC_BASE__
+#include <base/args.h>
