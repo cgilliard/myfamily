@@ -1,4 +1,4 @@
-OBJS := main.o
-TEST_OBJS := $(OBJS) ../base/*.o
+OBJS := main.o real_main.o
+TEST_OBJS := real_main.o ../base/*.o
 
 include ../Makefile.template

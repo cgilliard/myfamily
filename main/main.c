@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <stdio.h>
+// don't do much here just call to the real_main so we can add to criterion
+// criterion redirects output when you call a 'main'
 
-int real_main(int argc, char **argv) {
-
-	printf("main doesn't currently do anything\n");
-	return 0;
-}
-
+#include <main/main.h>
 int main(int argc, char **argv) { return real_main(argc, argv); }

@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/test.h>
 #include <criterion/criterion.h>
 
-Test(base, file) { cr_assert(true); }
+FamSuite("base");
+
+FamTest(base, args) { cr_assert(true); }
+
+FamTest(base, file) {
+	void *abc = tlmalloc(1);
+	tlfree(abc);
+}

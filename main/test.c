@@ -12,11 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/test.h>
 #include <criterion/criterion.h>
+#include <criterion/hooks.h>
+#include <main/main.h>
 
-int real_main(int argc, char **argv);
+FamSuite("main");
 
-Test(test, main) {
+FamTest(main, main) {
+	printf("pre test\n");
 	int r = real_main(0, NULL);
 	cr_assert_eq(r, 0);
 }
+
+FamTest(main, other) {}
