@@ -1,6 +1,5 @@
 include Makefile.config
 
-.SILENT:
 all: $(SUBDIRS)
 	$(CC) $(CC_FLAGS) -o bin/fam $(ALL_OBJS)
 clean:
