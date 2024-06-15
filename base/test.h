@@ -15,11 +15,16 @@
 #include <base/colors.h>
 #include <base/macro_utils.h>
 #include <base/tlmalloc.h>
+#include <criterion/criterion.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+#define assert(x) cr_assert(x)
+#define assert_eq(x, y) cr_assert_eq(x, y)
+#define assert_neq(x, y) cr_assert_neq(x, y)
 
 #define FamSuite(name)                                                         \
 	void setup_suite(void) {                                               \

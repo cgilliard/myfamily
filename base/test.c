@@ -13,12 +13,13 @@
 // limitations under the License.
 
 #include <base/test.h>
-#include <criterion/criterion.h>
 
 FamSuite("base");
 
 FamTest(base, args) {
-	cr_assert(true);
+	assert(true);
+	assert_eq(1, 1);
+	assert_neq(1, 2);
 	printf("starting args\n");
 }
 
@@ -26,5 +27,5 @@ FamTest(base, file) {
 	printf("starting file test\n");
 	void *abc = tlmalloc(1);
 	tlfree(abc);
-	// cr_assert(false);
+	// assert(false);
 }
