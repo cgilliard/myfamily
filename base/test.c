@@ -17,7 +17,7 @@
 #include <base/test.h>
 
 FamSuite(base);
-/*
+
 FamTest(base, test_args_params) {
 	ArgsParam param = ArgsParam_build("test", NULL, NULL, false, true);
 	assert(*(bool *)ArgsParam_get_multiple(&param));
@@ -119,7 +119,7 @@ FamTest(base, test_args) {
 		}
 	}
 }
-*/
+
 FamTest(base, test_params_equal) {
 	ArgsParam p1 = ArgsParam_build("test", NULL, NULL, false, true);
 	ArgsParam p2 = ArgsParam_build("test", NULL, NULL, false, true);
@@ -172,4 +172,38 @@ FamTest(base, test_params_equal) {
 	p1 = ArgsParam_build(NULL, "test", "ok", true, false);
 	p2 = ArgsParam_build(NULL, "test", "ok", true, false);
 	assert(equal(&p1, &p2));
+}
+
+FamTest(base, test_init_args) {
+	bool ret;
+	Args args1 = Args_build();
+	Args_add_param(&args1, "string4", "", "s", false, false);
+	int argc1 = 1;
+	const char *argv1[] = {"--string4"};
+	ret = Args_init(&args1, argc1, (char **)argv1);
+	assert(ret);
+
+	Args args2 = Args_build();
+	int argc2 = 4;
+
+	Args_add_param(&args2, "str1", "", "s", true, false);
+	Args_add_param(&args2, "verbose", "", "v", false, false);
+	Args_add_param(&args2, "debug", "", "d", false, false);
+
+	const char *argv2[] = {"--str1", "ok", "-d", "--verbose"};
+	ret = Args_init(&args2, argc2, (char **)argv2);
+	assert(ret);
+
+	int argc3 = 4;
+	Args args3 = Args_build();
+
+	Args_add_param(&args3, "str1", "", "s", true, false);
+	Args_add_param(&args3, "verbose", "", "v", false, false);
+	Args_add_param(&args3, "debug", "", "d", false, false);
+
+	const char *argv3[] = {"--str", "ok", "-d", "--verbose"};
+	ret = Args_init(&args3, argc3, (char **)argv3);
+	assert(!ret);
+
+	/// char *expect_ok = Args_value(&args2, "str1", "another");
 }

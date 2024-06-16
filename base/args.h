@@ -22,7 +22,7 @@
 	TRAIT_REQUIRED(T, bool, add_param, T##Ptr *args, const char *name,     \
 		       const char *help, const char *short_name,               \
 		       bool takes_value, bool multiple)                        \
-	TRAIT_REQUIRED(T, void, init, T##Ptr *args, int argc, char **argv)     \
+	TRAIT_REQUIRED(T, bool, init, T##Ptr *args, int argc, char **argv)     \
 	TRAIT_REQUIRED(T, char *, value, T##Ptr *args, char *param,            \
 		       char *value)                                            \
 	TRAIT_REQUIRED(T, T##Ptr, build)
@@ -50,11 +50,13 @@ SETTER(ArgsParam, help)
 SETTER(ArgsParam, short_name)
 SETTER(ArgsParam, takes_value)
 SETTER(ArgsParam, multiple)
+SETTER(ArgsParam, argv_itt);
 GETTER(ArgsParam, name)
 GETTER(ArgsParam, help)
 GETTER(ArgsParam, short_name)
 GETTER(ArgsParam, takes_value)
 GETTER(ArgsParam, multiple)
+GETTER(ArgsParam, argv_itt);
 
 GETTER(Args, count)
 GETTER(Args, params)
