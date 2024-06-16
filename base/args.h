@@ -34,7 +34,8 @@
 
 CLASS(ArgsParam,
       FIELD(char *, name) FIELD(char *, help) FIELD(char *, short_name)
-	  FIELD(bool, takes_value) FIELD(bool, multiple) FIELD(u64, argv_itt));
+	  FIELD(bool, takes_value) FIELD(bool, multiple) FIELD(u64, argv_itt)
+	      FIELD(bool, specified));
 IMPL(ArgsParam, TRAIT_COPY)
 IMPL(ArgsParam, TRAIT_EQUAL)
 IMPL(ArgsParam, TRAIT_ARGS_PARAM)
@@ -56,7 +57,9 @@ GETTER(ArgsParam, help)
 GETTER(ArgsParam, short_name)
 GETTER(ArgsParam, takes_value)
 GETTER(ArgsParam, multiple)
-GETTER(ArgsParam, argv_itt);
+GETTER(ArgsParam, argv_itt)
+GETTER(ArgsParam, specified)
+SETTER(ArgsParam, specified)
 
 GETTER(Args, count)
 GETTER(Args, params)

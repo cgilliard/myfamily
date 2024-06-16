@@ -73,6 +73,7 @@ ArgsParam ArgsParam_build(const char *name, const char *help,
 	ArgsParam_set_takes_value(&ret, takes_value);
 	ArgsParam_set_multiple(&ret, multiple);
 	ArgsParam_set_argv_itt(&ret, 0);
+	ArgsParam_set_specified(&ret, false);
 	return ret;
 }
 
@@ -198,7 +199,8 @@ bool Args_add_param(ArgsPtr *ptr, const char *name, const char *help,
 	return ret;
 }
 
-bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi) {
+bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi,
+		bool *already_specified) {
 	if (name[0] != '-' || strlen(name) < 2)
 		return false;
 
@@ -209,6 +211,7 @@ bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi) {
 	for (u64 i = 0; i < count; i++) {
 		char *pname = *ArgsParam_get_name(&params[i]);
 		char *short_name = *ArgsParam_get_short_name(&params[i]);
+		bool specified = *ArgsParam_get_specified(&params[i]);
 
 		if (pname && name[1] == '-' || short_name && name[1] != '-') {
 			int len;
@@ -228,6 +231,9 @@ bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi) {
 				*is_takes_value =
 				    *ArgsParam_get_takes_value(&params[i]);
 				*is_multi = *ArgsParam_get_multiple(&params[i]);
+				*already_specified = specified;
+
+				ArgsParam_set_specified(&params[i], true);
 
 				ret = true;
 				break;
@@ -253,17 +259,66 @@ bool Args_init(Args *args, int argc, char **argv) {
 	Args_set_argv(args, argv_copy);
 	Args_set_argc(args, argc);
 
+	// set specified to false for all
+	u64 count = *(u64 *)Args_get_count(args);
+	ArgsParamPtr *params = *(ArgsParamPtr **)Args_get_params(args);
+	for (u64 i = 0; i < count; i++) {
+		ArgsParam_set_specified(&params[i], false);
+	}
+
 	for (u64 i = 0; i < argc; i++) {
-		bool is_takes_value, is_multi;
-		if (!find_param(args, argv_copy[i], &is_takes_value,
-				&is_multi)) {
-			printf("Unknown parameter: %s\n", argv_copy[i]);
+		bool is_takes_value, is_multi, already_specified;
+		if (!find_param(args, argv_copy[i], &is_takes_value, &is_multi,
+				&already_specified)) {
+			printf("Error: Unknown parameter: %s\n", argv_copy[i]);
 			ret = false;
 			break;
 		}
 
-		if (is_takes_value)
+		if (already_specified) {
+			printf(
+			    "Error: Parameter specified more than once: %s\n",
+			    argv_copy[i]);
+			ret = false;
+			break;
+		}
+
+		if (is_multi && !is_takes_value) {
+			printf("Error: Parameter cannot be multi and and not "
+			       "takes_value: %s\n",
+			       argv_copy[i]);
+			ret = false;
+			break;
+		}
+
+		if (is_takes_value) {
 			i += 1;
+			if (i >= argc) {
+				printf("Error: Value not found for: %s\n",
+				       argv_copy[i - 1]);
+				ret = false;
+				break;
+			}
+			if (argv_copy[i][0] == '-') {
+				printf("Error: Expected a value for: %s\n",
+				       argv_copy[i - 1]);
+				ret = false;
+				break;
+			}
+		}
+
+		if (is_multi) {
+			while (true) {
+				if (i >= argc)
+					break;
+				if (strlen(argv_copy[i]) > 1 &&
+				    argv_copy[i][0] == '-') {
+					i--;
+					break;
+				}
+				i++;
+			}
+		}
 	}
 
 	return ret;

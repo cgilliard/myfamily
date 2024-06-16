@@ -197,6 +197,7 @@ FamTest(base, test_init_args) {
 	int argc3 = 4;
 	Args args3 = Args_build();
 
+	// str not found
 	Args_add_param(&args3, "str1", "", "s", true, false);
 	Args_add_param(&args3, "verbose", "", "v", false, false);
 	Args_add_param(&args3, "debug", "", "d", false, false);
@@ -205,5 +206,60 @@ FamTest(base, test_init_args) {
 	ret = Args_init(&args3, argc3, (char **)argv3);
 	assert(!ret);
 
-	/// char *expect_ok = Args_value(&args2, "str1", "another");
+	// short and long matches ok
+	char *argv4[] = {"--str1", "ok", "-d", "--verbose"};
+	Args args4 = Args_build();
+	Args_add_param(&args4, "str1", "", "s", true, false);
+	Args_add_param(&args4, "verbose", "", "v", false, false);
+	Args_add_param(&args4, "debug", "", "d", false, false);
+	ret = Args_init(&args4, 4, argv4);
+	assert(ret);
+
+	// non multi error
+	char *argv5[] = {"--str1", "ok", "x", "-d", "--verbose"};
+	Args args5 = Args_build();
+	Args_add_param(&args5, "str1", "", "s", true, false);
+	Args_add_param(&args5, "verbose", "", "v", false, false);
+	Args_add_param(&args5, "debug", "", "d", false, false);
+	ret = Args_init(&args5, 5, argv5);
+	assert(!ret);
+
+	// multi
+	char *argv6[] = {"--str1", "ok", "x", "-d", "--verbose"};
+	Args args6 = Args_build();
+	Args_add_param(&args6, "str1", "", "s", true, true);
+	Args_add_param(&args6, "verbose", "", "v", false, false);
+	Args_add_param(&args6, "debug", "", "d", false, false);
+	ret = Args_init(&args6, 5, argv6);
+	assert(ret);
+
+	// takes param not found
+	char *argv7[] = {"--str1", "ok", "x", "-d", "--verbose", "--port"};
+	Args args7 = Args_build();
+	Args_add_param(&args7, "str1", "", "s", true, true);
+	Args_add_param(&args7, "verbose", "", "v", false, false);
+	Args_add_param(&args7, "debug", "", "d", false, false);
+	Args_add_param(&args7, "port", "", "p", true, false);
+	ret = Args_init(&args7, 6, argv7);
+	assert(!ret);
+
+	// takes param not found because another option
+	char *argv8[] = {"--str1", "-p", "x", "-d", "--verbose"};
+	Args args8 = Args_build();
+	Args_add_param(&args8, "str1", "", "s", true, true);
+	Args_add_param(&args8, "verbose", "", "v", false, false);
+	Args_add_param(&args8, "debug", "", "d", false, false);
+	Args_add_param(&args8, "port", "", "p", true, false);
+	ret = Args_init(&args8, 5, argv8);
+	assert(!ret);
+
+	// duplicate (debug)
+	char *argv9[] = {"--str1", "p", "x", "-d", "--debug"};
+	Args args9 = Args_build();
+	Args_add_param(&args9, "str1", "", "s", true, true);
+	Args_add_param(&args9, "verbose", "", "v", false, false);
+	Args_add_param(&args9, "debug", "", "d", false, false);
+	Args_add_param(&args9, "port", "", "p", true, false);
+	ret = Args_init(&args9, 5, argv9);
+	assert(!ret);
 }
