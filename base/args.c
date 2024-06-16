@@ -15,6 +15,30 @@
 #include <base/args.h>
 #include <base/tlmalloc.h>
 
+SETTER(ArgsParam, name)
+SETTER(ArgsParam, help)
+SETTER(ArgsParam, short_name)
+SETTER(ArgsParam, takes_value)
+SETTER(ArgsParam, multiple)
+SETTER(ArgsParam, argv_itt);
+GETTER(ArgsParam, name)
+GETTER(ArgsParam, help)
+GETTER(ArgsParam, short_name)
+GETTER(ArgsParam, takes_value)
+GETTER(ArgsParam, multiple)
+GETTER(ArgsParam, argv_itt)
+GETTER(ArgsParam, specified)
+SETTER(ArgsParam, specified)
+
+GETTER(Args, count)
+GETTER(Args, params)
+SETTER(Args, count)
+SETTER(Args, params)
+SETTER(Args, argc)
+SETTER(Args, argv)
+GETTER(Args, argv)
+GETTER(Args, argc)
+
 void ArgsParam_cleanup(ArgsParamPtr *ptr) {
 	void *name = *ArgsParam_get_name(ptr);
 	if (name) {
@@ -119,23 +143,17 @@ bool ArgsParam_equal(ArgsParam *obj1, ArgsParam *obj2) {
 }
 
 bool ArgsParam_copy(ArgsParam *dst, ArgsParam *src) {
-	bool ret = true;
 	*dst = ArgsParam_build(
 	    *ArgsParam_get_name(src), *ArgsParam_get_help(src),
 	    *ArgsParam_get_short_name(src), *ArgsParam_get_takes_value(src),
 	    *ArgsParam_get_multiple(src));
 
-	return ret;
+	if (!equal(src, dst))
+		return false;
+	return true;
 }
 
 size_t ArgsParam_size(ArgsParam *obj) { return sizeof(ArgsParam); }
-
-SETTER(Args, count)
-SETTER(Args, params)
-SETTER(Args, argc)
-SETTER(Args, argv)
-GETTER(Args, argv)
-GETTER(Args, argc)
 
 void Args_cleanup(ArgsPtr *ptr) {
 	u64 count = *(u64 *)Args_get_count(ptr);
@@ -394,4 +412,3 @@ bool Args_value(Args *args, char *buffer, size_t len, char *param,
 
 	return ret;
 }
-

@@ -57,16 +57,24 @@ void vtable_override(Vtable *table, VtableEntry entry);
 #define FNPTR(name) name;
 #define FIELD(field_type, field_name) field_type CAT(_, field_name);
 #define GETTER(name, field_name)                                               \
-	static MEMBER_TYPE(name, CAT(_, field_name)) *                         \
+	MEMBER_TYPE(name, CAT(_, field_name)) *                                \
 	    CAT(name##_, CAT(get_, field_name))(name##Ptr * self) {            \
 		return &self->CAT(_, field_name);                              \
 	}
 #define SETTER(name, field_name)                                               \
-	static void CAT(name##_, CAT(set_, field_name))(                       \
+	void CAT(name##_, CAT(set_, field_name))(                              \
 	    name##Ptr * self,                                                  \
 	    MEMBER_TYPE(name, CAT(_, field_name)) CAT(_, field_name)) {        \
 		self->CAT(_, field_name) = CAT(_, field_name);                 \
 	}
+#define GETTER_PROTO(name, field_name)                                         \
+	MEMBER_TYPE(name, CAT(_, field_name)) *                                \
+	    CAT(name##_, CAT(get_, field_name))(name##Ptr * self);
+
+#define SETTER_PROTO(name, field_name)                                         \
+	static void CAT(name##_, CAT(set_, field_name))(                       \
+	    name##Ptr * self,                                                  \
+	    MEMBER_TYPE(name, CAT(_, field_name)) CAT(_, field_name));
 
 #define CLASS(name, ...)                                                       \
 	typedef struct {                                                       \

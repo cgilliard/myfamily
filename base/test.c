@@ -16,6 +16,15 @@
 #include <base/class.h>
 #include <base/test.h>
 
+GETTER_PROTO(ArgsParam, name)
+GETTER_PROTO(ArgsParam, help)
+GETTER_PROTO(ArgsParam, short_name)
+GETTER_PROTO(ArgsParam, takes_value)
+GETTER_PROTO(ArgsParam, multiple)
+GETTER_PROTO(ArgsParam, specified)
+GETTER_PROTO(Args, count)
+GETTER_PROTO(Args, params)
+
 FamSuite(base);
 
 FamTest(base, test_args_params) {

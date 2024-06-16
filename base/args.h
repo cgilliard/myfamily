@@ -48,22 +48,4 @@ CLASS(Args, FIELD(char **, argv) FIELD(int, argc) FIELD(ArgsParamPtr *, params)
 IMPL(Args, TRAIT_ARGS)
 #define Args DEFINE_CLASS(Args)
 
-SETTER(ArgsParam, name)
-SETTER(ArgsParam, help)
-SETTER(ArgsParam, short_name)
-SETTER(ArgsParam, takes_value)
-SETTER(ArgsParam, multiple)
-SETTER(ArgsParam, argv_itt);
-GETTER(ArgsParam, name)
-GETTER(ArgsParam, help)
-GETTER(ArgsParam, short_name)
-GETTER(ArgsParam, takes_value)
-GETTER(ArgsParam, multiple)
-GETTER(ArgsParam, argv_itt)
-GETTER(ArgsParam, specified)
-SETTER(ArgsParam, specified)
-
-GETTER(Args, count)
-GETTER(Args, params)
-
 #endif // _BASE_ARGS__
