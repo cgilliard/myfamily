@@ -263,3 +263,62 @@ FamTest(base, test_init_args) {
 	ret = Args_init(&args9, 5, argv9);
 	assert(!ret);
 }
+
+FamTest(base, args_value) {
+	bool ret;
+	char *value;
+	char *argv1[] = {"--str1", "x", "-v", "--debug"};
+	Args args1 = Args_build();
+	Args_add_param(&args1, "str1", "", "s", true, false);
+	Args_add_param(&args1, "verbose", "", "v", false, false);
+	Args_add_param(&args1, "debug", "", "d", false, false);
+	Args_add_param(&args1, "port", "", "p", true, false);
+	ret = Args_init(&args1, 4, argv1);
+	assert(ret);
+
+	char buffer[1024];
+	strcpy(buffer, "");
+	ret = Args_value(&args1, buffer, 1024, "str1", "y");
+	assert(ret);
+	assert_eq_str(buffer, "x");
+
+	ret = Args_value(&args1, buffer, 1024, "debug", "");
+	assert(ret);
+
+	ret = Args_value(&args1, buffer, 1024, "verbose", "");
+	assert(ret);
+
+	strcpy(buffer, "");
+
+	char *argv2[] = {"--str1", "x", "y", "-v", "--debug"};
+	Args args2 = Args_build();
+	Args_add_param(&args2, "str1", "", "s", true, true);
+	Args_add_param(&args2, "verbose", "", "v", false, false);
+	Args_add_param(&args2, "debug", "", "d", false, false);
+	Args_add_param(&args2, "port", "", "p", true, false);
+	Args_add_param(&args2, "other", "", "o", false, false);
+	ret = Args_init(&args2, 5, argv2);
+	assert(ret);
+
+	ret = Args_value(&args2, buffer, 1024, "str1", "z");
+	assert(ret);
+	assert_eq_str(buffer, "x");
+
+	ret = Args_value(&args2, buffer, 1024, "str1", "z");
+	assert(ret);
+	assert_eq_str(buffer, "y");
+
+	ret = Args_value(&args2, buffer, 1024, "str1", "z");
+	assert(!ret);
+	assert_eq_str(buffer, "z");
+
+	ret = Args_value(&args2, buffer, 1024, "port", "8080");
+	assert(!ret);
+	assert_eq_str(buffer, "8080");
+
+	ret = Args_value(&args2, buffer, 1024, "debug", NULL);
+	assert(ret);
+
+	ret = Args_value(&args2, buffer, 1024, "other", NULL);
+	assert(!ret);
+}

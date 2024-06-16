@@ -18,13 +18,15 @@
 #include <base/class.h>
 #include <base/traits.h>
 
+#define MAX_SHORT_NAME_LEN 10
+
 #define TRAIT_ARGS(T)                                                          \
 	TRAIT_REQUIRED(T, bool, add_param, T##Ptr *args, const char *name,     \
 		       const char *help, const char *short_name,               \
 		       bool takes_value, bool multiple)                        \
 	TRAIT_REQUIRED(T, bool, init, T##Ptr *args, int argc, char **argv)     \
-	TRAIT_REQUIRED(T, char *, value, T##Ptr *args, char *param,            \
-		       char *value)                                            \
+	TRAIT_REQUIRED(T, bool, value, T##Ptr *args, char *buffer, size_t len, \
+		       char *param, char *value)                               \
 	TRAIT_REQUIRED(T, T##Ptr, build)
 
 #define TRAIT_ARGS_PARAM(T)                                                    \

@@ -173,6 +173,13 @@ Args Args_build() {
 
 bool Args_add_param(ArgsPtr *ptr, const char *name, const char *help,
 		    const char *short_name, bool takes_value, bool multiple) {
+
+	if (strlen(short_name) > MAX_SHORT_NAME_LEN) {
+		printf("Illegal short name (must be at most %i characters "
+		       "long): %s",
+		       MAX_SHORT_NAME_LEN, short_name);
+		return false;
+	}
 	bool ret = true;
 	u64 count = *(u64 *)Args_get_count(ptr);
 	void *nptr;
@@ -182,9 +189,9 @@ bool Args_add_param(ArgsPtr *ptr, const char *name, const char *help,
 	} else {
 		void *p = *Args_get_params(ptr);
 		nptr = tlrealloc(p, sizeof(ArgsParam) * (count + 1));
-		if (nptr == NULL)
-			ret = false;
-		else {
+		if (nptr == NULL) {
+			panic("Could not allocate memory to build params");
+		} else {
 			Args_set_params(ptr, nptr);
 		}
 	}
@@ -294,7 +301,7 @@ bool Args_init(Args *args, int argc, char **argv) {
 		if (is_takes_value) {
 			i += 1;
 			if (i >= argc) {
-				printf("Error: Value not found for: %s\n",
+				printf("Error: Expected a value for: %s\n",
 				       argv_copy[i - 1]);
 				ret = false;
 				break;
@@ -323,12 +330,68 @@ bool Args_init(Args *args, int argc, char **argv) {
 
 	return ret;
 }
-char *Args_value(Args *args, char *param, char *value) {
+bool Args_value(Args *args, char *buffer, size_t len, char *param,
+		char *value) {
+	char param_buffer[strlen(param) + 3];
+	char param_buffer_short[MAX_SHORT_NAME_LEN + 3];
+	strcpy(param_buffer, "--");
+	strcat(param_buffer, param);
+	strcpy(param_buffer_short, "-");
+	bool ret = false;
 	int argc = *Args_get_argc(args);
 	char **argv = *Args_get_argv(args);
-	for (u64 i = 0; i < argc; i++) {
-		printf("argv[%llu]='%s'\n", i, argv[i]);
+
+	u64 count = *(u64 *)Args_get_count(args);
+	ArgsParamPtr *params = *(ArgsParamPtr **)Args_get_params(args);
+	bool takes_value = false;
+	bool multi = false;
+	u64 match_index = 0;
+	for (u64 i = 0; i < count; i++) {
+		char *name = *ArgsParam_get_name(&params[i]);
+		if (!strcmp(name, param)) {
+			char *short_name =
+			    *ArgsParam_get_short_name(&params[i]);
+			takes_value = *ArgsParam_get_takes_value(&params[i]);
+			multi = *ArgsParam_get_multiple(&params[i]);
+			strcat(param_buffer_short, short_name);
+			match_index = i;
+		}
 	}
 
-	return NULL;
+	u64 i;
+	for (i = 0; i < argc; i++) {
+		if (!strcmp(param_buffer, argv[i])) {
+			// long match
+			ret = true;
+			break;
+		}
+		if (!strcmp(param_buffer_short, argv[i])) {
+			// short match
+			ret = true;
+			break;
+		}
+	}
+
+	if (ret) {
+		i++;
+		if (multi) {
+			u64 itt = *ArgsParam_get_argv_itt(&params[match_index]);
+			i += itt;
+			ArgsParam_set_argv_itt(&params[match_index], itt + 1);
+			if (i < argc && argv[i][0] != '-')
+				strncpy(buffer, argv[i], len);
+			else {
+				ret = false;
+			}
+		} else if (takes_value && i < argc) {
+			strncpy(buffer, argv[i], len);
+		}
+	}
+
+	if (!ret && value != NULL) {
+		strncpy(buffer, value, len);
+	}
+
+	return ret;
 }
+
