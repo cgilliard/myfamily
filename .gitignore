@@ -6,5 +6,4 @@
 **/*.fam
 /bin/*
 /doc/*
-/Makefile
 /Makefile.config

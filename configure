@@ -15,7 +15,6 @@ fi
 
 done
 
-cp Makefile.in Makefile
 cp Makefile.config.in Makefile.config
 perl -pi -e 's/REPLACE_CRITERION_INCLUDE/$ENV{include}/g' Makefile.config
 perl -pi -e 's/REPLACE_CRITERION_LIB/$ENV{lib}/g' Makefile.config
