@@ -23,6 +23,7 @@
 #include <unistd.h>
 
 #define assert(x) cr_assert(x)
+#define assert_eq_str(x, y) cr_assert(!strcmp(x, y))
 #define assert_eq(x, y) cr_assert_eq(x, y)
 #define assert_neq(x, y) cr_assert_neq(x, y)
 
@@ -32,7 +33,7 @@
 		printf("[" ANSI_COLOR_BLUE "====" ANSI_COLOR_RESET             \
 		       "] Running " ANSI_COLOR_GREEN "%s" ANSI_COLOR_RESET     \
 		       " test suite...\n",                                     \
-		       name);                                                  \
+		       #name);                                                 \
 	}                                                                      \
 	Test(init, init, .init = setup_suite) {}                               \
 	static u64 initial_alloc_diff;                                         \
@@ -51,6 +52,9 @@
 			       "] Number of allocations not equal to number "  \
 			       "of frees. Memory leak?\n",                     \
 			       cur_name);                                      \
+			printf("[" ANSI_COLOR_BLUE "====" ANSI_COLOR_RESET     \
+			       "] initial_alloc_diff=%llu,diff=%llu\n",        \
+			       initial_alloc_diff, diff);                      \
 			pid_t iPid = getpid();                                 \
 			kill(iPid, SIGINT);                                    \
 		}                                                              \

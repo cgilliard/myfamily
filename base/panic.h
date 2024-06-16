@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
-#include <criterion/criterion.h>
-#include <criterion/hooks.h>
-#include <main/main.h>
+#ifndef _PANIC_BASE__
+#define _PANIC_BASE__
 
-FamSuite(main);
+void panic(const char *str) __attribute__((noreturn));
 
-FamTest(main, main) {
-	int r = real_main(0, NULL);
-	cr_assert_eq(r, 0);
-}
-
-FamTest(main, other) {}
+#endif // _PANIC_BASE__

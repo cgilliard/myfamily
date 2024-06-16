@@ -12,20 +12,164 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/args.h>
+#include <base/class.h>
 #include <base/test.h>
 
-FamSuite("base");
+FamSuite(base);
+/*
+FamTest(base, test_args_params) {
+	ArgsParam param = ArgsParam_build("test", NULL, NULL, false, true);
+	assert(*(bool *)ArgsParam_get_multiple(&param));
+	assert(!*(bool *)ArgsParam_get_takes_value(&param));
+	ArgsParam param2 = ArgsParam_build("test2", "help", "s", true, false);
+	assert(!*(bool *)ArgsParam_get_multiple(&param2));
+	assert(*(bool *)ArgsParam_get_takes_value(&param2));
 
-FamTest(base, args) {
-	assert(true);
-	assert_eq(1, 1);
-	assert_neq(1, 2);
-	printf("starting args\n");
+	assert(!strcmp(*ArgsParam_get_name(&param), "test"));
+	assert_eq(*ArgsParam_get_help(&param), NULL);
+	assert_eq(*ArgsParam_get_short_name(&param), NULL);
+
+	assert(!strcmp(*ArgsParam_get_name(&param2), "test2"));
+	assert(!strcmp(*ArgsParam_get_help(&param2), "help"));
+	assert(!strcmp(*ArgsParam_get_short_name(&param2), "s"));
+
+	// you can call this more than once
+	ArgsParam_cleanup(&param);
+	ArgsParam_cleanup(&param);
+
+	// or not call it because when it goes out of scope the cleanup fn will
+	// be called
+	ArgsParam param3 = ArgsParam_build("test", NULL, NULL, false, true);
 }
 
-FamTest(base, file) {
-	printf("starting file test\n");
-	void *abc = tlmalloc(1);
-	tlfree(abc);
-	// assert(false);
+FamTest(base, test_args_params_copy) {
+	ArgsParam param = ArgsParam_build("test2", "help", "s", true, false);
+	ArgsParam param2;
+	copy(&param2, &param);
+	assert(!strcmp(*ArgsParam_get_name(&param2), "test2"));
+	assert(!strcmp(*ArgsParam_get_help(&param2), "help"));
+	assert(!strcmp(*ArgsParam_get_short_name(&param2), "s"));
+	assert_eq(*ArgsParam_get_multiple(&param2), false);
+	assert_eq(*ArgsParam_get_takes_value(&param2), true);
+}
+
+FamTest(base, test_args) {
+
+	Args x1;
+	x1._count = 10;
+	assert_eq(*(u64 *)Args_get_count(&x1), 10);
+	x1 = Args_build();
+	assert_eq(*(u64 *)Args_get_count(&x1), 0);
+
+	Args x2 = Args_build();
+	Args_add_param(&x2, "threads", "the number of threads to start", "t",
+		       true, false);
+
+	Args_add_param(&x2, "timeout", "time in milliseconds before halting",
+		       "o", true, false);
+
+	Args_add_param(&x2, "debug",
+		       "if set to true, debugging info is printed", "d", false,
+		       false);
+	Args_add_param(&x2, "port", "port to listen to, multiple allowed", "p",
+		       true, true);
+
+	u64 count = *(u64 *)Args_get_count(&x2);
+	ArgsParamPtr *params = *(ArgsParamPtr **)Args_get_params(&x2);
+	for (u64 i = 0; i < count; i++) {
+		char *name = *((char **)ArgsParam_get_name(&params[i]));
+		char *help = *((char **)ArgsParam_get_help(&params[i]));
+		char *short_name =
+		    *((char **)ArgsParam_get_short_name(&params[i]));
+		bool takes_value =
+		    *((bool *)ArgsParam_get_takes_value(&params[i]));
+		bool multiple = *((bool *)ArgsParam_get_multiple(&params[i]));
+		if (i == 0) {
+			assert_eq_str(name, "threads");
+			assert_eq_str(help, "the number of threads to start");
+			assert_eq_str(short_name, "t");
+			assert_eq(takes_value, true);
+			assert_eq(multiple, false);
+		}
+		if (i == 1) {
+			assert_eq_str(name, "timeout");
+			assert_eq_str(help,
+				      "time in milliseconds before halting");
+			assert_eq_str(short_name, "o");
+			assert_eq(takes_value, true);
+			assert_eq(multiple, false);
+		}
+		if (i == 2) {
+			assert_eq_str(name, "debug");
+			assert_eq_str(
+			    help, "if set to true, debugging info is printed");
+			assert_eq_str(short_name, "d");
+			assert_eq(takes_value, false);
+			assert_eq(multiple, false);
+		}
+
+		if (i == 3) {
+			assert_eq_str(name, "port");
+			assert_eq_str(help,
+				      "port to listen to, multiple allowed");
+			assert_eq_str(short_name, "p");
+			assert_eq(takes_value, true);
+			assert_eq(multiple, true);
+		}
+	}
+}
+*/
+FamTest(base, test_params_equal) {
+	ArgsParam p1 = ArgsParam_build("test", NULL, NULL, false, true);
+	ArgsParam p2 = ArgsParam_build("test", NULL, NULL, false, true);
+	assert(equal(&p1, &p2));
+
+	cleanup(&p1);
+	cleanup(&p2);
+	p1 = ArgsParam_build("test", NULL, NULL, false, true);
+	p2 = ArgsParam_build("test", "test", NULL, false, true);
+	assert(!equal(&p1, &p2));
+
+	cleanup(&p1);
+	cleanup(&p2);
+	p1 = ArgsParam_build("test", "ok", NULL, false, true);
+	p2 = ArgsParam_build("test", "test", NULL, false, true);
+	assert(!equal(&p1, &p2));
+
+	cleanup(&p1);
+	cleanup(&p2);
+	p1 = ArgsParam_build("test", "test", "abc", false, true);
+	p2 = ArgsParam_build("test", "test", NULL, false, true);
+	assert(!equal(&p1, &p2));
+
+	cleanup(&p1);
+	cleanup(&p2);
+	p1 = ArgsParam_build("test", "test", "ok", true, true);
+	p2 = ArgsParam_build("test", "test", "ok", true, true);
+	assert(equal(&p1, &p2));
+
+	cleanup(&p1);
+	cleanup(&p2);
+	p1 = ArgsParam_build("test", "test", "ok", false, true);
+	p2 = ArgsParam_build("test", "test", "ok", true, true);
+	assert(!equal(&p1, &p2));
+
+	cleanup(&p1);
+	cleanup(&p2);
+	p1 = ArgsParam_build("test", "test", "ok", true, true);
+	p2 = ArgsParam_build("test", "test", "ok", true, false);
+	assert(!equal(&p1, &p2));
+
+	cleanup(&p1);
+	cleanup(&p2);
+	p1 = ArgsParam_build(NULL, "test", "ok", true, false);
+	p2 = ArgsParam_build("test", "test", "ok", true, false);
+	assert(!equal(&p1, &p2));
+
+	cleanup(&p1);
+	cleanup(&p2);
+	p1 = ArgsParam_build(NULL, "test", "ok", true, false);
+	p2 = ArgsParam_build(NULL, "test", "ok", true, false);
+	assert(equal(&p1, &p2));
 }

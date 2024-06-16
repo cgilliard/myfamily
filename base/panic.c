@@ -12,16 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
-#include <criterion/criterion.h>
-#include <criterion/hooks.h>
-#include <main/main.h>
+#include <base/panic.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-FamSuite(main);
-
-FamTest(main, main) {
-	int r = real_main(0, NULL);
-	cr_assert_eq(r, 0);
+void panic(const char *str) {
+	printf("thread panicked: %s\n", str);
+	exit(-1);
 }
-
-FamTest(main, other) {}

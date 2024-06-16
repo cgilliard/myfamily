@@ -15,4 +15,48 @@
 #ifndef _BASE_ARGS__
 #define _BASE_ARGS__
 
+#include <base/class.h>
+#include <base/traits.h>
+
+#define TRAIT_ARGS(T)                                                          \
+	TRAIT_REQUIRED(T, bool, add_param, T##Ptr *args, const char *name,     \
+		       const char *help, const char *short_name,               \
+		       bool takes_value, bool multiple)                        \
+	TRAIT_REQUIRED(T, void, init, T##Ptr *args, int argc, char **argv)     \
+	TRAIT_REQUIRED(T, char *, value, T##Ptr *args, char *param,            \
+		       char *value)                                            \
+	TRAIT_REQUIRED(T, T##Ptr, build)
+
+#define TRAIT_ARGS_PARAM(T)                                                    \
+	TRAIT_REQUIRED(T, T##Ptr, build, const char *name, const char *help,   \
+		       const char *short_name, bool takes_value,               \
+		       bool multiple)
+
+CLASS(ArgsParam,
+      FIELD(char *, name) FIELD(char *, help) FIELD(char *, short_name)
+	  FIELD(bool, takes_value) FIELD(bool, multiple) FIELD(u64, argv_itt));
+IMPL(ArgsParam, TRAIT_COPY)
+IMPL(ArgsParam, TRAIT_EQUAL)
+IMPL(ArgsParam, TRAIT_ARGS_PARAM)
+#define ArgsParam DEFINE_CLASS(ArgsParam)
+
+CLASS(Args, FIELD(char **, argv) FIELD(int, argc) FIELD(ArgsParamPtr *, params)
+		FIELD(u64, count))
+IMPL(Args, TRAIT_ARGS)
+#define Args DEFINE_CLASS(Args)
+
+SETTER(ArgsParam, name)
+SETTER(ArgsParam, help)
+SETTER(ArgsParam, short_name)
+SETTER(ArgsParam, takes_value)
+SETTER(ArgsParam, multiple)
+GETTER(ArgsParam, name)
+GETTER(ArgsParam, help)
+GETTER(ArgsParam, short_name)
+GETTER(ArgsParam, takes_value)
+GETTER(ArgsParam, multiple)
+
+GETTER(Args, count)
+GETTER(Args, params)
+
 #endif // _BASE_ARGS__
