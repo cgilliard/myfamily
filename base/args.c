@@ -379,7 +379,8 @@ void args_error_exit(Args *args, char *format, ...) {
 void args_print_version(Args *args) {
 	char *prog = *Args_get_prog(args);
 	char *version = *Args_get_version(args);
-	fprintf(stderr, "%s %s\n", prog, version);
+	fprintf(stderr, "%s%s%s %s%s%s\n", BRIGHT_RED, prog, RESET, GREEN,
+		version, RESET);
 }
 
 bool Args_init(Args *args, int argc, char **argv, u64 debug_flags) {
