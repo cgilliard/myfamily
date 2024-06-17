@@ -622,4 +622,3 @@ void Args_usage(Args *args) {
 		}
 	}
 }
-

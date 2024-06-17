@@ -30,10 +30,8 @@
 #define FamSuite(name)                                                         \
 	void setup_suite(void) {                                               \
 		void *test = tlmalloc(1);                                      \
-		printf("[" ANSI_COLOR_BLUE "====" ANSI_COLOR_RESET             \
-		       "] Running " ANSI_COLOR_GREEN "%s" ANSI_COLOR_RESET     \
-		       " test suite...\n",                                     \
-		       #name);                                                 \
+		printf("[%s====%s] Running %s%s%s test suite...\n", BLUE,      \
+		       RESET, GREEN, #name, RESET);                            \
 	}                                                                      \
 	Test(init, init, .init = setup_suite) {}                               \
 	static u64 initial_alloc_diff;                                         \
@@ -44,17 +42,17 @@
 		u64 cur_free_count = free_count();                             \
 		u64 diff = cur_alloc_count - cur_free_count;                   \
 		if (diff != initial_alloc_diff) {                              \
-			printf("[" ANSI_COLOR_BLUE "====" ANSI_COLOR_RESET     \
-			       "] " ANSI_COLOR_RED                             \
-			       "Error in tear_down of test" ANSI_COLOR_RESET   \
-			       " '" ANSI_COLOR_GREEN "%s" ANSI_COLOR_RESET     \
-			       "'.\n[" ANSI_COLOR_BLUE "====" ANSI_COLOR_RESET \
-			       "] Number of allocations not equal to number "  \
-			       "of frees. Memory leak?\n",                     \
-			       cur_name);                                      \
-			printf("[" ANSI_COLOR_BLUE "====" ANSI_COLOR_RESET     \
-			       "] initial_alloc_diff=%llu,diff=%llu\n",        \
-			       initial_alloc_diff, diff);                      \
+			printf(                                                \
+			    "[%s====%s] %sError in tear_down of test%s "       \
+			    "'%s%s%s'.\n[%s====%s] Number of allocations not " \
+			    "equal to number "                                 \
+			    "of frees. Memory leak?\n",                        \
+			    BLUE, RESET, RED, RESET, GREEN, cur_name, RESET,   \
+			    BLUE, RESET);                                      \
+			printf("[%s====%s] "                                   \
+			       "initial_alloc_diff=%llu,diff=%"                \
+			       "llu\n",                                        \
+			       BLUE, RESET, initial_alloc_diff, diff);         \
 			pid_t iPid = getpid();                                 \
 			kill(iPid, SIGINT);                                    \
 		}                                                              \
