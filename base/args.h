@@ -19,15 +19,19 @@
 #include <base/traits.h>
 
 #define MAX_SHORT_NAME_LEN 10
+#define DEBUG_INIT_NO_EXIT 0x1
 
 #define TRAIT_ARGS(T)                                                          \
 	TRAIT_REQUIRED(T, bool, add_param, T##Ptr *args, const char *name,     \
 		       const char *help, const char *short_name,               \
 		       bool takes_value, bool multiple)                        \
-	TRAIT_REQUIRED(T, bool, init, T##Ptr *args, int argc, char **argv)     \
+	TRAIT_REQUIRED(T, bool, init, T##Ptr *args, int argc, char **argv,     \
+		       u64 flags)                                              \
 	TRAIT_REQUIRED(T, bool, value, T##Ptr *args, char *buffer, size_t len, \
 		       char *param, char *value)                               \
-	TRAIT_REQUIRED(T, T##Ptr, build)
+	TRAIT_REQUIRED(T, T##Ptr, build, char *prog, char *version,            \
+		       char *author)                                           \
+	TRAIT_REQUIRED(T, void, usage, T##Ptr *ptr)
 
 #define TRAIT_ARGS_PARAM(T)                                                    \
 	TRAIT_REQUIRED(T, T##Ptr, build, const char *name, const char *help,   \
@@ -44,8 +48,13 @@ IMPL(ArgsParam, TRAIT_ARGS_PARAM)
 #define ArgsParam DEFINE_CLASS(ArgsParam)
 
 CLASS(Args, FIELD(char **, argv) FIELD(int, argc) FIELD(ArgsParamPtr *, params)
-		FIELD(u64, count))
+		FIELD(u64, count) FIELD(char *, prog) FIELD(char *, version)
+		    FIELD(char *, author) FIELD(u64, debug_flags))
 IMPL(Args, TRAIT_ARGS)
 #define Args DEFINE_CLASS(Args)
+
+#define ARGS(prog, version, author) Args_build(prog, version, author)
+#define PARAM(args, name, short_name, help, takes_value, multiple)             \
+	Args_add_param(args, name, help, short_name, takes_value, multiple)
 
 #endif // _BASE_ARGS__

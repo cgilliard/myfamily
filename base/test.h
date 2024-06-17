@@ -71,7 +71,7 @@
 		cur_name = #test;                                              \
 		if (access("bin/nocapture", F_OK) != 0) {                      \
 			char s[100];                                           \
-			sprintf(s, "bin/output_%s.log", #test);                \
+			snprintf(s, 100, "bin/output_%s.log", #test);          \
 			log_fd = open(s, O_WRONLY | O_CREAT | O_TRUNC, 0644);  \
 			dup2(log_fd, STDOUT_FILENO);                           \
 			dup2(log_fd, STDERR_FILENO);                           \

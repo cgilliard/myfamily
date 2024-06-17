@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/args.h>
+#include <base/backtrace.h>
 #include <base/class.h>
 #include <base/test.h>
 
@@ -68,10 +69,10 @@ FamTest(base, test_args) {
 	Args x1;
 	x1._count = 10;
 	assert_eq(*(u64 *)Args_get_count(&x1), 10);
-	x1 = Args_build();
+	x1 = Args_build("", "", "");
 	assert_eq(*(u64 *)Args_get_count(&x1), 0);
 
-	Args x2 = Args_build();
+	Args x2 = Args_build("", "", "");
 	Args_add_param(&x2, "threads", "the number of threads to start", "t",
 		       true, false);
 
@@ -184,108 +185,110 @@ FamTest(base, test_params_equal) {
 }
 
 FamTest(base, test_init_args) {
+	char buffer[1024];
 	bool ret;
-	Args args1 = Args_build();
+	Args args1 = Args_build("", "", "");
 	Args_add_param(&args1, "string4", "", "s", false, false);
 	int argc1 = 1;
-	const char *argv1[] = {"--string4"};
-	ret = Args_init(&args1, argc1, (char **)argv1);
+	const char *argv1[] = {"test", "--string4"};
+	ret = Args_init(&args1, argc1, (char **)argv1, DEBUG_INIT_NO_EXIT);
 	assert(ret);
 
-	Args args2 = Args_build();
+	Args args2 = Args_build("", "", "");
 	int argc2 = 4;
 
 	Args_add_param(&args2, "str1", "", "s", true, false);
 	Args_add_param(&args2, "verbose", "", "v", false, false);
 	Args_add_param(&args2, "debug", "", "d", false, false);
 
-	const char *argv2[] = {"--str1", "ok", "-d", "--verbose"};
-	ret = Args_init(&args2, argc2, (char **)argv2);
+	const char *argv2[] = {"test", "--str1", "ok", "-d", "--verbose"};
+	ret = Args_init(&args2, argc2, (char **)argv2, DEBUG_INIT_NO_EXIT);
 	assert(ret);
 
 	int argc3 = 4;
-	Args args3 = Args_build();
+	Args args3 = Args_build("", "", "");
 
 	// str not found
 	Args_add_param(&args3, "str1", "", "s", true, false);
 	Args_add_param(&args3, "verbose", "", "v", false, false);
 	Args_add_param(&args3, "debug", "", "d", false, false);
 
-	const char *argv3[] = {"--str", "ok", "-d", "--verbose"};
-	ret = Args_init(&args3, argc3, (char **)argv3);
+	const char *argv3[] = {"test", "--str", "ok", "-d", "--verbose"};
+	ret = Args_init(&args3, argc3, (char **)argv3, DEBUG_INIT_NO_EXIT);
 	assert(!ret);
 
 	// short and long matches ok
-	char *argv4[] = {"--str1", "ok", "-d", "--verbose"};
-	Args args4 = Args_build();
+	char *argv4[] = {"test", "--str1", "ok", "-d", "--verbose"};
+	Args args4 = Args_build("", "", "");
 	Args_add_param(&args4, "str1", "", "s", true, false);
 	Args_add_param(&args4, "verbose", "", "v", false, false);
 	Args_add_param(&args4, "debug", "", "d", false, false);
-	ret = Args_init(&args4, 4, argv4);
+	ret = Args_init(&args4, 4, argv4, DEBUG_INIT_NO_EXIT);
 	assert(ret);
 
 	// non multi error
-	char *argv5[] = {"--str1", "ok", "x", "-d", "--verbose"};
-	Args args5 = Args_build();
+	char *argv5[] = {"test", "--str1", "ok", "x", "-d", "--verbose"};
+	Args args5 = Args_build("", "", "");
 	Args_add_param(&args5, "str1", "", "s", true, false);
 	Args_add_param(&args5, "verbose", "", "v", false, false);
 	Args_add_param(&args5, "debug", "", "d", false, false);
-	ret = Args_init(&args5, 5, argv5);
+	ret = Args_init(&args5, 5, argv5, DEBUG_INIT_NO_EXIT);
 	assert(!ret);
 
 	// multi
-	char *argv6[] = {"--str1", "ok", "x", "-d", "--verbose"};
-	Args args6 = Args_build();
+	char *argv6[] = {"test", "--str1", "ok", "x", "-d", "--verbose"};
+	Args args6 = Args_build("", "", "");
 	Args_add_param(&args6, "str1", "", "s", true, true);
 	Args_add_param(&args6, "verbose", "", "v", false, false);
 	Args_add_param(&args6, "debug", "", "d", false, false);
-	ret = Args_init(&args6, 5, argv6);
+	ret = Args_init(&args6, 5, argv6, DEBUG_INIT_NO_EXIT);
 	assert(ret);
 
 	// takes param not found
-	char *argv7[] = {"--str1", "ok", "x", "-d", "--verbose", "--port"};
-	Args args7 = Args_build();
+	char *argv7[] = {"test", "--str1",    "ok",    "x",
+			 "-d",	 "--verbose", "--port"};
+	Args args7 = Args_build("", "", "");
 	Args_add_param(&args7, "str1", "", "s", true, true);
 	Args_add_param(&args7, "verbose", "", "v", false, false);
 	Args_add_param(&args7, "debug", "", "d", false, false);
 	Args_add_param(&args7, "port", "", "p", true, false);
-	ret = Args_init(&args7, 6, argv7);
+	ret = Args_init(&args7, 7, argv7, DEBUG_INIT_NO_EXIT);
 	assert(!ret);
 
 	// takes param not found because another option
-	char *argv8[] = {"--str1", "-p", "x", "-d", "--verbose"};
-	Args args8 = Args_build();
+	char *argv8[] = {"test", "--str1", "-p", "x", "-d", "--verbose"};
+	Args args8 = Args_build("", "", "");
 	Args_add_param(&args8, "str1", "", "s", true, true);
 	Args_add_param(&args8, "verbose", "", "v", false, false);
 	Args_add_param(&args8, "debug", "", "d", false, false);
 	Args_add_param(&args8, "port", "", "p", true, false);
-	ret = Args_init(&args8, 5, argv8);
+	ret = Args_init(&args8, 5, argv8, DEBUG_INIT_NO_EXIT);
 	assert(!ret);
 
 	// duplicate (debug)
-	char *argv9[] = {"--str1", "p", "x", "-d", "--debug"};
-	Args args9 = Args_build();
+	char *argv9[] = {"test", "--str1", "p", "x", "-d", "--debug"};
+	Args args9 = Args_build("", "", "");
 	Args_add_param(&args9, "str1", "", "s", true, true);
 	Args_add_param(&args9, "verbose", "", "v", false, false);
 	Args_add_param(&args9, "debug", "", "d", false, false);
 	Args_add_param(&args9, "port", "", "p", true, false);
-	ret = Args_init(&args9, 5, argv9);
+	ret = Args_init(&args9, 6, argv9, DEBUG_INIT_NO_EXIT);
 	assert(!ret);
 }
 
 FamTest(base, args_value) {
+	char buffer[1024];
 	bool ret;
 	char *value;
-	char *argv1[] = {"--str1", "x", "-v", "--debug"};
-	Args args1 = Args_build();
+	char *argv1[] = {"test", "--str1", "x", "-v", "--debug"};
+	Args args1 = Args_build("", "", "");
 	Args_add_param(&args1, "str1", "", "s", true, false);
 	Args_add_param(&args1, "verbose", "", "v", false, false);
 	Args_add_param(&args1, "debug", "", "d", false, false);
 	Args_add_param(&args1, "port", "", "p", true, false);
-	ret = Args_init(&args1, 4, argv1);
+	ret = Args_init(&args1, 5, argv1, DEBUG_INIT_NO_EXIT);
 	assert(ret);
 
-	char buffer[1024];
 	strcpy(buffer, "");
 	ret = Args_value(&args1, buffer, 1024, "str1", "y");
 	assert(ret);
@@ -299,14 +302,14 @@ FamTest(base, args_value) {
 
 	strcpy(buffer, "");
 
-	char *argv2[] = {"--str1", "x", "y", "-v", "--debug"};
-	Args args2 = Args_build();
+	char *argv2[] = {"test", "--str1", "x", "y", "-v", "--debug"};
+	Args args2 = Args_build("", "", "");
 	Args_add_param(&args2, "str1", "", "s", true, true);
 	Args_add_param(&args2, "verbose", "", "v", false, false);
 	Args_add_param(&args2, "debug", "", "d", false, false);
 	Args_add_param(&args2, "port", "", "p", true, false);
 	Args_add_param(&args2, "other", "", "o", false, false);
-	ret = Args_init(&args2, 5, argv2);
+	ret = Args_init(&args2, 6, argv2, DEBUG_INIT_NO_EXIT);
 	assert(ret);
 
 	ret = Args_value(&args2, buffer, 1024, "str1", "z");
@@ -331,3 +334,113 @@ FamTest(base, args_value) {
 	ret = Args_value(&args2, buffer, 1024, "other", NULL);
 	assert(!ret);
 }
+
+FamTest(base, args_errors) {
+	bool ret;
+	char *value;
+	char *argv1[] = {"test", "--str1", "x", "-v", "--debug"};
+	Args args1 = Args_build("", "", "");
+	Args_add_param(&args1, "str2", "", "s", true, false);
+	Args_add_param(&args1, "verbose", "", "v", false, false);
+	Args_add_param(&args1, "debug", "", "d", false, false);
+	Args_add_param(&args1, "port", "", "p", true, false);
+	ret = Args_init(&args1, 5, argv1, DEBUG_INIT_NO_EXIT);
+	assert(!ret);
+
+	char *argv2[] = {"test", "--str2", "x", "-v", "--debug"};
+	Args args2 = Args_build("", "", "");
+	Args_add_param(&args2, "str2", "", "s", true, false);
+	Args_add_param(&args2, "verbose", "", "v", false, false);
+	Args_add_param(&args2, "debug", "", "d", true, false);
+	Args_add_param(&args2, "port", "", "p", true, false);
+	ret = Args_init(&args2, 5, argv2, DEBUG_INIT_NO_EXIT);
+	assert(!ret);
+
+	char *argv3[] = {"test", "--str2", "x", "-v", "--debug", "-p"};
+	Args args3 = Args_build("", "", "");
+	Args_add_param(&args3, "str2", "", "s", true, false);
+	Args_add_param(&args3, "verbose", "", "v", false, false);
+	Args_add_param(&args3, "debug", "", "d", true, false);
+	Args_add_param(&args3, "port", "", "p", true, false);
+	ret = Args_init(&args3, 6, argv3, DEBUG_INIT_NO_EXIT);
+	assert(!ret);
+
+	char *argv4[] = {"test", "--str1", "x", "-v", "--verbose"};
+	Args args4 =
+	    Args_build("testargs", "0.0.1-beta.1", "The MyFamily Developers");
+	Args_add_param(&args4, "str1", "String to use for this program", "s",
+		       true, true);
+	Args_add_param(&args4, "verbose",
+		       "Print additional debugging information", "v", false,
+		       false);
+	Args_add_param(&args4, "debug", "Print debugging details", "d", false,
+		       false);
+	Args_add_param(&args4, "port", "TCP/IP port to bind to", "p", true,
+		       false);
+	ret = Args_init(&args4, 5, argv4, DEBUG_INIT_NO_EXIT);
+	assert(!ret);
+
+	Args_usage(&args4);
+}
+
+FamTest(base, args_double_cleanup) {
+	char buffer[1024];
+	bool ret;
+	char *value;
+	char *argv1[] = {"test", "--str1", "x", "-v", "--debug"};
+	Args args1 = Args_build("", "", "");
+	Args_add_param(&args1, "str2", "", "s", true, false);
+	Args_add_param(&args1, "verbose", "", "v", false, false);
+	Args_add_param(&args1, "debug", "", "d", false, false);
+	Args_add_param(&args1, "port", "", "p", true, false);
+	ret = Args_init(&args1, 5, argv1, DEBUG_INIT_NO_EXIT);
+	assert(!ret);
+
+	cleanup(&args1);
+	cleanup(&args1);
+}
+
+FamTest(base, backtrace) {
+	Backtrace bt = EMPTY_BACKTRACE;
+	Backtrace_generate(&bt, 100);
+
+	u64 count = *Backtrace_get_count(&bt);
+	char buffer[1024];
+	for (u64 i = 0; i < count; i++) {
+		bool ret = Backtrace_fn_name(&bt, buffer, 1024, i);
+		BacktraceEntryPtr *rows = *Backtrace_get_rows(&bt);
+		char *name = *BacktraceEntry_get_name(&rows[i]);
+		char *bin_name = *BacktraceEntry_get_bin_name(&rows[i]);
+		char *address = *BacktraceEntry_get_address(&rows[i]);
+		char *file_path = *BacktraceEntry_get_file_path(&rows[i]);
+		assert_eq_str(buffer, name);
+		assert(ret);
+
+		ret = Backtrace_bin_name(&bt, buffer, 1024, i);
+		assert(ret);
+		assert_eq_str(buffer, bin_name);
+
+		ret = Backtrace_address(&bt, buffer, 1024, i);
+		assert(ret);
+		assert_eq_str(buffer, address);
+
+		ret = Backtrace_file_path(&bt, buffer, 1024, i);
+		assert(ret);
+		assert_eq_str(buffer, file_path);
+	}
+
+	bool ret = Backtrace_fn_name(&bt, buffer, 1024, count);
+	assert(!ret);
+
+	ret = Backtrace_bin_name(&bt, buffer, 1024, count);
+	assert(!ret);
+
+	ret = Backtrace_address(&bt, buffer, 1024, count);
+	assert(!ret);
+
+	ret = Backtrace_file_path(&bt, buffer, 1024, count);
+	assert(!ret);
+
+	print(&bt, 0);
+}
+

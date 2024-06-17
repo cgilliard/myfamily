@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #include <base/args.h>
+#include <base/colors.h>
 #include <base/tlmalloc.h>
+#include <stdlib.h>
 
 SETTER(ArgsParam, name)
 SETTER(ArgsParam, help)
@@ -38,6 +40,14 @@ SETTER(Args, argc)
 SETTER(Args, argv)
 GETTER(Args, argv)
 GETTER(Args, argc)
+SETTER(Args, prog);
+SETTER(Args, author);
+SETTER(Args, version);
+GETTER(Args, prog);
+GETTER(Args, author);
+GETTER(Args, version);
+GETTER(Args, debug_flags);
+SETTER(Args, debug_flags);
 
 void ArgsParam_cleanup(ArgsParamPtr *ptr) {
 	void *name = *ArgsParam_get_name(ptr);
@@ -167,6 +177,7 @@ void Args_cleanup(ArgsPtr *ptr) {
 		void *p = *Args_get_params(ptr);
 		tlfree(p);
 	}
+	Args_set_count(ptr, 0);
 
 	char **argv = *(char ***)Args_get_argv(ptr);
 	int argc = *Args_get_argc(ptr);
@@ -178,14 +189,64 @@ void Args_cleanup(ArgsPtr *ptr) {
 		tlfree(argv);
 		Args_set_argv(ptr, NULL);
 	}
+
+	void *prog = *Args_get_prog(ptr);
+	if (prog) {
+		tlfree(prog);
+		Args_set_prog(ptr, NULL);
+	}
+
+	void *version = *Args_get_version(ptr);
+	if (version) {
+		tlfree(version);
+		Args_set_version(ptr, NULL);
+	}
+
+	void *author = *Args_get_author(ptr);
+	if (author) {
+		tlfree(author);
+		Args_set_author(ptr, NULL);
+	}
 }
 
-Args Args_build() {
-	ArgsPtr ret;
+Args Args_build(char *prog, char *version, char *author) {
+	ArgsPtr ret = BUILD(Args, NULL, 0, NULL, 0, NULL, NULL, NULL);
 	Args_set_count(&ret, 0);
 	Args_set_params(&ret, NULL);
 	Args_set_argc(&ret, 0);
 	Args_set_argv(&ret, NULL);
+
+	char *prog_copy;
+	if (prog == NULL) {
+		prog_copy = tlmalloc(sizeof(char));
+		prog_copy[0] = 0;
+	} else {
+		prog_copy = tlmalloc(sizeof(char) * (1 + strlen(prog)));
+		strcpy(prog_copy, prog);
+	}
+
+	char *version_copy;
+	if (version == NULL) {
+		version_copy = tlmalloc(sizeof(char));
+		version_copy[0] = 0;
+	} else {
+		version_copy = tlmalloc(sizeof(char) * (1 + strlen(version)));
+		strcpy(version_copy, version);
+	}
+
+	char *author_copy;
+	if (author == NULL) {
+		author_copy = tlmalloc(sizeof(char));
+		author_copy[0] = 0;
+	} else {
+		author_copy = tlmalloc(sizeof(char) * (1 + strlen(author)));
+		strcpy(author_copy, author);
+	}
+
+	Args_set_prog(&ret, prog_copy);
+	Args_set_author(&ret, author_copy);
+	Args_set_version(&ret, version_copy);
+
 	return ret;
 }
 
@@ -193,9 +254,10 @@ bool Args_add_param(ArgsPtr *ptr, const char *name, const char *help,
 		    const char *short_name, bool takes_value, bool multiple) {
 
 	if (strlen(short_name) > MAX_SHORT_NAME_LEN) {
-		printf("Illegal short name (must be at most %i characters "
-		       "long): %s",
-		       MAX_SHORT_NAME_LEN, short_name);
+		fprintf(stderr,
+			"Illegal short name (must be at most %i characters "
+			"long): %s",
+			MAX_SHORT_NAME_LEN, short_name);
 		return false;
 	}
 	bool ret = true;
@@ -269,10 +331,45 @@ bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi,
 	return ret;
 }
 
-bool Args_init(Args *args, int argc, char **argv) {
+void args_error_exit(Args *args, char *format, ...) {
+	char *prog = *Args_get_prog(args);
+	va_list va_args;
+	va_start(va_args, format);
+	fprintf(stderr, "%sError%s: ", RED, RESET);
+	vfprintf(stderr, format, va_args);
+	fprintf(stderr, "\n\n");
+	fprintf(stderr,
+		"%sUSAGE%s:\n    %s%s%s [%sOPTIONS%s]\n\nFor more information "
+		"try %s--help%s\n",
+		DIMMED, RESET, BRIGHT_RED, prog, RESET, DIMMED, RESET, GREEN,
+		RESET);
+	va_end(va_args);
+	u64 debug_flags = *Args_get_debug_flags(args);
+	if (!(debug_flags & DEBUG_INIT_NO_EXIT))
+		exit(-1);
+}
+
+void args_print_version(Args *args) {
+	char *prog = *Args_get_prog(args);
+	char *version = *Args_get_version(args);
+	fprintf(stderr, "%s %s\n", prog, version);
+}
+
+bool Args_init(Args *args, int argc, char **argv, u64 debug_flags) {
 	bool ret = true;
 	char **argv_copy = tlmalloc(sizeof(char *) * argc);
 	u64 i = 0;
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
+			Args_usage(args);
+			exit(0);
+		}
+		if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--help")) {
+			args_print_version(args);
+			exit(0);
+		}
+	}
+
 	for (i = 0; i < argc; i++) {
 		argv_copy[i] = tlmalloc(sizeof(char) * strlen(argv[i]));
 		if (!argv_copy[i]) {
@@ -283,6 +380,7 @@ bool Args_init(Args *args, int argc, char **argv) {
 
 	Args_set_argv(args, argv_copy);
 	Args_set_argc(args, argc);
+	Args_set_debug_flags(args, debug_flags);
 
 	// set specified to false for all
 	u64 count = *(u64 *)Args_get_count(args);
@@ -291,27 +389,29 @@ bool Args_init(Args *args, int argc, char **argv) {
 		ArgsParam_set_specified(&params[i], false);
 	}
 
-	for (u64 i = 0; i < argc; i++) {
+	for (u64 i = 1; i < argc; i++) {
 		bool is_takes_value, is_multi, already_specified;
 		if (!find_param(args, argv_copy[i], &is_takes_value, &is_multi,
 				&already_specified)) {
-			printf("Error: Unknown parameter: %s\n", argv_copy[i]);
+			args_error_exit(args, "Unknown option: '%s%s%s'",
+					YELLOW, argv_copy[i], RESET);
 			ret = false;
 			break;
 		}
 
 		if (already_specified) {
-			printf(
-			    "Error: Parameter specified more than once: %s\n",
+			args_error_exit(
+			    args, "Parameter specified more than once: %s",
 			    argv_copy[i]);
 			ret = false;
 			break;
 		}
 
 		if (is_multi && !is_takes_value) {
-			printf("Error: Parameter cannot be multi and and not "
-			       "takes_value: %s\n",
-			       argv_copy[i]);
+			args_error_exit(args,
+					"Parameter cannot be multi and and not "
+					"takes_value: %s",
+					argv_copy[i]);
 			ret = false;
 			break;
 		}
@@ -319,14 +419,16 @@ bool Args_init(Args *args, int argc, char **argv) {
 		if (is_takes_value) {
 			i += 1;
 			if (i >= argc) {
-				printf("Error: Expected a value for: %s\n",
-				       argv_copy[i - 1]);
+				args_error_exit(args,
+						"Expected a value for: %s",
+						argv_copy[i - 1]);
 				ret = false;
 				break;
 			}
 			if (argv_copy[i][0] == '-') {
-				printf("Error: Expected a value for: %s\n",
-				       argv_copy[i - 1]);
+				args_error_exit(args,
+						"Expected a value for: %s",
+						argv_copy[i - 1]);
 				ret = false;
 				break;
 			}
@@ -412,3 +514,112 @@ bool Args_value(Args *args, char *buffer, size_t len, char *param,
 
 	return ret;
 }
+
+void Args_usage(Args *args) {
+	u64 count = *(u64 *)Args_get_count(args);
+	ArgsParamPtr *params = *(ArgsParamPtr **)Args_get_params(args);
+	u64 max_len = 0;
+	for (u64 i = 0; i < count; i++) {
+		bool takes_value = *ArgsParam_get_takes_value(&params[i]);
+		bool multi = *ArgsParam_get_multiple(&params[i]);
+		char *name = *ArgsParam_get_name(&params[i]);
+		char *short_name = *ArgsParam_get_short_name(&params[i]);
+		u64 len;
+		if (!takes_value)
+			len = snprintf(NULL, 0, "    -%s, --%s", short_name,
+				       name);
+		else if (multi)
+			len = snprintf(NULL, 0, "    -%s, --%s (<%s>, ...)",
+				       short_name, name, name);
+		else
+			len = snprintf(NULL, 0, "    -%s, --%s <%s>",
+				       short_name, name, name);
+		if (len > max_len)
+			max_len = len;
+	}
+
+	max_len += 4;
+
+	char *prog = *Args_get_prog(args);
+	char *author = *Args_get_author(args);
+	char *version = *Args_get_version(args);
+	char buffer[1025];
+	char buffer2[1025];
+	u64 i;
+	for (i = 0; i < max_len - 13 && i < 1024; i++)
+		buffer[i] = ' ';
+	buffer[i] = 0;
+
+	for (i = 0; i < max_len - 16 && i < 1024; i++)
+		buffer2[i] = ' ';
+	buffer2[i] = 0;
+
+	fprintf(
+	    stderr,
+	    "%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s [%sOPTIONS%s]\n"
+	    "    %s-h%s, %s--help%s%sPrints help information\n"
+	    "    %s-V%s, %s--version%s%sPrints version information\n",
+	    CYAN, prog, RESET, YELLOW, version, RESET, GREEN, author, RESET,
+	    DIMMED, RESET, BRIGHT_RED, prog, RESET, DIMMED, RESET, CYAN, RESET,
+	    YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET, buffer2);
+
+	for (u64 i = 0; i < count; i++) {
+		bool takes_value = *ArgsParam_get_takes_value(&params[i]);
+		if (!takes_value) {
+			char *name = *ArgsParam_get_name(&params[i]);
+			char *short_name =
+			    *ArgsParam_get_short_name(&params[i]);
+			char *help = *ArgsParam_get_help(&params[i]);
+			u64 len = snprintf(NULL, 0, "    -%s, --%s", short_name,
+					   name);
+			u64 i;
+			for (i = 0; i < max_len - len && i < 1024; i++)
+				buffer[i] = ' ';
+			buffer[i] = 0;
+			fprintf(stderr, "    %s-%s%s, %s--%s%s %s%s\n", CYAN,
+				short_name, RESET, YELLOW, name, RESET, buffer,
+				help);
+		}
+	}
+	fprintf(stderr, "\n%sOPTIONS%s:\n", DIMMED, RESET);
+
+	for (u64 i = 0; i < count; i++) {
+		bool takes_value = *ArgsParam_get_takes_value(&params[i]);
+		if (takes_value) {
+			char *name = *ArgsParam_get_name(&params[i]);
+			char *short_name =
+			    *ArgsParam_get_short_name(&params[i]);
+			char *help = *ArgsParam_get_help(&params[i]);
+			bool multi = *ArgsParam_get_multiple(&params[i]);
+			if (multi) {
+				u64 len = snprintf(NULL, 0,
+						   "    -%s, --%s (<%s>, ...)",
+						   short_name, name, name);
+				u64 i;
+				for (i = 0; i < max_len - len && i < 1024; i++)
+					buffer[i] = ' ';
+				buffer[i] = 0;
+				fprintf(
+				    stderr,
+				    "    %s-%s%s, %s--%s%s (<%s>, ...) %s%s\n",
+				    CYAN, short_name, RESET, YELLOW, name,
+				    RESET, name, buffer, help);
+			} else {
+
+				u64 len =
+				    snprintf(NULL, 0, "    -%s, --%s <%s>",
+					     short_name, name, name);
+				u64 i;
+				for (i = 0; i < max_len - len && i < 1024; i++)
+					buffer[i] = ' ';
+				buffer[i] = 0;
+
+				fprintf(stderr,
+					"    %s-%s%s, %s--%s%s <%s> %s%s\n",
+					CYAN, short_name, RESET, YELLOW, name,
+					RESET, name, buffer, help);
+			}
+		}
+	}
+}
+
