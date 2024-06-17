@@ -15,6 +15,6 @@
 #ifndef _PANIC_BASE__
 #define _PANIC_BASE__
 
-void panic(const char *str) __attribute__((noreturn));
+void panic(const char *format, ...) __attribute__((noreturn));
 
 #endif // _PANIC_BASE__

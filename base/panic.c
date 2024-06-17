@@ -13,10 +13,17 @@
 // limitations under the License.
 
 #include <base/panic.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-void panic(const char *str) {
-	printf("thread panicked: %s\n", str);
+void panic(const char *fmt, ...) {
+	va_list args;
+
+	fprintf(stderr, "thread panicked: ");
+	va_start(args, fmt);
+	vfprintf(stderr, fmt, args);
+	va_end(args);
+	fprintf(stderr, "\n");
 	exit(-1);
 }

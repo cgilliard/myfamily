@@ -56,5 +56,6 @@ IMPL(Args, TRAIT_ARGS)
 #define ARGS(prog, version, author) Args_build(prog, version, author)
 #define PARAM(args, name, short_name, help, takes_value, multiple)             \
 	Args_add_param(args, name, help, short_name, takes_value, multiple)
+#define ARGS_INIT(args, argc, argv) Args_init(args, argc, argv, 0)
 
 #endif // _BASE_ARGS__

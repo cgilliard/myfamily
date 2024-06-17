@@ -242,6 +242,13 @@ bool Backtrace_add_entry(Backtrace *ptr, const char *name, const char *bin_name,
 	return ret;
 }
 
+Backtrace Backtrace_generate_bt(u64 max_depth) {
+	BacktracePtr ret = EMPTY_BACKTRACE;
+	Backtrace_generate(&ret, max_depth);
+
+	return ret;
+}
+
 bool Backtrace_generate(Backtrace *ptr, u64 max_depth) {
 	void *array[max_depth];
 	int size = backtrace(array, max_depth);
@@ -379,7 +386,7 @@ bool Backtrace_copy(Backtrace *dst, Backtrace *src) {
 }
 size_t Backtrace_size(Backtrace *ptr) { return sizeof(Backtrace); }
 
-void Backtrace_print(Backtrace *ptr, u64 flags) {
+void Backtrace_print(Backtrace *ptr) {
 	printf("Backtrace:\n");
 	BacktraceEntryPtr *rows;
 	rows = *GET_ROWS(ptr);

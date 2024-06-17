@@ -25,7 +25,7 @@
 
 #define TRAIT_TO_STR(T) TRAIT_REQUIRED(T, char *, to_str, T##Ptr *obj)
 
-#define TRAIT_PRINT(T) TRAIT_REQUIRED(T, void, print, T##Ptr *obj, u64 flags)
+#define TRAIT_PRINT(T) TRAIT_REQUIRED(T, void, print, T##Ptr *obj)
 
 // trait implementations
 bool equal(void *obj1, void *obj2);
@@ -106,6 +106,6 @@ DEFINE_COPY_IMPL(bool)
 void no_cleanup(void *ptr);
 void cleanup(void *ptr);
 char *to_str(void *s);
-void print(void *ptr, u64 flags);
+void print(void *ptr);
 
 #endif // _TRAITS_BASE__

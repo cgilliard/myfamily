@@ -14,7 +14,6 @@
 
 #include <base/args.h>
 #include <base/backtrace.h>
-#include <stdio.h>
 
 int real_main(int argc, char **argv) {
 	Args args = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
@@ -23,10 +22,13 @@ int real_main(int argc, char **argv) {
 	PARAM(&args, "port", "p", "TCP/IP Port to bind to (multiple allowed)",
 	      true, true);
 	PARAM(&args, "debug", "d", "Print debugging information", false, false);
-	Args_init(&args, argc, argv, 0);
-	printf("main doesn't currently do anything\n");
-	Backtrace bt = EMPTY_BACKTRACE;
-	Backtrace_generate(&bt, 100);
-	print(&bt, 0);
+	PARAM(&args, "address", "a",
+	      "TCP/IP address to bind to. The default value is 127.0.0.1.",
+	      true, false);
+	PARAM(&args, "counter", "c", "The counter", true, false);
+	ARGS_INIT(&args, argc, argv);
+
+	Backtrace bt = GENERATE_BACKTRACE;
+	print(&bt);
 	return 0;
 }

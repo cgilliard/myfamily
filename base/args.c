@@ -254,20 +254,16 @@ bool Args_add_param(ArgsPtr *ptr, const char *name, const char *help,
 		    const char *short_name, bool takes_value, bool multiple) {
 
 	if (strlen(short_name) > MAX_SHORT_NAME_LEN) {
-		fprintf(stderr,
-			"Illegal short name (must be at most %i characters "
-			"long): %s",
-			MAX_SHORT_NAME_LEN, short_name);
-		return false;
+		panic("Illegal short name (must be at most %i characters "
+		      "long): %s",
+		      MAX_SHORT_NAME_LEN, short_name);
 	}
 
 	if (!strcmp(short_name, "h")) {
-		fprintf(stderr, "short_name 'h' is reserved.");
-		return false;
+		panic("short_name 'h' is reserved.");
 	}
 	if (!strcmp(short_name, "V")) {
-		fprintf(stderr, "short_name 'V' is reserved.");
-		return false;
+		panic("short_name 'V' is reserved.");
 	}
 
 	ArgsParamPtr *params = *(ArgsParamPtr **)Args_get_params(ptr);
@@ -276,13 +272,11 @@ bool Args_add_param(ArgsPtr *ptr, const char *name, const char *help,
 		char *pname = *ArgsParam_get_name(&params[i]);
 		char *pshort_name = *ArgsParam_get_short_name(&params[i]);
 		if (!strcmp(name, pname)) {
-			fprintf(stderr, "duplicate name detected: %s\n", name);
-			return false;
+			panic("duplicate name detected: %s", name);
 		}
 		if (!strcmp(short_name, pshort_name)) {
-			fprintf(stderr, "duplicate short_name detected: %s\n",
-				short_name);
-			return false;
+			panic("duplicate short_name detected: %s\n",
+			      short_name);
 		}
 	}
 
