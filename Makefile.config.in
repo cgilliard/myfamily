@@ -1,3 +1,4 @@
+SHELL := /bin/bash
 CC=gcc
 CC_FLAGS=-g -Wno-format -Wno-attributes -Wno-ignored-attributes -I.. $(COVERAGE)
 CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
