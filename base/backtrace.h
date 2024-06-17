@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BACKTRACE_BASE__
-#define _BAKCTRACE_BASE__
+#ifndef _BASE_BACKTRACE__
+#define _BASE_BACKTRACE__
 
 #include <base/class.h>
 #include <base/traits.h>
@@ -66,4 +66,4 @@ GETTER_PROTO(BacktraceEntry, file_path)
 #define BACKTRACE(bt) Backtrace_generate(bt, 100)
 #define GENERATE_BACKTRACE Backtrace_generate_bt(100)
 
-#endif // _BACKTRACE_BASE__
+#endif // _BASE_BACKTRACE__

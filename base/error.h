@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _ERROR_BASE__
-#define _ERROR_BASE__
+#ifndef _BASE_ERROR__
+#define _BASE_ERROR__
 
 #include <base/backtrace.h>
 #include <base/class.h>
@@ -27,7 +27,7 @@ IMPL(ErrorKind, TRAIT_COPY)
 IMPL(ErrorKind, TRAIT_SIZE)
 IMPL(ErrorKind, TRAIT_EQUAL)
 #define ErrorKind DEFINE_CLASS(ErrorKind)
-GETTER(ErrorKind, kind)
+static GETTER(ErrorKind, kind);
 
 CLASS(Error, FIELD(ErrorKind, kind) FIELD(char, message[MAX_ERROR_MESSAGE_LEN])
 		 FIELD(Backtrace, bt) FIELD(u64, flags))
@@ -36,12 +36,14 @@ IMPL(Error, TRAIT_SIZE)
 IMPL(Error, TRAIT_PRINT)
 IMPL(Error, TRAIT_EQUAL)
 #define Error DEFINE_CLASS(Error)
-GETTER(Error, kind)
-GETTER(Error, message)
-GETTER(Error, bt)
+
+static GETTER(Error, kind);
+static GETTER(Error, message);
+static GETTER(Error, bt);
 
 Error error_build(ErrorKind kind, char *msg);
 #define ERROR(kind, msg) error_build(kind, msg)
+#define EKIND(kind) BUILD(ErrorKind, kind)
+#define KIND(e) Error_get_kind(&e)
 
-#endif // _ERROR_BASE__
-
+#endif // _BASE_ERROR__

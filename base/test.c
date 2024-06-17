@@ -15,6 +15,7 @@
 #include <base/args.h>
 #include <base/backtrace.h>
 #include <base/class.h>
+#include <base/error.h>
 #include <base/test.h>
 
 GETTER_PROTO(ArgsParam, name)
@@ -460,4 +461,26 @@ FamTest(base, backtrace) {
 	assert(!ret);
 
 	print(&bt);
+}
+
+ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
+ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
+
+FamTest(base, test_error) {
+	Error err1 = ERROR(ILLEGAL_STATE, "test illegal state");
+	Error err2 = ERROR(ILLEGAL_ARGUMENT, "arg must be greater than 100");
+	Error err3 = ERROR(ILLEGAL_ARGUMENT, "arg must be greater than 10");
+
+	// error 2 and 3 are equal because they have the same kind, message or
+	// backtrace is not compared
+	assert(equal(&err2, &err3));
+	// different kind
+	assert(!equal(&err1, &err2));
+	// different kind
+	assert(!equal(&err1, &err3));
+
+	// kind can also be compared
+	assert(equal(KIND(err2), KIND(err3)));
+	assert(!equal(KIND(err1), KIND(err2)));
+	assert(!equal(KIND(err1), KIND(err3)));
 }
