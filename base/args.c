@@ -260,11 +260,38 @@ bool Args_add_param(ArgsPtr *ptr, const char *name, const char *help,
 			MAX_SHORT_NAME_LEN, short_name);
 		return false;
 	}
-	bool ret = true;
+
+	if (!strcmp(short_name, "h")) {
+		fprintf(stderr, "short_name 'h' is reserved.");
+		return false;
+	}
+	if (!strcmp(short_name, "V")) {
+		fprintf(stderr, "short_name 'V' is reserved.");
+		return false;
+	}
+
+	ArgsParamPtr *params = *(ArgsParamPtr **)Args_get_params(ptr);
 	u64 count = *(u64 *)Args_get_count(ptr);
+	for (u64 i = 0; i < count; i++) {
+		char *pname = *ArgsParam_get_name(&params[i]);
+		char *pshort_name = *ArgsParam_get_short_name(&params[i]);
+		if (!strcmp(name, pname)) {
+			fprintf(stderr, "duplicate name detected: %s\n", name);
+			return false;
+		}
+		if (!strcmp(short_name, pshort_name)) {
+			fprintf(stderr, "duplicate short_name detected: %s\n",
+				short_name);
+			return false;
+		}
+	}
+
+	bool ret = true;
 	void *nptr;
 	if (count == 0) {
 		nptr = tlmalloc(sizeof(ArgsParam));
+		if (nptr == NULL)
+			panic("Could not allocate memory to build params");
 		Args_set_params(ptr, nptr);
 	} else {
 		void *p = *Args_get_params(ptr);

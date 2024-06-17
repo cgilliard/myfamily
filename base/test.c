@@ -400,6 +400,19 @@ FamTest(base, args_double_cleanup) {
 	cleanup(&args1);
 }
 
+FamTest(base, args_dups) {
+	Args args = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
+	assert(PARAM(&args, "threads", "t", "Number of threads to execute",
+		     true, false));
+	assert(PARAM(&args, "port", "p",
+		     "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(!PARAM(&args, "port", "p",
+		      "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(!PARAM(&args, "aaaa", "p", "", true, true));
+	assert(!PARAM(&args, "aaaa", "h", "", true, true));
+	assert(!PARAM(&args, "aaaa", "V", "", true, true));
+}
+
 FamTest(base, backtrace) {
 	Backtrace bt = EMPTY_BACKTRACE;
 	Backtrace_generate(&bt, 100);
