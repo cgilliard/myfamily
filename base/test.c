@@ -471,8 +471,8 @@ FamTest(base, test_error) {
 	Error err2 = ERROR(ILLEGAL_ARGUMENT, "arg must be greater than 100");
 	Error err3 = ERROR(ILLEGAL_ARGUMENT, "arg must be greater than 10");
 
-	// error 2 and 3 are equal because they have the same kind, message or
-	// backtrace is not compared
+	// error 2 and 3 are equal because they have the same kind. Message or
+	// Backtrace is not compared.
 	assert(equal(&err2, &err3));
 	// different kind
 	assert(!equal(&err1, &err2));
