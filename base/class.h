@@ -15,10 +15,12 @@
 #ifndef _CLASS_BASE__
 #define _CLASS_BASE__
 
+#define _GNU_SOURCE
 #include <base/cleanup.h>
 #include <base/macro_utils.h>
 #include <base/panic.h>
 #include <base/tlmalloc.h>
+#include <stdio.h>
 #include <string.h>
 
 #define UNIQUE_ID __COUNTER__

@@ -334,13 +334,8 @@ bool Backtrace_generate(Backtrace *ptr, u64 max_depth) {
 		}
 		if (fn_name[0] == 63 || fn_name[0] == -107)
 			strcpy(fn_name, "Unknown");
-
-		BacktraceEntry ent;
-		ent.address = address;
-		ent.function_name = fn_name;
-		ent.file_path = file_path;
-		ent.bin_name = buffer;
-		if (backtrace_add_entry(&ptr, &ent))
+		if (!Backtrace_add_entry(ptr, fn_name, buffer, address,
+                                         file_path))
 			break;
 #endif // OS Specific code
 	}

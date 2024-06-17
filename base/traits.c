@@ -55,29 +55,7 @@ void *unwrap_err(void *obj) {
 	return do_unwrap(obj);
 }
 
-#define IMPL_COPY_IMPL(type)                                                   \
-	bool copy_impl_##type(type *dst, type *src) {                          \
-		memcpy(dst, src, sizeof(type));                                \
-		return true;                                                   \
-	}                                                                      \
-	size_t size_impl_##type(type *s) { return sizeof(type); }              \
-	void cleanup_impl_##type(type *s) {}
-
-IMPL_COPY_IMPL(f64);
-IMPL_COPY_IMPL(f32);
-IMPL_COPY_IMPL(i128);
-IMPL_COPY_IMPL(i64);
-IMPL_COPY_IMPL(i32);
-IMPL_COPY_IMPL(i16);
-IMPL_COPY_IMPL(i8);
-IMPL_COPY_IMPL(u128);
-IMPL_COPY_IMPL(u64);
-IMPL_COPY_IMPL(u32);
-IMPL_COPY_IMPL(u16);
-IMPL_COPY_IMPL(u8);
-IMPL_COPY_IMPL(bool);
-
-bool copy_impl(void *dst, void *src) {
+bool copy(void *dst, void *src) {
 	bool *(*do_copy)(Object *dst, Object *src) =
 	    find_fn((Object *)src, "copy");
 	if (do_copy == NULL)
@@ -86,14 +64,12 @@ bool copy_impl(void *dst, void *src) {
 	return do_copy(dst, src);
 }
 
-size_t size_impl(void *obj) {
+size_t size(void *obj) {
 	size_t (*do_size)(Object *obj) = find_fn((Object *)obj, "size");
 	if (do_size == NULL)
 		panic("size not implemented for this type");
 	return do_size(obj);
 }
-
-void no_cleanup(void *ptr) {}
 
 void cleanup(void *ptr) {
 	bool (*do_cleanup)(Object *ptr) = find_fn((Object *)ptr, "cleanup");

@@ -15,6 +15,7 @@
 #ifndef _BASE_COLORS__
 #define _BASE_COLORS__
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 
 #ifdef __linux__

@@ -16,7 +16,9 @@
 #include <base/backtrace.h>
 #include <base/class.h>
 #include <base/error.h>
+#include <base/result.h>
 #include <base/test.h>
+#include <base/unit.h>
 
 GETTER_PROTO(ArgsParam, name)
 GETTER_PROTO(ArgsParam, help)
@@ -410,13 +412,12 @@ FamTest(base, args_dups) {
 
 	// Cannot test these because they exit now. Leaving them commented out
 	// for now.
-	/*
-	assert(!PARAM(&args, "port", "p",
-		      "TCP/IP Port to bind to (multiple allowed)", true, true));
-	assert(!PARAM(&args, "aaaa", "p", "", true, true));
-	assert(!PARAM(&args, "aaaa", "h", "", true, true));
-	assert(!PARAM(&args, "aaaa", "V", "", true, true));
-	*/
+
+	// assert(!PARAM(&args, "port", "p", "TCP/IP Port to bind to (multiple
+	// allowed)", true, true));
+	// assert(!PARAM(&args, "aaaa", "p", "", true, true));
+	// assert(!PARAM(&args, "aaaa", "h", "", true, true));
+	// assert(!PARAM(&args, "aaaa", "V", "", true, true));
 }
 
 FamTest(base, backtrace) {
@@ -484,3 +485,36 @@ FamTest(base, test_error) {
 	assert(!equal(KIND(err1), KIND(err2)));
 	assert(!equal(KIND(err1), KIND(err3)));
 }
+
+CLASS(TestResult, FIELD(u64, x))
+IMPL(TestResult, TRAIT_COPY);
+#define TestResult DEFINE_CLASS(TestResult)
+void TestResult_cleanup(TestResult *ptr) { printf("cleanup test result\n"); }
+GETTER(TestResult, x)
+#define GET_X(tr) *TestResult_get_x(tr)
+
+size_t TestResult_size(TestResult *result) { return sizeof(Result); }
+bool TestResult_copy(TestResult *dst, TestResult *src) {
+	dst->_x = src->_x;
+	return true;
+}
+
+FamTest(base, test_result) {
+	Unit x1 = BUILD(Unit);
+	Result r1 = Result_build_ok(&x1);
+	assert(r1.is_ok());
+
+	TestResult x2 = BUILD(TestResult, 10);
+	Result r2 = Result_build_ok(&x2);
+	assert(r2.is_ok());
+	TestResultPtr *res2 = (TestResult *)unwrap(&r2);
+	u64 value = GET_X(res2);
+	assert_eq(value, 10);
+
+	Error err3 = ERROR(ILLEGAL_STATE, "test result");
+	Result r3 = Result_build_err(&err3);
+	assert(!r3.is_ok());
+	ErrorPtr *ret3 = unwrap_err(&r3);
+	assert(equal(KIND(err3), &ILLEGAL_STATE));
+}
+

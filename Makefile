@@ -30,7 +30,13 @@ test: $(SUBDIRS)
 testnc: $(SUBDIRS)
 	ERROR="0"; \
 	for dir in $(SUBDIRS); do \
+		if  test -z $(TARGET); then \
 		$(MAKE) -C $$dir testnc; \
+		else \
+			if [[ "$$dir" == "$(TARGET)" ]]; then \
+			$(MAKE) -C $$dir testnc; \
+			fi; \
+		fi; \
 		if [ $$? -ne "0" ]; then \
 		ERROR="1"; \
 		fi; \
