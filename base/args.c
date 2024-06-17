@@ -556,12 +556,14 @@ void Args_usage(Args *args) {
 
 	fprintf(
 	    stderr,
-	    "%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s [%sOPTIONS%s]\n"
+	    "%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s [%sOPTIONS%s]\n\n"
+	    "%sFLAGS%s:\n"
 	    "    %s-h%s, %s--help%s%sPrints help information\n"
 	    "    %s-V%s, %s--version%s%sPrints version information\n",
 	    CYAN, prog, RESET, YELLOW, version, RESET, GREEN, author, RESET,
-	    DIMMED, RESET, BRIGHT_RED, prog, RESET, DIMMED, RESET, CYAN, RESET,
-	    YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET, buffer2);
+	    DIMMED, RESET, BRIGHT_RED, prog, RESET, DIMMED, RESET, DIMMED,
+	    RESET, CYAN, RESET, YELLOW, RESET, buffer, CYAN, RESET, YELLOW,
+	    RESET, buffer2);
 
 	for (u64 i = 0; i < count; i++) {
 		bool takes_value = *ArgsParam_get_takes_value(&params[i]);
