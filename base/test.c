@@ -517,4 +517,3 @@ FamTest(base, test_result) {
 	ErrorPtr *ret3 = unwrap_err(&r3);
 	assert(equal(KIND(err3), &ILLEGAL_STATE));
 }
-

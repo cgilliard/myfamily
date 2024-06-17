@@ -66,4 +66,3 @@ ErrorPtr *Result_unwrap_err(Result *result) {
 	void *ref = *Result_get_err(result);
 	return ref;
 }
-

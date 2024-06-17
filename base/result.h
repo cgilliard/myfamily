@@ -35,4 +35,3 @@ IMPL(Result, TRAIT_RESULT)
 static ErrorPtr *unwrap_err(Result *obj) { return Result_unwrap_err(obj); }
 
 #endif // _RESULT_BASE__
-
