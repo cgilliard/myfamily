@@ -23,8 +23,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define ERROR_PRINT_FLAG_NO_COLOR 0x1
-#define ERROR_PRINT_FLAG_NO_BACKTRACE 0x1 << 1
+#define ERROR_PRINT_FLAG_NO_BACKTRACE 0x1
 
 #define u8 uint8_t
 #define i8 int8_t
