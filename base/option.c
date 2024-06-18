@@ -12,69 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/ekinds.h>
-#include <base/result.h>
+#include <base/option.h>
 
-GETTER(Result, err)
-GETTER(Result, ref)
-SETTER(Result, err)
-SETTER(Result, ref)
-GETTER(Result, no_cleanup)
-SETTER(Result, no_cleanup)
+GETTER(Option, ref)
+SETTER(Option, ref)
+GETTER(Option, no_cleanup)
+SETTER(Option, no_cleanup)
 
-bool is_ok_impl_true() { return true; }
-
-bool is_ok_impl_false() { return false; }
-
-void Result_cleanup(Result *ptr) {
-	void *ref = *Result_get_ref(ptr);
-	void *err = *Result_get_err(ptr);
-	bool no_cleanup = *Result_get_no_cleanup(ptr);
+void Option_cleanup(Option *option) {
+	void *ref = *Option_get_ref(option);
+	bool no_cleanup = *Option_get_no_cleanup(option);
 	if (ref) {
 		if (!no_cleanup)
 			cleanup(ref);
 		tlfree(ref);
-		Result_set_ref(ptr, NULL);
-	}
-	if (err) {
-		cleanup(err);
-		tlfree(err);
-		Result_set_err(ptr, NULL);
+		Option_set_ref(option, NULL);
 	}
 }
+size_t Option_size(Option *option) { return sizeof(Option); }
+bool Option_copy(Option *dst, Option *src) {
+	dst->is_some = src->is_some;
+	Option_set_ref(dst, *Option_get_ref(src));
+	Option_set_no_cleanup(dst, *Option_get_no_cleanup(src));
 
-Result Result_build_err(Error *ref) {
-	void *ref_copy = tlmalloc(size(ref));
-	if (!ref_copy) {
-		Error e = ERROR(ALLOC_ERROR,
-				"Could not allocate memory to copy result");
-		return Err(e);
-	}
-	copy(ref_copy, ref);
-	ResultPtr ret = BUILD(Result, is_ok_impl_false, ref_copy, NULL, false);
-	return ret;
+	return true;
 }
-
-Result Result_build_ok(void *ref) {
+Option Option_build(void *ref) {
 	void *ref_copy = tlmalloc(size(ref));
 	if (!ref_copy) {
-		Error e = ERROR(ALLOC_ERROR,
-				"Could not allocate memory to copy result");
-		return Err(e);
+		panic("Could not allocate memory to copy option");
 	}
 	if (!copy(ref_copy, ref)) {
-		Error e = ERROR(COPY_ERROR, "Error copying object");
-		return Err(e);
+		panic("Error copying object");
 	}
-	ResultPtr ret = BUILD(Result, is_ok_impl_true, NULL, ref_copy, false);
+	OptionPtr ret = BUILD(Option, is_some_true, ref_copy, false);
+
 	return ret;
 }
-
-void *Result_unwrap(Result *result) {
-	if (!result->is_ok())
-		panic("attempt to unwrap a Result that is an error");
-
-	void *ref = *Result_get_ref(result);
+void *Option_unwrap(Option *option) {
+	if (!option->is_some()) {
+		panic("attempt to unwrap an Option that is none");
+	}
+	void *ref = *Option_get_ref(option);
 
 	// automatically unwrap the primitive types
 	if (!strcmp(CLASS_NAME(ref), "Bool")) {
@@ -103,13 +82,7 @@ void *Result_unwrap(Result *result) {
 
 	// ownership is now transferred
 	// we don't want to cleanup
-	Result_set_no_cleanup(result, true);
+	Option_set_no_cleanup(option, true);
 
 	return ref;
-}
-
-Error Result_unwrap_err(Result *result) {
-	ErrorPtr ret;
-	copy(&ret, *Result_get_err(result));
-	return ret;
 }

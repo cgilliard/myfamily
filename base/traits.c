@@ -65,6 +65,16 @@ bool copy(void *dst, void *src) {
 	return do_copy(dst, src);
 }
 
+bool clone(void *dst, void *src) {
+	bool *(*do_clone)(Object *dst, Object *src) =
+	    find_fn((Object *)src, "clone");
+	if (do_clone == NULL)
+		panic("clone not implemented for this type");
+	((Object *)dst)->vdata.vtable = ((Object *)src)->vdata.vtable;
+	((Object *)dst)->vdata.name = ((Object *)src)->vdata.name;
+	return do_clone(dst, src);
+}
+
 size_t size(void *obj) {
 	size_t (*do_size)(Object *obj) = find_fn((Object *)obj, "size");
 	if (do_size == NULL)

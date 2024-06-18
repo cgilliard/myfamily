@@ -16,7 +16,9 @@
 #include <base/backtrace.h>
 #include <base/class.h>
 #include <base/error.h>
+#include <base/option.h>
 #include <base/prim.h>
+#include <base/rc.h>
 #include <base/result.h>
 #include <base/string.h>
 #include <base/test.h>
@@ -635,4 +637,72 @@ FamTest(base, test_string) {
 	String c3 = STRINGP("test2");
 	assert(equal(&c1, &c2));
 	assert(!equal(&c1, &c3));
+}
+
+FamTest(base, test_rc) {
+	Rc t1 = RC(STRINGPTR("abc"));
+	{
+		Rc t2;
+		clone(&t2, &t1);
+		StringPtr s2 = *(String *)unwrap(&t2);
+		assert_eq_str(unwrap(&s2), "abc");
+	}
+	StringPtr s3 = *(String *)unwrap(&t1);
+	assert_eq_str(unwrap(&s3), "abc");
+}
+
+FamTest(base, test_option) {
+	Option opt1 = None;
+	assert(!opt1.is_some());
+
+	u64 x2 = 2;
+	Option opt2 = Some(x2);
+
+	assert(opt2.is_some());
+	u64 value2 = *(u64 *)unwrap(&opt2);
+	assert_eq(value2, 2);
+
+	String s = STRINGP("test");
+	Option opt3 = Some(s);
+	assert(opt3.is_some());
+	String sout = *(String *)unwrap(&opt3);
+	assert(equal(&s, &sout));
+	char *text = unwrap(&sout);
+	assert_eq_str(text, "test");
+
+	i16 x4 = 8080;
+	Option opt4 = Some(x4);
+	assert(opt4.is_some());
+	i16 x4_out = *(i16 *)unwrap(&opt4);
+	assert_eq(x4_out, x4);
+}
+
+ErrorKind ILLEGAL_VALUE = EKIND("IllegalValue");
+
+Result test_try_fn2(u32 x) {
+	if (x > 100) {
+		Error e = ERROR(ILLEGAL_VALUE, "test: x was %llu", x);
+		return Err(e);
+	}
+	u32 ret = x + 10;
+	return Ok(ret);
+}
+
+Result test_try_fn1(u32 x) {
+	Result rfn2 = test_try_fn2(x);
+	u32 res = *(u32 *)Try(rfn2);
+	u32 ret = res + 20;
+	return Ok(ret);
+}
+
+FamTest(base, test_try_expect) {
+	Result r1 = test_try_fn1(10);
+	assert(r1.is_ok());
+	u32 v1 = *(u32 *)unwrap(&r1);
+	assert_eq(v1, 40);
+
+	Result r2 = test_try_fn1(110);
+	assert(!r2.is_ok());
+	Error e = unwrap_err(&r2);
+	assert(equal(KIND(e), &ILLEGAL_VALUE));
 }

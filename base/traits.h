@@ -18,6 +18,7 @@
 #include <base/class.h>
 
 #define TRAIT_EQUAL(T) TRAIT_REQUIRED(T, bool, equal, T##Ptr *dst, T##Ptr *src)
+#define TRAIT_CLONE(T) TRAIT_REQUIRED(T, bool, clone, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_COPY(T)                                                          \
 	TRAIT_REQUIRED(T, bool, copy, T##Ptr *dst, T##Ptr *src)                \
 	TRAIT_SUPER(T, TRAIT_SIZE)
@@ -34,6 +35,7 @@ bool equal(void *obj1, void *obj2);
 void *unwrap(void *obj);
 size_t size(void *obj);
 bool copy(void *dest, void *src);
+bool clone(void *dest, void *src);
 void cleanup(void *ptr);
 char *to_str(void *s);
 void print(void *ptr);

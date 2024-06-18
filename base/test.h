@@ -54,7 +54,7 @@
 			       "llu\n",                                        \
 			       BLUE, RESET, initial_alloc_diff, diff);         \
 			pid_t iPid = getpid();                                 \
-			kill(iPid, SIGINT);                                    \
+			kill(iPid, SIGINT); /* trigger failure */              \
 		}                                                              \
 		if (log_fd > 0)                                                \
 			close(log_fd);                                         \

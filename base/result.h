@@ -78,4 +78,21 @@ static Result Result_build_ok_bool(void *value) {
 
 #define Err(x) Result_build_err(&x)
 
+#define Try(x)                                                                 \
+	({                                                                     \
+		if (!x.is_ok()) {                                              \
+			Error e = unwrap_err(&x);                              \
+			return Err(e);                                         \
+		};                                                             \
+		unwrap(&x);                                                    \
+	})
+
+#define Expect(x)                                                              \
+	({                                                                     \
+		if (!x.is_ok()) {                                              \
+			panic("Expected Ok, found Err");                       \
+		}                                                              \
+		unwrap(&x);                                                    \
+	})
+
 #endif // _RESULT_BASE__

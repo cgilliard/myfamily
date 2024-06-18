@@ -20,7 +20,8 @@
 
 #define TRAIT_STRING_BUILD(T)                                                  \
 	TRAIT_REQUIRED(T, Result, build, const char *s)                        \
-	TRAIT_REQUIRED(T, T##Ptr, build_expect, const char *s)
+	TRAIT_REQUIRED(T, T##Ptr, build_expect, const char *s)                 \
+	TRAIT_REQUIRED(T, T##Ptr *, build_ptr, const char *s)
 
 CLASS(String, FIELD(char *, ptr) FIELD(u64, len))
 IMPL(String, TRAIT_STRING_BUILD)
@@ -31,5 +32,6 @@ IMPL(String, TRAIT_UNWRAP)
 
 #define STRINGP(s) String_build_expect(s)
 #define STRING(s) String_build(s)
+#define STRINGPTR(s) String_build_ptr(s)
 
 #endif // _STRING_BASE__

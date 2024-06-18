@@ -85,3 +85,9 @@ String String_build_expect(const char *s) {
 	StringPtr ret = BUILD(String, ptr, len);
 	return ret;
 }
+
+StringPtr *String_build_ptr(const char *s) {
+	StringPtr *ret = tlmalloc(sizeof(StringPtr));
+	*ret = String_build_expect(s);
+	return ret;
+}
