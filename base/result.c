@@ -19,6 +19,8 @@ GETTER(Result, err)
 GETTER(Result, ref)
 SETTER(Result, err)
 SETTER(Result, ref)
+GETTER(Result, no_cleanup)
+SETTER(Result, no_cleanup)
 
 bool is_ok_impl_true() { return true; }
 
@@ -27,8 +29,10 @@ bool is_ok_impl_false() { return false; }
 void Result_cleanup(Result *ptr) {
 	void *ref = *Result_get_ref(ptr);
 	void *err = *Result_get_err(ptr);
+	bool no_cleanup = *Result_get_no_cleanup(ptr);
 	if (ref) {
-		cleanup(ref);
+		if (!no_cleanup)
+			cleanup(ref);
 		tlfree(ref);
 		Result_set_ref(ptr, NULL);
 	}
@@ -47,7 +51,7 @@ Result Result_build_err(Error *ref) {
 		return Err(e);
 	}
 	copy(ref_copy, ref);
-	ResultPtr ret = BUILD(Result, is_ok_impl_false, ref_copy, NULL);
+	ResultPtr ret = BUILD(Result, is_ok_impl_false, ref_copy, NULL, false);
 	return ret;
 }
 
@@ -62,7 +66,7 @@ Result Result_build_ok(void *ref) {
 		Error e = ERROR(COPY_ERROR, "Error copying object");
 		return Err(e);
 	}
-	ResultPtr ret = BUILD(Result, is_ok_impl_true, NULL, ref_copy);
+	ResultPtr ret = BUILD(Result, is_ok_impl_true, NULL, ref_copy, false);
 	return ret;
 }
 
@@ -93,6 +97,11 @@ void *Result_unwrap(Result *result) {
 	} else if (!strcmp(CLASS_NAME(ref), "I8")) {
 		ref = unwrap(ref);
 	}
+
+	// ownership is now transferred
+	// we don't want to cleanup
+	Result_set_no_cleanup(result, true);
+
 	return ref;
 }
 

@@ -548,8 +548,8 @@ FamTest(base, test_result) {
 	TestResult x2 = BUILD(TestResult, 10);
 	Result r2 = Result_build_ok(&x2);
 	assert(r2.is_ok());
-	TestResultPtr *res2 = (TestResult *)unwrap(&r2);
-	u64 value = GET_X(res2);
+	TestResult res2 = *(TestResult *)unwrap(&r2);
+	u64 value = GET_X(&res2);
 	assert_eq(value, 10);
 
 	Error err3 = ERROR(ILLEGAL_STATE, "test result");
@@ -561,8 +561,8 @@ FamTest(base, test_result) {
 
 	Result r4 = Ok(UNIT);
 	assert(r4.is_ok());
-	UnitPtr *res4 = (Unit *)unwrap(&r4);
-	assert(equal(res4, &UNIT));
+	Unit res4 = *(Unit *)unwrap(&r4);
+	assert(equal(&res4, &UNIT));
 
 	// oneliner
 	assert(equal(unwrap(&r4), &UNIT));
@@ -590,13 +590,13 @@ FamTest(base, test_result) {
 	TestResultTLMalloc trtlm = tlmalloc_build(19);
 	Result res9 = Ok(trtlm);
 	assert(res9.is_ok());
-	TestResultTLMallocPtr *ptr9 = unwrap(&res9);
-	assert_eq(*ptr9->_data, 19);
+	TestResultTLMalloc ptr9 = *(TestResultTLMalloc *)unwrap(&res9);
+	assert_eq(*ptr9._data, 19);
 
 	Result trtres2 = test_tlmalloc_returns(20);
 	assert(trtres2.is_ok());
-	TestResultTLMallocPtr *trtunwrap2 = unwrap(&trtres2);
-	assert_eq(*trtunwrap2->_data, 20);
+	TestResultTLMalloc trtunwrap2 = *(TestResultTLMalloc *)unwrap(&trtres2);
+	assert_eq(*trtunwrap2._data, 20);
 
 	Result trtres3 = test_tlmalloc_returns(200);
 	assert(!trtres3.is_ok());
@@ -623,8 +623,11 @@ FamTest(base, test_string) {
 	cleanup(&s1);
 
 	assert(s2.is_ok());
-	StringPtr s2unwrapped = *(String *)unwrap(&s2);
+
+	String s2unwrapped = *(String *)unwrap(&s2);
+
 	char *chars_s2 = (char *)unwrap(&s2unwrapped);
+
 	assert_eq_str(chars_s2, "test2");
 
 	String c1 = STRINGP("test");

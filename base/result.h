@@ -26,7 +26,8 @@
 
 #define TRAIT_UNWRAP_ERR(T) TRAIT_REQUIRED(T, Error, unwrap_err, T##Ptr *result)
 
-CLASS(Result, FNPTR(bool (*is_ok)()) FIELD(Error *, err) FIELD(void *, ref))
+CLASS(Result, FNPTR(bool (*is_ok)()) FIELD(Error *, err) FIELD(void *, ref)
+		  FIELD(bool, no_cleanup))
 IMPL(Result, TRAIT_UNWRAP)
 IMPL(Result, TRAIT_UNWRAP_ERR)
 IMPL(Result, TRAIT_RESULT)

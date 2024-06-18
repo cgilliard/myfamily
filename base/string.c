@@ -32,7 +32,8 @@ size_t String_size(String *s) { return sizeof(String); }
 bool String_copy(String *dst, String *src) {
 	u64 len = *String_get_len(src);
 	String_set_len(dst, len);
-	String_set_ptr(dst, tlmalloc(sizeof(char) * (1 + len)));
+	void *tmp = tlmalloc(sizeof(char) * (1 + len));
+	String_set_ptr(dst, tmp);
 
 	char *dst_ptr = *String_get_ptr(dst);
 	char *src_ptr = *String_get_ptr(src);
