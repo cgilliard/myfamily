@@ -29,8 +29,9 @@ void String_cleanup(StringPtr *s) {
 }
 size_t String_size(String *s) { return sizeof(String); }
 bool String_copy(String *dst, String *src) {
-	String_set_len(dst, *String_get_len(src));
-	String_set_ptr(dst, tlmalloc(sizeof(char) * (1 + dst->_len)));
+	u64 len = *String_get_len(src);
+	String_set_len(dst, len);
+	String_set_ptr(dst, tlmalloc(sizeof(char) * (1 + len)));
 
 	char *dst_ptr = *String_get_ptr(dst);
 	char *src_ptr = *String_get_ptr(src);
@@ -42,7 +43,7 @@ bool String_copy(String *dst, String *src) {
 	}
 }
 void *String_unwrap(StringPtr *obj) {
-	char *ptr = obj->_ptr;
+	char *ptr = *String_get_ptr(obj);
 	return ptr;
 }
 bool String_equal(String *obj1, String *obj2) { return false; }
