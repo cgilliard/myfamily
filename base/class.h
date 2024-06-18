@@ -39,7 +39,7 @@ typedef struct {
 typedef struct {
 	Vtable *vtable;
 	// reserved for other data as needed
-	void *reserved;
+	char *name;
 } Vdata;
 
 typedef struct {
@@ -52,7 +52,7 @@ void vtable_override(Vtable *table, VtableEntry entry);
 
 #define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup)
 
-#define BUILD(name, ...) {{&name##Vtable, NULL}, __VA_ARGS__}
+#define BUILD(name, ...) {{&name##Vtable, #name}, __VA_ARGS__}
 
 #define MEMBER_TYPE(type, member) typeof(((type *)0)->member)
 
@@ -122,5 +122,8 @@ void vtable_override(Vtable *table, VtableEntry entry);
 		VtableEntry next = {str, T##_##name};                          \
 		vtable_add_entry(&T##Vtable, next);                            \
 	}
+
+#define CLASS_NAME(x) ((Object *)(x))->vdata.name
+#define CLASS_NAME_REF(x) ((Object *)(&x))->vdata.name
 
 #endif //_CLASS_BASE__

@@ -17,6 +17,7 @@
 
 #include <base/class.h>
 #include <base/error.h>
+#include <base/prim.h>
 #include <base/traits.h>
 
 #define TRAIT_RESULT(T)                                                        \
@@ -33,5 +34,27 @@ IMPL(Result, TRAIT_RESULT)
 #define Result DEFINE_CLASS(Result)
 
 static ErrorPtr *unwrap_err(Result *obj) { return Result_unwrap_err(obj); }
+
+static Result Result_build_ok_i32(void *value) {
+	I32 v = BUILD(I32, *((i32 *)value));
+	ResultPtr ret = Result_build_ok(&v);
+
+	return ret;
+}
+
+static Result Result_build_ok_u64(void *value) {
+	U64 v = BUILD(U64, *((u64 *)value));
+	ResultPtr ret = Result_build_ok(&v);
+
+	return ret;
+}
+
+#define Ok(x)                                                                  \
+	_Generic((x),                                                          \
+	    u64: Result_build_ok_u64,                                          \
+	    i32: Result_build_ok_i32,                                          \
+	    default: Result_build_ok)(&x)
+
+#define Err(x) Result_build_err(&x)
 
 #endif // _RESULT_BASE__

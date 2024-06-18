@@ -16,6 +16,7 @@
 #include <base/backtrace.h>
 #include <base/class.h>
 #include <base/error.h>
+#include <base/prim.h>
 #include <base/result.h>
 #include <base/test.h>
 #include <base/unit.h>
@@ -486,8 +487,7 @@ FamTest(base, test_error) {
 	assert(!equal(KIND(err1), KIND(err3)));
 }
 
-CLASS(TestResult, FIELD(u64, x))
-IMPL(TestResult, TRAIT_COPY);
+CLASS(TestResult, FIELD(u64, x) FIELD(u64 *, ptr)) IMPL(TestResult, TRAIT_COPY);
 #define TestResult DEFINE_CLASS(TestResult)
 void TestResult_cleanup(TestResult *ptr) { printf("cleanup test result\n"); }
 GETTER(TestResult, x)
@@ -497,6 +497,46 @@ size_t TestResult_size(TestResult *result) { return sizeof(Result); }
 bool TestResult_copy(TestResult *dst, TestResult *src) {
 	dst->_x = src->_x;
 	return true;
+}
+
+Result test_result_returns(int x) {
+	if (x > 100) {
+		Error e = ERROR(ILLEGAL_STATE, "x is over 100. ");
+		return Err(e);
+	} else {
+		return Ok(x);
+	}
+}
+
+CLASS(TestResultTLMalloc, FIELD(u64 *, data))
+IMPL(TestResultTLMalloc, TRAIT_COPY)
+#define TestResultTLMalloc DEFINE_CLASS(TestResultTLMalloc)
+void TestResultTLMalloc_cleanup(TestResultTLMalloc *ptr) { tlfree(ptr->_data); }
+bool TestResultTLMalloc_copy(TestResultTLMalloc *dst, TestResultTLMalloc *src) {
+	dst->_data = tlmalloc(sizeof(u64));
+	memcpy(dst->_data, src->_data, sizeof(u64));
+	return true;
+}
+
+size_t TestResultTLMalloc_size(TestResultTLMalloc *ptr) {
+	return sizeof(TestResultTLMalloc);
+}
+
+TestResultTLMalloc tlmalloc_build(u64 v) {
+	u64 *tlm = tlmalloc(sizeof(u64));
+	*tlm = v;
+	TestResultTLMallocPtr ret = BUILD(TestResultTLMalloc, tlm);
+	return ret;
+}
+
+Result test_tlmalloc_returns(u64 x) {
+	if (x > 100) {
+		Error e = ERROR(ILLEGAL_STATE, "x is over 100. ");
+		return Err(e);
+	} else {
+		TestResultTLMalloc ret = tlmalloc_build(x);
+		return Ok(ret);
+	}
 }
 
 FamTest(base, test_result) {
@@ -512,9 +552,61 @@ FamTest(base, test_result) {
 	assert_eq(value, 10);
 
 	Error err3 = ERROR(ILLEGAL_STATE, "test result");
-	Result r3 = Result_build_err(&err3);
+	Result r3 = Err(err3);
 	assert(!r3.is_ok());
 	ErrorPtr *ret3 = unwrap_err(&r3);
-	assert(equal(KIND(err3), &ILLEGAL_STATE));
+	assert(equal(KIND(*ret3), &ILLEGAL_STATE));
 	print(&err3);
+
+	Result r4 = Ok(UNIT);
+	assert(r4.is_ok());
+	UnitPtr *res4 = (Unit *)unwrap(&r4);
+	assert(equal(res4, &UNIT));
+
+	// oneliner
+	assert(equal(unwrap(&r4), &UNIT));
+
+	u64 x5 = 3;
+	Result r5 = Ok(x5);
+	u64 res5 = *(u64 *)unwrap(&r5);
+	assert_eq(res5, 3);
+
+	int x6 = 4;
+	Result r6 = Ok(x6);
+	int res6 = *(int *)unwrap(&r6);
+	assert_eq(res6, 4);
+
+	Result res7 = test_result_returns(7);
+	assert(res7.is_ok());
+	int x7 = *(int *)unwrap(&res7);
+	assert_eq(x7, 7);
+
+	Result res8 = test_result_returns(107);
+	assert(!res8.is_ok());
+	ErrorPtr e8 = *(Error *)unwrap_err(&res8);
+	assert(equal(KIND(e8), &ILLEGAL_STATE));
+
+	TestResultTLMalloc trtlm = tlmalloc_build(19);
+	Result res9 = Ok(trtlm);
+	assert(res9.is_ok());
+	TestResultTLMallocPtr *ptr9 = unwrap(&res9);
+	assert_eq(*ptr9->_data, 19);
+
+	Result trtres2 = test_tlmalloc_returns(20);
+	assert(trtres2.is_ok());
+	TestResultTLMallocPtr *trtunwrap2 = unwrap(&trtres2);
+	assert_eq(*trtunwrap2->_data, 20);
+
+	Result trtres3 = test_tlmalloc_returns(200);
+	assert(!trtres3.is_ok());
+	ErrorPtr etrtres3 = *(Error *)unwrap_err(&trtres3);
+	assert(equal(KIND(etrtres3), &ILLEGAL_STATE));
+}
+
+FamTest(base, test_prim) {
+	U64 u64test = BUILD(U64, 100);
+	u64 value = *(u64 *)unwrap(&u64test);
+	assert_eq(value, 100);
+
+	Error x = ERROR(ILLEGAL_ARGUMENT, "test string %i", 3);
 }

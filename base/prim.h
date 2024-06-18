@@ -12,17 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _UNIT_BASE__
-#define _UNIT_BASE__
+#ifndef _BASE_PRIM__
+#define _BASE_PRIM__
 
 #include <base/class.h>
 #include <base/traits.h>
 
-CLASS(Unit)
-IMPL(Unit, TRAIT_COPY)
-IMPL(Unit, TRAIT_SIZE)
-IMPL(Unit, TRAIT_EQUAL)
-#define Unit DEFINE_CLASS(Unit)
-static Unit UNIT = BUILD(Unit);
+CLASS(U64, FIELD(u64, value))
+IMPL(U64, TRAIT_COPY)
+IMPL(U64, TRAIT_UNWRAP)
+#define U64 DEFINE_CLASS(U64)
+static GETTER(U64, value);
 
-#endif // _UNIT_BASE__
+CLASS(I32, FIELD(i32, value))
+IMPL(I32, TRAIT_COPY)
+IMPL(I32, TRAIT_UNWRAP)
+#define I32 DEFINE_CLASS(I32)
+static GETTER(I32, value);
+
+#define VALUE(x) _Generic((x), U64 *: U64_get_value, default: I32_get_value)(&x)
+
+#endif // _BASE_PRIM__

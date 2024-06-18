@@ -17,3 +17,4 @@
 void Unit_cleanup(UnitPtr *u) {}
 bool Unit_copy(UnitPtr *dst, UnitPtr *src) { return true; }
 size_t Unit_size(UnitPtr *u) { return sizeof(UnitPtr); }
+bool Unit_equal(UnitPtr *obj1, UnitPtr *obj2) { return true; }

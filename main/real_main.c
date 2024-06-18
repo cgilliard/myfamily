@@ -14,6 +14,7 @@
 
 #include <base/args.h>
 #include <base/backtrace.h>
+#include <base/error.h>
 
 void setup_args(Args *args) {
 	*args = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
@@ -28,12 +29,14 @@ void setup_args(Args *args) {
 	PARAM(args, "counter", "c", "The counter", true, false);
 }
 
+ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
+
 int real_main(int argc, char **argv) {
 	Args args;
 	setup_args(&args);
 	ARGS_INIT(&args, argc, argv);
 
-	Backtrace bt = GENERATE_BACKTRACE;
-	print(&bt);
+	Error e = ERROR(ILLEGAL_STATE, "main not implemented %i", 5);
+	print(&e);
 	return 0;
 }

@@ -37,7 +37,9 @@ void Error_cleanup(ErrorPtr *obj) {
 }
 
 bool Error_copy(Error *dst, Error *src) {
-	memcpy(dst->_kind._kind, src->_kind._kind, MAX_ERROR_KIND_LEN);
+	if (!copy(&dst->_kind, &src->_kind))
+		return false;
+	// memcpy(dst->_kind._kind, src->_kind._kind, MAX_ERROR_KIND_LEN);
 	memcpy(dst->_message, src->_message, MAX_ERROR_MESSAGE_LEN);
 	return copy(&dst->_bt, &src->_bt);
 }
@@ -58,14 +60,14 @@ bool Error_equal(Error *obj1, Error *obj2) {
 	return equal(Error_get_kind(obj1), Error_get_kind(obj2));
 }
 
-Error error_build(ErrorKind kind, char *msg) {
+Error error_build(ErrorKind kind, char *fmt, ...) {
 	BacktracePtr bt = BUILD(Backtrace, NULL, 0);
 	Backtrace_generate(&bt, 100);
 	ErrorPtr ret = BUILD(Error, kind, {}, bt);
 	char *err_msg = (char *)Error_get_message(&ret);
-	int len = strlen(msg);
-	if (len > MAX_ERROR_MESSAGE_LEN)
-		len = MAX_ERROR_MESSAGE_LEN;
-	memcpy(err_msg, msg, len);
+	va_list args;
+	va_start(args, fmt);
+	u64 len = vsnprintf(err_msg, MAX_ERROR_MESSAGE_LEN, fmt, args);
+	va_end(args);
 	return ret;
 }

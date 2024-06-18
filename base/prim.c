@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _UNIT_BASE__
-#define _UNIT_BASE__
+#include <base/prim.h>
 
-#include <base/class.h>
-#include <base/traits.h>
+void U64_cleanup(U64 *ptr) {}
+size_t U64_size(U64 *ptr) { return sizeof(U64); }
+bool U64_copy(U64 *dst, U64 *src) {
+	memcpy(&dst->_value, &src->_value, sizeof(u64));
+	return true;
+}
+void *U64_unwrap(U64 *ptr) { return &ptr->_value; }
 
-CLASS(Unit)
-IMPL(Unit, TRAIT_COPY)
-IMPL(Unit, TRAIT_SIZE)
-IMPL(Unit, TRAIT_EQUAL)
-#define Unit DEFINE_CLASS(Unit)
-static Unit UNIT = BUILD(Unit);
-
-#endif // _UNIT_BASE__
+void I32_cleanup(I32 *ptr) {}
+size_t I32_size(I32 *ptr) { return sizeof(I32); }
+bool I32_copy(I32 *dst, I32 *src) {
+	memcpy(&dst->_value, &src->_value, sizeof(i32));
+	return true;
+}
+void *I32_unwrap(I32 *ptr) { return &ptr->_value; }

@@ -57,6 +57,12 @@ void *Result_unwrap(Result *result) {
 		panic("attempt to unwrap a Result that is an error");
 
 	void *ref = *Result_get_ref(result);
+
+	if (!strcmp(CLASS_NAME(ref), "U64")) {
+		ref = unwrap(ref);
+	} else if (!strcmp(CLASS_NAME(ref), "I32")) {
+		ref = unwrap(ref);
+	}
 	return ref;
 }
 
