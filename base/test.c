@@ -626,4 +626,10 @@ FamTest(base, test_string) {
 	StringPtr s2unwrapped = *(String *)unwrap(&s2);
 	char *chars_s2 = (char *)unwrap(&s2unwrapped);
 	assert_eq_str(chars_s2, "test2");
+
+	String c1 = STRINGP("test");
+	String c2 = STRINGP("test");
+	String c3 = STRINGP("test2");
+	assert(equal(&c1, &c2));
+	assert(!equal(&c1, &c3));
 }

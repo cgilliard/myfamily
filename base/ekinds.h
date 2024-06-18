@@ -19,5 +19,6 @@
 
 static ErrorKind ALLOC_ERROR = EKIND("MemoryAllocationError");
 static ErrorKind COPY_ERROR = EKIND("CopyError");
+static ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
 
 #endif // _BASE_EKINDS__

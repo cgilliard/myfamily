@@ -25,6 +25,7 @@ void String_cleanup(StringPtr *s) {
 	if (ptr != NULL) {
 		tlfree(ptr);
 		String_set_ptr(s, NULL);
+		String_set_len(s, 0);
 	}
 }
 size_t String_size(String *s) { return sizeof(String); }
@@ -46,8 +47,18 @@ void *String_unwrap(StringPtr *obj) {
 	char *ptr = *String_get_ptr(obj);
 	return ptr;
 }
-bool String_equal(String *obj1, String *obj2) { return false; }
+bool String_equal(String *obj1, String *obj2) {
+	char *obj1_ptr = *String_get_ptr(obj1);
+	char *obj2_ptr = *String_get_ptr(obj2);
+	if (obj1_ptr == NULL || obj2_ptr == NULL)
+		return false;
+	return !strcmp(obj1_ptr, obj2_ptr);
+}
 Result String_build(const char *s) {
+	if (s == NULL) {
+		Error e = ERROR(ILLEGAL_ARGUMENT, "char pointer was NULL");
+		return Err(e);
+	}
 	u64 len = strlen(s);
 	char *ptr = tlmalloc(sizeof(char) * (1 + len));
 	if (ptr == NULL) {
@@ -61,6 +72,8 @@ Result String_build(const char *s) {
 }
 
 String String_build_expect(const char *s) {
+	if (s == NULL)
+		panic("char pointer was NULL");
 	u64 len = strlen(s);
 	char *ptr = tlmalloc(sizeof(char) * (1 + len));
 	if (ptr == NULL) {
