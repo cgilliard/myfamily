@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/ekinds.h>
 #include <base/result.h>
 
 GETTER(Result, err)
@@ -40,6 +41,11 @@ void Result_cleanup(Result *ptr) {
 
 Result Result_build_err(Error *ref) {
 	void *ref_copy = tlmalloc(size(ref));
+	if (!ref_copy) {
+		Error e = ERROR(ALLOC_ERROR,
+				"Could not allocate memory to copy result");
+		return Err(e);
+	}
 	copy(ref_copy, ref);
 	ResultPtr ret = BUILD(Result, is_ok_impl_false, ref_copy, NULL);
 	return ret;
@@ -47,7 +53,15 @@ Result Result_build_err(Error *ref) {
 
 Result Result_build_ok(void *ref) {
 	void *ref_copy = tlmalloc(size(ref));
-	copy(ref_copy, ref);
+	if (!ref_copy) {
+		Error e = ERROR(ALLOC_ERROR,
+				"Could not allocate memory to copy result");
+		return Err(e);
+	}
+	if (!copy(ref_copy, ref)) {
+		Error e = ERROR(COPY_ERROR, "Error copying object");
+		return Err(e);
+	}
 	ResultPtr ret = BUILD(Result, is_ok_impl_true, NULL, ref_copy);
 	return ret;
 }
@@ -58,9 +72,25 @@ void *Result_unwrap(Result *result) {
 
 	void *ref = *Result_get_ref(result);
 
-	if (!strcmp(CLASS_NAME(ref), "U64")) {
+	if (!strcmp(CLASS_NAME(ref), "Bool")) {
+		ref = unwrap(ref);
+	} else if (!strcmp(CLASS_NAME(ref), "I8")) {
 		ref = unwrap(ref);
 	} else if (!strcmp(CLASS_NAME(ref), "I32")) {
+		ref = unwrap(ref);
+	} else if (!strcmp(CLASS_NAME(ref), "U64")) {
+		ref = unwrap(ref);
+	} else if (!strcmp(CLASS_NAME(ref), "I128")) {
+		ref = unwrap(ref);
+	} else if (!strcmp(CLASS_NAME(ref), "I128")) {
+		ref = unwrap(ref);
+	} else if (!strcmp(CLASS_NAME(ref), "I64")) {
+		ref = unwrap(ref);
+	} else if (!strcmp(CLASS_NAME(ref), "I32")) {
+		ref = unwrap(ref);
+	} else if (!strcmp(CLASS_NAME(ref), "I16")) {
+		ref = unwrap(ref);
+	} else if (!strcmp(CLASS_NAME(ref), "I8")) {
 		ref = unwrap(ref);
 	}
 	return ref;

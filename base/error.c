@@ -39,7 +39,6 @@ void Error_cleanup(ErrorPtr *obj) {
 bool Error_copy(Error *dst, Error *src) {
 	if (!copy(&dst->_kind, &src->_kind))
 		return false;
-	// memcpy(dst->_kind._kind, src->_kind._kind, MAX_ERROR_KIND_LEN);
 	memcpy(dst->_message, src->_message, MAX_ERROR_MESSAGE_LEN);
 	return copy(&dst->_bt, &src->_bt);
 }

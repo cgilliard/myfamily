@@ -18,6 +18,7 @@
 #include <base/error.h>
 #include <base/prim.h>
 #include <base/result.h>
+#include <base/string.h>
 #include <base/test.h>
 #include <base/unit.h>
 
@@ -609,4 +610,20 @@ FamTest(base, test_prim) {
 	assert_eq(value, 100);
 
 	Error x = ERROR(ILLEGAL_ARGUMENT, "test string %i", 3);
+}
+
+FamTest(base, test_string) {
+	Result s2 = STRING("test2");
+	String s1 = STRINGP("test1");
+
+	assert_eq_str((char *)unwrap(&s1), "test1");
+
+	// test double cleanup
+	cleanup(&s1);
+	cleanup(&s1);
+
+	assert(s2.is_ok());
+	StringPtr s2unwrapped = *(String *)unwrap(&s2);
+	char *chars_s2 = (char *)unwrap(&s2unwrapped);
+	assert_eq_str(chars_s2, "test2");
 }
