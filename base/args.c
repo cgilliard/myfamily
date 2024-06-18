@@ -421,7 +421,7 @@ bool Args_init(Args *args, int argc, char **argv, u64 debug_flags) {
 			break;
 		}
 
-		if (already_specified) {
+		if (already_specified && !is_multi) {
 			args_error_exit(
 			    args, "Parameter specified more than once: %s",
 			    argv_copy[i]);
@@ -456,6 +456,7 @@ bool Args_init(Args *args, int argc, char **argv, u64 debug_flags) {
 			}
 		}
 
+		/*
 		if (is_multi) {
 			while (true) {
 				if (i >= argc)
@@ -468,6 +469,7 @@ bool Args_init(Args *args, int argc, char **argv, u64 debug_flags) {
 				i++;
 			}
 		}
+		*/
 	}
 
 	return ret;
@@ -518,12 +520,35 @@ bool Args_value(Args *args, char *buffer, size_t len, char *param,
 		i++;
 		if (multi) {
 			u64 itt = *ArgsParam_get_argv_itt(&params[match_index]);
-			i += itt;
-			ArgsParam_set_argv_itt(&params[match_index], itt + 1);
-			if (i < argc && argv[i][0] != '-')
+			if (itt == 0) {
+				ArgsParam_set_argv_itt(&params[match_index], 1);
 				strncpy(buffer, argv[i], len);
-			else {
-				ret = false;
+			} else {
+				u64 first_match = i;
+				i += itt;
+				while (true) {
+					if (i >= argc) {
+						ret = false;
+						break;
+					}
+
+					if (!strcmp(param_buffer, argv[i]) ||
+					    !strcmp(param_buffer_short,
+						    argv[i])) {
+						// next match
+						i += 1;
+						if (i >= argc) {
+							ret = false;
+							break;
+						}
+						strncpy(buffer, argv[i], len);
+						ArgsParam_set_argv_itt(
+						    &params[match_index],
+						    (i - first_match) + 1);
+						break;
+					}
+					i += 1;
+				}
 			}
 		} else if (takes_value && i < argc) {
 			strncpy(buffer, argv[i], len);

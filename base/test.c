@@ -243,12 +243,13 @@ FamTest(base, test_init_args) {
 	assert(!ret);
 
 	// multi
-	char *argv6[] = {"test", "--str1", "ok", "x", "-d", "--verbose"};
+	char *argv6[] = {"test", "--str1", "ok",       "--str1",
+			 "x",	 "-d",	   "--verbose"};
 	Args args6 = Args_build("", "", "");
 	Args_add_param(&args6, "str1", "", "s", true, true);
 	Args_add_param(&args6, "verbose", "", "v", false, false);
 	Args_add_param(&args6, "debug", "", "d", false, false);
-	ret = Args_init(&args6, 5, argv6, DEBUG_INIT_NO_EXIT);
+	ret = Args_init(&args6, 7, argv6, DEBUG_INIT_NO_EXIT);
 	assert(ret);
 
 	// takes param not found
@@ -309,14 +310,14 @@ FamTest(base, args_value) {
 
 	strcpy(buffer, "");
 
-	char *argv2[] = {"test", "--str1", "x", "y", "-v", "--debug"};
+	char *argv2[] = {"test", "--str1", "x", "-s", "y", "-v", "--debug"};
 	Args args2 = Args_build("", "", "");
 	Args_add_param(&args2, "str1", "", "s", true, true);
 	Args_add_param(&args2, "verbose", "", "v", false, false);
 	Args_add_param(&args2, "debug", "", "d", false, false);
 	Args_add_param(&args2, "port", "", "p", true, false);
 	Args_add_param(&args2, "other", "", "o", false, false);
-	ret = Args_init(&args2, 6, argv2, DEBUG_INIT_NO_EXIT);
+	ret = Args_init(&args2, 7, argv2, DEBUG_INIT_NO_EXIT);
 	assert(ret);
 
 	ret = Args_value(&args2, buffer, 1024, "str1", "z");
