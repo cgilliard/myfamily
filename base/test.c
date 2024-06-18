@@ -554,8 +554,8 @@ FamTest(base, test_result) {
 	Error err3 = ERROR(ILLEGAL_STATE, "test result");
 	Result r3 = Err(err3);
 	assert(!r3.is_ok());
-	ErrorPtr *ret3 = unwrap_err(&r3);
-	assert(equal(KIND(*ret3), &ILLEGAL_STATE));
+	Error ret3 = unwrap_err(&r3);
+	assert(equal(KIND(ret3), &ILLEGAL_STATE));
 	print(&err3);
 
 	Result r4 = Ok(UNIT);
@@ -583,7 +583,7 @@ FamTest(base, test_result) {
 
 	Result res8 = test_result_returns(107);
 	assert(!res8.is_ok());
-	ErrorPtr e8 = *(Error *)unwrap_err(&res8);
+	Error e8 = unwrap_err(&res8);
 	assert(equal(KIND(e8), &ILLEGAL_STATE));
 
 	TestResultTLMalloc trtlm = tlmalloc_build(19);
@@ -599,7 +599,7 @@ FamTest(base, test_result) {
 
 	Result trtres3 = test_tlmalloc_returns(200);
 	assert(!trtres3.is_ok());
-	ErrorPtr etrtres3 = *(Error *)unwrap_err(&trtres3);
+	Error etrtres3 = unwrap_err(&trtres3);
 	assert(equal(KIND(etrtres3), &ILLEGAL_STATE));
 }
 

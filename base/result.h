@@ -24,8 +24,7 @@
 	TRAIT_REQUIRED(T, ResultPtr, build_ok, void *ref)                      \
 	TRAIT_REQUIRED(T, ResultPtr, build_err, Error *ref)
 
-#define TRAIT_UNWRAP_ERR(T)                                                    \
-	TRAIT_REQUIRED(T, ErrorPtr *, unwrap_err, T##Ptr *result)
+#define TRAIT_UNWRAP_ERR(T) TRAIT_REQUIRED(T, Error, unwrap_err, T##Ptr *result)
 
 CLASS(Result, FNPTR(bool (*is_ok)()) FIELD(Error *, err) FIELD(void *, ref))
 IMPL(Result, TRAIT_UNWRAP)
@@ -33,17 +32,29 @@ IMPL(Result, TRAIT_UNWRAP_ERR)
 IMPL(Result, TRAIT_RESULT)
 #define Result DEFINE_CLASS(Result)
 
-static ErrorPtr *unwrap_err(Result *obj) { return Result_unwrap_err(obj); }
+static Error unwrap_err(Result *obj) { return Result_unwrap_err(obj); }
 
-static Result Result_build_ok_i32(void *value) {
-	I32 v = BUILD(I32, *((i32 *)value));
-	ResultPtr ret = Result_build_ok(&v);
+#define DEFINE_RESULT_BUILD_OK_PRIM(bits, type_upper, type_lower)              \
+	static Result Result_build_ok_##type_lower##bits(void *value) {        \
+		type_upper##bits v =                                           \
+		    BUILD(type_upper##bits, *((type_lower##bits *)value));     \
+		ResultPtr ret = Result_build_ok(&v);                           \
+		return ret;                                                    \
+	}
 
-	return ret;
-}
+DEFINE_RESULT_BUILD_OK_PRIM(128, U, u)
+DEFINE_RESULT_BUILD_OK_PRIM(64, U, u)
+DEFINE_RESULT_BUILD_OK_PRIM(32, U, u)
+DEFINE_RESULT_BUILD_OK_PRIM(16, U, u)
+DEFINE_RESULT_BUILD_OK_PRIM(8, U, u)
+DEFINE_RESULT_BUILD_OK_PRIM(128, I, i)
+DEFINE_RESULT_BUILD_OK_PRIM(64, I, i)
+DEFINE_RESULT_BUILD_OK_PRIM(32, I, i)
+DEFINE_RESULT_BUILD_OK_PRIM(16, I, i)
+DEFINE_RESULT_BUILD_OK_PRIM(8, I, i)
 
-static Result Result_build_ok_u64(void *value) {
-	U64 v = BUILD(U64, *((u64 *)value));
+static Result Result_build_ok_bool(void *value) {
+	Bool v = BUILD(Bool, *((bool *)value));
 	ResultPtr ret = Result_build_ok(&v);
 
 	return ret;
@@ -51,8 +62,17 @@ static Result Result_build_ok_u64(void *value) {
 
 #define Ok(x)                                                                  \
 	_Generic((x),                                                          \
+	    u128: Result_build_ok_u128,                                        \
 	    u64: Result_build_ok_u64,                                          \
+	    u32: Result_build_ok_u32,                                          \
+	    u16: Result_build_ok_u16,                                          \
+	    u8: Result_build_ok_u8,                                            \
+	    i128: Result_build_ok_i128,                                        \
+	    i64: Result_build_ok_i64,                                          \
 	    i32: Result_build_ok_i32,                                          \
+	    i16: Result_build_ok_i16,                                          \
+	    i8: Result_build_ok_i8,                                            \
+	    bool: Result_build_ok_bool,                                        \
 	    default: Result_build_ok)(&x)
 
 #define Err(x) Result_build_err(&x)

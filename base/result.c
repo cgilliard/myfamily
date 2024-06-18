@@ -66,9 +66,8 @@ void *Result_unwrap(Result *result) {
 	return ref;
 }
 
-ErrorPtr *Result_unwrap_err(Result *result) {
-	if (result->is_ok())
-		panic("attempt to unwrap_err a Result that is not an error");
-	void *ref = *Result_get_err(result);
-	return ref;
+Error Result_unwrap_err(Result *result) {
+	ErrorPtr ret;
+	copy(&ret, *Result_get_err(result));
+	return ret;
 }

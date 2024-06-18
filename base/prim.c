@@ -14,18 +14,26 @@
 
 #include <base/prim.h>
 
-void U64_cleanup(U64 *ptr) {}
-size_t U64_size(U64 *ptr) { return sizeof(U64); }
-bool U64_copy(U64 *dst, U64 *src) {
-	memcpy(&dst->_value, &src->_value, sizeof(u64));
-	return true;
-}
-void *U64_unwrap(U64 *ptr) { return &ptr->_value; }
+#define DEFINE_PRIM_IMPLS(prim_type, type)                                     \
+	void type##_cleanup(type *ptr) {}                                      \
+	size_t type##_size(type *ptr) { return sizeof(type); }                 \
+	void *type##_unwrap(type *ptr) { return &ptr->_value; }                \
+	bool type##_copy(type *dst, type *src) {                               \
+		memcpy(&dst->_value, &src->_value, sizeof(prim_type));         \
+		return true;                                                   \
+	}
 
-void I32_cleanup(I32 *ptr) {}
-size_t I32_size(I32 *ptr) { return sizeof(I32); }
-bool I32_copy(I32 *dst, I32 *src) {
-	memcpy(&dst->_value, &src->_value, sizeof(i32));
-	return true;
-}
-void *I32_unwrap(I32 *ptr) { return &ptr->_value; }
+DEFINE_PRIM_IMPLS(i8, I8)
+DEFINE_PRIM_IMPLS(i16, I16)
+DEFINE_PRIM_IMPLS(i32, I32)
+DEFINE_PRIM_IMPLS(i64, I64)
+DEFINE_PRIM_IMPLS(i128, I128)
+
+DEFINE_PRIM_IMPLS(u8, U8)
+DEFINE_PRIM_IMPLS(u16, U16)
+DEFINE_PRIM_IMPLS(u32, U32)
+DEFINE_PRIM_IMPLS(U64, U64)
+DEFINE_PRIM_IMPLS(u128, U128)
+
+DEFINE_PRIM_IMPLS(bool, Bool)
+

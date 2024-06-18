@@ -18,18 +18,53 @@
 #include <base/class.h>
 #include <base/traits.h>
 
-CLASS(U64, FIELD(u64, value))
-IMPL(U64, TRAIT_COPY)
-IMPL(U64, TRAIT_UNWRAP)
-#define U64 DEFINE_CLASS(U64)
-static GETTER(U64, value);
+#define DEFINE_PRIM_CLASS(prim_type, type)                                     \
+	CLASS(type, FIELD(prim_type, value))                                   \
+	IMPL(type, TRAIT_COPY);                                                \
+	IMPL(type, TRAIT_UNWRAP);
 
-CLASS(I32, FIELD(i32, value))
-IMPL(I32, TRAIT_COPY)
-IMPL(I32, TRAIT_UNWRAP)
+DEFINE_PRIM_CLASS(bool, Bool)
+#define Bool DEFINE_CLASS(Bool)
+static GETTER(Bool, value);
+
+DEFINE_PRIM_CLASS(i128, I128)
+#define I128 DEFINE_CLASS(I128)
+static GETTER(I128, value);
+
+DEFINE_PRIM_CLASS(i64, I64)
+#define I64 DEFINE_CLASS(I64)
+static GETTER(I64, value);
+
+DEFINE_PRIM_CLASS(i32, I32)
 #define I32 DEFINE_CLASS(I32)
 static GETTER(I32, value);
 
-#define VALUE(x) _Generic((x), U64 *: U64_get_value, default: I32_get_value)(&x)
+DEFINE_PRIM_CLASS(i16, I16)
+#define I16 DEFINE_CLASS(I16)
+static GETTER(I16, value);
+
+DEFINE_PRIM_CLASS(i8, I8)
+#define I8 DEFINE_CLASS(I8)
+static GETTER(I8, value);
+
+DEFINE_PRIM_CLASS(u128, U128)
+#define U128 DEFINE_CLASS(U128)
+static GETTER(U128, value);
+
+DEFINE_PRIM_CLASS(u64, U64)
+#define U64 DEFINE_CLASS(U64)
+static GETTER(U64, value);
+
+DEFINE_PRIM_CLASS(u32, U32)
+#define U32 DEFINE_CLASS(U32)
+static GETTER(U32, value);
+
+DEFINE_PRIM_CLASS(u16, U16)
+#define U16 DEFINE_CLASS(U16)
+static GETTER(U16, value);
+
+DEFINE_PRIM_CLASS(u8, U8)
+#define U8 DEFINE_CLASS(U8)
+static GETTER(U8, value);
 
 #endif // _BASE_PRIM__
