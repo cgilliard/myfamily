@@ -705,4 +705,9 @@ FamTest(base, test_try_expect) {
 	assert(!r2.is_ok());
 	Error e = unwrap_err(&r2);
 	assert(equal(KIND(e), &ILLEGAL_VALUE));
+
+	i64 m = 10;
+	Result r3 = Ok(m);
+	i64 m_out = *(i64 *)Expect(r3);
+	assert_eq(m_out, m);
 }
