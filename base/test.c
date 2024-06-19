@@ -14,6 +14,7 @@
 
 #include <base/class.h>
 #include <base/error.h>
+#include <base/option.h>
 #include <base/rc.h>
 #include <base/string.h>
 #include <base/test.h>
@@ -112,4 +113,17 @@ FamTest(base, test_string) {
 	Result r1 = Ok(*s1);
 	StringPtr *s2 = unwrap(&r1);
 	assert(equal(s1, s2));
+}
+
+FamTest(base, test_option) {
+	StringPtr *s1 = STRINGPTR("test");
+	Option x = Some(*s1);
+	StringPtr *s2 = unwrap(&x);
+	assert(equal(s1, s2));
+}
+
+FamTest(base, test_multi_lvl) {
+	StringPtr *s1 = STRINGPTR("test2");
+	Option x = Some(*s1);
+	// Result y = Ok(x);
 }
