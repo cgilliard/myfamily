@@ -32,8 +32,9 @@ void Result_cleanup(Result *ptr) {
 	void *err = *Result_get_err(ptr);
 	bool no_cleanup = *Result_get_no_cleanup(ptr);
 	if (ref) {
-		if (!no_cleanup)
+		if (!no_cleanup) {
 			cleanup(ref);
+		}
 		tlfree(ref);
 		Result_set_ref(ptr, NULL);
 	}
@@ -58,9 +59,8 @@ Result Result_build_err(Error *ref) {
 
 Result Result_build_ok(void *ref) {
 	if (!implements(ref, "copy")) {
-		Error e =
-		    ERROR(COPY_NOT_IMPLEMENTED_ERROR, "Result required copy");
-		return Err(e);
+		Rc rc = RC(ref);
+		return Result_build_ok(&rc);
 	}
 
 	void *ref_copy = tlmalloc(size(ref));
@@ -82,6 +82,7 @@ void *Result_unwrap(Result *result) {
 		panic("attempt to unwrap a Result that is an error");
 
 	void *ref = *Result_get_ref(result);
+	bool not_rc = true;
 
 	// automatically unwrap the primitive types
 	if (!strcmp(CLASS_NAME(ref), "Bool")) {
@@ -106,11 +107,15 @@ void *Result_unwrap(Result *result) {
 		ref = unwrap(ref);
 	} else if (!strcmp(CLASS_NAME(ref), "I8")) {
 		ref = unwrap(ref);
+	} else if (!strcmp(CLASS_NAME(ref), "Rc")) {
+		ref = unwrap(ref);
+		not_rc = false;
 	}
 
 	// ownership is now transferred
 	// we don't want to cleanup
-	Result_set_no_cleanup(result, true);
+	if (not_rc)
+		Result_set_no_cleanup(result, true);
 
 	return ref;
 }

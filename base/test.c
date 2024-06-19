@@ -98,10 +98,18 @@ FamTest(base, test_rc) {
 			Rc rc2;
 			clone(&rc2, &rc);
 		}
+
 		// cleanup did not occur here because while rc2's cleanup was
 		// called, the counter was not equal to 0 so RcTest's cleanup
 		// was not called.
 		assert_eq(rc_test_cleanup_count, 0);
 	}
 	assert_eq(rc_test_cleanup_count, 1);
+}
+
+FamTest(base, test_string) {
+	StringPtr *s1 = STRINGPTR("this is a test");
+	Result r1 = Ok(*s1);
+	StringPtr *s2 = unwrap(&r1);
+	assert(equal(s1, s2));
 }

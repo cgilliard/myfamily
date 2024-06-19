@@ -21,6 +21,7 @@
 #define TRAIT_RC_BUILD(T) TRAIT_REQUIRED(T, T##Ptr, build, void *ref)
 
 CLASS(Rc, FIELD(void *, ref) FIELD(u64 *, count))
+IMPL(Rc, TRAIT_COPY)
 IMPL(Rc, TRAIT_CLONE)
 IMPL(Rc, TRAIT_RC_BUILD)
 IMPL(Rc, TRAIT_UNWRAP)

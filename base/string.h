@@ -25,7 +25,7 @@
 
 CLASS(String, FIELD(char *, ptr) FIELD(u64, len))
 IMPL(String, TRAIT_STRING_BUILD)
-IMPL(String, TRAIT_COPY)
+IMPL(String, TRAIT_CLONE)
 IMPL(String, TRAIT_EQUAL)
 IMPL(String, TRAIT_UNWRAP)
 #define String DEFINE_CLASS(String)

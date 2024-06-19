@@ -34,6 +34,9 @@ void Rc_cleanup(Rc *obj) {
 	}
 }
 
+bool Rc_copy(Rc *dst, Rc *src) { return Rc_clone(dst, src); }
+size_t Rc_size(Rc *obj) { return sizeof(Rc); }
+
 bool Rc_clone(Rc *dst, Rc *src) {
 	u64 *count = *Rc_get_count(src);
 	void *ref = *Rc_get_ref(src);
@@ -41,7 +44,7 @@ bool Rc_clone(Rc *dst, Rc *src) {
 	Rc_set_count(dst, count);
 	Rc_set_ref(dst, ref);
 
-	return false;
+	return true;
 }
 
 Rc Rc_build(void *obj) {

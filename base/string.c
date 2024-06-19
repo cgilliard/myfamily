@@ -29,7 +29,7 @@ void String_cleanup(StringPtr *s) {
 	}
 }
 size_t String_size(String *s) { return sizeof(String); }
-bool String_copy(String *dst, String *src) {
+bool String_clone(String *dst, String *src) {
 	u64 len = *String_get_len(src);
 	String_set_len(dst, len);
 	void *tmp = tlmalloc(sizeof(char) * (1 + len));

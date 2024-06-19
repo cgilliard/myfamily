@@ -18,6 +18,7 @@
 #include <base/class.h>
 #include <base/error.h>
 #include <base/prim.h>
+#include <base/rc.h>
 #include <base/traits.h>
 
 #define TRAIT_RESULT(T)                                                        \
