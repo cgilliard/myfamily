@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include <base/class.h>
+#include <base/error.h>
+#include <base/rc.h>
+#include <base/string.h>
 #include <base/test.h>
 
 FamSuite(base);
@@ -61,4 +64,44 @@ FamTest(base, test_vtable_sort) {
 	vtable_cleanup(&table);
 }
 
-FamTest(base, test_another) {}
+FamTest(base, test_error) {
+	ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
+	ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
+	Error err1 = ERROR(ILLEGAL_STATE, "illegal state message %i", 3);
+	Error err2 = ERROR(ILLEGAL_ARGUMENT, "ill arg");
+	Error err3 = ERROR(ILLEGAL_STATE, "another illegal state err");
+	assert(equal(KIND(err1), KIND(err1)));
+	assert(!equal(KIND(err1), KIND(err2)));
+	assert(equal(KIND(err1), KIND(err3)));
+	assert(!equal(&err1, &err2));
+	assert(equal(&err1, &err3));
+}
+
+static int rc_test_cleanup_count = 0;
+CLASS(RcTest, FIELD(u32, x))
+#define RcTest DEFINE_CLASS(RcTest)
+
+void RcTest_cleanup(RcTestPtr *ptr) { rc_test_cleanup_count += 1; }
+RcTest *test_build_rctest(u32 x) {
+	RcTestPtr *ret = tlmalloc(sizeof(RcTest));
+	ret->vdata.vtable = &RcTestVtable;
+	ret->_x = x;
+}
+
+FamTest(base, test_rc) {
+	{
+		RcTestPtr *x = test_build_rctest(10);
+		Rc rc = RC(x);
+		assert_eq(rc_test_cleanup_count, 0);
+
+		{
+			Rc rc2;
+			clone(&rc2, &rc);
+		}
+		// cleanup did not occur here because while rc2's cleanup was
+		// called, the counter was not equal to 0 so RcTest's cleanup
+		// was not called.
+		assert_eq(rc_test_cleanup_count, 0);
+	}
+	assert_eq(rc_test_cleanup_count, 1);
+}
