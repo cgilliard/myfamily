@@ -712,3 +712,147 @@ FamTest(base, test_try_expect) {
 	i64 m_out = *(i64 *)Expect(r3);
 	assert_eq(m_out, m);
 }
+
+FamTest(base, test_sub_command) {
+	bool res;
+
+	Args args = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
+	assert(PARAM(&args, "threads", "t", "Number of threads to execute",
+		     true, false));
+	assert(PARAM(&args, "port", "p",
+		     "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(
+	    PARAM(&args, "debug", "d", "print debugging info", false, false));
+
+	SubCommand sub1 = SubCommand_build("verse", 0, 3);
+	Args_sub(&args, &sub1);
+	SubCommand sub2 = SubCommand_build("genc", 0, 5);
+	Args_sub(&args, &sub2);
+	char *argv1[] = {"bin", "--threads", "7", "-p", "0", "verse", "-d"};
+	res = Args_init(&args, 7, argv1, DEBUG_INIT_NO_EXIT);
+	assert(res);
+
+	char *argv2[] = {"bin", "--threads", "7", "-p", "0", "verse2", "-d"};
+	Args args2 = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
+	assert(PARAM(&args2, "threads", "t", "Number of threads to execute",
+		     true, false));
+	assert(PARAM(&args2, "port", "p",
+		     "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(
+	    PARAM(&args2, "debug", "d", "print debugging info", false, false));
+	res = Args_init(&args2, 7, argv2, DEBUG_INIT_NO_EXIT);
+	assert(!res);
+
+	char *argv3[] = {"bin",	  "--threads", "7", "-p", "0",
+			 "verse", "d",	       "e", "f"};
+	Args args3 = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
+	assert(PARAM(&args3, "threads", "t", "Number of threads to execute",
+		     true, false));
+	assert(PARAM(&args3, "port", "p",
+		     "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(
+	    PARAM(&args3, "debug", "d", "print debugging info", false, false));
+	SubCommand sub31 = SubCommand_build("verse", 0, 3);
+	Args_sub(&args3, &sub31);
+	res = Args_init(&args3, 9, argv3, DEBUG_INIT_NO_EXIT);
+	assert(res);
+
+	char *argv4[] = {"bin",	  "--threads", "7", "-p", "0",
+			 "verse", "d",	       "e", "f",  "g"};
+	Args args4 = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
+	assert(PARAM(&args4, "threads", "t", "Number of threads to execute",
+		     true, false));
+	assert(PARAM(&args4, "port", "p",
+		     "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(
+	    PARAM(&args4, "debug", "d", "print debugging info", false, false));
+	SubCommand sub41 = SubCommand_build("verse", 0, 3);
+	Args_sub(&args4, &sub41);
+	res = Args_init(&args4, 10, argv4, DEBUG_INIT_NO_EXIT);
+	assert(!res);
+
+	char *argv5[] = {"bin",	  "--threads", "7", "-p", "0",
+			 "verse", "d",	       "e", "f",  "g"};
+	Args args5 = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
+	assert(PARAM(&args5, "threads", "t", "Number of threads to execute",
+		     true, false));
+	assert(PARAM(&args5, "port", "p",
+		     "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(
+	    PARAM(&args5, "debug", "d", "print debugging info", false, false));
+	SubCommand sub51 = SubCommand_build("verse", 5, 6);
+	Args_sub(&args5, &sub51);
+	res = Args_init(&args5, 10, argv5, DEBUG_INIT_NO_EXIT);
+	assert(!res);
+
+	char *argv6[] = {"bin", "--threads", "7", "-p", "0", "verse",
+			 "d",	"e",	     "f", "g",	"h"};
+	Args args6 = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
+	assert(PARAM(&args6, "threads", "t", "Number of threads to execute",
+		     true, false));
+	assert(PARAM(&args6, "port", "p",
+		     "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(
+	    PARAM(&args6, "debug", "d", "print debugging info", false, false));
+	SubCommand sub61 = SubCommand_build("verse", 5, 6);
+	Args_sub(&args6, &sub61);
+	res = Args_init(&args6, 11, argv6, DEBUG_INIT_NO_EXIT);
+	assert(res);
+
+	char *argv7[] = {"bin", "--threads", "7", "-p", "0", "verse",
+			 "d",	"e",	     "f", "g",	"h", "i"};
+	Args args7 = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
+	assert(PARAM(&args7, "threads", "t", "Number of threads to execute",
+		     true, false));
+	assert(PARAM(&args7, "port", "p",
+		     "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(
+	    PARAM(&args7, "debug", "d", "print debugging info", false, false));
+	SubCommand sub71 = SubCommand_build("verse", 5, 6);
+	Args_sub(&args7, &sub71);
+	res = Args_init(&args7, 12, argv7, DEBUG_INIT_NO_EXIT);
+	assert(res);
+
+	char *argv8[] = {"bin", "--threads", "7", "-p", "0", "verse", "d",
+			 "e",	"f",	     "g", "h",	"i", "j"};
+	Args args8 = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
+	assert(PARAM(&args8, "threads", "t", "Number of threads to execute",
+		     true, false));
+	assert(PARAM(&args8, "port", "p",
+		     "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(
+	    PARAM(&args8, "debug", "d", "print debugging info", false, false));
+	SubCommand sub81 = SubCommand_build("verse", 5, 6);
+	Args_sub(&args8, &sub81);
+	res = Args_init(&args8, 13, argv8, DEBUG_INIT_NO_EXIT);
+	assert(!res);
+}
+
+FamTest(base, test_sub_command_values) {
+	bool res;
+	char *argv7[] = {"bin", "--threads", "7", "-p", "0", "verse",
+			 "d",	"e",	     "f", "g",	"h", "i"};
+	Args args7 = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
+	assert(PARAM(&args7, "threads", "t", "Number of threads to execute",
+		     true, false));
+	assert(PARAM(&args7, "port", "p",
+		     "TCP/IP Port to bind to (multiple allowed)", true, true));
+	assert(
+	    PARAM(&args7, "debug", "d", "print debugging info", false, false));
+	SubCommand sub71 = SubCommand_build("verse", 5, 6);
+	Args_sub(&args7, &sub71);
+	res = Args_init(&args7, 12, argv7, DEBUG_INIT_NO_EXIT);
+	assert(res);
+
+	char *v = Args_get_sub_command(&args7, 0);
+	assert_eq_str(v, "verse");
+	v = Args_get_sub_command(&args7, 1);
+	assert_eq_str(v, "d");
+	v = Args_get_sub_command(&args7, 2);
+	assert_eq_str(v, "e");
+	assert_eq_str(Args_get_sub_command(&args7, 3), "f");
+	assert_eq_str(Args_get_sub_command(&args7, 4), "g");
+	assert_eq_str(Args_get_sub_command(&args7, 5), "h");
+	assert_eq_str(Args_get_sub_command(&args7, 6), "i");
+	assert_eq(Args_get_sub_command(&args7, 7), NULL);
+}

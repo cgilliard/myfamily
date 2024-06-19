@@ -79,7 +79,7 @@ void vtable_override(Vtable *table, VtableEntry entry);
 	    MEMBER_TYPE(name, CAT(_, field_name)) CAT(_, field_name));
 
 #define CLASS(name, ...)                                                       \
-	typedef struct {                                                       \
+	typedef struct name##Ptr {                                             \
 		Vdata vdata;                                                   \
 		__VA_ARGS__                                                    \
 	} name##Ptr;                                                           \
