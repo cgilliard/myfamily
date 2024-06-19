@@ -16,25 +16,33 @@ $(SUBDIRS):
 test: $(SUBDIRS)
 	ERROR="0"; \
 	for dir in $(SUBDIRS); do \
+		if test -z $(CRITERION_TEST_PATTERN); then \
+                        CRITERION_TEST_PATTERN=$$dir/*; \
+                        export CRITERION_TEST_PATTERN; \
+                fi; \
 		if  test -z $(TARGET); then \
-		$(MAKE) -C $$dir test; \
+			$(MAKE) -C $$dir test; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
-			$(MAKE) -C $$dir test; \
+				$(MAKE) -C $$dir test; \
 			fi; \
 		fi; \
 		if [ $$? -ne "0" ]; then \
-		ERROR="1"; \
+			ERROR="1"; \
 		fi; \
 	done; 
 testnc: $(SUBDIRS)
 	ERROR="0"; \
 	for dir in $(SUBDIRS); do \
+		if test -z $(CRITERION_TEST_PATTERN); then \
+			CRITERION_TEST_PATTERN=$$dir/*; \
+			export CRITERION_TEST_PATTERN; \
+		fi; \
 		if  test -z $(TARGET); then \
 		$(MAKE) -C $$dir testnc; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
-			$(MAKE) -C $$dir testnc; \
+				$(MAKE) -C $$dir testnc; \
 			fi; \
 		fi; \
 		if [ $$? -ne "0" ]; then \

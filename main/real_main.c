@@ -12,31 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/args.h>
-#include <base/backtrace.h>
-#include <base/error.h>
-
-void setup_args(Args *args) {
-	*args = ARGS("fam", "0.0.1-beta.1", "The MyFamily Developers");
-	PARAM(args, "threads", "t", "Number of threads to execute", true,
-	      false);
-	PARAM(args, "port", "p", "TCP/IP Port to bind to (multiple allowed)",
-	      true, true);
-	PARAM(args, "debug", "d", "Print debugging information", false, false);
-	PARAM(args, "address", "a",
-	      "TCP/IP address to bind to. The default value is 127.0.0.1.",
-	      true, false);
-	PARAM(args, "counter", "c", "The counter", true, false);
-}
-
-ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
+#include <stdio.h>
 
 int real_main(int argc, char **argv) {
-	Args args;
-	setup_args(&args);
-	ARGS_INIT(&args, argc, argv);
-
-	Error e = ERROR(ILLEGAL_STATE, "main not implemented %i", 5);
-	print(&e);
+	printf("main doesn't do anything\n");
 	return 0;
 }

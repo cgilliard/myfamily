@@ -29,7 +29,6 @@
 
 #define FamSuite(name)                                                         \
 	void setup_suite(void) {                                               \
-		void *test = tlmalloc(1);                                      \
 		printf("[%s====%s] Running %s%s%s test suite...\n", BLUE,      \
 		       RESET, GREEN, #name, RESET);                            \
 	}                                                                      \
@@ -77,4 +76,4 @@
 			log_fd = -1;                                           \
 		}                                                              \
 	}                                                                      \
-	Test(base, test, .init = setup_##test, .fini = tear_down)
+	Test(suite, test, .init = setup_##test, .fini = tear_down)
