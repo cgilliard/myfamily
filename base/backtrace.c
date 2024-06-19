@@ -52,6 +52,12 @@ int get_file_line(char *bin, char *addr, char *line_num, char *fn_name,
 	pid_t process_id;
 	int cmd_max_len = strlen(bin) + strlen(addr) + 100;
 	char cmd[cmd_max_len];
+
+	// hack to get line numbers on linux in criterion
+	if (!strcmp(bin, "boxfort-worker")) {
+		strcpy(bin, "./bin/test");
+	}
+
 #ifdef __APPLE__
 	snprintf(cmd, cmd_max_len, "atos --fullPath -o %s %s", bin, addr);
 #else  // LINUX/WIN for now
