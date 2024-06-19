@@ -17,11 +17,14 @@
 #include <base/macro_utils.h>
 #include <base/tlmalloc.h>
 #include <criterion/criterion.h>
+#include <criterion/hooks.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+
+void my_post_test_hook(struct criterion_test_stats *stats) {}
 
 #define assert(x)                                                              \
 	{                                                                      \
@@ -33,11 +36,11 @@
 	}
 #define assert_eq_str(x, y)                                                    \
 	{                                                                      \
-		if (!strcmp(x, y)) {                                           \
+		if (strcmp(x, y)) {                                            \
 			Backtrace b = GENERATE_BACKTRACE;                      \
 			print(&b);                                             \
 		}                                                              \
-		cr_assert(!strcmp(x, y))                                       \
+		cr_assert(!strcmp(x, y));                                      \
 	}
 #define assert_eq(x, y)                                                        \
 	{                                                                      \
@@ -45,7 +48,7 @@
 			Backtrace b = GENERATE_BACKTRACE;                      \
 			print(&b);                                             \
 		}                                                              \
-		cr_assert_eq(x, y)                                             \
+		cr_assert_eq(x, y);                                            \
 	}
 #define assert_neq(x, y)                                                       \
 	{                                                                      \
@@ -53,7 +56,7 @@
 			Backtrace b = GENERATE_BACKTRACE;                      \
 			print(&b);                                             \
 		}                                                              \
-		cr_assert_neq(x, y)                                            \
+		cr_assert_neq(x, y);                                           \
 	}
 
 #define FamSuite(name)                                                         \
@@ -65,7 +68,7 @@
 	static u64 initial_alloc_diff;                                         \
 	static char *cur_name = "";                                            \
 	static int log_fd = -1;                                                \
-	void tear_down(void) {                                                 \
+	void tear_down() {                                                     \
 		u64 cur_alloc_count = alloc_count();                           \
 		u64 cur_free_count = free_count();                             \
 		u64 diff = cur_alloc_count - cur_free_count;                   \

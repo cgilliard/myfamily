@@ -38,7 +38,6 @@ typedef struct {
 
 typedef struct {
 	Vtable *vtable;
-	// reserved for other data as needed
 	char *name;
 } Vdata;
 
@@ -46,9 +45,12 @@ typedef struct {
 	Vdata vdata;
 } Object;
 
+void sort_vtable(Vtable *table);
+bool implements(Object *obj, const char *name);
 void *find_fn(Object *obj, const char *name);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
 void vtable_override(Vtable *table, VtableEntry entry);
+void vtable_cleanup(Vtable *table);
 
 #define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup)
 
