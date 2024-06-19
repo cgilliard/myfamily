@@ -17,9 +17,8 @@
 FamSuite(base);
 
 FamTest(base, test_tmalloc) {
-	printf("test tlmalloc\n");
 	void *ptr = tlmalloc(1);
 	tlfree(ptr);
 }
 
-FamTest(base, test_cleanup) { printf("test cleanup\n"); }
+FamTest(base, test_cleanup) { assert(true); }

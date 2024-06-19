@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/backtrace.h>
 #include <base/colors.h>
 #include <base/macro_utils.h>
 #include <base/tlmalloc.h>
@@ -22,10 +23,38 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define assert(x) cr_assert(x)
-#define assert_eq_str(x, y) cr_assert(!strcmp(x, y))
-#define assert_eq(x, y) cr_assert_eq(x, y)
-#define assert_neq(x, y) cr_assert_neq(x, y)
+#define assert(x)                                                              \
+	{                                                                      \
+		if (!x) {                                                      \
+			Backtrace b = GENERATE_BACKTRACE;                      \
+			print(&b);                                             \
+		}                                                              \
+		cr_assert(x);                                                  \
+	}
+#define assert_eq_str(x, y)                                                    \
+	{                                                                      \
+		if (!strcmp(x, y)) {                                           \
+			Backtrace b = GENERATE_BACKTRACE;                      \
+			print(&b);                                             \
+		}                                                              \
+		cr_assert(!strcmp(x, y))                                       \
+	}
+#define assert_eq(x, y)                                                        \
+	{                                                                      \
+		if (x != y) {                                                  \
+			Backtrace b = GENERATE_BACKTRACE;                      \
+			print(&b);                                             \
+		}                                                              \
+		cr_assert_eq(x, y)                                             \
+	}
+#define assert_neq(x, y)                                                       \
+	{                                                                      \
+		if (x == y) {                                                  \
+			Backtrace b = GENERATE_BACKTRACE;                      \
+			print(&b);                                             \
+		}                                                              \
+		cr_assert_neq(x, y)                                            \
+	}
 
 #define FamSuite(name)                                                         \
 	void setup_suite(void) {                                               \
