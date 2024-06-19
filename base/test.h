@@ -30,6 +30,8 @@ void my_post_test_hook(struct criterion_test_stats *stats) {}
 	{                                                                      \
 		if (!x) {                                                      \
 			Backtrace b = GENERATE_BACKTRACE;                      \
+			printf("[%s====%s] Assertion failed at ", BLUE,        \
+			       RESET);                                         \
 			print(&b);                                             \
 		}                                                              \
 		cr_assert(x);                                                  \
@@ -38,6 +40,8 @@ void my_post_test_hook(struct criterion_test_stats *stats) {}
 	{                                                                      \
 		if (strcmp(x, y)) {                                            \
 			Backtrace b = GENERATE_BACKTRACE;                      \
+			printf("[%s====%s] Assertion failed at ", BLUE,        \
+			       RESET);                                         \
 			print(&b);                                             \
 		}                                                              \
 		cr_assert(!strcmp(x, y));                                      \
@@ -46,6 +50,8 @@ void my_post_test_hook(struct criterion_test_stats *stats) {}
 	{                                                                      \
 		if (x != y) {                                                  \
 			Backtrace b = GENERATE_BACKTRACE;                      \
+			printf("[%s====%s] Assertion failed at ", BLUE,        \
+			       RESET);                                         \
 			print(&b);                                             \
 		}                                                              \
 		cr_assert_eq(x, y);                                            \
@@ -54,6 +60,8 @@ void my_post_test_hook(struct criterion_test_stats *stats) {}
 	{                                                                      \
 		if (x == y) {                                                  \
 			Backtrace b = GENERATE_BACKTRACE;                      \
+			printf("[%s====%s] Assertion failed at ", BLUE,        \
+			       RESET);                                         \
 			print(&b);                                             \
 		}                                                              \
 		cr_assert_neq(x, y);                                           \
@@ -65,6 +73,7 @@ void my_post_test_hook(struct criterion_test_stats *stats) {}
 		       RESET, GREEN, #name, RESET);                            \
 	}                                                                      \
 	Test(init, init, .init = setup_suite) {}                               \
+	static int test_count = 0;                                             \
 	static u64 initial_alloc_diff;                                         \
 	static char *cur_name = "";                                            \
 	static int log_fd = -1;                                                \

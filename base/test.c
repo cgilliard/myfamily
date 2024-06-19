@@ -60,3 +60,5 @@ FamTest(base, test_vtable_sort) {
 
 	vtable_cleanup(&table);
 }
+
+FamTest(base, test_another) {}

@@ -21,9 +21,11 @@ test: $(SUBDIRS)
                         export CRITERION_TEST_PATTERN; \
                 fi; \
 		if  test -z $(TARGET); then \
+			echo "[====] Running $$dir test suite..."; \
 			$(MAKE) -C $$dir test; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
+				echo "[====] Running $$dir test suite..."; \
 				$(MAKE) -C $$dir test; \
 			fi; \
 		fi; \
@@ -39,9 +41,12 @@ testnc: $(SUBDIRS)
 			export CRITERION_TEST_PATTERN; \
 		fi; \
 		if  test -z $(TARGET); then \
-		$(MAKE) -C $$dir testnc; \
+			NOCOLOR="\033[0m"; \
+			echo -e "[====] Running $$dir test suite..."; \
+			$(MAKE) -C $$dir testnc; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
+				echo "[====] Running $$dir test suite..."; \
 				$(MAKE) -C $$dir testnc; \
 			fi; \
 		fi; \
