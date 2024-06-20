@@ -165,5 +165,13 @@ FamTest(base, test_args_param) {
 	assert_eq_str(*ArgsParam_get_short_name(&args2), "p2short");
 	assert_eq(*ArgsParam_get_takes_value(&args2), false);
 	assert_eq(*ArgsParam_get_multiple(&args2), false);
-}
 
+	Result r3 =
+	    ArgsParam_build("p2name", "p2help", "p2short", false, false);
+	ArgsParam args3 = *(ArgsParam *)unwrap(&r3);
+
+	assert(!equal(&args1, &args2));
+	assert(equal(&args1, &args1));
+	assert(equal(&args2, &args3));
+	assert(!equal(&args1, &args3));
+}
