@@ -21,9 +21,8 @@
 #include <base/traits.h>
 
 #define TRAIT_ARGS_PARAM(T)                                                    \
-	TRAIT_REQUIRED(T, Result, build, const char *name, const char *help,   \
-		       const char *short_name, bool takes_value,               \
-		       bool multiple)
+	TRAIT_REQUIRED(T, Result, build, char *name, char *help,               \
+		       char *short_name, bool takes_value, bool multiple)
 
 #define TRAIT_SUB_COMMAND(T)                                                   \
 	TRAIT_REQUIRED(T, Result, build, char *name, u32 min_args, u32 max_args)

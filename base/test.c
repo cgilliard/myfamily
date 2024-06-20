@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/args.h>
 #include <base/class.h>
 #include <base/error.h>
 #include <base/option.h>
@@ -140,3 +141,29 @@ FamTest(base, test_multi_lvl) {
 	StringPtr *s4 = STRINGP("test4");
 	Rc rc = RC(s4);
 }
+
+GETTER_PROTO(ArgsParam, name)
+GETTER_PROTO(ArgsParam, help)
+GETTER_PROTO(ArgsParam, short_name)
+GETTER_PROTO(ArgsParam, takes_value)
+GETTER_PROTO(ArgsParam, multiple)
+
+FamTest(base, test_args_param) {
+	Result r1 = ArgsParam_build("p1name", "p1help", "p1short", true, true);
+	ArgsParam args1 = *(ArgsParam *)unwrap(&r1);
+	assert_eq_str(*ArgsParam_get_name(&args1), "p1name");
+	assert_eq_str(*ArgsParam_get_help(&args1), "p1help");
+	assert_eq_str(*ArgsParam_get_short_name(&args1), "p1short");
+	assert_eq(*ArgsParam_get_takes_value(&args1), true);
+	assert_eq(*ArgsParam_get_multiple(&args1), true);
+
+	Result r2 =
+	    ArgsParam_build("p2name", "p2help", "p2short", false, false);
+	ArgsParam args2 = *(ArgsParam *)unwrap(&r2);
+	assert_eq_str(*ArgsParam_get_name(&args2), "p2name");
+	assert_eq_str(*ArgsParam_get_help(&args2), "p2help");
+	assert_eq_str(*ArgsParam_get_short_name(&args2), "p2short");
+	assert_eq(*ArgsParam_get_takes_value(&args2), false);
+	assert_eq(*ArgsParam_get_multiple(&args2), false);
+}
+
