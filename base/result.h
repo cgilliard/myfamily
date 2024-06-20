@@ -30,6 +30,7 @@
 CLASS(Result, FNPTR(bool (*is_ok)()) FIELD(Error *, err) FIELD(void *, ref)
 		  FIELD(bool, no_cleanup))
 IMPL(Result, TRAIT_UNWRAP)
+IMPL(Result, TRAIT_COPY)
 IMPL(Result, TRAIT_UNWRAP_ERR)
 IMPL(Result, TRAIT_RESULT)
 #define Result DEFINE_CLASS(Result)

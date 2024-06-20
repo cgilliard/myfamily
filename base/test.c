@@ -125,5 +125,15 @@ FamTest(base, test_option) {
 FamTest(base, test_multi_lvl) {
 	StringPtr *s1 = STRINGPTR("test2");
 	Option x = Some(*s1);
-	// Result y = Ok(x);
+	Result y = Ok(x);
+	Option z = *(Option *)unwrap(&y);
+	StringPtr *s2 = unwrap(&z);
+	assert(equal(s1, s2));
+
+	StringPtr *s3 = STRINGPTR("test3");
+	Result x3 = Ok(*s3);
+	Option y3 = Some(x3);
+	Result x3_out = *(Result *)unwrap(&y3);
+	StringPtr *s3_out = unwrap(&x3_out);
+	assert(equal(s3_out, s3));
 }

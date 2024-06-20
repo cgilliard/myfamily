@@ -27,6 +27,44 @@ bool is_ok_impl_true() { return true; }
 
 bool is_ok_impl_false() { return false; }
 
+size_t Result_size(Result *ptr) { return sizeof(Result); }
+
+bool Result_copy(Result *dst, Result *src) {
+	Object *ref;
+	void *src_ref = *Result_get_ref(src);
+	if (src_ref) {
+		ref = tlmalloc(size(src_ref));
+		if (!ref)
+			return false;
+		if (!copy(ref, src_ref)) {
+			tlfree(ref);
+			return false;
+		}
+
+	} else {
+		ref = NULL;
+	}
+	Result_set_ref(dst, ref);
+
+	ErrorPtr *err;
+	ErrorPtr *src_err = *Result_get_err(src);
+	if (src_err) {
+		err = tlmalloc(size(src_err));
+		if (!err)
+			return false;
+		// copy error always returns true
+		copy(err, src_err);
+	} else {
+		err = NULL;
+	}
+	Result_set_err(dst, err);
+
+	Result_set_no_cleanup(dst, *Result_get_no_cleanup(src));
+	dst->is_ok = src->is_ok;
+
+	return true;
+}
+
 void Result_cleanup(Result *ptr) {
 	void *ref = *Result_get_ref(ptr);
 	void *err = *Result_get_err(ptr);

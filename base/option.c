@@ -24,17 +24,23 @@ void Option_cleanup(Option *option) {
 	void *ref = *Option_get_ref(option);
 	bool no_cleanup = *Option_get_no_cleanup(option);
 	if (ref) {
-		if (!no_cleanup)
+		if (!no_cleanup) {
 			cleanup(ref);
+		}
 		tlfree(ref);
 		Option_set_ref(option, NULL);
 	}
 }
 size_t Option_size(Option *option) { return sizeof(Option); }
 bool Option_copy(Option *dst, Option *src) {
-	dst->is_some = src->is_some;
-	Option_set_ref(dst, *Option_get_ref(src));
+	Object *ref = tlmalloc(size(src));
+	if (!copy(ref, *Option_get_ref(src))) {
+		tlfree(ref);
+		return false;
+	}
 	Option_set_no_cleanup(dst, *Option_get_no_cleanup(src));
+	dst->is_some = src->is_some;
+	Option_set_ref(dst, ref);
 
 	return true;
 }
@@ -61,7 +67,7 @@ void *Option_unwrap(Option *option) {
 	}
 	void *ref = *Option_get_ref(option);
 
-	bool is_rc = false;
+	bool not_rc = true;
 	char *cn = CLASS_NAME(ref);
 
 	// automatically unwrap the primitive types
@@ -88,13 +94,13 @@ void *Option_unwrap(Option *option) {
 	} else if (!strcmp(cn, "I8")) {
 		ref = unwrap(ref);
 	} else if (!strcmp(cn, "Rc")) {
-		is_rc = true;
+		not_rc = false;
 		ref = unwrap(ref);
 	}
 
 	// ownership is now transferred
 	// we don't want to cleanup
-	if (!is_rc)
+	if (not_rc)
 		Option_set_no_cleanup(option, true);
 
 	return ref;
