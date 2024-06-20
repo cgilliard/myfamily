@@ -97,4 +97,11 @@ static Result Result_build_ok_bool(void *value) {
 		unwrap(&x);                                                    \
 	})
 
+#define todo()                                                                 \
+	({                                                                     \
+		ErrorKind NOT_IMPLEMENTED = BUILD(ErrorKind, "unimplemented"); \
+		Error err = ERROR(NOT_IMPLEMENTED, "Not yet implemented!");    \
+		return Err(err);                                               \
+	});
+
 #endif // _RESULT_BASE__
