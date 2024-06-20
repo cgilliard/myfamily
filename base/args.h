@@ -25,7 +25,9 @@
 		       char *short_name, bool takes_value, bool multiple)
 
 #define TRAIT_SUB_COMMAND(T)                                                   \
-	TRAIT_REQUIRED(T, Result, build, char *name, u32 min_args, u32 max_args)
+	TRAIT_REQUIRED(T, Result, build, char *name, u32 min_args,             \
+		       u32 max_args)                                           \
+	TRAIT_REQUIRED(T, Result, add_param, T##Ptr *sub, ArgsParam *param)
 
 #define TRAIT_ARGS(T)                                                          \
 	TRAIT_REQUIRED(T, Result, add_param, T##Ptr *args, const char *name,   \
@@ -52,7 +54,7 @@ IMPL(ArgsParam, TRAIT_EQUAL)
 IMPL(ArgsParam, TRAIT_ARGS_PARAM)
 #define ArgsParam DEFINE_CLASS(ArgsParam)
 
-CLASS(SubCommand, FIELD(char *, name) FIELD(ArgsParamPtr *, params)
+CLASS(SubCommand, FIELD(char *, name) FIELD(ArgsParam *, params)
 		      FIELD(ArgsParamState *, params_state) FIELD(u64, count)
 			  FIELD(u32, min_add_args) FIELD(u32, max_add_args))
 IMPL(SubCommand, TRAIT_COPY)
@@ -61,7 +63,7 @@ IMPL(SubCommand, TRAIT_SUB_COMMAND)
 
 CLASS(Args,
       FIELD(char *, prog) FIELD(char *, version) FIELD(char *, author)
-	  FIELD(ArgsParamPtr *, params) FIELD(ArgsParamState *, params_state)
+	  FIELD(ArgsParam *, params) FIELD(ArgsParamState *, params_state)
 	      FIELD(u64, count) FIELD(SubCommand *, subs) FIELD(u64, subs_count)
 		  FIELD(char **, argv) FIELD(int, argc) FIELD(u64, debug_flags))
 IMPL(Args, TRAIT_ARGS);

@@ -175,3 +175,40 @@ FamTest(base, test_args_param) {
 	assert(equal(&args2, &args3));
 	assert(!equal(&args1, &args3));
 }
+
+GETTER_PROTO(SubCommand, name)
+GETTER_PROTO(SubCommand, params)
+GETTER_PROTO(SubCommand, params_state)
+GETTER_PROTO(SubCommand, count)
+GETTER_PROTO(SubCommand, min_add_args)
+GETTER_PROTO(SubCommand, max_add_args)
+
+FamTest(base, test_sub_command) {
+	Result r1 = SubCommand_build("test1", 2, 5);
+	SubCommand s1 = *(SubCommand *)unwrap(&r1);
+	assert_eq_str(*SubCommand_get_name(&s1), "test1");
+	assert_eq(*SubCommand_get_min_add_args(&s1), 2);
+	assert_eq(*SubCommand_get_max_add_args(&s1), 5);
+	assert_eq(*SubCommand_get_count(&s1), 0);
+
+	Result r11 =
+	    ArgsParam_build("p1name", "p1help", "p1short", false, false);
+	ArgsParam p1 = *(ArgsParam *)unwrap(&r11);
+
+	Result r111 = SubCommand_add_param(&s1, &p1);
+	assert(r111.is_ok());
+
+	Result r12 =
+	    ArgsParam_build("p2name", "p2help", "p2short", false, false);
+	ArgsParam p2 = *(ArgsParam *)unwrap(&r12);
+
+	Result r112 = SubCommand_add_param(&s1, &p2);
+	assert(r112.is_ok());
+
+	ArgsParamPtr *params_out = *SubCommand_get_params(&s1);
+	ArgsParamStatePtr *params_state_out = *SubCommand_get_params_state(&s1);
+
+	assert_eq(*SubCommand_get_count(&s1), 2);
+	assert(equal(&params_out[0], &p1));
+	assert(equal(&params_out[1], &p2));
+}

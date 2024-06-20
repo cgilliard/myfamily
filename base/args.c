@@ -14,6 +14,7 @@
 
 #include <base/args.h>
 #include <base/ekinds.h>
+#include <base/unit.h>
 
 SETTER(ArgsParam, name)
 SETTER(ArgsParam, help)
@@ -25,6 +26,24 @@ GETTER(ArgsParam, help)
 GETTER(ArgsParam, short_name)
 GETTER(ArgsParam, takes_value)
 GETTER(ArgsParam, multiple)
+
+GETTER(SubCommand, name)
+SETTER(SubCommand, name)
+GETTER(SubCommand, params)
+SETTER(SubCommand, params)
+GETTER(SubCommand, params_state)
+SETTER(SubCommand, params_state)
+GETTER(SubCommand, count)
+SETTER(SubCommand, count)
+GETTER(SubCommand, min_add_args)
+SETTER(SubCommand, min_add_args)
+GETTER(SubCommand, max_add_args)
+SETTER(SubCommand, max_add_args)
+
+GETTER(ArgsParamState, specified)
+SETTER(ArgsParamState, specified)
+GETTER(ArgsParamState, itt)
+SETTER(ArgsParamState, itt)
 
 void ArgsParamState_cleanup(ArgsParamState *ptr) {}
 
@@ -154,10 +173,177 @@ bool ArgsParam_equal(ArgsParam *obj1, ArgsParam *obj2) {
 
 size_t ArgsParam_size(ArgsParam *ptr) { return sizeof(ArgsParam); }
 
-void SubCommand_cleanup(SubCommand *ptr) {}
-bool SubCommand_copy(SubCommand *dst, SubCommand *src) { return false; }
+void SubCommand_cleanup(SubCommand *ptr) {
+	char *name = *SubCommand_get_name(ptr);
+	u64 count = *SubCommand_get_count(ptr);
+	if (name) {
+		tlfree(name);
+		SubCommand_set_name(ptr, NULL);
+	}
+
+	ArgsParamPtr *params = *SubCommand_get_params(ptr);
+	if (params) {
+		for (u64 i = 0; i < count; i++) {
+			cleanup(&params[i]);
+		}
+		tlfree(params);
+		SubCommand_set_params(ptr, NULL);
+	}
+
+	ArgsParamStatePtr *params_state = *SubCommand_get_params_state(ptr);
+	if (params_state) {
+		for (u64 i = 0; i < count; i++) {
+			cleanup(&params_state[i]);
+		}
+		tlfree(params_state);
+		SubCommand_set_params_state(ptr, NULL);
+	}
+
+	SubCommand_set_count(ptr, 0);
+}
+
+SubCommand SubCommand_build_impl(char *name, ArgsParam *params,
+				 ArgsParamState *state, u64 count, u64 min_args,
+				 u64 max_args) {
+	SubCommandPtr ret =
+	    BUILD(SubCommand, name, params, state, count, min_args, max_args);
+
+	return ret;
+}
+
+bool SubCommand_copy(SubCommand *dst, SubCommand *src) {
+	bool ret = true;
+	char *src_name = *SubCommand_get_name(src);
+	char *name = tlmalloc(sizeof(char) * strlen(src_name));
+	if (name == NULL)
+		return false;
+	strcpy(name, src_name);
+	u64 count = *SubCommand_get_count(src);
+	ArgsParamPtr *params = NULL;
+
+	if (count > 0) {
+		params = tlmalloc(sizeof(ArgsParam) * count);
+		if (params == NULL) {
+			if (name)
+				tlfree(name);
+			return false;
+		}
+	} else
+		params = NULL;
+
+	ArgsParamStatePtr *params_state;
+	if (count > 0) {
+		params_state = tlmalloc(sizeof(ArgsParamState) * count);
+		if (params_state == NULL) {
+			if (params)
+				tlfree(params);
+			if (name)
+				tlfree(name);
+			return false;
+		}
+	} else
+		params_state = NULL;
+
+	ArgsParamPtr *params_src = *SubCommand_get_params(src);
+	ArgsParamStatePtr *params_state_src = *SubCommand_get_params_state(src);
+	for (u64 i = 0; i < count; i++) {
+		if (!copy(&params[i], &params_src[i])) {
+			ret = false;
+			break;
+		}
+		if (!copy(&params_state[i], &params_state_src[i])) {
+			ret = false;
+			break;
+		}
+	}
+
+	if (ret) {
+		u64 max_args = *SubCommand_get_max_add_args(src);
+		u64 min_args = *SubCommand_get_min_add_args(src);
+
+		*dst = SubCommand_build_impl(name, params, params_state, count,
+					     min_args, max_args);
+	} else {
+		if (params)
+			tlfree(params);
+		if (name)
+			tlfree(name);
+		if (params_state)
+			tlfree(params_state);
+	}
+
+	return ret;
+}
 size_t SubCommand_size(SubCommand *ptr) { return sizeof(SubCommand); }
-Result SubCommand_build(char *name, u32 min_args, u32 max_args) { todo() }
+Result SubCommand_build(char *name, u32 min_args, u32 max_args) {
+
+	SubCommandPtr src =
+	    BUILD(SubCommand, name, NULL, NULL, 0, min_args, max_args);
+	SubCommand ret;
+	copy(&ret, &src);
+	return Ok(ret);
+}
+
+Result SubCommand_add_param(SubCommand *ptr, ArgsParam *param) {
+	u64 count = *SubCommand_get_count(ptr);
+	if (count == 0) {
+		ArgsParamPtr *params_ptr = tlmalloc(sizeof(ArgsParam));
+		if (params_ptr == NULL) {
+			Error err =
+			    ERROR(ALLOC_ERROR, "could not allocate memory");
+			return Err(err);
+		}
+
+		ArgsParamStatePtr *params_state_ptr =
+		    tlmalloc(sizeof(ArgsParamState));
+		if (params_state_ptr == NULL) {
+			tlfree(params_ptr);
+			Error err =
+			    ERROR(ALLOC_ERROR, "could not allocate memory");
+			return Err(err);
+		}
+
+		ArgsParamStatePtr tmp_state = BUILD(ArgsParamState, false, 0);
+		memcpy(&params_state_ptr[count], &tmp_state,
+		       sizeof(ArgsParamState));
+
+		copy(&params_ptr[count], param);
+		SubCommand_set_params(ptr, params_ptr);
+		SubCommand_set_params_state(ptr, params_state_ptr);
+	} else {
+		ArgsParamPtr *params_ptr = *SubCommand_get_params(ptr);
+		void *tmp =
+		    tlrealloc(params_ptr, sizeof(ArgsParam) * (1 + count));
+		if (tmp == NULL) {
+			Error err =
+			    ERROR(ALLOC_ERROR, "could not allocate memory");
+			return Err(err);
+		}
+		params_ptr = tmp;
+
+		ArgsParamStatePtr *params_state_ptr =
+		    *SubCommand_get_params_state(ptr);
+		tmp = tlrealloc(params_state_ptr,
+				sizeof(ArgsParamState) * (1 + count));
+		if (tmp == NULL) {
+			Error err =
+			    ERROR(ALLOC_ERROR, "could not allocate memory");
+			return Err(err);
+		}
+		params_state_ptr = tmp;
+
+		ArgsParamStatePtr tmp_state = BUILD(ArgsParamState, false, 0);
+		memcpy(&params_state_ptr[count], &tmp_state,
+		       sizeof(ArgsParamState));
+
+		copy(&params_ptr[count], param);
+		SubCommand_set_params(ptr, params_ptr);
+		SubCommand_set_params_state(ptr, params_state_ptr);
+	}
+
+	SubCommand_set_count(ptr, count + 1);
+	return Ok(UNIT);
+}
 
 void Args_cleanup(Args *ptr) {}
 Result Args_add_param(Args *ptr, const char *name, const char *help,
