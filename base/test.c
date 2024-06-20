@@ -136,4 +136,7 @@ FamTest(base, test_multi_lvl) {
 	Result x3_out = *(Result *)unwrap(&y3);
 	StringPtr *s3_out = unwrap(&x3_out);
 	assert(equal(s3_out, s3));
+
+	StringPtr *s4 = STRINGPTR("test4");
+	Rc rc = RC(s4);
 }
