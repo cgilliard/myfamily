@@ -55,7 +55,7 @@ bool String_equal(String *obj1, String *obj2) {
 		return false;
 	return !strcmp(obj1_ptr, obj2_ptr);
 }
-Result String_build(const char *s) {
+Result String_build_try(const char *s) {
 	if (s == NULL) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "char pointer was NULL");
 		return Err(e);
@@ -86,8 +86,19 @@ String String_build_expect(const char *s) {
 	return ret;
 }
 
-StringPtr *String_build_ptr(const char *s) {
+StringPtr *String_build_ptr_expect(const char *s) {
 	StringPtr *ret = tlmalloc(sizeof(StringPtr));
+	if (ret == NULL)
+		panic("Allocation Error: Could not allocate memory");
 	*ret = String_build_expect(s);
 	return ret;
+}
+
+Result String_build_ptr_try(const char *s) {
+	StringPtr *ret = tlmalloc(sizeof(StringPtr));
+	if (ret == NULL) {
+		Error e = ERROR(ALLOC_ERROR, "Could not allocate memory");
+		return Err(e);
+	}
+	return String_build_try(s);
 }

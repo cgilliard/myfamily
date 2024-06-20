@@ -109,34 +109,34 @@ FamTest(base, test_rc) {
 }
 
 FamTest(base, test_string) {
-	StringPtr *s1 = STRINGPTR("this is a test");
+	StringPtr *s1 = STRINGP("this is a test");
 	Result r1 = Ok(*s1);
 	StringPtr *s2 = unwrap(&r1);
 	assert(equal(s1, s2));
 }
 
 FamTest(base, test_option) {
-	StringPtr *s1 = STRINGPTR("test");
+	StringPtr *s1 = STRINGP("test");
 	Option x = Some(*s1);
 	StringPtr *s2 = unwrap(&x);
 	assert(equal(s1, s2));
 }
 
 FamTest(base, test_multi_lvl) {
-	StringPtr *s1 = STRINGPTR("test2");
+	StringPtr *s1 = STRINGP("test2");
 	Option x = Some(*s1);
 	Result y = Ok(x);
 	Option z = *(Option *)unwrap(&y);
 	StringPtr *s2 = unwrap(&z);
 	assert(equal(s1, s2));
 
-	StringPtr *s3 = STRINGPTR("test3");
+	StringPtr *s3 = STRINGP("test3");
 	Result x3 = Ok(*s3);
 	Option y3 = Some(x3);
 	Result x3_out = *(Result *)unwrap(&y3);
 	StringPtr *s3_out = unwrap(&x3_out);
 	assert(equal(s3_out, s3));
 
-	StringPtr *s4 = STRINGPTR("test4");
+	StringPtr *s4 = STRINGP("test4");
 	Rc rc = RC(s4);
 }
