@@ -22,11 +22,11 @@ test: $(SUBDIRS)
                 fi; \
 		if  test -z $(TARGET); then \
 			echo "[====] Running $$dir test suite..."; \
-			$(MAKE) -C $$dir test; \
+			$(MAKE) -C $$dir test || exit 1; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
 				echo "[====] Running $$dir test suite..."; \
-				$(MAKE) -C $$dir test; \
+				$(MAKE) -C $$dir test || exit 1;\
 			fi; \
 		fi; \
 		if [ $$? -ne "0" ]; then \
@@ -43,11 +43,11 @@ testnc: $(SUBDIRS)
 		if  test -z $(TARGET); then \
 			NOCOLOR="\033[0m"; \
 			echo -e "[====] Running $$dir test suite..."; \
-			$(MAKE) -C $$dir testnc; \
+			$(MAKE) -C $$dir testnc || exit 1; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
 				echo "[====] Running $$dir test suite..."; \
-				$(MAKE) -C $$dir testnc; \
+				$(MAKE) -C $$dir testnc || exit 1; \
 			fi; \
 		fi; \
 		if [ $$? -ne "0" ]; then \

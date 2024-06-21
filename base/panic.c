@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/backtrace.h>
 #include <base/panic.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -20,10 +21,13 @@
 void panic(const char *fmt, ...) {
 	va_list args;
 
+	Backtrace bt = GENERATE_BACKTRACE;
+
 	fprintf(stderr, "thread panicked: ");
 	va_start(args, fmt);
 	vfprintf(stderr, fmt, args);
 	va_end(args);
 	fprintf(stderr, "\n");
+	print(&bt);
 	exit(-1);
 }

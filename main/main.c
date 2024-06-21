@@ -16,4 +16,9 @@
 // criterion redirects output when you call a 'main'
 
 #include <main/main.h>
-int main(int argc, char **argv) { return real_main(argc, argv); }
+
+int main(int argc, char **argv) {
+	Result r = real_main(argc, argv);
+	Expect(r);
+	return 0;
+}

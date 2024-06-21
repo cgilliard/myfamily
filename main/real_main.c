@@ -12,9 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/args.h>
+#include <base/unit.h>
 #include <stdio.h>
 
-int real_main(int argc, char **argv) {
-	printf("main doesn't do anything\n");
-	return 0;
+Result build_args() {
+	Result res = Args_build("prog", "v1.0", "MyFamily Developers");
+	Expect(res);
+	ArgsPtr args = *(Args *)Try(res);
+	Result res2 = Args_add_param(&args, "threads", "number of threads", "t",
+				     true, false);
+	Expect(res2);
+	Result res3 = Args_add_param(&args, "port", "tcp/ip port to bind to",
+				     "p", true, true);
+	Expect(res3);
+	return Ok(args);
+}
+
+Result real_main(int argc, char **argv) {
+	Result res = build_args();
+	Args args = *(Args *)Try(res);
+	Result res2 = Args_init(&args, argc, argv, 0);
+	return Ok(UNIT);
 }

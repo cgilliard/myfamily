@@ -27,9 +27,6 @@ FamTest(base, test_tmalloc) {
 	tlfree(ptr);
 }
 
-FamTest(base, test_cleanup) { // assert(true);
-}
-
 int xyz(int x) { return x + 10; }
 int abc(int x) { return x + 20; }
 
@@ -215,4 +212,18 @@ FamTest(base, test_sub_command) {
 
 FamTest(base, test_args) {
 	Result r1 = Args_build("prog", "v1.0", "MyFamily Developers");
+	assert(r1.is_ok());
+	Args a1 = *(Args *)unwrap(&r1);
+	Result r11 = Args_add_param(&a1, "threads", "number of threads", "t",
+				    true, false);
+	assert(r11.is_ok());
+	Result r12 = Args_add_param(&a1, "port", "tcp/ip port to bind to", "p",
+				    true, true);
+	assert(r12.is_ok());
+
+	Result r13 = SubCommand_build("mysub", 0, 1);
+	assert(r13.is_ok());
+	SubCommand sub11 = *(SubCommand *)unwrap(&r13);
+	Result r14 = Args_add_sub(&a1, &sub11);
+	assert(r14.is_ok());
 }

@@ -59,7 +59,8 @@ bool copy(void *dst, void *src) {
 	bool *(*do_copy)(Object *dst, Object *src) =
 	    find_fn((Object *)src, "copy");
 	if (do_copy == NULL)
-		panic("copy not implemented for this type");
+		panic("copy not implemented for this type: %s",
+		      ((Object *)src)->vdata.name);
 	((Object *)dst)->vdata.vtable = ((Object *)src)->vdata.vtable;
 	((Object *)dst)->vdata.name = ((Object *)src)->vdata.name;
 	return do_copy(dst, src);

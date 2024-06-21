@@ -41,9 +41,11 @@
 		       char *author)                                           \
 	TRAIT_REQUIRED(T, void, usage, T##Ptr *ptr)                            \
 	TRAIT_REQUIRED(T, Result, add_sub, T##Ptr *ptr, SubCommand *sub)       \
-	TRAIT_REQUIRED(T, Option, argument, T##Ptr *ptr, u64 index)
+	TRAIT_REQUIRED(T, Option, argument, T##Ptr *ptr, u64 index)            \
+	TRAIT_REQUIRED(T, Result, print_version, T##Ptr *args)
 
 CLASS(ArgsParamState, FIELD(bool, specified) FIELD(u64, itt))
+IMPL(ArgsParamState, TRAIT_COPY)
 #define ArgsParamState DEFINE_CLASS(ArgsParamState)
 
 CLASS(ArgsParam,

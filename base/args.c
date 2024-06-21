@@ -15,6 +15,7 @@
 #include <base/args.h>
 #include <base/ekinds.h>
 #include <base/unit.h>
+#include <stdlib.h>
 
 SETTER(ArgsParam, name)
 SETTER(ArgsParam, help)
@@ -55,8 +56,20 @@ GETTER(Args, version)
 SETTER(Args, version)
 GETTER(Args, author)
 SETTER(Args, author)
+GETTER(Args, argv)
+SETTER(Args, argv)
+GETTER(Args, argc)
+SETTER(Args, argc)
 
 void ArgsParamState_cleanup(ArgsParamState *ptr) {}
+size_t ArgsParamState_size(ArgsParamState *ptr) {
+	return sizeof(ArgsParamState);
+}
+bool ArgsParamState_copy(ArgsParamState *dst, ArgsParamState *src) {
+	dst->_specified = src->_specified;
+	dst->_itt = src->_itt;
+	return true;
+}
 
 ArgsParam ArgsParam_build_impl(char *name_copy, char *help_copy,
 			       char *short_name_copy, bool takes_value,
@@ -397,7 +410,8 @@ Result Args_add_param(Args *ptr, char *name, char *help, char *short_name,
 	return Ok(UNIT);
 }
 Result Args_add_sub(Args *ptr, SubCommand *sub) {
-	u64 count = *Args_get_subs_count(ptr);
+
+	u64 count = *(u64 *)Args_get_subs_count(ptr);
 	SubCommandPtr *subs = *Args_get_subs(ptr);
 
 	if (count == 0) {
@@ -520,7 +534,57 @@ Result Args_build(char *prog, char *version, char *author) {
 	return Ok(ret);
 }
 
-Result Args_init(Args *ptr, int argc, char **argv, u64 flags) { todo() }
+Result Args_print_version(Args *args) { return Ok(UNIT); }
+
+Result Args_init(Args *args, int argc, char **argv, u64 flags) {
+	bool ret = true;
+	char **argv_copy = tlmalloc(sizeof(char *) * argc);
+	if (argv_copy == NULL) {
+		Error err =
+		    ERROR(ALLOC_ERROR, "Could not allocate required memory");
+		return Err(err);
+	}
+	u64 i = 0;
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
+			Args_usage(args);
+			exit(0);
+		}
+		if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--help")) {
+			Result x = Args_print_version(args);
+			Expect(x);
+			exit(0);
+		}
+	}
+
+	for (i = 0; i < argc; i++) {
+		argv_copy[i] = tlmalloc(sizeof(char) * (1 + strlen(argv[i])));
+		if (!argv_copy[i]) {
+			for (u64 j = i - 1; j >= 0; j--)
+				tlfree(argv_copy[j]);
+			tlfree(argv_copy);
+		}
+		strcpy(argv_copy[i], argv[i]);
+	}
+
+	Args_set_argv(args, argv_copy);
+	Args_set_argc(args, argc);
+
+	// set specified to false for all
+	SubCommandPtr *subs = *(SubCommand **)Args_get_subs(args);
+	u64 count = *(u64 *)SubCommand_get_count(&subs[0]);
+
+	ArgsParamStatePtr *params_state =
+	    (ArgsParamStatePtr *)SubCommand_get_params_state(&subs[0]);
+
+	for (u64 i = 0; i < count; i++) {
+		ArgsParamState_set_specified(&params_state[i], false);
+	}
+
+	for (u64 i = 1; i < argc; i++) {
+	}
+	return Ok(UNIT);
+}
 
 void Args_usage(Args *ptr) {}
 

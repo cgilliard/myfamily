@@ -15,6 +15,8 @@
 #ifndef _MAIN_MAIN__
 #define _MAIN_MAIN__
 
-int real_main(int argc, char **argv);
+#include <base/result.h>
+
+Result real_main(int argc, char **argv);
 
 #endif // _MAIN_MAIN__
