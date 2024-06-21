@@ -26,6 +26,10 @@ Result build_args() {
 	Result res3 = Args_add_param(&args, "port", "tcp/ip port to bind to",
 				     "p", true, true);
 	Expect(res3);
+	Result r1 = SubCommand_build("test1", 2, 5);
+	SubCommand sub1 = *(SubCommand *)unwrap(&r1);
+	Result r2 = Args_add_sub(&args, &sub1);
+
 	return Ok(args);
 }
 

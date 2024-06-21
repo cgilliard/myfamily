@@ -16,6 +16,7 @@
 #include <base/ekinds.h>
 #include <base/unit.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 SETTER(ArgsParam, name)
 SETTER(ArgsParam, help)
@@ -536,6 +537,85 @@ Result Args_build(char *prog, char *version, char *author) {
 
 Result Args_print_version(Args *args) { return Ok(UNIT); }
 
+bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi,
+		bool *already_specified) {
+	if (name[0] != '-' || strlen(name) < 2)
+		return false;
+
+	bool ret = false;
+
+	SubCommandPtr *subs = *Args_get_subs(args);
+	u64 count = *(u64 *)SubCommand_get_count(&subs[0]);
+	ArgsParamPtr *params =
+	    *(ArgsParamPtr **)SubCommand_get_params(&subs[0]);
+	ArgsParamStatePtr *params_state =
+	    *(ArgsParamStatePtr **)SubCommand_get_params_state(&subs[0]);
+
+	for (u64 i = 0; i < count; i++) {
+		char *pname = *ArgsParam_get_name(&params[i]);
+		char *short_name = *ArgsParam_get_short_name(&params[i]);
+		bool specified =
+		    *ArgsParamState_get_specified(&params_state[i]);
+
+		if (pname && name[1] == '-' || short_name && name[1] != '-') {
+			int len;
+			if (name[1] == '-')
+				len = strlen(pname);
+			else
+				len = strlen(short_name);
+			char pname_updated[len + 3];
+			if (name[1] == '-') {
+				strcpy(pname_updated, "--");
+				strcat(pname_updated, pname);
+			} else {
+				strcpy(pname_updated, "-");
+				strcat(pname_updated, short_name);
+			}
+			if (!strcmp(name, pname_updated)) {
+				*is_takes_value =
+				    *ArgsParam_get_takes_value(&params[i]);
+				*is_multi = *ArgsParam_get_multiple(&params[i]);
+				*already_specified = specified;
+				ArgsParamState_set_specified(&params_state[i],
+							     true);
+
+				ret = true;
+				break;
+			}
+		}
+	}
+
+	return ret;
+}
+
+bool args_check_sub_command(Args *args, char *arg, u64 *sub_itt,
+			    u64 *sub_index) {
+	u64 sub_count = *Args_get_subs_count(args);
+	SubCommandPtr *sub_arr = *Args_get_subs(args);
+	if (*sub_itt == 0) {
+		for (u64 i = 0; i < sub_count; i++) {
+			char *name = *SubCommand_get_name(&sub_arr[i]);
+			if (!strcmp(name, arg)) {
+				*sub_itt = 1;
+				*sub_index = i;
+				return true;
+			}
+		}
+	} else {
+		u64 max = *SubCommand_get_max_add_args(&sub_arr[*sub_index]);
+		*sub_itt += 1;
+
+		if (*sub_itt > 1 + max) {
+			printf(
+			    "Too many arguments specified for this command\n");
+			exit(-1);
+		} else {
+			return true;
+		}
+	}
+	return false;
+}
+
 Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 	bool ret = true;
 	char **argv_copy = tlmalloc(sizeof(char *) * argc);
@@ -581,8 +661,56 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 		ArgsParamState_set_specified(&params_state[i], false);
 	}
 
+	u64 sub_itt = 0;
+	u64 sub_index = 0;
+	bool sub_found = false;
 	for (u64 i = 1; i < argc; i++) {
+		bool is_takes_value, is_multi, already_specified,
+		    is_sub = false;
+		if (!find_param(args, argv_copy[i], &is_takes_value, &is_multi,
+				&already_specified)) {
+
+			if (!args_check_sub_command(args, argv_copy[i],
+						    &sub_itt, &sub_index)) {
+				printf("unknown param: %s\n", argv_copy[i]);
+				exit(-1);
+			} else {
+				is_sub = true;
+			}
+		}
+
+		if (is_sub) {
+			sub_found = true;
+		} else if (!is_multi && already_specified) {
+			printf("Specified more than once: %s\n", argv_copy[i]);
+			exit(-1);
+		} else if (is_takes_value) {
+			i += 1;
+			if (i >= argc) {
+				printf("expected a value for %s\n",
+				       argv_copy[i - 1]);
+				exit(-1);
+			}
+			if (argv_copy[i][0] == '-') {
+				printf("Expected a value for: %s\n",
+				       argv_copy[i - 1]);
+				ret = false;
+				exit(-1);
+			}
+		}
 	}
+
+	if (sub_found) {
+		SubCommandPtr *sub_arr = *Args_get_subs(args);
+		u64 min = *SubCommand_get_min_add_args(&sub_arr[sub_index]);
+		char *name = *SubCommand_get_name(&sub_arr[sub_index]);
+		if (min >= sub_itt) {
+			printf(
+			    "Sub command %s must have at least %i arguments\n",
+			    name, min);
+		}
+	}
+
 	return Ok(UNIT);
 }
 

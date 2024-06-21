@@ -36,7 +36,7 @@
 	TRAIT_REQUIRED(T, Result, init, T##Ptr *args, int argc, char **argv,   \
 		       u64 flags)                                              \
 	TRAIT_REQUIRED(T, Result, value, T##Ptr *args, char *buffer,           \
-		       usize len, char *param, char *value)                   \
+		       usize len, char *param, char *value)                    \
 	TRAIT_REQUIRED(T, Result, build, char *prog, char *version,            \
 		       char *author)                                           \
 	TRAIT_REQUIRED(T, void, usage, T##Ptr *ptr)                            \

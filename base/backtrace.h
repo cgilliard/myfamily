@@ -28,11 +28,11 @@
 		       const char *address, const char *file_path)
 
 #define TRAIT_GET_BACKTRACE(T)                                                 \
-	TRAIT_REQUIRED(T, bool, fn_name, T##Ptr *bt, char *buffer, usize len, \
+	TRAIT_REQUIRED(T, bool, fn_name, T##Ptr *bt, char *buffer, usize len,  \
 		       u64 index)                                              \
-	TRAIT_REQUIRED(T, bool, bin_name, T##Ptr *bt, char *buffer,            \
-		       usize len, u64 index)                                  \
-	TRAIT_REQUIRED(T, bool, address, T##Ptr *bt, char *buffer, usize len, \
+	TRAIT_REQUIRED(T, bool, bin_name, T##Ptr *bt, char *buffer, usize len, \
+		       u64 index)                                              \
+	TRAIT_REQUIRED(T, bool, address, T##Ptr *bt, char *buffer, usize len,  \
 		       u64 index)                                              \
 	TRAIT_REQUIRED(T, bool, file_path, T##Ptr *bt, char *buffer,           \
 		       usize len, u64 index)
