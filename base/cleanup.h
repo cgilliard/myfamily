@@ -17,7 +17,8 @@
 
 // Ensure the cleanup attribute is available
 #ifdef __GNUC__
-#define Cleanup(f) __attribute__((cleanup(f)))
+#define Cleanup(f)                                                             \
+	__attribute__((warn_unused_result)) __attribute__((cleanup(f)))
 #else
 #define Cleanup(f)
 #endif

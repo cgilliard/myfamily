@@ -392,7 +392,8 @@ Result Args_add_param(Args *ptr, char *name, char *help, char *short_name,
 	Result res =
 	    ArgsParam_build(name, help, short_name, takes_value, multiple);
 	ArgsParam param = *(ArgsParam *)Try(res);
-	SubCommand_add_param(&subs[0], &param);
+	Result res2 = SubCommand_add_param(&subs[0], &param);
+	Try(res2);
 	return Ok(UNIT);
 }
 Result Args_add_sub(Args *ptr, SubCommand *sub) {
