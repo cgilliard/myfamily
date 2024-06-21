@@ -30,9 +30,9 @@
 	TRAIT_REQUIRED(T, Result, add_param, T##Ptr *sub, ArgsParam *param)
 
 #define TRAIT_ARGS(T)                                                          \
-	TRAIT_REQUIRED(T, Result, add_param, T##Ptr *args, const char *name,   \
-		       const char *help, const char *short_name,               \
-		       bool takes_value, bool multiple)                        \
+	TRAIT_REQUIRED(T, Result, add_param, T##Ptr *args, char *name,         \
+		       char *help, char *short_name, bool takes_value,         \
+		       bool multiple)                                          \
 	TRAIT_REQUIRED(T, Result, init, T##Ptr *args, int argc, char **argv,   \
 		       u64 flags)                                              \
 	TRAIT_REQUIRED(T, Result, value, T##Ptr *args, char *buffer,           \
@@ -40,7 +40,7 @@
 	TRAIT_REQUIRED(T, Result, build, char *prog, char *version,            \
 		       char *author)                                           \
 	TRAIT_REQUIRED(T, void, usage, T##Ptr *ptr)                            \
-	TRAIT_REQUIRED(T, void, add_sub, T##Ptr *ptr, SubCommand *sub)         \
+	TRAIT_REQUIRED(T, Result, add_sub, T##Ptr *ptr, SubCommand *sub)       \
 	TRAIT_REQUIRED(T, Option, argument, T##Ptr *ptr, u64 index)
 
 CLASS(ArgsParamState, FIELD(bool, specified) FIELD(u64, itt))
@@ -63,10 +63,10 @@ IMPL(SubCommand, TRAIT_SUB_COMMAND)
 
 CLASS(Args,
       FIELD(char *, prog) FIELD(char *, version) FIELD(char *, author)
-	  FIELD(ArgsParam *, params) FIELD(ArgsParamState *, params_state)
-	      FIELD(u64, count) FIELD(SubCommand *, subs) FIELD(u64, subs_count)
-		  FIELD(char **, argv) FIELD(int, argc) FIELD(u64, debug_flags))
+	  FIELD(SubCommand *, subs) FIELD(u64, subs_count) FIELD(char **, argv)
+	      FIELD(int, argc) FIELD(u64, debug_flags))
 IMPL(Args, TRAIT_ARGS);
+IMPL(Args, TRAIT_COPY);
 #define Args DEFINE_CLASS(Args)
 
 #endif // _BASE_ARGS__

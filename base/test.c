@@ -212,3 +212,7 @@ FamTest(base, test_sub_command) {
 	assert(equal(&params_out[0], &p1));
 	assert(equal(&params_out[1], &p2));
 }
+
+FamTest(base, test_args) {
+	Result r1 = Args_build("prog", "v1.0", "MyFamily Developers");
+}

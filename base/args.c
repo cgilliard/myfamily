@@ -45,6 +45,17 @@ SETTER(ArgsParamState, specified)
 GETTER(ArgsParamState, itt)
 SETTER(ArgsParamState, itt)
 
+GETTER(Args, subs)
+SETTER(Args, subs)
+GETTER(Args, subs_count)
+SETTER(Args, subs_count)
+GETTER(Args, prog)
+SETTER(Args, prog)
+GETTER(Args, version)
+SETTER(Args, version)
+GETTER(Args, author)
+SETTER(Args, author)
+
 void ArgsParamState_cleanup(ArgsParamState *ptr) {}
 
 ArgsParam ArgsParam_build_impl(char *name_copy, char *help_copy,
@@ -104,6 +115,7 @@ bool ArgsParam_copy(ArgsParam *dst, ArgsParam *src) {
 
 	if (ret && help) {
 		help_copy = tlmalloc(sizeof(char) * (1 + strlen(help)));
+
 		if (!help_copy) {
 			ret = false;
 		} else {
@@ -345,22 +357,173 @@ Result SubCommand_add_param(SubCommand *ptr, ArgsParam *param) {
 	return Ok(UNIT);
 }
 
-void Args_cleanup(Args *ptr) {}
-Result Args_add_param(Args *ptr, const char *name, const char *help,
-		      const char *short_name, bool takes_value, bool multiple) {
-	todo()
+void Args_cleanup(Args *ptr) {
+	u64 count = *Args_get_subs_count(ptr);
+	SubCommandPtr *subs = *Args_get_subs(ptr);
+	for (u64 i = 0; i < count; i++) {
+		cleanup(&subs[i]);
+	}
+	if (subs) {
+		tlfree(subs);
+		Args_set_subs(ptr, NULL);
+	}
+
+	char *prog = *Args_get_prog(ptr);
+	if (prog) {
+		tlfree(prog);
+		Args_set_prog(ptr, NULL);
+	}
+
+	char *version = *Args_get_version(ptr);
+	if (version) {
+		tlfree(version);
+		Args_set_version(ptr, NULL);
+	}
+
+	char *author = *Args_get_author(ptr);
+	if (author) {
+		tlfree(author);
+		Args_set_author(ptr, NULL);
+	}
 }
-void Args_add_sub(Args *ptr, SubCommand *sub) {}
-
-Option Args_argument(Args *ptr, u64 index) { return None; }
-
-Result Args_build(char *prog, char *version, char *author){todo()}
-
-Result Args_init(Args *ptr, int argc, char **argv, u64 flags) {
-	todo()
+Result Args_add_param(Args *ptr, char *name, char *help, char *short_name,
+		      bool takes_value, bool multiple) {
+	SubCommandPtr *subs = *Args_get_subs(ptr);
+	Result res =
+	    ArgsParam_build(name, help, short_name, takes_value, multiple);
+	ArgsParam param = *(ArgsParam *)Try(res);
+	SubCommand_add_param(&subs[0], &param);
+	return Ok(UNIT);
 }
+Result Args_add_sub(Args *ptr, SubCommand *sub) {
+	u64 count = *Args_get_subs_count(ptr);
+	SubCommandPtr *subs = *Args_get_subs(ptr);
+
+	if (count == 0) {
+		void *tmp = tlmalloc(sizeof(SubCommand));
+		if (tmp == NULL) {
+			Error err =
+			    ERROR(ALLOC_ERROR, "Could not increase the size of "
+					       "the sub command list");
+			return Err(err);
+		}
+		subs = tmp;
+		Args_set_subs(ptr, tmp);
+	} else {
+		void *tmp = tlrealloc(subs, sizeof(SubCommand) * (1 + count));
+		if (tmp == NULL) {
+			Error err =
+			    ERROR(ALLOC_ERROR, "Could not increase the size of "
+					       "the sub command list");
+			return Err(err);
+		}
+		subs = tmp;
+		Args_set_subs(ptr, tmp);
+	}
+	copy(&subs[count], sub);
+	Args_set_subs_count(ptr, count + 1);
+
+	return Ok(UNIT);
+}
+
+bool Args_copy(Args *dst, Args *src) {
+	bool ret = true;
+	char *prog_src = *Args_get_prog(src);
+	char *version_src = *Args_get_version(src);
+	char *author_src = *Args_get_author(src);
+
+	char *prog;
+	if (prog_src) {
+		prog = tlmalloc(sizeof(char) * (strlen(prog_src) + 1));
+		if (prog == NULL)
+			ret = false;
+		else
+			strcpy(prog, prog_src);
+	} else
+		prog = NULL;
+
+	char *version;
+	if (version_src) {
+		version = tlmalloc(sizeof(char) * (strlen(version_src) + 1));
+		if (version == NULL)
+			ret = false;
+		else
+			strcpy(version, version_src);
+	} else
+		version = NULL;
+
+	char *author;
+	if (author_src) {
+		author = tlmalloc(sizeof(char) * (strlen(author_src) + 1));
+		if (author == NULL)
+			ret = false;
+		else
+			strcpy(author, author_src);
+	}
+
+	else
+		author = NULL;
+
+	if (ret) {
+		Args_set_prog(dst, prog);
+		Args_set_version(dst, version);
+		Args_set_author(dst, author);
+	}
+
+	u64 subs_count = *Args_get_subs_count(src);
+	SubCommandPtr *subs_src = *Args_get_subs(src);
+	SubCommandPtr *subs;
+	if (subs_count > 0) {
+		subs = tlmalloc(sizeof(SubCommand) * subs_count);
+		if (subs == NULL)
+			ret = false;
+		else
+			for (u64 i = 0; i < subs_count; i++) {
+				if (!copy(&subs[i], &subs_src[i]))
+					ret = false;
+			}
+
+	} else
+		subs = NULL;
+	Args_set_subs(dst, subs);
+	Args_set_subs_count(dst, subs_count);
+
+	if (!ret) {
+		if (prog)
+			tlfree(prog);
+		if (author)
+			tlfree(author);
+		if (version)
+			tlfree(version);
+		if (subs)
+			tlfree(subs);
+	}
+	return ret;
+}
+
+size_t Args_size(Args *obj) { return sizeof(Args); }
+
+Result Args_build(char *prog, char *version, char *author) {
+	ArgsPtr src = BUILD(Args, prog, version, author, NULL, 0, NULL, 0, 0);
+	Args ret;
+	if (!copy(&ret, &src)) {
+		Error err = ERROR(COPY_ERROR, "could not copy sub args");
+		return Err(err);
+	}
+
+	Result res = SubCommand_build("", 0, 0);
+	SubCommand sub = *(SubCommand *)Try(res);
+	Result res2 = Args_add_sub(&ret, &sub);
+	Try(res2);
+
+	return Ok(ret);
+}
+
+Result Args_init(Args *ptr, int argc, char **argv, u64 flags) { todo() }
 
 void Args_usage(Args *ptr) {}
+
+Option Args_argument(Args *ptr, u64 index) { return None; }
 
 Result Args_value(Args *ptr, char *buffer, size_t len, char *param,
 		  char *value) {
