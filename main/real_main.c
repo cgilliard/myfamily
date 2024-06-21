@@ -13,20 +13,23 @@
 // limitations under the License.
 
 #include <base/args.h>
+#include <base/string.h>
 #include <base/unit.h>
 #include <stdio.h>
 
 Result build_args() {
-	Result res = Args_build("prog", "v1.0", "MyFamily Developers");
-	Expect(res);
-	ArgsPtr args = *(Args *)Try(res);
-	Result res2 = Args_add_param(&args, "threads", "number of threads", "t",
-				     true, false);
+	Args args = ARGS("prog", "v1.0", "MyFamily Developers");
+
+	ArgsParam p1 = PARAM("threads", "number of threads", "t", true, false);
+	Result res1 = Args_add_param(&args, &p1);
+	Expect(res1);
+
+	ArgsParam p2 = PARAM("port", "tcp/ip port to bind to", "p", true, true);
+	Result res2 = Args_add_param(&args, &p2);
 	Expect(res2);
-	Result res3 = Args_add_param(&args, "port", "tcp/ip port to bind to",
-				     "p", true, true);
-	Expect(res3);
+
 	Result r1 = SubCommand_build("test1", 2, 5);
+	Expect(r1);
 	SubCommand sub1 = *(SubCommand *)unwrap(&r1);
 	Result r2 = Args_add_sub(&args, &sub1);
 
@@ -36,6 +39,32 @@ Result build_args() {
 Result real_main(int argc, char **argv) {
 	Result res = build_args();
 	Args args = *(Args *)Try(res);
-	Result res2 = Args_init(&args, argc, argv, 0);
+	Result res2 = ARGS_INIT(&args, argc, argv);
+	Try(res2);
+	printf("main doesn't do anything yet\n");
+
+	printf("arguments:\n");
+	u64 i = 0;
+	while (true) {
+		Option o = Args_argument(&args, i);
+		if (!o.is_some())
+			break;
+		StringPtr *p = unwrap(&o);
+		char *p1 = unwrap(p);
+		printf("arg[%i]=%s\n", i, p1);
+		i += 1;
+	}
+
+	printf("port:\n");
+	while (true) {
+		Result r = Args_value(&args, "port");
+		Option o = *(Option *)unwrap(&r);
+		if (!o.is_some())
+			break;
+		StringPtr *s = (String *)unwrap(&o);
+		char *v = unwrap(s);
+		printf("port=%s\n", v);
+	}
+
 	return Ok(UNIT);
 }

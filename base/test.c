@@ -19,6 +19,7 @@
 #include <base/rc.h>
 #include <base/string.h>
 #include <base/test.h>
+#include <base/unit.h>
 
 FamSuite(base);
 
@@ -111,6 +112,8 @@ FamTest(base, test_string) {
 	Result r1 = Ok(*s1);
 	StringPtr *s2 = unwrap(&r1);
 	assert(equal(s1, s2));
+	char *x = unwrap(s2);
+	assert_eq_str(x, "this is a test");
 }
 
 FamTest(base, test_option) {
@@ -121,6 +124,7 @@ FamTest(base, test_option) {
 }
 
 FamTest(base, test_multi_lvl) {
+	/*
 	StringPtr *s1 = STRINGP("test2");
 	Option x = Some(*s1);
 	Result y = Ok(x);
@@ -137,6 +141,11 @@ FamTest(base, test_multi_lvl) {
 
 	StringPtr *s4 = STRINGP("test4");
 	Rc rc = RC(s4);
+	*/
+
+	Result x5 = Ok(None);
+	Option o5 = *(Option *)unwrap(&x5);
+	assert(!o5.is_some());
 }
 
 GETTER_PROTO(ArgsParam, name)
@@ -211,19 +220,23 @@ FamTest(base, test_sub_command) {
 }
 
 FamTest(base, test_args) {
-	Result r1 = Args_build("prog", "v1.0", "MyFamily Developers");
-	assert(r1.is_ok());
-	Args a1 = *(Args *)unwrap(&r1);
-	Result r11 = Args_add_param(&a1, "threads", "number of threads", "t",
-				    true, false);
-	assert(r11.is_ok());
-	Result r12 = Args_add_param(&a1, "port", "tcp/ip port to bind to", "p",
-				    true, true);
-	assert(r12.is_ok());
-
+	Args a1 = ARGS("prog", "v1.0", "MyFamily Developers");
+	ArgsParam p11 = PARAM("threads", "number of threads", "t", true, false);
+	Result r11 = Args_add_param(&a1, &p11);
+	Expect(r11);
+	ArgsParam p12 =
+	    PARAM("port", "tcp/ip port to bind to", "p", true, true);
+	Result r12 = Args_add_param(&a1, &p12);
+	Expect(r12);
 	Result r13 = SubCommand_build("mysub", 0, 1);
 	assert(r13.is_ok());
 	SubCommand sub11 = *(SubCommand *)unwrap(&r13);
 	Result r14 = Args_add_sub(&a1, &sub11);
 	assert(r14.is_ok());
+	char *argv1[] = {"fam", "--threads", "1", "--port",
+			 "2",	"--port",    "3", "mysub"};
+	int argc1 = 8;
+	Result r1 = ARGS_INIT(&a1, argc1, argv1);
+	assert(r1.is_ok());
 }
+

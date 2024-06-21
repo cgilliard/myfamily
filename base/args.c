@@ -14,6 +14,7 @@
 
 #include <base/args.h>
 #include <base/ekinds.h>
+#include <base/string.h>
 #include <base/unit.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -246,7 +247,6 @@ bool SubCommand_copy(SubCommand *dst, SubCommand *src) {
 	strcpy(name, src_name);
 	u64 count = *SubCommand_get_count(src);
 	ArgsParamPtr *params = NULL;
-
 	if (count > 0) {
 		params = tlmalloc(sizeof(ArgsParam) * count);
 		if (params == NULL) {
@@ -269,7 +269,6 @@ bool SubCommand_copy(SubCommand *dst, SubCommand *src) {
 		}
 	} else
 		params_state = NULL;
-
 	ArgsParamPtr *params_src = *SubCommand_get_params(src);
 	ArgsParamStatePtr *params_state_src = *SubCommand_get_params_state(src);
 	for (u64 i = 0; i < count; i++) {
@@ -297,7 +296,6 @@ bool SubCommand_copy(SubCommand *dst, SubCommand *src) {
 		if (params_state)
 			tlfree(params_state);
 	}
-
 	return ret;
 }
 usize SubCommand_size(SubCommand *ptr) { return sizeof(SubCommand); }
@@ -399,14 +397,19 @@ void Args_cleanup(Args *ptr) {
 		tlfree(author);
 		Args_set_author(ptr, NULL);
 	}
+
+	int argc = *Args_get_argc(ptr);
+	char **argv = *Args_get_argv(ptr);
+
+	for (u64 i = 0; i < argc; i++) {
+		tlfree(argv[i]);
+	}
+	if (argc > 0)
+		tlfree(argv);
 }
-Result Args_add_param(Args *ptr, char *name, char *help, char *short_name,
-		      bool takes_value, bool multiple) {
+Result Args_add_param(Args *ptr, ArgsParam *param) {
 	SubCommandPtr *subs = *Args_get_subs(ptr);
-	Result res =
-	    ArgsParam_build(name, help, short_name, takes_value, multiple);
-	ArgsParam param = *(ArgsParam *)Try(res);
-	Result res2 = SubCommand_add_param(&subs[0], &param);
+	Result res2 = SubCommand_add_param(&subs[0], param);
 	Try(res2);
 	return Ok(UNIT);
 }
@@ -414,7 +417,6 @@ Result Args_add_sub(Args *ptr, SubCommand *sub) {
 
 	u64 count = *(u64 *)Args_get_subs_count(ptr);
 	SubCommandPtr *subs = *Args_get_subs(ptr);
-
 	if (count == 0) {
 		void *tmp = tlmalloc(sizeof(SubCommand));
 		if (tmp == NULL) {
@@ -451,6 +453,7 @@ bool Args_copy(Args *dst, Args *src) {
 	char *prog;
 	if (prog_src) {
 		prog = tlmalloc(sizeof(char) * (strlen(prog_src) + 1));
+
 		if (prog == NULL)
 			ret = false;
 		else
@@ -479,6 +482,27 @@ bool Args_copy(Args *dst, Args *src) {
 
 	else
 		author = NULL;
+
+	int argc = *Args_get_argc(src);
+	char **argv = *Args_get_argv(src);
+
+	char **argv_copy;
+	if (argc > 0)
+		argv_copy = tlmalloc(sizeof(char *) * argc);
+	else
+		argv_copy = NULL;
+	for (u64 i = 0; i < argc; i++) {
+		argv_copy[i] = tlmalloc(sizeof(char) * (1 + strlen(argv[i])));
+		if (!argv_copy[i]) {
+			for (u64 j = i - 1; j >= 0; j--)
+				tlfree(argv_copy[j]);
+			tlfree(argv_copy);
+		}
+		strcpy(argv_copy[i], argv[i]);
+	}
+
+	Args_set_argv(dst, argv_copy);
+	Args_set_argc(dst, argc);
 
 	if (ret) {
 		Args_set_prog(dst, prog);
@@ -526,8 +550,8 @@ Result Args_build(char *prog, char *version, char *author) {
 		Error err = ERROR(COPY_ERROR, "could not copy sub args");
 		return Err(err);
 	}
-
 	Result res = SubCommand_build("", 0, 0);
+
 	SubCommand sub = *(SubCommand *)Try(res);
 	Result res2 = Args_add_sub(&ret, &sub);
 	Try(res2);
@@ -535,7 +559,10 @@ Result Args_build(char *prog, char *version, char *author) {
 	return Ok(ret);
 }
 
-Result Args_print_version(Args *args) { return Ok(UNIT); }
+Result Args_print_version(Args *args) {
+	printf("print version\n");
+	return Ok(UNIT);
+}
 
 bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi,
 		bool *already_specified) {
@@ -708,17 +735,163 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 			printf(
 			    "Sub command %s must have at least %i arguments\n",
 			    name, min);
+			exit(-1);
 		}
 	}
 
 	return Ok(UNIT);
 }
 
-void Args_usage(Args *ptr) {}
+void Args_usage(Args *ptr) { printf("Usage: fam [options]\n"); }
 
-Option Args_argument(Args *ptr, u64 index) { return None; }
+Option Args_argument(Args *args, u64 index) {
+	int argc = *Args_get_argc(args);
+	char **argv = *Args_get_argv(args);
+	SubCommandPtr *sub_arr = *Args_get_subs(args);
+	ArgsParamPtr *params =
+	    *(ArgsParamPtr **)SubCommand_get_params(&sub_arr[0]);
+	u64 count = *(u64 *)SubCommand_get_count(&sub_arr[0]);
 
-Result Args_value(Args *ptr, char *buffer, usize len, char *param,
-		  char *value) {
-	todo()
+	int counter = 0;
+
+	for (u64 i = 1; i < argc; i++) {
+		if (argv[i][0] == '-') {
+			int len = strlen(argv[i]);
+			char buf[len + 1];
+			int start = 1;
+			if (len > 2 && argv[i][1] == '-') {
+				start = 2;
+			}
+
+			if (len > start) {
+				int itt = 0;
+				u64 j = 0;
+				for (j = start; j < len; j++) {
+					buf[itt] = argv[i][j];
+					itt++;
+				}
+				buf[itt] = 0;
+			}
+
+			for (u64 j = 0; j < count; j++) {
+				char *name = *ArgsParam_get_name(&params[j]);
+				char *short_name =
+				    *ArgsParam_get_short_name(&params[j]);
+				bool takes_value =
+				    *ArgsParam_get_takes_value(&params[j]);
+				if (!strcmp(name, buf) ||
+				    !strcmp(short_name, buf)) {
+
+					// if it takes a value, skip
+					if (takes_value) {
+						i += 1;
+						break;
+					}
+				}
+			}
+		} else {
+			if (counter == index) {
+				StringPtr *s = STRINGP(argv[i]);
+				return Some(*s);
+			}
+			counter += 1;
+		}
+	}
+
+	return None;
+}
+
+Result Args_value(Args *args, char *param) {
+	char param_buffer[strlen(param) + 3];
+	char param_buffer_short[strlen(param) + 3];
+	strcpy(param_buffer, "--");
+	strcat(param_buffer, param);
+	strcpy(param_buffer_short, "-");
+	bool ret = false;
+	int argc = *Args_get_argc(args);
+	char **argv = *Args_get_argv(args);
+
+	SubCommandPtr *sub_arr = *Args_get_subs(args);
+	ArgsParamPtr *params =
+	    *(ArgsParamPtr **)SubCommand_get_params(&sub_arr[0]);
+	ArgsParamStatePtr *params_state =
+	    *(ArgsParamStatePtr **)SubCommand_get_params_state(&sub_arr[0]);
+	u64 count = *(u64 *)SubCommand_get_count(&sub_arr[0]);
+
+	bool takes_value = false;
+	bool multi = false;
+	u64 match_index = 0;
+	for (u64 i = 0; i < count; i++) {
+		char *name = *ArgsParam_get_name(&params[i]);
+		if (!strcmp(name, param)) {
+			char *short_name =
+			    *ArgsParam_get_short_name(&params[i]);
+			takes_value = *ArgsParam_get_takes_value(&params[i]);
+			multi = *ArgsParam_get_multiple(&params[i]);
+			strcat(param_buffer_short, short_name);
+			match_index = i;
+		}
+	}
+
+	u64 i;
+	for (i = 1; i < argc; i++) {
+		if (!strcmp(param_buffer, argv[i])) {
+			// long match
+			ret = true;
+			break;
+		}
+		if (!strcmp(param_buffer_short, argv[i])) {
+			// short match
+			ret = true;
+			break;
+		}
+	}
+
+	Option ret_val = None;
+	if (ret) {
+		i++;
+		if (multi) {
+			u64 itt =
+			    *ArgsParamState_get_itt(&params_state[match_index]);
+			if (itt == 0) {
+				ArgsParamState_set_itt(
+				    &params_state[match_index], 1);
+				StringPtr *ret_str = STRINGP(argv[i]);
+				ret_val = Some(*ret_str);
+			} else {
+				u64 first_match = i;
+				i += itt;
+				while (true) {
+					if (i >= argc) {
+						ret = false;
+						break;
+					}
+
+					if (!strcmp(param_buffer, argv[i]) ||
+					    !strcmp(param_buffer_short,
+						    argv[i])) {
+						// next match
+						i += 1;
+						if (i >= argc) {
+							ret = false;
+							break;
+						}
+						StringPtr *ret_str =
+						    STRINGP(argv[i]);
+						ret_val = Some(*ret_str);
+						ArgsParamState_set_itt(
+						    &params_state[match_index],
+						    (i - first_match) + 1);
+						break;
+					}
+					i += 1;
+				}
+			}
+		} else if (takes_value && i < argc) {
+			StringPtr *ret_str = STRINGP(argv[i]);
+			ret_val = Some(*ret_str);
+		}
+	}
+
+	return Ok(ret_val);
 }

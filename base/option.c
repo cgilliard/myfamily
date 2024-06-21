@@ -33,14 +33,18 @@ void Option_cleanup(Option *option) {
 }
 usize Option_size(Option *option) { return sizeof(Option); }
 bool Option_copy(Option *dst, Option *src) {
-	Object *ref = tlmalloc(size(src));
-	if (!copy(ref, *Option_get_ref(src))) {
-		tlfree(ref);
-		return false;
+	if (src->is_some()) {
+		Object *ref = tlmalloc(size(src));
+		if (!copy(ref, *Option_get_ref(src))) {
+			tlfree(ref);
+			return false;
+		}
+		Option_set_no_cleanup(dst, *Option_get_no_cleanup(src));
+		Option_set_ref(dst, ref);
+	} else {
+		Option_set_ref(dst, NULL);
 	}
-	Option_set_no_cleanup(dst, *Option_get_no_cleanup(src));
 	dst->is_some = src->is_some;
-	Option_set_ref(dst, ref);
 
 	return true;
 }

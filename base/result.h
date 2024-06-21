@@ -80,13 +80,13 @@ static Result Result_build_ok_bool(void *value) {
 
 #define Err(x) Result_build_err(&x)
 
-#define Try(x)                                                                 \
+#define Try(_x)                                                                \
 	({                                                                     \
-		if (!x.is_ok()) {                                              \
-			Error e = unwrap_err(&x);                              \
+		if (!_x.is_ok()) {                                             \
+			Error e = unwrap_err(&_x);                             \
 			return Err(e);                                         \
 		};                                                             \
-		unwrap(&x);                                                    \
+		unwrap(&_x);                                                   \
 	})
 
 #define Expect(x)                                                              \

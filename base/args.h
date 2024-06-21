@@ -30,13 +30,10 @@
 	TRAIT_REQUIRED(T, Result, add_param, T##Ptr *sub, ArgsParam *param)
 
 #define TRAIT_ARGS(T)                                                          \
-	TRAIT_REQUIRED(T, Result, add_param, T##Ptr *args, char *name,         \
-		       char *help, char *short_name, bool takes_value,         \
-		       bool multiple)                                          \
+	TRAIT_REQUIRED(T, Result, add_param, T##Ptr *args, ArgsParam *param)   \
 	TRAIT_REQUIRED(T, Result, init, T##Ptr *args, int argc, char **argv,   \
 		       u64 flags)                                              \
-	TRAIT_REQUIRED(T, Result, value, T##Ptr *args, char *buffer,           \
-		       usize len, char *param, char *value)                    \
+	TRAIT_REQUIRED(T, Result, value, T##Ptr *args, char *param)            \
 	TRAIT_REQUIRED(T, Result, build, char *prog, char *version,            \
 		       char *author)                                           \
 	TRAIT_REQUIRED(T, void, usage, T##Ptr *ptr)                            \
@@ -70,5 +67,26 @@ CLASS(Args,
 IMPL(Args, TRAIT_ARGS);
 IMPL(Args, TRAIT_COPY);
 #define Args DEFINE_CLASS(Args)
+
+static ArgsParam ArgsParam_build_expect(char *name, char *help,
+					char *short_name, bool takes_value,
+					bool multiple) {
+	Result r =
+	    ArgsParam_build(name, help, short_name, takes_value, multiple);
+	Expect(r);
+	ArgsParamPtr ret = *(ArgsParam *)unwrap(&r);
+	return ret;
+}
+
+static Args Args_build_expect(char *prog, char *version, char *author) {
+	Result res = Args_build(prog, version, author);
+	ArgsPtr args = *(Args *)Expect(res);
+	return args;
+}
+
+#define ARGS(prog, version, author) Args_build_expect(prog, version, author)
+#define PARAM(name, help, short_name, takes_value, multiple)                   \
+	ArgsParam_build_expect(name, help, short_name, takes_value, multiple)
+#define ARGS_INIT(args, argc, argv) Args_init(args, argc, argv, 0)
 
 #endif // _BASE_ARGS__
