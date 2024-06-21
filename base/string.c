@@ -28,7 +28,7 @@ void String_cleanup(StringPtr *s) {
 		String_set_len(s, 0);
 	}
 }
-size_t String_size(String *s) { return sizeof(String); }
+usize String_size(String *s) { return sizeof(String); }
 bool String_clone(String *dst, String *src) {
 	u64 len = *String_get_len(src);
 	String_set_len(dst, len);

@@ -117,6 +117,6 @@ int rand_u128(u128 *v);
  * @see [rand_i64]
  * @see [rand_u128]
  */
-int rand_bytes(void *buf, size_t length);
+int rand_bytes(void *buf, usize length);
 
 #endif // _BASE_RAND__

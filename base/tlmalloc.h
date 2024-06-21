@@ -25,8 +25,8 @@ typedef struct TLMallocStats {
 	u64 cur_frees;
 } TLMallocStats;
 
-void *tlmalloc(size_t size);
-void *tlrealloc(void *ptr, size_t size);
+void *tlmalloc(usize size);
+void *tlrealloc(void *ptr, usize size);
 void tlfree(void *ptr);
 u128 cur_bytes_alloc();
 u64 alloc_count();

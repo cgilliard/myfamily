@@ -153,7 +153,7 @@ bool BacktraceEntry_copy(BacktraceEntry *dst, BacktraceEntry *src) {
 	    dst, *GET_NAME(src), *GET_BIN_NAME(src), *GET_ADDRESS(src),
 	    *GET_FILE_PATH(src));
 }
-size_t BacktraceEntry_size(BacktraceEntry *ptr) {
+usize BacktraceEntry_size(BacktraceEntry *ptr) {
 	return sizeof(BacktraceEntry);
 }
 
@@ -385,7 +385,7 @@ bool Backtrace_copy(Backtrace *dst, Backtrace *src) {
 
 	return ret;
 }
-size_t Backtrace_size(Backtrace *ptr) { return sizeof(Backtrace); }
+usize Backtrace_size(Backtrace *ptr) { return sizeof(Backtrace); }
 
 void Backtrace_print(Backtrace *ptr) {
 	printf("Backtrace:\n");
@@ -407,7 +407,7 @@ void Backtrace_print(Backtrace *ptr) {
 	}
 }
 
-bool Backtrace_fn_name(Backtrace *ptr, char *buffer, size_t len, u64 index) {
+bool Backtrace_fn_name(Backtrace *ptr, char *buffer, usize len, u64 index) {
 	u64 count = GET_COUNT(ptr);
 	if (index >= count)
 		return false;
@@ -420,7 +420,7 @@ bool Backtrace_fn_name(Backtrace *ptr, char *buffer, size_t len, u64 index) {
 	return true;
 }
 
-bool Backtrace_bin_name(Backtrace *ptr, char *buffer, size_t len, u64 index) {
+bool Backtrace_bin_name(Backtrace *ptr, char *buffer, usize len, u64 index) {
 	u64 count = GET_COUNT(ptr);
 	if (index >= count)
 		return false;
@@ -432,7 +432,7 @@ bool Backtrace_bin_name(Backtrace *ptr, char *buffer, size_t len, u64 index) {
 	return true;
 }
 
-bool Backtrace_address(Backtrace *ptr, char *buffer, size_t len, u64 index) {
+bool Backtrace_address(Backtrace *ptr, char *buffer, usize len, u64 index) {
 	u64 count = GET_COUNT(ptr);
 	if (index >= count)
 		return false;
@@ -444,7 +444,7 @@ bool Backtrace_address(Backtrace *ptr, char *buffer, size_t len, u64 index) {
 	return true;
 }
 
-bool Backtrace_file_path(Backtrace *ptr, char *buffer, size_t len, u64 index) {
+bool Backtrace_file_path(Backtrace *ptr, char *buffer, usize len, u64 index) {
 	u64 count = GET_COUNT(ptr);
 	if (index >= count)
 		return false;

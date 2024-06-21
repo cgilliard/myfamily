@@ -17,7 +17,7 @@
 
 _Thread_local TLMallocStats THREAD_LOCAL_TLMALLOC = {0, 0, 0, 0};
 
-void *tlmalloc(size_t size) {
+void *tlmalloc(usize size) {
 	void *ret;
 	ret = malloc(size);
 
@@ -27,7 +27,7 @@ void *tlmalloc(size_t size) {
 	}
 	return ret;
 }
-void *tlrealloc(void *ptr, size_t size) {
+void *tlrealloc(void *ptr, usize size) {
 	void *ret;
 	ret = realloc(ptr, size);
 	if (ret) {

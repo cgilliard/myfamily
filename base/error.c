@@ -19,7 +19,7 @@
 GETTER(Error, flags)
 
 void ErrorKind_cleanup(ErrorKindPtr *obj) {}
-size_t ErrorKind_size(ErrorKind *obj) { return sizeof(ErrorKind); }
+usize ErrorKind_size(ErrorKind *obj) { return sizeof(ErrorKind); }
 bool ErrorKind_copy(ErrorKind *dst, ErrorKind *src) {
 	void *dst_kind = ErrorKind_get_kind(dst);
 	void *src_kind = ErrorKind_get_kind(src);
@@ -43,7 +43,7 @@ bool Error_copy(Error *dst, Error *src) {
 	return copy(&dst->_bt, &src->_bt);
 }
 
-size_t Error_size(Error *obj) { return sizeof(Error); }
+usize Error_size(Error *obj) { return sizeof(Error); }
 void Error_print(Error *obj) {
 	ErrorKindPtr *kind = Error_get_kind(obj);
 	char *kind_str = (char *)ErrorKind_get_kind(kind);

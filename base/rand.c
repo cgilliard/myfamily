@@ -106,4 +106,4 @@ int rand_u128(u128 *v) {
 	return ret;
 }
 
-int rand_bytes(void *buf, size_t length) { return getentropy(buf, length); }
+int rand_bytes(void *buf, usize length) { return getentropy(buf, length); }

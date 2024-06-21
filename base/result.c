@@ -27,7 +27,7 @@ bool is_ok_impl_true() { return true; }
 
 bool is_ok_impl_false() { return false; }
 
-size_t Result_size(Result *ptr) { return sizeof(Result); }
+usize Result_size(Result *ptr) { return sizeof(Result); }
 
 bool Result_copy(Result *dst, Result *src) {
 	Object *ref;

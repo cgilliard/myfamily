@@ -16,7 +16,7 @@
 
 #define DEFINE_PRIM_IMPLS(prim_type, type)                                     \
 	void type##_cleanup(type *ptr) {}                                      \
-	size_t type##_size(type *ptr) { return sizeof(type); }                 \
+	usize type##_size(type *ptr) { return sizeof(type); }                 \
 	void *type##_unwrap(type *ptr) { return &ptr->_value; }                \
 	bool type##_copy(type *dst, type *src) {                               \
 		memcpy(&dst->_value, &src->_value, sizeof(prim_type));         \

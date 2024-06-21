@@ -35,7 +35,7 @@ void Rc_cleanup(Rc *obj) {
 }
 
 bool Rc_copy(Rc *dst, Rc *src) { return Rc_clone(dst, src); }
-size_t Rc_size(Rc *obj) { return sizeof(Rc); }
+usize Rc_size(Rc *obj) { return sizeof(Rc); }
 
 bool Rc_clone(Rc *dst, Rc *src) {
 	u64 *count = *Rc_get_count(src);

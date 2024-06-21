@@ -22,7 +22,7 @@
 #define TRAIT_COPY(T)                                                          \
 	TRAIT_REQUIRED(T, bool, copy, T##Ptr *dst, T##Ptr *src)                \
 	TRAIT_SUPER(T, TRAIT_SIZE)
-#define TRAIT_SIZE(T) TRAIT_REQUIRED(T, size_t, size, T##Ptr *obj)
+#define TRAIT_SIZE(T) TRAIT_REQUIRED(T, usize, size, T##Ptr *obj)
 
 #define TRAIT_TO_STR(T) TRAIT_REQUIRED(T, char *, to_str, T##Ptr *obj)
 
@@ -33,7 +33,7 @@
 // trait implementations
 bool equal(void *obj1, void *obj2);
 void *unwrap(void *obj);
-size_t size(void *obj);
+usize size(void *obj);
 bool copy(void *dest, void *src);
 bool clone(void *dest, void *src);
 void cleanup(void *ptr);

@@ -62,7 +62,7 @@ GETTER(Args, argc)
 SETTER(Args, argc)
 
 void ArgsParamState_cleanup(ArgsParamState *ptr) {}
-size_t ArgsParamState_size(ArgsParamState *ptr) {
+usize ArgsParamState_size(ArgsParamState *ptr) {
 	return sizeof(ArgsParamState);
 }
 bool ArgsParamState_copy(ArgsParamState *dst, ArgsParamState *src) {
@@ -196,7 +196,7 @@ bool ArgsParam_equal(ArgsParam *obj1, ArgsParam *obj2) {
 	return ret;
 }
 
-size_t ArgsParam_size(ArgsParam *ptr) { return sizeof(ArgsParam); }
+usize ArgsParam_size(ArgsParam *ptr) { return sizeof(ArgsParam); }
 
 void SubCommand_cleanup(SubCommand *ptr) {
 	char *name = *SubCommand_get_name(ptr);
@@ -299,7 +299,7 @@ bool SubCommand_copy(SubCommand *dst, SubCommand *src) {
 
 	return ret;
 }
-size_t SubCommand_size(SubCommand *ptr) { return sizeof(SubCommand); }
+usize SubCommand_size(SubCommand *ptr) { return sizeof(SubCommand); }
 Result SubCommand_build(char *name, u32 min_args, u32 max_args) {
 
 	SubCommandPtr src =
@@ -516,7 +516,7 @@ bool Args_copy(Args *dst, Args *src) {
 	return ret;
 }
 
-size_t Args_size(Args *obj) { return sizeof(Args); }
+usize Args_size(Args *obj) { return sizeof(Args); }
 
 Result Args_build(char *prog, char *version, char *author) {
 	ArgsPtr src = BUILD(Args, prog, version, author, NULL, 0, NULL, 0, 0);
@@ -590,7 +590,7 @@ void Args_usage(Args *ptr) {}
 
 Option Args_argument(Args *ptr, u64 index) { return None; }
 
-Result Args_value(Args *ptr, char *buffer, size_t len, char *param,
+Result Args_value(Args *ptr, char *buffer, usize len, char *param,
 		  char *value) {
 	todo()
 }

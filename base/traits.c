@@ -76,8 +76,8 @@ bool clone(void *dst, void *src) {
 	return do_clone(dst, src);
 }
 
-size_t size(void *obj) {
-	size_t (*do_size)(Object *obj) = find_fn((Object *)obj, "size");
+usize size(void *obj) {
+	usize (*do_size)(Object *obj) = find_fn((Object *)obj, "size");
 	if (do_size == NULL)
 		panic("size not implemented for this type");
 	return do_size(obj);
