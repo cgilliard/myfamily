@@ -851,6 +851,8 @@ void Args_usage(Args *args, char *sub_command) {
 			char *help = *ArgsParam_get_help(&params[i]);
 			u64 len = snprintf(NULL, 0, "    -%s, --%s", short_name,
 					   name);
+			if (len > max_len)
+				len = max_len;
 			u64 i;
 			for (i = 0; i < max_len - len && i < 1024; i++)
 				buffer[i] = ' ';
@@ -877,6 +879,8 @@ void Args_usage(Args *args, char *sub_command) {
 					u64 len = snprintf(
 					    NULL, 0, "    -%s, --%s <%s>, ...",
 					    short_name, name, name);
+					if (len > max_len)
+						len = max_len;
 					u64 i;
 					for (i = 0;
 					     i < max_len - len && i < 1024; i++)
@@ -893,6 +897,8 @@ void Args_usage(Args *args, char *sub_command) {
 					u64 len = snprintf(
 					    NULL, 0, "    -%s, --%s <%s>",
 					    short_name, name, name);
+					if (len > max_len)
+						len = max_len;
 					u64 i;
 					for (i = 0;
 					     i < max_len - len && i < 1024; i++)
@@ -917,6 +923,8 @@ void Args_usage(Args *args, char *sub_command) {
 			char *help = *SubCommand_get_help(subs[i]);
 
 			u64 len = strlen(name) + 3;
+			if (len > max_len)
+				len = max_len;
 			char buffer[1025];
 			u64 j;
 			for (j = 0; j < (max_len - len) && j < 1024; j++)
@@ -953,6 +961,8 @@ void Args_usage(Args *args, char *sub_command) {
 
 				if (!takes_value) {
 					u64 len = strlen(name) + 10;
+					if (len > max_len)
+						len = max_len;
 					char buffer[1025];
 					u64 j;
 					for (j = 0;
