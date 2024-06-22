@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 Result build_args() {
-	Args args = ARGS("prog", "v1.0", "MyFamily Developers");
+	Args args = ARGS("fam", "v0.0.1", "The MyFamily Developers");
 
 	ArgsParam p1 = PARAM("threads", "number of threads", "t", true, false);
 	Result res1 = Args_add_param(&args, &p1);
@@ -27,7 +27,8 @@ Result build_args() {
 	ArgsParam p2 = PARAM("port", "tcp/ip port to bind to", "p", true, true);
 	Result res2 = Args_add_param(&args, &p2);
 	Expect(res2);
-	Result r1 = SubCommand_build("test1", 2, 5);
+	Result r1 =
+	    SubCommand_build("test1", 2, 5, "this is a a test sub command");
 	Expect(r1);
 	SubCommand sub1 = *(SubCommand *)unwrap(&r1);
 	ArgsParam p3 = PARAM("other", "other option", "o", false, false);

@@ -26,7 +26,7 @@
 
 #define TRAIT_SUB_COMMAND(T)                                                   \
 	TRAIT_REQUIRED(T, Result, build, char *name, u32 min_args,             \
-		       u32 max_args)                                           \
+		       u32 max_args, char *help)                               \
 	TRAIT_REQUIRED(T, Result, add_param, T##Ptr *sub, ArgsParam *param)
 
 #define TRAIT_ARGS(T)                                                          \
@@ -55,7 +55,8 @@ IMPL(ArgsParam, TRAIT_ARGS_PARAM)
 
 CLASS(SubCommand, FIELD(char *, name) FIELD(ArgsParam *, params)
 		      FIELD(ArgsParamState *, params_state) FIELD(u64, count)
-			  FIELD(u32, min_add_args) FIELD(u32, max_add_args))
+			  FIELD(u32, min_add_args) FIELD(u32, max_add_args)
+			      FIELD(char *, help))
 IMPL(SubCommand, TRAIT_COPY)
 IMPL(SubCommand, TRAIT_SUB_COMMAND)
 #define SubCommand DEFINE_CLASS(SubCommand)

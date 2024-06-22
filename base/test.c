@@ -190,7 +190,7 @@ GETTER_PROTO(SubCommand, min_add_args)
 GETTER_PROTO(SubCommand, max_add_args)
 
 FamTest(base, test_sub_command) {
-	Result r1 = SubCommand_build("test1", 2, 5);
+	Result r1 = SubCommand_build("test1", 2, 5, "this is a help message");
 	SubCommand s1 = *(SubCommand *)unwrap(&r1);
 	assert_eq_str(*SubCommand_get_name(&s1), "test1");
 	assert_eq(*SubCommand_get_min_add_args(&s1), 2);
@@ -228,7 +228,7 @@ FamTest(base, test_args) {
 	    PARAM("port", "tcp/ip port to bind to", "p", true, true);
 	Result r12 = Args_add_param(&a1, &p12);
 	Expect(r12);
-	Result r13 = SubCommand_build("mysub", 0, 1);
+	Result r13 = SubCommand_build("mysub", 0, 1, "help msg");
 	assert(r13.is_ok());
 	SubCommand sub11 = *(SubCommand *)unwrap(&r13);
 	Result r14 = Args_add_sub(&a1, &sub11);
