@@ -20,6 +20,8 @@
 #include <base/result.h>
 #include <base/traits.h>
 
+#define DEBUG_INIT_NO_EXIT 0x1
+
 #define TRAIT_ARGS_PARAM(T)                                                    \
 	TRAIT_REQUIRED(T, Result, build, char *name, char *help,               \
 		       char *short_name, bool takes_value, bool multiple)

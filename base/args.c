@@ -65,6 +65,8 @@ GETTER(Args, argv)
 SETTER(Args, argv)
 GETTER(Args, argc)
 SETTER(Args, argc)
+GETTER(Args, debug_flags)
+SETTER(Args, debug_flags)
 
 void ArgsParamState_cleanup(ArgsParamState *ptr) {}
 usize ArgsParamState_size(ArgsParamState *ptr) {
@@ -381,6 +383,24 @@ Result SubCommand_add_param(SubCommand *ptr, ArgsParam *param) {
 	return Ok(UNIT);
 }
 
+void Args_error_exit(Args *args, char *format, ...) {
+	char *prog = *Args_get_prog(args);
+	va_list va_args;
+	va_start(va_args, format);
+	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+	vfprintf(stderr, format, va_args);
+	fprintf(stderr, "\n\n");
+	fprintf(stderr,
+		"%sUSAGE%s:\n    %s%s%s [%sOPTIONS%s]\n\nFor more information "
+		"try %s--help%s\n",
+		DIMMED, RESET, BRIGHT_RED, prog, RESET, DIMMED, RESET, GREEN,
+		RESET);
+	va_end(va_args);
+	u64 debug_flags = *Args_get_debug_flags(args);
+	if (!(debug_flags & DEBUG_INIT_NO_EXIT))
+		exit(-1);
+}
+
 void Args_cleanup(Args *ptr) {
 	u64 count = *Args_get_subs_count(ptr);
 	SubCommandPtr **subs = *Args_get_subs(ptr);
@@ -580,6 +600,7 @@ Result Args_print_version(Args *args) {
 	char *version = *Args_get_version(args);
 	fprintf(stderr, "%s%s%s %s%s%s\n", BRIGHT_RED, prog, RESET, GREEN,
 		version, RESET);
+	exit(0);
 	return Ok(UNIT);
 }
 
@@ -655,10 +676,9 @@ bool args_check_sub_command(Args *args, char *arg, u64 *sub_itt,
 		*sub_itt += 1;
 
 		if (*sub_itt > 1 + max) {
-			fprintf(
-			    stderr,
+			Args_error_exit(
+			    args,
 			    "Too many arguments specified for this command\n");
-			exit(-1);
 		} else {
 			return true;
 		}
@@ -729,9 +749,8 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 
 			if (!args_check_sub_command(args, argv_copy[i],
 						    &sub_itt, &sub_index)) {
-				fprintf(stderr, "unknown param: %s\n",
-					argv_copy[i]);
-				exit(-1);
+				Args_error_exit(args, "unknown param: %s\n",
+						argv_copy[i]);
 			} else {
 				is_sub = true;
 			}
@@ -740,21 +759,20 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 		if (is_sub) {
 			sub_found = true;
 		} else if (!is_multi && already_specified) {
-			fprintf(stderr, "Specified more than once: %s\n",
-				argv_copy[i]);
-			exit(-1);
+			Args_error_exit(args, "Specified more than once: %s\n",
+					argv_copy[i]);
 		} else if (is_takes_value) {
 			i += 1;
 			if (i >= argc) {
-				fprintf(stderr, "expected a value for %s\n",
-					argv_copy[i - 1]);
-				exit(-1);
+				Args_error_exit(args,
+						"expected a value for %s\n",
+						argv_copy[i - 1]);
 			}
 			if (argv_copy[i][0] == '-') {
-				fprintf(stderr, "Expected a value for: %s\n",
-					argv_copy[i - 1]);
+				Args_error_exit(args,
+						"Expected a value for: %s\n",
+						argv_copy[i - 1]);
 				ret = false;
-				exit(-1);
 			}
 		}
 	}
@@ -764,8 +782,8 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 		u64 min = *SubCommand_get_min_add_args(sub_arr[sub_index]);
 		char *name = *SubCommand_get_name(sub_arr[sub_index]);
 		if (min >= sub_itt) {
-			fprintf(
-			    stderr,
+			Args_error_exit(
+			    args,
 			    "Sub command %s must have at least %i arguments\n",
 			    name, min);
 			exit(-1);
