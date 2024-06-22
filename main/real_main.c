@@ -27,11 +27,22 @@ Result build_args() {
 	ArgsParam p2 = PARAM("port", "tcp/ip port to bind to", "p", true, true);
 	Result res2 = Args_add_param(&args, &p2);
 	Expect(res2);
-
 	Result r1 = SubCommand_build("test1", 2, 5);
 	Expect(r1);
 	SubCommand sub1 = *(SubCommand *)unwrap(&r1);
-	Result r2 = Args_add_sub(&args, &sub1);
+	ArgsParam p3 = PARAM("other", "other option", "o", false, false);
+	Result r2 = SubCommand_add_param(&sub1, &p3);
+	Expect(r2);
+	ArgsParam p4 = PARAM("another", "another option", "x", true, false);
+	Result rr = SubCommand_add_param(&sub1, &p4);
+	Expect(rr);
+
+	ArgsParam p5 = PARAM("special", "special option", "y", true, true);
+	Result rrr = SubCommand_add_param(&sub1, &p5);
+	Expect(rrr);
+
+	Result r3 = Args_add_sub(&args, &sub1);
+	Expect(r3);
 
 	return Ok(args);
 }
@@ -41,7 +52,6 @@ Result real_main(int argc, char **argv) {
 	Args args = *(Args *)Try(res);
 	Result res2 = ARGS_INIT(&args, argc, argv);
 	Try(res2);
-	printf("main doesn't do anything yet\n");
 
 	printf("arguments:\n");
 	u64 i = 0;
@@ -51,7 +61,7 @@ Result real_main(int argc, char **argv) {
 			break;
 		StringPtr *p = unwrap(&o);
 		char *p1 = unwrap(p);
-		printf("arg[%i]=%s\n", i, p1);
+		printf("      arg[%i]=%s\n", i, p1);
 		i += 1;
 	}
 
@@ -64,6 +74,17 @@ Result real_main(int argc, char **argv) {
 		StringPtr *s = (String *)unwrap(&o);
 		char *v = unwrap(s);
 		printf("port=%s\n", v);
+	}
+
+	printf("special:\n");
+	while (true) {
+		Result r = Args_value(&args, "special");
+		Option o = *(Option *)unwrap(&r);
+		if (!o.is_some())
+			break;
+		StringPtr *s = (String *)unwrap(&o);
+		char *v = unwrap(s);
+		printf("special=%s\n", v);
 	}
 
 	return Ok(UNIT);
