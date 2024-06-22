@@ -238,5 +238,21 @@ FamTest(base, test_args) {
 	int argc1 = 8;
 	Result r1 = ARGS_INIT(&a1, argc1, argv1);
 	assert(r1.is_ok());
+
+	Option o1 = Args_argument(&a1, 0);
+	assert(o1.is_some());
+	StringPtr *arg1 = unwrap(&o1);
+	assert_eq_str(unwrap(arg1), "mysub");
+	Option o2 = Args_argument(&a1, 1);
+	assert(!o2.is_some());
+
+	String scomp1 = STRINGSSTACKP("test84");
+	String scomp2 = STRINGSSTACKP("test84");
+	String scomp3 = STRINGSSTACKP("asldfjkl");
+	assert(equal(&scomp1, &scomp2));
+	assert(!equal(&scomp1, &scomp3));
 }
 
+FamTest(base, test_args_copy) {
+	Args a1 = ARGS("prog", "v1.0", "MyFamily Developers");
+}

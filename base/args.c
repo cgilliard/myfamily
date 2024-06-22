@@ -371,9 +371,10 @@ Result SubCommand_add_param(SubCommand *ptr, ArgsParam *param) {
 
 void Args_cleanup(Args *ptr) {
 	u64 count = *Args_get_subs_count(ptr);
-	SubCommandPtr *subs = *Args_get_subs(ptr);
+	SubCommandPtr **subs = *Args_get_subs(ptr);
 	for (u64 i = 0; i < count; i++) {
-		cleanup(&subs[i]);
+		cleanup(subs[i]);
+		tlfree(subs[i]);
 	}
 	if (subs) {
 		tlfree(subs);
@@ -408,17 +409,17 @@ void Args_cleanup(Args *ptr) {
 		tlfree(argv);
 }
 Result Args_add_param(Args *ptr, ArgsParam *param) {
-	SubCommandPtr *subs = *Args_get_subs(ptr);
-	Result res2 = SubCommand_add_param(&subs[0], param);
+	SubCommandPtr **subs = *Args_get_subs(ptr);
+	Result res2 = SubCommand_add_param(subs[0], param);
 	Try(res2);
 	return Ok(UNIT);
 }
 Result Args_add_sub(Args *ptr, SubCommand *sub) {
 
 	u64 count = *(u64 *)Args_get_subs_count(ptr);
-	SubCommandPtr *subs = *Args_get_subs(ptr);
+	SubCommandPtr **subs = *Args_get_subs(ptr);
 	if (count == 0) {
-		void *tmp = tlmalloc(sizeof(SubCommand));
+		void *tmp = tlmalloc(sizeof(SubCommand *));
 		if (tmp == NULL) {
 			Error err =
 			    ERROR(ALLOC_ERROR, "Could not increase the size of "
@@ -428,7 +429,7 @@ Result Args_add_sub(Args *ptr, SubCommand *sub) {
 		subs = tmp;
 		Args_set_subs(ptr, tmp);
 	} else {
-		void *tmp = tlrealloc(subs, sizeof(SubCommand) * (1 + count));
+		void *tmp = tlrealloc(subs, sizeof(SubCommand *) * (1 + count));
 		if (tmp == NULL) {
 			Error err =
 			    ERROR(ALLOC_ERROR, "Could not increase the size of "
@@ -438,7 +439,8 @@ Result Args_add_sub(Args *ptr, SubCommand *sub) {
 		subs = tmp;
 		Args_set_subs(ptr, tmp);
 	}
-	copy(&subs[count], sub);
+	subs[count] = tlmalloc(sizeof(SubCommand));
+	copy(subs[count], sub);
 	Args_set_subs_count(ptr, count + 1);
 
 	return Ok(UNIT);
@@ -511,15 +513,16 @@ bool Args_copy(Args *dst, Args *src) {
 	}
 
 	u64 subs_count = *Args_get_subs_count(src);
-	SubCommandPtr *subs_src = *Args_get_subs(src);
-	SubCommandPtr *subs;
+	SubCommandPtr **subs_src = *Args_get_subs(src);
+	SubCommandPtr **subs;
 	if (subs_count > 0) {
-		subs = tlmalloc(sizeof(SubCommand) * subs_count);
+		subs = tlmalloc(sizeof(SubCommand *) * subs_count);
 		if (subs == NULL)
 			ret = false;
 		else
 			for (u64 i = 0; i < subs_count; i++) {
-				if (!copy(&subs[i], &subs_src[i]))
+				subs[i] = tlmalloc(sizeof(SubCommand));
+				if (!copy(subs[i], subs_src[i]))
 					ret = false;
 			}
 
@@ -538,6 +541,7 @@ bool Args_copy(Args *dst, Args *src) {
 		if (subs)
 			tlfree(subs);
 	}
+
 	return ret;
 }
 
@@ -559,10 +563,7 @@ Result Args_build(char *prog, char *version, char *author) {
 	return Ok(ret);
 }
 
-Result Args_print_version(Args *args) {
-	printf("print version\n");
-	return Ok(UNIT);
-}
+Result Args_print_version(Args *args) { return Ok(UNIT); }
 
 bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi,
 		bool *already_specified) {
@@ -571,12 +572,11 @@ bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi,
 
 	bool ret = false;
 
-	SubCommandPtr *subs = *Args_get_subs(args);
-	u64 count = *(u64 *)SubCommand_get_count(&subs[0]);
-	ArgsParamPtr *params =
-	    *(ArgsParamPtr **)SubCommand_get_params(&subs[0]);
+	SubCommandPtr **subs = *Args_get_subs(args);
+	u64 count = *(u64 *)SubCommand_get_count(subs[0]);
+	ArgsParamPtr *params = *(ArgsParamPtr **)SubCommand_get_params(subs[0]);
 	ArgsParamStatePtr *params_state =
-	    *(ArgsParamStatePtr **)SubCommand_get_params_state(&subs[0]);
+	    *(ArgsParamStatePtr **)SubCommand_get_params_state(subs[0]);
 
 	for (u64 i = 0; i < count; i++) {
 		char *pname = *ArgsParam_get_name(&params[i]);
@@ -618,10 +618,10 @@ bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi,
 bool args_check_sub_command(Args *args, char *arg, u64 *sub_itt,
 			    u64 *sub_index) {
 	u64 sub_count = *Args_get_subs_count(args);
-	SubCommandPtr *sub_arr = *Args_get_subs(args);
+	SubCommandPtr **sub_arr = *Args_get_subs(args);
 	if (*sub_itt == 0) {
 		for (u64 i = 0; i < sub_count; i++) {
-			char *name = *SubCommand_get_name(&sub_arr[i]);
+			char *name = *SubCommand_get_name(sub_arr[i]);
 			if (!strcmp(name, arg)) {
 				*sub_itt = 1;
 				*sub_index = i;
@@ -629,7 +629,7 @@ bool args_check_sub_command(Args *args, char *arg, u64 *sub_itt,
 			}
 		}
 	} else {
-		u64 max = *SubCommand_get_max_add_args(&sub_arr[*sub_index]);
+		u64 max = *SubCommand_get_max_add_args(sub_arr[*sub_index]);
 		*sub_itt += 1;
 
 		if (*sub_itt > 1 + max) {
@@ -728,9 +728,9 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 	}
 
 	if (sub_found) {
-		SubCommandPtr *sub_arr = *Args_get_subs(args);
-		u64 min = *SubCommand_get_min_add_args(&sub_arr[sub_index]);
-		char *name = *SubCommand_get_name(&sub_arr[sub_index]);
+		SubCommandPtr **sub_arr = *Args_get_subs(args);
+		u64 min = *SubCommand_get_min_add_args(sub_arr[sub_index]);
+		char *name = *SubCommand_get_name(sub_arr[sub_index]);
 		if (min >= sub_itt) {
 			printf(
 			    "Sub command %s must have at least %i arguments\n",
@@ -747,10 +747,10 @@ void Args_usage(Args *ptr) { printf("Usage: fam [options]\n"); }
 Option Args_argument(Args *args, u64 index) {
 	int argc = *Args_get_argc(args);
 	char **argv = *Args_get_argv(args);
-	SubCommandPtr *sub_arr = *Args_get_subs(args);
+	SubCommandPtr **sub_arr = *Args_get_subs(args);
 	ArgsParamPtr *params =
-	    *(ArgsParamPtr **)SubCommand_get_params(&sub_arr[0]);
-	u64 count = *(u64 *)SubCommand_get_count(&sub_arr[0]);
+	    *(ArgsParamPtr **)SubCommand_get_params(sub_arr[0]);
+	u64 count = *(u64 *)SubCommand_get_count(sub_arr[0]);
 
 	int counter = 0;
 
@@ -811,12 +811,12 @@ Result Args_value(Args *args, char *param) {
 	int argc = *Args_get_argc(args);
 	char **argv = *Args_get_argv(args);
 
-	SubCommandPtr *sub_arr = *Args_get_subs(args);
+	SubCommandPtr **sub_arr = *Args_get_subs(args);
 	ArgsParamPtr *params =
-	    *(ArgsParamPtr **)SubCommand_get_params(&sub_arr[0]);
+	    *(ArgsParamPtr **)SubCommand_get_params(sub_arr[0]);
 	ArgsParamStatePtr *params_state =
-	    *(ArgsParamStatePtr **)SubCommand_get_params_state(&sub_arr[0]);
-	u64 count = *(u64 *)SubCommand_get_count(&sub_arr[0]);
+	    *(ArgsParamStatePtr **)SubCommand_get_params_state(sub_arr[0]);
+	u64 count = *(u64 *)SubCommand_get_count(sub_arr[0]);
 
 	bool takes_value = false;
 	bool multi = false;

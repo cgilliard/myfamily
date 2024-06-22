@@ -62,7 +62,7 @@ IMPL(SubCommand, TRAIT_SUB_COMMAND)
 
 CLASS(Args,
       FIELD(char *, prog) FIELD(char *, version) FIELD(char *, author)
-	  FIELD(SubCommand *, subs) FIELD(u64, subs_count) FIELD(char **, argv)
+	  FIELD(SubCommand **, subs) FIELD(u64, subs_count) FIELD(char **, argv)
 	      FIELD(int, argc) FIELD(u64, debug_flags))
 IMPL(Args, TRAIT_ARGS);
 IMPL(Args, TRAIT_COPY);
