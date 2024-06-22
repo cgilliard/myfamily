@@ -253,6 +253,7 @@ bool SubCommand_copy(SubCommand *dst, SubCommand *src) {
 	char *name = tlmalloc(sizeof(char) * (strlen(src_name) + 1));
 	char *src_help = *SubCommand_get_help(src);
 	char *help = tlmalloc(sizeof(char) * strlen(src_help) + 1);
+	strcpy(help, src_help);
 	if (name == NULL)
 		return false;
 	strcpy(name, src_name);
@@ -648,7 +649,8 @@ bool args_check_sub_command(Args *args, char *arg, u64 *sub_itt,
 		*sub_itt += 1;
 
 		if (*sub_itt > 1 + max) {
-			printf(
+			fprintf(
+			    stderr,
 			    "Too many arguments specified for this command\n");
 			exit(-1);
 		} else {
@@ -667,9 +669,16 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 		return Err(err);
 	}
 	u64 i = 0;
+	u64 sub_itt = 0;
+	u64 sub_index = 0;
+	char *sub_command = NULL;
 	for (i = 1; i < argc; i++) {
+		args_check_sub_command(args, argv[i], &sub_itt, &sub_index);
+		if (sub_command == NULL && sub_itt == 1) {
+			sub_command = argv[i];
+		}
 		if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--help")) {
-			Args_usage(args);
+			Args_usage(args, sub_command);
 			exit(0);
 		}
 		if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--help")) {
@@ -703,8 +712,8 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 		ArgsParamState_set_specified(&params_state[i], false);
 	}
 
-	u64 sub_itt = 0;
-	u64 sub_index = 0;
+	sub_itt = 0;
+	sub_index = 0;
 	bool sub_found = false;
 	for (u64 i = 1; i < argc; i++) {
 		bool is_takes_value, is_multi, already_specified,
@@ -714,7 +723,8 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 
 			if (!args_check_sub_command(args, argv_copy[i],
 						    &sub_itt, &sub_index)) {
-				printf("unknown param: %s\n", argv_copy[i]);
+				fprintf(stderr, "unknown param: %s\n",
+					argv_copy[i]);
 				exit(-1);
 			} else {
 				is_sub = true;
@@ -724,18 +734,19 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 		if (is_sub) {
 			sub_found = true;
 		} else if (!is_multi && already_specified) {
-			printf("Specified more than once: %s\n", argv_copy[i]);
+			fprintf(stderr, "Specified more than once: %s\n",
+				argv_copy[i]);
 			exit(-1);
 		} else if (is_takes_value) {
 			i += 1;
 			if (i >= argc) {
-				printf("expected a value for %s\n",
-				       argv_copy[i - 1]);
+				fprintf(stderr, "expected a value for %s\n",
+					argv_copy[i - 1]);
 				exit(-1);
 			}
 			if (argv_copy[i][0] == '-') {
-				printf("Expected a value for: %s\n",
-				       argv_copy[i - 1]);
+				fprintf(stderr, "Expected a value for: %s\n",
+					argv_copy[i - 1]);
 				ret = false;
 				exit(-1);
 			}
@@ -747,7 +758,8 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 		u64 min = *SubCommand_get_min_add_args(sub_arr[sub_index]);
 		char *name = *SubCommand_get_name(sub_arr[sub_index]);
 		if (min >= sub_itt) {
-			printf(
+			fprintf(
+			    stderr,
 			    "Sub command %s must have at least %i arguments\n",
 			    name, min);
 			exit(-1);
@@ -757,7 +769,7 @@ Result Args_init(Args *args, int argc, char **argv, u64 flags) {
 	return Ok(UNIT);
 }
 
-void Args_usage(Args *args) {
+void Args_usage(Args *args, char *sub_command) {
 	u64 subs_count = *Args_get_subs_count(args);
 	SubCommandPtr **subs = *Args_get_subs(args);
 	ArgsParamPtr *params = *SubCommand_get_params(subs[0]);
@@ -800,16 +812,29 @@ void Args_usage(Args *args) {
 	for (i = 0; i < max_len - 16 && i < 1024; i++)
 		buffer2[i] = ' ';
 	buffer2[i] = 0;
+	u64 sub_command_str_len;
+	if (sub_command)
+		sub_command_str_len = strlen(sub_command);
+	else
+		sub_command_str_len = 0;
+	char sub_command_str[sub_command_str_len + 30];
+	if (sub_command) {
+		snprintf(sub_command_str, sub_command_str_len + 30, "%s%s%s",
+			 BRIGHT_RED, sub_command, RESET);
+	} else {
+		snprintf(sub_command_str, sub_command_str_len + 30,
+			 "[%sSUB_COMMAND%s]", DIMMED, RESET);
+	}
 	fprintf(stderr,
 		"%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s "
-		"[%sCORE_OPTIONS%s] [%sSUB_COMMANDS%s] [%sSUB_OPTIONS%s]\n\n"
-		"%sFLAGS%s:\n"
+		"[%sCORE_OPTIONS%s] %s [%sSUB_OPTIONS%s]\n\n"
+		"%sCORE_FLAGS%s:\n"
 		"    %s-h%s, %s--help%s%sPrints help information\n"
 		"    %s-V%s, %s--version%s%sPrints version information\n",
 		CYAN, prog, RESET, YELLOW, version, RESET, GREEN, author, RESET,
-		DIMMED, RESET, BRIGHT_RED, prog, RESET, DIMMED, RESET, DIMMED,
-		RESET, DIMMED, RESET, DIMMED, RESET, CYAN, RESET, YELLOW, RESET,
-		buffer, CYAN, RESET, YELLOW, RESET, buffer2);
+		DIMMED, RESET, BRIGHT_RED, prog, RESET, DIMMED, RESET,
+		sub_command_str, DIMMED, RESET, DIMMED, RESET, CYAN, RESET,
+		YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET, buffer2);
 
 	for (u64 i = 0; i < count; i++) {
 		bool takes_value = *ArgsParam_get_takes_value(&params[i]);
@@ -844,8 +869,7 @@ void Args_usage(Args *args) {
 				    *ArgsParam_get_multiple(&params[i]);
 				if (multi) {
 					u64 len = snprintf(
-					    NULL, 0,
-					    "    -%s, --%s (<%s>, ...)",
+					    NULL, 0, "    -%s, --%s <%s>, ...",
 					    short_name, name, name);
 					u64 i;
 					for (i = 0;
@@ -853,8 +877,8 @@ void Args_usage(Args *args) {
 						buffer[i] = ' ';
 					buffer[i] = 0;
 					fprintf(stderr,
-						"    %s-%s%s, %s--%s%s (<%s>, "
-						"...) %s%s\n",
+						"    %s-%s%s, %s--%s%s <%s>, "
+						"... %s%s\n",
 						CYAN, short_name, RESET, YELLOW,
 						name, RESET, name, buffer,
 						help);
@@ -874,6 +898,121 @@ void Args_usage(Args *args) {
 					    "    %s-%s%s, %s--%s%s <%s> %s%s\n",
 					    CYAN, short_name, RESET, YELLOW,
 					    name, RESET, name, buffer, help);
+				}
+			}
+		}
+	}
+
+	if (subs_count > 1 && sub_command == NULL) {
+		fprintf(stderr, "\n%sSUB_COMMANDS%s:\n", DIMMED, RESET);
+		for (u64 i = 1; i < subs_count; i++) {
+
+			char *name = *SubCommand_get_name(subs[i]);
+			char *help = *SubCommand_get_help(subs[i]);
+
+			u64 len = strlen(name) + 3;
+			char buffer[1025];
+			u64 j;
+			for (j = 0; j < (max_len - len) && j < 1024; j++)
+				buffer[j] = ' ';
+			buffer[j] = 0;
+
+			fprintf(stderr, "    %s%s%s%s%s\n", CYAN, name, RESET,
+				buffer, help);
+		}
+	}
+
+	if (sub_command) {
+		u64 param_index = 0;
+		for (u64 i = 1; i < subs_count; i++) {
+			char *name = *SubCommand_get_name(subs[i]);
+			if (!strcmp(name, sub_command)) {
+				param_index = i;
+			}
+		}
+
+		if (param_index > 0) {
+			params = *SubCommand_get_params(subs[param_index]);
+			count = *SubCommand_get_count(subs[param_index]);
+
+			fprintf(stderr, "\n%sSUB_FLAGS%s (%s%s%s):\n", DIMMED,
+				RESET, BRIGHT_RED, sub_command, RESET);
+			for (u64 i = 0; i < count; i++) {
+				char *name = *ArgsParam_get_name(&params[i]);
+				char *short_name =
+				    *ArgsParam_get_short_name(&params[i]);
+				bool takes_value =
+				    *ArgsParam_get_takes_value(&params[i]);
+				char *help = *ArgsParam_get_help(&params[i]);
+
+				if (!takes_value) {
+					u64 len = strlen(name) + 10;
+					char buffer[1025];
+					u64 j;
+					for (j = 0;
+					     j < (max_len - len) && j < 1024;
+					     j++)
+						buffer[j] = ' ';
+					buffer[j] = 0;
+					fprintf(stderr,
+						"    %s-%s%s, %s--%s%s%s %s\n",
+						CYAN, short_name, RESET, YELLOW,
+						name, RESET, buffer, help);
+				}
+			}
+
+			fprintf(stderr, "\n%sSUB_OPTIONS%s (%s%s%s):\n", DIMMED,
+				RESET, BRIGHT_RED, sub_command, RESET);
+			for (u64 i = 0; i < count; i++) {
+				char *name = *ArgsParam_get_name(&params[i]);
+				char *short_name =
+				    *ArgsParam_get_short_name(&params[i]);
+				bool takes_value =
+				    *ArgsParam_get_takes_value(&params[i]);
+				char *help = *ArgsParam_get_help(&params[i]);
+				bool multiple =
+				    *ArgsParam_get_multiple(&params[i]);
+
+				if (takes_value) {
+					if (multiple) {
+						u64 len = 2 * strlen(name) + 19;
+						char buffer[1025];
+						u64 j;
+						if (len > max_len)
+							len = max_len;
+						for (j = 0;
+						     j < (max_len - len) &&
+						     j < 1024;
+						     j++)
+							buffer[j] = ' ';
+						buffer[j] = 0;
+						fprintf(stderr,
+							"    %s-%s%s, %s--%s%s "
+							"<%s>, ...%s %s"
+							"%s\n",
+							CYAN, short_name, RESET,
+							YELLOW, name, RESET,
+							name, buffer, help);
+					} else {
+						u64 len = 2 * strlen(name) + 13;
+						char buffer[1025];
+						u64 j;
+						if (len > max_len)
+							len = max_len;
+						for (j = 0;
+						     j < (max_len - len) &&
+						     j < 1024;
+						     j++)
+							buffer[j] = ' ';
+						buffer[j] = 0;
+						fprintf(stderr,
+							"    %s-%s%s, %s--%s%s "
+							"<%s>%s "
+							"%s\n",
+							CYAN, short_name, RESET,
+							YELLOW, name, RESET,
+							name, buffer, help);
+					}
 				}
 			}
 		}
@@ -967,6 +1106,7 @@ Result Args_value(Args *args, char *param) {
 	char **argv = *Args_get_argv(args);
 
 	SubCommandPtr **sub_arr = *Args_get_subs(args);
+	u64 sub_count = *Args_get_subs_count(args);
 	ArgsParamPtr *params =
 	    *(ArgsParamPtr **)SubCommand_get_params(sub_arr[0]);
 	ArgsParamStatePtr *params_state =

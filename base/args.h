@@ -36,7 +36,7 @@
 	TRAIT_REQUIRED(T, Result, value, T##Ptr *args, char *param)            \
 	TRAIT_REQUIRED(T, Result, build, char *prog, char *version,            \
 		       char *author)                                           \
-	TRAIT_REQUIRED(T, void, usage, T##Ptr *ptr)                            \
+	TRAIT_REQUIRED(T, void, usage, T##Ptr *ptr, char *sub_command)         \
 	TRAIT_REQUIRED(T, Result, add_sub, T##Ptr *ptr, SubCommand *sub)       \
 	TRAIT_REQUIRED(T, Option, argument, T##Ptr *ptr, u64 index)            \
 	TRAIT_REQUIRED(T, Result, print_version, T##Ptr *args)
