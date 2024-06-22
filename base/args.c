@@ -575,7 +575,13 @@ Result Args_build(char *prog, char *version, char *author) {
 	return Ok(ret);
 }
 
-Result Args_print_version(Args *args) { return Ok(UNIT); }
+Result Args_print_version(Args *args) {
+	char *prog = *Args_get_prog(args);
+	char *version = *Args_get_version(args);
+	fprintf(stderr, "%s%s%s %s%s%s\n", BRIGHT_RED, prog, RESET, GREEN,
+		version, RESET);
+	return Ok(UNIT);
+}
 
 bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi,
 		bool *already_specified, u64 *sub_index) {
