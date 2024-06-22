@@ -22,9 +22,8 @@ FamSuite(main);
 FamTest(main, main) {
 	char *argv[] = {"test"};
 	printf("n\n");
-	// Result r = real_main(1, argv);
-	//   assert(r.is_ok());
+	Result r = real_main(1, argv);
+	assert(r.is_ok());
 	printf("m r=%i\n", 0);
 }
 
-FamTest(main, other) {}

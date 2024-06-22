@@ -17,15 +17,21 @@ test: $(SUBDIRS)
 	ERROR="0"; \
 	for dir in $(SUBDIRS); do \
 		if test -z $(CRITERION_TEST_PATTERN); then \
-                        CRITERION_TEST_PATTERN=$$dir/*; \
-                        export CRITERION_TEST_PATTERN; \
+			if test -z $(FILTER); then \
+				export FILTER=*; \
+			fi; \
+		        export CRITERION_TEST_PATTERN=$$dir/$$FILTER; \
                 fi; \
 		if  test -z $(TARGET); then \
 			echo "[====] Running $$dir test suite..."; \
 			$(MAKE) -C $$dir test || exit 1; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
-				echo "[====] Running $$dir test suite..."; \
+			        if test -z $(FILTER); then \
+					echo "[====] Running $$dir test suite..."; \
+				else \
+					echo "[====] Running $$dir test suite... (FILTER=$$FILTER)"; \
+				fi;\
 				$(MAKE) -C $$dir test || exit 1;\
 			fi; \
 		fi; \
@@ -35,13 +41,15 @@ test: $(SUBDIRS)
 	done; 
 testnc: $(SUBDIRS)
 	ERROR="0"; \
+	export CRITERION_TEST_PATTERN=$(CRITERION_TEST_PATTERN); \
 	for dir in $(SUBDIRS); do \
 		if test -z $(CRITERION_TEST_PATTERN); then \
-			CRITERION_TEST_PATTERN=$$dir/*; \
-			export CRITERION_TEST_PATTERN; \
-		fi; \
+                        if test -z $(FILTER); then \
+                                export FILTER=*; \
+                        fi; \
+                        export CRITERION_TEST_PATTERN=$$dir/$$FILTER; \
+                fi; \
 		if  test -z $(TARGET); then \
-			NOCOLOR="\033[0m"; \
 			echo -e "[====] Running $$dir test suite..."; \
 			$(MAKE) -C $$dir testnc || exit 1; \
 		else \
