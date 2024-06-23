@@ -29,16 +29,16 @@ Result append(void *dst, void *src);
 	TRAIT_REQUIRED(T, T##Ptr *, build_ptr_expect, const char *s)           \
 	TRAIT_REQUIRED(T, Result, build_ptr_try, const char *s)
 
-CLASS(StringImpl, FIELD(char *, ptr) FIELD(u64, len))
-IMPL(StringImpl, TRAIT_STRING_BUILD)
-IMPL(StringImpl, TRAIT_CLONE)
-IMPL(StringImpl, TRAIT_EQUAL)
-IMPL(StringImpl, TRAIT_UNWRAP)
-IMPL(StringImpl, TRAIT_APPEND)
-#define StringImpl DEFINE_CLASS(StringImpl)
+CLASS(String, FIELD(char *, ptr) FIELD(u64, len))
+IMPL(String, TRAIT_STRING_BUILD)
+IMPL(String, TRAIT_CLONE)
+IMPL(String, TRAIT_EQUAL)
+IMPL(String, TRAIT_UNWRAP)
+IMPL(String, TRAIT_APPEND)
+#define String DEFINE_CLASS(String)
 
-#define STRINGIMPL(s) StringImpl_build_ptr_try(s)
-#define STRINGIMPLP(s) StringImpl_build_ptr_expect(s)
+#define STRINGIMPL(s) String_build_ptr_try(s)
+#define STRINGIMPLP(s) String_build_ptr_expect(s)
 
 CLASS(StringRef, FIELD(RcPtr *, ptr))
 IMPL(StringRef, TRAIT_COPY)

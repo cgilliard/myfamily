@@ -66,7 +66,7 @@ Result real_main(int argc, char **argv) {
 		Option o = Args_argument(&args, i);
 		if (!o.is_some())
 			break;
-		StringImplPtr *p = unwrap(&o);
+		StringPtr *p = unwrap(&o);
 		char *p1 = unwrap(p);
 		printf("      arg[%i]=%s\n", i, p1);
 		i += 1;
@@ -78,7 +78,7 @@ Result real_main(int argc, char **argv) {
 		Option o = *(Option *)unwrap(&r);
 		if (!o.is_some())
 			break;
-		StringImplPtr *s = (StringImpl *)unwrap(&o);
+		StringPtr *s = (String *)unwrap(&o);
 		char *v = unwrap(s);
 		printf("port=%s\n", v);
 	}
@@ -89,7 +89,7 @@ Result real_main(int argc, char **argv) {
 		Option o = *(Option *)unwrap(&r);
 		if (!o.is_some())
 			break;
-		StringImplPtr *s = (StringImpl *)unwrap(&o);
+		StringPtr *s = (String *)unwrap(&o);
 		char *v = unwrap(s);
 		printf("special=%s\n", v);
 	}

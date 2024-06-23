@@ -1119,7 +1119,7 @@ Option Args_argument(Args *args, u64 index) {
 				}
 			}
 			if (counter == index) {
-				StringImplPtr *s = STRINGIMPLP(argv[i]);
+				StringPtr *s = STRINGIMPLP(argv[i]);
 				return Some(*s);
 			}
 			counter += 1;
@@ -1223,7 +1223,7 @@ Result Args_value(Args *args, char *param) {
 			if (itt == 0) {
 				ArgsParamState_set_itt(
 				    &params_state[match_index], 1);
-				StringImplPtr *ret_str = STRINGIMPLP(argv[i]);
+				StringPtr *ret_str = STRINGIMPLP(argv[i]);
 				ret_val = Some(*ret_str);
 			} else {
 				u64 first_match = i;
@@ -1243,7 +1243,7 @@ Result Args_value(Args *args, char *param) {
 							ret = false;
 							break;
 						}
-						StringImplPtr *ret_str =
+						StringPtr *ret_str =
 						    STRINGIMPLP(argv[i]);
 						ret_val = Some(*ret_str);
 						ArgsParamState_set_itt(
@@ -1255,7 +1255,7 @@ Result Args_value(Args *args, char *param) {
 				}
 			}
 		} else if (takes_value && i < argc) {
-			StringImplPtr *ret_str = STRINGIMPLP(argv[i]);
+			StringPtr *ret_str = STRINGIMPLP(argv[i]);
 			ret_val = Some(*ret_str);
 		}
 	}
