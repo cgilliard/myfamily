@@ -256,3 +256,53 @@ FamTest(base, test_args) {
 FamTest(base, test_args_copy) {
 	Args a1 = ARGS("prog", "v1.0", "MyFamily Developers");
 }
+
+FamTest(base, test_string2) {
+	StringPtr *s1 = tlmalloc(sizeof(String));
+	StringPtr *s2 = STRINGP("this is a test");
+	StringPtr *s3 = tlmalloc(sizeof(String));
+	Rc rc1 = RC(s1);
+	Rc rc2 = RC(s2);
+	Rc rc3 = RC(s3);
+
+	clone(s1, s2);
+	assert(equal(s1, s2));
+
+	clone(s3, s1);
+	assert(equal(s3, s2));
+
+	Result r1 = append(s3, s1);
+	Expect(r1);
+
+	char *test = unwrap(s3);
+	assert_eq_str(test, "this is a testthis is a test");
+
+	assert(!equal(s1, s3));
+	assert(!equal(s2, s3));
+}
+
+Result rc_string_fun() {
+	RcString ret = RCSTRING("rc_string_fun");
+	RcString test;
+	copy(&test, &ret);
+	return Ok(ret);
+}
+
+Result rc_string_fun2() {
+	Result r1 = rc_string_fun();
+	RcString s = *(RcString *)unwrap(&r1);
+	return Ok(s);
+}
+
+FamTest(base, test_rc_string) {
+	RcString rcs = RCSTRING("test2");
+	RcString rcs2;
+	copy(&rcs2, &rcs);
+	assert_eq_str(unwrap(&rcs), "test2");
+	assert_eq_str(unwrap(&rcs2), "test2");
+
+	Result r1 = rc_string_fun2();
+	assert(r1.is_ok());
+	RcString s1 = *(RcString *)unwrap(&r1);
+	assert_eq_str(unwrap(&s1), "rc_string_fun");
+}

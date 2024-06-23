@@ -28,6 +28,11 @@ Result build_args() {
 	Result res2 = Args_add_param(&args, &p2);
 	Expect(res2);
 
+	ArgsParam p23 =
+	    PARAM("portv", "vtcp/ip port to bind to", "v", true, true);
+	Result res23 = Args_add_param(&args, &p23);
+	Expect(res23);
+
 	Result r1 =
 	    SubCommand_build("test1", 2, 5, "this is a a test sub command");
 	Expect(r1);

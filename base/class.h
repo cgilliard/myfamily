@@ -81,6 +81,8 @@ void vtable_cleanup(Vtable *table);
 	    MEMBER_TYPE(name, CAT(_, field_name)) CAT(_, field_name));
 
 #define CLASS(name, ...)                                                       \
+	typedef struct name name;                                              \
+	typedef struct name##Ptr name##Ptr;                                    \
 	typedef struct name##Ptr {                                             \
 		Vdata vdata;                                                   \
 		__VA_ARGS__                                                    \

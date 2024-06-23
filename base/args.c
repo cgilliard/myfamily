@@ -658,7 +658,7 @@ bool find_param(Args *args, char *name, bool *is_takes_value, bool *is_multi,
 bool args_check_sub_command(Args *args, char *arg, u64 *sub_itt,
 			    u64 *sub_index) {
 	u64 len = strlen(arg);
-	if (len > 1 && arg[0] == '-') // option
+	if (len >= 1 && arg[0] == '-') // option
 		return false;
 	u64 sub_count = *Args_get_subs_count(args);
 	SubCommandPtr **sub_arr = *Args_get_subs(args);

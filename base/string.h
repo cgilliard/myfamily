@@ -18,6 +18,11 @@
 #include <base/class.h>
 #include <base/result.h>
 
+Result append(void *dst, void *src);
+
+#define TRAIT_APPEND(T)                                                        \
+	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
+
 #define TRAIT_STRING_BUILD(T)                                                  \
 	TRAIT_REQUIRED(T, Result, build_try, const char *s)                    \
 	TRAIT_REQUIRED(T, T##Ptr, build_expect, const char *s)                 \
@@ -29,11 +34,20 @@ IMPL(String, TRAIT_STRING_BUILD)
 IMPL(String, TRAIT_CLONE)
 IMPL(String, TRAIT_EQUAL)
 IMPL(String, TRAIT_UNWRAP)
+IMPL(String, TRAIT_APPEND)
 #define String DEFINE_CLASS(String)
 
 #define STRINGSSTACKP(s) String_build_expect(s)
 #define STRINGSTACK(s) String_build_try(s)
 #define STRING(s) String_build_ptr_try(s)
 #define STRINGP(s) String_build_ptr_expect(s)
+
+CLASS(RcString, FIELD(RcPtr *, ptr))
+IMPL(RcString, TRAIT_COPY)
+IMPL(RcString, TRAIT_UNWRAP)
+#define RcString DEFINE_CLASS(RcString)
+
+RcString RcString_build(char *s);
+#define RCSTRING(x) RcString_build(x)
 
 #endif // _STRING_BASE__

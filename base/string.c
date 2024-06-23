@@ -14,11 +14,14 @@
 
 #include <base/ekinds.h>
 #include <base/string.h>
+#include <base/unit.h>
 
 GETTER(String, ptr)
 SETTER(String, ptr)
 GETTER(String, len)
 SETTER(String, len)
+GETTER(RcString, ptr)
+SETTER(RcString, ptr)
 
 void String_cleanup(StringPtr *s) {
 	char *ptr = *String_get_ptr(s);
@@ -55,6 +58,7 @@ bool String_equal(String *obj1, String *obj2) {
 		return false;
 	return !strcmp(obj1_ptr, obj2_ptr);
 }
+
 Result String_build_try(const char *s) {
 	if (s == NULL) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "char pointer was NULL");
@@ -101,4 +105,69 @@ Result String_build_ptr_try(const char *s) {
 		return Err(e);
 	}
 	return String_build_try(s);
+}
+
+Result String_append(String *dst, String *src) {
+	char *dst_ptr = *String_get_ptr(dst);
+	char *src_ptr = *String_get_ptr(src);
+	u64 nlen = strlen(dst_ptr) + strlen(src_ptr);
+	char *tmp = tlrealloc(dst_ptr, (nlen + 1) * sizeof(char));
+
+	if (!tmp) {
+		Error err = ERROR(ALLOC_ERROR, "could not allocate "
+					       "sufficient memory");
+		return Err(err);
+	}
+
+	strcat(tmp, src_ptr);
+	String_set_ptr(dst, tmp);
+	String_set_len(dst, nlen);
+
+	return Ok(UNIT);
+}
+
+Result append(void *dst, void *src) {
+	ResultPtr (*do_append)(Object *dst, Object *src) =
+	    find_fn((Object *)src, "append");
+	if (do_append == NULL)
+		panic("append not implemented for this type");
+	return do_append(dst, src);
+}
+
+RcString RcString_build(char *s) {
+	StringPtr *ptr = STRINGP(s);
+	RcPtr *nrc = tlmalloc(sizeof(Rc));
+	*nrc = RC(ptr);
+	RcStringPtr ret = BUILD(RcString, nrc);
+	return ret;
+}
+
+bool RcString_copy(RcString *dst, RcString *src) {
+	RcPtr *src_rc = src->_ptr;
+	RcPtr *nrc = tlmalloc(sizeof(Rc));
+	if (nrc == NULL)
+		return false;
+	if (!clone(nrc, src_rc)) {
+		tlfree(nrc);
+		return false;
+	}
+	dst->_ptr = nrc;
+
+	return true;
+}
+usize RcString_size(RcString *obj) { return sizeof(RcString); }
+
+void *RcString_unwrap(RcString *obj) {
+	RcPtr *ptr = *RcString_get_ptr(obj);
+	StringPtr *s = unwrap(ptr);
+	return unwrap(s);
+}
+
+void RcString_cleanup(RcString *ptr) {
+	RcPtr *rc = *RcString_get_ptr(ptr);
+	if (rc != NULL) {
+		cleanup(rc);
+		tlfree(rc);
+		RcString_set_ptr(ptr, NULL);
+	}
 }

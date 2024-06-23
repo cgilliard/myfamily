@@ -21,5 +21,8 @@ static ErrorKind ALLOC_ERROR = EKIND("MemoryAllocationError");
 static ErrorKind COPY_ERROR = EKIND("CopyError");
 static ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
 static ErrorKind COPY_NOT_IMPLEMENTED_ERROR = EKIND("CopyNotImplemented");
+static ErrorKind FILE_NOT_FOUND_ERROR = EKIND("FileNotFound");
+static ErrorKind IO_ERROR = EKIND("I/O Error");
+static ErrorKind PARSE_ERROR = EKIND("ParseError");
 
 #endif // _BASE_EKINDS__

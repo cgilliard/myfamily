@@ -48,13 +48,6 @@ void print(void *obj) {
 	do_print(obj);
 }
 
-void *unwrap_err(void *obj) {
-	void *(*do_unwrap)(Object *obj) = find_fn((Object *)obj, "unwrap_err");
-	if (do_unwrap == NULL)
-		panic("unwrap_err not implemented for this type");
-	return do_unwrap(obj);
-}
-
 bool copy(void *dst, void *src) {
 	bool *(*do_copy)(Object *dst, Object *src) =
 	    find_fn((Object *)src, "copy");
