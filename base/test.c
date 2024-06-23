@@ -108,18 +108,18 @@ FamTest(base, test_rc) {
 }
 
 FamTest(base, test_string) {
-	StringPtr *s1 = STRINGP("this is a test");
+	StringImplPtr *s1 = STRINGIMPLP("this is a test");
 	Result r1 = Ok(*s1);
-	StringPtr *s2 = unwrap(&r1);
+	StringImplPtr *s2 = unwrap(&r1);
 	assert(equal(s1, s2));
 	char *x = unwrap(s2);
 	assert_eq_str(x, "this is a test");
 }
 
 FamTest(base, test_option) {
-	StringPtr *s1 = STRINGP("test");
+	StringImplPtr *s1 = STRINGIMPLP("test");
 	Option x = Some(*s1);
-	StringPtr *s2 = unwrap(&x);
+	StringImplPtr *s2 = unwrap(&x);
 	assert(equal(s1, s2));
 }
 
@@ -241,14 +241,14 @@ FamTest(base, test_args) {
 
 	Option o1 = Args_argument(&a1, 0);
 	assert(o1.is_some());
-	StringPtr *arg1 = unwrap(&o1);
+	StringImplPtr *arg1 = unwrap(&o1);
 	assert_eq_str(unwrap(arg1), "mysub");
 	Option o2 = Args_argument(&a1, 1);
 	assert(!o2.is_some());
 
-	String scomp1 = STRINGSSTACKP("test84");
-	String scomp2 = STRINGSSTACKP("test84");
-	String scomp3 = STRINGSSTACKP("asldfjkl");
+	StringImpl scomp1 = StringImpl_build_expect("test84");
+	StringImpl scomp2 = StringImpl_build_expect("test84");
+	StringImpl scomp3 = StringImpl_build_expect("asldfjkl");
 	assert(equal(&scomp1, &scomp2));
 	assert(!equal(&scomp1, &scomp3));
 }
@@ -258,9 +258,9 @@ FamTest(base, test_args_copy) {
 }
 
 FamTest(base, test_string2) {
-	StringPtr *s1 = tlmalloc(sizeof(String));
-	StringPtr *s2 = STRINGP("this is a test");
-	StringPtr *s3 = tlmalloc(sizeof(String));
+	StringImplPtr *s1 = tlmalloc(sizeof(StringImpl));
+	StringImplPtr *s2 = STRINGIMPLP("this is a test");
+	StringImplPtr *s3 = tlmalloc(sizeof(StringImpl));
 	Rc rc1 = RC(s1);
 	Rc rc2 = RC(s2);
 	Rc rc3 = RC(s3);
@@ -282,27 +282,31 @@ FamTest(base, test_string2) {
 }
 
 Result rc_string_fun() {
-	RcString ret = RCSTRING("rc_string_fun");
-	RcString test;
+	StringRef ret = STRINGP("rc_string_fun");
+	StringRef test;
 	copy(&test, &ret);
 	return Ok(ret);
 }
 
 Result rc_string_fun2() {
 	Result r1 = rc_string_fun();
-	RcString s = *(RcString *)unwrap(&r1);
+	StringRef s = *(StringRef *)unwrap(&r1);
 	return Ok(s);
 }
 
 FamTest(base, test_rc_string) {
-	RcString rcs = RCSTRING("test2");
-	RcString rcs2;
+	StringRef rcs = STRINGP("test2");
+	StringRef rcs2;
 	copy(&rcs2, &rcs);
 	assert_eq_str(unwrap(&rcs), "test2");
 	assert_eq_str(unwrap(&rcs2), "test2");
 
 	Result r1 = rc_string_fun2();
 	assert(r1.is_ok());
-	RcString s1 = *(RcString *)unwrap(&r1);
+	StringRef s1 = *(StringRef *)unwrap(&r1);
 	assert_eq_str(unwrap(&s1), "rc_string_fun");
+
+	Result r2 = STRING("abc");
+	StringRef s2 = *(StringRef *)Expect(r2);
+	assert_eq_str(unwrap(&s2), "abc");
 }

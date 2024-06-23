@@ -16,30 +16,30 @@
 #include <base/string.h>
 #include <base/unit.h>
 
-GETTER(String, ptr)
-SETTER(String, ptr)
-GETTER(String, len)
-SETTER(String, len)
-GETTER(RcString, ptr)
-SETTER(RcString, ptr)
+GETTER(StringImpl, ptr)
+SETTER(StringImpl, ptr)
+GETTER(StringImpl, len)
+SETTER(StringImpl, len)
+GETTER(StringRef, ptr)
+SETTER(StringRef, ptr)
 
-void String_cleanup(StringPtr *s) {
-	char *ptr = *String_get_ptr(s);
+void StringImpl_cleanup(StringImplPtr *s) {
+	char *ptr = *StringImpl_get_ptr(s);
 	if (ptr != NULL) {
 		tlfree(ptr);
-		String_set_ptr(s, NULL);
-		String_set_len(s, 0);
+		StringImpl_set_ptr(s, NULL);
+		StringImpl_set_len(s, 0);
 	}
 }
-usize String_size(String *s) { return sizeof(String); }
-bool String_clone(String *dst, String *src) {
-	u64 len = *String_get_len(src);
-	String_set_len(dst, len);
+usize StringImpl_size(StringImpl *s) { return sizeof(StringImpl); }
+bool StringImpl_clone(StringImpl *dst, StringImpl *src) {
+	u64 len = *StringImpl_get_len(src);
+	StringImpl_set_len(dst, len);
 	void *tmp = tlmalloc(sizeof(char) * (1 + len));
-	String_set_ptr(dst, tmp);
+	StringImpl_set_ptr(dst, tmp);
 
-	char *dst_ptr = *String_get_ptr(dst);
-	char *src_ptr = *String_get_ptr(src);
+	char *dst_ptr = *StringImpl_get_ptr(dst);
+	char *src_ptr = *StringImpl_get_ptr(src);
 	if (dst_ptr == NULL)
 		return false;
 	else {
@@ -47,19 +47,19 @@ bool String_clone(String *dst, String *src) {
 		return true;
 	}
 }
-void *String_unwrap(StringPtr *obj) {
-	char *ptr = *String_get_ptr(obj);
+void *StringImpl_unwrap(StringImpl *obj) {
+	char *ptr = *StringImpl_get_ptr(obj);
 	return ptr;
 }
-bool String_equal(String *obj1, String *obj2) {
-	char *obj1_ptr = *String_get_ptr(obj1);
-	char *obj2_ptr = *String_get_ptr(obj2);
+bool StringImpl_equal(StringImpl *obj1, StringImpl *obj2) {
+	char *obj1_ptr = *StringImpl_get_ptr(obj1);
+	char *obj2_ptr = *StringImpl_get_ptr(obj2);
 	if (obj1_ptr == NULL || obj2_ptr == NULL)
 		return false;
 	return !strcmp(obj1_ptr, obj2_ptr);
 }
 
-Result String_build_try(const char *s) {
+Result StringImpl_build_try(const char *s) {
 	if (s == NULL) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "char pointer was NULL");
 		return Err(e);
@@ -72,11 +72,11 @@ Result String_build_try(const char *s) {
 	}
 	strcpy(ptr, s);
 
-	String ret = BUILD(String, ptr, len);
+	StringImpl ret = BUILD(StringImpl, ptr, len);
 	return Ok(ret);
 }
 
-String String_build_expect(const char *s) {
+StringImpl StringImpl_build_expect(const char *s) {
 	if (s == NULL)
 		panic("char pointer was NULL");
 	u64 len = strlen(s);
@@ -86,30 +86,30 @@ String String_build_expect(const char *s) {
 	}
 	strcpy(ptr, s);
 
-	StringPtr ret = BUILD(String, ptr, len);
+	StringImplPtr ret = BUILD(StringImpl, ptr, len);
 	return ret;
 }
 
-StringPtr *String_build_ptr_expect(const char *s) {
-	StringPtr *ret = tlmalloc(sizeof(StringPtr));
+StringImplPtr *StringImpl_build_ptr_expect(const char *s) {
+	StringImplPtr *ret = tlmalloc(sizeof(StringImplPtr));
 	if (ret == NULL)
 		panic("Allocation Error: Could not allocate memory");
-	*ret = String_build_expect(s);
+	*ret = StringImpl_build_expect(s);
 	return ret;
 }
 
-Result String_build_ptr_try(const char *s) {
-	StringPtr *ret = tlmalloc(sizeof(StringPtr));
+Result StringImpl_build_ptr_try(const char *s) {
+	StringImplPtr *ret = tlmalloc(sizeof(StringImplPtr));
 	if (ret == NULL) {
 		Error e = ERROR(ALLOC_ERROR, "Could not allocate memory");
 		return Err(e);
 	}
-	return String_build_try(s);
+	return StringImpl_build_try(s);
 }
 
-Result String_append(String *dst, String *src) {
-	char *dst_ptr = *String_get_ptr(dst);
-	char *src_ptr = *String_get_ptr(src);
+Result StringImpl_append(StringImpl *dst, StringImpl *src) {
+	char *dst_ptr = *StringImpl_get_ptr(dst);
+	char *src_ptr = *StringImpl_get_ptr(src);
 	u64 nlen = strlen(dst_ptr) + strlen(src_ptr);
 	char *tmp = tlrealloc(dst_ptr, (nlen + 1) * sizeof(char));
 
@@ -120,8 +120,8 @@ Result String_append(String *dst, String *src) {
 	}
 
 	strcat(tmp, src_ptr);
-	String_set_ptr(dst, tmp);
-	String_set_len(dst, nlen);
+	StringImpl_set_ptr(dst, tmp);
+	StringImpl_set_len(dst, nlen);
 
 	return Ok(UNIT);
 }
@@ -134,15 +134,30 @@ Result append(void *dst, void *src) {
 	return do_append(dst, src);
 }
 
-RcString RcString_build(char *s) {
-	StringPtr *ptr = STRINGP(s);
+StringRef StringRef_buildp(char *s) {
+	StringImplPtr *ptr = STRINGIMPLP(s);
 	RcPtr *nrc = tlmalloc(sizeof(Rc));
+	if (nrc == NULL)
+		panic("could not allocate memory");
 	*nrc = RC(ptr);
-	RcStringPtr ret = BUILD(RcString, nrc);
+	StringRefPtr ret = BUILD(StringRef, nrc);
 	return ret;
 }
 
-bool RcString_copy(RcString *dst, RcString *src) {
+Result StringRef_build(char *s) {
+	StringImplPtr *ptr = STRINGIMPLP(s);
+	RcPtr *nrc = tlmalloc(sizeof(Rc));
+	if (nrc == NULL) {
+		Error err =
+		    ERROR(ALLOC_ERROR, "Could not allocate sufficient memory");
+		return Err(err);
+	}
+	*nrc = RC(ptr);
+	StringRef ret = BUILD(StringRef, nrc);
+	return Ok(ret);
+}
+
+bool StringRef_copy(StringRef *dst, StringRef *src) {
 	RcPtr *src_rc = src->_ptr;
 	RcPtr *nrc = tlmalloc(sizeof(Rc));
 	if (nrc == NULL)
@@ -155,19 +170,19 @@ bool RcString_copy(RcString *dst, RcString *src) {
 
 	return true;
 }
-usize RcString_size(RcString *obj) { return sizeof(RcString); }
+usize StringRef_size(StringRef *obj) { return sizeof(StringRef); }
 
-void *RcString_unwrap(RcString *obj) {
-	RcPtr *ptr = *RcString_get_ptr(obj);
-	StringPtr *s = unwrap(ptr);
+void *StringRef_unwrap(StringRef *obj) {
+	RcPtr *ptr = *StringRef_get_ptr(obj);
+	StringImplPtr *s = unwrap(ptr);
 	return unwrap(s);
 }
 
-void RcString_cleanup(RcString *ptr) {
-	RcPtr *rc = *RcString_get_ptr(ptr);
+void StringRef_cleanup(StringRef *ptr) {
+	RcPtr *rc = *StringRef_get_ptr(ptr);
 	if (rc != NULL) {
 		cleanup(rc);
 		tlfree(rc);
-		RcString_set_ptr(ptr, NULL);
+		StringRef_set_ptr(ptr, NULL);
 	}
 }

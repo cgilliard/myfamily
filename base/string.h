@@ -29,25 +29,25 @@ Result append(void *dst, void *src);
 	TRAIT_REQUIRED(T, T##Ptr *, build_ptr_expect, const char *s)           \
 	TRAIT_REQUIRED(T, Result, build_ptr_try, const char *s)
 
-CLASS(String, FIELD(char *, ptr) FIELD(u64, len))
-IMPL(String, TRAIT_STRING_BUILD)
-IMPL(String, TRAIT_CLONE)
-IMPL(String, TRAIT_EQUAL)
-IMPL(String, TRAIT_UNWRAP)
-IMPL(String, TRAIT_APPEND)
-#define String DEFINE_CLASS(String)
+CLASS(StringImpl, FIELD(char *, ptr) FIELD(u64, len))
+IMPL(StringImpl, TRAIT_STRING_BUILD)
+IMPL(StringImpl, TRAIT_CLONE)
+IMPL(StringImpl, TRAIT_EQUAL)
+IMPL(StringImpl, TRAIT_UNWRAP)
+IMPL(StringImpl, TRAIT_APPEND)
+#define StringImpl DEFINE_CLASS(StringImpl)
 
-#define STRINGSSTACKP(s) String_build_expect(s)
-#define STRINGSTACK(s) String_build_try(s)
-#define STRING(s) String_build_ptr_try(s)
-#define STRINGP(s) String_build_ptr_expect(s)
+#define STRINGIMPL(s) StringImpl_build_ptr_try(s)
+#define STRINGIMPLP(s) StringImpl_build_ptr_expect(s)
 
-CLASS(RcString, FIELD(RcPtr *, ptr))
-IMPL(RcString, TRAIT_COPY)
-IMPL(RcString, TRAIT_UNWRAP)
-#define RcString DEFINE_CLASS(RcString)
+CLASS(StringRef, FIELD(RcPtr *, ptr))
+IMPL(StringRef, TRAIT_COPY)
+IMPL(StringRef, TRAIT_UNWRAP)
+#define StringRef DEFINE_CLASS(StringRef)
 
-RcString RcString_build(char *s);
-#define RCSTRING(x) RcString_build(x)
+StringRef StringRef_buildp(char *s);
+Result StringRef_build(char *s);
+#define STRING(x) StringRef_build(x)
+#define STRINGP(x) StringRef_buildp(x)
 
 #endif // _STRING_BASE__
