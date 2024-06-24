@@ -23,6 +23,19 @@ SETTER(String, len)
 GETTER(StringRef, ptr)
 SETTER(StringRef, ptr)
 
+char *rstrstr(char *s1, char *s2) {
+	size_t s1len = strlen(s1);
+	size_t s2len = strlen(s2);
+	char *s;
+
+	if (s2len > s1len)
+		return NULL;
+	for (s = s1 + s1len - s2len; s >= s1; --s)
+		if (strncmp(s, s2, s2len) == 0)
+			return s;
+	return NULL;
+}
+
 void String_cleanup(StringPtr *s) {
 	char *ptr = *String_get_ptr(s);
 	if (ptr != NULL) {
@@ -47,6 +60,12 @@ bool String_clone(String *dst, String *src) {
 		return true;
 	}
 }
+
+u64 String_len(String *obj) {
+	u64 len = *String_get_len(obj);
+	return len;
+}
+
 void *String_unwrap(String *obj) {
 	char *ptr = *String_get_ptr(obj);
 	return ptr;
@@ -110,14 +129,6 @@ Result String_append(String *dst, String *src) {
 	return Ok(UNIT);
 }
 
-Result append(void *dst, void *src) {
-	ResultPtr (*do_append)(Object *dst, Object *src) =
-	    find_fn((Object *)src, "append");
-	if (do_append == NULL)
-		panic("append not implemented for this type");
-	return do_append(dst, src);
-}
-
 StringRef StringRef_buildp(char *s) {
 	StringPtr *ptr = STRINGPTRP(s);
 	RcPtr *nrc = tlmalloc(sizeof(Rc));
@@ -126,6 +137,13 @@ StringRef StringRef_buildp(char *s) {
 	*nrc = RC(ptr);
 	StringRefPtr ret = BUILD(StringRef, nrc);
 	return ret;
+}
+
+u64 StringRef_len(StringRef *obj) {
+	RcPtr *rc = *StringRef_get_ptr(obj);
+	StringPtr *ptr = unwrap(rc);
+	u64 len = *String_get_len(ptr);
+	return len;
 }
 
 Result StringRef_build(char *s) {
@@ -176,14 +194,6 @@ bool StringRef_clone(StringRef *dst, StringRef *src) {
 	return true;
 }
 
-Result deep_copy(void *dst, void *src) {
-	ResultPtr (*do_deep_copy)(Object *dst, Object *src) =
-	    find_fn((Object *)src, "deep_copy");
-	if (do_deep_copy == NULL)
-		panic("append not implemented for this type");
-	return do_deep_copy(dst, src);
-}
-
 Result StringRef_deep_copy(StringRef *dst, StringRef *src) {
 	RcPtr *src_rc = *StringRef_get_ptr(src);
 	StringPtr *src_str = unwrap(src_rc);
@@ -223,4 +233,77 @@ Result StringRef_append(StringRef *dst, StringRef *src) {
 	StringPtr *dst_ptr = unwrap(dst_rc);
 	StringPtr *src_ptr = unwrap(src_rc);
 	return append(dst_ptr, src_ptr);
+}
+
+Result StringRef_index_of(StringRef *s, StringRef *n) {
+	RcPtr *sptr = *StringRef_get_ptr(s);
+	RcPtr *nptr = *StringRef_get_ptr(n);
+	StringPtr *sstrptr = unwrap(sptr);
+	StringPtr *nstrptr = unwrap(nptr);
+	return String_index_of(sstrptr, nstrptr);
+}
+
+Result StringRef_last_index_of(StringRef *s, StringRef *n) {
+
+	RcPtr *sptr = *StringRef_get_ptr(s);
+	RcPtr *nptr = *StringRef_get_ptr(n);
+	StringPtr *sstrptr = unwrap(sptr);
+	StringPtr *nstrptr = unwrap(nptr);
+	return String_last_index_of(sstrptr, nstrptr);
+}
+
+Result StringRef_substring(StringRef *s, u64 start, u64 end) {
+
+	RcPtr *sptr = *StringRef_get_ptr(s);
+	StringPtr *sstrptr = unwrap(sptr);
+	return String_substring(sstrptr, start, end);
+}
+
+Result String_index_of(StringPtr *s, StringPtr *n) {
+	char *sptr = *String_get_ptr(s);
+	char *nptr = *String_get_ptr(n);
+	char *res = strstr(sptr, nptr);
+	i64 ret;
+	if (res == NULL)
+		ret = -1;
+	else
+		ret = res - sptr;
+	return Ok(ret);
+}
+
+Result String_last_index_of(StringPtr *s, StringPtr *n) {
+	char *sptr = *String_get_ptr(s);
+	char *nptr = *String_get_ptr(n);
+	char *res = rstrstr(sptr, nptr);
+	i64 ret;
+	if (res == NULL)
+		ret = -1;
+	else
+		ret = res - sptr;
+	return Ok(ret);
+}
+
+Result String_substring(StringPtr *s, u64 start, u64 end) {
+	if (start > end) {
+		Error err = ERROR(
+		    ILLEGAL_ARGUMENT,
+		    "start (%llu) must be equal to or less than end (%llu)",
+		    start, end);
+		return Err(err);
+	}
+	u64 len = *String_get_len(s);
+	if (end > len) {
+		Error err = ERROR(ILLEGAL_ARGUMENT,
+				  "end (%llu) must be equal to or less than "
+				  "the length of s (%llu)",
+				  end, len);
+		return Err(err);
+	}
+	char *sptr = *String_get_ptr(s);
+	char nstr[(end - start) + 1];
+	strncpy(nstr, sptr + start, (end - start));
+	nstr[end - start] = 0;
+	StringRef ret = STRINGP(nstr);
+
+	return Ok(ret);
 }

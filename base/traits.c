@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/traits.h>
 #include <base/traits_base.h>
 
 bool equal(void *obj1, void *obj2) {
@@ -82,4 +83,20 @@ void cleanup(void *ptr) {
 	void (*do_cleanup)(Object *ptr) = find_fn((Object *)ptr, "cleanup");
 	if (do_cleanup != NULL)
 		do_cleanup(ptr);
+}
+
+Result append(void *dst, void *src) {
+	ResultPtr (*do_append)(Object *dst, Object *src) =
+	    find_fn((Object *)src, "append");
+	if (do_append == NULL)
+		panic("append not implemented for this type");
+	return do_append(dst, src);
+}
+
+Result deep_copy(void *dst, void *src) {
+	ResultPtr (*do_deep_copy)(Object *dst, Object *src) =
+	    find_fn((Object *)src, "deep_copy");
+	if (do_deep_copy == NULL)
+		panic("append not implemented for this type");
+	return do_deep_copy(dst, src);
 }

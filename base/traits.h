@@ -12,9 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/result.h>
 #include <base/traits_base.h>
+
+#ifndef _BASE_TRAITS__
+#define _BASE_TRAITS__
+
+Result append(void *dst, void *src);
+Result deep_copy(void *dst, void *src);
 
 #define TRAIT_APPEND(T)                                                        \
 	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_DEEP_COPY(T)                                                     \
 	TRAIT_REQUIRED(T, Result, deep_copy, T##Ptr *dst, T##Ptr *src)
+
+#define TRAIT_LEN(T) TRAIT_REQUIRED(T, u64, len, T##Ptr *obj)
+
+#endif // _BASE_TRAITS__

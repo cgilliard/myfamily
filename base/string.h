@@ -19,9 +19,6 @@
 #include <base/result.h>
 #include <base/traits.h>
 
-Result append(void *dst, void *src);
-Result deep_copy(void *dst, void *src);
-
 #define TRAIT_STRINGREF_BUILD(T) TRAIT_REQUIRED(T, Result, build, char *s)
 
 #define TRAIT_STRING_BUILD(T)                                                  \
@@ -29,12 +26,20 @@ Result deep_copy(void *dst, void *src);
 	TRAIT_REQUIRED(T, T##Ptr *, build_ptr_expect, const char *s)           \
 	TRAIT_REQUIRED(T, Result, build_ptr_try, char *s)
 
+#define TRAIT_STRING_CORE(T)                                                   \
+	TRAIT_REQUIRED(T, Result, substring, T##Ptr *s, u64 start, u64 end)    \
+	TRAIT_REQUIRED(T, Result, index_of, T##Ptr *s, T##Ptr *n)              \
+	TRAIT_REQUIRED(T, Result, last_index_of, T##Ptr *s, T##Ptr *n)
+
 CLASS(String, FIELD(char *, ptr) FIELD(u64, len))
 IMPL(String, TRAIT_STRING_BUILD)
 IMPL(String, TRAIT_CLONE)
 IMPL(String, TRAIT_EQUAL)
 IMPL(String, TRAIT_UNWRAP)
 IMPL(String, TRAIT_APPEND)
+IMPL(String, TRAIT_LEN)
+IMPL(String, TRAIT_STRING_CORE)
+
 #define String DEFINE_CLASS(String)
 #define STRINGPTRP(s) String_build_ptr_expect(s)
 #define STRINGPTR(s) String_build_ptr_try(s)
@@ -47,6 +52,8 @@ IMPL(StringRef, TRAIT_CLONE)
 IMPL(StringRef, TRAIT_EQUAL)
 IMPL(StringRef, TRAIT_APPEND)
 IMPL(StringRef, TRAIT_DEEP_COPY)
+IMPL(StringRef, TRAIT_LEN)
+IMPL(StringRef, TRAIT_STRING_CORE)
 #define StringRef DEFINE_CLASS(StringRef)
 
 StringRef StringRef_buildp(char *s);

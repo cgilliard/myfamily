@@ -369,3 +369,41 @@ FamTest(base, test_string_ref_equal) {
 	assert(equal(&sr1, &sr3));
 	assert(!equal(&sr1, &sr2));
 }
+
+FamTest(base, test_string_fns) {
+	StringPtr *s1 = STRINGPTRP("abcdefghijklmnopqrstuvwxyz");
+	StringPtr *s2 = STRINGPTRP("ghi");
+	Result r1 = String_index_of(s1, s2);
+	i64 v1 = *(i64 *)unwrap(&r1);
+	assert_eq(v1, 6);
+	cleanup(s1);
+	tlfree(s1);
+	cleanup(s2);
+	tlfree(s2);
+
+	StringRef s3 = STRINGP("abcdefghijklmnopqrstuvwxyz");
+	StringRef s4 = STRINGP("hijk");
+	Result r2 = StringRef_index_of(&s3, &s4);
+	i64 v2 = *(i64 *)unwrap(&r2);
+	assert_eq(v2, 7);
+
+	StringRef s5 = STRINGP("abcdefghijklmnopqrstuvwxyz");
+	StringRef s6 = STRINGP("hijk");
+	Result r3 = StringRef_last_index_of(&s5, &s6);
+	i64 v3 = *(i64 *)unwrap(&r3);
+	assert_eq(v3, 7);
+
+	StringRef s7 = STRINGP("123456789012345");
+	StringRef s8 = STRINGP("123");
+	Result r4 = StringRef_last_index_of(&s7, &s8);
+	i64 v4 = *(i64 *)unwrap(&r4);
+	assert_eq(v4, 10);
+
+	Result r5 = StringRef_index_of(&s7, &s8);
+	i64 v5 = *(i64 *)unwrap(&r5);
+	assert_eq(v5, 0);
+
+	Result r6 = StringRef_substring(&s7, 2, 4);
+	StringRef ssub = *(StringRef *)unwrap(&r6);
+	assert_eq_str(unwrap(&ssub), "34");
+}
