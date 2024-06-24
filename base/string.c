@@ -51,12 +51,22 @@ void *String_unwrap(String *obj) {
 	char *ptr = *String_get_ptr(obj);
 	return ptr;
 }
+
 bool String_equal(String *obj1, String *obj2) {
 	char *obj1_ptr = *String_get_ptr(obj1);
 	char *obj2_ptr = *String_get_ptr(obj2);
 	if (obj1_ptr == NULL || obj2_ptr == NULL)
 		return false;
 	return !strcmp(obj1_ptr, obj2_ptr);
+}
+
+Result String_build_ptr_try(char *s) {
+	StringPtr rs = BUILD(String, s, strlen(s));
+	StringPtr *rsc = tlmalloc(sizeof(String));
+	clone(rsc, &rs);
+	Rc ret = RC(rsc);
+	Rc_set_flags(&ret, RC_FLAGS_NO_UNWRAP);
+	return Ok(ret);
 }
 
 String String_build_expect(const char *s) {
@@ -73,44 +83,12 @@ String String_build_expect(const char *s) {
 	return ret;
 }
 
-Result String_build_try(const char *s) {
-	if (s == NULL) {
-		Error err = ERROR(ILLEGAL_ARGUMENT, "char * must not be NULL");
-		return Err(err);
-	}
-	u64 len = strlen(s);
-	char *ptr = tlmalloc(sizeof(char) * (1 + len));
-	if (ptr == NULL) {
-		Error err = ERROR(ALLOC_ERROR, "could not allocate "
-					       "sufficient memory");
-		return Err(err);
-	}
-	strcpy(ptr, s);
-
-	StringPtr ret = BUILD(String, ptr, len);
-	return Ok(ret);
-}
-
 StringPtr *String_build_ptr_expect(const char *s) {
 	StringPtr *ret = tlmalloc(sizeof(StringPtr));
 	if (ret == NULL)
 		panic("Allocation Error: Could not allocate memory");
 	*ret = String_build_expect(s);
 	return ret;
-}
-
-Result String_build_ptr_try(const char *s) {
-	StringPtr *ret = tlmalloc(sizeof(StringPtr));
-	if (ret == NULL) {
-		Error err = ERROR(ALLOC_ERROR, "could not allocate "
-					       "sufficient memory");
-		return Err(err);
-	}
-
-	Result res = String_build_try(s);
-	*ret = *(StringPtr *)Try(res);
-
-	return Ok(ret);
 }
 
 Result String_append(String *dst, String *src) {
@@ -141,7 +119,7 @@ Result append(void *dst, void *src) {
 }
 
 StringRef StringRef_buildp(char *s) {
-	StringPtr *ptr = STRINGPTR(s);
+	StringPtr *ptr = STRINGPTRP(s);
 	RcPtr *nrc = tlmalloc(sizeof(Rc));
 	if (nrc == NULL)
 		panic("could not allocate memory");
@@ -151,16 +129,41 @@ StringRef StringRef_buildp(char *s) {
 }
 
 Result StringRef_build(char *s) {
-	StringPtr *ptr = STRINGPTR(s);
+	if (s == NULL) {
+		Error err = ERROR(ILLEGAL_ARGUMENT, "s cannot be NULL");
+		return Err(err);
+	}
+	StringPtr *sptr = tlmalloc(sizeof(String));
+	if (sptr == NULL) {
+		Error err =
+		    ERROR(ALLOC_ERROR, "could not allocate sufficient memory");
+		return Err(err);
+	}
+	StringPtr scpy = BUILD(String, s, strlen(s));
+	if (!clone(sptr, &scpy)) {
+		Error err = ERROR(COPY_ERROR, "could not clone the string");
+		return Err(err);
+	}
 	RcPtr *nrc = tlmalloc(sizeof(Rc));
 	if (nrc == NULL) {
 		Error err =
-		    ERROR(ALLOC_ERROR, "Could not allocate sufficient memory");
+		    ERROR(ALLOC_ERROR, "could not allocate sufficient memory");
 		return Err(err);
 	}
-	*nrc = RC(ptr);
+	*nrc = RC(sptr);
 	StringRef ret = BUILD(StringRef, nrc);
 	return Ok(ret);
+}
+
+bool StringRef_equal(StringRef *dst, StringRef *src) {
+	RcPtr *rc_src = *StringRef_get_ptr(src);
+	RcPtr *rc_dst = *StringRef_get_ptr(dst);
+
+	return equal(unwrap(rc_src), unwrap(rc_dst));
+}
+
+bool StringRef_clone(StringRef *dst, StringRef *src) {
+	return StringRef_copy(dst, src);
 }
 
 bool StringRef_copy(StringRef *dst, StringRef *src) {
@@ -225,4 +228,3 @@ Result StringRef_append(StringRef *dst, StringRef *src) {
 	StringPtr *src_ptr = unwrap(src_rc);
 	return append(dst_ptr, src_ptr);
 }
-

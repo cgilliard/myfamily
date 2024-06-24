@@ -18,14 +18,19 @@
 #include <base/class.h>
 #include <base/traits.h>
 
+#define RC_FLAGS_NO_UNWRAP 0x1
+
 #define TRAIT_RC_BUILD(T) TRAIT_REQUIRED(T, T##Ptr, build, void *ref)
 
-CLASS(Rc, FIELD(void *, ref) FIELD(u64 *, count))
+CLASS(Rc, FIELD(void *, ref) FIELD(u64 *, count) FIELD(u8, flags))
 IMPL(Rc, TRAIT_COPY)
 IMPL(Rc, TRAIT_CLONE)
 IMPL(Rc, TRAIT_RC_BUILD)
 IMPL(Rc, TRAIT_UNWRAP)
 #define Rc DEFINE_CLASS(Rc)
+
+static GETTER(Rc, flags);
+static SETTER(Rc, flags);
 
 #define RC(x) Rc_build(x)
 

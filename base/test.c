@@ -108,7 +108,7 @@ FamTest(base, test_rc) {
 }
 
 FamTest(base, test_string) {
-	StringPtr *s1 = STRINGPTR("this is a test");
+	StringPtr *s1 = STRINGPTRP("this is a test");
 	Result r1 = Ok(*s1);
 	StringPtr *s2 = unwrap(&r1);
 	assert(equal(s1, s2));
@@ -117,7 +117,7 @@ FamTest(base, test_string) {
 }
 
 FamTest(base, test_option) {
-	StringPtr *s1 = STRINGPTR("test");
+	StringPtr *s1 = STRINGPTRP("test");
 	Option x = Some(*s1);
 	StringPtr *s2 = unwrap(&x);
 	assert(equal(s1, s2));
@@ -259,7 +259,7 @@ FamTest(base, test_args_copy) {
 
 FamTest(base, test_string2) {
 	StringPtr *s1 = tlmalloc(sizeof(String));
-	StringPtr *s2 = STRINGPTR("this is a test");
+	StringPtr *s2 = STRINGPTRP("this is a test");
 	StringPtr *s3 = tlmalloc(sizeof(String));
 	Rc rc1 = RC(s1);
 	Rc rc2 = RC(s2);
@@ -310,7 +310,7 @@ FamTest(base, test_rc_string) {
 	StringRef s2 = *(StringRef *)Expect(xx);
 	assert_eq_str(unwrap(&s2), "abc");
 
-	StringPtr *s0 = STRINGPTR("this is a test2");
+	StringPtr *s0 = STRINGPTRP("this is a test2");
 	cleanup(s0);
 	tlfree(s0);
 
@@ -352,4 +352,20 @@ FamTest(base, test_deep_copy) {
 	assert_eq_str(unwrap(&sdr3), "2");
 	// deep copy occurred so it's separate from sdr1
 	assert_eq_str(unwrap(&sdr2), "test");
+}
+
+FamTest(base, test_string_ptr_build) {
+	Result r1 = STRINGPTR("test 7");
+	Rc rc1 = *(Rc *)unwrap(&r1);
+	StringPtr *s1 = unwrap(&rc1);
+	assert_eq_str(unwrap(s1), "test 7");
+}
+
+FamTest(base, test_string_ref_equal) {
+	StringRef sr1 = STRINGP("test1");
+	StringRef sr2 = STRINGP("test2");
+	StringRef sr3 = STRINGP("test1");
+
+	assert(equal(&sr1, &sr3));
+	assert(!equal(&sr1, &sr2));
 }

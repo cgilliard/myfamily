@@ -40,9 +40,11 @@ usize Rc_size(Rc *obj) { return sizeof(Rc); }
 bool Rc_clone(Rc *dst, Rc *src) {
 	u64 *count = *Rc_get_count(src);
 	void *ref = *Rc_get_ref(src);
+	u8 flags = *Rc_get_flags(src);
 	*count += 1;
 	Rc_set_count(dst, count);
 	Rc_set_ref(dst, ref);
+	Rc_set_flags(dst, flags);
 
 	return true;
 }
@@ -50,7 +52,7 @@ bool Rc_clone(Rc *dst, Rc *src) {
 Rc Rc_build(void *obj) {
 	u64 *count = tlmalloc(sizeof(u64));
 	*count = 1;
-	RcPtr ret = BUILD(Rc, obj, count);
+	RcPtr ret = BUILD(Rc, obj, count, 0);
 	return ret;
 }
 

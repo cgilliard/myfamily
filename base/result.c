@@ -149,7 +149,9 @@ void *Result_unwrap(Result *result) {
 		ref = unwrap(ref);
 	} else if (!strcmp(cn, "Rc")) {
 		not_rc = false;
-		ref = unwrap(ref);
+		u8 flags = *Rc_get_flags(ref);
+		if ((flags & RC_FLAGS_NO_UNWRAP) == 0)
+			ref = unwrap(ref);
 	}
 
 	// ownership is now transferred
