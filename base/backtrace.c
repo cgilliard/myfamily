@@ -148,7 +148,7 @@ void BacktraceEntry_cleanup(BacktraceEntry *ptr) {
 		SET_ADDRESS(ptr, NULL);
 	}
 }
-bool BacktraceEntry_copy(BacktraceEntry *dst, BacktraceEntry *src) {
+bool BacktraceEntry_clone(BacktraceEntry *dst, BacktraceEntry *src) {
 	return BacktraceEntry_set_backtrace_entry_values(
 	    dst, *GET_NAME(src), *GET_BIN_NAME(src), *GET_ADDRESS(src),
 	    *GET_FILE_PATH(src));
@@ -364,7 +364,7 @@ void Backtrace_cleanup(Backtrace *ptr) {
 		SET_ROWS(ptr, NULL);
 	}
 }
-bool Backtrace_copy(Backtrace *dst, Backtrace *src) {
+bool Backtrace_clone(Backtrace *dst, Backtrace *src) {
 	bool ret = true;
 	u64 src_count = GET_COUNT(src);
 	SET_COUNT(dst, src_count);

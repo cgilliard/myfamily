@@ -163,10 +163,6 @@ bool StringRef_equal(StringRef *dst, StringRef *src) {
 }
 
 bool StringRef_clone(StringRef *dst, StringRef *src) {
-	return StringRef_copy(dst, src);
-}
-
-bool StringRef_copy(StringRef *dst, StringRef *src) {
 	RcPtr *src_rc = src->_ptr;
 
 	dst->_ptr = tlmalloc(sizeof(Rc));

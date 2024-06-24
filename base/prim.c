@@ -18,7 +18,7 @@
 	void type##_cleanup(type *ptr) {}                                      \
 	usize type##_size(type *ptr) { return sizeof(type); }                  \
 	void *type##_unwrap(type *ptr) { return &ptr->_value; }                \
-	bool type##_copy(type *dst, type *src) {                               \
+	bool type##_clone(type *dst, type *src) {                               \
 		memcpy(&dst->_value, &src->_value, sizeof(prim_type));         \
 		return true;                                                   \
 	}

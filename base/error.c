@@ -20,7 +20,7 @@ GETTER(Error, flags)
 
 void ErrorKind_cleanup(ErrorKindPtr *obj) {}
 usize ErrorKind_size(ErrorKind *obj) { return sizeof(ErrorKind); }
-bool ErrorKind_copy(ErrorKind *dst, ErrorKind *src) {
+bool ErrorKind_clone(ErrorKind *dst, ErrorKind *src) {
 	void *dst_kind = ErrorKind_get_kind(dst);
 	void *src_kind = ErrorKind_get_kind(src);
 	memcpy(dst_kind, src_kind, MAX_ERROR_KIND_LEN);
@@ -36,7 +36,7 @@ void Error_cleanup(ErrorPtr *obj) {
 	cleanup(bt);
 }
 
-bool Error_copy(Error *dst, Error *src) {
+bool Error_clone(Error *dst, Error *src) {
 	if (!copy(&dst->_kind, &src->_kind))
 		return false;
 	memcpy(dst->_message, src->_message, MAX_ERROR_MESSAGE_LEN);

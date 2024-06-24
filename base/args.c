@@ -72,7 +72,7 @@ void ArgsParamState_cleanup(ArgsParamState *ptr) {}
 usize ArgsParamState_size(ArgsParamState *ptr) {
 	return sizeof(ArgsParamState);
 }
-bool ArgsParamState_copy(ArgsParamState *dst, ArgsParamState *src) {
+bool ArgsParamState_clone(ArgsParamState *dst, ArgsParamState *src) {
 	dst->_specified = src->_specified;
 	dst->_itt = src->_itt;
 	return true;
@@ -115,7 +115,7 @@ void ArgsParam_cleanup(ArgsParam *ptr) {
 		ArgsParam_set_short_name(ptr, NULL);
 	}
 }
-bool ArgsParam_copy(ArgsParam *dst, ArgsParam *src) {
+bool ArgsParam_clone(ArgsParam *dst, ArgsParam *src) {
 	bool ret = true;
 	char *name_copy = NULL, *help_copy = NULL, *short_name_copy = NULL;
 
@@ -249,7 +249,7 @@ SubCommand SubCommand_build_impl(char *name, ArgsParam *params,
 	return ret;
 }
 
-bool SubCommand_copy(SubCommand *dst, SubCommand *src) {
+bool SubCommand_clone(SubCommand *dst, SubCommand *src) {
 	bool ret = true;
 	char *src_name = *SubCommand_get_name(src);
 	char *name = tlmalloc(sizeof(char) * (strlen(src_name) + 1));
@@ -478,7 +478,7 @@ Result Args_add_sub(Args *ptr, SubCommand *sub) {
 	return Ok(UNIT);
 }
 
-bool Args_copy(Args *dst, Args *src) {
+bool Args_clone(Args *dst, Args *src) {
 	bool ret = true;
 	char *prog_src = *Args_get_prog(src);
 	char *version_src = *Args_get_version(src);

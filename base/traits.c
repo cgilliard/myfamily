@@ -48,6 +48,8 @@ void print(void *obj) {
 	do_print(obj);
 }
 
+bool default_copy(void *dst, void *src) { return clone(dst, src); }
+
 bool copy(void *dst, void *src) {
 	bool *(*do_copy)(Object *dst, Object *src) =
 	    find_fn((Object *)src, "copy");
@@ -77,7 +79,7 @@ usize size(void *obj) {
 }
 
 void cleanup(void *ptr) {
-	bool (*do_cleanup)(Object *ptr) = find_fn((Object *)ptr, "cleanup");
+	void (*do_cleanup)(Object *ptr) = find_fn((Object *)ptr, "cleanup");
 	if (do_cleanup != NULL)
 		do_cleanup(ptr);
 }

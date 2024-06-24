@@ -34,7 +34,6 @@ void Rc_cleanup(Rc *obj) {
 	}
 }
 
-bool Rc_copy(Rc *dst, Rc *src) { return Rc_clone(dst, src); }
 usize Rc_size(Rc *obj) { return sizeof(Rc); }
 
 bool Rc_clone(Rc *dst, Rc *src) {

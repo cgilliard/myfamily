@@ -32,7 +32,7 @@ void Option_cleanup(Option *option) {
 	}
 }
 usize Option_size(Option *option) { return sizeof(Option); }
-bool Option_copy(Option *dst, Option *src) {
+bool Option_clone(Option *dst, Option *src) {
 	if (src->is_some()) {
 		Object *ref = tlmalloc(size(src));
 		if (!copy(ref, *Option_get_ref(src))) {

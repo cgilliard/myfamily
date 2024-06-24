@@ -20,8 +20,10 @@
 #define TRAIT_EQUAL(T) TRAIT_REQUIRED(T, bool, equal, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_CLONE(T) TRAIT_REQUIRED(T, bool, clone, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_COPY(T)                                                          \
-	TRAIT_REQUIRED(T, bool, copy, T##Ptr *dst, T##Ptr *src)                \
-	TRAIT_SUPER(T, TRAIT_SIZE)
+	TRAIT_IMPL(T, copy, default_copy)                                      \
+	TRAIT_SUPER(T, TRAIT_SIZE)                                             \
+	TRAIT_SUPER(T, TRAIT_CLONE)
+
 #define TRAIT_SIZE(T) TRAIT_REQUIRED(T, usize, size, T##Ptr *obj)
 
 #define TRAIT_TO_STR(T) TRAIT_REQUIRED(T, char *, to_str, T##Ptr *obj)
@@ -29,6 +31,8 @@
 #define TRAIT_PRINT(T) TRAIT_REQUIRED(T, void, print, T##Ptr *obj)
 
 #define TRAIT_UNWRAP(T) TRAIT_REQUIRED(T, void *, unwrap, T##Ptr *obj)
+
+#define TRAIT_TEST(T) TRAIT_IMPL(T, test1, test1_default)
 
 // trait implementations
 bool equal(void *obj1, void *obj2);
@@ -39,5 +43,8 @@ bool clone(void *dest, void *src);
 void cleanup(void *ptr);
 char *to_str(void *s);
 void print(void *ptr);
+
+// default implementations
+bool default_copy(void *dst, void *src);
 
 #endif // _TRAITS_BASE__

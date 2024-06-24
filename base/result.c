@@ -29,7 +29,7 @@ bool is_ok_impl_false() { return false; }
 
 usize Result_size(Result *ptr) { return sizeof(Result); }
 
-bool Result_copy(Result *dst, Result *src) {
+bool Result_clone(Result *dst, Result *src) {
 	Object *ref;
 	void *src_ref = *Result_get_ref(src);
 	if (src_ref) {
