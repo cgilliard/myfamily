@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _UNIT_BASE__
-#define _UNIT_BASE__
+#ifndef _BASE_UNIT__
+#define _BASE_UNIT__
 
 #include <base/class.h>
 #include <base/traits_base.h>
@@ -25,4 +25,4 @@ IMPL(Unit, TRAIT_EQUAL)
 #define Unit DEFINE_CLASS(Unit)
 static Unit UNIT = BUILD(Unit);
 
-#endif // _UNIT_BASE__
+#endif // _BASE_UNIT__

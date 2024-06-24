@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _PANIC_BASE__
-#define _PANIC_BASE__
+#ifndef _BASE_PANIC__
+#define _BASE_PANIC__
 
 void panic(const char *format, ...) __attribute__((noreturn));
 
-#endif // _PANIC_BASE__
+#endif // _BASE_PANIC__

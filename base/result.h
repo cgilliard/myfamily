@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _RESULT_BASE__
-#define _RESULT_BASE__
+#ifndef _BASE_RESULT__
+#define _BASE_RESULT__
 
 #include <base/class.h>
 #include <base/error.h>
@@ -104,4 +104,4 @@ static Result Result_build_ok_bool(void *value) {
 		return Err(err);                                               \
 	});
 
-#endif // _RESULT_BASE__
+#endif // _BASE_RESULT__

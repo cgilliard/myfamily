@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _TLMALLOC_BASE__
-#define _TLMALLOC_BASE__
+#ifndef _BASE_TLMALLOC__
+#define _BASE_TLMALLOC__
 
 #include <base/types.h>
 #include <stddef.h>
@@ -33,4 +33,4 @@ u64 alloc_count();
 u64 realloc_count();
 u64 free_count();
 
-#endif // _TLMALLOC_BASE__
+#endif // _BASE_TLMALLOC__

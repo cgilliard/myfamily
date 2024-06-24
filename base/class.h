@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CLASS_BASE__
-#define _CLASS_BASE__
+#ifndef _BASE_CLASS__
+#define _BASE_CLASS__
 
 #define _GNU_SOURCE
 #include <base/cleanup.h>
@@ -130,4 +130,4 @@ void vtable_cleanup(Vtable *table);
 #define CLASS_NAME(x) ((Object *)(x))->vdata.name
 #define CLASS_NAME_REF(x) ((Object *)(&x))->vdata.name
 
-#endif //_CLASS_BASE__
+#endif // _BASE_CLASS__

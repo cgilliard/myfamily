@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _TRAITS_BASE__
-#define _TRAITS_BASE__
+#ifndef _BASE_TRAITS__
+#define _BASE_TRAITS__
 
 #include <base/class.h>
 
@@ -47,4 +47,4 @@ void print(void *ptr);
 // default implementations
 bool default_copy(void *dst, void *src);
 
-#endif // _TRAITS_BASE__
+#endif // _BASE_TRAITS__

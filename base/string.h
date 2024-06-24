@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _STRING_BASE__
-#define _STRING_BASE__
+#ifndef _BASE_STRING__
+#define _BASE_STRING__
 
 #include <base/class.h>
 #include <base/result.h>
@@ -54,4 +54,4 @@ Result StringRef_build(char *s);
 #define STRING(x) StringRef_build(x)
 #define STRINGP(x) StringRef_buildp(x)
 
-#endif // _STRING_BASE__
+#endif // _BASE_STRING__
