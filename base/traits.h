@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/traits_base.h>
+
 #define TRAIT_APPEND(T)                                                        \
 	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_DEEP_COPY(T)                                                     \
