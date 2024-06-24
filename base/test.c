@@ -108,7 +108,7 @@ FamTest(base, test_rc) {
 }
 
 FamTest(base, test_string) {
-	StringPtr *s1 = STRINGIMPLP("this is a test");
+	StringPtr *s1 = STRINGPTR("this is a test");
 	Result r1 = Ok(*s1);
 	StringPtr *s2 = unwrap(&r1);
 	assert(equal(s1, s2));
@@ -117,7 +117,7 @@ FamTest(base, test_string) {
 }
 
 FamTest(base, test_option) {
-	StringPtr *s1 = STRINGIMPLP("test");
+	StringPtr *s1 = STRINGPTR("test");
 	Option x = Some(*s1);
 	StringPtr *s2 = unwrap(&x);
 	assert(equal(s1, s2));
@@ -259,7 +259,7 @@ FamTest(base, test_args_copy) {
 
 FamTest(base, test_string2) {
 	StringPtr *s1 = tlmalloc(sizeof(String));
-	StringPtr *s2 = STRINGIMPLP("this is a test");
+	StringPtr *s2 = STRINGPTR("this is a test");
 	StringPtr *s3 = tlmalloc(sizeof(String));
 	Rc rc1 = RC(s1);
 	Rc rc2 = RC(s2);
@@ -306,7 +306,50 @@ FamTest(base, test_rc_string) {
 	StringRef s1 = *(StringRef *)unwrap(&r1);
 	assert_eq_str(unwrap(&s1), "rc_string_fun");
 
-	Result r2 = STRING("abc");
-	StringRef s2 = *(StringRef *)Expect(r2);
+	Result xx = STRING("abc");
+	StringRef s2 = *(StringRef *)Expect(xx);
 	assert_eq_str(unwrap(&s2), "abc");
+
+	StringPtr *s0 = STRINGPTR("this is a test2");
+	cleanup(s0);
+	tlfree(s0);
+
+	StringRef sr1 = STRINGP("test");
+	StringRef sr2 = STRINGP("3");
+	Result srr = append(&sr1, &sr2);
+	assert(srr.is_ok());
+	assert_eq_str(unwrap(&sr1), "test3");
+	assert_eq_str(unwrap(&sr2), "3");
+}
+
+FamTest(base, test_deep_copy) {
+	StringRef sr1 = STRINGP("test");
+	StringRef sr2;
+	StringRef sr3 = STRINGP("2");
+
+	copy(&sr2, &sr1);
+	assert_eq_str(unwrap(&sr1), unwrap(&sr2));
+	Result r1 = append(&sr1, &sr3);
+	assert(r1.is_ok());
+
+	assert_eq_str(unwrap(&sr1), "test2");
+	assert_eq_str(unwrap(&sr3), "2");
+	// not a deep copy just a ref copy so this will be the same memory
+	// location as sr1
+	assert_eq_str(unwrap(&sr2), "test2");
+
+	StringRef sdr1 = STRINGP("test");
+	StringRef sdr2 = BUILD(StringRef);
+	StringRef sdr3 = STRINGP("2");
+
+	Result r0 = deep_copy(&sdr2, &sdr1);
+	assert(r0.is_ok());
+	assert_eq_str(unwrap(&sdr1), unwrap(&sdr2));
+	Result r11 = append(&sdr1, &sdr3);
+	assert(r11.is_ok());
+
+	assert_eq_str(unwrap(&sdr1), "test2");
+	assert_eq_str(unwrap(&sdr3), "2");
+	// deep copy occurred so it's separate from sdr1
+	assert_eq_str(unwrap(&sdr2), "test");
 }

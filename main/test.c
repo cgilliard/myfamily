@@ -24,4 +24,3 @@ FamTest(main, main) {
 	Result r = real_main(1, argv);
 	assert(r.is_ok());
 }
-
