@@ -18,7 +18,7 @@
 #include <base/class.h>
 #include <base/option.h>
 #include <base/result.h>
-#include <base/traits.h>
+#include <base/traits_base.h>
 
 #define DEBUG_INIT_NO_EXIT 0x1
 

@@ -12,39 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _TRAITS_BASE__
-#define _TRAITS_BASE__
-
-#include <base/class.h>
-
-#define TRAIT_EQUAL(T) TRAIT_REQUIRED(T, bool, equal, T##Ptr *dst, T##Ptr *src)
-#define TRAIT_CLONE(T) TRAIT_REQUIRED(T, bool, clone, T##Ptr *dst, T##Ptr *src)
-#define TRAIT_COPY(T)                                                          \
-	TRAIT_IMPL(T, copy, default_copy)                                      \
-	TRAIT_SUPER(T, TRAIT_SIZE)                                             \
-	TRAIT_SUPER(T, TRAIT_CLONE)
-
-#define TRAIT_SIZE(T) TRAIT_REQUIRED(T, usize, size, T##Ptr *obj)
-
-#define TRAIT_TO_STR(T) TRAIT_REQUIRED(T, char *, to_str, T##Ptr *obj)
-
-#define TRAIT_PRINT(T) TRAIT_REQUIRED(T, void, print, T##Ptr *obj)
-
-#define TRAIT_UNWRAP(T) TRAIT_REQUIRED(T, void *, unwrap, T##Ptr *obj)
-
-#define TRAIT_TEST(T) TRAIT_IMPL(T, test1, test1_default)
-
-// trait implementations
-bool equal(void *obj1, void *obj2);
-void *unwrap(void *obj);
-usize size(void *obj);
-bool copy(void *dest, void *src);
-bool clone(void *dest, void *src);
-void cleanup(void *ptr);
-char *to_str(void *s);
-void print(void *ptr);
-
-// default implementations
-bool default_copy(void *dst, void *src);
-
-#endif // _TRAITS_BASE__
+#define TRAIT_APPEND(T)                                                        \
+	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
+#define TRAIT_DEEP_COPY(T)                                                     \
+	TRAIT_REQUIRED(T, Result, deep_copy, T##Ptr *dst, T##Ptr *src)

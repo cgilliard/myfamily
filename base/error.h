@@ -17,7 +17,7 @@
 
 #include <base/backtrace.h>
 #include <base/class.h>
-#include <base/traits.h>
+#include <base/traits_base.h>
 
 #define MAX_ERROR_KIND_LEN 128
 #define MAX_ERROR_MESSAGE_LEN 512

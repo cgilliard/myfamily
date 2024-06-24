@@ -16,7 +16,7 @@
 #define _UNIT_BASE__
 
 #include <base/class.h>
-#include <base/traits.h>
+#include <base/traits_base.h>
 
 CLASS(Unit)
 IMPL(Unit, TRAIT_COPY)

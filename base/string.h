@@ -17,14 +17,11 @@
 
 #include <base/class.h>
 #include <base/result.h>
+#include <base/traits.h>
 
 Result append(void *dst, void *src);
 Result deep_copy(void *dst, void *src);
 
-#define TRAIT_APPEND(T)                                                        \
-	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
-#define TRAIT_DEEP_COPY(T)                                                     \
-	TRAIT_REQUIRED(T, Result, deep_copy, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_STRINGREF_BUILD(T) TRAIT_REQUIRED(T, Result, build, char *s)
 
 #define TRAIT_STRING_BUILD(T)                                                  \

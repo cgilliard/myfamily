@@ -16,7 +16,7 @@
 #define _BASE_RC__
 
 #include <base/class.h>
-#include <base/traits.h>
+#include <base/traits_base.h>
 
 #define RC_FLAGS_NO_UNWRAP 0x1
 

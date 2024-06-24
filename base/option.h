@@ -17,7 +17,7 @@
 
 #include <base/class.h>
 #include <base/prim.h>
-#include <base/traits.h>
+#include <base/traits_base.h>
 
 #define TRAIT_OPTION(T) TRAIT_REQUIRED(T, OptionPtr, build, void *ref)
 

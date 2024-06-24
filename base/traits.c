@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/traits.h>
+#include <base/traits_base.h>
 
 bool equal(void *obj1, void *obj2) {
 	if (((Object *)obj1)->vdata.vtable->id !=

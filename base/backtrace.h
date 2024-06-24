@@ -16,7 +16,7 @@
 #define _BASE_BACKTRACE__
 
 #include <base/class.h>
-#include <base/traits.h>
+#include <base/traits_base.h>
 
 #define TRAIT_GENERATE_BACKTRACE(T)                                            \
 	TRAIT_REQUIRED(T, bool, generate, T##Ptr *bt, u64 max_depth)           \

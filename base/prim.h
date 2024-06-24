@@ -16,7 +16,7 @@
 #define _BASE_PRIM__
 
 #include <base/class.h>
-#include <base/traits.h>
+#include <base/traits_base.h>
 
 #define DEFINE_PRIM_CLASS(prim_type, type)                                     \
 	CLASS(type, FIELD(prim_type, value))                                   \

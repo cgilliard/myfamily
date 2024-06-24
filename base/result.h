@@ -19,7 +19,7 @@
 #include <base/error.h>
 #include <base/prim.h>
 #include <base/rc.h>
-#include <base/traits.h>
+#include <base/traits_base.h>
 
 #define TRAIT_RESULT(T)                                                        \
 	TRAIT_REQUIRED(T, ResultPtr, build_ok, void *ref)                      \
