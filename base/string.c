@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/class.h>
 #include <base/ekinds.h>
 #include <base/string.h>
 #include <base/unit.h>
@@ -22,6 +23,14 @@ GETTER(String, len)
 SETTER(String, len)
 GETTER(StringRef, ptr)
 SETTER(StringRef, ptr)
+
+Result char_at(void *s, u64 index) {
+	ResultPtr (*do_char_at)(Object *s, u64 index) =
+	    find_fn((Object *)s, "char_at");
+	if (do_char_at == NULL)
+		panic("char_at not implemented for this type");
+	return do_char_at(s, index);
+}
 
 char *rstrstr(char *s1, char *s2) {
 	size_t s1len = strlen(s1);
@@ -305,5 +314,70 @@ Result String_substring(StringPtr *s, u64 start, u64 end) {
 	nstr[end - start] = 0;
 	StringRef ret = STRINGP(nstr);
 
+	return Ok(ret);
+}
+
+char *StringRef_to_str(StringRef *s) {
+	RcPtr *sptr = *StringRef_get_ptr(s);
+	StringPtr *sstrptr = unwrap(sptr);
+	return to_str(sstrptr);
+}
+
+char *String_to_str(String *s) {
+	char *sptr = *String_get_ptr(s);
+	return sptr;
+}
+
+Result StringRef_index_of_s(StringRef *s, char *n) {
+	RcPtr *sptr = *StringRef_get_ptr(s);
+	StringPtr *sstrptr = unwrap(sptr);
+	return String_index_of_s(sstrptr, n);
+}
+
+Result StringRef_last_index_of_s(StringRef *s, char *n) {
+	RcPtr *sptr = *StringRef_get_ptr(s);
+	StringPtr *sstrptr = unwrap(sptr);
+	return String_last_index_of_s(sstrptr, n);
+}
+
+Result String_index_of_s(String *s, char *n) {
+	char *sptr = *String_get_ptr(s);
+	char *res = strstr(sptr, n);
+	i64 ret;
+	if (res == NULL)
+		ret = -1;
+	else
+		ret = res - sptr;
+	return Ok(ret);
+}
+
+Result String_last_index_of_s(String *s, char *n) {
+	char *sptr = *String_get_ptr(s);
+	char *res = rstrstr(sptr, n);
+	i64 ret;
+	if (res == NULL)
+		ret = -1;
+	else
+		ret = res - sptr;
+	return Ok(ret);
+}
+
+Result StringRef_char_at(StringRef *s, u64 index) {
+	RcPtr *sptr = *StringRef_get_ptr(s);
+	StringPtr *sstrptr = unwrap(sptr);
+	return String_char_at(sstrptr, index);
+}
+
+Result String_char_at(String *s, u64 index) {
+	char *sptr = *String_get_ptr(s);
+	u64 len = *(u64 *)String_get_len(s);
+	if (index >= len) {
+		Error err =
+		    ERROR(STRING_INDEX_OUT_OF_BOUNDS,
+			  "index (%llu) is greater than or equal to len (%llu)",
+			  index, len);
+		return Err(err);
+	}
+	i8 ret = sptr[index];
 	return Ok(ret);
 }

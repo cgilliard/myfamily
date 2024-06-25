@@ -19,6 +19,7 @@
 #include <base/rc.h>
 #include <base/string.h>
 #include <base/test.h>
+#include <base/tokenizer.h>
 #include <base/unit.h>
 
 FamSuite(base);
@@ -373,37 +374,99 @@ FamTest(base, test_string_ref_equal) {
 FamTest(base, test_string_fns) {
 	StringPtr *s1 = STRINGPTRP("abcdefghijklmnopqrstuvwxyz");
 	StringPtr *s2 = STRINGPTRP("ghi");
-	Result r1 = String_index_of(s1, s2);
+	Result r1 = INDEX_OF(s1, s2);
 	i64 v1 = *(i64 *)unwrap(&r1);
 	assert_eq(v1, 6);
-	cleanup(s1);
-	tlfree(s1);
-	cleanup(s2);
-	tlfree(s2);
 
 	StringRef s3 = STRINGP("abcdefghijklmnopqrstuvwxyz");
 	StringRef s4 = STRINGP("hijk");
-	Result r2 = StringRef_index_of(&s3, &s4);
+	Result r2 = INDEX_OF(&s3, &s4);
 	i64 v2 = *(i64 *)unwrap(&r2);
 	assert_eq(v2, 7);
 
 	StringRef s5 = STRINGP("abcdefghijklmnopqrstuvwxyz");
 	StringRef s6 = STRINGP("hijk");
-	Result r3 = StringRef_last_index_of(&s5, &s6);
+	Result r3 = LAST_INDEX_OF(&s5, &s6);
 	i64 v3 = *(i64 *)unwrap(&r3);
 	assert_eq(v3, 7);
 
 	StringRef s7 = STRINGP("123456789012345");
 	StringRef s8 = STRINGP("123");
-	Result r4 = StringRef_last_index_of(&s7, &s8);
+	Result r4 = LAST_INDEX_OF(&s7, &s8);
 	i64 v4 = *(i64 *)unwrap(&r4);
 	assert_eq(v4, 10);
 
-	Result r5 = StringRef_index_of(&s7, &s8);
+	Result r5 = INDEX_OF(&s7, &s8);
 	i64 v5 = *(i64 *)unwrap(&r5);
 	assert_eq(v5, 0);
 
-	Result r6 = StringRef_substring(&s7, 2, 4);
+	Result r7 = INDEX_OF(&s7, &s6);
+	i64 v7 = *(i64 *)unwrap(&r7);
+	assert_eq(v7, -1);
+
+	Result r6 = SUBSTRING(&s7, 2, 4);
 	StringRef ssub = *(StringRef *)unwrap(&r6);
-	assert_eq_str(unwrap(&ssub), "34");
+	assert_eq_str(to_str(&ssub), "34");
+	assert_eq_str(to_str(s1), to_str(&s3));
+	assert(strcmp(to_str(s1), to_str(s2)));
+
+	Result r10 = LAST_INDEX_OF(&s7, "123");
+	assert_eq(10, *(i64 *)unwrap(&r10));
+
+	Result r11 = INDEX_OF(&s7, "123");
+	assert_eq(0, *(i64 *)unwrap(&r11));
+
+	StringRef lentest = STRINGP("abcdefgh123456789");
+	Result r12 = INDEX_OF(&lentest, "1234");
+	u64 start = *(i64 *)unwrap(&r12);
+	u64 end = len(&lentest);
+	Result r13 = SUBSTRING(&lentest, start, end);
+	StringRef sub = *(StringRef *)unwrap(&r13);
+	assert_eq_str(to_str(&sub), "123456789");
+
+	Result rch1 = char_at(&lentest, 3);
+	char ch1 = *(char *)unwrap(&rch1);
+	assert_eq(ch1, 'd');
+
+	Result rch2 = char_at(&lentest, 0);
+	char ch2 = *(char *)unwrap(&rch2);
+	assert_eq(ch2, 'a');
+
+	Result rch3 = char_at(&lentest, 100);
+	assert(!rch3.is_ok());
+
+	cleanup(s1);
+	tlfree(s1);
+	cleanup(s2);
+	tlfree(s2);
 }
+
+FamTest(base, test_tokenizer) {
+
+	StringRef line = STRINGP("this is a test");
+	Result r1 = Tokenizer_parse(&line);
+	Tokenizer t1 = *(Tokenizer *)unwrap(&r1);
+	Result r2 = Tokenizer_next_token(&t1);
+}
+
+Result ret_str(StringRef s) {
+	StringRef ret;
+	copy(&ret, &s);
+	return Ok(ret);
+}
+
+FamTest(base, test_str_refs) {
+	StringRef s = STRINGP("testing 1234");
+	Result r1 = ret_str(s);
+	StringRef rref = *(StringRef *)unwrap(&r1);
+	assert_eq_str(to_str(&rref), "testing 1234");
+}
+
+FamTest(base, test_option_cleanup) {
+	StringPtr *ptr = STRINGPTRP("abc");
+	Rc rc = RC(ptr);
+	Option x = Some(rc);
+	StringPtr *ptr_out = unwrap(&x);
+	assert_eq_str(to_str(ptr_out), "abc");
+}
+

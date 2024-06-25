@@ -15,6 +15,7 @@
 #ifndef _PARSER_PARSER__
 #define _PARSER_PARSER__
 
+/*
 #include <base/class.h>
 #include <base/result.h>
 
@@ -74,5 +75,6 @@ CLASS(TokenTree,
       FIELD(TokenTreeType, token_type) FIELD(Ident, ident) FIELD(Group, group)
 	  FIELD(Punct, punct) FIELD(Literal, literal) FIELD(Span, span))
 #define TokenTree DEFINE_CLASS(TokenTree)
+*/
 
 #endif // _PARSER_PARSER__

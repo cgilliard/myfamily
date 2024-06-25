@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/*
 #include <base/ekinds.h>
 #include <base/option.h>
 #include <base/tlmalloc.h>
@@ -73,3 +74,4 @@ Result TokenStream_parse(char *path, u64 flags) {
 
 	TokenStream_set_fp(&strm, fp);
 }
+*/

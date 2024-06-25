@@ -21,11 +21,11 @@ SETTER(Rc, ref)
 
 void Rc_cleanup(Rc *obj) {
 	u64 *count = *Rc_get_count(obj);
+	void *ref = *Rc_get_ref(obj);
 	if (count) {
 		*count -= 1;
 
 		if (*count == 0) {
-			void *ref = *Rc_get_ref(obj);
 			cleanup(ref);
 			tlfree(ref);
 			tlfree(count);

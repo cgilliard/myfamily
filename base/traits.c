@@ -100,3 +100,10 @@ Result deep_copy(void *dst, void *src) {
 		panic("append not implemented for this type");
 	return do_deep_copy(dst, src);
 }
+
+u64 len(void *obj) {
+	u64 (*do_len)(Object *obj) = find_fn((Object *)obj, "len");
+	if (do_len == NULL)
+		panic("len not implemented for this type");
+	return do_len(obj);
+}

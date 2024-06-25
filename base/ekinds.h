@@ -24,5 +24,6 @@ static ErrorKind COPY_NOT_IMPLEMENTED_ERROR = EKIND("CopyNotImplemented");
 static ErrorKind FILE_NOT_FOUND_ERROR = EKIND("FileNotFound");
 static ErrorKind IO_ERROR = EKIND("I/O Error");
 static ErrorKind PARSE_ERROR = EKIND("ParseError");
+static ErrorKind STRING_INDEX_OUT_OF_BOUNDS = EKIND("StringIndexOutOfBounds");
 
 #endif // _BASE_EKINDS__

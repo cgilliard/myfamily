@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/result.h>
+#include <base/string.h>
 #include <base/traits_base.h>
 
 #ifndef _BASE_TRAITS__
@@ -20,6 +21,7 @@
 
 Result append(void *dst, void *src);
 Result deep_copy(void *dst, void *src);
+u64 len(void *obj);
 
 #define TRAIT_APPEND(T)                                                        \
 	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
@@ -27,5 +29,9 @@ Result deep_copy(void *dst, void *src);
 	TRAIT_REQUIRED(T, Result, deep_copy, T##Ptr *dst, T##Ptr *src)
 
 #define TRAIT_LEN(T) TRAIT_REQUIRED(T, u64, len, T##Ptr *obj)
+
+#define TRAIT_TOKENIZER(T)                                                     \
+	TRAIT_REQUIRED(T, Result, parse, StringRef *s)                         \
+	TRAIT_REQUIRED(T, Result, next_token, T##Ptr *self)
 
 #endif // _BASE_TRAITS__
