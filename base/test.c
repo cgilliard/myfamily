@@ -442,7 +442,6 @@ FamTest(base, test_string_fns) {
 }
 
 FamTest(base, test_tokenizer) {
-
 	StringRef line = STRINGP("this is a test");
 	Result r1 = Tokenizer_parse(&line);
 	Tokenizer t1 = *(Tokenizer *)unwrap(&r1);
@@ -470,3 +469,47 @@ FamTest(base, test_option_cleanup) {
 	assert_eq_str(to_str(ptr_out), "abc");
 }
 
+CLASS(TestResult, FIELD(char *, value))
+IMPL(TestResult, TRAIT_CLONE);
+#define TestResult DEFINE_CLASS(TestResult)
+GETTER(TestResult, value)
+SETTER(TestResult, value)
+
+bool TestResult_clone(TestResult *dst, TestResult *src) { return true; }
+usize TestResult_size(TestResult *obj) { return sizeof(TestResult); }
+
+void TestResult_cleanup(TestResult *tr) {
+	char *value = *TestResult_get_value(tr);
+	if (value) {
+		tlfree(value);
+		TestResult_set_value(tr, NULL);
+	}
+}
+
+FamTest(base, test_result_scenarios) {
+	char *value = tlmalloc(sizeof(char) * 10);
+	strcpy(value, "test1");
+	TestResult tr = BUILD(TestResult, value);
+	TestResultPtr *tr2 = tlmalloc(sizeof(TestResult));
+	BUILDPTR(tr2, TestResult);
+	char *value2 = tlmalloc(sizeof(char) * 10);
+	strcpy(value2, "test2");
+	TestResult_set_value(tr2, value2);
+
+	Result r1 = Ok(tr);
+	assert(!r1.is_ok());
+
+	Rc rc = RC(tr2);
+	Rc rc2;
+	clone(&rc2, &rc);
+	Result r2 = Ok(rc);
+	assert(r2.is_ok());
+	TestResultPtr tr2_out = *(TestResult *)unwrap(&r2);
+	char *value_out = *TestResult_get_value(&tr2_out);
+	assert_eq_str(value_out, "test2");
+
+	Option o3 = Some(rc2);
+	TestResultPtr tr2_out2 = *(TestResult *)unwrap(&o3);
+	char *value_out2 = *TestResult_get_value(&tr2_out2);
+	assert_eq_str(value_out2, "test2");
+}

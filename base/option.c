@@ -50,8 +50,7 @@ bool Option_clone(Option *dst, Option *src) {
 }
 Option Option_build(void *ref) {
 	if (!implements(ref, "copy")) {
-		Rc rc = RC(ref);
-		return Option_build(&rc);
+		panic("Copy must be implemented to build an option");
 	}
 	void *ref_copy = tlmalloc(size(ref));
 	if (!ref_copy) {

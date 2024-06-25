@@ -97,8 +97,9 @@ Result Result_build_err(Error *ref) {
 
 Result Result_build_ok(void *ref) {
 	if (!implements(ref, "copy")) {
-		Rc rc = RC(ref);
-		return Result_build_ok(&rc);
+		Error err = ERROR(COPY_NOT_IMPLEMENTED_ERROR,
+				  "Copy must be implemented to build a result");
+		return Err(err);
 	}
 
 	void *ref_copy = tlmalloc(size(ref));

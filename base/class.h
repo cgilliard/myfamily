@@ -55,6 +55,11 @@ void vtable_cleanup(Vtable *table);
 #define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup)
 
 #define BUILD(name, ...) {{&name##Vtable, #name}, __VA_ARGS__}
+#define BUILDPTR(ptr, cname)                                                   \
+	({                                                                     \
+		ptr->vdata.vtable = &cname##Vtable;                            \
+		ptr->vdata.name = #cname;                                      \
+	})
 
 #define MEMBER_TYPE(type, member) typeof(((type *)0)->member)
 
