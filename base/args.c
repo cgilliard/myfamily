@@ -1120,7 +1120,8 @@ Option Args_argument(Args *args, u64 index) {
 			}
 			if (counter == index) {
 				StringPtr *s = STRINGPTRP(argv[i]);
-				return Some(*s);
+				Rc rc = RC(s);
+				return Some(rc);
 			}
 			counter += 1;
 		}
@@ -1224,7 +1225,8 @@ Result Args_value(Args *args, char *param) {
 				ArgsParamState_set_itt(
 				    &params_state[match_index], 1);
 				StringPtr *ret_str = STRINGPTRP(argv[i]);
-				ret_val = Some(*ret_str);
+				Rc rc = RC(ret_str);
+				ret_val = Some(rc);
 			} else {
 				u64 first_match = i;
 				i += itt;
@@ -1245,7 +1247,8 @@ Result Args_value(Args *args, char *param) {
 						}
 						StringPtr *ret_str =
 						    STRINGPTRP(argv[i]);
-						ret_val = Some(*ret_str);
+						Rc rc = RC(ret_str);
+						ret_val = Some(rc);
 						ArgsParamState_set_itt(
 						    &params_state[match_index],
 						    (i - first_match) + 1);
@@ -1256,7 +1259,8 @@ Result Args_value(Args *args, char *param) {
 			}
 		} else if (takes_value && i < argc) {
 			StringPtr *ret_str = STRINGPTRP(argv[i]);
-			ret_val = Some(*ret_str);
+			Rc rc = RC(ret_str);
+			ret_val = Some(rc);
 		}
 	}
 

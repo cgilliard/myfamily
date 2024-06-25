@@ -110,7 +110,8 @@ FamTest(base, test_rc) {
 
 FamTest(base, test_string) {
 	StringPtr *s1 = STRINGPTRP("this is a test");
-	Result r1 = Ok(*s1);
+	Rc rc = RC(s1);
+	Result r1 = Ok(rc);
 	StringPtr *s2 = unwrap(&r1);
 	assert(equal(s1, s2));
 	char *x = unwrap(s2);
@@ -119,7 +120,8 @@ FamTest(base, test_string) {
 
 FamTest(base, test_option) {
 	StringPtr *s1 = STRINGPTRP("test");
-	Option x = Some(*s1);
+	Rc rc = RC(s1);
+	Option x = Some(rc);
 	StringPtr *s2 = unwrap(&x);
 	assert(equal(s1, s2));
 }
