@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/error.h>
 #include <base/option.h>
 #include <base/result.h>
 #include <base/string.h>
@@ -176,4 +177,17 @@ FamTest(base, test_string_ref) {
 	RcPtr *rc11 = unwrap(&r11);
 	StringPtr *s11 = unwrap(rc11);
 	assert_eq_str(unwrap(s11), "another");
+}
+
+FamTest(base, test_error_clone) {
+	ErrorKind kind1 = EKIND("TestKind");
+	Error e1 = ERROR(kind1, "this is a test");
+	Error e2;
+	copy(&e2, &e1);
+	ErrorKindPtr *k2 = Error_get_kind(&e2);
+	assert(equal(&kind1, k2));
+	char *msg = (char *)Error_get_message(&e2);
+	assert_eq_str(msg, "this is a test");
+	print(&e1);
+	print(&e2);
 }

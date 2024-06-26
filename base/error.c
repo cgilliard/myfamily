@@ -37,10 +37,18 @@ void Error_cleanup(ErrorPtr *obj) {
 }
 
 bool Error_clone(Error *dst, Error *src) {
-	if (!copy(&dst->_kind, &src->_kind))
+	ErrorKindPtr *dst_kind = Error_get_kind(dst);
+	ErrorKindPtr *src_kind = Error_get_kind(src);
+	if (!copy(dst_kind, src_kind))
 		return false;
-	memcpy(dst->_message, src->_message, MAX_ERROR_MESSAGE_LEN);
-	return copy(&dst->_bt, &src->_bt);
+
+	char *src_msg = (char *)Error_get_message(src);
+	char *dst_msg = (char *)Error_get_message(dst);
+	memcpy(dst_msg, src_msg, MAX_ERROR_MESSAGE_LEN);
+
+	BacktracePtr *bt = Error_get_bt(dst);
+	BacktracePtr *src_bt = Error_get_bt(src);
+	return copy(bt, src_bt);
 }
 
 usize Error_size(Error *obj) { return sizeof(Error); }
