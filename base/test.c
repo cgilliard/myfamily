@@ -17,6 +17,7 @@
 #include <base/result.h>
 #include <base/string.h>
 #include <base/test.h>
+#include <base/tokenizer.h>
 #include <base/unit.h>
 
 FamSuite(base);
@@ -222,4 +223,84 @@ FamTest(base, test_deep_copy) {
 	assert_eq_str(unwrap(&sdr3), "2");
 	// deep copy occurred so it's separate from sdr1
 	assert_eq_str(unwrap(&sdr2), "test");
+}
+
+FamTest(base, test_ident) {
+	Ident ident = IDENT("abc");
+	assert_eq_str(to_str(&ident), "abc");
+
+	Ident ident2;
+	bool cr = clone(&ident2, &ident);
+	assert(cr);
+
+	assert_eq_str(to_str(&ident2), "abc");
+}
+
+FamTest(base, test_literal) {
+	Literal literal = LITERAL("\"def\"");
+	assert_eq_str(to_str(&literal), "\"def\"");
+
+	Literal literal2;
+	bool cr = clone(&literal2, &literal);
+	assert(cr);
+	assert_eq_str(to_str(&literal2), "\"def\"");
+
+	Literal literal3 = LITERAL(100);
+	assert_eq_str(to_str(&literal3), "100");
+
+	Literal literal4;
+	cr = clone(&literal4, &literal3);
+	assert(cr);
+	assert_eq_str(to_str(&literal4), "100");
+}
+
+FamTest(base, test_punct) {
+	Punct p1 = PUNCT('.', '.', '.');
+	assert_eq(*Punct_get_ch(&p1), '.');
+	assert_eq(*Punct_get_second_ch(&p1), '.');
+	assert_eq(*Punct_get_third_ch(&p1), '.');
+
+	Punct p2 = PUNCT('<');
+	assert_eq(*Punct_get_ch(&p2), '<');
+	assert_eq(*Punct_get_second_ch(&p2), 0);
+	assert_eq(*Punct_get_third_ch(&p2), 0);
+}
+
+FamTest(base, test_token) {
+	IdentPtr ident = IDENT("abc");
+	Token t1 = TOKEN(ident);
+	Token t2;
+	clone(&t2, &t1);
+	assert_eq(*Token_get_ttype(&t1), IdentType);
+	assert_eq(*Token_get_ttype(&t2), IdentType);
+	IdentPtr t1_out = *Token_get_ident(&t1);
+	assert_eq_str(to_str(&t1_out), "abc");
+	IdentPtr t2_out = *Token_get_ident(&t2);
+	assert_eq_str(to_str(&t2_out), "abc");
+
+	PunctPtr punct = PUNCT('<', '=');
+	Token t3 = TOKEN(punct);
+	Token t4;
+	clone(&t4, &t3);
+	assert_eq(*Token_get_ttype(&t3), PunctType);
+	assert_eq(*Token_get_ttype(&t4), PunctType);
+	PunctPtr t3_out = *Token_get_punct(&t3);
+	assert_eq(*Punct_get_ch(&t3_out), '<');
+	assert_eq(*Punct_get_second_ch(&t3_out), '=');
+	assert_eq(*Punct_get_third_ch(&t3_out), 0);
+	PunctPtr t4_out = *Token_get_punct(&t4);
+	assert_eq(*Punct_get_ch(&t4_out), '<');
+	assert_eq(*Punct_get_second_ch(&t4_out), '=');
+	assert_eq(*Punct_get_third_ch(&t4_out), 0);
+
+	LiteralPtr literal = LITERAL(-155023);
+	Token t5 = TOKEN(literal);
+	Token t6;
+	clone(&t6, &t5);
+	assert_eq(*Token_get_ttype(&t5), LiteralType);
+	assert_eq(*Token_get_ttype(&t6), LiteralType);
+	LiteralPtr t5_out = *Token_get_literal(&t5);
+	assert_eq_str(to_str(&t5_out), "-155023");
+	LiteralPtr t6_out = *Token_get_literal(&t6);
+	assert_eq_str(to_str(&t6_out), "-155023");
 }

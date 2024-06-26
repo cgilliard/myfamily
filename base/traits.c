@@ -98,6 +98,8 @@ Result deep_copy(void *dst, void *src) {
 	    find_fn((Object *)src, "deep_copy");
 	if (do_deep_copy == NULL)
 		panic("append not implemented for this type");
+	((Object *)dst)->vdata.vtable = ((Object *)src)->vdata.vtable;
+	((Object *)dst)->vdata.name = ((Object *)src)->vdata.name;
 	return do_deep_copy(dst, src);
 }
 
