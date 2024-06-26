@@ -279,15 +279,17 @@ bool StringRef_equal(StringRef *dst, StringRef *src) {
 }
 
 bool StringRef_clone(StringRef *dst, StringRef *src) {
-	RcPtr *src_rc = src->_ptr;
+	RcPtr *src_rc = *StringRef_get_ptr(src);
+	RcPtr *dst_rc = tlmalloc(sizeof(Rc));
 
-	dst->_ptr = tlmalloc(sizeof(Rc));
-	if (dst->_ptr == NULL)
+	if (dst_rc == NULL)
 		return false;
-	if (!clone(dst->_ptr, src_rc)) {
-		tlfree(dst->_ptr);
+	if (!clone(dst_rc, src_rc)) {
+		tlfree(dst_rc);
 		return false;
 	}
+
+	StringRef_set_ptr(dst, dst_rc);
 
 	return true;
 }
@@ -295,16 +297,24 @@ bool StringRef_clone(StringRef *dst, StringRef *src) {
 Result StringRef_deep_copy(StringRef *dst, StringRef *src) {
 	RcPtr *src_rc = *StringRef_get_ptr(src);
 	StringPtr *src_str = unwrap(src_rc);
-	dst->_ptr = tlmalloc(sizeof(Rc));
-	StringPtr *dst_str = tlmalloc(sizeof(String));
-	if (dst_str == NULL) {
+	RcPtr *dst_ptr = tlmalloc(sizeof(Rc));
+	if (dst_ptr == NULL) {
 		Error err =
 		    ERROR(ALLOC_ERROR, "Could not allocate sufficient memory");
 		return Err(err);
 	}
+	StringPtr *dst_str = tlmalloc(sizeof(String));
+	if (dst_str == NULL) {
+		tlfree(dst_ptr);
+		Error err =
+		    ERROR(ALLOC_ERROR, "Could not allocate sufficient memory");
+		return Err(err);
+	}
+
 	clone(dst_str, src_str);
 	Rc x = RC(dst_str);
-	copy(dst->_ptr, &x);
+	copy(dst_ptr, &x);
+	StringRef_set_ptr(dst, dst_ptr);
 	return Ok(UNIT);
 }
 
