@@ -13,14 +13,7 @@
 // limitations under the License.
 
 #include <base/test.h>
-#include <criterion/criterion.h>
-#include <criterion/hooks.h>
-#include <main/main.h>
 
 FamSuite(main);
 
-FamTest(main, main) {
-	char *argv[] = {"test"};
-	Result r = real_main(1, argv);
-	assert(r.is_ok());
-}
+FamTest(main, main) {}

@@ -155,7 +155,6 @@ void *Result_unwrap(Result *result) {
 			ref = unwrap(ref);
 		}
 	}
-
 	// ownership is now transferred
 	// we don't want to cleanup
 	if (not_rc)

@@ -138,6 +138,95 @@ Result String_append(String *dst, String *src) {
 	return Ok(UNIT);
 }
 
+Result String_index_of(StringPtr *s, StringPtr *n) {
+	char *sptr = *String_get_ptr(s);
+	char *nptr = *String_get_ptr(n);
+	char *res = strstr(sptr, nptr);
+	i64 ret;
+	if (res == NULL)
+		ret = -1;
+	else
+		ret = res - sptr;
+	return Ok(ret);
+}
+
+Result String_last_index_of(StringPtr *s, StringPtr *n) {
+	char *sptr = *String_get_ptr(s);
+	char *nptr = *String_get_ptr(n);
+	char *res = rstrstr(sptr, nptr);
+	i64 ret;
+	if (res == NULL)
+		ret = -1;
+	else
+		ret = res - sptr;
+	return Ok(ret);
+}
+
+Result String_substring(StringPtr *s, u64 start, u64 end) {
+	if (start > end) {
+		Error err = ERROR(
+		    ILLEGAL_ARGUMENT,
+		    "start (%llu) must be equal to or less than end (%llu)",
+		    start, end);
+		return Err(err);
+	}
+	u64 len = *String_get_len(s);
+	if (end > len) {
+		Error err = ERROR(ILLEGAL_ARGUMENT,
+				  "end (%llu) must be equal to or less than "
+				  "the length of s (%llu)",
+				  end, len);
+		return Err(err);
+	}
+	char *sptr = *String_get_ptr(s);
+	char nstr[(end - start) + 1];
+	strncpy(nstr, sptr + start, (end - start));
+	nstr[end - start] = 0;
+
+	return STRINGPTR(nstr);
+}
+
+char *String_to_str(String *s) {
+	char *sptr = *String_get_ptr(s);
+	return sptr;
+}
+
+Result String_index_of_s(String *s, char *n) {
+	char *sptr = *String_get_ptr(s);
+	char *res = strstr(sptr, n);
+	i64 ret;
+	if (res == NULL)
+		ret = -1;
+	else
+		ret = res - sptr;
+	return Ok(ret);
+}
+
+Result String_last_index_of_s(String *s, char *n) {
+	char *sptr = *String_get_ptr(s);
+	char *res = rstrstr(sptr, n);
+	i64 ret;
+	if (res == NULL)
+		ret = -1;
+	else
+		ret = res - sptr;
+	return Ok(ret);
+}
+
+Result String_char_at(String *s, u64 index) {
+	char *sptr = *String_get_ptr(s);
+	u64 len = *(u64 *)String_get_len(s);
+	if (index >= len) {
+		Error err =
+		    ERROR(STRING_INDEX_OUT_OF_BOUNDS,
+			  "index (%llu) is greater than or equal to len (%llu)",
+			  index, len);
+		return Err(err);
+	}
+	i8 ret = sptr[index];
+	return Ok(ret);
+}
+
 StringRef StringRef_buildp(char *s) {
 	StringPtr *ptr = STRINGPTRP(s);
 	RcPtr *nrc = tlmalloc(sizeof(Rc));
@@ -268,64 +357,10 @@ Result StringRef_substring(StringRef *s, u64 start, u64 end) {
 	return String_substring(sstrptr, start, end);
 }
 
-Result String_index_of(StringPtr *s, StringPtr *n) {
-	char *sptr = *String_get_ptr(s);
-	char *nptr = *String_get_ptr(n);
-	char *res = strstr(sptr, nptr);
-	i64 ret;
-	if (res == NULL)
-		ret = -1;
-	else
-		ret = res - sptr;
-	return Ok(ret);
-}
-
-Result String_last_index_of(StringPtr *s, StringPtr *n) {
-	char *sptr = *String_get_ptr(s);
-	char *nptr = *String_get_ptr(n);
-	char *res = rstrstr(sptr, nptr);
-	i64 ret;
-	if (res == NULL)
-		ret = -1;
-	else
-		ret = res - sptr;
-	return Ok(ret);
-}
-
-Result String_substring(StringPtr *s, u64 start, u64 end) {
-	if (start > end) {
-		Error err = ERROR(
-		    ILLEGAL_ARGUMENT,
-		    "start (%llu) must be equal to or less than end (%llu)",
-		    start, end);
-		return Err(err);
-	}
-	u64 len = *String_get_len(s);
-	if (end > len) {
-		Error err = ERROR(ILLEGAL_ARGUMENT,
-				  "end (%llu) must be equal to or less than "
-				  "the length of s (%llu)",
-				  end, len);
-		return Err(err);
-	}
-	char *sptr = *String_get_ptr(s);
-	char nstr[(end - start) + 1];
-	strncpy(nstr, sptr + start, (end - start));
-	nstr[end - start] = 0;
-	StringRef ret = STRINGP(nstr);
-
-	return Ok(ret);
-}
-
 char *StringRef_to_str(StringRef *s) {
 	RcPtr *sptr = *StringRef_get_ptr(s);
 	StringPtr *sstrptr = unwrap(sptr);
 	return to_str(sstrptr);
-}
-
-char *String_to_str(String *s) {
-	char *sptr = *String_get_ptr(s);
-	return sptr;
 }
 
 Result StringRef_index_of_s(StringRef *s, char *n) {
@@ -340,44 +375,8 @@ Result StringRef_last_index_of_s(StringRef *s, char *n) {
 	return String_last_index_of_s(sstrptr, n);
 }
 
-Result String_index_of_s(String *s, char *n) {
-	char *sptr = *String_get_ptr(s);
-	char *res = strstr(sptr, n);
-	i64 ret;
-	if (res == NULL)
-		ret = -1;
-	else
-		ret = res - sptr;
-	return Ok(ret);
-}
-
-Result String_last_index_of_s(String *s, char *n) {
-	char *sptr = *String_get_ptr(s);
-	char *res = rstrstr(sptr, n);
-	i64 ret;
-	if (res == NULL)
-		ret = -1;
-	else
-		ret = res - sptr;
-	return Ok(ret);
-}
-
 Result StringRef_char_at(StringRef *s, u64 index) {
 	RcPtr *sptr = *StringRef_get_ptr(s);
 	StringPtr *sstrptr = unwrap(sptr);
 	return String_char_at(sstrptr, index);
-}
-
-Result String_char_at(String *s, u64 index) {
-	char *sptr = *String_get_ptr(s);
-	u64 len = *(u64 *)String_get_len(s);
-	if (index >= len) {
-		Error err =
-		    ERROR(STRING_INDEX_OUT_OF_BOUNDS,
-			  "index (%llu) is greater than or equal to len (%llu)",
-			  index, len);
-		return Err(err);
-	}
-	i8 ret = sptr[index];
-	return Ok(ret);
 }

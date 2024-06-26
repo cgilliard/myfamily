@@ -15,10 +15,12 @@
 // don't do much here just call to the real_main so we can add to criterion
 // criterion redirects output when you call a 'main'
 
-#include <main/main.h>
+// #include <main/main.h>
+#include <stdio.h>
 
 int main(int argc, char **argv) {
-	Result r = real_main(argc, argv);
-	Expect(r);
+	// Result r = real_main(argc, argv);
+	// Expect(r);
+	printf("main doesn't do anything yet\n");
 	return 0;
 }

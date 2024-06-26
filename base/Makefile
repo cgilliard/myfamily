@@ -1,4 +1,4 @@
-OBJS := panic.o tlmalloc.o backtrace.o class.o traits.o error.o result.o prim.o rc.o string.o option.o rand.o unit.o args.o tokenizer.o
+OBJS := panic.o tlmalloc.o backtrace.o class.o traits.o prim.o string.o unit.o error.o result.o rc.o option.o rand.o
 TEST_OBJS := $(OBJS)
 
 include ../Makefile.template

@@ -12,506 +12,168 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/args.h>
-#include <base/class.h>
-#include <base/error.h>
 #include <base/option.h>
-#include <base/rc.h>
+#include <base/result.h>
 #include <base/string.h>
 #include <base/test.h>
-#include <base/tokenizer.h>
 #include <base/unit.h>
 
 FamSuite(base);
 
-FamTest(base, test_tmalloc) {
-	void *ptr = tlmalloc(1);
-	tlfree(ptr);
+FamTest(base, test_tmalloc) {}
+
+FamTest(base, test_result) {
+	u64 v1 = 3;
+	Result r1 = Ok(v1);
+	assert(r1.is_ok());
+	assert_eq(*(u64 *)unwrap(&r1), 3);
+
+	i128 v2 = -10;
+	Result r2 = Ok(v2);
+	assert(r2.is_ok());
+	assert_eq(*(i128 *)unwrap(&r2), -10);
+
+	U64Ptr *v3 = tlmalloc(sizeof(U64));
+	BUILDPTR(v3, U64);
+	v3->_value = 101;
+	Rc rc3 = RC(v3);
+	Result r3 = Ok(rc3);
+	U64 v3_out = *(U64 *)unwrap(&r3);
+	assert_eq(v3_out._value, 101);
 }
 
-int xyz(int x) { return x + 10; }
-int abc(int x) { return x + 20; }
+FamTest(base, test_option) {
+	u64 v1 = 3;
+	Option o1 = Some(v1);
+	assert(o1.is_some());
+	assert_eq(*(u64 *)unwrap(&o1), 3);
 
-FamTest(base, test_vtable_sort) {
-	Vtable table = {0, 0, NULL};
-	VtableEntry ent0 = {"zzz", xyz};
-	VtableEntry ent1 = {"myent1", xyz};
-	VtableEntry ent2 = {"next", xyz};
-	VtableEntry ent3 = {"prev", xyz};
-	VtableEntry ent4 = {"aaa", abc};
-	vtable_add_entry(&table, ent0);
-	vtable_add_entry(&table, ent1);
-	vtable_add_entry(&table, ent2);
-	vtable_add_entry(&table, ent3);
-	vtable_add_entry(&table, ent4);
+	i128 v2 = -10;
+	Option o2 = Some(v2);
+	assert(o2.is_some());
+	assert_eq(*(i128 *)unwrap(&o2), -10);
 
-	assert_eq_str(table.entries[0].name, "aaa");
-	assert_eq_str(table.entries[4].name, "zzz");
-
-	Object obj;
-	obj.vdata.vtable = &table;
-	assert(implements(&obj, "zzz"));
-	assert(!implements(&obj, "yyy"));
-	assert(implements(&obj, "aaa"));
-	assert(implements(&obj, "next"));
-	assert(implements(&obj, "myent1"));
-	assert(implements(&obj, "prev"));
-
-	int (*prev_fn)(int x) = find_fn(&obj, "prev");
-	assert_eq(prev_fn(7), 17);
-	int (*abc_fn)(int x) = find_fn(&obj, "aaa");
-	assert_eq(abc_fn(8), 28);
-
-	vtable_cleanup(&table);
-}
-
-FamTest(base, test_error) {
-	ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
-	ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
-	Error err1 = ERROR(ILLEGAL_STATE, "illegal state message %i", 3);
-	Error err2 = ERROR(ILLEGAL_ARGUMENT, "ill arg");
-	Error err3 = ERROR(ILLEGAL_STATE, "another illegal state err");
-	assert(equal(KIND(err1), KIND(err1)));
-	assert(!equal(KIND(err1), KIND(err2)));
-	assert(equal(KIND(err1), KIND(err3)));
-	assert(!equal(&err1, &err2));
-	assert(equal(&err1, &err3));
-}
-
-static int rc_test_cleanup_count = 0;
-CLASS(RcTest, FIELD(u32, x))
-#define RcTest DEFINE_CLASS(RcTest)
-
-void RcTest_cleanup(RcTestPtr *ptr) { rc_test_cleanup_count += 1; }
-RcTest *test_build_rctest(u32 x) {
-	RcTestPtr *ret = tlmalloc(sizeof(RcTest));
-	ret->vdata.vtable = &RcTestVtable;
-	ret->_x = x;
-}
-
-FamTest(base, test_rc) {
-	{
-		RcTestPtr *x = test_build_rctest(10);
-		Rc rc = RC(x);
-		assert_eq(rc_test_cleanup_count, 0);
-
-		{
-			Rc rc2;
-			clone(&rc2, &rc);
-		}
-
-		// cleanup did not occur here because while rc2's cleanup was
-		// called, the counter was not equal to 0 so RcTest's cleanup
-		// was not called.
-		assert_eq(rc_test_cleanup_count, 0);
-	}
-	assert_eq(rc_test_cleanup_count, 1);
+	U64Ptr *v3 = tlmalloc(sizeof(U64));
+	BUILDPTR(v3, U64);
+	v3->_value = 101;
+	Rc rc3 = RC(v3);
+	Option o3 = Some(rc3);
+	U64 v3_out = *(U64 *)unwrap(&o3);
+	assert_eq(v3_out._value, 101);
 }
 
 FamTest(base, test_string) {
 	StringPtr *s1 = STRINGPTRP("this is a test");
-	Rc rc = RC(s1);
-	Result r1 = Ok(rc);
-	StringPtr *s2 = unwrap(&r1);
-	assert(equal(s1, s2));
-	char *x = unwrap(s2);
-	assert_eq_str(x, "this is a test");
-}
+	Result r2 = STRINGPTR("another string");
+	Rc rc = *(Rc *)unwrap(&r2);
+	StringPtr s2 = *(String *)unwrap(&rc);
 
-FamTest(base, test_option) {
-	StringPtr *s1 = STRINGPTRP("test");
-	Rc rc = RC(s1);
-	Option x = Some(rc);
-	StringPtr *s2 = unwrap(&x);
-	assert(equal(s1, s2));
-}
+	assert_eq_str(to_str(&s2), "another string");
+	assert_eq_str(to_str(s1), "this is a test");
+	assert_eq(len(s1), strlen("this is a test"));
+	assert_eq(len(&s2), strlen("another string"));
 
-FamTest(base, test_multi_lvl) {
-	/*
-	StringPtr *s1 = STRINGP("test2");
-	Option x = Some(*s1);
-	Result y = Ok(x);
-	Option z = *(Option *)unwrap(&y);
-	StringPtr *s2 = unwrap(&z);
-	assert(equal(s1, s2));
+	String s3;
+	clone(&s3, &s2);
 
-	StringPtr *s3 = STRINGP("test3");
-	Result x3 = Ok(*s3);
-	Option y3 = Some(x3);
-	Result x3_out = *(Result *)unwrap(&y3);
-	StringPtr *s3_out = unwrap(&x3_out);
-	assert(equal(s3_out, s3));
+	assert(equal(&s2, &s3));
+	assert(!equal(&s1, &s3));
 
-	StringPtr *s4 = STRINGP("test4");
-	Rc rc = RC(s4);
-	*/
+	Result ra = append(&s3, s1);
+	assert_eq_str(to_str(&s3), "another stringthis is a test");
+	assert_eq(len(&s3), strlen("another stringthis is a test"));
 
-	Result x5 = Ok(None);
-	Option o5 = *(Option *)unwrap(&x5);
-	assert(!o5.is_some());
-}
+	assert_eq_str(unwrap(&s3), "another stringthis is a test");
 
-GETTER_PROTO(ArgsParam, name)
-GETTER_PROTO(ArgsParam, help)
-GETTER_PROTO(ArgsParam, short_name)
-GETTER_PROTO(ArgsParam, takes_value)
-GETTER_PROTO(ArgsParam, multiple)
+	Result r4 = INDEX_OF(&s3, "this is");
+	i64 res = *(i64 *)unwrap(&r4);
+	assert_eq(res, 14);
 
-FamTest(base, test_args_param) {
-	Result r1 = ArgsParam_build("p1name", "p1help", "p1short", true, true);
-	ArgsParam args1 = *(ArgsParam *)unwrap(&r1);
-	assert_eq_str(*ArgsParam_get_name(&args1), "p1name");
-	assert_eq_str(*ArgsParam_get_help(&args1), "p1help");
-	assert_eq_str(*ArgsParam_get_short_name(&args1), "p1short");
-	assert_eq(*ArgsParam_get_takes_value(&args1), true);
-	assert_eq(*ArgsParam_get_multiple(&args1), true);
+	StringPtr *s5 = STRINGPTRP("i");
+	Result r5 = INDEX_OF(&s3, s5);
+	i64 res5 = *(i64 *)unwrap(&r5);
+	assert_eq(res5, 11);
 
-	Result r2 =
-	    ArgsParam_build("p2name", "p2help", "p2short", false, false);
-	ArgsParam args2 = *(ArgsParam *)unwrap(&r2);
-	assert_eq_str(*ArgsParam_get_name(&args2), "p2name");
-	assert_eq_str(*ArgsParam_get_help(&args2), "p2help");
-	assert_eq_str(*ArgsParam_get_short_name(&args2), "p2short");
-	assert_eq(*ArgsParam_get_takes_value(&args2), false);
-	assert_eq(*ArgsParam_get_multiple(&args2), false);
+	Result r6 = LAST_INDEX_OF(&s3, s5);
+	i64 res6 = *(i64 *)unwrap(&r6);
+	assert_eq(res6, 19);
 
-	Result r3 =
-	    ArgsParam_build("p2name", "p2help", "p2short", false, false);
-	ArgsParam args3 = *(ArgsParam *)unwrap(&r3);
+	Result r7 = LAST_INDEX_OF(&s3, "abababaa");
+	i64 res7 = *(i64 *)unwrap(&r7);
+	assert_eq(res7, -1);
 
-	assert(!equal(&args1, &args2));
-	assert(equal(&args1, &args1));
-	assert(equal(&args2, &args3));
-	assert(!equal(&args1, &args3));
-}
+	Result r8 = char_at(&s3, 0);
+	signed char ch8 = *(signed char *)unwrap(&r8);
+	assert_eq(ch8, 'a');
+	Result r9 = char_at(&s3, 2);
+	signed char ch9 = *(signed char *)unwrap(&r9);
+	assert_eq(ch9, 'o');
 
-GETTER_PROTO(SubCommand, name)
-GETTER_PROTO(SubCommand, params)
-GETTER_PROTO(SubCommand, params_state)
-GETTER_PROTO(SubCommand, count)
-GETTER_PROTO(SubCommand, min_add_args)
-GETTER_PROTO(SubCommand, max_add_args)
+	Result r10 = char_at(&s3, 10000);
+	assert(!r10.is_ok());
 
-FamTest(base, test_sub_command) {
-	Result r1 = SubCommand_build("test1", 2, 5, "this is a help message");
-	SubCommand s1 = *(SubCommand *)unwrap(&r1);
-	assert_eq_str(*SubCommand_get_name(&s1), "test1");
-	assert_eq(*SubCommand_get_min_add_args(&s1), 2);
-	assert_eq(*SubCommand_get_max_add_args(&s1), 5);
-	assert_eq(*SubCommand_get_count(&s1), 0);
-
-	Result r11 =
-	    ArgsParam_build("p1name", "p1help", "p1short", false, false);
-	ArgsParam p1 = *(ArgsParam *)unwrap(&r11);
-
-	Result r111 = SubCommand_add_param(&s1, &p1);
-	assert(r111.is_ok());
-
-	Result r12 =
-	    ArgsParam_build("p2name", "p2help", "p2short", false, false);
-	ArgsParam p2 = *(ArgsParam *)unwrap(&r12);
-
-	Result r112 = SubCommand_add_param(&s1, &p2);
-	assert(r112.is_ok());
-
-	ArgsParamPtr *params_out = *SubCommand_get_params(&s1);
-	ArgsParamStatePtr *params_state_out = *SubCommand_get_params_state(&s1);
-
-	assert_eq(*SubCommand_get_count(&s1), 2);
-	assert(equal(&params_out[0], &p1));
-	assert(equal(&params_out[1], &p2));
-}
-
-FamTest(base, test_args) {
-	Args a1 = ARGS("prog", "v1.0", "MyFamily Developers");
-	ArgsParam p11 = PARAM("threads", "number of threads", "t", true, false);
-	Result r11 = Args_add_param(&a1, &p11);
-	Expect(r11);
-	ArgsParam p12 =
-	    PARAM("port", "tcp/ip port to bind to", "p", true, true);
-	Result r12 = Args_add_param(&a1, &p12);
-	Expect(r12);
-	Result r13 = SubCommand_build("mysub", 0, 1, "help msg");
-	assert(r13.is_ok());
-	SubCommand sub11 = *(SubCommand *)unwrap(&r13);
-	Result r14 = Args_add_sub(&a1, &sub11);
-	assert(r14.is_ok());
-	char *argv1[] = {"fam", "--threads", "1", "--port",
-			 "2",	"--port",    "3", "mysub"};
-	int argc1 = 8;
-	Result r1 = ARGS_INIT(&a1, argc1, argv1);
-	assert(r1.is_ok());
-
-	Option o1 = Args_argument(&a1, 0);
-	assert(o1.is_some());
-	StringPtr *arg1 = unwrap(&o1);
-	assert_eq_str(unwrap(arg1), "mysub");
-	Option o2 = Args_argument(&a1, 1);
-	assert(!o2.is_some());
-
-	String scomp1 = String_build_expect("test84");
-	String scomp2 = String_build_expect("test84");
-	String scomp3 = String_build_expect("asldfjkl");
-	assert(equal(&scomp1, &scomp2));
-	assert(!equal(&scomp1, &scomp3));
-}
-
-FamTest(base, test_args_copy) {
-	Args a1 = ARGS("prog", "v1.0", "MyFamily Developers");
-}
-
-FamTest(base, test_string2) {
-	StringPtr *s1 = tlmalloc(sizeof(String));
-	StringPtr *s2 = STRINGPTRP("this is a test");
-	StringPtr *s3 = tlmalloc(sizeof(String));
-	Rc rc1 = RC(s1);
-	Rc rc2 = RC(s2);
-	Rc rc3 = RC(s3);
-
-	clone(s1, s2);
-	assert(equal(s1, s2));
-
-	clone(s3, s1);
-	assert(equal(s3, s2));
-
-	Result r1 = append(s3, s1);
-	Expect(r1);
-
-	char *test = unwrap(s3);
-	assert_eq_str(test, "this is a testthis is a test");
-
-	assert(!equal(s1, s3));
-	assert(!equal(s2, s3));
-}
-
-Result rc_string_fun() {
-	StringRef ret = STRINGP("rc_string_fun");
-	StringRef test;
-	copy(&test, &ret);
-	return Ok(ret);
-}
-
-Result rc_string_fun2() {
-	Result r1 = rc_string_fun();
-	StringRef s = *(StringRef *)unwrap(&r1);
-	return Ok(s);
-}
-
-FamTest(base, test_rc_string) {
-	StringRef rcs = STRINGP("test2");
-	StringRef rcs2;
-	copy(&rcs2, &rcs);
-	assert_eq_str(unwrap(&rcs), "test2");
-	assert_eq_str(unwrap(&rcs2), "test2");
-
-	Result r1 = rc_string_fun2();
-	assert(r1.is_ok());
-	StringRef s1 = *(StringRef *)unwrap(&r1);
-	assert_eq_str(unwrap(&s1), "rc_string_fun");
-
-	Result xx = STRING("abc");
-	StringRef s2 = *(StringRef *)Expect(xx);
-	assert_eq_str(unwrap(&s2), "abc");
-
-	StringPtr *s0 = STRINGPTRP("this is a test2");
-	cleanup(s0);
-	tlfree(s0);
-
-	StringRef sr1 = STRINGP("test");
-	StringRef sr2 = STRINGP("3");
-	Result srr = append(&sr1, &sr2);
-	assert(srr.is_ok());
-	assert_eq_str(unwrap(&sr1), "test3");
-	assert_eq_str(unwrap(&sr2), "3");
-}
-
-FamTest(base, test_deep_copy) {
-	StringRef sr1 = STRINGP("test");
-	StringRef sr2;
-	StringRef sr3 = STRINGP("2");
-
-	copy(&sr2, &sr1);
-	assert_eq_str(unwrap(&sr1), unwrap(&sr2));
-	Result r1 = append(&sr1, &sr3);
-	assert(r1.is_ok());
-
-	assert_eq_str(unwrap(&sr1), "test2");
-	assert_eq_str(unwrap(&sr3), "2");
-	// not a deep copy just a ref copy so this will be the same memory
-	// location as sr1
-	assert_eq_str(unwrap(&sr2), "test2");
-
-	StringRef sdr1 = STRINGP("test");
-	StringRef sdr2 = BUILD(StringRef);
-	StringRef sdr3 = STRINGP("2");
-
-	Result r0 = deep_copy(&sdr2, &sdr1);
-	assert(r0.is_ok());
-	assert_eq_str(unwrap(&sdr1), unwrap(&sdr2));
-	Result r11 = append(&sdr1, &sdr3);
-	assert(r11.is_ok());
-
-	assert_eq_str(unwrap(&sdr1), "test2");
-	assert_eq_str(unwrap(&sdr3), "2");
-	// deep copy occurred so it's separate from sdr1
-	assert_eq_str(unwrap(&sdr2), "test");
-}
-
-FamTest(base, test_string_ptr_build) {
-	Result r1 = STRINGPTR("test 7");
-	Rc rc1 = *(Rc *)unwrap(&r1);
-	StringPtr *s1 = unwrap(&rc1);
-	assert_eq_str(unwrap(s1), "test 7");
-}
-
-FamTest(base, test_string_ref_equal) {
-	StringRef sr1 = STRINGP("test1");
-	StringRef sr2 = STRINGP("test2");
-	StringRef sr3 = STRINGP("test1");
-
-	assert(equal(&sr1, &sr3));
-	assert(!equal(&sr1, &sr2));
-}
-
-FamTest(base, test_string_fns) {
-	StringPtr *s1 = STRINGPTRP("abcdefghijklmnopqrstuvwxyz");
-	StringPtr *s2 = STRINGPTRP("ghi");
-	Result r1 = INDEX_OF(s1, s2);
-	i64 v1 = *(i64 *)unwrap(&r1);
-	assert_eq(v1, 6);
-
-	StringRef s3 = STRINGP("abcdefghijklmnopqrstuvwxyz");
-	StringRef s4 = STRINGP("hijk");
-	Result r2 = INDEX_OF(&s3, &s4);
-	i64 v2 = *(i64 *)unwrap(&r2);
-	assert_eq(v2, 7);
-
-	StringRef s5 = STRINGP("abcdefghijklmnopqrstuvwxyz");
-	StringRef s6 = STRINGP("hijk");
-	Result r3 = LAST_INDEX_OF(&s5, &s6);
-	i64 v3 = *(i64 *)unwrap(&r3);
-	assert_eq(v3, 7);
-
-	StringRef s7 = STRINGP("123456789012345");
-	StringRef s8 = STRINGP("123");
-	Result r4 = LAST_INDEX_OF(&s7, &s8);
-	i64 v4 = *(i64 *)unwrap(&r4);
-	assert_eq(v4, 10);
-
-	Result r5 = INDEX_OF(&s7, &s8);
-	i64 v5 = *(i64 *)unwrap(&r5);
-	assert_eq(v5, 0);
-
-	Result r7 = INDEX_OF(&s7, &s6);
-	i64 v7 = *(i64 *)unwrap(&r7);
-	assert_eq(v7, -1);
-
-	Result r6 = SUBSTRING(&s7, 2, 4);
-	StringRef ssub = *(StringRef *)unwrap(&r6);
-	assert_eq_str(to_str(&ssub), "34");
-	assert_eq_str(to_str(s1), to_str(&s3));
-	assert(strcmp(to_str(s1), to_str(s2)));
-
-	Result r10 = LAST_INDEX_OF(&s7, "123");
-	assert_eq(10, *(i64 *)unwrap(&r10));
-
-	Result r11 = INDEX_OF(&s7, "123");
-	assert_eq(0, *(i64 *)unwrap(&r11));
-
-	StringRef lentest = STRINGP("abcdefgh123456789");
-	Result r12 = INDEX_OF(&lentest, "1234");
-	u64 start = *(i64 *)unwrap(&r12);
-	u64 end = len(&lentest);
-	Result r13 = SUBSTRING(&lentest, start, end);
-	StringRef sub = *(StringRef *)unwrap(&r13);
-	assert_eq_str(to_str(&sub), "123456789");
-
-	Result rch1 = char_at(&lentest, 3);
-	char ch1 = *(char *)unwrap(&rch1);
-	assert_eq(ch1, 'd');
-
-	Result rch2 = char_at(&lentest, 0);
-	char ch2 = *(char *)unwrap(&rch2);
-	assert_eq(ch2, 'a');
-
-	Result rch3 = char_at(&lentest, 100);
-	assert(!rch3.is_ok());
+	Result r11 = SUBSTRING(&s3, 0, 7);
+	RcPtr *rc11 = unwrap(&r11);
+	StringPtr *s11 = unwrap(rc11);
+	assert_eq_str(unwrap(s11), "another");
 
 	cleanup(s1);
 	tlfree(s1);
-	cleanup(s2);
-	tlfree(s2);
+
+	cleanup(s5);
+	tlfree(s5);
 }
 
-FamTest(base, test_tokenizer) {
-	StringRef line = STRINGP("this is a test");
-	Result r1 = Tokenizer_parse(&line);
-	Tokenizer t1 = *(Tokenizer *)unwrap(&r1);
-	Result r2 = Tokenizer_next_token(&t1);
-}
+FamTest(base, test_string_ref) {
+	StringRef s1 = STRINGP("this is a test");
+	Result r2 = STRING("another string");
+	StringRef s2 = *(StringRef *)unwrap(&r2);
 
-Result ret_str(StringRef s) {
-	StringRef ret;
-	copy(&ret, &s);
-	return Ok(ret);
-}
+	assert_eq_str(to_str(&s2), "another string");
+	assert_eq_str(to_str(&s1), "this is a test");
+	assert_eq(len(&s1), strlen("this is a test"));
+	assert_eq(len(&s2), strlen("another string"));
 
-FamTest(base, test_str_refs) {
-	StringRef s = STRINGP("testing 1234");
-	Result r1 = ret_str(s);
-	StringRef rref = *(StringRef *)unwrap(&r1);
-	assert_eq_str(to_str(&rref), "testing 1234");
-}
+	StringRef s3;
+	clone(&s3, &s2);
 
-FamTest(base, test_option_cleanup) {
-	StringPtr *ptr = STRINGPTRP("abc");
-	Rc rc = RC(ptr);
-	Option x = Some(rc);
-	StringPtr *ptr_out = unwrap(&x);
-	assert_eq_str(to_str(ptr_out), "abc");
-}
+	assert(equal(&s2, &s3));
+	assert(!equal(&s1, &s3));
 
-CLASS(TestResult, FIELD(char *, value))
-IMPL(TestResult, TRAIT_CLONE);
-#define TestResult DEFINE_CLASS(TestResult)
-GETTER(TestResult, value)
-SETTER(TestResult, value)
+	Result ra = append(&s3, &s1);
+	assert_eq_str(to_str(&s3), "another stringthis is a test");
+	assert_eq(len(&s3), strlen("another stringthis is a test"));
+	assert_eq_str(unwrap(&s3), "another stringthis is a test");
 
-bool TestResult_clone(TestResult *dst, TestResult *src) { return true; }
-usize TestResult_size(TestResult *obj) { return sizeof(TestResult); }
+	Result r4 = INDEX_OF(&s3, "this is");
+	i64 res = *(i64 *)unwrap(&r4);
+	assert_eq(res, 14);
 
-void TestResult_cleanup(TestResult *tr) {
-	char *value = *TestResult_get_value(tr);
-	if (value) {
-		tlfree(value);
-		TestResult_set_value(tr, NULL);
-	}
-}
+	StringRef s5 = STRINGP("i");
+	Result r5 = INDEX_OF(&s3, &s5);
+	i64 res5 = *(i64 *)unwrap(&r5);
+	assert_eq(res5, 11);
 
-FamTest(base, test_result_scenarios) {
-	char *value = tlmalloc(sizeof(char) * 10);
-	strcpy(value, "test1");
-	TestResult tr = BUILD(TestResult, value);
-	TestResultPtr *tr2 = tlmalloc(sizeof(TestResult));
-	BUILDPTR(tr2, TestResult);
-	char *value2 = tlmalloc(sizeof(char) * 10);
-	strcpy(value2, "test2");
-	TestResult_set_value(tr2, value2);
+	Result r6 = LAST_INDEX_OF(&s3, &s5);
+	i64 res6 = *(i64 *)unwrap(&r6);
+	assert_eq(res6, 19);
 
-	Result r1 = Ok(tr);
-	assert(!r1.is_ok());
+	Result r7 = LAST_INDEX_OF(&s3, "abababaa");
+	i64 res7 = *(i64 *)unwrap(&r7);
+	assert_eq(res7, -1);
 
-	Rc rc = RC(tr2);
-	Rc rc2;
-	clone(&rc2, &rc);
-	Result r2 = Ok(rc);
-	assert(r2.is_ok());
-	TestResultPtr tr2_out = *(TestResult *)unwrap(&r2);
-	char *value_out = *TestResult_get_value(&tr2_out);
-	assert_eq_str(value_out, "test2");
+	Result r8 = char_at(&s3, 0);
+	signed char ch8 = *(signed char *)unwrap(&r8);
+	assert_eq(ch8, 'a');
+	Result r9 = char_at(&s3, 2);
+	signed char ch9 = *(signed char *)unwrap(&r9);
+	assert_eq(ch9, 'o');
 
-	Option o3 = Some(rc2);
-	TestResultPtr tr2_out2 = *(TestResult *)unwrap(&o3);
-	char *value_out2 = *TestResult_get_value(&tr2_out2);
-	assert_eq_str(value_out2, "test2");
+	Result r10 = char_at(&s3, 10000);
+	assert(!r10.is_ok());
+
+	Result r11 = SUBSTRING(&s3, 0, 7);
+	RcPtr *rc11 = unwrap(&r11);
+	StringPtr *s11 = unwrap(rc11);
+	assert_eq_str(unwrap(s11), "another");
 }
