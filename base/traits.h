@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/formatter.h>
 #include <base/result.h>
 #include <base/string.h>
 #include <base/traits_base.h>
@@ -19,9 +20,12 @@
 #ifndef _BASE_TRAITS__
 #define _BASE_TRAITS__
 
+#define TO_STRING_BUF_SIZE 10000
+
 Result append(void *dst, void *src);
 Result deep_copy(void *dst, void *src);
 u64 len(void *obj);
+Result to_string(void *obj);
 
 #define TRAIT_APPEND(T)                                                        \
 	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
@@ -33,5 +37,13 @@ u64 len(void *obj);
 #define TRAIT_TOKENIZER(T)                                                     \
 	TRAIT_REQUIRED(T, Result, parse, StringRef *s)                         \
 	TRAIT_REQUIRED(T, Result, next_token, T##Ptr *self)
+
+#define TRAIT_FORMATTER(T)                                                     \
+	TRAIT_REQUIRED(T, Result, write, T##Ptr *f, char *fmt, ...)
+
+#define TRAIT_TO_STR_REF(T) TRAIT_REQUIRED(T, Result, to_str_ref, T##Ptr *obj)
+
+#define TRAIT_DISPLAY(T)                                                       \
+	TRAIT_REQUIRED(T, Result, fmt, T##Ptr *self, Formatter *formatter)
 
 #endif // _BASE_TRAITS__

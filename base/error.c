@@ -17,6 +17,7 @@
 #include <string.h>
 
 GETTER(Error, flags)
+SETTER(Error, flags)
 
 void ErrorKind_cleanup(ErrorKindPtr *obj) {}
 usize ErrorKind_size(ErrorKind *obj) { return sizeof(ErrorKind); }
@@ -48,6 +49,8 @@ bool Error_clone(Error *dst, Error *src) {
 
 	BacktracePtr *bt = Error_get_bt(dst);
 	BacktracePtr *src_bt = Error_get_bt(src);
+
+	Error_set_flags(dst, *Error_get_flags(src));
 	return copy(bt, src_bt);
 }
 
@@ -60,8 +63,9 @@ void Error_print(Error *obj) {
 	printf("%s%s%s: \"%s%s%s\"\n", RED, kind_str, RESET, GREEN, msg, RESET);
 	u64 flags = *Error_get_flags(obj);
 
-	if ((flags & ERROR_PRINT_FLAG_NO_BACKTRACE) == 0)
+	if ((flags & ERROR_PRINT_FLAG_NO_BACKTRACE) == 0) {
 		print(Error_get_bt(obj));
+	}
 }
 bool Error_equal(Error *obj1, Error *obj2) {
 	return equal(Error_get_kind(obj1), Error_get_kind(obj2));

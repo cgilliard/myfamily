@@ -25,5 +25,7 @@ static ErrorKind FILE_NOT_FOUND_ERROR = EKIND("FileNotFound");
 static ErrorKind IO_ERROR = EKIND("I/O Error");
 static ErrorKind PARSE_ERROR = EKIND("ParseError");
 static ErrorKind STRING_INDEX_OUT_OF_BOUNDS = EKIND("StringIndexOutOfBounds");
+static ErrorKind WRITE_ERROR = EKIND("WriteError");
+static ErrorKind OVERFLOW = EKIND("Overflow");
 
 #endif // _BASE_EKINDS__

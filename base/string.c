@@ -361,10 +361,14 @@ Result StringRef_last_index_of(StringRef *s, StringRef *n) {
 }
 
 Result StringRef_substring(StringRef *s, u64 start, u64 end) {
-
 	RcPtr *sptr = *StringRef_get_ptr(s);
 	StringPtr *sstrptr = unwrap(sptr);
-	return String_substring(sstrptr, start, end);
+	Result res = String_substring(sstrptr, start, end);
+	RcPtr rc = *(Rc *)unwrap(&res);
+	Rc rc_clone;
+	bool clone_res = clone(&rc_clone, &rc);
+	StringRefPtr srp = BUILD(StringRef, &rc_clone);
+	return Ok(srp);
 }
 
 char *StringRef_to_str(StringRef *s) {

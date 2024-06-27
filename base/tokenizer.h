@@ -28,15 +28,18 @@ typedef enum TokenType {
 CLASS(Ident, FIELD(StringRef, value))
 IMPL(Ident, TRAIT_COPY)
 IMPL(Ident, TRAIT_TO_STR)
+IMPL(Ident, TRAIT_DISPLAY)
 #define Ident DEFINE_CLASS(Ident)
 
 Ident Ident_build(char *s);
 
 CLASS(Punct, FIELD(char, ch) FIELD(char, second_ch) FIELD(char, third_ch))
 IMPL(Punct, TRAIT_COPY)
+IMPL(Punct, TRAIT_DISPLAY)
 #define Punct DEFINE_CLASS(Punct)
 
 CLASS(Literal, FIELD(StringRef, value))
+IMPL(Literal, TRAIT_DISPLAY)
 IMPL(Literal, TRAIT_TO_STR)
 IMPL(Literal, TRAIT_COPY)
 #define Literal DEFINE_CLASS(Literal)
@@ -44,9 +47,10 @@ IMPL(Literal, TRAIT_COPY)
 Literal Literal_build(char *value);
 Literal Literal_build_num(i128 value);
 
-CLASS(Token, FIELD(TokenType, ttype) FIELD(Ident, ident) FIELD(Punct, punct)
-		 FIELD(Literal, literal))
-IMPL(Token, TRAIT_CLONE)
+CLASS(Token, FIELD(TokenType, ttype) FIELD(Ident *, ident) FIELD(Punct *, punct)
+		 FIELD(Literal *, literal))
+IMPL(Token, TRAIT_DISPLAY)
+IMPL(Token, TRAIT_COPY)
 #define Token DEFINE_CLASS(Token)
 
 Token Build_token_ident(Ident ident);

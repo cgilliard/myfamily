@@ -109,3 +109,21 @@ u64 len(void *obj) {
 		panic("len not implemented for this type");
 	return do_len(obj);
 }
+
+Result to_string(void *obj) {
+	ResultPtr (*do_fmt)(Object *obj, Formatter *formatter) =
+	    find_fn((Object *)obj, "fmt");
+	if (do_fmt == NULL) {
+
+		panic("display trait not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	}
+
+	char buf[TO_STRING_BUF_SIZE];
+	Formatter fmt = BUILD(Formatter, buf, TO_STRING_BUF_SIZE, 0);
+
+	Result r = do_fmt(obj, &fmt);
+	Try(r);
+
+	return Formatter_to_str_ref(&fmt);
+}

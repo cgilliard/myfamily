@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/error.h>
+#include <base/formatter.h>
 #include <base/option.h>
 #include <base/result.h>
 #include <base/string.h>
@@ -175,9 +176,8 @@ FamTest(base, test_string_ref) {
 	assert(!r10.is_ok());
 
 	Result r11 = SUBSTRING(&s3, 0, 7);
-	RcPtr *rc11 = unwrap(&r11);
-	StringPtr *s11 = unwrap(rc11);
-	assert_eq_str(unwrap(s11), "another");
+	StringRef s11 = *(StringRef *)unwrap(&r11);
+	assert_eq_str(unwrap(&s11), "another");
 }
 
 FamTest(base, test_error_clone) {
@@ -223,6 +223,21 @@ FamTest(base, test_deep_copy) {
 	assert_eq_str(unwrap(&sdr3), "2");
 	// deep copy occurred so it's separate from sdr1
 	assert_eq_str(unwrap(&sdr2), "test");
+
+	StringRef x1 = STRINGP("my first string");
+	StringRef x2;
+	StringRef x3 = STRINGP(" more");
+	Result xr0 = deep_copy(&x2, &x1);
+	Result ar0 = append(&x1, &x3);
+
+	assert_eq_str(to_str(&x1), "my first string more");
+	assert_eq_str(to_str(&x2), "my first string");
+	printf("CLASS=%s %s %s\n", CLASS_NAME(&x1), CLASS_NAME(&x2),
+	       CLASS_NAME(&x3));
+
+	assert_eq_str(CLASS_NAME(&x1), "StringRef");
+	assert_eq_str(CLASS_NAME(&x2), "StringRef");
+	assert_eq_str(CLASS_NAME(&x3), "StringRef");
 }
 
 FamTest(base, test_ident) {
@@ -267,40 +282,171 @@ FamTest(base, test_punct) {
 }
 
 FamTest(base, test_token) {
-	IdentPtr ident = IDENT("abc");
+	Ident ident = IDENT("abc");
 	Token t1 = TOKEN(ident);
+
+	printf("1\n");
+	Result r0 = to_string(&t1);
+	printf("2\n");
+	assert(r0.is_ok());
+	StringRef s0 = *(StringRef *)unwrap(&r0);
+	printf("class=%s\n", CLASS_NAME(&s0));
+	printf("s0=%s\n", to_str(&s0));
 	Token t2;
 	clone(&t2, &t1);
+	printf("4\n");
 	assert_eq(*Token_get_ttype(&t1), IdentType);
 	assert_eq(*Token_get_ttype(&t2), IdentType);
-	IdentPtr t1_out = *Token_get_ident(&t1);
-	assert_eq_str(to_str(&t1_out), "abc");
-	IdentPtr t2_out = *Token_get_ident(&t2);
-	assert_eq_str(to_str(&t2_out), "abc");
+	IdentPtr *t1_out = *Token_get_ident(&t1);
+	printf("5\n");
+	assert_eq_str(to_str(t1_out), "abc");
+	printf("6\n");
+	IdentPtr *t2_out = *Token_get_ident(&t2);
+	assert_eq_str(to_str(t2_out), "abc");
+	printf("6\n");
 
-	PunctPtr punct = PUNCT('<', '=');
+	Punct punct = PUNCT('<', '=');
+	printf("7\n");
+
 	Token t3 = TOKEN(punct);
+	printf("7.4\n");
+	Result r13 = to_string(&t3);
+	printf("8\n");
+	assert(r13.is_ok());
+	StringRef s13 = *(StringRef *)unwrap(&r13);
+	printf("class=%s\n", CLASS_NAME(&s13));
+	printf("s13=%s\n", to_str(&s13));
 	Token t4;
 	clone(&t4, &t3);
 	assert_eq(*Token_get_ttype(&t3), PunctType);
 	assert_eq(*Token_get_ttype(&t4), PunctType);
-	PunctPtr t3_out = *Token_get_punct(&t3);
-	assert_eq(*Punct_get_ch(&t3_out), '<');
-	assert_eq(*Punct_get_second_ch(&t3_out), '=');
-	assert_eq(*Punct_get_third_ch(&t3_out), 0);
-	PunctPtr t4_out = *Token_get_punct(&t4);
-	assert_eq(*Punct_get_ch(&t4_out), '<');
-	assert_eq(*Punct_get_second_ch(&t4_out), '=');
-	assert_eq(*Punct_get_third_ch(&t4_out), 0);
+	PunctPtr *t3_out = *Token_get_punct(&t3);
+	assert_eq(*Punct_get_ch(t3_out), '<');
+	assert_eq(*Punct_get_second_ch(t3_out), '=');
+	assert_eq(*Punct_get_third_ch(t3_out), 0);
+	PunctPtr *t4_out = *Token_get_punct(&t4);
+	assert_eq(*Punct_get_ch(t4_out), '<');
+	assert_eq(*Punct_get_second_ch(t4_out), '=');
+	assert_eq(*Punct_get_third_ch(t4_out), 0);
 
-	LiteralPtr literal = LITERAL(-155023);
+	Literal literal = LITERAL(-155023);
 	Token t5 = TOKEN(literal);
+	Result r10 = to_string(&t5);
+	assert(r10.is_ok());
+	StringRef s10 = *(StringRef *)unwrap(&r10);
+	printf("class=%s\n", CLASS_NAME(&s10));
+	printf("s10=%s\n", to_str(&s10));
 	Token t6;
 	clone(&t6, &t5);
 	assert_eq(*Token_get_ttype(&t5), LiteralType);
 	assert_eq(*Token_get_ttype(&t6), LiteralType);
-	LiteralPtr t5_out = *Token_get_literal(&t5);
-	assert_eq_str(to_str(&t5_out), "-155023");
-	LiteralPtr t6_out = *Token_get_literal(&t6);
-	assert_eq_str(to_str(&t6_out), "-155023");
+	LiteralPtr *t5_out = *Token_get_literal(&t5);
+	assert_eq_str(to_str(t5_out), "-155023");
+	LiteralPtr *t6_out = *Token_get_literal(&t6);
+	assert_eq_str(to_str(t6_out), "-155023");
 }
+
+FamTest(base, test_tokenizer) {
+	StringRef s1 = STRINGP("this is a test");
+	Result r1 = Tokenizer_parse(&s1);
+	assert(r1.is_ok());
+	Tokenizer t1 = *(Tokenizer *)unwrap(&r1);
+
+	while (true) {
+		Result next = Tokenizer_next_token(&t1);
+		printf("got next\n");
+		assert(next.is_ok());
+		Option opt = *(Option *)unwrap(&next);
+		if (!opt.is_some())
+			break;
+
+		Token token = *(Token *)unwrap(&opt);
+		Result nt = to_string(&token);
+		StringRef nsr = *(StringRef *)unwrap(&nt);
+		printf("next token ret: %s\n", to_str(&nsr));
+		cleanup(&next);
+	}
+}
+
+CLASS(LoopTest, FIELD(char *, my_ptr))
+IMPL(LoopTest, TRAIT_COPY)
+#define LoopTest DEFINE_CLASS(LoopTest)
+void LoopTest_cleanup(LoopTest *ptr) {
+	if (ptr->_my_ptr) {
+		tlfree(ptr->_my_ptr);
+		ptr->_my_ptr = NULL;
+	}
+}
+bool LoopTest_clone(LoopTest *dst, LoopTest *src) { return true; }
+usize LoopTest_size(LoopTest *obj) { return sizeof(LoopTest); }
+
+FamTest(base, test_loop) {
+	int counter = 0;
+	while (counter < 1000) {
+		printf("loop %i\n", counter);
+		// printf("1\n");
+		Ident ident = IDENT("abc");
+		Token t = TOKEN(ident);
+		// Literal ident = LITERAL("\"def\"");
+		// Punct ident = PUNCT('>');
+		// printf("2\n");
+		// StringRef t = STRINGP("def");
+		//  u64 t = counter;
+
+		// char *my_ptr = tlmalloc(sizeof(char) * 100);
+		// strcpy(my_ptr, "test");
+		// LoopTest t1 = BUILD(LoopTest, my_ptr);
+		//  printf("3\n");
+		Option o = Some(t);
+		// printf("4\n");
+		Result r = Ok(o);
+		// printf("5\n");
+		//	Option o_out = *(Option *)unwrap(&r);
+		// Token t_out = *(Token *)unwrap(&o_out);
+		//  printf("6\n");
+		//	Token t_out = *(Token *)unwrap(&o_out);
+		// Result r_out = to_string(&t_out);
+		// StringRef sr_out = *(StringRef *)unwrap(&o_out);
+		// printf("sr=%s\n", to_str(&sr_out));
+		// assert_eq_str(to_str(&sr_out), "def");
+		// assert_eq(t_out, counter);
+		//     Token t_out = *(Token *)unwrap(&o_out);
+		//     Result r_out = to_string(&t_out);
+
+		// cleanup(tcopy);
+		// cleanup(icopy);
+		// cleanup(tcopy);
+		counter += 1;
+		// printf("7\n");
+	}
+}
+
+FamTest(base, test_option_res_etc) {
+	Ident ident = IDENT("test");
+	Token token = TOKEN(ident);
+	Option opt = Some(token);
+	Result rx = Ok(opt);
+}
+
+FamTest(base, test_formatter) {
+	char buf[1024];
+	Formatter fmt = BUILD(Formatter, buf, 1024, 0);
+	Result r = Formatter_write(&fmt, "%i - %s", 10, "hi there");
+	assert(r.is_ok());
+	Result r2 = Formatter_to_str_ref(&fmt);
+	StringRef ref = *(StringRef *)unwrap(&r2);
+	assert_eq_str(to_str(&ref), "10 - hi there");
+
+	Result r3 = Formatter_write(&fmt, " done.");
+	Result r4 = Formatter_to_str_ref(&fmt);
+	StringRef ref2 = *(StringRef *)unwrap(&r4);
+	assert_eq_str(to_str(&ref2), "10 - hi there done.");
+
+	char buf2[10];
+	Formatter fmt2 = BUILD(Formatter, buf2, 10, 0);
+	Result r5 = Formatter_write(&fmt2, "012345678901234");
+	assert(!r5.is_ok());
+	Error e5 = unwrap_err(&r5);
+	print(&e5);
+}
+
