@@ -69,7 +69,8 @@ bool clone(void *dst, void *src) {
 		panic("clone not implemented for this type");
 	((Object *)dst)->vdata.vtable = ((Object *)src)->vdata.vtable;
 	((Object *)dst)->vdata.name = ((Object *)src)->vdata.name;
-	return do_clone(dst, src);
+	bool ret = do_clone(dst, src);
+	return ret;
 }
 
 usize size(void *obj) {
@@ -110,7 +111,9 @@ u64 len(void *obj) {
 	return do_len(obj);
 }
 
-Result to_string(void *obj) {
+Result to_string(void *obj) { return to_string_buf(obj, TO_STRING_BUF_SIZE); }
+
+Result to_string_buf(void *obj, usize buf_size) {
 	ResultPtr (*do_fmt)(Object *obj, Formatter *formatter) =
 	    find_fn((Object *)obj, "fmt");
 	if (do_fmt == NULL) {
@@ -119,7 +122,7 @@ Result to_string(void *obj) {
 		      CLASS_NAME(obj));
 	}
 
-	char buf[TO_STRING_BUF_SIZE];
+	char buf[buf_size];
 	Formatter fmt = BUILD(Formatter, buf, TO_STRING_BUF_SIZE, 0);
 
 	Result r = do_fmt(obj, &fmt);

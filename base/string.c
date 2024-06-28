@@ -310,7 +310,6 @@ Result StringRef_deep_copy(StringRef *dst, StringRef *src) {
 		    ERROR(ALLOC_ERROR, "Could not allocate sufficient memory");
 		return Err(err);
 	}
-
 	clone(dst_str, src_str);
 	Rc x = RC(dst_str);
 	copy(dst_ptr, &x);

@@ -22,7 +22,8 @@ typedef enum TokenType {
 	NoType = 0,
 	IdentType = 1,
 	LiteralType = 2,
-	PunctType = 3
+	PunctType = 3,
+	DocType = 4
 } TokenType;
 
 CLASS(Ident, FIELD(StringRef, value))
@@ -32,6 +33,14 @@ IMPL(Ident, TRAIT_DISPLAY)
 #define Ident DEFINE_CLASS(Ident)
 
 Ident Ident_build(char *s);
+
+CLASS(Doc, FIELD(StringRef, value))
+IMPL(Doc, TRAIT_COPY)
+IMPL(Doc, TRAIT_TO_STR)
+IMPL(Doc, TRAIT_DISPLAY)
+#define Doc DEFINE_CLASS(Doc)
+
+Doc Doc_build(char *s);
 
 CLASS(Punct, FIELD(char, ch) FIELD(char, second_ch) FIELD(char, third_ch))
 IMPL(Punct, TRAIT_COPY)
@@ -47,8 +56,9 @@ IMPL(Literal, TRAIT_COPY)
 Literal Literal_build(char *value);
 Literal Literal_build_num(i128 value);
 
-CLASS(Token, FIELD(TokenType, ttype) FIELD(Ident *, ident) FIELD(Punct *, punct)
-		 FIELD(Literal *, literal))
+CLASS(Token,
+      FIELD(TokenType, ttype) FIELD(Ident *, ident) FIELD(Literal *, literal)
+	  FIELD(Punct *, punct) FIELD(Doc *, doc))
 IMPL(Token, TRAIT_DISPLAY)
 IMPL(Token, TRAIT_COPY)
 #define Token DEFINE_CLASS(Token)
@@ -56,15 +66,23 @@ IMPL(Token, TRAIT_COPY)
 Token Build_token_ident(Ident ident);
 Token Build_token_literal(Literal literal);
 Token Build_token_punct(Punct punct);
+Token Build_token_doc(Doc doc);
 
 CLASS(Tokenizer, FIELD(u64, pos) FIELD(StringRef, ref) FIELD(bool, in_comment))
 IMPL(Tokenizer, TRAIT_TOKENIZER)
 IMPL(Tokenizer, TRAIT_COPY)
 #define Tokenizer DEFINE_CLASS(Tokenizer)
 
+StringRef Token_simple_str(Token *ptr);
+
 #define TOKEN_INIT BUILD(Token, NoType, BUILD(Ident), {}, {NULL})
 #define IDENT(s) Ident_build(s)
+#define DOC(s) Doc_build(s)
 #define PUNCT(...) {{&PunctVtable, "Punct"}, __VA_ARGS__}
+#define TOKEN_TYPE(x) *Token_get_ttype(&x)
+#define TOKEN_STR(x) Token_simple_str(&x)
+#define NEXT_TOKEN(x) Tokenizer_next_token(&x)
+
 static GETTER(Punct, ch);
 static GETTER(Punct, second_ch);
 static GETTER(Punct, third_ch);
@@ -72,6 +90,7 @@ static GETTER(Token, ttype);
 static GETTER(Token, ident);
 static GETTER(Token, punct);
 static GETTER(Token, literal);
+static GETTER(Token, doc);
 
 #define LITERAL(s)                                                             \
 	_Generic((s), char *: Literal_build, default: Literal_build_num)(s)
@@ -80,22 +99,7 @@ static GETTER(Token, literal);
 	_Generic((s),                                                          \
 	    Ident: Build_token_ident,                                          \
 	    Literal: Build_token_literal,                                      \
-	    Punct: Build_token_punct)(s)
-/*
-StringRef s = STRINGP("this is a test");
-Tokenizer tokenizer = TOKENIZER(&s);
-while (true) {
-Result next = NEXT_TOKEN(&tokenizer);
-if (!next.is_ok()) {
-	// handle err
-	break;
-}
-Option opt = *(Option *)unwrap(&next);
-if (!opt.is_some())
-	break;
-Token token = *(Token *)unwrap(&opt);
-// process token tree
-}
-*/
+	    Punct: Build_token_punct,                                          \
+	    Doc: Build_token_doc)(s)
 
 #endif // _BASE_TOKENIZER__

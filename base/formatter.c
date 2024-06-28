@@ -64,6 +64,7 @@ Result Formatter_write(Formatter *ptr, char *fmt, ...) {
 			return Ok(UNIT);
 		}
 	}
+	return Ok(UNIT);
 }
 
 Result Formatter_to_str_ref(Formatter *ptr) {

@@ -26,6 +26,7 @@ Result append(void *dst, void *src);
 Result deep_copy(void *dst, void *src);
 u64 len(void *obj);
 Result to_string(void *obj);
+Result to_string_buf(void *obj, usize buffer_size);
 
 #define TRAIT_APPEND(T)                                                        \
 	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
