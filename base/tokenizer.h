@@ -54,6 +54,8 @@ StringRef Token_simple_str(Token *ptr);
 
 static GETTER(Token, ttype);
 static GETTER(Token, text);
+static GETTER(Tokenizer, in_comment);
+static SETTER(Tokenizer, in_comment);
 
 #define TOKEN(ttype, s)                                                        \
 	_Generic((s), i128: Token_build_lit_num, default: Token_build)(ttype, s)

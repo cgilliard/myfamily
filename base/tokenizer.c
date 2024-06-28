@@ -20,8 +20,6 @@ SETTER(Token, ttype)
 SETTER(Token, text)
 GETTER(Tokenizer, pos)
 SETTER(Tokenizer, pos)
-GETTER(Tokenizer, in_comment)
-SETTER(Tokenizer, in_comment)
 GETTER(Tokenizer, ref)
 SETTER(Tokenizer, ref)
 
@@ -160,8 +158,9 @@ Result do_skip_comments(Tokenizer *ptr) {
 			}
 			bool in_start_comment = true;
 			while (true) {
-				if (pos >= rlen)
+				if (pos >= rlen) {
 					break;
+				}
 				Result r3 = char_at(ref, pos);
 				char ch3 = *(signed char *)unwrap(&r3);
 				if ((ch3 == ' ' || ch3 == '\t' || ch3 == '\v' ||
@@ -180,8 +179,10 @@ Result do_skip_comments(Tokenizer *ptr) {
 		if (ch == '/' && ch2 == '*') {
 			pos += 2;
 			while (true) {
-				if (pos >= rlen)
+				if (pos >= rlen) {
+					Tokenizer_set_in_comment(ptr, true);
 					break;
+				}
 				Result r3 = char_at(ref, pos - 1);
 				char close_ch1 = *(signed char *)unwrap(&r3);
 				Result r4 = char_at(ref, pos);
@@ -210,7 +211,35 @@ Result do_skip_comments(Tokenizer *ptr) {
 	}
 }
 
-Result Tokenizer_skip_to_token(Tokenizer *ptr) {
+Result Tokenizer_skip_in_comment(Tokenizer *ptr) {
+	StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
+	u64 rlen = len(ref);
+	u64 pos = *Tokenizer_get_pos(ptr);
+	while (true) {
+		if (pos >= rlen)
+			break;
+		if (pos > 0) {
+			Result r1 = char_at(ref, pos - 1);
+			char ch1 = *(signed char *)Try(r1);
+			Result r2 = char_at(ref, pos);
+			char ch2 = *(signed char *)Try(r2);
+			if (ch1 == '*' && ch2 == '/') {
+				pos += 1;
+				Tokenizer_set_in_comment(ptr, false);
+				break;
+			}
+		}
+		pos += 1;
+	}
+	Tokenizer_set_pos(ptr, pos);
+	return Ok(UNIT);
+}
+
+Result Tokenizer_skip_to_token(Tokenizer *ptr, bool in_comment) {
+	if (in_comment) {
+		Result r0 = Tokenizer_skip_in_comment(ptr);
+		Try(r0);
+	}
 	while (true) {
 		Result r1 = do_skip_white_space(ptr);
 		Try(r1);
@@ -389,11 +418,13 @@ Result Tokenizer_next_token(Tokenizer *ptr) {
 	StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
 	u64 rlen = len(ref);
 	u64 pos = *Tokenizer_get_pos(ptr);
+	bool in_comment = *Tokenizer_get_in_comment(ptr);
+
 	if (pos >= rlen) {
 		return Ok(None);
 	}
 
-	Result skip = Tokenizer_skip_to_token(ptr);
+	Result skip = Tokenizer_skip_to_token(ptr, in_comment);
 	Option res = *(Option *)Try(skip);
 	if (res.is_some()) {
 		StringRef comment = *(StringRef *)unwrap(&res);

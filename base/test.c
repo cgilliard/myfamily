@@ -314,11 +314,13 @@ FamTest(base, test_token) {
 }
 
 void expect_tokens(char *str, TokenType *type_expects, char **token_str_expects,
-		   int expect_count) {
+		   int expect_count, bool in_comment_end,
+		   bool in_comment_start) {
 	StringRef s = STRINGP(str);
 	Result r = Tokenizer_parse(&s);
 	assert(r.is_ok());
 	Tokenizer t = *(Tokenizer *)unwrap(&r);
+	Tokenizer_set_in_comment(&t, in_comment_start);
 	int count = 0;
 
 	while (true) {
@@ -338,6 +340,7 @@ void expect_tokens(char *str, TokenType *type_expects, char **token_str_expects,
 
 		count += 1;
 	}
+	assert_eq(*Tokenizer_get_in_comment(&t), in_comment_end);
 	assert_eq(count, expect_count);
 }
 
@@ -345,19 +348,20 @@ FamTest(base, test_tokenizer) {
 	printf("t1:\n");
 	TokenType exp_tt1[] = {IdentType, IdentType, IdentType, IdentType};
 	char *exp_tstr1[] = {"this", "is", "a", "test"};
-	expect_tokens("this is a test", exp_tt1, exp_tstr1, 4);
+	expect_tokens("this is a test", exp_tt1, exp_tstr1, 4, false, false);
 
 	printf("t2:\n");
 	TokenType exp_tt2[] = {IdentType, IdentType, PunctType, LiteralType,
 			       PunctType};
 	char *exp_tstr2[] = {"u64", "x", "=", "0", ";"};
-	expect_tokens("u64 x = 0;", exp_tt2, exp_tstr2, 5);
+	expect_tokens("u64 x = 0;", exp_tt2, exp_tstr2, 5, false, false);
 
 	printf("t3:\n");
 	TokenType exp_tt3[] = {IdentType, PunctType,   IdentType,
 			       PunctType, LiteralType, PunctType};
 	char *exp_tstr3[] = {"char", "*", "x9_bac", "=", "\"abc123\"", ";"};
-	expect_tokens("char *x9_bac = \"abc123\";", exp_tt3, exp_tstr3, 6);
+	expect_tokens("char *x9_bac = \"abc123\";", exp_tt3, exp_tstr3, 6,
+		      false, false);
 
 	printf("t4:\n");
 	TokenType exp_tt4[] = {IdentType,   PunctType, IdentType,   PunctType,
@@ -366,95 +370,116 @@ FamTest(base, test_tokenizer) {
 	char *exp_tstr4[] = {"if", "(",	     "abc",	 "!=", "7",	")",
 			     "{",  "return", "\"test\"", "+",  "\'x\'", "}"};
 	expect_tokens("if(abc!= 7) { return \"test\" + \'x\'}", exp_tt4,
-		      exp_tstr4, 12);
+		      exp_tstr4, 12, false, false);
 
 	printf("t5\n");
 	TokenType exp_tt5[] = {IdentType,   PunctType, IdentType, PunctType,
 			       LiteralType, PunctType, IdentType, PunctType};
 	char *exp_tstr5[] = {"if", "(", "x", "=", "745", ")", "return", ";"};
-	expect_tokens("if\n\n\t(x=745) return;\t\n", exp_tt5, exp_tstr5, 8);
+	expect_tokens("if\n\n\t(x=745) return;\t\n", exp_tt5, exp_tstr5, 8,
+		      false, false);
 
 	printf("t6\n");
 	TokenType exp_tt6[] = {IdentType,   PunctType, IdentType, PunctType,
 			       LiteralType, PunctType, IdentType, PunctType};
 	char *exp_tstr6[] = {"if", "(", "x", "=", "745", ")", "return", ";"};
-	expect_tokens("if\n\n\t(x=745) return; ", exp_tt6, exp_tstr6, 8);
+	expect_tokens("if\n\n\t(x=745) return; ", exp_tt6, exp_tstr6, 8, false,
+		      false);
 
 	printf("t7\n");
 	TokenType exp_tt7[] = {IdentType, PunctType, IdentType};
 	char *exp_tstr7[] = {"abc", "=", "def"};
-	expect_tokens("abc = def", exp_tt7, exp_tstr7, 3);
+	expect_tokens("abc = def", exp_tt7, exp_tstr7, 3, false, false);
 
 	printf("t8\n");
 	TokenType exp_tt8[] = {IdentType, PunctType, IdentType};
 	char *exp_tstr8[] = {"abc", "=", "def"};
-	expect_tokens("abc = def\n ", exp_tt8, exp_tstr8, 3);
+	expect_tokens("abc = def\n ", exp_tt8, exp_tstr8, 3, false, false);
 
 	printf("t9\n");
 	TokenType exp_tt9[] = {PunctType, PunctType, PunctType};
 	char *exp_tstr9[] = {"<=", ">=", "..."};
-	expect_tokens("<=>=...\n ", exp_tt9, exp_tstr9, 3);
+	expect_tokens("<=>=...\n ", exp_tt9, exp_tstr9, 3, false, false);
 
 	printf("t10\n");
 	TokenType exp_tt10[] = {IdentType, PunctType, PunctType, IdentType,
 				PunctType};
 	char *exp_tstr10[] = {"x", ">=", "...", "hi", ";"};
 	expect_tokens("x>=... // ok this is a test  \t\n  hi ; ", exp_tt10,
-		      exp_tstr10, 5);
+		      exp_tstr10, 5, false, false);
 
 	printf("t11\n");
 	TokenType exp_tt11[] = {IdentType, PunctType, PunctType, IdentType,
 				PunctType};
 	char *exp_tstr11[] = {"x", ">=", "...", "hi", ";"};
 	expect_tokens("x>=... /* ok this is a test  \t\n  */ hi ; ", exp_tt11,
-		      exp_tstr11, 5);
+		      exp_tstr11, 5, false, false);
 
 	printf("t12\n");
 	TokenType exp_tt12[] = {IdentType, PunctType, PunctType, IdentType,
 				PunctType};
 	char *exp_tstr12[] = {"x", ">=", "...", "hi", ";"};
-	expect_tokens("x>=... /**/ hi ; ", exp_tt12, exp_tstr12, 5);
+	expect_tokens("x>=... /**/ hi ; ", exp_tt12, exp_tstr12, 5, false,
+		      false);
 
 	printf("t13\n");
 	// use same exp as last time
-	expect_tokens("x>=... /* */ hi ; ", exp_tt12, exp_tstr12, 5);
+	expect_tokens("x>=... /* */ hi ; ", exp_tt12, exp_tstr12, 5, false,
+		      false);
 
 	// end on a comment
 	printf("t14\n");
 	// use same exp as last time
-	expect_tokens("x>=...  hi ;  /*      ", exp_tt12, exp_tstr12, 5);
+	expect_tokens("x>=...  hi ;  /*      ", exp_tt12, exp_tstr12, 5, true,
+		      false);
 
 	// end on a comment
 	printf("t15\n");
 	// use same exp as last time
-	expect_tokens("x>=...  hi ;  // testing     ", exp_tt12, exp_tstr12, 5);
+	expect_tokens("x>=...  hi ;  // testing     ", exp_tt12, exp_tstr12, 5,
+		      false, false);
 
 	printf("t16\n");
 	TokenType exp_tt16[] = {IdentType, PunctType, PunctType,
 				DocType,   IdentType, PunctType};
 	char *exp_tstr16[] = {"x", ">=", "...", "ok this is a test", "hi", ";"};
 	expect_tokens("x>=... /// ok this is a test\n   hi ; ", exp_tt16,
-		      exp_tstr16, 6);
+		      exp_tstr16, 6, false, false);
 
 	printf("t17\n");
 	TokenType exp_tt17[] = {IdentType, PunctType, PunctType,
 				DocType,   IdentType, PunctType};
 	char *exp_tstr17[] = {"x", ">=", "...", "", "hi", ";"};
-	expect_tokens("x>=... ///\n   hi ; ", exp_tt17, exp_tstr17, 6);
+	expect_tokens("x>=... ///\n   hi ; ", exp_tt17, exp_tstr17, 6, false,
+		      false);
 
 	printf("t18\n");
 	// use 17 exp again
-	expect_tokens("x>=... /// \n   hi ; ", exp_tt17, exp_tstr17, 6);
+	expect_tokens("x>=... /// \n   hi ; ", exp_tt17, exp_tstr17, 6, false,
+		      false);
 
 	printf("t19\n");
 	// use 17 exp again
-	expect_tokens("x>=... ///\t\n   hi ; ", exp_tt17, exp_tstr17, 6);
+	expect_tokens("x>=... ///\t\n   hi ; ", exp_tt17, exp_tstr17, 6, false,
+		      false);
 
 	printf("t20\n");
 	TokenType exp_tt20[] = {IdentType, PunctType, PunctType,
 				DocType,   IdentType, PunctType};
 	char *exp_tstr20[] = {"x", ">=", "...", "x", "hi", ";"};
-	expect_tokens("x>=... ///x\n   hi ; ", exp_tt20, exp_tstr20, 6);
+	expect_tokens("x>=... ///x\n   hi ; ", exp_tt20, exp_tstr20, 6, false,
+		      false);
+
+	printf("t21\n");
+	TokenType exp_tt21[] = {IdentType, PunctType};
+	char *exp_tstr21[] = {"hi", ";"};
+	expect_tokens(" hi ; /*", exp_tt21, exp_tstr21, 2, true, false);
+
+	printf("t22\n");
+	TokenType exp_tt22[] = {IdentType, PunctType};
+	char *exp_tstr22[] = {"hi", ";"};
+	expect_tokens(" a b c 10 \"abc\" */ hi ; ", exp_tt22, exp_tstr22, 2,
+		      false, true);
 }
 
 FamTest(base, test_option_res_etc) {
