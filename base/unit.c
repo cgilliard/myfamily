@@ -31,4 +31,3 @@ Result Unit_dbg(Unit *ptr, Formatter *formatter) {
 	Try(r);
 	return Ok(UNIT);
 }
-

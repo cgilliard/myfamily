@@ -16,17 +16,8 @@
 #include <base/tokenizer.h>
 #include <base/unit.h>
 
-GETTER(Ident, value)
-SETTER(Ident, value)
-GETTER(Literal, value)
-SETTER(Literal, value)
-GETTER(Doc, value)
-SETTER(Doc, value)
-SETTER(Punct, ch)
-SETTER(Punct, second_ch)
-SETTER(Punct, third_ch)
 SETTER(Token, ttype)
-SETTER(Token, doc)
+SETTER(Token, text)
 GETTER(Tokenizer, pos)
 SETTER(Tokenizer, pos)
 GETTER(Tokenizer, in_comment)
@@ -34,96 +25,60 @@ SETTER(Tokenizer, in_comment)
 GETTER(Tokenizer, ref)
 SETTER(Tokenizer, ref)
 
-Doc Doc_build(char *s) {
-	StringRef ref = STRINGP(s);
-	DocPtr ret = BUILD(Doc);
-	Result r = deep_copy(&ret._value, &ref);
-	Expect(r);
-	return ret;
-}
-void Doc_cleanup(Doc *ptr) {
-	StringRefPtr value = *Doc_get_value(ptr);
-	cleanup(&value);
-}
-bool Doc_clone(Doc *dst, Doc *src) {
+Result Token_fmt(Token *obj, Formatter *formatter) {
+	TokenType ttype = *Token_get_ttype(obj);
+	StringRefPtr token = *Token_get_text(obj);
 
-	StringRefPtr value_src = *Doc_get_value(src);
-	Result r = deep_copy(&dst->_value, &value_src);
-	return r.is_ok();
-}
-Result Doc_fmt(Doc *ptr, Formatter *formatter) {
-	StringRefPtr value = *Doc_get_value(ptr);
-	Result r = Formatter_write(formatter, "Doc[\"%s\"]", to_str(&value));
-	Try(r);
+	if (ttype == IdentType) {
+		Result r = WRITE(formatter, "Token[Ident[%s]]", to_str(&token));
+		Try(r);
+	} else if (ttype == LiteralType) {
+		Result r =
+		    WRITE(formatter, "Token[Literal[%s]]", to_str(&token));
+		Try(r);
+	} else if (ttype == PunctType) {
+		Result r = WRITE(formatter, "Token[Punct[%s]]", to_str(&token));
+		Try(r);
+	} else if (ttype == DocType) {
+		Result r = WRITE(formatter, "Token[Doc[%s]]", to_str(&token));
+		Try(r);
+	} else {
+		Result r = WRITE(formatter, "Token[Unknown]");
+		Try(r);
+	}
 	return Ok(UNIT);
 }
-usize Doc_size(Doc *ptr) { return sizeof(Doc); }
-char *Doc_to_str(Doc *ptr) {
-	StringRefPtr value = *Doc_get_value(ptr);
-	return to_str(&value);
-}
 
-void Ident_cleanup(Ident *ptr) {
-	StringRefPtr value = *Ident_get_value(ptr);
-	cleanup(&value);
-}
+usize Token_size(Token *obj) { return sizeof(Token); }
 
-Result Ident_fmt(Ident *ptr, Formatter *formatter) {
-	StringRefPtr value = *Ident_get_value(ptr);
-	Result r = Formatter_write(formatter, "Ident[\"%s\"]", to_str(&value));
-	Try(r);
-	return Ok(UNIT);
-}
-bool Ident_clone(Ident *dst, Ident *src) {
-	StringRefPtr value_src = *Ident_get_value(src);
-	Result r = deep_copy(&dst->_value, &value_src);
-	return r.is_ok();
-}
-usize Ident_size(Ident *obj) { return sizeof(Ident); }
-char *Ident_to_str(Ident *obj) {
-	StringRefPtr value = *Ident_get_value(obj);
-	return to_str(&value);
-}
-Ident Ident_build(char *s) {
-	StringRef ref = STRINGP(s);
-	IdentPtr ret = BUILD(Ident);
-	Result r = deep_copy(&ret._value, &ref);
-	Expect(r);
-
-	return ret;
-}
-
-Result Literal_fmt(Literal *ptr, Formatter *formatter) {
-	StringRefPtr value = *Literal_get_value(ptr);
-	Result r =
-	    Formatter_write(formatter, "Literal[\"%s\"]", to_str(&value));
+Result Token_dbg(Token *obj, Formatter *f) {
+	StringRefPtr token = *Token_get_text(obj);
+	Result r = WRITE(f, "%s", to_str(&token));
 	Try(r);
 	return Ok(UNIT);
 }
 
-void Literal_cleanup(Literal *ptr) {
-	StringRefPtr value = *Literal_get_value(ptr);
-	cleanup(&value);
+void Token_cleanup(Token *ptr) {
+	TokenType ttype = *Token_get_ttype(ptr);
+	if (ttype != NoType) {
+		cleanup(&ptr->_text);
+	}
+	Token_set_ttype(ptr, NoType);
 }
-bool Literal_clone(Literal *dst, Literal *src) {
-	StringRefPtr value_src = *Literal_get_value(src);
-	Result r = deep_copy(&dst->_value, &value_src);
+bool Token_clone(Token *dst, Token *src) {
+	TokenType ttype = *Token_get_ttype(src);
+	Token_set_ttype(dst, ttype);
+	Result r = deep_copy(&dst->_text, &src->_text);
 	return r.is_ok();
 }
-usize Literal_size(Literal *obj) { return sizeof(Literal); }
-char *Literal_to_str(Literal *obj) {
-	StringRefPtr value = *Literal_get_value(obj);
-	return to_str(&value);
-}
-Literal Literal_build(char *s) {
-	StringRef ref = STRINGP(s);
-	LiteralPtr ret = BUILD(Literal);
-	Result r = deep_copy(&ret._value, &ref);
-	Expect(r);
 
+Token Token_build(TokenType ttype, char *text) {
+	StringRefPtr ref = STRINGP(text);
+	TokenPtr ret = BUILD(Token, ttype, ref);
 	return ret;
 }
-Literal Literal_build_num(i128 value) {
+
+Token Token_build_lit_num(i128 value) {
 	char is_negative[2];
 	if (value < 0) {
 		value = value * -1;
@@ -140,173 +95,8 @@ Literal Literal_build_num(i128 value) {
 		snprintf(s, 100, "%s%llu%llu", is_negative, high, low);
 	else
 		snprintf(s, 100, "%s%llu", is_negative, low);
-	StringRefPtr sref = STRINGP(s);
-	LiteralPtr ret = BUILD(Literal, sref);
-	return ret;
-}
-
-Result Punct_fmt(Punct *ptr, Formatter *formatter) {
-	signed char p_ch = *Punct_get_ch(ptr);
-	signed char p_second_ch = *Punct_get_second_ch(ptr);
-	signed char p_third_ch = *Punct_get_third_ch(ptr);
-	Result r;
-
-	if (p_second_ch == 0)
-		r = Formatter_write(formatter, "Punct[\"%c\"]", p_ch);
-	else if (p_third_ch == 0)
-		r = Formatter_write(formatter, "Punct[\"%c%c\"]", p_ch,
-				    p_second_ch);
-	else
-		r = Formatter_write(formatter, "Punct[\"%c%c%c\"]", p_ch,
-				    p_second_ch, p_third_ch);
-	Try(r);
-	return Ok(UNIT);
-}
-
-void Punct_cleanup(Punct *ptr) {}
-bool Punct_clone(Punct *dst, Punct *src) {
-	Punct_set_ch(dst, *Punct_get_ch(src));
-	Punct_set_second_ch(dst, *Punct_get_second_ch(src));
-	Punct_set_third_ch(dst, *Punct_get_third_ch(src));
-	return true;
-}
-usize Punct_size(Punct *obj) { return sizeof(Punct); }
-
-Result Token_fmt(Token *obj, Formatter *formatter) {
-	u64 ttype = *Token_get_ttype(obj);
-	if (ttype == IdentType) {
-		IdentPtr *ident = *(Ident **)Token_get_ident(obj);
-		Result r0 = to_string(ident);
-		StringRef s = *(StringRef *)Try(r0);
-		Result r = Formatter_write(formatter, "Token[%s]", to_str(&s));
-		Try(r);
-	} else if (ttype == LiteralType) {
-		LiteralPtr *literal = *(Literal **)Token_get_literal(obj);
-		Result r0 = to_string(literal);
-		StringRef s = *(StringRef *)Try(r0);
-		Result r = Formatter_write(formatter, "Token[%s]", to_str(&s));
-		Try(r);
-	} else if (ttype == PunctType) {
-		PunctPtr *punct = *(Punct **)Token_get_punct(obj);
-		Result r0 = to_string(punct);
-		StringRef s = *(StringRef *)Try(r0);
-		Result r = Formatter_write(formatter, "Token[%s]", to_str(&s));
-		Try(r);
-	} else if (ttype == DocType) {
-		DocPtr *doc = *(Doc **)Token_get_doc(obj);
-		Result r0 = to_string(doc);
-		StringRef s = *(StringRef *)Try(r0);
-		Result r = Formatter_write(formatter, "Token[%s]", to_str(&s));
-		Try(r);
-	} else {
-		Result r = Formatter_write(formatter, "Token[]");
-		Try(r);
-	}
-	return Ok(UNIT);
-}
-
-usize Token_size(Token *obj) { return sizeof(Token); }
-
-StringRef Token_simple_str(Token *ptr) {
-	TokenType ttype = *(TokenType *)Token_get_ttype(ptr);
-	if (ttype == IdentType) {
-		IdentPtr *ident = *Token_get_ident(ptr);
-		StringRefPtr value = *Ident_get_value(ident);
-		StringRefPtr ret;
-		Result r = deep_copy(&ret, &value);
-		if (!r.is_ok())
-			panic("deep copy failed");
-		return ret;
-	} else if (ttype == LiteralType) {
-		LiteralPtr *literal = *Token_get_literal(ptr);
-		StringRefPtr value = *Literal_get_value(literal);
-		StringRefPtr ret;
-		Result r = deep_copy(&ret, &value);
-		if (!r.is_ok())
-			panic("deep copy failed");
-		return ret;
-	} else if (ttype == PunctType) {
-		PunctPtr *punct = *Token_get_punct(ptr);
-		char buf[4];
-		buf[0] = *Punct_get_ch(punct);
-		buf[1] = *Punct_get_second_ch(punct);
-		buf[2] = *Punct_get_third_ch(punct);
-		buf[3] = 0;
-
-		return STRINGP(buf);
-	} else if (ttype == DocType) {
-		DocPtr *doc = *Token_get_doc(ptr);
-		StringRefPtr value = *Doc_get_value(doc);
-		StringRefPtr ret;
-		Result r = deep_copy(&ret, &value);
-		if (!r.is_ok())
-			panic("deep copy failed");
-		return ret;
-	}
-	return STRINGP("");
-}
-
-void Token_cleanup(Token *ptr) {
-	TokenType ttype = *Token_get_ttype(ptr);
-	if (ttype == IdentType) {
-		cleanup(ptr->_ident);
-		tlfree(ptr->_ident);
-	} else if (ttype == LiteralType) {
-		cleanup(ptr->_literal);
-		tlfree(ptr->_literal);
-	} else if (ttype == PunctType) {
-		cleanup(ptr->_punct);
-		tlfree(ptr->_punct);
-	} else if (ttype == DocType) {
-		cleanup(ptr->_doc);
-		tlfree(ptr->_doc);
-	}
-	Token_set_ttype(ptr, NoType);
-}
-bool Token_clone(Token *dst, Token *src) {
-	TokenType ttype = *Token_get_ttype(src);
-	Token_set_ttype(dst, ttype);
-	if (ttype == IdentType) {
-		dst->_ident = tlmalloc(sizeof(Ident));
-		bool ret = clone(dst->_ident, src->_ident);
-		return ret;
-	} else if (ttype == LiteralType) {
-		dst->_literal = tlmalloc(sizeof(Literal));
-		return clone(dst->_literal, src->_literal);
-	} else if (ttype == PunctType) {
-		dst->_punct = tlmalloc(sizeof(Punct));
-		return clone(dst->_punct, src->_punct);
-	} else if (ttype == DocType) {
-		dst->_doc = tlmalloc(sizeof(Doc));
-		BUILDPTR(dst->_doc, Doc);
-		bool ret = clone(dst->_doc, src->_doc);
-		return ret;
-	}
-	return true;
-}
-Token Build_token_ident(Ident ident) {
-	TokenPtr ret = BUILD(Token, IdentType);
-	ret._ident = tlmalloc(sizeof(Ident));
-	clone(ret._ident, &ident);
-	return ret;
-}
-Token Build_token_literal(Literal literal) {
-	TokenPtr ret = BUILD(Token, LiteralType);
-	ret._literal = tlmalloc(sizeof(Literal));
-	clone(ret._literal, &literal);
-	return ret;
-}
-Token Build_token_punct(Punct punct) {
-	TokenPtr ret = BUILD(Token, PunctType);
-	ret._punct = tlmalloc(sizeof(Punct));
-	clone(ret._punct, &punct);
-	return ret;
-}
-
-Token Build_token_doc(Doc doc) {
-	TokenPtr ret = BUILD(Token, DocType);
-	ret._doc = tlmalloc(sizeof(Doc));
-	clone(ret._doc, &doc);
+	StringRefPtr ref = STRINGP(s);
+	TokenPtr ret = BUILD(Token, LiteralType, ref);
 	return ret;
 }
 
@@ -365,13 +155,23 @@ Result do_skip_comments(Tokenizer *ptr) {
 					// this is a doc comment. we need to
 					// return it
 					start_doc_comment = pos + 1;
+					pos += 1;
 				}
 			}
+			bool in_start_comment = true;
 			while (true) {
 				if (pos >= rlen)
 					break;
 				Result r3 = char_at(ref, pos);
 				char ch3 = *(signed char *)unwrap(&r3);
+				if ((ch3 == ' ' || ch3 == '\t' || ch3 == '\v' ||
+				     ch3 == '\f') &&
+				    in_start_comment &&
+				    start_doc_comment != 0) {
+					start_doc_comment += 1;
+				} else {
+					in_start_comment = false;
+				}
 				if (ch3 == '\n')
 					break;
 				pos += 1;
@@ -455,8 +255,7 @@ Result Tokenizer_proc_ident(Tokenizer *ptr) {
 	Tokenizer_set_pos(ptr, end);
 	Result ret = SUBSTRING(ref, start, end);
 	StringRef sptr = *(StringRef *)unwrap(&ret);
-	Ident ident = IDENT(to_str(&sptr));
-	Token token = TOKEN(ident);
+	Token token = TOKEN(IdentType, to_str(&sptr));
 	Option opt = Some(token);
 	return Ok(opt);
 }
@@ -494,8 +293,7 @@ Result Tokenizer_proc_literal(Tokenizer *ptr) {
 	Tokenizer_set_pos(ptr, end);
 	Result ret = SUBSTRING(ref, start, end);
 	StringRef sptr = *(StringRef *)unwrap(&ret);
-	Literal literal = LITERAL(to_str(&sptr));
-	Token token = TOKEN(literal);
+	Token token = TOKEN(LiteralType, to_str(&sptr));
 	Option opt = Some(token);
 	return Ok(opt);
 }
@@ -577,22 +375,14 @@ Result Tokenizer_proc_punct(Tokenizer *ptr) {
 	else
 		Tokenizer_set_pos(ptr, pos + 1);
 
-	if (ch3 != 0) {
-		Punct punct = PUNCT(ch, ch2, ch3);
-		Token token = TOKEN(punct);
-		Option opt = Some(token);
-		return Ok(opt);
-	} else if (ch2 != 0) {
-		Punct punct = PUNCT(ch, ch2);
-		Token token = TOKEN(punct);
-		Option opt = Some(token);
-		return Ok(opt);
-	} else {
-		Punct punct = PUNCT(ch);
-		Token token = TOKEN(punct);
-		Option opt = Some(token);
-		return Ok(opt);
-	}
+	char punct[4];
+	punct[0] = ch;
+	punct[1] = ch2;
+	punct[2] = ch3;
+	punct[3] = 0;
+	Token token = TOKEN(PunctType, punct);
+	Option opt = Some(token);
+	return Ok(opt);
 }
 
 Result Tokenizer_next_token(Tokenizer *ptr) {
@@ -606,31 +396,10 @@ Result Tokenizer_next_token(Tokenizer *ptr) {
 	Result skip = Tokenizer_skip_to_token(ptr);
 	Option res = *(Option *)Try(skip);
 	if (res.is_some()) {
-
 		StringRef comment = *(StringRef *)unwrap(&res);
-		StringRefPtr comment_copy;
-		Result rdc = deep_copy(&comment_copy, &comment);
-		Try(rdc);
-		char *comment_copy_str = to_str(&comment_copy);
-		Doc doc = DOC(to_str(&comment_copy));
-		Token token = TOKEN(doc);
-
-		// StringRef rrx = TOKEN_STR(token);
+		Token token = TOKEN(DocType, to_str(&comment));
 		Option opt = Some(token);
 		return Ok(opt);
-		/*
-		StringRef sptr = *(StringRef *)unwrap(&ret);
-	Ident ident = IDENT(to_str(&sptr));
-	Token token = TOKEN(ident);
-	Option opt = Some(token);
-	return Ok(opt);
-		 *
-		 *
-			DocPtr doc = DOC(" ok this is a test");
-			Token token = TOKEN(doc);
-			Option opt = Some(token);
-			return Ok(opt);
-			*/
 	}
 	pos = *Tokenizer_get_pos(ptr);
 	if (pos >= rlen) {

@@ -131,9 +131,29 @@ Result to_string_buf(void *obj, usize buf_size) {
 	}
 
 	char buf[buf_size];
-	Formatter fmt = BUILD(Formatter, buf, TO_STRING_BUF_SIZE, 0);
+	Formatter fmt = BUILD(Formatter, buf, buf_size, 0);
 
 	Result r = do_fmt(obj, &fmt);
+	Try(r);
+
+	return Formatter_to_str_ref(&fmt);
+}
+
+Result to_debug(void *obj) { return to_debug_buf(obj, TO_STRING_BUF_SIZE); }
+
+Result to_debug_buf(void *obj, usize buf_size) {
+	ResultPtr (*do_dbg)(Object *obj, Formatter *formatter) =
+	    find_fn((Object *)obj, "dbg");
+	if (do_dbg == NULL) {
+
+		panic("debug trait not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	}
+
+	char buf[buf_size];
+	Formatter fmt = BUILD(Formatter, buf, buf_size, 0);
+
+	Result r = do_dbg(obj, &fmt);
 	Try(r);
 
 	return Formatter_to_str_ref(&fmt);

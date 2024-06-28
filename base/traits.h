@@ -27,6 +27,8 @@ Result deep_copy(void *dst, void *src);
 u64 len(void *obj);
 Result to_string(void *obj);
 Result to_string_buf(void *obj, usize buffer_size);
+Result to_debug(void *obj);
+Result to_debug_buf(void *obj, usize buffer_size);
 
 #define UNWRAP_AS(type, value) *(type *)unwrap_as(#type, &value)
 

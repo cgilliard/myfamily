@@ -280,58 +280,8 @@ FamTest(base, test_deep_copy) {
 	assert_eq_str(CLASS_NAME(&x3), "StringRef");
 }
 
-FamTest(base, test_ident) {
-	Ident ident = IDENT("abc");
-	assert_eq_str(to_str(&ident), "abc");
-
-	Ident ident2;
-	bool cr = clone(&ident2, &ident);
-	assert(cr);
-
-	assert_eq_str(to_str(&ident2), "abc");
-}
-
-FamTest(base, test_literal) {
-	Literal literal = LITERAL("\"def\"");
-	assert_eq_str(to_str(&literal), "\"def\"");
-
-	Literal literal2;
-	bool cr = clone(&literal2, &literal);
-	assert(cr);
-	assert_eq_str(to_str(&literal2), "\"def\"");
-
-	Literal literal3 = LITERAL(100);
-	assert_eq_str(to_str(&literal3), "100");
-
-	Literal literal4;
-	cr = clone(&literal4, &literal3);
-	assert(cr);
-	assert_eq_str(to_str(&literal4), "100");
-}
-
-FamTest(base, test_doc) {
-	Doc d1 = DOC("testing 123");
-	assert_eq_str(to_str(&d1), "testing 123");
-
-	Doc d2 = DOC("okabc 456");
-	assert_eq_str(to_str(&d2), "okabc 456");
-}
-
-FamTest(base, test_punct) {
-	Punct p1 = PUNCT('.', '.', '.');
-	assert_eq(*Punct_get_ch(&p1), '.');
-	assert_eq(*Punct_get_second_ch(&p1), '.');
-	assert_eq(*Punct_get_third_ch(&p1), '.');
-
-	Punct p2 = PUNCT('<');
-	assert_eq(*Punct_get_ch(&p2), '<');
-	assert_eq(*Punct_get_second_ch(&p2), 0);
-	assert_eq(*Punct_get_third_ch(&p2), 0);
-}
-
 FamTest(base, test_token) {
-	Ident ident = IDENT("abc");
-	Token t1 = TOKEN(ident);
+	Token t1 = TOKEN(IdentType, "abc");
 
 	Result r0 = to_string(&t1);
 	assert(r0.is_ok());
@@ -340,14 +290,14 @@ FamTest(base, test_token) {
 	clone(&t2, &t1);
 	assert_eq(*Token_get_ttype(&t1), IdentType);
 	assert_eq(*Token_get_ttype(&t2), IdentType);
-	IdentPtr *t1_out = *Token_get_ident(&t1);
-	assert_eq_str(to_str(t1_out), "abc");
-	IdentPtr *t2_out = *Token_get_ident(&t2);
-	assert_eq_str(to_str(t2_out), "abc");
+	Result r1_out = to_debug(&t1);
+	StringRef t1_out = UNWRAP_AS(StringRef, r1_out);
+	assert_eq_str(to_str(&t1_out), "abc");
+	Result r2_out = to_debug(&t2);
+	StringRef t2_out = UNWRAP_AS(StringRef, r2_out);
+	assert_eq_str(to_str(&t2_out), "abc");
 
-	Punct punct = PUNCT('<', '=');
-
-	Token t3 = TOKEN(punct);
+	Token t3 = TOKEN(PunctType, "<=");
 	Result r13 = to_string(&t3);
 	assert(r13.is_ok());
 	StringRef s13 = *(StringRef *)unwrap(&r13);
@@ -355,50 +305,12 @@ FamTest(base, test_token) {
 	clone(&t4, &t3);
 	assert_eq(*Token_get_ttype(&t3), PunctType);
 	assert_eq(*Token_get_ttype(&t4), PunctType);
-	PunctPtr *t3_out = *Token_get_punct(&t3);
-	assert_eq(*Punct_get_ch(t3_out), '<');
-	assert_eq(*Punct_get_second_ch(t3_out), '=');
-	assert_eq(*Punct_get_third_ch(t3_out), 0);
-	PunctPtr *t4_out = *Token_get_punct(&t4);
-	assert_eq(*Punct_get_ch(t4_out), '<');
-	assert_eq(*Punct_get_second_ch(t4_out), '=');
-	assert_eq(*Punct_get_third_ch(t4_out), 0);
-
-	Literal literal = LITERAL(-155023);
-	Token t5 = TOKEN(literal);
-	Result r10 = to_string(&t5);
-	assert(r10.is_ok());
-	StringRef s10 = *(StringRef *)unwrap(&r10);
-	Token t6;
-	clone(&t6, &t5);
-	assert_eq(*Token_get_ttype(&t5), LiteralType);
-	assert_eq(*Token_get_ttype(&t6), LiteralType);
-	LiteralPtr *t5_out = *Token_get_literal(&t5);
-	assert_eq_str(to_str(t5_out), "-155023");
-	LiteralPtr *t6_out = *Token_get_literal(&t6);
-	assert_eq_str(to_str(t6_out), "-155023");
-
-	/*
-	Doc doc = DOC("testing docs");
-	Token t7 = TOKEN(doc);
-	Result r11 = to_string(&t7);
-	assert(r11.is_ok());
-	StringRef s11 = *(StringRef *)unwrap(&r11);
-	printf("class=%s\n", CLASS_NAME(&s11));
-	printf("s11=%s\n", to_str(&s11));
-	Token t8;
-	clone(&t8, &t7);
-	assert_eq(*Token_get_ttype(&t7), DocType);
-	assert_eq(*Token_get_ttype(&t8), DocType);
-	DocPtr *t7_out = *Token_get_doc(&t7);
-	assert_eq_str(to_str(t7_out), "testing docs");
-	DocPtr *t8_out = *Token_get_doc(&t8);
-	assert_eq_str(to_str(t8_out), "testing docs");
-	Token t9;
-	clone(&t9, &t8);
-	DocPtr *t9_out = *Token_get_doc(&t9);
-	assert_eq_str(to_str(t9_out), "testing docs");
-	*/
+	Result r3_out = to_debug(&t3);
+	StringRef t3_out = UNWRAP_AS(StringRef, r3_out);
+	assert_eq_str(to_str(&t3_out), "<=");
+	Result r4_out = to_debug(&t4);
+	StringRef t4_out = UNWRAP_AS(StringRef, r4_out);
+	assert_eq_str(to_str(&t4_out), "<=");
 }
 
 void expect_tokens(char *str, TokenType *type_expects, char **token_str_expects,
@@ -416,7 +328,8 @@ void expect_tokens(char *str, TokenType *type_expects, char **token_str_expects,
 		if (!opt.is_some())
 			break;
 		Token token = *(Token *)unwrap(&opt);
-		StringRef token_str = TOKEN_STR(token);
+		Result token_str_r = TOKEN_STR(token);
+		StringRef token_str = UNWRAP_AS(StringRef, token_str_r);
 		Result nt = to_string(&token);
 		StringRef nsr = *(StringRef *)unwrap(&nt);
 		printf("Token[%i]: %s\n", count, to_str(&nsr));
@@ -516,20 +429,36 @@ FamTest(base, test_tokenizer) {
 	// use same exp as last time
 	expect_tokens("x>=...  hi ;  // testing     ", exp_tt12, exp_tstr12, 5);
 
-	/*
 	printf("t16\n");
 	TokenType exp_tt16[] = {IdentType, PunctType, PunctType,
 				DocType,   IdentType, PunctType};
-	char *exp_tstr16[] = {"x",  ">=", "...", " ok this is a test",
-			      "hi", ";"};
+	char *exp_tstr16[] = {"x", ">=", "...", "ok this is a test", "hi", ";"};
 	expect_tokens("x>=... /// ok this is a test\n   hi ; ", exp_tt16,
 		      exp_tstr16, 6);
-		      */
+
+	printf("t17\n");
+	TokenType exp_tt17[] = {IdentType, PunctType, PunctType,
+				DocType,   IdentType, PunctType};
+	char *exp_tstr17[] = {"x", ">=", "...", "", "hi", ";"};
+	expect_tokens("x>=... ///\n   hi ; ", exp_tt17, exp_tstr17, 6);
+
+	printf("t18\n");
+	// use 17 exp again
+	expect_tokens("x>=... /// \n   hi ; ", exp_tt17, exp_tstr17, 6);
+
+	printf("t19\n");
+	// use 17 exp again
+	expect_tokens("x>=... ///\t\n   hi ; ", exp_tt17, exp_tstr17, 6);
+
+	printf("t20\n");
+	TokenType exp_tt20[] = {IdentType, PunctType, PunctType,
+				DocType,   IdentType, PunctType};
+	char *exp_tstr20[] = {"x", ">=", "...", "x", "hi", ";"};
+	expect_tokens("x>=... ///x\n   hi ; ", exp_tt20, exp_tstr20, 6);
 }
 
 FamTest(base, test_option_res_etc) {
-	Ident ident = IDENT("test");
-	Token token = TOKEN(ident);
+	Token token = TOKEN(DocType, "doctest");
 	Option opt = Some(token);
 	Result rx = Ok(opt);
 }

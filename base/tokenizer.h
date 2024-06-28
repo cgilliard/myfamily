@@ -18,6 +18,10 @@
 #include <base/class.h>
 #include <base/traits.h>
 
+#define TRAIT_TOKEN(T)                                                         \
+	TRAIT_REQUIRED(T, T##Ptr, build, TokenType type, char *token)          \
+	TRAIT_REQUIRED(T, T##Ptr, build_lit_num, i128)
+
 typedef enum TokenType {
 	NoType = 0,
 	IdentType = 1,
@@ -26,47 +30,12 @@ typedef enum TokenType {
 	DocType = 4
 } TokenType;
 
-CLASS(Ident, FIELD(StringRef, value))
-IMPL(Ident, TRAIT_COPY)
-IMPL(Ident, TRAIT_TO_STR)
-IMPL(Ident, TRAIT_DISPLAY)
-#define Ident DEFINE_CLASS(Ident)
-
-Ident Ident_build(char *s);
-
-CLASS(Doc, FIELD(StringRef, value))
-IMPL(Doc, TRAIT_COPY)
-IMPL(Doc, TRAIT_TO_STR)
-IMPL(Doc, TRAIT_DISPLAY)
-#define Doc DEFINE_CLASS(Doc)
-
-Doc Doc_build(char *s);
-
-CLASS(Punct, FIELD(char, ch) FIELD(char, second_ch) FIELD(char, third_ch))
-IMPL(Punct, TRAIT_COPY)
-IMPL(Punct, TRAIT_DISPLAY)
-#define Punct DEFINE_CLASS(Punct)
-
-CLASS(Literal, FIELD(StringRef, value))
-IMPL(Literal, TRAIT_DISPLAY)
-IMPL(Literal, TRAIT_TO_STR)
-IMPL(Literal, TRAIT_COPY)
-#define Literal DEFINE_CLASS(Literal)
-
-Literal Literal_build(char *value);
-Literal Literal_build_num(i128 value);
-
-CLASS(Token,
-      FIELD(TokenType, ttype) FIELD(Ident *, ident) FIELD(Literal *, literal)
-	  FIELD(Punct *, punct) FIELD(Doc *, doc))
+CLASS(Token, FIELD(TokenType, ttype) FIELD(StringRef, text))
 IMPL(Token, TRAIT_DISPLAY)
+IMPL(Token, TRAIT_DEBUG)
+IMPL(Token, TRAIT_TOKEN)
 IMPL(Token, TRAIT_COPY)
 #define Token DEFINE_CLASS(Token)
-
-Token Build_token_ident(Ident ident);
-Token Build_token_literal(Literal literal);
-Token Build_token_punct(Punct punct);
-Token Build_token_doc(Doc doc);
 
 CLASS(Tokenizer, FIELD(u64, pos) FIELD(StringRef, ref) FIELD(bool, in_comment))
 IMPL(Tokenizer, TRAIT_TOKENIZER)
@@ -80,26 +49,13 @@ StringRef Token_simple_str(Token *ptr);
 #define DOC(s) Doc_build(s)
 #define PUNCT(...) {{&PunctVtable, "Punct"}, __VA_ARGS__}
 #define TOKEN_TYPE(x) *Token_get_ttype(&x)
-#define TOKEN_STR(x) Token_simple_str(&x)
+#define TOKEN_STR(x) to_debug(&x)
 #define NEXT_TOKEN(x) Tokenizer_next_token(&x)
 
-static GETTER(Punct, ch);
-static GETTER(Punct, second_ch);
-static GETTER(Punct, third_ch);
 static GETTER(Token, ttype);
-static GETTER(Token, ident);
-static GETTER(Token, punct);
-static GETTER(Token, literal);
-static GETTER(Token, doc);
+static GETTER(Token, text);
 
-#define LITERAL(s)                                                             \
-	_Generic((s), char *: Literal_build, default: Literal_build_num)(s)
-
-#define TOKEN(s)                                                               \
-	_Generic((s),                                                          \
-	    Ident: Build_token_ident,                                          \
-	    Literal: Build_token_literal,                                      \
-	    Punct: Build_token_punct,                                          \
-	    Doc: Build_token_doc)(s)
+#define TOKEN(ttype, s)                                                        \
+	_Generic((s), i128: Token_build_lit_num, default: Token_build)(ttype, s)
 
 #endif // _BASE_TOKENIZER__
