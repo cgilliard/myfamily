@@ -168,3 +168,11 @@ Error Result_unwrap_err(Result *result) {
 	copy(&ret, *Result_get_err(result));
 	return ret;
 }
+
+void *Result_unwrap_as(char *name, Result *result) {
+	void *ret = unwrap(result);
+	if (strcmp(CLASS_NAME(ret), name))
+		panic("Expected class [%s], Found class [%s]", name,
+		      CLASS_NAME(ret));
+	return ret;
+}

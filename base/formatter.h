@@ -23,4 +23,6 @@ IMPL(Formatter, TRAIT_FORMATTER)
 IMPL(Formatter, TRAIT_TO_STR_REF)
 #define Formatter DEFINE_CLASS(Formatter)
 
+#define WRITE(f, ...) Formatter_write(f, __VA_ARGS__)
+
 #endif // _BASE_FORMATTER__

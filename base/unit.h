@@ -16,12 +16,13 @@
 #define _BASE_UNIT__
 
 #include <base/class.h>
-#include <base/traits_base.h>
+#include <base/traits.h>
 
 CLASS(Unit)
 IMPL(Unit, TRAIT_COPY)
 IMPL(Unit, TRAIT_SIZE)
 IMPL(Unit, TRAIT_EQUAL)
+IMPL(Unit, TRAIT_DEBUG)
 #define Unit DEFINE_CLASS(Unit)
 static Unit UNIT = BUILD(Unit);
 

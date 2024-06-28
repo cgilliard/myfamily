@@ -411,22 +411,14 @@ void expect_tokens(char *str, TokenType *type_expects, char **token_str_expects,
 
 	while (true) {
 		Result next = NEXT_TOKEN(t);
-		printf("returned next token\n");
 		assert(next.is_ok());
-		printf("1: cn=%s\n", CLASS_NAME(&next));
 		Option opt = *(Option *)unwrap(&next);
-		printf("2: cn=%s\n", CLASS_NAME(&opt));
 		if (!opt.is_some())
 			break;
-		printf("3\n");
 		Token token = *(Token *)unwrap(&opt);
-		printf("3.5 cn token =%s\n", CLASS_NAME(&token));
 		StringRef token_str = TOKEN_STR(token);
-		printf("4\n");
 		Result nt = to_string(&token);
-		printf("5\n");
 		StringRef nsr = *(StringRef *)unwrap(&nt);
-		printf("6\n");
 		printf("Token[%i]: %s\n", count, to_str(&nsr));
 		assert_eq(TOKEN_TYPE(token), type_expects[count]);
 		assert_eq_str(to_str(&token_str), token_str_expects[count]);
@@ -564,3 +556,9 @@ FamTest(base, test_formatter) {
 	print(&e5);
 }
 
+FamTest(base, test_unwrap_as) {
+	StringRef test1 = STRINGP("test unwrap_as");
+	Result r1 = Ok(test1);
+	StringRef test1_out = UNWRAP_AS(StringRef, r1);
+	assert_eq_str(to_str(&test1_out), "test unwrap_as");
+}

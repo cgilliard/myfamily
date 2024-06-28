@@ -28,6 +28,8 @@ u64 len(void *obj);
 Result to_string(void *obj);
 Result to_string_buf(void *obj, usize buffer_size);
 
+#define UNWRAP_AS(type, value) *(type *)unwrap_as(#type, &value)
+
 #define TRAIT_APPEND(T)                                                        \
 	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_DEEP_COPY(T)                                                     \
@@ -46,5 +48,7 @@ Result to_string_buf(void *obj, usize buffer_size);
 
 #define TRAIT_DISPLAY(T)                                                       \
 	TRAIT_REQUIRED(T, Result, fmt, T##Ptr *self, Formatter *formatter)
+#define TRAIT_DEBUG(T)                                                         \
+	TRAIT_REQUIRED(T, Result, dbg, T##Ptr *self, Formatter *formatter)
 
 #endif // _BASE_TRAITS__

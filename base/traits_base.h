@@ -32,11 +32,15 @@
 
 #define TRAIT_UNWRAP(T) TRAIT_REQUIRED(T, void *, unwrap, T##Ptr *obj)
 
+#define TRAIT_UNWRAP_AS(T)                                                     \
+	TRAIT_REQUIRED(T, void *, unwrap_as, char *class_name, T##Ptr *obj)
+
 #define TRAIT_TEST(T) TRAIT_IMPL(T, test1, test1_default)
 
 // trait implementations
 bool equal(void *obj1, void *obj2);
 void *unwrap(void *obj);
+void *unwrap_as(char *name, void *obj);
 usize size(void *obj);
 bool copy(void *dest, void *src);
 bool clone(void *dest, void *src);

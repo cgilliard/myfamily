@@ -35,6 +35,14 @@ void *unwrap(void *obj) {
 	return do_unwrap(obj);
 }
 
+void *unwrap_as(char *name, void *obj) {
+	void *(*do_unwrap_as)(char *name, Object *obj) =
+	    find_fn((Object *)obj, "unwrap_as");
+	if (do_unwrap_as == NULL)
+		panic("unwrap_as not implemented by type %s", CLASS_NAME(obj));
+	return do_unwrap_as(name, obj);
+}
+
 char *to_str(void *obj) {
 	char *(*do_to_str)(Object *obj) = find_fn((Object *)obj, "to_str");
 	if (do_to_str == NULL)
