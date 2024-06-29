@@ -17,7 +17,7 @@
 
 #include <base/class.h>
 #include <base/prim.h>
-#include <base/traits_base.h>
+#include <base/traits.h>
 
 #define TRAIT_OPTION(T) TRAIT_REQUIRED(T, OptionPtr, build, void *ref)
 
@@ -28,7 +28,9 @@ CLASS(Option,
       FNPTR(bool (*is_some)()) FIELD(void *, ref) FIELD(bool, no_cleanup))
 IMPL(Option, TRAIT_COPY)
 IMPL(Option, TRAIT_UNWRAP)
+IMPL(Option, TRAIT_UNWRAP_AS)
 IMPL(Option, TRAIT_OPTION)
+IMPL(Option, TRAIT_DEBUG)
 #define Option DEFINE_CLASS(Option)
 
 #define DEFINE_OPTION_BUILD_SOME_PRIM(bits, type_upper, type_lower)            \

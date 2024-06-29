@@ -19,64 +19,40 @@
 #define CATI(x, y) x##y
 #define CAT(x, y) CATI(x, y)
 
-#define STRINGIZE(arg) STRINGIZE1(arg)
-#define STRINGIZE1(arg) STRINGIZE2(arg)
-#define STRINGIZE2(arg) #arg
+#define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, NAME,     \
+		  ...)                                                         \
+	NAME
+#define FOR_EACH(action, ...)                                                  \
+	EXPAND(GET_MACRO(__VA_ARGS__, FOR_EACH_12, FOR_EACH_11, FOR_EACH_10,   \
+			 FOR_EACH_9, FOR_EACH_8, FOR_EACH_7, FOR_EACH_6,       \
+			 FOR_EACH_5, FOR_EACH_4, FOR_EACH_3, FOR_EACH_2,       \
+			 FOR_EACH_1)(action, __VA_ARGS__))
 
-#define CONCATENATE(arg1, arg2) CONCATENATE1(arg1, arg2)
-#define CONCATENATE1(arg1, arg2) CONCATENATE2(arg1, arg2)
-#define CONCATENATE2(arg1, arg2) arg1##arg2
+#define FOR_EACH_1(action, a) action(a)
+#define FOR_EACH_2(action, a, b) action(a), action(b)
+#define FOR_EACH_3(action, a, b, c) action(a), action(b), action(c)
+#define FOR_EACH_4(action, a, b, c, d)                                         \
+	action(a), action(b), action(c), action(d)
+#define FOR_EACH_5(action, a, b, c, d, e)                                      \
+	action(a), action(b), action(c), action(d), action(e)
+#define FOR_EACH_6(action, a, b, c, d, e, f)                                   \
+	action(a), action(b), action(c), action(d), action(e), action(f)
+#define FOR_EACH_7(action, a, b, c, d, e, f, g)                                \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g)
+#define FOR_EACH_8(action, a, b, c, d, e, f, g, h)                             \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g), action(h)
+#define FOR_EACH_9(action, a, b, c, d, e, f, g, h, i)                          \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g), action(h), action(i)
+#define FOR_EACH_10(action, a, b, c, d, e, f, g, h, i, j)                      \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g), action(h), action(i), action(j)
+#define FOR_EACH_11(action, a, b, c, d, e, f, g, h, i, j, k)                   \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g), action(h), action(i), action(j), action(k)
+#define FOR_EACH_12(action, a, b, c, d, e, f, g, h, i, j, k, l)                \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g), action(h), action(i), action(j), action(k), action(l)
 
-#define FOR_EACH_1(what, x, ...) what(x)
-#define FOR_EACH_2(what, x, ...)                                               \
-	what(x);                                                               \
-	FOR_EACH_1(what, __VA_ARGS__);
-#define FOR_EACH_3(what, x, ...)                                               \
-	what(x);                                                               \
-	FOR_EACH_2(what, __VA_ARGS__);
-#define FOR_EACH_4(what, x, ...)                                               \
-	what(x);                                                               \
-	FOR_EACH_3(what, __VA_ARGS__);
-#define FOR_EACH_5(what, x, ...)                                               \
-	what(x);                                                               \
-	FOR_EACH_4(what, __VA_ARGS__);
-#define FOR_EACH_6(what, x, ...)                                               \
-	what(x);                                                               \
-	FOR_EACH_5(what, __VA_ARGS__);
-#define FOR_EACH_7(what, x, ...)                                               \
-	what(x);                                                               \
-	FOR_EACH_6(what, __VA_ARGS__);
-#define FOR_EACH_8(what, x, ...)                                               \
-	what(x);                                                               \
-	FOR_EACH_7(what, __VA_ARGS__);
-
-#define FOR_EACH_NARG(...) FOR_EACH_NARG_(__VA_ARGS__, FOR_EACH_RSEQ_N())
-#define FOR_EACH_NARG_(...) FOR_EACH_ARG_N(__VA_ARGS__)
-#define FOR_EACH_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, N, ...) N
-#define FOR_EACH_RSEQ_N() 8, 7, 6, 5, 4, 3, 2, 1, 0
-
-#define FOR_EACH_(N, what, x, ...)                                             \
-	CONCATENATE(FOR_EACH_, N)(what, x, __VA_ARGS__)
-#define FOR_EACH(what, x, ...)                                                 \
-	FOR_EACH_(FOR_EACH_NARG(x, __VA_ARGS__), what, x, __VA_ARGS__)
-
-#define SPLIT_0(str) SPLIT_1(str)
-#define SPLIT_1(str) SPLIT_2(str)
-#define SPLIT_2(str) SPLIT_3(str)
-#define SPLIT_3(str) SPLIT_4(str)
-#define SPLIT_4(str) SPLIT_5(str)
-#define SPLIT_5(str) SPLIT_6(str)
-#define SPLIT_6(str) SPLIT_7(str)
-#define SPLIT_7(str) SPLIT_8(str)
-#define SPLIT_8(str) SPLIT_9(str)
-#define SPLIT_9(str) str
-
-#define GET_FIRST(str) GET_FIRST_I(str, ;, )
-#define GET_FIRST_I(str, delim, ...) GET_FIRST_II(str, delim, __VA_ARGS__)
-#define GET_FIRST_II(first, ...) first
-
-#define GET_REST(str) GET_REST_I(str, ;, )
-#define GET_REST_I(str, delim, ...) GET_REST_II(__VA_ARGS__)
-#define GET_REST_II(first, ...) __VA_ARGS__
-
-#define SPLIT(str) SPLIT_0(str)

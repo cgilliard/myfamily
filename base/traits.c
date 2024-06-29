@@ -84,7 +84,8 @@ bool clone(void *dst, void *src) {
 usize size(void *obj) {
 	usize (*do_size)(Object *obj) = find_fn((Object *)obj, "size");
 	if (do_size == NULL)
-		panic("size not implemented for this type");
+		panic("size not implemented for this type: %s",
+		      ((Object *)obj)->vdata.name);
 	return do_size(obj);
 }
 
@@ -145,14 +146,21 @@ Result to_debug_buf(void *obj, usize buf_size) {
 	ResultPtr (*do_dbg)(Object *obj, Formatter *formatter) =
 	    find_fn((Object *)obj, "dbg");
 	if (do_dbg == NULL) {
+		void (*do_to_str_buf)(Object *obj, char *buf, usize max_len) =
+		    find_fn((Object *)obj, "to_str_buf");
 
-		panic("debug trait not implemented for this type [%s]",
-		      CLASS_NAME(obj));
+		if (do_to_str_buf == NULL)
+			panic("debug and to_str_buf trait not implemented for "
+			      "this "
+			      "type [%s]",
+			      CLASS_NAME(obj));
+		char buf[buf_size];
+		do_to_str_buf(obj, buf, buf_size);
+		return STRING(buf);
 	}
 
 	char buf[buf_size];
 	Formatter fmt = BUILD(Formatter, buf, buf_size, 0);
-
 	Result r = do_dbg(obj, &fmt);
 	Try(r);
 

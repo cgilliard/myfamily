@@ -13,26 +13,35 @@
 // limitations under the License.
 
 #include <base/prim.h>
+#include <base/result.h>
+#include <base/unit.h>
+#include <stdio.h>
 
-#define DEFINE_PRIM_IMPLS(prim_type, type)                                     \
+#define DEFINE_PRIM_IMPLS(prim_type, type, format)                             \
 	void type##_cleanup(type *ptr) {}                                      \
 	usize type##_size(type *ptr) { return sizeof(type); }                  \
+	void type##_to_str_buf(type *ptr, char *buf, usize max_len) {          \
+		snprintf(buf, max_len, "%" format, ptr->_value);               \
+	}                                                                      \
 	void *type##_unwrap(type *ptr) { return &ptr->_value; }                \
 	bool type##_clone(type *dst, type *src) {                              \
 		memcpy(&dst->_value, &src->_value, sizeof(prim_type));         \
 		return true;                                                   \
 	}
 
-DEFINE_PRIM_IMPLS(i8, I8)
-DEFINE_PRIM_IMPLS(i16, I16)
-DEFINE_PRIM_IMPLS(i32, I32)
-DEFINE_PRIM_IMPLS(i64, I64)
-DEFINE_PRIM_IMPLS(i128, I128)
+DEFINE_PRIM_IMPLS(i8, I8, PRId8)
+DEFINE_PRIM_IMPLS(i16, I16, PRId16)
+DEFINE_PRIM_IMPLS(i32, I32, PRId32)
+DEFINE_PRIM_IMPLS(i64, I64, PRId64)
+// TODO: Need to make a custom implementation to display 128 bit correctly
+DEFINE_PRIM_IMPLS(i128, I128, PRId64)
 
-DEFINE_PRIM_IMPLS(u8, U8)
-DEFINE_PRIM_IMPLS(u16, U16)
-DEFINE_PRIM_IMPLS(u32, U32)
-DEFINE_PRIM_IMPLS(U64, U64)
-DEFINE_PRIM_IMPLS(u128, U128)
+DEFINE_PRIM_IMPLS(u8, U8, PRIu8)
+DEFINE_PRIM_IMPLS(u16, U16, PRIu16)
+DEFINE_PRIM_IMPLS(u32, U32, PRIu32)
+DEFINE_PRIM_IMPLS(U64, U64, PRIu64)
+// TODO: Need to make a custom implementation to display 128 bit correctly
+DEFINE_PRIM_IMPLS(u128, U128, PRIu64)
 
-DEFINE_PRIM_IMPLS(bool, Bool)
+DEFINE_PRIM_IMPLS(bool, Bool, PRIu32)
+

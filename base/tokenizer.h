@@ -18,6 +18,10 @@
 #include <base/class.h>
 #include <base/traits.h>
 
+#define TRAIT_TOKENIZER(T)                                                     \
+	TRAIT_REQUIRED(T, Result, parse, StringRef *s)                         \
+	TRAIT_REQUIRED(T, Result, next_token, T##Ptr *self)
+
 #define TRAIT_TOKEN(T)                                                         \
 	TRAIT_REQUIRED(T, T##Ptr, build, TokenType type, char *token)          \
 	TRAIT_REQUIRED(T, T##Ptr, build_lit_num, i128)
@@ -42,12 +46,6 @@ IMPL(Tokenizer, TRAIT_TOKENIZER)
 IMPL(Tokenizer, TRAIT_COPY)
 #define Tokenizer DEFINE_CLASS(Tokenizer)
 
-StringRef Token_simple_str(Token *ptr);
-
-#define TOKEN_INIT BUILD(Token, NoType, BUILD(Ident), {}, {NULL})
-#define IDENT(s) Ident_build(s)
-#define DOC(s) Doc_build(s)
-#define PUNCT(...) {{&PunctVtable, "Punct"}, __VA_ARGS__}
 #define TOKEN_TYPE(x) *Token_get_ttype(&x)
 #define TOKEN_STR(x) to_debug(&x)
 #define NEXT_TOKEN(x) Tokenizer_next_token(&x)

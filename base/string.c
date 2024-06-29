@@ -53,6 +53,14 @@ void String_cleanup(StringPtr *s) {
 		String_set_len(s, 0);
 	}
 }
+
+Result String_dbg(String *s, Formatter *f) {
+	char *ptr = *String_get_ptr(s);
+	Result r0 = WRITE(f, "'%s'", ptr);
+	Try(r0);
+	return Ok(UNIT);
+}
+
 usize String_size(String *s) { return sizeof(String); }
 bool String_clone(String *dst, String *src) {
 	u64 len = *String_get_len(src);
@@ -242,6 +250,16 @@ u64 StringRef_len(StringRef *obj) {
 	StringPtr *ptr = unwrap(rc);
 	u64 len = *String_get_len(ptr);
 	return len;
+}
+
+Result StringRef_dbg(StringRef *s, Formatter *f) {
+	RcPtr *rc = *StringRef_get_ptr(s);
+	StringPtr *ptr = unwrap(rc);
+	Result r0 = to_debug(ptr);
+	StringRef inner = *(StringRef *)Try(r0);
+	Result r1 = WRITE(f, to_str(&inner));
+	Try(r1);
+	return Ok(UNIT);
 }
 
 Result StringRef_build(char *s) {

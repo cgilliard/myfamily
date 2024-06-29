@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/ekinds.h>
 #include <base/error.h>
 #include <base/formatter.h>
 #include <base/option.h>
@@ -19,6 +20,7 @@
 #include <base/string.h>
 #include <base/test.h>
 #include <base/tokenizer.h>
+#include <base/tuple.h>
 #include <base/unit.h>
 
 FamSuite(base);
@@ -313,27 +315,25 @@ FamTest(base, test_token) {
 	assert_eq_str(to_str(&t4_out), "<=");
 }
 
-void expect_tokens(char *str, TokenType *type_expects, char **token_str_expects,
-		   int expect_count, bool in_comment_end,
-		   bool in_comment_start) {
+Result expect_tokens(char *str, TokenType *type_expects,
+		     char **token_str_expects, int expect_count,
+		     bool in_comment_end, bool in_comment_start) {
 	StringRef s = STRINGP(str);
 	Result r = Tokenizer_parse(&s);
-	assert(r.is_ok());
-	Tokenizer t = *(Tokenizer *)unwrap(&r);
+	Tokenizer t = *(Tokenizer *)Try(r);
 	Tokenizer_set_in_comment(&t, in_comment_start);
 	int count = 0;
 
 	while (true) {
 		Result next = NEXT_TOKEN(t);
-		assert(next.is_ok());
-		Option opt = *(Option *)unwrap(&next);
+		Option opt = *(Option *)Try(next);
 		if (!opt.is_some())
 			break;
-		Token token = *(Token *)unwrap(&opt);
+		Token token = UNWRAP_AS(Token, opt);
 		Result token_str_r = TOKEN_STR(token);
 		StringRef token_str = UNWRAP_AS(StringRef, token_str_r);
 		Result nt = to_string(&token);
-		StringRef nsr = *(StringRef *)unwrap(&nt);
+		StringRef nsr = UNWRAP_AS(StringRef, nt);
 		printf("Token[%i]: %s\n", count, to_str(&nsr));
 		assert_eq(TOKEN_TYPE(token), type_expects[count]);
 		assert_eq_str(to_str(&token_str), token_str_expects[count]);
@@ -342,26 +342,30 @@ void expect_tokens(char *str, TokenType *type_expects, char **token_str_expects,
 	}
 	assert_eq(*Tokenizer_get_in_comment(&t), in_comment_end);
 	assert_eq(count, expect_count);
+
+	return Ok(UNIT);
 }
 
 FamTest(base, test_tokenizer) {
 	printf("t1:\n");
 	TokenType exp_tt1[] = {IdentType, IdentType, IdentType, IdentType};
 	char *exp_tstr1[] = {"this", "is", "a", "test"};
-	expect_tokens("this is a test", exp_tt1, exp_tstr1, 4, false, false);
+	Result r1 = expect_tokens("this is a test", exp_tt1, exp_tstr1, 4,
+				  false, false);
 
 	printf("t2:\n");
 	TokenType exp_tt2[] = {IdentType, IdentType, PunctType, LiteralType,
 			       PunctType};
 	char *exp_tstr2[] = {"u64", "x", "=", "0", ";"};
-	expect_tokens("u64 x = 0;", exp_tt2, exp_tstr2, 5, false, false);
+	Result r2 =
+	    expect_tokens("u64 x = 0;", exp_tt2, exp_tstr2, 5, false, false);
 
 	printf("t3:\n");
 	TokenType exp_tt3[] = {IdentType, PunctType,   IdentType,
 			       PunctType, LiteralType, PunctType};
 	char *exp_tstr3[] = {"char", "*", "x9_bac", "=", "\"abc123\"", ";"};
-	expect_tokens("char *x9_bac = \"abc123\";", exp_tt3, exp_tstr3, 6,
-		      false, false);
+	Result r3 = expect_tokens("char *x9_bac = \"abc123\";", exp_tt3,
+				  exp_tstr3, 6, false, false);
 
 	printf("t4:\n");
 	TokenType exp_tt4[] = {IdentType,   PunctType, IdentType,   PunctType,
@@ -369,117 +373,149 @@ FamTest(base, test_tokenizer) {
 			       LiteralType, PunctType, LiteralType, PunctType};
 	char *exp_tstr4[] = {"if", "(",	     "abc",	 "!=", "7",	")",
 			     "{",  "return", "\"test\"", "+",  "\'x\'", "}"};
-	expect_tokens("if(abc!= 7) { return \"test\" + \'x\'}", exp_tt4,
-		      exp_tstr4, 12, false, false);
+	Result r4 = expect_tokens("if(abc!= 7) { return \"test\" + \'x\'}",
+				  exp_tt4, exp_tstr4, 12, false, false);
 
 	printf("t5\n");
 	TokenType exp_tt5[] = {IdentType,   PunctType, IdentType, PunctType,
 			       LiteralType, PunctType, IdentType, PunctType};
 	char *exp_tstr5[] = {"if", "(", "x", "=", "745", ")", "return", ";"};
-	expect_tokens("if\n\n\t(x=745) return;\t\n", exp_tt5, exp_tstr5, 8,
-		      false, false);
+	Result r5 = expect_tokens("if\n\n\t(x=745) return;\t\n", exp_tt5,
+				  exp_tstr5, 8, false, false);
 
 	printf("t6\n");
 	TokenType exp_tt6[] = {IdentType,   PunctType, IdentType, PunctType,
 			       LiteralType, PunctType, IdentType, PunctType};
 	char *exp_tstr6[] = {"if", "(", "x", "=", "745", ")", "return", ";"};
-	expect_tokens("if\n\n\t(x=745) return; ", exp_tt6, exp_tstr6, 8, false,
-		      false);
+	Result r6 = expect_tokens("if\n\n\t(x=745) return; ", exp_tt6,
+				  exp_tstr6, 8, false, false);
 
 	printf("t7\n");
 	TokenType exp_tt7[] = {IdentType, PunctType, IdentType};
 	char *exp_tstr7[] = {"abc", "=", "def"};
-	expect_tokens("abc = def", exp_tt7, exp_tstr7, 3, false, false);
+	Result r7 =
+	    expect_tokens("abc = def", exp_tt7, exp_tstr7, 3, false, false);
 
 	printf("t8\n");
 	TokenType exp_tt8[] = {IdentType, PunctType, IdentType};
 	char *exp_tstr8[] = {"abc", "=", "def"};
-	expect_tokens("abc = def\n ", exp_tt8, exp_tstr8, 3, false, false);
+	Result r8 =
+	    expect_tokens("abc = def\n ", exp_tt8, exp_tstr8, 3, false, false);
 
 	printf("t9\n");
 	TokenType exp_tt9[] = {PunctType, PunctType, PunctType};
 	char *exp_tstr9[] = {"<=", ">=", "..."};
-	expect_tokens("<=>=...\n ", exp_tt9, exp_tstr9, 3, false, false);
+	Result r9 =
+	    expect_tokens("<=>=...\n ", exp_tt9, exp_tstr9, 3, false, false);
 
 	printf("t10\n");
 	TokenType exp_tt10[] = {IdentType, PunctType, PunctType, IdentType,
 				PunctType};
 	char *exp_tstr10[] = {"x", ">=", "...", "hi", ";"};
-	expect_tokens("x>=... // ok this is a test  \t\n  hi ; ", exp_tt10,
-		      exp_tstr10, 5, false, false);
+	Result r10 = expect_tokens("x>=... // ok this is a test  \t\n  hi ; ",
+				   exp_tt10, exp_tstr10, 5, false, false);
 
 	printf("t11\n");
 	TokenType exp_tt11[] = {IdentType, PunctType, PunctType, IdentType,
 				PunctType};
 	char *exp_tstr11[] = {"x", ">=", "...", "hi", ";"};
-	expect_tokens("x>=... /* ok this is a test  \t\n  */ hi ; ", exp_tt11,
-		      exp_tstr11, 5, false, false);
+	Result r11 =
+	    expect_tokens("x>=... /* ok this is a test  \t\n  */ hi ; ",
+			  exp_tt11, exp_tstr11, 5, false, false);
 
 	printf("t12\n");
 	TokenType exp_tt12[] = {IdentType, PunctType, PunctType, IdentType,
 				PunctType};
 	char *exp_tstr12[] = {"x", ">=", "...", "hi", ";"};
-	expect_tokens("x>=... /**/ hi ; ", exp_tt12, exp_tstr12, 5, false,
-		      false);
+	Result r12 = expect_tokens("x>=... /**/ hi ; ", exp_tt12, exp_tstr12, 5,
+				   false, false);
 
 	printf("t13\n");
 	// use same exp as last time
-	expect_tokens("x>=... /* */ hi ; ", exp_tt12, exp_tstr12, 5, false,
-		      false);
+	Result r13 = expect_tokens("x>=... /* */ hi ; ", exp_tt12, exp_tstr12,
+				   5, false, false);
 
 	// end on a comment
 	printf("t14\n");
 	// use same exp as last time
-	expect_tokens("x>=...  hi ;  /*      ", exp_tt12, exp_tstr12, 5, true,
-		      false);
+	Result r14 = expect_tokens("x>=...  hi ;  /*      ", exp_tt12,
+				   exp_tstr12, 5, true, false);
 
 	// end on a comment
 	printf("t15\n");
 	// use same exp as last time
-	expect_tokens("x>=...  hi ;  // testing     ", exp_tt12, exp_tstr12, 5,
-		      false, false);
+	Result r15 = expect_tokens("x>=...  hi ;  // testing     ", exp_tt12,
+				   exp_tstr12, 5, false, false);
 
 	printf("t16\n");
 	TokenType exp_tt16[] = {IdentType, PunctType, PunctType,
 				DocType,   IdentType, PunctType};
 	char *exp_tstr16[] = {"x", ">=", "...", "ok this is a test", "hi", ";"};
-	expect_tokens("x>=... /// ok this is a test\n   hi ; ", exp_tt16,
-		      exp_tstr16, 6, false, false);
+	Result r16 = expect_tokens("x>=... /// ok this is a test\n   hi ; ",
+				   exp_tt16, exp_tstr16, 6, false, false);
 
 	printf("t17\n");
 	TokenType exp_tt17[] = {IdentType, PunctType, PunctType,
 				DocType,   IdentType, PunctType};
 	char *exp_tstr17[] = {"x", ">=", "...", "", "hi", ";"};
-	expect_tokens("x>=... ///\n   hi ; ", exp_tt17, exp_tstr17, 6, false,
-		      false);
+	Result r17 = expect_tokens("x>=... ///\n   hi ; ", exp_tt17, exp_tstr17,
+				   6, false, false);
 
 	printf("t18\n");
 	// use 17 exp again
-	expect_tokens("x>=... /// \n   hi ; ", exp_tt17, exp_tstr17, 6, false,
-		      false);
+	Result r18 = expect_tokens("x>=... /// \n   hi ; ", exp_tt17,
+				   exp_tstr17, 6, false, false);
 
 	printf("t19\n");
 	// use 17 exp again
-	expect_tokens("x>=... ///\t\n   hi ; ", exp_tt17, exp_tstr17, 6, false,
-		      false);
+	Result r19 = expect_tokens("x>=... ///\t\n   hi ; ", exp_tt17,
+				   exp_tstr17, 6, false, false);
 
 	printf("t20\n");
 	TokenType exp_tt20[] = {IdentType, PunctType, PunctType,
 				DocType,   IdentType, PunctType};
 	char *exp_tstr20[] = {"x", ">=", "...", "x", "hi", ";"};
-	expect_tokens("x>=... ///x\n   hi ; ", exp_tt20, exp_tstr20, 6, false,
-		      false);
+	Result r20 = expect_tokens("x>=... ///x\n   hi ; ", exp_tt20,
+				   exp_tstr20, 6, false, false);
 
 	printf("t21\n");
 	TokenType exp_tt21[] = {IdentType, PunctType};
 	char *exp_tstr21[] = {"hi", ";"};
-	expect_tokens(" hi ; /*", exp_tt21, exp_tstr21, 2, true, false);
+	Result r21 =
+	    expect_tokens(" hi ; /*", exp_tt21, exp_tstr21, 2, true, false);
 
 	printf("t22\n");
 	TokenType exp_tt22[] = {IdentType, PunctType};
 	char *exp_tstr22[] = {"hi", ";"};
-	expect_tokens(" a b c 10 \"abc\" */ hi ; ", exp_tt22, exp_tstr22, 2,
-		      false, true);
+	Result r22 = expect_tokens(" a b c 10 \"abc\" */ hi ; ", exp_tt22,
+				   exp_tstr22, 2, false, true);
+
+	Expect(r1);
+	Expect(r2);
+	Expect(r3);
+	Expect(r4);
+	Expect(r5);
+
+	Expect(r6);
+	Expect(r7);
+	Expect(r8);
+	Expect(r9);
+	Expect(r10);
+
+	Expect(r11);
+	Expect(r12);
+	Expect(r13);
+	Expect(r14);
+	Expect(r15);
+
+	Expect(r16);
+	Expect(r17);
+	Expect(r18);
+	Expect(r19);
+	Expect(r20);
+
+	Expect(r21);
+	Expect(r22);
 }
 
 FamTest(base, test_option_res_etc) {
@@ -515,4 +551,133 @@ FamTest(base, test_unwrap_as) {
 	Result r1 = Ok(test1);
 	StringRef test1_out = UNWRAP_AS(StringRef, r1);
 	assert_eq_str(to_str(&test1_out), "test unwrap_as");
+
+	Result r = to_debug(&UNIT);
+	StringRef ref = UNWRAP_AS(StringRef, r);
+	char *tmp = to_str(&ref);
+	assert_eq_str(tmp, "\"()\"");
+
+	Option opt = Some(UNIT);
+	Result r2 = to_debug(&opt);
+	StringRef ref2 = UNWRAP_AS(StringRef, r2);
+	tmp = to_str(&ref2);
+	assert_eq_str(tmp, "Option[\"()\"]");
 }
+
+FamTest(base, test_tuple) {
+	i128 i = 1;
+	i32 x = 2;
+	u64 uu = 3;
+	Unit u = UNIT;
+	StringRef vv = STRINGP("this is a test");
+	i32 x2 = 10;
+	char *okx = "okokok";
+	Tuple t = TUPLE(u, vv, okx, x2, i, uu);
+	assert_eq(len(&t), 6);
+	i32 x2_out;
+	ELEMENT_AT(&t, 3, &x2_out);
+	assert_eq(x2_out, 10);
+	char ok_out[100];
+	ELEMENT_AT(&t, 2, ok_out);
+	assert_eq_str(ok_out, "okokok");
+	char vv_out[100];
+	ELEMENT_AT(&t, 1, vv_out);
+	assert_eq_str(vv_out, "this is a test");
+	Error e = ERROR(ALLOC_ERROR, "test errors");
+	Tuple t2 = TUPLE(e);
+	Error e_out;
+	ELEMENT_AT(&t2, 0, &e_out);
+	assert(equal(KIND(e_out), &ALLOC_ERROR));
+	i8 i8_1v = 1;
+	i16 i16_1v = 2;
+	i32 i32_1v = 1;
+	i64 i64_1v = 2;
+	i128 i128_1v = 2;
+	u8 u8_1v = 1;
+	u16 u16_1v = 2;
+	u32 u32_1v = 1;
+	u64 u64_1v = 2;
+	u128 u128_1v = 2;
+	bool bool_1v = false;
+	char *str_1v = "12345";
+	Tuple t3 = TUPLE(i8_1v, i16_1v, i32_1v, i64_1v, i128_1v, u8_1v, u16_1v,
+			 u32_1v, u64_1v, u128_1v, bool_1v, str_1v);
+
+	i8 i8_1v_out = 0;
+	i16 i16_1v_out = 0;
+	i32 i32_1v_out = 0;
+	i64 i64_1v_out = 0;
+	i128 i128_1v_out = 0;
+	u8 u8_1v_out = 0;
+	u16 u16_1v_out = 0;
+	u32 u32_1v_out = 0;
+	u64 u64_1v_out = 0;
+	u128 u128_1v_out = 0;
+	bool bool_1v_out = true;
+	char str_1v_out[100];
+
+	ELEMENT_AT(&t3, 0, &i8_1v_out);
+	assert_eq(i8_1v_out, i8_1v);
+
+	ELEMENT_AT(&t3, 1, &i16_1v_out);
+	assert_eq(i16_1v_out, i16_1v);
+
+	ELEMENT_AT(&t3, 2, &i32_1v_out);
+	assert_eq(i32_1v_out, i32_1v);
+
+	ELEMENT_AT(&t3, 3, &i64_1v_out);
+	assert_eq(i64_1v_out, i64_1v);
+
+	ELEMENT_AT(&t3, 4, &i128_1v_out);
+	assert_eq(i128_1v_out, i128_1v);
+
+	ELEMENT_AT(&t3, 5, &u8_1v_out);
+	assert_eq(u8_1v_out, u8_1v);
+
+	ELEMENT_AT(&t3, 6, &u16_1v_out);
+	assert_eq(u16_1v_out, u16_1v);
+
+	ELEMENT_AT(&t3, 7, &u32_1v_out);
+	assert_eq(u32_1v_out, u32_1v);
+
+	ELEMENT_AT(&t3, 8, &u64_1v_out);
+	assert_eq(u64_1v_out, u64_1v);
+
+	ELEMENT_AT(&t3, 9, &u128_1v_out);
+	assert_eq(u128_1v_out, u128_1v);
+
+	ELEMENT_AT(&t3, 10, &bool_1v_out);
+	assert_eq(bool_1v_out, bool_1v);
+
+	ELEMENT_AT(&t3, 11, str_1v_out);
+	assert_eq_str(str_1v_out, "12345");
+
+	i128 c1_v1 = -100;
+	char *c1_v2 = "this is a test2";
+	u32 c1_v3 = 37;
+	Tuple c1 = TUPLE(c1_v1, c1_v2, c1_v3);
+	Tuple c2;
+	copy(&c2, &c1);
+	u32 c1_v3_out = 0;
+	ELEMENT_AT(&c2, 2, &c1_v3_out);
+	assert_eq(c1_v3_out, 37);
+
+	char *str = "test";
+	char *str2 = "ok";
+	char *str3 = "another";
+	u64 v64 = 101;
+	u32 v32 = 102;
+	i32 vi32 = -100;
+	bool vbool1 = false;
+	bool vbool2 = true;
+
+	Tuple cc = TUPLE(str, str2, str3, v64, v32, vi32, vbool1, vbool2);
+	char str_out[100];
+	ELEMENT_AT(&cc, 0, &str_out);
+	assert_eq_str(str_out, "test");
+
+	Result debug = to_debug(&cc);
+	StringRef dbg = UNWRAP_AS(StringRef, debug);
+	printf("debug=%s\n", to_str(&dbg));
+}
+

@@ -36,10 +36,15 @@ Result char_at(void *s, u64 index);
 	TRAIT_REQUIRED(T, Result, last_index_of_s, T##Ptr *s, char *n)         \
 	TRAIT_REQUIRED(T, Result, char_at, T##Ptr *s, u64 index)
 
+// have to include this here because Formatter depends on String/StringRef
+typedef struct Formatter Formatter;
+
 CLASS(String, FIELD(char *, ptr) FIELD(u64, len))
 IMPL(String, TRAIT_STRING_BUILD)
 IMPL(String, TRAIT_CLONE)
+IMPL(String, TRAIT_SIZE)
 IMPL(String, TRAIT_EQUAL)
+IMPL(String, TRAIT_DEBUG)
 IMPL(String, TRAIT_UNWRAP)
 IMPL(String, TRAIT_APPEND)
 IMPL(String, TRAIT_LEN)
@@ -56,6 +61,7 @@ IMPL(StringRef, TRAIT_COPY)
 IMPL(StringRef, TRAIT_UNWRAP)
 IMPL(StringRef, TRAIT_EQUAL)
 IMPL(StringRef, TRAIT_APPEND)
+IMPL(StringRef, TRAIT_DEBUG)
 IMPL(StringRef, TRAIT_DEEP_COPY)
 IMPL(StringRef, TRAIT_TO_STR)
 IMPL(StringRef, TRAIT_LEN)

@@ -27,6 +27,9 @@
 #define TRAIT_SIZE(T) TRAIT_REQUIRED(T, usize, size, T##Ptr *obj)
 
 #define TRAIT_TO_STR(T) TRAIT_REQUIRED(T, char *, to_str, T##Ptr *obj)
+#define TRAIT_TO_STR_BUF(T)                                                    \
+	TRAIT_REQUIRED(T, void, to_str_buf, T##Ptr *obj, char *buf,            \
+		       usize max_len)
 
 #define TRAIT_PRINT(T) TRAIT_REQUIRED(T, void, print, T##Ptr *obj)
 

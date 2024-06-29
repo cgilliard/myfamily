@@ -39,10 +39,6 @@ Result to_debug_buf(void *obj, usize buffer_size);
 
 #define TRAIT_LEN(T) TRAIT_REQUIRED(T, u64, len, T##Ptr *obj)
 
-#define TRAIT_TOKENIZER(T)                                                     \
-	TRAIT_REQUIRED(T, Result, parse, StringRef *s)                         \
-	TRAIT_REQUIRED(T, Result, next_token, T##Ptr *self)
-
 #define TRAIT_FORMATTER(T)                                                     \
 	TRAIT_REQUIRED(T, Result, write, T##Ptr *f, char *fmt, ...)
 

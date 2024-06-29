@@ -14,11 +14,28 @@
 
 #include <base/option.h>
 #include <base/rc.h>
+#include <base/unit.h>
 
 GETTER(Option, ref)
 SETTER(Option, ref)
 GETTER(Option, no_cleanup)
 SETTER(Option, no_cleanup)
+
+Result Option_dbg(Option *option, Formatter *f) {
+	void *ref = *Option_get_ref(option);
+
+	if (!implements(ref, "dbg")) {
+		Result r = WRITE(f, "Option<>");
+		Try(r);
+	} else {
+		Result r0 = to_debug(ref);
+		StringRef s0 = *(StringRef *)Try(r0);
+		Result r = WRITE(f, "Option[%s]", to_str(&s0));
+		Try(r);
+	}
+
+	return Ok(UNIT);
+}
 
 void Option_cleanup(Option *option) {
 	void *ref = *Option_get_ref(option);
@@ -107,4 +124,12 @@ void *Option_unwrap(Option *option) {
 		Option_set_no_cleanup(option, true);
 
 	return ref;
+}
+
+void *Option_unwrap_as(char *name, Option *option) {
+	void *ret = unwrap(option);
+	if (strcmp(CLASS_NAME(ret), name))
+		panic("Expected class [%s], Found class [%s]", name,
+		      CLASS_NAME(ret));
+	return ret;
 }
