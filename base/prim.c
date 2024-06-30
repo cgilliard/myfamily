@@ -33,15 +33,55 @@ DEFINE_PRIM_IMPLS(i8, I8, PRId8)
 DEFINE_PRIM_IMPLS(i16, I16, PRId16)
 DEFINE_PRIM_IMPLS(i32, I32, PRId32)
 DEFINE_PRIM_IMPLS(i64, I64, PRId64)
-// TODO: Need to make a custom implementation to display 128 bit correctly
-DEFINE_PRIM_IMPLS(i128, I128, PRId64)
 
 DEFINE_PRIM_IMPLS(u8, U8, PRIu8)
 DEFINE_PRIM_IMPLS(u16, U16, PRIu16)
 DEFINE_PRIM_IMPLS(u32, U32, PRIu32)
 DEFINE_PRIM_IMPLS(U64, U64, PRIu64)
-// TODO: Need to make a custom implementation to display 128 bit correctly
-DEFINE_PRIM_IMPLS(u128, U128, PRIu64)
 
-DEFINE_PRIM_IMPLS(bool, Bool, PRIu32)
+void U128_cleanup(U128 *ptr) {}
+usize U128_size(U128 *ptr) { return sizeof(U128); }
 
+void U128_to_str_buf(U128 *ptr, char *buf, usize max_len) {
+	u128 value = ptr->_value;
+	if (value < UINT64_MAX)
+		snprintf(buf, max_len, "%" PRIu64, value);
+	else
+		snprintf(buf, max_len, "U128");
+}
+
+void *U128_unwrap(U128 *ptr) { return &ptr->_value; }
+bool U128_clone(U128 *dst, U128 *src) {
+	memcpy(&dst->_value, &src->_value, sizeof(u128));
+	return true;
+}
+
+void I128_cleanup(I128 *ptr) {}
+usize I128_size(I128 *ptr) { return sizeof(I128); }
+void I128_to_str_buf(I128 *ptr, char *buf, usize max_len) {
+	i128 value = ptr->_value;
+	if (value < INT64_MAX && value > INT64_MIN)
+		snprintf(buf, max_len, "%" PRId64, value);
+	else
+		snprintf(buf, max_len, "I128");
+}
+void *I128_unwrap(I128 *ptr) { return &ptr->_value; }
+bool I128_clone(I128 *dst, I128 *src) {
+	memcpy(&dst->_value, &src->_value, sizeof(i128));
+	return true;
+}
+
+void Bool_cleanup(Bool *ptr) {}
+usize Bool_size(Bool *ptr) { return sizeof(Bool); }
+void Bool_to_str_buf(Bool *ptr, char *buf, usize max_len) {
+	bool value = ptr->_value;
+	if (value)
+		snprintf(buf, max_len, "true");
+	else
+		snprintf(buf, max_len, "false");
+}
+void *Bool_unwrap(Bool *ptr) { return &ptr->_value; }
+bool Bool_clone(Bool *dst, Bool *src) {
+	memcpy(&dst->_value, &src->_value, sizeof(bool));
+	return true;
+}

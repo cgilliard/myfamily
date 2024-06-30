@@ -106,4 +106,3 @@ static Result Result_build_ok_bool(void *value) {
 	});
 
 #endif // _BASE_RESULT__
-

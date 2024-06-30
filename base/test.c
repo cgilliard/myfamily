@@ -22,6 +22,7 @@
 #include <base/tokenizer.h>
 #include <base/tuple.h>
 #include <base/unit.h>
+#include <limits.h>
 
 FamSuite(base);
 
@@ -564,6 +565,10 @@ FamTest(base, test_unwrap_as) {
 	assert_eq_str(tmp, "Option[\"()\"]");
 }
 
+#define UINT128_MAX ((unsigned __int128)(-1))
+#define INT128_MAX ((signed __int128)(UINT128_MAX >> 1))
+#define INT128_MIN ((signed __int128)(-INT128_MAX - 1))
+
 FamTest(base, test_tuple) {
 	i128 i = 1;
 	i32 x = 2;
@@ -679,5 +684,53 @@ FamTest(base, test_tuple) {
 	Result debug = to_debug(&cc);
 	StringRef dbg = UNWRAP_AS(StringRef, debug);
 	printf("debug=%s\n", to_str(&dbg));
-}
 
+	u8 display_u8_max = UCHAR_MAX;
+	i8 display_i8_min = SCHAR_MIN;
+	i8 display_i8_max = SCHAR_MAX;
+	u16 display_u16_max = USHRT_MAX;
+	i16 display_i16_min = SHRT_MIN;
+	i16 display_i16_max = SHRT_MAX;
+	u32 display_u32_max = UINT_MAX;
+	i32 display_i32_min = INT_MIN;
+	i32 display_i32_max = INT_MAX;
+	u64 display_u64_max = ULLONG_MAX;
+	i64 display_i64_min = LLONG_MIN;
+	i64 display_i64_max = LLONG_MAX;
+	u128 display_u128_max = UINT128_MAX;
+	i128 display_i128_min = INT128_MIN;
+	i128 display_i128_max = INT128_MAX;
+	bool display_bool_false = false;
+	bool display_bool_true = true;
+
+	Tuple test_display = TUPLE(
+	    display_u8_max, display_i8_min, display_i8_max, display_u16_max,
+	    display_i16_min, display_i16_max, display_u32_max, display_i32_min,
+	    display_i32_max, display_u64_max, display_i64_min, display_i64_max);
+	Result debug2 = to_debug(&test_display);
+	StringRef dbg2 = UNWRAP_AS(StringRef, debug2);
+	printf("debug2=%s\n", to_str(&dbg2));
+	assert_eq_str("Tuple(255, -128, 127, 65535, -32768, 32767, 4294967295, "
+		      "-2147483648, 2147483647, 18446744073709551615, "
+		      "-9223372036854775808, 9223372036854775807)",
+		      to_str(&dbg2))
+
+	    Tuple test_display2 =
+		TUPLE(display_u128_max, display_i128_min, display_i128_max,
+		      display_bool_false, display_bool_true);
+	Result debug3 = to_debug(&test_display2);
+	StringRef dbg3 = UNWRAP_AS(StringRef, debug3);
+	printf("debug3=%s\n", to_str(&dbg3));
+
+	u128 vvux = UINT128_MAX;
+	i128 vvixo = INT128_MAX;
+	i128 vvix = 1;
+	i128 vvim = 0;
+	u128 vvsome = 1234;
+	i128 vvimo = INT128_MIN;
+	Tuple test = TUPLE(vvux, vvix, vvim, vvsome, vvixo, vvimo);
+	Result debugx = to_debug(&test);
+	StringRef dbgx = UNWRAP_AS(StringRef, debugx);
+	printf("debug=%s\n", to_str(&dbgx));
+	assert_eq_str(to_str(&dbgx), "Tuple(U128, 1, 0, 1234, I128, I128)");
+}

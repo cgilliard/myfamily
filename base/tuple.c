@@ -235,4 +235,3 @@ void *Tuple_add_value_str(char **value) {
 	clone(ret, &c);
 	return (void *)ret;
 }
-
