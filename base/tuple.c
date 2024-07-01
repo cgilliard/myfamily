@@ -136,6 +136,9 @@ void Tuple_element_at(Tuple *tuple, u64 index, void *dst) {
 	} else if (!strcmp(cn, "I8")) {
 		ref = unwrap(ref);
 		memcpy(dst, ref, sizeof(i8));
+	} else if (!strcmp(cn, "USize")) {
+		ref = unwrap(ref);
+		memcpy(dst, ref, sizeof(usize));
 	} else if (!strcmp(cn, "StringRef")) {
 		ref = unwrap(ref);
 		strcpy(dst, ref);
@@ -184,6 +187,13 @@ void *Tuple_add_value_i8(void *value) {
 	I8Ptr *ret = tlmalloc(sizeof(I8));
 	BUILDPTR(ret, I8);
 	ret->_value = *(i8 *)value;
+	return (void *)ret;
+}
+
+void *Tuple_add_value_usize(void *value) {
+	USizePtr *ret = tlmalloc(sizeof(USize));
+	BUILDPTR(ret, USize);
+	ret->_value = *(usize *)value;
 	return (void *)ret;
 }
 

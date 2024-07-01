@@ -68,4 +68,8 @@ DEFINE_PRIM_CLASS(u8, U8)
 #define U8 DEFINE_CLASS(U8)
 static GETTER(U8, value);
 
+DEFINE_PRIM_CLASS(usize, USize)
+#define USize DEFINE_CLASS(USize)
+static GETTER(USize, value);
+
 #endif // _BASE_PRIM__

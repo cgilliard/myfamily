@@ -85,3 +85,15 @@ bool Bool_clone(Bool *dst, Bool *src) {
 	memcpy(&dst->_value, &src->_value, sizeof(bool));
 	return true;
 }
+
+void USize_cleanup(USize *ptr) {}
+usize USize_size(USize *ptr) { return sizeof(USize); }
+void USize_to_str_buf(USize *ptr, char *buf, usize max_len) {
+	usize value = ptr->_value;
+	snprintf(buf, max_len, "%zu", value);
+}
+void *USize_unwrap(USize *ptr) { return &ptr->_value; }
+bool USize_clone(USize *dst, USize *src) {
+	memcpy(&dst->_value, &src->_value, sizeof(usize));
+	return true;
+}

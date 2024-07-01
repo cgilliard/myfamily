@@ -58,7 +58,12 @@ static Option None = BUILD(Option, is_some_false, NULL, false);
 static Option Option_build_some_bool(void *value) {
 	Bool v = BUILD(Bool, *((bool *)value));
 	OptionPtr ret = Option_build(&v);
+	return ret;
+}
 
+static Option Option_build_some_usize(void *value) {
+	USize v = BUILD(USize, *((usize *)value));
+	OptionPtr ret = Option_build(&v);
 	return ret;
 }
 
@@ -74,6 +79,7 @@ static Option Option_build_some_bool(void *value) {
 	    i32: Option_build_some_i32,                                        \
 	    i16: Option_build_some_i16,                                        \
 	    i8: Option_build_some_i8,                                          \
+	    usize: Option_build_some_usize,                                    \
 	    bool: Option_build_some_bool,                                      \
 	    default: Option_build)(&x)
 

@@ -80,6 +80,17 @@ FamTest(base, test_result) {
 
 	*/
 
+	usize x = 1234;
+	Result x1 = Ok(x);
+	assert(x1.is_ok());
+	usize x_out = Try(usize, x1);
+	assert_eq(x_out, 1234);
+
+	Option opt1 = Some(x);
+	assert(opt1.is_some());
+	usize x_out2 = *(usize *)unwrap(&opt1);
+	assert_eq(x_out2, 1234);
+
 	return Ok(UNIT);
 }
 

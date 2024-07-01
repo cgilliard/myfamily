@@ -113,6 +113,8 @@ void *Option_unwrap(Option *option) {
 		ref = unwrap(ref);
 	} else if (!strcmp(cn, "I8")) {
 		ref = unwrap(ref);
+	} else if (!strcmp(cn, "USize")) {
+		ref = unwrap(ref);
 	} else if (!strcmp(cn, "Rc")) {
 		not_rc = false;
 		ref = unwrap(ref);

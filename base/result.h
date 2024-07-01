@@ -57,10 +57,15 @@ DEFINE_RESULT_BUILD_OK_PRIM(32, I, i)
 DEFINE_RESULT_BUILD_OK_PRIM(16, I, i)
 DEFINE_RESULT_BUILD_OK_PRIM(8, I, i)
 
+static Result Result_build_ok_usize(void *value) {
+	USize v = BUILD(USize, *((usize *)value));
+	ResultPtr ret = Result_build_ok(&v);
+	return ret;
+}
+
 static Result Result_build_ok_bool(void *value) {
 	Bool v = BUILD(Bool, *((bool *)value));
 	ResultPtr ret = Result_build_ok(&v);
-
 	return ret;
 }
 
@@ -76,6 +81,7 @@ static Result Result_build_ok_bool(void *value) {
 	    i32: Result_build_ok_i32,                                          \
 	    i16: Result_build_ok_i16,                                          \
 	    i8: Result_build_ok_i8,                                            \
+	    usize: Result_build_ok_usize,                                      \
 	    bool: Result_build_ok_bool,                                        \
 	    default: Result_build_ok)(&x)
 

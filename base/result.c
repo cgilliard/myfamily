@@ -148,6 +148,8 @@ void *Result_unwrap(Result *result) {
 		ref = unwrap(ref);
 	} else if (!strcmp(cn, "I8")) {
 		ref = unwrap(ref);
+	} else if (!strcmp(cn, "USize")) {
+		ref = unwrap(ref);
 	} else if (!strcmp(cn, "Rc")) {
 		not_rc = false;
 		u8 flags = *Rc_get_flags(ref);
@@ -159,7 +161,6 @@ void *Result_unwrap(Result *result) {
 	}
 	// ownership is now transferred
 	// we don't want to cleanup
-	// if (not_rc)
 	Result_set_no_cleanup(result, true);
 
 	return ref;

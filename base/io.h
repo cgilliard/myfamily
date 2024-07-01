@@ -28,9 +28,15 @@ Result myseek(void *obj, u64 pos);
 #define TRAIT_SEEK(T) TRAIT_REQUIRED(T, Result, seek, T##Ptr *self, u64 pos)
 
 #define TRAIT_READ(T)                                                          \
-	TRAIT_REQUIRED(T, Result, read, T##Ptr *self, char *buf, u64 limit)    \
+	TRAIT_REQUIRED(T, Result, read, T##Ptr *self, char *buf, u64 len)      \
 	TRAIT_IMPL(T, read_to_string, read_to_string_impl)                     \
 	TRAIT_IMPL(T, read_exact, read_exact_impl)
+
+#define TRAIT_WRITE(T)                                                         \
+	TRAIT_REQUIRED(T, Result, write, T##Ptr *self, char *buf)              \
+	TRAIT_REQUIRED(T, Result, flush, T##Ptr *self)                         \
+	TRAIT_IMPL(T, Result, write_all, T##Ptr *self, char *buf)              \
+	TRAIT_IMPL(T, Result, write_fmt, T##Ptr *self, char *buf, ...)
 
 #define TRAIT_READER(T)                                                        \
 	TRAIT_REQUIRED(T, Result, read_fixed_bytes, T##Ptr *self, char *buf,   \
