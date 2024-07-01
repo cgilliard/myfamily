@@ -16,4 +16,4 @@
 
 FamSuite(parser);
 
-FamTest(parser, parser_basic) {}
+FamTest(parser, parser_basic) { return Ok(UNIT); }

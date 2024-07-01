@@ -16,4 +16,4 @@
 
 FamSuite(main);
 
-FamTest(main, main) {}
+FamTest(main, main) { return Ok(UNIT); }

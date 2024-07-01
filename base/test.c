@@ -28,7 +28,7 @@
 
 FamSuite(base);
 
-FamTest(base, test_tmalloc) {}
+FamTest(base, test_tmalloc) { return Ok(UNIT); }
 
 FamTest(base, test_result) {
 	u64 v1 = 3;
@@ -48,6 +48,7 @@ FamTest(base, test_result) {
 	Result r3 = Ok(rc3);
 	U64 v3_out = *(U64 *)unwrap(&r3);
 	assert_eq(v3_out._value, 101);
+	return Ok(UNIT);
 }
 
 FamTest(base, test_option) {
@@ -68,6 +69,7 @@ FamTest(base, test_option) {
 	Option o3 = Some(rc3);
 	U64 v3_out = *(U64 *)unwrap(&o3);
 	assert_eq(v3_out._value, 101);
+	return Ok(UNIT);
 }
 
 FamTest(base, test_string) {
@@ -132,6 +134,7 @@ FamTest(base, test_string) {
 
 	cleanup(s5);
 	tlfree(s5);
+	return Ok(UNIT);
 }
 
 FamTest(base, test_string_ref) {
@@ -225,6 +228,7 @@ FamTest(base, test_string_ref) {
 	assert(arr.is_ok());
 	assert_eq_str(to_str(&def1), "defabc");
 	assert_eq_str(to_str(&dc), "def");
+	return Ok(UNIT);
 }
 
 FamTest(base, test_error_clone) {
@@ -238,6 +242,7 @@ FamTest(base, test_error_clone) {
 	assert_eq_str(msg, "this is a test");
 	print(&e1);
 	print(&e2);
+	return Ok(UNIT);
 }
 
 FamTest(base, test_deep_copy) {
@@ -285,6 +290,7 @@ FamTest(base, test_deep_copy) {
 	assert_eq_str(CLASS_NAME(&x1), "StringRef");
 	assert_eq_str(CLASS_NAME(&x2), "StringRef");
 	assert_eq_str(CLASS_NAME(&x3), "StringRef");
+	return Ok(UNIT);
 }
 
 FamTest(base, test_token) {
@@ -318,6 +324,8 @@ FamTest(base, test_token) {
 	Result r4_out = to_debug(&t4);
 	StringRef t4_out = Expect(StringRef, r4_out);
 	assert_eq_str(to_str(&t4_out), "<=");
+
+	return Ok(UNIT);
 }
 
 Result expect_tokens(char *str, TokenType *type_expects,
@@ -521,12 +529,15 @@ FamTest(base, test_tokenizer) {
 
 	Expect(Unit, r21);
 	Expect(Unit, r22);
+
+	return Ok(UNIT);
 }
 
 FamTest(base, test_option_res_etc) {
 	Token token = TOKEN(DocType, "doctest");
 	Option opt = Some(token);
 	Result rx = Ok(opt);
+	return Ok(UNIT);
 }
 
 FamTest(base, test_formatter) {
@@ -549,6 +560,7 @@ FamTest(base, test_formatter) {
 	assert(!r5.is_ok());
 	Error e5 = unwrap_err(&r5);
 	print(&e5);
+	return Ok(UNIT);
 }
 
 FamTest(base, test_unwrap_as) {
@@ -567,6 +579,8 @@ FamTest(base, test_unwrap_as) {
 	StringRef ref2 = Expect(StringRef, r2);
 	tmp = to_str(&ref2);
 	assert_eq_str(tmp, "Option[\"()\"]");
+
+	return Ok(UNIT);
 }
 
 #define UINT128_MAX ((unsigned __int128)(-1))
@@ -738,6 +752,8 @@ FamTest(base, test_tuple) {
 	printf("debug=%s\n", to_str(&dbgx));
 	// TODO: implement printing of large i128/u128
 	assert_eq_str(to_str(&dbgx), "Tuple(U128, 1, 0, 1234, I128, I128)");
+
+	return Ok(UNIT);
 }
 
 FamTest(base, test_file) {
@@ -792,6 +808,8 @@ FamTest(base, test_file) {
 
 	Result r3 = FOPEN("./resources/not_there.txt", OpenRead);
 	assert(!r3.is_ok());
+
+	return Ok(UNIT);
 }
 
 Result test_try2() {
@@ -804,4 +822,6 @@ Result test_try2() {
 FamTest(base, test_try2) {
 	Result r1 = test_try2();
 	assert(r1.is_ok());
+
+	return Ok(UNIT);
 }

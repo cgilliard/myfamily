@@ -15,7 +15,9 @@
 #include <base/backtrace.h>
 #include <base/colors.h>
 #include <base/macro_utils.h>
+#include <base/result.h>
 #include <base/tlmalloc.h>
+#include <base/unit.h>
 #include <criterion/criterion.h>
 #include <criterion/hooks.h>
 #include <fcntl.h>
@@ -117,4 +119,9 @@ void my_post_test_hook(struct criterion_test_stats *stats) {}
 			log_fd = -1;                                           \
 		}                                                              \
 	}                                                                      \
-	Test(suite, test, .init = setup_##test, .fini = tear_down)
+	Result test_##suite##_##test();                                        \
+	Test(suite, test, .init = setup_##test, .fini = tear_down) {           \
+		Result r = test_##suite##_##test();                            \
+		assert(r.is_ok());                                             \
+	}                                                                      \
+	Result test_##suite##_##test()
