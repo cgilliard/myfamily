@@ -202,7 +202,7 @@ Result do_skip_comments(Tokenizer *ptr) {
 
 	if (start_doc_comment) {
 		// a doc comment was found, return the substring.
-		Result r = SUBSTRING(ref, start_doc_comment, pos);
+		Result r = SUBSTRING(*ref, start_doc_comment, pos);
 		StringRef comment = Try(StringRef, r);
 		Option opt = Some(comment);
 		return Ok(opt);
@@ -282,7 +282,7 @@ Result Tokenizer_proc_ident(Tokenizer *ptr) {
 	}
 	u64 end = pos;
 	Tokenizer_set_pos(ptr, end);
-	Result ret = SUBSTRING(ref, start, end);
+	Result ret = SUBSTRING(*ref, start, end);
 	StringRef sptr = *(StringRef *)unwrap(&ret);
 	Token token = TOKEN(IdentType, to_str(&sptr));
 	Option opt = Some(token);
@@ -320,7 +320,7 @@ Result Tokenizer_proc_literal(Tokenizer *ptr) {
 	}
 	u64 end = pos;
 	Tokenizer_set_pos(ptr, end);
-	Result ret = SUBSTRING(ref, start, end);
+	Result ret = SUBSTRING(*ref, start, end);
 	StringRef sptr = *(StringRef *)unwrap(&ret);
 	Token token = TOKEN(LiteralType, to_str(&sptr));
 	Option opt = Some(token);

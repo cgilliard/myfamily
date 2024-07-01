@@ -154,7 +154,7 @@ FamTest(base, test_string) {
 	Result r10 = char_at(&s3, 10000);
 	assert(!r10.is_ok());
 
-	Result r11 = SUBSTRING(&s3, 0, 7);
+	Result r11 = SUBSTRING(s3, 0, 7);
 	RcPtr *rc11 = unwrap(&r11);
 	StringPtr *s11 = unwrap(rc11);
 	assert_eq_str(unwrap(s11), "another");
@@ -217,12 +217,12 @@ FamTest(base, test_string_ref) {
 	Result r10 = char_at(&s3, 10000);
 	assert(!r10.is_ok());
 
-	Result r11 = SUBSTRING(&s3, 0, 7);
+	Result r11 = SUBSTRING(s3, 0, 7);
 	StringRef s11 = Try(StringRef, r11);
 	assert_eq_str(unwrap(&s11), "another");
 
 	/* from version:
-	 StringRef s11 = SUBSTRING(&s3, 0, 7)?;
+	 StringRef s11 = SUBSTRING(s3, 0, 7)?;
 	 assert_eq_str(s11, "another");
 	 */
 
@@ -469,11 +469,8 @@ FamTest(base, test_tokenizer) {
 	TokenType exp_tt11[] = {IdentType, PunctType, PunctType, IdentType,
 				PunctType};
 	char *exp_tstr11[] = {"x", ">=", "...", "hi", ";"};
-	Result r11 = expect_tokens("x>=... /* ok this is a test  \t\n  */
-				   hi;
-				   ",
-				   exp_tt11,
-				   exp_tstr11, 5, false, false);
+	Result r11 = expect_tokens("x>=... /* ok this is a test  \t\n  */ hi; ",
+				   exp_tt11, exp_tstr11, 5, false, false);
 
 	printf("t12\n");
 	TokenType exp_tt12[] = {IdentType, PunctType, PunctType, IdentType,

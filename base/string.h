@@ -92,8 +92,8 @@ Result StringRef_build(char *s);
 	    default: String_last_index_of))(s, n)
 
 #define SUBSTRING(s, start, end)                                               \
-	_Generic((*s),                                                         \
+	_Generic((s),                                                          \
 	    StringRef: StringRef_substring,                                    \
-	    String: String_substring)(s, start, end)
+	    String: String_substring)(&s, start, end)
 
 #endif // _BASE_STRING__
