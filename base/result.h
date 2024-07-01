@@ -96,6 +96,20 @@ static Result Result_build_ok_bool(void *value) {
 		*(type *)unwrap(&x);                                           \
 	})
 
+#define Try2(type, res)                                                        \
+	({                                                                     \
+		if (!res.is_ok()) {                                            \
+			Error e = unwrap_err(&res);                            \
+			return Err(e);                                         \
+		};                                                             \
+		type##Ptr ret;                                                 \
+		type##Ptr *tmp = unwrap(&res);                                 \
+		memcpy(&ret, tmp, sizeof(type));                               \
+		if (!implements((Object *)tmp, "copy"))                        \
+			tlfree(tmp);                                           \
+		ret;                                                           \
+	})
+
 #define Expect(type, res)                                                      \
 	({                                                                     \
 		if (!res.is_ok()) {                                            \
@@ -115,5 +129,23 @@ static Result Result_build_ok_bool(void *value) {
 		Error err = ERROR(NOT_IMPLEMENTED, "Not yet implemented!");    \
 		return Err(err);                                               \
 	});
+
+static u64 try_impl_u64(void *ret, Result r) {
+	*(u64 *)ret = *(u64 *)unwrap(&r);
+	return *(u64 *)ret;
+}
+static void *try_impl(void *ret, Result r) {
+	void *tmp = unwrap(&r);
+	usize size_v = size(tmp);
+	memcpy(ret, tmp, size_v);
+	if (!implements((Object *)tmp, "copy"))
+		tlfree(tmp);
+	return ret;
+}
+
+#define Try3(ret, res)                                                         \
+	_Generic((ret),                                                        \
+	    u64: try_impl_u64(&ret, res),                                      \
+	    default: try_impl(&ret, res))
 
 #endif // _BASE_RESULT__

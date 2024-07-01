@@ -90,3 +90,9 @@ Result read_exact_impl(Object *self, char *buf, u64 len) {
 
 	return Ok(UNIT);
 }
+
+Result write_all_impl(Object *self, char *buf, u64 len){todo()}
+
+Result write_fmt_impl(Object *self, char *fmt, ...) {
+	todo()
+}

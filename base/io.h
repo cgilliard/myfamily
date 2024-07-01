@@ -20,6 +20,8 @@
 
 Result read_to_string_impl(Object *self);
 Result read_exact_impl(Object *self, char *buf, u64 len);
+Result write_all_impl(Object *self, char *buf, u64 len);
+Result write_fmt_impl(Object *self, char *fmt, ...);
 Result myread(void *obj, char *buf, u64 limit);
 Result read_to_string(void *obj);
 Result read_exact(void *obj, char *buf, u64 limit);
@@ -33,10 +35,10 @@ Result myseek(void *obj, u64 pos);
 	TRAIT_IMPL(T, read_exact, read_exact_impl)
 
 #define TRAIT_WRITE(T)                                                         \
-	TRAIT_REQUIRED(T, Result, write, T##Ptr *self, char *buf)              \
+	TRAIT_REQUIRED(T, Result, write, T##Ptr *self, char *buf, u64 len)     \
 	TRAIT_REQUIRED(T, Result, flush, T##Ptr *self)                         \
-	TRAIT_IMPL(T, Result, write_all, T##Ptr *self, char *buf)              \
-	TRAIT_IMPL(T, Result, write_fmt, T##Ptr *self, char *buf, ...)
+	TRAIT_IMPL(T, write_all, write_all_impl)                               \
+	TRAIT_IMPL(T, write_fmt, write_fmt_impl)
 
 #define TRAIT_READER(T)                                                        \
 	TRAIT_REQUIRED(T, Result, read_fixed_bytes, T##Ptr *self, char *buf,   \

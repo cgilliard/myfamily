@@ -89,3 +89,9 @@ Result File_open(char *path, OpenOptions opt) {
 	Rc rc = RC(ret);
 	return Ok(rc);
 }
+
+Result File_flush(File *ptr){todo()}
+
+Result File_write(File *ptr, char *buf, u64 len) {
+	todo()
+}

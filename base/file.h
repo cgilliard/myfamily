@@ -32,6 +32,7 @@ typedef enum OpenOptions {
 
 CLASS(File, FIELD(FILE *, fp))
 IMPL(File, TRAIT_READ)
+IMPL(File, TRAIT_WRITE)
 IMPL(File, TRAIT_FILE_OPEN)
 IMPL(File, TRAIT_SEEK)
 IMPL(File, TRAIT_SIZE)
