@@ -22,12 +22,12 @@ usize Unit_size(UnitPtr *u) { return sizeof(UnitPtr); }
 bool Unit_equal(UnitPtr *obj1, UnitPtr *obj2) { return true; }
 Result Unit_fmt(Unit *ptr, Formatter *formatter) {
 	Result r = WRITE(formatter, "()");
-	Try(r);
+	Try(Unit, r);
 	return Ok(UNIT);
 }
 
 Result Unit_dbg(Unit *ptr, Formatter *formatter) {
 	Result r = WRITE(formatter, "\"()\"");
-	Try(r);
+	Try(Unit, r);
 	return Ok(UNIT);
 }

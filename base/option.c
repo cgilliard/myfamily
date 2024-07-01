@@ -26,12 +26,12 @@ Result Option_dbg(Option *option, Formatter *f) {
 
 	if (!implements(ref, "dbg")) {
 		Result r = WRITE(f, "Option<>");
-		Try(r);
+		Try(Unit, r);
 	} else {
 		Result r0 = to_debug(ref);
-		StringRef s0 = *(StringRef *)Try(r0);
+		StringRef s0 = Try(StringRef, r0);
 		Result r = WRITE(f, "Option[%s]", to_str(&s0));
-		Try(r);
+		Try(Unit, r);
 	}
 
 	return Ok(UNIT);

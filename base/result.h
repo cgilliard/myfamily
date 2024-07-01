@@ -81,21 +81,26 @@ static Result Result_build_ok_bool(void *value) {
 
 #define Err(x) Result_build_err(&x)
 
-#define Try(_x)                                                                \
-	({                                                                     \
-		if (!_x.is_ok()) {                                             \
-			Error e = unwrap_err(&_x);                             \
-			return Err(e);                                         \
-		};                                                             \
-		unwrap(&_x);                                                   \
-	})
-
-#define Expect(x)                                                              \
+#define Try(type, x)                                                           \
 	({                                                                     \
 		if (!x.is_ok()) {                                              \
+			Error e = unwrap_err(&x);                              \
+			return Err(e);                                         \
+		};                                                             \
+		*(type *)unwrap(&x);                                           \
+	})
+
+#define Expect(type, res)                                                      \
+	({                                                                     \
+		if (!res.is_ok()) {                                            \
 			panic("Expected Ok, found Err");                       \
 		}                                                              \
-		unwrap(&x);                                                    \
+		type##Ptr ret;                                                 \
+		type##Ptr *tmp = unwrap(&res);                                 \
+		memcpy(&ret, tmp, sizeof(type));                               \
+		if (!implements((Object *)tmp, "copy"))                        \
+			tlfree(tmp);                                           \
+		ret;                                                           \
 	})
 
 #define todo()                                                                 \

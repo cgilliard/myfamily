@@ -29,20 +29,20 @@ Result Token_fmt(Token *obj, Formatter *formatter) {
 
 	if (ttype == IdentType) {
 		Result r = WRITE(formatter, "Token[Ident[%s]]", to_str(&token));
-		Try(r);
+		Try(Unit, r);
 	} else if (ttype == LiteralType) {
 		Result r =
 		    WRITE(formatter, "Token[Literal[%s]]", to_str(&token));
-		Try(r);
+		Try(Unit, r);
 	} else if (ttype == PunctType) {
 		Result r = WRITE(formatter, "Token[Punct[%s]]", to_str(&token));
-		Try(r);
+		Try(Unit, r);
 	} else if (ttype == DocType) {
 		Result r = WRITE(formatter, "Token[Doc[%s]]", to_str(&token));
-		Try(r);
+		Try(Unit, r);
 	} else {
 		Result r = WRITE(formatter, "Token[Unknown]");
-		Try(r);
+		Try(Unit, r);
 	}
 	return Ok(UNIT);
 }
@@ -52,7 +52,7 @@ usize Token_size(Token *obj) { return sizeof(Token); }
 Result Token_dbg(Token *obj, Formatter *f) {
 	StringRefPtr token = *Token_get_text(obj);
 	Result r = WRITE(f, "%s", to_str(&token));
-	Try(r);
+	Try(Unit, r);
 	return Ok(UNIT);
 }
 
@@ -203,7 +203,7 @@ Result do_skip_comments(Tokenizer *ptr) {
 	if (start_doc_comment) {
 		// a doc comment was found, return the substring.
 		Result r = SUBSTRING(ref, start_doc_comment, pos);
-		StringRef comment = *(StringRef *)Try(r);
+		StringRef comment = Try(StringRef, r);
 		Option opt = Some(comment);
 		return Ok(opt);
 	} else {
@@ -220,9 +220,9 @@ Result Tokenizer_skip_in_comment(Tokenizer *ptr) {
 			break;
 		if (pos > 0) {
 			Result r1 = char_at(ref, pos - 1);
-			char ch1 = *(signed char *)Try(r1);
+			char ch1 = Try(signed char, r1);
 			Result r2 = char_at(ref, pos);
-			char ch2 = *(signed char *)Try(r2);
+			char ch2 = Try(signed char, r2);
 			if (ch1 == '*' && ch2 == '/') {
 				pos += 1;
 				Tokenizer_set_in_comment(ptr, false);
@@ -238,13 +238,13 @@ Result Tokenizer_skip_in_comment(Tokenizer *ptr) {
 Result Tokenizer_skip_to_token(Tokenizer *ptr, bool in_comment) {
 	if (in_comment) {
 		Result r0 = Tokenizer_skip_in_comment(ptr);
-		Try(r0);
+		Try(Unit, r0);
 	}
 	while (true) {
 		Result r1 = do_skip_white_space(ptr);
-		Try(r1);
+		Try(Unit, r1);
 		Result r2 = do_skip_comments(ptr);
-		Option opt = *(Option *)Try(r2);
+		Option opt = Try(Option, r2);
 		if (opt.is_some()) {
 			StringRef sref = *(StringRef *)unwrap(&opt);
 			Option ret = Some(sref);
@@ -425,7 +425,7 @@ Result Tokenizer_next_token(Tokenizer *ptr) {
 	}
 
 	Result skip = Tokenizer_skip_to_token(ptr, in_comment);
-	Option res = *(Option *)Try(skip);
+	Option res = Try(Option, skip);
 	if (res.is_some()) {
 		StringRef comment = *(StringRef *)unwrap(&res);
 		Token token = TOKEN(DocType, to_str(&comment));

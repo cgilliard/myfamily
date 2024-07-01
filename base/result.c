@@ -152,13 +152,15 @@ void *Result_unwrap(Result *result) {
 		not_rc = false;
 		u8 flags = *Rc_get_flags(ref);
 		if ((flags & RC_FLAGS_NO_UNWRAP) == 0) {
+			RcPtr *rc = ref;
 			ref = unwrap(ref);
+			Rc_cleanup_no_ref(rc);
 		}
 	}
 	// ownership is now transferred
 	// we don't want to cleanup
-	if (not_rc)
-		Result_set_no_cleanup(result, true);
+	// if (not_rc)
+	Result_set_no_cleanup(result, true);
 
 	return ref;
 }
@@ -170,7 +172,9 @@ Error Result_unwrap_err(Result *result) {
 }
 
 void *Result_unwrap_as(char *name, Result *result) {
+
 	void *ret = unwrap(result);
+
 	if (strcmp(CLASS_NAME(ret), name))
 		panic("Expected class [%s], Found class [%s]", name,
 		      CLASS_NAME(ret));

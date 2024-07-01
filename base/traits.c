@@ -14,6 +14,7 @@
 
 #include <base/traits.h>
 #include <base/traits_base.h>
+#include <base/unit.h>
 
 bool equal(void *obj1, void *obj2) {
 	if (((Object *)obj1)->vdata.vtable->id !=
@@ -135,7 +136,7 @@ Result to_string_buf(void *obj, usize buf_size) {
 	Formatter fmt = BUILD(Formatter, buf, buf_size, 0);
 
 	Result r = do_fmt(obj, &fmt);
-	Try(r);
+	Try(Unit, r);
 
 	return Formatter_to_str_ref(&fmt);
 }
@@ -162,7 +163,7 @@ Result to_debug_buf(void *obj, usize buf_size) {
 	char buf[buf_size];
 	Formatter fmt = BUILD(Formatter, buf, buf_size, 0);
 	Result r = do_dbg(obj, &fmt);
-	Try(r);
+	Try(Unit, r);
 
 	return Formatter_to_str_ref(&fmt);
 }

@@ -30,7 +30,17 @@ Result to_string_buf(void *obj, usize buffer_size);
 Result to_debug(void *obj);
 Result to_debug_buf(void *obj, usize buffer_size);
 
-#define UNWRAP_AS(type, value) *(type *)unwrap_as(#type, &value)
+#define UNWRAP_AS(type, value) ({ *(type *)unwrap_as(#type, &value); })
+
+#define UNWRAP_AS2(type, res)                                                  \
+	({                                                                     \
+		type##Ptr ret;                                                 \
+		type##Ptr *tmp = unwrap(&res);                                 \
+		memcpy(&ret, tmp, sizeof(type));                               \
+		if (!implements((Object *)tmp, "copy"))                        \
+			tlfree(tmp);                                           \
+		ret;                                                           \
+	})
 
 #define TRAIT_APPEND(T)                                                        \
 	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)

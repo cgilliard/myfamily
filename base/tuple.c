@@ -62,26 +62,26 @@ Result Tuple_dbg(Tuple *obj, Formatter *f) {
 	u64 count = *Tuple_get_count(obj);
 	void **elements = *Tuple_get_elements(obj);
 	Result r0 = WRITE(f, "Tuple(");
-	Try(r0);
+	Try(Unit, r0);
 	for (u64 i = 0; i < count; i++) {
 		if (implements(elements[i], "dbg") ||
 		    implements(elements[i], "to_str_buf")) {
 			Result r = to_debug(elements[i]);
-			Try(r);
-			StringRef item = *(StringRef *)Try(r);
+			Try(Unit, r);
+			StringRef item = Try(StringRef, r);
 			Result r2 = WRITE(f, "%s", to_str(&item));
-			Try(r2);
+			Try(Unit, r2);
 		} else {
 			Result r3 = WRITE(f, "%s", CLASS_NAME(elements[i]));
-			Try(r3);
+			Try(Unit, r3);
 		}
 		if (i != count - 1) {
 			Result r4 = WRITE(f, ", ");
-			Try(r4);
+			Try(Unit, r4);
 		}
 	}
 	Result r5 = WRITE(f, ")");
-	Try(r5);
+	Try(Unit, r5);
 	return Ok(UNIT);
 }
 bool Tuple_equal(Tuple *obj1, Tuple *obj2) { return false; }

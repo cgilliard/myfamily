@@ -12,27 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_RC__
-#define _BASE_RC__
+#ifndef _BASE_FILE__
+#define _BASE_FILE__
 
 #include <base/class.h>
-#include <base/traits_base.h>
+#include <base/io.h>
 
-#define RC_FLAGS_NO_UNWRAP 0x1
+typedef enum OpenOptions {
+	OpenRead = 0,
+	OpenWrite = 1,
+	OpenAppend = 2,
+	OpenReadExtended = 3,
+	OpenWriteExtended = 4,
+	OpenAppendExtended = 5
+} OpenOptions;
 
-#define TRAIT_RC_BUILD(T) TRAIT_REQUIRED(T, T##Ptr, build, void *ref)
+#define TRAIT_FILE_OPEN(T)                                                     \
+	TRAIT_REQUIRED(T, Result, open, char *path, OpenOptions opt)
 
-CLASS(Rc, FIELD(void *, ref) FIELD(u64 *, count) FIELD(u8, flags))
-IMPL(Rc, TRAIT_COPY)
-IMPL(Rc, TRAIT_CLONE)
-IMPL(Rc, TRAIT_RC_BUILD)
-IMPL(Rc, TRAIT_UNWRAP)
-#define Rc DEFINE_CLASS(Rc)
+CLASS(File, FIELD(FILE *, fp))
+IMPL(File, TRAIT_READ)
+IMPL(File, TRAIT_FILE_OPEN)
+IMPL(File, TRAIT_SEEK)
+IMPL(File, TRAIT_SIZE)
+#define File DEFINE_CLASS(File)
 
-void Rc_cleanup_no_ref(Rc *obj);
-static GETTER(Rc, flags);
-static SETTER(Rc, flags);
+#define FOPEN(path, options) File_open(path, options)
 
-#define RC(x) Rc_build(x)
-
-#endif // _BASE_RC__
+#endif // _BASE_FILE__

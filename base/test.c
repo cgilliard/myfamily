@@ -14,11 +14,13 @@
 
 #include <base/ekinds.h>
 #include <base/error.h>
+#include <base/file.h>
 #include <base/formatter.h>
 #include <base/option.h>
 #include <base/result.h>
 #include <base/string.h>
 #include <base/test.h>
+#include <base/tlmalloc.h>
 #include <base/tokenizer.h>
 #include <base/tuple.h>
 #include <base/unit.h>
@@ -122,6 +124,8 @@ FamTest(base, test_string) {
 	RcPtr *rc11 = unwrap(&r11);
 	StringPtr *s11 = unwrap(rc11);
 	assert_eq_str(unwrap(s11), "another");
+
+	cleanup(rc11);
 
 	cleanup(s1);
 	tlfree(s1);
@@ -294,10 +298,10 @@ FamTest(base, test_token) {
 	assert_eq(*Token_get_ttype(&t1), IdentType);
 	assert_eq(*Token_get_ttype(&t2), IdentType);
 	Result r1_out = to_debug(&t1);
-	StringRef t1_out = UNWRAP_AS(StringRef, r1_out);
+	StringRef t1_out = Expect(StringRef, r1_out);
 	assert_eq_str(to_str(&t1_out), "abc");
 	Result r2_out = to_debug(&t2);
-	StringRef t2_out = UNWRAP_AS(StringRef, r2_out);
+	StringRef t2_out = Expect(StringRef, r2_out);
 	assert_eq_str(to_str(&t2_out), "abc");
 
 	Token t3 = TOKEN(PunctType, "<=");
@@ -309,10 +313,10 @@ FamTest(base, test_token) {
 	assert_eq(*Token_get_ttype(&t3), PunctType);
 	assert_eq(*Token_get_ttype(&t4), PunctType);
 	Result r3_out = to_debug(&t3);
-	StringRef t3_out = UNWRAP_AS(StringRef, r3_out);
+	StringRef t3_out = Expect(StringRef, r3_out);
 	assert_eq_str(to_str(&t3_out), "<=");
 	Result r4_out = to_debug(&t4);
-	StringRef t4_out = UNWRAP_AS(StringRef, r4_out);
+	StringRef t4_out = Expect(StringRef, r4_out);
 	assert_eq_str(to_str(&t4_out), "<=");
 }
 
@@ -321,20 +325,20 @@ Result expect_tokens(char *str, TokenType *type_expects,
 		     bool in_comment_end, bool in_comment_start) {
 	StringRef s = STRINGP(str);
 	Result r = Tokenizer_parse(&s);
-	Tokenizer t = *(Tokenizer *)Try(r);
+	Tokenizer t = Try(Tokenizer, r);
 	Tokenizer_set_in_comment(&t, in_comment_start);
 	int count = 0;
 
 	while (true) {
 		Result next = NEXT_TOKEN(t);
-		Option opt = *(Option *)Try(next);
+		Option opt = Try(Option, next);
 		if (!opt.is_some())
 			break;
-		Token token = UNWRAP_AS(Token, opt);
+		Token token = *(Token *)unwrap(&opt);
 		Result token_str_r = TOKEN_STR(token);
-		StringRef token_str = UNWRAP_AS(StringRef, token_str_r);
+		StringRef token_str = Expect(StringRef, token_str_r);
 		Result nt = to_string(&token);
-		StringRef nsr = UNWRAP_AS(StringRef, nt);
+		StringRef nsr = Expect(StringRef, nt);
 		printf("Token[%i]: %s\n", count, to_str(&nsr));
 		assert_eq(TOKEN_TYPE(token), type_expects[count]);
 		assert_eq_str(to_str(&token_str), token_str_expects[count]);
@@ -491,32 +495,32 @@ FamTest(base, test_tokenizer) {
 	Result r22 = expect_tokens(" a b c 10 \"abc\" */ hi ; ", exp_tt22,
 				   exp_tstr22, 2, false, true);
 
-	Expect(r1);
-	Expect(r2);
-	Expect(r3);
-	Expect(r4);
-	Expect(r5);
+	Expect(Unit, r1);
+	Expect(Unit, r2);
+	Expect(Unit, r3);
+	Expect(Unit, r4);
+	Expect(Unit, r5);
 
-	Expect(r6);
-	Expect(r7);
-	Expect(r8);
-	Expect(r9);
-	Expect(r10);
+	Expect(Unit, r6);
+	Expect(Unit, r7);
+	Expect(Unit, r8);
+	Expect(Unit, r9);
+	Expect(Unit, r10);
 
-	Expect(r11);
-	Expect(r12);
-	Expect(r13);
-	Expect(r14);
-	Expect(r15);
+	Expect(Unit, r11);
+	Expect(Unit, r12);
+	Expect(Unit, r13);
+	Expect(Unit, r14);
+	Expect(Unit, r15);
 
-	Expect(r16);
-	Expect(r17);
-	Expect(r18);
-	Expect(r19);
-	Expect(r20);
+	Expect(Unit, r16);
+	Expect(Unit, r17);
+	Expect(Unit, r18);
+	Expect(Unit, r19);
+	Expect(Unit, r20);
 
-	Expect(r21);
-	Expect(r22);
+	Expect(Unit, r21);
+	Expect(Unit, r22);
 }
 
 FamTest(base, test_option_res_etc) {
@@ -550,17 +554,17 @@ FamTest(base, test_formatter) {
 FamTest(base, test_unwrap_as) {
 	StringRef test1 = STRINGP("test unwrap_as");
 	Result r1 = Ok(test1);
-	StringRef test1_out = UNWRAP_AS(StringRef, r1);
+	StringRef test1_out = Expect(StringRef, r1);
 	assert_eq_str(to_str(&test1_out), "test unwrap_as");
 
 	Result r = to_debug(&UNIT);
-	StringRef ref = UNWRAP_AS(StringRef, r);
+	StringRef ref = Expect(StringRef, r);
 	char *tmp = to_str(&ref);
 	assert_eq_str(tmp, "\"()\"");
 
 	Option opt = Some(UNIT);
 	Result r2 = to_debug(&opt);
-	StringRef ref2 = UNWRAP_AS(StringRef, r2);
+	StringRef ref2 = Expect(StringRef, r2);
 	tmp = to_str(&ref2);
 	assert_eq_str(tmp, "Option[\"()\"]");
 }
@@ -682,7 +686,7 @@ FamTest(base, test_tuple) {
 	assert_eq_str(str_out, "test");
 
 	Result debug = to_debug(&cc);
-	StringRef dbg = UNWRAP_AS(StringRef, debug);
+	StringRef dbg = Expect(StringRef, debug);
 	printf("debug=%s\n", to_str(&dbg));
 
 	u8 display_u8_max = UCHAR_MAX;
@@ -708,7 +712,7 @@ FamTest(base, test_tuple) {
 	    display_i16_min, display_i16_max, display_u32_max, display_i32_min,
 	    display_i32_max, display_u64_max, display_i64_min, display_i64_max);
 	Result debug2 = to_debug(&test_display);
-	StringRef dbg2 = UNWRAP_AS(StringRef, debug2);
+	StringRef dbg2 = Expect(StringRef, debug2);
 	printf("debug2=%s\n", to_str(&dbg2));
 	assert_eq_str("Tuple(255, -128, 127, 65535, -32768, 32767, 4294967295, "
 		      "-2147483648, 2147483647, 18446744073709551615, "
@@ -719,7 +723,7 @@ FamTest(base, test_tuple) {
 		TUPLE(display_u128_max, display_i128_min, display_i128_max,
 		      display_bool_false, display_bool_true);
 	Result debug3 = to_debug(&test_display2);
-	StringRef dbg3 = UNWRAP_AS(StringRef, debug3);
+	StringRef dbg3 = Expect(StringRef, debug3);
 	printf("debug3=%s\n", to_str(&dbg3));
 
 	u128 vvux = UINT128_MAX;
@@ -730,7 +734,74 @@ FamTest(base, test_tuple) {
 	i128 vvimo = INT128_MIN;
 	Tuple test = TUPLE(vvux, vvix, vvim, vvsome, vvixo, vvimo);
 	Result debugx = to_debug(&test);
-	StringRef dbgx = UNWRAP_AS(StringRef, debugx);
+	StringRef dbgx = Expect(StringRef, debugx);
 	printf("debug=%s\n", to_str(&dbgx));
+	// TODO: implement printing of large i128/u128
 	assert_eq_str(to_str(&dbgx), "Tuple(U128, 1, 0, 1234, I128, I128)");
+}
+
+FamTest(base, test_file) {
+	Result r1 = FOPEN("./resources/abc.txt", OpenRead);
+	File f1 = Expect(File, r1);
+
+	Result r11 = read_to_string(&f1);
+	StringRef s1 = Expect(StringRef, r11);
+	assert_eq_str(to_str(&s1), "this is a test\n");
+
+	Result r2 = FOPEN("./resources/abc.txt", OpenRead);
+	File f2 = Expect(File, r2);
+	char buf[3];
+	Result r22 = myread(&f2, buf, 2);
+	u64 bytes = *(u64 *)unwrap(&r22);
+	assert_eq(bytes, 2);
+	buf[2] = 0;
+	assert_eq_str(buf, "th");
+
+	Result r23 = myread(&f2, buf, 2);
+	bytes = *(u64 *)unwrap(&r23);
+	assert_eq(bytes, 2);
+	buf[2] = 0;
+	assert_eq_str(buf, "is");
+
+	Result r24 = read_exact(&f2, buf, 2);
+	assert(r24.is_ok());
+	buf[2] = 0;
+	assert_eq_str(buf, " i");
+
+	Result r26 = myseek(&f2, 0);
+	Expect(Unit, r26);
+
+	Result r27 = myread(&f2, buf, 2);
+	bytes = *(u64 *)unwrap(&r27);
+	assert_eq(bytes, 2);
+	buf[2] = 0;
+	assert_eq_str(buf, "th");
+
+	char buf2[1000];
+	Result r25 = read_exact(&f2, buf2, 1000);
+	assert(!r25.is_ok());
+
+	Result r40 = myseek(&f2, 0);
+	Expect(Unit, r40);
+
+	Result r41 = myread(&f2, buf, 2);
+	bytes = *(u64 *)unwrap(&r41);
+	assert_eq(bytes, 2);
+	buf[2] = 0;
+	assert_eq_str(buf, "th");
+
+	Result r3 = FOPEN("./resources/not_there.txt", OpenRead);
+	assert(!r3.is_ok());
+}
+
+Result test_try2() {
+	Result r1 = STRING("this is a test");
+	StringRef s1 = Try(StringRef, r1);
+	assert_eq_str(to_str(&s1), "this is a test");
+	return Ok(UNIT);
+}
+
+FamTest(base, test_try2) {
+	Result r1 = test_try2();
+	assert(r1.is_ok());
 }

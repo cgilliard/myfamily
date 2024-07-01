@@ -34,6 +34,19 @@ void Rc_cleanup(Rc *obj) {
 	}
 }
 
+void Rc_cleanup_no_ref(Rc *obj) {
+	u64 *count = *Rc_get_count(obj);
+	void *ref = *Rc_get_ref(obj);
+	if (count) {
+		*count -= 1;
+
+		if (*count == 0) {
+			tlfree(count);
+			count = NULL;
+		}
+	}
+}
+
 usize Rc_size(Rc *obj) { return sizeof(Rc); }
 
 bool Rc_clone(Rc *dst, Rc *src) {

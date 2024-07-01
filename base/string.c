@@ -57,7 +57,7 @@ void String_cleanup(StringPtr *s) {
 Result String_dbg(String *s, Formatter *f) {
 	char *ptr = *String_get_ptr(s);
 	Result r0 = WRITE(f, "'%s'", ptr);
-	Try(r0);
+	Try(Unit, r0);
 	return Ok(UNIT);
 }
 
@@ -256,9 +256,9 @@ Result StringRef_dbg(StringRef *s, Formatter *f) {
 	RcPtr *rc = *StringRef_get_ptr(s);
 	StringPtr *ptr = unwrap(rc);
 	Result r0 = to_debug(ptr);
-	StringRef inner = *(StringRef *)Try(r0);
+	StringRef inner = Try(StringRef, r0);
 	Result r1 = WRITE(f, to_str(&inner));
-	Try(r1);
+	Try(Unit, r1);
 	return Ok(UNIT);
 }
 
@@ -381,10 +381,11 @@ Result StringRef_substring(StringRef *s, u64 start, u64 end) {
 	RcPtr *sptr = *StringRef_get_ptr(s);
 	StringPtr *sstrptr = unwrap(sptr);
 	Result res = String_substring(sstrptr, start, end);
-	RcPtr rc = *(Rc *)unwrap(&res);
-	Rc rc_clone;
-	bool clone_res = clone(&rc_clone, &rc);
-	StringRefPtr srp = BUILD(StringRef, &rc_clone);
+	Rc rc = *(Rc *)unwrap(&res);
+	// Rc rc_clone;
+	// bool clone_res = clone(&rc_clone, &rc);
+	// StringRefPtr srp = BUILD(StringRef, &rc_clone);
+	StringRefPtr srp = BUILD(StringRef, &rc);
 	return Ok(srp);
 }
 
