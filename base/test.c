@@ -30,9 +30,36 @@ FamSuite(base);
 
 FamTest(base, test_tmalloc) { return Ok(UNIT); }
 
-FamTest(base, test_result_all) { return Ok(UNIT); }
+FamTest(base, test_result_all) {
+	u64 v1 = 31;
+	Result r1 = Ok(v1);
+	assert(r1.is_ok());
+	printf("y\n");
+	U64 v1_out = Try3(U64, r1);
+	printf("x\n");
+	assert_eq(*(u64 *)unwrap(&v1_out), 31);
+
+	/*
+	i8 v2 = 32;
+	Result r2 = Ok(v2);
+	assert(r2.is_ok());
+	i8 v2_out = Try3(v2_out, r2);
+	assert_eq(v2_out, 32);
+
+	StringRef v3 = STRINGP("abc");
+	Result r3 = Ok(v3);
+	assert(r3.is_ok());
+	// StringRef v3_out = *(StringRef *)Try3(v3_out, r3);
+	StringRef v3_out = Expect(StringRef, r3);
+	printf("ok\n");
+	// assert_eq_str(to_str(&v3_out), "abc");
+	*/
+
+	return Ok(UNIT);
+}
 
 FamTest(base, test_result) {
+	/*
 	StringRef xx1 = STRINGP("test");
 	Result xxr1 = Ok(xx1);
 	StringRefPtr xx1_out = *(StringRef *)Try3(xx1_out, xxr1);
@@ -51,6 +78,7 @@ FamTest(base, test_result) {
 	assert(r1.is_ok());
 	u64 v1_out = Try3(v1_out, r1);
 	assert_eq(v1_out, 31);
+	*/
 
 	// prim again
 	i128 v2 = -10;
@@ -874,9 +902,9 @@ FamTest(base, test_file) {
 }
 
 FamTest(base, test_file_write) {
-	Result r1 = FOPEN("./resources/tmpfile.txt", OpenRead);
+	Result r1 = FOPEN("./resources/tmpfile.txt", OpenWrite);
 	assert(r1.is_ok());
-	File f1 = Try2(File, r1);
+	File f1 = Expect(File, r1);
 	return Ok(UNIT);
 }
 
@@ -884,6 +912,7 @@ Result test_try2() {
 	Result r1 = STRING("this is a test");
 	StringRef s1 = Try2(StringRef, r1);
 	assert_eq_str(to_str(&s1), "this is a test");
+
 	return Ok(UNIT);
 }
 

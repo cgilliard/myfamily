@@ -126,6 +126,7 @@ void *Result_unwrap(Result *result) {
 	char *cn = CLASS_NAME(ref);
 
 	// automatically unwrap the primitive types
+
 	if (!strcmp(cn, "Bool")) {
 		ref = unwrap(ref);
 	} else if (!strcmp(cn, "U8")) {
@@ -135,7 +136,7 @@ void *Result_unwrap(Result *result) {
 	} else if (!strcmp(cn, "U32")) {
 		ref = unwrap(ref);
 	} else if (!strcmp(cn, "U64")) {
-		ref = unwrap(ref);
+		// ref = unwrap(ref);
 	} else if (!strcmp(cn, "U128")) {
 		ref = unwrap(ref);
 	} else if (!strcmp(cn, "I128")) {

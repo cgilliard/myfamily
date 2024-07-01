@@ -110,6 +110,40 @@ static Result Result_build_ok_bool(void *value) {
 		ret;                                                           \
 	})
 
+#define todo()                                                                 \
+	({                                                                     \
+		ErrorKind NOT_IMPLEMENTED = BUILD(ErrorKind, "unimplemented"); \
+		Error err = ERROR(NOT_IMPLEMENTED, "Not yet implemented!");    \
+		return Err(err);                                               \
+	});
+
+#define DEFINE_TRY_IMPL(sign, bits)                                            \
+	static sign##bits try_impl_##sign##bits(void *ret, Result r) {         \
+		*(sign##bits *)ret = *(sign##bits *)unwrap(&r);                \
+		return *(sign##bits *)ret;                                     \
+	}
+
+DEFINE_TRY_IMPL(u, 128)
+DEFINE_TRY_IMPL(u, 64)
+DEFINE_TRY_IMPL(u, 32)
+DEFINE_TRY_IMPL(u, 16)
+DEFINE_TRY_IMPL(u, 8)
+DEFINE_TRY_IMPL(i, 128)
+DEFINE_TRY_IMPL(i, 64)
+DEFINE_TRY_IMPL(i, 32)
+DEFINE_TRY_IMPL(i, 16)
+DEFINE_TRY_IMPL(i, 8)
+
+static usize try_impl_usize(void *ret, Result r) {
+	*(usize *)ret = *(usize *)unwrap(&r);
+	return *(usize *)ret;
+}
+
+static bool try_impl_bool(void *ret, Result r) {
+	*(bool *)ret = *(bool *)unwrap(&r);
+	return *(bool *)ret;
+}
+
 #define Expect(type, res)                                                      \
 	({                                                                     \
 		if (!res.is_ok()) {                                            \
@@ -123,29 +157,35 @@ static Result Result_build_ok_bool(void *value) {
 		ret;                                                           \
 	})
 
-#define todo()                                                                 \
+#define Try3(type, res)                                                        \
 	({                                                                     \
-		ErrorKind NOT_IMPLEMENTED = BUILD(ErrorKind, "unimplemented"); \
-		Error err = ERROR(NOT_IMPLEMENTED, "Not yet implemented!");    \
-		return Err(err);                                               \
-	});
+		if (!res.is_ok()) {                                            \
+			Error e = unwrap_err(&res);                            \
+			return Err(e);                                         \
+		}                                                              \
+		type##Ptr ret;                                                 \
+		type##Ptr *tmp = unwrap(&res);                                 \
+		memcpy(&ret, tmp, sizeof(type));                               \
+		if (!implements((Object *)tmp, "copy"))                        \
+			tlfree(tmp);                                           \
+		ret;                                                           \
+	})
 
-static u64 try_impl_u64(void *ret, Result r) {
-	*(u64 *)ret = *(u64 *)unwrap(&r);
-	return *(u64 *)ret;
-}
-static void *try_impl(void *ret, Result r) {
-	void *tmp = unwrap(&r);
-	usize size_v = size(tmp);
-	memcpy(ret, tmp, size_v);
-	if (!implements((Object *)tmp, "copy"))
-		tlfree(tmp);
-	return ret;
-}
-
+/*
 #define Try3(ret, res)                                                         \
 	_Generic((ret),                                                        \
+	    u128: try_impl_u128(&ret, res),                                    \
 	    u64: try_impl_u64(&ret, res),                                      \
+	    u32: try_impl_u32(&ret, res),                                      \
+	    u16: try_impl_u16(&ret, res),                                      \
+	    u8: try_impl_u8(&ret, res),                                        \
+	    i128: try_impl_i128(&ret, res),                                    \
+	    i64: try_impl_i64(&ret, res),                                      \
+	    i32: try_impl_i32(&ret, res),                                      \
+	    i16: try_impl_i16(&ret, res),                                      \
+	    i8: try_impl_i8(&ret, res),                                        \
+	    usize: try_impl_usize(&ret, res),                                  \
 	    default: try_impl(&ret, res))
+	    */
 
 #endif // _BASE_RESULT__
