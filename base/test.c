@@ -31,23 +31,55 @@ FamSuite(base);
 FamTest(base, test_tmalloc) { return Ok(UNIT); }
 
 FamTest(base, test_result) {
+	// prim
 	u64 v1 = 3;
 	Result r1 = Ok(v1);
 	assert(r1.is_ok());
-	assert_eq(*(u64 *)unwrap(&r1), 3);
+	u64 v1_out = Try(u64, r1);
+	assert_eq(v1_out, 3);
 
+	// prim again
 	i128 v2 = -10;
 	Result r2 = Ok(v2);
 	assert(r2.is_ok());
-	assert_eq(*(i128 *)unwrap(&r2), -10);
+	i128 v2_out = Try(i128, r2);
+	assert_eq(v2_out, -10);
 
+	// pointers
 	U64Ptr *v3 = tlmalloc(sizeof(U64));
 	BUILDPTR(v3, U64);
 	v3->_value = 101;
 	Rc rc3 = RC(v3);
 	Result r3 = Ok(rc3);
-	U64 v3_out = *(U64 *)unwrap(&r3);
+	U64 v3_out = Try(U64, r3);
 	assert_eq(v3_out._value, 101);
+
+	// prim with pre-proc equiv
+	u64 v4 = UINT64_MAX;
+	Result r4 = Ok(v4);
+	assert(r4.is_ok());
+	u64 v4_out = Try(u64, r4);
+	assert_eq(v4_out, UINT64_MAX);
+
+	// Preprocessed equiv: (prims are auto created)
+	/*
+	Result<u64> myfun() {
+		Ok(UINT64_MAX)
+	}
+	u64 v5_out = myfun()?;
+	assert_eq(v5_out, UINT64_MAX);
+
+	Generated code:
+	Result myfun() {
+		u64 __generated_v1 = UINT64_MAX;
+		return Ok(__generated_v1);
+	}
+	Result __generated_v2 = myfun();
+	u64 v5_out = Try(u64, __generated_v2);
+	assert_eq(v5_out, UINT64_MAX);
+
+	*/
+
 	return Ok(UNIT);
 }
 
@@ -140,7 +172,7 @@ FamTest(base, test_string) {
 FamTest(base, test_string_ref) {
 	StringRef s1 = STRINGP("this is a test");
 	Result r2 = STRING("another string");
-	StringRef s2 = *(StringRef *)unwrap(&r2);
+	StringRef s2 = Try(StringRef, r2);
 
 	assert_eq_str(to_str(&s2), "another string");
 	assert_eq_str(to_str(&s1), "this is a test");
@@ -159,35 +191,40 @@ FamTest(base, test_string_ref) {
 	assert_eq_str(unwrap(&s3), "another stringthis is a test");
 
 	Result r4 = INDEX_OF(&s3, "this is");
-	i64 res = *(i64 *)unwrap(&r4);
+	i64 res = Try(i64, r4);
 	assert_eq(res, 14);
 
 	StringRef s5 = STRINGP("i");
 	Result r5 = INDEX_OF(&s3, &s5);
-	i64 res5 = *(i64 *)unwrap(&r5);
+	i64 res5 = Try(i64, r5);
 	assert_eq(res5, 11);
 
 	Result r6 = LAST_INDEX_OF(&s3, &s5);
-	i64 res6 = *(i64 *)unwrap(&r6);
+	i64 res6 = Try(i64, r6);
 	assert_eq(res6, 19);
 
 	Result r7 = LAST_INDEX_OF(&s3, "abababaa");
-	i64 res7 = *(i64 *)unwrap(&r7);
+	i64 res7 = Try(i64, r7);
 	assert_eq(res7, -1);
 
 	Result r8 = char_at(&s3, 0);
-	signed char ch8 = *(signed char *)unwrap(&r8);
+	signed char ch8 = Try(signed char, r8);
 	assert_eq(ch8, 'a');
 	Result r9 = char_at(&s3, 2);
-	signed char ch9 = *(signed char *)unwrap(&r9);
+	signed char ch9 = Try(signed char, r9);
 	assert_eq(ch9, 'o');
 
 	Result r10 = char_at(&s3, 10000);
 	assert(!r10.is_ok());
 
 	Result r11 = SUBSTRING(&s3, 0, 7);
-	StringRef s11 = *(StringRef *)unwrap(&r11);
+	StringRef s11 = Try(StringRef, r11);
 	assert_eq_str(unwrap(&s11), "another");
+
+	/* from version:
+	 StringRef s11 = SUBSTRING(&s3, 0, 7)?;
+	 assert_eq_str(s11, "another");
+	 */
 
 	StringRef abc1 = STRINGP("abc");
 	{
@@ -432,9 +469,11 @@ FamTest(base, test_tokenizer) {
 	TokenType exp_tt11[] = {IdentType, PunctType, PunctType, IdentType,
 				PunctType};
 	char *exp_tstr11[] = {"x", ">=", "...", "hi", ";"};
-	Result r11 =
-	    expect_tokens("x>=... /* ok this is a test  \t\n  */ hi ; ",
-			  exp_tt11, exp_tstr11, 5, false, false);
+	Result r11 = expect_tokens("x>=... /* ok this is a test  \t\n  */
+				   hi;
+				   ",
+				   exp_tt11,
+				   exp_tstr11, 5, false, false);
 
 	printf("t12\n");
 	TokenType exp_tt12[] = {IdentType, PunctType, PunctType, IdentType,
