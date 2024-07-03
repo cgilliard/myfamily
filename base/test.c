@@ -22,7 +22,7 @@ FamSuite(base);
 FamTest(base, test_basic) { return Ok(UNIT); }
 
 ENUM(MyEnum, VARIANTS(TYPE_INT, TYPE_FLOAT, TYPE_STRING),
-     TYPES("u64", "f32", "StringRef"))
+     TYPES("u64", "f32", "String"))
 #define MyEnum DEFINE_ENUM(MyEnum)
 
 CLASS(MyClass, FIELD(u64, value))
@@ -46,16 +46,16 @@ FamTest(base, test_enum) {
 		      printf("type_int: %llu\n", val);
 		      ret = 100;
 	      }) VARIANT(TYPE_STRING, {
-		      StringRef val = ENUM_VALUE(val, StringRef, x);
+		      String val = ENUM_VALUE(val, String, x);
 		      printf("type_string: %s\n", to_str(&val));
 		      ret = 200;
 	      }) VARIANT(TYPE_FLOAT, { printf("type_float\n"); }));
 
 	assert_eq(ret, 100);
 
-	StringRef value2 = STRINGP("this is a test");
+	String value2 = STRINGP("this is a test");
 	MyEnum x2 = BUILD_ENUM(MyEnum, TYPE_STRING, value2);
-	StringRef value2_out = ENUM_VALUE(value2_out, StringRef, x2);
+	String value2_out = ENUM_VALUE(value2_out, String, x2);
 	printf("1: %s\n", CLASS_NAME(&value2_out));
 	assert_eq_str(to_str(&value2_out), "this is a test");
 	printf("2\n");
@@ -63,7 +63,7 @@ FamTest(base, test_enum) {
 	i64 ret2 = 0;
 	MATCH(x2, VARIANT(TYPE_INT, { printf("type_int\n"); })
 		      VARIANT(TYPE_STRING, {
-			      StringRef val2 = ENUM_VALUE(val2, StringRef, x2);
+			      String val2 = ENUM_VALUE(val2, String, x2);
 			      printf("type_string: %s\n", to_str(&val2));
 			      ret2 = -1;
 		      }) VARIANT(TYPE_FLOAT, {
@@ -99,7 +99,7 @@ ENUM(TestVariants,
      VARIANTS(VU8, VU16, VU32, VU64, VU128, VI8, VI16, VI32, VI64, VI128, VBOOL,
 	      VUSIZE, VF32, VF64, VSTRINGREF, VMYCLASS),
      TYPES("u8", "u16", "u32", "u64", "u128", "i8", "i16", "i32", "i64", "i128",
-	   "bool", "usize", "f32", "f64", "StringRef", "MyClass"))
+	   "bool", "usize", "f32", "f64", "String", "MyClass"))
 #define TestVariants DEFINE_ENUM(TestVariants)
 
 u64 do_match(TestVariants tv) {
@@ -147,7 +147,7 @@ i128 do_match_value(TestVariants tv) {
                 VARIANT(VF64, { f64 checkr = ENUM_VALUE(checkr, f64, tv); check = checkr; })
                 VARIANT(VBOOL, { bool checkr = ENUM_VALUE(checkr, bool, tv); check = checkr; })
                 VARIANT(VUSIZE, { usize checkr = ENUM_VALUE(checkr, usize, tv); check = checkr; })
-		VARIANT(VSTRINGREF, { StringRef checkr = ENUM_VALUE(checkr, StringRef, tv); assert_eq_str(to_str(&checkr), "string ref"); check = 150; })
+		VARIANT(VSTRINGREF, { String checkr = ENUM_VALUE(checkr, String, tv); assert_eq_str(to_str(&checkr), "string ref"); check = 150; })
 		VARIANT(VMYCLASS, { MyClass checkr = ENUM_VALUE(checkr, MyClass, tv); assert_eq(checkr._value, 1111); check = 160; })
         );
 	// clang-format on
@@ -170,7 +170,7 @@ FamTest(base, test_enum2) {
 	f64 vf64 = 120.0;
 	bool vbool = false;
 	usize vusize = 140;
-	StringRef vsr = STRINGP("string ref");
+	String vsr = STRINGP("string ref");
 
 	MyClass vclz_stack = BUILD(MyClass, 1111);
 	Rc vclz = RC_HEAPIFY(vclz_stack);
@@ -296,7 +296,7 @@ FamTest(base, test_tuple) {
 	f64 vf64 = 120.0;
 	bool vbool = true;
 	usize vusize = 140;
-	StringRef vsr = STRINGP("string ref");
+	String vsr = STRINGP("string ref");
 	MyClass vclz_stack = BUILD(MyClass, 1111);
 	Rc vclz = RC_HEAPIFY(vclz_stack);
 
@@ -321,7 +321,7 @@ FamTest(base, test_tuple) {
 	TUPLE_TEST_TYPE(bool, t2, 2, true);
 	TUPLE_TEST_TYPE(usize, t2, 3, 140);
 
-	StringRef vsr_out;
+	String vsr_out;
 	ELEMENT_AT(&t2, 4, &vsr_out);
 	assert_eq_str(to_str(&vsr_out), "string ref");
 

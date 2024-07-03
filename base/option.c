@@ -29,7 +29,7 @@ Result Option_dbg(Option *option, Formatter *f) {
 		Try(Unit, r);
 	} else {
 		Result r0 = to_debug(ref);
-		StringRef s0 = Try(StringRef, r0);
+		String s0 = Try(String, r0);
 		Result r = WRITE(f, "Option[%s]", to_str(&s0));
 		Try(Unit, r);
 	}

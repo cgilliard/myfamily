@@ -25,7 +25,7 @@ SETTER(Tokenizer, ref)
 
 Result Token_fmt(Token *obj, Formatter *formatter) {
 	TokenType ttype = *Token_get_ttype(obj);
-	StringRefPtr token = *Token_get_text(obj);
+	StringPtr token = *Token_get_text(obj);
 
 	if (ttype == IdentType) {
 		Result r = WRITE(formatter, "Token[Ident[%s]]", to_str(&token));
@@ -48,7 +48,7 @@ Result Token_fmt(Token *obj, Formatter *formatter) {
 }
 
 Result Token_dbg(Token *obj, Formatter *f) {
-	StringRefPtr token = *Token_get_text(obj);
+	StringPtr token = *Token_get_text(obj);
 	Result r = WRITE(f, "%s", to_str(&token));
 	Try(Unit, r);
 	return Ok(UNIT);
@@ -69,7 +69,7 @@ bool Token_clone(Token *dst, Token *src) {
 }
 
 Token Token_build(TokenType ttype, char *text) {
-	StringRefPtr ref = STRINGP(text);
+	StringPtr ref = STRINGP(text);
 	TokenPtr ret = BUILD(Token, ttype, ref);
 	return ret;
 }
@@ -91,27 +91,27 @@ Token Token_build_lit_num(i128 value) {
 		snprintf(s, 100, "%s%llu%llu", is_negative, high, low);
 	else
 		snprintf(s, 100, "%s%llu", is_negative, low);
-	StringRefPtr ref = STRINGP(s);
+	StringPtr ref = STRINGP(s);
 	TokenPtr ret = BUILD(Token, LiteralType, ref);
 	return ret;
 }
 
 void Tokenizer_cleanup(Tokenizer *ptr) {
-	StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
+	StringPtr *ref = (String *)Tokenizer_get_ref(ptr);
 	cleanup(ref);
 }
 bool Tokenizer_clone(Tokenizer *dst, Tokenizer *src) {
 	Tokenizer_set_pos(dst, *Tokenizer_get_pos(src));
 	Tokenizer_set_in_comment(dst, *Tokenizer_get_in_comment(src));
-	StringRefPtr dc = BUILD(StringRef);
-	StringRefPtr *src_ref = (StringRef *)Tokenizer_get_ref(src);
+	StringPtr dc = BUILD(String);
+	StringPtr *src_ref = (String *)Tokenizer_get_ref(src);
 	Result r = deep_copy(&dc, src_ref);
 	Tokenizer_set_ref(dst, dc);
 	return true;
 }
 
 Result do_skip_white_space(Tokenizer *ptr) {
-	StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
+	StringPtr *ref = (String *)Tokenizer_get_ref(ptr);
 	u64 rlen = len(ref);
 	u64 pos = *Tokenizer_get_pos(ptr);
 
@@ -131,7 +131,7 @@ Result do_skip_white_space(Tokenizer *ptr) {
 	return Ok(UNIT);
 }
 Result do_skip_comments(Tokenizer *ptr) {
-	StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
+	StringPtr *ref = (String *)Tokenizer_get_ref(ptr);
 	u64 rlen = len(ref);
 	u64 pos = *Tokenizer_get_pos(ptr);
 	u64 start_doc_comment = 0;
@@ -201,7 +201,7 @@ Result do_skip_comments(Tokenizer *ptr) {
 	if (start_doc_comment) {
 		// a doc comment was found, return the substring.
 		Result r = SUBSTRING(*ref, start_doc_comment, pos);
-		StringRef comment = Try(StringRef, r);
+		String comment = Try(String, r);
 		Option opt = Some(comment);
 		return Ok(opt);
 	} else {
@@ -210,7 +210,7 @@ Result do_skip_comments(Tokenizer *ptr) {
 }
 
 Result Tokenizer_skip_in_comment(Tokenizer *ptr) {
-	StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
+	StringPtr *ref = (String *)Tokenizer_get_ref(ptr);
 	u64 rlen = len(ref);
 	u64 pos = *Tokenizer_get_pos(ptr);
 	while (true) {
@@ -244,11 +244,11 @@ Result Tokenizer_skip_to_token(Tokenizer *ptr, bool in_comment) {
 		Result r2 = do_skip_comments(ptr);
 		Option opt = Try(Option, r2);
 		if (opt.is_some()) {
-			StringRef sref = *(StringRef *)unwrap(&opt);
+			String sref = *(String *)unwrap(&opt);
 			Option ret = Some(sref);
 			return Ok(ret);
 		}
-		StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
+		StringPtr *ref = (String *)Tokenizer_get_ref(ptr);
 		u64 rlen = len(ref);
 		u64 pos = *Tokenizer_get_pos(ptr);
 		if (pos >= rlen)
@@ -264,7 +264,7 @@ Result Tokenizer_skip_to_token(Tokenizer *ptr, bool in_comment) {
 }
 
 Result Tokenizer_proc_ident(Tokenizer *ptr) {
-	StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
+	StringPtr *ref = (String *)Tokenizer_get_ref(ptr);
 	u64 rlen = len(ref);
 	u64 pos = *Tokenizer_get_pos(ptr);
 	u64 start = pos;
@@ -281,14 +281,14 @@ Result Tokenizer_proc_ident(Tokenizer *ptr) {
 	u64 end = pos;
 	Tokenizer_set_pos(ptr, end);
 	Result ret = SUBSTRING(*ref, start, end);
-	StringRef sptr = *(StringRef *)unwrap(&ret);
+	String sptr = *(String *)unwrap(&ret);
 	Token token = TOKEN(IdentType, to_str(&sptr));
 	Option opt = Some(token);
 	return Ok(opt);
 }
 
 Result Tokenizer_proc_literal(Tokenizer *ptr) {
-	StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
+	StringPtr *ref = (String *)Tokenizer_get_ref(ptr);
 	u64 rlen = len(ref);
 	u64 pos = *Tokenizer_get_pos(ptr);
 	u64 start = pos;
@@ -319,7 +319,7 @@ Result Tokenizer_proc_literal(Tokenizer *ptr) {
 	u64 end = pos;
 	Tokenizer_set_pos(ptr, end);
 	Result ret = SUBSTRING(*ref, start, end);
-	StringRef sptr = *(StringRef *)unwrap(&ret);
+	String sptr = *(String *)unwrap(&ret);
 	Token token = TOKEN(LiteralType, to_str(&sptr));
 	Option opt = Some(token);
 	return Ok(opt);
@@ -368,7 +368,7 @@ bool is_third_punct(char ch1, char ch2, char ch3) {
 }
 
 Result Tokenizer_proc_punct(Tokenizer *ptr) {
-	StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
+	StringPtr *ref = (String *)Tokenizer_get_ref(ptr);
 	u64 rlen = len(ref);
 	u64 pos = *Tokenizer_get_pos(ptr);
 	u64 start = pos;
@@ -413,7 +413,7 @@ Result Tokenizer_proc_punct(Tokenizer *ptr) {
 }
 
 Result Tokenizer_next_token(Tokenizer *ptr) {
-	StringRefPtr *ref = (StringRef *)Tokenizer_get_ref(ptr);
+	StringPtr *ref = (String *)Tokenizer_get_ref(ptr);
 	u64 rlen = len(ref);
 	u64 pos = *Tokenizer_get_pos(ptr);
 	bool in_comment = *Tokenizer_get_in_comment(ptr);
@@ -425,7 +425,7 @@ Result Tokenizer_next_token(Tokenizer *ptr) {
 	Result skip = Tokenizer_skip_to_token(ptr, in_comment);
 	Option res = Try(Option, skip);
 	if (res.is_some()) {
-		StringRef comment = *(StringRef *)unwrap(&res);
+		String comment = *(String *)unwrap(&res);
 		Token token = TOKEN(DocType, to_str(&comment));
 		Option opt = Some(token);
 		return Ok(opt);
@@ -445,9 +445,9 @@ Result Tokenizer_next_token(Tokenizer *ptr) {
 		return Tokenizer_proc_punct(ptr);
 }
 
-Result Tokenizer_parse(StringRef *s) {
+Result Tokenizer_parse(String *s) {
 	Tokenizer ret = BUILD(Tokenizer, ._pos = 0, ._in_comment = false);
-	StringRefPtr copy;
+	StringPtr copy;
 	Result r = deep_copy(&copy, s);
 	Tokenizer_set_ref(&ret, copy);
 	return Ok(ret);

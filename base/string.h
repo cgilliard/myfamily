@@ -36,7 +36,7 @@ Result char_at(void *s, u64 index);
 	TRAIT_REQUIRED(T, Result, last_index_of_s, T##Ptr *s, char *n)         \
 	TRAIT_REQUIRED(T, Result, char_at, T##Ptr *s, u64 index)
 
-// have to include this here because Formatter depends on CString/StringRef
+// have to include this here because Formatter depends on CString/String
 typedef struct Formatter Formatter;
 
 CLASS(CString, FIELD(char *, ptr) FIELD(u64, len))
@@ -54,45 +54,45 @@ IMPL(CString, TRAIT_STRING_CORE)
 #define STRINGPTRP(s) CString_build_ptr_expect(s)
 #define STRINGPTR(s) CString_build_ptr_try(s)
 
-CLASS(StringRef, FIELD(RcPtr *, ptr))
-IMPL(StringRef, TRAIT_STRINGREF_BUILD)
-IMPL(StringRef, TRAIT_COPY)
-IMPL(StringRef, TRAIT_UNWRAP)
-IMPL(StringRef, TRAIT_EQUAL)
-IMPL(StringRef, TRAIT_APPEND)
-IMPL(StringRef, TRAIT_DEBUG)
-IMPL(StringRef, TRAIT_DEEP_COPY)
-IMPL(StringRef, TRAIT_TO_STR)
-IMPL(StringRef, TRAIT_LEN)
-IMPL(StringRef, TRAIT_STRING_CORE)
-#define StringRef DEFINE_CLASS(StringRef)
+CLASS(String, FIELD(RcPtr *, ptr))
+IMPL(String, TRAIT_STRINGREF_BUILD)
+IMPL(String, TRAIT_COPY)
+IMPL(String, TRAIT_UNWRAP)
+IMPL(String, TRAIT_EQUAL)
+IMPL(String, TRAIT_APPEND)
+IMPL(String, TRAIT_DEBUG)
+IMPL(String, TRAIT_DEEP_COPY)
+IMPL(String, TRAIT_TO_STR)
+IMPL(String, TRAIT_LEN)
+IMPL(String, TRAIT_STRING_CORE)
+#define String DEFINE_CLASS(String)
 
-StringRef StringRef_buildp(char *s);
-Result StringRef_build(char *s);
-#define STRING(x) StringRef_build(x)
-#define STRINGP(x) StringRef_buildp(x)
+String String_buildp(char *s);
+Result String_build(char *s);
+#define STRING(x) String_build(x)
+#define STRINGP(x) String_buildp(x)
 
 #define INDEX_OF(s, n)                                                         \
 	_Generic((*s),                                                         \
-	    StringRef: _Generic((n),                                           \
-	    char *: StringRef_index_of_s,                                      \
-	    default: StringRef_index_of),                                      \
+	    String: _Generic((n),                                           \
+	    char *: String_index_of_s,                                      \
+	    default: String_index_of),                                      \
 	    CString: _Generic((n),                                             \
 	    char *: CString_index_of_s,                                        \
 	    default: CString_index_of))(s, n)
 
 #define LAST_INDEX_OF(s, n)                                                    \
 	_Generic((*s),                                                         \
-	    StringRef: _Generic((n),                                           \
-	    char *: StringRef_last_index_of_s,                                 \
-	    default: StringRef_last_index_of),                                 \
+	    String: _Generic((n),                                           \
+	    char *: String_last_index_of_s,                                 \
+	    default: String_last_index_of),                                 \
 	    CString: _Generic((n),                                             \
 	    char *: CString_last_index_of_s,                                   \
 	    default: CString_last_index_of))(s, n)
 
 #define SUBSTRING(s, start, end)                                               \
 	_Generic((s),                                                          \
-	    StringRef: StringRef_substring,                                    \
+	    String: String_substring,                                    \
 	    CString: CString_substring)(&s, start, end)
 
 #endif // _BASE_STRING__

@@ -19,7 +19,7 @@
 #include <base/traits.h>
 
 #define TRAIT_TOKENIZER(T)                                                     \
-	TRAIT_REQUIRED(T, Result, parse, StringRef *s)                         \
+	TRAIT_REQUIRED(T, Result, parse, String *s)                         \
 	TRAIT_REQUIRED(T, Result, next_token, T##Ptr *self)
 
 #define TRAIT_TOKEN(T)                                                         \
@@ -34,14 +34,14 @@ typedef enum TokenType {
 	DocType = 4
 } TokenType;
 
-CLASS(Token, FIELD(TokenType, ttype) FIELD(StringRef, text))
+CLASS(Token, FIELD(TokenType, ttype) FIELD(String, text))
 IMPL(Token, TRAIT_DISPLAY)
 IMPL(Token, TRAIT_DEBUG)
 IMPL(Token, TRAIT_TOKEN)
 IMPL(Token, TRAIT_COPY)
 #define Token DEFINE_CLASS(Token)
 
-CLASS(Tokenizer, FIELD(u64, pos) FIELD(StringRef, ref) FIELD(bool, in_comment))
+CLASS(Tokenizer, FIELD(u64, pos) FIELD(String, ref) FIELD(bool, in_comment))
 IMPL(Tokenizer, TRAIT_TOKENIZER)
 IMPL(Tokenizer, TRAIT_COPY)
 #define Tokenizer DEFINE_CLASS(Tokenizer)

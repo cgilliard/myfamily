@@ -68,7 +68,7 @@ Result Tuple_dbg(Tuple *obj, Formatter *f) {
 		    implements(elements[i], "to_str_buf")) {
 			Result r = to_debug(elements[i]);
 			Try(Unit, r);
-			StringRef item = Try(StringRef, r);
+			String item = Try(String, r);
 			Result r2 = WRITE(f, "%s", to_str(&item));
 			Try(Unit, r2);
 		} else {

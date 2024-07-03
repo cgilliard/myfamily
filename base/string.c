@@ -21,8 +21,8 @@ GETTER(CString, ptr)
 SETTER(CString, ptr)
 GETTER(CString, len)
 SETTER(CString, len)
-GETTER(StringRef, ptr)
-SETTER(StringRef, ptr)
+GETTER(String, ptr)
+SETTER(String, ptr)
 
 Result char_at(void *s, u64 index) {
 	ResultPtr (*do_char_at)(Object *s, u64 index) =
@@ -234,36 +234,36 @@ Result CString_char_at(CString *s, u64 index) {
 	return Ok(ret);
 }
 
-// StringRef
+// String
 
-StringRef StringRef_buildp(char *s) {
+String String_buildp(char *s) {
 	CStringPtr *ptr = STRINGPTRP(s);
 	RcPtr *nrc = tlmalloc(sizeof(Rc));
 	if (nrc == NULL)
 		panic("could not allocate memory");
 	*nrc = RC(ptr);
-	StringRefPtr ret = BUILD(StringRef, nrc);
+	StringPtr ret = BUILD(String, nrc);
 	return ret;
 }
 
-u64 StringRef_len(StringRef *obj) {
-	RcPtr *rc = *StringRef_get_ptr(obj);
+u64 String_len(String *obj) {
+	RcPtr *rc = *String_get_ptr(obj);
 	CStringPtr *ptr = unwrap(rc);
 	u64 len = *CString_get_len(ptr);
 	return len;
 }
 
-Result StringRef_dbg(StringRef *s, Formatter *f) {
-	RcPtr *rc = *StringRef_get_ptr(s);
+Result String_dbg(String *s, Formatter *f) {
+	RcPtr *rc = *String_get_ptr(s);
 	CStringPtr *ptr = unwrap(rc);
 	Result r0 = to_debug(ptr);
-	StringRef inner = Try(StringRef, r0);
+	String inner = Try(String, r0);
 	Result r1 = WRITE(f, to_str(&inner));
 	Try(Unit, r1);
 	return Ok(UNIT);
 }
 
-Result StringRef_build(char *s) {
+Result String_build(char *s) {
 	if (s == NULL) {
 		Error err = ERROR(ILLEGAL_ARGUMENT, "s cannot be NULL");
 		return Err(err);
@@ -286,19 +286,19 @@ Result StringRef_build(char *s) {
 		return Err(err);
 	}
 	*nrc = RC(sptr);
-	StringRef ret = BUILD(StringRef, nrc);
+	String ret = BUILD(String, nrc);
 	return Ok(ret);
 }
 
-bool StringRef_equal(StringRef *dst, StringRef *src) {
-	RcPtr *rc_src = *StringRef_get_ptr(src);
-	RcPtr *rc_dst = *StringRef_get_ptr(dst);
+bool String_equal(String *dst, String *src) {
+	RcPtr *rc_src = *String_get_ptr(src);
+	RcPtr *rc_dst = *String_get_ptr(dst);
 
 	return equal(unwrap(rc_src), unwrap(rc_dst));
 }
 
-bool StringRef_clone(StringRef *dst, StringRef *src) {
-	RcPtr *src_rc = *StringRef_get_ptr(src);
+bool String_clone(String *dst, String *src) {
+	RcPtr *src_rc = *String_get_ptr(src);
 	RcPtr *dst_rc = tlmalloc(sizeof(Rc));
 
 	if (dst_rc == NULL)
@@ -308,13 +308,13 @@ bool StringRef_clone(StringRef *dst, StringRef *src) {
 		return false;
 	}
 
-	StringRef_set_ptr(dst, dst_rc);
+	String_set_ptr(dst, dst_rc);
 
 	return true;
 }
 
-Result StringRef_deep_copy(StringRef *dst, StringRef *src) {
-	RcPtr *src_rc = *StringRef_get_ptr(src);
+Result String_deep_copy(String *dst, String *src) {
+	RcPtr *src_rc = *String_get_ptr(src);
 	CStringPtr *src_str = unwrap(src_rc);
 	RcPtr *dst_ptr = tlmalloc(sizeof(Rc));
 	if (dst_ptr == NULL) {
@@ -332,79 +332,79 @@ Result StringRef_deep_copy(StringRef *dst, StringRef *src) {
 	clone(dst_str, src_str);
 	Rc x = RC(dst_str);
 	copy(dst_ptr, &x);
-	StringRef_set_ptr(dst, dst_ptr);
+	String_set_ptr(dst, dst_ptr);
 	return Ok(UNIT);
 }
 
-void *StringRef_unwrap(StringRef *obj) {
-	RcPtr *ptr = *StringRef_get_ptr(obj);
+void *String_unwrap(String *obj) {
+	RcPtr *ptr = *String_get_ptr(obj);
 	CStringPtr *s = unwrap(ptr);
 	return unwrap(s);
 }
 
-void StringRef_cleanup(StringRef *ptr) {
-	RcPtr *rc = *StringRef_get_ptr(ptr);
+void String_cleanup(String *ptr) {
+	RcPtr *rc = *String_get_ptr(ptr);
 	if (rc != NULL) {
 		cleanup(rc);
 		tlfree(rc);
-		StringRef_set_ptr(ptr, NULL);
+		String_set_ptr(ptr, NULL);
 	}
 }
 
-Result StringRef_append(StringRef *dst, StringRef *src) {
-	RcPtr *dst_rc = *StringRef_get_ptr(dst);
-	RcPtr *src_rc = *StringRef_get_ptr(src);
+Result String_append(String *dst, String *src) {
+	RcPtr *dst_rc = *String_get_ptr(dst);
+	RcPtr *src_rc = *String_get_ptr(src);
 	CStringPtr *dst_ptr = unwrap(dst_rc);
 	CStringPtr *src_ptr = unwrap(src_rc);
 	return append(dst_ptr, src_ptr);
 }
 
-Result StringRef_index_of(StringRef *s, StringRef *n) {
-	RcPtr *sptr = *StringRef_get_ptr(s);
-	RcPtr *nptr = *StringRef_get_ptr(n);
+Result String_index_of(String *s, String *n) {
+	RcPtr *sptr = *String_get_ptr(s);
+	RcPtr *nptr = *String_get_ptr(n);
 	CStringPtr *sstrptr = unwrap(sptr);
 	CStringPtr *nstrptr = unwrap(nptr);
 	return CString_index_of(sstrptr, nstrptr);
 }
 
-Result StringRef_last_index_of(StringRef *s, StringRef *n) {
+Result String_last_index_of(String *s, String *n) {
 
-	RcPtr *sptr = *StringRef_get_ptr(s);
-	RcPtr *nptr = *StringRef_get_ptr(n);
+	RcPtr *sptr = *String_get_ptr(s);
+	RcPtr *nptr = *String_get_ptr(n);
 	CStringPtr *sstrptr = unwrap(sptr);
 	CStringPtr *nstrptr = unwrap(nptr);
 	return CString_last_index_of(sstrptr, nstrptr);
 }
 
-Result StringRef_substring(StringRef *s, u64 start, u64 end) {
-	RcPtr *sptr = *StringRef_get_ptr(s);
+Result String_substring(String *s, u64 start, u64 end) {
+	RcPtr *sptr = *String_get_ptr(s);
 	CStringPtr *sstrptr = unwrap(sptr);
 	Result res = CString_substring(sstrptr, start, end);
 	Rc rc = *(Rc *)unwrap(&res);
-	StringRefPtr srp = BUILD(StringRef, &rc);
+	StringPtr srp = BUILD(String, &rc);
 	return Ok(srp);
 }
 
-char *StringRef_to_str(StringRef *s) {
-	RcPtr *sptr = *StringRef_get_ptr(s);
+char *String_to_str(String *s) {
+	RcPtr *sptr = *String_get_ptr(s);
 	CStringPtr *sstrptr = unwrap(sptr);
 	return to_str(sstrptr);
 }
 
-Result StringRef_index_of_s(StringRef *s, char *n) {
-	RcPtr *sptr = *StringRef_get_ptr(s);
+Result String_index_of_s(String *s, char *n) {
+	RcPtr *sptr = *String_get_ptr(s);
 	CStringPtr *sstrptr = unwrap(sptr);
 	return CString_index_of_s(sstrptr, n);
 }
 
-Result StringRef_last_index_of_s(StringRef *s, char *n) {
-	RcPtr *sptr = *StringRef_get_ptr(s);
+Result String_last_index_of_s(String *s, char *n) {
+	RcPtr *sptr = *String_get_ptr(s);
 	CStringPtr *sstrptr = unwrap(sptr);
 	return CString_last_index_of_s(sstrptr, n);
 }
 
-Result StringRef_char_at(StringRef *s, u64 index) {
-	RcPtr *sptr = *StringRef_get_ptr(s);
+Result String_char_at(String *s, u64 index) {
+	RcPtr *sptr = *String_get_ptr(s);
 	CStringPtr *sstrptr = unwrap(sptr);
 	return CString_char_at(sstrptr, index);
 }
