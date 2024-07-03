@@ -452,4 +452,3 @@ Result Tokenizer_parse(StringRef *s) {
 	Tokenizer_set_ref(&ret, copy);
 	return Ok(ret);
 }
-
