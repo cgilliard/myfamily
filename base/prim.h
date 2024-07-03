@@ -72,4 +72,12 @@ DEFINE_PRIM_CLASS(usize, USize)
 #define USize DEFINE_CLASS(USize)
 static GETTER(USize, value);
 
+DEFINE_PRIM_CLASS(f32, F32)
+#define F32 DEFINE_CLASS(F32)
+static GETTER(F32, value);
+
+DEFINE_PRIM_CLASS(f64, F64)
+#define F64 DEFINE_CLASS(F64)
+static GETTER(F64, value);
+
 #endif // _BASE_PRIM__

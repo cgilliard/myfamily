@@ -47,8 +47,6 @@ Result Token_fmt(Token *obj, Formatter *formatter) {
 	return Ok(UNIT);
 }
 
-usize Token_size(Token *obj) { return sizeof(Token); }
-
 Result Token_dbg(Token *obj, Formatter *f) {
 	StringRefPtr token = *Token_get_text(obj);
 	Result r = WRITE(f, "%s", to_str(&token));
@@ -455,4 +453,3 @@ Result Tokenizer_parse(StringRef *s) {
 	return Ok(ret);
 }
 
-usize Tokenizer_size(Tokenizer *obj) { return sizeof(Tokenizer); }

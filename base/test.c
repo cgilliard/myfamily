@@ -15,6 +15,7 @@
 #include <base/enum.h>
 #include <base/rc.h>
 #include <base/test.h>
+#include <base/tuple.h>
 
 FamSuite(base);
 
@@ -27,9 +28,7 @@ ENUM(MyEnum, VARIANTS(TYPE_INT, TYPE_FLOAT, TYPE_STRING),
 CLASS(MyClass, FIELD(u64, value))
 #define MyClass DEFINE_CLASS(MyClass)
 
-void MyClass_cleanup(MyClass *ptr) {
-	printf("--------myclass cleanup %i\n", ptr);
-}
+void MyClass_cleanup(MyClass *ptr) {}
 
 ENUM(MyEnum2, VARIANTS(TYPE_MY_CLASS, TYPE_U64), TYPES("MyClass", "u64"))
 #define MyEnum2 DEFINE_ENUM(MyEnum2)
@@ -172,8 +171,9 @@ FamTest(base, test_enum2) {
 	bool vbool = false;
 	usize vusize = 140;
 	StringRef vsr = STRINGP("string ref");
-	Rc vclz = BOX(MyClassPtr);
-	DEREF(vclz, MyClass)->_value = 1111;
+
+	MyClass vclz_stack = BUILD(MyClass, 1111);
+	Rc vclz = RC_HEAPIFY(vclz_stack);
 
 	TestVariants mu8 = BUILD_ENUM(TestVariants, VU8, vu8);
 	check = do_match(mu8);
@@ -270,6 +270,84 @@ FamTest(base, test_enum2) {
 	assert_eq(check, 16);
 	check = do_match_value(mclz);
 	assert_eq(check, 160);
+
+	return Ok(UNIT);
+}
+
+#define TUPLE_TEST_TYPE(type, tuple, index, exp)                               \
+	({                                                                     \
+		type v##type##_out = 0;                                        \
+		ELEMENT_AT(&tuple, index, &v##type##_out);                     \
+		assert_eq(v##type##_out, exp);                                 \
+	})
+
+FamTest(base, test_tuple) {
+	u8 vu8 = 10;
+	u16 vu16 = 20;
+	u32 vu32 = 30;
+	u64 vu64 = 40;
+	u128 vu128 = 50;
+	i8 vi8 = 60;
+	i16 vi16 = 70;
+	i32 vi32 = 80;
+	i64 vi64 = 90;
+	i128 vi128 = 100;
+	f32 vf32 = 110.0;
+	f64 vf64 = 120.0;
+	bool vbool = true;
+	usize vusize = 140;
+	StringRef vsr = STRINGP("string ref");
+	MyClass vclz_stack = BUILD(MyClass, 1111);
+	Rc vclz = RC_HEAPIFY(vclz_stack);
+
+	Tuple t1 =
+	    TUPLE(vu8, vu16, vu32, vu64, vu128, vi8, vi16, vi32, vi64, vi128);
+	Tuple t2 = TUPLE(vf32, vf64, vbool, vusize, vsr, vclz);
+
+	TUPLE_TEST_TYPE(u8, t1, 0, 10);
+	TUPLE_TEST_TYPE(u16, t1, 1, 20);
+	TUPLE_TEST_TYPE(u32, t1, 2, 30);
+	TUPLE_TEST_TYPE(u64, t1, 3, 40);
+	TUPLE_TEST_TYPE(u128, t1, 4, 50);
+	TUPLE_TEST_TYPE(i8, t1, 5, 60);
+	TUPLE_TEST_TYPE(i16, t1, 6, 70);
+	TUPLE_TEST_TYPE(i32, t1, 7, 80);
+	TUPLE_TEST_TYPE(i64, t1, 8, 90);
+	TUPLE_TEST_TYPE(i128, t1, 9, 100);
+
+	TUPLE_TEST_TYPE(f32, t2, 0, 110.0);
+	TUPLE_TEST_TYPE(f64, t2, 1, 120.0);
+
+	TUPLE_TEST_TYPE(bool, t2, 2, true);
+	TUPLE_TEST_TYPE(usize, t2, 3, 140);
+
+	StringRef vsr_out;
+	ELEMENT_AT(&t2, 4, &vsr_out);
+	assert_eq_str(to_str(&vsr_out), "string ref");
+
+	MyClass mc;
+	ELEMENT_AT(&t2, 5, &mc);
+	assert_eq(mc._value, 1111);
+
+	return Ok(UNIT);
+}
+
+FamTest(base, test_heapify) {
+	MyClass mc = BUILD(MyClass, 101);
+	MyClassPtr *ptr = HEAPIFY(mc);
+	assert_eq(ptr->_value, 101);
+	cleanup(ptr);
+	tlfree(ptr);
+
+	MyClass mc2 = BUILD(MyClass, 202);
+	Rc rc2 = RC_HEAPIFY(mc2);
+	// leave this as is to test memory management in this state. Cleanup
+	// should free everything properly
+
+	MyClass mc3 = BUILD(MyClass, 303);
+	Rc rc3 = RC_HEAPIFY(mc3);
+	MyClass mc3_out = *(MyClass *)unwrap(&rc3);
+	assert_eq(mc3_out._value, 303);
 
 	return Ok(UNIT);
 }

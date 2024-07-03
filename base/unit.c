@@ -18,7 +18,6 @@
 
 void Unit_cleanup(UnitPtr *u) {}
 bool Unit_clone(UnitPtr *dst, UnitPtr *src) { return true; }
-usize Unit_size(UnitPtr *u) { return sizeof(UnitPtr); }
 bool Unit_equal(UnitPtr *obj1, UnitPtr *obj2) { return true; }
 Result Unit_fmt(Unit *ptr, Formatter *formatter) {
 	Result r = WRITE(formatter, "()");

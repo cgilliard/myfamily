@@ -39,7 +39,9 @@ void *Tuple_add_value_i64(void *value);
 void *Tuple_add_value_i32(void *value);
 void *Tuple_add_value_i16(void *value);
 void *Tuple_add_value_i8(void *value);
-void *Tuple_add_value_str(char **value);
+void *Tuple_add_value_f64(void *value);
+void *Tuple_add_value_f32(void *value);
+void *Tuple_add_value_usize(void *value);
 void *Tuple_add_value_bool(void *value);
 
 #define CREATE_GENERIC(value)                                                  \
@@ -54,7 +56,9 @@ void *Tuple_add_value_bool(void *value);
 	    u32: Tuple_add_value_u32,                                          \
 	    u16: Tuple_add_value_u16,                                          \
 	    u8: Tuple_add_value_u8,                                            \
-	    char *: Tuple_add_value_str,                                       \
+	    f64: Tuple_add_value_f64,                                          \
+	    f32: Tuple_add_value_f32,                                          \
+	    usize: Tuple_add_value_usize,                                      \
 	    bool: Tuple_add_value_bool,                                        \
 	    default: Tuple_add_value)(&value)
 

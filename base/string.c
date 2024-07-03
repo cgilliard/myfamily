@@ -17,10 +17,10 @@
 #include <base/string.h>
 #include <base/unit.h>
 
-GETTER(String, ptr)
-SETTER(String, ptr)
-GETTER(String, len)
-SETTER(String, len)
+GETTER(CString, ptr)
+SETTER(CString, ptr)
+GETTER(CString, len)
+SETTER(CString, len)
 GETTER(StringRef, ptr)
 SETTER(StringRef, ptr)
 
@@ -45,31 +45,30 @@ char *rstrstr(char *s1, char *s2) {
 	return NULL;
 }
 
-void String_cleanup(StringPtr *s) {
-	char *ptr = *String_get_ptr(s);
+void CString_cleanup(CStringPtr *s) {
+	char *ptr = *CString_get_ptr(s);
 	if (ptr != NULL) {
 		tlfree(ptr);
-		String_set_ptr(s, NULL);
-		String_set_len(s, 0);
+		CString_set_ptr(s, NULL);
+		CString_set_len(s, 0);
 	}
 }
 
-Result String_dbg(String *s, Formatter *f) {
-	char *ptr = *String_get_ptr(s);
+Result CString_dbg(CString *s, Formatter *f) {
+	char *ptr = *CString_get_ptr(s);
 	Result r0 = WRITE(f, "'%s'", ptr);
 	Try(Unit, r0);
 	return Ok(UNIT);
 }
 
-usize String_size(String *s) { return sizeof(String); }
-bool String_clone(String *dst, String *src) {
-	u64 len = *String_get_len(src);
-	String_set_len(dst, len);
+bool CString_clone(CString *dst, CString *src) {
+	u64 len = *CString_get_len(src);
+	CString_set_len(dst, len);
 	void *tmp = tlmalloc(sizeof(char) * (1 + len));
-	String_set_ptr(dst, tmp);
+	CString_set_ptr(dst, tmp);
 
-	char *dst_ptr = *String_get_ptr(dst);
-	char *src_ptr = *String_get_ptr(src);
+	char *dst_ptr = *CString_get_ptr(dst);
+	char *src_ptr = *CString_get_ptr(src);
 	if (dst_ptr == NULL)
 		return false;
 	else {
@@ -78,34 +77,34 @@ bool String_clone(String *dst, String *src) {
 	}
 }
 
-u64 String_len(String *obj) {
-	u64 len = *String_get_len(obj);
+u64 CString_len(CString *obj) {
+	u64 len = *CString_get_len(obj);
 	return len;
 }
 
-void *String_unwrap(String *obj) {
-	char *ptr = *String_get_ptr(obj);
+void *CString_unwrap(CString *obj) {
+	char *ptr = *CString_get_ptr(obj);
 	return ptr;
 }
 
-bool String_equal(String *obj1, String *obj2) {
-	char *obj1_ptr = *String_get_ptr(obj1);
-	char *obj2_ptr = *String_get_ptr(obj2);
+bool CString_equal(CString *obj1, CString *obj2) {
+	char *obj1_ptr = *CString_get_ptr(obj1);
+	char *obj2_ptr = *CString_get_ptr(obj2);
 	if (obj1_ptr == NULL || obj2_ptr == NULL)
 		return false;
 	return !strcmp(obj1_ptr, obj2_ptr);
 }
 
-Result String_build_ptr_try(char *s) {
-	StringPtr rs = BUILD(String, s, strlen(s));
-	StringPtr *rsc = tlmalloc(sizeof(String));
+Result CString_build_ptr_try(char *s) {
+	CStringPtr rs = BUILD(CString, s, strlen(s));
+	CStringPtr *rsc = tlmalloc(sizeof(CString));
 	clone(rsc, &rs);
 	Rc ret = RC(rsc);
 	Rc_set_flags(&ret, RC_FLAGS_NO_UNWRAP);
 	return Ok(ret);
 }
 
-String String_build_expect(const char *s) {
+CString CString_build_expect(const char *s) {
 	if (s == NULL)
 		panic("char pointer was NULL");
 	u64 len = strlen(s);
@@ -115,21 +114,21 @@ String String_build_expect(const char *s) {
 	}
 	strcpy(ptr, s);
 
-	StringPtr ret = BUILD(String, ptr, len);
+	CStringPtr ret = BUILD(CString, ptr, len);
 	return ret;
 }
 
-StringPtr *String_build_ptr_expect(const char *s) {
-	StringPtr *ret = tlmalloc(sizeof(StringPtr));
+CStringPtr *CString_build_ptr_expect(const char *s) {
+	CStringPtr *ret = tlmalloc(sizeof(CStringPtr));
 	if (ret == NULL)
 		panic("Allocation Error: Could not allocate memory");
-	*ret = String_build_expect(s);
+	*ret = CString_build_expect(s);
 	return ret;
 }
 
-Result String_append(String *dst, String *src) {
-	char *dst_ptr = *String_get_ptr(dst);
-	char *src_ptr = *String_get_ptr(src);
+Result CString_append(CString *dst, CString *src) {
+	char *dst_ptr = *CString_get_ptr(dst);
+	char *src_ptr = *CString_get_ptr(src);
 	u64 nlen = strlen(dst_ptr) + strlen(src_ptr);
 	char *tmp = tlrealloc(dst_ptr, (nlen + 1) * sizeof(char));
 
@@ -140,15 +139,15 @@ Result String_append(String *dst, String *src) {
 	}
 
 	strcat(tmp, src_ptr);
-	String_set_ptr(dst, tmp);
-	String_set_len(dst, nlen);
+	CString_set_ptr(dst, tmp);
+	CString_set_len(dst, nlen);
 
 	return Ok(UNIT);
 }
 
-Result String_index_of(StringPtr *s, StringPtr *n) {
-	char *sptr = *String_get_ptr(s);
-	char *nptr = *String_get_ptr(n);
+Result CString_index_of(CStringPtr *s, CStringPtr *n) {
+	char *sptr = *CString_get_ptr(s);
+	char *nptr = *CString_get_ptr(n);
 	char *res = strstr(sptr, nptr);
 	i64 ret;
 	if (res == NULL)
@@ -158,9 +157,9 @@ Result String_index_of(StringPtr *s, StringPtr *n) {
 	return Ok(ret);
 }
 
-Result String_last_index_of(StringPtr *s, StringPtr *n) {
-	char *sptr = *String_get_ptr(s);
-	char *nptr = *String_get_ptr(n);
+Result CString_last_index_of(CStringPtr *s, CStringPtr *n) {
+	char *sptr = *CString_get_ptr(s);
+	char *nptr = *CString_get_ptr(n);
 	char *res = rstrstr(sptr, nptr);
 	i64 ret;
 	if (res == NULL)
@@ -170,7 +169,7 @@ Result String_last_index_of(StringPtr *s, StringPtr *n) {
 	return Ok(ret);
 }
 
-Result String_substring(StringPtr *s, u64 start, u64 end) {
+Result CString_substring(CStringPtr *s, u64 start, u64 end) {
 	if (start > end) {
 		Error err = ERROR(
 		    ILLEGAL_ARGUMENT,
@@ -178,7 +177,7 @@ Result String_substring(StringPtr *s, u64 start, u64 end) {
 		    start, end);
 		return Err(err);
 	}
-	u64 len = *String_get_len(s);
+	u64 len = *CString_get_len(s);
 	if (end > len) {
 		Error err = ERROR(ILLEGAL_ARGUMENT,
 				  "end (%llu) must be equal to or less than "
@@ -186,7 +185,7 @@ Result String_substring(StringPtr *s, u64 start, u64 end) {
 				  end, len);
 		return Err(err);
 	}
-	char *sptr = *String_get_ptr(s);
+	char *sptr = *CString_get_ptr(s);
 	char nstr[(end - start) + 1];
 	strncpy(nstr, sptr + start, (end - start));
 	nstr[end - start] = 0;
@@ -194,13 +193,13 @@ Result String_substring(StringPtr *s, u64 start, u64 end) {
 	return STRINGPTR(nstr);
 }
 
-char *String_to_str(String *s) {
-	char *sptr = *String_get_ptr(s);
+char *CString_to_str(CString *s) {
+	char *sptr = *CString_get_ptr(s);
 	return sptr;
 }
 
-Result String_index_of_s(String *s, char *n) {
-	char *sptr = *String_get_ptr(s);
+Result CString_index_of_s(CString *s, char *n) {
+	char *sptr = *CString_get_ptr(s);
 	char *res = strstr(sptr, n);
 	i64 ret;
 	if (res == NULL)
@@ -210,8 +209,8 @@ Result String_index_of_s(String *s, char *n) {
 	return Ok(ret);
 }
 
-Result String_last_index_of_s(String *s, char *n) {
-	char *sptr = *String_get_ptr(s);
+Result CString_last_index_of_s(CString *s, char *n) {
+	char *sptr = *CString_get_ptr(s);
 	char *res = rstrstr(sptr, n);
 	i64 ret;
 	if (res == NULL)
@@ -221,9 +220,9 @@ Result String_last_index_of_s(String *s, char *n) {
 	return Ok(ret);
 }
 
-Result String_char_at(String *s, u64 index) {
-	char *sptr = *String_get_ptr(s);
-	u64 len = *(u64 *)String_get_len(s);
+Result CString_char_at(CString *s, u64 index) {
+	char *sptr = *CString_get_ptr(s);
+	u64 len = *(u64 *)CString_get_len(s);
 	if (index >= len) {
 		Error err =
 		    ERROR(STRING_INDEX_OUT_OF_BOUNDS,
@@ -235,8 +234,10 @@ Result String_char_at(String *s, u64 index) {
 	return Ok(ret);
 }
 
+// StringRef
+
 StringRef StringRef_buildp(char *s) {
-	StringPtr *ptr = STRINGPTRP(s);
+	CStringPtr *ptr = STRINGPTRP(s);
 	RcPtr *nrc = tlmalloc(sizeof(Rc));
 	if (nrc == NULL)
 		panic("could not allocate memory");
@@ -247,14 +248,14 @@ StringRef StringRef_buildp(char *s) {
 
 u64 StringRef_len(StringRef *obj) {
 	RcPtr *rc = *StringRef_get_ptr(obj);
-	StringPtr *ptr = unwrap(rc);
-	u64 len = *String_get_len(ptr);
+	CStringPtr *ptr = unwrap(rc);
+	u64 len = *CString_get_len(ptr);
 	return len;
 }
 
 Result StringRef_dbg(StringRef *s, Formatter *f) {
 	RcPtr *rc = *StringRef_get_ptr(s);
-	StringPtr *ptr = unwrap(rc);
+	CStringPtr *ptr = unwrap(rc);
 	Result r0 = to_debug(ptr);
 	StringRef inner = Try(StringRef, r0);
 	Result r1 = WRITE(f, to_str(&inner));
@@ -267,13 +268,13 @@ Result StringRef_build(char *s) {
 		Error err = ERROR(ILLEGAL_ARGUMENT, "s cannot be NULL");
 		return Err(err);
 	}
-	StringPtr *sptr = tlmalloc(sizeof(String));
+	CStringPtr *sptr = tlmalloc(sizeof(CString));
 	if (sptr == NULL) {
 		Error err =
 		    ERROR(ALLOC_ERROR, "could not allocate sufficient memory");
 		return Err(err);
 	}
-	StringPtr scpy = BUILD(String, s, strlen(s));
+	CStringPtr scpy = BUILD(CString, s, strlen(s));
 	if (!clone(sptr, &scpy)) {
 		Error err = ERROR(COPY_ERROR, "could not clone the string");
 		return Err(err);
@@ -314,14 +315,14 @@ bool StringRef_clone(StringRef *dst, StringRef *src) {
 
 Result StringRef_deep_copy(StringRef *dst, StringRef *src) {
 	RcPtr *src_rc = *StringRef_get_ptr(src);
-	StringPtr *src_str = unwrap(src_rc);
+	CStringPtr *src_str = unwrap(src_rc);
 	RcPtr *dst_ptr = tlmalloc(sizeof(Rc));
 	if (dst_ptr == NULL) {
 		Error err =
 		    ERROR(ALLOC_ERROR, "Could not allocate sufficient memory");
 		return Err(err);
 	}
-	StringPtr *dst_str = tlmalloc(sizeof(String));
+	CStringPtr *dst_str = tlmalloc(sizeof(CString));
 	if (dst_str == NULL) {
 		tlfree(dst_ptr);
 		Error err =
@@ -335,11 +336,9 @@ Result StringRef_deep_copy(StringRef *dst, StringRef *src) {
 	return Ok(UNIT);
 }
 
-usize StringRef_size(StringRef *obj) { return sizeof(StringRef); }
-
 void *StringRef_unwrap(StringRef *obj) {
 	RcPtr *ptr = *StringRef_get_ptr(obj);
-	StringPtr *s = unwrap(ptr);
+	CStringPtr *s = unwrap(ptr);
 	return unwrap(s);
 }
 
@@ -355,60 +354,57 @@ void StringRef_cleanup(StringRef *ptr) {
 Result StringRef_append(StringRef *dst, StringRef *src) {
 	RcPtr *dst_rc = *StringRef_get_ptr(dst);
 	RcPtr *src_rc = *StringRef_get_ptr(src);
-	StringPtr *dst_ptr = unwrap(dst_rc);
-	StringPtr *src_ptr = unwrap(src_rc);
+	CStringPtr *dst_ptr = unwrap(dst_rc);
+	CStringPtr *src_ptr = unwrap(src_rc);
 	return append(dst_ptr, src_ptr);
 }
 
 Result StringRef_index_of(StringRef *s, StringRef *n) {
 	RcPtr *sptr = *StringRef_get_ptr(s);
 	RcPtr *nptr = *StringRef_get_ptr(n);
-	StringPtr *sstrptr = unwrap(sptr);
-	StringPtr *nstrptr = unwrap(nptr);
-	return String_index_of(sstrptr, nstrptr);
+	CStringPtr *sstrptr = unwrap(sptr);
+	CStringPtr *nstrptr = unwrap(nptr);
+	return CString_index_of(sstrptr, nstrptr);
 }
 
 Result StringRef_last_index_of(StringRef *s, StringRef *n) {
 
 	RcPtr *sptr = *StringRef_get_ptr(s);
 	RcPtr *nptr = *StringRef_get_ptr(n);
-	StringPtr *sstrptr = unwrap(sptr);
-	StringPtr *nstrptr = unwrap(nptr);
-	return String_last_index_of(sstrptr, nstrptr);
+	CStringPtr *sstrptr = unwrap(sptr);
+	CStringPtr *nstrptr = unwrap(nptr);
+	return CString_last_index_of(sstrptr, nstrptr);
 }
 
 Result StringRef_substring(StringRef *s, u64 start, u64 end) {
 	RcPtr *sptr = *StringRef_get_ptr(s);
-	StringPtr *sstrptr = unwrap(sptr);
-	Result res = String_substring(sstrptr, start, end);
+	CStringPtr *sstrptr = unwrap(sptr);
+	Result res = CString_substring(sstrptr, start, end);
 	Rc rc = *(Rc *)unwrap(&res);
-	// Rc rc_clone;
-	// bool clone_res = clone(&rc_clone, &rc);
-	// StringRefPtr srp = BUILD(StringRef, &rc_clone);
 	StringRefPtr srp = BUILD(StringRef, &rc);
 	return Ok(srp);
 }
 
 char *StringRef_to_str(StringRef *s) {
 	RcPtr *sptr = *StringRef_get_ptr(s);
-	StringPtr *sstrptr = unwrap(sptr);
+	CStringPtr *sstrptr = unwrap(sptr);
 	return to_str(sstrptr);
 }
 
 Result StringRef_index_of_s(StringRef *s, char *n) {
 	RcPtr *sptr = *StringRef_get_ptr(s);
-	StringPtr *sstrptr = unwrap(sptr);
-	return String_index_of_s(sstrptr, n);
+	CStringPtr *sstrptr = unwrap(sptr);
+	return CString_index_of_s(sstrptr, n);
 }
 
 Result StringRef_last_index_of_s(StringRef *s, char *n) {
 	RcPtr *sptr = *StringRef_get_ptr(s);
-	StringPtr *sstrptr = unwrap(sptr);
-	return String_last_index_of_s(sstrptr, n);
+	CStringPtr *sstrptr = unwrap(sptr);
+	return CString_last_index_of_s(sstrptr, n);
 }
 
 Result StringRef_char_at(StringRef *s, u64 index) {
 	RcPtr *sptr = *StringRef_get_ptr(s);
-	StringPtr *sstrptr = unwrap(sptr);
-	return String_char_at(sstrptr, index);
+	CStringPtr *sstrptr = unwrap(sptr);
+	return CString_char_at(sstrptr, index);
 }

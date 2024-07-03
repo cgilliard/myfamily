@@ -48,7 +48,6 @@ void Option_cleanup(Option *option) {
 		Option_set_ref(option, NULL);
 	}
 }
-usize Option_size(Option *option) { return sizeof(Option); }
 bool Option_clone(Option *dst, Option *src) {
 	if (src->is_some()) {
 		Object *ref = tlmalloc(size(src));

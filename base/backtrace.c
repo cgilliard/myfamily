@@ -153,9 +153,6 @@ bool BacktraceEntry_clone(BacktraceEntry *dst, BacktraceEntry *src) {
 	    dst, *GET_NAME(src), *GET_BIN_NAME(src), *GET_ADDRESS(src),
 	    *GET_FILE_PATH(src));
 }
-usize BacktraceEntry_size(BacktraceEntry *ptr) {
-	return sizeof(BacktraceEntry);
-}
 
 bool BacktraceEntry_set_backtrace_entry_values(BacktraceEntry *ptr,
 					       const char *name,
@@ -383,7 +380,6 @@ bool Backtrace_clone(Backtrace *dst, Backtrace *src) {
 
 	return ret;
 }
-usize Backtrace_size(Backtrace *ptr) { return sizeof(Backtrace); }
 
 void Backtrace_print(Backtrace *ptr) {
 	printf("Backtrace:\n");

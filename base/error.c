@@ -20,7 +20,6 @@ GETTER(Error, flags)
 SETTER(Error, flags)
 
 void ErrorKind_cleanup(ErrorKindPtr *obj) {}
-usize ErrorKind_size(ErrorKind *obj) { return sizeof(ErrorKind); }
 bool ErrorKind_clone(ErrorKind *dst, ErrorKind *src) {
 	void *dst_kind = ErrorKind_get_kind(dst);
 	void *src_kind = ErrorKind_get_kind(src);
@@ -54,7 +53,6 @@ bool Error_clone(Error *dst, Error *src) {
 	return copy(bt, src_bt);
 }
 
-usize Error_size(Error *obj) { return sizeof(Error); }
 void Error_print(Error *obj) {
 	ErrorKindPtr *kind = Error_get_kind(obj);
 	char *kind_str = (char *)ErrorKind_get_kind(kind);

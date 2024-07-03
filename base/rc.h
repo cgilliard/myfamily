@@ -35,16 +35,11 @@ static SETTER(Rc, flags);
 
 #define RC(x) Rc_build(x)
 
-#define BOX(ptrname)                                                           \
+#define BOX(pname)                                                             \
 	({                                                                     \
-		usize str_len = strlen(#ptrname);                              \
-		char buf[str_len + 1];                                         \
-		strcpy(buf, #ptrname);                                         \
-		buf[str_len - 3] = 0;                                          \
-		printf("buf=%s\n", buf);                                       \
-		Object *inner = tlmalloc(sizeof(ptrname));                     \
-		inner->vdata.vtable = &ptrname##_Vtable__;                     \
-		inner->vdata.name = ptrname##_vdata_name__;                    \
+		Object *inner = tlmalloc(sizeof(pname));                       \
+		inner->vdata.vtable = &pname##_Vtable__;                       \
+		inner->vdata.name = pname##_vdata_name__;                      \
 		RcPtr ret = RC(inner);                                         \
 		ret;                                                           \
 	})

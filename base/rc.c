@@ -47,8 +47,6 @@ void Rc_cleanup_no_ref(Rc *obj) {
 	}
 }
 
-usize Rc_size(Rc *obj) { return sizeof(Rc); }
-
 bool Rc_clone(Rc *dst, Rc *src) {
 	u64 *count = *Rc_get_count(src);
 	void *ref = *Rc_get_ref(src);

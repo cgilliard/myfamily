@@ -61,6 +61,20 @@ void vtable_cleanup(Vtable *table);
 		ptr->vdata.name = #cname;                                      \
 	})
 
+#define HEAPIFY(value)                                                         \
+	({                                                                     \
+		void *ret = tlmalloc(size(&value));                            \
+		memcpy(ret, &value, size(&value));                             \
+		ret;                                                           \
+	})
+
+#define RC_HEAPIFY(value)                                                      \
+	({                                                                     \
+		void *ptr = HEAPIFY(value);                                    \
+		RcPtr ret = RC(ptr);                                           \
+		ret;                                                           \
+	})
+
 #define MEMBER_TYPE(type, member) typeof(((type *)0)->member)
 
 #define FNPTR(name) name;
@@ -94,12 +108,13 @@ void vtable_cleanup(Vtable *table);
 	} name##Ptr;                                                           \
 	static Vtable name##Ptr_Vtable__ = {0, UNIQUE_ID, NULL};               \
 	void name##_cleanup(name##Ptr *obj);                                   \
+	static usize name##_size(name##Ptr *obj) { return sizeof(name##Ptr); } \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
-		char *str;                                                     \
-		asprintf(&str, "cleanup");                                     \
-		VtableEntry next = {str, name##_cleanup};                      \
+		VtableEntry next = {"cleanup", name##_cleanup};                \
 		vtable_add_entry(&name##Ptr_Vtable__, next);                   \
+		VtableEntry next2 = {"size", name##_size};                     \
+		vtable_add_entry(&name##Ptr_Vtable__, next2);                  \
 	}                                                                      \
 	static char *name##Ptr_vdata_name__ = #name;
 

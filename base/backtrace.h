@@ -43,14 +43,12 @@
 CLASS(BacktraceEntry, FIELD(char *, name) FIELD(char *, bin_name)
 			  FIELD(char *, address) FIELD(char *, file_path))
 IMPL(BacktraceEntry, TRAIT_COPY)
-IMPL(BacktraceEntry, TRAIT_SIZE)
 IMPL(BacktraceEntry, TRAIT_SET_BACKTRACE_ENTRY)
 
 #define BacktraceEntry DEFINE_CLASS(BacktraceEntry)
 
 CLASS(Backtrace, FIELD(BacktraceEntryPtr *, rows) FIELD(u64, count))
 IMPL(Backtrace, TRAIT_COPY)
-IMPL(Backtrace, TRAIT_SIZE)
 IMPL(Backtrace, TRAIT_GENERATE_BACKTRACE)
 IMPL(Backtrace, TRAIT_PRINT)
 IMPL(Backtrace, TRAIT_GET_BACKTRACE)

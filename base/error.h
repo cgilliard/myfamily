@@ -24,7 +24,6 @@
 
 CLASS(ErrorKind, FIELD(char, kind[MAX_ERROR_KIND_LEN]))
 IMPL(ErrorKind, TRAIT_COPY)
-IMPL(ErrorKind, TRAIT_SIZE)
 IMPL(ErrorKind, TRAIT_EQUAL)
 #define ErrorKind DEFINE_CLASS(ErrorKind)
 static GETTER(ErrorKind, kind);
@@ -32,7 +31,6 @@ static GETTER(ErrorKind, kind);
 CLASS(Error, FIELD(ErrorKind, kind) FIELD(char, message[MAX_ERROR_MESSAGE_LEN])
 		 FIELD(Backtrace, bt) FIELD(u64, flags))
 IMPL(Error, TRAIT_COPY)
-IMPL(Error, TRAIT_SIZE)
 IMPL(Error, TRAIT_PRINT)
 IMPL(Error, TRAIT_EQUAL)
 #define Error DEFINE_CLASS(Error)

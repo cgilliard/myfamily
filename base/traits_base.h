@@ -21,10 +21,7 @@
 #define TRAIT_CLONE(T) TRAIT_REQUIRED(T, bool, clone, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_COPY(T)                                                          \
 	TRAIT_IMPL(T, copy, default_copy)                                      \
-	TRAIT_SUPER(T, TRAIT_SIZE)                                             \
 	TRAIT_SUPER(T, TRAIT_CLONE)
-
-#define TRAIT_SIZE(T) TRAIT_REQUIRED(T, usize, size, T##Ptr *obj)
 
 #define TRAIT_TO_STR(T) TRAIT_REQUIRED(T, char *, to_str, T##Ptr *obj)
 #define TRAIT_TO_STR_BUF(T)                                                    \

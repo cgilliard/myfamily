@@ -85,7 +85,6 @@ Result Tuple_dbg(Tuple *obj, Formatter *f) {
 	return Ok(UNIT);
 }
 bool Tuple_equal(Tuple *obj1, Tuple *obj2) { return false; }
-usize Tuple_size(Tuple *obj) { return sizeof(Tuple); }
 
 u64 Tuple_len(Tuple *tuple) {
 	u64 count = *Tuple_get_count(tuple);
@@ -139,17 +138,28 @@ void Tuple_element_at(Tuple *tuple, u64 index, void *dst) {
 	} else if (!strcmp(cn, "USize")) {
 		ref = unwrap(ref);
 		memcpy(dst, ref, sizeof(usize));
-	} else if (!strcmp(cn, "StringRef")) {
+	} else if (!strcmp(cn, "F64")) {
 		ref = unwrap(ref);
-		strcpy(dst, ref);
-
+		memcpy(dst, ref, sizeof(f64));
+	} else if (!strcmp(cn, "F32")) {
+		ref = unwrap(ref);
+		memcpy(dst, ref, sizeof(f32));
 	} else {
 		// it's an object, we'll call copy which must be implemented
-		copy(dst, ref);
+		if (!strcmp(cn, "Rc")) {
+			void *tmp = unwrap(ref);
+			memcpy(dst, tmp, size(tmp));
+		} else {
+			copy(dst, ref);
+		}
 	}
 }
 
 void *Tuple_add_value(void *value) {
+	if (!implements(value, "copy")) {
+		panic("copy is required. RC can "
+		      "be used to wrap other types");
+	}
 	void *ret = tlmalloc(size(value));
 	copy(ret, value);
 	return ret;
@@ -239,9 +249,16 @@ void *Tuple_add_value_bool(void *value) {
 	return (void *)ret;
 }
 
-void *Tuple_add_value_str(char **value) {
-	StringRef c = STRINGP(*value);
-	StringRefPtr *ret = tlmalloc(sizeof(StringRef));
-	clone(ret, &c);
+void *Tuple_add_value_f64(void *value) {
+	F64Ptr *ret = tlmalloc(sizeof(F64));
+	BUILDPTR(ret, F64);
+	ret->_value = *(f64 *)value;
+	return (void *)ret;
+}
+
+void *Tuple_add_value_f32(void *value) {
+	F32Ptr *ret = tlmalloc(sizeof(F32));
+	BUILDPTR(ret, F32);
+	ret->_value = *(f32 *)value;
 	return (void *)ret;
 }
