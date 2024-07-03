@@ -46,7 +46,7 @@ typedef struct {
 } Object;
 
 void sort_vtable(Vtable *table);
-bool implements(Object *obj, const char *name);
+bool implements(void *obj, const char *name);
 void *find_fn(Object *obj, const char *name);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
 void vtable_override(Vtable *table, VtableEntry entry);
@@ -94,6 +94,23 @@ void vtable_cleanup(Vtable *table);
 	} name##Ptr;                                                           \
 	static Vtable name##Vtable = {0, UNIQUE_ID, NULL};                     \
 	void name##_cleanup(name##Ptr *obj);                                   \
+	static void                                                            \
+	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
+		char *str;                                                     \
+		asprintf(&str, "cleanup");                                     \
+		VtableEntry next = {str, name##_cleanup};                      \
+		vtable_add_entry(&name##Vtable, next);                         \
+	}
+
+#define CLASS_STATIC_CLEANUP(name, ...)                                        \
+	typedef struct name name;                                              \
+	typedef struct name##Ptr name##Ptr;                                    \
+	typedef struct name##Ptr {                                             \
+		Vdata vdata;                                                   \
+		__VA_ARGS__                                                    \
+	} name##Ptr;                                                           \
+	static Vtable name##Vtable = {0, UNIQUE_ID, NULL};                     \
+	static void name##_cleanup(name##Ptr *obj);                            \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
 		char *str;                                                     \

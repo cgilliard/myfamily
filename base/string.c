@@ -344,15 +344,12 @@ void *StringRef_unwrap(StringRef *obj) {
 }
 
 void StringRef_cleanup(StringRef *ptr) {
-	printf("stringref cleanup %i\n", ptr);
 	RcPtr *rc = *StringRef_get_ptr(ptr);
 	if (rc != NULL) {
-		printf("cleanup %i\n", rc);
 		cleanup(rc);
 		tlfree(rc);
 		StringRef_set_ptr(ptr, NULL);
 	}
-	printf("cleanup complete\n");
 }
 
 Result StringRef_append(StringRef *dst, StringRef *src) {

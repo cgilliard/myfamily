@@ -31,8 +31,8 @@ void sort_vtable(Vtable *table) {
 	      compare_vtable_entry);
 }
 
-bool implements(Object *obj, const char *name) {
-	return find_fn(obj, name) != NULL;
+bool implements(void *obj, const char *name) {
+	return find_fn((Object *)obj, name) != NULL;
 }
 
 void *find_fn(Object *obj, const char *name) {

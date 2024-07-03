@@ -12,9 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _PARSER_PARSER__
-#define _PARSER_PARSER__
-
-#include <base/class.h>
-
-#endif // _PARSER_PARSER__
+#include <base/enum.h>

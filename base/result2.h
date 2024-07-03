@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _MAIN_MAIN__
-#define _MAIN_MAIN__
+#ifndef _BASE_RESULT2__
+#define _BASE_RESULT2__
 
-#include <base/result.h>
-
-Result real_main(int argc, char **argv);
-
-#endif // _MAIN_MAIN__
+#endif // _BASE_RESULT2__

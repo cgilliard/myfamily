@@ -32,7 +32,8 @@ bool equal(void *obj1, void *obj2) {
 void *unwrap(void *obj) {
 	void *(*do_unwrap)(Object *obj) = find_fn((Object *)obj, "unwrap");
 	if (do_unwrap == NULL)
-		panic("unwrap not implemented for this type");
+		panic("unwrap not implemented for this type [%s]",
+		      CLASS_NAME(obj));
 	return do_unwrap(obj);
 }
 
