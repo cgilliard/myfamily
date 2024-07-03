@@ -57,7 +57,7 @@ void vtable_cleanup(Vtable *table);
 #define BUILD(name, ...) {{&name##_Vtable__, #name}, __VA_ARGS__}
 #define BUILDPTR(ptr, cname)                                                   \
 	({                                                                     \
-		ptr->vdata.vtable = &cname##_Vtable__;                            \
+		ptr->vdata.vtable = &cname##_Vtable__;                         \
 		ptr->vdata.name = #cname;                                      \
 	})
 
@@ -92,14 +92,14 @@ void vtable_cleanup(Vtable *table);
 		Vdata vdata;                                                   \
 		__VA_ARGS__                                                    \
 	} name##Ptr;                                                           \
-	static Vtable name##_Vtable__ = {0, UNIQUE_ID, NULL};                     \
+	static Vtable name##_Vtable__ = {0, UNIQUE_ID, NULL};                  \
 	void name##_cleanup(name##Ptr *obj);                                   \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
 		char *str;                                                     \
 		asprintf(&str, "cleanup");                                     \
 		VtableEntry next = {str, name##_cleanup};                      \
-		vtable_add_entry(&name##_Vtable__, next);                         \
+		vtable_add_entry(&name##_Vtable__, next);                      \
 	}
 
 #define CLASS_STATIC_CLEANUP(name, ...)                                        \
@@ -109,14 +109,14 @@ void vtable_cleanup(Vtable *table);
 		Vdata vdata;                                                   \
 		__VA_ARGS__                                                    \
 	} name##Ptr;                                                           \
-	static Vtable name##_Vtable__ = {0, UNIQUE_ID, NULL};                     \
+	static Vtable name##_Vtable__ = {0, UNIQUE_ID, NULL};                  \
 	static void name##_cleanup(name##Ptr *obj);                            \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
 		char *str;                                                     \
 		asprintf(&str, "cleanup");                                     \
 		VtableEntry next = {str, name##_cleanup};                      \
-		vtable_add_entry(&name##_Vtable__, next);                         \
+		vtable_add_entry(&name##_Vtable__, next);                      \
 	}
 
 #define IMPL(name, trait) EXPAND(trait(name))
@@ -127,7 +127,7 @@ void vtable_cleanup(Vtable *table);
 		char *str;                                                     \
 		asprintf(&str, "%s", #trait);                                  \
 		VtableEntry next = {str, implfn};                              \
-		vtable_override(&name##_Vtable__, next);                          \
+		vtable_override(&name##_Vtable__, next);                       \
 	}
 
 #define TRAIT_SUPER(name, trait) EXPAND(trait(name))
@@ -137,7 +137,7 @@ void vtable_cleanup(Vtable *table);
 		char *str;                                                     \
 		asprintf(&str, "%s", #name);                                   \
 		VtableEntry next = {str, default};                             \
-		vtable_add_entry(&T##_Vtable__, next);                            \
+		vtable_add_entry(&T##_Vtable__, next);                         \
 	}
 
 #define TRAIT_REQUIRED(T, R, name, ...)                                        \
@@ -146,7 +146,7 @@ void vtable_cleanup(Vtable *table);
 		char *str;                                                     \
 		asprintf(&str, "%s", #name);                                   \
 		VtableEntry next = {str, T##_##name};                          \
-		vtable_add_entry(&T##_Vtable__, next);                            \
+		vtable_add_entry(&T##_Vtable__, next);                         \
 	}
 
 #define CLASS_NAME(x) ((Object *)(x))->vdata.name
