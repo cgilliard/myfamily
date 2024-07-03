@@ -13,3 +13,25 @@
 // limitations under the License.
 
 #include <base/result2.h>
+
+void ResultHolder_cleanup(ResultHolder *ptr) {
+	cleanup(ptr->_ref);
+	tlfree(ptr->_ref);
+}
+
+bool ResultHolder_clone(ResultHolder *dst, ResultHolder *src) {
+	dst->_ref = tlmalloc(size(src->_ref));
+	bool ret = clone(dst->_ref, src->_ref);
+	return ret;
+}
+
+void *Result2_unwrap(Result2 *ptr) {
+	Result2Ptr v = *ptr;
+	void *ret = NULL;
+	MATCH(v, VARIANT(Ok, {
+		      ResultHolderPtr rholder =
+			  ENUM_VALUE(rholder, ResultHolder, v);
+		      ret = rholder._ref;
+	      }) VARIANT(Err, { panic("Attempt to unwrap an error!"); }));
+	return ret;
+}

@@ -134,7 +134,7 @@ void *Result_unwrap(Result *result) {
 	} else if (!strcmp(cn, "U32")) {
 		ref = unwrap(ref);
 	} else if (!strcmp(cn, "U64")) {
-		// ref = unwrap(ref);
+		ref = unwrap(ref);
 	} else if (!strcmp(cn, "U128")) {
 		ref = unwrap(ref);
 	} else if (!strcmp(cn, "I128")) {

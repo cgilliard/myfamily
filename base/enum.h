@@ -22,12 +22,14 @@
 	typedef enum { variants } name##_Variants__;                           \
 	static char *name##_Arr__[] = {types};                                 \
 	CLASS_STATIC_CLEANUP(name, name##_Variants__ type; void *value;        \
-			     bool is_prim;)                                    \
+			     bool is_prim; bool no_cleanup;)                   \
 	static inline void name##_cleanup(name##Ptr *ptr) {                    \
-		if (!ptr->is_prim) {                                           \
-			cleanup(ptr->value);                                   \
+		if (!ptr->no_cleanup) {                                        \
+			if (!ptr->is_prim) {                                   \
+				cleanup(ptr->value);                           \
+			}                                                      \
+			tlfree(ptr->value);                                    \
 		}                                                              \
-		tlfree(ptr->value);                                            \
 	}
 
 #define DEFINE_ENUM_VALUE(sign, bits)                                          \
@@ -149,7 +151,7 @@ static void *build_enum_value_usize(usize *v, char *type_str) {
 }
 
 static void *build_enum_value(void *v, char *type_str) {
-	if (!strcmp(CLASS_NAME(v), "Rc")) {
+	if (!strcmp(CLASS_NAME(v), "Rc") && strcmp(type_str, "Rc")) {
 		// rc, check inner type instead
 		Rc rc_clone;
 		clone(&rc_clone, v);
@@ -158,7 +160,7 @@ static void *build_enum_value(void *v, char *type_str) {
 			panic("Attempt to build an enum with the "
 			      "wrong value. Expected [%s], Found "
 			      "[%s]",
-			      type_str, CLASS_NAME(v));
+			      type_str, CLASS_NAME(obj));
 	} else if (strcmp(type_str, CLASS_NAME(v))) {
 		panic("Attempt to build an enum with the "
 		      "wrong value. Expected [%s], Found [%s]",
@@ -184,103 +186,118 @@ static void *build_enum_value(void *v, char *type_str) {
 				     type,                                     \
 				     build_enum_value_usize(                   \
 					 (usize *)&v, name##_Arr__[type]),     \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    bool: ({                                                           \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_bool(                    \
 					 (bool *)&v, name##_Arr__[type]),      \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    f64: ({                                                            \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_f64((f64 *)&v,           \
 							  name##_Arr__[type]), \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    f32: ({                                                            \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_f32((f32 *)&v,           \
 							  name##_Arr__[type]), \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    i128: ({                                                           \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_i128(                    \
 					 (i128 *)&v, name##_Arr__[type]),      \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    i64: ({                                                            \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_i64((i64 *)&v,           \
 							  name##_Arr__[type]), \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    i32: ({                                                            \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_i32((i32 *)&v,           \
 							  name##_Arr__[type]), \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    i16: ({                                                            \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_i16((i16 *)&v,           \
 							  name##_Arr__[type]), \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    i8: ({                                                             \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_i8((i8 *)&v,             \
 							 name##_Arr__[type]),  \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    u128: ({                                                           \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_u128(                    \
 					 (u128 *)&v, name##_Arr__[type]),      \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    u64: ({                                                            \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_u64((u64 *)&v,           \
 							  name##_Arr__[type]), \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    u32: ({                                                            \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_u32((u32 *)&v,           \
 							  name##_Arr__[type]), \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    u16: ({                                                            \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_u16((u16 *)&v,           \
 							  name##_Arr__[type]), \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    u8: ({                                                             \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value_u8((u8 *)&v,             \
 							 name##_Arr__[type]),  \
-				     true};                                    \
+				     true,                                     \
+				     false};                                   \
 		 }),                                                           \
 	    default: ({                                                        \
 			 (name##Ptr){{&name##Ptr_Vtable__, #name},             \
 				     type,                                     \
 				     build_enum_value(&v, name##_Arr__[type]), \
+				     false,                                    \
 				     false};                                   \
 		 }))
 

@@ -14,6 +14,7 @@
 
 #include <base/enum.h>
 #include <base/rc.h>
+#include <base/result2.h>
 #include <base/test.h>
 #include <base/tuple.h>
 
@@ -29,6 +30,13 @@ CLASS(MyClass, FIELD(u64, value))
 #define MyClass DEFINE_CLASS(MyClass)
 
 void MyClass_cleanup(MyClass *ptr) {}
+
+CLASS(MyClass2, FIELD(char *, v))
+#define MyClass2 DEFINE_CLASS(MyClass2)
+void MyClass2_cleanup(MyClass2 *ptr) {
+	printf("free %i -> %i\n", ptr, ptr->_v);
+	tlfree(ptr->_v);
+}
 
 ENUM(MyEnum2, VARIANTS(TYPE_MY_CLASS, TYPE_U64), TYPES("MyClass", "u64"))
 #define MyEnum2 DEFINE_ENUM(MyEnum2)
@@ -349,5 +357,23 @@ FamTest(base, test_heapify) {
 	MyClass mc3_out = *(MyClass *)unwrap(&rc3);
 	assert_eq(mc3_out._value, 303);
 
+	return Ok(UNIT);
+}
+
+ErrorKind TEST_ERROR = EKIND("TestError");
+FamTest(base, test_result) {
+	String v = STRINGP("test1");
+	Result2 res = Ok2(v);
+	printf("====================res built\n");
+	StringPtr *v_out = (String *)unwrap(&res);
+	printf("v_out=%s\n", to_str(v_out));
+	assert_eq_str(to_str(v_out), "test1");
+
+	// Result2 res2 = BUILD_ENUM(Result2, Err, e);
+	//  ErrorPtr e2 = *(Error *)unwrap(&res2);
+
+	printf("test complete\n");
+	cleanup(v_out);
+	tlfree(v_out);
 	return Ok(UNIT);
 }

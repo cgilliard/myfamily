@@ -25,6 +25,15 @@
 
 #define UNIQUE_ID __COUNTER__
 
+// global trait table
+typedef struct TraitTable {
+	char **traits;
+	char **implementors;
+	u64 count;
+} TraitTable;
+
+static TraitTable _global_traits__ = {NULL, NULL, 0};
+
 typedef struct {
 	char *name;
 	void *fn_ptr;

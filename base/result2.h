@@ -15,4 +15,26 @@
 #ifndef _BASE_RESULT2__
 #define _BASE_RESULT2__
 
+#include <base/enum.h>
+#include <base/traits_base.h>
+
+CLASS(ResultHolder, FIELD(void *, ref))
+IMPL(ResultHolder, TRAIT_COPY)
+#define ResultHolder DEFINE_CLASS(ResultHolder)
+
+ENUM(Result2, VARIANTS(Ok, Err), TYPES("ResultHolder", "Error"))
+IMPL(Result2, TRAIT_UNWRAP)
+#define Result2 DEFINE_ENUM(Result2)
+
+#define Ok2(v)                                                                 \
+	({                                                                     \
+		ResultHolder rholder = BUILD(ResultHolder);                    \
+		rholder._ref = tlmalloc(size(&v));                             \
+		printf("1 size = %i\n", size(&v));                             \
+		copy(rholder._ref, &v);                                        \
+		printf("x\n");                                                 \
+		printf("2: %s\n", to_str(rholder._ref));                       \
+		BUILD_ENUM(Result2, Ok, rholder);                              \
+	})
+
 #endif // _BASE_RESULT2__
