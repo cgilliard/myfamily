@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/enum.h>
+#include <base/rc.h>
 #include <base/test.h>
 
 FamSuite(base);
@@ -97,9 +98,9 @@ FamTest(base, test_enum) {
 
 ENUM(TestVariants,
      VARIANTS(VU8, VU16, VU32, VU64, VU128, VI8, VI16, VI32, VI64, VI128, VBOOL,
-	      VUSIZE, VF32, VF64),
+	      VUSIZE, VF32, VF64, VSTRINGREF, VMYCLASS),
      TYPES("u8", "u16", "u32", "u64", "u128", "i8", "i16", "i32", "i64", "i128",
-	   "bool", "usize", "f32", "f64"))
+	   "bool", "usize", "f32", "f64", "StringRef", "MyClass"))
 #define TestVariants DEFINE_ENUM(TestVariants)
 
 u64 do_match(TestVariants tv) {
@@ -121,6 +122,8 @@ u64 do_match(TestVariants tv) {
 		VARIANT(VF64, { check = 12; })
 		VARIANT(VBOOL, { check = 13; })
 		VARIANT(VUSIZE, { check = 14; })
+		VARIANT(VSTRINGREF, { check = 15; })
+		VARIANT(VMYCLASS, { check = 16; })
 	);
 	// clang-format on
 	return check;
@@ -145,6 +148,8 @@ i128 do_match_value(TestVariants tv) {
                 VARIANT(VF64, { f64 checkr = ENUM_VALUE(checkr, f64, tv); check = checkr; })
                 VARIANT(VBOOL, { bool checkr = ENUM_VALUE(checkr, bool, tv); check = checkr; })
                 VARIANT(VUSIZE, { usize checkr = ENUM_VALUE(checkr, usize, tv); check = checkr; })
+		VARIANT(VSTRINGREF, { StringRef checkr = ENUM_VALUE(checkr, StringRef, tv); assert_eq_str(to_str(&checkr), "string ref"); check = 150; })
+		VARIANT(VMYCLASS, { MyClass checkr = ENUM_VALUE(checkr, MyClass, tv); assert_eq(checkr._value, 1111); check = 160; })
         );
 	// clang-format on
 	return check;
@@ -166,6 +171,9 @@ FamTest(base, test_enum2) {
 	f64 vf64 = 120.0;
 	bool vbool = false;
 	usize vusize = 140;
+	StringRef vsr = STRINGP("string ref");
+	Rc vclz = BOX(MyClass_Vtable__, sizeof(MyClass), "MyClass");
+	AS_REF(vclz, MyClassPtr)->_value = 1111;
 
 	TestVariants mu8 = BUILD_ENUM(TestVariants, VU8, vu8);
 	check = do_match(mu8);
@@ -250,6 +258,18 @@ FamTest(base, test_enum2) {
 	assert_eq(check, 14);
 	check = do_match_value(musize);
 	assert_eq(check, 140);
+
+	TestVariants msr = BUILD_ENUM(TestVariants, VSTRINGREF, vsr);
+	check = do_match(msr);
+	assert_eq(check, 15);
+	check = do_match_value(msr);
+	assert_eq(check, 150);
+
+	TestVariants mclz = BUILD_ENUM(TestVariants, VMYCLASS, vclz);
+	check = do_match(mclz);
+	assert_eq(check, 16);
+	check = do_match_value(mclz);
+	assert_eq(check, 160);
 
 	return Ok(UNIT);
 }
