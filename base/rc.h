@@ -35,15 +35,6 @@ static SETTER(Rc, flags);
 
 #define RC(x) Rc_build(x)
 
-#define BOX(pname)                                                             \
-	({                                                                     \
-		Object *inner = tlmalloc(sizeof(pname));                       \
-		inner->vdata.vtable = &pname##_Vtable__;                       \
-		inner->vdata.name = pname##_vdata_name__;                      \
-		RcPtr ret = RC(inner);                                         \
-		ret;                                                           \
-	})
-
 #define DEREF(rc, clz) ((clz *)unwrap(&rc))
 
 #endif // _BASE_RC__

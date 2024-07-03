@@ -19,7 +19,7 @@
 #include <base/traits.h>
 
 #define TRAIT_TOKENIZER(T)                                                     \
-	TRAIT_REQUIRED(T, Result, parse, String *s)                         \
+	TRAIT_REQUIRED(T, Result, parse, String *s)                            \
 	TRAIT_REQUIRED(T, Result, next_token, T##Ptr *self)
 
 #define TRAIT_TOKEN(T)                                                         \

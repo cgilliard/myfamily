@@ -61,16 +61,16 @@ void vtable_cleanup(Vtable *table);
 		ptr->vdata.name = #cname;                                      \
 	})
 
-#define HEAPIFY(value)                                                         \
+#define HEAPIFY_DIRECT(value)                                                  \
 	({                                                                     \
 		void *ret = tlmalloc(size(&value));                            \
 		memcpy(ret, &value, size(&value));                             \
 		ret;                                                           \
 	})
 
-#define RC_HEAPIFY(value)                                                      \
+#define HEAPIFY(value)                                                         \
 	({                                                                     \
-		void *ptr = HEAPIFY(value);                                    \
+		void *ptr = HEAPIFY_DIRECT(value);                             \
 		RcPtr ret = RC(ptr);                                           \
 		ret;                                                           \
 	})

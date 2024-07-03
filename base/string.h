@@ -74,25 +74,24 @@ Result String_build(char *s);
 
 #define INDEX_OF(s, n)                                                         \
 	_Generic((*s),                                                         \
-	    String: _Generic((n),                                           \
-	    char *: String_index_of_s,                                      \
-	    default: String_index_of),                                      \
+	    String: _Generic((n),                                              \
+	    char *: String_index_of_s,                                         \
+	    default: String_index_of),                                         \
 	    CString: _Generic((n),                                             \
 	    char *: CString_index_of_s,                                        \
 	    default: CString_index_of))(s, n)
 
 #define LAST_INDEX_OF(s, n)                                                    \
 	_Generic((*s),                                                         \
-	    String: _Generic((n),                                           \
-	    char *: String_last_index_of_s,                                 \
-	    default: String_last_index_of),                                 \
+	    String: _Generic((n),                                              \
+	    char *: String_last_index_of_s,                                    \
+	    default: String_last_index_of),                                    \
 	    CString: _Generic((n),                                             \
 	    char *: CString_last_index_of_s,                                   \
 	    default: CString_last_index_of))(s, n)
 
 #define SUBSTRING(s, start, end)                                               \
-	_Generic((s),                                                          \
-	    String: String_substring,                                    \
-	    CString: CString_substring)(&s, start, end)
+	_Generic((s), String: String_substring, CString: CString_substring)(   \
+	    &s, start, end)
 
 #endif // _BASE_STRING__

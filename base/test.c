@@ -173,7 +173,7 @@ FamTest(base, test_enum2) {
 	String vsr = STRINGP("string ref");
 
 	MyClass vclz_stack = BUILD(MyClass, 1111);
-	Rc vclz = RC_HEAPIFY(vclz_stack);
+	Rc vclz = HEAPIFY(vclz_stack);
 
 	TestVariants mu8 = BUILD_ENUM(TestVariants, VU8, vu8);
 	check = do_match(mu8);
@@ -298,7 +298,7 @@ FamTest(base, test_tuple) {
 	usize vusize = 140;
 	String vsr = STRINGP("string ref");
 	MyClass vclz_stack = BUILD(MyClass, 1111);
-	Rc vclz = RC_HEAPIFY(vclz_stack);
+	Rc vclz = HEAPIFY(vclz_stack);
 
 	Tuple t1 =
 	    TUPLE(vu8, vu16, vu32, vu64, vu128, vi8, vi16, vi32, vi64, vi128);
@@ -334,18 +334,18 @@ FamTest(base, test_tuple) {
 
 FamTest(base, test_heapify) {
 	MyClass mc = BUILD(MyClass, 101);
-	MyClassPtr *ptr = HEAPIFY(mc);
+	MyClassPtr *ptr = HEAPIFY_DIRECT(mc);
 	assert_eq(ptr->_value, 101);
 	cleanup(ptr);
 	tlfree(ptr);
 
 	MyClass mc2 = BUILD(MyClass, 202);
-	Rc rc2 = RC_HEAPIFY(mc2);
+	Rc rc2 = HEAPIFY(mc2);
 	// leave this as is to test memory management in this state. Cleanup
 	// should free everything properly
 
 	MyClass mc3 = BUILD(MyClass, 303);
-	Rc rc3 = RC_HEAPIFY(mc3);
+	Rc rc3 = HEAPIFY(mc3);
 	MyClass mc3_out = *(MyClass *)unwrap(&rc3);
 	assert_eq(mc3_out._value, 303);
 
