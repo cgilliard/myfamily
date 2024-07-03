@@ -239,7 +239,6 @@ bool Backtrace_add_entry(Backtrace *ptr, const char *name, const char *bin_name,
 		BacktraceEntry_set_backtrace_entry_values(&ent, name, bin_name,
 							  address, file_path);
 		BacktraceEntryPtr *entry_arr;
-		rows[count].vdata.vtable = &BacktraceEntryVtable;
 		copy(&rows[count], &ent);
 
 		SET_COUNT(ptr, count + 1);
@@ -374,7 +373,6 @@ bool Backtrace_clone(Backtrace *dst, Backtrace *src) {
 		    tlmalloc(sizeof(BacktraceEntry) * src_count);
 		BacktraceEntryPtr *src_rows = *GET_ROWS(src);
 		for (u64 i = 0; i < src_count; i++) {
-			rows[i].vdata.vtable = &BacktraceEntryVtable;
 			if (!copy(&rows[i], &src_rows[i])) {
 				ret = false;
 				break;
