@@ -172,8 +172,8 @@ FamTest(base, test_enum2) {
 	bool vbool = false;
 	usize vusize = 140;
 	StringRef vsr = STRINGP("string ref");
-	Rc vclz = BOX(MyClass_Vtable__, sizeof(MyClass), "MyClass");
-	AS_REF(vclz, MyClassPtr)->_value = 1111;
+	Rc vclz = BOX(MyClassPtr);
+	DEREF(vclz, MyClass)->_value = 1111;
 
 	TestVariants mu8 = BUILD_ENUM(TestVariants, VU8, vu8);
 	check = do_match(mu8);
