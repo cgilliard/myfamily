@@ -30,13 +30,54 @@
 		tlfree(ptr->value);                                            \
 	}
 
+#define DEFINE_ENUM_VALUE(sign, bits)                                          \
+	static sign##bits enum_value_##sign##bits(void *value) {               \
+		sign##bits r;                                                  \
+		memcpy(&r, value, sizeof(sign##bits));                         \
+		return r;                                                      \
+	}
+
+DEFINE_ENUM_VALUE(u, 8)
+DEFINE_ENUM_VALUE(u, 16)
+DEFINE_ENUM_VALUE(u, 32)
+DEFINE_ENUM_VALUE(u, 64)
+DEFINE_ENUM_VALUE(u, 128)
+DEFINE_ENUM_VALUE(i, 8)
+DEFINE_ENUM_VALUE(i, 16)
+DEFINE_ENUM_VALUE(i, 32)
+DEFINE_ENUM_VALUE(i, 64)
+DEFINE_ENUM_VALUE(i, 128)
+DEFINE_ENUM_VALUE(f, 32)
+DEFINE_ENUM_VALUE(f, 64)
+
+static bool enum_value_bool(void *value) {
+	bool r;
+	memcpy(&r, value, sizeof(bool));
+	return r;
+}
+
+static usize enum_value_usize(void *value) {
+	usize r;
+	memcpy(&r, value, sizeof(usize));
+	return r;
+}
+
 #define ENUM_VALUE(ret, type, e)                                               \
 	_Generic((ret),                                                        \
-	    u64: ({                                                            \
-			 u64 r;                                                \
-			 memcpy(&r, e.value, sizeof(u64));                     \
-			 *(&r);                                                \
-		 }),                                                           \
+	    u8: enum_value_u8(e.value),                                        \
+	    u16: enum_value_u16(e.value),                                      \
+	    u32: enum_value_u32(e.value),                                      \
+	    u64: enum_value_u64(e.value),                                      \
+	    u128: enum_value_u128(e.value),                                    \
+	    i8: enum_value_i8(e.value),                                        \
+	    i16: enum_value_i16(e.value),                                      \
+	    i32: enum_value_i32(e.value),                                      \
+	    i64: enum_value_i64(e.value),                                      \
+	    i128: enum_value_i128(e.value),                                    \
+	    f32: enum_value_f32(e.value),                                      \
+	    f64: enum_value_f64(e.value),                                      \
+	    bool: enum_value_bool(e.value),                                    \
+	    usize: enum_value_usize(e.value),                                  \
 	    default: ({                                                        \
 			 if (!strcmp(CLASS_NAME(e.value), "Rc")) {             \
 				 ret = *(type *)unwrap(e.value);               \
