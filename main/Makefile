@@ -1,4 +1,4 @@
 OBJS := main.o
-TEST_OBJS := ../base/*.o
+TEST_OBJS := 
 
 include ../Makefile.template
