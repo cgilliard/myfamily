@@ -16,7 +16,17 @@
 #define CATI(x, y) x##y
 #define CAT(x, y) CATI(x, y)
 
+#define SIZE___int128_t 16
+#define SIZE_int64_t 8
+#define SIZE_int32_t 4
+#define SIZE_int16_t 2
+#define SIZE_int8_t 1
+#define SIZE___uint128_t 16
 #define SIZE_uint64_t 8
 #define SIZE_uint32_t 4
+#define SIZE_uint16_t 2
+#define SIZE_uint8_t 1
+#define SIZE__Bool 1
+#define SIZE_size_t 8
 
 #define SIZE_OF(type) SIZE_##type
