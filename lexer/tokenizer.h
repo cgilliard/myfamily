@@ -27,6 +27,7 @@ typedef enum TokenType {
 typedef struct Token {
 	TokenType type;
 	char *token;
+	u64 line_num;
 } Token;
 
 typedef struct Tokenizer {

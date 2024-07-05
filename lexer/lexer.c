@@ -15,10 +15,19 @@
 #include <errno.h>
 #include <lexer/lexer.h>
 #include <stdlib.h>
+#include <string.h>
+
+char *lexer_read_line(Lexer *l) {
+	char *ret = malloc(sizeof(char) * LEXER_BUF_SIZE);
+	if (fgets(ret, LEXER_BUF_SIZE, l->fp) == NULL) {
+		lexer_cleanup(l);
+		return NULL;
+	}
+
+	return ret;
+}
 
 int lexer_init(Lexer *l, char *file) {
-	// create buffer with LEXER_BUF_SIZE for reading
-	char buf[LEXER_BUF_SIZE];
 
 	// file/lexer cannot be null
 	if (file == NULL || l == NULL) {
@@ -28,19 +37,13 @@ int lexer_init(Lexer *l, char *file) {
 
 	l->fp = NULL;
 	l->tokenizer = NULL;
+	l->line_num = 1;
 
 	// open the file for reading
 	l->fp = fopen(file, "r");
 
 	// if file cannot be read return error
 	if (l->fp == NULL) {
-		return LexerStateErr;
-	}
-
-	// read first line of the file, tokenizer can handle newlines or lack
-	// thereof so no problems if line is longer than LEXER_BUF_SIZE
-	if (fgets(buf, LEXER_BUF_SIZE, l->fp) == NULL) {
-		lexer_cleanup(l);
 		return LexerStateErr;
 	}
 
@@ -53,13 +56,21 @@ int lexer_init(Lexer *l, char *file) {
 		return LexerStateErr;
 	}
 
-	// try to init the tokenizer
-	if (tokenizer_init(l->tokenizer, buf) != TokenizerStateOk) {
+	char *buf = lexer_read_line(l);
+	if (buf == NULL) {
 		lexer_cleanup(l);
 		return LexerStateErr;
 	}
 
-	return LexerStateOk;
+	// try to init the tokenizer
+	if (tokenizer_init(l->tokenizer, buf) != TokenizerStateOk) {
+		lexer_cleanup(l);
+		free(buf);
+		return LexerStateErr;
+	} else {
+		free(buf);
+		return LexerStateOk;
+	}
 }
 
 int lexer_next_token(Lexer *l, Token *token) {
@@ -84,17 +95,22 @@ int lexer_next_token(Lexer *l, Token *token) {
 				return LexerStateComplete;
 		}
 
+		l->line_num += 1;
+
 		// try to init again
 		if (tokenizer_init(l->tokenizer, buf) != TokenizerStateOk) {
+			// free(buf);
 			return LexerStateErr;
 		}
 
 		state = tokenizer_next_token(l->tokenizer, token);
+		// free(buf);
 	}
 
-	if (state == TokenizerStateOk)
+	if (state == TokenizerStateOk) {
+		token->line_num = l->line_num;
 		return LexerStateOk;
-	else
+	} else
 		return LexerStateErr;
 }
 

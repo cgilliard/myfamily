@@ -28,6 +28,7 @@ typedef enum LexerState {
 typedef struct Lexer {
 	Tokenizer *tokenizer;
 	FILE *fp;
+	u64 line_num;
 } Lexer;
 
 int lexer_init(Lexer *l, char *file);

@@ -869,6 +869,7 @@ Test(lexer, test_parser_basic) {
 }
 
 Test(lexer, lexer) {
+
 	Lexer l1;
 	Token tk;
 
@@ -877,11 +878,13 @@ Test(lexer, lexer) {
 
 	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
 	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert_eq(tk.line_num, 1);
 	cr_assert(!strcmp(tk.token, "test"));
 	token_cleanup(&tk);
 
 	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
 	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert_eq(tk.line_num, 1);
 	cr_assert(!strcmp(tk.token, "file"));
 	token_cleanup(&tk);
 
@@ -973,4 +976,12 @@ Test(lexer, lexer) {
 
 	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateComplete);
 	lexer_cleanup(&l1);
+
+	cr_assert_eq(lexer_init(&l1, "./resources/lexer_long_line.lex"),
+		     LexerStateOk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "ok"));
+	token_cleanup(&tk);
 }
