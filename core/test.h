@@ -74,4 +74,3 @@
 		test_##suite##_##test();                                       \
 	}                                                                      \
 	void test_##suite##_##test()
-
