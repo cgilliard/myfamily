@@ -33,6 +33,7 @@ typedef struct Lexer {
 
 int lexer_init(Lexer *l, char *file);
 int lexer_next_token(Lexer *l, Token *token);
+char *lexer_read_line(Lexer *l);
 void lexer_cleanup(Lexer *l);
 
 #endif // _LEXER_LEXER__

@@ -18,17 +18,37 @@
 #include <string.h>
 
 char *lexer_read_line(Lexer *l) {
-	char *ret = malloc(sizeof(char) * LEXER_BUF_SIZE);
-	if (fgets(ret, LEXER_BUF_SIZE, l->fp) == NULL) {
-		lexer_cleanup(l);
-		return NULL;
-	}
+	char *ret = NULL;
+	u64 count = 0;
+	while (true) {
+		if (ret == NULL) {
+			ret = malloc(sizeof(char) * LEXER_BUF_SIZE);
+			strcpy(ret, "");
+		} else {
+			char *tmp = realloc(ret, sizeof(char) * LEXER_BUF_SIZE *
+						     (1 + count));
+			if (tmp == NULL) {
+				free(ret);
+				return NULL;
+			}
+			ret = tmp;
+		}
+		u64 str_len = strlen(ret);
+		if (fgets(ret + str_len, LEXER_BUF_SIZE, l->fp) == NULL) {
+			free(ret);
+			return NULL;
+		}
 
-	return ret;
+		count += 1;
+		str_len = strlen(ret);
+		if (str_len >= (count * (LEXER_BUF_SIZE - 1)))
+			continue;
+
+		return ret;
+	}
 }
 
 int lexer_init(Lexer *l, char *file) {
-
 	// file/lexer cannot be null
 	if (file == NULL || l == NULL) {
 		errno = EINVAL;
@@ -84,11 +104,9 @@ int lexer_next_token(Lexer *l, Token *token) {
 		// cleanup the previous tokenizer
 		tokenizer_cleanup(l->tokenizer);
 
-		// create buffer with LEXER_BUF_SIZE for reading
-		char buf[LEXER_BUF_SIZE];
+		char *buf = lexer_read_line(l);
 
-		// try to read the next line
-		if (feof(l->fp) || fgets(buf, LEXER_BUF_SIZE, l->fp) == NULL) {
+		if (buf == NULL) {
 			if (state == TokenizerStateCompleteInComment)
 				return LexerStateErr;
 			else
@@ -99,12 +117,12 @@ int lexer_next_token(Lexer *l, Token *token) {
 
 		// try to init again
 		if (tokenizer_init(l->tokenizer, buf) != TokenizerStateOk) {
-			// free(buf);
+			free(buf);
 			return LexerStateErr;
 		}
 
 		state = tokenizer_next_token(l->tokenizer, token);
-		// free(buf);
+		free(buf);
 	}
 
 	if (state == TokenizerStateOk) {
