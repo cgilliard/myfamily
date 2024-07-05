@@ -61,7 +61,7 @@ int lexer_init(Lexer *l, char *file) {
 	l->line_num = 1;
 
 	// open the file for reading
-	l->fp = fopen(file, "r");
+	l->fp = myfopen(file, "r");
 
 	// if file cannot be read return error
 	if (l->fp == NULL) {
@@ -137,7 +137,7 @@ void lexer_cleanup(Lexer *l) {
 	// check if fp is NULL and close it then set to NULL so this can be
 	// called multiple times
 	if (l->fp != NULL) {
-		fclose(l->fp);
+		myfclose(l->fp);
 		l->fp = NULL;
 	}
 
