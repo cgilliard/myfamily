@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <criterion/criterion.h>
+#include <lexer/lexer.h>
 #include <lexer/tokenizer.h>
 
 Test(lexer, test_parser_basic) {
@@ -859,4 +860,117 @@ Test(lexer, test_parser_basic) {
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
+
+	cr_assert_eq(tokenizer_init(&t, "  \t\n\n    // nothing"),
+		     TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
+}
+
+Test(lexer, lexer) {
+	Lexer l1;
+	Token tk;
+
+	cr_assert_eq(lexer_init(&l1, "./resources/lexer_test1.lex"),
+		     LexerStateOk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "test"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "file"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "x"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, "="));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "1"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, "+"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "1"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ";"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateComplete);
+	lexer_cleanup(&l1);
+
+	cr_assert_eq(lexer_init(&l1, "./resources/lexer_test2.lex"),
+		     LexerStateOk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeDoc);
+	cr_assert(!strcmp(tk.token, "Doc here"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "trait"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "test"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, "{"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "let"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "x"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, "="));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "123"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ";"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, "}"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateComplete);
+	lexer_cleanup(&l1);
 }

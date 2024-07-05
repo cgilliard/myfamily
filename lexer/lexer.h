@@ -17,11 +17,21 @@
 
 #include <lexer/tokenizer.h>
 
+#define LEXER_BUF_SIZE 1024
+
+typedef enum LexerState {
+	LexerStateOk = 0,
+	LexerStateErr = 1,
+	LexerStateComplete = 2
+} LexerState;
+
 typedef struct Lexer {
-	Tokenizer tokenizer;
+	Tokenizer *tokenizer;
+	FILE *fp;
 } Lexer;
 
 int lexer_init(Lexer *l, char *file);
 int lexer_next_token(Lexer *l, Token *token);
+void lexer_cleanup(Lexer *l);
 
 #endif // _LEXER_LEXER__
