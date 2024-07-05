@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/resources.h>
 #include <errno.h>
 #include <lexer/tokenizer.h>
-#include <stdlib.h>
 #include <string.h>
 
 int tokenizer_init(Tokenizer *t, char *line) {
@@ -26,7 +26,7 @@ int tokenizer_init(Tokenizer *t, char *line) {
 
 	// copy the input string
 	t->len = strlen(line);
-	t->s = malloc(sizeof(char) * (1 + t->len));
+	t->s = mymalloc(sizeof(char) * (1 + t->len));
 	if (t->s == NULL) {
 		return TokenizerStateErr;
 	}
@@ -87,7 +87,7 @@ int tokenizer_skip_comments(Tokenizer *t, Token *next) {
 			if (end_doc < start_doc)
 				end_doc = start_doc;
 			u64 doc_size = end_doc - start_doc;
-			next->token = malloc(sizeof(char) * (doc_size + 1));
+			next->token = mymalloc(sizeof(char) * (doc_size + 1));
 			memcpy(next->token, t->s + start_doc, doc_size);
 			next->token[doc_size] = 0;
 		}
@@ -170,7 +170,7 @@ int tokenizer_proc_ident(Tokenizer *t, Token *next) {
 	u64 tlen = end - start;
 
 	// allocate and copy over the token
-	next->token = malloc(sizeof(char) * (tlen + 1));
+	next->token = mymalloc(sizeof(char) * (tlen + 1));
 	if (next->token == NULL)
 		return TokenizerStateErr;
 	memcpy(next->token, t->s + start, tlen);
@@ -200,7 +200,7 @@ int tokenizer_proc_string_literal(Tokenizer *t, Token *next) {
 	u64 tlen = end - start;
 
 	// allocate and copy over the token
-	next->token = malloc(sizeof(char) * (tlen + 1));
+	next->token = mymalloc(sizeof(char) * (tlen + 1));
 	if (next->token == NULL)
 		return TokenizerStateErr;
 	memcpy(next->token, t->s + start, tlen);
@@ -230,7 +230,7 @@ int tokenizer_proc_char_literal(Tokenizer *t, Token *next) {
 	u64 tlen = end - start;
 
 	// allocate and copy over the token
-	next->token = malloc(sizeof(char) * (tlen + 1));
+	next->token = mymalloc(sizeof(char) * (tlen + 1));
 	if (next->token == NULL)
 		return TokenizerStateErr;
 	memcpy(next->token, t->s + start, tlen);
@@ -264,7 +264,7 @@ int tokenizer_proc_num_literal(Tokenizer *t, Token *next) {
 	u64 tlen = end - start;
 
 	// allocate and copy over the token
-	next->token = malloc(sizeof(char) * (tlen + 1));
+	next->token = mymalloc(sizeof(char) * (tlen + 1));
 	if (next->token == NULL)
 		return TokenizerStateErr;
 	memcpy(next->token, t->s + start, tlen);
@@ -332,7 +332,7 @@ int tokenizer_proc_punct(Tokenizer *t, Token *next) {
 		       : 0;
 
 	// allocate and copy over the token
-	next->token = malloc(sizeof(char) * 4);
+	next->token = mymalloc(sizeof(char) * 4);
 	if (next->token == NULL)
 		return TokenizerStateErr;
 
@@ -390,7 +390,7 @@ int tokenizer_next_token(Tokenizer *t, Token *next) {
 void tokenizer_cleanup(Tokenizer *t) {
 	// check if it's null to be safe in case it's called twice
 	if (t->s != NULL) {
-		free(t->s);
+		myfree(t->s);
 		t->s = NULL;
 	}
 }
@@ -398,7 +398,7 @@ void tokenizer_cleanup(Tokenizer *t) {
 void token_cleanup(Token *t) {
 	// check if it's null to be safe in case it's called twice
 	if (t->token != NULL) {
-		free(t->token);
+		myfree(t->token);
 		t->token = NULL;
 	}
 }

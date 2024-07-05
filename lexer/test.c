@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <criterion/criterion.h>
+#include <core/test.h>
 #include <lexer/lexer.h>
 #include <lexer/tokenizer.h>
 
-Test(lexer, test_parser_basic) {
+MySuite(lexer);
+
+MyTest(lexer, test_parser_basic) {
 	Tokenizer t;
 	Token tk;
 
@@ -73,6 +75,7 @@ Test(lexer, test_parser_basic) {
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
 	cr_assert_eq(tk.type, TokenTypeLiteral);
 	cr_assert(!strcmp(tk.token, "1234"));
+	token_cleanup(&tk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
 	cr_assert_eq(tk.type, TokenTypeIdent);
@@ -197,11 +200,11 @@ Test(lexer, test_parser_basic) {
 	tokenizer_cleanup(&t);
 
 	// init tokenizer
-	cr_assert_eq(
-	    tokenizer_init(
-		&t, "if(x == y) \r\n{ x = y + 10; } \n\telse { while(true) "
-		    "{ x += 1; if (x > 100) break; }}"),
-	    TokenizerStateOk);
+	cr_assert_eq(tokenizer_init(
+			 &t,
+			 "if(x == y) \r\n{ x = y + 10; } \n\telse { while(true)"
+			 "{ x += 1; if (x > 100) break; }}"),
+		     TokenizerStateOk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
 	cr_assert_eq(tk.type, TokenTypeIdent);
@@ -382,9 +385,9 @@ Test(lexer, test_parser_basic) {
 	tokenizer_cleanup(&t);
 
 	// init tokenizer
-	cr_assert_eq(tokenizer_init(
-			 &t, "if x // this is a comment ; 8 ok \"abc\" \nhi;"),
-		     TokenizerStateOk);
+	cr_assert_eq(
+	    tokenizer_init(&t, "if x // this is a comment ; 8 ok \"abc\"\nhi;"),
+	    TokenizerStateOk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
 	cr_assert_eq(tk.type, TokenTypeIdent);
@@ -412,7 +415,7 @@ Test(lexer, test_parser_basic) {
 	// init tokenizer
 	cr_assert_eq(
 	    tokenizer_init(
-		&t, "if x // this is a comment \n // ; 8 ok \"abc\" \nhi;"),
+		&t, "if x // this is a comment \n // ; 8 ok \"abc\"\nhi;"),
 	    TokenizerStateOk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
@@ -439,7 +442,7 @@ Test(lexer, test_parser_basic) {
 	tokenizer_cleanup(&t);
 
 	// init tokenizer
-	cr_assert_eq(tokenizer_init(&t, "if x //\n//\n// this is a comment \n "
+	cr_assert_eq(tokenizer_init(&t, "if x //\n//\n// this is a comment \n"
 					"// ; 8 ok \"abc\" \nhi; //"),
 		     TokenizerStateOk);
 
@@ -525,9 +528,9 @@ Test(lexer, test_parser_basic) {
 	tokenizer_cleanup(&t);
 
 	// init tokenizer
-	cr_assert_eq(
-	    tokenizer_init(&t, "if x /* // // // */\nhi; //    end comments"),
-	    TokenizerStateOk);
+	cr_assert_eq(tokenizer_init(&t, "if x /* // // // */\nhi; //    end"
+					"comments"),
+		     TokenizerStateOk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
 	cr_assert_eq(tk.type, TokenTypeIdent);
@@ -553,7 +556,9 @@ Test(lexer, test_parser_basic) {
 	tokenizer_cleanup(&t);
 
 	// init tokenizer
-	cr_assert_eq(tokenizer_init(&t, "if x /**/hi; /*    end comments"),
+	cr_assert_eq(tokenizer_init(&t, "if x /**/"
+					"hi;"
+					"/*    end comments"),
 		     TokenizerStateOk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
@@ -581,7 +586,9 @@ Test(lexer, test_parser_basic) {
 	tokenizer_cleanup(&t);
 
 	// init tokenizer
-	cr_assert_eq(tokenizer_init(&t, "if x /**/hi; /*    end comments*/"),
+	cr_assert_eq(tokenizer_init(&t, "if x /**/"
+					""
+					"hi; /*    end comments*/"),
 		     TokenizerStateOk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
@@ -608,10 +615,9 @@ Test(lexer, test_parser_basic) {
 	tokenizer_cleanup(&t);
 
 	// init tokenizer
-	cr_assert_eq(
-	    tokenizer_init(&t,
-			   "if x /// this is a test\nhi; /*    end comments*/"),
-	    TokenizerStateOk);
+	cr_assert_eq(tokenizer_init(&t, "if x /// this is a test\nhi; "
+					"/*    end comments*/"),
+		     TokenizerStateOk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
 	cr_assert_eq(tk.type, TokenTypeIdent);
@@ -642,11 +648,11 @@ Test(lexer, test_parser_basic) {
 	tokenizer_cleanup(&t);
 
 	// init tokenizer
-	cr_assert_eq(tokenizer_init(
-			 &t, "if x /// this is a test\n"
-			     "///       ok ok ok\n"
-			     "    \t///aslkjdflkasf jadl asdk \" kadlfs 3224\n"
-			     "hi; /*    end comments*/"),
+	cr_assert_eq(tokenizer_init(&t, "if x /// this is a test\n"
+					"///       ok ok ok\n"
+					"    \t///aslkjdflkasf jadl "
+					"asdk \" kadlfs 3224\n"
+					"hi; /*    end comments*/"),
 		     TokenizerStateOk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
@@ -687,11 +693,12 @@ Test(lexer, test_parser_basic) {
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
 
-	cr_assert_eq(tokenizer_init(
-			 &t, "if x /// this is a test\n"
-			     "///       ok ok ok\n"
-			     "    \t///aslkjdflkasf jadl asdk \" kadlfs 3224\n"
-			     "hi; /*    end comments*/ /// end on doc comment"),
+	cr_assert_eq(tokenizer_init(&t, "if x /// this is a test\n"
+					"///       ok ok ok\n"
+					"    \t///aslkjdflkasf jadl "
+					"asdk \" kadlfs 3224\n"
+					"hi; /*    end comments*/ /// "
+					"end on doc comment"),
 		     TokenizerStateOk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
@@ -803,10 +810,9 @@ Test(lexer, test_parser_basic) {
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
 
-	cr_assert_eq(
-	    tokenizer_init(
-		&t, "123u64, 777isize, 1_234usize 1.9f64 2.2f32 0x1234 0y10"),
-	    TokenizerStateOk);
+	cr_assert_eq(tokenizer_init(&t, "123u64, 777isize, 1_234usize "
+					"1.9f64 2.2f32 0x1234 0y10"),
+		     TokenizerStateOk);
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
 	cr_assert_eq(tk.type, TokenTypeLiteral);
@@ -868,7 +874,7 @@ Test(lexer, test_parser_basic) {
 	tokenizer_cleanup(&t);
 }
 
-Test(lexer, test_lexer) {
+MyTest(lexer, test_lexer) {
 
 	Lexer l1;
 	Token tk;
@@ -1008,4 +1014,3 @@ Test(lexer, test_lexer) {
 	cr_assert_eq(lexer_next_token(&l1, &tk), LexerStateComplete);
 	lexer_cleanup(&l1);
 }
-

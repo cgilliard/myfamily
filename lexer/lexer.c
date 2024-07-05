@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/resources.h>
 #include <errno.h>
 #include <lexer/lexer.h>
 #include <stdlib.h>
@@ -22,20 +23,20 @@ char *lexer_read_line(Lexer *l) {
 	u64 count = 0;
 	while (true) {
 		if (ret == NULL) {
-			ret = malloc(sizeof(char) * LEXER_BUF_SIZE);
+			ret = mymalloc(sizeof(char) * LEXER_BUF_SIZE);
 			strcpy(ret, "");
 		} else {
-			char *tmp = realloc(ret, sizeof(char) * LEXER_BUF_SIZE *
-						     (1 + count));
+			char *tmp = myrealloc(
+			    ret, sizeof(char) * LEXER_BUF_SIZE * (1 + count));
 			if (tmp == NULL) {
-				free(ret);
+				myfree(ret);
 				return NULL;
 			}
 			ret = tmp;
 		}
 		u64 str_len = strlen(ret);
 		if (fgets(ret + str_len, LEXER_BUF_SIZE, l->fp) == NULL) {
-			free(ret);
+			myfree(ret);
 			return NULL;
 		}
 
@@ -68,7 +69,7 @@ int lexer_init(Lexer *l, char *file) {
 	}
 
 	// allocate memory for the tokenizer
-	l->tokenizer = malloc(sizeof(Tokenizer));
+	l->tokenizer = mymalloc(sizeof(Tokenizer));
 
 	if (l->tokenizer == NULL) {
 		// memory allocation err
@@ -85,10 +86,10 @@ int lexer_init(Lexer *l, char *file) {
 	// try to init the tokenizer
 	if (tokenizer_init(l->tokenizer, buf) != TokenizerStateOk) {
 		lexer_cleanup(l);
-		free(buf);
+		myfree(buf);
 		return LexerStateErr;
 	} else {
-		free(buf);
+		myfree(buf);
 		return LexerStateOk;
 	}
 }
@@ -117,12 +118,12 @@ int lexer_next_token(Lexer *l, Token *token) {
 
 		// try to init again
 		if (tokenizer_init(l->tokenizer, buf) != TokenizerStateOk) {
-			free(buf);
+			myfree(buf);
 			return LexerStateErr;
 		}
 
 		state = tokenizer_next_token(l->tokenizer, token);
-		free(buf);
+		myfree(buf);
 	}
 
 	if (state == TokenizerStateOk) {
@@ -143,6 +144,6 @@ void lexer_cleanup(Lexer *l) {
 	// same for the tokenizer
 	if (l->tokenizer != NULL) {
 		tokenizer_cleanup(l->tokenizer);
-		free(l->tokenizer);
+		myfree(l->tokenizer);
 	}
 }
