@@ -493,4 +493,370 @@ Test(parser, test_parser_basic) {
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
+
+	// init tokenizer
+	cr_assert_eq(
+	    tokenizer_init(&t, "if x /*\n//\n// this is a comment \n "
+			       "// ; 8 ok \"abc\" */\nhi; //    end comments"),
+	    TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "if"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "x"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "hi"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ";"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
+
+	// init tokenizer
+	cr_assert_eq(
+	    tokenizer_init(&t, "if x /* // // // */\nhi; //    end comments"),
+	    TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "if"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "x"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "hi"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ";"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
+
+	// init tokenizer
+	cr_assert_eq(tokenizer_init(&t, "if x /**/hi; /*    end comments"),
+		     TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "if"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "x"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "hi"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ";"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk),
+		     TokenizerStateCompleteInComment);
+	tokenizer_cleanup(&t);
+
+	// init tokenizer
+	cr_assert_eq(tokenizer_init(&t, "if x /**/hi; /*    end comments*/"),
+		     TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "if"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "x"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "hi"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ";"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
+
+	// init tokenizer
+	cr_assert_eq(
+	    tokenizer_init(&t,
+			   "if x /// this is a test\nhi; /*    end comments*/"),
+	    TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "if"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "x"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeDoc);
+	cr_assert(!strcmp(tk.token, "this is a test"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "hi"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ";"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
+
+	// init tokenizer
+	cr_assert_eq(tokenizer_init(
+			 &t, "if x /// this is a test\n"
+			     "///       ok ok ok\n"
+			     "    \t///aslkjdflkasf jadl asdk \" kadlfs 3224\n"
+			     "hi; /*    end comments*/"),
+		     TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "if"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "x"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeDoc);
+	cr_assert(!strcmp(tk.token, "this is a test"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeDoc);
+	cr_assert(!strcmp(tk.token, "ok ok ok"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeDoc);
+	cr_assert(!strcmp(tk.token, "aslkjdflkasf jadl asdk \" kadlfs 3224"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "hi"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ";"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
+
+	cr_assert_eq(tokenizer_init(
+			 &t, "if x /// this is a test\n"
+			     "///       ok ok ok\n"
+			     "    \t///aslkjdflkasf jadl asdk \" kadlfs 3224\n"
+			     "hi; /*    end comments*/ /// end on doc comment"),
+		     TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "if"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "x"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeDoc);
+	cr_assert(!strcmp(tk.token, "this is a test"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeDoc);
+	cr_assert(!strcmp(tk.token, "ok ok ok"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeDoc);
+	cr_assert(!strcmp(tk.token, "aslkjdflkasf jadl asdk \" kadlfs 3224"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "hi"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ";"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeDoc);
+	cr_assert(!strcmp(tk.token, "end on doc comment"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
+
+	cr_assert_eq(tokenizer_init(&t, "if x /**//**//* ok */ 2"),
+		     TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "if"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "x"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "2"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
+
+	cr_assert_eq(tokenizer_init(&t, "\"ok1\"\"ok2\"3;"), TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "\"ok1\""));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "\"ok2\""));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "3"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ";"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
+
+	cr_assert_eq(tokenizer_init(&t, "_1 1_ 1_2"), TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "_1"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "1_"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "1_2"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
+
+	cr_assert_eq(
+	    tokenizer_init(
+		&t, "123u64, 777isize, 1_234usize 1.9f64 2.2f32 0x1234 0y10"),
+	    TokenizerStateOk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "123u64"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ","));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "777isize"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypePunct);
+	cr_assert(!strcmp(tk.token, ","));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "1_234usize"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "1.9f64"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "2.2f32"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "0x1234"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeLiteral);
+	cr_assert(!strcmp(tk.token, "0"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateOk);
+	cr_assert_eq(tk.type, TokenTypeIdent);
+	cr_assert(!strcmp(tk.token, "y10"));
+	token_cleanup(&tk);
+
+	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
+	tokenizer_cleanup(&t);
 }

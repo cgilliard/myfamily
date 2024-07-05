@@ -35,5 +35,6 @@
 #define f64 double
 #define f32 float
 #define usize size_t
+#define isize ptrdiff_t
 
 #endif // _CORE_TYPES__

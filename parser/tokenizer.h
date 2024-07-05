@@ -39,7 +39,8 @@ typedef struct Tokenizer {
 typedef enum TokenizerState {
 	TokenizerStateOk = 0,
 	TokenizerStateErr = 1,
-	TokenizerStateComplete = 2
+	TokenizerStateComplete = 2,
+	TokenizerStateCompleteInComment = 3,
 } TokenizerState;
 
 int tokenizer_init(Tokenizer *t, char *line);

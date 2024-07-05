@@ -53,11 +53,63 @@ int tokenizer_skip_comments(Tokenizer *t, Token *next) {
 
 	char ch1 = t->s[t->pos];
 	char ch2 = t->s[t->pos + 1];
+	bool is_doc_comment = false;
 
 	if (ch1 == '/' && ch2 == '/') {
+		u64 start_doc = t->pos;
+		if (t->pos + 2 < t->len) {
+			// check if we're in a doc comment
+			if (t->s[t->pos + 2] == '/') {
+				// in doc comment
+				is_doc_comment = true;
+				t->pos = t->pos + 3;
+				start_doc = t->pos;
+			}
+		}
+
+		bool found_start = false;
+
 		while (true) {
 			if (t->pos >= t->len || t->s[t->pos] == '\n')
 				break;
+
+			if (!found_start && tokenizer_is_white_space(t)) {
+				start_doc = t->pos + 1;
+			} else {
+				found_start = true;
+			}
+			t->pos += 1;
+		}
+
+		if (is_doc_comment) {
+			next->type = TokenTypeDoc;
+			u64 end_doc = t->pos;
+			if (end_doc < start_doc)
+				end_doc = start_doc;
+			u64 doc_size = end_doc - start_doc;
+			next->token = malloc(sizeof(char) * (doc_size + 1));
+			memcpy(next->token, t->s + start_doc, doc_size);
+			next->token[doc_size] = 0;
+		}
+
+	} else if (ch1 == '/' && ch2 == '*') {
+		t->in_comment = true;
+		t->pos += 1;
+		while (true) {
+			if (t->pos >= t->len ||
+			    (t->s[t->pos - 1] == '*' && t->s[t->pos] == '/')) {
+				if (t->pos < t->len) {
+					t->in_comment = false;
+					t->pos += 1;
+				}
+
+				while (t->pos < t->len) {
+					if (!tokenizer_is_white_space(t))
+						break;
+					t->pos += 1;
+				}
+				break;
+			}
 			t->pos += 1;
 		}
 	}
@@ -82,12 +134,17 @@ int tokenizer_skip_to_token(Tokenizer *t, Token *next) {
 		tokenizer_skip_white_space(t, next);
 		tokenizer_skip_comments(t, next);
 
-		if (t->pos >= t->len || t->s[t->pos] != '\n')
+		if (t->pos >= t->len ||
+		    (t->s[t->pos] != '\n' && t->s[t->pos] != '/') ||
+		    next->type == TokenTypeDoc)
 			break;
 	}
 
-	if (t->pos >= t->len)
+	if (t->pos >= t->len && next->type != TokenTypeDoc) {
+		if (t->in_comment)
+			return TokenizerStateCompleteInComment;
 		return TokenizerStateComplete;
+	}
 
 	return TokenizerStateOk;
 }
@@ -183,6 +240,7 @@ int tokenizer_proc_char_literal(Tokenizer *t, Token *next) {
 }
 
 int tokenizer_proc_num_literal(Tokenizer *t, Token *next) {
+	int ret = TokenizerStateOk;
 	next->type = TokenTypeLiteral;
 	u64 start = t->pos;
 	while (true) {
@@ -192,8 +250,12 @@ int tokenizer_proc_num_literal(Tokenizer *t, Token *next) {
 
 		char ch = t->s[t->pos];
 
-		// continue until literal termination char
-		if (!((ch >= '0' && ch <= '9') || ch == '.')) {
+		// continue until literal termination char (we allow all chars
+		// needed for the various types at the tokenizer level. Checking
+		// the order, etc is done at a later phase)
+		if (!((ch >= '0' && ch <= '9') || ch == '.' || ch == '_' ||
+		      ch == 'u' || ch == 'i' || ch == 's' || ch == 'z' ||
+		      ch == 'e' || ch == 'f' || ch == 'x')) {
 			break;
 		}
 		t->pos += 1;
@@ -208,7 +270,7 @@ int tokenizer_proc_num_literal(Tokenizer *t, Token *next) {
 	memcpy(next->token, t->s + start, tlen);
 	next->token[tlen] = 0;
 
-	return TokenizerStateOk;
+	return ret;
 }
 
 bool is_second_punct(char ch1, char ch2) {
@@ -234,11 +296,13 @@ bool is_second_punct(char ch1, char ch2) {
 		return true;
 	if (ch1 == ':' && ch2 == ':')
 		return true;
-	if (ch1 == '<' && (ch2 == '<' || ch2 == '='))
+	if (ch1 == '<' && (ch2 == '<' || ch2 == '=' || ch2 == '-'))
 		return true;
 	if (ch1 == '>' && (ch2 == '>' || ch2 == '='))
 		return true;
 	if (ch1 == '.' && ch2 == '.')
+		return true;
+	if (ch1 == '(' && ch2 == ')')
 		return true;
 
 	return false;
@@ -249,6 +313,8 @@ bool is_third_punct(char ch1, char ch2, char ch3) {
 	if (ch1 == '>' && ch2 == '>' && ch3 == '=')
 		return true;
 	if (ch1 == '.' && ch2 == '.' && ch3 == '.')
+		return true;
+	if (ch1 == '.' && ch2 == '.' && ch3 == '=')
 		return true;
 	return false;
 }
@@ -285,9 +351,11 @@ int tokenizer_proc_punct(Tokenizer *t, Token *next) {
 }
 
 int tokenizer_next_token(Tokenizer *t, Token *next) {
+	next->type =
+	    TokenTypeIdent; // init so that we know when it's been set to doc
 	// first skip all whitespace / comments
 	int skip = tokenizer_skip_to_token(t, next);
-	if (skip != TokenizerStateOk)
+	if (skip != TokenizerStateOk || next->type == TokenTypeDoc)
 		return skip;
 
 	// check first char to determine which type of token we're in
