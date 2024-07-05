@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <errno.h>
-#include <parser/tokenizer.h>
+#include <lexer/tokenizer.h>
 #include <stdlib.h>
 #include <string.h>
 

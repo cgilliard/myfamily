@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _PARSER_PARSER__
-#define _PARSER_PARSER__
+#ifndef _PARSER_TOKENIZER__
+#define _PARSER_TOKENIZER__
 
 #include <core/types.h>
 
@@ -48,4 +48,4 @@ int tokenizer_next_token(Tokenizer *t, Token *next);
 void tokenizer_cleanup(Tokenizer *t);
 void token_cleanup(Token *t);
 
-#endif // _PARSER_PARSER__
+#endif // _PARSER_TOKENIZER__

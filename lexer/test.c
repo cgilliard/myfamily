@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <criterion/criterion.h>
-#include <parser/tokenizer.h>
+#include <lexer/tokenizer.h>
 
-Test(parser, test_parser_basic) {
+Test(lexer, test_parser_basic) {
 	Tokenizer t;
 	Token tk;
 
