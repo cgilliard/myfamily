@@ -19,7 +19,7 @@
 
 int tokenizer_init(Tokenizer *t, char *line) {
 	// check input
-	if (line == NULL) {
+	if (line == NULL || t == NULL) {
 		errno = EINVAL;
 		return TokenizerStateErr;
 	}
