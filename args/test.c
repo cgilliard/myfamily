@@ -108,4 +108,3 @@ MyTest(args, test_args) {
 	sub_command_cleanup(&sc);
 	args_cleanup(&args);
 }
-
