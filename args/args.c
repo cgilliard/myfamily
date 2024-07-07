@@ -382,6 +382,38 @@ u64 args_subi_for(Args *args, char *sub) {
 	return subi;
 }
 
+bool args_check_option(Args *args, u64 subi, char *name, bool is_short,
+		       char *argv) {
+	bool found = false;
+	for (u64 j = 0; j < args->subs[subi]->params_count; j++) {
+		bool multi = args->subs[subi]->params[j].multiple;
+		if (is_short &&
+		    !strcmp(args->subs[subi]->params[j].short_name, name)) {
+			found = true;
+			if (args->subs[subi]->params_state[j].specified &&
+			    !multi)
+				args_exit_error(
+				    args,
+				    "Option: %s was spsecified more than once ",
+				    argv);
+			args->subs[subi]->params_state[j].specified = true;
+			break;
+		} else if (!is_short &&
+			   !strcmp(args->subs[subi]->params[j].name, name)) {
+			found = true;
+			if (args->subs[subi]->params_state[j].specified &&
+			    !multi)
+				args_exit_error(
+				    args,
+				    "Option: %s was spsecified more than once ",
+				    argv);
+			args->subs[subi]->params_state[j].specified = true;
+			break;
+		}
+	}
+	return found;
+}
+
 void args_check_validity(Args *args, int argc, char **argv) {
 	// check if there's a sub command and check arg count
 	char *sub = NULL;
@@ -427,11 +459,9 @@ void args_check_validity(Args *args, int argc, char **argv) {
 					args_exit_error(
 					    args,
 					    "Incorrect number of "
-					    "arguments for "
-					    "sub command '%s' (%i "
-					    "specified). "
-					    "Number of arguments must "
-					    "be "
+					    "arguments for sub command '%s' "
+					    "(%i specified). "
+					    "Number of arguments must be "
 					    "between %i and %i.",
 					    args->subs[i]->name, arg_count,
 					    args->subs[i]->min_args,
@@ -483,146 +513,23 @@ void args_check_validity(Args *args, int argc, char **argv) {
 				strcpy(name, args->argv[i] + 1);
 				is_short = true;
 			}
+
+			found = args_check_option(args, subi, name, is_short,
+						  argv[i]);
 			if (args_sub_takes_value(args, subi, name, is_short)) {
-				for (u64 j = 0;
-				     j < args->subs[subi]->params_count; j++) {
-					bool multi = args->subs[subi]
-							 ->params[j]
-							 .multiple;
-					if ((is_short &&
-					     !strcmp(args->subs[subi]
-							 ->params[j]
-							 .short_name,
-						     name)) ||
-					    (!is_short &&
-					     !strcmp(args->subs[subi]
-							 ->params[j]
-							 .name,
-						     name))) {
-
-						if (args->subs[subi]
-							->params_state[j]
-							.specified &&
-						    !multi)
-							args_exit_error(
-							    args,
-							    "Option: "
-							    "%s was "
-							    "specified "
-							    "more than "
-							    "once ",
-							    argv[i]);
-						args->subs[subi]
-						    ->params_state[j]
-						    .specified = true;
-					}
-				}
-
 				i += 1;
-			} else {
-				for (u64 j = 0;
-				     j < args->subs[subi]->params_count; j++) {
-					bool multi = args->subs[subi]
-							 ->params[j]
-							 .multiple;
-
-					if (is_short && !strcmp(args->subs[subi]
-								    ->params[j]
-								    .short_name,
-								name)) {
-						found = true;
-						if (args->subs[subi]
-							->params_state[j]
-							.specified &&
-						    !multi)
-							args_exit_error(
-							    args,
-							    "Op"
-							    "ti"
-							    "on"
-							    ": "
-							    "%s"
-							    " w"
-							    "as"
-							    " s"
-							    "pe"
-							    "ci"
-							    "fi"
-							    "ed"
-							    " "
-							    "mo"
-							    "re"
-							    " t"
-							    "ha"
-							    "n "
-							    "on"
-							    "ce"
-							    " ",
-							    argv[i]);
-						args->subs[subi]
-						    ->params_state[j]
-						    .specified = true;
-						break;
-					} else if (!is_short &&
-						   !strcmp(args->subs[subi]
-							       ->params[j]
-							       .name,
-							   name)) {
-						found = true;
-						if (args->subs[subi]
-							->params_state[j]
-							.specified &&
-						    !multi)
-							args_exit_error(
-							    args,
-							    "Op"
-							    "ti"
-							    "on"
-							    ": "
-							    "%s"
-							    " w"
-							    "as"
-							    " s"
-							    "pe"
-							    "ci"
-							    "fi"
-							    "ed"
-							    " "
-							    "mo"
-							    "re"
-							    " t"
-							    "ha"
-							    "n "
-							    "on"
-							    "ce"
-							    " ",
-							    argv[i]);
-						args->subs[subi]
-						    ->params_state[j]
-						    .specified = true;
-						break;
-					}
-				}
-				if (!found) {
-					if (subi == 0) {
-						args_exit_error(args,
-								"Unknown "
-								"option: "
-								"%s",
-								argv[i]);
-					} else {
-						args_exit_error(
-						    args,
-						    "Unknown "
-						    "option: "
-						    "%s. Not "
-						    "valid for "
-						    "SubCommand"
-						    " "
-						    "\"%s\".",
-						    argv[i],
-						    args->subs[subi]->name);
-					}
+			}
+			if (!found) {
+				if (subi == 0) {
+					args_exit_error(args,
+							"Unknown option: %s",
+							argv[i]);
+				} else {
+					args_exit_error(
+					    args,
+					    "Unknown option: %s. Not valid for "
+					    "SubCommand \"%s\".",
+					    argv[i], args->subs[subi]->name);
 				}
 			}
 		}
