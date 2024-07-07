@@ -20,7 +20,7 @@ void build_args(Args *args) {
 		   0, 0);
 
 	SubCommand sc;
-	ArgsParam ap1, ap2, ap3, ap4;
+	ArgsParam ap1, ap2, ap3, ap4, ap5;
 	args_param_build(&ap1, "threads", "Number of threads to execute", "t",
 			 true, false, "1");
 
@@ -32,6 +32,9 @@ void build_args(Args *args) {
 	args_param_build(&ap4, "show_request", "Show request information", "s",
 			 false, false, NULL);
 
+	args_param_build(&ap5, "address", "Tcp/Ip address to bind to", "a",
+			 true, false, "127.0.0.1");
+
 	sub_command_build(&sc, "node", "Start the full node", 1, 2);
 	sub_command_add_param(&sc, &ap1);
 	sub_command_add_param(&sc, &ap4);
@@ -39,6 +42,7 @@ void build_args(Args *args) {
 	args_add_sub_command(args, &sc);
 	args_add_param(args, &ap2);
 	args_add_param(args, &ap3);
+	args_add_param(args, &ap5);
 }
 
 int real_main(int argc, char **argv) {

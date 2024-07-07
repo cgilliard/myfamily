@@ -913,6 +913,23 @@ void args_usage(Args *args, char *sub_command) {
 				char *short_name = params[i].short_name;
 				char *help = params[i].help;
 				bool multi = params[i].multiple;
+				char *default_value = params[i].default_value;
+				u64 default_value_str_len;
+				if (default_value == NULL) {
+					default_value_str_len = 1;
+				} else {
+					default_value_str_len =
+					    strlen(default_value) + 100;
+				}
+				char default_value_str[default_value_str_len];
+				if (default_value == NULL)
+					strcpy(default_value_str, "");
+				else
+					snprintf(default_value_str,
+						 default_value_str_len,
+						 " (default value: %s)",
+						 default_value);
+
 				if (multi) {
 					u64 len = snprintf(
 					    NULL, 0, "    -%s, --%s <%s>, ...",
@@ -926,10 +943,10 @@ void args_usage(Args *args, char *sub_command) {
 					buffer[i] = 0;
 					fprintf(stderr,
 						"    %s-%s%s, %s--%s%s <%s>, "
-						"... %s%s\n",
+						"... %s%s%s\n",
 						CYAN, short_name, RESET, YELLOW,
-						name, RESET, name, buffer,
-						help);
+						name, RESET, name, buffer, help,
+						default_value_str);
 				} else {
 
 					u64 len = snprintf(
@@ -943,11 +960,12 @@ void args_usage(Args *args, char *sub_command) {
 						buffer[i] = ' ';
 					buffer[i] = 0;
 
-					fprintf(
-					    stderr,
-					    "    %s-%s%s, %s--%s%s <%s> %s%s\n",
-					    CYAN, short_name, RESET, YELLOW,
-					    name, RESET, name, buffer, help);
+					fprintf(stderr,
+						"    %s-%s%s, %s--%s%s <%s> "
+						"%s%s%s\n",
+						CYAN, short_name, RESET, YELLOW,
+						name, RESET, name, buffer, help,
+						default_value_str);
 				}
 			}
 		}
@@ -1022,6 +1040,23 @@ void args_usage(Args *args, char *sub_command) {
 				char *help = params[i].help;
 				bool multiple = params[i].multiple;
 
+				char *default_value = params[i].default_value;
+				u64 default_value_str_len;
+				if (default_value == NULL) {
+					default_value_str_len = 1;
+				} else {
+					default_value_str_len =
+					    strlen(default_value) + 100;
+				}
+				char default_value_str[default_value_str_len];
+				if (default_value == NULL)
+					strcpy(default_value_str, "");
+				else
+					snprintf(default_value_str,
+						 default_value_str_len,
+						 " (default value: %s)",
+						 default_value);
+
 				if (takes_value) {
 					if (multiple) {
 						u64 len = 2 * strlen(name) + 19;
@@ -1038,10 +1073,11 @@ void args_usage(Args *args, char *sub_command) {
 						fprintf(stderr,
 							"    %s-%s%s, %s--%s%s "
 							"<%s>, ...%s %s"
-							"%s\n",
+							"%s%s\n",
 							CYAN, short_name, RESET,
 							YELLOW, name, RESET,
-							name, buffer, help);
+							name, buffer, help,
+							default_value_str);
 					} else {
 						u64 len = 2 * strlen(name) + 13;
 						char buffer[1025];
@@ -1057,10 +1093,11 @@ void args_usage(Args *args, char *sub_command) {
 						fprintf(stderr,
 							"    %s-%s%s, %s--%s%s "
 							"<%s>%s "
-							"%s\n",
+							"%s%s\n",
 							CYAN, short_name, RESET,
 							YELLOW, name, RESET,
-							name, buffer, help);
+							name, buffer, help,
+							default_value_str);
 					}
 				}
 			}
