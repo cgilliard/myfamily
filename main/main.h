@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <main/main.h>
-#include <stdio.h>
+#ifndef _MAIN_MAIN__
+#define _MAIN_MAIN__
 
-int main(int argc, char **argv) { return real_main(argc, argv); }
+int real_main(int argc, char **argv);
+
+#endif // _MAIN_MAIN__
