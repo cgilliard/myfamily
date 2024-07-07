@@ -91,14 +91,16 @@ void args_param_cleanup(ArgsParam *ap) {
 	}
 }
 int sub_command_build(SubCommand *sc, char *name, char *help, u32 min_args,
-		      u32 max_args) {
-	if (name == NULL || help == NULL || min_args > max_args) {
+		      u32 max_args, char *arg_doc) {
+	if (name == NULL || help == NULL || min_args > max_args ||
+	    arg_doc == NULL) {
 		errno = EINVAL;
 		return -1;
 	}
 
 	sc->name = NULL;
 	sc->help = NULL;
+	sc->arg_doc = NULL;
 	sc->params_count = 0;
 
 	sc->name = mymalloc((1 + strlen(name)) * sizeof(char));
@@ -115,9 +117,15 @@ int sub_command_build(SubCommand *sc, char *name, char *help, u32 min_args,
 	}
 	strcpy(sc->help, help);
 
+	sc->arg_doc = mymalloc((1 + strlen(arg_doc)) * sizeof(char));
+	if (sc->arg_doc == NULL) {
+		sub_command_cleanup(sc);
+		return -1;
+	}
+	strcpy(sc->arg_doc, arg_doc);
+
 	sc->min_args = min_args;
 	sc->max_args = max_args;
-
 	return 0;
 }
 void sub_command_cleanup(SubCommand *sc) {
@@ -129,6 +137,11 @@ void sub_command_cleanup(SubCommand *sc) {
 	if (sc->help) {
 		myfree(sc->help);
 		sc->help = NULL;
+	}
+
+	if (sc->arg_doc) {
+		myfree(sc->arg_doc);
+		sc->arg_doc = NULL;
 	}
 
 	if (sc->params_count != 0) {
@@ -144,6 +157,10 @@ void sub_command_cleanup(SubCommand *sc) {
 	}
 }
 int sub_command_add_param(SubCommand *sc, ArgsParam *ap) {
+	if (ap->name == NULL || ap->help == NULL || ap->short_name == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
 	if (sc->params_count == 0) {
 		sc->params = mymalloc(sizeof(ArgsParam));
 		sc->params_state = mymalloc(sizeof(ArgsParamState));
@@ -195,7 +212,6 @@ int sub_command_add_param(SubCommand *sc, ArgsParam *ap) {
 	}
 
 	sc->params_state[index].specified = false;
-	sc->params_state[index].itt = 0;
 
 	if (sc->params[index].name == NULL || sc->params[index].help == NULL ||
 	    sc->params[index].short_name == NULL) {
@@ -231,7 +247,7 @@ int args_build(Args *args, char *prog, char *version, char *author,
 
 	// first subcommand is our params
 	SubCommand sc;
-	sub_command_build(&sc, "", "", min_args, max_args);
+	sub_command_build(&sc, "", "", min_args, max_args, "");
 	args_add_sub_command(args, &sc);
 	sub_command_cleanup(&sc);
 
@@ -278,13 +294,18 @@ int args_add_param(Args *args, ArgsParam *ap) {
 int args_add_sub_command(Args *args, SubCommand *sc) {
 	if (args->subs_count == 0) {
 		args->subs = mymalloc(sizeof(SubCommand *));
-		if (args->subs == NULL)
+		if (args->subs == NULL) {
+			fprintf(stderr, "add subcommand %s failed!\n",
+				sc->name);
 			return -1;
+		}
 	} else {
 		SubCommand **tmp = myrealloc(
 		    args->subs, sizeof(SubCommand *) * (1 + args->subs_count));
 
 		if (tmp == NULL) {
+			fprintf(stderr, "add subcommand %s failed!\n",
+				sc->name);
 			return -1;
 		}
 
@@ -293,14 +314,23 @@ int args_add_sub_command(Args *args, SubCommand *sc) {
 
 	args->subs[args->subs_count] = mymalloc(sizeof(SubCommand));
 	if (args->subs[args->subs_count] == NULL) {
+		fprintf(stderr, "add subcommand %s failed!\n", sc->name);
 		return -1;
 	}
 
-	sub_command_build(args->subs[args->subs_count], sc->name, sc->help,
-			  sc->min_args, sc->max_args);
+	if (sub_command_build(args->subs[args->subs_count], sc->name, sc->help,
+			      sc->min_args, sc->max_args, sc->arg_doc)) {
+		fprintf(stderr, "add subcommand %s failed!\n", sc->name);
+		myfree(args->subs[args->subs_count]);
+		return -1;
+	}
 	for (u64 i = 0; i < sc->params_count; i++) {
-		sub_command_add_param(args->subs[args->subs_count],
-				      &sc->params[i]);
+		if (sub_command_add_param(args->subs[args->subs_count],
+					  &sc->params[i])) {
+			fprintf(stderr,
+				"add param [%s] subcommand %s failed!\n",
+				sc->params[i].name, sc->name);
+		}
 	}
 
 	args->subs_count += 1;
@@ -426,7 +456,7 @@ void args_check_validity(Args *args, int argc, char **argv) {
 			args_exit_error(args, "Unknown SubCommand \"%s\"", sub);
 		}
 	} else if (args->subs_count > 1) {
-		args_exit_error(args, "SubCommand was not specified");
+		args_usage(args, NULL);
 	} else {
 		// check number of args
 		if (arg_count > args->subs[0]->max_args ||
@@ -450,7 +480,10 @@ void args_check_validity(Args *args, int argc, char **argv) {
 		}
 
 		u64 len = strlen(argv[i]);
+		printf("opt = %s\n", argv[i]);
 		if (len > 0 && argv[i][0] == '-') {
+			printf("1 subcount=%i\n",
+			       args->subs[subi]->params_count);
 			// option to check
 			char name[len];
 			bool is_short;
@@ -462,8 +495,8 @@ void args_check_validity(Args *args, int argc, char **argv) {
 				strcpy(name, args->argv[i] + 1);
 				is_short = true;
 			}
+			printf("2\n");
 			if (args_sub_takes_value(args, subi, name, is_short)) {
-
 				for (u64 j = 0;
 				     j < args->subs[subi]->params_count; j++) {
 					bool multi = args->subs[subi]
@@ -500,10 +533,12 @@ void args_check_validity(Args *args, int argc, char **argv) {
 
 				i += 1;
 			} else {
-				bool multi =
-				    args->subs[subi]->params[i].multiple;
 				for (u64 j = 0;
 				     j < args->subs[subi]->params_count; j++) {
+					bool multi = args->subs[subi]
+							 ->params[j]
+							 .multiple;
+
 					if (is_short && !strcmp(args->subs[subi]
 								    ->params[j]
 								    .short_name,
@@ -604,6 +639,7 @@ void args_check_validity(Args *args, int argc, char **argv) {
 				}
 			}
 		}
+		printf("com\n");
 	}
 }
 
@@ -709,7 +745,6 @@ int args_value_of(Args *args, char *param_name, char *value_buf,
 		errno = ENOENT;
 		return -1;
 	}
-
 	u64 itt_index = 0;
 	for (u64 i = 1; i < args->argc; i++) {
 		if (!strcmp(args->argv[i], param_name_buf) ||
@@ -802,11 +837,13 @@ void args_print_version(Args *args) {
 void args_usage(Args *args, char *sub_command) {
 	bool found = false;
 	u64 subs_count = args->subs_count;
+	u64 sub_index = 0;
 
 	if (sub_command) {
 		for (u64 i = 1; i < subs_count; i++) {
 			char *name = args->subs[i]->name;
 			if (!strcmp(name, sub_command)) {
+				sub_index = i;
 				found = true;
 			}
 		}
@@ -864,24 +901,28 @@ void args_usage(Args *args, char *sub_command) {
 	else
 		sub_command_str_len = 0;
 	char sub_command_str[sub_command_str_len + 30];
+	char *sub_arg_doc_str = "";
 	if (sub_command) {
 		snprintf(sub_command_str, sub_command_str_len + 30, "%s%s%s",
 			 BRIGHT_RED, sub_command, RESET);
+		sub_arg_doc_str = args->subs[sub_index]->arg_doc;
 	} else {
 		snprintf(sub_command_str, sub_command_str_len + 30,
 			 "[%sSUB_COMMAND%s]", DIMMED, RESET);
 	}
+
 	fprintf(stderr,
 		"%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s "
-		"[%sCORE_OPTIONS%s] %s [%sSUB_OPTIONS%s]\n\n"
+		"[%sCORE_OPTIONS%s] %s [%sSUB_OPTIONS%s] %s\n\n"
 		"%sCORE_FLAGS%s:\n"
 		"    %s-h%s, %s--help%s%sPrints help information\n"
 		"    %s-V%s, %s--version%s%sPrints version "
 		"information\n",
 		CYAN, prog, RESET, YELLOW, version, RESET, GREEN, author, RESET,
 		DIMMED, RESET, BRIGHT_RED, prog, RESET, DIMMED, RESET,
-		sub_command_str, DIMMED, RESET, DIMMED, RESET, CYAN, RESET,
-		YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET, buffer2);
+		sub_command_str, DIMMED, RESET, sub_arg_doc_str, DIMMED, RESET,
+		CYAN, RESET, YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET,
+		buffer2);
 
 	for (u64 i = 0; i < count; i++) {
 		bool takes_value = params[i].takes_value;
@@ -927,7 +968,7 @@ void args_usage(Args *args, char *sub_command) {
 				else
 					snprintf(default_value_str,
 						 default_value_str_len,
-						 " (default value: %s)",
+						 " (default value: '%s')",
 						 default_value);
 
 				if (multi) {
@@ -977,8 +1018,9 @@ void args_usage(Args *args, char *sub_command) {
 
 			char *name = args->subs[i]->name;
 			char *help = args->subs[i]->help;
+			char *arg_doc = args->subs[i]->arg_doc;
 
-			u64 len = strlen(name) + 3;
+			u64 len = strlen(name) + strlen(arg_doc) + 4;
 			if (len > max_len)
 				len = max_len;
 			char buffer[1025];
@@ -987,8 +1029,8 @@ void args_usage(Args *args, char *sub_command) {
 				buffer[j] = ' ';
 			buffer[j] = 0;
 
-			fprintf(stderr, "    %s%s%s%s%s\n", CYAN, name, RESET,
-				buffer, help);
+			fprintf(stderr, "    %s%s%s %s%s%s\n", CYAN, name,
+				RESET, arg_doc, buffer, help);
 		}
 	}
 

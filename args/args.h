@@ -21,7 +21,6 @@
 
 typedef struct ArgsParamState {
 	bool specified;
-	u64 itt;
 } ArgsParamState;
 
 typedef struct ArgsParam {
@@ -41,6 +40,7 @@ typedef struct SubCommand {
 	u32 min_args;
 	u32 max_args;
 	char *help;
+	char *arg_doc;
 } SubCommand;
 
 typedef struct Args {
@@ -58,7 +58,7 @@ int args_param_build(ArgsParam *ap, char *name, char *help, char *short_name,
 		     bool takes_value, bool multiple, char *default_value);
 void args_param_cleanup(ArgsParam *ap);
 int sub_command_build(SubCommand *sc, char *name, char *help, u32 min_args,
-		      u32 max_args);
+		      u32 max_args, char *arg_doc);
 int sub_command_add_param(SubCommand *sc, ArgsParam *ap);
 void sub_command_cleanup(SubCommand *sc);
 int args_build(Args *args, char *prog, char *version, char *author,
