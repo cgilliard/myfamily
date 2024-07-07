@@ -337,40 +337,16 @@ int args_add_sub_command(Args *args, SubCommand *sc) {
 	return 0;
 }
 
-bool args_takes_value(Args *args, char *name, bool is_short) {
-	for (u64 k = 0; k < args->subs_count; k++) {
-		for (u64 j = 0; j < args->subs[k]->params_count; j++) {
-			if (is_short &&
-			    !strcmp(name,
-				    args->subs[k]->params[j].short_name)) {
-				if (name,
-				    args->subs[k]->params[j].takes_value) {
-					return true;
-				} else
-					break;
-			} else if (!strcmp(name,
-					   args->subs[k]->params[j].name)) {
-				if (name,
-				    args->subs[k]->params[j].takes_value) {
-					return true;
-				} else
-					break;
-			}
-		}
-	}
-	return false;
-}
-
 bool args_sub_takes_value(Args *args, u64 subi, char *name, bool is_short) {
-	for (u64 j = 0; j < args->subs[subi]->params_count; j++) {
+	for (u64 i = 0; i < args->subs[subi]->params_count; i++) {
 		if (is_short &&
-		    !strcmp(name, args->subs[subi]->params[j].short_name)) {
-			if (name, args->subs[subi]->params[j].takes_value) {
+		    !strcmp(name, args->subs[subi]->params[i].short_name)) {
+			if (name, args->subs[subi]->params[i].takes_value) {
 				return true;
 			} else
 				break;
-		} else if (!strcmp(name, args->subs[subi]->params[j].name)) {
-			if (name, args->subs[subi]->params[j].takes_value) {
+		} else if (!strcmp(name, args->subs[subi]->params[i].name)) {
+			if (name, args->subs[subi]->params[i].takes_value) {
 				return true;
 			} else
 				break;
@@ -396,10 +372,21 @@ void args_exit_error(Args *args, char *format, ...) {
 		exit(-1);
 }
 
+u64 args_subi_for(Args *args, char *sub) {
+	u64 subi = 0;
+	for (u64 i = 1; i < args->subs_count; i++) {
+		if (!strcmp(sub, args->subs[i]->name)) {
+			subi = i;
+		}
+	}
+	return subi;
+}
+
 void args_check_validity(Args *args, int argc, char **argv) {
 	// check if there's a sub command and check arg count
 	char *sub = NULL;
 	u32 arg_count = 0;
+	u64 subi = 0;
 	u64 sub_arg = ULONG_MAX;
 	for (u64 i = 1; i < argc; i++) {
 		u64 len = strlen(argv[i]);
@@ -414,13 +401,14 @@ void args_check_validity(Args *args, int argc, char **argv) {
 				strcpy(name, args->argv[i] + 1);
 				is_short = true;
 			}
-			if (args_takes_value(args, name, is_short)) {
+			if (args_sub_takes_value(args, subi, name, is_short)) {
 				i += 1;
 			}
 		} else {
 			if (!sub && args->subs_count > 1) {
 				sub = argv[i];
 				sub_arg = i;
+				subi = args_subi_for(args, sub);
 			} else
 				arg_count += 1;
 		}
@@ -438,10 +426,12 @@ void args_check_validity(Args *args, int argc, char **argv) {
 				    arg_count < args->subs[i]->min_args) {
 					args_exit_error(
 					    args,
-					    "Incorrect number of arguments for "
+					    "Incorrect number of "
+					    "arguments for "
 					    "sub command '%s' (%i "
 					    "specified). "
-					    "Number of arguments must be "
+					    "Number of arguments must "
+					    "be "
 					    "between %i and %i.",
 					    args->subs[i]->name, arg_count,
 					    args->subs[i]->min_args,
@@ -461,12 +451,13 @@ void args_check_validity(Args *args, int argc, char **argv) {
 		// check number of args
 		if (arg_count > args->subs[0]->max_args ||
 		    arg_count < args->subs[0]->min_args) {
-			args_exit_error(
-			    args,
-			    "Incorrect number of arguments (%i specified). "
-			    "Number of arguments must be between %i and %i.",
-			    arg_count, args->subs[0]->min_args,
-			    args->subs[0]->max_args);
+			args_exit_error(args,
+					"Incorrect number of arguments "
+					"(%i specified). "
+					"Number of arguments must be "
+					"between %i and %i.",
+					arg_count, args->subs[0]->min_args,
+					args->subs[0]->max_args);
 		}
 	}
 
@@ -480,10 +471,7 @@ void args_check_validity(Args *args, int argc, char **argv) {
 		}
 
 		u64 len = strlen(argv[i]);
-		printf("opt = %s\n", argv[i]);
 		if (len > 0 && argv[i][0] == '-') {
-			printf("1 subcount=%i\n",
-			       args->subs[subi]->params_count);
 			// option to check
 			char name[len];
 			bool is_short;
@@ -495,7 +483,6 @@ void args_check_validity(Args *args, int argc, char **argv) {
 				strcpy(name, args->argv[i] + 1);
 				is_short = true;
 			}
-			printf("2\n");
 			if (args_sub_takes_value(args, subi, name, is_short)) {
 				for (u64 j = 0;
 				     j < args->subs[subi]->params_count; j++) {
@@ -639,7 +626,6 @@ void args_check_validity(Args *args, int argc, char **argv) {
 				}
 			}
 		}
-		printf("com\n");
 	}
 }
 
@@ -694,8 +680,14 @@ int args_init(Args *args, int argc, char **argv) {
 							is_short = true;
 						}
 
-						if (args_takes_value(
-							args, name, is_short)) {
+						u64 subi = 0;
+						if (sub)
+							subi = args_subi_for(
+							    args, sub);
+
+						if (args_sub_takes_value(
+							args, subi, name,
+							is_short)) {
 							j += 1;
 						}
 					}
@@ -983,7 +975,8 @@ void args_usage(Args *args, char *sub_command) {
 						buffer[i] = ' ';
 					buffer[i] = 0;
 					fprintf(stderr,
-						"    %s-%s%s, %s--%s%s <%s>, "
+						"    %s-%s%s, %s--%s%s "
+						"<%s>, "
 						"... %s%s%s\n",
 						CYAN, short_name, RESET, YELLOW,
 						name, RESET, name, buffer, help,
@@ -1002,7 +995,8 @@ void args_usage(Args *args, char *sub_command) {
 					buffer[i] = 0;
 
 					fprintf(stderr,
-						"    %s-%s%s, %s--%s%s <%s> "
+						"    %s-%s%s, %s--%s%s "
+						"<%s> "
 						"%s%s%s\n",
 						CYAN, short_name, RESET, YELLOW,
 						name, RESET, name, buffer, help,
@@ -1068,7 +1062,8 @@ void args_usage(Args *args, char *sub_command) {
 						buffer[j] = ' ';
 					buffer[j] = 0;
 					fprintf(stderr,
-						"    %s-%s%s, %s--%s%s%s %s\n",
+						"    %s-%s%s, "
+						"%s--%s%s%s %s\n",
 						CYAN, short_name, RESET, YELLOW,
 						name, RESET, buffer, help);
 				}
@@ -1113,7 +1108,8 @@ void args_usage(Args *args, char *sub_command) {
 							buffer[j] = ' ';
 						buffer[j] = 0;
 						fprintf(stderr,
-							"    %s-%s%s, %s--%s%s "
+							"    %s-%s%s, "
+							"%s--%s%s "
 							"<%s>, ...%s %s"
 							"%s%s\n",
 							CYAN, short_name, RESET,
@@ -1133,7 +1129,8 @@ void args_usage(Args *args, char *sub_command) {
 							buffer[j] = ' ';
 						buffer[j] = 0;
 						fprintf(stderr,
-							"    %s-%s%s, %s--%s%s "
+							"    %s-%s%s, "
+							"%s--%s%s "
 							"<%s>%s "
 							"%s%s\n",
 							CYAN, short_name, RESET,
