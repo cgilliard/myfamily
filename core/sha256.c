@@ -163,4 +163,3 @@ char *SHA256(char *data) {
 
 	return hashStr;
 }
-

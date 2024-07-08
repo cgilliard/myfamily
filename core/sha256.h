@@ -18,4 +18,3 @@
 char *SHA256(char *data);
 
 #endif // _CORE_SHA256__
-
