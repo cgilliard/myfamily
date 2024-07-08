@@ -13,9 +13,14 @@
 // limitations under the License.
 
 #include <args/args.h>
+#include <bible/bible.h>
 #include <core/dir.h>
+#include <dirent.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 void build_args(Args *args) {
 	const char *home_dir = get_home_directory();
@@ -118,46 +123,55 @@ void build_args(Args *args) {
 	args_add_param(args, &cfg_config_dir);
 }
 
+void process_verse(Args *args, char *config_dir) {
+	Bible bible;
+	char bible_path[strlen(config_dir) + 10];
+	strcpy(bible_path, config_dir);
+	strcat(bible_path, "/akjv.txt");
+	if (bible_build(&bible, bible_path)) {
+		fprintf(stderr, "Could not load bible at path %s: %s\n",
+			bible_path, strerror(errno));
+		exit(-1);
+	}
+
+	char buf[1024];
+	char book_buf[100];
+	u8 chapter, verse;
+	if (bible_random_verse_to_string(&bible, buf, 1024) < 0) {
+		fprintf(stderr, "Could not find random verse due to: %s\n",
+			strerror(errno));
+		exit(-1);
+	}
+
+	printf("%s\n", buf);
+}
+
 int real_main(int argc, char **argv) {
 	Args args;
 	build_args(&args);
 	args_init(&args, argc, argv);
 
-	char buf[100];
-	int ret;
-	ret = args_value_of(&args, "threads", buf, 100, 0);
-	if (ret > 0) {
-		printf("threads='%s'\n", buf);
-	}
-
-	u64 count = 0;
-	while (true) {
-		ret = args_value_of(&args, "port", buf, 100, count);
-		if (ret > 0) {
-			printf("port='%s'\n", buf);
-			count += 1;
-		} else {
-			break;
+	// we always ensure that the config directory exists.
+	int config_dir_len = args_value_of(&args, "config_dir", NULL, 0, 0);
+	char config_dir[config_dir_len + 1];
+	args_value_of(&args, "config_dir", config_dir, config_dir_len + 1, 0);
+	if (access(config_dir, F_OK)) {
+		if (mkdir(config_dir, 0700)) {
+			perror("Failed to create specified config directory");
+			exit(-1);
 		}
 	}
 
-	ret = args_value_of(&args, "debug", buf, 100, 0);
+	// get first argument (subcommand)
+	char command[100];
+	int ret = args_get_argument(&args, 0, command, 100);
 	if (ret > 0) {
-		printf("debug set\n");
+		if (!strcmp(command, "verse")) {
+			process_verse(&args, config_dir);
+		} else {
+			printf("Not implemented!\n");
+		}
 	}
-
-	count = 0;
-	while (true) {
-		ret = args_get_argument(&args, count, buf, 100);
-
-		if (ret > 0) {
-			printf("arg[%i]=%s\n", count, buf);
-			count += 1;
-		} else
-			break;
-	}
-
-	printf("main does not do anything\n");
 
 	args_cleanup(&args);
 	return 0;

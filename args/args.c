@@ -611,7 +611,7 @@ int args_init(Args *args, int argc, char **argv) {
 
 int args_value_of(Args *args, char *param_name, char *value_buf,
 		  u64 max_value_len, u64 index) {
-	if (args == NULL || param_name == NULL || value_buf == NULL) {
+	if (args == NULL || param_name == NULL) {
 		errno = EINVAL;
 		return -1;
 	}
@@ -650,12 +650,15 @@ int args_value_of(Args *args, char *param_name, char *value_buf,
 		    !strcmp(args->argv[i], short_name_buf)) {
 			if (itt_index == index) {
 				if (takes_value && i + 1 < args->argc) {
-					snprintf(value_buf, max_value_len, "%s",
-						 args->argv[i + 1]);
-				} else if (takes_value && max_value_len > 0) {
+					return snprintf(value_buf,
+							max_value_len, "%s",
+							args->argv[i + 1]);
+				} else if (takes_value && max_value_len > 1) {
 					strcpy(value_buf, "");
+					return 0;
+				} else {
+					return 0;
 				}
-				return 1;
 			} else {
 				itt_index += 1;
 			}
@@ -663,11 +666,11 @@ int args_value_of(Args *args, char *param_name, char *value_buf,
 	}
 
 	if (default_value != NULL && index == 0) {
-		snprintf(value_buf, max_value_len, "%s", default_value);
-		return 1;
+		return snprintf(value_buf, max_value_len, "%s", default_value);
 	}
 
-	return 0;
+	errno = ENOENT;
+	return -1;
 }
 int args_get_argument(Args *args, u64 index, char *value_buf,
 		      u64 max_value_len) {

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_COLORS__
-#define _BASE_COLORS__
+#ifndef _CORE_COLORS__
+#define _CORE_COLORS__
 
 #define _GNU_SOURCE
 #include <stdlib.h>
@@ -103,4 +103,4 @@ static char *get_reset() {
 }
 #define RESET get_reset()
 
-#endif // _BASE_COLORS__
+#endif // _CORE_COLORS__
