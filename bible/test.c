@@ -108,6 +108,11 @@ MyTest(bible, test_bible_basic) {
 		line_num++;
 	}
 
+	// try invalid book
+	char buf_out[1024];
+	int res = bible_verse_to_string(&bible, "", 1, 1, buf_out, 1024);
+	cr_assert_eq(res, -1);
+
 	fclose(fp);
 
 	bible_cleanup(&bible);
