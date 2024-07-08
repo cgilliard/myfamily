@@ -47,7 +47,8 @@ MyTest(args, test_sub_command) {
 	args_param_build(&ap3, "debug", "print debug info", "d", false, false,
 			 NULL);
 
-	cr_assert(!sub_command_build(&sc, "node", "start the full node", 1, 2));
+	cr_assert(!sub_command_build(&sc, "node", "start the full node", 1, 2,
+				     "arg doc"));
 
 	sub_command_add_param(&sc, &ap1);
 	sub_command_add_param(&sc, &ap2);
@@ -68,8 +69,8 @@ MyTest(args, test_sub_command) {
 	args_param_cleanup(&ap2);
 	args_param_cleanup(&ap3);
 
-	cr_assert(sub_command_build(&sc, NULL, "adkflaljdf", 1, 2));
-	cr_assert(sub_command_build(&sc, "ok", "adkflaljdf", 3, 2));
+	cr_assert(sub_command_build(&sc, NULL, "adkflaljdf", 1, 2, "arg doc"));
+	cr_assert(sub_command_build(&sc, "ok", "adkflaljdf", 3, 2, "arg doc"));
 }
 
 MyTest(args, test_args) {
@@ -88,7 +89,7 @@ MyTest(args, test_args) {
 	args_param_build(&ap3, "debug", "print debug info", "d", false, false,
 			 NULL);
 
-	sub_command_build(&sc, "node", "start the full node", 1, 2);
+	sub_command_build(&sc, "node", "start the full node", 1, 2, "arg doc");
 	sub_command_add_param(&sc, &ap1);
 
 	args_add_sub_command(&args, &sc);

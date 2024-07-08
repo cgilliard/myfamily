@@ -88,8 +88,6 @@ void build_args(Args *args) {
 
 	args_add_sub_command(args, &verse);
 
-	// args_add_sub_command(args, &build);
-
 	// build the node SubCommand
 	SubCommand node;
 	ArgsParam cfg_threads, cfg_show;
