@@ -84,8 +84,6 @@ MyTest(bible, test_bible_basic) {
 
 		cr_assert(res != -1);
 
-		printf("line_num=%i,buf_out=%s,compare=%s\n", line_num, buf_out,
-		       compare);
 		cr_assert(!strcmp(buf_out, compare));
 
 		if (last_chapter != chapter_int) {

@@ -196,8 +196,6 @@ void process_verse(Args *args, char *config_dir) {
 		verse_ptr = &verse;
 	}
 
-	printf("chapter=%i,verse=%i,book='%s'\n", chapter_int, verse_int, book);
-
 	if (verse_int != -1 && chapter_int == -1) {
 		fprintf(stderr, "If --verse is specified, --chapter must also "
 				"be specified\n");
