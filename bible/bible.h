@@ -43,7 +43,9 @@ typedef struct Bible {
 int bible_build(Bible *bible, char *path);
 void bible_cleanup(Bible *bible);
 int bible_verse_to_string(Bible *bible, char *book, u8 chapter, u8 verse,
-			  char *buf, int buf_len);
-int bible_random_verse_to_string(Bible *bible, char *buf, int buf_len);
+			  char *buf, int buf_len, bool colors);
+int bible_random_verse_to_string(Bible *bible, char *buf, int buf_len,
+				 bool colors, char *optional_book,
+				 u8 *optional_chapter, u8 *optional_verse);
 
 #endif // _BIBLE_BIBLE__

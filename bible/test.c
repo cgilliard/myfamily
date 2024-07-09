@@ -78,11 +78,14 @@ MyTest(bible, test_bible_basic) {
 			 verse_int, text);
 
 		char buf_out[1024];
-		int res = bible_verse_to_string(&bible, bookname, chapter_int,
-						verse_int, buf_out, 1024);
+		int res =
+		    bible_verse_to_string(&bible, bookname, chapter_int,
+					  verse_int, buf_out, 1024, false);
 
 		cr_assert(res != -1);
 
+		printf("line_num=%i,buf_out=%s,compare=%s\n", line_num, buf_out,
+		       compare);
 		cr_assert(!strcmp(buf_out, compare));
 
 		if (last_chapter != chapter_int) {
@@ -90,7 +93,7 @@ MyTest(bible, test_bible_basic) {
 			if (line_num != 0) {
 				res = bible_verse_to_string(
 				    &bible, last_book, last_chapter,
-				    last_verse + 1, buf_out, 1024);
+				    last_verse + 1, buf_out, 1024, false);
 				cr_assert_eq(res, -1);
 			}
 		}
@@ -98,7 +101,7 @@ MyTest(bible, test_bible_basic) {
 			// new book try to get invalid chapter
 			res = bible_verse_to_string(&bible, last_book,
 						    last_chapter + 1, 1,
-						    buf_out, 1024);
+						    buf_out, 1024, false);
 			cr_assert_eq(res, -1);
 		}
 
@@ -110,7 +113,7 @@ MyTest(bible, test_bible_basic) {
 
 	// try invalid book
 	char buf_out[1024];
-	int res = bible_verse_to_string(&bible, "", 1, 1, buf_out, 1024);
+	int res = bible_verse_to_string(&bible, "", 1, 1, buf_out, 1024, false);
 	cr_assert_eq(res, -1);
 
 	fclose(fp);

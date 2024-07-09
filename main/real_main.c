@@ -85,6 +85,27 @@ void build_args(Args *args) {
 	SubCommand verse;
 	sub_command_build(&verse, "verse", "Print a random Bible verse", 0, 0,
 			  "");
+	ArgsParam no_colors_param, book_param, chapter_param, verse_param;
+	args_param_build(&no_colors_param, "no_colors", "Do not display colors",
+			 "n", false, false, NULL);
+	args_param_build(
+	    &book_param, "book",
+	    "Randomly select verse from the specified book of the Bible", "b",
+	    true, false, NULL);
+	args_param_build(
+	    &chapter_param, "chapter",
+	    "Randomly select verse from the specified chapter of the Bible. "
+	    "This option requires that --book be specified as well.",
+	    "x", true, false, NULL);
+	args_param_build(&verse_param, "verse",
+			 "Select the specified verse. This option requires "
+			 "that --book and --chapter be specified as well.",
+			 "v", true, false, NULL);
+
+	sub_command_add_param(&verse, &no_colors_param);
+	sub_command_add_param(&verse, &book_param);
+	sub_command_add_param(&verse, &chapter_param);
+	sub_command_add_param(&verse, &verse_param);
 
 	args_add_sub_command(args, &verse);
 
@@ -122,6 +143,34 @@ void build_args(Args *args) {
 }
 
 void process_verse(Args *args, char *config_dir) {
+	bool no_colors = args_value_of(args, "no_colors", NULL, 0, 0) >= 0;
+	char book[100];
+	args_value_of(args, "book", book, 100, 0);
+	char chapter_buf[100];
+	int chapter_int = -1;
+	if (args_value_of(args, "chapter", chapter_buf, 100, 0) != -1) {
+		chapter_int = atoi(chapter_buf);
+		if (chapter_int <= 0 || chapter_int > 255) {
+			fprintf(
+			    stderr,
+			    "The chapter specified must be a positive "
+			    "integer which is equal to or less than 255.\n");
+			exit(-1);
+		}
+	}
+	char verse_buf[100];
+	int verse_int = -1;
+	if (args_value_of(args, "verse", verse_buf, 100, 0) != -1) {
+		verse_int = atoi(verse_buf);
+		if (verse_int <= 0 || verse_int > 255) {
+			fprintf(
+			    stderr,
+			    "The verse specified must be a positive "
+			    "integer which is equal to or less than 255.\n");
+			exit(-1);
+		}
+	}
+
 	Bible bible;
 	char bible_path[strlen(config_dir) + 10];
 	strcpy(bible_path, config_dir);
@@ -135,13 +184,39 @@ void process_verse(Args *args, char *config_dir) {
 	char buf[1024];
 	char book_buf[100];
 	u8 chapter, verse;
-	if (bible_random_verse_to_string(&bible, buf, 1024) < 0) {
+
+	u8 *chapter_ptr = NULL;
+	if (chapter_int != -1) {
+		chapter = chapter_int;
+		chapter_ptr = &chapter;
+	}
+	u8 *verse_ptr = NULL;
+	if (verse_int != -1) {
+		verse = verse_int;
+		verse_ptr = &verse;
+	}
+
+	printf("chapter=%i,verse=%i,book='%s'\n", chapter_int, verse_int, book);
+
+	if (verse_int != -1 && chapter_int == -1) {
+		fprintf(stderr, "If --verse is specified, --chapter must also "
+				"be specified\n");
+		exit(-1);
+	}
+	if (chapter_int != -1 && (book == NULL || strlen(book) == 0)) {
+		fprintf(stderr, "If --chapter is specified, --book must also "
+				"be specified\n");
+		exit(-1);
+	}
+	if (bible_random_verse_to_string(&bible, buf, 1024, !no_colors, book,
+					 chapter_ptr, verse_ptr) < 0) {
 		fprintf(stderr, "Could not find random verse due to: %s\n",
 			strerror(errno));
 		exit(-1);
 	}
 
 	printf("%s\n", buf);
+	bible_cleanup(&bible);
 }
 
 int real_main(int argc, char **argv) {

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <bible/bible.h>
+#include <core/colors.h>
 #include <core/rand.h>
 #include <core/resources.h>
 #include <core/sha256.h>
@@ -222,13 +223,28 @@ void bible_cleanup(Bible *bible) {
 	myfree(bible->book_ids_sorted);
 }
 
-int bible_verse_to_string(Bible *bible, char *book, u8 chapter, u8 verse,
-			  char *buf, int buf_len) {
+int format_verse(Bible *bible, int index, char *buf, int buf_len, bool colors) {
 
+	if (colors)
+		return snprintf(
+		    buf, buf_len, "[%s%s%s:%s%i:%i%s] %s%s%s", GREEN,
+		    bible->book_ids[bible->verses[index].book_id].name, RESET,
+		    CYAN, bible->verses[index].chapter_id,
+		    bible->verses[index].verse_id, RESET, YELLOW,
+		    bible->verses[index].text, RESET);
+	else
+		return snprintf(
+		    buf, buf_len, "[%s:%i:%i] %s",
+		    bible->book_ids[bible->verses[index].book_id].name,
+		    bible->verses[index].chapter_id,
+		    bible->verses[index].verse_id, bible->verses[index].text);
+}
+
+int bible_book_index(Bible *bible, char *book) {
 	// use binary search to find the book
 	int index;
 	int min = 0;
-	int max = bible->book_id_count;
+	int max = bible->book_id_count - 1;
 	int book_id;
 	while (true) {
 		if (max < min) {
@@ -247,86 +263,189 @@ int bible_verse_to_string(Bible *bible, char *book, u8 chapter, u8 verse,
 			min = index + 1;
 		}
 	}
+	return book_id;
+}
 
-	// use binary search to find the verse
-	min = 0;
-	max = bible->verse_count;
-	bool book_reset = false;
-	bool chapter_reset = false;
+int bible_verse_to_string(Bible *bible, char *book, u8 chapter, u8 verse,
+			  char *buf, int buf_len, bool colors) {
+	return bible_random_verse_to_string(bible, buf, buf_len, colors, book,
+					    &chapter, &verse);
+	/*
+		int bible_random_verse_to_string(Bible *bible, char *buf, int
+	   buf_len, bool colors, char *optional_book, u8 *optional_chapter, u8
+	   *optional_verse) {
+					 */
 
-	while (true) {
-		if (max < min) {
-			errno = EINVAL;
-			return -1;
+	/*
+int index;
+int min = 0;
+int max = bible->verse_count;
+int book_id = bible_book_index(bible, book);
+
+// use binary search to find the verse
+bool book_reset = false;
+bool chapter_reset = false;
+
+while (true) {
+	if (max < min) {
+		errno = EINVAL;
+		return -1;
+	}
+	index = min + ((max - min) / 2);
+	if (book_id == bible->verses[index].book_id) {
+		if (!book_reset) {
+			// reset max/min (only once)
+
+			min = index;
+			max = index;
+			while (min >= 0 &&
+			       bible->verses[min].book_id == book_id)
+				min--;
+			while (max < bible->verse_count &&
+			       bible->verses[max].book_id == book_id)
+				max++;
+			book_reset = true;
 		}
-		index = min + ((max - min) / 2);
-		if (book_id == bible->verses[index].book_id) {
-			if (!book_reset) {
+		if (chapter == bible->verses[index].chapter_id) {
+			if (!chapter_reset) {
 				// reset max/min (only once)
 
 				min = index;
 				max = index;
 				while (min >= 0 &&
-				       bible->verses[min].book_id == book_id)
+				       bible->verses[min].chapter_id ==
+					   chapter)
 					min--;
 				while (max < bible->verse_count &&
-				       bible->verses[max].book_id == book_id)
+				       bible->verses[max].chapter_id ==
+					   chapter)
 					max++;
-				// index = min + ((max - min) / 2);
-				book_reset = true;
+
+				chapter_reset = true;
 			}
-			if (chapter == bible->verses[index].chapter_id) {
-				if (!chapter_reset) {
-					// reset max/min (only once)
-
-					min = index;
-					max = index;
-					while (min >= 0 &&
-					       bible->verses[min].chapter_id ==
-						   chapter)
-						min--;
-					while (max < bible->verse_count &&
-					       bible->verses[max].chapter_id ==
-						   chapter)
-						max++;
-
-					chapter_reset = true;
-				}
-				if (verse == bible->verses[index].verse_id) {
-					break;
-				} else if (verse <
-					   bible->verses[index].verse_id) {
-					max = index - 1;
-				} else {
-					min = index + 1;
-				}
-			} else if (chapter < bible->verses[index].chapter_id) {
+			if (verse == bible->verses[index].verse_id) {
+				break;
+			} else if (verse <
+				   bible->verses[index].verse_id) {
 				max = index - 1;
 			} else {
 				min = index + 1;
 			}
-		} else if (book_id < bible->verses[index].book_id) {
+		} else if (chapter < bible->verses[index].chapter_id) {
 			max = index - 1;
 		} else {
 			min = index + 1;
 		}
+	} else if (book_id < bible->verses[index].book_id) {
+		max = index - 1;
+	} else {
+		min = index + 1;
 	}
-
-	return snprintf(buf, buf_len, "[%s:%i:%i] %s",
-			bible->book_ids[bible->verses[index].book_id].name,
-			bible->verses[index].chapter_id,
-			bible->verses[index].verse_id,
-			bible->verses[index].text);
 }
 
-int bible_random_verse_to_string(Bible *bible, char *buf, int buf_len) {
+return format_verse(bible, index, buf, buf_len, colors);
+*/
+}
+
+int bible_random_verse_to_string(Bible *bible, char *buf, int buf_len,
+				 bool colors, char *optional_book,
+				 u8 *optional_chapter, u8 *optional_verse) {
 	u16 r;
 	if (rand_u16(&r))
 		return -1;
-	r %= bible->verse_count;
 
-	return snprintf(buf, buf_len, "[%s:%i:%i] %s",
-			bible->book_ids[bible->verses[r].book_id].name,
-			bible->verses[r].chapter_id, bible->verses[r].verse_id,
-			bible->verses[r].text);
+	if (optional_book && strlen(optional_book) > 0) {
+		int book_id = bible_book_index(bible, optional_book);
+		if (book_id < 0)
+			return -1;
+
+		int index;
+		int min = 0;
+		int max = bible->verse_count;
+
+		// use binary search to find the verse
+
+		while (true) {
+			if (max < min) {
+				errno = EINVAL;
+				return -1;
+			}
+			index = min + ((max - min) / 2);
+			if (book_id == bible->verses[index].book_id) {
+				min = index;
+				max = index;
+				while (min - 1 >= 0 &&
+				       bible->verses[min - 1].book_id ==
+					   book_id)
+					min--;
+				while (max + 1 < bible->verse_count &&
+				       bible->verses[max + 1].book_id ==
+					   book_id)
+					max++;
+				break;
+			} else if (book_id < bible->verses[index].book_id) {
+				max = index - 1;
+			} else {
+				min = index + 1;
+			}
+		}
+
+		if (optional_chapter) {
+			u8 target_chapter = *optional_chapter;
+			while (true) {
+				if (max < min) {
+					errno = EINVAL;
+					return -1;
+				}
+				index = min + ((max - min) / 2);
+				if (target_chapter ==
+				    bible->verses[index].chapter_id) {
+					min = index;
+					max = index;
+					while (min >= 0 &&
+					       bible->verses[min].chapter_id ==
+						   target_chapter &&
+					       bible->verses[max].book_id ==
+						   book_id)
+						min--;
+					while (max < bible->verse_count &&
+					       bible->verses[max].chapter_id ==
+						   target_chapter &&
+					       bible->verses[max].book_id ==
+						   book_id)
+						max++;
+
+					if (optional_verse) {
+						u8 target_verse =
+						    *optional_verse;
+						if (target_verse + 1 >
+						    max - min) {
+							errno = EINVAL;
+							return -1;
+						}
+						min += target_verse - 1;
+						max = min + 2;
+					}
+					break;
+				} else if (target_chapter <
+					   bible->verses[index].chapter_id) {
+					max = index - 1;
+				} else {
+					min = index + 1;
+				}
+			}
+		}
+
+		char rmin_buf[1024];
+		format_verse(bible, min + 1, rmin_buf, 1024, true);
+		char rmax_buf[1024];
+		format_verse(bible, max - 1, rmax_buf, 1024, true);
+		printf("min_verse=%s\n", rmin_buf);
+		printf("max_verse=%s\n", rmax_buf);
+
+		r %= ((max - 1) - min);
+		r += (min + 1);
+	} else
+		r %= bible->verse_count;
+	return format_verse(bible, r, buf, buf_len, colors);
 }
