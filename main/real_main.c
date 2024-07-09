@@ -90,11 +90,11 @@ void build_args(Args *args) {
 			 "n", false, false, NULL);
 	args_param_build(
 	    &book_param, "book",
-	    "Randomly select verse from the specified book of the Bible", "b",
+	    "Randomly select a verse from the specified book of the Bible", "b",
 	    true, false, NULL);
 	args_param_build(
 	    &chapter_param, "chapter",
-	    "Randomly select verse from the specified chapter of the Bible. "
+	    "Randomly select a verse from the specified chapter of the Bible. "
 	    "This option requires that --book be specified as well.",
 	    "x", true, false, NULL);
 	args_param_build(&verse_param, "verse",
