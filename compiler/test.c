@@ -12,29 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _LEXER_LEXER__
-#define _LEXER_LEXER__
+#include <compiler/parser.h>
+#include <core/test.h>
 
-#include <lexer/tokenizer.h>
+MySuite(compiler);
 
-#define LEXER_BUF_SIZE 1024
+MyTest(compiler, test_compiler_basic) {
+	ParserPackage pkg;
+	parser_pkg_init(&pkg);
+	parser_parse_file(&pkg, "./resources/test.fam");
 
-typedef enum LexerState {
-	LexerStateOk = 0,
-	LexerStateErr = 1,
-	LexerStateComplete = 2
-} LexerState;
+	cr_assert_eq(pkg.class_count, 1);
+	cr_assert(!strcmp(pkg.classes[0].name, "MyClass"));
+	cr_assert_eq(pkg.classes[0].imports.count, 2);
+	cr_assert(!strcmp(pkg.classes[0].imports.list[0].name, "ghi"));
+	cr_assert(!strcmp(pkg.classes[0].imports.list[1].name, "*"));
 
-typedef struct Lexer {
-	Tokenizer *tokenizer;
-	FILE *fp;
-	char *file;
-	u64 line_num;
-} Lexer;
-
-int lexer_init(Lexer *l, char *file);
-int lexer_next_token(Lexer *l, Token *token);
-char *lexer_read_line(Lexer *l);
-void lexer_cleanup(Lexer *l);
-
-#endif // _LEXER_LEXER__
+	parser_pkg_cleanup(&pkg);
+}

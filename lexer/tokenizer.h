@@ -28,6 +28,7 @@ typedef struct Token {
 	TokenType type;
 	char *token;
 	u64 line_num;
+	char *span;
 } Token;
 
 typedef struct Tokenizer {
@@ -44,6 +45,7 @@ typedef enum TokenizerState {
 	TokenizerStateCompleteInComment = 3,
 } TokenizerState;
 
+int display_error(Token *token, char *fmt, ...);
 int tokenizer_init(Tokenizer *t, char *line);
 int tokenizer_next_token(Tokenizer *t, Token *next);
 void tokenizer_cleanup(Tokenizer *t);

@@ -41,20 +41,6 @@ void build_args(Args *args) {
 
 	args_add_sub_command(args, &init);
 
-	// build the compile SubCommand
-	SubCommand compile;
-	ArgsParam cfg_output_dir;
-	args_param_build(&cfg_output_dir, "output",
-			 "Directory to store the output of compilation "
-			 "(defaults to the directory of the file)",
-			 "o", true, false, NULL);
-	sub_command_build(&compile, "compile",
-			  "Compile the specified .fam file", 1, 100000,
-			  "<file>");
-	sub_command_add_param(&compile, &cfg_output_dir);
-
-	args_add_sub_command(args, &compile);
-
 	// build the build SubCommand
 	SubCommand build;
 	sub_command_build(&build, "build", "Build project in release mode", 0,

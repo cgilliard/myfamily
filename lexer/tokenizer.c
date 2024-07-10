@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/colors.h>
 #include <core/resources.h>
 #include <errno.h>
 #include <lexer/tokenizer.h>
@@ -351,6 +352,7 @@ int tokenizer_proc_punct(Tokenizer *t, Token *next) {
 }
 
 int tokenizer_next_token(Tokenizer *t, Token *next) {
+	next->span = NULL;
 	next->type =
 	    TokenTypeIdent; // init so that we know when it's been set to doc
 	// first skip all whitespace / comments
@@ -401,4 +403,21 @@ void token_cleanup(Token *t) {
 		myfree(t->token);
 		t->token = NULL;
 	}
+
+	// check if it's null to be safe in case it's called twice
+	if (t->span != NULL) {
+		myfree(t->span);
+		t->span = NULL;
+	}
 }
+
+int display_error(Token *token, char *fmt, ...) {
+	va_list va_args;
+	va_start(va_args, fmt);
+	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+	vfprintf(stderr, fmt, va_args);
+	va_end(va_args);
+	fprintf(stderr, "\n%s", token->span);
+	return 0;
+}
+
