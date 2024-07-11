@@ -30,12 +30,14 @@ typedef struct ParserStatement {
 } ParserStatement;
 
 typedef struct ParserFunction {
-
+	char *name;
+	char *return_type;
 } ParserFunction;
 
-typedef struct ParserFields {
-
-} ParserFields;
+typedef struct ParserField {
+	char *name;
+	char *type;
+} ParserField;
 
 typedef struct ParserImport {
 	char *name;
@@ -51,7 +53,7 @@ typedef struct ParserClass {
 	ParserImportList imports;
 	ParserFunction *functions;
 	int function_count;
-	ParserFields *fields;
+	ParserField *fields;
 	int field_count;
 } ParserClass;
 

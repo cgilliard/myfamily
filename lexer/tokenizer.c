@@ -303,8 +303,6 @@ bool is_second_punct(char ch1, char ch2) {
 		return true;
 	if (ch1 == '.' && ch2 == '.')
 		return true;
-	if (ch1 == '(' && ch2 == ')')
-		return true;
 
 	return false;
 }
@@ -420,4 +418,3 @@ int display_error(Token *token, char *fmt, ...) {
 	fprintf(stderr, "\n%s", token->span);
 	return 0;
 }
-
