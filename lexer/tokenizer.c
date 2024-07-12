@@ -251,18 +251,34 @@ int tokenizer_proc_num_literal(Tokenizer *t, Token *next) {
 
 		char ch = t->s[t->pos];
 
-		// continue until literal termination char (we allow all chars
-		// needed for the various types at the tokenizer level. Checking
-		// the order, etc is done at a later phase)
-		if (!((ch >= '0' && ch <= '9') || ch == '.' || ch == '_' ||
-		      ch == 'u' || ch == 'i' || ch == 's' || ch == 'z' ||
-		      ch == 'e' || ch == 'f' || ch == 'x')) {
+		// continue until literal termination char (we allow all
+		// chars needed for the various types at the tokenizer
+		// level. Checking the order, etc is done at a later
+		// phase)
+		if (t->pos == start) {
+			if (!(ch == '-' || (ch >= '0' && ch <= '9')))
+				break;
+		} else if (!((ch >= '0' && ch <= '9') || ch == '.' ||
+			     ch == '_' || ch == 'u' || ch == 'i' || ch == 's' ||
+			     ch == 'z' || ch == 'e' || ch == 'f' || ch == 'x'))
 			break;
-		}
 		t->pos += 1;
 	}
 	u64 end = t->pos;
 	u64 tlen = end - start;
+
+	// special case of lone minus sign is a punct, not a literal
+	if (tlen == 1 && t->s[start] == '-') {
+		next->type = TokenTypePunct;
+		// we also must deal with these: -= and ->
+		if (t->pos < t->len) {
+			if (t->s[t->pos] == '=' || t->s[t->pos] == '>') {
+				t->pos += 1;
+				end = t->pos;
+				tlen = end - start;
+			}
+		}
+	}
 
 	// allocate and copy over the token
 	next->token = mymalloc(sizeof(char) * (tlen + 1));
@@ -378,7 +394,7 @@ int tokenizer_next_token(Tokenizer *t, Token *next) {
 	} else if (first == '\'') {
 		// char literal
 		return tokenizer_proc_char_literal(t, next);
-	} else if (first >= '0' && first <= '9') {
+	} else if ((first >= '0' && first <= '9') || first == '-') {
 		// number literal
 		return tokenizer_proc_num_literal(t, next);
 	} else {

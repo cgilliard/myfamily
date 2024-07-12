@@ -29,6 +29,17 @@ typedef struct ParserStatement {
 
 } ParserStatement;
 
+typedef struct ParserGeneric {
+	char *param_name;
+	int param_type_count;
+	char **param_types;
+} ParserGeneric;
+
+typedef struct ParserGenericList {
+	ParserGeneric *list;
+	int count;
+} ParserGenericList;
+
 typedef struct ParserFunction {
 	char *name;
 	char *return_type;

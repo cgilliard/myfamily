@@ -19,6 +19,26 @@
 #include <lexer/lexer.h>
 #include <string.h>
 
+void *parser_mymalloc_and_copy(char *str) {
+	char *ret = mymalloc(sizeof(char) * (1 + strlen(str)));
+	if (ret)
+		strcpy(ret, str);
+	return ret;
+}
+
+void *parser_resize_list(void *ptr, int *cur_size, usize size) {
+	void *ret;
+	if (*cur_size == 0) {
+		ret = mymalloc(size);
+	} else {
+		ret = myrealloc(ptr, size * (*cur_size + 1));
+	}
+	if (ret)
+		*cur_size += 1;
+
+	return ret;
+}
+
 int parser_copy_import_list(ParserImportList *dst, ParserImportList *src) {
 	if (src->count == 0)
 		return 0;
@@ -173,6 +193,67 @@ int parser_process_param_list(Lexer *lexer, ParserClass *class) {
 	}
 }
 
+int parser_process_idents(char *ident1, char *ident2, ParserClass *class) {
+	int ret = 0;
+	if (ident1 != NULL) {
+		void *retptr =
+		    parser_resize_list(class->functions, &class->function_count,
+				       sizeof(ParserFunction));
+		if (retptr)
+			class->functions = retptr;
+		else
+			ret = -1;
+
+		ParserFunction *fns = class->functions;
+		int index = class->function_count - 1;
+
+		if (ret == 0) {
+			fns[index].name = NULL;
+			fns[index].return_type = NULL;
+			if (ident2 != NULL) {
+				fns[index].name =
+				    parser_mymalloc_and_copy(ident2);
+				if (fns[index].name == NULL)
+					ret = -1;
+				else {
+					fns[index].return_type =
+					    parser_mymalloc_and_copy(ident1);
+					if (fns[index].return_type == NULL)
+						ret = -1;
+				}
+			} else {
+				fns[index].name =
+				    parser_mymalloc_and_copy(ident1);
+				if (fns[index].name == NULL)
+					ret = -1;
+				else {
+					fns[index].return_type =
+					    parser_mymalloc_and_copy("void");
+					if (fns[index].return_type == NULL)
+						ret = -1;
+				}
+			}
+
+			if (ret != 0) {
+				class->function_count -= 1;
+				if (fns[index].name)
+					myfree(fns[index].name);
+				if (fns[index].return_type)
+					myfree(fns[index].return_type);
+			}
+		}
+	}
+
+	if (ident1 != NULL) {
+		myfree(ident1);
+	}
+	if (ident2 != NULL) {
+		myfree(ident2);
+	}
+
+	return ret;
+}
+
 int parser_process_class_base_plus_at(Lexer *lexer, ParserClass *class) {
 	// we know this is a function declaration
 	int ret = 0;
@@ -199,147 +280,65 @@ int parser_process_class_base_plus_at(Lexer *lexer, ParserClass *class) {
 				// begin the param list.
 				if (ident1 == NULL) {
 					display_error(
-					    &token,
-					    "Invalid function declaration. No "
-					    "function name specified.");
+					    &token, "Invalid function "
+						    "declaration. No "
+						    "function name specified.");
 				}
 				ret = parser_process_param_list(lexer, class);
 				token_cleanup(&token);
 				break;
 			} else {
+				display_error(&token,
+					      "Unexpected token."
+					      "Expected '('. Found '%s'",
+					      token.token);
 			}
 		} else if (token.type == TokenTypeIdent) {
 			if (!strcmp(token.token, "mut")) {
 				if (counter != 0) {
-					display_error(
-					    &token,
-					    "Unexpected token. 'mut' "
-					    "must be declared immediately "
-					    "after the @ symbol.");
+					display_error(&token,
+						      "Unexpected token. 'mut' "
+						      "must be declared "
+						      "immediately "
+						      "after the @ symbol.");
 				}
 				// mutable function
 				is_mut = true;
 			} else {
-				// this is either the function name or return
-				// type
+				// this is either the function name or
+				// return type
 				if (ident1 == NULL) {
-					ident1 =
-					    mymalloc(sizeof(char) *
-						     (1 + strlen(token.token)));
-					strcpy(ident1, token.token);
+					ident1 = parser_mymalloc_and_copy(
+					    token.token);
+					if (ident1 == NULL)
+						ret = -1;
 				} else if (ident2 == NULL) {
-					ident2 =
-					    mymalloc(sizeof(char) *
-						     (1 + strlen(token.token)));
-					strcpy(ident2, token.token);
+					ident2 = parser_mymalloc_and_copy(
+					    token.token);
+					if (ident2 == NULL)
+						ret = -1;
+				} else {
+					display_error(
+					    &token,
+					    "Unexpected token."
+					    "Expected '('. Found '%s'",
+					    token.token);
 				}
 			}
+		} else {
+			display_error(&token,
+				      "Unexpected token."
+				      "Expected '('. Found '%s'",
+				      token.token);
 		}
 		counter += 1;
 		token_cleanup(&token);
 	}
 
-	if (ident1 != NULL) {
-		if (class->function_count == 0) {
-			class->functions = mymalloc(sizeof(ParserFunction));
-			if (class->functions == NULL) {
-				ret = -1;
-			}
-
-		} else {
-			void *tmp = myrealloc(class->functions,
-					      sizeof(ParserFunction) *
-						  (class->function_count + 1));
-			if (tmp == NULL)
-				ret = -1;
-			else
-				class->functions = tmp;
-		}
-
-		if (ret == 0) {
-
-			class->function_count += 1;
-
-			if (ident2 != NULL) {
-				class->functions[class->function_count - 1]
-				    .name = mymalloc(sizeof(char) *
-						     (1 + strlen(ident2)));
-				if (class->functions[class->function_count - 1]
-					.name == NULL) {
-					ret = -1;
-				} else {
-					strcpy(
-					    class
-						->functions
-						    [class->function_count - 1]
-						.name,
-					    ident2);
-					class
-					    ->functions[class->function_count -
-							1]
-					    .return_type =
-					    mymalloc(sizeof(char) *
-						     (1 + strlen(ident1)));
-					if (class
-						->functions
-						    [class->function_count - 1]
-						.return_type == NULL) {
-						ret = -1;
-					} else
-						strcpy(
-						    class
-							->functions
-							    [class
-								 ->function_count -
-							     1]
-							.return_type,
-						    ident1);
-				}
-			} else {
-				class->functions[class->function_count - 1]
-				    .name = mymalloc(sizeof(char) *
-						     (1 + strlen(ident1)));
-				if (class->functions[class->function_count - 1]
-					.name == NULL)
-					ret = -1;
-				else {
-					strcpy(
-					    class
-						->functions
-						    [class->function_count - 1]
-						.name,
-					    ident1);
-					class
-					    ->functions[class->function_count -
-							1]
-					    .return_type =
-					    mymalloc(sizeof(char) * 5);
-					if (class
-						->functions
-						    [class->function_count - 1]
-						.return_type == NULL)
-						ret = -1;
-					else
-						strcpy(
-						    class
-							->functions
-							    [class
-								 ->function_count -
-							     1]
-							.return_type,
-						    "void");
-				}
-			}
-		}
-	}
-
-	if (ident1 != NULL) {
-		myfree(ident1);
-	}
-	if (ident2 != NULL) {
-		myfree(ident2);
-	}
-	return ret;
+	if (ret == 0)
+		return parser_process_idents(ident1, ident2, class);
+	else
+		return ret;
 }
 
 int parser_process_class_base_plus_ident(Lexer *lexer, ParserClass *class,
@@ -366,9 +365,9 @@ int parser_process_class_base_plus_ident(Lexer *lexer, ParserClass *class,
 			if (!strcmp(token.token, "(")) {
 				if (is_static && ident2 == NULL) {
 					display_error(
-					    &token,
-					    "Invalid function declaration. No "
-					    "function name specified.");
+					    &token, "Invalid function "
+						    "declaration. No "
+						    "function name specified.");
 					ret = -1;
 				} else {
 					is_fn = true;
@@ -380,15 +379,16 @@ int parser_process_class_base_plus_ident(Lexer *lexer, ParserClass *class,
 			} else if (!strcmp(token.token, ";")) {
 				// type decl
 				if (is_static) {
-					display_error(
-					    &token,
-					    "Invalid field declaration. static "
-					    "is only allowed for functions.");
+					display_error(&token,
+						      "Invalid field "
+						      "declaration. static "
+						      "is only allowed for "
+						      "functions.");
 					ret = -1;
 				} else if (ident2 == NULL) {
-					display_error(
-					    &token,
-					    "Expected field name. Found ';'.");
+					display_error(&token,
+						      "Expected field "
+						      "name. Found ';'.");
 					ret = -1;
 				}
 				token_cleanup(&token);
@@ -404,11 +404,11 @@ int parser_process_class_base_plus_ident(Lexer *lexer, ParserClass *class,
 				strcpy(ident2, token.token);
 			} else if (ident3 == NULL) {
 				if (!is_static) {
-					display_error(
-					    &token,
-					    "Unexpected token. Expected '(', "
-					    "Found '%s'.",
-					    token.token);
+					display_error(&token,
+						      "Unexpected token. "
+						      "Expected '(', "
+						      "Found '%s'.",
+						      token.token);
 					ret = -1;
 				} else {
 					ident3 =
