@@ -3,7 +3,6 @@
 **/*.gcov
 **/*.gcno
 **/*.gcda
-**/*.fam
 */bin
 /bin/*
 /doc/*
