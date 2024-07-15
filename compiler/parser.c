@@ -279,7 +279,7 @@ int parser_process_class_base_plus_at(Lexer *lexer, ParserClass *class) {
 			if (!strcmp(token.token, "(")) {
 				// begin the param list.
 				if (ident1 == NULL) {
-					display_error(
+					token_display_error(
 					    &token, "Invalid function "
 						    "declaration. No "
 						    "function name specified.");
@@ -288,19 +288,19 @@ int parser_process_class_base_plus_at(Lexer *lexer, ParserClass *class) {
 				token_cleanup(&token);
 				break;
 			} else {
-				display_error(&token,
-					      "Unexpected token."
-					      "Expected '('. Found '%s'",
-					      token.token);
+				token_display_error(&token,
+						    "Unexpected token."
+						    "Expected '('. Found '%s'",
+						    token.token);
 			}
 		} else if (token.type == TokenTypeIdent) {
 			if (!strcmp(token.token, "mut")) {
 				if (counter != 0) {
-					display_error(&token,
-						      "Unexpected token. 'mut' "
-						      "must be declared "
-						      "immediately "
-						      "after the @ symbol.");
+					token_display_error(
+					    &token, "Unexpected token. 'mut' "
+						    "must be declared "
+						    "immediately "
+						    "after the @ symbol.");
 				}
 				// mutable function
 				is_mut = true;
@@ -318,7 +318,7 @@ int parser_process_class_base_plus_at(Lexer *lexer, ParserClass *class) {
 					if (ident2 == NULL)
 						ret = -1;
 				} else {
-					display_error(
+					token_display_error(
 					    &token,
 					    "Unexpected token."
 					    "Expected '('. Found '%s'",
@@ -326,10 +326,10 @@ int parser_process_class_base_plus_at(Lexer *lexer, ParserClass *class) {
 				}
 			}
 		} else {
-			display_error(&token,
-				      "Unexpected token."
-				      "Expected '('. Found '%s'",
-				      token.token);
+			token_display_error(&token,
+					    "Unexpected token."
+					    "Expected '('. Found '%s'",
+					    token.token);
 		}
 		counter += 1;
 		token_cleanup(&token);
@@ -364,7 +364,7 @@ int parser_process_class_base_plus_ident(Lexer *lexer, ParserClass *class,
 		if (token.type == TokenTypePunct) {
 			if (!strcmp(token.token, "(")) {
 				if (is_static && ident2 == NULL) {
-					display_error(
+					token_display_error(
 					    &token, "Invalid function "
 						    "declaration. No "
 						    "function name specified.");
@@ -379,16 +379,16 @@ int parser_process_class_base_plus_ident(Lexer *lexer, ParserClass *class,
 			} else if (!strcmp(token.token, ";")) {
 				// type decl
 				if (is_static) {
-					display_error(&token,
-						      "Invalid field "
-						      "declaration. static "
-						      "is only allowed for "
-						      "functions.");
+					token_display_error(
+					    &token, "Invalid field "
+						    "declaration. static "
+						    "is only allowed for "
+						    "functions.");
 					ret = -1;
 				} else if (ident2 == NULL) {
-					display_error(&token,
-						      "Expected field "
-						      "name. Found ';'.");
+					token_display_error(&token,
+							    "Expected field "
+							    "name. Found ';'.");
 					ret = -1;
 				}
 				token_cleanup(&token);
@@ -404,11 +404,11 @@ int parser_process_class_base_plus_ident(Lexer *lexer, ParserClass *class,
 				strcpy(ident2, token.token);
 			} else if (ident3 == NULL) {
 				if (!is_static) {
-					display_error(&token,
-						      "Unexpected token. "
-						      "Expected '(', "
-						      "Found '%s'.",
-						      token.token);
+					token_display_error(&token,
+							    "Unexpected token. "
+							    "Expected '(', "
+							    "Found '%s'.",
+							    token.token);
 					ret = -1;
 				} else {
 					ident3 =
@@ -626,23 +626,24 @@ int parser_process_class_inner(Lexer *lexer, ParserClass *class) {
 				token_cleanup(&token);
 				break;
 			} else {
-				display_error(&token,
-					      "Unexpected token. "
-					      "Expected either '@', "
-					      "function name, or "
-					      "type. Found '%s'.",
-					      token.token);
+				token_display_error(&token,
+						    "Unexpected token. "
+						    "Expected either '@', "
+						    "function name, or "
+						    "type. Found '%s'.",
+						    token.token);
 				ret = -1;
 			}
 		} else if (token.type == TokenTypeIdent) {
 			ret = parser_process_class_base_plus_ident(lexer, class,
 								   token.token);
 		} else {
-			display_error(&token,
-				      "Unexpected token. Expected either '@', "
-				      "function name, or "
-				      "type. Found '%s'.",
-				      token.token);
+			token_display_error(
+			    &token,
+			    "Unexpected token. Expected either '@', "
+			    "function name, or "
+			    "type. Found '%s'.",
+			    token.token);
 			ret = -1;
 		}
 		token_cleanup(&token);
@@ -691,15 +692,16 @@ int parser_process_class(ParserPackage *pkg, Lexer *lexer, char *class_name,
 			if (!strcmp(token.token, "{")) {
 				parser_process_class_inner(lexer, class);
 			} else
-				display_error(&token,
-					      "Unexpected token. Expected '{'. "
-					      "Found '%s'.",
-					      token.token);
+				token_display_error(
+				    &token,
+				    "Unexpected token. Expected '{'. "
+				    "Found '%s'.",
+				    token.token);
 		} else {
-			display_error(&token,
-				      "Unexpected token. Expected '{'. "
-				      "Found '%s'.",
-				      token.token);
+			token_display_error(&token,
+					    "Unexpected token. Expected '{'. "
+					    "Found '%s'.",
+					    token.token);
 			ret = -1;
 		}
 
@@ -753,7 +755,7 @@ int parser_parse_file(ParserPackage *pkg, char *file) {
 					     &import_list);
 		} else {
 			// handle error
-			display_error(
+			token_display_error(
 			    &token,
 			    "Unexpected token. Expected either '@' or "
 			    "class name. Found '%s'.",

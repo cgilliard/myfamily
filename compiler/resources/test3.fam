@@ -250,8 +250,21 @@ TestReturns {
 		Ok($)
 	}
 
-	fn6() {
+	/// Doc comment
+	/// @param abc an unsigned 32 bit int
+	/// @return the input value plus 1
+	fn6(abc: u32) -> u32 {
 		let res: u32 = fn4(10)!; // this is ok because first variant returned.
 		let res: u32 = fn4(110)!; // this panics because second variant returns.
+		abc + 1
+	}
+}
+
+/// This is a doc comment for the below class
+#[custom_proc]
+DocClass {
+	#[custom_proc(multiple => tokens)]
+	fn1() -> TestReturnEnum<$, MyError> {
+		TestReturnEnum::Ok($)
 	}
 }

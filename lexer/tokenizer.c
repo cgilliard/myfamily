@@ -425,7 +425,47 @@ void token_cleanup(Token *t) {
 	}
 }
 
-int display_error(Token *token, char *fmt, ...) {
+typedef enum TokenDisplayType {
+	TokenDisplayTypeError = 0,
+	TokenDisplayTypeWarning = 1
+} TokenDisplayType;
+
+int token_display_impl(Token *token, TokenDisplayType type, char *fmt,
+		       va_list va_args) {
+	if (type == TokenDisplayTypeError)
+		fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+	else
+		fprintf(stderr, "%sWarning%s: ", YELLOW, RESET);
+	vfprintf(stderr, fmt, va_args);
+	fprintf(stderr, "\n%s", token->span);
+	return 0;
+}
+
+int token_display_error(Token *token, char *fmt, ...) {
+	va_list va_args;
+	va_start(va_args, fmt);
+	int ret =
+	    token_display_impl(token, TokenDisplayTypeError, fmt, va_args);
+	va_end(va_args);
+	return ret;
+
+	/*
+	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+	vfprintf(stderr, fmt, va_args);
+	va_end(va_args);
+	fprintf(stderr, "\n%s", token->span);
+	return 0;
+	*/
+}
+
+int token_display_warning(Token *token, char *fmt, ...) {
+	va_list va_args;
+	va_start(va_args, fmt);
+	int ret =
+	    token_display_impl(token, TokenDisplayTypeWarning, fmt, va_args);
+	va_end(va_args);
+	return ret;
+	/*
 	va_list va_args;
 	va_start(va_args, fmt);
 	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
@@ -433,4 +473,5 @@ int display_error(Token *token, char *fmt, ...) {
 	va_end(va_args);
 	fprintf(stderr, "\n%s", token->span);
 	return 0;
+	*/
 }

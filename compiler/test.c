@@ -52,3 +52,9 @@ MyTest(compiler, test_compiler_basic) {
 
 	parser_pkg_cleanup(&pkg);
 }
+
+MyTest(compiler, test_compiler_3) {
+	// ParserPackage pkg;
+	// parser_pkg_init(&pkg);
+	// parser_parse_file(&pkg, "./resources/test3.fam");
+}
