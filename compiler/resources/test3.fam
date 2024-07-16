@@ -5,11 +5,11 @@
 // rust equiv: use xyz::*;
 @xyz::*;
 
-module mymod; // file based module defns
+mod mymod; // file based module defns (maps to mymod.fam or mymod/mod.rs)
 // in file module defns
-module mymod2 {
+mod mymod2 {
 	MyMod2Class {
-		x: usize;
+		@x: usize;
 	}
 }
 
@@ -36,8 +36,8 @@ EnumTest {
 // Enums can have fields and functions:
 EnumTest2 {
 	V1 {
-		x: i32;
-		y: u64;
+		@x: i32;
+		@y: u64;
 		build(x: i32, y: u64) {
 			@ {
                                 x,
@@ -46,8 +46,8 @@ EnumTest2 {
 		}
 	},
 	V2 {
-		x: usize;
-		y: i128;
+		@x: usize;
+		@y: i128;
 		build(x: usize, y: i128) {
 			@ {
 				x,
@@ -95,19 +95,21 @@ UseEnumTest2 {
 
 // a more standard class. This is actually an enum with a single variant.
 pub MyClass {
-	x: i32;
-	y: i64;
-	z: EnumTest2;
+	@x: i32;
+	@y: i64;
+	@z: EnumTest2;
+	// static field. No '@'.
+	BUFFER_SIZE: usize;
 	// Dynamically sized arrays act like pointers, however with some safety. The alloc!([T], usize) and dealloc!([T])
 	// functions, which execute native C code to allocate/deallocate memory allow for safe access to dynamicly
         // sized contigious memory. Like arrays, attempting to access 'out of bounds' items will result in a 
 	// thread panic. The user is responsible for allocating/deallocating memory with these types.
-	ptr: [u8];
-	arr: [u32; 10];
+	@ptr: [u8];
+	@arr: [u32; 10];
 	// 2d
-	ptr2: [][EnumTest2];
+	@ptr2: [][EnumTest2];
 	// 3d
-	ptr3: [][][u32];
+	@ptr3: [][][u32];
 
 	// Slices are allowed in function calls, but not as fields in classes. They cannot be returned from functions
 	// as no references can. Also this function has the default visibility which is pub(package).
@@ -180,9 +182,9 @@ MyClass::Clone {
 }
 
 priv MyClassWithTuplesAndClosures {
-	x: (u32, i64);
-	y: Option<|usize, i128| -> usize>;
-	z: |isize, u128| -> MyClass;
+	@x: (u32, i64);
+	@y: Option<|usize, i128| -> usize>;
+	@z: |isize, u128| -> MyClass;
 }
 
 MyError {
@@ -200,10 +202,22 @@ TestOptionEnum <T> {
 	None,
 }
 
+TestGenericWithTypeSpecified <T: Clone> {
+	@x: T;
+	@test_clone(clonable: T) -> T {
+		let y = clonable.clone();
+		x
+	}
+
+	@mut test_super_clone<X:SuperClone>(v: X) {
+		@x = v.clone();
+	}
+}
+
 // '?' and '!' syntax
 TestReturns {
-	x: u32;
-	y: u64;
+	@x: u32;
+	@y: u64;
 
 	fn1(x: u32) -> TestReturnEnum<u32, MyError> {
 		if(x>100)

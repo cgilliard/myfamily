@@ -17,22 +17,65 @@
 
 #include <lexer/lexer.h>
 
-typedef struct ParserType {
+typedef enum ParserStatementType {
+	ParserStatementTypeNative = 0,
+	ParserStatementTypeExpression = 1,
+} ParserStatementType;
 
-} ParserType;
+typedef struct ParserStatement {
+	ParserStatementType type;
+	void *data;
+} ParserStatement;
 
 typedef struct ParserExpression {
 
 } ParserExpression;
 
-typedef struct ParserStatement {
+typedef struct ParserArgumentList {
+	ParserExpression *list;
+	int count;
+} ParserArgumentList;
 
-} ParserStatement;
+typedef struct ParserStatementNativeData {
+	char *fn_name;
+	ParserArgumentList arg_list;
+} ParserStatementNativeData;
+
+typedef struct ParserStatementExpressionData {
+
+} ParserStatementExpressionData;
+
+typedef struct ParserStatementBlock {
+	ParserStatement *stmts;
+	int count;
+} ParserStatementBlock;
+
+typedef enum ParserVisibility {
+	ParserVisibilityPub = 0,
+	ParserVisibilityMod = 1,
+	ParserVisibilityPriv = 2,
+} ParserVisibility;
+
+typedef enum ParserTypeType {
+	ParserTypeStandard = 0,
+	ParserTypeSizedArray = 1,
+	ParserTypeDynamicArray = 2,
+	ParserTypeTuple = 3,
+	ParserTypeRef = 4,
+	ParserTypeClosure = 5,
+	ParserTypeUnit = 6,
+} ParserTypeType;
+
+typedef struct ParserType {
+	char *name;
+	ParserTypeType type;
+	void *data;
+} ParserType;
 
 typedef struct ParserGeneric {
-	char *param_name;
-	int param_type_count;
-	char **param_types;
+	char *name;
+	ParserType **param_types;
+	int count;
 } ParserGeneric;
 
 typedef struct ParserGenericList {
@@ -40,18 +83,63 @@ typedef struct ParserGenericList {
 	int count;
 } ParserGenericList;
 
-typedef struct ParserFunction {
+typedef struct ParserTypeStandardData {
+	ParserGenericList list;
+} ParserTypeStandardData;
+
+typedef struct ParserTypeSizedArrayData {
+	ParserType type;
+	int len;
+} ParserTypeSizedArrayData;
+
+typedef struct ParserTypeDynamicArrayData {
+	ParserType type;
+} ParserTypeDynamicArrayData;
+
+typedef struct ParserTypeTupleData {
+	ParserType *types;
+	int count;
+} ParserTypeTupleData;
+
+typedef struct ParserTypeRefData {
+	ParserType type;
+} ParserTypeRefData;
+
+typedef struct ParserTypeClosureData {
+	ParserType *param_list;
+	int count;
+	ParserType return_type;
+} ParserTypeClosureData;
+
+typedef struct ParserParam {
 	char *name;
-	char *return_type;
+	ParserType type;
+} ParserParam;
+
+typedef struct ParserParamList {
+	ParserParam *list;
+	int count;
+} ParserParamList;
+
+typedef struct ParserFunction {
+	ParserVisibility visibility;
+	bool is_static;
+	char *name;
+	ParserType return_type;
+	ParserParamList param_list;
+	ParserStatementBlock block;
 } ParserFunction;
 
 typedef struct ParserField {
+	ParserVisibility visibility;
+	bool is_static;
 	char *name;
-	char *type;
+	ParserType type;
 } ParserField;
 
 typedef struct ParserImport {
 	char *name;
+	char *import_path;
 } ParserImport;
 
 typedef struct ParserImportList {
@@ -59,28 +147,53 @@ typedef struct ParserImportList {
 	int count;
 } ParserImportList;
 
-typedef struct ParserClass {
+typedef struct ParserEnumVariant {
 	char *name;
 	ParserImportList imports;
 	ParserFunction *functions;
 	int function_count;
 	ParserField *fields;
 	int field_count;
-} ParserClass;
+} ParserEnumVariant;
+
+typedef struct ParserEnum {
+	ParserVisibility visibility;
+	struct ParserEnum *complete_list;
+	int complete_count;
+	ParserEnumVariant *variants;
+	int variant_count;
+} ParserEnum;
+
+typedef struct ParserModule {
+	ParserVisibility visibility;
+	ParserEnum *enums;
+	int enum_count;
+	struct ParserModule *sub_modules;
+	int sub_module_count;
+} ParserModule;
+
+typedef struct ParserModuleList {
+	char *name;
+	ParserModule *list;
+	int count;
+} ParserModuleList;
 
 typedef struct ParserPackage {
-	ParserClass *classes;
-	int class_count;
-	struct ParserPackage *sub_packages;
-	int sub_package_count;
+	char *name;
+	char *version;
+	char **authors;
+	int author_count;
+	char *description;
+	char **keywords;
+	int keyword_count;
+	bool is_lib;
+	ParserModule root;
+	ParserModuleList dependencies;
+	ParserModuleList test_dependencies;
 } ParserPackage;
 
-typedef struct SyntaxTree {
-	ParserPackage root;
-} SyntaxTree;
-
-int parser_parse_file(ParserPackage *pkg, char *file);
-int parser_pkg_init(ParserPackage *pkg);
+int parser_parse_project(ParserPackage *pkg, char *dir);
+void parser_pkg_init(ParserPackage *pkg);
 void parser_pkg_cleanup(ParserPackage *pkg);
 
 #endif // _COMPILER_PARSER__

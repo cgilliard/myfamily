@@ -12,15 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <compiler/parser.h>
-#include <core/test.h>
-
-MySuite(compiler);
-
-MyTest(compiler, test_compiler_basic) {
-	ParserPackage root1;
-	parser_pkg_init(&root1);
-	parser_parse_project(&root1, "./resources/test1");
-
-	parser_pkg_cleanup(&root1);
-}
+mod misc;

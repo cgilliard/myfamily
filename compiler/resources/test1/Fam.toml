@@ -1,0 +1,16 @@
+# Package details
+[package]
+	name = "myfamily"
+	version = "0.0.1-beta.1"
+	authors = ["The MyFamily Developers"]
+	description = "My Family core libraries"
+	keywords = ["Jesus", "Bible", "Family", "Crypto"]
+	# if true, build as a library (dll/so/dylib)
+	# if false, build as binary (<name> on linux/mac and <name>.exe on win)
+	lib = false
+
+[dependencies]
+	fam_core = { path = "./core" }
+	fam_util = { path = "./util" }
+
+[test-dependencies]

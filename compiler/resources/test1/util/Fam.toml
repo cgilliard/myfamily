@@ -1,0 +1,10 @@
+# Package details
+[package]
+	name = "fam_util"
+	version = "0.0.1-beta.1"
+	authors = ["The MyFamily Developers"]
+	description = "util - My Family core libraries"
+	keywords = ["Jesus", "Bible", "Family", "Crypto"]
+
+[dependencies]
+
