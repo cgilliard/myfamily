@@ -1,0 +1,23 @@
+# Package details
+[package]
+	name = "myfamily"
+	version = "0.0.1-beta.1"
+	authors = ["The MyFamily Developers"]
+	description = "My Family core libraries"
+	keywords = ["Jesus", "Bible", "Family", "Crypto"]
+	# This is the path to the main class. It must contain either main() or main(argc: i32, argv: [][u8]
+	main = "main.Main"
+	
+
+[dependencies]
+	main = { path = "./main" }
+	core = { path = "./core" }
+	foo  = { git = "https://github.com/cgilliard/myregex.git", branch = "next" }
+	bar  = { git = "https://github.com/cgilliard/myargs.git", tag = "0.0.2" }
+	baz  = { git = "https://github.com/cgilliard/myhttp.git", rev = "ffbe9254ee93f027d5e09b43acee8bf4b5a1dfa7" }
+	baz2 = { git = "https://github.com/cgilliard/mystuff.git", rev = "refs/pull/123/head" }
+
+
+[test-dependencies]
+	testlib = { path = "./test" }
+	testfoo = { git = "https://github.com/cgilliard/mytest.git" }

@@ -88,8 +88,8 @@ UseEnumTest2 {
 	pub test() {
 		let v1 = EnumTest2::V1::build(-1, 100);
 		let v2 = EnumTest2::V2::build(1, 1);
-		v1.say_hello();
-		v2.say_hello();
+		v1.say_hello(1);
+		v2.say_hello(2);
 	}
 }
 
@@ -104,6 +104,10 @@ pub MyClass {
 	// thread panic. The user is responsible for allocating/deallocating memory with these types.
 	ptr: [u8];
 	arr: [u32; 10];
+	// 2d
+	ptr2: [][EnumTest2];
+	// 3d
+	ptr3: [][][u32];
 
 	// Slices are allowed in function calls, but not as fields in classes. They cannot be returned from functions
 	// as no references can. Also this function has the default visibility which is pub(package).
@@ -261,9 +265,9 @@ TestReturns {
 }
 
 /// This is a doc comment for the below class
-#[custom_proc]
+#[custom_proc] // proc macros
 DocClass {
-	#[custom_proc(multiple => tokens)]
+	#[custom_proc(multiple => tokens)] // proc macro with tokens specified
 	fn1() -> TestReturnEnum<$, MyError> {
 		TestReturnEnum::Ok($)
 	}
