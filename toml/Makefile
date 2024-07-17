@@ -1,4 +1,4 @@
 OBJS := toml.o
-TEST_OBJS := $(OBJS) ../core/*.o
+TEST_OBJS := $(OBJS)
 
 include ../Makefile.template

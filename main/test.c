@@ -12,8 +12,3 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/test.h>
-
-MySuite(main);
-
-MyTest(main, test_main_basic) {}

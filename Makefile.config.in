@@ -6,6 +6,8 @@ CRITERION_LIB=-LREPLACE_CRITERION_LIB
 CC_TEST_FLAGS=-g -Wno-format -Wno-attributes -Wno-ignored-attributes -lcriterion -I.. $(CRITERION_INCLUDE) $(CRITERION_LIB) $(COVERAGE)
 MAKE=make
 INSTALL_DIR=/usr/local/bin
-ALL_OBJS=main/*.o lexer/*.o core/*.o args/*.o bible/*.o compiler/*.o toml/*.o
-SUBDIRS := main args bible toml
-HEADERS := $(wildcard main/*.h) $(wildcard lexer/*.h) $(wildcard core/*.h) $(wildcard args/*.h) $(wildcard bible/*.h) $(wildcard complier/*.h) $(wildcard toml/*.h)
+ALL_OBJS=main/*.o toml/*.o core/*.o
+SUBDIRS := main toml core
+HEADERS := $(wildcard main/*.h) \
+	   $(wildcard toml/*.h) \
+	   $(wildcard core/*.h) \
