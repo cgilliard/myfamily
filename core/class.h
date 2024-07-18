@@ -76,8 +76,8 @@ void vtable_cleanup(Vtable *table);
 #define FNPTR(name) name;
 #define FIELD(field_type, field_name) field_type CAT(_, field_name);
 
-#define GET(type, obj, field_name) *type##_get_##field_name(&obj)
-#define SET(type, obj, field_name, value) type##_set_##field_name(&obj, value)
+#define GET(type, obj, field_name) *type##_get_##field_name(obj)
+#define SET(type, obj, field_name, value) type##_set_##field_name(obj, value)
 
 #define GETTER(name, field_name)                                               \
 	MEMBER_TYPE(name, CAT(_, field_name)) *                                \

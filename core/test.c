@@ -31,11 +31,12 @@ SETTER(MyTestClass, testf);
 
 MyTest(core, test_class) {
 	MyTestClass c1 = BUILD(MyTestClass, 8);
-	u32 out = GET(MyTestClass, c1, testf);
+	u32 out = GET(MyTestClass, &c1, testf);
 	assert_eq(out, 8);
-	SET(MyTestClass, c1, testf, 9);
-	out = GET(MyTestClass, c1, testf);
+	SET(MyTestClass, &c1, testf, 9);
+	out = GET(MyTestClass, &c1, testf);
 	assert_eq(out, 9);
+	return Ok(UNIT);
 }
 
 MyTest(core, test_tuple) {
@@ -52,8 +53,9 @@ MyTest(core, test_tuple) {
 	assert_eq(vu16_out, 20);
 	MyTestClass c1_out;
 	ELEMENT_AT(&tuple, 2, &c1_out);
-	u32 out = GET(MyTestClass, c1_out, testf);
+	u32 out = GET(MyTestClass, &c1_out, testf);
 	assert_eq(out, 8);
+	return Ok(UNIT);
 }
 
 ENUM(MyEnum, VARIANTS(TYPE_U32, TYPE_U64), TYPES("u32", "u64"))
@@ -75,6 +77,7 @@ MyTest(core, test_enum) {
 	      }));
 
 	assert_eq(ret, 149);
+	return Ok(UNIT);
 }
 
 static ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
@@ -140,6 +143,7 @@ MyTest(core, test_result) {
 	assert(is_err);
 	Error err7 = UNWRAP_ERR(r7);
 	assert(equal(KIND(err7), &ILLEGAL_ARGUMENT));
+	return Ok(UNIT);
 }
 
 Result test_try2(u64 x) {
@@ -187,6 +191,7 @@ MyTest(core, test_try_expect) {
 	U64 u_out = UNWRAP(r6, U64);
 	u64 u_out_unwrap = *(u64 *)unwrap(&u_out);
 	assert_eq(u_out_unwrap, 1001);
+	return Ok(UNIT);
 }
 
 CLASS(TestCleanup, FIELD(void *, ptr))
@@ -195,10 +200,10 @@ GETTER(TestCleanup, ptr)
 SETTER(TestCleanup, ptr)
 
 void TestCleanup_cleanup(TestCleanup *tc) {
-	void *p = GET(TestCleanup, *tc, ptr);
+	void *p = GET(TestCleanup, tc, ptr);
 	if (p != NULL) {
 		myfree(p);
-		SET(TestCleanup, *tc, ptr, NULL);
+		SET(TestCleanup, tc, ptr, NULL);
 	}
 }
 
@@ -218,4 +223,5 @@ MyTest(core, test_cleanup) {
 
 	Result r3 = ret_test_cleanup();
 	TestCleanup tc3_out = UNWRAP(r3, TestCleanup);
+	return Ok(UNIT);
 }

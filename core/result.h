@@ -206,7 +206,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error");          \
 			 RcPtr rc = *(Rc *)x.value;                            \
-			 SET(Rc, rc, flags, RC_FLAGS_NO_CLEANUP);              \
+			 SET(Rc, &rc, flags, RC_FLAGS_NO_CLEANUP);             \
 			 void *ptr = unwrap(&rc);                              \
 			 memcpy(&v, ptr, size(ptr));                           \
 			 x.no_cleanup = true;                                  \

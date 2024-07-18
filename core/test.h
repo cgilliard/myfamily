@@ -14,10 +14,15 @@
 
 #include <core/colors.h>
 #include <core/resources.h>
+#include <core/result.h>
 #include <criterion/criterion.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <unistd.h>
+
+#define assert(value) cr_assert(value)
+#define assert_eq(v1, v2) cr_assert_eq(v1, v2)
+#define assert_eq_str(s1, s2) cr_assert(!strcmp(s1, s2))
 
 #define MySuite(name)                                                          \
 	void setup_suite(void) {                                               \
@@ -87,12 +92,10 @@
 			log_fd = -1;                                           \
 		}                                                              \
 	}                                                                      \
-	void test_##suite##_##test();                                          \
+	Result test_##suite##_##test();                                        \
 	Test(suite, test, .init = setup_##test, .fini = tear_down) {           \
-		test_##suite##_##test();                                       \
+		Result r = test_##suite##_##test();                            \
+		assert(IS_OK(r));                                              \
 	}                                                                      \
-	void test_##suite##_##test()
+	Result test_##suite##_##test()
 
-#define assert(value) cr_assert(value)
-#define assert_eq(v1, v2) cr_assert_eq(v1, v2)
-#define assert_eq_str(s1, s2) cr_assert(!strcmp(s1, s2))
