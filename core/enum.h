@@ -51,8 +51,6 @@ DEFINE_ENUM_VALUE(f, 64)
 bool enum_value_bool(void *value);
 usize enum_value_usize(void *value);
 
-#define ENUM_VALUE_RC_RAW(ret, e) e.value
-
 #define ENUM_VALUE(ret, type, e)                                               \
 	_Generic((ret),                                                        \
 	    u8: enum_value_u8(e.value),                                        \

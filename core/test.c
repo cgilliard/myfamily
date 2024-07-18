@@ -19,6 +19,7 @@
 #include <core/result.h>
 #include <core/test.h>
 #include <core/tuple.h>
+#include <core/unit.h>
 
 MySuite(core);
 
@@ -76,6 +77,19 @@ MyTest(core, test_enum) {
 	assert_eq(ret, 149);
 }
 
+static ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
+static ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
+
+Result test_fn(u64 x) {
+	if (x < 100) {
+		Error err = ERROR(ILLEGAL_ARGUMENT, "test");
+		return Err(err);
+	} else {
+		u64 y = 1234;
+		return Ok(y);
+	}
+}
+
 MyTest(core, test_result) {
 	I64 v = BUILD(I64, 10);
 	Result r = Ok(v);
@@ -83,11 +97,10 @@ MyTest(core, test_result) {
 	MATCH(r, VARIANT(Ok, { is_ok = true; }));
 	assert(is_ok);
 
-	ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
 	Error err = ERROR(ILLEGAL_ARGUMENT, "test");
 	Result r2 = Err(err);
 	MATCH(r2, VARIANT(Err, {
-		      Error e2 = ENUM_VALUE(e2, Error, r2);
+		      Error e2 = UNWRAP_ERR(r2);
 		      assert(equal(KIND(e2), &ILLEGAL_ARGUMENT));
 		      is_ok = false;
 	      }));
@@ -104,7 +117,7 @@ MyTest(core, test_result) {
 	bool confirm = false;
 
 	MATCH(r4, VARIANT(Ok, {
-		      u16 v4_out = UNWRAP(r4, v4_out);
+		      u16 v4_out = UNWRAP_IMPL(r4, v4_out);
 		      assert_eq(v4_out, 101);
 		      confirm = true;
 	      }) VARIANT(Err, { confirm = false; }));
@@ -113,7 +126,96 @@ MyTest(core, test_result) {
 
 	U128 v128 = BUILD(U128, 1234);
 	Result r5 = Ok(v128);
-	U128 v128_out = UNWRAP(r5, v128_out);
+	U128 v128_out = UNWRAP_IMPL(r5, v128_out);
 	u128 v128_out_unwrap = *(u128 *)unwrap(&v128_out);
 	assert_eq(v128_out_unwrap, 1234);
+
+	Result r6 = test_fn(200);
+	u64 v6 = UNWRAP_IMPL(r6, v6);
+	assert_eq(v6, 1234);
+
+	Result r7 = test_fn(1);
+	bool is_err = false;
+	MATCH(r7, VARIANT(Err, { is_err = true; }));
+	assert(is_err);
+	Error err7 = UNWRAP_ERR(r7);
+	assert(equal(KIND(err7), &ILLEGAL_ARGUMENT));
+}
+
+Result test_try2(u64 x) {
+	if (x < 50) {
+		Error e = ERROR(ILLEGAL_STATE, "test_try2");
+		return Err(e);
+	}
+	return Ok(x);
+}
+
+Result test_try(u64 x) {
+	Result r = test_try2(x);
+	u64 y = TRY(r, y);
+	if (x < 100) {
+		Error e = ERROR(ILLEGAL_ARGUMENT, "test_try");
+		return Err(e);
+	}
+	return Ok(y);
+}
+
+MyTest(core, test_try_expect) {
+	Result r1 = test_try(200);
+	assert(IS_OK(r1));
+
+	Result r2 = test_try(90);
+	assert(IS_ERR(r2));
+	Error e2 = UNWRAP_ERR(r2);
+	assert(equal(KIND(e2), &ILLEGAL_ARGUMENT));
+
+	Result r3 = test_try(9);
+	assert(IS_ERR(r3));
+	Error e3 = UNWRAP_ERR(r3);
+	assert(equal(KIND(e3), &ILLEGAL_STATE));
+
+	Result r4 = test_try(200);
+	u64 v4 = EXPECT(r4, v4);
+	assert_eq(v4, 200);
+
+	u16 v5 = 10;
+	Result r5 = Ok(v5);
+	u16 v5_out = UNWRAP_IMPL(r5, v5_out);
+
+	U64Ptr u = BUILD(U64, 1001);
+	Result r6 = Ok(u);
+	U64 u_out = UNWRAP(r6, U64);
+	u64 u_out_unwrap = *(u64 *)unwrap(&u_out);
+	assert_eq(u_out_unwrap, 1001);
+}
+
+CLASS(TestCleanup, FIELD(void *, ptr))
+#define TestCleanup DEFINE_CLASS(TestCleanup)
+GETTER(TestCleanup, ptr)
+SETTER(TestCleanup, ptr)
+
+void TestCleanup_cleanup(TestCleanup *tc) {
+	void *p = GET(TestCleanup, *tc, ptr);
+	if (p != NULL) {
+		myfree(p);
+		SET(TestCleanup, *tc, ptr, NULL);
+	}
+}
+
+Result ret_test_cleanup() {
+	void *ptr = mymalloc(1);
+	TestCleanupPtr tc = BUILD(TestCleanup, ptr);
+	return Ok(tc);
+}
+
+MyTest(core, test_cleanup) {
+	void *ptr = mymalloc(1);
+	TestCleanupPtr tc = BUILD(TestCleanup, ptr);
+	Result r1 = Ok(tc);
+	TestCleanup tc_out = UNWRAP(r1, TestCleanup);
+
+	Result r2 = ret_test_cleanup();
+
+	Result r3 = ret_test_cleanup();
+	TestCleanup tc3_out = UNWRAP(r3, TestCleanup);
 }

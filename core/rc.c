@@ -22,11 +22,13 @@ SETTER(Rc, ref)
 void Rc_cleanup(Rc *obj) {
 	u64 *count = *Rc_get_count(obj);
 	void *ref = *Rc_get_ref(obj);
+	u8 flags = *Rc_get_flags(obj);
 	if (count) {
 		*count -= 1;
 
 		if (*count == 0) {
-			cleanup(ref);
+			if ((flags & RC_FLAGS_NO_CLEANUP) == 0)
+				cleanup(ref);
 			myfree(ref);
 			myfree(count);
 			count = NULL;

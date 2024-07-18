@@ -133,12 +133,16 @@ void *Tuple_add_value(void *value) {
 		      "be used to wrap other types");
 	}
 	void *ret = mymalloc(size(value));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	copy(ret, value);
 	return ret;
 }
 
 void *Tuple_add_value_i128(void *value) {
 	I128Ptr *ret = mymalloc(sizeof(I128));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, I128);
 	ret->_value = *(i128 *)value;
 	return (void *)ret;
@@ -146,6 +150,8 @@ void *Tuple_add_value_i128(void *value) {
 
 void *Tuple_add_value_i64(void *value) {
 	I64Ptr *ret = mymalloc(sizeof(I64));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, I64);
 	ret->_value = *(i64 *)value;
 	return (void *)ret;
@@ -153,6 +159,8 @@ void *Tuple_add_value_i64(void *value) {
 
 void *Tuple_add_value_i32(void *value) {
 	I32Ptr *ret = mymalloc(sizeof(I32));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, I32);
 	ret->_value = *(i32 *)value;
 	return (void *)ret;
@@ -160,6 +168,8 @@ void *Tuple_add_value_i32(void *value) {
 
 void *Tuple_add_value_i16(void *value) {
 	I16Ptr *ret = mymalloc(sizeof(I16));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, I16);
 	ret->_value = *(i16 *)value;
 	return (void *)ret;
@@ -167,6 +177,8 @@ void *Tuple_add_value_i16(void *value) {
 
 void *Tuple_add_value_i8(void *value) {
 	I8Ptr *ret = mymalloc(sizeof(I8));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, I8);
 	ret->_value = *(i8 *)value;
 	return (void *)ret;
@@ -174,6 +186,8 @@ void *Tuple_add_value_i8(void *value) {
 
 void *Tuple_add_value_usize(void *value) {
 	USizePtr *ret = mymalloc(sizeof(USize));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, USize);
 	ret->_value = *(usize *)value;
 	return (void *)ret;
@@ -181,6 +195,8 @@ void *Tuple_add_value_usize(void *value) {
 
 void *Tuple_add_value_u128(void *value) {
 	U128Ptr *ret = mymalloc(sizeof(U128));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, U128);
 	ret->_value = *(u128 *)value;
 	return (void *)ret;
@@ -188,6 +204,8 @@ void *Tuple_add_value_u128(void *value) {
 
 void *Tuple_add_value_u64(void *value) {
 	U64Ptr *ret = mymalloc(sizeof(U64));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, U64);
 	ret->_value = *(u64 *)value;
 	return (void *)ret;
@@ -195,6 +213,8 @@ void *Tuple_add_value_u64(void *value) {
 
 void *Tuple_add_value_u32(void *value) {
 	U32Ptr *ret = mymalloc(sizeof(U32));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, U32);
 	ret->_value = *(u32 *)value;
 	return (void *)ret;
@@ -202,6 +222,8 @@ void *Tuple_add_value_u32(void *value) {
 
 void *Tuple_add_value_u16(void *value) {
 	U16Ptr *ret = mymalloc(sizeof(U16));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, U16);
 	ret->_value = *(u16 *)value;
 	return (void *)ret;
@@ -209,6 +231,8 @@ void *Tuple_add_value_u16(void *value) {
 
 void *Tuple_add_value_u8(void *value) {
 	U8Ptr *ret = mymalloc(sizeof(U8));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, U8);
 	ret->_value = *(u8 *)value;
 	return (void *)ret;
@@ -216,6 +240,8 @@ void *Tuple_add_value_u8(void *value) {
 
 void *Tuple_add_value_bool(void *value) {
 	BoolPtr *ret = mymalloc(sizeof(Bool));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, Bool);
 	ret->_value = *(bool *)value;
 	return (void *)ret;
@@ -223,6 +249,8 @@ void *Tuple_add_value_bool(void *value) {
 
 void *Tuple_add_value_f64(void *value) {
 	F64Ptr *ret = mymalloc(sizeof(F64));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, F64);
 	ret->_value = *(f64 *)value;
 	return (void *)ret;
@@ -230,6 +258,8 @@ void *Tuple_add_value_f64(void *value) {
 
 void *Tuple_add_value_f32(void *value) {
 	F32Ptr *ret = mymalloc(sizeof(F32));
+	if (!ret)
+		panic("Could not allocate sufficient memory");
 	BUILDPTR(ret, F32);
 	ret->_value = *(f32 *)value;
 	return (void *)ret;

@@ -15,6 +15,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
+#define STRINGIFY(x) #x
 #define EXPAND(x) x
 #define CATI(x, y) x##y
 #define CAT(x, y) CATI(x, y)
