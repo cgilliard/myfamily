@@ -128,11 +128,13 @@ void vtable_cleanup(Vtable *table);
 	} name##Ptr;                                                           \
 	static Vtable name##Ptr_Vtable__ = {0, UNIQUE_ID, NULL};               \
 	static void name##_cleanup(name##Ptr *obj);                            \
+	static usize name##_size(name##Ptr *obj) { return sizeof(name##Ptr); } \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
-		char *str;                                                     \
 		VtableEntry next = {"cleanup", name##_cleanup};                \
 		vtable_add_entry(&name##Ptr_Vtable__, next);                   \
+		VtableEntry next2 = {"size", name##_size};                     \
+		vtable_add_entry(&name##Ptr_Vtable__, next2);                  \
 	}
 
 #define IMPL(name, trait) EXPAND(trait(name))

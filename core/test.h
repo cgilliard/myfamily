@@ -98,4 +98,3 @@
 		assert(IS_OK(r));                                              \
 	}                                                                      \
 	Result test_##suite##_##test()
-

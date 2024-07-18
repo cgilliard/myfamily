@@ -15,6 +15,7 @@
 #include <core/class.h>
 #include <core/enum.h>
 #include <core/error.h>
+#include <core/option.h>
 #include <core/rc.h>
 #include <core/result.h>
 #include <core/test.h>
@@ -120,7 +121,7 @@ MyTest(core, test_result) {
 	bool confirm = false;
 
 	MATCH(r4, VARIANT(Ok, {
-		      u16 v4_out = UNWRAP_IMPL(r4, v4_out);
+		      u16 v4_out = UNWRAP_PRIM(r4, v4_out);
 		      assert_eq(v4_out, 101);
 		      confirm = true;
 	      }) VARIANT(Err, { confirm = false; }));
@@ -129,12 +130,12 @@ MyTest(core, test_result) {
 
 	U128 v128 = BUILD(U128, 1234);
 	Result r5 = Ok(v128);
-	U128 v128_out = UNWRAP_IMPL(r5, v128_out);
+	U128 v128_out = UNWRAP_PRIM(r5, v128_out);
 	u128 v128_out_unwrap = *(u128 *)unwrap(&v128_out);
 	assert_eq(v128_out_unwrap, 1234);
 
 	Result r6 = test_fn(200);
-	u64 v6 = UNWRAP_IMPL(r6, v6);
+	u64 v6 = UNWRAP_PRIM(r6, v6);
 	assert_eq(v6, 1234);
 
 	Result r7 = test_fn(1);
@@ -184,7 +185,7 @@ MyTest(core, test_try_expect) {
 
 	u16 v5 = 10;
 	Result r5 = Ok(v5);
-	u16 v5_out = UNWRAP_IMPL(r5, v5_out);
+	u16 v5_out = UNWRAP_PRIM(r5, v5_out);
 
 	U64Ptr u = BUILD(U64, 1001);
 	Result r6 = Ok(u);
@@ -223,5 +224,44 @@ MyTest(core, test_cleanup) {
 
 	Result r3 = ret_test_cleanup();
 	TestCleanup tc3_out = UNWRAP(r3, TestCleanup);
+	return Ok(UNIT);
+}
+
+MyTest(core, test_option) {
+	u64 v1 = 10;
+	Option opt1 = Some(v1);
+	assert(IS_SOME(opt1));
+	bool is_some = false;
+
+	MATCH(opt1, VARIANT(SOME, { is_some = true; })
+			VARIANT(NONE, { is_some = false; }));
+	assert(is_some);
+
+	u64 v1_out = UNWRAP_PRIM(opt1, v1_out);
+	assert_eq(v1_out, 10);
+
+	Option opt2 = None;
+	assert(IS_NONE(opt2));
+
+	return Ok(UNIT);
+}
+
+MyTest(core, test_complex) {
+	u32 x1 = 123;
+	ResultPtr x2 = Ok(x1);
+	ResultPtr x3 = Ok(x2);
+	ResultPtr x4 = Ok(x3);
+	OptionPtr x5 = Some(x4);
+	OptionPtr x6 = Some(x5);
+	Result x7 = Ok(x6);
+
+	Option x6_out = UNWRAP(x7, Option);
+	Option x5_out = UNWRAP(x6_out, Option);
+	Result x4_out = UNWRAP(x5_out, Result);
+	Result x3_out = UNWRAP(x4_out, Result);
+	Result x2_out = UNWRAP(x3_out, Result);
+	u32 x1_out = UNWRAP_PRIM(x2_out, x1_out);
+	assert_eq(x1_out, 123);
+
 	return Ok(UNIT);
 }
