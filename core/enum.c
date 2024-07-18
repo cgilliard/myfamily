@@ -53,7 +53,7 @@ usize enum_value_usize(void *value) {
 		if (strcmp(type_str, type_compare)) {                          \
 			panic("Attempt to build an enum with the "             \
 			      "wrong value. Expected [%s], Found [%s]",        \
-			      type_compare, type_str);                         \
+			      type_str, type_compare);                         \
 		}                                                              \
 		void *value = mymalloc(sizeof(sign##bits));                    \
 		if (value == NULL) {                                           \
@@ -80,7 +80,7 @@ void *build_enum_value_bool(bool *v, char *type_str) {
 	if (strcmp(type_str, "bool")) {
 		panic("Attempt to build an enum with the "
 		      "wrong value. Expected [%s], Found [%s]",
-		      "bool", type_str);
+		      type_str, "bool");
 	}
 	void *value = mymalloc(sizeof(bool));
 	if (value == NULL) {
@@ -94,7 +94,7 @@ void *build_enum_value_usize(usize *v, char *type_str) {
 	if (strcmp(type_str, "usize")) {
 		panic("Attempt to build an enum with the "
 		      "wrong value. Expected [%s], Found [%s]",
-		      "usize", type_str);
+		      type_str, "usize");
 	}
 	void *value = mymalloc(sizeof(usize));
 	if (value == NULL) {

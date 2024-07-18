@@ -14,7 +14,9 @@
 
 #include <core/class.h>
 #include <core/enum.h>
+#include <core/error.h>
 #include <core/rc.h>
+#include <core/result.h>
 #include <core/test.h>
 #include <core/tuple.h>
 
@@ -72,4 +74,46 @@ MyTest(core, test_enum) {
 	      }));
 
 	assert_eq(ret, 149);
+}
+
+MyTest(core, test_result) {
+	I64 v = BUILD(I64, 10);
+	Result r = Ok(v);
+	bool is_ok = false;
+	MATCH(r, VARIANT(Ok, { is_ok = true; }));
+	assert(is_ok);
+
+	ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
+	Error err = ERROR(ILLEGAL_ARGUMENT, "test");
+	Result r2 = Err(err);
+	MATCH(r2, VARIANT(Err, {
+		      Error e2 = ENUM_VALUE(e2, Error, r2);
+		      assert(equal(KIND(e2), &ILLEGAL_ARGUMENT));
+		      is_ok = false;
+	      }));
+	assert(!is_ok);
+
+	I32 v2 = BUILD(I32, 1);
+	Result r3 = Ok(v2);
+	MATCH(r3, VARIANT(Ok, { is_ok = true; }));
+	assert(is_ok);
+
+	u16 v4 = 101;
+	Result r4 = Ok(v4);
+
+	bool confirm = false;
+
+	MATCH(r4, VARIANT(Ok, {
+		      u16 v4_out = UNWRAP(r4, v4_out);
+		      assert_eq(v4_out, 101);
+		      confirm = true;
+	      }) VARIANT(Err, { confirm = false; }));
+
+	assert(confirm);
+
+	U128 v128 = BUILD(U128, 1234);
+	Result r5 = Ok(v128);
+	U128 v128_out = UNWRAP(r5, v128_out);
+	u128 v128_out_unwrap = *(u128 *)unwrap(&v128_out);
+	assert_eq(v128_out_unwrap, 1234);
 }

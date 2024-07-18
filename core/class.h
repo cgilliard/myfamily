@@ -131,8 +131,7 @@ void vtable_cleanup(Vtable *table);
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
 		char *str;                                                     \
-		asprintf(&str, "cleanup");                                     \
-		VtableEntry next = {str, name##_cleanup};                      \
+		VtableEntry next = {"cleanup", name##_cleanup};                \
 		vtable_add_entry(&name##Ptr_Vtable__, next);                   \
 	}
 
