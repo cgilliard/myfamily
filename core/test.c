@@ -113,7 +113,7 @@ MyTest(core, test_enum) {
 Result test_fn(u64 x) {
 	if (x < 100) {
 		Error err = ERROR(ILLEGAL_ARGUMENT, "test");
-		return Err(err);
+		return Err2(err);
 	} else {
 		u64 y = 1234;
 		return Ok(y);
@@ -128,7 +128,7 @@ MyTest(core, test_result) {
 	assert(is_ok);
 
 	Error err = ERROR(ILLEGAL_ARGUMENT, "test");
-	Result r2 = Err(err);
+	Result r2 = Err2(err);
 	MATCH(r2, VARIANT(Err, {
 		      Error e2 = UNWRAP_ERR(r2);
 		      assert(equal(KIND(e2), &ILLEGAL_ARGUMENT));
@@ -176,7 +176,7 @@ MyTest(core, test_result) {
 Result test_try2(u64 x) {
 	if (x < 50) {
 		Error e = ERROR(ILLEGAL_STATE, "test_try2");
-		return Err(e);
+		return Err2(e);
 	}
 	return Ok(x);
 }
@@ -186,7 +186,7 @@ Result test_try(u64 x) {
 	u64 y = TRY(r, y);
 	if (x < 100) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "test_try");
-		return Err(e);
+		return Err2(e);
 	}
 	return Ok(y);
 }
@@ -407,6 +407,21 @@ MyTest(core, test_formatter) {
 	Result r7 = Formatter_to_string(&fmt);
 	String s7 = UNWRAP(r7, String);
 	assert_eq_str(unwrap(&s7), "value1: 123, value2: -1");
+
+	return Ok(UNIT);
+}
+
+ENUM(MyEnum3, VARIANTS(TYPE_USIZE, TYPE_U643, TYPE_BOOL3),
+     TYPES("usize", "u64", "bool"))
+#define MyEnum3 DEFINE_ENUM(MyEnum3)
+
+MyTest(core, test_alloc_error_result) {
+	Result rx2 = STATIC_ALLOC_RESULT;
+	Error err3 = UNWRAP_ERR(rx2);
+	assert(equal(KIND(err3), KIND(STATIC_ALLOC_ERROR)));
+
+	usize x1 = 505;
+	MyEnum3 my_enum = TRY_BUILD_ENUM(MyEnum3, TYPE_USIZE, x1);
 
 	return Ok(UNIT);
 }

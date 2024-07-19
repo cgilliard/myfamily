@@ -29,10 +29,18 @@ ENUM(Option, VARIANTS(SOME, NONE), TYPES("Rc", "Unit"))
 #define Some(x)                                                                \
 	({                                                                     \
 		Rc rc = HEAPIFY(x);                                            \
+		OptionPtr o = TRY_BUILD_ENUM(Option, SOME, rc);                \
+		o;                                                             \
+	})
+
+#define SomeP(x)                                                               \
+	({                                                                     \
+		Rc rc = HEAPIFY(x);                                            \
 		OptionPtr o = BUILD_ENUM(Option, SOME, rc);                    \
 		o;                                                             \
 	})
 
-#define None BUILD_ENUM(Option, NONE, UNIT)
+// special initialization of None to avoid the need to create multiple instances
+static Option None = {{&OptionPtr_Vtable__, "Option"}, NONE, &UNIT, true, true};
 
 #endif // _CORE_OPTION__

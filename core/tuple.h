@@ -44,21 +44,264 @@ void *Tuple_add_value_bool(void *value);
 
 #define CREATE_GENERIC(value)                                                  \
 	_Generic((value),                                                      \
-	    i128: Tuple_add_value_i128,                                        \
-	    i64: Tuple_add_value_i64,                                          \
-	    i32: Tuple_add_value_i32,                                          \
-	    i16: Tuple_add_value_i16,                                          \
-	    i8: Tuple_add_value_i8,                                            \
-	    u128: Tuple_add_value_u128,                                        \
-	    u64: Tuple_add_value_u64,                                          \
-	    u32: Tuple_add_value_u32,                                          \
-	    u16: Tuple_add_value_u16,                                          \
-	    u8: Tuple_add_value_u8,                                            \
-	    f64: Tuple_add_value_f64,                                          \
-	    f32: Tuple_add_value_f32,                                          \
-	    usize: Tuple_add_value_usize,                                      \
-	    bool: Tuple_add_value_bool,                                        \
-	    default: Tuple_add_value)(&value)
+	    i128: ({                                                           \
+			 void *_ptr__ = Tuple_add_value_i128(&value);          \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    i64: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_i64(&value);           \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    i32: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_i32(&value);           \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    i16: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_i16(&value);           \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    i8: ({                                                             \
+			 void *_ptr__ = Tuple_add_value_i8(&value);            \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    u128: ({                                                           \
+			 void *_ptr__ = Tuple_add_value_u128(&value);          \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    u64: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_u64(&value);           \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    u32: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_u32(&value);           \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    u16: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_u16(&value);           \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    u8: ({                                                             \
+			 void *_ptr__ = Tuple_add_value_u8(&value);            \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    f64: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_f64(&value);           \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    f32: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_f32(&value);           \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    usize: ({                                                          \
+			 void *_ptr__ = Tuple_add_value_usize(&value);         \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    bool: ({                                                           \
+			 void *_ptr__ = Tuple_add_value_bool(&value);          \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    default: ({                                                        \
+			 void *_ptr__ = Tuple_add_value(&value);               \
+			 if (!_ptr__) {                                        \
+				 Error _err__ = ERROR(                         \
+				     ALLOC_ERROR,                              \
+				     "Could not allocate sufficient memory");  \
+				 return Err(_err__);                           \
+			 }                                                     \
+			 _ptr__;                                               \
+		 }))
+
+#define CREATE_GENERICP(value)                                                 \
+	_Generic((value),                                                      \
+	    i128: ({                                                           \
+			 void *_ptr__ = Tuple_add_value_i128(&value);          \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    i64: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_i64(&value);           \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    i32: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_i32(&value);           \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    i16: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_i16(&value);           \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    i8: ({                                                             \
+			 void *_ptr__ = Tuple_add_value_i8(&value);            \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    u128: ({                                                           \
+			 void *_ptr__ = Tuple_add_value_u128(&value);          \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    u64: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_u64(&value);           \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    u32: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_u32(&value);           \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    u16: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_u16(&value);           \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    u8: ({                                                             \
+			 void *_ptr__ = Tuple_add_value_u8(&value);            \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    f64: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_f64(&value);           \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    f32: ({                                                            \
+			 void *_ptr__ = Tuple_add_value_f32(&value);           \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    usize: ({                                                          \
+			 void *_ptr__ = Tuple_add_value_usize(&value);         \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    bool: ({                                                           \
+			 void *_ptr__ = Tuple_add_value_bool(&value);          \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }),                                                           \
+	    default: ({                                                        \
+			 void *_ptr__ = Tuple_add_value(&value);               \
+			 if (!_ptr__)                                          \
+				 panic("Could not allocate "                   \
+				       "sufficient memory");                   \
+			 _ptr__;                                               \
+		 }))
 
 #define ELEMENT_AT(tuple, index, dst) Tuple_element_at(tuple, index, dst)
 
@@ -70,8 +313,8 @@ void *Tuple_add_value_bool(void *value);
 		void **elements = mymalloc(count * sizeof(void *));            \
 		if (!elements) {                                               \
 			Error __err12_ =                                       \
-			    ERROR(ALLOC_ERROR,                                 \
-				  "Could not allocate sufficient memory");     \
+			    ERROR(ALLOC_ERROR, "Could not allocate "           \
+					       "sufficient memory");           \
 			return Err(__err12_);                                  \
 		}                                                              \
 		for (u64 i = 0; i < count; ++i) {                              \
@@ -84,11 +327,12 @@ void *Tuple_add_value_bool(void *value);
 #define TUPLEP(...)                                                            \
 	({                                                                     \
 		void *values[] = {                                             \
-		    EXPAND(FOR_EACH(CREATE_GENERIC, __VA_ARGS__))};            \
+		    EXPAND(FOR_EACH(CREATE_GENERICP, __VA_ARGS__))};           \
 		u64 count = sizeof(values) / sizeof(values[0]);                \
 		void **elements = mymalloc(count * sizeof(void *));            \
 		if (!elements)                                                 \
-			panic("Could not allocate sufficient memory");         \
+			panic("Could not allocate sufficient "                 \
+			      "memory");                                       \
 		for (u64 i = 0; i < count; ++i) {                              \
 			elements[i] = values[i];                               \
 		}                                                              \

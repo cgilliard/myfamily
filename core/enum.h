@@ -97,7 +97,7 @@ usize enum_value_usize(void *value);
 			 } else if (!copy(&ret, e.value)) {                    \
 				 Error _err1__ = ERROR(                        \
 				     COPY_ERROR, "Could not copy object");     \
-				 return Err(_err1__);                          \
+				 return Err2(_err1__);                         \
 			 }                                                     \
 			 *(type *)&ret;                                        \
 		 }))
@@ -126,6 +126,8 @@ void *build_enum_value_bool(bool *v, char *type_str);
 void *build_enum_value_usize(usize *v, char *type_str);
 void *build_enum_value(void *v, char *type_str);
 
+// try to build the enum and return the static result which contains the error
+// we don't try to create a new error because it requires malloc.
 #define TRY_BUILD_ENUM(name, type, v)                                          \
 	_Generic(                                                              \
 	    (v),                                                               \
@@ -133,10 +135,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr = build_enum_value_usize((usize *)&v,            \
 						       name##_Arr__[type]);    \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -145,10 +144,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_bool((bool *)&v, name##_Arr__[type]); \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -157,10 +153,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_f64((f64 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -169,10 +162,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_f32((f32 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -181,10 +171,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_i128((i128 *)&v, name##_Arr__[type]); \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -193,10 +180,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_i64((i64 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -205,10 +189,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_i32((i32 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -217,10 +198,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_i16((i16 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -229,10 +207,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_i8((i8 *)&v, name##_Arr__[type]);     \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -241,10 +216,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_u128((u128 *)&v, name##_Arr__[type]); \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -253,10 +225,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_u64((u64 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -265,10 +234,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_u32((u32 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -277,10 +243,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_u16((u16 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -289,10 +252,7 @@ void *build_enum_value(void *v, char *type_str);
 		    void *ptr =                                                \
 			build_enum_value_u8((u8 *)&v, name##_Arr__[type]);     \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
@@ -300,10 +260,7 @@ void *build_enum_value(void *v, char *type_str);
 	    default: ({                                                        \
 		    void *ptr = build_enum_value(&v, name##_Arr__[type]);      \
 		    if (!ptr) {                                                \
-			    Error __err11_ =                                   \
-				ERROR(ALLOC_ERROR,                             \
-				      "Could not allocate sufficient memory"); \
-			    return Err(__err11_);                              \
+			    return STATIC_ALLOC_RESULT;                        \
 		    }                                                          \
 		    (name##Ptr){{&name##Ptr_Vtable__, #name},                  \
 				type,                                          \

@@ -31,9 +31,15 @@ bool ErrorKind_equal(ErrorKind *obj1, ErrorKind *obj2) {
 		       (char *)ErrorKind_get_kind(obj2));
 }
 
+#include <core/result.h>
+
 void Error_cleanup(ErrorPtr *obj) {
-	BacktracePtr *bt = Error_get_bt(obj);
-	cleanup(bt);
+	u64 flags = *Error_get_flags(obj);
+
+	if (!(flags && ERROR_NO_CLEANUP)) {
+		BacktracePtr *bt = Error_get_bt(obj);
+		cleanup(bt);
+	}
 }
 
 bool Error_clone(Error *dst, Error *src) {
@@ -62,7 +68,8 @@ void Error_print(Error *obj) {
 	u64 flags = *Error_get_flags(obj);
 
 	if ((flags & ERROR_PRINT_FLAG_NO_BACKTRACE) == 0) {
-		print(Error_get_bt(obj));
+		void *bt = Error_get_bt(obj);
+		print(bt);
 	}
 }
 bool Error_equal(Error *obj1, Error *obj2) {

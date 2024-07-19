@@ -59,6 +59,17 @@ IMPL(String, TRAIT_STRING_CORE)
 		Result _r88__ = String_char_at(s, index);                      \
 		if (IS_ERR(_r88__)) {                                          \
 			Error _err__ = UNWRAP_ERR(_r88__);                     \
+			return Err2(_err__);                                   \
+		}                                                              \
+		i8 _rr99__ = UNWRAP_PRIM(_r88__, _rr99__);                     \
+		_rr99__;                                                       \
+	})
+
+#define CHAR_ATP(s, index)                                                     \
+	({                                                                     \
+		Result _r88__ = String_char_at(s, index);                      \
+		if (IS_ERR(_r88__)) {                                          \
+			Error _err__ = UNWRAP_ERR(_r88__);                     \
 			return Err(_err__);                                    \
 		}                                                              \
 		i8 _rr99__ = UNWRAP_PRIM(_r88__, _rr99__);                     \

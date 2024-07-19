@@ -94,7 +94,13 @@
 	}                                                                      \
 	Result test_##suite##_##test();                                        \
 	Test(suite, test, .init = setup_##test, .fini = tear_down) {           \
+                                                                               \
 		Result r = test_##suite##_##test();                            \
+		if (IS_ERR(r)) {                                               \
+			printf("An error occurred in the test function:\n");   \
+			Error e = UNWRAP_ERR(r);                               \
+			print(&e);                                             \
+		}                                                              \
 		assert(IS_OK(r));                                              \
 	}                                                                      \
 	Result test_##suite##_##test()

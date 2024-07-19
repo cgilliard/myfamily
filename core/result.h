@@ -232,7 +232,17 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 v;                                                    \
 		 }))
 
+static Error STATIC_ALLOC_ERROR = {
+    {&ErrorPtr_Vtable__, "Error"},
+    {{&ErrorKindPtr_Vtable__, "ErrorKind"}, "AllocError"},
+    "Could not allocate sufficient memory",
+    {{&BacktracePtr_Vtable__, "Backtrace"}, NULL, 0},
+    ERROR_NO_CLEANUP};
+static Result STATIC_ALLOC_RESULT = {
+    {&ResultPtr_Vtable__, "Result"}, Err, &STATIC_ALLOC_ERROR, true, true};
+
 #define Err(e) BUILD_ENUM(Result, Err, e)
+#define Err2(e) TRY_BUILD_ENUM(Result, Err, e)
 
 #define UNWRAP_ERR(x)                                                          \
 	({                                                                     \
