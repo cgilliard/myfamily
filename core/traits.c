@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/traits.h>
 #include <core/traits_base.h>
 #include <core/unit.h>
+
+#include <core/traits.h>
 
 bool equal(void *obj1, void *obj2) {
 	if (((Object *)obj1)->vdata.vtable->id !=
@@ -97,7 +98,12 @@ void cleanup(void *ptr) {
 		do_cleanup(ptr);
 }
 
-/*
+u64 len(void *obj) {
+	u64 (*do_len)(Object *obj) = find_fn((Object *)obj, "len");
+	if (do_len == NULL)
+		panic("len not implemented for this type");
+	return do_len(obj);
+}
 
 Result append(void *dst, void *src) {
 	ResultPtr (*do_append)(Object *dst, Object *src) =
@@ -107,23 +113,7 @@ Result append(void *dst, void *src) {
 	return do_append(dst, src);
 }
 
-Result deep_copy(void *dst, void *src) {
-	ResultPtr (*do_deep_copy)(Object *dst, Object *src) =
-	    find_fn((Object *)src, "deep_copy");
-	if (do_deep_copy == NULL)
-		panic("append not implemented for this type");
-	((Object *)dst)->vdata.vtable = ((Object *)src)->vdata.vtable;
-	((Object *)dst)->vdata.name = ((Object *)src)->vdata.name;
-	return do_deep_copy(dst, src);
-}
-
-u64 len(void *obj) {
-	u64 (*do_len)(Object *obj) = find_fn((Object *)obj, "len");
-	if (do_len == NULL)
-		panic("len not implemented for this type");
-	return do_len(obj);
-}
-
+/*
 Result to_string(void *obj) { return to_string_buf(obj, TO_STRING_BUF_SIZE); }
 
 Result to_string_buf(void *obj, usize buf_size) {
@@ -139,7 +129,7 @@ Result to_string_buf(void *obj, usize buf_size) {
 	Formatter fmt = BUILD(Formatter, buf, buf_size, 0);
 
 	Result r = do_fmt(obj, &fmt);
-	Try(Unit, r);
+	TRY(Unit, r);
 
 	return Formatter_to_str_ref(&fmt);
 }
@@ -166,7 +156,7 @@ Result to_debug_buf(void *obj, usize buf_size) {
 	char buf[buf_size];
 	Formatter fmt = BUILD(Formatter, buf, buf_size, 0);
 	Result r = do_dbg(obj, &fmt);
-	Try(Unit, r);
+	TRY(Unit, r);
 
 	return Formatter_to_str_ref(&fmt);
 }

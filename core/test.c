@@ -15,9 +15,11 @@
 #include <core/class.h>
 #include <core/enum.h>
 #include <core/error.h>
+#include <core/formatter.h>
 #include <core/option.h>
 #include <core/rc.h>
 #include <core/result.h>
+#include <core/string.h>
 #include <core/test.h>
 #include <core/tuple.h>
 #include <core/unit.h>
@@ -211,6 +213,7 @@ void TestCleanup_cleanup(TestCleanup *tc) {
 Result ret_test_cleanup() {
 	void *ptr = mymalloc(1);
 	TestCleanupPtr tc = BUILD(TestCleanup, ptr);
+
 	return Ok(tc);
 }
 
@@ -224,6 +227,7 @@ MyTest(core, test_cleanup) {
 
 	Result r3 = ret_test_cleanup();
 	TestCleanup tc3_out = UNWRAP(r3, TestCleanup);
+
 	return Ok(UNIT);
 }
 
@@ -262,6 +266,124 @@ MyTest(core, test_complex) {
 	Result x2_out = UNWRAP(x3_out, Result);
 	u32 x1_out = UNWRAP_PRIM(x2_out, x1_out);
 	assert_eq(x1_out, 123);
+
+	return Ok(UNIT);
+}
+
+MyTest(core, test_string) {
+	Result r1 = String_build("this is a test");
+	String s1 = TRY(r1, s1);
+	assert_eq_str(unwrap(&s1), "this is a test");
+	assert_eq(len(&s1), strlen("this is a test"));
+
+	String s2;
+	bool ret = clone(&s2, &s1);
+	assert(ret);
+	assert_eq_str(unwrap(&s2), "this is a test");
+	assert_eq(len(&s2), strlen("this is a test"));
+
+	assert(equal(&s1, &s2));
+
+	Result r3 = String_build("this is a test2");
+	String s3 = TRY(r3, s3);
+
+	assert(!equal(&s1, &s3));
+
+	Result r4 = append(&s3, &s2);
+	assert(IS_OK(r4));
+
+	// s3 is the string which has been appended to
+	assert_eq_str(unwrap(&s3), "this is a test2this is a test");
+	assert_eq(len(&s3), strlen("this is a test2this is a test"));
+
+	// s2 is unchanged
+	assert_eq_str(unwrap(&s2), "this is a test");
+	assert_eq(len(&s2), strlen("this is a test"));
+
+	return Ok(UNIT);
+}
+
+MyTest(core, test_string_core) {
+	Result r1 = STRING("abcdefghijklmnopqrstuvwxyz");
+	String s1 = TRY(r1, s1);
+
+	Result r2 = String_index_of_s(&s1, "def");
+	i64 v2 = UNWRAP_PRIM(r2, v2);
+	assert_eq(v2, 3);
+
+	String s2 = STRING("abcdefghijklmnopqrstuvwxyzabc");
+	assert_eq(CHAR_AT(&s2, 3), 'd');
+
+	assert_eq(INDEX_OF(&s2, "ghi"), 6);
+	String sub1 = STRING("ghi");
+	assert_eq(INDEX_OF(&s2, &sub1), 6);
+
+	assert_eq(INDEX_OF(&s2, "ghi"), 6);
+	String sub2 = STRING("ghi");
+	assert_eq(INDEX_OF(&s2, &sub2), 6);
+
+	assert_eq(INDEX_OF(&s2, "abc"), 0);
+	String sub3 = STRING("abc");
+	assert_eq(INDEX_OF(&s2, &sub3), 0);
+
+	assert_eq(LAST_INDEX_OF(&s2, "abc"), 26);
+	String sub4 = STRING("abc");
+	assert_eq(LAST_INDEX_OF(&s2, &sub4), 26);
+
+	String sub = SUBSTRING(&s2, 3, 6);
+	assert_eq_str(unwrap(&sub), "def");
+
+	return Ok(UNIT);
+}
+
+CLASS(FmtClass, FIELD(u64, value1) FIELD(i32, value2))
+IMPL(FmtClass, TRAIT_DISPLAY)
+IMPL(FmtClass, TRAIT_DEBUG)
+#define FmtClass DEFINE_CLASS(FmtClass)
+GETTER(FmtClass, value1)
+GETTER(FmtClass, value2)
+
+void FmtClass_cleanup(FmtClass *ptr) {}
+
+Result FmtClass_fmt(FmtClass *ptr, Formatter *fmt) {
+	u64 v1 = GET(FmtClass, ptr, value1);
+	i32 v2 = GET(FmtClass, ptr, value2);
+	return WRITE(fmt, "value1: %llu, value2: %i", v1, v2);
+}
+
+Result FmtClass_dbg(FmtClass *ptr, Formatter *fmt) {
+	u64 v1 = GET(FmtClass, ptr, value1);
+	i32 v2 = GET(FmtClass, ptr, value2);
+	return WRITE(fmt, "[value1: %llu, value2: %i]", v1, v2);
+}
+
+MyTest(core, test_formatter) {
+	FmtClass fmtclass = BUILD(FmtClass, 123, -1);
+	Result r = to_string(&fmtclass);
+	String s = TRY(r, s);
+	assert_eq_str(unwrap(&s), "value1: 123, value2: -1");
+
+	Result r2 = to_debug(&fmtclass);
+	String s2 = TRY(r2, s2);
+	assert_eq_str(unwrap(&s2), "[value1: 123, value2: -1]");
+
+	String s3 = TO_STRING(&fmtclass);
+	assert_eq_str(unwrap(&s3), "value1: 123, value2: -1");
+
+	String s4 = TO_DEBUG(&fmtclass);
+	assert_eq_str(unwrap(&s4), "[value1: 123, value2: -1]");
+
+	String s5 = STRING("testing abc");
+	assert_eq_str(unwrap(&s5), "testing abc");
+
+	Formatter fmt = FORMATTER(1000);
+	ResultPtr (*do_fmt)(Object *obj, Formatter *formatter) =
+	    find_fn((Object *)&fmtclass, "fmt");
+	Result r6 = do_fmt((Object *)&fmtclass, &fmt);
+	TRYU(r6);
+	Result r7 = Formatter_to_string(&fmt);
+	String s7 = UNWRAP(r7, String);
+	assert_eq_str(unwrap(&s7), "value1: 123, value2: -1");
 
 	return Ok(UNIT);
 }

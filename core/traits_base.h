@@ -48,6 +48,7 @@ bool clone(void *dest, void *src);
 void cleanup(void *ptr);
 char *to_str(void *s);
 void print(void *ptr);
+u64 len(void *obj);
 
 // default implementations
 bool default_copy(void *dst, void *src);

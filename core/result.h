@@ -34,6 +34,14 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		UNWRAP_PRIM(x, v);                                             \
 	})
 
+#define TRYU(x)                                                                \
+	({                                                                     \
+		if (IS_ERR(x)) {                                               \
+			Error e = UNWRAP_ERR(x);                               \
+			return Err(e);                                         \
+		}                                                              \
+	})
+
 #define EXPECT(x, v)                                                           \
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
@@ -65,7 +73,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 	_Generic((v),                                                          \
 	    u8: ({                                                             \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 U8Ptr val = ENUM_VALUE(val, U8, x);                   \
 			 if (strcmp(CLASS_NAME(&val), "U8"))                   \
 				 panic("Expected [U8]. Found [%s].",           \
@@ -75,7 +83,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    u16: ({                                                            \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 U16Ptr val = ENUM_VALUE(val, U16, x);                 \
 			 if (strcmp(CLASS_NAME(&val), "U16"))                  \
 				 panic("Expected [U16]. Found [%s].",          \
@@ -85,7 +93,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    u32: ({                                                            \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 U32Ptr val = ENUM_VALUE(val, U32, x);                 \
 			 if (strcmp(CLASS_NAME(&val), "U32"))                  \
 				 panic("Expected [U32]. Found [%s].",          \
@@ -95,7 +103,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    u64: ({                                                            \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 U64Ptr val = ENUM_VALUE(val, U64, x);                 \
 			 if (strcmp(CLASS_NAME(&val), "U64"))                  \
 				 panic("Expected [U64]. Found [%s].",          \
@@ -105,7 +113,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    u128: ({                                                           \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 U128Ptr val = ENUM_VALUE(val, U128, x);               \
 			 if (strcmp(CLASS_NAME(&val), "U128"))                 \
 				 panic("Expected [U128]. Found [%s].",         \
@@ -115,7 +123,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    i8: ({                                                             \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 I8Ptr val = ENUM_VALUE(val, I8, x);                   \
 			 if (strcmp(CLASS_NAME(&val), "I8"))                   \
 				 panic("Expected [I8]. Found [%s].",           \
@@ -125,7 +133,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    i16: ({                                                            \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 I16Ptr val = ENUM_VALUE(val, I16, x);                 \
 			 if (strcmp(CLASS_NAME(&val), "I16"))                  \
 				 panic("Expected [I16]. Found [%s].",          \
@@ -135,7 +143,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    i32: ({                                                            \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 I32Ptr val = ENUM_VALUE(val, I32, x);                 \
 			 if (strcmp(CLASS_NAME(&val), "I32"))                  \
 				 panic("Expected [I32]. Found [%s].",          \
@@ -145,7 +153,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    i64: ({                                                            \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 I64Ptr val = ENUM_VALUE(val, I64, x);                 \
 			 if (strcmp(CLASS_NAME(&val), "I64"))                  \
 				 panic("Expected [I64]. Found [%s].",          \
@@ -155,7 +163,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    i128: ({                                                           \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 I128Ptr val = ENUM_VALUE(val, I128, x);               \
 			 if (strcmp(CLASS_NAME(&val), "I128"))                 \
 				 panic("Expected [I128]. Found [%s].",         \
@@ -165,7 +173,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    f32: ({                                                            \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 F32Ptr val = ENUM_VALUE(val, F32, x);                 \
 			 if (strcmp(CLASS_NAME(&val), "F32"))                  \
 				 panic("Expected [F32]. Found [%s].",          \
@@ -175,7 +183,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    f64: ({                                                            \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 F64Ptr val = ENUM_VALUE(val, F64, x);                 \
 			 if (strcmp(CLASS_NAME(&val), "F64"))                  \
 				 panic("Expected [F64]. Found [%s].",          \
@@ -185,7 +193,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    bool: ({                                                           \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 BoolPtr val = ENUM_VALUE(val, Bool, x);               \
 			 if (strcmp(CLASS_NAME(&val), "Bool"))                 \
 				 panic("Expected [Bool]. Found [%s].",         \
@@ -195,7 +203,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    usize: ({                                                          \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 USizePtr val = ENUM_VALUE(val, USize, x);             \
 			 if (strcmp(CLASS_NAME(&val), "USize"))                \
 				 panic("Expected [USize]. Found [%s].",        \
@@ -205,7 +213,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		 }),                                                           \
 	    default: ({                                                        \
 			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");          \
+				 panic("Attempt to unwrap an error or none");  \
 			 RcPtr rc = *(Rc *)x.value;                            \
 			 SET(Rc, &rc, flags, RC_FLAGS_NO_CLEANUP);             \
 			 void *ptr = unwrap(&rc);                              \

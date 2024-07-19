@@ -20,9 +20,9 @@
 
 #define DEFINE_PRIM_CLASS(prim_type, type)                                     \
 	CLASS(type, FIELD(prim_type, value))                                   \
-	IMPL(type, TRAIT_COPY);                                                \
-	IMPL(type, TRAIT_TO_STR_BUF);                                          \
-	IMPL(type, TRAIT_UNWRAP);
+	IMPL(type, TRAIT_COPY)                                                 \
+	IMPL(type, TRAIT_TO_STR_BUF)                                           \
+	IMPL(type, TRAIT_UNWRAP)
 
 DEFINE_PRIM_CLASS(bool, Bool)
 #define Bool DEFINE_CLASS(Bool)

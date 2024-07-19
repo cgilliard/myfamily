@@ -14,4 +14,24 @@
 
 #ifndef _CORE_TRAITS__
 #define _CORE_TRAITS__
+
+#include <core/result.h>
+#include <core/traits_base.h>
+
+Result append(void *dst, void *src);
+
+#define TRAIT_APPEND(T)                                                        \
+	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
+
+#define TRAIT_TO_STRING(T) TRAIT_REQUIRED(T, Result, to_string, T##Ptr *obj)
+
+#define TRAIT_FORMATTER(T)                                                     \
+	TRAIT_REQUIRED(T, Result, write, T##Ptr *f, char *fmt, ...)
+
+#define TRAIT_DISPLAY(T)                                                       \
+	TRAIT_REQUIRED(T, Result, fmt, T##Ptr *self, Formatter *formatter)
+
+#define TRAIT_DEBUG(T)                                                         \
+	TRAIT_REQUIRED(T, Result, dbg, T##Ptr *self, Formatter *formatter)
+
 #endif // _CORE_TRAITS__

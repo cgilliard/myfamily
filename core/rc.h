@@ -16,6 +16,7 @@
 #define _CORE_RC__
 
 #include <core/class.h>
+#include <core/prim.h>
 #include <core/traits_base.h>
 
 #define RC_FLAGS_NO_CLEANUP 0x1
@@ -37,9 +38,9 @@ static SETTER(Rc, flags);
 
 #define HEAPIFY_DIRECT(value)                                                  \
 	({                                                                     \
-		void *ret = mymalloc(size(&value));                            \
-		memcpy(ret, &value, size(&value));                             \
-		ret;                                                           \
+		void *__ret_ = mymalloc(size(&value));                         \
+		memcpy(__ret_, &value, size(&value));                          \
+		__ret_;                                                        \
 	})
 
 #define HEAPIFY(v)                                                             \
