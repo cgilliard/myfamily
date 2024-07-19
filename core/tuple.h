@@ -68,6 +68,25 @@ void *Tuple_add_value_bool(void *value);
 		    EXPAND(FOR_EACH(CREATE_GENERIC, __VA_ARGS__))};            \
 		u64 count = sizeof(values) / sizeof(values[0]);                \
 		void **elements = mymalloc(count * sizeof(void *));            \
+		if (!elements) {                                               \
+			Error __err12_ =                                       \
+			    ERROR(ALLOC_ERROR,                                 \
+				  "Could not allocate sufficient memory");     \
+			return Err(__err12_);                                  \
+		}                                                              \
+		for (u64 i = 0; i < count; ++i) {                              \
+			elements[i] = values[i];                               \
+		}                                                              \
+		TuplePtr tuple = BUILD(Tuple, elements, count);                \
+		tuple;                                                         \
+	})
+
+#define TUPLEP(...)                                                            \
+	({                                                                     \
+		void *values[] = {                                             \
+		    EXPAND(FOR_EACH(CREATE_GENERIC, __VA_ARGS__))};            \
+		u64 count = sizeof(values) / sizeof(values[0]);                \
+		void **elements = mymalloc(count * sizeof(void *));            \
 		if (!elements)                                                 \
 			panic("Could not allocate sufficient memory");         \
 		for (u64 i = 0; i < count; ++i) {                              \

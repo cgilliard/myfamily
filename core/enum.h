@@ -98,7 +98,7 @@ usize enum_value_usize(void *value);
 				 Error _err1__ = ERROR(                        \
 				     COPY_ERROR, "Could not copy object");     \
 				 return Err(_err1__);                          \
-			 } /*panic("Could not copy object"); */                \
+			 }                                                     \
 			 *(type *)&ret;                                        \
 		 }))
 

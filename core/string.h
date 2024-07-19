@@ -47,6 +47,13 @@ IMPL(String, TRAIT_STRING_CORE)
 		_rr44__;                                                       \
 	})
 
+#define STRINGP(s)                                                             \
+	({                                                                     \
+		Result _rr33__ = String_build(s);                              \
+		StringPtr _rr44__ = EXPECT(_rr33__, _rr44__);                  \
+		_rr44__;                                                       \
+	})
+
 #define CHAR_AT(s, index)                                                      \
 	({                                                                     \
 		Result _r88__ = String_char_at(s, index);                      \

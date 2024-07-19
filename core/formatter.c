@@ -127,4 +127,3 @@ Result to_debug_buf(void *obj, usize buf_size) {
 
 	return Formatter_to_string(&fmt);
 }
-
