@@ -122,7 +122,8 @@ void Tuple_element_at(Tuple *tuple, u64 index, void *dst) {
 			void *tmp = unwrap(ref);
 			memcpy(dst, tmp, size(tmp));
 		} else {
-			copy(dst, ref);
+			if (!copy(dst, ref))
+				panic("Could not copy object");
 		}
 	}
 }

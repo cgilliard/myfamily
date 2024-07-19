@@ -57,7 +57,7 @@ usize enum_value_usize(void *value) {
 		}                                                              \
 		void *value = mymalloc(sizeof(sign##bits));                    \
 		if (value == NULL) {                                           \
-			panic("Could not allocate sufficient memory");         \
+			return NULL;                                           \
 		}                                                              \
 		memcpy(value, v, sizeof(sign##bits));                          \
 		return value;                                                  \
@@ -84,7 +84,7 @@ void *build_enum_value_bool(bool *v, char *type_str) {
 	}
 	void *value = mymalloc(sizeof(bool));
 	if (value == NULL) {
-		panic("Could not allocate sufficient memory");
+		return NULL;
 	}
 	memcpy(value, v, sizeof(bool));
 	return value;
@@ -98,7 +98,7 @@ void *build_enum_value_usize(usize *v, char *type_str) {
 	}
 	void *value = mymalloc(sizeof(usize));
 	if (value == NULL) {
-		panic("Could not allocate sufficient memory");
+		return NULL;
 	}
 	memcpy(value, v, sizeof(usize));
 	return value;
@@ -127,8 +127,10 @@ void *build_enum_value(void *v, char *type_str) {
 
 	void *value = mymalloc(size((Object *)v));
 	if (!value)
-		panic("Could not allocate sufficient memory");
-	if (!copy(value, v))
-		panic("Could not copy object");
+		return NULL;
+	if (!copy(value, v)) {
+		myfree(value);
+		return NULL;
+	}
 	return value;
 }

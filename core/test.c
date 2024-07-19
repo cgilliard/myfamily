@@ -64,6 +64,10 @@ MyTest(core, test_tuple) {
 ENUM(MyEnum, VARIANTS(TYPE_U32, TYPE_U64), TYPES("u32", "u64"))
 #define MyEnum DEFINE_ENUM(MyEnum)
 
+ENUM(MyEnum2, VARIANTS(TYPE_U322, TYPE_U642, TYPE_BOOL),
+     TYPES("u32", "u64", "bool"))
+#define MyEnum2 DEFINE_ENUM(MyEnum2)
+
 MyTest(core, test_enum) {
 	u64 value1 = 49;
 	MyEnum x = BUILD_ENUM(MyEnum, TYPE_U64, value1);
@@ -80,11 +84,31 @@ MyTest(core, test_enum) {
 	      }));
 
 	assert_eq(ret, 149);
+
+	bool value2 = false;
+	MyEnum2 y = BUILD_ENUM(MyEnum2, TYPE_BOOL, value2);
+	bool value2_out = true;
+	MATCH(y, VARIANT(TYPE_BOOL,
+			 { value2_out = ENUM_VALUE(value2_out, bool, y); }));
+	assert(!value2_out);
+
+	bool value3 = true;
+	MyEnum2 z = BUILD_ENUM(MyEnum2, TYPE_BOOL, value3);
+	bool value3_out = false;
+	MATCH(z, VARIANT(TYPE_BOOL,
+			 { value3_out = ENUM_VALUE(value2_out, bool, z); }));
+	assert(value3_out);
+
+	u64 value4 = 101;
+	MyEnum my_enum = TRY_BUILD_ENUM(MyEnum, TYPE_U64, value4);
+	u64 value4_out = 0;
+	MATCH(my_enum, VARIANT(TYPE_U64, {
+		      value4_out = TRY_ENUM_VALUE(value4_out, u64, my_enum);
+	      }));
+	assert_eq(value4_out, 101);
+
 	return Ok(UNIT);
 }
-
-static ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
-static ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
 
 Result test_fn(u64 x) {
 	if (x < 100) {
@@ -304,8 +328,7 @@ MyTest(core, test_string) {
 }
 
 MyTest(core, test_string_core) {
-	Result r1 = STRING("abcdefghijklmnopqrstuvwxyz");
-	String s1 = TRY(r1, s1);
+	String s1 = STRING("abcdefghijklmnopqrstuvwxyz");
 
 	Result r2 = String_index_of_s(&s1, "def");
 	i64 v2 = UNWRAP_PRIM(r2, v2);

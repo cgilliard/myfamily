@@ -15,6 +15,7 @@
 #ifndef _CORE_RESULT__
 #define _CORE_RESULT__
 
+#include <core/ekinds.h>
 #include <core/enum.h>
 #include <core/error.h>
 #include <core/rc.h>
@@ -52,10 +53,17 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 		UNWRAP_PRIM(x, v);                                             \
 	})
 
-#define Ok(x)                                                                  \
+#define OkR(x)                                                                 \
 	({                                                                     \
 		Rc rc = HEAPIFY(x);                                            \
 		ResultPtr r = BUILD_ENUM(Result, Ok, rc);                      \
+		r;                                                             \
+	})
+
+#define Ok(x)                                                                  \
+	({                                                                     \
+		Rc rc = HEAPIFY(x);                                            \
+		ResultPtr r = TRY_BUILD_ENUM(Result, Ok, rc);                  \
 		r;                                                             \
 	})
 
