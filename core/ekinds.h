@@ -17,8 +17,6 @@
 
 #include <core/error.h>
 
-static ErrorKind ALLOC_ERROR = EKIND("MemoryAllocationError");
-static ErrorKind COPY_ERROR = EKIND("CopyError");
 static ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
 static ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
 static ErrorKind COPY_NOT_IMPLEMENTED_ERROR = EKIND("CopyNotImplemented");

@@ -56,7 +56,7 @@ Result Formatter_write(Formatter *ptr, char *fmt, ...) {
 	if (r < 0) {
 		char *msg = strerror(errno);
 		Error err = ERROR(WRITE_ERROR, "%s", msg);
-		return Err2(err);
+		return Err(err);
 	}
 	va_end(args);
 
@@ -72,7 +72,7 @@ Result Formatter_write(Formatter *ptr, char *fmt, ...) {
 				  "formatted string would have been %i "
 				  "bytes. Only %llu bytes were available",
 				  r2, rem);
-			return Err2(err);
+			return Err(err);
 		} else {
 			Formatter_set_pos(ptr, pos + r);
 			return Ok(UNIT);

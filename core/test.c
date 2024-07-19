@@ -113,7 +113,7 @@ MyTest(core, test_enum) {
 Result test_fn(u64 x) {
 	if (x < 100) {
 		Error err = ERROR(ILLEGAL_ARGUMENT, "test");
-		return Err2(err);
+		return Err(err);
 	} else {
 		u64 y = 1234;
 		return Ok(y);
@@ -128,7 +128,7 @@ MyTest(core, test_result) {
 	assert(is_ok);
 
 	Error err = ERROR(ILLEGAL_ARGUMENT, "test");
-	Result r2 = Err2(err);
+	Result r2 = Err(err);
 	MATCH(r2, VARIANT(Err, {
 		      Error e2 = UNWRAP_ERR(r2);
 		      assert(equal(KIND(e2), &ILLEGAL_ARGUMENT));
@@ -176,7 +176,7 @@ MyTest(core, test_result) {
 Result test_try2(u64 x) {
 	if (x < 50) {
 		Error e = ERROR(ILLEGAL_STATE, "test_try2");
-		return Err2(e);
+		return Err(e);
 	}
 	return Ok(x);
 }
@@ -186,7 +186,7 @@ Result test_try(u64 x) {
 	u64 y = TRY(r, y);
 	if (x < 100) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "test_try");
-		return Err2(e);
+		return Err(e);
 	}
 	return Ok(y);
 }

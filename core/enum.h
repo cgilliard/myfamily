@@ -95,9 +95,7 @@ usize enum_value_usize(void *value);
 			 if (!strcmp(CLASS_NAME(e.value), "Rc")) {             \
 				 ret = *(type *)unwrap(e.value);               \
 			 } else if (!copy(&ret, e.value)) {                    \
-				 Error _err1__ = ERROR(                        \
-				     COPY_ERROR, "Could not copy object");     \
-				 return Err2(_err1__);                         \
+				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 *(type *)&ret;                                        \
 		 }))

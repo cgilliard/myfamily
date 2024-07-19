@@ -30,7 +30,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
 			Error e = UNWRAP_ERR(x);                               \
-			return Err(e);                                         \
+			return Err(e);                                        \
 		}                                                              \
 		UNWRAP_PRIM(x, v);                                             \
 	})
@@ -39,7 +39,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
 			Error e = UNWRAP_ERR(x);                               \
-			return Err(e);                                         \
+			return Err(e);                                        \
 		}                                                              \
 	})
 
@@ -241,8 +241,8 @@ static Error STATIC_ALLOC_ERROR = {
 static Result STATIC_ALLOC_RESULT = {
     {&ResultPtr_Vtable__, "Result"}, Err, &STATIC_ALLOC_ERROR, true, true};
 
-#define Err(e) BUILD_ENUM(Result, Err, e)
-#define Err2(e) TRY_BUILD_ENUM(Result, Err, e)
+#define ErrP(e) BUILD_ENUM(Result, Err, e)
+#define Err(e) TRY_BUILD_ENUM(Result, Err, e)
 
 #define UNWRAP_ERR(x)                                                          \
 	({                                                                     \

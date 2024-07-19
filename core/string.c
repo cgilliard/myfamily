@@ -66,14 +66,14 @@ bool String_equal(String *s1, String *s2) {
 Result String_append(String *s1, String *s2) {
 	if (s1 == NULL || s2 == NULL) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "input must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 
 	char *s1_ptr = GET(String, s1, ptr);
 	char *s2_ptr = GET(String, s2, ptr);
 	if (s1_ptr == NULL || s2_ptr == NULL) {
 		Error e = ERROR(ILLEGAL_STATE, "ptr must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 
 	u64 s1len = GET(String, s1, len);
@@ -81,9 +81,7 @@ Result String_append(String *s1, String *s2) {
 	u64 s1_new_len = s1len + s2len;
 	void *tmp = myrealloc(s1_ptr, sizeof(char) * (s1_new_len + 1));
 	if (tmp == NULL) {
-		Error e =
-		    ERROR(ALLOC_ERROR, "Could not allocate sufficient memory");
-		return Err2(e);
+		return STATIC_ALLOC_RESULT;
 	}
 
 	strcat(tmp, s2_ptr);
@@ -96,14 +94,12 @@ Result String_append(String *s1, String *s2) {
 Result String_build(char *s) {
 	if (s == NULL) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "s must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 	u64 len = strlen(s);
 	char *ptr = mymalloc(sizeof(char) * (len + 1));
 	if (ptr == NULL) {
-		Error e =
-		    ERROR(ALLOC_ERROR, "Could not allocate sufficient memory");
-		return Err2(e);
+		return STATIC_ALLOC_RESULT;
 	}
 	strcpy(ptr, s);
 	StringPtr ret = BUILD(String, ptr, len);
@@ -140,13 +136,13 @@ char *rstrstr(char *s1, char *s2) {
 Result String_index_of(String *s, String *n) {
 	if (s == NULL || n == NULL) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "input must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 	char *sptr = GET(String, s, ptr);
 	char *nptr = GET(String, n, ptr);
 	if (sptr == NULL || nptr == NULL) {
 		Error e = ERROR(ILLEGAL_STATE, "ptr must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 	char *res = strstr(sptr, nptr);
 	i64 ret;
@@ -160,13 +156,13 @@ Result String_index_of(String *s, String *n) {
 Result String_last_index_of(String *s, String *n) {
 	if (s == NULL || n == NULL) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "input must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 	char *sptr = GET(String, s, ptr);
 	char *nptr = GET(String, n, ptr);
 	if (sptr == NULL || nptr == NULL) {
 		Error e = ERROR(ILLEGAL_STATE, "ptr must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 	char *res = rstrstr(sptr, nptr);
 	i64 ret;
@@ -183,7 +179,7 @@ Result String_substring(String *s, u64 start, u64 end) {
 		    ILLEGAL_ARGUMENT,
 		    "start (%llu) must be equal to or less than end (%llu)",
 		    start, end);
-		return Err2(err);
+		return Err(err);
 	}
 	u64 slen = GET(String, s, len);
 	if (end > slen) {
@@ -191,7 +187,7 @@ Result String_substring(String *s, u64 start, u64 end) {
 				  "end (%llu) must be equal to or less than "
 				  "the length of s (%llu)",
 				  end, slen);
-		return Err2(err);
+		return Err(err);
 	}
 	char *sptr = GET(String, s, ptr);
 	char nstr[(end - start) + 1];
@@ -204,12 +200,12 @@ Result String_substring(String *s, u64 start, u64 end) {
 Result String_index_of_s(String *s, char *n) {
 	if (s == NULL || n == NULL) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "input must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 	char *sptr = GET(String, s, ptr);
 	if (sptr == NULL) {
 		Error e = ERROR(ILLEGAL_STATE, "ptr must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 	char *res = strstr(sptr, n);
 	i64 ret;
@@ -223,12 +219,12 @@ Result String_index_of_s(String *s, char *n) {
 Result String_last_index_of_s(String *s, char *n) {
 	if (s == NULL || n == NULL) {
 		Error e = ERROR(ILLEGAL_ARGUMENT, "input must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 	char *sptr = GET(String, s, ptr);
 	if (sptr == NULL) {
 		Error e = ERROR(ILLEGAL_STATE, "ptr must not be NULL");
-		return Err2(e);
+		return Err(e);
 	}
 	char *res = rstrstr(sptr, n);
 	i64 ret;
@@ -247,7 +243,7 @@ Result String_char_at(String *s, u64 index) {
 		    ERROR(STRING_INDEX_OUT_OF_BOUNDS,
 			  "index (%llu) is greater than or equal to len (%llu)",
 			  index, slen);
-		return Err2(err);
+		return Err(err);
 	}
 	i8 ret = sptr[index];
 	return Ok(ret);
