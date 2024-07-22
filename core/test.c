@@ -112,7 +112,7 @@ MyTest(core, test_enum) {
 
 Result test_fn(u64 x) {
 	if (x < 100) {
-		Error err = ERROR(ILLEGAL_ARGUMENT, "test");
+		Error err = ERR(ILLEGAL_ARGUMENT, "test");
 		return Err(err);
 	} else {
 		u64 y = 1234;
@@ -127,7 +127,7 @@ MyTest(core, test_result) {
 	MATCH(r, VARIANT(Ok, { is_ok = true; }));
 	assert(is_ok);
 
-	Error err = ERROR(ILLEGAL_ARGUMENT, "test");
+	Error err = ERR(ILLEGAL_ARGUMENT, "test");
 	Result r2 = Err(err);
 	MATCH(r2, VARIANT(Err, {
 		      Error e2 = UNWRAP_ERR(r2);
@@ -175,7 +175,7 @@ MyTest(core, test_result) {
 
 Result test_try2(u64 x) {
 	if (x < 50) {
-		Error e = ERROR(ILLEGAL_STATE, "test_try2");
+		Error e = ERR(ILLEGAL_STATE, "test_try2");
 		return Err(e);
 	}
 	return Ok(x);
@@ -185,7 +185,7 @@ Result test_try(u64 x) {
 	Result r = test_try2(x);
 	u64 y = TRY(r, y);
 	if (x < 100) {
-		Error e = ERROR(ILLEGAL_ARGUMENT, "test_try");
+		Error e = ERR(ILLEGAL_ARGUMENT, "test_try");
 		return Err(e);
 	}
 	return Ok(y);
@@ -330,7 +330,7 @@ MyTest(core, test_string) {
 MyTest(core, test_string_core) {
 	String s1 = STRING("abcdefghijklmnopqrstuvwxyz");
 
-	Result r2 = String_index_of_s(&s1, "def");
+	Result r2 = String_index_of_s(&s1, "def", 0);
 	i64 v2 = UNWRAP_PRIM(r2, v2);
 	assert_eq(v2, 3);
 
@@ -355,6 +355,10 @@ MyTest(core, test_string_core) {
 
 	String sub = SUBSTRING(&s2, 3, 6);
 	assert_eq_str(unwrap(&sub), "def");
+
+	Result r3 = String_index_of_s(&s2, "abc", 1);
+	i64 v3 = UNWRAP_PRIM(r3, v3);
+	assert_eq(v3, 26);
 
 	return Ok(UNIT);
 }

@@ -13,8 +13,11 @@
 // limitations under the License.
 
 #include <core/prim.h>
+#include <core/result.h>
 #include <core/unit.h>
 #include <stdio.h>
+
+#include <core/formatter.h>
 
 #define DEFINE_PRIM_IMPLS(prim_type, type, format)                             \
 	void type##_cleanup(type *ptr) {}                                      \
@@ -92,6 +95,17 @@ bool USize_clone(USize *dst, USize *src) {
 	return true;
 }
 
+void ISize_cleanup(ISize *ptr) {}
+void ISize_to_str_buf(ISize *ptr, char *buf, usize max_len) {
+	isize value = ptr->_value;
+	snprintf(buf, max_len, "%zu", value);
+}
+void *ISize_unwrap(ISize *ptr) { return &ptr->_value; }
+bool ISize_clone(ISize *dst, ISize *src) {
+	memcpy(&dst->_value, &src->_value, sizeof(isize));
+	return true;
+}
+
 void F32_cleanup(F32 *ptr) {}
 void F32_to_str_buf(F32 *ptr, char *buf, usize max_len) {
 	f32 value = ptr->_value;
@@ -113,3 +127,4 @@ bool F64_clone(F64 *dst, F64 *src) {
 	memcpy(&dst->_value, &src->_value, sizeof(f64));
 	return true;
 }
+

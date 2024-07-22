@@ -55,7 +55,7 @@ Result Formatter_write(Formatter *ptr, char *fmt, ...) {
 	i32 r = vsnprintf(buf + pos, rem, fmt, args);
 	if (r < 0) {
 		char *msg = strerror(errno);
-		Error err = ERROR(WRITE_ERROR, "%s", msg);
+		Error err = ERR(WRITE_ERROR, "%s", msg);
 		return Err(err);
 	}
 	va_end(args);
@@ -67,11 +67,10 @@ Result Formatter_write(Formatter *ptr, char *fmt, ...) {
 		va_start(args2, fmt);
 		i32 r2 = vsnprintf(NULL, 0, fmt, args2);
 		if (r2 > rem) {
-			Error err =
-			    ERROR(OVERFLOW,
-				  "formatted string would have been %i "
-				  "bytes. Only %llu bytes were available",
-				  r2, rem);
+			Error err = ERR(OVERFLOW,
+					"formatted string would have been %i "
+					"bytes. Only %llu bytes were available",
+					r2, rem);
 			return Err(err);
 		} else {
 			Formatter_set_pos(ptr, pos + r);
@@ -127,3 +126,67 @@ Result to_debug_buf(void *obj, usize buf_size) {
 
 	return Formatter_to_string(&fmt);
 }
+
+Result U8_fmt(U8 *v, Formatter *f) {
+	return WRITE(f, "%" PRIu8, GET(U8, v, value));
+}
+
+Result U16_fmt(U16 *v, Formatter *f) {
+	return WRITE(f, "%" PRIu16, GET(U16, v, value));
+}
+
+Result U32_fmt(U32 *v, Formatter *f) {
+	return WRITE(f, "%" PRIu32, GET(U32, v, value));
+}
+
+Result U64_fmt(U64 *v, Formatter *f) {
+	return WRITE(f, "%" PRIu64, GET(U64, v, value));
+}
+
+Result U128_fmt(U128 *v, Formatter *f) {
+	return WRITE(f, "%i", GET(U128, v, value));
+}
+
+Result I8_fmt(I8 *v, Formatter *f) { return WRITE(f, "%d", GET(I8, v, value)); }
+
+Result I16_fmt(I16 *v, Formatter *f) {
+	return WRITE(f, "%" PRIi16, GET(I16, v, value));
+}
+
+Result I32_fmt(I32 *v, Formatter *f) {
+	return WRITE(f, "%" PRIi32, GET(I32, v, value));
+}
+
+Result I64_fmt(I64 *v, Formatter *f) {
+	return WRITE(f, "%" PRIi64, GET(I64, v, value));
+}
+
+Result I128_fmt(I128 *v, Formatter *f) {
+	return WRITE(f, "%i", GET(I128, v, value));
+}
+
+Result F32_fmt(F32 *v, Formatter *f) {
+	return WRITE(f, "%f", GET(F32, v, value));
+}
+
+Result F64_fmt(F64 *v, Formatter *f) {
+	return WRITE(f, "%f", GET(F64, v, value));
+}
+
+Result USize_fmt(USize *v, Formatter *f) {
+	return WRITE(f, "%zu", GET(USize, v, value));
+}
+
+Result ISize_fmt(ISize *v, Formatter *f) {
+	return WRITE(f, "%jd", GET(ISize, v, value));
+}
+
+Result Bool_fmt(Bool *v, Formatter *f) {
+	bool boolv = GET(Bool, v, value);
+	if (boolv)
+		return WRITE(f, "true");
+	else
+		return WRITE(f, "false");
+}
+
+Result Unit_fmt(Unit *v, Formatter *f) { return WRITE(f, "()"); }

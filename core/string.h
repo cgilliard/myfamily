@@ -23,17 +23,21 @@
 
 #define TRAIT_STRING_CORE(T)                                                   \
 	TRAIT_REQUIRED(T, Result, substring, T##Ptr *s, u64 start, u64 end)    \
-	TRAIT_REQUIRED(T, Result, index_of, T##Ptr *s, T##Ptr *n)              \
+	TRAIT_REQUIRED(T, Result, index_of, T##Ptr *s, T##Ptr *n, u64 start)   \
 	TRAIT_REQUIRED(T, Result, last_index_of, T##Ptr *s, T##Ptr *n)         \
-	TRAIT_REQUIRED(T, Result, index_of_s, T##Ptr *s, char *n)              \
+	TRAIT_REQUIRED(T, Result, index_of_s, T##Ptr *s, char *n, u64 start)   \
 	TRAIT_REQUIRED(T, Result, last_index_of_s, T##Ptr *s, char *n)         \
 	TRAIT_REQUIRED(T, Result, char_at, T##Ptr *s, u64 index)
+
+// have to include this here because Formatter depends on String
+typedef struct Formatter Formatter;
 
 CLASS(String, FIELD(char *, ptr) FIELD(u64, len))
 IMPL(String, TRAIT_CLONE)
 IMPL(String, TRAIT_EQUAL)
 IMPL(String, TRAIT_STRING_BUILD)
 IMPL(String, TRAIT_UNWRAP)
+IMPL(String, TRAIT_DISPLAY)
 IMPL(String, TRAIT_LEN)
 IMPL(String, TRAIT_APPEND)
 IMPL(String, TRAIT_PRINT)
@@ -59,7 +63,7 @@ IMPL(String, TRAIT_STRING_CORE)
 		Result _r88__ = String_char_at(s, index);                      \
 		if (IS_ERR(_r88__)) {                                          \
 			Error _err__ = UNWRAP_ERR(_r88__);                     \
-			return Err(_err__);                                   \
+			return Err(_err__);                                    \
 		}                                                              \
 		i8 _rr99__ = UNWRAP_PRIM(_r88__, _rr99__);                     \
 		_rr99__;                                                       \
@@ -79,12 +83,12 @@ IMPL(String, TRAIT_STRING_CORE)
 #define INDEX_OF(s, n)                                                         \
 	_Generic((n),                                                          \
 	    char *: ({                                                         \
-			 Result _r111__ = String_index_of_s(s, (char *)n);     \
+			 Result _r111__ = String_index_of_s(s, (char *)n, 0);  \
 			 i64 _r222__ = TRY(_r111__, _r222__);                  \
 			 _r222__;                                              \
 		 }),                                                           \
 	    default: ({                                                        \
-			 Result _r111__ = String_index_of(s, (String *)n);     \
+			 Result _r111__ = String_index_of(s, (String *)n, 0);  \
 			 i64 _r222__ = TRY(_r111__, _r222__);                  \
 			 _r222__;                                              \
 		 }))

@@ -30,7 +30,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
 			Error e = UNWRAP_ERR(x);                               \
-			return Err(e);                                        \
+			return Err(e);                                         \
 		}                                                              \
 		UNWRAP_PRIM(x, v);                                             \
 	})
@@ -39,7 +39,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
 			Error e = UNWRAP_ERR(x);                               \
-			return Err(e);                                        \
+			return Err(e);                                         \
 		}                                                              \
 	})
 

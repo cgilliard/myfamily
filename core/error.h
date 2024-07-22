@@ -40,7 +40,7 @@ static GETTER(Error, message);
 static GETTER(Error, bt);
 
 Error error_build(ErrorKind kind, char *fmt, ...);
-#define ERROR(kind, ...) error_build(kind, ##__VA_ARGS__)
+#define ERR(kind, ...) error_build(kind, ##__VA_ARGS__)
 #define EKIND(kind) BUILD(ErrorKind, kind)
 #define KIND(e) Error_get_kind(&e)
 

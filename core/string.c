@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <core/ekinds.h>
+#include <core/formatter.h>
 #include <core/resources.h>
 #include <core/string.h>
 #include <core/unit.h>
@@ -65,14 +66,14 @@ bool String_equal(String *s1, String *s2) {
 
 Result String_append(String *s1, String *s2) {
 	if (s1 == NULL || s2 == NULL) {
-		Error e = ERROR(ILLEGAL_ARGUMENT, "input must not be NULL");
+		Error e = ERR(ILLEGAL_ARGUMENT, "input must not be NULL");
 		return Err(e);
 	}
 
 	char *s1_ptr = GET(String, s1, ptr);
 	char *s2_ptr = GET(String, s2, ptr);
 	if (s1_ptr == NULL || s2_ptr == NULL) {
-		Error e = ERROR(ILLEGAL_STATE, "ptr must not be NULL");
+		Error e = ERR(ILLEGAL_STATE, "ptr must not be NULL");
 		return Err(e);
 	}
 
@@ -93,7 +94,7 @@ Result String_append(String *s1, String *s2) {
 
 Result String_build(char *s) {
 	if (s == NULL) {
-		Error e = ERROR(ILLEGAL_ARGUMENT, "s must not be NULL");
+		Error e = ERR(ILLEGAL_ARGUMENT, "s must not be NULL");
 		return Err(e);
 	}
 	u64 len = strlen(s);
@@ -133,18 +134,18 @@ char *rstrstr(char *s1, char *s2) {
 	return NULL;
 }
 
-Result String_index_of(String *s, String *n) {
+Result String_index_of(String *s, String *n, u64 start) {
 	if (s == NULL || n == NULL) {
-		Error e = ERROR(ILLEGAL_ARGUMENT, "input must not be NULL");
+		Error e = ERR(ILLEGAL_ARGUMENT, "input must not be NULL");
 		return Err(e);
 	}
 	char *sptr = GET(String, s, ptr);
 	char *nptr = GET(String, n, ptr);
 	if (sptr == NULL || nptr == NULL) {
-		Error e = ERROR(ILLEGAL_STATE, "ptr must not be NULL");
+		Error e = ERR(ILLEGAL_STATE, "ptr must not be NULL");
 		return Err(e);
 	}
-	char *res = strstr(sptr, nptr);
+	char *res = strstr(sptr + start, nptr);
 	i64 ret;
 	if (res == NULL)
 		ret = -1;
@@ -155,13 +156,13 @@ Result String_index_of(String *s, String *n) {
 
 Result String_last_index_of(String *s, String *n) {
 	if (s == NULL || n == NULL) {
-		Error e = ERROR(ILLEGAL_ARGUMENT, "input must not be NULL");
+		Error e = ERR(ILLEGAL_ARGUMENT, "input must not be NULL");
 		return Err(e);
 	}
 	char *sptr = GET(String, s, ptr);
 	char *nptr = GET(String, n, ptr);
 	if (sptr == NULL || nptr == NULL) {
-		Error e = ERROR(ILLEGAL_STATE, "ptr must not be NULL");
+		Error e = ERR(ILLEGAL_STATE, "ptr must not be NULL");
 		return Err(e);
 	}
 	char *res = rstrstr(sptr, nptr);
@@ -175,18 +176,18 @@ Result String_last_index_of(String *s, String *n) {
 
 Result String_substring(String *s, u64 start, u64 end) {
 	if (start > end) {
-		Error err = ERROR(
-		    ILLEGAL_ARGUMENT,
-		    "start (%llu) must be equal to or less than end (%llu)",
-		    start, end);
+		Error err =
+		    ERR(ILLEGAL_ARGUMENT,
+			"start (%llu) must be equal to or less than end (%llu)",
+			start, end);
 		return Err(err);
 	}
 	u64 slen = GET(String, s, len);
 	if (end > slen) {
-		Error err = ERROR(ILLEGAL_ARGUMENT,
-				  "end (%llu) must be equal to or less than "
-				  "the length of s (%llu)",
-				  end, slen);
+		Error err = ERR(ILLEGAL_ARGUMENT,
+				"end (%llu) must be equal to or less than "
+				"the length of s (%llu)",
+				end, slen);
 		return Err(err);
 	}
 	char *sptr = GET(String, s, ptr);
@@ -197,17 +198,17 @@ Result String_substring(String *s, u64 start, u64 end) {
 	return String_build(nstr);
 }
 
-Result String_index_of_s(String *s, char *n) {
+Result String_index_of_s(String *s, char *n, u64 start) {
 	if (s == NULL || n == NULL) {
-		Error e = ERROR(ILLEGAL_ARGUMENT, "input must not be NULL");
+		Error e = ERR(ILLEGAL_ARGUMENT, "input must not be NULL");
 		return Err(e);
 	}
 	char *sptr = GET(String, s, ptr);
 	if (sptr == NULL) {
-		Error e = ERROR(ILLEGAL_STATE, "ptr must not be NULL");
+		Error e = ERR(ILLEGAL_STATE, "ptr must not be NULL");
 		return Err(e);
 	}
-	char *res = strstr(sptr, n);
+	char *res = strstr(sptr + start, n);
 	i64 ret;
 	if (res == NULL)
 		ret = -1;
@@ -218,12 +219,12 @@ Result String_index_of_s(String *s, char *n) {
 
 Result String_last_index_of_s(String *s, char *n) {
 	if (s == NULL || n == NULL) {
-		Error e = ERROR(ILLEGAL_ARGUMENT, "input must not be NULL");
+		Error e = ERR(ILLEGAL_ARGUMENT, "input must not be NULL");
 		return Err(e);
 	}
 	char *sptr = GET(String, s, ptr);
 	if (sptr == NULL) {
-		Error e = ERROR(ILLEGAL_STATE, "ptr must not be NULL");
+		Error e = ERR(ILLEGAL_STATE, "ptr must not be NULL");
 		return Err(e);
 	}
 	char *res = rstrstr(sptr, n);
@@ -240,11 +241,13 @@ Result String_char_at(String *s, u64 index) {
 	u64 slen = GET(String, s, len);
 	if (index >= slen) {
 		Error err =
-		    ERROR(STRING_INDEX_OUT_OF_BOUNDS,
-			  "index (%llu) is greater than or equal to len (%llu)",
-			  index, slen);
+		    ERR(STRING_INDEX_OUT_OF_BOUNDS,
+			"index (%llu) is greater than or equal to len (%llu)",
+			index, slen);
 		return Err(err);
 	}
 	i8 ret = sptr[index];
 	return Ok(ret);
 }
+
+Result String_fmt(String *s, Formatter *f) { return WRITE(f, unwrap(s)); }

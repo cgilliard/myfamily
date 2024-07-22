@@ -167,6 +167,15 @@ void vtable_cleanup(Vtable *table);
 		vtable_add_entry(&T##Ptr_Vtable__, next);                      \
 	}
 
+#define TRAIT_REQUIRED_EXT(T, R, name, ...)                                    \
+	R T##_##name(__VA_ARGS__);                                             \
+	static void __attribute__((constructor)) CAT(add_##T, UNIQUE_ID)() {   \
+		char *str;                                                     \
+		asprintf(&str, "%s", #name);                                   \
+		VtableEntry next = {str, T##_##name};                          \
+		vtable_add_entry(&T##_Vtable__, next);                         \
+	}
+
 #define CLASS_NAME(x) ((Object *)(x))->vdata.name
 #define CLASS_NAME_REF(x) ((Object *)(&x))->vdata.name
 
