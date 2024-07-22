@@ -127,4 +127,3 @@ bool F64_clone(F64 *dst, F64 *src) {
 	memcpy(&dst->_value, &src->_value, sizeof(f64));
 	return true;
 }
-
