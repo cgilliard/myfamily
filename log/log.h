@@ -64,92 +64,14 @@ CLASS(Log, FIELD(FILE *, fp) FIELD(LogConfig, config))
 IMPL(Log, LOG_CORE)
 #define Log DEFINE_CLASS(Log)
 
-#define PROC_ARG(value)                                                        \
-	_Generic((value),                                                      \
-	    u128: ({                                                           \
-			 U128Ptr _vu128__ = BUILD(U128);                       \
-			 memcpy(&(_vu128__._value), &value, sizeof(u128));     \
-			 _vu128__;                                             \
-		 }),                                                           \
-	    u64: ({                                                            \
-			 U64Ptr _vu64__ = BUILD(U64);                          \
-			 memcpy(&(_vu64__._value), &value, sizeof(u64));       \
-			 _vu64__;                                              \
-		 }),                                                           \
-	    u32: ({                                                            \
-			 U32Ptr _vu32__ = BUILD(U32);                          \
-			 memcpy(&(_vu32__._value), &value, sizeof(u32));       \
-			 _vu32__;                                              \
-		 }),                                                           \
-	    u16: ({                                                            \
-			 U16Ptr _vu16__ = BUILD(U16);                          \
-			 memcpy(&(_vu16__._value), &value, sizeof(u16));       \
-			 _vu16__;                                              \
-		 }),                                                           \
-	    u8: ({                                                             \
-			 U8Ptr _vu8__ = BUILD(U8);                             \
-			 memcpy(&(_vu8__._value), &value, sizeof(u8));         \
-			 _vu8__;                                               \
-		 }),                                                           \
-	    i128: ({                                                           \
-			 U128Ptr _vi128__ = BUILD(I128);                       \
-			 memcpy(&(_vi128__._value), &value, sizeof(i128));     \
-			 _vi128__;                                             \
-		 }),                                                           \
-	    i64: ({                                                            \
-			 U64Ptr _vi64__ = BUILD(I64);                          \
-			 memcpy(&(_vi64__._value), &value, sizeof(i64));       \
-			 _vi64__;                                              \
-		 }),                                                           \
-	    i32: ({                                                            \
-			 U32Ptr _vi32__ = BUILD(I32);                          \
-			 memcpy(&(_vi32__._value), &value, sizeof(i32));       \
-			 _vi32__;                                              \
-		 }),                                                           \
-	    i16: ({                                                            \
-			 U16Ptr _vi16__ = BUILD(I16);                          \
-			 memcpy(&(_vi16__._value), &value, sizeof(i16));       \
-			 _vi16__;                                              \
-		 }),                                                           \
-	    i8: ({                                                             \
-			 I8Ptr _vi8__ = BUILD(I8);                             \
-			 memcpy(&(_vi8__._value), &value, sizeof(i8));         \
-			 _vi8__;                                               \
-		 }),                                                           \
-	    f64: ({                                                            \
-			 U64Ptr _vf64__ = BUILD(F64);                          \
-			 memcpy(&(_vf64__._value), &value, sizeof(f64));       \
-			 _vf64__;                                              \
-		 }),                                                           \
-	    f32: ({                                                            \
-			 U32Ptr _vf32__ = BUILD(F32);                          \
-			 memcpy(&(_vf32__._value), &value, sizeof(f32));       \
-			 _vf32__;                                              \
-		 }),                                                           \
-	    usize: ({                                                          \
-			 USizePtr _vusize__ = BUILD(USize);                    \
-			 memcpy(&(_vusize__._value), &value, sizeof(usize));   \
-			 _vusize__;                                            \
-		 }),                                                           \
-	    isize: ({                                                          \
-			 ISizePtr _visize__ = BUILD(ISize);                    \
-			 memcpy(&(_visize__._value), &value, sizeof(isize));   \
-			 _visize__;                                            \
-		 }),                                                           \
-	    bool: ({                                                           \
-			 BoolPtr _bool__ = BUILD(Bool);                        \
-			 memcpy(&(_bool__._value), &value, sizeof(bool));      \
-			 _bool__;                                              \
-		 }),                                                           \
-	    default: ({ value; }))
 #define debug(l, fmt, ...)                                                     \
-	({ log(l, DEBUG, fmt, EXPAND(FOR_EACH(PROC_ARG, __VA_ARGS__))); })
-
-#define log(l, level, fmt, ...)                                                \
 	({                                                                     \
-		String _s__ = STRING(fmt);                                     \
-		Result _r__ = Log_log(l, level, _s__, __VA_ARGS__);            \
-		TRYU(_r__);                                                    \
+		Formatter formatter = FORMATTER(10000);                        \
+		Result _r1__ = FORMAT(&formatter, fmt, __VA_ARGS__);           \
+		TRYU(_r1__);                                                   \
+		Result _r2__ = Formatter_to_string(&formatter);                \
+		String _s__ = TRY(_r2__, _s__);                                \
+		printf("DEBUG: %s\n", unwrap(&_s__));                          \
 	})
 
 #endif // _LOG_LOG__

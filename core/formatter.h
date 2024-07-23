@@ -86,7 +86,6 @@ IMPL(Bool, TRAIT_DISPLAY)
 #define Bool DEFINE_CLASS(Bool)
 
 #define WRITE(f, ...) Formatter_write(f, __VA_ARGS__)
-// #define WRITE2(f, ...) Formatter_write2(f, __VA_ARGS__)
 #define TO_STRING(x)                                                           \
 	({                                                                     \
 		Result _rr11__ = to_string(x);                                 \

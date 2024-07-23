@@ -251,3 +251,4 @@ Result String_char_at(String *s, u64 index) {
 }
 
 Result String_fmt(String *s, Formatter *f) { return WRITE(f, unwrap(s)); }
+

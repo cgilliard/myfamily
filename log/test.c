@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <core/enum.h>
+#include <core/format.h>
 #include <core/result.h>
 #include <core/string.h>
 #include <core/test.h>
@@ -33,7 +34,9 @@ IMPL(MyEnumLog, TRAIT_DISPLAY)
 Result MyEnumLog_fmt(MyEnumLog *ptr, Formatter *f) {
 	MyEnumLogPtr vvx = *ptr;
 	u64 value1_out = ENUM_VALUE(value1_out, u64, vvx);
-	return WRITE(f, "value=%i", value1_out);
+	Result r1 = FORMAT(f, "value={}", value1_out);
+	TRYU(r1);
+	return Ok(UNIT);
 }
 
 MyTest(log, test_unit_tostr) {
@@ -77,25 +80,28 @@ MyTest(log, test_log_basic) {
 	i64 vv4 = 14;
 	f32 vvv1 = 15.1;
 	f64 vvv2 = 16.1;
+	u128 vvvv1 = 9999;
+	i128 vvvv2 = -8888;
 	usize usize1 = 123;
 	isize isize1 = 456;
 	bool b1 = true;
 	bool b2 = false;
 
-	debug(&log,
-	      "v1={},v2={},v3={},v4={},vv1={},vv2={},vv3={},vv4={},"
-	      "",
-	      v1, v2, v3, v4, vv1, vv2, vv3, vv4);
+	debug(&log, "v1={},v2={},v3={},v4={},vv1={},vv2={},vv3={},vv4={}", v1,
+	      v2, v3, v4, vv1, vv2, vv3, vv4);
 
 	debug(&log, "v={},v2={}", vvv1, vvv2);
 
 	debug(&log, "usize={},isize={}", usize1, isize1);
 
 	debug(&log, "b1={},b2={}", b1, b2);
+	String s3 = STRING("ok");
 
-	debug(&log, "s1={},s2={}", s1, s2);
+	debug(&log, "s1={},s2={},s3={}", s1, s2, s3);
 	Unit u = BUILD(Unit);
-	debug(&log, "u={},u2={}", u, u);
+	debug(&log, "u={},u2={},u3={}", u, u, UNIT);
+
+	debug(&log, "vvvv1={},vvvv2={}", vvvv1, vvvv2);
 
 	return Ok(UNIT);
 }

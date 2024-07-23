@@ -194,8 +194,50 @@ Result U64_fmt(U64 *v, Formatter *f) {
 	return WRITE(f, "%" PRIu64, GET(U64, v, value));
 }
 
+/*
 Result U128_fmt(U128 *v, Formatter *f) {
-	return WRITE(f, "%i", GET(U128, v, value));
+	u128 value = GET(U128, v, value);
+	return WRITE(f, "%i", value);
+}
+*/
+
+void uint128_to_str(char *str, u128 value) {
+	char buffer[128];
+	int pos = 0;
+
+	// Handle the base case for 0
+	if (value == 0) {
+		str[0] = '0';
+		str[1] = '\0';
+		return;
+	}
+
+	while (value > 0) {
+		buffer[pos++] = '0' + (value % 10);
+		value /= 10;
+	}
+	buffer[pos] = '\0';
+
+	// Reverse the buffer to get the correct number
+	int len = pos;
+	for (int i = 0; i < len / 2; i++) {
+		char temp = buffer[i];
+		buffer[i] = buffer[len - 1 - i];
+		buffer[len - 1 - i] = temp;
+	}
+
+	// Copy to the output string
+	for (int i = 0; i < len; i++) {
+		str[i] = buffer[i];
+	}
+	str[len] = '\0';
+}
+
+Result U128_fmt(U128 *v, Formatter *f) {
+	u128 value = GET(U128, v, value);
+	char str[128];
+	uint128_to_str(str, value);
+	return WRITE(f, "%s", str);
 }
 
 Result I8_fmt(I8 *v, Formatter *f) { return WRITE(f, "%d", GET(I8, v, value)); }
@@ -212,8 +254,57 @@ Result I64_fmt(I64 *v, Formatter *f) {
 	return WRITE(f, "%" PRIi64, GET(I64, v, value));
 }
 
+/*
 Result I128_fmt(I128 *v, Formatter *f) {
 	return WRITE(f, "%i", GET(I128, v, value));
+}
+*/
+
+void int128_to_str(char *str, i128 value) {
+	char buffer[128];
+	int pos = 0;
+	int is_negative = value < 0;
+
+	// Handle the base case for 0
+	if (value == 0) {
+		str[0] = '0';
+		str[1] = '\0';
+		return;
+	}
+
+	// If the value is negative, make it positive for easier handling
+	if (is_negative) {
+		value = -value;
+	}
+
+	while (value > 0) {
+		buffer[pos++] = '0' + (value % 10);
+		value /= 10;
+	}
+	buffer[pos] = '\0';
+
+	// Reverse the buffer to get the correct number
+	int len = pos;
+	for (int i = 0; i < len / 2; i++) {
+		char temp = buffer[i];
+		buffer[i] = buffer[len - 1 - i];
+		buffer[len - 1 - i] = temp;
+	}
+
+	// Add the negative sign if necessary
+	if (is_negative) {
+		str[0] = '-';
+		strcpy(str + 1, buffer);
+	} else {
+		strcpy(str, buffer);
+	}
+}
+
+Result I128_fmt(I128 *v, Formatter *f) {
+	i128 value = GET(I128, v, value);
+	char str[128];
+	int128_to_str(str, value);
+	return WRITE(f, "%s", str);
 }
 
 Result F32_fmt(F32 *v, Formatter *f) {
