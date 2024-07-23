@@ -74,16 +74,18 @@ IMPL(Log, LOG_CORE)
 
 #define ShowLogLevel(x)                                                        \
 	({                                                                     \
+		bool v = x;                                                    \
 		LogConfigOptionPtr opt =                                       \
-		    BUILD_ENUM(LogConfigOption, SHOW_LOG_LEVEL, x);            \
+		    BUILD_ENUM(LogConfigOption, SHOW_LOG_LEVEL, v);            \
 		RcPtr rc = HEAPIFY(opt);                                       \
 		rc;                                                            \
 	})
 
 #define ShowTimestamp(x)                                                       \
 	({                                                                     \
+		bool v = x;                                                    \
 		LogConfigOptionPtr opt2 =                                      \
-		    BUILD_ENUM(LogConfigOption, SHOW_TIMESTAMP, x);            \
+		    BUILD_ENUM(LogConfigOption, SHOW_TIMESTAMP, v);            \
 		RcPtr rc2 = HEAPIFY(opt2);                                     \
 		rc2;                                                           \
 	})
@@ -115,7 +117,6 @@ IMPL(Log, LOG_CORE)
 	({                                                                     \
 		FormatterPtr formatter = Log_formatter(l);                     \
 		Formatter_reset(&formatter);                                   \
-		int _x__ = 0;                                                  \
 		Result _r1__ = FORMAT(&formatter, fmt, __VA_ARGS__);           \
 		TRYU(_r1__);                                                   \
 		Result _r2__ = Formatter_to_string(&formatter);                \

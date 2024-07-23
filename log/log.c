@@ -48,6 +48,11 @@ Result Log_log(Log *log, LogLevel level, String line) {
 		Result r1 = append(&full_line, &level_str);
 		TRYU(r1);
 	}
+	if (config.show_timestamp) {
+		String ts_string = STRING("[Tue Jul 23 14:59:52 PDT 2024]: ");
+		Result r1 = append(&full_line, &ts_string);
+		TRYU(r1);
+	}
 	Result r2 = append(&full_line, &line);
 	TRYU(r2);
 	printf("%s\n", unwrap(&full_line));
@@ -60,6 +65,7 @@ Formatter Log_formatter(Log *log) { return GET(Log, log, formatter); }
 Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 	LogConfig lc;
 	lc.show_log_level = true;
+	lc.show_timestamp = true;
 
 	for (int i = 0; i < n; i++) {
 		LogConfigOptionPtr next;
@@ -75,10 +81,10 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 		MATCH(
 		    next, VARIANT(SHOW_TIMESTAMP, {
 			    bool v = ENUM_VALUE(v, bool, next);
+			    lc.show_timestamp = v;
 		    }) VARIANT(SHOW_LOG_LEVEL, {
 			    bool v = ENUM_VALUE(v, bool, next);
 			    lc.show_log_level = v;
-			    printf("show log level: %i\n", v);
 		    }) VARIANT(SHOW_TERMINAL, { printf("show terminal\n"); }));
 	}
 	va_end(ptr);

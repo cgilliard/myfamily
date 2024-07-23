@@ -107,9 +107,8 @@ MyTest(log, test_log_basic) {
 	return Ok(_());
 }
 
-MyTest(log, test_log_no_log_level) {
-	bool v = false;
-	Log log = LOG(ShowLogLevel(v));
+MyTest(log, test_log_log_level) {
+	Log log = LOG(ShowLogLevel(true), ShowTimestamp(true));
 	u32 x = 4;
 	info(&log, "test {}", x);
 	debug(&log, "test2");
@@ -128,8 +127,7 @@ MyTest(log, testfmt) {
 }
 
 MyTest(log, testlogmacro) {
-	bool v = true;
-	Log log = LOG(ShowLogLevel(v), ShowTimestamp(v));
+	Log log = LOG(ShowLogLevel(true), ShowTimestamp(false));
 	u64 x = 1000;
 	debug(&log, "test {}", x);
 	info(&log, "ok ok ok");
