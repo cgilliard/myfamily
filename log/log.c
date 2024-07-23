@@ -20,4 +20,3 @@
 void Log_cleanup(Log *log) {}
 
 Result Log_log(Log *log, LogLevel level, String fmt, ...) { return Ok(UNIT); }
-
