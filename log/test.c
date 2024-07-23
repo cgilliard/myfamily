@@ -40,8 +40,7 @@ Result MyEnumLog_fmt(MyEnumLog *ptr, Formatter *f) {
 }
 
 MyTest(log, test_unit_tostr) {
-	Result r = Log_build(0);
-	LogPtr log = TRY(r, log);
+	LogPtr log = LOG();
 
 	u32 v = 12345;
 	MyEnumLog mel = BUILD_ENUM(MyEnumLog, TYPE1, v);
@@ -110,9 +109,7 @@ MyTest(log, test_log_basic) {
 
 MyTest(log, test_log_no_log_level) {
 	bool v = false;
-	LogConfigOption opt = BUILD_ENUM(LogConfigOption, SHOW_LOG_LEVEL, v);
-	Result r = Log_build(1, opt);
-	Log log = TRY(r, log);
+	Log log = LOG(ShowLogLevel(v));
 	u32 x = 4;
 	info(&log, "test {}", x);
 	debug(&log, "test2");
@@ -127,5 +124,15 @@ MyTest(log, testfmt) {
 	Result rrr = Formatter_to_string(&f);
 	String s = TRY(rrr, s);
 	printf("s=%s\n", unwrap(&s));
+	return Ok(UNIT);
+}
+
+MyTest(log, testlogmacro) {
+	bool v = true;
+	Log log = LOG(ShowLogLevel(v), ShowTimestamp(v));
+	u64 x = 1000;
+	debug(&log, "test {}", x);
+	info(&log, "ok ok ok");
+
 	return Ok(UNIT);
 }

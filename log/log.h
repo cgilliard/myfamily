@@ -60,12 +60,44 @@ typedef struct LogConfig {
 	TRAIT_REQUIRED(T, Result, log, T##Ptr *log, LogLevel level,            \
 		       String line)                                            \
 	TRAIT_REQUIRED(T, Formatter, formatter, T##Ptr *log)                   \
-	TRAIT_REQUIRED(T, Result, build, int n, ...)
+	TRAIT_REQUIRED(T, Result, build, int n, ...)                           \
+	TRAIT_REQUIRED(T, Result, build_rc, int n, ...)
 
 CLASS(Log,
       FIELD(LogConfig, config) FIELD(FILE *, fp) FIELD(Formatter, formatter))
 IMPL(Log, LOG_CORE)
 #define Log DEFINE_CLASS(Log)
+
+#define COUNT_LOG_CONFIG(value) ({ __counter___ += 1; })
+
+#define PROC_LOG_CONFIG(value) ({ value; })
+
+#define ShowLogLevel(x)                                                        \
+	({                                                                     \
+		LogConfigOptionPtr opt =                                       \
+		    BUILD_ENUM(LogConfigOption, SHOW_LOG_LEVEL, x);            \
+		RcPtr rc = HEAPIFY(opt);                                       \
+		rc;                                                            \
+	})
+
+#define ShowTimestamp(x)                                                       \
+	({                                                                     \
+		LogConfigOptionPtr opt2 =                                      \
+		    BUILD_ENUM(LogConfigOption, SHOW_TIMESTAMP, x);            \
+		RcPtr rc2 = HEAPIFY(opt2);                                     \
+		rc2;                                                           \
+	})
+
+#define LOG(...)                                                               \
+	({                                                                     \
+		int __counter___ = 0;                                          \
+		EXPAND(FOR_EACH(COUNT_LOG_CONFIG, __VA_ARGS__));               \
+		Result __rr___ =                                               \
+		    Log_build_rc(__counter___ __VA_OPT__(, ) __VA_OPT__(       \
+			EXPAND(FOR_EACH(PROC_LOG_CONFIG, __VA_ARGS__))));      \
+		LogPtr __log___ = TRY(__rr___, __log___);                      \
+		__log___;                                                      \
+	})
 
 #define debug(l, fmt, ...)                                                     \
 	({                                                                     \

@@ -57,17 +57,25 @@ Result Log_log(Log *log, LogLevel level, String line) {
 
 Formatter Log_formatter(Log *log) { return GET(Log, log, formatter); }
 
-Result Log_build(int n, ...) {
+Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 	LogConfig lc;
 	lc.show_log_level = true;
 
-	va_list ptr;
-	va_start(ptr, n);
 	for (int i = 0; i < n; i++) {
-		LogConfigOptionPtr next = va_arg(ptr, LogConfigOption);
+		LogConfigOptionPtr next;
+		Rc rc;
+		if (!is_rc)
+			next = va_arg(ptr, LogConfigOption);
+		else {
+			rc = va_arg(ptr, Rc);
+			void *ptr = unwrap(&rc);
+			memcpy(&next, ptr, size(ptr));
+		}
 
 		MATCH(
-		    next, VARIANT(SHOW_LOG_LEVEL, {
+		    next, VARIANT(SHOW_TIMESTAMP, {
+			    bool v = ENUM_VALUE(v, bool, next);
+		    }) VARIANT(SHOW_LOG_LEVEL, {
 			    bool v = ENUM_VALUE(v, bool, next);
 			    lc.show_log_level = v;
 			    printf("show log level: %i\n", v);
@@ -80,3 +88,14 @@ Result Log_build(int n, ...) {
 	return Ok(ret);
 }
 
+Result Log_build_rc(int n, ...) {
+	va_list ptr;
+	va_start(ptr, n);
+	return Log_build_impl(n, ptr, true);
+}
+
+Result Log_build(int n, ...) {
+	va_list ptr;
+	va_start(ptr, n);
+	return Log_build_impl(n, ptr, false);
+}
