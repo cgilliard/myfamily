@@ -56,3 +56,11 @@
 #define FOR_EACH_12(action, a, b, c, d, e, f, g, h, i, j, k, l)                \
 	action(a), action(b), action(c), action(d), action(e), action(f),      \
 	    action(g), action(h), action(i), action(j), action(k), action(l)
+
+#define IF_ELSE(cond) _IF_ELSE(cond)
+#define _IF_ELSE(cond) __IF_ELSE_##cond
+#define __IF_ELSE_1(true_case, false_case) true_case
+#define __IF_ELSE_0(true_case, false_case) false_case
+
+#define GET_3RD_ARG(arg1, arg2, arg3, ...) arg3
+#define HAS_ARGS(...) GET_3RD_ARG(__VA_ARGS__, 1, 0, 0)

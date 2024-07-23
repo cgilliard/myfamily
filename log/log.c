@@ -12,11 +12,71 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/ekinds.h>
+#include <core/error.h>
 #include <core/formatter.h>
 #include <core/string.h>
 #include <core/unit.h>
 #include <log/log.h>
 
+GETTER(Log, formatter)
+GETTER(Log, config)
+
 void Log_cleanup(Log *log) {}
 
-Result Log_log(Log *log, LogLevel level, String fmt, ...) { return Ok(UNIT); }
+Result Log_log(Log *log, LogLevel level, String line) {
+	String full_line = STRING("");
+	LogConfig config = GET(Log, log, config);
+	if (config.show_log_level) {
+		String level_str;
+		if (level == TRACE)
+			level_str = STRING("TRACE: ");
+		else if (level == DEBUG)
+			level_str = STRING("DEBUG: ");
+		else if (level == INFO)
+			level_str = STRING("INFO: ");
+		else if (level == WARN)
+			level_str = STRING("WARN: ");
+		else if (level == ERROR)
+			level_str = STRING("ERROR: ");
+		else if (level == FATAL)
+			level_str = STRING("FATAL: ");
+		else {
+			Error err = ERR(ILLEGAL_STATE, "unexpected log level");
+			return Err(err);
+		}
+		Result r1 = append(&full_line, &level_str);
+		TRYU(r1);
+	}
+	Result r2 = append(&full_line, &line);
+	TRYU(r2);
+	printf("%s\n", unwrap(&full_line));
+
+	return Ok(UNIT);
+}
+
+Formatter Log_formatter(Log *log) { return GET(Log, log, formatter); }
+
+Result Log_build(int n, ...) {
+	LogConfig lc;
+	lc.show_log_level = true;
+
+	va_list ptr;
+	va_start(ptr, n);
+	for (int i = 0; i < n; i++) {
+		LogConfigOptionPtr next = va_arg(ptr, LogConfigOption);
+
+		MATCH(
+		    next, VARIANT(SHOW_LOG_LEVEL, {
+			    bool v = ENUM_VALUE(v, bool, next);
+			    lc.show_log_level = v;
+			    printf("show log level: %i\n", v);
+		    }) VARIANT(SHOW_TERMINAL, { printf("show terminal\n"); }));
+	}
+	va_end(ptr);
+
+	Formatter f = FORMATTER(10000);
+	LogPtr ret = BUILD(Log, lc, NULL, f);
+	return Ok(ret);
+}
+

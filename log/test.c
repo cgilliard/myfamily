@@ -40,7 +40,8 @@ Result MyEnumLog_fmt(MyEnumLog *ptr, Formatter *f) {
 }
 
 MyTest(log, test_unit_tostr) {
-	Log log;
+	Result r = Log_build(0);
+	LogPtr log = TRY(r, log);
 
 	u32 v = 12345;
 	MyEnumLog mel = BUILD_ENUM(MyEnumLog, TYPE1, v);
@@ -59,7 +60,8 @@ MyTest(log, test_unit_tostr) {
 }
 
 MyTest(log, test_log_basic) {
-	Log log;
+	Result r = Log_build(0);
+	Log log = TRY(r, log);
 	String s1 = STRING("abc");
 	String s2 = STRING("def");
 	i8 vi8 = 44;
@@ -105,3 +107,20 @@ MyTest(log, test_log_basic) {
 
 	return Ok(UNIT);
 }
+
+MyTest(log, test_log_no_log_level) {
+	bool v = true;
+	LogConfigOption opt = BUILD_ENUM(LogConfigOption, SHOW_LOG_LEVEL, v);
+	Result r = Log_build(1, opt);
+	Log log = TRY(r, log);
+	u32 x = 4;
+	info(&log, "test {}", x);
+	debug(&log, "test2 {}", x);
+
+	Formatter f = FORMATTER(1000);
+	Result rr = FORMAT(&f, "test1", x);
+
+	return Ok(UNIT);
+}
+
+MyTest(log, testfmt) { return Ok(UNIT); }

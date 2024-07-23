@@ -100,6 +100,15 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 		 }),                                                           \
 	    default: ({ value; }))
 
+#define FORMAT_NO_ARGS(f, fmt) format(f, fmt)
+#define FORMAT_ARGS(f, fmt, ...)                                               \
+	format(f, fmt, EXPAND(FOR_EACH(PROC_ARG, __VA_ARGS__)))
+/*
+#define FORMAT(f, fmt, ...)                                                    \
+	IF_ELSE(HAS_ARGS(__VA_ARGS__))                                         \
+	(FORMAT_ARGS(f, fmt, __VA_ARGS__)), (FORMAT_NO_ARGS(f, fmt))
+	*/
+
 #define FORMAT(f, fmt, ...)                                                    \
 	format(f, fmt, EXPAND(FOR_EACH(PROC_ARG, __VA_ARGS__)))
 

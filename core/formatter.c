@@ -80,49 +80,7 @@ Result Formatter_write(Formatter *ptr, char *fmt, ...) {
 	return Ok(UNIT);
 }
 
-/*
-Result Formatter_write2(Formatter *formatter, String fmt, ...) {
-	int n = 0;
-
-	u64 itt = 0;
-	while (true) {
-		Result r = String_index_of_s(&fmt, "{}", itt);
-		i64 v = TRY(r, v);
-		if (v < 0)
-			break;
-		itt = v + 2;
-		n += 1;
-	}
-
-	va_list ptr;
-	va_start(ptr, n);
-
-	itt = 0;
-	String fmt_str = STRING("");
-	for (int i = 0; i < n; i++) {
-		Result r = String_index_of_s(&fmt, "{}", itt);
-		i64 v = TRY(r, v);
-		if (v < 0)
-			break;
-		String sub = SUBSTRING(&fmt, itt, v);
-		Result r2 = append(&fmt_str, &sub);
-		Result r3 = WRITE(&formatter, unwrap(&sub));
-		Object *next = va_arg(ptr, void *);
-		if (CLASS_NAME(next) == NULL) {
-			printf("null\n");
-		}
-		Result r4 = to_string(next);
-		String s4 = TRY(r4, s4);
-		Result r5 = WRITE(&formatter, unwrap(&s4));
-
-		itt = v + 2;
-	}
-	String sub = SUBSTRING(&fmt, itt, len(&fmt));
-	Result r5 = WRITE(&formatter, unwrap(&sub));
-	va_end(ptr);
-	return Ok(UNIT);
-}
-*/
+void Formatter_reset(Formatter *ptr) { SET(Formatter, ptr, pos, 0); }
 
 Result Formatter_to_string(Formatter *ptr) {
 	char *buf = *Formatter_get_buf(ptr);
@@ -194,13 +152,6 @@ Result U64_fmt(U64 *v, Formatter *f) {
 	return WRITE(f, "%" PRIu64, GET(U64, v, value));
 }
 
-/*
-Result U128_fmt(U128 *v, Formatter *f) {
-	u128 value = GET(U128, v, value);
-	return WRITE(f, "%i", value);
-}
-*/
-
 void uint128_to_str(char *str, u128 value) {
 	char buffer[128];
 	int pos = 0;
@@ -253,12 +204,6 @@ Result I32_fmt(I32 *v, Formatter *f) {
 Result I64_fmt(I64 *v, Formatter *f) {
 	return WRITE(f, "%" PRIi64, GET(I64, v, value));
 }
-
-/*
-Result I128_fmt(I128 *v, Formatter *f) {
-	return WRITE(f, "%i", GET(I128, v, value));
-}
-*/
 
 void int128_to_str(char *str, i128 value) {
 	char buffer[128];
@@ -332,3 +277,4 @@ Result Bool_fmt(Bool *v, Formatter *f) {
 }
 
 Result Unit_fmt(Unit *v, Formatter *f) { return WRITE(f, "()"); }
+

@@ -58,20 +58,38 @@ typedef struct LogConfig {
 
 #define LOG_CORE(T)                                                            \
 	TRAIT_REQUIRED(T, Result, log, T##Ptr *log, LogLevel level,            \
-		       String fmt, ...)
+		       String line)                                            \
+	TRAIT_REQUIRED(T, Formatter, formatter, T##Ptr *log)                   \
+	TRAIT_REQUIRED(T, Result, build, int n, ...)
 
-CLASS(Log, FIELD(FILE *, fp) FIELD(LogConfig, config))
+CLASS(Log,
+      FIELD(LogConfig, config) FIELD(FILE *, fp) FIELD(Formatter, formatter))
 IMPL(Log, LOG_CORE)
 #define Log DEFINE_CLASS(Log)
 
 #define debug(l, fmt, ...)                                                     \
 	({                                                                     \
-		Formatter formatter = FORMATTER(10000);                        \
+		FormatterPtr formatter = Log_formatter(l);                     \
+		Formatter_reset(&formatter);                                   \
 		Result _r1__ = FORMAT(&formatter, fmt, __VA_ARGS__);           \
 		TRYU(_r1__);                                                   \
 		Result _r2__ = Formatter_to_string(&formatter);                \
 		String _s__ = TRY(_r2__, _s__);                                \
-		printf("DEBUG: %s\n", unwrap(&_s__));                          \
+		Result _r2debug__ = Log_log(l, DEBUG, _s__);                   \
+		TRYU(_r2debug__);                                              \
+	})
+
+#define info(l, fmt, ...)                                                      \
+	({                                                                     \
+		FormatterPtr formatter = Log_formatter(l);                     \
+		Formatter_reset(&formatter);                                   \
+		int _x__ = 0;                                                  \
+		Result _r1__ = FORMAT(&formatter, fmt, __VA_ARGS__);           \
+		TRYU(_r1__);                                                   \
+		Result _r2__ = Formatter_to_string(&formatter);                \
+		String _s__ = TRY(_r2__, _s__);                                \
+		Result _r2debug__ = Log_log(l, INFO, _s__);                    \
+		TRYU(_r2debug__);                                              \
 	})
 
 #endif // _LOG_LOG__

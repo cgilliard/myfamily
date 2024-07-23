@@ -30,7 +30,7 @@ IMPL(Formatter, TRAIT_FORMATTER)
 IMPL(Formatter, TRAIT_TO_STRING)
 #define Formatter DEFINE_CLASS(Formatter)
 
-// Result Formatter_write2(Formatter *f, String fmt, ...);
+void Formatter_reset(Formatter *fmt);
 
 #undef U64
 IMPL(U64, TRAIT_DISPLAY)
