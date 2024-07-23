@@ -30,6 +30,8 @@ IMPL(Formatter, TRAIT_FORMATTER)
 IMPL(Formatter, TRAIT_TO_STRING)
 #define Formatter DEFINE_CLASS(Formatter)
 
+// Result Formatter_write2(Formatter *f, String fmt, ...);
+
 #undef U64
 IMPL(U64, TRAIT_DISPLAY)
 #define U64 DEFINE_CLASS(U64)
@@ -83,11 +85,8 @@ IMPL(USize, TRAIT_DISPLAY)
 IMPL(Bool, TRAIT_DISPLAY)
 #define Bool DEFINE_CLASS(Bool)
 
-#undef Unit
-IMPL(Unit, TRAIT_DISPLAY)
-#define Unit DEFINE_CLASS(Unit)
-
 #define WRITE(f, ...) Formatter_write(f, __VA_ARGS__)
+// #define WRITE2(f, ...) Formatter_write2(f, __VA_ARGS__)
 #define TO_STRING(x)                                                           \
 	({                                                                     \
 		Result _rr11__ = to_string(x);                                 \

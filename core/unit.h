@@ -18,8 +18,8 @@
 #include <core/class.h>
 #include <core/traits_base.h>
 
-CLASS(Unit, FIELD(bool, _dummy))
-// CLASS(Unit)
+// CLASS(Unit, FIELD(bool, _dummy))
+CLASS(Unit)
 IMPL(Unit, TRAIT_COPY)
 IMPL(Unit, TRAIT_EQUAL)
 #define Unit DEFINE_CLASS(Unit)

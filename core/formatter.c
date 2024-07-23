@@ -80,6 +80,50 @@ Result Formatter_write(Formatter *ptr, char *fmt, ...) {
 	return Ok(UNIT);
 }
 
+/*
+Result Formatter_write2(Formatter *formatter, String fmt, ...) {
+	int n = 0;
+
+	u64 itt = 0;
+	while (true) {
+		Result r = String_index_of_s(&fmt, "{}", itt);
+		i64 v = TRY(r, v);
+		if (v < 0)
+			break;
+		itt = v + 2;
+		n += 1;
+	}
+
+	va_list ptr;
+	va_start(ptr, n);
+
+	itt = 0;
+	String fmt_str = STRING("");
+	for (int i = 0; i < n; i++) {
+		Result r = String_index_of_s(&fmt, "{}", itt);
+		i64 v = TRY(r, v);
+		if (v < 0)
+			break;
+		String sub = SUBSTRING(&fmt, itt, v);
+		Result r2 = append(&fmt_str, &sub);
+		Result r3 = WRITE(&formatter, unwrap(&sub));
+		Object *next = va_arg(ptr, void *);
+		if (CLASS_NAME(next) == NULL) {
+			printf("null\n");
+		}
+		Result r4 = to_string(next);
+		String s4 = TRY(r4, s4);
+		Result r5 = WRITE(&formatter, unwrap(&s4));
+
+		itt = v + 2;
+	}
+	String sub = SUBSTRING(&fmt, itt, len(&fmt));
+	Result r5 = WRITE(&formatter, unwrap(&sub));
+	va_end(ptr);
+	return Ok(UNIT);
+}
+*/
+
 Result Formatter_to_string(Formatter *ptr) {
 	char *buf = *Formatter_get_buf(ptr);
 	u64 pos = *Formatter_get_pos(ptr);
@@ -93,16 +137,23 @@ Result to_string_buf(void *obj, usize buf_size) {
 	ResultPtr (*do_fmt)(Object *obj, Formatter *formatter) =
 	    find_fn((Object *)obj, "fmt");
 	if (do_fmt == NULL) {
+		char *class_name = CLASS_NAME(obj);
+		u64 id = ((Object *)obj)->vdata.id;
+		int sz = strlen(class_name) + 20;
+		if (sz > buf_size)
+			sz = buf_size;
+		char buf[1 + sz];
+		Formatter fmt = BUILD(Formatter, buf, buf_size, 0, false);
+		snprintf(buf, 1 + sz, "%s@%llu", class_name, id);
 
-		panic("display trait not implemented for this type [%s]",
-		      CLASS_NAME(obj));
+		return String_build(buf);
 	}
 
 	char buf[buf_size];
 	Formatter fmt = BUILD(Formatter, buf, buf_size, 0, false);
 
 	Result r = do_fmt(obj, &fmt);
-	Unit u = TRY(r, u);
+	TRYU(r);
 
 	return Formatter_to_string(&fmt);
 }

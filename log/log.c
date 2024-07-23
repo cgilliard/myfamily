@@ -46,7 +46,10 @@ Result Log_log(Log *log, LogLevel level, String fmt, ...) {
 		String sub = SUBSTRING(&fmt, itt, v);
 		Result r2 = append(&fmt_str, &sub);
 		Result r3 = WRITE(&formatter, unwrap(&sub));
-		void *next = va_arg(ptr, void *);
+		Object *next = va_arg(ptr, void *);
+		if (CLASS_NAME(next) == NULL) {
+			printf("null\n");
+		}
 		Result r4 = to_string(next);
 		String s4 = TRY(r4, s4);
 		Result r5 = WRITE(&formatter, unwrap(&s4));

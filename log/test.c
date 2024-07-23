@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/enum.h>
 #include <core/result.h>
 #include <core/string.h>
 #include <core/test.h>
+#include <core/tuple.h>
 #include <core/unit.h>
 #include <log/log.h>
 
@@ -22,11 +24,34 @@
 
 MySuite(log);
 
+MyTest(log, test_va_args) { return Ok(UNIT); }
+
+ENUM(MyEnumLog, VARIANTS(TYPE1, TYPE2, TYPE3), TYPES("u32", "u64", "usize"))
+IMPL(MyEnumLog, TRAIT_DISPLAY)
+#define MyEnumLog DEFINE_ENUM(MyEnumLog)
+
+Result MyEnumLog_fmt(MyEnumLog *ptr, Formatter *f) {
+	MyEnumLogPtr vvx = *ptr;
+	u64 value1_out = ENUM_VALUE(value1_out, u64, vvx);
+	return WRITE(f, "value=%i", value1_out);
+}
+
 MyTest(log, test_unit_tostr) {
 	Log log;
 
-	Unit s = UNIT;
-	debug(&log, "u={}", s);
+	u32 v = 12345;
+	MyEnumLog mel = BUILD_ENUM(MyEnumLog, TYPE1, v);
+
+	debug(&log, "mel={}", mel);
+
+	String s2 = STRING("test");
+	debug(&log, "u={},s={},u2={}", UNIT, s2, UNIT);
+
+	u32 x = 1;
+	u64 y = 2;
+	i32 z = -2;
+	Tuple t1 = TUPLE(x, y, z);
+
 	return Ok(UNIT);
 }
 
@@ -69,9 +94,8 @@ MyTest(log, test_log_basic) {
 	debug(&log, "b1={},b2={}", b1, b2);
 
 	debug(&log, "s1={},s2={}", s1, s2);
-	Unit u = UNIT;
-	printf("unit.vdata=%i\n", u.vdata);
-	debug(&log, "u={}", u);
+	Unit u = BUILD(Unit);
+	debug(&log, "u={},u2={}", u, u);
 
 	return Ok(UNIT);
 }

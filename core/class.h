@@ -49,6 +49,7 @@ typedef struct {
 typedef struct {
 	Vtable *vtable;
 	char *name;
+	u64 id;
 } Vdata;
 
 typedef struct {
@@ -64,11 +65,14 @@ void vtable_cleanup(Vtable *table);
 
 #define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup)
 
-#define BUILD(name, ...) {{&name##Ptr_Vtable__, #name}, __VA_ARGS__}
+#define NEXT_ID __COUNTER__
+#define BUILD(name, ...)                                                       \
+	{{&name##Ptr_Vtable__, #name, NEXT_ID}, false, __VA_ARGS__}
 #define BUILDPTR(ptr, cname)                                                   \
 	({                                                                     \
 		ptr->vdata.vtable = &cname##Ptr_Vtable__;                      \
 		ptr->vdata.name = #cname;                                      \
+		ptr->vdata.id = NEXT_ID;                                       \
 	})
 
 #define MEMBER_TYPE(type, member) typeof(((type *)0)->member)
@@ -105,6 +109,7 @@ void vtable_cleanup(Vtable *table);
 	typedef struct name##Ptr name##Ptr;                                    \
 	typedef struct name##Ptr {                                             \
 		Vdata vdata;                                                   \
+		bool __dummy_;                                                 \
 		__VA_ARGS__                                                    \
 	} name##Ptr;                                                           \
 	static Vtable name##Ptr_Vtable__ = {0, UNIQUE_ID, NULL};               \
