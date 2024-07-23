@@ -110,6 +110,6 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 	*/
 
 #define FORMAT(f, fmt, ...)                                                    \
-	format(f, fmt, EXPAND(FOR_EACH(PROC_ARG, __VA_ARGS__)))
+	format(f, fmt __VA_OPT__(, ) EXPAND(FOR_EACH(PROC_ARG, __VA_ARGS__)))
 
 #endif // _CORE_FORMAT__

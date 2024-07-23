@@ -109,18 +109,23 @@ MyTest(log, test_log_basic) {
 }
 
 MyTest(log, test_log_no_log_level) {
-	bool v = true;
+	bool v = false;
 	LogConfigOption opt = BUILD_ENUM(LogConfigOption, SHOW_LOG_LEVEL, v);
 	Result r = Log_build(1, opt);
 	Log log = TRY(r, log);
 	u32 x = 4;
 	info(&log, "test {}", x);
-	debug(&log, "test2 {}", x);
-
-	Formatter f = FORMATTER(1000);
-	Result rr = FORMAT(&f, "test1", x);
+	debug(&log, "test2");
 
 	return Ok(UNIT);
 }
 
-MyTest(log, testfmt) { return Ok(UNIT); }
+MyTest(log, testfmt) {
+	int x = 0;
+	Formatter f = FORMATTER(1000);
+	Result rr = FORMAT(&f, "test1");
+	Result rrr = Formatter_to_string(&f);
+	String s = TRY(rrr, s);
+	printf("s=%s\n", unwrap(&s));
+	return Ok(UNIT);
+}
