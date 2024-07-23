@@ -39,7 +39,7 @@ MyTest(core, test_class) {
 	SET(MyTestClass, &c1, testf, 9);
 	out = GET(MyTestClass, &c1, testf);
 	assert_eq(out, 9);
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 MyTest(core, test_tuple) {
@@ -58,7 +58,7 @@ MyTest(core, test_tuple) {
 	ELEMENT_AT(&tuple, 2, &c1_out);
 	u32 out = GET(MyTestClass, &c1_out, testf);
 	assert_eq(out, 8);
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 ENUM(MyEnum, VARIANTS(TYPE_U32, TYPE_U64), TYPES("u32", "u64"))
@@ -107,7 +107,7 @@ MyTest(core, test_enum) {
 	      }));
 	assert_eq(value4_out, 101);
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 Result test_fn(u64 x) {
@@ -170,7 +170,7 @@ MyTest(core, test_result) {
 	assert(is_err);
 	Error err7 = UNWRAP_ERR(r7);
 	assert(equal(KIND(err7), &ILLEGAL_ARGUMENT));
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 Result test_try2(u64 x) {
@@ -218,7 +218,7 @@ MyTest(core, test_try_expect) {
 	U64 u_out = UNWRAP(r6, U64);
 	u64 u_out_unwrap = *(u64 *)unwrap(&u_out);
 	assert_eq(u_out_unwrap, 1001);
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 CLASS(TestCleanup, FIELD(void *, ptr))
@@ -252,7 +252,7 @@ MyTest(core, test_cleanup) {
 	Result r3 = ret_test_cleanup();
 	TestCleanup tc3_out = UNWRAP(r3, TestCleanup);
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 MyTest(core, test_option) {
@@ -271,7 +271,7 @@ MyTest(core, test_option) {
 	Option opt2 = None;
 	assert(IS_NONE(opt2));
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 MyTest(core, test_complex) {
@@ -291,7 +291,7 @@ MyTest(core, test_complex) {
 	u32 x1_out = UNWRAP_PRIM(x2_out, x1_out);
 	assert_eq(x1_out, 123);
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 MyTest(core, test_string) {
@@ -324,7 +324,7 @@ MyTest(core, test_string) {
 	assert_eq_str(unwrap(&s2), "this is a test");
 	assert_eq(len(&s2), strlen("this is a test"));
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 MyTest(core, test_string_core) {
@@ -360,7 +360,7 @@ MyTest(core, test_string_core) {
 	i64 v3 = UNWRAP_PRIM(r3, v3);
 	assert_eq(v3, 26);
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 CLASS(FmtClass, FIELD(u64, value1) FIELD(i32, value2))
@@ -412,7 +412,7 @@ MyTest(core, test_formatter) {
 	String s7 = UNWRAP(r7, String);
 	assert_eq_str(unwrap(&s7), "value1: 123, value2: -1");
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 ENUM(MyEnum3, VARIANTS(TYPE_USIZE, TYPE_U643, TYPE_BOOL3),
@@ -427,5 +427,5 @@ MyTest(core, test_alloc_error_result) {
 	usize x1 = 505;
 	MyEnum3 my_enum = TRY_BUILD_ENUM(MyEnum3, TYPE_USIZE, x1);
 
-	return Ok(UNIT);
+	return Ok(_());
 }

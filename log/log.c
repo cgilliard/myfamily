@@ -52,7 +52,7 @@ Result Log_log(Log *log, LogLevel level, String line) {
 	TRYU(r2);
 	printf("%s\n", unwrap(&full_line));
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 Formatter Log_formatter(Log *log) { return GET(Log, log, formatter); }

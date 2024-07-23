@@ -52,5 +52,5 @@ Result format(Formatter *formatter, char *format_s, ...) {
 	String sub = SUBSTRING(&fmt, itt, len(&fmt));
 	Result r5 = WRITE(formatter, unwrap(&sub));
 	va_end(ptr);
-	return Ok(UNIT);
+	return Ok(_());
 }

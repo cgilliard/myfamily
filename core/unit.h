@@ -24,5 +24,6 @@ IMPL(Unit, TRAIT_COPY)
 IMPL(Unit, TRAIT_EQUAL)
 #define Unit DEFINE_CLASS(Unit)
 static Unit UNIT = BUILD(Unit);
+#define _() UNIT
 
 #endif // _CORE_UNIT__

@@ -62,7 +62,7 @@ Result Formatter_write(Formatter *ptr, char *fmt, ...) {
 
 	if (r < rem) {
 		Formatter_set_pos(ptr, pos + r);
-		return Ok(UNIT);
+		return Ok(_());
 	} else if (r >= rem) {
 		va_start(args2, fmt);
 		i32 r2 = vsnprintf(NULL, 0, fmt, args2);
@@ -74,10 +74,10 @@ Result Formatter_write(Formatter *ptr, char *fmt, ...) {
 			return Err(err);
 		} else {
 			Formatter_set_pos(ptr, pos + r);
-			return Ok(UNIT);
+			return Ok(_());
 		}
 	}
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 void Formatter_reset(Formatter *ptr) { SET(Formatter, ptr, pos, 0); }

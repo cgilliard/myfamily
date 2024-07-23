@@ -25,7 +25,7 @@
 
 MySuite(log);
 
-MyTest(log, test_va_args) { return Ok(UNIT); }
+MyTest(log, test_va_args) { return Ok(_()); }
 
 ENUM(MyEnumLog, VARIANTS(TYPE1, TYPE2, TYPE3), TYPES("u32", "u64", "usize"))
 IMPL(MyEnumLog, TRAIT_DISPLAY)
@@ -36,7 +36,7 @@ Result MyEnumLog_fmt(MyEnumLog *ptr, Formatter *f) {
 	u64 value1_out = ENUM_VALUE(value1_out, u64, vvx);
 	Result r1 = FORMAT(f, "value={}", value1_out);
 	TRYU(r1);
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 MyTest(log, test_unit_tostr) {
@@ -48,14 +48,14 @@ MyTest(log, test_unit_tostr) {
 	debug(&log, "mel={}", mel);
 
 	String s2 = STRING("test");
-	debug(&log, "u={},s={},u2={}", UNIT, s2, UNIT);
+	debug(&log, "u={},s={},u2={}", _(), s2, _());
 
 	u32 x = 1;
 	u64 y = 2;
 	i32 z = -2;
 	Tuple t1 = TUPLE(x, y, z);
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 MyTest(log, test_log_basic) {
@@ -100,11 +100,11 @@ MyTest(log, test_log_basic) {
 
 	debug(&log, "s1={},s2={},s3={}", s1, s2, s3);
 	Unit u = BUILD(Unit);
-	debug(&log, "u={},u2={},u3={}", u, u, UNIT);
+	debug(&log, "u={},u2={},u3={}", u, u, _());
 
 	debug(&log, "vvvv1={},vvvv2={}", vvvv1, vvvv2);
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 MyTest(log, test_log_no_log_level) {
@@ -114,7 +114,7 @@ MyTest(log, test_log_no_log_level) {
 	info(&log, "test {}", x);
 	debug(&log, "test2");
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 MyTest(log, testfmt) {
@@ -124,7 +124,7 @@ MyTest(log, testfmt) {
 	Result rrr = Formatter_to_string(&f);
 	String s = TRY(rrr, s);
 	printf("s=%s\n", unwrap(&s));
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 MyTest(log, testlogmacro) {
@@ -134,5 +134,5 @@ MyTest(log, testlogmacro) {
 	debug(&log, "test {}", x);
 	info(&log, "ok ok ok");
 
-	return Ok(UNIT);
+	return Ok(_());
 }

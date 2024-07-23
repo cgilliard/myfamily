@@ -89,7 +89,7 @@ Result String_append(String *s1, String *s2) {
 	SET(String, s1, ptr, tmp);
 	SET(String, s1, len, s1_new_len);
 
-	return Ok(UNIT);
+	return Ok(_());
 }
 
 Result String_build(char *s) {
