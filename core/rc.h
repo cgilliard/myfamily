@@ -122,13 +122,6 @@ static SETTER(Rc, flags);
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    size_t: ({                                                         \
-			 USizePtr obj = BUILD(USize, 0);                       \
-			 memcpy(&obj._value, &v, sizeof(u64));                 \
-			 void *ptr = HEAPIFY_DIRECT(obj);                      \
-			 RcPtr ret = RC(ptr);                                  \
-			 ret;                                                  \
-		 }),                                                           \
 	    float: ({                                                          \
 			 F32Ptr obj = BUILD(F32, 0);                           \
 			 memcpy(&obj._value, &v, sizeof(f32));                 \

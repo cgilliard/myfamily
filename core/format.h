@@ -83,16 +83,6 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 			 memcpy(&(_vf32__._value), &(value), sizeof(f32));     \
 			 _vf32__;                                              \
 		 }),                                                           \
-	    size_t: ({                                                         \
-			 USizePtr _vu64__ = BUILD(USize);                      \
-			 memcpy(&(_vu64__._value), &(value), sizeof(u64));     \
-			 _vu64__;                                              \
-		 }),                                                           \
-	    intptr_t: ({                                                       \
-			 ISizePtr _vu64__ = BUILD(ISize);                      \
-			 memcpy(&(_vu64__._value), &(value), sizeof(u64));     \
-			 _vu64__;                                              \
-		 }),                                                           \
 	    bool: ({                                                           \
 			 BoolPtr _bool__ = BUILD(Bool);                        \
 			 memcpy(&(_bool__._value), &(value), sizeof(bool));    \

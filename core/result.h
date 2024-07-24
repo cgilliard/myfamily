@@ -209,16 +209,6 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 bool ret = *(bool *)unwrap(&val);                     \
 			 ret;                                                  \
 		 }),                                                           \
-	    size_t: ({                                                         \
-			 if (IS_ERR(x))                                        \
-				 panic("Attempt to unwrap an error or none");  \
-			 USizePtr val = ENUM_VALUE(val, USize, x);             \
-			 if (strcmp(CLASS_NAME(&val), "USize"))                \
-				 panic("Expected [USize]. Found [%s].",        \
-				       CLASS_NAME(&val));                      \
-			 u64 ret = *(u64 *)unwrap(&val);                       \
-			 ret;                                                  \
-		 }),                                                           \
 	    default: ({                                                        \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
