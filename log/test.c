@@ -33,14 +33,12 @@ IMPL(MyEnumLog, TRAIT_DISPLAY)
 
 Result MyEnumLog_fmt(MyEnumLog *ptr, Formatter *f) {
 	MyEnumLogPtr vvx = *ptr;
-	u64 value1_out = ENUM_VALUE(value1_out, u64, vvx);
-	Result r1 = FORMAT(f, "value={}", value1_out);
-	TRYU(r1);
-	return Ok(_());
+	u32 value1_out = ENUM_VALUE(value1_out, u32, vvx);
+	return FORMAT(f, "value={}", value1_out);
 }
 
 MyTest(log, test_unit_tostr) {
-	LogPtr log = LOG();
+	Log log = LOG();
 
 	u32 v = 12345;
 	MyEnumLog mel = BUILD_ENUM(MyEnumLog, TYPE1, v);
@@ -86,22 +84,41 @@ MyTest(log, test_log_basic) {
 	u64 u641 = 123;
 	bool b1 = true;
 	bool b2 = false;
+	/*
+	Formatter f = FORMATTER(10000);
+	Result _r1 = FORMAT(&f, "v1={},v2={},v3={},v4={},vv1={},vv2={},vv3={},vv4={}", v1,
+              v2, v3, v4, vv1, vv2, vv3, vv4);
+        Result __r1 = FORMAT(&f, "v={},v2={}", vvv1, vvv2);
+        Result __r2 = FORMAT(&f, "u64={},u64={}", u641, u641);
+        Result _r2 = FORMAT(&f, "x={},x={}", v1, v2);
 
+        Result _r3 = FORMAT(&f, "b1={},b2={}", b1, b2);
+        String s3 = STRING("ok");
+
+        Result _r4 = FORMAT(&f, "s1={},s2={},s3={}", s1, s2, s3);
+        Unit u = BUILD(Unit);
+        Result __r4 = FORMAT(&f, "u={},u2={},u3={}", u, u, _());
+
+        Result _r5 = FORMAT(&f, "vvvv1={},vvvv2={}", vvvv1, vvvv2);
+	*/
+	
 	debug(&log, "v1={},v2={},v3={},v4={},vv1={},vv2={},vv3={},vv4={}", v1,
 	      v2, v3, v4, vv1, vv2, vv3, vv4);
-
-	debug(&log, "v={},v2={}", vvv1, vvv2);
-
-	debug(&log, "u64={},u64={}", u641, u641);
+	//debug(&log, "v={},v2={}", vvv1, vvv2);
+	//debug(&log, "u64={},u64={}", u641, u641);
+	debug(&log, "x={},x={}", v1, v2);
 
 	debug(&log, "b1={},b2={}", b1, b2);
 	String s3 = STRING("ok");
 
 	debug(&log, "s1={},s2={},s3={}", s1, s2, s3);
 	Unit u = BUILD(Unit);
-	debug(&log, "u={},u2={},u3={}", u, u, _());
+	//debug(&log, "u={},u2={},u3={}", b1, b2, b1);
 
 	debug(&log, "vvvv1={},vvvv2={}", vvvv1, vvvv2);
+	
+	
+	printf("basic complete\n");
 
 	return Ok(_());
 }

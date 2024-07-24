@@ -431,6 +431,17 @@ MyTest(core, test_alloc_error_result) {
 	return Ok(_());
 }
 
+ENUM(MyEnumLogX, VARIANTS(TYPE1, TYPE2, TYPE3), TYPES("u32", "u64", "u64"))
+IMPL(MyEnumLogX, TRAIT_DISPLAY)
+#define MyEnumLogX DEFINE_ENUM(MyEnumLogX)
+
+Result MyEnumLogX_fmt(MyEnumLogX *ptr, Formatter *f) {
+        MyEnumLogXPtr vvx = *ptr;
+        u32 value1_out = ENUM_VALUE(value1_out, u32, vvx);
+        return FORMAT(f, "value={}", value1_out);
+}
+
+
 MyTest(core, test_format) {
 	Formatter fmt = FORMATTER(10000);
 	u32 x = 123;
@@ -443,5 +454,27 @@ MyTest(core, test_format) {
 	char *s_out = unwrap(&s1);
 	printf("s=%s\n", unwrap(&s1));
 	assert_eq_str(s_out, "this is a test 123 456 78 abc");
+
+	Formatter_reset(&fmt);	
+
+
+	u32 v = 12345;
+        MyEnumLogX mel = BUILD_ENUM(MyEnumLogX, TYPE1, v);
+	Result r3 = FORMAT(&fmt, "test {}", mel);
+	Result rr3 = Formatter_to_string(&fmt);
+	String s3 = TRY(rr3, s3);
+	printf("s=%s\n", unwrap(&s3));
+
+	Formatter_reset(&fmt);
+
+	x = 3;
+	y = 34;
+	z = 11;
+	 Result r2 = FORMAT(&fmt, "this is a test {} {} {} {}", x, y, z, UNIT);
+	 Result rr2 = Formatter_to_string(&fmt);
+	 String s2 = TRY(rr2, s2);
+	 printf("s2=%s\n", unwrap(&s2));
+
+
 	return Ok(_());
 }
