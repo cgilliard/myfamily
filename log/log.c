@@ -22,7 +22,10 @@
 GETTER(Log, formatter)
 GETTER(Log, config)
 
-void Log_cleanup(Log *log) {}
+void Log_cleanup(Log *log) {
+	FormatterPtr f = GET(Log, log, formatter);
+	cleanup(&f);
+}
 
 Result Log_log(Log *log, LogLevel level, String line) {
 	String full_line = STRING("");
@@ -79,21 +82,20 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 			memcpy(&next, ptr, size(ptr));
 		}
 
-		MATCH(
-		    next, VARIANT(SHOW_TIMESTAMP, {
-			    lc.show_timestamp =
-				ENUM_VALUE(lc.show_timestamp, bool, next);
-		    }) VARIANT(SHOW_LOG_LEVEL, {
-			    lc.show_log_level =
-				ENUM_VALUE(lc.show_log_level, bool, next);
-		    }) VARIANT(FORMATTER_SIZE, {
-			    lc.formatter_size =
-				ENUM_VALUE(lc.formatter_size, u64, next);
-		    }) VARIANT(SHOW_TERMINAL, { printf("show terminal\n"); }));
+		MATCH(next, VARIANT(SHOW_TIMESTAMP, {
+			      lc.show_timestamp =
+				  ENUM_VALUE(lc.show_timestamp, bool, next);
+		      }) VARIANT(SHOW_LOG_LEVEL, {
+			      lc.show_log_level =
+				  ENUM_VALUE(lc.show_log_level, bool, next);
+		      }) VARIANT(FORMATTER_SIZE, {
+			      lc.formatter_size =
+				  ENUM_VALUE(lc.formatter_size, u64, next);
+		      }) VARIANT(SHOW_TERMINAL, {}));
 	}
 	va_end(ptr);
 
-	Formatter f = FORMATTER(lc.formatter_size);
+	FormatterPtr f = FORMATTER(lc.formatter_size);
 	LogPtr ret = BUILD(Log, lc, NULL, f);
 	return Ok(ret);
 }

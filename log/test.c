@@ -84,28 +84,10 @@ MyTest(log, test_log_basic) {
 	u64 u641 = 123;
 	bool b1 = true;
 	bool b2 = false;
-	/*
-	Formatter f = FORMATTER(10000);
-	Result _r1 = FORMAT(&f,
-	"v1={},v2={},v3={},v4={},vv1={},vv2={},vv3={},vv4={}", v1, v2, v3, v4,
-	vv1, vv2, vv3, vv4); Result __r1 = FORMAT(&f, "v={},v2={}", vvv1, vvv2);
-	Result __r2 = FORMAT(&f, "u64={},u64={}", u641, u641);
-	Result _r2 = FORMAT(&f, "x={},x={}", v1, v2);
-
-	Result _r3 = FORMAT(&f, "b1={},b2={}", b1, b2);
-	String s3 = STRING("ok");
-
-	Result _r4 = FORMAT(&f, "s1={},s2={},s3={}", s1, s2, s3);
-	Unit u = BUILD(Unit);
-	Result __r4 = FORMAT(&f, "u={},u2={},u3={}", u, u, _());
-
-	Result _r5 = FORMAT(&f, "vvvv1={},vvvv2={}", vvvv1, vvvv2);
-	*/
-
 	debug(&log, "v1={},v2={},v3={},v4={},vv1={},vv2={},vv3={},vv4={}", v1,
 	      v2, v3, v4, vv1, vv2, vv3, vv4);
-	// debug(&log, "v={},v2={}", vvv1, vvv2);
-	// debug(&log, "u64={},u64={}", u641, u641);
+	debug(&log, "v={},v2={}", vvv1, vvv2);
+	debug(&log, "u64={},u64={}", u641, u641);
 	debug(&log, "x={},x={}", v1, v2);
 
 	debug(&log, "b1={},b2={}", b1, b2);
@@ -113,7 +95,7 @@ MyTest(log, test_log_basic) {
 
 	debug(&log, "s1={},s2={},s3={}", s1, s2, s3);
 	Unit u = BUILD(Unit);
-	// debug(&log, "u={},u2={},u3={}", b1, b2, b1);
+	debug(&log, "u={},u2={},u3={}", b1, b2, b1);
 
 	debug(&log, "vvvv1={},vvvv2={}", vvvv1, vvvv2);
 
@@ -151,8 +133,8 @@ MyTest(log, testlogmacro) {
 
 	Result r = init_global_log();
 	TRYU(r);
-
 	debug(GLOBAL_LOGGER, "hi");
+	cleanup(GLOBAL_LOGGER);
 
 	return Ok(_());
 }
