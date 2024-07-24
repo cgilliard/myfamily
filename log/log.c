@@ -66,6 +66,7 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 	LogConfig lc;
 	lc.show_log_level = true;
 	lc.show_timestamp = true;
+	lc.formatter_size = 10000;
 
 	for (int i = 0; i < n; i++) {
 		LogConfigOptionPtr next;
@@ -80,16 +81,19 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 
 		MATCH(
 		    next, VARIANT(SHOW_TIMESTAMP, {
-			    bool v = ENUM_VALUE(v, bool, next);
-			    lc.show_timestamp = v;
+			    lc.show_timestamp =
+				ENUM_VALUE(lc.show_timestamp, bool, next);
 		    }) VARIANT(SHOW_LOG_LEVEL, {
-			    bool v = ENUM_VALUE(v, bool, next);
-			    lc.show_log_level = v;
+			    lc.show_log_level =
+				ENUM_VALUE(lc.show_log_level, bool, next);
+		    }) VARIANT(FORMATTER_SIZE, {
+			    lc.formatter_size =
+				ENUM_VALUE(lc.formatter_size, u64, next);
 		    }) VARIANT(SHOW_TERMINAL, { printf("show terminal\n"); }));
 	}
 	va_end(ptr);
 
-	Formatter f = FORMATTER(10000);
+	Formatter f = FORMATTER(lc.formatter_size);
 	LogPtr ret = BUILD(Log, lc, NULL, f);
 	return Ok(ret);
 }
@@ -105,3 +109,4 @@ Result Log_build(int n, ...) {
 	va_start(ptr, n);
 	return Log_build_impl(n, ptr, false);
 }
+

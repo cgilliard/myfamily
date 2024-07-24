@@ -27,9 +27,10 @@
 ENUM(LogConfigOption,
      VARIANTS(SHOW_COLORS, SHOW_TERMINAL, SHOW_TIMESTAMP, SHOW_MILLIS,
 	      SHOW_LOG_LEVEL, SHOW_LINENUM, AUTO_ROTATE, DELETE_ROTATION,
-	      MAX_SIZE_BYTES, MAX_AGE_MILLIS, LOG_FILE_PATH, FILE_HEADER),
+	      MAX_SIZE_BYTES, MAX_AGE_MILLIS, LOG_FILE_PATH, FILE_HEADER,
+	      LOG_SYNC, FORMATTER_SIZE),
      TYPES("bool", "bool", "bool", "bool", "bool", "bool", "bool", "bool",
-	   "u64", "u64", "String", "String"))
+	   "u64", "u64", "String", "String", "bool", "u64"))
 #define LogConfigOption DEFINE_ENUM(LogConfigOption)
 
 typedef enum LogLevel {
@@ -54,6 +55,8 @@ typedef struct LogConfig {
 	u64 max_age_millis;
 	String log_file_path;
 	String file_header;
+	bool is_sync;
+	u64 formatter_size;
 } LogConfig;
 
 #define LOG_CORE(T)                                                            \
@@ -74,20 +77,29 @@ IMPL(Log, LOG_CORE)
 
 #define ShowLogLevel(x)                                                        \
 	({                                                                     \
-		bool v = x;                                                    \
-		LogConfigOptionPtr opt =                                       \
-		    BUILD_ENUM(LogConfigOption, SHOW_LOG_LEVEL, v);            \
-		RcPtr rc = HEAPIFY(opt);                                       \
-		rc;                                                            \
+		bool __v1_ = x;                                                \
+		LogConfigOptionPtr __opt1_ =                                   \
+		    BUILD_ENUM(LogConfigOption, SHOW_LOG_LEVEL, __v1_);        \
+		RcPtr __rc1_ = HEAPIFY(__opt1_);                               \
+		__rc1_;                                                        \
 	})
 
 #define ShowTimestamp(x)                                                       \
 	({                                                                     \
-		bool v = x;                                                    \
-		LogConfigOptionPtr opt2 =                                      \
-		    BUILD_ENUM(LogConfigOption, SHOW_TIMESTAMP, v);            \
-		RcPtr rc2 = HEAPIFY(opt2);                                     \
-		rc2;                                                           \
+		bool __v2_ = x;                                                \
+		LogConfigOptionPtr __opt2_ =                                   \
+		    BUILD_ENUM(LogConfigOption, SHOW_TIMESTAMP, __v2_);        \
+		RcPtr __rc2_ = HEAPIFY(__opt2_);                               \
+		__rc2_;                                                        \
+	})
+
+#define FormatterSize(x)                                                       \
+	({                                                                     \
+		u64 __v3_ = x;                                                 \
+		LogConfigOptionPtr _opt3__ =                                   \
+		    BUILD_ENUM(LogConfigOption, FORMATTER_SIZE, __v3_);        \
+		RcPtr __rc3_ = HEAPIFY(_opt3__);                               \
+		__rc3_;                                                        \
 	})
 
 #define LOG(...)                                                               \
@@ -101,17 +113,34 @@ IMPL(Log, LOG_CORE)
 		__log___;                                                      \
 	})
 
-#define debug(l, fmt, ...)                                                     \
+static LogPtr *GLOBAL_LOGGER = NULL;
+static Result init_global_log() {
+	if (!GLOBAL_LOGGER) {
+		GLOBAL_LOGGER = malloc(sizeof(LogPtr));
+		*GLOBAL_LOGGER = LOG();
+	}
+	return Ok(_());
+}
+
+#define debug_impl(l, fmt, ...)                                                \
 	({                                                                     \
 		FormatterPtr formatter = Log_formatter(l);                     \
 		Formatter_reset(&formatter);                                   \
-		Result _r1__ = FORMAT(&formatter, fmt, __VA_ARGS__);           \
+		Result _r1__ = FORMAT(&formatter, (char *)fmt, __VA_ARGS__);   \
 		TRYU(_r1__);                                                   \
 		Result _r2__ = Formatter_to_string(&formatter);                \
 		String _s__ = TRY(_r2__, _s__);                                \
 		Result _r2debug__ = Log_log(l, DEBUG, _s__);                   \
 		TRYU(_r2debug__);                                              \
 	})
+
+#define debug(l, ...)                                                          \
+	_Generic((l),                                                          \
+	    LogPtr *: ({ debug_impl((LogPtr *)l, __VA_ARGS__); }),             \
+	    default: ({                                                        \
+			 debug_impl(GLOBAL_LOGGER,                             \
+				    (char *)l __VA_OPT__(, __VA_ARGS__));      \
+		 }))
 
 #define info(l, fmt, ...)                                                      \
 	({                                                                     \

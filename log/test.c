@@ -127,10 +127,17 @@ MyTest(log, testfmt) {
 }
 
 MyTest(log, testlogmacro) {
-	Log log = LOG(ShowLogLevel(true), ShowTimestamp(false));
+	Log log =
+	    LOG(ShowLogLevel(true), ShowTimestamp(false), FormatterSize(1500));
 	u64 x = 1000;
 	debug(&log, "test {}", x);
+	debug(&log, "x={}", x);
 	info(&log, "ok ok ok");
+
+	Result r = init_global_log();
+	TRYU(r);
+
+	debug(GLOBAL_LOGGER, "hi");
 
 	return Ok(_());
 }
