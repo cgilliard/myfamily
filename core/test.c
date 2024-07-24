@@ -434,11 +434,14 @@ MyTest(core, test_alloc_error_result) {
 MyTest(core, test_format) {
 	Formatter fmt = FORMATTER(10000);
 	u32 x = 123;
-	Result r1 = FORMAT(&fmt, "this is a test {}", x);
+	u16 y = 456;
+	u8 z = 78;
+	String s0 = STRING("abc");
+	Result r1 = FORMAT(&fmt, "this is a test {} {} {} {}", x, y, z, s0);
 	Result rr1 = Formatter_to_string(&fmt);
 	String s1 = TRY(rr1, s1);
 	char *s_out = unwrap(&s1);
 	printf("s=%s\n", unwrap(&s1));
-	assert_eq_str(s_out, "this is a test 123");
+	assert_eq_str(s_out, "this is a test 123 456 78 abc");
 	return Ok(_());
 }

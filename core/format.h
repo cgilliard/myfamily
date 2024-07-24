@@ -21,76 +21,57 @@
 
 Result format(FormatterPtr *formatter, char *fmt, ...);
 
+#define PROC_TYPE(sign_upper, sign_lower, bits, value)                         \
+	__arg_arr__[__itt___] = mymalloc(sizeof(sign_upper##bits));            \
+	sign_upper##bits##Ptr *__ptr___ = __arg_arr__[__itt___];               \
+	BUILDPTR(__ptr___, sign_upper##bits);                                  \
+	memcpy(&__ptr___->_value, &value, sizeof(sign_lower##bits));           \
+	__itt___++;                                                            \
+	__arg_arr__[__itt___ - 1];
+
 #define PROC_ARG(value)                                                        \
 	_Generic((value),                                                      \
-	    __uint128_t: ({                                                    \
-			 U128Ptr _vu128__ = BUILD(U128);                       \
-			 memcpy(&(_vu128__._value), &(value), sizeof(u128));   \
-			 &_vu128__;                                            \
-		 }),                                                           \
-	    uint64_t: ({                                                       \
-			 U64Ptr _vu64__ = BUILD(U64);                          \
-			 memcpy(&(_vu64__._value), &(value), sizeof(u64));     \
-			 &_vu64__;                                             \
-		 }),                                                           \
-	    uint32_t: ({                                                       \
-			 U32Ptr _vu32__ = BUILD(U32);                          \
-			 memcpy(&(_vu32__._value), &(value), sizeof(u32));     \
-			 &_vu32__;                                             \
-		 }),                                                           \
-	    uint16_t: ({                                                       \
-			 U16Ptr _vu16__ = BUILD(U16);                          \
-			 memcpy(&(_vu16__._value), &(value), sizeof(u16));     \
-			 &_vu16__;                                             \
-		 }),                                                           \
-	    uint8_t: ({                                                        \
-			 U8Ptr _vu8__ = BUILD(U8);                             \
-			 memcpy(&(_vu8__._value), &(value), sizeof(u8));       \
-			 &_vu8__;                                              \
-		 }),                                                           \
-	    __int128_t: ({                                                     \
-			 U128Ptr _vi128__ = BUILD(I128);                       \
-			 memcpy(&(_vi128__._value), &(value), sizeof(i128));   \
-			 &_vi128__;                                            \
-		 }),                                                           \
-	    int64_t: ({                                                        \
-			 U64Ptr _vi64__ = BUILD(I64);                          \
-			 memcpy(&(_vi64__._value), &(value), sizeof(i64));     \
-			 &_vi64__;                                             \
-		 }),                                                           \
-	    int32_t: ({                                                        \
-			 U32Ptr _vi32__ = BUILD(I32);                          \
-			 memcpy(&(_vi32__._value), &(value), sizeof(i32));     \
-			 _vi32__;                                              \
-		 }),                                                           \
-	    int16_t: ({                                                        \
-			 U16Ptr _vi16__ = BUILD(I16);                          \
-			 memcpy(&(_vi16__._value), &(value), sizeof(i16));     \
-			 &_vi16__;                                             \
-		 }),                                                           \
-	    int8_t: ({                                                         \
-			 I8Ptr _vi8__ = BUILD(I8);                             \
-			 memcpy(&(_vi8__._value), &(value), sizeof(i8));       \
-			 &_vi8__;                                              \
-		 }),                                                           \
-	    double: ({                                                         \
-			 U64Ptr _vf64__ = BUILD(F64);                          \
-			 memcpy(&(_vf64__._value), &(value), sizeof(f64));     \
-			 &_vf64__;                                             \
-		 }),                                                           \
-	    float: ({                                                          \
-			 U32Ptr _vf32__ = BUILD(F32);                          \
-			 memcpy(&(_vf32__._value), &(value), sizeof(f32));     \
-			 &_vf32__;                                             \
-		 }),                                                           \
+	    i8: ({PROC_TYPE(I, i, 8, value)}),                                 \
+	    i16: ({PROC_TYPE(I, i, 16, value)}),                               \
+	    i32: ({PROC_TYPE(I, i, 32, value)}),                               \
+	    i64: ({PROC_TYPE(I, i, 64, value)}),                               \
+	    i128: ({PROC_TYPE(I, i, 128, value)}),                             \
+	    u8: ({PROC_TYPE(U, u, 8, value)}),                                 \
+	    u16: ({PROC_TYPE(U, u, 16, value)}),                               \
+	    u32: ({PROC_TYPE(U, u, 32, value)}),                               \
+	    u64: ({PROC_TYPE(U, u, 64, value)}),                               \
+	    u128: ({PROC_TYPE(U, u, 128, value)}),                             \
+	    f32: ({PROC_TYPE(F, f, 32, value)}),                               \
+	    f64: ({PROC_TYPE(F, f, 64, value)}),                               \
 	    bool: ({                                                           \
-			 BoolPtr _bool__ = BUILD(Bool);                        \
-			 memcpy(&(_bool__._value), &(value), sizeof(bool));    \
-			 &_bool__;                                             \
+			 __arg_arr__[__itt___] = mymalloc(sizeof(Bool));       \
+			 BoolPtr *__ptr___ = __arg_arr__[__itt___];            \
+			 BUILDPTR(__ptr___, Bool);                             \
+			 memcpy(&__ptr___->_value, &value, sizeof(bool));      \
+			 __itt___++;                                           \
+			 __arg_arr__[__itt___ - 1];                            \
 		 }),                                                           \
 	    default: ({ &value; }))
 
+#define COUNT_FORMAT(value) ({ __counter___ += 1; })
+
 #define FORMAT(f, fmt, ...)                                                    \
-	format(f, fmt __VA_OPT__(, ) EXPAND(FOR_EACH(PROC_ARG, __VA_ARGS__)))
+	({                                                                     \
+		u64 __counter___ = 0;                                          \
+		EXPAND(FOR_EACH(COUNT_FORMAT, __VA_ARGS__));                   \
+		void **__arg_arr__ = mymalloc(sizeof(void *) * __counter___);  \
+		for (u64 __i___ = 0; __i___ < __counter___; __i___++)          \
+			__arg_arr__[__i___] = NULL;                            \
+		u64 __itt___ = 0;                                              \
+		ResultPtr __ret__ =                                            \
+		    format(f, fmt __VA_OPT__(, )                               \
+				  EXPAND(FOR_EACH(PROC_ARG, __VA_ARGS__)));    \
+		for (u64 __i___ = 0; __i___ < __counter___; __i___++) {        \
+			if (__arg_arr__[__i___])                               \
+				myfree(__arg_arr__[__i___]);                   \
+		}                                                              \
+		myfree(__arg_arr__);                                           \
+		__ret__;                                                       \
+	})
 
 #endif // _CORE_FORMAT__
