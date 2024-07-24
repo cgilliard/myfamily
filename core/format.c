@@ -44,7 +44,7 @@ Result format(Formatter *formatter, char *format_s, ...) {
 		Object *next = va_arg(ptr, Object *);
 		Result r4 = to_string(next);
 		String s4 = TRY(r4, s4);
-		Result r6 =  append(&fmt_str, &s4);
+		Result r6 = append(&fmt_str, &s4);
 
 		itt = v + 2;
 	}
