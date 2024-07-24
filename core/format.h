@@ -23,72 +23,72 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 
 #define PROC_ARG(value)                                                        \
 	_Generic((value),                                                      \
-	    u128: ({                                                           \
+	    __uint128_t: ({                                                           \
 			 U128Ptr _vu128__ = BUILD(U128);                       \
 			 memcpy(&(_vu128__._value), &(value), sizeof(u128));   \
 			 _vu128__;                                             \
 		 }),                                                           \
-	    u64: ({                                                            \
+	    uint64_t: ({                                                            \
 			 U64Ptr _vu64__ = BUILD(U64);                          \
 			 memcpy(&(_vu64__._value), &(value), sizeof(u64));     \
 			 _vu64__;                                              \
 		 }),                                                           \
-	    u32: ({                                                            \
+	    uint32_t: ({                                                            \
 			 U32Ptr _vu32__ = BUILD(U32);                          \
 			 memcpy(&(_vu32__._value), &(value), sizeof(u32));     \
 			 _vu32__;                                              \
 		 }),                                                           \
-	    u16: ({                                                            \
+	    uint16_t: ({                                                            \
 			 U16Ptr _vu16__ = BUILD(U16);                          \
 			 memcpy(&(_vu16__._value), &(value), sizeof(u16));     \
 			 _vu16__;                                              \
 		 }),                                                           \
-	    u8: ({                                                             \
+	    uint8_t: ({                                                             \
 			 U8Ptr _vu8__ = BUILD(U8);                             \
 			 memcpy(&(_vu8__._value), &(value), sizeof(u8));       \
 			 _vu8__;                                               \
 		 }),                                                           \
-	    i128: ({                                                           \
+	    __int128_t: ({                                                           \
 			 U128Ptr _vi128__ = BUILD(I128);                       \
 			 memcpy(&(_vi128__._value), &(value), sizeof(i128));   \
 			 _vi128__;                                             \
 		 }),                                                           \
-	    i64: ({                                                            \
+	    int64_t: ({                                                            \
 			 U64Ptr _vi64__ = BUILD(I64);                          \
 			 memcpy(&(_vi64__._value), &(value), sizeof(i64));     \
 			 _vi64__;                                              \
 		 }),                                                           \
-	    i32: ({                                                            \
+	    int32_t: ({                                                            \
 			 U32Ptr _vi32__ = BUILD(I32);                          \
 			 memcpy(&(_vi32__._value), &(value), sizeof(i32));     \
 			 _vi32__;                                              \
 		 }),                                                           \
-	    i16: ({                                                            \
+	    int16_t: ({                                                            \
 			 U16Ptr _vi16__ = BUILD(I16);                          \
 			 memcpy(&(_vi16__._value), &(value), sizeof(i16));     \
 			 _vi16__;                                              \
 		 }),                                                           \
-	    i8: ({                                                             \
+	    int8_t: ({                                                             \
 			 I8Ptr _vi8__ = BUILD(I8);                             \
 			 memcpy(&(_vi8__._value), &(value), sizeof(i8));       \
 			 _vi8__;                                               \
 		 }),                                                           \
-	    f64: ({                                                            \
+	    double: ({                                                            \
 			 U64Ptr _vf64__ = BUILD(F64);                          \
 			 memcpy(&(_vf64__._value), &(value), sizeof(f64));     \
 			 _vf64__;                                              \
 		 }),                                                           \
-	    f32: ({                                                            \
+	    float: ({                                                            \
 			 U32Ptr _vf32__ = BUILD(F32);                          \
 			 memcpy(&(_vf32__._value), &(value), sizeof(f32));     \
 			 _vf32__;                                              \
 		 }),                                                           \
-	    usize: ({                                                          \
+	    size_t: ({                                                          \
 			 USizePtr _vusize__ = BUILD(USize);                    \
 			 memcpy(&(_vusize__._value), &(value), sizeof(usize)); \
 			 _vusize__;                                            \
 		 }),                                                           \
-	    isize: ({                                                          \
+	    intptr_t: ({                                                          \
 			 ISizePtr _visize__ = BUILD(ISize);                    \
 			 memcpy(&(_visize__._value), &(value), sizeof(isize)); \
 			 _visize__;                                            \

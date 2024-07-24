@@ -53,20 +53,20 @@ usize enum_value_usize(void *value);
 
 #define ENUM_VALUE(ret, type, e)                                               \
 	_Generic((ret),                                                        \
-	    u8: enum_value_u8(e.value),                                        \
-	    u16: enum_value_u16(e.value),                                      \
-	    u32: enum_value_u32(e.value),                                      \
-	    u64: enum_value_u64(e.value),                                      \
-	    u128: enum_value_u128(e.value),                                    \
-	    i8: enum_value_i8(e.value),                                        \
-	    i16: enum_value_i16(e.value),                                      \
-	    i32: enum_value_i32(e.value),                                      \
-	    i64: enum_value_i64(e.value),                                      \
-	    i128: enum_value_i128(e.value),                                    \
-	    f32: enum_value_f32(e.value),                                      \
-	    f64: enum_value_f64(e.value),                                      \
+	    uint8_t: enum_value_u8(e.value),                                        \
+	    uint16_t: enum_value_u16(e.value),                                      \
+	    uint32_t: enum_value_u32(e.value),                                      \
+	    uint64_t: enum_value_u64(e.value),                                      \
+	    __uint128_t: enum_value_u128(e.value),                                    \
+	    int8_t: enum_value_i8(e.value),                                        \
+	    int16_t: enum_value_i16(e.value),                                      \
+	    int32_t: enum_value_i32(e.value),                                      \
+	    int64_t: enum_value_i64(e.value),                                      \
+	    __int128_t: enum_value_i128(e.value),                                    \
+	    float: enum_value_f32(e.value),                                      \
+	    double: enum_value_f64(e.value),                                      \
 	    bool: enum_value_bool(e.value),                                    \
-	    usize: enum_value_usize(e.value),                                  \
+	    size_t: enum_value_usize(e.value),                                  \
 	    default: ({                                                        \
 			 if (!strcmp(CLASS_NAME(e.value), "Rc")) {             \
 				 ret = *(type *)unwrap(e.value);               \
@@ -77,20 +77,20 @@ usize enum_value_usize(void *value);
 
 #define TRY_ENUM_VALUE(ret, type, e)                                           \
 	_Generic((ret),                                                        \
-	    u8: enum_value_u8(e.value),                                        \
-	    u16: enum_value_u16(e.value),                                      \
-	    u32: enum_value_u32(e.value),                                      \
-	    u64: enum_value_u64(e.value),                                      \
-	    u128: enum_value_u128(e.value),                                    \
-	    i8: enum_value_i8(e.value),                                        \
-	    i16: enum_value_i16(e.value),                                      \
-	    i32: enum_value_i32(e.value),                                      \
-	    i64: enum_value_i64(e.value),                                      \
-	    i128: enum_value_i128(e.value),                                    \
-	    f32: enum_value_f32(e.value),                                      \
-	    f64: enum_value_f64(e.value),                                      \
+	    uint8_t: enum_value_u8(e.value),                                        \
+	    uint16_t: enum_value_u16(e.value),                                      \
+	    uint32_t: enum_value_u32(e.value),                                      \
+	    uint64_t: enum_value_u64(e.value),                                      \
+	    __uint128_t: enum_value_u128(e.value),                                    \
+	    int8_t: enum_value_i8(e.value),                                        \
+	    int16_t: enum_value_i16(e.value),                                      \
+	    int32_t: enum_value_i32(e.value),                                      \
+	    int64_t: enum_value_i64(e.value),                                      \
+	    __int128_t: enum_value_i128(e.value),                                    \
+	    float: enum_value_f32(e.value),                                      \
+	    double: enum_value_f64(e.value),                                      \
 	    bool: enum_value_bool(e.value),                                    \
-	    usize: enum_value_usize(e.value),                                  \
+	    size_t: enum_value_usize(e.value),                                  \
 	    default: ({                                                        \
 			 if (!strcmp(CLASS_NAME(e.value), "Rc")) {             \
 				 ret = *(type *)unwrap(e.value);               \
@@ -129,7 +129,7 @@ void *build_enum_value(void *v, char *type_str);
 #define TRY_BUILD_ENUM(name, type, v)                                          \
 	_Generic(                                                              \
 	    (v),                                                               \
-	    usize: ({                                                          \
+	    size_t: ({                                                          \
 		    void *ptr = build_enum_value_usize((usize *)&v,            \
 						       name##_Arr__[type]);    \
 		    if (!ptr) {                                                \
@@ -147,7 +147,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    f64: ({                                                            \
+	    double: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_f64((f64 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
@@ -156,7 +156,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    f32: ({                                                            \
+	    float: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_f32((f32 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
@@ -165,7 +165,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    i128: ({                                                           \
+	    __int128_t: ({                                                           \
 		    void *ptr =                                                \
 			build_enum_value_i128((i128 *)&v, name##_Arr__[type]); \
 		    if (!ptr) {                                                \
@@ -174,7 +174,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    i64: ({                                                            \
+	    int64_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_i64((i64 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
@@ -183,7 +183,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    i32: ({                                                            \
+	    int32_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_i32((i32 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
@@ -192,7 +192,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    i16: ({                                                            \
+	    int16_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_i16((i16 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
@@ -201,7 +201,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    i8: ({                                                             \
+	    int8_t: ({                                                             \
 		    void *ptr =                                                \
 			build_enum_value_i8((i8 *)&v, name##_Arr__[type]);     \
 		    if (!ptr) {                                                \
@@ -210,7 +210,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    u128: ({                                                           \
+	    __uint128_t: ({                                                           \
 		    void *ptr =                                                \
 			build_enum_value_u128((u128 *)&v, name##_Arr__[type]); \
 		    if (!ptr) {                                                \
@@ -219,7 +219,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    u64: ({                                                            \
+	    uint64_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_u64((u64 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
@@ -228,7 +228,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    u32: ({                                                            \
+	    uint32_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_u32((u32 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
@@ -237,7 +237,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    u16: ({                                                            \
+	    uint16_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_u16((u16 *)&v, name##_Arr__[type]);   \
 		    if (!ptr) {                                                \
@@ -246,7 +246,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    u8: ({                                                             \
+	    uint8_t: ({                                                             \
 		    void *ptr =                                                \
 			build_enum_value_u8((u8 *)&v, name##_Arr__[type]);     \
 		    if (!ptr) {                                                \
@@ -270,7 +270,7 @@ void *build_enum_value(void *v, char *type_str);
 #define BUILD_ENUM(name, type, v)                                              \
 	_Generic(                                                              \
 	    (v),                                                               \
-	    usize: ({                                                          \
+	    size_t: ({                                                          \
 		    void *ptr = build_enum_value_usize((usize *)&v,            \
 						       name##_Arr__[type]);    \
 		    if (!ptr)                                                  \
@@ -286,7 +286,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    f64: ({                                                            \
+	    double: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_f64((f64 *)&v, name##_Arr__[type]);   \
 		    if (!ptr)                                                  \
@@ -294,7 +294,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    f32: ({                                                            \
+	    float: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_f32((f32 *)&v, name##_Arr__[type]);   \
 		    if (!ptr)                                                  \
@@ -302,7 +302,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    i128: ({                                                           \
+	    __int128_t: ({                                                           \
 		    void *ptr =                                                \
 			build_enum_value_i128((i128 *)&v, name##_Arr__[type]); \
 		    if (!ptr)                                                  \
@@ -310,7 +310,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    i64: ({                                                            \
+	    int64_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_i64((i64 *)&v, name##_Arr__[type]);   \
 		    if (!ptr)                                                  \
@@ -318,7 +318,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    i32: ({                                                            \
+	    int32_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_i32((i32 *)&v, name##_Arr__[type]);   \
 		    if (!ptr)                                                  \
@@ -326,7 +326,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    i16: ({                                                            \
+	    int16_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_i16((i16 *)&v, name##_Arr__[type]);   \
 		    if (!ptr)                                                  \
@@ -334,7 +334,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    i8: ({                                                             \
+	    int8_t: ({                                                             \
 		    void *ptr =                                                \
 			build_enum_value_i8((i8 *)&v, name##_Arr__[type]);     \
 		    if (!ptr)                                                  \
@@ -342,7 +342,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    u128: ({                                                           \
+	    __uint128_t: ({                                                           \
 		    void *ptr =                                                \
 			build_enum_value_u128((u128 *)&v, name##_Arr__[type]); \
 		    if (!ptr)                                                  \
@@ -350,7 +350,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    u64: ({                                                            \
+	    uint64_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_u64((u64 *)&v, name##_Arr__[type]);   \
 		    if (!ptr)                                                  \
@@ -358,7 +358,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    u32: ({                                                            \
+	    uint32_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_u32((u32 *)&v, name##_Arr__[type]);   \
 		    if (!ptr)                                                  \
@@ -366,7 +366,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    u16: ({                                                            \
+	    uint16_t: ({                                                            \
 		    void *ptr =                                                \
 			build_enum_value_u16((u16 *)&v, name##_Arr__[type]);   \
 		    if (!ptr)                                                  \
@@ -374,7 +374,7 @@ void *build_enum_value(void *v, char *type_str);
 		    (name##Ptr){                                               \
 			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
 	    }),                                                                \
-	    u8: ({                                                             \
+	    uint8_t: ({                                                             \
 		    void *ptr =                                                \
 			build_enum_value_u8((u8 *)&v, name##_Arr__[type]);     \
 		    if (!ptr)                                                  \

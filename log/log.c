@@ -109,4 +109,3 @@ Result Log_build(int n, ...) {
 	va_start(ptr, n);
 	return Log_build_impl(n, ptr, false);
 }
-

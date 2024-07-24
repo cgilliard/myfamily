@@ -79,7 +79,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 
 #define UNWRAP_PRIM(x, v)                                                      \
 	_Generic((v),                                                          \
-	    u8: ({                                                             \
+	    uint8_t: ({                                                             \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 U8Ptr val = ENUM_VALUE(val, U8, x);                   \
@@ -89,7 +89,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 u8 ret = *(u8 *)unwrap(&val);                         \
 			 ret;                                                  \
 		 }),                                                           \
-	    u16: ({                                                            \
+	    uint16_t: ({                                                            \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 U16Ptr val = ENUM_VALUE(val, U16, x);                 \
@@ -99,7 +99,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 u16 ret = *(u16 *)unwrap(&val);                       \
 			 ret;                                                  \
 		 }),                                                           \
-	    u32: ({                                                            \
+	    uint32_t: ({                                                            \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 U32Ptr val = ENUM_VALUE(val, U32, x);                 \
@@ -109,7 +109,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 u32 ret = *(u32 *)unwrap(&val);                       \
 			 ret;                                                  \
 		 }),                                                           \
-	    u64: ({                                                            \
+	    uint64_t: ({                                                            \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 U64Ptr val = ENUM_VALUE(val, U64, x);                 \
@@ -119,7 +119,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 u64 ret = *(u64 *)unwrap(&val);                       \
 			 ret;                                                  \
 		 }),                                                           \
-	    u128: ({                                                           \
+	    __uint128_t: ({                                                           \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 U128Ptr val = ENUM_VALUE(val, U128, x);               \
@@ -129,7 +129,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 u128 ret = *(u128 *)unwrap(&val);                     \
 			 ret;                                                  \
 		 }),                                                           \
-	    i8: ({                                                             \
+	    int8_t: ({                                                             \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 I8Ptr val = ENUM_VALUE(val, I8, x);                   \
@@ -139,7 +139,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 i8 ret = *(i8 *)unwrap(&val);                         \
 			 ret;                                                  \
 		 }),                                                           \
-	    i16: ({                                                            \
+	    int16_t: ({                                                            \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 I16Ptr val = ENUM_VALUE(val, I16, x);                 \
@@ -149,7 +149,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 i16 ret = *(i16 *)unwrap(&val);                       \
 			 ret;                                                  \
 		 }),                                                           \
-	    i32: ({                                                            \
+	    int32_t: ({                                                            \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 I32Ptr val = ENUM_VALUE(val, I32, x);                 \
@@ -159,7 +159,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 i32 ret = *(i32 *)unwrap(&val);                       \
 			 ret;                                                  \
 		 }),                                                           \
-	    i64: ({                                                            \
+	    int64_t: ({                                                            \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 I64Ptr val = ENUM_VALUE(val, I64, x);                 \
@@ -169,7 +169,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 i64 ret = *(i64 *)unwrap(&val);                       \
 			 ret;                                                  \
 		 }),                                                           \
-	    i128: ({                                                           \
+	    __int128_t: ({                                                           \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 I128Ptr val = ENUM_VALUE(val, I128, x);               \
@@ -179,7 +179,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 i128 ret = *(i128 *)unwrap(&val);                     \
 			 ret;                                                  \
 		 }),                                                           \
-	    f32: ({                                                            \
+	    float: ({                                                            \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 F32Ptr val = ENUM_VALUE(val, F32, x);                 \
@@ -189,7 +189,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 f32 ret = *(f32 *)unwrap(&val);                       \
 			 ret;                                                  \
 		 }),                                                           \
-	    f64: ({                                                            \
+	    double: ({                                                            \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 F64Ptr val = ENUM_VALUE(val, F64, x);                 \
@@ -209,7 +209,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 bool ret = *(bool *)unwrap(&val);                     \
 			 ret;                                                  \
 		 }),                                                           \
-	    usize: ({                                                          \
+	    size_t: ({                                                          \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \
 			 USizePtr val = ENUM_VALUE(val, USize, x);             \
