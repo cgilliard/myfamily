@@ -38,7 +38,5 @@
 #define i128 __int128_t
 #define f64 double
 #define f32 float
-#define usize size_t
-#define isize intptr_t
 
 #endif // _CORE_TYPES__

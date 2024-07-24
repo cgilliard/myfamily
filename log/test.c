@@ -27,7 +27,7 @@ MySuite(log);
 
 MyTest(log, test_va_args) { return Ok(_()); }
 
-ENUM(MyEnumLog, VARIANTS(TYPE1, TYPE2, TYPE3), TYPES("u32", "u64", "usize"))
+ENUM(MyEnumLog, VARIANTS(TYPE1, TYPE2, TYPE3), TYPES("u32", "u64", "u64"))
 IMPL(MyEnumLog, TRAIT_DISPLAY)
 #define MyEnumLog DEFINE_ENUM(MyEnumLog)
 
@@ -83,8 +83,7 @@ MyTest(log, test_log_basic) {
 	f64 vvv2 = 16.1;
 	u128 vvvv1 = 9999;
 	i128 vvvv2 = -8888;
-	usize usize1 = 123;
-	isize isize1 = 456;
+	u64 u641 = 123;
 	bool b1 = true;
 	bool b2 = false;
 
@@ -93,7 +92,7 @@ MyTest(log, test_log_basic) {
 
 	debug(&log, "v={},v2={}", vvv1, vvv2);
 
-	debug(&log, "usize={},isize={}", usize1, isize1);
+	debug(&log, "u64={},u64={}", u641, u641);
 
 	debug(&log, "b1={},b2={}", b1, b2);
 	String s3 = STRING("ok");

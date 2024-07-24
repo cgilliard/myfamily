@@ -84,8 +84,8 @@ bool clone(void *dst, void *src) {
 	return ret;
 }
 
-usize size(void *obj) {
-	usize (*do_size)(Object *obj) = find_fn((Object *)obj, "size");
+u64 size(void *obj) {
+	u64 (*do_size)(Object *obj) = find_fn((Object *)obj, "size");
 	if (do_size == NULL)
 		panic("size not implemented for this type: %s",
 		      ((Object *)obj)->vdata.name);

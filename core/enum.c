@@ -40,12 +40,6 @@ bool enum_value_bool(void *value) {
 	return r;
 }
 
-usize enum_value_usize(void *value) {
-	usize r;
-	memcpy(&r, value, sizeof(usize));
-	return r;
-}
-
 #define DEFINE_BUILD_ENUM_VALUE_IMPL(sign, bits)                               \
 	void *build_enum_value_##sign##bits(sign##bits *v, char *type_str) {   \
 		char type_compare[20];                                         \
@@ -87,20 +81,6 @@ void *build_enum_value_bool(bool *v, char *type_str) {
 		return NULL;
 	}
 	memcpy(value, v, sizeof(bool));
-	return value;
-}
-
-void *build_enum_value_usize(usize *v, char *type_str) {
-	if (strcmp(type_str, "usize")) {
-		panic("Attempt to build an enum with the "
-		      "wrong value. Expected [%s], Found [%s]",
-		      type_str, "usize");
-	}
-	void *value = mymalloc(sizeof(usize));
-	if (value == NULL) {
-		return NULL;
-	}
-	memcpy(value, v, sizeof(usize));
 	return value;
 }
 

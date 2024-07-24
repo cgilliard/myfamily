@@ -39,97 +39,89 @@ void *Tuple_add_value_i16(void *value);
 void *Tuple_add_value_i8(void *value);
 void *Tuple_add_value_f64(void *value);
 void *Tuple_add_value_f32(void *value);
-void *Tuple_add_value_usize(void *value);
 void *Tuple_add_value_bool(void *value);
 
 #define CREATE_GENERIC(value)                                                  \
 	_Generic((value),                                                      \
-	    __int128_t: ({                                                           \
+	    __int128_t: ({                                                     \
 			 void *_ptr__ = Tuple_add_value_i128(&value);          \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    int64_t: ({                                                            \
+	    int64_t: ({                                                        \
 			 void *_ptr__ = Tuple_add_value_i64(&value);           \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    int32_t: ({                                                            \
+	    int32_t: ({                                                        \
 			 void *_ptr__ = Tuple_add_value_i32(&value);           \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    int16_t: ({                                                            \
+	    int16_t: ({                                                        \
 			 void *_ptr__ = Tuple_add_value_i16(&value);           \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    int8_t: ({                                                             \
+	    int8_t: ({                                                         \
 			 void *_ptr__ = Tuple_add_value_i8(&value);            \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    __uint128_t: ({                                                           \
+	    __uint128_t: ({                                                    \
 			 void *_ptr__ = Tuple_add_value_u128(&value);          \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    uint64_t: ({                                                            \
+	    uint64_t: ({                                                       \
 			 void *_ptr__ = Tuple_add_value_u64(&value);           \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    uint32_t: ({                                                            \
+	    uint32_t: ({                                                       \
 			 void *_ptr__ = Tuple_add_value_u32(&value);           \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    uint16_t: ({                                                            \
+	    uint16_t: ({                                                       \
 			 void *_ptr__ = Tuple_add_value_u16(&value);           \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    uint8_t: ({                                                             \
+	    uint8_t: ({                                                        \
 			 void *_ptr__ = Tuple_add_value_u8(&value);            \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    double: ({                                                            \
+	    double: ({                                                         \
 			 void *_ptr__ = Tuple_add_value_f64(&value);           \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    float: ({                                                            \
+	    float: ({                                                          \
 			 void *_ptr__ = Tuple_add_value_f32(&value);           \
-			 if (!_ptr__) {                                        \
-				 return STATIC_ALLOC_RESULT;                   \
-			 }                                                     \
-			 _ptr__;                                               \
-		 }),                                                           \
-	    size_t: ({                                                          \
-			 void *_ptr__ = Tuple_add_value_usize(&value);         \
 			 if (!_ptr__) {                                        \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
@@ -152,92 +144,85 @@ void *Tuple_add_value_bool(void *value);
 
 #define CREATE_GENERICP(value)                                                 \
 	_Generic((value),                                                      \
-	    __int128_t: ({                                                           \
+	    __int128_t: ({                                                     \
 			 void *_ptr__ = Tuple_add_value_i128(&value);          \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    int64_t: ({                                                            \
+	    int64_t: ({                                                        \
 			 void *_ptr__ = Tuple_add_value_i64(&value);           \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    int32_t: ({                                                            \
+	    int32_t: ({                                                        \
 			 void *_ptr__ = Tuple_add_value_i32(&value);           \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    int16_t: ({                                                            \
+	    int16_t: ({                                                        \
 			 void *_ptr__ = Tuple_add_value_i16(&value);           \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    int8_t: ({                                                             \
+	    int8_t: ({                                                         \
 			 void *_ptr__ = Tuple_add_value_i8(&value);            \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    __uint128_t: ({                                                           \
+	    __uint128_t: ({                                                    \
 			 void *_ptr__ = Tuple_add_value_u128(&value);          \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    uint64_t: ({                                                            \
+	    uint64_t: ({                                                       \
 			 void *_ptr__ = Tuple_add_value_u64(&value);           \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    uint32_t: ({                                                            \
+	    uint32_t: ({                                                       \
 			 void *_ptr__ = Tuple_add_value_u32(&value);           \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    uint16_t: ({                                                            \
+	    uint16_t: ({                                                       \
 			 void *_ptr__ = Tuple_add_value_u16(&value);           \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    uint8_t: ({                                                             \
+	    uint8_t: ({                                                        \
 			 void *_ptr__ = Tuple_add_value_u8(&value);            \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    double: ({                                                            \
+	    double: ({                                                         \
 			 void *_ptr__ = Tuple_add_value_f64(&value);           \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \
 			 _ptr__;                                               \
 		 }),                                                           \
-	    float: ({                                                            \
+	    float: ({                                                          \
 			 void *_ptr__ = Tuple_add_value_f32(&value);           \
-			 if (!_ptr__)                                          \
-				 panic("Could not allocate "                   \
-				       "sufficient memory");                   \
-			 _ptr__;                                               \
-		 }),                                                           \
-	    size_t: ({                                                          \
-			 void *_ptr__ = Tuple_add_value_usize(&value);         \
 			 if (!_ptr__)                                          \
 				 panic("Could not allocate "                   \
 				       "sufficient memory");                   \

@@ -21,7 +21,7 @@
 
 #define DEFINE_PRIM_IMPLS(prim_type, type, format)                             \
 	void type##_cleanup(type *ptr) {}                                      \
-	void type##_to_str_buf(type *ptr, char *buf, usize max_len) {          \
+	void type##_to_str_buf(type *ptr, char *buf, u64 max_len) {            \
 		snprintf(buf, max_len, "%" format, ptr->_value);               \
 	}                                                                      \
 	void *type##_unwrap(type *ptr) { return &ptr->_value; }                \
@@ -42,7 +42,7 @@ DEFINE_PRIM_IMPLS(u64, U64, PRIu64)
 
 void U128_cleanup(U128 *ptr) {}
 
-void U128_to_str_buf(U128 *ptr, char *buf, usize max_len) {
+void U128_to_str_buf(U128 *ptr, char *buf, u64 max_len) {
 	u128 value = ptr->_value;
 	if (value < UINT64_MAX)
 		snprintf(buf, max_len, "%" PRIu64, value);
@@ -57,7 +57,7 @@ bool U128_clone(U128 *dst, U128 *src) {
 }
 
 void I128_cleanup(I128 *ptr) {}
-void I128_to_str_buf(I128 *ptr, char *buf, usize max_len) {
+void I128_to_str_buf(I128 *ptr, char *buf, u64 max_len) {
 	i128 value = ptr->_value;
 	if (value < INT64_MAX && value > INT64_MIN)
 		snprintf(buf, max_len, "%" PRId64, value);
@@ -71,7 +71,7 @@ bool I128_clone(I128 *dst, I128 *src) {
 }
 
 void Bool_cleanup(Bool *ptr) {}
-void Bool_to_str_buf(Bool *ptr, char *buf, usize max_len) {
+void Bool_to_str_buf(Bool *ptr, char *buf, u64 max_len) {
 	bool value = ptr->_value;
 	if (value)
 		snprintf(buf, max_len, "true");
@@ -85,29 +85,29 @@ bool Bool_clone(Bool *dst, Bool *src) {
 }
 
 void USize_cleanup(USize *ptr) {}
-void USize_to_str_buf(USize *ptr, char *buf, usize max_len) {
-	usize value = ptr->_value;
+void USize_to_str_buf(USize *ptr, char *buf, u64 max_len) {
+	u64 value = ptr->_value;
 	snprintf(buf, max_len, "%zu", value);
 }
 void *USize_unwrap(USize *ptr) { return &ptr->_value; }
 bool USize_clone(USize *dst, USize *src) {
-	memcpy(&dst->_value, &src->_value, sizeof(usize));
+	memcpy(&dst->_value, &src->_value, sizeof(u64));
 	return true;
 }
 
 void ISize_cleanup(ISize *ptr) {}
-void ISize_to_str_buf(ISize *ptr, char *buf, usize max_len) {
-	isize value = ptr->_value;
+void ISize_to_str_buf(ISize *ptr, char *buf, u64 max_len) {
+	u64 value = ptr->_value;
 	snprintf(buf, max_len, "%zu", value);
 }
 void *ISize_unwrap(ISize *ptr) { return &ptr->_value; }
 bool ISize_clone(ISize *dst, ISize *src) {
-	memcpy(&dst->_value, &src->_value, sizeof(isize));
+	memcpy(&dst->_value, &src->_value, sizeof(u64));
 	return true;
 }
 
 void F32_cleanup(F32 *ptr) {}
-void F32_to_str_buf(F32 *ptr, char *buf, usize max_len) {
+void F32_to_str_buf(F32 *ptr, char *buf, u64 max_len) {
 	f32 value = ptr->_value;
 	snprintf(buf, max_len, "%f", value);
 }
@@ -118,7 +118,7 @@ bool F32_clone(F32 *dst, F32 *src) {
 }
 
 void F64_cleanup(F64 *ptr) {}
-void F64_to_str_buf(F64 *ptr, char *buf, usize max_len) {
+void F64_to_str_buf(F64 *ptr, char *buf, u64 max_len) {
 	f64 value = ptr->_value;
 	snprintf(buf, max_len, "%e", value);
 }

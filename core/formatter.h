@@ -20,9 +20,9 @@
 #include <core/unit.h>
 
 Result to_string(void *obj);
-Result to_string_buf(void *obj, usize buf_size);
+Result to_string_buf(void *obj, u64 buf_size);
 Result to_debug(void *obj);
-Result to_debug_buf(void *obj, usize buf_size);
+Result to_debug_buf(void *obj, u64 buf_size);
 
 CLASS(Formatter,
       FIELD(char *, buf) FIELD(u64, len) FIELD(u64, pos) FIELD(bool, cleanup))

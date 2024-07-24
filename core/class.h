@@ -114,7 +114,7 @@ void vtable_cleanup(Vtable *table);
 	} name##Ptr;                                                           \
 	static Vtable name##Ptr_Vtable__ = {0, UNIQUE_ID, NULL};               \
 	void name##_cleanup(name##Ptr *obj);                                   \
-	static usize name##_size(name##Ptr *obj) { return sizeof(name##Ptr); } \
+	static u64 name##_size(name##Ptr *obj) { return sizeof(name##Ptr); }   \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
 		VtableEntry next = {"cleanup", name##_cleanup};                \
@@ -133,7 +133,7 @@ void vtable_cleanup(Vtable *table);
 	} name##Ptr;                                                           \
 	static Vtable name##Ptr_Vtable__ = {0, UNIQUE_ID, NULL};               \
 	static void name##_cleanup(name##Ptr *obj);                            \
-	static usize name##_size(name##Ptr *obj) { return sizeof(name##Ptr); } \
+	static u64 name##_size(name##Ptr *obj) { return sizeof(name##Ptr); }   \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
 		VtableEntry next = {"cleanup", name##_cleanup};                \

@@ -91,7 +91,7 @@ Result Formatter_to_string(Formatter *ptr) {
 
 Result to_string(void *obj) { return to_string_buf(obj, TO_STRING_BUF_SIZE); }
 
-Result to_string_buf(void *obj, usize buf_size) {
+Result to_string_buf(void *obj, u64 buf_size) {
 	ResultPtr (*do_fmt)(Object *obj, Formatter *formatter) =
 	    find_fn((Object *)obj, "fmt");
 	if (do_fmt == NULL) {
@@ -118,7 +118,7 @@ Result to_string_buf(void *obj, usize buf_size) {
 
 Result to_debug(void *obj) { return to_debug_buf(obj, TO_STRING_BUF_SIZE); }
 
-Result to_debug_buf(void *obj, usize buf_size) {
+Result to_debug_buf(void *obj, u64 buf_size) {
 	ResultPtr (*do_fmt)(Object *obj, Formatter *formatter) =
 	    find_fn((Object *)obj, "dbg");
 	if (do_fmt == NULL) {

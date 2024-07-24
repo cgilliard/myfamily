@@ -416,7 +416,7 @@ MyTest(core, test_formatter) {
 }
 
 ENUM(MyEnum3, VARIANTS(TYPE_USIZE, TYPE_U643, TYPE_BOOL3),
-     TYPES("usize", "u64", "bool"))
+     TYPES("u64", "u64", "bool"))
 #define MyEnum3 DEFINE_ENUM(MyEnum3)
 
 MyTest(core, test_alloc_error_result) {
@@ -424,7 +424,7 @@ MyTest(core, test_alloc_error_result) {
 	Error err3 = UNWRAP_ERR(rx2);
 	assert(equal(KIND(err3), KIND(STATIC_ALLOC_ERROR)));
 
-	usize x1 = 505;
+	u64 x1 = 505;
 	MyEnum3 my_enum = TRY_BUILD_ENUM(MyEnum3, TYPE_USIZE, x1);
 
 	return Ok(_());

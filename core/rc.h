@@ -59,56 +59,56 @@ static SETTER(Rc, flags);
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    uint32_t: ({                                                            \
+	    uint32_t: ({                                                       \
 			 U32Ptr obj = BUILD(U32, 0);                           \
 			 memcpy(&obj._value, &v, sizeof(u32));                 \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    uint64_t: ({                                                            \
+	    uint64_t: ({                                                       \
 			 U64Ptr obj = BUILD(U64, 0);                           \
 			 memcpy(&obj._value, &v, sizeof(u64));                 \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    __uint128_t: ({                                                           \
+	    __uint128_t: ({                                                    \
 			 U128Ptr obj = BUILD(U128, 0);                         \
 			 memcpy(&obj._value, &v, sizeof(u128));                \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    int8_t: ({                                                             \
+	    int8_t: ({                                                         \
 			 I8Ptr obj = BUILD(I8, 0);                             \
 			 memcpy(&obj._value, &v, sizeof(i8));                  \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    int16_t: ({                                                            \
+	    int16_t: ({                                                        \
 			 I16Ptr obj = BUILD(I16, 0);                           \
 			 memcpy(&obj._value, &v, sizeof(i16));                 \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    int32_t: ({                                                            \
+	    int32_t: ({                                                        \
 			 I32Ptr obj = BUILD(I32, 0);                           \
 			 memcpy(&obj._value, &v, sizeof(i32));                 \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    int64_t: ({                                                            \
+	    int64_t: ({                                                        \
 			 I64Ptr obj = BUILD(I64, 0);                           \
 			 memcpy(&obj._value, &v, sizeof(i64));                 \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    __int128_t: ({                                                           \
+	    __int128_t: ({                                                     \
 			 I128Ptr obj = BUILD(I128, 0);                         \
 			 memcpy(&obj._value, &v, sizeof(i128));                \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \
@@ -122,21 +122,21 @@ static SETTER(Rc, flags);
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    size_t: ({                                                          \
+	    size_t: ({                                                         \
 			 USizePtr obj = BUILD(USize, 0);                       \
-			 memcpy(&obj._value, &v, sizeof(usize));               \
+			 memcpy(&obj._value, &v, sizeof(u64));                 \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    float: ({                                                            \
+	    float: ({                                                          \
 			 F32Ptr obj = BUILD(F32, 0);                           \
 			 memcpy(&obj._value, &v, sizeof(f32));                 \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \
 			 RcPtr ret = RC(ptr);                                  \
 			 ret;                                                  \
 		 }),                                                           \
-	    double: ({                                                            \
+	    double: ({                                                         \
 			 F64Ptr obj = BUILD(F64, 0);                           \
 			 memcpy(&obj._value, &v, sizeof(f64));                 \
 			 void *ptr = HEAPIFY_DIRECT(obj);                      \

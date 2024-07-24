@@ -109,7 +109,7 @@ void Tuple_element_at(Tuple *tuple, u64 index, void *dst) {
 		memcpy(dst, ref, sizeof(i8));
 	} else if (!strcmp(cn, "USize")) {
 		ref = unwrap(ref);
-		memcpy(dst, ref, sizeof(usize));
+		memcpy(dst, ref, sizeof(u64));
 	} else if (!strcmp(cn, "F64")) {
 		ref = unwrap(ref);
 		memcpy(dst, ref, sizeof(f64));
@@ -185,15 +185,6 @@ void *Tuple_add_value_i8(void *value) {
 		return NULL;
 	BUILDPTR(ret, I8);
 	ret->_value = *(i8 *)value;
-	return (void *)ret;
-}
-
-void *Tuple_add_value_usize(void *value) {
-	USizePtr *ret = mymalloc(sizeof(USize));
-	if (!ret)
-		return NULL;
-	BUILDPTR(ret, USize);
-	ret->_value = *(usize *)value;
 	return (void *)ret;
 }
 

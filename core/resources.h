@@ -26,8 +26,8 @@ typedef struct ResourceStats {
 	u64 fclose_sum;
 } ResourceStats;
 
-void *mymalloc(usize size);
-void *myrealloc(void *ptr, usize size);
+void *mymalloc(u64 size);
+void *myrealloc(void *ptr, u64 size);
 void myfree(void *ptr);
 FILE *myfopen(char *path, const char *mode);
 void myfclose(FILE *ptr);

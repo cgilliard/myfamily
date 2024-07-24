@@ -17,7 +17,7 @@
 
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 
-void *mymalloc(usize size) {
+void *mymalloc(u64 size) {
 	void *ret;
 	ret = malloc(size);
 
@@ -26,7 +26,7 @@ void *mymalloc(usize size) {
 	}
 	return ret;
 }
-void *myrealloc(void *ptr, usize size) {
+void *myrealloc(void *ptr, u64 size) {
 	void *ret;
 	ret = realloc(ptr, size);
 

@@ -26,8 +26,7 @@
 
 #define TRAIT_TO_STR(T) TRAIT_REQUIRED(T, char *, to_str, T##Ptr *obj)
 #define TRAIT_TO_STR_BUF(T)                                                    \
-	TRAIT_REQUIRED(T, void, to_str_buf, T##Ptr *obj, char *buf,            \
-		       usize max_len)
+	TRAIT_REQUIRED(T, void, to_str_buf, T##Ptr *obj, char *buf, u64 max_len)
 
 #define TRAIT_PRINT(T) TRAIT_REQUIRED(T, void, print, T##Ptr *obj)
 
@@ -42,7 +41,7 @@
 bool equal(void *obj1, void *obj2);
 void *unwrap(void *obj);
 void *unwrap_as(char *name, void *obj);
-usize size(void *obj);
+u64 size(void *obj);
 bool copy(void *dest, void *src);
 bool clone(void *dest, void *src);
 void cleanup(void *ptr);
