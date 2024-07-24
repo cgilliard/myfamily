@@ -15,6 +15,7 @@
 #include <core/class.h>
 #include <core/enum.h>
 #include <core/error.h>
+#include <core/format.h>
 #include <core/formatter.h>
 #include <core/option.h>
 #include <core/rc.h>
@@ -427,5 +428,17 @@ MyTest(core, test_alloc_error_result) {
 	u64 x1 = 505;
 	MyEnum3 my_enum = TRY_BUILD_ENUM(MyEnum3, TYPE_USIZE, x1);
 
+	return Ok(_());
+}
+
+MyTest(core, test_format) {
+	Formatter fmt = FORMATTER(10000);
+	u32 x = 123;
+	Result r1 = FORMAT(&fmt, "this is a test {}", x);
+	Result rr1 = Formatter_to_string(&fmt);
+	String s1 = TRY(rr1, s1);
+	char *s_out = unwrap(&s1);
+	printf("s=%s\n", unwrap(&s1));
+	assert_eq_str(s_out, "this is a test 123");
 	return Ok(_());
 }

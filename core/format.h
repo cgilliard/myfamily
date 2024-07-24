@@ -26,37 +26,37 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 	    __uint128_t: ({                                                    \
 			 U128Ptr _vu128__ = BUILD(U128);                       \
 			 memcpy(&(_vu128__._value), &(value), sizeof(u128));   \
-			 _vu128__;                                             \
+			 &_vu128__;                                            \
 		 }),                                                           \
 	    uint64_t: ({                                                       \
 			 U64Ptr _vu64__ = BUILD(U64);                          \
 			 memcpy(&(_vu64__._value), &(value), sizeof(u64));     \
-			 _vu64__;                                              \
+			 &_vu64__;                                             \
 		 }),                                                           \
 	    uint32_t: ({                                                       \
 			 U32Ptr _vu32__ = BUILD(U32);                          \
 			 memcpy(&(_vu32__._value), &(value), sizeof(u32));     \
-			 _vu32__;                                              \
+			 &_vu32__;                                             \
 		 }),                                                           \
 	    uint16_t: ({                                                       \
 			 U16Ptr _vu16__ = BUILD(U16);                          \
 			 memcpy(&(_vu16__._value), &(value), sizeof(u16));     \
-			 _vu16__;                                              \
+			 &_vu16__;                                             \
 		 }),                                                           \
 	    uint8_t: ({                                                        \
 			 U8Ptr _vu8__ = BUILD(U8);                             \
 			 memcpy(&(_vu8__._value), &(value), sizeof(u8));       \
-			 _vu8__;                                               \
+			 &_vu8__;                                              \
 		 }),                                                           \
 	    __int128_t: ({                                                     \
 			 U128Ptr _vi128__ = BUILD(I128);                       \
 			 memcpy(&(_vi128__._value), &(value), sizeof(i128));   \
-			 _vi128__;                                             \
+			 &_vi128__;                                            \
 		 }),                                                           \
 	    int64_t: ({                                                        \
 			 U64Ptr _vi64__ = BUILD(I64);                          \
 			 memcpy(&(_vi64__._value), &(value), sizeof(i64));     \
-			 _vi64__;                                              \
+			 &_vi64__;                                             \
 		 }),                                                           \
 	    int32_t: ({                                                        \
 			 U32Ptr _vi32__ = BUILD(I32);                          \
@@ -66,29 +66,29 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 	    int16_t: ({                                                        \
 			 U16Ptr _vi16__ = BUILD(I16);                          \
 			 memcpy(&(_vi16__._value), &(value), sizeof(i16));     \
-			 _vi16__;                                              \
+			 &_vi16__;                                             \
 		 }),                                                           \
 	    int8_t: ({                                                         \
 			 I8Ptr _vi8__ = BUILD(I8);                             \
 			 memcpy(&(_vi8__._value), &(value), sizeof(i8));       \
-			 _vi8__;                                               \
+			 &_vi8__;                                              \
 		 }),                                                           \
 	    double: ({                                                         \
 			 U64Ptr _vf64__ = BUILD(F64);                          \
 			 memcpy(&(_vf64__._value), &(value), sizeof(f64));     \
-			 _vf64__;                                              \
+			 &_vf64__;                                             \
 		 }),                                                           \
 	    float: ({                                                          \
 			 U32Ptr _vf32__ = BUILD(F32);                          \
 			 memcpy(&(_vf32__._value), &(value), sizeof(f32));     \
-			 _vf32__;                                              \
+			 &_vf32__;                                             \
 		 }),                                                           \
 	    bool: ({                                                           \
 			 BoolPtr _bool__ = BUILD(Bool);                        \
 			 memcpy(&(_bool__._value), &(value), sizeof(bool));    \
-			 _bool__;                                              \
+			 &_bool__;                                             \
 		 }),                                                           \
-	    default: ({ value; }))
+	    default: ({ &value; }))
 
 #define FORMAT(f, fmt, ...)                                                    \
 	format(f, fmt __VA_OPT__(, ) EXPAND(FOR_EACH(PROC_ARG, __VA_ARGS__)))
