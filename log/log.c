@@ -133,6 +133,10 @@ Result Log_log(Log *log, LogLevel level, String line) {
 
 		if (!found_path)
 			strcpy(bt_buf, "UNKNOWN");
+		// take out space (linux)
+		for (u64 i = 0; i < strlen(bt_buf); i++)
+			if (bt_buf[i] == ' ')
+				bt_buf[i] = 0;
 
 		String line_num_str;
 		if (config.show_colors) {
