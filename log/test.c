@@ -125,9 +125,12 @@ MyTest(log, testfmt) {
 }
 
 MyTest(log, testlogmacro) {
+
 	Log log =
 	    LOG(ShowLogLevel(true), ShowTimestamp(true), FormatterSize(1500),
-		ShowLineNum(false), ShowMillis(false));
+		ShowLineNum(false), ShowMillis(false), ShowColors(true),
+		LogFilePath("./abcdef.log"), FileHeader("myheader"),
+		MaxAgeMillis(100000));
 	u64 x = 1000;
 
 	itrace(&log, "test {}", x);

@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/backtrace.h>
 #include <core/panic.h>
+#include <core/traits_base.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,5 +27,10 @@ void panic(const char *fmt, ...) {
 	vfprintf(stderr, fmt, args);
 	va_end(args);
 	fprintf(stderr, "\n");
+
+	Backtrace bt = BUILD(Backtrace, NULL, 0);
+	Backtrace_generate(&bt, 100);
+	print(&bt);
+
 	exit(-1);
 }

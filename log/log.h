@@ -22,6 +22,7 @@
 #include <core/format.h>
 #include <core/formatter.h>
 #include <core/macro_utils.h>
+#include <core/option.h>
 #include <core/result.h>
 #include <core/string.h>
 
@@ -47,7 +48,7 @@ typedef enum LogLevel {
 
 typedef struct LogConfig {
 	bool show_colors;
-	bool show_stdout;
+	bool show_terminal;
 	bool show_timestamp;
 	bool show_millis;
 	bool show_log_level;
@@ -56,8 +57,8 @@ typedef struct LogConfig {
 	bool delete_rotation;
 	u64 max_size_bytes;
 	u64 max_age_millis;
-	String log_file_path;
-	String file_header;
+	Option log_file_path;
+	Option file_header;
 	bool is_sync;
 	u64 formatter_size;
 } LogConfig;
@@ -121,6 +122,89 @@ IMPL(Log, LOG_CORE)
 		    BUILD_ENUM(LogConfigOption, SHOW_MILLIS, __v5_);           \
 		RcPtr __rc5_ = HEAPIFY(__opt5_);                               \
 		__rc5_;                                                        \
+	})
+
+#define ShowStdout(x)                                                          \
+	({                                                                     \
+		bool __v6_ = x;                                                \
+		LogConfigOptionPtr __opt6_ =                                   \
+		    BUILD_ENUM(LogConfigOption, SHOW_STDOUT, __v6_);           \
+		RcPtr __rc6_ = HEAPIFY(__opt6_);                               \
+		__rc6_;                                                        \
+	})
+
+#define ShowColors(x)                                                          \
+	({                                                                     \
+		bool __v7_ = x;                                                \
+		LogConfigOptionPtr __opt7_ =                                   \
+		    BUILD_ENUM(LogConfigOption, SHOW_COLORS, __v7_);           \
+		RcPtr __rc7_ = HEAPIFY(__opt7_);                               \
+		__rc7_;                                                        \
+	})
+
+#define AutoRotate(x)                                                          \
+	({                                                                     \
+		bool __v8_ = x;                                                \
+		LogConfigOptionPtr __opt8_ =                                   \
+		    BUILD_ENUM(LogConfigOption, AUTO_ROTATE, __v8_);           \
+		RcPtr __rc8_ = HEAPIFY(__opt8_);                               \
+		__rc8_;                                                        \
+	})
+
+#define DeleteRotation(x)                                                      \
+	({                                                                     \
+		bool __v9_ = x;                                                \
+		LogConfigOptionPtr __opt9_ =                                   \
+		    BUILD_ENUM(LogConfigOption, DELETE_ROTATION, __v9_);       \
+		RcPtr __rc9_ = HEAPIFY(__opt9_);                               \
+		__rc9_;                                                        \
+	})
+
+#define MaxAgeMillis(x)                                                        \
+	({                                                                     \
+		u64 __v10_ = x;                                                \
+		LogConfigOptionPtr __opt10_ =                                  \
+		    BUILD_ENUM(LogConfigOption, MAX_AGE_MILLIS, __v10_);       \
+		RcPtr __rc10_ = HEAPIFY(__opt10_);                             \
+		__rc10_;                                                       \
+	})
+
+#define MaxSizeBytes(x)                                                        \
+	({                                                                     \
+		u64 __v11_ = x;                                                \
+		LogConfigOptionPtr __opt11_ =                                  \
+		    BUILD_ENUM(LogConfigOption, MAX_SIZE_BYTES, __v11_);       \
+		RcPtr __rc11_ = HEAPIFY(__opt11_);                             \
+		__rc11_;                                                       \
+	})
+
+#define LogSync(x)                                                             \
+	({                                                                     \
+		bool __v12_ = x;                                               \
+		LogConfigOptionPtr __opt12_ =                                  \
+		    BUILD_ENUM(LogConfigOption, LOG_SYNC, __v12_);             \
+		RcPtr __rc12_ = HEAPIFY(__opt12_);                             \
+		__rc12_;                                                       \
+	})
+
+#define LogFilePath(x)                                                         \
+	({                                                                     \
+		StringPtr __p13_ = STRING(x);                                  \
+		Rc __rc131_ = HEAPIFY(__p13_);                                 \
+		LogConfigOptionPtr __opt13_ =                                  \
+		    BUILD_ENUM(LogConfigOption, LOG_FILE_PATH, __rc131_);      \
+		RcPtr __rc13_ = HEAPIFY(__opt13_);                             \
+		__rc13_;                                                       \
+	})
+
+#define FileHeader(x)                                                          \
+	({                                                                     \
+		StringPtr __p14_ = STRING(x);                                  \
+		Rc __rc141_ = HEAPIFY(__p14_);                                 \
+		LogConfigOptionPtr __opt14_ =                                  \
+		    BUILD_ENUM(LogConfigOption, FILE_HEADER, __rc141_);        \
+		RcPtr __rc14_ = HEAPIFY(__opt14_);                             \
+		__rc14_;                                                       \
 	})
 
 #define LOG(...)                                                               \
