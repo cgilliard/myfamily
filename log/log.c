@@ -118,7 +118,6 @@ Result Log_log(Log *log, LogLevel level, String line) {
 		Backtrace_generate(&bt, 100);
 
 		u64 count = GET(Backtrace, &bt, count);
-		printf("count=%llu\n", count);
 		bool found_log_c = false;
 		bool found_path = false;
 		for (u64 i = 0; i < count; i++) {
