@@ -140,6 +140,20 @@ Result Log_log(Log *log, LogLevel level, String line) {
 			if (bt_buf[i] == ' ')
 				bt_buf[i] = 0;
 
+		if (found_path) {
+			int strlen_bt_buf = strlen(bt_buf);
+			if (strlen_bt_buf > config.line_num_max_len) {
+				char nbuf[config.line_num_max_len + 3];
+				nbuf[0] = '.';
+				nbuf[1] = '.';
+				strcpy(nbuf + 2,
+				       bt_buf + (strlen_bt_buf -
+						 config.line_num_max_len));
+				nbuf[config.line_num_max_len + 2] = 0;
+				strcpy(bt_buf, nbuf);
+			}
+		}
+
 		String line_num_str;
 		if (config.show_colors) {
 			snprintf(buf, 100, "[%s%s%s]: ", YELLOW, bt_buf, RESET);
@@ -152,7 +166,10 @@ Result Log_log(Log *log, LogLevel level, String line) {
 	}
 	Result r2 = append(&full_line, &line);
 	TRYU(r2);
-	printf("%s\n", unwrap(&full_line));
+	if (level >= WARN)
+		fprintf(stderr, "%s\n", unwrap(&full_line));
+	else
+		fprintf(stdout, "%s\n", unwrap(&full_line));
 
 	return Ok(_());
 }
@@ -161,12 +178,20 @@ Formatter Log_formatter(Log *log) { return GET(Log, log, formatter); }
 
 Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 	LogConfig lc;
+
 	lc.show_log_level = true;
 	lc.show_timestamp = true;
+	lc.show_terminal = false;
 	lc.formatter_size = 10000;
-	lc.show_linenum = true;
+	lc.max_age_millis = 1000 * 60 * 60; // 1 hr
+	lc.max_size_bytes = 1024 * 1024;    // 1 mb
+	lc.delete_rotation = false;
+	lc.show_linenum = false;
 	lc.show_colors = true;
 	lc.show_millis = true;
+	lc.auto_rotate = false;
+	lc.is_sync = false;
+	lc.line_num_max_len = 30;
 	lc.log_file_path = None;
 	lc.file_header = None;
 
@@ -214,10 +239,13 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 			}) VARIANT(MAX_AGE_MILLIS, {
                                 lc.max_age_millis = ENUM_VALUE(lc.max_age_millis, u64, next);
 			}) VARIANT(MAX_SIZE_BYTES, {
-                                lc.max_size_bytes= ENUM_VALUE(lc.max_size_bytes, u64, next);
-			}) VARIANT(SHOW_LINENUM, {
+                                lc.max_size_bytes = ENUM_VALUE(lc.max_size_bytes, u64, next);
+			}) VARIANT(LINENUM_MAX_LEN, {
+                                lc.line_num_max_len = ENUM_VALUE(lc.line_num_max_len, u64, next);
+                        }) VARIANT(SHOW_LINENUM, {
 				lc.show_linenum = ENUM_VALUE(lc.show_linenum, bool, next);
-			}));
+			})
+		);
 		// clang-format on
 	}
 	va_end(ptr);

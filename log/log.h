@@ -32,9 +32,9 @@ ENUM(LogConfigOption,
      VARIANTS(SHOW_COLORS, SHOW_TERMINAL, SHOW_TIMESTAMP, SHOW_MILLIS,
 	      SHOW_LOG_LEVEL, SHOW_LINENUM, AUTO_ROTATE, DELETE_ROTATION,
 	      MAX_SIZE_BYTES, MAX_AGE_MILLIS, LOG_FILE_PATH, FILE_HEADER,
-	      LOG_SYNC, FORMATTER_SIZE),
+	      LOG_SYNC, FORMATTER_SIZE, LINENUM_MAX_LEN),
      TYPES("bool", "bool", "bool", "bool", "bool", "bool", "bool", "bool",
-	   "u64", "u64", "String", "String", "bool", "u64"))
+	   "u64", "u64", "String", "String", "bool", "u64", "u16"))
 #define LogConfigOption DEFINE_ENUM(LogConfigOption)
 
 typedef enum LogLevel {
@@ -61,6 +61,7 @@ typedef struct LogConfig {
 	Option file_header;
 	bool is_sync;
 	u64 formatter_size;
+	u16 line_num_max_len;
 } LogConfig;
 
 #define LOG_CORE(T)                                                            \
@@ -205,6 +206,15 @@ IMPL(Log, LOG_CORE)
 		    BUILD_ENUM(LogConfigOption, FILE_HEADER, __rc141_);        \
 		RcPtr __rc14_ = HEAPIFY(__opt14_);                             \
 		__rc14_;                                                       \
+	})
+
+#define LineNumMaxLen(x)                                                       \
+	({                                                                     \
+		u16 __v15_ = x;                                                \
+		LogConfigOptionPtr __opt15_ =                                  \
+		    BUILD_ENUM(LogConfigOption, LINENUM_MAX_LEN, __v15_);      \
+		RcPtr __rc15_ = HEAPIFY(__opt15_);                             \
+		__rc15_;                                                       \
 	})
 
 #define LOG(...)                                                               \
