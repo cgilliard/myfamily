@@ -21,7 +21,11 @@
 #include <core/unit.h>
 #include <log/log.h>
 
-#define LOG_LEVEL DEBUG
+#define LOG_LEVEL TRACE
+
+static void __attribute__((constructor)) log_init_logger() {
+	Result r = init_global_log();
+}
 
 MySuite(log);
 
@@ -43,10 +47,10 @@ MyTest(log, test_unit_tostr) {
 	u32 v = 12345;
 	MyEnumLog mel = BUILD_ENUM(MyEnumLog, TYPE1, v);
 
-	debug(&log, "mel={}", mel);
+	idebug(&log, "mel={}", mel);
 
 	String s2 = STRING("test");
-	debug(&log, "u={},s={},u2={}", _(), s2, _());
+	idebug(&log, "uii={},s={},u2={}", _(), s2, _());
 
 	u32 x = 1;
 	u64 y = 2;
@@ -84,22 +88,19 @@ MyTest(log, test_log_basic) {
 	u64 u641 = 123;
 	bool b1 = true;
 	bool b2 = false;
-	debug(&log, "v1={},v2={},v3={},v4={},vv1={},vv2={},vv3={},vv4={}", v1,
-	      v2, v3, v4, vv1, vv2, vv3, vv4);
-	debug(&log, "v={},v2={}", vvv1, vvv2);
-	debug(&log, "u64={},u64={}", u641, u641);
-	debug(&log, "x={},x={}", v1, v2);
+	idebug(&log, "v1={},v2={},v3={},v4={},vv1={},vv2={},vv3={},vv4={}", v1,
+	       v2, v3, v4, vv1, vv2, vv3, vv4);
+	idebug(&log, "v={},v2={}", vvv1, vvv2);
+	idebug(&log, "u64={},u64={}", u641, u641);
+	idebug(&log, "x={},x={}", v1, v2);
 
-	debug(&log, "b1={},b2={}", b1, b2);
+	idebug(&log, "b1={},b2={}", b1, b2);
 	String s3 = STRING("ok");
 
-	debug(&log, "s1={},s2={},s3={}", s1, s2, s3);
+	idebug(&log, "s1={},s2={},s3={}", s1, s2, s3);
 	Unit u = BUILD(Unit);
-	debug(&log, "u={},u2={},u3={}", b1, b2, b1);
-
-	debug(&log, "vvvv1={},vvvv2={}", vvvv1, vvvv2);
-
-	printf("basic complete\n");
+	idebug(&log, "u={},u2={},u3={}", b1, b2, b1);
+	idebug(&log, "vvvv1={},vvvv2={}", vvvv1, vvvv2);
 
 	return Ok(_());
 }
@@ -107,8 +108,8 @@ MyTest(log, test_log_basic) {
 MyTest(log, test_log_log_level) {
 	Log log = LOG(ShowLogLevel(true), ShowTimestamp(true));
 	u32 x = 4;
-	info(&log, "test {}", x);
-	debug(&log, "test2");
+	iinfo(&log, "test {}", x);
+	idebug(&log, "test2");
 
 	return Ok(_());
 }
@@ -124,17 +125,53 @@ MyTest(log, testfmt) {
 }
 
 MyTest(log, testlogmacro) {
-	Log log =
-	    LOG(ShowLogLevel(true), ShowTimestamp(false), FormatterSize(1500));
+	Log log = LOG(ShowLogLevel(true), ShowTimestamp(true),
+		      FormatterSize(1500), ShowLineNum(false));
 	u64 x = 1000;
-	debug(&log, "test {}", x);
-	debug(&log, "x={}", x);
-	info(&log, "ok ok ok");
+	/*
+		itrace(&log, "test {}", x);
+		itrace(&log, "ok ok ok");
 
-	Result r = init_global_log();
-	TRYU(r);
-	debug(GLOBAL_LOGGER, "hi");
-	cleanup(GLOBAL_LOGGER);
+		trace("hi");
+		trace("abc {}", x);
+		*/
+
+	idebug(&log, "test {}", x);
+	idebug(&log, "ok ok ok");
+
+	debug("hi");
+	debug("abc {}", x);
+
+	iinfo(&log, "test {}", x);
+	iinfo(&log, "ok ok ok");
+
+	info("hi");
+	info("abc {}", x);
+	/*
+		iinfo(&log, "test {}", x);
+		iinfo(&log, "ok ok ok");
+
+		info("hi");
+		info("abc {}", x);
+
+		iwarn(&log, "test {}", x);
+		iwarn(&log, "ok ok ok");
+
+		warn("hi");
+		warn("abc {}", x);
+
+		ierror(&log, "test {}", x);
+		ierror(&log, "ok ok ok");
+
+		error("hi");
+		error("abc {}", x);
+
+		ifatal(&log, "test {}", x);
+		ifatal(&log, "ok ok ok");
+
+		fatal("hi");
+		fatal("abc {}", x);
+		*/
 
 	return Ok(_());
 }

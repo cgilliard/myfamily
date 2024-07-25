@@ -18,8 +18,11 @@
 #include <core/class.h>
 #include <core/colors.h>
 #include <core/enum.h>
+#include <core/error.h>
+#include <core/format.h>
 #include <core/formatter.h>
 #include <core/macro_utils.h>
+#include <core/result.h>
 #include <core/string.h>
 
 #define _FILE_OFFSET_BITS 64
@@ -71,7 +74,7 @@ CLASS(Log,
 IMPL(Log, LOG_CORE)
 #define Log DEFINE_CLASS(Log)
 
-#define COUNT_LOG_CONFIG(value) ({ __counter___ += 1; })
+#define COUNT_ARGS(value) ({ __counter___ += 1; })
 
 #define PROC_LOG_CONFIG(value) ({ value; })
 
@@ -102,10 +105,19 @@ IMPL(Log, LOG_CORE)
 		__rc3_;                                                        \
 	})
 
+#define ShowLineNum(x)                                                         \
+	({                                                                     \
+		bool __v4_ = x;                                                \
+		LogConfigOptionPtr __opt4_ =                                   \
+		    BUILD_ENUM(LogConfigOption, SHOW_LINENUM, __v4_);          \
+		RcPtr __rc4_ = HEAPIFY(__opt4_);                               \
+		__rc4_;                                                        \
+	})
+
 #define LOG(...)                                                               \
 	({                                                                     \
 		int __counter___ = 0;                                          \
-		EXPAND(FOR_EACH(COUNT_LOG_CONFIG, __VA_ARGS__));               \
+		EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));                     \
 		Result __rr___ =                                               \
 		    Log_build_rc(__counter___ __VA_OPT__(, ) __VA_OPT__(       \
 			EXPAND(FOR_EACH(PROC_LOG_CONFIG, __VA_ARGS__))));      \
@@ -122,36 +134,29 @@ static Result init_global_log() {
 	return Ok(_());
 }
 
-#define debug_impl(l, fmt, ...)                                                \
+#define log_impl(l, local_level, level, fmt, ...)                              \
 	({                                                                     \
-		FormatterPtr formatter = Log_formatter(l);                     \
-		Formatter_reset(&formatter);                                   \
-		Result _r1__ = FORMAT(&formatter, (char *)fmt, __VA_ARGS__);   \
-		TRYU(_r1__);                                                   \
-		Result _r2__ = Formatter_to_string(&formatter);                \
-		String _s__ = TRY(_r2__, _s__);                                \
-		Result _r2debug__ = Log_log(l, DEBUG, _s__);                   \
-		TRYU(_r2debug__);                                              \
+		if (local_level <= level) {                                    \
+			int __counter___ = 0;                                  \
+			EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));             \
+			FormatterPtr formatter = Log_formatter(l);             \
+			Formatter_reset(&formatter);                           \
+			Result _r1__ =                                         \
+			    FORMAT(&formatter, (char *)fmt, __VA_ARGS__);      \
+			TRYU(_r1__);                                           \
+			Result _r2__ = Formatter_to_string(&formatter);        \
+			String _s__ = TRY(_r2__, _s__);                        \
+			Result _r3__ = Log_log(l, level, _s__);                \
+			TRYU(_r3__);                                           \
+		}                                                              \
 	})
 
-#define debug(l, ...)                                                          \
-	_Generic((l),                                                          \
-	    LogPtr *: ({ debug_impl((LogPtr *)l, __VA_ARGS__); }),             \
-	    default: ({                                                        \
-			 debug_impl(GLOBAL_LOGGER,                             \
-				    (char *)l __VA_OPT__(, __VA_ARGS__));      \
-		 }))
+#define idebug(l, fmt, ...) log_impl(l, LOG_LEVEL, DEBUG, fmt, __VA_ARGS__)
+#define debug(fmt, ...)                                                        \
+	log_impl(GLOBAL_LOGGER, LOG_LEVEL, DEBUG, fmt, __VA_ARGS__)
 
-#define info(l, fmt, ...)                                                      \
-	({                                                                     \
-		FormatterPtr formatter = Log_formatter(l);                     \
-		Formatter_reset(&formatter);                                   \
-		Result _r1__ = FORMAT(&formatter, fmt, __VA_ARGS__);           \
-		TRYU(_r1__);                                                   \
-		Result _r2__ = Formatter_to_string(&formatter);                \
-		String _s__ = TRY(_r2__, _s__);                                \
-		Result _r2debug__ = Log_log(l, INFO, _s__);                    \
-		TRYU(_r2debug__);                                              \
-	})
+#define iinfo(l, fmt, ...) log_impl(l, LOG_LEVEL, INFO, fmt, __VA_ARGS__)
+#define info(fmt, ...)                                                         \
+	log_impl(GLOBAL_LOGGER, LOG_LEVEL, INFO, fmt, __VA_ARGS__)
 
 #endif // _LOG_LOG__

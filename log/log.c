@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/colors.h>
 #include <core/ekinds.h>
 #include <core/error.h>
 #include <core/formatter.h>
@@ -28,33 +29,76 @@ void Log_cleanup(Log *log) {
 }
 
 Result Log_log(Log *log, LogLevel level, String line) {
+	char buf[100];
 	String full_line = STRING("");
 	LogConfig config = GET(Log, log, config);
+	if (config.show_timestamp) {
+		if (config.show_colors)
+			snprintf(buf, 100,
+				 "[%s2024-07-24 15:23:30.581%s]: ", DIMMED,
+				 RESET);
+		else
+			snprintf(buf, 100, "[2024-07-24 15:23:30.582]: ");
+		String ts_string = STRING(buf);
+		Result r1 = append(&full_line, &ts_string);
+		TRYU(r1);
+	}
 	if (config.show_log_level) {
 		String level_str;
-		if (level == TRACE)
-			level_str = STRING("TRACE: ");
-		else if (level == DEBUG)
-			level_str = STRING("DEBUG: ");
-		else if (level == INFO)
-			level_str = STRING("INFO: ");
-		else if (level == WARN)
-			level_str = STRING("WARN: ");
-		else if (level == ERROR)
-			level_str = STRING("ERROR: ");
-		else if (level == FATAL)
-			level_str = STRING("FATAL: ");
-		else {
+		if (level == TRACE) {
+			level_str = STRING("(TRACE): ");
+		} else if (level == DEBUG) {
+			if (config.show_colors)
+				snprintf(buf, 100, "(%sDEBUG%s): ", CYAN,
+					 RESET);
+			else
+				snprintf(buf, 100, "(DEBUG): ");
+			level_str = STRING(buf);
+		} else if (level == INFO) {
+			if (config.show_colors)
+				snprintf(buf, 100, "(%sINFO%s) : ", GREEN,
+					 RESET);
+			else
+				snprintf(buf, 100, "(INFO) : ");
+			level_str = STRING(buf);
+		} else if (level == WARN) {
+			if (config.show_colors)
+				snprintf(buf, 100, "(%sWARN%s) : ", YELLOW,
+					 RESET);
+			else
+				snprintf(buf, 100, "(WARN) : ");
+			level_str = STRING(buf);
+		} else if (level == ERROR) {
+			if (config.show_colors)
+				snprintf(buf, 100, "(%sERROR%s): ", RED, RESET);
+			else
+				snprintf(buf, 100, "(ERROR): ");
+			level_str = STRING(buf);
+		} else if (level == FATAL) {
+			if (config.show_colors)
+				snprintf(buf, 100, "(%sFATAL%s): ", BRIGHT_RED,
+					 RESET);
+			else
+				snprintf(buf, 100, "(FATAL): ");
+			level_str = STRING(buf);
+		} else {
 			Error err = ERR(ILLEGAL_STATE, "unexpected log level");
 			return Err(err);
 		}
 		Result r1 = append(&full_line, &level_str);
 		TRYU(r1);
 	}
-	if (config.show_timestamp) {
-		String ts_string = STRING("[Tue Jul 23 14:59:52 PDT 2024]: ");
-		Result r1 = append(&full_line, &ts_string);
-		TRYU(r1);
+	if (config.show_linenum) {
+		String line_num_str;
+		if (config.show_colors) {
+			snprintf(buf, 100,
+				 "[%s..myfamily/log/log.c:85%s]: ", YELLOW,
+				 RESET);
+			line_num_str = STRING(buf);
+		} else {
+			line_num_str = STRING("[..myfamily/log/log.c:85]: ");
+		}
+		Result r1 = append(&full_line, &line_num_str);
 	}
 	Result r2 = append(&full_line, &line);
 	TRYU(r2);
@@ -70,6 +114,8 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 	lc.show_log_level = true;
 	lc.show_timestamp = true;
 	lc.formatter_size = 10000;
+	lc.show_linenum = true;
+	lc.show_colors = true;
 
 	for (int i = 0; i < n; i++) {
 		LogConfigOptionPtr next;
@@ -91,7 +137,10 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 		      }) VARIANT(FORMATTER_SIZE, {
 			      lc.formatter_size =
 				  ENUM_VALUE(lc.formatter_size, u64, next);
-		      }) VARIANT(SHOW_TERMINAL, {}));
+		      }) VARIANT(SHOW_LINENUM, {
+			      lc.show_linenum =
+				  ENUM_VALUE(lc.show_linenum, bool, next);
+		      }));
 	}
 	va_end(ptr);
 
