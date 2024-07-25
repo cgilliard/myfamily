@@ -69,10 +69,13 @@ typedef struct LogConfig {
 		       String line)                                            \
 	TRAIT_REQUIRED(T, Formatter, formatter, T##Ptr *log)                   \
 	TRAIT_REQUIRED(T, Result, build, int n, ...)                           \
-	TRAIT_REQUIRED(T, Result, build_rc, int n, ...)
+	TRAIT_REQUIRED(T, Result, build_rc, int n, ...)                        \
+	TRAIT_REQUIRED(T, Result, rotate, T##Ptr *log)                         \
+	TRAIT_REQUIRED(T, bool, need_rotate, T##Ptr *log)
 
 CLASS(Log,
-      FIELD(LogConfig, config) FIELD(FILE *, fp) FIELD(Formatter, formatter))
+      FIELD(LogConfig, config) FIELD(FILE *, fp) FIELD(Formatter, formatter)
+	  FIELD(u64, cur_size) FIELD(u64, last_rotation))
 IMPL(Log, LOG_CORE)
 #define Log DEFINE_CLASS(Log)
 
@@ -125,11 +128,11 @@ IMPL(Log, LOG_CORE)
 		__rc5_;                                                        \
 	})
 
-#define ShowStdout(x)                                                          \
+#define ShowTerminal(x)                                                        \
 	({                                                                     \
 		bool __v6_ = x;                                                \
 		LogConfigOptionPtr __opt6_ =                                   \
-		    BUILD_ENUM(LogConfigOption, SHOW_STDOUT, __v6_);           \
+		    BUILD_ENUM(LogConfigOption, SHOW_TERMINAL, __v6_);         \
 		RcPtr __rc6_ = HEAPIFY(__opt6_);                               \
 		__rc6_;                                                        \
 	})

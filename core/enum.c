@@ -21,6 +21,8 @@
 		return r;                                                      \
 	}
 
+DEFINE_ENUM_VALUE_IMPL(u, size)
+DEFINE_ENUM_VALUE_IMPL(i, size)
 DEFINE_ENUM_VALUE_IMPL(u, 8)
 DEFINE_ENUM_VALUE_IMPL(u, 16)
 DEFINE_ENUM_VALUE_IMPL(u, 32)
@@ -57,6 +59,8 @@ bool enum_value_bool(void *value) {
 		return value;                                                  \
 	}
 
+DEFINE_BUILD_ENUM_VALUE_IMPL(u, size)
+DEFINE_BUILD_ENUM_VALUE_IMPL(i, size)
 DEFINE_BUILD_ENUM_VALUE_IMPL(u, 128)
 DEFINE_BUILD_ENUM_VALUE_IMPL(u, 64)
 DEFINE_BUILD_ENUM_VALUE_IMPL(u, 32)
@@ -114,3 +118,4 @@ void *build_enum_value(void *v, char *type_str) {
 	}
 	return value;
 }
+

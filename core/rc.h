@@ -45,6 +45,20 @@ static SETTER(Rc, flags);
 
 #define HEAPIFY(v)                                                             \
 	_Generic((v),                                                          \
+	    usize: ({                                                          \
+			 USize obj = BUILD(USize, 0);                          \
+			 memcpy(&obj._value, &v, sizeof(usize));               \
+			 void *ptr = HEAPIFY_DIRECT(obj);                      \
+			 RcPtr ret = RC(ptr);                                  \
+			 ret;                                                  \
+		 }),                                                           \
+	    isize: ({                                                          \
+			 ISize obj = BUILD(ISize, 0);                          \
+			 memcpy(&obj._value, &v, sizeof(isize));               \
+			 void *ptr = HEAPIFY_DIRECT(obj);                      \
+			 RcPtr ret = RC(ptr);                                  \
+			 ret;                                                  \
+		 }),                                                           \
 	    uint8_t: ({                                                        \
 			 U8Ptr obj = BUILD(U8, 0);                             \
 			 memcpy(&obj._value, &v, sizeof(u8));                  \

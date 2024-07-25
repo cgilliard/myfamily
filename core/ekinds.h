@@ -28,6 +28,7 @@ static ErrorKind WRITE_ERROR = EKIND("WriteError");
 static ErrorKind OVERFLOW = EKIND("Overflow");
 static ErrorKind UNEXPECTED_EOF = EKIND("UnexpecteEOF");
 static ErrorKind FILE_OPEN_ERROR = EKIND("FileOpen");
+static ErrorKind RAND_ERROR = EKIND("RandError");
 static ErrorKind FILE_SEEK_ERROR = EKIND("FileSeek");
 
 #endif // _BASE_EKINDS__

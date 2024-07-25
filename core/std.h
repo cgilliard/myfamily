@@ -12,33 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_TYPES__
-#define _CORE_TYPES__
-
-#include <core/cleanup.h>
-#include <inttypes.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-
-#define ERROR_PRINT_FLAG_NO_BACKTRACE 0x1
-#define ERROR_NO_CLEANUP 0x1 << 1
-
-#define u8 uint8_t
-#define i8 int8_t
-#define u16 uint16_t
-#define i16 int16_t
-#define u32 uint32_t
-#define i32 int32_t
-#define u64 uint64_t
-#define i64 int64_t
-#define u128 __uint128_t
-#define i128 __int128_t
-#define f64 double
-#define f32 float
-#define usize uintptr_t
-#define isize intptr_t
-
-#endif // _CORE_TYPES__
+#include <core/backtrace.h>
+#include <core/class.h>
+#include <core/colors.h>
+#include <core/ekinds.h>
+#include <core/enum.h>
+#include <core/error.h>
+#include <core/format.h>
+#include <core/formatter.h>
+#include <core/option.h>
+#include <core/prim.h>
+#include <core/rand.h>
+#include <core/rc.h>
+#include <core/resources.h>
+#include <core/result.h>
+#include <core/string.h>
+#include <core/traits.h>
+#include <core/tuple.h>
+#include <core/types.h>
+#include <core/unit.h>

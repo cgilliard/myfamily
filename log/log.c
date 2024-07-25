@@ -12,18 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/colors.h>
-#include <core/ekinds.h>
-#include <core/error.h>
-#include <core/formatter.h>
-#include <core/string.h>
-#include <core/unit.h>
+#include <core/std.h>
+#include <errno.h>
 #include <log/log.h>
 #include <sys/time.h>
 #include <time.h>
 
+const char PathSeparator =
+#ifdef _WIN32
+    '\\';
+#else
+    '/';
+#endif
+
 GETTER(Log, formatter)
 GETTER(Log, config)
+GETTER(Log, fp)
+SETTER(Log, fp)
+GETTER(Log, last_rotation)
+SETTER(Log, last_rotation)
+GETTER(Log, cur_size)
+SETTER(Log, cur_size)
+
+u64 log_now() {
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	u64 ret = (u64)(tv.tv_sec) * 1000 + (u64)(tv.tv_usec) / 1000;
+	return ret;
+}
 
 void Log_cleanup(Log *log) {
 	FormatterPtr f = GET(Log, log, formatter);
@@ -31,6 +47,25 @@ void Log_cleanup(Log *log) {
 	LogConfig config = GET(Log, log, config);
 	cleanup(&config.log_file_path);
 	cleanup(&config.file_header);
+	FILE *fp = GET(Log, log, fp);
+	if (fp != NULL)
+		myfclose(fp);
+}
+
+bool Log_need_rotate(Log *log) {
+	LogConfig config = GET(Log, log, config);
+	u64 max_size_bytes = config.max_size_bytes;
+	u64 max_age_millis = config.max_age_millis;
+
+	u64 last_rot = GET(Log, log, last_rotation);
+	u64 cur_sz = GET(Log, log, cur_size);
+	u64 now = log_now();
+
+	if (now - last_rot > max_age_millis)
+		return true;
+	if (cur_sz > max_size_bytes)
+		return true;
+	return false;
 }
 
 Result Log_log(Log *log, LogLevel level, String line) {
@@ -166,22 +201,180 @@ Result Log_log(Log *log, LogLevel level, String line) {
 	}
 	Result r2 = append(&full_line, &line);
 	TRYU(r2);
-	if (level >= WARN)
-		fprintf(stderr, "%s\n", unwrap(&full_line));
-	else
-		fprintf(stdout, "%s\n", unwrap(&full_line));
+	char *raw_line = unwrap(&full_line);
+
+	if (config.show_terminal) {
+		if (level >= WARN)
+			fprintf(stderr, "%s\n", raw_line);
+		else
+			fprintf(stdout, "%s\n", raw_line);
+	}
+
+	FILE *fp = GET(Log, log, fp);
+	if (fp) {
+		u64 last_rot = GET(Log, log, last_rotation);
+		u64 cur_sz = GET(Log, log, cur_size);
+		cur_sz += strlen(raw_line) + 1;
+		SET(Log, log, cur_size, cur_sz);
+		fprintf(fp, "%s\n", raw_line);
+		fflush(fp);
+	}
 
 	return Ok(_());
 }
 
 Formatter Log_formatter(Log *log) { return GET(Log, log, formatter); }
 
+Result Log_rotate(Log *log) {
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+
+	LogConfig conf = GET(Log, log, config);
+	char *path = NULL;
+	StringPtr log_file_path;
+	MATCH(conf.log_file_path, VARIANT(SOME, {
+		      log_file_path = TRY_ENUM_VALUE(log_file_path, String,
+						     conf.log_file_path);
+		      path = unwrap(&log_file_path);
+	      }));
+
+	if (path == NULL) {
+		Error e =
+		    ERR(ILLEGAL_STATE,
+			"rotation called on a log that does not have a file");
+		return Err(e);
+	}
+
+	char rotation_name[strlen(path) + 100];
+	char *fname = strrchr(path, PathSeparator);
+	char *ext;
+	if (fname == NULL) {
+		fname = path;
+	} else {
+		if (strlen(fname) > 0) {
+			fname = fname + 1;
+		} else {
+			Error e = ERR(ILLEGAL_STATE, "invalid file path");
+			return Err(e);
+		}
+	}
+	strncpy(rotation_name, path, fname - path);
+	rotation_name[fname - path] = 0;
+
+	ext = strrchr(fname, '.');
+	if (ext == NULL) {
+		ext = fname + strlen(fname);
+	}
+
+	char date_format[100];
+	strncpy(rotation_name + (fname - path), fname, ext - fname);
+	rotation_name[ext - path] = 0;
+	strcat(rotation_name, ".r_");
+	u64 r;
+	if (rand_u64(&r)) {
+		Error e = ERR(RAND_ERROR, "could not generate a random");
+		return Err(e);
+	}
+	snprintf(date_format, 100, "%d_%02d_%02d_%02d_%02d_%02d_%" PRIu64,
+		 tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,
+		 tm.tm_min, tm.tm_sec, r);
+	strcat(rotation_name, date_format);
+	strcat(rotation_name, ext);
+
+	FILE *lfp = GET(Log, log, fp);
+	myfclose(lfp);
+	bool delete_rotation = conf.delete_rotation;
+	if (delete_rotation) {
+		remove(path);
+	} else {
+		rename(path, rotation_name);
+	}
+
+	lfp = myfopen(path, "w");
+	if (lfp == NULL) {
+		int err = errno;
+		char *error_message = strerror(err);
+		char buf[strlen(error_message) + strlen(path) + 5];
+		strcpy(buf, path);
+		strcat(buf, ": ");
+		strcat(buf, error_message);
+		Error e = ERR(IO_ERROR, buf);
+		return Err(e);
+	}
+	MATCH(conf.file_header, VARIANT(SOME, {
+		      StringPtr header =
+			  TRY_ENUM_VALUE(header, String, conf.file_header);
+		      char *hdr = unwrap(&header);
+		      fprintf(lfp, "%s\n", hdr);
+		      fflush(lfp);
+	      }));
+	fseek(lfp, 0, SEEK_END);
+	SET(Log, log, cur_size, ftello(lfp));
+	SET(Log, log, fp, lfp);
+	SET(Log, log, last_rotation, log_now());
+
+	return Ok(_());
+}
+
+Result Log_update_init_state(FILE *fp, LogConfig *lc) {
+	u64 sz = 0;
+	MATCH(lc->file_header, VARIANT(SOME, {
+		      // check if this is a new file and needs a file header
+		      fseek(fp, 0L, SEEK_END);
+		      sz = ftell(fp);
+
+		      if (sz == 0) {
+			      // new file add header
+			      StringPtr header = TRY_ENUM_VALUE(
+				  header, String, lc->file_header);
+			      char *hdr = unwrap(&header);
+			      fprintf(fp, "%s\n", hdr);
+			      fflush(fp);
+			      sz = strlen(hdr);
+		      }
+	      }));
+	return Ok(sz);
+}
+
+Result Log_build_fp(LogConfig *lc) {
+	usize ret_fp = 0;
+	u64 cur_size = 0;
+	MATCH(lc->log_file_path, VARIANT(SOME, {
+		      StringPtr value =
+			  TRY_ENUM_VALUE(value, String, lc->log_file_path);
+		      char *lfp = unwrap(&value);
+		      FILE *fp = myfopen(lfp, "a");
+		      if (!fp) {
+			      int err = errno;
+			      char *error_message = strerror(err);
+			      char buf[strlen(error_message) + strlen(lfp) + 5];
+			      strcpy(buf, lfp);
+			      strcat(buf, ": ");
+			      strcat(buf, error_message);
+			      Error e = ERR(IO_ERROR, buf);
+			      return Err(e);
+		      }
+
+		      Result r = Log_update_init_state(fp, lc);
+		      if (IS_ERR(r)) {
+			      myfclose(fp);
+			      Error e = UNWRAP_ERR(r);
+			      return Err(e);
+		      }
+		      cur_size = TRY(r, cur_size);
+		      ret_fp = (usize)fp;
+	      }));
+
+	TuplePtr ret = TUPLE(ret_fp, cur_size);
+	return Ok(ret);
+}
+
 Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 	LogConfig lc;
 
 	lc.show_log_level = true;
 	lc.show_timestamp = true;
-	lc.show_terminal = false;
+	lc.show_terminal = true;
 	lc.formatter_size = 10000;
 	lc.max_age_millis = 1000 * 60 * 60; // 1 hr
 	lc.max_size_bytes = 1024 * 1024;    // 1 mb
@@ -209,49 +402,63 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 		// clang-format off
 		MATCH(next,
 			VARIANT(SHOW_TIMESTAMP, {
-				lc.show_timestamp = ENUM_VALUE(lc.show_timestamp, bool, next);
+				lc.show_timestamp = TRY_ENUM_VALUE(lc.show_timestamp, bool, next);
 			}) VARIANT(SHOW_LOG_LEVEL, {
-				lc.show_log_level = ENUM_VALUE(lc.show_log_level, bool, next);
+				lc.show_log_level = TRY_ENUM_VALUE(lc.show_log_level, bool, next);
 			}) VARIANT(FORMATTER_SIZE, {
-				lc.formatter_size = ENUM_VALUE(lc.formatter_size, u64, next);
+				lc.formatter_size = TRY_ENUM_VALUE(lc.formatter_size, u64, next);
 			}) VARIANT(SHOW_MILLIS, {
-				lc.show_millis = ENUM_VALUE(lc.show_millis, bool, next);
+				lc.show_millis = TRY_ENUM_VALUE(lc.show_millis, bool, next);
 			}) VARIANT(LOG_FILE_PATH, {
-				StringPtr s = ENUM_VALUE(s, String, next);
+				StringPtr s = TRY_ENUM_VALUE(s, String, next);
 				StringPtr sclone;
 				clone(&sclone, &s);
 				lc.log_file_path = Some(sclone);
 			}) VARIANT(FILE_HEADER, {
-				StringPtr s = ENUM_VALUE(s, String, next);
+				StringPtr s = TRY_ENUM_VALUE(s, String, next);
 				StringPtr sclone;
 				clone(&sclone, &s);
 				lc.file_header = Some(sclone);
 			}) VARIANT(SHOW_COLORS, {
-				lc.show_colors = ENUM_VALUE(lc.show_colors, bool, next);
+				lc.show_colors = TRY_ENUM_VALUE(lc.show_colors, bool, next);
 			}) VARIANT(LOG_SYNC, {
-                                lc.is_sync = ENUM_VALUE(lc.is_sync, bool, next);
+                                lc.is_sync = TRY_ENUM_VALUE(lc.is_sync, bool, next);
 			}) VARIANT(SHOW_TERMINAL, {
-				lc.show_terminal = ENUM_VALUE(lc.show_terminal, bool, next);
+				lc.show_terminal = TRY_ENUM_VALUE(lc.show_terminal, bool, next);
 			}) VARIANT(AUTO_ROTATE, {
-				lc.auto_rotate = ENUM_VALUE(lc.auto_rotate, bool, next);
+				lc.auto_rotate = TRY_ENUM_VALUE(lc.auto_rotate, bool, next);
 			}) VARIANT(DELETE_ROTATION, {
-				lc.delete_rotation = ENUM_VALUE(lc.delete_rotation, bool, next);
+				lc.delete_rotation = TRY_ENUM_VALUE(lc.delete_rotation, bool, next);
 			}) VARIANT(MAX_AGE_MILLIS, {
-                                lc.max_age_millis = ENUM_VALUE(lc.max_age_millis, u64, next);
+                                lc.max_age_millis = TRY_ENUM_VALUE(lc.max_age_millis, u64, next);
 			}) VARIANT(MAX_SIZE_BYTES, {
-                                lc.max_size_bytes = ENUM_VALUE(lc.max_size_bytes, u64, next);
+                                lc.max_size_bytes = TRY_ENUM_VALUE(lc.max_size_bytes, u64, next);
 			}) VARIANT(LINENUM_MAX_LEN, {
-                                lc.line_num_max_len = ENUM_VALUE(lc.line_num_max_len, u64, next);
+                                lc.line_num_max_len = TRY_ENUM_VALUE(lc.line_num_max_len, u64, next);
                         }) VARIANT(SHOW_LINENUM, {
-				lc.show_linenum = ENUM_VALUE(lc.show_linenum, bool, next);
+				lc.show_linenum = TRY_ENUM_VALUE(lc.show_linenum, bool, next);
 			})
 		);
 		// clang-format on
 	}
 	va_end(ptr);
 
+	Result r1 = Log_build_fp(&lc);
 	FormatterPtr f = FORMATTER(lc.formatter_size);
-	LogPtr ret = BUILD(Log, lc, NULL, f);
+
+	// if there's an error cleanup to free allocated resources
+	if (IS_ERR(r1)) {
+		LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0);
+		cleanup(&ret);
+	}
+	Tuple t = TRY(r1, t);
+	usize fusize;
+	ELEMENT_AT(&t, 0, &fusize);
+	u64 cur_size;
+	ELEMENT_AT(&t, 1, &cur_size);
+	FILE *fp = (FILE *)fusize;
+	LogPtr ret = BUILD(Log, lc, fp, f, cur_size, log_now());
+
 	return Ok(ret);
 }
 

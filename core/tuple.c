@@ -259,3 +259,21 @@ void *Tuple_add_value_f32(void *value) {
 	ret->_value = *(f32 *)value;
 	return (void *)ret;
 }
+
+void *Tuple_add_value_usize(void *value) {
+	USizePtr *ret = mymalloc(sizeof(USize));
+	if (!ret)
+		return NULL;
+	BUILDPTR(ret, USize);
+	ret->_value = *(usize *)value;
+	return (void *)ret;
+}
+
+void *Tuple_add_value_isize(void *value) {
+	ISizePtr *ret = mymalloc(sizeof(ISize));
+	if (!ret)
+		return NULL;
+	BUILDPTR(ret, ISize);
+	ret->_value = *(isize *)value;
+	return (void *)ret;
+}

@@ -49,9 +49,13 @@ DEFINE_ENUM_VALUE(f, 32)
 DEFINE_ENUM_VALUE(f, 64)
 
 bool enum_value_bool(void *value);
+isize enum_value_isize(void *value);
+usize enum_value_usize(void *value);
 
 #define ENUM_VALUE(ret, type, e)                                               \
 	_Generic((ret),                                                        \
+	    usize: enum_value_usize(e.value),                                  \
+	    isize: enum_value_isize(e.value),                                  \
 	    uint8_t: enum_value_u8(e.value),                                   \
 	    uint16_t: enum_value_u16(e.value),                                 \
 	    uint32_t: enum_value_u32(e.value),                                 \
@@ -75,6 +79,8 @@ bool enum_value_bool(void *value);
 
 #define TRY_ENUM_VALUE(ret, type, e)                                           \
 	_Generic((ret),                                                        \
+	    usize: enum_value_usize(e.value),                                  \
+	    isize: enum_value_isize(e.value),                                  \
 	    uint8_t: enum_value_u8(e.value),                                   \
 	    uint16_t: enum_value_u16(e.value),                                 \
 	    uint32_t: enum_value_u32(e.value),                                 \
@@ -116,6 +122,8 @@ DEFINE_BUILD_ENUM_VALUE(i, 16)
 DEFINE_BUILD_ENUM_VALUE(i, 8)
 DEFINE_BUILD_ENUM_VALUE(f, 64)
 DEFINE_BUILD_ENUM_VALUE(f, 32)
+DEFINE_BUILD_ENUM_VALUE(u, size)
+DEFINE_BUILD_ENUM_VALUE(i, size)
 
 void *build_enum_value_bool(bool *v, char *type_str);
 void *build_enum_value(void *v, char *type_str);
@@ -125,6 +133,24 @@ void *build_enum_value(void *v, char *type_str);
 #define TRY_BUILD_ENUM(name, type, v)                                          \
 	_Generic(                                                              \
 	    (v),                                                               \
+	    usize: ({                                                          \
+		    void *ptr = build_enum_value_usize((usize *)&v,            \
+						       name##_Arr__[type]);    \
+		    if (!ptr) {                                                \
+			    return STATIC_ALLOC_RESULT;                        \
+		    }                                                          \
+		    (name##Ptr){                                               \
+			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
+	    }),                                                                \
+	    isize: ({                                                          \
+		    void *ptr = build_enum_value_isize((isize *)&v,            \
+						       name##_Arr__[type]);    \
+		    if (!ptr) {                                                \
+			    return STATIC_ALLOC_RESULT;                        \
+		    }                                                          \
+		    (name##Ptr){                                               \
+			{&name##Ptr_Vtable__, #name}, type, ptr, true, false}; \
+	    }),                                                                \
 	    bool: ({                                                           \
 		    void *ptr =                                                \
 			build_enum_value_bool((bool *)&v, name##_Arr__[type]); \

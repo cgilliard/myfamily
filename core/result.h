@@ -79,6 +79,26 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 
 #define UNWRAP_PRIM(x, v)                                                      \
 	_Generic((v),                                                          \
+	    usize: ({                                                          \
+			 if (IS_ERR(x))                                        \
+				 panic("Attempt to unwrap an error or none");  \
+			 USizePtr val = ENUM_VALUE(val, USize, x);             \
+			 if (strcmp(CLASS_NAME(&val), "USize"))                \
+				 panic("Expected [USize]. Found [%s].",        \
+				       CLASS_NAME(&val));                      \
+			 usize ret = *(usize *)unwrap(&val);                   \
+			 ret;                                                  \
+		 }),                                                           \
+	    isize: ({                                                          \
+			 if (IS_ERR(x))                                        \
+				 panic("Attempt to unwrap an error or none");  \
+			 ISizePtr val = ENUM_VALUE(val, ISize, x);             \
+			 if (strcmp(CLASS_NAME(&val), "ISize"))                \
+				 panic("Expected [ISize]. Found [%s].",        \
+				       CLASS_NAME(&val));                      \
+			 isize ret = *(isize *)unwrap(&val);                   \
+			 ret;                                                  \
+		 }),                                                           \
 	    uint8_t: ({                                                        \
 			 if (IS_ERR(x))                                        \
 				 panic("Attempt to unwrap an error or none");  \

@@ -29,6 +29,22 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 	__itt___++;                                                            \
 	__arg_arr__[__itt___ - 1];
 
+#define PROC_TYPE_ISIZE(value)                                                 \
+	__arg_arr__[__itt___] = mymalloc(sizeof(isize));                       \
+	ISizePtr *__ptr___ = __arg_arr__[__itt___];                            \
+	BUILDPTR(__ptr___, ISize);                                             \
+	memcpy(&__ptr___->_value, &value, sizeof(isize));                      \
+	__itt___++;                                                            \
+	__arg_arr__[__itt___ - 1];
+
+#define PROC_TYPE_USIZE(value)                                                 \
+	__arg_arr__[__itt___] = mymalloc(sizeof(usize));                       \
+	USizePtr *__ptr___ = __arg_arr__[__itt___];                            \
+	BUILDPTR(__ptr___, USize);                                             \
+	memcpy(&__ptr___->_value, &value, sizeof(usize));                      \
+	__itt___++;                                                            \
+	__arg_arr__[__itt___ - 1];
+
 #define PROC_ARG(value)                                                        \
 	_Generic((value),                                                      \
 	    i8: ({PROC_TYPE(I, i, 8, value)}),                                 \
@@ -43,6 +59,8 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 	    u128: ({PROC_TYPE(U, u, 128, value)}),                             \
 	    f32: ({PROC_TYPE(F, f, 32, value)}),                               \
 	    f64: ({PROC_TYPE(F, f, 64, value)}),                               \
+	    isize: ({PROC_TYPE_ISIZE(value)}),                                 \
+	    usize: ({PROC_TYPE_USIZE(value)}),                                 \
 	    bool: ({                                                           \
 			 __arg_arr__[__itt___] = mymalloc(sizeof(Bool));       \
 			 BoolPtr *__ptr___ = __arg_arr__[__itt___];            \
