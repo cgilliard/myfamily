@@ -113,14 +113,34 @@ Result Log_log(Log *log, LogLevel level, String line) {
 		TRYU(r1);
 	}
 	if (config.show_linenum) {
+		char bt_buf[2000];
+		Backtrace bt = BUILD(Backtrace, NULL, 0);
+		Backtrace_generate(&bt, 100);
+
+		u64 count = GET(Backtrace, &bt, count);
+		printf("count=%llu\n", count);
+		bool found_log_c = false;
+		bool found_path = false;
+		for (u64 i = 0; i < count; i++) {
+			Backtrace_file_path(&bt, bt_buf, 2000, i);
+			if (strstr(bt_buf, "log/log.c:"))
+				found_log_c = true;
+			else if (found_log_c) {
+				found_path = true;
+				break;
+			}
+		}
+
+		if (!found_path)
+			strcpy(bt_buf, "UNKNOWN");
+
 		String line_num_str;
 		if (config.show_colors) {
-			snprintf(buf, 100,
-				 "[%s..myfamily/log/log.c:85%s]: ", YELLOW,
-				 RESET);
+			snprintf(buf, 100, "[%s%s%s]: ", YELLOW, bt_buf, RESET);
 			line_num_str = STRING(buf);
 		} else {
-			line_num_str = STRING("[..myfamily/log/log.c:85]: ");
+			snprintf(buf, 100, "[%s]: ", bt_buf);
+			line_num_str = STRING(buf);
 		}
 		Result r1 = append(&full_line, &line_num_str);
 	}
