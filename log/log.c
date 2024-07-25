@@ -19,6 +19,8 @@
 #include <core/string.h>
 #include <core/unit.h>
 #include <log/log.h>
+#include <sys/time.h>
+#include <time.h>
 
 GETTER(Log, formatter)
 GETTER(Log, config)
@@ -29,16 +31,32 @@ void Log_cleanup(Log *log) {
 }
 
 Result Log_log(Log *log, LogLevel level, String line) {
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
 	char buf[100];
+	char milli_buf[20];
 	String full_line = STRING("");
 	LogConfig config = GET(Log, log, config);
+
+	if (config.show_millis) {
+		struct timeval time;
+		gettimeofday(&time, NULL);
+		int millis = time.tv_usec / 1000;
+		snprintf(milli_buf, 20, ".%03d", millis);
+	} else
+		strcpy(milli_buf, "");
+
 	if (config.show_timestamp) {
-		if (config.show_colors)
-			snprintf(buf, 100,
-				 "[%s2024-07-24 15:23:30.581%s]: ", DIMMED,
-				 RESET);
-		else
-			snprintf(buf, 100, "[2024-07-24 15:23:30.582]: ");
+		if (config.show_colors) {
+			snprintf(
+			    buf, 100,
+			    "[%s%d-%02d-%02d %02d:%02d:%02d%s%s]: ", DIMMED,
+			    tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+			    tm.tm_hour, tm.tm_min, tm.tm_sec, milli_buf, RESET);
+		} else
+			snprintf(buf, 100, "[%d-%02d-%02d %02d:%02d:%02d%s]: ",
+				 tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+				 tm.tm_hour, tm.tm_min, tm.tm_sec, milli_buf);
 		String ts_string = STRING(buf);
 		Result r1 = append(&full_line, &ts_string);
 		TRYU(r1);
@@ -46,7 +64,12 @@ Result Log_log(Log *log, LogLevel level, String line) {
 	if (config.show_log_level) {
 		String level_str;
 		if (level == TRACE) {
-			level_str = STRING("(TRACE): ");
+			if (config.show_colors)
+				snprintf(buf, 100, "(%sTRACE%s): ", BLUE,
+					 RESET);
+			else
+				snprintf(buf, 100, "(TRACE): ");
+			level_str = STRING(buf);
 		} else if (level == DEBUG) {
 			if (config.show_colors)
 				snprintf(buf, 100, "(%sDEBUG%s): ", CYAN,
@@ -70,7 +93,8 @@ Result Log_log(Log *log, LogLevel level, String line) {
 			level_str = STRING(buf);
 		} else if (level == ERROR) {
 			if (config.show_colors)
-				snprintf(buf, 100, "(%sERROR%s): ", RED, RESET);
+				snprintf(buf, 100, "(%sERROR%s): ", MAGENTA,
+					 RESET);
 			else
 				snprintf(buf, 100, "(ERROR): ");
 			level_str = STRING(buf);
@@ -116,6 +140,7 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 	lc.formatter_size = 10000;
 	lc.show_linenum = true;
 	lc.show_colors = true;
+	lc.show_millis = true;
 
 	for (int i = 0; i < n; i++) {
 		LogConfigOptionPtr next;
@@ -137,6 +162,9 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 		      }) VARIANT(FORMATTER_SIZE, {
 			      lc.formatter_size =
 				  ENUM_VALUE(lc.formatter_size, u64, next);
+		      }) VARIANT(SHOW_MILLIS, {
+			      lc.show_millis =
+				  ENUM_VALUE(lc.show_millis, bool, next);
 		      }) VARIANT(SHOW_LINENUM, {
 			      lc.show_linenum =
 				  ENUM_VALUE(lc.show_linenum, bool, next);

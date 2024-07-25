@@ -125,16 +125,16 @@ MyTest(log, testfmt) {
 }
 
 MyTest(log, testlogmacro) {
-	Log log = LOG(ShowLogLevel(true), ShowTimestamp(true),
-		      FormatterSize(1500), ShowLineNum(false));
+	Log log =
+	    LOG(ShowLogLevel(true), ShowTimestamp(true), FormatterSize(1500),
+		ShowLineNum(false), ShowMillis(false));
 	u64 x = 1000;
-	/*
-		itrace(&log, "test {}", x);
-		itrace(&log, "ok ok ok");
 
-		trace("hi");
-		trace("abc {}", x);
-		*/
+	itrace(&log, "test {}", x);
+	itrace(&log, "ok ok ok");
+
+	trace("hi");
+	trace("abc {}", x);
 
 	idebug(&log, "test {}", x);
 	idebug(&log, "ok ok ok");
@@ -147,31 +147,24 @@ MyTest(log, testlogmacro) {
 
 	info("hi");
 	info("abc {}", x);
-	/*
-		iinfo(&log, "test {}", x);
-		iinfo(&log, "ok ok ok");
 
-		info("hi");
-		info("abc {}", x);
+	iwarn(&log, "test {}", x);
+	iwarn(&log, "ok ok ok");
 
-		iwarn(&log, "test {}", x);
-		iwarn(&log, "ok ok ok");
+	warn("hi");
+	warn("abc {}", x);
 
-		warn("hi");
-		warn("abc {}", x);
+	ierror(&log, "test {}", x);
+	ierror(&log, "ok ok ok");
 
-		ierror(&log, "test {}", x);
-		ierror(&log, "ok ok ok");
+	error("hi");
+	error("abc {}", x);
 
-		error("hi");
-		error("abc {}", x);
+	ifatal(&log, "test {}", x);
+	ifatal(&log, "ok ok ok");
 
-		ifatal(&log, "test {}", x);
-		ifatal(&log, "ok ok ok");
-
-		fatal("hi");
-		fatal("abc {}", x);
-		*/
+	fatal("hi");
+	fatal("abc {}", x);
 
 	return Ok(_());
 }

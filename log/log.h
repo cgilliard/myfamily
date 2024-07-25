@@ -114,6 +114,15 @@ IMPL(Log, LOG_CORE)
 		__rc4_;                                                        \
 	})
 
+#define ShowMillis(x)                                                          \
+	({                                                                     \
+		bool __v5_ = x;                                                \
+		LogConfigOptionPtr __opt5_ =                                   \
+		    BUILD_ENUM(LogConfigOption, SHOW_MILLIS, __v5_);           \
+		RcPtr __rc5_ = HEAPIFY(__opt5_);                               \
+		__rc5_;                                                        \
+	})
+
 #define LOG(...)                                                               \
 	({                                                                     \
 		int __counter___ = 0;                                          \
@@ -151,6 +160,10 @@ static Result init_global_log() {
 		}                                                              \
 	})
 
+#define itrace(l, fmt, ...) log_impl(l, LOG_LEVEL, TRACE, fmt, __VA_ARGS__)
+#define trace(fmt, ...)                                                        \
+	log_impl(GLOBAL_LOGGER, LOG_LEVEL, TRACE, fmt, __VA_ARGS__)
+
 #define idebug(l, fmt, ...) log_impl(l, LOG_LEVEL, DEBUG, fmt, __VA_ARGS__)
 #define debug(fmt, ...)                                                        \
 	log_impl(GLOBAL_LOGGER, LOG_LEVEL, DEBUG, fmt, __VA_ARGS__)
@@ -158,5 +171,17 @@ static Result init_global_log() {
 #define iinfo(l, fmt, ...) log_impl(l, LOG_LEVEL, INFO, fmt, __VA_ARGS__)
 #define info(fmt, ...)                                                         \
 	log_impl(GLOBAL_LOGGER, LOG_LEVEL, INFO, fmt, __VA_ARGS__)
+
+#define iwarn(l, fmt, ...) log_impl(l, LOG_LEVEL, WARN, fmt, __VA_ARGS__)
+#define warn(fmt, ...)                                                         \
+	log_impl(GLOBAL_LOGGER, LOG_LEVEL, WARN, fmt, __VA_ARGS__)
+
+#define ierror(l, fmt, ...) log_impl(l, LOG_LEVEL, ERROR, fmt, __VA_ARGS__)
+#define error(fmt, ...)                                                        \
+	log_impl(GLOBAL_LOGGER, LOG_LEVEL, ERROR, fmt, __VA_ARGS__)
+
+#define ifatal(l, fmt, ...) log_impl(l, LOG_LEVEL, FATAL, fmt, __VA_ARGS__)
+#define fatal(fmt, ...)                                                        \
+	log_impl(GLOBAL_LOGGER, LOG_LEVEL, FATAL, fmt, __VA_ARGS__)
 
 #endif // _LOG_LOG__
