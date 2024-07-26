@@ -20,15 +20,9 @@
 
 #define append(dst, src)                                                       \
 	_Generic((src),                                                        \
-	    char *: ({                                                         \
-			 printf("append_impl\n");                              \
-			 append_impl(dst, src);                                \
-		 }),                                                           \
-	    default: ({                                                        \
-			 printf("default\n");                                  \
-			 panic("append_s");                                    \
-			 append_s(dst, (Object *)src);                         \
-		 }))
+	    char *: ({ append_impl(dst, src); }),                              \
+	    void *: ({ append_impl(dst, src); }),                              \
+	    default: ({ append_s(dst, (Object *)src); }))
 
 Result append_impl(void *dst, void *src);
 Result append_s(void *dst, Object *src);

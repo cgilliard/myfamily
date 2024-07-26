@@ -485,6 +485,13 @@ MyTest(core, test_string_append_s) {
 	String s2 = STRING("test222");
 	Result r2 = append_s(&s1, (Object *)&s2);
 	assert_eq_str(unwrap(&s1), "test1test2test222");
+	Result r3 = append(&s1, unwrap(&s2));
+	assert_eq_str(unwrap(&s1), "test1test2test222test222");
+	String s4 = STRING("abc");
+	String s5 = STRING("def");
+
+	Result r4 = append(&s4, &s5);
+	assert_eq_str(unwrap(&s4), "abcdef");
 
 	return Ok(_());
 }

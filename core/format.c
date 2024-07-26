@@ -40,17 +40,21 @@ Result format(Formatter *formatter, char *format_s, ...) {
 		if (v < 0)
 			break;
 		String sub = SUBSTRING(&fmt, itt, v);
-		Result r2 = append(&fmt_str, unwrap(&sub));
+		char *substr = unwrap(&sub);
+		Result r2 = append(&fmt_str, substr);
 		Object *next = va_arg(ptr, Object *);
 		Result r4 = to_string(next);
 		String s4 = TRY(r4, s4);
-		Result r6 = append(&fmt_str, unwrap(&s4));
+		char *s4str = unwrap(&s4);
+		Result r6 = append(&fmt_str, s4str);
 
 		itt = v + 2;
 	}
 	String sub = SUBSTRING(&fmt, itt, len(&fmt));
-	Result r2 = append(&fmt_str, unwrap(&sub));
-	Result r5 = WRITE(formatter, unwrap(&fmt_str));
+	char *substr = unwrap(&sub);
+	Result r2 = append(&fmt_str, substr);
+	char *fmt_str_str = unwrap(&fmt_str);
+	Result r5 = WRITE(formatter, fmt_str_str);
 	va_end(ptr);
 	return Ok(_());
 }
