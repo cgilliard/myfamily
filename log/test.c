@@ -127,7 +127,7 @@ MyTest(log, testfmt) {
 MyTest(log, testlogmacro) {
 	Log loga = LOG(DeleteRotation(true), ShowTerminal(true));
 	Log log =
-	    LOG(LogSync(false), AutoRotate(true), DeleteRotation(false),
+	    LOG(LogSync(true), AutoRotate(true), DeleteRotation(false),
 		ShowTerminal(true), ShowLogLevel(true), ShowTimestamp(true),
 		FormatterSize(1500), ShowLineNum(true), ShowMillis(true),
 		ShowColors(true), LogFilePath("./bin/testlogmacro.log"),

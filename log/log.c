@@ -54,6 +54,7 @@ void Log_cleanup(Log *log) {
 
 	pthread_mutex_t *lock = GET(Log, log, lock);
 	if (lock) {
+		pthread_mutex_destroy(lock);
 		myfree(lock);
 		SET(Log, log, lock, NULL);
 	}
@@ -479,6 +480,12 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 			LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, NULL);
 			cleanup(&ret);
 			return Err(STATIC_ALLOC_ERROR);
+		}
+		if(pthread_mutex_init(lock, NULL)) {
+			LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, NULL);
+                        cleanup(&ret);
+			Error e = ERR(PTHREAD_ERROR, "could not init pthread");
+			return Err(e);
 		}
 	}
 	LogPtr ret = BUILD(Log, lc, fp, f, cur_size, log_now(), lock);

@@ -25,7 +25,7 @@
 		snprintf(buf, max_len, "%" format, ptr->_value);               \
 	}                                                                      \
 	void *type##_unwrap(type *ptr) { return &ptr->_value; }                \
-	bool type##_myclone(type *dst, type *src) {                              \
+	bool type##_myclone(type *dst, type *src) {                            \
 		memcpy(&dst->_value, &src->_value, sizeof(prim_type));         \
 		return true;                                                   \
 	}

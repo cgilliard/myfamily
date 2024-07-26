@@ -18,7 +18,8 @@
 #include <core/class.h>
 
 #define TRAIT_EQUAL(T) TRAIT_REQUIRED(T, bool, equal, T##Ptr *dst, T##Ptr *src)
-#define TRAIT_CLONE(T) TRAIT_REQUIRED(T, bool, myclone, T##Ptr *dst, T##Ptr *src)
+#define TRAIT_CLONE(T)                                                         \
+	TRAIT_REQUIRED(T, bool, myclone, T##Ptr *dst, T##Ptr *src)
 #define TRAIT_LEN(T) TRAIT_REQUIRED(T, u64, len, T##Ptr *obj)
 #define TRAIT_COPY(T)                                                          \
 	TRAIT_IMPL(T, copy, default_copy)                                      \

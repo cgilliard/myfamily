@@ -30,5 +30,6 @@ static ErrorKind UNEXPECTED_EOF = EKIND("UnexpecteEOF");
 static ErrorKind FILE_OPEN_ERROR = EKIND("FileOpen");
 static ErrorKind RAND_ERROR = EKIND("RandError");
 static ErrorKind FILE_SEEK_ERROR = EKIND("FileSeek");
+static ErrorKind PTHREAD_ERROR = EKIND("PthreadError");
 
 #endif // _BASE_EKINDS__
