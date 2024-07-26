@@ -17,7 +17,7 @@ test: $(SUBDIRS)
 	ERROR="0"; \
 	for dir in $(SUBDIRS); do \
 		if test -z $(CRITERION_TEST_PATTERN); then \
-			if test -z $(FILTER); then \
+			if test -z $(TEST); then \
 				export FILTER=*; \
 			fi; \
 		        export CRITERION_TEST_PATTERN=$$dir/$$FILTER; \
@@ -27,10 +27,10 @@ test: $(SUBDIRS)
 			$(MAKE) -C $$dir test || exit 1; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
-			        if test -z $(FILTER); then \
+			        if test -z $(TEST); then \
 					echo "[====] Running $$dir test suite..."; \
 				else \
-					echo "[====] Running $$dir test suite... (FILTER=$$FILTER)"; \
+					echo "[====] Running $$dir test suite... (FILTER=$$TEST)"; \
 				fi;\
 				$(MAKE) -C $$dir test || exit 1;\
 			fi; \
@@ -44,7 +44,7 @@ testnc: $(SUBDIRS)
 	export CRITERION_TEST_PATTERN=$(CRITERION_TEST_PATTERN); \
 	for dir in $(SUBDIRS); do \
 		if test -z $(CRITERION_TEST_PATTERN); then \
-                        if test -z $(FILTER); then \
+                        if test -z $(TEST); then \
                                 export FILTER=*; \
                         fi; \
                         export CRITERION_TEST_PATTERN=$$dir/$$FILTER; \
@@ -54,7 +54,11 @@ testnc: $(SUBDIRS)
 			$(MAKE) -C $$dir testnc || exit 1; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
-				echo "[====] Running $$dir test suite..."; \
+			if test -z $(TEST); then \
+                                        echo "[====] Running $$dir test suite..."; \
+                                else \
+                                        echo "[====] Running $$dir test suite... (FILTER=$$TEST)"; \
+                                fi;\
 				$(MAKE) -C $$dir testnc || exit 1; \
 			fi; \
 		fi; \

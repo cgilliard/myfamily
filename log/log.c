@@ -33,6 +33,7 @@ GETTER(Log, last_rotation)
 SETTER(Log, last_rotation)
 GETTER(Log, cur_size)
 SETTER(Log, cur_size)
+SETTER(Log, lock)
 
 u64 log_now() {
 	struct timeval tv;
@@ -50,6 +51,12 @@ void Log_cleanup(Log *log) {
 	FILE *fp = GET(Log, log, fp);
 	if (fp != NULL)
 		myfclose(fp);
+
+	pthread_mutex_t *lock = GET(Log, log, lock);
+	if (lock) {
+		myfree(lock);
+		SET(Log, log, lock, NULL);
+	}
 }
 
 bool Log_need_rotate(Log *log) {
@@ -454,8 +461,9 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 
 	// if there's an error cleanup to free allocated resources
 	if (IS_ERR(r1)) {
-		LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0);
+		LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, NULL);
 		cleanup(&ret);
+		return r1;
 	}
 	Tuple t = TRY(r1, t);
 	usize fusize;
@@ -463,7 +471,17 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 	u64 cur_size;
 	ELEMENT_AT(&t, 1, &cur_size);
 	FILE *fp = (FILE *)fusize;
-	LogPtr ret = BUILD(Log, lc, fp, f, cur_size, log_now());
+	pthread_mutex_t *lock = NULL;
+
+	if (lc.is_sync) {
+		lock = mymalloc(sizeof(pthread_mutex_t));
+		if (!lock) {
+			LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, NULL);
+			cleanup(&ret);
+			return Err(STATIC_ALLOC_ERROR);
+		}
+	}
+	LogPtr ret = BUILD(Log, lc, fp, f, cur_size, log_now(), lock);
 
 	return Ok(ret);
 }

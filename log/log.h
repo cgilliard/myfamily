@@ -16,6 +16,7 @@
 #define _LOG_LOG__
 
 #include <core/std.h>
+#include <pthread.h>
 
 #define _FILE_OFFSET_BITS 64
 
@@ -64,11 +65,13 @@ typedef struct LogConfig {
 	TRAIT_REQUIRED(T, Result, rotate, T##Ptr *log)                         \
 	TRAIT_REQUIRED(T, bool, need_rotate, T##Ptr *log)
 
-CLASS(Log,
-      FIELD(LogConfig, config) FIELD(FILE *, fp) FIELD(Formatter, formatter)
-	  FIELD(u64, cur_size) FIELD(u64, last_rotation))
+CLASS(Log, FIELD(LogConfig, config) FIELD(FILE *, fp)
+	       FIELD(Formatter, formatter) FIELD(u64, cur_size)
+		   FIELD(u64, last_rotation) FIELD(pthread_mutex_t *, lock))
 IMPL(Log, LOG_CORE)
 #define Log DEFINE_CLASS(Log)
+
+static GETTER(Log, lock);
 
 #define COUNT_ARGS(value) ({ __counter___ += 1; })
 
@@ -234,17 +237,28 @@ static Result init_global_log() {
 #define log_impl(l, local_level, level, fmt, ...)                              \
 	({                                                                     \
 		if (local_level <= level) {                                    \
+			pthread_mutex_t *lock = GET(Log, l, lock);             \
+			if (lock)                                              \
+				pthread_mutex_lock(lock);                      \
 			int __counter___ = 0;                                  \
 			EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));             \
 			FormatterPtr formatter = Log_formatter(l);             \
 			Formatter_reset(&formatter);                           \
 			Result _r1__ =                                         \
 			    FORMAT(&formatter, (char *)fmt, __VA_ARGS__);      \
+			if (IS_ERR(_r1__) && lock)                             \
+				pthread_mutex_unlock(lock);                    \
 			TRYU(_r1__);                                           \
 			Result _r2__ = Formatter_to_string(&formatter);        \
+			if (IS_ERR(_r2__) && lock)                             \
+				pthread_mutex_unlock(lock);                    \
 			String _s__ = TRY(_r2__, _s__);                        \
 			Result _r3__ = Log_log(l, level, _s__);                \
+			if (IS_ERR(_r3__) && lock)                             \
+				pthread_mutex_unlock(lock);                    \
 			TRYU(_r3__);                                           \
+			if (lock)                                              \
+				pthread_mutex_unlock(lock);                    \
 		}                                                              \
 	})
 
