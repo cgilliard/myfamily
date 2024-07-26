@@ -12,18 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/class.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/format.h>
-#include <core/formatter.h>
-#include <core/option.h>
-#include <core/rc.h>
-#include <core/result.h>
-#include <core/string.h>
+#include <core/std.h>
 #include <core/test.h>
-#include <core/tuple.h>
-#include <core/unit.h>
 
 MySuite(core);
 
@@ -492,6 +482,26 @@ MyTest(core, test_string_append_s) {
 
 	Result r4 = append(&s4, &s5);
 	assert_eq_str(unwrap(&s4), "abcdef");
+
+	Result r5 = StringBuilder_build("testing");
+	StringBuilder sb1 = TRY(r5, sb1);
+
+	Result r6 = append(&sb1, "test");
+	assert_eq(1000, GET(StringBuilder, &sb1, capacity));
+	Result r7 = StringBuilder_to_string(&sb1);
+	String s_out7 = TRY(r7, s_out7);
+	assert_eq_str(unwrap(&s_out7), "testingtest");
+	assert_eq(1000, GET(StringBuilder, &sb1, capacity));
+	u64 len7 = len(&sb1);
+
+	String cont = STRING("continue");
+	Result r8 = append(&sb1, &cont);
+
+	Result r9 = StringBuilder_to_string(&sb1);
+	String s_out9 = TRY(r9, s_out9);
+	assert_eq_str(unwrap(&s_out9), "testingtestcontinue");
+	assert_eq(1000, GET(StringBuilder, &sb1, capacity));
+	assert_eq(len(&sb1), strlen("testingtestcontinue"));
 
 	return Ok(_());
 }

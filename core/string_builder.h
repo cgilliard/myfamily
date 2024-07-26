@@ -20,11 +20,17 @@
 #include <core/traits.h>
 #include <core/unit.h>
 
-#define TRAIT_STRING_BUILDER_CORE(T) TRAIT_REQUIRED(T, Result, build, char *s)
+#define TRAIT_STRING_BUILDER_CORE(T)                                           \
+	TRAIT_REQUIRED(T, Result, build, char *s)                              \
+	TRAIT_REQUIRED(T, Result, to_string, T##Ptr *sb)
 
 CLASS(StringBuilder, FIELD(char *, ptr) FIELD(u64, len) FIELD(u64, capacity))
 IMPL(StringBuilder, TRAIT_STRING_BUILDER_CORE)
+IMPL(StringBuilder, TRAIT_LEN)
 IMPL(StringBuilder, TRAIT_APPEND)
 #define StringBuilder DEFINE_CLASS(StringBuilder)
+
+static GETTER(StringBuilder, capacity);
+static GETTER(StringBuilder, len);
 
 #endif // _CORE_STRING_BUILDER__
