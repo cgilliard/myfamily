@@ -20,12 +20,13 @@
 #define CATI(x, y) x##y
 #define CAT(x, y) CATI(x, y)
 
-#define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, NAME,     \
-		  ...)                                                         \
+#define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, \
+		  _15, _16, _17, NAME, ...)                                    \
 	NAME
 #define FOR_EACH(action, ...)                                                  \
 	__VA_OPT__(EXPAND(GET_MACRO(                                           \
-	    __VA_ARGS__, FOR_EACH_12, FOR_EACH_11, FOR_EACH_10, FOR_EACH_9,    \
+	    __VA_ARGS__, FOR_EACH_17, FOR_EACH_16, FOR_EACH_15, FOR_EACH_14,   \
+	    FOR_EACH_13, FOR_EACH_12, FOR_EACH_11, FOR_EACH_10, FOR_EACH_9,    \
 	    FOR_EACH_8, FOR_EACH_7, FOR_EACH_6, FOR_EACH_5, FOR_EACH_4,        \
 	    FOR_EACH_3, FOR_EACH_2, FOR_EACH_1)(action, __VA_ARGS__)))
 
@@ -56,6 +57,26 @@
 #define FOR_EACH_12(action, a, b, c, d, e, f, g, h, i, j, k, l)                \
 	action(a), action(b), action(c), action(d), action(e), action(f),      \
 	    action(g), action(h), action(i), action(j), action(k), action(l)
+#define FOR_EACH_13(action, a, b, c, d, e, f, g, h, i, j, k, l, m)             \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g), action(h), action(i), action(j), action(k), action(l),  \
+	    action(m)
+#define FOR_EACH_14(action, a, b, c, d, e, f, g, h, i, j, k, l, m, n)          \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g), action(h), action(i), action(j), action(k), action(l),  \
+	    action(m), action(n)
+#define FOR_EACH_15(action, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)       \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g), action(h), action(i), action(j), action(k), action(l),  \
+	    action(m), action(n), action(o)
+#define FOR_EACH_16(action, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)    \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g), action(h), action(i), action(j), action(k), action(l),  \
+	    action(m), action(n), action(o), action(p)
+#define FOR_EACH_17(action, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q) \
+	action(a), action(b), action(c), action(d), action(e), action(f),      \
+	    action(g), action(h), action(i), action(j), action(k), action(l),  \
+	    action(m), action(n), action(o), action(p), action(q)
 
 #define IF_ELSE(cond) _IF_ELSE(cond)
 #define _IF_ELSE(cond) __IF_ELSE_##cond

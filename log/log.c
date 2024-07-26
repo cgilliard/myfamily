@@ -218,6 +218,12 @@ Result Log_log(Log *log, LogLevel level, String line) {
 		SET(Log, log, cur_size, cur_sz);
 		fprintf(fp, "%s\n", raw_line);
 		fflush(fp);
+		if (config.auto_rotate) {
+			if (Log_need_rotate(log)) {
+				Result r = Log_rotate(log);
+				TRYU(r);
+			}
+		}
 	}
 
 	return Ok(_());

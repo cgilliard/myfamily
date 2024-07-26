@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/std.h>
 #include <main/main.h>
 #include <stdio.h>
 
-int main(int argc, char **argv) { return real_main(argc, argv); }
+int main(int argc, char **argv) { Result r = real_main(argc, argv); }

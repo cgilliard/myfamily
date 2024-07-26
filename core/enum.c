@@ -118,4 +118,3 @@ void *build_enum_value(void *v, char *type_str) {
 	}
 	return value;
 }
-

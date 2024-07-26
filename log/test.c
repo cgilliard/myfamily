@@ -125,12 +125,13 @@ MyTest(log, testfmt) {
 }
 
 MyTest(log, testlogmacro) {
+	Log loga = LOG(DeleteRotation(true), ShowTerminal(true));
 	Log log =
-	    LOG(ShowTerminal(true), ShowLogLevel(true), ShowTimestamp(true),
-		FormatterSize(1500), ShowLineNum(true), ShowMillis(true),
-		ShowColors(true), LogFilePath("./bin/testlogmacro.log"),
-		FileHeader("myheader"), MaxAgeMillis(100000),
-		MaxSizeBytes(4000), LineNumMaxLen(30));
+	    LOG(AutoRotate(true), DeleteRotation(false), ShowTerminal(true),
+		ShowLogLevel(true), ShowTimestamp(true), FormatterSize(1500),
+		ShowLineNum(true), ShowMillis(true), ShowColors(true),
+		LogFilePath("./bin/testlogmacro.log"), FileHeader("myheader"),
+		MaxAgeMillis(100000), MaxSizeBytes(4000), LineNumMaxLen(30));
 	u64 x = 1000;
 
 	itrace(&log, "test {}", x);
@@ -162,12 +163,6 @@ MyTest(log, testlogmacro) {
 
 	error("hi");
 	error("abc {}", x);
-
-	if (Log_need_rotate(&log)) {
-		printf("rotate!\n");
-		Result r = Log_rotate(&log);
-		TRYU(r);
-	}
 
 	ifatal(&log, "test {}", x);
 	ifatal(&log, "ok ok ok");

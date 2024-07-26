@@ -15,16 +15,7 @@
 #ifndef _LOG_LOG__
 #define _LOG_LOG__
 
-#include <core/class.h>
-#include <core/colors.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/format.h>
-#include <core/formatter.h>
-#include <core/macro_utils.h>
-#include <core/option.h>
-#include <core/result.h>
-#include <core/string.h>
+#include <core/std.h>
 
 #define _FILE_OFFSET_BITS 64
 
