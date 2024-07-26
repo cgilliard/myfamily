@@ -481,9 +481,9 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 			cleanup(&ret);
 			return Err(STATIC_ALLOC_ERROR);
 		}
-		if(pthread_mutex_init(lock, NULL)) {
+		if (pthread_mutex_init(lock, NULL)) {
 			LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, NULL);
-                        cleanup(&ret);
+			cleanup(&ret);
 			Error e = ERR(PTHREAD_ERROR, "could not init pthread");
 			return Err(e);
 		}

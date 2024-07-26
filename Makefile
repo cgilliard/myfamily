@@ -54,7 +54,11 @@ testnc: $(SUBDIRS)
 			$(MAKE) -C $$dir testnc || exit 1; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
-				echo "[====] Running $$dir test suite..."; \
+				if test -z $(FILTER); then \
+					echo "[====] Running $$dir test suite..."; \
+				else \
+					echo "[====] Running $$dir test suite... (FILTER=$$FILTER)"; \
+				fi;\
 				$(MAKE) -C $$dir testnc || exit 1; \
 			fi; \
 		fi; \

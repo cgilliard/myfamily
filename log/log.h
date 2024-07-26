@@ -239,9 +239,9 @@ static Result init_global_log() {
 		if (local_level <= level) {                                    \
 			pthread_mutex_t *lock = GET(Log, l, lock);             \
 			if (lock) {                                            \
-				if(pthread_mutex_lock(lock)) \
-			       	panic("Could not obtain lock");                      \
-				}\
+				if (pthread_mutex_lock(lock))                  \
+					panic("Could not obtain lock");        \
+			}                                                      \
 			int __counter___ = 0;                                  \
 			EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));             \
 			FormatterPtr formatter = Log_formatter(l);             \
@@ -249,18 +249,26 @@ static Result init_global_log() {
 			Result _r1__ =                                         \
 			    FORMAT(&formatter, (char *)fmt, __VA_ARGS__);      \
 			if (IS_ERR(_r1__) && lock)                             \
-				if(pthread_mutex_unlock(lock)) panic("Could not unlock pthread_mutex_t");                    \
+				if (pthread_mutex_unlock(lock))                \
+					panic("Could not unlock "              \
+					      "pthread_mutex_t");              \
 			TRYU(_r1__);                                           \
 			Result _r2__ = Formatter_to_string(&formatter);        \
 			if (IS_ERR(_r2__) && lock)                             \
-				if(pthread_mutex_unlock(lock))  panic("Could not unlock pthread_mutex_t");                     \
+				if (pthread_mutex_unlock(lock))                \
+					panic("Could not unlock "              \
+					      "pthread_mutex_t");              \
 			String _s__ = TRY(_r2__, _s__);                        \
 			Result _r3__ = Log_log(l, level, _s__);                \
 			if (IS_ERR(_r3__) && lock)                             \
-				if(pthread_mutex_unlock(lock))  panic("Could not unlock pthread_mutex_t");                     \
+				if (pthread_mutex_unlock(lock))                \
+					panic("Could not unlock "              \
+					      "pthread_mutex_t");              \
 			TRYU(_r3__);                                           \
 			if (lock)                                              \
-				if(pthread_mutex_unlock(lock))  panic("Could not unlock pthread_mutex_t");                     \
+				if (pthread_mutex_unlock(lock))                \
+					panic("Could not unlock "              \
+					      "pthread_mutex_t");              \
 		}                                                              \
 	})
 
