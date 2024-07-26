@@ -302,7 +302,7 @@ MyTest(core, test_string) {
 	assert_eq(len(&s1), strlen("this is a test"));
 
 	String s2;
-	bool ret = clone(&s2, &s1);
+	bool ret = myclone(&s2, &s1);
 	assert(ret);
 	assert_eq_str(unwrap(&s2), "this is a test");
 	assert_eq(len(&s2), strlen("this is a test"));

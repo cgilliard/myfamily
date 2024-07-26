@@ -25,7 +25,7 @@
 		snprintf(buf, max_len, "%" format, ptr->_value);               \
 	}                                                                      \
 	void *type##_unwrap(type *ptr) { return &ptr->_value; }                \
-	bool type##_clone(type *dst, type *src) {                              \
+	bool type##_myclone(type *dst, type *src) {                              \
 		memcpy(&dst->_value, &src->_value, sizeof(prim_type));         \
 		return true;                                                   \
 	}
@@ -51,7 +51,7 @@ void U128_to_str_buf(U128 *ptr, char *buf, u64 max_len) {
 }
 
 void *U128_unwrap(U128 *ptr) { return &ptr->_value; }
-bool U128_clone(U128 *dst, U128 *src) {
+bool U128_myclone(U128 *dst, U128 *src) {
 	memcpy(&dst->_value, &src->_value, sizeof(u128));
 	return true;
 }
@@ -65,7 +65,7 @@ void I128_to_str_buf(I128 *ptr, char *buf, u64 max_len) {
 		snprintf(buf, max_len, "I128");
 }
 void *I128_unwrap(I128 *ptr) { return &ptr->_value; }
-bool I128_clone(I128 *dst, I128 *src) {
+bool I128_myclone(I128 *dst, I128 *src) {
 	memcpy(&dst->_value, &src->_value, sizeof(i128));
 	return true;
 }
@@ -79,7 +79,7 @@ void Bool_to_str_buf(Bool *ptr, char *buf, u64 max_len) {
 		snprintf(buf, max_len, "false");
 }
 void *Bool_unwrap(Bool *ptr) { return &ptr->_value; }
-bool Bool_clone(Bool *dst, Bool *src) {
+bool Bool_myclone(Bool *dst, Bool *src) {
 	memcpy(&dst->_value, &src->_value, sizeof(bool));
 	return true;
 }
@@ -90,7 +90,7 @@ void USize_to_str_buf(USize *ptr, char *buf, u64 max_len) {
 	snprintf(buf, max_len, "%zu", value);
 }
 void *USize_unwrap(USize *ptr) { return &ptr->_value; }
-bool USize_clone(USize *dst, USize *src) {
+bool USize_myclone(USize *dst, USize *src) {
 	memcpy(&dst->_value, &src->_value, sizeof(u64));
 	return true;
 }
@@ -101,7 +101,7 @@ void ISize_to_str_buf(ISize *ptr, char *buf, u64 max_len) {
 	snprintf(buf, max_len, "%zu", value);
 }
 void *ISize_unwrap(ISize *ptr) { return &ptr->_value; }
-bool ISize_clone(ISize *dst, ISize *src) {
+bool ISize_myclone(ISize *dst, ISize *src) {
 	memcpy(&dst->_value, &src->_value, sizeof(u64));
 	return true;
 }
@@ -112,7 +112,7 @@ void F32_to_str_buf(F32 *ptr, char *buf, u64 max_len) {
 	snprintf(buf, max_len, "%f", value);
 }
 void *F32_unwrap(F32 *ptr) { return &ptr->_value; }
-bool F32_clone(F32 *dst, F32 *src) {
+bool F32_myclone(F32 *dst, F32 *src) {
 	memcpy(&dst->_value, &src->_value, sizeof(f32));
 	return true;
 }
@@ -123,7 +123,7 @@ void F64_to_str_buf(F64 *ptr, char *buf, u64 max_len) {
 	snprintf(buf, max_len, "%e", value);
 }
 void *F64_unwrap(F64 *ptr) { return &ptr->_value; }
-bool F64_clone(F64 *dst, F64 *src) {
+bool F64_myclone(F64 *dst, F64 *src) {
 	memcpy(&dst->_value, &src->_value, sizeof(f64));
 	return true;
 }

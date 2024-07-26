@@ -15,5 +15,5 @@
 #include <core/unit.h>
 
 void Unit_cleanup(UnitPtr *u) {}
-bool Unit_clone(UnitPtr *dst, UnitPtr *src) { return true; }
+bool Unit_myclone(UnitPtr *dst, UnitPtr *src) { return true; }
 bool Unit_equal(UnitPtr *obj1, UnitPtr *obj2) { return true; }

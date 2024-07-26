@@ -15,7 +15,6 @@
 #ifndef _CORE_COLORS__
 #define _CORE_COLORS__
 
-#define _GNU_SOURCE
 #include <stdlib.h>
 
 #ifdef __linux__
@@ -23,7 +22,7 @@
 #endif // __linux__
 
 static char *get_dimmed() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (getenv("NO_COLOR")) {
 		return "";
 	} else {
 		return "\x1b[2m";
@@ -32,7 +31,7 @@ static char *get_dimmed() {
 #define DIMMED get_dimmed()
 
 static char *get_red() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (getenv("NO_COLOR")) {
 		return "";
 	} else {
 		return "\x1b[31m";
@@ -41,7 +40,7 @@ static char *get_red() {
 #define RED get_red()
 
 static char *get_bright_red() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (getenv("NO_COLOR")) {
 		return "";
 	} else {
 		return "\x1b[91m";
@@ -50,7 +49,7 @@ static char *get_bright_red() {
 #define BRIGHT_RED get_bright_red()
 
 static char *get_green() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (getenv("NO_COLOR")) {
 		return "";
 	} else {
 		return "\x1b[32m";
@@ -59,7 +58,7 @@ static char *get_green() {
 #define GREEN get_green()
 
 static char *get_yellow() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (getenv("NO_COLOR")) {
 		return "";
 	} else {
 		return "\x1b[33m";
@@ -68,7 +67,7 @@ static char *get_yellow() {
 #define YELLOW get_yellow()
 
 static char *get_cyan() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (getenv("NO_COLOR")) {
 		return "";
 	} else {
 		return "\x1b[36m";
@@ -77,7 +76,7 @@ static char *get_cyan() {
 #define CYAN get_cyan()
 
 static char *get_magenta() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (getenv("NO_COLOR")) {
 		return "";
 	} else {
 		return "\x1b[35m";
@@ -86,7 +85,7 @@ static char *get_magenta() {
 #define MAGENTA get_magenta()
 
 static char *get_blue() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (getenv("NO_COLOR")) {
 		return "";
 	} else {
 		return "\x1b[34m";
@@ -95,7 +94,7 @@ static char *get_blue() {
 #define BLUE get_blue()
 
 static char *get_reset() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (getenv("NO_COLOR")) {
 		return "";
 	} else {
 		return "\x1b[0m";

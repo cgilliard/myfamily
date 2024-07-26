@@ -15,7 +15,6 @@
 #ifndef _CORE_CLASS__
 #define _CORE_CLASS__
 
-#define _GNU_SOURCE
 #include <core/cleanup.h>
 #include <core/macro_utils.h>
 #include <core/panic.h>
@@ -147,9 +146,7 @@ void vtable_cleanup(Vtable *table);
 #define OVERRIDE(name, trait, implfn)                                          \
 	static void                                                            \
 	    __attribute__((constructor)) ov__##name##_##trait##_vtable() {     \
-		char *str;                                                     \
-		asprintf(&str, "%s", #trait);                                  \
-		VtableEntry next = {str, implfn};                              \
+		VtableEntry next = {#trait, implfn};                              \
 		vtable_override(&name##Ptr_Vtable__, next);                    \
 	}
 
@@ -157,27 +154,21 @@ void vtable_cleanup(Vtable *table);
 
 #define TRAIT_IMPL(T, name, default)                                           \
 	static void __attribute__((constructor)) add_##name##_##T##_vtable() { \
-		char *str;                                                     \
-		asprintf(&str, "%s", #name);                                   \
-		VtableEntry next = {str, default};                             \
+		VtableEntry next = {#name, default};                             \
 		vtable_add_entry(&T##Ptr_Vtable__, next);                      \
 	}
 
 #define TRAIT_REQUIRED(T, R, name, ...)                                        \
 	R T##_##name(__VA_ARGS__);                                             \
 	static void __attribute__((constructor)) CAT(add_##T, UNIQUE_ID)() {   \
-		char *str;                                                     \
-		asprintf(&str, "%s", #name);                                   \
-		VtableEntry next = {str, T##_##name};                          \
+		VtableEntry next = {#name, T##_##name};                          \
 		vtable_add_entry(&T##Ptr_Vtable__, next);                      \
 	}
 
 #define TRAIT_REQUIRED_EXT(T, R, name, ...)                                    \
 	R T##_##name(__VA_ARGS__);                                             \
 	static void __attribute__((constructor)) CAT(add_##T, UNIQUE_ID)() {   \
-		char *str;                                                     \
-		asprintf(&str, "%s", #name);                                   \
-		VtableEntry next = {str, T##_##name};                          \
+		VtableEntry next = {#name, T##_##name};                          \
 		vtable_add_entry(&T##_Vtable__, next);                         \
 	}
 

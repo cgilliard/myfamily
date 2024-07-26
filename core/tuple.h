@@ -45,20 +45,6 @@ void *Tuple_add_value_isize(void *value);
 
 #define CREATE_GENERIC(value)                                                  \
 	_Generic((value),                                                      \
-	    usize: ({                                                          \
-			 void *_ptr__ = Tuple_add_value_usize(&value);         \
-			 if (!_ptr__) {                                        \
-				 return STATIC_ALLOC_RESULT;                   \
-			 }                                                     \
-			 _ptr__;                                               \
-		 }),                                                           \
-	    isize: ({                                                          \
-			 void *_ptr__ = Tuple_add_value_isize(&value);         \
-			 if (!_ptr__) {                                        \
-				 return STATIC_ALLOC_RESULT;                   \
-			 }                                                     \
-			 _ptr__;                                               \
-		 }),                                                           \
 	    __int128_t: ({                                                     \
 			 void *_ptr__ = Tuple_add_value_i128(&value);          \
 			 if (!_ptr__) {                                        \

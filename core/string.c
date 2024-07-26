@@ -31,7 +31,7 @@ void String_cleanup(String *s) {
 	}
 }
 
-bool String_clone(String *dst, String *src) {
+bool String_myclone(String *dst, String *src) {
 	char *src_ptr = GET(String, src, ptr);
 	u64 slen = GET(String, src, len);
 

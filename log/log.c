@@ -350,7 +350,7 @@ Result Log_update_init_state(FILE *fp, LogConfig *lc) {
 }
 
 Result Log_build_fp(LogConfig *lc) {
-	usize ret_fp = 0;
+	u64 ret_fp = 0;
 	u64 cur_size = 0;
 	MATCH(lc->log_file_path, VARIANT(SOME, {
 		      StringPtr value =
@@ -424,14 +424,14 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 				lc.show_millis = TRY_ENUM_VALUE(lc.show_millis, bool, next);
 			}) VARIANT(LOG_FILE_PATH, {
 				StringPtr s = TRY_ENUM_VALUE(s, String, next);
-				StringPtr sclone;
-				clone(&sclone, &s);
-				lc.log_file_path = Some(sclone);
+				StringPtr smyclone;
+				myclone(&smyclone, &s);
+				lc.log_file_path = Some(smyclone);
 			}) VARIANT(FILE_HEADER, {
 				StringPtr s = TRY_ENUM_VALUE(s, String, next);
-				StringPtr sclone;
-				clone(&sclone, &s);
-				lc.file_header = Some(sclone);
+				StringPtr smyclone;
+				myclone(&smyclone, &s);
+				lc.file_header = Some(smyclone);
 			}) VARIANT(SHOW_COLORS, {
 				lc.show_colors = TRY_ENUM_VALUE(lc.show_colors, bool, next);
 			}) VARIANT(LOG_SYNC, {
@@ -466,11 +466,11 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 		return r1;
 	}
 	Tuple t = TRY(r1, t);
-	usize fusize;
-	ELEMENT_AT(&t, 0, &fusize);
+	u64 fp64;
+	ELEMENT_AT(&t, 0, &fp64);
 	u64 cur_size;
 	ELEMENT_AT(&t, 1, &cur_size);
-	FILE *fp = (FILE *)fusize;
+	FILE *fp = (FILE *)fp64;
 	pthread_mutex_t *lock = NULL;
 
 	if (lc.is_sync) {

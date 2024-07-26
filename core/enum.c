@@ -91,9 +91,9 @@ void *build_enum_value_bool(bool *v, char *type_str) {
 void *build_enum_value(void *v, char *type_str) {
 	if (!strcmp(CLASS_NAME(v), "Rc") && strcmp(type_str, "Rc")) {
 		// rc, check inner type instead
-		Rc rc_clone;
-		clone(&rc_clone, v);
-		Object *obj = unwrap(&rc_clone);
+		Rc rc_myclone;
+		myclone(&rc_myclone, v);
+		Object *obj = unwrap(&rc_myclone);
 		if (strcmp(CLASS_NAME(obj), type_str))
 			panic("Attempt to build an enum with the "
 			      "wrong value. Expected [%s], Found "

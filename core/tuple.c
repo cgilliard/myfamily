@@ -31,7 +31,7 @@ void Tuple_cleanup(Tuple *tuple) {
 	myfree(elements);
 }
 
-bool Tuple_clone(Tuple *dst, Tuple *src) {
+bool Tuple_myclone(Tuple *dst, Tuple *src) {
 	u64 count_src = *Tuple_get_count(src);
 	void **elements_src = *Tuple_get_elements(src);
 

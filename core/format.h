@@ -59,8 +59,6 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 	    u128: ({PROC_TYPE(U, u, 128, value)}),                             \
 	    f32: ({PROC_TYPE(F, f, 32, value)}),                               \
 	    f64: ({PROC_TYPE(F, f, 64, value)}),                               \
-	    isize: ({PROC_TYPE_ISIZE(value)}),                                 \
-	    usize: ({PROC_TYPE_USIZE(value)}),                                 \
 	    bool: ({                                                           \
 			 __arg_arr__[__itt___] = mymalloc(sizeof(Bool));       \
 			 BoolPtr *__ptr___ = __arg_arr__[__itt___];            \

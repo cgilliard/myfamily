@@ -60,7 +60,7 @@ void print(void *obj) {
 	do_print(obj);
 }
 
-bool default_copy(void *dst, void *src) { return clone(dst, src); }
+bool default_copy(void *dst, void *src) { return myclone(dst, src); }
 
 bool copy(void *dst, void *src) {
 	bool *(*do_copy)(Object *dst, Object *src) =
@@ -73,14 +73,14 @@ bool copy(void *dst, void *src) {
 	return do_copy(dst, src);
 }
 
-bool clone(void *dst, void *src) {
-	bool *(*do_clone)(Object *dst, Object *src) =
-	    find_fn((Object *)src, "clone");
-	if (do_clone == NULL)
-		panic("clone not implemented for this type");
+bool myclone(void *dst, void *src) {
+	bool *(*do_myclone)(Object *dst, Object *src) =
+	    find_fn((Object *)src, "myclone");
+	if (do_myclone == NULL)
+		panic("myclone not implemented for this type");
 	((Object *)dst)->vdata.vtable = ((Object *)src)->vdata.vtable;
 	((Object *)dst)->vdata.name = ((Object *)src)->vdata.name;
-	bool ret = do_clone(dst, src);
+	bool ret = do_myclone(dst, src);
 	return ret;
 }
 

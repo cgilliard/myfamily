@@ -36,7 +36,7 @@ void Rc_cleanup(Rc *obj) {
 	}
 }
 
-bool Rc_clone(Rc *dst, Rc *src) {
+bool Rc_myclone(Rc *dst, Rc *src) {
 	u64 *count = *Rc_get_count(src);
 	void *ref = *Rc_get_ref(src);
 	u8 flags = *Rc_get_flags(src);
