@@ -18,10 +18,24 @@
 #include <core/result.h>
 #include <core/traits_base.h>
 
-Result append(void *dst, void *src);
+#define append(dst, src)                                                       \
+	_Generic((src),                                                        \
+	    char *: ({                                                         \
+			 printf("append_impl\n");                              \
+			 append_impl(dst, src);                                \
+		 }),                                                           \
+	    default: ({                                                        \
+			 printf("default\n");                                  \
+			 panic("append_s");                                    \
+			 append_s(dst, (Object *)src);                         \
+		 }))
+
+Result append_impl(void *dst, void *src);
+Result append_s(void *dst, Object *src);
 
 #define TRAIT_APPEND(T)                                                        \
-	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, T##Ptr *src)
+	TRAIT_REQUIRED(T, Result, append, T##Ptr *dst, char *src)              \
+	TRAIT_REQUIRED(T, Result, append_s, T##Ptr *dst, Object *s)
 
 #define TRAIT_TO_STRING(T) TRAIT_REQUIRED(T, Result, to_string, T##Ptr *obj)
 

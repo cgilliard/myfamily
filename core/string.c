@@ -64,21 +64,33 @@ bool String_equal(String *s1, String *s2) {
 	return !strcmp(s1_ptr, s2_ptr);
 }
 
-Result String_append(String *s1, String *s2) {
-	if (s1 == NULL || s2 == NULL) {
+Result String_append_s(String *s1, Object *s2) {
+	if (strcmp(CLASS_NAME(s2), "String")) {
+		Error e = ERR(UNEXPECTED_CLASS_ERROR,
+			      "Trying to append class '%s', expected String\n",
+			      CLASS_NAME(s2));
+		return Err(e);
+	}
+
+	StringPtr *s2ptr = (StringPtr *)s2;
+	return String_append(s1, unwrap(s2));
+}
+
+Result String_append(String *s1, char *s2_ptr) {
+
+	if (s1 == NULL || s2_ptr == NULL) {
 		Error e = ERR(ILLEGAL_ARGUMENT, "input must not be NULL");
 		return Err(e);
 	}
 
 	char *s1_ptr = GET(String, s1, ptr);
-	char *s2_ptr = GET(String, s2, ptr);
-	if (s1_ptr == NULL || s2_ptr == NULL) {
+	if (s1_ptr == NULL) {
 		Error e = ERR(ILLEGAL_STATE, "ptr must not be NULL");
 		return Err(e);
 	}
 
 	u64 s1len = GET(String, s1, len);
-	u64 s2len = GET(String, s2, len);
+	u64 s2len = strlen(s2_ptr);
 	u64 s1_new_len = s1len + s2len;
 	void *tmp = myrealloc(s1_ptr, sizeof(char) * (s1_new_len + 1));
 	if (tmp == NULL) {

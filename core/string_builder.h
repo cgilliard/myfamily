@@ -12,23 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/backtrace.h>
+#ifndef _CORE_STRING_BUILDER__
+#define _CORE_STRING_BUILDER__
+
 #include <core/class.h>
-#include <core/colors.h>
-#include <core/ekinds.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/format.h>
-#include <core/formatter.h>
-#include <core/option.h>
-#include <core/prim.h>
-#include <core/rand.h>
-#include <core/rc.h>
-#include <core/resources.h>
 #include <core/result.h>
-#include <core/string.h>
-#include <core/string_builder.h>
 #include <core/traits.h>
-#include <core/tuple.h>
-#include <core/types.h>
 #include <core/unit.h>
+
+#define TRAIT_STRING_BUILDER_CORE(T) TRAIT_REQUIRED(T, Result, build, char *s)
+
+CLASS(StringBuilder, FIELD(char *, ptr) FIELD(u64, len) FIELD(u64, capacity))
+IMPL(StringBuilder, TRAIT_STRING_BUILDER_CORE)
+IMPL(StringBuilder, TRAIT_APPEND)
+#define StringBuilder DEFINE_CLASS(StringBuilder)
+
+#endif // _CORE_STRING_BUILDER__

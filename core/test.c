@@ -314,7 +314,7 @@ MyTest(core, test_string) {
 
 	assert(!equal(&s1, &s3));
 
-	Result r4 = append(&s3, &s2);
+	Result r4 = append(&s3, "this is a test");
 	assert(IS_OK(r4));
 
 	// s3 is the string which has been appended to
@@ -472,6 +472,19 @@ MyTest(core, test_format) {
 	Result rr2 = Formatter_to_string(&fmt);
 	String s2 = TRY(rr2, s2);
 	printf("s2=%s\n", unwrap(&s2));
+
+	return Ok(_());
+}
+
+MyTest(core, test_string_append_s) {
+	String s1 = STRING("test1");
+	Result r1 = append(&s1, "test2");
+
+	assert_eq_str(unwrap(&s1), "test1test2");
+
+	String s2 = STRING("test222");
+	Result r2 = append_s(&s1, (Object *)&s2);
+	assert_eq_str(unwrap(&s1), "test1test2test222");
 
 	return Ok(_());
 }

@@ -125,7 +125,6 @@ MyTest(log, testfmt) {
 }
 
 MyTest(log, testlogmacro) {
-	Log loga = LOG(DeleteRotation(true), ShowTerminal(true));
 	Log log =
 	    LOG(LogSync(true), AutoRotate(true), DeleteRotation(false),
 		ShowTerminal(true), ShowLogLevel(true), ShowTimestamp(true),

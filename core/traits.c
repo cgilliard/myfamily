@@ -105,10 +105,18 @@ u64 len(void *obj) {
 	return do_len(obj);
 }
 
-Result append(void *dst, void *src) {
+Result append_impl(void *dst, void *src) {
 	ResultPtr (*do_append)(Object *dst, Object *src) =
-	    find_fn((Object *)src, "append");
+	    find_fn((Object *)dst, "append");
 	if (do_append == NULL)
 		panic("append not implemented for this type");
 	return do_append(dst, src);
+}
+
+Result append_s(void *dst, Object *src) {
+	ResultPtr (*do_append_s)(void *dst, Object *src) =
+	    find_fn((Object *)dst, "append_s");
+	if (do_append_s == NULL)
+		panic("append_s not implemented for this type");
+	return do_append_s(dst, src);
 }

@@ -104,7 +104,7 @@ Result Log_log(Log *log, LogLevel level, String line) {
 				 tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
 				 tm.tm_hour, tm.tm_min, tm.tm_sec, milli_buf);
 		String ts_string = STRING(buf);
-		Result r1 = append(&full_line, &ts_string);
+		Result r1 = append(&full_line, unwrap(&ts_string));
 		TRYU(r1);
 	}
 	if (config.show_log_level) {
@@ -155,7 +155,7 @@ Result Log_log(Log *log, LogLevel level, String line) {
 			Error err = ERR(ILLEGAL_STATE, "unexpected log level");
 			return Err(err);
 		}
-		Result r1 = append(&full_line, &level_str);
+		Result r1 = append(&full_line, unwrap(&level_str));
 		TRYU(r1);
 	}
 	if (config.show_linenum) {
@@ -205,9 +205,9 @@ Result Log_log(Log *log, LogLevel level, String line) {
 			snprintf(buf, 100, "[%s]: ", bt_buf);
 			line_num_str = STRING(buf);
 		}
-		Result r1 = append(&full_line, &line_num_str);
+		Result r1 = append(&full_line, unwrap(&line_num_str));
 	}
-	Result r2 = append(&full_line, &line);
+	Result r2 = append(&full_line, unwrap(&line));
 	TRYU(r2);
 	char *raw_line = unwrap(&full_line);
 

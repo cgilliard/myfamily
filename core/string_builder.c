@@ -12,23 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/backtrace.h>
-#include <core/class.h>
-#include <core/colors.h>
-#include <core/ekinds.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/format.h>
-#include <core/formatter.h>
-#include <core/option.h>
-#include <core/prim.h>
-#include <core/rand.h>
-#include <core/rc.h>
-#include <core/resources.h>
-#include <core/result.h>
 #include <core/string.h>
 #include <core/string_builder.h>
-#include <core/traits.h>
-#include <core/tuple.h>
-#include <core/types.h>
-#include <core/unit.h>
+
+void StringBuilder_cleanup(StringBuilder *ptr) {}
+Result StringBuilder_build(char *s) { return Ok(_()); }
+Result StringBuilder_append(StringBuilder *dst, char *ptr) { return Ok(_()); }
+Result StringBuilder_append_s(StringBuilder *s1, Object *s2) { return Ok(_()); }

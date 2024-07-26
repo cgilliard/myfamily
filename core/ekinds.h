@@ -31,5 +31,6 @@ static ErrorKind FILE_OPEN_ERROR = EKIND("FileOpen");
 static ErrorKind RAND_ERROR = EKIND("RandError");
 static ErrorKind FILE_SEEK_ERROR = EKIND("FileSeek");
 static ErrorKind PTHREAD_ERROR = EKIND("PthreadError");
+static ErrorKind UNEXPECTED_CLASS_ERROR = EKIND("UnexpectedClass");
 
 #endif // _BASE_EKINDS__
