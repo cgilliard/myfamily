@@ -20,12 +20,15 @@
 
 Result read_to_string_impl(Object *self);
 Result read_exact_impl(Object *self, char *buf, u64 len);
+Result write_all(void *self, char *buf, u64 len);
 Result write_all_impl(Object *self, char *buf, u64 len);
 Result write_fmt_impl(Object *self, char *fmt, ...);
+Result mywrite(void *obj, char *buf, u64 limit);
 Result myread(void *obj, char *buf, u64 limit);
 Result read_to_string(void *obj);
 Result read_exact(void *obj, char *buf, u64 limit);
 Result myseek(void *obj, u64 pos);
+Result myflush(void *obj);
 
 #define TRAIT_SEEK(T) TRAIT_REQUIRED(T, Result, seek, T##Ptr *self, u64 pos)
 

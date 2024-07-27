@@ -15,9 +15,27 @@
 #include <core/ekinds.h>
 #include <core/io.h>
 #include <core/string.h>
+#include <core/string_builder.h>
 #include <core/unit.h>
 
 #define RTS_BUF_SIZE 1024
+
+Result write_all(void *obj, char *buf, u64 limit) {
+	ResultPtr (*do_write_all)(Object *obj, char *buf, u64 limit) =
+	    find_fn((Object *)obj, "write_all");
+	if (do_write_all == NULL)
+		panic("write_all not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_write_all(obj, buf, limit);
+}
+
+Result myflush(void *obj) {
+	ResultPtr (*do_flush)(Object *obj) = find_fn((Object *)obj, "flush");
+	if (do_flush == NULL)
+		panic("flush not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_flush(obj);
+}
 
 Result myread(void *obj, char *buf, u64 limit) {
 	ResultPtr (*do_read)(Object *obj, char *buf, u64 limit) =
@@ -26,6 +44,15 @@ Result myread(void *obj, char *buf, u64 limit) {
 		panic("read not implemented for this type [%s]",
 		      CLASS_NAME(obj));
 	return do_read(obj, buf, limit);
+}
+
+Result mywrite(void *obj, char *buf, u64 limit) {
+	ResultPtr (*do_write)(Object *obj, char *buf, u64 limit) =
+	    find_fn((Object *)obj, "write");
+	if (do_write == NULL)
+		panic("write not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_write(obj, buf, limit);
 }
 
 Result read_to_string(void *obj) {
@@ -57,7 +84,7 @@ Result myseek(void *obj, u64 pos) {
 
 Result read_to_string_impl(Object *self) {
 	char buf[RTS_BUF_SIZE + 1];
-	StringPtr ret = STRING("");
+	StringBuilder ret = STRING_BUILDER("", ret);
 	while (true) {
 		Result r = myread(self, buf, RTS_BUF_SIZE);
 		u64 rlen = TRY(r, rlen);
@@ -73,7 +100,7 @@ Result read_to_string_impl(Object *self) {
 			break;
 	}
 
-	return Ok(ret);
+	return StringBuilder_to_string(&ret);
 }
 
 Result read_exact_impl(Object *self, char *buf, u64 len) {
@@ -90,6 +117,18 @@ Result read_exact_impl(Object *self, char *buf, u64 len) {
 	return Ok(_());
 }
 
-Result write_all_impl(Object *self, char *buf, u64 len) { return Ok(_()); }
+Result write_all_impl(Object *self, char *buf, u64 len) {
+	u64 wlen_sum = 0;
+	u64 rem = len;
+	while (true) {
+		if (wlen_sum == len)
+			break;
+		Result r = mywrite(self, buf + wlen_sum, rem);
+		u64 wlen = TRY(r, wlen);
+		wlen_sum += wlen;
+		rem -= wlen;
+	}
+	return Ok(_());
+}
 
 Result write_fmt_impl(Object *self, char *fmt, ...) { return Ok(_()); }

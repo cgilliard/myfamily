@@ -530,5 +530,14 @@ MyTest(core, test_file) {
 	String s2 = TRY(r2, s2);
 	assert_eq_string(s2, "this is a test\n");
 
+	File file2 = FOPEN("./bin/test_file_1.txt", OpenWrite);
+	Result r3 = write_all(&file2, "01234", 5);
+	Result r32 = myflush(&file2);
+
+	File file4 = FOPEN("./bin/test_file_1.txt", OpenRead);
+	Result r4 = read_to_string(&file4);
+	String s4 = TRY(r4, s4);
+	assert_eq_string(s4, "01234");
+
 	return Ok(_());
 }

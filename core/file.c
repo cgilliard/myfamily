@@ -75,5 +75,24 @@ Result File_seek(File *ptr, u64 pos) {
 	return Ok(_());
 }
 
-Result File_write(File *ptr, char *buf, u64 len) {}
-Result File_flush(File *ptr) {}
+Result File_write(File *ptr, char *buf, u64 len) {
+	FILE *fp = GET(File, ptr, fp);
+	errno = 0;
+	u64 wlen = fwrite(buf, sizeof(char), len, fp);
+	if (wlen == 0) {
+		char *s = strerror(errno);
+		Error e = ERR(IO_ERROR, "write error: %s", s);
+		return Err(e);
+	}
+
+	return Ok(wlen);
+}
+Result File_flush(File *ptr) {
+	FILE *fp = GET(File, ptr, fp);
+	if (fflush(fp)) {
+		char *s = strerror(errno);
+		Error e = ERR(IO_ERROR, "flush error: %s", s);
+		return Err(e);
+	}
+	return Ok(_());
+}
