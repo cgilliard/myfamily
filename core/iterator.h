@@ -12,26 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/backtrace.h>
+#ifndef _CORE_ITERATOR__
+#define _CORE_ITERATOR__
+
 #include <core/class.h>
-#include <core/colors.h>
-#include <core/ekinds.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/file.h>
-#include <core/format.h>
-#include <core/formatter.h>
-#include <core/io.h>
-#include <core/iterator.h>
-#include <core/option.h>
-#include <core/prim.h>
-#include <core/rand.h>
-#include <core/rc.h>
-#include <core/resources.h>
 #include <core/result.h>
-#include <core/string.h>
-#include <core/string_builder.h>
-#include <core/traits.h>
-#include <core/tuple.h>
-#include <core/types.h>
-#include <core/unit.h>
+
+Result next(void *obj);
+
+#define TRAIT_ITERATOR(T) TRAIT_REQUIRED(T, Result, next, T##Ptr *itt)
+
+#define foreach(type, item, iterator)                                          \
+	for (Result item = next(&iterator);                                    \
+	     IS_OK(item) && IS_SOME(PEEK_OBJECT(item, Option));                \
+	     item = next(&iterator))
+
+#endif // _CORE_ITERATOR__
+

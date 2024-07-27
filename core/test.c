@@ -541,3 +541,56 @@ MyTest(core, test_file) {
 
 	return Ok(_());
 }
+
+CLASS(MyIterator, FIELD(i32 *, data) FIELD(u64, cur))
+IMPL(MyIterator, TRAIT_ITERATOR)
+#define MyIterator DEFINE_CLASS(MyIterator)
+
+GETTER(MyIterator, cur)
+SETTER(MyIterator, cur)
+GETTER(MyIterator, data)
+
+void MyIterator_cleanup(MyIterator *ptr) {}
+Result MyIterator_next(MyIterator *ptr) {
+	i32 *datav = GET(MyIterator, ptr, data);
+	u64 curv = GET(MyIterator, ptr, cur);
+	if (datav[curv] == 0)
+		return Ok(None);
+	SET(MyIterator, ptr, cur, curv + 1);
+	OptionPtr ret = Some(datav[curv]);
+	return Ok(ret);
+}
+
+MyTest(core, test_iterator) {
+	i32 ints[11];
+	for (i32 i = 0; i < 11; i++)
+		ints[i] = i + 10;
+	ints[10] = 0;
+	MyIterator itt = BUILD(MyIterator, ints, 0);
+
+	i32 counter = 0;
+	while (true) {
+		Result r = next(&itt);
+		Option o = TRY(r, o);
+		if (IS_NONE(o))
+			break;
+		i32 x = UNWRAP_PRIM(o, x);
+		assert_eq(x, counter + 10);
+		counter += 1;
+	}
+
+	assert_eq(counter, 10);
+
+	MyIterator itt2 = BUILD(MyIterator, ints, 0);
+	counter = 0;
+	foreach (i32, item, itt2) {
+		Option o = TRY(item, o);
+		i32 x = UNWRAP_PRIM(o, x);
+		assert_eq(x, counter + 10);
+		counter += 1;
+	}
+
+	assert_eq(counter, 10);
+
+	return Ok(_());
+}

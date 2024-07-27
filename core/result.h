@@ -222,6 +222,13 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			 v;                                                    \
 		 }))
 
+#define PEEK_OBJECT(x, type)                                                   \
+	({                                                                     \
+		RcPtr rc = *(Rc *)x.value;                                     \
+		void *ptr = unwrap(&rc);                                       \
+		*(type *)ptr;                                                  \
+	})
+
 static Error STATIC_ALLOC_ERROR = {
     {&ErrorPtr_Vtable__, "Error", NEXT_ID},
     false,
