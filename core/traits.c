@@ -93,7 +93,8 @@ u64 size(void *obj) {
 }
 
 void cleanup(void *ptr) {
-	void (*do_cleanup)(Object *ptr) = find_fn((Object *)ptr, "cleanup");
+	Object *objptr = ptr;
+	void (*do_cleanup)(Object *ptr) = find_fn(objptr, "cleanup");
 	if (do_cleanup != NULL)
 		do_cleanup(ptr);
 }

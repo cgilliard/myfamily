@@ -101,7 +101,7 @@ usize enum_value_usize(void *value);
 
 #define ENUM_TYPE(e) e.type
 
-#define DEFINE_ENUM(x) x##Ptr Cleanup(x##_cleanup)
+#define DEFINE_ENUM(x) x##Ptr Cleanup(x##_cleanup_impl)
 
 #define DEFINE_BUILD_ENUM_VALUE(sign, bits)                                    \
 	void *build_enum_value_##sign##bits(sign##bits *v, char *type_str);

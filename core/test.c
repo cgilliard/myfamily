@@ -561,36 +561,52 @@ Result MyIterator_next(MyIterator *ptr) {
 	return Ok(ret);
 }
 
+CLASS(MyIterator2, FIELD(i32 *, data) FIELD(u64, cur))
+IMPL(MyIterator2, TRAIT_ITERATOR)
+#define MyIterator2 DEFINE_CLASS(MyIterator2)
+
+GETTER(MyIterator2, cur)
+SETTER(MyIterator2, cur)
+GETTER(MyIterator2, data)
+
+void MyIterator2_cleanup(MyIterator2 *ptr) {}
+Result MyIterator2_next(MyIterator2 *ptr) {
+	i32 *datav = GET(MyIterator2, ptr, data);
+	u64 curv = GET(MyIterator2, ptr, cur);
+	if (datav[curv] == 0)
+		return Ok(None);
+	SET(MyIterator2, ptr, cur, curv + 1);
+	char buf[100];
+	snprintf(buf, 100, "%i", datav[curv]);
+	StringPtr s = STRING(buf);
+	OptionPtr ret = Some(s);
+	return Ok(ret);
+}
+
 MyTest(core, test_iterator) {
 	i32 ints[11];
 	for (i32 i = 0; i < 11; i++)
 		ints[i] = i + 10;
 	ints[10] = 0;
-	MyIterator itt = BUILD(MyIterator, ints, 0);
-
 	i32 counter = 0;
-	while (true) {
-		Result r = next(&itt);
-		Option o = TRY(r, o);
-		if (IS_NONE(o))
-			break;
-		i32 x = UNWRAP_PRIM(o, x);
-		assert_eq(x, counter + 10);
+
+	MyIterator itt = BUILD(MyIterator, ints, 0);
+	foreach (i32, item, itt) {
+		assert_eq(item, counter + 10);
 		counter += 1;
 	}
-
 	assert_eq(counter, 10);
 
-	MyIterator itt2 = BUILD(MyIterator, ints, 0);
+	MyIterator2 itt2 = BUILD(MyIterator2, ints, 0);
 	counter = 0;
-	foreach (i32, item, itt2) {
-		Option o = TRY(item, o);
-		i32 x = UNWRAP_PRIM(o, x);
-		assert_eq(x, counter + 10);
+	foreach (String, item, itt2) {
+		char buf[10];
+		snprintf(buf, 10, "%i", counter + 10);
+		assert_eq_string(item, buf);
 		counter += 1;
 	}
-
 	assert_eq(counter, 10);
 
 	return Ok(_());
 }
+

@@ -22,10 +22,57 @@ Result next(void *obj);
 
 #define TRAIT_ITERATOR(T) TRAIT_REQUIRED(T, Result, next, T##Ptr *itt)
 
+#define FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, init)             \
+	({                                                                     \
+		if (!init)                                                     \
+			cleanup(&_ret_##counter##__);                          \
+		Result _r__ = next(&iterator);                                 \
+		if (IS_OK(_r__)) {                                             \
+			Option _o__ = TRY(_r__, _o__);                         \
+			if (IS_SOME(_o__)) {                                   \
+				_ret_##counter##__ = UNWRAP_PRIM(_o__, item);  \
+			} else {                                               \
+				_has_next_##counter##__ = false;               \
+			}                                                      \
+		} else {                                                       \
+			_has_next_##counter##__ = false;                       \
+		}                                                              \
+		_ret_##counter##__;                                            \
+	})
+
+#define FOR_EACH_IMPL(type, item, iterator, counter, init)                     \
+	_Generic((item),                                                       \
+	    i8: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),    \
+	    i16: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),   \
+	    i32: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),   \
+	    i64: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),   \
+	    i128: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),  \
+	    u8: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),    \
+	    u16: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),   \
+	    u32: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),   \
+	    u64: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),   \
+	    u128: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),  \
+	    f32: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),   \
+	    f64: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),   \
+	    bool: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),  \
+	    default: ({                                                        \
+			 ((Object *)&_ret_##counter##__)->vdata.no_cleanup =   \
+			     true;                                             \
+			 FOR_EACH_IMPL_DETAILS(type, item, iterator, counter,  \
+					       init);                          \
+		 }))
+
+#define foreach_impl_expand(type, item, iterator, counter)                     \
+	bool _has_next_##counter##__ = true;                                   \
+	type _ret_##counter##__;                                               \
+	for (type item = FOR_EACH_IMPL(type, item, iterator, counter, true);   \
+	     _has_next_##counter##__;                                          \
+	     item = FOR_EACH_IMPL(type, item, iterator, counter, false))
+
+#define foreach_impl(type, item, iterator, counter)                            \
+	foreach_impl_expand(type, item, iterator, counter)
+
 #define foreach(type, item, iterator)                                          \
-	for (Result item = next(&iterator);                                    \
-	     IS_OK(item) && IS_SOME(PEEK_OBJECT(item, Option));                \
-	     item = next(&iterator))
+	foreach_impl(type, item, iterator, UNIQUE_ID)
 
 #endif // _CORE_ITERATOR__
-

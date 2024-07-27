@@ -49,6 +49,7 @@ typedef struct {
 	Vtable *vtable;
 	char *name;
 	u64 id;
+	bool no_cleanup;
 } Vdata;
 
 typedef struct {
@@ -62,16 +63,17 @@ void vtable_add_entry(Vtable *table, VtableEntry entry);
 void vtable_override(Vtable *table, VtableEntry entry);
 void vtable_cleanup(Vtable *table);
 
-#define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup)
+#define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup_impl)
 
 #define NEXT_ID __COUNTER__
 #define BUILD(name, ...)                                                       \
-	{{&name##Ptr_Vtable__, #name, NEXT_ID}, false, __VA_ARGS__}
+	{{&name##Ptr_Vtable__, #name, NEXT_ID, false}, false, __VA_ARGS__}
 #define BUILDPTR(ptr, cname)                                                   \
 	({                                                                     \
 		ptr->vdata.vtable = &cname##Ptr_Vtable__;                      \
 		ptr->vdata.name = #cname;                                      \
 		ptr->vdata.id = NEXT_ID;                                       \
+		ptr->vdata.no_cleanup = false;                                 \
 	})
 
 #define MEMBER_TYPE(type, member) typeof(((type *)0)->member)
@@ -113,6 +115,10 @@ void vtable_cleanup(Vtable *table);
 	} name##Ptr;                                                           \
 	static Vtable name##Ptr_Vtable__ = {0, UNIQUE_ID, NULL};               \
 	void name##_cleanup(name##Ptr *obj);                                   \
+	static void name##_cleanup_impl(name##Ptr *obj) {                      \
+		if (!obj->vdata.no_cleanup)                                    \
+			name##_cleanup(obj);                                   \
+	}                                                                      \
 	static u64 name##_size(name##Ptr *obj) { return sizeof(name##Ptr); }   \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
@@ -132,6 +138,10 @@ void vtable_cleanup(Vtable *table);
 	} name##Ptr;                                                           \
 	static Vtable name##Ptr_Vtable__ = {0, UNIQUE_ID, NULL};               \
 	static void name##_cleanup(name##Ptr *obj);                            \
+	static void name##_cleanup_impl(name##Ptr *obj) {                      \
+		if (!obj->vdata.no_cleanup)                                    \
+			name##_cleanup(obj);                                   \
+	}                                                                      \
 	static u64 name##_size(name##Ptr *obj) { return sizeof(name##Ptr); }   \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
