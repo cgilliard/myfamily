@@ -33,4 +33,10 @@ IMPL(StringBuilder, TRAIT_APPEND)
 static GETTER(StringBuilder, capacity);
 static GETTER(StringBuilder, len);
 
+#define STRING_BUILDER(x, b)                                                   \
+	({                                                                     \
+		Result __r__ = StringBuilder_build(x);                         \
+		TRY(__r__, b);                                                 \
+	})
+
 #endif // _CORE_STRING_BUILDER__

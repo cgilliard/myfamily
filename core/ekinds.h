@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_EKINDS__
-#define _BASE_EKINDS__
+#ifndef _CORE_EKINDS__
+#define _CORE_EKINDS__
 
 #include <core/error.h>
 
@@ -33,4 +33,4 @@ static ErrorKind FILE_SEEK_ERROR = EKIND("FileSeek");
 static ErrorKind PTHREAD_ERROR = EKIND("PthreadError");
 static ErrorKind UNEXPECTED_CLASS_ERROR = EKIND("UnexpectedClass");
 
-#endif // _BASE_EKINDS__
+#endif // _CORE_EKINDS__

@@ -503,5 +503,32 @@ MyTest(core, test_string_append_s) {
 	assert_eq(1000, GET(StringBuilder, &sb1, capacity));
 	assert_eq(len(&sb1), strlen("testingtestcontinue"));
 
+	StringBuilder sb2 = STRING_BUILDER("", sb2);
+	for (u64 i = 0; i < 100; i++) {
+		Result r = append(&sb2, "abcdefghijklmnopqrstuvwxyz");
+	}
+	Result r10 = StringBuilder_to_string(&sb2);
+	String s10 = TRY(r10, s10);
+	for (u64 i = 0; i < 100 * 26; i++) {
+		Result rr = String_char_at(&s10, i);
+		i8 b = TRY(rr, b);
+		char ch = (char)b;
+		assert_eq(ch, 'a' + i % 26);
+	}
+
+	u64 cap = GET(StringBuilder, &sb2, capacity);
+	u64 sblen = len(&sb2);
+	assert_eq(cap, 3000);
+	assert_eq(sblen, 2600);
+
+	return Ok(_());
+}
+
+MyTest(core, test_file) {
+	File file = FOPEN("./resources/test_file.txt", OpenRead);
+	Result r2 = read_to_string(&file);
+	String s2 = TRY(r2, s2);
+	assert_eq_string(s2, "this is a test\n");
+
 	return Ok(_());
 }

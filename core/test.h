@@ -23,6 +23,7 @@
 #define assert(value) cr_assert(value)
 #define assert_eq(v1, v2) cr_assert_eq(v1, v2)
 #define assert_eq_str(s1, s2) cr_assert(!strcmp(s1, s2))
+#define assert_eq_string(string, cstr) cr_assert(!strcmp(unwrap(&string), cstr))
 
 #define MySuite(name)                                                          \
 	void setup_suite(void) {                                               \

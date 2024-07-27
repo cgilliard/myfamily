@@ -18,8 +18,10 @@
 #include <core/ekinds.h>
 #include <core/enum.h>
 #include <core/error.h>
+#include <core/file.h>
 #include <core/format.h>
 #include <core/formatter.h>
+#include <core/io.h>
 #include <core/option.h>
 #include <core/prim.h>
 #include <core/rand.h>
