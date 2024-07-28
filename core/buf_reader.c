@@ -32,7 +32,7 @@ Result BufReader_open_impl(int n, va_list ptr, bool is_rc) {
 	for (int i = 0; i < n; i++) {
 		printf("i=%i\n", i);
 		BufReaderOptionPtr next;
-		Rc rc;
+		RcPtr rc;
 		if (!is_rc) {
 			printf("x\n");
 			next = va_arg(ptr, BufReaderOption);
@@ -48,10 +48,11 @@ Result BufReader_open_impl(int n, va_list ptr, bool is_rc) {
 
 		MATCH(next, VARIANT(BUF_READER_FILE, {
 			      printf("found a file\n");
-			      file = TRY_ENUM_VALUE(file, File, next);
-			      printf("val %s\n", CLASS_NAME(&file));
+			      FilePtr fptr = TRY_ENUM_VALUE(file, File, next);
+			      memcpy(&file, &fptr, size(&fptr));
 		      }));
 	}
+	va_end(ptr);
 	printf("exit\n");
 
 	BufReaderPtr ret = BUILD(BufReader, file);

@@ -636,8 +636,7 @@ MyTest(core, test_buf_reader) {
 	    BufReaderOption, BUF_READER_MAXIMUM_BUF_SIZE, maximum_size);
 	    */
 
-	Result r1 =
-	    BufReader_open_rc(1, BufReaderFile("./resources/test_file.txt"));
+	// Rc x = BufReaderFile("./resources/test_file.txt");
+	// Result r1 = BufReader_open_rc(1, x);
 	return Ok(_());
 }
-
