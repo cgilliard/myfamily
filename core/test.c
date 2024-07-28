@@ -636,13 +636,35 @@ MyTest(core, test_buf_reader) {
 	    BufReaderOption, BUF_READER_MAXIMUM_BUF_SIZE, maximum_size);
 	    */
 
-	// Rc x = BufReaderFile("./resources/test_file.txt");
-	// Result r1 = BufReader_open_rc(1, x);
+	printf("1\n");
+	Rc x = BufReaderFile("./resources/test_file.txt");
+	printf("2\n");
+	Result r1 = BufReader_open_rc(1, x);
+	printf("3\n");
 	return Ok(_());
 }
 
+CLASS(CleanupClass1, FIELD(int, x));
+#define CleanupClass1 DEFINE_CLASS(CleanupClass1)
+
+void CleanupClass1_cleanup(CleanupClass1 *ptr) {
+	printf("cleanup class1 ptr = %i\n", ptr);
+}
+
+ENUM(CleanupEnum1, VARIANTS(CE1_1), TYPES("Rc"))
+#define CleanupEnum1 DEFINE_ENUM(CleanupEnum1)
+
+ENUM(CleanupEnum2, VARIANTS(CE2_1), TYPES("CleanupEnum1"))
+#define CleanupEnum2 DEFINE_ENUM(CleanupEnum2)
+
 MyTest(core, test_cleanup2) {
-	String s1 = STRING("test");
-	Rc rc1 = HEAPIFY(s1);
+	CleanupClass1 cc1 = BUILD(CleanupClass1, 123);
+	Rc rc1 = HEAPIFY(cc1);
+	CleanupEnum1 ce1 = BUILD_ENUM(CleanupEnum1, CE1_1, rc1);
+	Result r1 = Ok(ce1);
+	/*
+	Rc rc2 = HEAPIFY(ce1);
+	CleanupEnum2 ce2 = BUILD_ENUM(CleanupEnum2, CE2_1, rc2);
+	*/
 	return Ok(_());
 }
