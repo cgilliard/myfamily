@@ -73,8 +73,6 @@ IMPL(Log, LOG_CORE)
 
 static GETTER(Log, lock);
 
-#define COUNT_ARGS(value) ({ __counter___ += 1; })
-
 #define PROC_LOG_CONFIG(value) ({ value; })
 
 #define ShowLogLevel(x)                                                        \

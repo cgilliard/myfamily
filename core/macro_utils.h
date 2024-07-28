@@ -78,6 +78,8 @@
 	    action(g), action(h), action(i), action(j), action(k), action(l),  \
 	    action(m), action(n), action(o), action(p), action(q)
 
+#define COUNT_ARGS(value) ({ __counter___ += 1; })
+
 #define IF_ELSE(cond) _IF_ELSE(cond)
 #define _IF_ELSE(cond) __IF_ELSE_##cond
 #define __IF_ELSE_1(true_case, false_case) true_case

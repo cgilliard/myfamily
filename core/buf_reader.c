@@ -31,7 +31,7 @@ Result BufReader_open_impl(int n, va_list ptr, bool is_rc) {
 	NO_CLEANUP(frc);
 	for (int i = 0; i < n; i++) {
 		BufReaderOptionPtr next;
-		RcPtr rc;
+		Rc rc;
 		if (!is_rc) {
 			next = va_arg(ptr, BufReaderOption);
 		} else {

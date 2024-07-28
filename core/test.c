@@ -620,24 +620,33 @@ MyTest(core, test_iterator) {
 
 MyTest(core, test_buf_reader) {
 	/*
-	FilePtr f1 = FOPEN("./resources/test_file.txt", OpenRead);
-	Rc rc = HEAPIFY(f1);
-	BufReaderOption opt1 = BUILD_ENUM(BufReaderOption, BUF_READER_FILE, rc);
-	*/
-	// RcPtr opt1 = BufReaderFile("./resources/test_file.txt");
-
-	/*
 	u64 initial_size = 8192;
 	BufReaderOption opt2 = BUILD_ENUM(
 	    BufReaderOption, BUF_READER_INITIAL_BUF_SIZE, initial_size);
+	Rc z = HEAPIFY(opt2);
+	*/
 
-	u64 maximum_size = 1024 * 1024;
-	BufReaderOption opt3 = BUILD_ENUM(
-	    BufReaderOption, BUF_READER_MAXIMUM_BUF_SIZE, maximum_size);
+	// Rc z = BufReaderInitialSize(8192);
+	/*
+		u64 maximum_size = 1024 * 1024;
+		BufReaderOption opt3 = BUILD_ENUM(
+		    BufReaderOption, BUF_READER_MAXIMUM_BUF_SIZE, maximum_size);
+		Rc y = HEAPIFY(opt3);
+		*/
+
+	// Rc x = BufReaderFile("./resources/test_file.txt");
+	/*
+	Result r1 = BufReader_open_rc(
+	    3, BufReaderFile("./resources/test_file.txt"),
+	    BufReaderInitialSize(8192), BufReaderMaximumSize(30000));
 	    */
 
-	Rc x = BufReaderFile("./resources/test_file.txt");
-	Result r1 = BufReader_open_rc(1, x);
+	File f1 = FOPEN("./resources/test_file.txt", OpenRead);
+	BufReader br = BUF_READER(BufReaderFile(f1), BufReaderInitialSize(8192),
+				  BufReaderMaximumSize(30000));
+
+	File f2 = FOPEN("./resources/test_file.txt", OpenRead);
+	BufReader br2 = BUF_READER(BufReaderFile(f2));
 	return Ok(_());
 }
 

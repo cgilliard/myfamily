@@ -34,14 +34,44 @@ IMPL(BufReader, TRAIT_READER)
 IMPL(BufReader, TRAIT_BUF_READER)
 #define BufReader DEFINE_CLASS(BufReader)
 
-#define BufReaderFile(x)                                                       \
+#define BufReaderFile(__fp__)                                                  \
 	({                                                                     \
-		File __fp__ = FOPEN(x, OpenRead);                              \
 		Rc __rcfp__ = HEAPIFY(__fp__);                                 \
 		BufReaderOption __optfp__ =                                    \
 		    BUILD_ENUM(BufReaderOption, BUF_READER_FILE, __rcfp__);    \
 		RcPtr __rcfp2__ = HEAPIFY(__optfp__);                          \
 		__rcfp2__;                                                     \
+	})
+
+#define BufReaderInitialSize(x)                                                \
+	({                                                                     \
+		u64 __vb11_ = x;                                               \
+		BufReaderOption __optb11_ = BUILD_ENUM(                        \
+		    BufReaderOption, BUF_READER_INITIAL_BUF_SIZE, __vb11_);    \
+		RcPtr __rcb11_ = HEAPIFY(__optb11_);                           \
+		__rcb11_;                                                      \
+	})
+
+#define BufReaderMaximumSize(x)                                                \
+	({                                                                     \
+		u64 __vb12_ = x;                                               \
+		BufReaderOption __optb12_ = BUILD_ENUM(                        \
+		    BufReaderOption, BUF_READER_MAXIMUM_BUF_SIZE, __vb12_);    \
+		RcPtr __rcb12_ = HEAPIFY(__optb12_);                           \
+		__rcb12_;                                                      \
+	})
+
+#define PROC_BUF_READER_CONFIG(value) ({ value; })
+
+#define BUF_READER(...)                                                        \
+	({                                                                     \
+		int __counter___ = 0;                                          \
+		EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));                     \
+		Result __rr___ = BufReader_open_rc(                            \
+		    __counter___ __VA_OPT__(, ) __VA_OPT__(EXPAND(             \
+			FOR_EACH(PROC_BUF_READER_CONFIG, __VA_ARGS__))));      \
+		BufReaderPtr __bptr__ = TRY(__rr___, __bptr__);                \
+		__bptr__;                                                      \
 	})
 
 #endif // _CORE_BUF_READER__
