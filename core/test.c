@@ -636,11 +636,8 @@ MyTest(core, test_buf_reader) {
 	    BufReaderOption, BUF_READER_MAXIMUM_BUF_SIZE, maximum_size);
 	    */
 
-	printf("1\n");
 	Rc x = BufReaderFile("./resources/test_file.txt");
-	printf("2\n");
 	Result r1 = BufReader_open_rc(1, x);
-	printf("3\n");
 	return Ok(_());
 }
 

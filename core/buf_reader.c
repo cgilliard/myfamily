@@ -18,7 +18,7 @@
 GETTER(BufReader, f)
 
 void BufReader_cleanup(BufReader *ptr) {
-	FilePtr file = GET(BufReader, ptr, f);
+	Rc file = GET(BufReader, ptr, f);
 	cleanup(&file);
 }
 
@@ -27,7 +27,8 @@ Result BufReader_read_fixed_bytes(BufReader *ptr, char *buf, u64 len) {
 }
 
 Result BufReader_open_impl(int n, va_list ptr, bool is_rc) {
-	FilePtr file;
+	Rc frc;
+	NO_CLEANUP(frc);
 	for (int i = 0; i < n; i++) {
 		BufReaderOptionPtr next;
 		RcPtr rc;
@@ -39,14 +40,12 @@ Result BufReader_open_impl(int n, va_list ptr, bool is_rc) {
 			memcpy(&next, vptr, size(vptr));
 		}
 
-		MATCH(next, VARIANT(BUF_READER_FILE, {
-			      FilePtr fptr = TRY_ENUM_VALUE(file, File, next);
-			      memcpy(&file, &fptr, size(&fptr));
-		      }));
+		MATCH(next,
+		      VARIANT(BUF_READER_FILE, { myclone(&frc, next.value); }));
 	}
 	va_end(ptr);
 
-	BufReaderPtr ret = BUILD(BufReader, file);
+	BufReaderPtr ret = BUILD(BufReader, frc);
 
 	return Ok(ret);
 }

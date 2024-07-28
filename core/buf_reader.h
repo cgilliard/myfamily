@@ -29,7 +29,7 @@ ENUM(BufReaderOption,
 	TRAIT_REQUIRED(T, Result, open, int n, ...)                            \
 	TRAIT_REQUIRED(T, Result, open_rc, int n, ...)
 
-CLASS(BufReader, FIELD(File, f))
+CLASS(BufReader, FIELD(Rc, f))
 IMPL(BufReader, TRAIT_READER)
 IMPL(BufReader, TRAIT_BUF_READER)
 #define BufReader DEFINE_CLASS(BufReader)

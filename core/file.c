@@ -21,7 +21,6 @@ SETTER(File, fp)
 
 void File_cleanup(File *ptr) {
 	FILE *fp = GET(File, ptr, fp);
-	printf("fclose %i\n", fp);
 	if (fp) {
 		myfclose(fp);
 		File_set_fp(ptr, NULL);
@@ -46,7 +45,6 @@ Result File_open(char *path, OpenOptions opt) {
 		Error err = ERR(FILE_OPEN_ERROR, "Unexpected open options");
 		return Err(err);
 	}
-	printf("fopen %i\n", fp);
 	File_set_fp(&ret, fp);
 
 	if (fp == NULL) {
