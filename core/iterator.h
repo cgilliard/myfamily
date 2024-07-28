@@ -56,8 +56,7 @@ Result next(void *obj);
 	    f64: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),   \
 	    bool: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),  \
 	    default: ({                                                        \
-			 ((Object *)&_ret_##counter##__)->vdata.no_cleanup =   \
-			     true;                                             \
+			 NO_CLEANUP(_ret_##counter##__);                       \
 			 FOR_EACH_IMPL_DETAILS(type, item, iterator, counter,  \
 					       init);                          \
 		 }))

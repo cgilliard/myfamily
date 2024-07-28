@@ -16,7 +16,8 @@ OBJS := class.o \
 	string_builder.o \
 	io.o \
 	file.o \
-	iterator.o
+	iterator.o \
+	buf_reader.o
 TEST_OBJS := $(OBJS)
 
 include ../Makefile.template

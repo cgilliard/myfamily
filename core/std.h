@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <core/backtrace.h>
+#include <core/buf_reader.h>
 #include <core/class.h>
 #include <core/colors.h>
 #include <core/ekinds.h>

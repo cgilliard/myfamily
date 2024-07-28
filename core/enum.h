@@ -91,9 +91,13 @@ usize enum_value_usize(void *value);
 	    double: enum_value_f64(e.value),                                   \
 	    bool: enum_value_bool(e.value),                                    \
 	    default: ({                                                        \
+			 printf("def\n");                                      \
+			 printf("cl=%s\n", CLASS_NAME(e.value));               \
 			 if (!strcmp(CLASS_NAME(e.value), "Rc")) {             \
+				 printf("rc found\n");                         \
 				 ret = *(type *)unwrap(e.value);               \
 			 } else if (!copy(&ret, e.value)) {                    \
+				 printf("nc\n");                               \
 				 return STATIC_ALLOC_RESULT;                   \
 			 }                                                     \
 			 *(type *)&ret;                                        \

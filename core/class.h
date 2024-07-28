@@ -66,6 +66,7 @@ void vtable_cleanup(Vtable *table);
 #define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup_impl)
 
 #define NEXT_ID __COUNTER__
+#define NO_CLEANUP(obj) ((Object *)&obj)->vdata.no_cleanup = true
 #define BUILD(name, ...)                                                       \
 	{{&name##Ptr_Vtable__, #name, NEXT_ID, false}, false, __VA_ARGS__}
 #define BUILDPTR(ptr, cname)                                                   \

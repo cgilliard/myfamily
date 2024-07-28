@@ -22,6 +22,7 @@ SETTER(File, fp)
 void File_cleanup(File *ptr) {
 	FILE *fp = GET(File, ptr, fp);
 	if (fp) {
+		printf("fclose %i\n", fp);
 		myfclose(fp);
 		File_set_fp(ptr, NULL);
 	}
@@ -54,6 +55,7 @@ Result File_open(char *path, OpenOptions opt) {
 				path, err_text);
 		return Err(err);
 	}
+	printf("fp open %i\n", fp);
 
 	return Ok(ret);
 }

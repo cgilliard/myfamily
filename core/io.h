@@ -30,6 +30,21 @@ Result read_exact(void *obj, char *buf, u64 limit);
 Result myseek(void *obj, u64 pos);
 Result myflush(void *obj);
 
+Result read_u8_impl(void *obj);
+Result read_u16_impl(void *obj);
+Result read_u32_impl(void *obj);
+Result read_u64_impl(void *obj);
+Result read_u128_impl(void *obj);
+Result read_i8_impl(void *obj);
+Result read_i16_impl(void *obj);
+Result read_i32_impl(void *obj);
+Result read_i64_impl(void *obj);
+Result read_i128_impl(void *obj);
+Result read_bool_impl(void *obj);
+Result expect_u8_impl(void *obj, u8 value);
+Result read_empty_bytes_impl(void *obj, u64 count);
+Result read_line_impl(void *obj);
+
 #define TRAIT_SEEK(T) TRAIT_REQUIRED(T, Result, seek, T##Ptr *self, u64 pos)
 
 #define TRAIT_READ(T)                                                          \
@@ -56,9 +71,9 @@ Result myflush(void *obj);
 	TRAIT_IMPL(T, read_i64, read_i64_impl)                                 \
 	TRAIT_IMPL(T, read_u128, read_u128_impl)                               \
 	TRAIT_IMPL(T, read_i128, read_i128_impl)                               \
-	TRAIT_IMPL(T, read_usize, read_usize_impl)                             \
 	TRAIT_IMPL(T, read_bool, read_bool_impl)                               \
 	TRAIT_IMPL(T, expect_u8, expect_u8_impl)                               \
-	TRAIT_IMPL(T, read_empty_bytes, read_empty_bytes_impl)
+	TRAIT_IMPL(T, read_empty_bytes, read_empty_bytes_impl)                 \
+	TRAIT_IMPL(T, read_line, read_line_impl)
 
 #endif // _CORE_IO__

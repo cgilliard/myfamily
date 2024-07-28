@@ -539,6 +539,14 @@ MyTest(core, test_file) {
 	String s4 = TRY(r4, s4);
 	assert_eq_string(s4, "01234");
 
+	/*
+	File file5 = FOPEN("./bin/test_file_1.txt", OpenRead);
+	BufReader fbuf5 = BUF_READER(file5);
+	foreach (String, line, lines(&fbuf5)) {
+		debug("line={}", line);
+	}
+	*/
+
 	return Ok(_());
 }
 
@@ -607,6 +615,29 @@ MyTest(core, test_iterator) {
 	}
 	assert_eq(counter, 10);
 
+	return Ok(_());
+}
+
+MyTest(core, test_buf_reader) {
+	/*
+	FilePtr f1 = FOPEN("./resources/test_file.txt", OpenRead);
+	Rc rc = HEAPIFY(f1);
+	BufReaderOption opt1 = BUILD_ENUM(BufReaderOption, BUF_READER_FILE, rc);
+	*/
+	// RcPtr opt1 = BufReaderFile("./resources/test_file.txt");
+
+	/*
+	u64 initial_size = 8192;
+	BufReaderOption opt2 = BUILD_ENUM(
+	    BufReaderOption, BUF_READER_INITIAL_BUF_SIZE, initial_size);
+
+	u64 maximum_size = 1024 * 1024;
+	BufReaderOption opt3 = BUILD_ENUM(
+	    BufReaderOption, BUF_READER_MAXIMUM_BUF_SIZE, maximum_size);
+	    */
+
+	Result r1 =
+	    BufReader_open_rc(1, BufReaderFile("./resources/test_file.txt"));
 	return Ok(_());
 }
 

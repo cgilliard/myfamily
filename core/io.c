@@ -132,3 +132,18 @@ Result write_all_impl(Object *self, char *buf, u64 len) {
 }
 
 Result write_fmt_impl(Object *self, char *fmt, ...) { return Ok(_()); }
+
+Result read_u8_impl(void *obj) { return Ok(_()); }
+Result read_u16_impl(void *obj) { return Ok(_()); }
+Result read_u32_impl(void *obj) { return Ok(_()); }
+Result read_u64_impl(void *obj) { return Ok(_()); }
+Result read_u128_impl(void *obj) { return Ok(_()); }
+Result read_i8_impl(void *obj) { return Ok(_()); }
+Result read_i16_impl(void *obj) { return Ok(_()); }
+Result read_i32_impl(void *obj) { return Ok(_()); }
+Result read_i64_impl(void *obj) { return Ok(_()); }
+Result read_i128_impl(void *obj) { return Ok(_()); }
+Result read_bool_impl(void *obj) { return Ok(_()); }
+Result expect_u8_impl(void *obj, u8 value) { return Ok(_()); }
+Result read_empty_bytes_impl(void *obj, u64 count) { return Ok(_()); }
+Result read_line_impl(void *obj) { return Ok(_()); }
