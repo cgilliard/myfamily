@@ -18,7 +18,6 @@
 GETTER(BufReader, f)
 
 void BufReader_cleanup(BufReader *ptr) {
-	printf("br cleanup\n");
 	FilePtr file = GET(BufReader, ptr, f);
 	cleanup(&file);
 }
@@ -30,30 +29,22 @@ Result BufReader_read_fixed_bytes(BufReader *ptr, char *buf, u64 len) {
 Result BufReader_open_impl(int n, va_list ptr, bool is_rc) {
 	FilePtr file;
 	for (int i = 0; i < n; i++) {
-		printf("i=%i\n", i);
 		BufReaderOptionPtr next;
 		RcPtr rc;
 		if (!is_rc) {
-			printf("x\n");
 			next = va_arg(ptr, BufReaderOption);
 		} else {
-			printf("ok\n");
 			rc = va_arg(ptr, Rc);
-			printf("next\n");
 			void *vptr = unwrap(&rc);
-			printf("1\n");
 			memcpy(&next, vptr, size(vptr));
-			printf("2\n");
 		}
 
 		MATCH(next, VARIANT(BUF_READER_FILE, {
-			      printf("found a file\n");
 			      FilePtr fptr = TRY_ENUM_VALUE(file, File, next);
 			      memcpy(&file, &fptr, size(&fptr));
 		      }));
 	}
 	va_end(ptr);
-	printf("exit\n");
 
 	BufReaderPtr ret = BUILD(BufReader, file);
 

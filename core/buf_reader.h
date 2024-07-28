@@ -37,11 +37,10 @@ IMPL(BufReader, TRAIT_BUF_READER)
 #define BufReaderFile(x)                                                       \
 	({                                                                     \
 		FilePtr __fp__ = FOPEN(x, OpenRead);                           \
-		RcPtr __rcfp__ = HEAPIFY(__fp__);                              \
+		Rc __rcfp__ = HEAPIFY(__fp__);                                 \
 		BufReaderOptionPtr __optfp__ =                                 \
 		    BUILD_ENUM(BufReaderOption, BUF_READER_FILE, __rcfp__);    \
 		RcPtr __rcfp2__ = HEAPIFY(__optfp__);                          \
-		printf("class=%s\n", CLASS_NAME(&__rcfp2__));                  \
 		__rcfp2__;                                                     \
 	})
 

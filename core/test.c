@@ -234,7 +234,7 @@ Result ret_test_cleanup() {
 
 MyTest(core, test_cleanup) {
 	void *ptr = mymalloc(1);
-	TestCleanupPtr tc = BUILD(TestCleanup, ptr);
+	TestCleanup tc = BUILD(TestCleanup, ptr);
 	Result r1 = Ok(tc);
 	TestCleanup tc_out = UNWRAP(r1, TestCleanup);
 
@@ -638,5 +638,11 @@ MyTest(core, test_buf_reader) {
 
 	// Rc x = BufReaderFile("./resources/test_file.txt");
 	// Result r1 = BufReader_open_rc(1, x);
+	return Ok(_());
+}
+
+MyTest(core, test_cleanup2) {
+	String s1 = STRING("test");
+	Rc rc1 = HEAPIFY(s1);
 	return Ok(_());
 }

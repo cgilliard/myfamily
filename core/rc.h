@@ -40,6 +40,7 @@ static SETTER(Rc, flags);
 	({                                                                     \
 		void *__ret_ = mymalloc(size(&value));                         \
 		memcpy(__ret_, &value, size(&value));                          \
+		NO_CLEANUP(value);                                             \
 		__ret_;                                                        \
 	})
 
