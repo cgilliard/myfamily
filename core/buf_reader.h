@@ -63,10 +63,17 @@ IMPL(BufReader, TRAIT_BUF_READER)
 
 #define PROC_BUF_READER_CONFIG(value) ({ value; })
 
+// TODO: This should not only check counter is 0, but also check for an actual
+// BufReaderFile argument
 #define BUF_READER(...)                                                        \
 	({                                                                     \
 		int __counter___ = 0;                                          \
 		EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));                     \
+		if (__counter___ == 0) {                                       \
+			Error e = ERR(ILLEGAL_ARGUMENT,                        \
+				      "BufReaderFile must be specified");      \
+			return Err(e);                                         \
+		}                                                              \
 		Result __rr___ = BufReader_open_rc(                            \
 		    __counter___ __VA_OPT__(, ) __VA_OPT__(EXPAND(             \
 			FOR_EACH(PROC_BUF_READER_CONFIG, __VA_ARGS__))));      \

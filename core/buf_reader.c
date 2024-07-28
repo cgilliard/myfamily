@@ -29,6 +29,7 @@ Result BufReader_read_fixed_bytes(BufReader *ptr, char *buf, u64 len) {
 Result BufReader_open_impl(int n, va_list ptr, bool is_rc) {
 	Rc frc;
 	NO_CLEANUP(frc);
+	bool found_file = false;
 	for (int i = 0; i < n; i++) {
 		BufReaderOptionPtr next;
 		Rc rc;
@@ -40,10 +41,18 @@ Result BufReader_open_impl(int n, va_list ptr, bool is_rc) {
 			memcpy(&next, vptr, size(vptr));
 		}
 
-		MATCH(next,
-		      VARIANT(BUF_READER_FILE, { myclone(&frc, next.value); }));
+		MATCH(next, VARIANT(BUF_READER_FILE, {
+			      found_file = true;
+			      myclone(&frc, next.value);
+		      }));
 	}
 	va_end(ptr);
+
+	if (!found_file) {
+		Error e =
+		    ERR(ILLEGAL_ARGUMENT, "BufReaderFile must be specified");
+		return Err(e);
+	}
 
 	BufReaderPtr ret = BUILD(BufReader, frc);
 
