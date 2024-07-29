@@ -14,17 +14,17 @@
 
 #include <core/slice.h>
 
-GETTER(RefHolder, len)
+GETTER(Slice, len)
 
-void RefHolder_cleanup(RefHolder *rh) {}
+void Slice_cleanup(Slice *rh) {}
 
-u64 RefHolder_len(RefHolder *rh) {
-	u64 ret = GET(RefHolder, rh, len);
+u64 Slice_len(Slice *rh) {
+	u64 ret = GET(Slice, rh, len);
 	return ret;
 }
 
-RefHolder RefHolder_build(void *ptr, u64 size) {
-	RefHolder ret = BUILD(RefHolder, ptr, size);
+Slice Slice_build(void *ptr, u64 size) {
+	Slice ret = BUILD(Slice, ptr, size);
 	return ret;
 }
 

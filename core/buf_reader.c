@@ -127,7 +127,7 @@ Result BufReader_fill_buf(BufReader *ptr) {
 
 	SET(BufReader, ptr, offset, offset);
 
-	RefHolder ret = REF_HOLDER(buf, offset);
+	Slice ret = SLICE(buf, offset);
 	return Ok(ret);
 }
 

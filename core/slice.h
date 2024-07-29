@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_REF_HOLDER__
-#define _CORE_REF_HOLDER__
+#ifndef _CORE_SLICE__
+#define _CORE_SLICE__
 
 #include <core/class.h>
 #include <core/traits.h>
 
-CLASS(RefHolder, FIELD(void *, ref) FIELD(u64, len))
-IMPL(RefHolder, TRAIT_LEN)
-#define RefHolder DEFINE_CLASS(RefHolder)
+CLASS(Slice, FIELD(void *, ref) FIELD(u64, len))
+IMPL(Slice, TRAIT_LEN)
+#define Slice DEFINE_CLASS(Slice)
 
-static GETTER(RefHolder, ref);
+static GETTER(Slice, ref);
 
-RefHolder RefHolder_build(void *ref, u64 size);
+Slice Slice_build(void *ref, u64 size);
 
-#define REF_HOLDER(ref, size) RefHolder_build(ref, size)
+#define SLICE(ref, size) Slice_build(ref, size)
 
-#endif // _CORE_REF_HOLDER__
+#endif // _CORE_SLICE__

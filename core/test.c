@@ -688,18 +688,18 @@ MyTest(core, test_buf_reader_consume_fill) {
 	BufReader br = BUF_READER(BufReaderReadable(f), BufReaderCapacity(10));
 
 	Result r1 = BufReader_fill_buf(&br);
-	RefHolder ref1 = TRY(r1, ref1);
+	Slice ref1 = TRY(r1, ref1);
 	assert_eq(len(&ref1), 10);
-	char *buf = GET(RefHolder, &ref1, ref);
+	char *buf = GET(Slice, &ref1, ref);
 	for (int i = 0; i < 10; i++) {
 		assert_eq(buf[i], i + '0');
 	}
 	BufReader_consume_buf(&br, 5);
 
 	Result r2 = BufReader_fill_buf(&br);
-	RefHolder ref2 = TRY(r2, ref2);
+	Slice ref2 = TRY(r2, ref2);
 	assert_eq(len(&ref2), 10);
-	buf = GET(RefHolder, &ref2, ref);
+	buf = GET(Slice, &ref2, ref);
 	for (int i = 0; i < 10; i++) {
 		int j = (i + 5) % 10;
 		assert_eq(buf[i], j + '0');
@@ -709,7 +709,7 @@ MyTest(core, test_buf_reader_consume_fill) {
 	BufReader br2 = BUF_READER(BufReaderReadable(f2));
 
 	Result r3 = BufReader_fill_buf(&br2);
-	RefHolder ref3 = TRY(r3, ref3);
+	Slice ref3 = TRY(r3, ref3);
 	// entire file len
 	assert_eq(len(&ref3), 101);
 
@@ -717,7 +717,7 @@ MyTest(core, test_buf_reader_consume_fill) {
 
 	// check buffer empty on next call
 	Result r4 = BufReader_fill_buf(&br2);
-	RefHolder ref4 = TRY(r4, ref4);
+	Slice ref4 = TRY(r4, ref4);
 	assert_eq(len(&ref4), 0);
 
 	return Ok(_());
