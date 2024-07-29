@@ -12,28 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/backtrace.h>
-#include <core/buf_reader.h>
-#include <core/class.h>
-#include <core/colors.h>
-#include <core/ekinds.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/file.h>
-#include <core/format.h>
-#include <core/formatter.h>
-#include <core/io.h>
-#include <core/iterator.h>
-#include <core/option.h>
-#include <core/prim.h>
-#include <core/rand.h>
-#include <core/rc.h>
-#include <core/resources.h>
-#include <core/result.h>
 #include <core/slice.h>
-#include <core/string.h>
-#include <core/string_builder.h>
-#include <core/traits.h>
-#include <core/tuple.h>
-#include <core/types.h>
-#include <core/unit.h>
+
+GETTER(RefHolder, len)
+
+void RefHolder_cleanup(RefHolder *rh) {}
+
+u64 RefHolder_len(RefHolder *rh) {
+	u64 ret = GET(RefHolder, rh, len);
+	return ret;
+}
+
+RefHolder RefHolder_build(void *ptr, u64 size) {
+	RefHolder ret = BUILD(RefHolder, ptr, size);
+	return ret;
+}
+

@@ -13,60 +13,128 @@
 // limitations under the License.
 
 #include <core/buf_reader.h>
+#include <core/slice.h>
 #include <core/unit.h>
 
 GETTER(BufReader, f)
+GETTER(BufReader, buf)
+SETTER(BufReader, buf)
+GETTER(BufReader, offset)
+SETTER(BufReader, offset)
+GETTER(BufReader, capacity)
+SETTER(BufReader, capacity)
 
 void BufReader_cleanup(BufReader *ptr) {
-	Rc file = GET(BufReader, ptr, f);
-	cleanup(&file);
+	RcPtr readable = GET(BufReader, ptr, f);
+	cleanup(&readable);
+
+	char *buf = GET(BufReader, ptr, buf);
+	if (buf) {
+		myfree(buf);
+		SET(BufReader, ptr, buf, NULL);
+	}
 }
 
-Result BufReader_read_fixed_bytes(BufReader *ptr, char *buf, u64 len) {
+Result BufReader_read_fixed_bytes(BufReader *ptr, char *buffer, u64 len) {
+	u64 wlen_sum = 0;
+	Rc readablerc = GET(BufReader, ptr, f);
+	Object *readable = unwrap(&readablerc);
+	u64 rem = len;
+	u64 offset = 0;
+
+	while (rem > 0) {
+		Result r = myread(readable, buffer + offset, rem);
+		u64 wlen = TRY(r, wlen);
+
+		if (wlen == 0) {
+			Error e = ERR(IO_ERROR,
+				      "Could not fill whole buffer. Found "
+				      "%llu. Needed %llu",
+				      wlen_sum, len);
+			return Err(e);
+		}
+
+		wlen_sum += wlen;
+		rem -= wlen;
+	}
 	return Ok(_());
 }
 
-Result BufReader_open_impl(int n, va_list ptr, bool is_rc) {
+Result BufReader_open_impl(int n, va_list ptr) {
 	Rc frc;
 	NO_CLEANUP(frc);
-	bool found_file = false;
+	u64 capacity = 8196;
+	bool found_readable = false;
 	for (int i = 0; i < n; i++) {
 		BufReaderOptionPtr next;
-		Rc rc;
-		if (!is_rc) {
-			next = va_arg(ptr, BufReaderOption);
-		} else {
-			rc = va_arg(ptr, Rc);
-			void *vptr = unwrap(&rc);
-			memcpy(&next, vptr, size(vptr));
-		}
+		Rc rc = va_arg(ptr, Rc);
+		void *vptr = unwrap(&rc);
+		memcpy(&next, vptr, size(vptr));
 
 		MATCH(next, VARIANT(BUF_READER_FILE, {
-			      found_file = true;
+			      found_readable = true;
 			      myclone(&frc, next.value);
+		      }) VARIANT(BUF_READER_CAPACITY, {
+			      capacity = TRY_ENUM_VALUE(capacity, u64, next);
 		      }));
 	}
 	va_end(ptr);
 
-	if (!found_file) {
-		Error e =
-		    ERR(ILLEGAL_ARGUMENT, "BufReaderFile must be specified");
+	if (!found_readable) {
+		Error e = ERR(ILLEGAL_ARGUMENT,
+			      "BufReaderReadable must be specified");
 		return Err(e);
 	}
 
-	BufReaderPtr ret = BUILD(BufReader, frc);
+	char *buf = mymalloc(sizeof(char) * capacity);
 
+	BufReader ret = BUILD(BufReader, frc, capacity, buf, 0);
+	return Ok(ret);
+}
+
+void BufReader_consume_buf(BufReader *ptr, u64 amt) {
+	u64 offset = GET(BufReader, ptr, offset);
+	char *buf = GET(BufReader, ptr, buf);
+
+	if (amt > offset)
+		amt = offset;
+
+	if (amt > 0) {
+		memmove(buf, buf + amt, amt);
+		SET(BufReader, ptr, offset, offset - amt);
+	}
+}
+
+Result BufReader_fill_buf(BufReader *ptr) {
+	char *buf = GET(BufReader, ptr, buf);
+	u64 offset = GET(BufReader, ptr, offset);
+	u64 capacity = GET(BufReader, ptr, capacity);
+
+	if (offset >= capacity) {
+		Error e = ERR(OVERFLOW, "Buffer is full");
+		return Err(e);
+	}
+
+	u64 rem = capacity - offset;
+
+	Rc readablerc = GET(BufReader, ptr, f);
+	Object *readable = unwrap(&readablerc);
+
+	Result r = myread(readable, buf + offset, rem);
+	u64 rlen = TRY(r, rlen);
+
+	offset += rlen;
+
+	SET(BufReader, ptr, offset, offset);
+
+	RefHolder ret = REF_HOLDER(buf, offset);
 	return Ok(ret);
 }
 
 Result BufReader_open(int n, ...) {
 	va_list ptr;
 	va_start(ptr, n);
-	return BufReader_open_impl(n, ptr, false);
+	return BufReader_open_impl(n, ptr);
 }
 
-Result BufReader_open_rc(int n, ...) {
-	va_list ptr;
-	va_start(ptr, n);
-	return BufReader_open_impl(n, ptr, true);
-}
+Result read_line_impl(Object *ptr, String *s) { todo(); }

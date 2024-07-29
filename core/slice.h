@@ -12,28 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/backtrace.h>
-#include <core/buf_reader.h>
+#ifndef _CORE_REF_HOLDER__
+#define _CORE_REF_HOLDER__
+
 #include <core/class.h>
-#include <core/colors.h>
-#include <core/ekinds.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/file.h>
-#include <core/format.h>
-#include <core/formatter.h>
-#include <core/io.h>
-#include <core/iterator.h>
-#include <core/option.h>
-#include <core/prim.h>
-#include <core/rand.h>
-#include <core/rc.h>
-#include <core/resources.h>
-#include <core/result.h>
-#include <core/slice.h>
-#include <core/string.h>
-#include <core/string_builder.h>
 #include <core/traits.h>
-#include <core/tuple.h>
-#include <core/types.h>
-#include <core/unit.h>
+
+CLASS(RefHolder, FIELD(void *, ref) FIELD(u64, len))
+IMPL(RefHolder, TRAIT_LEN)
+#define RefHolder DEFINE_CLASS(RefHolder)
+
+static GETTER(RefHolder, ref);
+
+RefHolder RefHolder_build(void *ref, u64 size);
+
+#define REF_HOLDER(ref, size) RefHolder_build(ref, size)
+
+#endif // _CORE_REF_HOLDER__

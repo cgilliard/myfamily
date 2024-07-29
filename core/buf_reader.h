@@ -18,23 +18,27 @@
 #include <core/enum.h>
 #include <core/file.h>
 #include <core/io.h>
+#include <core/string.h>
 
-ENUM(BufReaderOption,
-     VARIANTS(BUF_READER_FILE, BUF_READER_INITIAL_BUF_SIZE,
-	      BUF_READER_MAXIMUM_BUF_SIZE),
-     TYPES("Rc", "u64", "u64"))
+ENUM(BufReaderOption, VARIANTS(BUF_READER_FILE, BUF_READER_CAPACITY),
+     TYPES("Rc", "u64"))
 #define BufReaderOption DEFINE_ENUM(BufReaderOption)
 
 #define TRAIT_BUF_READER(T)                                                    \
 	TRAIT_REQUIRED(T, Result, open, int n, ...)                            \
-	TRAIT_REQUIRED(T, Result, open_rc, int n, ...)
+	TRAIT_REQUIRED(T, Result, fill_buf, T##Ptr *ptr)                       \
+	TRAIT_REQUIRED(T, void, consume_buf, T##Ptr *ptr, u64 amt)             \
+	TRAIT_IMPL(T, read_line, read_line_impl)
 
-CLASS(BufReader, FIELD(Rc, f))
+Result read_line_impl(Object *ptr, String *s);
+
+CLASS(BufReader,
+      FIELD(Rc, f) FIELD(u64, capacity) FIELD(char *, buf) FIELD(u64, offset))
 IMPL(BufReader, TRAIT_READER)
 IMPL(BufReader, TRAIT_BUF_READER)
 #define BufReader DEFINE_CLASS(BufReader)
 
-#define BufReaderFile(__fp__)                                                  \
+#define BufReaderReadable(__fp__)                                              \
 	({                                                                     \
 		Rc __rcfp__ = HEAPIFY(__fp__);                                 \
 		BufReaderOption __optfp__ =                                    \
@@ -43,38 +47,29 @@ IMPL(BufReader, TRAIT_BUF_READER)
 		__rcfp2__;                                                     \
 	})
 
-#define BufReaderInitialSize(x)                                                \
+#define BufReaderCapacity(x)                                                   \
 	({                                                                     \
 		u64 __vb11_ = x;                                               \
-		BufReaderOption __optb11_ = BUILD_ENUM(                        \
-		    BufReaderOption, BUF_READER_INITIAL_BUF_SIZE, __vb11_);    \
+		BufReaderOption __optb11_ =                                    \
+		    BUILD_ENUM(BufReaderOption, BUF_READER_CAPACITY, __vb11_); \
 		RcPtr __rcb11_ = HEAPIFY(__optb11_);                           \
 		__rcb11_;                                                      \
-	})
-
-#define BufReaderMaximumSize(x)                                                \
-	({                                                                     \
-		u64 __vb12_ = x;                                               \
-		BufReaderOption __optb12_ = BUILD_ENUM(                        \
-		    BufReaderOption, BUF_READER_MAXIMUM_BUF_SIZE, __vb12_);    \
-		RcPtr __rcb12_ = HEAPIFY(__optb12_);                           \
-		__rcb12_;                                                      \
 	})
 
 #define PROC_BUF_READER_CONFIG(value) ({ value; })
 
 // TODO: This should not only check counter is 0, but also check for an actual
-// BufReaderFile argument
+// BufReaderReadable argument
 #define BUF_READER(...)                                                        \
 	({                                                                     \
 		int __counter___ = 0;                                          \
 		EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));                     \
 		if (__counter___ == 0) {                                       \
 			Error e = ERR(ILLEGAL_ARGUMENT,                        \
-				      "BufReaderFile must be specified");      \
+				      "BufReaderReadable must be specified");  \
 			return Err(e);                                         \
 		}                                                              \
-		Result __rr___ = BufReader_open_rc(                            \
+		Result __rr___ = BufReader_open(                               \
 		    __counter___ __VA_OPT__(, ) __VA_OPT__(EXPAND(             \
 			FOR_EACH(PROC_BUF_READER_CONFIG, __VA_ARGS__))));      \
 		BufReaderPtr __bptr__ = TRY(__rr___, __bptr__);                \

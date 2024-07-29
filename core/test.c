@@ -624,12 +624,32 @@ Result try_buf_reader() {
 }
 
 MyTest(core, test_buf_reader) {
-	File f1 = FOPEN("./resources/test_file.txt", OpenRead);
-	BufReader br = BUF_READER(BufReaderFile(f1), BufReaderInitialSize(8192),
-				  BufReaderMaximumSize(30000));
+	char buf[100];
 
-	File f2 = FOPEN("./resources/test_file.txt", OpenRead);
-	BufReader br2 = BUF_READER(BufReaderFile(f2));
+	File f1 = FOPEN("./resources/test_file.txt", OpenRead);
+	BufReader br =
+	    BUF_READER(BufReaderReadable(f1), BufReaderCapacity(30000));
+
+	File f2 = FOPEN("./resources/test_file2.txt", OpenRead);
+	BufReader br2 = BUF_READER(BufReaderReadable(f2));
+
+	Result r = read_fixed_bytes(&br2, buf, 10);
+	buf[10] = 0;
+	assert_eq_str(buf, "0123456789");
+
+	cleanup(&r);
+	r = read_fixed_bytes(&br2, buf, 15);
+	buf[15] = 0;
+	assert_eq_str(buf, "012345678901234");
+
+	cleanup(&r);
+	r = read_fixed_bytes(&br2, buf, 15);
+	buf[15] = 0;
+	assert_eq_str(buf, "567890123456789");
+
+	cleanup(&r);
+	r = read_fixed_bytes(&br2, buf, 100);
+	assert(IS_ERR(r));
 
 	Result rx = try_buf_reader();
 	assert(IS_ERR(rx));
@@ -659,6 +679,46 @@ MyTest(core, test_cleanup2) {
 		assert_eq(cleanup_count, 0);
 	}
 	assert_eq(cleanup_count, 1);
+
+	return Ok(_());
+}
+
+MyTest(core, test_buf_reader_consume_fill) {
+	File f = FOPEN("./resources/test_file2.txt", OpenRead);
+	BufReader br = BUF_READER(BufReaderReadable(f), BufReaderCapacity(10));
+
+	Result r1 = BufReader_fill_buf(&br);
+	RefHolder ref1 = TRY(r1, ref1);
+	assert_eq(len(&ref1), 10);
+	char *buf = GET(RefHolder, &ref1, ref);
+	for (int i = 0; i < 10; i++) {
+		assert_eq(buf[i], i + '0');
+	}
+	BufReader_consume_buf(&br, 5);
+
+	Result r2 = BufReader_fill_buf(&br);
+	RefHolder ref2 = TRY(r2, ref2);
+	assert_eq(len(&ref2), 10);
+	buf = GET(RefHolder, &ref2, ref);
+	for (int i = 0; i < 10; i++) {
+		int j = (i + 5) % 10;
+		assert_eq(buf[i], j + '0');
+	}
+
+	File f2 = FOPEN("./resources/test_file2.txt", OpenRead);
+	BufReader br2 = BUF_READER(BufReaderReadable(f2));
+
+	Result r3 = BufReader_fill_buf(&br2);
+	RefHolder ref3 = TRY(r3, ref3);
+	// entire file len
+	assert_eq(len(&ref3), 101);
+
+	BufReader_consume_buf(&br2, 101);
+
+	// check buffer empty on next call
+	Result r4 = BufReader_fill_buf(&br2);
+	RefHolder ref4 = TRY(r4, ref4);
+	assert_eq(len(&ref4), 0);
 
 	return Ok(_());
 }

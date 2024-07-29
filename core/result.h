@@ -26,6 +26,12 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 #define IS_ERR(x) x.type == Err
 #define IS_OK(x) x.type == Ok
 
+#define todo()                                                                 \
+	({                                                                     \
+		Error e = ERR(UNIMPLEMENTED, "Not yet implemented");           \
+		return Err(e);                                                 \
+	})
+
 #define TRY(x, v)                                                              \
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
