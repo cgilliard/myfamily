@@ -18,6 +18,7 @@
 #include <core/enum.h>
 #include <core/file.h>
 #include <core/io.h>
+#include <core/iterator.h>
 #include <core/string.h>
 
 ENUM(BufReaderOption, VARIANTS(BUF_READER_FILE, BUF_READER_CAPACITY),
@@ -28,9 +29,17 @@ ENUM(BufReaderOption, VARIANTS(BUF_READER_FILE, BUF_READER_CAPACITY),
 	TRAIT_REQUIRED(T, Result, open, int n, ...)                            \
 	TRAIT_REQUIRED(T, Result, fill_buf, T##Ptr *ptr)                       \
 	TRAIT_REQUIRED(T, void, consume_buf, T##Ptr *ptr, u64 amt)             \
-	TRAIT_IMPL(T, read_line, read_line_impl)
+	TRAIT_IMPL(T, read_line, read_line_impl)                               \
+	TRAIT_IMPL(T, read_until, read_until_impl)                             \
+	TRAIT_IMPL(T, lines, lines_impl)
 
 Result read_line_impl(Object *ptr, String *s);
+Result read_until_impl(Object *ptr, String *dst, u8 b);
+Object *lines_impl(Object *ptr);
+
+void consume_buf(void *obj, u64 amt);
+Result fill_buf(void *obj);
+Result read_until(void *ptr, String *dst, u8 b);
 
 CLASS(BufReader,
       FIELD(Rc, f) FIELD(u64, capacity) FIELD(char *, buf) FIELD(u64, offset))
@@ -38,7 +47,7 @@ IMPL(BufReader, TRAIT_READER)
 IMPL(BufReader, TRAIT_BUF_READER)
 #define BufReader DEFINE_CLASS(BufReader)
 
-#define BufReaderReadable(__fp__)                                              \
+#define Readable(__fp__)                                                       \
 	({                                                                     \
 		Rc __rcfp__ = HEAPIFY(__fp__);                                 \
 		BufReaderOption __optfp__ =                                    \

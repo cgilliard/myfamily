@@ -18,7 +18,8 @@ OBJS := class.o \
 	file.o \
 	iterator.o \
 	buf_reader.o \
-	slice.o
+	slice.o \
+	vec.o
 TEST_OBJS := $(OBJS)
 
 include ../Makefile.template

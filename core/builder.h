@@ -12,18 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/slice.h>
+#ifndef _CORE_BUILDER__
+#define _CORE_BUILDER__
 
-GETTER(Slice, len)
+// #define BUILDER(name, variants, types, defaults,
 
-void Slice_cleanup(Slice *rh) {}
-
-u64 Slice_len(Slice *rh) {
-	u64 ret = GET(Slice, rh, len);
-	return ret;
-}
-
-Slice Slice_build(void *ptr, u64 size) {
-	Slice ret = BUILD(Slice, ptr, size);
-	return ret;
-}
+#endif // _CORE_BUILDER__

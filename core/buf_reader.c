@@ -24,6 +24,35 @@ SETTER(BufReader, offset)
 GETTER(BufReader, capacity)
 SETTER(BufReader, capacity)
 
+Result read_until(void *obj, String *dst, u8 b) {
+	ResultPtr (*do_read_until)(Object *obj, String *dst, u8 b) =
+	    find_fn((Object *)obj, "read_until");
+	if (do_read_until == NULL)
+		panic("read_until not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_read_until(obj, dst, b);
+}
+
+void consume_buf(void *obj, u64 amt) {
+	void (*do_consume_buf)(Object *obj, u64 amt) =
+	    find_fn((Object *)obj, "consume_buf");
+	if (do_consume_buf == NULL)
+		panic("consume_buf not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+
+	return do_consume_buf(obj, amt);
+}
+
+Result fill_buf(void *obj) {
+	ResultPtr (*do_fill_buf)(Object *obj) =
+	    find_fn((Object *)obj, "fill_buf");
+	if (do_fill_buf == NULL)
+		panic("fill_buf not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+
+	return do_fill_buf(obj);
+}
+
 void BufReader_cleanup(BufReader *ptr) {
 	RcPtr readable = GET(BufReader, ptr, f);
 	cleanup(&readable);
@@ -110,22 +139,17 @@ Result BufReader_fill_buf(BufReader *ptr) {
 	u64 offset = GET(BufReader, ptr, offset);
 	u64 capacity = GET(BufReader, ptr, capacity);
 
-	if (offset >= capacity) {
-		Error e = ERR(OVERFLOW, "Buffer is full");
-		return Err(e);
-	}
-
 	u64 rem = capacity - offset;
 
 	Rc readablerc = GET(BufReader, ptr, f);
 	Object *readable = unwrap(&readablerc);
 
-	Result r = myread(readable, buf + offset, rem);
-	u64 rlen = TRY(r, rlen);
-
-	offset += rlen;
-
-	SET(BufReader, ptr, offset, offset);
+	if (offset == 0) {
+		Result r = myread(readable, buf + offset, rem);
+		u64 rlen = TRY(r, rlen);
+		offset += rlen;
+		SET(BufReader, ptr, offset, offset);
+	}
 
 	Slice ret = SLICE(buf, offset);
 	return Ok(ret);
@@ -137,4 +161,23 @@ Result BufReader_open(int n, ...) {
 	return BufReader_open_impl(n, ptr);
 }
 
-Result read_line_impl(Object *ptr, String *s) { todo(); }
+Result read_line_impl(Object *ptr, String *dst) { todo(); }
+Result read_until_impl(Object *ptr, String *dst, u8 b) {
+	int count = 0;
+	while (true) {
+		Result r = fill_buf(ptr);
+		Slice slice = TRY(r, slice);
+		u64 slice_len = len(&slice);
+		printf("slice_len=%llu\n", slice_len);
+		if (slice_len == 0)
+			break;
+
+		char buffer[slice_len + 1];
+		// memcpy(buffer, slice_len);
+		buffer[slice_len] = 0;
+		consume_buf(ptr, slice_len);
+	}
+
+	return Ok(_());
+}
+Object *lines_impl(Object *ptr) { return NULL; }

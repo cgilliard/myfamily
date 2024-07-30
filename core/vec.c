@@ -12,18 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/slice.h>
+#include <core/vec.h>
 
-GETTER(Slice, len)
+void Vec_cleanup(Vec *ptr) {}
 
-void Slice_cleanup(Slice *rh) {}
-
-u64 Slice_len(Slice *rh) {
-	u64 ret = GET(Slice, rh, len);
-	return ret;
-}
-
-Slice Slice_build(void *ptr, u64 size) {
-	Slice ret = BUILD(Slice, ptr, size);
-	return ret;
-}

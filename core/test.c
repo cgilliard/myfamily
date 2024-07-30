@@ -627,11 +627,10 @@ MyTest(core, test_buf_reader) {
 	char buf[100];
 
 	File f1 = FOPEN("./resources/test_file.txt", OpenRead);
-	BufReader br =
-	    BUF_READER(BufReaderReadable(f1), BufReaderCapacity(30000));
+	BufReader br = BUF_READER(Readable(f1), BufReaderCapacity(30000));
 
 	File f2 = FOPEN("./resources/test_file2.txt", OpenRead);
-	BufReader br2 = BUF_READER(BufReaderReadable(f2));
+	BufReader br2 = BUF_READER(Readable(f2));
 
 	Result r = read_fixed_bytes(&br2, buf, 10);
 	buf[10] = 0;
@@ -685,40 +684,53 @@ MyTest(core, test_cleanup2) {
 
 MyTest(core, test_buf_reader_consume_fill) {
 	File f = FOPEN("./resources/test_file2.txt", OpenRead);
-	BufReader br = BUF_READER(BufReaderReadable(f), BufReaderCapacity(10));
+	BufReader br = BUF_READER(Readable(f), BufReaderCapacity(10));
 
-	Result r1 = BufReader_fill_buf(&br);
+	Result r1 = fill_buf(&br);
 	Slice ref1 = TRY(r1, ref1);
 	assert_eq(len(&ref1), 10);
 	char *buf = GET(Slice, &ref1, ref);
 	for (int i = 0; i < 10; i++) {
 		assert_eq(buf[i], i + '0');
 	}
-	BufReader_consume_buf(&br, 5);
+	consume_buf(&br, 5);
 
-	Result r2 = BufReader_fill_buf(&br);
+	Result r2 = fill_buf(&br);
 	Slice ref2 = TRY(r2, ref2);
-	assert_eq(len(&ref2), 10);
+	printf("len=%llu\n", len(&ref2));
+	assert_eq(len(&ref2), 5);
 	buf = GET(Slice, &ref2, ref);
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 5; i++) {
 		int j = (i + 5) % 10;
 		assert_eq(buf[i], j + '0');
 	}
 
 	File f2 = FOPEN("./resources/test_file2.txt", OpenRead);
-	BufReader br2 = BUF_READER(BufReaderReadable(f2));
+	BufReader br2 = BUF_READER(Readable(f2));
 
-	Result r3 = BufReader_fill_buf(&br2);
+	Result r3 = fill_buf(&br2);
 	Slice ref3 = TRY(r3, ref3);
 	// entire file len
 	assert_eq(len(&ref3), 101);
 
-	BufReader_consume_buf(&br2, 101);
+	consume_buf(&br2, 101);
 
 	// check buffer empty on next call
-	Result r4 = BufReader_fill_buf(&br2);
+	Result r4 = fill_buf(&br2);
 	Slice ref4 = TRY(r4, ref4);
 	assert_eq(len(&ref4), 0);
+
+	return Ok(_());
+}
+
+MyTest(core, test_read_until) {
+	File f = FOPEN("./resources/test_file3.txt", OpenRead);
+	BufReader br = BUF_READER(Readable(f), BufReaderCapacity(10));
+
+	String s = STRING("");
+	Result r = read_until(&br, &s, '\n');
+	TRYU(r);
+	printf("s=%s\n", unwrap(&s));
 
 	return Ok(_());
 }
