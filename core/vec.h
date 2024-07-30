@@ -19,12 +19,18 @@
 #include <core/enum.h>
 #include <core/traits.h>
 
-// #define TRAIT_VEC(T) REQUIRED
+#define TRAIT_VEC(T)                                                           \
+	TRAIT_REQUIRED(T, Result, push, T##Ptr *ptr, void *elem)               \
+	TRAIT_REQUIRED(T, Result, get, T##Ptr *ptr, u64 index)                 \
+	TRAIT_REQUIRED(T, Result, set, T##Ptr *ptr, u64 index, void *elem)     \
+	TRAIT_REQUIRED(T, Result, resize, T##Ptr *ptr, u64 new_size)
 
 ENUM(VecOption, VARIANTS(VEC_CAPACITY), TYPES("u64"))
 #define VecOption DEFINE_ENUM(VecOption)
 
 CLASS(Vec, FIELD(char *, buf) FIELD(u64, capacity) FIELD(u64, len))
+// IMPL(Vec, TRAIT_VEC)
+// IMPL(Vec, TRAIT_APPEND)
 #define Vec DEFINE_CLASS(Vec)
 
 #define VEC_CAPACITY(cap)                                                      \
@@ -35,5 +41,7 @@ CLASS(Vec, FIELD(char *, buf) FIELD(u64, capacity) FIELD(u64, len))
 		RcPtr __rvv11_ = HEAPIFY(__optv11_);                           \
 		__rvvb11_;                                                     \
 	})
+
+#define VEC(...) BUILD(Vec)
 
 #endif // _CORE_VEC__

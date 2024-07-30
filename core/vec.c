@@ -15,4 +15,3 @@
 #include <core/vec.h>
 
 void Vec_cleanup(Vec *ptr) {}
-
