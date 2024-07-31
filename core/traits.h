@@ -28,7 +28,7 @@ Result append_impl(void *dst, void *src);
 Result append_s(void *dst, Object *src);
 Rc into_iter_impl(void *obj);
 
-#define into_iter(x)                                                           \
+#define INTO_ITER(x)                                                           \
 	({                                                                     \
 		RcPtr _into_iter_rc___ = into_iter_impl(x);                    \
 		_into_iter_rc___;                                              \

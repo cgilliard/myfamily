@@ -774,10 +774,11 @@ MyTest(core, test_lines) {
 	// first use into_iter
 	File f = FOPEN("./resources/test_file3.txt", OpenRead);
 	BufReader br = BUF_READER(Readable(f), Capacity(10));
-	Iterator iter = into_iter(&br);
+	Iterator iter = INTO_ITER(&br);
 	int count = 0;
 
 	foreach (String, line, iter) {
+		printf("line='%s'\n", unwrap(&line));
 		char exp[100];
 		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
 		assert_eq_string(line, exp);
@@ -786,13 +787,15 @@ MyTest(core, test_lines) {
 
 	assert_eq(count, 3);
 
+	printf("second run\n");
 	// next use lines
 	File f2 = FOPEN("./resources/test_file3.txt", OpenRead);
-	BufReader br2 = BUF_READER(Readable(f2), Capacity(10));
+	BufReader br2 = BUF_READER(Readable(f2), Capacity(100));
 	BufReaderLineIterator iter2 = LINES(br2);
 	count = 0;
 
 	foreach (String, line, iter2) {
+		printf("%i: line='%s'\n", count, unwrap(&line));
 		char exp[100];
 		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
 		assert_eq_string(line, exp);

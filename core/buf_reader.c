@@ -149,7 +149,7 @@ void BufReader_consume_buf(BufReader *ptr, u64 amt) {
 		amt = offset;
 
 	if (amt > 0) {
-		memmove(buf, buf + amt, amt);
+		memmove(buf, buf + amt, offset - amt);
 		SET(BufReader, ptr, offset, offset - amt);
 	}
 }
@@ -229,6 +229,7 @@ Result read_until_impl(Object *ptr, Slice dst, u8 b) {
 			if (b == slice_data[i]) {
 				to_consume = i + 1;
 				found_mark = true;
+				break;
 			}
 		}
 
@@ -251,6 +252,7 @@ Result read_until_impl(Object *ptr, Slice dst, u8 b) {
 
 	return Ok(rlen);
 }
+
 Result lines_impl(Object *ptr) {
 	BufReaderLineIterator ret = BUILD(BufReaderLineIterator, ptr);
 	return Ok(ret);
