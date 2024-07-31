@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <core/buf_reader.h>
+#include <core/option.h>
 #include <core/slice.h>
 #include <core/unit.h>
 
@@ -23,9 +24,28 @@ GETTER(BufReader, offset)
 SETTER(BufReader, offset)
 GETTER(BufReader, capacity)
 SETTER(BufReader, capacity)
+GETTER(BufReaderLineIterator, reader)
+SETTER(BufReaderLineIterator, reader)
 
-Result read_until(void *obj, String *dst, u8 b) {
-	ResultPtr (*do_read_until)(Object *obj, String *dst, u8 b) =
+Result lines(void *obj) {
+	ResultPtr (*do_lines)(Object *obj) = find_fn((Object *)obj, "lines");
+	if (do_lines == NULL)
+		panic("lines not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_lines(obj);
+}
+
+Result read_line(void *obj, String *s) {
+	ResultPtr (*do_read_line)(Object *obj, String *s) =
+	    find_fn((Object *)obj, "read_line");
+	if (do_read_line == NULL)
+		panic("read_line not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_read_line(obj, s);
+}
+
+Result read_until(void *obj, Slice dst, u8 b) {
+	ResultPtr (*do_read_until)(Object *obj, Slice dst, u8 b) =
 	    find_fn((Object *)obj, "read_until");
 	if (do_read_until == NULL)
 		panic("read_until not implemented for this type [%s]",
@@ -161,23 +181,110 @@ Result BufReader_open(int n, ...) {
 	return BufReader_open_impl(n, ptr);
 }
 
-Result read_line_impl(Object *ptr, String *dst) { todo(); }
-Result read_until_impl(Object *ptr, String *dst, u8 b) {
-	int count = 0;
-	while (true) {
-		Result r = fill_buf(ptr);
-		Slice slice = TRY(r, slice);
-		u64 slice_len = len(&slice);
-		printf("slice_len=%llu\n", slice_len);
-		if (slice_len == 0)
-			break;
+Result read_line_impl(Object *ptr, String *dst) {
+	char buf[1024];
+	Slice s = SLICE(buf, 1024);
+	bool nlfound = false;
 
-		char buffer[slice_len + 1];
-		// memcpy(buffer, slice_len);
-		buffer[slice_len] = 0;
-		consume_buf(ptr, slice_len);
+	while (true) {
+		Result r = read_until_impl(ptr, s, '\n');
+		u64 rlen = TRY(r, rlen);
+
+		if (rlen > 0) {
+			char *slice_data = GET(Slice, &s, ref);
+			if (slice_data[rlen - 1] == '\n') {
+				slice_data[rlen - 1] = 0;
+				nlfound = true;
+			}
+			Result r2 = String_from_slice(&s, rlen);
+			String nstr = TRY(r2, nstr);
+			Result r3 = append(dst, &nstr);
+			TRYU(r3);
+		}
+
+		if (rlen < 1024 || nlfound)
+			break;
 	}
 
 	return Ok(_());
 }
-Object *lines_impl(Object *ptr) { return NULL; }
+
+Result read_until_impl(Object *ptr, Slice dst, u8 b) {
+	int counter = 0;
+	u64 rlen = 0;
+	u64 dst_len = len(&dst);
+	while (true) {
+		u64 offset = rlen;
+		Result r = fill_buf(ptr);
+		Slice slice = TRY(r, slice);
+		char *slice_data = GET(Slice, &slice, ref);
+		u64 slice_len = len(&slice);
+		if (slice_len == 0)
+			break;
+
+		u64 to_consume = slice_len;
+		bool found_mark = false;
+
+		for (u64 i = 0; i < slice_len; i++) {
+			if (b == slice_data[i]) {
+				to_consume = i + 1;
+				found_mark = true;
+			}
+		}
+
+		if (to_consume + rlen > dst_len) {
+			to_consume = dst_len - rlen;
+			rlen = dst_len;
+		} else {
+			rlen += to_consume;
+		}
+
+		memcpy(GET(Slice, &dst, ref) + offset, slice_data, to_consume);
+		consume_buf(ptr, to_consume);
+
+		if (rlen == dst_len || found_mark)
+			break;
+
+		if (++counter > 30)
+			break;
+	}
+
+	return Ok(rlen);
+}
+Result lines_impl(Object *ptr) {
+	BufReaderLineIterator ret = BUILD(BufReaderLineIterator, ptr);
+	return Ok(ret);
+}
+
+void BufReaderLineIterator_cleanup(BufReaderLineIterator *ptr) {}
+
+Result BufReaderLineIterator_next(BufReaderLineIterator *ptr) {
+	char buf[1024];
+	Slice slice = SLICE(buf, 1024);
+	Object *obj = GET(BufReaderLineIterator, ptr, reader);
+	Result r = read_until(obj, slice, '\n');
+	u64 rlen = TRY(r, rlen);
+
+	char *slice_chars = GET(Slice, &slice, ref);
+	if (rlen > 0)
+		slice_chars[rlen - 1] = 0;
+
+	String ret = STRING("");
+	Result slice_str_res = String_from_slice(&slice, rlen);
+	String slice_str = TRY(slice_str_res, slice_str);
+	Result ar = append(&ret, &slice_str);
+	TRYU(ar);
+	if (len(&ret) > 0) {
+		Option retopt = Some(ret);
+		return Ok(retopt);
+	} else
+		return Ok(None);
+}
+
+Rc BufReader_into_iter(BufReader *ptr) {
+	BufReaderLineIteratorPtr *ret = mymalloc(sizeof(BufReaderLineIterator));
+	BUILDPTR(ret, BufReaderLineIterator);
+	SET(BufReaderLineIterator, ret, reader, (Object *)ptr);
+	RcPtr rc = RC(ret);
+	return rc;
+}

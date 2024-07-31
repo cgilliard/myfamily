@@ -87,3 +87,5 @@
 
 #define GET_3RD_ARG(arg1, arg2, arg3, ...) arg3
 #define HAS_ARGS(...) GET_3RD_ARG(__VA_ARGS__, 1, 0, 0)
+
+#define loop while (true)

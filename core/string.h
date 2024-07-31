@@ -17,6 +17,7 @@
 
 #include <core/class.h>
 #include <core/result.h>
+#include <core/slice.h>
 #include <core/traits.h>
 
 #define TRAIT_STRING_BUILD(T) TRAIT_REQUIRED(T, Result, build, char *s)
@@ -27,7 +28,8 @@
 	TRAIT_REQUIRED(T, Result, last_index_of, T##Ptr *s, T##Ptr *n)         \
 	TRAIT_REQUIRED(T, Result, index_of_s, T##Ptr *s, char *n, u64 start)   \
 	TRAIT_REQUIRED(T, Result, last_index_of_s, T##Ptr *s, char *n)         \
-	TRAIT_REQUIRED(T, Result, char_at, T##Ptr *s, u64 index)
+	TRAIT_REQUIRED(T, Result, char_at, T##Ptr *s, u64 index)               \
+	TRAIT_REQUIRED(T, Result, from_slice, Slice *s, u64 len)
 
 // have to include this here because Formatter depends on String
 typedef struct Formatter Formatter;

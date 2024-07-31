@@ -17,6 +17,15 @@
 
 #include <core/traits.h>
 
+Rc into_iter(void *obj) {
+	RcPtr (*do_into_iter)(Object *obj) =
+	    find_fn((Object *)obj, "into_iter");
+	if (do_into_iter == NULL)
+		panic("into_iter not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_into_iter(obj);
+}
+
 bool equal(void *obj1, void *obj2) {
 	if (((Object *)obj1)->vdata.vtable->id !=
 	    ((Object *)obj2)->vdata.vtable->id) {

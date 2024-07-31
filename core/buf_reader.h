@@ -19,7 +19,12 @@
 #include <core/file.h>
 #include <core/io.h>
 #include <core/iterator.h>
+#include <core/slice.h>
 #include <core/string.h>
+
+CLASS(BufReaderLineIterator, FIELD(Object *, reader))
+IMPL(BufReaderLineIterator, TRAIT_ITERATOR)
+#define BufReaderLineIterator DEFINE_CLASS(BufReaderLineIterator)
 
 ENUM(BufReaderOption, VARIANTS(BUF_READER_FILE, BUF_READER_CAPACITY),
      TYPES("Rc", "u64"))
@@ -34,17 +39,20 @@ ENUM(BufReaderOption, VARIANTS(BUF_READER_FILE, BUF_READER_CAPACITY),
 	TRAIT_IMPL(T, lines, lines_impl)
 
 Result read_line_impl(Object *ptr, String *s);
-Result read_until_impl(Object *ptr, String *dst, u8 b);
-Object *lines_impl(Object *ptr);
+Result read_until_impl(Object *ptr, Slice dst, u8 b);
+Result lines_impl(Object *ptr);
 
 void consume_buf(void *obj, u64 amt);
 Result fill_buf(void *obj);
-Result read_until(void *ptr, String *dst, u8 b);
+Result read_until(void *ptr, Slice dst, u8 b);
+Result read_line(void *ptr, String *s);
+Result lines(void *ptr);
 
 CLASS(BufReader,
       FIELD(Rc, f) FIELD(u64, capacity) FIELD(char *, buf) FIELD(u64, offset))
 IMPL(BufReader, TRAIT_READER)
 IMPL(BufReader, TRAIT_BUF_READER)
+IMPL(BufReader, TRAIT_INTO_ITER)
 #define BufReader DEFINE_CLASS(BufReader)
 
 #define Readable(__fp__)                                                       \
@@ -56,7 +64,7 @@ IMPL(BufReader, TRAIT_BUF_READER)
 		__rcfp2__;                                                     \
 	})
 
-#define BufReaderCapacity(x)                                                   \
+#define Capacity(x)                                                            \
 	({                                                                     \
 		u64 __vb11_ = x;                                               \
 		BufReaderOption __optb11_ =                                    \
@@ -83,6 +91,14 @@ IMPL(BufReader, TRAIT_BUF_READER)
 			FOR_EACH(PROC_BUF_READER_CONFIG, __VA_ARGS__))));      \
 		BufReaderPtr __bptr__ = TRY(__rr___, __bptr__);                \
 		__bptr__;                                                      \
+	})
+
+#define LINES(br)                                                              \
+	({                                                                     \
+		Result __lines_ = lines(&br);                                  \
+		BufReaderLineIterator __bri_ = TRY(__lines_, __bri_);          \
+		__bri_;                                                        \
+		;                                                              \
 	})
 
 #endif // _CORE_BUF_READER__

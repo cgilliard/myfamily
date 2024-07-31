@@ -263,3 +263,11 @@ Result String_char_at(String *s, u64 index) {
 }
 
 Result String_fmt(String *s, Formatter *f) { return WRITE(f, unwrap(s)); }
+
+Result String_from_slice(Slice *s, u64 len) {
+	char buf[len + 1];
+	void *ref = GET(Slice, s, ref);
+	memcpy(buf, ref, len);
+	buf[len] = 0;
+	return String_build(buf);
+}

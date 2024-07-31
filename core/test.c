@@ -441,7 +441,6 @@ MyTest(core, test_format) {
 	Result rr1 = Formatter_to_string(&fmt);
 	String s1 = TRY(rr1, s1);
 	char *s_out = unwrap(&s1);
-	printf("s=%s\n", unwrap(&s1));
 	assert_eq_str(s_out, "this is a test 123 456 78 abc");
 
 	Formatter_reset(&fmt);
@@ -451,7 +450,6 @@ MyTest(core, test_format) {
 	Result r3 = FORMAT(&fmt, "test {}", mel);
 	Result rr3 = Formatter_to_string(&fmt);
 	String s3 = TRY(rr3, s3);
-	printf("s=%s\n", unwrap(&s3));
 
 	Formatter_reset(&fmt);
 
@@ -461,7 +459,6 @@ MyTest(core, test_format) {
 	Result r2 = FORMAT(&fmt, "this is a test {} {} {} {}", x, y, z, UNIT);
 	Result rr2 = Formatter_to_string(&fmt);
 	String s2 = TRY(rr2, s2);
-	printf("s2=%s\n", unwrap(&s2));
 
 	return Ok(_());
 }
@@ -538,14 +535,6 @@ MyTest(core, test_file) {
 	Result r4 = read_to_string(&file4);
 	String s4 = TRY(r4, s4);
 	assert_eq_string(s4, "01234");
-
-	/*
-	File file5 = FOPEN("./bin/test_file_1.txt", OpenRead);
-	BufReader fbuf5 = BUF_READER(file5);
-	foreach (String, line, lines(&fbuf5)) {
-		debug("line={}", line);
-	}
-	*/
 
 	return Ok(_());
 }
@@ -627,7 +616,7 @@ MyTest(core, test_buf_reader) {
 	char buf[100];
 
 	File f1 = FOPEN("./resources/test_file.txt", OpenRead);
-	BufReader br = BUF_READER(Readable(f1), BufReaderCapacity(30000));
+	BufReader br = BUF_READER(Readable(f1), Capacity(30000));
 
 	File f2 = FOPEN("./resources/test_file2.txt", OpenRead);
 	BufReader br2 = BUF_READER(Readable(f2));
@@ -684,7 +673,7 @@ MyTest(core, test_cleanup2) {
 
 MyTest(core, test_buf_reader_consume_fill) {
 	File f = FOPEN("./resources/test_file2.txt", OpenRead);
-	BufReader br = BUF_READER(Readable(f), BufReaderCapacity(10));
+	BufReader br = BUF_READER(Readable(f), Capacity(10));
 
 	Result r1 = fill_buf(&br);
 	Slice ref1 = TRY(r1, ref1);
@@ -697,7 +686,6 @@ MyTest(core, test_buf_reader_consume_fill) {
 
 	Result r2 = fill_buf(&br);
 	Slice ref2 = TRY(r2, ref2);
-	printf("len=%llu\n", len(&ref2));
 	assert_eq(len(&ref2), 5);
 	buf = GET(Slice, &ref2, ref);
 	for (int i = 0; i < 5; i++) {
@@ -725,13 +713,75 @@ MyTest(core, test_buf_reader_consume_fill) {
 
 MyTest(core, test_read_until) {
 	File f = FOPEN("./resources/test_file3.txt", OpenRead);
-	BufReader br = BUF_READER(Readable(f), BufReaderCapacity(10));
+	BufReader br = BUF_READER(Readable(f), Capacity(10));
 
-	String s = STRING("");
-	Result r = read_until(&br, &s, '\n');
-	TRYU(r);
-	printf("s=%s\n", unwrap(&s));
+	char buf[1000];
+	Slice s = SLICE(buf, 1000);
+	Result r = read_until(&br, s, '\n');
+	u64 rlen = TRY(r, rlen);
+	Result r2 = String_from_slice(&s, rlen);
+	String s2 = TRY(r2, s2);
+	assert_eq_string(s2, "abcdefghijklmnopqrstuvwxyz1\n");
+
+	Result r3 = read_until(&br, s, '\n');
+	rlen = TRY(r3, rlen);
+	Result r4 = String_from_slice(&s, rlen);
+	String s3 = TRY(r4, s3);
+	assert_eq_string(s3, "abcdefghijklmnopqrstuvwxyz2\n");
+
+	Result r5 = read_until(&br, s, '\n');
+	rlen = TRY(r5, rlen);
+	Result r6 = String_from_slice(&s, rlen);
+	String s4 = TRY(r6, s4);
+	assert_eq_string(s4, "abcdefghijklmnopqrstuvwxyz3\n");
+
+	Result r7 = read_until(&br, s, '\n');
+	rlen = TRY(r7, rlen);
+	assert_eq(rlen, 0);
+
+	File f2 = FOPEN("./resources/test_file3.txt", OpenRead);
+	BufReader br2 = BUF_READER(Readable(f2), Capacity(100));
+	Result r8 = read_until(&br2, s, '*');
+	rlen = TRY(r8, rlen);
+	assert_eq(rlen, 84);
 
 	return Ok(_());
 }
 
+MyTest(core, test_read_line) {
+	File f = FOPEN("./resources/test_file3.txt", OpenRead);
+	BufReader br = BUF_READER(Readable(f), Capacity(10));
+
+	int count = 0;
+	loop {
+		String s1 = STRING("");
+		Result r1 = read_line(&br, &s1);
+		TRYU(r1);
+
+		char exp[100];
+		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
+
+		if (len(&s1) == 0)
+			break;
+		assert_eq_string(s1, exp);
+		count += 1;
+	}
+
+	return Ok(_());
+}
+
+MyTest(core, test_lines) {
+	File f = FOPEN("./resources/test_file3.txt", OpenRead);
+	BufReader br = BUF_READER(Readable(f), Capacity(10));
+	BufReaderLineIterator bri = LINES(br);
+
+	int count = 0;
+	foreach (String, line, bri) {
+		char exp[100];
+		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
+		assert_eq_string(line, exp);
+		count += 1;
+	}
+
+	return Ok(_());
+}
