@@ -17,7 +17,7 @@
 
 #include <core/traits.h>
 
-Rc into_iter(void *obj) {
+Rc into_iter_impl(void *obj) {
 	RcPtr (*do_into_iter)(Object *obj) =
 	    find_fn((Object *)obj, "into_iter");
 	if (do_into_iter == NULL)

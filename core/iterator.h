@@ -20,13 +20,22 @@
 
 Result next(void *obj);
 
+// for into_iter
+#define Iterator Rc
+
 #define TRAIT_ITERATOR(T) TRAIT_REQUIRED(T, Result, next, T##Ptr *itt)
 
 #define FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, init)             \
 	({                                                                     \
 		if (!init)                                                     \
 			cleanup(&_ret_##counter##__);                          \
-		Result _r__ = next(&iterator);                                 \
+		Result _r__;                                                   \
+		if (!strcmp(CLASS_NAME(&iterator), "Rc")) {                    \
+			void *_tmp__ = unwrap(&iterator);                      \
+			_r__ = next(_tmp__);                                   \
+		} else {                                                       \
+			_r__ = next(&iterator);                                \
+		}                                                              \
 		if (IS_OK(_r__)) {                                             \
 			Option _o__ = TRY(_r__, _o__);                         \
 			if (IS_SOME(_o__)) {                                   \

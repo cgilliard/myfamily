@@ -771,17 +771,35 @@ MyTest(core, test_read_line) {
 }
 
 MyTest(core, test_lines) {
+	// first use into_iter
 	File f = FOPEN("./resources/test_file3.txt", OpenRead);
 	BufReader br = BUF_READER(Readable(f), Capacity(10));
-	BufReaderLineIterator bri = LINES(br);
-
+	Iterator iter = into_iter(&br);
 	int count = 0;
-	foreach (String, line, bri) {
+
+	foreach (String, line, iter) {
 		char exp[100];
 		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
 		assert_eq_string(line, exp);
 		count += 1;
 	}
+
+	assert_eq(count, 3);
+
+	// next use lines
+	File f2 = FOPEN("./resources/test_file3.txt", OpenRead);
+	BufReader br2 = BUF_READER(Readable(f2), Capacity(10));
+	BufReaderLineIterator iter2 = LINES(br2);
+	count = 0;
+
+	foreach (String, line, iter2) {
+		char exp[100];
+		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
+		assert_eq_string(line, exp);
+		count += 1;
+	}
+
+	assert_eq(count, 3);
 
 	return Ok(_());
 }

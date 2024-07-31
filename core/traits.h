@@ -26,7 +26,13 @@
 
 Result append_impl(void *dst, void *src);
 Result append_s(void *dst, Object *src);
-Rc into_iter(void *obj);
+Rc into_iter_impl(void *obj);
+
+#define into_iter(x)                                                           \
+	({                                                                     \
+		RcPtr _into_iter_rc___ = into_iter_impl(x);                    \
+		_into_iter_rc___;                                              \
+	})
 
 #define TRAIT_INTO_ITER(T) TRAIT_REQUIRED(T, Rc, into_iter, T##Ptr *obj)
 

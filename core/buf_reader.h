@@ -76,14 +76,14 @@ IMPL(BufReader, TRAIT_INTO_ITER)
 #define PROC_BUF_READER_CONFIG(value) ({ value; })
 
 // TODO: This should not only check counter is 0, but also check for an actual
-// BufReaderReadable argument
+// Readable argument
 #define BUF_READER(...)                                                        \
 	({                                                                     \
 		int __counter___ = 0;                                          \
 		EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));                     \
 		if (__counter___ == 0) {                                       \
 			Error e = ERR(ILLEGAL_ARGUMENT,                        \
-				      "BufReaderReadable must be specified");  \
+				      "Readable must be specified");           \
 			return Err(e);                                         \
 		}                                                              \
 		Result __rr___ = BufReader_open(                               \
@@ -96,7 +96,7 @@ IMPL(BufReader, TRAIT_INTO_ITER)
 #define LINES(br)                                                              \
 	({                                                                     \
 		Result __lines_ = lines(&br);                                  \
-		BufReaderLineIterator __bri_ = TRY(__lines_, __bri_);          \
+		BufReaderLineIteratorPtr __bri_ = TRY(__lines_, __bri_);       \
 		__bri_;                                                        \
 		;                                                              \
 	})
