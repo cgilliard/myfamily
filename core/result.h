@@ -30,7 +30,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 	({                                                                     \
 		Error e = ERR(UNIMPLEMENTED, "Not yet implemented");           \
 		return Err(e);                                                 \
-	})
+	});
 
 #define TRY(x, v)                                                              \
 	({                                                                     \

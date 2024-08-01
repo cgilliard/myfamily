@@ -479,7 +479,7 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 		if (!lock) {
 			LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, NULL);
 			cleanup(&ret);
-			return Err(STATIC_ALLOC_ERROR);
+			return STATIC_ALLOC_RESULT;
 		}
 		if (pthread_mutex_init(lock, NULL)) {
 			LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, NULL);

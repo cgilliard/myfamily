@@ -30,6 +30,7 @@
 #include <core/rc.h>
 #include <core/resources.h>
 #include <core/result.h>
+#include <core/slabs.h>
 #include <core/slice.h>
 #include <core/string.h>
 #include <core/string_builder.h>

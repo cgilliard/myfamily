@@ -23,6 +23,7 @@ IMPL(Slice, TRAIT_LEN)
 #define Slice DEFINE_CLASS(Slice)
 
 static GETTER(Slice, ref);
+static SETTER(Slice, ref);
 
 Slice Slice_build(void *ref, u64 size);
 

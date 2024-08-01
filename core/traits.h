@@ -18,6 +18,12 @@
 #include <core/result.h>
 #include <core/traits_base.h>
 
+typedef enum OrdOptions {
+	GreaterThan = 1,
+	LessThan = -1,
+	EqualTo = 0,
+} OrdOptions;
+
 #define append(dst, src)                                                       \
 	_Generic((src),                                                        \
 	    char *: ({ append_impl(dst, src); }),                              \
@@ -27,6 +33,7 @@
 Result append_impl(void *dst, void *src);
 Result append_s(void *dst, Object *src);
 Rc into_iter_impl(void *obj);
+void myqsort(void *arr, u64 len);
 
 #define INTO_ITER(x)                                                           \
 	({                                                                     \
@@ -50,5 +57,8 @@ Rc into_iter_impl(void *obj);
 
 #define TRAIT_DEBUG(T)                                                         \
 	TRAIT_REQUIRED(T, Result, dbg, T##Ptr *self, Formatter *formatter)
+
+#define TRAIT_CMP(T)                                                           \
+	TRAIT_REQUIRED(T, OrdOptions, cmp, const void *a, const void *b)
 
 #endif // _CORE_TRAITS__

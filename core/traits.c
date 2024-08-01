@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/traits.h>
 #include <core/traits_base.h>
 #include <core/unit.h>
-
-#include <core/traits.h>
+#include <stdlib.h>
 
 Rc into_iter_impl(void *obj) {
 	RcPtr (*do_into_iter)(Object *obj) =
@@ -130,3 +130,17 @@ Result append_s(void *dst, Object *src) {
 		panic("append_s not implemented for this type");
 	return do_append_s(dst, src);
 }
+
+int myqsort_compare(const void *a, const void *b) {
+	i32 (*do_cmp)(const void *a, const void *b) =
+	    find_fn((Object *)a, "cmp");
+	if (do_cmp == NULL)
+		panic("cmp not implemented for this type");
+	return do_cmp(a, b);
+}
+
+void myqsort(void *arr, u64 len) {
+	Object **objarr = arr;
+	qsort(arr, len, size(&objarr[0]), myqsort_compare);
+}
+

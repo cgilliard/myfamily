@@ -806,3 +806,81 @@ MyTest(core, test_lines) {
 
 	return Ok(_());
 }
+
+MyTest(core, test_slab_data) {
+	SlabData sd;
+	Result r1 = SlabData_init(&sd, 10, 26, 20);
+	TRYU(r1);
+
+	char buf1[26];
+	char buf2[26];
+	char buf3[26];
+	char buf4[26];
+	for (int i = 0; i < 26; i++)
+		buf1[i] = 'a' + i;
+	for (int i = 0; i < 26; i++)
+		buf2[i] = '0';
+
+	Slice slice1 = SLICE(buf1, 26);
+	Slice slice2 = SLICE(buf2, 26);
+	Slice slice3 = SLICE(buf3, 26);
+	Slice slice4 = SLICE(buf4, 26);
+
+	Result r2 = SlabData_write(&sd, &slice1, 0);
+	Result r3 = SlabData_write(&sd, &slice2, 3);
+	Result r4 = SlabData_read(&sd, &slice3, 0);
+	Result r5 = SlabData_read(&sd, &slice4, 3);
+
+	TRYU(r2);
+	TRYU(r3);
+	TRYU(r4);
+	TRYU(r5);
+
+	char *ref1 = GET(Slice, &slice1, ref);
+	char *ref2 = GET(Slice, &slice2, ref);
+	char *ref3 = GET(Slice, &slice3, ref);
+	char *ref4 = GET(Slice, &slice4, ref);
+
+	for (int i = 0; i < 26; i++) {
+		assert_eq(ref1[i], 'a' + i);
+		assert_eq(ref1[i], ref3[i]);
+		assert_eq(ref2[i], ref4[i]);
+	}
+
+	// overwrite data
+	for (int i = 0; i < 26; i++) {
+		ref1[i] = 0;
+	}
+
+	// re-read
+	Result r6 = SlabData_read(&sd, &slice1, 0);
+	TRYU(r6);
+
+	for (int i = 0; i < 26; i++)
+		assert_eq(ref1[i], 'a' + i);
+
+	Result r7 = SlabData_reference(&sd, &slice1, 0);
+	TRYU(r7);
+	ref1 = GET(Slice, &slice1, ref);
+
+	// overwrite data
+	for (int i = 0; i < 26; i++) {
+		ref1[i] = 0;
+	}
+
+	Result r8 = SlabData_read(&sd, &slice2, 0);
+	ref2 = GET(Slice, &slice2, ref);
+
+	for (int i = 0; i < 26; i++)
+		assert_eq(ref2[i], 0);
+
+	return Ok(_());
+}
+
+MyTest(core, test_slabs) {
+	SlabAllocator sa = SLABS(
+	    SlabDataConfig(10, 80, 100), SlabDataConfig(30, 40, 200),
+	    SlabDataConfig(30, 41, 200), Zeroed(true), SlabsPerResize(15));
+
+	return Ok(_());
+}
