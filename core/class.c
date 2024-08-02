@@ -35,7 +35,7 @@ bool implements(void *obj, const char *name) {
 	return find_fn((Object *)obj, name) != NULL;
 }
 
-void *find_fn(Object *obj, const char *name) {
+void *find_fn(const Object *obj, const char *name) {
 	int left = 0;
 	int right = obj->vdata.vtable->len - 1;
 	while (left <= right) {

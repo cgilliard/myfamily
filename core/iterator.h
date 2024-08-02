@@ -39,7 +39,7 @@ Result next(void *obj);
 		if (IS_OK(_r__)) {                                             \
 			Option _o__ = TRY(_r__, _o__);                         \
 			if (IS_SOME(_o__)) {                                   \
-				_ret_##counter##__ = UNWRAP_PRIM(_o__, item);  \
+				_ret_##counter##__ = UNWRAP_VALUE(_o__, item);  \
 			} else {                                               \
 				_has_next_##counter##__ = false;               \
 			}                                                      \

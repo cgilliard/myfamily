@@ -138,7 +138,7 @@ MyTest(core, test_result) {
 	bool confirm = false;
 
 	MATCH(r4, VARIANT(Ok, {
-		      u16 v4_out = UNWRAP_PRIM(r4, v4_out);
+		      u16 v4_out = UNWRAP_VALUE(r4, v4_out);
 		      assert_eq(v4_out, 101);
 		      confirm = true;
 	      }) VARIANT(Err, { confirm = false; }));
@@ -147,12 +147,12 @@ MyTest(core, test_result) {
 
 	U128 v128 = BUILD(U128, 1234);
 	Result r5 = Ok(v128);
-	U128 v128_out = UNWRAP_PRIM(r5, v128_out);
+	U128 v128_out = UNWRAP_VALUE(r5, v128_out);
 	u128 v128_out_unwrap = *(u128 *)unwrap(&v128_out);
 	assert_eq(v128_out_unwrap, 1234);
 
 	Result r6 = test_fn(200);
-	u64 v6 = UNWRAP_PRIM(r6, v6);
+	u64 v6 = UNWRAP_VALUE(r6, v6);
 	assert_eq(v6, 1234);
 
 	Result r7 = test_fn(1);
@@ -202,7 +202,7 @@ MyTest(core, test_try_expect) {
 
 	u16 v5 = 10;
 	Result r5 = Ok(v5);
-	u16 v5_out = UNWRAP_PRIM(r5, v5_out);
+	u16 v5_out = UNWRAP_VALUE(r5, v5_out);
 
 	U64Ptr u = BUILD(U64, 1001);
 	Result r6 = Ok(u);
@@ -256,7 +256,7 @@ MyTest(core, test_option) {
 			VARIANT(NONE, { is_some = false; }));
 	assert(is_some);
 
-	u64 v1_out = UNWRAP_PRIM(opt1, v1_out);
+	u64 v1_out = UNWRAP_VALUE(opt1, v1_out);
 	assert_eq(v1_out, 10);
 
 	Option opt2 = None;
@@ -279,7 +279,7 @@ MyTest(core, test_complex) {
 	Result x4_out = UNWRAP(x5_out, Result);
 	Result x3_out = UNWRAP(x4_out, Result);
 	Result x2_out = UNWRAP(x3_out, Result);
-	u32 x1_out = UNWRAP_PRIM(x2_out, x1_out);
+	u32 x1_out = UNWRAP_VALUE(x2_out, x1_out);
 	assert_eq(x1_out, 123);
 
 	return Ok(_());
@@ -322,7 +322,7 @@ MyTest(core, test_string_core) {
 	String s1 = STRING("abcdefghijklmnopqrstuvwxyz");
 
 	Result r2 = String_index_of_s(&s1, "def", 0);
-	i64 v2 = UNWRAP_PRIM(r2, v2);
+	i64 v2 = UNWRAP_VALUE(r2, v2);
 	assert_eq(v2, 3);
 
 	String s2 = STRING("abcdefghijklmnopqrstuvwxyzabc");
@@ -348,7 +348,7 @@ MyTest(core, test_string_core) {
 	assert_eq_str(unwrap(&sub), "def");
 
 	Result r3 = String_index_of_s(&s2, "abc", 1);
-	i64 v3 = UNWRAP_PRIM(r3, v3);
+	i64 v3 = UNWRAP_VALUE(r3, v3);
 	assert_eq(v3, 26);
 
 	return Ok(_());
@@ -880,7 +880,164 @@ MyTest(core, test_slab_data) {
 MyTest(core, test_slabs) {
 	SlabAllocator sa = SLABS(
 	    SlabDataConfig(10, 80, 100), SlabDataConfig(30, 40, 200),
-	    SlabDataConfig(30, 41, 200), Zeroed(true), SlabsPerResize(15));
+	    SlabDataConfig(31, 41, 200), Zeroed(true), SlabsPerResize(15));
+	char buf[10];
+	Slice slice = SLICE(buf, 10);
 
+	Result r1 = SlabAllocator_allocate(&sa, &slice, 10);
+	Option o1 = TRY(r1, o1);
+	assert(IS_SOME(o1));
+	u64 v1 = UNWRAP_VALUE(o1, v1);
+	assert_eq(v1, 0);
+	Result r2 = SlabAllocator_allocate(&sa, &slice, 10);
+	Option o2 = TRY(r2, o2);
+	assert(IS_SOME(o2));
+	u64 v2 = UNWRAP_VALUE(o2, v2);
+	assert_eq(v2, 1);
+	Result r3 = SlabAllocator_allocate(&sa, &slice, 10);
+	Option o3 = TRY(r3, o3);
+	assert(IS_SOME(o3));
+	u64 v3 = UNWRAP_VALUE(o3, v3);
+	assert_eq(v3, 2);
+
+	char *ref;
+
+	Result r4 = SlabAllocator_get(&sa, &slice, 2);
+	assert(IS_OK(r4));
+	assert_eq(len(&slice), 10);
+	ref = GET(Slice, &slice, ref);
+	ref[0] = 'a';
+	ref[1] = 'b';
+	ref[2] = 'c';
+
+	Result r5 = SlabAllocator_get(&sa, &slice, 1);
+	assert(IS_OK(r5));
+	assert_eq(len(&slice), 10);
+	ref = GET(Slice, &slice, ref);
+	ref[0] = '1';
+	ref[1] = '2';
+	ref[2] = '3';
+
+	Result r6 = SlabAllocator_get(&sa, &slice, 2);
+	assert(IS_OK(r6));
+	assert_eq(len(&slice), 10);
+	ref = GET(Slice, &slice, ref);
+	assert_eq(ref[0], 'a');
+	assert_eq(ref[1], 'b');
+	assert_eq(ref[2], 'c');
+
+	Result r7 = SlabAllocator_get(&sa, &slice, 1);
+	assert(IS_OK(r7));
+	assert_eq(len(&slice), 10);
+	ref = GET(Slice, &slice, ref);
+	assert_eq(ref[0], '1');
+	assert_eq(ref[1], '2');
+	assert_eq(ref[2], '3');
+
+	Result r8 = SlabAllocator_free(&sa, 2);
+	TRYU(r8);
+
+	Result r9 = SlabAllocator_allocate(&sa, &slice, 10);
+	Option o9 = TRY(r9, o9);
+	assert(IS_SOME(o9));
+	u64 v9 = UNWRAP_VALUE(o9, v9);
+	assert_eq(v9, 2);
+
+	Result r10 = SlabAllocator_allocate(&sa, &slice, 10);
+	Option o10 = TRY(r10, o10);
+	assert(IS_SOME(o10));
+	u64 v10 = UNWRAP_VALUE(o10, v10);
+	assert_eq(v10, 3);
+
+	return Ok(_());
+}
+
+// create a Sortable class implementing the CMP (compare) trait (sort by 'id')
+CLASS(SortableTest, FIELD(u64, id) FIELD(String, name))
+// require implementation of the CMP trait.
+IMPL(SortableTest, TRAIT_CMP)
+#define SortableTest DEFINE_CLASS(SortableTest)
+
+// define GETTERs for both name and id
+GETTER(SortableTest, name)
+GETTER(SortableTest, id)
+
+// cleanup function cleans up the name
+void SortableTest_cleanup(SortableTest *ptr) {
+	// the cleanup function for string will automatally deallocate the
+	// String when name goes out of scope.
+	String name = GET(SortableTest, ptr, name);
+}
+
+// As required by TRAIT_CMP, we implement the 'cmp' function. Name must be
+// <class name>_cmp with the specified signature from the TRAIT definition:
+// #define TRAIT_CMP(T) \
+// TRAIT_REQUIRED(T, OrdOptions, cmp, const void *a, const void *b)
+OrdOptions SortableTest_cmp(const void *a, const void *b) {
+	u64 id1 = GET(SortableTest, a, id); // call getter for first object
+	u64 id2 = GET(SortableTest, b, id); // call getter for second object
+
+	// our value is less than the compared value so return LessThan
+	if (id1 < id2)
+		return LessThan;
+	// our value is greater than the compared value so return GreaterThan
+	if (id1 > id2)
+		return GreaterThan;
+	// otherwise it must be equal
+	return EqualTo;
+}
+
+// obtain the index of the matched value. We know all these are present
+// so we can just return the index. In other cases we could check that
+// the Option value 'res' is none by using the IS_NONE macro
+u64 get_index_binsearch(SortableTestPtr *value, SortableTest *arr, u64 len) {
+	// first call the binsearch function on our array with our specified
+	// length. We're tying to find 'value'.
+	Result r1 = binsearch(arr, len, (Object *)value);
+	// We expect that the Result r1 will be of the variant Ok so we call
+	// the EXPECT macro which panics if the Result is an error.
+	Option res = EXPECT(r1, res);
+	// Unwrap the return value and return it
+	u64 ret = UNWRAP_VALUE(res, ret);
+	return ret;
+}
+
+MyTest(core, test_binsearch) {
+	// declare an array. The type SortableTestPtr is used. This is the same
+	// as SortableTest, but it does not include the cleanup attribute which
+	// would not be allowed to be specified in this situation because we are
+	// declaring an array here.
+	SortableTestPtr arr[5];
+
+	// create 5 example SortableTest elements in unsorted order.
+	// Note about lifetimes. Since SortableTest does declare
+	// the cleanup attribute, the array must not be used after these
+	// 5 instances go out of scope. This is the user's responsibility to
+	// manage.
+	SortableTest t1 = BUILD(SortableTest, 1, STRING("Chris"));
+	SortableTest t2 = BUILD(SortableTest, 3, STRING("Joe"));
+	SortableTest t3 = BUILD(SortableTest, 2, STRING("Sam"));
+	SortableTest t4 = BUILD(SortableTest, 5, STRING("Jane"));
+	SortableTest t5 = BUILD(SortableTest, 4, STRING("Jenny"));
+	arr[0] = t1;
+	arr[1] = t2;
+	arr[2] = t3;
+	arr[3] = t4;
+	arr[4] = t5;
+
+	// Since we implement the TRAIT_CMP trait for SortableTest, we can call
+	// myqsort on an array of this type.
+	myqsort(arr, 5);
+
+	// The updated order should be Chris (id=1), Sam (id=2), Joe (id=3),
+	// Jenny (id=4), Jane (id=5). The below assertions verify that myqsort
+	// worked and that binary search also worked.
+	assert_eq(get_index_binsearch(&t1, arr, 5), 0);
+	assert_eq(get_index_binsearch(&t2, arr, 5), 2);
+	assert_eq(get_index_binsearch(&t3, arr, 5), 1);
+	assert_eq(get_index_binsearch(&t4, arr, 5), 4);
+	assert_eq(get_index_binsearch(&t5, arr, 5), 3);
+
+	// Return the UNIT type on completion of the test
 	return Ok(_());
 }

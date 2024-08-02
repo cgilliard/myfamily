@@ -58,7 +58,7 @@ typedef struct {
 
 void sort_vtable(Vtable *table);
 bool implements(void *obj, const char *name);
-void *find_fn(Object *obj, const char *name);
+void *find_fn(const Object *obj, const char *name);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
 void vtable_override(Vtable *table, VtableEntry entry);
 void vtable_cleanup(Vtable *table);
@@ -87,8 +87,8 @@ void vtable_cleanup(Vtable *table);
 
 #define GETTER(name, field_name)                                               \
 	MEMBER_TYPE(name, CAT(_, field_name)) *                                \
-	    CAT(name##_, CAT(get_, field_name))(name##Ptr * self) {            \
-		return &self->CAT(_, field_name);                              \
+	    CAT(name##_, CAT(get_, field_name))(const void *self) {            \
+		return &((name##Ptr *)self)->CAT(_, field_name);               \
 	}
 
 #define SETTER(name, field_name)                                               \
@@ -99,7 +99,7 @@ void vtable_cleanup(Vtable *table);
 	}
 #define GETTER_PROTO(name, field_name)                                         \
 	MEMBER_TYPE(name, CAT(_, field_name)) *                                \
-	    CAT(name##_, CAT(get_, field_name))(name##Ptr * self);
+	    CAT(name##_, CAT(get_, field_name))(const void *self);
 
 #define SETTER_PROTO(name, field_name)                                         \
 	static void CAT(name##_, CAT(set_, field_name))(                       \

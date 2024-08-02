@@ -14,6 +14,7 @@
 
 #include <core/result.h>
 #include <core/slabs.h>
+#include <limits.h>
 #include <stdlib.h>
 
 GETTER(SlabData, data)
@@ -39,27 +40,17 @@ bool SlabSizeCount_myclone(SlabSizeCount *dst, SlabSizeCount *src) {
 	return true;
 }
 
-void slab_write_ptr(char *bytes, u64 n) {
-	for (int i = 7; i >= 0; i--) {
-		bytes[i] = n & 0xFF;
-		n = n >> 8;
-	}
-}
-
-void slab_set_max(char *bytes) {
-	for (int i = 0; i < 8; i++)
-		bytes[i] = 0xFF;
-}
-
 Result slab_init_free_list(SlabData *sd, u64 slab_count, u64 slab_offset) {
 	SlabDataParams p = GET(SlabData, sd, sdp);
 	u64 slab_size = p.slab_size;
 	for (u64 i = slab_offset; i < slab_offset + slab_count; i++) {
 		char next_bytes[8];
 		if (i < (slab_offset + slab_count) - 1) {
-			slab_write_ptr(next_bytes, i + 1);
+			u64 next_u64 = i + 1;
+			memcpy(next_bytes, &next_u64, sizeof(u64));
 		} else {
-			slab_set_max(next_bytes);
+			u64 next_u64 = UINT64_MAX;
+			memcpy(next_bytes, &next_u64, sizeof(u64));
 		}
 		u64 offset_next = i * (8 + slab_size);
 		Slice slice = SLICE(next_bytes, 8);
@@ -78,10 +69,8 @@ void SlabData_cleanup(SlabData *ptr) {
 }
 
 OrdOptions SlabData_cmp(const void *a, const void *b) {
-	const SlabDataPtr *sa = a;
-	const SlabDataPtr *sb = b;
-	SlabDataParams params1 = sa->_sdp;
-	SlabDataParams params2 = sb->_sdp;
+	SlabDataParams params1 = GET(SlabData, a, sdp);
+	SlabDataParams params2 = GET(SlabData, b, sdp);
 	if (params1.slab_size < params2.slab_size)
 		return LessThan;
 	if (params1.slab_size > params2.slab_size)
@@ -89,7 +78,7 @@ OrdOptions SlabData_cmp(const void *a, const void *b) {
 	return EqualTo;
 }
 
-Result SlabData_init(SlabData *ptr, u64 initial_slabs, u64 slab_size,
+Result SlabData_init(SlabData *ptr, u64 slab_size, u64 initial_slabs,
 		     u64 max_slabs) {
 	void *d = mymalloc(slab_size * initial_slabs);
 	SET(SlabData, ptr, data, d);
@@ -211,7 +200,6 @@ Result SlabAllocator_build_impl(int num, va_list ptr) {
 	}
 
 	for (int i = 0; i < count; i++) {
-		printf("sz[%i] = %i\n", i, slab_data_arr[i]._sdp.slab_size);
 	}
 
 	SlabAllocator ret = BUILD(SlabAllocator, slab_data_arr, count, zeroed,
@@ -225,13 +213,81 @@ Result SlabAllocator_build(int n, ...) {
 	return SlabAllocator_build_impl(n, ptr);
 }
 
-Result SlabAllocator_allocate(SlabAllocator *ptr, Slice *slice,
-			      u64 size){todo()}
+Result SlabAllocator_allocate(SlabAllocator *ptr, Slice *slice, u64 sz) {
+	SlabDataPtr *arr = GET(SlabAllocator, ptr, slab_data_arr);
+	u64 count = GET(SlabAllocator, ptr, slab_data_arr_size);
+	SlabData value = BUILD(SlabData, NULL, {sz, 0, 0, 0});
+	Result r1 = binsearch(arr, count, (Object *)&value);
+	Option opt = TRY(r1, opt);
+	if (IS_NONE(opt)) {
+		// we don't have this size return None
+		return Ok(None);
+	} else {
+		char next_bytes[8];
+		u64 index = UNWRAP_VALUE(opt, index);
+		// shift and mask index as the last byte
+		u64 ret = arr[index]._sdp.free_list_head | (index << 56);
+		if (ret == UINT64_MAX) {
+			// TODO: check if we haven't hit our max slabs, if not
+			// resize.
+			return Ok(None);
+		} else {
+			u64 offset_next = ret * (8 + arr[index]._sdp.slab_size);
+			Slice slice_next = SLICE(next_bytes, 8);
+			Result r = SlabData_read(&arr[index], &slice_next,
+						 offset_next);
+			TRYU(r);
+			memcpy(&arr[index]._sdp.free_list_head, slice_next._ref,
+			       8);
+			Option opt = Some(ret);
+			return Ok(opt);
+		}
+	}
+}
 
-Result SlabAllocator_get(SlabAllocator *ptr, Slice *slice, u64 id){todo()}
+Result SlabAllocator_get(SlabAllocator *ptr, Slice *slice, u64 id) {
+	u64 index = (id >> 56) & 0xFF;
+	u64 rel = id & 0x00FFFFFFFFFFFFFF;
+	u64 count = GET(SlabAllocator, ptr, slab_data_arr_size);
+	if (index >= count) {
+		Error e =
+		    ERR(ILLEGAL_ARGUMENT,
+			"index: %llu greater than or equal to count: %llu",
+			index, count);
+		return Err(e);
+	}
+	SlabDataPtr *arr = GET(SlabAllocator, ptr, slab_data_arr);
+	SlabDataParams sdp = GET(SlabData, &arr[index], sdp);
+	SET(Slice, slice, ref,
+	    GET(SlabData, &arr[index], data) + rel * (8 + sdp.slab_size) + 8);
+	SET(Slice, slice, len, sdp.slab_size);
+
+	return Ok(_());
+}
 
 Result SlabAllocator_free(SlabAllocator *ptr, u64 id) {
-	todo()
+	u64 index = (id >> 56) & 0xFF;
+	u64 rel = id & 0x00FFFFFFFFFFFFFF;
+	u64 count = GET(SlabAllocator, ptr, slab_data_arr_size);
+	if (index >= count) {
+		Error e =
+		    ERR(ILLEGAL_ARGUMENT,
+			"index: %llu greater than or equal to count: %llu",
+			index, count);
+		return Err(e);
+	}
+
+	SlabDataPtr *arr = GET(SlabAllocator, ptr, slab_data_arr);
+
+	char next_bytes[8];
+	u64 offset_next = rel * (8 + arr[index]._sdp.slab_size);
+	Slice slice_next = SLICE(next_bytes, 8);
+	Result r = SlabData_reference(&arr[index], &slice_next, offset_next);
+	TRYU(r);
+	memcpy(slice_next._ref, &arr[index]._sdp.free_list_head, sizeof(u64));
+	arr[index]._sdp.free_list_head = rel;
+
+	return Ok(_());
 }
 
 void SlabAllocator_cleanup(SlabAllocator *ptr) {

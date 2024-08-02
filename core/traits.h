@@ -15,6 +15,7 @@
 #ifndef _CORE_TRAITS__
 #define _CORE_TRAITS__
 
+#include <core/option.h>
 #include <core/result.h>
 #include <core/traits_base.h>
 
@@ -34,6 +35,7 @@ Result append_impl(void *dst, void *src);
 Result append_s(void *dst, Object *src);
 Rc into_iter_impl(void *obj);
 void myqsort(void *arr, u64 len);
+Result binsearch(void *arr, u64 len, const Object *value);
 
 #define INTO_ITER(x)                                                           \
 	({                                                                     \

@@ -144,3 +144,25 @@ void myqsort(void *arr, u64 len) {
 	qsort(arr, len, size(&objarr[0]), myqsort_compare);
 }
 
+Result binsearch(void *arr, u64 len, const Object *value) {
+	Option ret = None;
+	if (len == 0)
+		return Ok(ret);
+	u64 left = 0;
+	u64 right = len - 1;
+	OrdOptions (*do_cmp)(const void *a, const void *b) =
+	    find_fn(value, "cmp");
+	while (left <= right) {
+		u64 mid = left + (right - left) / 2;
+		OrdOptions cmp = do_cmp(arr + size((void *)value) * mid, value);
+		if (cmp == EqualTo) {
+			ret = Some(mid);
+			break;
+		} else if (cmp == GreaterThan)
+			right = mid - 1;
+		else
+			left = mid + 1;
+	}
+
+	return Ok(ret);
+}

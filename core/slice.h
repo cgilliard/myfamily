@@ -25,6 +25,8 @@ IMPL(Slice, TRAIT_LEN)
 static GETTER(Slice, ref);
 static SETTER(Slice, ref);
 
+static SETTER(Slice, len);
+
 Slice Slice_build(void *ref, u64 size);
 
 #define SLICE(ref, size) Slice_build(ref, size)

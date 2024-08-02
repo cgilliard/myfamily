@@ -85,7 +85,7 @@ usize enum_value_usize(void *value);
 	    int8_t: enum_value_i8(e.value),                                    \
 	    int16_t: enum_value_i16(e.value),                                  \
 	    int32_t: enum_value_i32(e.value),                                  \
-	    int64_t: enum_value_i64(e.value),                                  \
+	    int64_t: enum_value_u64(e.value),                                  \
 	    __int128_t: enum_value_i128(e.value),                              \
 	    float: enum_value_f32(e.value),                                    \
 	    double: enum_value_f64(e.value),                                   \

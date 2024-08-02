@@ -38,7 +38,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			Error e = UNWRAP_ERR(x);                               \
 			return Err(e);                                         \
 		}                                                              \
-		UNWRAP_PRIM(x, v);                                             \
+		UNWRAP_VALUE(x, v);                                             \
 	})
 
 #define TRYU(x)                                                                \
@@ -56,7 +56,7 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 			print(&e);                                             \
 			panic("Expect on an error");                           \
 		}                                                              \
-		UNWRAP_PRIM(x, v);                                             \
+		UNWRAP_VALUE(x, v);                                             \
 	})
 
 #define OkR(x)                                                                 \
@@ -76,14 +76,14 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 #define UNWRAP(x, type)                                                        \
 	({                                                                     \
 		type##Ptr ret;                                                 \
-		ret = UNWRAP_PRIM(x, ret);                                     \
+		ret = UNWRAP_VALUE(x, ret);                                     \
 		if (strcmp(#type, CLASS_NAME(&ret)))                           \
 			panic("Expected [%s]. Found [%s].", #type,             \
 			      CLASS_NAME(&ret));                               \
 		ret;                                                           \
 	})
 
-#define UNWRAP_PRIM(x, v)                                                      \
+#define UNWRAP_VALUE(x, v)                                                      \
 	_Generic((v),                                                          \
 	    uint8_t: ({                                                        \
 			 if (IS_ERR(x))                                        \
