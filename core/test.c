@@ -878,14 +878,11 @@ MyTest(core, test_slab_data) {
 }
 
 MyTest(core, test_resize) {
-	SlabAllocator sa = SLABS(SlabDataConfig(100, 10, 30), Zeroed(false),
+	SlabAllocator sa = SLABS(SlabDataConfig(100, 10, 35), Zeroed(false),
 				 SlabsPerResize(10));
 
-	char buf[100];
-	Slice slice = SLICE(buf, 100);
-
-	// initially 10 are allocated, but max is 30 so we can allocate 30 slabs
-	for (u64 i = 0; i < 30; i++) {
+	// initially 10 are allocated, but max is 35 so we can allocate 35 slabs
+	for (u64 i = 0; i < 35; i++) {
 		Result r = SlabAllocator_allocate(&sa, 100);
 		Option o = TRY(r, o);
 		assert(IS_SOME(o));
@@ -893,6 +890,7 @@ MyTest(core, test_resize) {
 		assert_eq(id, i);
 	}
 
+	// attempt on 36th time returns None
 	Result r = SlabAllocator_allocate(&sa, 100);
 	Option o = TRY(r, o);
 	assert(IS_NONE(o));

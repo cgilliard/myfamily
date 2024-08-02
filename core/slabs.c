@@ -126,19 +126,13 @@ Result SlabData_resize(SlabData *ptr, u64 slabs) {
 	u64 cur_slabs = p.slab_count;
 	u64 slab_size = p.slab_size;
 
-	void *nd = myrealloc(d, slabs * (slab_size + 8));
+	void *nd = myrealloc(d, (cur_slabs + slabs) * (slab_size + 8));
 	if (nd == NULL) {
 		return STATIC_ALLOC_RESULT;
 	}
 	SET(SlabData, ptr, data, nd);
 
-	if (slabs > cur_slabs) {
-		Result r =
-		    slab_init_free_list(ptr, slabs - cur_slabs, cur_slabs);
-		TRYU(r);
-	}
-
-	return Ok(_());
+	return slab_init_free_list(ptr, slabs, cur_slabs);
 }
 
 Result SlabAllocator_build_impl(int num, va_list ptr) {
@@ -231,9 +225,7 @@ Result SlabAllocator_allocate(SlabAllocator *ptr, u64 sz) {
 		// shift and mask index as the last byte
 		u64 ret = arr[index]._sdp.free_list_head | (index << 56);
 		if (ret == UINT64_MAX) {
-			// TODO: check if we haven't hit our max slabs, if not
-			// resize.
-
+			// check if we haven't hit our max slabs, if not resize
 			u64 max_slabs = arr[index]._sdp.max_slabs;
 			u64 slab_count = arr[index]._sdp.slab_count;
 			u64 slabs_per_resize =
@@ -244,12 +236,12 @@ Result SlabAllocator_allocate(SlabAllocator *ptr, u64 sz) {
 				u64 resize_count = slabs_per_resize;
 				slab_count += slabs_per_resize;
 				if (slab_count > max_slabs) {
-					resize_count = max_slabs - slab_count;
+					resize_count = max_slabs - cur_slabs;
 					slab_count = max_slabs;
 				}
 
-				Result r2 = slab_init_free_list(
-				    &arr[index], resize_count, cur_slabs);
+				Result r2 =
+				    SlabData_resize(&arr[index], resize_count);
 				TRYU(r2);
 				arr[index]._sdp.slab_count = slab_count;
 				arr[index]._sdp.free_list_head = cur_slabs;
