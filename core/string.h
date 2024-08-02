@@ -67,7 +67,7 @@ IMPL(String, TRAIT_STRING_CORE)
 			Error _err__ = UNWRAP_ERR(_r88__);                     \
 			return Err(_err__);                                    \
 		}                                                              \
-		i8 _rr99__ = UNWRAP_VALUE(_r88__, _rr99__);                     \
+		i8 _rr99__ = UNWRAP_VALUE(_r88__, _rr99__);                    \
 		_rr99__;                                                       \
 	})
 
@@ -78,7 +78,7 @@ IMPL(String, TRAIT_STRING_CORE)
 			Error _err__ = UNWRAP_ERR(_r88__);                     \
 			return ErrP(_err__);                                   \
 		}                                                              \
-		i8 _rr99__ = UNWRAP_VALUE(_r88__, _rr99__);                     \
+		i8 _rr99__ = UNWRAP_VALUE(_r88__, _rr99__);                    \
 		_rr99__;                                                       \
 	})
 

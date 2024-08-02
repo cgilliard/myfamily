@@ -44,8 +44,7 @@ ENUM(SlabAllocatorOption,
 
 #define TRAIT_SLAB_ALLOCATOR(T)                                                \
 	TRAIT_REQUIRED(T, Result, build, int num, ...)                         \
-	TRAIT_REQUIRED(T, Result, allocate, T##Ptr *ptr, Slice *slice,         \
-		       u64 size)                                               \
+	TRAIT_REQUIRED(T, Result, allocate, T##Ptr *ptr, u64 size)             \
 	TRAIT_REQUIRED(T, Result, get, T##Ptr *ptr, Slice *slice, u64 id)      \
 	TRAIT_REQUIRED(T, Result, free, T##Ptr *ptr, u64 id)
 

@@ -26,6 +26,8 @@ SETTER(SlabData, sdp)
 GETTER(SlabAllocator, slab_data_arr);
 SETTER(SlabAllocator, slab_data_arr);
 GETTER(SlabAllocator, slab_data_arr_size);
+GETTER(SlabAllocator, zeroed);
+GETTER(SlabAllocator, slabs_per_resize);
 
 GETTER(SlabSizeCount, slab_size);
 GETTER(SlabSizeCount, slab_count);
@@ -213,8 +215,9 @@ Result SlabAllocator_build(int n, ...) {
 	return SlabAllocator_build_impl(n, ptr);
 }
 
-Result SlabAllocator_allocate(SlabAllocator *ptr, Slice *slice, u64 sz) {
+Result SlabAllocator_allocate(SlabAllocator *ptr, u64 sz) {
 	SlabDataPtr *arr = GET(SlabAllocator, ptr, slab_data_arr);
+	bool zeroed = GET(SlabAllocator, ptr, zeroed);
 	u64 count = GET(SlabAllocator, ptr, slab_data_arr_size);
 	SlabData value = BUILD(SlabData, NULL, {sz, 0, 0, 0});
 	Result r1 = binsearch(arr, count, (Object *)&value);
@@ -230,18 +233,49 @@ Result SlabAllocator_allocate(SlabAllocator *ptr, Slice *slice, u64 sz) {
 		if (ret == UINT64_MAX) {
 			// TODO: check if we haven't hit our max slabs, if not
 			// resize.
-			return Ok(None);
-		} else {
-			u64 offset_next = ret * (8 + arr[index]._sdp.slab_size);
-			Slice slice_next = SLICE(next_bytes, 8);
-			Result r = SlabData_read(&arr[index], &slice_next,
-						 offset_next);
-			TRYU(r);
-			memcpy(&arr[index]._sdp.free_list_head, slice_next._ref,
-			       8);
-			Option opt = Some(ret);
-			return Ok(opt);
+
+			u64 max_slabs = arr[index]._sdp.max_slabs;
+			u64 slab_count = arr[index]._sdp.slab_count;
+			u64 slabs_per_resize =
+			    GET(SlabAllocator, ptr, slabs_per_resize);
+
+			u64 cur_slabs = slab_count;
+			if (slab_count < max_slabs) {
+				u64 resize_count = slabs_per_resize;
+				slab_count += slabs_per_resize;
+				if (slab_count > max_slabs) {
+					resize_count = max_slabs - slab_count;
+					slab_count = max_slabs;
+				}
+
+				Result r2 = slab_init_free_list(
+				    &arr[index], resize_count, cur_slabs);
+				TRYU(r2);
+				arr[index]._sdp.slab_count = slab_count;
+				arr[index]._sdp.free_list_head = cur_slabs;
+				ret = arr[index]._sdp.free_list_head |
+				      (index << 56);
+			}
+
+			if (ret == UINT64_MAX)
+				return Ok(None);
 		}
+
+		u64 offset_next = ret * (8 + arr[index]._sdp.slab_size);
+		Slice slice_next = SLICE(next_bytes, 8);
+		Result r = SlabData_read(&arr[index], &slice_next, offset_next);
+		TRYU(r);
+		memcpy(&arr[index]._sdp.free_list_head, slice_next._ref, 8);
+		Option opt = Some(ret);
+
+		if (zeroed) {
+			u64 start_data = offset_next + 8;
+			for (u64 i = 0; i < arr[index]._sdp.slab_size; i++) {
+				((char *)arr[index]._data)[i + start_data] = 0;
+			}
+		}
+
+		return Ok(opt);
 	}
 }
 

@@ -877,6 +877,29 @@ MyTest(core, test_slab_data) {
 	return Ok(_());
 }
 
+MyTest(core, test_resize) {
+	SlabAllocator sa = SLABS(SlabDataConfig(100, 10, 30), Zeroed(false),
+				 SlabsPerResize(10));
+
+	char buf[100];
+	Slice slice = SLICE(buf, 100);
+
+	// initially 10 are allocated, but max is 30 so we can allocate 30 slabs
+	for (u64 i = 0; i < 30; i++) {
+		Result r = SlabAllocator_allocate(&sa, 100);
+		Option o = TRY(r, o);
+		assert(IS_SOME(o));
+		u64 id = UNWRAP_VALUE(o, id);
+		assert_eq(id, i);
+	}
+
+	Result r = SlabAllocator_allocate(&sa, 100);
+	Option o = TRY(r, o);
+	assert(IS_NONE(o));
+
+	return Ok(_());
+}
+
 MyTest(core, test_slabs) {
 	SlabAllocator sa = SLABS(
 	    SlabDataConfig(10, 80, 100), SlabDataConfig(30, 40, 200),
@@ -884,17 +907,17 @@ MyTest(core, test_slabs) {
 	char buf[10];
 	Slice slice = SLICE(buf, 10);
 
-	Result r1 = SlabAllocator_allocate(&sa, &slice, 10);
+	Result r1 = SlabAllocator_allocate(&sa, 10);
 	Option o1 = TRY(r1, o1);
 	assert(IS_SOME(o1));
 	u64 v1 = UNWRAP_VALUE(o1, v1);
 	assert_eq(v1, 0);
-	Result r2 = SlabAllocator_allocate(&sa, &slice, 10);
+	Result r2 = SlabAllocator_allocate(&sa, 10);
 	Option o2 = TRY(r2, o2);
 	assert(IS_SOME(o2));
 	u64 v2 = UNWRAP_VALUE(o2, v2);
 	assert_eq(v2, 1);
-	Result r3 = SlabAllocator_allocate(&sa, &slice, 10);
+	Result r3 = SlabAllocator_allocate(&sa, 10);
 	Option o3 = TRY(r3, o3);
 	assert(IS_SOME(o3));
 	u64 v3 = UNWRAP_VALUE(o3, v3);
@@ -937,13 +960,21 @@ MyTest(core, test_slabs) {
 	Result r8 = SlabAllocator_free(&sa, 2);
 	TRYU(r8);
 
-	Result r9 = SlabAllocator_allocate(&sa, &slice, 10);
+	Result r9 = SlabAllocator_allocate(&sa, 10);
 	Option o9 = TRY(r9, o9);
 	assert(IS_SOME(o9));
 	u64 v9 = UNWRAP_VALUE(o9, v9);
 	assert_eq(v9, 2);
 
-	Result r10 = SlabAllocator_allocate(&sa, &slice, 10);
+	// since we are zeroed, these values should all be 0.
+	Result rr = SlabAllocator_get(&sa, &slice, 2);
+	assert(IS_OK(rr));
+	ref = GET(Slice, &slice, ref);
+	assert_eq(ref[0], 0);
+	assert_eq(ref[1], 0);
+	assert_eq(ref[2], 0);
+
+	Result r10 = SlabAllocator_allocate(&sa, 10);
 	Option o10 = TRY(r10, o10);
 	assert(IS_SOME(o10));
 	u64 v10 = UNWRAP_VALUE(o10, v10);
