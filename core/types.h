@@ -15,7 +15,6 @@
 #ifndef _CORE_TYPES__
 #define _CORE_TYPES__
 
-#include <core/cleanup.h>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdbool.h>
