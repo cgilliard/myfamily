@@ -1,4 +1,4 @@
-OBJS := rand.o 
+OBJS := rand.o slabs.o
 
 TEST_OBJS := $(OBJS)
 

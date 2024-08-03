@@ -12,29 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_TYPES__
-#define _CORE_TYPES__
+#ifndef _CORE_MYMALLOC__
+#define _CORE_MYMALLOC__
 
-#include <inttypes.h>
-#include <stdarg.h>
-#include <stdbool.h>
+#include <core/slabs.h>
 #include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
 
-#define u8 uint8_t
-#define i8 int8_t
-#define u16 uint16_t
-#define i16 int16_t
-#define u32 uint32_t
-#define i32 int32_t
-#define u64 uint64_t
-#define i64 int64_t
-#define u128 __uint128_t
-#define i128 __int128_t
-#define f64 double
-#define f32 float
-#define usize uintptr_t
-#define isize intptr_t
+typedef struct ResourceStats {
+	u64 malloc_sum;
+	u64 realloc_sum;
+	u64 free_sum;
+	u64 fopen_sum;
+	u64 fclose_sum;
+} ResourceStats;
 
-#endif // _CORE_TYPES__
+void *mymalloc(u64 size);
+void *myrealloc(void *ptr, u64 size);
+void myfree(void *ptr);
+FILE *myfopen(char *path, const char *mode);
+void myfclose(FILE *ptr);
+u64 mymalloc_sum();
+u64 myrealloc_sum();
+u64 myfree_sum();
+u64 myfopen_sum();
+u64 myfclose_sum();
+
+#endif // _CORE_MYMALLOC__
