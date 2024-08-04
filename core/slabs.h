@@ -45,6 +45,7 @@ typedef struct SlabDataPtr SlabDataPtr;
 	    __attribute__((warn_unused_result, cleanup(slab_data_cleanup)))
 
 typedef struct Slab {
+	u64 id;
 	void *data;
 	u64 len;
 } Slab;

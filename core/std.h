@@ -12,25 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_MYMALLOC__
-#define _CORE_MYMALLOC__
-
+#include <core/mymalloc.h>
+#include <core/rand.h>
 #include <core/slabs.h>
-#include <stddef.h>
-
-typedef struct ResourceStats {
-	u64 malloc_sum;
-	u64 realloc_sum;
-	u64 free_sum;
-	u64 fopen_sum;
-	u64 fclose_sum;
-} ResourceStats;
-
-int mymalloc(SlabAllocator *sa, Slab *slab, u64 size);
-int myrealloc(SlabAllocator *sa, Slab *slab, u64 size);
-int myfree(SlabAllocator *sa, Slab *slab);
-FILE *myfopen(const char *path, const char *mode);
-void myfclose(FILE *ptr);
-ResourceStats get_resource_stats();
-
-#endif // _CORE_MYMALLOC__

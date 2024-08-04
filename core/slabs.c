@@ -195,6 +195,7 @@ int slab_allocator_get(SlabAllocator *ptr, Slab *slab, u64 id) {
 	if (index >= ptr->slab_data_arr_size)
 		return -1;
 	slab->len = ptr->slab_data_arr[index].sdp.slab_size;
+	slab->id = id;
 	u64 offset = rel * (8 + ptr->slab_data_arr[index].sdp.slab_size) + 8;
 	slab_data_access(&ptr->slab_data_arr[index], slab, offset);
 
