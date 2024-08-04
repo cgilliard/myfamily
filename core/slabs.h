@@ -59,6 +59,7 @@ typedef struct SlabAllocatorPtr {
 	SlabDataPtr *slab_data_arr;
 	u64 slab_data_arr_size;
 	bool zeroed;
+	struct SlabAllocatorPtr *prev;
 } SlabAllocatorPtr;
 #define SlabAllocator                                                          \
 	SlabAllocatorPtr __attribute__((warn_unused_result,                    \

@@ -103,11 +103,15 @@ int slab_allocator_build(SlabAllocator *ptr, bool zeroed, int slab_data_count,
 	ptr->slab_data_arr = malloc(sizeof(SlabDataPtr) * slab_data_count);
 	ptr->slab_data_arr_size = slab_data_count;
 	ptr->zeroed = zeroed;
+	ptr->prev = NULL;
 	va_list sdptr;
 	va_start(sdptr, slab_data_count);
 	for (u64 i = 0; i < slab_data_count; i++) {
 		SlabDataParams sdp = va_arg(sdptr, SlabDataParams);
-		sdp.free_list_head = 0;
+		if (sdp.slab_count == 0)
+			sdp.free_list_head = UINT64_MAX;
+		else
+			sdp.free_list_head = 0;
 		slab_data_build(&ptr->slab_data_arr[i], sdp);
 	}
 	va_end(sdptr);

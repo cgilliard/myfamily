@@ -64,7 +64,8 @@ void vtable_add_entry(Vtable *table, VtableEntry entry);
 void vtable_override(Vtable *table, VtableEntry entry);
 void vtable_cleanup(Vtable *table);
 
-#define DEFINE_CLASS(x) x##Ptr Cleanup(x##_cleanup_impl)
+#define DEFINE_CLASS(x)                                                        \
+	x##Ptr __attribute__((warn_unused_result, cleanup(x##_cleanup_impl)))
 
 #define NEXT_ID __COUNTER__
 #define NO_CLEANUP(obj) ((Object *)&obj)->vdata.no_cleanup = true

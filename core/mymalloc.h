@@ -22,19 +22,26 @@
 extern _Thread_local SlabAllocator TL_SLAB_ALLOCATOR;
 extern _Thread_local SlabAllocatorPtr *local_slab_allocator;
 
-static void set_local_slab_allocator(SlabAllocatorPtr *ptr) {
+static void set_local_slab_allocator(SlabAllocatorPtr *ptr, bool is_unset) {
+	if (ptr && !is_unset)
+		ptr->prev = local_slab_allocator;
 	local_slab_allocator = ptr;
 }
 
-#define SLAB_ALLOCATOR(sa) set_local_slab_allocator(sa)
-#define UNSET_SLAB_ALLOCATOR() set_local_slab_allocator(NULL)
+#define SLAB_ALLOCATOR(sa) set_local_slab_allocator(sa, false)
+#define UNSET_SLAB_ALLOCATOR()                                                 \
+	({                                                                     \
+		if (local_slab_allocator)                                      \
+			set_local_slab_allocator(local_slab_allocator->prev,   \
+						 true);                        \
+		else                                                           \
+			set_local_slab_allocator(NULL, true);                  \
+	})
 
 #define SPMAX(x)                                                               \
 	SLAB_PARAMS(SlabSize(x), SlabCount(0), MaxSlabs(UINT64_MAX),           \
 		    SlabsPerResize(10))
-
 static void __attribute__((constructor)) init_slab_allocator() {
-
 	TL_SLAB_ALLOCATOR = SLABS(
 	    false, SPMAX(1), SPMAX(2), SPMAX(3), SPMAX(4), SPMAX(5), SPMAX(6),
 	    SPMAX(7), SPMAX(8), SPMAX(9), SPMAX(10), SPMAX(11), SPMAX(12),
@@ -60,6 +67,7 @@ typedef struct ResourceStats {
 	u64 free_sum;
 	u64 fopen_sum;
 	u64 fclose_sum;
+	u64 slab_misses;
 } ResourceStats;
 
 int mymalloc(Slab *slab, u64 size);

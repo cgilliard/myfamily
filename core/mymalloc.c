@@ -15,16 +15,17 @@
 #include <core/mymalloc.h>
 #include <string.h>
 
-_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
+_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0, 0};
 
-_Thread_local SlabAllocator TL_SLAB_ALLOCATOR;
+_Thread_local SlabAllocatorPtr TL_SLAB_ALLOCATOR;
 _Thread_local SlabAllocatorPtr *local_slab_allocator;
 
 int mymalloc(Slab *slab, u64 size) {
 	// get correct slab allocator
 	SlabAllocatorPtr *sa = local_slab_allocator;
-	if (!sa)
+	if (!sa) {
 		sa = &TL_SLAB_ALLOCATOR;
+	}
 
 	int ret = 0;
 
@@ -32,6 +33,7 @@ int mymalloc(Slab *slab, u64 size) {
 	u64 alloc = slab_allocator_allocate(sa, size);
 
 	if (alloc == UINT64_MAX) {
+		THREAD_LOCAL_RESOURCE_STATS.slab_misses++;
 		// could not allocate the slab. Try malloc.
 		slab->data = malloc(size);
 		if (slab->data == NULL)

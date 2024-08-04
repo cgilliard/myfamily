@@ -14,6 +14,8 @@
 
 #include <core/std.h>
 #include <criterion/criterion.h>
+#include <pthread.h>
+#include <unistd.h>
 
 Test(core, slab_data) {
 	SlabData sd;
@@ -289,12 +291,116 @@ Test(core, test_0size_initial_sa) {
 		SLAB_ALLOCATOR(&sa);
 
 		Slab slab1;
+		slab1.data = 0;
 		cr_assert_eq(mymalloc(&slab1, 1), 0);
 		cr_assert_eq(slab1.id, 0);
 		cr_assert_eq(slab1.len, 1);
+		cr_assert_neq(slab1.data, 0);
+
 		myfree(&slab1);
 		UNSET_SLAB_ALLOCATOR();
 	}
 	ResourceStats end_stats = get_resource_stats();
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_nested_slabs) {
+	ResourceStats init_stats = get_resource_stats();
+
+	{
+		SlabAllocator sa1 = SLABS(
+		    false, SLAB_PARAMS(SlabSize(10), SlabCount(10),
+				       MaxSlabs(100), SlabsPerResize(10)));
+		SLAB_ALLOCATOR(&sa1);
+
+		Slab slab1;
+		cr_assert_eq(mymalloc(&slab1, 10), 0);
+		cr_assert_eq(slab1.id, 0);
+		cr_assert_eq(slab1.len, 10);
+		myfree(&slab1);
+
+		{
+
+			SlabAllocator sa2 = SLABS(
+			    false, SLAB_PARAMS(SlabSize(20), SlabCount(10),
+					       MaxSlabs(100)));
+			SLAB_ALLOCATOR(&sa2);
+
+			Slab slab2;
+			slab2.data = 0;
+			cr_assert_eq(mymalloc(&slab2, 20), 0);
+			cr_assert_eq(slab2.id, 0);
+			cr_assert_eq(slab2.len, 20);
+			myfree(&slab2);
+
+			cr_assert_eq(mymalloc(&slab2, 10), 0);
+			cr_assert_neq(slab2.id, 0);
+			cr_assert_eq(slab2.len, 10);
+			myfree(&slab2);
+
+			UNSET_SLAB_ALLOCATOR();
+		}
+
+		cr_assert_eq(mymalloc(&slab1, 10), 0);
+		cr_assert_eq(slab1.id, 0);
+		cr_assert_eq(slab1.len, 10);
+		myfree(&slab1);
+
+		cr_assert_eq(mymalloc(&slab1, 20), 0);
+		cr_assert_neq(slab1.id, 0);
+		cr_assert_eq(slab1.len, 20);
+		myfree(&slab1);
+
+		UNSET_SLAB_ALLOCATOR();
+	}
+
+	Slab slab;
+	slab.data = 0;
+	cr_assert_eq(mymalloc(&slab, 1), 0);
+	cr_assert_eq(slab.id, 0);
+	cr_assert_eq(slab.len, 1);
+	myfree(&slab);
+
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+CLASS(MyClass, FIELD(u64, val))
+#define MyClass DEFINE_CLASS(MyClass)
+
+void MyClass_cleanup(MyClass *ptr) {}
+
+GETTER(MyClass, val)
+
+Test(core, test_class) {
+	MyClass x = BUILD(MyClass, 1);
+	u64 val = GET(MyClass, &x, val);
+	cr_assert_eq(val, 1);
+	ResourceStats rs = get_resource_stats();
+}
+
+void *myThreadFun(void *vargp) {
+	sleep(1);
+
+	Slab slab;
+	slab.data = 0;
+	cr_assert_eq(mymalloc(&slab, 1), 0);
+	printf("id=%llu %p, %llu\n", slab.id, slab.data, slab.len);
+
+	printf("Printing from Thread \n");
+	return NULL;
+}
+
+Test(core, test_threads) {
+	Slab slab;
+	slab.data = 0;
+	cr_assert_eq(mymalloc(&slab, 1), 0);
+	cr_assert_eq(slab.id, 0);
+	cr_assert_eq(slab.len, 1);
+
+	pthread_t thread_id;
+	printf("Before Thread\n");
+	pthread_create(&thread_id, NULL, myThreadFun, NULL);
+	pthread_join(thread_id, NULL);
+	printf("After Thread\n");
 }
