@@ -380,27 +380,37 @@ Test(core, test_class) {
 }
 
 void *myThreadFun(void *vargp) {
-	sleep(1);
+	ResourceStats init_stats = get_resource_stats();
 
-	Slab slab;
-	slab.data = 0;
-	cr_assert_eq(mymalloc(&slab, 1), 0);
-	printf("id=%llu %p, %llu\n", slab.id, slab.data, slab.len);
-
-	printf("Printing from Thread \n");
+	{
+		Slab slab;
+		slab.data = 0;
+		cr_assert_eq(mymalloc(&slab, 1), 0);
+		cr_assert_eq(slab.len, 1);
+		cr_assert_eq(slab.id, 0);
+		cr_assert_neq(slab.data, 0);
+		cr_assert_eq(myfree(&slab), 0);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 	return NULL;
 }
 
 Test(core, test_threads) {
-	Slab slab;
-	slab.data = 0;
-	cr_assert_eq(mymalloc(&slab, 1), 0);
-	cr_assert_eq(slab.id, 0);
-	cr_assert_eq(slab.len, 1);
+	ResourceStats init_stats = get_resource_stats();
+	{
+		Slab slab;
+		slab.data = 0;
+		cr_assert_eq(mymalloc(&slab, 1), 0);
+		cr_assert_eq(slab.id, 0);
+		cr_assert_eq(slab.len, 1);
 
-	pthread_t thread_id;
-	printf("Before Thread\n");
-	pthread_create(&thread_id, NULL, myThreadFun, NULL);
-	pthread_join(thread_id, NULL);
-	printf("After Thread\n");
+		pthread_t thread_id;
+		pthread_create(&thread_id, NULL, myThreadFun, NULL);
+		pthread_join(thread_id, NULL);
+
+		cr_assert_eq(myfree(&slab), 0);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }

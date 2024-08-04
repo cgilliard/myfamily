@@ -104,6 +104,7 @@ int slab_allocator_build(SlabAllocator *ptr, bool zeroed, int slab_data_count,
 	ptr->slab_data_arr_size = slab_data_count;
 	ptr->zeroed = zeroed;
 	ptr->prev = NULL;
+	ptr->initialized = true;
 	va_list sdptr;
 	va_start(sdptr, slab_data_count);
 	for (u64 i = 0; i < slab_data_count; i++) {

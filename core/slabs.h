@@ -56,6 +56,7 @@ int slab_data_access(SlabData *ptr, Slab *slab, u64 offset);
 int slab_data_resize(SlabData *ptr);
 
 typedef struct SlabAllocatorPtr {
+	bool initialized;
 	SlabDataPtr *slab_data_arr;
 	u64 slab_data_arr_size;
 	bool zeroed;
@@ -64,6 +65,8 @@ typedef struct SlabAllocatorPtr {
 #define SlabAllocator                                                          \
 	SlabAllocatorPtr __attribute__((warn_unused_result,                    \
 					cleanup(slab_allocator_cleanup)))
+
+#define SLAB_ALLOCATOR_UNINIT {false}
 
 void slab_allocator_cleanup(SlabAllocator *ptr);
 int slab_allocator_build(SlabAllocator *ptr, bool zeroed, int slab_data_count,

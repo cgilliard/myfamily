@@ -41,7 +41,7 @@ static void set_local_slab_allocator(SlabAllocatorPtr *ptr, bool is_unset) {
 #define SPMAX(x)                                                               \
 	SLAB_PARAMS(SlabSize(x), SlabCount(0), MaxSlabs(UINT64_MAX),           \
 		    SlabsPerResize(10))
-static void __attribute__((constructor)) init_slab_allocator() {
+static void init_tl_slab_allocator() {
 	TL_SLAB_ALLOCATOR = SLABS(
 	    false, SPMAX(1), SPMAX(2), SPMAX(3), SPMAX(4), SPMAX(5), SPMAX(6),
 	    SPMAX(7), SPMAX(8), SPMAX(9), SPMAX(10), SPMAX(11), SPMAX(12),

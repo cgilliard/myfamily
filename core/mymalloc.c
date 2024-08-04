@@ -17,13 +17,15 @@
 
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0, 0};
 
-_Thread_local SlabAllocatorPtr TL_SLAB_ALLOCATOR;
+_Thread_local SlabAllocatorPtr TL_SLAB_ALLOCATOR = SLAB_ALLOCATOR_UNINIT;
 _Thread_local SlabAllocatorPtr *local_slab_allocator;
 
 int mymalloc(Slab *slab, u64 size) {
 	// get correct slab allocator
 	SlabAllocatorPtr *sa = local_slab_allocator;
 	if (!sa) {
+		if (!TL_SLAB_ALLOCATOR.initialized)
+			init_tl_slab_allocator();
 		sa = &TL_SLAB_ALLOCATOR;
 	}
 
@@ -59,8 +61,11 @@ int myfree(Slab *slab) {
 	// get correct slab allocator
 	// get correct slab allocator
 	SlabAllocatorPtr *sa = local_slab_allocator;
-	if (!sa)
+	if (!sa) {
+		if (!TL_SLAB_ALLOCATOR.initialized)
+			init_tl_slab_allocator();
 		sa = &TL_SLAB_ALLOCATOR;
+	}
 
 	int ret = 0;
 	if (slab->id == UINT64_MAX) {
@@ -85,8 +90,11 @@ int myfree(Slab *slab) {
 int myrealloc(Slab *slab, u64 size) {
 	// get correct slab allocator
 	SlabAllocatorPtr *sa = local_slab_allocator;
-	if (!sa)
+	if (!sa) {
+		if (!TL_SLAB_ALLOCATOR.initialized)
+			init_tl_slab_allocator();
 		sa = &TL_SLAB_ALLOCATOR;
+	}
 
 	int ret = 0;
 
