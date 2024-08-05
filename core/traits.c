@@ -69,6 +69,13 @@ bool equal(void *obj1, void *obj2) {
 	return do_equal(obj1, obj2);
 }
 
+void print(void *obj) {
+	char *(*do_print)(Object *obj) = find_fn((Object *)obj, "print");
+	if (do_print == NULL)
+		panic("print not implemented for this type");
+	do_print(obj);
+}
+
 /*
 Rc into_iter_impl(void *obj) {
 	RcPtr (*do_into_iter)(Object *obj) =

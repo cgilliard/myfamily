@@ -519,3 +519,14 @@ Test(core, test_prim) {
 	copy(&x, &UNIT);
 	cr_assert(equal(&x, &UNIT));
 }
+
+Test(core, test_backtrace_entry) {
+	BacktraceEntry e1 =
+	    BUILD(BacktraceEntry, "test1", "test2", "test3", "test4");
+
+	cr_assert(!strcmp(e1._name, "test1"));
+
+	Backtrace bt = INIT_BACKTRACE;
+	BACKTRACE(&bt);
+	print(&bt);
+}
