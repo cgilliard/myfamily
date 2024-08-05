@@ -19,43 +19,40 @@ SETTER(Rc, count)
 GETTER(Rc, ref)
 SETTER(Rc, ref)
 
-void Rc_cleanup(Rc *obj) {
-	u64 *count = *Rc_get_count(obj);
-	void *ref = *Rc_get_ref(obj);
-	u8 flags = *Rc_get_flags(obj);
-	if (count) {
-		*count -= 1;
+void Rc_cleanup(Rc *ptr) {
+	Slab count = GET(Rc, ptr, count);
+	Slab ref = GET(Rc, ptr, ref);
+	u8 flags = GET(Rc, ptr, flags);
+	if (count.data) {
+		*(u64 *)count.data -= 1;
 
-		if (*count == 0) {
+		if (*(u64 *)count.data == 0) {
 			if ((flags & RC_FLAGS_NO_CLEANUP) == 0)
-				cleanup(ref);
-			myfree(ref);
-			myfree(count);
-			count = NULL;
+				cleanup(ref.data);
+			myfree(&ref);
+			myfree(&count);
 		}
 	}
 }
 
 bool Rc_myclone(Rc *dst, Rc *src) {
-	u64 *count = *Rc_get_count(src);
-	void *ref = *Rc_get_ref(src);
-	u8 flags = *Rc_get_flags(src);
-	*count += 1;
-	Rc_set_count(dst, count);
-	Rc_set_ref(dst, ref);
-	Rc_set_flags(dst, flags);
+	Slab count = GET(Rc, src, count);
+	*(u64 *)count.data += 1;
+	SET(Rc, dst, ref, GET(Rc, src, ref));
+	SET(Rc, dst, flags, GET(Rc, src, flags));
 
 	return true;
 }
 
-Rc Rc_build(void *obj) {
-	u64 *count = mymalloc(sizeof(u64));
-	*count = 1;
-	RcPtr ret = BUILD(Rc, obj, count, 0);
+Rc Rc_build(Slab slab) {
+	Slab count;
+	mymalloc(&count, sizeof(u64));
+	*(u64 *)count.data = 1;
+	RcPtr ret = BUILD(Rc, slab, count, 0);
 	return ret;
 }
 
-void *Rc_unwrap(Rc *obj) {
-	void *ref = *Rc_get_ref(obj);
-	return ref;
+void *Rc_unwrap(Rc *ptr) {
+	Slab ref = GET(Rc, ptr, ref);
+	return ref.data;
 }

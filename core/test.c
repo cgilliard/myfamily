@@ -483,3 +483,39 @@ Test(core, test_next_greater_slab_size) {
 		next_greater_slab_size(i);
 	}
 }
+
+Test(core, test_rc) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		Slab slab1;
+		mymalloc(&slab1, sizeof(MyClass));
+		MyClassPtr *ptr = slab1.data;
+		BUILDPTR(ptr, MyClass);
+		Rc rc1 = RC(slab1);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_rc_advanced) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		Slab slab1;
+		mymalloc(&slab1, sizeof(MyClass));
+		MyClassPtr *ptr = slab1.data;
+		BUILDPTR(ptr, MyClass);
+		Rc rc1 = RC(slab1);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_prim) {
+	u64 xu = 1234;
+	U64 xv = BUILD(U64, xu);
+	u64 xu_out = *(u64 *)unwrap(&xv);
+	cr_assert_eq(xu_out, xu);
+	Unit x;
+	copy(&x, &UNIT);
+	cr_assert(equal(&x, &UNIT));
+}

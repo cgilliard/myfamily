@@ -1,4 +1,4 @@
-OBJS := rand.o slabs.o mymalloc.o class.o 
+OBJS := rand.o slabs.o mymalloc.o class.o rc.o traits.o unit.o prim.o
 
 TEST_OBJS := $(OBJS)
 

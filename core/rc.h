@@ -16,14 +16,13 @@
 #define _CORE_RC__
 
 #include <core/class.h>
-#include <core/prim.h>
 #include <core/traits_base.h>
 
 #define RC_FLAGS_NO_CLEANUP 0x1
 
-#define TRAIT_RC_BUILD(T) TRAIT_REQUIRED(T, T##Ptr, build, void *ref)
+#define TRAIT_RC_BUILD(T) TRAIT_REQUIRED(T, T##Ptr, build, Slab ref)
 
-CLASS(Rc, FIELD(void *, ref) FIELD(u64 *, count) FIELD(u8, flags))
+CLASS(Rc, FIELD(Slab, ref) FIELD(Slab, count) FIELD(u8, flags))
 IMPL(Rc, TRAIT_COPY)
 IMPL(Rc, TRAIT_RC_BUILD)
 IMPL(Rc, TRAIT_UNWRAP)

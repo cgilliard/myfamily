@@ -13,11 +13,8 @@
 // limitations under the License.
 
 #include <core/prim.h>
-#include <core/result.h>
 #include <core/unit.h>
 #include <stdio.h>
-
-#include <core/formatter.h>
 
 #define DEFINE_PRIM_IMPLS(prim_type, type, format)                             \
 	void type##_cleanup(type *ptr) {}                                      \
