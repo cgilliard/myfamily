@@ -373,10 +373,12 @@ void MyClass_cleanup(MyClass *ptr) {}
 GETTER(MyClass, val)
 
 Test(core, test_class) {
+	ResourceStats rs_start = get_resource_stats();
 	MyClass x = BUILD(MyClass, 1);
 	u64 val = GET(MyClass, &x, val);
 	cr_assert_eq(val, 1);
 	ResourceStats rs = get_resource_stats();
+	cr_assert_eq(rs.slab_misses, rs_start.slab_misses);
 }
 
 void *myThreadFun(void *vargp) {
@@ -384,6 +386,27 @@ void *myThreadFun(void *vargp) {
 
 	{
 		Slab slab;
+		slab.data = 0;
+		cr_assert_eq(mymalloc(&slab, 1), 0);
+		cr_assert_eq(slab.len, 1);
+		cr_assert_eq(slab.id, 0);
+		cr_assert_neq(slab.data, 0);
+		cr_assert_eq(myfree(&slab), 0);
+
+		slab.data = 0;
+		cr_assert_eq(mymalloc(&slab, 1), 0);
+		cr_assert_eq(slab.len, 1);
+		cr_assert_eq(slab.id, 0);
+		cr_assert_neq(slab.data, 0);
+		cr_assert_eq(myfree(&slab), 0);
+
+		slab.data = 0;
+		cr_assert_eq(mymalloc(&slab, 1), 0);
+		cr_assert_eq(slab.len, 1);
+		cr_assert_eq(slab.id, 0);
+		cr_assert_neq(slab.data, 0);
+		cr_assert_eq(myfree(&slab), 0);
+
 		slab.data = 0;
 		cr_assert_eq(mymalloc(&slab, 1), 0);
 		cr_assert_eq(slab.len, 1);
@@ -404,13 +427,59 @@ Test(core, test_threads) {
 		cr_assert_eq(mymalloc(&slab, 1), 0);
 		cr_assert_eq(slab.id, 0);
 		cr_assert_eq(slab.len, 1);
+		cr_assert_neq(slab.data, 0);
 
 		pthread_t thread_id;
 		pthread_create(&thread_id, NULL, myThreadFun, NULL);
 		pthread_join(thread_id, NULL);
 
 		cr_assert_eq(myfree(&slab), 0);
+
+		slab.data = 0;
+		cr_assert_eq(mymalloc(&slab, 1), 0);
+		cr_assert_eq(slab.id, 0);
+		cr_assert_eq(slab.len, 1);
+		cr_assert_neq(slab.data, 0);
+		cr_assert_eq(myfree(&slab), 0);
+
+		slab.data = 0;
+		cr_assert_eq(mymalloc(&slab, 1), 0);
+		cr_assert_eq(slab.id, 0);
+		cr_assert_eq(slab.len, 1);
+		cr_assert_neq(slab.data, 0);
+		cr_assert_eq(myfree(&slab), 0);
+
+		slab.data = 0;
+		cr_assert_eq(mymalloc(&slab, 1), 0);
+		cr_assert_eq(slab.id, 0);
+		cr_assert_eq(slab.len, 1);
+		cr_assert_neq(slab.data, 0);
+		cr_assert_eq(myfree(&slab), 0);
+
+		slab.data = 0;
+		cr_assert_eq(mymalloc(&slab, 1), 0);
+		cr_assert_eq(slab.id, 0);
+		cr_assert_eq(slab.len, 1);
+		cr_assert_neq(slab.data, 0);
+		cr_assert_eq(myfree(&slab), 0);
 	}
 	ResourceStats end_stats = get_resource_stats();
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_next_greater_slab_size) {
+	cr_assert_eq(next_greater_slab_size(1), 1);
+	cr_assert_eq(next_greater_slab_size(3), 3);
+	cr_assert_eq(next_greater_slab_size(100000), 100000);
+	cr_assert_eq(next_greater_slab_size(191), 192);
+	cr_assert_eq(next_greater_slab_size(192), 192);
+	cr_assert_eq(next_greater_slab_size(193), 200);
+	cr_assert_eq(next_greater_slab_size(199), 200);
+	cr_assert_eq(next_greater_slab_size(200), 200);
+	cr_assert_eq(next_greater_slab_size(201), 208);
+
+	for (u64 i = 1; i < 50000; i++) {
+		// ensure no infinite loops
+		next_greater_slab_size(i);
+	}
 }

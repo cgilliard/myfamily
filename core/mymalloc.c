@@ -20,7 +20,29 @@ _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0, 0};
 _Thread_local SlabAllocatorPtr TL_SLAB_ALLOCATOR = SLAB_ALLOCATOR_UNINIT;
 _Thread_local SlabAllocatorPtr *local_slab_allocator;
 
+u64 next_greater_slab_size(u64 size) {
+	u64 right = sizeof(slab_sizes) / sizeof(slab_sizes[0]) - 1;
+	if (size > slab_sizes[right])
+		return size;
+	if (size <= 64)
+		return size;
+	u64 left = 0;
+	while (left <= right) {
+		u64 mid = left + (right - left) / 2;
+		if (slab_sizes[mid] >= size && slab_sizes[mid - 1] < size)
+			return slab_sizes[mid];
+		if (slab_sizes[mid] > size)
+			right = mid - 1;
+		else
+			left = mid + 1;
+	}
+
+	return right;
+}
+
 int mymalloc(Slab *slab, u64 size) {
+	size = next_greater_slab_size(size);
+
 	// get correct slab allocator
 	SlabAllocatorPtr *sa = local_slab_allocator;
 	if (!sa) {
@@ -59,7 +81,6 @@ int mymalloc(Slab *slab, u64 size) {
 
 int myfree(Slab *slab) {
 	// get correct slab allocator
-	// get correct slab allocator
 	SlabAllocatorPtr *sa = local_slab_allocator;
 	if (!sa) {
 		if (!TL_SLAB_ALLOCATOR.initialized)
@@ -88,6 +109,7 @@ int myfree(Slab *slab) {
 }
 
 int myrealloc(Slab *slab, u64 size) {
+	size = next_greater_slab_size(size);
 	// get correct slab allocator
 	SlabAllocatorPtr *sa = local_slab_allocator;
 	if (!sa) {

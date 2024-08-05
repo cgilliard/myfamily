@@ -14,5 +14,6 @@
 
 #include <core/class.h>
 #include <core/mymalloc.h>
+#include <core/panic.h>
 #include <core/rand.h>
 #include <core/slabs.h>
