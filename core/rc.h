@@ -38,18 +38,20 @@ static SETTER(Rc, flags);
 	({                                                                     \
 		Slab slab;                                                     \
 		slab.data = 0;                                                 \
+		RcPtr ret;                                                     \
 		u64 _sz__ = mysize(&obj);                                      \
-		if (mymalloc(&slab, _sz__))                                    \
+		if (mymalloc(&slab, _sz__)) {                                  \
 			slab.data = NULL;                                      \
-		else                                                           \
+			ret = RC(slab);                                        \
+		} else {                                                       \
 			memcpy(slab.data, &obj, _sz__);                        \
-		NO_CLEANUP(obj);                                               \
-		RcPtr ret = RC(slab);                                          \
-		if (is_prim)                                                   \
-			SET(Rc, &ret, flags, RC_FLAGS_PRIM);                   \
-		else                                                           \
-			SET(Rc, &ret, flags, 0);                               \
-		u8 flags = GET(Rc, &ret, flags);                               \
+			NO_CLEANUP(obj);                                       \
+			ret = RC(slab);                                        \
+			if (is_prim)                                           \
+				SET(Rc, &ret, flags, RC_FLAGS_PRIM);           \
+			else                                                   \
+				SET(Rc, &ret, flags, 0);                       \
+		}                                                              \
 		ret;                                                           \
 	})
 

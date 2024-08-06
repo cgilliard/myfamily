@@ -716,27 +716,37 @@ Test(core, test_slab_no_malloc) {
 Test(core, test_enum_oom) {
 	ResourceStats init_stats = get_resource_stats();
 	{
-		// first use default slab allocator which will succeed
-		u64 y1 = 20;
-		MyEnum e0 = BUILD_ENUM2(MyEnum, VV01, y1);
-		cr_assert_neq(e0.slab.data, NULL);
-		u64 y1_out = ENUM_VALUE2(y1_out, u64, e0);
-		cr_assert_eq(y1_out, y1);
-	}
 
-	{
-		// init slab allocator and define with no slabs and no_malloc
-		SlabAllocator sa;
-		Slab slab1, slab2, slab3, slab4, slab5, slab6;
-		sa = SLABS(false);
-		sa.no_malloc = true;
-		SLAB_ALLOCATOR(&sa);
+		{
+			// first use default slab allocator which will succeed
+			u64 y1 = 20;
+			MyEnum e0 = BUILD_ENUM2(MyEnum, VV01, y1);
+			cr_assert_neq(e0.slab.data, NULL);
+			u64 y1_out = ENUM_VALUE2(y1_out, u64, e0);
+			cr_assert_eq(y1_out, y1);
+		}
 
-		u64 x1 = 10;
-		MyEnum e1 = BUILD_ENUM2(MyEnum, VV01, x1);
-		cr_assert_eq(e1.slab.data, NULL);
+		{
+			// init slab allocator and define with no slabs and
+			// no_malloc
+			SlabAllocator sa;
+			Slab slab1, slab2, slab3, slab4, slab5, slab6;
+			sa = SLABS(false);
+			sa.no_malloc = true;
+			SLAB_ALLOCATOR(&sa);
 
-		UNSET_SLAB_ALLOCATOR();
+			u64 x1 = 10;
+			MyEnum e1 = BUILD_ENUM2(MyEnum, VV01, x1);
+			cr_assert_eq(e1.slab.data, NULL);
+
+			Slab slab;
+			mymalloc(&slab, 100);
+			MyClass3 x2 = BUILD(MyClass3, slab);
+			MyEnum e2 = BUILD_ENUM2(MyEnum, VV03, x2);
+			cr_assert_eq(e2.slab.data, NULL);
+
+			UNSET_SLAB_ALLOCATOR();
+		}
 	}
 	ResourceStats end_stats = get_resource_stats();
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);

@@ -48,9 +48,12 @@ bool Rc_myclone(Rc *dst, Rc *src) {
 
 Rc Rc_build(Slab slab) {
 	Slab count;
-	mymalloc(&count, sizeof(u64));
-	u64 initial = 1;
-	*(u64 *)count.data = initial;
+	count.data = NULL;
+	if (slab.data) {
+		mymalloc(&count, sizeof(u64));
+		u64 initial = 1;
+		*(u64 *)count.data = initial;
+	}
 	RcPtr ret = BUILD(Rc, slab, count, 0);
 	return ret;
 }

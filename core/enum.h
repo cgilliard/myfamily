@@ -33,7 +33,7 @@
 				cleanup(ptr->slab.data);                       \
 			}                                                      \
 			if (myfree(&ptr->slab))                                \
-				panic("Cleanup failed!");                      \
+				printf("Cleanup failed!\n");                   \
 		}                                                              \
 	}
 
@@ -547,12 +547,25 @@ void *build_enum_value(Slab *slab, void *v, char *type_str);
 	    bool: BUILD_ENUM2_PRIM(name##Ptr, type, v, sizeof(bool)),          \
 	    default: ({                                                        \
 			 RcPtr _rc__ = HEAPIFY(v);                             \
+			 u8 flags;                                             \
 			 Slab slab;                                            \
-			 u64 _sz__ = mysize(&_rc__);                           \
-			 mymalloc(&slab, _sz__);                               \
-			 memcpy(slab.data, &_rc__, _sz__);                     \
+			 if (_rc__._ref.data) {                                \
+				 flags = 0;                                    \
+				 u64 _sz__ = mysize(&_rc__);                   \
+				 if (!mymalloc(&slab, _sz__))                  \
+					 memcpy(slab.data, &_rc__, _sz__);     \
+				 else {                                        \
+					 flags = ENUM_FLAG_NO_CLEANUP;         \
+					 slab.data = NULL;                     \
+					 cleanup(&_rc__);                      \
+				 }                                             \
+                                                                               \
+			 } else {                                              \
+				 flags = ENUM_FLAG_NO_CLEANUP;                 \
+				 slab.data = NULL;                             \
+			 }                                                     \
 			 (name##Ptr){                                          \
-			     {&name##Ptr_Vtable__, #name}, type, 0, slab};     \
+			     {&name##Ptr_Vtable__, #name}, type, flags, slab}; \
 		 }))
 
 #define ENUM_VALUE2_PRIM(ret, type, e, storage_type)                           \
