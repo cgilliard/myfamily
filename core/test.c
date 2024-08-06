@@ -634,5 +634,7 @@ Test(core, test_enum) {
 		// MyClass3 x2_out = ENUM_VALUE2(x2_out, MyClass3, e2);
 	}
 	ResourceStats end_stats = get_resource_stats();
+	printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
+	       end_stats.malloc_sum);
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }

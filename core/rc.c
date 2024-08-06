@@ -41,6 +41,7 @@ bool Rc_myclone(Rc *dst, Rc *src) {
 	*(u64 *)count.data += 1;
 	SET(Rc, dst, ref, GET(Rc, src, ref));
 	SET(Rc, dst, flags, GET(Rc, src, flags));
+	SET(Rc, dst, count, count);
 
 	return true;
 }
