@@ -626,39 +626,39 @@ Test(core, test_enum) {
 	ResourceStats init_stats = get_resource_stats();
 	{
 		u64 x1 = 10;
-		MyEnum e1 = BUILD_ENUM2(MyEnum, VV01, x1);
-		u64 x1_out = ENUM_VALUE2(x1_out, u64, e1);
+		MyEnum e1 = BUILD_ENUM(MyEnum, VV01, x1);
+		u64 x1_out = ENUM_VALUE(x1_out, u64, e1);
 		cr_assert_eq(x1_out, x1);
 
 		Slab slab;
 		mymalloc(&slab, 100);
 		MyClass3 x2 = BUILD(MyClass3, slab);
-		MyEnum e2 = BUILD_ENUM2(MyEnum, VV03, x2);
-		MyClass3 x2_out = ENUM_VALUE2(x2_out, MyClass3, e2);
+		MyEnum e2 = BUILD_ENUM(MyEnum, VV03, x2);
+		MyClass3 x2_out = ENUM_VALUE(x2_out, MyClass3, e2);
 
 		u32 x3 = 20;
-		MyEnum e3 = BUILD_ENUM2(MyEnum, VV02, x3);
-		u32 x3_out = ENUM_VALUE2(x3_out, u32, e3);
+		MyEnum e3 = BUILD_ENUM(MyEnum, VV02, x3);
+		u32 x3_out = ENUM_VALUE(x3_out, u32, e3);
 		cr_assert_eq(x3_out, x3);
 
 		i8 x4 = 9;
-		MyEnum2 e4 = BUILD_ENUM2(MyEnum2, V201, x4);
-		i8 x4_out = ENUM_VALUE2(x4_out, i8, e4);
+		MyEnum2 e4 = BUILD_ENUM(MyEnum2, V201, x4);
+		i8 x4_out = ENUM_VALUE(x4_out, i8, e4);
 		cr_assert_eq(x4_out, x4);
 
 		bool x5 = false;
-		MyEnum2 e5 = BUILD_ENUM2(MyEnum2, V206, x5);
-		bool x5_out = ENUM_VALUE2(x5_out, bool, e5);
+		MyEnum2 e5 = BUILD_ENUM(MyEnum2, V206, x5);
+		bool x5_out = ENUM_VALUE(x5_out, bool, e5);
 		cr_assert_eq(x5_out, x5);
 
 		bool x6 = true;
-		MyEnum2 e6 = BUILD_ENUM2(MyEnum2, V206, x6);
-		bool x6_out = ENUM_VALUE2(x6_out, bool, e6);
+		MyEnum2 e6 = BUILD_ENUM(MyEnum2, V206, x6);
+		bool x6_out = ENUM_VALUE(x6_out, bool, e6);
 		cr_assert_eq(x6_out, x6);
 
 		f64 x7 = 1.234;
-		MyEnum2 e7 = BUILD_ENUM2(MyEnum2, V207, x7);
-		f64 x7_out = ENUM_VALUE2(x7_out, f64, e7);
+		MyEnum2 e7 = BUILD_ENUM(MyEnum2, V207, x7);
+		f64 x7_out = ENUM_VALUE(x7_out, f64, e7);
 		cr_assert_eq(x7_out, x7);
 	}
 	ResourceStats end_stats = get_resource_stats();
@@ -720,9 +720,9 @@ Test(core, test_enum_oom) {
 		{
 			// first use default slab allocator which will succeed
 			u64 y1 = 20;
-			MyEnum e0 = BUILD_ENUM2(MyEnum, VV01, y1);
+			MyEnum e0 = BUILD_ENUM(MyEnum, VV01, y1);
 			cr_assert_neq(e0.slab.data, NULL);
-			u64 y1_out = ENUM_VALUE2(y1_out, u64, e0);
+			u64 y1_out = ENUM_VALUE(y1_out, u64, e0);
 			cr_assert_eq(y1_out, y1);
 		}
 
@@ -736,13 +736,13 @@ Test(core, test_enum_oom) {
 			SLAB_ALLOCATOR(&sa);
 
 			u64 x1 = 10;
-			MyEnum e1 = BUILD_ENUM2(MyEnum, VV01, x1);
+			MyEnum e1 = BUILD_ENUM(MyEnum, VV01, x1);
 			cr_assert_eq(e1.slab.data, NULL);
 
 			Slab slab;
 			mymalloc(&slab, 100);
 			MyClass3 x2 = BUILD(MyClass3, slab);
-			MyEnum e2 = BUILD_ENUM2(MyEnum, VV03, x2);
+			MyEnum e2 = BUILD_ENUM(MyEnum, VV03, x2);
 			cr_assert_eq(e2.slab.data, NULL);
 
 			UNSET_SLAB_ALLOCATOR();
