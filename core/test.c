@@ -618,23 +618,49 @@ void MyClass3_cleanup(MyClass3 *ptr) { myfree(&ptr->_s); }
 ENUM(MyEnum, VARIANTS(VV01, VV02, VV03), TYPES("u64", "u32", "MyClass3"))
 #define MyEnum DEFINE_ENUM(MyEnum)
 
+ENUM(MyEnum2, VARIANTS(V201, V202, V203, V204, V205, V206, V207),
+     TYPES("i8", "i16", "i32", "i64", "i128", "bool", "f64"))
+#define MyEnum2 DEFINE_ENUM(MyEnum2)
+
 Test(core, test_enum) {
 	ResourceStats init_stats = get_resource_stats();
 	{
 		u64 x1 = 10;
 		MyEnum e1 = BUILD_ENUM2(MyEnum, VV01, x1);
-		u64 x1_out = ENUM_VALUE2(x1_out, U64, e1);
+		u64 x1_out = ENUM_VALUE2(x1_out, u64, e1);
 		cr_assert_eq(x1_out, x1);
 
 		Slab slab;
 		mymalloc(&slab, 100);
 		MyClass3 x2 = BUILD(MyClass3, slab);
 		MyEnum e2 = BUILD_ENUM2(MyEnum, VV03, x2);
+		MyClass3 x2_out = ENUM_VALUE2(x2_out, MyClass3, e2);
 
-		// MyClass3 x2_out = ENUM_VALUE2(x2_out, MyClass3, e2);
+		u32 x3 = 20;
+		MyEnum e3 = BUILD_ENUM2(MyEnum, VV02, x3);
+		u32 x3_out = ENUM_VALUE2(x3_out, u32, e3);
+		cr_assert_eq(x3_out, x3);
+
+		i8 x4 = 9;
+		MyEnum2 e4 = BUILD_ENUM2(MyEnum2, V201, x4);
+		i8 x4_out = ENUM_VALUE2(x4_out, i8, e4);
+		cr_assert_eq(x4_out, x4);
+
+		bool x5 = false;
+		MyEnum2 e5 = BUILD_ENUM2(MyEnum2, V206, x5);
+		bool x5_out = ENUM_VALUE2(x5_out, bool, e5);
+		cr_assert_eq(x5_out, x5);
+
+		bool x6 = true;
+		MyEnum2 e6 = BUILD_ENUM2(MyEnum2, V206, x6);
+		bool x6_out = ENUM_VALUE2(x6_out, bool, e6);
+		cr_assert_eq(x6_out, x6);
+
+		f64 x7 = 1.234;
+		MyEnum2 e7 = BUILD_ENUM2(MyEnum2, V207, x7);
+		f64 x7_out = ENUM_VALUE2(x7_out, f64, e7);
+		cr_assert_eq(x7_out, x7);
 	}
 	ResourceStats end_stats = get_resource_stats();
-	printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
-	       end_stats.malloc_sum);
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }
