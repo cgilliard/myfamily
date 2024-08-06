@@ -621,7 +621,7 @@ Test(core, test_rc_clone) {
 	cr_assert_eq(cleanup_count, 1);
 }
 
-CLASS(MyClass3, FIELD(Slab, s));
+CLASS(MyClass3, FIELD(Slab, s) FIELD(u64, vv));
 #define MyClass3 DEFINE_CLASS(MyClass3)
 
 void MyClass3_cleanup(MyClass3 *ptr) { myfree(&ptr->_s); }
@@ -762,6 +762,34 @@ Test(core, test_enum_oom) {
 
 			UNSET_SLAB_ALLOCATOR();
 		}
+	}
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_result) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		u64 x1 = 1234;
+		Result r1 = Ok(x1);
+		u64 x1_out = EXPECT(r1, x1_out);
+		cr_assert_eq(x1_out, 1234);
+		cr_assert_eq(x1, 1234);
+
+		i128 x2 = -123;
+		Result r2 = Ok(x2);
+		i128 x2_out = EXPECT(r2, x2_out);
+		cr_assert_eq(x2_out, -123);
+		cr_assert_eq(x2, -123);
+
+		Slab slab;
+		mymalloc(&slab, 100);
+		MyClass3 x3 = BUILD(MyClass3, slab, 101);
+		cr_assert_eq(x3._vv, 101);
+
+		Result r3 = Ok(x3);
+		MyClass3 x3_out = EXPECT(r3, x3_out);
+		cr_assert_eq(x3_out._vv, 101);
 	}
 	ResourceStats end_stats = get_resource_stats();
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
