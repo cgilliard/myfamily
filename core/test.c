@@ -180,52 +180,54 @@ Test(core, test_mymalloc) {
 			   SLAB_PARAMS(SlabSize(50), SlabCount(30)),
 			   SLAB_PARAMS(SlabSize(25), SlabCount(20)));
 		SLAB_ALLOCATOR(&sa);
+		{
 
-		// allocate several slabs
-		cr_assert_eq(mymalloc(&slab1, 10), 0);
-		cr_assert_eq(mymalloc(&slab2, 10), 0);
-		cr_assert_eq(mymalloc(&slab3, 10), 0);
+			// allocate several slabs
+			cr_assert_eq(mymalloc(&slab1, 10), 0);
+			cr_assert_eq(mymalloc(&slab2, 10), 0);
+			cr_assert_eq(mymalloc(&slab3, 10), 0);
 
-		// value slab2's id
-		cr_assert_eq(slab2.id, 1);
-		cr_assert_eq(slab2.len, 10);
-		cr_assert_eq(myfree(&slab2), 0);
-		cr_assert_eq(mymalloc(&slab4, 10), 0);
-		cr_assert_eq(mymalloc(&slab5, 10), 0);
-		cr_assert_eq(mymalloc(&slab6, 11), 0);
+			// value slab2's id
+			cr_assert_eq(slab2.id, 1);
+			cr_assert_eq(slab2.len, 10);
+			cr_assert_eq(myfree(&slab2), 0);
+			cr_assert_eq(mymalloc(&slab4, 10), 0);
+			cr_assert_eq(mymalloc(&slab5, 10), 0);
+			cr_assert_eq(mymalloc(&slab6, 11), 0);
 
-		// check ids
-		cr_assert_eq(slab1.id, 0);
-		cr_assert_eq(slab3.id, 2);
-		cr_assert_eq(slab4.id, 1);
-		cr_assert_eq(slab5.id, 3);
-		cr_assert_eq(slab6.id, UINT64_MAX);
+			// check ids
+			cr_assert_eq(slab1.id, 0);
+			cr_assert_eq(slab3.id, 2);
+			cr_assert_eq(slab4.id, 1);
+			cr_assert_eq(slab5.id, 3);
+			cr_assert_eq(slab6.id, UINT64_MAX);
 
-		// check len
-		cr_assert_eq(slab1.len, 10);
-		cr_assert_eq(slab3.len, 10);
-		cr_assert_eq(slab4.len, 10);
-		cr_assert_eq(slab5.len, 10);
-		cr_assert_eq(slab6.len, 11);
+			// check len
+			cr_assert_eq(slab1.len, 10);
+			cr_assert_eq(slab3.len, 10);
+			cr_assert_eq(slab4.len, 10);
+			cr_assert_eq(slab5.len, 10);
+			cr_assert_eq(slab6.len, 11);
 
-		// ensure freeing slabs doesn't result in an error
-		cr_assert_eq(myfree(&slab1), 0);
-		cr_assert_eq(myfree(&slab3), 0);
-		cr_assert_eq(myfree(&slab4), 0);
-		cr_assert_eq(myfree(&slab5), 0);
-		cr_assert_eq(myfree(&slab6), 0);
+			// ensure freeing slabs doesn't result in an error
+			cr_assert_eq(myfree(&slab1), 0);
+			cr_assert_eq(myfree(&slab3), 0);
+			cr_assert_eq(myfree(&slab4), 0);
+			cr_assert_eq(myfree(&slab5), 0);
+			cr_assert_eq(myfree(&slab6), 0);
 
-		// allocate other sizes
-		cr_assert_eq(mymalloc(&slab1, 25), 0);
-		// slab1 has index = 1 so shift 1 << 56
-		cr_assert_eq(slab1.id, (u64)0x1 << 56);
+			// allocate other sizes
+			cr_assert_eq(mymalloc(&slab1, 25), 0);
+			// slab1 has index = 1 so shift 1 << 56
+			cr_assert_eq(slab1.id, (u64)0x1 << 56);
 
-		cr_assert_eq(mymalloc(&slab2, 50), 0);
-		// slab2 has index = 2 so shift 2 << 56
-		cr_assert_eq(slab2.id, (u64)0x2 << 56);
+			cr_assert_eq(mymalloc(&slab2, 50), 0);
+			// slab2 has index = 2 so shift 2 << 56
+			cr_assert_eq(slab2.id, (u64)0x2 << 56);
 
-		cr_assert_eq(myfree(&slab1), 0);
-		cr_assert_eq(myfree(&slab2), 0);
+			cr_assert_eq(myfree(&slab1), 0);
+			cr_assert_eq(myfree(&slab2), 0);
+		}
 		UNSET_SLAB_ALLOCATOR();
 	}
 
@@ -249,32 +251,34 @@ Test(core, test_realloc) {
 			  SLAB_PARAMS(SlabSize(50), SlabCount(30)),
 			  SLAB_PARAMS(SlabSize(25), SlabCount(20)));
 		SLAB_ALLOCATOR(&sa);
+		{
 
-		cr_assert_eq(mymalloc(&slab1, 10), 0);
-		((char *)slab1.data)[0] = 1;
-		((char *)slab1.data)[1] = 2;
-		((char *)slab1.data)[2] = 3;
-		cr_assert_eq(slab1.len, 10);
-		cr_assert_eq(myrealloc(&slab1, 25), 0);
-		cr_assert_eq(((char *)slab1.data)[0], 1);
-		cr_assert_eq(((char *)slab1.data)[1], 2);
-		cr_assert_eq(((char *)slab1.data)[2], 3);
-		((char *)slab1.data)[0] = 4;
-		((char *)slab1.data)[1] = 5;
-		((char *)slab1.data)[2] = 6;
-		cr_assert_eq(slab1.len, 25);
-		cr_assert_eq(myrealloc(&slab1, 50), 0);
-		cr_assert_eq(((char *)slab1.data)[0], 4);
-		cr_assert_eq(((char *)slab1.data)[1], 5);
-		cr_assert_eq(((char *)slab1.data)[2], 6);
-		cr_assert_eq(slab1.len, 50);
-		cr_assert_eq(myrealloc(&slab1, 60), 0);
-		cr_assert_eq(((char *)slab1.data)[0], 4);
-		cr_assert_eq(((char *)slab1.data)[1], 5);
-		cr_assert_eq(((char *)slab1.data)[2], 6);
-		cr_assert_eq(slab1.len, 60);
+			cr_assert_eq(mymalloc(&slab1, 10), 0);
+			((char *)slab1.data)[0] = 1;
+			((char *)slab1.data)[1] = 2;
+			((char *)slab1.data)[2] = 3;
+			cr_assert_eq(slab1.len, 10);
+			cr_assert_eq(myrealloc(&slab1, 25), 0);
+			cr_assert_eq(((char *)slab1.data)[0], 1);
+			cr_assert_eq(((char *)slab1.data)[1], 2);
+			cr_assert_eq(((char *)slab1.data)[2], 3);
+			((char *)slab1.data)[0] = 4;
+			((char *)slab1.data)[1] = 5;
+			((char *)slab1.data)[2] = 6;
+			cr_assert_eq(slab1.len, 25);
+			cr_assert_eq(myrealloc(&slab1, 50), 0);
+			cr_assert_eq(((char *)slab1.data)[0], 4);
+			cr_assert_eq(((char *)slab1.data)[1], 5);
+			cr_assert_eq(((char *)slab1.data)[2], 6);
+			cr_assert_eq(slab1.len, 50);
+			cr_assert_eq(myrealloc(&slab1, 60), 0);
+			cr_assert_eq(((char *)slab1.data)[0], 4);
+			cr_assert_eq(((char *)slab1.data)[1], 5);
+			cr_assert_eq(((char *)slab1.data)[2], 6);
+			cr_assert_eq(slab1.len, 60);
 
-		cr_assert_eq(myfree(&slab1), 0);
+			cr_assert_eq(myfree(&slab1), 0);
+		}
 		UNSET_SLAB_ALLOCATOR();
 	}
 	ResourceStats end_stats = get_resource_stats();
@@ -290,14 +294,17 @@ Test(core, test_0size_initial_sa) {
 				       SlabsPerResize(10)));
 		SLAB_ALLOCATOR(&sa);
 
-		Slab slab1;
-		slab1.data = 0;
-		cr_assert_eq(mymalloc(&slab1, 1), 0);
-		cr_assert_eq(slab1.id, 0);
-		cr_assert_eq(slab1.len, 1);
-		cr_assert_neq(slab1.data, 0);
+		{
 
-		myfree(&slab1);
+			Slab slab1;
+			slab1.data = 0;
+			cr_assert_eq(mymalloc(&slab1, 1), 0);
+			cr_assert_eq(slab1.id, 0);
+			cr_assert_eq(slab1.len, 1);
+			cr_assert_neq(slab1.data, 0);
+
+			myfree(&slab1);
+		}
 		UNSET_SLAB_ALLOCATOR();
 	}
 	ResourceStats end_stats = get_resource_stats();
@@ -312,44 +319,48 @@ Test(core, test_nested_slabs) {
 		    false, SLAB_PARAMS(SlabSize(10), SlabCount(10),
 				       MaxSlabs(100), SlabsPerResize(10)));
 		SLAB_ALLOCATOR(&sa1);
-
-		Slab slab1;
-		cr_assert_eq(mymalloc(&slab1, 10), 0);
-		cr_assert_eq(slab1.id, 0);
-		cr_assert_eq(slab1.len, 10);
-		myfree(&slab1);
-
 		{
 
-			SlabAllocator sa2 = SLABS(
-			    false, SLAB_PARAMS(SlabSize(20), SlabCount(10),
-					       MaxSlabs(100)));
-			SLAB_ALLOCATOR(&sa2);
+			Slab slab1;
+			cr_assert_eq(mymalloc(&slab1, 10), 0);
+			cr_assert_eq(slab1.id, 0);
+			cr_assert_eq(slab1.len, 10);
+			myfree(&slab1);
 
-			Slab slab2;
-			slab2.data = 0;
-			cr_assert_eq(mymalloc(&slab2, 20), 0);
-			cr_assert_eq(slab2.id, 0);
-			cr_assert_eq(slab2.len, 20);
-			myfree(&slab2);
+			{
 
-			cr_assert_eq(mymalloc(&slab2, 10), 0);
-			cr_assert_neq(slab2.id, 0);
-			cr_assert_eq(slab2.len, 10);
-			myfree(&slab2);
+				SlabAllocator sa2 =
+				    SLABS(false, SLAB_PARAMS(SlabSize(20),
+							     SlabCount(10),
+							     MaxSlabs(100)));
+				SLAB_ALLOCATOR(&sa2);
+				{
+					Slab slab2;
+					slab2.data = 0;
+					cr_assert_eq(mymalloc(&slab2, 20), 0);
+					cr_assert_eq(slab2.id, 0);
+					cr_assert_eq(slab2.len, 20);
+					myfree(&slab2);
 
-			UNSET_SLAB_ALLOCATOR();
+					cr_assert_eq(mymalloc(&slab2, 10), 0);
+					cr_assert_neq(slab2.id, 0);
+					cr_assert_eq(slab2.len, 10);
+					myfree(&slab2);
+				}
+
+				UNSET_SLAB_ALLOCATOR();
+			}
+
+			cr_assert_eq(mymalloc(&slab1, 10), 0);
+			cr_assert_eq(slab1.id, 0);
+			cr_assert_eq(slab1.len, 10);
+			myfree(&slab1);
+
+			cr_assert_eq(mymalloc(&slab1, 20), 0);
+			cr_assert_neq(slab1.id, 0);
+			cr_assert_eq(slab1.len, 20);
+			myfree(&slab1);
 		}
-
-		cr_assert_eq(mymalloc(&slab1, 10), 0);
-		cr_assert_eq(slab1.id, 0);
-		cr_assert_eq(slab1.len, 10);
-		myfree(&slab1);
-
-		cr_assert_eq(mymalloc(&slab1, 20), 0);
-		cr_assert_neq(slab1.id, 0);
-		cr_assert_eq(slab1.len, 20);
-		myfree(&slab1);
 
 		UNSET_SLAB_ALLOCATOR();
 	}
@@ -692,20 +703,22 @@ Test(core, test_slab_no_malloc) {
 		    SLAB_PARAMS(SlabSize(25), SlabCount(20)));
 		sa.no_malloc = true;
 		SLAB_ALLOCATOR(&sa);
+		{
 
-		cr_assert_eq(mymalloc(&slab1, 10), 0);
-		myfree(&slab1);
-		cr_assert_neq(mymalloc(&slab1, 11), 0);
-		Slab arr[10];
+			cr_assert_eq(mymalloc(&slab1, 10), 0);
+			myfree(&slab1);
+			cr_assert_neq(mymalloc(&slab1, 11), 0);
+			Slab arr[10];
 
-		for (int i = 0; i < 10; i++) {
-			cr_assert_eq(mymalloc(&arr[i], 10), 0);
-		}
+			for (int i = 0; i < 10; i++) {
+				cr_assert_eq(mymalloc(&arr[i], 10), 0);
+			}
 
-		cr_assert_neq(mymalloc(&slab1, 10), 0);
+			cr_assert_neq(mymalloc(&slab1, 10), 0);
 
-		for (int i = 0; i < 10; i++) {
-			cr_assert_eq(myfree(&arr[i]), 0);
+			for (int i = 0; i < 10; i++) {
+				cr_assert_eq(myfree(&arr[i]), 0);
+			}
 		}
 		UNSET_SLAB_ALLOCATOR();
 	}
@@ -734,16 +747,18 @@ Test(core, test_enum_oom) {
 			sa = SLABS(false);
 			sa.no_malloc = true;
 			SLAB_ALLOCATOR(&sa);
+			{
 
-			u64 x1 = 10;
-			MyEnum e1 = BUILD_ENUM(MyEnum, VV01, x1);
-			cr_assert_eq(e1.slab.data, NULL);
+				u64 x1 = 10;
+				MyEnum e1 = BUILD_ENUM(MyEnum, VV01, x1);
+				cr_assert_eq(e1.slab.data, NULL);
 
-			Slab slab;
-			mymalloc(&slab, 100);
-			MyClass3 x2 = BUILD(MyClass3, slab);
-			MyEnum e2 = BUILD_ENUM(MyEnum, VV03, x2);
-			cr_assert_eq(e2.slab.data, NULL);
+				Slab slab;
+				mymalloc(&slab, 100);
+				MyClass3 x2 = BUILD(MyClass3, slab);
+				MyEnum e2 = BUILD_ENUM(MyEnum, VV03, x2);
+				cr_assert_eq(e2.slab.data, NULL);
+			}
 
 			UNSET_SLAB_ALLOCATOR();
 		}
