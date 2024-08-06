@@ -59,6 +59,13 @@ static void init_tl_slab_allocator() {
 	    false, SPMAX(slab_sizes[0]), SPMAX(slab_sizes[1]),
 	    SPMAX(slab_sizes[2]), SPMAX(slab_sizes[3]), SPMAX(slab_sizes[4]),
 	    SPMAX(slab_sizes[5]), SPMAX(slab_sizes[6]), SPMAX(slab_sizes[7]),
+	    SPMAX(slab_sizes[8]), SPMAX(slab_sizes[9]), SPMAX(slab_sizes[10]));
+	    */
+
+	TL_SLAB_ALLOCATOR = SLABS(
+	    false, SPMAX(slab_sizes[0]), SPMAX(slab_sizes[1]),
+	    SPMAX(slab_sizes[2]), SPMAX(slab_sizes[3]), SPMAX(slab_sizes[4]),
+	    SPMAX(slab_sizes[5]), SPMAX(slab_sizes[6]), SPMAX(slab_sizes[7]),
 	    SPMAX(slab_sizes[8]), SPMAX(slab_sizes[9]), SPMAX(slab_sizes[10]),
 	    SPMAX(slab_sizes[11]), SPMAX(slab_sizes[12]), SPMAX(slab_sizes[13]),
 	    SPMAX(slab_sizes[14]), SPMAX(slab_sizes[15]), SPMAX(slab_sizes[16]),
@@ -94,17 +101,7 @@ static void init_tl_slab_allocator() {
 	    SPMAX(slab_sizes[102]), SPMAX(slab_sizes[103]),
 	    SPMAX(slab_sizes[104]), SPMAX(slab_sizes[105]),
 	    SPMAX(slab_sizes[106]), SPMAX(slab_sizes[107]),
-	    SPMAX(slab_sizes[108]), SPMAX(slab_sizes[109]));
-	    */
-	/*
-	TL_SLAB_ALLOCATOR =
-	    SLABS(false, SLAB_PARAMS(SlabSize(1), SlabCount(20)));
-	    */
-	TL_SLAB_ALLOCATOR = SLABS(
-	    false, SPMAX(slab_sizes[0]), SPMAX(slab_sizes[1]),
-	    SPMAX(slab_sizes[2]), SPMAX(slab_sizes[3]), SPMAX(slab_sizes[4]),
-	    SPMAX(slab_sizes[5]), SPMAX(slab_sizes[6]), SPMAX(slab_sizes[7]),
-	    SPMAX(slab_sizes[8]), SPMAX(slab_sizes[9]), SPMAX(slab_sizes[10]));
+	    SPMAX(slab_sizes[108]));
 }
 
 typedef struct ResourceStats {

@@ -29,15 +29,15 @@ u64 next_greater_slab_size(u64 size) {
 	u64 left = 0;
 	while (left <= right) {
 		u64 mid = left + (right - left) / 2;
-		if (slab_sizes[mid] >= size && slab_sizes[mid - 1] < size)
+		if (slab_sizes[mid] >= size && slab_sizes[mid - 1] < size) {
 			return slab_sizes[mid];
+		}
 		if (slab_sizes[mid] > size)
 			right = mid - 1;
 		else
 			left = mid + 1;
 	}
-
-	return right;
+	return slab_sizes[right];
 }
 
 int mymalloc(Slab *slab, u64 size) {

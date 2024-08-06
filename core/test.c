@@ -664,3 +664,15 @@ Test(core, test_enum) {
 	ResourceStats end_stats = get_resource_stats();
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }
+
+Test(core, test_local_slab_allocator) {
+	u64 x = 1;
+	loop {
+		Slab slab1;
+		cr_assert_eq(mymalloc(&slab1, x), 0);
+		myfree(&slab1);
+		x += 10;
+		if (x > 20000)
+			break;
+	}
+}
