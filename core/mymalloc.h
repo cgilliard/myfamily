@@ -61,7 +61,6 @@ static void init_tl_slab_allocator() {
 	    SPMAX(slab_sizes[5]), SPMAX(slab_sizes[6]), SPMAX(slab_sizes[7]),
 	    SPMAX(slab_sizes[8]), SPMAX(slab_sizes[9]), SPMAX(slab_sizes[10]));
 	    */
-
 	TL_SLAB_ALLOCATOR = SLABS(
 	    false, SPMAX(slab_sizes[0]), SPMAX(slab_sizes[1]),
 	    SPMAX(slab_sizes[2]), SPMAX(slab_sizes[3]), SPMAX(slab_sizes[4]),

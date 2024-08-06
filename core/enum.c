@@ -108,7 +108,7 @@ void *build_enum_value(Slab *slab, void *v, char *type_str) {
 		      "be used to wrap other types");
 	}
 
-	if (mymalloc(slab, size((Object *)v)))
+	if (mymalloc(slab, mysize((Object *)v)))
 		return NULL;
 	void *value = slab->data;
 	if (!copy(value, v)) {

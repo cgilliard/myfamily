@@ -17,7 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void vtable_cleanup(Vtable *table) { myfree(&table->slab); }
+void vtable_cleanup(Vtable *table) { free(table->entries); 
+				     }
 
 int compare_vtable_entry(const void *ent1, const void *ent2) {
 	const VtableEntry *vtent1 = ent1;
@@ -54,16 +55,15 @@ void *find_fn(const Object *obj, const char *name) {
 
 void vtable_add_entry(Vtable *table, VtableEntry entry) {
 	if (table->entries == NULL) {
-		int res = mymalloc(&table->slab,
-				   sizeof(VtableEntry) * (table->len + 1));
-		table->entries = table->slab.data;
+		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
 		if (table->entries == NULL)
 			panic("Couldn't allocate memory for vtable");
 	} else {
-		if (myrealloc(&table->slab,
-			      sizeof(VtableEntry) * (table->len + 1)))
+		void *tmp = realloc(table->entries,
+			      sizeof(VtableEntry) * (table->len + 1));
+		if(tmp == NULL)
 			panic("Couldn't allocate memory for vtable");
-		table->entries = table->slab.data;
+		table->entries = tmp;
 	}
 
 	memcpy(&table->entries[table->len], &entry, sizeof(VtableEntry));

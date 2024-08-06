@@ -42,7 +42,7 @@
 bool equal(void *obj1, void *obj2);
 void *unwrap(void *obj);
 void *unwrap_as(char *name, void *obj);
-u64 size(void *obj);
+u64 mysize(void *obj);
 bool copy(void *dest, void *src);
 bool myclone(void *dest, void *src);
 void cleanup(void *ptr);

@@ -77,10 +77,10 @@ void print(void *obj) {
 	do_print(obj);
 }
 
-u64 size(void *obj) {
-	u64 (*do_size)(Object *obj) = find_fn((Object *)obj, "size");
+u64 mysize(void *obj) {
+	u64 (*do_size)(Object *obj) = find_fn((Object *)obj, "mysize");
 	if (do_size == NULL)
-		panic("size not implemented for this type: %s",
+		panic("mysize not implemented for this type: %s",
 		      ((Object *)obj)->vdata.name);
 	return do_size(obj);
 }
