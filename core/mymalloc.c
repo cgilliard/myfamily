@@ -40,8 +40,8 @@ u64 next_greater_slab_size(u64 size) {
 	return slab_sizes[right];
 }
 
-int mymalloc(Slab *slab, u64 size) {
-	size = next_greater_slab_size(size);
+int mymalloc(Slab *slab, u64 size_in) {
+	u64 size = next_greater_slab_size(size_in);
 
 	// get correct slab allocator
 	SlabAllocatorPtr *sa = local_slab_allocator;
@@ -58,13 +58,17 @@ int mymalloc(Slab *slab, u64 size) {
 
 	if (alloc == UINT64_MAX) {
 		THREAD_LOCAL_RESOURCE_STATS.slab_misses++;
-		// could not allocate the slab. Try malloc.
-		slab->data = malloc(size);
-		if (slab->data == NULL)
+		if (sa->no_malloc) {
 			ret = -1;
-		else {
-			slab->id = UINT64_MAX;
-			slab->len = size;
+		} else {
+			// could not allocate the slab. Try malloc.
+			slab->data = malloc(size);
+			if (slab->data == NULL)
+				ret = -1;
+			else {
+				slab->id = UINT64_MAX;
+				slab->len = size;
+			}
 		}
 	} else {
 		// we found a slab. Access it.

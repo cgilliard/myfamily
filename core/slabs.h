@@ -61,6 +61,7 @@ typedef struct SlabAllocatorPtr {
 	u64 slab_data_arr_size;
 	bool zeroed;
 	struct SlabAllocatorPtr *prev;
+	bool no_malloc;
 } SlabAllocatorPtr;
 #define SlabAllocator                                                          \
 	SlabAllocatorPtr __attribute__((warn_unused_result,                    \
@@ -80,7 +81,6 @@ typedef enum SlabAllocatorConfigType {
 	SASlabSize = 1,
 	SASlabsPerResize = 2,
 	SAMaxSlabs = 3,
-	SAZeroed = 4,
 } SlabAllocatorConfigType;
 
 typedef struct SlabAllocatorConfig {
@@ -113,10 +113,12 @@ typedef struct SlabAllocatorConfig {
 #define SLABS(zeroed, ...)                                                     \
 	({                                                                     \
 		SlabAllocatorPtr _sa__;                                        \
+		bool __no_malloc___ = false;                                   \
 		int __counter___ = 0;                                          \
 		EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));                     \
-		slab_allocator_build(&_sa__, zeroed, __counter___,             \
-				     __VA_ARGS__);                             \
+		slab_allocator_build(&_sa__, zeroed,                           \
+				     __counter___ __VA_OPT__(, ) __VA_ARGS__); \
+		_sa__.no_malloc = false;                                       \
 		_sa__;                                                         \
 	})
 

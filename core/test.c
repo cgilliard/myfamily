@@ -676,3 +676,68 @@ Test(core, test_local_slab_allocator) {
 			break;
 	}
 }
+
+Test(core, test_slab_no_malloc) {
+	ResourceStats init_stats = get_resource_stats();
+
+	{
+
+		// init slab allocator and define some slabs
+		SlabAllocator sa;
+		Slab slab1, slab2, slab3, slab4, slab5, slab6;
+		sa = SLABS(
+		    false,
+		    SLAB_PARAMS(SlabSize(10), SlabCount(10), MaxSlabs(10)),
+		    SLAB_PARAMS(SlabSize(50), SlabCount(30)),
+		    SLAB_PARAMS(SlabSize(25), SlabCount(20)));
+		sa.no_malloc = true;
+		SLAB_ALLOCATOR(&sa);
+
+		cr_assert_eq(mymalloc(&slab1, 10), 0);
+		myfree(&slab1);
+		cr_assert_neq(mymalloc(&slab1, 11), 0);
+		Slab arr[10];
+
+		for (int i = 0; i < 10; i++) {
+			cr_assert_eq(mymalloc(&arr[i], 10), 0);
+		}
+
+		cr_assert_neq(mymalloc(&slab1, 10), 0);
+
+		for (int i = 0; i < 10; i++) {
+			cr_assert_eq(myfree(&arr[i]), 0);
+		}
+		UNSET_SLAB_ALLOCATOR();
+	}
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_enum_oom) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		// first use default slab allocator which will succeed
+		u64 y1 = 20;
+		MyEnum e0 = BUILD_ENUM2(MyEnum, VV01, y1);
+		cr_assert_neq(e0.slab.data, NULL);
+		u64 y1_out = ENUM_VALUE2(y1_out, u64, e0);
+		cr_assert_eq(y1_out, y1);
+	}
+
+	{
+		// init slab allocator and define with no slabs and no_malloc
+		SlabAllocator sa;
+		Slab slab1, slab2, slab3, slab4, slab5, slab6;
+		sa = SLABS(false);
+		sa.no_malloc = true;
+		SLAB_ALLOCATOR(&sa);
+
+		u64 x1 = 10;
+		MyEnum e1 = BUILD_ENUM2(MyEnum, VV01, x1);
+		cr_assert_eq(e1.slab.data, NULL);
+
+		UNSET_SLAB_ALLOCATOR();
+	}
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}

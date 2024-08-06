@@ -519,9 +519,15 @@ void *build_enum_value(Slab *slab, void *v, char *type_str);
 #define BUILD_ENUM2_PRIM(name, type, v, _size__)                               \
 	({                                                                     \
 		Slab slab;                                                     \
-		mymalloc(&slab, _size__);                                      \
-		memcpy(slab.data, &v, _size__);                                \
-		(name){{&name##_Vtable__, #name}, type, ENUM_FLAG_PRIM, slab}; \
+		int _res__ = mymalloc(&slab, _size__);                         \
+		u8 flags = ENUM_FLAG_PRIM;                                     \
+		if (!_res__)                                                   \
+			memcpy(slab.data, &v, _size__);                        \
+		else {                                                         \
+			slab.data = NULL;                                      \
+			flags = ENUM_FLAG_NO_CLEANUP | ENUM_FLAG_PRIM;         \
+		}                                                              \
+		(name){{&name##_Vtable__, #name}, type, flags, slab};          \
 	})
 
 #define BUILD_ENUM2(name, type, v)                                             \
