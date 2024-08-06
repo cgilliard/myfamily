@@ -20,6 +20,7 @@ GETTER(Rc, ref)
 SETTER(Rc, ref)
 
 void Rc_cleanup(Rc *ptr) {
+	printf("rc cleanup %p\n", ptr);
 	Slab count = GET(Rc, ptr, count);
 	Slab ref = GET(Rc, ptr, ref);
 	u8 flags = GET(Rc, ptr, flags);
@@ -47,12 +48,19 @@ bool Rc_myclone(Rc *dst, Rc *src) {
 Rc Rc_build(Slab slab) {
 	Slab count;
 	mymalloc(&count, sizeof(u64));
-	*(u64 *)count.data = 1;
+	u64 initial = 1;
+	*(u64 *)count.data = initial;
 	RcPtr ret = BUILD(Rc, slab, count, 0);
 	return ret;
 }
 
 void *Rc_unwrap(Rc *ptr) {
 	Slab ref = GET(Rc, ptr, ref);
+	u8 flags = GET(Rc, ptr, flags);
+	// set no cleanup after unwrap is called
+	SET(Rc, ptr, flags, flags | RC_FLAGS_NO_CLEANUP);
+	if ((flags & RC_FLAGS_PRIM) != 0) {
+		return unwrap(ref.data);
+	}
 	return ref.data;
 }

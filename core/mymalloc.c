@@ -80,6 +80,7 @@ int mymalloc(Slab *slab, u64 size) {
 }
 
 int myfree(Slab *slab) {
+	printf("freeing slab.data=%p\n", slab->data);
 	// get correct slab allocator
 	SlabAllocatorPtr *sa = local_slab_allocator;
 	if (!sa) {

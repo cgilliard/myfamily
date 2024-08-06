@@ -530,3 +530,117 @@ Test(core, test_backtrace_entry) {
 	BACKTRACE(&bt);
 	print(&bt);
 }
+
+CLASS(MyClass2, FIELD(Slab, slab))
+#define MyClass2 DEFINE_CLASS(MyClass2)
+
+void MyClass2_cleanup(MyClass2 *ptr) {}
+
+Test(core, test_error) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		Error err = ERR(ILLEGAL_ARGUMENT, "illegal arg found");
+		// Result r1 = ErrP(err);
+		// print(&err);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+/*
+Result gen_result() {
+	u64 x = 1234;
+	// return Ok(x);
+}
+*/
+
+CLASS(TestClassHeapify, FIELD(u64, v) FIELD(Slab, s))
+#define TestClassHeapify DEFINE_CLASS(TestClassHeapify)
+GETTER(TestClassHeapify, s)
+
+static int cleanup_count = 0;
+
+void TestClassHeapify_cleanup(TestClassHeapify *ptr) {
+	cleanup_count++;
+	Slab s = GET(TestClassHeapify, ptr, s);
+	myfree(&s);
+}
+
+Test(core, test_heapify) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		u64 x1 = 10;
+		Rc x = HEAPIFY(x1);
+		u64 x1_out = *(u64 *)unwrap(&x);
+		cr_assert_eq(x1_out, x1);
+
+		i32 x2 = -1;
+		Rc rc2 = HEAPIFY(x2);
+		i32 x2_out = *(i32 *)unwrap(&rc2);
+		cr_assert_eq(x2_out, x2);
+
+		Slab slab;
+		mymalloc(&slab, 100);
+		TestClassHeapify x3 = BUILD(TestClassHeapify, 555, slab);
+		Rc rc3 = HEAPIFY(x3);
+		TestClassHeapify x3_out = *(TestClassHeapify *)unwrap(&rc3);
+		cr_assert_eq(x3_out._v, 555);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_rc_clone) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		cleanup_count = 0;
+		Slab slab;
+		mymalloc(&slab, 100);
+		TestClassHeapify x3 = BUILD(TestClassHeapify, 555, slab);
+		Rc rc3 = HEAPIFY(x3);
+		Rc rc4;
+		myclone(&rc3, &rc4);
+		TestClassHeapify x3_out = *(TestClassHeapify *)unwrap(&rc3);
+		cr_assert_eq(x3_out._v, 555);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+	cr_assert_eq(cleanup_count, 1);
+}
+
+CLASS(MyClass3, FIELD(Slab, s));
+#define MyClass3 DEFINE_CLASS(MyClass3)
+
+void MyClass3_cleanup(MyClass3 *ptr) {
+	printf("myclass3 cleanup %p\n", ptr);
+	myfree(&ptr->_s);
+}
+
+ENUM(MyEnum, VARIANTS(VV01, VV02, VV03), TYPES("u64", "u32", "MyClass3"))
+#define MyEnum DEFINE_ENUM(MyEnum)
+
+Test(core, test_enum) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		/*
+		u64 x1 = 10;
+		MyEnum e1 = BUILD_ENUM2(MyEnum, VV01, x1);
+		u64 x1_out = ENUM_VALUE2(x1_out, U64, e1);
+		cr_assert_eq(x1_out, x1);
+		printf("post val\n");
+		*/
+
+		printf("start test\n");
+		Slab slab;
+		mymalloc(&slab, 100);
+		MyClass3 x2 = BUILD(MyClass3, slab);
+		MyEnum e2 = BUILD_ENUM2(MyEnum, VV03, x2);
+		printf("post build\n");
+
+		//  MyClass3 x2_out = ENUM_VALUE2(x2_out, MyClass3, e2);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
+	       end_stats.malloc_sum);
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}

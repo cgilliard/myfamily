@@ -14,10 +14,14 @@
 
 #include <core/backtrace.h>
 #include <core/class.h>
+#include <core/ekinds.h>
+#include <core/enum.h>
+#include <core/error.h>
 #include <core/mymalloc.h>
 #include <core/panic.h>
 #include <core/prim.h>
 #include <core/rand.h>
 #include <core/rc.h>
+#include <core/result.h>
 #include <core/slabs.h>
 #include <core/unit.h>

@@ -20,8 +20,10 @@
 bool default_copy(void *dst, void *src) { return myclone(dst, src); }
 
 void cleanup(void *ptr) {
+	printf("cleanup %p cl = %s\n", ptr, CLASS_NAME(ptr));
 	Object *objptr = ptr;
 	void (*do_cleanup)(Object *ptr) = find_fn(objptr, "cleanup");
+	printf("found fn\n");
 	if (do_cleanup != NULL)
 		do_cleanup(ptr);
 }
@@ -53,7 +55,8 @@ bool copy(void *dst, void *src) {
 		      ((Object *)src)->vdata.name);
 	((Object *)dst)->vdata.vtable = ((Object *)src)->vdata.vtable;
 	((Object *)dst)->vdata.name = ((Object *)src)->vdata.name;
-	return do_copy(dst, src);
+	bool ret = do_copy(dst, src);
+	return ret;
 }
 
 bool equal(void *obj1, void *obj2) {
@@ -74,6 +77,14 @@ void print(void *obj) {
 	if (do_print == NULL)
 		panic("print not implemented for this type");
 	do_print(obj);
+}
+
+u64 size(void *obj) {
+	u64 (*do_size)(Object *obj) = find_fn((Object *)obj, "size");
+	if (do_size == NULL)
+		panic("size not implemented for this type: %s",
+		      ((Object *)obj)->vdata.name);
+	return do_size(obj);
 }
 
 /*

@@ -119,6 +119,7 @@ void vtable_cleanup(Vtable *table);
 	static Vtable name##Ptr_Vtable__ = {0, UNIQUE_ID, NULL};               \
 	void name##_cleanup(name##Ptr *obj);                                   \
 	static void name##_cleanup_impl(name##Ptr *obj) {                      \
+		printf("cleanup impl %s\n", #name);                            \
 		if (!obj->vdata.no_cleanup)                                    \
 			name##_cleanup(obj);                                   \
 	}                                                                      \

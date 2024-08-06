@@ -15,6 +15,7 @@
 #ifndef _CORE_RESULT__
 #define _CORE_RESULT__
 
+/*
 #include <core/ekinds.h>
 #include <core/enum.h>
 #include <core/error.h>
@@ -69,9 +70,9 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 #define Ok(x)                                                                  \
 	({                                                                     \
 		Rc rc = HEAPIFY(x);                                            \
-		ResultPtr r = TRY_BUILD_ENUM(Result, Ok, rc);                  \
-		r;                                                             \
-	})
+ResultPtr r = BUILD_ENUM(Result, Ok, rc);
+r;
+})
 
 #define UNWRAP(x, type)                                                        \
 	({                                                                     \
@@ -259,5 +260,5 @@ static Result STATIC_ALLOC_RESULT = {{&ResultPtr_Vtable__, "Result", NEXT_ID},
 		copy(&ret, x.value);                                           \
 		ret;                                                           \
 	})
-
+*/
 #endif // _CORE_RESULT__

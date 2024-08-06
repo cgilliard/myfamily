@@ -112,6 +112,15 @@ void BacktraceEntry_set_backtrace_entry_values(BacktraceEntry *ptr,
 					       const char *bin_name,
 					       const char *address,
 					       const char *file_path) {
+	BUILDPTR(ptr, BacktraceEntry);
+	int file_path_len = strlen(file_path);
+	if (file_path_len > BACKTRACE_CHAR_ARRAY_LEN)
+		file_path =
+		    file_path + (file_path_len - BACKTRACE_CHAR_ARRAY_LEN) + 1;
+	int strlen_bin_name = strlen(bin_name);
+	if (strlen_bin_name > BACKTRACE_CHAR_ARRAY_LEN)
+		bin_name =
+		    bin_name + (strlen_bin_name - BACKTRACE_CHAR_ARRAY_LEN) + 1;
 	snprintf(ptr->_name, BACKTRACE_CHAR_ARRAY_LEN, "%s", name);
 	snprintf(ptr->_bin_name, BACKTRACE_CHAR_ARRAY_LEN, "%s", bin_name);
 	snprintf(ptr->_address, BACKTRACE_CHAR_ARRAY_LEN, "%s", address);
@@ -243,7 +252,7 @@ bool Backtrace_myclone(Backtrace *dst, Backtrace *src) {
 	bool ret = true;
 	u64 src_count = GET_COUNT(src);
 	SET_COUNT(dst, src_count);
-	for (int i = 0; i < src_count; i++) {
+	for (u64 i = 0; i < src_count; i++) {
 		myclone(&dst->_rows[i], &src->_rows[i]);
 	}
 
