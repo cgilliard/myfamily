@@ -542,7 +542,7 @@ void *build_enum_value(Slab *slab, void *v, char *type_str);
 	    default: ({                                                        \
 			 RcPtr _rc__ = HEAPIFY(v);                             \
 			 Slab slab;                                            \
-			 u64 _sz__ = mysize(&_rc__);                             \
+			 u64 _sz__ = mysize(&_rc__);                           \
 			 mymalloc(&slab, _sz__);                               \
 			 memcpy(slab.data, &_rc__, _sz__);                     \
 			 (name##Ptr){                                          \
@@ -574,7 +574,7 @@ void *build_enum_value(Slab *slab, void *v, char *type_str);
 	    default: ({                                                        \
 			 type##Ptr _ret__;                                     \
 			 Rc _copy__;                                           \
-			 memcpy(&_copy__, e.slab.data, mysize(e.slab.data));     \
+			 memcpy(&_copy__, e.slab.data, mysize(e.slab.data));   \
 			 _ret__ = *(type *)unwrap(&_copy__);                   \
 			 _ret__;                                               \
 		 }))

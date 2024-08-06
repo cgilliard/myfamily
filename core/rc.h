@@ -38,7 +38,7 @@ static SETTER(Rc, flags);
 	({                                                                     \
 		Slab slab;                                                     \
 		slab.data = 0;                                                 \
-		u64 _sz__ = mysize(&obj);                                        \
+		u64 _sz__ = mysize(&obj);                                      \
 		if (mymalloc(&slab, _sz__))                                    \
 			slab.data = NULL;                                      \
 		else                                                           \

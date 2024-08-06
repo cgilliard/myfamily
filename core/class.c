@@ -17,8 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void vtable_cleanup(Vtable *table) { free(table->entries); 
-				     }
+void vtable_cleanup(Vtable *table) { free(table->entries); }
 
 int compare_vtable_entry(const void *ent1, const void *ent2) {
 	const VtableEntry *vtent1 = ent1;
@@ -60,8 +59,8 @@ void vtable_add_entry(Vtable *table, VtableEntry entry) {
 			panic("Couldn't allocate memory for vtable");
 	} else {
 		void *tmp = realloc(table->entries,
-			      sizeof(VtableEntry) * (table->len + 1));
-		if(tmp == NULL)
+				    sizeof(VtableEntry) * (table->len + 1));
+		if (tmp == NULL)
 			panic("Couldn't allocate memory for vtable");
 		table->entries = tmp;
 	}

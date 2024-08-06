@@ -122,12 +122,12 @@ void vtable_cleanup(Vtable *table);
 		if (!obj->vdata.no_cleanup)                                    \
 			name##_cleanup(obj);                                   \
 	}                                                                      \
-	static u64 name##_mysize(name##Ptr *obj) { return sizeof(name##Ptr); }   \
+	static u64 name##_mysize(name##Ptr *obj) { return sizeof(name##Ptr); } \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
 		VtableEntry next = {"cleanup", name##_cleanup};                \
 		vtable_add_entry(&name##Ptr_Vtable__, next);                   \
-		VtableEntry next2 = {"mysize", name##_mysize};                     \
+		VtableEntry next2 = {"mysize", name##_mysize};                 \
 		vtable_add_entry(&name##Ptr_Vtable__, next2);                  \
 	}                                                                      \
 	static char *name##Ptr_vdata_name__ = #name;
@@ -145,12 +145,12 @@ void vtable_cleanup(Vtable *table);
 		if (!obj->vdata.no_cleanup)                                    \
 			name##_cleanup(obj);                                   \
 	}                                                                      \
-	static u64 name##_mysize(name##Ptr *obj) { return sizeof(name##Ptr); }   \
+	static u64 name##_mysize(name##Ptr *obj) { return sizeof(name##Ptr); } \
 	static void                                                            \
 	    __attribute__((constructor)) add_cleanup_##name##_vtable() {       \
 		VtableEntry next = {"cleanup", name##_cleanup};                \
 		vtable_add_entry(&name##Ptr_Vtable__, next);                   \
-		VtableEntry next2 = {"mysize", name##_mysize};                     \
+		VtableEntry next2 = {"mysize", name##_mysize};                 \
 		vtable_add_entry(&name##Ptr_Vtable__, next2);                  \
 	}
 
