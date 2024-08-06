@@ -601,7 +601,7 @@ Test(core, test_rc_clone) {
 		TestClassHeapify x3 = BUILD(TestClassHeapify, 555, slab);
 		Rc rc3 = HEAPIFY(x3);
 		Rc rc4;
-		myclone(&rc3, &rc4);
+		myclone(&rc4, &rc3);
 		TestClassHeapify x3_out = *(TestClassHeapify *)unwrap(&rc3);
 		cr_assert_eq(x3_out._v, 555);
 	}
