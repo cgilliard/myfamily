@@ -28,8 +28,13 @@ void Rc_cleanup(Rc *ptr) {
 		*(u64 *)count.data -= 1;
 
 		if (*(u64 *)count.data == 0) {
-			if ((flags & RC_FLAGS_NO_CLEANUP) == 0)
+			printf("count was 0\n");
+			if ((flags & RC_FLAGS_NO_CLEANUP) == 0) {
+				printf("calling cleanup\n");
 				cleanup(ref.data);
+			} else {
+				printf("cleanup disabled\n");
+			}
 			myfree(&ref);
 			myfree(&count);
 		}

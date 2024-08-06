@@ -537,8 +537,7 @@ void *build_enum_value(Slab *slab, void *v, char *type_str);
 			 Slab slab;                                            \
 			 u64 _sz__ = size(&_rc__);                             \
 			 mymalloc(&slab, _sz__);                               \
-			 myclone(slab.data, &_rc__);                           \
-			 printf("slab.data=%p\n", slab.data);                  \
+			 memcpy(slab.data, &_rc__, _sz__);                     \
 			 (name##Ptr){                                          \
 			     {&name##Ptr_Vtable__, #name}, type, 0, slab};     \
 		 }))
@@ -552,7 +551,12 @@ void *build_enum_value(Slab *slab, void *v, char *type_str);
 		 }),                                                           \
 	    default: ({                                                        \
 			 type##Ptr _ret__;                                     \
-			 memcpy(&_ret__, e.slab.data, size(e.slab.data));      \
+			 Rc _copy__;                                           \
+			 printf("0 %p %s\n", e.slab.data, #type);              \
+			 memcpy(&_copy__, e.slab.data, size(e.slab.data));     \
+			 _ret__ = *(type *)unwrap(&_copy__);                   \
+			 printf("1\n");                                        \
+			 e.flags |= ENUM_FLAG_NO_CLEANUP;                      \
 			 _ret__;                                               \
 		 }))
 

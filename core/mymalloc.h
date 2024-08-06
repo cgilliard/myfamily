@@ -54,6 +54,7 @@ static u64 slab_sizes[] = {
     232, 240, 248, 256, 272, 288, 304,	320,  336,  352,  368,	384, 400, 416,
     432, 448, 464, 480, 496, 512, 1024, 2048, 4096, 8192, 16384};
 static void init_tl_slab_allocator() {
+	/*
 	TL_SLAB_ALLOCATOR = SLABS(
 	    false, SPMAX(slab_sizes[0]), SPMAX(slab_sizes[1]),
 	    SPMAX(slab_sizes[2]), SPMAX(slab_sizes[3]), SPMAX(slab_sizes[4]),
@@ -94,6 +95,16 @@ static void init_tl_slab_allocator() {
 	    SPMAX(slab_sizes[104]), SPMAX(slab_sizes[105]),
 	    SPMAX(slab_sizes[106]), SPMAX(slab_sizes[107]),
 	    SPMAX(slab_sizes[108]), SPMAX(slab_sizes[109]));
+	    */
+	/*
+	TL_SLAB_ALLOCATOR =
+	    SLABS(false, SLAB_PARAMS(SlabSize(1), SlabCount(20)));
+	    */
+	TL_SLAB_ALLOCATOR = SLABS(
+	    false, SPMAX(slab_sizes[0]), SPMAX(slab_sizes[1]),
+	    SPMAX(slab_sizes[2]), SPMAX(slab_sizes[3]), SPMAX(slab_sizes[4]),
+	    SPMAX(slab_sizes[5]), SPMAX(slab_sizes[6]), SPMAX(slab_sizes[7]),
+	    SPMAX(slab_sizes[8]), SPMAX(slab_sizes[9]), SPMAX(slab_sizes[10]));
 }
 
 typedef struct ResourceStats {

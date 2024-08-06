@@ -622,22 +622,18 @@ ENUM(MyEnum, VARIANTS(VV01, VV02, VV03), TYPES("u64", "u32", "MyClass3"))
 Test(core, test_enum) {
 	ResourceStats init_stats = get_resource_stats();
 	{
-		/*
 		u64 x1 = 10;
 		MyEnum e1 = BUILD_ENUM2(MyEnum, VV01, x1);
 		u64 x1_out = ENUM_VALUE2(x1_out, U64, e1);
 		cr_assert_eq(x1_out, x1);
-		printf("post val\n");
-		*/
 
-		printf("start test\n");
 		Slab slab;
 		mymalloc(&slab, 100);
 		MyClass3 x2 = BUILD(MyClass3, slab);
 		MyEnum e2 = BUILD_ENUM2(MyEnum, VV03, x2);
-		printf("post build\n");
 
-		//  MyClass3 x2_out = ENUM_VALUE2(x2_out, MyClass3, e2);
+		// MyClass3 x2_out = ENUM_VALUE2(x2_out, MyClass3, e2);
+		printf("got x2_out\n");
 	}
 	ResourceStats end_stats = get_resource_stats();
 	printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
