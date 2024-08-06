@@ -20,10 +20,8 @@
 bool default_copy(void *dst, void *src) { return myclone(dst, src); }
 
 void cleanup(void *ptr) {
-	printf("cleanup %p cl = %s\n", ptr, CLASS_NAME(ptr));
 	Object *objptr = ptr;
 	void (*do_cleanup)(Object *ptr) = find_fn(objptr, "cleanup");
-	printf("found fn\n");
 	if (do_cleanup != NULL)
 		do_cleanup(ptr);
 }

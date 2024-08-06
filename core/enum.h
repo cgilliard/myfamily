@@ -28,14 +28,9 @@
 	CLASS_STATIC_CLEANUP(name, name##_Variants__ type; u8 flags;           \
 			     Slab slab;)                                       \
 	static inline void name##_cleanup(name##Ptr *ptr) {                    \
-		printf("enum cleanup %p\n", ptr);                              \
 		if ((ptr->flags & ENUM_FLAG_NO_CLEANUP) == 0) {                \
-			printf("cleanup enabled\n");                           \
 			if ((ptr->flags & ENUM_FLAG_PRIM) == 0) {              \
-				printf("not prim. cleanup = %p\n",             \
-				       ptr->slab.data);                        \
 				cleanup(ptr->slab.data);                       \
-				printf("type cleanup complete\n");             \
 			}                                                      \
 			if (myfree(&ptr->slab))                                \
 				panic("Cleanup failed!");                      \
@@ -552,10 +547,8 @@ void *build_enum_value(Slab *slab, void *v, char *type_str);
 	    default: ({                                                        \
 			 type##Ptr _ret__;                                     \
 			 Rc _copy__;                                           \
-			 printf("0 %p %s\n", e.slab.data, #type);              \
 			 memcpy(&_copy__, e.slab.data, size(e.slab.data));     \
 			 _ret__ = *(type *)unwrap(&_copy__);                   \
-			 printf("1\n");                                        \
 			 e.flags |= ENUM_FLAG_NO_CLEANUP;                      \
 			 _ret__;                                               \
 		 }))

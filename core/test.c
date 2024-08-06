@@ -416,6 +416,8 @@ void *myThreadFun(void *vargp) {
 	}
 	ResourceStats end_stats = get_resource_stats();
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+	// deallocate the slab allocator for this thread for testing purposes
+	slab_allocator_cleanup(&TL_SLAB_ALLOCATOR);
 	return NULL;
 }
 
@@ -611,10 +613,7 @@ Test(core, test_rc_clone) {
 CLASS(MyClass3, FIELD(Slab, s));
 #define MyClass3 DEFINE_CLASS(MyClass3)
 
-void MyClass3_cleanup(MyClass3 *ptr) {
-	printf("myclass3 cleanup %p\n", ptr);
-	myfree(&ptr->_s);
-}
+void MyClass3_cleanup(MyClass3 *ptr) { myfree(&ptr->_s); }
 
 ENUM(MyEnum, VARIANTS(VV01, VV02, VV03), TYPES("u64", "u32", "MyClass3"))
 #define MyEnum DEFINE_ENUM(MyEnum)
@@ -633,10 +632,7 @@ Test(core, test_enum) {
 		MyEnum e2 = BUILD_ENUM2(MyEnum, VV03, x2);
 
 		// MyClass3 x2_out = ENUM_VALUE2(x2_out, MyClass3, e2);
-		printf("got x2_out\n");
 	}
 	ResourceStats end_stats = get_resource_stats();
-	printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
-	       end_stats.malloc_sum);
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }
