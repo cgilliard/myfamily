@@ -20,6 +20,7 @@
 #include <core/error.h>
 #include <core/prim.h>
 #include <core/rc.h>
+#include <core/traits_base.h>
 
 ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 #define Result DEFINE_ENUM(Result)
@@ -112,8 +113,9 @@ static Result STATIC_ALLOC_RESULT = {
 #define TRY(x, v)                                                              \
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
-			Error e = UNWRAP_ERR(x);                               \
-			return Err(e);                                         \
+			ErrorPtr e = UNWRAP_ERR(x);                            \
+			ResultPtr ret = Err(e);                                \
+			return ret;                                            \
 		}                                                              \
 		UNWRAP_VALUE(x, v);                                            \
 	})

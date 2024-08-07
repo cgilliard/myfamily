@@ -726,16 +726,7 @@ Test(core, test_slab_no_malloc) {
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }
 
-Result res_fun(int x) {
-	if (x < 0) {
-		Error e = ERR(ILLEGAL_ARGUMENT,
-			      "x was %i. It must be a positive number");
-		return Err(e);
-	} else {
-		int y = x + 10;
-		return Ok(y);
-	}
-}
+Result res_fun(int x);
 
 Test(core, test_enum_oom) {
 	ResourceStats init_stats = get_resource_stats();
@@ -843,6 +834,17 @@ Test(core, test_res_fun) {
 	Result r2 = res_fun(-1);
 	cr_assert(IS_ERR(r2));
 	cr_assert(!IS_OK(r2));
+}
+
+Result res_fun(int x) {
+	if (x < 0) {
+		ErrorPtr e = ERR(ILLEGAL_ARGUMENT,
+				 "x was %i. It must be a positive number");
+		return Err(e);
+	} else {
+		int y = x + 10;
+		return Ok(y);
+	}
 }
 
 Result res_fun2(int x) {
