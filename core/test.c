@@ -790,7 +790,22 @@ Test(core, test_result) {
 		Result r3 = Ok(x3);
 		MyClass3 x3_out = EXPECT(r3, x3_out);
 		cr_assert_eq(x3_out._vv, 101);
+
+		i64 x6 = -888;
+		Result r6 = Ok(x6);
+		i64 x6_out = EXPECT(r6, x6_out);
+		cr_assert_eq(x6_out, -888);
+		cr_assert_eq(x6, -888);
+
+		u128 x5 = 222;
+		Result r5 = Ok(x5);
+		u128 x5_out = EXPECT(r5, x5_out);
+		cr_assert_eq(x5_out, 222);
+		cr_assert_eq(x5, 222);
 	}
 	ResourceStats end_stats = get_resource_stats();
+	if (init_stats.malloc_sum != end_stats.malloc_sum)
+		printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
+		       end_stats.malloc_sum);
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }
