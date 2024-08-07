@@ -18,6 +18,7 @@
 #include <core/ekinds.h>
 #include <core/enum.h>
 #include <core/error.h>
+#include <core/prim.h>
 #include <core/rc.h>
 
 ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
@@ -26,12 +27,45 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 #define IS_ERR(x) x.type == Err
 #define IS_OK(x) x.type == Ok
 
+static Error STATIC_ALLOC_ERROR = {
+    {&ErrorPtr_Vtable__, "Error", NEXT_ID},
+    false,
+    {{&ErrorKindPtr_Vtable__, "ErrorKind", NEXT_ID}, false, "AllocError"},
+    "Could not allocate sufficient memory",
+    {{&BacktracePtr_Vtable__, "Backtrace", NEXT_ID}, false, NULL, 0},
+    ERROR_NO_CLEANUP};
+
+static Rc STATIC_ALLOC_ERROR_RC = {
+    {&RcPtr_Vtable__, "Rc", NEXT_ID},
+    false,
+    {UINT64_MAX, &STATIC_ALLOC_ERROR, sizeof(Error)},
+    {},
+    RC_FLAGS_NO_COUNTER};
+
 #define Ok(x)                                                                  \
 	({                                                                     \
 		Rc rc = HEAPIFY(x);                                            \
 		ResultPtr r = BUILD_ENUM(Result, Ok, rc);                      \
+		if (r.slab.data == NULL) {                                     \
+			r = STATIC_ALLOC_RESULT;                               \
+		}                                                              \
 		r;                                                             \
 	})
+
+#define Err(e)                                                                 \
+	({                                                                     \
+		ResultPtr r = BUILD_ENUM(Result, Err, e);                      \
+		if (r.slab.data == NULL) {                                     \
+			r = STATIC_ALLOC_RESULT;                               \
+		}                                                              \
+		r;                                                             \
+	})
+
+static Result STATIC_ALLOC_RESULT = {
+    {&ResultPtr_Vtable__, "Result"},
+    Err,
+    ENUM_FLAG_NO_CLEANUP,
+    {UINT64_MAX, &STATIC_ALLOC_ERROR_RC, sizeof(Rc)}};
 
 #define UNWRAP_TYPE(type, x)                                                   \
 	({                                                                     \
@@ -69,9 +103,19 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 	({                                                                     \
 		if (IS_OK(x))                                                  \
 			panic("Attempt to unwrap_err an ok");                  \
-		ErrorPtr ret;                                                  \
-		copy(&ret, x.slab.data);                                       \
+		RcPtr ptr;                                                     \
+		copy(&ptr, x.slab.data);                                       \
+		ErrorPtr ret = *(Error *)unwrap(&ptr);                         \
 		ret;                                                           \
+	})
+
+#define TRY(x, v)                                                              \
+	({                                                                     \
+		if (IS_ERR(x)) {                                               \
+			Error e = UNWRAP_ERR(x);                               \
+			return Err(e);                                         \
+		}                                                              \
+		UNWRAP_VALUE(x, v);                                            \
 	})
 
 #define EXPECT(x, v)                                                           \

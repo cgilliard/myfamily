@@ -38,7 +38,10 @@ void Rc_cleanup(Rc *ptr) {
 
 bool Rc_myclone(Rc *dst, Rc *src) {
 	Slab count = GET(Rc, src, count);
-	*(u64 *)count.data += 1;
+	u8 flags = GET(Rc, src, flags);
+	if ((flags & RC_FLAGS_NO_COUNTER) == 0) {
+		*(u64 *)count.data += 1;
+	}
 	SET(Rc, dst, ref, GET(Rc, src, ref));
 	SET(Rc, dst, flags, GET(Rc, src, flags));
 	SET(Rc, dst, count, count);

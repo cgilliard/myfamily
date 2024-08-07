@@ -260,21 +260,26 @@ bool Backtrace_myclone(Backtrace *dst, Backtrace *src) {
 }
 
 void Backtrace_print(Backtrace *ptr) {
-	printf("Backtrace:\n");
 	BacktraceEntryPtr *rows = ptr->_rows;
 	u64 count = GET_COUNT(ptr);
-	for (int i = 0; i < count; i++) {
-		char *function_name = rows[i]._name;
-		char *bin_name = rows[i]._bin_name;
-		char *address = rows[i]._address;
-		char *file_path = rows[i]._file_path;
-		printf("#%i:\n\
+	if (count == 0) {
+		printf("-------------Backtrace not available-------------\n");
+	} else {
+		printf("Backtrace:\n");
+		for (int i = 0; i < count; i++) {
+			char *function_name = rows[i]._name;
+			char *bin_name = rows[i]._bin_name;
+			char *address = rows[i]._address;
+			char *file_path = rows[i]._file_path;
+			printf("#%i:\n\
 	[%sfn=%s%s%s%s']\n\
 	[%sbinary=%s'%s%s%s'] [%saddress=%s%s]\n\
 	[%scode=%s'%s%s%s']\n",
-		       i, DIMMED, RESET, GREEN, function_name, RESET, DIMMED,
-		       RESET, MAGENTA, bin_name, RESET, DIMMED, RESET, address,
-		       DIMMED, RESET, CYAN, file_path, RESET);
+			       i, DIMMED, RESET, GREEN, function_name, RESET,
+			       DIMMED, RESET, MAGENTA, bin_name, RESET, DIMMED,
+			       RESET, address, DIMMED, RESET, CYAN, file_path,
+			       RESET);
+		}
 	}
 }
 

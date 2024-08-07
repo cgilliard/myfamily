@@ -726,6 +726,17 @@ Test(core, test_slab_no_malloc) {
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }
 
+Result res_fun(int x) {
+	if (x < 0) {
+		Error e = ERR(ILLEGAL_ARGUMENT,
+			      "x was %i. It must be a positive number");
+		return Err(e);
+	} else {
+		int y = x + 10;
+		return Ok(y);
+	}
+}
+
 Test(core, test_enum_oom) {
 	ResourceStats init_stats = get_resource_stats();
 	{
@@ -758,6 +769,20 @@ Test(core, test_enum_oom) {
 				MyClass3 x2 = BUILD(MyClass3, slab);
 				MyEnum e2 = BUILD_ENUM(MyEnum, VV03, x2);
 				cr_assert_eq(e2.slab.data, NULL);
+
+				Result r = Ok(x1);
+				cr_assert(IS_ERR(r));
+				Error e = UNWRAP_ERR(r);
+				print(&e);
+
+				// this is still an error because we're oom
+				Result r2 = res_fun(1);
+				cr_assert(IS_ERR(r2));
+
+				Result r3 = res_fun(-1);
+				cr_assert(IS_ERR(r3));
+				Error e3 = UNWRAP_ERR(r3);
+				print(&e3);
 			}
 
 			UNSET_SLAB_ALLOCATOR();
@@ -802,6 +827,58 @@ Test(core, test_result) {
 		u128 x5_out = EXPECT(r5, x5_out);
 		cr_assert_eq(x5_out, 222);
 		cr_assert_eq(x5, 222);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	if (init_stats.malloc_sum != end_stats.malloc_sum)
+		printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
+		       end_stats.malloc_sum);
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_res_fun) {
+	Result r1 = res_fun(1);
+	cr_assert(!IS_ERR(r1));
+	cr_assert(IS_OK(r1));
+
+	Result r2 = res_fun(-1);
+	cr_assert(IS_ERR(r2));
+	cr_assert(!IS_OK(r2));
+}
+
+Result res_fun2(int x) {
+	Result r = res_fun(x);
+	int y = TRY(r, y);
+	return Ok(y);
+}
+
+Test(core, test_try) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		Result r1 = res_fun2(7);
+		cr_assert(IS_OK(r1));
+		int x1 = EXPECT(r1, x1);
+		cr_assert_eq(x1, 17);
+
+		Result r2 = res_fun2(-10);
+		cr_assert(IS_ERR(r2));
+		Error e3 = UNWRAP_ERR(r2);
+		print(&e3);
+
+		Result r3 = res_fun2(1);
+		bool v3 = false;
+		MATCH(r3, VARIANT(Ok, { v3 = true; })
+			      VARIANT(Err, { v3 = false; }));
+		cr_assert(v3);
+
+		Result r4 = res_fun2(-10);
+		bool v4 = false;
+		MATCH(r4, VARIANT(Ok, { v4 = true; })
+			      VARIANT(Err, { v4 = false; }));
+		cr_assert(!v4);
+
+		ResultPtr res1 = STATIC_ALLOC_RESULT;
+		ErrorPtr err1 = UNWRAP_ERR(res1);
+		print(&err1);
 	}
 	ResourceStats end_stats = get_resource_stats();
 	if (init_stats.malloc_sum != end_stats.malloc_sum)
