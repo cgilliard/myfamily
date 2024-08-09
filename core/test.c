@@ -1014,3 +1014,19 @@ Test(core, test_enum2) {
 		       end_stats.malloc_sum);
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }
+
+Result res_fun_simple(i64 v) {
+	if (v > 0)
+		return Ok(v);
+	else {
+		Error e = ERR(ILLEGAL_ARGUMENT,
+			      "v was %i. It must be a positive number", v);
+		return Err(e);
+	}
+}
+
+Test(core, result_overhead) {
+	Result res = res_fun_simple(77);
+	i64 v_out = EXPECT(res, v_out);
+	cr_assert_eq(v_out, 77);
+}

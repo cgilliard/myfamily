@@ -17,7 +17,7 @@
 #include <stdio.h>
 
 #define DEFINE_PRIM_IMPLS(prim_type, type, format)                             \
-	void type##_cleanup(type *ptr) { printf("cleanup prim %p\n", ptr); }   \
+	void type##_cleanup(type *ptr) {}                                      \
 	void type##_to_str_buf(type *ptr, char *buf, u64 max_len) {            \
 		snprintf(buf, max_len, "%" format, ptr->_value);               \
 	}                                                                      \
