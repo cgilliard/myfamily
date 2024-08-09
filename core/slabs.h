@@ -20,26 +20,21 @@
 #include <limits.h>
 #include <stdlib.h>
 
-typedef struct SlabDataConfig {
-	u64 slab_size;
-	u64 slab_count;
-	u64 max_slabs;
-	u64 slabs_per_resize;
-} SlabDataConfig;
-
 typedef struct SlabDataParams {
 	u64 slab_size;
-	u64 slab_count;
+	u64 slabs_per_resize;
+	u64 initial_chunks;
 	u64 max_slabs;
 	u64 free_list_head;
-	u64 slabs_per_resize;
 } SlabDataParams;
 
-struct SlabDataPtr {
-	void *data;
+typedef struct SlabDataPtr {
+	void **data;
+	u64 count;
+	u64 cur_slabs;
 	SlabDataParams sdp;
-};
-typedef struct SlabDataPtr SlabDataPtr;
+} SlabDataPtr;
+
 #define SlabData                                                               \
 	SlabDataPtr                                                            \
 	    __attribute__((warn_unused_result, cleanup(slab_data_cleanup)))
@@ -49,6 +44,11 @@ typedef struct Slab {
 	void *data;
 	u64 len;
 } Slab;
+
+void slab_data_cleanup(SlabData *ptr);
+int slab_data_build(SlabData *ptr, SlabDataParams sdp);
+int slab_data_access(SlabData *ptr, Slab *slab, u64 offset);
+int slab_data_resize(SlabData *ptr);
 
 void slab_data_cleanup(SlabData *ptr);
 int slab_data_build(SlabData *ptr, SlabDataParams sdp);
@@ -88,7 +88,7 @@ typedef struct SlabAllocatorConfig {
 	u64 value;
 } SlabAllocatorConfig;
 
-#define SlabCount(num) ({ _sdp__.slab_count = num; })
+#define SlabCount(num) ({ _sdp__.initial_chunks = num; })
 
 #define SlabSize(num) ({ _sdp__.slab_size = num; })
 
@@ -103,7 +103,7 @@ typedef struct SlabAllocatorConfig {
 		SlabDataParams _sdp__;                                         \
 		_sdp__.free_list_head = 0;                                     \
 		_sdp__.slab_size = 512;                                        \
-		_sdp__.slab_count = 10;                                        \
+		_sdp__.initial_chunks = 1;                                     \
 		_sdp__.max_slabs = 100;                                        \
 		_sdp__.slabs_per_resize = 10;                                  \
 		EXPAND(FOR_EACH(UPDATE_SLAB_PARAMS, __VA_ARGS__));             \

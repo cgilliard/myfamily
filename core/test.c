@@ -23,7 +23,7 @@ Test(core, slab_data) {
 	Slab slab;
 	slab.len = 10;
 	p.slab_size = 10;
-	p.slab_count = 10;
+	p.initial_chunks = 1;
 	p.max_slabs = 35;
 	p.slabs_per_resize = 10;
 	p.free_list_head = 0;
@@ -49,19 +49,18 @@ Test(core, slab_allocator) {
 	SlabAllocator sa;
 	SlabDataParams sdp1, sdp2;
 	sdp1.slab_size = 10;
-	sdp1.slab_count = 10;
+	sdp1.initial_chunks = 1;
 	sdp1.max_slabs = 30;
 	sdp1.slabs_per_resize = 5;
 	sdp1.free_list_head = 0;
 
 	sdp2.slab_size = 20;
-	sdp2.slab_count = 10;
+	sdp2.initial_chunks = 1;
 	sdp2.max_slabs = 50;
 	sdp2.slabs_per_resize = 10;
 	sdp2.free_list_head = 0;
 
 	slab_allocator_build(&sa, true, 2, sdp1, sdp2);
-
 	u64 id = slab_allocator_allocate(&sa, 10);
 	cr_assert_eq(id, 0);
 	Slab slab;
@@ -98,13 +97,13 @@ Test(core, slab_allocator_resize) {
 	SlabAllocator sa;
 	SlabDataParams sdp1, sdp2;
 	sdp1.slab_size = 10;
-	sdp1.slab_count = 10;
+	sdp1.initial_chunks = 2;
 	sdp1.max_slabs = 35;
 	sdp1.slabs_per_resize = 5;
 	sdp1.free_list_head = 0;
 
 	sdp2.slab_size = 20;
-	sdp2.slab_count = 10;
+	sdp2.initial_chunks = 1;
 	sdp2.max_slabs = 50;
 	sdp2.slabs_per_resize = 10;
 	sdp2.free_list_head = 0;
@@ -147,21 +146,21 @@ Test(core, slab_allocator_params) {
 	cr_assert_eq(sdp1.slab_size, 512);
 	cr_assert_eq(sdp1.max_slabs, 100);
 	cr_assert_eq(sdp1.slabs_per_resize, 10);
-	cr_assert_eq(sdp1.slab_count, 10);
+	cr_assert_eq(sdp1.initial_chunks, 1);
 	cr_assert_eq(sdp1.free_list_head, 0);
 
 	SlabDataParams sdp2 = SLAB_PARAMS(SlabSize(256));
 	cr_assert_eq(sdp2.slab_size, 256);
 	cr_assert_eq(sdp2.max_slabs, 100);
 	cr_assert_eq(sdp2.slabs_per_resize, 10);
-	cr_assert_eq(sdp2.slab_count, 10);
+	cr_assert_eq(sdp2.initial_chunks, 1);
 	cr_assert_eq(sdp2.free_list_head, 0);
 
 	SlabDataParams sdp3 = SLAB_PARAMS(SlabCount(300), MaxSlabs(400));
 	cr_assert_eq(sdp3.slab_size, 512);
 	cr_assert_eq(sdp3.max_slabs, 400);
 	cr_assert_eq(sdp3.slabs_per_resize, 10);
-	cr_assert_eq(sdp3.slab_count, 300);
+	cr_assert_eq(sdp3.initial_chunks, 300);
 	cr_assert_eq(sdp3.free_list_head, 0);
 
 	SlabData sd;
@@ -560,12 +559,10 @@ Test(core, test_error) {
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }
 
-/*
 Result gen_result() {
 	u64 x = 1234;
 	// return Ok(x);
 }
-*/
 
 CLASS(TestClassHeapify, FIELD(u64, v) FIELD(Slab, s))
 #define TestClassHeapify DEFINE_CLASS(TestClassHeapify)
@@ -696,11 +693,11 @@ Test(core, test_slab_no_malloc) {
 		// init slab allocator and define some slabs
 		SlabAllocator sa;
 		Slab slab1, slab2, slab3, slab4, slab5, slab6;
-		sa = SLABS(
-		    false,
-		    SLAB_PARAMS(SlabSize(10), SlabCount(10), MaxSlabs(10)),
-		    SLAB_PARAMS(SlabSize(50), SlabCount(30)),
-		    SLAB_PARAMS(SlabSize(25), SlabCount(20)));
+		sa =
+		    SLABS(false,
+			  SLAB_PARAMS(SlabSize(10), SlabCount(1), MaxSlabs(10)),
+			  SLAB_PARAMS(SlabSize(50), SlabCount(3)),
+			  SLAB_PARAMS(SlabSize(25), SlabCount(2)));
 		sa.no_malloc = true;
 		SLAB_ALLOCATOR(&sa);
 		{
@@ -1061,4 +1058,138 @@ Test(core, test_option) {
 		printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
 		       end_stats.malloc_sum);
 	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Result test_complex5(int x) {
+	int xy = x + 1;
+	/*
+	Result x1 = Ok(xy);
+	Result x2 = Ok(x1);
+	Result x3 = Ok(x2);
+	Result x4 = Ok(x3);
+	Option x5 = Some(x4);
+	Option x6 = Some(x5);
+	Result x7 = Ok(x6);
+	Option x6_out = TRY(x7, x6_out);
+	Option x5_out = TRY(x6_out, x5_out);
+	Result x4_out = TRY(x5_out, x4_out);
+	Result x3_out = TRY(x4_out, x3_out);
+	Result x2_out = TRY(x3_out, x2_out);
+	Result x1_out = TRY(x2_out, x2_out);
+	int v_out = TRY(x1_out, v_out);
+	cr_assert_eq(v_out, 1);
+	*/
+	int y = x + 5;
+	return Ok(y);
+}
+
+Option test_complex4(int x) {
+	Result r5 = test_complex5(x);
+	int v5 = EXPECT(r5, v5);
+	int v = v5 + 5;
+	return Some(v);
+}
+
+Result test_complex3(int x) {
+	Option v4 = test_complex4(x);
+	int v = TRY(v4, v);
+	return Ok(v);
+}
+
+Result test_complex2(int x) {
+	Option y = Some(x);
+	int z = TRY(y, z);
+	cr_assert_eq(z, x);
+	return test_complex3(z);
+}
+
+Result test_complex1(int x) { return test_complex2(x); }
+
+Test(core, test_complex) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		Result r = test_complex1(0);
+		cr_assert(IS_OK(r));
+		int r_val = EXPECT(r, r_val);
+		cr_assert_eq(r_val, 10);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	if (init_stats.malloc_sum != end_stats.malloc_sum)
+		printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
+		       end_stats.malloc_sum);
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_slab_resize) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		int xy = 1;
+		Result x1 = Ok(xy);
+		Result x2 = Ok(x1);
+		Result x3 = Ok(x2);
+		Result x4 = Ok(x3);
+		Option x5 = Some(x4);
+		Result x6 = Ok(x5);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	if (init_stats.malloc_sum != end_stats.malloc_sum)
+		printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
+		       end_stats.malloc_sum);
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_slab_data2) {
+	SlabData sd;
+	SlabDataParams p;
+	Slab slab;
+	slab.len = 10;
+	p.slab_size = 10;
+	p.initial_chunks = 1;
+	p.max_slabs = 35;
+	p.slabs_per_resize = 10;
+	p.free_list_head = 0;
+	cr_assert_eq(slab_data_build(&sd, p), 0);
+
+	slab_data_access(&sd, &slab, 0);
+	for (int i = 0; i < 10; i++)
+		((char *)slab.data)[i] = i;
+	slab_data_access(&sd, &slab, 20);
+	for (int i = 0; i < 10; i++) {
+		((char *)slab.data)[i] = i + 10;
+	}
+
+	cr_assert_eq(slab_data_access(&sd, &slab, 0), 0);
+	for (int i = 0; i < 10; i++) {
+		cr_assert_eq(((char *)slab.data)[i], i);
+	}
+
+	cr_assert_eq(slab_data_access(&sd, &slab, 20), 0);
+	for (int i = 0; i < 10; i++)
+		cr_assert_eq(((char *)slab.data)[i], i + 10);
+
+	cr_assert_eq(slab_data_access(&sd, &slab, 180), -1);
+
+	cr_assert_eq(slab_data_resize(&sd), 0);
+
+	cr_assert_eq(slab_data_access(&sd, &slab, 180), 0);
+	for (int i = 0; i < 10; i++) {
+		((char *)slab.data)[i] = i + 20;
+	}
+
+	cr_assert_eq(slab_data_access(&sd, &slab, 0), 0);
+	for (int i = 0; i < 10; i++) {
+		cr_assert_eq(((char *)slab.data)[i], i);
+	}
+
+	cr_assert_eq(slab_data_access(&sd, &slab, 20), 0);
+	for (int i = 0; i < 10; i++)
+		cr_assert_eq(((char *)slab.data)[i], i + 10);
+
+	cr_assert_eq(slab_data_access(&sd, &slab, 180), 0);
+	for (int i = 0; i < 10; i++)
+		cr_assert_eq(((char *)slab.data)[i], i + 20);
+
+	cr_assert_eq(slab_data_access(&sd, &slab, 360), -1);
+
+	cr_assert_eq(slab_data_access(&sd, &slab, 359), 0);
 }
