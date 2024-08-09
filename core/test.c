@@ -131,12 +131,12 @@ Test(core, slab_allocator_resize) {
 Test(core, slab_allocator_params) {
 	SlabAllocator sa;
 	slab_allocator_build(&sa, false, 2,
-			     SLAB_PARAMS(SlabSize(10), SlabCount(20)),
-			     SLAB_PARAMS(SlabSize(50), SlabCount(30)));
+			     SLAB_PARAMS(SlabSize(10), InitialChunks(2)),
+			     SLAB_PARAMS(SlabSize(50), InitialChunks(3)));
 
 	SlabAllocator sa2 =
-	    SLABS(true, SLAB_PARAMS(SlabSize(50), SlabCount(20)),
-		  SLAB_PARAMS(SlabSize(10), SlabCount(30)));
+	    SLABS(true, SLAB_PARAMS(SlabSize(50), InitialChunks(2)),
+		  SLAB_PARAMS(SlabSize(10), InitialChunks(3)));
 	cr_assert_eq(sa2.slab_data_arr_size, 2);
 	cr_assert_eq(sa2.slab_data_arr[0].sdp.slab_size, 10);
 	cr_assert_eq(sa2.slab_data_arr[1].sdp.slab_size, 50);
@@ -156,11 +156,11 @@ Test(core, slab_allocator_params) {
 	cr_assert_eq(sdp2.initial_chunks, 1);
 	cr_assert_eq(sdp2.free_list_head, 0);
 
-	SlabDataParams sdp3 = SLAB_PARAMS(SlabCount(300), MaxSlabs(400));
+	SlabDataParams sdp3 = SLAB_PARAMS(InitialChunks(3), MaxSlabs(400));
 	cr_assert_eq(sdp3.slab_size, 512);
 	cr_assert_eq(sdp3.max_slabs, 400);
 	cr_assert_eq(sdp3.slabs_per_resize, 10);
-	cr_assert_eq(sdp3.initial_chunks, 300);
+	cr_assert_eq(sdp3.initial_chunks, 3);
 	cr_assert_eq(sdp3.free_list_head, 0);
 
 	SlabData sd;
@@ -175,9 +175,9 @@ Test(core, test_mymalloc) {
 		// init slab allocator and define some slabs
 		SlabAllocator sa;
 		Slab slab1, slab2, slab3, slab4, slab5, slab6;
-		sa = SLABS(false, SLAB_PARAMS(SlabSize(10), SlabCount(20)),
-			   SLAB_PARAMS(SlabSize(50), SlabCount(30)),
-			   SLAB_PARAMS(SlabSize(25), SlabCount(20)));
+		sa = SLABS(false, SLAB_PARAMS(SlabSize(10), InitialChunks(2)),
+			   SLAB_PARAMS(SlabSize(50), InitialChunks(3)),
+			   SLAB_PARAMS(SlabSize(25), InitialChunks(2)));
 		SLAB_ALLOCATOR(&sa);
 		{
 
@@ -246,9 +246,9 @@ Test(core, test_realloc) {
 		cr_assert_eq(myfree(&slab1), 0);
 
 		SlabAllocator sa =
-		    SLABS(false, SLAB_PARAMS(SlabSize(10), SlabCount(20)),
-			  SLAB_PARAMS(SlabSize(50), SlabCount(30)),
-			  SLAB_PARAMS(SlabSize(25), SlabCount(20)));
+		    SLABS(false, SLAB_PARAMS(SlabSize(10), InitialChunks(2)),
+			  SLAB_PARAMS(SlabSize(50), InitialChunks(3)),
+			  SLAB_PARAMS(SlabSize(25), InitialChunks(2)));
 		SLAB_ALLOCATOR(&sa);
 		{
 
@@ -289,8 +289,8 @@ Test(core, test_0size_initial_sa) {
 
 	{
 		SlabAllocator sa = SLABS(
-		    false, SLAB_PARAMS(SlabSize(1), SlabCount(0), MaxSlabs(100),
-				       SlabsPerResize(10)));
+		    false, SLAB_PARAMS(SlabSize(1), InitialChunks(0),
+				       MaxSlabs(100), SlabsPerResize(10)));
 		SLAB_ALLOCATOR(&sa);
 
 		{
@@ -315,7 +315,7 @@ Test(core, test_nested_slabs) {
 
 	{
 		SlabAllocator sa1 = SLABS(
-		    false, SLAB_PARAMS(SlabSize(10), SlabCount(10),
+		    false, SLAB_PARAMS(SlabSize(10), InitialChunks(1),
 				       MaxSlabs(100), SlabsPerResize(10)));
 		SLAB_ALLOCATOR(&sa1);
 		{
@@ -330,7 +330,7 @@ Test(core, test_nested_slabs) {
 
 				SlabAllocator sa2 =
 				    SLABS(false, SLAB_PARAMS(SlabSize(20),
-							     SlabCount(10),
+							     InitialChunks(1),
 							     MaxSlabs(100)));
 				SLAB_ALLOCATOR(&sa2);
 				{
@@ -693,11 +693,11 @@ Test(core, test_slab_no_malloc) {
 		// init slab allocator and define some slabs
 		SlabAllocator sa;
 		Slab slab1, slab2, slab3, slab4, slab5, slab6;
-		sa =
-		    SLABS(false,
-			  SLAB_PARAMS(SlabSize(10), SlabCount(1), MaxSlabs(10)),
-			  SLAB_PARAMS(SlabSize(50), SlabCount(3)),
-			  SLAB_PARAMS(SlabSize(25), SlabCount(2)));
+		sa = SLABS(
+		    false,
+		    SLAB_PARAMS(SlabSize(10), InitialChunks(1), MaxSlabs(10)),
+		    SLAB_PARAMS(SlabSize(50), InitialChunks(3)),
+		    SLAB_PARAMS(SlabSize(25), InitialChunks(2)));
 		sa.no_malloc = true;
 		SLAB_ALLOCATOR(&sa);
 		{

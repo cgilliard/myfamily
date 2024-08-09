@@ -76,19 +76,7 @@ u64 slab_allocator_allocate(SlabAllocator *ptr, u64 size);
 int slab_allocator_get(SlabAllocator *ptr, Slab *slab, u64 id);
 int slab_allocator_free(SlabAllocator *ptr, u64 id);
 
-typedef enum SlabAllocatorConfigType {
-	SASlabCount = 0,
-	SASlabSize = 1,
-	SASlabsPerResize = 2,
-	SAMaxSlabs = 3,
-} SlabAllocatorConfigType;
-
-typedef struct SlabAllocatorConfig {
-	SlabAllocatorConfigType type;
-	u64 value;
-} SlabAllocatorConfig;
-
-#define SlabCount(num) ({ _sdp__.initial_chunks = num; })
+#define InitialChunks(num) ({ _sdp__.initial_chunks = num; })
 
 #define SlabSize(num) ({ _sdp__.slab_size = num; })
 
