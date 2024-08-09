@@ -803,7 +803,6 @@ Test(core, test_result) {
 		MyClass3 x3 = BUILD(MyClass3, _slab___, 101);
 		cr_assert_eq(x3._vv, 101);
 
-		printf("building ok\n");
 		Result r3 = Ok(x3);
 		MyClass3 x3_out = EXPECT(r3, x3_out);
 		cr_assert_eq(x3_out._vv, 101);
@@ -865,18 +864,13 @@ Result res_fun3(int x) {
 	mymalloc(&slab, 20000);
 	MyClass3Ptr v = BUILD(MyClass3, slab, 107);
 	ResultPtr ret = Ok(v);
-	printf("ret built\n");
 	return ret;
 }
 
 Result res_fun4(int x) {
-	// printf("resfun4\n");
 	Result r = res_fun3(0);
-	// printf("res_fun3 complete\n");
 	MyClass3 ret9 = TRY(r, ret9);
-	printf("ret done4 %s size=%llu\n", CLASS_NAME(&ret9), mysize(&ret9));
 	ResultPtr rr1 = Ok(ret9);
-	printf("ok built\n");
 	return rr1;
 }
 
@@ -884,11 +878,8 @@ Test(core, test_try) {
 	ResourceStats init_stats = get_resource_stats();
 	{
 		Result r = res_fun4(0);
-		printf("1\n");
 		MyClass3 mc3 = EXPECT(r, mc3);
-		printf("mc3 out\n");
 		cr_assert_eq(mc3._vv, 107);
-		printf("complete\n");
 
 		Result r1 = res_fun2(7);
 		cr_assert(IS_OK(r1));
@@ -953,9 +944,7 @@ Test(core, test_rc_2) {
 		cr_assert_eq(x1_out, 111);
 
 		Rc r3 = rc_ret2();
-		printf("ret2 unwrap\n");
 		u64 x3_out = *(u64 *)unwrap(&r3);
-		printf("ret2 complete unwrap\n");
 		cr_assert_eq(x3_out, 111);
 
 		u16 x4 = 72;
@@ -963,9 +952,7 @@ Test(core, test_rc_2) {
 
 		u16 x5 = 77;
 		Rc r5 = HEAPIFY(x5);
-		printf("call unwrap on u16\n");
 		u16 x5_out = *(u16 *)unwrap(&r5);
-		printf("unwrap complete\n");
 		cr_assert_eq(x5_out, 77);
 
 		Rc r6 = rc_ret3();
@@ -992,9 +979,7 @@ Test(core, test_enum2) {
 
 		Slab slab;
 		mymalloc(&slab, 100);
-		printf("building x2\n");
 		MyClass3 x2 = BUILD(MyClass3, slab);
-		printf("x2 built\n");
 		MyEnum e2 = BUILD_ENUM(MyEnum, VV03, x2);
 		MyClass3 x2_out = ENUM_VALUE(x2_out, MyClass3, e2);
 
