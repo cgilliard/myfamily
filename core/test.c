@@ -1062,7 +1062,6 @@ Test(core, test_option) {
 
 Result test_complex5(int x) {
 	int xy = x + 1;
-	/*
 	Result x1 = Ok(xy);
 	Result x2 = Ok(x1);
 	Result x3 = Ok(x2);
@@ -1075,10 +1074,9 @@ Result test_complex5(int x) {
 	Result x4_out = TRY(x5_out, x4_out);
 	Result x3_out = TRY(x4_out, x3_out);
 	Result x2_out = TRY(x3_out, x2_out);
-	Result x1_out = TRY(x2_out, x2_out);
+	Result x1_out = TRY(x2_out, x1_out);
 	int v_out = TRY(x1_out, v_out);
 	cr_assert_eq(v_out, 1);
-	*/
 	int y = x + 5;
 	return Ok(y);
 }
