@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/backtrace.h>
-#include <core/class.h>
-#include <core/ekinds.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/mymalloc.h>
-#include <core/panic.h>
-#include <core/prim.h>
-#include <core/rand.h>
-#include <core/rc.h>
-#include <core/result.h>
-#include <core/slabs.h>
 #include <core/slice.h>
-#include <core/string.h>
-#include <core/string_builder.h>
-#include <core/unit.h>
+
+GETTER(Slice, len)
+
+void Slice_cleanup(Slice *rh) {}
+
+u64 Slice_len(Slice *rh) {
+	u64 ret = GET(Slice, rh, len);
+	return ret;
+}
+
+Slice Slice_build(void *ptr, u64 size) {
+	Slice ret = BUILD(Slice, ptr, size);
+	return ret;
+}

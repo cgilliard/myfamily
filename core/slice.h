@@ -12,19 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/backtrace.h>
+#ifndef _CORE_SLICE__
+#define _CORE_SLICE__
+
 #include <core/class.h>
-#include <core/ekinds.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/mymalloc.h>
-#include <core/panic.h>
-#include <core/prim.h>
-#include <core/rand.h>
-#include <core/rc.h>
-#include <core/result.h>
-#include <core/slabs.h>
-#include <core/slice.h>
-#include <core/string.h>
-#include <core/string_builder.h>
-#include <core/unit.h>
+#include <core/traits.h>
+
+CLASS(Slice, FIELD(void *, ref) FIELD(u64, len))
+IMPL(Slice, TRAIT_LEN)
+#define Slice DEFINE_CLASS(Slice)
+
+static GETTER(Slice, ref);
+static SETTER(Slice, ref);
+
+static SETTER(Slice, len);
+
+Slice Slice_build(void *ref, u64 size);
+
+#define SLICE(ref, size) Slice_build(ref, size)
+
+#endif // _CORE_SLICE__

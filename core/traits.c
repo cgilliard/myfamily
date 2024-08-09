@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// #include <core/traits.h>
+#include <core/traits.h>
 #include <core/traits_base.h>
-// #include <core/unit.h>
+#include <core/unit.h>
 #include <stdlib.h>
 
 bool default_copy(void *dst, void *src) { return myclone(dst, src); }
@@ -83,6 +83,29 @@ u64 mysize(void *obj) {
 		panic("mysize not implemented for this type: %s",
 		      ((Object *)obj)->vdata.name);
 	return do_size(obj);
+}
+
+u64 len(void *obj) {
+	u64 (*do_len)(Object *obj) = find_fn((Object *)obj, "len");
+	if (do_len == NULL)
+		panic("len not implemented for this type");
+	return do_len(obj);
+}
+
+Result append_impl(void *dst, void *src) {
+	ResultPtr (*do_append)(Object *dst, Object *src) =
+	    find_fn((Object *)dst, "append");
+	if (do_append == NULL)
+		panic("append not implemented for this type");
+	return do_append(dst, src);
+}
+
+Result append_s(void *dst, Object *src) {
+	ResultPtr (*do_append_s)(void *dst, Object *src) =
+	    find_fn((Object *)dst, "append_s");
+	if (do_append_s == NULL)
+		panic("append_s not implemented for this type");
+	return do_append_s(dst, src);
 }
 
 /*
