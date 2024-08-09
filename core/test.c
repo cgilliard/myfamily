@@ -798,11 +798,12 @@ Test(core, test_result) {
 		cr_assert_eq(x2_out, -123);
 		cr_assert_eq(x2, -123);
 
-		Slab slab;
-		mymalloc(&slab, 100);
-		MyClass3 x3 = BUILD(MyClass3, slab, 101);
+		Slab _slab___;
+		mymalloc(&_slab___, 100);
+		MyClass3 x3 = BUILD(MyClass3, _slab___, 101);
 		cr_assert_eq(x3._vv, 101);
 
+		printf("building ok\n");
 		Result r3 = Ok(x3);
 		MyClass3 x3_out = EXPECT(r3, x3_out);
 		cr_assert_eq(x3_out._vv, 101);
@@ -836,10 +837,16 @@ Test(core, test_res_fun) {
 	cr_assert(!IS_OK(r2));
 }
 
+Result ret_err() {
+	Error e =
+	    ERR(ILLEGAL_ARGUMENT, "x was %i. It must be a positive number");
+	return Err(e);
+}
+
 Result res_fun(int x) {
 	if (x < 0) {
 		ErrorPtr e = ERR(ILLEGAL_ARGUMENT,
-				 "x was %i. It must be a positive number");
+				 "x was %i. It must be a positive number", x);
 		return Err(e);
 	} else {
 		int y = x + 10;
@@ -853,9 +860,36 @@ Result res_fun2(int x) {
 	return Ok(y);
 }
 
+Result res_fun3(int x) {
+	Slab slab;
+	mymalloc(&slab, 20000);
+	MyClass3Ptr v = BUILD(MyClass3, slab, 107);
+	ResultPtr ret = Ok(v);
+	printf("ret built\n");
+	return ret;
+}
+
+Result res_fun4(int x) {
+	// printf("resfun4\n");
+	Result r = res_fun3(0);
+	// printf("res_fun3 complete\n");
+	MyClass3 ret9 = TRY(r, ret9);
+	printf("ret done4 %s size=%llu\n", CLASS_NAME(&ret9), mysize(&ret9));
+	ResultPtr rr1 = Ok(ret9);
+	printf("ok built\n");
+	return rr1;
+}
+
 Test(core, test_try) {
 	ResourceStats init_stats = get_resource_stats();
 	{
+		Result r = res_fun4(0);
+		printf("1\n");
+		MyClass3 mc3 = EXPECT(r, mc3);
+		printf("mc3 out\n");
+		cr_assert_eq(mc3._vv, 107);
+		printf("complete\n");
+
 		Result r1 = res_fun2(7);
 		cr_assert(IS_OK(r1));
 		int x1 = EXPECT(r1, x1);
@@ -878,9 +912,116 @@ Test(core, test_try) {
 			      VARIANT(Err, { v4 = false; }));
 		cr_assert(!v4);
 
-		ResultPtr res1 = STATIC_ALLOC_RESULT;
-		ErrorPtr err1 = UNWRAP_ERR(res1);
+		Result res1 = STATIC_ALLOC_RESULT;
+		Error err1 = UNWRAP_ERR(res1);
 		print(&err1);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	if (init_stats.malloc_sum != end_stats.malloc_sum)
+		printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
+		       end_stats.malloc_sum);
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Rc rc_ret1() {
+	u64 x1 = 111;
+	RcPtr r1 = HEAPIFY(x1);
+	return r1;
+}
+
+Rc rc_ret2() {
+	Rc r1 = rc_ret1();
+	RcPtr r2;
+	myclone(&r2, &r1);
+	return r2;
+}
+
+Rc rc_ret3() {
+	Slab slab;
+	mymalloc(&slab, 300);
+	MyClass3 mc3 = BUILD(MyClass3, slab, 11);
+	RcPtr rc = HEAPIFY(mc3);
+	return rc;
+}
+
+Test(core, test_rc_2) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		Rc r1 = rc_ret1();
+		Rc r2 = rc_ret1();
+		u64 x1_out = *(u64 *)unwrap(&r2);
+		cr_assert_eq(x1_out, 111);
+
+		Rc r3 = rc_ret2();
+		printf("ret2 unwrap\n");
+		u64 x3_out = *(u64 *)unwrap(&r3);
+		printf("ret2 complete unwrap\n");
+		cr_assert_eq(x3_out, 111);
+
+		u16 x4 = 72;
+		Rc r4 = HEAPIFY(x4);
+
+		u16 x5 = 77;
+		Rc r5 = HEAPIFY(x5);
+		printf("call unwrap on u16\n");
+		u16 x5_out = *(u16 *)unwrap(&r5);
+		printf("unwrap complete\n");
+		cr_assert_eq(x5_out, 77);
+
+		Rc r6 = rc_ret3();
+		Rc r7 = rc_ret3();
+		Rc r8;
+		myclone(&r8, &r7);
+		MyClass3 r7_out = *(MyClass3 *)unwrap(&r7);
+		cr_assert_eq(r7_out._vv, 11);
+	}
+	ResourceStats end_stats = get_resource_stats();
+	if (init_stats.malloc_sum != end_stats.malloc_sum)
+		printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
+		       end_stats.malloc_sum);
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
+}
+
+Test(core, test_enum2) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		u64 x1 = 10;
+		MyEnum e1 = BUILD_ENUM(MyEnum, VV01, x1);
+		u64 x1_out = ENUM_VALUE(x1_out, u64, e1);
+		cr_assert_eq(x1_out, x1);
+
+		Slab slab;
+		mymalloc(&slab, 100);
+		printf("building x2\n");
+		MyClass3 x2 = BUILD(MyClass3, slab);
+		printf("x2 built\n");
+		MyEnum e2 = BUILD_ENUM(MyEnum, VV03, x2);
+		MyClass3 x2_out = ENUM_VALUE(x2_out, MyClass3, e2);
+
+		u32 x3 = 20;
+		MyEnum e3 = BUILD_ENUM(MyEnum, VV02, x3);
+		u32 x3_out = ENUM_VALUE(x3_out, u32, e3);
+		cr_assert_eq(x3_out, x3);
+
+		i8 x4 = 9;
+		MyEnum2 e4 = BUILD_ENUM(MyEnum2, V201, x4);
+		i8 x4_out = ENUM_VALUE(x4_out, i8, e4);
+		cr_assert_eq(x4_out, x4);
+
+		bool x5 = false;
+		MyEnum2 e5 = BUILD_ENUM(MyEnum2, V206, x5);
+		bool x5_out = ENUM_VALUE(x5_out, bool, e5);
+		cr_assert_eq(x5_out, x5);
+
+		bool x6 = true;
+		MyEnum2 e6 = BUILD_ENUM(MyEnum2, V206, x6);
+		bool x6_out = ENUM_VALUE(x6_out, bool, e6);
+		cr_assert_eq(x6_out, x6);
+
+		f64 x7 = 1.234;
+		MyEnum2 e7 = BUILD_ENUM(MyEnum2, V207, x7);
+		f64 x7_out = ENUM_VALUE(x7_out, f64, e7);
+		cr_assert_eq(x7_out, x7);
 	}
 	ResourceStats end_stats = get_resource_stats();
 	if (init_stats.malloc_sum != end_stats.malloc_sum)

@@ -45,21 +45,21 @@ static Rc STATIC_ALLOC_ERROR_RC = {
 
 #define Ok(x)                                                                  \
 	({                                                                     \
-		Rc rc = HEAPIFY(x);                                            \
-		ResultPtr r = BUILD_ENUM(Result, Ok, rc);                      \
-		if (r.slab.data == NULL) {                                     \
-			r = STATIC_ALLOC_RESULT;                               \
+		Rc ___rc__##x = HEAPIFY(x);                                    \
+		ResultPtr _r__##x = BUILD_ENUM(Result, Ok, ___rc__##x);        \
+		if (_r__##x.slab.data == NULL) {                               \
+			_r__##x = STATIC_ALLOC_RESULT;                         \
 		}                                                              \
-		r;                                                             \
+		_r__##x;                                                       \
 	})
 
 #define Err(e)                                                                 \
 	({                                                                     \
-		ResultPtr r = BUILD_ENUM(Result, Err, e);                      \
-		if (r.slab.data == NULL) {                                     \
-			r = STATIC_ALLOC_RESULT;                               \
+		ResultPtr _r__##x = BUILD_ENUM(Result, Err, e);                \
+		if (_r__##x.slab.data == NULL) {                               \
+			_r__##x = STATIC_ALLOC_RESULT;                         \
 		}                                                              \
-		r;                                                             \
+		_r__##x;                                                       \
 	})
 
 static Result STATIC_ALLOC_RESULT = {
@@ -70,8 +70,8 @@ static Result STATIC_ALLOC_RESULT = {
 
 #define UNWRAP_TYPE(type, x)                                                   \
 	({                                                                     \
-		Rc _out__ = ENUM_VALUE(_out__, Rc, x);                         \
-		*(type *)unwrap(&_out__);                                      \
+		Rc _out__##x = ENUM_VALUE(_out__##x, Rc, x);                   \
+		*(type *)unwrap(&_out__##x);                                   \
 	})
 
 #define UNWRAP_VALUE(x, v)                                                     \
@@ -90,13 +90,10 @@ static Result STATIC_ALLOC_RESULT = {
 	    f64: UNWRAP_TYPE(f64, x),                                          \
 	    bool: UNWRAP_TYPE(bool, x),                                        \
 	    default: ({                                                        \
-			 Rc rc = ENUM_VALUE(rc, Rc, x);                        \
-			 SET(Rc, &rc, flags, RC_FLAGS_NO_CLEANUP);             \
-			 void *ptr = unwrap(&rc);                              \
-			 memcpy(&v, ptr, mysize(ptr));                         \
-			 x.flags = ENUM_FLAG_NO_CLEANUP;                       \
-			 cleanup(&rc);                                         \
-			 myfree(&x.slab);                                      \
+			 Rc _unwrap_value__rc_##v =                            \
+			     ENUM_VALUE(_unwrap_value__rc_##v, Rc, x);         \
+			 void *_ptr__##v = unwrap(&_unwrap_value__rc_##v);     \
+			 memcpy(&v, _ptr__##v, mysize(_ptr__##v));             \
 			 v;                                                    \
 		 }))
 
@@ -104,18 +101,14 @@ static Result STATIC_ALLOC_RESULT = {
 	({                                                                     \
 		if (IS_OK(x))                                                  \
 			panic("Attempt to unwrap_err an ok");                  \
-		RcPtr ptr;                                                     \
-		copy(&ptr, x.slab.data);                                       \
-		ErrorPtr ret = *(Error *)unwrap(&ptr);                         \
-		ret;                                                           \
+		*(Error *)unwrap(x.slab.data);                                 \
 	})
 
 #define TRY(x, v)                                                              \
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
-			ErrorPtr e = UNWRAP_ERR(x);                            \
-			ResultPtr ret = Err(e);                                \
-			return ret;                                            \
+			Error _e__##x = UNWRAP_ERR(x);                         \
+			return Err(_e__##x);                                   \
 		}                                                              \
 		UNWRAP_VALUE(x, v);                                            \
 	})

@@ -128,10 +128,7 @@
 	    f64: ENUM_VALUE_PRIM(ret, type, e, f64),                           \
 	    bool: ENUM_VALUE_PRIM(ret, type, e, bool),                         \
 	    default: ({                                                        \
-			 type##Ptr _ret__;                                     \
-			 Rc _copy__;                                           \
-			 memcpy(&_copy__, e.slab.data, mysize(e.slab.data));   \
-			 _ret__ = *(type *)unwrap(&_copy__);                   \
+			 type##Ptr _ret__ = *(type *)unwrap(e.slab.data);      \
 			 _ret__;                                               \
 		 }))
 

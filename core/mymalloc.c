@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/backtrace.h>
 #include <core/mymalloc.h>
 #include <string.h>
 
@@ -63,6 +64,7 @@ int mymalloc(Slab *slab, u64 size_in) {
 		} else {
 			// could not allocate the slab. Try malloc.
 			slab->data = malloc(size);
+
 			if (slab->data == NULL)
 				ret = -1;
 			else {
