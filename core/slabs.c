@@ -96,7 +96,11 @@ int slab_data_resize(SlabData *ptr) {
 	if (data == NULL)
 		return -1;
 
-	void *tmp = realloc(ptr->data, sizeof(void *) * (ptr->count + 1));
+	void *tmp;
+	if (ptr->count)
+		tmp = realloc(ptr->data, sizeof(void *) * (ptr->count + 1));
+	else
+		tmp = malloc(sizeof(void *) * (ptr->count + 1));
 	if (tmp == NULL) {
 		free(data);
 		return -1;
