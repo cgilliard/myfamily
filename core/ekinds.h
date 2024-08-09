@@ -20,6 +20,7 @@
 static ErrorKind ILLEGAL_ARGUMENT = EKIND("IllegalArgument");
 static ErrorKind ILLEGAL_STATE = EKIND("IllegalState");
 static ErrorKind COPY_NOT_IMPLEMENTED_ERROR = EKIND("CopyNotImplemented");
+static ErrorKind UNWRAP_NONE = EKIND("UnwrapNone");
 static ErrorKind FILE_NOT_FOUND_ERROR = EKIND("FileNotFound");
 static ErrorKind IO_ERROR = EKIND("I/O Error");
 static ErrorKind PARSE_ERROR = EKIND("ParseError");

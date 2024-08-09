@@ -1025,8 +1025,40 @@ Result res_fun_simple(i64 v) {
 	}
 }
 
-Test(core, result_overhead) {
+Test(core, test_result_overhead) {
 	Result res = res_fun_simple(77);
 	i64 v_out = EXPECT(res, v_out);
 	cr_assert_eq(v_out, 77);
+}
+
+Result test_option(u32 y) {
+	Option x = Some(y);
+	cr_assert(IS_SOME(x));
+	cr_assert(!IS_NONE(x));
+	u32 v1 = EXPECT(x, v1);
+	cr_assert_eq(v1, 9);
+
+	Option x2 = None;
+	cr_assert(IS_NONE(x2));
+	cr_assert(!IS_SOME(x2));
+
+	i64 v3 = -100;
+	Option x3 = Some(v3);
+	i64 v3_out = TRY(x3, v3_out);
+	cr_assert_eq(v3_out, -100);
+
+	return Ok(UNIT);
+}
+
+Test(core, test_option) {
+	ResourceStats init_stats = get_resource_stats();
+	{
+		Result r = test_option(9);
+		cr_assert(IS_OK(r));
+	}
+	ResourceStats end_stats = get_resource_stats();
+	if (init_stats.malloc_sum != end_stats.malloc_sum)
+		printf("init=%llu,end=%llu\n", init_stats.malloc_sum,
+		       end_stats.malloc_sum);
+	cr_assert_eq(init_stats.malloc_sum, end_stats.malloc_sum);
 }
