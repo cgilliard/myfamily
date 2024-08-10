@@ -110,4 +110,14 @@ int slab_allocator_free(SlabAllocator *ptr, u64 id);
 		_sa__;                                                         \
 	})
 
+#define ALLOCATE_SLAB(size)                                                    \
+	({                                                                     \
+		({                                                             \
+			Slab ret;                                              \
+			if (mymalloc(&ret, size))                              \
+				return STATIC_ALLOC_ERROR_RESULT;                    \
+			ret;                                                   \
+		});                                                            \
+	})
+
 #endif // _CORE_SLABS__

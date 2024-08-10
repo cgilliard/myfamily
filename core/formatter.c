@@ -102,7 +102,7 @@ Result to_string_buf(void *obj, u64 buf_size) {
 			sz = buf_size;
 		Slab buf_slab;
 		if (mymalloc(&buf_slab, 1 + sz)) {
-			return STATIC_ALLOC_RESULT;
+			return STATIC_ALLOC_ERROR_RESULT;
 		}
 		Formatter fmt = BUILD(Formatter, buf_slab, 0, true);
 		snprintf(buf_slab.data, 1 + sz, "%s@%llu", class_name, id);
@@ -112,7 +112,7 @@ Result to_string_buf(void *obj, u64 buf_size) {
 
 	Slab buf_slab;
 	if (mymalloc(&buf_slab, buf_size)) {
-		return STATIC_ALLOC_RESULT;
+		return STATIC_ALLOC_ERROR_RESULT;
 	}
 	Formatter fmt = BUILD(Formatter, buf_slab, 0, true);
 
@@ -135,7 +135,7 @@ Result to_debug_buf(void *obj, u64 buf_size) {
 			sz = buf_size;
 		Slab buf_slab;
 		if (mymalloc(&buf_slab, 1 + sz)) {
-			return STATIC_ALLOC_RESULT;
+			return STATIC_ALLOC_ERROR_RESULT;
 		}
 		Formatter fmt = BUILD(Formatter, buf_slab, 0, true);
 		snprintf(buf_slab.data, 1 + sz, "%s@%llu", class_name, id);
@@ -145,7 +145,7 @@ Result to_debug_buf(void *obj, u64 buf_size) {
 
 	Slab buf_slab;
 	if (mymalloc(&buf_slab, buf_size)) {
-		return STATIC_ALLOC_RESULT;
+		return STATIC_ALLOC_ERROR_RESULT;
 	}
 	Formatter fmt = BUILD(Formatter, buf_slab, 0, true);
 
@@ -288,4 +288,3 @@ Result Bool_fmt(Bool *v, Formatter *f) {
 }
 
 Result Unit_fmt(Unit *v, Formatter *f) { return WRITE(f, "()"); }
-

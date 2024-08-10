@@ -92,7 +92,7 @@ Result String_append(String *s1, char *s2_ptr) {
 	u64 s2len = strlen(s2_ptr);
 	u64 s1_new_len = s1len + s2len;
 	if (myrealloc(&s1_slab, sizeof(char) * (s1_new_len + 1))) {
-		return STATIC_ALLOC_RESULT;
+		return STATIC_ALLOC_ERROR_RESULT;
 	}
 
 	strcat(s1_slab.data, s2_ptr);
@@ -109,7 +109,7 @@ Result String_build(char *s) {
 	u64 len = strlen(s);
 	Slab slab;
 	if (mymalloc(&slab, sizeof(char) * (len + 1))) {
-		return STATIC_ALLOC_RESULT;
+		return STATIC_ALLOC_ERROR_RESULT;
 	}
 	strcpy(slab.data, s);
 	StringPtr ret = BUILD(String, slab);

@@ -53,7 +53,7 @@ Result StringBuilder_build(char *s) {
 
 	Slab slab;
 	if (mymalloc(&slab, sizeof(char) * (initial_size)))
-		return STATIC_ALLOC_RESULT;
+		return STATIC_ALLOC_ERROR_RESULT;
 	strcpy(slab.data, s);
 
 	StringBuilder ret = BUILD(StringBuilder, slab, initial_size);
@@ -80,7 +80,7 @@ Result StringBuilder_append(StringBuilder *s1, char *s2) {
 
 	if (ncapacity != oldcapacity) {
 		if (myrealloc(&slab, sizeof(char) * (ncapacity))) {
-			return STATIC_ALLOC_RESULT;
+			return STATIC_ALLOC_ERROR_RESULT;
 		}
 	}
 	strcat(s1_ptr, s2);

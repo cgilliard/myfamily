@@ -107,7 +107,7 @@ IMPL(Bool, TRAIT_DISPLAY)
 		({                                                             \
 			Slab buf;                                              \
 			if (mymalloc(&buf, size * sizeof(char)))               \
-				return STATIC_ALLOC_RESULT;                    \
+				return STATIC_ALLOC_ERROR_RESULT;                    \
 			FormatterPtr f = BUILD(Formatter, buf, 0, true);       \
 			f;                                                     \
 		});                                                            \

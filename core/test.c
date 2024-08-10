@@ -854,7 +854,7 @@ MyTest(core, test_try) {
 	MATCH(r4, VARIANT(Ok, { v4 = true; }) VARIANT(Err, { v4 = false; }));
 	cr_assert(!v4);
 
-	Result res1 = STATIC_ALLOC_RESULT;
+	Result res1 = STATIC_ALLOC_ERROR_RESULT;
 	Error err1 = UNWRAP_ERR(res1);
 	print(&err1);
 	return Ok(UNIT);
@@ -1432,5 +1432,11 @@ MyTest(core, test_iterator) {
 	}
 	assert_eq(counter, 10);
 
+	return Ok(UNIT);
+}
+
+MyTest(core, test_slab_allocate_macro) {
+	Slab slab = ALLOCATE_SLAB(10);
+	myfree(&slab);
 	return Ok(UNIT);
 }

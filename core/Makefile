@@ -15,7 +15,10 @@ OBJS := rand.o \
 	tuple.o \
 	formatter.o \
 	format.o \
-	iterator.o
+	iterator.o \
+	io.o \
+	file.o \
+	buf_reader.o
 
 TEST_OBJS := $(OBJS)
 

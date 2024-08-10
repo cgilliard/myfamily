@@ -12,26 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/backtrace.h>
-// #include <core/buf_reader.h>
-#include <core/class.h>
-#include <core/ekinds.h>
-#include <core/enum.h>
-#include <core/error.h>
 #include <core/file.h>
-#include <core/format.h>
-#include <core/formatter.h>
-#include <core/io.h>
-#include <core/iterator.h>
-#include <core/mymalloc.h>
-#include <core/panic.h>
-#include <core/prim.h>
-#include <core/rand.h>
-#include <core/rc.h>
-#include <core/result.h>
-#include <core/slabs.h>
-#include <core/slice.h>
-#include <core/string.h>
-#include <core/string_builder.h>
-#include <core/tuple.h>
-#include <core/unit.h>
+
+void File_cleanup(File *ptr) {}
+Result File_open(char *path, OpenOptions opt) { todo(); }
+Result File_read(File *ptr, char *buf, u64 len) { todo(); }
+Result File_seek(File *ptr, u64 pos) { todo(); }
+Result File_write(File *ptr, char *buf, u64 len) { todo(); }
+Result File_flush(File *ptr) { todo(); }
