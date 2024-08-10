@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <core/ekinds.h>
+#include <core/formatter.h>
 #include <core/string.h>
 #include <core/string_builder.h>
 
@@ -107,4 +108,9 @@ Result StringBuilder_to_string(StringBuilder *sb) {
 u64 StringBuilder_len(StringBuilder *sb) {
 	Slab slab = GET(StringBuilder, sb, slab);
 	return strlen(slab.data);
+}
+
+Result StringBuilder_fmt(StringBuilder *sb, Formatter *f) {
+	Slab slab = GET(StringBuilder, sb, slab);
+	return WRITE(f, slab.data);
 }

@@ -12,23 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/backtrace.h>
-#include <core/class.h>
-#include <core/ekinds.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/format.h>
-#include <core/formatter.h>
 #include <core/iterator.h>
-#include <core/mymalloc.h>
-#include <core/panic.h>
-#include <core/prim.h>
-#include <core/rand.h>
-#include <core/rc.h>
-#include <core/result.h>
-#include <core/slabs.h>
-#include <core/slice.h>
-#include <core/string.h>
-#include <core/string_builder.h>
-#include <core/tuple.h>
-#include <core/unit.h>
+
+Result next(void *obj) {
+	ResultPtr (*do_next)(void *obj) = find_fn((Object *)obj, "next");
+	if (do_next == NULL)
+		panic("next not implemented for this type");
+	return do_next(obj);
+}

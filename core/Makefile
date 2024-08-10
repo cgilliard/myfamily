@@ -14,7 +14,8 @@ OBJS := rand.o \
 	string_builder.o \
 	tuple.o \
 	formatter.o \
-	format.o
+	format.o \
+	iterator.o
 
 TEST_OBJS := $(OBJS)
 

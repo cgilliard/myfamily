@@ -28,6 +28,7 @@ CLASS(StringBuilder, FIELD(Slab, slab) FIELD(u64, capacity))
 IMPL(StringBuilder, TRAIT_STRING_BUILDER_CORE)
 IMPL(StringBuilder, TRAIT_LEN)
 IMPL(StringBuilder, TRAIT_APPEND)
+IMPL(StringBuilder, TRAIT_DISPLAY)
 #define StringBuilder DEFINE_CLASS(StringBuilder)
 
 static GETTER(StringBuilder, capacity);

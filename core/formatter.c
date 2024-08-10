@@ -288,3 +288,4 @@ Result Bool_fmt(Bool *v, Formatter *f) {
 }
 
 Result Unit_fmt(Unit *v, Formatter *f) { return WRITE(f, "()"); }
+

@@ -14,6 +14,7 @@
 
 #include <core/format.h>
 #include <core/result.h>
+#include <core/string_builder.h>
 
 Result format(Formatter *formatter, char *format_s, ...) {
 	String fmt = STRING(format_s);
@@ -33,7 +34,7 @@ Result format(Formatter *formatter, char *format_s, ...) {
 	va_start(ptr, n);
 
 	itt = 0;
-	String fmt_str = STRING("");
+	StringBuilder fmt_str = STRING_BUILDER("", fmt_str);
 	for (int i = 0; i < n; i++) {
 		Result r = String_index_of_s(&fmt, "{}", itt);
 		i64 v = TRY(r, v);
@@ -42,20 +43,24 @@ Result format(Formatter *formatter, char *format_s, ...) {
 		String sub = SUBSTRING(&fmt, itt, v);
 		char *substr = unwrap(&sub);
 		Result r2 = append(&fmt_str, substr);
+		TRYU(r2);
 		Object *next = va_arg(ptr, Object *);
 		Result r4 = to_string(next);
 		String s4 = TRY(r4, s4);
 		char *s4str = unwrap(&s4);
 		Result r6 = append(&fmt_str, s4str);
+		TRYU(r6);
 
 		itt = v + 2;
 	}
+
 	String sub = SUBSTRING(&fmt, itt, len(&fmt));
 	char *substr = unwrap(&sub);
 	Result r2 = append(&fmt_str, substr);
 	TRYU(r2);
-	char *fmt_str_str = unwrap(&fmt_str);
-	Result r5 = WRITE(formatter, fmt_str_str);
+	Result fmt_str_res = to_string(&fmt_str);
+	String fmt_str_s = TRY(fmt_str_res, fmt_str_s);
+	Result r5 = WRITE(formatter, unwrap(&fmt_str_s));
 	TRYU(r5);
 	va_end(ptr);
 	return Ok(UNIT);

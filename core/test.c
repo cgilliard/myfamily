@@ -1348,7 +1348,7 @@ MyTest(core, test_formatter) {
 	U64 v1 = BUILD(U64, 999);
 	Result r = to_string(&v1);
 	String s = TRY(r, s);
-	printf("s='%s'\n", unwrap(&s));
+	assert_eq_string(s, "999");
 	return Ok(UNIT);
 }
 
@@ -1363,6 +1363,74 @@ MyTest(core, test_format) {
 	Result r1 = Formatter_to_string(&f);
 	String s = TRY(r1, s);
 	assert_eq_string(s, "this is a test 1234 -1 123 another string");
+
+	return Ok(UNIT);
+}
+
+CLASS(MyIterator, FIELD(i32 *, data) FIELD(u64, cur))
+IMPL(MyIterator, TRAIT_ITERATOR)
+#define MyIterator DEFINE_CLASS(MyIterator)
+
+GETTER(MyIterator, cur)
+SETTER(MyIterator, cur)
+GETTER(MyIterator, data)
+
+void MyIterator_cleanup(MyIterator *ptr) {}
+Result MyIterator_next(MyIterator *ptr) {
+	i32 *datav = GET(MyIterator, ptr, data);
+	u64 curv = GET(MyIterator, ptr, cur);
+	if (datav[curv] == 0)
+		return Ok(None);
+	SET(MyIterator, ptr, cur, curv + 1);
+	OptionPtr ret = Some(datav[curv]);
+	return Ok(ret);
+}
+
+CLASS(MyIterator2, FIELD(i32 *, data) FIELD(u64, cur))
+IMPL(MyIterator2, TRAIT_ITERATOR)
+#define MyIterator2 DEFINE_CLASS(MyIterator2)
+
+GETTER(MyIterator2, cur)
+SETTER(MyIterator2, cur)
+GETTER(MyIterator2, data)
+
+void MyIterator2_cleanup(MyIterator2 *ptr) {}
+Result MyIterator2_next(MyIterator2 *ptr) {
+	i32 *datav = GET(MyIterator2, ptr, data);
+	u64 curv = GET(MyIterator2, ptr, cur);
+	if (datav[curv] == 0)
+		return Ok(None);
+	SET(MyIterator2, ptr, cur, curv + 1);
+	char buf[100];
+	snprintf(buf, 100, "%i", datav[curv]);
+	StringPtr s = STRING(buf);
+	OptionPtr ret = Some(s);
+	return Ok(ret);
+}
+
+MyTest(core, test_iterator) {
+	i32 ints[11];
+	for (i32 i = 0; i < 11; i++)
+		ints[i] = i + 10;
+	ints[10] = 0;
+	i32 counter = 0;
+
+	MyIterator itt = BUILD(MyIterator, ints, 0);
+	foreach (i32, item, itt) {
+		assert_eq(item, counter + 10);
+		counter += 1;
+	}
+	assert_eq(counter, 10);
+
+	MyIterator2 itt2 = BUILD(MyIterator2, ints, 0);
+	counter = 0;
+	foreach (String, item, itt2) {
+		char buf[10];
+		snprintf(buf, 10, "%i", counter + 10);
+		assert_eq_string(item, buf);
+		counter += 1;
+	}
+	assert_eq(counter, 10);
 
 	return Ok(UNIT);
 }
