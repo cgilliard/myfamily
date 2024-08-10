@@ -1351,3 +1351,18 @@ MyTest(core, test_formatter) {
 	printf("s='%s'\n", unwrap(&s));
 	return Ok(UNIT);
 }
+
+MyTest(core, test_format) {
+	Formatter f = FORMATTER(1000);
+	u64 v = 1234;
+	int v2 = -1;
+	u16 m = 123;
+	String s1 = STRING("another string");
+	Result r = FORMAT(&f, "this is a test {} {} {} {}", v, v2, m, s1);
+	TRYU(r);
+	Result r1 = Formatter_to_string(&f);
+	String s = TRY(r1, s);
+	assert_eq_string(s, "this is a test 1234 -1 123 another string");
+
+	return Ok(UNIT);
+}

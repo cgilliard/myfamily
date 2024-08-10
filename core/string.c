@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <core/ekinds.h>
-// #include <core/formatter.h>
+#include <core/formatter.h>
 #include <core/mymalloc.h>
 #include <core/string.h>
 #include <core/unit.h>
@@ -276,9 +276,7 @@ Result String_char_at(String *s, u64 index) {
 	return Ok(ret);
 }
 
-Result String_fmt(String *s, Formatter *f) {
-	todo();
-} // return WRITE(f, unwrap(s)); }
+Result String_fmt(String *s, Formatter *f) { return WRITE(f, unwrap(s)); }
 
 Result String_from_slice(Slice *s, u64 len) {
 	char buf[len + 1];

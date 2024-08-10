@@ -13,7 +13,8 @@ OBJS := rand.o \
 	slice.o \
 	string_builder.o \
 	tuple.o \
-	formatter.o
+	formatter.o \
+	format.o
 
 TEST_OBJS := $(OBJS)
 

@@ -106,7 +106,7 @@ IMPL(Bool, TRAIT_DISPLAY)
 	({                                                                     \
 		({                                                             \
 			Slab buf;                                              \
-			if (mymalloc(buf, size * sizeof(char)))                \
+			if (mymalloc(&buf, size * sizeof(char)))               \
 				return STATIC_ALLOC_RESULT;                    \
 			FormatterPtr f = BUILD(Formatter, buf, 0, true);       \
 			f;                                                     \
@@ -117,7 +117,7 @@ IMPL(Bool, TRAIT_DISPLAY)
 	({                                                                     \
 		({                                                             \
 			Slab buf;                                              \
-			if (mymalloc(buf, size * sizeof(char)))                \
+			if (mymalloc(&buf, size * sizeof(char)))               \
 				panic("Could not allocate sufficient memory"); \
 			FormatterPtr f = BUILD(Formatter, buf, 0, true);       \
 			f;                                                     \
