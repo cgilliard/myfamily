@@ -51,29 +51,30 @@ bool Rc_myclone(Rc *dst, Rc *src) {
 
 bool Rc_deep_copy(Rc *dst, Rc *src) {
 	Slab src_slab = GET(Rc, src, ref);
-	if (implements(src_slab.data, "myclone")) {
-		Slab dst_ref;
-		Slab count_slab;
-		if (mymalloc(&dst_ref, mysize(src_slab.data)))
-			return false;
-		if (!myclone(dst_ref.data, src_slab.data)) {
-			myfree(&dst_ref);
-			return false;
-		}
+	if (!implements(src_slab.data, "myclone"))
+		panic("myclone not implemented for type '%s' and is required "
+		      "for deep_copy!",
+		      CLASS_NAME(src));
+	Slab dst_ref;
+	Slab count_slab;
+	if (mymalloc(&dst_ref, mysize(src_slab.data)))
+		return false;
+	if (!myclone(dst_ref.data, src_slab.data)) {
+		myfree(&dst_ref);
+		return false;
+	}
 
-		if (mymalloc(&count_slab, sizeof(u64))) {
-			myfree(&dst_ref);
-			return false;
-		}
-		u64 initial = 1;
-		*(u64 *)count_slab.data = initial;
+	if (mymalloc(&count_slab, sizeof(u64))) {
+		myfree(&dst_ref);
+		return false;
+	}
+	u64 initial = 1;
+	*(u64 *)count_slab.data = initial;
 
-		SET(Rc, dst, flags, 0);
-		SET(Rc, dst, count, count_slab);
-		SET(Rc, dst, ref, dst_ref);
-		return true;
-	} else
-		return myclone(dst, src);
+	SET(Rc, dst, flags, 0);
+	SET(Rc, dst, count, count_slab);
+	SET(Rc, dst, ref, dst_ref);
+	return true;
 }
 
 Rc Rc_build(Slab slab) {
