@@ -29,17 +29,44 @@ IMPL(Tuple, TRAIT_COPY)
 
 void *Tuple_element_at(Tuple *t, u64 index, void *dst);
 Slab Tuple_add_value(Rc value);
+Slab Tuple_add_value_u128(void *value);
 Slab Tuple_add_value_u64(void *value);
+Slab Tuple_add_value_u32(void *value);
+Slab Tuple_add_value_u16(void *value);
+Slab Tuple_add_value_u8(void *value);
+Slab Tuple_add_value_i128(void *value);
+Slab Tuple_add_value_i64(void *value);
+Slab Tuple_add_value_i32(void *value);
+Slab Tuple_add_value_i16(void *value);
+Slab Tuple_add_value_i8(void *value);
+Slab Tuple_add_value_f64(void *value);
+Slab Tuple_add_value_f32(void *value);
+Slab Tuple_add_value_bool(void *value);
+
+#define CREATE_GENERIC_TYPE(sign, bits, value)                                 \
+	({                                                                     \
+		Slab _ptr__ = Tuple_add_value_##sign##bits(&value);            \
+		if (!_ptr__.data) {                                            \
+			return STATIC_ALLOC_RESULT;                            \
+		}                                                              \
+		_ptr__;                                                        \
+	})
 
 #define CREATE_GENERIC(value)                                                  \
 	_Generic((value),                                                      \
-	    u64: ({                                                            \
-			 Slab _ptr__ = Tuple_add_value_u64(&value);            \
-			 if (!_ptr__.data) {                                   \
-				 return STATIC_ALLOC_RESULT;                   \
-			 }                                                     \
-			 _ptr__;                                               \
-		 }),                                                           \
+	    u128: CREATE_GENERIC_TYPE(u, 128, value),                          \
+	    u64: CREATE_GENERIC_TYPE(u, 64, value),                            \
+	    u32: CREATE_GENERIC_TYPE(u, 32, value),                            \
+	    u16: CREATE_GENERIC_TYPE(u, 16, value),                            \
+	    u8: CREATE_GENERIC_TYPE(u, 8, value),                              \
+	    i128: CREATE_GENERIC_TYPE(i, 128, value),                          \
+	    i64: CREATE_GENERIC_TYPE(i, 64, value),                            \
+	    i32: CREATE_GENERIC_TYPE(i, 32, value),                            \
+	    i16: CREATE_GENERIC_TYPE(i, 16, value),                            \
+	    i8: CREATE_GENERIC_TYPE(i, 8, value),                              \
+	    f64: CREATE_GENERIC_TYPE(f, 64, value),                            \
+	    f32: CREATE_GENERIC_TYPE(f, 32, value),                            \
+	    bool: CREATE_GENERIC_TYPE(bo, ol, value),                          \
 	    default: ({                                                        \
 			 RcPtr _rc__ = HEAPIFY(value);                         \
 			 Slab _ptr__ = Tuple_add_value(_rc__);                 \

@@ -83,11 +83,48 @@ void *Tuple_element_at(Tuple *tuple, u64 index, void *dst) {
 	Slab ref = elements_ptr[index];
 
 	char *cn = CLASS_NAME(ref.data);
-	if (!strcmp(cn, "U64")) {
+	if (!strcmp(cn, "U128")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(u128));
+	} else if (!strcmp(cn, "U64")) {
 		void *dst_ref = unwrap(ref.data);
 		memcpy(dst, dst_ref, sizeof(u64));
+	} else if (!strcmp(cn, "U32")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(u32));
+	} else if (!strcmp(cn, "U16")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(u16));
+	} else if (!strcmp(cn, "U8")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(u8));
+	} else if (!strcmp(cn, "I128")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(i128));
+	} else if (!strcmp(cn, "I64")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(i64));
+	} else if (!strcmp(cn, "I32")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(i32));
+	} else if (!strcmp(cn, "I16")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(i16));
+	} else if (!strcmp(cn, "I8")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(i8));
+	} else if (!strcmp(cn, "F64")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(f64));
+	} else if (!strcmp(cn, "F32")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(f32));
+	} else if (!strcmp(cn, "Bool")) {
+		void *dst_ref = unwrap(ref.data);
+		memcpy(dst, dst_ref, sizeof(bool));
 	} else {
-		// it's an object, we'll call copy which must be implemented
+		// it's an object, we'll call copy which must be
+		// implemented
 		if (!strcmp(cn, "Rc")) {
 			void *tmp = unwrap(ref.data);
 			memcpy(dst, tmp, mysize(tmp));
@@ -111,15 +148,41 @@ Slab Tuple_add_value(Rc rc) {
 	return slab;
 }
 
-Slab Tuple_add_value_u64(void *value) {
+#define IMPL_ADD_VALUE_TYPE(sign, sign_upper, bits)                            \
+	Slab Tuple_add_value_##sign##bits(void *value) {                       \
+		Slab slab;                                                     \
+		if (mymalloc(&slab, sizeof(sign_upper##bits))) {               \
+			slab.data = NULL;                                      \
+			return slab;                                           \
+		}                                                              \
+		Object *obj = slab.data;                                       \
+		BUILDPTR(obj, sign_upper##bits);                               \
+		((sign_upper##bits##Ptr *)(slab.data))->_value =               \
+		    *(sign##bits *)value;                                      \
+		return slab;                                                   \
+	}
+
+IMPL_ADD_VALUE_TYPE(u, U, 128)
+IMPL_ADD_VALUE_TYPE(u, U, 64)
+IMPL_ADD_VALUE_TYPE(u, U, 32)
+IMPL_ADD_VALUE_TYPE(u, U, 16)
+IMPL_ADD_VALUE_TYPE(u, U, 8)
+IMPL_ADD_VALUE_TYPE(i, I, 128)
+IMPL_ADD_VALUE_TYPE(i, I, 64)
+IMPL_ADD_VALUE_TYPE(i, I, 32)
+IMPL_ADD_VALUE_TYPE(i, I, 16)
+IMPL_ADD_VALUE_TYPE(i, I, 8)
+IMPL_ADD_VALUE_TYPE(f, F, 64)
+IMPL_ADD_VALUE_TYPE(f, F, 32)
+
+Slab Tuple_add_value_bool(void *value) {
 	Slab slab;
-	if (mymalloc(&slab, sizeof(U64))) {
+	if (mymalloc(&slab, sizeof(Bool))) {
 		slab.data = NULL;
 		return slab;
 	}
 	Object *obj = slab.data;
-	BUILDPTR(obj, U64);
-	((U64Ptr *)(slab.data))->_value = *(u64 *)value;
+	BUILDPTR(obj, Bool);
+	((BoolPtr *)(slab.data))->_value = *(bool *)value;
 	return slab;
 }
-

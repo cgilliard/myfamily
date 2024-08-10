@@ -1269,5 +1269,77 @@ MyTest(core, test_tuple) {
 	String s_out2 = ELEMENT_AT(t2, 3, s_out2);
 	assert_eq_string(s_out2, unwrap(&s));
 
+	u32 v1 = 10;
+	u16 v2 = 20;
+	Tuple t3 = TUPLE(v1, v2);
+	u32 v1_out = ELEMENT_AT(t3, 0, v1_out);
+	assert_eq(v1_out, 10);
+
+	u16 v2_out = ELEMENT_AT(t3, 1, v2_out);
+	assert_eq(v2_out, 20);
+
+	u8 c1 = 1;
+	u16 c2 = 2;
+	u32 c3 = 3;
+	u64 c4 = 4;
+	u128 c5 = 5;
+	i8 c6 = -1;
+	i16 c7 = -2;
+	i32 c8 = -3;
+	i64 c9 = -4;
+	i128 c10 = -5;
+	f32 c11 = 1.0;
+	f64 c12 = 2.1;
+	bool c13 = false;
+	String c14 = STRING("abcdef");
+
+	Tuple tall =
+	    TUPLE(c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13, c14);
+	u64 lentall = len(&tall);
+	assert_eq(lentall, 14);
+
+	u8 c1_out = ELEMENT_AT(tall, 0, c1_out);
+	assert_eq(c1_out, 1);
+	u16 c2_out = ELEMENT_AT(tall, 1, c2_out);
+	assert_eq(c2_out, 2);
+	u32 c3_out = ELEMENT_AT(tall, 2, c3_out);
+	assert_eq(c3_out, 3);
+	u64 c4_out = ELEMENT_AT(tall, 3, c4_out);
+	assert_eq(c4_out, 4);
+	u128 c5_out = ELEMENT_AT(tall, 4, c5_out);
+	assert_eq(c5_out, 5);
+
+	i8 c6_out = ELEMENT_AT(tall, 5, c6_out);
+	assert_eq(c6_out, -1);
+	i16 c7_out = ELEMENT_AT(tall, 6, c7_out);
+	assert_eq(c7_out, -2);
+	i32 c8_out = ELEMENT_AT(tall, 7, c8_out);
+	assert_eq(c8_out, -3);
+	i64 c9_out = ELEMENT_AT(tall, 8, c9_out);
+	assert_eq(c9_out, -4);
+	i128 c10_out = ELEMENT_AT(tall, 9, c10_out);
+	assert_eq(c10_out, -5);
+
+	f32 c11_out = ELEMENT_AT(tall, 10, c11_out);
+	assert_eq(c11_out, 1.0);
+
+	f64 c12_out = ELEMENT_AT(tall, 11, c12_out);
+	assert_eq(c12_out, 2.1);
+
+	bool c13_out = ELEMENT_AT(tall, 12, c13_out);
+	assert_eq(c13_out, false);
+
+	String c14_out = ELEMENT_AT(tall, 13, c14_out);
+	assert_eq_string(c14_out, "abcdef");
+
+	Tuple tall_clone;
+	myclone(&tall_clone, &tall);
+
+	String c14_out2 = ELEMENT_AT(tall_clone, 13, c14_out2);
+	assert_eq_string(c14_out2, "abcdef");
+
+	i32 c8_out2 = ELEMENT_AT(tall_clone, 7, c8_out2);
+	assert_eq(c8_out2, -3);
+
 	return Ok(UNIT);
 }
