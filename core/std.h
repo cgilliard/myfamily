@@ -17,6 +17,7 @@
 #include <core/ekinds.h>
 #include <core/enum.h>
 #include <core/error.h>
+#include <core/formatter.h>
 #include <core/mymalloc.h>
 #include <core/panic.h>
 #include <core/prim.h>

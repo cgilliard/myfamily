@@ -1343,3 +1343,11 @@ MyTest(core, test_tuple) {
 
 	return Ok(UNIT);
 }
+
+MyTest(core, test_formatter) {
+	U64 v1 = BUILD(U64, 999);
+	Result r = to_string(&v1);
+	String s = TRY(r, s);
+	printf("s='%s'\n", unwrap(&s));
+	return Ok(UNIT);
+}

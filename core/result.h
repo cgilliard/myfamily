@@ -52,21 +52,26 @@ static Rc STATIC_ALLOC_ERROR_RC = {
 
 #define Ok(x)                                                                  \
 	({                                                                     \
-		Rc ___rc__##x = HEAPIFY(x);                                    \
-		ResultPtr _r__##x = BUILD_ENUM(Result, Ok, ___rc__##x);        \
-		if (_r__##x.slab.data == NULL) {                               \
-			_r__##x = STATIC_ALLOC_RESULT;                         \
-		}                                                              \
-		_r__##x;                                                       \
+		({                                                             \
+			Rc ___rc__##x = HEAPIFY(x);                            \
+			ResultPtr _r__##x =                                    \
+			    BUILD_ENUM(Result, Ok, ___rc__##x);                \
+			if (_r__##x.slab.data == NULL) {                       \
+				_r__##x = STATIC_ALLOC_RESULT;                 \
+			}                                                      \
+			_r__##x;                                               \
+		});                                                            \
 	})
 
 #define Err(e)                                                                 \
 	({                                                                     \
-		ResultPtr _r__##x = BUILD_ENUM(Result, Err, e);                \
-		if (_r__##x.slab.data == NULL) {                               \
-			_r__##x = STATIC_ALLOC_RESULT;                         \
-		}                                                              \
-		_r__##x;                                                       \
+		({                                                             \
+			ResultPtr _r__##x = BUILD_ENUM(Result, Err, e);        \
+			if (_r__##x.slab.data == NULL) {                       \
+				_r__##x = STATIC_ALLOC_RESULT;                 \
+			}                                                      \
+			_r__##x;                                               \
+		});                                                            \
 	})
 
 static Result STATIC_ALLOC_RESULT = {
@@ -77,8 +82,10 @@ static Result STATIC_ALLOC_RESULT = {
 
 #define UNWRAP_TYPE(type, x)                                                   \
 	({                                                                     \
-		Rc _out__##x = ENUM_VALUE(_out__##x, Rc, x);                   \
-		*(type *)unwrap(&_out__##x);                                   \
+		({                                                             \
+			Rc _out__##x = ENUM_VALUE(_out__##x, Rc, x);           \
+			*(type *)unwrap(&_out__##x);                           \
+		});                                                            \
 	})
 
 #define UNWRAP_VALUE(x, v)                                                     \
@@ -97,11 +104,14 @@ static Result STATIC_ALLOC_RESULT = {
 	    f64: UNWRAP_TYPE(f64, x),                                          \
 	    bool: UNWRAP_TYPE(bool, x),                                        \
 	    default: ({                                                        \
-			 Rc _unwrap_value__rc_##v =                            \
-			     ENUM_VALUE(_unwrap_value__rc_##v, Rc, x);         \
-			 void *_ptr__##v = unwrap(&_unwrap_value__rc_##v);     \
-			 memcpy(&v, _ptr__##v, mysize(_ptr__##v));             \
-			 v;                                                    \
+			 ({                                                    \
+				 Rc _unwrap_value__rc_##v =                    \
+				     ENUM_VALUE(_unwrap_value__rc_##v, Rc, x); \
+				 void *_ptr__##v =                             \
+				     unwrap(&_unwrap_value__rc_##v);           \
+				 memcpy(&v, _ptr__##v, mysize(_ptr__##v));     \
+				 v;                                            \
+			 });                                                   \
 		 }))
 
 #define UNWRAP_ERR(x)                                                          \
@@ -147,15 +157,20 @@ static Result STATIC_ALLOC_RESULT = {
 
 #define todo()                                                                 \
 	({                                                                     \
-		Error _e__ = ERR(UNIMPLEMENTED, "Not yet implemented");        \
-		return Err(_e__);                                              \
+		({                                                             \
+			Error _e__ =                                           \
+			    ERR(UNIMPLEMENTED, "Not yet implemented");         \
+			return Err(_e__);                                      \
+		});                                                            \
 	});
 
 #define Some(x)                                                                \
 	({                                                                     \
-		Rc rc = HEAPIFY(x);                                            \
-		OptionPtr res = BUILD_ENUM(Option, SOME, rc);                  \
-		res;                                                           \
+		({                                                             \
+			Rc rc = HEAPIFY(x);                                    \
+			OptionPtr res = BUILD_ENUM(Option, SOME, rc);          \
+			res;                                                   \
+		});                                                            \
 	})
 
 // special initialization of None to avoid the need to create multiple instances
