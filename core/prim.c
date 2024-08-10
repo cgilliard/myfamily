@@ -81,28 +81,6 @@ bool Bool_myclone(Bool *dst, Bool *src) {
 	return true;
 }
 
-void USize_cleanup(USize *ptr) {}
-void USize_to_str_buf(USize *ptr, char *buf, u64 max_len) {
-	u64 value = ptr->_value;
-	snprintf(buf, max_len, "%zu", value);
-}
-void *USize_unwrap(USize *ptr) { return &ptr->_value; }
-bool USize_myclone(USize *dst, USize *src) {
-	memcpy(&dst->_value, &src->_value, sizeof(u64));
-	return true;
-}
-
-void ISize_cleanup(ISize *ptr) {}
-void ISize_to_str_buf(ISize *ptr, char *buf, u64 max_len) {
-	u64 value = ptr->_value;
-	snprintf(buf, max_len, "%zu", value);
-}
-void *ISize_unwrap(ISize *ptr) { return &ptr->_value; }
-bool ISize_myclone(ISize *dst, ISize *src) {
-	memcpy(&dst->_value, &src->_value, sizeof(u64));
-	return true;
-}
-
 void F32_cleanup(F32 *ptr) {}
 void F32_to_str_buf(F32 *ptr, char *buf, u64 max_len) {
 	f32 value = ptr->_value;

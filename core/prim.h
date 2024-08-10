@@ -68,14 +68,6 @@ DEFINE_PRIM_CLASS(u8, U8)
 #define U8 DEFINE_CLASS(U8)
 static GETTER(U8, value);
 
-DEFINE_PRIM_CLASS(u64, USize)
-#define USize DEFINE_CLASS(USize)
-static GETTER(USize, value);
-
-DEFINE_PRIM_CLASS(u64, ISize)
-#define ISize DEFINE_CLASS(ISize)
-static GETTER(ISize, value);
-
 DEFINE_PRIM_CLASS(f32, F32)
 #define F32 DEFINE_CLASS(F32)
 static GETTER(F32, value);

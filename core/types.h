@@ -34,8 +34,6 @@
 #define i128 __int128_t
 #define f64 double
 #define f32 float
-#define usize uintptr_t
-#define isize intptr_t
 
 // for some mapping issues, we make these definitions
 #define u8Ptr u8
