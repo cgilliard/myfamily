@@ -108,6 +108,18 @@ Result append_s(void *dst, Object *src) {
 	return do_append_s(dst, src);
 }
 
+bool deep_copy(void *dst, void *src) {
+	bool *(*do_deep_copy)(Object *dst, Object *src) =
+	    find_fn((Object *)src, "deep_copy");
+	if (do_deep_copy == NULL)
+		panic("deep_copy not implemented for this type: %s",
+		      ((Object *)src)->vdata.name);
+	((Object *)dst)->vdata.vtable = ((Object *)src)->vdata.vtable;
+	((Object *)dst)->vdata.name = ((Object *)src)->vdata.name;
+	bool ret = do_deep_copy(dst, src);
+	return ret;
+}
+
 /*
 Rc into_iter_impl(void *obj) {
 	RcPtr (*do_into_iter)(Object *obj) =

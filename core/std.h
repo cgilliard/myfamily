@@ -27,4 +27,5 @@
 #include <core/slice.h>
 #include <core/string.h>
 #include <core/string_builder.h>
+#include <core/tuple.h>
 #include <core/unit.h>

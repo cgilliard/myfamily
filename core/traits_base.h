@@ -24,6 +24,8 @@
 #define TRAIT_COPY(T)                                                          \
 	TRAIT_IMPL(T, copy, default_copy)                                      \
 	TRAIT_SUPER(T, TRAIT_CLONE)
+#define TRAIT_DEEP_COPY(T)                                                     \
+	TRAIT_REQUIRED(T, bool, deep_copy, T##Ptr *dst, T##Ptr *src)
 
 #define TRAIT_TO_STR(T) TRAIT_REQUIRED(T, char *, to_str, T##Ptr *obj)
 #define TRAIT_TO_STR_BUF(T)                                                    \
@@ -49,6 +51,7 @@ void cleanup(void *ptr);
 char *to_str(void *s);
 void print(void *ptr);
 u64 len(void *obj);
+bool deep_copy(void *dst, void *src);
 
 // default implementations
 bool default_copy(void *dst, void *src);

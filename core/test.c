@@ -1234,3 +1234,40 @@ MyTest(core, test_string_append_s) {
 
 	return Ok(UNIT);
 }
+
+MyTest(core, test_tuple) {
+	u64 x = 1;
+	u64 y = 2;
+	u64 z = 3;
+	String s = STRING("abc");
+	Tuple t1 = TUPLE(x, y, z, s);
+
+	u64 x_out = ELEMENT_AT(t1, 0, x_out);
+	assert_eq(x_out, x);
+	u64 y_out = ELEMENT_AT(t1, 1, y_out);
+	assert_eq(y_out, y);
+	u64 z_out = ELEMENT_AT(t1, 2, z_out);
+	assert_eq(z_out, z);
+
+	String s_out = ELEMENT_AT(t1, 3, s_out);
+	assert_eq_string(s_out, unwrap(&s));
+
+	Tuple t2;
+	myclone(&t2, &t1);
+
+	u64 lent2 = len(&t2);
+	assert_eq(lent2, 4);
+	x_out = ELEMENT_AT(t2, 0, x_out);
+	assert_eq(x_out, 1);
+
+	y_out = ELEMENT_AT(t2, 1, y_out);
+	assert_eq(y_out, 2);
+
+	z_out = ELEMENT_AT(t2, 2, z_out);
+	assert_eq(z_out, 3);
+
+	String s_out2 = ELEMENT_AT(t2, 3, s_out2);
+	assert_eq_string(s_out2, unwrap(&s));
+
+	return Ok(UNIT);
+}
