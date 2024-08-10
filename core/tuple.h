@@ -47,7 +47,7 @@ Slab Tuple_add_value_bool(void *value);
 	({                                                                     \
 		Slab _ptr__ = Tuple_add_value_##sign##bits(&value);            \
 		if (!_ptr__.data) {                                            \
-			return STATIC_ALLOC_ERROR_RESULT;                            \
+			return STATIC_ALLOC_ERROR_RESULT;                      \
 		}                                                              \
 		_ptr__;                                                        \
 	})
@@ -71,7 +71,7 @@ Slab Tuple_add_value_bool(void *value);
 			 RcPtr _rc__ = HEAPIFY(value);                         \
 			 Slab _ptr__ = Tuple_add_value(_rc__);                 \
 			 if (!_ptr__.data) {                                   \
-				 return STATIC_ALLOC_ERROR_RESULT;                   \
+				 return STATIC_ALLOC_ERROR_RESULT;             \
 			 }                                                     \
 			 _ptr__;                                               \
 		 }))
@@ -89,7 +89,7 @@ Slab Tuple_add_value_bool(void *value);
 		u64 count = sizeof(values) / sizeof(values[0]);                \
 		Slab elements;                                                 \
 		if (mymalloc(&elements, count * sizeof(Slab *))) {             \
-			return STATIC_ALLOC_ERROR_RESULT;                            \
+			return STATIC_ALLOC_ERROR_RESULT;                      \
 		}                                                              \
 		Slab *element_arr = elements.data;                             \
 		for (u64 i = 0; i < count; ++i) {                              \

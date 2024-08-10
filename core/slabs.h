@@ -115,7 +115,7 @@ int slab_allocator_free(SlabAllocator *ptr, u64 id);
 		({                                                             \
 			Slab ret;                                              \
 			if (mymalloc(&ret, size))                              \
-				return STATIC_ALLOC_ERROR_RESULT;                    \
+				return STATIC_ALLOC_ERROR_RESULT;              \
 			ret;                                                   \
 		});                                                            \
 	})

@@ -20,6 +20,23 @@
 
 #define RTS_BUF_SIZE 1024
 
+Result write_all(void *obj, char *buf, u64 limit) {
+	ResultPtr (*do_write_all)(Object *obj, char *buf, u64 limit) =
+	    find_fn((Object *)obj, "write_all");
+	if (do_write_all == NULL)
+		panic("write_all not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_write_all(obj, buf, limit);
+}
+
+Result myflush(void *obj) {
+	ResultPtr (*do_flush)(Object *obj) = find_fn((Object *)obj, "flush");
+	if (do_flush == NULL)
+		panic("flush not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_flush(obj);
+}
+
 Result read_exact_impl(Object *self, char *buf, u64 len) {
 	Result r = myread(self, buf, len);
 	u64 rlen = *(u64 *)unwrap(&r);

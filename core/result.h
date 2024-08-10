@@ -57,7 +57,7 @@ static Rc STATIC_ALLOC_ERROR_RC = {
 			ResultPtr _r__##x =                                    \
 			    BUILD_ENUM(Result, Ok, ___rc__##x);                \
 			if (_r__##x.slab.data == NULL) {                       \
-				_r__##x = STATIC_ALLOC_ERROR_RESULT;                 \
+				_r__##x = STATIC_ALLOC_ERROR_RESULT;           \
 			}                                                      \
 			_r__##x;                                               \
 		});                                                            \
@@ -68,7 +68,7 @@ static Rc STATIC_ALLOC_ERROR_RC = {
 		({                                                             \
 			ResultPtr _r__##x = BUILD_ENUM(Result, Err, e);        \
 			if (_r__##x.slab.data == NULL) {                       \
-				_r__##x = STATIC_ALLOC_ERROR_RESULT;                 \
+				_r__##x = STATIC_ALLOC_ERROR_RESULT;           \
 			}                                                      \
 			_r__##x;                                               \
 		});                                                            \

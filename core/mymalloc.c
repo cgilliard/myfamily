@@ -153,8 +153,18 @@ int myrealloc(Slab *slab, u64 size) {
 	return ret;
 }
 
-FILE *myfopen(const char *path, const char *mode) { return NULL; }
-void myfclose(FILE *ptr) {}
+FILE *myfopen(const char *path, const char *mode) {
+	FILE *ret = fopen(path, mode);
+
+	if (ret) {
+		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
+	}
+	return ret;
+}
+void myfclose(FILE *ptr) {
+	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
+	fclose(ptr);
+}
 
 ResourceStats get_resource_stats() {
 	ResourceStats ret = THREAD_LOCAL_RESOURCE_STATS;

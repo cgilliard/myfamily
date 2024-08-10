@@ -13,10 +13,84 @@
 // limitations under the License.
 
 #include <core/file.h>
+#include <errno.h>
 
-void File_cleanup(File *ptr) {}
-Result File_open(char *path, OpenOptions opt) { todo(); }
-Result File_read(File *ptr, char *buf, u64 len) { todo(); }
-Result File_seek(File *ptr, u64 pos) { todo(); }
-Result File_write(File *ptr, char *buf, u64 len) { todo(); }
-Result File_flush(File *ptr) { todo(); }
+GETTER(File, fp)
+SETTER(File, fp)
+
+void File_cleanup(File *ptr) {
+	FILE *fp = GET(File, ptr, fp);
+	if (fp) {
+		myfclose(fp);
+		SET(File, ptr, fp, NULL);
+	}
+}
+Result File_open(char *path, OpenOptions opt) {
+	FilePtr ret = BUILD(File);
+	FILE *fptr;
+	if (opt == OpenRead)
+		fptr = myfopen(path, "r");
+	else if (opt == OpenWrite)
+		fptr = myfopen(path, "w");
+	else if (opt == OpenAppend)
+		fptr = myfopen(path, "a");
+	else if (opt == OpenReadExtended)
+		fptr = myfopen(path, "r+");
+	else if (opt == OpenWriteExtended)
+		fptr = myfopen(path, "w+");
+	else if (opt == OpenAppendExtended)
+		fptr = myfopen(path, "a+");
+	else {
+		Error err = ERR(FILE_OPEN_ERROR, "Unexpected open options");
+		return Err(err);
+	}
+	SET(File, &ret, fp, fptr);
+
+	if (fptr == NULL) {
+		char *err_text = strerror(errno);
+		Error err = ERR(FILE_OPEN_ERROR,
+				"Attempt to open file '%s' generated error: %s",
+				path, err_text);
+		return Err(err);
+	}
+	return Ok(ret);
+}
+
+Result File_read(File *ptr, char *buf, u64 len) {
+	FILE *fp = GET(File, ptr, fp);
+	u64 val = fread(buf, 1, len, fp);
+	return Ok(val);
+}
+Result File_seek(File *ptr, u64 pos) {
+	FILE *fp = GET(File, ptr, fp);
+	if (fseek(fp, pos, SEEK_SET) != 0) {
+		char *err_text = strerror(errno);
+		Error err =
+		    ERR(FILE_SEEK_ERROR, "Attempt to seek generated error: %s",
+			err_text);
+		return Err(err);
+	}
+	return Ok(UNIT);
+}
+
+Result File_write(File *ptr, char *buf, u64 len) {
+	FILE *fp = GET(File, ptr, fp);
+	errno = 0;
+	u64 wlen = fwrite(buf, sizeof(char), len, fp);
+	if (wlen == 0) {
+		char *s = strerror(errno);
+		Error e = ERR(IO_ERROR, "write error: %s", s);
+		return Err(e);
+	}
+
+	return Ok(wlen);
+}
+Result File_flush(File *ptr) {
+	FILE *fp = GET(File, ptr, fp);
+	if (fflush(fp)) {
+		char *s = strerror(errno);
+		Error e = ERR(IO_ERROR, "flush error: %s", s);
+		return Err(e);
+	}
+	return Ok(UNIT);
+}
