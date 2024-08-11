@@ -31,7 +31,7 @@ Result format(Formatter *formatter, char *format_s, ...) {
 	}
 
 	va_list ptr;
-	va_start(ptr, n);
+	va_start(ptr, format_s);
 
 	itt = 0;
 	StringBuilder fmt_str = STRING_BUILDER("", fmt_str);

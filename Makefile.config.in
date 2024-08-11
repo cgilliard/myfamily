@@ -1,9 +1,9 @@
 SHELL := /bin/bash
 CC=gcc
-CC_FLAGS=-D_GNU_SOURCE -g -Wno-int-to-pointer-cast -Wno-varargs -Wno-format -Wno-attributes -Wno-ignored-attributes -I.. $(COVERAGE)
+CC_FLAGS=-D_GNU_SOURCE -g -Wno-attributes -Wno-ignored-attributes -I.. $(COVERAGE)
 CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
 CRITERION_LIB=-LREPLACE_CRITERION_LIB
-CC_TEST_FLAGS=-D_GNU_SOURCE -g -Wno-int-to-pointer-cast -Wno-varargs -Wno-format -Wno-attributes -Wno-ignored-attributes -lcriterion -I.. $(CRITERION_INCLUDE) $(CRITERION_LIB) $(COVERAGE)
+CC_TEST_FLAGS=-D_GNU_SOURCE -g -Wno-attributes -Wno-ignored-attributes -lcriterion -I.. $(CRITERION_INCLUDE) $(CRITERION_LIB) $(COVERAGE)
 MAKE=make
 INSTALL_DIR=/usr/local/bin
 ALL_OBJS=main/*.o toml/*.o core/*.o
