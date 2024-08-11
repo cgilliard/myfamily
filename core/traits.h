@@ -51,14 +51,8 @@ Result binsearch(void *arr, u64 len, const Object *value);
 
 #define TRAIT_TO_STRING(T) TRAIT_REQUIRED(T, Result, to_string, T##Ptr *obj)
 
-#define TRAIT_FORMATTER(T)                                                     \
-	TRAIT_REQUIRED(T, Result, write, T##Ptr *f, char *fmt, ...)
-
 #define TRAIT_DISPLAY(T)                                                       \
 	TRAIT_REQUIRED(T, Result, fmt, T##Ptr *self, Formatter *formatter)
-
-#define TRAIT_DEBUG(T)                                                         \
-	TRAIT_REQUIRED(T, Result, dbg, T##Ptr *self, Formatter *formatter)
 
 #define TRAIT_CMP(T)                                                           \
 	TRAIT_REQUIRED(T, OrdOptions, cmp, const void *a, const void *b)

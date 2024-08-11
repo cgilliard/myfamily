@@ -18,27 +18,22 @@
 #include <core/class.h>
 
 #define TRAIT_EQUAL(T) TRAIT_REQUIRED(T, bool, equal, T##Ptr *dst, T##Ptr *src)
+
 #define TRAIT_CLONE(T)                                                         \
 	TRAIT_REQUIRED(T, bool, myclone, T##Ptr *dst, T##Ptr *src)
+
 #define TRAIT_LEN(T) TRAIT_REQUIRED(T, u64, len, T##Ptr *obj)
+
 #define TRAIT_COPY(T)                                                          \
 	TRAIT_IMPL(T, copy, default_copy)                                      \
 	TRAIT_SUPER(T, TRAIT_CLONE)
+
 #define TRAIT_DEEP_COPY(T)                                                     \
 	TRAIT_REQUIRED(T, bool, deep_copy, T##Ptr *dst, T##Ptr *src)
-
-#define TRAIT_TO_STR(T) TRAIT_REQUIRED(T, char *, to_str, T##Ptr *obj)
-#define TRAIT_TO_STR_BUF(T)                                                    \
-	TRAIT_REQUIRED(T, void, to_str_buf, T##Ptr *obj, char *buf, u64 max_len)
 
 #define TRAIT_PRINT(T) TRAIT_REQUIRED(T, void, print, T##Ptr *obj)
 
 #define TRAIT_UNWRAP(T) TRAIT_REQUIRED(T, void *, unwrap, T##Ptr *obj)
-
-#define TRAIT_UNWRAP_AS(T)                                                     \
-	TRAIT_REQUIRED(T, void *, unwrap_as, char *class_name, T##Ptr *obj)
-
-#define TRAIT_TEST(T) TRAIT_IMPL(T, test1, test1_default)
 
 // trait implementations
 bool equal(void *obj1, void *obj2);

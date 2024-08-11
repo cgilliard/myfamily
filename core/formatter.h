@@ -19,6 +19,9 @@
 #include <core/traits.h>
 #include <core/unit.h>
 
+#define TRAIT_FORMATTER(T)                                                     \
+	TRAIT_REQUIRED(T, Result, write, T##Ptr *f, char *fmt, ...)
+
 Result to_string(void *obj);
 Result to_string_buf(void *obj, u64 buf_size);
 Result to_debug(void *obj);
