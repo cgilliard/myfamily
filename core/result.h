@@ -35,6 +35,8 @@ ENUM(Option, VARIANTS(SOME, NONE), TYPES("Rc", "Unit"))
 #define IS_SOME(x) x.type == SOME
 #define IS_NONE(x) x.type == NONE
 
+// static errors for allocation issues so we don't need to call malloc to create
+// them.
 static Error STATIC_ALLOC_ERROR = {
     {&ErrorPtr_Vtable__, "Error", NEXT_ID},
     false,
@@ -50,41 +52,46 @@ static Rc STATIC_ALLOC_ERROR_RC = {
     {},
     RC_FLAGS_NO_COUNTER};
 
-#define Ok(x)                                                                  \
-	({                                                                     \
-		({                                                             \
-			Rc ___rc__##x = HEAPIFY(x);                            \
-			ResultPtr _r__##x =                                    \
-			    BUILD_ENUM(Result, Ok, ___rc__##x);                \
-			if (_r__##x.slab.data == NULL) {                       \
-				_r__##x = STATIC_ALLOC_ERROR_RESULT;           \
-			}                                                      \
-			_r__##x;                                               \
-		});                                                            \
-	})
-
-#define Err(e)                                                                 \
-	({                                                                     \
-		({                                                             \
-			ResultPtr _r__##x = BUILD_ENUM(Result, Err, e);        \
-			if (_r__##x.slab.data == NULL) {                       \
-				_r__##x = STATIC_ALLOC_ERROR_RESULT;           \
-			}                                                      \
-			_r__##x;                                               \
-		});                                                            \
-	})
-
 static Result STATIC_ALLOC_ERROR_RESULT = {
     {&ResultPtr_Vtable__, "Result"},
     Err,
     ENUM_FLAG_NO_CLEANUP,
     {UINT64_MAX, &STATIC_ALLOC_ERROR_RC, sizeof(Rc)}};
 
+// special initialization of None to avoid the need to create multiple instances
+static Option None = {{&OptionPtr_Vtable__, "Option"},
+		      NONE,
+		      ENUM_FLAG_NO_CLEANUP,
+		      {UINT64_MAX, &UNIT, sizeof(Unit)}};
+
+#define Ok(x)                                                                  \
+	({                                                                     \
+		({                                                             \
+			Rc rc = HEAPIFY(x);                                    \
+			ResultPtr r = BUILD_ENUM(Result, Ok, rc);              \
+			if (r.slab.data == NULL) {                             \
+				r = STATIC_ALLOC_ERROR_RESULT;                 \
+			}                                                      \
+			r;                                                     \
+		});                                                            \
+	})
+
+#define Err(e)                                                                 \
+	({                                                                     \
+		({                                                             \
+			ResultPtr r = BUILD_ENUM(Result, Err, e);              \
+			if (r.slab.data == NULL) {                             \
+				r = STATIC_ALLOC_ERROR_RESULT;                 \
+			}                                                      \
+			r;                                                     \
+		});                                                            \
+	})
+
 #define UNWRAP_TYPE(type, x)                                                   \
 	({                                                                     \
 		({                                                             \
-			Rc _out__##x = ENUM_VALUE(_out__##x, Rc, x);           \
-			type ret = *(type *)unwrap(&_out__##x);                \
+			Rc rc = ENUM_VALUE(rc, Rc, x);                         \
+			type ret = *(type *)unwrap(&rc);                       \
 			ret;                                                   \
 		});                                                            \
 	})
@@ -106,31 +113,32 @@ static Result STATIC_ALLOC_ERROR_RESULT = {
 	    bool: UNWRAP_TYPE(bool, x),                                        \
 	    default: ({                                                        \
 			 ({                                                    \
-				 Rc _unwrap_value__rc_##v =                    \
-				     ENUM_VALUE(_unwrap_value__rc_##v, Rc, x); \
-				 void *_ptr__##v =                             \
-				     unwrap(&_unwrap_value__rc_##v);           \
-				 memcpy(&v, _ptr__##v, mysize(_ptr__##v));     \
+				 Rc rc = ENUM_VALUE(rc, Rc, x);                \
+				 void *ptr = unwrap(&rc);                      \
+				 memcpy(&v, ptr, mysize(ptr));                 \
 				 v;                                            \
 			 });                                                   \
 		 }))
 
 #define UNWRAP_ERR(x)                                                          \
 	({                                                                     \
-		if (IS_OK(x))                                                  \
-			panic("Attempt to unwrap_err an ok");                  \
-		*(Error *)unwrap(x.slab.data);                                 \
+		({                                                             \
+			if (IS_OK(x))                                          \
+				panic("Attempt to unwrap_err an ok");          \
+			Error e = *(Error *)unwrap(x.slab.data);               \
+			e;                                                     \
+		});                                                            \
 	})
 
 #define TRY(x, v)                                                              \
 	({                                                                     \
 		if (!strcmp(CLASS_NAME(&x), "Option") && IS_NONE(x)) {         \
-			Error _e__##x = ERR(UNWRAP_NONE, "Unwrap on a none");  \
-			return Err(_e__##x);                                   \
+			Error e = ERR(UNWRAP_NONE, "Unwrap on a none");        \
+			return Err(e);                                         \
 		}                                                              \
 		if ((!strcmp(CLASS_NAME(&x), "Result") && IS_ERR(x))) {        \
-			Error _e__##x = UNWRAP_ERR(x);                         \
-			return Err(_e__##x);                                   \
+			Error e = UNWRAP_ERR(x);                               \
+			return Err(e);                                         \
 		}                                                              \
 		UNWRAP_VALUE(x, v);                                            \
 	})
@@ -138,8 +146,8 @@ static Result STATIC_ALLOC_ERROR_RESULT = {
 #define TRYU(x)                                                                \
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
-			Error _e2__##x = UNWRAP_ERR(x);                        \
-			return Err(_e2__##x);                                  \
+			Error e = UNWRAP_ERR(x);                               \
+			return Err(e);                                         \
 		}                                                              \
 	})
 
@@ -159,9 +167,8 @@ static Result STATIC_ALLOC_ERROR_RESULT = {
 #define todo()                                                                 \
 	({                                                                     \
 		({                                                             \
-			Error _e__ =                                           \
-			    ERR(UNIMPLEMENTED, "Not yet implemented");         \
-			return Err(_e__);                                      \
+			Error e = ERR(UNIMPLEMENTED, "Not yet implemented!");  \
+			return Err(e);                                         \
 		});                                                            \
 	});
 
@@ -174,9 +181,4 @@ static Result STATIC_ALLOC_ERROR_RESULT = {
 		});                                                            \
 	})
 
-// special initialization of None to avoid the need to create multiple instances
-static Option None = {{&OptionPtr_Vtable__, "Option"},
-		      NONE,
-		      ENUM_FLAG_NO_CLEANUP,
-		      {UINT64_MAX, &UNIT, sizeof(Unit)}};
 #endif // _CORE_RESULT__

@@ -7,6 +7,7 @@ all: $(OBJS)
 test: test.c
 	mkdir -p bin
 	rm -rf bin/test
+	rm -rf bin/nocapture
 	$(CC) $(CC_TEST_FLAGS) $(TEST_OBJS) -o bin/test test.c
 	./bin/test --timeout 60 -f
 	@rm -rf bin
