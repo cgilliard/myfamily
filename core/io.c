@@ -37,6 +37,15 @@ Result myflush(void *obj) {
 	return do_flush(obj);
 }
 
+Result myseek(void *obj, u64 pos) {
+	ResultPtr (*do_seek)(Object *obj, u64 pos) =
+	    find_fn((Object *)obj, "seek");
+	if (do_seek == NULL)
+		panic("seek not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_seek(obj, pos);
+}
+
 Result read_exact_impl(Object *self, char *buf, u64 len) {
 	Result r = myread(self, buf, len);
 	u64 rlen = *(u64 *)unwrap(&r);
@@ -49,6 +58,15 @@ Result read_exact_impl(Object *self, char *buf, u64 len) {
 	}
 
 	return Ok(UNIT);
+}
+
+Result read_exact(void *obj, char *buf, u64 len) {
+	ResultPtr (*do_read_exact)(Object *obj, char *buf, u64 len) =
+	    find_fn((Object *)obj, "read_exact");
+	if (do_read_exact == NULL)
+		panic("read_exact not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_read_exact(obj, buf, len);
 }
 
 Result myread(void *obj, char *buf, u64 limit) {
