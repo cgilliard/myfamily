@@ -14,6 +14,13 @@
 
 #include <core/buf_reader.h>
 
+GETTER(BufReader, f)
+GETTER(BufReader, buf)
+GETTER(BufReader, offset)
+SETTER(BufReader, offset)
+GETTER(BufReaderLineIterator, reader)
+SETTER(BufReaderLineIterator, reader)
+
 Result lines(void *obj) {
 	ResultPtr (*do_lines)(Object *obj) = find_fn((Object *)obj, "lines");
 	if (do_lines == NULL)
@@ -60,36 +67,244 @@ Result fill_buf(void *obj) {
 	return do_fill_buf(obj);
 }
 
-void BufReader_cleanup(BufReader *ptr) {}
-Result BufReader_read_fixed_bytes(BufReader *ptr, char *buffer, u64 len) {
-	todo();
+void BufReader_cleanup(BufReader *ptr) {
+	RcPtr readable = GET(BufReader, ptr, f);
+	cleanup(&readable);
+
+	Slab slab = GET(BufReader, ptr, buf);
+	if (slab.data) {
+		myfree(&slab);
+		slab.data = NULL;
+	}
 }
-Result BufReader_open_impl(int n, va_list ptr) { todo(); }
-void BufReader_consume_buf(BufReader *ptr, u64 amt) {}
-Result BufReader_fill_buf(BufReader *ptr) { todo(); }
-Result BufReader_read(BufReader *ptr, char *buffer, u64 len) { todo(); }
 
-Result BufReader_open(int n, ...) { todo(); }
+Result BufReader_read_fixed_bytes(BufReader *ptr, char *buffer, u64 len) {
+	u64 wlen_sum = 0;
+	Rc readablerc = GET(BufReader, ptr, f);
+	Object *readable = unwrap(&readablerc);
+	u64 rem = len;
+	u64 offset = 0;
 
-Result read_line_impl(Object *ptr, String *dst) { todo(); }
+	while (rem > 0) {
+		Result r = myread(readable, buffer + offset, rem);
+		u64 wlen = TRY(r, wlen);
 
-Result read_until_impl(Object *ptr, Slice dst, u8 b) { todo(); }
+		if (wlen == 0) {
+			Error e = ERR(IO_ERROR,
+				      "Could not fill whole buffer. Found "
+				      "%llu. Needed %llu",
+				      wlen_sum, len);
+			return Err(e);
+		}
 
-Result lines_impl(Object *ptr) { todo(); }
+		wlen_sum += wlen;
+		rem -= wlen;
+	}
+	return Ok(UNIT);
+}
+Result BufReader_open_impl(int n, va_list ptr) {
+	Rc frc;
+	NO_CLEANUP(frc);
+	u64 capacity = 8196;
+	bool found_readable = false;
+	for (int i = 0; i < n; i++) {
+		BufReaderOption next;
+		Rc rc = va_arg(ptr, Rc);
+		void *vptr = unwrap(&rc);
+		memcpy(&next, vptr, mysize(vptr));
+
+		MATCH(next, VARIANT(BUF_READER_FILE, {
+			      found_readable = true;
+			      Rc readable = ENUM_VALUE(readable, Rc, next);
+			      myclone(&frc, &readable);
+		      }) VARIANT(BUF_READER_CAPACITY, {
+			      capacity = ENUM_VALUE(capacity, u64, next);
+		      }));
+	}
+	va_end(ptr);
+
+	if (!found_readable) {
+		Error e = ERR(ILLEGAL_ARGUMENT,
+			      "BufReaderReadable must be specified");
+		return Err(e);
+	}
+
+	Slab buf = ALLOCATE_SLAB(sizeof(char) * capacity);
+	BufReader ret = BUILD(BufReader, frc, buf, 0);
+
+	return Ok(ret);
+}
+void BufReader_consume_buf(BufReader *ptr, u64 amt) {
+	u64 offset = GET(BufReader, ptr, offset);
+	Slab buf = GET(BufReader, ptr, buf);
+
+	if (amt > offset)
+		amt = offset;
+
+	if (amt > 0) {
+		memmove(buf.data, buf.data + amt, offset - amt);
+		SET(BufReader, ptr, offset, offset - amt);
+	}
+}
+Result BufReader_fill_buf(BufReader *ptr) {
+	Slab buf = GET(BufReader, ptr, buf);
+	u64 offset = GET(BufReader, ptr, offset);
+	u64 capacity = buf.len;
+
+	u64 rem = capacity - offset;
+
+	Rc readablerc = GET(BufReader, ptr, f);
+	Object *readable = unwrap(&readablerc);
+
+	if (offset == 0) {
+		Result r = myread(readable, buf.data + offset, rem);
+		u64 rlen = TRY(r, rlen);
+		offset += rlen;
+		SET(BufReader, ptr, offset, offset);
+	}
+
+	Slice ret = SLICE(buf.data, offset);
+	return Ok(ret);
+}
+Result BufReader_read(BufReader *ptr, char *buffer, u64 len) {
+	u64 wlen_sum = 0;
+	Rc readablerc = GET(BufReader, ptr, f);
+	Object *readable = unwrap(&readablerc);
+	u64 rem = len;
+	u64 offset = 0;
+
+	while (rem > 0) {
+		Result r = myread(readable, buffer + offset, rem);
+		u64 wlen = TRY(r, wlen);
+
+		if (wlen == 0) {
+			Error e = ERR(IO_ERROR,
+				      "Could not fill whole buffer. Found "
+				      "%llu. Needed %llu",
+				      wlen_sum, len);
+			return Err(e);
+		}
+
+		wlen_sum += wlen;
+		rem -= wlen;
+	}
+
+	return Ok(UNIT);
+}
+
+Result BufReader_open(int n, ...) {
+	va_list ptr;
+	va_start(ptr, n);
+	return BufReader_open_impl(n, ptr);
+}
+
+Result read_line_impl(Object *ptr, String *dst) {
+	char buf[1024];
+	Slice s = SLICE(buf, 1024);
+	bool nlfound = false;
+
+	while (true) {
+		Result r = read_until_impl(ptr, s, '\n');
+		u64 rlen = TRY(r, rlen);
+
+		if (rlen > 0) {
+			char *slice_data = GET(Slice, &s, ref);
+			if (slice_data[rlen - 1] == '\n') {
+				slice_data[rlen - 1] = 0;
+				nlfound = true;
+			}
+			Result r2 = String_from_slice(&s, rlen);
+			String nstr = TRY(r2, nstr);
+			Result r3 = append(dst, &nstr);
+			TRYU(r3);
+		}
+
+		if (rlen < 1024 || nlfound)
+			break;
+	}
+
+	return Ok(UNIT);
+}
+
+Result read_until_impl(Object *ptr, Slice dst, u8 b) {
+	int counter = 0;
+	u64 rlen = 0;
+	u64 dst_len = len(&dst);
+	while (true) {
+		u64 offset = rlen;
+		Result r = fill_buf(ptr);
+		Slice slice = TRY(r, slice);
+		char *slice_data = GET(Slice, &slice, ref);
+		u64 slice_len = len(&slice);
+		if (slice_len == 0)
+			break;
+
+		u64 to_consume = slice_len;
+		bool found_mark = false;
+
+		for (u64 i = 0; i < slice_len; i++) {
+			if (b == slice_data[i]) {
+				to_consume = i + 1;
+				found_mark = true;
+				break;
+			}
+		}
+
+		if (to_consume + rlen > dst_len) {
+			to_consume = dst_len - rlen;
+			rlen = dst_len;
+		} else {
+			rlen += to_consume;
+		}
+
+		memcpy(GET(Slice, &dst, ref) + offset, slice_data, to_consume);
+		consume_buf(ptr, to_consume);
+
+		if (rlen == dst_len || found_mark)
+			break;
+
+		if (++counter > 30)
+			break;
+	}
+
+	return Ok(rlen);
+}
+
+Result lines_impl(Object *ptr) {
+	BufReaderLineIterator ret = BUILD(BufReaderLineIterator, ptr);
+	return Ok(ret);
+}
 
 void BufReaderLineIterator_cleanup(BufReaderLineIterator *ptr) {}
 
-Result BufReaderLineIterator_next(BufReaderLineIterator *ptr) { todo(); }
+Result BufReaderLineIterator_next(BufReaderLineIterator *ptr) {
+	char buf[1024];
+	Slice slice = SLICE(buf, 1024);
+	Object *obj = GET(BufReaderLineIterator, ptr, reader);
+	Result r = read_until(obj, slice, '\n');
+	u64 rlen = TRY(r, rlen);
+
+	char *slice_chars = GET(Slice, &slice, ref);
+	if (rlen > 0)
+		slice_chars[rlen - 1] = 0;
+
+	String ret = STRING("");
+	Result slice_str_res = String_from_slice(&slice, rlen);
+	String slice_str = TRY(slice_str_res, slice_str);
+	Result ar = append(&ret, &slice_str);
+	TRYU(ar);
+	if (len(&ret) > 0) {
+		Option retopt = Some(ret);
+		return Ok(retopt);
+	} else
+		return Ok(None);
+}
 
 Rc BufReader_into_iter(BufReader *ptr) {
-	/*
-	BufReaderLineIteratorPtr *ret = mymalloc(sizeof(BufReaderLineIterator));
-	BUILDPTR(ret, BufReaderLineIterator);
-	SET(BufReaderLineIterator, ret, reader, (Object *)ptr);
-	RcPtr rc = RC(ret);
+	Slab slab = ALLOCATE_SLABP(sizeof(BufReaderLineIterator));
+	Object *obj = slab.data;
+	BUILDPTR(obj, BufReaderLineIterator);
+	SET(BufReaderLineIterator, slab.data, reader, (Object *)ptr);
+	RcPtr rc = RC(slab);
 	return rc;
-	*/
-	int x = 0;
-	Rc h = HEAPIFY(x);
-	return h;
 }

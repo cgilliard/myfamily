@@ -1458,3 +1458,43 @@ MyTest(core, test_file) {
 
 	return Ok(UNIT);
 }
+
+Result try_buf_reader() {
+	BufReader br = BUF_READER();
+	return Ok(UNIT);
+}
+
+MyTest(core, test_buf_reader) {
+	char buf[100];
+
+	File f1 = FOPEN("./resources/test_file.txt", OpenRead);
+	BufReader br = BUF_READER(Readable(f1), Capacity(30000));
+	/*
+
+	File f2 = FOPEN("./resources/test_file2.txt", OpenRead);
+	BufReader br2 = BUF_READER(Readable(f2));
+
+	Result r = myread(&br2, buf, 10);
+	buf[10] = 0;
+	assert_eq_str(buf, "0123456789");
+
+	cleanup(&r);
+	r = myread(&br2, buf, 15);
+	buf[15] = 0;
+	assert_eq_str(buf, "012345678901234");
+
+	cleanup(&r);
+	r = myread(&br2, buf, 15);
+	buf[15] = 0;
+	assert_eq_str(buf, "567890123456789");
+
+	cleanup(&r);
+	r = myread(&br2, buf, 100);
+	assert(IS_ERR(r));
+
+	Result rx = try_buf_reader();
+	assert(IS_ERR(rx));
+	*/
+
+	return Ok(UNIT);
+}

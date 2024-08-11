@@ -40,8 +40,7 @@ Result read_until(void *ptr, Slice dst, u8 b);
 Result read_line(void *ptr, String *s);
 Result lines(void *ptr);
 
-CLASS(BufReader,
-      FIELD(Rc, f) FIELD(u64, capacity) FIELD(char *, buf) FIELD(u64, offset))
+CLASS(BufReader, FIELD(Rc, f) FIELD(Slab, buf) FIELD(u64, offset))
 IMPL(BufReader, TRAIT_BUF_READER)
 IMPL(BufReader, TRAIT_INTO_ITER)
 #define BufReader DEFINE_CLASS(BufReader)
@@ -70,18 +69,21 @@ IMPL(BufReader, TRAIT_INTO_ITER)
 // Readable argument
 #define BUF_READER(...)                                                        \
 	({                                                                     \
-		int __counter___ = 0;                                          \
-		EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));                     \
-		if (__counter___ == 0) {                                       \
-			Error e = ERR(ILLEGAL_ARGUMENT,                        \
-				      "Readable must be specified");           \
-			return Err(e);                                         \
-		}                                                              \
-		Result __rr___ = BufReader_open(                               \
-		    __counter___ __VA_OPT__(, ) __VA_OPT__(EXPAND(             \
-			FOR_EACH(PROC_BUF_READER_CONFIG, __VA_ARGS__))));      \
-		BufReaderPtr __bptr__ = TRY(__rr___, __bptr__);                \
-		__bptr__;                                                      \
+		({                                                             \
+			int __counter___ = 0;                                  \
+			EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));             \
+			if (__counter___ == 0) {                               \
+				Error e = ERR(ILLEGAL_ARGUMENT,                \
+					      "Readable must be specified");   \
+				return Err(e);                                 \
+			}                                                      \
+			Result __rr___ = BufReader_open(                       \
+			    __counter___ __VA_OPT__(, )                        \
+				__VA_OPT__(EXPAND(FOR_EACH(                    \
+				    PROC_BUF_READER_CONFIG, __VA_ARGS__))));   \
+			BufReaderPtr __bptr__ = TRY(__rr___, __bptr__);        \
+			__bptr__;                                              \
+		});                                                            \
 	})
 
 #define LINES(br)                                                              \
