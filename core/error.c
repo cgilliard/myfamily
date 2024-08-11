@@ -78,7 +78,7 @@ bool Error_equal(Error *obj1, Error *obj2) {
 
 Error error_build(ErrorKind kind, char *fmt, ...) {
 	BacktracePtr bt = BUILD(Backtrace, NULL, 0);
-	Backtrace_generate(&bt, 100);
+	BACKTRACE(&bt);
 	ErrorPtr ret = BUILD(Error, kind, {}, bt);
 	char *err_msg = (char *)Error_get_message(&ret);
 	va_list args;

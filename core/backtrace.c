@@ -127,32 +127,21 @@ void BacktraceEntry_set_backtrace_entry_values(BacktraceEntry *ptr,
 	snprintf(ptr->_file_path, BACKTRACE_CHAR_ARRAY_LEN, "%s", file_path);
 }
 
-#define GET_ROWS(bt) Backtrace_get_rows(bt)
-#define SET_ROWS(bt, value) Backtrace_set_rows(bt, value)
-#define GET_COUNT(bt) *Backtrace_get_count(bt)
-#define SET_COUNT(bt, value) Backtrace_set_count(bt, value)
-
 bool Backtrace_add_entry(Backtrace *ptr, const char *name, const char *bin_name,
 			 const char *address, const char *file_path) {
-	u64 count = GET_COUNT(ptr);
+	u64 count = GET(Backtrace, ptr, count);
 	if (count >= MAX_BACKTRACE_ROWS)
 		return false;
 	BacktraceEntry_set_backtrace_entry_values(&ptr->_rows[count], name,
 						  bin_name, address, file_path);
-	SET_COUNT(ptr, count + 1);
+	u64 c = count + 1;
+	SET(Backtrace, ptr, count, c);
 	return true;
 }
 
-Backtrace Backtrace_generate_bt(u64 max_depth) {
-	BacktracePtr ret = EMPTY_BACKTRACE;
-	Backtrace_generate(&ret, max_depth);
-
-	return ret;
-}
-
-bool Backtrace_generate(Backtrace *ptr, u64 max_depth) {
-	void *array[max_depth];
-	int size = backtrace(array, max_depth);
+bool Backtrace_generate(Backtrace *ptr) {
+	void *array[MAX_BACKTRACE_ROWS];
+	int size = backtrace(array, MAX_BACKTRACE_ROWS);
 	char **strings = backtrace_symbols(array, size);
 	if (strings == NULL)
 		size = 0;
@@ -246,12 +235,18 @@ bool Backtrace_generate(Backtrace *ptr, u64 max_depth) {
 	return true;
 }
 
+Backtrace Backtrace_generate_bt() {
+	BacktracePtr ret = EMPTY_BACKTRACE;
+	Backtrace_generate(&ret);
+	return ret;
+}
+
 void Backtrace_cleanup(Backtrace *ptr) {}
 
 bool Backtrace_myclone(Backtrace *dst, Backtrace *src) {
 	bool ret = true;
-	u64 src_count = GET_COUNT(src);
-	SET_COUNT(dst, src_count);
+	u64 src_count = GET(Backtrace, src, count);
+	SET(Backtrace, dst, count, src_count);
 	for (u64 i = 0; i < src_count; i++) {
 		myclone(&dst->_rows[i], &src->_rows[i]);
 	}
@@ -261,7 +256,7 @@ bool Backtrace_myclone(Backtrace *dst, Backtrace *src) {
 
 void Backtrace_print(Backtrace *ptr) {
 	BacktraceEntryPtr *rows = ptr->_rows;
-	u64 count = GET_COUNT(ptr);
+	u64 count = GET(Backtrace, ptr, count);
 	if (count == 0) {
 		printf("-------------Backtrace not available-------------\n");
 	} else {
@@ -284,7 +279,7 @@ void Backtrace_print(Backtrace *ptr) {
 }
 
 bool Backtrace_fn_name(Backtrace *ptr, char *buffer, u64 len, u64 index) {
-	u64 count = GET_COUNT(ptr);
+	u64 count = GET(Backtrace, ptr, count);
 	if (index >= count)
 		return false;
 
@@ -296,7 +291,7 @@ bool Backtrace_fn_name(Backtrace *ptr, char *buffer, u64 len, u64 index) {
 }
 
 bool Backtrace_bin_name(Backtrace *ptr, char *buffer, u64 len, u64 index) {
-	u64 count = GET_COUNT(ptr);
+	u64 count = GET(Backtrace, ptr, count);
 	if (index >= count)
 		return false;
 
@@ -307,7 +302,7 @@ bool Backtrace_bin_name(Backtrace *ptr, char *buffer, u64 len, u64 index) {
 }
 
 bool Backtrace_address(Backtrace *ptr, char *buffer, u64 len, u64 index) {
-	u64 count = GET_COUNT(ptr);
+	u64 count = GET(Backtrace, ptr, count);
 	if (index >= count)
 		return false;
 
@@ -318,7 +313,7 @@ bool Backtrace_address(Backtrace *ptr, char *buffer, u64 len, u64 index) {
 }
 
 bool Backtrace_file_path(Backtrace *ptr, char *buffer, u64 len, u64 index) {
-	u64 count = GET_COUNT(ptr);
+	u64 count = GET(Backtrace, ptr, count);
 	if (index >= count)
 		return false;
 

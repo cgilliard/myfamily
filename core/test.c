@@ -521,7 +521,7 @@ MyTest(core, test_backtrace_entry) {
 
 	cr_assert(!strcmp(e1._name, "test1"));
 
-	Backtrace bt = INIT_BACKTRACE;
+	Backtrace bt = EMPTY_BACKTRACE;
 	BACKTRACE(&bt);
 	print(&bt);
 	return Ok(UNIT);

@@ -29,7 +29,7 @@ void panic(const char *fmt, ...) {
 	fprintf(stderr, "\n");
 
 	Backtrace bt = BUILD(Backtrace, NULL, 0);
-	Backtrace_generate(&bt, 100);
+	BACKTRACE(&bt);
 	print(&bt);
 
 	exit(-1);

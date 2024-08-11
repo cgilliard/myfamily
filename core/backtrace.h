@@ -19,8 +19,8 @@
 #include <core/traits_base.h>
 
 #define TRAIT_GENERATE_BACKTRACE(T)                                            \
-	TRAIT_REQUIRED(T, bool, generate, T##Ptr *bt, u64 max_depth)           \
-	TRAIT_REQUIRED(T, T##Ptr, generate_bt, u64 max_depth)
+	TRAIT_REQUIRED(T, bool, generate, T##Ptr *bt)                          \
+	TRAIT_REQUIRED(T, T##Ptr, generate_bt)
 
 #define TRAIT_SET_BACKTRACE_ENTRY(T)                                           \
 	TRAIT_REQUIRED(T, void, set_backtrace_entry_values, T##Ptr *bt,        \
@@ -36,9 +36,6 @@
 		       u64 index)                                              \
 	TRAIT_REQUIRED(T, bool, file_path, T##Ptr *bt, char *buffer, u64 len,  \
 		       u64 index)
-
-#define EMPTY_BACKTRACE_ENTRY BUILD(BacktraceEntry, NULL, NULL, NULL, NULL)
-#define EMPTY_BACKTRACE BUILD(Backtrace, NULL, 0)
 
 #define BACKTRACE_CHAR_ARRAY_LEN 100
 #define MAX_BACKTRACE_ROWS 100
@@ -68,8 +65,7 @@ GETTER_PROTO(BacktraceEntry, bin_name)
 GETTER_PROTO(BacktraceEntry, address)
 GETTER_PROTO(BacktraceEntry, file_path)
 
-#define INIT_BACKTRACE BUILD(Backtrace)
-#define BACKTRACE(bt) ({ Backtrace_generate(bt, 100); })
-#define GENERATE_BACKTRACE Backtrace_generate_bt(100)
+#define EMPTY_BACKTRACE BUILD(Backtrace, NULL, 0)
+#define BACKTRACE(bt) ({ Backtrace_generate(bt); })
 
 #endif // _CORE_BACKTRACE__
