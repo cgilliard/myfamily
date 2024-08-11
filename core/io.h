@@ -82,8 +82,6 @@ Result write_empty_bytes_impl(void *obj, u64 count);
 	TRAIT_SUPER(T, TRAIT_READ)
 
 #define TRAIT_BIN_READER(T)                                                    \
-	TRAIT_REQUIRED(T, Result, read_fixed_bytes, T##Ptr *self, char *buf,   \
-		       u64 limit)                                              \
 	TRAIT_IMPL(T, read_u8, read_u8_impl)                                   \
 	TRAIT_IMPL(T, read_i8, read_i8_impl)                                   \
 	TRAIT_IMPL(T, read_u16, read_u16_impl)                                 \
@@ -100,8 +98,6 @@ Result write_empty_bytes_impl(void *obj, u64 count);
 	TRAIT_SUPER(T, TRAIT_READ)
 
 #define TRAIT_BIN_WRITER(T)                                                    \
-	TRAIT_REQUIRED(T, Result, write_fixed_bytes, T##Ptr *self, char *buf,  \
-		       u64 limit)                                              \
 	TRAIT_IMPL(T, write_u8, write_u8_impl)                                 \
 	TRAIT_IMPL(T, write_i8, write_i8_impl)                                 \
 	TRAIT_IMPL(T, write_u16, write_u16_impl)                               \
