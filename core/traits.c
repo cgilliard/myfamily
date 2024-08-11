@@ -120,7 +120,6 @@ bool deep_copy(void *dst, void *src) {
 	return ret;
 }
 
-/*
 Rc into_iter_impl(void *obj) {
 	RcPtr (*do_into_iter)(Object *obj) =
 	    find_fn((Object *)obj, "into_iter");
@@ -130,6 +129,49 @@ Rc into_iter_impl(void *obj) {
 	return do_into_iter(obj);
 }
 
+int myqsort_compare(const void *a, const void *b) {
+	i32 (*do_cmp)(const void *a, const void *b) =
+	    find_fn((Object *)a, "cmp");
+	if (do_cmp == NULL)
+		panic("cmp not implemented for this type");
+	return do_cmp(a, b);
+}
+
+void myqsort(void *arr, u64 len) {
+	Object **objarr = arr;
+	qsort(arr, len, mysize(&objarr[0]), myqsort_compare);
+}
+
+Result binsearch(void *arr, u64 len, const Object *value) {
+	Option ret = None;
+	if (len == 0)
+		return Ok(ret);
+	i64 left = 0;
+	i64 right = len - 1;
+
+	// Function pointer for comparison
+	OrdOptions (*do_cmp)(const void *a, const void *b) =
+	    find_fn(value, "cmp");
+	if (do_cmp == NULL)
+		panic("cmp not implemented for this type");
+	while (left <= right) {
+		i64 mid = left + (right - left) / 2;
+		// Perform comparison using the function pointer
+		OrdOptions cmp =
+		    do_cmp(arr + mysize((void *)value) * mid, value);
+		if (cmp == EqualTo) {
+			ret = Some(mid);
+			break;
+		} else if (cmp == GreaterThan)
+			right = mid - 1;
+		else
+			left = mid + 1;
+	}
+
+	return Ok(ret);
+}
+
+/*
 bool equal(void *obj1, void *obj2) {
 	if (((Object *)obj1)->vdata.vtable->id !=
 	    ((Object *)obj2)->vdata.vtable->id) {

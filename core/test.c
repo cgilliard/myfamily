@@ -1469,7 +1469,6 @@ MyTest(core, test_buf_reader) {
 
 	File f1 = FOPEN("./resources/test_file.txt", OpenRead);
 	BufReader br = BUF_READER(Readable(f1), Capacity(30000));
-	/*
 
 	File f2 = FOPEN("./resources/test_file2.txt", OpenRead);
 	BufReader br2 = BUF_READER(Readable(f2));
@@ -1494,7 +1493,230 @@ MyTest(core, test_buf_reader) {
 
 	Result rx = try_buf_reader();
 	assert(IS_ERR(rx));
-	*/
 
+	return Ok(UNIT);
+}
+
+MyTest(core, test_buf_reader_consume_fill) {
+	File f = FOPEN("./resources/test_file2.txt", OpenRead);
+	BufReader br = BUF_READER(Readable(f), Capacity(10));
+
+	Result r1 = fill_buf(&br);
+	Slice ref1 = TRY(r1, ref1);
+	assert_eq(len(&ref1), 10);
+	char *buf = GET(Slice, &ref1, ref);
+	for (int i = 0; i < 10; i++) {
+		assert_eq(buf[i], i + '0');
+	}
+	consume_buf(&br, 5);
+
+	Result r2 = fill_buf(&br);
+	Slice ref2 = TRY(r2, ref2);
+	assert_eq(len(&ref2), 5);
+	buf = GET(Slice, &ref2, ref);
+	for (int i = 0; i < 5; i++) {
+		int j = (i + 5) % 10;
+		assert_eq(buf[i], j + '0');
+	}
+
+	File f2 = FOPEN("./resources/test_file2.txt", OpenRead);
+	BufReader br2 = BUF_READER(Readable(f2));
+
+	Result r3 = fill_buf(&br2);
+	Slice ref3 = TRY(r3, ref3);
+	// entire file len
+	assert_eq(len(&ref3), 101);
+
+	consume_buf(&br2, 101);
+
+	// check buffer empty on next call
+	Result r4 = fill_buf(&br2);
+	Slice ref4 = TRY(r4, ref4);
+	assert_eq(len(&ref4), 0);
+
+	return Ok(UNIT);
+}
+
+MyTest(core, test_read_until) {
+	File f = FOPEN("./resources/test_file3.txt", OpenRead);
+	BufReader br = BUF_READER(Readable(f), Capacity(10));
+
+	char buf[1000];
+	Slice s = SLICE(buf, 1000);
+	Result r = read_until(&br, s, '\n');
+	u64 rlen = TRY(r, rlen);
+	Result r2 = String_from_slice(&s, rlen);
+	String s2 = TRY(r2, s2);
+	assert_eq_string(s2, "abcdefghijklmnopqrstuvwxyz1\n");
+
+	Result r3 = read_until(&br, s, '\n');
+	rlen = TRY(r3, rlen);
+	Result r4 = String_from_slice(&s, rlen);
+	String s3 = TRY(r4, s3);
+	assert_eq_string(s3, "abcdefghijklmnopqrstuvwxyz2\n");
+
+	Result r5 = read_until(&br, s, '\n');
+	rlen = TRY(r5, rlen);
+	Result r6 = String_from_slice(&s, rlen);
+	String s4 = TRY(r6, s4);
+	assert_eq_string(s4, "abcdefghijklmnopqrstuvwxyz3\n");
+
+	Result r7 = read_until(&br, s, '\n');
+	rlen = TRY(r7, rlen);
+	assert_eq(rlen, 0);
+
+	File f2 = FOPEN("./resources/test_file3.txt", OpenRead);
+	BufReader br2 = BUF_READER(Readable(f2), Capacity(100));
+	Result r8 = read_until(&br2, s, '*');
+	rlen = TRY(r8, rlen);
+	assert_eq(rlen, 84);
+
+	return Ok(UNIT);
+}
+
+MyTest(core, test_read_line) {
+	File f = FOPEN("./resources/test_file3.txt", OpenRead);
+	BufReader br = BUF_READER(Readable(f), Capacity(10));
+
+	int count = 0;
+	loop {
+		String s1 = STRING("");
+		Result r1 = read_line(&br, &s1);
+		TRYU(r1);
+
+		char exp[100];
+		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
+
+		if (len(&s1) == 0)
+			break;
+		assert_eq_string(s1, exp);
+		count += 1;
+	}
+	return Ok(UNIT);
+}
+
+MyTest(core, test_lines) {
+	// first use into_iter
+	File f = FOPEN("./resources/test_file3.txt", OpenRead);
+	BufReader br = BUF_READER(Readable(f), Capacity(10));
+	Iterator iter = INTO_ITER(&br);
+	int count = 0;
+
+	foreach (String, line, iter) {
+		printf("line='%s'\n", unwrap(&line));
+		char exp[100];
+		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
+		assert_eq_string(line, exp);
+		count += 1;
+	}
+
+	assert_eq(count, 3);
+
+	printf("second run\n");
+	// next use lines
+	File f2 = FOPEN("./resources/test_file3.txt", OpenRead);
+	BufReader br2 = BUF_READER(Readable(f2), Capacity(100));
+	BufReaderLineIterator iter2 = LINES(br2);
+	count = 0;
+
+	foreach (String, line, iter2) {
+		printf("%i: line='%s'\n", count, unwrap(&line));
+		char exp[100];
+		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
+		assert_eq_string(line, exp);
+		count += 1;
+	}
+
+	assert_eq(count, 3);
+	return Ok(UNIT);
+}
+
+// create a Sortable class implementing the CMP (compare) trait (sort by 'id')
+CLASS(SortableTest, FIELD(u64, id) FIELD(String, name))
+// require implementation of the CMP trait.
+IMPL(SortableTest, TRAIT_CMP)
+#define SortableTest DEFINE_CLASS(SortableTest)
+
+// define GETTERs for both name and id
+GETTER(SortableTest, name)
+GETTER(SortableTest, id)
+
+// cleanup function cleans up the name
+void SortableTest_cleanup(SortableTest *ptr) {
+	// the cleanup function for string will automatally deallocate the
+	// String when name goes out of scope.
+	String name = GET(SortableTest, ptr, name);
+}
+
+// As required by TRAIT_CMP, we implement the 'cmp' function. Name must be
+// <class name>_cmp with the specified signature from the TRAIT definition:
+// #define TRAIT_CMP(T) \
+// TRAIT_REQUIRED(T, OrdOptions, cmp, const void *a, const void *b)
+OrdOptions SortableTest_cmp(const void *a, const void *b) {
+	u64 id1 = GET(SortableTest, a, id); // call getter for first object
+	u64 id2 = GET(SortableTest, b, id); // call getter for second object
+
+	// our value is less than the compared value so return LessThan
+	if (id1 < id2)
+		return LessThan;
+	// our value is greater than the compared value so return GreaterThan
+	if (id1 > id2)
+		return GreaterThan;
+	// otherwise it must be equal
+	return EqualTo;
+}
+
+// obtain the index of the matched value. We know all these are present
+// so we can just return the index. In other cases we could check that
+// the Option value 'res' is none by using the IS_NONE macro
+u64 get_index_binsearch(SortableTestPtr *value, SortableTest *arr, u64 len) {
+	// first call the binsearch function on our array with our specified
+	// length. We're tying to find 'value'.
+	Result r1 = binsearch(arr, len, (Object *)value);
+	// We expect that the Result r1 will be of the variant Ok so we call
+	// the EXPECT macro which panics if the Result is an error.
+	Option res = EXPECT(r1, res);
+	// Unwrap the return value and return it
+	u64 ret = UNWRAP_VALUE(res, ret);
+	return ret;
+}
+
+MyTest(core, test_binsearch) {
+	// declare an array. The type SortableTestPtr is used. This is the same
+	// as SortableTest, but it does not include the cleanup attribute which
+	// would not be allowed to be specified in this situation because we are
+	// declaring an array here.
+	SortableTestPtr arr[5];
+
+	// create 5 example SortableTest elements in unsorted order.
+	// Note about lifetimes. Since SortableTest does declare
+	// the cleanup attribute, the array must not be used after these
+	// 5 instances go out of scope. This is the user's responsibility to
+	// manage.
+	SortableTest t1 = BUILD(SortableTest, 1, STRING("Chris"));
+	SortableTest t2 = BUILD(SortableTest, 3, STRING("Joe"));
+	SortableTest t3 = BUILD(SortableTest, 2, STRING("Sam"));
+	SortableTest t4 = BUILD(SortableTest, 5, STRING("Jane"));
+	SortableTest t5 = BUILD(SortableTest, 4, STRING("Jenny"));
+	arr[0] = t1;
+	arr[1] = t2;
+	arr[2] = t3;
+	arr[3] = t4;
+	arr[4] = t5;
+
+	// Since we implement the TRAIT_CMP trait for SortableTest, we can call
+	// myqsort on an array of this type.
+	myqsort(arr, 5);
+
+	// The updated order should be Chris (id=1), Sam (id=2), Joe (id=3),
+	// Jenny (id=4), Jane (id=5). The below assertions verify that myqsort
+	// worked and that binary search also worked.
+	assert_eq(get_index_binsearch(&t1, arr, 5), 0);
+	assert_eq(get_index_binsearch(&t2, arr, 5), 2);
+	assert_eq(get_index_binsearch(&t3, arr, 5), 1);
+	assert_eq(get_index_binsearch(&t4, arr, 5), 4);
+	assert_eq(get_index_binsearch(&t5, arr, 5), 3);
+
+	// Return the UNIT type on completion of the test
 	return Ok(UNIT);
 }
