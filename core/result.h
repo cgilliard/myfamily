@@ -84,7 +84,8 @@ static Result STATIC_ALLOC_ERROR_RESULT = {
 	({                                                                     \
 		({                                                             \
 			Rc _out__##x = ENUM_VALUE(_out__##x, Rc, x);           \
-			*(type *)unwrap(&_out__##x);                           \
+			type ret = *(type *)unwrap(&_out__##x);                \
+			ret;                                                   \
 		});                                                            \
 	})
 
