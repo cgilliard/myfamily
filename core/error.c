@@ -36,7 +36,7 @@ bool ErrorKind_equal(ErrorKind *obj1, ErrorKind *obj2) {
 void Error_cleanup(ErrorPtr *obj) {
 	u64 flags = *Error_get_flags(obj);
 
-	if (!(flags && ERROR_NO_CLEANUP)) {
+	if (!(flags & ERROR_NO_CLEANUP)) {
 		BacktracePtr *bt = Error_get_bt(obj);
 		cleanup(bt);
 	}

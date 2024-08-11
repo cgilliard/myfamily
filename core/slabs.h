@@ -35,6 +35,8 @@ typedef struct SlabDataPtr {
 	SlabDataParams sdp;
 } SlabDataPtr;
 
+void slab_data_cleanup(SlabDataPtr *ptr);
+
 #define SlabData                                                               \
 	SlabDataPtr                                                            \
 	    __attribute__((warn_unused_result, cleanup(slab_data_cleanup)))
@@ -45,7 +47,6 @@ typedef struct Slab {
 	u64 len;
 } Slab;
 
-void slab_data_cleanup(SlabData *ptr);
 int slab_data_build(SlabData *ptr, SlabDataParams sdp);
 int slab_data_access(SlabData *ptr, Slab *slab, u64 offset);
 int slab_data_resize(SlabData *ptr);
@@ -63,13 +64,15 @@ typedef struct SlabAllocatorPtr {
 	struct SlabAllocatorPtr *prev;
 	bool no_malloc;
 } SlabAllocatorPtr;
+
+void slab_allocator_cleanup(SlabAllocatorPtr *ptr);
+
 #define SlabAllocator                                                          \
 	SlabAllocatorPtr __attribute__((warn_unused_result,                    \
 					cleanup(slab_allocator_cleanup)))
 
 #define SLAB_ALLOCATOR_UNINIT {false}
 
-void slab_allocator_cleanup(SlabAllocator *ptr);
 int slab_allocator_build(SlabAllocator *ptr, bool zeroed, int slab_data_count,
 			 ...);
 u64 slab_allocator_allocate(SlabAllocator *ptr, u64 size);

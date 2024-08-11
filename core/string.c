@@ -128,7 +128,7 @@ u64 String_len(String *s) {
 
 void String_print(String *s) {
 	Slab slab = GET(String, s, slab);
-	printf("%s\n", slab.data);
+	printf("%s\n", (char *)slab.data);
 }
 
 Result char_at(void *s, u64 index) {

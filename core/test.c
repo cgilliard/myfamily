@@ -782,12 +782,12 @@ MyTest(core, test_result) {
 
 MyTest(core, test_res_fun) {
 	Result r1 = res_fun(1);
-	cr_assert(!IS_ERR(r1));
+	cr_assert(!(IS_ERR(r1)));
 	cr_assert(IS_OK(r1));
 
 	Result r2 = res_fun(-1);
 	cr_assert(IS_ERR(r2));
-	cr_assert(!IS_OK(r2));
+	cr_assert(!(IS_OK(r2)));
 	return Ok(UNIT);
 }
 
@@ -967,13 +967,13 @@ MyTest(core, test_result_overhead) {
 Result test_option(u32 y) {
 	Option x = Some(y);
 	cr_assert(IS_SOME(x));
-	cr_assert(!IS_NONE(x));
+	cr_assert(!(IS_NONE(x)));
 	u32 v1 = EXPECT(x, v1);
 	cr_assert_eq(v1, 9);
 
 	Option x2 = None;
 	cr_assert(IS_NONE(x2));
-	cr_assert(!IS_SOME(x2));
+	cr_assert(!(IS_SOME(x2)));
 
 	i64 v3 = -100;
 	Option x3 = Some(v3);
@@ -1603,7 +1603,6 @@ MyTest(core, test_lines) {
 	int count = 0;
 
 	foreach (String, line, iter) {
-		printf("line='%s'\n", unwrap(&line));
 		char exp[100];
 		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
 		assert_eq_string(line, exp);
@@ -1620,7 +1619,6 @@ MyTest(core, test_lines) {
 	count = 0;
 
 	foreach (String, line, iter2) {
-		printf("%i: line='%s'\n", count, unwrap(&line));
 		char exp[100];
 		snprintf(exp, 100, "abcdefghijklmnopqrstuvwxyz%i", count + 1);
 		assert_eq_string(line, exp);

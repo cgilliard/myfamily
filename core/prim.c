@@ -42,7 +42,7 @@ void U128_cleanup(U128 *ptr) {}
 void U128_to_str_buf(U128 *ptr, char *buf, u64 max_len) {
 	u128 value = ptr->_value;
 	if (value < UINT64_MAX)
-		snprintf(buf, max_len, "%" PRIu64, value);
+		snprintf(buf, max_len, "%" PRIu64, (u64)value);
 	else
 		snprintf(buf, max_len, "U128");
 }
@@ -57,7 +57,7 @@ void I128_cleanup(I128 *ptr) {}
 void I128_to_str_buf(I128 *ptr, char *buf, u64 max_len) {
 	i128 value = ptr->_value;
 	if (value < INT64_MAX && value > INT64_MIN)
-		snprintf(buf, max_len, "%" PRId64, value);
+		snprintf(buf, max_len, "%" PRId64, (u64)value);
 	else
 		snprintf(buf, max_len, "I128");
 }
