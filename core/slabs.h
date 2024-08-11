@@ -116,21 +116,21 @@ int slab_allocator_free(SlabAllocator *ptr, u64 id);
 #define ALLOCATE_SLAB(size)                                                    \
 	({                                                                     \
 		({                                                             \
-			Slab ret;                                              \
-			if (mymalloc(&ret, size))                              \
+			Slab _ret_allocate_slab__;                             \
+			if (mymalloc(&_ret_allocate_slab__, size))             \
 				return STATIC_ALLOC_ERROR_RESULT;              \
-			ret;                                                   \
+			_ret_allocate_slab__;                                  \
 		});                                                            \
 	})
 
 #define ALLOCATE_SLABP(size)                                                   \
 	({                                                                     \
 		({                                                             \
-			Slab ret;                                              \
-			if (mymalloc(&ret, size))                              \
+			Slab _ret_allocate_slab__;                             \
+			if (mymalloc(&_ret_allocate_slab__, size))             \
 				panic(                                         \
 				    "Could not allocate sufficient memory!");  \
-			ret;                                                   \
+			_ret_allocate_slab__;                                  \
 		});                                                            \
 	})
 

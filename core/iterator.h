@@ -28,7 +28,7 @@ Result next(void *obj);
 #define FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, init)             \
 	({                                                                     \
 		if (!init)                                                     \
-			cleanup(&_ret_##counter##__);                          \
+			cleanup(&_ret_foreach_impl_##counter##__);             \
 		Result _r__;                                                   \
 		if (!strcmp(CLASS_NAME(&iterator), "Rc")) {                    \
 			void *_tmp__ = unwrap(&iterator);                      \
@@ -39,14 +39,15 @@ Result next(void *obj);
 		if (IS_OK(_r__)) {                                             \
 			Option _o__ = TRY(_r__, _o__);                         \
 			if (IS_SOME(_o__)) {                                   \
-				_ret_##counter##__ = UNWRAP_VALUE(_o__, item); \
+				_ret_foreach_impl_##counter##__ =              \
+				    UNWRAP_VALUE(_o__, item);                  \
 			} else {                                               \
-				_has_next_##counter##__ = false;               \
+				_has_next_foreach_impl_##counter##__ = false;  \
 			}                                                      \
 		} else {                                                       \
-			_has_next_##counter##__ = false;                       \
+			_has_next_foreach_impl_##counter##__ = false;          \
 		}                                                              \
-		_ret_##counter##__;                                            \
+		_ret_foreach_impl_##counter##__;                               \
 	})
 
 #define FOR_EACH_IMPL(type, item, iterator, counter, init)                     \
@@ -65,16 +66,16 @@ Result next(void *obj);
 	    f64: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),   \
 	    bool: FOR_EACH_IMPL_DETAILS(type, item, iterator, counter, true),  \
 	    default: ({                                                        \
-			 NO_CLEANUP(_ret_##counter##__);                       \
+			 NO_CLEANUP(_ret_foreach_impl_##counter##__);          \
 			 FOR_EACH_IMPL_DETAILS(type, item, iterator, counter,  \
 					       init);                          \
 		 }))
 
 #define foreach_impl_expand(type, item, iterator, counter)                     \
-	bool _has_next_##counter##__ = true;                                   \
-	type _ret_##counter##__;                                               \
+	bool _has_next_foreach_impl_##counter##__ = true;                      \
+	type _ret_foreach_impl_##counter##__;                                  \
 	for (type item = FOR_EACH_IMPL(type, item, iterator, counter, true);   \
-	     _has_next_##counter##__;                                          \
+	     _has_next_foreach_impl_##counter##__;                             \
 	     item = FOR_EACH_IMPL(type, item, iterator, counter, false))
 
 #define foreach_impl(type, item, iterator, counter)                            \

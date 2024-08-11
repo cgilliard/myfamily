@@ -186,6 +186,5 @@ void vtable_cleanup(Vtable *table);
 	}
 
 #define CLASS_NAME(x) ((Object *)(x))->vdata.name
-#define CLASS_NAME_REF(x) ((Object *)(&x))->vdata.name
 
 #endif // _CORE_CLASS__

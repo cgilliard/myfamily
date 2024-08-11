@@ -48,8 +48,8 @@ IMPL(String, TRAIT_STRING_CORE)
 
 #define STRING(s)                                                              \
 	({                                                                     \
-		Result _rr33__ = String_build(s);                              \
-		StringPtr _rr44__ = TRY(_rr33__, _rr44__);                     \
+		Result _rr34__ = String_build(s);                              \
+		StringPtr _rr44__ = TRY(_rr34__, _rr44__);                     \
 		_rr44__;                                                       \
 	})
 

@@ -67,32 +67,32 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 #define Ok(x)                                                                  \
 	({                                                                     \
 		({                                                             \
-			Rc rc = HEAPIFY(x);                                    \
-			ResultPtr r = BUILD_ENUM(Result, Ok, rc);              \
-			if (r.slab.data == NULL) {                             \
-				r = STATIC_ALLOC_ERROR_RESULT;                 \
+			Rc _rc_##x = HEAPIFY(x);                               \
+			ResultPtr _r_##x = BUILD_ENUM(Result, Ok, _rc_##x);    \
+			if (_r_##x.slab.data == NULL) {                        \
+				_r_##x = STATIC_ALLOC_ERROR_RESULT;            \
 			}                                                      \
-			r;                                                     \
+			_r_##x;                                                \
 		});                                                            \
 	})
 
 #define Err(e)                                                                 \
 	({                                                                     \
 		({                                                             \
-			ResultPtr r = BUILD_ENUM(Result, Err, e);              \
-			if (r.slab.data == NULL) {                             \
-				r = STATIC_ALLOC_ERROR_RESULT;                 \
+			ResultPtr _r_##e = BUILD_ENUM(Result, Err, e);         \
+			if (_r_##e.slab.data == NULL) {                        \
+				_r_##e = STATIC_ALLOC_ERROR_RESULT;            \
 			}                                                      \
-			r;                                                     \
+			_r_##e;                                                \
 		});                                                            \
 	})
 
 #define UNWRAP_TYPE(type, x)                                                   \
 	({                                                                     \
 		({                                                             \
-			Rc rc = ENUM_VALUE(rc, Rc, x);                         \
-			type ret = *(type *)unwrap(&rc);                       \
-			ret;                                                   \
+			Rc _rc_##x = ENUM_VALUE(_rc_##x, Rc, x);               \
+			type _ret_##x = *(type *)unwrap(&_rc_##x);             \
+			_ret_##x;                                              \
 		});                                                            \
 	})
 
@@ -125,20 +125,20 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 		({                                                             \
 			if (IS_OK(x))                                          \
 				panic("Attempt to unwrap_err an ok");          \
-			Error e = *(Error *)unwrap(x.slab.data);               \
-			e;                                                     \
+			Error _e_##x = *(Error *)unwrap(x.slab.data);          \
+			_e_##x;                                                \
 		});                                                            \
 	})
 
 #define TRY(x, v)                                                              \
 	({                                                                     \
 		if (!strcmp(CLASS_NAME(&x), "Option") && IS_NONE(x)) {         \
-			Error e = ERR(UNWRAP_NONE, "Unwrap on a none");        \
-			return Err(e);                                         \
+			Error _e_##v = ERR(UNWRAP_NONE, "Unwrap on a none");   \
+			return Err(_e_##v);                                    \
 		}                                                              \
 		if ((!strcmp(CLASS_NAME(&x), "Result") && IS_ERR(x))) {        \
-			Error e = UNWRAP_ERR(x);                               \
-			return Err(e);                                         \
+			Error _e_##v = UNWRAP_ERR(x);                          \
+			return Err(_e_##v);                                    \
 		}                                                              \
 		UNWRAP_VALUE(x, v);                                            \
 	})
@@ -146,8 +146,8 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 #define TRYU(x)                                                                \
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
-			Error e = UNWRAP_ERR(x);                               \
-			return Err(e);                                         \
+			Error _e_##x = UNWRAP_ERR(x);                          \
+			return Err(_e_##x);                                    \
 		}                                                              \
 	})
 
@@ -157,8 +157,8 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 			panic("Expect on none");                               \
 		}                                                              \
 		if ((!strcmp(CLASS_NAME(&x), "Result") && IS_ERR(x))) {        \
-			Error e = UNWRAP_ERR(x);                               \
-			print(&e);                                             \
+			Error _e_##v = UNWRAP_ERR(x);                          \
+			print(&_e_##v);                                        \
 			panic("Expect on an error/none");                      \
 		}                                                              \
 		UNWRAP_VALUE(x, v);                                            \
@@ -167,17 +167,18 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 #define todo()                                                                 \
 	({                                                                     \
 		({                                                             \
-			Error e = ERR(UNIMPLEMENTED, "Not yet implemented!");  \
-			return Err(e);                                         \
+			Error _e__ =                                           \
+			    ERR(UNIMPLEMENTED, "Not yet implemented!");        \
+			return Err(_e__);                                      \
 		});                                                            \
 	});
 
 #define Some(x)                                                                \
 	({                                                                     \
 		({                                                             \
-			Rc rc = HEAPIFY(x);                                    \
-			OptionPtr res = BUILD_ENUM(Option, SOME, rc);          \
-			res;                                                   \
+			Rc _rc__ = HEAPIFY(x);                                 \
+			OptionPtr _res__ = BUILD_ENUM(Option, SOME, _rc__);    \
+			_res__;                                                \
 		});                                                            \
 	})
 

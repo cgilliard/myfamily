@@ -41,7 +41,6 @@
 	x##Ptr __attribute__((warn_unused_result, cleanup(x##_cleanup_impl)))
 
 #define VARIANTS(...) __VA_ARGS__
-#define TYPE(field_type, field_name) field_type field_name;
 #define TYPES(...) __VA_ARGS__
 
 #define MATCH(name, ...)                                                       \
@@ -53,83 +52,96 @@
 	if (mytype == type)                                                    \
 	exe
 
-#define BUILD_ENUM_PRIM(name, type, v, _size__)                                \
+#define BUILD_ENUM_PRIM(name, variant, v, size)                                \
 	({                                                                     \
-		Slab slab;                                                     \
-		int _res__ = mymalloc(&slab, _size__);                         \
-		u8 flags = ENUM_FLAG_PRIM;                                     \
-		if (!_res__)                                                   \
-			memcpy(slab.data, &v, _size__);                        \
-		else {                                                         \
-			slab.data = NULL;                                      \
-			flags = ENUM_FLAG_NO_CLEANUP | ENUM_FLAG_PRIM;         \
-		}                                                              \
-		(name){{&name##_Vtable__, #name}, type, flags, slab};          \
+		({                                                             \
+			Slab _slab;                                            \
+			int _res = mymalloc(&_slab, size);                     \
+			u8 _flags = ENUM_FLAG_PRIM;                            \
+			if (!_res)                                             \
+				memcpy(_slab.data, &v, size);                  \
+			else {                                                 \
+				_slab.data = NULL;                             \
+				_flags =                                       \
+				    ENUM_FLAG_NO_CLEANUP | ENUM_FLAG_PRIM;     \
+			}                                                      \
+			name ret = {{&name##_Vtable__, #name},                 \
+				    variant,                                   \
+				    _flags,                                    \
+				    _slab};                                    \
+			ret;                                                   \
+		});                                                            \
 	})
 
-#define BUILD_ENUM(name, type, v)                                              \
+#define BUILD_ENUM(name, variant, v)                                           \
 	_Generic((v),                                                          \
-	    u8: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(u8)),               \
-	    u16: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(u16)),             \
-	    u32: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(u32)),             \
-	    u64: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(u64)),             \
-	    u128: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(u128)),           \
-	    i8: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(i8)),               \
-	    i16: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(i16)),             \
-	    i32: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(i32)),             \
-	    i64: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(i64)),             \
-	    i128: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(i128)),           \
-	    f32: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(f32)),             \
-	    f64: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(f64)),             \
-	    bool: BUILD_ENUM_PRIM(name##Ptr, type, v, sizeof(bool)),           \
+	    u8: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(u8)),            \
+	    u16: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(u16)),          \
+	    u32: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(u32)),          \
+	    u64: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(u64)),          \
+	    u128: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(u128)),        \
+	    i8: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(i8)),            \
+	    i16: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(i16)),          \
+	    i32: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(i32)),          \
+	    i64: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(i64)),          \
+	    i128: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(i128)),        \
+	    f32: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(f32)),          \
+	    f64: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(f64)),          \
+	    bool: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(bool)),        \
 	    default: ({                                                        \
-			 RcPtr _rc__ = HEAPIFY(v);                             \
-			 u8 flags;                                             \
-			 Slab slab;                                            \
-			 if (_rc__._ref.data) {                                \
-				 flags = 0;                                    \
-				 u64 _sz__ = mysize(&_rc__);                   \
-				 if (!mymalloc(&slab, _sz__))                  \
-					 memcpy(slab.data, &_rc__, _sz__);     \
-				 else {                                        \
-					 flags = ENUM_FLAG_NO_CLEANUP;         \
-					 slab.data = NULL;                     \
-					 cleanup(&_rc__);                      \
-				 }                                             \
+			 ({                                                    \
+				 RcPtr _rc_##v = HEAPIFY(v);                   \
+				 u8 _flags;                                    \
+				 Slab _slab;                                   \
+				 if (_rc_##v._ref.data) {                      \
+					 _flags = 0;                           \
+					 u64 sz = mysize(&_rc_##v);            \
+					 if (!mymalloc(&_slab, sz))            \
+						 memcpy(_slab.data, &_rc_##v,  \
+							sz);                   \
+					 else {                                \
+						 _flags =                      \
+						     ENUM_FLAG_NO_CLEANUP;     \
+						 _slab.data = NULL;            \
+						 cleanup(&_rc_##v);            \
+					 }                                     \
                                                                                \
-			 } else {                                              \
-				 flags = ENUM_FLAG_NO_CLEANUP;                 \
-				 slab.data = NULL;                             \
-			 }                                                     \
-			 (name##Ptr){                                          \
-			     {&name##Ptr_Vtable__, #name}, type, flags, slab}; \
+				 } else {                                      \
+					 _flags = ENUM_FLAG_NO_CLEANUP;        \
+					 _slab.data = NULL;                    \
+				 }                                             \
+				 (name##Ptr){{&name##Ptr_Vtable__, #name},     \
+					     variant,                          \
+					     _flags,                           \
+					     _slab};                           \
+			 });                                                   \
 		 }))
 
-#define ENUM_VALUE_PRIM(ret, type, e, storage_type)                            \
+#define ENUM_VALUE_PRIM(e, storage_type)                                       \
 	({                                                                     \
-		storage_type _ret__;                                           \
-		memcpy(&_ret__, e.slab.data, sizeof(storage_type));            \
-		_ret__;                                                        \
+		storage_type _ret__##e;                                        \
+		memcpy(&_ret__##e, e.slab.data, sizeof(storage_type));         \
+		_ret__##e;                                                     \
 	})
 
 #define ENUM_VALUE(ret, type, e)                                               \
 	_Generic((ret),                                                        \
-	    u8: ENUM_VALUE_PRIM(ret, type, e, u8),                             \
-	    u16: ENUM_VALUE_PRIM(ret, type, e, u16),                           \
-	    u32: ENUM_VALUE_PRIM(ret, type, e, u32),                           \
-	    u64: ENUM_VALUE_PRIM(ret, type, e, u64),                           \
-	    u128: ENUM_VALUE_PRIM(ret, type, e, u128),                         \
-	    i8: ENUM_VALUE_PRIM(ret, type, e, i8),                             \
-	    i16: ENUM_VALUE_PRIM(ret, type, e, i16),                           \
-	    i32: ENUM_VALUE_PRIM(ret, type, e, i32),                           \
-	    i64: ENUM_VALUE_PRIM(ret, type, e, i64),                           \
-	    i128: ENUM_VALUE_PRIM(ret, type, e, i128),                         \
-	    f32: ENUM_VALUE_PRIM(ret, type, e, f32),                           \
-	    f64: ENUM_VALUE_PRIM(ret, type, e, f64),                           \
-	    bool: ENUM_VALUE_PRIM(ret, type, e, bool),                         \
+	    u8: ENUM_VALUE_PRIM(e, u8),                                        \
+	    u16: ENUM_VALUE_PRIM(e, u16),                                      \
+	    u32: ENUM_VALUE_PRIM(e, u32),                                      \
+	    u64: ENUM_VALUE_PRIM(e, u64),                                      \
+	    u128: ENUM_VALUE_PRIM(e, u128),                                    \
+	    i8: ENUM_VALUE_PRIM(e, i8),                                        \
+	    i16: ENUM_VALUE_PRIM(e, i16),                                      \
+	    i32: ENUM_VALUE_PRIM(e, i32),                                      \
+	    i64: ENUM_VALUE_PRIM(e, i64),                                      \
+	    i128: ENUM_VALUE_PRIM(e, i128),                                    \
+	    f32: ENUM_VALUE_PRIM(e, f32),                                      \
+	    f64: ENUM_VALUE_PRIM(e, f64),                                      \
+	    bool: ENUM_VALUE_PRIM(e, bool),                                    \
 	    default: ({                                                        \
-			 type##Ptr _ret__ = *(type *)unwrap(e.slab.data);      \
-			 _ret__;                                               \
+			 type##Ptr _ret__##ret = *(type *)unwrap(e.slab.data); \
+			 _ret__##ret;                                          \
 		 }))
 
 #endif // _CORE_ENUM__

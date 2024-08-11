@@ -90,40 +90,46 @@ IMPL(Bool, TRAIT_DISPLAY)
 #define TO_STRING(x)                                                           \
 	({                                                                     \
 		({                                                             \
-			Result r = to_string(x);                               \
-			StringPtr sptr = TRY(r, sptr);                         \
-			sptr;                                                  \
+			Result _r_to_string_impl__ = to_string(x);             \
+			StringPtr _sptr_to_string_impl__ =                     \
+			    TRY(_r_to_string_impl__, _sptr_to_string_impl__);  \
+			_sptr_to_string_impl__;                                \
 		});                                                            \
 	})
 
 #define TO_DEBUG(x)                                                            \
 	({                                                                     \
 		({                                                             \
-			Result r = to_debug(x);                                \
-			StringPtr sptr = TRY(r, sptr);                         \
-			sptr;                                                  \
+			Result _r_to_debug_impl__ = to_debug(x);               \
+			StringPtr _sptr_to_debug_impl__ =                      \
+			    TRY(_r_to_debug_impl__, _sptr_to_debug_impl__);    \
+			_sptr_to_debug_impl__;                                 \
 		});                                                            \
 	})
 
 #define FORMATTER(size)                                                        \
 	({                                                                     \
 		({                                                             \
-			Slab buf;                                              \
-			if (mymalloc(&buf, size * sizeof(char)))               \
+			Slab _buf_formatter_impl__;                            \
+			if (mymalloc(&_buf_formatter_impl__,                   \
+				     size * sizeof(char)))                     \
 				return STATIC_ALLOC_ERROR_RESULT;              \
-			FormatterPtr f = BUILD(Formatter, buf, 0, true);       \
-			f;                                                     \
+			FormatterPtr _f_formatter_impl_ret__ =                 \
+			    BUILD(Formatter, _buf_formatter_impl__, 0, true);  \
+			_f_formatter_impl_ret__;                               \
 		});                                                            \
 	})
 
 #define FORMATTERP(size)                                                       \
 	({                                                                     \
 		({                                                             \
-			Slab buf;                                              \
-			if (mymalloc(&buf, size * sizeof(char)))               \
+			Slab _buf_formatterp_impl__;                           \
+			if (mymalloc(&_buf_formatterp_impl__,                  \
+				     size * sizeof(char)))                     \
 				panic("Could not allocate sufficient memory"); \
-			FormatterPtr f = BUILD(Formatter, buf, 0, true);       \
-			f;                                                     \
+			FormatterPtr _f_formatterp_impl_ret__ =                \
+			    BUILD(Formatter, _buf_formatterp_impl__, 0, true); \
+			_f_formatterp_impl_ret__;                              \
 		});                                                            \
 	})
 

@@ -23,14 +23,17 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 
 #define PROC_TYPE(sign_upper, sign_lower, bits, value)                         \
 	({                                                                     \
-		mymalloc(&((Slab *)slabs.data)[itt],                           \
-			 sizeof(sign_upper##bits));                            \
-		sign_upper##bits##Ptr *__ptr___ =                              \
-		    ((Slab *)slabs.data)[itt].data;                            \
-		BUILDPTR(__ptr___, sign_upper##bits);                          \
-		memcpy(&__ptr___->_value, &value, sizeof(sign_lower##bits));   \
-		itt++;                                                         \
-		__ptr___;                                                      \
+		mymalloc(                                                      \
+		    &((Slab *)_slabs__format_impl__.data)[_itt_format_impl__], \
+		    sizeof(sign_upper##bits));                                 \
+		sign_upper##bits##Ptr *_ptr_proc_type__ =                      \
+		    ((Slab *)_slabs__format_impl__.data)[_itt_format_impl__]   \
+			.data;                                                 \
+		BUILDPTR(_ptr_proc_type__, sign_upper##bits);                  \
+		memcpy(&_ptr_proc_type__->_value, &value,                      \
+		       sizeof(sign_lower##bits));                              \
+		_itt_format_impl__++;                                          \
+		_ptr_proc_type__;                                              \
 	})
 
 #define PROC_ARG(value)                                                        \
@@ -48,12 +51,18 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 	    f32: ({ PROC_TYPE(F, f, 32, value); }),                            \
 	    f64: ({ PROC_TYPE(F, f, 64, value); }),                            \
 	    bool: ({                                                           \
-			 mymalloc(&((Slab *)slabs.data)[itt], sizeof(Bool));   \
-			 BoolPtr *__ptr___ = ((Slab *)slabs.data)[itt].data;   \
-			 BUILDPTR(__ptr___, Bool);                             \
-			 memcpy(&__ptr___->_value, &value, sizeof(bool));      \
-			 itt++;                                                \
-			 __ptr___;                                             \
+			 mymalloc(&((Slab *)_slabs__format_impl__              \
+					.data)[_itt_format_impl__],            \
+				  sizeof(Bool));                               \
+			 BoolPtr *_ptr_proc_arg_impl__ =                       \
+			     ((Slab *)_slabs__format_impl__                    \
+				  .data)[_itt_format_impl__]                   \
+				 .data;                                        \
+			 BUILDPTR(_ptr_proc_arg_impl__, Bool);                 \
+			 memcpy(&_ptr_proc_arg_impl__->_value, &value,         \
+				sizeof(bool));                                 \
+			 _itt_format_impl__++;                                 \
+			 _ptr_proc_arg_impl__;                                 \
 		 }),                                                           \
 	    default: ({ &value; }))
 
@@ -64,18 +73,20 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 		({                                                             \
 			u64 __counter___ = 0;                                  \
 			EXPAND(FOR_EACH(COUNT_FORMAT, __VA_ARGS__));           \
-			Slab slabs;                                            \
+			Slab _slabs__format_impl__;                            \
                                                                                \
-			mymalloc(&slabs, sizeof(Slab) * __counter___);         \
-			u64 itt = 0;                                           \
-			ResultPtr ret =                                        \
+			mymalloc(&_slabs__format_impl__,                       \
+				 sizeof(Slab) * __counter___);                 \
+			u64 _itt_format_impl__ = 0;                            \
+			ResultPtr _ret__format_impl__ =                        \
 			    format(f, fmt __VA_OPT__(, ) EXPAND(               \
 					  FOR_EACH(PROC_ARG, __VA_ARGS__)));   \
-			for (u64 i = 0; i < __counter___; i++) {               \
-				myfree(&((Slab *)slabs.data)[i]);              \
+			for (u64 _i__ = 0; _i__ < __counter___; _i__++) {      \
+				myfree(&((Slab *)_slabs__format_impl__         \
+					     .data)[_i__]);                    \
 			}                                                      \
-			myfree(&slabs);                                        \
-			ret;                                                   \
+			myfree(&_slabs__format_impl__);                        \
+			_ret__format_impl__;                                   \
 		});                                                            \
 	})
 

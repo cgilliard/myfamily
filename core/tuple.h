@@ -84,19 +84,24 @@ Slab Tuple_add_value_bool(void *value);
 
 #define TUPLE(...)                                                             \
 	({                                                                     \
-		Slab values[] = {                                              \
+		Slab _values__tuple_impl__[] = {                               \
 		    EXPAND(FOR_EACH(CREATE_GENERIC, __VA_ARGS__))};            \
-		u64 count = sizeof(values) / sizeof(values[0]);                \
-		Slab elements;                                                 \
-		if (mymalloc(&elements, count * sizeof(Slab *))) {             \
+		u64 _count_tuple_impl__ = sizeof(_values__tuple_impl__) /      \
+					  sizeof(_values__tuple_impl__[0]);    \
+		Slab _elements_tuple_impl__;                                   \
+		if (mymalloc(&_elements_tuple_impl__,                          \
+			     _count_tuple_impl__ * sizeof(Slab *))) {          \
 			return STATIC_ALLOC_ERROR_RESULT;                      \
 		}                                                              \
-		Slab *element_arr = elements.data;                             \
-		for (u64 i = 0; i < count; ++i) {                              \
-			element_arr[i] = values[i];                            \
+		Slab *_element_arr__tuple_impl__ =                             \
+		    _elements_tuple_impl__.data;                               \
+		for (u64 i = 0; i < _count_tuple_impl__; ++i) {                \
+			_element_arr__tuple_impl__[i] =                        \
+			    _values__tuple_impl__[i];                          \
 		}                                                              \
-		TuplePtr tuple = BUILD(Tuple, elements, count);                \
-		tuple;                                                         \
+		TuplePtr _tuple_return_tuple_impl__ =                          \
+		    BUILD(Tuple, _elements_tuple_impl__, _count_tuple_impl__); \
+		_tuple_return_tuple_impl__;                                    \
 	})
 
 #endif // _CORE_TUPLE__

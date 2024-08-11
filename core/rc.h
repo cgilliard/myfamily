@@ -38,17 +38,17 @@ static SETTER(Rc, flags);
 
 #define HEAPIFY_OBJ(obj, is_prim)                                              \
 	({                                                                     \
-		Slab slab;                                                     \
-		slab.data = 0;                                                 \
+		Slab _slab__;                                                  \
+		_slab__.data = 0;                                              \
 		RcPtr _ret__;                                                  \
 		u64 _sz__ = mysize(&obj);                                      \
-		if (mymalloc(&slab, _sz__)) {                                  \
-			slab.data = NULL;                                      \
-			_ret__ = RC(slab);                                     \
+		if (mymalloc(&_slab__, _sz__)) {                               \
+			_slab__.data = NULL;                                   \
+			_ret__ = RC(_slab__);                                  \
 		} else {                                                       \
-			memcpy(slab.data, &obj, _sz__);                        \
+			memcpy(_slab__.data, &obj, _sz__);                     \
 			NO_CLEANUP(obj);                                       \
-			_ret__ = RC(slab);                                     \
+			_ret__ = RC(_slab__);                                  \
 			if (is_prim)                                           \
 				SET(Rc, &_ret__, flags,                        \
 				    RC_FLAGS_PRIM | RC_FLAGS_NO_CLEANUP);      \
@@ -61,69 +61,69 @@ static SETTER(Rc, flags);
 #define HEAPIFY(v)                                                             \
 	_Generic((v),                                                          \
 	    uint8_t: ({                                                        \
-			 U8Ptr obj = BUILD(U8, 0);                             \
-			 memcpy(&obj._value, &v, sizeof(u8));                  \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 U8Ptr _obj__ = BUILD(U8, 0);                          \
+			 memcpy(&_obj__._value, &v, sizeof(u8));               \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    uint16_t: ({                                                       \
-			 U16Ptr obj = BUILD(U16, 0);                           \
-			 memcpy(&obj._value, &v, sizeof(u16));                 \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 U16Ptr _obj__ = BUILD(U16, 0);                        \
+			 memcpy(&_obj__._value, &v, sizeof(u16));              \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    uint32_t: ({                                                       \
-			 U32Ptr obj = BUILD(U32, 0);                           \
-			 memcpy(&obj._value, &v, sizeof(u32));                 \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 U32Ptr _obj__ = BUILD(U32, 0);                        \
+			 memcpy(&_obj__._value, &v, sizeof(u32));              \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    uint64_t: ({                                                       \
-			 U64Ptr obj = BUILD(U64, 0);                           \
-			 memcpy(&obj._value, &v, sizeof(u64));                 \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 U64Ptr _obj__ = BUILD(U64, 0);                        \
+			 memcpy(&_obj__._value, &v, sizeof(u64));              \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    __uint128_t: ({                                                    \
-			 U128Ptr obj = BUILD(U128, 0);                         \
-			 memcpy(&obj._value, &v, sizeof(u128));                \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 U128Ptr _obj__ = BUILD(U128, 0);                      \
+			 memcpy(&_obj__._value, &v, sizeof(u128));             \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    int8_t: ({                                                         \
-			 I8Ptr obj = BUILD(I8, 0);                             \
-			 memcpy(&obj._value, &v, sizeof(i8));                  \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 I8Ptr _obj__ = BUILD(I8, 0);                          \
+			 memcpy(&_obj__._value, &v, sizeof(i8));               \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    int16_t: ({                                                        \
-			 I16Ptr obj = BUILD(I16, 0);                           \
-			 memcpy(&obj._value, &v, sizeof(i16));                 \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 I16Ptr _obj__ = BUILD(I16, 0);                        \
+			 memcpy(&_obj__._value, &v, sizeof(i16));              \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    int32_t: ({                                                        \
-			 I32Ptr obj = BUILD(I32, 0);                           \
-			 memcpy(&obj._value, &v, sizeof(i32));                 \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 I32Ptr _obj__ = BUILD(I32, 0);                        \
+			 memcpy(&_obj__._value, &v, sizeof(i32));              \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    int64_t: ({                                                        \
-			 I64Ptr obj = BUILD(I64, 0);                           \
-			 memcpy(&obj._value, &v, sizeof(i64));                 \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 I64Ptr _obj__ = BUILD(I64, 0);                        \
+			 memcpy(&_obj__._value, &v, sizeof(i64));              \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    __int128_t: ({                                                     \
-			 I128Ptr obj = BUILD(I128, 0);                         \
-			 memcpy(&obj._value, &v, sizeof(i128));                \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 I128Ptr _obj__ = BUILD(I128, 0);                      \
+			 memcpy(&_obj__._value, &v, sizeof(i128));             \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    bool: ({                                                           \
-			 BoolPtr obj = BUILD(Bool, 0);                         \
-			 memcpy(&obj._value, &v, sizeof(bool));                \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 BoolPtr _obj__ = BUILD(Bool, 0);                      \
+			 memcpy(&_obj__._value, &v, sizeof(bool));             \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    float: ({                                                          \
-			 F32Ptr obj = BUILD(F32, 0);                           \
-			 memcpy(&obj._value, &v, sizeof(f32));                 \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 F32Ptr _obj__ = BUILD(F32, 0);                        \
+			 memcpy(&_obj__._value, &v, sizeof(f32));              \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    double: ({                                                         \
-			 F64Ptr obj = BUILD(F64, 0);                           \
-			 memcpy(&obj._value, &v, sizeof(f64));                 \
-			 HEAPIFY_OBJ(obj, true);                               \
+			 F64Ptr _obj__ = BUILD(F64, 0);                        \
+			 memcpy(&_obj__._value, &v, sizeof(f64));              \
+			 HEAPIFY_OBJ(_obj__, true);                            \
 		 }),                                                           \
 	    default: ({ HEAPIFY_OBJ(v, false); }))
 
