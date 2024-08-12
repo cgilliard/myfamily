@@ -58,7 +58,7 @@ bool Tuple_myclone(Tuple *dst, Tuple *src) {
 		if (implements(src_elements[i].data, "deep_copy")) {
 			deep_copy(element_arr[i].data, src_elements[i].data);
 		} else {
-			copy(element_arr[i].data, src_elements[i].data);
+			myclone(element_arr[i].data, src_elements[i].data);
 		}
 	}
 

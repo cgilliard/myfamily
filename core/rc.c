@@ -71,7 +71,7 @@ bool Rc_deep_copy(Rc *dst, Rc *src) {
 	u64 initial = 1;
 	*(u64 *)count_slab.data = initial;
 
-	SET(Rc, dst, flags, 0);
+	SET(Rc, dst, flags, GET(Rc, src, flags) & ~RC_FLAGS_CONSUMED);
 	SET(Rc, dst, count, count_slab);
 	SET(Rc, dst, ref, dst_ref);
 	return true;
@@ -92,8 +92,11 @@ Rc Rc_build(Slab slab) {
 void *Rc_unwrap(Rc *ptr) {
 	Slab ref = GET(Rc, ptr, ref);
 	u8 flags = GET(Rc, ptr, flags);
+	if ((flags & RC_FLAGS_CONSUMED) != 0 &&
+	    (flags & RC_FLAGS_NO_COUNTER) == 0)
+		panic("Rc has already been consumed");
 	// set no cleanup after unwrap is called
-	SET(Rc, ptr, flags, flags | RC_FLAGS_NO_CLEANUP);
+	SET(Rc, ptr, flags, flags | RC_FLAGS_NO_CLEANUP | RC_FLAGS_CONSUMED);
 	if ((flags & RC_FLAGS_PRIM) != 0) {
 		return unwrap(ref.data);
 	}

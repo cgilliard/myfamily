@@ -117,9 +117,12 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 	    bool: UNWRAP_TYPE(bool, x),                                        \
 	    default: ({                                                        \
 			 ({                                                    \
-				 Rc rc = ENUM_VALUE(rc, Rc, x);                \
-				 void *ptr = unwrap(&rc);                      \
-				 memcpy(&v, ptr, mysize(ptr));                 \
+				 Rc _rc_unwrap_value__ =                       \
+				     ENUM_VALUE(_rc_unwrap_value__, Rc, x);    \
+				 void *__ptr_unwrap_value__ =                  \
+				     unwrap(&_rc_unwrap_value__);              \
+				 memcpy(&v, __ptr_unwrap_value__,              \
+					mysize(__ptr_unwrap_value__));         \
 				 v;                                            \
 			 });                                                   \
 		 }))

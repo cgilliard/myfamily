@@ -726,7 +726,6 @@ MyTest(core, test_enum_oom) {
 				MyClass3 x2 = BUILD(MyClass3, slab);
 				MyEnum e2 = BUILD_ENUM(MyEnum, VV03, x2);
 				cr_assert_eq(e2.slab.data, NULL);
-
 				Result r = Ok(x1);
 				cr_assert(IS_ERR(r));
 				Error e = UNWRAP_ERR(r);
@@ -1258,7 +1257,6 @@ MyTest(core, test_tuple) {
 
 	Tuple t2;
 	myclone(&t2, &t1);
-
 	u64 lent2 = len(&t2);
 	assert_eq(lent2, 4);
 	x_out = ELEMENT_AT(t2, 0, x_out);
@@ -1741,5 +1739,72 @@ MyTest(core, test_rc_deep_copy) {
 	deep_copy(&rc, &rc_in);
 	String s_out = *(String *)unwrap(&rc);
 	assert_eq_string2(s, s_out);
+	return Ok(UNIT);
+}
+
+typedef struct TestConfig {
+	Option opt;
+} TestConfig;
+
+CLASS(TestConfigHold, FIELD(TestConfig, cc))
+#define TestConfigHold DEFINE_CLASS(TestConfigHold)
+
+void TestConfigHold_cleanup(TestConfigHold *ptr) { cleanup(&ptr->_cc); }
+
+Result build_opt() {
+	TestConfig conf;
+	String v1 = STRING("expected2");
+	printf("addr v1 creation = %p\n", unwrap(&v1));
+	conf.opt = Some(v1);
+	TestConfigHold th = BUILD(TestConfigHold, conf);
+	RcPtr *vptr = th._cc.opt.slab.data;
+	RcPtr *v2ptr = vptr->_ref.data;
+	StringPtr *v3ptr = v2ptr->_ref.data;
+	char *v4ptr = unwrap(v3ptr);
+
+	printf("vptr=%p, cl=%s\n", vptr, CLASS_NAME(vptr));
+	printf("v2ptr=%p, cl=%s\n", v2ptr, CLASS_NAME(v2ptr));
+	printf("v3ptr=%p, cl=%s\n", v3ptr, CLASS_NAME(v3ptr));
+	printf("v4ptr=%p, v=%s\n", v4ptr, v4ptr);
+	return Ok(th);
+}
+
+Result fun3(TestConfigHold *th) {
+	String sx = STRING("unreferenced");
+	RcPtr *vptr = th->_cc.opt.slab.data;
+	RcPtr *v2ptr = vptr->_ref.data;
+	StringPtr *v3ptr = v2ptr->_ref.data;
+	char *v4ptr = unwrap(v3ptr);
+	printf("-------------------------------------------\n");
+	printf("vptr=%p, cl=%s\n", vptr, CLASS_NAME(vptr));
+	printf("v2ptr=%p, cl=%s\n", v2ptr, CLASS_NAME(v2ptr));
+	printf("v3ptr=%p, cl=%s\n", v3ptr, CLASS_NAME(v3ptr));
+	printf("v4ptr=%p, v=%s\n", v4ptr, v4ptr);
+
+	String rr = TRY(th->_cc.opt, rr);
+	assert_eq_string(rr, "expected2");
+
+	return Ok(UNIT);
+}
+
+MyTest(core, test_heapify_scope) {
+	TestConfigHold th;
+	printf("cc0=%p\n", &th._cc.opt.slab.data);
+
+	{
+		String s2 = STRING("other str");
+		Result r2 = build_opt();
+		th = TRY(r2, th);
+		MATCH(th._cc.opt,
+		      VARIANT(SOME, {
+					/*
+			      StringPtr rr = TRY(th._cc.opt, rr);
+			      printf("opt=%s %p\n", unwrap(&rr), unwrap(&rr));
+			      */
+				    }));
+	}
+
+	Result rxx = fun3(&th);
+
 	return Ok(UNIT);
 }

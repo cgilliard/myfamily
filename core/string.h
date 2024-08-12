@@ -49,8 +49,8 @@ IMPL(String, TRAIT_STRING_CORE)
 #define STRING(s)                                                              \
 	({                                                                     \
 		Result _rr34__ = String_build(s);                              \
-		StringPtr _rr44__ = TRY(_rr34__, _rr44__);                     \
-		_rr44__;                                                       \
+		StringPtr _rr44_string__ = TRY(_rr34__, _rr44_string__);       \
+		_rr44_string__;                                                \
 	})
 
 #define STRINGP(s)                                                             \

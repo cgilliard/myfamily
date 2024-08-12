@@ -18,9 +18,10 @@
 #include <core/class.h>
 #include <core/traits_base.h>
 
-#define RC_FLAGS_NO_CLEANUP 0x1
-#define RC_FLAGS_PRIM 0x1 << 1
-#define RC_FLAGS_NO_COUNTER 0x1 << 2
+#define RC_FLAGS_NO_CLEANUP (0x1)
+#define RC_FLAGS_PRIM (0x1 << 1)
+#define RC_FLAGS_NO_COUNTER (0x1 << 2)
+#define RC_FLAGS_CONSUMED (0x1 << 3)
 
 #define TRAIT_RC_BUILD(T) TRAIT_REQUIRED(T, T##Ptr, build, Slab ref)
 

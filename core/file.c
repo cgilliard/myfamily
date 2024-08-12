@@ -44,7 +44,6 @@ Result File_open(char *path, OpenOptions opt) {
 		Error err = ERR(FILE_OPEN_ERROR, "Unexpected open options");
 		return Err(err);
 	}
-	printf("fptr = %p\n", fptr);
 	SET(File, &ret, fp, fptr);
 
 	if (fptr == NULL) {
@@ -58,11 +57,8 @@ Result File_open(char *path, OpenOptions opt) {
 }
 
 Result File_read(File *ptr, char *buf, u64 len) {
-	printf("fr\n");
 	FILE *fp = GET(File, ptr, fp);
-	printf("fp co: %p\n", fp);
 	u64 val = fread(buf, 1, len, fp);
-	printf("2\n");
 	return Ok(val);
 }
 Result File_seek(File *ptr, u64 pos) {

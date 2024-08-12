@@ -90,20 +90,24 @@
 	    bool: BUILD_ENUM_PRIM(name##Ptr, variant, v, sizeof(bool)),        \
 	    default: ({                                                        \
 			 ({                                                    \
-				 RcPtr _rc_##v = HEAPIFY(v);                   \
+				 RcPtr _rc_build_enum_impl__ = HEAPIFY(v);     \
 				 u8 _flags;                                    \
 				 Slab _slab;                                   \
-				 if (_rc_##v._ref.data) {                      \
+				 if (_rc_build_enum_impl__._ref.data) {        \
 					 _flags = 0;                           \
-					 u64 sz = mysize(&_rc_##v);            \
+					 u64 sz =                              \
+					     mysize(&_rc_build_enum_impl__);   \
 					 if (!mymalloc(&_slab, sz))            \
-						 memcpy(_slab.data, &_rc_##v,  \
-							sz);                   \
+						 memcpy(                       \
+						     _slab.data,               \
+						     &_rc_build_enum_impl__,   \
+						     sz);                      \
 					 else {                                \
 						 _flags =                      \
 						     ENUM_FLAG_NO_CLEANUP;     \
 						 _slab.data = NULL;            \
-						 cleanup(&_rc_##v);            \
+						 cleanup(                      \
+						     &_rc_build_enum_impl__);  \
 					 }                                     \
                                                                                \
 				 } else {                                      \

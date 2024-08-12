@@ -19,16 +19,13 @@ bool Option_myclone(Option *dst, Option *src) {
 	if (IS_NONE(*src)) {
 		*dst = None;
 	} else {
-		printf("some found\n");
 		void *data = src->slab.data;
 		Rc sv = *(Rc *)unwrap(src->slab.data);
 		String sv2 = *(String *)unwrap(&sv);
-		printf("sv=%s,cl=%s\n", unwrap(&sv2), CLASS_NAME(&sv2));
 		RcPtr rc = BUILD(Rc);
 		deep_copy(&rc, &sv);
 		*dst = BUILD_ENUM(Option, SOME, rc);
 		StringPtr out = ENUM_VALUE(out, String, *dst);
-		printf("outval=%s\n", unwrap(&out));
 	}
 	return true;
 }

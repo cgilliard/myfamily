@@ -167,7 +167,6 @@ Result BufReader_fill_buf(BufReader *ptr) {
 	return Ok(ret);
 }
 Result BufReader_read(BufReader *ptr, char *buffer, u64 len) {
-	printf("r\n");
 	u64 wlen_sum = 0;
 	Rc readablerc = GET(BufReader, ptr, f);
 	Object *readable = unwrap(&readablerc);
@@ -175,11 +174,8 @@ Result BufReader_read(BufReader *ptr, char *buffer, u64 len) {
 	u64 offset = 0;
 
 	while (rem > 0) {
-		printf("rem=%llu\n", rem);
 		Result r = myread(readable, buffer + offset, rem);
-		printf("pre try\n");
 		u64 wlen = TRY(r, wlen);
-		printf("try\n");
 
 		if (wlen == 0) {
 			Error e = ERR(IO_ERROR,
@@ -192,8 +188,6 @@ Result BufReader_read(BufReader *ptr, char *buffer, u64 len) {
 		wlen_sum += wlen;
 		rem -= wlen;
 	}
-
-	printf("complete\n");
 
 	return Ok(UNIT);
 }
