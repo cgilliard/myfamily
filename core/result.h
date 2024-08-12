@@ -27,13 +27,14 @@ ENUM(Result, VARIANTS(Ok, Err), TYPES("Rc", "Error"))
 #define Result DEFINE_ENUM(Result)
 
 ENUM(Option, VARIANTS(SOME, NONE), TYPES("Rc", "Unit"))
+IMPL(Option, TRAIT_CLONE)
 #define Option DEFINE_ENUM(Option)
 
-#define IS_ERR(x) x.type == Err
-#define IS_OK(x) x.type == Ok
+#define IS_ERR(x) (x).type == Err
+#define IS_OK(x) (x).type == Ok
 
-#define IS_SOME(x) x.type == SOME
-#define IS_NONE(x) x.type == NONE
+#define IS_SOME(x) (x).type == SOME
+#define IS_NONE(x) (x).type == NONE
 
 // static errors for allocation issues so we don't need to call malloc to create
 // them.
@@ -67,32 +68,35 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 #define Ok(x)                                                                  \
 	({                                                                     \
 		({                                                             \
-			Rc _rc_##x = HEAPIFY(x);                               \
-			ResultPtr _r_##x = BUILD_ENUM(Result, Ok, _rc_##x);    \
-			if (_r_##x.slab.data == NULL) {                        \
-				_r_##x = STATIC_ALLOC_ERROR_RESULT;            \
+			Rc _rc_ok_impl__ = HEAPIFY(x);                         \
+			ResultPtr _r_ok_impl__ =                               \
+			    BUILD_ENUM(Result, Ok, _rc_ok_impl__);             \
+			if (_r_ok_impl__.slab.data == NULL) {                  \
+				_r_ok_impl__ = STATIC_ALLOC_ERROR_RESULT;      \
 			}                                                      \
-			_r_##x;                                                \
+			_r_ok_impl__;                                          \
 		});                                                            \
 	})
 
 #define Err(e)                                                                 \
 	({                                                                     \
 		({                                                             \
-			ResultPtr _r_##e = BUILD_ENUM(Result, Err, e);         \
-			if (_r_##e.slab.data == NULL) {                        \
-				_r_##e = STATIC_ALLOC_ERROR_RESULT;            \
+			ResultPtr _r_err_impl__ = BUILD_ENUM(Result, Err, e);  \
+			if (_r_err_impl__.slab.data == NULL) {                 \
+				_r_err_impl__ = STATIC_ALLOC_ERROR_RESULT;     \
 			}                                                      \
-			_r_##e;                                                \
+			_r_err_impl__;                                         \
 		});                                                            \
 	})
 
 #define UNWRAP_TYPE(type, x)                                                   \
 	({                                                                     \
 		({                                                             \
-			Rc _rc_##x = ENUM_VALUE(_rc_##x, Rc, x);               \
-			type _ret_##x = *(type *)unwrap(&_rc_##x);             \
-			_ret_##x;                                              \
+			Rc _rc_unwrap_type_impl__ =                            \
+			    ENUM_VALUE(_rc_unwrap_type_impl__, Rc, x);         \
+			type _ret_unwrap_type_impl__ =                         \
+			    *(type *)unwrap(&_rc_unwrap_type_impl__);          \
+			_ret_unwrap_type_impl__;                               \
 		});                                                            \
 	})
 
@@ -125,20 +129,22 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 		({                                                             \
 			if (IS_OK(x))                                          \
 				panic("Attempt to unwrap_err an ok");          \
-			Error _e_##x = *(Error *)unwrap(x.slab.data);          \
-			_e_##x;                                                \
+			Error _e_unwrap_err_impl__ =                           \
+			    *(Error *)unwrap(x.slab.data);                     \
+			_e_unwrap_err_impl__;                                  \
 		});                                                            \
 	})
 
 #define TRY(x, v)                                                              \
 	({                                                                     \
 		if (!strcmp(CLASS_NAME(&x), "Option") && IS_NONE(x)) {         \
-			Error _e_##v = ERR(UNWRAP_NONE, "Unwrap on a none");   \
-			return Err(_e_##v);                                    \
+			Error _e_try_impl__ =                                  \
+			    ERR(UNWRAP_NONE, "Unwrap on a none");              \
+			return Err(_e_try_impl__);                             \
 		}                                                              \
 		if ((!strcmp(CLASS_NAME(&x), "Result") && IS_ERR(x))) {        \
-			Error _e_##v = UNWRAP_ERR(x);                          \
-			return Err(_e_##v);                                    \
+			Error _e_try_impl__ = UNWRAP_ERR(x);                   \
+			return Err(_e_try_impl__);                             \
 		}                                                              \
 		UNWRAP_VALUE(x, v);                                            \
 	})
@@ -146,8 +152,8 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 #define TRYU(x)                                                                \
 	({                                                                     \
 		if (IS_ERR(x)) {                                               \
-			Error _e_##x = UNWRAP_ERR(x);                          \
-			return Err(_e_##x);                                    \
+			Error _e_tryu_impl__ = UNWRAP_ERR(x);                  \
+			return Err(_e_tryu_impl__);                            \
 		}                                                              \
 	})
 
@@ -157,8 +163,8 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 			panic("Expect on none");                               \
 		}                                                              \
 		if ((!strcmp(CLASS_NAME(&x), "Result") && IS_ERR(x))) {        \
-			Error _e_##v = UNWRAP_ERR(x);                          \
-			print(&_e_##v);                                        \
+			Error _e_expect_impl__ = UNWRAP_ERR(x);                \
+			print(&_e_expect_impl__);                              \
 			panic("Expect on an error/none");                      \
 		}                                                              \
 		UNWRAP_VALUE(x, v);                                            \
@@ -176,9 +182,10 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 #define Some(x)                                                                \
 	({                                                                     \
 		({                                                             \
-			Rc _rc__ = HEAPIFY(x);                                 \
-			OptionPtr _res__ = BUILD_ENUM(Option, SOME, _rc__);    \
-			_res__;                                                \
+			Rc _rc_some_impl_ = HEAPIFY(x);                        \
+			OptionPtr _res_some_impl_ =                            \
+			    BUILD_ENUM(Option, SOME, _rc_some_impl_);          \
+			_res_some_impl_;                                       \
 		});                                                            \
 	})
 

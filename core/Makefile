@@ -18,7 +18,8 @@ OBJS := rand.o \
 	iterator.o \
 	io.o \
 	file.o \
-	buf_reader.o
+	buf_reader.o \
+	option.o
 
 TEST_OBJS := $(OBJS)
 

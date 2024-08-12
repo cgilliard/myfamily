@@ -30,7 +30,8 @@ bool myclone(void *dst, void *src) {
 	bool *(*do_myclone)(Object *dst, Object *src) =
 	    find_fn((Object *)src, "myclone");
 	if (do_myclone == NULL)
-		panic("myclone not implemented for this type");
+		panic("myclone not implemented for this type [%s]",
+		      CLASS_NAME(src));
 	((Object *)dst)->vdata.vtable = ((Object *)src)->vdata.vtable;
 	((Object *)dst)->vdata.name = ((Object *)src)->vdata.name;
 	bool ret = do_myclone(dst, src);

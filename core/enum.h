@@ -119,9 +119,10 @@
 
 #define ENUM_VALUE_PRIM(e, storage_type)                                       \
 	({                                                                     \
-		storage_type _ret__##e;                                        \
-		memcpy(&_ret__##e, e.slab.data, sizeof(storage_type));         \
-		_ret__##e;                                                     \
+		storage_type _ret_enum_value_prim__;                           \
+		memcpy(&_ret_enum_value_prim__, (e).slab.data,                 \
+		       sizeof(storage_type));                                  \
+		_ret_enum_value_prim__;                                        \
 	})
 
 #define ENUM_VALUE(ret, type, e)                                               \
@@ -140,8 +141,9 @@
 	    f64: ENUM_VALUE_PRIM(e, f64),                                      \
 	    bool: ENUM_VALUE_PRIM(e, bool),                                    \
 	    default: ({                                                        \
-			 type##Ptr _ret__##ret = *(type *)unwrap(e.slab.data); \
-			 _ret__##ret;                                          \
+			 type##Ptr _ret__enum_value__ =                        \
+			     *(type *)unwrap((e).slab.data);                   \
+			 _ret__enum_value__;                                   \
 		 }))
 
 #endif // _CORE_ENUM__

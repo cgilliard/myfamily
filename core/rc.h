@@ -40,22 +40,22 @@ static SETTER(Rc, flags);
 	({                                                                     \
 		Slab _slab__;                                                  \
 		_slab__.data = 0;                                              \
-		RcPtr _ret__;                                                  \
+		RcPtr _ret_heapify_obj_;                                       \
 		u64 _sz__ = mysize(&obj);                                      \
 		if (mymalloc(&_slab__, _sz__)) {                               \
 			_slab__.data = NULL;                                   \
-			_ret__ = RC(_slab__);                                  \
+			_ret_heapify_obj_ = RC(_slab__);                       \
 		} else {                                                       \
 			memcpy(_slab__.data, &obj, _sz__);                     \
 			NO_CLEANUP(obj);                                       \
-			_ret__ = RC(_slab__);                                  \
+			_ret_heapify_obj_ = RC(_slab__);                       \
 			if (is_prim)                                           \
-				SET(Rc, &_ret__, flags,                        \
+				SET(Rc, &_ret_heapify_obj_, flags,             \
 				    RC_FLAGS_PRIM | RC_FLAGS_NO_CLEANUP);      \
 			else                                                   \
-				SET(Rc, &_ret__, flags, 0);                    \
+				SET(Rc, &_ret_heapify_obj_, flags, 0);         \
 		}                                                              \
-		_ret__;                                                        \
+		_ret_heapify_obj_;                                             \
 	})
 
 #define HEAPIFY(v)                                                             \

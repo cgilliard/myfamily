@@ -70,6 +70,7 @@ Result read_exact(void *obj, char *buf, u64 len) {
 }
 
 Result myread(void *obj, char *buf, u64 limit) {
+	printf("myr\n");
 	ResultPtr (*do_read)(Object *obj, char *buf, u64 limit) =
 	    find_fn((Object *)obj, "read");
 	if (do_read == NULL)

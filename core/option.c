@@ -12,28 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/backtrace.h>
-#include <core/buf_reader.h>
-#include <core/class.h>
-#include <core/colors.h>
-#include <core/ekinds.h>
-#include <core/enum.h>
-#include <core/error.h>
-#include <core/file.h>
-#include <core/format.h>
-#include <core/formatter.h>
-#include <core/io.h>
-#include <core/iterator.h>
-#include <core/mymalloc.h>
-#include <core/panic.h>
-#include <core/prim.h>
-#include <core/rand.h>
-#include <core/rc.h>
-#include <core/result.h>
-#include <core/slabs.h>
-#include <core/slice.h>
+#include <core/option.h>
 #include <core/string.h>
-#include <core/string_builder.h>
-#include <core/tuple.h>
-#include <core/types.h>
-#include <core/unit.h>
+
+bool Option_myclone(Option *dst, Option *src) {
+	if (IS_NONE(*src)) {
+		*dst = None;
+	} else {
+		printf("some found\n");
+		void *data = src->slab.data;
+		Rc sv = *(Rc *)unwrap(src->slab.data);
+		String sv2 = *(String *)unwrap(&sv);
+		printf("sv=%s,cl=%s\n", unwrap(&sv2), CLASS_NAME(&sv2));
+		RcPtr rc = BUILD(Rc);
+		deep_copy(&rc, &sv);
+		*dst = BUILD_ENUM(Option, SOME, rc);
+		StringPtr out = ENUM_VALUE(out, String, *dst);
+		printf("outval=%s\n", unwrap(&out));
+	}
+	return true;
+}

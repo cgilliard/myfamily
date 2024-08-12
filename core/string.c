@@ -117,8 +117,8 @@ Result String_build(char *s) {
 }
 
 void *String_unwrap(String *s) {
-	Slab slab = GET(String, s, slab);
-	return slab.data;
+	Slab slabx = GET(String, s, slab);
+	return slabx.data;
 }
 
 u64 String_len(String *s) {
