@@ -34,11 +34,13 @@
 #define TRAIT_PRINT(T) TRAIT_REQUIRED(T, void, print, T##Ptr *obj)
 
 #define TRAIT_UNWRAP(T) TRAIT_REQUIRED(T, void *, unwrap, T##Ptr *obj)
+#define TRAIT_BORROW(T) TRAIT_REQUIRED(T, void *, borrow, T##Ptr *obj)
 
 // trait implementations
 bool equal(void *obj1, void *obj2);
 void *unwrap(void *obj);
 void *unwrap_as(char *name, void *obj);
+void *borrow(void *obj);
 u64 mysize(void *obj);
 bool copy(void *dest, void *src);
 bool myclone(void *dest, void *src);

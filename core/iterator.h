@@ -31,7 +31,7 @@ Result next(void *obj);
 			cleanup(&_ret_foreach_impl_##counter##__);             \
 		Result _r__;                                                   \
 		if (!strcmp(CLASS_NAME(&iterator), "Rc")) {                    \
-			void *_tmp__ = unwrap(&iterator);                      \
+			void *_tmp__ = borrow(&iterator);                      \
 			_r__ = next(_tmp__);                                   \
 		} else {                                                       \
 			_r__ = next(&iterator);                                \

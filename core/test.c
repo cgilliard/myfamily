@@ -615,7 +615,6 @@ MyTest(core, test_enum) {
 	MyClass3 x2 = BUILD(MyClass3, slab);
 	MyEnum e2 = BUILD_ENUM(MyEnum, VV03, x2);
 	MyClass3 x2_out = ENUM_VALUE(x2_out, MyClass3, e2);
-	printf("x2out.cl=%s\n", CLASS_NAME(&x2_out));
 
 	u32 x3 = 20;
 	MyEnum e3 = BUILD_ENUM(MyEnum, VV02, x3);
@@ -947,6 +946,7 @@ MyTest(core, test_enum2) {
 	MyEnum2 e7 = BUILD_ENUM(MyEnum2, V207, x7);
 	f64 x7_out = ENUM_VALUE(x7_out, f64, e7);
 	cr_assert_eq(x7_out, x7);
+
 	return Ok(UNIT);
 }
 
@@ -1247,6 +1247,8 @@ MyTest(core, test_tuple) {
 
 	u64 x_out = ELEMENT_AT(t1, 0, x_out);
 	assert_eq(x_out, x);
+	u64 x_out2 = ELEMENT_AT(t1, 0, x_out2);
+	assert_eq(x_out2, x);
 	u64 y_out = ELEMENT_AT(t1, 1, y_out);
 	assert_eq(y_out, y);
 	u64 z_out = ELEMENT_AT(t1, 2, z_out);
@@ -1477,7 +1479,6 @@ MyTest(core, test_buf_reader) {
 
 	printf("pre\n");
 	Result r = myread(&br2, buf, 10);
-	/*
 	buf[10] = 0;
 	assert_eq_str(buf, "0123456789");
 
@@ -1497,13 +1498,11 @@ MyTest(core, test_buf_reader) {
 
 	Result rx = try_buf_reader();
 	assert(IS_ERR(rx));
-	*/
 
 	return Ok(UNIT);
 }
 
 MyTest(core, test_buf_reader_consume_fill) {
-	/*
 	File f = FOPEN("./resources/test_file2.txt", OpenRead);
 	BufReader br = BUF_READER(Readable(f), Capacity(10));
 
@@ -1539,13 +1538,11 @@ MyTest(core, test_buf_reader_consume_fill) {
 	Result r4 = fill_buf(&br2);
 	Slice ref4 = TRY(r4, ref4);
 	assert_eq(len(&ref4), 0);
-	*/
 
 	return Ok(UNIT);
 }
 
 MyTest(core, test_read_until) {
-	/*
 	File f = FOPEN("./resources/test_file3.txt", OpenRead);
 	BufReader br = BUF_READER(Readable(f), Capacity(10));
 
@@ -1578,13 +1575,11 @@ MyTest(core, test_read_until) {
 	Result r8 = read_until(&br2, s, '*');
 	rlen = TRY(r8, rlen);
 	assert_eq(rlen, 84);
-	*/
 
 	return Ok(UNIT);
 }
 
 MyTest(core, test_read_line) {
-	/*
 	File f = FOPEN("./resources/test_file3.txt", OpenRead);
 	BufReader br = BUF_READER(Readable(f), Capacity(10));
 
@@ -1602,12 +1597,10 @@ MyTest(core, test_read_line) {
 		assert_eq_string(s1, exp);
 		count += 1;
 	}
-	*/
 	return Ok(UNIT);
 }
 
 MyTest(core, test_lines) {
-	/*
 	// first use into_iter
 	File f = FOPEN("./resources/test_file3.txt", OpenRead);
 	BufReader br = BUF_READER(Readable(f), Capacity(10));
@@ -1623,7 +1616,6 @@ MyTest(core, test_lines) {
 
 	assert_eq(count, 3);
 
-	printf("second run\n");
 	// next use lines
 	File f2 = FOPEN("./resources/test_file3.txt", OpenRead);
 	BufReader br2 = BUF_READER(Readable(f2), Capacity(100));
@@ -1638,7 +1630,6 @@ MyTest(core, test_lines) {
 	}
 
 	assert_eq(count, 3);
-	*/
 	return Ok(UNIT);
 }
 
@@ -1754,7 +1745,6 @@ void TestConfigHold_cleanup(TestConfigHold *ptr) { cleanup(&ptr->_cc); }
 Result build_opt() {
 	TestConfig conf;
 	String v1 = STRING("expected2");
-	printf("addr v1 creation = %p\n", unwrap(&v1));
 	conf.opt = Some(v1);
 	TestConfigHold th = BUILD(TestConfigHold, conf);
 	RcPtr *vptr = th._cc.opt.slab.data;
@@ -1762,10 +1752,6 @@ Result build_opt() {
 	StringPtr *v3ptr = v2ptr->_ref.data;
 	char *v4ptr = unwrap(v3ptr);
 
-	printf("vptr=%p, cl=%s\n", vptr, CLASS_NAME(vptr));
-	printf("v2ptr=%p, cl=%s\n", v2ptr, CLASS_NAME(v2ptr));
-	printf("v3ptr=%p, cl=%s\n", v3ptr, CLASS_NAME(v3ptr));
-	printf("v4ptr=%p, v=%s\n", v4ptr, v4ptr);
 	return Ok(th);
 }
 
@@ -1775,11 +1761,6 @@ Result fun3(TestConfigHold *th) {
 	RcPtr *v2ptr = vptr->_ref.data;
 	StringPtr *v3ptr = v2ptr->_ref.data;
 	char *v4ptr = unwrap(v3ptr);
-	printf("-------------------------------------------\n");
-	printf("vptr=%p, cl=%s\n", vptr, CLASS_NAME(vptr));
-	printf("v2ptr=%p, cl=%s\n", v2ptr, CLASS_NAME(v2ptr));
-	printf("v3ptr=%p, cl=%s\n", v3ptr, CLASS_NAME(v3ptr));
-	printf("v4ptr=%p, v=%s\n", v4ptr, v4ptr);
 
 	String rr = TRY(th->_cc.opt, rr);
 	assert_eq_string(rr, "expected2");
@@ -1789,22 +1770,55 @@ Result fun3(TestConfigHold *th) {
 
 MyTest(core, test_heapify_scope) {
 	TestConfigHold th;
-	printf("cc0=%p\n", &th._cc.opt.slab.data);
-
 	{
 		String s2 = STRING("other str");
 		Result r2 = build_opt();
 		th = TRY(r2, th);
-		MATCH(th._cc.opt,
-		      VARIANT(SOME, {
-					/*
-			      StringPtr rr = TRY(th._cc.opt, rr);
-			      printf("opt=%s %p\n", unwrap(&rr), unwrap(&rr));
-			      */
-				    }));
+		MATCH(th._cc.opt, VARIANT(SOME, {
+			      String rr = BORROW(th._cc.opt, rr);
+			      assert_eq_string(rr, "expected2");
+		      }));
 	}
 
 	Result rxx = fun3(&th);
+
+	return Ok(UNIT);
+}
+
+ENUM(SoiEnum, VARIANTS(SOI_STRING, SOI_INT), TYPES("String", "i32"))
+#define SoiEnum DEFINE_ENUM(SoiEnum)
+
+MyTest(core, test_enum_borrow) {
+	i32 x1 = 10;
+	SoiEnum s1 = BUILD_ENUM(SoiEnum, SOI_INT, x1);
+	i32 x1_out = ENUM_VALUE_BORROW(x1_out, i32, s1);
+	assert_eq(x1_out, 10);
+	i32 x1_out2 = ENUM_VALUE(x1_out2, i32, s1);
+	assert_eq(x1_out2, 10);
+
+	String x2 = STRING("test");
+	SoiEnum s2 = BUILD_ENUM(SoiEnum, SOI_STRING, x2);
+	StringPtr x2_out = ENUM_VALUE_BORROW(x2_out, String, s2);
+	assert_eq_string(x2_out, "test");
+	String x2_out2 = ENUM_VALUE(x2_out2, String, s2);
+
+	String x3 = STRING("x3 str");
+	Option o3 = Some(x3);
+	String x3_out_borrow = BORROW(o3, x3_out_borrow);
+	assert_eq_string(x3_out_borrow, "x3 str");
+
+	String x3_out = TRY(o3, x3_out);
+	assert_eq_string(x3_out, "x3 str");
+
+	i32 x4 = -10;
+	Option o4 = Some(x4);
+	i32 x4_out = BORROW(o4, x4_out);
+	assert_eq(x4_out, -10);
+	i32 x4_out2 = BORROW(o4, x4_out2);
+	assert_eq(x4_out2, -10);
+
+	i32 x4_out3 = TRY(o4, x4_out3);
+	assert_eq(x4_out3, -10);
 
 	return Ok(UNIT);
 }

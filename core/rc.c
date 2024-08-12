@@ -102,3 +102,17 @@ void *Rc_unwrap(Rc *ptr) {
 	}
 	return ref.data;
 }
+
+void *Rc_borrow(Rc *ptr) {
+	Slab ref = GET(Rc, ptr, ref);
+	u8 flags = GET(Rc, ptr, flags);
+
+	if ((flags & RC_FLAGS_CONSUMED) != 0 &&
+	    (flags & RC_FLAGS_NO_COUNTER) == 0)
+		panic("Rc has already been consumed");
+
+	if ((flags & RC_FLAGS_PRIM) != 0) {
+		return unwrap(ref.data);
+	}
+	return ref.data;
+}

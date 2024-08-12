@@ -46,6 +46,14 @@ void *unwrap(void *obj) {
 	return do_unwrap(obj);
 }
 
+void *borrow(void *obj) {
+	void *(*do_borrow)(Object *obj) = find_fn((Object *)obj, "borrow");
+	if (do_borrow == NULL)
+		panic("borrow not implemented for this type [%s]",
+		      CLASS_NAME(obj));
+	return do_borrow(obj);
+}
+
 bool copy(void *dst, void *src) {
 	bool *(*do_copy)(Object *dst, Object *src) =
 	    find_fn((Object *)src, "copy");

@@ -100,6 +100,45 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 		});                                                            \
 	})
 
+#define UNWRAP_TYPE_BORROW(type, x)                                            \
+	({                                                                     \
+		({                                                             \
+			RcPtr _rc_unwrap_type_impl__ =                         \
+			    ENUM_VALUE_BORROW(_rc_unwrap_type_impl__, Rc, x);  \
+			type _ret_unwrap_type_impl__ =                         \
+			    *(type *)unwrap(&_rc_unwrap_type_impl__);          \
+			_ret_unwrap_type_impl__;                               \
+		});                                                            \
+	})
+
+#define BORROW(x, v)                                                           \
+	_Generic((v),                                                          \
+	    u8: UNWRAP_TYPE_BORROW(u8, x),                                     \
+	    u16: UNWRAP_TYPE_BORROW(u16, x),                                   \
+	    u32: UNWRAP_TYPE_BORROW(u32, x),                                   \
+	    u64: UNWRAP_TYPE_BORROW(u64, x),                                   \
+	    u128: UNWRAP_TYPE_BORROW(u128, x),                                 \
+	    i8: UNWRAP_TYPE_BORROW(i8, x),                                     \
+	    i16: UNWRAP_TYPE_BORROW(i16, x),                                   \
+	    i32: UNWRAP_TYPE_BORROW(i32, x),                                   \
+	    i64: UNWRAP_TYPE_BORROW(i64, x),                                   \
+	    i128: UNWRAP_TYPE_BORROW(i128, x),                                 \
+	    f32: UNWRAP_TYPE_BORROW(f32, x),                                   \
+	    f64: UNWRAP_TYPE_BORROW(f64, x),                                   \
+	    bool: UNWRAP_TYPE_BORROW(bool, x),                                 \
+	    default: ({                                                        \
+			 ({                                                    \
+				 RcPtr _rc_unwrap_value__ = ENUM_VALUE_BORROW( \
+				     _rc_unwrap_value__, Rc, x);               \
+				 void *__ptr_unwrap_value__ =                  \
+				     borrow(&_rc_unwrap_value__);              \
+				 memcpy(&v, __ptr_unwrap_value__,              \
+					mysize(__ptr_unwrap_value__));         \
+				 NO_CLEANUP(v);                                \
+				 v;                                            \
+			 });                                                   \
+		 }))
+
 #define UNWRAP_VALUE(x, v)                                                     \
 	_Generic((v),                                                          \
 	    u8: UNWRAP_TYPE(u8, x),                                            \

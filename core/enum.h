@@ -19,8 +19,9 @@
 #include <core/rc.h>
 #include <core/slabs.h>
 
-#define ENUM_FLAG_PRIM 0x1
-#define ENUM_FLAG_NO_CLEANUP 0x1 << 1
+#define ENUM_FLAG_PRIM (0x1)
+#define ENUM_FLAG_NO_CLEANUP (0x1 << 1)
+#define ENUM_FLAG_CONSUMED (0x1 << 2)
 
 #define ENUM(name, variants, types)                                            \
 	typedef enum { variants } name##_Variants__;                           \
@@ -123,6 +124,10 @@
 
 #define ENUM_VALUE_PRIM(e, storage_type)                                       \
 	({                                                                     \
+		if (((e).flags & ENUM_FLAG_CONSUMED) != 0) {                   \
+			panic("Enum has already been consumed");               \
+		}                                                              \
+		(e).flags |= ENUM_FLAG_CONSUMED;                               \
 		storage_type _ret_enum_value_prim__;                           \
 		memcpy(&_ret_enum_value_prim__, (e).slab.data,                 \
 		       sizeof(storage_type));                                  \
@@ -147,6 +152,39 @@
 	    default: ({                                                        \
 			 type##Ptr _ret__enum_value__ =                        \
 			     *(type *)unwrap((e).slab.data);                   \
+			 _ret__enum_value__;                                   \
+		 }))
+
+#define ENUM_VALUE_PRIM_BORROW(e, storage_type)                                \
+	({                                                                     \
+		if (((e).flags & ENUM_FLAG_CONSUMED) != 0) {                   \
+			panic("Enum has already been consumed");               \
+		}                                                              \
+		storage_type _ret_enum_value_prim__;                           \
+		memcpy(&_ret_enum_value_prim__, (e).slab.data,                 \
+		       sizeof(storage_type));                                  \
+		_ret_enum_value_prim__;                                        \
+	})
+
+#define ENUM_VALUE_BORROW(ret, type, e)                                        \
+	_Generic((ret),                                                        \
+	    u8: ENUM_VALUE_PRIM_BORROW(e, u8),                                 \
+	    u16: ENUM_VALUE_PRIM_BORROW(e, u16),                               \
+	    u32: ENUM_VALUE_PRIM_BORROW(e, u32),                               \
+	    u64: ENUM_VALUE_PRIM_BORROW(e, u64),                               \
+	    u128: ENUM_VALUE_PRIM_BORROW(e, u128),                             \
+	    i8: ENUM_VALUE_PRIM_BORROW(e, i8),                                 \
+	    i16: ENUM_VALUE_PRIM_BORROW(e, i16),                               \
+	    i32: ENUM_VALUE_PRIM_BORROW(e, i32),                               \
+	    i64: ENUM_VALUE_PRIM_BORROW(e, i64),                               \
+	    i128: ENUM_VALUE_PRIM_BORROW(e, i128),                             \
+	    f32: ENUM_VALUE_PRIM_BORROW(e, f32),                               \
+	    f64: ENUM_VALUE_PRIM_BORROW(e, f64),                               \
+	    bool: ENUM_VALUE_PRIM_BORROW(e, bool),                             \
+	    default: ({                                                        \
+			 type##Ptr _ret__enum_value__ =                        \
+			     *(type *)borrow((e).slab.data);                   \
+			 NO_CLEANUP(_ret__enum_value__);                       \
 			 _ret__enum_value__;                                   \
 		 }))
 
