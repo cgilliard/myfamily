@@ -52,11 +52,10 @@ void Log_cleanup(Log *log) {
 	if (fp != NULL)
 		myfclose(fp);
 
-	pthread_mutex_t *lock = GET(Log, log, lock);
-	if (lock) {
-		pthread_mutex_destroy(lock);
-		// myfree(lock);
-		SET(Log, log, lock, NULL);
+	if (config.is_sync) {
+		Slab lock_slab = GET(Log, log, lock);
+		pthread_mutex_destroy(lock_slab.data);
+		myfree(&lock_slab);
 	}
 }
 
@@ -463,8 +462,10 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 	FormatterPtr f = FORMATTER(lc.formatter_size);
 
 	// if there's an error cleanup to free allocated resources
+	Slab lock;
 	if (IS_ERR(r1)) {
-		LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, NULL);
+		lock.data = NULL;
+		LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, lock);
 		cleanup(&ret);
 		return r1;
 	}
@@ -472,23 +473,23 @@ Result Log_build_impl(int n, va_list ptr, bool is_rc) {
 	u64 fp64 = ELEMENT_AT(t, 0, fp64);
 	u64 cur_size = ELEMENT_AT(t, 1, cur_size);
 	FILE *fp = (FILE *)fp64;
-	pthread_mutex_t *lock = NULL;
 
 	if (lc.is_sync) {
-		/*
-		lock = mymalloc(sizeof(pthread_mutex_t));
-		if (!lock) {
-			LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, NULL);
+		if (mymalloc(&lock, sizeof(pthread_mutex_t))) {
+			lock.data = NULL;
+			LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, lock);
 			cleanup(&ret);
 			return STATIC_ALLOC_ERROR_RESULT;
 		}
-		if (pthread_mutex_init(lock, NULL)) {
-			LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, NULL);
+		if (pthread_mutex_init((pthread_mutex_t *)lock.data, NULL)) {
+			lock.data = NULL;
+			LogPtr ret = BUILD(Log, lc, NULL, f, 0, 0, lock);
 			cleanup(&ret);
 			Error e = ERR(PTHREAD_ERROR, "could not init pthread");
 			return Err(e);
 		}
-		*/
+	} else {
+		lock.data = NULL;
 	}
 	LogPtr ret = BUILD(Log, lc, fp, f, cur_size, log_now(), lock);
 

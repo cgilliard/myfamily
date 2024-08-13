@@ -65,9 +65,9 @@ typedef struct LogConfig {
 	TRAIT_REQUIRED(T, Result, rotate, T##Ptr *log)                         \
 	TRAIT_REQUIRED(T, bool, need_rotate, T##Ptr *log)
 
-CLASS(Log, FIELD(LogConfig, config) FIELD(FILE *, fp)
-	       FIELD(Formatter, formatter) FIELD(u64, cur_size)
-		   FIELD(u64, last_rotation) FIELD(pthread_mutex_t *, lock))
+CLASS(Log,
+      FIELD(LogConfig, config) FIELD(FILE *, fp) FIELD(Formatter, formatter)
+	  FIELD(u64, cur_size) FIELD(u64, last_rotation) FIELD(Slab, lock))
 IMPL(Log, LOG_CORE)
 #define Log DEFINE_CLASS(Log)
 
@@ -233,7 +233,8 @@ static Result init_global_log() {
 #define log_impl(l, local_level, level, fmt, ...)                              \
 	({                                                                     \
 		if (local_level <= level) {                                    \
-			pthread_mutex_t *lock = GET(Log, l, lock);             \
+			Slab lslab = GET(Log, l, lock);                        \
+			pthread_mutex_t *lock = lslab.data;                    \
 			if (lock) {                                            \
 				if (pthread_mutex_lock(lock))                  \
 					panic("Could not obtain lock");        \

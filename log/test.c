@@ -124,15 +124,6 @@ MyTest(log, testfmt) {
 }
 
 MyTest(log, testlogmacro) {
-	/*
-	Log log =
-	    LOG(LogSync(true), AutoRotate(true), DeleteRotation(false),
-		ShowTerminal(true), ShowLogLevel(true), ShowTimestamp(true),
-		FormatterSize(1500), ShowLineNum(true), ShowMillis(true),
-		ShowColors(true), LogFilePath("./bin/testlogmacro.log"),
-		FileHeader("myheader"), MaxAgeMillis(100000),
-		MaxSizeBytes(4000), LineNumMaxLen(30));
-		*/
 	Log log =
 	    LOG(LogSync(true), AutoRotate(true), DeleteRotation(false),
 		ShowTerminal(true), ShowLogLevel(true), ShowTimestamp(true),
