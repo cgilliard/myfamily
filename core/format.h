@@ -64,7 +64,13 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 			 _itt_format_impl__++;                                 \
 			 _ptr_proc_arg_impl__;                                 \
 		 }),                                                           \
-	    default: ({ &value; }))
+	    default: ({                                                        \
+			 ((Slab *)                                             \
+			      _slabs__format_impl__.data)[_itt_format_impl__]  \
+			     .data = NULL;                                     \
+			 _itt_format_impl__++;                                 \
+			 &value;                                               \
+		 }))
 
 #define COUNT_FORMAT(value) ({ __counter___ += 1; })
 
@@ -82,8 +88,11 @@ Result format(FormatterPtr *formatter, char *fmt, ...);
 			    format(f, fmt __VA_OPT__(, ) EXPAND(               \
 					  FOR_EACH(PROC_ARG, __VA_ARGS__)));   \
 			for (u64 _i__ = 0; _i__ < __counter___; _i__++) {      \
-				myfree(&((Slab *)_slabs__format_impl__         \
-					     .data)[_i__]);                    \
+				if (((Slab *)_slabs__format_impl__.data)[_i__] \
+					.data != NULL) {                       \
+					myfree(&((Slab *)_slabs__format_impl__ \
+						     .data)[_i__]);            \
+				}                                              \
 			}                                                      \
 			myfree(&_slabs__format_impl__);                        \
 			_ret__format_impl__;                                   \

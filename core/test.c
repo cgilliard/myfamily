@@ -1822,3 +1822,18 @@ MyTest(core, test_enum_borrow) {
 
 	return Ok(UNIT);
 }
+
+MyTest(core, test_formatter_str) {
+	String s1 = STRING("test1");
+	String s2 = STRING("test2");
+	String s3 = STRING("test3");
+	Formatter formatter = FORMATTER(1000);
+	u64 x1 = 1;
+	u32 x2 = 2;
+	i8 x3 = -3;
+
+	Result _r2__ = FORMAT(&formatter, "x1={},x2={},x3={}", x1, x2, x3);
+	Formatter_reset(&formatter);
+	Result _r1__ = FORMAT(&formatter, "s1={},s2={},s3={}", s1, s2, s3);
+	return Ok(UNIT);
+}

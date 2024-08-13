@@ -65,6 +65,7 @@ Result Formatter_write(Formatter *ptr, char *fmt, ...) {
 	} else if (r >= rem) {
 		va_start(args2, fmt);
 		i32 r2 = vsnprintf(NULL, 0, fmt, args2);
+		va_end(args2);
 		if (r2 > rem) {
 			Error err = ERR(OVERFLOW,
 					"formatted string would have been %i "

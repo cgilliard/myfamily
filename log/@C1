@@ -1,0 +1,12 @@
+`Ú.
+[[2m2024-08-11 18:55:59.553[0m]: ([34mTRACE[0m): [[33m..ojects/myfamily/log/test.c:127[0m]: ok ok ok
+[[2m2024-08-11 18:55:59.695[0m]: ([36mDEBUG[0m): [[33m..ojects/myfamily/log/test.c:127[0m]: test 1000
+[[2m2024-08-11 18:55:59.823[0m]: ([36mDEBUG[0m): [[33m..ojects/myfamily/log/test.c:127[0m]: ok ok ok
+[[2m2024-08-11 18:55:59.964[0m]: ([32mINFO[0m) : [[33m..ojects/myfamily/log/test.c:127[0m]: test 1000
+[[2m2024-08-11 18:56:00.107[0m]: ([32mINFO[0m) : [[33m..ojects/myfamily/log/test.c:127[0m]: ok ok ok
+[[2m2024-08-11 18:56:00.243[0m]: ([33mWARN[0m) : [[33m..ojects/myfamily/log/test.c:127[0m]: test 1000
+[[2m2024-08-11 18:56:00.383[0m]: ([33mWARN[0m) : [[33m..ojects/myfamily/log/test.c:127[0m]: ok ok ok
+[[2m2024-08-11 18:56:00.522[0m]: ([35mERROR[0m): [[33m..ojects/myfamily/log/test.c:127[0m]: test 1000
+[[2m2024-08-11 18:56:00.655[0m]: ([35mERROR[0m): [[33m..ojects/myfamily/log/test.c:127[0m]: ok ok ok
+[[2m2024-08-11 18:56:00.785[0m]: ([91mFATAL[0m): [[33m..ojects/myfamily/log/test.c:127[0m]: test 1000
+[[2m2024-08-11 18:56:00.925[0m]: ([91mFATAL[0m): [[33m..ojects/myfamily/log/test.c:127[0m]: ok ok ok
