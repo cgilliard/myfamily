@@ -93,7 +93,7 @@ Result Formatter_to_string(Formatter *ptr) {
 Result to_string(void *obj) { return to_string_buf(obj, TO_STRING_BUF_SIZE); }
 
 Result to_string_buf(void *obj, u64 buf_size) {
-	ResultPtr (*do_fmt)(Object *obj, Formatter *formatter) =
+	ResultPtr (*do_fmt)(Object * obj, Formatter * formatter) =
 	    find_fn((Object *)obj, "fmt");
 	if (do_fmt == NULL) {
 		char *class_name = CLASS_NAME(obj);
@@ -106,7 +106,7 @@ Result to_string_buf(void *obj, u64 buf_size) {
 			return STATIC_ALLOC_ERROR_RESULT;
 		}
 		Formatter fmt = BUILD(Formatter, buf_slab, 0, true);
-		snprintf(buf_slab.data, 1 + sz, "%s@%llu", class_name, id);
+		snprintf(buf_slab.data, 1 + sz, "%s@%" PRIu64, class_name, id);
 
 		return String_build(buf_slab.data);
 	}
@@ -126,7 +126,7 @@ Result to_string_buf(void *obj, u64 buf_size) {
 Result to_debug(void *obj) { return to_debug_buf(obj, TO_STRING_BUF_SIZE); }
 
 Result to_debug_buf(void *obj, u64 buf_size) {
-	ResultPtr (*do_fmt)(Object *obj, Formatter *formatter) =
+	ResultPtr (*do_fmt)(Object * obj, Formatter * formatter) =
 	    find_fn((Object *)obj, "dbg");
 	if (do_fmt == NULL) {
 		char *class_name = CLASS_NAME(obj);
@@ -139,7 +139,7 @@ Result to_debug_buf(void *obj, u64 buf_size) {
 			return STATIC_ALLOC_ERROR_RESULT;
 		}
 		Formatter fmt = BUILD(Formatter, buf_slab, 0, true);
-		snprintf(buf_slab.data, 1 + sz, "%s@%llu", class_name, id);
+		snprintf(buf_slab.data, 1 + sz, "%s@%" PRIu64, class_name, id);
 
 		return String_build(buf_slab.data);
 	}

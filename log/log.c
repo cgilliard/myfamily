@@ -198,11 +198,14 @@ Result Log_log(Log *log, LogLevel level, String line) {
 
 		String line_num_str;
 		if (conf.show_colors) {
-			snprintf(buf, 100, "[%s%s%s]: ", YELLOW, bt_buf, RESET);
-			line_num_str = STRING(buf);
+			char line_num_buf[2005];
+			snprintf(line_num_buf, 2005, "[%s%s%s]: ", YELLOW,
+				 bt_buf, RESET);
+			line_num_str = STRING(line_num_buf);
 		} else {
-			snprintf(buf, 100, "[%s]: ", bt_buf);
-			line_num_str = STRING(buf);
+			char line_num_buf[2005];
+			snprintf(line_num_buf, 2005, "[%s]: ", bt_buf);
+			line_num_str = STRING(line_num_buf);
 		}
 		Result r1 = append(&full_line, unwrap(&line_num_str));
 	}
