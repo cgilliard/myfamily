@@ -1837,3 +1837,73 @@ MyTest(core, test_formatter_str) {
 	Result _r1__ = FORMAT(&formatter, "s1={},s2={},s3={}", s1, s2, s3);
 	return Ok(UNIT);
 }
+
+/*
+#define GENERICS DEFINE_GENERICS((K, i32), (V, String))
+Hashtable(K, V) build_hashtable() {
+	Hashtable v = Hashtable(K, V);
+	return v;
+}
+#undef GENERICS
+*/
+
+/*
+#define build_hashtable DEFINE_FUNCTION(GENERICS((K, i32), (V, String)), (int
+initial_capacity) build_hashtable {
+
+		}
+		*/
+
+#define GENERIC(type, g) type
+
+#define build_string_impl                                                      \
+	FUNCTION(GENERIC(Result, String), build_string, FN_PARAM(char *, init))
+build_string_impl {
+	String s = STRING(init);
+	// uncomment this line to see static assertion failure
+	// int s = 1234;
+	return Ok(s);
+}
+
+#define RESULT_TYPE String
+Result my_static_assert_fn() {
+	String b = STRING("test");
+	// int b = 0;
+
+	return OkT(b);
+}
+#undef RESULT_TYPE
+
+#define RESULT_TYPE i32
+Result my_static_assert_fn2() {
+	// String b = STRING("test");
+	i32 b = 0;
+
+	return OkT(b);
+}
+#undef RESULT_TYPE
+
+#define OPTION_TYPE i32
+Option my_static_assert_fn3() {
+	// String b = STRINGP("test");
+	i32 b = 0;
+
+	return SomeT(b);
+}
+#undef OPTION_TYPE
+
+#define OPTION_TYPE String
+Option my_static_assert_fn4() {
+	String b = STRINGP("test");
+	// i32 b = 0;
+
+	return SomeT(b);
+}
+#undef OPTION_TYPE
+
+MyTest(core, test_static_assert) {
+	Result r1 = build_string("dabc");
+	String s1 = TRY(r1, s1);
+	assert_eq_string(s1, "dabc");
+	return Ok(UNIT);
+}

@@ -187,4 +187,27 @@ void vtable_cleanup(Vtable *table);
 
 #define CLASS_NAME(x) ((Object *)(x))->vdata.name
 
+// Define macros to extract the type and name from a tuple
+#define EXTRACT_TYPE_NAME(type, name) type name
+#define EXTRACT_NAME(type, name) name
+
+// Define the macros for unwrapping the tuples
+#define UNWRAP_FN_PARAM_TYPE_NAME(type_name) EXTRACT_TYPE_NAME type_name
+#define UNWRAP_FN_PARAM_NAME(type_name) EXTRACT_NAME type_name
+
+// Define PROC_FN_SIGNATURE and PROC_FN_PARAMS to use UNWRAP_FN_PARAM correctly
+#define PROC_FN_SIGNATURE(...) FOR_EACH(UNWRAP_FN_PARAM_TYPE_NAME, __VA_ARGS__)
+#define PROC_FN_PARAMS(...) FOR_EACH(UNWRAP_FN_PARAM_NAME, __VA_ARGS__)
+
+// Define a parameter macro for testing
+#define FN_PARAM(type, name) (type, name)
+
+#define FUNCTION(rtype, name, ...)                                             \
+	rtype name##_helper(PROC_FN_SIGNATURE(__VA_ARGS__));                   \
+	rtype name(PROC_FN_SIGNATURE(__VA_ARGS__)) {                           \
+		printf("calling helper\n");                                    \
+		return name##_helper(PROC_FN_PARAMS(__VA_ARGS__));             \
+	}                                                                      \
+	rtype name##_helper(PROC_FN_SIGNATURE(__VA_ARGS__))
+
 #endif // _CORE_CLASS__

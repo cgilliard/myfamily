@@ -78,6 +78,22 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 		});                                                            \
 	})
 
+#define OkT(x)                                                                 \
+	({                                                                     \
+		({                                                             \
+			_Static_assert(                                        \
+			    sizeof(RESULT_TYPE) == sizeof(x),                  \
+			    "Function is returning the incorrect size");       \
+			Rc _rc_ok_impl__ = HEAPIFY(x);                         \
+			ResultPtr _r_ok_impl__ =                               \
+			    BUILD_ENUM(Result, Ok, _rc_ok_impl__);             \
+			if (_r_ok_impl__.slab.data == NULL) {                  \
+				_r_ok_impl__ = STATIC_ALLOC_ERROR_RESULT;      \
+			}                                                      \
+			_r_ok_impl__;                                          \
+		});                                                            \
+	})
+
 #define Err(e)                                                                 \
 	({                                                                     \
 		({                                                             \
@@ -224,6 +240,19 @@ static Option None = {{&OptionPtr_Vtable__, "Option"},
 #define Some(x)                                                                \
 	({                                                                     \
 		({                                                             \
+			Rc _rc_some_impl_ = HEAPIFY(x);                        \
+			OptionPtr _res_some_impl_ =                            \
+			    BUILD_ENUM(Option, SOME, _rc_some_impl_);          \
+			_res_some_impl_;                                       \
+		});                                                            \
+	})
+
+#define SomeT(x)                                                               \
+	({                                                                     \
+		({                                                             \
+			_Static_assert(                                        \
+			    sizeof(OPTION_TYPE) == sizeof(x),                  \
+			    "Function is returning the incorrect size");       \
 			Rc _rc_some_impl_ = HEAPIFY(x);                        \
 			OptionPtr _res_some_impl_ =                            \
 			    BUILD_ENUM(Option, SOME, _rc_some_impl_);          \
