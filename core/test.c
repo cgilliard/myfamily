@@ -1838,29 +1838,11 @@ MyTest(core, test_formatter_str) {
 	return Ok(UNIT);
 }
 
-/*
-#define GENERICS DEFINE_GENERICS((K, i32), (V, String))
-Hashtable(K, V) build_hashtable() {
-	Hashtable v = Hashtable(K, V);
-	return v;
-}
-#undef GENERICS
-*/
-
-/*
-#define build_hashtable DEFINE_FUNCTION(GENERICS((K, i32), (V, String)), (int
-initial_capacity) build_hashtable {
-
-		}
-		*/
-
-#define GENERIC(type, g) type
-
 #define build_string_impl                                                      \
 	FUNCTION(GENERIC(Result, String), build_string, FN_PARAM(char *, init))
 build_string_impl {
 	String s = STRING(init);
-	// uncomment this line to see static assertion failure
+	//     uncomment this line to see static assertion failure
 	// int s = 1234;
 	return Ok(s);
 }
@@ -1905,5 +1887,21 @@ MyTest(core, test_static_assert) {
 	Result r1 = build_string("dabc");
 	String s1 = TRY(r1, s1);
 	assert_eq_string(s1, "dabc");
+	return Ok(UNIT);
+}
+
+CLASS(TestAssertClass, FIELD(i32, x))
+#define TestAssertClass DEFINE_CLASS(TestAssertClass)
+
+void TestAssertClass_cleanup(TestAssertClass *ptr) {}
+
+enum { EXPECTED_ID = 1234 };
+
+typedef struct test_str {
+	u64 id;
+} test_str;
+
+MyTest(core, test_basic_assert) {
+	int v = 0;
 	return Ok(UNIT);
 }

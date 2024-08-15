@@ -16,6 +16,8 @@
 #define _CORE_RC__
 
 #include <core/class.h>
+#include <core/mymalloc.h>
+#include <core/panic.h>
 #include <core/traits_base.h>
 
 #define RC_FLAGS_NO_CLEANUP (0x1)

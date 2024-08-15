@@ -16,23 +16,9 @@
 #define _CORE_CLASS__
 
 #include <core/macro_utils.h>
-#include <core/mymalloc.h>
-#include <core/panic.h>
-#include <core/slabs.h>
 #include <core/types.h>
 #include <stdio.h>
 #include <string.h>
-
-#define UNIQUE_ID __COUNTER__
-
-// global trait table
-typedef struct TraitTable {
-	char **traits;
-	char **implementors;
-	u64 count;
-} TraitTable;
-
-static TraitTable _global_traits__ = {NULL, NULL, 0};
 
 typedef struct {
 	char *name;
@@ -43,7 +29,6 @@ typedef struct {
 	u64 len;
 	u128 id;
 	VtableEntry *entries;
-	Slab slab;
 } Vtable;
 
 typedef struct {
@@ -178,14 +163,15 @@ void vtable_cleanup(Vtable *table);
 		vtable_add_entry(&T##Ptr_Vtable__, next);                      \
 	}
 
-#define TRAIT_REQUIRED_EXT(T, R, name, ...)                                    \
-	R T##_##name(__VA_ARGS__);                                             \
-	static void __attribute__((constructor)) CAT(add_##T, UNIQUE_ID)() {   \
-		VtableEntry next = {#name, T##_##name};                        \
-		vtable_add_entry(&T##_Vtable__, next);                         \
-	}
-
 #define CLASS_NAME(x) ((Object *)(x))->vdata.name
+
+#define GENERIC(type, g) (type##Ptr, g##Ptr)
+
+#define EXTRACT_GENERIC_TYPE(type, g) type
+#define EXTRACT_GENERIC_G(type, g) #g
+
+#define UNWRAP_GENERIC_TYPE(type_g) EXTRACT_GENERIC_TYPE type_g
+#define UNWRAP_GENERIC_G(type_g) EXTRACT_GENERIC_G type_g
 
 // Define macros to extract the type and name from a tuple
 #define EXTRACT_TYPE_NAME(type, name) type name
@@ -203,11 +189,25 @@ void vtable_cleanup(Vtable *table);
 #define FN_PARAM(type, name) (type, name)
 
 #define FUNCTION(rtype, name, ...)                                             \
-	rtype name##_helper(PROC_FN_SIGNATURE(__VA_ARGS__));                   \
-	rtype name(PROC_FN_SIGNATURE(__VA_ARGS__)) {                           \
-		printf("calling helper\n");                                    \
-		return name##_helper(PROC_FN_PARAMS(__VA_ARGS__));             \
+	UNWRAP_GENERIC_TYPE(rtype)                                             \
+	name##_helper(PROC_FN_SIGNATURE(__VA_ARGS__));                         \
+	UNWRAP_GENERIC_TYPE(rtype)                                             \
+	name(PROC_FN_SIGNATURE(__VA_ARGS__)) {                                 \
+		printf("calling helper2\n");                                   \
+		UNWRAP_GENERIC_TYPE(rtype)                                     \
+		ret = name##_helper(PROC_FN_PARAMS(__VA_ARGS__));              \
+		char *cn = CLASS_NAME(                                         \
+		    ((Rc *)((Rc *)ret.slab.data)->_ref.data)->_ref.data);      \
+		char cnbuf[strlen(cn) + 5];                                    \
+		strcpy(cnbuf, cn);                                             \
+		strcat(cnbuf, "Ptr");                                          \
+		char *exp_type = UNWRAP_GENERIC_G(rtype);                      \
+		if (strcmp(cnbuf, exp_type))                                   \
+			panic("Expected function %s to return type an Enum "   \
+			      "containing type %s, but it returned type %s.",  \
+			      #name, exp_type, cn);                            \
+		return ret;                                                    \
 	}                                                                      \
-	rtype name##_helper(PROC_FN_SIGNATURE(__VA_ARGS__))
+	UNWRAP_GENERIC_TYPE(rtype) name##_helper(PROC_FN_SIGNATURE(__VA_ARGS__))
 
 #endif // _CORE_CLASS__

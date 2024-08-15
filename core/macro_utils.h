@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#define UNIQUE_ID __COUNTER__
 #define STRINGIFY(x) #x
 #define EXPAND(x) x
 #define CATI(x, y) x##y
