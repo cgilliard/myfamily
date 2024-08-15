@@ -6,9 +6,8 @@ CRITERION_LIB=-LREPLACE_CRITERION_LIB
 CC_TEST_FLAGS=-D_GNU_SOURCE -g -Wno-attributes -Wno-ignored-attributes -lcriterion -I.. $(CRITERION_INCLUDE) $(CRITERION_LIB) $(COVERAGE)
 MAKE=make
 INSTALL_DIR=/usr/local/bin
-ALL_OBJS=main/*.o toml/*.o core/*.o log/*.o
-SUBDIRS := main toml core log
+ALL_OBJS=main/*.o toml/*.o core/*.o
+SUBDIRS := main toml core
 HEADERS := $(wildcard main/*.h) \
 	   $(wildcard toml/*.h) \
 	   $(wildcard core/*.h) \
-	   $(wildcard log/*.h)

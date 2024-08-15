@@ -13,67 +13,24 @@
 // limitations under the License.
 
 #include <core/class.h>
-#include <core/panic.h>
-#include <stdlib.h>
 #include <string.h>
 
-void vtable_cleanup(Vtable *table) { free(table->entries); }
+Slab init_generic_slab(char **bindings[]) {
+	printf("init slabs\n");
+	Slab ret = {0, NULL, 0};
+	return ret;
+}
 
-int compare_vtable_entry(const void *ent1, const void *ent2) {
-	const VtableEntry *vtent1 = ent1;
-	const VtableEntry *vtent2 = ent2;
+int compare_trait_lookup_entry(const void *ent1, const void *ent2) {
+	const TraitEntry *vtent1 = ent1;
+	const TraitEntry *vtent2 = ent2;
 	return strcmp(vtent1->name, vtent2->name);
 }
 
-void sort_vtable(Vtable *table) {
-	qsort(table->entries, table->len, sizeof(VtableEntry),
-	      compare_vtable_entry);
+void sort_global_trait_lookup_table() {
+	qsort(__global_trait_lookup_table.entries,
+	      __global_trait_lookup_table.len, sizeof(TraitEntry),
+	      compare_trait_lookup_entry);
 }
 
-bool implements(void *obj, const char *name) {
-	return find_fn((Object *)obj, name) != NULL;
-}
-
-void *find_fn(const Object *obj, const char *name) {
-	int left = 0;
-	int right = obj->vdata.vtable->len - 1;
-	while (left <= right) {
-		int mid = left + (right - left) / 2;
-		int cmp = strcmp(name, obj->vdata.vtable->entries[mid].name);
-
-		if (cmp == 0) {
-			return obj->vdata.vtable->entries[mid].fn_ptr;
-		} else if (cmp < 0) {
-			right = mid - 1;
-		} else {
-			left = mid + 1;
-		}
-	}
-	return NULL;
-}
-
-void vtable_add_entry(Vtable *table, VtableEntry entry) {
-	if (table->entries == NULL) {
-		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
-		if (table->entries == NULL)
-			panic("Couldn't allocate memory for vtable");
-	} else {
-		void *tmp = realloc(table->entries,
-				    sizeof(VtableEntry) * (table->len + 1));
-		if (tmp == NULL)
-			panic("Couldn't allocate memory for vtable");
-		table->entries = tmp;
-	}
-
-	memcpy(&table->entries[table->len], &entry, sizeof(VtableEntry));
-	table->len += 1;
-	sort_vtable(table);
-}
-
-void vtable_override(Vtable *table, VtableEntry entry) {
-	for (int i = 0; i < table->len; i++) {
-		if (!strcmp(entry.name, table->entries[i].name)) {
-			table->entries[i].fn_ptr = entry.fn_ptr;
-		}
-	}
-}
+void add_trait_entry(TraitEntry *ent) { printf("add te %s\n", ent->name); }
