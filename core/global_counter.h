@@ -30,4 +30,3 @@ extern i64 __global_counter__;
 	INIT_ID_FN(name);
 
 #endif // _CORE_GLOBAL_COUNTER__
-
