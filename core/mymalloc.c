@@ -17,8 +17,8 @@
 
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0, 0};
 
-_Thread_local SlabAllocatorPtr TL_SLAB_ALLOCATOR = SLAB_ALLOCATOR_UNINIT;
-_Thread_local SlabAllocatorPtr *local_slab_allocator;
+_Thread_local HeapAllocatorPtr TL_SLAB_ALLOCATOR = SLAB_ALLOCATOR_UNINIT;
+_Thread_local HeapAllocatorPtr *local_heap_allocator;
 
 u64 next_greater_slab_size(u64 size) {
 	u64 right = sizeof(slab_sizes) / sizeof(slab_sizes[0]) - 1;
@@ -40,24 +40,24 @@ u64 next_greater_slab_size(u64 size) {
 	return slab_sizes[right];
 }
 
-int mymalloc(Slab *slab, u64 size_in) {
+int mymalloc(FatPtr *slab, u64 size_in) {
 	u64 size = next_greater_slab_size(size_in);
 
 	// get correct slab allocator
-	SlabAllocatorPtr *sa = local_slab_allocator;
+	HeapAllocatorPtr *sa = local_heap_allocator;
 	if (!sa) {
 		if (!TL_SLAB_ALLOCATOR.initialized)
-			init_tl_slab_allocator();
+			init_tl_heap_allocator();
 		sa = &TL_SLAB_ALLOCATOR;
 	}
 
 	int ret = 0;
 
 	// try to allocate a slab
-	u64 alloc = slab_allocator_allocate(sa, size);
+	u64 alloc = heap_allocator_allocate(sa, size);
 
 	if (alloc == UINT64_MAX) {
-		THREAD_LOCAL_RESOURCE_STATS.slab_misses++;
+		THREAD_LOCAL_RESOURCE_STATS.heap_misses++;
 		if (sa->no_malloc) {
 			ret = -1;
 		} else {
@@ -73,7 +73,7 @@ int mymalloc(Slab *slab, u64 size_in) {
 		}
 	} else {
 		// we found a slab. Access it.
-		if (slab_allocator_get(sa, slab, alloc))
+		if (heap_allocator_get(sa, slab, alloc))
 			ret = -1;
 	}
 
@@ -84,12 +84,12 @@ int mymalloc(Slab *slab, u64 size_in) {
 	return ret;
 }
 
-int myfree(Slab *slab) {
+int myfree(FatPtr *slab) {
 	// get correct slab allocator
-	SlabAllocatorPtr *sa = local_slab_allocator;
+	HeapAllocatorPtr *sa = local_heap_allocator;
 	if (!sa) {
 		if (!TL_SLAB_ALLOCATOR.initialized)
-			init_tl_slab_allocator();
+			init_tl_heap_allocator();
 		sa = &TL_SLAB_ALLOCATOR;
 	}
 
@@ -102,7 +102,7 @@ int myfree(Slab *slab) {
 		}
 	} else {
 		// slab allocated so try to free it with the slab allocator
-		if (slab_allocator_free(sa, slab->id))
+		if (heap_allocator_free(sa, slab->id))
 			ret = -1;
 	}
 
@@ -113,13 +113,13 @@ int myfree(Slab *slab) {
 	return ret;
 }
 
-int myrealloc(Slab *slab, u64 size) {
+int myrealloc(FatPtr *slab, u64 size) {
 	size = next_greater_slab_size(size);
 	// get correct slab allocator
-	SlabAllocatorPtr *sa = local_slab_allocator;
+	HeapAllocatorPtr *sa = local_heap_allocator;
 	if (!sa) {
 		if (!TL_SLAB_ALLOCATOR.initialized)
-			init_tl_slab_allocator();
+			init_tl_heap_allocator();
 		sa = &TL_SLAB_ALLOCATOR;
 	}
 
@@ -135,7 +135,7 @@ int myrealloc(Slab *slab, u64 size) {
 			THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
 		}
 	} else {
-		Slab nslab;
+		FatPtr nslab;
 		if (mymalloc(&nslab, size)) {
 			ret = -1;
 		} else {

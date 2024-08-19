@@ -12,72 +12,72 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_SLABS__
-#define _CORE_SLABS__
+#ifndef _CORE_HEAP__
+#define _CORE_HEAP__
 
 #include <core/macro_utils.h>
 #include <core/types.h>
 #include <limits.h>
 #include <stdlib.h>
 
-typedef struct SlabDataParams {
-	u64 slab_size;
-	u64 slabs_per_resize;
-	u64 initial_chunks;
-	u64 max_slabs;
-	u64 free_list_head;
-} SlabDataParams;
+typedef struct HeapDataParams {
+	size_t slab_size;
+	size_t slabs_per_resize;
+	size_t initial_chunks;
+	size_t max_slabs;
+	size_t free_list_head;
+} HeapDataParams;
 
-typedef struct SlabDataPtr {
+typedef struct HeapDataPtr {
 	void **data;
-	u64 count;
-	u64 cur_slabs;
-	SlabDataParams sdp;
-} SlabDataPtr;
+	size_t count;
+	size_t cur_slabs;
+	HeapDataParams sdp;
+} HeapDataPtr;
 
-void slab_data_cleanup(SlabDataPtr *ptr);
+void heap_data_cleanup(HeapDataPtr *ptr);
 
-#define SlabData                                                               \
-	SlabDataPtr                                                            \
-	    __attribute__((warn_unused_result, cleanup(slab_data_cleanup)))
+#define HeapData                                                               \
+	HeapDataPtr                                                            \
+	    __attribute__((warn_unused_result, cleanup(heap_data_cleanup)))
 
-typedef struct Slab {
-	u64 id;
+typedef struct FatPtr {
+	size_t id;
 	void *data;
-	u64 len;
-} Slab;
+	size_t len;
+} FatPtr;
 
-int slab_data_build(SlabData *ptr, SlabDataParams sdp);
-int slab_data_access(SlabData *ptr, Slab *slab, u64 offset);
-int slab_data_resize(SlabData *ptr);
+int heap_data_build(HeapData *ptr, HeapDataParams sdp);
+int heap_data_access(HeapData *ptr, FatPtr *slab, size_t offset);
+int heap_data_resize(HeapData *ptr);
 
-void slab_data_cleanup(SlabData *ptr);
-int slab_data_build(SlabData *ptr, SlabDataParams sdp);
-int slab_data_access(SlabData *ptr, Slab *slab, u64 offset);
-int slab_data_resize(SlabData *ptr);
+void heap_data_cleanup(HeapData *ptr);
+int heap_data_build(HeapData *ptr, HeapDataParams sdp);
+int heap_data_access(HeapData *ptr, FatPtr *slab, size_t offset);
+int heap_data_resize(HeapData *ptr);
 
-typedef struct SlabAllocatorPtr {
+typedef struct HeapAllocatorPtr {
 	bool initialized;
-	SlabDataPtr *slab_data_arr;
-	u64 slab_data_arr_size;
+	HeapDataPtr *heap_data_arr;
+	size_t heap_data_arr_size;
 	bool zeroed;
-	struct SlabAllocatorPtr *prev;
+	struct HeapAllocatorPtr *prev;
 	bool no_malloc;
-} SlabAllocatorPtr;
+} HeapAllocatorPtr;
 
-void slab_allocator_cleanup(SlabAllocatorPtr *ptr);
+void heap_allocator_cleanup(HeapAllocatorPtr *ptr);
 
-#define SlabAllocator                                                          \
-	SlabAllocatorPtr __attribute__((warn_unused_result,                    \
-					cleanup(slab_allocator_cleanup)))
+#define HeapAllocator                                                          \
+	HeapAllocatorPtr __attribute__((warn_unused_result,                    \
+					cleanup(heap_allocator_cleanup)))
 
 #define SLAB_ALLOCATOR_UNINIT {false}
 
-int slab_allocator_build(SlabAllocator *ptr, bool zeroed, int slab_data_count,
+int heap_allocator_build(HeapAllocator *ptr, bool zeroed, int heap_data_count,
 			 ...);
-u64 slab_allocator_allocate(SlabAllocator *ptr, u64 size);
-int slab_allocator_get(SlabAllocator *ptr, Slab *slab, u64 id);
-int slab_allocator_free(SlabAllocator *ptr, u64 id);
+size_t heap_allocator_allocate(HeapAllocator *ptr, size_t size);
+int heap_allocator_get(HeapAllocator *ptr, FatPtr *slab, size_t id);
+int heap_allocator_free(HeapAllocator *ptr, size_t id);
 
 #define InitialChunks(num) ({ _sdp__.initial_chunks = num; })
 
@@ -91,7 +91,7 @@ int slab_allocator_free(SlabAllocator *ptr, u64 id);
 
 #define SLAB_PARAMS(...)                                                       \
 	({                                                                     \
-		SlabDataParams _sdp__;                                         \
+		HeapDataParams _sdp__;                                         \
 		_sdp__.free_list_head = 0;                                     \
 		_sdp__.slab_size = 512;                                        \
 		_sdp__.initial_chunks = 1;                                     \
@@ -103,11 +103,11 @@ int slab_allocator_free(SlabAllocator *ptr, u64 id);
 
 #define SLABS(zeroed, ...)                                                     \
 	({                                                                     \
-		SlabAllocatorPtr _sa__;                                        \
+		HeapAllocatorPtr _sa__;                                        \
 		bool __no_malloc___ = false;                                   \
 		int __counter___ = 0;                                          \
 		EXPAND(FOR_EACH(COUNT_ARGS, __VA_ARGS__));                     \
-		slab_allocator_build(&_sa__, zeroed,                           \
+		heap_allocator_build(&_sa__, zeroed,                           \
 				     __counter___ __VA_OPT__(, ) __VA_ARGS__); \
 		_sa__.no_malloc = false;                                       \
 		_sa__;                                                         \
@@ -116,22 +116,22 @@ int slab_allocator_free(SlabAllocator *ptr, u64 id);
 #define ALLOCATE_SLAB(size)                                                    \
 	({                                                                     \
 		({                                                             \
-			Slab _ret_allocate_slab__;                             \
-			if (mymalloc(&_ret_allocate_slab__, size))             \
+			FatPtr _ret_allocate_heap__;                           \
+			if (mymalloc(&_ret_allocate_heap__, size))             \
 				return STATIC_ALLOC_ERROR_RESULT;              \
-			_ret_allocate_slab__;                                  \
+			_ret_allocate_heap__;                                  \
 		});                                                            \
 	})
 
 #define ALLOCATE_SLABP(size)                                                   \
 	({                                                                     \
 		({                                                             \
-			Slab _ret_allocate_slab__;                             \
-			if (mymalloc(&_ret_allocate_slab__, size))             \
+			FatPtr _ret_allocate_heap__;                           \
+			if (mymalloc(&_ret_allocate_heap__, size))             \
 				panic(                                         \
 				    "Could not allocate sufficient memory!");  \
-			_ret_allocate_slab__;                                  \
+			_ret_allocate_heap__;                                  \
 		});                                                            \
 	})
 
-#endif // _CORE_SLABS__
+#endif // _CORE_HEAP__

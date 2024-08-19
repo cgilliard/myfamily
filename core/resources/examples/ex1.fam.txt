@@ -1,0 +1,770 @@
+// This is a proposal of a universal prototype data structure.
+// It is meant to serve the purpose of both a class like structure which can be instantiated into
+// an object and a interface like structure that specifies what the implementing class must provide.
+// The prototype can be a combination of each (interface-like and class-like) as well. If a prototype
+// has any aspect that is 'interface-like', it is considered 'incomplete'. Any prototype may complete
+// another prototype which is incomplete. Incomplete prototypes may not be instantiated.
+// Another important note about incomplete prototypes is that they may not have data members. This
+// aligns the language more with a trait based language like rust/swift.
+// The syntax of the prototype is as follows:
+// Example 1: Base type definition
+
+// This prototype uses the struct-like syntax to define two named parameters ('x' and 'y') as fields.
+// They are of the primitive types i32 and u64 respectively.
+ProtoTest1 {
+	@x: i32;
+	@y: u64;
+}
+
+// This prototype uses the tuple-like syntax to define two unnamed fields of the type i32 and u64 respectively.
+ProtoTest2 (i32, u64)
+
+// This prototype uses the unit-like syntax. It has no fields.
+ProtoTest3
+
+// Example 2: single vs multi variant enums
+
+// Below is an example of a multi variant enum. This prototype has 3 variants. They are V1, V2, and V3.
+// They use the three syntax types previously described. When an enum has no variants specified and uses
+// the struct-like syntax (as is the case in the ProtoTest1 example), it implicitly is a single variant enum.
+// In an implicit single variant enum, the single variant is unnamed.
+ProtoTest4 {
+	V1 {
+		@x: i32;
+		@y: u64;
+	},
+	V2(u32),
+	V3
+}
+
+// Example 3: nested enums
+
+// in this example, variant V1 defines another enum inside of itself. V2 is a tuple-like variant.
+ProtoTest5 {
+	V1 {
+		NestV1 {
+			@x: i32;
+			@y: u128;
+		},
+		NestV2(i32, bool),
+		NestV3
+	},
+	V2(u32)
+}
+
+// Example 4: accessing variants and instantiation.
+ProtoTest6 {
+	test() {
+		// single variant struct-like prototypes are instantiated using standard syntax
+		// for creating structs.
+		var v1 = ProtoTest1 { x: 1, y: 2 };
+
+		// tuple-like prototypes are instantiated using standard syntax for creating tuples
+		var v2 = ProtoTest2(10, 20);
+
+		// unit-like prototypes are instantiated using standard syntax for unit types
+		var v3 = ProtoTest3;
+
+		// likewise multi-variant prototypes that are defined in a struct like manner use
+		// standard syntax to instantiate as well.
+		var v4 = ProtoTest4::V1 { x: 1, y: 2 };
+
+		// tuple-like
+		var v5 = ProtoTest4::V2(0);
+
+		// unit-like
+		var v6 = ProtoTest4::V3;
+
+		// below demonstrates how to instantiate nested variants
+		var v7 = ProtoTest5::V1::NestV1 { x: 1, y: 2 };
+		var v8 = ProtoTest5::V1::NestV2(1, false);
+		var v9 = ProtoTest5::V1::NestV3;
+		var v10 = ProtoTest5::V2(10);
+
+		// To access a variant/field the following syntax is used:
+		// a unnamed single variant struct-like syntax is accessed in a way
+		// one might expect to access the fields of a struct;
+		var x1 = v1.x;
+		var x2 = v1.y;
+
+		// tuple like
+		var x3 = v2.0; // this refers to the 0th element in v2 which is a 2 element tuple;
+		var x4 = v2.1; // second element
+
+		// In the case of v4, it was instantiated as a struct-like variant of ProtoTest4, so
+		// it is accessed in a struct-like manner.
+		var x5 = v4.x;
+		var x6 = v4.y;
+
+		// v5 is a special case of the tuple-like syntax. If a tuple only has a single field,
+		// we do not require the index to be specified and it is assumed that the single element
+		// is being referenced. The example below demonstrates this syntax.
+		var x7 = v5; // x7 contains the value of the 0th element in v5 which is 0.
+
+		// The remaining types would be accessed in the same manor. The inner most nesting applies.
+		// So, if the inner-most variant is described in a struct-like manner, you access it as above.
+		// same goes for tuple-like.
+	}
+}
+
+// Example 5: static and member functions
+
+// Prototypes may have 0 or more static and 0 or more member functions.
+// The below example shows the static functions do_things2 and do_all and the member
+// function do_thing1. The '@' indicates that this function is a member function.
+// member functions have an implicit reference to themselves that can be accessed within
+// the function via the '@' symbol. This symbol is similar to the 'self' variable in rust.
+// In the case below, The @value is set to one when the variable 'obj' is instantiated.
+// Then when obj.do_thing1 is called with the parameter 10 specified, @value (1) is added to x (10).
+// So, the return value of this function is 11. Functions may optionally specify a return type. If
+// no return type is specified they are assumed to have no return type. As in rust, the last statement
+// is the return value. So in the example, below the function returns @value + x. Functions with
+// the '!' at the end are native functions which are implemented in C. The details of their implementation
+// is beyond the scope of the discussion for now.
+ProtoTest7 {
+	// member function with one parameter and a return type both i32.
+	@do_thing1(x: i32) -> i32 { println!("show: {}", x); @value + x }
+	// static function that calls a native function with a string literal as the argument.
+	do_thing2() { println!("hello world!"); }
+	// static function with no parameters or return type.
+	do_all() {
+		// instantiate the object with the specified value.
+		var obj = ProtoTest7 { value: 1 };
+		// call member function do_thing1.
+		let i32 v = obj.do_thing1(10);
+		// print result
+		println!("v={}", v);
+		// call the static function do_thing2.
+		ProtoTest7::do_thing2();
+	}
+	// the single field for this prototype
+	@value: i32;
+}
+
+// Example 6: incomplete prototypes
+
+// Incomplete prototype
+Greet {
+	@greet();
+}
+
+// Cat completes the greet prototype
+Cat {}
+Cat::Greet {
+	// implement the required greet function
+	@greet() {
+		println!("meow!");
+	}
+}
+
+// Dog completes the greet prototype
+Dog {}
+
+Dog::Greet {
+	// implement the required greet function
+        @greet() {
+                println!("bark!");
+        }
+}
+
+TestGreet {
+	test() {
+		var cat = Cat {};
+		var dog = Dog {};
+		cat.greet();
+		dog.greet();
+		// output:
+		// meow!
+		// bark!
+	}
+}
+
+// Example 7: Mutability
+TestMutability {
+	@mut update_x(x: i32) {
+		@x = x;
+	}
+	@mut update_y(y: u32) {
+		@y = y;
+	}
+        @mut update_y(z: u64) {
+                @z = z;
+        }
+
+	@get_x() -> i32 {
+		@x
+	}
+
+	@get_y() -> u32 {
+                @y
+        }
+
+	@get_z() -> u64 {
+                @z
+        }
+
+	test() {
+		var v = TestMutability { x: 1, y: 2, z: 3 };
+		v.update_x(10);
+		v.update_y(20);
+ 		v.update_z(30);
+
+		let v = TestMutability { x: 1, y: 2, z: 3 };
+		println!("v.x={},v.y={},v.z={}", v.get_x(), v.get_y(), v.get_z());
+		// would result in a compiler error because let syntax indicates immutability:
+		// v.update_x(100);
+	}
+
+	@x: i32;
+	@y: u32;
+	@z: u64;
+}
+
+// Example8: Implicit mutability and static/member status
+
+// functions need to explicitly state their mutability. Based on the body of the function, the mutability
+// and static / member status is implied. If a function is implicitly mutable the mutability rules apply.
+// likewise for implicit member functions.
+TestImplicitMutability {
+	// although this function is not specified as @mut test1(), it is implicitly a mutable member
+	// function due to the fact that it mutably accesses the '@' variable in its body.
+	test1() {
+		@x += 1;
+	}
+
+	// this function is a static function as it does not access the '@' variable.
+	test2() {
+		println!("ok");
+	}
+
+	// this function immutably accesses the '@' variable so it is implicitly @test3() -> u64.
+	test3() -> u64 {
+		@y
+	}
+	@x: i32;
+	@y: u64;
+}
+
+// Example 9: dynamically vs statically sized arrays and memory management
+
+// drop prototype is a built-in incomplete prototype which, when implemented by a complete prototype
+// is executed when the instance goes out of scope or has no more references.
+Drop {
+	@drop();
+}
+
+TestArrays: Drop {
+	test() {
+		// build an instance of a TestArrays prototype
+		var te = TestArrays::build(200);
+	}
+
+	build(capacity: u64) -> $ {
+		// allocate memory to the dynamically sized array 'value1'.
+		// allocate is a native function that returns a dynamically sized array instance.
+		// user is responsible for deallocation.
+		var value1: [u8] = allocate!(capacity);
+		// declare the appropriate sized statically sized array.
+		let value2: [u8; 100];
+
+		// initialize both arrays
+		for i in 0..capacity {
+			value1[i] = 0;
+		}
+		for i in 0..100 {
+                        value2[i] = 0;
+                }
+
+		// return the $ with initialized values.
+		$ {
+                        value1, 
+                        value2
+                }
+	}
+
+	// this drop implementation deallocates all memory assigned to value1 via the native function deallocate.
+	@drop() {
+		deallocate!(value1);
+	}
+
+	@value1: [u8]; // a dynamically sized array
+	@value2: [u8; 100]; // a statically sized array with 100 elements
+}
+
+// Example 10: Pattern matching
+
+EnumMatch1 {
+	@x: u32;
+	@y: i64;
+}
+
+EnumMatch2 {
+	V1,
+	V2(u32, i64),
+	V3 {
+		@x: u64;
+		@y: i32;
+	},
+}
+
+EnumMatch3 {
+        V1 {
+                NestV1 {
+                        @x: i32;
+                        @y: u128;
+                },
+                NestV2(i32, bool),
+                NestV3
+        },
+        V2(u32)
+}
+
+TestMatch {
+	test() {
+                let v1 = EnumMatch1 { x: 1, y: 2 };
+
+		// recall that single member struct-like prototypes have an implicit single
+		// unnamed variant. Since they have no name, they cannot be matched by name in
+		// a match so they can only be referred to by the '_' wild card operator. See
+		// below.
+
+		var test1 = false;
+		var test1 = match v1 {
+			_ => { true }
+		};
+		assert!(test1);
+
+
+		// the below example demonstrates matching on a multi-variant prototype
+		var v2 = EnumMatch2::V2(1, -1);
+		var test2 = match v2 {
+			V1 => { false }, // this is not a match since we are 'V2'
+			// matching a tuple-like syntax requires the same number of arguments as specified
+			V2(x, y) => {
+				// assert expected values
+				assert_eq!(x, 1);
+				assert_eq!(y, -1);
+				true
+			},
+			V3(x) => { false } // this is not a match since we are 'V2'
+		};
+		assert!(test2);
+
+		var v3 = EnumMatch2::V3 { x: 100; y: -100 };
+		var test3 = match v3 {
+			V1 => { false },
+			V3(v) => {
+				// v will hold the value of the struct-like syntax here
+				// do assertions for expected values
+				assert_eq!(v.x, 100);
+				assert_eq!(v.y, -100);
+			}
+			_ => false, // wild card notation can be used to match all remaining variants.
+		};
+		assert!(test3);
+
+		// matching a unit-like variant.
+		var v4 = EnumMatch2::V1;
+		var test4 = match v4 {
+			V1 => true,
+			_ => false,
+		};
+		assert!(test4);
+
+		// demonstration of matching nested enums
+		var v5 = EnumMatch3::V1::NestV1 { x: 1, y: 2 };
+                var v6 = EnumMatch3::V1::NestV2(1, false);
+                var v7 = EnumMatch3::V1::NestV3;
+
+		// match v5 which is of the EnumMatch3::V1::NestV1 variant.
+		let test5 = match v5 {
+			// match and do assertions
+			EnumMatch3::V1::NestV1(v) => { assert_eq!(v.x, 1); assert_eq!(v.y, 2); true },
+			_ => false,
+		};
+		assert!(test5);
+
+		// match v6 which is of the EnumMatch3::V1::NestV2 variant.
+		let test6 = match v6 {
+			// match and do assertions
+			EnumMatch3::V1::NestV2(x,y) => { assert_eq!(x, 1); assert_eq!(y, false); true },
+			_ => false,
+		};
+		assert!(test6);
+
+		// match v7 which is of the EnumMatch3::V1::NestV3 variant.
+		let test7 = match v7 {
+			// match and do assertions
+			EnumMatch3::V1::NestV3 => true,
+			_ => false,
+		};
+		assert!(test7);
+	}
+}
+
+// Example 11: modules and imports
+
+// import module path abc::def::ghi use it as the name 'ghi2'
+@abc::def::ghi(ghi2);
+// import ghi::abc::x and ghi::abc::y use it as 'y2'
+@ghi::abc::{x, y(y2)};
+// import everything in the xyz module
+@xyz::*;
+
+mod mymod; // file based mod maps to either mymod.fam or mymod/mod.fam
+
+// inline module definition
+mod mymod2 {
+        // example prototype which just has a single member for each primitive type
+        // no current support for 'char' unicode or usize/isize type values. The
+        // system is currently limited to 64 bit architectures.
+        // @ syntax is used to represent a member field of this class.
+        // without the @, these variables are 'static'
+        MyMod2Class {
+                @a: i8
+                @b: i16
+                @c: i32
+                @d: i64
+                @e: i128
+                @f: u8
+                @h: u16
+                @i: u32
+                @j: u64
+                @k: u128
+                @l: f32
+                @m: f64
+                @o: bool
+                static_test: u32
+        }
+}
+
+// Example 12: simplicity of standard traits/interfaces using prototype syntax
+// This would be similar to the clone trait in rust. Note simplified syntax to define
+// the incomplete prototype here.
+// here we use $ to represent self by value and Self as a parameter or return type
+Clone {
+        @clone() -> $;
+	@mut clone_from(source: $) { ... }
+}
+
+// copy marker has Clone as a super prototype.
+Copy: Clone {}
+
+// Example 13: auto-boxing attribute
+// in this example we introduce prototype attributes which is a key value pair list of attributes as seen below.
+// These attributes are of the form: [a=b,c=d,...]. In this instance auto-boxing is set to true. The default value
+// for auto-boxing is false. If set to true, variants of this prototype will be ‘auto-boxed' meaning internally they
+// will be stored on the heap. Thus the size of the largest variant of this enum will be much smaller since it only needs
+// to store a pointer and some metadata for each instance. This reduces size of the object when instantiating a smaller
+// variant. In this case, the size of memory required to store VariantA is reduced from one megabyte to a few 10s
+// of bytes.
+AutoBoxedEnum [auto-boxing=true] {
+	VariantA(i32),
+	VariantB {
+		arr: [u8; 1_000_000];
+	}
+}
+
+Example 13: Multi-threading
+
+// This simple multi-threading example illustrates thread creation, joining,
+// locking and read/write locking.
+
+// Some things to note:
+// 1.) We don't have the exact same rules as Rust here. This would not be valid in rust because
+// in Rust the Arc cannot be accessed in another thread unless it is inside a mutex or rwlock.
+// Here we require the user to manage this aspect of thread safety.
+// 2.) We use closures for the critical sections. This enforces the requirement to have
+// a well defined cricital section such that locks are always released at the end of the scope
+// and allows us to integrate with another part of the library and thus not require special block
+// syntax (as is the case in java).
+// 3.) There may be some issues with this code, but this is an initial rough sketch of how
+// multi-threading and synchronization might work.
+
+MultiThreadedTest {
+	start1(l: Lock, v: &mut Arc<u64>) {
+		println!("From thread 1!");
+
+		// obtain a lock from this Lock object. The specified closure
+                // is executed once the lock is obtained.
+		lock!(l, || {
+			// critical section
+			*v += 1;
+		});
+
+	}
+
+	start2(l: RwLock, v: &mut Arc<u64>) {
+		println!("From thread 2!");
+
+		// obtain a read lock from this RwLock object. The specified closure
+                // is executed once the lock is obtained.
+		rlock!(l, || {
+			// any number of threads can enter this section
+			// as long as no other threads have obtained the write lock
+			// we also use the dereference of the Rc here, by allowing
+			// the Rc to be dereferenced mutably without being inside the
+			// lock object we can modify multiple data structures within
+			// the same lock. It's up to the user to ensure that it's done
+			// safely.
+			*v += 1;
+		});
+
+		// obtain a write lock from this RwLock object. The specified closure
+		// is executed once the lock is obtained.
+		wlock!(l, || {
+			// write lock (exclusive)
+			*v += 1;
+		});
+	}
+
+	test() {
+		let l1 = lock!(); // native function to obtain a mutex lock.
+		var v = Arc::new(0u64); // init an atomic reference counter
+
+		let th1 = thread!(MultiThreadedTest::start1, l1, &mut v); // start thread calling function 'start1'
+ 		join!(th1); // join thread1 when complete
+
+		let l2 = rwlock!();
+		let th2 = thread!(MultiThreadedTest::start2, l2, &mut v); // start thread calling function 'start2'
+		join!(th2); // join thread2 when complete
+
+		assert_eq!(*v, 3);
+
+		println!("Threads complete!");
+	}
+}
+
+// Example 14: Error handling.
+// We will have the same error handling as rust which is dependant on the following operators:
+// '?' operator. "x?" is the equivilent of: match x {
+//     Ok(ok) => ok,
+//     Err(err) => return Err(err),
+// }
+// '!' operator. "x!" is the equivilent of: match x {
+//     Ok(ok) => ok,
+//     Err(err) => panic!(err);
+// }
+// 
+// these, like rust are implemented using the Try incomplete prototype below:
+// Try <Output, Residual>{
+//     @from_output(output: Output) -> $;
+//     // we introduce a function attribute 'consume'. The available values are 'true' and 'false'. Default is
+//     // false. If set to true, '@' will be consumed and unusable after the function call completes.
+//     @ [consume=true] branch() -> $;
+// }
+
+// Example of these
+
+// define an error type
+Error {
+	@code: u32,
+}
+
+// define a unit type
+Unit
+
+TestErrors {
+	@try_value(x: i32) -> Result<i32, Error> {
+		// Return statements may only return the Err variant of a Try completing prototype.
+		// They must also occur in the first block of a function.
+		{
+			if(x > 10) {
+				Error e = Error { code: 2 };
+				return Err(e);
+			} 
+			if(x < -100) {
+				Error e = Error { code: 1 };
+                                return Err(e);
+			}
+
+		}
+		// no more errors may be returned
+		// The '?' and '!' operators are still allowed at this point.
+
+		var ret: i32 = 0;
+		if(x > 5) {
+			ret = x;
+		}
+		// The Ok(ret) syntax is not used because this is implicit
+		// The only way to return is through the final implicit statment
+		// return statements are only allowed with blocks.
+		ret
+	}
+	@try_value_unit(x: i32) -> Result<Unit, Error> {
+		// This if statement is the first block in the function so errors are allowed.
+		if(x > 10) {
+                        Error e = Error { code: 2 };
+                        Err(e)
+                }
+		Unit
+	}
+	test() {
+		let te = TestErrors {};
+		let v1 = te.try_value(1)?;
+		assert_eq!(v1, 0);
+		let v2 = te.try_value(6)!;
+		assert_eq!(v2, 6);
+		let v3 = te.try_value(20);
+		let test3 = match v3 {
+			Ok(_) => false,
+			Err(_) => true,
+		};
+		let v4 = te.try_value_unit(1);
+		let test4 = match v4 {
+                        Ok(_) => false,
+                        Err(_) => true,
+                };
+		
+		assert!(test3);
+		assert!(test4);
+	}
+}
+
+// Example 14: Generics
+// generics allowed on prototypes and functions. The <> syntax is used.
+
+TestGenerics<T: Clone> {
+	@clonable: T;
+	@y: u32;
+        @mut set_clonable<T: Clone>(clonable: T) {
+                @clonable = clonable.clone();
+        }
+}
+
+TestGenerics::Clone {
+	@clone() -> $ {
+		$ {
+			cloneable: @x.clone(),
+			y: @y
+		}
+	}
+}
+
+// Example 15: Generics
+
+Iterator <Item> {
+    @mut next() -> Option<Item>;
+}
+
+// example with a prototype bound specified
+
+// in this case the item must be clonable. 
+ClonableIterator <Item: Clone> {
+	@mut next() -> Option<Item>;
+}
+
+ListIterator <T> {
+	@list: &List<T>;
+	@u64: itt;
+	new(list: &List<T>) -> $ {
+		$ {
+			list,
+			itt: 0,
+		}
+	}
+}
+
+// completing a prototype
+// note: Generics not specified for this implementation. Generics are specifed in the main prototype
+// block only. The compiler refers to those.
+ListIterator::Iterator {
+        @mut next() -> Option<T> {
+                list.get(itt++)
+        }
+}
+
+// Example 16: Unspecified tuples (tuples without a specified prototype)
+
+TestUnnamedTuples {
+	test() -> Result<(u32, List<i32>), Error> {
+		var x = list::new();
+		x.push(1);
+		x.push(2);
+		// create an unnamed tuple and return it
+		var tuple = (1u32, x);
+		tuple
+	}
+}
+
+// define an error type
+Error {
+        @code: u32,
+}
+
+TestTryGuard {
+	try_function(x: i32) -> Result<u32, Error> {
+		{
+			if x < 0 {
+				Error e = Error { code: 1 }
+				return Err(e);
+			}
+		}
+		// Only successful returns allowed here. The Try success variant is inferred here
+		// so Ok(42) syntax is not used
+		42
+	}
+
+}
+
+// Example 17: Visibility
+
+// default visibility is private which means it's only visible within the prototype.
+// lib means visible within the library. This corresponds to pub(crate) in rust
+// And 'pub' are public externally to the library.
+// This syntax can be used with prototypes and functions
+pub Proto {
+	pub test() {
+	}
+	hidden_fn() {
+	}
+	lib lib_local_fn() {
+	}
+}
+
+// also allowed on modules
+pub mod mymod;
+
+mod other {
+}
+
+// also allowed with imports
+pub @abc::def::ghi;
+
+// Family.toml
+[package]
+name = "myfamily"
+version = "0.0.1"
+authors = ["The My Family Developers"]
+
+[dependencies]
+# local dependencies
+myfamily_core = { path = "./core" }
+myfamily_util = { path = "./util" }
+# git dependencies
+allocator = { git = "https://github.com/allocatorsinc/allocator" }
+log = { git = "https://github.com/mylogprovider/log", branch = "next" }
+config = { git = "https://github.com/configco/config", tag = "1.1.0" }
+http = { git = "https://github.com/quickhttp/http", rev = "0c0990399270277832fbb5b91a1fa118e6f63dba" }
+# short version for github and gitlab
+mytestframework = { github = "mytestframework/theframework", tag = "1.2.1" }
+coolcomments = { gitlab = "coolcomments/comments", tag = "4.3.7" }
+# tags of this format are the prefered method of controlling versions.
+# when you build the Family.lock file will store the git commit hash and always use that
+# version unless you use the 'update' functionality.
+
+// Family.lock
+version = <version_number>
+
+[[package]]
+name = "allocator"
+git_commit_hash = "0c0990399270277832fbb5b91a1fa118e6f63dba"
+source = "git+https://github.com/allocatorsinc/allocator"
+checksum = "520f05a5cbd335fae5a99ff7a6ab8627577660ee5cfd6a94a6a929b52ff0321c"
+dependencies = [
+ "log",
+ "http",
+ "config",
+]
+
+...

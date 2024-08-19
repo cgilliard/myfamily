@@ -12,5 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/class.h>
+#ifndef _CORE_GLOBAL_COUNTER__
+#define _CORE_GLOBAL_COUNTER__
+
+#include <core/types.h>
+
+extern i64 __global_counter__;
+
+#define UNIQUE_ID() __global_counter__++
+#define INIT_ID_FN(id)                                                         \
+	static inline void __attribute__((constructor)) __init_id_##id() {     \
+		id = UNIQUE_ID();                                              \
+	}
+
+#define INIT_ID(name)                                                          \
+	i64 name = 0;                                                          \
+	INIT_ID_FN(name);
+
+#endif // _CORE_GLOBAL_COUNTER__
 

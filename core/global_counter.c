@@ -12,5 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/class.h>
-
+#include <core/global_counter.h>
+i64 __global_counter__ = 1;

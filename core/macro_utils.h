@@ -12,14 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#define UNIQUE_ID __COUNTER__
+#ifndef _CORE_MACRO_UTILS__
+#define _CORE_MACRO_UTILS__
+
 #define STRINGIFY(x) #x
 #define EXPAND(x) x
 #define CATI(x, y) x##y
 #define CAT(x, y) CATI(x, y)
 
 #define COUNT_ARGS(value) ({ __counter___ += 1; })
+#define COMMA_IF_ARGS(...) __VA_OPT__(, )
 #define loop while (true)
+
+// Define base cases for the number of arguments
+#define FOR_EACH_INNER_1(what, x) what(x)
+#define FOR_EACH_INNER_2(what, x, ...)                                         \
+	what(x) FOR_EACH_INNER_1(what, __VA_ARGS__)
+#define FOR_EACH_INNER_3(what, x, ...)                                         \
+	what(x) FOR_EACH_INNER_2(what, __VA_ARGS__)
+#define FOR_EACH_INNER_4(what, x, ...)                                         \
+	what(x) FOR_EACH_INNER_3(what, __VA_ARGS__)
+#define FOR_EACH_INNER_5(what, x, ...)                                         \
+	what(x) FOR_EACH_INNER_4(what, __VA_ARGS__)
+// Extend as needed...
+
+// Helper macros to determine the number of arguments
+#define FOR_EACH_INNER_N(_1, _2, _3, _4, _5, N, ...) N
+#define FOR_EACH_INNER_HELPER(count) FOR_EACH_INNER_##count
+#define FOR_EACH_INNER(what, ...)                                              \
+	FOR_EACH_INNER_HELPER(FOR_EACH_INNER_N(__VA_ARGS__, 5, 4, 3, 2, 1))    \
+	(what, __VA_ARGS__)
 
 #define GET_MACRO(                                                             \
     _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16,     \
@@ -9914,3 +9936,5 @@
 	    action(v244), action(v245), action(v246), action(v247),            \
 	    action(v248), action(v249), action(v250), action(v251),            \
 	    action(v252), action(v253), action(v254), action(v255)
+
+#endif // _CORE_MACRO_UTILS__

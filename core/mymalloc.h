@@ -15,29 +15,29 @@
 #ifndef _CORE_MYMALLOC__
 #define _CORE_MYMALLOC__
 
+#include <core/heap.h>
 #include <core/macro_utils.h>
-#include <core/slabs.h>
 #include <stddef.h>
 
-extern _Thread_local SlabAllocator TL_SLAB_ALLOCATOR;
-extern _Thread_local SlabAllocatorPtr *local_slab_allocator;
+extern _Thread_local HeapAllocator TL_SLAB_ALLOCATOR;
+extern _Thread_local HeapAllocatorPtr *local_heap_allocator;
 
 u64 next_greater_slab_size(u64 size);
 
-static void set_local_slab_allocator(SlabAllocatorPtr *ptr, bool is_unset) {
+static void set_local_heap_allocator(HeapAllocatorPtr *ptr, bool is_unset) {
 	if (ptr && !is_unset)
-		ptr->prev = local_slab_allocator;
-	local_slab_allocator = ptr;
+		ptr->prev = local_heap_allocator;
+	local_heap_allocator = ptr;
 }
 
-#define SLAB_ALLOCATOR(sa) set_local_slab_allocator(sa, false)
+#define SLAB_ALLOCATOR(sa) set_local_heap_allocator(sa, false)
 #define UNSET_SLAB_ALLOCATOR()                                                 \
 	({                                                                     \
-		if (local_slab_allocator)                                      \
-			set_local_slab_allocator(local_slab_allocator->prev,   \
+		if (local_heap_allocator)                                      \
+			set_local_heap_allocator(local_heap_allocator->prev,   \
 						 true);                        \
 		else                                                           \
-			set_local_slab_allocator(NULL, true);                  \
+			set_local_heap_allocator(NULL, true);                  \
 	})
 
 #define SPMAX(x)                                                               \
@@ -53,7 +53,7 @@ static u64 slab_sizes[] = {
     120, 128, 136, 144, 152, 160, 168,	176,  184,  192,  200,	 208,  216, 224,
     232, 240, 248, 256, 272, 288, 304,	320,  336,  352,  368,	 384,  400, 416,
     432, 448, 464, 480, 496, 512, 1024, 2048, 4096, 8192, 16384, 65536};
-static void init_tl_slab_allocator() {
+static void init_tl_heap_allocator() {
 	TL_SLAB_ALLOCATOR = SLABS(
 	    false, SPMAX(slab_sizes[0]), SPMAX(slab_sizes[1]),
 	    SPMAX(slab_sizes[2]), SPMAX(slab_sizes[3]), SPMAX(slab_sizes[4]),
@@ -104,12 +104,12 @@ typedef struct ResourceStats {
 	u64 free_sum;
 	u64 fopen_sum;
 	u64 fclose_sum;
-	u64 slab_misses;
+	u64 heap_misses;
 } ResourceStats;
 
-int mymalloc(Slab *slab, u64 size);
-int myrealloc(Slab *slab, u64 size);
-int myfree(Slab *slab);
+int mymalloc(FatPtr *slab, u64 size);
+int myrealloc(FatPtr *slab, u64 size);
+int myfree(FatPtr *slab);
 FILE *myfopen(const char *path, const char *mode);
 void myfclose(FILE *ptr);
 ResourceStats get_resource_stats();
