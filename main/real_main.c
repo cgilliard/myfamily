@@ -12,24 +12,3 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <dirent.h>
-#include <errno.h>
-#include <log/log.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-#define LOG_LEVEL DEBUG
-
-Result real_main(int argc, char **argv) {
-	Log log = LOG(LogFilePath("/tmp/abc.log"), MaxAgeMillis(10000),
-		      AutoRotate(false));
-
-	for (int i = 0; i < 200; i++) {
-		idebug(&log, "this is a test");
-		sleep(1);
-	}
-
-	return Ok(_());
-}

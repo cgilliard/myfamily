@@ -1,13 +1,16 @@
 SHELL := /bin/bash
-CC=gcc
-CC_FLAGS=-D_GNU_SOURCE -g -Wno-attributes -Wno-ignored-attributes -I.. $(COVERAGE)
+CC=cc
+MAKE=make
+CC_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes $(COVERAGE)
 CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
 CRITERION_LIB=-LREPLACE_CRITERION_LIB
-CC_TEST_FLAGS=-D_GNU_SOURCE -g -Wno-attributes -Wno-ignored-attributes -lcriterion -I.. $(CRITERION_INCLUDE) $(CRITERION_LIB) $(COVERAGE)
-MAKE=make
+CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB) $(COVERAGE)
+RELEASE_FLAGS=-O3 -flto
+TEST_FLAGS=-g -fsanitize=undefined -fsanitize=address -Og
 INSTALL_DIR=/usr/local/bin
 ALL_OBJS=main/*.o toml/*.o core/*.o
 SUBDIRS := main toml core
+SUBDIRS_RELEASE := $(SUBDIRS)
 HEADERS := $(wildcard main/*.h) \
-	   $(wildcard toml/*.h) \
-	   $(wildcard core/*.h) \
+           $(wildcard toml/*.h) \
+           $(wildcard core/*.h) \

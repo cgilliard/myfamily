@@ -1,4 +1,4 @@
-OBJS := class.o heap.o mymalloc.o global_counter.o stack.o
+OBJS := heap.o stack.o
 
 TEST_OBJS := $(OBJS)
 

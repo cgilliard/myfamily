@@ -1,7 +1,7 @@
 include Makefile.config
 
-all: $(SUBDIRS)
-	$(CC) $(CC_FLAGS) -o bin/fam $(ALL_OBJS)
+all: release_build
+	$(CC) $(RELEASE_FLAGS) $(CC_FLAGS) -o bin/fam $(ALL_OBJS)
 clean:
 	rm -rf */*.o
 	rm -rf bin/*
@@ -11,9 +11,21 @@ clean:
 	rm -rf *.gcno
 	rm -rf *.gcda
 	rm -rf *.gcov
+
 $(SUBDIRS):
 	$(MAKE) -C $@
-test: $(SUBDIRS)
+
+test_build:
+	for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir FLAG_OPTIONS="$(TEST_FLAGS)"; \
+	done;
+
+release_build:
+	for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir FLAG_OPTIONS="$(RELEASE_FLAGS)"; \
+	done;
+
+test: test_build
 	ERROR="0"; \
 	for dir in $(SUBDIRS); do \
 		if test -z $(CRITERION_TEST_PATTERN); then \
@@ -24,7 +36,7 @@ test: $(SUBDIRS)
                 fi; \
 		if  test -z $(TARGET); then \
 			echo "[====] Running $$dir test suite..."; \
-			$(MAKE) -C $$dir test || exit 1; \
+			$(MAKE) -C $$dir test FLAG_OPTIONS="$(TEST_FLAGS)" || exit 1; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
 			        if test -z $(FILTER); then \
@@ -32,7 +44,7 @@ test: $(SUBDIRS)
 				else \
 					echo "[====] Running $$dir test suite... (FILTER=$$FILTER)"; \
 				fi;\
-				$(MAKE) -C $$dir test || exit 1;\
+				$(MAKE) -C $$dir test FLAG_OPTIONS="$(TEST_FLAGS)" || exit 1;\
 			fi; \
 		fi; \
 		if [ $$? -ne "0" ]; then \
@@ -51,7 +63,7 @@ testnc: $(SUBDIRS)
                 fi; \
 		if  test -z $(TARGET); then \
 			echo -e "[====] Running $$dir test suite..."; \
-			$(MAKE) -C $$dir testnc || exit 1; \
+			$(MAKE) -C $$dir testnc FLAG_OPTIONS="$(TEST_FLAGS)" || exit 1; \
 		else \
 			if [[ "$$dir" == "$(TARGET)" ]]; then \
 				if test -z $(FILTER); then \
@@ -59,7 +71,7 @@ testnc: $(SUBDIRS)
 				else \
 					echo "[====] Running $$dir test suite... (FILTER=$$FILTER)"; \
 				fi;\
-				$(MAKE) -C $$dir testnc || exit 1; \
+				$(MAKE) -C $$dir testnc FLAG_OPTIONS="$(TEST_FLAGS)" || exit 1; \
 			fi; \
 		fi; \
 		if [ $$? -ne "0" ]; then \

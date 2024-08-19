@@ -15,31 +15,4 @@
 #ifndef _CORE_STACK__
 #define _CORE_STACK__
 
-#include <core/heap.h>
-#include <core/types.h>
-
-typedef struct StackAllocator {
-	FatPtr begin;
-	void *sp;
-	size_t size;
-	f64 realloc_factor;
-	size_t initial_size;
-} StackAllocator;
-
-typedef struct StackAllocatorConfig {
-	size_t initial_size;
-	f64 realloc_factor;
-} StackAllocatorConfig;
-
-int build_stack(StackAllocatorConfig *config, StackAllocator *sa);
-int allocate_stack(size_t size, StackAllocator *sa);
-int deallocate_stack(size_t size, StackAllocator *sa);
-int calculate_size_stack(size_t return_type_size, size_t self_size,
-			 StackAllocator *sa);
-void *get_stack_begin(StackAllocator *sa);
-void cleanup_stack(StackAllocator *sa);
-
-#define DEFAULT_STACK_ALLOCATOR_CONFIG {2048, 2.0}
-#define SP_OFFSET(type, sa, offset) (*((type *)(get_stack_begin(&sa) + offset)))
-
 #endif // _CORE_STACK__
