@@ -25,6 +25,11 @@ release_build:
 		$(MAKE) -C $$dir FLAG_OPTIONS="$(RELEASE_FLAGS)"; \
 	done;
 
+san_build:
+	 for dir in $(SUBDIRS); do \
+		 $(MAKE) -C $$dir FLAG_OPTIONS="$(SAN_FLAGS)"; \
+	done;
+
 test: test_build
 	ERROR="0"; \
 	for dir in $(SUBDIRS); do \
@@ -51,7 +56,35 @@ test: test_build
 			ERROR="1"; \
 		fi; \
 	done; 
-testnc: $(SUBDIRS)
+
+testsan: san_build
+	ERROR="0"; \
+	for dir in $(SUBDIRS); do \
+		if test -z $(CRITERION_TEST_PATTERN); then \
+			if test -z $(FILTER); then \
+				export FILTER=*; \
+			fi; \
+			export CRITERION_TEST_PATTERN=$$dir/$$FILTER; \
+		fi; \
+		if  test -z $(TARGET); then \
+			echo "[====] Running $$dir test suite..."; \
+			$(MAKE) -C $$dir test FLAG_OPTIONS="$(SAN_FLAGS)" || exit 1; \
+		else \
+			if [[ "$$dir" == "$(TARGET)" ]]; then \
+				if test -z $(FILTER); then \
+					echo "[====] Running $$dir test suite..."; \
+				else \
+					echo "[====] Running $$dir test suite... (FILTER=$$FILTER)"; \
+				fi;\
+				$(MAKE) -C $$dir test FLAG_OPTIONS="$(SAN_FLAGS)" || exit 1;\
+			fi; \
+		fi; \
+		if [ $$? -ne "0" ]; then \
+			ERROR="1"; \
+		fi; \
+	done; 
+
+testnc: test_build
 	ERROR="0"; \
 	export CRITERION_TEST_PATTERN=$(CRITERION_TEST_PATTERN); \
 	for dir in $(SUBDIRS); do \

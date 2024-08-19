@@ -6,7 +6,8 @@ CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
 CRITERION_LIB=-LREPLACE_CRITERION_LIB
 CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB) $(COVERAGE)
 RELEASE_FLAGS=-O3 -flto
-TEST_FLAGS=-g -fsanitize=undefined -fsanitize=address -Og
+TEST_FLAGS=-g -Og
+SAN_FLAGS=-g -Og -fsanitize=undefined -fsanitize=address
 INSTALL_DIR=/usr/local/bin
 ALL_OBJS=main/*.o toml/*.o core/*.o
 SUBDIRS := main toml core
