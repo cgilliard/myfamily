@@ -349,4 +349,3 @@ int heap_allocator_cleanup(HeapAllocator *ptr) {
 	}
 	return 0;
 }
-
