@@ -241,6 +241,49 @@ Test(core, test_heap_init_multi_chunk) {
 		cr_assert_eq(ptrs[i].len, 16);
 	}
 
-	// cleanup ha and exit
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+}
+
+Test(core, test_invalid_configurations) {
+	cr_assert_neq(heap_allocator_build(NULL, NULL, 0), 0);
+	HeapAllocator ha;
+	FatPtr ptr, ptr2;
+	HeapAllocatorConfig hconfig = {true, true};
+	cr_assert_eq(heap_allocator_build(&ha, &hconfig, 0), 0);
+	// no_malloc is true so this fails
+	cr_assert_neq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	HeapDataParamsConfig hdconfig1 = {16, 0, 0, 0};
+	cr_assert_eq(heap_allocator_build(&ha, &hconfig, 1, hdconfig1), 0);
+
+	// can't create any slabs because max_slabs is 0 and no_malloc true
+	cr_assert_neq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	// test freeing an invalid fptr
+	HeapDataParamsConfig hdconfig2 = {16, 10, 1, 10};
+	HeapDataParamsConfig hdconfig2a = {32, 10, 1, 10};
+	cr_assert_eq(
+	    heap_allocator_build(&ha, &hconfig, 2, hdconfig2, hdconfig2a), 0);
+	cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+	cr_assert_eq(heap_allocator_allocate(&ha, 32, &ptr2), 0);
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	HeapDataParamsConfig hdconfig3 = {16, 0, 0, 0};
+	cr_assert_eq(heap_allocator_build(&ha, &hconfig, 1, hdconfig3), 0);
+
+	// delete an invalid fat ptrs from another ha
+	cr_assert_neq(heap_allocator_free(&ha, &ptr), 0);
+	cr_assert_neq(heap_allocator_free(&ha, &ptr2), 0);
+
+	// cleanup ha
 	heap_allocator_cleanup(&ha);
 }

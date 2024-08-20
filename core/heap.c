@@ -37,8 +37,11 @@ typedef struct HeapAllocatorImpl {
 
 static u64 __malloc_count = 0;
 static u64 __free_count = 0;
+static bool __ret_null_alloc = false;
 
 static inline void *do_malloc(size_t size) {
+	if (__ret_null_alloc)
+		return NULL;
 	void *ret = malloc(size);
 	// printf("malloc %zu [%p (%llu)]\n", size, ret, ++__malloc_count);
 	return ret;
@@ -50,6 +53,8 @@ static inline void do_free(void *ptr) {
 }
 
 static inline void *do_realloc(void *ptr, size_t size) {
+	if (__ret_null_alloc)
+		return NULL;
 	void *ret = realloc(ptr, size);
 	// printf("realloc %zu [old=%p,new=%p]\n", size, ptr, ret);
 	return ret;
@@ -62,6 +67,8 @@ u64 fat_ptr_len(FatPtr *ptr) { return ptr->len; }
 int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs,
 				  bool last_is_uint_max) {
 	hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
+	if (hd->data[index] == NULL)
+		return -1;
 	if (index == 0)
 		hd->free_list = do_malloc(sizeof(u32) * slabs);
 	else {
@@ -111,6 +118,8 @@ int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp,
 		ptr->impl->hd_arr[index].data = do_malloc(
 		    ptr->impl->hd_arr[index].hdp.config.initial_chunks *
 		    sizeof(void *));
+		if (ptr->impl->hd_arr[index].data == NULL)
+			return -1;
 		ptr->impl->hd_arr[index].cur_slabs =
 		    ptr->impl->hd_arr[index].hdp.config.initial_chunks *
 		    ptr->impl->hd_arr[index].hdp.config.slabs_per_resize;
@@ -218,14 +227,20 @@ int heap_data_resize(u64 index, HeapData *hd) {
 			nslabs_count = hd->hdp.config.max_slabs;
 
 		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
+		void *tmp;
 		if (hd->data)
-			hd->data = do_realloc(hd->data,
-					      (hd->count + 1) * sizeof(void *));
+			tmp = do_realloc(hd->data,
+					 (hd->count + 1) * sizeof(void *));
 		else
-			hd->data = do_malloc((hd->count + 1) * sizeof(void **));
+			tmp = do_malloc((hd->count + 1) * sizeof(void **));
 
-		heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc,
-					      true);
+		if (tmp == NULL)
+			return -1;
+		hd->data = tmp;
+
+		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc,
+						  true))
+			return -1;
 		hd->hdp.free_list_head = hd->cur_slabs;
 		hd->cur_slabs = nslabs_count;
 		hd->count += 1;
@@ -278,9 +293,14 @@ int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr) {
 	if (index < 0) {
 		if (!ptr->impl->config.no_malloc) {
 			fptr->data = do_malloc(size);
-			fptr->len = size;
-			fptr->id = UINT64_MAX;
-			ret = 0;
+			if (fptr->data == NULL) {
+				fptr->len = 0;
+				ret = -1;
+			} else {
+				fptr->len = size;
+				fptr->id = UINT64_MAX;
+				ret = 0;
+			}
 		}
 	} else {
 		HeapData *hd = &ptr->impl->hd_arr[index];
@@ -295,9 +315,14 @@ int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr) {
 				// could not allocate, so we fall back to malloc
 				// if configured
 				fptr->data = do_malloc(size);
-				fptr->len = size;
-				fptr->id = UINT64_MAX;
-				ret = 0;
+				if (fptr->data == NULL) {
+					fptr->len = 0;
+					ret = -1;
+				} else {
+					fptr->len = size;
+					fptr->id = UINT64_MAX;
+					ret = 0;
+				}
 			}
 		}
 	}

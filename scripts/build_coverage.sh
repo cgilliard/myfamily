@@ -6,7 +6,7 @@ linessum=0;
 coveredsum=0;
 rm -f /tmp/gcov_cat.txt
 
-for d in "log" "base" "main" "util"
+for d in "core" "main" "toml"
 do
 
 cd $d
@@ -20,7 +20,7 @@ do
 		percent=`gcov $f | grep "^Lines" | head -1 | cut -f2 -d ' ' | cut -f2 -d ':' | cut -f1 -d '%' | tr -d \\n`;
 		lines=`gcov $f | grep "^Lines" | head -1 | cut -f4 -d ' ' | tr -d \\n`;
 		v=100;
-		echo $percent;
+		if [ -n "$percent" ]; then
 		ratio=`awk "BEGIN {print $percent / 100}"`;
 		covered=`awk "BEGIN {print int($ratio * $lines)}"`;
 		linessum=`awk "BEGIN {print $linessum + $lines}"`;
@@ -29,6 +29,9 @@ do
 		cat $f.gcov >> /tmp/gcov_cat.txt
 
 		echo "percent=$percent,lines=$lines,percent_dec=$ratio,covered=$covered";
+		else
+			echo "$f is empty. Will not include.";
+		fi
 	fi
 done
 
