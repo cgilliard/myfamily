@@ -13,105 +13,73 @@
 // limitations under the License.
 
 #include <core/heap.h>
-#include <string.h>
+#include <errno.h>
+#include <stdlib.h>
 
-int heap_init_free_list(HeapDataPtr *sd, size_t heap_count,
-			size_t heap_offset) {
-	int ret = 0;
-	HeapDataParams p = sd->sdp;
-	size_t slab_size = p.slab_size;
-	for (size_t i = heap_offset; i < heap_offset + heap_count; i++) {
-		size_t offset_next = i * (8 + slab_size);
-		FatPtr slab;
-		slab.len = 8;
-		if (heap_data_access(sd, &slab, offset_next)) {
-			break;
-		}
+typedef struct HeapDataParams {
+	HeapDataParamsConfig config;
+	u32 free_list_head;
+} HeapDataParams;
 
-		size_t next_size_t;
-		if (i < (heap_offset + heap_count) - 1)
-			next_size_t = i + 1;
-		else
-			next_size_t = UINT64_MAX;
-		memcpy(slab.data, &next_size_t, sizeof(size_t));
-	}
+typedef struct HeapData {
+	void **data;
+	u32 *free_list;
+	u32 count;
+	u32 cur_slabs;
+	HeapDataParams hdp;
+} HeapData;
+
+typedef struct HeapAllocatorImpl {
+	u32 hd_size;
+	HeapAllocatorConfig config;
+	HeapData *hd_arr;
+} HeapAllocatorImpl;
+
+static u64 __malloc_count = 0;
+static u64 __free_count = 0;
+
+static inline void *do_malloc(size_t size) {
+	void *ret = malloc(size);
+	// printf("malloc %zu [%p (%llu)]\n", size, ret, ++__malloc_count);
 	return ret;
 }
 
-void heap_data_cleanup(HeapData *ptr) {
-	for (size_t i = 0; i < ptr->count; i++) {
-		free(ptr->data[i]);
-	}
-	if (ptr->count)
-		free(ptr->data);
-	ptr->count = 0;
+static inline void do_free(void *ptr) {
+	// printf("free %p (%llu)\n", ptr, ++__free_count);
+	free(ptr);
 }
 
-int heap_data_build(HeapData *ptr, HeapDataParams sdp) {
-	memcpy(&ptr->sdp, &sdp, sizeof(HeapDataParams));
-	ptr->cur_slabs = 0;
-	ptr->count = 0;
-	if (sdp.initial_chunks) {
-		ptr->data = malloc(sdp.initial_chunks * sizeof(void *));
-		if (!ptr->data)
+static inline void *do_realloc(void *ptr, size_t size) {
+	void *ret = realloc(ptr, size);
+	// printf("realloc %zu [old=%p,new=%p]\n", size, ptr, ret);
+	return ret;
+}
+
+void *fat_ptr_data(FatPtr *ptr) { return ptr->data; }
+
+u64 fat_ptr_len(FatPtr *ptr) { return ptr->len; }
+
+int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs,
+				  bool last_is_uint_max) {
+	hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
+	if (index == 0)
+		hd->free_list = do_malloc(sizeof(u32) * slabs);
+	else {
+		void *tmp = do_realloc(hd->free_list,
+				       sizeof(u32) * (hd->cur_slabs + slabs));
+		if (!tmp) {
+			do_free(hd->data[index]);
 			return -1;
-		for (size_t i = 0; i < sdp.initial_chunks; i++) {
-			ptr->data[i] =
-			    malloc((sdp.slab_size + 8) * sdp.slabs_per_resize);
-			if (ptr->data[i] == NULL) {
-				for (size_t j = i - 1; j >= 0; j--) {
-					free(ptr->data[j]);
-				}
-				free(ptr->data);
-				ptr->data = NULL;
-				ptr->count = 0;
-				return -1;
-			}
 		}
-		ptr->cur_slabs = sdp.initial_chunks * sdp.slabs_per_resize;
-		ptr->count = sdp.initial_chunks;
-		heap_init_free_list(
-		    ptr, sdp.slabs_per_resize * sdp.initial_chunks, 0);
+		hd->free_list = tmp;
 	}
-
-	return 0;
-}
-
-int heap_data_access(HeapData *ptr, FatPtr *slab, size_t offset) {
-	if (offset >= ((ptr->sdp.slab_size + 8) * ptr->cur_slabs)) {
-		return -1;
+	u32 offset = index * hd->hdp.config.slabs_per_resize;
+	for (u64 i = 0; i < slabs; i++) {
+		if ((i == (slabs - 1)) && last_is_uint_max)
+			hd->free_list[i + offset] = UINT32_MAX;
+		else
+			hd->free_list[i + offset] = offset + i + 1;
 	}
-	size_t heap_index =
-	    offset / (ptr->sdp.slabs_per_resize * (ptr->sdp.slab_size + 8));
-	size_t offset_mod =
-	    offset % (ptr->sdp.slabs_per_resize * (ptr->sdp.slab_size + 8));
-	slab->data = ptr->data[heap_index] + offset_mod;
-	return 0;
-}
-
-int heap_data_resize(HeapData *ptr) {
-	if (ptr->cur_slabs >= ptr->sdp.max_slabs)
-		return -1;
-	void *data =
-	    malloc((ptr->sdp.slab_size + 8) * ptr->sdp.slabs_per_resize);
-	if (data == NULL)
-		return -1;
-
-	void *tmp;
-	if (ptr->count)
-		tmp = realloc(ptr->data, sizeof(void *) * (ptr->count + 1));
-	else
-		tmp = malloc(sizeof(void *) * (ptr->count + 1));
-	if (tmp == NULL) {
-		free(data);
-		return -1;
-	}
-	ptr->data = tmp;
-	ptr->data[ptr->count] = data;
-	ptr->count++;
-	ptr->cur_slabs += ptr->sdp.slabs_per_resize;
-	heap_init_free_list(ptr, ptr->sdp.slabs_per_resize,
-			    ptr->cur_slabs - ptr->sdp.slabs_per_resize);
 
 	return 0;
 }
@@ -119,69 +87,113 @@ int heap_data_resize(HeapData *ptr) {
 int heap_data_compare(const void *p1, const void *p2) {
 	int ret = 0;
 
-	HeapDataPtr d1 = *(HeapDataPtr *)p1;
-	HeapDataPtr d2 = *(HeapDataPtr *)p2;
+	HeapData d1 = *(HeapData *)p1;
+	HeapData d2 = *(HeapData *)p2;
 
-	if (d1.sdp.slab_size > d2.sdp.slab_size)
+	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
 		ret = 1;
-	else if (d1.sdp.slab_size < d2.sdp.slab_size)
+	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
 		ret = -1;
 
 	return ret;
 }
 
-int heap_allocator_build(HeapAllocator *ptr, bool zeroed, int heap_data_count,
-			 ...) {
+int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp,
+			    u64 index) {
+
 	int ret = 0;
+	ptr->impl->hd_arr[index].hdp.config = *hdp;
+	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
+	ptr->impl->hd_arr[index].cur_slabs = 0;
+	ptr->impl->hd_arr[index].count =
+	    ptr->impl->hd_arr[index].hdp.config.initial_chunks;
+	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks) {
+		ptr->impl->hd_arr[index].data = do_malloc(
+		    ptr->impl->hd_arr[index].hdp.config.initial_chunks *
+		    sizeof(void *));
+		ptr->impl->hd_arr[index].cur_slabs =
+		    ptr->impl->hd_arr[index].hdp.config.initial_chunks *
+		    ptr->impl->hd_arr[index].hdp.config.slabs_per_resize;
+		bool last_is_uint_max = false;
+		for (u64 i = 0;
+		     i < ptr->impl->hd_arr[index].hdp.config.initial_chunks;
+		     i++) {
 
-	ptr->heap_data_arr = malloc(sizeof(HeapDataPtr) * heap_data_count);
-	ptr->heap_data_arr_size = heap_data_count;
-	ptr->zeroed = zeroed;
-	ptr->prev = NULL;
-	ptr->initialized = true;
-	va_list sdptr;
-	va_start(sdptr, heap_data_count);
-	for (size_t i = 0; i < heap_data_count; i++) {
-		HeapDataParams sdp = va_arg(sdptr, HeapDataParams);
-		if (sdp.initial_chunks == 0)
-			sdp.free_list_head = UINT64_MAX;
-		else
-			sdp.free_list_head = 0;
-		heap_data_build(&ptr->heap_data_arr[i], sdp);
-	}
-	va_end(sdptr);
-
-	if (ptr->heap_data_arr_size > 1) {
-		qsort(ptr->heap_data_arr, ptr->heap_data_arr_size,
-		      sizeof(HeapDataPtr), heap_data_compare);
-	}
-
+			if (i ==
+			    ptr->impl->hd_arr[index].hdp.config.initial_chunks -
+				1)
+				last_is_uint_max = true;
+			if (heap_allocator_init_free_list(
+				&ptr->impl->hd_arr[index], i,
+				ptr->impl->hd_arr[index]
+				    .hdp.config.slabs_per_resize,
+				last_is_uint_max))
+				ret = -1;
+		}
+	} else
+		ptr->impl->hd_arr[index].data = NULL;
 	return ret;
 }
 
-void heap_allocator_cleanup(HeapAllocator *ptr) {
-	for (size_t i = 0; i < ptr->heap_data_arr_size; i++) {
-		heap_data_cleanup(&ptr->heap_data_arr[i]);
+int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
+			 int heap_data_params_count, ...) {
+	// check inputs
+	if (ptr == NULL || config == NULL) {
+		errno = EINVAL;
+		return -1;
 	}
-	ptr->heap_data_arr_size = 0;
 
-	if (ptr->heap_data_arr) {
-		free(ptr->heap_data_arr);
-		ptr->heap_data_arr = NULL;
+	// allocate the HeapAllocatorImpl
+	ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
+	if (ptr->impl == NULL)
+		return -1;
+
+	// copy the config
+	ptr->impl->config = *config;
+
+	// allocate heap data array
+	ptr->impl->hd_arr =
+	    do_malloc(sizeof(HeapData) * heap_data_params_count);
+	if (ptr->impl->hd_arr == NULL) {
+		heap_allocator_cleanup(ptr);
+		return -1;
 	}
+
+	// iterate through specified heap data params
+	va_list hdps;
+	va_start(hdps, heap_data_params_count);
+	for (u64 i = 0; i < heap_data_params_count; i++) {
+		HeapDataParamsConfig hdp = va_arg(hdps, HeapDataParamsConfig);
+		if (heap_allocator_init_hdp(ptr, &hdp, i)) {
+			heap_allocator_cleanup(ptr);
+			return -1;
+		}
+	}
+
+	if (heap_data_params_count) {
+		qsort(ptr->impl->hd_arr, heap_data_params_count,
+		      sizeof(HeapData), heap_data_compare);
+	}
+
+	ptr->impl->hd_size = heap_data_params_count;
+
+	va_end(hdps);
+
+	return 0;
 }
 
 // binary search for the correct slab size
-int heap_allocator_index(HeapAllocator *ptr, size_t size) {
+int heap_allocator_index(HeapAllocator *ptr, u64 size) {
 	int ret = -1;
-	if (ptr->heap_data_arr_size == 0)
+	if (ptr->impl->hd_size == 0)
 		return ret;
+
 	int left = 0;
-	int right = ptr->heap_data_arr_size - 1;
+	int right = ptr->impl->hd_size - 1;
 
 	while (left <= right) {
 		int mid = left + (right - left) / 2;
-		size_t slab_size = ptr->heap_data_arr[mid].sdp.slab_size;
+		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
 		if (slab_size == size) {
 			ret = mid;
 			break;
@@ -191,92 +203,150 @@ int heap_allocator_index(HeapAllocator *ptr, size_t size) {
 			left = mid + 1;
 	}
 
+	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1) {
+		return right + 1;
+	}
+
 	return ret;
 }
 
-size_t heap_allocator_allocate(HeapAllocator *ptr, size_t size) {
-	int index = heap_allocator_index(ptr, size);
+int heap_data_resize(u64 index, HeapData *hd) {
+	if (hd->cur_slabs < hd->hdp.config.max_slabs) {
+		u32 nslabs_count =
+		    hd->hdp.config.slabs_per_resize + hd->cur_slabs;
+		if (nslabs_count > hd->hdp.config.max_slabs)
+			nslabs_count = hd->hdp.config.max_slabs;
 
-	// slab size not found return UINT64_MAX.
-	if (index < 0)
-		return UINT64_MAX;
+		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
+		if (hd->data)
+			hd->data = do_realloc(hd->data,
+					      (hd->count + 1) * sizeof(void *));
+		else
+			hd->data = do_malloc((hd->count + 1) * sizeof(void **));
 
-	size_t ret = ptr->heap_data_arr[index].sdp.free_list_head;
-	if (ret == UINT64_MAX) {
-		size_t cur_slabs = ptr->heap_data_arr[index].cur_slabs;
-		// No more slabs, try to resize, or return UINT64_MAX
-		if (heap_data_resize(&ptr->heap_data_arr[index]))
-			return UINT64_MAX;
-		ptr->heap_data_arr[index].sdp.free_list_head = cur_slabs;
-		ret = ptr->heap_data_arr[index].sdp.free_list_head;
+		heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc,
+					      true);
+		hd->hdp.free_list_head = hd->cur_slabs;
+		hd->cur_slabs = nslabs_count;
+		hd->count += 1;
+		return 0;
 	}
-
-	size_t offset_next =
-	    ret * (8 + ptr->heap_data_arr[index].sdp.slab_size);
-	FatPtr next;
-	heap_data_access(&ptr->heap_data_arr[index], &next, offset_next);
-	memcpy(&ptr->heap_data_arr[index].sdp.free_list_head, next.data, 8);
-
-	// zero out memory if configured
-	if (ptr->zeroed) {
-		for (size_t i = 0; i < ptr->heap_data_arr[index].sdp.slab_size;
-		     i++) {
-			((char *)next.data)[i + 8] = 0;
-		}
-	}
-
-	return ret | ((size_t)index << 56);
+	return -1;
 }
-int heap_allocator_get(HeapAllocator *ptr, FatPtr *slab, size_t id) {
-	size_t index = (id >> 56) & 0xFF;
-	size_t rel = id & 0x00FFFFFFFFFFFFFF;
 
-	if (index >= ptr->heap_data_arr_size)
+int heap_data_allocate(u64 index, HeapData *hd, FatPtr *fptr) {
+	if (hd->cur_slabs == 0) {
+		// this hd initially had 0 slabs
+		// resize it
+		if (heap_data_resize(index, hd))
+			return -1;
+	}
+
+	if (hd->hdp.free_list_head == UINT32_MAX)
 		return -1;
-	slab->len = ptr->heap_data_arr[index].sdp.slab_size;
-	slab->id = id;
-	size_t offset = rel * (8 + ptr->heap_data_arr[index].sdp.slab_size) + 8;
-	heap_data_access(&ptr->heap_data_arr[index], slab, offset);
+	u64 id = hd->hdp.free_list_head;
+	hd->hdp.free_list_head = hd->free_list[id];
+	fptr->id = id | (index << 56);
+	fptr->len = hd->hdp.config.slab_size;
+
+	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
+	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
+
+	fptr->data =
+	    hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
 
 	return 0;
 }
-int heap_allocator_free(HeapAllocator *ptr, size_t id) {
-	size_t index = (id >> 56) & 0xFF;     // Extract the index
-	size_t rel = id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
 
-	if (index >= ptr->heap_data_arr_size) {
+int heap_data_free(u64 index, HeapData *hd, FatPtr *fptr) {
+	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
+
+	if (rel >= hd->cur_slabs)
+		return -1;
+
+	u64 head = hd->hdp.free_list_head;
+	hd->hdp.free_list_head = rel;
+	hd->free_list[rel] = head;
+
+	return 0;
+}
+
+int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr) {
+	int ret = -1;
+	int index = heap_allocator_index(ptr, size);
+
+	if (index < 0) {
+		if (!ptr->impl->config.no_malloc) {
+			fptr->data = do_malloc(size);
+			fptr->len = size;
+			fptr->id = UINT64_MAX;
+			ret = 0;
+		}
+	} else {
+		HeapData *hd = &ptr->impl->hd_arr[index];
+		ret = heap_data_allocate(index, hd, fptr);
+		if (ret) {
+			// there are no more slabs. Try to resize
+			if (!heap_data_resize(index, hd)) {
+				// successful resize, allocate should always
+				// succeed here
+				ret = heap_data_allocate(index, hd, fptr);
+			} else if (!ptr->impl->config.no_malloc) {
+				// could not allocate, so we fall back to malloc
+				// if configured
+				fptr->data = do_malloc(size);
+				fptr->len = size;
+				fptr->id = UINT64_MAX;
+				ret = 0;
+			}
+		}
+	}
+
+	return ret;
+}
+
+int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr) {
+	if (fptr->id == UINT64_MAX) {
+		// malloc allocated
+
+		if (fptr->data) {
+			do_free(fptr->data);
+			fptr->data = NULL;
+		}
+
+		return 0;
+	}
+
+	u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
+
+	if (index >= ptr->impl->hd_size) {
+		errno = EINVAL;
 		return -1; // Invalid index
 	}
 
-	HeapDataPtr *sd = &ptr->heap_data_arr[index];
-	FatPtr slab;
-	size_t offset = rel * (8 + sd->sdp.slab_size);
-
-	// Access the slab to ensure it's a valid address
-	if (heap_data_access(sd, &slab, offset) != 0) {
-		return -1; // Failed to access the slab
-	}
-
-	// Update the free list
-	size_t old_head = sd->sdp.free_list_head;
-	memcpy(slab.data, &old_head, sizeof(size_t));
-	sd->sdp.free_list_head = rel;
-
-	// zero out memory since it's now freed
-	if (ptr->zeroed) {
-		size_t start_data = offset + 8;
-		/*
-		for (size_t i = 0; i < ptr->heap_data_arr[index].sdp.slab_size;
-		     i++) {
-			((char *)ptr->heap_data_arr[index]
-			     .data)[i + start_data] = 0;
-		}
-		*/
-		for (size_t i = 0; i < ptr->heap_data_arr[index].sdp.slab_size;
-		     i++) {
-			((char *)slab.data)[i + 8] = 0;
-		}
-	}
-
-	return 0; // Success
+	HeapData *hd = &ptr->impl->hd_arr[index];
+	return heap_data_free(index, hd, fptr);
 }
+
+int heap_allocator_cleanup(HeapAllocator *ptr) {
+	// check for impl and deallocate
+	if (ptr->impl) {
+		for (u32 i = 0; i < ptr->impl->hd_size; i++) {
+			if (ptr->impl->hd_arr[i].count) {
+				// check that it's not an unallocated heap data
+				do_free(ptr->impl->hd_arr[i].free_list);
+				for (u64 j = 0; j < ptr->impl->hd_arr[i].count;
+				     j++) {
+					do_free(ptr->impl->hd_arr[i].data[j]);
+				}
+				do_free(ptr->impl->hd_arr[i].data);
+			}
+		}
+
+		do_free(ptr->impl->hd_arr);
+		do_free(ptr->impl);
+		ptr->impl = NULL;
+	}
+	return 0;
+}
+

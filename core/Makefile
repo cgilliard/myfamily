@@ -1,4 +1,4 @@
-OBJS := heap.o stack.o
+OBJS := heap.o stack.o panic.o
 
 TEST_OBJS := $(OBJS)
 

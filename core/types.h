@@ -35,19 +35,4 @@
 #define f64 double
 #define f32 float
 
-// for some mapping issues, we make these definitions
-#define u8Ptr u8
-#define u16Ptr u16
-#define u32Ptr u32
-#define u64Ptr u64
-#define u128Ptr u128
-#define i8Ptr i8
-#define i16Ptr i16
-#define i32Ptr i32
-#define i64Ptr i64
-#define i128Ptr i128
-#define f32Ptr f32
-#define f64Ptr f64
-#define boolPtr bool
-
 #endif // _CORE_TYPES__
