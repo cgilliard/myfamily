@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Check if pre-commit is installed and install hooks if necessary
+if [ -f ".pre-commit-config.yaml" ]; then
+    if ! pre-commit install >/dev/null 2>&1; then
+        echo "Installing pre-commit hooks..."
+        pre-commit install
+    fi
+fi
