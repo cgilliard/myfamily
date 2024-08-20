@@ -241,6 +241,6 @@ Test(core, test_heap_init_multi_chunk) {
 		cr_assert_eq(ptrs[i].len, 16);
 	}
 
-	// cleanup ha
+	// cleanup ha and exit
 	heap_allocator_cleanup(&ha);
 }
