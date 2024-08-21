@@ -1,0 +1,26 @@
+include ../Makefile.config
+SOURCES := $(patsubst %.c,%.o,$(wildcard *.c))
+
+%.o : %.c $(HEADERS)
+	$(CC) $(FLAG_OPTIONS) $(CC_FLAGS) -I.. -c -o $@ $<
+all: $(OBJS)
+test: test.c
+	mkdir -p bin
+	rm -rf bin/test
+	rm -rf bin/nocapture
+	$(CC) $(FLAG_OPTIONS) $(CC_TEST_FLAGS) $(TEST_OBJS) -I.. -o bin/test test.c
+	./bin/test --timeout 60 -f
+	@rm -rf bin
+testnc: test.c
+	mkdir -p bin
+	rm -rf bin/test
+	touch bin/nocapture
+	$(CC) $(FLAG_OPTIONS) $(CC_TEST_FLAGS) $(TEST_OBJS) -I.. -o bin/test test.c
+	./bin/test --timeout 60 -f
+	@rm -rf bin
+clean:
+	rm -rf *.o
+	rm -rf bin
+	rm -rf *.gcov
+	rm -rf *.gcno
+	rm -rf *.gcda
