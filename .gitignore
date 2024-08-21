@@ -3,4 +3,6 @@
 **/*.gcov
 **/*.gcno
 **/*.gcda
+/bin/*
+/doc/*
 /Makefile.config
