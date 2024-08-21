@@ -23,6 +23,7 @@ Test(core, test_heap) {
 	FatPtr ptr1 = {1, NULL, 2};
 	cr_assert_eq(fat_ptr_len(&ptr1), 2);
 	cr_assert_eq(fat_ptr_data(&ptr1), NULL);
+	cr_assert_eq(fat_ptr_id(&ptr1), 1);
 
 	// setup an ha with three sizes
 	HeapAllocator ha;
@@ -319,6 +320,7 @@ Test(core, test_heap_oom) {
 	HeapAllocatorConfig hconfig = {true, true};
 	HeapDataParamsConfig hdconfig1 = {32, 10, 1, 10};
 	HeapDataParamsConfig hdconfig2 = {16, 10, 1, 10};
+	HeapDataParamsConfig hdconfig3 = {16, 10, 1, 30};
 
 	__debug_build_allocator_malloc_fail1 = true;
 	cr_assert_neq(heap_allocator_build(&ha, &hconfig, 0), 0);
@@ -386,8 +388,6 @@ Test(core, test_heap_oom) {
 
 	cr_assert_eq(__malloc_count, __free_count);
 
-	// test malloc failure in resize
-	HeapDataParamsConfig hdconfig3 = {16, 10, 1, 30};
 	cr_assert_eq(heap_allocator_build(&ha, &hconfig, 1, hdconfig3), 0);
 
 	__debug_build_allocator_malloc_fail7 = true;
@@ -426,6 +426,29 @@ Test(core, test_heap_oom) {
 	}
 
 	// no more slabs and we have mo_malloc configured
+	cr_assert_neq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	__debug_build_allocator_malloc_fail8 = true;
+
+	cr_assert_neq(heap_allocator_build(&ha, &hconfig, 1, hdconfig3), 0);
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	// test failure6 faiure of malloc after no slabs left
+	__debug_build_allocator_malloc_fail8 = false;
+	__debug_build_allocator_malloc_fail6 = true;
+
+	// build ok
+	cr_assert_eq(heap_allocator_build(&ha, &hconfig2, 0), 0);
+	// allocation failure
 	cr_assert_neq(heap_allocator_allocate(&ha, 16, &ptr), 0);
 
 	// cleanup ha

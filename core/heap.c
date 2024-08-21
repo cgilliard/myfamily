@@ -45,6 +45,7 @@ bool __debug_build_allocator_malloc_fail4 = false;
 bool __debug_build_allocator_malloc_fail5 = false;
 bool __debug_build_allocator_malloc_fail6 = false;
 bool __debug_build_allocator_malloc_fail7 = false;
+bool __debug_build_allocator_malloc_fail8 = false;
 
 void *do_malloc(size_t size) {
 	__malloc_count += 1;
@@ -134,9 +135,10 @@ int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp,
 	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks) {
 		ptr->impl->hd_arr[index].data = NULL;
 
-		ptr->impl->hd_arr[index].data = do_malloc(
-		    ptr->impl->hd_arr[index].hdp.config.initial_chunks *
-		    sizeof(void *));
+		if (!__debug_build_allocator_malloc_fail8)
+			ptr->impl->hd_arr[index].data = do_malloc(
+			    ptr->impl->hd_arr[index].hdp.config.initial_chunks *
+			    sizeof(void *));
 		if (ptr->impl->hd_arr[index].data == NULL)
 			return -1;
 		ptr->impl->hd_arr[index].cur_slabs =

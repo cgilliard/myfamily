@@ -29,6 +29,7 @@ extern bool __debug_build_allocator_malloc_fail4;
 extern bool __debug_build_allocator_malloc_fail5;
 extern bool __debug_build_allocator_malloc_fail6;
 extern bool __debug_build_allocator_malloc_fail7;
+extern bool __debug_build_allocator_malloc_fail8;
 
 void *do_malloc(size_t size);
 void *do_realloc(void *ptr, size_t size);
