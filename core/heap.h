@@ -15,6 +15,39 @@
 #ifndef _CORE_HEAP__
 #define _CORE_HEAP__
 
+/**
+ * @file
+ * @brief This file contains definitions for the custom heap allocator.
+ *
+ * @section Overview
+ * The custom heap allocator aims to provide efficient memory management for
+ * high-performance applications. It includes features such as:
+ * - Slab allocation for reducing fragmentation
+ * - Support for varying block sizes
+ *
+ * @section Design Decisions
+ * - The allocator uses a slab-based approach to minimize fragmentation and
+ *   improve allocation performance.
+ * - It incorporates a thread-local storage mechanism to optimize for
+ * multi-threaded scenarios.
+ *
+ * @section notes
+ * - Note that the #HeapAllocator implementation does not provide any
+ *   thread safety. Externaly thread safety techniques must be employed.
+ * - Note that regarding alignment, the slab allocator allocates the free
+ *   list independantly from the raw slab data. Free list entries are 4
+ *   bytes long so they follow standard alignment practices for 4 bytes by
+ *   dividing an array into 4 byte chunks for each free list entry.
+ *   The data section is split up sequentially. If a 16 byte slab_size is
+ *   configured with 10 slabs_per_resize, a chunk will be a contiguous block of
+ *   160 bytes. When a slab allocated from this chunk it will be aligned to the
+ *   16 byte offsets within this chunk.
+ *
+ * @section Usage
+ * To use the heap allocator, initialize it with the desired parameters and
+ * then use the provided API functions for allocation and deallocation.
+ */
+
 #include <core/types.h>
 
 /**
