@@ -1,17 +1,25 @@
+# Executables
 SHELL := /bin/bash
 CC=cc
 MAKE=make
-CC_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes $(COVERAGE)
+
+# FLags
+CC_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes
 CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
 CRITERION_LIB=-LREPLACE_CRITERION_LIB
-CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB) $(COVERAGE)
+CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB)
 RELEASE_FLAGS=-O3 -flto
 TEST_FLAGS=-g -Og -DTEST
 SAN_FLAGS=-g -Og -fsanitize=undefined -fsanitize=address -DTEST
+COVERAGE_FLAGS=--coverage -DTEST
+
+# Install directory
 INSTALL_DIR=/usr/local/bin
+
+# Object directories
 ALL_OBJS=main/*.o toml/*.o core/*.o
 SUBDIRS := main toml core
 SUBDIRS_RELEASE := $(SUBDIRS)
 HEADERS := $(wildcard main/*.h) \
            $(wildcard toml/*.h) \
-           $(wildcard core/*.h) \
+           $(wildcard core/*.h)
