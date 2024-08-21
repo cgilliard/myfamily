@@ -520,3 +520,27 @@ Test(core, test_heap_zeroed) {
 
 	cr_assert_eq(__malloc_count, __free_count);
 }
+
+Test(core, test_invalid_heap_configurations) {
+	cr_assert_eq(__malloc_count, __free_count);
+
+	HeapAllocator ha;
+	HeapAllocatorConfig hconfig = {true, true};
+	HeapDataParamsConfig hdconfig1 = {0, 10, 1, 10};
+	HeapDataParamsConfig hdconfig2 = {16, 10, 1, 10};
+
+	cr_assert_neq(heap_allocator_build(&ha, &hconfig, 1, hdconfig1), 0);
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	cr_assert_neq(
+	    heap_allocator_build(&ha, &hconfig, 2, hdconfig2, hdconfig2), 0);
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
+}
