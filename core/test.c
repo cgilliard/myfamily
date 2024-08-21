@@ -456,3 +456,67 @@ Test(core, test_heap_oom) {
 
 	cr_assert_eq(__malloc_count, __free_count);
 }
+
+Test(core, test_heap_zeroed) {
+	FatPtr ptr;
+	HeapAllocator ha;
+	HeapAllocatorConfig hconfig_zeroed = {true, true};
+	HeapAllocatorConfig hconfig_non_zeroed = {false, false};
+	HeapDataParamsConfig hdconfig1 = {16, 20, 1, 45};
+	char *data;
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	// first try without zeroed
+	cr_assert_eq(
+	    heap_allocator_build(&ha, &hconfig_non_zeroed, 1, hdconfig1), 0);
+
+	cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+	cr_assert_eq(fat_ptr_id(&ptr), 0);
+	data = fat_ptr_data(&ptr);
+	for (u64 i = 0; i < 16; i++) {
+		data[i] = 1;
+	}
+
+	cr_assert_eq(heap_allocator_free(&ha, &ptr), 0);
+
+	cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+	cr_assert_eq(fat_ptr_id(&ptr), 0);
+	data = fat_ptr_data(&ptr);
+	for (u64 i = 0; i < 16; i++) {
+		// since it's not zeroed, value will be '1' which was set before
+		// freeing/allocating
+		cr_assert_eq(data[i], 1);
+	}
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	// setup ha with a single size with zeroed enabled
+	cr_assert_eq(heap_allocator_build(&ha, &hconfig_zeroed, 1, hdconfig1),
+		     0);
+
+	cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+	cr_assert_eq(fat_ptr_id(&ptr), 0);
+	data = fat_ptr_data(&ptr);
+	for (u64 i = 0; i < 16; i++) {
+		data[i] = 1;
+	}
+
+	cr_assert_eq(heap_allocator_free(&ha, &ptr), 0);
+
+	cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+	cr_assert_eq(fat_ptr_id(&ptr), 0);
+	data = fat_ptr_data(&ptr);
+	for (u64 i = 0; i < 16; i++) {
+		// this time it's zeroed out
+		cr_assert_eq(data[i], 0);
+	}
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
+}

@@ -369,10 +369,17 @@ int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr) {
 		}
 	}
 
+	if (!ret && ptr->impl->config.zeroed) {
+		for (u64 i = 0; i < fptr->len; i++) {
+			((char *)fptr->data)[i] = 0;
+		}
+	}
+
 	return ret;
 }
 
 int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr) {
+	int ret = 0;
 	if (fptr->id == UINT64_MAX) {
 		// malloc allocated
 
@@ -381,18 +388,27 @@ int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr) {
 			fptr->data = NULL;
 		}
 
-		return 0;
+		ret = 0;
+	} else {
+
+		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
+
+		if (index >= ptr->impl->hd_size) {
+			errno = EINVAL;
+			ret = -1; // invalid index
+		} else {
+			HeapData *hd = &ptr->impl->hd_arr[index];
+			ret = heap_data_free(index, hd, fptr);
+		}
 	}
 
-	u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
-
-	if (index >= ptr->impl->hd_size) {
-		errno = EINVAL;
-		return -1; // Invalid index
+	if (!ret && ptr->impl->config.zeroed) {
+		for (u64 i = 0; i < fptr->len; i++) {
+			((char *)fptr->data)[i] = 0;
+		}
 	}
 
-	HeapData *hd = &ptr->impl->hd_arr[index];
-	return heap_data_free(index, hd, fptr);
+	return ret;
 }
 
 int heap_allocator_cleanup(HeapAllocator *ptr) {
