@@ -17,6 +17,19 @@
 
 #include <core/types.h>
 
+// make some private functions/variables visible for tests
+#ifdef TEST
+extern u64 __malloc_count;
+extern u64 __free_count;
+extern bool __debug_build_allocator_malloc_fail1;
+extern bool __debug_build_allocator_malloc_fail2;
+extern bool __debug_build_allocator_malloc_fail3;
+extern bool __debug_build_allocator_malloc_fail4;
+extern bool __debug_build_allocator_malloc_fail5;
+
+void *do_realloc(void *ptr, size_t size);
+#endif // TEST
+
 typedef struct HeapDataParamsConfig {
 	u32 slab_size;
 	u32 slabs_per_resize;

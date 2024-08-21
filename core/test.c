@@ -16,6 +16,8 @@
 #include <criterion/criterion.h>
 
 Test(core, test_heap) {
+	cr_assert_eq(__malloc_count, __free_count);
+
 	// setup some fat pointers and assert len and data function
 	FatPtr ptrs[40];
 	FatPtr ptr1 = {1, NULL, 2};
@@ -106,9 +108,13 @@ Test(core, test_heap) {
 
 	// cleanup ha
 	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
 }
 
 Test(core, test_heap_resize) {
+	cr_assert_eq(__malloc_count, __free_count);
+
 	// setup an ha and 46 fat pointers
 	FatPtr ptrs[46];
 	HeapAllocator ha;
@@ -134,9 +140,13 @@ Test(core, test_heap_resize) {
 
 	// cleanup ha
 	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
 }
 
 Test(core, test_heap_free) {
+	cr_assert_eq(__malloc_count, __free_count);
+
 	// setup ha with a single size
 	FatPtr ptrs[46];
 	HeapAllocator ha;
@@ -165,9 +175,13 @@ Test(core, test_heap_free) {
 
 	// cleanup ha
 	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
 }
 
 Test(core, test_heap_initial_size0) {
+	cr_assert_eq(__malloc_count, __free_count);
+
 	// setup ha with a single size and no slabs initially
 	FatPtr ptrs[46];
 	HeapAllocator ha;
@@ -211,9 +225,13 @@ Test(core, test_heap_initial_size0) {
 
 	// cleanup ha
 	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
 }
 
 Test(core, test_heap_init_multi_chunk) {
+	cr_assert_eq(__malloc_count, __free_count);
+
 	// setup ha with multi initial chunks
 	FatPtr ptrs[81];
 	HeapAllocator ha;
@@ -243,9 +261,13 @@ Test(core, test_heap_init_multi_chunk) {
 
 	// cleanup ha
 	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
 }
 
 Test(core, test_invalid_configurations) {
+	cr_assert_eq(__malloc_count, __free_count);
+
 	cr_assert_neq(heap_allocator_build(NULL, NULL, 0), 0);
 	HeapAllocator ha;
 	FatPtr ptr, ptr2;
@@ -280,10 +302,57 @@ Test(core, test_invalid_configurations) {
 	HeapDataParamsConfig hdconfig3 = {16, 0, 0, 0};
 	cr_assert_eq(heap_allocator_build(&ha, &hconfig, 1, hdconfig3), 0);
 
-	// delete an invalid fat ptrs from another ha
+	// delete invalid fat ptrs from another ha
 	cr_assert_neq(heap_allocator_free(&ha, &ptr), 0);
 	cr_assert_neq(heap_allocator_free(&ha, &ptr2), 0);
 
 	// cleanup ha
 	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
+}
+
+Test(core, test_heap_oom) {
+	/*
+	cr_assert_eq(__malloc_count, __free_count);
+
+	HeapAllocator ha;
+	HeapAllocatorConfig hconfig = {true, true};
+	HeapDataParamsConfig hdconfig1 = {32, 10, 1, 10};
+	HeapDataParamsConfig hdconfig2 = {16, 10, 1, 10};
+	__debug_build_allocator_malloc_fail1 = true;
+	cr_assert_neq(heap_allocator_build(&ha, &hconfig, 0), 0);
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	__debug_build_allocator_malloc_fail1 = false;
+	__debug_build_allocator_malloc_fail2 = true;
+	cr_assert_neq(heap_allocator_build(&ha, &hconfig, 0), 0);
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	__debug_build_allocator_malloc_fail2 = false;
+	__debug_build_allocator_malloc_fail3 = true;
+
+	cr_assert_neq(
+	    heap_allocator_build(&ha, &hconfig, 2, hdconfig1, hdconfig2), 0);
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	__debug_build_allocator_malloc_fail3 = false;
+	__debug_build_allocator_malloc_fail4 = true;
+
+	cr_assert_neq(
+	    heap_allocator_build(&ha, &hconfig, 2, hdconfig1, hdconfig2), 0);
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	__debug_build_allocator_malloc_fail4 = false;
+	__debug_build_allocator_malloc_fail5 = true;
+
+	cr_assert_neq(
+	    heap_allocator_build(&ha, &hconfig, 2, hdconfig1, hdconfig2), 0);
+
+	cr_assert_eq(__malloc_count, __free_count);
+	*/
 }
