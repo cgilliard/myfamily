@@ -313,7 +313,6 @@ Test(core, test_invalid_configurations) {
 }
 
 Test(core, test_heap_oom) {
-	/*
 	cr_assert_eq(__malloc_count, __free_count);
 
 	HeapAllocator ha;
@@ -354,5 +353,33 @@ Test(core, test_heap_oom) {
 	    heap_allocator_build(&ha, &hconfig, 2, hdconfig1, hdconfig2), 0);
 
 	cr_assert_eq(__malloc_count, __free_count);
-	*/
+
+	// make a valid heap for testing allocate failures
+	__debug_build_allocator_malloc_fail5 = false;
+	FatPtr ptr;
+	cr_assert_eq(heap_allocator_build(&ha, &hconfig, 1, hdconfig1), 0);
+
+	__debug_build_allocator_malloc_fail6 = true;
+	cr_assert_neq(heap_allocator_allocate(&ha, 33, &ptr), 0);
+
+	for (u64 i = 0; i < 10; i++)
+		cr_assert_eq(heap_allocator_allocate(&ha, 32, &ptr), 0);
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	// create a malloc enabled ha
+	HeapAllocatorConfig hconfig2 = {false, false};
+	cr_assert_eq(heap_allocator_build(&ha, &hconfig2, 1, hdconfig1), 0);
+
+	for (u64 i = 0; i < 10; i++)
+		cr_assert_eq(heap_allocator_allocate(&ha, 32, &ptr), 0);
+
+	// malloc configured to fail here
+	cr_assert_neq(heap_allocator_allocate(&ha, 32, &ptr), 0);
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
 }

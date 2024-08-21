@@ -43,6 +43,7 @@ bool __debug_build_allocator_malloc_fail2 = false;
 bool __debug_build_allocator_malloc_fail3 = false;
 bool __debug_build_allocator_malloc_fail4 = false;
 bool __debug_build_allocator_malloc_fail5 = false;
+bool __debug_build_allocator_malloc_fail6 = false;
 
 void *do_malloc(size_t size) {
 	void *ret = malloc(size);
@@ -73,31 +74,14 @@ int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs,
 	if (hd->data[index] == NULL)
 		return -1;
 
-	if (index == 0) {
-		hd->free_list = do_malloc(sizeof(u32) * slabs);
-	} else {
-		void *tmp = do_realloc(hd->free_list,
-				       sizeof(u32) * (hd->cur_slabs + slabs));
-		if (!tmp) {
-			do_free(hd->data[index]);
-			return -1;
-		}
-		hd->free_list = tmp;
-	}
-
-	/*
 	void *tmp = NULL;
 
-	printf("do malloc with slabs = %u, index=%llu, cur_slabs=%u\n", slabs,
-	       index, hd->cur_slabs);
 	if (!__debug_build_allocator_malloc_fail5) {
 		if (index == 0)
 			tmp = do_malloc(sizeof(u32) * slabs);
 		else {
 			tmp = do_realloc(hd->free_list,
 					 sizeof(u32) * (hd->cur_slabs + slabs));
-			printf("realloc with size = %u\n",
-			       (hd->cur_slabs + slabs));
 		}
 	}
 
@@ -107,7 +91,7 @@ int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs,
 	}
 
 	hd->free_list = tmp;
-	*/
+
 	u32 offset = index * hd->hdp.config.slabs_per_resize;
 	for (u64 i = 0; i < slabs; i++) {
 		if ((i == (slabs - 1)) && last_is_uint_max)
@@ -330,7 +314,9 @@ int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr) {
 
 	if (index < 0) {
 		if (!ptr->impl->config.no_malloc) {
-			fptr->data = do_malloc(size);
+			fptr->data = NULL;
+			if (!__debug_build_allocator_malloc_fail6)
+				fptr->data = do_malloc(size);
 			if (fptr->data == NULL) {
 				fptr->len = 0;
 				ret = -1;
@@ -352,7 +338,9 @@ int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr) {
 			} else if (!ptr->impl->config.no_malloc) {
 				// could not allocate, so we fall back to malloc
 				// if configured
-				fptr->data = do_malloc(size);
+				fptr->data = NULL;
+				if (!__debug_build_allocator_malloc_fail6)
+					fptr->data = do_malloc(size);
 				if (fptr->data == NULL) {
 					fptr->len = 0;
 					ret = -1;
@@ -397,17 +385,25 @@ int heap_allocator_cleanup(HeapAllocator *ptr) {
 		for (u32 i = 0; i < ptr->impl->hd_size; i++) {
 			if (ptr->impl->hd_arr[i].count) {
 				// check that it's not an unallocated heap data
-				do_free(ptr->impl->hd_arr[i].free_list);
+				if (ptr->impl->hd_arr[i].free_list) {
+					do_free(ptr->impl->hd_arr[i].free_list);
+					ptr->impl->hd_arr[i].free_list = NULL;
+				}
 				for (u64 j = 0; j < ptr->impl->hd_arr[i].count;
 				     j++) {
 					do_free(ptr->impl->hd_arr[i].data[j]);
 				}
-				do_free(ptr->impl->hd_arr[i].data);
+				if (ptr->impl->hd_arr[i].data) {
+					do_free(ptr->impl->hd_arr[i].data);
+					ptr->impl->hd_arr[i].data = NULL;
+				}
 			}
 		}
 
-		if (ptr->impl->hd_arr)
+		if (ptr->impl->hd_arr) {
 			do_free(ptr->impl->hd_arr);
+			ptr->impl->hd_arr = NULL;
+		}
 		do_free(ptr->impl);
 		ptr->impl = NULL;
 	}

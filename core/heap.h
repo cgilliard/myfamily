@@ -26,6 +26,7 @@ extern bool __debug_build_allocator_malloc_fail2;
 extern bool __debug_build_allocator_malloc_fail3;
 extern bool __debug_build_allocator_malloc_fail4;
 extern bool __debug_build_allocator_malloc_fail5;
+extern bool __debug_build_allocator_malloc_fail6;
 
 void *do_realloc(void *ptr, size_t size);
 #endif // TEST
