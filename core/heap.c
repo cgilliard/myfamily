@@ -44,15 +44,18 @@ bool __debug_build_allocator_malloc_fail3 = false;
 bool __debug_build_allocator_malloc_fail4 = false;
 bool __debug_build_allocator_malloc_fail5 = false;
 bool __debug_build_allocator_malloc_fail6 = false;
+bool __debug_build_allocator_malloc_fail7 = false;
 
 void *do_malloc(size_t size) {
+	__malloc_count += 1;
 	void *ret = malloc(size);
-	// printf("malloc %zu [%p (%llu)]\n", size, ret, ++__malloc_count);
+	// printf("malloc %zu [%p (%llu)]\n", size, ret, __malloc_count);
 	return ret;
 }
 
 void do_free(void *ptr) {
-	// printf("free %p (%llu)\n", ptr, ++__free_count);
+	__free_count += 1;
+	// printf("free %p (%llu)\n", ptr, __free_count);
 	free(ptr);
 }
 
@@ -65,6 +68,8 @@ void *do_realloc(void *ptr, size_t size) {
 void *fat_ptr_data(FatPtr *ptr) { return ptr->data; }
 
 u64 fat_ptr_len(FatPtr *ptr) { return ptr->len; }
+
+u64 fat_ptr_id(FatPtr *ptr) { return ptr->id; }
 
 int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs,
 				  bool last_is_uint_max) {
@@ -127,6 +132,8 @@ int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp,
 	ptr->impl->hd_arr[index].count =
 	    ptr->impl->hd_arr[index].hdp.config.initial_chunks;
 	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks) {
+		ptr->impl->hd_arr[index].data = NULL;
+
 		ptr->impl->hd_arr[index].data = do_malloc(
 		    ptr->impl->hd_arr[index].hdp.config.initial_chunks *
 		    sizeof(void *));
@@ -194,10 +201,14 @@ int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
 	for (u64 i = 0; i < heap_data_params_count; i++) {
 		HeapDataParamsConfig hdp = va_arg(hdps, HeapDataParamsConfig);
 		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
+		ptr->impl->hd_arr[i].data = NULL;
 		if ((__debug_build_allocator_malloc_fail3 && i > 0) ||
 		    heap_allocator_init_hdp(ptr, &hdp, i)) {
 			ptr->impl->hd_size = i; // update for cleanup, others
 						// did not get allocated
+			if (ptr->impl->hd_arr[i].data) {
+				do_free(ptr->impl->hd_arr[i].data);
+			}
 			heap_allocator_cleanup(ptr);
 			return -1;
 		}
@@ -250,11 +261,14 @@ int heap_data_resize(u64 index, HeapData *hd) {
 
 		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
 		void *tmp = NULL;
-		if (hd->data)
-			tmp = do_realloc(hd->data,
-					 (hd->count + 1) * sizeof(void *));
-		else
-			tmp = do_malloc((hd->count + 1) * sizeof(void **));
+		if (!__debug_build_allocator_malloc_fail7) {
+			if (hd->data)
+				tmp = do_realloc(hd->data, (hd->count + 1) *
+							       sizeof(void *));
+			else
+				tmp = do_malloc((hd->count + 1) *
+						sizeof(void **));
+		}
 
 		if (tmp == NULL)
 			return -1;

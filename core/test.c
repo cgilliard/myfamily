@@ -319,6 +319,7 @@ Test(core, test_heap_oom) {
 	HeapAllocatorConfig hconfig = {true, true};
 	HeapDataParamsConfig hdconfig1 = {32, 10, 1, 10};
 	HeapDataParamsConfig hdconfig2 = {16, 10, 1, 10};
+
 	__debug_build_allocator_malloc_fail1 = true;
 	cr_assert_neq(heap_allocator_build(&ha, &hconfig, 0), 0);
 
@@ -387,7 +388,45 @@ Test(core, test_heap_oom) {
 
 	// test malloc failure in resize
 	HeapDataParamsConfig hdconfig3 = {16, 10, 1, 30};
-	cr_assert_eq(heap_allocator_build(&ha, &hconfig2, 1, hdconfig3), 0);
+	cr_assert_eq(heap_allocator_build(&ha, &hconfig, 1, hdconfig3), 0);
+
+	__debug_build_allocator_malloc_fail7 = true;
+	__debug_build_allocator_malloc_fail6 = false;
+
+	for (u64 i = 0; i < 10; i++) {
+		cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+	}
+
+	cr_assert_neq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+
+	//__debug_build_allocator_malloc_fail4 = true;
+	__debug_build_allocator_malloc_fail7 = false;
+
+	// now we can create new slabs
+	for (u64 i = 0; i < 10; i++) {
+		cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+	}
+
+	// set fail4 which fails in the init free list function
+	__debug_build_allocator_malloc_fail4 = true;
+
+	cr_assert_neq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+
+	// use failure 5 which is a little later in the function
+	// should be the same result
+	__debug_build_allocator_malloc_fail5 = true;
+	__debug_build_allocator_malloc_fail4 = false;
+
+	cr_assert_neq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+
+	__debug_build_allocator_malloc_fail5 = false;
+
+	for (u64 i = 0; i < 10; i++) {
+		cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
+	}
+
+	// no more slabs and we have mo_malloc configured
+	cr_assert_neq(heap_allocator_allocate(&ha, 16, &ptr), 0);
 
 	// cleanup ha
 	heap_allocator_cleanup(&ha);

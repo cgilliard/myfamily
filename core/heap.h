@@ -19,6 +19,7 @@
 
 // make some private functions/variables visible for tests
 #ifdef TEST
+typedef struct FatPtr FatPtr;
 extern u64 __malloc_count;
 extern u64 __free_count;
 extern bool __debug_build_allocator_malloc_fail1;
@@ -27,8 +28,12 @@ extern bool __debug_build_allocator_malloc_fail3;
 extern bool __debug_build_allocator_malloc_fail4;
 extern bool __debug_build_allocator_malloc_fail5;
 extern bool __debug_build_allocator_malloc_fail6;
+extern bool __debug_build_allocator_malloc_fail7;
 
+void *do_malloc(size_t size);
 void *do_realloc(void *ptr, size_t size);
+void do_free(void *ptr);
+u64 fat_ptr_id(FatPtr *ptr);
 #endif // TEST
 
 typedef struct HeapDataParamsConfig {
