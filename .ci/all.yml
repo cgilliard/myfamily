@@ -1,12 +1,12 @@
 steps:
   - script: |
       ./configure
-      make clean test
+      make clean testsan
     displayName: macOS Test
     condition: eq( variables['Agent.OS'], 'Darwin' )
   - script: |
       ./configure
-      make clean test
+      make clean testsan
     displayName: Linux Test
     condition: eq( variables['Agent.OS'], 'Linux' )
   - script: |
