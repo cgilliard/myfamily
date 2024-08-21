@@ -382,4 +382,15 @@ Test(core, test_heap_oom) {
 
 	// cleanup ha
 	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
+
+	// test malloc failure in resize
+	HeapDataParamsConfig hdconfig3 = {16, 10, 1, 30};
+	cr_assert_eq(heap_allocator_build(&ha, &hconfig2, 1, hdconfig3), 0);
+
+	// cleanup ha
+	heap_allocator_cleanup(&ha);
+
+	cr_assert_eq(__malloc_count, __free_count);
 }

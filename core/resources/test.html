@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full-Screen with Bottom Toolbar</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* Disable scrolling by default */
+        }
+
+        .toolbar {
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            line-height: 50px; /* Center the text vertically */
+            bottom: 0; /* Align the toolbar to the bottom */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toolbar" class="toolbar">
+        This is a toolbar at the bottom.
+    </div>
+
+    <script>
+        function enterFullScreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { // Safari
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) { // IE11
+                document.documentElement.msRequestFullscreen();
+            }
+        }
+
+        function preventScroll() {
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+        }
+
+        function adjustToolbarPosition() {
+            const toolbar = document.getElementById('toolbar');
+            const height = window.innerHeight;
+
+            // Adjust the toolbar's bottom position based on the full-screen height
+            toolbar.style.bottom = 0;  // It will already be aligned at the bottom
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                preventScroll();
+                adjustToolbarPosition();
+            }
+        });
+
+        document.addEventListener('webkitfullscreenchange', () => {
+            if (document.webkitFullscreenElement) {
+                preventScroll();
+                adjustToolbarPosition();
+            }
+        });
+
+        document.addEventListener('mozfullscreenchange', () => {
+            if (document.mozFullScreenElement) {
+                preventScroll();
+                adjustToolbarPosition();
+            }
+        });
+
+        document.addEventListener('msfullscreenchange', () => {
+            if (document.msFullscreenElement) {
+                preventScroll();
+                adjustToolbarPosition();
+            }
+        });
+
+        window.onresize = adjustToolbarPosition;
+
+        // Attempt to enter full-screen mode when the page loads
+        window.onload = function() {
+            enterFullScreen();
+        };
+
+    </script>
+</body>
+</html>
+
