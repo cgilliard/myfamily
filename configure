@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Ensure pre-commit is setup
-pre-commit install
+rm .git/hooks/pre-commit
+pre-commit install -f
 
 for var in "$@"
 do
