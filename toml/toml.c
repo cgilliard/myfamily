@@ -92,7 +92,7 @@ static char *STRNDUP(const char *s, size_t n) {
 
 /**
  * Convert a char in utf8 into UCS, and store it in *ret.
- * Return #bytes consumed or -1 on failure.
+ * Return bytes consumed or -1 on failure.
  */
 int toml_utf8_to_ucs(const char *orig, int len, int64_t *ret) {
 	const unsigned char *buf = (const unsigned char *)orig;
@@ -192,7 +192,7 @@ int toml_utf8_to_ucs(const char *orig, int len, int64_t *ret) {
 
 /**
  *	Convert a UCS char to utf8 code, and return it in buf.
- *	Return #bytes used in buf to encode the char, or
+ *	Return bytes used in buf to encode the char, or
  *	-1 on error.
  */
 int toml_ucs_to_utf8(int64_t code, char buf[6]) {
