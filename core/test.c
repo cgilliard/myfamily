@@ -543,6 +543,7 @@ Test(core, test_invalid_heap_configurations) {
 	heap_allocator_cleanup(&ha);
 
 	cr_assert_eq(__malloc_count, __free_count);
+	cr_assert(false);
 }
 
 Test(core, test_panic) {

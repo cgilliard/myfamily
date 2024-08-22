@@ -9,7 +9,7 @@ This module implements the following:
 
 \section core Overview
 
-The modle handles core functionalities within the MyFamily project. These include memory management, vtable implementation, and more.
+The module handles core functionalities within the MyFamily project. These include memory management, vtable implementation, and more.
 
 ## Key module files
 
