@@ -14,6 +14,7 @@
  * * gcc or cc (clang)
  * * bash (build scripts including in makefile)
  * * perl (replacing parameters in the configure script)
+ * * pre-commit (handle formatting)
  *
  * Optional: (for test and documentation only)
  *
