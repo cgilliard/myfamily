@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Ensure pre-commit is setup
+pre-commit install
+
 for var in "$@"
 do
 
