@@ -1,7 +1,6 @@
 # Test markdown page
 
-<div style="position: relative; width: 100%;">
-    <div class="overlay"></div>
+<div>
     <img class="myfamily" src="images/MyFamilyLogo.png"/>
 </div>
 
