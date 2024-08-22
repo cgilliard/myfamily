@@ -48,10 +48,10 @@ define run_tests
     if [ ! -f $(3) ]; then \
         linessum=0; \
         coveredsum=0; \
+	rm -f /tmp/gcov_cat.txt; \
         for dir in  $(SUBDIRS); do \
 	    echo "=====================================$$dir====================================="; \
 	    cd $$dir; \
-	    rm -f /tmp/gcov_cat.txt; \
 	    for file in *.c; do \
 	       if [ $$file != "test.c" ]; then \
 	           echo "Processing: $$dir/$$file"; \
