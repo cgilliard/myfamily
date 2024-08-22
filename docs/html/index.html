@@ -66,12 +66,52 @@ $(function() {
 <div class="title">My Family Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Welcome to the My Family Library Documentation.</p>
-<p>This is the main page of the documentation of the myfamily repo Library.</p>
-<p>For detailed information, refer to:</p><ul>
+<div class="textblock"><p>Welcome to the My Family Documentation.</p>
+<p>For module level documentation, refer to:</p><ul>
 <li><a class="el" href="group__core.html#core">Core Library Documentation</a></li>
-<li><a class="el" href="dir_5c982d53a68cdbcd421152b4020263a9.html">Main Executable Documentation</a> </li>
+<li><a class="el" href="dir_5c982d53a68cdbcd421152b4020263a9.html">Main Executable Documentation</a></li>
 </ul>
+<h1><a class="anchor" id="Build"></a>
+Build</h1>
+<p>1.) Prerequisites</p><ul>
+<li>make</li>
+<li>gcc or cc (clang)</li>
+<li>bash (build scripts including in makefile)</li>
+<li>perl (replacing parameters in the configure script)</li>
+</ul>
+<p>Optional: (for test and documentation only)</p>
+<ul>
+<li>doxygen - to build docs (<a href="https://www.doxygen.nl/index.html">https://www.doxygen.nl/index.html</a>)</li>
+<li>criterion - to run tests (<a href="https://github.com/Snaipe/Criterion">https://github.com/Snaipe/Criterion</a>)</li>
+</ul>
+<p>2.) Configure</p>
+<div class="fragment"><div class="line"><span class="preprocessor"># ./configure</span></div>
+</div><!-- fragment --><p>If you want to be able to run the tests, and the criterion library/include directories are not in your search pathes, specify the location of your criterion headers and libs as shown below.</p>
+<div class="fragment"><div class="line"><span class="preprocessor"># ./configure --with-criterion-include=&lt;path/to/criterion/include/dir&gt; \</span></div>
+<div class="line"><span class="preprocessor">             --with-criterion-lib=&lt;path/to/criterion/lib/dir&gt;</span></div>
+</div><!-- fragment --><p>This might look something like this: </p><div class="fragment"><div class="line"><span class="preprocessor"># ./configure \</span></div>
+<div class="line"><span class="preprocessor">--with-criterion-lib=/Users/USERNAME/homebrew/Cellar/criterion/2.4.2/lib \</span></div>
+<div class="line"><span class="preprocessor">--with-criterion-include=/Users/USERNAME/homebrew/Cellar/criterion/2.4.2/include</span></div>
+</div><!-- fragment --><p> 3.) Build</p>
+<div class="fragment"><div class="line"><span class="preprocessor"># make</span></div>
+</div><!-- fragment --><p>4.) Install </p><div class="fragment"><div class="line"><span class="preprocessor"># sudo make install</span></div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md2"></a>
+Documentation</h1>
+<p>To build the documentation run the following command:</p>
+<div class="fragment"><div class="line"><span class="preprocessor"># make doc</span></div>
+</div><!-- fragment --><p>Documentation will be placed in the /doc directory.</p>
+<h1><a class="anchor" id="autotoc_md3"></a>
+Tests</h1>
+<p>To run the tests, use the following command:</p>
+<div class="fragment"><div class="line"><span class="preprocessor"># make test</span></div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md4"></a>
+Code coverage</h1>
+<p>For code coverage, run the following command:</p>
+<div class="fragment"><div class="line"><span class="preprocessor"># make coverage</span></div>
+</div><!-- fragment --><p>A summary will be displayed after tests run. To view coverage of a specific file cd into its directory and run the gcov command. For example, for <a class="el" href="heap_8c.html">heap.c</a></p>
+<div class="fragment"><div class="line"><span class="preprocessor"># cd core</span></div>
+<div class="line"><span class="preprocessor"># gcov heap.c</span></div>
+</div><!-- fragment --><p>The result will be stored in the heap.c.gcov file. Additional code coverage reporting is available by clicking on the documentation link from the repo's README. </p>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->
