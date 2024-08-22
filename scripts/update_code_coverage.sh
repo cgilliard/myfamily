@@ -42,3 +42,6 @@ perl -pi -e 's/REPLACECOVERAGE/$ENV{coverage}/g' docs/code_coverage.html
 perl -pi -e 's/REPLACETIMESTAMP/$ENV{timestampsv}/g' docs/code_coverage.html
 perl -pi -e 's/REPLACELINES/$ENV{linesrep}/g' docs/code_coverage.html
 perl -pi -e 's/REPLACECCLINES/$ENV{coveredrep}/g' docs/code_coverage.html
+
+cp README.md.template README.md
+perl -pi -e 's/CODE_COVERAGE/$ENV{cc_final}/g' README.md

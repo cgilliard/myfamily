@@ -13,3 +13,4 @@
 // limitations under the License.
 
 #include <core/heap.h>
+#include <core/panic.h>

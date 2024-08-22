@@ -17,6 +17,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+bool __debug_no_exit = false;
+
 void panic(const char *fmt, ...) {
 	va_list args;
 
@@ -26,5 +28,7 @@ void panic(const char *fmt, ...) {
 	va_end(args);
 	fprintf(stderr, "\n");
 
-	exit(-1);
+	// clang-format off
+	if (!__debug_no_exit) { exit(-1); } else { printf("simulated panic!\n"); }
+	// clang-format on
 }

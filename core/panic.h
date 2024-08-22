@@ -15,6 +15,12 @@
 #ifndef _CORE_PANIC__
 #define _CORE_PANIC__
 
-void panic(const char *format, ...) __attribute__((noreturn));
+#include <core/types.h>
+
+#ifdef TEST
+extern bool __debug_no_exit;
+#endif // TEST
+
+void panic(const char *format, ...);
 
 #endif // _CORE_PANIC__

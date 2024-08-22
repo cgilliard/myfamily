@@ -544,3 +544,10 @@ Test(core, test_invalid_heap_configurations) {
 
 	cr_assert_eq(__malloc_count, __free_count);
 }
+
+Test(core, test_panic) {
+	__debug_no_exit = true;
+	panic("this will not exit\n");
+	printf("post\n");
+	//__debug_no_exit = false;
+}
