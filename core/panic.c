@@ -19,6 +19,15 @@
 
 bool __debug_no_exit = false;
 
+#define EXIT_IF_NOT_TEST()                                                     \
+	({                                                                     \
+		if (!__debug_no_exit) {                                        \
+			exit(-1);                                              \
+		} else {                                                       \
+			printf("simulated panic!\n");                          \
+		}                                                              \
+	})
+
 void panic(const char *fmt, ...) {
 	va_list args;
 
@@ -28,7 +37,5 @@ void panic(const char *fmt, ...) {
 	va_end(args);
 	fprintf(stderr, "\n");
 
-	// clang-format off
-	if (!__debug_no_exit) { exit(-1); } else { printf("simulated panic!\n"); }
-	// clang-format on
+	EXIT_IF_NOT_TEST();
 }

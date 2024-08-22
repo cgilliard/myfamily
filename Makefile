@@ -49,12 +49,12 @@ define run_tests
         linessum=0; \
         coveredsum=0; \
         for dir in  $(SUBDIRS); do \
-	    echo "=======$$dir======="; \
+	    echo "=====================================$$dir====================================="; \
 	    cd $$dir; \
 	    rm -f /tmp/gcov_cat.txt; \
 	    for file in *.c; do \
 	       if [ $$file != "test.c" ]; then \
-	           echo $$dir/$$file; \
+	           echo "Processing: $$dir/$$file"; \
                    gcno_file="$${file%.c}.gcno"; \
 		   if [ -f "$$gcno_file" ]; then \
 		       percent=`gcov $$file | grep "^Lines" | head -1 | cut -f2 -d ' ' | cut -f2 -d ':' | cut -f1 -d '%' | tr -d \\n`; \
@@ -63,16 +63,23 @@ define run_tests
 		       fi; \
                        lines=`gcov $$file | grep "^Lines" | head -1 | cut -f4 -d ' ' | tr -d \\n`; \
 		       gcov_file="$$file.gcov"; \
-		       cat $$gcov_file >> /tmp/gcov_cat.txt; \
-		       if [ "$$lines" == "" ]; then \
-                           lines=0; \
-                       fi; \
-		       ratio=`awk "BEGIN {print $$percent / 100}"`; \
-		       covered=`awk "BEGIN {print int($$ratio * $$lines)}"`; \
-		       linessum=`awk "BEGIN {print $$linessum + $$lines}"`; \
-                       coveredsum=`awk "BEGIN {print $$coveredsum + $$covered}"`; \
-		       echo "Results for $$file. percent=$$percent%. lines=$$lines. ratio=$$ratio. covered=$$covered."; \
+		       if [ -f "$$file.gcov" ]; then \
+		           cat $$gcov_file >> /tmp/gcov_cat.txt; \
+		           if [ "$$lines" == "" ]; then \
+                               lines=0; \
+                           fi; \
+		           ratio=`awk "BEGIN {print $$percent / 100}"`; \
+		           covered=`awk "BEGIN {print int($$ratio * $$lines)}"`; \
+		           linessum=`awk "BEGIN {print $$linessum + $$lines}"`; \
+                           coveredsum=`awk "BEGIN {print $$coveredsum + $$covered}"`; \
+		           echo "-->Results for $$file. percent=$$percent%. lines=$$lines. ratio=$$ratio. covered=$$covered."; \
+		       else \
+                           echo "-->No gcov file for $$file. Not including in results."; \
+		       fi; \
+		   else \
+		       echo "-->No gcno file for $$file. Not including in results."; \
 		   fi; \
+		   echo "------------------------------------------------------------------------------"; \
                fi; \
 	    done; \
 	    cd ..; \
@@ -80,7 +87,7 @@ define run_tests
         codecov=`awk "BEGIN {print 100 * $$coveredsum / $$linessum}"` \
         codecov=`printf "%.2f" $$codecov`; \
 	echo "$$codecov" > /tmp/cc_final; \
-	echo "=========================SUMMARY============================="; \
+	echo "===================================SUMMARY===================================="; \
 	timestamp=$$(date +%s); \
         echo "CodeCoverage=$$codecov%, CoveredLines=($$coveredsum of $$linessum)."; \
 	echo "$$timestamp $$codecov $$coveredsum $$linessum" > /tmp/codecov; \
