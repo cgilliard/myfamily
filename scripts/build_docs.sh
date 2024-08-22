@@ -11,6 +11,9 @@ cp -rp ../doc/html/* docs/html
 
 ./configure
 make clean coverage
+# append code cov numbers to our running totals
+cat /tmp/codecov >> docs/cc.txt
+./scripts/update_code_coverage.sh
 
 git config user.name "Pipelines-Bot"
 git checkout main

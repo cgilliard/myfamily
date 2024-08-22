@@ -77,7 +77,9 @@ define run_tests
         codecov=`awk "BEGIN {print 100 * $$coveredsum / $$linessum}"` \
         codecov=`printf "%.2f" $$codecov`; \
 	echo "=========================SUMMARY============================="; \
-	echo "CodeCoverage=$$codecov%, CoveredLines=($$coveredsum of $$linessum)."; \
+	timestamp=$$(date +%s); \
+        echo "CodeCoverage=$$codecov%, CoveredLines=($$coveredsum of $$linessum)."; \
+	echo "$$timestamp $$codecov $$coveredsum $$linessum" > /tmp/codecov; \
     fi; \
     exit $$ERROR
 endef
