@@ -1,3 +1,4 @@
-Documentation for this repo can be found below:
+Documentation for myfamily can be found below.
 
-Coming soon!
+* [Home](https://cgilliard.github.io/myfamily/html/index.html)
+
