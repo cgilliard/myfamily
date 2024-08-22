@@ -9,7 +9,8 @@ var searchData=
   ['_5f_5fdebug_5fbuild_5fallocator_5fmalloc_5ffail6_6',['__debug_build_allocator_malloc_fail6',['../heap_8c.html#a58332362efbb9d34a902c7df25a93a39',1,'heap.c']]],
   ['_5f_5fdebug_5fbuild_5fallocator_5fmalloc_5ffail7_7',['__debug_build_allocator_malloc_fail7',['../heap_8c.html#a790212b6c0b6f258af46d8e1acc24c1d',1,'heap.c']]],
   ['_5f_5fdebug_5fbuild_5fallocator_5fmalloc_5ffail8_8',['__debug_build_allocator_malloc_fail8',['../heap_8c.html#ae458b8744a7596e3c3c439a63be3efa3',1,'heap.c']]],
-  ['_5f_5ffree_5fcount_9',['__free_count',['../heap_8c.html#acedf25d2c9abb87fcc1f7e4f20f36d0d',1,'heap.c']]],
-  ['_5f_5fmalloc_5fcount_10',['__malloc_count',['../heap_8c.html#ac999b653db84b954b729e703994387f3',1,'heap.c']]],
-  ['_5fposix_5fc_5fsource_11',['_POSIX_C_SOURCE',['../toml_8c.html#a3024ccd4a9af5109d24e6c57565d74a1',1,'toml.c']]]
+  ['_5f_5fdebug_5fno_5fexit_9',['__debug_no_exit',['../panic_8c.html#afdcc37888c474e6afc2a4a3e2fd3c9ef',1,'panic.c']]],
+  ['_5f_5ffree_5fcount_10',['__free_count',['../heap_8c.html#acedf25d2c9abb87fcc1f7e4f20f36d0d',1,'heap.c']]],
+  ['_5f_5fmalloc_5fcount_11',['__malloc_count',['../heap_8c.html#ac999b653db84b954b729e703994387f3',1,'heap.c']]],
+  ['_5fposix_5fc_5fsource_12',['_POSIX_C_SOURCE',['../toml_8c.html#a3024ccd4a9af5109d24e6c57565d74a1',1,'toml.c']]]
 ];

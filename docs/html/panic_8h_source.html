@@ -87,10 +87,18 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _CORE_PANIC__</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _CORE_PANIC__</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keywordtype">void</span> <a class="code" href="panic_8h.html#a17027d9289ef25f7899d1d35d3e59893">panic</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *format, ...) __attribute__((noreturn));</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">core/types.h</a>&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_PANIC__</span></div>
-<div class="ttc" id="apanic_8h_html_a17027d9289ef25f7899d1d35d3e59893"><div class="ttname"><a href="panic_8h.html#a17027d9289ef25f7899d1d35d3e59893">panic</a></div><div class="ttdeci">void panic(const char *format,...) __attribute__((noreturn))</div><div class="ttdef"><b>Definition:</b> panic.c:20</div></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#ifdef TEST</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">bool</span> <a class="code" href="panic_8c.html#afdcc37888c474e6afc2a4a3e2fd3c9ef">__debug_no_exit</a>;</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// TEST</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keywordtype">void</span> <a class="code" href="panic_8h.html#a138d8879e47c08e2265c41d75e539f9b">panic</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *format, ...);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_PANIC__</span></div>
+<div class="ttc" id="apanic_8c_html_afdcc37888c474e6afc2a4a3e2fd3c9ef"><div class="ttname"><a href="panic_8c.html#afdcc37888c474e6afc2a4a3e2fd3c9ef">__debug_no_exit</a></div><div class="ttdeci">bool __debug_no_exit</div><div class="ttdef"><b>Definition:</b> panic.c:20</div></div>
+<div class="ttc" id="apanic_8h_html_a138d8879e47c08e2265c41d75e539f9b"><div class="ttname"><a href="panic_8h.html#a138d8879e47c08e2265c41d75e539f9b">panic</a></div><div class="ttdeci">void panic(const char *format,...)</div><div class="ttdef"><b>Definition:</b> panic.c:22</div></div>
+<div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		 <p align="center">
-                        Code Coverage is currently 17.11%.
+                        Code Coverage is currently 15.92%.
                 </p>
 		<center>
 			<div class="chart">
@@ -60,19 +60,23 @@
 			let raw_data = [16.67,
 15.45,
 15.45,
-15.45,];
+15.45,
+15.92,];
 			let labels = [format_date(1724296044 * 1000 ),
 format_date(1724297686 * 1000 ),
 format_date(1724303299 * 1000 ),
-format_date(1724310067 * 1000 ),];
+format_date(1724310067 * 1000 ),
+format_date(1724342762 * 1000 ),];
 			let raw_data2 = [1752,
 1638,
 1638,
-1638,];
+1638,
+1639,];
                         let raw_data3 = [292,
 253,
 253,
-253,];
+253,
+261,];
 
 			const data = {
 				labels: labels,
@@ -130,7 +134,6 @@ format_date(1724310067 * 1000 ),];
         -:    0:Graph:heap.gcno
         -:    0:Data:heap.gcda
         -:    0:Runs:12
-        -:    0:Programs:1
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -227,10 +230,10 @@ format_date(1724310067 * 1000 ),];
        28:   94:		if (index == 0)
        18:   95:			tmp = do_malloc(sizeof(u32) * slabs);
         -:   96:		else {
-       20:   97:			tmp = do_realloc(hd->free_list,
+       10:   97:			tmp = do_realloc(hd->free_list,
        10:   98:					 sizeof(u32) * (hd->cur_slabs + slabs));
         -:   99:		}
-       28:  100:	}
+        -:  100:	}
         -:  101:
        30:  102:	if (!tmp) {
         2:  103:		do_free(hd->data[index]);
@@ -246,24 +249,24 @@ format_date(1724310067 * 1000 ),];
        27:  113:			hd->free_list[i + offset] = UINT32_MAX;
         -:  114:		else
       381:  115:			hd->free_list[i + offset] = offset + i + 1;
-      408:  116:	}
+        -:  116:	}
         -:  117:
        28:  118:	return 0;
-       32:  119:}
+        -:  119:}
         -:  120:
         -:  121:// compare function used for sorting.
-        4:  122:int heap_data_compare(const void *p1, const void *p2) {
-        4:  123:	int ret = 0;
+        5:  122:int heap_data_compare(const void *p1, const void *p2) {
+        5:  123:	int ret = 0;
         -:  124:
-        4:  125:	HeapData d1 = *(HeapData *)p1;
-        4:  126:	HeapData d2 = *(HeapData *)p2;
+        5:  125:	HeapData d1 = *(HeapData *)p1;
+        5:  126:	HeapData d2 = *(HeapData *)p2;
         -:  127:
-        4:  128:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
+        5:  128:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
         1:  129:		ret = 1;
-        3:  130:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
-        2:  131:		ret = -1;
+        4:  130:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
+        3:  131:		ret = -1;
         -:  132:
-        4:  133:	return ret;
+        5:  133:	return ret;
         -:  134:}
         -:  135:
         -:  136:// initialize the heap data params
@@ -295,31 +298,31 @@ format_date(1724310067 * 1000 ),];
         -:  162:
         -:  163:		// set cur_slabs value
        19:  164:		ptr->impl->hd_arr[index].cur_slabs =
-       38:  165:		    ptr->impl->hd_arr[index].hdp.config.initial_chunks *
+       19:  165:		    ptr->impl->hd_arr[index].hdp.config.initial_chunks *
        19:  166:		    ptr->impl->hd_arr[index].hdp.config.slabs_per_resize;
         -:  167:
         -:  168:		// initialize the initial_chunks of the free list
        19:  169:		bool last_is_uint_max = false;
        19:  170:		ptr->impl->hd_arr[index].free_list = NULL;
-       39:  171:		for (u64 i = 0;
+       19:  171:		for (u64 i = 0;
        39:  172:		     i < ptr->impl->hd_arr[index].hdp.config.initial_chunks;
        20:  173:		     i++) {
         -:  174:
-       40:  175:			if (i ==
+       20:  175:			if (i ==
        20:  176:			    ptr->impl->hd_arr[index].hdp.config.initial_chunks -
         -:  177:				1)
        19:  178:				last_is_uint_max = true;
        20:  179:			if (heap_allocator_init_free_list(
        20:  180:				&ptr->impl->hd_arr[index], i,
        20:  181:				ptr->impl->hd_arr[index]
-       20:  182:				    .hdp.config.slabs_per_resize,
-       20:  183:				last_is_uint_max))
+        -:  182:				    .hdp.config.slabs_per_resize,
+        -:  183:				last_is_uint_max))
         2:  184:				ret = -1;
-       20:  185:		}
-       19:  186:	} else
+        -:  185:		}
+        -:  186:	} else
         3:  187:		ptr->impl->hd_arr[index].data = NULL;
        22:  188:	return ret;
-       23:  189:}
+        -:  189:}
         -:  190:
        24:  191:int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
         -:  192:			 int heap_data_params_count, ...) {
@@ -359,22 +362,22 @@ format_date(1724310067 * 1000 ),];
        24:  226:		HeapDataParamsConfig hdp = va_arg(hdps, HeapDataParamsConfig);
        24:  227:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
        24:  228:		ptr->impl->hd_arr[i].data = NULL;
-       24:  229:		if ((__debug_build_allocator_malloc_fail3 && i > 0) ||
-       24:  230:		    heap_allocator_init_hdp(ptr, &hdp, i)) {
+       47:  229:		if ((__debug_build_allocator_malloc_fail3 && i > 0) ||
+       23:  230:		    heap_allocator_init_hdp(ptr, &hdp, i)) {
         4:  231:			ptr->impl->hd_size = i; // update for cleanup, others
         -:  232:						// did not get allocated
         4:  233:			if (ptr->impl->hd_arr[i].data) {
         2:  234:				do_free(ptr->impl->hd_arr[i].data);
-        2:  235:			}
+        -:  235:			}
         4:  236:			heap_allocator_cleanup(ptr);
         4:  237:			return -1;
         -:  238:		}
-       20:  239:	}
+        -:  239:	}
         -:  240:
        17:  241:	if (heap_data_params_count) {
        15:  242:		qsort(ptr->impl->hd_arr, heap_data_params_count,
         -:  243:		      sizeof(HeapData), heap_data_compare);
-       15:  244:	}
+        -:  244:	}
         -:  245:
         -:  246:	// check invalid configurations
        17:  247:	u64 last_size = 0;
@@ -393,12 +396,12 @@ format_date(1724310067 * 1000 ),];
         1:  260:			return -1;
         -:  261:		}
        17:  262:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
-       17:  263:	}
+        -:  263:	}
         -:  264:
        15:  265:	va_end(hdps);
         -:  266:
        15:  267:	return 0;
-       24:  268:}
+        -:  268:}
         -:  269:
         -:  270:// binary search for the correct slab size
       390:  271:int heap_allocator_index(HeapAllocator *ptr, u64 size) {
@@ -426,7 +429,7 @@ format_date(1724310067 * 1000 ),];
         -:  293:	}
         -:  294:
       359:  295:	return ret;
-      390:  296:}
+        -:  296:}
         -:  297:
        20:  298:int heap_data_resize(u64 index, HeapData *hd) {
         -:  299:	// check that we can resize this hdp
@@ -449,7 +452,7 @@ format_date(1724310067 * 1000 ),];
         -:  316:			else
         1:  317:				tmp = do_malloc((hd->count + 1) *
         -:  318:						sizeof(void **));
-       12:  319:		}
+        -:  319:		}
         -:  320:
        13:  321:		if (tmp == NULL)
         1:  322:			return -1;
@@ -465,7 +468,7 @@ format_date(1724310067 * 1000 ),];
        10:  332:		return 0;
         -:  333:	}
         7:  334:	return -1;
-       20:  335:}
+        -:  335:}
         -:  336:
       389:  337:int heap_data_allocate(u64 index, HeapData *hd, FatPtr *fptr) {
       389:  338:	if (hd->cur_slabs == 0) {
@@ -473,7 +476,7 @@ format_date(1724310067 * 1000 ),];
         -:  340:		// resize it
         2:  341:		if (heap_data_resize(index, hd))
         1:  342:			return -1;
-        1:  343:	}
+        -:  343:	}
         -:  344:
         -:  345:	// no more slabs, return error
       388:  346:	if (hd->hdp.free_list_head == UINT32_MAX)
@@ -497,7 +500,7 @@ format_date(1724310067 * 1000 ),];
       371:  364:	    hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
         -:  365:
       371:  366:	return 0;
-      389:  367:}
+        -:  367:}
         -:  368:
         -:  369:// free data in this HeapData
       121:  370:int heap_data_free(u64 index, HeapData *hd, FatPtr *fptr) {
@@ -513,7 +516,7 @@ format_date(1724310067 * 1000 ),];
       120:  380:	hd->free_list[rel] = head;
         -:  381:
       120:  382:	return 0;
-      121:  383:}
+        -:  383:}
         -:  384:
         -:  385:// main allocation function
       390:  386:int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr) {
@@ -530,13 +533,13 @@ format_date(1724310067 * 1000 ),];
         8:  397:			if (fptr->data == NULL) {
         1:  398:				fptr->len = 0;
         1:  399:				ret = -1;
-        1:  400:			} else {
+        -:  400:			} else {
         7:  401:				fptr->len = size;
         7:  402:				fptr->id = UINT64_MAX;
         7:  403:				ret = 0;
         -:  404:			}
-        8:  405:		}
-       10:  406:	} else {
+        -:  405:		}
+        -:  406:	} else {
       380:  407:		HeapData *hd = &ptr->impl->hd_arr[index];
       380:  408:		ret = heap_data_allocate(index, hd, fptr);
       380:  409:		if (ret) {
@@ -545,7 +548,7 @@ format_date(1724310067 * 1000 ),];
         -:  412:				// successful resize, allocate should always
         -:  413:				// succeed here
         9:  414:				ret = heap_data_allocate(index, hd, fptr);
-       18:  415:			} else if (!ptr->impl->config.no_malloc) {
+        9:  415:			} else if (!ptr->impl->config.no_malloc) {
         -:  416:				// could not allocate, so we fall back to malloc
         -:  417:				// if configured
         4:  418:				fptr->data = NULL;
@@ -554,20 +557,20 @@ format_date(1724310067 * 1000 ),];
         4:  421:				if (fptr->data == NULL) {
         1:  422:					fptr->len = 0;
         1:  423:					ret = -1;
-        1:  424:				} else {
+        -:  424:				} else {
         3:  425:					fptr->len = size;
         3:  426:					fptr->id = UINT64_MAX;
         3:  427:					ret = 0;
         -:  428:				}
-        4:  429:			}
-       18:  430:		}
+        -:  429:			}
+        -:  430:		}
         -:  431:	}
         -:  432:
       390:  433:	if (!ret && ptr->impl->config.zeroed) {
       924:  434:		for (u64 i = 0; i < fptr->len; i++) {
       880:  435:			((char *)fptr->data)[i] = 0;
-      880:  436:		}
-       44:  437:	}
+        -:  436:		}
+        -:  437:	}
         -:  438:
       390:  439:	return ret;
         -:  440:}
@@ -580,17 +583,17 @@ format_date(1724310067 * 1000 ),];
        10:  447:		if (fptr->data) {
        10:  448:			do_free(fptr->data);
        10:  449:			fptr->data = NULL;
-       10:  450:		}
+        -:  450:		}
         -:  451:
        10:  452:		ret = 0;
-       10:  453:	} else {
+        -:  453:	} else {
         -:  454:
       122:  455:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
         -:  456:
       122:  457:		if (index >= ptr->impl->hd_size) {
         1:  458:			errno = EINVAL;
         1:  459:			ret = -1; // invalid index
-        1:  460:		} else {
+        -:  460:		} else {
       121:  461:			HeapData *hd = &ptr->impl->hd_arr[index];
       121:  462:			ret = heap_data_free(index, hd, fptr);
         -:  463:		}
@@ -599,8 +602,8 @@ format_date(1724310067 * 1000 ),];
       132:  466:	if (!ret && ptr->impl->config.zeroed) {
        17:  467:		for (u64 i = 0; i < fptr->len; i++) {
        16:  468:			((char *)fptr->data)[i] = 0;
-       16:  469:		}
-        1:  470:	}
+        -:  469:		}
+        -:  470:	}
         -:  471:
       132:  472:	return ret;
         -:  473:}
@@ -614,32 +617,31 @@ format_date(1724310067 * 1000 ),];
        18:  481:				if (ptr->impl->hd_arr[i].free_list) {
        18:  482:					do_free(ptr->impl->hd_arr[i].free_list);
        18:  483:					ptr->impl->hd_arr[i].free_list = NULL;
-       18:  484:				}
+        -:  484:				}
        46:  485:				for (u64 j = 0; j < ptr->impl->hd_arr[i].count;
        28:  486:				     j++) {
        28:  487:					do_free(ptr->impl->hd_arr[i].data[j]);
-       28:  488:				}
+        -:  488:				}
        18:  489:				if (ptr->impl->hd_arr[i].data) {
        18:  490:					do_free(ptr->impl->hd_arr[i].data);
        18:  491:					ptr->impl->hd_arr[i].data = NULL;
-       18:  492:				}
-       18:  493:			}
-       20:  494:		}
+        -:  492:				}
+        -:  493:			}
+        -:  494:		}
         -:  495:
        22:  496:		if (ptr->impl->hd_arr) {
        21:  497:			do_free(ptr->impl->hd_arr);
        21:  498:			ptr->impl->hd_arr = NULL;
-       21:  499:		}
+        -:  499:		}
        22:  500:		do_free(ptr->impl);
        22:  501:		ptr->impl = NULL;
-       22:  502:	}
+        -:  502:	}
        25:  503:	return 0;
         -:  504:}
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
-        -:    0:Runs:1
-        -:    0:Programs:1
+        -:    0:Runs:12
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -671,7 +673,7 @@ format_date(1724310067 * 1000 ),];
         1:   29:	fprintf(stderr, "\n");
         -:   30:
         -:   31:	// clang-format off
-        1:   32:	if (!__debug_no_exit) { exit(-1); } else { printf("simulated panic!\n"); }
+       1*:   32:	if (!__debug_no_exit) { exit(-1); } else { printf("simulated panic!\n"); }
         -:   33:	// clang-format on
         1:   34:}</textarea>
 		</p>
