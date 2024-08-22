@@ -8,8 +8,9 @@ var searchData=
   ['comma_5fif_5fargs_21',['COMMA_IF_ARGS',['../macro__utils_8h.html#a370dbc5ee1e4129f160e4cd02d339bab',1,'macro_utils.h']]],
   ['config_22',['config',['../structHeapDataParams.html#af0bc0449c2881f8efc137e9852dd79c8',1,'HeapDataParams::config()'],['../structHeapAllocatorImpl.html#a09bf09b072bc6246ba1ce2f0f525bd89',1,'HeapAllocatorImpl::config()']]],
   ['context_5ft_23',['context_t',['../structcontext__t.html',1,'context_t'],['../toml_8c.html#afde0fcb21678582c657bc6d18032620f',1,'context_t():&#160;toml.c']]],
-  ['count_24',['count',['../structHeapData.html#a8dbec459ee643e06df1ac1707486f009',1,'HeapData']]],
-  ['count_5fargs_25',['COUNT_ARGS',['../macro__utils_8h.html#a0fd8db0ff0a0f357e7347ad233843085',1,'macro_utils.h']]],
-  ['cur_5fslabs_26',['cur_slabs',['../structHeapData.html#a3e798a7eabfba042bb3ec9c3d098e899',1,'HeapData']]],
-  ['curtab_27',['curtab',['../structcontext__t.html#af33e85ee4a26155836561b749623e1ea',1,'context_t']]]
+  ['core_20module_24',['Core Module',['../group__core.html',1,'(Global Namespace)'],['../md_core_README.html',1,'(Global Namespace)']]],
+  ['count_25',['count',['../structHeapData.html#a8dbec459ee643e06df1ac1707486f009',1,'HeapData']]],
+  ['count_5fargs_26',['COUNT_ARGS',['../macro__utils_8h.html#a0fd8db0ff0a0f357e7347ad233843085',1,'macro_utils.h']]],
+  ['cur_5fslabs_27',['cur_slabs',['../structHeapData.html#a3e798a7eabfba042bb3ec9c3d098e899',1,'HeapData']]],
+  ['curtab_28',['curtab',['../structcontext__t.html#af33e85ee4a26155836561b749623e1ea',1,'context_t']]]
 ];

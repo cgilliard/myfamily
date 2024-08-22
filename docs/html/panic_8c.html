@@ -67,6 +67,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -78,6 +79,11 @@ $(function() {
 <code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a43944fb6610e289ed9087bea8324f701"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8c.html#a43944fb6610e289ed9087bea8324f701">EXIT_IF_NOT_TEST</a>()</td></tr>
+<tr class="separator:a43944fb6610e289ed9087bea8324f701"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ad1f1a1dc0581a11b597453f148106393"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a> (const char *fmt,...)</td></tr>
@@ -88,6 +94,32 @@ Variables</h2></td></tr>
 <tr class="memitem:afdcc37888c474e6afc2a4a3e2fd3c9ef"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8c.html#afdcc37888c474e6afc2a4a3e2fd3c9ef">__debug_no_exit</a> = false</td></tr>
 <tr class="separator:afdcc37888c474e6afc2a4a3e2fd3c9ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a43944fb6610e289ed9087bea8324f701"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43944fb6610e289ed9087bea8324f701">&#9670;&nbsp;</a></span>EXIT_IF_NOT_TEST</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXIT_IF_NOT_TEST</td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                     \</div>
+<div class="line">        if (!<a class="code" href="panic_8c.html#afdcc37888c474e6afc2a4a3e2fd3c9ef">__debug_no_exit</a>) {                                        \</div>
+<div class="line">            exit(-1);                                              \</div>
+<div class="line">        } <span class="keywordflow">else</span> {                                                       \</div>
+<div class="line">            printf(<span class="stringliteral">&quot;simulated panic!\n&quot;</span>);                          \</div>
+<div class="line">        }                                                              \</div>
+<div class="line">    })</div>
+<div class="ttc" id="apanic_8c_html_afdcc37888c474e6afc2a4a3e2fd3c9ef"><div class="ttname"><a href="panic_8c.html#afdcc37888c474e6afc2a4a3e2fd3c9ef">__debug_no_exit</a></div><div class="ttdeci">bool __debug_no_exit</div><div class="ttdef"><b>Definition:</b> panic.c:20</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ad1f1a1dc0581a11b597453f148106393"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad1f1a1dc0581a11b597453f148106393">&#9670;&nbsp;</a></span>panic()</h2>
