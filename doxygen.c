@@ -7,5 +7,5 @@
  *
  * For detailed information, refer to:
  * - \ref core "Core Library Documentation"
- * - \ref main "Main Documentation"
+ * - \ref main "Main Executable Documentation"
  */
