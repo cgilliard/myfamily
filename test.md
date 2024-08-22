@@ -1,6 +1,6 @@
 # Test markdown page
 
-<div class="background-div">
+<div style="position: relative; width: 100%;">
     <div class="overlay"></div>
     <img class="myfamily" src="images/MyFamilyLogo.png"/>
 </div>
