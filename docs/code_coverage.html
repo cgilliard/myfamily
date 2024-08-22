@@ -62,23 +62,27 @@
 15.45,
 15.45,
 15.92,
+15.92,
 15.92,];
 			let labels = [format_date(1724296044 * 1000 ),
 format_date(1724297686 * 1000 ),
 format_date(1724303299 * 1000 ),
 format_date(1724310067 * 1000 ),
 format_date(1724342762 * 1000 ),
-format_date(1724342955 * 1000 ),];
+format_date(1724342955 * 1000 ),
+format_date(1724344312 * 1000 ),];
 			let raw_data2 = [1752,
 1638,
 1638,
 1638,
+1639,
 1639,
 1639,];
                         let raw_data3 = [292,
 253,
 253,
 253,
+261,
 261,
 261,];
 
@@ -667,19 +671,26 @@ format_date(1724342955 * 1000 ),];
         -:   19:
         -:   20:bool __debug_no_exit = false;
         -:   21:
-        1:   22:void panic(const char *fmt, ...) {
-        -:   23:	va_list args;
-        -:   24:
-        1:   25:	fprintf(stderr, "thread panicked: ");
-        1:   26:	va_start(args, fmt);
-        1:   27:	vfprintf(stderr, fmt, args);
-        1:   28:	va_end(args);
-        1:   29:	fprintf(stderr, "\n");
+        -:   22:#define EXIT_IF_NOT_TEST()                                                     \
+        -:   23:	({                                                                     \
+        -:   24:		if (!__debug_no_exit) {                                        \
+        -:   25:			exit(-1);                                              \
+        -:   26:		} else {                                                       \
+        -:   27:			printf("simulated panic!\n");                          \
+        -:   28:		}                                                              \
+        -:   29:	})
         -:   30:
-        -:   31:	// clang-format off
-       1*:   32:	if (!__debug_no_exit) { exit(-1); } else { printf("simulated panic!\n"); }
-        -:   33:	// clang-format on
-        1:   34:}</textarea>
+        1:   31:void panic(const char *fmt, ...) {
+        -:   32:	va_list args;
+        -:   33:
+        1:   34:	fprintf(stderr, "thread panicked: ");
+        1:   35:	va_start(args, fmt);
+        1:   36:	vfprintf(stderr, fmt, args);
+        1:   37:	va_end(args);
+        1:   38:	fprintf(stderr, "\n");
+        -:   39:
+       1*:   40:	EXIT_IF_NOT_TEST();
+        1:   41:}</textarea>
 		</p>
 	</body>
 </html>
