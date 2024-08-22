@@ -6,5 +6,6 @@ var searchData=
   ['do_5ffree_30',['do_free',['../heap_8c.html#ae4c3316e92e9e6f0a0d77937608397ff',1,'heap.c']]],
   ['do_5fmalloc_31',['do_malloc',['../heap_8c.html#a87531095daa9fb95b847158ed06e6873',1,'heap.c']]],
   ['do_5frealloc_32',['do_realloc',['../heap_8c.html#a75080a2b10c46ce029f300f13e9790a8',1,'heap.c']]],
-  ['dot_33',['DOT',['../toml_8c.html#a1cd5a977fc0e004b56371bd3d7555bada87fdcd2ffa8f71b49da9e0cfd4fb893f',1,'toml.c']]]
+  ['dot_33',['DOT',['../toml_8c.html#a1cd5a977fc0e004b56371bd3d7555bada87fdcd2ffa8f71b49da9e0cfd4fb893f',1,'toml.c']]],
+  ['doxygen_2ec_34',['doxygen.c',['../doxygen_8c.html',1,'']]]
 ];
