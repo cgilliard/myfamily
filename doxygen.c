@@ -9,4 +9,3 @@
  * - \ref core "Core Library Documentation"
  * - \ref main "Main Documentation"
  */
-
