@@ -1,7 +1,8 @@
-                <section class="background-div">
+# Test markdown page
+                <div class="background-div">
                         <div class="overlay"></div>
                         <img class="myfamily" src="images/MyFamilyLogo.png">
-                </section>
+                </div>
                 <div style="width: 70%; padding-left: 15%; padding-top: 20px;">
                         “Just as a body, though one, has many parts, but all its many parts form one body, so it is with Christ. For we were all baptized by one Spirit so as to form one body—whether Jews or Gentiles, slave or free—and we were all given the one Spirit to drink. Even so the body is not made up of one part but of many”.
                 </div>
