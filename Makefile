@@ -51,6 +51,7 @@ define run_tests
         for dir in  $(SUBDIRS); do \
 	    echo "=======$$dir======="; \
 	    cd $$dir; \
+	    rm -f /tmp/gcov_cat.txt; \
 	    for file in *.c; do \
 	       if [ $$file != "test.c" ]; then \
 	           echo $$dir/$$file; \
@@ -61,6 +62,8 @@ define run_tests
 		           percent=0.00; \
 		       fi; \
                        lines=`gcov $$file | grep "^Lines" | head -1 | cut -f4 -d ' ' | tr -d \\n`; \
+		       gcov_file="$$file.gcov"; \
+		       cat $$gcov_file >> /tmp/gcov_cat.txt; \
 		       if [ "$$lines" == "" ]; then \
                            lines=0; \
                        fi; \
@@ -76,6 +79,7 @@ define run_tests
 	done; \
         codecov=`awk "BEGIN {print 100 * $$coveredsum / $$linessum}"` \
         codecov=`printf "%.2f" $$codecov`; \
+	echo "$$codecov" > /tmp/cc_final; \
 	echo "=========================SUMMARY============================="; \
 	timestamp=$$(date +%s); \
         echo "CodeCoverage=$$codecov%, CoveredLines=($$coveredsum of $$linessum)."; \
