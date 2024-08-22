@@ -4,10 +4,6 @@
 [![Code Coverage](https://img.shields.io/static/v1?label=Code%20Coverage&message=15.92%&color=purple)](https://cgilliard.github.io/myfamily/code_coverage.html)
 [![License](https://img.shields.io/github/license/cgilliard/bitcoinmw.svg)](https://github.com/cgilliard/bitcoinmw/blob/master/LICENSE)
 
-# Overview
-
-My family is a work in progress.
-
 <div>
     <img class="myfamily" src="images/MyFamilyLogo.png"/>
 </div>
