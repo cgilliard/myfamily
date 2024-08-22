@@ -1,3 +1,21 @@
 #!/bin/bash
 
-echo "build docs";
+echo "Building docs";
+make doc
+git clone https://anything:$1@github.com/cgilliard/myfamily.git myfamilydocs
+cd myfamilydocs
+
+rm -rf docs/html/*
+cp -rp ../doc/html/* docs/html
+
+
+./configure
+make clean coverage
+
+git config user.name "Pipelines-Bot"
+git checkout main
+git config user.email "pipelinesbot.noreply@example.com"
+git config user.name "Pipelines-Bot"
+git add --all
+git commit -am "Pipelines-Bot: Updated repo (via build_docs script) Source Version is $2";
+git push https://$1@github.com/cgilliard/myfamily.git
