@@ -552,7 +552,6 @@ Test(core, test_panic) {
 }
 
 Test(core, test_chained_allocator) {
-	/*
 	// build 2 slab allocators with varying size slabs
 	HeapAllocator ha, ha2;
 	FatPtr ptr;
@@ -570,6 +569,7 @@ Test(core, test_chained_allocator) {
 				      {64, 10, 0, UINT32_MAX}};
 	set_default_hdpc_arr(arr, sizeof(arr) / sizeof(arr[0]));
 
+	/*
 	// allocate before adding these allocators to the chain should get a
 	// 48 byte block because the default heap allocator uses slabs that
 	// are 16 bytes apart in size.
