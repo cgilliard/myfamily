@@ -569,7 +569,6 @@ Test(core, test_chained_allocator) {
 				      {64, 10, 0, UINT32_MAX}};
 	set_default_hdpc_arr(arr, sizeof(arr) / sizeof(arr[0]));
 
-	/*
 	// allocate before adding these allocators to the chain should get a
 	// 48 byte block because the default heap allocator uses slabs that
 	// are 16 bytes apart in size.
@@ -664,5 +663,6 @@ Test(core, test_chained_allocator) {
 
 	global_sync_allocator_cleanup();
 	thread_local_allocator_cleanup();
-	*/
+	heap_allocator_cleanup(&ha);
+	heap_allocator_cleanup(&ha2);
 }
