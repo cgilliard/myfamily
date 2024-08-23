@@ -74,6 +74,19 @@ _Thread_local ChainGuardEntry
     __thread_local_chain_allocator[MAX_CHAIN_ALLOCATOR_DEPTH];
 _Thread_local u64 __thread_local_chain_allocator_index = 0;
 
+void thread_local_allocator_cleanup() {
+	if (__thread_local_chain_allocator_index > 0)
+		heap_allocator_cleanup(
+		    __thread_local_chain_allocator
+			[__thread_local_chain_allocator_index]
+			    .ha);
+}
+
+void global_sync_allocator_cleanup() {
+	if (__global_sync_allocator != NULL)
+		heap_allocator_cleanup(__global_sync_allocator);
+}
+
 void chain_guard_cleanup(ChainGuard *ptr) {
 	__thread_local_chain_allocator_index--;
 }

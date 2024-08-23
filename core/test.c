@@ -645,7 +645,6 @@ Test(core, test_chained_allocator) {
 	cr_assert_eq(chain_malloc(&ptr, 16), 0);
 	cr_assert_eq(fat_ptr_len(&ptr), 16);
 	char *data, *data2;
-	;
 
 	data = fat_ptr_data(&ptr);
 	for (int i = 0; i < 16; i++) {
@@ -661,4 +660,7 @@ Test(core, test_chained_allocator) {
 		cr_assert_eq(data[i], i);
 	}
 	chain_free(&ptr2);
+
+	global_sync_allocator_cleanup();
+	thread_local_allocator_cleanup();
 }

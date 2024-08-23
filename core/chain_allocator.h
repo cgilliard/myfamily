@@ -157,6 +157,16 @@ int chain_realloc(FatPtr *dst, FatPtr *src, u64 size);
  */
 int chain_free(FatPtr *ptr);
 
+/**
+ * Cleans up the global sync allocator. This is mostly required for tests.
+ */
+void global_sync_allocator_cleanup();
+
+/**
+ * Cleans up the thread local allocator. This is mostly required for tests.
+ */
+void thread_local_allocator_cleanup();
+
 #define SCOPED_ALLOCATOR(ha, is_sync)                                          \
 	({                                                                     \
 		ChainConfig _cfg__ = {ha, is_sync};                            \
