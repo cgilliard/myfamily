@@ -138,9 +138,31 @@ typedef struct HeapAllocator {
  * @see [heap_allocator_allocate]
  * @see [heap_allocator_free]
  * @see [heap_allocator_cleanup]
+ * @see [heap_allocator_build_arr]
  */
 int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
 			 int heap_data_params_count, ...);
+
+/**
+ * Builds a heap_allocator based on the specified #HeapAllocatorConfig and
+ * #HeapDataParamsConfig configurations. This is the array based version of
+ * build.
+ * @param ptr A pointer to the location where the #HeapAllocator to be
+ * configured is stored. This pointer must not be NULL.
+ * @param config The configuration for this #HeapAllocator.
+ * @param arr The array of HeapDataParamsConfigs which specify this
+ * HeapAllocator.
+ * @param heap_data_params_count The number of variadic arguments being
+ * passed to this function.
+ * @return 0 on success -1 on error with the appropriate errno value set.
+ * @see [heap_allocator_allocate]
+ * @see [heap_allocator_free]
+ * @see [heap_allocator_cleanup]
+ * @see [heap_allocator_build]
+ */
+int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
+			     HeapDataParamsConfig arr[],
+			     u64 heap_data_params_count);
 
 /**
  * Allocates a #FatPtr from the #HeapAllocator (if possible). Note that
@@ -201,6 +223,19 @@ void *fat_ptr_data(FatPtr *ptr);
  * @see [fat_ptr_data]
  */
 u64 fat_ptr_len(FatPtr *ptr);
+
+#define HA_CONFIG_DEFAULT                                                      \
+	{ false, false }
+#define HAP_CONFIG(slab_size, slabs_per_resize, initial_chunks, max_slabs)     \
+	({                                                                     \
+		HeapDataParamsConfig _ret__ = {                                \
+		    slab_size,                                                 \
+		    slabs_per_resize,                                          \
+		    initial_chunks,                                            \
+		    max_slabs,                                                 \
+		};                                                             \
+		_ret__;                                                        \
+	})
 
 // make some private functions/variables visible for tests
 #ifdef TEST

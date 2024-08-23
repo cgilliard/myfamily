@@ -12,5 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/chain_allocator.h>
 #include <core/heap.h>
 #include <core/panic.h>

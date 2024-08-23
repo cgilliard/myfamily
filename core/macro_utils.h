@@ -15,6 +15,7 @@
 #ifndef _CORE_MACRO_UTILS__
 #define _CORE_MACRO_UTILS__
 
+#define UNIQUE_ID __COUNTER__
 #define STRINGIFY(x) #x
 #define EXPAND(x) x
 #define CATI(x, y) x##y

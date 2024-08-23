@@ -188,9 +188,9 @@ int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp,
 	return ret;
 }
 
-int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
-			 int heap_data_params_count, ...) {
-
+int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
+			     HeapDataParamsConfig arr[],
+			     u64 heap_data_params_count) {
 	// check inputs
 	if (ptr == NULL || config == NULL || heap_data_params_count >= 256) {
 		errno = EINVAL;
@@ -220,10 +220,8 @@ int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
 	ptr->impl->hd_size = heap_data_params_count;
 
 	// iterate through specified heap data params
-	va_list hdps;
-	va_start(hdps, heap_data_params_count);
 	for (u64 i = 0; i < heap_data_params_count; i++) {
-		HeapDataParamsConfig hdp = va_arg(hdps, HeapDataParamsConfig);
+		HeapDataParamsConfig hdp = arr[i];
 		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
 		ptr->impl->hd_arr[i].data = NULL;
 		if ((__debug_build_allocator_malloc_fail3 && i > 0) ||
@@ -262,9 +260,30 @@ int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
 		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
 	}
 
-	va_end(hdps);
-
 	return 0;
+}
+
+int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
+			 int heap_data_params_count, ...) {
+	int arr_size = heap_data_params_count;
+
+	// 0 size is allowed, so we update to address sanitizer warning.
+	if (arr_size <= 0) {
+		arr_size = 1;
+	}
+	HeapDataParamsConfig arr[arr_size];
+	va_list hdps;
+	va_start(hdps, heap_data_params_count);
+	// build the array to pass to heap_allocator_build_arr
+	for (u64 i = 0; i < heap_data_params_count; i++) {
+		HeapDataParamsConfig hdp = va_arg(hdps, HeapDataParamsConfig);
+		arr[i] = hdp;
+	}
+
+	va_end(hdps);
+	// call the array version of the function
+	return heap_allocator_build_arr(ptr, config, arr,
+					heap_data_params_count);
 }
 
 // binary search for the correct slab size

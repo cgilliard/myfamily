@@ -550,3 +550,113 @@ Test(core, test_panic) {
 	panic("this will not exit\n");
 	__debug_no_exit = false;
 }
+
+Test(core, test_chained_allocator) {
+	// build 2 slab allocators with varying size slabs
+	HeapAllocator ha, ha2;
+	FatPtr ptr;
+	HeapAllocatorConfig hconfig = {false, false};
+	HeapDataParamsConfig hdconfig1 = {16, 10, 1, 10};
+	HeapDataParamsConfig hdconfig2 = {32, 10, 1, 10};
+	cr_assert_eq(
+	    heap_allocator_build(&ha, &hconfig, 2, hdconfig1, hdconfig2), 0);
+	cr_assert_eq(heap_allocator_build(&ha2, &hconfig, 1, hdconfig1), 0);
+
+	// set a custom default thread local slab allocator with these values
+	HeapDataParamsConfig arr[] = {{16, 10, 0, UINT32_MAX},
+				      {32, 10, 0, UINT32_MAX},
+				      {48, 10, 0, UINT32_MAX},
+				      {64, 10, 0, UINT32_MAX}};
+	set_default_hdpc_arr(arr, sizeof(arr) / sizeof(arr[0]));
+
+	// allocate before adding these allocators to the chain should get a
+	// 48 byte block because the default heap allocator uses slabs that
+	// are 16 bytes apart in size.
+	cr_assert_eq(chain_malloc(&ptr, 33), 0);
+	cr_assert_eq(fat_ptr_len(&ptr), 48);
+	chain_free(&ptr);
+	{
+		// now set our first ha to the chain
+		ChainGuard ca = SCOPED_ALLOCATOR(&ha, false);
+
+		// blocks over 32 bytes use malloc and have the exact size
+		cr_assert_eq(chain_malloc(&ptr, 33), 0);
+		cr_assert_eq(fat_ptr_len(&ptr), 33);
+		chain_free(&ptr);
+
+		// blocks between 16 and 32 round up to 32 byte slabs
+		cr_assert_eq(chain_malloc(&ptr, 17), 0);
+		cr_assert_eq(fat_ptr_len(&ptr), 32);
+		chain_free(&ptr);
+
+		{
+			// Use ha2 which has only 16 byte slabs. This 17 byte
+			// FatPtr uses malloc and is exactly 17 bytes.
+			ChainGuard ca2 = SCOPED_ALLOCATOR(&ha2, false);
+			cr_assert_eq(chain_malloc(&ptr, 17), 0);
+			cr_assert_eq(fat_ptr_len(&ptr), 17);
+		}
+
+		// with our first ha (since ha2 is now out of scope) the 17 byte
+		// request maps to 32 byte slabs
+		cr_assert_eq(chain_malloc(&ptr, 17), 0);
+		cr_assert_eq(fat_ptr_len(&ptr), 32);
+		chain_free(&ptr);
+	}
+
+	// now a 33 byte request maps to the default allocator which has 48 byte
+	// slabs
+	cr_assert_eq(chain_malloc(&ptr, 33), 0);
+	cr_assert_eq(fat_ptr_len(&ptr), 48);
+	chain_free(&ptr);
+
+	// test the global sync allocator
+
+	// Thread local allocator has a max slab size of 64 bytes so 87 is
+	// allocated using malloc at the exact size
+	cr_assert_eq(chain_malloc(&ptr, 87), 0);
+	cr_assert_eq(fat_ptr_len(&ptr), 87);
+	chain_free(&ptr);
+
+	// reset the global allocator with 128 byte slabs
+	HeapDataParamsConfig arr2[] = {{16, 10, 0, UINT32_MAX},
+				       {32, 10, 0, UINT32_MAX},
+				       {48, 10, 0, UINT32_MAX},
+				       {64, 10, 0, UINT32_MAX},
+				       {128, 10, 0, UINT32_MAX}};
+	set_default_hdpc_arr(arr2, sizeof(arr2) / sizeof(arr2[0]));
+
+	// now try with the global sync allocator which has 128 byte slabs.
+	{
+		ChainGuard guard = GLOBAL_SYNC_ALLOCATOR();
+		cr_assert_eq(chain_malloc(&ptr, 87), 0);
+		cr_assert_eq(fat_ptr_len(&ptr), 128);
+		chain_free(&ptr);
+	}
+
+	// now it's out of scope we should be back at 87 bytes
+	cr_assert_eq(chain_malloc(&ptr, 87), 0);
+	cr_assert_eq(fat_ptr_len(&ptr), 87);
+	chain_free(&ptr);
+
+	// test realloc
+	FatPtr ptr2;
+	cr_assert_eq(chain_malloc(&ptr, 16), 0);
+	cr_assert_eq(fat_ptr_len(&ptr), 16);
+	char *data, *data2;
+	;
+
+	data = fat_ptr_data(&ptr);
+	for (int i = 0; i < 16; i++) {
+		data[i] = i;
+	}
+
+	cr_assert_eq(chain_realloc(&ptr2, &ptr, 30), 0);
+	cr_assert_eq(fat_ptr_len(&ptr2), 32);
+
+	data2 = fat_ptr_data(&ptr2);
+	data = fat_ptr_data(&ptr);
+	for (int i = 0; i < 16; i++) {
+		cr_assert_eq(data[i], i);
+	}
+}
