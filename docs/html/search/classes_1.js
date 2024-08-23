@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['fatptr_479',['FatPtr',['../structFatPtr.html',1,'']]]
+  ['fatptr_530',['FatPtr',['../structFatPtr.html',1,'']]]
 ];

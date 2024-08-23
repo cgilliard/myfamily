@@ -68,6 +68,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
@@ -92,6 +93,13 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structHeapAllocator.html">HeapAllocator</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a278f1e1d6c3c86f7dae9831e3b783207"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#a278f1e1d6c3c86f7dae9831e3b783207">HA_CONFIG_DEFAULT</a>&#160;&#160;&#160;	{ false, false }</td></tr>
+<tr class="separator:a278f1e1d6c3c86f7dae9831e3b783207"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d66769b42d4381ca08d14b2141d5aa7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#a1d66769b42d4381ca08d14b2141d5aa7">HAP_CONFIG</a>(slab_size,  slabs_per_resize,  initial_chunks,  max_slabs)</td></tr>
+<tr class="separator:a1d66769b42d4381ca08d14b2141d5aa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:ab3580ee1cd3b7571f43cfefa06f90bd3"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structHeapDataParamsConfig.html">HeapDataParamsConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#ab3580ee1cd3b7571f43cfefa06f90bd3">HeapDataParamsConfig</a></td></tr>
@@ -109,6 +117,8 @@ Typedefs</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a9883e6ead40a99cbd04b70e7078b71e1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#a9883e6ead40a99cbd04b70e7078b71e1">heap_allocator_build</a> (<a class="el" href="structHeapAllocator.html">HeapAllocator</a> *ptr, <a class="el" href="structHeapAllocatorConfig.html">HeapAllocatorConfig</a> *config, int heap_data_params_count,...)</td></tr>
 <tr class="separator:a9883e6ead40a99cbd04b70e7078b71e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2934ff095b16ad98181e25e7971b0f7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#ab2934ff095b16ad98181e25e7971b0f7">heap_allocator_build_arr</a> (<a class="el" href="structHeapAllocator.html">HeapAllocator</a> *ptr, <a class="el" href="structHeapAllocatorConfig.html">HeapAllocatorConfig</a> *config, <a class="el" href="structHeapDataParamsConfig.html">HeapDataParamsConfig</a> arr[], <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> heap_data_params_count)</td></tr>
+<tr class="separator:ab2934ff095b16ad98181e25e7971b0f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f08a0124120fbf0cda9563502f780fa"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#a9f08a0124120fbf0cda9563502f780fa">heap_allocator_allocate</a> (<a class="el" href="structHeapAllocator.html">HeapAllocator</a> *ptr, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> size, <a class="el" href="structFatPtr.html">FatPtr</a> *fptr)</td></tr>
 <tr class="separator:a9f08a0124120fbf0cda9563502f780fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac75241ce08a968d8baf3c6c8d9f97cde"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#ac75241ce08a968d8baf3c6c8d9f97cde">heap_allocator_free</a> (<a class="el" href="structHeapAllocator.html">HeapAllocator</a> *ptr, <a class="el" href="structFatPtr.html">FatPtr</a> *fptr)</td></tr>
@@ -143,7 +153,71 @@ notes</h1>
 <h1><a class="anchor" id="Usage"></a>
 Usage</h1>
 <p>To use the heap allocator, initialize it with the desired parameters and then use the provided API functions for allocation and deallocation. </p>
-</div><h2 class="groupheader">Typedef Documentation</h2>
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a278f1e1d6c3c86f7dae9831e3b783207"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a278f1e1d6c3c86f7dae9831e3b783207">&#9670;&nbsp;</a></span>HA_CONFIG_DEFAULT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define HA_CONFIG_DEFAULT&#160;&#160;&#160;	{ false, false }</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1d66769b42d4381ca08d14b2141d5aa7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d66769b42d4381ca08d14b2141d5aa7">&#9670;&nbsp;</a></span>HAP_CONFIG</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define HAP_CONFIG</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">slab_size, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">slabs_per_resize, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">initial_chunks, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">max_slabs&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                     \</div>
+<div class="line">        HeapDataParamsConfig _ret__ = {                                \</div>
+<div class="line">            slab_size,                                                 \</div>
+<div class="line">            slabs_per_resize,                                          \</div>
+<div class="line">            initial_chunks,                                            \</div>
+<div class="line">            max_slabs,                                                 \</div>
+<div class="line">        };                                                             \</div>
+<div class="line">        _ret__;                                                        \</div>
+<div class="line">    })</div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Typedef Documentation</h2>
 <a id="a699932104dc21b9953a234a0421ed0a9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a699932104dc21b9953a234a0421ed0a9">&#9670;&nbsp;</a></span>FatPtr</h2>
 
@@ -400,7 +474,66 @@ Usage</h1>
 <dd>
 [<a class="el" href="heap_8h.html#ac75241ce08a968d8baf3c6c8d9f97cde">heap_allocator_free</a>] </dd>
 <dd>
-[<a class="el" href="heap_8h.html#aa798be4af0288b37bf349b3fd178efed">heap_allocator_cleanup</a>] </dd></dl>
+[<a class="el" href="heap_8h.html#aa798be4af0288b37bf349b3fd178efed">heap_allocator_cleanup</a>] </dd>
+<dd>
+[<a class="el" href="heap_8h.html#ab2934ff095b16ad98181e25e7971b0f7">heap_allocator_build_arr</a>] </dd></dl>
+
+</div>
+</div>
+<a id="ab2934ff095b16ad98181e25e7971b0f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2934ff095b16ad98181e25e7971b0f7">&#9670;&nbsp;</a></span>heap_allocator_build_arr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int heap_allocator_build_arr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structHeapAllocator.html">HeapAllocator</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structHeapAllocatorConfig.html">HeapAllocatorConfig</a> *&#160;</td>
+          <td class="paramname"><em>config</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structHeapDataParamsConfig.html">HeapDataParamsConfig</a>&#160;</td>
+          <td class="paramname"><em>arr</em>[], </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
+          <td class="paramname"><em>heap_data_params_count</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Builds a heap_allocator based on the specified <a class="el" href="structHeapAllocatorConfig.html">HeapAllocatorConfig</a> and <a class="el" href="structHeapDataParamsConfig.html">HeapDataParamsConfig</a> configurations. This is the array based version of build. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ptr</td><td>A pointer to the location where the <a class="el" href="structHeapAllocator.html">HeapAllocator</a> to be configured is stored. This pointer must not be NULL. </td></tr>
+    <tr><td class="paramname">config</td><td>The configuration for this <a class="el" href="structHeapAllocator.html">HeapAllocator</a>. </td></tr>
+    <tr><td class="paramname">arr</td><td>The array of HeapDataParamsConfigs which specify this <a class="el" href="structHeapAllocator.html">HeapAllocator</a>. </td></tr>
+    <tr><td class="paramname">heap_data_params_count</td><td>The number of variadic arguments being passed to this function. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success -1 on error with the appropriate errno value set. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#a9f08a0124120fbf0cda9563502f780fa">heap_allocator_allocate</a>] </dd>
+<dd>
+[<a class="el" href="heap_8h.html#ac75241ce08a968d8baf3c6c8d9f97cde">heap_allocator_free</a>] </dd>
+<dd>
+[<a class="el" href="heap_8h.html#aa798be4af0288b37bf349b3fd178efed">heap_allocator_cleanup</a>] </dd>
+<dd>
+[<a class="el" href="heap_8h.html#a9883e6ead40a99cbd04b70e7078b71e1">heap_allocator_build</a>] </dd></dl>
 
 </div>
 </div>

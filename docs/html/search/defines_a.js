@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['toml_5fextern_963',['TOML_EXTERN',['../toml_8h.html#a022d02391f9de10a690e4c7bcccb6ada',1,'toml.h']]],
-  ['tostring_964',['TOSTRING',['../toml_8c.html#a9063e80f8777300c93afde6e6f4c9cea',1,'toml.c']]]
+  ['malloc_1053',['MALLOC',['../toml_8c.html#a541003e0fe1f4a99585737e2a89843c3',1,'toml.c']]],
+  ['malloc_1054',['malloc',['../toml_8c.html#a5046e1cbf958143f3bf7aded35204202',1,'toml.c']]],
+  ['mutref_1055',['MutRef',['../type_8h.html#a570e7c0b852aea689961af40af3e7b03',1,'type.h']]]
 ];
