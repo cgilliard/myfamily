@@ -6,6 +6,7 @@ steps:
     condition: eq( variables['Agent.OS'], 'Darwin' )
   - script: |
       ./configure
+      export ASAN_OPTIONS=detect_leaks=1:exitcode=1
       make clean testsan
     displayName: Linux Test
     condition: eq( variables['Agent.OS'], 'Linux' )
