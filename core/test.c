@@ -663,6 +663,6 @@ Test(core, test_chained_allocator) {
 
 	global_sync_allocator_cleanup();
 	thread_local_allocator_cleanup();
-	// heap_allocator_cleanup(&ha);
-	// heap_allocator_cleanup(&ha2);
+	heap_allocator_cleanup(&ha);
+	heap_allocator_cleanup(&ha2);
 }
