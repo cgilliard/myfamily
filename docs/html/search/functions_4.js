@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['panic_530',['panic',['../panic_8c.html#ad1f1a1dc0581a11b597453f148106393',1,'panic(const char *fmt,...):&#160;panic.c'],['../panic_8h.html#a138d8879e47c08e2265c41d75e539f9b',1,'panic(const char *format,...):&#160;panic.c']]]
+  ['global_5fsync_5fallocator_5finit_582',['global_sync_allocator_init',['../chain__allocator_8c.html#a55bafb1e01b68923a0eca99fca814d4a',1,'chain_allocator.c']]]
 ];

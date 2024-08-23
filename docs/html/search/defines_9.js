@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['strdup_960',['strdup',['../toml_8c.html#a2f35dff70d447197a36db45d9c42be30',1,'toml.c']]],
-  ['stringify_961',['STRINGIFY',['../macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7',1,'STRINGIFY():&#160;macro_utils.h'],['../toml_8c.html#a6df1d22fb5f09eccc23b9f399670cfd7',1,'STRINGIFY():&#160;toml.c']]],
-  ['strndup_962',['strndup',['../toml_8c.html#a7c3972b4ab432d88f0a2b046e3f613aa',1,'toml.c']]]
+  ['let_1051',['let',['../type_8h.html#a045dd54932944d8830380f4596d64446',1,'type.h']]],
+  ['loop_1052',['loop',['../macro__utils_8h.html#a8093cf142de43413a3649101cf95152c',1,'macro_utils.h']]]
 ];
