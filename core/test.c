@@ -595,6 +595,7 @@ Test(core, test_chained_allocator) {
 			ChainGuard ca2 = SCOPED_ALLOCATOR(&ha2, false);
 			cr_assert_eq(chain_malloc(&ptr, 17), 0);
 			cr_assert_eq(fat_ptr_len(&ptr), 17);
+			chain_free(&ptr);
 		}
 
 		// with our first ha (since ha2 is now out of scope) the 17 byte
@@ -659,4 +660,5 @@ Test(core, test_chained_allocator) {
 	for (int i = 0; i < 16; i++) {
 		cr_assert_eq(data[i], i);
 	}
+	chain_free(&ptr2);
 }
