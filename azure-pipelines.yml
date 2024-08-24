@@ -65,5 +65,6 @@ jobs:
         python3 -m venv venv
         source venv/bin/activate
         pip install --upgrade pip
+        pip install pre-commit
       displayName: MacOS Test Dependencies
     - template: '.ci/all.yml'
