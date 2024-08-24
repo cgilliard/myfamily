@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['panic_600',['panic',['../panic_8c.html#ad1f1a1dc0581a11b597453f148106393',1,'panic(const char *fmt,...):&#160;panic.c'],['../panic_8h.html#a138d8879e47c08e2265c41d75e539f9b',1,'panic(const char *format,...):&#160;panic.c']]]
+  ['main_0',['main',['../main_8c.html#a3c04138a5bfe5d72780bb7e82a18e627',1,'main.c']]]
 ];

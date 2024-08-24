@@ -25,7 +25,7 @@
 var menudata={children:[
 {text:"Main Page",url:"index.html"},
 {text:"Related Pages",url:"pages.html"},
-{text:"Modules",url:"modules.html"},
+{text:"Topics",url:"topics.html"},
 {text:"Classes",url:"annotated.html",children:[
 {text:"Class List",url:"annotated.html"},
 {text:"Class Index",url:"classes.html"},
@@ -107,6 +107,8 @@ var menudata={children:[
 {text:"f",url:"globals_func.html#index_f"},
 {text:"g",url:"globals_func.html#index_g"},
 {text:"h",url:"globals_func.html#index_h"},
+{text:"i",url:"globals_func.html#index_i"},
+{text:"l",url:"globals_func.html#index_l"},
 {text:"m",url:"globals_func.html#index_m"},
 {text:"o",url:"globals_func.html#index_o"},
 {text:"p",url:"globals_func.html#index_p"},

@@ -663,6 +663,12 @@ Test(core, test_chained_allocator) {
 
 	global_sync_allocator_cleanup();
 	thread_local_allocator_cleanup();
-	// heap_allocator_cleanup(&ha);
-	// heap_allocator_cleanup(&ha2);
+	heap_allocator_cleanup(&ha);
+	heap_allocator_cleanup(&ha2);
+}
+
+Test(core, test_lock) {
+	Lock l1 = LOCK();
+	{ LockGuard lg01 = lock(&l1); }
+	{ LockGuard lg11 = lock(&l1); }
 }

@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['set_5fdefault_5fhconfig_601',['set_default_hconfig',['../chain__allocator_8c.html#a0050f8533288c2e5b15d631f27a209e1',1,'chain_allocator.c']]],
-  ['set_5fdefault_5fhdpc_5farr_602',['set_default_hdpc_arr',['../chain__allocator_8c.html#a925509968cee221c2ca1e0cfda302e28',1,'chain_allocator.c']]],
-  ['sort_5fvtable_603',['sort_vtable',['../type_8c.html#adc5e90382878eb50826eeae340a4ef64',1,'sort_vtable(Vtable *table):&#160;type.c'],['../type_8h.html#adc5e90382878eb50826eeae340a4ef64',1,'sort_vtable(Vtable *table):&#160;type.c']]]
+  ['objectptr_5fcleanup_0',['ObjectPtr_cleanup',['../type_8c.html#a89a0a05c58501829db0c8f155d6effc5',1,'ObjectPtr_cleanup(Ref ptr):&#160;type.c'],['../type_8h.html#ae7fa38e65770bdef6c9e69002c496245',1,'ObjectPtr_cleanup(const ObjectPtr *ptr):&#160;type.h']]]
 ];

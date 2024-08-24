@@ -14,4 +14,5 @@
 
 #include <core/chain_allocator.h>
 #include <core/heap.h>
+#include <core/lock.h>
 #include <core/panic.h>
