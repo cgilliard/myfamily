@@ -15,6 +15,7 @@
 #include <core/lock.h>
 #include <core/panic.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #define MAX_LOCKS 100
 _Thread_local Lock *__active_locks_[MAX_LOCKS];
@@ -48,17 +49,22 @@ Lock Lock_build() {
 void Lock_cleanup(LockPtr *ptr) { pthread_mutex_destroy(&ptr->lock); }
 
 void Lock_set_poison(Lock *ptr) { atomic_exchange(&ptr->poison, true); }
-bool Lock_is_poisoned(Lock *ptr) { return atomic_fetch_add(&ptr->poison, 0); }
+bool Lock_is_poisoned(Lock *ptr) { return atomic_load(&ptr->poison); }
 void Lock_clear_poison(Lock *ptr) { atomic_exchange(&ptr->poison, false); }
 
 LockGuard lock(Lock *ptr) {
-	if (atomic_fetch_add(&ptr->poison, 0))
+	if (atomic_load(&ptr->poison))
 		panic("Lock %p: poisoned!", ptr);
+
 	u64 tid;
+#ifdef __APPLE__
 	pthread_threadid_np(NULL, &tid);
+#else
+	tid = gettid();
+#endif // tid code
 
 	// check if this would be a deadlock
-	if (atomic_fetch_add(&ptr->is_locked, 0) &&
+	if (atomic_load(&ptr->is_locked) &&
 	    atomic_fetch_add(&ptr->tid, 0) == tid)
 		panic("Lock %p: attempt to lock would deadlock!", lock);
 
