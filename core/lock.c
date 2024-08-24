@@ -79,7 +79,7 @@ LockGuard lock(Lock *ptr) {
 }
 
 void Lockguard_cleanup(LockGuardPtr *ptr) {
-	if (ptr) {
+	if (ptr && ptr->ref) {
 		atomic_exchange(&ptr->ref->is_locked, false);
 		pthread_mutex_unlock(&ptr->ref->lock);
 		delete_active_lock(ptr->ref);

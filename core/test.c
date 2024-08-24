@@ -566,9 +566,10 @@ Test(core, test_panic) {
 }
 
 Test(core, test_chained_allocator) {
+	FatPtr ptr;
+
 	// build 2 slab allocators with varying size slabs
 	HeapAllocator ha, ha2;
-	FatPtr ptr;
 	HeapAllocatorConfig hconfig = {false, false};
 	HeapDataParamsConfig hdconfig1 = {16, 10, 1, 10};
 	HeapDataParamsConfig hdconfig2 = {32, 10, 1, 10};
@@ -587,6 +588,7 @@ Test(core, test_chained_allocator) {
 	// 48 byte block because the default heap allocator uses slabs that
 	// are 16 bytes apart in size.
 	cr_assert_eq(chain_malloc(&ptr, 33), 0);
+
 	cr_assert_eq(fat_ptr_len(&ptr), 48);
 	chain_free(&ptr);
 	{
@@ -680,7 +682,6 @@ Test(core, test_chained_allocator) {
 	heap_allocator_cleanup(&ha);
 	heap_allocator_cleanup(&ha2);
 }
-
 Test(core, test_lock) {
 	Lock l1 = LOCK();
 	{ LockGuard lg01 = lock(&l1); }
@@ -745,5 +746,3 @@ Test(core, test_threads) {
 	cr_assert(JoinResult_is_panic(&jr2));
 	cr_assert(!JoinResult_is_error(&jr2));
 }
-
-Test(core, test_tpan) {}

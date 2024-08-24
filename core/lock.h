@@ -49,5 +49,6 @@ Lock Lock_build();
 LockGuard lock(Lock *lock);
 
 #define LOCK() Lock_build()
+#define LOCK_GUARD_CLEANUP_SAFE {NULL};
 
 #endif // _CORE_LOCK__

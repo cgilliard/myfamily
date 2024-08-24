@@ -17,6 +17,7 @@
 
 #include <core/chain_allocator.h>
 #include <core/heap.h>
+#include <core/lock.h>
 
 /**
  * @file
@@ -70,6 +71,7 @@
 
 /** @cond */
 extern HeapAllocator *__global_sync_allocator;
+extern Lock *__global_sync_allocator_lock;
 /** @endcond */
 
 /**
@@ -82,6 +84,7 @@ extern HeapAllocator *__global_sync_allocator;
 typedef struct ChainConfig {
 	HeapAllocator *ha;
 	bool is_sync;
+	Lock *lock;
 } ChainConfig;
 
 /** @cond */
@@ -91,6 +94,7 @@ typedef struct ChainGuardPtr {
 	u64 index;
 	HeapAllocator *ha;
 	bool is_sync;
+	Lock *lock;
 } ChainGuardPtr;
 
 void chain_guard_cleanup(ChainGuardPtr *ptr);
@@ -188,7 +192,8 @@ void thread_local_allocator_cleanup();
 	({                                                                     \
 		if (__global_sync_allocator == NULL)                           \
 			global_sync_allocator_init();                          \
-		ChainConfig _cfg__ = {__global_sync_allocator, true};          \
+		ChainConfig _cfg__ = {__global_sync_allocator, true,           \
+				      __global_sync_allocator_lock};           \
 		ChainGuardPtr ret = chain_guard(&_cfg__);                      \
 		ret;                                                           \
 	})
