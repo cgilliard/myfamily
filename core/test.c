@@ -699,7 +699,6 @@ void *start_thread(void *data) {
 		LockGuard lg = lock(&th_lock);
 		counter++;
 		cr_assert_eq(counter, 1);
-		sleep(2);
 	}
 	{
 		LockGuard lg = lock(&th_lock);
@@ -713,16 +712,9 @@ Test(core, test_lock_panic) {
 	pthread_t th;
 	th_lock = LOCK();
 	pthread_create(&th, NULL, &start_thread, NULL);
-	sleep(1);
-	{
-		LockGuard lg = lock(&th_lock);
-		counter++;
-		cr_assert_eq(counter, 2);
-	}
 	pthread_join(th, NULL);
 	bool isp = Lock_is_poisoned(&th_lock);
 	cr_assert(isp);
-	sleep(2);
 }
 
 void start_thread_test(void *obj) {

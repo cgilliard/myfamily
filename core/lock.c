@@ -69,6 +69,9 @@ LockGuard lock(Lock *ptr) {
 
 	// obtain lock
 	pthread_mutex_lock(&ptr->lock);
+	if (atomic_load(&ptr->poison))
+		panic("Lock %p: poisoned!", ptr);
+
 	insert_active_lock(ptr);
 
 	// set tid/is_locked and return
