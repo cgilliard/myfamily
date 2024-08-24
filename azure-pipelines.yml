@@ -45,6 +45,8 @@ jobs:
         uname -a
         sudo apt-get update
         sudo apt-get install libcriterion-dev doxygen
+        sudo apt-get install python3-pip
+        sudo pip3 install pre-commit
       displayName: Linux Test Dependencies
     - template: '.ci/all.yml'
 - job: macos
@@ -59,5 +61,9 @@ jobs:
     - script: |
         sw_vers
         brew install criterion
+        brew install python
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
       displayName: MacOS Test Dependencies
     - template: '.ci/all.yml'
