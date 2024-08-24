@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['vtable_0',['Vtable',['../struct_vtable.html',1,'']]],
-  ['vtableentry_1',['VtableEntry',['../struct_vtable_entry.html',1,'']]]
+  ['vtable_580',['Vtable',['../structVtable.html',1,'']]],
+  ['vtableentry_581',['VtableEntry',['../structVtableEntry.html',1,'']]]
 ];

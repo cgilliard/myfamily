@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		 <p align="center">
-                        Code Coverage is currently 19.07%.
+                        Code Coverage is currently 20.31%.
                 </p>
 		<center>
 			<div class="chart">
@@ -68,7 +68,8 @@
 15.92,
 15.92,
 18.75,
-19.07,];
+19.07,
+20.31,];
 			let labels = [format_date(1724296044 * 1000 ),
 format_date(1724297686 * 1000 ),
 format_date(1724303299 * 1000 ),
@@ -80,7 +81,8 @@ format_date(1724346969 * 1000 ),
 format_date(1724352193 * 1000 ),
 format_date(1724396488 * 1000 ),
 format_date(1724455036 * 1000 ),
-format_date(1724474307 * 1000 ),];
+format_date(1724474307 * 1000 ),
+format_date(1724476633 * 1000 ),];
 			let raw_data2 = [1752,
 1638,
 1638,
@@ -92,7 +94,8 @@ format_date(1724474307 * 1000 ),];
 1639,
 1639,
 1717,
-1725,];
+1725,
+1768,];
                         let raw_data3 = [292,
 253,
 253,
@@ -104,7 +107,8 @@ format_date(1724474307 * 1000 ),];
 261,
 261,
 322,
-329,];
+329,
+359,];
 
 			const data = {
 				labels: labels,
@@ -2616,7 +2620,7 @@ format_date(1724474307 * 1000 ),];
         -:    0:Source:chain_allocator.c
         -:    0:Graph:chain_allocator.gcno
         -:    0:Data:chain_allocator.gcda
-        -:    0:Runs:13
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2790,7 +2794,7 @@ format_date(1724474307 * 1000 ),];
         -:    0:Source:heap.c
         -:    0:Graph:heap.gcno
         -:    0:Data:heap.gcda
-        -:    0:Runs:13
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2852,11 +2856,11 @@ format_date(1724474307 * 1000 ),];
       154:   59:	return ret;
         -:   60:}
         -:   61:
-      130:   62:void do_free(void *ptr) {
-      130:   63:	__free_count += 1;
+      143:   62:void do_free(void *ptr) {
+      143:   63:	__free_count += 1;
         -:   64:	// printf("free %p (%llu)\n", ptr, __free_count);
-      130:   65:	free(ptr);
-      130:   66:}
+      143:   65:	free(ptr);
+      143:   66:}
         -:   67:
        21:   68:void *do_realloc(void *ptr, size_t size) {
        21:   69:	void *ret = realloc(ptr, size);
@@ -3284,40 +3288,136 @@ format_date(1724474307 * 1000 ),];
       143:  491:	return ret;
         -:  492:}
         -:  493:
-       27:  494:int heap_allocator_cleanup(HeapAllocator *ptr) {
+       29:  494:int heap_allocator_cleanup(HeapAllocator *ptr) {
         -:  495:	// check for impl and deallocate
-       27:  496:	if (ptr->impl) {
-       48:  497:		for (u32 i = 0; i < ptr->impl->hd_size; i++) {
-       25:  498:			if (ptr->impl->hd_arr[i].count) {
+       29:  496:	if (ptr->impl) {
+       53:  497:		for (u32 i = 0; i < ptr->impl->hd_size; i++) {
+       28:  498:			if (ptr->impl->hd_arr[i].count) {
         -:  499:				// check that it's not an unallocated heap data
-       19:  500:				if (ptr->impl->hd_arr[i].free_list) {
-       19:  501:					do_free(ptr->impl->hd_arr[i].free_list);
-       19:  502:					ptr->impl->hd_arr[i].free_list = NULL;
+       22:  500:				if (ptr->impl->hd_arr[i].free_list) {
+       22:  501:					do_free(ptr->impl->hd_arr[i].free_list);
+       22:  502:					ptr->impl->hd_arr[i].free_list = NULL;
         -:  503:				}
-       48:  504:				for (u64 j = 0; j < ptr->impl->hd_arr[i].count;
-       29:  505:				     j++) {
-       29:  506:					do_free(ptr->impl->hd_arr[i].data[j]);
+       54:  504:				for (u64 j = 0; j < ptr->impl->hd_arr[i].count;
+       32:  505:				     j++) {
+       32:  506:					do_free(ptr->impl->hd_arr[i].data[j]);
         -:  507:				}
-       19:  508:				if (ptr->impl->hd_arr[i].data) {
-       19:  509:					do_free(ptr->impl->hd_arr[i].data);
-       19:  510:					ptr->impl->hd_arr[i].data = NULL;
+       22:  508:				if (ptr->impl->hd_arr[i].data) {
+       22:  509:					do_free(ptr->impl->hd_arr[i].data);
+       22:  510:					ptr->impl->hd_arr[i].data = NULL;
         -:  511:				}
         -:  512:			}
         -:  513:		}
         -:  514:
-       23:  515:		if (ptr->impl->hd_arr) {
-       22:  516:			do_free(ptr->impl->hd_arr);
-       22:  517:			ptr->impl->hd_arr = NULL;
+       25:  515:		if (ptr->impl->hd_arr) {
+       24:  516:			do_free(ptr->impl->hd_arr);
+       24:  517:			ptr->impl->hd_arr = NULL;
         -:  518:		}
-       23:  519:		do_free(ptr->impl);
-       23:  520:		ptr->impl = NULL;
+       25:  519:		do_free(ptr->impl);
+       25:  520:		ptr->impl = NULL;
         -:  521:	}
-       27:  522:	return 0;
+       29:  522:	return 0;
         -:  523:}
+        -:    0:Source:lock.c
+        -:    0:Graph:lock.gcno
+        -:    0:Data:lock.gcda
+        -:    0:Runs:14
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <core/lock.h>
+        -:   16:#include <core/panic.h>
+        -:   17:#include <stdio.h>
+        -:   18:#include <unistd.h>
+        -:   19:
+        -:   20:#define MAX_LOCKS 100
+        -:   21:_Thread_local Lock *__active_locks_[MAX_LOCKS];
+        -:   22:_Thread_local u64 __active_lock_count_ = 0;
+        -:   23:
+        2:   24:void insert_active_lock(Lock *ptr) {
+        2:   25:	if (__active_lock_count_ >= MAX_LOCKS)
+    #####:   26:		panic("too many locks!");
+        2:   27:	__active_locks_[__active_lock_count_] = ptr;
+        2:   28:	__active_lock_count_++;
+        2:   29:}
+        2:   30:void delete_active_lock(Lock *ptr) {
+        -:   31:	// note: locks are removed in reverse order
+        -:   32:	// It's possible that cleanup occurs in slightly different order
+        -:   33:	// but the effect is the same each lock would be invalidated at the end
+        -:   34:	// of a scope. For simplicity we just decrement here.
+        2:   35:	if (__active_lock_count_ == 0)
+    #####:   36:		panic("active lock stack underflow. Unexpected error!");
+        2:   37:	__active_lock_count_--;
+        2:   38:}
+        -:   39:
+        1:   40:Lock Lock_build() {
+        -:   41:	LockPtr ret;
+        1:   42:	pthread_mutex_init(&ret.lock, NULL);
+        1:   43:	atomic_init(&ret.poison, false);
+        1:   44:	atomic_init(&ret.is_locked, false);
+        1:   45:	atomic_init(&ret.tid, 0);
+        1:   46:	return ret;
+        -:   47:}
+        -:   48:
+        1:   49:void Lock_cleanup(LockPtr *ptr) { pthread_mutex_destroy(&ptr->lock); }
+        -:   50:
+    #####:   51:void Lock_set_poison(Lock *ptr) { atomic_exchange(&ptr->poison, true); }
+    #####:   52:bool Lock_is_poisoned(Lock *ptr) { return atomic_load(&ptr->poison); }
+    #####:   53:void Lock_clear_poison(Lock *ptr) { atomic_exchange(&ptr->poison, false); }
+        -:   54:
+        2:   55:LockGuard lock(Lock *ptr) {
+        2:   56:	if (atomic_load(&ptr->poison))
+    #####:   57:		panic("Lock %p: poisoned!", ptr);
+        -:   58:
+        -:   59:	u64 tid;
+        -:   60:#ifdef __APPLE__
+        -:   61:	pthread_threadid_np(NULL, &tid);
+        -:   62:#else
+        2:   63:	tid = gettid();
+        -:   64:#endif // tid code
+        -:   65:
+        -:   66:	// check if this would be a deadlock
+       2*:   67:	if (atomic_load(&ptr->is_locked) &&
+    #####:   68:	    atomic_fetch_add(&ptr->tid, 0) == tid)
+    #####:   69:		panic("Lock %p: attempt to lock would deadlock!", lock);
+        -:   70:
+        -:   71:	// obtain lock
+        2:   72:	pthread_mutex_lock(&ptr->lock);
+        2:   73:	insert_active_lock(ptr);
+        -:   74:
+        -:   75:	// set tid/is_locked and return
+        2:   76:	atomic_exchange(&ptr->tid, tid);
+        2:   77:	atomic_exchange(&ptr->is_locked, true);
+        2:   78:	LockGuardPtr ret = {ptr};
+        2:   79:	return ret;
+        -:   80:}
+        -:   81:
+        2:   82:void Lockguard_cleanup(LockGuardPtr *ptr) {
+        2:   83:	atomic_exchange(&ptr->ref->is_locked, false);
+        2:   84:	pthread_mutex_unlock(&ptr->ref->lock);
+        2:   85:	delete_active_lock(ptr->ref);
+        2:   86:}
+        -:   87:
+    #####:   88:void Lock_mark_poisoned() {
+    #####:   89:	for (u64 i = 0; i < __active_lock_count_; i++) {
+    #####:   90:		Lock_set_poison(__active_locks_[i]);
+        -:   91:	}
+    #####:   92:}
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
-        -:    0:Runs:13
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
