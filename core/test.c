@@ -562,7 +562,7 @@ Test(core, test_panic) {
 	}
 	panic_loop++;
 	if (!is_panic)
-		panic("panic\n");
+		panic("panic test_panic");
 }
 
 Test(core, test_chained_allocator) {
@@ -702,7 +702,7 @@ void *start_thread(void *data) {
 	}
 	{
 		LockGuard lg = lock(&th_lock);
-		panic("panic");
+		panic("panic start_thread");
 	}
 
 	return NULL;
@@ -723,3 +723,27 @@ Test(core, test_lock_panic) {
 	cr_assert(isp);
 	sleep(2);
 }
+
+void start_thread_test(void *obj) {
+	int v = *((int *)obj);
+	cr_assert_eq(v, 101);
+}
+
+void start_thread_panic(void *obj) { panic("panic start_thread_panic"); }
+
+Test(core, test_threads) {
+	int y = 101;
+	Thread th;
+	Thread_start(&th, start_thread_test, &y);
+	JoinResult jr = Thread_join(&th);
+	cr_assert(!JoinResult_is_panic(&jr));
+	cr_assert(!JoinResult_is_error(&jr));
+
+	Thread th2;
+	Thread_start(&th2, start_thread_panic, &y);
+	JoinResult jr2 = Thread_join(&th2);
+	cr_assert(JoinResult_is_panic(&jr2));
+	cr_assert(!JoinResult_is_error(&jr2));
+}
+
+Test(core, test_tpan) {}

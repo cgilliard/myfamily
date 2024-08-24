@@ -18,10 +18,9 @@
 #include <core/types.h>
 #include <setjmp.h>
 
-#define THREAD_PANIC 1
-#define NO_PANIC 0
-
 extern _Thread_local jmp_buf return_jmp;
+
+#define THREAD_PANIC 1
 
 #ifdef TEST
 extern bool __debug_no_exit;

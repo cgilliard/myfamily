@@ -87,9 +87,15 @@ void Lockguard_cleanup(LockGuardPtr *ptr) {
 }
 
 void Lock_mark_poisoned() {
-	for (u64 i = 0; i < __active_lock_count_; i++) {
-		Lock_set_poison(__active_locks_[i]);
-		atomic_exchange(&__active_locks_[i]->is_locked, false);
-		pthread_mutex_unlock(&__active_locks_[i]->lock);
+	if (__active_lock_count_) {
+		u64 i = __active_lock_count_ - 1;
+		while (true) {
+			Lock_set_poison(__active_locks_[i]);
+			atomic_exchange(&__active_locks_[i]->is_locked, false);
+			pthread_mutex_unlock(&__active_locks_[i]->lock);
+			if (i == 0)
+				break;
+			i--;
+		}
 	}
 }

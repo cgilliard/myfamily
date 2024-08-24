@@ -1,4 +1,4 @@
-OBJS := heap.o panic.o chain_allocator.o lock.o
+OBJS := heap.o panic.o chain_allocator.o lock.o thread.o
 
 TEST_OBJS := $(OBJS)
 

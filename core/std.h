@@ -16,3 +16,4 @@
 #include <core/heap.h>
 #include <core/lock.h>
 #include <core/panic.h>
+#include <core/thread.h>
