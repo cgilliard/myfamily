@@ -12,21 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/lock.h>
 #include <core/panic.h>
+#include <setjmp.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdnoreturn.h>
 
-bool __debug_no_exit = false;
-
-#define EXIT_IF_NOT_TEST()                                                     \
-	({                                                                     \
-		if (!__debug_no_exit) {                                        \
-			exit(-1);                                              \
-		} else {                                                       \
-			printf("simulated panic!\n");                          \
-		}                                                              \
-	})
+_Thread_local jmp_buf return_jmp;
 
 void panic(const char *fmt, ...) {
 	va_list args;
@@ -37,5 +31,6 @@ void panic(const char *fmt, ...) {
 	va_end(args);
 	fprintf(stderr, "\n");
 
-	EXIT_IF_NOT_TEST();
+	Lock_mark_poisoned();
+	longjmp(return_jmp, THREAD_PANIC);
 }

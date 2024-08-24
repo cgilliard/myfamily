@@ -64,8 +64,7 @@ LockGuard lock(Lock *ptr) {
 #endif // tid code
 
 	// check if this would be a deadlock
-	if (atomic_load(&ptr->is_locked) &&
-	    atomic_fetch_add(&ptr->tid, 0) == tid)
+	if (atomic_load(&ptr->is_locked) && atomic_load(&ptr->tid) == tid)
 		panic("Lock %p: attempt to lock would deadlock!", lock);
 
 	// obtain lock
@@ -80,13 +79,17 @@ LockGuard lock(Lock *ptr) {
 }
 
 void Lockguard_cleanup(LockGuardPtr *ptr) {
-	atomic_exchange(&ptr->ref->is_locked, false);
-	pthread_mutex_unlock(&ptr->ref->lock);
-	delete_active_lock(ptr->ref);
+	if (ptr) {
+		atomic_exchange(&ptr->ref->is_locked, false);
+		pthread_mutex_unlock(&ptr->ref->lock);
+		delete_active_lock(ptr->ref);
+	}
 }
 
 void Lock_mark_poisoned() {
 	for (u64 i = 0; i < __active_lock_count_; i++) {
 		Lock_set_poison(__active_locks_[i]);
+		atomic_exchange(&__active_locks_[i]->is_locked, false);
+		pthread_mutex_unlock(&__active_locks_[i]->lock);
 	}
 }

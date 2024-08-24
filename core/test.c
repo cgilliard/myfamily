@@ -14,6 +14,7 @@
 
 #include <core/std.h>
 #include <criterion/criterion.h>
+#include <unistd.h>
 
 Test(core, test_heap) {
 	cr_assert_eq(__malloc_count, __free_count);
@@ -545,10 +546,23 @@ Test(core, test_invalid_heap_configurations) {
 	cr_assert_eq(__malloc_count, __free_count);
 }
 
+int panic_loop = 0;
+
 Test(core, test_panic) {
-	__debug_no_exit = true;
-	panic("this will not exit\n");
-	__debug_no_exit = false;
+	bool is_panic = false;
+	if (PANIC_RETURN()) {
+		is_panic = true;
+	}
+
+	// first loop is not a panic
+	if (panic_loop) {
+		cr_assert(is_panic);
+	} else {
+		cr_assert(!is_panic);
+	}
+	panic_loop++;
+	if (!is_panic)
+		panic("panic\n");
 }
 
 Test(core, test_chained_allocator) {
@@ -671,4 +685,41 @@ Test(core, test_lock) {
 	Lock l1 = LOCK();
 	{ LockGuard lg01 = lock(&l1); }
 	{ LockGuard lg11 = lock(&l1); }
+}
+
+Lock th_lock;
+int counter = 0;
+
+void *start_thread(void *data) {
+	if (PANIC_RETURN()) {
+		return NULL;
+	}
+	{
+		LockGuard lg = lock(&th_lock);
+		counter++;
+		cr_assert_eq(counter, 1);
+		sleep(2);
+	}
+	{
+		LockGuard lg = lock(&th_lock);
+		panic("panic");
+	}
+
+	return NULL;
+}
+
+Test(core, test_lock_panic) {
+	pthread_t th;
+	th_lock = LOCK();
+	pthread_create(&th, NULL, &start_thread, NULL);
+	sleep(1);
+	{
+		LockGuard lg = lock(&th_lock);
+		counter++;
+		cr_assert_eq(counter, 2);
+	}
+	pthread_join(th, NULL);
+	bool isp = Lock_is_poisoned(&th_lock);
+	cr_assert(isp);
+	sleep(2);
 }
