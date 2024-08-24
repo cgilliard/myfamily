@@ -59,13 +59,13 @@
  * allocations and deallocations are thread safe.
  * ```
  *  {
- *  		FatPtr ptr;
-		ChainGuard guard = GLOBAL_SYNC_ALLOCATOR();
-		cr_assert_eq(chain_malloc(&ptr, 87), 0);
-		cr_assert_eq(fat_ptr_len(&ptr), 128);
-		chain_free(&ptr);
-    }
-    ```
+ *     FatPtr ptr;
+ *     ChainGuard guard = GLOBAL_SYNC_ALLOCATOR();
+ *     cr_assert_eq(chain_malloc(&ptr, 87), 0);
+ *     cr_assert_eq(fat_ptr_len(&ptr), 128);
+ *     chain_free(&ptr);
+ * }
+ * ```
  */
 
 /** @cond */
