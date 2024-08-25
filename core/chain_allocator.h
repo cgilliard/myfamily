@@ -75,7 +75,7 @@ extern _Thread_local HeapAllocator *__default_tl_heap_allocator;
 
 /** @cond */
 extern HeapAllocator *__global_sync_allocator;
-extern Lock *__global_sync_allocator_lock;
+extern LockPtr *__global_sync_allocator_lock;
 /** @endcond */
 
 /**
