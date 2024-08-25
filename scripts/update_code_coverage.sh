@@ -36,6 +36,8 @@ export coveredrep=`cat /tmp/covered`;
 export cc_final=`cat /tmp/cc_final`;
 export gcov="unimplemented";
 
+cp /tmp/gcov_cat.txt docs/
+
 perl -pi -e 's/REPLACESUMMARY/$ENV{gcov}/g' docs/code_coverage.html
 perl -pi -e 's/REPLACECOVERAGE_SINGLE/$ENV{cc_final}/g' docs/code_coverage.html
 perl -pi -e 's/REPLACECOVERAGE/$ENV{coverage}/g' docs/code_coverage.html
