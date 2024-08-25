@@ -52,6 +52,11 @@ void *Thread_proc_start(void *arg) {
 	ChainGuard guard = GLOBAL_SYNC_ALLOCATOR();
 	if (chain_free(&taw->self))
 		panic("Could not free ThreadArgsWrapper");
+
+	if (__default_tl_heap_allocator != NULL) {
+		heap_allocator_cleanup(__default_tl_heap_allocator);
+	}
+
 	pthread_exit(&PANIC_FALSE);
 }
 
