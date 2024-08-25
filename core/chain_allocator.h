@@ -19,6 +19,10 @@
 #include <core/heap.h>
 #include <core/lock.h>
 
+#define MAX_CHAIN_ALLOCATOR_DEPTH 100
+
+extern _Thread_local HeapAllocator *__default_tl_heap_allocator;
+
 /**
  * @file
  * @brief This file contains definitions for the chain_allocator.

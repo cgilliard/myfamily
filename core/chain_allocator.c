@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+_Thread_local HeapAllocator *__default_tl_heap_allocator = NULL;
 HeapAllocator *__global_sync_allocator = NULL;
 Lock *__global_sync_allocator_lock = NULL;
 
@@ -79,8 +80,6 @@ typedef struct ChainGuardEntry {
 	Lock *lock;
 } ChainGuardEntry;
 
-#define MAX_CHAIN_ALLOCATOR_DEPTH 100
-
 _Thread_local ChainGuardEntry
     __thread_local_chain_allocator[MAX_CHAIN_ALLOCATOR_DEPTH];
 _Thread_local u64 __thread_local_chain_allocator_index = 0;
@@ -132,6 +131,8 @@ int chain_malloc(FatPtr *ptr, u64 size) {
 			free(ha);
 			return -1;
 		};
+
+		__default_tl_heap_allocator = ha;
 		__thread_local_chain_allocator[0].ha = ha;
 		__thread_local_chain_allocator[0].is_sync = false;
 		__thread_local_chain_allocator_index++;

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <core/chain_allocator.h>
 #include <core/lock.h>
 #include <core/panic.h>
 #include <setjmp.h>
@@ -32,5 +33,9 @@ void panic(const char *fmt, ...) {
 	fprintf(stderr, "\n");
 
 	Lock_mark_poisoned();
+
+	if (__default_tl_heap_allocator != NULL) {
+		heap_allocator_cleanup(__default_tl_heap_allocator);
+	}
 	longjmp(return_jmp, THREAD_PANIC);
 }
