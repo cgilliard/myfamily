@@ -67,13 +67,15 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">test.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="std_8h_source.html">core/std.h</a>&gt;</code><br />
 <code>#include &lt;criterion/criterion.h&gt;</code><br />
+<code>#include &lt;unistd.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -101,10 +103,83 @@ Functions</h2></td></tr>
 <tr class="separator:abe667586a06875454a08d644d8d26a1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af08567d387c9cd3a6b7dcc65df11f46f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#af08567d387c9cd3a6b7dcc65df11f46f">Test</a> (core, test_lock)</td></tr>
 <tr class="separator:af08567d387c9cd3a6b7dcc65df11f46f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95992ff1c680aee0500222140e1d7f7c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a95992ff1c680aee0500222140e1d7f7c">start_thread</a> (void *data)</td></tr>
+<tr class="separator:a95992ff1c680aee0500222140e1d7f7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac87b8747c3396c10d6e8053380f561e8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ac87b8747c3396c10d6e8053380f561e8">Test</a> (core, test_lock_panic)</td></tr>
+<tr class="separator:ac87b8747c3396c10d6e8053380f561e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af34001a67eba2e80aac78c0bd4e55676"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#af34001a67eba2e80aac78c0bd4e55676">start_thread_test</a> (void *obj)</td></tr>
+<tr class="separator:af34001a67eba2e80aac78c0bd4e55676"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac821e366cdafad803efff87aa760a147"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ac821e366cdafad803efff87aa760a147">start_thread_panic</a> (void *obj)</td></tr>
+<tr class="separator:ac821e366cdafad803efff87aa760a147"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a24f59d085df4f4a817c57290ee25ae"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a7a24f59d085df4f4a817c57290ee25ae">Test</a> (core, test_threads)</td></tr>
+<tr class="separator:a7a24f59d085df4f4a817c57290ee25ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a91d35bd734de72c73a9f7ceefde27805"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a91d35bd734de72c73a9f7ceefde27805">panic_loop</a> = 0</td></tr>
+<tr class="separator:a91d35bd734de72c73a9f7ceefde27805"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a498283fd13577af3ad02f670b56be87b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a498283fd13577af3ad02f670b56be87b">th_lock</a></td></tr>
+<tr class="separator:a498283fd13577af3ad02f670b56be87b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a617a47c70795bcff659815ad0efd2266"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a617a47c70795bcff659815ad0efd2266">counter</a> = 0</td></tr>
+<tr class="separator:a617a47c70795bcff659815ad0efd2266"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a95992ff1c680aee0500222140e1d7f7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a95992ff1c680aee0500222140e1d7f7c">&#9670;&nbsp;</a></span>start_thread()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* start_thread </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac821e366cdafad803efff87aa760a147"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac821e366cdafad803efff87aa760a147">&#9670;&nbsp;</a></span>start_thread_panic()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void start_thread_panic </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af34001a67eba2e80aac78c0bd4e55676"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af34001a67eba2e80aac78c0bd4e55676">&#9670;&nbsp;</a></span>start_thread_test()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void start_thread_test </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="abe667586a06875454a08d644d8d26a1a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe667586a06875454a08d644d8d26a1a">&#9670;&nbsp;</a></span>Test() <span class="overload">[1/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abe667586a06875454a08d644d8d26a1a">&#9670;&nbsp;</a></span>Test() <span class="overload">[1/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -132,7 +207,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="abc9490115ac78fd4263c336e25f1bdab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc9490115ac78fd4263c336e25f1bdab">&#9670;&nbsp;</a></span>Test() <span class="overload">[2/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abc9490115ac78fd4263c336e25f1bdab">&#9670;&nbsp;</a></span>Test() <span class="overload">[2/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -160,7 +235,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a796b35e1e1ec2371237371873654f7f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a796b35e1e1ec2371237371873654f7f3">&#9670;&nbsp;</a></span>Test() <span class="overload">[3/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a796b35e1e1ec2371237371873654f7f3">&#9670;&nbsp;</a></span>Test() <span class="overload">[3/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -188,7 +263,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a598893a24d4b4ed0d83a7e3a982342f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a598893a24d4b4ed0d83a7e3a982342f7">&#9670;&nbsp;</a></span>Test() <span class="overload">[4/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a598893a24d4b4ed0d83a7e3a982342f7">&#9670;&nbsp;</a></span>Test() <span class="overload">[4/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -216,7 +291,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="aae4f2ef362aecd9f58db2a92248875d9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae4f2ef362aecd9f58db2a92248875d9">&#9670;&nbsp;</a></span>Test() <span class="overload">[5/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aae4f2ef362aecd9f58db2a92248875d9">&#9670;&nbsp;</a></span>Test() <span class="overload">[5/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -244,7 +319,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a0de5a1cd6824c3cf6cded055ef422dbc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0de5a1cd6824c3cf6cded055ef422dbc">&#9670;&nbsp;</a></span>Test() <span class="overload">[6/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0de5a1cd6824c3cf6cded055ef422dbc">&#9670;&nbsp;</a></span>Test() <span class="overload">[6/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -272,7 +347,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a43da227902a57d12bae71997f6b36e8b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a43da227902a57d12bae71997f6b36e8b">&#9670;&nbsp;</a></span>Test() <span class="overload">[7/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a43da227902a57d12bae71997f6b36e8b">&#9670;&nbsp;</a></span>Test() <span class="overload">[7/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -300,7 +375,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a373b86596f317bca0f1a3aa2709d60f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a373b86596f317bca0f1a3aa2709d60f0">&#9670;&nbsp;</a></span>Test() <span class="overload">[8/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a373b86596f317bca0f1a3aa2709d60f0">&#9670;&nbsp;</a></span>Test() <span class="overload">[8/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -328,7 +403,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="ae3a8f628d9dac7dc3f05966f0e908077"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3a8f628d9dac7dc3f05966f0e908077">&#9670;&nbsp;</a></span>Test() <span class="overload">[9/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3a8f628d9dac7dc3f05966f0e908077">&#9670;&nbsp;</a></span>Test() <span class="overload">[9/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -356,7 +431,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a53b39248511aa6761c9eb2ecb1b80151"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53b39248511aa6761c9eb2ecb1b80151">&#9670;&nbsp;</a></span>Test() <span class="overload">[10/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a53b39248511aa6761c9eb2ecb1b80151">&#9670;&nbsp;</a></span>Test() <span class="overload">[10/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -384,7 +459,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="af08567d387c9cd3a6b7dcc65df11f46f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af08567d387c9cd3a6b7dcc65df11f46f">&#9670;&nbsp;</a></span>Test() <span class="overload">[11/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af08567d387c9cd3a6b7dcc65df11f46f">&#9670;&nbsp;</a></span>Test() <span class="overload">[11/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -411,8 +486,36 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ac87b8747c3396c10d6e8053380f561e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac87b8747c3396c10d6e8053380f561e8">&#9670;&nbsp;</a></span>Test() <span class="overload">[12/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Test </td>
+          <td>(</td>
+          <td class="paramtype">core&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_lock_panic&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a0f351fe662073e04f52ac5cfba5db2d9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f351fe662073e04f52ac5cfba5db2d9">&#9670;&nbsp;</a></span>Test() <span class="overload">[12/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f351fe662073e04f52ac5cfba5db2d9">&#9670;&nbsp;</a></span>Test() <span class="overload">[13/14]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -433,6 +536,77 @@ Functions</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7a24f59d085df4f4a817c57290ee25ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a24f59d085df4f4a817c57290ee25ae">&#9670;&nbsp;</a></span>Test() <span class="overload">[14/14]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Test </td>
+          <td>(</td>
+          <td class="paramtype">core&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_threads&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a617a47c70795bcff659815ad0efd2266"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a617a47c70795bcff659815ad0efd2266">&#9670;&nbsp;</a></span>counter</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int counter = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a91d35bd734de72c73a9f7ceefde27805"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91d35bd734de72c73a9f7ceefde27805">&#9670;&nbsp;</a></span>panic_loop</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int panic_loop = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a498283fd13577af3ad02f670b56be87b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a498283fd13577af3ad02f670b56be87b">&#9670;&nbsp;</a></span>th_lock</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> th_lock</td>
         </tr>
       </table>
 </div><div class="memdoc">

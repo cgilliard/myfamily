@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['panic_644',['panic',['../panic_8c.html#ad1f1a1dc0581a11b597453f148106393',1,'panic(const char *fmt,...):&#160;panic.c'],['../panic_8h.html#a138d8879e47c08e2265c41d75e539f9b',1,'panic(const char *format,...):&#160;panic.c']]]
+  ['objectptr_5fcleanup_683',['ObjectPtr_cleanup',['../type_8c.html#a89a0a05c58501829db0c8f155d6effc5',1,'ObjectPtr_cleanup(Ref ptr):&#160;type.c'],['../type_8h.html#ae7fa38e65770bdef6c9e69002c496245',1,'ObjectPtr_cleanup(const ObjectPtr *ptr):&#160;type.h']]]
 ];
