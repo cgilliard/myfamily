@@ -34,7 +34,7 @@ export timestampsv=`cat /tmp/timestamps`;
 export linesrep=`cat /tmp/lines`;
 export coveredrep=`cat /tmp/covered`;
 export cc_final=`cat /tmp/cc_final`;
-export gcov=`cat /tmp/gcov_cat.txt`;
+export gcov="unimplemented";
 
 perl -pi -e 's/REPLACESUMMARY/$ENV{gcov}/g' docs/code_coverage.html
 perl -pi -e 's/REPLACECOVERAGE_SINGLE/$ENV{cc_final}/g' docs/code_coverage.html
