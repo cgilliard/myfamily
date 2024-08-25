@@ -113,8 +113,7 @@
 		</script>
 
 		<p align="center">
-			Raw gcov output:<br/>
-			<textarea readonly class="textarea" rows="50" cols="100">REPLACESUMMARY</textarea>
+		<a href="https://raw.githubusercontent.com/cgilliard/myfamily/main/docs/gcov_cat.txt">Raw gcov output</a>
 		</p>
 	</body>
 </html>
