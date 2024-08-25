@@ -276,8 +276,8 @@ var searchData=
   ['for_5feach_5finner_5f5_349',['FOR_EACH_INNER_5',['../macro__utils_8h.html#ae5bb9e7b07c2a3d9fcd0dbdfe9fbd95c',1,'macro_utils.h']]],
   ['for_5feach_5finner_5fhelper_350',['FOR_EACH_INNER_HELPER',['../macro__utils_8h.html#ab85f43c1b3bcacd27a785195129a21d7',1,'macro_utils.h']]],
   ['for_5feach_5finner_5fn_351',['FOR_EACH_INNER_N',['../macro__utils_8h.html#a229a8ffd9ed2b8de08ea47861a553088',1,'macro_utils.h']]],
-  ['free_352',['FREE',['../toml_8c.html#a834f31033781e091a3dbdfe16f7e8285',1,'toml.c']]],
-  ['free_353',['free',['../toml_8c.html#affb9fc32698fab7f7b36e0cf8e64c83e',1,'toml.c']]],
+  ['free_352',['free',['../toml_8c.html#affb9fc32698fab7f7b36e0cf8e64c83e',1,'toml.c']]],
+  ['free_353',['FREE',['../toml_8c.html#a834f31033781e091a3dbdfe16f7e8285',1,'toml.c']]],
   ['free_5flist_354',['free_list',['../structHeapData.html#a29975f1d8bcf6d1c834d51434dd04a1f',1,'HeapData']]],
   ['free_5flist_5fhead_355',['free_list_head',['../structHeapDataParams.html#a9ee738ee4ef37e4094185578b034a89b',1,'HeapDataParams']]]
 ];
