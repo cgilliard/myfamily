@@ -15,7 +15,7 @@
 	</head>
 	<body>
 		 <p align="center">
-                        Code Coverage is currently REPLACECOVERAGE_SINGLE%.
+                        Code Coverage is currently 23.24%.
                 </p>
 		<center>
 			<div class="chart">
@@ -57,10 +57,74 @@
 					hours + ':' + minutes + ':' + seconds + ' ' + am_pm;
 			}
 
-			let raw_data = [REPLACECOVERAGE];
-			let labels = [REPLACETIMESTAMP];
-			let raw_data2 = [REPLACELINES];
-                        let raw_data3 = [REPLACECCLINES];
+			let raw_data = [16.67,
+15.45,
+15.45,
+15.45,
+15.92,
+15.92,
+15.92,
+15.92,
+15.92,
+15.92,
+18.75,
+19.07,
+20.31,
+20.31,
+23.09,
+23.24,
+23.24,];
+			let labels = [format_date(1724296044 * 1000 ),
+format_date(1724297686 * 1000 ),
+format_date(1724303299 * 1000 ),
+format_date(1724310067 * 1000 ),
+format_date(1724342762 * 1000 ),
+format_date(1724342955 * 1000 ),
+format_date(1724344312 * 1000 ),
+format_date(1724346969 * 1000 ),
+format_date(1724352193 * 1000 ),
+format_date(1724396488 * 1000 ),
+format_date(1724455036 * 1000 ),
+format_date(1724474307 * 1000 ),
+format_date(1724476633 * 1000 ),
+format_date(1724483101 * 1000 ),
+format_date(1724544901 * 1000 ),
+format_date(1724550213 * 1000 ),
+format_date(1724550997 * 1000 ),];
+			let raw_data2 = [1752,
+1638,
+1638,
+1638,
+1639,
+1639,
+1639,
+1639,
+1639,
+1639,
+1717,
+1725,
+1768,
+1768,
+1836,
+1859,
+1859,];
+                        let raw_data3 = [292,
+253,
+253,
+253,
+261,
+261,
+261,
+261,
+261,
+261,
+322,
+329,
+359,
+359,
+424,
+432,
+432,];
 
 			const data = {
 				labels: labels,
@@ -114,7 +178,7 @@
 
 		<p align="center">
 			Raw gcov output:<br/>
-			<textarea readonly class="textarea" rows="50" cols="100">REPLACESUMMARY</textarea>
+			<textarea readonly class="textarea" rows="50" cols="100">unimplemented</textarea>
 		</p>
 	</body>
 </html>
