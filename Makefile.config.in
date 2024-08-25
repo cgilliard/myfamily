@@ -4,10 +4,10 @@ CC=cc
 MAKE=make
 
 # FLags
-CC_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -Werror=incompatible-pointer-types-discards-qualifiers
+CC_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes
 CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
 CRITERION_LIB=-LREPLACE_CRITERION_LIB
-CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -Werror=incompatible-pointer-types-discards-qualifiers -lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB)
+CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB)
 RELEASE_FLAGS=-O3 -flto
 TEST_FLAGS=-g -Og -DTEST
 SAN_FLAGS=-g -Og -fsanitize=undefined -fsanitize=address -DTEST
