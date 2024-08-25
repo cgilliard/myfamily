@@ -715,6 +715,7 @@ Test(core, test_lock_panic) {
 	pthread_join(th, NULL);
 	bool isp = Lock_is_poisoned(&th_lock);
 	cr_assert(isp);
+	Lock_cleanup(&th_lock);
 }
 
 void start_thread_test(void *obj) {
