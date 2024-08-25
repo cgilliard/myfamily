@@ -75,14 +75,15 @@ FatPtr build_fat_ptr(u64 size);
 // TODO: _fptr__.data may be NULL, need to handle. Once we have 'Result'
 // implement two versions of this macro. One which panics and one which returns
 // error.
-#define new                                                                    \
-	(type, ...)({                                                          \
-		FatPtr _fptr__ = build_fat_ptr(type##_size());                 \
-		type _type__ = {__VA_ARGS__};                                  \
-		*((type *)_fptr__.data) = _type__;                             \
-		Object _ret__ = {&type##_Vtable__, unique_id(), 0, _fptr__};   \
+// clang-format off
+#define new(name, ...)({                                                          \
+		FatPtr _fptr__ = build_fat_ptr(name##_size());                 \
+		name _type__ = {__VA_ARGS__};                                  \
+		*((name *)_fptr__.data) = _type__;                             \
+		Object _ret__ = {&name##_Vtable__, unique_id(), 0, _fptr__};   \
 		_ret__;                                                        \
 	})
+// clang-format on
 
 #define get(type, obj, field_name) *type##_get_##field_name(&obj)
 #define set(type, obj, field_name, value) type##_set_##field_name(&obj, value)

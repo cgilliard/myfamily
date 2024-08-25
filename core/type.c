@@ -22,23 +22,6 @@ u64 __global_counter__ = 0;
 
 u64 unique_id() { return __global_counter__++; }
 
-// need to access the const mutably here for cleanup only
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored                                                 \
-    "-Wincompatible-pointer-types-discards-qualifiers"
-void Object_cleanup(Ref ptr) {
-	Object *unconst = ptr;
-	if ((unconst->flags & VDATA_FLAGS_NO_CLEANUP) == 0) {
-		void (*do_cleanup)(Object * ptr) = find_fn(ptr, "cleanup");
-		if (do_cleanup)
-			do_cleanup(ptr);
-		if (fat_ptr_data(&unconst->ptr)) {
-			chain_free(&unconst->ptr);
-		}
-	}
-}
-#pragma GCC diagnostic pop // re-enable
-
 FatPtr build_fat_ptr(u64 size) {
 	FatPtr ret;
 	if (chain_malloc(&ret, size)) {
@@ -94,4 +77,27 @@ void *find_fn(Ref obj, const char *name) {
 		}
 	}
 	return NULL;
+}
+
+#if defined(__clang__)
+// Clang-specific pragma
+#pragma clang diagnostic ignored                                               \
+    "-Wincompatible-pointer-types-discards-qualifiers"
+#elif defined(__GNUC__) && !defined(__clang__)
+// GCC-specific pragma
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+#else
+#warning "Unknown compiler or platform. No specific warning pragmas applied."
+#endif
+void Object_cleanup(Ref ptr) {
+	Object *unconst = ptr;
+	if ((unconst->flags & VDATA_FLAGS_NO_CLEANUP) == 0) {
+		void (*do_cleanup)(Object * ptr) = find_fn(ptr, "cleanup");
+		if (do_cleanup)
+			do_cleanup(ptr);
+		if (fat_ptr_data(&unconst->ptr)) {
+			chain_free(&unconst->ptr);
+		}
+	}
 }
