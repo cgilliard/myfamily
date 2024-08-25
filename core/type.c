@@ -32,12 +32,18 @@ void ObjectPtr_cleanup(Ref ptr) {
 		void (*do_cleanup)(ObjectPtr * ptr) = find_fn(ptr, "cleanup");
 		if (do_cleanup)
 			do_cleanup(ptr);
-	}
-	if (fat_ptr_data(&unconst->ptr)) {
-		// myfree(&unconst->ptr);
+		if (fat_ptr_data(&unconst->ptr)) {
+			chain_free(&unconst->ptr);
+		}
 	}
 }
 #pragma GCC diagnostic pop // re-enable
+
+FatPtr build_fat_ptr(u64 size) {
+	FatPtr ret;
+	chain_malloc(&ret, size);
+	return ret;
+}
 
 int compare_vtable_entry(const void *ent1, const void *ent2) {
 	const VtableEntry *vtent1 = ent1;

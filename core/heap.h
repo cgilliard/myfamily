@@ -214,7 +214,7 @@ int heap_allocator_cleanup(HeapAllocator *ptr);
  * @return a void pointer to the data location assicated to this #FatPtr
  * @see [fat_ptr_len]
  */
-void *fat_ptr_data(FatPtr *ptr);
+void *fat_ptr_data(const FatPtr *ptr);
 
 /**
  * Returns the length in bytes of the specified #FatPtr.
@@ -222,7 +222,7 @@ void *fat_ptr_data(FatPtr *ptr);
  * @return the length in bytes that has been allocated to this #FatPtr.
  * @see [fat_ptr_data]
  */
-u64 fat_ptr_len(FatPtr *ptr);
+u64 fat_ptr_len(const FatPtr *ptr);
 
 #define HA_CONFIG_DEFAULT                                                      \
 	{ false, false }
@@ -254,7 +254,7 @@ extern bool __debug_build_allocator_malloc_fail8;
 void *do_malloc(size_t size);
 void *do_realloc(void *ptr, size_t size);
 void do_free(void *ptr);
-u64 fat_ptr_id(FatPtr *ptr);
+u64 fat_ptr_id(const FatPtr *ptr);
 #endif // TEST
 
 #endif // _CORE_HEAP__

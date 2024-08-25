@@ -71,11 +71,11 @@ void *do_realloc(void *ptr, size_t size) {
 	return ret;
 }
 
-void *fat_ptr_data(FatPtr *ptr) { return ptr->data; }
+void *fat_ptr_data(const FatPtr *ptr) { return ptr->data; }
 
-u64 fat_ptr_len(FatPtr *ptr) { return ptr->len; }
+u64 fat_ptr_len(const FatPtr *ptr) { return ptr->len; }
 
-u64 fat_ptr_id(FatPtr *ptr) { return ptr->id; }
+u64 fat_ptr_id(const FatPtr *ptr) { return ptr->id; }
 
 int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs,
 				  bool last_is_uint_max) {
@@ -455,6 +455,9 @@ int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr) {
 		}
 	}
 
+	// printf("allocate size=%llu,id=%llu,p=%p\n", size, fptr->id,
+	// fptr->data);
+
 	return ret;
 }
 
@@ -487,6 +490,8 @@ int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr) {
 			((char *)fptr->data)[i] = 0;
 		}
 	}
+
+	// printf("free id=%llu,p=%p\n", fptr->id, fptr->data);
 
 	return ret;
 }

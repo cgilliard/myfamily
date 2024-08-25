@@ -17,3 +17,4 @@
 #include <core/lock.h>
 #include <core/panic.h>
 #include <core/thread.h>
+#include <core/type.h>

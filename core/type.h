@@ -15,9 +15,9 @@
 #ifndef _CORE_TYPE__
 #define _CORE_TYPE__
 
+#include <core/chain_allocator.h>
 #include <core/heap.h>
 #include <core/macro_utils.h>
-#include <core/mymalloc.h>
 #include <core/types.h>
 
 #define VDATA_FLAGS_NO_CLEANUP (0x1 << 0)
@@ -44,6 +44,7 @@ void sort_vtable(Vtable *table);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
 void *find_fn(const ObjectPtr *obj, const char *name);
 u64 unique_id();
+FatPtr build_fat_ptr(u64 size);
 
 #define Cleanup                                                                \
 	ObjectPtr                                                              \
@@ -54,33 +55,60 @@ u64 unique_id();
 #define MutRef Cleanup *
 #define Ref const Cleanup *
 
-#define TYPE_DATA(name, ...)                                                   \
+#define Type(name, ...)                                                        \
+	typedef struct name name;                                              \
+	static Vtable name##_Vtable__ = {0, NULL};                             \
+	u64 name##_size();                                                     \
+	void name##_cleanup(name *obj);                                        \
 	typedef struct name {                                                  \
 		__VA_ARGS__                                                    \
 	} name;                                                                \
 	u64 name##_size() { return sizeof(name); }                             \
 	void __attribute__((constructor)) __add_impls_##name##_vtable() {      \
-		VtableEntry next = {"cleanup", name##_cleanup};                \
-		vtable_add_entry(&name##_Vtable__, next);                      \
-		VtableEntry next2 = {"size", name##_size};                     \
-		vtable_add_entry(&name##_Vtable__, next2);                     \
+		VtableEntry cleanup = {"cleanup", name##_cleanup};             \
+		vtable_add_entry(&name##_Vtable__, cleanup);                   \
+		VtableEntry size = {"size", name##_size};                      \
+		vtable_add_entry(&name##_Vtable__, size);                      \
 	}
 
-#define TYPE(name)                                                             \
-	typedef struct name name;                                              \
-	static Vtable name##_Vtable__ = {0, NULL};                             \
-	u64 name##_size();                                                     \
-	void name##_cleanup(name *obj);
+#define Field(field_type, field_name) field_type field_name;
 
-#define FIELD(field_type, field_name) field_type field_name;
+#define new                                                                    \
+	(type, ...)({                                                          \
+		FatPtr _fptr__ = build_fat_ptr(type##_size());                 \
+		type _type__ = {__VA_ARGS__};                                  \
+		type *ref = _fptr__.data;                                      \
+		*ref = _type__;                                                \
+		ObjectPtr _ret__ = {&type##_Vtable__, unique_id(), 0,          \
+				    _fptr__};                                  \
+		_ret__;                                                        \
+	})
 
-static FatPtr build_fat_ptr(u64 size) {
-	FatPtr ret;
-	// mymalloc(&ret, size);
-	return ret;
-}
+#define get(type, obj, field_name) *type##_get_##field_name(&obj)
+#define set(type, obj, field_name, value) type##_set_##field_name(&obj, value)
 
-#define BUILD(type)                                                            \
-	{ &type##_Vtable__, unique_id(), 0, build_fat_ptr(type##_size()) }
+#define MEMBER_TYPE(type, member) typeof(((type *)0)->member)
+
+#define getter(name, field_name)                                               \
+	MEMBER_TYPE(name, field_name) *                                        \
+	    name##_get_##field_name(const ObjectPtr *self) {                   \
+		name *tptr = fat_ptr_data(&self->ptr);                         \
+		return &tptr->field_name;                                      \
+	}
+
+#define setter(name, field_name)                                               \
+	void name##_set_##field_name(                                          \
+	    ObjectPtr *self, MEMBER_TYPE(name, field_name) field_name) {       \
+		name *tptr = fat_ptr_data(&self->ptr);                         \
+		tptr->field_name = field_name;                                 \
+	}
+
+#define getter_proto(name, field_name)                                         \
+	MEMBER_TYPE(name, field_name) *                                        \
+	    name##_get_##field_name(const ObjectPtr *self);
+
+#define setter_proto(name, field_name)                                         \
+	void name##_set_##field_name(                                          \
+	    ObjectPtr *self, MEMBER_TYPE(name, field_name) field_name);
 
 #endif // _CORE_TYPE__

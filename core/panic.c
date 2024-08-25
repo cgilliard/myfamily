@@ -22,6 +22,7 @@
 #include <stdnoreturn.h>
 
 _Thread_local jmp_buf return_jmp;
+_Thread_local bool jmp_return_set = false;
 
 void panic(const char *fmt, ...) {
 	va_list args;
@@ -37,5 +38,10 @@ void panic(const char *fmt, ...) {
 	if (__default_tl_heap_allocator != NULL) {
 		heap_allocator_cleanup(__default_tl_heap_allocator);
 	}
+
+	// If jump return has not been set, we resort to an exit with an error
+	// status.
+	if (!jmp_return_set)
+		exit(-1);
 	longjmp(return_jmp, THREAD_PANIC);
 }

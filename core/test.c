@@ -794,3 +794,91 @@ Test(core, test_synchronized) {
 	cr_assert(!JoinResult_is_error(&jr));
 	Lock_cleanup(&sync_lock);
 }
+
+// declare a type called 'TestType' to demonstrate usage of the macro library.
+// This type has two fields, a u64 and a u32
+Type(TestType, Field(u64, x) Field(u32, y));
+
+// create setter prototypes. In this case these are optional as the criterion
+// library uses a single test file. But this allows for separation of the
+// function prototype from the actual implementation.
+setter_proto(TestType, x);
+// likewise for the getter prototype allowing access to this field.
+getter_proto(TestType, x);
+setter_proto(TestType, y);
+getter_proto(TestType, y);
+
+// these are the actual setter/getter implementations. Clearly all of these are
+// optional and can be declared in any context they're needed.
+// to declare a static version of the setters/getters, one could prefix these
+// macros with the 'static' keyword thus allowing these to be declared in header
+// files.
+setter(TestType, x);
+getter(TestType, x);
+setter(TestType, y);
+getter(TestType, y);
+
+// implement the required __atrribute__ 'cleanup' function which will be called
+// when Any TestType instance goes out of scope. In this case, we
+// don't do anything since no actual cleanup is required. There is no need to
+// explicitly call this function as the macros set an __attribute__ cleanup
+// function which is automatically executed when the variable goes out of scope.
+void TestType_cleanup(TestType *ptr) {}
+
+void update_x_y(ObjectPtr *ptr) {
+	set(TestType, *ptr, x, 100);
+	set(TestType, *ptr, y, 200);
+}
+
+Test(core, test_types) {
+	// declare some unsigned integer variables for use with our Type.
+	u64 xv;
+	u32 yv;
+
+	// instantiate a 'new' instance of TestType. This new instance is
+	// declared using 'var' syntax which maps to a mutable instance of the
+	// variable. The initial values are specified in order according to the
+	// declaration. So, in this case, the field x = 1 and y = 2.
+	var t1 = new (TestType, 1, 2);
+
+	// use the 'get' function to get the values of 'x' and 'y'.
+	xv = get(TestType, t1, x);
+	yv = get(TestType, t1, y);
+
+	// they are equal to 1 and 2 respectively.
+	cr_assert_eq(xv, 1);
+	cr_assert_eq(yv, 2);
+
+	// set 'x' to 100.
+	set(TestType, t1, x, 100);
+
+	// get 'x' and make assertion.
+	xv = get(TestType, t1, x);
+	cr_assert_eq(xv, 100);
+
+	// instantiate a 'new' instance of TestType. This instance is declared
+	// using 'let' syntax which maps to an immutable instance of the
+	// variable. Once again initial values are specified.
+	let t2 = new (TestType, 3, 4);
+
+	// getters (which are immutable) can be used to access the values of t2.
+	xv = get(TestType, t2, x);
+	yv = get(TestType, t2, y);
+
+	cr_assert_eq(xv, 3);
+	cr_assert_eq(yv, 4);
+
+	// update x and y
+	update_x_y(&t1);
+	xv = get(TestType, t1, x);
+	yv = get(TestType, t1, y);
+	cr_assert_eq(xv, 100);
+	cr_assert_eq(yv, 200);
+
+	// This line would result in a compiler warning (which is configured to
+	// an error in the default build configuration)  because t2 is immutable
+	// set(TestType, t2, x, 100);
+
+	// this line also results in a compiler warning/error
+	// update_x_y(&t2);
+}
