@@ -738,3 +738,58 @@ Test(core, test_threads) {
 	cr_assert(JoinResult_is_panic(&jr2));
 	cr_assert(!JoinResult_is_error(&jr2));
 }
+
+Lock cond_lock;
+bool check_condition = false;
+int cond_count = 0;
+
+void cond_thread(void *obj) {
+	int v = *((int *)obj);
+	{
+		LockGuard lg = lock(&cond_lock);
+		while (!check_condition)
+			Lock_wait(&cond_lock, 0);
+		cond_count++;
+	}
+}
+
+Test(core, test_wait_notify) {
+	cond_lock = LOCK();
+	int v = 1234;
+	Thread th;
+	Thread_start(&th, cond_thread, &v);
+	check_condition = true;
+	Lock_notify(&cond_lock);
+	JoinResult jr = Thread_join(&th);
+	cr_assert(cond_count == 1);
+	cr_assert(!JoinResult_is_panic(&jr));
+	cr_assert(!JoinResult_is_error(&jr));
+	Lock_cleanup(&cond_lock);
+}
+
+Lock sync_lock;
+bool sync_cond = false;
+u64 sync_count = 0;
+
+void sync_thread(void *obj) {
+	// clang-format off
+	synchronized(sync_lock, {
+		while(!sync_cond)
+			Lock_wait(&sync_lock, 0);
+	})
+	sync_count++;
+	// clang-format on
+}
+
+Test(core, test_synchronized) {
+	sync_lock = LOCK();
+	Thread th;
+	Thread_start(&th, sync_thread, NULL);
+	sync_cond = true;
+	Lock_notify(&sync_lock);
+	JoinResult jr = Thread_join(&th);
+	cr_assert_eq(sync_count, 1);
+	cr_assert(!JoinResult_is_panic(&jr));
+	cr_assert(!JoinResult_is_error(&jr));
+	Lock_cleanup(&sync_lock);
+}

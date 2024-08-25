@@ -21,6 +21,7 @@
 
 typedef struct LockPtr {
 	pthread_mutex_t lock;
+	pthread_cond_t cond;
 	atomic_ullong tid;
 	atomic_bool is_locked;
 	atomic_bool poison;
@@ -47,8 +48,17 @@ Lock Lock_build();
 	    __attribute__((warn_unused_result, cleanup(Lockguard_cleanup)))
 
 LockGuard lock(Lock *lock);
+void Lock_wait(Lock *lock, u64 nanos);
+void Lock_notify(Lock *lock);
+void Lock_notify_all(Lock *lock);
 
 #define LOCK() Lock_build()
 #define LOCK_GUARD_CLEANUP_SAFE {NULL};
+
+#define synchronized(ptr, exe)                                                 \
+	do {                                                                   \
+		LockGuard __lg__ = lock(&ptr);                                 \
+		exe                                                            \
+	} while (0);
 
 #endif // _CORE_LOCK__
