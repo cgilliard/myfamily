@@ -32,23 +32,22 @@ typedef struct {
 	VtableEntry *entries;
 } Vtable;
 
-typedef struct ObjectPtr {
+typedef struct Object {
 	Vtable *vtable;
 	u64 id;
 	u8 flags;
 	FatPtr ptr;
-} ObjectPtr;
+} Object;
 
-void ObjectPtr_cleanup(const ObjectPtr *ptr);
+void Object_cleanup(const Object *ptr);
 void sort_vtable(Vtable *table);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
-void *find_fn(const ObjectPtr *obj, const char *name);
+void *find_fn(const Object *obj, const char *name);
 u64 unique_id();
 FatPtr build_fat_ptr(u64 size);
 
 #define Cleanup                                                                \
-	ObjectPtr                                                              \
-	    __attribute__((warn_unused_result, cleanup(ObjectPtr_cleanup)))
+	Object __attribute__((warn_unused_result, cleanup(Object_cleanup)))
 
 #define var Cleanup
 #define let const Cleanup
@@ -73,14 +72,15 @@ FatPtr build_fat_ptr(u64 size);
 
 #define Field(field_type, field_name) field_type field_name;
 
+// TODO: _fptr__.data may be NULL, need to handle. Once we have 'Result'
+// implement two versions of this macro. One which panics and one which returns
+// error.
 #define new                                                                    \
 	(type, ...)({                                                          \
 		FatPtr _fptr__ = build_fat_ptr(type##_size());                 \
 		type _type__ = {__VA_ARGS__};                                  \
-		type *ref = _fptr__.data;                                      \
-		*ref = _type__;                                                \
-		ObjectPtr _ret__ = {&type##_Vtable__, unique_id(), 0,          \
-				    _fptr__};                                  \
+		*((type *)_fptr__.data) = _type__;                             \
+		Object _ret__ = {&type##_Vtable__, unique_id(), 0, _fptr__};   \
 		_ret__;                                                        \
 	})
 
@@ -91,24 +91,24 @@ FatPtr build_fat_ptr(u64 size);
 
 #define getter(name, field_name)                                               \
 	MEMBER_TYPE(name, field_name) *                                        \
-	    name##_get_##field_name(const ObjectPtr *self) {                   \
+	    name##_get_##field_name(const Object *self) {                      \
 		name *tptr = fat_ptr_data(&self->ptr);                         \
 		return &tptr->field_name;                                      \
 	}
 
 #define setter(name, field_name)                                               \
 	void name##_set_##field_name(                                          \
-	    ObjectPtr *self, MEMBER_TYPE(name, field_name) field_name) {       \
+	    Object *self, MEMBER_TYPE(name, field_name) field_name) {          \
 		name *tptr = fat_ptr_data(&self->ptr);                         \
 		tptr->field_name = field_name;                                 \
 	}
 
 #define getter_proto(name, field_name)                                         \
 	MEMBER_TYPE(name, field_name) *                                        \
-	    name##_get_##field_name(const ObjectPtr *self);
+	    name##_get_##field_name(const Object *self);
 
 #define setter_proto(name, field_name)                                         \
 	void name##_set_##field_name(                                          \
-	    ObjectPtr *self, MEMBER_TYPE(name, field_name) field_name);
+	    Object *self, MEMBER_TYPE(name, field_name) field_name);
 
 #endif // _CORE_TYPE__

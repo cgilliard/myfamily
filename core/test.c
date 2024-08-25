@@ -825,7 +825,7 @@ getter(TestType, y);
 // function which is automatically executed when the variable goes out of scope.
 void TestType_cleanup(TestType *ptr) {}
 
-void update_x_y(ObjectPtr *ptr) {
+void update_x_y(MutRef ptr) {
 	set(TestType, *ptr, x, 100);
 	set(TestType, *ptr, y, 200);
 }

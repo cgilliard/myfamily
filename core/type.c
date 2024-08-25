@@ -26,10 +26,10 @@ u64 unique_id() { return __global_counter__++; }
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored                                                 \
     "-Wincompatible-pointer-types-discards-qualifiers"
-void ObjectPtr_cleanup(Ref ptr) {
-	ObjectPtr *unconst = ptr;
+void Object_cleanup(Ref ptr) {
+	Object *unconst = ptr;
 	if ((unconst->flags & VDATA_FLAGS_NO_CLEANUP) == 0) {
-		void (*do_cleanup)(ObjectPtr * ptr) = find_fn(ptr, "cleanup");
+		void (*do_cleanup)(Object * ptr) = find_fn(ptr, "cleanup");
 		if (do_cleanup)
 			do_cleanup(ptr);
 		if (fat_ptr_data(&unconst->ptr)) {
@@ -41,7 +41,11 @@ void ObjectPtr_cleanup(Ref ptr) {
 
 FatPtr build_fat_ptr(u64 size) {
 	FatPtr ret;
-	chain_malloc(&ret, size);
+	if (chain_malloc(&ret, size)) {
+		// if chain_malloc is an error we set data to NULL and caller to
+		// handle
+		ret.data = NULL;
+	}
 	return ret;
 }
 
