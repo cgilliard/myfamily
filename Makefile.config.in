@@ -8,6 +8,15 @@ CC_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes
 CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
 CRITERION_LIB=-LREPLACE_CRITERION_LIB
 CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB)
+ifeq ($(shell $(CC) -dM -E - < /dev/null | grep '__clang__'),)
+    # If GCC is detected
+    CC_FLAGS += -Werror=discarded-qualifiers
+    CC_TEST_FLAGS += -Werror=discarded-qualifiers
+else
+    # If Clang is detected
+    CC_FLAGS += -Werror=incompatible-pointer-types-discards-qualifiers
+    CC_TEST_FLAGS += -Werror=incompatible-pointer-types-discards-qualifiers
+endif
 RELEASE_FLAGS=-O3 -flto
 TEST_FLAGS=-g -Og -DTEST
 SAN_FLAGS=-g -Og -fsanitize=undefined -fsanitize=address -DTEST
