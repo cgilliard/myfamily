@@ -68,7 +68,6 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
@@ -86,11 +85,6 @@ $(function() {
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:ab53a76916d5a7c5966fc994b1d02dbff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#ab53a76916d5a7c5966fc994b1d02dbff">MAX_CHAIN_ALLOCATOR_DEPTH</a>&#160;&#160;&#160;100</td></tr>
-<tr class="separator:ab53a76916d5a7c5966fc994b1d02dbff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -124,8 +118,12 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a89a0b0126a544f4d152c9b6d9d381209"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structHeapAllocator.html">HeapAllocator</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a89a0b0126a544f4d152c9b6d9d381209">__default_tl_heap_allocator</a> = NULL</td></tr>
+<tr class="separator:a89a0b0126a544f4d152c9b6d9d381209"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78281631a068160585f291c1008be6a6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structHeapAllocator.html">HeapAllocator</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a78281631a068160585f291c1008be6a6">__global_sync_allocator</a> = NULL</td></tr>
 <tr class="separator:a78281631a068160585f291c1008be6a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a056b083c03dcecdc263ff590f67a5669"><td class="memItemLeft" align="right" valign="top"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a056b083c03dcecdc263ff590f67a5669">__global_sync_allocator_lock</a> = NULL</td></tr>
+<tr class="separator:a056b083c03dcecdc263ff590f67a5669"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aafa38721651819c348c2d3dccceaff22"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structHeapAllocatorConfig.html">HeapAllocatorConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#aafa38721651819c348c2d3dccceaff22">__default_hconfig_</a> = {false, false}</td></tr>
 <tr class="separator:aafa38721651819c348c2d3dccceaff22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add9f5a74c73caad1f1599ddbffdfb88e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structHeapDataParamsConfig.html">HeapDataParamsConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a> []</td></tr>
@@ -134,26 +132,11 @@ Variables</h2></td></tr>
 <tr class="separator:ad09fb2a24755bca224bd076e6d818aec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb5d070ac2ed7841c63e686177e6fc79"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#acb5d070ac2ed7841c63e686177e6fc79">__default_hdpc_arr_size</a></td></tr>
 <tr class="separator:acb5d070ac2ed7841c63e686177e6fc79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26f0241573b4b4f69e5559c1d7b209e1"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a26f0241573b4b4f69e5559c1d7b209e1">__thread_local_chain_allocator</a> [<a class="el" href="chain__allocator_8c.html#ab53a76916d5a7c5966fc994b1d02dbff">MAX_CHAIN_ALLOCATOR_DEPTH</a>]</td></tr>
+<tr class="memitem:a26f0241573b4b4f69e5559c1d7b209e1"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a26f0241573b4b4f69e5559c1d7b209e1">__thread_local_chain_allocator</a> [<a class="el" href="chain__allocator_8h.html#ab53a76916d5a7c5966fc994b1d02dbff">MAX_CHAIN_ALLOCATOR_DEPTH</a>]</td></tr>
 <tr class="separator:a26f0241573b4b4f69e5559c1d7b209e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1142069a8e3a2876e39aa13e67b035c"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#ac1142069a8e3a2876e39aa13e67b035c">__thread_local_chain_allocator_index</a> = 0</td></tr>
 <tr class="separator:ac1142069a8e3a2876e39aa13e67b035c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="ab53a76916d5a7c5966fc994b1d02dbff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab53a76916d5a7c5966fc994b1d02dbff">&#9670;&nbsp;</a></span>MAX_CHAIN_ALLOCATOR_DEPTH</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MAX_CHAIN_ALLOCATOR_DEPTH&#160;&#160;&#160;100</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="a75e50a043100b00eed7fa9dc3ceb661d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a75e50a043100b00eed7fa9dc3ceb661d">&#9670;&nbsp;</a></span>ChainGuardEntry</h2>
@@ -486,7 +469,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Initial value:</b><div class="fragment"><div class="line">=</div>
 <div class="line">    <span class="keyword">sizeof</span>(<a class="code" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>) / <span class="keyword">sizeof</span>(<a class="code" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>[0])</div>
-<div class="ttc" id="achain__allocator_8c_html_add9f5a74c73caad1f1599ddbffdfb88e"><div class="ttname"><a href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a></div><div class="ttdeci">HeapDataParamsConfig __default_hdpc_arr_value[]</div><div class="ttdef"><b>Definition:</b> chain_allocator.c:24</div></div>
+<div class="ttc" id="achain__allocator_8c_html_add9f5a74c73caad1f1599ddbffdfb88e"><div class="ttname"><a href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a></div><div class="ttdeci">HeapDataParamsConfig __default_hdpc_arr_value[]</div><div class="ttdef"><b>Definition:</b> chain_allocator.c:26</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -514,6 +497,20 @@ Variables</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a89a0b0126a544f4d152c9b6d9d381209"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89a0b0126a544f4d152c9b6d9d381209">&#9670;&nbsp;</a></span>__default_tl_heap_allocator</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">_Thread_local <a class="el" href="structHeapAllocator.html">HeapAllocator</a>* __default_tl_heap_allocator = NULL</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a78281631a068160585f291c1008be6a6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a78281631a068160585f291c1008be6a6">&#9670;&nbsp;</a></span>__global_sync_allocator</h2>
 
@@ -528,6 +525,20 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a056b083c03dcecdc263ff590f67a5669"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a056b083c03dcecdc263ff590f67a5669">&#9670;&nbsp;</a></span>__global_sync_allocator_lock</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a>* __global_sync_allocator_lock = NULL</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a26f0241573b4b4f69e5559c1d7b209e1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a26f0241573b4b4f69e5559c1d7b209e1">&#9670;&nbsp;</a></span>__thread_local_chain_allocator</h2>
 
@@ -535,7 +546,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">_Thread_local <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a> __thread_local_chain_allocator[<a class="el" href="chain__allocator_8c.html#ab53a76916d5a7c5966fc994b1d02dbff">MAX_CHAIN_ALLOCATOR_DEPTH</a>]</td>
+          <td class="memname">_Thread_local <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a> __thread_local_chain_allocator[<a class="el" href="chain__allocator_8h.html#ab53a76916d5a7c5966fc994b1d02dbff">MAX_CHAIN_ALLOCATOR_DEPTH</a>]</td>
         </tr>
       </table>
 </div><div class="memdoc">

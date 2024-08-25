@@ -96,6 +96,8 @@ Macros</h2></td></tr>
 <tr class="separator:afc37b5ae502cbe90cde7bb660c40d614"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefb7db7456a848e7cefe90816a5aaa88"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#aefb7db7456a848e7cefe90816a5aaa88">LOCK</a>()&#160;&#160;&#160;<a class="el" href="lock_8h.html#ad2b937c09217ad140001c5f97dbc395c">Lock_build</a>()</td></tr>
 <tr class="separator:aefb7db7456a848e7cefe90816a5aaa88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc1d8e926cf1f2b3887e2c155eb8b8ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#abc1d8e926cf1f2b3887e2c155eb8b8ab">LOCK_GUARD_CLEANUP_SAFE</a>&#160;&#160;&#160;{NULL};</td></tr>
+<tr class="separator:abc1d8e926cf1f2b3887e2c155eb8b8ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -155,6 +157,20 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="abc1d8e926cf1f2b3887e2c155eb8b8ab"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc1d8e926cf1f2b3887e2c155eb8b8ab">&#9670;&nbsp;</a></span>LOCK_GUARD_CLEANUP_SAFE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define LOCK_GUARD_CLEANUP_SAFE&#160;&#160;&#160;{NULL};</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="afc37b5ae502cbe90cde7bb660c40d614"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afc37b5ae502cbe90cde7bb660c40d614">&#9670;&nbsp;</a></span>LockGuard</h2>
 
@@ -168,7 +184,7 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    LockGuardPtr                                                           \</div>
 <div class="line">        __attribute__((warn_unused_result, cleanup(<a class="code" href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a>)))</div>
-<div class="ttc" id="alock_8h_html_a7c2e32969ff851fb0a311f9491011b52"><div class="ttname"><a href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a></div><div class="ttdeci">void Lockguard_cleanup(LockGuardPtr *ptr)</div><div class="ttdef"><b>Definition:</b> lock.c:82</div></div>
+<div class="ttc" id="alock_8h_html_a7c2e32969ff851fb0a311f9491011b52"><div class="ttname"><a href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a></div><div class="ttdeci">void Lockguard_cleanup(LockGuardPtr *ptr)</div><div class="ttdef"><b>Definition:</b> lock.c:84</div></div>
 </div><!-- fragment -->
 </div>
 </div>

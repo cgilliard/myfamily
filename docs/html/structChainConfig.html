@@ -78,6 +78,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ad0aa27f6cd58c9e03882e5f9ff93158e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a016ef8ed5f9f74fbeeaf2d76762a7200"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structChainConfig.html#a016ef8ed5f9f74fbeeaf2d76762a7200">is_sync</a></td></tr>
 <tr class="separator:a016ef8ed5f9f74fbeeaf2d76762a7200"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a078edc474df493a3b1c8fb7b3bfec1f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structChainConfig.html#a078edc474df493a3b1c8fb7b3bfec1f2">lock</a></td></tr>
+<tr class="separator:a078edc474df493a3b1c8fb7b3bfec1f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The <a class="el" href="structChainConfig.html">ChainConfig</a> specifies which <a class="el" href="structHeapAllocator.html">HeapAllocator</a> will be used and whether calls to <a class="el" href="chain__allocator_8h.html#a6b4433e7d057a87fdf1fa33006dc6d43">chain_malloc</a>, <a class="el" href="chain__allocator_8h.html#a64f481aa76ea155a58cc2a4d8778e0d4">chain_realloc</a>, and <a class="el" href="chain__allocator_8h.html#abce9c8f3105d54e0cf1e80cfd0688c42">chain_free</a> should be performed in a synchronous manner using locks. </p><dl class="params"><dt>Parameters</dt><dd>
@@ -110,6 +112,20 @@ Public Attributes</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">bool ChainConfig::is_sync</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a078edc474df493a3b1c8fb7b3bfec1f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a078edc474df493a3b1c8fb7b3bfec1f2">&#9670;&nbsp;</a></span>lock</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a>* ChainConfig::lock</td>
         </tr>
       </table>
 </div><div class="memdoc">

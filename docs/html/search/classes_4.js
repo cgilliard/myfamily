@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['objectptr_571',['ObjectPtr',['../structObjectPtr.html',1,'']]]
+  ['lockguardptr_602',['LockGuardPtr',['../structLockGuardPtr.html',1,'']]],
+  ['lockptr_603',['LockPtr',['../structLockPtr.html',1,'']]]
 ];

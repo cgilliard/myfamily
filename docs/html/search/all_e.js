@@ -1,6 +1,10 @@
 var searchData=
 [
-  ['objectptr_441',['ObjectPtr',['../structObjectPtr.html',1,'ObjectPtr'],['../type_8h.html#aa81db2d219246e69ea604a26f7dea297',1,'ObjectPtr():&#160;type.h']]],
-  ['objectptr_5fcleanup_442',['ObjectPtr_cleanup',['../type_8c.html#a89a0a05c58501829db0c8f155d6effc5',1,'ObjectPtr_cleanup(Ref ptr):&#160;type.c'],['../type_8h.html#ae7fa38e65770bdef6c9e69002c496245',1,'ObjectPtr_cleanup(const ObjectPtr *ptr):&#160;type.h']]],
-  ['ok_443',['ok',['../structtoml__datum__t.html#aaaa1a9c7276341b8c114b5ef67fb87bb',1,'toml_datum_t']]]
+  ['name_442',['name',['../structVtableEntry.html#a74664b1cf7b569ba5393f7586b731cac',1,'VtableEntry']]],
+  ['narr_443',['narr',['../structtoml__table__t.html#a2661908eba6faf7deeadda8cc71b56f6',1,'toml_table_t']]],
+  ['newline_444',['NEWLINE',['../toml_8c.html#a1cd5a977fc0e004b56371bd3d7555bada59d02b47a666732cc6577f158272b099',1,'toml.c']]],
+  ['nitem_445',['nitem',['../structtoml__array__t.html#a3a0f22528b06ae74462d9e894817c909',1,'toml_array_t']]],
+  ['nkval_446',['nkval',['../structtoml__table__t.html#a5a9122b12c06d527b8353da0a65f71ec',1,'toml_table_t']]],
+  ['no_5fmalloc_447',['no_malloc',['../structHeapAllocatorConfig.html#af68e472fa3d04f4a3714370af1f41456',1,'HeapAllocatorConfig']]],
+  ['ntab_448',['ntab',['../structtoml__table__t.html#a924b7c34df9bdd5bf3ab0266859cc031',1,'toml_table_t']]]
 ];

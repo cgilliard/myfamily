@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['toml_5fextern_1126',['TOML_EXTERN',['../toml_8h.html#a022d02391f9de10a690e4c7bcccb6ada',1,'toml.h']]],
-  ['tostring_1127',['TOSTRING',['../toml_8c.html#a9063e80f8777300c93afde6e6f4c9cea',1,'toml.c']]],
-  ['type_1128',['TYPE',['../type_8h.html#a23293ac2f1c46bdbbfe2cad8c2fb31ee',1,'type.h']]],
-  ['type_5fdata_1129',['TYPE_DATA',['../type_8h.html#aca9311fb5cd27a2ef0d6ac7432cfffe1',1,'type.h']]]
+  ['scoped_5fallocator_1188',['SCOPED_ALLOCATOR',['../chain__allocator_8h.html#a5f80eb18a2917d69e22f6414ba4cb167',1,'chain_allocator.h']]],
+  ['strdup_1189',['strdup',['../toml_8c.html#a2f35dff70d447197a36db45d9c42be30',1,'toml.c']]],
+  ['stringify_1190',['STRINGIFY',['../macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7',1,'STRINGIFY():&#160;macro_utils.h'],['../toml_8c.html#a6df1d22fb5f09eccc23b9f399670cfd7',1,'STRINGIFY():&#160;toml.c']]],
+  ['strndup_1191',['strndup',['../toml_8c.html#a7c3972b4ab432d88f0a2b046e3f613aa',1,'toml.c']]]
 ];

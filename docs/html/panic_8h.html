@@ -67,20 +67,72 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#define-members">Macros</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">panic.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">core/types.h</a>&gt;</code><br />
+<code>#include &lt;setjmp.h&gt;</code><br />
 </div>
 <p><a href="panic_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:aabbd74f602cfcf4c8af724a7249b5fc0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#aabbd74f602cfcf4c8af724a7249b5fc0">THREAD_PANIC</a>&#160;&#160;&#160;1</td></tr>
+<tr class="separator:aabbd74f602cfcf4c8af724a7249b5fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1a50374abefd3a49d9fe68b398b5e7a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#ad1a50374abefd3a49d9fe68b398b5e7a">PANIC_RETURN</a>()</td></tr>
+<tr class="separator:ad1a50374abefd3a49d9fe68b398b5e7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a138d8879e47c08e2265c41d75e539f9b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#a138d8879e47c08e2265c41d75e539f9b">panic</a> (const char *format,...)</td></tr>
 <tr class="separator:a138d8879e47c08e2265c41d75e539f9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a9b2ef860ddf9f6950da834c0b674ea5f"><td class="memItemLeft" align="right" valign="top">_Thread_local jmp_buf&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#a9b2ef860ddf9f6950da834c0b674ea5f">return_jmp</a></td></tr>
+<tr class="separator:a9b2ef860ddf9f6950da834c0b674ea5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ad1a50374abefd3a49d9fe68b398b5e7a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1a50374abefd3a49d9fe68b398b5e7a">&#9670;&nbsp;</a></span>PANIC_RETURN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PANIC_RETURN</td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                     \</div>
+<div class="line">        int _value__ = setjmp(<a class="code" href="panic_8h.html#a9b2ef860ddf9f6950da834c0b674ea5f">return_jmp</a>);                             \</div>
+<div class="line">        _value__ != 0;                                                 \</div>
+<div class="line">    })</div>
+<div class="ttc" id="apanic_8h_html_a9b2ef860ddf9f6950da834c0b674ea5f"><div class="ttname"><a href="panic_8h.html#a9b2ef860ddf9f6950da834c0b674ea5f">return_jmp</a></div><div class="ttdeci">_Thread_local jmp_buf return_jmp</div><div class="ttdef"><b>Definition:</b> panic.c:24</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aabbd74f602cfcf4c8af724a7249b5fc0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabbd74f602cfcf4c8af724a7249b5fc0">&#9670;&nbsp;</a></span>THREAD_PANIC</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define THREAD_PANIC&#160;&#160;&#160;1</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a138d8879e47c08e2265c41d75e539f9b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a138d8879e47c08e2265c41d75e539f9b">&#9670;&nbsp;</a></span>panic()</h2>
@@ -106,6 +158,29 @@ Functions</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a9b2ef860ddf9f6950da834c0b674ea5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b2ef860ddf9f6950da834c0b674ea5f">&#9670;&nbsp;</a></span>return_jmp</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">_Thread_local jmp_buf return_jmp</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
