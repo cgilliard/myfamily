@@ -54,13 +54,18 @@ FatPtr build_fat_ptr(u64 size);
 #define MutRef Cleanup *
 #define Ref const Cleanup *
 
+#define PROC_SETTER(x, y) x abc y
+#define PROC_FORMAT(x, y) x y
+#define BUILD_SETTERS(x, ...) PROC_SETTER __VA_ARGS__
+#define BUILD_ARGS(...) PROC_FORMAT __VA_ARGS__;
+
 #define Type(name, ...)                                                        \
 	typedef struct name name;                                              \
 	static Vtable name##_Vtable__ = {0, NULL};                             \
 	u64 name##_size();                                                     \
 	void name##_cleanup(name *obj);                                        \
 	typedef struct name {                                                  \
-		__VA_ARGS__                                                    \
+		FOR_EACH(BUILD_ARGS, __VA_ARGS__)                              \
 	} name;                                                                \
 	u64 name##_size() { return sizeof(name); }                             \
 	void __attribute__((constructor)) __add_impls_##name##_vtable() {      \
@@ -70,7 +75,12 @@ FatPtr build_fat_ptr(u64 size);
 		vtable_add_entry(&name##_Vtable__, size);                      \
 	}
 
-#define Field(field_type, field_name) field_type field_name;
+// FOR_EACH(BUILD_SETTERS, __VA_ARGS__)
+
+#define xSetable(field_type, field_name) (v##field_type, v##field_name)
+#define Setable(field_type, field_name) (field_type, field_name)
+#define Getable(field_type, field_name) (field_type, field_name)
+#define Field(field_type, field_name) (field_type, field_name)
 
 // TODO: _fptr__.data may be NULL, need to handle. Once we have 'Result'
 // implement two versions of this macro. One which panics and one which returns
@@ -90,25 +100,25 @@ FatPtr build_fat_ptr(u64 size);
 
 #define MEMBER_TYPE(type, member) typeof(((type *)0)->member)
 
-#define getter(name, field_name)                                               \
+#define Getter(name, field_name)                                               \
 	MEMBER_TYPE(name, field_name) *                                        \
 	    name##_get_##field_name(const Object *self) {                      \
 		name *tptr = fat_ptr_data(&self->ptr);                         \
 		return &tptr->field_name;                                      \
 	}
 
-#define setter(name, field_name)                                               \
+#define Setter(name, field_name)                                               \
 	void name##_set_##field_name(                                          \
 	    Object *self, MEMBER_TYPE(name, field_name) field_name) {          \
 		name *tptr = fat_ptr_data(&self->ptr);                         \
 		tptr->field_name = field_name;                                 \
 	}
 
-#define getter_proto(name, field_name)                                         \
+#define GetterProto(name, field_name)                                          \
 	MEMBER_TYPE(name, field_name) *                                        \
 	    name##_get_##field_name(const Object *self);
 
-#define setter_proto(name, field_name)                                         \
+#define SetterProto(name, field_name)                                          \
 	void name##_set_##field_name(                                          \
 	    Object *self, MEMBER_TYPE(name, field_name) field_name);
 
