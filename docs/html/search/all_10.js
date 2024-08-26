@@ -8,6 +8,8 @@ var searchData=
   ['panic_5freturn_468',['PANIC_RETURN',['../panic_8h.html#ad1a50374abefd3a49d9fe68b398b5e7a',1,'panic.h']]],
   ['panic_5ftrue_469',['PANIC_TRUE',['../thread_8c.html#a4ed8c8d636d1f0a8f99089131d8061b5',1,'thread.c']]],
   ['poison_470',['poison',['../structLockPtr.html#aa3d6266b7a81191e096edd34604a2308',1,'LockPtr']]],
-  ['pth_471',['pth',['../structThreadImpl.html#a855a0ba0f888ea266318db8a30b63e7b',1,'ThreadImpl']]],
-  ['ptr_472',['ptr',['../structObjectPtr.html#aae680dd68910d5dd1fee8294371458b5',1,'ObjectPtr::ptr()'],['../structtoken__t.html#a5d139c6bed0739675e2d92c7a3cc89f1',1,'token_t::ptr()']]]
+  ['proc_5fformat_471',['PROC_FORMAT',['../type_8h.html#ada10c1645bb1a122057db2098e647727',1,'type.h']]],
+  ['proc_5fsetter_472',['PROC_SETTER',['../type_8h.html#a81e4d011b3977d9e9ee6feb73433e48b',1,'type.h']]],
+  ['pth_473',['pth',['../structThreadImpl.html#a855a0ba0f888ea266318db8a30b63e7b',1,'ThreadImpl']]],
+  ['ptr_474',['ptr',['../structObject.html#ab5fe3ea3742b5c62e699e90968db8325',1,'Object::ptr()'],['../structtoken__t.html#a5d139c6bed0739675e2d92c7a3cc89f1',1,'token_t::ptr()']]]
 ];

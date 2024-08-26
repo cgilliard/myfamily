@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['fat_5fptr_5fdata_670',['fat_ptr_data',['../heap_8c.html#aa648ed1f185b2be8726c39f8c1250265',1,'fat_ptr_data(FatPtr *ptr):&#160;heap.c'],['../heap_8h.html#aa648ed1f185b2be8726c39f8c1250265',1,'fat_ptr_data(FatPtr *ptr):&#160;heap.c']]],
-  ['fat_5fptr_5fid_671',['fat_ptr_id',['../heap_8c.html#ad5ed01d3808ed2bc9bc1d1e97ff45f93',1,'heap.c']]],
-  ['fat_5fptr_5flen_672',['fat_ptr_len',['../heap_8c.html#a327a83953cdce415ac9e03c4f465540e',1,'fat_ptr_len(FatPtr *ptr):&#160;heap.c'],['../heap_8h.html#a327a83953cdce415ac9e03c4f465540e',1,'fat_ptr_len(FatPtr *ptr):&#160;heap.c']]],
-  ['find_5ffn_673',['find_fn',['../type_8c.html#a5657c8857fc0a2d9fe47adabbd4d4572',1,'find_fn(Ref obj, const char *name):&#160;type.c'],['../type_8h.html#ae7003fe98d1718a0bee4a3ac5e7540ff',1,'find_fn(const ObjectPtr *obj, const char *name):&#160;type.h']]]
+  ['fat_5fptr_5fdata_679',['fat_ptr_data',['../heap_8c.html#a2beb14eedce3e8fbcff7b86df3209e91',1,'fat_ptr_data(const FatPtr *ptr):&#160;heap.c'],['../heap_8h.html#a2beb14eedce3e8fbcff7b86df3209e91',1,'fat_ptr_data(const FatPtr *ptr):&#160;heap.c']]],
+  ['fat_5fptr_5fid_680',['fat_ptr_id',['../heap_8c.html#a6a172e13c6187a33eda5d96526411444',1,'heap.c']]],
+  ['fat_5fptr_5flen_681',['fat_ptr_len',['../heap_8c.html#a582a48e1532268a1d999b84edaa6abf9',1,'fat_ptr_len(const FatPtr *ptr):&#160;heap.c'],['../heap_8h.html#a582a48e1532268a1d999b84edaa6abf9',1,'fat_ptr_len(const FatPtr *ptr):&#160;heap.c']]],
+  ['find_5ffn_682',['find_fn',['../type_8c.html#a5657c8857fc0a2d9fe47adabbd4d4572',1,'find_fn(Ref obj, const char *name):&#160;type.c'],['../type_8h.html#a2b4d2a863926a7886419d0e53aa465a0',1,'find_fn(const Object *obj, const char *name):&#160;type.h']]]
 ];

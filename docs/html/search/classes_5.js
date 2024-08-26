@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['objectptr_620',['ObjectPtr',['../structObjectPtr.html',1,'']]]
+  ['object_628',['Object',['../structObject.html',1,'']]]
 ];

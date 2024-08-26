@@ -125,10 +125,10 @@ Functions</h2></td></tr>
 <tr class="separator:ac75241ce08a968d8baf3c6c8d9f97cde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa798be4af0288b37bf349b3fd178efed"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#aa798be4af0288b37bf349b3fd178efed">heap_allocator_cleanup</a> (<a class="el" href="structHeapAllocator.html">HeapAllocator</a> *ptr)</td></tr>
 <tr class="separator:aa798be4af0288b37bf349b3fd178efed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa648ed1f185b2be8726c39f8c1250265"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#aa648ed1f185b2be8726c39f8c1250265">fat_ptr_data</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:aa648ed1f185b2be8726c39f8c1250265"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a327a83953cdce415ac9e03c4f465540e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#a327a83953cdce415ac9e03c4f465540e">fat_ptr_len</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:a327a83953cdce415ac9e03c4f465540e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2beb14eedce3e8fbcff7b86df3209e91"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
+<tr class="separator:a2beb14eedce3e8fbcff7b86df3209e91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a582a48e1532268a1d999b84edaa6abf9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#a582a48e1532268a1d999b84edaa6abf9">fat_ptr_len</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
+<tr class="separator:a582a48e1532268a1d999b84edaa6abf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This file contains definitions for the custom heap allocator. </p>
@@ -229,9 +229,9 @@ Usage</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>A pointer structure which includes the length and ID such that the <a class="el" href="structHeapAllocator.html">HeapAllocator</a> implementation may assign and reuse freed slabs and manage memory resources based on specifications. <a class="el" href="structFatPtr.html">FatPtr</a> fields should not be accessed directly and instead the getters for data and len should be used. </p><dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#aa648ed1f185b2be8726c39f8c1250265">fat_ptr_data</a>] </dd>
+<p>A pointer structure which includes the length and ID such that the <a class="el" href="structHeapAllocator.html">HeapAllocator</a> implementation may assign and reuse freed slabs and manage memory resources based on specifications. <a class="el" href="structFatPtr.html">FatPtr</a> fields should not be accessed directly and instead the getters for data and len should be used. </p><dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a>] </dd>
 <dd>
-[<a class="el" href="heap_8h.html#a327a83953cdce415ac9e03c4f465540e">fat_ptr_len</a>] </dd></dl>
+[<a class="el" href="heap_8h.html#a582a48e1532268a1d999b84edaa6abf9">fat_ptr_len</a>] </dd></dl>
 
 </div>
 </div>
@@ -324,8 +324,8 @@ Usage</h1>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="aa648ed1f185b2be8726c39f8c1250265"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa648ed1f185b2be8726c39f8c1250265">&#9670;&nbsp;</a></span>fat_ptr_data()</h2>
+<a id="a2beb14eedce3e8fbcff7b86df3209e91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2beb14eedce3e8fbcff7b86df3209e91">&#9670;&nbsp;</a></span>fat_ptr_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -333,7 +333,7 @@ Usage</h1>
         <tr>
           <td class="memname">void* fat_ptr_data </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>
@@ -346,12 +346,12 @@ Usage</h1>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a void pointer to the data location assicated to this <a class="el" href="structFatPtr.html">FatPtr</a> </dd></dl>
-<dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#a327a83953cdce415ac9e03c4f465540e">fat_ptr_len</a>] </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#a582a48e1532268a1d999b84edaa6abf9">fat_ptr_len</a>] </dd></dl>
 
 </div>
 </div>
-<a id="a327a83953cdce415ac9e03c4f465540e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a327a83953cdce415ac9e03c4f465540e">&#9670;&nbsp;</a></span>fat_ptr_len()</h2>
+<a id="a582a48e1532268a1d999b84edaa6abf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a582a48e1532268a1d999b84edaa6abf9">&#9670;&nbsp;</a></span>fat_ptr_len()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -359,7 +359,7 @@ Usage</h1>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> fat_ptr_len </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>
@@ -372,7 +372,7 @@ Usage</h1>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the length in bytes that has been allocated to this <a class="el" href="structFatPtr.html">FatPtr</a>. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#aa648ed1f185b2be8726c39f8c1250265">fat_ptr_data</a>] </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a>] </dd></dl>
 
 </div>
 </div>

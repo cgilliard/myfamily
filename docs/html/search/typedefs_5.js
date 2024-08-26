@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['objectptr_888',['ObjectPtr',['../type_8h.html#aa81db2d219246e69ea604a26f7dea297',1,'type.h']]]
+  ['object_905',['Object',['../type_8h.html#ab1287b6141419421dc5c14b9f7756b0a',1,'type.h']]]
 ];
