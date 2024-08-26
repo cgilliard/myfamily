@@ -901,10 +901,3 @@ Test(core, test_types) {
 	}
 	printf("drop complete\n");
 }
-
-// TraitImpl(bool, clone2x, Param(Object *, self), Param(int, x));
-
-/*
-#define Drop2 Required(T, void, drop, Object *self)
-	Trait(Drop2);
-	*/

@@ -139,9 +139,10 @@ FatPtr build_fat_ptr(u64 size);
 
 #define Impl(name, trait) EXPAND(trait(name))
 
+/*
 #define OVERRIDE(name, trait, implfn)                                          \
-	static void __attribute__((constructor))                               \
-	ov__##name##_##trait##_vtable() {                                      \
+	static void                                                            \
+	    __attribute__((constructor)) ov__##name##_##trait##_vtable() {     \
 		VtableEntry next = {#trait, implfn};                           \
 		vtable_override(&name##_Vtable__, next);                       \
 	}
@@ -153,35 +154,30 @@ FatPtr build_fat_ptr(u64 size);
 		VtableEntry next = {#name, default};                           \
 		vtable_add_entry(&T##_Vtable__, next);                         \
 	}
-
-#define Required(T, R, name, ...)                                              \
-	R T##_##name(__VA_ARGS__);                                             \
-	static void __attribute__((constructor)) CAT(add_##T, UNIQUE_ID)() {   \
-		VtableEntry next = {#name, T##_##name};                        \
-		vtable_add_entry(&T##_Vtable__, next);                         \
-	}
-
-/* BoundsCheck b1 = {"dst", dst}; */
-/* BoundsCheck b2 = {"src", src}; */ /* check_bounds("Clone",
-					"clone",
-					b1,
-					b2);
-				      */
+	*/
 
 // Define macros to extract the type and name from a tuple
 #define EXTRACT_TYPE_NAME(type, name) type name
 #define EXTRACT_NAME(type, name) name
 
 // Define the macros for unwrapping the tuples
-#define UNWRAP_Param_TYPE_NAME(type_name) EXTRACT_TYPE_NAME type_name
-#define UNWRAP_Param_NAME(type_name) EXTRACT_NAME type_name
+#define UNWRAP_PARAM_TYPE_NAME(type_name) EXTRACT_TYPE_NAME type_name
+#define UNWRAP_PARAM_NAME(type_name) EXTRACT_NAME type_name
 
-// Define PROC_FN_SIGNATURE and PROC_ParamS to use UNWRAP_Param correctly
-#define PROC_FN_SIGNATURE(...) FOR_EACH(UNWRAP_Param_TYPE_NAME, __VA_ARGS__)
-#define PROC_ParamS(...) FOR_EACH(UNWRAP_Param_NAME, __VA_ARGS__)
+// Define PROC_FN_SIGNATURE and PROC_PARAMS to use UNWRAP_PARAMS correctly
+#define PROC_FN_SIGNATURE(...) FOR_EACH(UNWRAP_PARAM_TYPE_NAME, __VA_ARGS__)
+#define PROC_PARAMS(...) FOR_EACH(UNWRAP_PARAM_NAME, __VA_ARGS__)
 
 // Define a parameter macro for testing
 #define Param(type, name) (type, name)
+
+#define Required(T, R, name, ...)                                              \
+	R T##_##name(PROC_FN_SIGNATURE(__VA_ARGS__));                          \
+	static void __attribute__((constructor))                               \
+	CAT(__required_add_##T##_, UNIQUE_ID)() {                              \
+		VtableEntry next = {#name, T##_##name};                        \
+		vtable_add_entry(&T##_Vtable__, next);                         \
+	}
 
 #define TraitImpl(return_type, name, ...)                                      \
 	static return_type name(PROC_FN_SIGNATURE(__VA_ARGS__)) {              \
@@ -198,7 +194,7 @@ FatPtr build_fat_ptr(u64 size);
 			      "required function [%s]l",                       \
 			      TypeName((*self)));                              \
                                                                                \
-		return impl(PROC_ParamS(__VA_ARGS__));                         \
+		return impl(PROC_PARAMS(__VA_ARGS__));                         \
 	}
 
 #endif // _CORE_TYPE__

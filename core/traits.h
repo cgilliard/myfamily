@@ -17,7 +17,7 @@
 
 #include <core/type.h>
 
-#define Drop(T) Required(T, void, drop, Object *self)
+#define Drop(T) Required(T, void, drop, Param(Object *, self))
 TraitImpl(void, drop, Param(Object *, self));
 
 // # desired syntax:
@@ -29,8 +29,9 @@ TraitImpl(void, drop, Param(Object *, self));
 // Where(SuperClone, TraitBound(self, Super), FunctionBound(clone, self, Clone))
 // Trait(SuperClone);
 
-#define Clone(T) Required(T, bool, clone, Object *dst, Object *self)
-TraitImpl(bool, clone, Param(Object *, dst), Param(Object *, self));
+#define Clone(T)                                                               \
+	Required(T, bool, myclone, Param(Object *, dst), Param(Object *, self))
+TraitImpl(bool, myclone, Param(Object *, dst), Param(Object *, self));
 
 // is this possible?
 // Bound(Clone, clone, (dst, Copy), (src, Drop))
