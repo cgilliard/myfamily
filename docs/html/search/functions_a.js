@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['objectptr_5fcleanup_704',['ObjectPtr_cleanup',['../type_8c.html#a89a0a05c58501829db0c8f155d6effc5',1,'ObjectPtr_cleanup(Ref ptr):&#160;type.c'],['../type_8h.html#ae7fa38e65770bdef6c9e69002c496245',1,'ObjectPtr_cleanup(const ObjectPtr *ptr):&#160;type.h']]]
+  ['object_5fcleanup_715',['Object_cleanup',['../type_8c.html#a6163a4ef1973199742c132f3279d5f9d',1,'Object_cleanup(Ref ptr):&#160;type.c'],['../type_8h.html#aa73f18beaa4379c17baf05a138d68dd2',1,'Object_cleanup(const Object *ptr):&#160;type.h']]]
 ];

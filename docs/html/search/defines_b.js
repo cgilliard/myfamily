@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['panic_5freturn_1216',['PANIC_RETURN',['../panic_8h.html#ad1a50374abefd3a49d9fe68b398b5e7a',1,'panic.h']]]
+  ['new_1231',['new',['../type_8h.html#a12dedb437d95fb1cf019b42b64a2c1f3',1,'type.h']]]
 ];

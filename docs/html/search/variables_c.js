@@ -1,9 +1,7 @@
 var searchData=
 [
-  ['name_832',['name',['../structVtableEntry.html#a74664b1cf7b569ba5393f7586b731cac',1,'VtableEntry']]],
-  ['narr_833',['narr',['../structtoml__table__t.html#a2661908eba6faf7deeadda8cc71b56f6',1,'toml_table_t']]],
-  ['nitem_834',['nitem',['../structtoml__array__t.html#a3a0f22528b06ae74462d9e894817c909',1,'toml_array_t']]],
-  ['nkval_835',['nkval',['../structtoml__table__t.html#a5a9122b12c06d527b8353da0a65f71ec',1,'toml_table_t']]],
-  ['no_5fmalloc_836',['no_malloc',['../structHeapAllocatorConfig.html#af68e472fa3d04f4a3714370af1f41456',1,'HeapAllocatorConfig']]],
-  ['ntab_837',['ntab',['../structtoml__table__t.html#a924b7c34df9bdd5bf3ab0266859cc031',1,'toml_table_t']]]
+  ['max_5fslabs_845',['max_slabs',['../structHeapDataParamsConfig.html#aa65ac4eab15eef5a8a48d1baffb88f98',1,'HeapDataParamsConfig']]],
+  ['millisec_846',['millisec',['../structtoml__timestamp__t.html#a0ecf384370faabd646bde9ddfca1f4c1',1,'toml_timestamp_t::millisec()'],['../structtoml__timestamp__t.html#a24e5f8771f8bc5018379e3845f123d08',1,'toml_timestamp_t::millisec()']]],
+  ['minute_847',['minute',['../structtoml__timestamp__t.html#ad193b1382e5ccf15c055985c74e184c9',1,'toml_timestamp_t::minute()'],['../structtoml__timestamp__t.html#a6ebacdbbdc6727ad555253be93670bcb',1,'toml_timestamp_t::minute()']]],
+  ['month_848',['month',['../structtoml__timestamp__t.html#acd4dc7fa735050aacc6f9e1bd2ca6743',1,'toml_timestamp_t::month()'],['../structtoml__timestamp__t.html#ac30e145270d4681b38d0423cedae0f56',1,'toml_timestamp_t::month()']]]
 ];

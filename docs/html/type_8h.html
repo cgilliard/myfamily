@@ -75,9 +75,9 @@ $(function() {
 <div class="title">type.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="heap_8h_source.html">core/heap.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="chain__allocator_8h_source.html">core/chain_allocator.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="heap_8h_source.html">core/heap.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="macro__utils_8h_source.html">core/macro_utils.h</a>&gt;</code><br />
-<code>#include &lt;core/mymalloc.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="types_8h_source.html">core/types.h</a>&gt;</code><br />
 </div>
 <p><a href="type_8h_source.html">Go to the source code of this file.</a></p>
@@ -88,14 +88,14 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structVtable.html">Vtable</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structObjectPtr.html">ObjectPtr</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structObject.html">Object</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a08db27966d6cfc7a7b73d601e702fd16"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a08db27966d6cfc7a7b73d601e702fd16">VDATA_FLAGS_NO_CLEANUP</a>&#160;&#160;&#160;(0x1 &lt;&lt; 0)</td></tr>
 <tr class="separator:a08db27966d6cfc7a7b73d601e702fd16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2bd3162fc79efcb3977a2147100d9ca"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#af2bd3162fc79efcb3977a2147100d9ca">Cleanup</a></td></tr>
+<tr class="memitem:af2bd3162fc79efcb3977a2147100d9ca"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#af2bd3162fc79efcb3977a2147100d9ca">Cleanup</a>&#160;&#160;&#160;	<a class="el" href="structObject.html">Object</a> __attribute__((warn_unused_result, cleanup(<a class="el" href="type_8h.html#aa73f18beaa4379c17baf05a138d68dd2">Object_cleanup</a>)))</td></tr>
 <tr class="separator:af2bd3162fc79efcb3977a2147100d9ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b0936415a643c88ce543099c10e0d7f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a1b0936415a643c88ce543099c10e0d7f">var</a>&#160;&#160;&#160;<a class="el" href="type_8h.html#af2bd3162fc79efcb3977a2147100d9ca">Cleanup</a></td></tr>
 <tr class="separator:a1b0936415a643c88ce543099c10e0d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -105,46 +105,102 @@ Macros</h2></td></tr>
 <tr class="separator:a570e7c0b852aea689961af40af3e7b03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1bc16e1e74ec9e5be22ffb08c6eb1523"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a1bc16e1e74ec9e5be22ffb08c6eb1523">Ref</a>&#160;&#160;&#160;const <a class="el" href="type_8h.html#af2bd3162fc79efcb3977a2147100d9ca">Cleanup</a> *</td></tr>
 <tr class="separator:a1bc16e1e74ec9e5be22ffb08c6eb1523"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aca9311fb5cd27a2ef0d6ac7432cfffe1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aca9311fb5cd27a2ef0d6ac7432cfffe1">TYPE_DATA</a>(name, ...)</td></tr>
-<tr class="separator:aca9311fb5cd27a2ef0d6ac7432cfffe1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23293ac2f1c46bdbbfe2cad8c2fb31ee"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a23293ac2f1c46bdbbfe2cad8c2fb31ee">TYPE</a>(name)</td></tr>
-<tr class="separator:a23293ac2f1c46bdbbfe2cad8c2fb31ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa38e0955e40a8af5a2578970e42b2dfb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa38e0955e40a8af5a2578970e42b2dfb">FIELD</a>(field_type,  field_name)&#160;&#160;&#160;field_type field_name;</td></tr>
-<tr class="separator:aa38e0955e40a8af5a2578970e42b2dfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc2d25b453b7eeb86fc6b78cb7914668"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#adc2d25b453b7eeb86fc6b78cb7914668">BUILD</a>(type)&#160;&#160;&#160;	{ &amp;type##_Vtable__, <a class="el" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a>(), 0, build_fat_ptr(type##_size()) }</td></tr>
-<tr class="separator:adc2d25b453b7eeb86fc6b78cb7914668"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81e4d011b3977d9e9ee6feb73433e48b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a81e4d011b3977d9e9ee6feb73433e48b">PROC_SETTER</a>(x,  y)&#160;&#160;&#160;x abc y</td></tr>
+<tr class="separator:a81e4d011b3977d9e9ee6feb73433e48b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada10c1645bb1a122057db2098e647727"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ada10c1645bb1a122057db2098e647727">PROC_FORMAT</a>(x,  y)&#160;&#160;&#160;x y</td></tr>
+<tr class="separator:ada10c1645bb1a122057db2098e647727"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0c6cd1896551a3717a73a3f8ccd1097"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ac0c6cd1896551a3717a73a3f8ccd1097">BUILD_SETTERS</a>(x, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a81e4d011b3977d9e9ee6feb73433e48b">PROC_SETTER</a> __VA_ARGS__</td></tr>
+<tr class="separator:ac0c6cd1896551a3717a73a3f8ccd1097"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06c489750f60c02de66c17129ad3c372"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a06c489750f60c02de66c17129ad3c372">BUILD_ARGS</a>(...)&#160;&#160;&#160;<a class="el" href="type_8h.html#ada10c1645bb1a122057db2098e647727">PROC_FORMAT</a> __VA_ARGS__;</td></tr>
+<tr class="separator:a06c489750f60c02de66c17129ad3c372"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d94417e304d0cd9c2a88b4a10ba0645"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a9d94417e304d0cd9c2a88b4a10ba0645">Type</a>(name, ...)</td></tr>
+<tr class="separator:a9d94417e304d0cd9c2a88b4a10ba0645"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5386795ea369f230c5673078e14c44ef"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a5386795ea369f230c5673078e14c44ef">xSetable</a>(field_type,  field_name)&#160;&#160;&#160;(v##field_type, v##field_name)</td></tr>
+<tr class="separator:a5386795ea369f230c5673078e14c44ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf118f9ddfd0953d07ddaf84701bc20a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#acf118f9ddfd0953d07ddaf84701bc20a">Setable</a>(field_type,  field_name)&#160;&#160;&#160;(field_type, field_name)</td></tr>
+<tr class="separator:acf118f9ddfd0953d07ddaf84701bc20a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6972422dc71e712bd8473c99e01aea9c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a6972422dc71e712bd8473c99e01aea9c">Getable</a>(field_type,  field_name)&#160;&#160;&#160;(field_type, field_name)</td></tr>
+<tr class="separator:a6972422dc71e712bd8473c99e01aea9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dd518df1105dd849cae4ac614bf708e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(field_type,  field_name)&#160;&#160;&#160;(field_type, field_name)</td></tr>
+<tr class="separator:a3dd518df1105dd849cae4ac614bf708e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12dedb437d95fb1cf019b42b64a2c1f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a12dedb437d95fb1cf019b42b64a2c1f3">new</a>(name, ...)</td></tr>
+<tr class="separator:a12dedb437d95fb1cf019b42b64a2c1f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a606b9e7d6ac796611316762571d2f491"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a606b9e7d6ac796611316762571d2f491">get</a>(type,  obj,  field_name)&#160;&#160;&#160;*type##_get_##field_name(&amp;obj)</td></tr>
+<tr class="separator:a606b9e7d6ac796611316762571d2f491"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca3bdc5dca3fa4e3b56008e73d262772"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aca3bdc5dca3fa4e3b56008e73d262772">set</a>(type,  obj,  field_name,  value)&#160;&#160;&#160;type##_set_##field_name(&amp;obj, value)</td></tr>
+<tr class="separator:aca3bdc5dca3fa4e3b56008e73d262772"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e4ae7e3ad7421bc9d9db8f82fa445fc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a1e4ae7e3ad7421bc9d9db8f82fa445fc">MEMBER_TYPE</a>(type,  member)&#160;&#160;&#160;typeof(((type *)0)-&gt;member)</td></tr>
+<tr class="separator:a1e4ae7e3ad7421bc9d9db8f82fa445fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a645cbf85a827c70a0226a23005361bec"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a645cbf85a827c70a0226a23005361bec">Getter</a>(name,  field_name)</td></tr>
+<tr class="separator:a645cbf85a827c70a0226a23005361bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47cea31cba96bffbe62e58c83acba7e9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a47cea31cba96bffbe62e58c83acba7e9">Setter</a>(name,  field_name)</td></tr>
+<tr class="separator:a47cea31cba96bffbe62e58c83acba7e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0acbf1799b8a16c671a82f8902aa1f13"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a0acbf1799b8a16c671a82f8902aa1f13">GetterProto</a>(name,  field_name)</td></tr>
+<tr class="separator:a0acbf1799b8a16c671a82f8902aa1f13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d1d29ad54f1c81ec0390ceef56bb680"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a8d1d29ad54f1c81ec0390ceef56bb680">SetterProto</a>(name,  field_name)</td></tr>
+<tr class="separator:a8d1d29ad54f1c81ec0390ceef56bb680"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:aa81db2d219246e69ea604a26f7dea297"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structObjectPtr.html">ObjectPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa81db2d219246e69ea604a26f7dea297">ObjectPtr</a></td></tr>
-<tr class="separator:aa81db2d219246e69ea604a26f7dea297"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1287b6141419421dc5c14b9f7756b0a"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structObject.html">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ab1287b6141419421dc5c14b9f7756b0a">Object</a></td></tr>
+<tr class="separator:ab1287b6141419421dc5c14b9f7756b0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae7fa38e65770bdef6c9e69002c496245"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ae7fa38e65770bdef6c9e69002c496245">ObjectPtr_cleanup</a> (const <a class="el" href="structObjectPtr.html">ObjectPtr</a> *ptr)</td></tr>
-<tr class="separator:ae7fa38e65770bdef6c9e69002c496245"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa73f18beaa4379c17baf05a138d68dd2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa73f18beaa4379c17baf05a138d68dd2">Object_cleanup</a> (const <a class="el" href="structObject.html">Object</a> *ptr)</td></tr>
+<tr class="separator:aa73f18beaa4379c17baf05a138d68dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc5e90382878eb50826eeae340a4ef64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#adc5e90382878eb50826eeae340a4ef64">sort_vtable</a> (<a class="el" href="structVtable.html">Vtable</a> *table)</td></tr>
 <tr class="separator:adc5e90382878eb50826eeae340a4ef64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5082273ba4bf9ad23e49ca9319bef78e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a5082273ba4bf9ad23e49ca9319bef78e">vtable_add_entry</a> (<a class="el" href="structVtable.html">Vtable</a> *table, <a class="el" href="structVtableEntry.html">VtableEntry</a> entry)</td></tr>
 <tr class="separator:a5082273ba4bf9ad23e49ca9319bef78e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7003fe98d1718a0bee4a3ac5e7540ff"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ae7003fe98d1718a0bee4a3ac5e7540ff">find_fn</a> (const <a class="el" href="structObjectPtr.html">ObjectPtr</a> *obj, const char *name)</td></tr>
-<tr class="separator:ae7003fe98d1718a0bee4a3ac5e7540ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b4d2a863926a7886419d0e53aa465a0"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a> (const <a class="el" href="structObject.html">Object</a> *obj, const char *name)</td></tr>
+<tr class="separator:a2b4d2a863926a7886419d0e53aa465a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2106e13dbac6575e8d701b9f1f4aa79d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a> ()</td></tr>
 <tr class="separator:a2106e13dbac6575e8d701b9f1f4aa79d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a909192bbfb2649a87561595bca24acaa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structFatPtr.html">FatPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a> (<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> size)</td></tr>
+<tr class="separator:a909192bbfb2649a87561595bca24acaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="adc2d25b453b7eeb86fc6b78cb7914668"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adc2d25b453b7eeb86fc6b78cb7914668">&#9670;&nbsp;</a></span>BUILD</h2>
+<a id="a06c489750f60c02de66c17129ad3c372"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06c489750f60c02de66c17129ad3c372">&#9670;&nbsp;</a></span>BUILD_ARGS</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define BUILD</td>
+          <td class="memname">#define BUILD_ARGS</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">type</td><td>)</td>
-          <td>&#160;&#160;&#160;	{ &amp;type##_Vtable__, <a class="el" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a>(), 0, build_fat_ptr(type##_size()) }</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="type_8h.html#ada10c1645bb1a122057db2098e647727">PROC_FORMAT</a> __VA_ARGS__;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac0c6cd1896551a3717a73a3f8ccd1097"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0c6cd1896551a3717a73a3f8ccd1097">&#9670;&nbsp;</a></span>BUILD_SETTERS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BUILD_SETTERS</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a81e4d011b3977d9e9ee6feb73433e48b">PROC_SETTER</a> __VA_ARGS__</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -158,24 +214,21 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define Cleanup</td>
+          <td class="memname">#define Cleanup&#160;&#160;&#160;	<a class="el" href="structObject.html">Object</a> __attribute__((warn_unused_result, cleanup(<a class="el" href="type_8h.html#aa73f18beaa4379c17baf05a138d68dd2">Object_cleanup</a>)))</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ObjectPtr                                                              \</div>
-<div class="line">        __attribute__((warn_unused_result, cleanup(<a class="code" href="type_8h.html#ae7fa38e65770bdef6c9e69002c496245">ObjectPtr_cleanup</a>)))</div>
-<div class="ttc" id="atype_8h_html_ae7fa38e65770bdef6c9e69002c496245"><div class="ttname"><a href="type_8h.html#ae7fa38e65770bdef6c9e69002c496245">ObjectPtr_cleanup</a></div><div class="ttdeci">void ObjectPtr_cleanup(const ObjectPtr *ptr)</div></div>
-</div><!-- fragment -->
+
 </div>
 </div>
-<a id="aa38e0955e40a8af5a2578970e42b2dfb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa38e0955e40a8af5a2578970e42b2dfb">&#9670;&nbsp;</a></span>FIELD</h2>
+<a id="a3dd518df1105dd849cae4ac614bf708e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3dd518df1105dd849cae4ac614bf708e">&#9670;&nbsp;</a></span>Field</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define FIELD</td>
+          <td class="memname">#define Field</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">field_type, </td>
@@ -189,11 +242,139 @@ Functions</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;field_type field_name;</td>
+          <td></td><td>&#160;&#160;&#160;(field_type, field_name)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+</div>
+</div>
+<a id="a606b9e7d6ac796611316762571d2f491"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a606b9e7d6ac796611316762571d2f491">&#9670;&nbsp;</a></span>get</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define get</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">obj, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;*type##_get_##field_name(&amp;obj)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6972422dc71e712bd8473c99e01aea9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6972422dc71e712bd8473c99e01aea9c">&#9670;&nbsp;</a></span>Getable</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Getable</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;(field_type, field_name)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a645cbf85a827c70a0226a23005361bec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a645cbf85a827c70a0226a23005361bec">&#9670;&nbsp;</a></span>Getter</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Getter</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a1e4ae7e3ad7421bc9d9db8f82fa445fc">MEMBER_TYPE</a>(name, field_name) *                                        \</div>
+<div class="line">        name##_get_##field_name(<span class="keyword">const</span> <a class="code" href="structObject.html">Object</a> *<span class="keyword">self</span>) {                      \</div>
+<div class="line">        name *tptr = <a class="code" href="heap_8c.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a>(&amp;self-&gt;ptr);                         \</div>
+<div class="line">        return &amp;tptr-&gt;field_name;                                      \</div>
+<div class="line">    }</div>
+<div class="ttc" id="aheap_8c_html_a2beb14eedce3e8fbcff7b86df3209e91"><div class="ttname"><a href="heap_8c.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a></div><div class="ttdeci">void * fat_ptr_data(const FatPtr *ptr)</div><div class="ttdef"><b>Definition:</b> heap.c:74</div></div>
+<div class="ttc" id="astructObject_html"><div class="ttname"><a href="structObject.html">Object</a></div><div class="ttdef"><b>Definition:</b> type.h:35</div></div>
+<div class="ttc" id="atype_8h_html_a1e4ae7e3ad7421bc9d9db8f82fa445fc"><div class="ttname"><a href="type_8h.html#a1e4ae7e3ad7421bc9d9db8f82fa445fc">MEMBER_TYPE</a></div><div class="ttdeci">#define MEMBER_TYPE(type, member)</div><div class="ttdef"><b>Definition:</b> type.h:101</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a0acbf1799b8a16c671a82f8902aa1f13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0acbf1799b8a16c671a82f8902aa1f13">&#9670;&nbsp;</a></span>GetterProto</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define GetterProto</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a1e4ae7e3ad7421bc9d9db8f82fa445fc">MEMBER_TYPE</a>(name, field_name) *                                        \</div>
+<div class="line">        name##_get_##field_name(<span class="keyword">const</span> <a class="code" href="structObject.html">Object</a> *<span class="keyword">self</span>);</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a045dd54932944d8830380f4596d64446"></a>
@@ -204,6 +385,34 @@ Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define let&#160;&#160;&#160;const <a class="el" href="type_8h.html#af2bd3162fc79efcb3977a2147100d9ca">Cleanup</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1e4ae7e3ad7421bc9d9db8f82fa445fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e4ae7e3ad7421bc9d9db8f82fa445fc">&#9670;&nbsp;</a></span>MEMBER_TYPE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MEMBER_TYPE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">member&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;typeof(((type *)0)-&gt;member)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -224,51 +433,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a1bc16e1e74ec9e5be22ffb08c6eb1523"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1bc16e1e74ec9e5be22ffb08c6eb1523">&#9670;&nbsp;</a></span>Ref</h2>
+<a id="a12dedb437d95fb1cf019b42b64a2c1f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12dedb437d95fb1cf019b42b64a2c1f3">&#9670;&nbsp;</a></span>new</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define Ref&#160;&#160;&#160;const <a class="el" href="type_8h.html#af2bd3162fc79efcb3977a2147100d9ca">Cleanup</a> *</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a23293ac2f1c46bdbbfe2cad8c2fb31ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a23293ac2f1c46bdbbfe2cad8c2fb31ee">&#9670;&nbsp;</a></span>TYPE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define TYPE</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">name</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">typedef</span> <span class="keyword">struct </span>name name;                                              \</div>
-<div class="line">    static <a class="code" href="structVtable.html">Vtable</a> name##_Vtable__ = {0, NULL};                             \</div>
-<div class="line">    u64 name##_size();                                                     \</div>
-<div class="line">    void name##_cleanup(name *obj);</div>
-<div class="ttc" id="astructVtable_html"><div class="ttname"><a href="structVtable.html">Vtable</a></div><div class="ttdef"><b>Definition:</b> type.h:30</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="aca9311fb5cd27a2ef0d6ac7432cfffe1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aca9311fb5cd27a2ef0d6ac7432cfffe1">&#9670;&nbsp;</a></span>TYPE_DATA</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define TYPE_DATA</td>
+          <td class="memname">#define new</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">name, </td>
@@ -286,16 +458,260 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">typedef</span> <span class="keyword">struct </span>name {                                                  \</div>
-<div class="line">        __VA_ARGS__                                                    \</div>
+<b>Value:</b><div class="fragment"><div class="line">        ({                                                          \</div>
+<div class="line">        FatPtr _fptr__ = <a class="code" href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a>(name##_size());                 \</div>
+<div class="line">        name _type__ = {__VA_ARGS__};                                  \</div>
+<div class="line">        *((name *)_fptr__.data) = _type__;                             \</div>
+<div class="line">        Object _ret__ = {&amp;name##_Vtable__, <a class="code" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a>(), 0, _fptr__};   \</div>
+<div class="line">        _ret__;                                                        \</div>
+<div class="line">    })</div>
+<div class="ttc" id="atype_8h_html_a2106e13dbac6575e8d701b9f1f4aa79d"><div class="ttname"><a href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a></div><div class="ttdeci">u64 unique_id()</div><div class="ttdef"><b>Definition:</b> type.c:23</div></div>
+<div class="ttc" id="atype_8h_html_a909192bbfb2649a87561595bca24acaa"><div class="ttname"><a href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a></div><div class="ttdeci">FatPtr build_fat_ptr(u64 size)</div><div class="ttdef"><b>Definition:</b> type.c:25</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ada10c1645bb1a122057db2098e647727"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada10c1645bb1a122057db2098e647727">&#9670;&nbsp;</a></span>PROC_FORMAT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_FORMAT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">y&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;x y</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a81e4d011b3977d9e9ee6feb73433e48b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a81e4d011b3977d9e9ee6feb73433e48b">&#9670;&nbsp;</a></span>PROC_SETTER</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_SETTER</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">y&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;x abc y</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1bc16e1e74ec9e5be22ffb08c6eb1523"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1bc16e1e74ec9e5be22ffb08c6eb1523">&#9670;&nbsp;</a></span>Ref</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Ref&#160;&#160;&#160;const <a class="el" href="type_8h.html#af2bd3162fc79efcb3977a2147100d9ca">Cleanup</a> *</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aca3bdc5dca3fa4e3b56008e73d262772"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca3bdc5dca3fa4e3b56008e73d262772">&#9670;&nbsp;</a></span>set</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define set</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">obj, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;type##_set_##field_name(&amp;obj, value)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acf118f9ddfd0953d07ddaf84701bc20a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf118f9ddfd0953d07ddaf84701bc20a">&#9670;&nbsp;</a></span>Setable</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Setable</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;(field_type, field_name)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a47cea31cba96bffbe62e58c83acba7e9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47cea31cba96bffbe62e58c83acba7e9">&#9670;&nbsp;</a></span>Setter</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Setter</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordtype">void</span> name##_set_##field_name(                                          \</div>
+<div class="line">        <a class="code" href="structObject.html">Object</a> *<span class="keyword">self</span>, <a class="code" href="type_8h.html#a1e4ae7e3ad7421bc9d9db8f82fa445fc">MEMBER_TYPE</a>(name, field_name) field_name) {          \</div>
+<div class="line">        name *tptr = <a class="code" href="heap_8c.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a>(&amp;self-&gt;ptr);                         \</div>
+<div class="line">        tptr-&gt;field_name = field_name;                                 \</div>
+<div class="line">    }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a8d1d29ad54f1c81ec0390ceef56bb680"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d1d29ad54f1c81ec0390ceef56bb680">&#9670;&nbsp;</a></span>SetterProto</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SetterProto</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordtype">void</span> name##_set_##field_name(                                          \</div>
+<div class="line">        <a class="code" href="structObject.html">Object</a> *<span class="keyword">self</span>, <a class="code" href="type_8h.html#a1e4ae7e3ad7421bc9d9db8f82fa445fc">MEMBER_TYPE</a>(name, field_name) field_name);</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a9d94417e304d0cd9c2a88b4a10ba0645"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d94417e304d0cd9c2a88b4a10ba0645">&#9670;&nbsp;</a></span>Type</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Type</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">typedef</span> <span class="keyword">struct </span>name name;                                              \</div>
+<div class="line">    static <a class="code" href="structVtable.html">Vtable</a> name##_Vtable__ = {0, NULL};                             \</div>
+<div class="line">    u64 name##_size();                                                     \</div>
+<div class="line">    void name##_cleanup(name *obj);                                        \</div>
+<div class="line">    typedef <span class="keyword">struct </span>name {                                                  \</div>
+<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a06c489750f60c02de66c17129ad3c372">BUILD_ARGS</a>, __VA_ARGS__)                              \</div>
 <div class="line">    } name;                                                                \</div>
 <div class="line">    u64 name##_size() { <span class="keywordflow">return</span> <span class="keyword">sizeof</span>(name); }                             \</div>
 <div class="line">    void __attribute__((constructor)) __add_impls_##name##_vtable() {      \</div>
-<div class="line">        VtableEntry next = {<span class="stringliteral">&quot;cleanup&quot;</span>, name##_cleanup};                \</div>
-<div class="line">        vtable_add_entry(&amp;name##_Vtable__, next);                      \</div>
-<div class="line">        VtableEntry next2 = {<span class="stringliteral">&quot;size&quot;</span>, name##_size};                     \</div>
-<div class="line">        vtable_add_entry(&amp;name##_Vtable__, next2);                     \</div>
+<div class="line">        VtableEntry cleanup = {<span class="stringliteral">&quot;cleanup&quot;</span>, name##_cleanup};             \</div>
+<div class="line">        vtable_add_entry(&amp;name##_Vtable__, cleanup);                   \</div>
+<div class="line">        VtableEntry size = {<span class="stringliteral">&quot;size&quot;</span>, name##_size};                      \</div>
+<div class="line">        vtable_add_entry(&amp;name##_Vtable__, size);                      \</div>
 <div class="line">    }</div>
+<div class="ttc" id="astructVtable_html"><div class="ttname"><a href="structVtable.html">Vtable</a></div><div class="ttdef"><b>Definition:</b> type.h:30</div></div>
+<div class="ttc" id="atype_8h_html_a06c489750f60c02de66c17129ad3c372"><div class="ttname"><a href="type_8h.html#a06c489750f60c02de66c17129ad3c372">BUILD_ARGS</a></div><div class="ttdeci">#define BUILD_ARGS(...)</div><div class="ttdef"><b>Definition:</b> type.h:60</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -327,15 +743,43 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a id="aa81db2d219246e69ea604a26f7dea297"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa81db2d219246e69ea604a26f7dea297">&#9670;&nbsp;</a></span>ObjectPtr</h2>
+<a id="a5386795ea369f230c5673078e14c44ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5386795ea369f230c5673078e14c44ef">&#9670;&nbsp;</a></span>xSetable</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="structObjectPtr.html">ObjectPtr</a> <a class="el" href="structObjectPtr.html">ObjectPtr</a></td>
+          <td class="memname">#define xSetable</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;(v##field_type, v##field_name)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="ab1287b6141419421dc5c14b9f7756b0a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab1287b6141419421dc5c14b9f7756b0a">&#9670;&nbsp;</a></span>Object</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structObject.html">Object</a> <a class="el" href="structObject.html">Object</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -343,8 +787,26 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ae7003fe98d1718a0bee4a3ac5e7540ff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae7003fe98d1718a0bee4a3ac5e7540ff">&#9670;&nbsp;</a></span>find_fn()</h2>
+<a id="a909192bbfb2649a87561595bca24acaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a909192bbfb2649a87561595bca24acaa">&#9670;&nbsp;</a></span>build_fat_ptr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structFatPtr.html">FatPtr</a> build_fat_ptr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
+          <td class="paramname"><em>size</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2b4d2a863926a7886419d0e53aa465a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b4d2a863926a7886419d0e53aa465a0">&#9670;&nbsp;</a></span>find_fn()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -352,7 +814,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void* find_fn </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structObjectPtr.html">ObjectPtr</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structObject.html">Object</a> *&#160;</td>
           <td class="paramname"><em>obj</em>, </td>
         </tr>
         <tr>
@@ -371,16 +833,16 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ae7fa38e65770bdef6c9e69002c496245"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae7fa38e65770bdef6c9e69002c496245">&#9670;&nbsp;</a></span>ObjectPtr_cleanup()</h2>
+<a id="aa73f18beaa4379c17baf05a138d68dd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa73f18beaa4379c17baf05a138d68dd2">&#9670;&nbsp;</a></span>Object_cleanup()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void ObjectPtr_cleanup </td>
+          <td class="memname">void Object_cleanup </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structObjectPtr.html">ObjectPtr</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structObject.html">Object</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>

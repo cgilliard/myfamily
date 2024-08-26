@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['year_604',['year',['../structtoml__timestamp__t.html#af2ad301a397736799dc69f961eefbf82',1,'toml_timestamp_t::year()'],['../structtoml__timestamp__t.html#ac342ce4fae08654918d979f94cbdff3e',1,'toml_timestamp_t::year()']]]
+  ['xsetable_611',['xSetable',['../type_8h.html#a5386795ea369f230c5673078e14c44ef',1,'type.h']]]
 ];

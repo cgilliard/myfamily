@@ -105,12 +105,12 @@ Functions</h2></td></tr>
 <tr class="separator:ae4c3316e92e9e6f0a0d77937608397ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75080a2b10c46ce029f300f13e9790a8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#a75080a2b10c46ce029f300f13e9790a8">do_realloc</a> (void *ptr, size_t size)</td></tr>
 <tr class="separator:a75080a2b10c46ce029f300f13e9790a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa648ed1f185b2be8726c39f8c1250265"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#aa648ed1f185b2be8726c39f8c1250265">fat_ptr_data</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:aa648ed1f185b2be8726c39f8c1250265"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a327a83953cdce415ac9e03c4f465540e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#a327a83953cdce415ac9e03c4f465540e">fat_ptr_len</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:a327a83953cdce415ac9e03c4f465540e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad5ed01d3808ed2bc9bc1d1e97ff45f93"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#ad5ed01d3808ed2bc9bc1d1e97ff45f93">fat_ptr_id</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:ad5ed01d3808ed2bc9bc1d1e97ff45f93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2beb14eedce3e8fbcff7b86df3209e91"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
+<tr class="separator:a2beb14eedce3e8fbcff7b86df3209e91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a582a48e1532268a1d999b84edaa6abf9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#a582a48e1532268a1d999b84edaa6abf9">fat_ptr_len</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
+<tr class="separator:a582a48e1532268a1d999b84edaa6abf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a172e13c6187a33eda5d96526411444"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#a6a172e13c6187a33eda5d96526411444">fat_ptr_id</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
+<tr class="separator:a6a172e13c6187a33eda5d96526411444"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a303b7ac8d6324237f536b13ca5a15522"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#a303b7ac8d6324237f536b13ca5a15522">heap_allocator_init_free_list</a> (<a class="el" href="structHeapData.html">HeapData</a> *hd, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> index, <a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a> slabs, bool last_is_uint_max)</td></tr>
 <tr class="separator:a303b7ac8d6324237f536b13ca5a15522"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1da4e6748eaa1653ee84c888e8d9e9e9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#a1da4e6748eaa1653ee84c888e8d9e9e9">heap_data_compare</a> (const void *p1, const void *p2)</td></tr>
@@ -267,8 +267,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="aa648ed1f185b2be8726c39f8c1250265"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa648ed1f185b2be8726c39f8c1250265">&#9670;&nbsp;</a></span>fat_ptr_data()</h2>
+<a id="a2beb14eedce3e8fbcff7b86df3209e91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2beb14eedce3e8fbcff7b86df3209e91">&#9670;&nbsp;</a></span>fat_ptr_data()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -276,7 +276,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void* fat_ptr_data </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>
@@ -289,12 +289,12 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a void pointer to the data location assicated to this <a class="el" href="structFatPtr.html">FatPtr</a> </dd></dl>
-<dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#a327a83953cdce415ac9e03c4f465540e">fat_ptr_len</a>] </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#a582a48e1532268a1d999b84edaa6abf9">fat_ptr_len</a>] </dd></dl>
 
 </div>
 </div>
-<a id="ad5ed01d3808ed2bc9bc1d1e97ff45f93"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad5ed01d3808ed2bc9bc1d1e97ff45f93">&#9670;&nbsp;</a></span>fat_ptr_id()</h2>
+<a id="a6a172e13c6187a33eda5d96526411444"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a172e13c6187a33eda5d96526411444">&#9670;&nbsp;</a></span>fat_ptr_id()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -302,7 +302,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> fat_ptr_id </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>
@@ -311,8 +311,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a327a83953cdce415ac9e03c4f465540e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a327a83953cdce415ac9e03c4f465540e">&#9670;&nbsp;</a></span>fat_ptr_len()</h2>
+<a id="a582a48e1532268a1d999b84edaa6abf9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a582a48e1532268a1d999b84edaa6abf9">&#9670;&nbsp;</a></span>fat_ptr_len()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -320,7 +320,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> fat_ptr_len </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>
@@ -333,7 +333,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the length in bytes that has been allocated to this <a class="el" href="structFatPtr.html">FatPtr</a>. </dd></dl>
-<dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#aa648ed1f185b2be8726c39f8c1250265">fat_ptr_data</a>] </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a>] </dd></dl>
 
 </div>
 </div>
