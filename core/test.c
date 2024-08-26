@@ -797,10 +797,7 @@ Test(core, test_synchronized) {
 
 // declare a type called 'TestType' to demonstrate usage of the macro library.
 // This type has two fields, a u64 and a u32
-// Current syntax
 Type(TestType, Field(u64, x) Field(u32, y));
-// Desired syntax (default values optional)
-// Type(TestType, Getable(u64, x, 0) Setable(u32, y, 0));
 
 // create setter/getter prototypes. In this case these are optional as the
 // criterion library uses a single test file. But this allows for separation of
@@ -820,12 +817,13 @@ Getter(TestType, x);
 Setter(TestType, y);
 Getter(TestType, y);
 
-// implement the required __atrribute__ 'cleanup' function which will be called
-// when Any TestType instance goes out of scope. In this case, we
-// don't do anything since no actual cleanup is required. There is no need to
-// explicitly call this function as the macros set an __attribute__ cleanup
-// function which is automatically executed when the variable goes out of scope.
-void TestType_cleanup(TestType *ptr) {}
+// implement the drop trait
+Impl(TestType, Drop);
+
+void TestType_drop(Object *self) {
+	set(TestType, *self, x, 200);
+	printf("drop\n");
+}
 
 void update_x_y(Object *ptr) {
 	set(TestType, *ptr, x, 100);
@@ -833,62 +831,80 @@ void update_x_y(Object *ptr) {
 }
 
 Test(core, test_types) {
-	// declare some unsigned integer variables for use with our Type.
-	u64 xv;
-	u32 yv;
+	{
+		// declare some unsigned integer variables for use with our
+		// Type.
+		u64 xv;
+		u32 yv;
 
-	// instantiate a 'new' instance of TestType. This new instance is
-	// declared using 'var' syntax which maps to a mutable instance of the
-	// variable. The initial values are specified in order according to the
-	// declaration. So, in this case, the field x = 1 and y = 2.
-	// Current syntax
-	var t1 = new (TestType, 1, 2);
+		// instantiate a 'new' instance of TestType. This new instance
+		// is declared using 'var' syntax which maps to a mutable
+		// instance of the variable. The initial values are specified in
+		// order according to the declaration. So, in this case, the
+		// field x = 1 and y = 2. Current syntax
+		var t1 = new (TestType, 1, 2);
+		cr_assert(!strcmp(TypeName(t1), "TestType"));
 
-	// use the 'get' function to get the values of 'x' and 'y'.
-	xv = get(TestType, t1, x);
-	yv = get(TestType, t1, y);
+		// use the 'get' function to get the values of 'x' and 'y'.
+		xv = get(TestType, t1, x);
+		yv = get(TestType, t1, y);
 
-	// they are equal to 1 and 2 respectively.
-	cr_assert_eq(xv, 1);
-	cr_assert_eq(yv, 2);
+		// they are equal to 1 and 2 respectively.
+		cr_assert_eq(xv, 1);
+		cr_assert_eq(yv, 2);
 
-	// set 'x' to 100.
-	set(TestType, t1, x, 100);
+		// set 'x' to 100.
+		set(TestType, t1, x, 100);
 
-	// get 'x' and make assertion.
-	xv = get(TestType, t1, x);
-	cr_assert_eq(xv, 100);
+		// get 'x' and make assertion.
+		xv = get(TestType, t1, x);
+		cr_assert_eq(xv, 100);
 
-	// instantiate a 'new' instance of TestType. This instance is declared
-	// using 'let' syntax which maps to an immutable instance of the
-	// variable. Once again initial values are specified.
-	let t2 = new (TestType, 3, 4);
+		// instantiate a 'new' instance of TestType. This instance is
+		// declared using 'let' syntax which maps to an immutable
+		// instance of the variable. Once again initial values are
+		// specified.
+		let t2 = new (TestType, 3, 4);
 
-	// getters (which are immutable) can be used to access the values of t2.
-	xv = get(TestType, t2, x);
-	yv = get(TestType, t2, y);
+		// getters (which are immutable) can be used to access the
+		// values of t2.
+		xv = get(TestType, t2, x);
+		yv = get(TestType, t2, y);
 
-	cr_assert_eq(xv, 3);
-	cr_assert_eq(yv, 4);
+		cr_assert_eq(xv, 3);
+		cr_assert_eq(yv, 4);
 
-	// update x and y
-	update_x_y(&t1);
-	xv = get(TestType, t1, x);
-	yv = get(TestType, t1, y);
-	cr_assert_eq(xv, 100);
-	cr_assert_eq(yv, 200);
+		// update x and y
+		update_x_y(&t1);
+		xv = get(TestType, t1, x);
+		yv = get(TestType, t1, y);
+		cr_assert_eq(xv, 100);
+		cr_assert_eq(yv, 200);
 
-	// This line would result in a compiler warning (which is configured to
-	// an error in the default build configuration)  because t2 is immutable
-	// set(TestType, t2, x, 100);
+		// This line would result in a compiler warning (which is
+		// configured to an error in the default build configuration)
+		// because t2 is immutable set(TestType, t2, x, 100);
 
-	// this line also results in a compiler warning/error
-	// update_x_y(&t2);
+		// this line also results in a compiler warning/error
+		// update_x_y(&t2);
 
-	// Use With syntax to initialize values
-	let t3 = new (TestType, With(y, 400), With(x, 300));
-	xv = get(TestType, t3, x);
-	yv = get(TestType, t3, y);
-	cr_assert_eq(xv, 300);
-	cr_assert_eq(yv, 400);
+		// Use With syntax to initialize values
+		let t3 = new (TestType, With(y, 400), With(x, 300));
+		xv = get(TestType, t3, x);
+		yv = get(TestType, t3, y);
+		cr_assert_eq(xv, 300);
+		cr_assert_eq(yv, 400);
+
+		drop(&t1);
+
+		printf("end scope\n");
+	}
+	printf("drop complete\n");
 }
+
+// TraitImpl(bool, clone2x, Param(Object *, self), Param(int, x));
+
+/*
+#define Drop2 Required(T, void, drop, Object *self)
+	Trait(Drop2);
+	*/

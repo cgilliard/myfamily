@@ -28,6 +28,7 @@ typedef struct {
 } VtableEntry;
 
 typedef struct {
+	char *name;
 	u64 len;
 	VtableEntry *entries;
 } Vtable;
@@ -39,6 +40,30 @@ typedef struct Object {
 	FatPtr ptr;
 } Object;
 
+typedef struct TraitBound {
+	char *name;
+	char *binding;
+} TraitBound;
+
+typedef struct TraitRequired {
+	char *name;
+	TraitBound *bounds;
+	u64 bounds_count;
+} TraitRequired;
+
+typedef struct TraitDefn {
+	char *name;
+	TraitRequired *entries;
+	u64 entry_count;
+} TraitDefn;
+
+typedef struct TraitTable {
+	TraitDefn *entries;
+	u64 entry_count;
+} TraitTable;
+
+extern TraitTable __global_trait_table;
+
 void Object_cleanup(const Object *ptr);
 void sort_vtable(Vtable *table);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
@@ -49,25 +74,21 @@ FatPtr build_fat_ptr(u64 size);
 #define Cleanup                                                                \
 	Object __attribute__((warn_unused_result, cleanup(Object_cleanup)))
 
+#define TypeName(obj) obj.vtable->name
+
 #define var Cleanup
 #define let const Cleanup
 
-#define BOTH(x, y) x y
-#define SECOND(x, y) y
-#define BUILD_ARGS(x, ...) BOTH __VA_ARGS__;
-
 #define Type(name, ...)                                                        \
 	typedef struct name name;                                              \
-	static Vtable name##_Vtable__ = {0, NULL};                             \
+	static Vtable name##_Vtable__ = {#name, 0, NULL};                      \
 	u64 name##_size();                                                     \
-	void name##_cleanup(name *obj);                                        \
 	typedef struct name {                                                  \
 		__VA_ARGS__                                                    \
 	} name;                                                                \
 	u64 name##_size() { return sizeof(name); }                             \
-	void __attribute__((constructor)) __add_impls_##name##_vtable() {      \
-		VtableEntry cleanup = {"cleanup", name##_cleanup};             \
-		vtable_add_entry(&name##_Vtable__, cleanup);                   \
+	static void __attribute__((constructor))                               \
+	__add_impls_##name##_vtable() {                                        \
 		VtableEntry size = {"size", name##_size};                      \
 		vtable_add_entry(&name##_Vtable__, size);                      \
 	}
@@ -115,5 +136,69 @@ FatPtr build_fat_ptr(u64 size);
 #define SetterProto(name, field_name)                                          \
 	void name##_set_##field_name(                                          \
 	    Object *self, MEMBER_TYPE(name, field_name) field_name);
+
+#define Impl(name, trait) EXPAND(trait(name))
+
+#define OVERRIDE(name, trait, implfn)                                          \
+	static void __attribute__((constructor))                               \
+	ov__##name##_##trait##_vtable() {                                      \
+		VtableEntry next = {#trait, implfn};                           \
+		vtable_override(&name##_Vtable__, next);                       \
+	}
+
+#define TRAIT_SUPER(name, trait) EXPAND(trait(name))
+
+#define TRAIT_IMPL(T, name, default)                                           \
+	static void __attribute__((constructor)) add_##name##_##T##_vtable() { \
+		VtableEntry next = {#name, default};                           \
+		vtable_add_entry(&T##_Vtable__, next);                         \
+	}
+
+#define Required(T, R, name, ...)                                              \
+	R T##_##name(__VA_ARGS__);                                             \
+	static void __attribute__((constructor)) CAT(add_##T, UNIQUE_ID)() {   \
+		VtableEntry next = {#name, T##_##name};                        \
+		vtable_add_entry(&T##_Vtable__, next);                         \
+	}
+
+/* BoundsCheck b1 = {"dst", dst}; */
+/* BoundsCheck b2 = {"src", src}; */ /* check_bounds("Clone",
+					"clone",
+					b1,
+					b2);
+				      */
+
+// Define macros to extract the type and name from a tuple
+#define EXTRACT_TYPE_NAME(type, name) type name
+#define EXTRACT_NAME(type, name) name
+
+// Define the macros for unwrapping the tuples
+#define UNWRAP_Param_TYPE_NAME(type_name) EXTRACT_TYPE_NAME type_name
+#define UNWRAP_Param_NAME(type_name) EXTRACT_NAME type_name
+
+// Define PROC_FN_SIGNATURE and PROC_ParamS to use UNWRAP_Param correctly
+#define PROC_FN_SIGNATURE(...) FOR_EACH(UNWRAP_Param_TYPE_NAME, __VA_ARGS__)
+#define PROC_ParamS(...) FOR_EACH(UNWRAP_Param_NAME, __VA_ARGS__)
+
+// Define a parameter macro for testing
+#define Param(type, name) (type, name)
+
+#define TraitImpl(return_type, name, ...)                                      \
+	static return_type name(PROC_FN_SIGNATURE(__VA_ARGS__)) {              \
+		if (!self)                                                     \
+			panic(                                                 \
+			    "Runtime error: Illegal argument! self was NULL"); \
+		return_type (*impl)(PROC_FN_SIGNATURE(__VA_ARGS__)) =          \
+		    find_fn(self, #name);                                      \
+                                                                               \
+		if (!impl)                                                     \
+			panic("Runtime error: Trait bound violation! Type "    \
+			      "'%s' does "                                     \
+			      "not implement the "                             \
+			      "required function [%s]l",                       \
+			      TypeName((*self)));                              \
+                                                                               \
+		return impl(PROC_ParamS(__VA_ARGS__));                         \
+	}
 
 #endif // _CORE_TYPE__

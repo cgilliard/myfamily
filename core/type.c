@@ -18,6 +18,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+TraitTable __global_trait_table;
+
+void __attribute__((constructor)) __init_tt() {
+	__global_trait_table.entry_count = 1;
+	__global_trait_table.entries = malloc(sizeof(TraitDefn));
+	__global_trait_table.entries[0].name = "Drop";
+	__global_trait_table.entries[0].entry_count = 1;
+	__global_trait_table.entries[0].entries = malloc(sizeof(TraitRequired));
+	__global_trait_table.entries[0].entries[0].name = "drop";
+	__global_trait_table.entries[0].entries[0].bounds_count = 0;
+}
+
 u64 __global_counter__ = 0;
 
 u64 unique_id() { return __global_counter__++; }
@@ -93,9 +105,9 @@ void *find_fn(const Object *obj, const char *name) {
 void Object_cleanup(const Object *ptr) {
 	Object *unconst = ptr;
 	if ((unconst->flags & VDATA_FLAGS_NO_CLEANUP) == 0) {
-		void (*do_cleanup)(Object * ptr) = find_fn(ptr, "cleanup");
-		if (do_cleanup)
-			do_cleanup(ptr);
+		void (*drop)(Object * ptr) = find_fn(ptr, "drop");
+		if (drop)
+			drop(ptr);
 		if (fat_ptr_data(&unconst->ptr)) {
 			chain_free(&unconst->ptr);
 		}
