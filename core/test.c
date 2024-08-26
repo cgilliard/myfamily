@@ -798,15 +798,14 @@ Test(core, test_synchronized) {
 // declare a type called 'TestType' to demonstrate usage of the macro library.
 // This type has two fields, a u64 and a u32
 // Current syntax
-Type(TestType, Setable(u64, x), Getable(u32, y));
+Type(TestType, Field(u64, x) Field(u32, y));
 // Desired syntax (default values optional)
 // Type(TestType, Getable(u64, x, 0) Setable(u32, y, 0));
 
-// create setter prototypes. In this case these are optional as the criterion
-// library uses a single test file. But this allows for separation of the
-// function prototype from the actual implementation.
+// create setter/getter prototypes. In this case these are optional as the
+// criterion library uses a single test file. But this allows for separation of
+// the function prototype from the actual implementation.
 SetterProto(TestType, x);
-// likewise for the getter prototype allowing access to this field.
 GetterProto(TestType, x);
 SetterProto(TestType, y);
 GetterProto(TestType, y);
@@ -844,8 +843,6 @@ Test(core, test_types) {
 	// declaration. So, in this case, the field x = 1 and y = 2.
 	// Current syntax
 	var t1 = new (TestType, 1, 2);
-	// desired syntax 'With'.
-	// var t1 = new (TestType, With(x, 1), With(y, 2));
 
 	// use the 'get' function to get the values of 'x' and 'y'.
 	xv = get(TestType, t1, x);
@@ -887,51 +884,11 @@ Test(core, test_types) {
 
 	// this line also results in a compiler warning/error
 	// update_x_y(&t2);
+
+	// Use With syntax to initialize values
+	let t3 = new (TestType, With(y, 400), With(x, 300));
+	xv = get(TestType, t3, x);
+	yv = get(TestType, t3, y);
+	cr_assert_eq(xv, 300);
+	cr_assert_eq(yv, 400);
 }
-
-/*
- * // declare a type 'TestType' with getters declared for VarX automatically and
-getters/setters declared for VarY automatically.
-// Also initialize the values of those variables to 10 and 20 respectively.
-// VarZ is created of type bool with no public getters or setters and no default
-initial value. Type(TestType, Getable(u64, VarX, 10) Setable(u32, VarY, 20),
-Field(bool, VarZ));
-
-// Example test
-Test(core, test_type)
-{
-	// declare some local variables
-	u64 xv;
-	u32 yv;
-
-	// create an instance of TestType with VarZ initialized to false and
-VarY initialized to 30. let test_type_a = new(TestType, VarZ(false), VarY(30));
-
-	// do assertions on initial values x is the default since it wasn't
-specified y is the specified value xv = get(TestType, test_type_a, VarX); yv =
-get(TestType, test_type_a, VarY); cr_assert_eq(xv, 10); cr_assert_eq(yv, 30);
-
-	// create another mutable instance of TestType with all default values
-	var test_type_b = new(TestType);
-	// get values and do assertions, defaults expected
-	xv = get(TestType, test_type_b, x);
-	yv = get(TestType, test_type_b, y);
-	cr_assert_eq(xv, 10);
-	cr_assert_eq(yv, 20);
-
-	// since this is a mutable instance, the setter may be called. Only the
-setter for VarY exists.
-	// however, the other getters/setters can be created using the
-Getter/Setter macros, presuably in the C
-	// implementation file so that they are only avialble internally.
-	set(TestType, test_type_b, VarY, 100);
-	// get the new value and do the assertion.
-	yv = get(TestType, test_type_c, y);
-	cr_assert_eq(yv, 100);
-}
-*/
-
-// #define TEST_PROC(x) (x, y)
-// #define TEST(...) FOR_EACH(TEST_PROC, test123, __VA_ARGS__)
-
-// TEST(1, 2, 3)

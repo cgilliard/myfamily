@@ -61,7 +61,7 @@ void vtable_add_entry(Vtable *table, VtableEntry entry) {
 	sort_vtable(table);
 }
 
-void *find_fn(Ref obj, const char *name) {
+void *find_fn(const Object *obj, const char *name) {
 	int left = 0;
 	int right = obj->vtable->len - 1;
 	while (left <= right) {
@@ -90,7 +90,7 @@ void *find_fn(Ref obj, const char *name) {
 #else
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
-void Object_cleanup(Ref ptr) {
+void Object_cleanup(const Object *ptr) {
 	Object *unconst = ptr;
 	if ((unconst->flags & VDATA_FLAGS_NO_CLEANUP) == 0) {
 		void (*do_cleanup)(Object * ptr) = find_fn(ptr, "cleanup");
