@@ -18,7 +18,7 @@
 #include <core/type.h>
 
 #define Drop(T) Required(T, void, drop, Param(Object *, self))
-TraitImpl(void, drop, Param(Object *, self));
+TraitImpl(Drop, void, drop, Param(Object *, self));
 
 // # desired syntax:
 // #define Drop(T) Required(T, void, drop, Param(Object *, self))
@@ -31,7 +31,7 @@ TraitImpl(void, drop, Param(Object *, self));
 
 #define Clone(T)                                                               \
 	Required(T, bool, myclone, Param(Object *, dst), Param(Object *, self))
-TraitImpl(bool, myclone, Param(Object *, dst), Param(Object *, self));
+TraitImpl(Drop, bool, myclone, Param(Object *, dst), Param(Object *, self));
 
 // is this possible?
 // Bound(Clone, clone, (dst, Copy), (src, Drop))

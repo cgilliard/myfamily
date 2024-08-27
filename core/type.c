@@ -18,8 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-TraitTable __global_trait_table;
-
+/*
 void __attribute__((constructor)) __init_tt() {
 	__global_trait_table.entry_count = 1;
 	__global_trait_table.entries = malloc(sizeof(TraitDefn));
@@ -29,6 +28,7 @@ void __attribute__((constructor)) __init_tt() {
 	__global_trait_table.entries[0].entries[0].name = "drop";
 	__global_trait_table.entries[0].entries[0].bounds_count = 0;
 }
+*/
 
 u64 __global_counter__ = 0;
 
