@@ -109,7 +109,7 @@ FatPtr build_fat_ptr(u64 size);
 	FOR_EACH(UNWRAP_PARAM_TYPE_NAME, , (, ), __VA_ARGS__)
 #define PROC_PARAMS(...) FOR_EACH(UNWRAP_PARAM_NAME, , (, ), __VA_ARGS__)
 
-#define Param(type, name) type name
+#define Param(type, name) (type, name)
 #define ParamImpl(type, name) (type, name)
 
 #define RequiredOld(T, is_var, R, name, ...)                                   \
@@ -122,11 +122,20 @@ FatPtr build_fat_ptr(u64 size);
 #define Var()
 #define Const() const
 
+#define SECOND_ALT(x, y) y
+#define SECOND(x, y) SECOND_ALT y
+#define PROCESS_FN_CALL(...) FOR_EACH_INNER(SECOND, none, (, ), __VA_ARGS__)
+
+#define BOTH_ALT2(x, y) x y
+#define BOTH_ALT(x, y) BOTH_ALT2 y
+#define PROCESS_FN_SIG(...) FOR_EACH_INNER(BOTH_ALT, none, (, ), __VA_ARGS__)
+
 // TODO: pass params correctly in call to impl.
 #define PROC_TRAIT_IMPL_FN(mutability, return_type, name, ...)                 \
 	static return_type name(mutability() Object *self __VA_OPT__(, )       \
-				    __VA_ARGS__) {                             \
-		return_type (*impl)() = find_fn(self, #name);                  \
+				    __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) { \
+		return_type (*impl)(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) = \
+		    find_fn(self, #name);                                      \
 		if (!impl)                                                     \
 			panic("Runtime error: Trait bound violation! "         \
 			      "Type "                                          \
@@ -139,7 +148,7 @@ FatPtr build_fat_ptr(u64 size);
 		__thread_local_self_Const = self;                              \
 		__thread_local_self_Var = NULL;                                \
 		__thread_local_self_##mutability = self;                       \
-		return impl();                                                 \
+		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}
 #define PROC_TRAIT_IMPL(arg, x) PROC_TRAIT_IMPL_FN x
 #define TraitImpl2(trait) FOR_EACH(PROC_TRAIT_IMPL, none, (), trait)
@@ -169,7 +178,8 @@ FatPtr build_fat_ptr(u64 size);
 
 #define PROC_TRAIT_STATEMENT_IMPL_EXP(impl_type, mutability, return_type,      \
 				      fn_name, ...)                            \
-	return_type impl_type##_##fn_name(__VA_ARGS__);                        \
+	return_type impl_type##_##fn_name(                                     \
+	    __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)));                          \
 	static void __attribute__((constructor))                               \
 	__required_add__##impl_type##_##fn_name() {                            \
 		VtableEntry next = {#fn_name, impl_type##_##fn_name};          \

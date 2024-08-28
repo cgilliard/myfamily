@@ -800,7 +800,7 @@ Type(TestType, Field(u64, x), Field(u32, y));
 #define Print                                                                  \
 	DefineTrait(Required(Const, void, print), Required(Const, u64, get_x), \
 		    Required(Const, u32, get_y), Required(Var, void, incr),    \
-		    Required(Const, void, print_int, Param(u64, value),        \
+		    Required(Var, void, print_int, Param(u64, value),          \
 			     Param(u32, value2)))
 // old print
 /*
@@ -844,7 +844,10 @@ void TestType_param_set2(u64 value1, u32 value2) {
 	$Var(x) = value1;
 	$Var(y) = value2;
 }
-void TestType_print_int(u64 value, u32 value2) {}
+void TestType_print_int(u64 value, u32 value2) {
+	$Var(x) = value;
+	$Var(y) = value2;
+}
 #undef IMPL
 
 // TraitImpl(Print, Const, void, print);
@@ -858,6 +861,9 @@ Test(core, test_type) {
 	incr(&v1);
 	cr_assert_eq(get_x(&v1), 5);
 	cr_assert_eq(get_y(&v1), 6);
+	print_int(&v1, 101, 202);
+	cr_assert_eq(get_x(&v1), 101);
+	cr_assert_eq(get_y(&v1), 202);
 	/*
 	print2(&v1);
 	cr_assert_eq(get_x(&v1), 2);
