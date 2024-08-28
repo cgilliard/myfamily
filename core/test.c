@@ -799,19 +799,49 @@ Type(TestType, Field(u64, x), Field(u32, y));
 // current:
 // #define Print(T) Required(T, Const, void, print)
 #define Print                                                                  \
-	DefineTrait(Required(Const, void, print), Required(Mut, void, print2))
+	DefineTrait(Required(Const, void, print), Required(Mut, void, print2), \
+		    Required(Const, u64, get_x), Required(Const, u32, get_y),  \
+		    Required(Mut, void, param_set, Param(u64, value)),         \
+		    Required(Mut, void, param_set2, Param(u64, value1),        \
+			     Param(u32, value2)))
 TraitImpl(Print, Const, void, print);
+TraitImpl(Print, Mut, void, print2);
+TraitImpl(Print, Const, u64, get_x);
+TraitImpl(Print, Const, u32, get_y);
+TraitImpl(Print, Mut, void, param_set, ParamImpl(u64, value));
+TraitImpl(Print, Mut, void, param_set2, ParamImpl(u64, value1),
+	  ParamImpl(u32, value2));
 
 Impl(TestType, Print);
 
 #define IMPL TestType
 void TestType_print() { printf("x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
-void TestType_print2() { printf("print2 x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
+void TestType_print2() {
+	$Mut(x)++;
+	$Mut(y)++;
+	printf("print2 x=%" PRIu64 ",y=%u\n", $(x), $(y));
+}
+u64 TestType_get_x() { return $(x); }
+u32 TestType_get_y() { return $(y); }
+void TestType_param_set(u64 value) { $Mut(x) = value; }
+void TestType_param_set2(u64 value1, u32 value2) {
+	$Mut(x) = value1;
+	$Mut(y) = value2;
+}
 #undef IMPL
 
 Test(core, test_type) {
 	var v1 = new (TestType, With(x, 1), With(y, 5));
 	print(&v1);
+	print2(&v1);
+	cr_assert_eq(get_x(&v1), 2);
+	param_set(&v1, 12345);
+	cr_assert_eq(get_x(&v1), 12345);
+	cr_assert_eq(get_y(&v1), 6);
+
+	param_set2(&v1, 111, 222);
+	cr_assert_eq(get_x(&v1), 111);
+	cr_assert_eq(get_y(&v1), 222);
 }
 
 /*

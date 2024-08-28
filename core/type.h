@@ -110,7 +110,8 @@ FatPtr build_fat_ptr(u64 size);
 	FOR_EACH(UNWRAP_PARAM_TYPE_NAME, , (, ), __VA_ARGS__)
 #define PROC_PARAMS(...) FOR_EACH(UNWRAP_PARAM_NAME, , (, ), __VA_ARGS__)
 
-#define Param(type, name, ...) (type, name __VA_OPT__(, ) __VA_ARGS__)
+#define Param(type, name) type name
+#define ParamImpl(type, name) (type, name)
 
 #define RequiredOld(T, is_mut, R, name, ...)                                   \
 	R T##_##name(PROC_FN_SIGNATURE(__VA_ARGS__));                          \
@@ -147,7 +148,7 @@ FatPtr build_fat_ptr(u64 size);
 
 #define PROC_TRAIT_STATEMENT_IMPL_EXP(impl_type, mutability, return_type,      \
 				      fn_name, ...)                            \
-	return_type impl_type##_##fn_name();                                   \
+	return_type impl_type##_##fn_name(__VA_ARGS__);                        \
 	static void __attribute__((constructor))                               \
 	__required_add__##impl_type##_##fn_name() {                            \
 		VtableEntry next = {#fn_name, impl_type##_##fn_name};          \
