@@ -797,17 +797,24 @@ Test(core, test_synchronized) {
 
 Type(TestType, Field(u64, x), Field(u32, y));
 
+#define AccessTestType(T)                                                      \
+	Required(T, Const, u64, get_x) Required(T, Const, u32, get_y)
 #define Drop(T) Required(T, Mut, void, drop)
 #define Print(T)                                                               \
 	Required(T, Const, void, print) Required(T, Mut, void, print_incr)
 TraitImpl(Print, Const, void, print);
 TraitImpl(Print, Mut, void, print_incr);
 TraitImpl(Drop, Mut, void, drop);
+TraitImpl(AcecssTestType, Const, u64, get_x);
+TraitImpl(AcecssTestType, Const, u64, get_y);
 
 Impl(TestType, Print);
 Impl(TestType, Drop);
+Impl(TestType, AccessTestType);
 
 #define IMPL TestType
+u64 TestType_get_x() { return $(x); }
+u32 TestType_get_y() { return $(y); }
 void TestType_print() { printf("x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
 
 void TestType_print_incr() {
@@ -820,13 +827,20 @@ void TestType_drop() { printf("drop with x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
 #undef IMPL
 
 Test(core, test_type) {
-	var x = new (TestType, With(x, 1), With(y, 5));
-	print(&x);
-	print_incr(&x);
+	var v1 = new (TestType, With(x, 1), With(y, 5));
+	print(&v1);
+	cr_assert_eq(get_x(&v1), 1);
+	cr_assert_eq(get_y(&v1), 5);
+	print_incr(&v1);
+	cr_assert_eq(get_x(&v1), 2);
+	cr_assert_eq(get_y(&v1), 6);
 
-	let y = new (TestType, With(x, 100), With(y, 500));
-	print(&y);
+	let v2 = new (TestType, With(x, 100), With(y, 500));
+	print(&v2);
+	cr_assert_eq(get_x(&v2), 100);
+	cr_assert_eq(get_y(&v2), 500);
+
 	// This line would be a compiler error due to the immutable access of a
 	// mutable function.
-	// print_incr(&y);
+	// print_incr(&v2);
 }
