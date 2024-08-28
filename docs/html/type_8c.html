@@ -75,7 +75,6 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="panic_8h_source.html">core/panic.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="type_8h_source.html">core/type.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="types_8h_source.html">core/types.h</a>&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
 </div><table class="memberdecls">
@@ -98,6 +97,10 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a7584392485c1057e73a56ba7c43e4bee"><td class="memItemLeft" align="right" valign="top">_Thread_local const <a class="el" href="structObject.html">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8c.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a> = NULL</td></tr>
+<tr class="separator:a7584392485c1057e73a56ba7c43e4bee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad128f0064c5bec87c79d02e93404434d"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structObject.html">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8c.html#ad128f0064c5bec87c79d02e93404434d">__thread_local_self_Mut</a> = NULL</td></tr>
+<tr class="separator:ad128f0064c5bec87c79d02e93404434d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4b292b38a6f07caa49221407b4428bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8c.html#ad4b292b38a6f07caa49221407b4428bc">__global_counter__</a> = 0</td></tr>
 <tr class="separator:ad4b292b38a6f07caa49221407b4428bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -266,6 +269,34 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> __global_counter__ = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7584392485c1057e73a56ba7c43e4bee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7584392485c1057e73a56ba7c43e4bee">&#9670;&nbsp;</a></span>__thread_local_self_Const</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">_Thread_local const <a class="el" href="structObject.html">Object</a>* __thread_local_self_Const = NULL</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad128f0064c5bec87c79d02e93404434d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad128f0064c5bec87c79d02e93404434d">&#9670;&nbsp;</a></span>__thread_local_self_Mut</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">_Thread_local <a class="el" href="structObject.html">Object</a>* __thread_local_self_Mut = NULL</td>
         </tr>
       </table>
 </div><div class="memdoc">

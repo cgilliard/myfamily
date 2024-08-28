@@ -89,35 +89,8 @@ $(function() {
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="type_8h.html">core/type.h</a>&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="traits_8h.html#a9f5df403c9e25149465c8d7ba2f569a0">   20</a></span>&#160;<span class="preprocessor">#define Drop(T) Required(T, void, drop, Param(Object *, self))</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="traits_8h.html#abedf385866aef3798050e7ec3a11d141">   21</a></span>&#160;<a class="code" href="traits_8h.html#abedf385866aef3798050e7ec3a11d141">TraitImpl</a>(<a class="code" href="traits_8h.html#a9f5df403c9e25149465c8d7ba2f569a0">Drop</a>, <span class="keywordtype">void</span>, drop, <a class="code" href="type_8h.html#ae77825bf3976cd2514226884a8146fba">Param</a>(<a class="code" href="structObject.html">Object</a> *, <span class="keyword">self</span>));</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment">// # desired syntax:</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment">// #define Drop(T) Required(T, void, drop, Param(Object *, self))</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment">// Trait(Drop);</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">// #define Clone(T) Required(T, Object, clone, Param(Object *, self))</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">// Trait(Clone);</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">// #define SuperClone(T) Required(T, Object, super_clone, Param(Object *, self))</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment">// Where(SuperClone, TraitBound(self, Super), FunctionBound(clone, self, Clone))</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">// Trait(SuperClone);</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="traits_8h.html#ab496ff59425769f937b6936e982461ee">   32</a></span>&#160;<span class="preprocessor">#define Clone(T)                                                               \</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">    Required(T, bool, myclone, Param(Object *, dst), Param(Object *, self))</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="traits_8h.html#aa46e129d71ac5b41226c880dab03dd19">   34</a></span>&#160;<a class="code" href="traits_8h.html#abedf385866aef3798050e7ec3a11d141">TraitImpl</a>(<a class="code" href="traits_8h.html#a9f5df403c9e25149465c8d7ba2f569a0">Drop</a>, <span class="keywordtype">bool</span>, myclone, <a class="code" href="type_8h.html#ae77825bf3976cd2514226884a8146fba">Param</a>(<a class="code" href="structObject.html">Object</a> *, dst), <a class="code" href="type_8h.html#ae77825bf3976cd2514226884a8146fba">Param</a>(<a class="code" href="structObject.html">Object</a> *, <span class="keyword">self</span>));</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment">// is this possible?</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">// Bound(Clone, clone, (dst, Copy), (src, Drop))</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">// Then in .c file:</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">// TraitImpl(Clone) generates:</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">// void clone(Object *dst, Object *src) { // check bounds from static table and</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">// panic if not implemented. Then execute the trait. }</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_TRAITS__</span></div>
-<div class="ttc" id="astructObject_html"><div class="ttname"><a href="structObject.html">Object</a></div><div class="ttdef"><b>Definition:</b> type.h:36</div></div>
-<div class="ttc" id="atraits_8h_html_a9f5df403c9e25149465c8d7ba2f569a0"><div class="ttname"><a href="traits_8h.html#a9f5df403c9e25149465c8d7ba2f569a0">Drop</a></div><div class="ttdeci">#define Drop(T)</div><div class="ttdef"><b>Definition:</b> traits.h:20</div></div>
-<div class="ttc" id="atraits_8h_html_abedf385866aef3798050e7ec3a11d141"><div class="ttname"><a href="traits_8h.html#abedf385866aef3798050e7ec3a11d141">TraitImpl</a></div><div class="ttdeci">TraitImpl(Drop, void, drop, Param(Object *, self))</div></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_TRAITS__</span></div>
 <div class="ttc" id="atype_8h_html"><div class="ttname"><a href="type_8h.html">type.h</a></div></div>
-<div class="ttc" id="atype_8h_html_ae77825bf3976cd2514226884a8146fba"><div class="ttname"><a href="type_8h.html#ae77825bf3976cd2514226884a8146fba">Param</a></div><div class="ttdeci">#define Param(type, name)</div><div class="ttdef"><b>Definition:</b> type.h:195</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
