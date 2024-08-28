@@ -112,7 +112,7 @@ FatPtr build_fat_ptr(u64 size);
 
 #define Param(type, name, ...) (type, name __VA_OPT__(, ) __VA_ARGS__)
 
-#define Required(T, is_mut, R, name, ...)                                      \
+#define RequiredOld(T, is_mut, R, name, ...)                                   \
 	R T##_##name(PROC_FN_SIGNATURE(__VA_ARGS__));                          \
 	static void __attribute__((constructor))                               \
 	CAT(__required_add_##T##_, UNIQUE_ID)() {                              \
@@ -145,7 +145,24 @@ FatPtr build_fat_ptr(u64 size);
 		return impl(PROC_PARAMS(__VA_ARGS__));                         \
 	}
 
-#define Impl(name, trait) EXPAND(trait(name))
+#define PROC_TRAIT_STATEMENT_IMPL_EXP(impl_type, mutability, return_type,      \
+				      fn_name, ...)                            \
+	return_type impl_type##_##fn_name();                                   \
+	static void __attribute__((constructor))                               \
+	__required_add__##impl_type##_##fn_name() {                            \
+		VtableEntry next = {#fn_name, impl_type##_##fn_name};          \
+		vtable_add_entry(&impl_type##_Vtable__, next);                 \
+	}
+#define PROC_TRAIT_STATEMENT_IMPL(...)                                         \
+	PROC_TRAIT_STATEMENT_IMPL_EXP(__VA_ARGS__)
+#define PROC_TRAIT_STATEMENT(arg, x)                                           \
+	PROC_TRAIT_STATEMENT_IMPL(arg, EXPAND_ALL x)
+// #define PROC_TRAIT_STATEMENT(arg, x) [ arg, EXPAND_ALL x ]
+#define PROC_IMPL(name, ...)                                                   \
+	FOR_EACH(PROC_TRAIT_STATEMENT, name, (), __VA_ARGS__)
+#define DefineTrait(...) __VA_ARGS__
+#define Required(...) (__VA_ARGS__)
+#define Impl(name, trait) PROC_IMPL(name, trait)
 
 // TODO: _fptr__.data may be NULL, need to handle. Once we have
 // 'Result' implement two versions of this macro. One which

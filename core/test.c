@@ -796,7 +796,25 @@ Test(core, test_synchronized) {
 }
 
 Type(TestType, Field(u64, x), Field(u32, y));
+// current:
+// #define Print(T) Required(T, Const, void, print)
+#define Print                                                                  \
+	DefineTrait(Required(Const, void, print), Required(Mut, void, print2))
+TraitImpl(Print, Const, void, print);
 
+Impl(TestType, Print);
+
+#define IMPL TestType
+void TestType_print() { printf("x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
+void TestType_print2() { printf("print2 x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
+#undef IMPL
+
+Test(core, test_type) {
+	var v1 = new (TestType, With(x, 1), With(y, 5));
+	print(&v1);
+}
+
+/*
 #define AccessTestType(T)                                                      \
 	Required(T, Const, u64, get_x) Required(T, Const, u32, get_y)
 #define Drop(T) Required(T, Mut, void, drop)
@@ -844,3 +862,4 @@ Test(core, test_type) {
 	// mutable function.
 	// print_incr(&v2);
 }
+*/
