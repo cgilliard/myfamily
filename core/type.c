@@ -14,21 +14,11 @@
 
 #include <core/panic.h>
 #include <core/type.h>
-#include <core/types.h>
 #include <stdlib.h>
 #include <string.h>
 
-/*
-void __attribute__((constructor)) __init_tt() {
-	__global_trait_table.entry_count = 1;
-	__global_trait_table.entries = malloc(sizeof(TraitDefn));
-	__global_trait_table.entries[0].name = "Drop";
-	__global_trait_table.entries[0].entry_count = 1;
-	__global_trait_table.entries[0].entries = malloc(sizeof(TraitRequired));
-	__global_trait_table.entries[0].entries[0].name = "drop";
-	__global_trait_table.entries[0].entries[0].bounds_count = 0;
-}
-*/
+_Thread_local const Object *__thread_local_self_Const = NULL;
+_Thread_local Object *__thread_local_self_Mut = NULL;
 
 u64 __global_counter__ = 0;
 

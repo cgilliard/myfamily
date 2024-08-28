@@ -795,109 +795,144 @@ Test(core, test_synchronized) {
 	Lock_cleanup(&sync_lock);
 }
 
-// declare a type called 'TestType' to demonstrate usage of the macro library.
-// This type has two fields, a u64 and a u32
-Type(TestType, Field(u64, x) Field(u32, y));
+Type(TestType, Field(u64, x), Field(u32, y));
 
-// create setter/getter prototypes. In this case these are optional as the
-// criterion library uses a single test file. But this allows for separation of
-// the function prototype from the actual implementation.
-SetterProto(TestType, x);
-GetterProto(TestType, x);
-SetterProto(TestType, y);
-GetterProto(TestType, y);
+#define Print(T)                                                               \
+	Required(T, Const, void, print) Required(T, Mut, void, print_incr)
+TraitImpl(Print, Const, void, print);
+TraitImpl(Print, Mut, void, print_incr);
 
-// these are the actual setter/getter implementations. Clearly all of these are
-// optional and can be declared in any context they're needed.
-// to declare a static version of the setters/getters, one could prefix these
-// macros with the 'static' keyword thus allowing these to be declared in header
-// files.
-Setter(TestType, x);
-Getter(TestType, x);
-Setter(TestType, y);
-Getter(TestType, y);
+Impl(TestType, Print);
 
-// implement the drop trait
+#define IMPL TestType
+void TestType_print() { printf("x=%llu,y=%u\n", $Const(x), $Const(y)); }
+
+void TestType_print_incr() {
+	$(x)++;
+	$(y)++;
+	printf("x=%llu,y=%u\n", $(x), $(y));
+}
+#undef IMPL
+
+Test(core, test_type) {
+	var x = new (TestType, With(x, 1), With(y, 5));
+	print(&x);
+	print_incr(&x);
+
+	let y = new (TestType, With(x, 100), With(y, 500));
+	print(&y);
+	// print_incr(&y);
+}
+
+/*
+
+#define Drop(T) Required(T, Mut, void, drop)
+TraitImpl(Drop, Mut, void, drop);
+
+#define MyTrait(T) \
+	Required(T, Mut, u32, do_something, Param(u32, x), Param(Object *,
+y)) \ Required(T, Mut, u64, do_something2, Param(u64, v)) TraitImpl(MyTrait,
+Mut, u32, do_something, Param(u32, x), Param(Object *, y));
+TraitImpl(MyTrait, Mut, u64, do_something2, Param(u64, v));
+
+Impl(TestType, Print);
 Impl(TestType, Drop);
+Impl(TestType, MyTrait);
 
-void TestType_drop(Object *self) {
-	set(TestType, *self, x, 200);
-	printf("drop\n");
+#define IMPL TestType
+void TestType_print(const Object *self) {
+	printf("x=%llu,y=%u\n", $CONST(x), $CONST(y));
 }
-
-void update_x_y(Object *ptr) {
-	set(TestType, *ptr, x, 100);
-	set(TestType, *ptr, y, 200);
+void TestType_drop(Object *self) { printf("dropping TestType\n"); }
+u32 TestType_do_something(Object *self, u32 x, Object *y) {
+	$(x) += 3;
+	return $(y) + 1;
 }
-
-Test(core, test_types) {
-	{
-		// declare some unsigned integer variables for use with our
-		// Type.
-		u64 xv;
-		u32 yv;
-
-		// instantiate a 'new' instance of TestType. This new instance
-		// is declared using 'var' syntax which maps to a mutable
-		// instance of the variable. The initial values are specified in
-		// order according to the declaration. So, in this case, the
-		// field x = 1 and y = 2. Current syntax
-		var t1 = new (TestType, 1, 2);
-		cr_assert(!strcmp(TypeName(t1), "TestType"));
-
-		// use the 'get' function to get the values of 'x' and 'y'.
-		xv = get(TestType, t1, x);
-		yv = get(TestType, t1, y);
-
-		// they are equal to 1 and 2 respectively.
-		cr_assert_eq(xv, 1);
-		cr_assert_eq(yv, 2);
-
-		// set 'x' to 100.
-		set(TestType, t1, x, 100);
-
-		// get 'x' and make assertion.
-		xv = get(TestType, t1, x);
-		cr_assert_eq(xv, 100);
-
-		// instantiate a 'new' instance of TestType. This instance is
-		// declared using 'let' syntax which maps to an immutable
-		// instance of the variable. Once again initial values are
-		// specified.
-		let t2 = new (TestType, 3, 4);
-
-		// getters (which are immutable) can be used to access the
-		// values of t2.
-		xv = get(TestType, t2, x);
-		yv = get(TestType, t2, y);
-
-		cr_assert_eq(xv, 3);
-		cr_assert_eq(yv, 4);
-
-		// update x and y
-		update_x_y(&t1);
-		xv = get(TestType, t1, x);
-		yv = get(TestType, t1, y);
-		cr_assert_eq(xv, 100);
-		cr_assert_eq(yv, 200);
-
-		// This line would result in a compiler warning (which is
-		// configured to an error in the default build configuration)
-		// because t2 is immutable set(TestType, t2, x, 100);
-
-		// this line also results in a compiler warning/error
-		// update_x_y(&t2);
-
-		// Use With syntax to initialize values
-		let t3 = new (TestType, With(y, 400), With(x, 300));
-		xv = get(TestType, t3, x);
-		yv = get(TestType, t3, y);
-		cr_assert_eq(xv, 300);
-		cr_assert_eq(yv, 400);
-
-		drop(&t1);
-
-		printf("end scope\n");
-	}
-	printf("drop complete\n");
+u64 TestType_do_something2(Object *self, u64 v) {
+	$(y) -= 1;
+	return $(x) + 1;
 }
+#undef IMPL
+
+Test(core, test_type) {
+	var x = new (TestType, With(x, 1), With(y, 5));
+
+	print(&x);
+	u32 v = do_something(&x, 2, NULL);
+	cr_assert_eq(v, 6);
+	u64 v2 = do_something2(&x, 100);
+	cr_assert_eq(v2, 5);
+
+	let y = new (TestType, With(x, 100), With(y, 200));
+	print(&y);
+}
+*/
+
+/*
+Type(TestType, Field(u64, x), Field(u32, y));
+
+char *msg = "this is a test";
+
+void *my_testfn(char *format, ...) { return msg; }
+int my_otherfn(int x, int y) { return 10; }
+u128 my_u128fn(int v) { return 9; }
+int no_params() { return 104; }
+
+typedef struct TestStruct {
+	u32 x;
+	u64 y;
+	i16 z;
+} TestStruct;
+
+#define SELF_TYPE TestStruct
+Test(core, test_type) {
+	Object my_obj;
+	chain_malloc(&my_obj.ptr, sizeof(TestStruct));
+	((TestStruct *)(my_obj.ptr.data))->x = 1;
+	((TestStruct *)(my_obj.ptr.data))->y = 2;
+	((TestStruct *)(my_obj.ptr.data))->z = 3;
+	__thread_local_self_ref_ = &my_obj;
+	cr_assert_eq($(x), 1);
+	$(x)++;
+	cr_assert_eq($(x), 2);
+	cr_assert_eq($(y), 2);
+	cr_assert_eq($(z), 3);
+	chain_free(&my_obj.ptr);
+}
+#undef SELF_TYPE
+
+#define SELF_TYPE TestType
+Test(core, test_type2) {
+	Object my_obj;
+	chain_malloc(&my_obj.ptr, sizeof(TestType));
+	((TestType *)(my_obj.ptr.data))->x = 100;
+	((TestType *)(my_obj.ptr.data))->y = 200;
+
+	__thread_local_self_ref_ = &my_obj;
+
+	cr_assert_eq($(x), 100);
+	cr_assert_eq($(y), 200);
+	$(x) += 10;
+	cr_assert_eq($(x), 110);
+
+	chain_free(&my_obj.ptr);
+}
+#undef SELF_TYPE
+*/
+
+// #define DO_SOMETHING(arg, x) [ arg, x ]
+
+/*
+#define TEST_FOR_EACH(...) FOR_EACH(DO_SOMETHING, test, (xxv), __VA_ARGS__)
+0 : TEST_FOR_EACH();
+1 : TEST_FOR_EACH(abc);
+2 : TEST_FOR_EACH(abc, def);
+3 : TEST_FOR_EACH(abc, def, ghi);
+4 : TEST_FOR_EACH(abc, def, ghi, jlk);
+5 : TEST_FOR_EACH(abc, def, ghi, jkl, mno);
+6 : TEST_FOR_EACH(abc, def, ghi, jkl, mno, pqr);
+7 : TEST_FOR_EACH(abc, def, ghi, jkl, mno, pqr, tuv);
+8 : TEST_FOR_EACH(abc, def, ghi, jkl, mno, pqr, tuv, wxy);
+9 : TEST_FOR_EACH(abc, def, ghi, jkl, mno, pqr, tuv, wxy, zzz);
+10 : TEST_FOR_EACH(abc, def, ghi, jkl, mno, pqr, tuv, wxy, zzz, z22);
+*/

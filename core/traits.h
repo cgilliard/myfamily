@@ -17,27 +17,4 @@
 
 #include <core/type.h>
 
-#define Drop(T) Required(T, void, drop, Param(Object *, self))
-TraitImpl(Drop, void, drop, Param(Object *, self));
-
-// # desired syntax:
-// #define Drop(T) Required(T, void, drop, Param(Object *, self))
-// Trait(Drop);
-// #define Clone(T) Required(T, Object, clone, Param(Object *, self))
-// Trait(Clone);
-// #define SuperClone(T) Required(T, Object, super_clone, Param(Object *, self))
-// Where(SuperClone, TraitBound(self, Super), FunctionBound(clone, self, Clone))
-// Trait(SuperClone);
-
-#define Clone(T)                                                               \
-	Required(T, bool, myclone, Param(Object *, dst), Param(Object *, self))
-TraitImpl(Drop, bool, myclone, Param(Object *, dst), Param(Object *, self));
-
-// is this possible?
-// Bound(Clone, clone, (dst, Copy), (src, Drop))
-// Then in .c file:
-// TraitImpl(Clone) generates:
-// void clone(Object *dst, Object *src) { // check bounds from static table and
-// panic if not implemented. Then execute the trait. }
-
 #endif // _CORE_TRAITS__
