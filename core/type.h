@@ -100,19 +100,15 @@ FatPtr build_fat_ptr(u64 size);
 // Define macros to extract the type and name from a tuple
 #define EXTRACT_TYPE_NAME(type, name, ...) type name
 #define EXTRACT_NAME(type, name, ...) name
-#define EXTRACT_BOUNDS(type, name, ...)                                        \
-	__VA_OPT__(check_bounds(name, #__VA_ARGS__);)
 
 // Define the macros for unwrapping the tuples
 #define UNWRAP_PARAM_TYPE_NAME(ignore, type_name) EXTRACT_TYPE_NAME type_name
 #define UNWRAP_PARAM_NAME(ignore, type_name) EXTRACT_NAME type_name
-#define UNWRAP_BOUNDS(type_name) EXTRACT_BOUNDS type_name
 
 // Define PROC_FN_SIGNATURE and PROC_PARAMS to use UNWRAP_PARAMS correctly
 #define PROC_FN_SIGNATURE(...)                                                 \
 	FOR_EACH(UNWRAP_PARAM_TYPE_NAME, , (, ), __VA_ARGS__)
 #define PROC_PARAMS(...) FOR_EACH(UNWRAP_PARAM_NAME, , (, ), __VA_ARGS__)
-#define PROC_CHECK_BOUNDS(...) FOR_EACH(UNWRAP_BOUNDS, (), __VA_ARGS__)
 
 #define Param(type, name, ...) (type, name __VA_OPT__(, ) __VA_ARGS__)
 
@@ -165,47 +161,5 @@ FatPtr build_fat_ptr(u64 size);
 		_ret__;                                                        \
 	})
 // clang-format on
-
-/*
-
-#define Param(type, name) (type, name)
-#define EXTRACT_TYPE_NAME(type, name, ...) type, name
-#define EXTRACT_NAME(type, name, ...) name
-
-// Define the macros for unwrapping the tuples
-#define UNWRAP_PARAM_TYPE_NAME(ignore, type_name) EXTRACT_TYPE_NAME type_name
-#define UNWRAP_PARAM_NAME(type_name) EXTRACT_NAME type_name
-
-// Define PROC_FN_SIGNATURE and PROC_PARAMS to use UNWRAP_PARAMS correctly
-#define PROC_FN_SIGNATURE(...)                                                 \
-       FOR_EACH(UNWRAP_PARAM_TYPE_NAME, ignore, (, ), __VA_ARGS__)
-#define PROC_PARAMS(...) FOR_EACH(UNWRAP_PARAM_NAME, ignore, (, ), __VA_ARGS__)
-
-#define Required(T, R, name, ...)                                              \
-       R T##_##name(PROC_FN_SIGNATURE(__VA_ARGS__));                          \
-       static void __attribute__((constructor)) CAT(__required_add_##T##_,    \
-						    UNIQUE_ID)() {            \
-	       VtableEntry next = {#name, T##_##name};                        \
-	       vtable_add_entry(&T##_Vtable__, next);                         \
-       }
-
-#define TraitImpl(trait, return_type, name, ...) PROC_FN_SIGNATURE(__VA_ARGS__)
-*/
-/*
-	static return_type name(PROC_FN_SIGNATURE(__VA_ARGS__)) {              \
-		if (!self)                                                     \
-			panic(                                                 \
-			    "Runtime error: Illegal argument! self was NULL"); \
-		return_type (*impl)(PROC_FN_SIGNATURE(__VA_ARGS__)) =        \
-		    find_fn(self, #name);                                      \
-		if (!impl)                                                     \
-			panic("Runtime error: Trait bound violation! Type "    \
-			      "'%s' does "                                     \
-			      "not implement the "                             \
-			      "required function [%s]",                        \
-			      TypeName((*self)));
-return impl(PROC_PARAMS(__VA_ARGS__));
-}
-*/
 
 #endif // _CORE_TYPE__

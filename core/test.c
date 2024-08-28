@@ -798,7 +798,6 @@ Test(core, test_synchronized) {
 Type(TestType, Field(u64, x), Field(u32, y));
 
 #define Drop(T) Required(T, Mut, void, drop)
-
 #define Print(T)                                                               \
 	Required(T, Const, void, print) Required(T, Mut, void, print_incr)
 TraitImpl(Print, Const, void, print);
@@ -807,12 +806,6 @@ TraitImpl(Drop, Mut, void, drop);
 
 Impl(TestType, Print);
 Impl(TestType, Drop);
-
-/*
- * Desired: #define Print Required(Const, void, print) Required(Mut, void,
- * print_incr) Required(Const, i32, print_ints, Param(i32, x), Param(i64, y))
- * Impl(TestType, Print);
- */
 
 #define IMPL TestType
 void TestType_print() { printf("x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
@@ -833,118 +826,7 @@ Test(core, test_type) {
 
 	let y = new (TestType, With(x, 100), With(y, 500));
 	print(&y);
+	// This line would be a compiler error due to the immutable access of a
+	// mutable function.
 	// print_incr(&y);
 }
-
-/*
-
-#define Drop(T) Required(T, Mut, void, drop)
-TraitImpl(Drop, Mut, void, drop);
-
-#define MyTrait(T) \
-	Required(T, Mut, u32, do_something, Param(u32, x), Param(Object *,
-y)) \ Required(T, Mut, u64, do_something2, Param(u64, v)) TraitImpl(MyTrait,
-Mut, u32, do_something, Param(u32, x), Param(Object *, y));
-TraitImpl(MyTrait, Mut, u64, do_something2, Param(u64, v));
-
-Impl(TestType, Print);
-Impl(TestType, Drop);
-Impl(TestType, MyTrait);
-
-#define IMPL TestType
-void TestType_print(const Object *self) {
-	printf("x=%llu,y=%u\n", $CONST(x), $CONST(y));
-}
-void TestType_drop(Object *self) { printf("dropping TestType\n"); }
-u32 TestType_do_something(Object *self, u32 x, Object *y) {
-	$(x) += 3;
-	return $(y) + 1;
-}
-u64 TestType_do_something2(Object *self, u64 v) {
-	$(y) -= 1;
-	return $(x) + 1;
-}
-#undef IMPL
-
-Test(core, test_type) {
-	var x = new (TestType, With(x, 1), With(y, 5));
-
-	print(&x);
-	u32 v = do_something(&x, 2, NULL);
-	cr_assert_eq(v, 6);
-	u64 v2 = do_something2(&x, 100);
-	cr_assert_eq(v2, 5);
-
-	let y = new (TestType, With(x, 100), With(y, 200));
-	print(&y);
-}
-*/
-
-/*
-Type(TestType, Field(u64, x), Field(u32, y));
-
-char *msg = "this is a test";
-
-void *my_testfn(char *format, ...) { return msg; }
-int my_otherfn(int x, int y) { return 10; }
-u128 my_u128fn(int v) { return 9; }
-int no_params() { return 104; }
-
-typedef struct TestStruct {
-	u32 x;
-	u64 y;
-	i16 z;
-} TestStruct;
-
-#define SELF_TYPE TestStruct
-Test(core, test_type) {
-	Object my_obj;
-	chain_malloc(&my_obj.ptr, sizeof(TestStruct));
-	((TestStruct *)(my_obj.ptr.data))->x = 1;
-	((TestStruct *)(my_obj.ptr.data))->y = 2;
-	((TestStruct *)(my_obj.ptr.data))->z = 3;
-	__thread_local_self_ref_ = &my_obj;
-	cr_assert_eq($(x), 1);
-	$(x)++;
-	cr_assert_eq($(x), 2);
-	cr_assert_eq($(y), 2);
-	cr_assert_eq($(z), 3);
-	chain_free(&my_obj.ptr);
-}
-#undef SELF_TYPE
-
-#define SELF_TYPE TestType
-Test(core, test_type2) {
-	Object my_obj;
-	chain_malloc(&my_obj.ptr, sizeof(TestType));
-	((TestType *)(my_obj.ptr.data))->x = 100;
-	((TestType *)(my_obj.ptr.data))->y = 200;
-
-	__thread_local_self_ref_ = &my_obj;
-
-	cr_assert_eq($(x), 100);
-	cr_assert_eq($(y), 200);
-	$(x) += 10;
-	cr_assert_eq($(x), 110);
-
-	chain_free(&my_obj.ptr);
-}
-#undef SELF_TYPE
-*/
-
-// #define DO_SOMETHING(arg, x) [ arg, x ]
-
-/*
-#define TEST_FOR_EACH(...) FOR_EACH(DO_SOMETHING, test, (xxv), __VA_ARGS__)
-0 : TEST_FOR_EACH();
-1 : TEST_FOR_EACH(abc);
-2 : TEST_FOR_EACH(abc, def);
-3 : TEST_FOR_EACH(abc, def, ghi);
-4 : TEST_FOR_EACH(abc, def, ghi, jlk);
-5 : TEST_FOR_EACH(abc, def, ghi, jkl, mno);
-6 : TEST_FOR_EACH(abc, def, ghi, jkl, mno, pqr);
-7 : TEST_FOR_EACH(abc, def, ghi, jkl, mno, pqr, tuv);
-8 : TEST_FOR_EACH(abc, def, ghi, jkl, mno, pqr, tuv, wxy);
-9 : TEST_FOR_EACH(abc, def, ghi, jkl, mno, pqr, tuv, wxy, zzz);
-10 : TEST_FOR_EACH(abc, def, ghi, jkl, mno, pqr, tuv, wxy, zzz, z22);
-*/
