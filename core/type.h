@@ -41,6 +41,17 @@ typedef struct Object {
 	FatPtr ptr;
 } Object;
 
+typedef struct SelfCleanupImpl {
+	const Object *prev_tl_self_Const;
+	Object *prev_tl_self_Mut;
+} SelfCleanupImpl;
+
+void SelfCleanupImpl_update(SelfCleanupImpl *sc);
+
+#define SelfCleanup                                                            \
+	SelfCleanupImpl __attribute__((warn_unused_result,                     \
+				       cleanup(SelfCleanupImpl_update)))
+
 extern _Thread_local const Object *__thread_local_self_Const;
 extern _Thread_local Object *__thread_local_self_Mut;
 
@@ -59,9 +70,9 @@ FatPtr build_fat_ptr(u64 size);
 #define var Cleanup
 #define let const Cleanup
 
-#define $(field_name) ((IMPL *)__thread_local_self_Mut->ptr.data)->field_name
+#define $Mut(field_name) ((IMPL *)__thread_local_self_Mut->ptr.data)->field_name
 
-#define $Const(field_name)                                                     \
+#define $(field_name)                                                          \
 	((const IMPL *)__thread_local_self_Const->ptr.data)->field_name
 
 #define BOTH(x, y) x y
@@ -114,18 +125,25 @@ FatPtr build_fat_ptr(u64 size);
 	}
 #define Mut()
 #define Const() const
+
+// TODO: need to set the previous verion of these values but problem with
+// returning for voids. Need to implement a cleanup attribute handler to update
+// to previous values on the stack.
 #define TraitImpl(trait, is_mut, return_type, name, ...)                       \
 	static return_type name(is_mut() Object *self __VA_OPT__(, )           \
 				    PROC_FN_SIGNATURE(__VA_ARGS__)) {          \
 		return_type (*impl)(PROC_FN_SIGNATURE(__VA_ARGS__)) =          \
 		    find_fn(self, #name);                                      \
 		if (!impl)                                                     \
-			panic("Runtime error: Trait bound violation! Type "    \
+			panic("Runtime error: Trait bound violation! "         \
+			      "Type "                                          \
 			      "'%s' does "                                     \
 			      "not implement the "                             \
 			      "required function [%s]",                        \
 			      TypeName((*self)));                              \
-		__thread_local_self_Const = NULL;                              \
+		SelfCleanup sc = {__thread_local_self_Const,                   \
+				  __thread_local_self_Mut};                    \
+		__thread_local_self_Const = self;                              \
 		__thread_local_self_Mut = NULL;                                \
 		__thread_local_self_##is_mut = self;                           \
 		return impl(PROC_PARAMS(__VA_ARGS__));                         \

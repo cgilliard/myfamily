@@ -81,6 +81,11 @@ void *find_fn(const Object *obj, const char *name) {
 	return NULL;
 }
 
+void SelfCleanupImpl_update(SelfCleanupImpl *ptr) {
+	__thread_local_self_Const = ptr->prev_tl_self_Const;
+	__thread_local_self_Mut = ptr->prev_tl_self_Mut;
+}
+
 #if defined(__clang__)
 // Clang-specific pragma
 #pragma clang diagnostic ignored                                               \
@@ -96,8 +101,17 @@ void Object_cleanup(const Object *ptr) {
 	Object *unconst = ptr;
 	if ((unconst->flags & VDATA_FLAGS_NO_CLEANUP) == 0) {
 		void (*drop)(Object * ptr) = find_fn(ptr, "drop");
-		if (drop)
+		if (drop) {
+			// setup self references
+			Object *tmp_Mut = __thread_local_self_Mut;
+			Object *tmp_Const = __thread_local_self_Const;
+			__thread_local_self_Const = unconst;
+			__thread_local_self_Mut = unconst;
 			drop(ptr);
+			// revert
+			__thread_local_self_Mut = tmp_Mut;
+			__thread_local_self_Const = tmp_Const;
+		}
 		if (fat_ptr_data(&unconst->ptr)) {
 			chain_free(&unconst->ptr);
 		}

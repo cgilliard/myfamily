@@ -797,21 +797,33 @@ Test(core, test_synchronized) {
 
 Type(TestType, Field(u64, x), Field(u32, y));
 
+#define Drop(T) Required(T, Mut, void, drop)
+
 #define Print(T)                                                               \
 	Required(T, Const, void, print) Required(T, Mut, void, print_incr)
 TraitImpl(Print, Const, void, print);
 TraitImpl(Print, Mut, void, print_incr);
+TraitImpl(Drop, Mut, void, drop);
 
 Impl(TestType, Print);
+Impl(TestType, Drop);
+
+/*
+ * Desired: #define Print Required(Const, void, print) Required(Mut, void,
+ * print_incr) Required(Const, i32, print_ints, Param(i32, x), Param(i64, y))
+ * Impl(TestType, Print);
+ */
 
 #define IMPL TestType
-void TestType_print() { printf("x=%" PRIu64 ",y=%u\n", $Const(x), $Const(y)); }
+void TestType_print() { printf("x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
 
 void TestType_print_incr() {
-	$(x)++;
-	$(y)++;
+	$Mut(x)++;
+	$Mut(y)++;
 	printf("x=%" PRIu64 ",y=%u\n", $(x), $(y));
 }
+
+void TestType_drop() { printf("drop with x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
 #undef IMPL
 
 Test(core, test_type) {
