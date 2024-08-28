@@ -805,12 +805,12 @@ TraitImpl(Print, Mut, void, print_incr);
 Impl(TestType, Print);
 
 #define IMPL TestType
-void TestType_print() { printf("x=%llu,y=%u\n", $Const(x), $Const(y)); }
+void TestType_print() { printf("x=%" PRIu64 ",y=%u\n", $Const(x), $Const(y)); }
 
 void TestType_print_incr() {
 	$(x)++;
 	$(y)++;
-	printf("x=%llu,y=%u\n", $(x), $(y));
+	printf("x=%" PRIu64 ",y=%u\n", $(x), $(y));
 }
 #undef IMPL
 
