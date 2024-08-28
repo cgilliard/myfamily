@@ -18,7 +18,7 @@
 #include <string.h>
 
 _Thread_local const Object *__thread_local_self_Const = NULL;
-_Thread_local Object *__thread_local_self_Mut = NULL;
+_Thread_local Object *__thread_local_self_Var = NULL;
 
 u64 __global_counter__ = 0;
 
@@ -83,7 +83,7 @@ void *find_fn(const Object *obj, const char *name) {
 
 void SelfCleanupImpl_update(SelfCleanupImpl *ptr) {
 	__thread_local_self_Const = ptr->prev_tl_self_Const;
-	__thread_local_self_Mut = ptr->prev_tl_self_Mut;
+	__thread_local_self_Var = ptr->prev_tl_self_Var;
 }
 
 #if defined(__clang__)
@@ -103,13 +103,13 @@ void Object_cleanup(const Object *ptr) {
 		void (*drop)(Object * ptr) = find_fn(ptr, "drop");
 		if (drop) {
 			// setup self references
-			Object *tmp_Mut = __thread_local_self_Mut;
+			Object *tmp_Var = __thread_local_self_Var;
 			Object *tmp_Const = __thread_local_self_Const;
 			__thread_local_self_Const = unconst;
-			__thread_local_self_Mut = unconst;
+			__thread_local_self_Var = unconst;
 			drop(ptr);
 			// revert
-			__thread_local_self_Mut = tmp_Mut;
+			__thread_local_self_Var = tmp_Var;
 			__thread_local_self_Const = tmp_Const;
 		}
 		if (fat_ptr_data(&unconst->ptr)) {

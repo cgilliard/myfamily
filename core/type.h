@@ -43,7 +43,7 @@ typedef struct Object {
 
 typedef struct SelfCleanupImpl {
 	const Object *prev_tl_self_Const;
-	Object *prev_tl_self_Mut;
+	Object *prev_tl_self_Var;
 } SelfCleanupImpl;
 
 void SelfCleanupImpl_update(SelfCleanupImpl *sc);
@@ -53,7 +53,7 @@ void SelfCleanupImpl_update(SelfCleanupImpl *sc);
 				       cleanup(SelfCleanupImpl_update)))
 
 extern _Thread_local const Object *__thread_local_self_Const;
-extern _Thread_local Object *__thread_local_self_Mut;
+extern _Thread_local Object *__thread_local_self_Var;
 
 void Object_cleanup(const Object *ptr);
 void sort_vtable(Vtable *table);
@@ -70,7 +70,7 @@ FatPtr build_fat_ptr(u64 size);
 #define var Cleanup
 #define let const Cleanup
 
-#define $Mut(field_name) ((IMPL *)__thread_local_self_Mut->ptr.data)->field_name
+#define $Var(field_name) ((IMPL *)__thread_local_self_Var->ptr.data)->field_name
 
 #define $(field_name)                                                          \
 	((const IMPL *)__thread_local_self_Const->ptr.data)->field_name
@@ -93,7 +93,7 @@ FatPtr build_fat_ptr(u64 size);
 	}
 
 #define Field(field_type, field_name) (field_type, field_name)
-#define With(x, y) .x = y
+#define With(x, y) (x, y)
 
 // Begin trait
 
@@ -101,7 +101,6 @@ FatPtr build_fat_ptr(u64 size);
 #define EXTRACT_TYPE_NAME(type, name, ...) type name
 #define EXTRACT_NAME(type, name, ...) name
 
-// Define the macros for unwrapping the tuples
 #define UNWRAP_PARAM_TYPE_NAME(ignore, type_name) EXTRACT_TYPE_NAME type_name
 #define UNWRAP_PARAM_NAME(ignore, type_name) EXTRACT_NAME type_name
 
@@ -113,21 +112,43 @@ FatPtr build_fat_ptr(u64 size);
 #define Param(type, name) type name
 #define ParamImpl(type, name) (type, name)
 
-#define RequiredOld(T, is_mut, R, name, ...)                                   \
+#define RequiredOld(T, is_var, R, name, ...)                                   \
 	R T##_##name(PROC_FN_SIGNATURE(__VA_ARGS__));                          \
 	static void __attribute__((constructor))                               \
 	CAT(__required_add_##T##_, UNIQUE_ID)() {                              \
 		VtableEntry next = {#name, T##_##name};                        \
 		vtable_add_entry(&T##_Vtable__, next);                         \
 	}
-#define Mut()
+#define Var()
 #define Const() const
+
+// TODO: pass params correctly in call to impl.
+#define PROC_TRAIT_IMPL_FN(mutability, return_type, name, ...)                 \
+	static return_type name(mutability() Object *self __VA_OPT__(, )       \
+				    __VA_ARGS__) {                             \
+		return_type (*impl)() = find_fn(self, #name);                  \
+		if (!impl)                                                     \
+			panic("Runtime error: Trait bound violation! "         \
+			      "Type "                                          \
+			      "'%s' does "                                     \
+			      "not implement the "                             \
+			      "required function [%s]",                        \
+			      TypeName((*self)), #name);                       \
+		SelfCleanup sc = {__thread_local_self_Const,                   \
+				  __thread_local_self_Var};                    \
+		__thread_local_self_Const = self;                              \
+		__thread_local_self_Var = NULL;                                \
+		__thread_local_self_##mutability = self;                       \
+		return impl();                                                 \
+	}
+#define PROC_TRAIT_IMPL(arg, x) PROC_TRAIT_IMPL_FN x
+#define TraitImpl2(trait) FOR_EACH(PROC_TRAIT_IMPL, none, (), trait)
 
 // TODO: need to set the previous verion of these values but problem with
 // returning for voids. Need to implement a cleanup attribute handler to update
 // to previous values on the stack.
-#define TraitImpl(trait, is_mut, return_type, name, ...)                       \
-	static return_type name(is_mut() Object *self __VA_OPT__(, )           \
+#define TraitImpl(trait, is_var, return_type, name, ...)                       \
+	static return_type name(is_var() Object *self __VA_OPT__(, )           \
 				    PROC_FN_SIGNATURE(__VA_ARGS__)) {          \
 		return_type (*impl)(PROC_FN_SIGNATURE(__VA_ARGS__)) =          \
 		    find_fn(self, #name);                                      \
@@ -139,10 +160,10 @@ FatPtr build_fat_ptr(u64 size);
 			      "required function [%s]",                        \
 			      TypeName((*self)));                              \
 		SelfCleanup sc = {__thread_local_self_Const,                   \
-				  __thread_local_self_Mut};                    \
+				  __thread_local_self_Var};                    \
 		__thread_local_self_Const = self;                              \
-		__thread_local_self_Mut = NULL;                                \
-		__thread_local_self_##is_mut = self;                           \
+		__thread_local_self_Var = NULL;                                \
+		__thread_local_self_##is_var = self;                           \
 		return impl(PROC_PARAMS(__VA_ARGS__));                         \
 	}
 
@@ -165,6 +186,13 @@ FatPtr build_fat_ptr(u64 size);
 #define Required(...) (__VA_ARGS__)
 #define Impl(name, trait) PROC_IMPL(name, trait)
 
+#define SET_OFFSET_OF_IMPL(ptr, structure, name, value)                        \
+	*((typeof(((structure *)0)->name) *)(ptr + offsetof(structure,         \
+							    name))) = value;
+
+#define SET_OFFSET_OF(...) SET_OFFSET_OF_IMPL(__VA_ARGS__)
+#define SET_PARAM(ptr, value) SET_OFFSET_OF(EXPAND_ALL ptr, EXPAND_ALL value)
+
 // TODO: _fptr__.data may be NULL, need to handle. Once we have
 // 'Result' implement two versions of this macro. One which
 // panics and one which returns error. Also, implement a trait
@@ -172,9 +200,8 @@ FatPtr build_fat_ptr(u64 size);
 // settings.
 // clang-format off
 #define new(name, ...)({ \
-		name _type__ = {__VA_ARGS__};                                  \
 		FatPtr _fptr__ = build_fat_ptr(name##_size());                 \
-		*((name *)_fptr__.data) = _type__;                             \
+		FOR_EACH(SET_PARAM, (_fptr__.data, name), (), __VA_ARGS__)     \
 		Object _ret__ = {&name##_Vtable__, unique_id(), 0, _fptr__};   \
 		_ret__;                                                        \
 	})
