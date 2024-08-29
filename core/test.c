@@ -1053,9 +1053,12 @@ Test(core, test_use_after_drop) {
 	cr_assert_eq(tm_drop_count, 1);
 }
 
+#define OtherTrait DefineTrait(OtherTrait, Required(Const, u64, other_stuff))
+
 #define DEF_IMPL_TRAIT                                                         \
 	DefineTrait(DEF_IMPL_TRAIT, Required(Const, u64, testx2),              \
-		    RequiredWithDefault(my_default_testx1, Var, u64, testx1))
+		    RequiredWithDefault(my_default_testx1, Var, u64, testx1),  \
+		    Super(Drop))
 TraitImpl(DEF_IMPL_TRAIT);
 Impl(TestMove, DEF_IMPL_TRAIT);
 

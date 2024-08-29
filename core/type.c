@@ -69,6 +69,45 @@ void vtable_add_entry(Vtable *table, VtableEntry entry) {
 	sort_vtable(table);
 }
 
+bool vtable_check_impl_trait(Vtable *table, char *trait) {
+	bool ret = false;
+
+	for (u64 i = 0; i < table->trait_len; i++) {
+		if (!strcmp(table->trait_entries[i].trait_name, trait)) {
+			ret = true;
+			break;
+		}
+	}
+
+	return ret;
+}
+
+void vtable_add_trait(Vtable *table, char *trait) {
+	if (table->trait_entries == NULL) {
+		table->trait_entries =
+		    malloc(sizeof(VtableTraitEntry) * (table->trait_len + 1));
+		if (table->trait_entries == NULL)
+			panic("Couldn't allocate memory for vtable");
+	} else {
+		void *tmp =
+		    realloc(table->trait_entries,
+			    sizeof(VtableTraitEntry) * (table->trait_len + 1));
+		if (tmp == NULL)
+			panic("Couldn't allocate memory for vtable");
+		table->trait_entries = tmp;
+	}
+
+	VtableTraitEntry entry;
+	if (strlen(trait) >= MAX_TRAIT_NAME_LEN)
+		panic("trait name [%s] is too long. MAX_TRAIT_NAME_LEN = %i\n",
+		      trait, MAX_TRAIT_NAME_LEN - 1);
+	strcpy(entry.trait_name, trait);
+
+	memcpy(&table->trait_entries[table->trait_len], &entry,
+	       sizeof(VtableTraitEntry));
+	table->trait_len += 1;
+}
+
 void *find_fn(const Object *obj, const char *name) {
 	int left = 0;
 	int right = obj->vtable->len - 1;

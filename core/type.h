@@ -22,6 +22,8 @@
 #include <core/panic.h>
 #include <core/types.h>
 
+#define MAX_TRAIT_NAME_LEN 128
+
 #define OBJECT_FLAGS_NO_CLEANUP (0x1 << 0)
 #define OBJECT_FLAGS_CONSUMED (0x1 << 1)
 
@@ -30,10 +32,17 @@ typedef struct {
 	void *fn_ptr;
 } VtableEntry;
 
+typedef struct VtableTraitEntry {
+	char trait_name[MAX_TRAIT_NAME_LEN + 1];
+
+} VtableTraitEntry;
+
 typedef struct {
 	char *name;
 	u64 len;
 	VtableEntry *entries;
+	u64 trait_len;
+	VtableTraitEntry *trait_entries;
 } Vtable;
 
 typedef struct Object {
@@ -64,6 +73,8 @@ void Object_cleanup(const Object *ptr);
 void Object_build(Object *ptr);
 void sort_vtable(Vtable *table);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
+void vtable_add_trait(Vtable *table, char *trait);
+bool vtable_check_impl_trait(Vtable *table, char *trait);
 void *find_fn(const Object *obj, const char *name);
 u64 unique_id();
 FatPtr build_fat_ptr(u64 size);
@@ -85,7 +96,7 @@ FatPtr build_fat_ptr(u64 size);
 
 #define Type(name, ...)                                                        \
 	typedef struct name name;                                              \
-	static Vtable name##_Vtable__ = {#name, 0, NULL};                      \
+	static Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL};             \
 	u64 name##_size();                                                     \
 	typedef struct name {                                                  \
 		FOR_EACH(CALL_BOTH, , (;), __VA_ARGS__);                       \
@@ -121,13 +132,6 @@ FatPtr build_fat_ptr(u64 size);
 
 #define Param(type) (type, CAT(name_, __COUNTER__))
 
-#define RequiredOld(T, is_var, R, name, ...)                                   \
-	R T##_##name(PROC_FN_SIGNATURE(__VA_ARGS__));                          \
-	static void __attribute__((constructor))                               \
-	CAT(__required_add_##T##_, UNIQUE_ID)() {                              \
-		VtableEntry next = {#name, T##_##name};                        \
-		vtable_add_entry(&T##_Vtable__, next);                         \
-	}
 #define Var()
 #define Const() const
 
@@ -168,7 +172,21 @@ FatPtr build_fat_ptr(u64 size);
 		VtableEntry next = {#fn_name, default_impl_fn};                \
 		vtable_add_entry(&T##_Vtable__, next);                         \
 	}
-#define DEFAULT_IMPL_(...) DEFAULT_IMPL__(__VA_ARGS__)
+
+#define CHECK_SUPER_(type, trait)                                              \
+	static void __attribute__((constructor))                               \
+	check_super_##type##_##trait() {                                       \
+		if (!vtable_check_impl_trait(&type##_Vtable__, #trait)) {      \
+			panic("Runtime error: Required trait [%s] not "        \
+			      "implemented by type %s! Halting!",              \
+			      #trait, #type);                                  \
+		}                                                              \
+	}
+#define CHECK_SUPER(...) CHECK_SUPER_(__VA_ARGS__)
+#define FIRST_VAR_ARGS(x, ...) x
+#define SUPER_PROC(arg, x) CHECK_SUPER(arg, FIRST_VAR_ARGS x)
+#define DEFAULT_IMPL_(x, ...)                                                  \
+	MULTI_SWITCH2_INNER(SUPER_PROC, DEFAULT_IMPL__, x, __VA_ARGS__)
 #define DEFAULT_IMPL(T, ...) DEFAULT_IMPL_(T, EXPAND_ALL __VA_ARGS__)
 
 #define PROC_TRAIT_IMPL_FN_DEFAULT__(default_fn, mutability, return_type,      \
@@ -196,8 +214,10 @@ FatPtr build_fat_ptr(u64 size);
 		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}
 
-#define PROC_TRAIT_IMPL_FN_DEFAULT_(...)                                       \
-	PROC_TRAIT_IMPL_FN_DEFAULT__(__VA_ARGS__)
+#define SUPER_TRAIT_CONFIG(trait_name, ignore)
+#define PROC_TRAIT_IMPL_FN_DEFAULT_(x, ...)                                    \
+	MULTI_SWITCH2(SUPER_TRAIT_CONFIG, PROC_TRAIT_IMPL_FN_DEFAULT__, x,     \
+		      __VA_ARGS__)
 #define PROC_TRAIT_IMPL_FN_DEFAULT(...)                                        \
 	PROC_TRAIT_IMPL_FN_DEFAULT_(EXPAND_ALL __VA_ARGS__)
 
@@ -229,7 +249,12 @@ FatPtr build_fat_ptr(u64 size);
 	FOR_EACH(PROC_TRAIT_STATEMENT, name, (), __VA_ARGS__)
 #define Required(...) (__VA_ARGS__)
 #define RequiredWithDefault(...) ((__VA_ARGS__))
-#define PROC_IMPL_(name, trait_name, ...) PROC_IMPL(name, __VA_ARGS__)
+#define PROC_IMPL_(name, trait_name, ...)                                      \
+	PROC_IMPL(name, __VA_ARGS__)                                           \
+	static void __attribute__((constructor))                               \
+	vtable_add_trait_impl_##name##_##trait_name() {                        \
+		vtable_add_trait(&name##_Vtable__, #trait_name);               \
+	}
 #define Impl(name, ...) PROC_IMPL_(name, __VA_ARGS__)
 
 #define SET_OFFSET_OF_IMPL(ptr, structure, name, value)                        \
@@ -239,6 +264,7 @@ FatPtr build_fat_ptr(u64 size);
 #define SET_OFFSET_OF(...) SET_OFFSET_OF_IMPL(__VA_ARGS__)
 #define SET_PARAM(ptr, value) SET_OFFSET_OF(EXPAND_ALL ptr, EXPAND_ALL value)
 #define DefineTrait(...) __VA_ARGS__
+#define Super(x) (((x)))
 
 // TODO: _fptr__.data may be NULL, need to handle. Once we have
 // 'Result' implement two versions of this macro. One which

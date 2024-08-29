@@ -42,6 +42,15 @@
 #define MULTI_SWITCH2(action1, action2, arg, ...)                              \
 	EXPAND(MULTI_SWITCH2_(action1, action2, arg, __VA_ARGS__))
 
+#define MULTI_PARAM_INNER(action, ...) action(__VA_ARGS__)
+#define DOUBLE_PARAM_INNER(action, x, y) action(x, y)
+#define MULTI_SWITCH2_INNER_(action1, action2, arg, x, ...)                    \
+	EXPAND_ALL EXPAND(                                                     \
+	    __VA_OPT__(NONE)(DOUBLE_PARAM_INNER(action1, arg, x))              \
+		__VA_OPT__((MULTI_PARAM_INNER(action2, arg, x, __VA_ARGS__))))
+#define MULTI_SWITCH2_INNER(action1, action2, arg, ...)                        \
+	EXPAND(MULTI_SWITCH2_INNER_(action1, action2, arg, __VA_ARGS__))
+
 #define EMPTY()
 #define DEFER1(m) m EMPTY()
 #define UNWRAP(...) __VA_ARGS__
