@@ -175,7 +175,6 @@ FatPtr build_fat_ptr(u64 size);
 	PROC_TRAIT_STATEMENT_IMPL(arg, EXPAND_ALL x)
 #define PROC_IMPL(name, ...)                                                   \
 	FOR_EACH(PROC_TRAIT_STATEMENT, name, (), __VA_ARGS__)
-#define DefineTrait(...) __VA_ARGS__
 #define Required(...) (__VA_ARGS__)
 #define Impl(name, trait) PROC_IMPL(name, trait)
 

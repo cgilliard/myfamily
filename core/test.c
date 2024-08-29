@@ -805,11 +805,10 @@ Type(TestType, Field(u64, x), Field(u32, y));
 // Parameter arguments. The Param macro specifies these arguments with the type
 // of the parameter only.
 #define TestTrait                                                              \
-	DefineTrait(Required(Const, u64, get_x), Required(Const, u32, get_y),  \
-		    Required(Var, void, incr),                                 \
-		    Required(Var, void, add_x, Param(u64)),                    \
-		    Required(Var, void, sub_y, Param(u32)),                    \
-		    Required(Var, u64, sub_both, Param(u64), Param(u32)))
+	Required(Const, u64, get_x), Required(Const, u32, get_y),              \
+	    Required(Var, void, incr), Required(Var, void, add_x, Param(u64)), \
+	    Required(Var, void, sub_y, Param(u32)),                            \
+	    Required(Var, u64, sub_both, Param(u64), Param(u32))
 
 // The call to TraitImpl is mandatory for all traits. It will generate the
 // function calls for the trait. In this case, it generates the following
@@ -982,8 +981,7 @@ Test(core, test_build) {
 Type(TestMove, Field(char *, s), Field(u64, len));
 
 #define AccessTestMove                                                         \
-	DefineTrait(Required(Const, char *, get_tm_s),                         \
-		    Required(Const, u64, get_tm_len))
+	Required(Const, char *, get_tm_s), Required(Const, u64, get_tm_len)
 
 TraitImpl(AccessTestMove);
 
