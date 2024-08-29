@@ -795,134 +795,108 @@ Test(core, test_synchronized) {
 	Lock_cleanup(&sync_lock);
 }
 
+// Define a Testtype with two fields x and y which are u64 and u32 respectively
 Type(TestType, Field(u64, x), Field(u32, y));
 
-#define Print                                                                  \
-	DefineTrait(Required(Const, void, print), Required(Const, u64, get_x), \
-		    Required(Const, u32, get_y), Required(Var, void, incr),    \
-		    Required(Var, void, print_int, Param(u64, value),          \
-			     Param(u32, value2)))
-// old print
-/*
-#define Print                                                                  \
-	DefineTrait(Required(Const, void, print), Required(Var, void, print2), \
-		    Required(Const, u64, get_x), Required(Const, u32, get_y),  \
-		    Required(Var, void, param_set, Param(u64, value)),         \
-		    Required(Var, void, param_set2, Param(u64, value1),        \
-			     Param(u32, value2)))
-			     */
+// Define a trait with 5 required functions which are fairly self explanitory
+// The first parameter in the Required macro is the mutability. It must be
+// either Const or Var. The second parameter is the return type. The third
+// parameter is the function name. After that there may be a variable number of
+// Parameter arguments. The Param macro specifies these arguments with the type
+// followed by the parameter name.
+#define TestTrait                                                              \
+	DefineTrait(Required(Const, u64, get_x), Required(Const, u32, get_y),  \
+		    Required(Var, void, incr),                                 \
+		    Required(Var, void, add_x, Param(u64, value)),             \
+		    Required(Var, void, sub_y, Param(u32, value)))
 
-/*
-TraitImpl(Print, Const, void, print);
-TraitImpl(Print, Var, void, print2);
-TraitImpl(Print, Const, u64, get_x);
-TraitImpl(Print, Const, u32, get_y);
-TraitImpl(Print, Var, void, param_set, ParamImpl(u64, value));
-TraitImpl(Print, Var, void, param_set2, ParamImpl(u64, value1),
-	  ParamImpl(u32, value2));
-Impl(TestType, Print);
-*/
+// The call to TraitImpl is mandatory for all traits. It will generate the
+// function calls for the trait. In this case, it generates the following
+// functions: get_x, get_y, incr, add_x, and sub_y.
+TraitImpl(TestTrait);
 
-TraitImpl2(Print);
-Impl(TestType, Print);
+// Specify that TestType implements the TestTrait trait. This will modify
+// TestType's vtable and create function prototypes with the correct signature
+// for each required function for the trait.
+Impl(TestType, TestTrait);
+// Specify that TestType implements the Drop trait. This trait is an internal
+// trait that is called by the system automatically when the variable goes out
+// of scope. Note that, this function is a mutable function and may be called
+// even on an immutable variable.
+Impl(TestType, Drop);
 
+// declare a drop count variable for testing
+int drop_count = 0;
+
+// The IMPL value defines which type is being implemented. It is required to use
+// the $ and $Var macros which are used to access the internal data of the Type.
+// If $Var is accessed in a function that is immutable (Const), a thread panic
+// will occur.
 #define IMPL TestType
-void TestType_print() { printf("x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
+// This function which is required by the TestTrait returns the value of x. It
+// uses the $ (const) macro to access the value of x. Any function (mutable or
+// immutable) may use the '$' operator. It cannot modify values as it the
+// pointer it references is declared as 'const'.
+u64 TestType_get_x() { return $(x); }
+// Likewise for this similar required function.
+u32 TestType_get_y() { return $(y); }
+// This function is mutable and can therefore safely use the $Var macro to
+// modify an internal value of the Type. In this case, it subtracts the passed
+// in value from the value of y and sets the variable to this value.
+void TestType_sub_y(u32 value) { $Var(y) -= value; }
+// This mutable function increments both parameters.
 void TestType_incr() {
 	$Var(x)++;
 	$Var(y)++;
 }
-void TestType_print2() {
-	$Var(x)++;
-	$Var(y)++;
-	printf("print2 x=%" PRIu64 ",y=%u\n", $(x), $(y));
-}
-u64 TestType_get_x() { return $(x); }
-u32 TestType_get_y() { return $(y); }
-void TestType_param_set(u64 value) { $Var(x) = value; }
-void TestType_param_set2(u64 value1, u32 value2) {
-	$Var(x) = value1;
-	$Var(y) = value2;
-}
-void TestType_print_int(u64 value, u32 value2) {
-	$Var(x) = value;
-	$Var(y) = value2;
-}
+// This function is similar to the other mutable functions. It add updates x by
+// value.
+void TestType_add_x(u64 value) { $Var(x) += value; }
+// This is the drop handler for this type. As mentioned above drop is a special
+// function that is automatically called by the system to cleanup when the
+// variable goes out of scope.
+void TestType_drop() { drop_count++; }
 #undef IMPL
-
-// TraitImpl(Print, Const, void, print);
-// TraitImpl2(Print);
+// This ends the implementation of TestType. The $ and $Var operators can no
+// longer be used outside this block.
 
 Test(core, test_type) {
-	var v1 = new (TestType, With(x, 4), With(y, 5));
-	print(&v1);
-	cr_assert_eq(get_x(&v1), 4);
-	cr_assert_eq(get_y(&v1), 5);
-	incr(&v1);
-	cr_assert_eq(get_x(&v1), 5);
-	cr_assert_eq(get_y(&v1), 6);
-	print_int(&v1, 101, 202);
-	cr_assert_eq(get_x(&v1), 101);
-	cr_assert_eq(get_y(&v1), 202);
-	/*
-	print2(&v1);
-	cr_assert_eq(get_x(&v1), 2);
-	param_set(&v1, 12345);
-	cr_assert_eq(get_x(&v1), 12345);
-	cr_assert_eq(get_y(&v1), 6);
+	{
+		// declare a new instance of the TestType type using the 'new'
+		// macro. This instance is delcared as 'var' so it may call
+		// mutable methods of TestType. It is decleared with x and y
+		// both set to the specified values.
+		var v1 = new (TestType, With(x, 4), With(y, 5));
+		// call the polymorphic version of get_x/get_y on the v1
+		// instance. Assert the expected values.
+		cr_assert_eq(get_x(&v1), 4);
+		cr_assert_eq(get_y(&v1), 5);
+		// call the polymorphic version of incr on the v1 instance.
+		incr(&v1);
+		// call the polymorphic version of get_x/get_y on the v1
+		// instance. Assert the expected values.
+		cr_assert_eq(get_x(&v1), 5);
+		cr_assert_eq(get_y(&v1), 6);
+		// call the polymorphic version of add_x on the v1 instance and
+		// assert the expected values.
+		add_x(&v1, 100);
+		cr_assert_eq(get_x(&v1), 105);
+		cr_assert_eq(get_y(&v1), 6);
 
-	param_set2(&v1, 111, 222);
-	cr_assert_eq(get_x(&v1), 111);
-	cr_assert_eq(get_y(&v1), 222);
-	*/
+		// declare a second instance of TestType with the specified
+		// initial values and do the coresponding assertions.
+		let v2 = new (TestType, With(y, 50), With(x, 43));
+		cr_assert_eq(get_x(&v2), 43);
+		cr_assert_eq(get_y(&v2), 50);
+
+		// cannot do, not immutable
+		// incr(&v2);
+		// add_x(&v2, 10);
+
+		// assert that the drop handler has not been called yet.
+		cr_assert_eq(drop_count, 0);
+	}
+
+	// assert that the drop handler was called for both objects
+	cr_assert_eq(drop_count, 2);
 }
-
-/*
-#define AccessTestType(T)                                                      \
-	Required(T, Const, u64, get_x) Required(T, Const, u32, get_y)
-#define Drop(T) Required(T, Mut, void, drop)
-#define Print(T)                                                               \
-	Required(T, Const, void, print) Required(T, Mut, void, print_incr)
-TraitImpl(Print, Const, void, print);
-TraitImpl(Print, Mut, void, print_incr);
-TraitImpl(Drop, Mut, void, drop);
-TraitImpl(AcecssTestType, Const, u64, get_x);
-TraitImpl(AcecssTestType, Const, u64, get_y);
-
-Impl(TestType, Print);
-Impl(TestType, Drop);
-Impl(TestType, AccessTestType);
-
-#define IMPL TestType
-u64 TestType_get_x() { return $(x); }
-u32 TestType_get_y() { return $(y); }
-void TestType_print() { printf("x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
-
-void TestType_print_incr() {
-	$Mut(x)++;
-	$Mut(y)++;
-	printf("x=%" PRIu64 ",y=%u\n", $(x), $(y));
-}
-
-void TestType_drop() { printf("drop with x=%" PRIu64 ",y=%u\n", $(x), $(y)); }
-#undef IMPL
-
-Test(core, test_type) {
-	var v1 = new (TestType, With(x, 1), With(y, 5));
-	print(&v1);
-	cr_assert_eq(get_x(&v1), 1);
-	cr_assert_eq(get_y(&v1), 5);
-	print_incr(&v1);
-	cr_assert_eq(get_x(&v1), 2);
-	cr_assert_eq(get_y(&v1), 6);
-
-	let v2 = new (TestType, With(x, 100), With(y, 500));
-	print(&v2);
-	cr_assert_eq(get_x(&v2), 100);
-	cr_assert_eq(get_y(&v2), 500);
-
-	// This line would be a compiler error due to the immutable access of a
-	// mutable function.
-	// print_incr(&v2);
-}
-*/

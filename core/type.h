@@ -19,6 +19,7 @@
 #include <core/chain_allocator.h>
 #include <core/heap.h>
 #include <core/macro_utils.h>
+#include <core/panic.h>
 #include <core/types.h>
 
 #define VDATA_FLAGS_NO_CLEANUP (0x1 << 0)
@@ -75,15 +76,14 @@ FatPtr build_fat_ptr(u64 size);
 #define $(field_name)                                                          \
 	((const IMPL *)__thread_local_self_Const->ptr.data)->field_name
 
-#define BOTH(x, y) x y
-#define STRUCT_PARAM(ignore, x) BOTH x
+#define CALL_BOTH(x, y) BOTH y
 
 #define Type(name, ...)                                                        \
 	typedef struct name name;                                              \
 	static Vtable name##_Vtable__ = {#name, 0, NULL};                      \
 	u64 name##_size();                                                     \
 	typedef struct name {                                                  \
-		FOR_EACH(STRUCT_PARAM, , (;), __VA_ARGS__);                    \
+		FOR_EACH(CALL_BOTH, , (;), __VA_ARGS__);                       \
 	} name;                                                                \
 	u64 name##_size() { return sizeof(name); }                             \
 	static void __attribute__((constructor))                               \
@@ -122,15 +122,12 @@ FatPtr build_fat_ptr(u64 size);
 #define Var()
 #define Const() const
 
-#define SECOND_ALT(x, y) y
-#define SECOND(x, y) SECOND_ALT y
-#define PROCESS_FN_CALL(...) FOR_EACH_INNER(SECOND, none, (, ), __VA_ARGS__)
+#define CALL_SECOND(x, y) SECOND y
+#define PROCESS_FN_CALL(...)                                                   \
+	FOR_EACH_INNER(CALL_SECOND, none, (, ), __VA_ARGS__)
 
-#define BOTH_ALT2(x, y) x y
-#define BOTH_ALT(x, y) BOTH_ALT2 y
-#define PROCESS_FN_SIG(...) FOR_EACH_INNER(BOTH_ALT, none, (, ), __VA_ARGS__)
+#define PROCESS_FN_SIG(...) FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__)
 
-// TODO: pass params correctly in call to impl.
 #define PROC_TRAIT_IMPL_FN(mutability, return_type, name, ...)                 \
 	static return_type name(mutability() Object *self __VA_OPT__(, )       \
 				    __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) { \
@@ -151,11 +148,9 @@ FatPtr build_fat_ptr(u64 size);
 		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}
 #define PROC_TRAIT_IMPL(arg, x) PROC_TRAIT_IMPL_FN x
-#define TraitImpl2(trait) FOR_EACH(PROC_TRAIT_IMPL, none, (), trait)
+#define TraitImpl(trait) FOR_EACH(PROC_TRAIT_IMPL, none, (), trait)
 
-// TODO: need to set the previous verion of these values but problem with
-// returning for voids. Need to implement a cleanup attribute handler to update
-// to previous values on the stack.
+/*
 #define TraitImpl(trait, is_var, return_type, name, ...)                       \
 	static return_type name(is_var() Object *self __VA_OPT__(, )           \
 				    PROC_FN_SIGNATURE(__VA_ARGS__)) {          \
@@ -175,6 +170,7 @@ FatPtr build_fat_ptr(u64 size);
 		__thread_local_self_##is_var = self;                           \
 		return impl(PROC_PARAMS(__VA_ARGS__));                         \
 	}
+	*/
 
 #define PROC_TRAIT_STATEMENT_IMPL_EXP(impl_type, mutability, return_type,      \
 				      fn_name, ...)                            \

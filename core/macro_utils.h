@@ -21,6 +21,10 @@
 #define CATI(x, y) x##y
 #define CAT(x, y) CATI(x, y)
 
+#define FIRST(x, y) x
+#define SECOND(x, y) y
+#define BOTH(x, y) x y
+
 #define loop while (true)
 
 #define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...) NAME

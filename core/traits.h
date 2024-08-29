@@ -17,4 +17,7 @@
 
 #include <core/type.h>
 
+#define Drop DefineTrait(Required(Var, void, drop))
+TraitImpl(Drop);
+
 #endif // _CORE_TRAITS__
