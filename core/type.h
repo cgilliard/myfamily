@@ -109,8 +109,7 @@ FatPtr build_fat_ptr(u64 size);
 	FOR_EACH(UNWRAP_PARAM_TYPE_NAME, , (, ), __VA_ARGS__)
 #define PROC_PARAMS(...) FOR_EACH(UNWRAP_PARAM_NAME, , (, ), __VA_ARGS__)
 
-#define Param(type, name) (type, name)
-#define ParamImpl(type, name) (type, name)
+#define Param(type) (type, CAT(name_, __COUNTER__))
 
 #define RequiredOld(T, is_var, R, name, ...)                                   \
 	R T##_##name(PROC_FN_SIGNATURE(__VA_ARGS__));                          \

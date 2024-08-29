@@ -803,12 +803,13 @@ Type(TestType, Field(u64, x), Field(u32, y));
 // either Const or Var. The second parameter is the return type. The third
 // parameter is the function name. After that there may be a variable number of
 // Parameter arguments. The Param macro specifies these arguments with the type
-// followed by the parameter name.
+// of the paremter only.
 #define TestTrait                                                              \
 	DefineTrait(Required(Const, u64, get_x), Required(Const, u32, get_y),  \
 		    Required(Var, void, incr),                                 \
-		    Required(Var, void, add_x, Param(u64, value)),             \
-		    Required(Var, void, sub_y, Param(u32, value)))
+		    Required(Var, void, add_x, Param(u64)),                    \
+		    Required(Var, void, sub_y, Param(u32)),                    \
+		    Required(Var, u64, sub_both, Param(u64), Param(u32)))
 
 // The call to TraitImpl is mandatory for all traits. It will generate the
 // function calls for the trait. In this case, it generates the following
@@ -821,7 +822,7 @@ TraitImpl(TestTrait);
 Impl(TestType, TestTrait);
 // Specify that TestType implements the Drop trait. This trait is an internal
 // trait that is called by the system automatically when the variable goes out
-// of scope. Note that, this function is a mutable function and may be called
+// of scope. Note that this function is a mutable function and may be called
 // even on an immutable variable.
 Impl(TestType, Drop);
 
@@ -856,6 +857,12 @@ void TestType_add_x(u64 value) { $Var(x) += value; }
 // function that is automatically called by the system to cleanup when the
 // variable goes out of scope.
 void TestType_drop() { drop_count++; }
+// subtract the specified values from both fields. Return the value of x.
+u64 TestType_sub_both(u64 value1, u32 value2) {
+	$Var(x) -= value1;
+	$Var(y) -= value2;
+	return $(x);
+}
 #undef IMPL
 // This ends the implementation of TestType. The $ and $Var operators can no
 // longer be used outside this block.
@@ -882,6 +889,11 @@ Test(core, test_type) {
 		add_x(&v1, 100);
 		cr_assert_eq(get_x(&v1), 105);
 		cr_assert_eq(get_y(&v1), 6);
+
+		u64 ret = sub_both(&v1, 1, 3);
+		cr_assert_eq(get_x(&v1), 104);
+		cr_assert_eq(get_y(&v1), 3);
+		cr_assert_eq(ret, 104);
 
 		// declare a second instance of TestType with the specified
 		// initial values and do the coresponding assertions.
