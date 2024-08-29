@@ -978,3 +978,71 @@ Test(core, test_build) {
 	// Calling drop with host='localhost',port=9000,threads=4
 	// Calling drop with host='127.0.0.1',port=8080,threads=10
 }
+
+Type(TestMove, Field(char *, s), Field(u64, len));
+
+#define AccessTestMove                                                         \
+	DefineTrait(Required(Const, char *, get_tm_s),                         \
+		    Required(Const, u64, get_tm_len))
+
+TraitImpl(AccessTestMove);
+
+Impl(TestMove, Drop);
+Impl(TestMove, Build);
+Impl(TestMove, AccessTestMove);
+
+int tm_drop_count = 0;
+
+#define IMPL TestMove
+void TestMove_build() {
+	char *s = malloc(sizeof(char) * (strlen($(s)) + 1));
+	strcpy(s, $(s));
+	$Var(s) = s;
+}
+void TestMove_drop() {
+	tm_drop_count++;
+	free($(s));
+}
+u64 TestMove_get_tm_len() { return $(len); }
+char *TestMove_get_tm_s() { return $(s); }
+#undef IMPL
+
+Test(core, test_move) {
+	var tm1 = new (TestMove, With(s, "test"), With(len, 4));
+	cr_assert_eq(get_tm_len(&tm1), 4);
+	cr_assert(!strcmp(get_tm_s(&tm1), "test"));
+	var tm2;
+	Move(&tm2, &tm1);
+	cr_assert_eq(get_tm_len(&tm2), 4);
+	cr_assert(!strcmp(get_tm_s(&tm2), "test"));
+
+	// would result in panic because tm1 has already been consumed.
+	// cr_assert_eq(get_tm_len(&tm1), 4);
+
+	var tm4;
+	var tm3 = new (TestMove, With(s, "abc"), With(len, 3));
+	cr_assert_eq(get_tm_len(&tm3), 3);
+	cr_assert(!strcmp(get_tm_s(&tm3), "abc"));
+	Move(&tm4, &tm3);
+	cr_assert_eq(get_tm_len(&tm4), 3);
+	cr_assert(!strcmp(get_tm_s(&tm4), "abc"));
+
+	// would result in panic because tm3 has already been consumed.
+	// cr_assert_eq(get_tm_len(&tm3), 3);
+}
+
+Test(core, test_use_after_drop) {
+	tm_drop_count = 0;
+	{
+		var tm1 = new (TestMove, With(s, "test"), With(len, 4));
+		cr_assert_eq(get_tm_len(&tm1), 4);
+		cr_assert_eq(tm_drop_count, 0);
+		drop(&tm1);
+		cr_assert_eq(tm_drop_count, 1);
+		// would result in panic due to drop being called. Object is
+		// consumed.
+		// cr_assert_eq(get_tm_len(&tm1), 4);
+	}
+	// assert drop not called again as tm1 goes out of scope
+	cr_assert_eq(tm_drop_count, 1);
+}

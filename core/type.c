@@ -20,9 +20,15 @@
 _Thread_local const Object *__thread_local_self_Const = NULL;
 _Thread_local Object *__thread_local_self_Var = NULL;
 
-u64 __global_counter__ = 0;
+atomic_ullong __global_counter__;
+void __attribute__((constructor)) init_global_counter() {
+	atomic_init(&__global_counter__, 0);
+}
 
-u64 unique_id() { return __global_counter__++; }
+u64 unique_id() {
+	u64 ret = atomic_fetch_add(&__global_counter__, 1);
+	return ret;
+}
 
 FatPtr build_fat_ptr(u64 size) {
 	FatPtr ret;
@@ -114,7 +120,7 @@ void Object_build(Object *ptr) {
 #endif
 void Object_cleanup(const Object *ptr) {
 	Object *unconst = ptr;
-	if ((unconst->flags & VDATA_FLAGS_NO_CLEANUP) == 0) {
+	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0) {
 		void (*drop)(Object * ptr) = find_fn(ptr, "drop");
 		if (drop) {
 			// setup self references

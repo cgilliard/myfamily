@@ -18,7 +18,10 @@
 #include <core/type.h>
 
 #define Drop DefineTrait(Required(Var, void, drop))
-TraitImpl(Drop);
+// Drop has a special TraitImpl because we need to prevent it from being called
+// twice so it's not implemented using the standard TraitImpl.
+// TraitImpl(Drop);
+void drop(Object *self);
 
 #define Build DefineTrait(Required(Var, void, build))
 TraitImpl(Build);

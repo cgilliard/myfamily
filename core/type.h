@@ -22,7 +22,8 @@
 #include <core/panic.h>
 #include <core/types.h>
 
-#define VDATA_FLAGS_NO_CLEANUP (0x1 << 0)
+#define OBJECT_FLAGS_NO_CLEANUP (0x1 << 0)
+#define OBJECT_FLAGS_CONSUMED (0x1 << 1)
 
 typedef struct {
 	char *name;
@@ -96,7 +97,12 @@ FatPtr build_fat_ptr(u64 size);
 #define Field(field_type, field_name) (field_type, field_name)
 #define With(x, y) (x, y)
 
-// Begin trait
+#define Move(dst, src)                                                         \
+	({                                                                     \
+		*((Object *)dst) = *((Object *)src);                           \
+		(*((Object *)src)).flags |=                                    \
+		    OBJECT_FLAGS_CONSUMED | OBJECT_FLAGS_NO_CLEANUP;           \
+	})
 
 // Define macros to extract the type and name from a tuple
 #define EXTRACT_TYPE_NAME(type, name, ...) type name
@@ -128,18 +134,22 @@ FatPtr build_fat_ptr(u64 size);
 
 #define PROCESS_FN_SIG(...) FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__)
 
-#define PROC_TRAIT_IMPL_FN(mutability, return_type, name, ...)                 \
-	static return_type name(mutability() Object *self __VA_OPT__(, )       \
-				    __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) { \
+#define PROC_TRAIT_IMPL_FN(mutability, return_type, fn_name, ...)              \
+	static return_type fn_name(mutability() Object *self __VA_OPT__(       \
+	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) {                     \
+		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
+			panic("Runtime error: Object [%s@%" PRIu64             \
+			      "] has already been consumed!",                  \
+			      self->vtable->name, self->id);                   \
 		return_type (*impl)(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) = \
-		    find_fn(self, #name);                                      \
+		    find_fn(self, #fn_name);                                   \
 		if (!impl)                                                     \
 			panic("Runtime error: Trait bound violation! "         \
 			      "Type "                                          \
 			      "'%s' does "                                     \
 			      "not implement the "                             \
 			      "required function [%s]",                        \
-			      TypeName((*self)), #name);                       \
+			      TypeName((*self)), #fn_name);                    \
 		SelfCleanup sc = {__thread_local_self_Const,                   \
 				  __thread_local_self_Var};                    \
 		__thread_local_self_Const = self;                              \
@@ -149,28 +159,6 @@ FatPtr build_fat_ptr(u64 size);
 	}
 #define PROC_TRAIT_IMPL(arg, x) PROC_TRAIT_IMPL_FN x
 #define TraitImpl(trait) FOR_EACH(PROC_TRAIT_IMPL, none, (), trait)
-
-/*
-#define TraitImpl(trait, is_var, return_type, name, ...)                       \
-	static return_type name(is_var() Object *self __VA_OPT__(, )           \
-				    PROC_FN_SIGNATURE(__VA_ARGS__)) {          \
-		return_type (*impl)(PROC_FN_SIGNATURE(__VA_ARGS__)) =          \
-		    find_fn(self, #name);                                      \
-		if (!impl)                                                     \
-			panic("Runtime error: Trait bound violation! "         \
-			      "Type "                                          \
-			      "'%s' does "                                     \
-			      "not implement the "                             \
-			      "required function [%s]",                        \
-			      TypeName((*self)));                              \
-		SelfCleanup sc = {__thread_local_self_Const,                   \
-				  __thread_local_self_Var};                    \
-		__thread_local_self_Const = self;                              \
-		__thread_local_self_Var = NULL;                                \
-		__thread_local_self_##is_var = self;                           \
-		return impl(PROC_PARAMS(__VA_ARGS__));                         \
-	}
-	*/
 
 #define PROC_TRAIT_STATEMENT_IMPL_EXP(impl_type, mutability, return_type,      \
 				      fn_name, ...)                            \
@@ -185,7 +173,6 @@ FatPtr build_fat_ptr(u64 size);
 	PROC_TRAIT_STATEMENT_IMPL_EXP(__VA_ARGS__)
 #define PROC_TRAIT_STATEMENT(arg, x)                                           \
 	PROC_TRAIT_STATEMENT_IMPL(arg, EXPAND_ALL x)
-// #define PROC_TRAIT_STATEMENT(arg, x) [ arg, EXPAND_ALL x ]
 #define PROC_IMPL(name, ...)                                                   \
 	FOR_EACH(PROC_TRAIT_STATEMENT, name, (), __VA_ARGS__)
 #define DefineTrait(...) __VA_ARGS__
