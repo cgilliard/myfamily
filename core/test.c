@@ -16,6 +16,12 @@
 #include <criterion/criterion.h>
 #include <unistd.h>
 
+/*
+#define TEST1(arg1, x) [ arg1, x ]
+#define PROC_TEST(...) FOR_EACH(TEST1, myarg, (;), __VA_ARGS__)
+PROC_TEST(abc, def, ghi, aaa, zzz, mmm, xxx)
+*/
+
 Test(core, test_heap) {
 	cr_assert_eq(__malloc_count, __free_count);
 

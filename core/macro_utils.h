@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/macro_utils_inner.h>
-
 #define UNIQUE_ID __COUNTER__
 #define STRINGIFY(x) #x
 #define EXPAND(x) x
@@ -44,67 +42,48 @@
 #define MULTI_SWITCH2(action1, action2, arg, ...)                              \
 	EXPAND(MULTI_SWITCH2_(action1, action2, arg, __VA_ARGS__))
 
-#define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...) NAME
+#define EMPTY()
+#define DEFER1(m) m EMPTY()
+#define UNWRAP(...) __VA_ARGS__
 
-#define FOR_EACH(action, arg, delim, ...)                                      \
-	__VA_OPT__(EXPAND(GET_MACRO(                                           \
-	    __VA_ARGS__, FOR_EACH_10, FOR_EACH_9, FOR_EACH_8, FOR_EACH_7,      \
-	    FOR_EACH_6, FOR_EACH_5, FOR_EACH_4, FOR_EACH_3, FOR_EACH_2,        \
-	    FOR_EACH_1)(action, arg, delim, __VA_ARGS__)))
+#define EVAL(...) EVAL1024(__VA_ARGS__)
+#define EVAL1024(...) EVAL512(EVAL512(__VA_ARGS__))
+#define EVAL512(...) EVAL256(EVAL256(__VA_ARGS__))
+#define EVAL256(...) EVAL128(EVAL128(__VA_ARGS__))
+#define EVAL128(...) EVAL64(EVAL64(__VA_ARGS__))
+#define EVAL64(...) EVAL32(EVAL32(__VA_ARGS__))
+#define EVAL32(...) EVAL16(EVAL16(__VA_ARGS__))
+#define EVAL16(...) EVAL8(EVAL8(__VA_ARGS__))
+#define EVAL8(...) EVAL4(EVAL4(__VA_ARGS__))
+#define EVAL4(...) EVAL2(EVAL2(__VA_ARGS__))
+#define EVAL2(...) EVAL1(EVAL1(__VA_ARGS__))
+#define EVAL1(...) __VA_ARGS__
 
-#define FOR_EACH_1(action, arg, delim, v0) action(arg, v0)
-#define FOR_EACH_2(action, arg, delim, v0, v1)                                 \
-	action(arg, v0) EXPAND_ALL delim action(arg, v1)
-#define FOR_EACH_3(action, arg, delim, v0, v1, v2)                             \
-	action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \
-	EXPAND_ALL delim action(arg, v2)
-#define FOR_EACH_4(action, arg, delim, v0, v1, v2, v3)                         \
-	action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \
-	EXPAND_ALL delim action(arg, v2)                                       \
-	EXPAND_ALL delim action(arg, v3)
-#define FOR_EACH_5(action, arg, delim, v0, v1, v2, v3, v4)                     \
-	action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \
-	EXPAND_ALL delim action(arg, v2)                                       \
-	EXPAND_ALL delim action(arg, v3)                                       \
-	EXPAND_ALL delim action(arg, v4)
-#define FOR_EACH_6(action, arg, delim, v0, v1, v2, v3, v4, v5)                 \
-	action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \
-	EXPAND_ALL delim action(arg, v2)                                       \
-	EXPAND_ALL delim action(arg, v3)                                       \
-	EXPAND_ALL delim action(arg, v4)                                       \
-	EXPAND_ALL delim action(arg, v5)
-#define FOR_EACH_7(action, arg, delim, v0, v1, v2, v3, v4, v5, v6)             \
-	action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \
-	EXPAND_ALL delim action(arg, v2)                                       \
-	EXPAND_ALL delim action(arg, v3)                                       \
-	EXPAND_ALL delim action(arg, v4)                                       \
-	EXPAND_ALL delim action(arg, v5)                                       \
-	EXPAND_ALL delim action(arg, v6)
-#define FOR_EACH_8(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7)         \
-	action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \
-	EXPAND_ALL delim action(arg, v2)                                       \
-	EXPAND_ALL delim action(arg, v3)                                       \
-	EXPAND_ALL delim action(arg, v4)                                       \
-	EXPAND_ALL delim action(arg, v5)                                       \
-	EXPAND_ALL delim action(arg, v6)                                       \
-	EXPAND_ALL delim action(arg, v7)
-#define FOR_EACH_9(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7, v8)     \
-	action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \
-	EXPAND_ALL delim action(arg, v2)                                       \
-	EXPAND_ALL delim action(arg, v3)                                       \
-	EXPAND_ALL delim action(arg, v4)                                       \
-	EXPAND_ALL delim action(arg, v5)                                       \
-	EXPAND_ALL delim action(arg, v6)                                       \
-	EXPAND_ALL delim action(arg, v7)                                       \
-	EXPAND_ALL delim action(arg, v8)
-#define FOR_EACH_10(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7, v8,    \
-		    v9)                                                        \
-	action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \
-	EXPAND_ALL delim action(arg, v2)                                       \
-	EXPAND_ALL delim action(arg, v3)                                       \
-	EXPAND_ALL delim action(arg, v4)                                       \
-	EXPAND_ALL delim action(arg, v5)                                       \
-	EXPAND_ALL delim action(arg, v6)                                       \
-	EXPAND_ALL delim action(arg, v7)                                       \
-	EXPAND_ALL delim action(arg, v8)                                       \
-	EXPAND_ALL delim action(arg, v9)
+#define MAP(m, arg, delim, first, ...)                                         \
+	m(arg, first) __VA_OPT__(                                              \
+	    UNWRAP delim DEFER1(_MAP)()(m, arg, delim, __VA_ARGS__))
+#define _MAP() MAP
+
+#define EVAL_INNER(...) EVAL1024_INNER(__VA_ARGS__)
+#define EVAL1024_INNER(...) EVAL512_INNER(EVAL512_INNER(__VA_ARGS__))
+#define EVAL512_INNER(...) EVAL256_INNER(EVAL256_INNER(__VA_ARGS__))
+#define EVAL256_INNER(...) EVAL128_INNER(EVAL128_INNER(__VA_ARGS__))
+#define EVAL128_INNER(...) EVAL64_INNER(EVAL64_INNER(__VA_ARGS__))
+#define EVAL64_INNER(...) EVAL32_INNER(EVAL32_INNER(__VA_ARGS__))
+#define EVAL32_INNER(...) EVAL16_INNER(EVAL16_INNER(__VA_ARGS__))
+#define EVAL16_INNER(...) EVAL8_INNER(EVAL8_INNER(__VA_ARGS__))
+#define EVAL8_INNER(...) EVAL4_INNER(EVAL4_INNER(__VA_ARGS__))
+#define EVAL4_INNER(...) EVAL2_INNER(EVAL2_INNER(__VA_ARGS__))
+#define EVAL2_INNER(...) EVAL1_INNER(EVAL1_INNER(__VA_ARGS__))
+#define EVAL1_INNER(...) __VA_ARGS__
+
+#define MAP_INNER(m, arg, delim, first, ...)                                   \
+	m(arg, first) __VA_OPT__(                                              \
+	    UNWRAP delim DEFER1(_MAP_INNER)()(m, arg, delim, __VA_ARGS__))
+#define _MAP_INNER() MAP_INNER
+
+#define FOR_EACH(m, arg, delim, ...)                                           \
+	EVAL(__VA_OPT__(MAP(m, arg, delim, __VA_ARGS__)))
+
+#define FOR_EACH_INNER(m, arg, delim, ...)                                     \
+	__VA_OPT__(MAP_INNER(m, arg, delim, __VA_ARGS__))
