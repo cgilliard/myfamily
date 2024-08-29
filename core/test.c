@@ -798,12 +798,12 @@ Test(core, test_synchronized) {
 // Define a Testtype with two fields x and y which are u64 and u32 respectively
 Type(TestType, Field(u64, x), Field(u32, y));
 
-// Define a trait with 5 required functions which are fairly self explanitory
+// Define a trait with required functions which are fairly self explanitory.
 // The first parameter in the Required macro is the mutability. It must be
 // either Const or Var. The second parameter is the return type. The third
 // parameter is the function name. After that there may be a variable number of
 // Parameter arguments. The Param macro specifies these arguments with the type
-// of the paremter only.
+// of the parameter only.
 #define TestTrait                                                              \
 	DefineTrait(Required(Const, u64, get_x), Required(Const, u32, get_y),  \
 		    Required(Var, void, incr),                                 \
@@ -813,7 +813,7 @@ Type(TestType, Field(u64, x), Field(u32, y));
 
 // The call to TraitImpl is mandatory for all traits. It will generate the
 // function calls for the trait. In this case, it generates the following
-// functions: get_x, get_y, incr, add_x, and sub_y.
+// functions: get_x, get_y, incr, add_x, sub_y, and sub_both.
 TraitImpl(TestTrait);
 
 // Specify that TestType implements the TestTrait trait. This will modify
@@ -911,4 +911,70 @@ Test(core, test_type) {
 
 	// assert that the drop handler was called for both objects
 	cr_assert_eq(drop_count, 2);
+}
+
+// Test the Build trait. If implemented, the 'Build' trait's build function is
+// called when the new macro is executed. It can be used to validate
+// configuration, set default values, and do any other initialization procedures
+// for a type. Below is a simple example of a 'TestServer' Build trait that does
+// some input validation and sets default values. The Build trait can only
+// panic, but once we have Result implemented, we will also provide a 'TryBuild'
+// trait which returns a result which will allow for additional capabilities.
+Type(TestServer, Field(u16, port), Field(char *, host), Field(u16, threads));
+
+// define implemented traits 'Build' and 'Drop'
+Impl(TestServer, Build);
+Impl(TestServer, Drop);
+
+// Implement traits
+#define IMPL TestServer
+
+// do input validation and set defaults for our 'TestServer'
+void TestServer_build() {
+	// Check if threads are equal to 0. This is a misconfiguration. Panic if
+	// that's the case.
+	if ($(threads) == 0)
+		panic("Threads must be greater than 0!");
+
+	// If host is NULL (not configured) use the default setting of
+	// 127.0.0.1.
+	if ($(host) == NULL) {
+		$Var(host) = "127.0.0.1";
+	}
+
+	// If port is 0 (not configured) use the default setting of 80.
+	if ($(port) == 0) {
+		$Var(port) = 80;
+	}
+
+	// print out the configuration and return.
+	printf("Calling build with host='%s',port=%u,threads=%u\n", $(host),
+	       $(port), $(threads));
+}
+
+// The drop handler just prints out a message in this case, but could be used to
+// deallocate resources/close connections/etc.
+void TestServer_drop() {
+	printf("Calling drop with host='%s',port=%u,threads=%u\n", $(host),
+	       $(port), $(threads));
+}
+#undef IMPL
+
+Test(core, test_build) {
+
+	// Create three server instanes with varying settings and mutability.
+	var server1 = new (TestServer, With(port, 8080),
+			   With(host, "127.0.0.1"), With(threads, 10));
+	let server2 = new (TestServer, With(port, 9000),
+			   With(host, "localhost"), With(threads, 4));
+	let server3 = new (TestServer, With(threads, 6));
+
+	// Output of this test:
+	// ./bin/test --timeout 60 -f
+	// Calling build with host='127.0.0.1',port=8080,threads=10
+	// Calling build with host='localhost',port=9000,threads=4
+	// Calling build with host='127.0.0.1',port=80,threads=6
+	// Calling drop with host='127.0.0.1',port=80,threads=6
+	// Calling drop with host='localhost',port=9000,threads=4
+	// Calling drop with host='127.0.0.1',port=8080,threads=10
 }

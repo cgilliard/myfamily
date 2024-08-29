@@ -86,6 +86,21 @@ void SelfCleanupImpl_update(SelfCleanupImpl *ptr) {
 	__thread_local_self_Var = ptr->prev_tl_self_Var;
 }
 
+void Object_build(Object *ptr) {
+	void (*do_build)(Object * ptr) = find_fn(ptr, "build");
+	if (do_build) {
+		// setup self references
+		Object *tmp_Var = __thread_local_self_Var;
+		const Object *tmp_Const = __thread_local_self_Const;
+		__thread_local_self_Const = ptr;
+		__thread_local_self_Var = ptr;
+		do_build(ptr);
+		// revert
+		__thread_local_self_Var = tmp_Var;
+		__thread_local_self_Const = tmp_Const;
+	}
+}
+
 #if defined(__clang__)
 // Clang-specific pragma
 #pragma clang diagnostic ignored                                               \

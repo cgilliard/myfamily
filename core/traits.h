@@ -20,4 +20,7 @@
 #define Drop DefineTrait(Required(Var, void, drop))
 TraitImpl(Drop);
 
+#define Build DefineTrait(Required(Var, void, build))
+TraitImpl(Build);
+
 #endif // _CORE_TRAITS__

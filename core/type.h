@@ -57,6 +57,7 @@ extern _Thread_local const Object *__thread_local_self_Const;
 extern _Thread_local Object *__thread_local_self_Var;
 
 void Object_cleanup(const Object *ptr);
+void Object_build(Object *ptr);
 void sort_vtable(Vtable *table);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
 void *find_fn(const Object *obj, const char *name);
@@ -208,6 +209,7 @@ FatPtr build_fat_ptr(u64 size);
 		FatPtr _fptr__ = build_fat_ptr(name##_size());                 \
 		FOR_EACH(SET_PARAM, (_fptr__.data, name), (), __VA_ARGS__)     \
 		Object _ret__ = {&name##_Vtable__, unique_id(), 0, _fptr__};   \
+		Object_build(&_ret__);                                         \
 		_ret__;                                                        \
 	})
 // clang-format on
