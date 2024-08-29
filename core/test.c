@@ -967,7 +967,7 @@ Test(core, test_build) {
 			   With(host, "127.0.0.1"), With(threads, 10));
 	let server2 = new (TestServer, With(port, 9000),
 			   With(host, "localhost"), With(threads, 4));
-	let server3 = new (TestServer, With(threads, 6));
+	let server3 = new (TestServer, With(threads, 6), With(host, NULL));
 
 	// Output of this test:
 	// ./bin/test --timeout 60 -f
