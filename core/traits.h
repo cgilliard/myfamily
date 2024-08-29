@@ -17,13 +17,13 @@
 
 #include <core/type.h>
 
-#define Drop Required(Var, void, drop)
+#define Drop DefineTrait(Drop, Required(Var, void, drop))
 // Drop has a special TraitImpl because we need to prevent it from being called
 // twice so it's not implemented using the standard TraitImpl.
 // TraitImpl(Drop);
 void drop(Object *self);
 
-#define Build Required(Var, void, build)
+#define Build DefineTrait(Build, Required(Var, void, build))
 TraitImpl(Build);
 
 #endif // _CORE_TRAITS__

@@ -205,7 +205,9 @@ FatPtr build_fat_ptr(u64 size);
 	MULTI_SWITCH(PROC_TRAIT_IMPL_FN_DEFAULT, PROC_TRAIT_IMPL_FN_, x,       \
 		     __VA_ARGS__)
 #define PROC_TRAIT_IMPL(arg, x) PROC_TRAIT_IMPL_FN x
-#define TraitImpl(trait) FOR_EACH(PROC_TRAIT_IMPL, none, (), trait)
+#define TraitImplImpl(name, ...)                                               \
+	FOR_EACH(PROC_TRAIT_IMPL, none, (), __VA_ARGS__)
+#define TraitImpl(...) TraitImplImpl(__VA_ARGS__)
 
 #define PROC_TRAIT_STATEMENT_IMPL_EXP_(impl_type, mutability, return_type,     \
 				       fn_name, ...)                           \
@@ -227,7 +229,8 @@ FatPtr build_fat_ptr(u64 size);
 	FOR_EACH(PROC_TRAIT_STATEMENT, name, (), __VA_ARGS__)
 #define Required(...) (__VA_ARGS__)
 #define RequiredWithDefault(...) ((__VA_ARGS__))
-#define Impl(name, trait) PROC_IMPL(name, trait)
+#define PROC_IMPL_(name, trait_name, ...) PROC_IMPL(name, __VA_ARGS__)
+#define Impl(name, ...) PROC_IMPL_(name, __VA_ARGS__)
 
 #define SET_OFFSET_OF_IMPL(ptr, structure, name, value)                        \
 	*((typeof(((structure *)0)->name) *)(ptr + offsetof(structure,         \
@@ -235,6 +238,7 @@ FatPtr build_fat_ptr(u64 size);
 
 #define SET_OFFSET_OF(...) SET_OFFSET_OF_IMPL(__VA_ARGS__)
 #define SET_PARAM(ptr, value) SET_OFFSET_OF(EXPAND_ALL ptr, EXPAND_ALL value)
+#define DefineTrait(...) __VA_ARGS__
 
 // TODO: _fptr__.data may be NULL, need to handle. Once we have
 // 'Result' implement two versions of this macro. One which
