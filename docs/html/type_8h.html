@@ -80,6 +80,7 @@ $(function() {
 <code>#include &lt;<a class="el" href="chain__allocator_8h_source.html">core/chain_allocator.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="heap_8h_source.html">core/heap.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="macro__utils_8h_source.html">core/macro_utils.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="panic_8h_source.html">core/panic.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="types_8h_source.html">core/types.h</a>&gt;</code><br />
 </div>
 <p><a href="type_8h_source.html">Go to the source code of this file.</a></p>
@@ -92,11 +93,15 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structObject.html">Object</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSelfCleanupImpl.html">SelfCleanupImpl</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a08db27966d6cfc7a7b73d601e702fd16"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a08db27966d6cfc7a7b73d601e702fd16">VDATA_FLAGS_NO_CLEANUP</a>&#160;&#160;&#160;(0x1 &lt;&lt; 0)</td></tr>
 <tr class="separator:a08db27966d6cfc7a7b73d601e702fd16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0bd899b6febf24ca768f2a88bd30c67"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ae0bd899b6febf24ca768f2a88bd30c67">SelfCleanup</a></td></tr>
+<tr class="separator:ae0bd899b6febf24ca768f2a88bd30c67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2bd3162fc79efcb3977a2147100d9ca"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#af2bd3162fc79efcb3977a2147100d9ca">Cleanup</a>&#160;&#160;&#160;	<a class="el" href="structObject.html">Object</a> __attribute__((warn_unused_result, cleanup(<a class="el" href="type_8h.html#aa73f18beaa4379c17baf05a138d68dd2">Object_cleanup</a>)))</td></tr>
 <tr class="separator:af2bd3162fc79efcb3977a2147100d9ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7740fc1c5505b37330419fd68f73345"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a>(obj)&#160;&#160;&#160;obj.vtable-&gt;name</td></tr>
@@ -105,50 +110,70 @@ Macros</h2></td></tr>
 <tr class="separator:a1b0936415a643c88ce543099c10e0d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a045dd54932944d8830380f4596d64446"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a>&#160;&#160;&#160;const <a class="el" href="type_8h.html#af2bd3162fc79efcb3977a2147100d9ca">Cleanup</a></td></tr>
 <tr class="separator:a045dd54932944d8830380f4596d64446"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a68a4c50df206bdbb0d9c9fec249d19b1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a>&#160;&#160;&#160;) ((<a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a> *)<a class="el" href="type_8h.html#ad128f0064c5bec87c79d02e93404434d">__thread_local_self_Mut</a>-&gt;ptr.data)-&gt;field_name</td></tr>
+<tr class="memitem:acd831f9adf1ae76bd8d014861c913ee4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#acd831f9adf1ae76bd8d014861c913ee4">Var</a>(<a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a>)&#160;&#160;&#160;((<a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a> *)<a class="el" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a>-&gt;ptr.data)-&gt;<a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a></td></tr>
+<tr class="separator:acd831f9adf1ae76bd8d014861c913ee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68a4c50df206bdbb0d9c9fec249d19b1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a></td></tr>
 <tr class="separator:a68a4c50df206bdbb0d9c9fec249d19b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13fac7206e84b1f62469083440be7953"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a13fac7206e84b1f62469083440be7953">Const</a>(<a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a>)&#160;&#160;&#160;	((const <a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a> *)<a class="el" href="type_8h.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a>-&gt;ptr.data)-&gt;<a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a></td></tr>
-<tr class="separator:a13fac7206e84b1f62469083440be7953"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a699feff54e3c87657391e9334ab507dd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a699feff54e3c87657391e9334ab507dd">BOTH</a>(x,  y)&#160;&#160;&#160;x y</td></tr>
-<tr class="separator:a699feff54e3c87657391e9334ab507dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a200a24c704b8e92c43c1f87650ec8aba"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a200a24c704b8e92c43c1f87650ec8aba">STRUCT_PARAM</a>(ignore,  x)&#160;&#160;&#160;<a class="el" href="type_8h.html#a699feff54e3c87657391e9334ab507dd">BOTH</a> x</td></tr>
-<tr class="separator:a200a24c704b8e92c43c1f87650ec8aba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5aea6a4109216c23143fdb0248d2fde"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa5aea6a4109216c23143fdb0248d2fde">CALL_BOTH</a>(x,  y)&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a699feff54e3c87657391e9334ab507dd">BOTH</a> y</td></tr>
+<tr class="separator:aa5aea6a4109216c23143fdb0248d2fde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d94417e304d0cd9c2a88b4a10ba0645"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a9d94417e304d0cd9c2a88b4a10ba0645">Type</a>(name, ...)</td></tr>
 <tr class="separator:a9d94417e304d0cd9c2a88b4a10ba0645"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3dd518df1105dd849cae4ac614bf708e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(field_type,  <a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a>)&#160;&#160;&#160;(field_type, <a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a>)</td></tr>
 <tr class="separator:a3dd518df1105dd849cae4ac614bf708e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83dd37cc0bb92d715fc246014e02b359"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(x,  y)&#160;&#160;&#160;.x = y</td></tr>
+<tr class="memitem:a83dd37cc0bb92d715fc246014e02b359"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(x,  y)&#160;&#160;&#160;(x, y)</td></tr>
 <tr class="separator:a83dd37cc0bb92d715fc246014e02b359"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13eafc4c37da809ed5ffef5dfa15372c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a13eafc4c37da809ed5ffef5dfa15372c">EXTRACT_TYPE_NAME</a>(type,  name, ...)&#160;&#160;&#160;type name</td></tr>
 <tr class="separator:a13eafc4c37da809ed5ffef5dfa15372c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22f0619656583b16e8351306424d9252"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a22f0619656583b16e8351306424d9252">EXTRACT_NAME</a>(type,  name, ...)&#160;&#160;&#160;name</td></tr>
 <tr class="separator:a22f0619656583b16e8351306424d9252"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6985f9d619760c8d37fe6bb5adf22732"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a6985f9d619760c8d37fe6bb5adf22732">EXTRACT_BOUNDS</a>(type,  name, ...)&#160;&#160;&#160;	__VA_OPT__(check_bounds(name, #__VA_ARGS__);)</td></tr>
-<tr class="separator:a6985f9d619760c8d37fe6bb5adf22732"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9aa056a23749b2606f899fed108429ce"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a9aa056a23749b2606f899fed108429ce">UNWRAP_PARAM_TYPE_NAME</a>(ignore,  type_name)&#160;&#160;&#160;<a class="el" href="type_8h.html#a13eafc4c37da809ed5ffef5dfa15372c">EXTRACT_TYPE_NAME</a> type_name</td></tr>
 <tr class="separator:a9aa056a23749b2606f899fed108429ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b60212a45bfd73bb33dbfcdda0b451a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a6b60212a45bfd73bb33dbfcdda0b451a">UNWRAP_PARAM_NAME</a>(ignore,  type_name)&#160;&#160;&#160;<a class="el" href="type_8h.html#a22f0619656583b16e8351306424d9252">EXTRACT_NAME</a> type_name</td></tr>
 <tr class="separator:a6b60212a45bfd73bb33dbfcdda0b451a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7b7e783252b39ae9541ce998efe27fa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ad7b7e783252b39ae9541ce998efe27fa">UNWRAP_BOUNDS</a>(type_name)&#160;&#160;&#160;<a class="el" href="type_8h.html#a6985f9d619760c8d37fe6bb5adf22732">EXTRACT_BOUNDS</a> type_name</td></tr>
-<tr class="separator:ad7b7e783252b39ae9541ce998efe27fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee34c5dde9a30bc84c57fdb6c32afe42"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aee34c5dde9a30bc84c57fdb6c32afe42">PROC_FN_SIGNATURE</a>(...)&#160;&#160;&#160;	<a class="el" href="macro__utils_8h.html#a1598d76ed15988956afa5934a099f1e0">FOR_EACH</a>(<a class="el" href="type_8h.html#a9aa056a23749b2606f899fed108429ce">UNWRAP_PARAM_TYPE_NAME</a>, , (, ), __VA_ARGS__)</td></tr>
 <tr class="separator:aee34c5dde9a30bc84c57fdb6c32afe42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada597c7e84f76fb56c9c4d72599db443"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ada597c7e84f76fb56c9c4d72599db443">PROC_PARAMS</a>(...)&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a1598d76ed15988956afa5934a099f1e0">FOR_EACH</a>(<a class="el" href="type_8h.html#a6b60212a45bfd73bb33dbfcdda0b451a">UNWRAP_PARAM_NAME</a>, , (, ), __VA_ARGS__)</td></tr>
 <tr class="separator:ada597c7e84f76fb56c9c4d72599db443"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91f832a527effaf8d9abb1316765e41d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a91f832a527effaf8d9abb1316765e41d">PROC_CHECK_BOUNDS</a>(...)&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a1598d76ed15988956afa5934a099f1e0">FOR_EACH</a>(<a class="el" href="type_8h.html#ad7b7e783252b39ae9541ce998efe27fa">UNWRAP_BOUNDS</a>, (), __VA_ARGS__)</td></tr>
-<tr class="separator:a91f832a527effaf8d9abb1316765e41d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7519aefed319044c2d2b6cc71076ddea"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a7519aefed319044c2d2b6cc71076ddea">Param</a>(type,  name, ...)&#160;&#160;&#160;(type, name __VA_OPT__(, ) __VA_ARGS__)</td></tr>
-<tr class="separator:a7519aefed319044c2d2b6cc71076ddea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5fb8c83cf9194e2974df4b1ef5c180d4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a5fb8c83cf9194e2974df4b1ef5c180d4">Required</a>(T,  is_mut,  R,  name, ...)</td></tr>
-<tr class="separator:a5fb8c83cf9194e2974df4b1ef5c180d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3151b3f4efc61301b2d3f815905cec9f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a3151b3f4efc61301b2d3f815905cec9f">Mut</a>()</td></tr>
-<tr class="separator:a3151b3f4efc61301b2d3f815905cec9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0b43aeaffd7a613c3c061c0696d901a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(type)&#160;&#160;&#160;(type, <a class="el" href="macro__utils_8h.html#ac2c0beae88659357798c2fddb38a6518">CAT</a>(name_, __COUNTER__))</td></tr>
+<tr class="separator:af0b43aeaffd7a613c3c061c0696d901a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfcc430e1f4e479cf95b82e27c5f930d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#adfcc430e1f4e479cf95b82e27c5f930d">RequiredOld</a>(T,  is_var,  R,  name, ...)</td></tr>
+<tr class="separator:adfcc430e1f4e479cf95b82e27c5f930d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3521b7722e358f98597043439741612c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a3521b7722e358f98597043439741612c">Var</a>()</td></tr>
+<tr class="separator:a3521b7722e358f98597043439741612c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa737fc32d91c59bd8bd2fdb17ada2845"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>()&#160;&#160;&#160;const</td></tr>
 <tr class="separator:aa737fc32d91c59bd8bd2fdb17ada2845"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcd79e9d21fcf8fc8d98296bb8859b47"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#adcd79e9d21fcf8fc8d98296bb8859b47">TraitImpl</a>(trait,  is_mut,  return_type,  name, ...)</td></tr>
-<tr class="separator:adcd79e9d21fcf8fc8d98296bb8859b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f288a54c0f5989efc9189336398d7a8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a6f288a54c0f5989efc9189336398d7a8">Impl</a>(name,  trait)&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a>(trait(name))</td></tr>
+<tr class="memitem:ac66bad82b4222b29f5b45b3e98654269"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ac66bad82b4222b29f5b45b3e98654269">CALL_SECOND</a>(x,  y)&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a8cf792fb70b4f3de790edeb87b0665a3">SECOND</a> y</td></tr>
+<tr class="separator:ac66bad82b4222b29f5b45b3e98654269"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7033995114ec95e0e30960025176d46"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ae7033995114ec95e0e30960025176d46">PROCESS_FN_CALL</a>(...)&#160;&#160;&#160;	<a class="el" href="macro__utils__inner_8h.html#a8669041a489d613be9ad24b0a822a048">FOR_EACH_INNER</a>(<a class="el" href="type_8h.html#ac66bad82b4222b29f5b45b3e98654269">CALL_SECOND</a>, none, (, ), __VA_ARGS__)</td></tr>
+<tr class="separator:ae7033995114ec95e0e30960025176d46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7807ba2c750e8fd2ad770bdde7b0a601"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a>(...)&#160;&#160;&#160;<a class="el" href="macro__utils__inner_8h.html#a8669041a489d613be9ad24b0a822a048">FOR_EACH_INNER</a>(<a class="el" href="type_8h.html#aa5aea6a4109216c23143fdb0248d2fde">CALL_BOTH</a>, none, (, ), __VA_ARGS__)</td></tr>
+<tr class="separator:a7807ba2c750e8fd2ad770bdde7b0a601"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34d39cb2a8cd30c117b9971a131c33fe"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a34d39cb2a8cd30c117b9971a131c33fe">PROC_TRAIT_IMPL_FN</a>(mutability,  return_type,  name, ...)</td></tr>
+<tr class="separator:a34d39cb2a8cd30c117b9971a131c33fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9e1e65f1386259555df02a2039933e0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ab9e1e65f1386259555df02a2039933e0">PROC_TRAIT_IMPL</a>(arg,  x)&#160;&#160;&#160;<a class="el" href="type_8h.html#a34d39cb2a8cd30c117b9971a131c33fe">PROC_TRAIT_IMPL_FN</a> x</td></tr>
+<tr class="separator:ab9e1e65f1386259555df02a2039933e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe043c11eed280ffd272cb31e58bace4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#afe043c11eed280ffd272cb31e58bace4">TraitImpl</a>(trait)&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a1598d76ed15988956afa5934a099f1e0">FOR_EACH</a>(<a class="el" href="type_8h.html#ab9e1e65f1386259555df02a2039933e0">PROC_TRAIT_IMPL</a>, none, (), trait)</td></tr>
+<tr class="separator:afe043c11eed280ffd272cb31e58bace4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e298c733c77f31714bb72b4deacdd82"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a0e298c733c77f31714bb72b4deacdd82">PROC_TRAIT_STATEMENT_IMPL_EXP</a>(impl_type,  mutability,  return_type,  fn_name, ...)</td></tr>
+<tr class="separator:a0e298c733c77f31714bb72b4deacdd82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77f8b9ce5ca6dbfcff7e935fb2efff5f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a77f8b9ce5ca6dbfcff7e935fb2efff5f">PROC_TRAIT_STATEMENT_IMPL</a>(...)&#160;&#160;&#160;	<a class="el" href="type_8h.html#a0e298c733c77f31714bb72b4deacdd82">PROC_TRAIT_STATEMENT_IMPL_EXP</a>(__VA_ARGS__)</td></tr>
+<tr class="separator:a77f8b9ce5ca6dbfcff7e935fb2efff5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00634fae8500cf51edc2f495e6160071"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a00634fae8500cf51edc2f495e6160071">PROC_TRAIT_STATEMENT</a>(arg,  x)&#160;&#160;&#160;	<a class="el" href="type_8h.html#a77f8b9ce5ca6dbfcff7e935fb2efff5f">PROC_TRAIT_STATEMENT_IMPL</a>(arg, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> x)</td></tr>
+<tr class="separator:a00634fae8500cf51edc2f495e6160071"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afef1b27c11d7ff5e1802f0d5526e8ba0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#afef1b27c11d7ff5e1802f0d5526e8ba0">PROC_IMPL</a>(name, ...)&#160;&#160;&#160;	<a class="el" href="macro__utils_8h.html#a1598d76ed15988956afa5934a099f1e0">FOR_EACH</a>(<a class="el" href="type_8h.html#a00634fae8500cf51edc2f495e6160071">PROC_TRAIT_STATEMENT</a>, name, (), __VA_ARGS__)</td></tr>
+<tr class="separator:afef1b27c11d7ff5e1802f0d5526e8ba0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a576cf28d25620855f75b2023e4a53e59"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(...)&#160;&#160;&#160;__VA_ARGS__</td></tr>
+<tr class="separator:a576cf28d25620855f75b2023e4a53e59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4edfee2ef9567a47b388682adaaec1db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(...)&#160;&#160;&#160;(__VA_ARGS__)</td></tr>
+<tr class="separator:a4edfee2ef9567a47b388682adaaec1db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f288a54c0f5989efc9189336398d7a8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a6f288a54c0f5989efc9189336398d7a8">Impl</a>(name,  trait)&#160;&#160;&#160;<a class="el" href="type_8h.html#afef1b27c11d7ff5e1802f0d5526e8ba0">PROC_IMPL</a>(name, trait)</td></tr>
 <tr class="separator:a6f288a54c0f5989efc9189336398d7a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3432cb7af49dcfcffecc0635afb7be87"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a3432cb7af49dcfcffecc0635afb7be87">SET_OFFSET_OF_IMPL</a>(ptr,  structure,  name,  value)</td></tr>
+<tr class="separator:a3432cb7af49dcfcffecc0635afb7be87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abca5f6ccf1375a60458378849f687dc4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#abca5f6ccf1375a60458378849f687dc4">SET_OFFSET_OF</a>(...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a3432cb7af49dcfcffecc0635afb7be87">SET_OFFSET_OF_IMPL</a>(__VA_ARGS__)</td></tr>
+<tr class="separator:abca5f6ccf1375a60458378849f687dc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a59184228fa29efbc3df1901ae6da28a2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a59184228fa29efbc3df1901ae6da28a2">SET_PARAM</a>(ptr,  value)&#160;&#160;&#160;<a class="el" href="type_8h.html#abca5f6ccf1375a60458378849f687dc4">SET_OFFSET_OF</a>(<a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> ptr, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> value)</td></tr>
+<tr class="separator:a59184228fa29efbc3df1901ae6da28a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12dedb437d95fb1cf019b42b64a2c1f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a12dedb437d95fb1cf019b42b64a2c1f3">new</a>(name, ...)</td></tr>
 <tr class="separator:a12dedb437d95fb1cf019b42b64a2c1f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -156,11 +181,17 @@ Macros</h2></td></tr>
 Typedefs</h2></td></tr>
 <tr class="memitem:ab1287b6141419421dc5c14b9f7756b0a"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structObject.html">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ab1287b6141419421dc5c14b9f7756b0a">Object</a></td></tr>
 <tr class="separator:ab1287b6141419421dc5c14b9f7756b0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5796fa21fb1fe0f979f17051f4eb3e61"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structSelfCleanupImpl.html">SelfCleanupImpl</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a5796fa21fb1fe0f979f17051f4eb3e61">SelfCleanupImpl</a></td></tr>
+<tr class="separator:a5796fa21fb1fe0f979f17051f4eb3e61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a54b12fa3f9a7f03b6fd6898eba6d6382"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a54b12fa3f9a7f03b6fd6898eba6d6382">SelfCleanupImpl_update</a> (<a class="el" href="structSelfCleanupImpl.html">SelfCleanupImpl</a> *sc)</td></tr>
+<tr class="separator:a54b12fa3f9a7f03b6fd6898eba6d6382"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa73f18beaa4379c17baf05a138d68dd2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa73f18beaa4379c17baf05a138d68dd2">Object_cleanup</a> (const <a class="el" href="structObject.html">Object</a> *ptr)</td></tr>
 <tr class="separator:aa73f18beaa4379c17baf05a138d68dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6925c79571998ccf40ed3f5d8388443"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#af6925c79571998ccf40ed3f5d8388443">Object_build</a> (<a class="el" href="structObject.html">Object</a> *ptr)</td></tr>
+<tr class="separator:af6925c79571998ccf40ed3f5d8388443"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc5e90382878eb50826eeae340a4ef64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#adc5e90382878eb50826eeae340a4ef64">sort_vtable</a> (<a class="el" href="structVtable.html">Vtable</a> *table)</td></tr>
 <tr class="separator:adc5e90382878eb50826eeae340a4ef64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5082273ba4bf9ad23e49ca9319bef78e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a5082273ba4bf9ad23e49ca9319bef78e">vtable_add_entry</a> (<a class="el" href="structVtable.html">Vtable</a> *table, <a class="el" href="structVtableEntry.html">VtableEntry</a> entry)</td></tr>
@@ -176,18 +207,18 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a7584392485c1057e73a56ba7c43e4bee"><td class="memItemLeft" align="right" valign="top">_Thread_local const <a class="el" href="structObject.html">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a></td></tr>
 <tr class="separator:a7584392485c1057e73a56ba7c43e4bee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad128f0064c5bec87c79d02e93404434d"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structObject.html">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ad128f0064c5bec87c79d02e93404434d">__thread_local_self_Mut</a></td></tr>
-<tr class="separator:ad128f0064c5bec87c79d02e93404434d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf2cf0b8691ef9ea3833ec39bc0626f9"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structObject.html">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a></td></tr>
+<tr class="separator:aaf2cf0b8691ef9ea3833ec39bc0626f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a699feff54e3c87657391e9334ab507dd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a699feff54e3c87657391e9334ab507dd">&#9670;&nbsp;</a></span>BOTH</h2>
+<a id="aa5aea6a4109216c23143fdb0248d2fde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5aea6a4109216c23143fdb0248d2fde">&#9670;&nbsp;</a></span>CALL_BOTH</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define BOTH</td>
+          <td class="memname">#define CALL_BOTH</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">x, </td>
@@ -201,7 +232,35 @@ Variables</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;x y</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a699feff54e3c87657391e9334ab507dd">BOTH</a> y</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac66bad82b4222b29f5b45b3e98654269"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac66bad82b4222b29f5b45b3e98654269">&#9670;&nbsp;</a></span>CALL_SECOND</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CALL_SECOND</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">y&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a8cf792fb70b4f3de790edeb87b0665a3">SECOND</a> y</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -223,7 +282,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="aa737fc32d91c59bd8bd2fdb17ada2845"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa737fc32d91c59bd8bd2fdb17ada2845">&#9670;&nbsp;</a></span>Const <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa737fc32d91c59bd8bd2fdb17ada2845">&#9670;&nbsp;</a></span>Const</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -239,52 +298,18 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a13fac7206e84b1f62469083440be7953"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a13fac7206e84b1f62469083440be7953">&#9670;&nbsp;</a></span>Const <span class="overload">[2/2]</span></h2>
+<a id="a576cf28d25620855f75b2023e4a53e59"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a576cf28d25620855f75b2023e4a53e59">&#9670;&nbsp;</a></span>DefineTrait</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define Const</td>
+          <td class="memname">#define DefineTrait</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a></td><td>)</td>
-          <td>&#160;&#160;&#160;	((const <a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a> *)<a class="el" href="type_8h.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a>-&gt;ptr.data)-&gt;<a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a6985f9d619760c8d37fe6bb5adf22732"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6985f9d619760c8d37fe6bb5adf22732">&#9670;&nbsp;</a></span>EXTRACT_BOUNDS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define EXTRACT_BOUNDS</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">type, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">name, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;	__VA_OPT__(check_bounds(name, #__VA_ARGS__);)</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;__VA_ARGS__</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -394,11 +419,18 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define field_name&#160;&#160;&#160;) ((<a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a> *)<a class="el" href="type_8h.html#ad128f0064c5bec87c79d02e93404434d">__thread_local_self_Mut</a>-&gt;ptr.data)-&gt;field_name</td>
+          <td class="memname">#define field_name</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    )                                                          \</div>
+<div class="line">    ((<span class="keyword">const</span> <a class="code" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a> *)<a class="code" href="type_8h.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a>-&gt;<a class="code" href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">ptr</a>.<a class="code" href="structFatPtr.html#a31ba091180df5e031aa582cddbd09364">data</a>)-&gt;<a class="code" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a></div>
+<div class="ttc" id="acore_2test_8c_html_a750877e0398a37cb8f03443558fb7f6f"><div class="ttname"><a href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a></div><div class="ttdeci">#define IMPL</div><div class="ttdef"><b>Definition:</b> test.c:930</div></div>
+<div class="ttc" id="astructFatPtr_html_a31ba091180df5e031aa582cddbd09364"><div class="ttname"><a href="structFatPtr.html#a31ba091180df5e031aa582cddbd09364">FatPtr::data</a></div><div class="ttdeci">void * data</div><div class="ttdef"><b>Definition:</b> heap.h:104</div></div>
+<div class="ttc" id="astructObject_html_ab5fe3ea3742b5c62e699e90968db8325"><div class="ttname"><a href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">Object::ptr</a></div><div class="ttdeci">FatPtr ptr</div><div class="ttdef"><b>Definition:</b> type.h:42</div></div>
+<div class="ttc" id="atype_8h_html_a68a4c50df206bdbb0d9c9fec249d19b1"><div class="ttname"><a href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a></div><div class="ttdeci">#define field_name</div><div class="ttdef"><b>Definition:</b> type.h:77</div></div>
+<div class="ttc" id="atype_8h_html_a7584392485c1057e73a56ba7c43e4bee"><div class="ttname"><a href="type_8h.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a></div><div class="ttdeci">_Thread_local const Object * __thread_local_self_Const</div><div class="ttdef"><b>Definition:</b> type.c:20</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a6f288a54c0f5989efc9189336398d7a8"></a>
@@ -422,7 +454,7 @@ Variables</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a>(trait(name))</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#afef1b27c11d7ff5e1802f0d5526e8ba0">PROC_IMPL</a>(name, trait)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -437,23 +469,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define let&#160;&#160;&#160;const <a class="el" href="type_8h.html#af2bd3162fc79efcb3977a2147100d9ca">Cleanup</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a3151b3f4efc61301b2d3f815905cec9f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3151b3f4efc61301b2d3f815905cec9f">&#9670;&nbsp;</a></span>Mut</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define Mut</td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -486,19 +501,20 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">        ({ \</div>
-<div class="line">        name _type__ = {__VA_ARGS__};                                  \</div>
 <div class="line">        FatPtr _fptr__ = <a class="code" href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a>(name##_size());                 \</div>
-<div class="line">        *((name *)_fptr__.data) = _type__;                             \</div>
+<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a59184228fa29efbc3df1901ae6da28a2">SET_PARAM</a>, (_fptr__.data, name), (), __VA_ARGS__)     \</div>
 <div class="line">        Object _ret__ = {&amp;name##_Vtable__, <a class="code" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a>(), 0, _fptr__};   \</div>
+<div class="line">        Object_build(&amp;_ret__);                                         \</div>
 <div class="line">        _ret__;                                                        \</div>
 <div class="line">    })</div>
 <div class="ttc" id="atype_8h_html_a2106e13dbac6575e8d701b9f1f4aa79d"><div class="ttname"><a href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a></div><div class="ttdeci">u64 unique_id()</div><div class="ttdef"><b>Definition:</b> type.c:25</div></div>
+<div class="ttc" id="atype_8h_html_a59184228fa29efbc3df1901ae6da28a2"><div class="ttname"><a href="type_8h.html#a59184228fa29efbc3df1901ae6da28a2">SET_PARAM</a></div><div class="ttdeci">#define SET_PARAM(ptr, value)</div><div class="ttdef"><b>Definition:</b> type.h:200</div></div>
 <div class="ttc" id="atype_8h_html_a909192bbfb2649a87561595bca24acaa"><div class="ttname"><a href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a></div><div class="ttdeci">FatPtr build_fat_ptr(u64 size)</div><div class="ttdef"><b>Definition:</b> type.c:27</div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a7519aefed319044c2d2b6cc71076ddea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7519aefed319044c2d2b6cc71076ddea">&#9670;&nbsp;</a></span>Param</h2>
+<a id="af0b43aeaffd7a613c3c061c0696d901a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0b43aeaffd7a613c3c061c0696d901a">&#9670;&nbsp;</a></span>Param</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -507,42 +523,8 @@ Variables</h2></td></tr>
           <td class="memname">#define Param</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">type, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">name, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;(type, name __VA_OPT__(, ) __VA_ARGS__)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a91f832a527effaf8d9abb1316765e41d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91f832a527effaf8d9abb1316765e41d">&#9670;&nbsp;</a></span>PROC_CHECK_BOUNDS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define PROC_CHECK_BOUNDS</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em></td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a1598d76ed15988956afa5934a099f1e0">FOR_EACH</a>(<a class="el" href="type_8h.html#ad7b7e783252b39ae9541ce998efe27fa">UNWRAP_BOUNDS</a>, (), __VA_ARGS__)</td>
+          <td class="paramname">type</td><td>)</td>
+          <td>&#160;&#160;&#160;(type, <a class="el" href="macro__utils_8h.html#ac2c0beae88659357798c2fddb38a6518">CAT</a>(name_, __COUNTER__))</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -567,6 +549,34 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="afef1b27c11d7ff5e1802f0d5526e8ba0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afef1b27c11d7ff5e1802f0d5526e8ba0">&#9670;&nbsp;</a></span>PROC_IMPL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_IMPL</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;	<a class="el" href="macro__utils_8h.html#a1598d76ed15988956afa5934a099f1e0">FOR_EACH</a>(<a class="el" href="type_8h.html#a00634fae8500cf51edc2f495e6160071">PROC_TRAIT_STATEMENT</a>, name, (), __VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ada597c7e84f76fb56c9c4d72599db443"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ada597c7e84f76fb56c9c4d72599db443">&#9670;&nbsp;</a></span>PROC_PARAMS</h2>
 
@@ -585,8 +595,234 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a5fb8c83cf9194e2974df4b1ef5c180d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fb8c83cf9194e2974df4b1ef5c180d4">&#9670;&nbsp;</a></span>Required</h2>
+<a id="ab9e1e65f1386259555df02a2039933e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9e1e65f1386259555df02a2039933e0">&#9670;&nbsp;</a></span>PROC_TRAIT_IMPL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_TRAIT_IMPL</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">arg, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a34d39cb2a8cd30c117b9971a131c33fe">PROC_TRAIT_IMPL_FN</a> x</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a34d39cb2a8cd30c117b9971a131c33fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a34d39cb2a8cd30c117b9971a131c33fe">&#9670;&nbsp;</a></span>PROC_TRAIT_IMPL_FN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_TRAIT_IMPL_FN</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">mutability, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">return_type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">static</span> return_type name(mutability() <a class="code" href="structObject.html">Object</a> *<span class="keyword">self</span> __VA_OPT__(, )       \</div>
+<div class="line">                    __VA_OPT__(<a class="code" href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a>(__VA_ARGS__))) { \</div>
+<div class="line">        return_type (*impl)(__VA_OPT__(<a class="code" href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a>(__VA_ARGS__))) = \</div>
+<div class="line">            <a class="code" href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a>(<span class="keyword">self</span>, #name);                                      \</div>
+<div class="line">        if (!impl)                                                     \</div>
+<div class="line">            panic(<span class="stringliteral">&quot;Runtime error: Trait bound violation! &quot;</span>         \</div>
+<div class="line">                  <span class="stringliteral">&quot;Type &quot;</span>                                          \</div>
+<div class="line">                  <span class="stringliteral">&quot;&#39;%s&#39; does &quot;</span>                                     \</div>
+<div class="line">                  <span class="stringliteral">&quot;not implement the &quot;</span>                             \</div>
+<div class="line">                  <span class="stringliteral">&quot;required function [%s]&quot;</span>,                        \</div>
+<div class="line">                  <a class="code" href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a>((*<span class="keyword">self</span>)), #name);                       \</div>
+<div class="line">        SelfCleanup sc = {<a class="code" href="type_8h.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a>,                   \</div>
+<div class="line">                  __thread_local_self_Var};                    \</div>
+<div class="line">        __thread_local_self_Const = <span class="keyword">self</span>;                              \</div>
+<div class="line">        __thread_local_self_Var = NULL;                                \</div>
+<div class="line">        __thread_local_self_##mutability = <span class="keyword">self</span>;                       \</div>
+<div class="line">        return impl(__VA_OPT__(<a class="code" href="type_8h.html#ae7033995114ec95e0e30960025176d46">PROCESS_FN_CALL</a>(__VA_ARGS__)));         \</div>
+<div class="line">    }</div>
+<div class="ttc" id="astructObject_html"><div class="ttname"><a href="structObject.html">Object</a></div><div class="ttdef"><b>Definition:</b> type.h:38</div></div>
+<div class="ttc" id="atype_8h_html_a2b4d2a863926a7886419d0e53aa465a0"><div class="ttname"><a href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a></div><div class="ttdeci">void * find_fn(const Object *obj, const char *name)</div><div class="ttdef"><b>Definition:</b> type.c:66</div></div>
+<div class="ttc" id="atype_8h_html_a7807ba2c750e8fd2ad770bdde7b0a601"><div class="ttname"><a href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a></div><div class="ttdeci">#define PROCESS_FN_SIG(...)</div><div class="ttdef"><b>Definition:</b> type.h:129</div></div>
+<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:70</div></div>
+<div class="ttc" id="atype_8h_html_ae7033995114ec95e0e30960025176d46"><div class="ttname"><a href="type_8h.html#ae7033995114ec95e0e30960025176d46">PROCESS_FN_CALL</a></div><div class="ttdeci">#define PROCESS_FN_CALL(...)</div><div class="ttdef"><b>Definition:</b> type.h:126</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a00634fae8500cf51edc2f495e6160071"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00634fae8500cf51edc2f495e6160071">&#9670;&nbsp;</a></span>PROC_TRAIT_STATEMENT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_TRAIT_STATEMENT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">arg, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;	<a class="el" href="type_8h.html#a77f8b9ce5ca6dbfcff7e935fb2efff5f">PROC_TRAIT_STATEMENT_IMPL</a>(arg, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> x)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a77f8b9ce5ca6dbfcff7e935fb2efff5f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77f8b9ce5ca6dbfcff7e935fb2efff5f">&#9670;&nbsp;</a></span>PROC_TRAIT_STATEMENT_IMPL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_TRAIT_STATEMENT_IMPL</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;	<a class="el" href="type_8h.html#a0e298c733c77f31714bb72b4deacdd82">PROC_TRAIT_STATEMENT_IMPL_EXP</a>(__VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0e298c733c77f31714bb72b4deacdd82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e298c733c77f31714bb72b4deacdd82">&#9670;&nbsp;</a></span>PROC_TRAIT_STATEMENT_IMPL_EXP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_TRAIT_STATEMENT_IMPL_EXP</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">impl_type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">mutability, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">return_type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fn_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    return_type impl_type##_##fn_name(                                     \</div>
+<div class="line">        __VA_OPT__(<a class="code" href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a>(__VA_ARGS__)));                          \</div>
+<div class="line">    static <span class="keywordtype">void</span> __attribute__((constructor))                               \</div>
+<div class="line">    __required_add__##impl_type##_##fn_name() {                            \</div>
+<div class="line">        VtableEntry next = {#fn_name, impl_type##_##fn_name};          \</div>
+<div class="line">        vtable_add_entry(&amp;impl_type##_Vtable__, next);                 \</div>
+<div class="line">    }</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ae7033995114ec95e0e30960025176d46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7033995114ec95e0e30960025176d46">&#9670;&nbsp;</a></span>PROCESS_FN_CALL</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROCESS_FN_CALL</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;	<a class="el" href="macro__utils__inner_8h.html#a8669041a489d613be9ad24b0a822a048">FOR_EACH_INNER</a>(<a class="el" href="type_8h.html#ac66bad82b4222b29f5b45b3e98654269">CALL_SECOND</a>, none, (, ), __VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7807ba2c750e8fd2ad770bdde7b0a601"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7807ba2c750e8fd2ad770bdde7b0a601">&#9670;&nbsp;</a></span>PROCESS_FN_SIG</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROCESS_FN_SIG</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="macro__utils__inner_8h.html#a8669041a489d613be9ad24b0a822a048">FOR_EACH_INNER</a>(<a class="el" href="type_8h.html#aa5aea6a4109216c23143fdb0248d2fde">CALL_BOTH</a>, none, (, ), __VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4edfee2ef9567a47b388682adaaec1db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4edfee2ef9567a47b388682adaaec1db">&#9670;&nbsp;</a></span>Required</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -595,13 +831,31 @@ Variables</h2></td></tr>
           <td class="memname">#define Required</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;(__VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adfcc430e1f4e479cf95b82e27c5f930d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfcc430e1f4e479cf95b82e27c5f930d">&#9670;&nbsp;</a></span>RequiredOld</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RequiredOld</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
           <td class="paramname">T, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">is_mut, </td>
+          <td class="paramname">is_var, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -634,62 +888,64 @@ Variables</h2></td></tr>
 <div class="line">        VtableEntry next = {#name, T##_##name};                        \</div>
 <div class="line">        vtable_add_entry(&amp;T##_Vtable__, next);                         \</div>
 <div class="line">    }</div>
-<div class="ttc" id="amacro__utils_8h_html_a5307ca4974fe561cba18d9657f6b103c"><div class="ttname"><a href="macro__utils_8h.html#a5307ca4974fe561cba18d9657f6b103c">UNIQUE_ID</a></div><div class="ttdeci">#define UNIQUE_ID</div><div class="ttdef"><b>Definition:</b> macro_utils.h:15</div></div>
-<div class="ttc" id="atype_8h_html_aee34c5dde9a30bc84c57fdb6c32afe42"><div class="ttname"><a href="type_8h.html#aee34c5dde9a30bc84c57fdb6c32afe42">PROC_FN_SIGNATURE</a></div><div class="ttdeci">#define PROC_FN_SIGNATURE(...)</div><div class="ttdef"><b>Definition:</b> type.h:101</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a5307ca4974fe561cba18d9657f6b103c"><div class="ttname"><a href="macro__utils_8h.html#a5307ca4974fe561cba18d9657f6b103c">UNIQUE_ID</a></div><div class="ttdeci">#define UNIQUE_ID</div><div class="ttdef"><b>Definition:</b> macro_utils.h:17</div></div>
+<div class="ttc" id="atype_8h_html_aee34c5dde9a30bc84c57fdb6c32afe42"><div class="ttname"><a href="type_8h.html#aee34c5dde9a30bc84c57fdb6c32afe42">PROC_FN_SIGNATURE</a></div><div class="ttdeci">#define PROC_FN_SIGNATURE(...)</div><div class="ttdef"><b>Definition:</b> type.h:109</div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a200a24c704b8e92c43c1f87650ec8aba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a200a24c704b8e92c43c1f87650ec8aba">&#9670;&nbsp;</a></span>STRUCT_PARAM</h2>
+<a id="ae0bd899b6febf24ca768f2a88bd30c67"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0bd899b6febf24ca768f2a88bd30c67">&#9670;&nbsp;</a></span>SelfCleanup</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define STRUCT_PARAM</td>
+          <td class="memname">#define SelfCleanup</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="structSelfCleanupImpl.html">SelfCleanupImpl</a> __attribute__((warn_unused_result,                     \</div>
+<div class="line">                       cleanup(<a class="code" href="type_8h.html#a54b12fa3f9a7f03b6fd6898eba6d6382">SelfCleanupImpl_update</a>)))</div>
+<div class="ttc" id="astructSelfCleanupImpl_html"><div class="ttname"><a href="structSelfCleanupImpl.html">SelfCleanupImpl</a></div><div class="ttdef"><b>Definition:</b> type.h:45</div></div>
+<div class="ttc" id="atype_8h_html_a54b12fa3f9a7f03b6fd6898eba6d6382"><div class="ttname"><a href="type_8h.html#a54b12fa3f9a7f03b6fd6898eba6d6382">SelfCleanupImpl_update</a></div><div class="ttdeci">void SelfCleanupImpl_update(SelfCleanupImpl *sc)</div><div class="ttdef"><b>Definition:</b> type.c:84</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="abca5f6ccf1375a60458378849f687dc4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abca5f6ccf1375a60458378849f687dc4">&#9670;&nbsp;</a></span>SET_OFFSET_OF</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SET_OFFSET_OF</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">ignore, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">x&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a699feff54e3c87657391e9334ab507dd">BOTH</a> x</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a3432cb7af49dcfcffecc0635afb7be87">SET_OFFSET_OF_IMPL</a>(__VA_ARGS__)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="adcd79e9d21fcf8fc8d98296bb8859b47"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adcd79e9d21fcf8fc8d98296bb8859b47">&#9670;&nbsp;</a></span>TraitImpl</h2>
+<a id="a3432cb7af49dcfcffecc0635afb7be87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3432cb7af49dcfcffecc0635afb7be87">&#9670;&nbsp;</a></span>SET_OFFSET_OF_IMPL</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define TraitImpl</td>
+          <td class="memname">#define SET_OFFSET_OF_IMPL</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">trait, </td>
+          <td class="paramname">ptr, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">is_mut, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">return_type, </td>
+          <td class="paramname">structure, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -701,7 +957,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em>&#160;</td>
+          <td class="paramname">value&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -710,26 +966,55 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">static</span> return_type name(is_mut() <a class="code" href="structObject.html">Object</a> *<span class="keyword">self</span> __VA_OPT__(, )           \</div>
-<div class="line">                    <a class="code" href="type_8h.html#aee34c5dde9a30bc84c57fdb6c32afe42">PROC_FN_SIGNATURE</a>(__VA_ARGS__)) {          \</div>
-<div class="line">        return_type (*impl)(<a class="code" href="type_8h.html#aee34c5dde9a30bc84c57fdb6c32afe42">PROC_FN_SIGNATURE</a>(__VA_ARGS__)) =          \</div>
-<div class="line">            <a class="code" href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a>(<span class="keyword">self</span>, #name);                                      \</div>
-<div class="line">        if (!impl)                                                     \</div>
-<div class="line">            panic(<span class="stringliteral">&quot;Runtime error: Trait bound violation! Type &quot;</span>    \</div>
-<div class="line">                  <span class="stringliteral">&quot;&#39;%s&#39; does &quot;</span>                                     \</div>
-<div class="line">                  <span class="stringliteral">&quot;not implement the &quot;</span>                             \</div>
-<div class="line">                  <span class="stringliteral">&quot;required function [%s]&quot;</span>,                        \</div>
-<div class="line">                  <a class="code" href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a>((*<span class="keyword">self</span>)));                              \</div>
-<div class="line">        __thread_local_self_Const = NULL;                              \</div>
-<div class="line">        __thread_local_self_Mut = NULL;                                \</div>
-<div class="line">        __thread_local_self_##is_mut = <span class="keyword">self</span>;                           \</div>
-<div class="line">        return impl(<a class="code" href="type_8h.html#ada597c7e84f76fb56c9c4d72599db443">PROC_PARAMS</a>(__VA_ARGS__));                         \</div>
-<div class="line">    }</div>
-<div class="ttc" id="astructObject_html"><div class="ttname"><a href="structObject.html">Object</a></div><div class="ttdef"><b>Definition:</b> type.h:37</div></div>
-<div class="ttc" id="atype_8h_html_a2b4d2a863926a7886419d0e53aa465a0"><div class="ttname"><a href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a></div><div class="ttdeci">void * find_fn(const Object *obj, const char *name)</div><div class="ttdef"><b>Definition:</b> type.c:66</div></div>
-<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:57</div></div>
-<div class="ttc" id="atype_8h_html_ada597c7e84f76fb56c9c4d72599db443"><div class="ttname"><a href="type_8h.html#ada597c7e84f76fb56c9c4d72599db443">PROC_PARAMS</a></div><div class="ttdeci">#define PROC_PARAMS(...)</div><div class="ttdef"><b>Definition:</b> type.h:103</div></div>
+<b>Value:</b><div class="fragment"><div class="line">    *((typeof(((structure *)0)-&gt;name) *)(ptr + offsetof(structure,         \</div>
+<div class="line">                                name))) = value;</div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a59184228fa29efbc3df1901ae6da28a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a59184228fa29efbc3df1901ae6da28a2">&#9670;&nbsp;</a></span>SET_PARAM</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SET_PARAM</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ptr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#abca5f6ccf1375a60458378849f687dc4">SET_OFFSET_OF</a>(<a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> ptr, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> value)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afe043c11eed280ffd272cb31e58bace4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe043c11eed280ffd272cb31e58bace4">&#9670;&nbsp;</a></span>TraitImpl</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TraitImpl</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">trait</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a1598d76ed15988956afa5934a099f1e0">FOR_EACH</a>(<a class="el" href="type_8h.html#ab9e1e65f1386259555df02a2039933e0">PROC_TRAIT_IMPL</a>, none, (), trait)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
 </div>
 </div>
 <a id="a9d94417e304d0cd9c2a88b4a10ba0645"></a>
@@ -761,7 +1046,7 @@ Variables</h2></td></tr>
 <div class="line">    static <a class="code" href="structVtable.html">Vtable</a> name##_Vtable__ = {#name, 0, NULL};                      \</div>
 <div class="line">    u64 name##_size();                                                     \</div>
 <div class="line">    typedef <span class="keyword">struct </span>name {                                                  \</div>
-<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a200a24c704b8e92c43c1f87650ec8aba">STRUCT_PARAM</a>, , (;), __VA_ARGS__);                    \</div>
+<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#aa5aea6a4109216c23143fdb0248d2fde">CALL_BOTH</a>, , (;), __VA_ARGS__);                       \</div>
 <div class="line">    } name;                                                                \</div>
 <div class="line">    u64 name##_size() { <span class="keywordflow">return</span> <span class="keyword">sizeof</span>(name); }                             \</div>
 <div class="line">    static <span class="keywordtype">void</span> __attribute__((constructor))                               \</div>
@@ -769,8 +1054,8 @@ Variables</h2></td></tr>
 <div class="line">        VtableEntry size = {<span class="stringliteral">&quot;size&quot;</span>, name##_size};                      \</div>
 <div class="line">        vtable_add_entry(&amp;name##_Vtable__, size);                      \</div>
 <div class="line">    }</div>
-<div class="ttc" id="astructVtable_html"><div class="ttname"><a href="structVtable.html">Vtable</a></div><div class="ttdef"><b>Definition:</b> type.h:31</div></div>
-<div class="ttc" id="atype_8h_html_a200a24c704b8e92c43c1f87650ec8aba"><div class="ttname"><a href="type_8h.html#a200a24c704b8e92c43c1f87650ec8aba">STRUCT_PARAM</a></div><div class="ttdeci">#define STRUCT_PARAM(ignore, x)</div><div class="ttdef"><b>Definition:</b> type.h:68</div></div>
+<div class="ttc" id="astructVtable_html"><div class="ttname"><a href="structVtable.html">Vtable</a></div><div class="ttdef"><b>Definition:</b> type.h:32</div></div>
+<div class="ttc" id="atype_8h_html_aa5aea6a4109216c23143fdb0248d2fde"><div class="ttname"><a href="type_8h.html#aa5aea6a4109216c23143fdb0248d2fde">CALL_BOTH</a></div><div class="ttdeci">#define CALL_BOTH(x, y)</div><div class="ttdef"><b>Definition:</b> type.h:80</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -786,24 +1071,6 @@ Variables</h2></td></tr>
           <td class="paramtype">&#160;</td>
           <td class="paramname">obj</td><td>)</td>
           <td>&#160;&#160;&#160;obj.vtable-&gt;name</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad7b7e783252b39ae9541ce998efe27fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad7b7e783252b39ae9541ce998efe27fa">&#9670;&nbsp;</a></span>UNWRAP_BOUNDS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define UNWRAP_BOUNDS</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">type_name</td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a6985f9d619760c8d37fe6bb5adf22732">EXTRACT_BOUNDS</a> type_name</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -880,6 +1147,41 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a3521b7722e358f98597043439741612c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3521b7722e358f98597043439741612c">&#9670;&nbsp;</a></span>Var <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Var</td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acd831f9adf1ae76bd8d014861c913ee4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd831f9adf1ae76bd8d014861c913ee4">&#9670;&nbsp;</a></span>Var <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Var</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a></td><td>)</td>
+          <td>&#160;&#160;&#160;((<a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a> *)<a class="el" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a>-&gt;ptr.data)-&gt;<a class="el" href="type_8h.html#a68a4c50df206bdbb0d9c9fec249d19b1">field_name</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a08db27966d6cfc7a7b73d601e702fd16"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a08db27966d6cfc7a7b73d601e702fd16">&#9670;&nbsp;</a></span>VDATA_FLAGS_NO_CLEANUP</h2>
 
@@ -915,7 +1217,7 @@ Variables</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;.x = y</td>
+          <td></td><td>&#160;&#160;&#160;(x, y)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -931,6 +1233,20 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">typedef struct <a class="el" href="structObject.html">Object</a> <a class="el" href="structObject.html">Object</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5796fa21fb1fe0f979f17051f4eb3e61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5796fa21fb1fe0f979f17051f4eb3e61">&#9670;&nbsp;</a></span>SelfCleanupImpl</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structSelfCleanupImpl.html">SelfCleanupImpl</a> <a class="el" href="structSelfCleanupImpl.html">SelfCleanupImpl</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -984,6 +1300,24 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="af6925c79571998ccf40ed3f5d8388443"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6925c79571998ccf40ed3f5d8388443">&#9670;&nbsp;</a></span>Object_build()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Object_build </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structObject.html">Object</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aa73f18beaa4379c17baf05a138d68dd2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa73f18beaa4379c17baf05a138d68dd2">&#9670;&nbsp;</a></span>Object_cleanup()</h2>
 
@@ -995,6 +1329,24 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structObject.html">Object</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a54b12fa3f9a7f03b6fd6898eba6d6382"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54b12fa3f9a7f03b6fd6898eba6d6382">&#9670;&nbsp;</a></span>SelfCleanupImpl_update()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SelfCleanupImpl_update </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structSelfCleanupImpl.html">SelfCleanupImpl</a> *&#160;</td>
+          <td class="paramname"><em>sc</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -1088,8 +1440,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ad128f0064c5bec87c79d02e93404434d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad128f0064c5bec87c79d02e93404434d">&#9670;&nbsp;</a></span>__thread_local_self_Mut</h2>
+<a id="aaf2cf0b8691ef9ea3833ec39bc0626f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf2cf0b8691ef9ea3833ec39bc0626f9">&#9670;&nbsp;</a></span>__thread_local_self_Var</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1098,7 +1450,7 @@ Variables</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">_Thread_local <a class="el" href="structObject.html">Object</a>* __thread_local_self_Mut</td>
+          <td class="memname">_Thread_local <a class="el" href="structObject.html">Object</a>* __thread_local_self_Var</td>
         </tr>
       </table>
   </td>

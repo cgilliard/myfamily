@@ -72,7 +72,8 @@ $(function() {
 <div class="title">macro_utils.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
+<div class="textblock"><code>#include &lt;<a class="el" href="macro__utils__inner_8h_source.html">core/macro_utils_inner.h</a>&gt;</code><br />
+</div>
 <p><a href="macro__utils_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -89,8 +90,12 @@ Macros</h2></td></tr>
 <tr class="separator:a5cc8b4a50caacab5cbfb24c7e9e44431"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2c0beae88659357798c2fddb38a6518"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macro__utils_8h.html#ac2c0beae88659357798c2fddb38a6518">CAT</a>(x,  y)&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a5cc8b4a50caacab5cbfb24c7e9e44431">CATI</a>(x, y)</td></tr>
 <tr class="separator:ac2c0beae88659357798c2fddb38a6518"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fd8db0ff0a0f357e7347ad233843085"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macro__utils_8h.html#a0fd8db0ff0a0f357e7347ad233843085">COUNT_ARGS</a>(value)&#160;&#160;&#160;({ __counter___ += 1; })</td></tr>
-<tr class="separator:a0fd8db0ff0a0f357e7347ad233843085"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83420260ae1d2a06201582dd1c4ce0a5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macro__utils_8h.html#a83420260ae1d2a06201582dd1c4ce0a5">FIRST</a>(x,  y)&#160;&#160;&#160;x</td></tr>
+<tr class="separator:a83420260ae1d2a06201582dd1c4ce0a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8cf792fb70b4f3de790edeb87b0665a3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macro__utils_8h.html#a8cf792fb70b4f3de790edeb87b0665a3">SECOND</a>(x,  y)&#160;&#160;&#160;y</td></tr>
+<tr class="separator:a8cf792fb70b4f3de790edeb87b0665a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a699feff54e3c87657391e9334ab507dd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macro__utils_8h.html#a699feff54e3c87657391e9334ab507dd">BOTH</a>(x,  y)&#160;&#160;&#160;x y</td></tr>
+<tr class="separator:a699feff54e3c87657391e9334ab507dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8093cf142de43413a3649101cf95152c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macro__utils_8h.html#a8093cf142de43413a3649101cf95152c">loop</a>&#160;&#160;&#160;while (true)</td></tr>
 <tr class="separator:a8093cf142de43413a3649101cf95152c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada4b36d9cfc6889fa58b77c44757b3ed"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macro__utils_8h.html#ada4b36d9cfc6889fa58b77c44757b3ed">GET_MACRO</a>(_1,  _2,  _3,  _4,  _5,  _6,  _7,  _8,  _9,  _10,  NAME, ...)&#160;&#160;&#160;NAME</td></tr>
@@ -119,6 +124,34 @@ Macros</h2></td></tr>
 <tr class="separator:a4370033b4c52138e614f30302d440729"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a699feff54e3c87657391e9334ab507dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a699feff54e3c87657391e9334ab507dd">&#9670;&nbsp;</a></span>BOTH</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BOTH</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">y&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;x y</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ac2c0beae88659357798c2fddb38a6518"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac2c0beae88659357798c2fddb38a6518">&#9670;&nbsp;</a></span>CAT</h2>
 
@@ -175,24 +208,6 @@ Macros</h2></td></tr>
 
 </div>
 </div>
-<a id="a0fd8db0ff0a0f357e7347ad233843085"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0fd8db0ff0a0f357e7347ad233843085">&#9670;&nbsp;</a></span>COUNT_ARGS</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define COUNT_ARGS</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">value</td><td>)</td>
-          <td>&#160;&#160;&#160;({ __counter___ += 1; })</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="ae4b532a93c757194ec73b6790a3e6b1f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae4b532a93c757194ec73b6790a3e6b1f">&#9670;&nbsp;</a></span>EXPAND</h2>
 
@@ -223,6 +238,34 @@ Macros</h2></td></tr>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>...</em></td><td>)</td>
           <td>&#160;&#160;&#160;__VA_ARGS__</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a83420260ae1d2a06201582dd1c4ce0a5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83420260ae1d2a06201582dd1c4ce0a5">&#9670;&nbsp;</a></span>FIRST</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FIRST</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">y&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;x</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -270,18 +313,18 @@ Macros</h2></td></tr>
 <div class="line">        __VA_ARGS__, <a class="code" href="macro__utils_8h.html#a4370033b4c52138e614f30302d440729">FOR_EACH_10</a>, <a class="code" href="macro__utils_8h.html#a32b484ef63390686f4476867300175de">FOR_EACH_9</a>, <a class="code" href="macro__utils_8h.html#a19b9c2b96aee06b03523f81343d1b599">FOR_EACH_8</a>, <a class="code" href="macro__utils_8h.html#a61bc3064dae800f0be145936617678bc">FOR_EACH_7</a>,      \</div>
 <div class="line">        <a class="code" href="macro__utils_8h.html#ad7b864e10d33a6cc65eb8fea6ad6ebb0">FOR_EACH_6</a>, <a class="code" href="macro__utils_8h.html#abdfb8735ed38f765eb07dea54e472fee">FOR_EACH_5</a>, <a class="code" href="macro__utils_8h.html#a59c4948fe6312fd1447c263a4e4e7fd4">FOR_EACH_4</a>, <a class="code" href="macro__utils_8h.html#ae816991fde908fcb31db97b71be076eb">FOR_EACH_3</a>, <a class="code" href="macro__utils_8h.html#adc7c6db11e8a7c41c4f3978a8e44560f">FOR_EACH_2</a>,        \</div>
 <div class="line">        <a class="code" href="macro__utils_8h.html#a6c1f08d320203dbb6305815a60e89b91">FOR_EACH_1</a>)(action, arg, delim, __VA_ARGS__)))</div>
-<div class="ttc" id="amacro__utils_8h_html_a19b9c2b96aee06b03523f81343d1b599"><div class="ttname"><a href="macro__utils_8h.html#a19b9c2b96aee06b03523f81343d1b599">FOR_EACH_8</a></div><div class="ttdeci">#define FOR_EACH_8(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:61</div></div>
-<div class="ttc" id="amacro__utils_8h_html_a32b484ef63390686f4476867300175de"><div class="ttname"><a href="macro__utils_8h.html#a32b484ef63390686f4476867300175de">FOR_EACH_9</a></div><div class="ttdeci">#define FOR_EACH_9(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7, v8)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:69</div></div>
-<div class="ttc" id="amacro__utils_8h_html_a4370033b4c52138e614f30302d440729"><div class="ttname"><a href="macro__utils_8h.html#a4370033b4c52138e614f30302d440729">FOR_EACH_10</a></div><div class="ttdeci">#define FOR_EACH_10(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:78</div></div>
-<div class="ttc" id="amacro__utils_8h_html_a59c4948fe6312fd1447c263a4e4e7fd4"><div class="ttname"><a href="macro__utils_8h.html#a59c4948fe6312fd1447c263a4e4e7fd4">FOR_EACH_4</a></div><div class="ttdeci">#define FOR_EACH_4(action, arg, delim, v0, v1, v2, v3)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:39</div></div>
-<div class="ttc" id="amacro__utils_8h_html_a61bc3064dae800f0be145936617678bc"><div class="ttname"><a href="macro__utils_8h.html#a61bc3064dae800f0be145936617678bc">FOR_EACH_7</a></div><div class="ttdeci">#define FOR_EACH_7(action, arg, delim, v0, v1, v2, v3, v4, v5, v6)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:54</div></div>
-<div class="ttc" id="amacro__utils_8h_html_a6c1f08d320203dbb6305815a60e89b91"><div class="ttname"><a href="macro__utils_8h.html#a6c1f08d320203dbb6305815a60e89b91">FOR_EACH_1</a></div><div class="ttdeci">#define FOR_EACH_1(action, arg, delim, v0)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:33</div></div>
-<div class="ttc" id="amacro__utils_8h_html_abdfb8735ed38f765eb07dea54e472fee"><div class="ttname"><a href="macro__utils_8h.html#abdfb8735ed38f765eb07dea54e472fee">FOR_EACH_5</a></div><div class="ttdeci">#define FOR_EACH_5(action, arg, delim, v0, v1, v2, v3, v4)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:43</div></div>
-<div class="ttc" id="amacro__utils_8h_html_ad7b864e10d33a6cc65eb8fea6ad6ebb0"><div class="ttname"><a href="macro__utils_8h.html#ad7b864e10d33a6cc65eb8fea6ad6ebb0">FOR_EACH_6</a></div><div class="ttdeci">#define FOR_EACH_6(action, arg, delim, v0, v1, v2, v3, v4, v5)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:48</div></div>
-<div class="ttc" id="amacro__utils_8h_html_ada4b36d9cfc6889fa58b77c44757b3ed"><div class="ttname"><a href="macro__utils_8h.html#ada4b36d9cfc6889fa58b77c44757b3ed">GET_MACRO</a></div><div class="ttdeci">#define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:25</div></div>
-<div class="ttc" id="amacro__utils_8h_html_adc7c6db11e8a7c41c4f3978a8e44560f"><div class="ttname"><a href="macro__utils_8h.html#adc7c6db11e8a7c41c4f3978a8e44560f">FOR_EACH_2</a></div><div class="ttdeci">#define FOR_EACH_2(action, arg, delim, v0, v1)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:34</div></div>
-<div class="ttc" id="amacro__utils_8h_html_ae4b532a93c757194ec73b6790a3e6b1f"><div class="ttname"><a href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a></div><div class="ttdeci">#define EXPAND(x)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:17</div></div>
-<div class="ttc" id="amacro__utils_8h_html_ae816991fde908fcb31db97b71be076eb"><div class="ttname"><a href="macro__utils_8h.html#ae816991fde908fcb31db97b71be076eb">FOR_EACH_3</a></div><div class="ttdeci">#define FOR_EACH_3(action, arg, delim, v0, v1, v2)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:36</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a19b9c2b96aee06b03523f81343d1b599"><div class="ttname"><a href="macro__utils_8h.html#a19b9c2b96aee06b03523f81343d1b599">FOR_EACH_8</a></div><div class="ttdeci">#define FOR_EACH_8(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:66</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a32b484ef63390686f4476867300175de"><div class="ttname"><a href="macro__utils_8h.html#a32b484ef63390686f4476867300175de">FOR_EACH_9</a></div><div class="ttdeci">#define FOR_EACH_9(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7, v8)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:74</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a4370033b4c52138e614f30302d440729"><div class="ttname"><a href="macro__utils_8h.html#a4370033b4c52138e614f30302d440729">FOR_EACH_10</a></div><div class="ttdeci">#define FOR_EACH_10(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7, v8, v9)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:83</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a59c4948fe6312fd1447c263a4e4e7fd4"><div class="ttname"><a href="macro__utils_8h.html#a59c4948fe6312fd1447c263a4e4e7fd4">FOR_EACH_4</a></div><div class="ttdeci">#define FOR_EACH_4(action, arg, delim, v0, v1, v2, v3)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:44</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a61bc3064dae800f0be145936617678bc"><div class="ttname"><a href="macro__utils_8h.html#a61bc3064dae800f0be145936617678bc">FOR_EACH_7</a></div><div class="ttdeci">#define FOR_EACH_7(action, arg, delim, v0, v1, v2, v3, v4, v5, v6)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:59</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a6c1f08d320203dbb6305815a60e89b91"><div class="ttname"><a href="macro__utils_8h.html#a6c1f08d320203dbb6305815a60e89b91">FOR_EACH_1</a></div><div class="ttdeci">#define FOR_EACH_1(action, arg, delim, v0)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:38</div></div>
+<div class="ttc" id="amacro__utils_8h_html_abdfb8735ed38f765eb07dea54e472fee"><div class="ttname"><a href="macro__utils_8h.html#abdfb8735ed38f765eb07dea54e472fee">FOR_EACH_5</a></div><div class="ttdeci">#define FOR_EACH_5(action, arg, delim, v0, v1, v2, v3, v4)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:48</div></div>
+<div class="ttc" id="amacro__utils_8h_html_ad7b864e10d33a6cc65eb8fea6ad6ebb0"><div class="ttname"><a href="macro__utils_8h.html#ad7b864e10d33a6cc65eb8fea6ad6ebb0">FOR_EACH_6</a></div><div class="ttdeci">#define FOR_EACH_6(action, arg, delim, v0, v1, v2, v3, v4, v5)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:53</div></div>
+<div class="ttc" id="amacro__utils_8h_html_ada4b36d9cfc6889fa58b77c44757b3ed"><div class="ttname"><a href="macro__utils_8h.html#ada4b36d9cfc6889fa58b77c44757b3ed">GET_MACRO</a></div><div class="ttdeci">#define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:30</div></div>
+<div class="ttc" id="amacro__utils_8h_html_adc7c6db11e8a7c41c4f3978a8e44560f"><div class="ttname"><a href="macro__utils_8h.html#adc7c6db11e8a7c41c4f3978a8e44560f">FOR_EACH_2</a></div><div class="ttdeci">#define FOR_EACH_2(action, arg, delim, v0, v1)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:39</div></div>
+<div class="ttc" id="amacro__utils_8h_html_ae4b532a93c757194ec73b6790a3e6b1f"><div class="ttname"><a href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a></div><div class="ttdeci">#define EXPAND(x)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:19</div></div>
+<div class="ttc" id="amacro__utils_8h_html_ae816991fde908fcb31db97b71be076eb"><div class="ttname"><a href="macro__utils_8h.html#ae816991fde908fcb31db97b71be076eb">FOR_EACH_3</a></div><div class="ttdeci">#define FOR_EACH_3(action, arg, delim, v0, v1, v2)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:41</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -425,7 +468,7 @@ Macros</h2></td></tr>
 <div class="line">    EXPAND_ALL delim action(arg, v7)                                       \</div>
 <div class="line">    EXPAND_ALL delim action(arg, v8)                                       \</div>
 <div class="line">    EXPAND_ALL delim action(arg, v9)</div>
-<div class="ttc" id="amacro__utils_8h_html_a800c6a1a2abcb460825c03b17f67ec29"><div class="ttname"><a href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a></div><div class="ttdeci">#define EXPAND_ALL(...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:18</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a800c6a1a2abcb460825c03b17f67ec29"><div class="ttname"><a href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a></div><div class="ttdeci">#define EXPAND_ALL(...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:20</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1096,6 +1139,34 @@ Macros</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define loop&#160;&#160;&#160;while (true)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8cf792fb70b4f3de790edeb87b0665a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8cf792fb70b4f3de790edeb87b0665a3">&#9670;&nbsp;</a></span>SECOND</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SECOND</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">y&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;y</td>
         </tr>
       </table>
 </div><div class="memdoc">

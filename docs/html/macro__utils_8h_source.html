@@ -84,80 +84,86 @@ $(function() {
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// See the License for the specific language governing permissions and</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// limitations under the License.</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a5307ca4974fe561cba18d9657f6b103c">   15</a></span>&#160;<span class="preprocessor">#define UNIQUE_ID __COUNTER__</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7">   16</a></span>&#160;<span class="preprocessor">#define STRINGIFY(x) #x</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">   17</a></span>&#160;<span class="preprocessor">#define EXPAND(x) x</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">   18</a></span>&#160;<span class="preprocessor">#define EXPAND_ALL(...) __VA_ARGS__</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a5cc8b4a50caacab5cbfb24c7e9e44431">   19</a></span>&#160;<span class="preprocessor">#define CATI(x, y) x##y</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ac2c0beae88659357798c2fddb38a6518">   20</a></span>&#160;<span class="preprocessor">#define CAT(x, y) CATI(x, y)</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a0fd8db0ff0a0f357e7347ad233843085">   22</a></span>&#160;<span class="preprocessor">#define COUNT_ARGS(value) ({ __counter___ += 1; })</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a8093cf142de43413a3649101cf95152c">   23</a></span>&#160;<span class="preprocessor">#define loop while (true)</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ada4b36d9cfc6889fa58b77c44757b3ed">   25</a></span>&#160;<span class="preprocessor">#define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...) NAME</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a1598d76ed15988956afa5934a099f1e0">   27</a></span>&#160;<span class="preprocessor">#define FOR_EACH(action, arg, delim, ...)                                      \</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">    __VA_OPT__(EXPAND(GET_MACRO(                                           \</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">        __VA_ARGS__, FOR_EACH_10, FOR_EACH_9, FOR_EACH_8, FOR_EACH_7,      \</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">        FOR_EACH_6, FOR_EACH_5, FOR_EACH_4, FOR_EACH_3, FOR_EACH_2,        \</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">        FOR_EACH_1)(action, arg, delim, __VA_ARGS__)))</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a6c1f08d320203dbb6305815a60e89b91">   33</a></span>&#160;<span class="preprocessor">#define FOR_EACH_1(action, arg, delim, v0) action(arg, v0)</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#adc7c6db11e8a7c41c4f3978a8e44560f">   34</a></span>&#160;<span class="preprocessor">#define FOR_EACH_2(action, arg, delim, v0, v1)                                 \</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ae816991fde908fcb31db97b71be076eb">   36</a></span>&#160;<span class="preprocessor">#define FOR_EACH_3(action, arg, delim, v0, v1, v2)                             \</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a59c4948fe6312fd1447c263a4e4e7fd4">   39</a></span>&#160;<span class="preprocessor">#define FOR_EACH_4(action, arg, delim, v0, v1, v2, v3)                         \</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#abdfb8735ed38f765eb07dea54e472fee">   43</a></span>&#160;<span class="preprocessor">#define FOR_EACH_5(action, arg, delim, v0, v1, v2, v3, v4)                     \</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ad7b864e10d33a6cc65eb8fea6ad6ebb0">   48</a></span>&#160;<span class="preprocessor">#define FOR_EACH_6(action, arg, delim, v0, v1, v2, v3, v4, v5)                 \</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="macro__utils__inner_8h.html">core/macro_utils_inner.h</a>&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a5307ca4974fe561cba18d9657f6b103c">   17</a></span>&#160;<span class="preprocessor">#define UNIQUE_ID __COUNTER__</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7">   18</a></span>&#160;<span class="preprocessor">#define STRINGIFY(x) #x</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">   19</a></span>&#160;<span class="preprocessor">#define EXPAND(x) x</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">   20</a></span>&#160;<span class="preprocessor">#define EXPAND_ALL(...) __VA_ARGS__</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a5cc8b4a50caacab5cbfb24c7e9e44431">   21</a></span>&#160;<span class="preprocessor">#define CATI(x, y) x##y</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ac2c0beae88659357798c2fddb38a6518">   22</a></span>&#160;<span class="preprocessor">#define CAT(x, y) CATI(x, y)</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a83420260ae1d2a06201582dd1c4ce0a5">   24</a></span>&#160;<span class="preprocessor">#define FIRST(x, y) x</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a8cf792fb70b4f3de790edeb87b0665a3">   25</a></span>&#160;<span class="preprocessor">#define SECOND(x, y) y</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a699feff54e3c87657391e9334ab507dd">   26</a></span>&#160;<span class="preprocessor">#define BOTH(x, y) x y</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a8093cf142de43413a3649101cf95152c">   28</a></span>&#160;<span class="preprocessor">#define loop while (true)</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ada4b36d9cfc6889fa58b77c44757b3ed">   30</a></span>&#160;<span class="preprocessor">#define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...) NAME</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a1598d76ed15988956afa5934a099f1e0">   32</a></span>&#160;<span class="preprocessor">#define FOR_EACH(action, arg, delim, ...)                                      \</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">    __VA_OPT__(EXPAND(GET_MACRO(                                           \</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">        __VA_ARGS__, FOR_EACH_10, FOR_EACH_9, FOR_EACH_8, FOR_EACH_7,      \</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">        FOR_EACH_6, FOR_EACH_5, FOR_EACH_4, FOR_EACH_3, FOR_EACH_2,        \</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">        FOR_EACH_1)(action, arg, delim, __VA_ARGS__)))</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a6c1f08d320203dbb6305815a60e89b91">   38</a></span>&#160;<span class="preprocessor">#define FOR_EACH_1(action, arg, delim, v0) action(arg, v0)</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#adc7c6db11e8a7c41c4f3978a8e44560f">   39</a></span>&#160;<span class="preprocessor">#define FOR_EACH_2(action, arg, delim, v0, v1)                                 \</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ae816991fde908fcb31db97b71be076eb">   41</a></span>&#160;<span class="preprocessor">#define FOR_EACH_3(action, arg, delim, v0, v1, v2)                             \</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a59c4948fe6312fd1447c263a4e4e7fd4">   44</a></span>&#160;<span class="preprocessor">#define FOR_EACH_4(action, arg, delim, v0, v1, v2, v3)                         \</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#abdfb8735ed38f765eb07dea54e472fee">   48</a></span>&#160;<span class="preprocessor">#define FOR_EACH_5(action, arg, delim, v0, v1, v2, v3, v4)                     \</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)                                       \</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v5)</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a61bc3064dae800f0be145936617678bc">   54</a></span>&#160;<span class="preprocessor">#define FOR_EACH_7(action, arg, delim, v0, v1, v2, v3, v4, v5, v6)             \</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)                                       \</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v5)                                       \</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v6)</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a19b9c2b96aee06b03523f81343d1b599">   61</a></span>&#160;<span class="preprocessor">#define FOR_EACH_8(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7)         \</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)                                       \</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v5)                                       \</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v6)                                       \</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v7)</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a32b484ef63390686f4476867300175de">   69</a></span>&#160;<span class="preprocessor">#define FOR_EACH_9(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7, v8)     \</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)                                       \</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v5)                                       \</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v6)                                       \</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v7)                                       \</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v8)</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a4370033b4c52138e614f30302d440729">   78</a></span>&#160;<span class="preprocessor">#define FOR_EACH_10(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7, v8,    \</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">            v9)                                                        \</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)                                       \</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v5)                                       \</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v6)                                       \</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v7)                                       \</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v8)                                       \</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v9)</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ad7b864e10d33a6cc65eb8fea6ad6ebb0">   53</a></span>&#160;<span class="preprocessor">#define FOR_EACH_6(action, arg, delim, v0, v1, v2, v3, v4, v5)                 \</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)                                       \</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v5)</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a61bc3064dae800f0be145936617678bc">   59</a></span>&#160;<span class="preprocessor">#define FOR_EACH_7(action, arg, delim, v0, v1, v2, v3, v4, v5, v6)             \</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)                                       \</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v5)                                       \</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v6)</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a19b9c2b96aee06b03523f81343d1b599">   66</a></span>&#160;<span class="preprocessor">#define FOR_EACH_8(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7)         \</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)                                       \</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v5)                                       \</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v6)                                       \</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v7)</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a32b484ef63390686f4476867300175de">   74</a></span>&#160;<span class="preprocessor">#define FOR_EACH_9(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7, v8)     \</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)                                       \</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v5)                                       \</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v6)                                       \</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v7)                                       \</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v8)</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a4370033b4c52138e614f30302d440729">   83</a></span>&#160;<span class="preprocessor">#define FOR_EACH_10(action, arg, delim, v0, v1, v2, v3, v4, v5, v6, v7, v8,    \</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">            v9)                                                        \</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">    action(arg, v0) EXPAND_ALL delim action(arg, v1)                       \</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v2)                                       \</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v3)                                       \</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v4)                                       \</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v5)                                       \</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v6)                                       \</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v7)                                       \</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v8)                                       \</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">    EXPAND_ALL delim action(arg, v9)</span></div>
+<div class="ttc" id="amacro__utils__inner_8h_html"><div class="ttname"><a href="macro__utils__inner_8h.html">macro_utils_inner.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
