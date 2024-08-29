@@ -21,11 +21,28 @@
 #define CATI(x, y) x##y
 #define CAT(x, y) CATI(x, y)
 
+#define NONE(...)
 #define FIRST(x, y) x
 #define SECOND(x, y) y
 #define BOTH(x, y) x y
 
 #define loop while (true)
+
+#define MULTI_PARAM(action, ...) action(__VA_ARGS__)
+#define SINGLE_PARAM(action, x) action(x)
+#define MULTI_SWITCH_(action1, action2, x, ...)                                \
+	EXPAND_ALL EXPAND(__VA_OPT__(NONE)(SINGLE_PARAM(                       \
+	    action1, x)) __VA_OPT__((MULTI_PARAM(action2, x, __VA_ARGS__))))
+#define MULTI_SWITCH(action1, action2, ...)                                    \
+	EXPAND(MULTI_SWITCH_(action1, action2, __VA_ARGS__))
+
+#define DOUBLE_PARAM(action, x, y) action(x, y)
+#define MULTI_SWITCH2_(action1, action2, arg, x, ...)                          \
+	EXPAND_ALL EXPAND(                                                     \
+	    __VA_OPT__(NONE)(DOUBLE_PARAM(action1, arg, x))                    \
+		__VA_OPT__((MULTI_PARAM(action2, arg, x, __VA_ARGS__))))
+#define MULTI_SWITCH2(action1, action2, arg, ...)                              \
+	EXPAND(MULTI_SWITCH2_(action1, action2, arg, __VA_ARGS__))
 
 #define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...) NAME
 

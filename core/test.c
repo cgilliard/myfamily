@@ -1044,3 +1044,26 @@ Test(core, test_use_after_drop) {
 	// assert drop not called again as tm1 goes out of scope
 	cr_assert_eq(tm_drop_count, 1);
 }
+
+#define DEF_IMPL_TRAIT                                                         \
+	Required(Const, u64, testx2),                                          \
+	    RequiredWithDefault(my_default_testx1, Var, u64, testx1)
+TraitImpl(DEF_IMPL_TRAIT);
+Impl(TestMove, DEF_IMPL_TRAIT);
+
+u64 my_default_testx1() {
+	u64 ret = testx2($VarSelf);
+	return ret;
+}
+
+#define IMPL TestMove
+u64 TestMove_testx2() { return $(len); }
+#undef IMPL
+
+Test(core, test_defaults) {
+	var tm1 = new (TestMove, With(s, "testing"), With(len, 7));
+	u64 ret1 = testx1(&tm1);
+	u64 ret2 = testx2(&tm1);
+	cr_assert_eq(ret1, 7);
+	cr_assert_eq(ret2, 7);
+}

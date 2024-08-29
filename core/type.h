@@ -54,6 +54,9 @@ void SelfCleanupImpl_update(SelfCleanupImpl *sc);
 	SelfCleanupImpl __attribute__((warn_unused_result,                     \
 				       cleanup(SelfCleanupImpl_update)))
 
+#define $Self __thread_local_self_Const
+#define $VarSelf __thread_local_self_Var
+
 extern _Thread_local const Object *__thread_local_self_Const;
 extern _Thread_local Object *__thread_local_self_Var;
 
@@ -134,7 +137,7 @@ FatPtr build_fat_ptr(u64 size);
 
 #define PROCESS_FN_SIG(...) FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__)
 
-#define PROC_TRAIT_IMPL_FN(mutability, return_type, fn_name, ...)              \
+#define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)             \
 	static return_type fn_name(mutability() Object *self __VA_OPT__(       \
 	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) {                     \
 		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
@@ -157,11 +160,55 @@ FatPtr build_fat_ptr(u64 size);
 		__thread_local_self_##mutability = self;                       \
 		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}
+#define DEFAULT_IMPL__(T, default_impl_fn, mutability, return_type, fn_name,   \
+		       ...)                                                    \
+	return_type default_impl_fn(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)));  \
+	static void __attribute__((constructor))                               \
+	add_##fn_name##_##T##_vtable() {                                       \
+		VtableEntry next = {#fn_name, default_impl_fn};                \
+		vtable_add_entry(&T##_Vtable__, next);                         \
+	}
+#define DEFAULT_IMPL_(...) DEFAULT_IMPL__(__VA_ARGS__)
+#define DEFAULT_IMPL(T, ...) DEFAULT_IMPL_(T, EXPAND_ALL __VA_ARGS__)
+
+#define PROC_TRAIT_IMPL_FN_DEFAULT__(default_fn, mutability, return_type,      \
+				     fn_name, ...)                             \
+	static return_type fn_name(mutability() Object *self __VA_OPT__(       \
+	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) {                     \
+		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
+			panic("Runtime error: Object [%s@%" PRIu64             \
+			      "] has already been consumed!",                  \
+			      self->vtable->name, self->id);                   \
+		return_type (*impl)(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) = \
+		    find_fn(self, #fn_name);                                   \
+		if (!impl)                                                     \
+			panic("Runtime error: Trait bound violation! "         \
+			      "Type "                                          \
+			      "'%s' does "                                     \
+			      "not implement the "                             \
+			      "required function [%s]",                        \
+			      TypeName((*self)), #fn_name);                    \
+		SelfCleanup sc = {__thread_local_self_Const,                   \
+				  __thread_local_self_Var};                    \
+		__thread_local_self_Const = self;                              \
+		__thread_local_self_Var = NULL;                                \
+		__thread_local_self_##mutability = self;                       \
+		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
+	}
+
+#define PROC_TRAIT_IMPL_FN_DEFAULT_(...)                                       \
+	PROC_TRAIT_IMPL_FN_DEFAULT__(__VA_ARGS__)
+#define PROC_TRAIT_IMPL_FN_DEFAULT(...)                                        \
+	PROC_TRAIT_IMPL_FN_DEFAULT_(EXPAND_ALL __VA_ARGS__)
+
+#define PROC_TRAIT_IMPL_FN(x, ...)                                             \
+	MULTI_SWITCH(PROC_TRAIT_IMPL_FN_DEFAULT, PROC_TRAIT_IMPL_FN_, x,       \
+		     __VA_ARGS__)
 #define PROC_TRAIT_IMPL(arg, x) PROC_TRAIT_IMPL_FN x
 #define TraitImpl(trait) FOR_EACH(PROC_TRAIT_IMPL, none, (), trait)
 
-#define PROC_TRAIT_STATEMENT_IMPL_EXP(impl_type, mutability, return_type,      \
-				      fn_name, ...)                            \
+#define PROC_TRAIT_STATEMENT_IMPL_EXP_(impl_type, mutability, return_type,     \
+				       fn_name, ...)                           \
 	return_type impl_type##_##fn_name(                                     \
 	    __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)));                          \
 	static void __attribute__((constructor))                               \
@@ -169,6 +216,9 @@ FatPtr build_fat_ptr(u64 size);
 		VtableEntry next = {#fn_name, impl_type##_##fn_name};          \
 		vtable_add_entry(&impl_type##_Vtable__, next);                 \
 	}
+#define PROC_TRAIT_STATEMENT_IMPL_EXP(x, y, ...)                               \
+	MULTI_SWITCH2(DEFAULT_IMPL, PROC_TRAIT_STATEMENT_IMPL_EXP_, x, y,      \
+		      __VA_ARGS__)
 #define PROC_TRAIT_STATEMENT_IMPL(...)                                         \
 	PROC_TRAIT_STATEMENT_IMPL_EXP(__VA_ARGS__)
 #define PROC_TRAIT_STATEMENT(arg, x)                                           \
@@ -176,6 +226,7 @@ FatPtr build_fat_ptr(u64 size);
 #define PROC_IMPL(name, ...)                                                   \
 	FOR_EACH(PROC_TRAIT_STATEMENT, name, (), __VA_ARGS__)
 #define Required(...) (__VA_ARGS__)
+#define RequiredWithDefault(...) ((__VA_ARGS__))
 #define Impl(name, trait) PROC_IMPL(name, trait)
 
 #define SET_OFFSET_OF_IMPL(ptr, structure, name, value)                        \
