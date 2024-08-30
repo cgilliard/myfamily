@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['panic_528',['panic',['../panic_8c.html#ad1f1a1dc0581a11b597453f148106393',1,'panic(const char *fmt,...):&#160;panic.c'],['../panic_8h.html#a138d8879e47c08e2265c41d75e539f9b',1,'panic(const char *format,...):&#160;panic.c']]]
+  ['object_5fbuild_598',['Object_build',['../type_8c.html#af6925c79571998ccf40ed3f5d8388443',1,'Object_build(Object *ptr):&#160;type.c'],['../type_8h.html#af6925c79571998ccf40ed3f5d8388443',1,'Object_build(Object *ptr):&#160;type.c']]],
+  ['object_5fcleanup_599',['Object_cleanup',['../type_8c.html#aa73f18beaa4379c17baf05a138d68dd2',1,'Object_cleanup(const Object *ptr):&#160;type.c'],['../type_8h.html#aa73f18beaa4379c17baf05a138d68dd2',1,'Object_cleanup(const Object *ptr):&#160;type.c']]]
 ];
