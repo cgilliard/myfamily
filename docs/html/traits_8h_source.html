@@ -89,16 +89,20 @@ $(function() {
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="type_8h.html">core/type.h</a>&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">   20</a></span>&#160;<span class="preprocessor">#define Drop DefineTrait(Required(Var, void, drop))</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="traits_8h.html#a191a5802e228d5f0fb0c12e6da7fa1e3">   21</a></span>&#160;<a class="code" href="traits_8h.html#a191a5802e228d5f0fb0c12e6da7fa1e3">TraitImpl</a>(<a class="code" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>);</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">   23</a></span>&#160;<span class="preprocessor">#define Build DefineTrait(Required(Var, void, build))</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">   24</a></span>&#160;<a class="code" href="traits_8h.html#a191a5802e228d5f0fb0c12e6da7fa1e3">TraitImpl</a>(<a class="code" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>);</div>
+<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">   20</a></span>&#160;<span class="preprocessor">#define Drop DefineTrait(Drop, Required(Var, void, drop))</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment">// Drop has a special TraitImpl because we need to prevent it from being called</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment">// twice so it&#39;s not implemented using the standard TraitImpl.</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment">// TraitImpl(Drop);</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keywordtype">void</span> <a class="code" href="traits_8h.html#aafbdbb51ed2b82d034747628f19fd625">drop</a>(<a class="code" href="structObject.html">Object</a> *<span class="keyword">self</span>);</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_TRAITS__</span></div>
-<div class="ttc" id="atraits_8h_html_a191a5802e228d5f0fb0c12e6da7fa1e3"><div class="ttname"><a href="traits_8h.html#a191a5802e228d5f0fb0c12e6da7fa1e3">TraitImpl</a></div><div class="ttdeci">TraitImpl(Drop)</div></div>
-<div class="ttc" id="atraits_8h_html_a4c1bc9dae458cb02cbad68812b20345e"><div class="ttname"><a href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a></div><div class="ttdeci">#define Drop</div><div class="ttdef"><b>Definition:</b> traits.h:20</div></div>
-<div class="ttc" id="atraits_8h_html_a86f96056a0c61a863297f2a8fa71ec10"><div class="ttname"><a href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a></div><div class="ttdeci">#define Build</div><div class="ttdef"><b>Definition:</b> traits.h:23</div></div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">   26</a></span>&#160;<span class="preprocessor">#define Build DefineTrait(Build, Required(Var, void, build))</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">   27</a></span>&#160;<a class="code" href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">TraitImpl</a>(<a class="code" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_TRAITS__</span></div>
+<div class="ttc" id="astructObject_html"><div class="ttname"><a href="structObject.html">Object</a></div><div class="ttdef"><b>Definition:</b> type.h:48</div></div>
+<div class="ttc" id="atraits_8h_html_a86f96056a0c61a863297f2a8fa71ec10"><div class="ttname"><a href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a></div><div class="ttdeci">#define Build</div><div class="ttdef"><b>Definition:</b> traits.h:26</div></div>
+<div class="ttc" id="atraits_8h_html_a9eb45ffefd68e6b5d1b042e7a2fc7ba9"><div class="ttname"><a href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">TraitImpl</a></div><div class="ttdeci">TraitImpl(Build)</div></div>
+<div class="ttc" id="atraits_8h_html_aafbdbb51ed2b82d034747628f19fd625"><div class="ttname"><a href="traits_8h.html#aafbdbb51ed2b82d034747628f19fd625">drop</a></div><div class="ttdeci">void drop(Object *self)</div><div class="ttdef"><b>Definition:</b> traits.c:17</div></div>
 <div class="ttc" id="atype_8h_html"><div class="ttname"><a href="type_8h.html">type.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

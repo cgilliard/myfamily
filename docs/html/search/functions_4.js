@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['global_5fsync_5fallocator_5fcleanup_495',['global_sync_allocator_cleanup',['../chain__allocator_8c.html#a163e8c562c314450b519a9c23e84a420',1,'global_sync_allocator_cleanup():&#160;chain_allocator.c'],['../chain__allocator_8h.html#a163e8c562c314450b519a9c23e84a420',1,'global_sync_allocator_cleanup():&#160;chain_allocator.c']]],
-  ['global_5fsync_5fallocator_5finit_496',['global_sync_allocator_init',['../chain__allocator_8c.html#a55bafb1e01b68923a0eca99fca814d4a',1,'global_sync_allocator_init():&#160;chain_allocator.c'],['../chain__allocator_8h.html#a55bafb1e01b68923a0eca99fca814d4a',1,'global_sync_allocator_init():&#160;chain_allocator.c']]]
+  ['fat_5fptr_5fdata_561',['fat_ptr_data',['../heap_8c.html#a2beb14eedce3e8fbcff7b86df3209e91',1,'fat_ptr_data(const FatPtr *ptr):&#160;heap.c'],['../heap_8h.html#a2beb14eedce3e8fbcff7b86df3209e91',1,'fat_ptr_data(const FatPtr *ptr):&#160;heap.c']]],
+  ['fat_5fptr_5fid_562',['fat_ptr_id',['../heap_8c.html#a6a172e13c6187a33eda5d96526411444',1,'heap.c']]],
+  ['fat_5fptr_5flen_563',['fat_ptr_len',['../heap_8c.html#a582a48e1532268a1d999b84edaa6abf9',1,'fat_ptr_len(const FatPtr *ptr):&#160;heap.c'],['../heap_8h.html#a582a48e1532268a1d999b84edaa6abf9',1,'fat_ptr_len(const FatPtr *ptr):&#160;heap.c']]],
+  ['find_5ffn_564',['find_fn',['../type_8c.html#a2b4d2a863926a7886419d0e53aa465a0',1,'find_fn(const Object *obj, const char *name):&#160;type.c'],['../type_8h.html#a2b4d2a863926a7886419d0e53aa465a0',1,'find_fn(const Object *obj, const char *name):&#160;type.c']]]
 ];
