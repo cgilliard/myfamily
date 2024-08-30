@@ -1017,7 +1017,7 @@ Test(core, test_move) {
 	var tm1 = new (TestMove, With(s, "test"), With(len, 4));
 	cr_assert_eq(get_tm_len(&tm1), 4);
 	cr_assert(!strcmp(get_tm_s(&tm1), "test"));
-	var tm2;
+	var tm2 = OBJECT_INIT;
 	Move(&tm2, &tm1);
 	cr_assert_eq(get_tm_len(&tm2), 4);
 	cr_assert(!strcmp(get_tm_s(&tm2), "test"));
@@ -1025,7 +1025,7 @@ Test(core, test_move) {
 	// would result in panic because tm1 has already been consumed.
 	// cr_assert_eq(get_tm_len(&tm1), 4);
 
-	var tm4;
+	var tm4 = OBJECT_INIT;
 	var tm3 = new (TestMove, With(s, "abc"), With(len, 3));
 	cr_assert_eq(get_tm_len(&tm3), 3);
 	cr_assert(!strcmp(get_tm_s(&tm3), "abc"));
@@ -1035,6 +1035,13 @@ Test(core, test_move) {
 
 	// would result in panic because tm3 has already been consumed.
 	// cr_assert_eq(get_tm_len(&tm3), 3);
+
+	var tm5 = new (TestType);
+	// this would result in a panic due to differing types
+	// Move(&tm4, &tm5);
+
+	// this is ok
+	Move(&tm3, &tm4);
 }
 
 Test(core, test_use_after_drop) {
@@ -1052,8 +1059,6 @@ Test(core, test_use_after_drop) {
 	// assert drop not called again as tm1 goes out of scope
 	cr_assert_eq(tm_drop_count, 1);
 }
-
-#define OtherTrait DefineTrait(OtherTrait, Required(Const, u64, other_stuff))
 
 #define DEF_IMPL_TRAIT                                                         \
 	DefineTrait(DEF_IMPL_TRAIT, Required(Const, u64, testx2),              \
@@ -1077,4 +1082,62 @@ Test(core, test_defaults) {
 	u64 ret2 = testx2(&tm1);
 	cr_assert_eq(ret1, 7);
 	cr_assert_eq(ret2, 7);
+}
+
+Type(InnerType, Field(u64, value));
+Type(CompositeTest, Field(u64, x), Field(u32, y), Field(Object, z));
+
+Impl(InnerType, Drop);
+Impl(CompositeTest, Drop);
+Impl(CompositeTest, Build);
+
+#define SetCompTrait                                                           \
+	DefineTrait(SetCompTrait,                                              \
+		    Required(Var, void, set_comp_value, Param(Object *)))
+
+TraitImpl(SetCompTrait);
+Impl(CompositeTest, SetCompTrait);
+
+int inner_drops = 0;
+int comp_drops = 0;
+
+#define IMPL InnerType
+void InnerType_drop() {
+	printf("drop inner type value = %" PRIu64 "\n", $(value));
+	inner_drops += 1;
+}
+#undef IMPL
+
+// TODO: create a macro 'Obj' which allows for conveinent initialization of
+// Object pointers (Setting it to OBJECT_INIT. It would allow for a type param
+// (and later traits). It would also automatically call Object_cleanup when its
+// own cleanup is called. Also review what 'with' is doing here. We need to call
+// Move instead if possible.
+#define IMPL CompositeTest
+void CompositeTest_drop() {
+	printf("drop composite type type value(x) = %" PRIu64 "\n", $(x));
+	printf("drop composite type type value(y) = %u\n", $(y));
+	Object_cleanup(&$Var(z));
+	comp_drops += 1;
+}
+
+void CompositeTest_set_comp_value(Object *value) { Move(&$Var(z), value); }
+void CompositeTest_build() { $Var(z) = OBJECT_INIT; }
+#undef IMPL
+
+Test(core, test_composites) {
+	{
+		var comp = new (InnerType, With(value, 10));
+		var comp2 = new (InnerType, With(value, 11));
+		var ct1 = new (CompositeTest, With(x, 123), With(y, 333));
+		// comp is moved over to ct1 transferring ownership
+		set_comp_value(&ct1, &comp);
+		// comp2 is moved over to ct1 overwriting comp, thus calling its
+		// drop handler
+		set_comp_value(&ct1, &comp2);
+		// ct1 goes out of scope calling its drop handler which in turn
+		// calls comp2's drop handler
+	}
+	cr_assert_eq(inner_drops, 2);
+	cr_assert_eq(comp_drops, 1);
 }

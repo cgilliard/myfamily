@@ -111,8 +111,32 @@ FatPtr build_fat_ptr(u64 size);
 #define Field(field_type, field_name) (field_type, field_name)
 #define With(x, y) (x, y)
 
+#define OBJECT_INIT                                                            \
+	({                                                                     \
+		FatPtr _fptr__;                                                \
+		_fptr__.data = NULL;                                           \
+		_fptr__.len = 0;                                               \
+		Object _ret__ = {                                              \
+		    NULL, 0, OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED,  \
+		    _fptr__};                                                  \
+		_ret__;                                                        \
+	})
+
 #define Move(dst, src)                                                         \
 	({                                                                     \
+		/* Check for vtable mismatch */                                \
+		if (((*((Object *)dst)).vtable != NULL &&                      \
+		     ((*((Object *)dst)).vtable !=                             \
+		      ((*((Object *)src)).vtable)))) {                         \
+			panic("Vtable mismatch! Trying to set type %s to "     \
+			      "type %s!",                                      \
+			      ((*((Object *)dst)).vtable)->name,               \
+			      ((*((Object *)src)).vtable)->name);              \
+		}                                                              \
+		/* If the object is not consumed we call cleanup as we are     \
+		 * overwriting it.*/                                           \
+		if (((*((Object *)dst)).flags & OBJECT_FLAGS_CONSUMED) == 0)   \
+			Object_cleanup(dst);                                   \
 		*((Object *)dst) = *((Object *)src);                           \
 		(*((Object *)src)).flags |=                                    \
 		    OBJECT_FLAGS_CONSUMED | OBJECT_FLAGS_NO_CLEANUP;           \

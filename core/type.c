@@ -22,7 +22,7 @@ _Thread_local Object *__thread_local_self_Var = NULL;
 
 atomic_ullong __global_counter__;
 void __attribute__((constructor)) init_global_counter() {
-	atomic_init(&__global_counter__, 0);
+	atomic_init(&__global_counter__, 1);
 }
 
 u64 unique_id() {
