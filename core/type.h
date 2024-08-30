@@ -93,23 +93,49 @@ FatPtr build_fat_ptr(u64 size);
 	    ((const IMPL *)__thread_local_self_Const->ptr.data)->__VA_ARGS__)  \
 	__VA_OPT__(NONE)(__thread_local_self_Const)
 
-#define CALL_BOTH(x, y) BOTH y
+#define FIRST_TWO(x, y, ...) x y
+#define CALL_FIRST_TWO(x, y) FIRST_TWO y
+
+#define DROP_OBJECTS__(name, struct_type, inner, ...)                          \
+	__VA_OPT__(Object_cleanup(&((name *)(ptr->ptr.data))->inner);)
+#define DROP_OBJECTS_(...) DROP_OBJECTS__(__VA_ARGS__)
+#define DROP_OBJECTS(name, inner) DROP_OBJECTS_(name, EXPAND_ALL inner)
+
+#define BUILD_OBJECTS__(name, struct_type, inner, ...)                         \
+	__VA_OPT__(((name *)(ptr->ptr.data))->inner = OBJECT_INIT;             \
+		   ((name *)(ptr->ptr.data))->inner.vtable =                   \
+		       &__VA_ARGS__##_Vtable__;)
+#define BUILD_OBJECTS_(...) BUILD_OBJECTS__(__VA_ARGS__)
+#define BUILD_OBJECTS(name, inner) BUILD_OBJECTS_(name, EXPAND_ALL inner)
 
 #define Type(name, ...)                                                        \
 	typedef struct name name;                                              \
 	static Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL};             \
 	u64 name##_size();                                                     \
 	typedef struct name {                                                  \
-		FOR_EACH(CALL_BOTH, , (;), __VA_ARGS__);                       \
+		FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);                  \
 	} name;                                                                \
 	u64 name##_size() { return sizeof(name); }                             \
+	void name##_build_internal(Object *ptr) {                              \
+		FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__);               \
+	}                                                                      \
+	void name##_drop_internal(Object *ptr) {                               \
+		FOR_EACH(DROP_OBJECTS, name, (;), __VA_ARGS__);                \
+	}                                                                      \
 	static void __attribute__((constructor))                               \
 	__add_impls_##name##_vtable() {                                        \
 		VtableEntry size = {"size", name##_size};                      \
 		vtable_add_entry(&name##_Vtable__, size);                      \
+		VtableEntry build_internal = {"build_internal",                \
+					      name##_build_internal};          \
+		vtable_add_entry(&name##_Vtable__, build_internal);            \
+		VtableEntry drop_internal = {"drop_internal",                  \
+					     name##_drop_internal};            \
+		vtable_add_entry(&name##_Vtable__, drop_internal);             \
 	}
 
 #define Field(field_type, field_name) (field_type, field_name)
+#define Obj(obj_type, obj_name) (Object, obj_name, obj_type)
 #define With(x, y) (x, y)
 
 #define OBJECT_INIT                                                            \
@@ -164,6 +190,7 @@ FatPtr build_fat_ptr(u64 size);
 #define PROCESS_FN_CALL(...)                                                   \
 	FOR_EACH_INNER(CALL_SECOND, none, (, ), __VA_ARGS__)
 
+#define CALL_BOTH(x, y) BOTH y
 #define PROCESS_FN_SIG(...) FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__)
 
 #define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)             \
@@ -282,9 +309,23 @@ FatPtr build_fat_ptr(u64 size);
 	}
 #define Impl(name, ...) PROC_IMPL_(name, __VA_ARGS__)
 
+#define STRINGIFY_EXPAND(x) STRINGIFY(EXPAND(x))
+
+#define IS_OBJECT_TYPE(type) __builtin_types_compatible_p(typeof(type), Object)
+
+// TODO: separate processing for objects
 #define SET_OFFSET_OF_IMPL(ptr, structure, name, value)                        \
-	*((typeof(((structure *)0)->name) *)(ptr + offsetof(structure,         \
-							    name))) = value;
+	do {                                                                   \
+		if (IS_OBJECT_TYPE(((structure *)0)->name)) {                  \
+			/*printf("is object\n"); */                            \
+			*((typeof(((structure *)0)->name)                      \
+			       *)(ptr + offsetof(structure, name))) = value;   \
+		} else {                                                       \
+			/*printf("not object\n"); */                           \
+			*((typeof(((structure *)0)->name)                      \
+			       *)(ptr + offsetof(structure, name))) = value;   \
+		}                                                              \
+	} while (0);
 
 #define SET_OFFSET_OF(...) SET_OFFSET_OF_IMPL(__VA_ARGS__)
 #define SET_PARAM(ptr, value) SET_OFFSET_OF(EXPAND_ALL ptr, EXPAND_ALL value)

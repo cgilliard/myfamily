@@ -132,6 +132,12 @@ void SelfCleanupImpl_update(SelfCleanupImpl *ptr) {
 }
 
 void Object_build(Object *ptr) {
+	// call internal build handler
+	void (*build_int)(Object * ptr) = find_fn(ptr, "build_internal");
+	if (!build_int)
+		panic("no internal build handler found");
+	build_int(ptr);
+
 	void (*do_build)(Object * ptr) = find_fn(ptr, "build");
 	if (do_build) {
 		// setup self references
@@ -160,6 +166,13 @@ void Object_build(Object *ptr) {
 void Object_cleanup(const Object *ptr) {
 	Object *unconst = ptr;
 	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0) {
+		// call internal drop handler
+		void (*drop_int)(Object * ptr) = find_fn(ptr, "drop_internal");
+		if (!drop_int)
+			panic("no internal drop handler found");
+		drop_int(unconst);
+
+		// call defined drop handler
 		void (*drop)(Object * ptr) = find_fn(ptr, "drop");
 		if (drop) {
 			// setup self references

@@ -1001,6 +1001,8 @@ int tm_drop_count = 0;
 
 #define IMPL TestMove
 void TestMove_build() {
+	if ($(s) == NULL)
+		panic("TestMove: s must not be NULL");
 	char *s = malloc(sizeof(char) * (strlen($(s)) + 1));
 	strcpy(s, $(s));
 	$Var(s) = s;
@@ -1091,13 +1093,17 @@ Test(core, test_defaults) {
 Type(InnerType, Field(u64, value));
 Type(CompositeTest, Field(u64, x), Field(u32, y), Field(Object, z));
 
+#define InnerValue DefineTrait(InnerValue, Required(Const, u64, inner_value))
+TraitImpl(InnerValue);
+
 Impl(InnerType, Drop);
+Impl(InnerType, InnerValue);
 Impl(CompositeTest, Drop);
 Impl(CompositeTest, Build);
 
 #define SetCompTrait                                                           \
-	DefineTrait(SetCompTrait,                                              \
-		    Required(Var, void, set_comp_value, Param(Object *)))
+	DefineTrait(SetCompTrait, Required(Var, void, set_comp_value,          \
+					   Param(const Object *)))
 
 TraitImpl(SetCompTrait);
 Impl(CompositeTest, SetCompTrait);
@@ -1106,6 +1112,7 @@ int inner_drops = 0;
 int comp_drops = 0;
 
 #define IMPL InnerType
+u64 InnerType_inner_value() { return $(value); }
 void InnerType_drop() {
 	printf("drop inner type value = %" PRIu64 "\n", $(value));
 	inner_drops += 1;
@@ -1113,8 +1120,8 @@ void InnerType_drop() {
 #undef IMPL
 
 // TODO: create a macro 'Obj' which allows for conveinent initialization of
-// Object pointers (Setting it to OBJECT_INIT. It would allow for a type param
-// (and later traits). It would also automatically call Object_cleanup when its
+// Objects (Setting it to OBJECT_INIT. It would allow for a type param
+// (and later traits)). It would also automatically call Object_cleanup when its
 // own cleanup is called. Also review what 'with' is doing here. We need to call
 // Move instead if possible.
 #define IMPL CompositeTest
@@ -1125,7 +1132,9 @@ void CompositeTest_drop() {
 	comp_drops += 1;
 }
 
-void CompositeTest_set_comp_value(Object *value) { Move(&$Var(z), value); }
+void CompositeTest_set_comp_value(const Object *value) {
+	Move(&$Var(z), value);
+}
 void CompositeTest_build() { $Var(z) = OBJECT_INIT; }
 #undef IMPL
 
@@ -1144,4 +1153,30 @@ Test(core, test_composites) {
 	}
 	cr_assert_eq(inner_drops, 2);
 	cr_assert_eq(comp_drops, 1);
+}
+
+Type(AdvComp, Field(u64, x), Obj(InnerType, holder));
+Impl(AdvComp, SetCompTrait);
+
+#define IMPL AdvComp
+void AdvComp_set_comp_value(const Object *value) { Move(&$Var(holder), value); }
+#undef IMPL
+
+Test(core, test_obj_macro) {
+	inner_drops = 0;
+	let inner = new (InnerType, With(value, 123));
+	{
+		cr_assert_eq(inner_value(&inner), 123);
+		var advcomp1 = new (AdvComp, With(x, 0), With(holder, inner));
+		set_comp_value(&advcomp1, &inner);
+
+		// would result in panic because inner has already been consumed
+		// cr_assert_eq(inner_value(&inner), 123);
+		cr_assert_eq(inner_drops, 0);
+	}
+	// assert that the inner type was dropped
+	cr_assert_eq(inner_drops, 1);
+
+	// would result in panic because inner has already been consumed
+	// cr_assert_eq(inner_value(&inner), 123);
 }
