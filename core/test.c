@@ -1067,8 +1067,12 @@ Test(core, test_use_after_drop) {
 TraitImpl(DEF_IMPL_TRAIT);
 Impl(TestMove, DEF_IMPL_TRAIT);
 
+// In default implementations $Var() (mutable reference available in mutable
+// methods) and $() (immutable reference available in all methods) may be used
+// as a reference to the unknown type for calling other methods within the trait
+// or super traits.
 u64 my_default_testx1() {
-	u64 ret = testx2($VarSelf);
+	u64 ret = testx2($Var());
 	return ret;
 }
 

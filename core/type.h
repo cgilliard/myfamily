@@ -63,9 +63,6 @@ void SelfCleanupImpl_update(SelfCleanupImpl *sc);
 	SelfCleanupImpl __attribute__((warn_unused_result,                     \
 				       cleanup(SelfCleanupImpl_update)))
 
-#define $Self __thread_local_self_Const
-#define $VarSelf __thread_local_self_Var
-
 extern _Thread_local const Object *__thread_local_self_Const;
 extern _Thread_local Object *__thread_local_self_Var;
 
@@ -87,10 +84,14 @@ FatPtr build_fat_ptr(u64 size);
 #define var Cleanup
 #define let const Cleanup
 
-#define $Var(field_name) ((IMPL *)__thread_local_self_Var->ptr.data)->field_name
+#define $Var(...)                                                              \
+	__VA_OPT__(((IMPL *)__thread_local_self_Var->ptr.data)->__VA_ARGS__)   \
+	__VA_OPT__(NONE)(__thread_local_self_Var)
 
-#define $(field_name)                                                          \
-	((const IMPL *)__thread_local_self_Const->ptr.data)->field_name
+#define $(...)                                                                 \
+	__VA_OPT__(                                                            \
+	    ((const IMPL *)__thread_local_self_Const->ptr.data)->__VA_ARGS__)  \
+	__VA_OPT__(NONE)(__thread_local_self_Const)
 
 #define CALL_BOTH(x, y) BOTH y
 
