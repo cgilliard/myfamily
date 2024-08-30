@@ -67,6 +67,7 @@ extern _Thread_local const Object *__thread_local_self_Const;
 extern _Thread_local Object *__thread_local_self_Var;
 
 void Object_cleanup(const Object *ptr);
+void Object_mark_consumed(const Object *ptr);
 void Object_build(Object *ptr);
 void sort_vtable(Vtable *table);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
@@ -102,7 +103,7 @@ FatPtr build_fat_ptr(u64 size);
 #define DROP_OBJECTS(name, inner) DROP_OBJECTS_(name, EXPAND_ALL inner)
 
 #define BUILD_OBJECTS__(name, struct_type, inner, ...)                         \
-	__VA_OPT__(((name *)(ptr->ptr.data))->inner = OBJECT_INIT;             \
+	__VA_OPT__(/*((name *)(ptr->ptr.data))->inner = OBJECT_INIT; */        \
 		   ((name *)(ptr->ptr.data))->inner.vtable =                   \
 		       &__VA_ARGS__##_Vtable__;)
 #define BUILD_OBJECTS_(...) BUILD_OBJECTS__(__VA_ARGS__)
@@ -136,7 +137,8 @@ FatPtr build_fat_ptr(u64 size);
 
 #define Field(field_type, field_name) (field_type, field_name)
 #define Obj(obj_type, obj_name) (Object, obj_name, obj_type)
-#define With(x, y) (x, y)
+#define With(x, y) (x, y, ignore)
+#define WithObj(x, y) (x, y)
 
 #define OBJECT_INIT                                                            \
 	({                                                                     \
@@ -151,6 +153,8 @@ FatPtr build_fat_ptr(u64 size);
 
 #define Move(dst, src)                                                         \
 	({                                                                     \
+		if (((*((Object *)src)).flags & OBJECT_FLAGS_CONSUMED) != 0)   \
+			panic("src object has already been consumed\n");       \
 		/* Check for vtable mismatch */                                \
 		if (((*((Object *)dst)).vtable != NULL &&                      \
 		     ((*((Object *)dst)).vtable !=                             \
@@ -309,23 +313,26 @@ FatPtr build_fat_ptr(u64 size);
 	}
 #define Impl(name, ...) PROC_IMPL_(name, __VA_ARGS__)
 
-#define STRINGIFY_EXPAND(x) STRINGIFY(EXPAND(x))
-
 #define IS_OBJECT_TYPE(type) __builtin_types_compatible_p(typeof(type), Object)
 
+#define PROC_WITH_OBJ(ptr, structure, field_name, value)                       \
+	Object *_ptr__ = ptr + offsetof(structure, field_name);                \
+	(*_ptr__) = OBJECT_INIT;                                               \
+	Move(_ptr__, &value);
+
 // TODO: separate processing for objects
-#define SET_OFFSET_OF_IMPL(ptr, structure, name, value)                        \
-	do {                                                                   \
+#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                   \
+	__VA_OPT__(do {                                                        \
 		if (IS_OBJECT_TYPE(((structure *)0)->name)) {                  \
-			/*printf("is object\n"); */                            \
-			*((typeof(((structure *)0)->name)                      \
-			       *)(ptr + offsetof(structure, name))) = value;   \
+			panic("Cannot use With to set an Object. Use "         \
+			      "'WithObj' isntead.\n");                         \
 		} else {                                                       \
-			/*printf("not object\n"); */                           \
 			*((typeof(((structure *)0)->name)                      \
 			       *)(ptr + offsetof(structure, name))) = value;   \
 		}                                                              \
-	} while (0);
+	} while (0);)                                                          \
+	EXPAND(EXPAND(EXPAND_ALL EXPAND(__VA_OPT__(NONE)(                      \
+	    PROC_WITH_OBJ(ptr, structure, name, value)) __VA_OPT__(()))))
 
 #define SET_OFFSET_OF(...) SET_OFFSET_OF_IMPL(__VA_ARGS__)
 #define SET_PARAM(ptr, value) SET_OFFSET_OF(EXPAND_ALL ptr, EXPAND_ALL value)

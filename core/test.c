@@ -1167,14 +1167,18 @@ Test(core, test_obj_macro) {
 	let inner = new (InnerType, With(value, 123));
 	{
 		cr_assert_eq(inner_value(&inner), 123);
-		var advcomp1 = new (AdvComp, With(x, 0), With(holder, inner));
-		set_comp_value(&advcomp1, &inner);
+		// var advcomp1 = new (AdvComp, With(x, 0), With(holder,
+		// inner));
+		var advcomp1 =
+		    new (AdvComp, With(x, 0), WithObj(holder, inner));
+		// set_comp_value(&advcomp1, &inner);
 
 		// would result in panic because inner has already been consumed
 		// cr_assert_eq(inner_value(&inner), 123);
 		cr_assert_eq(inner_drops, 0);
 	}
 	// assert that the inner type was dropped
+	printf("internal drops = %i\n", inner_drops);
 	cr_assert_eq(inner_drops, 1);
 
 	// would result in panic because inner has already been consumed

@@ -190,3 +190,19 @@ void Object_cleanup(const Object *ptr) {
 		}
 	}
 }
+
+#if defined(__clang__)
+// Clang-specific pragma
+#pragma clang diagnostic ignored                                               \
+    "-Wincompatible-pointer-types-discards-qualifiers"
+#elif defined(__GNUC__) && !defined(__clang__)
+// GCC-specific pragma
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+#else
+#warning "Unknown compiler or platform. No specific warning pragmas applied."
+#endif
+void Object_mark_consumed(const Object *ptr) {
+	Object *unconst = ptr;
+	unconst->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
+}
