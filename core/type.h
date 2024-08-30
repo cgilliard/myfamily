@@ -69,6 +69,7 @@ extern _Thread_local Object *__thread_local_self_Var;
 void Object_cleanup(const Object *ptr);
 void Object_mark_consumed(const Object *ptr);
 void Object_build(Object *ptr);
+void Object_build_int(Object *ptr);
 void sort_vtable(Vtable *table);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
 void vtable_add_trait(Vtable *table, char *trait);
@@ -103,7 +104,7 @@ FatPtr build_fat_ptr(u64 size);
 #define DROP_OBJECTS(name, inner) DROP_OBJECTS_(name, EXPAND_ALL inner)
 
 #define BUILD_OBJECTS__(name, struct_type, inner, ...)                         \
-	__VA_OPT__(/*((name *)(ptr->ptr.data))->inner = OBJECT_INIT; */        \
+	__VA_OPT__(((name *)(ptr->ptr.data))->inner = OBJECT_INIT;             \
 		   ((name *)(ptr->ptr.data))->inner.vtable =                   \
 		       &__VA_ARGS__##_Vtable__;)
 #define BUILD_OBJECTS_(...) BUILD_OBJECTS__(__VA_ARGS__)
@@ -347,8 +348,9 @@ FatPtr build_fat_ptr(u64 size);
 // clang-format off
 #define new(name, ...)({ \
 		FatPtr _fptr__ = build_fat_ptr(name##_size());                 \
-		FOR_EACH(SET_PARAM, (_fptr__.data, name), (), __VA_ARGS__)     \
 		Object _ret__ = {&name##_Vtable__, unique_id(), 0, _fptr__};   \
+		Object_build_int(&_ret__);\
+		FOR_EACH(SET_PARAM, (_fptr__.data, name), (), __VA_ARGS__)     \
 		Object_build(&_ret__);                                         \
 		_ret__;                                                        \
 	})

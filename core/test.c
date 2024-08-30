@@ -1178,7 +1178,6 @@ Test(core, test_obj_macro) {
 		cr_assert_eq(inner_drops, 0);
 	}
 	// assert that the inner type was dropped
-	printf("internal drops = %i\n", inner_drops);
 	cr_assert_eq(inner_drops, 1);
 
 	// would result in panic because inner has already been consumed

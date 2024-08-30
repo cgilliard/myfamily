@@ -131,13 +131,15 @@ void SelfCleanupImpl_update(SelfCleanupImpl *ptr) {
 	__thread_local_self_Var = ptr->prev_tl_self_Var;
 }
 
-void Object_build(Object *ptr) {
+void Object_build_int(Object *ptr) {
 	// call internal build handler
 	void (*build_int)(Object * ptr) = find_fn(ptr, "build_internal");
 	if (!build_int)
 		panic("no internal build handler found");
 	build_int(ptr);
+}
 
+void Object_build(Object *ptr) {
 	void (*do_build)(Object * ptr) = find_fn(ptr, "build");
 	if (do_build) {
 		// setup self references
