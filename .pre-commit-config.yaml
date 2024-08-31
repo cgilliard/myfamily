@@ -3,5 +3,5 @@ repos:
   rev: v14.0.0  # Replace with the version of clang-format you want
   hooks:
     - id: clang-format
-      args: [-i]  # Automatically fix issues
+      args: [-i, -style=file]  # Automatically fix issues
       files: \.(c|h)$  # Specify which files to format
