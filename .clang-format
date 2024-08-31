@@ -1,4 +1,5 @@
 BasedOnStyle: LLVM
+PointerAlignment: Left
 BreakBeforeBraces: Allman
 ColumnLimit: 0
 IndentWidth: 8

@@ -17,8 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-_Thread_local const Object *__thread_local_self_Const = NULL;
-_Thread_local Object *__thread_local_self_Var = NULL;
+_Thread_local const Object* __thread_local_self_Const = NULL;
+_Thread_local Object* __thread_local_self_Var = NULL;
 
 atomic_ullong __global_counter__;
 void __attribute__((constructor)) init_global_counter()
@@ -44,20 +44,20 @@ FatPtr build_fat_ptr(u64 size)
 	return ret;
 }
 
-int compare_vtable_entry(const void *ent1, const void *ent2)
+int compare_vtable_entry(const void* ent1, const void* ent2)
 {
-	const VtableEntry *vtent1 = ent1;
-	const VtableEntry *vtent2 = ent2;
+	const VtableEntry* vtent1 = ent1;
+	const VtableEntry* vtent2 = ent2;
 	return strcmp(vtent1->name, vtent2->name);
 }
 
-void sort_vtable(Vtable *table)
+void sort_vtable(Vtable* table)
 {
 	qsort(table->entries, table->len, sizeof(VtableEntry),
 	      compare_vtable_entry);
 }
 
-void vtable_add_entry(Vtable *table, VtableEntry entry)
+void vtable_add_entry(Vtable* table, VtableEntry entry)
 {
 	if (table->entries == NULL)
 	{
@@ -67,7 +67,7 @@ void vtable_add_entry(Vtable *table, VtableEntry entry)
 	}
 	else
 	{
-		void *tmp = realloc(table->entries,
+		void* tmp = realloc(table->entries,
 				    sizeof(VtableEntry) * (table->len + 1));
 		if (tmp == NULL)
 			panic("Couldn't allocate memory for vtable");
@@ -79,7 +79,7 @@ void vtable_add_entry(Vtable *table, VtableEntry entry)
 	sort_vtable(table);
 }
 
-bool vtable_check_impl_trait(Vtable *table, char *trait)
+bool vtable_check_impl_trait(Vtable* table, char* trait)
 {
 	bool ret = false;
 
@@ -95,7 +95,7 @@ bool vtable_check_impl_trait(Vtable *table, char *trait)
 	return ret;
 }
 
-void vtable_add_trait(Vtable *table, char *trait)
+void vtable_add_trait(Vtable* table, char* trait)
 {
 	if (table->trait_entries == NULL)
 	{
@@ -106,7 +106,7 @@ void vtable_add_trait(Vtable *table, char *trait)
 	}
 	else
 	{
-		void *tmp =
+		void* tmp =
 		    realloc(table->trait_entries,
 			    sizeof(VtableTraitEntry) * (table->trait_len + 1));
 		if (tmp == NULL)
@@ -125,7 +125,7 @@ void vtable_add_trait(Vtable *table, char *trait)
 	table->trait_len += 1;
 }
 
-void *find_fn(const Object *obj, const char *name)
+void* find_fn(const Object* obj, const char* name)
 {
 	int left = 0;
 	int right = obj->vtable->len - 1;
@@ -150,20 +150,20 @@ void *find_fn(const Object *obj, const char *name)
 	return NULL;
 }
 
-void SelfCleanupImpl_update(SelfCleanupImpl *ptr)
+void SelfCleanupImpl_update(SelfCleanupImpl* ptr)
 {
 	__thread_local_self_Const = ptr->prev_tl_self_Const;
 	__thread_local_self_Var = ptr->prev_tl_self_Var;
 }
 
-void Object_check_param(const Object *obj)
+void Object_check_param(const Object* obj)
 {
 	if (obj && (obj->flags & OBJECT_FLAGS_CONSUMED) != 0)
 		panic("Passing a consumed object as a function "
 		      "parameter!");
 }
 
-void Object_build_int(Object *ptr)
+void Object_build_int(Object* ptr)
 {
 	// call internal build handler
 	void (*build_int)(Object * ptr) = find_fn(ptr, "build_internal");
@@ -172,14 +172,14 @@ void Object_build_int(Object *ptr)
 	build_int(ptr);
 }
 
-void Object_build(Object *ptr)
+void Object_build(Object* ptr)
 {
 	void (*do_build)(Object * ptr) = find_fn(ptr, "build");
 	if (do_build)
 	{
 		// setup self references
-		Object *tmp_Var = __thread_local_self_Var;
-		const Object *tmp_Const = __thread_local_self_Const;
+		Object* tmp_Var = __thread_local_self_Var;
+		const Object* tmp_Const = __thread_local_self_Const;
 		__thread_local_self_Const = ptr;
 		__thread_local_self_Var = ptr;
 		do_build(ptr);
@@ -200,9 +200,9 @@ void Object_build(Object *ptr)
 #else
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
-void Object_cleanup(const Object *ptr)
+void Object_cleanup(const Object* ptr)
 {
-	Object *unconst = ptr;
+	Object* unconst = ptr;
 	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0)
 	{
 		// call internal drop handler
@@ -216,8 +216,8 @@ void Object_cleanup(const Object *ptr)
 		if (drop)
 		{
 			// setup self references
-			Object *tmp_Var = __thread_local_self_Var;
-			Object *tmp_Const = __thread_local_self_Const;
+			Object* tmp_Var = __thread_local_self_Var;
+			Object* tmp_Const = __thread_local_self_Const;
 			__thread_local_self_Const = unconst;
 			__thread_local_self_Var = unconst;
 			drop(ptr);
@@ -244,9 +244,9 @@ void Object_cleanup(const Object *ptr)
 #else
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
-void Object_mark_consumed(const Object *ptr)
+void Object_mark_consumed(const Object* ptr)
 {
-	Object *unconst = ptr;
+	Object* unconst = ptr;
 	unconst->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
 }
 #pragma GCC diagnostic pop
