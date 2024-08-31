@@ -190,9 +190,9 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">LockGuardPtr                                                           \</a></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">LockGuardPtr \</a></div>
 <div class="line"><a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">	    __attribute__</a>((warn_unused_result, cleanup(<a class="code" href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a>)))</div>
-<div class="ttc" id="alock_8h_html_a7c2e32969ff851fb0a311f9491011b52"><div class="ttname"><a href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a></div><div class="ttdeci">void Lockguard_cleanup(LockGuardPtr *ptr)</div><div class="ttdef"><b>Definition:</b> lock.c:92</div></div>
+<div class="ttc" id="alock_8h_html_a7c2e32969ff851fb0a311f9491011b52"><div class="ttname"><a href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a></div><div class="ttdeci">void Lockguard_cleanup(LockGuardPtr *ptr)</div><div class="ttdef"><b>Definition:</b> lock.c:98</div></div>
 <div class="ttc" id="atype_8c_html_afd02bb0f6a745c39d5e3417493995c71"><div class="ttname"><a href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a></div><div class="ttdeci">void __attribute__((constructor))</div><div class="ttdef"><b>Definition:</b> type.c:24</div></div>
 </div><!-- fragment -->
 </div>
@@ -222,11 +222,12 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                   \</div>
-<div class="line">        LockGuard __lg__ = <a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>(&amp;ptr);                                 \</div>
-<div class="line">        exe                                                            \</div>
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span>                                     \</div>
+<div class="line">    {                                      \</div>
+<div class="line">        LockGuard __lg__ = <a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>(&amp;ptr); \</div>
+<div class="line">        exe                            \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0);</div>
-<div class="ttc" id="alock_8h_html_aedb785bacae99330d760b55c4cdaa4dd"><div class="ttname"><a href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a></div><div class="ttdeci">LockGuard lock(Lock *lock)</div><div class="ttdef"><b>Definition:</b> lock.c:68</div></div>
+<div class="ttc" id="alock_8h_html_aedb785bacae99330d760b55c4cdaa4dd"><div class="ttname"><a href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a></div><div class="ttdeci">LockGuard lock(Lock *lock)</div><div class="ttdef"><b>Definition:</b> lock.c:73</div></div>
 </div><!-- fragment -->
 </div>
 </div>
