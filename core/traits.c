@@ -14,7 +14,8 @@
 
 #include <core/traits.h>
 
-void drop(Object *self) {
+void drop(Object *self)
+{
 	if (self->flags & OBJECT_FLAGS_CONSUMED)
 		panic("Runtime error: Object [%s@%" PRIu64
 		      "] has already been consumed!",
@@ -35,7 +36,8 @@ void drop(Object *self) {
 	// the object):
 	self->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
 	// free the pointer here as well since cleanup will not be called
-	if (fat_ptr_data(&self->ptr)) {
+	if (fat_ptr_data(&self->ptr))
+	{
 		chain_free(&self->ptr);
 	}
 	return impl();

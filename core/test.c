@@ -22,7 +22,8 @@
 PROC_TEST(abc, def, ghi, aaa, zzz, mmm, xxx)
 */
 
-Test(core, test_heap) {
+Test(core, test_heap)
+{
 	cr_assert_eq(__malloc_count, __free_count);
 
 	// setup some fat pointers and assert len and data function
@@ -45,24 +46,32 @@ Test(core, test_heap) {
 	u64 last_size8_id = 0;
 	u64 last_size16_id = 0;
 	u64 last_size32_id = 0;
-	for (u64 i = 1; i < 40; i++) {
+	for (u64 i = 1; i < 40; i++)
+	{
 		cr_assert_eq(heap_allocator_allocate(&ha, i, &ptrs[i]), 0);
-		if (i <= 8) {
+		if (i <= 8)
+		{
 			// id from first batch with no batch id
 			cr_assert_eq(ptrs[i].id, i - 1);
 			cr_assert_eq(ptrs[i].len, 8);
 			last_size8_id = ptrs[i].id;
-		} else if (i <= 16) {
+		}
+		else if (i <= 16)
+		{
 			// id from the second batch with (1 << 56)
 			cr_assert_eq(ptrs[i].id, (i - 9) | (0x1L << 56));
 			cr_assert_eq(ptrs[i].len, 16);
 			last_size16_id = ptrs[i].id;
-		} else if (i <= 32) {
+		}
+		else if (i <= 32)
+		{
 			// id from the third batch with (2 << 56)
 			cr_assert_eq(ptrs[i].id, (i - 17) | (0x2L << 56));
 			cr_assert_eq(ptrs[i].len, 32);
 			last_size32_id = ptrs[i].id;
-		} else {
+		}
+		else
+		{
 			// these are allocating using malloc
 			cr_assert_eq(ptrs[i].len, i);
 			cr_assert_eq(ptrs[i].id, UINT64_MAX);
@@ -70,7 +79,8 @@ Test(core, test_heap) {
 	}
 
 	// free all slabs
-	for (u64 i = 1; i < 40; i++) {
+	for (u64 i = 1; i < 40; i++)
+	{
 		cr_assert_eq(heap_allocator_free(&ha, &ptrs[i]), 0);
 	}
 
@@ -104,7 +114,8 @@ Test(core, test_heap) {
 	cr_assert_eq(ptrs[8].id, last_size32_id - 2);
 
 	// continue with the 32 all the way (16 total 13 + 3)
-	for (u64 i = 0; i < 13; i++) {
+	for (u64 i = 0; i < 13; i++)
+	{
 		cr_assert_eq(heap_allocator_allocate(&ha, 32, &ptrs[9 + i]), 0);
 		cr_assert_eq(ptrs[9 + i].id, last_size32_id - (3 + i));
 	}
@@ -120,7 +131,8 @@ Test(core, test_heap) {
 	cr_assert_eq(__malloc_count, __free_count);
 }
 
-Test(core, test_heap_resize) {
+Test(core, test_heap_resize)
+{
 	cr_assert_eq(__malloc_count, __free_count);
 
 	// setup an ha and 46 fat pointers
@@ -132,7 +144,8 @@ Test(core, test_heap_resize) {
 
 	// allocate all slabs. The ha should resize twice and return ids in
 	// sequential order
-	for (u64 i = 0; i < 45; i++) {
+	for (u64 i = 0; i < 45; i++)
+	{
 		cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptrs[i]), 0);
 		cr_assert_eq(ptrs[i].id, i);
 		cr_assert_eq(ptrs[i].len, 16);
@@ -152,7 +165,8 @@ Test(core, test_heap_resize) {
 	cr_assert_eq(__malloc_count, __free_count);
 }
 
-Test(core, test_heap_free) {
+Test(core, test_heap_free)
+{
 	cr_assert_eq(__malloc_count, __free_count);
 
 	// setup ha with a single size
@@ -187,7 +201,8 @@ Test(core, test_heap_free) {
 	cr_assert_eq(__malloc_count, __free_count);
 }
 
-Test(core, test_heap_initial_size0) {
+Test(core, test_heap_initial_size0)
+{
 	cr_assert_eq(__malloc_count, __free_count);
 
 	// setup ha with a single size and no slabs initially
@@ -219,7 +234,8 @@ Test(core, test_heap_initial_size0) {
 	cr_assert_eq(heap_allocator_free(&ha, &ptrs[1]), 0);
 	cr_assert_eq(heap_allocator_free(&ha, &ptrs[3]), 0);
 
-	for (u64 i = 0; i < 45; i++) {
+	for (u64 i = 0; i < 45; i++)
+	{
 		cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptrs[i]), 0);
 		cr_assert_eq(ptrs[i].id, i);
 		cr_assert_eq(ptrs[i].len, 16);
@@ -237,7 +253,8 @@ Test(core, test_heap_initial_size0) {
 	cr_assert_eq(__malloc_count, __free_count);
 }
 
-Test(core, test_heap_init_multi_chunk) {
+Test(core, test_heap_init_multi_chunk)
+{
 	cr_assert_eq(__malloc_count, __free_count);
 
 	// setup ha with multi initial chunks
@@ -247,7 +264,8 @@ Test(core, test_heap_init_multi_chunk) {
 	HeapDataParamsConfig hdconfig1 = {16, 20, 2, 80};
 	cr_assert_eq(heap_allocator_build(&ha, &hconfig, 1, hdconfig1), 0);
 
-	for (u64 i = 0; i < 80; i++) {
+	for (u64 i = 0; i < 80; i++)
+	{
 		cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptrs[i]), 0);
 		cr_assert_eq(ptrs[i].id, i);
 		cr_assert_eq(ptrs[i].len, 16);
@@ -257,11 +275,13 @@ Test(core, test_heap_init_multi_chunk) {
 	cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptrs[80]), 0);
 	cr_assert_eq(ptrs[80].id, UINT64_MAX);
 
-	for (u64 i = 0; i < 81; i++) {
+	for (u64 i = 0; i < 81; i++)
+	{
 		cr_assert_eq(heap_allocator_free(&ha, &ptrs[i]), 0);
 	}
 
-	for (u64 i = 0; i < 80; i++) {
+	for (u64 i = 0; i < 80; i++)
+	{
 		cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptrs[i]), 0);
 		cr_assert_eq(ptrs[i].id, 79 - i);
 		cr_assert_eq(ptrs[i].len, 16);
@@ -273,7 +293,8 @@ Test(core, test_heap_init_multi_chunk) {
 	cr_assert_eq(__malloc_count, __free_count);
 }
 
-Test(core, test_invalid_configurations) {
+Test(core, test_invalid_configurations)
+{
 	cr_assert_eq(__malloc_count, __free_count);
 
 	cr_assert_neq(heap_allocator_build(NULL, NULL, 0), 0);
@@ -320,7 +341,8 @@ Test(core, test_invalid_configurations) {
 	cr_assert_eq(__malloc_count, __free_count);
 }
 
-Test(core, test_heap_oom) {
+Test(core, test_heap_oom)
+{
 	cr_assert_eq(__malloc_count, __free_count);
 
 	HeapAllocator ha;
@@ -400,7 +422,8 @@ Test(core, test_heap_oom) {
 	__debug_build_allocator_malloc_fail7 = true;
 	__debug_build_allocator_malloc_fail6 = false;
 
-	for (u64 i = 0; i < 10; i++) {
+	for (u64 i = 0; i < 10; i++)
+	{
 		cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
 	}
 
@@ -410,7 +433,8 @@ Test(core, test_heap_oom) {
 	__debug_build_allocator_malloc_fail7 = false;
 
 	// now we can create new slabs
-	for (u64 i = 0; i < 10; i++) {
+	for (u64 i = 0; i < 10; i++)
+	{
 		cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
 	}
 
@@ -428,7 +452,8 @@ Test(core, test_heap_oom) {
 
 	__debug_build_allocator_malloc_fail5 = false;
 
-	for (u64 i = 0; i < 10; i++) {
+	for (u64 i = 0; i < 10; i++)
+	{
 		cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
 	}
 
@@ -464,7 +489,8 @@ Test(core, test_heap_oom) {
 	cr_assert_eq(__malloc_count, __free_count);
 }
 
-Test(core, test_heap_zeroed) {
+Test(core, test_heap_zeroed)
+{
 	FatPtr ptr;
 	HeapAllocator ha;
 	HeapAllocatorConfig hconfig_zeroed = {true, true};
@@ -481,7 +507,8 @@ Test(core, test_heap_zeroed) {
 	cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
 	cr_assert_eq(fat_ptr_id(&ptr), 0);
 	data = fat_ptr_data(&ptr);
-	for (u64 i = 0; i < 16; i++) {
+	for (u64 i = 0; i < 16; i++)
+	{
 		data[i] = 1;
 	}
 
@@ -490,7 +517,8 @@ Test(core, test_heap_zeroed) {
 	cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
 	cr_assert_eq(fat_ptr_id(&ptr), 0);
 	data = fat_ptr_data(&ptr);
-	for (u64 i = 0; i < 16; i++) {
+	for (u64 i = 0; i < 16; i++)
+	{
 		// since it's not zeroed, value will be '1' which was set before
 		// freeing/allocating
 		cr_assert_eq(data[i], 1);
@@ -508,7 +536,8 @@ Test(core, test_heap_zeroed) {
 	cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
 	cr_assert_eq(fat_ptr_id(&ptr), 0);
 	data = fat_ptr_data(&ptr);
-	for (u64 i = 0; i < 16; i++) {
+	for (u64 i = 0; i < 16; i++)
+	{
 		data[i] = 1;
 	}
 
@@ -517,7 +546,8 @@ Test(core, test_heap_zeroed) {
 	cr_assert_eq(heap_allocator_allocate(&ha, 16, &ptr), 0);
 	cr_assert_eq(fat_ptr_id(&ptr), 0);
 	data = fat_ptr_data(&ptr);
-	for (u64 i = 0; i < 16; i++) {
+	for (u64 i = 0; i < 16; i++)
+	{
 		// this time it's zeroed out
 		cr_assert_eq(data[i], 0);
 	}
@@ -528,7 +558,8 @@ Test(core, test_heap_zeroed) {
 	cr_assert_eq(__malloc_count, __free_count);
 }
 
-Test(core, test_invalid_heap_configurations) {
+Test(core, test_invalid_heap_configurations)
+{
 	cr_assert_eq(__malloc_count, __free_count);
 
 	HeapAllocator ha;
@@ -554,16 +585,21 @@ Test(core, test_invalid_heap_configurations) {
 
 int panic_loop = 0;
 
-Test(core, test_panic) {
+Test(core, test_panic)
+{
 	bool is_panic = false;
-	if (PANIC_RETURN()) {
+	if (PANIC_RETURN())
+	{
 		is_panic = true;
 	}
 
 	// first loop is not a panic
-	if (panic_loop) {
+	if (panic_loop)
+	{
 		cr_assert(is_panic);
-	} else {
+	}
+	else
+	{
 		cr_assert(!is_panic);
 	}
 	panic_loop++;
@@ -571,7 +607,8 @@ Test(core, test_panic) {
 		panic("panic test_panic");
 }
 
-Test(core, test_chained_allocator) {
+Test(core, test_chained_allocator)
+{
 	FatPtr ptr;
 
 	// build 2 slab allocators with varying size slabs
@@ -669,7 +706,8 @@ Test(core, test_chained_allocator) {
 	char *data, *data2;
 
 	data = fat_ptr_data(&ptr);
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 16; i++)
+	{
 		data[i] = i;
 	}
 
@@ -678,7 +716,8 @@ Test(core, test_chained_allocator) {
 
 	data2 = fat_ptr_data(&ptr2);
 	data = fat_ptr_data(&ptr);
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 16; i++)
+	{
 		cr_assert_eq(data[i], i);
 	}
 	chain_free(&ptr2);
@@ -688,17 +727,24 @@ Test(core, test_chained_allocator) {
 	heap_allocator_cleanup(&ha);
 	heap_allocator_cleanup(&ha2);
 }
-Test(core, test_lock) {
+Test(core, test_lock)
+{
 	Lock l1 = LOCK();
-	{ LockGuard lg01 = lock(&l1); }
-	{ LockGuard lg11 = lock(&l1); }
+	{
+		LockGuard lg01 = lock(&l1);
+	}
+	{
+		LockGuard lg11 = lock(&l1);
+	}
 }
 
 Lock th_lock;
 int counter = 0;
 
-void *start_thread(void *data) {
-	if (PANIC_RETURN()) {
+void *start_thread(void *data)
+{
+	if (PANIC_RETURN())
+	{
 		return NULL;
 	}
 	{
@@ -714,7 +760,8 @@ void *start_thread(void *data) {
 	return NULL;
 }
 
-Test(core, test_lock_panic) {
+Test(core, test_lock_panic)
+{
 	pthread_t th;
 	th_lock = LOCK();
 	pthread_create(&th, NULL, &start_thread, NULL);
@@ -724,14 +771,16 @@ Test(core, test_lock_panic) {
 	Lock_cleanup(&th_lock);
 }
 
-void start_thread_test(void *obj) {
+void start_thread_test(void *obj)
+{
 	int v = *((int *)obj);
 	cr_assert_eq(v, 101);
 }
 
 void start_thread_panic(void *obj) { panic("panic start_thread_panic"); }
 
-Test(core, test_threads) {
+Test(core, test_threads)
+{
 	int y = 101;
 	Thread th;
 	Thread_start(&th, start_thread_test, &y);
@@ -750,7 +799,8 @@ Lock cond_lock;
 bool check_condition = false;
 int cond_count = 0;
 
-void cond_thread(void *obj) {
+void cond_thread(void *obj)
+{
 	int v = *((int *)obj);
 	{
 		LockGuard lg = lock(&cond_lock);
@@ -760,7 +810,8 @@ void cond_thread(void *obj) {
 	}
 }
 
-Test(core, test_wait_notify) {
+Test(core, test_wait_notify)
+{
 	cond_lock = LOCK();
 	int v = 1234;
 	Thread th;
@@ -778,7 +829,8 @@ Lock sync_lock;
 bool sync_cond = false;
 u64 sync_count = 0;
 
-void sync_thread(void *obj) {
+void sync_thread(void *obj)
+{
 	// clang-format off
 	synchronized(sync_lock, {
 		while(!sync_cond)
@@ -788,7 +840,8 @@ void sync_thread(void *obj) {
 	// clang-format on
 }
 
-Test(core, test_synchronized) {
+Test(core, test_synchronized)
+{
 	sync_lock = LOCK();
 	Thread th;
 	Thread_start(&th, sync_thread, NULL);
@@ -810,11 +863,11 @@ Type(TestType, Field(u64, x), Field(u32, y));
 // parameter is the function name. After that there may be a variable number of
 // Parameter arguments. The Param macro specifies these arguments with the type
 // of the parameter only.
-#define TestTrait                                                              \
-	DefineTrait(TestTrait, Required(Const, u64, get_x),                    \
-		    Required(Const, u32, get_y), Required(Var, void, incr),    \
-		    Required(Var, void, add_x, Param(u64)),                    \
-		    Required(Var, void, sub_y, Param(u32)),                    \
+#define TestTrait                                                           \
+	DefineTrait(TestTrait, Required(Const, u64, get_x),                 \
+		    Required(Const, u32, get_y), Required(Var, void, incr), \
+		    Required(Var, void, add_x, Param(u64)),                 \
+		    Required(Var, void, sub_y, Param(u32)),                 \
 		    Required(Var, u64, sub_both, Param(u64), Param(u32)))
 
 // The call to TraitImpl is mandatory for all traits. It will generate the
@@ -852,7 +905,8 @@ u32 TestType_get_y() { return $(y); }
 // in value from the value of y and sets the variable to this value.
 void TestType_sub_y(u32 value) { $Var(y) -= value; }
 // This mutable function increments both parameters.
-void TestType_incr() {
+void TestType_incr()
+{
 	$Var(x)++;
 	$Var(y)++;
 }
@@ -864,7 +918,8 @@ void TestType_add_x(u64 value) { $Var(x) += value; }
 // variable goes out of scope.
 void TestType_drop() { drop_count++; }
 // subtract the specified values from both fields. Return the value of x.
-u64 TestType_sub_both(u64 value1, u32 value2) {
+u64 TestType_sub_both(u64 value1, u32 value2)
+{
 	$Var(x) -= value1;
 	$Var(y) -= value2;
 	return $(x);
@@ -873,7 +928,8 @@ u64 TestType_sub_both(u64 value1, u32 value2) {
 // This ends the implementation of TestType. The $ and $Var operators can no
 // longer be used outside this block.
 
-Test(core, test_type) {
+Test(core, test_type)
+{
 	{
 		// declare a new instance of the TestType type using the 'new'
 		// macro. This instance is delcared as 'var' so it may call
@@ -936,7 +992,8 @@ Impl(TestServer, Drop);
 #define IMPL TestServer
 
 // do input validation and set defaults for our 'TestServer'
-void TestServer_build() {
+void TestServer_build()
+{
 	// Check if threads are equal to 0. This is a misconfiguration. Panic if
 	// that's the case.
 	if ($(threads) == 0)
@@ -944,12 +1001,14 @@ void TestServer_build() {
 
 	// If host is NULL (not configured) use the default setting of
 	// 127.0.0.1.
-	if ($(host) == NULL) {
+	if ($(host) == NULL)
+	{
 		$Var(host) = "127.0.0.1";
 	}
 
 	// If port is 0 (not configured) use the default setting of 80.
-	if ($(port) == 0) {
+	if ($(port) == 0)
+	{
 		$Var(port) = 80;
 	}
 
@@ -960,13 +1019,15 @@ void TestServer_build() {
 
 // The drop handler just prints out a message in this case, but could be used to
 // deallocate resources/close connections/etc.
-void TestServer_drop() {
+void TestServer_drop()
+{
 	printf("Calling drop with host='%s',port=%u,threads=%u\n", $(host),
 	       $(port), $(threads));
 }
 #undef IMPL
 
-Test(core, test_build) {
+Test(core, test_build)
+{
 
 	// Create three server instanes with varying settings and mutability.
 	var server1 = new (TestServer, With(port, 8080),
@@ -987,8 +1048,8 @@ Test(core, test_build) {
 
 Type(TestMove, Field(char *, s), Field(u64, len));
 
-#define AccessTestMove                                                         \
-	DefineTrait(AccessTestMove, Required(Const, char *, get_tm_s),         \
+#define AccessTestMove                                                 \
+	DefineTrait(AccessTestMove, Required(Const, char *, get_tm_s), \
 		    Required(Const, u64, get_tm_len))
 
 TraitImpl(AccessTestMove);
@@ -1000,14 +1061,16 @@ Impl(TestMove, AccessTestMove);
 int tm_drop_count = 0;
 
 #define IMPL TestMove
-void TestMove_build() {
+void TestMove_build()
+{
 	if ($(s) == NULL)
 		panic("TestMove: s must not be NULL");
 	char *s = malloc(sizeof(char) * (strlen($(s)) + 1));
 	strcpy(s, $(s));
 	$Var(s) = s;
 }
-void TestMove_drop() {
+void TestMove_drop()
+{
 	tm_drop_count++;
 	free($(s));
 }
@@ -1015,7 +1078,8 @@ u64 TestMove_get_tm_len() { return $(len); }
 char *TestMove_get_tm_s() { return $(s); }
 #undef IMPL
 
-Test(core, test_move) {
+Test(core, test_move)
+{
 	var tm1 = new (TestMove, With(s, "test"), With(len, 4));
 	cr_assert_eq(get_tm_len(&tm1), 4);
 	cr_assert(!strcmp(get_tm_s(&tm1), "test"));
@@ -1046,7 +1110,8 @@ Test(core, test_move) {
 	Move(&tm3, &tm4);
 }
 
-Test(core, test_use_after_drop) {
+Test(core, test_use_after_drop)
+{
 	tm_drop_count = 0;
 	{
 		var tm1 = new (TestMove, With(s, "test"), With(len, 4));
@@ -1062,9 +1127,9 @@ Test(core, test_use_after_drop) {
 	cr_assert_eq(tm_drop_count, 1);
 }
 
-#define DEF_IMPL_TRAIT                                                         \
-	DefineTrait(DEF_IMPL_TRAIT, Required(Const, u64, testx2),              \
-		    RequiredWithDefault(my_default_testx1, Var, u64, testx1),  \
+#define DEF_IMPL_TRAIT                                                        \
+	DefineTrait(DEF_IMPL_TRAIT, Required(Const, u64, testx2),             \
+		    RequiredWithDefault(my_default_testx1, Var, u64, testx1), \
 		    Super(Drop))
 TraitImpl(DEF_IMPL_TRAIT);
 Impl(TestMove, DEF_IMPL_TRAIT);
@@ -1073,16 +1138,21 @@ Impl(TestMove, DEF_IMPL_TRAIT);
 // methods) and $() (immutable reference available in all methods) may be used
 // as a reference to the unknown type for calling other methods within the trait
 // or super traits.
-u64 my_default_testx1() {
+u64 my_default_testx1()
+{
 	u64 ret = testx2($Var());
 	return ret;
 }
 
 #define IMPL TestMove
-u64 TestMove_testx2() { return $(len); }
+u64 TestMove_testx2()
+{
+	return $(len);
+}
 #undef IMPL
 
-Test(core, test_defaults) {
+Test(core, test_defaults)
+{
 	var tm1 = new (TestMove, With(s, "testing"), With(len, 7));
 	u64 ret1 = testx1(&tm1);
 	u64 ret2 = testx2(&tm1);
@@ -1101,8 +1171,8 @@ Impl(InnerType, InnerValue);
 Impl(CompositeTest, Drop);
 Impl(CompositeTest, Build);
 
-#define SetCompTrait                                                           \
-	DefineTrait(SetCompTrait, Required(Var, void, set_comp_value,          \
+#define SetCompTrait                                                  \
+	DefineTrait(SetCompTrait, Required(Var, void, set_comp_value, \
 					   Param(const Object *)))
 
 TraitImpl(SetCompTrait);
@@ -1112,8 +1182,12 @@ int inner_drops = 0;
 int comp_drops = 0;
 
 #define IMPL InnerType
-u64 InnerType_inner_value() { return $(value); }
-void InnerType_drop() {
+u64 InnerType_inner_value()
+{
+	return $(value);
+}
+void InnerType_drop()
+{
 	printf("drop inner type value = %" PRIu64 "\n", $(value));
 	inner_drops += 1;
 }
@@ -1125,20 +1199,23 @@ void InnerType_drop() {
 // own cleanup is called. Also review what 'with' is doing here. We need to call
 // Move instead if possible.
 #define IMPL CompositeTest
-void CompositeTest_drop() {
+void CompositeTest_drop()
+{
 	printf("drop composite type type value(x) = %" PRIu64 "\n", $(x));
 	printf("drop composite type type value(y) = %u\n", $(y));
 	Object_cleanup(&$Var(z));
 	comp_drops += 1;
 }
 
-void CompositeTest_set_comp_value(const Object *value) {
+void CompositeTest_set_comp_value(const Object *value)
+{
 	Move(&$Var(z), value);
 }
 void CompositeTest_build() { $Var(z) = OBJECT_INIT; }
 #undef IMPL
 
-Test(core, test_composites) {
+Test(core, test_composites)
+{
 	{
 		var comp = new (InnerType, With(value, 10));
 		var comp2 = new (InnerType, With(value, 11));
@@ -1155,8 +1232,8 @@ Test(core, test_composites) {
 	cr_assert_eq(comp_drops, 1);
 }
 
-#define AdvCompSetBoth                                                         \
-	DefineTrait(AdvCompSetBoth, Required(Var, void, set_both_adv,          \
+#define AdvCompSetBoth                                                \
+	DefineTrait(AdvCompSetBoth, Required(Var, void, set_both_adv, \
 					     Param(u64), Param(Object *)))
 TraitImpl(AdvCompSetBoth);
 
@@ -1165,11 +1242,15 @@ Impl(AdvComp, SetCompTrait);
 Impl(AdvComp, AdvCompSetBoth);
 
 #define IMPL AdvComp
-void AdvComp_set_comp_value(const Object *value) { Move(&$Var(holder), value); }
+void AdvComp_set_comp_value(const Object *value)
+{
+	Move(&$Var(holder), value);
+}
 void AdvComp_set_both_adv(u64 v1, Object *ptr) {}
 #undef IMPL
 
-Test(core, test_obj_macro) {
+Test(core, test_obj_macro)
+{
 	inner_drops = 0;
 	{
 		var inner = new (InnerType, With(value, 123));

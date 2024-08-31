@@ -65,8 +65,10 @@ TOML_EXTERN void toml_free(toml_table_t *tab);
  * fields may be NULL if they are not relevant. e.g. In a DATE
  * type, the hour, minute, second and z fields will be NULLs.
  */
-struct toml_timestamp_t {
-	struct { /* internal. do not use. */
+struct toml_timestamp_t
+{
+	struct
+	{ /* internal. do not use. */
 		int year, month, day;
 		int hour, minute, second, millisec;
 		char z[10];
@@ -79,14 +81,16 @@ struct toml_timestamp_t {
 /*-----------------------------------------------------------------
  *  Enhanced access methods
  */
-struct toml_datum_t {
+struct toml_datum_t
+{
 	int ok;
-	union {
+	union
+	{
 		toml_timestamp_t *ts; /* ts must be freed after use */
-		char *s;   /* string value. s must be freed after use */
-		int b;	   /* bool value */
-		int64_t i; /* int value */
-		double d;  /* double value */
+		char *s;	      /* string value. s must be freed after use */
+		int b;		      /* bool value */
+		int64_t i;	      /* int value */
+		double d;	      /* double value */
 	} u;
 };
 

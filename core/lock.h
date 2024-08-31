@@ -19,7 +19,8 @@
 #include <pthread.h>
 #include <stdatomic.h>
 
-typedef struct LockPtr {
+typedef struct LockPtr
+{
 	pthread_mutex_t lock;
 	pthread_cond_t cond;
 	atomic_ullong tid;
@@ -36,15 +37,16 @@ bool Lock_is_poisoned(Lock *ptr);
 void Lock_clear_poison(Lock *ptr);
 void Lock_mark_poisoned();
 
-typedef struct LockGuardPtr {
+typedef struct LockGuardPtr
+{
 	LockPtr *ref;
 } LockGuardPtr;
 
 void Lockguard_cleanup(LockGuardPtr *ptr);
 Lock Lock_build();
 
-#define LockGuard                                                              \
-	LockGuardPtr                                                           \
+#define LockGuard    \
+	LockGuardPtr \
 	    __attribute__((warn_unused_result, cleanup(Lockguard_cleanup)))
 
 LockGuard lock(Lock *lock);
@@ -55,10 +57,11 @@ void Lock_notify_all(Lock *lock);
 #define LOCK() Lock_build()
 #define LOCK_GUARD_CLEANUP_SAFE {NULL};
 
-#define synchronized(ptr, exe)                                                 \
-	do {                                                                   \
-		LockGuard __lg__ = lock(&ptr);                                 \
-		exe                                                            \
+#define synchronized(ptr, exe)                 \
+	do                                     \
+	{                                      \
+		LockGuard __lg__ = lock(&ptr); \
+		exe                            \
 	} while (0);
 
 #endif // _CORE_LOCK__

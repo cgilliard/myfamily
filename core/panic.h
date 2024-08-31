@@ -29,11 +29,11 @@ extern bool __debug_no_exit;
 
 void panic(const char *format, ...);
 
-#define PANIC_RETURN()                                                         \
-	({                                                                     \
-		jmp_return_set = true;                                         \
-		int _value__ = setjmp(return_jmp);                             \
-		_value__ != 0;                                                 \
+#define PANIC_RETURN()                             \
+	({                                         \
+		jmp_return_set = true;             \
+		int _value__ = setjmp(return_jmp); \
+		_value__ != 0;                     \
 	})
 
 #endif // _CORE_PANIC__

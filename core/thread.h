@@ -17,20 +17,22 @@
 
 #include <core/types.h>
 
-typedef struct JoinResult {
+typedef struct JoinResult
+{
 	bool is_panic;
 	bool is_error;
 } JoinResult;
 
 typedef struct ThreadImpl ThreadImpl;
 
-typedef struct ThreadPtr {
+typedef struct ThreadPtr
+{
 	FatPtr impl;
 } ThreadPtr;
 
 void Thread_cleanup(ThreadPtr *ptr);
 
-#define Thread                                                                 \
+#define Thread \
 	ThreadPtr __attribute__((warn_unused_result, cleanup(Thread_cleanup)))
 
 int Thread_start(Thread *ptr, void (*start_routine)(void *), void *args);

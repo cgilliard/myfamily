@@ -85,7 +85,8 @@ extern LockPtr *__global_sync_allocator_lock;
  * @param ha The #HeapAllocator to push to the top of the stack.
  * @param is_sync Whether or not synchronous locking should be used.
  */
-typedef struct ChainConfig {
+typedef struct ChainConfig
+{
 	HeapAllocator *ha;
 	bool is_sync;
 	Lock *lock;
@@ -94,7 +95,8 @@ typedef struct ChainConfig {
 /** @cond */
 typedef struct ChainGuardImpl ChainGuardImpl;
 
-typedef struct ChainGuardPtr {
+typedef struct ChainGuardPtr
+{
 	u64 index;
 	HeapAllocator *ha;
 	bool is_sync;
@@ -108,8 +110,8 @@ void chain_guard_cleanup(ChainGuardPtr *ptr);
  * The #ChainGuard is a data structure used to assist the Chain in knowing when
  * a particular link in the chain goes out of scope.
  */
-#define ChainGuard                                                             \
-	ChainGuardPtr                                                          \
+#define ChainGuard    \
+	ChainGuardPtr \
 	    __attribute__((warn_unused_result, cleanup(chain_guard_cleanup)))
 
 /**
@@ -175,11 +177,11 @@ void global_sync_allocator_cleanup();
  */
 void thread_local_allocator_cleanup();
 
-#define SCOPED_ALLOCATOR(ha, is_sync)                                          \
-	({                                                                     \
-		ChainConfig _cfg__ = {ha, is_sync};                            \
-		ChainGuardPtr ret = chain_guard(&_cfg__);                      \
-		ret;                                                           \
+#define SCOPED_ALLOCATOR(ha, is_sync)                     \
+	({                                                \
+		ChainConfig _cfg__ = {ha, is_sync};       \
+		ChainGuardPtr ret = chain_guard(&_cfg__); \
+		ret;                                      \
 	})
 
 /**
@@ -192,14 +194,14 @@ void thread_local_allocator_cleanup();
  * Note: This function panics if sufficient memory cannot be allocated to create
  * the required data structures.
  */
-#define GLOBAL_SYNC_ALLOCATOR()                                                \
-	({                                                                     \
-		if (__global_sync_allocator == NULL)                           \
-			global_sync_allocator_init();                          \
-		ChainConfig _cfg__ = {__global_sync_allocator, true,           \
-				      __global_sync_allocator_lock};           \
-		ChainGuardPtr ret = chain_guard(&_cfg__);                      \
-		ret;                                                           \
+#define GLOBAL_SYNC_ALLOCATOR()                                      \
+	({                                                           \
+		if (__global_sync_allocator == NULL)                 \
+			global_sync_allocator_init();                \
+		ChainConfig _cfg__ = {__global_sync_allocator, true, \
+				      __global_sync_allocator_lock}; \
+		ChainGuardPtr ret = chain_guard(&_cfg__);            \
+		ret;                                                 \
 	})
 
 #endif // _CORE_CHAIN_ALLOCATOR__

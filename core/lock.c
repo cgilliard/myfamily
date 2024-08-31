@@ -21,13 +21,15 @@
 _Thread_local Lock *__active_locks_[MAX_LOCKS];
 _Thread_local u64 __active_lock_count_ = 0;
 
-void insert_active_lock(Lock *ptr) {
+void insert_active_lock(Lock *ptr)
+{
 	if (__active_lock_count_ >= MAX_LOCKS)
 		panic("too many locks!");
 	__active_locks_[__active_lock_count_] = ptr;
 	__active_lock_count_++;
 }
-void delete_active_lock(Lock *ptr) {
+void delete_active_lock(Lock *ptr)
+{
 	// note: locks are removed in reverse order
 	// It's possible that cleanup occurs in slightly different order
 	// but the effect is the same each lock would be invalidated at the end
@@ -37,7 +39,8 @@ void delete_active_lock(Lock *ptr) {
 	__active_lock_count_--;
 }
 
-Lock Lock_build() {
+Lock Lock_build()
+{
 	LockPtr ret;
 	pthread_mutex_init(&ret.lock, NULL);
 	pthread_cond_init(&ret.cond, NULL);
@@ -47,7 +50,8 @@ Lock Lock_build() {
 	return ret;
 }
 
-void Lock_cleanup(LockPtr *ptr) {
+void Lock_cleanup(LockPtr *ptr)
+{
 	pthread_mutex_destroy(&ptr->lock);
 	pthread_cond_destroy(&ptr->cond);
 }
@@ -55,7 +59,8 @@ void Lock_cleanup(LockPtr *ptr) {
 void Lock_set_poison(Lock *ptr) { atomic_exchange(&ptr->poison, true); }
 bool Lock_is_poisoned(Lock *ptr) { return atomic_load(&ptr->poison); }
 void Lock_clear_poison(Lock *ptr) { atomic_exchange(&ptr->poison, false); }
-u64 Lock_get_tid() {
+u64 Lock_get_tid()
+{
 	u64 tid;
 #ifdef __APPLE__
 	pthread_threadid_np(NULL, &tid);
@@ -65,7 +70,8 @@ u64 Lock_get_tid() {
 	return tid;
 }
 
-LockGuard lock(Lock *ptr) {
+LockGuard lock(Lock *ptr)
+{
 	if (atomic_load(&ptr->poison))
 		panic("Lock %p: poisoned!", ptr);
 
@@ -89,18 +95,23 @@ LockGuard lock(Lock *ptr) {
 	return ret;
 }
 
-void Lockguard_cleanup(LockGuardPtr *ptr) {
-	if (ptr && ptr->ref) {
+void Lockguard_cleanup(LockGuardPtr *ptr)
+{
+	if (ptr && ptr->ref)
+	{
 		atomic_exchange(&ptr->ref->is_locked, false);
 		pthread_mutex_unlock(&ptr->ref->lock);
 		delete_active_lock(ptr->ref);
 	}
 }
 
-void Lock_mark_poisoned() {
-	if (__active_lock_count_) {
+void Lock_mark_poisoned()
+{
+	if (__active_lock_count_)
+	{
 		u64 i = __active_lock_count_ - 1;
-		while (true) {
+		while (true)
+		{
 			Lock_set_poison(__active_locks_[i]);
 			atomic_exchange(&__active_locks_[i]->is_locked, false);
 			pthread_mutex_unlock(&__active_locks_[i]->lock);
@@ -111,15 +122,19 @@ void Lock_mark_poisoned() {
 	}
 }
 
-void Lock_wait(Lock *ptr, u64 nanoseconds) {
+void Lock_wait(Lock *ptr, u64 nanoseconds)
+{
 	u64 tid = Lock_get_tid();
 	if (!(atomic_load(&ptr->is_locked) && atomic_load(&ptr->tid) == tid))
 		panic("Attempt to wait on lock %p without first obtaining the "
 		      "lock!",
 		      ptr);
-	if (nanoseconds == 0) {
+	if (nanoseconds == 0)
+	{
 		pthread_cond_wait(&ptr->cond, &ptr->lock);
-	} else {
+	}
+	else
+	{
 		struct timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts);
 
@@ -129,7 +144,8 @@ void Lock_wait(Lock *ptr, u64 nanoseconds) {
 
 		// Normalize the timespec structure in case of overflow in
 		// nanoseconds
-		if (ts.tv_nsec >= 1000000000) {
+		if (ts.tv_nsec >= 1000000000)
+		{
 			ts.tv_sec += ts.tv_nsec / 1000000000;
 			ts.tv_nsec %= 1000000000;
 		}

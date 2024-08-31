@@ -67,7 +67,8 @@
  * malloc will be called directly to attempt to allocate the required slabs.
  * @see [heap_allocator_build]
  */
-typedef struct HeapDataParamsConfig {
+typedef struct HeapDataParamsConfig
+{
 	u32 slab_size;
 	u32 slabs_per_resize;
 	u32 initial_chunks;
@@ -85,7 +86,8 @@ typedef struct HeapDataParamsConfig {
  * @param no_malloc if set to true no_malloc as described above is enabled.
  * @see [heap_allocator_build]
  */
-typedef struct HeapAllocatorConfig {
+typedef struct HeapAllocatorConfig
+{
 	bool zeroed;
 	bool no_malloc;
 } HeapAllocatorConfig;
@@ -99,7 +101,8 @@ typedef struct HeapAllocatorConfig {
  * @see [fat_ptr_data]
  * @see [fat_ptr_len]
  */
-typedef struct FatPtr {
+typedef struct FatPtr
+{
 	u64 id;
 	void *data;
 	u64 len;
@@ -122,7 +125,8 @@ typedef struct HeapAllocatorImpl HeapAllocatorImpl;
  * @see [heap_allocator_free]
  * @see [heap_allocator_cleanup]
  */
-typedef struct HeapAllocator {
+typedef struct HeapAllocator
+{
 	HeapAllocatorImpl *impl;
 } HeapAllocator;
 
@@ -224,17 +228,19 @@ void *fat_ptr_data(const FatPtr *ptr);
  */
 u64 fat_ptr_len(const FatPtr *ptr);
 
-#define HA_CONFIG_DEFAULT                                                      \
-	{ false, false }
-#define HAP_CONFIG(slab_size, slabs_per_resize, initial_chunks, max_slabs)     \
-	({                                                                     \
-		HeapDataParamsConfig _ret__ = {                                \
-		    slab_size,                                                 \
-		    slabs_per_resize,                                          \
-		    initial_chunks,                                            \
-		    max_slabs,                                                 \
-		};                                                             \
-		_ret__;                                                        \
+#define HA_CONFIG_DEFAULT    \
+	{                    \
+		false, false \
+	}
+#define HAP_CONFIG(slab_size, slabs_per_resize, initial_chunks, max_slabs) \
+	({                                                                 \
+		HeapDataParamsConfig _ret__ = {                            \
+		    slab_size,                                             \
+		    slabs_per_resize,                                      \
+		    initial_chunks,                                        \
+		    max_slabs,                                             \
+		};                                                         \
+		_ret__;                                                    \
 	})
 
 // make some private functions/variables visible for tests

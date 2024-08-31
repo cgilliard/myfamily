@@ -24,7 +24,8 @@
 _Thread_local jmp_buf return_jmp;
 _Thread_local bool jmp_return_set = false;
 
-void panic(const char *fmt, ...) {
+void panic(const char *fmt, ...)
+{
 	va_list args;
 
 	fprintf(stderr, "thread panicked: ");
@@ -35,7 +36,8 @@ void panic(const char *fmt, ...) {
 
 	Lock_mark_poisoned();
 
-	if (__default_tl_heap_allocator != NULL) {
+	if (__default_tl_heap_allocator != NULL)
+	{
 		heap_allocator_cleanup(__default_tl_heap_allocator);
 	}
 

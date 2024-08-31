@@ -21,18 +21,22 @@ _Thread_local const Object *__thread_local_self_Const = NULL;
 _Thread_local Object *__thread_local_self_Var = NULL;
 
 atomic_ullong __global_counter__;
-void __attribute__((constructor)) init_global_counter() {
+void __attribute__((constructor)) init_global_counter()
+{
 	atomic_init(&__global_counter__, 1);
 }
 
-u64 unique_id() {
+u64 unique_id()
+{
 	u64 ret = atomic_fetch_add(&__global_counter__, 1);
 	return ret;
 }
 
-FatPtr build_fat_ptr(u64 size) {
+FatPtr build_fat_ptr(u64 size)
+{
 	FatPtr ret;
-	if (chain_malloc(&ret, size)) {
+	if (chain_malloc(&ret, size))
+	{
 		// if chain_malloc is an error we set data to NULL and caller to
 		// handle
 		ret.data = NULL;
@@ -40,23 +44,29 @@ FatPtr build_fat_ptr(u64 size) {
 	return ret;
 }
 
-int compare_vtable_entry(const void *ent1, const void *ent2) {
+int compare_vtable_entry(const void *ent1, const void *ent2)
+{
 	const VtableEntry *vtent1 = ent1;
 	const VtableEntry *vtent2 = ent2;
 	return strcmp(vtent1->name, vtent2->name);
 }
 
-void sort_vtable(Vtable *table) {
+void sort_vtable(Vtable *table)
+{
 	qsort(table->entries, table->len, sizeof(VtableEntry),
 	      compare_vtable_entry);
 }
 
-void vtable_add_entry(Vtable *table, VtableEntry entry) {
-	if (table->entries == NULL) {
+void vtable_add_entry(Vtable *table, VtableEntry entry)
+{
+	if (table->entries == NULL)
+	{
 		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
 		if (table->entries == NULL)
 			panic("Couldn't allocate memory for vtable");
-	} else {
+	}
+	else
+	{
 		void *tmp = realloc(table->entries,
 				    sizeof(VtableEntry) * (table->len + 1));
 		if (tmp == NULL)
@@ -69,11 +79,14 @@ void vtable_add_entry(Vtable *table, VtableEntry entry) {
 	sort_vtable(table);
 }
 
-bool vtable_check_impl_trait(Vtable *table, char *trait) {
+bool vtable_check_impl_trait(Vtable *table, char *trait)
+{
 	bool ret = false;
 
-	for (u64 i = 0; i < table->trait_len; i++) {
-		if (!strcmp(table->trait_entries[i].trait_name, trait)) {
+	for (u64 i = 0; i < table->trait_len; i++)
+	{
+		if (!strcmp(table->trait_entries[i].trait_name, trait))
+		{
 			ret = true;
 			break;
 		}
@@ -82,13 +95,17 @@ bool vtable_check_impl_trait(Vtable *table, char *trait) {
 	return ret;
 }
 
-void vtable_add_trait(Vtable *table, char *trait) {
-	if (table->trait_entries == NULL) {
+void vtable_add_trait(Vtable *table, char *trait)
+{
+	if (table->trait_entries == NULL)
+	{
 		table->trait_entries =
 		    malloc(sizeof(VtableTraitEntry) * (table->trait_len + 1));
 		if (table->trait_entries == NULL)
 			panic("Couldn't allocate memory for vtable");
-	} else {
+	}
+	else
+	{
 		void *tmp =
 		    realloc(table->trait_entries,
 			    sizeof(VtableTraitEntry) * (table->trait_len + 1));
@@ -108,36 +125,46 @@ void vtable_add_trait(Vtable *table, char *trait) {
 	table->trait_len += 1;
 }
 
-void *find_fn(const Object *obj, const char *name) {
+void *find_fn(const Object *obj, const char *name)
+{
 	int left = 0;
 	int right = obj->vtable->len - 1;
-	while (left <= right) {
+	while (left <= right)
+	{
 		int mid = left + (right - left) / 2;
 		int cmp = strcmp(name, obj->vtable->entries[mid].name);
 
-		if (cmp == 0) {
+		if (cmp == 0)
+		{
 			return obj->vtable->entries[mid].fn_ptr;
-		} else if (cmp < 0) {
+		}
+		else if (cmp < 0)
+		{
 			right = mid - 1;
-		} else {
+		}
+		else
+		{
 			left = mid + 1;
 		}
 	}
 	return NULL;
 }
 
-void SelfCleanupImpl_update(SelfCleanupImpl *ptr) {
+void SelfCleanupImpl_update(SelfCleanupImpl *ptr)
+{
 	__thread_local_self_Const = ptr->prev_tl_self_Const;
 	__thread_local_self_Var = ptr->prev_tl_self_Var;
 }
 
-void Object_check_param(const Object *obj) {
+void Object_check_param(const Object *obj)
+{
 	if (obj && (obj->flags & OBJECT_FLAGS_CONSUMED) != 0)
 		panic("Passing a consumed object as a function "
 		      "parameter!");
 }
 
-void Object_build_int(Object *ptr) {
+void Object_build_int(Object *ptr)
+{
 	// call internal build handler
 	void (*build_int)(Object * ptr) = find_fn(ptr, "build_internal");
 	if (!build_int)
@@ -145,9 +172,11 @@ void Object_build_int(Object *ptr) {
 	build_int(ptr);
 }
 
-void Object_build(Object *ptr) {
+void Object_build(Object *ptr)
+{
 	void (*do_build)(Object * ptr) = find_fn(ptr, "build");
-	if (do_build) {
+	if (do_build)
+	{
 		// setup self references
 		Object *tmp_Var = __thread_local_self_Var;
 		const Object *tmp_Const = __thread_local_self_Const;
@@ -162,7 +191,7 @@ void Object_build(Object *ptr) {
 
 #if defined(__clang__)
 // Clang-specific pragma
-#pragma clang diagnostic ignored                                               \
+#pragma clang diagnostic ignored \
     "-Wincompatible-pointer-types-discards-qualifiers"
 #elif defined(__GNUC__) && !defined(__clang__)
 // GCC-specific pragma
@@ -171,9 +200,11 @@ void Object_build(Object *ptr) {
 #else
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
-void Object_cleanup(const Object *ptr) {
+void Object_cleanup(const Object *ptr)
+{
 	Object *unconst = ptr;
-	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0) {
+	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0)
+	{
 		// call internal drop handler
 		void (*drop_int)(Object * ptr) = find_fn(ptr, "drop_internal");
 		if (!drop_int)
@@ -182,7 +213,8 @@ void Object_cleanup(const Object *ptr) {
 
 		// call defined drop handler
 		void (*drop)(Object * ptr) = find_fn(ptr, "drop");
-		if (drop) {
+		if (drop)
+		{
 			// setup self references
 			Object *tmp_Var = __thread_local_self_Var;
 			Object *tmp_Const = __thread_local_self_Const;
@@ -193,7 +225,8 @@ void Object_cleanup(const Object *ptr) {
 			__thread_local_self_Var = tmp_Var;
 			__thread_local_self_Const = tmp_Const;
 		}
-		if (fat_ptr_data(&unconst->ptr)) {
+		if (fat_ptr_data(&unconst->ptr))
+		{
 			chain_free(&unconst->ptr);
 		}
 	}
@@ -202,7 +235,7 @@ void Object_cleanup(const Object *ptr) {
 #if defined(__clang__)
 // Clang-specific pragma
 #pragma GCC diagnostic push
-#pragma clang diagnostic ignored                                               \
+#pragma clang diagnostic ignored \
     "-Wincompatible-pointer-types-discards-qualifiers"
 #elif defined(__GNUC__) && !defined(__clang__)
 // GCC-specific pragma
@@ -211,7 +244,8 @@ void Object_cleanup(const Object *ptr) {
 #else
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
-void Object_mark_consumed(const Object *ptr) {
+void Object_mark_consumed(const Object *ptr)
+{
 	Object *unconst = ptr;
 	unconst->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
 }

@@ -23,26 +23,31 @@
 int PANIC_TRUE = 1;
 int PANIC_FALSE = 0;
 
-typedef struct ThreadArgsWrapper {
+typedef struct ThreadArgsWrapper
+{
 	void (*start_routine)(void *);
 	void *args;
 	FatPtr self;
 } ThreadArgsWrapper;
 
-typedef struct ThreadImpl {
+typedef struct ThreadImpl
+{
 	pthread_t pth;
 	u64 tid;
 	FatPtr self;
 } ThreadImpl;
 
-void Thread_cleanup(Thread *ptr) {
+void Thread_cleanup(Thread *ptr)
+{
 	if (chain_free(&ptr->impl))
 		panic("Could not free Thread");
 }
 
-void *Thread_proc_start(void *arg) {
+void *Thread_proc_start(void *arg)
+{
 	// set jmp return point for panics
-	if (PANIC_RETURN()) {
+	if (PANIC_RETURN())
+	{
 		pthread_exit(&PANIC_TRUE);
 	}
 
@@ -53,18 +58,21 @@ void *Thread_proc_start(void *arg) {
 	if (chain_free(&taw->self))
 		panic("Could not free ThreadArgsWrapper");
 
-	if (__default_tl_heap_allocator != NULL) {
+	if (__default_tl_heap_allocator != NULL)
+	{
 		heap_allocator_cleanup(__default_tl_heap_allocator);
 	}
 
 	pthread_exit(&PANIC_FALSE);
 }
 
-int Thread_start(Thread *th, void (*start_routine)(void *), void *args) {
+int Thread_start(Thread *th, void (*start_routine)(void *), void *args)
+{
 	int ret = 0;
 	ret = chain_malloc(&th->impl, sizeof(ThreadImpl));
 
-	if (!ret) {
+	if (!ret)
+	{
 
 		ChainGuard guard = GLOBAL_SYNC_ALLOCATOR();
 		ThreadImpl *ti = th->impl.data;
@@ -72,7 +80,8 @@ int Thread_start(Thread *th, void (*start_routine)(void *), void *args) {
 		FatPtr tawptr;
 		ret = chain_malloc(&tawptr, sizeof(ThreadArgsWrapper));
 
-		if (!ret) {
+		if (!ret)
+		{
 			ThreadArgsWrapper *data = tawptr.data;
 			data->start_routine = start_routine;
 			data->args = args;
@@ -85,13 +94,15 @@ int Thread_start(Thread *th, void (*start_routine)(void *), void *args) {
 	return ret;
 }
 
-JoinResult Thread_join(Thread *ptr) {
+JoinResult Thread_join(Thread *ptr)
+{
 	int result = -1;
 	int *status = &PANIC_FALSE;
 
 	if (ptr == NULL)
 		errno = EINVAL;
-	else {
+	else
+	{
 		ThreadImpl *ti = ptr->impl.data;
 		result = pthread_join(ti->pth, (void *)&status);
 	}

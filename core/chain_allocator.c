@@ -31,8 +31,10 @@ Lock *__global_sync_allocator_lock = NULL;
 HeapAllocatorConfig __default_hconfig_ = {false, false};
 
 // create default slab sizes for the heap allocator with alignment in mind
-#define HD_CFG(size)                                                           \
-	{ size, 10, 0, UINT32_MAX }
+#define HD_CFG(size)                    \
+	{                               \
+		size, 10, 0, UINT32_MAX \
+	}
 HeapDataParamsConfig __default_hdpc_arr_value[] = {HD_CFG(8),
 						   HD_CFG(16),
 						   HD_CFG(32),
@@ -82,32 +84,37 @@ u64 __default_hdpc_arr_size =
     sizeof(__default_hdpc_arr_value) / sizeof(__default_hdpc_arr_value[0]);
 
 // allows for overwriting the hconfig
-void set_default_hconfig(HeapAllocatorConfig *hconfig) {
+void set_default_hconfig(HeapAllocatorConfig *hconfig)
+{
 	__default_hconfig_ = *hconfig;
 }
 
 // allows for overwriting of the default hdpc array
-void set_default_hdpc_arr(HeapDataParamsConfig arr[], u64 size) {
+void set_default_hdpc_arr(HeapDataParamsConfig arr[], u64 size)
+{
 	__default_hdpc_arr_ = arr;
 	__default_hdpc_arr_size = size;
 }
 
 // build the using the default heap allocator config
-int build_default_heap_allocator(HeapAllocator *ptr) {
+int build_default_heap_allocator(HeapAllocator *ptr)
+{
 	return heap_allocator_build_arr(ptr, &__default_hconfig_,
 					__default_hdpc_arr_,
 					__default_hdpc_arr_size);
 }
 
 // init the global sync allocator
-void global_sync_allocator_init() {
+void global_sync_allocator_init()
+{
 	// allocate for the data structure
 	__global_sync_allocator = malloc(sizeof(HeapAllocator));
 	__global_sync_allocator_lock = malloc(sizeof(Lock));
 
 	// check for failures
 	if (__global_sync_allocator_lock == NULL ||
-	    __global_sync_allocator == NULL) {
+	    __global_sync_allocator == NULL)
+	{
 		// deallocate and panic
 		if (__global_sync_allocator_lock != NULL)
 			free(__global_sync_allocator_lock);
@@ -120,14 +127,16 @@ void global_sync_allocator_init() {
 	*__global_sync_allocator_lock = LOCK();
 
 	// build with the default configurations
-	if (build_default_heap_allocator(__global_sync_allocator)) {
+	if (build_default_heap_allocator(__global_sync_allocator))
+	{
 		free(__global_sync_allocator);
 		panic("Could not initialize the global sync HeapAllocator");
 	}
 }
 
 // Entry for the chain allocator stack.
-typedef struct ChainGuardEntry {
+typedef struct ChainGuardEntry
+{
 	HeapAllocator *ha;
 	bool is_sync;
 	Lock *lock;
@@ -139,7 +148,8 @@ _Thread_local ChainGuardEntry
 _Thread_local u64 __thread_local_chain_allocator_index = 0;
 
 // cleanup the local thread allocator (used when threads terminate)
-void thread_local_allocator_cleanup() {
+void thread_local_allocator_cleanup()
+{
 	if (__thread_local_chain_allocator_index > 0)
 		heap_allocator_cleanup(
 		    __thread_local_chain_allocator
@@ -147,16 +157,19 @@ void thread_local_allocator_cleanup() {
 			    .ha);
 }
 
-void global_sync_allocator_cleanup() {
+void global_sync_allocator_cleanup()
+{
 	if (__global_sync_allocator != NULL)
 		heap_allocator_cleanup(__global_sync_allocator);
 }
 
-void chain_guard_cleanup(ChainGuard *ptr) {
+void chain_guard_cleanup(ChainGuard *ptr)
+{
 	__thread_local_chain_allocator_index--;
 }
 
-ChainGuard chain_guard(ChainConfig *config) {
+ChainGuard chain_guard(ChainConfig *config)
+{
 	if (__thread_local_chain_allocator_index >= MAX_CHAIN_ALLOCATOR_DEPTH)
 		panic("too many chain allocators");
 
@@ -174,15 +187,18 @@ ChainGuard chain_guard(ChainConfig *config) {
 	return ret;
 }
 
-int chain_malloc(FatPtr *ptr, u64 size) {
-	if (__thread_local_chain_allocator_index == 0) {
+int chain_malloc(FatPtr *ptr, u64 size)
+{
+	if (__thread_local_chain_allocator_index == 0)
+	{
 		// thread local allocator has not been initialized. Create it
 		// now.
 		HeapAllocator *ha = malloc(sizeof(HeapAllocator));
 		if (!ha)
 			return -1;
 
-		if (build_default_heap_allocator(ha)) {
+		if (build_default_heap_allocator(ha))
+		{
 			free(ha);
 			return -1;
 		};
@@ -210,11 +226,14 @@ int chain_malloc(FatPtr *ptr, u64 size) {
 
 	return ret;
 }
-int chain_realloc(FatPtr *dst, FatPtr *src, u64 size) {
-	if (__thread_local_chain_allocator_index == 0) {
+int chain_realloc(FatPtr *dst, FatPtr *src, u64 size)
+{
+	if (__thread_local_chain_allocator_index == 0)
+	{
 		return -1;
 	}
-	if (size == 0) {
+	if (size == 0)
+	{
 		errno = EINVAL;
 		return -1;
 	}
@@ -229,7 +248,8 @@ int chain_realloc(FatPtr *dst, FatPtr *src, u64 size) {
 
 		ret = heap_allocator_allocate(
 		    __thread_local_chain_allocator[index].ha, size, dst);
-		if (!ret) {
+		if (!ret)
+		{
 			void *src_data = fat_ptr_data(src);
 			void *dst_data = fat_ptr_data(dst);
 			u64 len = fat_ptr_len(src);
@@ -240,8 +260,10 @@ int chain_realloc(FatPtr *dst, FatPtr *src, u64 size) {
 
 	return ret;
 }
-int chain_free(FatPtr *ptr) {
-	if (__thread_local_chain_allocator_index == 0) {
+int chain_free(FatPtr *ptr)
+{
+	if (__thread_local_chain_allocator_index == 0)
+	{
 		errno = ERANGE;
 		return -1;
 	}
