@@ -28,31 +28,31 @@ typedef struct LockPtr
 	atomic_bool poison;
 } LockPtr;
 
-void Lock_cleanup(LockPtr *ptr);
+void Lock_cleanup(LockPtr* ptr);
 
 #define Lock LockPtr __attribute__((warn_unused_result, cleanup(Lock_cleanup)))
 
-void Lock_set_poison(Lock *ptr);
-bool Lock_is_poisoned(Lock *ptr);
-void Lock_clear_poison(Lock *ptr);
+void Lock_set_poison(Lock* ptr);
+bool Lock_is_poisoned(Lock* ptr);
+void Lock_clear_poison(Lock* ptr);
 void Lock_mark_poisoned();
 
 typedef struct LockGuardPtr
 {
-	LockPtr *ref;
+	LockPtr* ref;
 } LockGuardPtr;
 
-void Lockguard_cleanup(LockGuardPtr *ptr);
+void Lockguard_cleanup(LockGuardPtr* ptr);
 Lock Lock_build();
 
 #define LockGuard    \
 	LockGuardPtr \
 	    __attribute__((warn_unused_result, cleanup(Lockguard_cleanup)))
 
-LockGuard lock(Lock *lock);
-void Lock_wait(Lock *lock, u64 nanos);
-void Lock_notify(Lock *lock);
-void Lock_notify_all(Lock *lock);
+LockGuard lock(Lock* lock);
+void Lock_wait(Lock* lock, u64 nanos);
+void Lock_notify(Lock* lock);
+void Lock_notify_all(Lock* lock);
 
 #define LOCK() Lock_build()
 #define LOCK_GUARD_CLEANUP_SAFE {NULL};

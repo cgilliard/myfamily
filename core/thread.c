@@ -25,8 +25,8 @@ int PANIC_FALSE = 0;
 
 typedef struct ThreadArgsWrapper
 {
-	void (*start_routine)(void *);
-	void *args;
+	void (*start_routine)(void*);
+	void* args;
 	FatPtr self;
 } ThreadArgsWrapper;
 
@@ -37,13 +37,13 @@ typedef struct ThreadImpl
 	FatPtr self;
 } ThreadImpl;
 
-void Thread_cleanup(Thread *ptr)
+void Thread_cleanup(Thread* ptr)
 {
 	if (chain_free(&ptr->impl))
 		panic("Could not free Thread");
 }
 
-void *Thread_proc_start(void *arg)
+void* Thread_proc_start(void* arg)
 {
 	// set jmp return point for panics
 	if (PANIC_RETURN())
@@ -51,7 +51,7 @@ void *Thread_proc_start(void *arg)
 		pthread_exit(&PANIC_TRUE);
 	}
 
-	ThreadArgsWrapper *taw = arg;
+	ThreadArgsWrapper* taw = arg;
 	(taw->start_routine)(taw->args);
 
 	ChainGuard guard = GLOBAL_SYNC_ALLOCATOR();
@@ -66,7 +66,7 @@ void *Thread_proc_start(void *arg)
 	pthread_exit(&PANIC_FALSE);
 }
 
-int Thread_start(Thread *th, void (*start_routine)(void *), void *args)
+int Thread_start(Thread* th, void (*start_routine)(void*), void* args)
 {
 	int ret = 0;
 	ret = chain_malloc(&th->impl, sizeof(ThreadImpl));
@@ -75,14 +75,14 @@ int Thread_start(Thread *th, void (*start_routine)(void *), void *args)
 	{
 
 		ChainGuard guard = GLOBAL_SYNC_ALLOCATOR();
-		ThreadImpl *ti = th->impl.data;
+		ThreadImpl* ti = th->impl.data;
 
 		FatPtr tawptr;
 		ret = chain_malloc(&tawptr, sizeof(ThreadArgsWrapper));
 
 		if (!ret)
 		{
-			ThreadArgsWrapper *data = tawptr.data;
+			ThreadArgsWrapper* data = tawptr.data;
 			data->start_routine = start_routine;
 			data->args = args;
 			data->self = tawptr;
@@ -94,22 +94,22 @@ int Thread_start(Thread *th, void (*start_routine)(void *), void *args)
 	return ret;
 }
 
-JoinResult Thread_join(Thread *ptr)
+JoinResult Thread_join(Thread* ptr)
 {
 	int result = -1;
-	int *status = &PANIC_FALSE;
+	int* status = &PANIC_FALSE;
 
 	if (ptr == NULL)
 		errno = EINVAL;
 	else
 	{
-		ThreadImpl *ti = ptr->impl.data;
-		result = pthread_join(ti->pth, (void *)&status);
+		ThreadImpl* ti = ptr->impl.data;
+		result = pthread_join(ti->pth, (void*)&status);
 	}
 	JoinResult jr = {*status == PANIC_TRUE, result != 0};
 	return jr;
 }
 
-bool JoinResult_is_panic(JoinResult *jr) { return jr->is_panic; }
+bool JoinResult_is_panic(JoinResult* jr) { return jr->is_panic; }
 
-bool JoinResult_is_error(JoinResult *jr) { return jr->is_error; }
+bool JoinResult_is_error(JoinResult* jr) { return jr->is_error; }

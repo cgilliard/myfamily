@@ -14,7 +14,7 @@
 
 #include <core/traits.h>
 
-void drop(Object *self)
+void drop(Object* self)
 {
 	if (self->flags & OBJECT_FLAGS_CONSUMED)
 		panic("Runtime error: Object [%s@%" PRIu64

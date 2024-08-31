@@ -27,7 +27,7 @@ extern _Thread_local bool jmp_return_set;
 extern bool __debug_no_exit;
 #endif // TEST
 
-void panic(const char *format, ...);
+void panic(const char* format, ...);
 
 #define PANIC_RETURN()                             \
 	({                                         \

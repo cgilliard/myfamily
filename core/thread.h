@@ -30,16 +30,16 @@ typedef struct ThreadPtr
 	FatPtr impl;
 } ThreadPtr;
 
-void Thread_cleanup(ThreadPtr *ptr);
+void Thread_cleanup(ThreadPtr* ptr);
 
 #define Thread \
 	ThreadPtr __attribute__((warn_unused_result, cleanup(Thread_cleanup)))
 
-int Thread_start(Thread *ptr, void (*start_routine)(void *), void *args);
-u64 Thread_id(Thread *ptr);
-JoinResult Thread_join(Thread *ptr);
+int Thread_start(Thread* ptr, void (*start_routine)(void*), void* args);
+u64 Thread_id(Thread* ptr);
+JoinResult Thread_join(Thread* ptr);
 
-bool JoinResult_is_panic(JoinResult *jr);
-bool JoinResult_is_error(JoinResult *jr);
+bool JoinResult_is_panic(JoinResult* jr);
+bool JoinResult_is_error(JoinResult* jr);
 
 #endif // _CORE_THREAD__

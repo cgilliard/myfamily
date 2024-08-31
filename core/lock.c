@@ -18,17 +18,17 @@
 #include <unistd.h>
 
 #define MAX_LOCKS 100
-_Thread_local Lock *__active_locks_[MAX_LOCKS];
+_Thread_local Lock* __active_locks_[MAX_LOCKS];
 _Thread_local u64 __active_lock_count_ = 0;
 
-void insert_active_lock(Lock *ptr)
+void insert_active_lock(Lock* ptr)
 {
 	if (__active_lock_count_ >= MAX_LOCKS)
 		panic("too many locks!");
 	__active_locks_[__active_lock_count_] = ptr;
 	__active_lock_count_++;
 }
-void delete_active_lock(Lock *ptr)
+void delete_active_lock(Lock* ptr)
 {
 	// note: locks are removed in reverse order
 	// It's possible that cleanup occurs in slightly different order
@@ -50,15 +50,15 @@ Lock Lock_build()
 	return ret;
 }
 
-void Lock_cleanup(LockPtr *ptr)
+void Lock_cleanup(LockPtr* ptr)
 {
 	pthread_mutex_destroy(&ptr->lock);
 	pthread_cond_destroy(&ptr->cond);
 }
 
-void Lock_set_poison(Lock *ptr) { atomic_exchange(&ptr->poison, true); }
-bool Lock_is_poisoned(Lock *ptr) { return atomic_load(&ptr->poison); }
-void Lock_clear_poison(Lock *ptr) { atomic_exchange(&ptr->poison, false); }
+void Lock_set_poison(Lock* ptr) { atomic_exchange(&ptr->poison, true); }
+bool Lock_is_poisoned(Lock* ptr) { return atomic_load(&ptr->poison); }
+void Lock_clear_poison(Lock* ptr) { atomic_exchange(&ptr->poison, false); }
 u64 Lock_get_tid()
 {
 	u64 tid;
@@ -70,7 +70,7 @@ u64 Lock_get_tid()
 	return tid;
 }
 
-LockGuard lock(Lock *ptr)
+LockGuard lock(Lock* ptr)
 {
 	if (atomic_load(&ptr->poison))
 		panic("Lock %p: poisoned!", ptr);
@@ -95,7 +95,7 @@ LockGuard lock(Lock *ptr)
 	return ret;
 }
 
-void Lockguard_cleanup(LockGuardPtr *ptr)
+void Lockguard_cleanup(LockGuardPtr* ptr)
 {
 	if (ptr && ptr->ref)
 	{
@@ -122,7 +122,7 @@ void Lock_mark_poisoned()
 	}
 }
 
-void Lock_wait(Lock *ptr, u64 nanoseconds)
+void Lock_wait(Lock* ptr, u64 nanoseconds)
 {
 	u64 tid = Lock_get_tid();
 	if (!(atomic_load(&ptr->is_locked) && atomic_load(&ptr->tid) == tid))
@@ -153,6 +153,6 @@ void Lock_wait(Lock *ptr, u64 nanoseconds)
 	}
 }
 
-void Lock_notify(Lock *ptr) { pthread_cond_signal(&ptr->cond); }
+void Lock_notify(Lock* ptr) { pthread_cond_signal(&ptr->cond); }
 
-void Lock_notify_all(Lock *ptr) { pthread_cond_broadcast(&ptr->cond); }
+void Lock_notify_all(Lock* ptr) { pthread_cond_broadcast(&ptr->cond); }

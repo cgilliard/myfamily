@@ -24,7 +24,7 @@
 _Thread_local jmp_buf return_jmp;
 _Thread_local bool jmp_return_set = false;
 
-void panic(const char *fmt, ...)
+void panic(const char* fmt, ...)
 {
 	va_list args;
 

@@ -29,8 +29,8 @@
 
 typedef struct
 {
-	char *name;
-	void *fn_ptr;
+	char* name;
+	void* fn_ptr;
 } VtableEntry;
 
 typedef struct VtableTraitEntry
@@ -41,16 +41,16 @@ typedef struct VtableTraitEntry
 
 typedef struct
 {
-	char *name;
+	char* name;
 	u64 len;
-	VtableEntry *entries;
+	VtableEntry* entries;
 	u64 trait_len;
-	VtableTraitEntry *trait_entries;
+	VtableTraitEntry* trait_entries;
 } Vtable;
 
 typedef struct Object
 {
-	Vtable *vtable;
+	Vtable* vtable;
 	u64 id;
 	u8 flags;
 	FatPtr ptr;
@@ -58,29 +58,29 @@ typedef struct Object
 
 typedef struct SelfCleanupImpl
 {
-	const Object *prev_tl_self_Const;
-	Object *prev_tl_self_Var;
+	const Object* prev_tl_self_Const;
+	Object* prev_tl_self_Var;
 } SelfCleanupImpl;
 
-void SelfCleanupImpl_update(SelfCleanupImpl *sc);
+void SelfCleanupImpl_update(SelfCleanupImpl* sc);
 
 #define SelfCleanup                                        \
 	SelfCleanupImpl __attribute__((warn_unused_result, \
 				       cleanup(SelfCleanupImpl_update)))
 
-extern _Thread_local const Object *__thread_local_self_Const;
-extern _Thread_local Object *__thread_local_self_Var;
+extern _Thread_local const Object* __thread_local_self_Const;
+extern _Thread_local Object* __thread_local_self_Var;
 
-void Object_cleanup(const Object *ptr);
-void Object_mark_consumed(const Object *ptr);
-void Object_build(Object *ptr);
-void Object_build_int(Object *ptr);
-void Object_check_param(const Object *obj);
-void sort_vtable(Vtable *table);
-void vtable_add_entry(Vtable *table, VtableEntry entry);
-void vtable_add_trait(Vtable *table, char *trait);
-bool vtable_check_impl_trait(Vtable *table, char *trait);
-void *find_fn(const Object *obj, const char *name);
+void Object_cleanup(const Object* ptr);
+void Object_mark_consumed(const Object* ptr);
+void Object_build(Object* ptr);
+void Object_build_int(Object* ptr);
+void Object_check_param(const Object* obj);
+void sort_vtable(Vtable* table);
+void vtable_add_entry(Vtable* table, VtableEntry entry);
+void vtable_add_trait(Vtable* table, char* trait);
+bool vtable_check_impl_trait(Vtable* table, char* trait);
+void* find_fn(const Object* obj, const char* name);
 u64 unique_id();
 FatPtr build_fat_ptr(u64 size);
 
@@ -92,28 +92,28 @@ FatPtr build_fat_ptr(u64 size);
 #define var Cleanup
 #define let const Cleanup
 
-#define $Var(...)                                                            \
-	__VA_OPT__(((IMPL *)__thread_local_self_Var->ptr.data)->__VA_ARGS__) \
-	__VA_OPT__(NONE)                                                     \
+#define $Var(...)                                                           \
+	__VA_OPT__(((IMPL*)__thread_local_self_Var->ptr.data)->__VA_ARGS__) \
+	__VA_OPT__(NONE)                                                    \
 	(__thread_local_self_Var)
 
-#define $(...)                                                                \
-	__VA_OPT__(                                                           \
-	    ((const IMPL *)__thread_local_self_Const->ptr.data)->__VA_ARGS__) \
-	__VA_OPT__(NONE)                                                      \
+#define $(...)                                                               \
+	__VA_OPT__(                                                          \
+	    ((const IMPL*)__thread_local_self_Const->ptr.data)->__VA_ARGS__) \
+	__VA_OPT__(NONE)                                                     \
 	(__thread_local_self_Const)
 
 #define FIRST_TWO(x, y, ...) x y
 #define CALL_FIRST_TWO(x, y) FIRST_TWO y
 
 #define DROP_OBJECTS__(name, struct_type, inner, ...) \
-	__VA_OPT__(Object_cleanup(&((name *)(ptr->ptr.data))->inner);)
+	__VA_OPT__(Object_cleanup(&((name*)(ptr->ptr.data))->inner);)
 #define DROP_OBJECTS_(...) DROP_OBJECTS__(__VA_ARGS__)
 #define DROP_OBJECTS(name, inner) DROP_OBJECTS_(name, EXPAND_ALL inner)
 
-#define BUILD_OBJECTS__(name, struct_type, inner, ...)             \
-	__VA_OPT__(((name *)(ptr->ptr.data))->inner = OBJECT_INIT; \
-		   ((name *)(ptr->ptr.data))->inner.vtable =       \
+#define BUILD_OBJECTS__(name, struct_type, inner, ...)            \
+	__VA_OPT__(((name*)(ptr->ptr.data))->inner = OBJECT_INIT; \
+		   ((name*)(ptr->ptr.data))->inner.vtable =       \
 		       &__VA_ARGS__##_Vtable__;)
 #define BUILD_OBJECTS_(...) BUILD_OBJECTS__(__VA_ARGS__)
 #define BUILD_OBJECTS(name, inner) BUILD_OBJECTS_(name, EXPAND_ALL inner)
@@ -127,11 +127,11 @@ FatPtr build_fat_ptr(u64 size);
 		FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);                  \
 	} name;                                                                \
 	u64 name##_size() { return sizeof(name); }                             \
-	void name##_build_internal(Object *ptr)                                \
+	void name##_build_internal(Object* ptr)                                \
 	{                                                                      \
 		FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__);               \
 	}                                                                      \
-	void name##_drop_internal(Object *ptr)                                 \
+	void name##_drop_internal(Object* ptr)                                 \
 	{                                                                      \
 		FOR_EACH(DROP_OBJECTS, name, (;), __VA_ARGS__);                \
 	}                                                                      \
@@ -163,27 +163,25 @@ FatPtr build_fat_ptr(u64 size);
 		_ret__;                                                       \
 	})
 
-#define Move(dst, src)                                                       \
-	({                                                                   \
-		if (((*((Object *)src)).flags & OBJECT_FLAGS_CONSUMED) != 0) \
-			panic("src object has already been consumed\n");     \
-		/* Check for vtable mismatch */                              \
-		if (((*((Object *)dst)).vtable != NULL &&                    \
-		     ((*((Object *)dst)).vtable !=                           \
-		      ((*((Object *)src)).vtable))))                         \
-		{                                                            \
-			panic("Vtable mismatch! Trying to set type %s to "   \
-			      "type %s!",                                    \
-			      ((*((Object *)dst)).vtable)->name,             \
-			      ((*((Object *)src)).vtable)->name);            \
-		}                                                            \
-		/* If the object is not consumed we call cleanup as we are   \
-		 * overwriting it.*/                                         \
-		if (((*((Object *)dst)).flags & OBJECT_FLAGS_CONSUMED) == 0) \
-			Object_cleanup(dst);                                 \
-		*((Object *)dst) = *((Object *)src);                         \
-		(*((Object *)src)).flags |=                                  \
-		    OBJECT_FLAGS_CONSUMED | OBJECT_FLAGS_NO_CLEANUP;         \
+#define Move(dst, src)                                                                                              \
+	({                                                                                                          \
+		if (((*((Object*)src)).flags & OBJECT_FLAGS_CONSUMED) != 0)                                         \
+			panic("src object has already been consumed\n");                                            \
+		/* Check for vtable mismatch */                                                                     \
+		if (((*((Object*)dst)).vtable != NULL && ((*((Object*)dst)).vtable != ((*((Object*)src)).vtable)))) \
+		{                                                                                                   \
+			panic("Vtable mismatch! Trying to set type %s to "                                          \
+			      "type %s!",                                                                           \
+			      ((*((Object*)dst)).vtable)->name,                                                     \
+			      ((*((Object*)src)).vtable)->name);                                                    \
+		}                                                                                                   \
+		/* If the object is not consumed we call cleanup as we are                                          \
+		 * overwriting it.*/                                                                                \
+		if (((*((Object*)dst)).flags & OBJECT_FLAGS_CONSUMED) == 0)                                         \
+			Object_cleanup(dst);                                                                        \
+		*((Object*)dst) = *((Object*)src);                                                                  \
+		(*((Object*)src)).flags |=                                                                          \
+		    OBJECT_FLAGS_CONSUMED | OBJECT_FLAGS_NO_CLEANUP;                                                \
 	})
 
 // Define macros to extract the type and name from a tuple
@@ -207,11 +205,11 @@ FatPtr build_fat_ptr(u64 size);
 #define PROCESS_FN_CALL(...) \
 	FOR_EACH_INNER(CALL_SECOND, none, (, ), __VA_ARGS__)
 
-#define OBJECT_ONLY(i, value)                                 \
-	_Generic((value),                                     \
-		 Object *                                     \
-		 : Object_check_param((const Object *)value), \
-		   default                                    \
+#define OBJECT_ONLY(i, value)                                \
+	_Generic((value),                                    \
+		 Object *                                    \
+		 : Object_check_param((const Object*)value), \
+		   default                                   \
 		 : Object_check_param(NULL))
 #define CALL_SECOND_OBJECT(x, y) OBJECT_ONLY y
 #define PROCESS_FN_CHECK_OBJECTS(...) \
@@ -224,7 +222,7 @@ FatPtr build_fat_ptr(u64 size);
 #define PROCESS_FN_SIG(...) FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__)
 
 #define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)             \
-	static return_type fn_name(mutability() Object *self __VA_OPT__(       \
+	static return_type fn_name(mutability() Object* self __VA_OPT__(       \
 	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)))                       \
 	{                                                                      \
 		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
@@ -278,7 +276,7 @@ FatPtr build_fat_ptr(u64 size);
 
 #define PROC_TRAIT_IMPL_FN_DEFAULT__(default_fn, mutability, return_type,      \
 				     fn_name, ...)                             \
-	static return_type fn_name(mutability() Object *self __VA_OPT__(       \
+	static return_type fn_name(mutability() Object* self __VA_OPT__(       \
 	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)))                       \
 	{                                                                      \
 		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
@@ -351,23 +349,23 @@ FatPtr build_fat_ptr(u64 size);
 #define IS_OBJECT_TYPE(type) __builtin_types_compatible_p(typeof(type), Object)
 
 #define PROC_WITH_OBJ(ptr, structure, field_name, value)        \
-	Object *_ptr__ = ptr + offsetof(structure, field_name); \
+	Object* _ptr__ = ptr + offsetof(structure, field_name); \
 	(*_ptr__) = OBJECT_INIT;                                \
 	Move(_ptr__, &value);
 
-#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                                            \
-	__VA_OPT__(do {                                                                                 \
-		if (IS_OBJECT_TYPE(((structure *)0)->name))                                             \
-		{                                                                                       \
-			panic("Cannot use With to set an Object. Use "                                  \
-			      "'WithObj' isntead.\n");                                                  \
-		}                                                                                       \
-		else                                                                                    \
-		{                                                                                       \
-			*((typeof(((structure *)0)->name) *)(ptr + offsetof(structure, name))) = value; \
-		}                                                                                       \
-	} while (0);)                                                                                   \
-	EXPAND(EXPAND(EXPAND_ALL EXPAND(__VA_OPT__(NONE)(                                               \
+#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                                          \
+	__VA_OPT__(do {                                                                               \
+		if (IS_OBJECT_TYPE(((structure*)0)->name))                                            \
+		{                                                                                     \
+			panic("Cannot use With to set an Object. Use "                                \
+			      "'WithObj' isntead.\n");                                                \
+		}                                                                                     \
+		else                                                                                  \
+		{                                                                                     \
+			*((typeof(((structure*)0)->name)*)(ptr + offsetof(structure, name))) = value; \
+		}                                                                                     \
+	} while (0);)                                                                                 \
+	EXPAND(EXPAND(EXPAND_ALL EXPAND(__VA_OPT__(NONE)(                                             \
 	    PROC_WITH_OBJ(ptr, structure, name, value)) __VA_OPT__(()))))
 
 #define SET_OFFSET_OF(...) SET_OFFSET_OF_IMPL(__VA_ARGS__)
