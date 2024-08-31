@@ -496,7 +496,7 @@ Test(core, test_heap_zeroed)
 	HeapAllocatorConfig hconfig_zeroed = {true, true};
 	HeapAllocatorConfig hconfig_non_zeroed = {false, false};
 	HeapDataParamsConfig hdconfig1 = {16, 20, 1, 45};
-	char* data;
+	char *data;
 
 	cr_assert_eq(__malloc_count, __free_count);
 
@@ -741,7 +741,7 @@ Test(core, test_lock)
 Lock th_lock;
 int counter = 0;
 
-void* start_thread(void* data)
+void *start_thread(void *data)
 {
 	if (PANIC_RETURN())
 	{
@@ -771,13 +771,13 @@ Test(core, test_lock_panic)
 	Lock_cleanup(&th_lock);
 }
 
-void start_thread_test(void* obj)
+void start_thread_test(void *obj)
 {
-	int v = *((int*)obj);
+	int v = *((int *)obj);
 	cr_assert_eq(v, 101);
 }
 
-void start_thread_panic(void* obj) { panic("panic start_thread_panic"); }
+void start_thread_panic(void *obj) { panic("panic start_thread_panic"); }
 
 Test(core, test_threads)
 {
@@ -799,9 +799,9 @@ Lock cond_lock;
 bool check_condition = false;
 int cond_count = 0;
 
-void cond_thread(void* obj)
+void cond_thread(void *obj)
 {
-	int v = *((int*)obj);
+	int v = *((int *)obj);
 	{
 		LockGuard lg = lock(&cond_lock);
 		while (!check_condition)
@@ -829,7 +829,7 @@ Lock sync_lock;
 bool sync_cond = false;
 u64 sync_count = 0;
 
-void sync_thread(void* obj)
+void sync_thread(void *obj)
 {
 	// clang-format off
 	synchronized(sync_lock, {
@@ -982,7 +982,7 @@ Test(core, test_type)
 // some input validation and sets default values. The Build trait can only
 // panic, but once we have Result implemented, we will also provide a 'TryBuild'
 // trait which returns a result which will allow for additional capabilities.
-Type(TestServer, Field(u16, port), Field(char*, host), Field(u16, threads));
+Type(TestServer, Field(u16, port), Field(char *, host), Field(u16, threads));
 
 // define implemented traits 'Build' and 'Drop'
 Impl(TestServer, Build);
@@ -1046,10 +1046,10 @@ Test(core, test_build)
 	// Calling drop with host='127.0.0.1',port=8080,threads=10
 }
 
-Type(TestMove, Field(char*, s), Field(u64, len));
+Type(TestMove, Field(char *, s), Field(u64, len));
 
-#define AccessTestMove                                                \
-	DefineTrait(AccessTestMove, Required(Const, char*, get_tm_s), \
+#define AccessTestMove                                                 \
+	DefineTrait(AccessTestMove, Required(Const, char *, get_tm_s), \
 		    Required(Const, u64, get_tm_len))
 
 TraitImpl(AccessTestMove);
@@ -1065,7 +1065,7 @@ void TestMove_build()
 {
 	if ($(s) == NULL)
 		panic("TestMove: s must not be NULL");
-	char* s = malloc(sizeof(char) * (strlen($(s)) + 1));
+	char *s = malloc(sizeof(char) * (strlen($(s)) + 1));
 	strcpy(s, $(s));
 	$Var(s) = s;
 }
@@ -1075,7 +1075,7 @@ void TestMove_drop()
 	free($(s));
 }
 u64 TestMove_get_tm_len() { return $(len); }
-char* TestMove_get_tm_s() { return $(s); }
+char *TestMove_get_tm_s() { return $(s); }
 #undef IMPL
 
 Test(core, test_move)
@@ -1173,7 +1173,7 @@ Impl(CompositeTest, Build);
 
 #define SetCompTrait                                                  \
 	DefineTrait(SetCompTrait, Required(Var, void, set_comp_value, \
-					   Param(const Object*)))
+					   Param(const Object *)))
 
 TraitImpl(SetCompTrait);
 Impl(CompositeTest, SetCompTrait);
@@ -1207,7 +1207,7 @@ void CompositeTest_drop()
 	comp_drops += 1;
 }
 
-void CompositeTest_set_comp_value(const Object* value)
+void CompositeTest_set_comp_value(const Object *value)
 {
 	Move(&$Var(z), value);
 }
@@ -1234,7 +1234,7 @@ Test(core, test_composites)
 
 #define AdvCompSetBoth                                                \
 	DefineTrait(AdvCompSetBoth, Required(Var, void, set_both_adv, \
-					     Param(u64), Param(Object*)))
+					     Param(u64), Param(Object *)))
 TraitImpl(AdvCompSetBoth);
 
 Type(AdvComp, Field(u64, x), Obj(InnerType, holder));
@@ -1242,11 +1242,11 @@ Impl(AdvComp, SetCompTrait);
 Impl(AdvComp, AdvCompSetBoth);
 
 #define IMPL AdvComp
-void AdvComp_set_comp_value(const Object* value)
+void AdvComp_set_comp_value(const Object *value)
 {
 	Move(&$Var(holder), value);
 }
-void AdvComp_set_both_adv(u64 v1, Object* ptr) {}
+void AdvComp_set_both_adv(u64 v1, Object *ptr) {}
 #undef IMPL
 
 Test(core, test_obj_macro)
