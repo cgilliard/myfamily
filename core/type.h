@@ -201,7 +201,7 @@ FatPtr build_fat_ptr(u64 size);
 		 : Object_check_param((const Object *)value), default          \
 		 : Object_check_param(NULL))
 #define CALL_SECOND_OBJECT(x, y) OBJECT_ONLY y
-#define PROCESS_FN_CALL_OBJECT(...)                                            \
+#define PROCESS_FN_CHECK_OBJECTS(...)                                          \
 	FOR_EACH_INNER(CALL_SECOND_OBJECT, none, (;), __VA_ARGS__)
 
 #define CALL_COUNT_OBJS(x, v) __count_obj_args__++
@@ -245,7 +245,10 @@ FatPtr build_fat_ptr(u64 size);
 		__thread_local_self_Const = self;                              \
 		__thread_local_self_Var = NULL;                                \
 		__thread_local_self_##mutability = self;                       \
-		PROCESS_FN_CALL_OBJECT(__VA_ARGS__);                           \
+		_Pragma("GCC diagnostic push");                                \
+		_Pragma("GCC diagnostic ignored \"-Wint-to-pointer-cast\"");   \
+		PROCESS_FN_CHECK_OBJECTS(__VA_ARGS__);                         \
+		_Pragma("GCC diagnostic pop");                                 \
 		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}
 #define DEFAULT_IMPL__(T, default_impl_fn, mutability, return_type, fn_name,   \
@@ -295,7 +298,10 @@ FatPtr build_fat_ptr(u64 size);
 		__thread_local_self_Const = self;                              \
 		__thread_local_self_Var = NULL;                                \
 		__thread_local_self_##mutability = self;                       \
-		PROCESS_FN_CALL_OBJECT(__VA_ARGS__);                           \
+		_Pragma("GCC diagnostic push");                                \
+		_Pragma("GCC diagnostic ignored \"-Wint-to-pointer-cast\"");   \
+		PROCESS_FN_CHECK_OBJECTS(__VA_ARGS__);                         \
+		_Pragma("GCC diagnostic pop");                                 \
 		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}
 
