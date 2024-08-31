@@ -201,6 +201,7 @@ void Object_cleanup(const Object *ptr) {
 
 #if defined(__clang__)
 // Clang-specific pragma
+#pragma GCC diagnostic push
 #pragma clang diagnostic ignored                                               \
     "-Wincompatible-pointer-types-discards-qualifiers"
 #elif defined(__GNUC__) && !defined(__clang__)
@@ -214,3 +215,4 @@ void Object_mark_consumed(const Object *ptr) {
 	Object *unconst = ptr;
 	unconst->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
 }
+#pragma GCC diagnostic pop
