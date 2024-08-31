@@ -1278,4 +1278,66 @@ Test(core, test_obj_macro)
 	cr_assert_eq(inner_drops, 2);
 }
 
-// TraitImpl(TestTrait);
+Type(ServerConfig, Field(u32, threads), Field(u16, port), Field(char*, host));
+Type(ServerTest2, Obj(ServerConfig, config), Field(u64, state), Field(i32, server_fd));
+
+#define ServerImpl DefineTrait(ServerImpl, Required(Const, char*, get_server_host))
+TraitImpl(ServerImpl);
+
+Impl(ServerConfig, Build);
+Impl(ServerConfig, Drop);
+
+Impl(ServerTest2, Build);
+Impl(ServerTest2, Drop);
+Impl(ServerTest2, ServerImpl);
+
+Getter(ServerConfig, threads);
+Setter(ServerConfig, threads);
+
+Getter(ServerConfig, host);
+Setter(ServerConfig, host);
+
+#define IMPL ServerConfig
+void ServerConfig_build()
+{
+	if ($(threads) == 0)
+		$Var(threads) = 10;
+	if ($(host) == NULL)
+		$Var(host) = "127.0.0.1";
+}
+void ServerConfig_drop()
+{
+	printf("sc drop\n");
+}
+#undef IMPL
+
+#define IMPL ServerTest2
+char* ServerTest2_get_server_host()
+{
+	return get(ServerConfig, $(config), host);
+}
+#undef IMPL
+
+#define IMPL ServerTest2
+void ServerTest2_build()
+{
+}
+void ServerTest2_drop() { printf("drop servertest2\n"); }
+#undef IMPL
+
+Test(core, test_sample)
+{
+	var config1 = new (ServerConfig, With(threads, 1));
+	var config2 = new (ServerConfig, With(host, "localhost"));
+
+	cr_assert_eq(get(ServerConfig, config1, threads), 1);
+	cr_assert_eq(get(ServerConfig, config2, threads), 10);
+
+	set(ServerConfig, config1, threads, 3);
+	cr_assert_eq(get(ServerConfig, config1, threads), 3);
+	cr_assert(!strcmp(get(ServerConfig, config1, host), "127.0.0.1"));
+	cr_assert(!strcmp(get(ServerConfig, config2, host), "localhost"));
+
+	let server = new (ServerTest2, WithObj(config, config1));
+	cr_assert(!strcmp(get_server_host(&server), "127.0.0.1"));
+}

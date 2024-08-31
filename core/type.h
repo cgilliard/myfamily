@@ -103,6 +103,24 @@ FatPtr build_fat_ptr(u64 size);
 	__VA_OPT__(NONE)                                                     \
 	(__thread_local_self_Const)
 
+#define Getter(type, field_name)                                                          \
+	static typeof(((type*)0)->field_name) type##_get_##field_name(const Object* self) \
+	{                                                                                 \
+		type* ptr = (type*)(self->ptr.data);                                      \
+		return ptr->field_name;                                                   \
+	}
+
+#define get(type, instance, field_name) type##_get_##field_name(&instance)
+
+#define Setter(type, field_name)                                                                \
+	static void type##_set_##field_name(Object* self, typeof(((type*)0)->field_name) value) \
+	{                                                                                       \
+		type* ptr = (type*)(self->ptr.data);                                            \
+		ptr->field_name = value;                                                        \
+	}
+
+#define set(type, instance, field_name, value) type##_set_##field_name(&instance, value)
+
 #define FIRST_TWO(x, y, ...) x y
 #define CALL_FIRST_TWO(x, y) FIRST_TWO y
 
@@ -130,6 +148,8 @@ FatPtr build_fat_ptr(u64 size);
 	void name##_build_internal(Object* ptr)                                \
 	{                                                                      \
 		FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__);               \
+		u64 size = name##_size();                                      \
+		memset(ptr->ptr.data, 0, size);                                \
 	}                                                                      \
 	void name##_drop_internal(Object* ptr)                                 \
 	{                                                                      \
