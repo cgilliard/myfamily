@@ -131,6 +131,12 @@ void SelfCleanupImpl_update(SelfCleanupImpl *ptr) {
 	__thread_local_self_Var = ptr->prev_tl_self_Var;
 }
 
+void Object_check_param(const Object *obj) {
+	if (obj && (obj->flags & OBJECT_FLAGS_CONSUMED) != 0)
+		panic("Passing a consumed object as a function "
+		      "parameter!");
+}
+
 void Object_build_int(Object *ptr) {
 	// call internal build handler
 	void (*build_int)(Object * ptr) = find_fn(ptr, "build_internal");

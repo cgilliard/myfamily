@@ -70,6 +70,7 @@ void Object_cleanup(const Object *ptr);
 void Object_mark_consumed(const Object *ptr);
 void Object_build(Object *ptr);
 void Object_build_int(Object *ptr);
+void Object_check_param(const Object *obj);
 void sort_vtable(Vtable *table);
 void vtable_add_entry(Vtable *table, VtableEntry entry);
 void vtable_add_trait(Vtable *table, char *trait);
@@ -195,8 +196,33 @@ FatPtr build_fat_ptr(u64 size);
 #define PROCESS_FN_CALL(...)                                                   \
 	FOR_EACH_INNER(CALL_SECOND, none, (, ), __VA_ARGS__)
 
+#define OBJECT_ONLY(i, value)                                                  \
+	_Generic((value), Object *                                             \
+		 : Object_check_param((const Object *)value), default          \
+		 : Object_check_param(NULL))
+#define CALL_SECOND_OBJECT(x, y) OBJECT_ONLY y
+#define PROCESS_FN_CALL_OBJECT(...)                                            \
+	FOR_EACH_INNER(CALL_SECOND_OBJECT, none, (;), __VA_ARGS__)
+
+#define CALL_COUNT_OBJS(x, v) __count_obj_args__++
+#define COUNT_OBJS(...) FOR_EACH_INNER(CALL_COUNT_OBJS, none, (;), __VA_ARGS__)
+
 #define CALL_BOTH(x, y) BOTH y
 #define PROCESS_FN_SIG(...) FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__)
+
+#define CHECK_OBJ(param)                                                       \
+	({                                                                     \
+		Object_check_param(param);                                     \
+		/*if ((((Object *)param)->flags & OBJECT_FLAGS_CONSUMED) != 0) \
+			panic("Object is already consumed!"); */               \
+	})
+
+#define CHECK_PARAM__(param)                                                   \
+	_Generic((param), Object * : CHECK_OBJ(param), default : ({}))
+
+#define CHECK_PARAM_(ignore, param) CHECK_PARAM__(param);
+#define CHECK_PARAM(ignore, param) CHECK_PARAM_ param
+#define CHECK_PARAMS(...) FOR_EACH_INNER(CHECK_PARAM, , (), __VA_ARGS__)
 
 #define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)             \
 	static return_type fn_name(mutability() Object *self __VA_OPT__(       \
@@ -219,6 +245,7 @@ FatPtr build_fat_ptr(u64 size);
 		__thread_local_self_Const = self;                              \
 		__thread_local_self_Var = NULL;                                \
 		__thread_local_self_##mutability = self;                       \
+		PROCESS_FN_CALL_OBJECT(__VA_ARGS__);                           \
 		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}
 #define DEFAULT_IMPL__(T, default_impl_fn, mutability, return_type, fn_name,   \
@@ -268,6 +295,7 @@ FatPtr build_fat_ptr(u64 size);
 		__thread_local_self_Const = self;                              \
 		__thread_local_self_Var = NULL;                                \
 		__thread_local_self_##mutability = self;                       \
+		PROCESS_FN_CALL_OBJECT(__VA_ARGS__);                           \
 		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}
 
