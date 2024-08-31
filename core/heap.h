@@ -228,10 +228,9 @@ void* fat_ptr_data(const FatPtr* ptr);
  */
 u64 fat_ptr_len(const FatPtr* ptr);
 
-#define HA_CONFIG_DEFAULT    \
-	{                    \
-		false, false \
-	}
+#define HA_CONFIG_DEFAULT \
+	{                 \
+	    false, false}
 #define HAP_CONFIG(slab_size, slabs_per_resize, initial_chunks, max_slabs) \
 	({                                                                 \
 		HeapDataParamsConfig _ret__ = {                            \

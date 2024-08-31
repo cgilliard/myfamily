@@ -205,12 +205,10 @@ FatPtr build_fat_ptr(u64 size);
 #define PROCESS_FN_CALL(...) \
 	FOR_EACH_INNER(CALL_SECOND, none, (, ), __VA_ARGS__)
 
-#define OBJECT_ONLY(i, value)                                \
-	_Generic((value),                                    \
-		 Object *                                    \
-		 : Object_check_param((const Object*)value), \
-		   default                                   \
-		 : Object_check_param(NULL))
+#define OBJECT_ONLY(i, value)                                   \
+	_Generic((value),                                       \
+	    Object *: Object_check_param((const Object*)value), \
+	    default: Object_check_param(NULL))
 #define CALL_SECOND_OBJECT(x, y) OBJECT_ONLY y
 #define PROCESS_FN_CHECK_OBJECTS(...) \
 	FOR_EACH_INNER(CALL_SECOND_OBJECT, none, (;), __VA_ARGS__)

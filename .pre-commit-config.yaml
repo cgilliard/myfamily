@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: v14.0.0  # Replace with the version of clang-format you want
+  rev: v18.1.6  # Replace with the version of clang-format you want
   hooks:
     - id: clang-format
       args: [-i, -style=file]  # Automatically fix issues

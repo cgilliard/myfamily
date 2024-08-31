@@ -31,10 +31,9 @@ Lock* __global_sync_allocator_lock = NULL;
 HeapAllocatorConfig __default_hconfig_ = {false, false};
 
 // create default slab sizes for the heap allocator with alignment in mind
-#define HD_CFG(size)                    \
-	{                               \
-		size, 10, 0, UINT32_MAX \
-	}
+#define HD_CFG(size) \
+	{            \
+	    size, 10, 0, UINT32_MAX}
 HeapDataParamsConfig __default_hdpc_arr_value[] = {HD_CFG(8),
 						   HD_CFG(16),
 						   HD_CFG(32),
