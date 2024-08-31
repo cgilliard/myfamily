@@ -27,17 +27,20 @@
 #define OBJECT_FLAGS_NO_CLEANUP (0x1 << 0)
 #define OBJECT_FLAGS_CONSUMED (0x1 << 1)
 
-typedef struct {
+typedef struct
+{
 	char *name;
 	void *fn_ptr;
 } VtableEntry;
 
-typedef struct VtableTraitEntry {
+typedef struct VtableTraitEntry
+{
 	char trait_name[MAX_TRAIT_NAME_LEN + 1];
 
 } VtableTraitEntry;
 
-typedef struct {
+typedef struct
+{
 	char *name;
 	u64 len;
 	VtableEntry *entries;
@@ -45,22 +48,24 @@ typedef struct {
 	VtableTraitEntry *trait_entries;
 } Vtable;
 
-typedef struct Object {
+typedef struct Object
+{
 	Vtable *vtable;
 	u64 id;
 	u8 flags;
 	FatPtr ptr;
 } Object;
 
-typedef struct SelfCleanupImpl {
+typedef struct SelfCleanupImpl
+{
 	const Object *prev_tl_self_Const;
 	Object *prev_tl_self_Var;
 } SelfCleanupImpl;
 
 void SelfCleanupImpl_update(SelfCleanupImpl *sc);
 
-#define SelfCleanup                                                            \
-	SelfCleanupImpl __attribute__((warn_unused_result,                     \
+#define SelfCleanup                                        \
+	SelfCleanupImpl __attribute__((warn_unused_result, \
 				       cleanup(SelfCleanupImpl_update)))
 
 extern _Thread_local const Object *__thread_local_self_Const;
@@ -79,7 +84,7 @@ void *find_fn(const Object *obj, const char *name);
 u64 unique_id();
 FatPtr build_fat_ptr(u64 size);
 
-#define Cleanup                                                                \
+#define Cleanup \
 	Object __attribute__((warn_unused_result, cleanup(Object_cleanup)))
 
 #define TypeName(obj) obj.vtable->name
@@ -87,54 +92,60 @@ FatPtr build_fat_ptr(u64 size);
 #define var Cleanup
 #define let const Cleanup
 
-#define $Var(...)                                                              \
-	__VA_OPT__(((IMPL *)__thread_local_self_Var->ptr.data)->__VA_ARGS__)   \
-	__VA_OPT__(NONE)(__thread_local_self_Var)
+#define $Var(...)                                                            \
+	__VA_OPT__(((IMPL *)__thread_local_self_Var->ptr.data)->__VA_ARGS__) \
+	__VA_OPT__(NONE)                                                     \
+	(__thread_local_self_Var)
 
-#define $(...)                                                                 \
-	__VA_OPT__(                                                            \
-	    ((const IMPL *)__thread_local_self_Const->ptr.data)->__VA_ARGS__)  \
-	__VA_OPT__(NONE)(__thread_local_self_Const)
+#define $(...)                                                                \
+	__VA_OPT__(                                                           \
+	    ((const IMPL *)__thread_local_self_Const->ptr.data)->__VA_ARGS__) \
+	__VA_OPT__(NONE)                                                      \
+	(__thread_local_self_Const)
 
 #define FIRST_TWO(x, y, ...) x y
 #define CALL_FIRST_TWO(x, y) FIRST_TWO y
 
-#define DROP_OBJECTS__(name, struct_type, inner, ...)                          \
+#define DROP_OBJECTS__(name, struct_type, inner, ...) \
 	__VA_OPT__(Object_cleanup(&((name *)(ptr->ptr.data))->inner);)
 #define DROP_OBJECTS_(...) DROP_OBJECTS__(__VA_ARGS__)
 #define DROP_OBJECTS(name, inner) DROP_OBJECTS_(name, EXPAND_ALL inner)
 
-#define BUILD_OBJECTS__(name, struct_type, inner, ...)                         \
-	__VA_OPT__(((name *)(ptr->ptr.data))->inner = OBJECT_INIT;             \
-		   ((name *)(ptr->ptr.data))->inner.vtable =                   \
+#define BUILD_OBJECTS__(name, struct_type, inner, ...)             \
+	__VA_OPT__(((name *)(ptr->ptr.data))->inner = OBJECT_INIT; \
+		   ((name *)(ptr->ptr.data))->inner.vtable =       \
 		       &__VA_ARGS__##_Vtable__;)
 #define BUILD_OBJECTS_(...) BUILD_OBJECTS__(__VA_ARGS__)
 #define BUILD_OBJECTS(name, inner) BUILD_OBJECTS_(name, EXPAND_ALL inner)
 
-#define Type(name, ...)                                                        \
-	typedef struct name name;                                              \
-	static Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL};             \
-	u64 name##_size();                                                     \
-	typedef struct name {                                                  \
-		FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);                  \
-	} name;                                                                \
-	u64 name##_size() { return sizeof(name); }                             \
-	void name##_build_internal(Object *ptr) {                              \
-		FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__);               \
-	}                                                                      \
-	void name##_drop_internal(Object *ptr) {                               \
-		FOR_EACH(DROP_OBJECTS, name, (;), __VA_ARGS__);                \
-	}                                                                      \
-	static void __attribute__((constructor))                               \
-	__add_impls_##name##_vtable() {                                        \
-		VtableEntry size = {"size", name##_size};                      \
-		vtable_add_entry(&name##_Vtable__, size);                      \
-		VtableEntry build_internal = {"build_internal",                \
-					      name##_build_internal};          \
-		vtable_add_entry(&name##_Vtable__, build_internal);            \
-		VtableEntry drop_internal = {"drop_internal",                  \
-					     name##_drop_internal};            \
-		vtable_add_entry(&name##_Vtable__, drop_internal);             \
+#define Type(name, ...)                                                \
+	typedef struct name name;                                      \
+	static Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL};     \
+	u64 name##_size();                                             \
+	typedef struct name                                            \
+	{                                                              \
+		FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);          \
+	} name;                                                        \
+	u64 name##_size() { return sizeof(name); }                     \
+	void name##_build_internal(Object *ptr)                        \
+	{                                                              \
+		FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__);       \
+	}                                                              \
+	void name##_drop_internal(Object *ptr)                         \
+	{                                                              \
+		FOR_EACH(DROP_OBJECTS, name, (;), __VA_ARGS__);        \
+	}                                                              \
+	static void                                                    \
+	    __attribute__((constructor)) __add_impls_##name##_vtable() \
+	{                                                              \
+		VtableEntry size = {"size", name##_size};              \
+		vtable_add_entry(&name##_Vtable__, size);              \
+		VtableEntry build_internal = {"build_internal",        \
+					      name##_build_internal};  \
+		vtable_add_entry(&name##_Vtable__, build_internal);    \
+		VtableEntry drop_internal = {"drop_internal",          \
+					     name##_drop_internal};    \
+		vtable_add_entry(&name##_Vtable__, drop_internal);     \
 	}
 
 #define Field(field_type, field_name) (field_type, field_name)
@@ -142,37 +153,38 @@ FatPtr build_fat_ptr(u64 size);
 #define With(x, y) (x, y, ignore)
 #define WithObj(x, y) (x, y)
 
-#define OBJECT_INIT                                                            \
-	({                                                                     \
-		FatPtr _fptr__;                                                \
-		_fptr__.data = NULL;                                           \
-		_fptr__.len = 0;                                               \
-		Object _ret__ = {                                              \
-		    NULL, 0, OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED,  \
-		    _fptr__};                                                  \
-		_ret__;                                                        \
+#define OBJECT_INIT                                                           \
+	({                                                                    \
+		FatPtr _fptr__;                                               \
+		_fptr__.data = NULL;                                          \
+		_fptr__.len = 0;                                              \
+		Object _ret__ = {                                             \
+		    NULL, 0, OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED, \
+		    _fptr__};                                                 \
+		_ret__;                                                       \
 	})
 
-#define Move(dst, src)                                                         \
-	({                                                                     \
-		if (((*((Object *)src)).flags & OBJECT_FLAGS_CONSUMED) != 0)   \
-			panic("src object has already been consumed\n");       \
-		/* Check for vtable mismatch */                                \
-		if (((*((Object *)dst)).vtable != NULL &&                      \
-		     ((*((Object *)dst)).vtable !=                             \
-		      ((*((Object *)src)).vtable)))) {                         \
-			panic("Vtable mismatch! Trying to set type %s to "     \
-			      "type %s!",                                      \
-			      ((*((Object *)dst)).vtable)->name,               \
-			      ((*((Object *)src)).vtable)->name);              \
-		}                                                              \
-		/* If the object is not consumed we call cleanup as we are     \
-		 * overwriting it.*/                                           \
-		if (((*((Object *)dst)).flags & OBJECT_FLAGS_CONSUMED) == 0)   \
-			Object_cleanup(dst);                                   \
-		*((Object *)dst) = *((Object *)src);                           \
-		(*((Object *)src)).flags |=                                    \
-		    OBJECT_FLAGS_CONSUMED | OBJECT_FLAGS_NO_CLEANUP;           \
+#define Move(dst, src)                                                       \
+	({                                                                   \
+		if (((*((Object *)src)).flags & OBJECT_FLAGS_CONSUMED) != 0) \
+			panic("src object has already been consumed\n");     \
+		/* Check for vtable mismatch */                              \
+		if (((*((Object *)dst)).vtable != NULL &&                    \
+		     ((*((Object *)dst)).vtable !=                           \
+		      ((*((Object *)src)).vtable))))                         \
+		{                                                            \
+			panic("Vtable mismatch! Trying to set type %s to "   \
+			      "type %s!",                                    \
+			      ((*((Object *)dst)).vtable)->name,             \
+			      ((*((Object *)src)).vtable)->name);            \
+		}                                                            \
+		/* If the object is not consumed we call cleanup as we are   \
+		 * overwriting it.*/                                         \
+		if (((*((Object *)dst)).flags & OBJECT_FLAGS_CONSUMED) == 0) \
+			Object_cleanup(dst);                                 \
+		*((Object *)dst) = *((Object *)src);                         \
+		(*((Object *)src)).flags |=                                  \
+		    OBJECT_FLAGS_CONSUMED | OBJECT_FLAGS_NO_CLEANUP;         \
 	})
 
 // Define macros to extract the type and name from a tuple
@@ -183,7 +195,7 @@ FatPtr build_fat_ptr(u64 size);
 #define UNWRAP_PARAM_NAME(ignore, type_name) EXTRACT_NAME type_name
 
 // Define PROC_FN_SIGNATURE and PROC_PARAMS to use UNWRAP_PARAMS correctly
-#define PROC_FN_SIGNATURE(...)                                                 \
+#define PROC_FN_SIGNATURE(...) \
 	FOR_EACH(UNWRAP_PARAM_TYPE_NAME, , (, ), __VA_ARGS__)
 #define PROC_PARAMS(...) FOR_EACH(UNWRAP_PARAM_NAME, , (, ), __VA_ARGS__)
 
@@ -193,15 +205,17 @@ FatPtr build_fat_ptr(u64 size);
 #define Const() const
 
 #define CALL_SECOND(x, y) SECOND y
-#define PROCESS_FN_CALL(...)                                                   \
+#define PROCESS_FN_CALL(...) \
 	FOR_EACH_INNER(CALL_SECOND, none, (, ), __VA_ARGS__)
 
-#define OBJECT_ONLY(i, value)                                                  \
-	_Generic((value), Object *                                             \
-		 : Object_check_param((const Object *)value), default          \
+#define OBJECT_ONLY(i, value)                                 \
+	_Generic((value),                                     \
+		 Object *                                     \
+		 : Object_check_param((const Object *)value), \
+		   default                                    \
 		 : Object_check_param(NULL))
 #define CALL_SECOND_OBJECT(x, y) OBJECT_ONLY y
-#define PROCESS_FN_CHECK_OBJECTS(...)                                          \
+#define PROCESS_FN_CHECK_OBJECTS(...) \
 	FOR_EACH_INNER(CALL_SECOND_OBJECT, none, (;), __VA_ARGS__)
 
 #define CALL_COUNT_OBJS(x, v) __count_obj_args__++
@@ -212,7 +226,8 @@ FatPtr build_fat_ptr(u64 size);
 
 #define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)             \
 	static return_type fn_name(mutability() Object *self __VA_OPT__(       \
-	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) {                     \
+	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)))                       \
+	{                                                                      \
 		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
 			panic("Runtime error: Object [%s@%" PRIu64             \
 			      "] has already been consumed!",                  \
@@ -234,35 +249,39 @@ FatPtr build_fat_ptr(u64 size);
 		PROCESS_FN_CHECK_OBJECTS(__VA_ARGS__);                         \
 		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}
-#define DEFAULT_IMPL__(T, default_impl_fn, mutability, return_type, fn_name,   \
-		       ...)                                                    \
-	return_type default_impl_fn(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)));  \
-	static void __attribute__((constructor))                               \
-	add_##fn_name##_##T##_vtable() {                                       \
-		VtableEntry next = {#fn_name, default_impl_fn};                \
-		vtable_add_entry(&T##_Vtable__, next);                         \
+#define DEFAULT_IMPL__(T, default_impl_fn, mutability, return_type, fn_name,  \
+		       ...)                                                   \
+	return_type default_impl_fn(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))); \
+	static void                                                           \
+	    __attribute__((constructor)) add_##fn_name##_##T##_vtable()       \
+	{                                                                     \
+		VtableEntry next = {#fn_name, default_impl_fn};               \
+		vtable_add_entry(&T##_Vtable__, next);                        \
 	}
 
-#define CHECK_SUPER_(type, trait)                                              \
-	static void __attribute__((constructor))                               \
-	check_super_##type##_##trait() {                                       \
-		if (!vtable_check_impl_trait(&type##_Vtable__, #trait)) {      \
-			panic("Runtime error: Required trait [%s] not "        \
-			      "implemented by type %s! Halting!",              \
-			      #trait, #type);                                  \
-		}                                                              \
+#define CHECK_SUPER_(type, trait)                                       \
+	static void                                                     \
+	    __attribute__((constructor)) check_super_##type##_##trait() \
+	{                                                               \
+		if (!vtable_check_impl_trait(&type##_Vtable__, #trait)) \
+		{                                                       \
+			panic("Runtime error: Required trait [%s] not " \
+			      "implemented by type %s! Halting!",       \
+			      #trait, #type);                           \
+		}                                                       \
 	}
 #define CHECK_SUPER(...) CHECK_SUPER_(__VA_ARGS__)
 #define FIRST_VAR_ARGS(x, ...) x
 #define SUPER_PROC(arg, x) CHECK_SUPER(arg, FIRST_VAR_ARGS x)
-#define DEFAULT_IMPL_(x, ...)                                                  \
+#define DEFAULT_IMPL_(x, ...) \
 	MULTI_SWITCH2_INNER(SUPER_PROC, DEFAULT_IMPL__, x, __VA_ARGS__)
 #define DEFAULT_IMPL(T, ...) DEFAULT_IMPL_(T, EXPAND_ALL __VA_ARGS__)
 
 #define PROC_TRAIT_IMPL_FN_DEFAULT__(default_fn, mutability, return_type,      \
 				     fn_name, ...)                             \
 	static return_type fn_name(mutability() Object *self __VA_OPT__(       \
-	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) {                     \
+	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)))                       \
+	{                                                                      \
 		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
 			panic("Runtime error: Object [%s@%" PRIu64             \
 			      "] has already been consumed!",                  \
@@ -286,67 +305,71 @@ FatPtr build_fat_ptr(u64 size);
 	}
 
 #define SUPER_TRAIT_CONFIG(trait_name, ignore)
-#define PROC_TRAIT_IMPL_FN_DEFAULT_(x, ...)                                    \
-	MULTI_SWITCH2(SUPER_TRAIT_CONFIG, PROC_TRAIT_IMPL_FN_DEFAULT__, x,     \
+#define PROC_TRAIT_IMPL_FN_DEFAULT_(x, ...)                                \
+	MULTI_SWITCH2(SUPER_TRAIT_CONFIG, PROC_TRAIT_IMPL_FN_DEFAULT__, x, \
 		      __VA_ARGS__)
-#define PROC_TRAIT_IMPL_FN_DEFAULT(...)                                        \
+#define PROC_TRAIT_IMPL_FN_DEFAULT(...) \
 	PROC_TRAIT_IMPL_FN_DEFAULT_(EXPAND_ALL __VA_ARGS__)
 
-#define PROC_TRAIT_IMPL_FN(x, ...)                                             \
-	MULTI_SWITCH(PROC_TRAIT_IMPL_FN_DEFAULT, PROC_TRAIT_IMPL_FN_, x,       \
+#define PROC_TRAIT_IMPL_FN(x, ...)                                       \
+	MULTI_SWITCH(PROC_TRAIT_IMPL_FN_DEFAULT, PROC_TRAIT_IMPL_FN_, x, \
 		     __VA_ARGS__)
 #define PROC_TRAIT_IMPL(arg, x) PROC_TRAIT_IMPL_FN x
-#define TraitImplImpl(name, ...)                                               \
+#define TraitImplImpl(name, ...) \
 	FOR_EACH(PROC_TRAIT_IMPL, none, (), __VA_ARGS__)
 #define TraitImpl(...) TraitImplImpl(__VA_ARGS__)
 
-#define PROC_TRAIT_STATEMENT_IMPL_EXP_(impl_type, mutability, return_type,     \
-				       fn_name, ...)                           \
-	return_type impl_type##_##fn_name(                                     \
-	    __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)));                          \
-	static void __attribute__((constructor))                               \
-	__required_add__##impl_type##_##fn_name() {                            \
-		VtableEntry next = {#fn_name, impl_type##_##fn_name};          \
-		vtable_add_entry(&impl_type##_Vtable__, next);                 \
+#define PROC_TRAIT_STATEMENT_IMPL_EXP_(impl_type, mutability, return_type, \
+				       fn_name, ...)                       \
+	return_type impl_type##_##fn_name(                                 \
+	    __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)));                      \
+	static void __attribute__((                                        \
+	    constructor)) __required_add__##impl_type##_##fn_name()        \
+	{                                                                  \
+		VtableEntry next = {#fn_name, impl_type##_##fn_name};      \
+		vtable_add_entry(&impl_type##_Vtable__, next);             \
 	}
-#define PROC_TRAIT_STATEMENT_IMPL_EXP(x, y, ...)                               \
-	MULTI_SWITCH2(DEFAULT_IMPL, PROC_TRAIT_STATEMENT_IMPL_EXP_, x, y,      \
+#define PROC_TRAIT_STATEMENT_IMPL_EXP(x, y, ...)                          \
+	MULTI_SWITCH2(DEFAULT_IMPL, PROC_TRAIT_STATEMENT_IMPL_EXP_, x, y, \
 		      __VA_ARGS__)
-#define PROC_TRAIT_STATEMENT_IMPL(...)                                         \
+#define PROC_TRAIT_STATEMENT_IMPL(...) \
 	PROC_TRAIT_STATEMENT_IMPL_EXP(__VA_ARGS__)
-#define PROC_TRAIT_STATEMENT(arg, x)                                           \
+#define PROC_TRAIT_STATEMENT(arg, x) \
 	PROC_TRAIT_STATEMENT_IMPL(arg, EXPAND_ALL x)
-#define PROC_IMPL(name, ...)                                                   \
+#define PROC_IMPL(name, ...) \
 	FOR_EACH(PROC_TRAIT_STATEMENT, name, (), __VA_ARGS__)
 #define Required(...) (__VA_ARGS__)
 #define RequiredWithDefault(...) ((__VA_ARGS__))
-#define PROC_IMPL_(name, trait_name, ...)                                      \
-	PROC_IMPL(name, __VA_ARGS__)                                           \
-	static void __attribute__((constructor))                               \
-	vtable_add_trait_impl_##name##_##trait_name() {                        \
-		vtable_add_trait(&name##_Vtable__, #trait_name);               \
+#define PROC_IMPL_(name, trait_name, ...)                               \
+	PROC_IMPL(name, __VA_ARGS__)                                    \
+	static void __attribute__((                                     \
+	    constructor)) vtable_add_trait_impl_##name##_##trait_name() \
+	{                                                               \
+		vtable_add_trait(&name##_Vtable__, #trait_name);        \
 	}
 #define Impl(name, ...) PROC_IMPL_(name, __VA_ARGS__)
 
 #define IS_OBJECT_TYPE(type) __builtin_types_compatible_p(typeof(type), Object)
 
-#define PROC_WITH_OBJ(ptr, structure, field_name, value)                       \
-	Object *_ptr__ = ptr + offsetof(structure, field_name);                \
-	(*_ptr__) = OBJECT_INIT;                                               \
+#define PROC_WITH_OBJ(ptr, structure, field_name, value)        \
+	Object *_ptr__ = ptr + offsetof(structure, field_name); \
+	(*_ptr__) = OBJECT_INIT;                                \
 	Move(_ptr__, &value);
 
-// TODO: separate processing for objects
-#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                   \
-	__VA_OPT__(do {                                                        \
-		if (IS_OBJECT_TYPE(((structure *)0)->name)) {                  \
-			panic("Cannot use With to set an Object. Use "         \
-			      "'WithObj' isntead.\n");                         \
-		} else {                                                       \
-			*((typeof(((structure *)0)->name)                      \
-			       *)(ptr + offsetof(structure, name))) = value;   \
-		}                                                              \
-	} while (0);)                                                          \
-	EXPAND(EXPAND(EXPAND_ALL EXPAND(__VA_OPT__(NONE)(                      \
+#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                 \
+	__VA_OPT__(do {                                                      \
+		if (IS_OBJECT_TYPE(((structure *)0)->name))                  \
+		{                                                            \
+			panic("Cannot use With to set an Object. Use "       \
+			      "'WithObj' isntead.\n");                       \
+		}                                                            \
+		else                                                         \
+		{                                                            \
+			*((typeof(((structure *)0)->name)                    \
+			       *)(ptr + offsetof(structure, name))) = value; \
+		}                                                            \
+	} while (0);)                                                        \
+	EXPAND(EXPAND(EXPAND_ALL EXPAND(__VA_OPT__(NONE)(                    \
 	    PROC_WITH_OBJ(ptr, structure, name, value)) __VA_OPT__(()))))
 
 #define SET_OFFSET_OF(...) SET_OFFSET_OF_IMPL(__VA_ARGS__)
