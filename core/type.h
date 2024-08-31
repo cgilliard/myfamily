@@ -210,20 +210,6 @@ FatPtr build_fat_ptr(u64 size);
 #define CALL_BOTH(x, y) BOTH y
 #define PROCESS_FN_SIG(...) FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__)
 
-#define CHECK_OBJ(param)                                                       \
-	({                                                                     \
-		Object_check_param(param);                                     \
-		/*if ((((Object *)param)->flags & OBJECT_FLAGS_CONSUMED) != 0) \
-			panic("Object is already consumed!"); */               \
-	})
-
-#define CHECK_PARAM__(param)                                                   \
-	_Generic((param), Object * : CHECK_OBJ(param), default : ({}))
-
-#define CHECK_PARAM_(ignore, param) CHECK_PARAM__(param);
-#define CHECK_PARAM(ignore, param) CHECK_PARAM_ param
-#define CHECK_PARAMS(...) FOR_EACH_INNER(CHECK_PARAM, , (), __VA_ARGS__)
-
 #define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)             \
 	static return_type fn_name(mutability() Object *self __VA_OPT__(       \
 	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) {                     \
