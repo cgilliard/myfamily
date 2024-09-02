@@ -15,6 +15,7 @@
 #include <core/heap.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 
 // internal representation of the HeapDataParamsConfig with the required
 // free_list_head value.
@@ -497,16 +498,11 @@ int heap_allocator_allocate(HeapAllocator* ptr, u64 size, FatPtr* fptr)
 		}
 	}
 
+	// if zeroed is configured set all memory of allocated slabs to 0.
 	if (!ret && ptr->impl->config.zeroed)
 	{
-		for (u64 i = 0; i < fptr->len; i++)
-		{
-			((char*)fptr->data)[i] = 0;
-		}
+		memset(fptr->data, 0, fptr->len);
 	}
-
-	// printf("allocate size=%llu,id=%llu,p=%p\n", size, fptr->id,
-	// fptr->data);
 
 	return ret;
 }
@@ -545,13 +541,8 @@ int heap_allocator_free(HeapAllocator* ptr, FatPtr* fptr)
 
 	if (!ret && ptr->impl->config.zeroed)
 	{
-		for (u64 i = 0; i < fptr->len; i++)
-		{
-			((char*)fptr->data)[i] = 0;
-		}
+		memset(fptr->data, 0, fptr->len);
 	}
-
-	// printf("free id=%llu,p=%p\n", fptr->id, fptr->data);
 
 	return ret;
 }
