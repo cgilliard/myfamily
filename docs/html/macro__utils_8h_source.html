@@ -100,27 +100,27 @@ $(function() {
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
 <div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a2a165b87d6fcc65659ccdf8ee595c8f2">   29</a></span>&#160;<span class="preprocessor">#define MULTI_PARAM(action, ...) action(__VA_ARGS__)</span></div>
 <div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#acccf4a6a4c7fd681bf65a4a90c3f2b9a">   30</a></span>&#160;<span class="preprocessor">#define SINGLE_PARAM(action, x) action(x)</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#abff9b4e185b14c74c618dd13ec5d52cd">   31</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH_(action1, action2, x, ...)                                \</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">    EXPAND_ALL EXPAND(__VA_OPT__(NONE)(SINGLE_PARAM(                       \</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#abff9b4e185b14c74c618dd13ec5d52cd">   31</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH_(action1, action2, x, ...)          \</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">    EXPAND_ALL EXPAND(__VA_OPT__(NONE)(SINGLE_PARAM( \</span></div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">        action1, x)) __VA_OPT__((MULTI_PARAM(action2, x, __VA_ARGS__))))</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a6375dd21159dc6c16bd3c2278055a359">   34</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH(action1, action2, ...)                                    \</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a6375dd21159dc6c16bd3c2278055a359">   34</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH(action1, action2, ...) \</span></div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">    EXPAND(MULTI_SWITCH_(action1, action2, __VA_ARGS__))</span></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
 <div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a02a7cec501cbe4419753d81d98160c4b">   37</a></span>&#160;<span class="preprocessor">#define DOUBLE_PARAM(action, x, y) action(x, y)</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a75a8c72f15495bed1b0322cf797aac0d">   38</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH2_(action1, action2, arg, x, ...)                          \</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">    EXPAND_ALL EXPAND(                                                     \</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">        __VA_OPT__(NONE)(DOUBLE_PARAM(action1, arg, x))                    \</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a75a8c72f15495bed1b0322cf797aac0d">   38</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH2_(action1, action2, arg, x, ...)       \</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">    EXPAND_ALL EXPAND(                                  \</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">        __VA_OPT__(NONE)(DOUBLE_PARAM(action1, arg, x)) \</span></div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">        __VA_OPT__((MULTI_PARAM(action2, arg, x, __VA_ARGS__))))</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a6d4022b2d8f73e4c3fdf01679b8c4abc">   42</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH2(action1, action2, arg, ...)                              \</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a6d4022b2d8f73e4c3fdf01679b8c4abc">   42</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH2(action1, action2, arg, ...) \</span></div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">    EXPAND(MULTI_SWITCH2_(action1, action2, arg, __VA_ARGS__))</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
 <div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ab0bc585be7ff67827731e30da8d84b14">   45</a></span>&#160;<span class="preprocessor">#define MULTI_PARAM_INNER(action, ...) action(__VA_ARGS__)</span></div>
 <div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ab913ebdfeff3d3f969aa58e2873b7494">   46</a></span>&#160;<span class="preprocessor">#define DOUBLE_PARAM_INNER(action, x, y) action(x, y)</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a4e09b55af4ffc77096505555671fe361">   47</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH2_INNER_(action1, action2, arg, x, ...)                    \</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">    EXPAND_ALL EXPAND(                                                     \</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">        __VA_OPT__(NONE)(DOUBLE_PARAM_INNER(action1, arg, x))              \</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a4e09b55af4ffc77096505555671fe361">   47</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH2_INNER_(action1, action2, arg, x, ...)       \</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">    EXPAND_ALL EXPAND(                                        \</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">        __VA_OPT__(NONE)(DOUBLE_PARAM_INNER(action1, arg, x)) \</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">        __VA_OPT__((MULTI_PARAM_INNER(action2, arg, x, __VA_ARGS__))))</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#af9981fa9ac5d880cf5025492c846dfea">   51</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH2_INNER(action1, action2, arg, ...)                        \</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#af9981fa9ac5d880cf5025492c846dfea">   51</a></span>&#160;<span class="preprocessor">#define MULTI_SWITCH2_INNER(action1, action2, arg, ...) \</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">    EXPAND(MULTI_SWITCH2_INNER_(action1, action2, arg, __VA_ARGS__))</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
 <div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a4ddebc5712d39b71767e3dceb9bfb74b">   54</a></span>&#160;<span class="preprocessor">#define EMPTY()</span></div>
@@ -140,8 +140,8 @@ $(function() {
 <div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a1da5ee0b8ba77ab31d29e01e5dd4d9aa">   68</a></span>&#160;<span class="preprocessor">#define EVAL2(...) EVAL1(EVAL1(__VA_ARGS__))</span></div>
 <div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#aad4f105758560e2d030fb28e39acea6f">   69</a></span>&#160;<span class="preprocessor">#define EVAL1(...) __VA_ARGS__</span></div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
-<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ae458f497bdf4fd42be4f21cf51d1614b">   71</a></span>&#160;<span class="preprocessor">#define MAP(m, arg, delim, first, ...)                                         \</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">    m(arg, first) __VA_OPT__(                                              \</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ae458f497bdf4fd42be4f21cf51d1614b">   71</a></span>&#160;<span class="preprocessor">#define MAP(m, arg, delim, first, ...) \</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">    m(arg, first) __VA_OPT__(      \</span></div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">        UNWRAP delim DEFER1(_MAP)()(m, arg, delim, __VA_ARGS__))</span></div>
 <div class="line"><a name="l00074"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a528b7d0384fed3b48bf31041d1ac758e">   74</a></span>&#160;<span class="preprocessor">#define _MAP() MAP</span></div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
@@ -158,15 +158,15 @@ $(function() {
 <div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a07c48d335e95a035ff6386f9c75fe824">   86</a></span>&#160;<span class="preprocessor">#define EVAL2_INNER(...) EVAL1_INNER(EVAL1_INNER(__VA_ARGS__))</span></div>
 <div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#ae728886cacc5db41c1ebd81995d23ce1">   87</a></span>&#160;<span class="preprocessor">#define EVAL1_INNER(...) __VA_ARGS__</span></div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a2dd0db6a782236cf1f39cf2192fd6504">   89</a></span>&#160;<span class="preprocessor">#define MAP_INNER(m, arg, delim, first, ...)                                   \</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">    m(arg, first) __VA_OPT__(                                              \</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a2dd0db6a782236cf1f39cf2192fd6504">   89</a></span>&#160;<span class="preprocessor">#define MAP_INNER(m, arg, delim, first, ...) \</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">    m(arg, first) __VA_OPT__(            \</span></div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">        UNWRAP delim DEFER1(_MAP_INNER)()(m, arg, delim, __VA_ARGS__))</span></div>
 <div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#aa539f8e4274e564703104fb94c01e25a">   92</a></span>&#160;<span class="preprocessor">#define _MAP_INNER() MAP_INNER</span></div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a57f29b9285b9beab8c788f98b08e3e5e">   94</a></span>&#160;<span class="preprocessor">#define FOR_EACH(m, arg, delim, ...)                                           \</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a57f29b9285b9beab8c788f98b08e3e5e">   94</a></span>&#160;<span class="preprocessor">#define FOR_EACH(m, arg, delim, ...) \</span></div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">    EVAL(__VA_OPT__(MAP(m, arg, delim, __VA_ARGS__)))</span></div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
-<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">   97</a></span>&#160;<span class="preprocessor">#define FOR_EACH_INNER(m, arg, delim, ...)                                     \</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">   97</a></span>&#160;<span class="preprocessor">#define FOR_EACH_INNER(m, arg, delim, ...) \</span></div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">    __VA_OPT__(MAP_INNER(m, arg, delim, __VA_ARGS__))</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

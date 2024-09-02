@@ -95,7 +95,7 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a278f1e1d6c3c86f7dae9831e3b783207"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#a278f1e1d6c3c86f7dae9831e3b783207">HA_CONFIG_DEFAULT</a>&#160;&#160;&#160;	{ false, false }</td></tr>
+<tr class="memitem:a278f1e1d6c3c86f7dae9831e3b783207"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#a278f1e1d6c3c86f7dae9831e3b783207">HA_CONFIG_DEFAULT</a></td></tr>
 <tr class="separator:a278f1e1d6c3c86f7dae9831e3b783207"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d66769b42d4381ca08d14b2141d5aa7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8h.html#a1d66769b42d4381ca08d14b2141d5aa7">HAP_CONFIG</a>(slab_size,  slabs_per_resize,  initial_chunks,  max_slabs)</td></tr>
 <tr class="separator:a1d66769b42d4381ca08d14b2141d5aa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -161,11 +161,13 @@ Usage</h1>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define HA_CONFIG_DEFAULT&#160;&#160;&#160;	{ false, false }</td>
+          <td class="memname">#define HA_CONFIG_DEFAULT</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    {                 \</div>
+<div class="line">        false, <span class="keyword">false</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a1d66769b42d4381ca08d14b2141d5aa7"></a>
@@ -205,14 +207,14 @@ Usage</h1>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ({                                                                     \</div>
-<div class="line">        HeapDataParamsConfig _ret__ = {                                \</div>
-<div class="line">            slab_size,                                                 \</div>
-<div class="line">            slabs_per_resize,                                          \</div>
-<div class="line">            initial_chunks,                                            \</div>
-<div class="line">            max_slabs,                                                 \</div>
-<div class="line">        };                                                             \</div>
-<div class="line">        _ret__;                                                        \</div>
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                 \</div>
+<div class="line">        HeapDataParamsConfig _ret__ = {                            \</div>
+<div class="line">            slab_size,                                             \</div>
+<div class="line">            slabs_per_resize,                                      \</div>
+<div class="line">            initial_chunks,                                        \</div>
+<div class="line">            max_slabs,                                             \</div>
+<div class="line">        };                                                         \</div>
+<div class="line">        _ret__;                                                    \</div>
 <div class="line">    })</div>
 </div><!-- fragment -->
 </div>
