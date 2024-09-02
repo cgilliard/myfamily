@@ -1,13 +1,13 @@
 #include <core/hidden.h>
 #include <core/type.h>
 
-Type(Hidden, Field(u64, value), Field(u64, capacity));
+Type(Hidden, Field(u64, value), Field(HiddenConfig, config));
 
 #define IMPL Hidden
 void Hidden_build(HiddenConfig* config)
 {
 	printf("building hidden: capacity = %llu\n", config->capacity);
-	$Var(capacity) = config->capacity;
+	$Var(config) = *config;
 }
 
 void Hidden_drop()
@@ -20,7 +20,7 @@ u64 Hidden_get_value()
 }
 u64 Hidden_get_capacity_impl()
 {
-	return $(capacity);
+	return $(config).capacity;
 }
 void Hidden_set_value(u64 v)
 {
