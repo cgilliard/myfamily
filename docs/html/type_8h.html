@@ -82,6 +82,8 @@ $(function() {
 <code>#include &lt;<a class="el" href="macro__utils_8h_source.html">core/macro_utils.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="panic_8h_source.html">core/panic.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="types_8h_source.html">core/types.h</a>&gt;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
 </div>
 <p><a href="type_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -118,16 +120,8 @@ Macros</h2></td></tr>
 <tr class="separator:a045dd54932944d8830380f4596d64446"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23cd3b356bdc7322fbf851888d7787f2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a>(...)</td></tr>
 <tr class="separator:a23cd3b356bdc7322fbf851888d7787f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28e76886e9ffe1b9d71ae38254b2be20"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(((const <a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>)</td></tr>
+<tr class="memitem:a28e76886e9ffe1b9d71ae38254b2be20"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(((const <a class="el" href="hidden_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>)</td></tr>
 <tr class="separator:a28e76886e9ffe1b9d71ae38254b2be20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a511e1f873a8a9104e5107b9e402be1b1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a511e1f873a8a9104e5107b9e402be1b1">Getter</a>(type,  field_name)</td></tr>
-<tr class="separator:a511e1f873a8a9104e5107b9e402be1b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf38ad028b498c8cb3aa0d39135bd5e4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#abf38ad028b498c8cb3aa0d39135bd5e4">get</a>(type,  instance,  field_name)&#160;&#160;&#160;type##_get_##field_name(&amp;instance)</td></tr>
-<tr class="separator:abf38ad028b498c8cb3aa0d39135bd5e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a240483d5e04d15d39384deeca30bc467"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a240483d5e04d15d39384deeca30bc467">Setter</a>(type,  field_name)</td></tr>
-<tr class="separator:a240483d5e04d15d39384deeca30bc467"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4eb0dcad9ef53f676ef2399a9eef02e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#af4eb0dcad9ef53f676ef2399a9eef02e">set</a>(type,  instance,  field_name,  value)&#160;&#160;&#160;type##_set_##field_name(&amp;instance, value)</td></tr>
-<tr class="separator:af4eb0dcad9ef53f676ef2399a9eef02e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec8bb7d27f1984ca2711a4952ddfac24"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aec8bb7d27f1984ca2711a4952ddfac24">FIRST_TWO</a>(x,  y, ...)&#160;&#160;&#160;x y</td></tr>
 <tr class="separator:aec8bb7d27f1984ca2711a4952ddfac24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c2b147d20531bee9783a9790bd3fd19"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a9c2b147d20531bee9783a9790bd3fd19">CALL_FIRST_TWO</a>(x,  y)&#160;&#160;&#160;<a class="el" href="type_8h.html#aec8bb7d27f1984ca2711a4952ddfac24">FIRST_TWO</a> y</td></tr>
@@ -144,10 +138,14 @@ Macros</h2></td></tr>
 <tr class="separator:ae4b9de0b0ec1ef3575409a1e46c76fba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f390c60f8ae86116dbff32d97046ccf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a9f390c60f8ae86116dbff32d97046ccf">BUILD_OBJECTS</a>(name,  inner)&#160;&#160;&#160;<a class="el" href="type_8h.html#ae4b9de0b0ec1ef3575409a1e46c76fba">BUILD_OBJECTS_</a>(name, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> inner)</td></tr>
 <tr class="separator:a9f390c60f8ae86116dbff32d97046ccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfc7d0564cfeb70cd44867c781dc4800"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#adfc7d0564cfeb70cd44867c781dc4800">TypeDef</a>(name, ...)</td></tr>
+<tr class="separator:adfc7d0564cfeb70cd44867c781dc4800"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d94417e304d0cd9c2a88b4a10ba0645"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a9d94417e304d0cd9c2a88b4a10ba0645">Type</a>(name, ...)</td></tr>
 <tr class="separator:a9d94417e304d0cd9c2a88b4a10ba0645"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3dd518df1105dd849cae4ac614bf708e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(field_type,  field_name)&#160;&#160;&#160;(field_type, field_name)</td></tr>
 <tr class="separator:a3dd518df1105dd849cae4ac614bf708e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8ab251a24209cfce663a91274994199"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(field_type,  field_name)&#160;&#160;&#160;(field_type, field_name)</td></tr>
+<tr class="separator:ad8ab251a24209cfce663a91274994199"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeab4ea1b1f9303b6be47b4bc0bfbc66c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aeab4ea1b1f9303b6be47b4bc0bfbc66c">Obj</a>(obj_type,  obj_name)&#160;&#160;&#160;(<a class="el" href="structObject.html">Object</a>, obj_name, obj_type)</td></tr>
 <tr class="separator:aeab4ea1b1f9303b6be47b4bc0bfbc66c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83dd37cc0bb92d715fc246014e02b359"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(x,  y)&#160;&#160;&#160;(x, y, ignore)</td></tr>
@@ -278,8 +276,8 @@ Functions</h2></td></tr>
 <tr class="separator:aa73f18beaa4379c17baf05a138d68dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e0e101066c231dcbef6f5eaa96f7a26"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a6e0e101066c231dcbef6f5eaa96f7a26">Object_mark_consumed</a> (const <a class="el" href="structObject.html">Object</a> *ptr)</td></tr>
 <tr class="separator:a6e0e101066c231dcbef6f5eaa96f7a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6925c79571998ccf40ed3f5d8388443"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#af6925c79571998ccf40ed3f5d8388443">Object_build</a> (<a class="el" href="structObject.html">Object</a> *ptr)</td></tr>
-<tr class="separator:af6925c79571998ccf40ed3f5d8388443"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a893523b668098e09113754219baea2cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a893523b668098e09113754219baea2cb">Object_build</a> (<a class="el" href="structObject.html">Object</a> *ptr, void *config)</td></tr>
+<tr class="separator:a893523b668098e09113754219baea2cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af038a1e14148513c91bb7be9dd5761b6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#af038a1e14148513c91bb7be9dd5761b6">Object_build_int</a> (<a class="el" href="structObject.html">Object</a> *ptr)</td></tr>
 <tr class="separator:af038a1e14148513c91bb7be9dd5761b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff9f02aea784a954165464235cc73775"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aff9f02aea784a954165464235cc73775">Object_check_param</a> (const <a class="el" href="structObject.html">Object</a> *obj)</td></tr>
@@ -326,7 +324,7 @@ Variables</h2></td></tr>
 <div class="line">    (<a class="code" href="type_8h.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a>)</div>
 <div class="ttc" id="amacro__utils_8h_html_ae2a0fdb2b3c3ae31c3fef23f8286af29"><div class="ttname"><a href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a></div><div class="ttdeci">#define NONE(...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:22</div></div>
 <div class="ttc" id="astructFatPtr_html_a31ba091180df5e031aa582cddbd09364"><div class="ttname"><a href="structFatPtr.html#a31ba091180df5e031aa582cddbd09364">FatPtr::data</a></div><div class="ttdeci">void * data</div><div class="ttdef"><b>Definition:</b> heap.h:107</div></div>
-<div class="ttc" id="astructObject_html_ab5fe3ea3742b5c62e699e90968db8325"><div class="ttname"><a href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">Object::ptr</a></div><div class="ttdeci">FatPtr ptr</div><div class="ttdef"><b>Definition:</b> type.h:56</div></div>
+<div class="ttc" id="astructObject_html_ab5fe3ea3742b5c62e699e90968db8325"><div class="ttname"><a href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">Object::ptr</a></div><div class="ttdeci">FatPtr ptr</div><div class="ttdef"><b>Definition:</b> type.h:58</div></div>
 <div class="ttc" id="atype_8h_html_a7584392485c1057e73a56ba7c43e4bee"><div class="ttname"><a href="type_8h.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a></div><div class="ttdeci">_Thread_local const Object * __thread_local_self_Const</div><div class="ttdef"><b>Definition:</b> type.c:20</div></div>
 </div><!-- fragment -->
 </div>
@@ -628,6 +626,34 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define Cleanup&#160;&#160;&#160;	<a class="el" href="structObject.html">Object</a> <a class="el" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="type_8h.html#aa73f18beaa4379c17baf05a138d68dd2">Object_cleanup</a>)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad8ab251a24209cfce663a91274994199"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8ab251a24209cfce663a91274994199">&#9670;&nbsp;</a></span>Config</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Config</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_type, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">field_name&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;(field_type, field_name)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1047,74 +1073,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="abf38ad028b498c8cb3aa0d39135bd5e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf38ad028b498c8cb3aa0d39135bd5e4">&#9670;&nbsp;</a></span>get</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define get</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">type, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">instance, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">field_name&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;type##_get_##field_name(&amp;instance)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a511e1f873a8a9104e5107b9e402be1b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a511e1f873a8a9104e5107b9e402be1b1">&#9670;&nbsp;</a></span>Getter</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define Getter</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">type, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">field_name&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">static</span> typeof(((type*)0)-&gt;field_name) type##_get_##field_name(<span class="keyword">const</span> <a class="code" href="structObject.html">Object</a>* <span class="keyword">self</span>) \</div>
-<div class="line">    {                                                                                 \</div>
-<div class="line">        type* ptr = (type*)(self-&gt;ptr.data);                                      \</div>
-<div class="line">        return ptr-&gt;field_name;                                                   \</div>
-<div class="line">    }</div>
-<div class="ttc" id="astructObject_html"><div class="ttname"><a href="structObject.html">Object</a></div><div class="ttdef"><b>Definition:</b> type.h:52</div></div>
-</div><!-- fragment -->
-</div>
-</div>
 <a id="ad11372ec273ce0609a5374c6dc3ad17d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad11372ec273ce0609a5374c6dc3ad17d">&#9670;&nbsp;</a></span>Impl</h2>
 
@@ -1233,8 +1191,9 @@ Variables</h2></td></tr>
 <div class="line">        (*((<a class="code" href="structObject.html">Object</a>*)src)).flags |=                                                                          \</div>
 <div class="line">            <a class="code" href="type_8h.html#abce3941cffbfc1da12a115314260d72d">OBJECT_FLAGS_CONSUMED</a> | <a class="code" href="type_8h.html#a290aa2e7fa12d86c057232b0c798fc98">OBJECT_FLAGS_NO_CLEANUP</a>;                                                \</div>
 <div class="line">    })</div>
-<div class="ttc" id="atype_8h_html_a290aa2e7fa12d86c057232b0c798fc98"><div class="ttname"><a href="type_8h.html#a290aa2e7fa12d86c057232b0c798fc98">OBJECT_FLAGS_NO_CLEANUP</a></div><div class="ttdeci">#define OBJECT_FLAGS_NO_CLEANUP</div><div class="ttdef"><b>Definition:</b> type.h:27</div></div>
-<div class="ttc" id="atype_8h_html_abce3941cffbfc1da12a115314260d72d"><div class="ttname"><a href="type_8h.html#abce3941cffbfc1da12a115314260d72d">OBJECT_FLAGS_CONSUMED</a></div><div class="ttdeci">#define OBJECT_FLAGS_CONSUMED</div><div class="ttdef"><b>Definition:</b> type.h:28</div></div>
+<div class="ttc" id="astructObject_html"><div class="ttname"><a href="structObject.html">Object</a></div><div class="ttdef"><b>Definition:</b> type.h:54</div></div>
+<div class="ttc" id="atype_8h_html_a290aa2e7fa12d86c057232b0c798fc98"><div class="ttname"><a href="type_8h.html#a290aa2e7fa12d86c057232b0c798fc98">OBJECT_FLAGS_NO_CLEANUP</a></div><div class="ttdeci">#define OBJECT_FLAGS_NO_CLEANUP</div><div class="ttdef"><b>Definition:</b> type.h:29</div></div>
+<div class="ttc" id="atype_8h_html_abce3941cffbfc1da12a115314260d72d"><div class="ttname"><a href="type_8h.html#abce3941cffbfc1da12a115314260d72d">OBJECT_FLAGS_CONSUMED</a></div><div class="ttdeci">#define OBJECT_FLAGS_CONSUMED</div><div class="ttdef"><b>Definition:</b> type.h:30</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1264,16 +1223,18 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">        ({ \</div>
-<div class="line">        FatPtr _fptr__ = <a class="code" href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a>(name##_size());                 \</div>
-<div class="line">        Object _ret__ = {&amp;name##_Vtable__, <a class="code" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a>(), 0, _fptr__};   \</div>
-<div class="line">        Object_build_int(&amp;_ret__);\</div>
-<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a59184228fa29efbc3df1901ae6da28a2">SET_PARAM</a>, (_fptr__.data, name), (), __VA_ARGS__)     \</div>
-<div class="line">        Object_build(&amp;_ret__);                                         \</div>
-<div class="line">        _ret__;                                                        \</div>
+<div class="line">        FatPtr _fptr__ = <a class="code" href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a>(name##_size());                   \</div>
+<div class="line">        Object _ret__ = {&amp;name##_Vtable__, <a class="code" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a>(), 0, _fptr__};     \</div>
+<div class="line">        Object_build_int(&amp;_ret__);                                       \</div>
+<div class="line">        name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a> __config_;                                          \</div>
+<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a59184228fa29efbc3df1901ae6da28a2">SET_PARAM</a>, (&amp;__config_, name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>), (), __VA_ARGS__) \</div>
+<div class="line">        Object_build(&amp;_ret__, &amp;__config_);                                           \</div>
+<div class="line">        _ret__;                                                          \</div>
 <div class="line">    })</div>
 <div class="ttc" id="atype_8h_html_a2106e13dbac6575e8d701b9f1f4aa79d"><div class="ttname"><a href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a></div><div class="ttdeci">u64 unique_id()</div><div class="ttdef"><b>Definition:</b> type.c:29</div></div>
 <div class="ttc" id="atype_8h_html_a59184228fa29efbc3df1901ae6da28a2"><div class="ttname"><a href="type_8h.html#a59184228fa29efbc3df1901ae6da28a2">SET_PARAM</a></div><div class="ttdeci">#define SET_PARAM(ptr, value)</div></div>
 <div class="ttc" id="atype_8h_html_a909192bbfb2649a87561595bca24acaa"><div class="ttname"><a href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a></div><div class="ttdeci">FatPtr build_fat_ptr(u64 size)</div><div class="ttdef"><b>Definition:</b> type.c:35</div></div>
+<div class="ttc" id="atype_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1634,7 +1595,7 @@ Variables</h2></td></tr>
 <div class="line">        return impl(<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="type_8h.html#ae7033995114ec95e0e30960025176d46">PROCESS_FN_CALL</a>(__VA_ARGS__)));         \</div>
 <div class="line">    }</div>
 <div class="ttc" id="atype_8h_html_a2b4d2a863926a7886419d0e53aa465a0"><div class="ttname"><a href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a></div><div class="ttdeci">void * find_fn(const Object *obj, const char *name)</div><div class="ttdef"><b>Definition:</b> type.c:128</div></div>
-<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:90</div></div>
+<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:92</div></div>
 <div class="ttc" id="atype_8h_html_ae7033995114ec95e0e30960025176d46"><div class="ttname"><a href="type_8h.html#ae7033995114ec95e0e30960025176d46">PROCESS_FN_CALL</a></div><div class="ttdeci">#define PROCESS_FN_CALL(...)</div></div>
 </div><!-- fragment -->
 </div>
@@ -2044,49 +2005,9 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="structSelfCleanupImpl.html">SelfCleanupImpl</a> <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, \</div>
 <div class="line">                       cleanup(<a class="code" href="type_8h.html#a54b12fa3f9a7f03b6fd6898eba6d6382">SelfCleanupImpl_update</a>)))</div>
-<div class="ttc" id="astructSelfCleanupImpl_html"><div class="ttname"><a href="structSelfCleanupImpl.html">SelfCleanupImpl</a></div><div class="ttdef"><b>Definition:</b> type.h:60</div></div>
+<div class="ttc" id="astructSelfCleanupImpl_html"><div class="ttname"><a href="structSelfCleanupImpl.html">SelfCleanupImpl</a></div><div class="ttdef"><b>Definition:</b> type.h:62</div></div>
 <div class="ttc" id="atype_8h_html_a54b12fa3f9a7f03b6fd6898eba6d6382"><div class="ttname"><a href="type_8h.html#a54b12fa3f9a7f03b6fd6898eba6d6382">SelfCleanupImpl_update</a></div><div class="ttdeci">void SelfCleanupImpl_update(SelfCleanupImpl *sc)</div><div class="ttdef"><b>Definition:</b> type.c:153</div></div>
 </div><!-- fragment -->
-</div>
-</div>
-<a id="af4eb0dcad9ef53f676ef2399a9eef02e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af4eb0dcad9ef53f676ef2399a9eef02e">&#9670;&nbsp;</a></span>set</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define set</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">type, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">instance, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">field_name, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">value&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;type##_set_##field_name(&amp;instance, value)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
 </div>
 </div>
 <a id="abca5f6ccf1375a60458378849f687dc4"></a>
@@ -2195,39 +2116,6 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-</div>
-</div>
-<a id="a240483d5e04d15d39384deeca30bc467"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a240483d5e04d15d39384deeca30bc467">&#9670;&nbsp;</a></span>Setter</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define Setter</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">type, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">field_name&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> type##_set_##field_name(<a class="code" href="structObject.html">Object</a>* <span class="keyword">self</span>, typeof(((type*)0)-&gt;field_name) value) \</div>
-<div class="line">    {                                                                                       \</div>
-<div class="line">        type* ptr = (type*)(self-&gt;ptr.data);                                            \</div>
-<div class="line">        ptr-&gt;field_name = value;                                                        \</div>
-<div class="line">    }</div>
-</div><!-- fragment -->
 </div>
 </div>
 <a id="a8300c58c407762ef5e63f1fc9cbaefd2"></a>
@@ -2375,39 +2263,74 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">typedef</span> <span class="keyword">struct </span>name name;                                              \</div>
-<div class="line">    static <a class="code" href="structVtable.html">Vtable</a> name##_Vtable__ = {#name, 0, NULL, 0, NULL};             \</div>
-<div class="line">    u64 name##_size();                                                     \</div>
-<div class="line">    typedef <span class="keyword">struct </span>name                                                    \</div>
-<div class="line">    {                                                                      \</div>
-<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a9c2b147d20531bee9783a9790bd3fd19">CALL_FIRST_TWO</a>, , (;), __VA_ARGS__);                  \</div>
-<div class="line">    } name;                                                                \</div>
-<div class="line">    u64 name##_size() { <span class="keywordflow">return</span> <span class="keyword">sizeof</span>(name); }                             \</div>
-<div class="line">    void name##_build_internal(<a class="code" href="structObject.html">Object</a>* ptr)                                \</div>
-<div class="line">    {                                                                      \</div>
-<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a9f390c60f8ae86116dbff32d97046ccf">BUILD_OBJECTS</a>, name, (;), __VA_ARGS__);               \</div>
-<div class="line">        u64 size = name##_size();                                      \</div>
-<div class="line">        memset(ptr-&gt;ptr.data, 0, size);                                \</div>
-<div class="line">    }                                                                      \</div>
-<div class="line">    void name##_drop_internal(<a class="code" href="structObject.html">Object</a>* ptr)                                 \</div>
-<div class="line">    {                                                                      \</div>
-<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#ac80e1c5ec6591a85b92849d0d066e9be">DROP_OBJECTS</a>, name, (;), __VA_ARGS__);                \</div>
-<div class="line">    }                                                                      \</div>
-<div class="line">    static <span class="keywordtype">void</span> <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((constructor)) __add_impls_##name##_vtable() \</div>
-<div class="line">    {                                                                      \</div>
-<div class="line">        VtableEntry size = {<span class="stringliteral">&quot;size&quot;</span>, name##_size};                      \</div>
-<div class="line">        vtable_add_entry(&amp;name##_Vtable__, size);                      \</div>
-<div class="line">        VtableEntry build_internal = {<span class="stringliteral">&quot;build_internal&quot;</span>,                \</div>
-<div class="line">                          name##_build_internal};          \</div>
-<div class="line">        vtable_add_entry(&amp;name##_Vtable__, build_internal);            \</div>
-<div class="line">        VtableEntry drop_internal = {<span class="stringliteral">&quot;drop_internal&quot;</span>,                  \</div>
-<div class="line">                         name##_drop_internal};            \</div>
-<div class="line">        vtable_add_entry(&amp;name##_Vtable__, drop_internal);             \</div>
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">typedef</span> <span class="keyword">struct </span>name name;                                       \</div>
+<div class="line">    Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL};             \</div>
+<div class="line">    u64 name##_size();                                              \</div>
+<div class="line">    typedef <span class="keyword">struct </span>name                                             \</div>
+<div class="line">    {                                                               \</div>
+<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a9c2b147d20531bee9783a9790bd3fd19">CALL_FIRST_TWO</a>, , (;), __VA_ARGS__);           \</div>
+<div class="line">    } name;                                                         \</div>
+<div class="line">    u64 name##_size() { <span class="keywordflow">return</span> <span class="keyword">sizeof</span>(name); }                      \</div>
+<div class="line">    void name##_build_internal(<a class="code" href="structObject.html">Object</a>* ptr)                         \</div>
+<div class="line">    {                                                               \</div>
+<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a9f390c60f8ae86116dbff32d97046ccf">BUILD_OBJECTS</a>, name, (;), __VA_ARGS__);        \</div>
+<div class="line">        u64 size = name##_size();                               \</div>
+<div class="line">        memset(ptr-&gt;ptr.data, 0, size);                         \</div>
+<div class="line">    }                                                               \</div>
+<div class="line">    void name##_drop_internal(<a class="code" href="structObject.html">Object</a>* ptr)                          \</div>
+<div class="line">    {                                                               \</div>
+<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#ac80e1c5ec6591a85b92849d0d066e9be">DROP_OBJECTS</a>, name, (;), __VA_ARGS__);         \</div>
+<div class="line">    }                                                               \</div>
+<div class="line">    void <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((constructor)) __add_impls_##name##_vtable() \</div>
+<div class="line">    {                                                               \</div>
+<div class="line">        VtableEntry size = {<span class="stringliteral">&quot;size&quot;</span>, name##_size};               \</div>
+<div class="line">        vtable_add_entry(&amp;name##_Vtable__, size);               \</div>
+<div class="line">        VtableEntry build_internal = {<span class="stringliteral">&quot;build_internal&quot;</span>,         \</div>
+<div class="line">                          name##_build_internal};   \</div>
+<div class="line">        vtable_add_entry(&amp;name##_Vtable__, build_internal);     \</div>
+<div class="line">        VtableEntry drop_internal = {<span class="stringliteral">&quot;drop_internal&quot;</span>,           \</div>
+<div class="line">                         name##_drop_internal};     \</div>
+<div class="line">        vtable_add_entry(&amp;name##_Vtable__, drop_internal);      \</div>
 <div class="line">    }</div>
-<div class="ttc" id="astructVtable_html"><div class="ttname"><a href="structVtable.html">Vtable</a></div><div class="ttdef"><b>Definition:</b> type.h:43</div></div>
 <div class="ttc" id="atype_8h_html_a9c2b147d20531bee9783a9790bd3fd19"><div class="ttname"><a href="type_8h.html#a9c2b147d20531bee9783a9790bd3fd19">CALL_FIRST_TWO</a></div><div class="ttdeci">#define CALL_FIRST_TWO(x, y)</div></div>
 <div class="ttc" id="atype_8h_html_a9f390c60f8ae86116dbff32d97046ccf"><div class="ttname"><a href="type_8h.html#a9f390c60f8ae86116dbff32d97046ccf">BUILD_OBJECTS</a></div><div class="ttdeci">#define BUILD_OBJECTS(name, inner)</div></div>
 <div class="ttc" id="atype_8h_html_ac80e1c5ec6591a85b92849d0d066e9be"><div class="ttname"><a href="type_8h.html#ac80e1c5ec6591a85b92849d0d066e9be">DROP_OBJECTS</a></div><div class="ttdeci">#define DROP_OBJECTS(name, inner)</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="adfc7d0564cfeb70cd44867c781dc4800"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfc7d0564cfeb70cd44867c781dc4800">&#9670;&nbsp;</a></span>TypeDef</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TypeDef</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">typedef</span> <span class="keyword">struct </span>name name;                             \</div>
+<div class="line">    u64 name##_size();                                    \</div>
+<div class="line">    extern <a class="code" href="structVtable.html">Vtable</a> name##_Vtable__;                        \</div>
+<div class="line">    typedef <span class="keyword">struct </span>name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>                           \</div>
+<div class="line">    {                                                     \</div>
+<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a9c2b147d20531bee9783a9790bd3fd19">CALL_FIRST_TWO</a>, , (;), __VA_ARGS__); \</div>
+<div class="line">    } name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>;</div>
+<div class="ttc" id="astructVtable_html"><div class="ttname"><a href="structVtable.html">Vtable</a></div><div class="ttdef"><b>Definition:</b> type.h:45</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2531,10 +2454,10 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(((<a class="code" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>*)<a class="code" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a>-&gt;<a class="code" href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">ptr</a>.<a class="code" href="structFatPtr.html#a31ba091180df5e031aa582cddbd09364">data</a>)-&gt;__VA_ARGS__) \</div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(((<a class="code" href="hidden_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>*)<a class="code" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a>-&gt;<a class="code" href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">ptr</a>.<a class="code" href="structFatPtr.html#a31ba091180df5e031aa582cddbd09364">data</a>)-&gt;__VA_ARGS__) \</div>
 <div class="line">    __VA_OPT__(<a class="code" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)                                                    \</div>
 <div class="line">    (<a class="code" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a>)</div>
-<div class="ttc" id="acore_2test_8c_html_a750877e0398a37cb8f03443558fb7f6f"><div class="ttname"><a href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a></div><div class="ttdeci">#define IMPL</div><div class="ttdef"><b>Definition:</b> test.c:1321</div></div>
+<div class="ttc" id="ahidden_8c_html_a750877e0398a37cb8f03443558fb7f6f"><div class="ttname"><a href="hidden_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a></div><div class="ttdeci">#define IMPL</div><div class="ttdef"><b>Definition:</b> hidden.c:6</div></div>
 <div class="ttc" id="atype_8h_html_aaf2cf0b8691ef9ea3833ec39bc0626f9"><div class="ttname"><a href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a></div><div class="ttdeci">_Thread_local Object * __thread_local_self_Var</div><div class="ttdef"><b>Definition:</b> type.c:21</div></div>
 </div><!-- fragment -->
 </div>
@@ -2685,8 +2608,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="af6925c79571998ccf40ed3f5d8388443"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af6925c79571998ccf40ed3f5d8388443">&#9670;&nbsp;</a></span>Object_build()</h2>
+<a id="a893523b668098e09113754219baea2cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a893523b668098e09113754219baea2cb">&#9670;&nbsp;</a></span>Object_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2695,8 +2618,18 @@ Variables</h2></td></tr>
           <td class="memname">void Object_build </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structObject.html">Object</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>config</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

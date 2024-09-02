@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['delete_5factive_5flock_589',['delete_active_lock',['../lock_8c.html#a328669fb930fdc53ae724c4bcb127267',1,'lock.c']]],
-  ['do_5ffree_590',['do_free',['../heap_8c.html#ae4c3316e92e9e6f0a0d77937608397ff',1,'heap.c']]],
-  ['do_5fmalloc_591',['do_malloc',['../heap_8c.html#a87531095daa9fb95b847158ed06e6873',1,'heap.c']]],
-  ['do_5frealloc_592',['do_realloc',['../heap_8c.html#a75080a2b10c46ce029f300f13e9790a8',1,'heap.c']]],
-  ['drop_593',['drop',['../traits_8c.html#aafbdbb51ed2b82d034747628f19fd625',1,'drop(Object *self):&#160;traits.c'],['../traits_8h.html#aafbdbb51ed2b82d034747628f19fd625',1,'drop(Object *self):&#160;traits.c']]]
+  ['fat_5fptr_5fdata_560',['fat_ptr_data',['../heap_8c.html#a2beb14eedce3e8fbcff7b86df3209e91',1,'fat_ptr_data(const FatPtr *ptr):&#160;heap.c'],['../heap_8h.html#a2beb14eedce3e8fbcff7b86df3209e91',1,'fat_ptr_data(const FatPtr *ptr):&#160;heap.c']]],
+  ['fat_5fptr_5fid_561',['fat_ptr_id',['../heap_8c.html#a6a172e13c6187a33eda5d96526411444',1,'heap.c']]],
+  ['fat_5fptr_5flen_562',['fat_ptr_len',['../heap_8c.html#a582a48e1532268a1d999b84edaa6abf9',1,'fat_ptr_len(const FatPtr *ptr):&#160;heap.c'],['../heap_8h.html#a582a48e1532268a1d999b84edaa6abf9',1,'fat_ptr_len(const FatPtr *ptr):&#160;heap.c']]],
+  ['find_5ffn_563',['find_fn',['../type_8c.html#a2b4d2a863926a7886419d0e53aa465a0',1,'find_fn(const Object *obj, const char *name):&#160;type.c'],['../type_8h.html#a2b4d2a863926a7886419d0e53aa465a0',1,'find_fn(const Object *obj, const char *name):&#160;type.c']]]
 ];
