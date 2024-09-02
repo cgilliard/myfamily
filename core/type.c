@@ -172,9 +172,9 @@ void Object_build_int(Object* ptr)
 	build_int(ptr);
 }
 
-void Object_build(Object* ptr)
+void Object_build(Object* ptr, void* config)
 {
-	void (*do_build)(Object* ptr) = find_fn(ptr, "build");
+	void (*do_build)(void* config) = find_fn(ptr, "build");
 	if (do_build)
 	{
 		// setup self references
@@ -182,7 +182,7 @@ void Object_build(Object* ptr)
 		const Object* tmp_Const = __thread_local_self_Const;
 		__thread_local_self_Const = ptr;
 		__thread_local_self_Var = ptr;
-		do_build(ptr);
+		do_build(config);
 		// revert
 		__thread_local_self_Var = tmp_Var;
 		__thread_local_self_Const = tmp_Const;

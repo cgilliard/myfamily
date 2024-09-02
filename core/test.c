@@ -854,6 +854,7 @@ Test(core, test_synchronized)
 	Lock_cleanup(&sync_lock);
 }
 
+/*
 // Define a Testtype with two fields x and y which are u64 and u32 respectively
 Type(TestType, Field(u64, x), Field(u32, y));
 
@@ -1316,9 +1317,6 @@ char* ServerTest2_get_server_host()
 {
 	return get(ServerConfig, $(config), host);
 }
-#undef IMPL
-
-#define IMPL ServerTest2
 void ServerTest2_build()
 {
 }
@@ -1341,3 +1339,40 @@ Test(core, test_sample)
 	let server = new (ServerTest2, WithObj(config, config1));
 	cr_assert(!strcmp(get_server_host(&server), "127.0.0.1"));
 }
+
+*/
+
+#include <core/hidden.h>
+Test(core, test_hidden)
+{
+	var hidden = new (Hidden, With(capacity, 1234));
+	set_value(&hidden, 122);
+	cr_assert_eq(get_value(&hidden), 122);
+	cr_assert_eq(get_capacity_impl(&hidden), 1234);
+}
+
+/*
+ * // .h file
+ * TypeDef(Server, Config(char *, host, "127.0.0.1"), Config(u16, port, 8080), Config(u32, threads, 6), ConfigObj(HashRingKey, key));
+ *
+ * // define server api
+ * #define ServerApi DefineTrait(ServerImpl, Required(Const, char*, get_server_host), Required(Var, void, start_server))
+ * TraitImpl(ServerApi);
+ *
+ * // .c file
+ * Type(Server, Field(u64, state), Field(i32, server_fd), Obj(ServerConfig, config));
+ * Impl(Server, ServerApi);
+ * Impl(Server, build);
+ * Impl(Server, drop);
+ *
+ * #define IMPL Server
+ * // do impl...
+ * #undef IMPL
+ *
+ * // usage in another .c file
+ * // instantiate with defaults except 'host'.
+ * var server = new(Server, With(host, "0.0.0.0"));
+ * start_server(&server);
+ * // ...
+ *
+ */

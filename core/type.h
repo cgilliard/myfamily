@@ -21,6 +21,8 @@
 #include <core/macro_utils.h>
 #include <core/panic.h>
 #include <core/types.h>
+#include <stdio.h>
+#include <string.h>
 
 #define MAX_TRAIT_NAME_LEN 128
 
@@ -73,7 +75,7 @@ extern _Thread_local Object* __thread_local_self_Var;
 
 void Object_cleanup(const Object* ptr);
 void Object_mark_consumed(const Object* ptr);
-void Object_build(Object* ptr);
+void Object_build(Object* ptr, void* config);
 void Object_build_int(Object* ptr);
 void Object_check_param(const Object* obj);
 void sort_vtable(Vtable* table);
@@ -103,24 +105,6 @@ FatPtr build_fat_ptr(u64 size);
 	__VA_OPT__(NONE)                                                     \
 	(__thread_local_self_Const)
 
-#define Getter(type, field_name)                                                          \
-	static typeof(((type*)0)->field_name) type##_get_##field_name(const Object* self) \
-	{                                                                                 \
-		type* ptr = (type*)(self->ptr.data);                                      \
-		return ptr->field_name;                                                   \
-	}
-
-#define get(type, instance, field_name) type##_get_##field_name(&instance)
-
-#define Setter(type, field_name)                                                                \
-	static void type##_set_##field_name(Object* self, typeof(((type*)0)->field_name) value) \
-	{                                                                                       \
-		type* ptr = (type*)(self->ptr.data);                                            \
-		ptr->field_name = value;                                                        \
-	}
-
-#define set(type, instance, field_name, value) type##_set_##field_name(&instance, value)
-
 #define FIRST_TWO(x, y, ...) x y
 #define CALL_FIRST_TWO(x, y) FIRST_TWO y
 
@@ -136,38 +120,48 @@ FatPtr build_fat_ptr(u64 size);
 #define BUILD_OBJECTS_(...) BUILD_OBJECTS__(__VA_ARGS__)
 #define BUILD_OBJECTS(name, inner) BUILD_OBJECTS_(name, EXPAND_ALL inner)
 
-#define Type(name, ...)                                                        \
-	typedef struct name name;                                              \
-	static Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL};             \
-	u64 name##_size();                                                     \
-	typedef struct name                                                    \
-	{                                                                      \
-		FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);                  \
-	} name;                                                                \
-	u64 name##_size() { return sizeof(name); }                             \
-	void name##_build_internal(Object* ptr)                                \
-	{                                                                      \
-		FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__);               \
-		u64 size = name##_size();                                      \
-		memset(ptr->ptr.data, 0, size);                                \
-	}                                                                      \
-	void name##_drop_internal(Object* ptr)                                 \
-	{                                                                      \
-		FOR_EACH(DROP_OBJECTS, name, (;), __VA_ARGS__);                \
-	}                                                                      \
-	static void __attribute__((constructor)) __add_impls_##name##_vtable() \
-	{                                                                      \
-		VtableEntry size = {"size", name##_size};                      \
-		vtable_add_entry(&name##_Vtable__, size);                      \
-		VtableEntry build_internal = {"build_internal",                \
-					      name##_build_internal};          \
-		vtable_add_entry(&name##_Vtable__, build_internal);            \
-		VtableEntry drop_internal = {"drop_internal",                  \
-					     name##_drop_internal};            \
-		vtable_add_entry(&name##_Vtable__, drop_internal);             \
+#define TypeDef(name, ...)                                    \
+	typedef struct name name;                             \
+	u64 name##_size();                                    \
+	extern Vtable name##_Vtable__;                        \
+	typedef struct name##Config                           \
+	{                                                     \
+		FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__); \
+	} name##Config;
+
+#define Type(name, ...)                                                 \
+	typedef struct name name;                                       \
+	Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL};             \
+	u64 name##_size();                                              \
+	typedef struct name                                             \
+	{                                                               \
+		FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);           \
+	} name;                                                         \
+	u64 name##_size() { return sizeof(name); }                      \
+	void name##_build_internal(Object* ptr)                         \
+	{                                                               \
+		FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__);        \
+		u64 size = name##_size();                               \
+		memset(ptr->ptr.data, 0, size);                         \
+	}                                                               \
+	void name##_drop_internal(Object* ptr)                          \
+	{                                                               \
+		FOR_EACH(DROP_OBJECTS, name, (;), __VA_ARGS__);         \
+	}                                                               \
+	void __attribute__((constructor)) __add_impls_##name##_vtable() \
+	{                                                               \
+		VtableEntry size = {"size", name##_size};               \
+		vtable_add_entry(&name##_Vtable__, size);               \
+		VtableEntry build_internal = {"build_internal",         \
+					      name##_build_internal};   \
+		vtable_add_entry(&name##_Vtable__, build_internal);     \
+		VtableEntry drop_internal = {"drop_internal",           \
+					     name##_drop_internal};     \
+		vtable_add_entry(&name##_Vtable__, drop_internal);      \
 	}
 
 #define Field(field_type, field_name) (field_type, field_name)
+#define Config(field_type, field_name) (field_type, field_name)
 #define Obj(obj_type, obj_name) (Object, obj_name, obj_type)
 #define With(x, y) (x, y, ignore)
 #define WithObj(x, y) (x, y)
@@ -398,12 +392,13 @@ FatPtr build_fat_ptr(u64 size);
 // settings.
 // clang-format off
 #define new(name, ...)({ \
-		FatPtr _fptr__ = build_fat_ptr(name##_size());                 \
-		Object _ret__ = {&name##_Vtable__, unique_id(), 0, _fptr__};   \
-		Object_build_int(&_ret__);\
-		FOR_EACH(SET_PARAM, (_fptr__.data, name), (), __VA_ARGS__)     \
-		Object_build(&_ret__);                                         \
-		_ret__;                                                        \
+		FatPtr _fptr__ = build_fat_ptr(name##_size());                   \
+		Object _ret__ = {&name##_Vtable__, unique_id(), 0, _fptr__};     \
+		Object_build_int(&_ret__);                                       \
+		name##Config __config_;                                          \
+		FOR_EACH(SET_PARAM, (&__config_, name##Config), (), __VA_ARGS__) \
+		Object_build(&_ret__, &__config_);                                           \
+		_ret__;                                                          \
 	})
 // clang-format on
 
