@@ -120,7 +120,7 @@ Macros</h2></td></tr>
 <tr class="separator:a045dd54932944d8830380f4596d64446"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23cd3b356bdc7322fbf851888d7787f2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a>(...)</td></tr>
 <tr class="separator:a23cd3b356bdc7322fbf851888d7787f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28e76886e9ffe1b9d71ae38254b2be20"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(((const <a class="el" href="hidden_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>)</td></tr>
+<tr class="memitem:a28e76886e9ffe1b9d71ae38254b2be20"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(((const <a class="el" href="test__encapsulation_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>)</td></tr>
 <tr class="separator:a28e76886e9ffe1b9d71ae38254b2be20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec8bb7d27f1984ca2711a4952ddfac24"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aec8bb7d27f1984ca2711a4952ddfac24">FIRST_TWO</a>(x,  y, ...)&#160;&#160;&#160;x y</td></tr>
 <tr class="separator:aec8bb7d27f1984ca2711a4952ddfac24"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -242,6 +242,8 @@ Macros</h2></td></tr>
 <tr class="separator:a7b6a9f714682c9f36decaa026844ab37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad11372ec273ce0609a5374c6dc3ad17d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ad11372ec273ce0609a5374c6dc3ad17d">Impl</a>(name, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a7b6a9f714682c9f36decaa026844ab37">PROC_IMPL_</a>(name, __VA_ARGS__)</td></tr>
 <tr class="separator:ad11372ec273ce0609a5374c6dc3ad17d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc51b80350cc707f8292d37734eb3457"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#acc51b80350cc707f8292d37734eb3457">Override</a>(name,  trait,  implfn)</td></tr>
+<tr class="separator:acc51b80350cc707f8292d37734eb3457"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43bbd62b5c26c4aff91d1b83c2608740"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a43bbd62b5c26c4aff91d1b83c2608740">IS_OBJECT_TYPE</a>(type)&#160;&#160;&#160;__builtin_types_compatible_p(typeof(type), <a class="el" href="structObject.html">Object</a>)</td></tr>
 <tr class="separator:a43bbd62b5c26c4aff91d1b83c2608740"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af62f03b82ea2b2d1a0b4bfe1ccad073e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#af62f03b82ea2b2d1a0b4bfe1ccad073e">PROC_WITH_OBJ</a>(ptr,  structure,  field_name,  value)</td></tr>
@@ -284,6 +286,8 @@ Functions</h2></td></tr>
 <tr class="separator:aff9f02aea784a954165464235cc73775"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc5e90382878eb50826eeae340a4ef64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#adc5e90382878eb50826eeae340a4ef64">sort_vtable</a> (<a class="el" href="structVtable.html">Vtable</a> *table)</td></tr>
 <tr class="separator:adc5e90382878eb50826eeae340a4ef64"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb0636afb88ebe75121824df05099b40"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aeb0636afb88ebe75121824df05099b40">vtable_override</a> (<a class="el" href="structVtable.html">Vtable</a> *table, <a class="el" href="structVtableEntry.html">VtableEntry</a> entry)</td></tr>
+<tr class="separator:aeb0636afb88ebe75121824df05099b40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5082273ba4bf9ad23e49ca9319bef78e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a5082273ba4bf9ad23e49ca9319bef78e">vtable_add_entry</a> (<a class="el" href="structVtable.html">Vtable</a> *table, <a class="el" href="structVtableEntry.html">VtableEntry</a> entry)</td></tr>
 <tr class="separator:a5082273ba4bf9ad23e49ca9319bef78e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a685f77a71db7c2ab533b766f7a6870f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a685f77a71db7c2ab533b766f7a6870f2">vtable_add_trait</a> (<a class="el" href="structVtable.html">Vtable</a> *table, char *trait)</td></tr>
@@ -414,7 +418,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(((name*)(ptr-&gt;ptr.data))-&gt;inner = <a class="code" href="type_8h.html#adb292545e8d39ad1892f3b4c622935da">OBJECT_INIT</a>; \</div>
 <div class="line">           ((name*)(ptr-&gt;ptr.data))-&gt;inner.vtable =       \</div>
-<div class="line">               &amp;__VA_ARGS__##_Vtable__;)</div>
+<div class="line">               &amp;__VA_ARGS__##_Vtable__);</div>
 <div class="ttc" id="atype_8h_html_a28e76886e9ffe1b9d71ae38254b2be20"><div class="ttname"><a href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a></div><div class="ttdeci">#define __VA_OPT__(((const IMPL)</div></div>
 <div class="ttc" id="atype_8h_html_adb292545e8d39ad1892f3b4c622935da"><div class="ttname"><a href="type_8h.html#adb292545e8d39ad1892f3b4c622935da">OBJECT_INIT</a></div><div class="ttdeci">#define OBJECT_INIT</div></div>
 </div><!-- fragment -->
@@ -614,7 +618,7 @@ Variables</h2></td></tr>
 <div class="line">        }                                                       \</div>
 <div class="line">    }</div>
 <div class="ttc" id="atype_8c_html_afd02bb0f6a745c39d5e3417493995c71"><div class="ttname"><a href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a></div><div class="ttdeci">void __attribute__((constructor))</div><div class="ttdef"><b>Definition:</b> type.c:24</div></div>
-<div class="ttc" id="atype_8h_html_a4e3d5a419eabb0fae833d71f283b58fb"><div class="ttname"><a href="type_8h.html#a4e3d5a419eabb0fae833d71f283b58fb">vtable_check_impl_trait</a></div><div class="ttdeci">bool vtable_check_impl_trait(Vtable *table, char *trait)</div><div class="ttdef"><b>Definition:</b> type.c:82</div></div>
+<div class="ttc" id="atype_8h_html_a4e3d5a419eabb0fae833d71f283b58fb"><div class="ttname"><a href="type_8h.html#a4e3d5a419eabb0fae833d71f283b58fb">vtable_check_impl_trait</a></div><div class="ttdeci">bool vtable_check_impl_trait(Vtable *table, char *trait)</div><div class="ttdef"><b>Definition:</b> type.c:93</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1227,6 +1231,7 @@ Variables</h2></td></tr>
 <div class="line">        Object _ret__ = {&amp;name##_Vtable__, <a class="code" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a>(), 0, _fptr__};     \</div>
 <div class="line">        Object_build_int(&amp;_ret__);                                       \</div>
 <div class="line">        name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a> __config_;                                          \</div>
+<div class="line">         memset(&amp;__config_, 0, <span class="keyword">sizeof</span>(name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>)); \</div>
 <div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a59184228fa29efbc3df1901ae6da28a2">SET_PARAM</a>, (&amp;__config_, name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>), (), __VA_ARGS__) \</div>
 <div class="line">        Object_build(&amp;_ret__, &amp;__config_);                                           \</div>
 <div class="line">        _ret__;                                                          \</div>
@@ -1345,7 +1350,47 @@ Variables</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    _Generic((value),                                       \</div>
 <div class="line">        <a class="code" href="structObject.html">Object</a> *: <a class="code" href="type_8h.html#aff9f02aea784a954165464235cc73775">Object_check_param</a>((<span class="keyword">const</span> <a class="code" href="structObject.html">Object</a>*)value), \</div>
 <div class="line">        <span class="keywordflow">default</span>: <a class="code" href="type_8h.html#aff9f02aea784a954165464235cc73775">Object_check_param</a>(NULL))</div>
-<div class="ttc" id="atype_8h_html_aff9f02aea784a954165464235cc73775"><div class="ttname"><a href="type_8h.html#aff9f02aea784a954165464235cc73775">Object_check_param</a></div><div class="ttdeci">void Object_check_param(const Object *obj)</div><div class="ttdef"><b>Definition:</b> type.c:159</div></div>
+<div class="ttc" id="atype_8h_html_aff9f02aea784a954165464235cc73775"><div class="ttname"><a href="type_8h.html#aff9f02aea784a954165464235cc73775">Object_check_param</a></div><div class="ttdeci">void Object_check_param(const Object *obj)</div><div class="ttdef"><b>Definition:</b> type.c:170</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="acc51b80350cc707f8292d37734eb3457"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc51b80350cc707f8292d37734eb3457">&#9670;&nbsp;</a></span>Override</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Override</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">trait, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">implfn&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">static</span> <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">void                                                      \</a></div>
+<div class="line"><a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">	    __attribute__</a>((constructor)) ov__##name##_##trait##_vtable() \</div>
+<div class="line">    {                                                                \</div>
+<div class="line">        VtableEntry next = {#trait, implfn};                     \</div>
+<div class="line">        vtable_override(&amp;name##_Vtable__, next);                 \</div>
+<div class="line">    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1594,8 +1639,8 @@ Variables</h2></td></tr>
 <div class="line">        PROCESS_FN_CHECK_OBJECTS(__VA_ARGS__);                         \</div>
 <div class="line">        return impl(<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="type_8h.html#ae7033995114ec95e0e30960025176d46">PROCESS_FN_CALL</a>(__VA_ARGS__)));         \</div>
 <div class="line">    }</div>
-<div class="ttc" id="atype_8h_html_a2b4d2a863926a7886419d0e53aa465a0"><div class="ttname"><a href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a></div><div class="ttdeci">void * find_fn(const Object *obj, const char *name)</div><div class="ttdef"><b>Definition:</b> type.c:128</div></div>
-<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:92</div></div>
+<div class="ttc" id="atype_8h_html_a2b4d2a863926a7886419d0e53aa465a0"><div class="ttname"><a href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a></div><div class="ttdeci">void * find_fn(const Object *obj, const char *name)</div><div class="ttdef"><b>Definition:</b> type.c:139</div></div>
+<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:93</div></div>
 <div class="ttc" id="atype_8h_html_ae7033995114ec95e0e30960025176d46"><div class="ttname"><a href="type_8h.html#ae7033995114ec95e0e30960025176d46">PROCESS_FN_CALL</a></div><div class="ttdeci">#define PROCESS_FN_CALL(...)</div></div>
 </div><!-- fragment -->
 </div>
@@ -2006,7 +2051,7 @@ Variables</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="structSelfCleanupImpl.html">SelfCleanupImpl</a> <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, \</div>
 <div class="line">                       cleanup(<a class="code" href="type_8h.html#a54b12fa3f9a7f03b6fd6898eba6d6382">SelfCleanupImpl_update</a>)))</div>
 <div class="ttc" id="astructSelfCleanupImpl_html"><div class="ttname"><a href="structSelfCleanupImpl.html">SelfCleanupImpl</a></div><div class="ttdef"><b>Definition:</b> type.h:62</div></div>
-<div class="ttc" id="atype_8h_html_a54b12fa3f9a7f03b6fd6898eba6d6382"><div class="ttname"><a href="type_8h.html#a54b12fa3f9a7f03b6fd6898eba6d6382">SelfCleanupImpl_update</a></div><div class="ttdeci">void SelfCleanupImpl_update(SelfCleanupImpl *sc)</div><div class="ttdef"><b>Definition:</b> type.c:153</div></div>
+<div class="ttc" id="atype_8h_html_a54b12fa3f9a7f03b6fd6898eba6d6382"><div class="ttname"><a href="type_8h.html#a54b12fa3f9a7f03b6fd6898eba6d6382">SelfCleanupImpl_update</a></div><div class="ttdeci">void SelfCleanupImpl_update(SelfCleanupImpl *sc)</div><div class="ttdef"><b>Definition:</b> type.c:164</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2071,22 +2116,22 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<span class="keywordflow">do</span> {                                                                               \</div>
-<div class="line">        if (<a class="code" href="type_8h.html#a43bbd62b5c26c4aff91d1b83c2608740">IS_OBJECT_TYPE</a>(((structure*)0)-&gt;name))                                            \</div>
-<div class="line">        {                                                                                     \</div>
-<div class="line">            panic(<span class="stringliteral">&quot;Cannot use With to set an Object. Use &quot;</span>                                \</div>
-<div class="line">                  <span class="stringliteral">&quot;&#39;WithObj&#39; isntead.\n&quot;</span>);                                                \</div>
-<div class="line">        }                                                                                     \</div>
-<div class="line">        else                                                                                  \</div>
-<div class="line">        {                                                                                     \</div>
-<div class="line">            *((typeof(((structure*)0)-&gt;name)*)(ptr + offsetof(structure, name))) = value; \</div>
-<div class="line">        }                                                                                     \</div>
-<div class="line">    } <span class="keywordflow">while</span> (0);)                                                                                 \</div>
-<div class="line">    <a class="code" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a>(<a class="code" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a>(<a class="code" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> <a class="code" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a>(<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(                                             \</div>
-<div class="line">        PROC_WITH_OBJ(ptr, structure, name, value)) <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(()))))</div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<span class="keywordflow">do</span> {                                                                                      \</div>
+<div class="line">        if (<a class="code" href="type_8h.html#a43bbd62b5c26c4aff91d1b83c2608740">IS_OBJECT_TYPE</a>(((structure*)0)-&gt;name))                                                   \</div>
+<div class="line">        {                                                                                            \</div>
+<div class="line">            panic(<span class="stringliteral">&quot;Cannot use With to set an Object. Use &quot;</span>                                       \</div>
+<div class="line">                  <span class="stringliteral">&quot;&#39;WithObj&#39; isntead.\n&quot;</span>);                                                       \</div>
+<div class="line">        }                                                                                            \</div>
+<div class="line">        else                                                                                         \</div>
+<div class="line">        {                                                                                            \</div>
+<div class="line">            *((typeof(((structure*)0)-&gt;name)*)((<span class="keywordtype">char</span>*)ptr + offsetof(structure, name))) = value; \</div>
+<div class="line">        }                                                                                            \</div>
+<div class="line">    } <span class="keywordflow">while</span> (0);)                                                                                        \</div>
+<div class="line">    <a class="code" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a>(<a class="code" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a>(<a class="code" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> <a class="code" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a>(<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="code" href="type_8h.html#af62f03b82ea2b2d1a0b4bfe1ccad073e">PROC_WITH_OBJ</a>(ptr, structure, name, value)) <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(()))))</div>
 <div class="ttc" id="amacro__utils_8h_html_a800c6a1a2abcb460825c03b17f67ec29"><div class="ttname"><a href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a></div><div class="ttdeci">#define EXPAND_ALL(...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:18</div></div>
 <div class="ttc" id="amacro__utils_8h_html_ae4b532a93c757194ec73b6790a3e6b1f"><div class="ttname"><a href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a></div><div class="ttdeci">#define EXPAND(x)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:17</div></div>
 <div class="ttc" id="atype_8h_html_a43bbd62b5c26c4aff91d1b83c2608740"><div class="ttname"><a href="type_8h.html#a43bbd62b5c26c4aff91d1b83c2608740">IS_OBJECT_TYPE</a></div><div class="ttdeci">#define IS_OBJECT_TYPE(type)</div></div>
+<div class="ttc" id="atype_8h_html_af62f03b82ea2b2d1a0b4bfe1ccad073e"><div class="ttname"><a href="type_8h.html#af62f03b82ea2b2d1a0b4bfe1ccad073e">PROC_WITH_OBJ</a></div><div class="ttdeci">#define PROC_WITH_OBJ(ptr, structure, field_name, value)</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2273,9 +2318,9 @@ Variables</h2></td></tr>
 <div class="line">    u64 name##_size() { <span class="keywordflow">return</span> <span class="keyword">sizeof</span>(name); }                      \</div>
 <div class="line">    void name##_build_internal(<a class="code" href="structObject.html">Object</a>* ptr)                         \</div>
 <div class="line">    {                                                               \</div>
-<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a9f390c60f8ae86116dbff32d97046ccf">BUILD_OBJECTS</a>, name, (;), __VA_ARGS__);        \</div>
 <div class="line">        u64 size = name##_size();                               \</div>
 <div class="line">        memset(ptr-&gt;ptr.data, 0, size);                         \</div>
+<div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a9f390c60f8ae86116dbff32d97046ccf">BUILD_OBJECTS</a>, name, (;), __VA_ARGS__);        \</div>
 <div class="line">    }                                                               \</div>
 <div class="line">    void name##_drop_internal(<a class="code" href="structObject.html">Object</a>* ptr)                          \</div>
 <div class="line">    {                                                               \</div>
@@ -2454,10 +2499,10 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(((<a class="code" href="hidden_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>*)<a class="code" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a>-&gt;<a class="code" href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">ptr</a>.<a class="code" href="structFatPtr.html#a31ba091180df5e031aa582cddbd09364">data</a>)-&gt;__VA_ARGS__) \</div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(((<a class="code" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>*)<a class="code" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a>-&gt;<a class="code" href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">ptr</a>.<a class="code" href="structFatPtr.html#a31ba091180df5e031aa582cddbd09364">data</a>)-&gt;__VA_ARGS__) \</div>
 <div class="line">    __VA_OPT__(<a class="code" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)                                                    \</div>
 <div class="line">    (<a class="code" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a>)</div>
-<div class="ttc" id="ahidden_8c_html_a750877e0398a37cb8f03443558fb7f6f"><div class="ttname"><a href="hidden_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a></div><div class="ttdeci">#define IMPL</div><div class="ttdef"><b>Definition:</b> hidden.c:6</div></div>
+<div class="ttc" id="acore_2test_8c_html_a750877e0398a37cb8f03443558fb7f6f"><div class="ttname"><a href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a></div><div class="ttdeci">#define IMPL</div><div class="ttdef"><b>Definition:</b> test.c:1413</div></div>
 <div class="ttc" id="atype_8h_html_aaf2cf0b8691ef9ea3833ec39bc0626f9"><div class="ttname"><a href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a></div><div class="ttdeci">_Thread_local Object * __thread_local_self_Var</div><div class="ttdef"><b>Definition:</b> type.c:21</div></div>
 </div><!-- fragment -->
 </div>
@@ -2834,6 +2879,34 @@ Variables</h2></td></tr>
           <td></td>
           <td class="paramtype">char *&#160;</td>
           <td class="paramname"><em>trait</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aeb0636afb88ebe75121824df05099b40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb0636afb88ebe75121824df05099b40">&#9670;&nbsp;</a></span>vtable_override()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vtable_override </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structVtable.html">Vtable</a> *&#160;</td>
+          <td class="paramname"><em>table</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structVtableEntry.html">VtableEntry</a>&#160;</td>
+          <td class="paramname"><em>entry</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
