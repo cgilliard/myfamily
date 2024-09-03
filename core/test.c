@@ -1357,3 +1357,41 @@ Test(core, test_sample)
 	}
 	cr_assert_eq(sc_drops, 1);
 }
+
+// Define a basic type
+TypeDef(TestOver, Config(u64, value));
+Type(TestOver, Field(u64, value));
+
+// define a trait with a single default implemented function
+#define OverrideTest DefineTrait(OverrideTest, RequiredWithDefault(override_test_default, Const, u64, get_overt))
+// call TraitImpl to declare and generate function calls
+TraitImpl(OverrideTest);
+
+// Require implementation of Build trait
+Impl(TestOver, Build);
+// Require implementation of OverrideTest trait for TestOver
+Impl(TestOver, OverrideTest);
+
+// define the default override test impl
+u64 override_test_default() { return 100; }
+
+// implement our override function
+#define IMPL TestOver
+u64 my_over_fn() { return $(value); }
+void TestOver_build(void* config_in)
+{
+	TestOverConfig* config = config_in;
+	$Var(value) = config->value;
+}
+#undef IMPL
+
+// call override macro to override with our own impl
+Override(TestOver, get_overt, my_over_fn);
+
+Test(core, test_override)
+{
+	// create a TestOver object
+	let to = new (TestOver, With(value, 300));
+	// assert that our override function is being used
+	cr_assert_eq(get_overt(&to), 300);
+}

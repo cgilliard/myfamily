@@ -79,6 +79,7 @@ void Object_build(Object* ptr, void* config);
 void Object_build_int(Object* ptr);
 void Object_check_param(const Object* obj);
 void sort_vtable(Vtable* table);
+void vtable_override(Vtable* table, VtableEntry entry);
 void vtable_add_entry(Vtable* table, VtableEntry entry);
 void vtable_add_trait(Vtable* table, char* trait);
 bool vtable_check_impl_trait(Vtable* table, char* trait);
@@ -358,6 +359,14 @@ FatPtr build_fat_ptr(u64 size);
 		vtable_add_trait(&name##_Vtable__, #trait_name);        \
 	}
 #define Impl(name, ...) PROC_IMPL_(name, __VA_ARGS__)
+
+#define Override(name, trait, implfn)                                    \
+	static void                                                      \
+	    __attribute__((constructor)) ov__##name##_##trait##_vtable() \
+	{                                                                \
+		VtableEntry next = {#trait, implfn};                     \
+		vtable_override(&name##_Vtable__, next);                 \
+	}
 
 #define IS_OBJECT_TYPE(type) __builtin_types_compatible_p(typeof(type), Object)
 

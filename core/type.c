@@ -79,6 +79,17 @@ void vtable_add_entry(Vtable* table, VtableEntry entry)
 	sort_vtable(table);
 }
 
+void vtable_override(Vtable* table, VtableEntry entry)
+{
+	for (int i = 0; i < table->len; i++)
+	{
+		if (!strcmp(entry.name, table->entries[i].name))
+		{
+			table->entries[i].fn_ptr = entry.fn_ptr;
+		}
+	}
+}
+
 bool vtable_check_impl_trait(Vtable* table, char* trait)
 {
 	bool ret = false;
