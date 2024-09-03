@@ -19,7 +19,7 @@ void drop(Object* self)
 	if (self->flags & OBJECT_FLAGS_CONSUMED)
 		panic("Runtime error: Object [%s@%" PRIu64
 		      "] has already been consumed!",
-		      self->vtable->name, self->id);
+		      self->vtable->name, self->ptr.id);
 	void (*impl)() = find_fn(self, "drop");
 	if (!impl)
 		panic("Runtime error: Trait bound violation! "

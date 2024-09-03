@@ -53,7 +53,6 @@ typedef struct
 typedef struct Object
 {
 	Vtable* vtable;
-	u64 id;
 	u8 flags;
 	FatPtr ptr;
 } Object;
@@ -168,15 +167,15 @@ FatPtr build_fat_ptr(u64 size);
 #define With(x, y) (x, y, ignore)
 #define WithObj(x, y) (x, y)
 
-#define OBJECT_INIT                                                           \
-	({                                                                    \
-		FatPtr _fptr__;                                               \
-		_fptr__.data = NULL;                                          \
-		_fptr__.len = 0;                                              \
-		Object _ret__ = {                                             \
-		    NULL, 0, OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED, \
-		    _fptr__};                                                 \
-		_ret__;                                                       \
+#define OBJECT_INIT                                                        \
+	({                                                                 \
+		FatPtr _fptr__;                                            \
+		_fptr__.data = NULL;                                       \
+		_fptr__.len = 0;                                           \
+		Object _ret__ = {                                          \
+		    NULL, OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED, \
+		    _fptr__};                                              \
+		_ret__;                                                    \
 	})
 
 #define Move(dst, src)                                                                                              \
@@ -296,7 +295,7 @@ FatPtr build_fat_ptr(u64 size);
 		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
 			panic("Runtime error: Object [%s@%" PRIu64             \
 			      "] has already been consumed!",                  \
-			      self->vtable->name, self->id);                   \
+			      self->vtable->name, self->ptr.id);               \
 		return_type (*impl)(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) = \
 		    find_fn(self, #fn_name);                                   \
 		if (!impl)                                                     \
@@ -402,7 +401,7 @@ FatPtr build_fat_ptr(u64 size);
 // clang-format off
 #define new(name, ...)({                                                         \
 		FatPtr _fptr__ = build_fat_ptr(name##_size());                   \
-		Object _ret__ = {&name##_Vtable__, unique_id(), 0, _fptr__};     \
+		Object _ret__ = {&name##_Vtable__, 0, _fptr__};     \
 		Object_build_int(&_ret__);                                       \
 		name##Config __config_;                                          \
 		memset(&__config_, 0, sizeof(name##Config));                     \
