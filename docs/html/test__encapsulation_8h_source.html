@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Family: core/hidden.h Source File</title>
+<title>My Family: core/test_encapsulation.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -67,25 +67,25 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">hidden.h</div>  </div>
+<div class="title">test_encapsulation.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="hidden_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="type_8h.html">core/type.h</a>&gt;</span></div>
+<a href="test__encapsulation_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="type_8h.html">core/type.h</a>&gt;</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160; </div>
-<div class="line"><a name="l00003"></a><span class="lineno"><a class="line" href="hidden_8h.html#a9350790bb34c38713a0a0ad62a870f23">    3</a></span>&#160;<span class="preprocessor">#define HiddenApi DefineTrait(HiddenApi, Required(Const, u64, get_value), Required(Var, void, set_value, Param(u64)), Required(Const, u64, get_capacity_impl))</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno"><a class="line" href="hidden_8h.html#a22cc05d270f9e3936fd724672c038bcc">    4</a></span>&#160;<a class="code" href="hidden_8h.html#a22cc05d270f9e3936fd724672c038bcc">TraitImpl</a>(<a class="code" href="hidden_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a>);</div>
+<div class="line"><a name="l00003"></a><span class="lineno"><a class="line" href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">    3</a></span>&#160;<span class="preprocessor">#define HiddenApi DefineTrait(HiddenApi, Required(Const, u64, get_value), Required(Var, void, set_value, Param(u64)), Required(Const, u64, get_capacity_impl))</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno"><a class="line" href="test__encapsulation_8h.html#a22cc05d270f9e3936fd724672c038bcc">    4</a></span>&#160;<a class="code" href="test__encapsulation_8h.html#a22cc05d270f9e3936fd724672c038bcc">TraitImpl</a>(<a class="code" href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a>);</div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160; </div>
-<div class="line"><a name="l00006"></a><span class="lineno"><a class="line" href="hidden_8h.html#a55719c1e83be46288f2594f9d04de478">    6</a></span>&#160;<a class="code" href="hidden_8h.html#a55719c1e83be46288f2594f9d04de478">TypeDef</a>(Hidden, <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, capacity));</div>
+<div class="line"><a name="l00006"></a><span class="lineno"><a class="line" href="test__encapsulation_8h.html#a55719c1e83be46288f2594f9d04de478">    6</a></span>&#160;<a class="code" href="test__encapsulation_8h.html#a55719c1e83be46288f2594f9d04de478">TypeDef</a>(Hidden, <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, capacity));</div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="hidden_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">    8</a></span>&#160;<a class="code" href="hidden_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">Impl</a>(Hidden, <a class="code" href="hidden_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a>);</div>
-<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="hidden_8h.html#a9deb1f17d0b1c7582af2052bc74283ac">    9</a></span>&#160;<a class="code" href="hidden_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">Impl</a>(Hidden, <a class="code" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>);</div>
-<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="hidden_8h.html#a477856f2ae5819524fc7e371d0b5c78f">   10</a></span>&#160;<a class="code" href="hidden_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">Impl</a>(Hidden, <a class="code" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>);</div>
-<div class="ttc" id="ahidden_8h_html_a22cc05d270f9e3936fd724672c038bcc"><div class="ttname"><a href="hidden_8h.html#a22cc05d270f9e3936fd724672c038bcc">TraitImpl</a></div><div class="ttdeci">TraitImpl(HiddenApi)</div></div>
-<div class="ttc" id="ahidden_8h_html_a55719c1e83be46288f2594f9d04de478"><div class="ttname"><a href="hidden_8h.html#a55719c1e83be46288f2594f9d04de478">TypeDef</a></div><div class="ttdeci">TypeDef(Hidden, Config(u64, capacity))</div></div>
-<div class="ttc" id="ahidden_8h_html_a79ff63999b6be45dc4b05bf76ebcee67"><div class="ttname"><a href="hidden_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">Impl</a></div><div class="ttdeci">Impl(Hidden, HiddenApi)</div></div>
-<div class="ttc" id="ahidden_8h_html_a9350790bb34c38713a0a0ad62a870f23"><div class="ttname"><a href="hidden_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a></div><div class="ttdeci">#define HiddenApi</div><div class="ttdef"><b>Definition:</b> hidden.h:3</div></div>
+<div class="line"><a name="l00008"></a><span class="lineno"><a class="line" href="test__encapsulation_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">    8</a></span>&#160;<a class="code" href="test__encapsulation_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">Impl</a>(Hidden, <a class="code" href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a>);</div>
+<div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="test__encapsulation_8h.html#a9deb1f17d0b1c7582af2052bc74283ac">    9</a></span>&#160;<a class="code" href="test__encapsulation_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">Impl</a>(Hidden, <a class="code" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>);</div>
+<div class="line"><a name="l00010"></a><span class="lineno"><a class="line" href="test__encapsulation_8h.html#a477856f2ae5819524fc7e371d0b5c78f">   10</a></span>&#160;<a class="code" href="test__encapsulation_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">Impl</a>(Hidden, <a class="code" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>);</div>
+<div class="ttc" id="atest__encapsulation_8h_html_a22cc05d270f9e3936fd724672c038bcc"><div class="ttname"><a href="test__encapsulation_8h.html#a22cc05d270f9e3936fd724672c038bcc">TraitImpl</a></div><div class="ttdeci">TraitImpl(HiddenApi)</div></div>
+<div class="ttc" id="atest__encapsulation_8h_html_a55719c1e83be46288f2594f9d04de478"><div class="ttname"><a href="test__encapsulation_8h.html#a55719c1e83be46288f2594f9d04de478">TypeDef</a></div><div class="ttdeci">TypeDef(Hidden, Config(u64, capacity))</div></div>
+<div class="ttc" id="atest__encapsulation_8h_html_a79ff63999b6be45dc4b05bf76ebcee67"><div class="ttname"><a href="test__encapsulation_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">Impl</a></div><div class="ttdeci">Impl(Hidden, HiddenApi)</div></div>
+<div class="ttc" id="atest__encapsulation_8h_html_a9350790bb34c38713a0a0ad62a870f23"><div class="ttname"><a href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a></div><div class="ttdeci">#define HiddenApi</div><div class="ttdef"><b>Definition:</b> test_encapsulation.h:3</div></div>
 <div class="ttc" id="atraits_8h_html_a4c1bc9dae458cb02cbad68812b20345e"><div class="ttname"><a href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a></div><div class="ttdeci">#define Drop</div><div class="ttdef"><b>Definition:</b> traits.h:20</div></div>
-<div class="ttc" id="atraits_8h_html_a86f96056a0c61a863297f2a8fa71ec10"><div class="ttname"><a href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a></div><div class="ttdeci">#define Build</div><div class="ttdef"><b>Definition:</b> traits.h:26</div></div>
+<div class="ttc" id="atraits_8h_html_a86f96056a0c61a863297f2a8fa71ec10"><div class="ttname"><a href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a></div><div class="ttdeci">#define Build</div><div class="ttdef"><b>Definition:</b> traits.h:27</div></div>
 <div class="ttc" id="atype_8h_html"><div class="ttname"><a href="type_8h.html">type.h</a></div></div>
 <div class="ttc" id="atype_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
 <div class="ttc" id="atypes_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
