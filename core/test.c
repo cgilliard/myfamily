@@ -1395,3 +1395,61 @@ Test(core, test_override)
 	// assert that our override function is being used
 	cr_assert_eq(get_overt(&to), 300);
 }
+
+TypeDef(TestFixedArr, Config(char*, buf), Config(u64, p1), Config(u32, p2), Config(u16, p3));
+Type(TestFixedArr, Field(u64, p1), Field(char, buf[100]), Field(u32, p2), Field(u16, p3));
+
+Impl(TestFixedArr, Build);
+
+#define TestFixedArrImpl DefineTrait(             \
+    TestFixedArrImpl,                             \
+    Required(Const, void, get_buf, Param(char*)), \
+    Required(Const, u64, get_p1),                 \
+    Required(Const, u32, get_p2),                 \
+    Required(Const, u16, get_p3))
+TraitImpl(TestFixedArrImpl);
+Impl(TestFixedArr, TestFixedArrImpl);
+
+#define IMPL TestFixedArr
+void TestFixedArr_build(void* config_in)
+{
+	TestFixedArrConfig* config = config_in;
+	u64 len = strlen(config->buf);
+	if (len >= 100)
+		len = 99;
+	memcpy($Var(buf), config->buf, len);
+	$Var(buf)[len] = 0;
+	$Var(p1) = config->p1;
+	$Var(p2) = config->p2;
+	$Var(p3) = config->p3;
+}
+void TestFixedArr_get_buf(char* buf_out)
+{
+	u64 len = strlen($(buf));
+	memcpy(buf_out, $(buf), len);
+	buf_out[len] = 0;
+}
+u64 TestFixedArr_get_p1()
+{
+	return $(p1);
+}
+u32 TestFixedArr_get_p2()
+{
+	return $(p2);
+}
+u16 TestFixedArr_get_p3()
+{
+	return $(p3);
+}
+#undef IMPL
+
+Test(core, test_fixed_array)
+{
+	let fa = new (TestFixedArr, With(buf, "testing123"), With(p1, 10), With(p2, 20), With(p3, 30));
+	char buf[100];
+	get_buf(&fa, buf);
+	cr_assert(!strcmp(buf, "testing123"));
+	cr_assert_eq(get_p1(&fa), 10);
+	cr_assert_eq(get_p2(&fa), 20);
+	cr_assert_eq(get_p3(&fa), 30);
+}
