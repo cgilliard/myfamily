@@ -242,7 +242,7 @@ FatPtr build_fat_ptr(u64 size);
 		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
 			panic("Runtime error: Object [%s@%" PRIu64             \
 			      "] has already been consumed!",                  \
-			      self->vtable->name, self->id);                   \
+			      self->vtable->name, self->ptr.id);               \
 		return_type (*impl)(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) = \
 		    find_fn(self, #fn_name);                                   \
 		if (!impl)                                                     \
@@ -400,14 +400,14 @@ FatPtr build_fat_ptr(u64 size);
 // 'validate' which is called here to validate the parameter
 // settings.
 // clang-format off
-#define new(name, ...)({ \
+#define new(name, ...)({                                                         \
 		FatPtr _fptr__ = build_fat_ptr(name##_size());                   \
 		Object _ret__ = {&name##_Vtable__, unique_id(), 0, _fptr__};     \
 		Object_build_int(&_ret__);                                       \
 		name##Config __config_;                                          \
-		 memset(&__config_, 0, sizeof(name##Config)); \
+		memset(&__config_, 0, sizeof(name##Config));                     \
 		FOR_EACH(SET_PARAM, (&__config_, name##Config), (), __VA_ARGS__) \
-		Object_build(&_ret__, &__config_);                                           \
+		Object_build(&_ret__, &__config_);                               \
 		_ret__;                                                          \
 	})
 // clang-format on

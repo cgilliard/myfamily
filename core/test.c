@@ -1453,3 +1453,51 @@ Test(core, test_fixed_array)
 	cr_assert_eq(get_p2(&fa), 20);
 	cr_assert_eq(get_p3(&fa), 30);
 }
+
+// Define a trait which has a single required function as well as a required super-trait (Drop in this case).
+#define SuperTest DefineTrait(SuperTest, Super(Drop), Required(Const, u64, get_super_value))
+TraitImpl(SuperTest);
+
+// Define another trait which has a single required function as well as a required super-trait (SuperTest in this case).
+#define SuperDuperTest DefineTrait(SuperDuperTest, Super(SuperTest), Required(Const, u64, get_super_duper_value))
+TraitImpl(SuperDuperTest);
+
+// Create a new type 'SuperImpl'.
+Type(SuperImpl, Field(u64, value));
+TypeDef(SuperImpl, Config(u64, value));
+
+// Implement SuperDuperTest trait (which in turn requires SuperTest, which in turn requires Drop). Additionally we'll implement 'Build'.
+Impl(SuperImpl, Drop);
+Impl(SuperImpl, SuperTest);
+Impl(SuperImpl, SuperDuperTest);
+Impl(SuperImpl, Build);
+
+// Do implementations which require 4 functions total.
+#define IMPL SuperImpl
+void SuperImpl_build(void* config_in)
+{
+	SuperImplConfig* config = config_in;
+	$Var(value) = config->value;
+}
+void SuperImpl_drop()
+{
+}
+u64 SuperImpl_get_super_value()
+{
+	return $(value);
+}
+u64 SuperImpl_get_super_duper_value()
+{
+	return $(value) + 1;
+}
+#undef IMPL
+
+Test(core, test_super)
+{
+	// instantiate an instance of SuperImpl with the specified initial value.
+	let super_test = new (SuperImpl, With(value, 10));
+
+	// do assertions based on expected values.
+	cr_assert_eq(get_super_value(&super_test), 10);
+	cr_assert_eq(get_super_duper_value(&super_test), 11);
+}
