@@ -116,7 +116,8 @@ FatPtr build_fat_ptr(u64 size);
 #define BUILD_OBJECTS__(name, struct_type, inner, ...)            \
 	__VA_OPT__(((name*)(ptr->ptr.data))->inner = OBJECT_INIT; \
 		   ((name*)(ptr->ptr.data))->inner.vtable =       \
-		       &__VA_ARGS__##_Vtable__;)
+		       &__VA_ARGS__##_Vtable__);
+
 #define BUILD_OBJECTS_(...) BUILD_OBJECTS__(__VA_ARGS__)
 #define BUILD_OBJECTS(name, inner) BUILD_OBJECTS_(name, EXPAND_ALL inner)
 
@@ -140,9 +141,9 @@ FatPtr build_fat_ptr(u64 size);
 	u64 name##_size() { return sizeof(name); }                      \
 	void name##_build_internal(Object* ptr)                         \
 	{                                                               \
-		FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__);        \
 		u64 size = name##_size();                               \
 		memset(ptr->ptr.data, 0, size);                         \
+		FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__);        \
 	}                                                               \
 	void name##_drop_internal(Object* ptr)                          \
 	{                                                               \
@@ -365,20 +366,19 @@ FatPtr build_fat_ptr(u64 size);
 	(*_ptr__) = OBJECT_INIT;                                \
 	Move(_ptr__, &value);
 
-#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                                          \
-	__VA_OPT__(do {                                                                               \
-		if (IS_OBJECT_TYPE(((structure*)0)->name))                                            \
-		{                                                                                     \
-			panic("Cannot use With to set an Object. Use "                                \
-			      "'WithObj' isntead.\n");                                                \
-		}                                                                                     \
-		else                                                                                  \
-		{                                                                                     \
-			*((typeof(((structure*)0)->name)*)(ptr + offsetof(structure, name))) = value; \
-		}                                                                                     \
-	} while (0);)                                                                                 \
-	EXPAND(EXPAND(EXPAND_ALL EXPAND(__VA_OPT__(NONE)(                                             \
-	    PROC_WITH_OBJ(ptr, structure, name, value)) __VA_OPT__(()))))
+#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                                                 \
+	__VA_OPT__(do {                                                                                      \
+		if (IS_OBJECT_TYPE(((structure*)0)->name))                                                   \
+		{                                                                                            \
+			panic("Cannot use With to set an Object. Use "                                       \
+			      "'WithObj' isntead.\n");                                                       \
+		}                                                                                            \
+		else                                                                                         \
+		{                                                                                            \
+			*((typeof(((structure*)0)->name)*)((char*)ptr + offsetof(structure, name))) = value; \
+		}                                                                                            \
+	} while (0);)                                                                                        \
+	EXPAND(EXPAND(EXPAND_ALL EXPAND(__VA_OPT__(NONE)(PROC_WITH_OBJ(ptr, structure, name, value)) __VA_OPT__(()))))
 
 #define SET_OFFSET_OF(...) SET_OFFSET_OF_IMPL(__VA_ARGS__)
 #define SET_PARAM(ptr, value) SET_OFFSET_OF(EXPAND_ALL ptr, EXPAND_ALL value)
@@ -396,6 +396,7 @@ FatPtr build_fat_ptr(u64 size);
 		Object _ret__ = {&name##_Vtable__, unique_id(), 0, _fptr__};     \
 		Object_build_int(&_ret__);                                       \
 		name##Config __config_;                                          \
+		 memset(&__config_, 0, sizeof(name##Config)); \
 		FOR_EACH(SET_PARAM, (&__config_, name##Config), (), __VA_ARGS__) \
 		Object_build(&_ret__, &__config_);                                           \
 		_ret__;                                                          \

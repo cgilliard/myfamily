@@ -23,7 +23,8 @@
 // TraitImpl(Drop);
 void drop(Object* self);
 
-#define Build DefineTrait(Build, Required(Var, void, build))
+// TODO: need generics here so we can pass the config in instead of a void pointer.
+#define Build DefineTrait(Build, Required(Var, void, build, Param(void*)))
 TraitImpl(Build);
 
 #endif // _CORE_TRAITS__

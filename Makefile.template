@@ -4,7 +4,7 @@ SOURCES := $(patsubst %.c,%.o,$(wildcard *.c))
 %.o : %.c $(HEADERS)
 	$(CC) $(FLAG_OPTIONS) $(CC_FLAGS) -I.. -c -o $@ $<
 all: $(OBJS)
-test: test.c
+test: test.c $(TEST_OBJS)
 	mkdir -p bin
 	rm -rf bin/test
 	rm -rf bin/nocapture

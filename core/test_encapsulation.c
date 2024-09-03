@@ -1,4 +1,4 @@
-#include <core/hidden.h>
+#include <core/test_encapsulation.h>
 #include <core/type.h>
 
 Type(Hidden, Field(u64, value), Field(HiddenConfig, config));

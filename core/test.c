@@ -13,14 +13,8 @@
 // limitations under the License.
 
 #include <core/std.h>
+#include <core/test_encapsulation.h>
 #include <criterion/criterion.h>
-#include <unistd.h>
-
-/*
-#define TEST1(arg1, x) [ arg1, x ]
-#define PROC_TEST(...) FOR_EACH(TEST1, myarg, (;), __VA_ARGS__)
-PROC_TEST(abc, def, ghi, aaa, zzz, mmm, xxx)
-*/
 
 Test(core, test_heap)
 {
@@ -854,37 +848,20 @@ Test(core, test_synchronized)
 	Lock_cleanup(&sync_lock);
 }
 
-/*
-// Define a Testtype with two fields x and y which are u64 and u32 respectively
+TypeDef(TestType, Config(u64, x_in), Config(u32, y_in));
 Type(TestType, Field(u64, x), Field(u32, y));
 
-// Define a trait with required functions which are fairly self explanitory.
-// The first parameter in the Required macro is the mutability. It must be
-// either Const or Var. The second parameter is the return type. The third
-// parameter is the function name. After that there may be a variable number of
-// Parameter arguments. The Param macro specifies these arguments with the type
-// of the parameter only.
 #define TestTrait                                                           \
 	DefineTrait(TestTrait, Required(Const, u64, get_x),                 \
 		    Required(Const, u32, get_y), Required(Var, void, incr), \
 		    Required(Var, void, add_x, Param(u64)),                 \
 		    Required(Var, void, sub_y, Param(u32)),                 \
 		    Required(Var, u64, sub_both, Param(u64), Param(u32)))
-
-// The call to TraitImpl is mandatory for all traits. It will generate the
-// function calls for the trait. In this case, it generates the following
-// functions: get_x, get_y, incr, add_x, sub_y, and sub_both.
 TraitImpl(TestTrait);
 
-// Specify that TestType implements the TestTrait trait. This will modify
-// TestType's vtable and create function prototypes with the correct signature
-// for each required function for the trait.
-Impl(TestType, TestTrait);
-// Specify that TestType implements the Drop trait. This trait is an internal
-// trait that is called by the system automatically when the variable goes out
-// of scope. Note that this function is a mutable function and may be called
-// even on an immutable variable.
+Impl(TestType, Build);
 Impl(TestType, Drop);
+Impl(TestType, TestTrait);
 
 // declare a drop count variable for testing
 int drop_count = 0;
@@ -925,10 +902,15 @@ u64 TestType_sub_both(u64 value1, u32 value2)
 	$Var(y) -= value2;
 	return $(x);
 }
+void TestType_build(void* config_void)
+{
+	TestTypeConfig* config = config_void;
+	$Var(x) = config->x_in;
+	$Var(y) = config->y_in;
+}
 #undef IMPL
 // This ends the implementation of TestType. The $ and $Var operators can no
 // longer be used outside this block.
-
 Test(core, test_type)
 {
 	{
@@ -936,7 +918,7 @@ Test(core, test_type)
 		// macro. This instance is delcared as 'var' so it may call
 		// mutable methods of TestType. It is decleared with x and y
 		// both set to the specified values.
-		var v1 = new (TestType, With(x, 4), With(y, 5));
+		var v1 = new (TestType, With(x_in, 4), With(y_in, 5));
 		// call the polymorphic version of get_x/get_y on the v1
 		// instance. Assert the expected values.
 		cr_assert_eq(get_x(&v1), 4);
@@ -960,7 +942,7 @@ Test(core, test_type)
 
 		// declare a second instance of TestType with the specified
 		// initial values and do the coresponding assertions.
-		let v2 = new (TestType, With(y, 50), With(x, 43));
+		let v2 = new (TestType, With(y_in, 50), With(x_in, 43));
 		cr_assert_eq(get_x(&v2), 43);
 		cr_assert_eq(get_y(&v2), 50);
 
@@ -984,6 +966,7 @@ Test(core, test_type)
 // panic, but once we have Result implemented, we will also provide a 'TryBuild'
 // trait which returns a result which will allow for additional capabilities.
 Type(TestServer, Field(u16, port), Field(char*, host), Field(u16, threads));
+TypeDef(TestServer, Config(u16, port), Config(char*, host), Config(u16, threads));
 
 // define implemented traits 'Build' and 'Drop'
 Impl(TestServer, Build);
@@ -993,25 +976,31 @@ Impl(TestServer, Drop);
 #define IMPL TestServer
 
 // do input validation and set defaults for our 'TestServer'
-void TestServer_build()
+void TestServer_build(void* config_in)
 {
+	TestServerConfig* config = config_in;
 	// Check if threads are equal to 0. This is a misconfiguration. Panic if
 	// that's the case.
-	if ($(threads) == 0)
+	if (config->threads == 0)
 		panic("Threads must be greater than 0!");
+	$Var(threads) = config->threads;
 
 	// If host is NULL (not configured) use the default setting of
 	// 127.0.0.1.
-	if ($(host) == NULL)
+	if (config->host == NULL)
 	{
 		$Var(host) = "127.0.0.1";
 	}
+	else
+		$Var(host) = config->host;
 
 	// If port is 0 (not configured) use the default setting of 80.
-	if ($(port) == 0)
+	if (config->port == 0)
 	{
 		$Var(port) = 80;
 	}
+	else
+		$Var(port) = config->port;
 
 	// print out the configuration and return.
 	printf("Calling build with host='%s',port=%u,threads=%u\n", $(host),
@@ -1048,6 +1037,7 @@ Test(core, test_build)
 }
 
 Type(TestMove, Field(char*, s), Field(u64, len));
+TypeDef(TestMove, Config(char*, s), Config(u64, len));
 
 #define AccessTestMove                                                \
 	DefineTrait(AccessTestMove, Required(Const, char*, get_tm_s), \
@@ -1062,13 +1052,15 @@ Impl(TestMove, AccessTestMove);
 int tm_drop_count = 0;
 
 #define IMPL TestMove
-void TestMove_build()
+void TestMove_build(void* config_in)
 {
-	if ($(s) == NULL)
+	TestMoveConfig* config = config_in;
+	if (config->s == NULL)
 		panic("TestMove: s must not be NULL");
-	char* s = malloc(sizeof(char) * (strlen($(s)) + 1));
-	strcpy(s, $(s));
+	char* s = malloc(sizeof(char) * (strlen(config->s) + 1));
+	strcpy(s, config->s);
 	$Var(s) = s;
+	$Var(len) = config->len;
 }
 void TestMove_drop()
 {
@@ -1162,13 +1154,16 @@ Test(core, test_defaults)
 }
 
 Type(InnerType, Field(u64, value));
+TypeDef(InnerType, Config(u64, value));
 Type(CompositeTest, Field(u64, x), Field(u32, y), Field(Object, z));
+TypeDef(CompositeTest, Config(u64, x), Config(u32, y));
 
 #define InnerValue DefineTrait(InnerValue, Required(Const, u64, inner_value))
 TraitImpl(InnerValue);
 
 Impl(InnerType, Drop);
 Impl(InnerType, InnerValue);
+Impl(InnerType, Build);
 Impl(CompositeTest, Drop);
 Impl(CompositeTest, Build);
 
@@ -1192,6 +1187,11 @@ void InnerType_drop()
 	printf("drop inner type value = %" PRIu64 "\n", $(value));
 	inner_drops += 1;
 }
+void InnerType_build(void* config_in)
+{
+	InnerTypeConfig* config = config_in;
+	$Var(value) = config->value;
+}
 #undef IMPL
 
 // TODO: create a macro 'Obj' which allows for conveinent initialization of
@@ -1212,7 +1212,7 @@ void CompositeTest_set_comp_value(const Object* value)
 {
 	Move(&$Var(z), value);
 }
-void CompositeTest_build() { $Var(z) = OBJECT_INIT; }
+void CompositeTest_build(void* config) { $Var(z) = OBJECT_INIT; }
 #undef IMPL
 
 Test(core, test_composites)
@@ -1239,15 +1239,26 @@ Test(core, test_composites)
 TraitImpl(AdvCompSetBoth);
 
 Type(AdvComp, Field(u64, x), Obj(InnerType, holder));
+TypeDef(AdvComp, Config(u64, x_in));
 Impl(AdvComp, SetCompTrait);
 Impl(AdvComp, AdvCompSetBoth);
+Impl(AdvComp, Build);
 
 #define IMPL AdvComp
 void AdvComp_set_comp_value(const Object* value)
 {
 	Move(&$Var(holder), value);
 }
-void AdvComp_set_both_adv(u64 v1, Object* ptr) {}
+void AdvComp_set_both_adv(u64 v1, Object* ptr)
+{
+	$Var(x) = v1;
+	Move(&$Var(holder), ptr);
+}
+void AdvComp_build(void* config_in)
+{
+	AdvCompConfig* config = config_in;
+	$Var(x) = config->x_in;
+}
 #undef IMPL
 
 Test(core, test_obj_macro)
@@ -1257,13 +1268,10 @@ Test(core, test_obj_macro)
 		var inner = new (InnerType, With(value, 123));
 		{
 			cr_assert_eq(inner_value(&inner), 123);
-			// var advcomp1 = new (AdvComp, With(x, 0), With(holder,
-			// inner));
-			var advcomp1 =
-			    new (AdvComp, With(x, 0), WithObj(holder, inner));
+			var advcomp1 = new (AdvComp, With(x_in, 0));
 			// set_comp_value(&advcomp1, &inner);
 			var inner2 = new (InnerType, With(value, 999));
-			set_both_adv(&advcomp1, 1, &inner2);
+			set_both_adv(&advcomp1, 1, &inner);
 
 			// would result in panic because inner has already been
 			// consumed cr_assert_eq(inner_value(&inner), 123);
@@ -1279,70 +1287,6 @@ Test(core, test_obj_macro)
 	cr_assert_eq(inner_drops, 2);
 }
 
-Type(ServerConfig, Field(u32, threads), Field(u16, port), Field(char*, host));
-Type(ServerTest2, Obj(ServerConfig, config), Field(u64, state), Field(i32, server_fd));
-
-#define ServerImpl DefineTrait(ServerImpl, Required(Const, char*, get_server_host))
-TraitImpl(ServerImpl);
-
-Impl(ServerConfig, Build);
-Impl(ServerConfig, Drop);
-
-Impl(ServerTest2, Build);
-Impl(ServerTest2, Drop);
-Impl(ServerTest2, ServerImpl);
-
-Getter(ServerConfig, threads);
-Setter(ServerConfig, threads);
-
-Getter(ServerConfig, host);
-Setter(ServerConfig, host);
-
-#define IMPL ServerConfig
-void ServerConfig_build()
-{
-	if ($(threads) == 0)
-		$Var(threads) = 10;
-	if ($(host) == NULL)
-		$Var(host) = "127.0.0.1";
-}
-void ServerConfig_drop()
-{
-	printf("sc drop\n");
-}
-#undef IMPL
-
-#define IMPL ServerTest2
-char* ServerTest2_get_server_host()
-{
-	return get(ServerConfig, $(config), host);
-}
-void ServerTest2_build()
-{
-}
-void ServerTest2_drop() { printf("drop servertest2\n"); }
-#undef IMPL
-
-Test(core, test_sample)
-{
-	var config1 = new (ServerConfig, With(threads, 1));
-	var config2 = new (ServerConfig, With(host, "localhost"));
-
-	cr_assert_eq(get(ServerConfig, config1, threads), 1);
-	cr_assert_eq(get(ServerConfig, config2, threads), 10);
-
-	set(ServerConfig, config1, threads, 3);
-	cr_assert_eq(get(ServerConfig, config1, threads), 3);
-	cr_assert(!strcmp(get(ServerConfig, config1, host), "127.0.0.1"));
-	cr_assert(!strcmp(get(ServerConfig, config2, host), "localhost"));
-
-	let server = new (ServerTest2, WithObj(config, config1));
-	cr_assert(!strcmp(get_server_host(&server), "127.0.0.1"));
-}
-
-*/
-
-#include <core/hidden.h>
 Test(core, test_hidden)
 {
 	var hidden = new (Hidden, With(capacity, 1234));
@@ -1351,42 +1295,65 @@ Test(core, test_hidden)
 	cr_assert_eq(get_capacity_impl(&hidden), 1234);
 }
 
-/*
- * // Goals: encapsulation and polymorphism in C.
- * // .h file
- * // First define a type using TypeDef. The TypeDef macro specifies the name of the type and any configuration parameters for this type.
- * // In this case, we specify the configuration parameters 'host', 'port', and 'threads'.
- * TypeDef(Server, Config(char *, host, "127.0.0.1"), Config(u16, port), Config(u32, threads));
- *
- * // define server api. Using the trait notation, we describe the required functions for this trait. Default implementations
- * // and super traits may also be specified in this notation.
- * #define ServerApi DefineTrait(ServerImpl, Required(Const, char*, get_server_host), Required(Var, void, start_server))
- * // Required for all traits. This macro implements the functions that call the implemented trait functions.
- * TraitImpl(ServerApi);
- *
- * // specify which traits are implemented for the Server Type.
- * Impl(Server, ServerApi); // our custom defined server api.
- * Impl(Server, build); // the build trait which is a built-in trait that is used to convert a 'Config' into an actual implementation.
- * Impl(Server, drop); // drop is called whenever an object goes out scope or the Object it is a member of goes out of scope.
- *
- * // .c file
- * // To encapsulte the data, the Type macro may be called in an independent C file to hide the access to its fields. In this case,
- * // A u64 state field, a server_fd and the ServerConfig are part of the Object. The ServerConfig struct is automatically generated by
- * // the TypeDef macro and may be used as it is in this case. It includes each configuration member. The build trait would merely set
- * // the 'config' field to the ServerConfig value passed into the build function by the code generated from the library's macros.
- * Type(Server, Field(u64, state), Field(i32, server_fd), Field(ServerConfig, config));
- *
- * // Within this 'IMPL' block the trait functions may be implemented with access to the $() and $Var() operators to immutably and mutably
- * // access the Type's data fields.
- * #define IMPL Server
- * // do impl...
- * #undef IMPL
- *
- * // usage in another .c file
- * // instantiate with defaults except 'host'.
- * var server = new(Server, With(host, "0.0.0.0"));
- * // call the polymorphic start_server function which maps to the server's implementation above.
- * start_server(&server);
- * // ...
- *
- */
+Type(ServerComponent, Field(u64, value), Field(void*, ptr));
+TypeDef(ServerComponent, Config(u64, value));
+
+Impl(ServerComponent, Build);
+Impl(ServerComponent, Drop);
+
+int sc_drops = 0;
+
+#define IMPL ServerComponent
+void ServerComponent_build(void* config_in)
+{
+	ServerComponentConfig* config = config_in;
+	$Var(value) = config->value;
+	$Var(ptr) = malloc(100);
+}
+void ServerComponent_drop()
+{
+	sc_drops++;
+	free($Var(ptr));
+}
+#undef IMPL
+
+TypeDef(Server, Config(u32, threads), Config(u16, port), Config(char*, host));
+Type(Server, Field(u64, state), Field(bool, is_started), Field(ServerConfig, config), Obj(ServerComponent, sc));
+
+#define ServerApi DefineTrait(ServerApi, Required(Var, bool, start_server), Required(Const, bool, is_started))
+TraitImpl(ServerApi);
+
+Impl(Server, Build);
+Impl(Server, Drop);
+Impl(Server, ServerApi);
+
+#define IMPL Server
+void Server_drop() {}
+void Server_build(void* config_in)
+{
+	ServerConfig* config = config_in;
+	$Var(config) = *config;
+	$Var(state) = 0;
+	$Var(sc) = new (ServerComponent, With(value, 10));
+}
+bool Server_start_server()
+{
+	if ($(is_started))
+		return false;
+	$Var(is_started) = true;
+	$Var(state) += 1;
+	return true;
+}
+bool Server_is_started() { return $(is_started); }
+#undef IMPL
+
+Test(core, test_sample)
+{
+	{
+		var server = new (Server, With(port, 8080));
+		cr_assert(!is_started(&server));
+		start_server(&server);
+		cr_assert(is_started(&server));
+	}
+	cr_assert_eq(sc_drops, 1);
+}
