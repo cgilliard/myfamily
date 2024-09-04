@@ -902,9 +902,9 @@ u64 TestType_sub_both(u64 value1, u32 value2)
 	$Var(y) -= value2;
 	return $(x);
 }
-void TestType_build(void* config_void)
+void TestType_build(const void* config_void)
 {
-	TestTypeConfig* config = config_void;
+	const TestTypeConfig* config = config_void;
 	$Var(x) = config->x_in;
 	$Var(y) = config->y_in;
 }
@@ -976,9 +976,9 @@ Impl(TestServer, Drop);
 #define IMPL TestServer
 
 // do input validation and set defaults for our 'TestServer'
-void TestServer_build(void* config_in)
+void TestServer_build(const void* config_in)
 {
-	TestServerConfig* config = config_in;
+	const TestServerConfig* config = config_in;
 	// Check if threads are equal to 0. This is a misconfiguration. Panic if
 	// that's the case.
 	if (config->threads == 0)
@@ -1052,9 +1052,9 @@ Impl(TestMove, AccessTestMove);
 int tm_drop_count = 0;
 
 #define IMPL TestMove
-void TestMove_build(void* config_in)
+void TestMove_build(const void* config_in)
 {
-	TestMoveConfig* config = config_in;
+	const TestMoveConfig* config = config_in;
 	if (config->s == NULL)
 		panic("TestMove: s must not be NULL");
 	char* s = malloc(sizeof(char) * (strlen(config->s) + 1));
@@ -1187,9 +1187,9 @@ void InnerType_drop()
 	printf("drop inner type value = %" PRIu64 "\n", $(value));
 	inner_drops += 1;
 }
-void InnerType_build(void* config_in)
+void InnerType_build(const void* config_in)
 {
-	InnerTypeConfig* config = config_in;
+	const InnerTypeConfig* config = config_in;
 	$Var(value) = config->value;
 }
 #undef IMPL
@@ -1212,7 +1212,7 @@ void CompositeTest_set_comp_value(const Object* value)
 {
 	Move(&$Var(z), value);
 }
-void CompositeTest_build(void* config) { $Var(z) = OBJECT_INIT; }
+void CompositeTest_build(const void* config) { $Var(z) = OBJECT_INIT; }
 #undef IMPL
 
 Test(core, test_composites)
@@ -1254,9 +1254,9 @@ void AdvComp_set_both_adv(u64 v1, Object* ptr)
 	$Var(x) = v1;
 	Move(&$Var(holder), ptr);
 }
-void AdvComp_build(void* config_in)
+void AdvComp_build(const void* config_in)
 {
-	AdvCompConfig* config = config_in;
+	const AdvCompConfig* config = config_in;
 	$Var(x) = config->x_in;
 }
 #undef IMPL
@@ -1305,9 +1305,9 @@ Impl(ServerComponent, Drop);
 int sc_drops = 0;
 
 #define IMPL ServerComponent
-void ServerComponent_build(void* config_in)
+void ServerComponent_build(const void* config_in)
 {
-	ServerComponentConfig* config = config_in;
+	const ServerComponentConfig* config = config_in;
 	$Var(value) = config->value;
 	$Var(ptr) = malloc(100);
 }
@@ -1330,9 +1330,9 @@ Impl(Server, ServerApi);
 
 #define IMPL Server
 void Server_drop() {}
-void Server_build(void* config_in)
+void Server_build(const void* config_in)
 {
-	ServerConfig* config = config_in;
+	const ServerConfig* config = config_in;
 	$Var(config) = *config;
 	$Var(state) = 0;
 	$Var(sc) = new (ServerComponent, With(value, 10));
@@ -1379,9 +1379,9 @@ u64 override_test_default() { return 100; }
 // implement our override function
 #define IMPL TestOver
 u64 my_over_fn() { return $(value); }
-void TestOver_build(void* config_in)
+void TestOver_build(const void* config_in)
 {
-	TestOverConfig* config = config_in;
+	const TestOverConfig* config = config_in;
 	$Var(value) = config->value;
 }
 #undef IMPL
@@ -1412,9 +1412,9 @@ TraitImpl(TestFixedArrImpl);
 Impl(TestFixedArr, TestFixedArrImpl);
 
 #define IMPL TestFixedArr
-void TestFixedArr_build(void* config_in)
+void TestFixedArr_build(const void* config_in)
 {
-	TestFixedArrConfig* config = config_in;
+	const TestFixedArrConfig* config = config_in;
 	u64 len = strlen(config->buf);
 	if (len >= 100)
 		len = 99;
@@ -1475,9 +1475,9 @@ Impl(SuperImpl, Build);
 
 // Do implementations which require 4 functions total.
 #define IMPL SuperImpl
-void SuperImpl_build(void* config_in)
+void SuperImpl_build(const void* config_in)
 {
-	SuperImplConfig* config = config_in;
+	const SuperImplConfig* config = config_in;
 	$Var(value) = config->value;
 }
 void SuperImpl_drop()
@@ -1513,7 +1513,7 @@ Impl(WithDrop, Build);
 
 #define IMPL WithDrop
 void WithDrop_drop() { printf("Droping withdrop %p\n", $()); }
-void WithDrop_build(void* ptr) {}
+void WithDrop_build(const void* ptr) {}
 #undef IMPL
 
 Type(MyObj);
@@ -1540,7 +1540,7 @@ Impl(MyObjBuildDrop, Drop);
 
 #define IMPL MyObjBuildDrop
 void MyObjBuildDrop_drop() {}
-void MyObjBuildDrop_build(void* config_in) {}
+void MyObjBuildDrop_build(const void* config_in) {}
 #undef IMPL
 
 Test(core, test_where)

@@ -90,7 +90,7 @@ void vtable_override(Vtable* table, VtableEntry entry)
 	}
 }
 
-bool vtable_check_impl_trait(Vtable* table, char* trait)
+bool vtable_check_impl_trait(const Vtable* table, const char* trait)
 {
 	bool ret = false;
 
@@ -183,9 +183,9 @@ void Object_build_int(Object* ptr)
 	build_int(ptr);
 }
 
-void Object_build(Object* ptr, void* config)
+void Object_build(Object* ptr, const void* config)
 {
-	void (*do_build)(void* config) = find_fn(ptr, "build");
+	void (*do_build)(const void* config) = find_fn(ptr, "build");
 	if (do_build)
 	{
 		// setup self references

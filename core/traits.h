@@ -24,7 +24,7 @@
 void drop(Object* self);
 
 // TODO: need generics here so we can pass the config in instead of a void pointer.
-#define Build DefineTrait(Build, Required(Var, void, build, Param(void*)))
+#define Build DefineTrait(Build, Required(Var, void, build, Param(const void*)))
 TraitImpl(Build);
 
 #endif // _CORE_TRAITS__
