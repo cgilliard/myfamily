@@ -1516,15 +1516,6 @@ void WithDrop_drop() { printf("Droping withdrop %p\n", $()); }
 void WithDrop_build(void* ptr) {}
 #undef IMPL
 
-Test(core, test_generic)
-{
-	var obj = new (WithDrop);
-	//   the following would fail due to trait bound violation:
-	// var obj = new (NoDrop);
-	var req_drop = OBJECT_TRAIT_BOUND(Drop);
-	Move(&req_drop, &obj);
-}
-
 Type(MyObj);
 Type(XType, Where(T, TraitBound(Drop), TraitBound(Build)), Field(u64, x), Obj(T, wd));
 TypeDef(XType);
@@ -1541,9 +1532,23 @@ void XType_set_wd_value(Object* ptr)
 }
 #undef IMPL
 
+Type(MyObjBuildDrop);
+TypeDef(MyObjBuildDrop);
+
+Impl(MyObjBuildDrop, Build);
+Impl(MyObjBuildDrop, Drop);
+
+#define IMPL MyObjBuildDrop
+void MyObjBuildDrop_drop() {}
+void MyObjBuildDrop_build(void* config_in) {}
+#undef IMPL
+
 Test(core, test_where)
 {
 	var y = new (WithDrop);
 	var x = new (XType);
 	set_wd_value(&x, &y);
+	var z = new (MyObjBuildDrop);
+	// this would panic because the binding to type 'WithDrop' has already occurred.
+	// set_wd_value(&x, &z);
 }

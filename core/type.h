@@ -51,18 +51,20 @@ typedef struct
 	bool is_trait_specifier;
 } Vtable;
 
+/*
 typedef struct GenericTable
 {
 	FatPtr ptr;
 	u64 generic_len;
 } GenericTable;
+*/
 
 typedef struct Object
 {
 	Vtable* vtable;
 	u8 flags;
 	FatPtr ptr;
-	FatPtr generic_table;
+	// FatPtr generic_table;
 } Object;
 
 typedef struct SelfCleanupImpl
@@ -222,32 +224,18 @@ FatPtr build_fat_ptr(u64 size);
 #define OBJECT_INIT                                                        \
 	({                                                                 \
 		FatPtr _fptr__ = FAT_PTR_INIT;                             \
-		FatPtr _gt_ptr__ = FAT_PTR_INIT;                           \
 		Object _ret__ = {                                          \
 		    NULL, OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED, \
-		    _fptr__, _gt_ptr__};                                   \
+		    _fptr__};                                              \
 		_ret__;                                                    \
 	})
-
-// TODO: handle chain_malloc errors (result or panic)
-#define OBJECT_TRAIT_BOUND(trait) ({                                 \
-	Object _ret__ = OBJECT_INIT;                                 \
-	chain_malloc(&_ret__.generic_table, sizeof(GenericTable));   \
-	if (_ret__.generic_table.data == NULL)                       \
-		panic("Could not allocate sufficient memory");       \
-	GenericTable* gt = (GenericTable*)_ret__.generic_table.data; \
-	chain_malloc(&gt->ptr, sizeof(VtableTraitEntry));            \
-	gt->generic_len = 1;                                         \
-	VtableTraitEntry* vte = gt->ptr.data;                        \
-	strcpy(vte->trait_name, #trait);                             \
-	_ret__;                                                      \
-})
 
 #define Move(dst, src)                                                                                                                          \
 	({                                                                                                                                      \
 		if (((*((Object*)src)).flags & OBJECT_FLAGS_CONSUMED) != 0)                                                                     \
 			panic("src object has already been consumed\n");                                                                        \
 		/* If there's a generic, check it */                                                                                            \
+		/*                                                                                                                              \
 		if ((*((Object*)dst)).generic_table.data != NULL)                                                                               \
 		{                                                                                                                               \
 			GenericTable* gt = (*((Object*)dst)).generic_table.data;                                                                \
@@ -260,6 +248,7 @@ FatPtr build_fat_ptr(u64 size);
 					panic("Required trait [%s] not implemented in type [%s].", reqd_trait, (*((Object*)src)).vtable->name); \
 			}                                                                                                                       \
 		}                                                                                                                               \
+		*/                                                                                                                              \
 		if (((*((Object*)dst)).vtable != NULL && ((*((Object*)dst)).vtable != ((*((Object*)src)).vtable))))                             \
 		{                                                                                                                               \
 			if ((*((Object*)dst)).vtable->is_trait_specifier)                                                                       \
@@ -489,8 +478,7 @@ FatPtr build_fat_ptr(u64 size);
 // clang-format off
 #define new(name, ...)({                                                         \
 		FatPtr _fptr__ = build_fat_ptr(name##_size());                   \
-		FatPtr _gt_ptr__ = FAT_PTR_INIT;                                 \
-		Object _ret__ = {&name##_Vtable__, 0, _fptr__, _gt_ptr__};       \
+		Object _ret__ = {&name##_Vtable__, 0, _fptr__ };       \
 		Object_build_int(&_ret__);                                       \
 		name##Config __config_;                                          \
 		memset(&__config_, 0, sizeof(name##Config));                     \
