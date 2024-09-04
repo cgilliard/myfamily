@@ -48,13 +48,21 @@ typedef struct
 	VtableEntry* entries;
 	u64 trait_len;
 	VtableTraitEntry* trait_entries;
+	bool is_trait_specifier;
 } Vtable;
+
+typedef struct GenericTable
+{
+	FatPtr ptr;
+	u64 generic_len;
+} GenericTable;
 
 typedef struct Object
 {
 	Vtable* vtable;
 	u8 flags;
 	FatPtr ptr;
+	FatPtr generic_table;
 } Object;
 
 typedef struct SelfCleanupImpl
@@ -90,6 +98,19 @@ FatPtr build_fat_ptr(u64 size);
 	Object __attribute__((warn_unused_result, cleanup(Object_cleanup)))
 
 #define TypeName(obj) obj.vtable->name
+#define Implements(obj, trait) ({                                              \
+	bool _ret__ = false;                                                   \
+	for (u64 _i__ = 0; _i__ < obj.vtable->trait_len; _i__++)               \
+	{                                                                      \
+		char* trait_name = obj.vtable->trait_entries[_i__].trait_name; \
+		if (!strcmp(trait, trait_name))                                \
+		{                                                              \
+			_ret__ = true;                                         \
+			break;                                                 \
+		}                                                              \
+	}                                                                      \
+	_ret__;                                                                \
+})
 
 #define var Cleanup
 #define let const Cleanup
@@ -105,21 +126,51 @@ FatPtr build_fat_ptr(u64 size);
 	__VA_OPT__(NONE)                                                     \
 	(__thread_local_self_Const)
 
-#define FIRST_TWO(x, y, ...) x y
+#define WHERE_IMPL(...)
+#define FIRST_TWO(x, ...) MULTI_SWITCH(WHERE_IMPL, FIRST_TWO_, x, __VA_ARGS__)
+#define FIRST_TWO_(x, y, ...) x y
 #define CALL_FIRST_TWO(x, y) FIRST_TWO y
 
 #define DROP_OBJECTS__(name, struct_type, inner, ...) \
 	__VA_OPT__(Object_cleanup(&((name*)(ptr->ptr.data))->inner);)
-#define DROP_OBJECTS_(...) DROP_OBJECTS__(__VA_ARGS__)
-#define DROP_OBJECTS(name, inner) DROP_OBJECTS_(name, EXPAND_ALL inner)
+#define DROP_OBJECTS_(x, y, ...) /*[ drop objects xval = x, yval = y, vargs = __VA_ARGS__ ]*/ __VA_OPT__(DROP_OBJECTS__(x, y, __VA_ARGS__))
+#define DROP_OBJECTS_EXPAND(...) DROP_OBJECTS_(__VA_ARGS__)
+#define DROP_OBJECTS(name, inner) DROP_OBJECTS_EXPAND(name, EXPAND_ALL inner)
 
-#define BUILD_OBJECTS__(name, struct_type, inner, ...)            \
+#define PROCESS_WHERE_INNER__(...) \
+	FIRST_STRINGIFY __VA_ARGS__
+#define PROCESS_WHERE_INNER_(...) PROCESS_WHERE_INNER__(__VA_ARGS__)
+#define PROCESS_WHERE_INNER(ignore, value) PROCESS_WHERE_INNER_(value)
+#define PROCESS_WHERE_________(name, value, ...)                                          \
+	Vtable value##_Vtable__ = {#value, 0, NULL, 0, NULL, true};                       \
+	void __attribute__((constructor)) __add_where_##name##_##value##_vtable()         \
+	{                                                                                 \
+		char* arr[] = {FOR_EACH_INNER(PROCESS_WHERE_INNER, , (, ), __VA_ARGS__)}; \
+		for (u64 i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)                    \
+		{                                                                         \
+			vtable_add_trait(&value##_Vtable__, arr[i]);                      \
+		}                                                                         \
+	}
+#define PROCESS_WHERE________(name, value, ...) PROCESS_WHERE_________(name, value, __VA_ARGS__)
+#define PROCESS_WHERE_______(name, value, ...) PROCESS_WHERE________(name, EXPAND_ALL value)
+#define PROCESS_WHERE______(name, ...) PROCESS_WHERE_______(name, __VA_ARGS__)
+#define PROCESS_WHERE_____(value) PROCESS_WHERE______(EXPAND_ALL value)
+#define PROCESS_WHERE____(...) __VA_OPT__(PROCESS_WHERE_____(__VA_ARGS__))
+#define PROCESS_WHERE___(name, value, ...) PROCESS_WHERE____(__VA_OPT__(NONE)(name, value))
+#define PROCESS_WHERE__(...) PROCESS_WHERE___(__VA_ARGS__)
+#define PROCESS_WHERE_(name, value, ...) PROCESS_WHERE__(name, value)
+#define PROCESS_WHERE(name, where) PROCESS_WHERE_(name, EXPAND_ALL where)
+
+#define BUILD_OBJECTS____(name, struct_type, inner, ...)          \
 	__VA_OPT__(((name*)(ptr->ptr.data))->inner = OBJECT_INIT; \
 		   ((name*)(ptr->ptr.data))->inner.vtable =       \
-		       &__VA_ARGS__##_Vtable__);
-
-#define BUILD_OBJECTS_(...) BUILD_OBJECTS__(__VA_ARGS__)
+		       &__VA_ARGS__##_Vtable__;)
+#define BUILD_OBJECTS__(name, v1, ...) __VA_OPT__(BUILD_OBJECTS____(name, v1, __VA_ARGS__))
+#define BUILD_OBJECTS_(name, v1, ...) BUILD_OBJECTS__(name, v1 __VA_OPT__(, ) __VA_ARGS__)
 #define BUILD_OBJECTS(name, inner) BUILD_OBJECTS_(name, EXPAND_ALL inner)
+
+#define Where(generic, ...) ((generic, __VA_ARGS__))
+#define TraitBound(t) (t)
 
 #define TypeDef(name, ...)                                    \
 	typedef struct name name;                             \
@@ -132,13 +183,14 @@ FatPtr build_fat_ptr(u64 size);
 
 #define Type(name, ...)                                                 \
 	typedef struct name name;                                       \
-	Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL};             \
+	Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL, false};      \
 	u64 name##_size();                                              \
 	typedef struct name                                             \
 	{                                                               \
 		FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);           \
 	} name;                                                         \
 	u64 name##_size() { return sizeof(name); }                      \
+	FOR_EACH(PROCESS_WHERE, name, (;), __VA_ARGS__);                \
 	void name##_build_internal(Object* ptr)                         \
 	{                                                               \
 		u64 size = name##_size();                               \
@@ -169,34 +221,70 @@ FatPtr build_fat_ptr(u64 size);
 
 #define OBJECT_INIT                                                        \
 	({                                                                 \
-		FatPtr _fptr__;                                            \
-		_fptr__.data = NULL;                                       \
-		_fptr__.len = 0;                                           \
+		FatPtr _fptr__ = FAT_PTR_INIT;                             \
+		FatPtr _gt_ptr__ = FAT_PTR_INIT;                           \
 		Object _ret__ = {                                          \
 		    NULL, OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED, \
-		    _fptr__};                                              \
+		    _fptr__, _gt_ptr__};                                   \
 		_ret__;                                                    \
 	})
 
-#define Move(dst, src)                                                                                              \
-	({                                                                                                          \
-		if (((*((Object*)src)).flags & OBJECT_FLAGS_CONSUMED) != 0)                                         \
-			panic("src object has already been consumed\n");                                            \
-		/* Check for vtable mismatch */                                                                     \
-		if (((*((Object*)dst)).vtable != NULL && ((*((Object*)dst)).vtable != ((*((Object*)src)).vtable)))) \
-		{                                                                                                   \
-			panic("Vtable mismatch! Trying to set type %s to "                                          \
-			      "type %s!",                                                                           \
-			      ((*((Object*)dst)).vtable)->name,                                                     \
-			      ((*((Object*)src)).vtable)->name);                                                    \
-		}                                                                                                   \
-		/* If the object is not consumed we call cleanup as we are                                          \
-		 * overwriting it.*/                                                                                \
-		if (((*((Object*)dst)).flags & OBJECT_FLAGS_CONSUMED) == 0)                                         \
-			Object_cleanup(dst);                                                                        \
-		*((Object*)dst) = *((Object*)src);                                                                  \
-		(*((Object*)src)).flags |=                                                                          \
-		    OBJECT_FLAGS_CONSUMED | OBJECT_FLAGS_NO_CLEANUP;                                                \
+// TODO: handle chain_malloc errors (result or panic)
+#define OBJECT_TRAIT_BOUND(trait) ({                                 \
+	Object _ret__ = OBJECT_INIT;                                 \
+	chain_malloc(&_ret__.generic_table, sizeof(GenericTable));   \
+	if (_ret__.generic_table.data == NULL)                       \
+		panic("Could not allocate sufficient memory");       \
+	GenericTable* gt = (GenericTable*)_ret__.generic_table.data; \
+	chain_malloc(&gt->ptr, sizeof(VtableTraitEntry));            \
+	gt->generic_len = 1;                                         \
+	VtableTraitEntry* vte = gt->ptr.data;                        \
+	strcpy(vte->trait_name, #trait);                             \
+	_ret__;                                                      \
+})
+
+#define Move(dst, src)                                                                                                                          \
+	({                                                                                                                                      \
+		if (((*((Object*)src)).flags & OBJECT_FLAGS_CONSUMED) != 0)                                                                     \
+			panic("src object has already been consumed\n");                                                                        \
+		/* If there's a generic, check it */                                                                                            \
+		if ((*((Object*)dst)).generic_table.data != NULL)                                                                               \
+		{                                                                                                                               \
+			GenericTable* gt = (*((Object*)dst)).generic_table.data;                                                                \
+			u64 _len__ = gt->generic_len;                                                                                           \
+			for (u64 _i__ = 0; _i__ < _len__; _i__++)                                                                               \
+			{                                                                                                                       \
+				VtableTraitEntry* trait_bound = gt->ptr.data;                                                                   \
+				char* reqd_trait = trait_bound[_i__].trait_name;                                                                \
+				if (!Implements((*((Object*)src)), reqd_trait))                                                                 \
+					panic("Required trait [%s] not implemented in type [%s].", reqd_trait, (*((Object*)src)).vtable->name); \
+			}                                                                                                                       \
+		}                                                                                                                               \
+		if (((*((Object*)dst)).vtable != NULL && ((*((Object*)dst)).vtable != ((*((Object*)src)).vtable))))                             \
+		{                                                                                                                               \
+			if ((*((Object*)dst)).vtable->is_trait_specifier)                                                                       \
+			{                                                                                                                       \
+				for (u64 i = 0; i < (*((Object*)dst)).vtable->trait_len; i++)                                                   \
+				{                                                                                                               \
+					if (!Implements((*((Object*)src)), (*((Object*)dst)).vtable->trait_entries[i].trait_name))              \
+						panic("required trait [%s] not implemented in type [%s].",                                      \
+						      (*((Object*)dst)).vtable->trait_entries[i],                                               \
+						      (*((Object*)src)).vtable->name);                                                          \
+				}                                                                                                               \
+			}                                                                                                                       \
+			else                                                                                                                    \
+				panic("Vtable mismatch! Trying to set type %s to "                                                              \
+				      "type %s!",                                                                                               \
+				      ((*((Object*)dst)).vtable)->name, ((*((Object*)src)).vtable)->name);                                      \
+		}                                                                                                                               \
+		if (((*((Object*)dst)).flags & OBJECT_FLAGS_CONSUMED) == 0)                                                                     \
+			Object_cleanup(dst);                                                                                                    \
+		/* We copy the flags and vtable from src and the Object data (ptr). The generic_table remains the same. */                      \
+		(*((Object*)dst)).vtable = (*((Object*)src)).vtable;                                                                            \
+		(*((Object*)dst)).flags = (*((Object*)src)).flags;                                                                              \
+		(*((Object*)dst)).ptr = (*((Object*)src)).ptr;                                                                                  \
+		/* Set src's flags to consumed and no_cleanup as the ownership is moved. */                                                     \
+		(*((Object*)src)).flags |= OBJECT_FLAGS_CONSUMED | OBJECT_FLAGS_NO_CLEANUP;                                                     \
 	})
 
 // Define macros to extract the type and name from a tuple
@@ -401,7 +489,8 @@ FatPtr build_fat_ptr(u64 size);
 // clang-format off
 #define new(name, ...)({                                                         \
 		FatPtr _fptr__ = build_fat_ptr(name##_size());                   \
-		Object _ret__ = {&name##_Vtable__, 0, _fptr__};     \
+		FatPtr _gt_ptr__ = FAT_PTR_INIT;                                 \
+		Object _ret__ = {&name##_Vtable__, 0, _fptr__, _gt_ptr__};       \
 		Object_build_int(&_ret__);                                       \
 		name##Config __config_;                                          \
 		memset(&__config_, 0, sizeof(name##Config));                     \

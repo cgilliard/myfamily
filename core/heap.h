@@ -228,6 +228,8 @@ void* fat_ptr_data(const FatPtr* ptr);
  */
 u64 fat_ptr_len(const FatPtr* ptr);
 
+#define FAT_PTR_INIT {0, NULL, 0};
+
 #define HA_CONFIG_DEFAULT \
 	{                 \
 	    false, false}

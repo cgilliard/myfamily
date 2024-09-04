@@ -1278,6 +1278,7 @@ Test(core, test_obj_macro)
 			cr_assert_eq(inner_drops, 0);
 		}
 		// assert that both of the inner type was dropped
+		printf("inner drops = %i\n", inner_drops);
 		cr_assert_eq(inner_drops, 2);
 
 		// would result in panic because inner has already been consumed
@@ -1500,4 +1501,49 @@ Test(core, test_super)
 	// do assertions based on expected values.
 	cr_assert_eq(get_super_value(&super_test), 10);
 	cr_assert_eq(get_super_duper_value(&super_test), 11);
+}
+
+Type(NoDrop);
+TypeDef(NoDrop);
+Type(WithDrop);
+TypeDef(WithDrop);
+
+Impl(WithDrop, Drop);
+Impl(WithDrop, Build);
+
+#define IMPL WithDrop
+void WithDrop_drop() { printf("Droping withdrop %p\n", $()); }
+void WithDrop_build(void* ptr) {}
+#undef IMPL
+
+Test(core, test_generic)
+{
+	var obj = new (WithDrop);
+	//   the following would fail due to trait bound violation:
+	// var obj = new (NoDrop);
+	var req_drop = OBJECT_TRAIT_BOUND(Drop);
+	Move(&req_drop, &obj);
+}
+
+Type(MyObj);
+Type(XType, Where(T, TraitBound(Drop), TraitBound(Build)), Field(u64, x), Obj(T, wd));
+TypeDef(XType);
+
+#define XTypeApi DefineTrait(XTypeApi, Required(Var, void, set_wd_value, Param(Object*)))
+TraitImpl(XTypeApi);
+
+Impl(XType, XTypeApi);
+
+#define IMPL XType
+void XType_set_wd_value(Object* ptr)
+{
+	Move(&$Var(wd), ptr);
+}
+#undef IMPL
+
+Test(core, test_where)
+{
+	var y = new (WithDrop);
+	var x = new (XType);
+	set_wd_value(&x, &y);
 }

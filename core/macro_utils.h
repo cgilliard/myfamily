@@ -16,11 +16,13 @@
 #define STRINGIFY(x) #x
 #define EXPAND(x) x
 #define EXPAND_ALL(...) __VA_ARGS__
+#define EXPAND_ALL_INNER(...) __VA_ARGS__
 #define CATI(x, y) x##y
 #define CAT(x, y) CATI(x, y)
 
 #define NONE(...)
 #define FIRST(x, y) x
+#define FIRST_STRINGIFY(x, y) #x
 #define SECOND(x, y) y
 #define BOTH(x, y) x y
 

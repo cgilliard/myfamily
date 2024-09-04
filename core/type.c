@@ -240,6 +240,15 @@ void Object_cleanup(const Object* ptr)
 		{
 			chain_free(&unconst->ptr);
 		}
+		if (fat_ptr_data(&unconst->generic_table))
+		{
+			GenericTable* gt = unconst->generic_table.data;
+			if (fat_ptr_data(&gt->ptr))
+			{
+				chain_free(&gt->ptr);
+			}
+			chain_free(&unconst->generic_table);
+		}
 	}
 }
 
