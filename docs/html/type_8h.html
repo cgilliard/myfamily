@@ -328,7 +328,7 @@ Variables</h2></td></tr>
 <div class="line">    (<a class="code" href="type_8h.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a>)</div>
 <div class="ttc" id="amacro__utils_8h_html_ae2a0fdb2b3c3ae31c3fef23f8286af29"><div class="ttname"><a href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a></div><div class="ttdeci">#define NONE(...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:22</div></div>
 <div class="ttc" id="astructFatPtr_html_a31ba091180df5e031aa582cddbd09364"><div class="ttname"><a href="structFatPtr.html#a31ba091180df5e031aa582cddbd09364">FatPtr::data</a></div><div class="ttdeci">void * data</div><div class="ttdef"><b>Definition:</b> heap.h:107</div></div>
-<div class="ttc" id="astructObject_html_ab5fe3ea3742b5c62e699e90968db8325"><div class="ttname"><a href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">Object::ptr</a></div><div class="ttdeci">FatPtr ptr</div><div class="ttdef"><b>Definition:</b> type.h:58</div></div>
+<div class="ttc" id="astructObject_html_ab5fe3ea3742b5c62e699e90968db8325"><div class="ttname"><a href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">Object::ptr</a></div><div class="ttdeci">FatPtr ptr</div><div class="ttdef"><b>Definition:</b> type.h:57</div></div>
 <div class="ttc" id="atype_8h_html_a7584392485c1057e73a56ba7c43e4bee"><div class="ttname"><a href="type_8h.html#a7584392485c1057e73a56ba7c43e4bee">__thread_local_self_Const</a></div><div class="ttdeci">_Thread_local const Object * __thread_local_self_Const</div><div class="ttdef"><b>Definition:</b> type.c:20</div></div>
 </div><!-- fragment -->
 </div>
@@ -1226,17 +1226,16 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">        ({ \</div>
+<b>Value:</b><div class="fragment"><div class="line">        ({                                                         \</div>
 <div class="line">        FatPtr _fptr__ = <a class="code" href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a>(name##_size());                   \</div>
-<div class="line">        Object _ret__ = {&amp;name##_Vtable__, <a class="code" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a>(), 0, _fptr__};     \</div>
+<div class="line">        Object _ret__ = {&amp;name##_Vtable__, 0, _fptr__};     \</div>
 <div class="line">        Object_build_int(&amp;_ret__);                                       \</div>
 <div class="line">        name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a> __config_;                                          \</div>
-<div class="line">         memset(&amp;__config_, 0, <span class="keyword">sizeof</span>(name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>)); \</div>
+<div class="line">        memset(&amp;__config_, 0, <span class="keyword">sizeof</span>(name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>));                     \</div>
 <div class="line">        FOR_EACH(<a class="code" href="type_8h.html#a59184228fa29efbc3df1901ae6da28a2">SET_PARAM</a>, (&amp;__config_, name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>), (), __VA_ARGS__) \</div>
-<div class="line">        Object_build(&amp;_ret__, &amp;__config_);                                           \</div>
+<div class="line">        Object_build(&amp;_ret__, &amp;__config_);                               \</div>
 <div class="line">        _ret__;                                                          \</div>
 <div class="line">    })</div>
-<div class="ttc" id="atype_8h_html_a2106e13dbac6575e8d701b9f1f4aa79d"><div class="ttname"><a href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a></div><div class="ttdeci">u64 unique_id()</div><div class="ttdef"><b>Definition:</b> type.c:29</div></div>
 <div class="ttc" id="atype_8h_html_a59184228fa29efbc3df1901ae6da28a2"><div class="ttname"><a href="type_8h.html#a59184228fa29efbc3df1901ae6da28a2">SET_PARAM</a></div><div class="ttdeci">#define SET_PARAM(ptr, value)</div></div>
 <div class="ttc" id="atype_8h_html_a909192bbfb2649a87561595bca24acaa"><div class="ttname"><a href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a></div><div class="ttdeci">FatPtr build_fat_ptr(u64 size)</div><div class="ttdef"><b>Definition:</b> type.c:35</div></div>
 <div class="ttc" id="atype_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
@@ -1310,14 +1309,14 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ({                                                                    \</div>
-<div class="line">        FatPtr _fptr__;                                               \</div>
-<div class="line">        _fptr__.data = NULL;                                          \</div>
-<div class="line">        _fptr__.len = 0;                                              \</div>
-<div class="line">        Object _ret__ = {                                             \</div>
-<div class="line">            NULL, 0, <a class="code" href="type_8h.html#a290aa2e7fa12d86c057232b0c798fc98">OBJECT_FLAGS_NO_CLEANUP</a> | <a class="code" href="type_8h.html#abce3941cffbfc1da12a115314260d72d">OBJECT_FLAGS_CONSUMED</a>, \</div>
-<div class="line">            _fptr__};                                                 \</div>
-<div class="line">        _ret__;                                                       \</div>
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                 \</div>
+<div class="line">        FatPtr _fptr__;                                            \</div>
+<div class="line">        _fptr__.data = NULL;                                       \</div>
+<div class="line">        _fptr__.len = 0;                                           \</div>
+<div class="line">        Object _ret__ = {                                          \</div>
+<div class="line">            NULL, <a class="code" href="type_8h.html#a290aa2e7fa12d86c057232b0c798fc98">OBJECT_FLAGS_NO_CLEANUP</a> | <a class="code" href="type_8h.html#abce3941cffbfc1da12a115314260d72d">OBJECT_FLAGS_CONSUMED</a>, \</div>
+<div class="line">            _fptr__};                                              \</div>
+<div class="line">        _ret__;                                                    \</div>
 <div class="line">    })</div>
 </div><!-- fragment -->
 </div>
@@ -1621,7 +1620,7 @@ Variables</h2></td></tr>
 <div class="line">        if (self-&gt;flags &amp; <a class="code" href="type_8h.html#abce3941cffbfc1da12a115314260d72d">OBJECT_FLAGS_CONSUMED</a>)                       \</div>
 <div class="line">            panic(<span class="stringliteral">&quot;Runtime error: Object [%s@%&quot;</span> PRIu64             \</div>
 <div class="line">                  <span class="stringliteral">&quot;] has already been consumed!&quot;</span>,                  \</div>
-<div class="line">                  self-&gt;vtable-&gt;name, self-&gt;id);                   \</div>
+<div class="line">                  self-&gt;vtable-&gt;name, self-&gt;ptr.id);               \</div>
 <div class="line">        return_type (*impl)(<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a>(__VA_ARGS__))) = \</div>
 <div class="line">            <a class="code" href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a>(<span class="keyword">self</span>, #fn_name);                                   \</div>
 <div class="line">        if (!impl)                                                     \</div>
@@ -1640,7 +1639,7 @@ Variables</h2></td></tr>
 <div class="line">        return impl(<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="type_8h.html#ae7033995114ec95e0e30960025176d46">PROCESS_FN_CALL</a>(__VA_ARGS__)));         \</div>
 <div class="line">    }</div>
 <div class="ttc" id="atype_8h_html_a2b4d2a863926a7886419d0e53aa465a0"><div class="ttname"><a href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a></div><div class="ttdeci">void * find_fn(const Object *obj, const char *name)</div><div class="ttdef"><b>Definition:</b> type.c:139</div></div>
-<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:93</div></div>
+<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:92</div></div>
 <div class="ttc" id="atype_8h_html_ae7033995114ec95e0e30960025176d46"><div class="ttname"><a href="type_8h.html#ae7033995114ec95e0e30960025176d46">PROCESS_FN_CALL</a></div><div class="ttdeci">#define PROCESS_FN_CALL(...)</div></div>
 </div><!-- fragment -->
 </div>
@@ -1745,7 +1744,7 @@ Variables</h2></td></tr>
 <div class="line">        if (self-&gt;flags &amp; <a class="code" href="type_8h.html#abce3941cffbfc1da12a115314260d72d">OBJECT_FLAGS_CONSUMED</a>)                       \</div>
 <div class="line">            panic(<span class="stringliteral">&quot;Runtime error: Object [%s@%&quot;</span> PRIu64             \</div>
 <div class="line">                  <span class="stringliteral">&quot;] has already been consumed!&quot;</span>,                  \</div>
-<div class="line">                  self-&gt;vtable-&gt;name, self-&gt;id);                   \</div>
+<div class="line">                  self-&gt;vtable-&gt;name, self-&gt;ptr.id);               \</div>
 <div class="line">        return_type (*impl)(<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a>(__VA_ARGS__))) = \</div>
 <div class="line">            <a class="code" href="type_8h.html#a2b4d2a863926a7886419d0e53aa465a0">find_fn</a>(<span class="keyword">self</span>, #fn_name);                                   \</div>
 <div class="line">        if (!impl)                                                     \</div>
@@ -2050,7 +2049,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="structSelfCleanupImpl.html">SelfCleanupImpl</a> <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, \</div>
 <div class="line">                       cleanup(<a class="code" href="type_8h.html#a54b12fa3f9a7f03b6fd6898eba6d6382">SelfCleanupImpl_update</a>)))</div>
-<div class="ttc" id="astructSelfCleanupImpl_html"><div class="ttname"><a href="structSelfCleanupImpl.html">SelfCleanupImpl</a></div><div class="ttdef"><b>Definition:</b> type.h:62</div></div>
+<div class="ttc" id="astructSelfCleanupImpl_html"><div class="ttname"><a href="structSelfCleanupImpl.html">SelfCleanupImpl</a></div><div class="ttdef"><b>Definition:</b> type.h:61</div></div>
 <div class="ttc" id="atype_8h_html_a54b12fa3f9a7f03b6fd6898eba6d6382"><div class="ttname"><a href="type_8h.html#a54b12fa3f9a7f03b6fd6898eba6d6382">SelfCleanupImpl_update</a></div><div class="ttdeci">void SelfCleanupImpl_update(SelfCleanupImpl *sc)</div><div class="ttdef"><b>Definition:</b> type.c:164</div></div>
 </div><!-- fragment -->
 </div>
@@ -2502,7 +2501,7 @@ Variables</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(((<a class="code" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>*)<a class="code" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a>-&gt;<a class="code" href="structObject.html#ab5fe3ea3742b5c62e699e90968db8325">ptr</a>.<a class="code" href="structFatPtr.html#a31ba091180df5e031aa582cddbd09364">data</a>)-&gt;__VA_ARGS__) \</div>
 <div class="line">    __VA_OPT__(<a class="code" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)                                                    \</div>
 <div class="line">    (<a class="code" href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a>)</div>
-<div class="ttc" id="acore_2test_8c_html_a750877e0398a37cb8f03443558fb7f6f"><div class="ttname"><a href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a></div><div class="ttdeci">#define IMPL</div><div class="ttdef"><b>Definition:</b> test.c:1413</div></div>
+<div class="ttc" id="acore_2test_8c_html_a750877e0398a37cb8f03443558fb7f6f"><div class="ttname"><a href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a></div><div class="ttdeci">#define IMPL</div><div class="ttdef"><b>Definition:</b> test.c:1476</div></div>
 <div class="ttc" id="atype_8h_html_aaf2cf0b8691ef9ea3833ec39bc0626f9"><div class="ttname"><a href="type_8h.html#aaf2cf0b8691ef9ea3833ec39bc0626f9">__thread_local_self_Var</a></div><div class="ttdeci">_Thread_local Object * __thread_local_self_Var</div><div class="ttdef"><b>Definition:</b> type.c:21</div></div>
 </div><!-- fragment -->
 </div>
