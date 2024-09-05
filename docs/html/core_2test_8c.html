@@ -76,6 +76,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="std_8h_source.html">core/std.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="test__encapsulation_8h_source.html">core/test_encapsulation.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="test__server_8h_source.html">core/test_server.h</a>&gt;</code><br />
 <code>#include &lt;criterion/criterion.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -108,7 +109,7 @@ Macros</h2></td></tr>
 <tr class="separator:a750877e0398a37cb8f03443558fb7f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a750877e0398a37cb8f03443558fb7f6f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>&#160;&#160;&#160;ServerComponent</td></tr>
 <tr class="separator:a750877e0398a37cb8f03443558fb7f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadd5f518ef7d243f2bc2b9b97ddad0e9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aadd5f518ef7d243f2bc2b9b97ddad0e9">ServerApi</a>&#160;&#160;&#160;<a class="el" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(ServerApi, <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#a3521b7722e358f98597043439741612c">Var</a>, bool, start_server), <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, bool, is_started))</td></tr>
+<tr class="memitem:aadd5f518ef7d243f2bc2b9b97ddad0e9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aadd5f518ef7d243f2bc2b9b97ddad0e9">ServerApi</a>&#160;&#160;&#160;<a class="el" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(ServerApi, <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#a3521b7722e358f98597043439741612c">Var</a>, bool, start_test_server), <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, bool, is_test_started))</td></tr>
 <tr class="separator:aadd5f518ef7d243f2bc2b9b97ddad0e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a750877e0398a37cb8f03443558fb7f6f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>&#160;&#160;&#160;Server</td></tr>
 <tr class="separator:a750877e0398a37cb8f03443558fb7f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -125,6 +126,14 @@ Macros</h2></td></tr>
 <tr class="memitem:a3929e1f44fd545056a7fd9069f113c2f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a3929e1f44fd545056a7fd9069f113c2f">SuperDuperTest</a>&#160;&#160;&#160;<a class="el" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(SuperDuperTest, <a class="el" href="type_8h.html#a8300c58c407762ef5e63f1fc9cbaefd2">Super</a>(<a class="el" href="core_2test_8c.html#af96d530aa4d1a1a9ef8c924c426dca61">SuperTest</a>), <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_super_duper_value))</td></tr>
 <tr class="separator:a3929e1f44fd545056a7fd9069f113c2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a750877e0398a37cb8f03443558fb7f6f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>&#160;&#160;&#160;SuperImpl</td></tr>
+<tr class="separator:a750877e0398a37cb8f03443558fb7f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a750877e0398a37cb8f03443558fb7f6f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>&#160;&#160;&#160;WithDrop</td></tr>
+<tr class="separator:a750877e0398a37cb8f03443558fb7f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0be43bfd829e4cf8d111b0b3894e870a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a0be43bfd829e4cf8d111b0b3894e870a">XTypeApi</a>&#160;&#160;&#160;<a class="el" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(XTypeApi, <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#a3521b7722e358f98597043439741612c">Var</a>, void, set_wd_value, <a class="el" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="el" href="structObj.html">Obj</a>*)))</td></tr>
+<tr class="separator:a0be43bfd829e4cf8d111b0b3894e870a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a750877e0398a37cb8f03443558fb7f6f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>&#160;&#160;&#160;XType</td></tr>
+<tr class="separator:a750877e0398a37cb8f03443558fb7f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a750877e0398a37cb8f03443558fb7f6f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>&#160;&#160;&#160;MyObjectBuildDrop</td></tr>
 <tr class="separator:a750877e0398a37cb8f03443558fb7f6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -171,8 +180,8 @@ Functions</h2></td></tr>
 <tr class="separator:aac37101a949d88e2d803ef3f8a572d34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab488f465c7acbd73c065a2fad9f4ac75"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ab488f465c7acbd73c065a2fad9f4ac75">Test</a> (core, test_synchronized)</td></tr>
 <tr class="separator:ab488f465c7acbd73c065a2fad9f4ac75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2cdf659e9a1396f4991b7319f39002d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#af2cdf659e9a1396f4991b7319f39002d">TypeDef</a> (TestType, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x_in), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y_in))</td></tr>
-<tr class="separator:af2cdf659e9a1396f4991b7319f39002d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cf074a1cd6a65134c64947c7700875e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a1cf074a1cd6a65134c64947c7700875e">Builder</a> (TestType, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x_in), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y_in))</td></tr>
+<tr class="separator:a1cf074a1cd6a65134c64947c7700875e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31ef9319b90a086d2c71f769ce88d6af"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a31ef9319b90a086d2c71f769ce88d6af">Type</a> (TestType, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y))</td></tr>
 <tr class="separator:a31ef9319b90a086d2c71f769ce88d6af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8abd47cdff4a3a21acc689618467cdf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ad8abd47cdff4a3a21acc689618467cdf">TraitImpl</a> (<a class="el" href="core_2test_8c.html#a5bc3b46d384f6e6dddd5d97143649744">TestTrait</a>)</td></tr>
@@ -197,28 +206,28 @@ Functions</h2></td></tr>
 <tr class="separator:ade8597a1e35288e29d669cf32943bbff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4706e18df764695712bb5c801c7ec646"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a4706e18df764695712bb5c801c7ec646">TestType_sub_both</a> (<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> value1, <a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a> value2)</td></tr>
 <tr class="separator:a4706e18df764695712bb5c801c7ec646"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fe8cd6ae37a042a2d9c2f351489b8d4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a1fe8cd6ae37a042a2d9c2f351489b8d4">TestType_build</a> (void *config_void)</td></tr>
-<tr class="separator:a1fe8cd6ae37a042a2d9c2f351489b8d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cb1853a382d81b96b0af839e158e831"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a1cb1853a382d81b96b0af839e158e831">TestType_build</a> (const void *config_void)</td></tr>
+<tr class="separator:a1cb1853a382d81b96b0af839e158e831"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46b8bb045de5485c8335dcf1d01d7cdc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a46b8bb045de5485c8335dcf1d01d7cdc">Test</a> (core, test_type)</td></tr>
 <tr class="separator:a46b8bb045de5485c8335dcf1d01d7cdc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24ce9fe62275d4d5d093fe9ff491024e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a24ce9fe62275d4d5d093fe9ff491024e">Type</a> (TestServer, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(char *, host), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, threads))</td></tr>
 <tr class="separator:a24ce9fe62275d4d5d093fe9ff491024e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ea25f4b25f4164eb0a1d76a15becac3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a0ea25f4b25f4164eb0a1d76a15becac3">TypeDef</a> (TestServer, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, host), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, threads))</td></tr>
-<tr class="separator:a0ea25f4b25f4164eb0a1d76a15becac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9241cf52217da146438a1ac49573dd53"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a9241cf52217da146438a1ac49573dd53">Builder</a> (TestServer, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, host), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, threads))</td></tr>
+<tr class="separator:a9241cf52217da146438a1ac49573dd53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10c3c8893fd21738c09fed361caf2cc0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a10c3c8893fd21738c09fed361caf2cc0">Impl</a> (TestServer, <a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>)</td></tr>
 <tr class="separator:a10c3c8893fd21738c09fed361caf2cc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a812e72fda790a5154458f0a6096ac262"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a812e72fda790a5154458f0a6096ac262">Impl</a> (TestServer, <a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>)</td></tr>
 <tr class="separator:a812e72fda790a5154458f0a6096ac262"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbff3318d3bb3fdac13c4c970df37e99"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#abbff3318d3bb3fdac13c4c970df37e99">TestServer_build</a> (void *config_in)</td></tr>
-<tr class="separator:abbff3318d3bb3fdac13c4c970df37e99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48a0c009e1449cac5a3668c6cbf94ae0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a48a0c009e1449cac5a3668c6cbf94ae0">TestServer_build</a> (const void *config_in)</td></tr>
+<tr class="separator:a48a0c009e1449cac5a3668c6cbf94ae0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3aa69b46926ed8d0a5d44d858fefb319"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a3aa69b46926ed8d0a5d44d858fefb319">TestServer_drop</a> ()</td></tr>
 <tr class="separator:a3aa69b46926ed8d0a5d44d858fefb319"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb755450bb6af5ca80537e9b5b15e66b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#adb755450bb6af5ca80537e9b5b15e66b">Test</a> (core, test_build)</td></tr>
 <tr class="separator:adb755450bb6af5ca80537e9b5b15e66b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3dc51b342cebd1f580fb7d1b99934715"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a3dc51b342cebd1f580fb7d1b99934715">Type</a> (TestMove, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(char *, s), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, len))</td></tr>
 <tr class="separator:a3dc51b342cebd1f580fb7d1b99934715"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05d6485423a78811b9ec15b450d7e056"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a05d6485423a78811b9ec15b450d7e056">TypeDef</a> (TestMove, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, s), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, len))</td></tr>
-<tr class="separator:a05d6485423a78811b9ec15b450d7e056"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67e539755e61c08cf142df81cdbd7d1c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a67e539755e61c08cf142df81cdbd7d1c">Builder</a> (TestMove, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, s), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, len))</td></tr>
+<tr class="separator:a67e539755e61c08cf142df81cdbd7d1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9bbc86dfd1c12129fb5984a3549b41a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ae9bbc86dfd1c12129fb5984a3549b41a">TraitImpl</a> (<a class="el" href="core_2test_8c.html#a03a137945731f32a9d6649d553d3fc46">AccessTestMove</a>)</td></tr>
 <tr class="separator:ae9bbc86dfd1c12129fb5984a3549b41a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7c2987d67d257577708e733404e7b6c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ab7c2987d67d257577708e733404e7b6c">Impl</a> (TestMove, <a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>)</td></tr>
@@ -227,8 +236,8 @@ Functions</h2></td></tr>
 <tr class="separator:a4ede64af237afcd8ba00912a32c91917"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a594a328e440618acd495ef97dac768d8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a594a328e440618acd495ef97dac768d8">Impl</a> (TestMove, <a class="el" href="core_2test_8c.html#a03a137945731f32a9d6649d553d3fc46">AccessTestMove</a>)</td></tr>
 <tr class="separator:a594a328e440618acd495ef97dac768d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8292bcf18924f7963e4aecf28882c3e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ad8292bcf18924f7963e4aecf28882c3e">TestMove_build</a> (void *config_in)</td></tr>
-<tr class="separator:ad8292bcf18924f7963e4aecf28882c3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdbc64e48ce284c8f2f2abb36a7d4336"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#abdbc64e48ce284c8f2f2abb36a7d4336">TestMove_build</a> (const void *config_in)</td></tr>
+<tr class="separator:abdbc64e48ce284c8f2f2abb36a7d4336"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7a191ea5894e7ad7dab7d954642a312"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ad7a191ea5894e7ad7dab7d954642a312">TestMove_drop</a> ()</td></tr>
 <tr class="separator:ad7a191ea5894e7ad7dab7d954642a312"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0635ff44e56d298bffa6243577f87b3e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a0635ff44e56d298bffa6243577f87b3e">TestMove_get_tm_len</a> ()</td></tr>
@@ -251,12 +260,12 @@ Functions</h2></td></tr>
 <tr class="separator:a53534c786f8edda9b54def2485d92a92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7054592dfc8df3608914d000349b1ace"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a7054592dfc8df3608914d000349b1ace">Type</a> (InnerType, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
 <tr class="separator:a7054592dfc8df3608914d000349b1ace"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a398885754203353abc629c7d1368d2f7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a398885754203353abc629c7d1368d2f7">TypeDef</a> (InnerType, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
-<tr class="separator:a398885754203353abc629c7d1368d2f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a476143355edef025aed5148d4edecc9b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a476143355edef025aed5148d4edecc9b">Type</a> (CompositeTest, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="structObject.html">Object</a>, z))</td></tr>
-<tr class="separator:a476143355edef025aed5148d4edecc9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e01250c7c84d1ed0689f10ec6d2e233"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a9e01250c7c84d1ed0689f10ec6d2e233">TypeDef</a> (CompositeTest, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y))</td></tr>
-<tr class="separator:a9e01250c7c84d1ed0689f10ec6d2e233"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6933addab1549bed56fb9d25cf2c03bf"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a6933addab1549bed56fb9d25cf2c03bf">Builder</a> (InnerType, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
+<tr class="separator:a6933addab1549bed56fb9d25cf2c03bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88fa26f1bdff55bd8dd927377d6cbd1b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a88fa26f1bdff55bd8dd927377d6cbd1b">Type</a> (CompositeTest, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="structObj.html">Obj</a>, z))</td></tr>
+<tr class="separator:a88fa26f1bdff55bd8dd927377d6cbd1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41a583bb0b66da3a538691cdaefd632a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a41a583bb0b66da3a538691cdaefd632a">Builder</a> (CompositeTest, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y))</td></tr>
+<tr class="separator:a41a583bb0b66da3a538691cdaefd632a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab08506d1b2e92bbd6aec53f348193842"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ab08506d1b2e92bbd6aec53f348193842">TraitImpl</a> (<a class="el" href="core_2test_8c.html#a5eb6d759a6e4830199c78b7243440218">InnerValue</a>)</td></tr>
 <tr class="separator:ab08506d1b2e92bbd6aec53f348193842"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a016b648044dc6a5a3c541993ec9dabd5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a016b648044dc6a5a3c541993ec9dabd5">Impl</a> (InnerType, <a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>)</td></tr>
@@ -277,54 +286,54 @@ Functions</h2></td></tr>
 <tr class="separator:a4f9b421f684d7587bc8ebcbecfcca8ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac80851b61547181fd2d30b9ddc873f71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ac80851b61547181fd2d30b9ddc873f71">InnerType_drop</a> ()</td></tr>
 <tr class="separator:ac80851b61547181fd2d30b9ddc873f71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46437f70d4ba34f357ed3b711fedcf3a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a46437f70d4ba34f357ed3b711fedcf3a">InnerType_build</a> (void *config_in)</td></tr>
-<tr class="separator:a46437f70d4ba34f357ed3b711fedcf3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acec7690a72d2f09587ef355049f3b23f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#acec7690a72d2f09587ef355049f3b23f">InnerType_build</a> (const void *config_in)</td></tr>
+<tr class="separator:acec7690a72d2f09587ef355049f3b23f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87d72d4ff7e71688dc5bb8ba1f1e1478"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a87d72d4ff7e71688dc5bb8ba1f1e1478">CompositeTest_drop</a> ()</td></tr>
 <tr class="separator:a87d72d4ff7e71688dc5bb8ba1f1e1478"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a932878ad1599f7de29fa0a915e9f1222"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a932878ad1599f7de29fa0a915e9f1222">CompositeTest_set_comp_value</a> (const <a class="el" href="structObject.html">Object</a> *value)</td></tr>
-<tr class="separator:a932878ad1599f7de29fa0a915e9f1222"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62ab3e08e78f0b16b19df1dbe25576f1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a62ab3e08e78f0b16b19df1dbe25576f1">CompositeTest_build</a> (void *config)</td></tr>
-<tr class="separator:a62ab3e08e78f0b16b19df1dbe25576f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace69d6155ca662440457b14de7516e47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ace69d6155ca662440457b14de7516e47">CompositeTest_set_comp_value</a> (const <a class="el" href="structObj.html">Obj</a> *value)</td></tr>
+<tr class="separator:ace69d6155ca662440457b14de7516e47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbfb3eb42152028ccf76fdd60bf17966"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#acbfb3eb42152028ccf76fdd60bf17966">CompositeTest_build</a> (const void *config)</td></tr>
+<tr class="separator:acbfb3eb42152028ccf76fdd60bf17966"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abcc0fd0f8b0142a1a02c2db2d33d2046"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#abcc0fd0f8b0142a1a02c2db2d33d2046">Test</a> (core, test_composites)</td></tr>
 <tr class="separator:abcc0fd0f8b0142a1a02c2db2d33d2046"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affc05f54ef7ab380eeb6218e9b1f4c81"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#affc05f54ef7ab380eeb6218e9b1f4c81">TraitImpl</a> (<a class="el" href="core_2test_8c.html#a41a32ef95e5109af68e49e5ad6a5bb66">AdvCompSetBoth</a>)</td></tr>
 <tr class="separator:affc05f54ef7ab380eeb6218e9b1f4c81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad44ee62305d9e820e77032e63b13de06"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ad44ee62305d9e820e77032e63b13de06">Type</a> (AdvComp, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x), <a class="el" href="type_8h.html#aeab4ea1b1f9303b6be47b4bc0bfbc66c">Obj</a>(InnerType, holder))</td></tr>
-<tr class="separator:ad44ee62305d9e820e77032e63b13de06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c8160c6b0f998199aba0520f70efcc9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a6c8160c6b0f998199aba0520f70efcc9">TypeDef</a> (AdvComp, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x_in))</td></tr>
-<tr class="separator:a6c8160c6b0f998199aba0520f70efcc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac57456b07667a0ea3101936a971fc902"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ac57456b07667a0ea3101936a971fc902">Type</a> (AdvComp, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x), <a class="el" href="type_8h.html#a51c74b980e29efc9363ed186928ec7f9">Object</a>(InnerType, holder))</td></tr>
+<tr class="separator:ac57456b07667a0ea3101936a971fc902"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afccaa48c3384a64773a7517d6d388551"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#afccaa48c3384a64773a7517d6d388551">Builder</a> (AdvComp, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x_in))</td></tr>
+<tr class="separator:afccaa48c3384a64773a7517d6d388551"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a340ddcff4c19affbfd4e41183654d9eb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a340ddcff4c19affbfd4e41183654d9eb">Impl</a> (AdvComp, <a class="el" href="core_2test_8c.html#a141a85243ffd654ce0a1aeadc6b08796">SetCompTrait</a>)</td></tr>
 <tr class="separator:a340ddcff4c19affbfd4e41183654d9eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d941f85de608f6a0a1c6bce2d3f9fdd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a4d941f85de608f6a0a1c6bce2d3f9fdd">Impl</a> (AdvComp, <a class="el" href="core_2test_8c.html#a41a32ef95e5109af68e49e5ad6a5bb66">AdvCompSetBoth</a>)</td></tr>
 <tr class="separator:a4d941f85de608f6a0a1c6bce2d3f9fdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a98e403842f3d469dba61ebd28b8f4b19"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a98e403842f3d469dba61ebd28b8f4b19">Impl</a> (AdvComp, <a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>)</td></tr>
 <tr class="separator:a98e403842f3d469dba61ebd28b8f4b19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43b6aea2874b97d765dca02e9db39f4e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a43b6aea2874b97d765dca02e9db39f4e">AdvComp_set_comp_value</a> (const <a class="el" href="structObject.html">Object</a> *value)</td></tr>
-<tr class="separator:a43b6aea2874b97d765dca02e9db39f4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7a0bc2b402a91308dd094fca7767916"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aa7a0bc2b402a91308dd094fca7767916">AdvComp_set_both_adv</a> (<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> v1, <a class="el" href="structObject.html">Object</a> *ptr)</td></tr>
-<tr class="separator:aa7a0bc2b402a91308dd094fca7767916"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa782f593a569284e7812ed2b462032f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#afa782f593a569284e7812ed2b462032f">AdvComp_build</a> (void *config_in)</td></tr>
-<tr class="separator:afa782f593a569284e7812ed2b462032f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94bf1eb6e098319f30ffb87fe298d296"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a94bf1eb6e098319f30ffb87fe298d296">AdvComp_set_comp_value</a> (const <a class="el" href="structObj.html">Obj</a> *value)</td></tr>
+<tr class="separator:a94bf1eb6e098319f30ffb87fe298d296"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21ffbff9611cc3cc40f91ddcadd25090"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a21ffbff9611cc3cc40f91ddcadd25090">AdvComp_set_both_adv</a> (<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> v1, <a class="el" href="structObj.html">Obj</a> *ptr)</td></tr>
+<tr class="separator:a21ffbff9611cc3cc40f91ddcadd25090"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2de78aa737e46bcc150198dd89e7076e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a2de78aa737e46bcc150198dd89e7076e">AdvComp_build</a> (const void *config_in)</td></tr>
+<tr class="separator:a2de78aa737e46bcc150198dd89e7076e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22f132b90a1317ff6ee9fd50bb01ac60"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a22f132b90a1317ff6ee9fd50bb01ac60">Test</a> (core, test_obj_macro)</td></tr>
 <tr class="separator:a22f132b90a1317ff6ee9fd50bb01ac60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14a11c4e8851c9328c89712df8807d7f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a14a11c4e8851c9328c89712df8807d7f">Test</a> (core, test_hidden)</td></tr>
 <tr class="separator:a14a11c4e8851c9328c89712df8807d7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a338fb8217648b87a7aba6c09243b0df7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a338fb8217648b87a7aba6c09243b0df7">Type</a> (ServerComponent, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(void *, ptr))</td></tr>
 <tr class="separator:a338fb8217648b87a7aba6c09243b0df7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab899f831444bdf437646089f4e689277"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ab899f831444bdf437646089f4e689277">TypeDef</a> (ServerComponent, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
-<tr class="separator:ab899f831444bdf437646089f4e689277"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f5069f26ef829b1c1e7d38a212fb4f2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a2f5069f26ef829b1c1e7d38a212fb4f2">Builder</a> (ServerComponent, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
+<tr class="separator:a2f5069f26ef829b1c1e7d38a212fb4f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bbab57f18349783c80d007c7d2abe28"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a8bbab57f18349783c80d007c7d2abe28">Impl</a> (ServerComponent, <a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>)</td></tr>
 <tr class="separator:a8bbab57f18349783c80d007c7d2abe28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a191de4be0c3afb3065b508e330d03b64"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a191de4be0c3afb3065b508e330d03b64">Impl</a> (ServerComponent, <a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>)</td></tr>
 <tr class="separator:a191de4be0c3afb3065b508e330d03b64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa70a136a6276529dcd725ca0e5b1369d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aa70a136a6276529dcd725ca0e5b1369d">ServerComponent_build</a> (void *config_in)</td></tr>
-<tr class="separator:aa70a136a6276529dcd725ca0e5b1369d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bb55872beea38086ae1cd921b1cc734"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a6bb55872beea38086ae1cd921b1cc734">ServerComponent_build</a> (const void *config_in)</td></tr>
+<tr class="separator:a6bb55872beea38086ae1cd921b1cc734"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ca93aa8d038e154f54ed6d686b59641"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a7ca93aa8d038e154f54ed6d686b59641">ServerComponent_drop</a> ()</td></tr>
 <tr class="separator:a7ca93aa8d038e154f54ed6d686b59641"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94e8a7436f95f1f7f5dc2ee64fc8e7f4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a94e8a7436f95f1f7f5dc2ee64fc8e7f4">TypeDef</a> (Server, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, threads), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, host))</td></tr>
-<tr class="separator:a94e8a7436f95f1f7f5dc2ee64fc8e7f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e4168d3581471992451059f23d32b23"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a4e4168d3581471992451059f23d32b23">Type</a> (Server, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, state), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(bool, is_started), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(ServerConfig, config), <a class="el" href="type_8h.html#aeab4ea1b1f9303b6be47b4bc0bfbc66c">Obj</a>(ServerComponent, sc))</td></tr>
-<tr class="separator:a4e4168d3581471992451059f23d32b23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1280efe611935b8754e01cae0c1a2e36"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a1280efe611935b8754e01cae0c1a2e36">Builder</a> (Server, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, threads), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, host))</td></tr>
+<tr class="separator:a1280efe611935b8754e01cae0c1a2e36"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05c53f1d2eda66d0a48e8111f92dc7bc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a05c53f1d2eda66d0a48e8111f92dc7bc">Type</a> (Server, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, state), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(bool, is_started), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(ServerConfig, config), <a class="el" href="type_8h.html#a51c74b980e29efc9363ed186928ec7f9">Object</a>(ServerComponent, sc))</td></tr>
+<tr class="separator:a05c53f1d2eda66d0a48e8111f92dc7bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a754ee318c6fcd6d1fb0c7428732868e0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a754ee318c6fcd6d1fb0c7428732868e0">TraitImpl</a> (<a class="el" href="core_2test_8c.html#aadd5f518ef7d243f2bc2b9b97ddad0e9">ServerApi</a>)</td></tr>
 <tr class="separator:a754ee318c6fcd6d1fb0c7428732868e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4fb5efa2550ee2b96918b5f2f11bf371"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a4fb5efa2550ee2b96918b5f2f11bf371">Impl</a> (Server, <a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>)</td></tr>
@@ -335,16 +344,16 @@ Functions</h2></td></tr>
 <tr class="separator:a4403075384d3776f9fc2722bf49fedf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a789766489f9fd98430d78c7e658452d3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a789766489f9fd98430d78c7e658452d3">Server_drop</a> ()</td></tr>
 <tr class="separator:a789766489f9fd98430d78c7e658452d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a191721f87a56e2cd67a3afef532185f9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a191721f87a56e2cd67a3afef532185f9">Server_build</a> (void *config_in)</td></tr>
-<tr class="separator:a191721f87a56e2cd67a3afef532185f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae203bb84c918de8d71c6c7ed7f90c46d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ae203bb84c918de8d71c6c7ed7f90c46d">Server_start_server</a> ()</td></tr>
-<tr class="separator:ae203bb84c918de8d71c6c7ed7f90c46d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3da6c0b3ea4d355efaecbfe6832e25c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aa3da6c0b3ea4d355efaecbfe6832e25c">Server_is_started</a> ()</td></tr>
-<tr class="separator:aa3da6c0b3ea4d355efaecbfe6832e25c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9cf03c89c53b47adb33c7ba913462b8a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a9cf03c89c53b47adb33c7ba913462b8a">Server_build</a> (const void *config_in)</td></tr>
+<tr class="separator:a9cf03c89c53b47adb33c7ba913462b8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51faa5c9738f8066ca903a773503ee68"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a51faa5c9738f8066ca903a773503ee68">Server_start_test_server</a> ()</td></tr>
+<tr class="separator:a51faa5c9738f8066ca903a773503ee68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cb3caf6ac85b63ede72c0a71fe0f3b0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a0cb3caf6ac85b63ede72c0a71fe0f3b0">Server_is_test_started</a> ()</td></tr>
+<tr class="separator:a0cb3caf6ac85b63ede72c0a71fe0f3b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac835af85fa84c53e85ea297ec35b24b7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ac835af85fa84c53e85ea297ec35b24b7">Test</a> (core, test_sample)</td></tr>
 <tr class="separator:ac835af85fa84c53e85ea297ec35b24b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc5bf871e6308a58deeac38b7d7b5276"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#afc5bf871e6308a58deeac38b7d7b5276">TypeDef</a> (TestOver, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
-<tr class="separator:afc5bf871e6308a58deeac38b7d7b5276"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0bdffd0595926f6202a68db1d8858a81"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a0bdffd0595926f6202a68db1d8858a81">Builder</a> (TestOver, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
+<tr class="separator:a0bdffd0595926f6202a68db1d8858a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1e6594e3a073592a00b5644509cd1b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ad1e6594e3a073592a00b5644509cd1b3">Type</a> (TestOver, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
 <tr class="separator:ad1e6594e3a073592a00b5644509cd1b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1719c2f894336bb11363681a747f5fb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aa1719c2f894336bb11363681a747f5fb">TraitImpl</a> (<a class="el" href="core_2test_8c.html#a4b39f84099edbd5d87d1ea78dbab5a56">OverrideTest</a>)</td></tr>
@@ -357,14 +366,14 @@ Functions</h2></td></tr>
 <tr class="separator:af172ef3695f2d5fe54be98061f48f021"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a28b82584c968447cf1e29e9462086880"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a28b82584c968447cf1e29e9462086880">my_over_fn</a> ()</td></tr>
 <tr class="separator:a28b82584c968447cf1e29e9462086880"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa796ed08fe627097ab22d6b47179610"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aaa796ed08fe627097ab22d6b47179610">TestOver_build</a> (void *config_in)</td></tr>
-<tr class="separator:aaa796ed08fe627097ab22d6b47179610"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac914d65b8b4a9bbfa76276eb8c5c199d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ac914d65b8b4a9bbfa76276eb8c5c199d">TestOver_build</a> (const void *config_in)</td></tr>
+<tr class="separator:ac914d65b8b4a9bbfa76276eb8c5c199d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65e76cdfade9b54b2ef917d964eca107"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a65e76cdfade9b54b2ef917d964eca107">Override</a> (TestOver, get_overt, <a class="el" href="core_2test_8c.html#a28b82584c968447cf1e29e9462086880">my_over_fn</a>)</td></tr>
 <tr class="separator:a65e76cdfade9b54b2ef917d964eca107"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee0349593699f6ba6ccb63769d065c8e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aee0349593699f6ba6ccb63769d065c8e">Test</a> (core, test_override)</td></tr>
 <tr class="separator:aee0349593699f6ba6ccb63769d065c8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0090861159a401c83beb25d003940104"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a0090861159a401c83beb25d003940104">TypeDef</a> (TestFixedArr, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, buf), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, p1), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, p2), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, p3))</td></tr>
-<tr class="separator:a0090861159a401c83beb25d003940104"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ba550f31f1be7df7e9ffde2719d843e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a0ba550f31f1be7df7e9ffde2719d843e">Builder</a> (TestFixedArr, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, buf), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, p1), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, p2), <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, p3))</td></tr>
+<tr class="separator:a0ba550f31f1be7df7e9ffde2719d843e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae01c06e9aa41d3d8f51381d7d63fd55d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ae01c06e9aa41d3d8f51381d7d63fd55d">Type</a> (TestFixedArr, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, p1), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(char, buf[100]), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, p2), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, p3))</td></tr>
 <tr class="separator:ae01c06e9aa41d3d8f51381d7d63fd55d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac87160b1e3e63f226a4897e88f69c519"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ac87160b1e3e63f226a4897e88f69c519">Impl</a> (TestFixedArr, <a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>)</td></tr>
@@ -373,8 +382,8 @@ Functions</h2></td></tr>
 <tr class="separator:aae7cf7a44ac11d51fcfe3b54cd6ba219"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a5e2e972d8d61a2bc12fc1ec4a10ec7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a8a5e2e972d8d61a2bc12fc1ec4a10ec7">Impl</a> (TestFixedArr, <a class="el" href="core_2test_8c.html#a8b0093826fd3d9484414d1c328de0252">TestFixedArrImpl</a>)</td></tr>
 <tr class="separator:a8a5e2e972d8d61a2bc12fc1ec4a10ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2677e4e180109c332e304140a1b7ff65"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a2677e4e180109c332e304140a1b7ff65">TestFixedArr_build</a> (void *config_in)</td></tr>
-<tr class="separator:a2677e4e180109c332e304140a1b7ff65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29ee19eda7e8d796adb26be8e136988c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a29ee19eda7e8d796adb26be8e136988c">TestFixedArr_build</a> (const void *config_in)</td></tr>
+<tr class="separator:a29ee19eda7e8d796adb26be8e136988c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69fa052c1e71c1ba5b200cd1fcacb10f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a69fa052c1e71c1ba5b200cd1fcacb10f">TestFixedArr_get_buf</a> (char *buf_out)</td></tr>
 <tr class="separator:a69fa052c1e71c1ba5b200cd1fcacb10f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d63951439e374d0bb360beb80669aff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a4d63951439e374d0bb360beb80669aff">TestFixedArr_get_p1</a> ()</td></tr>
@@ -391,8 +400,8 @@ Functions</h2></td></tr>
 <tr class="separator:a5c17e9baca8726e67ec8e8f98bd0e4ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af02223ac1837759b0a7c10c9e9b8769b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#af02223ac1837759b0a7c10c9e9b8769b">Type</a> (SuperImpl, <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
 <tr class="separator:af02223ac1837759b0a7c10c9e9b8769b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60e10f0dc2748cc9d992a2dbf03ca94d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a60e10f0dc2748cc9d992a2dbf03ca94d">TypeDef</a> (SuperImpl, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
-<tr class="separator:a60e10f0dc2748cc9d992a2dbf03ca94d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebea4d8e58fe0a7d8623506bddd1b222"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aebea4d8e58fe0a7d8623506bddd1b222">Builder</a> (SuperImpl, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value))</td></tr>
+<tr class="separator:aebea4d8e58fe0a7d8623506bddd1b222"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8c3d5becdeb1da2d9811b66a0fe63074"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a8c3d5becdeb1da2d9811b66a0fe63074">Impl</a> (SuperImpl, <a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>)</td></tr>
 <tr class="separator:a8c3d5becdeb1da2d9811b66a0fe63074"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12337599fbb14f93a3b466e4071c2c92"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a12337599fbb14f93a3b466e4071c2c92">Impl</a> (SuperImpl, <a class="el" href="core_2test_8c.html#af96d530aa4d1a1a9ef8c924c426dca61">SuperTest</a>)</td></tr>
@@ -401,8 +410,8 @@ Functions</h2></td></tr>
 <tr class="separator:aac179efc81c97dc46ab5c2b70e90a448"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af55d7b442e02bda9031b2ef6846171de"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#af55d7b442e02bda9031b2ef6846171de">Impl</a> (SuperImpl, <a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>)</td></tr>
 <tr class="separator:af55d7b442e02bda9031b2ef6846171de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6e8ac3d3f177cfcfd0c415f2e3a50e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ac6e8ac3d3f177cfcfd0c415f2e3a50e3">SuperImpl_build</a> (void *config_in)</td></tr>
-<tr class="separator:ac6e8ac3d3f177cfcfd0c415f2e3a50e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a004b2c7e89c6f2d1950ced58305d6b3a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a004b2c7e89c6f2d1950ced58305d6b3a">SuperImpl_build</a> (const void *config_in)</td></tr>
+<tr class="separator:a004b2c7e89c6f2d1950ced58305d6b3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a179ec59bbeb6ab1078dfc213ad060f92"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a179ec59bbeb6ab1078dfc213ad060f92">SuperImpl_drop</a> ()</td></tr>
 <tr class="separator:a179ec59bbeb6ab1078dfc213ad060f92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8765f223abccb8975a2886fdc2c2499"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aa8765f223abccb8975a2886fdc2c2499">SuperImpl_get_super_value</a> ()</td></tr>
@@ -411,6 +420,50 @@ Functions</h2></td></tr>
 <tr class="separator:a4ea55e98ad11746213d52403b867f722"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56f9b001fa17a6ee6e7c2c79969b7dcd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a56f9b001fa17a6ee6e7c2c79969b7dcd">Test</a> (core, test_super)</td></tr>
 <tr class="separator:a56f9b001fa17a6ee6e7c2c79969b7dcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32a27e4ec4bb20b6c92693b52c78380a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a32a27e4ec4bb20b6c92693b52c78380a">Type</a> (NoDrop)</td></tr>
+<tr class="separator:a32a27e4ec4bb20b6c92693b52c78380a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98754e4feef96cfa4f3f2eeb8ed15886"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a98754e4feef96cfa4f3f2eeb8ed15886">Builder</a> (NoDrop)</td></tr>
+<tr class="separator:a98754e4feef96cfa4f3f2eeb8ed15886"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9904f575bf1f3dc0b6203b3ee7b4ac53"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a9904f575bf1f3dc0b6203b3ee7b4ac53">Type</a> (WithDrop)</td></tr>
+<tr class="separator:a9904f575bf1f3dc0b6203b3ee7b4ac53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3d0549f73983c7985b19a31ec41a631"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aa3d0549f73983c7985b19a31ec41a631">Builder</a> (WithDrop)</td></tr>
+<tr class="separator:aa3d0549f73983c7985b19a31ec41a631"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a46c553fc5cdb8f4bd98b1fdeda9b6c58"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a46c553fc5cdb8f4bd98b1fdeda9b6c58">Impl</a> (WithDrop, <a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>)</td></tr>
+<tr class="separator:a46c553fc5cdb8f4bd98b1fdeda9b6c58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1268173cdb3ad8ecc6d82babfd8e78a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ac1268173cdb3ad8ecc6d82babfd8e78a">Impl</a> (WithDrop, <a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>)</td></tr>
+<tr class="separator:ac1268173cdb3ad8ecc6d82babfd8e78a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73a4171c48620d143b5f36c3bef828b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a73a4171c48620d143b5f36c3bef828b9">WithDrop_drop</a> ()</td></tr>
+<tr class="separator:a73a4171c48620d143b5f36c3bef828b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4c6c3c3f80989c6432bc00ef233c6d2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aa4c6c3c3f80989c6432bc00ef233c6d2">WithDrop_build</a> (const void *ptr)</td></tr>
+<tr class="separator:aa4c6c3c3f80989c6432bc00ef233c6d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaab81a0fdd132a55e8030bd82f851195"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aaab81a0fdd132a55e8030bd82f851195">Type</a> (MyObject)</td></tr>
+<tr class="separator:aaab81a0fdd132a55e8030bd82f851195"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2718e795d406dc9813d7f7f98b1c2a9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ab2718e795d406dc9813d7f7f98b1c2a9">Type</a> (XType, <a class="el" href="type_8h.html#aca46eaa8fa5416dd46b1e7643da2614a">Where</a>(T, <a class="el" href="type_8h.html#a5f095f7ee3ef284ef145992d4b5a7479">TraitBound</a>(<a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>), <a class="el" href="type_8h.html#a5f095f7ee3ef284ef145992d4b5a7479">TraitBound</a>(<a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>)), <a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x), <a class="el" href="type_8h.html#a186af0dcfce5f80cf526e746d9ea00d6">Generic</a>(T, wd))</td></tr>
+<tr class="separator:ab2718e795d406dc9813d7f7f98b1c2a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf34e8d3a15ddab0490c2e84f50ef221"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aaf34e8d3a15ddab0490c2e84f50ef221">Builder</a> (XType)</td></tr>
+<tr class="separator:aaf34e8d3a15ddab0490c2e84f50ef221"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1572b399a3cc4567a720d2c247c3fe8d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a1572b399a3cc4567a720d2c247c3fe8d">TraitImpl</a> (<a class="el" href="core_2test_8c.html#a0be43bfd829e4cf8d111b0b3894e870a">XTypeApi</a>)</td></tr>
+<tr class="separator:a1572b399a3cc4567a720d2c247c3fe8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7985d783d0d1f266f5f57e86934729b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aa7985d783d0d1f266f5f57e86934729b">Impl</a> (XType, <a class="el" href="core_2test_8c.html#a0be43bfd829e4cf8d111b0b3894e870a">XTypeApi</a>)</td></tr>
+<tr class="separator:aa7985d783d0d1f266f5f57e86934729b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12ee8476da02898b06c45781f4884acb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a12ee8476da02898b06c45781f4884acb">XType_set_wd_value</a> (<a class="el" href="structObj.html">Obj</a> *ptr)</td></tr>
+<tr class="separator:a12ee8476da02898b06c45781f4884acb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa75c3888cc308e2ffe332e2baa8c3c78"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aa75c3888cc308e2ffe332e2baa8c3c78">Type</a> (MyObjectBuildDrop)</td></tr>
+<tr class="separator:aa75c3888cc308e2ffe332e2baa8c3c78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e28e366d6a9fd13544fda7ea69ae84c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a2e28e366d6a9fd13544fda7ea69ae84c">Builder</a> (MyObjectBuildDrop)</td></tr>
+<tr class="separator:a2e28e366d6a9fd13544fda7ea69ae84c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ce8aa66a3a7baf4ffc95311721a3e94"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a3ce8aa66a3a7baf4ffc95311721a3e94">Impl</a> (MyObjectBuildDrop, <a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>)</td></tr>
+<tr class="separator:a3ce8aa66a3a7baf4ffc95311721a3e94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2c946cfcae86992710f18d9931bab87"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ad2c946cfcae86992710f18d9931bab87">Impl</a> (MyObjectBuildDrop, <a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>)</td></tr>
+<tr class="separator:ad2c946cfcae86992710f18d9931bab87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b3d0253b3bdd3180aabd077fc97fe1d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a1b3d0253b3bdd3180aabd077fc97fe1d">MyObjectBuildDrop_drop</a> ()</td></tr>
+<tr class="separator:a1b3d0253b3bdd3180aabd077fc97fe1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cb2b1345227be03f6e18d8fc18e397b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a3cb2b1345227be03f6e18d8fc18e397b">MyObjectBuildDrop_build</a> (const void *config_in)</td></tr>
+<tr class="separator:a3cb2b1345227be03f6e18d8fc18e397b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24f7e3149c9290f3023042f914bce2f0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a24f7e3149c9290f3023042f914bce2f0">Test</a> (core, test_where)</td></tr>
+<tr class="separator:a24f7e3149c9290f3023042f914bce2f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae6782580b87809e42ca215699a1315b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#aae6782580b87809e42ca215699a1315b">Test</a> (core, test_server)</td></tr>
+<tr class="separator:aae6782580b87809e42ca215699a1315b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -457,7 +510,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(<a class="code" href="core_2test_8c.html#a03a137945731f32a9d6649d553d3fc46">AccessTestMove</a>, <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <span class="keywordtype">char</span>*, get_tm_s), \</div>
 <div class="line">            <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_tm_len))</div>
-<div class="ttc" id="acore_2test_8c_html_a03a137945731f32a9d6649d553d3fc46"><div class="ttname"><a href="core_2test_8c.html#a03a137945731f32a9d6649d553d3fc46">AccessTestMove</a></div><div class="ttdeci">#define AccessTestMove</div><div class="ttdef"><b>Definition:</b> test.c:1042</div></div>
+<div class="ttc" id="acore_2test_8c_html_a03a137945731f32a9d6649d553d3fc46"><div class="ttname"><a href="core_2test_8c.html#a03a137945731f32a9d6649d553d3fc46">AccessTestMove</a></div><div class="ttdeci">#define AccessTestMove</div><div class="ttdef"><b>Definition:</b> test.c:1043</div></div>
 <div class="ttc" id="atype_8h_html_a4edfee2ef9567a47b388682adaaec1db"><div class="ttname"><a href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a></div><div class="ttdeci">#define Required(...)</div></div>
 <div class="ttc" id="atype_8h_html_a576cf28d25620855f75b2023e4a53e59"><div class="ttname"><a href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a></div><div class="ttdeci">#define DefineTrait(...)</div></div>
 <div class="ttc" id="atype_8h_html_aa737fc32d91c59bd8bd2fdb17ada2845"><div class="ttname"><a href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a></div><div class="ttdeci">#define Const()</div></div>
@@ -477,10 +530,10 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(<a class="code" href="core_2test_8c.html#a41a32ef95e5109af68e49e5ad6a5bb66">AdvCompSetBoth</a>, <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a>, <span class="keywordtype">void</span>, set_both_adv, \</div>
-<div class="line">                         <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>), <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="code" href="structObject.html">Object</a>*)))</div>
-<div class="ttc" id="acore_2test_8c_html_a41a32ef95e5109af68e49e5ad6a5bb66"><div class="ttname"><a href="core_2test_8c.html#a41a32ef95e5109af68e49e5ad6a5bb66">AdvCompSetBoth</a></div><div class="ttdeci">#define AdvCompSetBoth</div><div class="ttdef"><b>Definition:</b> test.c:1236</div></div>
-<div class="ttc" id="astructObject_html"><div class="ttname"><a href="structObject.html">Object</a></div><div class="ttdef"><b>Definition:</b> type.h:54</div></div>
-<div class="ttc" id="atype_8h_html_a23cd3b356bdc7322fbf851888d7787f2"><div class="ttname"><a href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a></div><div class="ttdeci">#define Var(...)</div><div class="ttdef"><b>Definition:</b> type.h:97</div></div>
+<div class="line">                         <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>), <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="code" href="structObj.html">Obj</a>*)))</div>
+<div class="ttc" id="acore_2test_8c_html_a41a32ef95e5109af68e49e5ad6a5bb66"><div class="ttname"><a href="core_2test_8c.html#a41a32ef95e5109af68e49e5ad6a5bb66">AdvCompSetBoth</a></div><div class="ttdeci">#define AdvCompSetBoth</div><div class="ttdef"><b>Definition:</b> test.c:1237</div></div>
+<div class="ttc" id="astructObj_html"><div class="ttname"><a href="structObj.html">Obj</a></div><div class="ttdef"><b>Definition:</b> type.h:56</div></div>
+<div class="ttc" id="atype_8h_html_a23cd3b356bdc7322fbf851888d7787f2"><div class="ttname"><a href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a></div><div class="ttdeci">#define Var(...)</div><div class="ttdef"><b>Definition:</b> type.h:112</div></div>
 <div class="ttc" id="atype_8h_html_af0b43aeaffd7a613c3c061c0696d901a"><div class="ttname"><a href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a></div><div class="ttdeci">#define Param(type)</div></div>
 </div><!-- fragment -->
 </div>
@@ -499,8 +552,8 @@ Variables</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(<a class="code" href="core_2test_8c.html#a292d16f15061bcf4ecde5220e25cf290">DEF_IMPL_TRAIT</a>, <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, testx2),             \</div>
 <div class="line">            <a class="code" href="type_8h.html#a2d187d9c01ea4b71735b1fb501ef4ea0">RequiredWithDefault</a>(<a class="code" href="core_2test_8c.html#ac787ba8e4a5c32486c7f3a6da3b5ea9d">my_default_testx1</a>, <a class="code" href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a>, <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, testx1), \</div>
 <div class="line">            <a class="code" href="type_8h.html#a8300c58c407762ef5e63f1fc9cbaefd2">Super</a>(<a class="code" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>))</div>
-<div class="ttc" id="acore_2test_8c_html_a292d16f15061bcf4ecde5220e25cf290"><div class="ttname"><a href="core_2test_8c.html#a292d16f15061bcf4ecde5220e25cf290">DEF_IMPL_TRAIT</a></div><div class="ttdeci">#define DEF_IMPL_TRAIT</div><div class="ttdef"><b>Definition:</b> test.c:1123</div></div>
-<div class="ttc" id="acore_2test_8c_html_ac787ba8e4a5c32486c7f3a6da3b5ea9d"><div class="ttname"><a href="core_2test_8c.html#ac787ba8e4a5c32486c7f3a6da3b5ea9d">my_default_testx1</a></div><div class="ttdeci">u64 my_default_testx1()</div><div class="ttdef"><b>Definition:</b> test.c:1134</div></div>
+<div class="ttc" id="acore_2test_8c_html_a292d16f15061bcf4ecde5220e25cf290"><div class="ttname"><a href="core_2test_8c.html#a292d16f15061bcf4ecde5220e25cf290">DEF_IMPL_TRAIT</a></div><div class="ttdeci">#define DEF_IMPL_TRAIT</div><div class="ttdef"><b>Definition:</b> test.c:1124</div></div>
+<div class="ttc" id="acore_2test_8c_html_ac787ba8e4a5c32486c7f3a6da3b5ea9d"><div class="ttname"><a href="core_2test_8c.html#ac787ba8e4a5c32486c7f3a6da3b5ea9d">my_default_testx1</a></div><div class="ttdeci">u64 my_default_testx1()</div><div class="ttdef"><b>Definition:</b> test.c:1135</div></div>
 <div class="ttc" id="atraits_8h_html_a4c1bc9dae458cb02cbad68812b20345e"><div class="ttname"><a href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a></div><div class="ttdeci">#define Drop</div><div class="ttdef"><b>Definition:</b> traits.h:20</div></div>
 <div class="ttc" id="atype_8h_html_a2d187d9c01ea4b71735b1fb501ef4ea0"><div class="ttname"><a href="type_8h.html#a2d187d9c01ea4b71735b1fb501ef4ea0">RequiredWithDefault</a></div><div class="ttdeci">#define RequiredWithDefault(...)</div></div>
 <div class="ttc" id="atype_8h_html_a8300c58c407762ef5e63f1fc9cbaefd2"><div class="ttname"><a href="type_8h.html#a8300c58c407762ef5e63f1fc9cbaefd2">Super</a></div><div class="ttdeci">#define Super(x)</div></div>
@@ -508,7 +561,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[1/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[1/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -522,7 +575,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[2/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[2/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -536,7 +589,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[3/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[3/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -550,7 +603,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[4/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[4/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -564,7 +617,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[5/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[5/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -578,7 +631,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[6/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[6/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -592,7 +645,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[7/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[7/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -606,7 +659,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[8/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[8/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -620,7 +673,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[9/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[9/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -634,7 +687,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[10/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[10/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -648,7 +701,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[11/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[11/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -662,13 +715,55 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a750877e0398a37cb8f03443558fb7f6f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[12/12]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[12/15]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">#define IMPL&#160;&#160;&#160;SuperImpl</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a750877e0398a37cb8f03443558fb7f6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[13/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMPL&#160;&#160;&#160;WithDrop</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a750877e0398a37cb8f03443558fb7f6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[14/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMPL&#160;&#160;&#160;XType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a750877e0398a37cb8f03443558fb7f6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a750877e0398a37cb8f03443558fb7f6f">&#9670;&nbsp;</a></span>IMPL <span class="overload">[15/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define IMPL&#160;&#160;&#160;MyObjectBuildDrop</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -710,7 +805,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ServerApi&#160;&#160;&#160;<a class="el" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(ServerApi, <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#a3521b7722e358f98597043439741612c">Var</a>, bool, start_server), <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, bool, is_started))</td>
+          <td class="memname">#define ServerApi&#160;&#160;&#160;<a class="el" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(ServerApi, <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#a3521b7722e358f98597043439741612c">Var</a>, bool, start_test_server), <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, bool, is_test_started))</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -729,8 +824,8 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(<a class="code" href="core_2test_8c.html#a141a85243ffd654ce0a1aeadc6b08796">SetCompTrait</a>, <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a>, <span class="keywordtype">void</span>, set_comp_value, \</div>
-<div class="line">                       <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<span class="keyword">const</span> <a class="code" href="structObject.html">Object</a>*)))</div>
-<div class="ttc" id="acore_2test_8c_html_a141a85243ffd654ce0a1aeadc6b08796"><div class="ttname"><a href="core_2test_8c.html#a141a85243ffd654ce0a1aeadc6b08796">SetCompTrait</a></div><div class="ttdeci">#define SetCompTrait</div><div class="ttdef"><b>Definition:</b> test.c:1170</div></div>
+<div class="line">                       <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a>*)))</div>
+<div class="ttc" id="acore_2test_8c_html_a141a85243ffd654ce0a1aeadc6b08796"><div class="ttname"><a href="core_2test_8c.html#a141a85243ffd654ce0a1aeadc6b08796">SetCompTrait</a></div><div class="ttdeci">#define SetCompTrait</div><div class="ttdef"><b>Definition:</b> test.c:1171</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -779,7 +874,7 @@ Variables</h2></td></tr>
 <div class="line">    <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_p1),                 \</div>
 <div class="line">    <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, get_p2),                 \</div>
 <div class="line">    <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="code" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, get_p3))</div>
-<div class="ttc" id="acore_2test_8c_html_a8b0093826fd3d9484414d1c328de0252"><div class="ttname"><a href="core_2test_8c.html#a8b0093826fd3d9484414d1c328de0252">TestFixedArrImpl</a></div><div class="ttdeci">#define TestFixedArrImpl</div><div class="ttdef"><b>Definition:</b> test.c:1404</div></div>
+<div class="ttc" id="acore_2test_8c_html_a8b0093826fd3d9484414d1c328de0252"><div class="ttname"><a href="core_2test_8c.html#a8b0093826fd3d9484414d1c328de0252">TestFixedArrImpl</a></div><div class="ttdeci">#define TestFixedArrImpl</div><div class="ttdef"><b>Definition:</b> test.c:1406</div></div>
 <div class="ttc" id="atypes_8h_html_a2b19d553290a8d4a083d3c03280ea800"><div class="ttname"><a href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a></div><div class="ttdeci">#define u16</div><div class="ttdef"><b>Definition:</b> types.h:27</div></div>
 <div class="ttc" id="atypes_8h_html_a332ccd83dfe2973e6cb2b61e4f3ab7e6"><div class="ttname"><a href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a></div><div class="ttdeci">#define u32</div><div class="ttdef"><b>Definition:</b> types.h:29</div></div>
 </div><!-- fragment -->
@@ -801,13 +896,27 @@ Variables</h2></td></tr>
 <div class="line">            <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a>, <span class="keywordtype">void</span>, add_x, <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>)),                 \</div>
 <div class="line">            <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a>, <span class="keywordtype">void</span>, sub_y, <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>)),                 \</div>
 <div class="line">            <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a>, <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, sub_both, <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>), <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>)))</div>
-<div class="ttc" id="acore_2test_8c_html_a5bc3b46d384f6e6dddd5d97143649744"><div class="ttname"><a href="core_2test_8c.html#a5bc3b46d384f6e6dddd5d97143649744">TestTrait</a></div><div class="ttdeci">#define TestTrait</div><div class="ttdef"><b>Definition:</b> test.c:854</div></div>
+<div class="ttc" id="acore_2test_8c_html_a5bc3b46d384f6e6dddd5d97143649744"><div class="ttname"><a href="core_2test_8c.html#a5bc3b46d384f6e6dddd5d97143649744">TestTrait</a></div><div class="ttdeci">#define TestTrait</div><div class="ttdef"><b>Definition:</b> test.c:855</div></div>
 </div><!-- fragment -->
 </div>
 </div>
+<a id="a0be43bfd829e4cf8d111b0b3894e870a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0be43bfd829e4cf8d111b0b3894e870a">&#9670;&nbsp;</a></span>XTypeApi</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define XTypeApi&#160;&#160;&#160;<a class="el" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(XTypeApi, <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#a3521b7722e358f98597043439741612c">Var</a>, void, set_wd_value, <a class="el" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="el" href="structObj.html">Obj</a>*)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="afa782f593a569284e7812ed2b462032f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa782f593a569284e7812ed2b462032f">&#9670;&nbsp;</a></span>AdvComp_build()</h2>
+<a id="a2de78aa737e46bcc150198dd89e7076e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2de78aa737e46bcc150198dd89e7076e">&#9670;&nbsp;</a></span>AdvComp_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -815,7 +924,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void AdvComp_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config_in</em></td><td>)</td>
           <td></td>
         </tr>
@@ -824,8 +933,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="aa7a0bc2b402a91308dd094fca7767916"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa7a0bc2b402a91308dd094fca7767916">&#9670;&nbsp;</a></span>AdvComp_set_both_adv()</h2>
+<a id="a21ffbff9611cc3cc40f91ddcadd25090"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21ffbff9611cc3cc40f91ddcadd25090">&#9670;&nbsp;</a></span>AdvComp_set_both_adv()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -839,7 +948,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structObject.html">Object</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="structObj.html">Obj</a> *&#160;</td>
           <td class="paramname"><em>ptr</em>&#160;</td>
         </tr>
         <tr>
@@ -852,8 +961,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a43b6aea2874b97d765dca02e9db39f4e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a43b6aea2874b97d765dca02e9db39f4e">&#9670;&nbsp;</a></span>AdvComp_set_comp_value()</h2>
+<a id="a94bf1eb6e098319f30ffb87fe298d296"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94bf1eb6e098319f30ffb87fe298d296">&#9670;&nbsp;</a></span>AdvComp_set_comp_value()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -861,7 +970,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void AdvComp_set_comp_value </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structObject.html">Object</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structObj.html">Obj</a> *&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -870,8 +979,448 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a62ab3e08e78f0b16b19df1dbe25576f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62ab3e08e78f0b16b19df1dbe25576f1">&#9670;&nbsp;</a></span>CompositeTest_build()</h2>
+<a id="afccaa48c3384a64773a7517d6d388551"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afccaa48c3384a64773a7517d6d388551">&#9670;&nbsp;</a></span>Builder() <span class="overload">[1/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">AdvComp&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x_in)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a41a583bb0b66da3a538691cdaefd632a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41a583bb0b66da3a538691cdaefd632a">&#9670;&nbsp;</a></span>Builder() <span class="overload">[2/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">CompositeTest&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6933addab1549bed56fb9d25cf2c03bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6933addab1549bed56fb9d25cf2c03bf">&#9670;&nbsp;</a></span>Builder() <span class="overload">[3/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">InnerType&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2e28e366d6a9fd13544fda7ea69ae84c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e28e366d6a9fd13544fda7ea69ae84c">&#9670;&nbsp;</a></span>Builder() <span class="overload">[4/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">MyObjectBuildDrop&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a98754e4feef96cfa4f3f2eeb8ed15886"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98754e4feef96cfa4f3f2eeb8ed15886">&#9670;&nbsp;</a></span>Builder() <span class="overload">[5/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">NoDrop&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1280efe611935b8754e01cae0c1a2e36"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1280efe611935b8754e01cae0c1a2e36">&#9670;&nbsp;</a></span>Builder() <span class="overload">[6/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">Server&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, threads)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, host)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2f5069f26ef829b1c1e7d38a212fb4f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f5069f26ef829b1c1e7d38a212fb4f2">&#9670;&nbsp;</a></span>Builder() <span class="overload">[7/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">ServerComponent&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aebea4d8e58fe0a7d8623506bddd1b222"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebea4d8e58fe0a7d8623506bddd1b222">&#9670;&nbsp;</a></span>Builder() <span class="overload">[8/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">SuperImpl&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0ba550f31f1be7df7e9ffde2719d843e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ba550f31f1be7df7e9ffde2719d843e">&#9670;&nbsp;</a></span>Builder() <span class="overload">[9/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">TestFixedArr&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, buf)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, p1)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, p2)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, p3)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a67e539755e61c08cf142df81cdbd7d1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67e539755e61c08cf142df81cdbd7d1c">&#9670;&nbsp;</a></span>Builder() <span class="overload">[10/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">TestMove&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, s)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, len)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0bdffd0595926f6202a68db1d8858a81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0bdffd0595926f6202a68db1d8858a81">&#9670;&nbsp;</a></span>Builder() <span class="overload">[11/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">TestOver&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9241cf52217da146438a1ac49573dd53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9241cf52217da146438a1ac49573dd53">&#9670;&nbsp;</a></span>Builder() <span class="overload">[12/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">TestServer&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, host)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, threads)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1cf074a1cd6a65134c64947c7700875e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cf074a1cd6a65134c64947c7700875e">&#9670;&nbsp;</a></span>Builder() <span class="overload">[13/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">TestType&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x_in)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y_in)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa3d0549f73983c7985b19a31ec41a631"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3d0549f73983c7985b19a31ec41a631">&#9670;&nbsp;</a></span>Builder() <span class="overload">[14/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">WithDrop&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaf34e8d3a15ddab0490c2e84f50ef221"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaf34e8d3a15ddab0490c2e84f50ef221">&#9670;&nbsp;</a></span>Builder() <span class="overload">[15/15]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">XType&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acbfb3eb42152028ccf76fdd60bf17966"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acbfb3eb42152028ccf76fdd60bf17966">&#9670;&nbsp;</a></span>CompositeTest_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -879,7 +1428,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void CompositeTest_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config</em></td><td>)</td>
           <td></td>
         </tr>
@@ -905,8 +1454,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a932878ad1599f7de29fa0a915e9f1222"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a932878ad1599f7de29fa0a915e9f1222">&#9670;&nbsp;</a></span>CompositeTest_set_comp_value()</h2>
+<a id="ace69d6155ca662440457b14de7516e47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace69d6155ca662440457b14de7516e47">&#9670;&nbsp;</a></span>CompositeTest_set_comp_value()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -914,7 +1463,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void CompositeTest_set_comp_value </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="structObject.html">Object</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structObj.html">Obj</a> *&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
         </tr>
@@ -942,7 +1491,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a4d941f85de608f6a0a1c6bce2d3f9fdd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d941f85de608f6a0a1c6bce2d3f9fdd">&#9670;&nbsp;</a></span>Impl() <span class="overload">[1/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d941f85de608f6a0a1c6bce2d3f9fdd">&#9670;&nbsp;</a></span>Impl() <span class="overload">[1/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -970,7 +1519,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a98e403842f3d469dba61ebd28b8f4b19"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a98e403842f3d469dba61ebd28b8f4b19">&#9670;&nbsp;</a></span>Impl() <span class="overload">[2/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a98e403842f3d469dba61ebd28b8f4b19">&#9670;&nbsp;</a></span>Impl() <span class="overload">[2/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -998,7 +1547,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a340ddcff4c19affbfd4e41183654d9eb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a340ddcff4c19affbfd4e41183654d9eb">&#9670;&nbsp;</a></span>Impl() <span class="overload">[3/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a340ddcff4c19affbfd4e41183654d9eb">&#9670;&nbsp;</a></span>Impl() <span class="overload">[3/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1026,7 +1575,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="afa1b2959b375382f2fb7f5721691ab8f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa1b2959b375382f2fb7f5721691ab8f">&#9670;&nbsp;</a></span>Impl() <span class="overload">[4/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afa1b2959b375382f2fb7f5721691ab8f">&#9670;&nbsp;</a></span>Impl() <span class="overload">[4/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1054,7 +1603,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="abcb4330e0836fca0cbaabc4257261574"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abcb4330e0836fca0cbaabc4257261574">&#9670;&nbsp;</a></span>Impl() <span class="overload">[5/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abcb4330e0836fca0cbaabc4257261574">&#9670;&nbsp;</a></span>Impl() <span class="overload">[5/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1082,7 +1631,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="adf6b57d4da3a01a1fd1bfb2be47ed088"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adf6b57d4da3a01a1fd1bfb2be47ed088">&#9670;&nbsp;</a></span>Impl() <span class="overload">[6/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#adf6b57d4da3a01a1fd1bfb2be47ed088">&#9670;&nbsp;</a></span>Impl() <span class="overload">[6/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1110,7 +1659,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a5f394d28c8505632a4f9b6196fefb58d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f394d28c8505632a4f9b6196fefb58d">&#9670;&nbsp;</a></span>Impl() <span class="overload">[7/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f394d28c8505632a4f9b6196fefb58d">&#9670;&nbsp;</a></span>Impl() <span class="overload">[7/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1138,7 +1687,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a016b648044dc6a5a3c541993ec9dabd5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a016b648044dc6a5a3c541993ec9dabd5">&#9670;&nbsp;</a></span>Impl() <span class="overload">[8/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a016b648044dc6a5a3c541993ec9dabd5">&#9670;&nbsp;</a></span>Impl() <span class="overload">[8/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1166,7 +1715,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a4f0e878178c0031a5590eaa1b3587d7a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4f0e878178c0031a5590eaa1b3587d7a">&#9670;&nbsp;</a></span>Impl() <span class="overload">[9/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4f0e878178c0031a5590eaa1b3587d7a">&#9670;&nbsp;</a></span>Impl() <span class="overload">[9/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1193,8 +1742,64 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a3ce8aa66a3a7baf4ffc95311721a3e94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ce8aa66a3a7baf4ffc95311721a3e94">&#9670;&nbsp;</a></span>Impl() <span class="overload">[10/36]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Impl </td>
+          <td>(</td>
+          <td class="paramtype">MyObjectBuildDrop&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad2c946cfcae86992710f18d9931bab87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2c946cfcae86992710f18d9931bab87">&#9670;&nbsp;</a></span>Impl() <span class="overload">[11/36]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Impl </td>
+          <td>(</td>
+          <td class="paramtype">MyObjectBuildDrop&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a4fb5efa2550ee2b96918b5f2f11bf371"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4fb5efa2550ee2b96918b5f2f11bf371">&#9670;&nbsp;</a></span>Impl() <span class="overload">[10/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fb5efa2550ee2b96918b5f2f11bf371">&#9670;&nbsp;</a></span>Impl() <span class="overload">[12/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1222,7 +1827,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a4b7ad21f54385e04dda0dac5699c5c79"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b7ad21f54385e04dda0dac5699c5c79">&#9670;&nbsp;</a></span>Impl() <span class="overload">[11/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b7ad21f54385e04dda0dac5699c5c79">&#9670;&nbsp;</a></span>Impl() <span class="overload">[13/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1250,7 +1855,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a4403075384d3776f9fc2722bf49fedf7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4403075384d3776f9fc2722bf49fedf7">&#9670;&nbsp;</a></span>Impl() <span class="overload">[12/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4403075384d3776f9fc2722bf49fedf7">&#9670;&nbsp;</a></span>Impl() <span class="overload">[14/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1278,7 +1883,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a8bbab57f18349783c80d007c7d2abe28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8bbab57f18349783c80d007c7d2abe28">&#9670;&nbsp;</a></span>Impl() <span class="overload">[13/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8bbab57f18349783c80d007c7d2abe28">&#9670;&nbsp;</a></span>Impl() <span class="overload">[15/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1306,7 +1911,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a191de4be0c3afb3065b508e330d03b64"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a191de4be0c3afb3065b508e330d03b64">&#9670;&nbsp;</a></span>Impl() <span class="overload">[14/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a191de4be0c3afb3065b508e330d03b64">&#9670;&nbsp;</a></span>Impl() <span class="overload">[16/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1334,7 +1939,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="af55d7b442e02bda9031b2ef6846171de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af55d7b442e02bda9031b2ef6846171de">&#9670;&nbsp;</a></span>Impl() <span class="overload">[15/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af55d7b442e02bda9031b2ef6846171de">&#9670;&nbsp;</a></span>Impl() <span class="overload">[17/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1362,7 +1967,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a8c3d5becdeb1da2d9811b66a0fe63074"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c3d5becdeb1da2d9811b66a0fe63074">&#9670;&nbsp;</a></span>Impl() <span class="overload">[16/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c3d5becdeb1da2d9811b66a0fe63074">&#9670;&nbsp;</a></span>Impl() <span class="overload">[18/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1390,7 +1995,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="aac179efc81c97dc46ab5c2b70e90a448"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac179efc81c97dc46ab5c2b70e90a448">&#9670;&nbsp;</a></span>Impl() <span class="overload">[17/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aac179efc81c97dc46ab5c2b70e90a448">&#9670;&nbsp;</a></span>Impl() <span class="overload">[19/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1418,7 +2023,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a12337599fbb14f93a3b466e4071c2c92"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12337599fbb14f93a3b466e4071c2c92">&#9670;&nbsp;</a></span>Impl() <span class="overload">[18/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a12337599fbb14f93a3b466e4071c2c92">&#9670;&nbsp;</a></span>Impl() <span class="overload">[20/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1446,7 +2051,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ac87160b1e3e63f226a4897e88f69c519"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac87160b1e3e63f226a4897e88f69c519">&#9670;&nbsp;</a></span>Impl() <span class="overload">[19/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac87160b1e3e63f226a4897e88f69c519">&#9670;&nbsp;</a></span>Impl() <span class="overload">[21/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1474,7 +2079,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a8a5e2e972d8d61a2bc12fc1ec4a10ec7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8a5e2e972d8d61a2bc12fc1ec4a10ec7">&#9670;&nbsp;</a></span>Impl() <span class="overload">[20/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a5e2e972d8d61a2bc12fc1ec4a10ec7">&#9670;&nbsp;</a></span>Impl() <span class="overload">[22/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1502,7 +2107,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a594a328e440618acd495ef97dac768d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a594a328e440618acd495ef97dac768d8">&#9670;&nbsp;</a></span>Impl() <span class="overload">[21/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a594a328e440618acd495ef97dac768d8">&#9670;&nbsp;</a></span>Impl() <span class="overload">[23/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1530,7 +2135,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a4ede64af237afcd8ba00912a32c91917"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ede64af237afcd8ba00912a32c91917">&#9670;&nbsp;</a></span>Impl() <span class="overload">[22/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ede64af237afcd8ba00912a32c91917">&#9670;&nbsp;</a></span>Impl() <span class="overload">[24/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1558,7 +2163,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a9e61d80815c55fa32a63f00c568f5759"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e61d80815c55fa32a63f00c568f5759">&#9670;&nbsp;</a></span>Impl() <span class="overload">[23/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9e61d80815c55fa32a63f00c568f5759">&#9670;&nbsp;</a></span>Impl() <span class="overload">[25/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1586,7 +2191,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ab7c2987d67d257577708e733404e7b6c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab7c2987d67d257577708e733404e7b6c">&#9670;&nbsp;</a></span>Impl() <span class="overload">[24/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7c2987d67d257577708e733404e7b6c">&#9670;&nbsp;</a></span>Impl() <span class="overload">[26/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1614,7 +2219,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a1ddaa174f11a438cdbc1df9c8327fb88"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1ddaa174f11a438cdbc1df9c8327fb88">&#9670;&nbsp;</a></span>Impl() <span class="overload">[25/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ddaa174f11a438cdbc1df9c8327fb88">&#9670;&nbsp;</a></span>Impl() <span class="overload">[27/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1642,7 +2247,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="aec13dd635cd0de30137dc103385a7e55"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aec13dd635cd0de30137dc103385a7e55">&#9670;&nbsp;</a></span>Impl() <span class="overload">[26/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aec13dd635cd0de30137dc103385a7e55">&#9670;&nbsp;</a></span>Impl() <span class="overload">[28/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1670,7 +2275,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a10c3c8893fd21738c09fed361caf2cc0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a10c3c8893fd21738c09fed361caf2cc0">&#9670;&nbsp;</a></span>Impl() <span class="overload">[27/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a10c3c8893fd21738c09fed361caf2cc0">&#9670;&nbsp;</a></span>Impl() <span class="overload">[29/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1698,7 +2303,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a812e72fda790a5154458f0a6096ac262"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a812e72fda790a5154458f0a6096ac262">&#9670;&nbsp;</a></span>Impl() <span class="overload">[28/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a812e72fda790a5154458f0a6096ac262">&#9670;&nbsp;</a></span>Impl() <span class="overload">[30/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1726,7 +2331,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a82ce78e2db9e411d01518a9dd5db8584"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82ce78e2db9e411d01518a9dd5db8584">&#9670;&nbsp;</a></span>Impl() <span class="overload">[29/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a82ce78e2db9e411d01518a9dd5db8584">&#9670;&nbsp;</a></span>Impl() <span class="overload">[31/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1754,7 +2359,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ade39db382798ae1f811c78db1b4edb89"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade39db382798ae1f811c78db1b4edb89">&#9670;&nbsp;</a></span>Impl() <span class="overload">[30/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ade39db382798ae1f811c78db1b4edb89">&#9670;&nbsp;</a></span>Impl() <span class="overload">[32/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1782,7 +2387,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a3efa455803e5350ed513ed577aa65af3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3efa455803e5350ed513ed577aa65af3">&#9670;&nbsp;</a></span>Impl() <span class="overload">[31/31]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3efa455803e5350ed513ed577aa65af3">&#9670;&nbsp;</a></span>Impl() <span class="overload">[33/36]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1809,8 +2414,92 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a46437f70d4ba34f357ed3b711fedcf3a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46437f70d4ba34f357ed3b711fedcf3a">&#9670;&nbsp;</a></span>InnerType_build()</h2>
+<a id="ac1268173cdb3ad8ecc6d82babfd8e78a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1268173cdb3ad8ecc6d82babfd8e78a">&#9670;&nbsp;</a></span>Impl() <span class="overload">[34/36]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Impl </td>
+          <td>(</td>
+          <td class="paramtype">WithDrop&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a46c553fc5cdb8f4bd98b1fdeda9b6c58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a46c553fc5cdb8f4bd98b1fdeda9b6c58">&#9670;&nbsp;</a></span>Impl() <span class="overload">[35/36]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Impl </td>
+          <td>(</td>
+          <td class="paramtype">WithDrop&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa7985d783d0d1f266f5f57e86934729b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7985d783d0d1f266f5f57e86934729b">&#9670;&nbsp;</a></span>Impl() <span class="overload">[36/36]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Impl </td>
+          <td>(</td>
+          <td class="paramtype">XType&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="core_2test_8c.html#a0be43bfd829e4cf8d111b0b3894e870a">XTypeApi</a>&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acec7690a72d2f09587ef355049f3b23f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acec7690a72d2f09587ef355049f3b23f">&#9670;&nbsp;</a></span>InnerType_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1818,7 +2507,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void InnerType_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config_in</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1895,6 +2584,41 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a3cb2b1345227be03f6e18d8fc18e397b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cb2b1345227be03f6e18d8fc18e397b">&#9670;&nbsp;</a></span>MyObjectBuildDrop_build()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MyObjectBuildDrop_build </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>config_in</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1b3d0253b3bdd3180aabd077fc97fe1d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b3d0253b3bdd3180aabd077fc97fe1d">&#9670;&nbsp;</a></span>MyObjectBuildDrop_drop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MyObjectBuildDrop_drop </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a65e76cdfade9b54b2ef917d964eca107"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a65e76cdfade9b54b2ef917d964eca107">&#9670;&nbsp;</a></span>Override()</h2>
 
@@ -1946,8 +2670,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a191721f87a56e2cd67a3afef532185f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a191721f87a56e2cd67a3afef532185f9">&#9670;&nbsp;</a></span>Server_build()</h2>
+<a id="a9cf03c89c53b47adb33c7ba913462b8a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9cf03c89c53b47adb33c7ba913462b8a">&#9670;&nbsp;</a></span>Server_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1955,7 +2679,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void Server_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config_in</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1981,14 +2705,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="aa3da6c0b3ea4d355efaecbfe6832e25c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3da6c0b3ea4d355efaecbfe6832e25c">&#9670;&nbsp;</a></span>Server_is_started()</h2>
+<a id="a0cb3caf6ac85b63ede72c0a71fe0f3b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0cb3caf6ac85b63ede72c0a71fe0f3b0">&#9670;&nbsp;</a></span>Server_is_test_started()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool Server_is_started </td>
+          <td class="memname">bool Server_is_test_started </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -1998,14 +2722,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ae203bb84c918de8d71c6c7ed7f90c46d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae203bb84c918de8d71c6c7ed7f90c46d">&#9670;&nbsp;</a></span>Server_start_server()</h2>
+<a id="a51faa5c9738f8066ca903a773503ee68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51faa5c9738f8066ca903a773503ee68">&#9670;&nbsp;</a></span>Server_start_test_server()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool Server_start_server </td>
+          <td class="memname">bool Server_start_test_server </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -2015,8 +2739,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="aa70a136a6276529dcd725ca0e5b1369d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa70a136a6276529dcd725ca0e5b1369d">&#9670;&nbsp;</a></span>ServerComponent_build()</h2>
+<a id="a6bb55872beea38086ae1cd921b1cc734"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6bb55872beea38086ae1cd921b1cc734">&#9670;&nbsp;</a></span>ServerComponent_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2024,7 +2748,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void ServerComponent_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config_in</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2104,8 +2828,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ac6e8ac3d3f177cfcfd0c415f2e3a50e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac6e8ac3d3f177cfcfd0c415f2e3a50e3">&#9670;&nbsp;</a></span>SuperImpl_build()</h2>
+<a id="a004b2c7e89c6f2d1950ced58305d6b3a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a004b2c7e89c6f2d1950ced58305d6b3a">&#9670;&nbsp;</a></span>SuperImpl_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2113,7 +2837,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void SuperImpl_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config_in</em></td><td>)</td>
           <td></td>
         </tr>
@@ -2192,7 +2916,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="adb755450bb6af5ca80537e9b5b15e66b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb755450bb6af5ca80537e9b5b15e66b">&#9670;&nbsp;</a></span>Test() <span class="overload">[1/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#adb755450bb6af5ca80537e9b5b15e66b">&#9670;&nbsp;</a></span>Test() <span class="overload">[1/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2220,7 +2944,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="abe667586a06875454a08d644d8d26a1a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe667586a06875454a08d644d8d26a1a">&#9670;&nbsp;</a></span>Test() <span class="overload">[2/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abe667586a06875454a08d644d8d26a1a">&#9670;&nbsp;</a></span>Test() <span class="overload">[2/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2248,7 +2972,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="abcc0fd0f8b0142a1a02c2db2d33d2046"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abcc0fd0f8b0142a1a02c2db2d33d2046">&#9670;&nbsp;</a></span>Test() <span class="overload">[3/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abcc0fd0f8b0142a1a02c2db2d33d2046">&#9670;&nbsp;</a></span>Test() <span class="overload">[3/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2276,7 +3000,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a53534c786f8edda9b54def2485d92a92"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53534c786f8edda9b54def2485d92a92">&#9670;&nbsp;</a></span>Test() <span class="overload">[4/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a53534c786f8edda9b54def2485d92a92">&#9670;&nbsp;</a></span>Test() <span class="overload">[4/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2304,7 +3028,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a3cca4e49cdd7d577f187b6dc27f2756d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3cca4e49cdd7d577f187b6dc27f2756d">&#9670;&nbsp;</a></span>Test() <span class="overload">[5/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cca4e49cdd7d577f187b6dc27f2756d">&#9670;&nbsp;</a></span>Test() <span class="overload">[5/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2332,7 +3056,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="abc9490115ac78fd4263c336e25f1bdab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc9490115ac78fd4263c336e25f1bdab">&#9670;&nbsp;</a></span>Test() <span class="overload">[6/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abc9490115ac78fd4263c336e25f1bdab">&#9670;&nbsp;</a></span>Test() <span class="overload">[6/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2360,7 +3084,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a796b35e1e1ec2371237371873654f7f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a796b35e1e1ec2371237371873654f7f3">&#9670;&nbsp;</a></span>Test() <span class="overload">[7/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a796b35e1e1ec2371237371873654f7f3">&#9670;&nbsp;</a></span>Test() <span class="overload">[7/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2388,7 +3112,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a598893a24d4b4ed0d83a7e3a982342f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a598893a24d4b4ed0d83a7e3a982342f7">&#9670;&nbsp;</a></span>Test() <span class="overload">[8/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a598893a24d4b4ed0d83a7e3a982342f7">&#9670;&nbsp;</a></span>Test() <span class="overload">[8/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2416,7 +3140,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="aae4f2ef362aecd9f58db2a92248875d9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae4f2ef362aecd9f58db2a92248875d9">&#9670;&nbsp;</a></span>Test() <span class="overload">[9/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aae4f2ef362aecd9f58db2a92248875d9">&#9670;&nbsp;</a></span>Test() <span class="overload">[9/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2444,7 +3168,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a0de5a1cd6824c3cf6cded055ef422dbc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0de5a1cd6824c3cf6cded055ef422dbc">&#9670;&nbsp;</a></span>Test() <span class="overload">[10/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0de5a1cd6824c3cf6cded055ef422dbc">&#9670;&nbsp;</a></span>Test() <span class="overload">[10/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2472,7 +3196,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a43da227902a57d12bae71997f6b36e8b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a43da227902a57d12bae71997f6b36e8b">&#9670;&nbsp;</a></span>Test() <span class="overload">[11/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a43da227902a57d12bae71997f6b36e8b">&#9670;&nbsp;</a></span>Test() <span class="overload">[11/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2500,7 +3224,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a373b86596f317bca0f1a3aa2709d60f0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a373b86596f317bca0f1a3aa2709d60f0">&#9670;&nbsp;</a></span>Test() <span class="overload">[12/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a373b86596f317bca0f1a3aa2709d60f0">&#9670;&nbsp;</a></span>Test() <span class="overload">[12/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2528,7 +3252,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a14a11c4e8851c9328c89712df8807d7f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14a11c4e8851c9328c89712df8807d7f">&#9670;&nbsp;</a></span>Test() <span class="overload">[13/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a14a11c4e8851c9328c89712df8807d7f">&#9670;&nbsp;</a></span>Test() <span class="overload">[13/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2556,7 +3280,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ae3a8f628d9dac7dc3f05966f0e908077"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3a8f628d9dac7dc3f05966f0e908077">&#9670;&nbsp;</a></span>Test() <span class="overload">[14/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3a8f628d9dac7dc3f05966f0e908077">&#9670;&nbsp;</a></span>Test() <span class="overload">[14/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2584,7 +3308,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a53b39248511aa6761c9eb2ecb1b80151"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53b39248511aa6761c9eb2ecb1b80151">&#9670;&nbsp;</a></span>Test() <span class="overload">[15/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a53b39248511aa6761c9eb2ecb1b80151">&#9670;&nbsp;</a></span>Test() <span class="overload">[15/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2612,7 +3336,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="af08567d387c9cd3a6b7dcc65df11f46f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af08567d387c9cd3a6b7dcc65df11f46f">&#9670;&nbsp;</a></span>Test() <span class="overload">[16/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af08567d387c9cd3a6b7dcc65df11f46f">&#9670;&nbsp;</a></span>Test() <span class="overload">[16/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2640,7 +3364,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ac87b8747c3396c10d6e8053380f561e8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac87b8747c3396c10d6e8053380f561e8">&#9670;&nbsp;</a></span>Test() <span class="overload">[17/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac87b8747c3396c10d6e8053380f561e8">&#9670;&nbsp;</a></span>Test() <span class="overload">[17/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2668,7 +3392,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a3a106b248aba49d0b6695b43620535b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a106b248aba49d0b6695b43620535b8">&#9670;&nbsp;</a></span>Test() <span class="overload">[18/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a106b248aba49d0b6695b43620535b8">&#9670;&nbsp;</a></span>Test() <span class="overload">[18/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2696,7 +3420,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a22f132b90a1317ff6ee9fd50bb01ac60"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a22f132b90a1317ff6ee9fd50bb01ac60">&#9670;&nbsp;</a></span>Test() <span class="overload">[19/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a22f132b90a1317ff6ee9fd50bb01ac60">&#9670;&nbsp;</a></span>Test() <span class="overload">[19/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2724,7 +3448,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="aee0349593699f6ba6ccb63769d065c8e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aee0349593699f6ba6ccb63769d065c8e">&#9670;&nbsp;</a></span>Test() <span class="overload">[20/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aee0349593699f6ba6ccb63769d065c8e">&#9670;&nbsp;</a></span>Test() <span class="overload">[20/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2752,7 +3476,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a0f351fe662073e04f52ac5cfba5db2d9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f351fe662073e04f52ac5cfba5db2d9">&#9670;&nbsp;</a></span>Test() <span class="overload">[21/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f351fe662073e04f52ac5cfba5db2d9">&#9670;&nbsp;</a></span>Test() <span class="overload">[21/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2780,7 +3504,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ac835af85fa84c53e85ea297ec35b24b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac835af85fa84c53e85ea297ec35b24b7">&#9670;&nbsp;</a></span>Test() <span class="overload">[22/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac835af85fa84c53e85ea297ec35b24b7">&#9670;&nbsp;</a></span>Test() <span class="overload">[22/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2807,8 +3531,36 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="aae6782580b87809e42ca215699a1315b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae6782580b87809e42ca215699a1315b">&#9670;&nbsp;</a></span>Test() <span class="overload">[23/30]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Test </td>
+          <td>(</td>
+          <td class="paramtype">core&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_server&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a56f9b001fa17a6ee6e7c2c79969b7dcd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56f9b001fa17a6ee6e7c2c79969b7dcd">&#9670;&nbsp;</a></span>Test() <span class="overload">[23/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a56f9b001fa17a6ee6e7c2c79969b7dcd">&#9670;&nbsp;</a></span>Test() <span class="overload">[24/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2836,7 +3588,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ab488f465c7acbd73c065a2fad9f4ac75"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab488f465c7acbd73c065a2fad9f4ac75">&#9670;&nbsp;</a></span>Test() <span class="overload">[24/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab488f465c7acbd73c065a2fad9f4ac75">&#9670;&nbsp;</a></span>Test() <span class="overload">[25/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2864,7 +3616,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a7a24f59d085df4f4a817c57290ee25ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a24f59d085df4f4a817c57290ee25ae">&#9670;&nbsp;</a></span>Test() <span class="overload">[25/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a24f59d085df4f4a817c57290ee25ae">&#9670;&nbsp;</a></span>Test() <span class="overload">[26/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2892,7 +3644,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a46b8bb045de5485c8335dcf1d01d7cdc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46b8bb045de5485c8335dcf1d01d7cdc">&#9670;&nbsp;</a></span>Test() <span class="overload">[26/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a46b8bb045de5485c8335dcf1d01d7cdc">&#9670;&nbsp;</a></span>Test() <span class="overload">[27/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2920,7 +3672,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a1e98ca120eb73b00d86c92bcabdde1b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e98ca120eb73b00d86c92bcabdde1b4">&#9670;&nbsp;</a></span>Test() <span class="overload">[27/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e98ca120eb73b00d86c92bcabdde1b4">&#9670;&nbsp;</a></span>Test() <span class="overload">[28/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2948,7 +3700,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="aeefe898f096dbcb3a610d68255c29b3c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeefe898f096dbcb3a610d68255c29b3c">&#9670;&nbsp;</a></span>Test() <span class="overload">[28/28]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aeefe898f096dbcb3a610d68255c29b3c">&#9670;&nbsp;</a></span>Test() <span class="overload">[29/30]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2975,8 +3727,36 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a2677e4e180109c332e304140a1b7ff65"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2677e4e180109c332e304140a1b7ff65">&#9670;&nbsp;</a></span>TestFixedArr_build()</h2>
+<a id="a24f7e3149c9290f3023042f914bce2f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24f7e3149c9290f3023042f914bce2f0">&#9670;&nbsp;</a></span>Test() <span class="overload">[30/30]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Test </td>
+          <td>(</td>
+          <td class="paramtype">core&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_where&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a29ee19eda7e8d796adb26be8e136988c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29ee19eda7e8d796adb26be8e136988c">&#9670;&nbsp;</a></span>TestFixedArr_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2984,7 +3764,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void TestFixedArr_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config_in</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3062,8 +3842,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ad8292bcf18924f7963e4aecf28882c3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8292bcf18924f7963e4aecf28882c3e">&#9670;&nbsp;</a></span>TestMove_build()</h2>
+<a id="abdbc64e48ce284c8f2f2abb36a7d4336"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abdbc64e48ce284c8f2f2abb36a7d4336">&#9670;&nbsp;</a></span>TestMove_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3071,7 +3851,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void TestMove_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config_in</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3148,8 +3928,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="aaa796ed08fe627097ab22d6b47179610"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaa796ed08fe627097ab22d6b47179610">&#9670;&nbsp;</a></span>TestOver_build()</h2>
+<a id="ac914d65b8b4a9bbfa76276eb8c5c199d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac914d65b8b4a9bbfa76276eb8c5c199d">&#9670;&nbsp;</a></span>TestOver_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3157,7 +3937,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void TestOver_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config_in</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3166,8 +3946,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="abbff3318d3bb3fdac13c4c970df37e99"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abbff3318d3bb3fdac13c4c970df37e99">&#9670;&nbsp;</a></span>TestServer_build()</h2>
+<a id="a48a0c009e1449cac5a3668c6cbf94ae0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48a0c009e1449cac5a3668c6cbf94ae0">&#9670;&nbsp;</a></span>TestServer_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3175,7 +3955,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void TestServer_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config_in</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3219,8 +3999,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a1fe8cd6ae37a042a2d9c2f351489b8d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1fe8cd6ae37a042a2d9c2f351489b8d4">&#9670;&nbsp;</a></span>TestType_build()</h2>
+<a id="a1cb1853a382d81b96b0af839e158e831"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cb1853a382d81b96b0af839e158e831">&#9670;&nbsp;</a></span>TestType_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3228,7 +4008,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname">void TestType_build </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>config_void</em></td><td>)</td>
           <td></td>
         </tr>
@@ -3352,7 +4132,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ae9bbc86dfd1c12129fb5984a3549b41a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9bbc86dfd1c12129fb5984a3549b41a">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[1/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9bbc86dfd1c12129fb5984a3549b41a">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[1/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3370,7 +4150,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="affc05f54ef7ab380eeb6218e9b1f4c81"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#affc05f54ef7ab380eeb6218e9b1f4c81">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[2/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#affc05f54ef7ab380eeb6218e9b1f4c81">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[2/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3388,7 +4168,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a2259b80ade30db20f9e4c183669a572c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2259b80ade30db20f9e4c183669a572c">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[3/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2259b80ade30db20f9e4c183669a572c">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[3/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3406,7 +4186,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ab08506d1b2e92bbd6aec53f348193842"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab08506d1b2e92bbd6aec53f348193842">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[4/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab08506d1b2e92bbd6aec53f348193842">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[4/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3424,7 +4204,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="aa1719c2f894336bb11363681a747f5fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa1719c2f894336bb11363681a747f5fb">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[5/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1719c2f894336bb11363681a747f5fb">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[5/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3442,7 +4222,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a754ee318c6fcd6d1fb0c7428732868e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a754ee318c6fcd6d1fb0c7428732868e0">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[6/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a754ee318c6fcd6d1fb0c7428732868e0">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[6/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3460,7 +4240,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a12d9dc18f13602b55872e2567e757a27"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12d9dc18f13602b55872e2567e757a27">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[7/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a12d9dc18f13602b55872e2567e757a27">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[7/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3478,7 +4258,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a5c17e9baca8726e67ec8e8f98bd0e4ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5c17e9baca8726e67ec8e8f98bd0e4ee">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[8/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c17e9baca8726e67ec8e8f98bd0e4ee">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[8/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3496,7 +4276,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a0e039878bc8462abdd0eff9459617bf1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e039878bc8462abdd0eff9459617bf1">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[9/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0e039878bc8462abdd0eff9459617bf1">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[9/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3514,7 +4294,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="aae7cf7a44ac11d51fcfe3b54cd6ba219"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae7cf7a44ac11d51fcfe3b54cd6ba219">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[10/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aae7cf7a44ac11d51fcfe3b54cd6ba219">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[10/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3532,7 +4312,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ad8abd47cdff4a3a21acc689618467cdf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8abd47cdff4a3a21acc689618467cdf">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[11/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad8abd47cdff4a3a21acc689618467cdf">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[11/12]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3549,8 +4329,26 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ad44ee62305d9e820e77032e63b13de06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad44ee62305d9e820e77032e63b13de06">&#9670;&nbsp;</a></span>Type() <span class="overload">[1/11]</span></h2>
+<a id="a1572b399a3cc4567a720d2c247c3fe8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1572b399a3cc4567a720d2c247c3fe8d">&#9670;&nbsp;</a></span>TraitImpl() <span class="overload">[12/12]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TraitImpl </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="core_2test_8c.html#a0be43bfd829e4cf8d111b0b3894e870a">XTypeApi</a>&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac57456b07667a0ea3101936a971fc902"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac57456b07667a0ea3101936a971fc902">&#9670;&nbsp;</a></span>Type() <span class="overload">[1/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3570,7 +4368,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#aeab4ea1b1f9303b6be47b4bc0bfbc66c">Obj</a>(InnerType, holder)&#160;</td>
+          <td class="paramtype"><a class="el" href="type_8h.html#a51c74b980e29efc9363ed186928ec7f9">Object</a>(InnerType, holder)&#160;</td>
           <td class="paramname">&#160;</td>
         </tr>
         <tr>
@@ -3583,8 +4381,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a476143355edef025aed5148d4edecc9b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a476143355edef025aed5148d4edecc9b">&#9670;&nbsp;</a></span>Type() <span class="overload">[2/11]</span></h2>
+<a id="a88fa26f1bdff55bd8dd927377d6cbd1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88fa26f1bdff55bd8dd927377d6cbd1b">&#9670;&nbsp;</a></span>Type() <span class="overload">[2/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3610,7 +4408,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="structObject.html">Object</a>, z)&#160;</td>
+          <td class="paramtype"><a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="structObj.html">Obj</a>, z)&#160;</td>
           <td class="paramname">&#160;</td>
         </tr>
         <tr>
@@ -3624,7 +4422,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a7054592dfc8df3608914d000349b1ace"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7054592dfc8df3608914d000349b1ace">&#9670;&nbsp;</a></span>Type() <span class="overload">[3/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a7054592dfc8df3608914d000349b1ace">&#9670;&nbsp;</a></span>Type() <span class="overload">[3/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3651,8 +4449,62 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a4e4168d3581471992451059f23d32b23"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4e4168d3581471992451059f23d32b23">&#9670;&nbsp;</a></span>Type() <span class="overload">[4/11]</span></h2>
+<a id="aaab81a0fdd132a55e8030bd82f851195"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaab81a0fdd132a55e8030bd82f851195">&#9670;&nbsp;</a></span>Type() <span class="overload">[4/16]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Type </td>
+          <td>(</td>
+          <td class="paramtype">MyObject&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa75c3888cc308e2ffe332e2baa8c3c78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa75c3888cc308e2ffe332e2baa8c3c78">&#9670;&nbsp;</a></span>Type() <span class="overload">[5/16]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Type </td>
+          <td>(</td>
+          <td class="paramtype">MyObjectBuildDrop&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a32a27e4ec4bb20b6c92693b52c78380a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32a27e4ec4bb20b6c92693b52c78380a">&#9670;&nbsp;</a></span>Type() <span class="overload">[6/16]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Type </td>
+          <td>(</td>
+          <td class="paramtype">NoDrop&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a05c53f1d2eda66d0a48e8111f92dc7bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05c53f1d2eda66d0a48e8111f92dc7bc">&#9670;&nbsp;</a></span>Type() <span class="overload">[7/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3684,7 +4536,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#aeab4ea1b1f9303b6be47b4bc0bfbc66c">Obj</a>(ServerComponent, sc)&#160;</td>
+          <td class="paramtype"><a class="el" href="type_8h.html#a51c74b980e29efc9363ed186928ec7f9">Object</a>(ServerComponent, sc)&#160;</td>
           <td class="paramname">&#160;</td>
         </tr>
         <tr>
@@ -3698,7 +4550,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a338fb8217648b87a7aba6c09243b0df7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a338fb8217648b87a7aba6c09243b0df7">&#9670;&nbsp;</a></span>Type() <span class="overload">[5/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a338fb8217648b87a7aba6c09243b0df7">&#9670;&nbsp;</a></span>Type() <span class="overload">[8/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3732,7 +4584,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="af02223ac1837759b0a7c10c9e9b8769b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af02223ac1837759b0a7c10c9e9b8769b">&#9670;&nbsp;</a></span>Type() <span class="overload">[6/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af02223ac1837759b0a7c10c9e9b8769b">&#9670;&nbsp;</a></span>Type() <span class="overload">[9/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3760,7 +4612,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ae01c06e9aa41d3d8f51381d7d63fd55d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae01c06e9aa41d3d8f51381d7d63fd55d">&#9670;&nbsp;</a></span>Type() <span class="overload">[7/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae01c06e9aa41d3d8f51381d7d63fd55d">&#9670;&nbsp;</a></span>Type() <span class="overload">[10/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3806,7 +4658,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a3dc51b342cebd1f580fb7d1b99934715"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3dc51b342cebd1f580fb7d1b99934715">&#9670;&nbsp;</a></span>Type() <span class="overload">[8/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a3dc51b342cebd1f580fb7d1b99934715">&#9670;&nbsp;</a></span>Type() <span class="overload">[11/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3840,7 +4692,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ad1e6594e3a073592a00b5644509cd1b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1e6594e3a073592a00b5644509cd1b3">&#9670;&nbsp;</a></span>Type() <span class="overload">[9/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1e6594e3a073592a00b5644509cd1b3">&#9670;&nbsp;</a></span>Type() <span class="overload">[12/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3868,7 +4720,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a24ce9fe62275d4d5d093fe9ff491024e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24ce9fe62275d4d5d093fe9ff491024e">&#9670;&nbsp;</a></span>Type() <span class="overload">[10/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a24ce9fe62275d4d5d093fe9ff491024e">&#9670;&nbsp;</a></span>Type() <span class="overload">[13/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3908,7 +4760,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a31ef9319b90a086d2c71f769ce88d6af"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a31ef9319b90a086d2c71f769ce88d6af">&#9670;&nbsp;</a></span>Type() <span class="overload">[11/11]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a31ef9319b90a086d2c71f769ce88d6af">&#9670;&nbsp;</a></span>Type() <span class="overload">[14/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3941,22 +4793,52 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a6c8160c6b0f998199aba0520f70efcc9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6c8160c6b0f998199aba0520f70efcc9">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[1/11]</span></h2>
+<a id="a9904f575bf1f3dc0b6203b3ee7b4ac53"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9904f575bf1f3dc0b6203b3ee7b4ac53">&#9670;&nbsp;</a></span>Type() <span class="overload">[15/16]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">TypeDef </td>
+          <td class="memname">Type </td>
           <td>(</td>
-          <td class="paramtype">AdvComp&#160;</td>
+          <td class="paramtype">WithDrop&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab2718e795d406dc9813d7f7f98b1c2a9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2718e795d406dc9813d7f7f98b1c2a9">&#9670;&nbsp;</a></span>Type() <span class="overload">[16/16]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Type </td>
+          <td>(</td>
+          <td class="paramtype">XType&#160;</td>
           <td class="paramname">, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x_in)&#160;</td>
+          <td class="paramtype"><a class="el" href="type_8h.html#aca46eaa8fa5416dd46b1e7643da2614a">Where</a>(T, <a class="el" href="type_8h.html#a5f095f7ee3ef284ef145992d4b5a7479">TraitBound</a>(<a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>), <a class="el" href="type_8h.html#a5f095f7ee3ef284ef145992d4b5a7479">TraitBound</a>(<a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>))&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#a186af0dcfce5f80cf526e746d9ea00d6">Generic</a>(T, wd)&#160;</td>
           <td class="paramname">&#160;</td>
         </tr>
         <tr>
@@ -3969,340 +4851,53 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a9e01250c7c84d1ed0689f10ec6d2e233"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e01250c7c84d1ed0689f10ec6d2e233">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[2/11]</span></h2>
+<a id="aa4c6c3c3f80989c6432bc00ef233c6d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4c6c3c3f80989c6432bc00ef233c6d2">&#9670;&nbsp;</a></span>WithDrop_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">TypeDef </td>
+          <td class="memname">void WithDrop_build </td>
           <td>(</td>
-          <td class="paramtype">CompositeTest&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x)&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a398885754203353abc629c7d1368d2f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a398885754203353abc629c7d1368d2f7">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[3/11]</span></h2>
+<a id="a73a4171c48620d143b5f36c3bef828b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73a4171c48620d143b5f36c3bef828b9">&#9670;&nbsp;</a></span>WithDrop_drop()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">TypeDef </td>
+          <td class="memname">void WithDrop_drop </td>
           <td>(</td>
-          <td class="paramtype">InnerType&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a94e8a7436f95f1f7f5dc2ee64fc8e7f4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94e8a7436f95f1f7f5dc2ee64fc8e7f4">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[4/11]</span></h2>
+<a id="a12ee8476da02898b06c45781f4884acb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12ee8476da02898b06c45781f4884acb">&#9670;&nbsp;</a></span>XType_set_wd_value()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">TypeDef </td>
+          <td class="memname">void XType_set_wd_value </td>
           <td>(</td>
-          <td class="paramtype">Server&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype"><a class="el" href="structObj.html">Obj</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, threads)&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port)&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, host)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ab899f831444bdf437646089f4e689277"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab899f831444bdf437646089f4e689277">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[5/11]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TypeDef </td>
-          <td>(</td>
-          <td class="paramtype">ServerComponent&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a60e10f0dc2748cc9d992a2dbf03ca94d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60e10f0dc2748cc9d992a2dbf03ca94d">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[6/11]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TypeDef </td>
-          <td>(</td>
-          <td class="paramtype">SuperImpl&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a0090861159a401c83beb25d003940104"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0090861159a401c83beb25d003940104">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[7/11]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TypeDef </td>
-          <td>(</td>
-          <td class="paramtype">TestFixedArr&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, buf)&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, p1)&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, p2)&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, p3)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a05d6485423a78811b9ec15b450d7e056"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a05d6485423a78811b9ec15b450d7e056">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[8/11]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TypeDef </td>
-          <td>(</td>
-          <td class="paramtype">TestMove&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, s)&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, len)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afc5bf871e6308a58deeac38b7d7b5276"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc5bf871e6308a58deeac38b7d7b5276">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[9/11]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TypeDef </td>
-          <td>(</td>
-          <td class="paramtype">TestOver&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, value)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a0ea25f4b25f4164eb0a1d76a15becac3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0ea25f4b25f4164eb0a1d76a15becac3">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[10/11]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TypeDef </td>
-          <td>(</td>
-          <td class="paramtype">TestServer&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port)&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(char *, host)&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, threads)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="af2cdf659e9a1396f4991b7319f39002d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af2cdf659e9a1396f4991b7319f39002d">&#9670;&nbsp;</a></span>TypeDef() <span class="overload">[11/11]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TypeDef </td>
-          <td>(</td>
-          <td class="paramtype">TestType&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, x_in)&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, y_in)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

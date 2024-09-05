@@ -2718,7 +2718,7 @@
         -:    0:Source:chain_allocator.c
         -:    0:Graph:chain_allocator.gcno
         -:    0:Data:chain_allocator.gcda
-        -:    0:Runs:30
+        -:    0:Runs:32
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2817,9 +2817,9 @@
         2:   96:}
         -:   97:
         -:   98:// build the using the default heap allocator config
-       20:   99:int build_default_heap_allocator(HeapAllocator* ptr)
+       22:   99:int build_default_heap_allocator(HeapAllocator* ptr)
         -:  100:{
-       20:  101:	return heap_allocator_build_arr(ptr, &__default_hconfig_,
+       22:  101:	return heap_allocator_build_arr(ptr, &__default_hconfig_,
         -:  102:					__default_hdpc_arr_,
         -:  103:					__default_hdpc_arr_size);
         -:  104:}
@@ -2906,44 +2906,44 @@
        10:  185:	return ret;
         -:  186:}
         -:  187:
-       40:  188:int chain_malloc(FatPtr* ptr, u64 size)
+       47:  188:int chain_malloc(FatPtr* ptr, u64 size)
         -:  189:{
-       40:  190:	if (__thread_local_chain_allocator_index == 0)
+       47:  190:	if (__thread_local_chain_allocator_index == 0)
         -:  191:	{
         -:  192:		// thread local allocator has not been initialized. Create it
         -:  193:		// now.
-       16:  194:		HeapAllocator* ha = malloc(sizeof(HeapAllocator));
-       16:  195:		if (!ha)
+       18:  194:		HeapAllocator* ha = malloc(sizeof(HeapAllocator));
+       18:  195:		if (!ha)
     #####:  196:			return -1;
         -:  197:
-       16:  198:		if (build_default_heap_allocator(ha))
+       18:  198:		if (build_default_heap_allocator(ha))
         -:  199:		{
     #####:  200:			free(ha);
     #####:  201:			return -1;
         -:  202:		};
         -:  203:
-       16:  204:		__default_tl_heap_allocator = ha;
-       16:  205:		__thread_local_chain_allocator[0].ha = ha;
-       16:  206:		__thread_local_chain_allocator[0].is_sync = false;
-       16:  207:		__thread_local_chain_allocator_index++;
+       18:  204:		__default_tl_heap_allocator = ha;
+       18:  205:		__thread_local_chain_allocator[0].ha = ha;
+       18:  206:		__thread_local_chain_allocator[0].is_sync = false;
+       18:  207:		__thread_local_chain_allocator_index++;
         -:  208:	}
-       40:  209:	if (size == 0)
-    #####:  210:		return -1;
+       47:  209:	if (size == 0)
+        4:  210:		return -1;
         -:  211:
-       40:  212:	u64 index = __thread_local_chain_allocator_index - 1;
-       40:  213:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+       43:  212:	u64 index = __thread_local_chain_allocator_index - 1;
+       43:  213:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  214:
         -:  215:	int ret;
         -:  216:	{
-       40:  217:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-       40:  218:		if (is_sync)
+       43:  217:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+       43:  218:		if (is_sync)
         5:  219:			lg = lock(__thread_local_chain_allocator[index].lock);
         -:  220:
-       40:  221:		ret = heap_allocator_allocate(
+       43:  221:		ret = heap_allocator_allocate(
         -:  222:		    __thread_local_chain_allocator[index].ha, size, ptr);
         -:  223:	}
         -:  224:
-       40:  225:	return ret;
+       43:  225:	return ret;
         -:  226:}
         1:  227:int chain_realloc(FatPtr* dst, FatPtr* src, u64 size)
         -:  228:{
@@ -2979,31 +2979,31 @@
         -:  258:
         1:  259:	return ret;
         -:  260:}
-       40:  261:int chain_free(FatPtr* ptr)
+       43:  261:int chain_free(FatPtr* ptr)
         -:  262:{
-       40:  263:	if (__thread_local_chain_allocator_index == 0)
+       43:  263:	if (__thread_local_chain_allocator_index == 0)
         -:  264:	{
     #####:  265:		errno = ERANGE;
     #####:  266:		return -1;
         -:  267:	}
-       40:  268:	u64 index = __thread_local_chain_allocator_index - 1;
-       40:  269:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+       43:  268:	u64 index = __thread_local_chain_allocator_index - 1;
+       43:  269:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  270:
         -:  271:	int ret;
         -:  272:	{
-       40:  273:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-       40:  274:		if (is_sync)
+       43:  273:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+       43:  274:		if (is_sync)
         4:  275:			lg = lock(__thread_local_chain_allocator[index].lock);
         -:  276:
-       40:  277:		ret = heap_allocator_free(
+       43:  277:		ret = heap_allocator_free(
         -:  278:		    __thread_local_chain_allocator[index].ha, ptr);
         -:  279:	}
-       40:  280:	return ret;
+       43:  280:	return ret;
         -:  281:}
         -:    0:Source:heap.c
         -:    0:Graph:heap.gcno
         -:    0:Data:heap.gcda
-        -:    0:Runs:30
+        -:    0:Runs:32
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3062,12 +3062,12 @@
         -:   56:bool __debug_build_allocator_malloc_fail7 = false;
         -:   57:bool __debug_build_allocator_malloc_fail8 = false;
         -:   58:
-      253:   59:void* do_malloc(size_t size)
+      266:   59:void* do_malloc(size_t size)
         -:   60:{
-      253:   61:	__malloc_count += 1;
-      253:   62:	void* ret = malloc(size);
+      266:   61:	__malloc_count += 1;
+      266:   62:	void* ret = malloc(size);
         -:   63:	// printf("malloc %zu [%p (%llu)]\n", size, ret, __malloc_count);
-      253:   64:	return ret;
+      266:   64:	return ret;
         -:   65:}
         -:   66:
       143:   67:void do_free(void* ptr)
@@ -3084,30 +3084,30 @@
        21:   78:	return ret;
         -:   79:}
         -:   80:
-       32:   81:void* fat_ptr_data(const FatPtr* ptr) { return ptr->data; }
+       39:   81:void* fat_ptr_data(const FatPtr* ptr) { return ptr->data; }
         -:   82:
        13:   83:u64 fat_ptr_len(const FatPtr* ptr) { return ptr->len; }
         -:   84:
         5:   85:u64 fat_ptr_id(const FatPtr* ptr) { return ptr->id; }
         -:   86:
-       60:   87:int heap_allocator_init_free_list(HeapData* hd, u64 index, u32 slabs,
+       63:   87:int heap_allocator_init_free_list(HeapData* hd, u64 index, u32 slabs,
         -:   88:				  bool last_is_uint_max)
         -:   89:{
-       60:   90:	hd->data[index] = NULL; // set to NULL for cleanup consistency
+       63:   90:	hd->data[index] = NULL; // set to NULL for cleanup consistency
         -:   91:
         -:   92:	// allocate memory for slabs
-       60:   93:	if (!__debug_build_allocator_malloc_fail4)
-       58:   94:		hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
-       60:   95:	if (hd->data[index] == NULL)
+       63:   93:	if (!__debug_build_allocator_malloc_fail4)
+       61:   94:		hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
+       63:   95:	if (hd->data[index] == NULL)
         2:   96:		return -1;
         -:   97:
-       58:   98:	void* tmp = NULL;
+       61:   98:	void* tmp = NULL;
         -:   99:
         -:  100:	// allocate / or reallocate the freelist
-       58:  101:	if (!__debug_build_allocator_malloc_fail5)
+       61:  101:	if (!__debug_build_allocator_malloc_fail5)
         -:  102:	{
-       56:  103:		if (index == 0)
-       46:  104:			tmp = do_malloc(sizeof(u32) * slabs);
+       59:  103:		if (index == 0)
+       49:  104:			tmp = do_malloc(sizeof(u32) * slabs);
         -:  105:		else
         -:  106:		{
        10:  107:			tmp = do_realloc(hd->free_list,
@@ -3115,59 +3115,59 @@
         -:  109:		}
         -:  110:	}
         -:  111:
-       58:  112:	if (!tmp)
+       61:  112:	if (!tmp)
         -:  113:	{
         2:  114:		do_free(hd->data[index]);
         2:  115:		return -1;
         -:  116:	}
         -:  117:
-       56:  118:	hd->free_list = tmp;
+       59:  118:	hd->free_list = tmp;
         -:  119:
         -:  120:	// initialize the values of the free list.
-       56:  121:	u32 offset = index * hd->hdp.config.slabs_per_resize;
-      744:  122:	for (u64 i = 0; i < slabs; i++)
+       59:  121:	u32 offset = index * hd->hdp.config.slabs_per_resize;
+      777:  122:	for (u64 i = 0; i < slabs; i++)
         -:  123:	{
-      688:  124:		if ((i == (slabs - 1)) && last_is_uint_max)
-       55:  125:			hd->free_list[i + offset] = UINT32_MAX;
+      718:  124:		if ((i == (slabs - 1)) && last_is_uint_max)
+       58:  125:			hd->free_list[i + offset] = UINT32_MAX;
         -:  126:		else
-      633:  127:			hd->free_list[i + offset] = offset + i + 1;
+      660:  127:			hd->free_list[i + offset] = offset + i + 1;
         -:  128:	}
         -:  129:
-       56:  130:	return 0;
+       59:  130:	return 0;
         -:  131:}
         -:  132:
         -:  133:// compare function used for sorting.
-     1815:  134:int heap_data_compare(const void* p1, const void* p2)
+     2015:  134:int heap_data_compare(const void* p1, const void* p2)
         -:  135:{
-     1815:  136:	int ret = 0;
+     2015:  136:	int ret = 0;
         -:  137:
-     1815:  138:	HeapData d1 = *(HeapData*)p1;
-     1815:  139:	HeapData d2 = *(HeapData*)p2;
+     2015:  138:	HeapData d1 = *(HeapData*)p1;
+     2015:  139:	HeapData d2 = *(HeapData*)p2;
         -:  140:
-     1815:  141:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
+     2015:  141:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
         1:  142:		ret = 1;
-     1814:  143:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
-     1813:  144:		ret = -1;
+     2014:  143:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
+     2013:  144:		ret = -1;
         -:  145:
-     1815:  146:	return ret;
+     2015:  146:	return ret;
         -:  147:}
         -:  148:
         -:  149:// initialize the heap data params
-      755:  150:int heap_allocator_init_hdp(HeapAllocator* ptr, HeapDataParamsConfig* hdp,
+      835:  150:int heap_allocator_init_hdp(HeapAllocator* ptr, HeapDataParamsConfig* hdp,
         -:  151:			    u64 index)
         -:  152:{
         -:  153:
         -:  154:	// set some value in case of a failure below such that cleanup can
         -:  155:	// succeed
-      755:  156:	int ret = 0;
-      755:  157:	ptr->impl->hd_arr[index].hdp.config = *hdp;
-      755:  158:	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
-      755:  159:	ptr->impl->hd_arr[index].cur_slabs = 0;
-      755:  160:	ptr->impl->hd_arr[index].count =
-      755:  161:	    ptr->impl->hd_arr[index].hdp.config.initial_chunks;
+      835:  156:	int ret = 0;
+      835:  157:	ptr->impl->hd_arr[index].hdp.config = *hdp;
+      835:  158:	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
+      835:  159:	ptr->impl->hd_arr[index].cur_slabs = 0;
+      835:  160:	ptr->impl->hd_arr[index].count =
+      835:  161:	    ptr->impl->hd_arr[index].hdp.config.initial_chunks;
         -:  162:
         -:  163:	// if we have initial chunks, initialize them
-      755:  164:	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks)
+      835:  164:	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks)
         -:  165:	{
        23:  166:		ptr->impl->hd_arr[index].data = NULL;
         -:  167:
@@ -3203,51 +3203,51 @@
         -:  197:		}
         -:  198:	}
         -:  199:	else
-      732:  200:		ptr->impl->hd_arr[index].data = NULL;
-      754:  201:	return ret;
+      812:  200:		ptr->impl->hd_arr[index].data = NULL;
+      834:  201:	return ret;
         -:  202:}
         -:  203:
-       46:  204:int heap_allocator_build_arr(HeapAllocator* ptr, HeapAllocatorConfig* config,
+       48:  204:int heap_allocator_build_arr(HeapAllocator* ptr, HeapAllocatorConfig* config,
         -:  205:			     HeapDataParamsConfig arr[],
         -:  206:			     u64 heap_data_params_count)
         -:  207:{
         -:  208:	// check inputs
-       46:  209:	if (ptr == NULL || config == NULL || heap_data_params_count >= 256)
+       48:  209:	if (ptr == NULL || config == NULL || heap_data_params_count >= 256)
         -:  210:	{
         1:  211:		errno = EINVAL;
         1:  212:		return -1;
         -:  213:	}
         -:  214:
         -:  215:	// allocate the HeapAllocatorImpl
-       45:  216:	if (!__debug_build_allocator_malloc_fail1)
-       44:  217:		ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
-       45:  218:	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
+       47:  216:	if (!__debug_build_allocator_malloc_fail1)
+       46:  217:		ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
+       47:  218:	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
         1:  219:		return -1;
         -:  220:
-       44:  221:	ptr->impl->hd_size = 0;
+       46:  221:	ptr->impl->hd_size = 0;
         -:  222:
         -:  223:	// copy the config
-       44:  224:	ptr->impl->config = *config;
+       46:  224:	ptr->impl->config = *config;
         -:  225:
         -:  226:	// allocate heap data array
-       44:  227:	ptr->impl->hd_arr = NULL;
-       44:  228:	if (!__debug_build_allocator_malloc_fail2)
-       43:  229:		ptr->impl->hd_arr =
-       43:  230:		    do_malloc(sizeof(HeapData) * heap_data_params_count);
-       44:  231:	if (ptr->impl->hd_arr == NULL || __debug_build_allocator_malloc_fail2)
+       46:  227:	ptr->impl->hd_arr = NULL;
+       46:  228:	if (!__debug_build_allocator_malloc_fail2)
+       45:  229:		ptr->impl->hd_arr =
+       45:  230:		    do_malloc(sizeof(HeapData) * heap_data_params_count);
+       46:  231:	if (ptr->impl->hd_arr == NULL || __debug_build_allocator_malloc_fail2)
         -:  232:	{
         1:  233:		heap_allocator_cleanup(ptr);
         1:  234:		return -1;
         -:  235:	}
-       43:  236:	ptr->impl->hd_size = heap_data_params_count;
+       45:  236:	ptr->impl->hd_size = heap_data_params_count;
         -:  237:
         -:  238:	// iterate through specified heap data params
-      795:  239:	for (u64 i = 0; i < heap_data_params_count; i++)
+      877:  239:	for (u64 i = 0; i < heap_data_params_count; i++)
         -:  240:	{
-      756:  241:		HeapDataParamsConfig hdp = arr[i];
-      756:  242:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
-      756:  243:		ptr->impl->hd_arr[i].data = NULL;
-      756:  244:		if ((__debug_build_allocator_malloc_fail3 && i > 0) || heap_allocator_init_hdp(ptr, &hdp, i))
+      836:  241:		HeapDataParamsConfig hdp = arr[i];
+      836:  242:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
+      836:  243:		ptr->impl->hd_arr[i].data = NULL;
+      836:  244:		if ((__debug_build_allocator_malloc_fail3 && i > 0) || heap_allocator_init_hdp(ptr, &hdp, i))
         -:  245:		{
         4:  246:			ptr->impl->hd_size = i; // update for cleanup, others
         -:  247:						// did not get allocated
@@ -3260,17 +3260,17 @@
         -:  254:		}
         -:  255:	}
         -:  256:
-       39:  257:	if (heap_data_params_count)
+       41:  257:	if (heap_data_params_count)
         -:  258:	{
-       37:  259:		qsort(ptr->impl->hd_arr, heap_data_params_count,
+       39:  259:		qsort(ptr->impl->hd_arr, heap_data_params_count,
         -:  260:		      sizeof(HeapData), heap_data_compare);
         -:  261:	}
         -:  262:
         -:  263:	// check invalid configurations
-       39:  264:	u64 last_size = 0;
-      788:  265:	for (u64 i = 0; i < heap_data_params_count; i++)
+       41:  264:	u64 last_size = 0;
+      870:  265:	for (u64 i = 0; i < heap_data_params_count; i++)
         -:  266:	{
-      751:  267:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == 0)
+      831:  267:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == 0)
         -:  268:		{
         -:  269:			// no 0 sized slabs allowed
         1:  270:			errno = EINVAL;
@@ -3278,17 +3278,17 @@
         1:  272:			return -1;
         -:  273:		}
         -:  274:		// note: logic correct because array is sorted.
-      750:  275:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == last_size)
+      830:  275:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == last_size)
         -:  276:		{
         -:  277:			// Duplicate slab_size
         1:  278:			errno = EEXIST;
         1:  279:			heap_allocator_cleanup(ptr);
         1:  280:			return -1;
         -:  281:		}
-      749:  282:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
+      829:  282:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
         -:  283:	}
         -:  284:
-       37:  285:	return 0;
+       39:  285:	return 0;
         -:  286:}
         -:  287:
        26:  288:int heap_allocator_build(HeapAllocator* ptr, HeapAllocatorConfig* config,
@@ -3318,138 +3318,138 @@
         -:  312:}
         -:  313:
         -:  314:// binary search for the correct slab size
-      431:  315:int heap_allocator_index(HeapAllocator* ptr, u64 size)
+      434:  315:int heap_allocator_index(HeapAllocator* ptr, u64 size)
         -:  316:{
-      431:  317:	int ret = -1;
-      431:  318:	if (ptr->impl->hd_size == 0)
+      434:  317:	int ret = -1;
+      434:  318:	if (ptr->impl->hd_size == 0)
         2:  319:		return ret;
         -:  320:
-      429:  321:	int left = 0;
-      429:  322:	int right = ptr->impl->hd_size - 1;
+      432:  321:	int left = 0;
+      432:  322:	int right = ptr->impl->hd_size - 1;
         -:  323:
-      684:  324:	while (left <= right)
+      700:  324:	while (left <= right)
         -:  325:	{
-      623:  326:		int mid = left + (right - left) / 2;
-      623:  327:		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
-      623:  328:		if (slab_size == size)
+      638:  326:		int mid = left + (right - left) / 2;
+      638:  327:		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
+      638:  328:		if (slab_size == size)
         -:  329:		{
-      368:  330:			ret = mid;
-      368:  331:			break;
+      370:  330:			ret = mid;
+      370:  331:			break;
         -:  332:		}
-      255:  333:		else if (slab_size > size)
-      155:  334:			right = mid - 1;
+      268:  333:		else if (slab_size > size)
+      163:  334:			right = mid - 1;
         -:  335:		else
-      100:  336:			left = mid + 1;
+      105:  336:			left = mid + 1;
         -:  337:	}
         -:  338:
-      429:  339:	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1)
+      432:  339:	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1)
         -:  340:	{
-       49:  341:		return right + 1;
+       50:  341:		return right + 1;
         -:  342:	}
         -:  343:
-      380:  344:	return ret;
+      382:  344:	return ret;
         -:  345:}
         -:  346:
-       45:  347:int heap_data_resize(u64 index, HeapData* hd)
+       48:  347:int heap_data_resize(u64 index, HeapData* hd)
         -:  348:{
         -:  349:	// check that we can resize this hdp
-       45:  350:	if (hd->cur_slabs < hd->hdp.config.max_slabs)
+       48:  350:	if (hd->cur_slabs < hd->hdp.config.max_slabs)
         -:  351:	{
         -:  352:		// calculate the new slabs
-       38:  353:		u32 nslabs_count =
-       38:  354:		    hd->hdp.config.slabs_per_resize + hd->cur_slabs;
-       38:  355:		if (nslabs_count > hd->hdp.config.max_slabs)
+       41:  353:		u32 nslabs_count =
+       41:  354:		    hd->hdp.config.slabs_per_resize + hd->cur_slabs;
+       41:  355:		if (nslabs_count > hd->hdp.config.max_slabs)
         2:  356:			nslabs_count = hd->hdp.config.max_slabs;
         -:  357:
         -:  358:		// determine slabs to allocate
-       38:  359:		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
+       41:  359:		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
         -:  360:
         -:  361:		// attempt to allocate
-       38:  362:		void* tmp = NULL;
-       38:  363:		if (!__debug_build_allocator_malloc_fail7)
+       41:  362:		void* tmp = NULL;
+       41:  363:		if (!__debug_build_allocator_malloc_fail7)
         -:  364:		{
-       37:  365:			if (hd->data)
+       40:  365:			if (hd->data)
        11:  366:				tmp = do_realloc(hd->data, (hd->count + 1) * sizeof(void*));
         -:  367:			else
-       26:  368:				tmp = do_malloc((hd->count + 1) * sizeof(void**));
+       29:  368:				tmp = do_malloc((hd->count + 1) * sizeof(void**));
         -:  369:		}
         -:  370:
-       38:  371:		if (tmp == NULL)
+       41:  371:		if (tmp == NULL)
         1:  372:			return -1;
-       37:  373:		hd->data = tmp;
+       40:  373:		hd->data = tmp;
         -:  374:
         -:  375:		// initialize the new part of the free list
-       37:  376:		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc,
+       40:  376:		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc,
         -:  377:						  true))
         2:  378:			return -1;
-       35:  379:		hd->hdp.free_list_head = hd->cur_slabs;
-       35:  380:		hd->cur_slabs = nslabs_count;
-       35:  381:		hd->count += 1;
-       35:  382:		return 0;
+       38:  379:		hd->hdp.free_list_head = hd->cur_slabs;
+       38:  380:		hd->cur_slabs = nslabs_count;
+       38:  381:		hd->count += 1;
+       38:  382:		return 0;
         -:  383:	}
         7:  384:	return -1;
         -:  385:}
         -:  386:
-      426:  387:int heap_data_allocate(u64 index, HeapData* hd, FatPtr* fptr)
+      429:  387:int heap_data_allocate(u64 index, HeapData* hd, FatPtr* fptr)
         -:  388:{
-      426:  389:	if (hd->cur_slabs == 0)
+      429:  389:	if (hd->cur_slabs == 0)
         -:  390:	{
         -:  391:		// this hd initially had 0 slabs
         -:  392:		// resize it
-       27:  393:		if (heap_data_resize(index, hd))
+       30:  393:		if (heap_data_resize(index, hd))
         1:  394:			return -1;
         -:  395:	}
         -:  396:
         -:  397:	// no more slabs, return error
-      425:  398:	if (hd->hdp.free_list_head == UINT32_MAX)
+      428:  398:	if (hd->hdp.free_list_head == UINT32_MAX)
        17:  399:		return -1;
         -:  400:
         -:  401:	// get next free slab
-      408:  402:	u64 id = hd->hdp.free_list_head;
+      411:  402:	u64 id = hd->hdp.free_list_head;
         -:  403:
         -:  404:	// update free list head
-      408:  405:	hd->hdp.free_list_head = hd->free_list[id];
+      411:  405:	hd->hdp.free_list_head = hd->free_list[id];
         -:  406:
         -:  407:	// update with the specific index (differing slab sizes)
-      408:  408:	fptr->id = id | (index << 56);
-      408:  409:	fptr->len = hd->hdp.config.slab_size;
+      411:  408:	fptr->id = id | (index << 56);
+      411:  409:	fptr->len = hd->hdp.config.slab_size;
         -:  410:
-      408:  411:	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
-      408:  412:	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
+      411:  411:	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
+      411:  412:	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
         -:  413:
         -:  414:	// set the data of the fptr
-      408:  415:	fptr->data =
-      408:  416:	    hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
+      411:  415:	fptr->data =
+      411:  416:	    hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
         -:  417:
-      408:  418:	return 0;
+      411:  418:	return 0;
         -:  419:}
         -:  420:
         -:  421:// free data in this HeapData
-      157:  422:int heap_data_free(u64 index, HeapData* hd, FatPtr* fptr)
+      160:  422:int heap_data_free(u64 index, HeapData* hd, FatPtr* fptr)
         -:  423:{
-      157:  424:	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
+      160:  424:	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
         -:  425:
         -:  426:	// if this is invalid return an error
-      157:  427:	if (rel >= hd->cur_slabs)
+      160:  427:	if (rel >= hd->cur_slabs)
         1:  428:		return -1;
         -:  429:
         -:  430:	// update head and rest of the list
-      156:  431:	u64 head = hd->hdp.free_list_head;
-      156:  432:	hd->hdp.free_list_head = rel;
-      156:  433:	hd->free_list[rel] = head;
+      159:  431:	u64 head = hd->hdp.free_list_head;
+      159:  432:	hd->hdp.free_list_head = rel;
+      159:  433:	hd->free_list[rel] = head;
         -:  434:
-      156:  435:	return 0;
+      159:  435:	return 0;
         -:  436:}
         -:  437:
         -:  438:// main allocation function
-      431:  439:int heap_allocator_allocate(HeapAllocator* ptr, u64 size, FatPtr* fptr)
+      434:  439:int heap_allocator_allocate(HeapAllocator* ptr, u64 size, FatPtr* fptr)
         -:  440:{
-      431:  441:	int ret = -1;
+      434:  441:	int ret = -1;
         -:  442:	// determine the index via binary search
-      431:  443:	int index = heap_allocator_index(ptr, size);
+      434:  443:	int index = heap_allocator_index(ptr, size);
         -:  444:
         -:  445:	// if this index is not found (too big) fall back to malloc
-      431:  446:	if (index < 0)
+      434:  446:	if (index < 0)
         -:  447:	{
        14:  448:		if (!ptr->impl->config.no_malloc)
         -:  449:		{
@@ -3471,9 +3471,9 @@
         -:  465:	}
         -:  466:	else
         -:  467:	{
-      417:  468:		HeapData* hd = &ptr->impl->hd_arr[index];
-      417:  469:		ret = heap_data_allocate(index, hd, fptr);
-      417:  470:		if (ret)
+      420:  468:		HeapData* hd = &ptr->impl->hd_arr[index];
+      420:  469:		ret = heap_data_allocate(index, hd, fptr);
+      420:  470:		if (ret)
         -:  471:		{
         -:  472:			// there are no more slabs. Try to resize
        18:  473:			if (!heap_data_resize(index, hd))
@@ -3505,18 +3505,18 @@
         -:  499:	}
         -:  500:
         -:  501:	// if zeroed is configured set all memory of allocated slabs to 0.
-      431:  502:	if (!ret && ptr->impl->config.zeroed)
+      434:  502:	if (!ret && ptr->impl->config.zeroed)
         -:  503:	{
        44:  504:		memset(fptr->data, 0, fptr->len);
         -:  505:	}
         -:  506:
-      431:  507:	return ret;
+      434:  507:	return ret;
         -:  508:}
         -:  509:
-      172:  510:int heap_allocator_free(HeapAllocator* ptr, FatPtr* fptr)
+      175:  510:int heap_allocator_free(HeapAllocator* ptr, FatPtr* fptr)
         -:  511:{
-      172:  512:	int ret = 0;
-      172:  513:	if (fptr->id == UINT64_MAX)
+      175:  512:	int ret = 0;
+      175:  513:	if (fptr->id == UINT64_MAX)
         -:  514:	{
         -:  515:		// malloc allocated
         -:  516:
@@ -3531,26 +3531,26 @@
         -:  525:	else
         -:  526:	{
         -:  527:
-      158:  528:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
+      161:  528:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
         -:  529:
-      158:  530:		if (index >= ptr->impl->hd_size)
+      161:  530:		if (index >= ptr->impl->hd_size)
         -:  531:		{
         1:  532:			errno = EINVAL;
         1:  533:			ret = -1; // invalid index
         -:  534:		}
         -:  535:		else
         -:  536:		{
-      157:  537:			HeapData* hd = &ptr->impl->hd_arr[index];
-      157:  538:			ret = heap_data_free(index, hd, fptr);
+      160:  537:			HeapData* hd = &ptr->impl->hd_arr[index];
+      160:  538:			ret = heap_data_free(index, hd, fptr);
         -:  539:		}
         -:  540:	}
         -:  541:
-      172:  542:	if (!ret && ptr->impl->config.zeroed)
+      175:  542:	if (!ret && ptr->impl->config.zeroed)
         -:  543:	{
         1:  544:		memset(fptr->data, 0, fptr->len);
         -:  545:	}
         -:  546:
-      172:  547:	return ret;
+      175:  547:	return ret;
         -:  548:}
         -:  549:
        29:  550:int heap_allocator_cleanup(HeapAllocator* ptr)
@@ -3594,7 +3594,7 @@
         -:    0:Source:lock.c
         -:    0:Graph:lock.gcno
         -:    0:Data:lock.gcda
-        -:    0:Runs:30
+        -:    0:Runs:32
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3692,15 +3692,15 @@
        15:   95:	return ret;
         -:   96:}
         -:   97:
-       86:   98:void Lockguard_cleanup(LockGuardPtr* ptr)
+       92:   98:void Lockguard_cleanup(LockGuardPtr* ptr)
         -:   99:{
-       86:  100:	if (ptr && ptr->ref)
+       92:  100:	if (ptr && ptr->ref)
         -:  101:	{
        14:  102:		atomic_exchange(&ptr->ref->is_locked, false);
        14:  103:		pthread_mutex_unlock(&ptr->ref->lock);
        14:  104:		delete_active_lock(ptr->ref);
         -:  105:	}
-       86:  106:}
+       92:  106:}
         -:  107:
         3:  108:void Lock_mark_poisoned()
         -:  109:{
@@ -3756,7 +3756,7 @@
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
-        -:    0:Runs:30
+        -:    0:Runs:32
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3809,53 +3809,274 @@
         -:    0:Source:test_encapsulation.c
         -:    0:Graph:test_encapsulation.gcno
         -:    0:Data:test_encapsulation.gcda
-        -:    0:Runs:29
-        -:    1:#include <core/test_encapsulation.h>
-        -:    2:#include <core/type.h>
-        -:    3:
-       33:    4:Type(Hidden, Field(u64, value), Field(HiddenConfig, config));
+        -:    0:Runs:31
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <core/test_encapsulation.h>
+        -:   16:#include <core/traits.h>
+        -:   17:#include <core/type.h>
+        -:   18:
+       35:   19:Type(HiddenDrop);
+------------------
+__add_impls_HiddenDrop_vtable:
+       31:   19:Type(HiddenDrop);
+------------------
+HiddenDrop_drop_internal:
+        1:   19:Type(HiddenDrop);
+------------------
+HiddenDrop_build_internal:
+        1:   19:Type(HiddenDrop);
+------------------
+HiddenDrop_size:
+        2:   19:Type(HiddenDrop);
+------------------
+        -:   20:Builder(HiddenDrop);
+       62:   21:Impl(HiddenDrop, Drop);
+------------------
+vtable_add_trait_impl_HiddenDrop_Drop:
+       31:   21:Impl(HiddenDrop, Drop);
+------------------
+__required_add__HiddenDrop_drop:
+       31:   21:Impl(HiddenDrop, Drop);
+------------------
+        -:   22:
+        -:   23:#define IMPL HiddenDrop
+        1:   24:void HiddenDrop_drop() {}
+        -:   25:#undef IMPL
+        -:   26:
+      98*:   27:Type(
 ------------------
 __add_impls_Hidden_vtable:
-       29:    4:Type(Hidden, Field(u64, value), Field(HiddenConfig, config));
+       31:   27:Type(
 ------------------
 Hidden_drop_internal:
-        1:    4:Type(Hidden, Field(u64, value), Field(HiddenConfig, config));
+        1:   27:Type(
 ------------------
 Hidden_build_internal:
-        1:    4:Type(Hidden, Field(u64, value), Field(HiddenConfig, config));
+       2*:   27:Type(
+------------------
+__add_where_Hidden_T_vtable:
+       62:   27:Type(
 ------------------
 Hidden_size:
-        2:    4:Type(Hidden, Field(u64, value), Field(HiddenConfig, config));
+        2:   27:Type(
 ------------------
-        -:    5:
-        -:    6:#define IMPL Hidden
-        1:    7:void Hidden_build(HiddenConfig* config)
-        -:    8:{
-        1:    9:	printf("building hidden: capacity = %llu\n", config->capacity);
-        1:   10:	$Var(config) = *config;
-        1:   11:}
-        -:   12:
-        1:   13:void Hidden_drop()
-        -:   14:{
-        1:   15:	printf("drop value=%llu\n", $(value));
-        1:   16:}
-        1:   17:u64 Hidden_get_value()
-        -:   18:{
-        1:   19:	return $(value);
-        -:   20:}
-        1:   21:u64 Hidden_get_capacity_impl()
-        -:   22:{
-        1:   23:	return $(config).capacity;
-        -:   24:}
-        1:   25:void Hidden_set_value(u64 v)
-        -:   26:{
-        1:   27:	$Var(value) = v;
-        1:   28:}
-        -:   29:#undef IMPL
+        -:   28:    Hidden,
+        -:   29:    Where(T, TraitBound(Drop)),
+        -:   30:    Field(u64, value),
+        -:   31:    Field(HiddenConfig, config),
+        -:   32:    Generic(T, v2),
+        -:   33:    Object(HiddenDrop, dd));
+        -:   34:
+        -:   35:#define IMPL Hidden
+        1:   36:void Hidden_build(HiddenConfig* config)
+        -:   37:{
+        1:   38:	printf("building hidden: capacity = %llu\n", config->capacity);
+        1:   39:	$Var(config) = *config;
+        1:   40:	let hd = new (HiddenDrop);
+       2*:   41:	Move(&$Var(v2), &hd);
+        1:   42:}
+        -:   43:
+        1:   44:void Hidden_drop()
+        -:   45:{
+        1:   46:	printf("drop value=%llu\n", $(value));
+        1:   47:}
+        1:   48:u64 Hidden_get_value()
+        -:   49:{
+        1:   50:	return $(value);
+        -:   51:}
+        1:   52:u64 Hidden_get_capacity_impl()
+        -:   53:{
+        1:   54:	return $(config).capacity;
+        -:   55:}
+        1:   56:void Hidden_set_value(u64 v)
+        -:   57:{
+        1:   58:	$Var(value) = v;
+        1:   59:}
+        -:   60:#undef IMPL
+        -:    0:Source:test_server.c
+        -:    0:Graph:test_server.gcno
+        -:    0:Data:test_server.gcda
+        -:    0:Runs:31
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <core/test_server.h>
+        -:   16:
+       35:   17:Type(CanDrop);
+------------------
+__add_impls_CanDrop_vtable:
+       31:   17:Type(CanDrop);
+------------------
+CanDrop_drop_internal:
+        1:   17:Type(CanDrop);
+------------------
+CanDrop_build_internal:
+        1:   17:Type(CanDrop);
+------------------
+CanDrop_size:
+        2:   17:Type(CanDrop);
+------------------
+        -:   18:Builder(CanDrop);
+       62:   19:Impl(CanDrop, Drop);
+------------------
+vtable_add_trait_impl_CanDrop_Drop:
+       31:   19:Impl(CanDrop, Drop);
+------------------
+__required_add__CanDrop_drop:
+       31:   19:Impl(CanDrop, Drop);
+------------------
+        -:   20:
+        -:   21:#define IMPL CanDrop
+        1:   22:void CanDrop_drop() { printf("dropping can drop\n"); }
+        -:   23:#undef IMPL
+        -:   24:
+       35:   25:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
+------------------
+__add_impls_HttpServerComponent_vtable:
+       31:   25:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
+------------------
+HttpServerComponent_drop_internal:
+        1:   25:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
+------------------
+HttpServerComponent_build_internal:
+        1:   25:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
+------------------
+HttpServerComponent_size:
+        2:   25:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
+------------------
+        -:   26:Builder(HttpServerComponent, Config(u64, state));
+        -:   27:
+       62:   28:Impl(HttpServerComponent, Drop);
+------------------
+vtable_add_trait_impl_HttpServerComponent_Drop:
+       31:   28:Impl(HttpServerComponent, Drop);
+------------------
+__required_add__HttpServerComponent_drop:
+       31:   28:Impl(HttpServerComponent, Drop);
+------------------
+       62:   29:Impl(HttpServerComponent, Build);
+------------------
+vtable_add_trait_impl_HttpServerComponent_Build:
+       31:   29:Impl(HttpServerComponent, Build);
+------------------
+__required_add__HttpServerComponent_build:
+       31:   29:Impl(HttpServerComponent, Build);
+------------------
+        -:   30:
+        -:   31:#define IMPL HttpServerComponent
+        1:   32:void HttpServerComponent_drop()
+        -:   33:{
+        1:   34:	printf("dropping http server component. Free %p\n", $(alloc_mem));
+        1:   35:	free($(alloc_mem));
+        1:   36:}
+        1:   37:void HttpServerComponent_build(const void* config_in)
+        -:   38:{
+        1:   39:	const HttpServerComponentConfig* config = config_in;
+        1:   40:	$Var(state) = config->state;
+        1:   41:	$Var(alloc_mem) = malloc(100);
+        1:   42:	printf("building http server component. Alloc %p\n", $(alloc_mem));
+        1:   43:}
+        -:   44:#undef IMPL
+        -:   45:
+      98*:   46:Type(
+------------------
+__add_impls_HttpServer_vtable:
+       31:   46:Type(
+------------------
+HttpServer_drop_internal:
+        1:   46:Type(
+------------------
+HttpServer_build_internal:
+       2*:   46:Type(
+------------------
+__add_where_HttpServer_T_vtable:
+       62:   46:Type(
+------------------
+HttpServer_size:
+        2:   46:Type(
+------------------
+        -:   47:    HttpServer,
+        -:   48:    Where(T, TraitBound(Drop)),
+        -:   49:    Field(HttpServerConfig, config),
+        -:   50:    Field(bool, is_started),
+        -:   51:    Object(HttpServerComponent, hsc),
+        -:   52:    Generic(T, droppable));
+        -:   53:
+        -:   54:#define IMPL HttpServer
+        1:   55:void HttpServer_validate_input(const HttpServerConfig* config)
+        -:   56:{
+        1:   57:	if (config->threads == 0)
+    #####:   58:		panic("Threads must be greater than 0. Halting!");
+        1:   59:	if (config->port == 0)
+    #####:   60:		panic("Port 0 is reserved. Halting!");
+        1:   61:	if (config->host == NULL)
+    #####:   62:		panic("host must not be NULL. Halting!");
+        -:   63:
+        1:   64:	$Var(config) = *config;
+        1:   65:}
+        1:   66:void HttpServer_build(const void* config_in)
+        -:   67:{
+        1:   68:	const HttpServerConfig* config = config_in;
+        1:   69:	HttpServer_validate_input(config);
+        1:   70:	$Var(is_started) = false;
+        2:   71:	let can_drop = new (CanDrop);
+       2*:   72:	Move(&$Var(droppable), &can_drop);
+        1:   73:	let hsc = new (HttpServerComponent, With(state, 1));
+       1*:   74:	Move(&$Var(hsc), &hsc);
+        1:   75:}
+        1:   76:void HttpServer_drop() { printf("dropping http server\n"); }
+        2:   77:bool HttpServer_is_started() { return $(is_started); }
+        2:   78:bool HttpServer_start_server()
+        -:   79:{
+        2:   80:	if ($(is_started))
+        1:   81:		return false;
+        1:   82:	$Var(is_started) = true;
+        1:   83:	printf(
+        -:   84:	    "Server started on %s:%" PRIu16 " with %" PRIu32 " threads\n",
+        1:   85:	    $(config).host, $(config).port, $(config).threads);
+        1:   86:	format_print_stats($());
+        1:   87:	return true;
+        -:   88:}
+        1:   89:void HttpServer_print_stats()
+        -:   90:{
+        1:   91:	printf("Current stats: is_started: %i\n", $(is_started));
+        1:   92:}
+        -:   93:#undef IMPL
+        -:   94:
+        1:   95:void format_print_stats_impl()
+        -:   96:{
+        1:   97:	printf("-----------------------------------------------------\n");
+        1:   98:	print_stats($());
+        1:   99:	printf("-----------------------------------------------------\n");
+        1:  100:}
         -:    0:Source:thread.c
         -:    0:Graph:thread.gcno
         -:    0:Data:thread.gcda
-        -:    0:Runs:30
+        -:    0:Runs:32
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3974,7 +4195,7 @@ Hidden_size:
         -:    0:Source:traits.c
         -:    0:Graph:traits.gcno
         -:    0:Data:traits.gcda
-        -:    0:Runs:30
+        -:    0:Runs:32
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3991,10 +4212,10 @@ Hidden_size:
         -:   14:
         -:   15:#include <core/traits.h>
         -:   16:
-        1:   17:void drop(Object* self)
+        1:   17:void drop(Obj* self)
         -:   18:{
         1:   19:	if (self->flags & OBJECT_FLAGS_CONSUMED)
-    #####:   20:		panic("Runtime error: Object [%s@%" PRIu64
+    #####:   20:		panic("Runtime error: Obj [%s@%" PRIu64
         -:   21:		      "] has already been consumed!",
     #####:   22:		      self->vtable->name, self->ptr.id);
         1:   23:	void (*impl)() = find_fn(self, "drop");
@@ -4022,7 +4243,7 @@ Hidden_size:
         -:    0:Source:type.c
         -:    0:Graph:type.gcno
         -:    0:Data:type.gcda
-        -:    0:Runs:30
+        -:    0:Runs:32
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4042,14 +4263,14 @@ Hidden_size:
         -:   17:#include <stdlib.h>
         -:   18:#include <string.h>
         -:   19:
-        -:   20:_Thread_local const Object* __thread_local_self_Const = NULL;
-        -:   21:_Thread_local Object* __thread_local_self_Var = NULL;
+        -:   20:_Thread_local const Obj* __thread_local_self_Const = NULL;
+        -:   21:_Thread_local Obj* __thread_local_self_Var = NULL;
         -:   22:
         -:   23:atomic_ullong __global_counter__;
-       30:   24:void __attribute__((constructor)) init_global_counter()
+       32:   24:void __attribute__((constructor)) init_global_counter()
         -:   25:{
-       30:   26:	atomic_init(&__global_counter__, 1);
-       30:   27:}
+       32:   26:	atomic_init(&__global_counter__, 1);
+       32:   27:}
         -:   28:
     #####:   29:u64 unique_id()
         -:   30:{
@@ -4057,173 +4278,173 @@ Hidden_size:
     #####:   32:	return ret;
         -:   33:}
         -:   34:
-       22:   35:FatPtr build_fat_ptr(u64 size)
+       29:   35:FatPtr build_fat_ptr(u64 size)
         -:   36:{
         -:   37:	FatPtr ret;
-       22:   38:	if (chain_malloc(&ret, size))
+       29:   38:	if (chain_malloc(&ret, size))
         -:   39:	{
         -:   40:		// if chain_malloc is an error we set data to NULL and caller to
         -:   41:		// handle
-    #####:   42:		ret.data = NULL;
+        4:   42:		ret.data = NULL;
         -:   43:	}
-       22:   44:	return ret;
+       29:   44:	return ret;
         -:   45:}
         -:   46:
-    13282:   47:int compare_vtable_entry(const void* ent1, const void* ent2)
+    22568:   47:int compare_vtable_entry(const void* ent1, const void* ent2)
         -:   48:{
-    13282:   49:	const VtableEntry* vtent1 = ent1;
-    13282:   50:	const VtableEntry* vtent2 = ent2;
-    13282:   51:	return strcmp(vtent1->name, vtent2->name);
+    22568:   49:	const VtableEntry* vtent1 = ent1;
+    22568:   50:	const VtableEntry* vtent2 = ent2;
+    22568:   51:	return strcmp(vtent1->name, vtent2->name);
         -:   52:}
         -:   53:
-     2494:   54:void sort_vtable(Vtable* table)
+     4154:   54:void sort_vtable(Vtable* table)
         -:   55:{
-     2494:   56:	qsort(table->entries, table->len, sizeof(VtableEntry),
+     4154:   56:	qsort(table->entries, table->len, sizeof(VtableEntry),
         -:   57:	      compare_vtable_entry);
-     2494:   58:}
+     4154:   58:}
         -:   59:
-     2494:   60:void vtable_add_entry(Vtable* table, VtableEntry entry)
+     4154:   60:void vtable_add_entry(Vtable* table, VtableEntry entry)
         -:   61:{
-     2494:   62:	if (table->entries == NULL)
+     4154:   62:	if (table->entries == NULL)
         -:   63:	{
-      348:   64:		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
-      348:   65:		if (table->entries == NULL)
+      651:   64:		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
+      651:   65:		if (table->entries == NULL)
     #####:   66:			panic("Couldn't allocate memory for vtable");
         -:   67:	}
         -:   68:	else
         -:   69:	{
-     2146:   70:		void* tmp = realloc(table->entries,
-     2146:   71:				    sizeof(VtableEntry) * (table->len + 1));
-     2146:   72:		if (tmp == NULL)
+     3503:   70:		void* tmp = realloc(table->entries,
+     3503:   71:				    sizeof(VtableEntry) * (table->len + 1));
+     3503:   72:		if (tmp == NULL)
     #####:   73:			panic("Couldn't allocate memory for vtable");
-     2146:   74:		table->entries = tmp;
+     3503:   74:		table->entries = tmp;
         -:   75:	}
         -:   76:
-     2494:   77:	memcpy(&table->entries[table->len], &entry, sizeof(VtableEntry));
-     2494:   78:	table->len += 1;
-     2494:   79:	sort_vtable(table);
-     2494:   80:}
+     4154:   77:	memcpy(&table->entries[table->len], &entry, sizeof(VtableEntry));
+     4154:   78:	table->len += 1;
+     4154:   79:	sort_vtable(table);
+     4154:   80:}
         -:   81:
-       29:   82:void vtable_override(Vtable* table, VtableEntry entry)
+       31:   82:void vtable_override(Vtable* table, VtableEntry entry)
         -:   83:{
-      174:   84:	for (int i = 0; i < table->len; i++)
+      186:   84:	for (int i = 0; i < table->len; i++)
         -:   85:	{
-      145:   86:		if (!strcmp(entry.name, table->entries[i].name))
+      155:   86:		if (!strcmp(entry.name, table->entries[i].name))
         -:   87:		{
-       29:   88:			table->entries[i].fn_ptr = entry.fn_ptr;
+       31:   88:			table->entries[i].fn_ptr = entry.fn_ptr;
         -:   89:		}
         -:   90:	}
-       29:   91:}
+       31:   91:}
         -:   92:
-       87:   93:bool vtable_check_impl_trait(Vtable* table, char* trait)
+      155:   93:bool vtable_check_impl_trait(const Vtable* table, const char* trait)
         -:   94:{
-       87:   95:	bool ret = false;
+      155:   95:	bool ret = false;
         -:   96:
-      116:   97:	for (u64 i = 0; i < table->trait_len; i++)
+      310:   97:	for (u64 i = 0; i < table->trait_len; i++)
         -:   98:	{
-      116:   99:		if (!strcmp(table->trait_entries[i].trait_name, trait))
+      310:   99:		if (!strcmp(table->trait_entries[i].trait_name, trait))
         -:  100:		{
-       87:  101:			ret = true;
-       87:  102:			break;
+      155:  101:			ret = true;
+      155:  102:			break;
         -:  103:		}
         -:  104:	}
         -:  105:
-       87:  106:	return ret;
+      155:  106:	return ret;
         -:  107:}
         -:  108:
-     1073:  109:void vtable_add_trait(Vtable* table, char* trait)
+     1798:  109:void vtable_add_trait(Vtable* table, char* trait)
         -:  110:{
-     1073:  111:	if (table->trait_entries == NULL)
+     1798:  111:	if (table->trait_entries == NULL)
         -:  112:	{
-      348:  113:		table->trait_entries =
-      348:  114:		    malloc(sizeof(VtableTraitEntry) * (table->trait_len + 1));
-      348:  115:		if (table->trait_entries == NULL)
+      682:  113:		table->trait_entries =
+      682:  114:		    malloc(sizeof(VtableTraitEntry) * (table->trait_len + 1));
+      682:  115:		if (table->trait_entries == NULL)
     #####:  116:			panic("Couldn't allocate memory for vtable");
         -:  117:	}
         -:  118:	else
         -:  119:	{
         -:  120:		void* tmp =
-      725:  121:		    realloc(table->trait_entries,
-      725:  122:			    sizeof(VtableTraitEntry) * (table->trait_len + 1));
-      725:  123:		if (tmp == NULL)
+     1116:  121:		    realloc(table->trait_entries,
+     1116:  122:			    sizeof(VtableTraitEntry) * (table->trait_len + 1));
+     1116:  123:		if (tmp == NULL)
     #####:  124:			panic("Couldn't allocate memory for vtable");
-      725:  125:		table->trait_entries = tmp;
+     1116:  125:		table->trait_entries = tmp;
         -:  126:	}
         -:  127:
         -:  128:	VtableTraitEntry entry;
-     1073:  129:	if (strlen(trait) >= MAX_TRAIT_NAME_LEN)
+     1798:  129:	if (strlen(trait) >= MAX_TRAIT_NAME_LEN)
     #####:  130:		panic("trait name [%s] is too long. MAX_TRAIT_NAME_LEN = %i\n",
         -:  131:		      trait, MAX_TRAIT_NAME_LEN - 1);
-     1073:  132:	strcpy(entry.trait_name, trait);
+     1798:  132:	strcpy(entry.trait_name, trait);
         -:  133:
-     1073:  134:	memcpy(&table->trait_entries[table->trait_len], &entry,
+     1798:  134:	memcpy(&table->trait_entries[table->trait_len], &entry,
         -:  135:	       sizeof(VtableTraitEntry));
-     1073:  136:	table->trait_len += 1;
-     1073:  137:}
+     1798:  136:	table->trait_len += 1;
+     1798:  137:}
         -:  138:
-      129:  139:void* find_fn(const Object* obj, const char* name)
+      164:  139:void* find_fn(const Obj* obj, const char* name)
         -:  140:{
-      129:  141:	int left = 0;
-      129:  142:	int right = obj->vtable->len - 1;
-      320:  143:	while (left <= right)
+      164:  141:	int left = 0;
+      164:  142:	int right = obj->vtable->len - 1;
+      398:  143:	while (left <= right)
         -:  144:	{
-      317:  145:		int mid = left + (right - left) / 2;
-      317:  146:		int cmp = strcmp(name, obj->vtable->entries[mid].name);
+      391:  145:		int mid = left + (right - left) / 2;
+      391:  146:		int cmp = strcmp(name, obj->vtable->entries[mid].name);
         -:  147:
-      317:  148:		if (cmp == 0)
+      391:  148:		if (cmp == 0)
         -:  149:		{
-      126:  150:			return obj->vtable->entries[mid].fn_ptr;
+      157:  150:			return obj->vtable->entries[mid].fn_ptr;
         -:  151:		}
-      191:  152:		else if (cmp < 0)
+      234:  152:		else if (cmp < 0)
         -:  153:		{
-      101:  154:			right = mid - 1;
+      125:  154:			right = mid - 1;
         -:  155:		}
         -:  156:		else
         -:  157:		{
-       90:  158:			left = mid + 1;
+      109:  158:			left = mid + 1;
         -:  159:		}
         -:  160:	}
-        3:  161:	return NULL;
+        7:  161:	return NULL;
         -:  162:}
         -:  163:
-       43:  164:void SelfCleanupImpl_update(SelfCleanupImpl* ptr)
+       50:  164:void SelfCleanupImpl_update(SelfCleanupImpl* ptr)
         -:  165:{
-       43:  166:	__thread_local_self_Const = ptr->prev_tl_self_Const;
-       43:  167:	__thread_local_self_Var = ptr->prev_tl_self_Var;
-       43:  168:}
+       50:  166:	__thread_local_self_Const = ptr->prev_tl_self_Const;
+       50:  167:	__thread_local_self_Var = ptr->prev_tl_self_Var;
+       50:  168:}
         -:  169:
-        9:  170:void Object_check_param(const Object* obj)
+       10:  170:void Obj_check_param(const Obj* obj)
         -:  171:{
-        9:  172:	if (obj && (obj->flags & OBJECT_FLAGS_CONSUMED) != 0)
+       10:  172:	if (obj && (obj->flags & OBJECT_FLAGS_CONSUMED) != 0)
     #####:  173:		panic("Passing a consumed object as a function "
         -:  174:		      "parameter!");
-        9:  175:}
+       10:  175:}
         -:  176:
-       22:  177:void Object_build_int(Object* ptr)
+       29:  177:void Obj_build_int(Obj* ptr)
         -:  178:{
         -:  179:	// call internal build handler
-       22:  180:	void (*build_int)(Object* ptr) = find_fn(ptr, "build_internal");
-       22:  181:	if (!build_int)
+       29:  180:	void (*build_int)(Obj* ptr) = find_fn(ptr, "build_internal");
+       29:  181:	if (!build_int)
     #####:  182:		panic("no internal build handler found");
-       22:  183:	build_int(ptr);
-       22:  184:}
+       29:  183:	build_int(ptr);
+       29:  184:}
         -:  185:
-       22:  186:void Object_build(Object* ptr, void* config)
+       29:  186:void Obj_build(Obj* ptr, const void* config)
         -:  187:{
-       22:  188:	void (*do_build)(void* config) = find_fn(ptr, "build");
-       22:  189:	if (do_build)
+       29:  188:	void (*do_build)(const void* config) = find_fn(ptr, "build");
+       29:  189:	if (do_build)
         -:  190:	{
         -:  191:		// setup self references
-       22:  192:		Object* tmp_Var = __thread_local_self_Var;
-       22:  193:		const Object* tmp_Const = __thread_local_self_Const;
-       22:  194:		__thread_local_self_Const = ptr;
-       22:  195:		__thread_local_self_Var = ptr;
-       22:  196:		do_build(config);
+       26:  192:		Obj* tmp_Var = __thread_local_self_Var;
+       26:  193:		const Obj* tmp_Const = __thread_local_self_Const;
+       26:  194:		__thread_local_self_Const = ptr;
+       26:  195:		__thread_local_self_Var = ptr;
+       26:  196:		do_build(config);
         -:  197:		// revert
-       22:  198:		__thread_local_self_Var = tmp_Var;
-       22:  199:		__thread_local_self_Const = tmp_Const;
+       26:  198:		__thread_local_self_Var = tmp_Var;
+       26:  199:		__thread_local_self_Const = tmp_Const;
         -:  200:	}
-       22:  201:}
+       29:  201:}
         -:  202:
         -:  203:#if defined(__clang__)
         -:  204:// Clang-specific pragma
@@ -4236,37 +4457,37 @@ Hidden_size:
         -:  211:#else
         -:  212:#warning "Unknown compiler or platform. No specific warning pragmas applied."
         -:  213:#endif
-       27:  214:void Object_cleanup(const Object* ptr)
+       39:  214:void Obj_cleanup(const Obj* ptr)
         -:  215:{
-       27:  216:	Object* unconst = ptr;
-       27:  217:	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0)
+       39:  216:	Obj* unconst = ptr;
+       39:  217:	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0)
         -:  218:	{
         -:  219:		// call internal drop handler
-       21:  220:		void (*drop_int)(Object* ptr) = find_fn(ptr, "drop_internal");
-       21:  221:		if (!drop_int)
+       28:  220:		void (*drop_int)(Obj* ptr) = find_fn(ptr, "drop_internal");
+       28:  221:		if (!drop_int)
     #####:  222:			panic("no internal drop handler found");
-       21:  223:		drop_int(unconst);
+       28:  223:		drop_int(unconst);
         -:  224:
         -:  225:		// call defined drop handler
-       21:  226:		void (*drop)(Object* ptr) = find_fn(ptr, "drop");
-       21:  227:		if (drop)
+       28:  226:		void (*drop)(Obj* ptr) = find_fn(ptr, "drop");
+       28:  227:		if (drop)
         -:  228:		{
         -:  229:			// setup self references
-       18:  230:			Object* tmp_Var = __thread_local_self_Var;
-       18:  231:			Object* tmp_Const = __thread_local_self_Const;
-       18:  232:			__thread_local_self_Const = unconst;
-       18:  233:			__thread_local_self_Var = unconst;
-       18:  234:			drop(ptr);
+       24:  230:			Obj* tmp_Var = __thread_local_self_Var;
+       24:  231:			Obj* tmp_Const = __thread_local_self_Const;
+       24:  232:			__thread_local_self_Const = unconst;
+       24:  233:			__thread_local_self_Var = unconst;
+       24:  234:			drop(ptr);
         -:  235:			// revert
-       18:  236:			__thread_local_self_Var = tmp_Var;
-       18:  237:			__thread_local_self_Const = tmp_Const;
+       24:  236:			__thread_local_self_Var = tmp_Var;
+       24:  237:			__thread_local_self_Const = tmp_Const;
         -:  238:		}
-       21:  239:		if (fat_ptr_data(&unconst->ptr))
+       28:  239:		if (fat_ptr_data(&unconst->ptr))
         -:  240:		{
-       21:  241:			chain_free(&unconst->ptr);
+       24:  241:			chain_free(&unconst->ptr);
         -:  242:		}
         -:  243:	}
-       27:  244:}
+       39:  244:}
         -:  245:
         -:  246:#if defined(__clang__)
         -:  247:// Clang-specific pragma
@@ -4280,9 +4501,9 @@ Hidden_size:
         -:  255:#else
         -:  256:#warning "Unknown compiler or platform. No specific warning pragmas applied."
         -:  257:#endif
-    #####:  258:void Object_mark_consumed(const Object* ptr)
+    #####:  258:void Obj_mark_consumed(const Obj* ptr)
         -:  259:{
-    #####:  260:	Object* unconst = ptr;
+    #####:  260:	Obj* unconst = ptr;
     #####:  261:	unconst->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
     #####:  262:}
         -:  263:#pragma GCC diagnostic pop
