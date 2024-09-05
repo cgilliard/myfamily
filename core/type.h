@@ -140,19 +140,19 @@ FatPtr build_fat_ptr(u64 size);
 	FIRST_STRINGIFY __VA_ARGS__
 #define PROCESS_WHERE_INNER_(...) PROCESS_WHERE_INNER__(__VA_ARGS__)
 #define PROCESS_WHERE_INNER(ignore, value) PROCESS_WHERE_INNER_(value)
-#define PROCESS_WHERE_________(name, value, ...)                                          \
-	Vtable name##_##value##_Vtable__ = {#value, 0, NULL, 0, NULL, true};              \
-	void __attribute__((constructor)) __add_where_##name##_##value##_vtable()         \
-	{                                                                                 \
-		char* arr[] = {FOR_EACH_INNER(PROCESS_WHERE_INNER, , (, ), __VA_ARGS__)}; \
-		int size = sizeof(arr) / sizeof(arr[0]);                                  \
-		name##_generic_name_arr = malloc((1 + size) * sizeof(char*));             \
-		for (u64 i = 0; i < size; i++)                                            \
-		{                                                                         \
-			name##_generic_name_arr[i] = #value;                              \
-			vtable_add_trait(&name##_##value##_Vtable__, arr[i]);             \
-		}                                                                         \
-		name##_generic_name_arr[size] = NULL;                                     \
+#define PROCESS_WHERE_________(name, value, ...)                                                      \
+	Vtable name##_##value##_Vtable__ = {#value, 0, NULL, 0, NULL, true};                          \
+	void __attribute__((constructor)) __add_where_##name##_##value##_vtable()                     \
+	{                                                                                             \
+		char* arr[] = {__VA_OPT__(FOR_EACH_INNER(PROCESS_WHERE_INNER, , (, ), __VA_ARGS__))}; \
+		int size = sizeof(arr) / sizeof(arr[0]);                                              \
+		name##_generic_name_arr = malloc((1 + size) * sizeof(char*));                         \
+		for (u64 i = 0; i < size; i++)                                                        \
+		{                                                                                     \
+			name##_generic_name_arr[i] = #value;                                          \
+			vtable_add_trait(&name##_##value##_Vtable__, arr[i]);                         \
+		}                                                                                     \
+		name##_generic_name_arr[size] = NULL;                                                 \
 	}
 #define PROCESS_WHERE________(name, value, ...) PROCESS_WHERE_________(name, value, __VA_ARGS__)
 #define PROCESS_WHERE_______(name, value, ...) PROCESS_WHERE________(name, EXPAND_ALL value)
@@ -201,46 +201,46 @@ FatPtr build_fat_ptr(u64 size);
 #define Where(generic, ...) ((generic, __VA_ARGS__))
 #define TraitBound(t) (t)
 
-#define Builder(name, ...)                                    \
-	typedef struct name name;                             \
-	u64 name##_size();                                    \
-	extern Vtable name##_Vtable__;                        \
-	typedef struct name##Config                           \
-	{                                                     \
-		FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__); \
+#define Builder(name, ...)                                                \
+	typedef struct name name;                                         \
+	u64 name##_size();                                                \
+	extern Vtable name##_Vtable__;                                    \
+	typedef struct name##Config                                       \
+	{                                                                 \
+		__VA_OPT__(FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__)); \
 	} name##Config;
 
-#define Type(name, ...)                                                 \
-	typedef struct name name;                                       \
-	Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL, false};      \
-	static char** name##_generic_name_arr = NULL;                   \
-	u64 name##_size();                                              \
-	typedef struct name                                             \
-	{                                                               \
-		FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);           \
-	} name;                                                         \
-	u64 name##_size() { return sizeof(name); }                      \
-	FOR_EACH(PROCESS_WHERE, name, (;), __VA_ARGS__);                \
-	void name##_build_internal(Obj* ptr)                            \
-	{                                                               \
-		u64 size = name##_size();                               \
-		memset(ptr->ptr.data, 0, size);                         \
-		FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__);        \
-	}                                                               \
-	void name##_drop_internal(Obj* ptr)                             \
-	{                                                               \
-		FOR_EACH(DROP_OBJECTS, name, (;), __VA_ARGS__);         \
-	}                                                               \
-	void __attribute__((constructor)) __add_impls_##name##_vtable() \
-	{                                                               \
-		VtableEntry size = {"size", name##_size};               \
-		vtable_add_entry(&name##_Vtable__, size);               \
-		VtableEntry build_internal = {"build_internal",         \
-					      name##_build_internal};   \
-		vtable_add_entry(&name##_Vtable__, build_internal);     \
-		VtableEntry drop_internal = {"drop_internal",           \
-					     name##_drop_internal};     \
-		vtable_add_entry(&name##_Vtable__, drop_internal);      \
+#define Type(name, ...)                                                      \
+	typedef struct name name;                                            \
+	Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL, false};           \
+	static char** name##_generic_name_arr = NULL;                        \
+	u64 name##_size();                                                   \
+	typedef struct name                                                  \
+	{                                                                    \
+		__VA_OPT__(FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__));    \
+	} name;                                                              \
+	u64 name##_size() { return sizeof(name); }                           \
+	__VA_OPT__(FOR_EACH(PROCESS_WHERE, name, (;), __VA_ARGS__));         \
+	void name##_build_internal(Obj* ptr)                                 \
+	{                                                                    \
+		u64 size = name##_size();                                    \
+		memset(ptr->ptr.data, 0, size);                              \
+		__VA_OPT__(FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__)); \
+	}                                                                    \
+	void name##_drop_internal(Obj* ptr)                                  \
+	{                                                                    \
+		__VA_OPT__(FOR_EACH(DROP_OBJECTS, name, (;), __VA_ARGS__));  \
+	}                                                                    \
+	void __attribute__((constructor)) __add_impls_##name##_vtable()      \
+	{                                                                    \
+		VtableEntry size = {"size", name##_size};                    \
+		vtable_add_entry(&name##_Vtable__, size);                    \
+		VtableEntry build_internal = {"build_internal",              \
+					      name##_build_internal};        \
+		vtable_add_entry(&name##_Vtable__, build_internal);          \
+		VtableEntry drop_internal = {"drop_internal",                \
+					     name##_drop_internal};          \
+		vtable_add_entry(&name##_Vtable__, drop_internal);           \
 	}
 
 #define Field(field_type, field_name) (field_type, field_name)
@@ -302,8 +302,8 @@ FatPtr build_fat_ptr(u64 size);
 
 // Define PROC_FN_SIGNATURE and PROC_PARAMS to use UNWRAP_PARAMS correctly
 #define PROC_FN_SIGNATURE(...) \
-	FOR_EACH(UNWRAP_PARAM_TYPE_NAME, , (, ), __VA_ARGS__)
-#define PROC_PARAMS(...) FOR_EACH(UNWRAP_PARAM_NAME, , (, ), __VA_ARGS__)
+	__VA_OPT__(FOR_EACH(UNWRAP_PARAM_TYPE_NAME, , (, ), __VA_ARGS__))
+#define PROC_PARAMS(...) __VA_OPT__(FOR_EACH(UNWRAP_PARAM_NAME, , (, ), __VA_ARGS__))
 
 #define Param(type) (type, CAT(name_, __COUNTER__))
 #define SelfConfig() (const void*, config, ignore, ignore)
@@ -316,7 +316,7 @@ FatPtr build_fat_ptr(u64 size);
 #define SECOND_ALL(x, y, ...) y
 #define CALL_SECOND(x, y) SECOND_ALL y
 #define PROCESS_FN_CALL(...) \
-	FOR_EACH_INNER(CALL_SECOND, none, (, ), __VA_ARGS__)
+	__VA_OPT__(FOR_EACH_INNER(CALL_SECOND, none, (, ), __VA_ARGS__))
 
 #define OBJECT_ONLY(i, value, ...)                     \
 	_Generic((value),                              \
@@ -324,14 +324,14 @@ FatPtr build_fat_ptr(u64 size);
 	    default: Obj_check_param(NULL))
 #define CALL_SECOND_OBJECT(x, y) OBJECT_ONLY y
 #define PROCESS_FN_CHECK_OBJECTS(...) \
-	FOR_EACH_INNER(CALL_SECOND_OBJECT, none, (;), __VA_ARGS__)
+	__VA_OPT__(FOR_EACH_INNER(CALL_SECOND_OBJECT, none, (;), __VA_ARGS__))
 
 #define CALL_COUNT_OBJS(x, v) __count_obj_args__++
-#define COUNT_OBJS(...) FOR_EACH_INNER(CALL_COUNT_OBJS, none, (;), __VA_ARGS__)
+#define COUNT_OBJS(...) __VA_OPT__(FOR_EACH_INNER(CALL_COUNT_OBJS, none, (;), __VA_ARGS__))
 
 #define BOTH_ALL(x, y, ...) x y
 #define CALL_BOTH(x, y) BOTH_ALL y
-#define PROCESS_FN_SIG(...) FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__)
+#define PROCESS_FN_SIG(...) __VA_OPT__(FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__))
 
 #define EXPAND3(x) x
 #define EXPAND2(x) x
@@ -341,7 +341,7 @@ FatPtr build_fat_ptr(u64 size);
 #define PROC_BOTH_PROTO_(impl_type, param_type, param_name, ...) __VA_OPT__(PROC_BOTH_PROTO__(impl_type, param_type, param_name, __VA_ARGS__)) EXPAND2 __VA_OPT__(NONE)(param_type param_name)
 #define PROC_BOTH_PROTO(...) PROC_BOTH_PROTO_(__VA_ARGS__)
 #define CALL_BOTH_PROTO(x, y) PROC_BOTH_PROTO(x, EXPAND_ALL y)
-#define PROCESS_FN_SIG_PROTO(impl_type, ...) FOR_EACH_INNER(CALL_BOTH_PROTO, impl_type, (, ), __VA_ARGS__)
+#define PROCESS_FN_SIG_PROTO(impl_type, ...) __VA_OPT__(FOR_EACH_INNER(CALL_BOTH_PROTO, impl_type, (, ), __VA_ARGS__))
 
 #define EXPAND_ALL2(...) __VA_ARGS__
 #define CHECK_SELF_IMPL___(self, type, var_name, ignore1, ...) \
@@ -350,7 +350,7 @@ FatPtr build_fat_ptr(u64 size);
 #define CHECK_SELF_IMPL__(self, type, var_name, ...) __VA_OPT__(CHECK_SELF_IMPL___(self, type, var_name, __VA_ARGS__))
 #define CHECK_SELF_IMPL_(...) CHECK_SELF_IMPL__(__VA_ARGS__)
 #define CHECK_SELF_IMPL(self, param) CHECK_SELF_IMPL_(self, EXPAND_ALL2 param)
-#define CHECK_SELF_PARAMS(self, ...) FOR_EACH_INNER(CHECK_SELF_IMPL, self, (;), __VA_ARGS__)
+#define CHECK_SELF_PARAMS(self, ...) __VA_OPT__(FOR_EACH_INNER(CHECK_SELF_IMPL, self, (;), __VA_ARGS__))
 
 #define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)             \
 	static return_type fn_name(mutability() Obj* self __VA_OPT__(          \
@@ -446,7 +446,7 @@ FatPtr build_fat_ptr(u64 size);
 		     __VA_ARGS__)
 #define PROC_TRAIT_IMPL(arg, x) PROC_TRAIT_IMPL_FN x
 #define TraitImplImpl(name, ...) \
-	FOR_EACH(PROC_TRAIT_IMPL, none, (), __VA_ARGS__)
+	__VA_OPT__(FOR_EACH(PROC_TRAIT_IMPL, none, (), __VA_ARGS__))
 #define TraitImpl(...) TraitImplImpl(__VA_ARGS__)
 
 #define PROC_TRAIT_STATEMENT_IMPL_EXP_(impl_type, mutability, return_type, \
@@ -467,7 +467,7 @@ FatPtr build_fat_ptr(u64 size);
 #define PROC_TRAIT_STATEMENT(arg, x) \
 	PROC_TRAIT_STATEMENT_IMPL(arg, EXPAND_ALL x)
 #define PROC_IMPL(name, ...) \
-	FOR_EACH(PROC_TRAIT_STATEMENT, name, (), __VA_ARGS__)
+	__VA_OPT__(FOR_EACH(PROC_TRAIT_STATEMENT, name, (), __VA_ARGS__))
 #define Required(...) (__VA_ARGS__)
 #define RequiredWithDefault(...) ((__VA_ARGS__))
 #define PROC_IMPL_(name, trait_name, ...)                               \
@@ -525,7 +525,7 @@ FatPtr build_fat_ptr(u64 size);
 		Obj_build_int(&_ret__);                                       \
 		name##Config __config_;                                          \
 		memset(&__config_, 0, sizeof(name##Config));                     \
-		FOR_EACH(SET_PARAM, (&__config_, name##Config), (), __VA_ARGS__) \
+		__VA_OPT__(FOR_EACH(SET_PARAM, (&__config_, name##Config), (), __VA_ARGS__)) \
 		Obj_build(&_ret__, &__config_);                               \
 		_ret__;                                                          \
 	})
