@@ -35,7 +35,7 @@ Type(
 #define IMPL Hidden
 void Hidden_build(HiddenConfig* config)
 {
-	printf("building hidden: capacity = %llu\n", config->capacity);
+	printf("building hidden: capacity = %" PRIu64 "\n", config->capacity);
 	$Var(config) = *config;
 	let hd = new (HiddenDrop);
 	Move(&$Var(v2), &hd);
@@ -43,7 +43,7 @@ void Hidden_build(HiddenConfig* config)
 
 void Hidden_drop()
 {
-	printf("drop value=%llu\n", $(value));
+	printf("drop value=%" PRIu64 "\n", $(value));
 }
 u64 Hidden_get_value()
 {
