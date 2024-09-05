@@ -195,7 +195,7 @@ FatPtr build_fat_ptr(u64 size);
 #define Where(generic, ...) ((generic, __VA_ARGS__))
 #define TraitBound(t) (t)
 
-#define TypeDef(name, ...)                                    \
+#define Builder(name, ...)                                    \
 	typedef struct name name;                             \
 	u64 name##_size();                                    \
 	extern Vtable name##_Vtable__;                        \

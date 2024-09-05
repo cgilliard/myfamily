@@ -17,14 +17,20 @@
 #include <core/type.h>
 
 Type(HiddenDrop);
-TypeDef(HiddenDrop);
+Builder(HiddenDrop);
 Impl(HiddenDrop, Drop);
 
 #define IMPL HiddenDrop
 void HiddenDrop_drop() {}
 #undef IMPL
 
-Type(Hidden, Where(T, TraitBound(Drop)), Field(u64, value), Field(HiddenConfig, config), Generic(T, v2), Obj(HiddenDrop, dd));
+Type(
+    Hidden,
+    Where(T, TraitBound(Drop)),
+    Field(u64, value),
+    Field(HiddenConfig, config),
+    Generic(T, v2),
+    Obj(HiddenDrop, dd));
 
 #define IMPL Hidden
 void Hidden_build(HiddenConfig* config)

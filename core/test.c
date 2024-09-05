@@ -14,6 +14,7 @@
 
 #include <core/std.h>
 #include <core/test_encapsulation.h>
+#include <core/test_server.h>
 #include <criterion/criterion.h>
 
 Test(core, test_heap)
@@ -848,7 +849,7 @@ Test(core, test_synchronized)
 	Lock_cleanup(&sync_lock);
 }
 
-TypeDef(TestType, Config(u64, x_in), Config(u32, y_in));
+Builder(TestType, Config(u64, x_in), Config(u32, y_in));
 Type(TestType, Field(u64, x), Field(u32, y));
 
 #define TestTrait                                                           \
@@ -966,7 +967,7 @@ Test(core, test_type)
 // panic, but once we have Result implemented, we will also provide a 'TryBuild'
 // trait which returns a result which will allow for additional capabilities.
 Type(TestServer, Field(u16, port), Field(char*, host), Field(u16, threads));
-TypeDef(TestServer, Config(u16, port), Config(char*, host), Config(u16, threads));
+Builder(TestServer, Config(u16, port), Config(char*, host), Config(u16, threads));
 
 // define implemented traits 'Build' and 'Drop'
 Impl(TestServer, Build);
@@ -1037,7 +1038,7 @@ Test(core, test_build)
 }
 
 Type(TestMove, Field(char*, s), Field(u64, len));
-TypeDef(TestMove, Config(char*, s), Config(u64, len));
+Builder(TestMove, Config(char*, s), Config(u64, len));
 
 #define AccessTestMove                                                \
 	DefineTrait(AccessTestMove, Required(Const, char*, get_tm_s), \
@@ -1154,9 +1155,9 @@ Test(core, test_defaults)
 }
 
 Type(InnerType, Field(u64, value));
-TypeDef(InnerType, Config(u64, value));
+Builder(InnerType, Config(u64, value));
 Type(CompositeTest, Field(u64, x), Field(u32, y), Field(Object, z));
-TypeDef(CompositeTest, Config(u64, x), Config(u32, y));
+Builder(CompositeTest, Config(u64, x), Config(u32, y));
 
 #define InnerValue DefineTrait(InnerValue, Required(Const, u64, inner_value))
 TraitImpl(InnerValue);
@@ -1239,7 +1240,7 @@ Test(core, test_composites)
 TraitImpl(AdvCompSetBoth);
 
 Type(AdvComp, Field(u64, x), Obj(InnerType, holder));
-TypeDef(AdvComp, Config(u64, x_in));
+Builder(AdvComp, Config(u64, x_in));
 Impl(AdvComp, SetCompTrait);
 Impl(AdvComp, AdvCompSetBoth);
 Impl(AdvComp, Build);
@@ -1297,7 +1298,7 @@ Test(core, test_hidden)
 }
 
 Type(ServerComponent, Field(u64, value), Field(void*, ptr));
-TypeDef(ServerComponent, Config(u64, value));
+Builder(ServerComponent, Config(u64, value));
 
 Impl(ServerComponent, Build);
 Impl(ServerComponent, Drop);
@@ -1318,10 +1319,10 @@ void ServerComponent_drop()
 }
 #undef IMPL
 
-TypeDef(Server, Config(u32, threads), Config(u16, port), Config(char*, host));
+Builder(Server, Config(u32, threads), Config(u16, port), Config(char*, host));
 Type(Server, Field(u64, state), Field(bool, is_started), Field(ServerConfig, config), Obj(ServerComponent, sc));
 
-#define ServerApi DefineTrait(ServerApi, Required(Var, bool, start_server), Required(Const, bool, is_started))
+#define ServerApi DefineTrait(ServerApi, Required(Var, bool, start_test_server), Required(Const, bool, is_test_started))
 TraitImpl(ServerApi);
 
 Impl(Server, Build);
@@ -1337,7 +1338,7 @@ void Server_build(const void* config_in)
 	$Var(state) = 0;
 	$Var(sc) = new (ServerComponent, With(value, 10));
 }
-bool Server_start_server()
+bool Server_start_test_server()
 {
 	if ($(is_started))
 		return false;
@@ -1345,22 +1346,22 @@ bool Server_start_server()
 	$Var(state) += 1;
 	return true;
 }
-bool Server_is_started() { return $(is_started); }
+bool Server_is_test_started() { return $(is_started); }
 #undef IMPL
 
 Test(core, test_sample)
 {
 	{
 		var server = new (Server, With(port, 8080));
-		cr_assert(!is_started(&server));
-		start_server(&server);
-		cr_assert(is_started(&server));
+		cr_assert(!is_test_started(&server));
+		start_test_server(&server);
+		cr_assert(is_test_started(&server));
 	}
 	cr_assert_eq(sc_drops, 1);
 }
 
 // Define a basic type
-TypeDef(TestOver, Config(u64, value));
+Builder(TestOver, Config(u64, value));
 Type(TestOver, Field(u64, value));
 
 // define a trait with a single default implemented function
@@ -1397,7 +1398,7 @@ Test(core, test_override)
 	cr_assert_eq(get_overt(&to), 300);
 }
 
-TypeDef(TestFixedArr, Config(char*, buf), Config(u64, p1), Config(u32, p2), Config(u16, p3));
+Builder(TestFixedArr, Config(char*, buf), Config(u64, p1), Config(u32, p2), Config(u16, p3));
 Type(TestFixedArr, Field(u64, p1), Field(char, buf[100]), Field(u32, p2), Field(u16, p3));
 
 Impl(TestFixedArr, Build);
@@ -1465,7 +1466,7 @@ TraitImpl(SuperDuperTest);
 
 // Create a new type 'SuperImpl'.
 Type(SuperImpl, Field(u64, value));
-TypeDef(SuperImpl, Config(u64, value));
+Builder(SuperImpl, Config(u64, value));
 
 // Implement SuperDuperTest trait (which in turn requires SuperTest, which in turn requires Drop). Additionally we'll implement 'Build'.
 Impl(SuperImpl, Drop);
@@ -1504,9 +1505,9 @@ Test(core, test_super)
 }
 
 Type(NoDrop);
-TypeDef(NoDrop);
+Builder(NoDrop);
 Type(WithDrop);
-TypeDef(WithDrop);
+Builder(WithDrop);
 
 Impl(WithDrop, Drop);
 Impl(WithDrop, Build);
@@ -1518,7 +1519,7 @@ void WithDrop_build(const void* ptr) {}
 
 Type(MyObj);
 Type(XType, Where(T, TraitBound(Drop), TraitBound(Build)), Field(u64, x), Generic(T, wd));
-TypeDef(XType);
+Builder(XType);
 
 #define XTypeApi DefineTrait(XTypeApi, Required(Var, void, set_wd_value, Param(Object*)))
 TraitImpl(XTypeApi);
@@ -1533,7 +1534,7 @@ void XType_set_wd_value(Object* ptr)
 #undef IMPL
 
 Type(MyObjBuildDrop);
-TypeDef(MyObjBuildDrop);
+Builder(MyObjBuildDrop);
 
 Impl(MyObjBuildDrop, Build);
 Impl(MyObjBuildDrop, Drop);
@@ -1551,4 +1552,18 @@ Test(core, test_where)
 	var z = new (MyObjBuildDrop);
 	// this would panic because the binding to type 'WithDrop' has already occurred.
 	// set_wd_value(&x, &z);
+}
+
+Test(core, test_server)
+{
+	{
+		printf("test_server\n");
+		var server = new (HttpServer, With(threads, 2), With(port, 8080), With(host, "0.0.0.0"));
+		cr_assert(!is_started(&server));
+		cr_assert(start_server(&server));
+		cr_assert(is_started(&server));
+		cr_assert(!start_server(&server));
+		printf("end scope, begin drop handlers\n");
+	}
+	printf("drop handlers should be complete.\n");
 }
