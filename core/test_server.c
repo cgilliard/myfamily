@@ -89,14 +89,14 @@ void HttpServer_validate_input(const HttpServerConfig* config)
 	// check threads and panic if they are not configured. memset is called on all
 	// data of the type so everything will be set to 0 initially including this parameter. So,
 	// here we effectively force the user to configure threads or a thread panic will occur.
-	if (config->threads == 0)
+	if ($(config).threads == 0)
 		panic("Threads must be greater than 0. Halting!");
 
 	// For port and host, we set default values keeping in mind the fact that everything is
 	// initialized to 0.
-	if (config->port == 0)
+	if ($(config).port == 0)
 		$Var(config).port = 8080;
-	if (config->host == NULL)
+	if ($(config).host == NULL)
 		$Var(config).host = "127.0.0.1";
 }
 void HttpServer_build(const HttpServerConfig* config)

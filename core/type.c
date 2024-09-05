@@ -174,6 +174,13 @@ void Obj_check_param(const Obj* obj)
 		      "parameter!");
 }
 
+bool Obj_is_type(const Obj* ptr, char* ref)
+{
+	if (!strcmp(TypeName((*ptr)), ref))
+		return true;
+	return false;
+}
+
 void Obj_build_int(Obj* ptr)
 {
 	// call internal build handler

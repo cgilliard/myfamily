@@ -73,6 +73,7 @@ extern _Thread_local Obj* __thread_local_self_Var;
 void Obj_cleanup(const Obj* ptr);
 void Obj_mark_consumed(const Obj* ptr);
 void Obj_build(Obj* ptr, const void* config);
+bool Obj_is_type(const Obj* ptr, char* ref);
 void Obj_build_int(Obj* ptr);
 void Obj_check_param(const Obj* obj);
 void sort_vtable(Vtable* table);
@@ -119,6 +120,11 @@ FatPtr build_fat_ptr(u64 size);
 	    ((const IMPL*)__thread_local_self_Const->ptr.data)->__VA_ARGS__) \
 	__VA_OPT__(NONE)                                                     \
 	(__thread_local_self_Const)
+#define $Context(value, type, ...)                       \
+	__VA_OPT__(                                      \
+	    ((const type*)value->ptr.data)->__VA_ARGS__) \
+	__VA_OPT__(NONE)                                 \
+	(value)
 
 #define FIRST_TWO(x, ...) MULTI_SWITCH(NONE, FIRST_TWO_, x, __VA_ARGS__)
 #define FIRST_TWO_(x, y, ...) x y
@@ -300,7 +306,9 @@ FatPtr build_fat_ptr(u64 size);
 #define PROC_PARAMS(...) FOR_EACH(UNWRAP_PARAM_NAME, , (, ), __VA_ARGS__)
 
 #define Param(type) (type, CAT(name_, __COUNTER__))
-#define SelfConfig() (const void*, config, ignore)
+#define SelfConfig() (const void*, config, ignore, ignore)
+#define Self() (const Obj*, CAT(self_ptr_, UNIQUE_ID), ignore)
+#define VarSelf() (Obj*, CAT(self_ptr_, UNIQUE_ID))
 
 #define Var()
 #define Const() const
@@ -325,11 +333,24 @@ FatPtr build_fat_ptr(u64 size);
 #define CALL_BOTH(x, y) BOTH_ALL y
 #define PROCESS_FN_SIG(...) FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__)
 
+#define EXPAND3(x) x
 #define EXPAND2(x) x
-#define PROC_BOTH_PROTO_(impl_type, param_type, param_name, ...) __VA_OPT__(const impl_type##Config*) EXPAND2 __VA_OPT__(NONE)(param_type param_name)
+#define PAREN (
+#define PAREN_END )
+#define PROC_BOTH_PROTO__(impl_type, param_type, param_name, ignore1, ...) __VA_OPT__(const impl_type##Config*) EXPAND3 __VA_OPT__(PAREN) __VA_OPT__(PAREN_END) __VA_OPT__(NONE)(const Obj*)
+#define PROC_BOTH_PROTO_(impl_type, param_type, param_name, ...) __VA_OPT__(PROC_BOTH_PROTO__(impl_type, param_type, param_name, __VA_ARGS__)) EXPAND2 __VA_OPT__(NONE)(param_type param_name)
 #define PROC_BOTH_PROTO(...) PROC_BOTH_PROTO_(__VA_ARGS__)
 #define CALL_BOTH_PROTO(x, y) PROC_BOTH_PROTO(x, EXPAND_ALL y)
 #define PROCESS_FN_SIG_PROTO(impl_type, ...) FOR_EACH_INNER(CALL_BOTH_PROTO, impl_type, (, ), __VA_ARGS__)
+
+#define EXPAND_ALL2(...) __VA_ARGS__
+#define CHECK_SELF_IMPL___(self, type, var_name, ignore1, ...) \
+	if (!Obj_is_type(var_name, self->vtable->name))        \
+		panic("Type mismatch. Expected %s!", self->vtable->name);
+#define CHECK_SELF_IMPL__(self, type, var_name, ...) __VA_OPT__(CHECK_SELF_IMPL___(self, type, var_name, __VA_ARGS__))
+#define CHECK_SELF_IMPL_(...) CHECK_SELF_IMPL__(__VA_ARGS__)
+#define CHECK_SELF_IMPL(self, param) CHECK_SELF_IMPL_(self, EXPAND_ALL2 param)
+#define CHECK_SELF_PARAMS(self, ...) FOR_EACH_INNER(CHECK_SELF_IMPL, self, (;), __VA_ARGS__)
 
 #define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)             \
 	static return_type fn_name(mutability() Obj* self __VA_OPT__(          \
@@ -353,6 +374,7 @@ FatPtr build_fat_ptr(u64 size);
 		__thread_local_self_Const = self;                              \
 		__thread_local_self_Var = NULL;                                \
 		__thread_local_self_##mutability = self;                       \
+		CHECK_SELF_PARAMS(self, __VA_ARGS__);                          \
 		PROCESS_FN_CHECK_OBJECTS(__VA_ARGS__);                         \
 		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}
@@ -407,6 +429,7 @@ FatPtr build_fat_ptr(u64 size);
 		__thread_local_self_Const = self;                              \
 		__thread_local_self_Var = NULL;                                \
 		__thread_local_self_##mutability = self;                       \
+		CHECK_SELF_PARAMS(self, __VA_ARGS__);                          \
 		PROCESS_FN_CHECK_OBJECTS(__VA_ARGS__);                         \
 		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
 	}

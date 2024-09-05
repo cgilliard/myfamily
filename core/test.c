@@ -1578,3 +1578,55 @@ Test(core, test_server)
 // dropping can drop
 // dropping http server
 // drop handlers should be complete.
+
+Type(EqTest, Field(u64, value));
+Builder(EqTest, Config(u64, value));
+
+Impl(EqTest, Build);
+Impl(EqTest, Equal);
+
+#define IMPL EqTest
+void EqTest_build(const EqTestConfig* config)
+{
+	$Var(value) = config->value;
+}
+bool EqTest_equal(const Obj* rhs)
+{
+	return $(value) == $Context(rhs, EqTest, value);
+}
+#undef IMPL
+
+Type(EqTest2, Field(u64, value));
+Builder(EqTest2, Config(u64, value));
+
+Impl(EqTest2, Build);
+Impl(EqTest2, Equal);
+
+#define IMPL EqTest2
+void EqTest2_build(const EqTest2Config* config)
+{
+	$Var(value) = config->value;
+}
+bool EqTest2_equal(const Obj* rhs)
+{
+	return $(value) == $Context(rhs, EqTest2, value);
+}
+#undef IMPL
+
+Test(core, test_equal)
+{
+	let x = new (EqTest, With(value, 1));
+	let y = new (EqTest, With(value, 1));
+	let z = new (EqTest, With(value, 2));
+	cr_assert(equal(&x, &y));
+	cr_assert(!equal(&x, &z));
+
+	let a = new (EqTest2, With(value, 7));
+	let b = new (EqTest2, With(value, 7));
+	let c = new (EqTest2, With(value, 8));
+	cr_assert(equal(&a, &b));
+	cr_assert(!equal(&a, &c));
+
+	// would cause panic because mismatched types.
+	// cr_assert(!equal(&a, &x));
+}
