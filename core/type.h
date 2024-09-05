@@ -217,7 +217,8 @@ FatPtr build_fat_ptr(u64 size);
 	u64 name##_size();                                                   \
 	typedef struct name                                                  \
 	{                                                                    \
-		__VA_OPT__(FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__));    \
+		char _dummy__;                                               \
+		__VA_OPT__(FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);)    \
 	} name;                                                              \
 	u64 name##_size() { return sizeof(name); }                           \
 	__VA_OPT__(FOR_EACH(PROCESS_WHERE, name, (;), __VA_ARGS__));         \
