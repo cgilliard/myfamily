@@ -79,15 +79,15 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a9350790bb34c38713a0a0ad62a870f23"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a>&#160;&#160;&#160;<a class="el" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(HiddenApi, <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_value), <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#a3521b7722e358f98597043439741612c">Var</a>, void, set_value, <a class="el" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>)), <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_capacity_impl))</td></tr>
+<tr class="memitem:a9350790bb34c38713a0a0ad62a870f23"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a></td></tr>
 <tr class="separator:a9350790bb34c38713a0a0ad62a870f23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a22cc05d270f9e3936fd724672c038bcc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__encapsulation_8h.html#a22cc05d270f9e3936fd724672c038bcc">TraitImpl</a> (<a class="el" href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a>)</td></tr>
 <tr class="separator:a22cc05d270f9e3936fd724672c038bcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a55719c1e83be46288f2594f9d04de478"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__encapsulation_8h.html#a55719c1e83be46288f2594f9d04de478">TypeDef</a> (Hidden, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, capacity))</td></tr>
-<tr class="separator:a55719c1e83be46288f2594f9d04de478"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68ee1e0aa899b8c8a678a1435938516b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__encapsulation_8h.html#a68ee1e0aa899b8c8a678a1435938516b">Builder</a> (Hidden, <a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, capacity))</td></tr>
+<tr class="separator:a68ee1e0aa899b8c8a678a1435938516b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79ff63999b6be45dc4b05bf76ebcee67"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__encapsulation_8h.html#a79ff63999b6be45dc4b05bf76ebcee67">Impl</a> (Hidden, <a class="el" href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a>)</td></tr>
 <tr class="separator:a79ff63999b6be45dc4b05bf76ebcee67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9deb1f17d0b1c7582af2052bc74283ac"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__encapsulation_8h.html#a9deb1f17d0b1c7582af2052bc74283ac">Impl</a> (Hidden, <a class="el" href="traits_8h.html#a4c1bc9dae458cb02cbad68812b20345e">Drop</a>)</td></tr>
@@ -103,14 +103,54 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define HiddenApi&#160;&#160;&#160;<a class="el" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(HiddenApi, <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_value), <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#a3521b7722e358f98597043439741612c">Var</a>, void, set_value, <a class="el" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>)), <a class="el" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_capacity_impl))</td>
+          <td class="memname">#define HiddenApi</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a>(                  \</div>
+<div class="line">    <a class="code" href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a>,                                  \</div>
+<div class="line">    <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_value),            \</div>
+<div class="line">    <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a>, <span class="keywordtype">void</span>, set_value, <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>)), \</div>
+<div class="line">    <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_capacity_impl))</div>
+<div class="ttc" id="atest__encapsulation_8h_html_a9350790bb34c38713a0a0ad62a870f23"><div class="ttname"><a href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a></div><div class="ttdeci">#define HiddenApi</div><div class="ttdef"><b>Definition:</b> test_encapsulation.h:20</div></div>
+<div class="ttc" id="atype_8h_html_a23cd3b356bdc7322fbf851888d7787f2"><div class="ttname"><a href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a></div><div class="ttdeci">#define Var(...)</div><div class="ttdef"><b>Definition:</b> type.h:112</div></div>
+<div class="ttc" id="atype_8h_html_a4edfee2ef9567a47b388682adaaec1db"><div class="ttname"><a href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a></div><div class="ttdeci">#define Required(...)</div></div>
+<div class="ttc" id="atype_8h_html_a576cf28d25620855f75b2023e4a53e59"><div class="ttname"><a href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a></div><div class="ttdeci">#define DefineTrait(...)</div></div>
+<div class="ttc" id="atype_8h_html_aa737fc32d91c59bd8bd2fdb17ada2845"><div class="ttname"><a href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a></div><div class="ttdeci">#define Const()</div></div>
+<div class="ttc" id="atype_8h_html_af0b43aeaffd7a613c3c061c0696d901a"><div class="ttname"><a href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a></div><div class="ttdeci">#define Param(type)</div></div>
+<div class="ttc" id="atypes_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a68ee1e0aa899b8c8a678a1435938516b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68ee1e0aa899b8c8a678a1435938516b">&#9670;&nbsp;</a></span>Builder()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Builder </td>
+          <td>(</td>
+          <td class="paramtype">Hidden&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, capacity)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">Function Documentation</h2>
 <a id="a477856f2ae5819524fc7e371d0b5c78f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a477856f2ae5819524fc7e371d0b5c78f">&#9670;&nbsp;</a></span>Impl() <span class="overload">[1/3]</span></h2>
 
@@ -207,34 +247,6 @@ Functions</h2></td></tr>
           <td class="paramtype"><a class="el" href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a55719c1e83be46288f2594f9d04de478"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a55719c1e83be46288f2594f9d04de478">&#9670;&nbsp;</a></span>TypeDef()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TypeDef </td>
-          <td>(</td>
-          <td class="paramtype">Hidden&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, capacity)&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

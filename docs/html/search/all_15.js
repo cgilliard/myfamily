@@ -1,15 +1,15 @@
 var searchData=
 [
-  ['val_535',['val',['../structtoml__keyval__t.html#ab49e3efa7e2517420c2ce5a2c45e6406',1,'toml_keyval_t::val()'],['../structtoml__arritem__t.html#a74355e9a38bf4540e63907aa280c32e7',1,'toml_arritem_t::val()']]],
-  ['valtype_536',['valtype',['../structtoml__arritem__t.html#a2f2dbe5f6e5cea3bebb8d854576f0874',1,'toml_arritem_t']]],
-  ['var_537',['var',['../type_8h.html#a1b0936415a643c88ce543099c10e0d7f',1,'type.h']]],
-  ['var_538',['Var',['../type_8h.html#a3521b7722e358f98597043439741612c',1,'Var():&#160;type.h'],['../type_8h.html#a23cd3b356bdc7322fbf851888d7787f2',1,'Var():&#160;type.h']]],
-  ['vtable_539',['Vtable',['../structVtable.html',1,'']]],
-  ['vtable_540',['vtable',['../structObject.html#a012b89a1dfd1c6ce87fa3b402190b8bd',1,'Object']]],
-  ['vtable_5fadd_5fentry_541',['vtable_add_entry',['../type_8c.html#a5082273ba4bf9ad23e49ca9319bef78e',1,'vtable_add_entry(Vtable *table, VtableEntry entry):&#160;type.c'],['../type_8h.html#a5082273ba4bf9ad23e49ca9319bef78e',1,'vtable_add_entry(Vtable *table, VtableEntry entry):&#160;type.c']]],
-  ['vtable_5fadd_5ftrait_542',['vtable_add_trait',['../type_8c.html#a685f77a71db7c2ab533b766f7a6870f2',1,'vtable_add_trait(Vtable *table, char *trait):&#160;type.c'],['../type_8h.html#a685f77a71db7c2ab533b766f7a6870f2',1,'vtable_add_trait(Vtable *table, char *trait):&#160;type.c']]],
-  ['vtable_5fcheck_5fimpl_5ftrait_543',['vtable_check_impl_trait',['../type_8c.html#a4e3d5a419eabb0fae833d71f283b58fb',1,'vtable_check_impl_trait(Vtable *table, char *trait):&#160;type.c'],['../type_8h.html#a4e3d5a419eabb0fae833d71f283b58fb',1,'vtable_check_impl_trait(Vtable *table, char *trait):&#160;type.c']]],
-  ['vtable_5foverride_544',['vtable_override',['../type_8h.html#aeb0636afb88ebe75121824df05099b40',1,'vtable_override(Vtable *table, VtableEntry entry):&#160;type.c'],['../type_8c.html#aeb0636afb88ebe75121824df05099b40',1,'vtable_override(Vtable *table, VtableEntry entry):&#160;type.c']]],
-  ['vtableentry_545',['VtableEntry',['../structVtableEntry.html',1,'']]],
-  ['vtabletraitentry_546',['VtableTraitEntry',['../structVtableTraitEntry.html',1,'VtableTraitEntry'],['../type_8h.html#a63338e751335ad4f44c66f1ff050f2c9',1,'VtableTraitEntry():&#160;type.h']]]
+  ['val_581',['val',['../structtoml__keyval__t.html#ab49e3efa7e2517420c2ce5a2c45e6406',1,'toml_keyval_t::val()'],['../structtoml__arritem__t.html#a74355e9a38bf4540e63907aa280c32e7',1,'toml_arritem_t::val()']]],
+  ['valtype_582',['valtype',['../structtoml__arritem__t.html#a2f2dbe5f6e5cea3bebb8d854576f0874',1,'toml_arritem_t']]],
+  ['var_583',['Var',['../type_8h.html#a3521b7722e358f98597043439741612c',1,'Var():&#160;type.h'],['../type_8h.html#a23cd3b356bdc7322fbf851888d7787f2',1,'Var():&#160;type.h']]],
+  ['var_584',['var',['../type_8h.html#a1b0936415a643c88ce543099c10e0d7f',1,'type.h']]],
+  ['vtable_585',['Vtable',['../structVtable.html',1,'']]],
+  ['vtable_586',['vtable',['../structObj.html#aef530ede4999ab9ad5b34395bb1c4e75',1,'Obj']]],
+  ['vtable_5fadd_5fentry_587',['vtable_add_entry',['../type_8c.html#a5082273ba4bf9ad23e49ca9319bef78e',1,'vtable_add_entry(Vtable *table, VtableEntry entry):&#160;type.c'],['../type_8h.html#a5082273ba4bf9ad23e49ca9319bef78e',1,'vtable_add_entry(Vtable *table, VtableEntry entry):&#160;type.c']]],
+  ['vtable_5fadd_5ftrait_588',['vtable_add_trait',['../type_8c.html#a685f77a71db7c2ab533b766f7a6870f2',1,'vtable_add_trait(Vtable *table, char *trait):&#160;type.c'],['../type_8h.html#a685f77a71db7c2ab533b766f7a6870f2',1,'vtable_add_trait(Vtable *table, char *trait):&#160;type.c']]],
+  ['vtable_5fcheck_5fimpl_5ftrait_589',['vtable_check_impl_trait',['../type_8c.html#a5513975c8def3d8423a6c1583dcf30e7',1,'vtable_check_impl_trait(const Vtable *table, const char *trait):&#160;type.c'],['../type_8h.html#a5513975c8def3d8423a6c1583dcf30e7',1,'vtable_check_impl_trait(const Vtable *table, const char *trait):&#160;type.c']]],
+  ['vtable_5foverride_590',['vtable_override',['../type_8h.html#aeb0636afb88ebe75121824df05099b40',1,'vtable_override(Vtable *table, VtableEntry entry):&#160;type.c'],['../type_8c.html#aeb0636afb88ebe75121824df05099b40',1,'vtable_override(Vtable *table, VtableEntry entry):&#160;type.c']]],
+  ['vtableentry_591',['VtableEntry',['../structVtableEntry.html',1,'']]],
+  ['vtabletraitentry_592',['VtableTraitEntry',['../structVtableTraitEntry.html',1,'VtableTraitEntry'],['../type_8h.html#a63338e751335ad4f44c66f1ff050f2c9',1,'VtableTraitEntry():&#160;type.h']]]
 ];
