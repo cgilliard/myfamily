@@ -300,7 +300,7 @@ FatPtr build_fat_ptr(u64 size);
 #define PROC_PARAMS(...) FOR_EACH(UNWRAP_PARAM_NAME, , (, ), __VA_ARGS__)
 
 #define Param(type) (type, CAT(name_, __COUNTER__))
-#define SelfConfig() (const void*, config)
+#define SelfConfig() (const void*, config, ignore)
 
 #define Var()
 #define Const() const
@@ -322,8 +322,14 @@ FatPtr build_fat_ptr(u64 size);
 #define COUNT_OBJS(...) FOR_EACH_INNER(CALL_COUNT_OBJS, none, (;), __VA_ARGS__)
 
 #define BOTH_ALL(x, y, ...) x y
-#define CALL_BOTH(x, y) BOTH y
+#define CALL_BOTH(x, y) BOTH_ALL y
 #define PROCESS_FN_SIG(...) FOR_EACH_INNER(CALL_BOTH, none, (, ), __VA_ARGS__)
+
+#define EXPAND2(x) x
+#define PROC_BOTH_PROTO_(impl_type, param_type, param_name, ...) __VA_OPT__(const impl_type##Config*) EXPAND2 __VA_OPT__(NONE)(param_type param_name)
+#define PROC_BOTH_PROTO(...) PROC_BOTH_PROTO_(__VA_ARGS__)
+#define CALL_BOTH_PROTO(x, y) PROC_BOTH_PROTO(x, EXPAND_ALL y)
+#define PROCESS_FN_SIG_PROTO(impl_type, ...) FOR_EACH_INNER(CALL_BOTH_PROTO, impl_type, (, ), __VA_ARGS__)
 
 #define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)             \
 	static return_type fn_name(mutability() Obj* self __VA_OPT__(          \
@@ -423,7 +429,7 @@ FatPtr build_fat_ptr(u64 size);
 #define PROC_TRAIT_STATEMENT_IMPL_EXP_(impl_type, mutability, return_type, \
 				       fn_name, ...)                       \
 	return_type impl_type##_##fn_name(                                 \
-	    __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)));                      \
+	    __VA_OPT__(PROCESS_FN_SIG_PROTO(impl_type, __VA_ARGS__)));     \
 	static void __attribute__((                                        \
 	    constructor)) __required_add__##impl_type##_##fn_name()        \
 	{                                                                  \

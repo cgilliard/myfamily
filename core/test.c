@@ -848,7 +848,6 @@ Test(core, test_synchronized)
 	cr_assert(!JoinResult_is_error(&jr));
 	Lock_cleanup(&sync_lock);
 }
-
 Builder(TestType, Config(u64, x_in), Config(u32, y_in));
 Type(TestType, Field(u64, x), Field(u32, y));
 
@@ -903,9 +902,8 @@ u64 TestType_sub_both(u64 value1, u32 value2)
 	$Var(y) -= value2;
 	return $(x);
 }
-void TestType_build(const void* config_void)
+void TestType_build(const TestTypeConfig* config)
 {
-	const TestTypeConfig* config = config_void;
 	$Var(x) = config->x_in;
 	$Var(y) = config->y_in;
 }
@@ -977,9 +975,8 @@ Impl(TestServer, Drop);
 #define IMPL TestServer
 
 // do input validation and set defaults for our 'TestServer'
-void TestServer_build(const void* config_in)
+void TestServer_build(const TestServerConfig* config)
 {
-	const TestServerConfig* config = config_in;
 	// Check if threads are equal to 0. This is a misconfiguration. Panic if
 	// that's the case.
 	if (config->threads == 0)
@@ -1053,9 +1050,8 @@ Impl(TestMove, AccessTestMove);
 int tm_drop_count = 0;
 
 #define IMPL TestMove
-void TestMove_build(const void* config_in)
+void TestMove_build(const TestMoveConfig* config)
 {
-	const TestMoveConfig* config = config_in;
 	if (config->s == NULL)
 		panic("TestMove: s must not be NULL");
 	char* s = malloc(sizeof(char) * (strlen(config->s) + 1));
@@ -1188,9 +1184,8 @@ void InnerType_drop()
 	printf("drop inner type value = %" PRIu64 "\n", $(value));
 	inner_drops += 1;
 }
-void InnerType_build(const void* config_in)
+void InnerType_build(const InnerTypeConfig* config)
 {
-	const InnerTypeConfig* config = config_in;
 	$Var(value) = config->value;
 }
 #undef IMPL
@@ -1213,7 +1208,7 @@ void CompositeTest_set_comp_value(const Obj* value)
 {
 	Move(&$Var(z), value);
 }
-void CompositeTest_build(const void* config) { $Var(z) = OBJECT_INIT; }
+void CompositeTest_build(const CompositeTestConfig* config) { $Var(z) = OBJECT_INIT; }
 #undef IMPL
 
 Test(core, test_composites)
@@ -1255,9 +1250,8 @@ void AdvComp_set_both_adv(u64 v1, Obj* ptr)
 	$Var(x) = v1;
 	Move(&$Var(holder), ptr);
 }
-void AdvComp_build(const void* config_in)
+void AdvComp_build(const AdvCompConfig* config)
 {
-	const AdvCompConfig* config = config_in;
 	$Var(x) = config->x_in;
 }
 #undef IMPL
@@ -1306,9 +1300,8 @@ Impl(ServerComponent, Drop);
 int sc_drops = 0;
 
 #define IMPL ServerComponent
-void ServerComponent_build(const void* config_in)
+void ServerComponent_build(const ServerComponentConfig* config)
 {
-	const ServerComponentConfig* config = config_in;
 	$Var(value) = config->value;
 	$Var(ptr) = malloc(100);
 }
@@ -1331,9 +1324,8 @@ Impl(Server, ServerApi);
 
 #define IMPL Server
 void Server_drop() {}
-void Server_build(const void* config_in)
+void Server_build(const ServerConfig* config)
 {
-	const ServerConfig* config = config_in;
 	$Var(config) = *config;
 	$Var(state) = 0;
 	$Var(sc) = new (ServerComponent, With(value, 10));
@@ -1380,9 +1372,8 @@ u64 override_test_default() { return 100; }
 // implement our override function
 #define IMPL TestOver
 u64 my_over_fn() { return $(value); }
-void TestOver_build(const void* config_in)
+void TestOver_build(const TestOverConfig* config)
 {
-	const TestOverConfig* config = config_in;
 	$Var(value) = config->value;
 }
 #undef IMPL
@@ -1413,9 +1404,8 @@ TraitImpl(TestFixedArrImpl);
 Impl(TestFixedArr, TestFixedArrImpl);
 
 #define IMPL TestFixedArr
-void TestFixedArr_build(const void* config_in)
+void TestFixedArr_build(const TestFixedArrConfig* config)
 {
-	const TestFixedArrConfig* config = config_in;
 	u64 len = strlen(config->buf);
 	if (len >= 100)
 		len = 99;
@@ -1476,9 +1466,8 @@ Impl(SuperImpl, Build);
 
 // Do implementations which require 4 functions total.
 #define IMPL SuperImpl
-void SuperImpl_build(const void* config_in)
+void SuperImpl_build(const SuperImplConfig* config)
 {
-	const SuperImplConfig* config = config_in;
 	$Var(value) = config->value;
 }
 void SuperImpl_drop()
@@ -1514,7 +1503,7 @@ Impl(WithDrop, Build);
 
 #define IMPL WithDrop
 void WithDrop_drop() { printf("Droping withdrop %p\n", $()); }
-void WithDrop_build(const void* ptr) {}
+void WithDrop_build(const WithDropConfig* ptr) {}
 #undef IMPL
 
 Type(MyObject);
@@ -1541,7 +1530,7 @@ Impl(MyObjectBuildDrop, Drop);
 
 #define IMPL MyObjectBuildDrop
 void MyObjectBuildDrop_drop() {}
-void MyObjectBuildDrop_build(const void* config_in) {}
+void MyObjectBuildDrop_build(const MyObjectBuildDropConfig* config) {}
 #undef IMPL
 
 Test(core, test_where)
@@ -1554,16 +1543,38 @@ Test(core, test_where)
 	// set_wd_value(&x, &z);
 }
 
+// Demonstrate a test of the test_server
 Test(core, test_server)
 {
 	{
 		printf("test_server\n");
-		var server = new (HttpServer, With(threads, 2), With(port, 8080), With(host, "0.0.0.0"));
+		// create a mutable instance
+		var server = new (HttpServer, With(threads, 2));
+		// assert that it's not started.
 		cr_assert(!is_started(&server));
+		// start the server.
 		cr_assert(start_server(&server));
+		// now assert that the server has started.
 		cr_assert(is_started(&server));
+		// a second attempt to start the server will result in a false return value.
 		cr_assert(!start_server(&server));
+		// we print a couple of messages to show that the drop handlers are called at
+		// the right time.
 		printf("end scope, begin drop handlers\n");
 	}
 	printf("drop handlers should be complete.\n");
 }
+
+// Output:
+// ./bin/test --timeout 60 -f
+// test_server
+// building http server component. Alloc 0x60000163c000
+// Server started on 127.0.0.1:8080 with 2 threads
+// -----------------------------------------------------
+// Current stats: is_started: 1
+// -----------------------------------------------------
+// end scope, begin drop handlers
+// dropping http server component. Free 0x60000163c000
+// dropping can drop
+// dropping http server
+// drop handlers should be complete.
