@@ -21,10 +21,10 @@
 // Drop has a special TraitImpl because we need to prevent it from being called
 // twice so it's not implemented using the standard TraitImpl.
 // TraitImpl(Drop);
-void drop(Object* self);
+void drop(Obj* self);
 
 // TODO: need generics here so we can pass the config in instead of a void pointer.
-#define Build DefineTrait(Build, Required(Var, void, build, Param(const void*)))
+#define Build DefineTrait(Build, Required(Var, void, build, SelfConfig()))
 TraitImpl(Build);
 
 #endif // _CORE_TRAITS__

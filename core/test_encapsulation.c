@@ -30,7 +30,7 @@ Type(
     Field(u64, value),
     Field(HiddenConfig, config),
     Generic(T, v2),
-    Obj(HiddenDrop, dd));
+    Object(HiddenDrop, dd));
 
 #define IMPL Hidden
 void Hidden_build(HiddenConfig* config)

@@ -18,8 +18,6 @@
 #include <core/traits.h>
 #include <core/type.h>
 
-void format_print_stats_impl();
-
 #define HttpServerCore DefineTrait(     \
     HttpServerCore,                     \
     Required(Const, void, print_stats), \

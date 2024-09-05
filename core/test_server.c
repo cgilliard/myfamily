@@ -48,13 +48,12 @@ Type(
     Where(T, TraitBound(Drop)),
     Field(HttpServerConfig, config),
     Field(bool, is_started),
-    Obj(HttpServerComponent, hsc),
+    Object(HttpServerComponent, hsc),
     Generic(T, droppable));
 
 #define IMPL HttpServer
-void HttpServer_build(const void* config_in)
+void HttpServer_validate_input(const HttpServerConfig* config)
 {
-	const HttpServerConfig* config = config_in;
 	if (config->threads == 0)
 		panic("Threads must be greater than 0. Halting!");
 	if (config->port == 0)
@@ -63,6 +62,11 @@ void HttpServer_build(const void* config_in)
 		panic("host must not be NULL. Halting!");
 
 	$Var(config) = *config;
+}
+void HttpServer_build(const void* config_in)
+{
+	const HttpServerConfig* config = config_in;
+	HttpServer_validate_input(config);
 	$Var(is_started) = false;
 	let can_drop = new (CanDrop);
 	Move(&$Var(droppable), &can_drop);

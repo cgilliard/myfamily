@@ -1113,7 +1113,7 @@ Test(core, test_use_after_drop)
 		cr_assert_eq(tm_drop_count, 0);
 		drop(&tm1);
 		cr_assert_eq(tm_drop_count, 1);
-		// would result in panic due to drop being called. Object is
+		// would result in panic due to drop being called. Obj is
 		// consumed.
 		// cr_assert_eq(get_tm_len(&tm1), 4);
 	}
@@ -1156,7 +1156,7 @@ Test(core, test_defaults)
 
 Type(InnerType, Field(u64, value));
 Builder(InnerType, Config(u64, value));
-Type(CompositeTest, Field(u64, x), Field(u32, y), Field(Object, z));
+Type(CompositeTest, Field(u64, x), Field(u32, y), Field(Obj, z));
 Builder(CompositeTest, Config(u64, x), Config(u32, y));
 
 #define InnerValue DefineTrait(InnerValue, Required(Const, u64, inner_value))
@@ -1170,7 +1170,7 @@ Impl(CompositeTest, Build);
 
 #define SetCompTrait                                                  \
 	DefineTrait(SetCompTrait, Required(Var, void, set_comp_value, \
-					   Param(const Object*)))
+					   Param(const Obj*)))
 
 TraitImpl(SetCompTrait);
 Impl(CompositeTest, SetCompTrait);
@@ -1195,9 +1195,9 @@ void InnerType_build(const void* config_in)
 }
 #undef IMPL
 
-// TODO: create a macro 'Obj' which allows for conveinent initialization of
-// Objects (Setting it to OBJECT_INIT. It would allow for a type param
-// (and later traits)). It would also automatically call Object_cleanup when its
+// TODO: create a macro 'Object' which allows for conveinent initialization of
+// Objs (Setting it to OBJECT_INIT. It would allow for a type param
+// (and later traits)). It would also automatically call Obj_cleanup when its
 // own cleanup is called. Also review what 'with' is doing here. We need to call
 // Move instead if possible.
 #define IMPL CompositeTest
@@ -1205,11 +1205,11 @@ void CompositeTest_drop()
 {
 	printf("drop composite type type value(x) = %" PRIu64 "\n", $(x));
 	printf("drop composite type type value(y) = %u\n", $(y));
-	Object_cleanup(&$Var(z));
+	Obj_cleanup(&$Var(z));
 	comp_drops += 1;
 }
 
-void CompositeTest_set_comp_value(const Object* value)
+void CompositeTest_set_comp_value(const Obj* value)
 {
 	Move(&$Var(z), value);
 }
@@ -1236,21 +1236,21 @@ Test(core, test_composites)
 
 #define AdvCompSetBoth                                                \
 	DefineTrait(AdvCompSetBoth, Required(Var, void, set_both_adv, \
-					     Param(u64), Param(Object*)))
+					     Param(u64), Param(Obj*)))
 TraitImpl(AdvCompSetBoth);
 
-Type(AdvComp, Field(u64, x), Obj(InnerType, holder));
+Type(AdvComp, Field(u64, x), Object(InnerType, holder));
 Builder(AdvComp, Config(u64, x_in));
 Impl(AdvComp, SetCompTrait);
 Impl(AdvComp, AdvCompSetBoth);
 Impl(AdvComp, Build);
 
 #define IMPL AdvComp
-void AdvComp_set_comp_value(const Object* value)
+void AdvComp_set_comp_value(const Obj* value)
 {
 	Move(&$Var(holder), value);
 }
-void AdvComp_set_both_adv(u64 v1, Object* ptr)
+void AdvComp_set_both_adv(u64 v1, Obj* ptr)
 {
 	$Var(x) = v1;
 	Move(&$Var(holder), ptr);
@@ -1320,7 +1320,7 @@ void ServerComponent_drop()
 #undef IMPL
 
 Builder(Server, Config(u32, threads), Config(u16, port), Config(char*, host));
-Type(Server, Field(u64, state), Field(bool, is_started), Field(ServerConfig, config), Obj(ServerComponent, sc));
+Type(Server, Field(u64, state), Field(bool, is_started), Field(ServerConfig, config), Object(ServerComponent, sc));
 
 #define ServerApi DefineTrait(ServerApi, Required(Var, bool, start_test_server), Required(Const, bool, is_test_started))
 TraitImpl(ServerApi);
@@ -1517,31 +1517,31 @@ void WithDrop_drop() { printf("Droping withdrop %p\n", $()); }
 void WithDrop_build(const void* ptr) {}
 #undef IMPL
 
-Type(MyObj);
+Type(MyObject);
 Type(XType, Where(T, TraitBound(Drop), TraitBound(Build)), Field(u64, x), Generic(T, wd));
 Builder(XType);
 
-#define XTypeApi DefineTrait(XTypeApi, Required(Var, void, set_wd_value, Param(Object*)))
+#define XTypeApi DefineTrait(XTypeApi, Required(Var, void, set_wd_value, Param(Obj*)))
 TraitImpl(XTypeApi);
 
 Impl(XType, XTypeApi);
 
 #define IMPL XType
-void XType_set_wd_value(Object* ptr)
+void XType_set_wd_value(Obj* ptr)
 {
 	Move(&$Var(wd), ptr);
 }
 #undef IMPL
 
-Type(MyObjBuildDrop);
-Builder(MyObjBuildDrop);
+Type(MyObjectBuildDrop);
+Builder(MyObjectBuildDrop);
 
-Impl(MyObjBuildDrop, Build);
-Impl(MyObjBuildDrop, Drop);
+Impl(MyObjectBuildDrop, Build);
+Impl(MyObjectBuildDrop, Drop);
 
-#define IMPL MyObjBuildDrop
-void MyObjBuildDrop_drop() {}
-void MyObjBuildDrop_build(const void* config_in) {}
+#define IMPL MyObjectBuildDrop
+void MyObjectBuildDrop_drop() {}
+void MyObjectBuildDrop_build(const void* config_in) {}
 #undef IMPL
 
 Test(core, test_where)
@@ -1549,7 +1549,7 @@ Test(core, test_where)
 	var y = new (WithDrop);
 	var x = new (XType);
 	set_wd_value(&x, &y);
-	var z = new (MyObjBuildDrop);
+	var z = new (MyObjectBuildDrop);
 	// this would panic because the binding to type 'WithDrop' has already occurred.
 	// set_wd_value(&x, &z);
 }

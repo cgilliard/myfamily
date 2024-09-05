@@ -14,10 +14,10 @@
 
 #include <core/traits.h>
 
-void drop(Object* self)
+void drop(Obj* self)
 {
 	if (self->flags & OBJECT_FLAGS_CONSUMED)
-		panic("Runtime error: Object [%s@%" PRIu64
+		panic("Runtime error: Obj [%s@%" PRIu64
 		      "] has already been consumed!",
 		      self->vtable->name, self->ptr.id);
 	void (*impl)() = find_fn(self, "drop");

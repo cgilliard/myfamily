@@ -17,8 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-_Thread_local const Object* __thread_local_self_Const = NULL;
-_Thread_local Object* __thread_local_self_Var = NULL;
+_Thread_local const Obj* __thread_local_self_Const = NULL;
+_Thread_local Obj* __thread_local_self_Var = NULL;
 
 atomic_ullong __global_counter__;
 void __attribute__((constructor)) init_global_counter()
@@ -136,7 +136,7 @@ void vtable_add_trait(Vtable* table, char* trait)
 	table->trait_len += 1;
 }
 
-void* find_fn(const Object* obj, const char* name)
+void* find_fn(const Obj* obj, const char* name)
 {
 	int left = 0;
 	int right = obj->vtable->len - 1;
@@ -167,30 +167,30 @@ void SelfCleanupImpl_update(SelfCleanupImpl* ptr)
 	__thread_local_self_Var = ptr->prev_tl_self_Var;
 }
 
-void Object_check_param(const Object* obj)
+void Obj_check_param(const Obj* obj)
 {
 	if (obj && (obj->flags & OBJECT_FLAGS_CONSUMED) != 0)
 		panic("Passing a consumed object as a function "
 		      "parameter!");
 }
 
-void Object_build_int(Object* ptr)
+void Obj_build_int(Obj* ptr)
 {
 	// call internal build handler
-	void (*build_int)(Object* ptr) = find_fn(ptr, "build_internal");
+	void (*build_int)(Obj* ptr) = find_fn(ptr, "build_internal");
 	if (!build_int)
 		panic("no internal build handler found");
 	build_int(ptr);
 }
 
-void Object_build(Object* ptr, const void* config)
+void Obj_build(Obj* ptr, const void* config)
 {
 	void (*do_build)(const void* config) = find_fn(ptr, "build");
 	if (do_build)
 	{
 		// setup self references
-		Object* tmp_Var = __thread_local_self_Var;
-		const Object* tmp_Const = __thread_local_self_Const;
+		Obj* tmp_Var = __thread_local_self_Var;
+		const Obj* tmp_Const = __thread_local_self_Const;
 		__thread_local_self_Const = ptr;
 		__thread_local_self_Var = ptr;
 		do_build(config);
@@ -211,24 +211,24 @@ void Object_build(Object* ptr, const void* config)
 #else
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
-void Object_cleanup(const Object* ptr)
+void Obj_cleanup(const Obj* ptr)
 {
-	Object* unconst = ptr;
+	Obj* unconst = ptr;
 	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0)
 	{
 		// call internal drop handler
-		void (*drop_int)(Object* ptr) = find_fn(ptr, "drop_internal");
+		void (*drop_int)(Obj* ptr) = find_fn(ptr, "drop_internal");
 		if (!drop_int)
 			panic("no internal drop handler found");
 		drop_int(unconst);
 
 		// call defined drop handler
-		void (*drop)(Object* ptr) = find_fn(ptr, "drop");
+		void (*drop)(Obj* ptr) = find_fn(ptr, "drop");
 		if (drop)
 		{
 			// setup self references
-			Object* tmp_Var = __thread_local_self_Var;
-			Object* tmp_Const = __thread_local_self_Const;
+			Obj* tmp_Var = __thread_local_self_Var;
+			Obj* tmp_Const = __thread_local_self_Const;
 			__thread_local_self_Const = unconst;
 			__thread_local_self_Var = unconst;
 			drop(ptr);
@@ -255,9 +255,9 @@ void Object_cleanup(const Object* ptr)
 #else
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
-void Object_mark_consumed(const Object* ptr)
+void Obj_mark_consumed(const Obj* ptr)
 {
-	Object* unconst = ptr;
+	Obj* unconst = ptr;
 	unconst->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
 }
 #pragma GCC diagnostic pop
