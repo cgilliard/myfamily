@@ -22,6 +22,7 @@
 #include <core/panic.h>
 #include <core/types.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define MAX_TRAIT_NAME_LEN 128
@@ -134,14 +135,18 @@ FatPtr build_fat_ptr(u64 size);
 #define PROCESS_WHERE_INNER_(...) PROCESS_WHERE_INNER__(__VA_ARGS__)
 #define PROCESS_WHERE_INNER(ignore, value) PROCESS_WHERE_INNER_(value)
 #define PROCESS_WHERE_________(name, value, ...)                                          \
-	Vtable value##_Vtable__ = {#value, 0, NULL, 0, NULL, true};                       \
+	Vtable name##_##value##_Vtable__ = {#value, 0, NULL, 0, NULL, true};              \
 	void __attribute__((constructor)) __add_where_##name##_##value##_vtable()         \
 	{                                                                                 \
 		char* arr[] = {FOR_EACH_INNER(PROCESS_WHERE_INNER, , (, ), __VA_ARGS__)}; \
-		for (u64 i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)                    \
+		int size = sizeof(arr) / sizeof(arr[0]);                                  \
+		name##_generic_name_arr = malloc((1 + size) * sizeof(char*));             \
+		for (u64 i = 0; i < size; i++)                                            \
 		{                                                                         \
-			vtable_add_trait(&value##_Vtable__, arr[i]);                      \
+			name##_generic_name_arr[i] = #value;                              \
+			vtable_add_trait(&name##_##value##_Vtable__, arr[i]);             \
 		}                                                                         \
+		name##_generic_name_arr[size] = NULL;                                     \
 	}
 #define PROCESS_WHERE________(name, value, ...) PROCESS_WHERE_________(name, value, __VA_ARGS__)
 #define PROCESS_WHERE_______(name, value, ...) PROCESS_WHERE________(name, EXPAND_ALL value)
@@ -153,10 +158,36 @@ FatPtr build_fat_ptr(u64 size);
 #define PROCESS_WHERE_(name, value, ...) PROCESS_WHERE__(name, value)
 #define PROCESS_WHERE(name, where) PROCESS_WHERE_(name, EXPAND_ALL where)
 
-#define BUILD_OBJECTS____(name, struct_type, inner, ...)          \
-	__VA_OPT__(((name*)(ptr->ptr.data))->inner = OBJECT_INIT; \
-		   ((name*)(ptr->ptr.data))->inner.vtable =       \
-		       &__VA_ARGS__##_Vtable__;)
+#define BUILD_OBJECTS_IMPL_(name, struct_type, inner, vtable_name, ...) __VA_OPT__(NONE)(BUILD_OBJECTS_IMPL__(name, struct_type, inner, vtable_name)) __VA_OPT__(BUILD_OBJECT_GENERIC(name, struct_type, inner, vtable_name))
+#define BUILD_OBJECTS_IMPL(name, struct_type, inner, ...) BUILD_OBJECTS_IMPL_(name, struct_type, inner, __VA_ARGS__)
+#define BUILD_OBJECTS_IMPL__(name, struct_type, inner, vtable_name) ({                              \
+	((name*)(ptr->ptr.data))->inner = OBJECT_INIT;                                              \
+	bool _is_generic__ = false;                                                                 \
+	for (u64 i = 0; name##_generic_name_arr != NULL && name##_generic_name_arr[i] != NULL; i++) \
+	{                                                                                           \
+		if (!strcmp(name##_generic_name_arr[i], STRINGIFY(vtable_name)))                    \
+		{                                                                                   \
+			_is_generic__ = true;                                                       \
+			break;                                                                      \
+		}                                                                                   \
+	}                                                                                           \
+	((name*)(ptr->ptr.data))->inner.vtable = &vtable_name##_Vtable__;                           \
+})
+#define BUILD_OBJECT_GENERIC(name, struct_type, inner, vtable_name) ({                              \
+	((name*)(ptr->ptr.data))->inner = OBJECT_INIT;                                              \
+	bool _is_generic__ = false;                                                                 \
+	for (u64 i = 0; name##_generic_name_arr != NULL && name##_generic_name_arr[i] != NULL; i++) \
+	{                                                                                           \
+		if (!strcmp(name##_generic_name_arr[i], STRINGIFY(vtable_name)))                    \
+		{                                                                                   \
+			_is_generic__ = true;                                                       \
+			break;                                                                      \
+		}                                                                                   \
+	}                                                                                           \
+	((name*)(ptr->ptr.data))->inner.vtable = &name##_##vtable_name##_Vtable__;                  \
+})
+
+#define BUILD_OBJECTS____(name, struct_type, inner, ...) __VA_OPT__(BUILD_OBJECTS_IMPL(name, struct_type, inner, __VA_ARGS__))
 #define BUILD_OBJECTS__(name, v1, ...) __VA_OPT__(BUILD_OBJECTS____(name, v1, __VA_ARGS__))
 #define BUILD_OBJECTS_(name, v1, ...) BUILD_OBJECTS__(name, v1 __VA_OPT__(, ) __VA_ARGS__)
 #define BUILD_OBJECTS(name, inner) BUILD_OBJECTS_(name, EXPAND_ALL inner)
@@ -176,6 +207,7 @@ FatPtr build_fat_ptr(u64 size);
 #define Type(name, ...)                                                 \
 	typedef struct name name;                                       \
 	Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL, false};      \
+	static char** name##_generic_name_arr = NULL;                   \
 	u64 name##_size();                                              \
 	typedef struct name                                             \
 	{                                                               \
@@ -208,6 +240,7 @@ FatPtr build_fat_ptr(u64 size);
 #define Field(field_type, field_name) (field_type, field_name)
 #define Config(field_type, field_name) (field_type, field_name)
 #define Obj(obj_type, obj_name) (Object, obj_name, obj_type)
+#define Generic(obj_type, obj_name) (Object, obj_name, obj_type, ignore)
 #define With(x, y) (x, y, ignore)
 #define WithObj(x, y) (x, y)
 

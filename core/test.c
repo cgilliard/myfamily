@@ -1517,7 +1517,7 @@ void WithDrop_build(const void* ptr) {}
 #undef IMPL
 
 Type(MyObj);
-Type(XType, Where(T, TraitBound(Drop), TraitBound(Build)), Field(u64, x), Obj(T, wd));
+Type(XType, Where(T, TraitBound(Drop), TraitBound(Build)), Field(u64, x), Generic(T, wd));
 TypeDef(XType);
 
 #define XTypeApi DefineTrait(XTypeApi, Required(Var, void, set_wd_value, Param(Object*)))

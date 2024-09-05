@@ -13,15 +13,26 @@
 // limitations under the License.
 
 #include <core/test_encapsulation.h>
+#include <core/traits.h>
 #include <core/type.h>
 
-Type(Hidden, Field(u64, value), Field(HiddenConfig, config));
+Type(HiddenDrop);
+TypeDef(HiddenDrop);
+Impl(HiddenDrop, Drop);
+
+#define IMPL HiddenDrop
+void HiddenDrop_drop() {}
+#undef IMPL
+
+Type(Hidden, Where(T, TraitBound(Drop)), Field(u64, value), Field(HiddenConfig, config), Generic(T, v2), Obj(HiddenDrop, dd));
 
 #define IMPL Hidden
 void Hidden_build(HiddenConfig* config)
 {
 	printf("building hidden: capacity = %llu\n", config->capacity);
 	$Var(config) = *config;
+	let hd = new (HiddenDrop);
+	Move(&$Var(v2), &hd);
 }
 
 void Hidden_drop()
