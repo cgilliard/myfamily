@@ -29,4 +29,7 @@ TraitImpl(Build);
 #define Equal DefineTrait(Equal, Required(Const, bool, equal, Self()))
 TraitImpl(Equal);
 
+#define Clone DefineTrait(Clone, Required(Const, Obj, klone))
+TraitImpl(Clone);
+
 #endif // _CORE_TRAITS__

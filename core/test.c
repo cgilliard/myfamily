@@ -1630,3 +1630,53 @@ Test(core, test_equal)
 	// would cause panic because mismatched types.
 	// cr_assert(!equal(&a, &x));
 }
+
+#define IncrTrait DefineTrait(IncrTrait, Required(Var, void, incr_clone_test))
+TraitImpl(IncrTrait);
+
+Type(CloneTest, Field(u64, value));
+Builder(CloneTest, Config(u64, value));
+
+Impl(CloneTest, Build);
+Impl(CloneTest, Clone);
+Impl(CloneTest, Drop);
+Impl(CloneTest, IncrTrait);
+
+int clone_test_drop_count = 0;
+
+#define IMPL CloneTest
+void CloneTest_build(const CloneTestConfig* config)
+{
+	$Var(value) = config->value;
+}
+void CloneTest_drop()
+{
+	clone_test_drop_count++;
+}
+Obj CloneTest_klone()
+{
+	var ret = new (CloneTest, With(value, $(value)));
+	ReturnObj(ret);
+}
+void CloneTest_incr_clone_test()
+{
+	$Var(value)++;
+}
+#undef IMPL
+
+Test(core, test_clone)
+{
+	{
+		var x = new (CloneTest, With(value, 100));
+		let y = klone(&x);
+		cr_assert_eq($Context((&y), CloneTest, value), 100);
+		let z = klone(&y);
+		cr_assert_eq($Context((&z), CloneTest, value), 100);
+		cr_assert_eq(clone_test_drop_count, 0);
+		incr_clone_test(&x);
+		cr_assert_eq($Context((&x), CloneTest, value), 101);
+		cr_assert_eq($Context((&y), CloneTest, value), 100);
+		cr_assert_eq($Context((&z), CloneTest, value), 100);
+	}
+	cr_assert_eq(clone_test_drop_count, 3);
+}
