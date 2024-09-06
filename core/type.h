@@ -29,6 +29,12 @@
 
 #define OBJECT_FLAGS_NO_CLEANUP (0x1 << 0)
 #define OBJECT_FLAGS_CONSUMED (0x1 << 1)
+#define OBJECT_FLAGS_RESERVED1 (0x1 << 2)
+#define OBJECT_FLAGS_RESERVED2 (0x1 << 3)
+#define OBJECT_FLAGS_RESERVED3 (0x1 << 4)
+#define OBJECT_FLAGS_RESERVED4 (0x1 << 5)
+#define OBJECT_FLAGS_RESERVED5 (0x1 << 6)
+#define OBJECT_FLAGS_RESERVED6 (0x1 << 7)
 
 typedef struct
 {
@@ -355,10 +361,22 @@ FatPtr build_fat_ptr(u64 size);
 #define CHECK_SELF_IMPL(self, param) CHECK_SELF_IMPL_(self, EXPAND_ALL2 param)
 #define CHECK_SELF_PARAMS(self, ...) __VA_OPT__(FOR_EACH_INNER(CHECK_SELF_IMPL, self, (;), __VA_ARGS__))
 
+// clang-format off
+#define UNEXPECTED_FLAGS(f) if (      \
+	f & OBJECT_FLAGS_RESERVED1 || \
+	f & OBJECT_FLAGS_RESERVED2 || \
+	f & OBJECT_FLAGS_RESERVED3 || \
+	f & OBJECT_FLAGS_RESERVED4 || \
+	f & OBJECT_FLAGS_RESERVED5 || \
+	f & OBJECT_FLAGS_RESERVED6)   \
+		panic("Runtime error: Obj in unexpected state! Was it initialized?");
+// clang-format on
+
 #define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)                      \
 	static return_type fn_name(mutability() Obj* self __VA_OPT__(                   \
 	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)))                                \
 	{                                                                               \
+		UNEXPECTED_FLAGS(self->flags);                                          \
 		if (self->flags & OBJECT_FLAGS_CONSUMED)                                \
 		{                                                                       \
 			if (self->vtable == NULL)                                       \
@@ -419,6 +437,7 @@ FatPtr build_fat_ptr(u64 size);
 	static return_type fn_name(mutability() Obj* self __VA_OPT__(                   \
 	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)))                                \
 	{                                                                               \
+		UNEXPECTED_FLAGS(self->flags);                                          \
 		if (self->flags & OBJECT_FLAGS_CONSUMED)                                \
 		{                                                                       \
 			if (self->vtable == NULL)                                       \
