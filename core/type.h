@@ -210,38 +210,38 @@ FatPtr build_fat_ptr(u64 size);
 		__VA_OPT__(FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__)); \
 	} name##Config;
 
-#define Type(name, ...)                                                      \
-	typedef struct name name;                                            \
-	Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL, false};           \
-	static char** name##_generic_name_arr = NULL;                        \
-	u64 name##_size();                                                   \
-	typedef struct name                                                  \
-	{                                                                    \
-		char _dummy__;                                               \
-		__VA_OPT__(FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);)    \
-	} name;                                                              \
-	u64 name##_size() { return sizeof(name); }                           \
-	__VA_OPT__(FOR_EACH(PROCESS_WHERE, name, (;), __VA_ARGS__));         \
-	void name##_build_internal(Obj* ptr)                                 \
-	{                                                                    \
-		u64 size = name##_size();                                    \
-		memset(ptr->ptr.data, 0, size);                              \
-		__VA_OPT__(FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__)); \
-	}                                                                    \
-	void name##_drop_internal(Obj* ptr)                                  \
-	{                                                                    \
-		__VA_OPT__(FOR_EACH(DROP_OBJECTS, name, (;), __VA_ARGS__));  \
-	}                                                                    \
-	void __attribute__((constructor)) __add_impls_##name##_vtable()      \
-	{                                                                    \
-		VtableEntry size = {"size", name##_size};                    \
-		vtable_add_entry(&name##_Vtable__, size);                    \
-		VtableEntry build_internal = {"build_internal",              \
-					      name##_build_internal};        \
-		vtable_add_entry(&name##_Vtable__, build_internal);          \
-		VtableEntry drop_internal = {"drop_internal",                \
-					     name##_drop_internal};          \
-		vtable_add_entry(&name##_Vtable__, drop_internal);           \
+#define Type(name, ...)                                                                                     \
+	typedef struct name name;                                                                           \
+	Vtable name##_Vtable__ = {#name, 0, NULL, 0, NULL, false};                                          \
+	static char** name##_generic_name_arr = NULL;                                                       \
+	u64 name##_size();                                                                                  \
+	typedef struct name                                                                                 \
+	{                                                                                                   \
+		EXPAND(EXPAND_ALL __VA_OPT__(PAREN) __VA_OPT__(PAREN_END) __VA_OPT__(NONE)(char _dummy__;)) \
+		__VA_OPT__(FOR_EACH(CALL_FIRST_TWO, , (;), __VA_ARGS__);)                                   \
+	} name;                                                                                             \
+	u64 name##_size() { return sizeof(name); }                                                          \
+	__VA_OPT__(FOR_EACH(PROCESS_WHERE, name, (;), __VA_ARGS__));                                        \
+	void name##_build_internal(Obj* ptr)                                                                \
+	{                                                                                                   \
+		u64 size = name##_size();                                                                   \
+		memset(ptr->ptr.data, 0, size);                                                             \
+		__VA_OPT__(FOR_EACH(BUILD_OBJECTS, name, (;), __VA_ARGS__));                                \
+	}                                                                                                   \
+	void name##_drop_internal(Obj* ptr)                                                                 \
+	{                                                                                                   \
+		__VA_OPT__(FOR_EACH(DROP_OBJECTS, name, (;), __VA_ARGS__));                                 \
+	}                                                                                                   \
+	void __attribute__((constructor)) __add_impls_##name##_vtable()                                     \
+	{                                                                                                   \
+		VtableEntry size = {"size", name##_size};                                                   \
+		vtable_add_entry(&name##_Vtable__, size);                                                   \
+		VtableEntry build_internal = {"build_internal",                                             \
+					      name##_build_internal};                                       \
+		vtable_add_entry(&name##_Vtable__, build_internal);                                         \
+		VtableEntry drop_internal = {"drop_internal",                                               \
+					     name##_drop_internal};                                         \
+		vtable_add_entry(&name##_Vtable__, drop_internal);                                          \
 	}
 
 #define Field(field_type, field_name) (field_type, field_name)
