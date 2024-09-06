@@ -355,31 +355,36 @@ FatPtr build_fat_ptr(u64 size);
 #define CHECK_SELF_IMPL(self, param) CHECK_SELF_IMPL_(self, EXPAND_ALL2 param)
 #define CHECK_SELF_PARAMS(self, ...) __VA_OPT__(FOR_EACH_INNER(CHECK_SELF_IMPL, self, (;), __VA_ARGS__))
 
-#define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)             \
-	static return_type fn_name(mutability() Obj* self __VA_OPT__(          \
-	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)))                       \
-	{                                                                      \
-		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
-			panic("Runtime error: Obj [%s@%" PRIu64                \
-			      "] has already been consumed!",                  \
-			      self->vtable->name, self->ptr.id);               \
-		return_type (*impl)(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) = \
-		    find_fn(self, #fn_name);                                   \
-		if (!impl)                                                     \
-			panic("Runtime error: Trait bound violation! "         \
-			      "Type "                                          \
-			      "'%s' does "                                     \
-			      "not implement the "                             \
-			      "required function [%s]",                        \
-			      TypeName((*self)), #fn_name);                    \
-		SelfCleanup sc = {__thread_local_self_Const,                   \
-				  __thread_local_self_Var};                    \
-		__thread_local_self_Const = self;                              \
-		__thread_local_self_Var = NULL;                                \
-		__thread_local_self_##mutability = self;                       \
-		CHECK_SELF_PARAMS(self, __VA_ARGS__);                          \
-		PROCESS_FN_CHECK_OBJECTS(__VA_ARGS__);                         \
-		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
+#define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name, ...)                      \
+	static return_type fn_name(mutability() Obj* self __VA_OPT__(                   \
+	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)))                                \
+	{                                                                               \
+		if (self->flags & OBJECT_FLAGS_CONSUMED)                                \
+		{                                                                       \
+			if (self->vtable == NULL)                                       \
+				panic("Runtime error: Obj has not been instantiated!"); \
+			else                                                            \
+				panic("Runtime error: Obj [%s@%" PRIu64                 \
+				      "] has already been consumed!",                   \
+				      self->vtable->name, self->ptr.id);                \
+		}                                                                       \
+		return_type (*impl)(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) =          \
+		    find_fn(self, #fn_name);                                            \
+		if (!impl)                                                              \
+			panic("Runtime error: Trait bound violation! "                  \
+			      "Type "                                                   \
+			      "'%s' does "                                              \
+			      "not implement the "                                      \
+			      "required function [%s]",                                 \
+			      TypeName((*self)), #fn_name);                             \
+		SelfCleanup sc = {__thread_local_self_Const,                            \
+				  __thread_local_self_Var};                             \
+		__thread_local_self_Const = self;                                       \
+		__thread_local_self_Var = NULL;                                         \
+		__thread_local_self_##mutability = self;                                \
+		CHECK_SELF_PARAMS(self, __VA_ARGS__);                                   \
+		PROCESS_FN_CHECK_OBJECTS(__VA_ARGS__);                                  \
+		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));                  \
 	}
 #define DEFAULT_IMPL__(T, default_impl_fn, mutability, return_type, fn_name,  \
 		       ...)                                                   \
@@ -409,32 +414,37 @@ FatPtr build_fat_ptr(u64 size);
 	MULTI_SWITCH2_INNER(SUPER_PROC, DEFAULT_IMPL__, x, __VA_ARGS__)
 #define DEFAULT_IMPL(T, ...) DEFAULT_IMPL_(T, EXPAND_ALL __VA_ARGS__)
 
-#define PROC_TRAIT_IMPL_FN_DEFAULT__(default_fn, mutability, return_type,      \
-				     fn_name, ...)                             \
-	static return_type fn_name(mutability() Obj* self __VA_OPT__(          \
-	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)))                       \
-	{                                                                      \
-		if (self->flags & OBJECT_FLAGS_CONSUMED)                       \
-			panic("Runtime error: Obj [%s@%" PRIu64                \
-			      "] has already been consumed!",                  \
-			      self->vtable->name, self->ptr.id);               \
-		return_type (*impl)(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) = \
-		    find_fn(self, #fn_name);                                   \
-		if (!impl)                                                     \
-			panic("Runtime error: Trait bound violation! "         \
-			      "Type "                                          \
-			      "'%s' does "                                     \
-			      "not implement the "                             \
-			      "required function [%s]",                        \
-			      TypeName((*self)), #fn_name);                    \
-		SelfCleanup sc = {__thread_local_self_Const,                   \
-				  __thread_local_self_Var};                    \
-		__thread_local_self_Const = self;                              \
-		__thread_local_self_Var = NULL;                                \
-		__thread_local_self_##mutability = self;                       \
-		CHECK_SELF_PARAMS(self, __VA_ARGS__);                          \
-		PROCESS_FN_CHECK_OBJECTS(__VA_ARGS__);                         \
-		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));         \
+#define PROC_TRAIT_IMPL_FN_DEFAULT__(default_fn, mutability, return_type,               \
+				     fn_name, ...)                                      \
+	static return_type fn_name(mutability() Obj* self __VA_OPT__(                   \
+	    , ) __VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__)))                                \
+	{                                                                               \
+		if (self->flags & OBJECT_FLAGS_CONSUMED)                                \
+		{                                                                       \
+			if (self->vtable == NULL)                                       \
+				panic("Runtime error: Obj has not been instantiated!"); \
+			else                                                            \
+				panic("Runtime error: Obj [%s@%" PRIu64                 \
+				      "] has already been consumed!",                   \
+				      self->vtable->name, self->ptr.id);                \
+		}                                                                       \
+		return_type (*impl)(__VA_OPT__(PROCESS_FN_SIG(__VA_ARGS__))) =          \
+		    find_fn(self, #fn_name);                                            \
+		if (!impl)                                                              \
+			panic("Runtime error: Trait bound violation! "                  \
+			      "Type "                                                   \
+			      "'%s' does "                                              \
+			      "not implement the "                                      \
+			      "required function [%s]",                                 \
+			      TypeName((*self)), #fn_name);                             \
+		SelfCleanup sc = {__thread_local_self_Const,                            \
+				  __thread_local_self_Var};                             \
+		__thread_local_self_Const = self;                                       \
+		__thread_local_self_Var = NULL;                                         \
+		__thread_local_self_##mutability = self;                                \
+		CHECK_SELF_PARAMS(self, __VA_ARGS__);                                   \
+		PROCESS_FN_CHECK_OBJECTS(__VA_ARGS__);                                  \
+		return impl(__VA_OPT__(PROCESS_FN_CALL(__VA_ARGS__)));                  \
 	}
 
 #define SUPER_TRAIT_CONFIG(trait_name, ignore)
