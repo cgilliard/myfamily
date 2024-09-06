@@ -1714,3 +1714,94 @@ Test(core, test_clone)
 	// cleanup/drop called when we called clone_from so 5 drops occurred.
 	cr_assert_eq(clone_test_drop_count, 5);
 }
+
+// Implement a rudimentary Option. This will be improved once we have Enumerations implemented, but for now
+// this will demonstrate the Iterator trait.
+Type(SimpleOption, Field(bool, is_some), Field(int, value));
+Builder(SimpleOption, Config(bool, is_some), Config(int, value));
+
+// implement Build
+Impl(SimpleOption, Build);
+
+// define an accessor trait
+#define SimpleOptionImpl DefineTrait(SimpleOptionImpl, Required(Const, int, option_value), Required(Const, bool, is_some))
+TraitImpl(SimpleOptionImpl);
+
+// implement it in SimpleOption
+Impl(SimpleOption, SimpleOptionImpl);
+
+// Do implementation (fairly self explanitory)
+#define IMPL SimpleOption
+void SimpleOption_build(const SimpleOptionConfig* config)
+{
+	$Var(is_some) = config->is_some;
+	$Var(value) = config->value;
+}
+bool SimpleOption_is_some() { return $(is_some); }
+int SimpleOption_option_value() { return $(value); }
+#undef IMPL
+
+// Implement a type that implements Iterator. This will be a simple int array
+// iterator.
+Type(IttTest, Field(int*, arr), Field(u64, len), Field(u64, cur));
+Builder(IttTest, Config(int*, arr), Config(u64, len));
+
+Impl(IttTest, Build);
+Impl(IttTest, Iterator);
+
+#define IMPL IttTest
+// builder initializes values
+void IttTest_build(const IttTestConfig* config)
+{
+	$Var(arr) = config->arr;
+	$Var(len) = config->len;
+	$Var(cur) = 0;
+}
+
+// next reutrns a 'next' value until 'cur' is greater than or equal to 'len'.
+Obj IttTest_next()
+{
+	if ($(cur) >= $(len))
+	{
+		// We've finished iterating return 'None'.
+		let ret = new (SimpleOption, With(is_some, false));
+		ReturnObj(ret);
+	}
+	// Get the next value and create a SimpleOption instance to return
+	let ret = new (SimpleOption, With(is_some, true), With(value, $(arr)[$(cur)]));
+	$Var(cur)++;	// increment the counter
+	ReturnObj(ret); // return our Option
+}
+#undef IMPL
+
+// Iterator test
+Test(core, test_iterator)
+{
+	// create an array with 10 elements
+	int myarr[10];
+	// initialize them to <index> + 10
+	for (int i = 0; i < 10; i++)
+		myarr[i] = i + 10;
+	// create an IttTest with our array.
+	var itt = new (IttTest, With(arr, myarr), With(len, 10));
+	// initialize the couter to 0.
+	int counter = 0;
+
+	// loop until we get 'None'
+	loop
+	{
+		// get the next value for this iterator
+		let v = next(&itt);
+		// if it's 'None', break
+		if (!is_some(&v))
+			break;
+		// we got an actual value. Assert it's <index> + 10
+		cr_assert_eq(option_value(&v), counter + 10);
+
+		// increment our counter
+		counter++;
+	}
+
+	// assert that there were 10 items returned
+	cr_assert_eq(counter, 10);
+}

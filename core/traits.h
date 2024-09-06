@@ -36,4 +36,11 @@ TraitImpl(Equal);
     RequiredWithDefault(clone_from_impl, Var, void, clone_from, Self()))
 TraitImpl(Clone);
 
+// Define a basic iterator trait. Currently there are no 'RequiredWithDefault' functions
+// specified, we can add those as needed.
+#define Iterator DefineTrait( \
+    Iterator,                 \
+    Required(Var, Obj, next))
+TraitImpl(Iterator);
+
 #endif // _CORE_TRAITS__
