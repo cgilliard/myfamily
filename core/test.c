@@ -1631,33 +1631,47 @@ Test(core, test_equal)
 	// cr_assert(!equal(&a, &x));
 }
 
-#define IncrTrait DefineTrait(IncrTrait, Required(Var, void, incr_clone_test))
-TraitImpl(IncrTrait);
-
+// Define a type for testing the Clone trait
 Type(CloneTest, Field(u64, value));
 Builder(CloneTest, Config(u64, value));
 
+// Implement Build/Drop/Clone
 Impl(CloneTest, Build);
 Impl(CloneTest, Clone);
 Impl(CloneTest, Drop);
+
+// Define a trait for incrementing the value so we can verify clones are independent.
+#define IncrTrait DefineTrait(IncrTrait, Required(Var, void, incr_clone_test))
+TraitImpl(IncrTrait);
 Impl(CloneTest, IncrTrait);
 
+// variable to count calls to the drop handler at specific points in execution.
 int clone_test_drop_count = 0;
 
 #define IMPL CloneTest
+// standard build to allow setting of the internal value.
 void CloneTest_build(const CloneTestConfig* config)
 {
 	$Var(value) = config->value;
 }
+// standard drop just to count drops.
 void CloneTest_drop()
 {
 	clone_test_drop_count++;
 }
+
+// implement clone
 Obj CloneTest_klone()
 {
-	var ret = new (CloneTest, With(value, $(value)));
+	// create a new instance with the same internal value.
+	let ret = new (CloneTest, With(value, $(value)));
+	// call the ReturnObj macro to properly handle returning of an Object
+	// this includes the handling of marking the previous value for proper
+	// cleanup and conumption flags. It also does the actual return statement
+	// so this is the last statement needed in the function.
 	ReturnObj(ret);
 }
+// simple function to increment the internal value.
 void CloneTest_incr_clone_test()
 {
 	$Var(value)++;
@@ -1667,16 +1681,36 @@ void CloneTest_incr_clone_test()
 Test(core, test_clone)
 {
 	{
+		// create a CloneTest with value of 100.
 		var x = new (CloneTest, With(value, 100));
+		// clone to y.
 		let y = klone(&x);
+		// assert that y's internal value is also 100.
 		cr_assert_eq($Context((&y), CloneTest, value), 100);
+		// clone to z.
 		let z = klone(&y);
+		// assert value for z
 		cr_assert_eq($Context((&z), CloneTest, value), 100);
+		// ensure no drops occurred
 		cr_assert_eq(clone_test_drop_count, 0);
+		// increment x's value
 		incr_clone_test(&x);
+		// do assertions to verify values are independent from one another.
 		cr_assert_eq($Context((&x), CloneTest, value), 101);
 		cr_assert_eq($Context((&y), CloneTest, value), 100);
 		cr_assert_eq($Context((&z), CloneTest, value), 100);
+		// create an uninitialized instance of a. This is needed so that clone_from
+		// can be called. Without this, behavior is undefined.
+		var a = new (CloneTest);
+		// use the default implemented clone_from function.
+		clone_from(&a, &x);
+		// do assertions to verify clone occurred.
+		cr_assert_eq($Context((&x), CloneTest, value), 101);
+		cr_assert_eq($Context((&a), CloneTest, value), 101);
+		// initial 'a' dropped when we call clone_from
+		cr_assert_eq(clone_test_drop_count, 1);
 	}
-	cr_assert_eq(clone_test_drop_count, 3);
+	// we have four objects, but also the initial value for a was consumed and
+	// cleanup/drop called when we called clone_from so 5 drops occurred.
+	cr_assert_eq(clone_test_drop_count, 5);
 }

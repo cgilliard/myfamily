@@ -29,7 +29,11 @@ TraitImpl(Build);
 #define Equal DefineTrait(Equal, Required(Const, bool, equal, Self()))
 TraitImpl(Equal);
 
-#define Clone DefineTrait(Clone, Required(Const, Obj, klone))
+// Clone trait. We use 'klone' to prevent name resolution conflicts on Linux.
+#define Clone DefineTrait(       \
+    Clone,                       \
+    Required(Const, Obj, klone), \
+    RequiredWithDefault(clone_from_impl, Var, void, clone_from, Self()))
 TraitImpl(Clone);
 
 #endif // _CORE_TRAITS__

@@ -92,7 +92,7 @@ FatPtr build_fat_ptr(u64 size);
 #define Cleanup \
 	Obj __attribute__((warn_unused_result, cleanup(Obj_cleanup)))
 
-#define ReturnObj(obj) ({ Obj _ret__ = obj; obj.flags = OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED; return _ret__; })
+#define ReturnObj(obj) ({ Obj _ret__ = obj; Obj_mark_consumed(&obj); return _ret__; })
 
 #define TypeName(obj) obj.vtable->name
 #define Implements(obj, trait) ({                                              \

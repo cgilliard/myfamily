@@ -42,3 +42,13 @@ void drop(Obj* self)
 	}
 	return impl();
 }
+
+// default implementation of clone_from
+void clone_from_impl(Obj* to_clone)
+{
+	// call the type specific 'klone' required method.
+	let v = klone(to_clone);
+	// move the result to $Var() internal self reference.
+	// cleanup handled by Move.
+	Move($Var(), &v);
+}
