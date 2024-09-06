@@ -1,10 +1,8 @@
 var searchData=
 [
-  ['obj_5fbuild_742',['Obj_build',['../type_8c.html#a88ed778591d4d04e69ea709ac160d7f7',1,'Obj_build(Obj *ptr, const void *config):&#160;type.c'],['../type_8h.html#a88ed778591d4d04e69ea709ac160d7f7',1,'Obj_build(Obj *ptr, const void *config):&#160;type.c']]],
-  ['obj_5fbuild_5fint_743',['Obj_build_int',['../type_8c.html#a093dfe4d6724a8edb8096178edfda2c9',1,'Obj_build_int(Obj *ptr):&#160;type.c'],['../type_8h.html#a093dfe4d6724a8edb8096178edfda2c9',1,'Obj_build_int(Obj *ptr):&#160;type.c']]],
-  ['obj_5fcheck_5fparam_744',['Obj_check_param',['../type_8c.html#a3f290b3462a12f43f88b642ff79ca1f9',1,'Obj_check_param(const Obj *obj):&#160;type.c'],['../type_8h.html#a3f290b3462a12f43f88b642ff79ca1f9',1,'Obj_check_param(const Obj *obj):&#160;type.c']]],
-  ['obj_5fcleanup_745',['Obj_cleanup',['../type_8c.html#a755c650048dad76731e21e92e73fbd34',1,'Obj_cleanup(const Obj *ptr):&#160;type.c'],['../type_8h.html#a755c650048dad76731e21e92e73fbd34',1,'Obj_cleanup(const Obj *ptr):&#160;type.c']]],
-  ['obj_5fmark_5fconsumed_746',['Obj_mark_consumed',['../type_8c.html#a4ede608ddb449aa7451e80b9c89ca244',1,'Obj_mark_consumed(const Obj *ptr):&#160;type.c'],['../type_8h.html#a4ede608ddb449aa7451e80b9c89ca244',1,'Obj_mark_consumed(const Obj *ptr):&#160;type.c']]],
-  ['override_747',['Override',['../core_2test_8c.html#a65e76cdfade9b54b2ef917d964eca107',1,'test.c']]],
-  ['override_5ftest_5fdefault_748',['override_test_default',['../core_2test_8c.html#af172ef3695f2d5fe54be98061f48f021',1,'test.c']]]
+  ['main_799',['main',['../main_8c.html#a3c04138a5bfe5d72780bb7e82a18e627',1,'main.c']]],
+  ['my_5fdefault_5ftestx1_800',['my_default_testx1',['../core_2test_8c.html#ac787ba8e4a5c32486c7f3a6da3b5ea9d',1,'test.c']]],
+  ['my_5fover_5ffn_801',['my_over_fn',['../core_2test_8c.html#a28b82584c968447cf1e29e9462086880',1,'test.c']]],
+  ['myobjectbuilddrop_5fbuild_802',['MyObjectBuildDrop_build',['../core_2test_8c.html#a1838c3fd4d30a3e1ab52b76bc9270c78',1,'test.c']]],
+  ['myobjectbuilddrop_5fdrop_803',['MyObjectBuildDrop_drop',['../core_2test_8c.html#a1b3d0253b3bdd3180aabd077fc97fe1d',1,'test.c']]]
 ];
