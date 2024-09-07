@@ -136,6 +136,7 @@ var menudata={children:[
 {text:"s",url:"globals_vars.html#index_s"},
 {text:"t",url:"globals_vars.html#index_t"}]},
 {text:"Typedefs",url:"globals_type.html",children:[
+{text:"_",url:"globals_type.html#index__5F"},
 {text:"c",url:"globals_type.html#index_c"},
 {text:"f",url:"globals_type.html#index_f"},
 {text:"h",url:"globals_type.html#index_h"},

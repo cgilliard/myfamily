@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['selfcleanupimpl_667',['SelfCleanupImpl',['../structSelfCleanupImpl.html',1,'']]]
+  ['obj_687',['Obj',['../structObj.html',1,'']]]
 ];

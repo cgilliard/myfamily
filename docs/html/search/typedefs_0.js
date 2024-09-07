@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['chainconfig_1040',['ChainConfig',['../chain__allocator_8h.html#a5af7013d38b21564ca3dcb12c769d6ce',1,'chain_allocator.h']]],
-  ['chainguardentry_1041',['ChainGuardEntry',['../chain__allocator_8c.html#a75e50a043100b00eed7fa9dc3ceb661d',1,'chain_allocator.c']]],
-  ['context_5ft_1042',['context_t',['../toml_8c.html#afde0fcb21678582c657bc6d18032620f',1,'toml.c']]]
+  ['_5f_5ftrait_5fimpl_5f_5fdrop_1070',['__trait_impl__Drop',['../traits_8h.html#a3db2b1570d579ced25c429fd748f2166',1,'traits.h']]]
 ];
