@@ -95,14 +95,33 @@ $(function() {
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment">// TraitImpl(Drop);</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keywordtype">void</span> <a class="code" href="traits_8h.html#a1bb190af6df7dd1bbd696a9f3815f774">drop</a>(<a class="code" href="structObj.html">Obj</a>* <span class="keyword">self</span>);</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">// TODO: need generics here so we can pass the config in instead of a void pointer.</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">   27</a></span>&#160;<span class="preprocessor">#define Build DefineTrait(Build, Required(Var, void, build, SelfConfig()))</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">   28</a></span>&#160;<a class="code" href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">TraitImpl</a>(<a class="code" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_TRAITS__</span></div>
-<div class="ttc" id="astructObj_html"><div class="ttname"><a href="structObj.html">Obj</a></div><div class="ttdef"><b>Definition:</b> type.h:56</div></div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">   26</a></span>&#160;<span class="preprocessor">#define Build DefineTrait(Build, Required(Var, void, build, SelfConfig()))</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">   27</a></span>&#160;<a class="code" href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">TraitImpl</a>(<a class="code" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="traits_8h.html#a40c9b8ed733e623e6cd95857dcbc425e">   29</a></span>&#160;<span class="preprocessor">#define Equal DefineTrait(Equal, Required(Const, bool, equal, Self()))</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="traits_8h.html#a50b023bfe205bc9e42ed8616d9b75217">   30</a></span>&#160;<a class="code" href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">TraitImpl</a>(<a class="code" href="traits_8h.html#a40c9b8ed733e623e6cd95857dcbc425e">Equal</a>);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">// Clone trait. We use &#39;klone&#39; to prevent name resolution conflicts on Linux.</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="traits_8h.html#a46286e6c338cb8ab2e261e4fe38efb50">   33</a></span>&#160;<span class="preprocessor">#define Clone DefineTrait(       \</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">    Clone,                       \</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">    Required(Const, Obj, klone), \</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">    RequiredWithDefault(clone_from_impl, Var, void, clone_from, Self()))</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="traits_8h.html#ad456599fc65595795eb95aa5cee1218e">   37</a></span>&#160;<a class="code" href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">TraitImpl</a>(<a class="code" href="traits_8h.html#a46286e6c338cb8ab2e261e4fe38efb50">Clone</a>);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">// Define a basic iterator trait. Currently there are no &#39;RequiredWithDefault&#39; functions</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">// specified, we can add those as needed.</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="traits_8h.html#a6893345db5299ec3dcf9cd18d82d0b23">   41</a></span>&#160;<span class="preprocessor">#define Iterator DefineTrait( \</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">    Iterator,                 \</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">    Required(Var, Obj, next))</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="traits_8h.html#a1c1fd92d128f5f079d231499a9963961">   44</a></span>&#160;<a class="code" href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">TraitImpl</a>(<a class="code" href="traits_8h.html#a6893345db5299ec3dcf9cd18d82d0b23">Iterator</a>);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_TRAITS__</span></div>
+<div class="ttc" id="astructObj_html"><div class="ttname"><a href="structObj.html">Obj</a></div><div class="ttdef"><b>Definition:</b> type.h:62</div></div>
 <div class="ttc" id="atraits_8h_html_a1bb190af6df7dd1bbd696a9f3815f774"><div class="ttname"><a href="traits_8h.html#a1bb190af6df7dd1bbd696a9f3815f774">drop</a></div><div class="ttdeci">void drop(Obj *self)</div><div class="ttdef"><b>Definition:</b> traits.c:17</div></div>
-<div class="ttc" id="atraits_8h_html_a86f96056a0c61a863297f2a8fa71ec10"><div class="ttname"><a href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a></div><div class="ttdeci">#define Build</div><div class="ttdef"><b>Definition:</b> traits.h:27</div></div>
+<div class="ttc" id="atraits_8h_html_a40c9b8ed733e623e6cd95857dcbc425e"><div class="ttname"><a href="traits_8h.html#a40c9b8ed733e623e6cd95857dcbc425e">Equal</a></div><div class="ttdeci">#define Equal</div><div class="ttdef"><b>Definition:</b> traits.h:29</div></div>
+<div class="ttc" id="atraits_8h_html_a46286e6c338cb8ab2e261e4fe38efb50"><div class="ttname"><a href="traits_8h.html#a46286e6c338cb8ab2e261e4fe38efb50">Clone</a></div><div class="ttdeci">#define Clone</div><div class="ttdef"><b>Definition:</b> traits.h:33</div></div>
+<div class="ttc" id="atraits_8h_html_a6893345db5299ec3dcf9cd18d82d0b23"><div class="ttname"><a href="traits_8h.html#a6893345db5299ec3dcf9cd18d82d0b23">Iterator</a></div><div class="ttdeci">#define Iterator</div><div class="ttdef"><b>Definition:</b> traits.h:41</div></div>
+<div class="ttc" id="atraits_8h_html_a86f96056a0c61a863297f2a8fa71ec10"><div class="ttname"><a href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a></div><div class="ttdeci">#define Build</div><div class="ttdef"><b>Definition:</b> traits.h:26</div></div>
 <div class="ttc" id="atraits_8h_html_a9eb45ffefd68e6b5d1b042e7a2fc7ba9"><div class="ttname"><a href="traits_8h.html#a9eb45ffefd68e6b5d1b042e7a2fc7ba9">TraitImpl</a></div><div class="ttdeci">TraitImpl(Build)</div></div>
 <div class="ttc" id="atype_8h_html"><div class="ttname"><a href="type_8h.html">type.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
