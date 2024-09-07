@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['chainconfig_653',['ChainConfig',['../structChainConfig.html',1,'']]],
-  ['chainguardentry_654',['ChainGuardEntry',['../structChainGuardEntry.html',1,'']]],
-  ['context_5ft_655',['context_t',['../structcontext__t.html',1,'']]]
+  ['_5f_5ftrait_5fimpl_5f_5fdrop_673',['__trait_impl__Drop',['../struct____trait__impl____Drop.html',1,'']]]
 ];

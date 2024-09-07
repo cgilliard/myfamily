@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['selfcleanupimpl_1054',['SelfCleanupImpl',['../type_8h.html#a5796fa21fb1fe0f979f17051f4eb3e61',1,'type.h']]]
+  ['obj_1084',['Obj',['../type_8h.html#aff243646b37d6ed5dc8f100186fee278',1,'type.h']]]
 ];

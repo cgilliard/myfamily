@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['obj_1053',['Obj',['../type_8h.html#aff243646b37d6ed5dc8f100186fee278',1,'type.h']]]
+  ['lockguardptr_1082',['LockGuardPtr',['../lock_8h.html#acdd269c5ab65bd7a20e7c2746c157280',1,'lock.h']]],
+  ['lockptr_1083',['LockPtr',['../lock_8h.html#a9a044721dc39928f80247e5555bd85b8',1,'lock.h']]]
 ];

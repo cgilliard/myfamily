@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['readme_2emd_695',['README.md',['../core_2README_8md.html',1,'(Global Namespace)'],['../README_8md.html',1,'(Global Namespace)']]],
-  ['real_5fmain_2ec_696',['real_main.c',['../real__main_8c.html',1,'']]]
+  ['panic_2ec_715',['panic.c',['../panic_8c.html',1,'']]],
+  ['panic_2eh_716',['panic.h',['../panic_8h.html',1,'']]],
+  ['prim_2ec_717',['prim.c',['../prim_8c.html',1,'']]],
+  ['prim_2eh_718',['prim.h',['../prim_8h.html',1,'']]]
 ];
