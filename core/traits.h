@@ -22,6 +22,10 @@
 // twice so it's not implemented using the standard TraitImpl.
 // TraitImpl(Drop);
 void drop(Obj* self);
+typedef struct __trait_impl__Drop
+{
+	char dummy;
+} __trait_impl__Drop;
 
 #define Build DefineTrait(Build, Required(Var, void, build, SelfConfig()))
 TraitImpl(Build);
@@ -42,5 +46,8 @@ TraitImpl(Clone);
     Iterator,                 \
     Required(Var, Obj, next))
 TraitImpl(Iterator);
+
+#define ValueOf DefineTrait(ValueOf, Required(Const, void, value_of, Param(void*)))
+TraitImpl(ValueOf);
 
 #endif // _CORE_TRAITS__

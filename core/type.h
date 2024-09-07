@@ -29,12 +29,12 @@
 
 #define OBJECT_FLAGS_NO_CLEANUP (0x1 << 0)
 #define OBJECT_FLAGS_CONSUMED (0x1 << 1)
-#define OBJECT_FLAGS_RESERVED1 (0x1 << 2)
-#define OBJECT_FLAGS_RESERVED2 (0x1 << 3)
-#define OBJECT_FLAGS_RESERVED3 (0x1 << 4)
-#define OBJECT_FLAGS_RESERVED4 (0x1 << 5)
-#define OBJECT_FLAGS_RESERVED5 (0x1 << 6)
-#define OBJECT_FLAGS_RESERVED6 (0x1 << 7)
+#define OBJECT_FLAG_HAS_MULTI_VARIANT (0x1 << 2)
+#define OBJECT_FLAGS_RESERVED5 (0x1 << 3)
+#define OBJECT_FLAGS_RESERVED4 (0x1 << 4)
+#define OBJECT_FLAGS_RESERVED3 (0x1 << 5)
+#define OBJECT_FLAGS_RESERVED2 (0x1 << 6)
+#define OBJECT_FLAGS_RESERVED1 (0x1 << 7)
 
 typedef struct
 {
@@ -367,8 +367,7 @@ FatPtr build_fat_ptr(u64 size);
 	f & OBJECT_FLAGS_RESERVED2 || \
 	f & OBJECT_FLAGS_RESERVED3 || \
 	f & OBJECT_FLAGS_RESERVED4 || \
-	f & OBJECT_FLAGS_RESERVED5 || \
-	f & OBJECT_FLAGS_RESERVED6)   \
+	f & OBJECT_FLAGS_RESERVED5)   \
 		panic("Runtime error: Obj in unexpected state! Was it initialized?");
 // clang-format on
 
@@ -477,7 +476,11 @@ FatPtr build_fat_ptr(u64 size);
 	MULTI_SWITCH(PROC_TRAIT_IMPL_FN_DEFAULT, PROC_TRAIT_IMPL_FN_, x, \
 		     __VA_ARGS__)
 #define PROC_TRAIT_IMPL(arg, x) PROC_TRAIT_IMPL_FN x
-#define TraitImplImpl(name, ...) \
+#define TraitImplImpl(name, ...)            \
+	typedef struct __trait_impl__##name \
+	{                                   \
+		char dummy;                 \
+	} __trait_impl__##name;             \
 	__VA_OPT__(FOR_EACH(PROC_TRAIT_IMPL, none, (), __VA_ARGS__))
 #define TraitImpl(...) TraitImplImpl(__VA_ARGS__)
 
@@ -502,12 +505,13 @@ FatPtr build_fat_ptr(u64 size);
 	__VA_OPT__(FOR_EACH(PROC_TRAIT_STATEMENT, name, (), __VA_ARGS__))
 #define Required(...) (__VA_ARGS__)
 #define RequiredWithDefault(...) ((__VA_ARGS__))
-#define PROC_IMPL_(name, trait_name, ...)                               \
-	PROC_IMPL(name, __VA_ARGS__)                                    \
-	static void __attribute__((                                     \
-	    constructor)) vtable_add_trait_impl_##name##_##trait_name() \
-	{                                                               \
-		vtable_add_trait(&name##_Vtable__, #trait_name);        \
+#define PROC_IMPL_(name, trait_name, ...)                                                     \
+	PROC_IMPL(name, __VA_ARGS__)                                                          \
+	static void __attribute__((                                                           \
+	    constructor)) vtable_add_trait_impl_##name##_##trait_name()                       \
+	{                                                                                     \
+		_Static_assert(sizeof(__trait_impl__##trait_name) != 0, "Trait not defined"); \
+		vtable_add_trait(&name##_Vtable__, #trait_name);                              \
 	}
 #define Impl(name, ...) PROC_IMPL_(name, __VA_ARGS__)
 

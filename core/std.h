@@ -13,9 +13,11 @@
 // limitations under the License.
 
 #include <core/chain_allocator.h>
+#include <core/enum.h>
 #include <core/heap.h>
 #include <core/lock.h>
 #include <core/panic.h>
+#include <core/prim.h>
 #include <core/thread.h>
 #include <core/traits.h>
 #include <core/type.h>

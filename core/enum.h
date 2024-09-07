@@ -12,23 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_TEST_ENC__
-#define _CORE_TEST_ENC__
+#ifndef _CORE_ENUM__
+#define _CORE_ENUM__
 
-#include <core/traits.h>
 #include <core/type.h>
 
-#define HiddenApi DefineTrait(                  \
-    HiddenApi,                                  \
-    Required(Const, u64, get_value),            \
-    Required(Var, void, set_value, Param(u64)), \
-    Required(Const, u64, get_capacity_impl))
-TraitImpl(HiddenApi);
+#define Enum(name, ...)
+#define EnumBuilder(name)
+#define match(e)
+#define _()
 
-Builder(Hidden, Config(u64, capacity));
-
-Impl(Hidden, HiddenApi);
-Impl(Hidden, Drop);
-Impl(Hidden, Build);
-
-#endif // _CORE_TEST_ENC__
+#endif // _CORE_ENUM__

@@ -33,7 +33,7 @@ Type(
     Object(HiddenDrop, dd));
 
 #define IMPL Hidden
-void Hidden_build(HiddenConfig* config)
+void Hidden_build(const HiddenConfig* config)
 {
 	printf("building hidden: capacity = %" PRIu64 "\n", config->capacity);
 	$Var(config) = *config;

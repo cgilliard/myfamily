@@ -1805,3 +1805,65 @@ Test(core, test_iterator)
 	// assert that there were 10 items returned
 	cr_assert_eq(counter, 10);
 }
+
+#define TEST_BOX(type, value) ({   \
+	type v_in = value;         \
+	let v_box = Box(v_in);     \
+	type v_out;                \
+	Unbox(v_box, v_out);       \
+	cr_assert_eq(v_in, v_out); \
+})
+
+Test(core, test_prim)
+{
+	TEST_BOX(i8, 10);
+	TEST_BOX(i16, -12);
+	TEST_BOX(i32, -11);
+	TEST_BOX(i64, 1234);
+	TEST_BOX(i128, 10);
+	TEST_BOX(u8, 10);
+	TEST_BOX(u16, 12);
+	TEST_BOX(u32, 11);
+	TEST_BOX(u64, 1234);
+	TEST_BOX(u128, 10);
+	TEST_BOX(f32, 11.3);
+	TEST_BOX(f64, 1234.4);
+	TEST_BOX(bool, false);
+	TEST_BOX(bool, true);
+}
+
+Enum(TestEnum, (V1, u64), (V2, u32), (V3, MyObject));
+
+/*
+// Declare an Enum named TestEnum with two variants:
+// V1 which is a u64.
+// V2 which is a u32.
+// V3 which is an instance of MyObject.
+Enum(TestEnum, (V1, u64), (V2, u32), (V3, MyObject));
+
+Test(core, test_enum)
+{
+	// create an instance of TestEnum of variant 'V1' using the new_enum macro.
+	// The underlying Enum instance is an Object with a special field set in the flags to indicate
+	// it is an enumeration. The FatPtr in this Object has 4 extra bytes for the type information
+	// to indicate which variant this is. In addition, the automatically generated size function
+	// of this object is dynamic in that it will return the size of the specific variant (including
+	// this 4 byte overhead.) This way, sizes match the exact amount of space needed per variant.
+	let e1 = _(TestEnum, V1, 10);
+	// Create a second instance of variant V2 with the specified u32 value.
+	let e2 = _(TestEnum, V2, 30);
+	// Create a third instance of variant V3
+	let my_obj = new (MyObject);
+	let e3 = _(TestEnum, V3, my_obj);
+
+	// match on e1. The blocks define a variable name for use in the arms of the match statement. The last value is
+	// returned using the gcc extension syntax. Auto boxing occurs so that the value can always be sent to a let/var
+	// declaration. The wildcard '_' matching is also shown in this example. Since the return values are primitives,
+	// they will be 'autoboxed' by the macro.
+	let v1 = match(e1, (V1, (myvar)({ myvar; })), (V2, (myvar2)({ myvar2; })), (_, ({ 0; })));
+
+	// match the results and confirm the inner values. The values must be 'Unboxed' to access
+	// the primtive type.
+	cr_assert_eq(Unbox(v1), 10);
+}
+*/
