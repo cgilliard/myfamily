@@ -17,6 +17,9 @@
 
 #include <core/type.h>
 
+// Function call to builtin size function that all objects implement
+u64 size(const Obj* self);
+
 #define Drop DefineTrait(Drop, Required(Var, void, drop))
 // Drop has a special TraitImpl because we need to prevent it from being called
 // twice so it's not implemented using the standard TraitImpl.
@@ -49,5 +52,11 @@ TraitImpl(Iterator);
 
 #define ValueOf DefineTrait(ValueOf, Required(Const, void, value_of, Param(void*)))
 TraitImpl(ValueOf);
+
+#define Unwrap DefineTrait(Unwrap, Required(Var, Obj, unwrap))
+TraitImpl(Unwrap);
+
+#define EnumProps DefineTrait(EnumProps, Super(Unwrap), Required(Const, u32, variant_id))
+TraitImpl(EnumProps);
 
 #endif // _CORE_TRAITS__

@@ -99,6 +99,7 @@ FatPtr build_fat_ptr(u64 size);
 	Obj __attribute__((warn_unused_result, cleanup(Obj_cleanup)))
 
 #define ReturnObj(obj) ({ Obj _ret__ = obj; Obj_mark_consumed(&obj); return _ret__; })
+#define ReturnObjAndConsumeSelf(obj) ({ Obj _ret__ = obj; Obj_mark_consumed(&obj); Obj_cleanup($()); return _ret__; })
 
 #define TypeName(obj) obj.vtable->name
 #define Implements(obj, trait) ({                                              \
@@ -128,10 +129,16 @@ FatPtr build_fat_ptr(u64 size);
 	    ((const IMPL*)__thread_local_self_Const->ptr.data)->__VA_ARGS__) \
 	__VA_OPT__(NONE)                                                     \
 	(__thread_local_self_Const)
-#define $Context(value, type, ...)                       \
-	__VA_OPT__(                                      \
-	    ((const type*)value->ptr.data)->__VA_ARGS__) \
-	__VA_OPT__(NONE)                                 \
+#define $Context(value, type, ...)                         \
+	__VA_OPT__(                                        \
+	    ((const type*)(value)->ptr.data)->__VA_ARGS__) \
+	__VA_OPT__(NONE)                                   \
+	(value)
+
+#define $ContextVar(value, type, ...)                \
+	__VA_OPT__(                                  \
+	    ((type*)(value)->ptr.data)->__VA_ARGS__) \
+	__VA_OPT__(NONE)                             \
 	(value)
 
 #define FIRST_TWO(x, ...) MULTI_SWITCH(NONE, FIRST_TWO_, x, __VA_ARGS__)
@@ -145,7 +152,7 @@ FatPtr build_fat_ptr(u64 size);
 #define DROP_OBJECTS(name, inner) DROP_OBJECTS_EXPAND(name, EXPAND_ALL inner)
 
 #define PROCESS_WHERE_INNER__(...) \
-	FIRST_STRINGIFY __VA_ARGS__
+	__VA_OPT__(FIRST_STRINGIFY __VA_ARGS__)
 #define PROCESS_WHERE_INNER_(...) PROCESS_WHERE_INNER__(__VA_ARGS__)
 #define PROCESS_WHERE_INNER(ignore, value) PROCESS_WHERE_INNER_(value)
 #define PROCESS_WHERE_________(name, value, ...)                                                      \

@@ -14,6 +14,27 @@
 
 #include <core/traits.h>
 
+u64 size(const Obj* self)
+{
+	if (self->flags & OBJECT_FLAGS_CONSUMED)
+		panic("Runtime error: Obj [%s@%" PRIu64
+		      "] has already been consumed!",
+		      self->vtable->name, self->ptr.id);
+	u64 (*impl)() = find_fn(self, "size");
+	if (!impl)
+		panic("Runtime error: Trait bound violation! "
+		      "Type "
+		      "'%s' does "
+		      "not implement the "
+		      "required function [%s]",
+		      TypeName((*self)), "size");
+	SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};
+	__thread_local_self_Const = self;
+	__thread_local_self_Var = NULL;
+
+	return impl();
+}
+
 void drop(Obj* self)
 {
 	if (self->flags & OBJECT_FLAGS_CONSUMED)

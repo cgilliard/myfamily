@@ -1,4 +1,4 @@
-OBJS := heap.o panic.o chain_allocator.o lock.o thread.o prim.o type.o traits.o
+OBJS := heap.o panic.o chain_allocator.o lock.o thread.o prim.o type.o traits.o rc.o
 
 TEST_OBJS := $(OBJS) test_encapsulation.o test_server.o
 

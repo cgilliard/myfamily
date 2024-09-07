@@ -1641,7 +1641,7 @@ Impl(CloneTest, Clone);
 Impl(CloneTest, Drop);
 
 // Define a trait for incrementing the value so we can verify clones are independent.
-#define IncrTrait DefineTrait(IncrTrait, Required(Var, void, incr_clone_test))
+#define IncrTrait DefineTrait(IncrTrait, Required(Var, void, incr_value))
 TraitImpl(IncrTrait);
 Impl(CloneTest, IncrTrait);
 
@@ -1672,7 +1672,7 @@ Obj CloneTest_klone()
 	ReturnObj(ret);
 }
 // simple function to increment the internal value.
-void CloneTest_incr_clone_test()
+void CloneTest_incr_value()
 {
 	$Var(value)++;
 }
@@ -1694,7 +1694,7 @@ Test(core, test_clone)
 		// ensure no drops occurred
 		cr_assert_eq(clone_test_drop_count, 0);
 		// increment x's value
-		incr_clone_test(&x);
+		incr_value(&x);
 		// do assertions to verify values are independent from one another.
 		cr_assert_eq($Context((&x), CloneTest, value), 101);
 		cr_assert_eq($Context((&y), CloneTest, value), 100);
@@ -1832,7 +1832,102 @@ Test(core, test_prim)
 	TEST_BOX(bool, true);
 }
 
-Enum(TestEnum, (V1, u64), (V2, u32), (V3, MyObject));
+// Create a simple Type that we can use to test Rc.
+Type(TestRc, Field(i32, value));
+Builder(TestRc, Config(i32, value));
+
+// Implement Drop and Build and IncrTrait to demonstrate Rc
+Impl(TestRc, Drop);
+Impl(TestRc, Build);
+Impl(TestRc, IncrTrait);
+
+// intialize drop count to 0.
+int test_rc_drop_count = 0;
+
+// do the implementation
+#define IMPL TestRc
+void TestRc_build(const TestRcConfig* config) { $Var(value) = config->value; }
+void TestRc_drop() { test_rc_drop_count++; }
+void TestRc_incr_value() { $Var(value)++; }
+#undef IMPL
+
+// test rc
+Test(core, test_rc)
+{
+	// first test without unwrapping any rcs. With two rcs only a single drop should occur.
+	{
+		let v1 = new (TestRc, With(value, 1234));
+		var rc1 = new (Rc, With(value, &v1));
+		var rc2 = klone(&rc1);
+		cr_assert_eq(test_rc_drop_count, 0);
+	}
+	cr_assert_eq(test_rc_drop_count, 1);
+
+	// next test with one unwrap. Still just a single drop should occur.
+	// also test multiple klones.
+	{
+		let v1 = new (TestRc, With(value, 5678));
+		var rc1 = new (Rc, With(value, &v1));
+		var rc2 = klone(&rc1);
+		let rc3 = klone(&rc2);
+		let rc4 = klone(&rc1);
+
+		let v = unwrap(&rc1);
+		cr_assert_eq($Context(&v, TestRc, value), 5678);
+
+		cr_assert_eq(test_rc_drop_count, 1);
+	}
+
+	cr_assert_eq(test_rc_drop_count, 2);
+
+	// finally test with both rcs unwrapped.
+	{
+		let v1 = new (TestRc, With(value, 9999));
+		var rc1 = new (Rc, With(value, &v1));
+		var rc2 = klone(&rc1);
+
+		var v = unwrap(&rc1);
+		cr_assert_eq($Context(&v, TestRc, value), 9999);
+
+		// modify the value in 'v', this should be visible in 'x' below as well.
+		incr_value(&v);
+
+		let x = unwrap(&rc2);
+		// verify the increment occurred.
+		cr_assert_eq($Context(&x, TestRc, value), 10000);
+
+		cr_assert_eq(test_rc_drop_count, 2);
+	}
+	cr_assert_eq(test_rc_drop_count, 3);
+}
+
+Type(Test1, Where(T), Field(u32, variant_id), Generic(T, value));
+Builder(Test1, Config(u32, variant_id), Config(const Obj*, value));
+
+Impl(Test1, Unwrap);
+Impl(Test1, EnumProps);
+Impl(Test1, Build);
+
+#define IMPL Test1
+void Test1_build(const Test1Config* config)
+{
+	$Var(variant_id) = config->variant_id;
+	Move(&$Var(value), config->value);
+}
+u32 Test1_variant_id() { return $(variant_id); }
+Obj Test1_unwrap() { ReturnObjAndConsumeSelf($(value)); }
+#undef IMPL
+
+Test(core, test_enum)
+{
+	let v = Box(-11);
+	var x = new (Test1, With(variant_id, 1), With(value, &v));
+	cr_assert_eq(variant_id(&x), 1);
+	let v_out = unwrap(&x);
+	i32 v_out_i32;
+	Unbox(v_out, v_out_i32);
+	cr_assert_eq(v_out_i32, -11);
+}
 
 /*
 // Declare an Enum named TestEnum with two variants:
