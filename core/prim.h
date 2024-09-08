@@ -47,18 +47,18 @@ Impl(Bool, ValueOf);
 
 #define Box2(v) _Generic((v), \
     u8: ({ DISABLE_WARNING; u8 * vptr = &v; let _ret____ = new (U8, With(value, *vptr)); ENABLE_WARNING; _ret____; }),                \
-    u16: ({ u16 * vptr = &v; let _ret___ = new (U16, With(value, *vptr)); _ret___; }),               \
-    u32: ({ u32 * vptr = &v; let _ret___ = new (U32, With(value, *vptr)); _ret___; }),               \
-    u64: ({ u64 * vptr = &v; let _ret___ = new (U64, With(value, *vptr)); _ret___; }),               \
-    u128: ({ u128 * vptr = &v; let _ret__ = new (U128, With(value, *vptr)); _ret__; }),              \
-    i8: ({ i8 * vptr = &v; let _ret____ = new (I8, With(value, *vptr)); _ret____; }),                \
-    i16: ({ i16 * vptr = &v; let _ret___ = new (I16, With(value, *vptr)); _ret___; }),               \
-    i32: ({ i32 * vptr = &v; let _ret___ = new (I32, With(value, *vptr)); _ret___; }),               \
-    i64: ({ i64 * vptr = &v; let _ret___ = new (I64, With(value, *vptr)); _ret___; }),               \
-    i128: ({ i128 * vptr = &v; let _ret__ = new (I128, With(value, *vptr)); _ret__; }),              \
-    f32: ({ f32 * vptr = &v; let _ret___ = new (F32, With(value, *vptr)); _ret___; }),               \
-    f64: ({ f64 * vptr = &v; let _ret___ = new (F64, With(value, *vptr)); _ret___; }),               \
-    bool: ({ bool * vptr = &v; let _ret__ = new (Bool, With(value, *vptr)); _ret__; }),              \
+    u16: ({ DISABLE_WARNING; u16 * vptr = &v; let _ret___ = new (U16, With(value, *vptr)); ENABLE_WARNING; _ret___; }),               \
+    u32: ({ DISABLE_WARNING; u32 * vptr = &v; let _ret___ = new (U32, With(value, *vptr)); ENABLE_WARNING; _ret___; }),               \
+    u64: ({ DISABLE_WARNING; u64 * vptr = &v; let _ret___ = new (U64, With(value, *vptr)); ENABLE_WARNING; _ret___; }),               \
+    u128: ({ DISABLE_WARNING; u128 * vptr = &v; let _ret__ = new (U128, With(value, *vptr)); ENABLE_WARNING; _ret__; }),              \
+    i8: ({ DISABLE_WARNING; i8 * vptr = &v; let _ret____ = new (I8, With(value, *vptr)); ENABLE_WARNING; _ret____; }),                \
+    i16: ({ DISABLE_WARNING; i16 * vptr = &v; let _ret___ = new (I16, With(value, *vptr)); ENABLE_WARNING; _ret___; }),               \
+    i32: ({ DISABLE_WARNING; i32 * vptr = &v; let _ret___ = new (I32, With(value, *vptr)); ENABLE_WARNING; _ret___; }),               \
+    i64: ({ DISABLE_WARNING; i64 * vptr = &v; let _ret___ = new (I64, With(value, *vptr)); ENABLE_WARNING; _ret___; }),               \
+    i128: ({ DISABLE_WARNING; i128 * vptr = &v; let _ret__ = new (I128, With(value, *vptr)); ENABLE_WARNING; _ret__; }),              \
+    f32: ({ DISABLE_WARNING; f32 * vptr = &v; let _ret___ = new (F32, With(value, *vptr)); ENABLE_WARNING; _ret___; }),               \
+    f64: ({ DISABLE_WARNING; f64 * vptr = &v; let _ret___ = new (F64, With(value, *vptr)); ENABLE_WARNING; _ret___; }),               \
+    bool: ({ DISABLE_WARNING; bool * vptr = &v; let _ret__ = new (Bool, With(value, *vptr)); ENABLE_WARNING; _ret__; }),              \
     Obj: ({ v; }),            \
     default: ({ panic("Attempt to box an unknown type!"); }))
 
