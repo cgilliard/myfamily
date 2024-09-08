@@ -28,10 +28,10 @@ Impl(EnumImpl, EnumProps);
 Impl(EnumImpl, Build);
 
 // Macro to disable warnings
-#define DISABLE_WARNINGS /*_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wcompound-token-split-by-macro\"")*/
+/*#define DISABLE_WARNINGS _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wcompound-token-split-by-macro\"")*/
 
 // Macro to re-enable warnings
-#define ENABLE_WARNINGS /* _Pragma("GCC diagnostic pop") */
+/*#define ENABLE_WARNINGS  _Pragma("GCC diagnostic pop") */
 
 #define PROC_ENUM_TYPES__(ignore, v) #v
 #define PROC_ENUM_TYPES_(...) PROC_ENUM_TYPES__(__VA_ARGS__)
@@ -53,31 +53,28 @@ Impl(EnumImpl, Build);
 	    FOR_EACH(PROC_ENUM_TYPES, name, (, ), __VA_ARGS__)};
 
 #define PROC_DEFAULT(code)       \
-	DISABLE_WARNINGS         \
+                                 \
 	default:                 \
 	{                        \
 		_ret__ = (code); \
 	}                        \
-	break;                   \
-		ENABLE_WARNINGS
+	break;
 
 #define PROC_VARIANT_MUT(name, ref, variant, value_name, ...) \
-	DISABLE_WARNINGS case _Enum_##name##_##variant##__:   \
+	case _Enum_##name##_##variant##__:                    \
 	{                                                     \
 		Obj value_name = ref;                         \
 		_ret__ = (__VA_ARGS__);                       \
 	}                                                     \
-	break;                                                \
-	ENABLE_WARNINGS
+	break;
 
 #define PROC_VARIANT____(name, ref, variant, value_name, ...) \
-	DISABLE_WARNINGS case _Enum_##name##_##variant##__:   \
+	case _Enum_##name##_##variant##__:                    \
 	{                                                     \
 		const Obj value_name = ref;                   \
 		_ret__ = (__VA_ARGS__);                       \
 	}                                                     \
-	break;                                                \
-	ENABLE_WARNINGS
+	break;
 
 #define PROC_VARIANT___(name, ref, variant, value_name, code, ...)          \
 	__VA_OPT__(PROC_VARIANT_MUT(name, ref, variant, code, __VA_ARGS__)) \
@@ -86,32 +83,6 @@ Impl(EnumImpl, Build);
 #define PROC_VARIANT_(name, ref, variant, ...) __VA_OPT__(PROC_VARIANT__(name, ref, variant, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_DEFAULT(variant)) __VA_OPT__(PAREN_END)
 #define PROC_VARIANT(...) PROC_VARIANT_(__VA_ARGS__)
 #define PROC_CASE(v, variant_case) PROC_VARIANT(EXPAND_ALL v, EXPAND_ALL variant_case)
-
-/*
-#define PROC_DEFAULT(code)       \
-	DISABLE_WARNINGS         \
-	default:                 \
-	{                        \
-		_ret__ = (code); \
-	}                        \
-	break;                   \
-		ENABLE_WARNINGS
-
-#define PROC_VARIANT___(name, ref, variant, value_name, ...) \
-	DISABLE_WARNINGS                                             \
-	case _Enum_##name##_##variant##__:                           \
-	{                                                            \
-		const Obj value_name = ref;                          \
-		_ret__ = (__VA_ARGS__);                              \
-	}                                                            \
-	break;                                                       \
-		ENABLE_WARNINGS
-
-#define PROC_VARIANT__(name, ref, variant, value_name, ...) __VA_OPT__(PROC_VARIANT___(name, ref, variant, value_name, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANT___(name, ref, variant, _, value_name)) __VA_OPT__(PAREN_END)
-#define PROC_VARIANT_(name, ref, variant, ...) __VA_OPT__(PROC_VARIANT__(name, ref, variant, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_DEFAULT(variant)) __VA_OPT__(PAREN_END)
-#define PROC_VARIANT(...) PROC_VARIANT_(__VA_ARGS__)
-#define PROC_CASE(v, variant_case) PROC_VARIANT(EXPAND_ALL v, EXPAND_ALL variant_case)
-*/
 
 // The match macro handles pattern matching. The current macro is immutable, need to implement
 // a syntax for mutable matching.
@@ -127,31 +98,28 @@ Impl(EnumImpl, Build);
 })
 
 #define PROC_DEFAULTN(code) \
-	DISABLE_WARNINGS    \
+                            \
 	default:            \
 	{                   \
 		(code);     \
 	}                   \
-	break;              \
-		ENABLE_WARNINGS
+	break;
 
 #define PROC_VARIANTN_MUT(name, ref, variant, value_name, code) \
-	DISABLE_WARNINGS case _Enum_##name##_##variant##__:     \
+	case _Enum_##name##_##variant##__:                      \
 	{                                                       \
 		Obj value_name = ref;                           \
 		(code);                                         \
 	}                                                       \
-	break;                                                  \
-	ENABLE_WARNINGS
+	break;
 
 #define PROC_VARIANTN____(name, ref, variant, value_name, code) \
-	DISABLE_WARNINGS case _Enum_##name##_##variant##__:     \
+	case _Enum_##name##_##variant##__:                      \
 	{                                                       \
 		const Obj value_name = ref;                     \
 		(code);                                         \
 	}                                                       \
-	break;                                                  \
-	ENABLE_WARNINGS
+	break;
 
 #define PROC_VARIANTN___(name, ref, variant, value_name, code, ...)          \
 	__VA_OPT__(PROC_VARIANTN_MUT(name, ref, variant, code, __VA_ARGS__)) \
