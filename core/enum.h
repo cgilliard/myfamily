@@ -28,8 +28,7 @@ Impl(EnumImpl, EnumProps);
 Impl(EnumImpl, Build);
 
 // Macro to disable warnings
-#define DISABLE_WARNINGS _Pragma("GCC diagnostic push") \
-    _Pragma("GCC diagnostic ignored \"-Wcompound-token-split-by-macro\"")
+#define DISABLE_WARNINGS _Pragma("GCC diagnostic push") /*_Pragma("GCC diagnostic ignored \"-Wcompound-token-split-by-macro\"")*/
 
 // Macro to re-enable warnings
 #define ENABLE_WARNINGS _Pragma("GCC diagnostic pop")
