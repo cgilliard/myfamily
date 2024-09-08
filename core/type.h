@@ -535,18 +535,17 @@ FatPtr build_fat_ptr(u64 size);
 	(*_ptr__) = OBJECT_INIT;                             \
 	Move(_ptr__, &value);
 
-#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                                                  \
-	__VA_OPT__(do {                                                                                       \
-		/*if (IS_OBJECT_TYPE(((structure*)0)->name))                                                  \
-		{                                                                                             \
-			panic("Cannot use With to set an Obj. Use "                                           \
-			      "'WithObject' isntead.\n");                                                     \
-		}                                                                                             \
-		else                                                                                          \
-		{                                                                                          */ \
-		*((typeof(((structure*)0)->name)*)((char*)ptr + offsetof(structure, name))) = value;          \
-		/*}*/                                                                                         \
-	} while (0);)                                                                                         \
+#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                                                 \
+	__VA_OPT__(do {                                                                                      \
+		if (IS_OBJECT_TYPE(((structure*)0)->name))                                                   \
+		{                                                                                            \
+			panic("Cannot use With to set an Obj. Perhaps, use a setter?");                      \
+		}                                                                                            \
+		else                                                                                         \
+		{                                                                                            \
+			*((typeof(((structure*)0)->name)*)((char*)ptr + offsetof(structure, name))) = value; \
+		}                                                                                            \
+	} while (0);)                                                                                        \
 	EXPAND(EXPAND(EXPAND_ALL EXPAND(__VA_OPT__(NONE)(PROC_WITH_OBJ(ptr, structure, name, value)) __VA_OPT__(()))))
 
 #define SET_OFFSET_OF(...) SET_OFFSET_OF_IMPL(__VA_ARGS__)
