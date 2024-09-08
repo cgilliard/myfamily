@@ -1949,6 +1949,8 @@ Test(core, test_enum_impl)
 	Unbox(v_out2, v_out_i32_2);
 }
 
+Builder(MutTest, Config(i32, value));
+
 // Current Enum Macro specifies the name of the Enum and a list of variants/type pairs.
 // The current implementation has unique namespaces so, there could be another enum with a 'dog'
 // 'cat' or 'bird' and it wouldn't interfere with this Enum. This causes some complications with
@@ -1956,7 +1958,28 @@ Test(core, test_enum_impl)
 // Another issue here is that the primitive types must be specified by their 'boxed' type
 // (i.e. I32/U64 as opposed to i32/u64). That should be fixable. Primitives and Objects are
 // supported here.
-Enum(PetsEnum, (bird, i32), (cat, u64), (dog, SimpleOption), (snake, bool));
+Enum(PetsEnum, (bird, i32), (cat, u64), (dog, SimpleOption), (snake, bool), (hampster, MutTest));
+
+Type(MutTest, Field(i32, value));
+
+Impl(MutTest, Build);
+Impl(MutTest, IncrTrait);
+Impl(MutTest, ValueOf);
+
+#define IMPL MutTest
+void MutTest_build(const MutTestConfig* config)
+{
+	$Var(value) = config->value;
+}
+void MutTest_incr_value()
+{
+	$Var(value)++;
+}
+void MutTest_value_of(void* dst)
+{
+	*(i32*)dst = $(value);
+}
+#undef IMPL
 
 Test(core, test_enum)
 {
@@ -1972,6 +1995,10 @@ Test(core, test_enum)
 	let cat3 = _(PetsEnum, cat, c3);
 	let simple_option = new (SimpleOption, With(is_some, true), With(value, 123));
 	let dog1 = _obj(PetsEnum, dog, simple_option);
+	let mut_test = new (MutTest, With(value, 100));
+	// let hampster_test = _obj(PetsEnum, hampster, mut_test);
+	let hampster_test = _(PetsEnum, bird, 0);
+	let hv2 = _obj(PetsEnum, hampster, mut_test);
 
 	// Call a match. Currently, the biggest problem is that the type of Enum must currently be
 	// specified in the match call. This has to do with the namespacing feature we mentioned before.
@@ -1986,12 +2013,48 @@ Test(core, test_enum)
 	// need to implement the wildcard match.
 	let r1 = match(
 	    PetsEnum,
-	    cat1,
+	    hv2,
 	    (bird, bird_value, { panic("mismatch"); UNIT; }),
+	    (hampster, hv, { /*incr_value(&hv);*/ i32 ival; Unbox(hv, ival); printf("hv=%i\n", ival); UNIT; }),
 	    (cat, cat_value, { u64 cv; Unbox(cat_value, cv); const Obj ret = new(U64, With(value, cv + 10)); ret; }),
 	    (dog, dog_value, { panic("mismatch"); UNIT; }));
 
-	matchn(PetsEnum, bird1, (bird, _, { printf("bird"); }), (cat, _, { printf("cat"); }), (dog, _, { printf("dog"); }));
+	printf("=======================================================start matchn==============================================\n");
+	// matchn(PetsEnum, bird1, (bird, mut bval, { i32 v; Unbox(bval, v); printf("bird: %i\n", v); }), (cat, _, { printf("cat"); }), (dog, { printf("dog"); }));
+	/*matchn(PetsEnum, hampster_test,
+	       (hampster, mut hv, { incr_value(&hv); incr_value(&hv); i32 hval; value_of(&hv, &hval); printf("hampster=%i,tn=%s\n", hval, TypeName(hv)); }),
+	       (cat, cat_value, { u64 cv; Unbox(cat_value, cv); printf("cv=%" PRIu64 "\n", cv); }),
+	       (bird, printf("bird\n")),
+	       (printf("no match!\n")));
+	*/
+
+	/*
+	let r2 = match(PetsEnum, hampster_test,
+		       (hampster, mut hv, { int vvvv = 10; UNIT; }),
+		       (cat, cat_value, { int vvvv = 1; UNIT; }),
+		       (bird, { int vvvv = 0; UNIT; }),
+		       ({ int vvvv = 0; UNIT; }));
+		       */
+
+	let r2 = match(PetsEnum, hampster_test,
+		       (hampster, mut hv, { incr_value(&hv); incr_value(&hv); i32 hval; value_of(&hv, &hval); printf("hampster=%i,tn=%s\n", hval, TypeName(hv)); UNIT; }),
+		       (cat, cat_value, { u64 cv; Unbox(cat_value, cv); printf("cv=%" PRIu64 "\n", cv); UNIT; }),
+		       (bird, { printf("bird\n"); UNIT; }),
+		       ({ printf("no match!\n"); UNIT; }));
+
+	/*
+let s = match cat1 {
+    PetsEnum::bird(bird_value) => {
+	info!("bird_value={}", bird_value);
+    },
+    PetsEnum::cat(mut cat_value) => {
+	cat_value.incr();
+	warn!("cat_value={}", cat_value);
+    },
+    _ => {
+	warn!("no match!");
+    }
+};
 
 	matchn(PetsEnum, bird1, (bird, _, printf("bird\n")), (cat, _, printf("cat\n")), (dog, _, printf("dog\n")));
 
@@ -2002,12 +2065,13 @@ Test(core, test_enum)
 
 	let testobj = new (SimpleOption, With(is_some, true), With(value, 123));
 	let dog10 = _obj(PetsEnum, dog, testobj);
-	i32 vi32 = 101;
-	let bird10 = _(PetsEnum, bird, vi32);
+	let bird10 = _(PetsEnum, bird, 101);
 	let snake1 = _bool(PetsEnum, snake, false);
+	let hampster1 = _string(PetsEnum, hampster, "hammie");
 
 	matchn(PetsEnum, snake1, (dog, printf("dog\n")), (snake, printf("snake\n")), (printf("default\n")));
 	let v = match(PetsEnum, snake1, (dog, { printf("dogmatch\n"); UNIT; }), (cat, { printf("snakematch\n"); UNIT; }), ({ printf("defaultmatch\n"); UNIT; }));
+	*/
 }
 
 /*

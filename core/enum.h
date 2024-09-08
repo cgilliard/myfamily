@@ -62,6 +62,42 @@ Impl(EnumImpl, Build);
 	break;                   \
 		ENABLE_WARNINGS
 
+#define PROC_VARIANT_MUT(name, ref, variant, value_name, __VA_ARGS__) \
+	DISABLE_WARNINGS case _Enum_##name##_##variant##__:           \
+	{                                                             \
+		Obj value_name = ref;                                 \
+		_ret__ = (__VA_ARGS__);                               \
+	}                                                             \
+	break;                                                        \
+	ENABLE_WARNINGS
+
+#define PROC_VARIANT____(name, ref, variant, value_name, __VA_ARGS__) \
+	DISABLE_WARNINGS case _Enum_##name##_##variant##__:           \
+	{                                                             \
+		const Obj value_name = ref;                           \
+		_ret__ = (__VA_ARGS__);                               \
+	}                                                             \
+	break;                                                        \
+	ENABLE_WARNINGS
+
+#define PROC_VARIANT___(name, ref, variant, value_name, code, ...)          \
+	__VA_OPT__(PROC_VARIANT_MUT(name, ref, variant, code, __VA_ARGS__)) \
+	EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANT____(name, ref, variant, value_name, code)) __VA_OPT__(PAREN_END)
+#define PROC_VARIANT__(name, ref, variant, value_name, ...) __VA_OPT__(PROC_VARIANT___(name, ref, variant, value_name, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANT____(name, ref, variant, _ignore__, value_name)) __VA_OPT__(PAREN_END)
+#define PROC_VARIANT_(name, ref, variant, ...) __VA_OPT__(PROC_VARIANT__(name, ref, variant, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_DEFAULT(variant)) __VA_OPT__(PAREN_END)
+#define PROC_VARIANT(...) PROC_VARIANT_(__VA_ARGS__)
+#define PROC_CASE(v, variant_case) PROC_VARIANT(EXPAND_ALL v, EXPAND_ALL variant_case)
+
+/*
+#define PROC_DEFAULT(code)       \
+	DISABLE_WARNINGS         \
+	default:                 \
+	{                        \
+		_ret__ = (code); \
+	}                        \
+	break;                   \
+		ENABLE_WARNINGS
+
 #define PROC_VARIANT___(name, ref, variant, value_name, __VA_ARGS__) \
 	DISABLE_WARNINGS                                             \
 	case _Enum_##name##_##variant##__:                           \
@@ -76,6 +112,7 @@ Impl(EnumImpl, Build);
 #define PROC_VARIANT_(name, ref, variant, ...) __VA_OPT__(PROC_VARIANT__(name, ref, variant, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_DEFAULT(variant)) __VA_OPT__(PAREN_END)
 #define PROC_VARIANT(...) PROC_VARIANT_(__VA_ARGS__)
 #define PROC_CASE(v, variant_case) PROC_VARIANT(EXPAND_ALL v, EXPAND_ALL variant_case)
+*/
 
 // The match macro handles pattern matching. The current macro is immutable, need to implement
 // a syntax for mutable matching.
@@ -99,16 +136,28 @@ Impl(EnumImpl, Build);
 	break;              \
 		ENABLE_WARNINGS
 
-#define PROC_VARIANTN___(name, ref, variant, value_name, code) \
-	DISABLE_WARNINGS                                       \
-	case _Enum_##name##_##variant##__:                     \
-	{                                                      \
-		const Obj value_name = ref;                    \
-		(code);                                        \
-	}                                                      \
-	break;                                                 \
-		ENABLE_WARNINGS
-#define PROC_VARIANTN__(name, ref, variant, value_name, ...) __VA_OPT__(PROC_VARIANTN___(name, ref, variant, value_name, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANTN___(name, ref, variant, _, value_name)) __VA_OPT__(PAREN_END)
+#define PROC_VARIANTN_MUT(name, ref, variant, value_name, code) \
+	DISABLE_WARNINGS case _Enum_##name##_##variant##__:     \
+	{                                                       \
+		Obj value_name = ref;                           \
+		(code);                                         \
+	}                                                       \
+	break;                                                  \
+	ENABLE_WARNINGS
+
+#define PROC_VARIANTN____(name, ref, variant, value_name, code) \
+	DISABLE_WARNINGS case _Enum_##name##_##variant##__:     \
+	{                                                       \
+		const Obj value_name = ref;                     \
+		(code);                                         \
+	}                                                       \
+	break;                                                  \
+	ENABLE_WARNINGS
+
+#define PROC_VARIANTN___(name, ref, variant, value_name, code, ...)          \
+	__VA_OPT__(PROC_VARIANTN_MUT(name, ref, variant, code, __VA_ARGS__)) \
+	EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANTN____(name, ref, variant, value_name, code)) __VA_OPT__(PAREN_END)
+#define PROC_VARIANTN__(name, ref, variant, value_name, ...) __VA_OPT__(PROC_VARIANTN___(name, ref, variant, value_name, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANTN____(name, ref, variant, _ignore__, value_name)) __VA_OPT__(PAREN_END)
 #define PROC_VARIANTN_(name, ref, variant, ...) __VA_OPT__(PROC_VARIANTN__(name, ref, variant, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_DEFAULTN(variant)) __VA_OPT__(PAREN_END)
 #define PROC_VARIANTN(...) PROC_VARIANTN_(__VA_ARGS__)
 #define PROC_CASEN(v, variant_case) PROC_VARIANTN(EXPAND_ALL v, EXPAND_ALL variant_case)
@@ -209,6 +258,17 @@ static bool is_prim_match(const char* expected, const char* found)
 	    EnumImpl,                                       \
 	    With(variant_id, _Enum_##name##_##variant##__), \
 	    With(value, &v));                               \
+	_ret__;                                             \
+})
+
+// TODO: this is a stub implementation. Once we have String,
+// replace with the String.
+#define _string(name, variant, v) ({                        \
+	const Obj _val__ = new (U32, With(value, 1234));    \
+	Obj _ret__ = new (                                  \
+	    EnumImpl,                                       \
+	    With(variant_id, _Enum_##name##_##variant##__), \
+	    With(value, &_val__));                          \
 	_ret__;                                             \
 })
 
