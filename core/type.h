@@ -351,8 +351,6 @@ FatPtr build_fat_ptr(u64 size);
 
 #define EXPAND3(x) x
 #define EXPAND2(x) x
-#define PAREN (
-#define PAREN_END )
 #define PROC_BOTH_PROTO__(impl_type, param_type, param_name, ignore1, ...) __VA_OPT__(const impl_type##Config*) EXPAND3 __VA_OPT__(PAREN) __VA_OPT__(PAREN_END) __VA_OPT__(NONE)(const Obj*)
 #define PROC_BOTH_PROTO_(impl_type, param_type, param_name, ...) __VA_OPT__(PROC_BOTH_PROTO__(impl_type, param_type, param_name, __VA_ARGS__)) EXPAND2 __VA_OPT__(NONE)(param_type param_name)
 #define PROC_BOTH_PROTO(...) PROC_BOTH_PROTO_(__VA_ARGS__)
@@ -537,18 +535,18 @@ FatPtr build_fat_ptr(u64 size);
 	(*_ptr__) = OBJECT_INIT;                             \
 	Move(_ptr__, &value);
 
-#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                                                 \
-	__VA_OPT__(do {                                                                                      \
-		if (IS_OBJECT_TYPE(((structure*)0)->name))                                                   \
-		{                                                                                            \
-			panic("Cannot use With to set an Obj. Use "                                          \
-			      "'WithObject' isntead.\n");                                                    \
-		}                                                                                            \
-		else                                                                                         \
-		{                                                                                            \
-			*((typeof(((structure*)0)->name)*)((char*)ptr + offsetof(structure, name))) = value; \
-		}                                                                                            \
-	} while (0);)                                                                                        \
+#define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                                                  \
+	__VA_OPT__(do {                                                                                       \
+		/*if (IS_OBJECT_TYPE(((structure*)0)->name))                                                  \
+		{                                                                                             \
+			panic("Cannot use With to set an Obj. Use "                                           \
+			      "'WithObject' isntead.\n");                                                     \
+		}                                                                                             \
+		else                                                                                          \
+		{                                                                                          */ \
+		*((typeof(((structure*)0)->name)*)((char*)ptr + offsetof(structure, name))) = value;          \
+		/*}*/                                                                                         \
+	} while (0);)                                                                                         \
 	EXPAND(EXPAND(EXPAND_ALL EXPAND(__VA_OPT__(NONE)(PROC_WITH_OBJ(ptr, structure, name, value)) __VA_OPT__(()))))
 
 #define SET_OFFSET_OF(...) SET_OFFSET_OF_IMPL(__VA_ARGS__)

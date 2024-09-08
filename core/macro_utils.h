@@ -19,6 +19,8 @@
 #define EXPAND_ALL_INNER(...) __VA_ARGS__
 #define CATI(x, y) x##y
 #define CAT(x, y) CATI(x, y)
+#define PAREN (
+#define PAREN_END )
 
 #define NONE(...)
 #define FIRST(x, y) x

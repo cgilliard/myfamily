@@ -53,15 +53,27 @@ Impl(EnumImpl, Build);
 	static const char* __##name##__type_name_arr[_Enum_##name##_size] = { \
 	    FOR_EACH(PROC_ENUM_TYPES, name, (, ), __VA_ARGS__)};
 
-#define PROC_VARIANT_(name, ref, variant, value_name, code) \
-	DISABLE_WARNINGS                                    \
-	case _Enum_##name##_##variant##__:                  \
-	{                                                   \
-		const Obj value_name = ref;                 \
-		_ret__ = (code);                            \
-	}                                                   \
-	break;                                              \
+#define PROC_DEFAULT(code)       \
+	DISABLE_WARNINGS         \
+	default:                 \
+	{                        \
+		_ret__ = (code); \
+	}                        \
+	break;                   \
 		ENABLE_WARNINGS
+
+#define PROC_VARIANT___(name, ref, variant, value_name, __VA_ARGS__) \
+	DISABLE_WARNINGS                                             \
+	case _Enum_##name##_##variant##__:                           \
+	{                                                            \
+		const Obj value_name = ref;                          \
+		_ret__ = (__VA_ARGS__);                              \
+	}                                                            \
+	break;                                                       \
+		ENABLE_WARNINGS
+
+#define PROC_VARIANT__(name, ref, variant, value_name, ...) __VA_OPT__(PROC_VARIANT___(name, ref, variant, value_name, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANT___(name, ref, variant, _, value_name)) __VA_OPT__(PAREN_END)
+#define PROC_VARIANT_(name, ref, variant, ...) __VA_OPT__(PROC_VARIANT__(name, ref, variant, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_DEFAULT(variant)) __VA_OPT__(PAREN_END)
 #define PROC_VARIANT(...) PROC_VARIANT_(__VA_ARGS__)
 #define PROC_CASE(v, variant_case) PROC_VARIANT(EXPAND_ALL v, EXPAND_ALL variant_case)
 
@@ -78,15 +90,26 @@ Impl(EnumImpl, Build);
 	_ret__;                                                    \
 })
 
-#define PROC_VARIANTN_(name, ref, variant, value_name, code) \
-	DISABLE_WARNINGS                                     \
-	case _Enum_##name##_##variant##__:                   \
-	{                                                    \
-		const Obj value_name = ref;                  \
-		(code);                                      \
-	}                                                    \
-	break;                                               \
+#define PROC_DEFAULTN(code) \
+	DISABLE_WARNINGS    \
+	default:            \
+	{                   \
+		(code);     \
+	}                   \
+	break;              \
 		ENABLE_WARNINGS
+
+#define PROC_VARIANTN___(name, ref, variant, value_name, code) \
+	DISABLE_WARNINGS                                       \
+	case _Enum_##name##_##variant##__:                     \
+	{                                                      \
+		const Obj value_name = ref;                    \
+		(code);                                        \
+	}                                                      \
+	break;                                                 \
+		ENABLE_WARNINGS
+#define PROC_VARIANTN__(name, ref, variant, value_name, ...) __VA_OPT__(PROC_VARIANTN___(name, ref, variant, value_name, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANTN___(name, ref, variant, _, value_name)) __VA_OPT__(PAREN_END)
+#define PROC_VARIANTN_(name, ref, variant, ...) __VA_OPT__(PROC_VARIANTN__(name, ref, variant, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_DEFAULTN(variant)) __VA_OPT__(PAREN_END)
 #define PROC_VARIANTN(...) PROC_VARIANTN_(__VA_ARGS__)
 #define PROC_CASEN(v, variant_case) PROC_VARIANTN(EXPAND_ALL v, EXPAND_ALL variant_case)
 
@@ -101,12 +124,45 @@ Impl(EnumImpl, Build);
 	};                                                          \
 })
 
+static bool is_prim_match(const char* expected, const char* found)
+{
+	if (!strcmp(found, "I8") && !strcmp(expected, "int8_t"))
+		return true;
+	if (!strcmp(found, "I16") && !strcmp(expected, "int16_t"))
+		return true;
+	if (!strcmp(found, "I32") && !strcmp(expected, "int32_t"))
+		return true;
+	if (!strcmp(found, "I64") && !strcmp(expected, "int64_t"))
+		return true;
+	if (!strcmp(found, "I128") && !strcmp(expected, "int128_t"))
+		return true;
+	if (!strcmp(found, "U8") && !strcmp(expected, "uint8_t"))
+		return true;
+	if (!strcmp(found, "U16") && !strcmp(expected, "uint16_t"))
+		return true;
+	if (!strcmp(found, "U32") && !strcmp(expected, "uint32_t"))
+		return true;
+	if (!strcmp(found, "U64") && !strcmp(expected, "uint64_t"))
+		return true;
+	if (!strcmp(found, "U128") && !strcmp(expected, "uint128_t"))
+		return true;
+	if (!strcmp(found, "F32") && !strcmp(expected, "float"))
+		return true;
+	if (!strcmp(found, "F64") && !strcmp(expected, "double"))
+		return true;
+	if (!strcmp(found, "Bool") && !strcmp(expected, "_Bool"))
+		return true;
+	return false;
+}
+
 // Check that the type is the expected type.
-#define ENUM_CHECK_TYPE_MATCH(name, variant, v) ({                                        \
-	if (strcmp(__##name##__type_name_arr[_Enum_##name##_##variant##__], TypeName(v))) \
-		panic("Enum type mismatch! Expected [%s]. Found [%s].",                   \
-		      __##name##__type_name_arr[_Enum_##name##_##variant##__],            \
-		      TypeName(v));                                                       \
+#define ENUM_CHECK_TYPE_MATCH(name, variant, v) ({                                                                                                   \
+	char* type_name = TypeName(v);                                                                                                               \
+	if (strcmp(__##name##__type_name_arr[_Enum_##name##_##variant##__], type_name))                                                              \
+	{                                                                                                                                            \
+		if (!is_prim_match(__##name##__type_name_arr[_Enum_##name##_##variant##__], type_name))                                              \
+			panic("Enum type mismatch! Expected [%s]. Found [%s].", __##name##__type_name_arr[_Enum_##name##_##variant##__], type_name); \
+	}                                                                                                                                            \
 })
 
 // Box primitive values
@@ -119,6 +175,30 @@ Impl(EnumImpl, Build);
 	    With(value, &_val__));                          \
 	_ret__;                                             \
 })
+
+#define HANDLE_PRIM_GEN(name, variant, _val__) ({           \
+	ENUM_CHECK_TYPE_MATCH(name, variant, _val__);       \
+	Obj _ret__ = new (                                  \
+	    EnumImpl,                                       \
+	    With(variant_id, _Enum_##name##_##variant##__), \
+	    With(value, &_val__));                          \
+	_ret__;                                             \
+})
+
+#define _(name, variant, v) _Generic((v), \
+    bool: ({ let _val__ = new (Bool, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                          \
+    f32: ({ let _val__ = new (F32, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \
+    f64: ({ let _val__ = new (F64, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \
+    i8: ({ let _val__ = new (I8, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                            \
+    i16: ({ let _val__ = new (I16, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \
+    i32: ({ let _val__ = new (I32, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \
+    i64: ({ let _val__ = new (I64, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \
+    i128: ({ let _val__ = new (I128, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                          \
+    u8: ({ let _val__ = new (U8, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                            \
+    u16: ({ let _val__ = new (U16, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \
+    u32: ({ let _val__ = new (U32, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \
+    u64: ({ let _val__ = new (U64, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \
+    u128: ({ let _val__ = new (U128, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }))
 
 // type specific implementations both primitive and Object
 // variants may be created

@@ -1956,17 +1956,20 @@ Test(core, test_enum_impl)
 // Another issue here is that the primitive types must be specified by their 'boxed' type
 // (i.e. I32/U64 as opposed to i32/u64). That should be fixable. Primitives and Objects are
 // supported here.
-Enum(PetsEnum, (bird, I32), (cat, U64), (dog, SimpleOption));
+Enum(PetsEnum, (bird, i32), (cat, u64), (dog, SimpleOption), (snake, bool));
 
 Test(core, test_enum)
 {
 	// create some enums of various types. The _i32 / _u64 / _obj notation allows for
 	// conversion to the specified type.
-	let bird1 = _i32(PetsEnum, bird, 10);
-	let bird2 = _i32(PetsEnum, bird, 10);
-	let cat1 = _u64(PetsEnum, cat, 13);
-	let cat2 = _u64(PetsEnum, cat, 20);
-	let cat3 = _u64(PetsEnum, cat, 30);
+	let bird1 = _(PetsEnum, bird, 10);
+	let bird2 = _(PetsEnum, bird, 10);
+	u64 c1 = 13;
+	u64 c2 = 20;
+	u64 c3 = 30;
+	let cat1 = _(PetsEnum, cat, c1);
+	let cat2 = _(PetsEnum, cat, c2);
+	let cat3 = _(PetsEnum, cat, c3);
 	let simple_option = new (SimpleOption, With(is_some, true), With(value, 123));
 	let dog1 = _obj(PetsEnum, dog, simple_option);
 
@@ -1988,28 +1991,23 @@ Test(core, test_enum)
 	    (cat, cat_value, { u64 cv; Unbox(cat_value, cv); const Obj ret = new(U64, With(value, cv + 10)); ret; }),
 	    (dog, dog_value, { panic("mismatch"); UNIT; }));
 
-	// let r2 = match(PetsEnum, bird1, (bird, _, { printf("bird"); UNIT; }), (cat, _, { printf("cat"); UNIT; }), (dog, _, { printf("dog"); UNIT; }));
-	//   match with no return value.
 	matchn(PetsEnum, bird1, (bird, _, { printf("bird"); }), (cat, _, { printf("cat"); }), (dog, _, { printf("dog"); }));
 
 	matchn(PetsEnum, bird1, (bird, _, printf("bird\n")), (cat, _, printf("cat\n")), (dog, _, printf("dog\n")));
-
-	/*
-	let s = match(
-	    cat1,
-	    (bird, bird_value, { info("bird_value={}", bird_value); String("bird"); }),
-	    (cat, cat_value, { warn("cat_value={}", cat_value); String("cat"); }),
-	    (dog, dog_value, { info("dog_value={}", dog_value); String("dog"); }));
-
-	// match with no return value.
-	matchn(bird1, (bird, _, { info("bird"); }), (cat, _, { warn("cat"); }), (dog, _, { info("dog"); }));
-
-	*/
 
 	// verify the returned value is correct. In this case, it's the input value + 10 (13 + 10 = 23).
 	u64 v1;
 	Unbox(r1, v1);
 	cr_assert_eq(v1, 23);
+
+	let testobj = new (SimpleOption, With(is_some, true), With(value, 123));
+	let dog10 = _obj(PetsEnum, dog, testobj);
+	i32 vi32 = 101;
+	let bird10 = _(PetsEnum, bird, vi32);
+	let snake1 = _bool(PetsEnum, snake, false);
+
+	matchn(PetsEnum, snake1, (dog, printf("dog\n")), (snake, printf("snake\n")), (printf("default\n")));
+	let v = match(PetsEnum, snake1, (dog, { printf("dogmatch\n"); UNIT; }), (cat, { printf("snakematch\n"); UNIT; }), ({ printf("defaultmatch\n"); UNIT; }));
 }
 
 /*
