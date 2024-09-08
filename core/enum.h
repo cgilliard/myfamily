@@ -17,32 +17,184 @@
 
 #include <core/traits.h>
 #include <core/type.h>
+#include <core/unit.h>
 
-#define Enum(name, ...)                                                                                           \
-	TypeImpl(name, Where(T), Field(u32, variant_id), Generic(T, obj));                                        \
-	Impl(name, EnumProperties);                                                                               \
-	u64 name##_sizeof_variant(u32 variant_id)                                                                 \
-	{                                                                                                         \
-		/* TODO: This is just hard coded. Need to modify this to set appropriate size per variant. */     \
-		/* Basic approach FOR_EACH go through variants passed in. For each one either call size if it */  \
-		/* doesn't implement EnumProperties or sizeof_max_variant for those that do implement.*/          \
-		return 128 + sizeof(u32);                                                                         \
-	}                                                                                                         \
-	u32 name##_variant_id() { return $Context($(), name, variant_id); }                                       \
-	void __attribute__((constructor)) __add_enum_##name()                                                     \
-	{                                                                                                         \
-		vtable_add_trait(&name##_Vtable__, "EnumProperties");                                             \
-	}                                                                                                         \
-	u64 name##_size()                                                                                         \
-	{                                                                                                         \
-		if (!Implements((*$()), "EnumProperties"))                                                        \
-			panic("required trait [EnumProperties] not implemented in type [%s].", TypeName((*$()))); \
-		u32 id = variant_id($());                                                                         \
-		u64 size = sizeof_variant($(), id);                                                               \
-		return size;                                                                                      \
-	}
-#define EnumBuilder(name)
-#define match(e)
-#define _()
+// Define generic EnumImpl builder
+Builder(EnumImpl, Config(i32, variant_id), Config(const Obj*, value));
+
+// Define the implementations for EnumImpl
+Impl(EnumImpl, AsRef);
+Impl(EnumImpl, EnumProps);
+Impl(EnumImpl, Build);
+
+// Macro to disable warnings
+#define DISABLE_WARNINGS _Pragma("GCC diagnostic push") \
+    _Pragma("GCC diagnostic ignored \"-Wcompound-token-split-by-macro\"")
+
+// Macro to re-enable warnings
+#define ENABLE_WARNINGS _Pragma("GCC diagnostic pop")
+
+#define PROC_ENUM_TYPES__(ignore, v) #v
+#define PROC_ENUM_TYPES_(...) PROC_ENUM_TYPES__(__VA_ARGS__)
+#define PROC_ENUM_TYPES(name, v) PROC_ENUM_TYPES_(EXPAND_ALL v)
+
+#define PROC_ENUM_DEFN__(name, v, ignore) _Enum_##name##_##v##__,
+#define PROC_ENUM_DEFN_(...) PROC_ENUM_DEFN__(__VA_ARGS__)
+#define PROC_ENUM_DEFN(name, v) PROC_ENUM_DEFN_(name, EXPAND_ALL v)
+
+// The enum macro builds the enum and the type string for the Enum. These along
+// with the EnumImpl are all that's needed.
+#define Enum(name, ...)                                                       \
+	typedef enum name                                                     \
+	{                                                                     \
+		FOR_EACH(PROC_ENUM_DEFN, name, (), __VA_ARGS__)               \
+		    _Enum_##name##_size                                       \
+	} name;                                                               \
+	static const char* __##name##__type_name_arr[_Enum_##name##_size] = { \
+	    FOR_EACH(PROC_ENUM_TYPES, name, (, ), __VA_ARGS__)};
+
+#define PROC_VARIANT_(name, ref, variant, value_name, code) \
+	DISABLE_WARNINGS                                    \
+	case _Enum_##name##_##variant##__:                  \
+	{                                                   \
+		const Obj value_name = ref;                 \
+		_ret__ = (code);                            \
+	}                                                   \
+	break;                                              \
+		ENABLE_WARNINGS
+#define PROC_VARIANT(...) PROC_VARIANT_(__VA_ARGS__)
+#define PROC_CASE(v, variant_case) PROC_VARIANT(EXPAND_ALL v, EXPAND_ALL variant_case)
+
+// The match macro handles pattern matching. The current macro is immutable, need to implement
+// a syntax for mutable matching.
+#define match(name, e, ...) ({                                     \
+	let _v__ = as_ref(&e);                                     \
+	i32 _v_id__ = variant_id(&e);                              \
+	Obj _ret__ = OBJECT_INIT;                                  \
+	switch (_v_id__)                                           \
+	{                                                          \
+		FOR_EACH(PROC_CASE, (name, _v__), (), __VA_ARGS__) \
+	}                                                          \
+	_ret__;                                                    \
+})
+
+#define PROC_VARIANTN_(name, ref, variant, value_name, code) \
+	DISABLE_WARNINGS                                     \
+	case _Enum_##name##_##variant##__:                   \
+	{                                                    \
+		const Obj value_name = ref;                  \
+		(code);                                      \
+	}                                                    \
+	break;                                               \
+		ENABLE_WARNINGS
+#define PROC_VARIANTN(...) PROC_VARIANTN_(__VA_ARGS__)
+#define PROC_CASEN(v, variant_case) PROC_VARIANTN(EXPAND_ALL v, EXPAND_ALL variant_case)
+
+// The matchn macro is identical to match except that there's no return value.
+// This allows for simple match expressions that do not return a value.
+#define matchn(name, e, ...) ({                                     \
+	let _v__ = as_ref(&e);                                      \
+	i32 _v_id__ = variant_id(&e);                               \
+	switch (_v_id__)                                            \
+	{                                                           \
+		FOR_EACH(PROC_CASEN, (name, _v__), (), __VA_ARGS__) \
+	};                                                          \
+})
+
+// Check that the type is the expected type.
+#define ENUM_CHECK_TYPE_MATCH(name, variant, v) ({                                        \
+	if (strcmp(__##name##__type_name_arr[_Enum_##name##_##variant##__], TypeName(v))) \
+		panic("Enum type mismatch! Expected [%s]. Found [%s].",                   \
+		      __##name##__type_name_arr[_Enum_##name##_##variant##__],            \
+		      TypeName(v));                                                       \
+})
+
+// Box primitive values
+#define HANDLE_PRIM_BOXING(name, variant, v) ({             \
+	let _val__ = Box(v);                                \
+	ENUM_CHECK_TYPE_MATCH(name, variant, _val__);       \
+	Obj _ret__ = new (                                  \
+	    EnumImpl,                                       \
+	    With(variant_id, _Enum_##name##_##variant##__), \
+	    With(value, &_val__));                          \
+	_ret__;                                             \
+})
+
+// type specific implementations both primitive and Object
+// variants may be created
+
+#define _obj(name, variant, v) ({                           \
+	ENUM_CHECK_TYPE_MATCH(name, variant, v);            \
+	Obj _ret__ = new (                                  \
+	    EnumImpl,                                       \
+	    With(variant_id, _Enum_##name##_##variant##__), \
+	    With(value, &v));                               \
+	_ret__;                                             \
+})
+
+#define _i8(name, variant, v) ({                   \
+	i64 _vin__ = v;                            \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _i16(name, variant, v) ({                  \
+	i64 _vin__ = v;                            \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _i32(name, variant, v) ({                  \
+	i32 _vin__ = v;                            \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _i64(name, variant, v) ({                  \
+	i64 _vin__ = v;                            \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _i128(name, variant, v) ({                 \
+	i128 _vin__ = v;                           \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _u8(name, variant, v) ({                   \
+	u8 _vin__ = v;                             \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _u16(name, variant, v) ({                  \
+	u16 _vin__ = v;                            \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _u32(name, variant, v) ({                  \
+	u32 _vin__ = v;                            \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _u64(name, variant, v) ({                  \
+	u64 _vin__ = v;                            \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _u128(name, variant, v) ({                 \
+	u128 _vin__ = v;                           \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _f32(name, variant, v) ({                  \
+	f32 _vin__ = v;                            \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _f64(name, variant, v) ({                  \
+	f64 _vin__ = v;                            \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
+
+#define _bool(name, variant, v) ({                 \
+	bool _vin__ = v;                           \
+	HANDLE_PRIM_BOXING(name, variant, _vin__); \
+})
 
 #endif // _CORE_ENUM__

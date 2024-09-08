@@ -42,13 +42,6 @@ void drop(Obj* self)
 		      "] has already been consumed!",
 		      self->vtable->name, self->ptr.id);
 	void (*impl)() = find_fn(self, "drop");
-	if (!impl)
-		panic("Runtime error: Trait bound violation! "
-		      "Type "
-		      "'%s' does "
-		      "not implement the "
-		      "required function [%s]",
-		      TypeName((*self)), "drop");
 	SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};
 	__thread_local_self_Const = self;
 	__thread_local_self_Var = self;
@@ -61,7 +54,9 @@ void drop(Obj* self)
 	{
 		chain_free(&self->ptr);
 	}
-	return impl();
+	// in the case of no drop existing we just return
+	if (impl)
+		impl();
 }
 
 // default implementation of clone_from

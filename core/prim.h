@@ -40,6 +40,28 @@ Builder(Bool, Config(bool, value));
 Impl(Bool, Build);
 Impl(Bool, ValueOf);
 
+#define DISABLE_WARNING _Pragma("GCC diagnostic push")                 \
+    _Pragma("GCC diagnostic ignored \"-Wincompatible-pointer-types\"") \
+	_Pragma("GCC diagnostic ignored \"-Wpointer-sign\"")
+#define ENABLE_WARNING _Pragma("GCC diagnostic pop")
+
+#define Box2(v) DISABLE_WARNING _Generic((v), \
+    u8: ({ u8 * vptr = &v; let _ret____ = new (U8, With(value, *vptr)); _ret____; }),                                \
+    u16: ({ u16 * vptr = &v; let _ret___ = new (U16, With(value, *vptr)); _ret___; }),                               \
+    u32: ({ u32 * vptr = &v; let _ret___ = new (U32, With(value, *vptr)); _ret___; }),                               \
+    u64: ({ u64 * vptr = &v; let _ret___ = new (U64, With(value, *vptr)); _ret___; }),                               \
+    u128: ({ u128 * vptr = &v; let _ret__ = new (U128, With(value, *vptr)); _ret__; }),                              \
+    i8: ({ i8 * vptr = &v; let _ret____ = new (I8, With(value, *vptr)); _ret____; }),                                \
+    i16: ({ i16 * vptr = &v; let _ret___ = new (I16, With(value, *vptr)); _ret___; }),                               \
+    i32: ({ i32 * vptr = &v; let _ret___ = new (I32, With(value, *vptr)); _ret___; }),                               \
+    i64: ({ i64 * vptr = &v; let _ret___ = new (I64, With(value, *vptr)); _ret___; }),                               \
+    i128: ({ i128 * vptr = &v; let _ret__ = new (I128, With(value, *vptr)); _ret__; }),                              \
+    f32: ({ f32 * vptr = &v; let _ret___ = new (F32, With(value, *vptr)); _ret___; }),                               \
+    f64: ({ f64 * vptr = &v; let _ret___ = new (F64, With(value, *vptr)); _ret___; }),                               \
+    bool: ({ bool * vptr = &v; let _ret__ = new (Bool, With(value, *vptr)); _ret__; }),                              \
+    Obj: ({ v; }),                            \
+    default: ({ panic("Attempt to box an unknown type!"); })) ENABLE_WARNING
+
 #define Box(v) _Generic((v),          \
     u8: new (U8, With(value, v)),     \
     u16: new (U16, With(value, v)),   \
@@ -54,7 +76,7 @@ Impl(Bool, ValueOf);
     f32: new (F32, With(value, v)),   \
     f64: new (F64, With(value, v)),   \
     bool: new (Bool, With(value, v)), \
-    default: panic("Attempt to Box a non-primitive type!"))
+    default: panic("Attempt to box an unknown type!"))
 
 #define Unbox(v, to) value_of(&v, &to)
 

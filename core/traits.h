@@ -56,7 +56,10 @@ TraitImpl(ValueOf);
 #define Unwrap DefineTrait(Unwrap, Required(Var, Obj, unwrap))
 TraitImpl(Unwrap);
 
-#define EnumProps DefineTrait(EnumProps, Super(Unwrap), Required(Const, u32, variant_id))
+#define AsRef DefineTrait(AsRef, Required(Const, Obj, as_ref))
+TraitImpl(AsRef);
+
+#define EnumProps DefineTrait(EnumProps, Super(AsRef), Required(Const, i32, variant_id))
 TraitImpl(EnumProps);
 
 #endif // _CORE_TRAITS__

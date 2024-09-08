@@ -12,14 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/chain_allocator.h>
-#include <core/enum.h>
-#include <core/heap.h>
-#include <core/lock.h>
-#include <core/panic.h>
-#include <core/prim.h>
-#include <core/rc.h>
-#include <core/thread.h>
-#include <core/traits.h>
-#include <core/type.h>
 #include <core/unit.h>
+
+Type(Unit);

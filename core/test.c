@@ -1814,6 +1814,14 @@ Test(core, test_iterator)
 	cr_assert_eq(v_in, v_out); \
 })
 
+#define TEST_BOX2(type, value) ({  \
+	type v_in = value;         \
+	let v_box = Box2(v_in);    \
+	type v_out;                \
+	Unbox(v_box, v_out);       \
+	cr_assert_eq(v_in, v_out); \
+})
+
 Test(core, test_prim)
 {
 	TEST_BOX(i8, 10);
@@ -1830,6 +1838,31 @@ Test(core, test_prim)
 	TEST_BOX(f64, 1234.4);
 	TEST_BOX(bool, false);
 	TEST_BOX(bool, true);
+
+	TEST_BOX2(i8, 10);
+	TEST_BOX2(i16, -12);
+	TEST_BOX2(i32, -11);
+	TEST_BOX2(i64, 1234);
+	TEST_BOX2(i128, 10);
+	TEST_BOX2(u8, 10);
+	TEST_BOX2(u16, 12);
+	TEST_BOX2(u32, 11);
+	TEST_BOX2(u64, 1234);
+	TEST_BOX2(u128, 10);
+	TEST_BOX2(f32, 11.3);
+	TEST_BOX2(f64, 1234.4);
+	TEST_BOX2(bool, false);
+	TEST_BOX2(bool, true);
+
+	i32 vb2 = 12;
+	let v = Box2(vb2);
+	i32 v_out;
+	Unbox(v, v_out);
+	cr_assert_eq(v_out, 12);
+	let v2 = new (SimpleOption, With(value, 7));
+	let v2_box = Box2(v2);
+	i32 v2_out = option_value(&v2_box);
+	cr_assert_eq(v2_out, 7);
 }
 
 // Create a simple Type that we can use to test Rc.
@@ -1901,32 +1934,82 @@ Test(core, test_rc)
 	cr_assert_eq(test_rc_drop_count, 3);
 }
 
-Type(Test1, Where(T), Field(u32, variant_id), Generic(T, value));
-Builder(Test1, Config(u32, variant_id), Config(const Obj*, value));
-
-Impl(Test1, Unwrap);
-Impl(Test1, EnumProps);
-Impl(Test1, Build);
-
-#define IMPL Test1
-void Test1_build(const Test1Config* config)
-{
-	$Var(variant_id) = config->variant_id;
-	Move(&$Var(value), config->value);
-}
-u32 Test1_variant_id() { return $(variant_id); }
-Obj Test1_unwrap() { ReturnObjAndConsumeSelf($(value)); }
-#undef IMPL
-
-Test(core, test_enum)
+Test(core, test_enum_impl)
 {
 	let v = Box(-11);
-	var x = new (Test1, With(variant_id, 1), With(value, &v));
+	var x = new (EnumImpl, With(variant_id, 1), With(value, &v));
 	cr_assert_eq(variant_id(&x), 1);
-	let v_out = unwrap(&x);
+	let v_out = as_ref(&x);
 	i32 v_out_i32;
 	Unbox(v_out, v_out_i32);
 	cr_assert_eq(v_out_i32, -11);
+
+	let v_out2 = as_ref(&x);
+	i32 v_out_i32_2;
+	Unbox(v_out2, v_out_i32_2);
+}
+
+// Current Enum Macro specifies the name of the Enum and a list of variants/type pairs.
+// The current implementation has unique namespaces so, there could be another enum with a 'dog'
+// 'cat' or 'bird' and it wouldn't interfere with this Enum. This causes some complications with
+// the match macro that I'll discuss later.
+// Another issue here is that the primitive types must be specified by their 'boxed' type
+// (i.e. I32/U64 as opposed to i32/u64). That should be fixable. Primitives and Objects are
+// supported here.
+Enum(PetsEnum, (bird, I32), (cat, U64), (dog, SimpleOption));
+
+Test(core, test_enum)
+{
+	// create some enums of various types. The _i32 / _u64 / _obj notation allows for
+	// conversion to the specified type.
+	let bird1 = _i32(PetsEnum, bird, 10);
+	let bird2 = _i32(PetsEnum, bird, 10);
+	let cat1 = _u64(PetsEnum, cat, 13);
+	let cat2 = _u64(PetsEnum, cat, 20);
+	let cat3 = _u64(PetsEnum, cat, 30);
+	let simple_option = new (SimpleOption, With(is_some, true), With(value, 123));
+	let dog1 = _obj(PetsEnum, dog, simple_option);
+
+	// Call a match. Currently, the biggest problem is that the type of Enum must currently be
+	// specified in the match call. This has to do with the namespacing feature we mentioned before.
+	// There may be a way to fix this and keep namespacing, but this definitely must be fixed even if
+	// we have to drop namespacing.
+	// The example below demonstrates, matching the variant, in this case a cat. Reading the value via
+	// the specified name 'cat_value', and returning a value (via the gcc extension mechanism, the last
+	// term in the statement is returned. In this case the value of 'ret' is returned. One other minor issue
+	// is that currently if we panic (as below) we still need to return an Object or there will be a compiler error
+	// stating that we're returning the wrong type. There may be a way to address this and if so it will be fixed.
+	// The last feature would be to ensure that all variants are specified (using _Static_assert). We also
+	// need to implement the wildcard match.
+	let r1 = match(
+	    PetsEnum,
+	    cat1,
+	    (bird, bird_value, { panic("mismatch"); UNIT; }),
+	    (cat, cat_value, { u64 cv; Unbox(cat_value, cv); const Obj ret = new(U64, With(value, cv + 10)); ret; }),
+	    (dog, dog_value, { panic("mismatch"); UNIT; }));
+
+	// let r2 = match(PetsEnum, bird1, (bird, _, { printf("bird"); UNIT; }), (cat, _, { printf("cat"); UNIT; }), (dog, _, { printf("dog"); UNIT; }));
+	//   match with no return value.
+	matchn(PetsEnum, bird1, (bird, _, { printf("bird"); }), (cat, _, { printf("cat"); }), (dog, _, { printf("dog"); }));
+
+	matchn(PetsEnum, bird1, (bird, _, printf("bird\n")), (cat, _, printf("cat\n")), (dog, _, printf("dog\n")));
+
+	/*
+	let s = match(
+	    cat1,
+	    (bird, bird_value, { info("bird_value={}", bird_value); String("bird"); }),
+	    (cat, cat_value, { warn("cat_value={}", cat_value); String("cat"); }),
+	    (dog, dog_value, { info("dog_value={}", dog_value); String("dog"); }));
+
+	// match with no return value.
+	matchn(bird1, (bird, _, { info("bird"); }), (cat, _, { warn("cat"); }), (dog, _, { info("dog"); }));
+
+	*/
+
+	// verify the returned value is correct. In this case, it's the input value + 10 (13 + 10 = 23).
+	u64 v1;
+	Unbox(r1, v1);
+	cr_assert_eq(v1, 23);
 }
 
 /*
