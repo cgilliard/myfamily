@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['xtype_5fset_5fwd_5fvalue_938',['XType_set_wd_value',['../core_2test_8c.html#a12ee8476da02898b06c45781f4884acb',1,'test.c']]]
+  ['withdrop_5fbuild_967',['WithDrop_build',['../core_2test_8c.html#ae474963048be3a61a3a13f02207881cf',1,'test.c']]],
+  ['withdrop_5fdrop_968',['WithDrop_drop',['../core_2test_8c.html#a73a4171c48620d143b5f36c3bef828b9',1,'test.c']]]
 ];

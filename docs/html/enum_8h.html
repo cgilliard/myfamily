@@ -72,7 +72,8 @@ $(function() {
 <div class="title">enum.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="type_8h_source.html">core/type.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="traits_8h_source.html">core/traits.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="type_8h_source.html">core/type.h</a>&gt;</code><br />
 </div>
 <p><a href="enum_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -130,7 +131,37 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    TypeImpl(name, <a class="code" href="type_8h.html#aca46eaa8fa5416dd46b1e7643da2614a">Where</a>(T), <a class="code" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, variant_id), <a class="code" href="type_8h.html#a186af0dcfce5f80cf526e746d9ea00d6">Generic</a>(T, obj));                                        \</div>
+<div class="line">    Impl(name, EnumProperties);                                                                               \</div>
+<div class="line">    u64 name##_sizeof_variant(<a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a> variant_id)                                                                 \</div>
+<div class="line">    {                                                                                                         \</div>
+<div class="line">        <span class="comment">/* TODO: This is just hard coded. Need to modify this to set appropriate size per variant. */</span>     \</div>
+<div class="line">        <span class="comment">/* Basic approach FOR_EACH go through variants passed in. For each one either call size if it */</span>  \</div>
+<div class="line">        <span class="comment">/* doesn&#39;t implement EnumProperties or sizeof_max_variant for those that do implement.*/</span>          \</div>
+<div class="line">        return 128 + <span class="keyword">sizeof</span>(<a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>);                                                                         \</div>
+<div class="line">    }                                                                                                         \</div>
+<div class="line">    u32 name##_variant_id() { <span class="keywordflow">return</span> $Context($(), name, variant_id); }                                       \</div>
+<div class="line">    void <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((constructor)) __add_enum_##name()                                                     \</div>
+<div class="line">    {                                                                                                         \</div>
+<div class="line">        vtable_add_trait(&amp;name##_Vtable__, <span class="stringliteral">&quot;EnumProperties&quot;</span>);                                             \</div>
+<div class="line">    }                                                                                                         \</div>
+<div class="line">    u64 name##_size()                                                                                         \</div>
+<div class="line">    {                                                                                                         \</div>
+<div class="line">        if (!<a class="code" href="type_8h.html#a96880c4154e8b61f307c31dbbd0cccd4">Implements</a>((*$()), <span class="stringliteral">&quot;EnumProperties&quot;</span>))                                                        \</div>
+<div class="line">            panic(<span class="stringliteral">&quot;required trait [EnumProperties] not implemented in type [%s].&quot;</span>, <a class="code" href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a>((*$()))); \</div>
+<div class="line">        u32 <span class="keywordtype">id</span> = variant_id($());                                                                         \</div>
+<div class="line">        u64 <a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a> = sizeof_variant($(), <span class="keywordtype">id</span>);                                                               \</div>
+<div class="line">        return <a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a>;                                                                                      \</div>
+<div class="line">    }</div>
+<div class="ttc" id="atraits_8c_html_a56165321ab30e10af6d42752217d1be1"><div class="ttname"><a href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a></div><div class="ttdeci">u64 size(const Obj *self)</div><div class="ttdef"><b>Definition:</b> traits.c:17</div></div>
+<div class="ttc" id="atype_8c_html_afd02bb0f6a745c39d5e3417493995c71"><div class="ttname"><a href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a></div><div class="ttdeci">void __attribute__((constructor))</div><div class="ttdef"><b>Definition:</b> type.c:24</div></div>
+<div class="ttc" id="atype_8h_html_a186af0dcfce5f80cf526e746d9ea00d6"><div class="ttname"><a href="type_8h.html#a186af0dcfce5f80cf526e746d9ea00d6">Generic</a></div><div class="ttdeci">#define Generic(obj_type, obj_name)</div></div>
+<div class="ttc" id="atype_8h_html_a3dd518df1105dd849cae4ac614bf708e"><div class="ttname"><a href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a></div><div class="ttdeci">#define Field(field_type, field_name)</div></div>
+<div class="ttc" id="atype_8h_html_a96880c4154e8b61f307c31dbbd0cccd4"><div class="ttname"><a href="type_8h.html#a96880c4154e8b61f307c31dbbd0cccd4">Implements</a></div><div class="ttdeci">#define Implements(obj, trait)</div><div class="ttdef"><b>Definition:</b> type.h:105</div></div>
+<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:104</div></div>
+<div class="ttc" id="atype_8h_html_aca46eaa8fa5416dd46b1e7643da2614a"><div class="ttname"><a href="type_8h.html#aca46eaa8fa5416dd46b1e7643da2614a">Where</a></div><div class="ttdeci">#define Where(generic,...)</div></div>
+<div class="ttc" id="atypes_8h_html_a332ccd83dfe2973e6cb2b61e4f3ab7e6"><div class="ttname"><a href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a></div><div class="ttdeci">#define u32</div><div class="ttdef"><b>Definition:</b> types.h:29</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="ae62dec79a8c2672f33cbef25837fba3e"></a>
