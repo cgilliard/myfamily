@@ -40,13 +40,13 @@ Builder(Bool, Config(bool, value));
 Impl(Bool, Build);
 Impl(Bool, ValueOf);
 
-/*#define DISABLE_WARNING  _Pragma("GCC diagnostic push")              \
+#define DISABLE_WARNING _Pragma("GCC diagnostic push")                 \
     _Pragma("GCC diagnostic ignored \"-Wincompatible-pointer-types\"") \
-	_Pragma("GCC diagnostic ignored \"-Wpointer-sign\"") */
-/* #define ENABLE_WARNING	 _Pragma("GCC diagnostic pop") */
+	_Pragma("GCC diagnostic ignored \"-Wpointer-sign\"")
+#define ENABLE_WARNING _Pragma("GCC diagnostic pop")
 
 #define Box2(v) _Generic((v), \
-    u8: ({ u8 * vptr = &v; let _ret____ = new (U8, With(value, *vptr)); _ret____; }),                \
+    u8: ({ DISABLE_WARNING; u8 * vptr = &v; let _ret____ = new (U8, With(value, *vptr)); ENABLE_WARNING; _ret____; }),                \
     u16: ({ u16 * vptr = &v; let _ret___ = new (U16, With(value, *vptr)); _ret___; }),               \
     u32: ({ u32 * vptr = &v; let _ret___ = new (U32, With(value, *vptr)); _ret___; }),               \
     u64: ({ u64 * vptr = &v; let _ret___ = new (U64, With(value, *vptr)); _ret___; }),               \
