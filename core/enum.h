@@ -15,52 +15,43 @@
 #ifndef _CORE_ENUM__
 #define _CORE_ENUM__
 
+#include <core/rc.h>
 #include <core/traits.h>
 #include <core/type.h>
 #include <core/unit.h>
 
-/*
-// Define generic EnumImpl builder
-Builder(EnumImpl, Config(i32, variant_id), Config(const Obj*, value));
-
-// Define the implementations for EnumImpl
-Impl(EnumImpl, AsRef);
-Impl(EnumImpl, EnumProps);
-Impl(EnumImpl, Build);
-*/
-
-#define PROC_ENUM_TYPES__(ignore, v) #v
+#define PROC_ENUM_TYPES__(variant, v) static char* _Enum_variant_Global_##variant##__ = #v;
 #define PROC_ENUM_TYPES_(...) PROC_ENUM_TYPES__(__VA_ARGS__)
-#define PROC_ENUM_TYPES(name, v) PROC_ENUM_TYPES_(EXPAND_ALL v)
+#define PROC_ENUM_TYPES(ignore, v) PROC_ENUM_TYPES_(EXPAND_ALL v)
 
-#define PROC_ENUM_DEFN__(name, v, ignore) _Enum_##name##_##v##__,
+#define PROC_ENUM_DEFN__(name, v, ignore) _Enum_Global_##v##__,
 #define PROC_ENUM_DEFN_(...) PROC_ENUM_DEFN__(__VA_ARGS__)
 #define PROC_ENUM_DEFN(name, v) PROC_ENUM_DEFN_(name, EXPAND_ALL v)
 
 // The enum macro builds the enum and the type string for the Enum.
-#define Enum(name, ...)                                                       \
-	typedef enum _Enum_##name{                                            \
-	    FOR_EACH(PROC_ENUM_DEFN, name, (), __VA_ARGS__)                   \
-		_Enum_##name##_size} _Enum_##name;                            \
-	static const char* __##name##__type_name_arr[_Enum_##name##_size] = { \
-	    FOR_EACH(PROC_ENUM_TYPES, name, (, ), __VA_ARGS__)};              \
-	Builder(name, Config(i32, variant_id), Config(const Obj*, value));    \
-	Type(name, Field(i32, variant_id), Object(Rc, value));                \
-	Impl(name, AsRef);                                                    \
-	Impl(name, EnumProps);                                                \
-	Impl(name, Build);                                                    \
-	void name##_build(const name##Config* config)                         \
-	{                                                                     \
-		$ContextVar($Var(), name, variant_id) = config->variant_id;   \
-		let rc = new (Rc, With(value, config->value));                \
-		Move(&$ContextVar($Var(), name, value), &rc);                 \
-	}                                                                     \
-	i32 name##_variant_id() { return $Context($(), name, variant_id); }   \
-	Obj name##_as_ref()                                                   \
-	{                                                                     \
-		var k = klone(&$Context($(), name, value));                   \
-		let obj = unwrap(&k);                                         \
-		ReturnObj(obj);                                               \
+#define Enum(name, ...)                                                    \
+	typedef enum _Enum_##name{                                         \
+	    FOR_EACH(PROC_ENUM_DEFN, name, (), __VA_ARGS__)                \
+		_Enum_##name##_size} _Enum_##name;                         \
+	FOR_EACH(PROC_ENUM_TYPES, name, (), __VA_ARGS__)                   \
+	Builder(name, Config(i32, variant_id), Config(const Obj*, value)); \
+	Impl(name, AsRef);                                                 \
+	Impl(name, EnumProps);                                             \
+	Impl(name, Build);
+#define EnumImpl(name)                                                      \
+	Type(name, Field(i32, variant_id), Object(Rc, value));              \
+	void name##_build(const name##Config* config)                       \
+	{                                                                   \
+		$ContextVar($Var(), name, variant_id) = config->variant_id; \
+		let rc = new (Rc, With(value, config->value));              \
+		Move(&$ContextVar($Var(), name, value), &rc);               \
+	}                                                                   \
+	i32 name##_variant_id() { return $Context($(), name, variant_id); } \
+	Obj name##_as_ref()                                                 \
+	{                                                                   \
+		var k = klone(&$Context($(), name, value));                 \
+		let obj = unwrap(&k);                                       \
+		ReturnObj(obj);                                             \
 	}
 
 #define PROC_DEFAULT(code)       \
@@ -97,15 +88,15 @@ Impl(EnumImpl, Build);
 
 // The match macro handles pattern matching. The current macro is immutable, need to implement
 // a syntax for mutable matching.
-#define match(name, e, ...) ({                                     \
-	let _v__ = as_ref(&e);                                     \
-	i32 _v_id__ = variant_id(&e);                              \
-	Obj _ret__ = OBJECT_INIT;                                  \
-	switch (_v_id__)                                           \
-	{                                                          \
-		FOR_EACH(PROC_CASE, (name, _v__), (), __VA_ARGS__) \
-	}                                                          \
-	_ret__;                                                    \
+#define match(e, ...) ({                                             \
+	let _v__ = as_ref(&e);                                       \
+	i32 _v_id__ = variant_id(&e);                                \
+	Obj _ret__ = OBJECT_INIT;                                    \
+	switch (_v_id__)                                             \
+	{                                                            \
+		FOR_EACH(PROC_CASE, (Global, _v__), (), __VA_ARGS__) \
+	}                                                            \
+	_ret__;                                                      \
 })
 
 #define PROC_DEFAULTN(code) \
@@ -142,13 +133,13 @@ Impl(EnumImpl, Build);
 
 // The matchn macro is identical to match except that there's no return value.
 // This allows for simple match expressions that do not return a value.
-#define matchn(name, e, ...) ({                                     \
-	let _v__ = as_ref(&e);                                      \
-	i32 _v_id__ = variant_id(&e);                               \
-	switch (_v_id__)                                            \
-	{                                                           \
-		FOR_EACH(PROC_CASEN, (name, _v__), (), __VA_ARGS__) \
-	};                                                          \
+#define matchn(e, ...) ({                                             \
+	let _v__ = as_ref(&e);                                        \
+	i32 _v_id__ = variant_id(&e);                                 \
+	switch (_v_id__)                                              \
+	{                                                             \
+		FOR_EACH(PROC_CASEN, (Global, _v__), (), __VA_ARGS__) \
+	};                                                            \
 })
 
 static bool is_prim_match(const char* expected, const char* found)
@@ -183,33 +174,29 @@ static bool is_prim_match(const char* expected, const char* found)
 }
 
 // Check that the type is the expected type.
-#define ENUM_CHECK_TYPE_MATCH(name, variant, v) ({                                                                                                   \
-	char* type_name = TypeName(v);                                                                                                               \
-	if (strcmp(__##name##__type_name_arr[_Enum_##name##_##variant##__], type_name))                                                              \
-	{                                                                                                                                            \
-		if (!is_prim_match(__##name##__type_name_arr[_Enum_##name##_##variant##__], type_name))                                              \
-			panic("Enum type mismatch! Expected [%s]. Found [%s].", __##name##__type_name_arr[_Enum_##name##_##variant##__], type_name); \
-	}                                                                                                                                            \
-})
+#define ENUM_CHECK_TYPE_MATCH(name, variant, v) ({\
+	char* found_name = TypeName(v);\
+	char *exp_name = _Enum_variant_Global_##variant##__;\
+if (strcmp(exp_name, found_name)) { if (!is_prim_match(exp_name, found_name)) panic("Enum type mismatch! Expected [%s]. Found [%s].", exp_name, found_name); } })
 
 // Box primitive values
-#define HANDLE_PRIM_BOXING(name, variant, v) ({             \
-	let _val__ = Box(v);                                \
-	ENUM_CHECK_TYPE_MATCH(name, variant, _val__);       \
-	Obj _ret__ = new (                                  \
-	    name,                                           \
-	    With(variant_id, _Enum_##name##_##variant##__), \
-	    With(value, &_val__));                          \
-	_ret__;                                             \
+#define HANDLE_PRIM_BOXING(name, variant, v) ({           \
+	let _val__ = Box(v);                              \
+	ENUM_CHECK_TYPE_MATCH(name, variant, _val__);     \
+	Obj _ret__ = new (                                \
+	    name,                                         \
+	    With(variant_id, _Enum_Global_##variant##__), \
+	    With(value, &_val__));                        \
+	_ret__;                                           \
 })
 
-#define HANDLE_PRIM_GEN(name, variant, _val__) ({           \
-	ENUM_CHECK_TYPE_MATCH(name, variant, _val__);       \
-	Obj _ret__ = new (                                  \
-	    name,                                           \
-	    With(variant_id, _Enum_##name##_##variant##__), \
-	    With(value, &_val__));                          \
-	_ret__;                                             \
+#define HANDLE_PRIM_GEN(name, variant, _val__) ({         \
+	ENUM_CHECK_TYPE_MATCH(name, variant, _val__);     \
+	Obj _ret__ = new (                                \
+	    name,                                         \
+	    With(variant_id, _Enum_Global_##variant##__), \
+	    With(value, &_val__));                        \
+	_ret__;                                           \
 })
 
 #define _(name, variant, v) _Generic((v), \
@@ -230,24 +217,24 @@ static bool is_prim_match(const char* expected, const char* found)
 // type specific implementations both primitive and Object
 // variants may be created
 
-#define _obj(name, variant, v) ({                           \
-	ENUM_CHECK_TYPE_MATCH(name, variant, v);            \
-	Obj _ret__ = new (                                  \
-	    name,                                           \
-	    With(variant_id, _Enum_##name##_##variant##__), \
-	    With(value, &v));                               \
-	_ret__;                                             \
+#define _obj(name, variant, v) ({                         \
+	ENUM_CHECK_TYPE_MATCH(name, variant, v);          \
+	Obj _ret__ = new (                                \
+	    name,                                         \
+	    With(variant_id, _Enum_Global_##variant##__), \
+	    With(value, &v));                             \
+	_ret__;                                           \
 })
 
 // TODO: this is a stub implementation. Once we have String,
 // replace with the String.
-#define _string(name, variant, v) ({                        \
-	const Obj _val__ = new (U32, With(value, 1234));    \
-	Obj _ret__ = new (                                  \
-	    name,                                           \
-	    With(variant_id, _Enum_##name##_##variant##__), \
-	    With(value, &_val__));                          \
-	_ret__;                                             \
+#define _string(name, variant, v) ({                      \
+	const Obj _val__ = new (U32, With(value, 1234));  \
+	Obj _ret__ = new (                                \
+	    name,                                         \
+	    With(variant_id, _Enum_Global_##variant##__), \
+	    With(value, &_val__));                        \
+	_ret__;                                           \
 })
 
 #define _i8(name, variant, v) ({                   \

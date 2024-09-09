@@ -101,7 +101,7 @@ FatPtr build_fat_ptr(u64 size);
 #define ReturnObj(obj) ({ Obj _ret__ = obj; Obj_mark_consumed(&obj); return _ret__; })
 #define ReturnObjAndConsumeSelf(obj) ({ Obj _ret__ = obj; Obj_mark_consumed(&obj); Obj_cleanup($()); return _ret__; })
 
-#define TypeName(obj) obj.vtable->name
+#define TypeName(obj) (obj).vtable->name
 #define Implements(obj, trait) ({                                              \
 	bool _ret__ = false;                                                   \
 	for (u64 _i__ = 0; _i__ < obj.vtable->trait_len; _i__++)               \
@@ -538,6 +538,9 @@ FatPtr build_fat_ptr(u64 size);
 	(*_ptr__) = OBJECT_INIT;                             \
 	Move(_ptr__, &value);
 
+#define DISABLE_WARNING_WCONST _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconstant-conversion\"")
+#define ENABLE_WARNING_WCONST _Pragma("GCC diagnostic pop")
+
 #define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                                                 \
 	__VA_OPT__(do {                                                                                      \
 		if (IS_OBJECT_TYPE(((structure*)0)->name))                                                   \
@@ -546,7 +549,9 @@ FatPtr build_fat_ptr(u64 size);
 		}                                                                                            \
 		else                                                                                         \
 		{                                                                                            \
+			DISABLE_WARNING_WCONST                                                               \
 			*((typeof(((structure*)0)->name)*)((char*)ptr + offsetof(structure, name))) = value; \
+			ENABLE_WARNING_WCONST                                                                \
 		}                                                                                            \
 	} while (0);)                                                                                        \
 	EXPAND(EXPAND(EXPAND_ALL EXPAND(__VA_OPT__(NONE)(PROC_WITH_OBJ(ptr, structure, name, value)) __VA_OPT__(()))))

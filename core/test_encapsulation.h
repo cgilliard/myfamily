@@ -15,6 +15,7 @@
 #ifndef _CORE_TEST_ENC__
 #define _CORE_TEST_ENC__
 
+#include <core/enum.h>
 #include <core/traits.h>
 #include <core/type.h>
 
@@ -30,5 +31,7 @@ Builder(Hidden, Config(u64, capacity));
 Impl(Hidden, HiddenApi);
 Impl(Hidden, Drop);
 Impl(Hidden, Build);
+
+Enum(HiddenEnum, (HiddenVar1, i32), (HiddenVar2, u64), (HiddenVar3, Hidden));
 
 #endif // _CORE_TEST_ENC__

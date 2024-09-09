@@ -58,3 +58,5 @@ void Hidden_set_value(u64 v)
 	$Var(value) = v;
 }
 #undef IMPL
+
+EnumImpl(HiddenEnum);

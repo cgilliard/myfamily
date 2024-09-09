@@ -14,15 +14,19 @@
 
 #include <core/prim.h>
 
-#define DEFINE_PRIM(lower, upper, bits)                             \
-	Type(upper##bits, Field(lower##bits, value));               \
-	void upper##bits##_build(const upper##bits##Config* config) \
-	{                                                           \
-		$Var(value) = config->value;                        \
-	}                                                           \
-	void upper##bits##_value_of(void* buf)                      \
-	{                                                           \
-		*(lower##bits*)buf = $(value);                      \
+#define DEFINE_PRIM(lower, upper, bits)                               \
+	Type(upper##bits, Field(lower##bits, value));                 \
+	void upper##bits##_build(const upper##bits##Config* config)   \
+	{                                                             \
+		$Var(value) = config->value;                          \
+	}                                                             \
+	void upper##bits##_value_of(void* buf)                        \
+	{                                                             \
+		*(lower##bits*)buf = $(value);                        \
+	}                                                             \
+	bool upper##bits##_equal(const Obj* rhs)                      \
+	{                                                             \
+		return $(value) == $Context(rhs, upper##bits, value); \
 	}
 
 #define IMPL U8
@@ -82,5 +86,9 @@ void Bool_build(const BoolConfig* config)
 void Bool_value_of(void* buf)
 {
 	*(bool*)buf = $(value);
+}
+bool Bool_equal(const Obj* rhs)
+{
+	return $(value) == $Context(rhs, Bool, value);
 }
 #undef IMPL

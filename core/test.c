@@ -1863,6 +1863,13 @@ Test(core, test_prim)
 	let v2_box = Box2(v2);
 	i32 v2_out = option_value(&v2_box);
 	cr_assert_eq(v2_out, 7);
+
+	let x1 = Box(100);
+	let x2 = Box(100);
+	let x3 = Box(200);
+	cr_assert(equal(&x1, &x2));
+	cr_assert(!equal(&x1, &x3));
+	cr_assert(!equal(&x2, &x3));
 }
 
 // Create a simple Type that we can use to test Rc.
@@ -1934,36 +1941,62 @@ Test(core, test_rc)
 	cr_assert_eq(test_rc_drop_count, 3);
 }
 
-Test(core, test_enum_impl)
+Test(core, test_enum_encap)
 {
-	/*
-	let v = Box(-11);
-	var x = new (EnumImpl, With(variant_id, 1), With(value, &v));
-	cr_assert_eq(variant_id(&x), 1);
-	let v_out = as_ref(&x);
-	i32 v_out_i32;
-	Unbox(v_out, v_out_i32);
-	cr_assert_eq(v_out_i32, -11);
+	// declare variables for testing purposes
+	u32 v_out;
+	u64 v_out64;
+	u64 v2 = 1000;
+	var hidden = new (Hidden, With(capacity, 1234));
+	set_value(&hidden, 101);
+	printf("value=%" PRIu64 "\n", get_value(&hidden));
 
-	let v_out2 = as_ref(&x);
-	i32 v_out_i32_2;
-	Unbox(v_out2, v_out_i32_2);
-	*/
+	// create two instances of our Enum with appropriate values.
+	let var1 = _(HiddenEnum, HiddenVar1, 123);
+	let var2 = _(HiddenEnum, HiddenVar2, v2);
+	let var3 = _obj(HiddenEnum, HiddenVar3, hidden);
+
+	// match on var1. Create a U32 of the specified value.
+	let m1 = match(var1, (HiddenVar1, new (U32, With(value, 1))), (HiddenVar2, new (U32, With(value, 2))), (new (U32, With(value, 3))));
+	Unbox(m1, v_out);	// unbox
+	cr_assert_eq(v_out, 1); // we should have 1.
+
+	// match on var2. Create a U32 of the specified value.
+	let m2 = match(var2, (HiddenVar1, new (U32, With(value, 1))), (HiddenVar2, new (U32, With(value, 2))), (new (U32, With(value, 3))));
+	Unbox(m2, v_out);	// unbox
+	cr_assert_eq(v_out, 2); // we should have 2.
+
+	// match on var3. Create a U32 of the specified value. (default match).
+	let m3 = match(var3, (HiddenVar1, new (U32, With(value, 1))), (HiddenVar2, new (U32, With(value, 2))), (new (U32, With(value, 3))));
+	Unbox(m3, v_out);	// unbox
+	cr_assert_eq(v_out, 3); // we should have 3.
+
+	// mutable match (demonstration of mutable match
+	let m4 = match(var3, (HiddenVar1, new (U64, With(value, 0))), (HiddenVar2, new (U64, With(value, 0))), (HiddenVar3, mut v, {
+			       u64 cur = get_value(&v);
+			       set_value(&v, 999);
+			       new (U64, With(value, cur));
+		       }));
+	Unbox(m4, v_out64);
+	cr_assert_eq(v_out64, 101);
+
+	// read the value now
+	let m5 = match(var3, (HiddenVar1, new (U64, With(value, 0))), (HiddenVar2, new (U64, With(value, 0))), (HiddenVar3, v, {
+			       u64 cur = get_value(&v);
+			       new (U64, With(value, cur));
+		       }));
+
+	// unbox and assert that it's changed to the updated value.
+	Unbox(m5, v_out64);
+	cr_assert_eq(v_out64, 999);
+
+	// This would result in a panic because v_out64 has already been consumed
+	// v_out64 = get_value(&hidden);
 }
 
+// Create a helper type for testing enums
 Builder(MutTest, Config(i32, value));
-
-// Current Enum Macro specifies the name of the Enum and a list of variants/type pairs.
-// The current implementation has unique namespaces so, there could be another enum with a 'dog'
-// 'cat' or 'bird' and it wouldn't interfere with this Enum. This causes some complications with
-// the match macro that I'll discuss later.
-// Another issue here is that the primitive types must be specified by their 'boxed' type
-// (i.e. I32/U64 as opposed to i32/u64). That should be fixable. Primitives and Objects are
-// supported here.
-Enum(PetsEnum, (bird, i32), (cat, u64), (dog, SimpleOption), (snake, bool), (hampster, MutTest));
-
 Type(MutTest, Field(i32, value));
-
 Impl(MutTest, Build);
 Impl(MutTest, IncrTrait);
 Impl(MutTest, ValueOf);
@@ -1983,14 +2016,61 @@ void MutTest_value_of(void* dst)
 }
 #undef IMPL
 
+// Create our main enum
+Enum(PetsEnum, (bird, i32), (cat, u64), (dog, SimpleOption), (snake, bool), (hamster, MutTest));
+EnumImpl(PetsEnum);
+
+// The trait system can be used by the Enums just like Types. This enum will implement the Equal trait.
+Impl(PetsEnum, Equal);
+
+// Implement the trait
+#define IMPL PetsEnum
+bool PetsEnum_equal(const Obj* rhs)
+{
+	// If the variant ids are not equal we know they are not equal
+	if (variant_id($()) != variant_id(rhs))
+		return false;
+
+	// The variant ids are equal so get the value of the right hand side.
+	let vrhs = as_ref(rhs);
+
+	// Match on self. We know the rhs is also the same variant.
+	let x = match(*($()), (bird, v, { new (Bool, With(value, equal(&v, &vrhs))); }),
+		      (cat, v, { new (Bool, With(value, equal(&v, &vrhs))); }),
+		      (dog, v, {
+			      // Dogs (SimpleOption) does not implement Equal so we have to use another method.
+			      // In this case, we call 'value_of' and compare.
+			      i32 self_i32;
+			      i32 rhs_i32;
+			      value_of(&v, &self_i32);
+			      value_of(&vrhs, &rhs_i32);
+			      // return true if the values are equal, otherwise return false
+			      new (Bool, With(value, rhs_i32 == self_i32));
+		      }),
+		      (snake, v, { new (Bool, With(value, equal(&v, &vrhs))); }), (hamster, v, {
+			      // hamster also does not implement equal, so use the value_of trait implementation
+			      // to compare the underlying values.
+			      i32 self_i32;
+			      i32 rhs_i32;
+			      value_of(&v, &self_i32);
+			      value_of(&vrhs, &rhs_i32);
+			      new (Bool, With(value, rhs_i32 == self_i32));
+		      }));
+
+	// The returned value in 'x' is our return value. Unbox it and return it.
+	bool ret;
+	Unbox(x, ret);
+	return ret;
+}
+#undef IMPL
+
 Test(core, test_enum)
 {
-	// create some enums of various types. The _i32 / _u64 / _obj notation allows for
-	// conversion to the specified type.
+	// create some enums of various types.
 	let bird1 = _(PetsEnum, bird, 10);
 	let bird2 = _(PetsEnum, bird, 10);
 	u64 c1 = 13;
-	u64 c2 = 20;
+	u64 c2 = 30;
 	u64 c3 = 30;
 	let cat1 = _(PetsEnum, cat, c1);
 	let cat2 = _(PetsEnum, cat, c2);
@@ -1998,114 +2078,14 @@ Test(core, test_enum)
 	let simple_option = new (SimpleOption, With(is_some, true), With(value, 123));
 	let dog1 = _obj(PetsEnum, dog, simple_option);
 	let mut_test = new (MutTest, With(value, 100));
-	// let hampster_test = _obj(PetsEnum, hampster, mut_test);
-	let hampster_test = _(PetsEnum, bird, 0);
-	let hv2 = _obj(PetsEnum, hampster, mut_test);
+	let ham1 = _obj(PetsEnum, hamster, mut_test);
+	let mut_test2 = new (MutTest, With(value, 100));
+	let ham2 = _obj(PetsEnum, hamster, mut_test2);
 
-	// Call a match. Currently, the biggest problem is that the type of Enum must currently be
-	// specified in the match call. This has to do with the namespacing feature we mentioned before.
-	// There may be a way to fix this and keep namespacing, but this definitely must be fixed even if
-	// we have to drop namespacing.
-	// The example below demonstrates, matching the variant, in this case a cat. Reading the value via
-	// the specified name 'cat_value', and returning a value (via the gcc extension mechanism, the last
-	// term in the statement is returned. In this case the value of 'ret' is returned. One other minor issue
-	// is that currently if we panic (as below) we still need to return an Object or there will be a compiler error
-	// stating that we're returning the wrong type. There may be a way to address this and if so it will be fixed.
-	// The last feature would be to ensure that all variants are specified (using _Static_assert). We also
-	// need to implement the wildcard match.
-	let r1 = match(
-	    PetsEnum,
-	    hv2,
-	    (bird, bird_value, { panic("mismatch"); UNIT; }),
-	    (hampster, hv, { /*incr_value(&hv);*/ i32 ival; Unbox(hv, ival); printf("hv=%i\n", ival); UNIT; }),
-	    (cat, cat_value, { u64 cv; Unbox(cat_value, cv); const Obj ret = new(U64, With(value, cv + 10)); ret; }),
-	    (dog, dog_value, { panic("mismatch"); UNIT; }));
-
-	printf("=======================================================start matchn==============================================\n");
-	// matchn(PetsEnum, bird1, (bird, mut bval, { i32 v; Unbox(bval, v); printf("bird: %i\n", v); }), (cat, _, { printf("cat"); }), (dog, { printf("dog"); }));
-	/*matchn(PetsEnum, hampster_test,
-	       (hampster, mut hv, { incr_value(&hv); incr_value(&hv); i32 hval; value_of(&hv, &hval); printf("hampster=%i,tn=%s\n", hval, TypeName(hv)); }),
-	       (cat, cat_value, { u64 cv; Unbox(cat_value, cv); printf("cv=%" PRIu64 "\n", cv); }),
-	       (bird, printf("bird\n")),
-	       (printf("no match!\n")));
-	*/
-
-	/*
-	let r2 = match(PetsEnum, hampster_test,
-		       (hampster, mut hv, { int vvvv = 10; UNIT; }),
-		       (cat, cat_value, { int vvvv = 1; UNIT; }),
-		       (bird, { int vvvv = 0; UNIT; }),
-		       ({ int vvvv = 0; UNIT; }));
-		       */
-
-	let r2 = match(PetsEnum, hampster_test,
-		       (hampster, mut hv, { incr_value(&hv); incr_value(&hv); i32 hval; value_of(&hv, &hval); printf("hampster=%i,tn=%s\n", hval, TypeName(hv)); UNIT; }),
-		       (cat, cat_value, { u64 cv; Unbox(cat_value, cv); printf("cv=%" PRIu64 "\n", cv); UNIT; }),
-		       (bird, { printf("bird\n"); UNIT; }),
-		       ({ printf("no match!\n"); UNIT; }));
-
-	/*
-let s = match cat1 {
-    PetsEnum::bird(bird_value) => {
-	info!("bird_value={}", bird_value);
-    },
-    PetsEnum::cat(mut cat_value) => {
-	cat_value.incr();
-	warn!("cat_value={}", cat_value);
-    },
-    _ => {
-	warn!("no match!");
-    }
-};
-
-	matchn(PetsEnum, bird1, (bird, _, printf("bird\n")), (cat, _, printf("cat\n")), (dog, _, printf("dog\n")));
-
-	// verify the returned value is correct. In this case, it's the input value + 10 (13 + 10 = 23).
-	u64 v1;
-	Unbox(r1, v1);
-	cr_assert_eq(v1, 23);
-
-	let testobj = new (SimpleOption, With(is_some, true), With(value, 123));
-	let dog10 = _obj(PetsEnum, dog, testobj);
-	let bird10 = _(PetsEnum, bird, 101);
-	let snake1 = _bool(PetsEnum, snake, false);
-	let hampster1 = _string(PetsEnum, hampster, "hammie");
-
-	matchn(PetsEnum, snake1, (dog, printf("dog\n")), (snake, printf("snake\n")), (printf("default\n")));
-	let v = match(PetsEnum, snake1, (dog, { printf("dogmatch\n"); UNIT; }), (cat, { printf("snakematch\n"); UNIT; }), ({ printf("defaultmatch\n"); UNIT; }));
-	*/
+	cr_assert(!equal(&cat1, &cat3));
+	cr_assert(equal(&cat2, &cat3));
+	cr_assert(!equal(&cat2, &dog1));
+	cr_assert(equal(&ham1, &ham2));
+	cr_assert(!equal(&dog1, &bird1));
+	cr_assert(equal(&bird1, &bird2));
 }
-
-/*
-// Declare an Enum named TestEnum with two variants:
-// V1 which is a u64.
-// V2 which is a u32.
-// V3 which is an instance of MyObject.
-Enum(TestEnum, (V1, u64), (V2, u32), (V3, MyObject));
-
-Test(core, test_enum)
-{
-	// create an instance of TestEnum of variant 'V1' using the new_enum macro.
-	// The underlying Enum instance is an Object with a special field set in the flags to indicate
-	// it is an enumeration. The FatPtr in this Object has 4 extra bytes for the type information
-	// to indicate which variant this is. In addition, the automatically generated size function
-	// of this object is dynamic in that it will return the size of the specific variant (including
-	// this 4 byte overhead.) This way, sizes match the exact amount of space needed per variant.
-	let e1 = _(TestEnum, V1, 10);
-	// Create a second instance of variant V2 with the specified u32 value.
-	let e2 = _(TestEnum, V2, 30);
-	// Create a third instance of variant V3
-	let my_obj = new (MyObject);
-	let e3 = _(TestEnum, V3, my_obj);
-
-	// match on e1. The blocks define a variable name for use in the arms of the match statement. The last value is
-	// returned using the gcc extension syntax. Auto boxing occurs so that the value can always be sent to a let/var
-	// declaration. The wildcard '_' matching is also shown in this example. Since the return values are primitives,
-	// they will be 'autoboxed' by the macro.
-	let v1 = match(e1, (V1, (myvar)({ myvar; })), (V2, (myvar2)({ myvar2; })), (_, ({ 0; })));
-
-	// match the results and confirm the inner values. The values must be 'Unboxed' to access
-	// the primtive type.
-	cr_assert_eq(Unbox(v1), 10);
-}
-*/
