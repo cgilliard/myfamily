@@ -2035,8 +2035,8 @@ bool PetsEnum_equal(const Obj* rhs)
 	let vrhs = as_ref(rhs);
 
 	// Match on self. We know the rhs is also the same variant.
-	let x = match(*($()), (bird, v, { new (Bool, With(value, equal(&v, &vrhs))); }),
-		      (cat, v, { new (Bool, With(value, equal(&v, &vrhs))); }),
+	let x = match(*($()), (bird, v, new (Bool, With(value, equal(&v, &vrhs)))),
+		      (cat, v, new (Bool, With(value, equal(&v, &vrhs)))),
 		      (dog, v, {
 			      // Dogs (SimpleOption) does not implement Equal so we have to use another method.
 			      // In this case, we call 'value_of' and compare.
@@ -2047,7 +2047,7 @@ bool PetsEnum_equal(const Obj* rhs)
 			      // return true if the values are equal, otherwise return false
 			      new (Bool, With(value, rhs_i32 == self_i32));
 		      }),
-		      (snake, v, { new (Bool, With(value, equal(&v, &vrhs))); }), (hamster, v, {
+		      (snake, v, new (Bool, With(value, equal(&v, &vrhs)))), (hamster, v, {
 			      // hamster also does not implement equal, so use the value_of trait implementation
 			      // to compare the underlying values.
 			      i32 self_i32;
