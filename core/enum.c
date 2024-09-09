@@ -15,6 +15,7 @@
 #include <core/enum.h>
 #include <core/rc.h>
 
+/*
 // Define the EnumImpl type
 Type(EnumImpl, Field(i32, variant_id), Object(Rc, value));
 
@@ -42,3 +43,4 @@ Obj EnumImpl_as_ref()
 	ReturnObj(obj);
 }
 #undef IMPL
+*/
