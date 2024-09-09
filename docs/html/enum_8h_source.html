@@ -87,39 +87,298 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _CORE_ENUM__</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _CORE_ENUM__</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="traits_8h.html">core/traits.h</a>&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="type_8h.html">core/type.h</a>&gt;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="enum_8h.html#a337db5f8f8e95c2d7277763293dcdb55">   21</a></span>&#160;<span class="preprocessor">#define Enum(name, ...)                                                                                           \</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">    TypeImpl(name, Where(T), Field(u32, variant_id), Generic(T, obj));                                        \</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">    Impl(name, EnumProperties);                                                                               \</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">    u64 name##_sizeof_variant(u32 variant_id)                                                                 \</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">    {                                                                                                         \</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">        </span><span class="comment">/* TODO: This is just hard coded. Need to modify this to set appropriate size per variant. */</span><span class="preprocessor">     \</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">        </span><span class="comment">/* Basic approach FOR_EACH go through variants passed in. For each one either call size if it */</span><span class="preprocessor">  \</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">        </span><span class="comment">/* doesn&#39;t implement EnumProperties or sizeof_max_variant for those that do implement.*/</span><span class="preprocessor">          \</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">        return 128 + sizeof(u32);                                                                         \</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">    }                                                                                                         \</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">    u32 name##_variant_id() { return $Context($(), name, variant_id); }                                       \</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">    void __attribute__((constructor)) __add_enum_##name()                                                     \</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">    {                                                                                                         \</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">        vtable_add_trait(&amp;name##_Vtable__, &quot;EnumProperties&quot;</span>);                                             \</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    }                                                                                                         \</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    u64 name##_size()                                                                                         \</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    {                                                                                                         \</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        if (!Implements((*$()), &quot;EnumProperties&quot;))                                                        \</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;            panic(&quot;required trait [EnumProperties] not implemented in type [%s].&quot;, TypeName((*$()))); \</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        u32 id = variant_id($());                                                                         \</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        u64 size = sizeof_variant($(), id);                                                               \</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        return size;                                                                                      \</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    }</div>
-<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="enum_8h.html#ae62dec79a8c2672f33cbef25837fba3e">   44</a></span>&#160;<span class="preprocessor">#define EnumBuilder(name)</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="enum_8h.html#a4ba042eb174a63c1a645cafabbede7e6">   45</a></span>&#160;<span class="preprocessor">#define match(e)</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="enum_8h.html#a9b7a4f9f7af9f0d1faa580df1c8167c3">   46</a></span>&#160;<span class="preprocessor">#define _()</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_ENUM__</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="rc_8h.html">core/rc.h</a>&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="traits_8h.html">core/traits.h</a>&gt;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="type_8h.html">core/type.h</a>&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="unit_8h.html">core/unit.h</a>&gt;</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="enum_8h.html#aaee7d0b67b79cd97a46f77fe9f9ae2d2">   23</a></span>&#160;<span class="preprocessor">#define PROC_ENUM_TYPES__(variant, v) static char* _Enum_variant_Global_##variant##__ = #v;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="enum_8h.html#a8065853fdbbdb9d10344f92e12f38617">   24</a></span>&#160;<span class="preprocessor">#define PROC_ENUM_TYPES_(...) PROC_ENUM_TYPES__(__VA_ARGS__)</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="enum_8h.html#a93f16adf0acd3e43e6b8d3af9e5a53a4">   25</a></span>&#160;<span class="preprocessor">#define PROC_ENUM_TYPES(ignore, v) PROC_ENUM_TYPES_(EXPAND_ALL v)</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="enum_8h.html#a54868b340b95cb4d0d841b76414a756b">   27</a></span>&#160;<span class="preprocessor">#define PROC_ENUM_DEFN__(name, v, ignore) _Enum_Global_##v##__,</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="enum_8h.html#a8c5ac0fd1c982b4256eccb3a34a9d798">   28</a></span>&#160;<span class="preprocessor">#define PROC_ENUM_DEFN_(...) PROC_ENUM_DEFN__(__VA_ARGS__)</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="enum_8h.html#a993462bd57af4a6c5ea1403756c493fc">   29</a></span>&#160;<span class="preprocessor">#define PROC_ENUM_DEFN(name, v) PROC_ENUM_DEFN_(name, EXPAND_ALL v)</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">// The enum macro builds the enum and the type string for the Enum.</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="enum_8h.html#a337db5f8f8e95c2d7277763293dcdb55">   32</a></span>&#160;<span class="preprocessor">#define Enum(name, ...)                                                    \</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">    typedef enum _Enum_##name{                                         \</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">        FOR_EACH(PROC_ENUM_DEFN, name, (), __VA_ARGS__)                \</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">        _Enum_##name##_size} _Enum_##name;                         \</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">    FOR_EACH(PROC_ENUM_TYPES, name, (), __VA_ARGS__)                   \</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">    Builder(name, Config(i32, variant_id), Config(const Obj*, value)); \</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">    Impl(name, AsRef);                                                 \</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">    Impl(name, EnumProps);                                             \</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">    Impl(name, Build);</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="enum_8h.html#a77dc772538f4ae057ff5c06b4fb70a91">   41</a></span>&#160;<span class="preprocessor">#define EnumImpl(name)                                                      \</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">    Type(name, Field(i32, variant_id), Object(Rc, value));              \</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">    void name##_build(const name##Config* config)                       \</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">    {                                                                   \</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">        $ContextVar($Var(), name, variant_id) = config-&gt;variant_id; \</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">        let rc = new (Rc, With(value, config-&gt;value));              \</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">        Move(&amp;$ContextVar($Var(), name, value), &amp;rc);               \</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">    }                                                                   \</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">    i32 name##_variant_id() { return $Context($(), name, variant_id); } \</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">    Obj name##_as_ref()                                                 \</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">    {                                                                   \</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">        var k = klone(&amp;$Context($(), name, value));                 \</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">        let obj = unwrap(&amp;k);                                       \</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">        ReturnObj(obj);                                             \</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="preprocessor">    }</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="enum_8h.html#a3e3d65d6c1add6260d5ab1fd80b41819">   57</a></span>&#160;<span class="preprocessor">#define PROC_DEFAULT(code)       \</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">                                 \</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">    default:                 \</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">    {                        \</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">        _ret__ = (code); \</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">    }                        \</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">    break;</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="enum_8h.html#a967e0f1fdc334c803a20052f1197183a">   65</a></span>&#160;<span class="preprocessor">#define PROC_VARIANT_MUT(name, ref, variant, value_name, ...) \</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">    case _Enum_##name##_##variant##__:                    \</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">    {                                                     \</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">        Obj value_name = ref;                         \</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">        _ret__ = (__VA_ARGS__);                       \</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">    }                                                     \</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">    break;</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00073"></a><span class="lineno"><a class="line" href="enum_8h.html#a1e0d961f961837fed3b775d5f925818e">   73</a></span>&#160;<span class="preprocessor">#define PROC_VARIANT____(name, ref, variant, value_name, ...) \</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">    case _Enum_##name##_##variant##__:                    \</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">    {                                                     \</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">        const Obj value_name = ref;                   \</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">        _ret__ = (__VA_ARGS__);                       \</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">    }                                                     \</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">    break;</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="enum_8h.html#a707f38c4cfd062f801d980f49a61e9fa">   81</a></span>&#160;<span class="preprocessor">#define PROC_VARIANT___(name, ref, variant, value_name, code, ...)          \</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">    __VA_OPT__(PROC_VARIANT_MUT(name, ref, variant, code, __VA_ARGS__)) \</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">    EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANT____(name, ref, variant, value_name, code)) __VA_OPT__(PAREN_END)</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="enum_8h.html#aab2b760740159a0d0fa5c3a8e25f2c29">   84</a></span>&#160;<span class="preprocessor">#define PROC_VARIANT__(name, ref, variant, value_name, ...) __VA_OPT__(PROC_VARIANT___(name, ref, variant, value_name, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANT____(name, ref, variant, _ignore__, value_name)) __VA_OPT__(PAREN_END)</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="enum_8h.html#a74ba51358c2b4bc3addf280f3247e26f">   85</a></span>&#160;<span class="preprocessor">#define PROC_VARIANT_(name, ref, variant, ...) __VA_OPT__(PROC_VARIANT__(name, ref, variant, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_DEFAULT(variant)) __VA_OPT__(PAREN_END)</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="enum_8h.html#a37e065d9417b415c45330597a340d7cc">   86</a></span>&#160;<span class="preprocessor">#define PROC_VARIANT(...) PROC_VARIANT_(__VA_ARGS__)</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="enum_8h.html#a092bc0a84b04763292b783d21082f294">   87</a></span>&#160;<span class="preprocessor">#define PROC_CASE(v, variant_case) PROC_VARIANT(EXPAND_ALL v, EXPAND_ALL variant_case)</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">// The match macro handles pattern matching. The current macro is immutable, need to implement</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">// a syntax for mutable matching.</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="enum_8h.html#a7c5178c4a821b0efec11f49e9a5fce97">   91</a></span>&#160;<span class="preprocessor">#define match(e, ...) ({                                             \</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">    let _v__ = as_ref(&amp;e);                                       \</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">    i32 _v_id__ = variant_id(&amp;e);                                \</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="preprocessor">    Obj _ret__ = OBJECT_INIT;                                    \</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">    switch (_v_id__)                                             \</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">    {                                                            \</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">        FOR_EACH(PROC_CASE, (Global, _v__), (), __VA_ARGS__) \</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor">    }                                                            \</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor">    _ret__;                                                      \</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="enum_8h.html#a3480af059648ef46713a9906a37647aa">  102</a></span>&#160;<span class="preprocessor">#define PROC_DEFAULTN(code) \</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">                            \</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">    default:            \</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">    {                   \</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="preprocessor">        (code);     \</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">    }                   \</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">    break;</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno"><a class="line" href="enum_8h.html#abdb9601d5ed2d8c9aa6741f731e59ae8">  110</a></span>&#160;<span class="preprocessor">#define PROC_VARIANTN_MUT(name, ref, variant, value_name, code) \</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">    case _Enum_##name##_##variant##__:                      \</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">    {                                                       \</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">        Obj value_name = ref;                           \</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="preprocessor">        (code);                                         \</span></div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="preprocessor">    }                                                       \</span></div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="preprocessor">    break;</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
+<div class="line"><a name="l00118"></a><span class="lineno"><a class="line" href="enum_8h.html#a77cb0100dcb3344082f74be0f216d5e8">  118</a></span>&#160;<span class="preprocessor">#define PROC_VARIANTN____(name, ref, variant, value_name, code) \</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">    case _Enum_##name##_##variant##__:                      \</span></div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="preprocessor">    {                                                       \</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor">        const Obj value_name = ref;                     \</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="preprocessor">        (code);                                         \</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="preprocessor">    }                                                       \</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="preprocessor">    break;</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno"><a class="line" href="enum_8h.html#a3c67ca75811995be35c55ab8f5ccd94a">  126</a></span>&#160;<span class="preprocessor">#define PROC_VARIANTN___(name, ref, variant, value_name, code, ...)          \</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">    __VA_OPT__(PROC_VARIANTN_MUT(name, ref, variant, code, __VA_ARGS__)) \</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">    EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANTN____(name, ref, variant, value_name, code)) __VA_OPT__(PAREN_END)</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno"><a class="line" href="enum_8h.html#aed07cfa144d9501308145ef7eb1a72b1">  129</a></span>&#160;<span class="preprocessor">#define PROC_VARIANTN__(name, ref, variant, value_name, ...) __VA_OPT__(PROC_VARIANTN___(name, ref, variant, value_name, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_VARIANTN____(name, ref, variant, _ignore__, value_name)) __VA_OPT__(PAREN_END)</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno"><a class="line" href="enum_8h.html#aac741dd5bbbce1a1d3dd6fb179106e45">  130</a></span>&#160;<span class="preprocessor">#define PROC_VARIANTN_(name, ref, variant, ...) __VA_OPT__(PROC_VARIANTN__(name, ref, variant, __VA_ARGS__)) EXPAND __VA_OPT__(PAREN NONE)(PROC_DEFAULTN(variant)) __VA_OPT__(PAREN_END)</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno"><a class="line" href="enum_8h.html#a184cf6ef9d44ef7134caff964aaa89b9">  131</a></span>&#160;<span class="preprocessor">#define PROC_VARIANTN(...) PROC_VARIANTN_(__VA_ARGS__)</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno"><a class="line" href="enum_8h.html#a73129a3058ffdd4b112390a41c2b3084">  132</a></span>&#160;<span class="preprocessor">#define PROC_CASEN(v, variant_case) PROC_VARIANTN(EXPAND_ALL v, EXPAND_ALL variant_case)</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="comment">// The matchn macro is identical to match except that there&#39;s no return value.</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="comment">// This allows for simple match expressions that do not return a value.</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno"><a class="line" href="enum_8h.html#a40433224a281f529534d3f36e76fdd0c">  136</a></span>&#160;<span class="preprocessor">#define matchn(e, ...) ({                                             \</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">    let _v__ = as_ref(&amp;e);                                        \</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="preprocessor">    i32 _v_id__ = variant_id(&amp;e);                                 \</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="preprocessor">    switch (_v_id__)                                              \</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="preprocessor">    {                                                             \</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;<span class="preprocessor">        FOR_EACH(PROC_CASEN, (Global, _v__), (), __VA_ARGS__) \</span></div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;<span class="preprocessor">    };                                                            \</span></div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="keyword">static</span> <span class="keywordtype">bool</span> is_prim_match(<span class="keyword">const</span> <span class="keywordtype">char</span>* expected, <span class="keyword">const</span> <span class="keywordtype">char</span>* found)</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;{</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;I8&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;int8_t&quot;</span>))</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;I16&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;int16_t&quot;</span>))</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;I32&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;int32_t&quot;</span>))</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;I64&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;int64_t&quot;</span>))</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;I128&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;int128_t&quot;</span>))</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;U8&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;uint8_t&quot;</span>))</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;U16&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;uint16_t&quot;</span>))</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;U32&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;uint32_t&quot;</span>))</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;U64&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;uint64_t&quot;</span>))</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;U128&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;uint128_t&quot;</span>))</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;F32&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;float&quot;</span>))</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;F64&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;double&quot;</span>))</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keywordflow">if</span> (!strcmp(found, <span class="stringliteral">&quot;Bool&quot;</span>) &amp;&amp; !strcmp(expected, <span class="stringliteral">&quot;_Bool&quot;</span>))</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;}</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160; </div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="comment">// Check that the type is the expected type.</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno"><a class="line" href="enum_8h.html#aca270635f954e34bc06784a985c0831a">  177</a></span>&#160;<span class="preprocessor">#define ENUM_CHECK_TYPE_MATCH(name, variant, v) ({\</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="preprocessor">    char* found_name = TypeName(v);\</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="preprocessor">    char *exp_name = _Enum_variant_Global_##variant##__;\</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="preprocessor">if (strcmp(exp_name, found_name)) { if (!is_prim_match(exp_name, found_name)) panic(&quot;Enum type mismatch! Expected [%s]. Found [%s].&quot;</span>, exp_name, found_name); } })</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160; </div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="comment">// Box primitive values</span></div>
+<div class="line"><a name="l00183"></a><span class="lineno"><a class="line" href="enum_8h.html#a8609cfbccd7ac381d1577e304b12a2f3">  183</a></span>&#160;<span class="preprocessor">#define HANDLE_PRIM_BOXING(name, variant, v) ({           \</span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="preprocessor">    let _val__ = Box(v);                              \</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="preprocessor">    ENUM_CHECK_TYPE_MATCH(name, variant, _val__);     \</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="preprocessor">    Obj _ret__ = new (                                \</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="preprocessor">        name,                                         \</span></div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="preprocessor">        With(variant_id, _Enum_Global_##variant##__), \</span></div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="preprocessor">        With(value, &amp;_val__));                        \</span></div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="preprocessor">    _ret__;                                           \</span></div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
+<div class="line"><a name="l00193"></a><span class="lineno"><a class="line" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">  193</a></span>&#160;<span class="preprocessor">#define HANDLE_PRIM_GEN(name, variant, _val__) ({         \</span></div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="preprocessor">    ENUM_CHECK_TYPE_MATCH(name, variant, _val__);     \</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="preprocessor">    Obj _ret__ = new (                                \</span></div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="preprocessor">        name,                                         \</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="preprocessor">        With(variant_id, _Enum_Global_##variant##__), \</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="preprocessor">        With(value, &amp;_val__));                        \</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="preprocessor">    _ret__;                                           \</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160; </div>
+<div class="line"><a name="l00202"></a><span class="lineno"><a class="line" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">  202</a></span>&#160;<span class="preprocessor">#define _(name, variant, v) _Generic((v), \</span></div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="preprocessor">    bool: ({ let _val__ = new (Bool, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                          \</span></div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="preprocessor">    f32: ({ let _val__ = new (F32, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \</span></div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;<span class="preprocessor">    f64: ({ let _val__ = new (F64, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \</span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="preprocessor">    i8: ({ let _val__ = new (I8, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                            \</span></div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="preprocessor">    i16: ({ let _val__ = new (I16, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;<span class="preprocessor">    i32: ({ let _val__ = new (I32, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \</span></div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="preprocessor">    i64: ({ let _val__ = new (I64, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="preprocessor">    i128: ({ let _val__ = new (I128, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                          \</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;<span class="preprocessor">    u8: ({ let _val__ = new (U8, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                            \</span></div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;<span class="preprocessor">    u16: ({ let _val__ = new (U16, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="preprocessor">    u32: ({ let _val__ = new (U32, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="preprocessor">    u64: ({ let _val__ = new (U64, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }),                           \</span></div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;<span class="preprocessor">    u128: ({ let _val__ = new (U128, With(value, v)); HANDLE_PRIM_GEN(name, variant, _val__); }))</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160; </div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;<span class="comment">// type specific implementations both primitive and Object</span></div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;<span class="comment">// variants may be created</span></div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
+<div class="line"><a name="l00220"></a><span class="lineno"><a class="line" href="enum_8h.html#ab30351e7fb4d8646f8b4d482e81174b4">  220</a></span>&#160;<span class="preprocessor">#define _obj(name, variant, v) ({                         \</span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="preprocessor">    ENUM_CHECK_TYPE_MATCH(name, variant, v);          \</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="preprocessor">    Obj _ret__ = new (                                \</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="preprocessor">        name,                                         \</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="preprocessor">        With(variant_id, _Enum_Global_##variant##__), \</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;<span class="preprocessor">        With(value, &amp;v));                             \</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="preprocessor">    _ret__;                                           \</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="comment">// TODO: this is a stub implementation. Once we have String,</span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;<span class="comment">// replace with the String.</span></div>
+<div class="line"><a name="l00231"></a><span class="lineno"><a class="line" href="enum_8h.html#afe9acbd3f6a590a88f9df8af6aa4eed4">  231</a></span>&#160;<span class="preprocessor">#define _string(name, variant, v) ({                      \</span></div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="preprocessor">    const Obj _val__ = new (U32, With(value, 1234));  \</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="preprocessor">    Obj _ret__ = new (                                \</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="preprocessor">        name,                                         \</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="preprocessor">        With(variant_id, _Enum_Global_##variant##__), \</span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;<span class="preprocessor">        With(value, &amp;_val__));                        \</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;<span class="preprocessor">    _ret__;                                           \</span></div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
+<div class="line"><a name="l00240"></a><span class="lineno"><a class="line" href="enum_8h.html#afab85fdebec84a93ec40e946397bfc2a">  240</a></span>&#160;<span class="preprocessor">#define _i8(name, variant, v) ({                   \</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="preprocessor">    i64 _vin__ = v;                            \</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160; </div>
+<div class="line"><a name="l00245"></a><span class="lineno"><a class="line" href="enum_8h.html#a2800ef68f68925773d5173c4487c29e8">  245</a></span>&#160;<span class="preprocessor">#define _i16(name, variant, v) ({                  \</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="preprocessor">    i64 _vin__ = v;                            \</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160; </div>
+<div class="line"><a name="l00250"></a><span class="lineno"><a class="line" href="enum_8h.html#a4dc057d81bc2dd717573c638f4200389">  250</a></span>&#160;<span class="preprocessor">#define _i32(name, variant, v) ({                  \</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;<span class="preprocessor">    i32 _vin__ = v;                            \</span></div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160; </div>
+<div class="line"><a name="l00255"></a><span class="lineno"><a class="line" href="enum_8h.html#af768675583443d573d8871600208a267">  255</a></span>&#160;<span class="preprocessor">#define _i64(name, variant, v) ({                  \</span></div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;<span class="preprocessor">    i64 _vin__ = v;                            \</span></div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
+<div class="line"><a name="l00260"></a><span class="lineno"><a class="line" href="enum_8h.html#aeb8a0b332eb54a4a300fdc7c5bb5f031">  260</a></span>&#160;<span class="preprocessor">#define _i128(name, variant, v) ({                 \</span></div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="preprocessor">    i128 _vin__ = v;                           \</span></div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160; </div>
+<div class="line"><a name="l00265"></a><span class="lineno"><a class="line" href="enum_8h.html#a536a12662cb33f90b834418288247d9c">  265</a></span>&#160;<span class="preprocessor">#define _u8(name, variant, v) ({                   \</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;<span class="preprocessor">    u8 _vin__ = v;                             \</span></div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160; </div>
+<div class="line"><a name="l00270"></a><span class="lineno"><a class="line" href="enum_8h.html#af7ae8213dc77cd94d163cb5a2fe3cb7e">  270</a></span>&#160;<span class="preprocessor">#define _u16(name, variant, v) ({                  \</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="preprocessor">    u16 _vin__ = v;                            \</span></div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160; </div>
+<div class="line"><a name="l00275"></a><span class="lineno"><a class="line" href="enum_8h.html#aebe4fea82338f29062bf44fb6306cf70">  275</a></span>&#160;<span class="preprocessor">#define _u32(name, variant, v) ({                  \</span></div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;<span class="preprocessor">    u32 _vin__ = v;                            \</span></div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160; </div>
+<div class="line"><a name="l00280"></a><span class="lineno"><a class="line" href="enum_8h.html#a318f314d57b312c93d53060ff2a8fafb">  280</a></span>&#160;<span class="preprocessor">#define _u64(name, variant, v) ({                  \</span></div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;<span class="preprocessor">    u64 _vin__ = v;                            \</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160; </div>
+<div class="line"><a name="l00285"></a><span class="lineno"><a class="line" href="enum_8h.html#a04416a76e70681a8d2aa3d741eaaf4e1">  285</a></span>&#160;<span class="preprocessor">#define _u128(name, variant, v) ({                 \</span></div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;<span class="preprocessor">    u128 _vin__ = v;                           \</span></div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160; </div>
+<div class="line"><a name="l00290"></a><span class="lineno"><a class="line" href="enum_8h.html#ad13422b767322f2b07501ea7dadfc72c">  290</a></span>&#160;<span class="preprocessor">#define _f32(name, variant, v) ({                  \</span></div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="preprocessor">    f32 _vin__ = v;                            \</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160; </div>
+<div class="line"><a name="l00295"></a><span class="lineno"><a class="line" href="enum_8h.html#a0fc6b33edf35767bde2a1cb6b659266e">  295</a></span>&#160;<span class="preprocessor">#define _f64(name, variant, v) ({                  \</span></div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;<span class="preprocessor">    f64 _vin__ = v;                            \</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160; </div>
+<div class="line"><a name="l00300"></a><span class="lineno"><a class="line" href="enum_8h.html#ab2266ea23efc22dbb80bffd2cd4d04e5">  300</a></span>&#160;<span class="preprocessor">#define _bool(name, variant, v) ({                 \</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;<span class="preprocessor">    bool _vin__ = v;                           \</span></div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="preprocessor">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="preprocessor">})</span></div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160; </div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_ENUM__</span></div>
+<div class="ttc" id="arc_8h_html"><div class="ttname"><a href="rc_8h.html">rc.h</a></div></div>
 <div class="ttc" id="atraits_8h_html"><div class="ttname"><a href="traits_8h.html">traits.h</a></div></div>
 <div class="ttc" id="atype_8h_html"><div class="ttname"><a href="type_8h.html">type.h</a></div></div>
+<div class="ttc" id="aunit_8h_html"><div class="ttname"><a href="unit_8h.html">unit.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

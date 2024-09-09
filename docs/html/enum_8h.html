@@ -72,25 +72,109 @@ $(function() {
 <div class="title">enum.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="traits_8h_source.html">core/traits.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="rc_8h_source.html">core/rc.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="traits_8h_source.html">core/traits.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="type_8h_source.html">core/type.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="unit_8h_source.html">core/unit.h</a>&gt;</code><br />
 </div>
 <p><a href="enum_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:aaee7d0b67b79cd97a46f77fe9f9ae2d2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#aaee7d0b67b79cd97a46f77fe9f9ae2d2">PROC_ENUM_TYPES__</a>(variant,  v)&#160;&#160;&#160;static char* _Enum_variant_Global_##variant##__ = #v;</td></tr>
+<tr class="separator:aaee7d0b67b79cd97a46f77fe9f9ae2d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8065853fdbbdb9d10344f92e12f38617"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a8065853fdbbdb9d10344f92e12f38617">PROC_ENUM_TYPES_</a>(...)&#160;&#160;&#160;<a class="el" href="enum_8h.html#aaee7d0b67b79cd97a46f77fe9f9ae2d2">PROC_ENUM_TYPES__</a>(__VA_ARGS__)</td></tr>
+<tr class="separator:a8065853fdbbdb9d10344f92e12f38617"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93f16adf0acd3e43e6b8d3af9e5a53a4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a93f16adf0acd3e43e6b8d3af9e5a53a4">PROC_ENUM_TYPES</a>(ignore,  v)&#160;&#160;&#160;<a class="el" href="enum_8h.html#a8065853fdbbdb9d10344f92e12f38617">PROC_ENUM_TYPES_</a>(<a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> v)</td></tr>
+<tr class="separator:a93f16adf0acd3e43e6b8d3af9e5a53a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54868b340b95cb4d0d841b76414a756b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a54868b340b95cb4d0d841b76414a756b">PROC_ENUM_DEFN__</a>(name,  v,  ignore)&#160;&#160;&#160;_Enum_Global_##v##__,</td></tr>
+<tr class="separator:a54868b340b95cb4d0d841b76414a756b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c5ac0fd1c982b4256eccb3a34a9d798"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a8c5ac0fd1c982b4256eccb3a34a9d798">PROC_ENUM_DEFN_</a>(...)&#160;&#160;&#160;<a class="el" href="enum_8h.html#a54868b340b95cb4d0d841b76414a756b">PROC_ENUM_DEFN__</a>(__VA_ARGS__)</td></tr>
+<tr class="separator:a8c5ac0fd1c982b4256eccb3a34a9d798"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a993462bd57af4a6c5ea1403756c493fc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a993462bd57af4a6c5ea1403756c493fc">PROC_ENUM_DEFN</a>(name,  v)&#160;&#160;&#160;<a class="el" href="enum_8h.html#a8c5ac0fd1c982b4256eccb3a34a9d798">PROC_ENUM_DEFN_</a>(name, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> v)</td></tr>
+<tr class="separator:a993462bd57af4a6c5ea1403756c493fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a337db5f8f8e95c2d7277763293dcdb55"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a337db5f8f8e95c2d7277763293dcdb55">Enum</a>(name, ...)</td></tr>
 <tr class="separator:a337db5f8f8e95c2d7277763293dcdb55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae62dec79a8c2672f33cbef25837fba3e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#ae62dec79a8c2672f33cbef25837fba3e">EnumBuilder</a>(name)</td></tr>
-<tr class="separator:ae62dec79a8c2672f33cbef25837fba3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ba042eb174a63c1a645cafabbede7e6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a4ba042eb174a63c1a645cafabbede7e6">match</a>(e)</td></tr>
-<tr class="separator:a4ba042eb174a63c1a645cafabbede7e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b7a4f9f7af9f0d1faa580df1c8167c3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a9b7a4f9f7af9f0d1faa580df1c8167c3">_</a>()</td></tr>
-<tr class="separator:a9b7a4f9f7af9f0d1faa580df1c8167c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77dc772538f4ae057ff5c06b4fb70a91"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a77dc772538f4ae057ff5c06b4fb70a91">EnumImpl</a>(name)</td></tr>
+<tr class="separator:a77dc772538f4ae057ff5c06b4fb70a91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e3d65d6c1add6260d5ab1fd80b41819"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a3e3d65d6c1add6260d5ab1fd80b41819">PROC_DEFAULT</a>(code)</td></tr>
+<tr class="separator:a3e3d65d6c1add6260d5ab1fd80b41819"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a967e0f1fdc334c803a20052f1197183a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a967e0f1fdc334c803a20052f1197183a">PROC_VARIANT_MUT</a>(name,  ref,  variant,  value_name, ...)</td></tr>
+<tr class="separator:a967e0f1fdc334c803a20052f1197183a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e0d961f961837fed3b775d5f925818e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a1e0d961f961837fed3b775d5f925818e">PROC_VARIANT____</a>(name,  ref,  variant,  value_name, ...)</td></tr>
+<tr class="separator:a1e0d961f961837fed3b775d5f925818e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a707f38c4cfd062f801d980f49a61e9fa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a707f38c4cfd062f801d980f49a61e9fa">PROC_VARIANT___</a>(name,  ref,  variant,  value_name,  code, ...)</td></tr>
+<tr class="separator:a707f38c4cfd062f801d980f49a61e9fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab2b760740159a0d0fa5c3a8e25f2c29"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#aab2b760740159a0d0fa5c3a8e25f2c29">PROC_VARIANT__</a>(name,  ref,  variant,  value_name, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="enum_8h.html#a707f38c4cfd062f801d980f49a61e9fa">PROC_VARIANT___</a>(name, ref, variant, value_name, __VA_ARGS__)) <a class="el" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a> <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a> <a class="el" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="el" href="enum_8h.html#a1e0d961f961837fed3b775d5f925818e">PROC_VARIANT____</a>(name, ref, variant, _ignore__, value_name)) <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a>)</td></tr>
+<tr class="separator:aab2b760740159a0d0fa5c3a8e25f2c29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74ba51358c2b4bc3addf280f3247e26f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a74ba51358c2b4bc3addf280f3247e26f">PROC_VARIANT_</a>(name,  ref,  variant, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="enum_8h.html#aab2b760740159a0d0fa5c3a8e25f2c29">PROC_VARIANT__</a>(name, ref, variant, __VA_ARGS__)) <a class="el" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a> <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a> <a class="el" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="el" href="enum_8h.html#a3e3d65d6c1add6260d5ab1fd80b41819">PROC_DEFAULT</a>(variant)) <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a>)</td></tr>
+<tr class="separator:a74ba51358c2b4bc3addf280f3247e26f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37e065d9417b415c45330597a340d7cc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a37e065d9417b415c45330597a340d7cc">PROC_VARIANT</a>(...)&#160;&#160;&#160;<a class="el" href="enum_8h.html#a74ba51358c2b4bc3addf280f3247e26f">PROC_VARIANT_</a>(__VA_ARGS__)</td></tr>
+<tr class="separator:a37e065d9417b415c45330597a340d7cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a092bc0a84b04763292b783d21082f294"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a092bc0a84b04763292b783d21082f294">PROC_CASE</a>(v,  variant_case)&#160;&#160;&#160;<a class="el" href="enum_8h.html#a37e065d9417b415c45330597a340d7cc">PROC_VARIANT</a>(<a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> v, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> variant_case)</td></tr>
+<tr class="separator:a092bc0a84b04763292b783d21082f294"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c5178c4a821b0efec11f49e9a5fce97"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a7c5178c4a821b0efec11f49e9a5fce97">match</a>(e, ...)</td></tr>
+<tr class="separator:a7c5178c4a821b0efec11f49e9a5fce97"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3480af059648ef46713a9906a37647aa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a3480af059648ef46713a9906a37647aa">PROC_DEFAULTN</a>(code)</td></tr>
+<tr class="separator:a3480af059648ef46713a9906a37647aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abdb9601d5ed2d8c9aa6741f731e59ae8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#abdb9601d5ed2d8c9aa6741f731e59ae8">PROC_VARIANTN_MUT</a>(name,  ref,  variant,  value_name,  code)</td></tr>
+<tr class="separator:abdb9601d5ed2d8c9aa6741f731e59ae8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77cb0100dcb3344082f74be0f216d5e8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a77cb0100dcb3344082f74be0f216d5e8">PROC_VARIANTN____</a>(name,  ref,  variant,  value_name,  code)</td></tr>
+<tr class="separator:a77cb0100dcb3344082f74be0f216d5e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c67ca75811995be35c55ab8f5ccd94a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a3c67ca75811995be35c55ab8f5ccd94a">PROC_VARIANTN___</a>(name,  ref,  variant,  value_name,  code, ...)</td></tr>
+<tr class="separator:a3c67ca75811995be35c55ab8f5ccd94a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed07cfa144d9501308145ef7eb1a72b1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#aed07cfa144d9501308145ef7eb1a72b1">PROC_VARIANTN__</a>(name,  ref,  variant,  value_name, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="enum_8h.html#a3c67ca75811995be35c55ab8f5ccd94a">PROC_VARIANTN___</a>(name, ref, variant, value_name, __VA_ARGS__)) <a class="el" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a> <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a> <a class="el" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="el" href="enum_8h.html#a77cb0100dcb3344082f74be0f216d5e8">PROC_VARIANTN____</a>(name, ref, variant, _ignore__, value_name)) <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a>)</td></tr>
+<tr class="separator:aed07cfa144d9501308145ef7eb1a72b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac741dd5bbbce1a1d3dd6fb179106e45"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#aac741dd5bbbce1a1d3dd6fb179106e45">PROC_VARIANTN_</a>(name,  ref,  variant, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="enum_8h.html#aed07cfa144d9501308145ef7eb1a72b1">PROC_VARIANTN__</a>(name, ref, variant, __VA_ARGS__)) <a class="el" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a> <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a> <a class="el" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="el" href="enum_8h.html#a3480af059648ef46713a9906a37647aa">PROC_DEFAULTN</a>(variant)) <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a>)</td></tr>
+<tr class="separator:aac741dd5bbbce1a1d3dd6fb179106e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a184cf6ef9d44ef7134caff964aaa89b9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a184cf6ef9d44ef7134caff964aaa89b9">PROC_VARIANTN</a>(...)&#160;&#160;&#160;<a class="el" href="enum_8h.html#aac741dd5bbbce1a1d3dd6fb179106e45">PROC_VARIANTN_</a>(__VA_ARGS__)</td></tr>
+<tr class="separator:a184cf6ef9d44ef7134caff964aaa89b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73129a3058ffdd4b112390a41c2b3084"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a73129a3058ffdd4b112390a41c2b3084">PROC_CASEN</a>(v,  variant_case)&#160;&#160;&#160;<a class="el" href="enum_8h.html#a184cf6ef9d44ef7134caff964aaa89b9">PROC_VARIANTN</a>(<a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> v, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> variant_case)</td></tr>
+<tr class="separator:a73129a3058ffdd4b112390a41c2b3084"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40433224a281f529534d3f36e76fdd0c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a40433224a281f529534d3f36e76fdd0c">matchn</a>(e, ...)</td></tr>
+<tr class="separator:a40433224a281f529534d3f36e76fdd0c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca270635f954e34bc06784a985c0831a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#aca270635f954e34bc06784a985c0831a">ENUM_CHECK_TYPE_MATCH</a>(name,  variant,  v)</td></tr>
+<tr class="separator:aca270635f954e34bc06784a985c0831a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8609cfbccd7ac381d1577e304b12a2f3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a8609cfbccd7ac381d1577e304b12a2f3">HANDLE_PRIM_BOXING</a>(name,  variant,  v)</td></tr>
+<tr class="separator:a8609cfbccd7ac381d1577e304b12a2f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63ca244bd5896e8a175d159f73e8a2aa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name,  variant,  _val__)</td></tr>
+<tr class="separator:a63ca244bd5896e8a175d159f73e8a2aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bae5ab157437fc2f69924192746a577"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>(name,  variant,  v)</td></tr>
+<tr class="separator:a6bae5ab157437fc2f69924192746a577"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab30351e7fb4d8646f8b4d482e81174b4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#ab30351e7fb4d8646f8b4d482e81174b4">_obj</a>(name,  variant,  v)</td></tr>
+<tr class="separator:ab30351e7fb4d8646f8b4d482e81174b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe9acbd3f6a590a88f9df8af6aa4eed4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#afe9acbd3f6a590a88f9df8af6aa4eed4">_string</a>(name,  variant,  v)</td></tr>
+<tr class="separator:afe9acbd3f6a590a88f9df8af6aa4eed4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afab85fdebec84a93ec40e946397bfc2a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#afab85fdebec84a93ec40e946397bfc2a">_i8</a>(name,  variant,  v)</td></tr>
+<tr class="separator:afab85fdebec84a93ec40e946397bfc2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2800ef68f68925773d5173c4487c29e8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a2800ef68f68925773d5173c4487c29e8">_i16</a>(name,  variant,  v)</td></tr>
+<tr class="separator:a2800ef68f68925773d5173c4487c29e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4dc057d81bc2dd717573c638f4200389"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a4dc057d81bc2dd717573c638f4200389">_i32</a>(name,  variant,  v)</td></tr>
+<tr class="separator:a4dc057d81bc2dd717573c638f4200389"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af768675583443d573d8871600208a267"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#af768675583443d573d8871600208a267">_i64</a>(name,  variant,  v)</td></tr>
+<tr class="separator:af768675583443d573d8871600208a267"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb8a0b332eb54a4a300fdc7c5bb5f031"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#aeb8a0b332eb54a4a300fdc7c5bb5f031">_i128</a>(name,  variant,  v)</td></tr>
+<tr class="separator:aeb8a0b332eb54a4a300fdc7c5bb5f031"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a536a12662cb33f90b834418288247d9c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a536a12662cb33f90b834418288247d9c">_u8</a>(name,  variant,  v)</td></tr>
+<tr class="separator:a536a12662cb33f90b834418288247d9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7ae8213dc77cd94d163cb5a2fe3cb7e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#af7ae8213dc77cd94d163cb5a2fe3cb7e">_u16</a>(name,  variant,  v)</td></tr>
+<tr class="separator:af7ae8213dc77cd94d163cb5a2fe3cb7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebe4fea82338f29062bf44fb6306cf70"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#aebe4fea82338f29062bf44fb6306cf70">_u32</a>(name,  variant,  v)</td></tr>
+<tr class="separator:aebe4fea82338f29062bf44fb6306cf70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a318f314d57b312c93d53060ff2a8fafb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a318f314d57b312c93d53060ff2a8fafb">_u64</a>(name,  variant,  v)</td></tr>
+<tr class="separator:a318f314d57b312c93d53060ff2a8fafb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04416a76e70681a8d2aa3d741eaaf4e1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a04416a76e70681a8d2aa3d741eaaf4e1">_u128</a>(name,  variant,  v)</td></tr>
+<tr class="separator:a04416a76e70681a8d2aa3d741eaaf4e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad13422b767322f2b07501ea7dadfc72c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#ad13422b767322f2b07501ea7dadfc72c">_f32</a>(name,  variant,  v)</td></tr>
+<tr class="separator:ad13422b767322f2b07501ea7dadfc72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fc6b33edf35767bde2a1cb6b659266e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#a0fc6b33edf35767bde2a1cb6b659266e">_f64</a>(name,  variant,  v)</td></tr>
+<tr class="separator:a0fc6b33edf35767bde2a1cb6b659266e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2266ea23efc22dbb80bffd2cd4d04e5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enum_8h.html#ab2266ea23efc22dbb80bffd2cd4d04e5">_bool</a>(name,  variant,  v)</td></tr>
+<tr class="separator:ab2266ea23efc22dbb80bffd2cd4d04e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a9b7a4f9f7af9f0d1faa580df1c8167c3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b7a4f9f7af9f0d1faa580df1c8167c3">&#9670;&nbsp;</a></span>_</h2>
+<a id="a6bae5ab157437fc2f69924192746a577"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6bae5ab157437fc2f69924192746a577">&#9670;&nbsp;</a></span>_</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -98,12 +182,637 @@ Macros</h2></td></tr>
         <tr>
           <td class="memname">#define _</td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    _Generic((v), \</div>
+<div class="line">    <span class="keywordtype">bool</span>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (Bool, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                          \</div>
+<div class="line">    <a class="code" href="types_8h.html#a1bd198f821a2a4ea63fa8ab2e4a2afb3">f32</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (F32, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                           \</div>
+<div class="line">    <a class="code" href="types_8h.html#a1d69936f20818f2cd1b34d1d2fd841be">f64</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (F64, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                           \</div>
+<div class="line">    <a class="code" href="types_8h.html#a8b1c3ba7ed71c46505556d43a9bee9e1">i8</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (I8, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                            \</div>
+<div class="line">    <a class="code" href="types_8h.html#a3e01dd59d72c4919aa21a46fa5299e23">i16</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (I16, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                           \</div>
+<div class="line">    <a class="code" href="types_8h.html#a832509ea197065489f1d60b6d7958cbf">i32</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (I32, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                           \</div>
+<div class="line">    <a class="code" href="types_8h.html#aa777e5139adfca31612ec04bc2b26845">i64</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (I64, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                           \</div>
+<div class="line">    <a class="code" href="types_8h.html#a5c951891355b2586e5de49153314e8e4">i128</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (I128, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                          \</div>
+<div class="line">    <a class="code" href="types_8h.html#af3b86d961da0a3575b4f99c9ffaf01fd">u8</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (U8, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                            \</div>
+<div class="line">    <a class="code" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (U16, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                           \</div>
+<div class="line">    <a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (U32, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                           \</div>
+<div class="line">    <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (U64, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }),                           \</div>
+<div class="line">    <a class="code" href="types_8h.html#a845593201b45c0e24fdab5e4152c9f40">u128</a>: ({ <a class="code" href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a> _val__ = <span class="keyword">new</span> (U128, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)); <a class="code" href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a>(name, variant, _val__); }))</div>
+<div class="ttc" id="aenum_8h_html_a63ca244bd5896e8a175d159f73e8a2aa"><div class="ttname"><a href="enum_8h.html#a63ca244bd5896e8a175d159f73e8a2aa">HANDLE_PRIM_GEN</a></div><div class="ttdeci">#define HANDLE_PRIM_GEN(name, variant, _val__)</div><div class="ttdef"><b>Definition:</b> enum.h:193</div></div>
+<div class="ttc" id="atype_8h_html_a045dd54932944d8830380f4596d64446"><div class="ttname"><a href="type_8h.html#a045dd54932944d8830380f4596d64446">let</a></div><div class="ttdeci">#define let</div><div class="ttdef"><b>Definition:</b> type.h:120</div></div>
+<div class="ttc" id="atype_8h_html_a83dd37cc0bb92d715fc246014e02b359"><div class="ttname"><a href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a></div><div class="ttdeci">#define With(x, y)</div></div>
+<div class="ttc" id="atypes_8h_html_a1bd198f821a2a4ea63fa8ab2e4a2afb3"><div class="ttname"><a href="types_8h.html#a1bd198f821a2a4ea63fa8ab2e4a2afb3">f32</a></div><div class="ttdeci">#define f32</div><div class="ttdef"><b>Definition:</b> types.h:36</div></div>
+<div class="ttc" id="atypes_8h_html_a1d69936f20818f2cd1b34d1d2fd841be"><div class="ttname"><a href="types_8h.html#a1d69936f20818f2cd1b34d1d2fd841be">f64</a></div><div class="ttdeci">#define f64</div><div class="ttdef"><b>Definition:</b> types.h:35</div></div>
+<div class="ttc" id="atypes_8h_html_a2b19d553290a8d4a083d3c03280ea800"><div class="ttname"><a href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a></div><div class="ttdeci">#define u16</div><div class="ttdef"><b>Definition:</b> types.h:27</div></div>
+<div class="ttc" id="atypes_8h_html_a332ccd83dfe2973e6cb2b61e4f3ab7e6"><div class="ttname"><a href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a></div><div class="ttdeci">#define u32</div><div class="ttdef"><b>Definition:</b> types.h:29</div></div>
+<div class="ttc" id="atypes_8h_html_a3e01dd59d72c4919aa21a46fa5299e23"><div class="ttname"><a href="types_8h.html#a3e01dd59d72c4919aa21a46fa5299e23">i16</a></div><div class="ttdeci">#define i16</div><div class="ttdef"><b>Definition:</b> types.h:28</div></div>
+<div class="ttc" id="atypes_8h_html_a5c951891355b2586e5de49153314e8e4"><div class="ttname"><a href="types_8h.html#a5c951891355b2586e5de49153314e8e4">i128</a></div><div class="ttdeci">#define i128</div><div class="ttdef"><b>Definition:</b> types.h:34</div></div>
+<div class="ttc" id="atypes_8h_html_a832509ea197065489f1d60b6d7958cbf"><div class="ttname"><a href="types_8h.html#a832509ea197065489f1d60b6d7958cbf">i32</a></div><div class="ttdeci">#define i32</div><div class="ttdef"><b>Definition:</b> types.h:30</div></div>
+<div class="ttc" id="atypes_8h_html_a845593201b45c0e24fdab5e4152c9f40"><div class="ttname"><a href="types_8h.html#a845593201b45c0e24fdab5e4152c9f40">u128</a></div><div class="ttdeci">#define u128</div><div class="ttdef"><b>Definition:</b> types.h:33</div></div>
+<div class="ttc" id="atypes_8h_html_a8b1c3ba7ed71c46505556d43a9bee9e1"><div class="ttname"><a href="types_8h.html#a8b1c3ba7ed71c46505556d43a9bee9e1">i8</a></div><div class="ttdeci">#define i8</div><div class="ttdef"><b>Definition:</b> types.h:26</div></div>
+<div class="ttc" id="atypes_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
+<div class="ttc" id="atypes_8h_html_aa777e5139adfca31612ec04bc2b26845"><div class="ttname"><a href="types_8h.html#aa777e5139adfca31612ec04bc2b26845">i64</a></div><div class="ttdeci">#define i64</div><div class="ttdef"><b>Definition:</b> types.h:32</div></div>
+<div class="ttc" id="atypes_8h_html_af3b86d961da0a3575b4f99c9ffaf01fd"><div class="ttname"><a href="types_8h.html#af3b86d961da0a3575b4f99c9ffaf01fd">u8</a></div><div class="ttdeci">#define u8</div><div class="ttdef"><b>Definition:</b> types.h:25</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ab2266ea23efc22dbb80bffd2cd4d04e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2266ea23efc22dbb80bffd2cd4d04e5">&#9670;&nbsp;</a></span>_bool</h2>
 
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _bool</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                 \</div>
+<div class="line">    bool _vin__ = v;                           \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ad13422b767322f2b07501ea7dadfc72c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad13422b767322f2b07501ea7dadfc72c">&#9670;&nbsp;</a></span>_f32</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _f32</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                  \</div>
+<div class="line">    f32 _vin__ = v;                            \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a0fc6b33edf35767bde2a1cb6b659266e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fc6b33edf35767bde2a1cb6b659266e">&#9670;&nbsp;</a></span>_f64</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _f64</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                  \</div>
+<div class="line">    f64 _vin__ = v;                            \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aeb8a0b332eb54a4a300fdc7c5bb5f031"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb8a0b332eb54a4a300fdc7c5bb5f031">&#9670;&nbsp;</a></span>_i128</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _i128</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                 \</div>
+<div class="line">    i128 _vin__ = v;                           \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a2800ef68f68925773d5173c4487c29e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2800ef68f68925773d5173c4487c29e8">&#9670;&nbsp;</a></span>_i16</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _i16</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                  \</div>
+<div class="line">    i64 _vin__ = v;                            \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a4dc057d81bc2dd717573c638f4200389"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4dc057d81bc2dd717573c638f4200389">&#9670;&nbsp;</a></span>_i32</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _i32</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                  \</div>
+<div class="line">    i32 _vin__ = v;                            \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="af768675583443d573d8871600208a267"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af768675583443d573d8871600208a267">&#9670;&nbsp;</a></span>_i64</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _i64</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                  \</div>
+<div class="line">    i64 _vin__ = v;                            \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="afab85fdebec84a93ec40e946397bfc2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afab85fdebec84a93ec40e946397bfc2a">&#9670;&nbsp;</a></span>_i8</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _i8</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                   \</div>
+<div class="line">    i64 _vin__ = v;                            \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ab30351e7fb4d8646f8b4d482e81174b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab30351e7fb4d8646f8b4d482e81174b4">&#9670;&nbsp;</a></span>_obj</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _obj</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                         \</div>
+<div class="line">    ENUM_CHECK_TYPE_MATCH(name, variant, v);          \</div>
+<div class="line">    Obj _ret__ = <span class="keyword">new</span> (                                \</div>
+<div class="line">        name,                                         \</div>
+<div class="line">        With(variant_id, _Enum_Global_##variant##__), \</div>
+<div class="line">        With(value, &amp;v));                             \</div>
+<div class="line">    _ret__;                                           \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="afe9acbd3f6a590a88f9df8af6aa4eed4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe9acbd3f6a590a88f9df8af6aa4eed4">&#9670;&nbsp;</a></span>_string</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _string</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                      \</div>
+<div class="line">    const <a class="code" href="structObj.html">Obj</a> _val__ = <span class="keyword">new</span> (U32, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, 1234));  \</div>
+<div class="line">    Obj _ret__ = <span class="keyword">new</span> (                                \</div>
+<div class="line">        name,                                         \</div>
+<div class="line">        With(variant_id, _Enum_Global_##variant##__), \</div>
+<div class="line">        With(value, &amp;_val__));                        \</div>
+<div class="line">    _ret__;                                           \</div>
+<div class="line">})</div>
+<div class="ttc" id="astructObj_html"><div class="ttname"><a href="structObj.html">Obj</a></div><div class="ttdef"><b>Definition:</b> type.h:62</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a04416a76e70681a8d2aa3d741eaaf4e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04416a76e70681a8d2aa3d741eaaf4e1">&#9670;&nbsp;</a></span>_u128</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _u128</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                 \</div>
+<div class="line">    u128 _vin__ = v;                           \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="af7ae8213dc77cd94d163cb5a2fe3cb7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af7ae8213dc77cd94d163cb5a2fe3cb7e">&#9670;&nbsp;</a></span>_u16</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _u16</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                  \</div>
+<div class="line">    u16 _vin__ = v;                            \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="aebe4fea82338f29062bf44fb6306cf70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebe4fea82338f29062bf44fb6306cf70">&#9670;&nbsp;</a></span>_u32</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _u32</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                  \</div>
+<div class="line">    u32 _vin__ = v;                            \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a318f314d57b312c93d53060ff2a8fafb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a318f314d57b312c93d53060ff2a8fafb">&#9670;&nbsp;</a></span>_u64</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _u64</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                  \</div>
+<div class="line">    u64 _vin__ = v;                            \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a536a12662cb33f90b834418288247d9c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a536a12662cb33f90b834418288247d9c">&#9670;&nbsp;</a></span>_u8</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define _u8</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                   \</div>
+<div class="line">    u8 _vin__ = v;                             \</div>
+<div class="line">    HANDLE_PRIM_BOXING(name, variant, _vin__); \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a337db5f8f8e95c2d7277763293dcdb55"></a>
@@ -131,47 +840,71 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    TypeImpl(name, <a class="code" href="type_8h.html#aca46eaa8fa5416dd46b1e7643da2614a">Where</a>(T), <a class="code" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, variant_id), <a class="code" href="type_8h.html#a186af0dcfce5f80cf526e746d9ea00d6">Generic</a>(T, obj));                                        \</div>
-<div class="line">    Impl(name, EnumProperties);                                                                               \</div>
-<div class="line">    u64 name##_sizeof_variant(<a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a> variant_id)                                                                 \</div>
-<div class="line">    {                                                                                                         \</div>
-<div class="line">        <span class="comment">/* TODO: This is just hard coded. Need to modify this to set appropriate size per variant. */</span>     \</div>
-<div class="line">        <span class="comment">/* Basic approach FOR_EACH go through variants passed in. For each one either call size if it */</span>  \</div>
-<div class="line">        <span class="comment">/* doesn&#39;t implement EnumProperties or sizeof_max_variant for those that do implement.*/</span>          \</div>
-<div class="line">        return 128 + <span class="keyword">sizeof</span>(<a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>);                                                                         \</div>
-<div class="line">    }                                                                                                         \</div>
-<div class="line">    u32 name##_variant_id() { <span class="keywordflow">return</span> $Context($(), name, variant_id); }                                       \</div>
-<div class="line">    void <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((constructor)) __add_enum_##name()                                                     \</div>
-<div class="line">    {                                                                                                         \</div>
-<div class="line">        vtable_add_trait(&amp;name##_Vtable__, <span class="stringliteral">&quot;EnumProperties&quot;</span>);                                             \</div>
-<div class="line">    }                                                                                                         \</div>
-<div class="line">    u64 name##_size()                                                                                         \</div>
-<div class="line">    {                                                                                                         \</div>
-<div class="line">        if (!<a class="code" href="type_8h.html#a96880c4154e8b61f307c31dbbd0cccd4">Implements</a>((*$()), <span class="stringliteral">&quot;EnumProperties&quot;</span>))                                                        \</div>
-<div class="line">            panic(<span class="stringliteral">&quot;required trait [EnumProperties] not implemented in type [%s].&quot;</span>, <a class="code" href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a>((*$()))); \</div>
-<div class="line">        u32 <span class="keywordtype">id</span> = variant_id($());                                                                         \</div>
-<div class="line">        u64 <a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a> = sizeof_variant($(), <span class="keywordtype">id</span>);                                                               \</div>
-<div class="line">        return <a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a>;                                                                                      \</div>
-<div class="line">    }</div>
-<div class="ttc" id="atraits_8c_html_a56165321ab30e10af6d42752217d1be1"><div class="ttname"><a href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a></div><div class="ttdeci">u64 size(const Obj *self)</div><div class="ttdef"><b>Definition:</b> traits.c:17</div></div>
-<div class="ttc" id="atype_8c_html_afd02bb0f6a745c39d5e3417493995c71"><div class="ttname"><a href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a></div><div class="ttdeci">void __attribute__((constructor))</div><div class="ttdef"><b>Definition:</b> type.c:24</div></div>
-<div class="ttc" id="atype_8h_html_a186af0dcfce5f80cf526e746d9ea00d6"><div class="ttname"><a href="type_8h.html#a186af0dcfce5f80cf526e746d9ea00d6">Generic</a></div><div class="ttdeci">#define Generic(obj_type, obj_name)</div></div>
-<div class="ttc" id="atype_8h_html_a3dd518df1105dd849cae4ac614bf708e"><div class="ttname"><a href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a></div><div class="ttdeci">#define Field(field_type, field_name)</div></div>
-<div class="ttc" id="atype_8h_html_a96880c4154e8b61f307c31dbbd0cccd4"><div class="ttname"><a href="type_8h.html#a96880c4154e8b61f307c31dbbd0cccd4">Implements</a></div><div class="ttdeci">#define Implements(obj, trait)</div><div class="ttdef"><b>Definition:</b> type.h:105</div></div>
-<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:104</div></div>
-<div class="ttc" id="atype_8h_html_aca46eaa8fa5416dd46b1e7643da2614a"><div class="ttname"><a href="type_8h.html#aca46eaa8fa5416dd46b1e7643da2614a">Where</a></div><div class="ttdeci">#define Where(generic,...)</div></div>
-<div class="ttc" id="atypes_8h_html_a332ccd83dfe2973e6cb2b61e4f3ab7e6"><div class="ttname"><a href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a></div><div class="ttdeci">#define u32</div><div class="ttdef"><b>Definition:</b> types.h:29</div></div>
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">typedef</span> <span class="keyword">enum</span> _Enum_##name{                                         \</div>
+<div class="line">        FOR_EACH(<a class="code" href="enum_8h.html#a993462bd57af4a6c5ea1403756c493fc">PROC_ENUM_DEFN</a>, name, (), __VA_ARGS__)                \</div>
+<div class="line">        _Enum_##name##_size} _Enum_##name;                         \</div>
+<div class="line">    FOR_EACH(<a class="code" href="enum_8h.html#a93f16adf0acd3e43e6b8d3af9e5a53a4">PROC_ENUM_TYPES</a>, name, (), __VA_ARGS__)                   \</div>
+<div class="line">    Builder(name, <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="code" href="types_8h.html#a832509ea197065489f1d60b6d7958cbf">i32</a>, variant_id), <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a>*, value)); \</div>
+<div class="line">    Impl(name, <a class="code" href="traits_8h.html#ac4b180eb5c514c135002763ea248171e">AsRef</a>);                                                 \</div>
+<div class="line">    Impl(name, <a class="code" href="traits_8h.html#a72bc53cddc1a6d836d4fbe9a0c72ab49">EnumProps</a>);                                             \</div>
+<div class="line">    Impl(name, <a class="code" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>);</div>
+<div class="ttc" id="aenum_8h_html_a93f16adf0acd3e43e6b8d3af9e5a53a4"><div class="ttname"><a href="enum_8h.html#a93f16adf0acd3e43e6b8d3af9e5a53a4">PROC_ENUM_TYPES</a></div><div class="ttdeci">#define PROC_ENUM_TYPES(ignore, v)</div><div class="ttdef"><b>Definition:</b> enum.h:25</div></div>
+<div class="ttc" id="aenum_8h_html_a993462bd57af4a6c5ea1403756c493fc"><div class="ttname"><a href="enum_8h.html#a993462bd57af4a6c5ea1403756c493fc">PROC_ENUM_DEFN</a></div><div class="ttdeci">#define PROC_ENUM_DEFN(name, v)</div><div class="ttdef"><b>Definition:</b> enum.h:29</div></div>
+<div class="ttc" id="atraits_8h_html_a72bc53cddc1a6d836d4fbe9a0c72ab49"><div class="ttname"><a href="traits_8h.html#a72bc53cddc1a6d836d4fbe9a0c72ab49">EnumProps</a></div><div class="ttdeci">#define EnumProps</div><div class="ttdef"><b>Definition:</b> traits.h:62</div></div>
+<div class="ttc" id="atraits_8h_html_a86f96056a0c61a863297f2a8fa71ec10"><div class="ttname"><a href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a></div><div class="ttdeci">#define Build</div><div class="ttdef"><b>Definition:</b> traits.h:33</div></div>
+<div class="ttc" id="atraits_8h_html_ac4b180eb5c514c135002763ea248171e"><div class="ttname"><a href="traits_8h.html#ac4b180eb5c514c135002763ea248171e">AsRef</a></div><div class="ttdeci">#define AsRef</div><div class="ttdef"><b>Definition:</b> traits.h:59</div></div>
+<div class="ttc" id="atype_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="ae62dec79a8c2672f33cbef25837fba3e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae62dec79a8c2672f33cbef25837fba3e">&#9670;&nbsp;</a></span>EnumBuilder</h2>
+<a id="aca270635f954e34bc06784a985c0831a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aca270635f954e34bc06784a985c0831a">&#9670;&nbsp;</a></span>ENUM_CHECK_TYPE_MATCH</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define EnumBuilder</td>
+          <td class="memname">#define ENUM_CHECK_TYPE_MATCH</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({\</div>
+<div class="line">    char* found_name = <a class="code" href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a>(v);\</div>
+<div class="line">    char *exp_name = _Enum_variant_Global_##variant##__;\</div>
+<div class="line">if (strcmp(exp_name, found_name)) { <span class="keywordflow">if</span> (!is_prim_match(exp_name, found_name)) <a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a>(<span class="stringliteral">&quot;Enum type mismatch! Expected [%s]. Found [%s].&quot;</span>, exp_name, found_name); } })</div>
+<div class="ttc" id="apanic_8c_html_ad1f1a1dc0581a11b597453f148106393"><div class="ttname"><a href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a></div><div class="ttdeci">void panic(const char *fmt,...)</div><div class="ttdef"><b>Definition:</b> panic.c:27</div></div>
+<div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:104</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a77dc772538f4ae057ff5c06b4fb70a91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77dc772538f4ae057ff5c06b4fb70a91">&#9670;&nbsp;</a></span>EnumImpl</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EnumImpl</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">name</td><td>)</td>
@@ -179,11 +912,114 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a9d94417e304d0cd9c2a88b4a10ba0645">Type</a>(name, <a class="code" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(<a class="code" href="types_8h.html#a832509ea197065489f1d60b6d7958cbf">i32</a>, variant_id), <a class="code" href="type_8h.html#a51c74b980e29efc9363ed186928ec7f9">Object</a>(Rc, value));              \</div>
+<div class="line">    void name##_build(<span class="keyword">const</span> name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>* config)                       \</div>
+<div class="line">    {                                                                   \</div>
+<div class="line">        $ContextVar($Var(), name, variant_id) = config-&gt;variant_id; \</div>
+<div class="line">        let rc = <span class="keyword">new</span> (Rc, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, config-&gt;value));              \</div>
+<div class="line">        Move(&amp;$ContextVar($Var(), name, value), &amp;rc);               \</div>
+<div class="line">    }                                                                   \</div>
+<div class="line">    i32 name##_variant_id() { <span class="keywordflow">return</span> $Context($(), name, variant_id); } \</div>
+<div class="line">    Obj name##_as_ref()                                                 \</div>
+<div class="line">    {                                                                   \</div>
+<div class="line">        var k = klone(&amp;$Context($(), name, value));                 \</div>
+<div class="line">        let obj = unwrap(&amp;k);                                       \</div>
+<div class="line">        ReturnObj(obj);                                             \</div>
+<div class="line">    }</div>
+<div class="ttc" id="atype_8h_html_a3dd518df1105dd849cae4ac614bf708e"><div class="ttname"><a href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a></div><div class="ttdeci">#define Field(field_type, field_name)</div></div>
+<div class="ttc" id="atype_8h_html_a51c74b980e29efc9363ed186928ec7f9"><div class="ttname"><a href="type_8h.html#a51c74b980e29efc9363ed186928ec7f9">Object</a></div><div class="ttdeci">#define Object(obj_type, obj_name)</div></div>
+<div class="ttc" id="atype_8h_html_a9d94417e304d0cd9c2a88b4a10ba0645"><div class="ttname"><a href="type_8h.html#a9d94417e304d0cd9c2a88b4a10ba0645">Type</a></div><div class="ttdeci">#define Type(name,...)</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a8609cfbccd7ac381d1577e304b12a2f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8609cfbccd7ac381d1577e304b12a2f3">&#9670;&nbsp;</a></span>HANDLE_PRIM_BOXING</h2>
 
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define HANDLE_PRIM_BOXING</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({           \</div>
+<div class="line">    let _val__ = <a class="code" href="prim_8h.html#a58ff64b6abb6403a6459779468d955e4">Box</a>(v);                              \</div>
+<div class="line">    ENUM_CHECK_TYPE_MATCH(name, variant, _val__);     \</div>
+<div class="line">    Obj _ret__ = <span class="keyword">new</span> (                                \</div>
+<div class="line">        name,                                         \</div>
+<div class="line">        With(variant_id, _Enum_Global_##variant##__), \</div>
+<div class="line">        With(value, &amp;_val__));                        \</div>
+<div class="line">    _ret__;                                           \</div>
+<div class="line">})</div>
+<div class="ttc" id="aprim_8h_html_a58ff64b6abb6403a6459779468d955e4"><div class="ttname"><a href="prim_8h.html#a58ff64b6abb6403a6459779468d955e4">Box</a></div><div class="ttdeci">#define Box(v)</div><div class="ttdef"><b>Definition:</b> prim.h:67</div></div>
+</div><!-- fragment -->
 </div>
 </div>
-<a id="a4ba042eb174a63c1a645cafabbede7e6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ba042eb174a63c1a645cafabbede7e6">&#9670;&nbsp;</a></span>match</h2>
+<a id="a63ca244bd5896e8a175d159f73e8a2aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a63ca244bd5896e8a175d159f73e8a2aa">&#9670;&nbsp;</a></span>HANDLE_PRIM_GEN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define HANDLE_PRIM_GEN</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">_val__&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({         \</div>
+<div class="line">    ENUM_CHECK_TYPE_MATCH(name, variant, _val__);     \</div>
+<div class="line">    Obj _ret__ = <span class="keyword">new</span> (                                \</div>
+<div class="line">        name,                                         \</div>
+<div class="line">        With(variant_id, _Enum_Global_##variant##__), \</div>
+<div class="line">        With(value, &amp;_val__));                        \</div>
+<div class="line">    _ret__;                                           \</div>
+<div class="line">})</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a7c5178c4a821b0efec11f49e9a5fce97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c5178c4a821b0efec11f49e9a5fce97">&#9670;&nbsp;</a></span>match</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -192,12 +1028,862 @@ Macros</h2></td></tr>
           <td class="memname">#define match</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">e</td><td>)</td>
+          <td class="paramname">e, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                             \</div>
+<div class="line">    let _v__ = as_ref(&amp;e);                                       \</div>
+<div class="line">    i32 _v_id__ = variant_id(&amp;e);                                \</div>
+<div class="line">    Obj _ret__ = <a class="code" href="type_8h.html#adb292545e8d39ad1892f3b4c622935da">OBJECT_INIT</a>;                                    \</div>
+<div class="line">    switch (_v_id__)                                             \</div>
+<div class="line">    {                                                            \</div>
+<div class="line">        FOR_EACH(<a class="code" href="enum_8h.html#a092bc0a84b04763292b783d21082f294">PROC_CASE</a>, (Global, _v__), (), __VA_ARGS__) \</div>
+<div class="line">    }                                                            \</div>
+<div class="line">    _ret__;                                                      \</div>
+<div class="line">})</div>
+<div class="ttc" id="aenum_8h_html_a092bc0a84b04763292b783d21082f294"><div class="ttname"><a href="enum_8h.html#a092bc0a84b04763292b783d21082f294">PROC_CASE</a></div><div class="ttdeci">#define PROC_CASE(v, variant_case)</div><div class="ttdef"><b>Definition:</b> enum.h:87</div></div>
+<div class="ttc" id="atype_8h_html_adb292545e8d39ad1892f3b4c622935da"><div class="ttname"><a href="type_8h.html#adb292545e8d39ad1892f3b4c622935da">OBJECT_INIT</a></div><div class="ttdeci">#define OBJECT_INIT</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a40433224a281f529534d3f36e76fdd0c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40433224a281f529534d3f36e76fdd0c">&#9670;&nbsp;</a></span>matchn</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define matchn</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">e, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                             \</div>
+<div class="line">    let _v__ = as_ref(&amp;e);                                        \</div>
+<div class="line">    i32 _v_id__ = variant_id(&amp;e);                                 \</div>
+<div class="line">    switch (_v_id__)                                              \</div>
+<div class="line">    {                                                             \</div>
+<div class="line">        FOR_EACH(<a class="code" href="enum_8h.html#a73129a3058ffdd4b112390a41c2b3084">PROC_CASEN</a>, (Global, _v__), (), __VA_ARGS__) \</div>
+<div class="line">    };                                                            \</div>
+<div class="line">})</div>
+<div class="ttc" id="aenum_8h_html_a73129a3058ffdd4b112390a41c2b3084"><div class="ttname"><a href="enum_8h.html#a73129a3058ffdd4b112390a41c2b3084">PROC_CASEN</a></div><div class="ttdeci">#define PROC_CASEN(v, variant_case)</div><div class="ttdef"><b>Definition:</b> enum.h:132</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a092bc0a84b04763292b783d21082f294"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a092bc0a84b04763292b783d21082f294">&#9670;&nbsp;</a></span>PROC_CASE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_CASE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant_case&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="enum_8h.html#a37e065d9417b415c45330597a340d7cc">PROC_VARIANT</a>(<a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> v, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> variant_case)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+</div>
+</div>
+<a id="a73129a3058ffdd4b112390a41c2b3084"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73129a3058ffdd4b112390a41c2b3084">&#9670;&nbsp;</a></span>PROC_CASEN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_CASEN</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant_case&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="enum_8h.html#a184cf6ef9d44ef7134caff964aaa89b9">PROC_VARIANTN</a>(<a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> v, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> variant_case)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3e3d65d6c1add6260d5ab1fd80b41819"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e3d65d6c1add6260d5ab1fd80b41819">&#9670;&nbsp;</a></span>PROC_DEFAULT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_DEFAULT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">code</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">                                 \</div>
+<div class="line">    default:                 \</div>
+<div class="line">    {                        \</div>
+<div class="line">        _ret__ = (code); \</div>
+<div class="line">    }                        \</div>
+<div class="line">    break;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a3480af059648ef46713a9906a37647aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3480af059648ef46713a9906a37647aa">&#9670;&nbsp;</a></span>PROC_DEFAULTN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_DEFAULTN</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">code</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">                            \</div>
+<div class="line">    default:            \</div>
+<div class="line">    {                   \</div>
+<div class="line">        (code);     \</div>
+<div class="line">    }                   \</div>
+<div class="line">    break;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a993462bd57af4a6c5ea1403756c493fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a993462bd57af4a6c5ea1403756c493fc">&#9670;&nbsp;</a></span>PROC_ENUM_DEFN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_ENUM_DEFN</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="enum_8h.html#a8c5ac0fd1c982b4256eccb3a34a9d798">PROC_ENUM_DEFN_</a>(name, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> v)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8c5ac0fd1c982b4256eccb3a34a9d798"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c5ac0fd1c982b4256eccb3a34a9d798">&#9670;&nbsp;</a></span>PROC_ENUM_DEFN_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_ENUM_DEFN_</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="enum_8h.html#a54868b340b95cb4d0d841b76414a756b">PROC_ENUM_DEFN__</a>(__VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a54868b340b95cb4d0d841b76414a756b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54868b340b95cb4d0d841b76414a756b">&#9670;&nbsp;</a></span>PROC_ENUM_DEFN__</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_ENUM_DEFN__</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ignore&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;_Enum_Global_##v##__,</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a93f16adf0acd3e43e6b8d3af9e5a53a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93f16adf0acd3e43e6b8d3af9e5a53a4">&#9670;&nbsp;</a></span>PROC_ENUM_TYPES</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_ENUM_TYPES</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ignore, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="enum_8h.html#a8065853fdbbdb9d10344f92e12f38617">PROC_ENUM_TYPES_</a>(<a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> v)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8065853fdbbdb9d10344f92e12f38617"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8065853fdbbdb9d10344f92e12f38617">&#9670;&nbsp;</a></span>PROC_ENUM_TYPES_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_ENUM_TYPES_</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="enum_8h.html#aaee7d0b67b79cd97a46f77fe9f9ae2d2">PROC_ENUM_TYPES__</a>(__VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaee7d0b67b79cd97a46f77fe9f9ae2d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaee7d0b67b79cd97a46f77fe9f9ae2d2">&#9670;&nbsp;</a></span>PROC_ENUM_TYPES__</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_ENUM_TYPES__</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;static char* _Enum_variant_Global_##variant##__ = #v;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a37e065d9417b415c45330597a340d7cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37e065d9417b415c45330597a340d7cc">&#9670;&nbsp;</a></span>PROC_VARIANT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="enum_8h.html#a74ba51358c2b4bc3addf280f3247e26f">PROC_VARIANT_</a>(__VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a74ba51358c2b4bc3addf280f3247e26f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74ba51358c2b4bc3addf280f3247e26f">&#9670;&nbsp;</a></span>PROC_VARIANT_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANT_</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ref, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="enum_8h.html#aab2b760740159a0d0fa5c3a8e25f2c29">PROC_VARIANT__</a>(name, ref, variant, __VA_ARGS__)) <a class="el" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a> <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a> <a class="el" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="el" href="enum_8h.html#a3e3d65d6c1add6260d5ab1fd80b41819">PROC_DEFAULT</a>(variant)) <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aab2b760740159a0d0fa5c3a8e25f2c29"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aab2b760740159a0d0fa5c3a8e25f2c29">&#9670;&nbsp;</a></span>PROC_VARIANT__</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANT__</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ref, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="enum_8h.html#a707f38c4cfd062f801d980f49a61e9fa">PROC_VARIANT___</a>(name, ref, variant, value_name, __VA_ARGS__)) <a class="el" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a> <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a> <a class="el" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="el" href="enum_8h.html#a1e0d961f961837fed3b775d5f925818e">PROC_VARIANT____</a>(name, ref, variant, _ignore__, value_name)) <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a707f38c4cfd062f801d980f49a61e9fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a707f38c4cfd062f801d980f49a61e9fa">&#9670;&nbsp;</a></span>PROC_VARIANT___</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANT___</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ref, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">code, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="enum_8h.html#a967e0f1fdc334c803a20052f1197183a">PROC_VARIANT_MUT</a>(name, ref, variant, code, __VA_ARGS__)) \</div>
+<div class="line">    EXPAND <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a> <a class="code" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="code" href="enum_8h.html#a1e0d961f961837fed3b775d5f925818e">PROC_VARIANT____</a>(name, ref, variant, value_name, code)) <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a>)</div>
+<div class="ttc" id="aenum_8h_html_a1e0d961f961837fed3b775d5f925818e"><div class="ttname"><a href="enum_8h.html#a1e0d961f961837fed3b775d5f925818e">PROC_VARIANT____</a></div><div class="ttdeci">#define PROC_VARIANT____(name, ref, variant, value_name,...)</div><div class="ttdef"><b>Definition:</b> enum.h:73</div></div>
+<div class="ttc" id="aenum_8h_html_a967e0f1fdc334c803a20052f1197183a"><div class="ttname"><a href="enum_8h.html#a967e0f1fdc334c803a20052f1197183a">PROC_VARIANT_MUT</a></div><div class="ttdeci">#define PROC_VARIANT_MUT(name, ref, variant, value_name,...)</div><div class="ttdef"><b>Definition:</b> enum.h:65</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a1c38cb40632dca8c8385d3cecea4b787"><div class="ttname"><a href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a></div><div class="ttdeci">#define PAREN</div><div class="ttdef"><b>Definition:</b> macro_utils.h:22</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a555e810f9d9a0f66c86e0ea873beda21"><div class="ttname"><a href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a></div><div class="ttdeci">#define PAREN_END</div><div class="ttdef"><b>Definition:</b> macro_utils.h:23</div></div>
+<div class="ttc" id="amacro__utils_8h_html_ae2a0fdb2b3c3ae31c3fef23f8286af29"><div class="ttname"><a href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a></div><div class="ttdeci">#define NONE(...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:25</div></div>
+<div class="ttc" id="atype_8h_html_a28e76886e9ffe1b9d71ae38254b2be20"><div class="ttname"><a href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a></div><div class="ttdeci">#define __VA_OPT__(((const IMPL)</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a1e0d961f961837fed3b775d5f925818e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e0d961f961837fed3b775d5f925818e">&#9670;&nbsp;</a></span>PROC_VARIANT____</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANT____</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ref, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> _Enum_##name##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##variant##__:                    \</div>
+<div class="line">    {                                                     \</div>
+<div class="line">        const <a class="code" href="structObj.html">Obj</a> value_name = ref;                   \</div>
+<div class="line">        _ret__ = (__VA_ARGS__);                       \</div>
+<div class="line">    }                                                     \</div>
+<div class="line">    break;</div>
+<div class="ttc" id="aenum_8h_html_a6bae5ab157437fc2f69924192746a577"><div class="ttname"><a href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a></div><div class="ttdeci">#define _(name, variant, v)</div><div class="ttdef"><b>Definition:</b> enum.h:202</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a967e0f1fdc334c803a20052f1197183a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a967e0f1fdc334c803a20052f1197183a">&#9670;&nbsp;</a></span>PROC_VARIANT_MUT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANT_MUT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ref, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> _Enum_##name##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##variant##__:                    \</div>
+<div class="line">    {                                                     \</div>
+<div class="line">        Obj value_name = ref;                         \</div>
+<div class="line">        _ret__ = (__VA_ARGS__);                       \</div>
+<div class="line">    }                                                     \</div>
+<div class="line">    break;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a184cf6ef9d44ef7134caff964aaa89b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a184cf6ef9d44ef7134caff964aaa89b9">&#9670;&nbsp;</a></span>PROC_VARIANTN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANTN</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="enum_8h.html#aac741dd5bbbce1a1d3dd6fb179106e45">PROC_VARIANTN_</a>(__VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aac741dd5bbbce1a1d3dd6fb179106e45"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac741dd5bbbce1a1d3dd6fb179106e45">&#9670;&nbsp;</a></span>PROC_VARIANTN_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANTN_</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ref, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="enum_8h.html#aed07cfa144d9501308145ef7eb1a72b1">PROC_VARIANTN__</a>(name, ref, variant, __VA_ARGS__)) <a class="el" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a> <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a> <a class="el" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="el" href="enum_8h.html#a3480af059648ef46713a9906a37647aa">PROC_DEFAULTN</a>(variant)) <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aed07cfa144d9501308145ef7eb1a72b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed07cfa144d9501308145ef7eb1a72b1">&#9670;&nbsp;</a></span>PROC_VARIANTN__</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANTN__</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ref, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="enum_8h.html#a3c67ca75811995be35c55ab8f5ccd94a">PROC_VARIANTN___</a>(name, ref, variant, value_name, __VA_ARGS__)) <a class="el" href="macro__utils_8h.html#ae4b532a93c757194ec73b6790a3e6b1f">EXPAND</a> <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a> <a class="el" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="el" href="enum_8h.html#a77cb0100dcb3344082f74be0f216d5e8">PROC_VARIANTN____</a>(name, ref, variant, _ignore__, value_name)) <a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3c67ca75811995be35c55ab8f5ccd94a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c67ca75811995be35c55ab8f5ccd94a">&#9670;&nbsp;</a></span>PROC_VARIANTN___</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANTN___</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ref, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">code, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="enum_8h.html#abdb9601d5ed2d8c9aa6741f731e59ae8">PROC_VARIANTN_MUT</a>(name, ref, variant, code, __VA_ARGS__)) \</div>
+<div class="line">    EXPAND <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787">PAREN</a> <a class="code" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="code" href="enum_8h.html#a77cb0100dcb3344082f74be0f216d5e8">PROC_VARIANTN____</a>(name, ref, variant, value_name, code)) <a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21">PAREN_END</a>)</div>
+<div class="ttc" id="aenum_8h_html_a77cb0100dcb3344082f74be0f216d5e8"><div class="ttname"><a href="enum_8h.html#a77cb0100dcb3344082f74be0f216d5e8">PROC_VARIANTN____</a></div><div class="ttdeci">#define PROC_VARIANTN____(name, ref, variant, value_name, code)</div><div class="ttdef"><b>Definition:</b> enum.h:118</div></div>
+<div class="ttc" id="aenum_8h_html_abdb9601d5ed2d8c9aa6741f731e59ae8"><div class="ttname"><a href="enum_8h.html#abdb9601d5ed2d8c9aa6741f731e59ae8">PROC_VARIANTN_MUT</a></div><div class="ttdeci">#define PROC_VARIANTN_MUT(name, ref, variant, value_name, code)</div><div class="ttdef"><b>Definition:</b> enum.h:110</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a77cb0100dcb3344082f74be0f216d5e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77cb0100dcb3344082f74be0f216d5e8">&#9670;&nbsp;</a></span>PROC_VARIANTN____</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANTN____</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ref, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">code&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> _Enum_##name##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##variant##__:                      \</div>
+<div class="line">    {                                                       \</div>
+<div class="line">        const <a class="code" href="structObj.html">Obj</a> value_name = ref;                     \</div>
+<div class="line">        (code);                                         \</div>
+<div class="line">    }                                                       \</div>
+<div class="line">    break;</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="abdb9601d5ed2d8c9aa6741f731e59ae8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abdb9601d5ed2d8c9aa6741f731e59ae8">&#9670;&nbsp;</a></span>PROC_VARIANTN_MUT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PROC_VARIANTN_MUT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">ref, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">variant, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value_name, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">code&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">case</span> _Enum_##name##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##variant##__:                      \</div>
+<div class="line">    {                                                       \</div>
+<div class="line">        Obj value_name = ref;                           \</div>
+<div class="line">        (code);                                         \</div>
+<div class="line">    }                                                       \</div>
+<div class="line">    break;</div>
+</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

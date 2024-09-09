@@ -2718,7 +2718,7 @@
         -:    0:Source:chain_allocator.c
         -:    0:Graph:chain_allocator.gcno
         -:    0:Data:chain_allocator.gcda
-        -:    0:Runs:36
+        -:    0:Runs:39
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2817,9 +2817,9 @@
         2:   96:}
         -:   97:
         -:   98:// build the using the default heap allocator config
-       26:   99:int build_default_heap_allocator(HeapAllocator* ptr)
+       29:   99:int build_default_heap_allocator(HeapAllocator* ptr)
         -:  100:{
-       26:  101:	return heap_allocator_build_arr(ptr, &__default_hconfig_,
+       29:  101:	return heap_allocator_build_arr(ptr, &__default_hconfig_,
         -:  102:					__default_hdpc_arr_,
         -:  103:					__default_hdpc_arr_size);
         -:  104:}
@@ -2906,44 +2906,44 @@
        10:  185:	return ret;
         -:  186:}
         -:  187:
-       84:  188:int chain_malloc(FatPtr* ptr, u64 size)
+      234:  188:int chain_malloc(FatPtr* ptr, u64 size)
         -:  189:{
-       84:  190:	if (__thread_local_chain_allocator_index == 0)
+      234:  190:	if (__thread_local_chain_allocator_index == 0)
         -:  191:	{
         -:  192:		// thread local allocator has not been initialized. Create it
         -:  193:		// now.
-       22:  194:		HeapAllocator* ha = malloc(sizeof(HeapAllocator));
-       22:  195:		if (!ha)
+       25:  194:		HeapAllocator* ha = malloc(sizeof(HeapAllocator));
+       25:  195:		if (!ha)
     #####:  196:			return -1;
         -:  197:
-       22:  198:		if (build_default_heap_allocator(ha))
+       25:  198:		if (build_default_heap_allocator(ha))
         -:  199:		{
     #####:  200:			free(ha);
     #####:  201:			return -1;
         -:  202:		};
         -:  203:
-       22:  204:		__default_tl_heap_allocator = ha;
-       22:  205:		__thread_local_chain_allocator[0].ha = ha;
-       22:  206:		__thread_local_chain_allocator[0].is_sync = false;
-       22:  207:		__thread_local_chain_allocator_index++;
+       25:  204:		__default_tl_heap_allocator = ha;
+       25:  205:		__thread_local_chain_allocator[0].ha = ha;
+       25:  206:		__thread_local_chain_allocator[0].is_sync = false;
+       25:  207:		__thread_local_chain_allocator_index++;
         -:  208:	}
-       84:  209:	if (size == 0)
+      234:  209:	if (size == 0)
     #####:  210:		return -1;
         -:  211:
-       84:  212:	u64 index = __thread_local_chain_allocator_index - 1;
-       84:  213:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+      234:  212:	u64 index = __thread_local_chain_allocator_index - 1;
+      234:  213:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  214:
         -:  215:	int ret;
         -:  216:	{
-       84:  217:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-       84:  218:		if (is_sync)
+      234:  217:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+      234:  218:		if (is_sync)
         5:  219:			lg = lock(__thread_local_chain_allocator[index].lock);
         -:  220:
-       84:  221:		ret = heap_allocator_allocate(
+      234:  221:		ret = heap_allocator_allocate(
         -:  222:		    __thread_local_chain_allocator[index].ha, size, ptr);
         -:  223:	}
         -:  224:
-       84:  225:	return ret;
+      234:  225:	return ret;
         -:  226:}
         1:  227:int chain_realloc(FatPtr* dst, FatPtr* src, u64 size)
         -:  228:{
@@ -2979,31 +2979,31 @@
         -:  258:
         1:  259:	return ret;
         -:  260:}
-       84:  261:int chain_free(FatPtr* ptr)
+      198:  261:int chain_free(FatPtr* ptr)
         -:  262:{
-       84:  263:	if (__thread_local_chain_allocator_index == 0)
+      198:  263:	if (__thread_local_chain_allocator_index == 0)
         -:  264:	{
     #####:  265:		errno = ERANGE;
     #####:  266:		return -1;
         -:  267:	}
-       84:  268:	u64 index = __thread_local_chain_allocator_index - 1;
-       84:  269:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+      198:  268:	u64 index = __thread_local_chain_allocator_index - 1;
+      198:  269:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  270:
         -:  271:	int ret;
         -:  272:	{
-       84:  273:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-       84:  274:		if (is_sync)
+      198:  273:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+      198:  274:		if (is_sync)
         4:  275:			lg = lock(__thread_local_chain_allocator[index].lock);
         -:  276:
-       84:  277:		ret = heap_allocator_free(
+      198:  277:		ret = heap_allocator_free(
         -:  278:		    __thread_local_chain_allocator[index].ha, ptr);
         -:  279:	}
-       84:  280:	return ret;
+      198:  280:	return ret;
         -:  281:}
         -:    0:Source:heap.c
         -:    0:Graph:heap.gcno
         -:    0:Data:heap.gcda
-        -:    0:Runs:36
+        -:    0:Runs:39
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3062,12 +3062,12 @@
         -:   56:bool __debug_build_allocator_malloc_fail7 = false;
         -:   57:bool __debug_build_allocator_malloc_fail8 = false;
         -:   58:
-      301:   59:void* do_malloc(size_t size)
+      335:   59:void* do_malloc(size_t size)
         -:   60:{
-      301:   61:	__malloc_count += 1;
-      301:   62:	void* ret = malloc(size);
+      335:   61:	__malloc_count += 1;
+      335:   62:	void* ret = malloc(size);
         -:   63:	// printf("malloc %zu [%p (%llu)]\n", size, ret, __malloc_count);
-      301:   64:	return ret;
+      335:   64:	return ret;
         -:   65:}
         -:   66:
       143:   67:void do_free(void* ptr)
@@ -3077,97 +3077,97 @@
       143:   71:	free(ptr);
       143:   72:}
         -:   73:
-       21:   74:void* do_realloc(void* ptr, size_t size)
+       35:   74:void* do_realloc(void* ptr, size_t size)
         -:   75:{
-       21:   76:	void* ret = realloc(ptr, size);
+       35:   76:	void* ret = realloc(ptr, size);
         -:   77:	// printf("realloc %zu [old=%p,new=%p]\n", size, ptr, ret);
-       21:   78:	return ret;
+       35:   78:	return ret;
         -:   79:}
         -:   80:
-       76:   81:void* fat_ptr_data(const FatPtr* ptr) { return ptr->data; }
+      162:   81:void* fat_ptr_data(const FatPtr* ptr) { return ptr->data; }
         -:   82:
        13:   83:u64 fat_ptr_len(const FatPtr* ptr) { return ptr->len; }
         -:   84:
         5:   85:u64 fat_ptr_id(const FatPtr* ptr) { return ptr->id; }
         -:   86:
-       72:   87:int heap_allocator_init_free_list(HeapData* hd, u64 index, u32 slabs,
+       86:   87:int heap_allocator_init_free_list(HeapData* hd, u64 index, u32 slabs,
         -:   88:				  bool last_is_uint_max)
         -:   89:{
-       72:   90:	hd->data[index] = NULL; // set to NULL for cleanup consistency
+       86:   90:	hd->data[index] = NULL; // set to NULL for cleanup consistency
         -:   91:
         -:   92:	// allocate memory for slabs
-       72:   93:	if (!__debug_build_allocator_malloc_fail4)
-       70:   94:		hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
-       72:   95:	if (hd->data[index] == NULL)
+       86:   93:	if (!__debug_build_allocator_malloc_fail4)
+       84:   94:		hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
+       86:   95:	if (hd->data[index] == NULL)
         2:   96:		return -1;
         -:   97:
-       70:   98:	void* tmp = NULL;
+       84:   98:	void* tmp = NULL;
         -:   99:
         -:  100:	// allocate / or reallocate the freelist
-       70:  101:	if (!__debug_build_allocator_malloc_fail5)
+       84:  101:	if (!__debug_build_allocator_malloc_fail5)
         -:  102:	{
-       68:  103:		if (index == 0)
-       58:  104:			tmp = do_malloc(sizeof(u32) * slabs);
+       82:  103:		if (index == 0)
+       65:  104:			tmp = do_malloc(sizeof(u32) * slabs);
         -:  105:		else
         -:  106:		{
-       10:  107:			tmp = do_realloc(hd->free_list,
-       10:  108:					 sizeof(u32) * (hd->cur_slabs + slabs));
+       17:  107:			tmp = do_realloc(hd->free_list,
+       17:  108:					 sizeof(u32) * (hd->cur_slabs + slabs));
         -:  109:		}
         -:  110:	}
         -:  111:
-       70:  112:	if (!tmp)
+       84:  112:	if (!tmp)
         -:  113:	{
         2:  114:		do_free(hd->data[index]);
         2:  115:		return -1;
         -:  116:	}
         -:  117:
-       68:  118:	hd->free_list = tmp;
+       82:  118:	hd->free_list = tmp;
         -:  119:
         -:  120:	// initialize the values of the free list.
-       68:  121:	u32 offset = index * hd->hdp.config.slabs_per_resize;
-      876:  122:	for (u64 i = 0; i < slabs; i++)
+       82:  121:	u32 offset = index * hd->hdp.config.slabs_per_resize;
+     1030:  122:	for (u64 i = 0; i < slabs; i++)
         -:  123:	{
-      808:  124:		if ((i == (slabs - 1)) && last_is_uint_max)
-       67:  125:			hd->free_list[i + offset] = UINT32_MAX;
+      948:  124:		if ((i == (slabs - 1)) && last_is_uint_max)
+       81:  125:			hd->free_list[i + offset] = UINT32_MAX;
         -:  126:		else
-      741:  127:			hd->free_list[i + offset] = offset + i + 1;
+      867:  127:			hd->free_list[i + offset] = offset + i + 1;
         -:  128:	}
         -:  129:
-       68:  130:	return 0;
+       82:  130:	return 0;
         -:  131:}
         -:  132:
         -:  133:// compare function used for sorting.
-     2415:  134:int heap_data_compare(const void* p1, const void* p2)
+     2715:  134:int heap_data_compare(const void* p1, const void* p2)
         -:  135:{
-     2415:  136:	int ret = 0;
+     2715:  136:	int ret = 0;
         -:  137:
-     2415:  138:	HeapData d1 = *(HeapData*)p1;
-     2415:  139:	HeapData d2 = *(HeapData*)p2;
+     2715:  138:	HeapData d1 = *(HeapData*)p1;
+     2715:  139:	HeapData d2 = *(HeapData*)p2;
         -:  140:
-     2415:  141:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
+     2715:  141:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
         1:  142:		ret = 1;
-     2414:  143:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
-     2413:  144:		ret = -1;
+     2714:  143:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
+     2713:  144:		ret = -1;
         -:  145:
-     2415:  146:	return ret;
+     2715:  146:	return ret;
         -:  147:}
         -:  148:
         -:  149:// initialize the heap data params
-      995:  150:int heap_allocator_init_hdp(HeapAllocator* ptr, HeapDataParamsConfig* hdp,
+     1115:  150:int heap_allocator_init_hdp(HeapAllocator* ptr, HeapDataParamsConfig* hdp,
         -:  151:			    u64 index)
         -:  152:{
         -:  153:
         -:  154:	// set some value in case of a failure below such that cleanup can
         -:  155:	// succeed
-      995:  156:	int ret = 0;
-      995:  157:	ptr->impl->hd_arr[index].hdp.config = *hdp;
-      995:  158:	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
-      995:  159:	ptr->impl->hd_arr[index].cur_slabs = 0;
-      995:  160:	ptr->impl->hd_arr[index].count =
-      995:  161:	    ptr->impl->hd_arr[index].hdp.config.initial_chunks;
+     1115:  156:	int ret = 0;
+     1115:  157:	ptr->impl->hd_arr[index].hdp.config = *hdp;
+     1115:  158:	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
+     1115:  159:	ptr->impl->hd_arr[index].cur_slabs = 0;
+     1115:  160:	ptr->impl->hd_arr[index].count =
+     1115:  161:	    ptr->impl->hd_arr[index].hdp.config.initial_chunks;
         -:  162:
         -:  163:	// if we have initial chunks, initialize them
-      995:  164:	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks)
+     1115:  164:	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks)
         -:  165:	{
        23:  166:		ptr->impl->hd_arr[index].data = NULL;
         -:  167:
@@ -3203,51 +3203,51 @@
         -:  197:		}
         -:  198:	}
         -:  199:	else
-      972:  200:		ptr->impl->hd_arr[index].data = NULL;
-      994:  201:	return ret;
+     1092:  200:		ptr->impl->hd_arr[index].data = NULL;
+     1114:  201:	return ret;
         -:  202:}
         -:  203:
-       52:  204:int heap_allocator_build_arr(HeapAllocator* ptr, HeapAllocatorConfig* config,
+       55:  204:int heap_allocator_build_arr(HeapAllocator* ptr, HeapAllocatorConfig* config,
         -:  205:			     HeapDataParamsConfig arr[],
         -:  206:			     u64 heap_data_params_count)
         -:  207:{
         -:  208:	// check inputs
-       52:  209:	if (ptr == NULL || config == NULL || heap_data_params_count >= 256)
+       55:  209:	if (ptr == NULL || config == NULL || heap_data_params_count >= 256)
         -:  210:	{
         1:  211:		errno = EINVAL;
         1:  212:		return -1;
         -:  213:	}
         -:  214:
         -:  215:	// allocate the HeapAllocatorImpl
-       51:  216:	if (!__debug_build_allocator_malloc_fail1)
-       50:  217:		ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
-       51:  218:	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
+       54:  216:	if (!__debug_build_allocator_malloc_fail1)
+       53:  217:		ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
+       54:  218:	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
         1:  219:		return -1;
         -:  220:
-       50:  221:	ptr->impl->hd_size = 0;
+       53:  221:	ptr->impl->hd_size = 0;
         -:  222:
         -:  223:	// copy the config
-       50:  224:	ptr->impl->config = *config;
+       53:  224:	ptr->impl->config = *config;
         -:  225:
         -:  226:	// allocate heap data array
-       50:  227:	ptr->impl->hd_arr = NULL;
-       50:  228:	if (!__debug_build_allocator_malloc_fail2)
-       49:  229:		ptr->impl->hd_arr =
-       49:  230:		    do_malloc(sizeof(HeapData) * heap_data_params_count);
-       50:  231:	if (ptr->impl->hd_arr == NULL || __debug_build_allocator_malloc_fail2)
+       53:  227:	ptr->impl->hd_arr = NULL;
+       53:  228:	if (!__debug_build_allocator_malloc_fail2)
+       52:  229:		ptr->impl->hd_arr =
+       52:  230:		    do_malloc(sizeof(HeapData) * heap_data_params_count);
+       53:  231:	if (ptr->impl->hd_arr == NULL || __debug_build_allocator_malloc_fail2)
         -:  232:	{
         1:  233:		heap_allocator_cleanup(ptr);
         1:  234:		return -1;
         -:  235:	}
-       49:  236:	ptr->impl->hd_size = heap_data_params_count;
+       52:  236:	ptr->impl->hd_size = heap_data_params_count;
         -:  237:
         -:  238:	// iterate through specified heap data params
-     1041:  239:	for (u64 i = 0; i < heap_data_params_count; i++)
+     1164:  239:	for (u64 i = 0; i < heap_data_params_count; i++)
         -:  240:	{
-      996:  241:		HeapDataParamsConfig hdp = arr[i];
-      996:  242:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
-      996:  243:		ptr->impl->hd_arr[i].data = NULL;
-      996:  244:		if ((__debug_build_allocator_malloc_fail3 && i > 0) || heap_allocator_init_hdp(ptr, &hdp, i))
+     1116:  241:		HeapDataParamsConfig hdp = arr[i];
+     1116:  242:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
+     1116:  243:		ptr->impl->hd_arr[i].data = NULL;
+     1116:  244:		if ((__debug_build_allocator_malloc_fail3 && i > 0) || heap_allocator_init_hdp(ptr, &hdp, i))
         -:  245:		{
         4:  246:			ptr->impl->hd_size = i; // update for cleanup, others
         -:  247:						// did not get allocated
@@ -3260,17 +3260,17 @@
         -:  254:		}
         -:  255:	}
         -:  256:
-       45:  257:	if (heap_data_params_count)
+       48:  257:	if (heap_data_params_count)
         -:  258:	{
-       43:  259:		qsort(ptr->impl->hd_arr, heap_data_params_count,
+       46:  259:		qsort(ptr->impl->hd_arr, heap_data_params_count,
         -:  260:		      sizeof(HeapData), heap_data_compare);
         -:  261:	}
         -:  262:
         -:  263:	// check invalid configurations
-       45:  264:	u64 last_size = 0;
-     1034:  265:	for (u64 i = 0; i < heap_data_params_count; i++)
+       48:  264:	u64 last_size = 0;
+     1157:  265:	for (u64 i = 0; i < heap_data_params_count; i++)
         -:  266:	{
-      991:  267:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == 0)
+     1111:  267:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == 0)
         -:  268:		{
         -:  269:			// no 0 sized slabs allowed
         1:  270:			errno = EINVAL;
@@ -3278,17 +3278,17 @@
         1:  272:			return -1;
         -:  273:		}
         -:  274:		// note: logic correct because array is sorted.
-      990:  275:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == last_size)
+     1110:  275:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == last_size)
         -:  276:		{
         -:  277:			// Duplicate slab_size
         1:  278:			errno = EEXIST;
         1:  279:			heap_allocator_cleanup(ptr);
         1:  280:			return -1;
         -:  281:		}
-      989:  282:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
+     1109:  282:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
         -:  283:	}
         -:  284:
-       43:  285:	return 0;
+       46:  285:	return 0;
         -:  286:}
         -:  287:
        26:  288:int heap_allocator_build(HeapAllocator* ptr, HeapAllocatorConfig* config,
@@ -3318,138 +3318,138 @@
         -:  312:}
         -:  313:
         -:  314:// binary search for the correct slab size
-      475:  315:int heap_allocator_index(HeapAllocator* ptr, u64 size)
+      625:  315:int heap_allocator_index(HeapAllocator* ptr, u64 size)
         -:  316:{
-      475:  317:	int ret = -1;
-      475:  318:	if (ptr->impl->hd_size == 0)
+      625:  317:	int ret = -1;
+      625:  318:	if (ptr->impl->hd_size == 0)
         2:  319:		return ret;
         -:  320:
-      473:  321:	int left = 0;
-      473:  322:	int right = ptr->impl->hd_size - 1;
+      623:  321:	int left = 0;
+      623:  322:	int right = ptr->impl->hd_size - 1;
         -:  323:
-      917:  324:	while (left <= right)
+     1800:  324:	while (left <= right)
         -:  325:	{
-      841:  326:		int mid = left + (right - left) / 2;
-      841:  327:		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
-      841:  328:		if (slab_size == size)
+     1663:  326:		int mid = left + (right - left) / 2;
+     1663:  327:		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
+     1663:  328:		if (slab_size == size)
         -:  329:		{
-      397:  330:			ret = mid;
-      397:  331:			break;
+      486:  330:			ret = mid;
+      486:  331:			break;
         -:  332:		}
-      444:  333:		else if (slab_size > size)
-      338:  334:			right = mid - 1;
+     1177:  333:		else if (slab_size > size)
+      920:  334:			right = mid - 1;
         -:  335:		else
-      106:  336:			left = mid + 1;
+      257:  336:			left = mid + 1;
         -:  337:	}
         -:  338:
-      473:  339:	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1)
+      623:  339:	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1)
         -:  340:	{
-       64:  341:		return right + 1;
+      125:  341:		return right + 1;
         -:  342:	}
         -:  343:
-      409:  344:	return ret;
+      498:  344:	return ret;
         -:  345:}
         -:  346:
-       57:  347:int heap_data_resize(u64 index, HeapData* hd)
+       71:  347:int heap_data_resize(u64 index, HeapData* hd)
         -:  348:{
         -:  349:	// check that we can resize this hdp
-       57:  350:	if (hd->cur_slabs < hd->hdp.config.max_slabs)
+       71:  350:	if (hd->cur_slabs < hd->hdp.config.max_slabs)
         -:  351:	{
         -:  352:		// calculate the new slabs
-       50:  353:		u32 nslabs_count =
-       50:  354:		    hd->hdp.config.slabs_per_resize + hd->cur_slabs;
-       50:  355:		if (nslabs_count > hd->hdp.config.max_slabs)
+       64:  353:		u32 nslabs_count =
+       64:  354:		    hd->hdp.config.slabs_per_resize + hd->cur_slabs;
+       64:  355:		if (nslabs_count > hd->hdp.config.max_slabs)
         2:  356:			nslabs_count = hd->hdp.config.max_slabs;
         -:  357:
         -:  358:		// determine slabs to allocate
-       50:  359:		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
+       64:  359:		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
         -:  360:
         -:  361:		// attempt to allocate
-       50:  362:		void* tmp = NULL;
-       50:  363:		if (!__debug_build_allocator_malloc_fail7)
+       64:  362:		void* tmp = NULL;
+       64:  363:		if (!__debug_build_allocator_malloc_fail7)
         -:  364:		{
-       49:  365:			if (hd->data)
-       11:  366:				tmp = do_realloc(hd->data, (hd->count + 1) * sizeof(void*));
+       63:  365:			if (hd->data)
+       18:  366:				tmp = do_realloc(hd->data, (hd->count + 1) * sizeof(void*));
         -:  367:			else
-       38:  368:				tmp = do_malloc((hd->count + 1) * sizeof(void**));
+       45:  368:				tmp = do_malloc((hd->count + 1) * sizeof(void**));
         -:  369:		}
         -:  370:
-       50:  371:		if (tmp == NULL)
+       64:  371:		if (tmp == NULL)
         1:  372:			return -1;
-       49:  373:		hd->data = tmp;
+       63:  373:		hd->data = tmp;
         -:  374:
         -:  375:		// initialize the new part of the free list
-       49:  376:		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc,
+       63:  376:		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc,
         -:  377:						  true))
         2:  378:			return -1;
-       47:  379:		hd->hdp.free_list_head = hd->cur_slabs;
-       47:  380:		hd->cur_slabs = nslabs_count;
-       47:  381:		hd->count += 1;
-       47:  382:		return 0;
+       61:  379:		hd->hdp.free_list_head = hd->cur_slabs;
+       61:  380:		hd->cur_slabs = nslabs_count;
+       61:  381:		hd->count += 1;
+       61:  382:		return 0;
         -:  383:	}
         7:  384:	return -1;
         -:  385:}
         -:  386:
-      470:  387:int heap_data_allocate(u64 index, HeapData* hd, FatPtr* fptr)
+      627:  387:int heap_data_allocate(u64 index, HeapData* hd, FatPtr* fptr)
         -:  388:{
-      470:  389:	if (hd->cur_slabs == 0)
+      627:  389:	if (hd->cur_slabs == 0)
         -:  390:	{
         -:  391:		// this hd initially had 0 slabs
         -:  392:		// resize it
-       39:  393:		if (heap_data_resize(index, hd))
+       46:  393:		if (heap_data_resize(index, hd))
         1:  394:			return -1;
         -:  395:	}
         -:  396:
         -:  397:	// no more slabs, return error
-      469:  398:	if (hd->hdp.free_list_head == UINT32_MAX)
-       17:  399:		return -1;
+      626:  398:	if (hd->hdp.free_list_head == UINT32_MAX)
+       24:  399:		return -1;
         -:  400:
         -:  401:	// get next free slab
-      452:  402:	u64 id = hd->hdp.free_list_head;
+      602:  402:	u64 id = hd->hdp.free_list_head;
         -:  403:
         -:  404:	// update free list head
-      452:  405:	hd->hdp.free_list_head = hd->free_list[id];
+      602:  405:	hd->hdp.free_list_head = hd->free_list[id];
         -:  406:
         -:  407:	// update with the specific index (differing slab sizes)
-      452:  408:	fptr->id = id | (index << 56);
-      452:  409:	fptr->len = hd->hdp.config.slab_size;
+      602:  408:	fptr->id = id | (index << 56);
+      602:  409:	fptr->len = hd->hdp.config.slab_size;
         -:  410:
-      452:  411:	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
-      452:  412:	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
+      602:  411:	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
+      602:  412:	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
         -:  413:
         -:  414:	// set the data of the fptr
-      452:  415:	fptr->data =
-      452:  416:	    hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
+      602:  415:	fptr->data =
+      602:  416:	    hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
         -:  417:
-      452:  418:	return 0;
+      602:  418:	return 0;
         -:  419:}
         -:  420:
         -:  421:// free data in this HeapData
-      201:  422:int heap_data_free(u64 index, HeapData* hd, FatPtr* fptr)
+      315:  422:int heap_data_free(u64 index, HeapData* hd, FatPtr* fptr)
         -:  423:{
-      201:  424:	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
+      315:  424:	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
         -:  425:
         -:  426:	// if this is invalid return an error
-      201:  427:	if (rel >= hd->cur_slabs)
+      315:  427:	if (rel >= hd->cur_slabs)
         1:  428:		return -1;
         -:  429:
         -:  430:	// update head and rest of the list
-      200:  431:	u64 head = hd->hdp.free_list_head;
-      200:  432:	hd->hdp.free_list_head = rel;
-      200:  433:	hd->free_list[rel] = head;
+      314:  431:	u64 head = hd->hdp.free_list_head;
+      314:  432:	hd->hdp.free_list_head = rel;
+      314:  433:	hd->free_list[rel] = head;
         -:  434:
-      200:  435:	return 0;
+      314:  435:	return 0;
         -:  436:}
         -:  437:
         -:  438:// main allocation function
-      475:  439:int heap_allocator_allocate(HeapAllocator* ptr, u64 size, FatPtr* fptr)
+      625:  439:int heap_allocator_allocate(HeapAllocator* ptr, u64 size, FatPtr* fptr)
         -:  440:{
-      475:  441:	int ret = -1;
+      625:  441:	int ret = -1;
         -:  442:	// determine the index via binary search
-      475:  443:	int index = heap_allocator_index(ptr, size);
+      625:  443:	int index = heap_allocator_index(ptr, size);
         -:  444:
         -:  445:	// if this index is not found (too big) fall back to malloc
-      475:  446:	if (index < 0)
+      625:  446:	if (index < 0)
         -:  447:	{
        14:  448:		if (!ptr->impl->config.no_malloc)
         -:  449:		{
@@ -3471,16 +3471,16 @@
         -:  465:	}
         -:  466:	else
         -:  467:	{
-      461:  468:		HeapData* hd = &ptr->impl->hd_arr[index];
-      461:  469:		ret = heap_data_allocate(index, hd, fptr);
-      461:  470:		if (ret)
+      611:  468:		HeapData* hd = &ptr->impl->hd_arr[index];
+      611:  469:		ret = heap_data_allocate(index, hd, fptr);
+      611:  470:		if (ret)
         -:  471:		{
         -:  472:			// there are no more slabs. Try to resize
-       18:  473:			if (!heap_data_resize(index, hd))
+       25:  473:			if (!heap_data_resize(index, hd))
         -:  474:			{
         -:  475:				// successful resize, allocate should always
         -:  476:				// succeed here
-        9:  477:				ret = heap_data_allocate(index, hd, fptr);
+       16:  477:				ret = heap_data_allocate(index, hd, fptr);
         -:  478:			}
         9:  479:			else if (!ptr->impl->config.no_malloc)
         -:  480:			{
@@ -3505,18 +3505,18 @@
         -:  499:	}
         -:  500:
         -:  501:	// if zeroed is configured set all memory of allocated slabs to 0.
-      475:  502:	if (!ret && ptr->impl->config.zeroed)
+      625:  502:	if (!ret && ptr->impl->config.zeroed)
         -:  503:	{
        44:  504:		memset(fptr->data, 0, fptr->len);
         -:  505:	}
         -:  506:
-      475:  507:	return ret;
+      625:  507:	return ret;
         -:  508:}
         -:  509:
-      216:  510:int heap_allocator_free(HeapAllocator* ptr, FatPtr* fptr)
+      330:  510:int heap_allocator_free(HeapAllocator* ptr, FatPtr* fptr)
         -:  511:{
-      216:  512:	int ret = 0;
-      216:  513:	if (fptr->id == UINT64_MAX)
+      330:  512:	int ret = 0;
+      330:  513:	if (fptr->id == UINT64_MAX)
         -:  514:	{
         -:  515:		// malloc allocated
         -:  516:
@@ -3531,26 +3531,26 @@
         -:  525:	else
         -:  526:	{
         -:  527:
-      202:  528:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
+      316:  528:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
         -:  529:
-      202:  530:		if (index >= ptr->impl->hd_size)
+      316:  530:		if (index >= ptr->impl->hd_size)
         -:  531:		{
         1:  532:			errno = EINVAL;
         1:  533:			ret = -1; // invalid index
         -:  534:		}
         -:  535:		else
         -:  536:		{
-      201:  537:			HeapData* hd = &ptr->impl->hd_arr[index];
-      201:  538:			ret = heap_data_free(index, hd, fptr);
+      315:  537:			HeapData* hd = &ptr->impl->hd_arr[index];
+      315:  538:			ret = heap_data_free(index, hd, fptr);
         -:  539:		}
         -:  540:	}
         -:  541:
-      216:  542:	if (!ret && ptr->impl->config.zeroed)
+      330:  542:	if (!ret && ptr->impl->config.zeroed)
         -:  543:	{
         1:  544:		memset(fptr->data, 0, fptr->len);
         -:  545:	}
         -:  546:
-      216:  547:	return ret;
+      330:  547:	return ret;
         -:  548:}
         -:  549:
        29:  550:int heap_allocator_cleanup(HeapAllocator* ptr)
@@ -3594,7 +3594,7 @@
         -:    0:Source:lock.c
         -:    0:Graph:lock.gcno
         -:    0:Data:lock.gcda
-        -:    0:Runs:36
+        -:    0:Runs:39
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3692,15 +3692,15 @@
        15:   95:	return ret;
         -:   96:}
         -:   97:
-      174:   98:void Lockguard_cleanup(LockGuardPtr* ptr)
+      438:   98:void Lockguard_cleanup(LockGuardPtr* ptr)
         -:   99:{
-      174:  100:	if (ptr && ptr->ref)
+      438:  100:	if (ptr && ptr->ref)
         -:  101:	{
        14:  102:		atomic_exchange(&ptr->ref->is_locked, false);
        14:  103:		pthread_mutex_unlock(&ptr->ref->lock);
        14:  104:		delete_active_lock(ptr->ref);
         -:  105:	}
-      174:  106:}
+      438:  106:}
         -:  107:
         3:  108:void Lock_mark_poisoned()
         -:  109:{
@@ -3756,7 +3756,7 @@
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
-        -:    0:Runs:36
+        -:    0:Runs:39
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3809,7 +3809,7 @@
         -:    0:Source:prim.c
         -:    0:Graph:prim.gcno
         -:    0:Data:prim.gcda
-        -:    0:Runs:36
+        -:    0:Runs:39
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3826,321 +3826,489 @@
         -:   14:
         -:   15:#include <core/prim.h>
         -:   16:
-        -:   17:#define DEFINE_PRIM(lower, upper, bits)                             \
-        -:   18:	Type(upper##bits, Field(lower##bits, value));               \
-        -:   19:	void upper##bits##_build(const upper##bits##Config* config) \
-        -:   20:	{                                                           \
-        -:   21:		$Var(value) = config->value;                        \
-        -:   22:	}                                                           \
-        -:   23:	void upper##bits##_value_of(void* buf)                      \
-        -:   24:	{                                                           \
-        -:   25:		*(lower##bits*)buf = $(value);                      \
-        -:   26:	}
-        -:   27:
-        -:   28:#define IMPL U8
-       42:   29:DEFINE_PRIM(u, U, 8);
+        -:   17:#define DEFINE_PRIM(lower, upper, bits)                               \
+        -:   18:	Type(upper##bits, Field(lower##bits, value));                 \
+        -:   19:	void upper##bits##_build(const upper##bits##Config* config)   \
+        -:   20:	{                                                             \
+        -:   21:		$Var(value) = config->value;                          \
+        -:   22:	}                                                             \
+        -:   23:	void upper##bits##_value_of(void* buf)                        \
+        -:   24:	{                                                             \
+        -:   25:		*(lower##bits*)buf = $(value);                        \
+        -:   26:	}                                                             \
+        -:   27:	bool upper##bits##_equal(const Obj* rhs)                      \
+        -:   28:	{                                                             \
+        -:   29:		return $(value) == $Context(rhs, upper##bits, value); \
+        -:   30:	}
+        -:   31:
+        -:   32:#define IMPL U8
+      51*:   33:DEFINE_PRIM(u, U, 8);
+------------------
+U8_equal:
+    #####:   33:DEFINE_PRIM(u, U, 8);
 ------------------
 U8_value_of:
-        1:   29:DEFINE_PRIM(u, U, 8);
+        2:   33:DEFINE_PRIM(u, U, 8);
 ------------------
 U8_build:
-        1:   29:DEFINE_PRIM(u, U, 8);
+        2:   33:DEFINE_PRIM(u, U, 8);
 ------------------
 __add_impls_U8_vtable:
-       36:   29:DEFINE_PRIM(u, U, 8);
+       39:   33:DEFINE_PRIM(u, U, 8);
 ------------------
 U8_drop_internal:
-        1:   29:DEFINE_PRIM(u, U, 8);
+        2:   33:DEFINE_PRIM(u, U, 8);
 ------------------
 U8_build_internal:
-        1:   29:DEFINE_PRIM(u, U, 8);
+        2:   33:DEFINE_PRIM(u, U, 8);
 ------------------
 U8_size:
-        2:   29:DEFINE_PRIM(u, U, 8);
-------------------
-        -:   30:#undef IMPL
-        -:   31:
-        -:   32:#define IMPL U16
-       42:   33:DEFINE_PRIM(u, U, 16);
-------------------
-U16_value_of:
-        1:   33:DEFINE_PRIM(u, U, 16);
-------------------
-U16_build:
-        1:   33:DEFINE_PRIM(u, U, 16);
-------------------
-__add_impls_U16_vtable:
-       36:   33:DEFINE_PRIM(u, U, 16);
-------------------
-U16_drop_internal:
-        1:   33:DEFINE_PRIM(u, U, 16);
-------------------
-U16_build_internal:
-        1:   33:DEFINE_PRIM(u, U, 16);
-------------------
-U16_size:
-        2:   33:DEFINE_PRIM(u, U, 16);
+        4:   33:DEFINE_PRIM(u, U, 8);
 ------------------
         -:   34:#undef IMPL
         -:   35:
-        -:   36:#define IMPL U32
-       42:   37:DEFINE_PRIM(u, U, 32);
+        -:   36:#define IMPL U16
+      51*:   37:DEFINE_PRIM(u, U, 16);
 ------------------
-U32_value_of:
-        1:   37:DEFINE_PRIM(u, U, 32);
+U16_equal:
+    #####:   37:DEFINE_PRIM(u, U, 16);
 ------------------
-U32_build:
-        1:   37:DEFINE_PRIM(u, U, 32);
+U16_value_of:
+        2:   37:DEFINE_PRIM(u, U, 16);
 ------------------
-__add_impls_U32_vtable:
-       36:   37:DEFINE_PRIM(u, U, 32);
+U16_build:
+        2:   37:DEFINE_PRIM(u, U, 16);
 ------------------
-U32_drop_internal:
-        1:   37:DEFINE_PRIM(u, U, 32);
+__add_impls_U16_vtable:
+       39:   37:DEFINE_PRIM(u, U, 16);
 ------------------
-U32_build_internal:
-        1:   37:DEFINE_PRIM(u, U, 32);
+U16_drop_internal:
+        2:   37:DEFINE_PRIM(u, U, 16);
 ------------------
-U32_size:
-        2:   37:DEFINE_PRIM(u, U, 32);
+U16_build_internal:
+        2:   37:DEFINE_PRIM(u, U, 16);
+------------------
+U16_size:
+        4:   37:DEFINE_PRIM(u, U, 16);
 ------------------
         -:   38:#undef IMPL
         -:   39:
-        -:   40:#define IMPL U64
-       42:   41:DEFINE_PRIM(u, U, 64);
+        -:   40:#define IMPL U32
+      69*:   41:DEFINE_PRIM(u, U, 32);
 ------------------
-U64_value_of:
-        1:   41:DEFINE_PRIM(u, U, 64);
+U32_equal:
+    #####:   41:DEFINE_PRIM(u, U, 32);
 ------------------
-U64_build:
-        1:   41:DEFINE_PRIM(u, U, 64);
+U32_value_of:
+        5:   41:DEFINE_PRIM(u, U, 32);
 ------------------
-__add_impls_U64_vtable:
-       36:   41:DEFINE_PRIM(u, U, 64);
+U32_build:
+        5:   41:DEFINE_PRIM(u, U, 32);
 ------------------
-U64_drop_internal:
-        1:   41:DEFINE_PRIM(u, U, 64);
+__add_impls_U32_vtable:
+       39:   41:DEFINE_PRIM(u, U, 32);
 ------------------
-U64_build_internal:
-        1:   41:DEFINE_PRIM(u, U, 64);
+U32_drop_internal:
+        5:   41:DEFINE_PRIM(u, U, 32);
 ------------------
-U64_size:
-        2:   41:DEFINE_PRIM(u, U, 64);
+U32_build_internal:
+        5:   41:DEFINE_PRIM(u, U, 32);
+------------------
+U32_size:
+       10:   41:DEFINE_PRIM(u, U, 32);
 ------------------
         -:   42:#undef IMPL
         -:   43:
-        -:   44:#define IMPL U128
-       42:   45:DEFINE_PRIM(u, U, 128);
+        -:   44:#define IMPL U64
+       81:   45:DEFINE_PRIM(u, U, 64);
 ------------------
-U128_value_of:
-        1:   45:DEFINE_PRIM(u, U, 128);
+U64_equal:
+        2:   45:DEFINE_PRIM(u, U, 64);
 ------------------
-U128_build:
-        1:   45:DEFINE_PRIM(u, U, 128);
+U64_value_of:
+        4:   45:DEFINE_PRIM(u, U, 64);
 ------------------
-__add_impls_U128_vtable:
-       36:   45:DEFINE_PRIM(u, U, 128);
+U64_build:
+        8:   45:DEFINE_PRIM(u, U, 64);
 ------------------
-U128_drop_internal:
-        1:   45:DEFINE_PRIM(u, U, 128);
+__add_impls_U64_vtable:
+       39:   45:DEFINE_PRIM(u, U, 64);
 ------------------
-U128_build_internal:
-        1:   45:DEFINE_PRIM(u, U, 128);
+U64_drop_internal:
+        4:   45:DEFINE_PRIM(u, U, 64);
 ------------------
-U128_size:
-        2:   45:DEFINE_PRIM(u, U, 128);
+U64_build_internal:
+        8:   45:DEFINE_PRIM(u, U, 64);
+------------------
+U64_size:
+       16:   45:DEFINE_PRIM(u, U, 64);
 ------------------
         -:   46:#undef IMPL
         -:   47:
-        -:   48:#define IMPL I8
-       42:   49:DEFINE_PRIM(i, I, 8);
+        -:   48:#define IMPL U128
+      51*:   49:DEFINE_PRIM(u, U, 128);
 ------------------
-I8_value_of:
-        1:   49:DEFINE_PRIM(i, I, 8);
+U128_equal:
+    #####:   49:DEFINE_PRIM(u, U, 128);
 ------------------
-I8_build:
-        1:   49:DEFINE_PRIM(i, I, 8);
+U128_value_of:
+        2:   49:DEFINE_PRIM(u, U, 128);
 ------------------
-__add_impls_I8_vtable:
-       36:   49:DEFINE_PRIM(i, I, 8);
+U128_build:
+        2:   49:DEFINE_PRIM(u, U, 128);
 ------------------
-I8_drop_internal:
-        1:   49:DEFINE_PRIM(i, I, 8);
+__add_impls_U128_vtable:
+       39:   49:DEFINE_PRIM(u, U, 128);
 ------------------
-I8_build_internal:
-        1:   49:DEFINE_PRIM(i, I, 8);
+U128_drop_internal:
+        2:   49:DEFINE_PRIM(u, U, 128);
 ------------------
-I8_size:
-        2:   49:DEFINE_PRIM(i, I, 8);
+U128_build_internal:
+        2:   49:DEFINE_PRIM(u, U, 128);
+------------------
+U128_size:
+        4:   49:DEFINE_PRIM(u, U, 128);
 ------------------
         -:   50:#undef IMPL
         -:   51:
-        -:   52:#define IMPL I16
-       42:   53:DEFINE_PRIM(i, I, 16);
+        -:   52:#define IMPL I8
+      51*:   53:DEFINE_PRIM(i, I, 8);
 ------------------
-I16_value_of:
-        1:   53:DEFINE_PRIM(i, I, 16);
+I8_equal:
+    #####:   53:DEFINE_PRIM(i, I, 8);
 ------------------
-I16_build:
-        1:   53:DEFINE_PRIM(i, I, 16);
+I8_value_of:
+        2:   53:DEFINE_PRIM(i, I, 8);
 ------------------
-__add_impls_I16_vtable:
-       36:   53:DEFINE_PRIM(i, I, 16);
+I8_build:
+        2:   53:DEFINE_PRIM(i, I, 8);
 ------------------
-I16_drop_internal:
-        1:   53:DEFINE_PRIM(i, I, 16);
+__add_impls_I8_vtable:
+       39:   53:DEFINE_PRIM(i, I, 8);
 ------------------
-I16_build_internal:
-        1:   53:DEFINE_PRIM(i, I, 16);
+I8_drop_internal:
+        2:   53:DEFINE_PRIM(i, I, 8);
 ------------------
-I16_size:
-        2:   53:DEFINE_PRIM(i, I, 16);
+I8_build_internal:
+        2:   53:DEFINE_PRIM(i, I, 8);
+------------------
+I8_size:
+        4:   53:DEFINE_PRIM(i, I, 8);
 ------------------
         -:   54:#undef IMPL
         -:   55:
-        -:   56:#define IMPL I32
-       42:   57:DEFINE_PRIM(i, I, 32);
+        -:   56:#define IMPL I16
+      51*:   57:DEFINE_PRIM(i, I, 16);
 ------------------
-I32_value_of:
-        1:   57:DEFINE_PRIM(i, I, 32);
+I16_equal:
+    #####:   57:DEFINE_PRIM(i, I, 16);
 ------------------
-I32_build:
-        1:   57:DEFINE_PRIM(i, I, 32);
+I16_value_of:
+        2:   57:DEFINE_PRIM(i, I, 16);
 ------------------
-__add_impls_I32_vtable:
-       36:   57:DEFINE_PRIM(i, I, 32);
+I16_build:
+        2:   57:DEFINE_PRIM(i, I, 16);
 ------------------
-I32_drop_internal:
-        1:   57:DEFINE_PRIM(i, I, 32);
+__add_impls_I16_vtable:
+       39:   57:DEFINE_PRIM(i, I, 16);
 ------------------
-I32_build_internal:
-        1:   57:DEFINE_PRIM(i, I, 32);
+I16_drop_internal:
+        2:   57:DEFINE_PRIM(i, I, 16);
 ------------------
-I32_size:
-        2:   57:DEFINE_PRIM(i, I, 32);
+I16_build_internal:
+        2:   57:DEFINE_PRIM(i, I, 16);
+------------------
+I16_size:
+        4:   57:DEFINE_PRIM(i, I, 16);
 ------------------
         -:   58:#undef IMPL
         -:   59:
-        -:   60:#define IMPL I64
-       42:   61:DEFINE_PRIM(i, I, 64);
+        -:   60:#define IMPL I32
+       88:   61:DEFINE_PRIM(i, I, 32);
 ------------------
-I64_value_of:
-        1:   61:DEFINE_PRIM(i, I, 64);
+I32_equal:
+        4:   61:DEFINE_PRIM(i, I, 32);
 ------------------
-I64_build:
-        1:   61:DEFINE_PRIM(i, I, 64);
+I32_value_of:
+        3:   61:DEFINE_PRIM(i, I, 32);
 ------------------
-__add_impls_I64_vtable:
-       36:   61:DEFINE_PRIM(i, I, 64);
+I32_build:
+        9:   61:DEFINE_PRIM(i, I, 32);
 ------------------
-I64_drop_internal:
-        1:   61:DEFINE_PRIM(i, I, 64);
+__add_impls_I32_vtable:
+       39:   61:DEFINE_PRIM(i, I, 32);
 ------------------
-I64_build_internal:
-        1:   61:DEFINE_PRIM(i, I, 64);
+I32_drop_internal:
+        6:   61:DEFINE_PRIM(i, I, 32);
 ------------------
-I64_size:
-        2:   61:DEFINE_PRIM(i, I, 64);
+I32_build_internal:
+        9:   61:DEFINE_PRIM(i, I, 32);
+------------------
+I32_size:
+       18:   61:DEFINE_PRIM(i, I, 32);
 ------------------
         -:   62:#undef IMPL
         -:   63:
-        -:   64:#define IMPL I128
-       42:   65:DEFINE_PRIM(i, I, 128);
+        -:   64:#define IMPL I64
+      51*:   65:DEFINE_PRIM(i, I, 64);
 ------------------
-I128_value_of:
-        1:   65:DEFINE_PRIM(i, I, 128);
+I64_equal:
+    #####:   65:DEFINE_PRIM(i, I, 64);
 ------------------
-I128_build:
-        1:   65:DEFINE_PRIM(i, I, 128);
+I64_value_of:
+        2:   65:DEFINE_PRIM(i, I, 64);
 ------------------
-__add_impls_I128_vtable:
-       36:   65:DEFINE_PRIM(i, I, 128);
+I64_build:
+        2:   65:DEFINE_PRIM(i, I, 64);
 ------------------
-I128_drop_internal:
-        1:   65:DEFINE_PRIM(i, I, 128);
+__add_impls_I64_vtable:
+       39:   65:DEFINE_PRIM(i, I, 64);
 ------------------
-I128_build_internal:
-        1:   65:DEFINE_PRIM(i, I, 128);
+I64_drop_internal:
+        2:   65:DEFINE_PRIM(i, I, 64);
 ------------------
-I128_size:
-        2:   65:DEFINE_PRIM(i, I, 128);
+I64_build_internal:
+        2:   65:DEFINE_PRIM(i, I, 64);
+------------------
+I64_size:
+        4:   65:DEFINE_PRIM(i, I, 64);
 ------------------
         -:   66:#undef IMPL
         -:   67:
-        -:   68:#define IMPL F32
-       42:   69:DEFINE_PRIM(f, F, 32);
+        -:   68:#define IMPL I128
+      51*:   69:DEFINE_PRIM(i, I, 128);
 ------------------
-F32_value_of:
-        1:   69:DEFINE_PRIM(f, F, 32);
+I128_equal:
+    #####:   69:DEFINE_PRIM(i, I, 128);
 ------------------
-F32_build:
-        1:   69:DEFINE_PRIM(f, F, 32);
+I128_value_of:
+        2:   69:DEFINE_PRIM(i, I, 128);
 ------------------
-__add_impls_F32_vtable:
-       36:   69:DEFINE_PRIM(f, F, 32);
+I128_build:
+        2:   69:DEFINE_PRIM(i, I, 128);
 ------------------
-F32_drop_internal:
-        1:   69:DEFINE_PRIM(f, F, 32);
+__add_impls_I128_vtable:
+       39:   69:DEFINE_PRIM(i, I, 128);
 ------------------
-F32_build_internal:
-        1:   69:DEFINE_PRIM(f, F, 32);
+I128_drop_internal:
+        2:   69:DEFINE_PRIM(i, I, 128);
 ------------------
-F32_size:
-        2:   69:DEFINE_PRIM(f, F, 32);
+I128_build_internal:
+        2:   69:DEFINE_PRIM(i, I, 128);
+------------------
+I128_size:
+        4:   69:DEFINE_PRIM(i, I, 128);
 ------------------
         -:   70:#undef IMPL
         -:   71:
-        -:   72:#define IMPL F64
-       42:   73:DEFINE_PRIM(f, F, 64);
+        -:   72:#define IMPL F32
+      51*:   73:DEFINE_PRIM(f, F, 32);
 ------------------
-F64_value_of:
-        1:   73:DEFINE_PRIM(f, F, 64);
+F32_equal:
+    #####:   73:DEFINE_PRIM(f, F, 32);
 ------------------
-F64_build:
-        1:   73:DEFINE_PRIM(f, F, 64);
+F32_value_of:
+        2:   73:DEFINE_PRIM(f, F, 32);
 ------------------
-__add_impls_F64_vtable:
-       36:   73:DEFINE_PRIM(f, F, 64);
+F32_build:
+        2:   73:DEFINE_PRIM(f, F, 32);
 ------------------
-F64_drop_internal:
-        1:   73:DEFINE_PRIM(f, F, 64);
+__add_impls_F32_vtable:
+       39:   73:DEFINE_PRIM(f, F, 32);
 ------------------
-F64_build_internal:
-        1:   73:DEFINE_PRIM(f, F, 64);
+F32_drop_internal:
+        2:   73:DEFINE_PRIM(f, F, 32);
 ------------------
-F64_size:
-        2:   73:DEFINE_PRIM(f, F, 64);
+F32_build_internal:
+        2:   73:DEFINE_PRIM(f, F, 32);
+------------------
+F32_size:
+        4:   73:DEFINE_PRIM(f, F, 32);
 ------------------
         -:   74:#undef IMPL
         -:   75:
-        -:   76:#define IMPL Bool
-       44:   77:Type(Bool, Field(bool, value));
+        -:   76:#define IMPL F64
+      51*:   77:DEFINE_PRIM(f, F, 64);
+------------------
+F64_equal:
+    #####:   77:DEFINE_PRIM(f, F, 64);
+------------------
+F64_value_of:
+        2:   77:DEFINE_PRIM(f, F, 64);
+------------------
+F64_build:
+        2:   77:DEFINE_PRIM(f, F, 64);
+------------------
+__add_impls_F64_vtable:
+       39:   77:DEFINE_PRIM(f, F, 64);
+------------------
+F64_drop_internal:
+        2:   77:DEFINE_PRIM(f, F, 64);
+------------------
+F64_build_internal:
+        2:   77:DEFINE_PRIM(f, F, 64);
+------------------
+F64_size:
+        4:   77:DEFINE_PRIM(f, F, 64);
+------------------
+        -:   78:#undef IMPL
+        -:   79:
+        -:   80:#define IMPL Bool
+       71:   81:Type(Bool, Field(bool, value));
 ------------------
 __add_impls_Bool_vtable:
-       36:   77:Type(Bool, Field(bool, value));
+       39:   81:Type(Bool, Field(bool, value));
 ------------------
 Bool_drop_internal:
-        2:   77:Type(Bool, Field(bool, value));
+        8:   81:Type(Bool, Field(bool, value));
 ------------------
 Bool_build_internal:
-        2:   77:Type(Bool, Field(bool, value));
+        8:   81:Type(Bool, Field(bool, value));
 ------------------
 Bool_size:
-        4:   77:Type(Bool, Field(bool, value));
+       16:   81:Type(Bool, Field(bool, value));
 ------------------
-        2:   78:void Bool_build(const BoolConfig* config)
-        -:   79:{
-        2:   80:	$Var(value) = config->value;
-        2:   81:}
-        2:   82:void Bool_value_of(void* buf)
+        8:   82:void Bool_build(const BoolConfig* config)
         -:   83:{
-        2:   84:	*(bool*)buf = $(value);
-        2:   85:}
-        -:   86:#undef IMPL
+        8:   84:	$Var(value) = config->value;
+        8:   85:}
+        8:   86:void Bool_value_of(void* buf)
+        -:   87:{
+        8:   88:	*(bool*)buf = $(value);
+        8:   89:}
+    #####:   90:bool Bool_equal(const Obj* rhs)
+        -:   91:{
+    #####:   92:	return $(value) == $Context(rhs, Bool, value);
+        -:   93:}
+        -:   94:#undef IMPL
+        -:    0:Source:rc.c
+        -:    0:Graph:rc.gcno
+        -:    0:Data:rc.gcda
+        -:    0:Runs:39
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <core/prim.h>
+        -:   16:#include <core/rc.h>
+        -:   17:
+        -:   18:// Rc has two 'FatPtr's The first is a counter and the second is holds the value. The value
+        -:   19:// can be any object (Obj).
+      151:   20:Type(Rc, Field(FatPtr, counter), Field(FatPtr, value));
+------------------
+__add_impls_Rc_vtable:
+       39:   20:Type(Rc, Field(FatPtr, counter), Field(FatPtr, value));
+------------------
+Rc_drop_internal:
+       16:   20:Type(Rc, Field(FatPtr, counter), Field(FatPtr, value));
+------------------
+Rc_build_internal:
+       32:   20:Type(Rc, Field(FatPtr, counter), Field(FatPtr, value));
+------------------
+Rc_size:
+       64:   20:Type(Rc, Field(FatPtr, counter), Field(FatPtr, value));
+------------------
+        -:   21:
+        -:   22:#define IMPL Rc
+        -:   23:// Build an Rc.
+       32:   24:void Rc_build(const RcConfig* config)
+        -:   25:{
+        -:   26:	// Allocate memory for both the counter and the value. The value is an Obj regardless of
+        -:   27:	// what type. It's data is held in the Object's own FatPtr.
+       32:   28:	chain_malloc(&($Var(value)), sizeof(Obj));
+       32:   29:	if ($(value).data == NULL)
+    #####:   30:		panic("Could not allocate sufficient memory");
+       32:   31:	chain_malloc(&($Var(counter)), sizeof(u64));
+       32:   32:	if ($(counter).data == NULL)
+        -:   33:	{
+    #####:   34:		chain_free(&($Var(value)));
+    #####:   35:		panic("Could not allocate sufficient memory");
+        -:   36:	}
+        -:   37:	// pointer to the internal data location
+       32:   38:	Obj* obj = $Var(value).data;
+        -:   39:	// initialize the object
+       32:   40:	*obj = OBJECT_INIT;
+        -:   41:	// if a value is passed in (which will be the case generally if the user is calling new,
+        -:   42:	// we move the Object into the shared memory location.
+       32:   43:	if (config->value)
+      14*:   44:		Move(obj, config->value);
+        -:   45:	// Initialize the counter to 1.
+       32:   46:	*(u64*)$Var(counter).data = 1;
+       32:   47:}
+        -:   48:// Drop an Rc.
+       32:   49:void Rc_drop()
+        -:   50:{
+        -:   51:	// When an instance of Rc is dropped, we decrement our counter and check if it is 0
+        -:   52:	// indicating that no more references remain.
+       32:   53:	(*(u64*)$Var(counter).data)--;
+       32:   54:	if ((*(u64*)$Var(counter).data) == 0)
+        -:   55:	{
+        -:   56:		// No other references remain.
+       14:   57:		Obj* value = $(value).data;
+        -:   58:		// If the Object is not yet consumed, drop it.
+       14:   59:		if ((value->flags & OBJECT_FLAGS_CONSUMED) == 0)
+       13:   60:			drop(value);
+        -:   61:		// Free the allocated memory for this Rc.
+       14:   62:		if (chain_free(&($Var(counter))))
+    #####:   63:			panic("Unexpected return from a chain_free!");
+       14:   64:		if (chain_free(&($Var(value))))
+    #####:   65:			panic("Unexpeted return from a chain_free!");
+        -:   66:	}
+       32:   67:}
+        -:   68:
+        -:   69:// Unwrap an Rc.
+       16:   70:Obj Rc_unwrap()
+        -:   71:{
+        -:   72:	Obj ret;
+        -:   73:	// If there are additional references, the returned object (acting as a reference to the shared data)
+        -:   74:	// should not be cleaned up. We merely copy the data and marked the returned reference as 'no cleanup'.
+       16:   75:	if (*(u64*)($(counter).data) > 1)
+        -:   76:	{
+       15:   77:		ret = *(Obj*)$(value).data;
+       15:   78:		ret.flags |= OBJECT_FLAGS_NO_CLEANUP;
+        -:   79:	}
+        -:   80:	else
+        -:   81:	{
+        -:   82:		// This is the final reference so we move out the Object
+        1:   83:		ret = OBJECT_INIT;
+       1*:   84:		Move(&ret, (Obj*)$(value).data);
+        -:   85:	}
+        -:   86:	// Drop this instance of the Rc
+       16:   87:	drop($Var());
+        -:   88:	// return the objecct.
+       16:   89:	return ret;
+        -:   90:}
+        -:   91:
+        -:   92:// Clone the Rc.
+       18:   93:Obj Rc_klone()
+        -:   94:{
+        -:   95:	// Update the counter by incrementing
+       18:   96:	u64* counter = $(counter).data;
+       18:   97:	(*counter)++;
+        -:   98:
+        -:   99:	// Create an Rc without a value
+       18:  100:	var ret = new (Rc);
+        -:  101:	// Set both the value and the counter to the appropriate values
+       18:  102:	$ContextVar((&ret), Rc, value).data = ((Obj*)$(value).data);
+       18:  103:	$ContextVar((&ret), Rc, counter).data = counter;
+        -:  104:	// Safely return the Object
+       18:  105:	ReturnObj(ret);
+        -:  106:}
+        -:  107:#undef IMPL
         -:    0:Source:test_encapsulation.c
         -:    0:Graph:test_encapsulation.gcno
         -:    0:Data:test_encapsulation.gcda
-        -:    0:Runs:35
+        -:    0:Runs:38
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4159,50 +4327,50 @@ Bool_size:
         -:   16:#include <core/traits.h>
         -:   17:#include <core/type.h>
         -:   18:
-       39:   19:Type(HiddenDrop);
+       45:   19:Type(HiddenDrop);
 ------------------
 __add_impls_HiddenDrop_vtable:
-       35:   19:Type(HiddenDrop);
+       38:   19:Type(HiddenDrop);
 ------------------
 HiddenDrop_drop_internal:
         1:   19:Type(HiddenDrop);
 ------------------
 HiddenDrop_build_internal:
-        1:   19:Type(HiddenDrop);
-------------------
-HiddenDrop_size:
         2:   19:Type(HiddenDrop);
 ------------------
+HiddenDrop_size:
+        4:   19:Type(HiddenDrop);
+------------------
         -:   20:Builder(HiddenDrop);
-       70:   21:Impl(HiddenDrop, Drop);
+       76:   21:Impl(HiddenDrop, Drop);
 ------------------
 vtable_add_trait_impl_HiddenDrop_Drop:
-       35:   21:Impl(HiddenDrop, Drop);
+       38:   21:Impl(HiddenDrop, Drop);
 ------------------
 __required_add__HiddenDrop_drop:
-       35:   21:Impl(HiddenDrop, Drop);
+       38:   21:Impl(HiddenDrop, Drop);
 ------------------
         -:   22:
         -:   23:#define IMPL HiddenDrop
         1:   24:void HiddenDrop_drop() {}
         -:   25:#undef IMPL
         -:   26:
-     110*:   27:Type(
+     123*:   27:Type(
 ------------------
 __add_impls_Hidden_vtable:
-       35:   27:Type(
+       38:   27:Type(
 ------------------
 Hidden_drop_internal:
         1:   27:Type(
 ------------------
 Hidden_build_internal:
-       2*:   27:Type(
+       4*:   27:Type(
 ------------------
 __add_where_Hidden_T_vtable:
-       70:   27:Type(
+       76:   27:Type(
 ------------------
 Hidden_size:
-        2:   27:Type(
+        4:   27:Type(
 ------------------
         -:   28:    Hidden,
         -:   29:    Where(T, TraitBound(Drop)),
@@ -4212,35 +4380,59 @@ Hidden_size:
         -:   33:    Object(HiddenDrop, dd));
         -:   34:
         -:   35:#define IMPL Hidden
-        1:   36:void Hidden_build(const HiddenConfig* config)
+        2:   36:void Hidden_build(const HiddenConfig* config)
         -:   37:{
-        1:   38:	printf("building hidden: capacity = %" PRIu64 "\n", config->capacity);
-        1:   39:	$Var(config) = *config;
-        1:   40:	let hd = new (HiddenDrop);
-       2*:   41:	Move(&$Var(v2), &hd);
-        1:   42:}
+        2:   38:	printf("building hidden: capacity = %" PRIu64 "\n", config->capacity);
+        2:   39:	$Var(config) = *config;
+        2:   40:	let hd = new (HiddenDrop);
+       4*:   41:	Move(&$Var(v2), &hd);
+        2:   42:}
         -:   43:
-        1:   44:void Hidden_drop()
+        2:   44:void Hidden_drop()
         -:   45:{
-        1:   46:	printf("drop value=%" PRIu64 "\n", $(value));
-        1:   47:}
-        1:   48:u64 Hidden_get_value()
+        2:   46:	printf("drop value=%" PRIu64 "\n", $(value));
+        2:   47:}
+        4:   48:u64 Hidden_get_value()
         -:   49:{
-        1:   50:	return $(value);
+        4:   50:	return $(value);
         -:   51:}
         1:   52:u64 Hidden_get_capacity_impl()
         -:   53:{
         1:   54:	return $(config).capacity;
         -:   55:}
-        1:   56:void Hidden_set_value(u64 v)
+        3:   56:void Hidden_set_value(u64 v)
         -:   57:{
-        1:   58:	$Var(value) = v;
-        1:   59:}
+        3:   58:	$Var(value) = v;
+        3:   59:}
         -:   60:#undef IMPL
+        -:   61:
+      63*:   62:EnumImpl(HiddenEnum);
+------------------
+HiddenEnum_as_ref:
+        5:   62:EnumImpl(HiddenEnum);
+------------------
+HiddenEnum_variant_id:
+        5:   62:EnumImpl(HiddenEnum);
+------------------
+HiddenEnum_build:
+       3*:   62:EnumImpl(HiddenEnum);
+------------------
+__add_impls_HiddenEnum_vtable:
+       38:   62:EnumImpl(HiddenEnum);
+------------------
+HiddenEnum_drop_internal:
+        3:   62:EnumImpl(HiddenEnum);
+------------------
+HiddenEnum_build_internal:
+       3*:   62:EnumImpl(HiddenEnum);
+------------------
+HiddenEnum_size:
+        6:   62:EnumImpl(HiddenEnum);
+------------------
         -:    0:Source:test_server.c
         -:    0:Graph:test_server.gcno
         -:    0:Data:test_server.gcda
-        -:    0:Runs:35
+        -:    0:Runs:38
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4265,10 +4457,10 @@ Hidden_size:
         -:   22:// the trait bound of HttpServer in our example. We also call the required macros
         -:   23:// to minimally intialize this type and declare that the Drop trait will be
         -:   24:// implemented.
-       39:   25:Type(CanDrop);
+       42:   25:Type(CanDrop);
 ------------------
 __add_impls_CanDrop_vtable:
-       35:   25:Type(CanDrop);
+       38:   25:Type(CanDrop);
 ------------------
 CanDrop_drop_internal:
         1:   25:Type(CanDrop);
@@ -4280,13 +4472,13 @@ CanDrop_size:
         2:   25:Type(CanDrop);
 ------------------
         -:   26:Builder(CanDrop);
-       70:   27:Impl(CanDrop, Drop);
+       76:   27:Impl(CanDrop, Drop);
 ------------------
 vtable_add_trait_impl_CanDrop_Drop:
-       35:   27:Impl(CanDrop, Drop);
+       38:   27:Impl(CanDrop, Drop);
 ------------------
 __required_add__CanDrop_drop:
-       35:   27:Impl(CanDrop, Drop);
+       38:   27:Impl(CanDrop, Drop);
 ------------------
         -:   28:
         -:   29:// Do the drop implementation for this type. By defining 'IMPL', we have access
@@ -4297,10 +4489,10 @@ __required_add__CanDrop_drop:
         -:   34:
         -:   35:// Now we declare a second type which will demonstrate concrete types. This type
         -:   36:// also has some data fields which are used and a Builder which allows configuration.
-       39:   37:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
+       42:   37:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
 ------------------
 __add_impls_HttpServerComponent_vtable:
-       35:   37:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
+       38:   37:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
 ------------------
 HttpServerComponent_drop_internal:
         1:   37:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
@@ -4314,21 +4506,21 @@ HttpServerComponent_size:
         -:   38:Builder(HttpServerComponent, Config(u64, state));
         -:   39:
         -:   40:// Implement Drop and Build for this type.
-       70:   41:Impl(HttpServerComponent, Drop);
+       76:   41:Impl(HttpServerComponent, Drop);
 ------------------
 vtable_add_trait_impl_HttpServerComponent_Drop:
-       35:   41:Impl(HttpServerComponent, Drop);
+       38:   41:Impl(HttpServerComponent, Drop);
 ------------------
 __required_add__HttpServerComponent_drop:
-       35:   41:Impl(HttpServerComponent, Drop);
+       38:   41:Impl(HttpServerComponent, Drop);
 ------------------
-       70:   42:Impl(HttpServerComponent, Build);
+       76:   42:Impl(HttpServerComponent, Build);
 ------------------
 vtable_add_trait_impl_HttpServerComponent_Build:
-       35:   42:Impl(HttpServerComponent, Build);
+       38:   42:Impl(HttpServerComponent, Build);
 ------------------
 __required_add__HttpServerComponent_build:
-       35:   42:Impl(HttpServerComponent, Build);
+       38:   42:Impl(HttpServerComponent, Build);
 ------------------
         -:   43:
         -:   44:// Here we implement drop and build, the required methods for our traits.
@@ -4359,10 +4551,10 @@ __required_add__HttpServerComponent_build:
         -:   69:// data is defined in our .c file and treated as an opaque pointer.
         -:   70:// The HttpServer type demonstrates the 'Where' clause for defining generics and the usage
         -:   71:// of all three types of data members (Generic, Object, and Field).
-     110*:   72:Type(
+     119*:   72:Type(
 ------------------
 __add_impls_HttpServer_vtable:
-       35:   72:Type(
+       38:   72:Type(
 ------------------
 HttpServer_drop_internal:
         1:   72:Type(
@@ -4371,7 +4563,7 @@ HttpServer_build_internal:
        2*:   72:Type(
 ------------------
 __add_where_HttpServer_T_vtable:
-       70:   72:Type(
+       76:   72:Type(
 ------------------
 HttpServer_size:
         2:   72:Type(
@@ -4463,7 +4655,7 @@ HttpServer_size:
         -:    0:Source:thread.c
         -:    0:Graph:thread.gcno
         -:    0:Data:thread.gcda
-        -:    0:Runs:36
+        -:    0:Runs:39
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4582,7 +4774,7 @@ HttpServer_size:
         -:    0:Source:traits.c
         -:    0:Graph:traits.gcno
         -:    0:Data:traits.gcda
-        -:    0:Runs:36
+        -:    0:Runs:39
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4599,48 +4791,64 @@ HttpServer_size:
         -:   14:
         -:   15:#include <core/traits.h>
         -:   16:
-        1:   17:void drop(Obj* self)
+    #####:   17:u64 size(const Obj* self)
         -:   18:{
-        1:   19:	if (self->flags & OBJECT_FLAGS_CONSUMED)
+    #####:   19:	if (self->flags & OBJECT_FLAGS_CONSUMED)
     #####:   20:		panic("Runtime error: Obj [%s@%" PRIu64
         -:   21:		      "] has already been consumed!",
     #####:   22:		      self->vtable->name, self->ptr.id);
-        1:   23:	void (*impl)() = find_fn(self, "drop");
-        1:   24:	if (!impl)
+    #####:   23:	u64 (*impl)() = find_fn(self, "size");
+    #####:   24:	if (!impl)
     #####:   25:		panic("Runtime error: Trait bound violation! "
         -:   26:		      "Type "
         -:   27:		      "'%s' does "
         -:   28:		      "not implement the "
         -:   29:		      "required function [%s]",
-    #####:   30:		      TypeName((*self)), "drop");
-        1:   31:	SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};
-        1:   32:	__thread_local_self_Const = self;
-        1:   33:	__thread_local_self_Var = self;
+    #####:   30:		      TypeName((*self)), "size");
+    #####:   31:	SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};
+    #####:   32:	__thread_local_self_Const = self;
+    #####:   33:	__thread_local_self_Var = NULL;
         -:   34:
-        -:   35:	// custom code here (set no cleanup since we're already done and consume
-        -:   36:	// the object):
-        1:   37:	self->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
-        -:   38:	// free the pointer here as well since cleanup will not be called
-        1:   39:	if (fat_ptr_data(&self->ptr))
-        -:   40:	{
-        1:   41:		chain_free(&self->ptr);
-        -:   42:	}
-        1:   43:	return impl();
-        -:   44:}
-        -:   45:
-        -:   46:// default implementation of clone_from
-        1:   47:void clone_from_impl(Obj* to_clone)
-        -:   48:{
-        -:   49:	// call the type specific 'klone' required method.
-        1:   50:	let v = klone(to_clone);
-        -:   51:	// move the result to $Var() internal self reference.
-        -:   52:	// cleanup handled by Move.
-       1*:   53:	Move($Var(), &v);
-        1:   54:}
+    #####:   35:	return impl();
+        -:   36:}
+        -:   37:
+       30:   38:void drop(Obj* self)
+        -:   39:{
+       30:   40:	if (self->flags & OBJECT_FLAGS_CONSUMED)
+    #####:   41:		panic("Runtime error: Obj [%s@%" PRIu64
+        -:   42:		      "] has already been consumed!",
+    #####:   43:		      self->vtable->name, self->ptr.id);
+       30:   44:	void (*impl)() = find_fn(self, "drop");
+       30:   45:	SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};
+       30:   46:	__thread_local_self_Const = self;
+       30:   47:	__thread_local_self_Var = self;
+        -:   48:
+        -:   49:	// custom code here (set no cleanup since we're already done and consume
+        -:   50:	// the object):
+       30:   51:	self->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
+        -:   52:	// free the pointer here as well since cleanup will not be called
+       30:   53:	if (fat_ptr_data(&self->ptr))
+        -:   54:	{
+       30:   55:		chain_free(&self->ptr);
+        -:   56:	}
+        -:   57:	// in the case of no drop existing we just return
+       30:   58:	if (impl)
+       20:   59:		impl();
+       30:   60:}
+        -:   61:
+        -:   62:// default implementation of clone_from
+        1:   63:void clone_from_impl(Obj* to_clone)
+        -:   64:{
+        -:   65:	// call the type specific 'klone' required method.
+        1:   66:	let v = klone(to_clone);
+        -:   67:	// move the result to $Var() internal self reference.
+        -:   68:	// cleanup handled by Move.
+       1*:   69:	Move($Var(), &v);
+        1:   70:}
         -:    0:Source:type.c
         -:    0:Graph:type.gcno
         -:    0:Data:type.gcda
-        -:    0:Runs:36
+        -:    0:Runs:39
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4664,10 +4872,10 @@ HttpServer_size:
         -:   21:_Thread_local Obj* __thread_local_self_Var = NULL;
         -:   22:
         -:   23:atomic_ullong __global_counter__;
-       36:   24:void __attribute__((constructor)) init_global_counter()
+       39:   24:void __attribute__((constructor)) init_global_counter()
         -:   25:{
-       36:   26:	atomic_init(&__global_counter__, 1);
-       36:   27:}
+       39:   26:	atomic_init(&__global_counter__, 1);
+       39:   27:}
         -:   28:
     #####:   29:u64 unique_id()
         -:   30:{
@@ -4675,180 +4883,180 @@ HttpServer_size:
     #####:   32:	return ret;
         -:   33:}
         -:   34:
-       66:   35:FatPtr build_fat_ptr(u64 size)
+      152:   35:FatPtr build_fat_ptr(u64 size)
         -:   36:{
         -:   37:	FatPtr ret;
-       66:   38:	if (chain_malloc(&ret, size))
+      152:   38:	if (chain_malloc(&ret, size))
         -:   39:	{
         -:   40:		// if chain_malloc is an error we set data to NULL and caller to
         -:   41:		// handle
     #####:   42:		ret.data = NULL;
         -:   43:	}
-       66:   44:	return ret;
+      152:   44:	return ret;
         -:   45:}
         -:   46:
-    47957:   47:int compare_vtable_entry(const void* ent1, const void* ent2)
+   111991:   47:int compare_vtable_entry(const void* ent1, const void* ent2)
         -:   48:{
-    47957:   49:	const VtableEntry* vtent1 = ent1;
-    47957:   50:	const VtableEntry* vtent2 = ent2;
-    47957:   51:	return strcmp(vtent1->name, vtent2->name);
+   111991:   49:	const VtableEntry* vtent1 = ent1;
+   111991:   50:	const VtableEntry* vtent2 = ent2;
+   111991:   51:	return strcmp(vtent1->name, vtent2->name);
         -:   52:}
         -:   53:
-     9095:   54:void sort_vtable(Vtable* table)
+    14264:   54:void sort_vtable(Vtable* table)
         -:   55:{
-     9095:   56:	qsort(table->entries, table->len, sizeof(VtableEntry),
+    14264:   56:	qsort(table->entries, table->len, sizeof(VtableEntry),
         -:   57:	      compare_vtable_entry);
-     9095:   58:}
+    14264:   58:}
         -:   59:
-     9095:   60:void vtable_add_entry(Vtable* table, VtableEntry entry)
+    14264:   60:void vtable_add_entry(Vtable* table, VtableEntry entry)
         -:   61:{
-     9095:   62:	if (table->entries == NULL)
+    14264:   62:	if (table->entries == NULL)
         -:   63:	{
-     1378:   64:		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
-     1378:   65:		if (table->entries == NULL)
+     1725:   64:		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
+     1725:   65:		if (table->entries == NULL)
     #####:   66:			panic("Couldn't allocate memory for vtable");
         -:   67:	}
         -:   68:	else
         -:   69:	{
-     7717:   70:		void* tmp = realloc(table->entries,
-     7717:   71:				    sizeof(VtableEntry) * (table->len + 1));
-     7717:   72:		if (tmp == NULL)
+    12539:   70:		void* tmp = realloc(table->entries,
+    12539:   71:				    sizeof(VtableEntry) * (table->len + 1));
+    12539:   72:		if (tmp == NULL)
     #####:   73:			panic("Couldn't allocate memory for vtable");
-     7717:   74:		table->entries = tmp;
+    12539:   74:		table->entries = tmp;
         -:   75:	}
         -:   76:
-     9095:   77:	memcpy(&table->entries[table->len], &entry, sizeof(VtableEntry));
-     9095:   78:	table->len += 1;
-     9095:   79:	sort_vtable(table);
-     9095:   80:}
+    14264:   77:	memcpy(&table->entries[table->len], &entry, sizeof(VtableEntry));
+    14264:   78:	table->len += 1;
+    14264:   79:	sort_vtable(table);
+    14264:   80:}
         -:   81:
-       35:   82:void vtable_override(Vtable* table, VtableEntry entry)
+       38:   82:void vtable_override(Vtable* table, VtableEntry entry)
         -:   83:{
-      210:   84:	for (int i = 0; i < table->len; i++)
+      228:   84:	for (int i = 0; i < table->len; i++)
         -:   85:	{
-      175:   86:		if (!strcmp(entry.name, table->entries[i].name))
+      190:   86:		if (!strcmp(entry.name, table->entries[i].name))
         -:   87:		{
-       35:   88:			table->entries[i].fn_ptr = entry.fn_ptr;
+       38:   88:			table->entries[i].fn_ptr = entry.fn_ptr;
         -:   89:		}
         -:   90:	}
-       35:   91:}
+       38:   91:}
         -:   92:
-      175:   93:bool vtable_check_impl_trait(const Vtable* table, const char* trait)
+      304:   93:bool vtable_check_impl_trait(const Vtable* table, const char* trait)
         -:   94:{
-      175:   95:	bool ret = false;
+      304:   95:	bool ret = false;
         -:   96:
-      350:   97:	for (u64 i = 0; i < table->trait_len; i++)
+      494:   97:	for (u64 i = 0; i < table->trait_len; i++)
         -:   98:	{
-      350:   99:		if (!strcmp(table->trait_entries[i].trait_name, trait))
+      494:   99:		if (!strcmp(table->trait_entries[i].trait_name, trait))
         -:  100:		{
-      175:  101:			ret = true;
-      175:  102:			break;
+      304:  101:			ret = true;
+      304:  102:			break;
         -:  103:		}
         -:  104:	}
         -:  105:
-      175:  106:	return ret;
+      304:  106:	return ret;
         -:  107:}
         -:  108:
-     4296:  109:void vtable_add_trait(Vtable* table, char* trait)
+     8252:  109:void vtable_add_trait(Vtable* table, char* trait)
         -:  110:{
-     4296:  111:	if (table->trait_entries == NULL)
+     8252:  111:	if (table->trait_entries == NULL)
         -:  112:	{
-     1413:  113:		table->trait_entries =
-     1413:  114:		    malloc(sizeof(VtableTraitEntry) * (table->trait_len + 1));
-     1413:  115:		if (table->trait_entries == NULL)
+     1724:  113:		table->trait_entries =
+     1724:  114:		    malloc(sizeof(VtableTraitEntry) * (table->trait_len + 1));
+     1724:  115:		if (table->trait_entries == NULL)
     #####:  116:			panic("Couldn't allocate memory for vtable");
         -:  117:	}
         -:  118:	else
         -:  119:	{
         -:  120:		void* tmp =
-     2883:  121:		    realloc(table->trait_entries,
-     2883:  122:			    sizeof(VtableTraitEntry) * (table->trait_len + 1));
-     2883:  123:		if (tmp == NULL)
+     6528:  121:		    realloc(table->trait_entries,
+     6528:  122:			    sizeof(VtableTraitEntry) * (table->trait_len + 1));
+     6528:  123:		if (tmp == NULL)
     #####:  124:			panic("Couldn't allocate memory for vtable");
-     2883:  125:		table->trait_entries = tmp;
+     6528:  125:		table->trait_entries = tmp;
         -:  126:	}
         -:  127:
         -:  128:	VtableTraitEntry entry;
-     4296:  129:	if (strlen(trait) >= MAX_TRAIT_NAME_LEN)
+     8252:  129:	if (strlen(trait) >= MAX_TRAIT_NAME_LEN)
     #####:  130:		panic("trait name [%s] is too long. MAX_TRAIT_NAME_LEN = %i\n",
         -:  131:		      trait, MAX_TRAIT_NAME_LEN - 1);
-     4296:  132:	strcpy(entry.trait_name, trait);
+     8252:  132:	strcpy(entry.trait_name, trait);
         -:  133:
-     4296:  134:	memcpy(&table->trait_entries[table->trait_len], &entry,
+     8252:  134:	memcpy(&table->trait_entries[table->trait_len], &entry,
         -:  135:	       sizeof(VtableTraitEntry));
-     4296:  136:	table->trait_len += 1;
-     4296:  137:}
+     8252:  136:	table->trait_len += 1;
+     8252:  137:}
         -:  138:
-      367:  139:void* find_fn(const Obj* obj, const char* name)
+      795:  139:void* find_fn(const Obj* obj, const char* name)
         -:  140:{
-      367:  141:	int left = 0;
-      367:  142:	int right = obj->vtable->len - 1;
-      892:  143:	while (left <= right)
+      795:  141:	int left = 0;
+      795:  142:	int right = obj->vtable->len - 1;
+     2138:  143:	while (left <= right)
         -:  144:	{
-      853:  145:		int mid = left + (right - left) / 2;
-      853:  146:		int cmp = strcmp(name, obj->vtable->entries[mid].name);
+     2048:  145:		int mid = left + (right - left) / 2;
+     2048:  146:		int cmp = strcmp(name, obj->vtable->entries[mid].name);
         -:  147:
-      853:  148:		if (cmp == 0)
+     2048:  148:		if (cmp == 0)
         -:  149:		{
-      328:  150:			return obj->vtable->entries[mid].fn_ptr;
+      705:  150:			return obj->vtable->entries[mid].fn_ptr;
         -:  151:		}
-      525:  152:		else if (cmp < 0)
+     1343:  152:		else if (cmp < 0)
         -:  153:		{
-      250:  154:			right = mid - 1;
+      643:  154:			right = mid - 1;
         -:  155:		}
         -:  156:		else
         -:  157:		{
-      275:  158:			left = mid + 1;
+      700:  158:			left = mid + 1;
         -:  159:		}
         -:  160:	}
-       39:  161:	return NULL;
+       90:  161:	return NULL;
         -:  162:}
         -:  163:
-      105:  164:void SelfCleanupImpl_update(SelfCleanupImpl* ptr)
+      247:  164:void SelfCleanupImpl_update(SelfCleanupImpl* ptr)
         -:  165:{
-      105:  166:	__thread_local_self_Const = ptr->prev_tl_self_Const;
-      105:  167:	__thread_local_self_Var = ptr->prev_tl_self_Var;
-      105:  168:}
+      247:  166:	__thread_local_self_Const = ptr->prev_tl_self_Const;
+      247:  167:	__thread_local_self_Var = ptr->prev_tl_self_Var;
+      247:  168:}
         -:  169:
-       29:  170:void Obj_check_param(const Obj* obj)
+       69:  170:void Obj_check_param(const Obj* obj)
         -:  171:{
-       29:  172:	if (obj && (obj->flags & OBJECT_FLAGS_CONSUMED) != 0)
+       69:  172:	if (obj && (obj->flags & OBJECT_FLAGS_CONSUMED) != 0)
     #####:  173:		panic("Passing a consumed object as a function "
         -:  174:		      "parameter!");
-       29:  175:}
+       69:  175:}
         -:  176:
-        5:  177:bool Obj_is_type(const Obj* ptr, char* ref)
+       17:  177:bool Obj_is_type(const Obj* ptr, char* ref)
         -:  178:{
-        5:  179:	if (!strcmp(TypeName((*ptr)), ref))
-        5:  180:		return true;
+       17:  179:	if (!strcmp(TypeName((*ptr)), ref))
+       17:  180:		return true;
     #####:  181:	return false;
         -:  182:}
         -:  183:
-       66:  184:void Obj_build_int(Obj* ptr)
+      152:  184:void Obj_build_int(Obj* ptr)
         -:  185:{
         -:  186:	// call internal build handler
-       66:  187:	void (*build_int)(Obj* ptr) = find_fn(ptr, "build_internal");
-       66:  188:	if (!build_int)
+      152:  187:	void (*build_int)(Obj* ptr) = find_fn(ptr, "build_internal");
+      152:  188:	if (!build_int)
     #####:  189:		panic("no internal build handler found");
-       66:  190:	build_int(ptr);
-       66:  191:}
+      152:  190:	build_int(ptr);
+      152:  191:}
         -:  192:
-       66:  193:void Obj_build(Obj* ptr, const void* config)
+      152:  193:void Obj_build(Obj* ptr, const void* config)
         -:  194:{
-       66:  195:	void (*do_build)(const void* config) = find_fn(ptr, "build");
-       66:  196:	if (do_build)
+      152:  195:	void (*do_build)(const void* config) = find_fn(ptr, "build");
+      152:  196:	if (do_build)
         -:  197:	{
         -:  198:		// setup self references
-       63:  199:		Obj* tmp_Var = __thread_local_self_Var;
-       63:  200:		const Obj* tmp_Const = __thread_local_self_Const;
-       63:  201:		__thread_local_self_Const = ptr;
-       63:  202:		__thread_local_self_Var = ptr;
-       63:  203:		do_build(config);
+      148:  199:		Obj* tmp_Var = __thread_local_self_Var;
+      148:  200:		const Obj* tmp_Const = __thread_local_self_Const;
+      148:  201:		__thread_local_self_Const = ptr;
+      148:  202:		__thread_local_self_Var = ptr;
+      148:  203:		do_build(config);
         -:  204:		// revert
-       63:  205:		__thread_local_self_Var = tmp_Var;
-       63:  206:		__thread_local_self_Const = tmp_Const;
+      148:  205:		__thread_local_self_Var = tmp_Var;
+      148:  206:		__thread_local_self_Const = tmp_Const;
         -:  207:	}
-       66:  208:}
+      152:  208:}
         -:  209:
         -:  210:#if defined(__clang__)
         -:  211:// Clang-specific pragma
@@ -4861,37 +5069,37 @@ HttpServer_size:
         -:  218:#else
         -:  219:#warning "Unknown compiler or platform. No specific warning pragmas applied."
         -:  220:#endif
-       91:  221:void Obj_cleanup(const Obj* ptr)
+      236:  221:void Obj_cleanup(const Obj* ptr)
         -:  222:{
-       91:  223:	Obj* unconst = ptr;
-       91:  224:	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0)
+      236:  223:	Obj* unconst = ptr;
+      236:  224:	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0)
         -:  225:	{
         -:  226:		// call internal drop handler
-       65:  227:		void (*drop_int)(Obj* ptr) = find_fn(ptr, "drop_internal");
-       65:  228:		if (!drop_int)
+      122:  227:		void (*drop_int)(Obj* ptr) = find_fn(ptr, "drop_internal");
+      122:  228:		if (!drop_int)
     #####:  229:			panic("no internal drop handler found");
-       65:  230:		drop_int(unconst);
+      122:  230:		drop_int(unconst);
         -:  231:
         -:  232:		// call defined drop handler
-       65:  233:		void (*drop)(Obj* ptr) = find_fn(ptr, "drop");
-       65:  234:		if (drop)
+      122:  233:		void (*drop)(Obj* ptr) = find_fn(ptr, "drop");
+      122:  234:		if (drop)
         -:  235:		{
         -:  236:			// setup self references
-       29:  237:			Obj* tmp_Var = __thread_local_self_Var;
-       29:  238:			Obj* tmp_Const = __thread_local_self_Const;
-       29:  239:			__thread_local_self_Const = unconst;
-       29:  240:			__thread_local_self_Var = unconst;
-       29:  241:			drop(ptr);
+       46:  237:			Obj* tmp_Var = __thread_local_self_Var;
+       46:  238:			Obj* tmp_Const = __thread_local_self_Const;
+       46:  239:			__thread_local_self_Const = unconst;
+       46:  240:			__thread_local_self_Var = unconst;
+       46:  241:			drop(ptr);
         -:  242:			// revert
-       29:  243:			__thread_local_self_Var = tmp_Var;
-       29:  244:			__thread_local_self_Const = tmp_Const;
+       46:  243:			__thread_local_self_Var = tmp_Var;
+       46:  244:			__thread_local_self_Const = tmp_Const;
         -:  245:		}
-       65:  246:		if (fat_ptr_data(&unconst->ptr))
+      122:  246:		if (fat_ptr_data(&unconst->ptr))
         -:  247:		{
-       65:  248:			chain_free(&unconst->ptr);
+      122:  248:			chain_free(&unconst->ptr);
         -:  249:		}
         -:  250:	}
-       91:  251:}
+      236:  251:}
         -:  252:
         -:  253:#if defined(__clang__)
         -:  254:// Clang-specific pragma
@@ -4905,9 +5113,43 @@ HttpServer_size:
         -:  262:#else
         -:  263:#warning "Unknown compiler or platform. No specific warning pragmas applied."
         -:  264:#endif
-       14:  265:void Obj_mark_consumed(const Obj* ptr)
+       45:  265:void Obj_mark_consumed(const Obj* ptr)
         -:  266:{
-       14:  267:	Obj* unconst = ptr;
-       14:  268:	unconst->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
-       14:  269:}
+       45:  267:	Obj* unconst = ptr;
+       45:  268:	unconst->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
+       45:  269:}
         -:  270:#pragma GCC diagnostic pop
+        -:    0:Source:unit.c
+        -:    0:Graph:unit.gcno
+        -:    0:Data:unit.gcda
+        -:    0:Runs:39
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <core/unit.h>
+        -:   16:
+      39*:   17:Type(Unit);
+------------------
+__add_impls_Unit_vtable:
+       39:   17:Type(Unit);
+------------------
+Unit_drop_internal:
+    #####:   17:Type(Unit);
+------------------
+Unit_build_internal:
+    #####:   17:Type(Unit);
+------------------
+Unit_size:
+    #####:   17:Type(Unit);
+------------------
