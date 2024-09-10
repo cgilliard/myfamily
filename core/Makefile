@@ -7,7 +7,8 @@ OBJS := heap.o \
 	type.o \
 	traits.o \
 	rc.o \
-	unit.o
+	unit.o \
+	backtrace.o
 
 TEST_OBJS := $(OBJS) test_encapsulation.o test_server.o
 

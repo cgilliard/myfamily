@@ -1990,7 +1990,7 @@ Test(core, test_enum_encap)
 	Unbox(m5, v_out64);
 	cr_assert_eq(v_out64, 999);
 
-	// This would result in a panic because v_out64 has already been consumed
+	// This would result in a panic because hidden has already been consumed
 	// v_out64 = get_value(&hidden);
 }
 

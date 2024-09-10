@@ -30,6 +30,9 @@
 
 #define mut is_mut,
 #define loop while (true)
+#define π(...)       \
+	while (true) \
+	sleep(UINT_MAX)
 
 #define MULTI_PARAM(action, ...) action(__VA_ARGS__)
 #define SINGLE_PARAM(action, x) action(x)
