@@ -1,12 +1,6 @@
 BasedOnStyle: LLVM
-PointerAlignment: Left  # Adjust to Right if needed
-BreakBeforeBraces: Allman
-ColumnLimit: 0
-IndentWidth: 8
-TabWidth: 8
+ColumnLimit: 100
+IndentWidth: 4
+TabWidth: 4
 UseTab: Always
-AlignAfterOpenBracket: Align
-AlignOperands: true
-AllowShortFunctionsOnASingleLine: All
-BreakBeforeBinaryOperators: NonAssignment
-AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: None
