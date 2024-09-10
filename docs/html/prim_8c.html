@@ -138,6 +138,8 @@ Functions</h2></td></tr>
 <tr class="separator:a094f57789a5593510c5ba6cb31c73d79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a214c2639a2218f8fe3105337eb4ac2c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="prim_8c.html#a214c2639a2218f8fe3105337eb4ac2c3">Bool_value_of</a> (void *buf)</td></tr>
 <tr class="separator:a214c2639a2218f8fe3105337eb4ac2c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92a2d7d18f86201ed00cf259d541a919"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="prim_8c.html#a92a2d7d18f86201ed00cf259d541a919">Bool_equal</a> (const <a class="el" href="structObj.html">Obj</a> *rhs)</td></tr>
+<tr class="separator:a92a2d7d18f86201ed00cf259d541a919"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a3207f231d3e381c359df16055ee45106"></a>
@@ -171,16 +173,21 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="prim_8c.html#a2b519bfc066494d2eb5b73b6abb6a8b8">Type</a>(upper##bits, <a class="code" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(lower##bits, value));               \</div>
-<div class="line">    void upper##bits##_build(<span class="keyword">const</span> upper##bits##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>* config) \</div>
-<div class="line">    {                                                           \</div>
-<div class="line">        $Var(value) = config-&gt;value;                        \</div>
-<div class="line">    }                                                           \</div>
-<div class="line">    void upper##bits##_value_of(<span class="keywordtype">void</span>* buf)                      \</div>
-<div class="line">    {                                                           \</div>
-<div class="line">        *(lower##bits*)buf = $(value);                      \</div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="prim_8c.html#a2b519bfc066494d2eb5b73b6abb6a8b8">Type</a>(upper##bits, <a class="code" href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a>(lower##bits, value));                 \</div>
+<div class="line">    void upper##bits##_build(<span class="keyword">const</span> upper##bits##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>* config)   \</div>
+<div class="line">    {                                                             \</div>
+<div class="line">        $Var(value) = config-&gt;value;                          \</div>
+<div class="line">    }                                                             \</div>
+<div class="line">    void upper##bits##_value_of(<span class="keywordtype">void</span>* buf)                        \</div>
+<div class="line">    {                                                             \</div>
+<div class="line">        *(lower##bits*)buf = $(value);                        \</div>
+<div class="line">    }                                                             \</div>
+<div class="line">    bool upper##bits##_equal(<span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a>* rhs)                      \</div>
+<div class="line">    {                                                             \</div>
+<div class="line">        return $(value) == $Context(rhs, upper##bits, value); \</div>
 <div class="line">    }</div>
 <div class="ttc" id="aprim_8c_html_a2b519bfc066494d2eb5b73b6abb6a8b8"><div class="ttname"><a href="prim_8c.html#a2b519bfc066494d2eb5b73b6abb6a8b8">Type</a></div><div class="ttdeci">Type(Bool, Field(bool, value))</div></div>
+<div class="ttc" id="astructObj_html"><div class="ttname"><a href="structObj.html">Obj</a></div><div class="ttdef"><b>Definition:</b> type.h:62</div></div>
 <div class="ttc" id="atype_8h_html_a3dd518df1105dd849cae4ac614bf708e"><div class="ttname"><a href="type_8h.html#a3dd518df1105dd849cae4ac614bf708e">Field</a></div><div class="ttdeci">#define Field(field_type, field_name)</div></div>
 <div class="ttc" id="atype_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
 </div><!-- fragment -->
@@ -380,6 +387,24 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">const BoolConfig *&#160;</td>
           <td class="paramname"><em>config</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a92a2d7d18f86201ed00cf259d541a919"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a92a2d7d18f86201ed00cf259d541a919">&#9670;&nbsp;</a></span>Bool_equal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Bool_equal </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structObj.html">Obj</a> *&#160;</td>
+          <td class="paramname"><em>rhs</em></td><td>)</td>
           <td></td>
         </tr>
       </table>

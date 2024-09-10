@@ -82,6 +82,12 @@ $(function() {
 Macros</h2></td></tr>
 <tr class="memitem:a8b9d32d6227b13b8d62d7aa1acd8c326"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="prim_8h.html#a8b9d32d6227b13b8d62d7aa1acd8c326">DEFINE_PRIM_HEADER</a>(lower,  upper,  bits)</td></tr>
 <tr class="separator:a8b9d32d6227b13b8d62d7aa1acd8c326"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a807b889b00653a54f0ed6fd492fd021b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a></td></tr>
+<tr class="separator:a807b889b00653a54f0ed6fd492fd021b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78d57a9fc3823ef2a4a3daff4c4032ec"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>&#160;&#160;&#160;_Pragma(&quot;GCC diagnostic pop&quot;)</td></tr>
+<tr class="separator:a78d57a9fc3823ef2a4a3daff4c4032ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dd62e2b4896987b932eef04d17386ce"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="prim_8h.html#a3dd62e2b4896987b932eef04d17386ce">Box2</a>(v)</td></tr>
+<tr class="separator:a3dd62e2b4896987b932eef04d17386ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58ff64b6abb6403a6459779468d955e4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="prim_8h.html#a58ff64b6abb6403a6459779468d955e4">Box</a>(v)</td></tr>
 <tr class="separator:a58ff64b6abb6403a6459779468d955e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50410f6d180882ef6c3ab96f94142ce2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="prim_8h.html#a50410f6d180882ef6c3ab96f94142ce2">Unbox</a>(v,  to)&#160;&#160;&#160;value_of(&amp;v, &amp;to)</td></tr>
@@ -119,6 +125,8 @@ Functions</h2></td></tr>
 <tr class="separator:a44fa0713e599853155c9a82e26e7081b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7787f41d2c2e94eda3cf8da34e24e80"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="prim_8h.html#ab7787f41d2c2e94eda3cf8da34e24e80">Impl</a> (Bool, <a class="el" href="traits_8h.html#a1a931293931f7a689e732d365b5662ba">ValueOf</a>)</td></tr>
 <tr class="separator:ab7787f41d2c2e94eda3cf8da34e24e80"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5984b738595f912124842208b91ebdca"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="prim_8h.html#a5984b738595f912124842208b91ebdca">Impl</a> (Bool, <a class="el" href="traits_8h.html#a40c9b8ed733e623e6cd95857dcbc425e">Equal</a>)</td></tr>
+<tr class="separator:a5984b738595f912124842208b91ebdca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a58ff64b6abb6403a6459779468d955e4"></a>
@@ -150,7 +158,7 @@ Functions</h2></td></tr>
 <div class="line">    <a class="code" href="types_8h.html#a1bd198f821a2a4ea63fa8ab2e4a2afb3">f32</a>: <span class="keyword">new</span> (F32, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)),   \</div>
 <div class="line">    <a class="code" href="types_8h.html#a1d69936f20818f2cd1b34d1d2fd841be">f64</a>: <span class="keyword">new</span> (F64, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)),   \</div>
 <div class="line">    <span class="keywordtype">bool</span>: <span class="keyword">new</span> (Bool, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, v)), \</div>
-<div class="line">    <span class="keywordflow">default</span>: <a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a>(<span class="stringliteral">&quot;Attempt to Box a non-primitive type!&quot;</span>))</div>
+<div class="line">    <span class="keywordflow">default</span>: <a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a>(<span class="stringliteral">&quot;Attempt to box an unknown type!&quot;</span>))</div>
 <div class="ttc" id="apanic_8c_html_ad1f1a1dc0581a11b597453f148106393"><div class="ttname"><a href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a></div><div class="ttdeci">void panic(const char *fmt,...)</div><div class="ttdef"><b>Definition:</b> panic.c:27</div></div>
 <div class="ttc" id="atype_8h_html_a83dd37cc0bb92d715fc246014e02b359"><div class="ttname"><a href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a></div><div class="ttdeci">#define With(x, y)</div></div>
 <div class="ttc" id="atypes_8h_html_a1bd198f821a2a4ea63fa8ab2e4a2afb3"><div class="ttname"><a href="types_8h.html#a1bd198f821a2a4ea63fa8ab2e4a2afb3">f32</a></div><div class="ttdeci">#define f32</div><div class="ttdef"><b>Definition:</b> types.h:36</div></div>
@@ -165,6 +173,43 @@ Functions</h2></td></tr>
 <div class="ttc" id="atypes_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
 <div class="ttc" id="atypes_8h_html_aa777e5139adfca31612ec04bc2b26845"><div class="ttname"><a href="types_8h.html#aa777e5139adfca31612ec04bc2b26845">i64</a></div><div class="ttdeci">#define i64</div><div class="ttdef"><b>Definition:</b> types.h:32</div></div>
 <div class="ttc" id="atypes_8h_html_af3b86d961da0a3575b4f99c9ffaf01fd"><div class="ttname"><a href="types_8h.html#af3b86d961da0a3575b4f99c9ffaf01fd">u8</a></div><div class="ttdeci">#define u8</div><div class="ttdef"><b>Definition:</b> types.h:25</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a3dd62e2b4896987b932eef04d17386ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3dd62e2b4896987b932eef04d17386ce">&#9670;&nbsp;</a></span>Box2</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Box2</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    _Generic((v), \</div>
+<div class="line">    <a class="code" href="types_8h.html#af3b86d961da0a3575b4f99c9ffaf01fd">u8</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#af3b86d961da0a3575b4f99c9ffaf01fd">u8</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret____ = <span class="keyword">new</span> (U8, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret____; }),                \</div>
+<div class="line">    <a class="code" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret___ = <span class="keyword">new</span> (U16, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret___; }),               \</div>
+<div class="line">    <a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret___ = <span class="keyword">new</span> (U32, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret___; }),               \</div>
+<div class="line">    <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret___ = <span class="keyword">new</span> (U64, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret___; }),               \</div>
+<div class="line">    <a class="code" href="types_8h.html#a845593201b45c0e24fdab5e4152c9f40">u128</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#a845593201b45c0e24fdab5e4152c9f40">u128</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret__ = <span class="keyword">new</span> (U128, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret__; }),              \</div>
+<div class="line">    <a class="code" href="types_8h.html#a8b1c3ba7ed71c46505556d43a9bee9e1">i8</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#a8b1c3ba7ed71c46505556d43a9bee9e1">i8</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret____ = <span class="keyword">new</span> (I8, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret____; }),                \</div>
+<div class="line">    <a class="code" href="types_8h.html#a3e01dd59d72c4919aa21a46fa5299e23">i16</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#a3e01dd59d72c4919aa21a46fa5299e23">i16</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret___ = <span class="keyword">new</span> (I16, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret___; }),               \</div>
+<div class="line">    <a class="code" href="types_8h.html#a832509ea197065489f1d60b6d7958cbf">i32</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#a832509ea197065489f1d60b6d7958cbf">i32</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret___ = <span class="keyword">new</span> (I32, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret___; }),               \</div>
+<div class="line">    <a class="code" href="types_8h.html#aa777e5139adfca31612ec04bc2b26845">i64</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#aa777e5139adfca31612ec04bc2b26845">i64</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret___ = <span class="keyword">new</span> (I64, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret___; }),               \</div>
+<div class="line">    <a class="code" href="types_8h.html#a5c951891355b2586e5de49153314e8e4">i128</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#a5c951891355b2586e5de49153314e8e4">i128</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret__ = <span class="keyword">new</span> (I128, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret__; }),              \</div>
+<div class="line">    <a class="code" href="types_8h.html#a1bd198f821a2a4ea63fa8ab2e4a2afb3">f32</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#a1bd198f821a2a4ea63fa8ab2e4a2afb3">f32</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret___ = <span class="keyword">new</span> (F32, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret___; }),               \</div>
+<div class="line">    <a class="code" href="types_8h.html#a1d69936f20818f2cd1b34d1d2fd841be">f64</a>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <a class="code" href="types_8h.html#a1d69936f20818f2cd1b34d1d2fd841be">f64</a> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret___ = <span class="keyword">new</span> (F64, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret___; }),               \</div>
+<div class="line">    <span class="keywordtype">bool</span>: ({ <a class="code" href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a>; <span class="keywordtype">bool</span> * vptr = &amp;v; <span class="keyword">const</span> <a class="code" href="structObj.html">Obj</a> _ret__ = <span class="keyword">new</span> (Bool, <a class="code" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(value, *vptr)); <a class="code" href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a>; _ret__; }),              \</div>
+<div class="line">    <a class="code" href="structObj.html">Obj</a>: ({ v; }),            \</div>
+<div class="line">    <span class="keywordflow">default</span>: ({ <a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a>(<span class="stringliteral">&quot;Attempt to box an unknown type!&quot;</span>); }))</div>
+<div class="ttc" id="aprim_8h_html_a78d57a9fc3823ef2a4a3daff4c4032ec"><div class="ttname"><a href="prim_8h.html#a78d57a9fc3823ef2a4a3daff4c4032ec">ENABLE_WARNING</a></div><div class="ttdeci">#define ENABLE_WARNING</div><div class="ttdef"><b>Definition:</b> prim.h:48</div></div>
+<div class="ttc" id="aprim_8h_html_a807b889b00653a54f0ed6fd492fd021b"><div class="ttname"><a href="prim_8h.html#a807b889b00653a54f0ed6fd492fd021b">DISABLE_WARNING</a></div><div class="ttdeci">#define DISABLE_WARNING</div><div class="ttdef"><b>Definition:</b> prim.h:45</div></div>
+<div class="ttc" id="astructObj_html"><div class="ttname"><a href="structObj.html">Obj</a></div><div class="ttdef"><b>Definition:</b> type.h:62</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -201,12 +246,45 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="prim_8h.html#ae557fffdebf1f47edabd367209f93202">Builder</a>(upper##bits, <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(lower##bits, value)); \</div>
 <div class="line">    Impl(upper##bits, <a class="code" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>);                         \</div>
-<div class="line">    Impl(upper##bits, <a class="code" href="traits_8h.html#a1a931293931f7a689e732d365b5662ba">ValueOf</a>);</div>
+<div class="line">    Impl(upper##bits, <a class="code" href="traits_8h.html#a1a931293931f7a689e732d365b5662ba">ValueOf</a>);                       \</div>
+<div class="line">    Impl(upper##bits, <a class="code" href="traits_8h.html#a40c9b8ed733e623e6cd95857dcbc425e">Equal</a>);</div>
 <div class="ttc" id="aprim_8h_html_ae557fffdebf1f47edabd367209f93202"><div class="ttname"><a href="prim_8h.html#ae557fffdebf1f47edabd367209f93202">Builder</a></div><div class="ttdeci">Builder(Bool, Config(bool, value))</div></div>
 <div class="ttc" id="atraits_8h_html_a1a931293931f7a689e732d365b5662ba"><div class="ttname"><a href="traits_8h.html#a1a931293931f7a689e732d365b5662ba">ValueOf</a></div><div class="ttdeci">#define ValueOf</div><div class="ttdef"><b>Definition:</b> traits.h:53</div></div>
+<div class="ttc" id="atraits_8h_html_a40c9b8ed733e623e6cd95857dcbc425e"><div class="ttname"><a href="traits_8h.html#a40c9b8ed733e623e6cd95857dcbc425e">Equal</a></div><div class="ttdeci">#define Equal</div><div class="ttdef"><b>Definition:</b> traits.h:36</div></div>
 <div class="ttc" id="atraits_8h_html_a86f96056a0c61a863297f2a8fa71ec10"><div class="ttname"><a href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a></div><div class="ttdeci">#define Build</div><div class="ttdef"><b>Definition:</b> traits.h:33</div></div>
 <div class="ttc" id="atype_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a807b889b00653a54f0ed6fd492fd021b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a807b889b00653a54f0ed6fd492fd021b">&#9670;&nbsp;</a></span>DISABLE_WARNING</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define DISABLE_WARNING</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    _Pragma(<span class="stringliteral">&quot;GCC diagnostic push&quot;</span>)                 \</div>
+<div class="line">    _Pragma(<span class="stringliteral">&quot;GCC diagnostic ignored \&quot;-Wincompatible-pointer-types\&quot;&quot;</span>) \</div>
+<div class="line">    _Pragma(<span class="stringliteral">&quot;GCC diagnostic ignored \&quot;-Wpointer-sign\&quot;&quot;</span>)</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a78d57a9fc3823ef2a4a3daff4c4032ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78d57a9fc3823ef2a4a3daff4c4032ec">&#9670;&nbsp;</a></span>ENABLE_WARNING</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ENABLE_WARNING&#160;&#160;&#160;_Pragma(&quot;GCC diagnostic pop&quot;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
 </div>
 </div>
 <a id="a50410f6d180882ef6c3ab96f94142ce2"></a>
@@ -675,7 +753,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a44fa0713e599853155c9a82e26e7081b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44fa0713e599853155c9a82e26e7081b">&#9670;&nbsp;</a></span>Impl() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a44fa0713e599853155c9a82e26e7081b">&#9670;&nbsp;</a></span>Impl() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -702,8 +780,36 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a5984b738595f912124842208b91ebdca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5984b738595f912124842208b91ebdca">&#9670;&nbsp;</a></span>Impl() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Impl </td>
+          <td>(</td>
+          <td class="paramtype">Bool&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="traits_8h.html#a40c9b8ed733e623e6cd95857dcbc425e">Equal</a>&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ab7787f41d2c2e94eda3cf8da34e24e80"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab7787f41d2c2e94eda3cf8da34e24e80">&#9670;&nbsp;</a></span>Impl() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7787f41d2c2e94eda3cf8da34e24e80">&#9670;&nbsp;</a></span>Impl() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">

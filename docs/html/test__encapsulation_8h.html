@@ -73,7 +73,8 @@ $(function() {
 <div class="title">test_encapsulation.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="traits_8h_source.html">core/traits.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="enum_8h_source.html">core/enum.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="traits_8h_source.html">core/traits.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="type_8h_source.html">core/type.h</a>&gt;</code><br />
 </div>
 <p><a href="test__encapsulation_8h_source.html">Go to the source code of this file.</a></p>
@@ -95,6 +96,8 @@ Functions</h2></td></tr>
 <tr class="separator:a9deb1f17d0b1c7582af2052bc74283ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a477856f2ae5819524fc7e371d0b5c78f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__encapsulation_8h.html#a477856f2ae5819524fc7e371d0b5c78f">Impl</a> (Hidden, <a class="el" href="traits_8h.html#a86f96056a0c61a863297f2a8fa71ec10">Build</a>)</td></tr>
 <tr class="separator:a477856f2ae5819524fc7e371d0b5c78f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5b2262fdb2414a2a07cd2a3c25d5a13"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__encapsulation_8h.html#ad5b2262fdb2414a2a07cd2a3c25d5a13">Enum</a> (HiddenEnum,(HiddenVar1, <a class="el" href="types_8h.html#a832509ea197065489f1d60b6d7958cbf">i32</a>),(HiddenVar2, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>),(HiddenVar3, Hidden))</td></tr>
+<tr class="separator:ad5b2262fdb2414a2a07cd2a3c25d5a13"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a9350790bb34c38713a0a0ad62a870f23"></a>
@@ -113,7 +116,7 @@ Functions</h2></td></tr>
 <div class="line">    <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_value),            \</div>
 <div class="line">    <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a>, <span class="keywordtype">void</span>, set_value, <a class="code" href="type_8h.html#af0b43aeaffd7a613c3c061c0696d901a">Param</a>(<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>)), \</div>
 <div class="line">    <a class="code" href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a>(<a class="code" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>, <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, get_capacity_impl))</div>
-<div class="ttc" id="atest__encapsulation_8h_html_a9350790bb34c38713a0a0ad62a870f23"><div class="ttname"><a href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a></div><div class="ttdeci">#define HiddenApi</div><div class="ttdef"><b>Definition:</b> test_encapsulation.h:21</div></div>
+<div class="ttc" id="atest__encapsulation_8h_html_a9350790bb34c38713a0a0ad62a870f23"><div class="ttname"><a href="test__encapsulation_8h.html#a9350790bb34c38713a0a0ad62a870f23">HiddenApi</a></div><div class="ttdeci">#define HiddenApi</div><div class="ttdef"><b>Definition:</b> test_encapsulation.h:22</div></div>
 <div class="ttc" id="atype_8h_html_a23cd3b356bdc7322fbf851888d7787f2"><div class="ttname"><a href="type_8h.html#a23cd3b356bdc7322fbf851888d7787f2">Var</a></div><div class="ttdeci">#define Var(...)</div><div class="ttdef"><b>Definition:</b> type.h:122</div></div>
 <div class="ttc" id="atype_8h_html_a4edfee2ef9567a47b388682adaaec1db"><div class="ttname"><a href="type_8h.html#a4edfee2ef9567a47b388682adaaec1db">Required</a></div><div class="ttdeci">#define Required(...)</div></div>
 <div class="ttc" id="atype_8h_html_a576cf28d25620855f75b2023e4a53e59"><div class="ttname"><a href="type_8h.html#a576cf28d25620855f75b2023e4a53e59">DefineTrait</a></div><div class="ttdeci">#define DefineTrait(...)</div></div>
@@ -140,6 +143,46 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>, capacity)&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad5b2262fdb2414a2a07cd2a3c25d5a13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5b2262fdb2414a2a07cd2a3c25d5a13">&#9670;&nbsp;</a></span>Enum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Enum </td>
+          <td>(</td>
+          <td class="paramtype">HiddenEnum&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">(HiddenVar1, <a class="el" href="types_8h.html#a832509ea197065489f1d60b6d7958cbf">i32</a>)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">(HiddenVar2, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>)&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">(HiddenVar3, Hidden)&#160;</td>
           <td class="paramname">&#160;</td>
         </tr>
         <tr>
