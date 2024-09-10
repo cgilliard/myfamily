@@ -1957,34 +1957,54 @@ Test(core, test_enum_encap)
 	let var3 = _obj(HiddenEnum, HiddenVar3, hidden);
 
 	// match on var1. Create a U32 of the specified value.
-	let m1 = match(var1, (HiddenVar1, new (U32, With(value, 1))), (HiddenVar2, new (U32, With(value, 2))), (new (U32, With(value, 3))));
+	let m1 = match(
+	    var1,
+	    (HiddenVar1, new (U32, With(value, 1))),
+	    (HiddenVar2, new (U32, With(value, 2))),
+	    (new (U32, With(value, 3))));
 	Unbox(m1, v_out);	// unbox
 	cr_assert_eq(v_out, 1); // we should have 1.
 
 	// match on var2. Create a U32 of the specified value.
-	let m2 = match(var2, (HiddenVar1, new (U32, With(value, 1))), (HiddenVar2, new (U32, With(value, 2))), (new (U32, With(value, 3))));
+	let m2 = match(
+	    var2,
+	    (HiddenVar1, new (U32, With(value, 1))),
+	    (HiddenVar2, new (U32, With(value, 2))),
+	    (new (U32, With(value, 3))));
 	Unbox(m2, v_out);	// unbox
 	cr_assert_eq(v_out, 2); // we should have 2.
 
 	// match on var3. Create a U32 of the specified value. (default match).
-	let m3 = match(var3, (HiddenVar1, new (U32, With(value, 1))), (HiddenVar2, new (U32, With(value, 2))), (new (U32, With(value, 3))));
+	let m3 = match(
+	    var3,
+	    (HiddenVar1, new (U32, With(value, 1))),
+	    (HiddenVar2, new (U32, With(value, 2))),
+	    (new (U32, With(value, 3))));
 	Unbox(m3, v_out);	// unbox
 	cr_assert_eq(v_out, 3); // we should have 3.
 
 	// mutable match (demonstration of mutable match
-	let m4 = match(var3, (HiddenVar1, new (U64, With(value, 0))), (HiddenVar2, new (U64, With(value, 0))), (HiddenVar3, mut v, {
-			       u64 cur = get_value(&v);
-			       set_value(&v, 999);
-			       new (U64, With(value, cur));
-		       }));
+	let m4 = match(
+	    var3,
+	    (HiddenVar1, new (U64, With(value, 0))),
+	    (HiddenVar2, new (U64, With(value, 0))),
+	    (HiddenVar3, mut v, {
+		    u64 cur = get_value(&v);
+		    set_value(&v, 999);
+		    new (U64, With(value, cur));
+	    }));
 	Unbox(m4, v_out64);
 	cr_assert_eq(v_out64, 101);
 
 	// read the value now
-	let m5 = match(var3, (HiddenVar1, new (U64, With(value, 0))), (HiddenVar2, new (U64, With(value, 0))), (HiddenVar3, v, {
-			       u64 cur = get_value(&v);
-			       new (U64, With(value, cur));
-		       }));
+	let m5 = match(
+	    var3,
+	    (HiddenVar1, new (U64, With(value, 0))),
+	    (HiddenVar2, new (U64, With(value, 0))),
+	    (HiddenVar3, v, {
+		    u64 cur = get_value(&v);
+		    new (U64, With(value, cur));
+	    }));
 
 	// unbox and assert that it's changed to the updated value.
 	Unbox(m5, v_out64);
@@ -2035,27 +2055,29 @@ bool PetsEnum_equal(const Obj* rhs)
 	let vrhs = as_ref(rhs);
 
 	// Match on self. We know the rhs is also the same variant.
-	let x = match(*($()), (bird, v, new (Bool, With(value, equal(&v, &vrhs)))),
-		      (cat, v, new (Bool, With(value, equal(&v, &vrhs)))),
-		      (dog, v, {
-			      // Dogs (SimpleOption) does not implement Equal so we have to use another method.
-			      // In this case, we call 'value_of' and compare.
-			      i32 self_i32;
-			      i32 rhs_i32;
-			      value_of(&v, &self_i32);
-			      value_of(&vrhs, &rhs_i32);
-			      // return true if the values are equal, otherwise return false
-			      new (Bool, With(value, rhs_i32 == self_i32));
-		      }),
-		      (snake, v, new (Bool, With(value, equal(&v, &vrhs)))), (hamster, v, {
-			      // hamster also does not implement equal, so use the value_of trait implementation
-			      // to compare the underlying values.
-			      i32 self_i32;
-			      i32 rhs_i32;
-			      value_of(&v, &self_i32);
-			      value_of(&vrhs, &rhs_i32);
-			      new (Bool, With(value, rhs_i32 == self_i32));
-		      }));
+	let x = match(
+	    *($()),
+	    (bird, v, new (Bool, With(value, equal(&v, &vrhs)))),
+	    (cat, v, new (Bool, With(value, equal(&v, &vrhs)))),
+	    (dog, v, {
+		    // Dogs (SimpleOption) does not implement Equal so we have to use another method.
+		    // In this case, we call 'value_of' and compare.
+		    i32 self_i32;
+		    i32 rhs_i32;
+		    value_of(&v, &self_i32);
+		    value_of(&vrhs, &rhs_i32);
+		    // return true if the values are equal, otherwise return false
+		    new (Bool, With(value, rhs_i32 == self_i32));
+	    }),
+	    (snake, v, new (Bool, With(value, equal(&v, &vrhs)))), (hamster, v, {
+		    // hamster also does not implement equal, so use the value_of trait implementation
+		    // to compare the underlying values.
+		    i32 self_i32;
+		    i32 rhs_i32;
+		    value_of(&v, &self_i32);
+		    value_of(&vrhs, &rhs_i32);
+		    new (Bool, With(value, rhs_i32 == self_i32));
+	    }));
 
 	// The returned value in 'x' is our return value. Unbox it and return it.
 	bool ret;
