@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['_5f_5fattribute_5f_5f_813',['__attribute__',['../type_8c.html#afd02bb0f6a745c39d5e3417493995c71',1,'type.c']]]
+  ['_24my_5fvoid_5fmethod_866',['$my_void_method',['../header__sample1_8h.html#adaad72b47c5b477a13327d6eccb912fd',1,'header_sample1.h']]],
+  ['_24print_867',['$print',['../header__sample1_8h.html#ae242ef8a50ae73db90399403f8bb4d52',1,'header_sample1.h']]]
 ];

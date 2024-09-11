@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['z_744',['z',['../structtoml__timestamp__t.html#a79612f3b9340c022278bc23f95956ea7',1,'toml_timestamp_t::z()'],['../structtoml__timestamp__t.html#ac606adc1de06301f2a28f26eadfe854e',1,'toml_timestamp_t::z()']]],
-  ['zeroed_745',['zeroed',['../structHeapAllocatorConfig.html#a9e1e7a708921e91050de20b0bb483bb7',1,'HeapAllocatorConfig']]]
+  ['y_791',['y',['../header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857',1,'header_sample1.h']]],
+  ['year_792',['year',['../structtoml__timestamp__t.html#af2ad301a397736799dc69f961eefbf82',1,'toml_timestamp_t::year()'],['../structtoml__timestamp__t.html#ac342ce4fae08654918d979f94cbdff3e',1,'toml_timestamp_t::year()']]]
 ];
