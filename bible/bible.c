@@ -76,17 +76,15 @@ int bible_parse_verse(Bible *bible, u64 index, char *buf) {
 	verse[end_verse - start_verse] = 0;
 
 	int start_text = end_verse + 2;
-	int end_text = strstr(buf, "\n") - buf;
 
-	// deal with last line in file which has no newline
-	if (end_text < 0)
+	int end_text;
+	const char *end_text_res = strstr(buf, "\n");
+	if (end_text_res == NULL) {
+		// last line has no newline so just use entire line here
 		end_text = strlen(buf);
-	if (end_text < start_text) {
-		fprintf(stderr, "invalid line %s, index=%" PRIu64 ", end_chapter=%i,start_chap=%i\n", buf,
-				index, end_verse, start_verse);
-		errno = EINVAL;
-		return -1;
-	}
+	} else
+		end_text = end_text_res - buf;
+
 	char text[(end_text - start_text) + 1];
 	memcpy(text, buf + start_text, end_text - start_text);
 	text[end_text - start_text] = 0;
