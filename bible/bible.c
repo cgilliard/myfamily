@@ -44,7 +44,6 @@ int bible_parse_verse(Bible *bible, u64 index, char *buf) {
 		errno = EINVAL;
 		return -1;
 	}
-	printf("buf=%s, end_book = %i\n", buf, end_book);
 	char bookname[end_book + 1];
 	memcpy(bookname, buf, end_book);
 	bookname[end_book] = 0;
