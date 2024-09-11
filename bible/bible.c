@@ -173,11 +173,12 @@ int bible_build(Bible *bible, char *path) {
 				return -1;
 			bible->verses = tmp;
 		}
-		int end_book = strstr(buf, "|") - buf;
-		if (end_book < 0) {
-			// there is at least one empty line in the text
+		const char *strstr_res = strstr(buf, "|");
+		if (strstr_res == NULL) {
+			// there is an empty line in the file. Skip it.
 			continue;
 		}
+		int end_book = strstr_res - buf;
 		if (bible_parse_verse(bible, bible->verse_count, buf))
 			return -1;
 		bible->verse_count += 1;
