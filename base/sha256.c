@@ -140,11 +140,12 @@ void SHA256Final(SHA256_CTX *ctx, uchar hash[]) {
 	}
 }
 
-char *SHA256(unsigned char *data) {
+int SHA256(unsigned char *data, char hashStr[65]) {
+	if (hashStr == NULL || data == NULL)
+		return -1;
 	int strLen = strlen((const char *)data);
 	SHA256_CTX ctx;
 	unsigned char hash[32];
-	char hashStr[65];
 	strcpy(hashStr, "");
 
 	SHA256Init(&ctx);
@@ -157,5 +158,5 @@ char *SHA256(unsigned char *data) {
 		strcat(hashStr, s);
 	}
 
-	return hashStr;
+	return 0;
 }

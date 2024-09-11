@@ -19,7 +19,8 @@
 #include <string.h>
 
 int bible_checksum(char *data) {
-	char *sha = SHA256(data);
+	char sha[65];
+	SHA256(data, sha);
 
 	// sha 256 checksum of the akjv bible from
 	// https://github.com/bible-hub/Bibles/blob/master/English__American_King_James_Version__akjv__LTR.txt
@@ -51,8 +52,7 @@ int bible_parse_verse(Bible *bible, u64 index, char *buf) {
 	int start_chapter = end_book + 2;
 	const char *end_chapter_str = strstr(buf + start_chapter, "|");
 	if (end_chapter_str == NULL) {
-		fprintf(stderr, "invalid line %s, index=%" PRIu64 ", end_chapter=%i,start_chap=%i\n", buf,
-				index, end_chapter, start_chapter);
+		fprintf(stderr, "invalid line %s, index=%" PRIu64 "\n", buf, index);
 		errno = EINVAL;
 		return -1;
 	}
@@ -71,8 +71,7 @@ int bible_parse_verse(Bible *bible, u64 index, char *buf) {
 	int start_verse = end_chapter + 2;
 	const char *end_verse_str = strstr(buf + start_verse, "|");
 	if (end_verse_str == NULL) {
-		fprintf(stderr, "invalid line %s, index=%" PRIu64 ", end_chapter=%i,start_chap=%i\n", buf,
-				index, end_verse, start_verse);
+		fprintf(stderr, "invalid line %s, index=%" PRIu64 "\n", buf, index);
 		errno = EINVAL;
 		return -1;
 	}

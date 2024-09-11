@@ -15,6 +15,6 @@
 #ifndef _BASE_SHA256__
 #define _BASE_SHA256__
 
-char *SHA256(char *data);
+int SHA256(char *data, char hashStr[65]);
 
 #endif // _BASE_SHA256__
