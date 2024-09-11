@@ -147,13 +147,13 @@ Macros</h2></td></tr>
 <tr class="separator:a84b5a7c8352e5538b2291b38890b3f41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65458b379bab39c163d25ccad7be4c80"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a65458b379bab39c163d25ccad7be4c80">FIRST_TWO</a>(x, ...)&#160;&#160;&#160;<a class="el" href="macro__utils_8h.html#a6375dd21159dc6c16bd3c2278055a359">MULTI_SWITCH</a>(<a class="el" href="macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>, <a class="el" href="type_8h.html#aa47705a2211482f7ffd71fa310be0f22">FIRST_TWO_</a>, x, __VA_ARGS__)</td></tr>
 <tr class="separator:a65458b379bab39c163d25ccad7be4c80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa47705a2211482f7ffd71fa310be0f22"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa47705a2211482f7ffd71fa310be0f22">FIRST_TWO_</a>(x,  y, ...)&#160;&#160;&#160;x y</td></tr>
+<tr class="memitem:aa47705a2211482f7ffd71fa310be0f22"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa47705a2211482f7ffd71fa310be0f22">FIRST_TWO_</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, ...)&#160;&#160;&#160;x <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td></tr>
 <tr class="separator:aa47705a2211482f7ffd71fa310be0f22"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c2b147d20531bee9783a9790bd3fd19"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a9c2b147d20531bee9783a9790bd3fd19">CALL_FIRST_TWO</a>(x,  y)&#160;&#160;&#160;<a class="el" href="type_8h.html#a65458b379bab39c163d25ccad7be4c80">FIRST_TWO</a> y</td></tr>
+<tr class="memitem:a9c2b147d20531bee9783a9790bd3fd19"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a9c2b147d20531bee9783a9790bd3fd19">CALL_FIRST_TWO</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)&#160;&#160;&#160;<a class="el" href="type_8h.html#a65458b379bab39c163d25ccad7be4c80">FIRST_TWO</a> <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td></tr>
 <tr class="separator:a9c2b147d20531bee9783a9790bd3fd19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31bc4cf65557fefc6240fe6d301ea16d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a31bc4cf65557fefc6240fe6d301ea16d">DROP_OBJECTS__</a>(name,  struct_type,  inner, ...)&#160;&#160;&#160;	<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="type_8h.html#a755c650048dad76731e21e92e73fbd34">Obj_cleanup</a>(&amp;((name*)(ptr-&gt;ptr.data))-&gt;inner);)</td></tr>
 <tr class="separator:a31bc4cf65557fefc6240fe6d301ea16d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac420a528a6301fd354efa1d449a81764"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ac420a528a6301fd354efa1d449a81764">DROP_OBJECTS_</a>(x,  y, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="type_8h.html#a31bc4cf65557fefc6240fe6d301ea16d">DROP_OBJECTS__</a>(x, y, __VA_ARGS__))</td></tr>
+<tr class="memitem:ac420a528a6301fd354efa1d449a81764"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ac420a528a6301fd354efa1d449a81764">DROP_OBJECTS_</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="type_8h.html#a31bc4cf65557fefc6240fe6d301ea16d">DROP_OBJECTS__</a>(x, <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, __VA_ARGS__))</td></tr>
 <tr class="separator:ac420a528a6301fd354efa1d449a81764"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e988d852374c4b82d22abc63fce0383"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a9e988d852374c4b82d22abc63fce0383">DROP_OBJECTS_EXPAND</a>(...)&#160;&#160;&#160;<a class="el" href="type_8h.html#ac420a528a6301fd354efa1d449a81764">DROP_OBJECTS_</a>(__VA_ARGS__)</td></tr>
 <tr class="separator:a9e988d852374c4b82d22abc63fce0383"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -221,9 +221,9 @@ Macros</h2></td></tr>
 <tr class="separator:a51c74b980e29efc9363ed186928ec7f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a186af0dcfce5f80cf526e746d9ea00d6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a186af0dcfce5f80cf526e746d9ea00d6">Generic</a>(obj_type,  obj_name)&#160;&#160;&#160;(<a class="el" href="structObj.html">Obj</a>, obj_name, obj_type, ignore)</td></tr>
 <tr class="separator:a186af0dcfce5f80cf526e746d9ea00d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83dd37cc0bb92d715fc246014e02b359"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(x,  y)&#160;&#160;&#160;(x, y, ignore)</td></tr>
+<tr class="memitem:a83dd37cc0bb92d715fc246014e02b359"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a83dd37cc0bb92d715fc246014e02b359">With</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)&#160;&#160;&#160;(x, <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, ignore)</td></tr>
 <tr class="separator:a83dd37cc0bb92d715fc246014e02b359"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:accbe8dfa3c214c2b7d0da037b8d24d35"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#accbe8dfa3c214c2b7d0da037b8d24d35">WithObject</a>(x,  y)&#160;&#160;&#160;(x, y)</td></tr>
+<tr class="memitem:accbe8dfa3c214c2b7d0da037b8d24d35"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#accbe8dfa3c214c2b7d0da037b8d24d35">WithObject</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)&#160;&#160;&#160;(x, <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)</td></tr>
 <tr class="separator:accbe8dfa3c214c2b7d0da037b8d24d35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb292545e8d39ad1892f3b4c622935da"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#adb292545e8d39ad1892f3b4c622935da">OBJECT_INIT</a></td></tr>
 <tr class="separator:adb292545e8d39ad1892f3b4c622935da"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -253,15 +253,15 @@ Macros</h2></td></tr>
 <tr class="separator:a3521b7722e358f98597043439741612c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa737fc32d91c59bd8bd2fdb17ada2845"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa737fc32d91c59bd8bd2fdb17ada2845">Const</a>()&#160;&#160;&#160;const</td></tr>
 <tr class="separator:aa737fc32d91c59bd8bd2fdb17ada2845"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abead0bbf4c2b9ff02131b2dddde1bea2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#abead0bbf4c2b9ff02131b2dddde1bea2">SECOND_ALL</a>(x,  y, ...)&#160;&#160;&#160;y</td></tr>
+<tr class="memitem:abead0bbf4c2b9ff02131b2dddde1bea2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#abead0bbf4c2b9ff02131b2dddde1bea2">SECOND_ALL</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, ...)&#160;&#160;&#160;<a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td></tr>
 <tr class="separator:abead0bbf4c2b9ff02131b2dddde1bea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac66bad82b4222b29f5b45b3e98654269"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ac66bad82b4222b29f5b45b3e98654269">CALL_SECOND</a>(x,  y)&#160;&#160;&#160;<a class="el" href="type_8h.html#abead0bbf4c2b9ff02131b2dddde1bea2">SECOND_ALL</a> y</td></tr>
+<tr class="memitem:ac66bad82b4222b29f5b45b3e98654269"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ac66bad82b4222b29f5b45b3e98654269">CALL_SECOND</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)&#160;&#160;&#160;<a class="el" href="type_8h.html#abead0bbf4c2b9ff02131b2dddde1bea2">SECOND_ALL</a> <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td></tr>
 <tr class="separator:ac66bad82b4222b29f5b45b3e98654269"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7033995114ec95e0e30960025176d46"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ae7033995114ec95e0e30960025176d46">PROCESS_FN_CALL</a>(...)&#160;&#160;&#160;	<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">FOR_EACH_INNER</a>(<a class="el" href="type_8h.html#ac66bad82b4222b29f5b45b3e98654269">CALL_SECOND</a>, none, (, ), __VA_ARGS__))</td></tr>
 <tr class="separator:ae7033995114ec95e0e30960025176d46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ca9504b1881f06b88a882911bf929c2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a1ca9504b1881f06b88a882911bf929c2">OBJECT_ONLY</a>(i,  value, ...)</td></tr>
+<tr class="memitem:a1ca9504b1881f06b88a882911bf929c2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a1ca9504b1881f06b88a882911bf929c2">OBJECT_ONLY</a>(<a class="el" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>,  value, ...)</td></tr>
 <tr class="separator:a1ca9504b1881f06b88a882911bf929c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5330309e6c417b07b0cb1a6007fb2393"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a5330309e6c417b07b0cb1a6007fb2393">CALL_SECOND_OBJECT</a>(x,  y)&#160;&#160;&#160;<a class="el" href="type_8h.html#a1ca9504b1881f06b88a882911bf929c2">OBJECT_ONLY</a> y</td></tr>
+<tr class="memitem:a5330309e6c417b07b0cb1a6007fb2393"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a5330309e6c417b07b0cb1a6007fb2393">CALL_SECOND_OBJECT</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)&#160;&#160;&#160;<a class="el" href="type_8h.html#a1ca9504b1881f06b88a882911bf929c2">OBJECT_ONLY</a> <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td></tr>
 <tr class="separator:a5330309e6c417b07b0cb1a6007fb2393"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a619eb1f4a3d5df812d0234bcf8b36e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a7a619eb1f4a3d5df812d0234bcf8b36e">PROCESS_FN_CHECK_OBJECTS</a>(...)&#160;&#160;&#160;	<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">FOR_EACH_INNER</a>(<a class="el" href="type_8h.html#a5330309e6c417b07b0cb1a6007fb2393">CALL_SECOND_OBJECT</a>, none, (;), __VA_ARGS__))</td></tr>
 <tr class="separator:a7a619eb1f4a3d5df812d0234bcf8b36e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -269,9 +269,9 @@ Macros</h2></td></tr>
 <tr class="separator:a9c7273d826612c255ed64f475247f299"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0523fffb9cdffa46b23221387d7c700e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a0523fffb9cdffa46b23221387d7c700e">COUNT_OBJS</a>(...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">FOR_EACH_INNER</a>(<a class="el" href="type_8h.html#a9c7273d826612c255ed64f475247f299">CALL_COUNT_OBJS</a>, none, (;), __VA_ARGS__))</td></tr>
 <tr class="separator:a0523fffb9cdffa46b23221387d7c700e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21acaeda3d97f75665ade50cee9a9370"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a21acaeda3d97f75665ade50cee9a9370">BOTH_ALL</a>(x,  y, ...)&#160;&#160;&#160;x y</td></tr>
+<tr class="memitem:a21acaeda3d97f75665ade50cee9a9370"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a21acaeda3d97f75665ade50cee9a9370">BOTH_ALL</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, ...)&#160;&#160;&#160;x <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td></tr>
 <tr class="separator:a21acaeda3d97f75665ade50cee9a9370"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5aea6a4109216c23143fdb0248d2fde"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa5aea6a4109216c23143fdb0248d2fde">CALL_BOTH</a>(x,  y)&#160;&#160;&#160;<a class="el" href="type_8h.html#a21acaeda3d97f75665ade50cee9a9370">BOTH_ALL</a> y</td></tr>
+<tr class="memitem:aa5aea6a4109216c23143fdb0248d2fde"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa5aea6a4109216c23143fdb0248d2fde">CALL_BOTH</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)&#160;&#160;&#160;<a class="el" href="type_8h.html#a21acaeda3d97f75665ade50cee9a9370">BOTH_ALL</a> <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td></tr>
 <tr class="separator:aa5aea6a4109216c23143fdb0248d2fde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7807ba2c750e8fd2ad770bdde7b0a601"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a>(...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">FOR_EACH_INNER</a>(<a class="el" href="type_8h.html#aa5aea6a4109216c23143fdb0248d2fde">CALL_BOTH</a>, none, (, ), __VA_ARGS__))</td></tr>
 <tr class="separator:a7807ba2c750e8fd2ad770bdde7b0a601"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -285,7 +285,7 @@ Macros</h2></td></tr>
 <tr class="separator:a36334d72ce6f569a8cbe237abe627f39"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8dcb98da4d789f630845dc502301e4aa"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a8dcb98da4d789f630845dc502301e4aa">PROC_BOTH_PROTO</a>(...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a36334d72ce6f569a8cbe237abe627f39">PROC_BOTH_PROTO_</a>(__VA_ARGS__)</td></tr>
 <tr class="separator:a8dcb98da4d789f630845dc502301e4aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2a532ad8a2bfdcbf4079ed5b79bc7a7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ab2a532ad8a2bfdcbf4079ed5b79bc7a7">CALL_BOTH_PROTO</a>(x,  y)&#160;&#160;&#160;<a class="el" href="type_8h.html#a8dcb98da4d789f630845dc502301e4aa">PROC_BOTH_PROTO</a>(x, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> y)</td></tr>
+<tr class="memitem:ab2a532ad8a2bfdcbf4079ed5b79bc7a7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ab2a532ad8a2bfdcbf4079ed5b79bc7a7">CALL_BOTH_PROTO</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)&#160;&#160;&#160;<a class="el" href="type_8h.html#a8dcb98da4d789f630845dc502301e4aa">PROC_BOTH_PROTO</a>(x, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)</td></tr>
 <tr class="separator:ab2a532ad8a2bfdcbf4079ed5b79bc7a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a223c948726fd3904aac629422ebb1b5e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a223c948726fd3904aac629422ebb1b5e">PROCESS_FN_SIG_PROTO</a>(impl_type, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">FOR_EACH_INNER</a>(<a class="el" href="type_8h.html#ab2a532ad8a2bfdcbf4079ed5b79bc7a7">CALL_BOTH_PROTO</a>, impl_type, (, ), __VA_ARGS__))</td></tr>
 <tr class="separator:a223c948726fd3904aac629422ebb1b5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -301,11 +301,11 @@ Macros</h2></td></tr>
 <tr class="separator:abcbca76d4375696cf17b813ad78807f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc79e6b53ea220c9a33aafa6ab637fb4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#abc79e6b53ea220c9a33aafa6ab637fb4">CHECK_SELF_PARAMS</a>(self, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">FOR_EACH_INNER</a>(<a class="el" href="type_8h.html#abcbca76d4375696cf17b813ad78807f6">CHECK_SELF_IMPL</a>, self, (;), __VA_ARGS__))</td></tr>
 <tr class="separator:abc79e6b53ea220c9a33aafa6ab637fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17ddae05258b7817824656030b96dfd0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a17ddae05258b7817824656030b96dfd0">UNEXPECTED_FLAGS</a>(f)</td></tr>
+<tr class="memitem:a17ddae05258b7817824656030b96dfd0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a17ddae05258b7817824656030b96dfd0">UNEXPECTED_FLAGS</a>(<a class="el" href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a>)</td></tr>
 <tr class="separator:a17ddae05258b7817824656030b96dfd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa675cc552be370e364caf41018d58d98"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#aa675cc552be370e364caf41018d58d98">PROC_TRAIT_IMPL_FN_</a>(mutability,  return_type,  fn_name, ...)</td></tr>
 <tr class="separator:aa675cc552be370e364caf41018d58d98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae90f6c1f887deca6d8077fe33b24a1f9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ae90f6c1f887deca6d8077fe33b24a1f9">DEFAULT_IMPL__</a>(T,  default_impl_fn,  mutability,  return_type,  fn_name,  ...)</td></tr>
+<tr class="memitem:ae90f6c1f887deca6d8077fe33b24a1f9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ae90f6c1f887deca6d8077fe33b24a1f9">DEFAULT_IMPL__</a>(<a class="el" href="header__sample1_8h.html#a9469c984c82f6a406933bb754923b7e5">T</a>,  default_impl_fn,  mutability,  return_type,  fn_name,  ...)</td></tr>
 <tr class="separator:ae90f6c1f887deca6d8077fe33b24a1f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a965b54e637fc3066fff0c9212fa3f557"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a965b54e637fc3066fff0c9212fa3f557">CHECK_SUPER_</a>(type,  trait)</td></tr>
 <tr class="separator:a965b54e637fc3066fff0c9212fa3f557"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -317,7 +317,7 @@ Macros</h2></td></tr>
 <tr class="separator:adb5afa6c222fc461f382b281b140047f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26ec1629f2bd2a8818133fb9e2091e2e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a26ec1629f2bd2a8818133fb9e2091e2e">DEFAULT_IMPL_</a>(x, ...)&#160;&#160;&#160;	<a class="el" href="macro__utils_8h.html#af9981fa9ac5d880cf5025492c846dfea">MULTI_SWITCH2_INNER</a>(<a class="el" href="type_8h.html#adb5afa6c222fc461f382b281b140047f">SUPER_PROC</a>, <a class="el" href="type_8h.html#ae90f6c1f887deca6d8077fe33b24a1f9">DEFAULT_IMPL__</a>, x, __VA_ARGS__)</td></tr>
 <tr class="separator:a26ec1629f2bd2a8818133fb9e2091e2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2821f944c41d6add9021928aa483f40c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a2821f944c41d6add9021928aa483f40c">DEFAULT_IMPL</a>(T, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a26ec1629f2bd2a8818133fb9e2091e2e">DEFAULT_IMPL_</a>(T, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> __VA_ARGS__)</td></tr>
+<tr class="memitem:a2821f944c41d6add9021928aa483f40c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a2821f944c41d6add9021928aa483f40c">DEFAULT_IMPL</a>(<a class="el" href="header__sample1_8h.html#a9469c984c82f6a406933bb754923b7e5">T</a>, ...)&#160;&#160;&#160;<a class="el" href="type_8h.html#a26ec1629f2bd2a8818133fb9e2091e2e">DEFAULT_IMPL_</a>(<a class="el" href="header__sample1_8h.html#a9469c984c82f6a406933bb754923b7e5">T</a>, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> __VA_ARGS__)</td></tr>
 <tr class="separator:a2821f944c41d6add9021928aa483f40c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7dee868fa6371dbff805b8dd8593f29"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ae7dee868fa6371dbff805b8dd8593f29">PROC_TRAIT_IMPL_FN_DEFAULT__</a>(default_fn,  mutability,  return_type,  fn_name, ...)</td></tr>
 <tr class="separator:ae7dee868fa6371dbff805b8dd8593f29"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -337,7 +337,7 @@ Macros</h2></td></tr>
 <tr class="separator:ae1be68f43da81b740f27838e98e4e37a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5071bbcd702264cc19cf1f2da8c2d0cd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a5071bbcd702264cc19cf1f2da8c2d0cd">PROC_TRAIT_STATEMENT_IMPL_EXP_</a>(impl_type,  mutability,  return_type,  fn_name, ...)</td></tr>
 <tr class="separator:a5071bbcd702264cc19cf1f2da8c2d0cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1cd8ffc18d3796bc6520261725c9616e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a1cd8ffc18d3796bc6520261725c9616e">PROC_TRAIT_STATEMENT_IMPL_EXP</a>(x,  y, ...)</td></tr>
+<tr class="memitem:a1cd8ffc18d3796bc6520261725c9616e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a1cd8ffc18d3796bc6520261725c9616e">PROC_TRAIT_STATEMENT_IMPL_EXP</a>(x,  <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, ...)</td></tr>
 <tr class="separator:a1cd8ffc18d3796bc6520261725c9616e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77f8b9ce5ca6dbfcff7e935fb2efff5f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a77f8b9ce5ca6dbfcff7e935fb2efff5f">PROC_TRAIT_STATEMENT_IMPL</a>(...)&#160;&#160;&#160;	<a class="el" href="type_8h.html#a1cd8ffc18d3796bc6520261725c9616e">PROC_TRAIT_STATEMENT_IMPL_EXP</a>(__VA_ARGS__)</td></tr>
 <tr class="separator:a77f8b9ce5ca6dbfcff7e935fb2efff5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -466,7 +466,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y, </td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -477,7 +477,7 @@ Variables</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;x y</td>
+          <td></td><td>&#160;&#160;&#160;x <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -524,9 +524,9 @@ Variables</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    ({                              \</div>
 <div class="line">    ((name*)(ptr-&gt;ptr.data))-&gt;inner = <a class="code" href="type_8h.html#adb292545e8d39ad1892f3b4c622935da">OBJECT_INIT</a>;                                              \</div>
 <div class="line">    bool _is_generic__ = <span class="keyword">false</span>;                                                                 \</div>
-<div class="line">    for (<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> i = 0; name##_generic_name_arr != NULL &amp;&amp; name##_generic_name_arr[i] != NULL; i++) \</div>
+<div class="line">    for (<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a> = 0; name##_generic_name_arr != NULL &amp;&amp; name##_generic_name_arr[<a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>] != NULL; <a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>++) \</div>
 <div class="line">    {                                                                                           \</div>
-<div class="line">        if (!strcmp(name##_generic_name_arr[i], <a class="code" href="macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7">STRINGIFY</a>(vtable_name)))                    \</div>
+<div class="line">        if (!strcmp(name##_generic_name_arr[<a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>], <a class="code" href="macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7">STRINGIFY</a>(vtable_name)))                    \</div>
 <div class="line">        {                                                                                   \</div>
 <div class="line">            _is_generic__ = <span class="keyword">true</span>;                                                       \</div>
 <div class="line">            break;                                                                      \</div>
@@ -535,9 +535,10 @@ Variables</h2></td></tr>
 <div class="line">    ((name*)(ptr-&gt;ptr.data))-&gt;inner.vtable = &amp;name##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##vtable_name##_Vtable__;                  \</div>
 <div class="line">})</div>
 <div class="ttc" id="aenum_8h_html_a6bae5ab157437fc2f69924192746a577"><div class="ttname"><a href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a></div><div class="ttdeci">#define _(name, variant, v)</div><div class="ttdef"><b>Definition:</b> enum.h:202</div></div>
+<div class="ttc" id="aheader__sample1_8h_html_af6fde94d1594d8b6e626117cde7005ab"><div class="ttname"><a href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a></div><div class="ttdeci">u64 i</div><div class="ttdef"><b>Definition:</b> header_sample1.h:33</div></div>
 <div class="ttc" id="amacro__utils_8h_html_a6df1d22fb5f09eccc23b9f399670cfd7"><div class="ttname"><a href="macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7">STRINGIFY</a></div><div class="ttdeci">#define STRINGIFY(x)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:16</div></div>
 <div class="ttc" id="atype_8h_html_adb292545e8d39ad1892f3b4c622935da"><div class="ttname"><a href="type_8h.html#adb292545e8d39ad1892f3b4c622935da">OBJECT_INIT</a></div><div class="ttdeci">#define OBJECT_INIT</div></div>
-<div class="ttc" id="atypes_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
+<div class="ttc" id="atypes_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:33</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -803,9 +804,9 @@ Variables</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    ({                              \</div>
 <div class="line">    ((name*)(ptr-&gt;ptr.data))-&gt;inner = <a class="code" href="type_8h.html#adb292545e8d39ad1892f3b4c622935da">OBJECT_INIT</a>;                                              \</div>
 <div class="line">    bool _is_generic__ = <span class="keyword">false</span>;                                                                 \</div>
-<div class="line">    for (<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> i = 0; name##_generic_name_arr != NULL &amp;&amp; name##_generic_name_arr[i] != NULL; i++) \</div>
+<div class="line">    for (<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a> = 0; name##_generic_name_arr != NULL &amp;&amp; name##_generic_name_arr[<a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>] != NULL; <a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>++) \</div>
 <div class="line">    {                                                                                           \</div>
-<div class="line">        if (!strcmp(name##_generic_name_arr[i], <a class="code" href="macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7">STRINGIFY</a>(vtable_name)))                    \</div>
+<div class="line">        if (!strcmp(name##_generic_name_arr[<a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>], <a class="code" href="macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7">STRINGIFY</a>(vtable_name)))                    \</div>
 <div class="line">        {                                                                                   \</div>
 <div class="line">            _is_generic__ = <span class="keyword">true</span>;                                                       \</div>
 <div class="line">            break;                                                                      \</div>
@@ -848,7 +849,7 @@ Variables</h2></td></tr>
 <div class="line">    {                                                                 \</div>
 <div class="line">        __VA_OPT__(<a class="code" href="macro__utils_8h.html#a57f29b9285b9beab8c788f98b08e3e5e">FOR_EACH</a>(<a class="code" href="type_8h.html#a9c2b147d20531bee9783a9790bd3fd19">CALL_FIRST_TWO</a>, , (;), __VA_ARGS__)); \</div>
 <div class="line">    } name##<a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>;</div>
-<div class="ttc" id="amacro__utils_8h_html_a57f29b9285b9beab8c788f98b08e3e5e"><div class="ttname"><a href="macro__utils_8h.html#a57f29b9285b9beab8c788f98b08e3e5e">FOR_EACH</a></div><div class="ttdeci">#define FOR_EACH(m, arg, delim,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:99</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a57f29b9285b9beab8c788f98b08e3e5e"><div class="ttname"><a href="macro__utils_8h.html#a57f29b9285b9beab8c788f98b08e3e5e">FOR_EACH</a></div><div class="ttdeci">#define FOR_EACH(m, arg, delim,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:102</div></div>
 <div class="ttc" id="astructVtable_html"><div class="ttname"><a href="structVtable.html">Vtable</a></div><div class="ttdef"><b>Definition:</b> type.h:52</div></div>
 <div class="ttc" id="atype_8h_html_a9c2b147d20531bee9783a9790bd3fd19"><div class="ttname"><a href="type_8h.html#a9c2b147d20531bee9783a9790bd3fd19">CALL_FIRST_TWO</a></div><div class="ttdeci">#define CALL_FIRST_TWO(x, y)</div></div>
 <div class="ttc" id="atype_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
@@ -871,12 +872,12 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y&#160;</td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a21acaeda3d97f75665ade50cee9a9370">BOTH_ALL</a> y</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a21acaeda3d97f75665ade50cee9a9370">BOTH_ALL</a> <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -899,12 +900,12 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y&#160;</td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a8dcb98da4d789f630845dc502301e4aa">PROC_BOTH_PROTO</a>(x, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> y)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a8dcb98da4d789f630845dc502301e4aa">PROC_BOTH_PROTO</a>(x, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -955,12 +956,12 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y&#160;</td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a65458b379bab39c163d25ccad7be4c80">FIRST_TWO</a> y</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a65458b379bab39c163d25ccad7be4c80">FIRST_TWO</a> <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -983,12 +984,12 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y&#160;</td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#abead0bbf4c2b9ff02131b2dddde1bea2">SECOND_ALL</a> y</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#abead0bbf4c2b9ff02131b2dddde1bea2">SECOND_ALL</a> <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1011,12 +1012,12 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y&#160;</td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a1ca9504b1881f06b88a882911bf929c2">OBJECT_ONLY</a> y</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a1ca9504b1881f06b88a882911bf929c2">OBJECT_ONLY</a> <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1408,7 +1409,7 @@ Variables</h2></td></tr>
           <td class="memname">#define DEFAULT_IMPL</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">T, </td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9469c984c82f6a406933bb754923b7e5">T</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1419,7 +1420,7 @@ Variables</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a26ec1629f2bd2a8818133fb9e2091e2e">DEFAULT_IMPL_</a>(T, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> __VA_ARGS__)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a26ec1629f2bd2a8818133fb9e2091e2e">DEFAULT_IMPL_</a>(<a class="el" href="header__sample1_8h.html#a9469c984c82f6a406933bb754923b7e5">T</a>, <a class="el" href="macro__utils_8h.html#a800c6a1a2abcb460825c03b17f67ec29">EXPAND_ALL</a> __VA_ARGS__)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1464,7 +1465,7 @@ Variables</h2></td></tr>
           <td class="memname">#define DEFAULT_IMPL__</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">T, </td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9469c984c82f6a406933bb754923b7e5">T</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1505,11 +1506,12 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    return_type default_impl_fn(<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a>(__VA_ARGS__))); \</div>
 <div class="line">    static <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">void                                                           \</a></div>
-<div class="line"><a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">	    __attribute__</a>((constructor)) add_##fn_name##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##T##_vtable()       \</div>
+<div class="line"><a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">	    __attribute__</a>((constructor)) add_##fn_name##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##<a class="code" href="header__sample1_8h.html#a9469c984c82f6a406933bb754923b7e5">T</a>##_vtable()       \</div>
 <div class="line">    {                                                                     \</div>
 <div class="line">        VtableEntry next = {#fn_name, default_impl_fn};               \</div>
-<div class="line">        vtable_add_entry(&amp;T##_Vtable__, next);                        \</div>
+<div class="line">        vtable_add_entry(&amp;<a class="code" href="header__sample1_8h.html#a9469c984c82f6a406933bb754923b7e5">T</a>##_Vtable__, next);                        \</div>
 <div class="line">    }</div>
+<div class="ttc" id="aheader__sample1_8h_html_a9469c984c82f6a406933bb754923b7e5"><div class="ttname"><a href="header__sample1_8h.html#a9469c984c82f6a406933bb754923b7e5">T</a></div><div class="ttdeci">MyClonableItterator::ClonableIterator where T</div><div class="ttdef"><b>Definition:</b> header_sample1.h:286</div></div>
 <div class="ttc" id="atype_8h_html_a7807ba2c750e8fd2ad770bdde7b0a601"><div class="ttname"><a href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a></div><div class="ttdeci">#define PROCESS_FN_SIG(...)</div></div>
 </div><!-- fragment -->
 </div>
@@ -1590,7 +1592,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y, </td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1601,7 +1603,7 @@ Variables</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="type_8h.html#a31bc4cf65557fefc6240fe6d301ea16d">DROP_OBJECTS__</a>(x, y, __VA_ARGS__))</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="el" href="type_8h.html#a31bc4cf65557fefc6240fe6d301ea16d">DROP_OBJECTS__</a>(x, <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, __VA_ARGS__))</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -1874,7 +1876,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y, </td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1885,7 +1887,7 @@ Variables</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;x y</td>
+          <td></td><td>&#160;&#160;&#160;x <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -2305,7 +2307,7 @@ Variables</h2></td></tr>
           <td class="memname">#define OBJECT_ONLY</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">i, </td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2657,7 +2659,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="macro__utils_8h.html#a6375dd21159dc6c16bd3c2278055a359">MULTI_SWITCH</a>(<a class="code" href="type_8h.html#a56609279eacc347fb3285f4196acf2c2">PROC_TRAIT_IMPL_FN_DEFAULT</a>, <a class="code" href="type_8h.html#aa675cc552be370e364caf41018d58d98">PROC_TRAIT_IMPL_FN_</a>, x, \</div>
 <div class="line">             __VA_ARGS__)</div>
-<div class="ttc" id="amacro__utils_8h_html_a6375dd21159dc6c16bd3c2278055a359"><div class="ttname"><a href="macro__utils_8h.html#a6375dd21159dc6c16bd3c2278055a359">MULTI_SWITCH</a></div><div class="ttdeci">#define MULTI_SWITCH(action1, action2,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:39</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a6375dd21159dc6c16bd3c2278055a359"><div class="ttname"><a href="macro__utils_8h.html#a6375dd21159dc6c16bd3c2278055a359">MULTI_SWITCH</a></div><div class="ttdeci">#define MULTI_SWITCH(action1, action2,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:42</div></div>
 <div class="ttc" id="atype_8h_html_a56609279eacc347fb3285f4196acf2c2"><div class="ttname"><a href="type_8h.html#a56609279eacc347fb3285f4196acf2c2">PROC_TRAIT_IMPL_FN_DEFAULT</a></div><div class="ttdeci">#define PROC_TRAIT_IMPL_FN_DEFAULT(...)</div></div>
 <div class="ttc" id="atype_8h_html_aa675cc552be370e364caf41018d58d98"><div class="ttname"><a href="type_8h.html#aa675cc552be370e364caf41018d58d98">PROC_TRAIT_IMPL_FN_</a></div><div class="ttdeci">#define PROC_TRAIT_IMPL_FN_(mutability, return_type, fn_name,...)</div></div>
 </div><!-- fragment -->
@@ -2748,7 +2750,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="macro__utils_8h.html#a6d4022b2d8f73e4c3fdf01679b8c4abc">MULTI_SWITCH2</a>(<a class="code" href="type_8h.html#ace32668f4d3f22420af6e24df949131f">SUPER_TRAIT_CONFIG</a>, <a class="code" href="type_8h.html#ae7dee868fa6371dbff805b8dd8593f29">PROC_TRAIT_IMPL_FN_DEFAULT__</a>, x, \</div>
 <div class="line">              __VA_ARGS__)</div>
-<div class="ttc" id="amacro__utils_8h_html_a6d4022b2d8f73e4c3fdf01679b8c4abc"><div class="ttname"><a href="macro__utils_8h.html#a6d4022b2d8f73e4c3fdf01679b8c4abc">MULTI_SWITCH2</a></div><div class="ttdeci">#define MULTI_SWITCH2(action1, action2, arg,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:47</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a6d4022b2d8f73e4c3fdf01679b8c4abc"><div class="ttname"><a href="macro__utils_8h.html#a6d4022b2d8f73e4c3fdf01679b8c4abc">MULTI_SWITCH2</a></div><div class="ttdeci">#define MULTI_SWITCH2(action1, action2, arg,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:50</div></div>
 <div class="ttc" id="atype_8h_html_ace32668f4d3f22420af6e24df949131f"><div class="ttname"><a href="type_8h.html#ace32668f4d3f22420af6e24df949131f">SUPER_TRAIT_CONFIG</a></div><div class="ttdeci">#define SUPER_TRAIT_CONFIG(trait_name, ignore)</div></div>
 <div class="ttc" id="atype_8h_html_ae7dee868fa6371dbff805b8dd8593f29"><div class="ttname"><a href="type_8h.html#ae7dee868fa6371dbff805b8dd8593f29">PROC_TRAIT_IMPL_FN_DEFAULT__</a></div><div class="ttdeci">#define PROC_TRAIT_IMPL_FN_DEFAULT__(default_fn, mutability, return_type, fn_name,...)</div></div>
 </div><!-- fragment -->
@@ -2862,7 +2864,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y, </td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -2877,8 +2879,9 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="macro__utils_8h.html#a6d4022b2d8f73e4c3fdf01679b8c4abc">MULTI_SWITCH2</a>(<a class="code" href="type_8h.html#a2821f944c41d6add9021928aa483f40c">DEFAULT_IMPL</a>, <a class="code" href="type_8h.html#a5071bbcd702264cc19cf1f2da8c2d0cd">PROC_TRAIT_STATEMENT_IMPL_EXP_</a>, x, y, \</div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="macro__utils_8h.html#a6d4022b2d8f73e4c3fdf01679b8c4abc">MULTI_SWITCH2</a>(<a class="code" href="type_8h.html#a2821f944c41d6add9021928aa483f40c">DEFAULT_IMPL</a>, <a class="code" href="type_8h.html#a5071bbcd702264cc19cf1f2da8c2d0cd">PROC_TRAIT_STATEMENT_IMPL_EXP_</a>, x, <a class="code" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, \</div>
 <div class="line">              __VA_ARGS__)</div>
+<div class="ttc" id="aheader__sample1_8h_html_a9c8c12a317970bbc2a659e60b628b857"><div class="ttname"><a href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></div><div class="ttdeci">i32 y</div><div class="ttdef"><b>Definition:</b> header_sample1.h:276</div></div>
 <div class="ttc" id="atype_8h_html_a2821f944c41d6add9021928aa483f40c"><div class="ttname"><a href="type_8h.html#a2821f944c41d6add9021928aa483f40c">DEFAULT_IMPL</a></div><div class="ttdeci">#define DEFAULT_IMPL(T,...)</div></div>
 <div class="ttc" id="atype_8h_html_a5071bbcd702264cc19cf1f2da8c2d0cd"><div class="ttname"><a href="type_8h.html#a5071bbcd702264cc19cf1f2da8c2d0cd">PROC_TRAIT_STATEMENT_IMPL_EXP_</a></div><div class="ttdeci">#define PROC_TRAIT_STATEMENT_IMPL_EXP_(impl_type, mutability, return_type, fn_name,...)</div></div>
 </div><!-- fragment -->
@@ -3347,14 +3350,14 @@ Variables</h2></td></tr>
 <div class="line">        char* arr[] = {<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">FOR_EACH_INNER</a>(<a class="code" href="type_8h.html#a5ee4135d894b760d178c3f48ed5e7544">PROCESS_WHERE_INNER</a>, , (, ), __VA_ARGS__))}; \</div>
 <div class="line">        int <a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a> = <span class="keyword">sizeof</span>(arr) / <span class="keyword">sizeof</span>(arr[0]);                                              \</div>
 <div class="line">        name##_generic_name_arr = <a class="code" href="toml_8c.html#a5046e1cbf958143f3bf7aded35204202">malloc</a>((1 + <a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a>) * <span class="keyword">sizeof</span>(<span class="keywordtype">char</span>*));                         \</div>
-<div class="line">        for (<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> i = 0; i &lt; <a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a>; i++)                                                        \</div>
+<div class="line">        for (<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a> = 0; <a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a> &lt; <a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a>; <a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>++)                                                        \</div>
 <div class="line">        {                                                                                     \</div>
-<div class="line">            name##_generic_name_arr[i] = #value;                                          \</div>
-<div class="line">            vtable_add_trait(&amp;name##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##value##_Vtable__, arr[i]);                         \</div>
+<div class="line">            name##_generic_name_arr[<a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>] = #value;                                          \</div>
+<div class="line">            vtable_add_trait(&amp;name##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##value##_Vtable__, arr[<a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>]);                         \</div>
 <div class="line">        }                                                                                     \</div>
 <div class="line">        name##_generic_name_arr[<a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a>] = NULL;                                                 \</div>
 <div class="line">    }</div>
-<div class="ttc" id="amacro__utils_8h_html_a58f589128e3dcfcf40a5988652fceac6"><div class="ttname"><a href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">FOR_EACH_INNER</a></div><div class="ttdeci">#define FOR_EACH_INNER(m, arg, delim,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:102</div></div>
+<div class="ttc" id="amacro__utils_8h_html_a58f589128e3dcfcf40a5988652fceac6"><div class="ttname"><a href="macro__utils_8h.html#a58f589128e3dcfcf40a5988652fceac6">FOR_EACH_INNER</a></div><div class="ttdeci">#define FOR_EACH_INNER(m, arg, delim,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:105</div></div>
 <div class="ttc" id="atoml_8c_html_a5046e1cbf958143f3bf7aded35204202"><div class="ttname"><a href="toml_8c.html#a5046e1cbf958143f3bf7aded35204202">malloc</a></div><div class="ttdeci">#define malloc(x)</div><div class="ttdef"><b>Definition:</b> toml.c:53</div></div>
 <div class="ttc" id="atraits_8c_html_a56165321ab30e10af6d42752217d1be1"><div class="ttname"><a href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a></div><div class="ttdeci">u64 size(const Obj *self)</div><div class="ttdef"><b>Definition:</b> traits.c:17</div></div>
 <div class="ttc" id="atype_8h_html_a5ee4135d894b760d178c3f48ed5e7544"><div class="ttname"><a href="type_8h.html#a5ee4135d894b760d178c3f48ed5e7544">PROCESS_WHERE_INNER</a></div><div class="ttdeci">#define PROCESS_WHERE_INNER(ignore, value)</div></div>
@@ -3513,7 +3516,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y, </td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -3524,7 +3527,7 @@ Variables</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;y</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -3954,18 +3957,19 @@ Variables</h2></td></tr>
           <td class="memname">#define UNEXPECTED_FLAGS</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">f</td><td>)</td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">if</span> (      \</div>
-<div class="line">    f &amp; <a class="code" href="type_8h.html#a39bd83788c4c4375e5b4a9ed9f854234">OBJECT_FLAGS_RESERVED1</a> || \</div>
-<div class="line">    f &amp; <a class="code" href="type_8h.html#af3045e8ea37e82257945f86115df3580">OBJECT_FLAGS_RESERVED2</a> || \</div>
-<div class="line">    f &amp; <a class="code" href="type_8h.html#a9b092c2e40da83fda0aa7d4167bbed5e">OBJECT_FLAGS_RESERVED3</a> || \</div>
-<div class="line">    f &amp; <a class="code" href="type_8h.html#abe2d91c7e68eaa7f2a48607796d48259">OBJECT_FLAGS_RESERVED4</a> || \</div>
-<div class="line">    f &amp; <a class="code" href="type_8h.html#a6790e2eca4bdd5984b8dc760c399c6bd">OBJECT_FLAGS_RESERVED5</a>)   \</div>
+<div class="line">    <a class="code" href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a> &amp; <a class="code" href="type_8h.html#a39bd83788c4c4375e5b4a9ed9f854234">OBJECT_FLAGS_RESERVED1</a> || \</div>
+<div class="line">    <a class="code" href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a> &amp; <a class="code" href="type_8h.html#af3045e8ea37e82257945f86115df3580">OBJECT_FLAGS_RESERVED2</a> || \</div>
+<div class="line">    <a class="code" href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a> &amp; <a class="code" href="type_8h.html#a9b092c2e40da83fda0aa7d4167bbed5e">OBJECT_FLAGS_RESERVED3</a> || \</div>
+<div class="line">    <a class="code" href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a> &amp; <a class="code" href="type_8h.html#abe2d91c7e68eaa7f2a48607796d48259">OBJECT_FLAGS_RESERVED4</a> || \</div>
+<div class="line">    <a class="code" href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a> &amp; <a class="code" href="type_8h.html#a6790e2eca4bdd5984b8dc760c399c6bd">OBJECT_FLAGS_RESERVED5</a>)   \</div>
 <div class="line">        panic(<span class="stringliteral">&quot;Runtime error: Obj in unexpected state! Was it initialized?&quot;</span>);</div>
+<div class="ttc" id="aheader__sample1_8h_html_a53325e9cd3d483310ad0ba8384682699"><div class="ttname"><a href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a></div><div class="ttdeci">u8 f</div><div class="ttdef"><b>Definition:</b> header_sample1.h:30</div></div>
 <div class="ttc" id="atype_8h_html_a39bd83788c4c4375e5b4a9ed9f854234"><div class="ttname"><a href="type_8h.html#a39bd83788c4c4375e5b4a9ed9f854234">OBJECT_FLAGS_RESERVED1</a></div><div class="ttdeci">#define OBJECT_FLAGS_RESERVED1</div><div class="ttdef"><b>Definition:</b> type.h:37</div></div>
 <div class="ttc" id="atype_8h_html_a6790e2eca4bdd5984b8dc760c399c6bd"><div class="ttname"><a href="type_8h.html#a6790e2eca4bdd5984b8dc760c399c6bd">OBJECT_FLAGS_RESERVED5</a></div><div class="ttdeci">#define OBJECT_FLAGS_RESERVED5</div><div class="ttdef"><b>Definition:</b> type.h:33</div></div>
 <div class="ttc" id="atype_8h_html_a9b092c2e40da83fda0aa7d4167bbed5e"><div class="ttname"><a href="type_8h.html#a9b092c2e40da83fda0aa7d4167bbed5e">OBJECT_FLAGS_RESERVED3</a></div><div class="ttdeci">#define OBJECT_FLAGS_RESERVED3</div><div class="ttdef"><b>Definition:</b> type.h:35</div></div>
@@ -4145,12 +4149,12 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y&#160;</td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;(x, y, ignore)</td>
+          <td></td><td>&#160;&#160;&#160;(x, <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>, ignore)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -4173,12 +4177,12 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">y&#160;</td>
+          <td class="paramname"><a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;(x, y)</td>
+          <td></td><td>&#160;&#160;&#160;(x, <a class="el" href="header__sample1_8h.html#a9c8c12a317970bbc2a659e60b628b857">y</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">

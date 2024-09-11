@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['chain_5fallocator_2ec_776',['chain_allocator.c',['../chain__allocator_8c.html',1,'']]],
-  ['chain_5fallocator_2eh_777',['chain_allocator.h',['../chain__allocator_8h.html',1,'']]]
+  ['backtrace_2ec_826',['backtrace.c',['../backtrace_8c.html',1,'']]],
+  ['backtrace_2eh_827',['backtrace.h',['../backtrace_8h.html',1,'']]]
 ];

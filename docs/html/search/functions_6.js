@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['fat_5fptr_5fdata_852',['fat_ptr_data',['../heap_8c.html#a2beb14eedce3e8fbcff7b86df3209e91',1,'fat_ptr_data(const FatPtr *ptr):&#160;heap.c'],['../heap_8h.html#a2beb14eedce3e8fbcff7b86df3209e91',1,'fat_ptr_data(const FatPtr *ptr):&#160;heap.c']]],
-  ['fat_5fptr_5fid_853',['fat_ptr_id',['../heap_8c.html#a6a172e13c6187a33eda5d96526411444',1,'heap.c']]],
-  ['fat_5fptr_5flen_854',['fat_ptr_len',['../heap_8c.html#a582a48e1532268a1d999b84edaa6abf9',1,'fat_ptr_len(const FatPtr *ptr):&#160;heap.c'],['../heap_8h.html#a582a48e1532268a1d999b84edaa6abf9',1,'fat_ptr_len(const FatPtr *ptr):&#160;heap.c']]],
-  ['find_5ffn_855',['find_fn',['../type_8c.html#ac0dd925401fb1753f59b9c1c82a9d660',1,'find_fn(const Obj *obj, const char *name):&#160;type.c'],['../type_8h.html#ac0dd925401fb1753f59b9c1c82a9d660',1,'find_fn(const Obj *obj, const char *name):&#160;type.c']]],
-  ['format_5fprint_5fstats_5fimpl_856',['format_print_stats_impl',['../test__server_8c.html#a02dd5b8a3dfae9172e2486181153a8e3',1,'test_server.c']]]
+  ['enum_904',['Enum',['../core_2test_8c.html#af896fc545ee7f471b2b4c30d2860b708',1,'Enum(PetsEnum,(bird, i32),(cat, u64),(dog, SimpleOption),(snake, bool),(hamster, MutTest)):&#160;test.c'],['../test__encapsulation_8h.html#ad5b2262fdb2414a2a07cd2a3c25d5a13',1,'Enum(HiddenEnum,(HiddenVar1, i32),(HiddenVar2, u64),(HiddenVar3, Hidden)):&#160;test_encapsulation.h']]],
+  ['enumimpl_905',['EnumImpl',['../core_2test_8c.html#a984d4dc490991269f1f3e6b48c3f2849',1,'EnumImpl(PetsEnum):&#160;test.c'],['../test__encapsulation_8c.html#ae5663c7a7127b189b0f1dcf712bd1885',1,'EnumImpl(HiddenEnum):&#160;test_encapsulation.c']]],
+  ['eqtest2_5fbuild_906',['EqTest2_build',['../core_2test_8c.html#ac53ed37c6d64fc00badc16e2f12be9ca',1,'test.c']]],
+  ['eqtest2_5fequal_907',['EqTest2_equal',['../core_2test_8c.html#a066bbcb82b74c3bc02f7c677b69a1b84',1,'test.c']]],
+  ['eqtest_5fbuild_908',['EqTest_build',['../core_2test_8c.html#ac8acb09564ee28d58f8436a1ef86705b',1,'test.c']]],
+  ['eqtest_5fequal_909',['EqTest_equal',['../core_2test_8c.html#ab9343733fcf0736c2a8fc3d5c7015978',1,'test.c']]]
 ];

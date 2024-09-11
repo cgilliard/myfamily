@@ -1,17 +1,19 @@
 var searchData=
 [
-  ['val_722',['val',['../structtoml__keyval__t.html#ab49e3efa7e2517420c2ce5a2c45e6406',1,'toml_keyval_t::val()'],['../structtoml__arritem__t.html#a74355e9a38bf4540e63907aa280c32e7',1,'toml_arritem_t::val()']]],
-  ['valtype_723',['valtype',['../structtoml__arritem__t.html#a2f2dbe5f6e5cea3bebb8d854576f0874',1,'toml_arritem_t']]],
-  ['valueof_724',['ValueOf',['../traits_8h.html#a1a931293931f7a689e732d365b5662ba',1,'traits.h']]],
-  ['var_725',['Var',['../type_8h.html#a3521b7722e358f98597043439741612c',1,'Var():&#160;type.h'],['../type_8h.html#a23cd3b356bdc7322fbf851888d7787f2',1,'Var():&#160;type.h']]],
-  ['var_726',['var',['../type_8h.html#a1b0936415a643c88ce543099c10e0d7f',1,'type.h']]],
-  ['varself_727',['VarSelf',['../type_8h.html#a81a7be46b59a22609bda2faca71f2d39',1,'type.h']]],
-  ['vtable_728',['Vtable',['../structVtable.html',1,'']]],
-  ['vtable_729',['vtable',['../structObj.html#aef530ede4999ab9ad5b34395bb1c4e75',1,'Obj']]],
-  ['vtable_5fadd_5fentry_730',['vtable_add_entry',['../type_8c.html#a5082273ba4bf9ad23e49ca9319bef78e',1,'vtable_add_entry(Vtable *table, VtableEntry entry):&#160;type.c'],['../type_8h.html#a5082273ba4bf9ad23e49ca9319bef78e',1,'vtable_add_entry(Vtable *table, VtableEntry entry):&#160;type.c']]],
-  ['vtable_5fadd_5ftrait_731',['vtable_add_trait',['../type_8c.html#a685f77a71db7c2ab533b766f7a6870f2',1,'vtable_add_trait(Vtable *table, char *trait):&#160;type.c'],['../type_8h.html#a685f77a71db7c2ab533b766f7a6870f2',1,'vtable_add_trait(Vtable *table, char *trait):&#160;type.c']]],
-  ['vtable_5fcheck_5fimpl_5ftrait_732',['vtable_check_impl_trait',['../type_8c.html#a5513975c8def3d8423a6c1583dcf30e7',1,'vtable_check_impl_trait(const Vtable *table, const char *trait):&#160;type.c'],['../type_8h.html#a5513975c8def3d8423a6c1583dcf30e7',1,'vtable_check_impl_trait(const Vtable *table, const char *trait):&#160;type.c']]],
-  ['vtable_5foverride_733',['vtable_override',['../type_8h.html#aeb0636afb88ebe75121824df05099b40',1,'vtable_override(Vtable *table, VtableEntry entry):&#160;type.c'],['../type_8c.html#aeb0636afb88ebe75121824df05099b40',1,'vtable_override(Vtable *table, VtableEntry entry):&#160;type.c']]],
-  ['vtableentry_734',['VtableEntry',['../structVtableEntry.html',1,'']]],
-  ['vtabletraitentry_735',['VtableTraitEntry',['../structVtableTraitEntry.html',1,'VtableTraitEntry'],['../type_8h.html#a63338e751335ad4f44c66f1ff050f2c9',1,'VtableTraitEntry():&#160;type.h']]]
+  ['u_751',['u',['../structtoml__datum__t.html#ae8fa14a35f947e041d600642516af12f',1,'toml_datum_t']]],
+  ['u128_752',['u128',['../types_8h.html#a845593201b45c0e24fdab5e4152c9f40',1,'types.h']]],
+  ['u16_753',['u16',['../types_8h.html#a2b19d553290a8d4a083d3c03280ea800',1,'types.h']]],
+  ['u32_754',['u32',['../types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6',1,'types.h']]],
+  ['u64_755',['u64',['../types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0',1,'types.h']]],
+  ['u8_756',['u8',['../types_8h.html#af3b86d961da0a3575b4f99c9ffaf01fd',1,'types.h']]],
+  ['unbox_757',['Unbox',['../prim_8h.html#a50410f6d180882ef6c3ab96f94142ce2',1,'prim.h']]],
+  ['unexpected_5fflags_758',['UNEXPECTED_FLAGS',['../type_8h.html#a17ddae05258b7817824656030b96dfd0',1,'type.h']]],
+  ['unique_5fid_759',['unique_id',['../type_8c.html#a2106e13dbac6575e8d701b9f1f4aa79d',1,'unique_id():&#160;type.c'],['../type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d',1,'unique_id():&#160;type.c']]],
+  ['unique_5fid_760',['UNIQUE_ID',['../macro__utils_8h.html#a5307ca4974fe561cba18d9657f6b103c',1,'macro_utils.h']]],
+  ['unit_2ec_761',['unit.c',['../unit_8c.html',1,'']]],
+  ['unit_2eh_762',['unit.h',['../unit_8h.html',1,'']]],
+  ['unwrap_763',['Unwrap',['../traits_8h.html#a8482c49df7213572538f86234aee2f17',1,'traits.h']]],
+  ['unwrap_764',['UNWRAP',['../macro__utils_8h.html#a64b3c41cfd9686f6608d2874a4c00a67',1,'macro_utils.h']]],
+  ['unwrap_5fparam_5fname_765',['UNWRAP_PARAM_NAME',['../type_8h.html#a6b60212a45bfd73bb33dbfcdda0b451a',1,'type.h']]],
+  ['unwrap_5fparam_5ftype_5fname_766',['UNWRAP_PARAM_TYPE_NAME',['../type_8h.html#a9aa056a23749b2606f899fed108429ce',1,'type.h']]]
 ];

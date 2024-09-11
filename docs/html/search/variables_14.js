@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['val_1156',['val',['../structtoml__keyval__t.html#ab49e3efa7e2517420c2ce5a2c45e6406',1,'toml_keyval_t::val()'],['../structtoml__arritem__t.html#a74355e9a38bf4540e63907aa280c32e7',1,'toml_arritem_t::val()']]],
-  ['valtype_1157',['valtype',['../structtoml__arritem__t.html#a2f2dbe5f6e5cea3bebb8d854576f0874',1,'toml_arritem_t']]],
-  ['vtable_1158',['vtable',['../structObj.html#aef530ede4999ab9ad5b34395bb1c4e75',1,'Obj']]]
+  ['u_1255',['u',['../structtoml__datum__t.html#ae8fa14a35f947e041d600642516af12f',1,'toml_datum_t']]]
 ];
