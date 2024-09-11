@@ -501,9 +501,19 @@ FatPtr build_fat_ptr(u64 size);
 	(*_ptr__) = OBJECT_INIT;                                                                       \
 	Move(_ptr__, &value);
 
+// Check if Clang or GCC is being used
+#if defined(__clang__)
 #define DISABLE_WARNING_WCONST                                                                     \
 	_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconstant-conversion\"")
 #define ENABLE_WARNING_WCONST _Pragma("GCC diagnostic pop")
+#elif defined(__GNUC__) // GCC-specific
+#define DISABLE_WARNING_WCONST                                                                     \
+	_Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wconversion\"")
+#define ENABLE_WARNING_WCONST _Pragma("GCC diagnostic pop")
+#else
+#define DISABLE_WARNING_WCONST
+#define ENABLE_WARNING_WCONST
+#endif
 
 #define SET_OFFSET_OF_IMPL(ptr, structure, name, value, ...)                                       \
 	__VA_OPT__(do {                                                                                \
