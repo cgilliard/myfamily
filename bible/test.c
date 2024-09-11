@@ -21,7 +21,10 @@ MyTest(bible, test_bible_basic) {
 	Bible bible;
 	char bible_path[100];
 	strcpy(bible_path, "./resources/akjv.txt");
-	cr_assert(!bible_build(&bible, bible_path));
+	int res = bible_build(&bible, bible_path);
+	if (res)
+		perror("bible build");
+	cr_assert(!res);
 
 	FILE *fp = fopen("./resources/akjv.txt", "r");
 	char buf[1024];
@@ -106,7 +109,7 @@ MyTest(bible, test_bible_basic) {
 
 	// try invalid book
 	char buf_out[1024];
-	int res = bible_verse_to_string(&bible, "", 1, 1, buf_out, 1024, false);
+	res = bible_verse_to_string(&bible, "", 1, 1, buf_out, 1024, false);
 	cr_assert_eq(res, -1);
 
 	fclose(fp);
@@ -118,6 +121,9 @@ MyTest(bible, load_basic) {
 	Bible bible;
 	char bible_path[100];
 	strcpy(bible_path, "./resources/akjv.txt");
-	cr_assert(!bible_build(&bible, bible_path));
+	int res = bible_build(&bible, bible_path);
+	if (res)
+		perror("bible build");
+	cr_assert(!res);
 	bible_cleanup(&bible);
 }

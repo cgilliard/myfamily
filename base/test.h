@@ -42,8 +42,7 @@
 				   "of frees. Memory leak?\n",                                                     \
 				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
 			printf("[%s====%s] "                                                                   \
-				   "initial_alloc_diff=%llu,diff=%"                                                \
-				   "llu\n",                                                                        \
+				   "initial_alloc_diff=%" PRIu64 ",diff=%" PRIu64 "\n",                            \
 				   BLUE, RESET, initial_alloc_diff, diff);                                         \
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
@@ -54,8 +53,7 @@
 				   "of file closes. File handle leak?\n",                                          \
 				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
 			printf("[%s====%s] "                                                                   \
-				   "initial_file_diff=%llu,diff=%"                                                 \
-				   "llu\n",                                                                        \
+				   "initial_file_diff=%" PRIu64 ",diff=%" PRIu64 "\n",                             \
 				   BLUE, RESET, initial_file_diff, file_diff);                                     \
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
