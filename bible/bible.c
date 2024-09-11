@@ -32,13 +32,19 @@ int bible_checksum(char *data) {
 }
 
 int bible_parse_verse(Bible *bible, u64 index, char *buf) {
-	int end_book = strstr(buf, "|") - buf;
+	const char *strstr_res = strstr(buf, "|");
+	if (strstr_res == NULL) {
+		fprintf(stderr, "invalid line %s, index=%" PRIu64 "\n", buf, index);
+		errno = EINVAL;
+		return -1;
+	}
+	int end_book = strstr_res - buf;
 	if (end_book < 0) {
 		fprintf(stderr, "invalid line %s, index=%" PRIu64 "\n", buf, index);
 		errno = EINVAL;
 		return -1;
 	}
-	printf("end_book = %i\n", end_book);
+	printf("buf=%s, end_book = %i\n", buf, end_book);
 	char bookname[end_book + 1];
 	memcpy(bookname, buf, end_book);
 	bookname[end_book] = 0;
