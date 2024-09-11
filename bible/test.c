@@ -37,15 +37,18 @@ MyTest(bible, test_bible_basic) {
 	while (true) {
 		if (fgets(buf, 1024, fp) == NULL)
 			break;
-		int end_book = strstr(buf, "|") - buf;
-		if (end_book < 0)
-			continue; // 1 empty line in akjv.txt
+		const char *end_book_str = strstr(buf, "|");
+		if (end_book_str == NULL)
+			continue; // 1 empty line
+		int end_book = end_book_str - buf;
 		char bookname[end_book + 1];
 		memcpy(bookname, buf, end_book);
 		bookname[end_book] = 0;
 
 		int start_chapter = end_book + 2;
-		int end_chapter = strstr(buf + start_chapter, "|") - buf;
+		const char *end_chapter_str = strstr(buf + start_chapter, "|");
+		cr_assert(end_chapter_str);
+		int end_chapter = end_chapter_str - buf;
 		cr_assert(end_chapter > start_chapter);
 
 		char chapter[(end_chapter - start_chapter) + 1];
@@ -53,7 +56,9 @@ MyTest(bible, test_bible_basic) {
 		chapter[end_chapter - start_chapter] = 0;
 
 		int start_verse = end_chapter + 2;
-		int end_verse = strstr(buf + start_verse, "|") - buf;
+		const char *end_verse_str = strstr(buf + start_verse, "|");
+		cr_assert(end_verse_str);
+		int end_verse = end_verse_str - buf;
 
 		cr_assert(end_verse > start_verse);
 
@@ -62,11 +67,14 @@ MyTest(bible, test_bible_basic) {
 		verse[end_verse - start_verse] = 0;
 
 		int start_text = end_verse + 2;
-		int end_text = strstr(buf, "\n") - buf;
+		const char *end_text_str = strstr(buf, "\n");
+		int end_text;
 
 		// deal with last line in file which has no newline
-		if (end_text < 0)
+		if (end_text_str == NULL)
 			end_text = strlen(buf);
+		else
+			end_text = end_text_str - buf;
 		cr_assert(end_text > start_text);
 		char text[(end_text - start_text) + 1];
 		memcpy(text, buf + start_text, end_text - start_text);
