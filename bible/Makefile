@@ -1,4 +1,4 @@
 OBJS := bible.o
-TEST_OBJS := $(OBJS) ../core/*.o
+TEST_OBJS := $(OBJS) ../base/*.o
 
 include ../Makefile.template

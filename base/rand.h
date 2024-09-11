@@ -15,7 +15,7 @@
 #ifndef _CORE_RAND__
 #define _CORE_RAND__
 
-#include <core/types.h>
+#include <base/types.h>
 #include <stdlib.h>
 
 /**

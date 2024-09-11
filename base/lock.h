@@ -15,12 +15,11 @@
 #ifndef _CORE_LOCK__
 #define _CORE_LOCK__
 
-#include <core/types.h>
+#include <base/types.h>
 #include <pthread.h>
 #include <stdatomic.h>
 
-typedef struct LockPtr
-{
+typedef struct LockPtr {
 	pthread_mutex_t lock;
 	pthread_cond_t cond;
 	atomic_ullong tid;
@@ -28,40 +27,36 @@ typedef struct LockPtr
 	atomic_bool poison;
 } LockPtr;
 
-void Lock_cleanup(LockPtr* ptr);
+void Lock_cleanup(LockPtr *ptr);
 
 #define Lock LockPtr __attribute__((warn_unused_result, cleanup(Lock_cleanup)))
 
-void Lock_set_poison(Lock* ptr);
-bool Lock_is_poisoned(Lock* ptr);
-void Lock_clear_poison(Lock* ptr);
+void Lock_set_poison(Lock *ptr);
+bool Lock_is_poisoned(Lock *ptr);
+void Lock_clear_poison(Lock *ptr);
 void Lock_mark_poisoned();
 
-typedef struct LockGuardPtr
-{
-	LockPtr* ref;
+typedef struct LockGuardPtr {
+	LockPtr *ref;
 } LockGuardPtr;
 
-void Lockguard_cleanup(LockGuardPtr* ptr);
+void Lockguard_cleanup(LockGuardPtr *ptr);
 Lock Lock_build();
 
-#define LockGuard    \
-	LockGuardPtr \
-	    __attribute__((warn_unused_result, cleanup(Lockguard_cleanup)))
+#define LockGuard LockGuardPtr __attribute__((warn_unused_result, cleanup(Lockguard_cleanup)))
 
-LockGuard lock(Lock* lock);
-void Lock_wait(Lock* lock, u64 nanos);
-void Lock_notify(Lock* lock);
-void Lock_notify_all(Lock* lock);
+LockGuard lock(Lock *lock);
+void Lock_wait(Lock *lock, u64 nanos);
+void Lock_notify(Lock *lock);
+void Lock_notify_all(Lock *lock);
 
 #define LOCK() Lock_build()
 #define LOCK_GUARD_CLEANUP_SAFE {NULL};
 
-#define synchronized(ptr, exe)                 \
-	do                                     \
-	{                                      \
-		LockGuard __lg__ = lock(&ptr); \
-		exe                            \
+#define synchronized(ptr, exe)                                                                     \
+	do {                                                                                           \
+		LockGuard __lg__ = lock(&ptr);                                                             \
+		exe                                                                                        \
 	} while (0);
 
 #endif // _CORE_LOCK__

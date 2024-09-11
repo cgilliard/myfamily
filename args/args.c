@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <args/args.h>
-#include <core/colors.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>

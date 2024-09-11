@@ -15,7 +15,7 @@
 #ifndef _CORE_PANIC__
 #define _CORE_PANIC__
 
-#include <core/types.h>
+#include <base/types.h>
 #include <setjmp.h>
 
 extern _Thread_local jmp_buf return_jmp;
@@ -27,13 +27,13 @@ extern _Thread_local bool jmp_return_set;
 extern bool __debug_no_exit;
 #endif // TEST
 
-void panic(const char* format, ...);
+void panic(const char *format, ...);
 
-#define PANIC_RETURN()                             \
-	({                                         \
-		jmp_return_set = true;             \
-		int _value__ = setjmp(return_jmp); \
-		_value__ != 0;                     \
+#define PANIC_RETURN()                                                                             \
+	({                                                                                             \
+		jmp_return_set = true;                                                                     \
+		int _value__ = setjmp(return_jmp);                                                         \
+		_value__ != 0;                                                                             \
 	})
 
 #endif // _CORE_PANIC__

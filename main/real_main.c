@@ -14,7 +14,7 @@
 
 #include <args/args.h>
 #include <bible/bible.h>
-#include <core/dir.h>
+#include <core/std.h>
 #include <dirent.h>
 #include <errno.h>
 #include <stdio.h>

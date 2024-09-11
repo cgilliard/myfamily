@@ -1,10 +1,4 @@
-OBJS := heap.o \
-	panic.o \
-	chain_allocator.o \
-	rand.o \
-	sha256.o \
-	lock.o \
-	thread.o \
+OBJS := thread.o \
 	prim.o \
 	type.o \
 	traits.o \
@@ -12,6 +6,6 @@ OBJS := heap.o \
 	unit.o \
 	backtrace.o
 
-TEST_OBJS := $(OBJS) test_encapsulation.o test_server.o
+TEST_OBJS := $(OBJS) test_encapsulation.o test_server.o ../base/*.o
 
 include ../Makefile.template

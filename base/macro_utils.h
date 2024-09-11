@@ -30,33 +30,30 @@
 
 #define mut is_mut,
 #define loop while (true)
-#define π(...)       \
-	while (true) \
+#define π(...)                                                                                     \
+	while (true)                                                                                   \
 	sleep(UINT_MAX)
 
 #define MULTI_PARAM(action, ...) action(__VA_ARGS__)
 #define SINGLE_PARAM(action, x) action(x)
-#define MULTI_SWITCH_(action1, action2, x, ...)          \
-	EXPAND_ALL EXPAND(__VA_OPT__(NONE)(SINGLE_PARAM( \
-	    action1, x)) __VA_OPT__((MULTI_PARAM(action2, x, __VA_ARGS__))))
-#define MULTI_SWITCH(action1, action2, ...) \
-	EXPAND(MULTI_SWITCH_(action1, action2, __VA_ARGS__))
+#define MULTI_SWITCH_(action1, action2, x, ...)                                                    \
+	EXPAND_ALL EXPAND(__VA_OPT__(NONE)(SINGLE_PARAM(action1, x))                                   \
+						  __VA_OPT__((MULTI_PARAM(action2, x, __VA_ARGS__))))
+#define MULTI_SWITCH(action1, action2, ...) EXPAND(MULTI_SWITCH_(action1, action2, __VA_ARGS__))
 
 #define DOUBLE_PARAM(action, x, y) action(x, y)
-#define MULTI_SWITCH2_(action1, action2, arg, x, ...)       \
-	EXPAND_ALL EXPAND(                                  \
-	    __VA_OPT__(NONE)(DOUBLE_PARAM(action1, arg, x)) \
-		__VA_OPT__((MULTI_PARAM(action2, arg, x, __VA_ARGS__))))
-#define MULTI_SWITCH2(action1, action2, arg, ...) \
+#define MULTI_SWITCH2_(action1, action2, arg, x, ...)                                              \
+	EXPAND_ALL EXPAND(__VA_OPT__(NONE)(DOUBLE_PARAM(action1, arg, x))                              \
+						  __VA_OPT__((MULTI_PARAM(action2, arg, x, __VA_ARGS__))))
+#define MULTI_SWITCH2(action1, action2, arg, ...)                                                  \
 	EXPAND(MULTI_SWITCH2_(action1, action2, arg, __VA_ARGS__))
 
 #define MULTI_PARAM_INNER(action, ...) action(__VA_ARGS__)
 #define DOUBLE_PARAM_INNER(action, x, y) action(x, y)
-#define MULTI_SWITCH2_INNER_(action1, action2, arg, x, ...)       \
-	EXPAND_ALL EXPAND(                                        \
-	    __VA_OPT__(NONE)(DOUBLE_PARAM_INNER(action1, arg, x)) \
-		__VA_OPT__((MULTI_PARAM_INNER(action2, arg, x, __VA_ARGS__))))
-#define MULTI_SWITCH2_INNER(action1, action2, arg, ...) \
+#define MULTI_SWITCH2_INNER_(action1, action2, arg, x, ...)                                        \
+	EXPAND_ALL EXPAND(__VA_OPT__(NONE)(DOUBLE_PARAM_INNER(action1, arg, x))                        \
+						  __VA_OPT__((MULTI_PARAM_INNER(action2, arg, x, __VA_ARGS__))))
+#define MULTI_SWITCH2_INNER(action1, action2, arg, ...)                                            \
 	EXPAND(MULTI_SWITCH2_INNER_(action1, action2, arg, __VA_ARGS__))
 
 #define EMPTY()
@@ -76,9 +73,8 @@
 #define EVAL2(...) EVAL1(EVAL1(__VA_ARGS__))
 #define EVAL1(...) __VA_ARGS__
 
-#define MAP(m, arg, delim, first, ...) \
-	m(arg, first) __VA_OPT__(      \
-	    UNWRAP delim DEFER1(_MAP)()(m, arg, delim, __VA_ARGS__))
+#define MAP(m, arg, delim, first, ...)                                                             \
+	m(arg, first) __VA_OPT__(UNWRAP delim DEFER1(_MAP)()(m, arg, delim, __VA_ARGS__))
 #define _MAP() MAP
 
 #define EVAL_INNER(...) EVAL1024_INNER(__VA_ARGS__)
@@ -94,13 +90,10 @@
 #define EVAL2_INNER(...) EVAL1_INNER(EVAL1_INNER(__VA_ARGS__))
 #define EVAL1_INNER(...) __VA_ARGS__
 
-#define MAP_INNER(m, arg, delim, first, ...) \
-	m(arg, first) __VA_OPT__(            \
-	    UNWRAP delim DEFER1(_MAP_INNER)()(m, arg, delim, __VA_ARGS__))
+#define MAP_INNER(m, arg, delim, first, ...)                                                       \
+	m(arg, first) __VA_OPT__(UNWRAP delim DEFER1(_MAP_INNER)()(m, arg, delim, __VA_ARGS__))
 #define _MAP_INNER() MAP_INNER
 
-#define FOR_EACH(m, arg, delim, ...) \
-	EVAL(__VA_OPT__(MAP(m, arg, delim, __VA_ARGS__)))
+#define FOR_EACH(m, arg, delim, ...) EVAL(__VA_OPT__(MAP(m, arg, delim, __VA_ARGS__)))
 
-#define FOR_EACH_INNER(m, arg, delim, ...) \
-	__VA_OPT__(MAP_INNER(m, arg, delim, __VA_ARGS__))
+#define FOR_EACH_INNER(m, arg, delim, ...) __VA_OPT__(MAP_INNER(m, arg, delim, __VA_ARGS__))

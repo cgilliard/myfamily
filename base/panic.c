@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/chain_allocator.h>
-#include <core/lock.h>
-#include <core/panic.h>
+#include <base/chain_allocator.h>
+#include <base/lock.h>
+#include <base/panic.h>
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -24,8 +24,7 @@
 _Thread_local jmp_buf return_jmp;
 _Thread_local bool jmp_return_set = false;
 
-void panic(const char* fmt, ...)
-{
+void panic(const char *fmt, ...) {
 	va_list args;
 
 	fprintf(stderr, "thread panicked: ");
@@ -36,8 +35,7 @@ void panic(const char* fmt, ...)
 
 	Lock_mark_poisoned();
 
-	if (__default_tl_heap_allocator != NULL)
-	{
+	if (__default_tl_heap_allocator != NULL) {
 		heap_allocator_cleanup(__default_tl_heap_allocator);
 	}
 

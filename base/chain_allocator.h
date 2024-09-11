@@ -15,13 +15,13 @@
 #ifndef _CORE_CHAIN_ALLOCATOR__
 #define _CORE_CHAIN_ALLOCATOR__
 
-#include <core/chain_allocator.h>
-#include <core/heap.h>
-#include <core/lock.h>
+#include <base/chain_allocator.h>
+#include <base/heap.h>
+#include <base/lock.h>
 
 #define MAX_CHAIN_ALLOCATOR_DEPTH 100
 
-extern _Thread_local HeapAllocator* __default_tl_heap_allocator;
+extern _Thread_local HeapAllocator *__default_tl_heap_allocator;
 
 /**
  * @file
@@ -74,8 +74,8 @@ extern _Thread_local HeapAllocator* __default_tl_heap_allocator;
  */
 
 /** @cond */
-extern HeapAllocator* __global_sync_allocator;
-extern LockPtr* __global_sync_allocator_lock;
+extern HeapAllocator *__global_sync_allocator;
+extern LockPtr *__global_sync_allocator_lock;
 /** @endcond */
 
 /**
@@ -85,34 +85,30 @@ extern LockPtr* __global_sync_allocator_lock;
  * @param ha The #HeapAllocator to push to the top of the stack.
  * @param is_sync Whether or not synchronous locking should be used.
  */
-typedef struct ChainConfig
-{
-	HeapAllocator* ha;
+typedef struct ChainConfig {
+	HeapAllocator *ha;
 	bool is_sync;
-	Lock* lock;
+	Lock *lock;
 } ChainConfig;
 
 /** @cond */
 typedef struct ChainGuardImpl ChainGuardImpl;
 
-typedef struct ChainGuardPtr
-{
+typedef struct ChainGuardPtr {
 	u64 index;
-	HeapAllocator* ha;
+	HeapAllocator *ha;
 	bool is_sync;
-	Lock* lock;
+	Lock *lock;
 } ChainGuardPtr;
 
-void chain_guard_cleanup(ChainGuardPtr* ptr);
+void chain_guard_cleanup(ChainGuardPtr *ptr);
 /** @endcond */
 
 /**
  * The #ChainGuard is a data structure used to assist the Chain in knowing when
  * a particular link in the chain goes out of scope.
  */
-#define ChainGuard    \
-	ChainGuardPtr \
-	    __attribute__((warn_unused_result, cleanup(chain_guard_cleanup)))
+#define ChainGuard ChainGuardPtr __attribute__((warn_unused_result, cleanup(chain_guard_cleanup)))
 
 /**
  * The #chain_guard function is used to push a new #HeapAllocator to the top
@@ -121,7 +117,7 @@ void chain_guard_cleanup(ChainGuardPtr* ptr);
  * @return A ChainGuard which is used to indicate when the #HeapAllocator should
  * go out of scope and revert to the previous #HeapAllocator.
  */
-ChainGuard chain_guard(ChainConfig* config);
+ChainGuard chain_guard(ChainConfig *config);
 /**
  * Initializes the global_sync_allocator. This happens automatically with the
  * first call to #GLOBAL_SYNC_ALLOCATOR.
@@ -131,7 +127,7 @@ void global_sync_allocator_init();
  * Sets a default #HeapAllocatorConfig to be used when a new thread local
  * #HeapAllocator or Global #HeapAllocator is created.
  */
-void set_default_hconfig(HeapAllocatorConfig* hconfig);
+void set_default_hconfig(HeapAllocatorConfig *hconfig);
 /**
  * Sets the default #HeapDataParamsConfig array to be used when a new thread
  * local #HeapAllocator or Global #HeapAllocator is created.
@@ -147,7 +143,7 @@ void set_default_hdpc_arr(HeapDataParamsConfig arr[], u64 size);
  * @param size The number of bytes to allocate to this #FatPtr.
  * @return 0 on success, otherwise returns -1 with appropriate errno value set.
  */
-int chain_malloc(FatPtr* ptr, u64 size);
+int chain_malloc(FatPtr *ptr, u64 size);
 /**
  * Reallocates a #FatPtr of the specified size and stores the resulting #FatPtr
  * in dst on success using the underlying #HeapAllocator at the top of the
@@ -157,7 +153,7 @@ int chain_malloc(FatPtr* ptr, u64 size);
  * @param size The new desired size of the reallocated #FatPtr.
  * @return 0 on success, otherwise returns -1 with appropriate errno value set.
  */
-int chain_realloc(FatPtr* dst, FatPtr* src, u64 size);
+int chain_realloc(FatPtr *dst, FatPtr *src, u64 size);
 
 /**
  * Frees the specified #FatPtr to the underlying #HeapAllocator at the top of
@@ -165,7 +161,7 @@ int chain_realloc(FatPtr* dst, FatPtr* src, u64 size);
  * @return 0 on success, otherwise returns -1 with appropriate errno value set.
  * @param ptr The reference to the #FatPtr to free.
  */
-int chain_free(FatPtr* ptr);
+int chain_free(FatPtr *ptr);
 
 /**
  * Cleans up the global sync allocator. This is mostly required for tests.
@@ -177,11 +173,11 @@ void global_sync_allocator_cleanup();
  */
 void thread_local_allocator_cleanup();
 
-#define SCOPED_ALLOCATOR(ha, is_sync)                     \
-	({                                                \
-		ChainConfig _cfg__ = {ha, is_sync};       \
-		ChainGuardPtr ret = chain_guard(&_cfg__); \
-		ret;                                      \
+#define SCOPED_ALLOCATOR(ha, is_sync)                                                              \
+	({                                                                                             \
+		ChainConfig _cfg__ = {ha, is_sync};                                                        \
+		ChainGuardPtr ret = chain_guard(&_cfg__);                                                  \
+		ret;                                                                                       \
 	})
 
 /**
@@ -194,14 +190,13 @@ void thread_local_allocator_cleanup();
  * Note: This function panics if sufficient memory cannot be allocated to create
  * the required data structures.
  */
-#define GLOBAL_SYNC_ALLOCATOR()                                      \
-	({                                                           \
-		if (__global_sync_allocator == NULL)                 \
-			global_sync_allocator_init();                \
-		ChainConfig _cfg__ = {__global_sync_allocator, true, \
-				      __global_sync_allocator_lock}; \
-		ChainGuardPtr ret = chain_guard(&_cfg__);            \
-		ret;                                                 \
+#define GLOBAL_SYNC_ALLOCATOR()                                                                    \
+	({                                                                                             \
+		if (__global_sync_allocator == NULL)                                                       \
+			global_sync_allocator_init();                                                          \
+		ChainConfig _cfg__ = {__global_sync_allocator, true, __global_sync_allocator_lock};        \
+		ChainGuardPtr ret = chain_guard(&_cfg__);                                                  \
+		ret;                                                                                       \
 	})
 
 #endif // _CORE_CHAIN_ALLOCATOR__

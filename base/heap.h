@@ -48,7 +48,7 @@
  * then use the provided API functions for allocation and deallocation.
  */
 
-#include <core/types.h>
+#include <base/types.h>
 
 /**
  * The HeapDataParamsConfig specifies how individiaul slab_sizes
@@ -67,8 +67,7 @@
  * malloc will be called directly to attempt to allocate the required slabs.
  * @see [heap_allocator_build]
  */
-typedef struct HeapDataParamsConfig
-{
+typedef struct HeapDataParamsConfig {
 	u32 slab_size;
 	u32 slabs_per_resize;
 	u32 initial_chunks;
@@ -86,8 +85,7 @@ typedef struct HeapDataParamsConfig
  * @param no_malloc if set to true no_malloc as described above is enabled.
  * @see [heap_allocator_build]
  */
-typedef struct HeapAllocatorConfig
-{
+typedef struct HeapAllocatorConfig {
 	bool zeroed;
 	bool no_malloc;
 } HeapAllocatorConfig;
@@ -101,10 +99,9 @@ typedef struct HeapAllocatorConfig
  * @see [fat_ptr_data]
  * @see [fat_ptr_len]
  */
-typedef struct FatPtr
-{
+typedef struct FatPtr {
 	u64 id;
-	void* data;
+	void *data;
 	u64 len;
 } FatPtr;
 
@@ -125,9 +122,8 @@ typedef struct HeapAllocatorImpl HeapAllocatorImpl;
  * @see [heap_allocator_free]
  * @see [heap_allocator_cleanup]
  */
-typedef struct HeapAllocator
-{
-	HeapAllocatorImpl* impl;
+typedef struct HeapAllocator {
+	HeapAllocatorImpl *impl;
 } HeapAllocator;
 
 /**
@@ -144,8 +140,8 @@ typedef struct HeapAllocator
  * @see [heap_allocator_cleanup]
  * @see [heap_allocator_build_arr]
  */
-int heap_allocator_build(HeapAllocator* ptr, HeapAllocatorConfig* config,
-			 int heap_data_params_count, ...);
+int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
+						 int heap_data_params_count, ...);
 
 /**
  * Builds a heap_allocator based on the specified #HeapAllocatorConfig and
@@ -164,9 +160,8 @@ int heap_allocator_build(HeapAllocator* ptr, HeapAllocatorConfig* config,
  * @see [heap_allocator_cleanup]
  * @see [heap_allocator_build]
  */
-int heap_allocator_build_arr(HeapAllocator* ptr, HeapAllocatorConfig* config,
-			     HeapDataParamsConfig arr[],
-			     u64 heap_data_params_count);
+int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
+							 HeapDataParamsConfig arr[], u64 heap_data_params_count);
 
 /**
  * Allocates a #FatPtr from the #HeapAllocator (if possible). Note that
@@ -187,7 +182,7 @@ int heap_allocator_build_arr(HeapAllocator* ptr, HeapAllocatorConfig* config,
  * @see [heap_allocator_free]
  * @see [heap_allocator_cleanup]
  */
-int heap_allocator_allocate(HeapAllocator* ptr, u64 size, FatPtr* fptr);
+int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr);
 
 /**
  * Free the data associated with this #FatPtr releasing it back to the
@@ -201,7 +196,7 @@ int heap_allocator_allocate(HeapAllocator* ptr, u64 size, FatPtr* fptr);
  * @return 0 on success -1 on error with the appropriate errno value set.
  * @see [heap_allocator_cleanup]
  */
-int heap_allocator_free(HeapAllocator* ptr, FatPtr* fptr);
+int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr);
 
 /**
  * Cleanup up this #HeapAllocator freeing all memory resources associated
@@ -210,7 +205,7 @@ int heap_allocator_free(HeapAllocator* ptr, FatPtr* fptr);
  * @return 0 on success -1 on error with the appropriate errno value set.
  * @see [heap_allocator_free]
  */
-int heap_allocator_cleanup(HeapAllocator* ptr);
+int heap_allocator_cleanup(HeapAllocator *ptr);
 
 /**
  * Returns the memory location of the specified #FatPtr.
@@ -218,7 +213,7 @@ int heap_allocator_cleanup(HeapAllocator* ptr);
  * @return a void pointer to the data location assicated to this #FatPtr
  * @see [fat_ptr_len]
  */
-void* fat_ptr_data(const FatPtr* ptr);
+void *fat_ptr_data(const FatPtr *ptr);
 
 /**
  * Returns the length in bytes of the specified #FatPtr.
@@ -226,22 +221,20 @@ void* fat_ptr_data(const FatPtr* ptr);
  * @return the length in bytes that has been allocated to this #FatPtr.
  * @see [fat_ptr_data]
  */
-u64 fat_ptr_len(const FatPtr* ptr);
+u64 fat_ptr_len(const FatPtr *ptr);
 
 #define FAT_PTR_INIT {0, NULL, 0};
 
-#define HA_CONFIG_DEFAULT \
-	{                 \
-	    false, false}
-#define HAP_CONFIG(slab_size, slabs_per_resize, initial_chunks, max_slabs) \
-	({                                                                 \
-		HeapDataParamsConfig _ret__ = {                            \
-		    slab_size,                                             \
-		    slabs_per_resize,                                      \
-		    initial_chunks,                                        \
-		    max_slabs,                                             \
-		};                                                         \
-		_ret__;                                                    \
+#define HA_CONFIG_DEFAULT {false, false}
+#define HAP_CONFIG(slab_size, slabs_per_resize, initial_chunks, max_slabs)                         \
+	({                                                                                             \
+		HeapDataParamsConfig _ret__ = {                                                            \
+			slab_size,                                                                             \
+			slabs_per_resize,                                                                      \
+			initial_chunks,                                                                        \
+			max_slabs,                                                                             \
+		};                                                                                         \
+		_ret__;                                                                                    \
 	})
 
 // make some private functions/variables visible for tests
@@ -258,10 +251,10 @@ extern bool __debug_build_allocator_malloc_fail6;
 extern bool __debug_build_allocator_malloc_fail7;
 extern bool __debug_build_allocator_malloc_fail8;
 
-void* do_malloc(size_t size);
-void* do_realloc(void* ptr, size_t size);
-void do_free(void* ptr);
-u64 fat_ptr_id(const FatPtr* ptr);
+void *do_malloc(size_t size);
+void *do_realloc(void *ptr, size_t size);
+void do_free(void *ptr);
+u64 fat_ptr_id(const FatPtr *ptr);
 #endif // TEST
 
 #endif // _CORE_HEAP__

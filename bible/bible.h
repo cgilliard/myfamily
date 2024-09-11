@@ -15,7 +15,7 @@
 #ifndef _BIBLE_BIBLE__
 #define _BIBLE_BIBLE__
 
-#include <core/types.h>
+#include <base/base.h>
 
 #define VERSE_BUF_LEN 1024
 #define BIBLE_CHECKSUM_SCAN_BUF_SIZE 4634230

@@ -11,21 +11,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#ifndef _CORE_RC__
-#define _CORE_RC__
-
-#include <base/types.h>
-#include <core/traits.h>
-
-// Builder allows any object to be passed into an Rc.
-// Passing in the value will consume it.
-Builder(Rc, Config(const Obj *, value));
-
-// Implement these four traits which provide the needed functionality for Rc.
-Impl(Rc, Unwrap);
-Impl(Rc, Build);
-Impl(Rc, Drop);
-Impl(Rc, Clone);
-
-#endif // _CORE_RC__

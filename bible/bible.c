@@ -13,9 +13,6 @@
 // limitations under the License.
 
 #include <bible/bible.h>
-#include <core/colors.h>
-#include <core/rand.h>
-#include <core/sha256.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>

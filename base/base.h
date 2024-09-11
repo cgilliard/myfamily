@@ -12,20 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_RC__
-#define _CORE_RC__
-
-#include <base/types.h>
-#include <core/traits.h>
-
-// Builder allows any object to be passed into an Rc.
-// Passing in the value will consume it.
-Builder(Rc, Config(const Obj *, value));
-
-// Implement these four traits which provide the needed functionality for Rc.
-Impl(Rc, Unwrap);
-Impl(Rc, Build);
-Impl(Rc, Drop);
-Impl(Rc, Clone);
-
-#endif // _CORE_RC__
+#include <base/chain_allocator.h>
+#include <base/colors.h>
+#include <base/dir.h>
+#include <base/heap.h>
+#include <base/lock.h>
+#include <base/panic.h>
+#include <base/rand.h>
+#include <base/sha256.h>

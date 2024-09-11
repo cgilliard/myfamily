@@ -22,7 +22,7 @@
 #include <windows.h>
 #endif
 
-const char *get_home_directory() {
+static const char *get_home_directory() {
 	const char *home = NULL;
 
 #ifdef _WIN32

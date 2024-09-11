@@ -12,20 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_RC__
-#define _CORE_RC__
+#ifndef _LEXER_LEXER__
+#define _LEXER_LEXER__
 
-#include <base/types.h>
-#include <core/traits.h>
+#include <lexer/tokenizer.h>
 
-// Builder allows any object to be passed into an Rc.
-// Passing in the value will consume it.
-Builder(Rc, Config(const Obj *, value));
+#define LEXER_BUF_SIZE 1024
 
-// Implement these four traits which provide the needed functionality for Rc.
-Impl(Rc, Unwrap);
-Impl(Rc, Build);
-Impl(Rc, Drop);
-Impl(Rc, Clone);
+typedef enum LexerState { LexerStateOk = 0, LexerStateErr = 1, LexerStateComplete = 2 } LexerState;
 
-#endif // _CORE_RC__
+typedef struct Lexer {
+	Tokenizer *tokenizer;
+	FILE *fp;
+	char *file;
+	u64 line_num;
+} Lexer;
+
+int lexer_init(Lexer *l, char *file);
+int lexer_next_token(Lexer *l, Token *token);
+char *lexer_read_line(Lexer *l);
+void lexer_cleanup(Lexer *l);
+
+#endif // _LEXER_LEXER__

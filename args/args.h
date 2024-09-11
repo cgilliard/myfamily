@@ -17,7 +17,7 @@
 
 #define DEBUG_INIT_NO_EXIT 0x1
 
-#include <core/types.h>
+#include <base/base.h>
 
 typedef struct ArgsParamState {
 	bool specified;
