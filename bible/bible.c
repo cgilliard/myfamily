@@ -91,7 +91,7 @@ int bible_parse_verse(Bible *bible, u64 index, char *buf) {
 	memcpy(text, buf + start_text, end_text - start_text);
 	text[end_text - start_text] = 0;
 
-	bible->verses[index].text = malloc(sizeof(char) * (end_text - start_text) + 1);
+	bible->verses[index].text = mymalloc(sizeof(char) * (end_text - start_text) + 1);
 	strcpy(bible->verses[index].text, text);
 	bible->verses[index].chapter_id = strtol(chapter, NULL, 10);
 	bible->verses[index].verse_id = strtol(verse, NULL, 10);
@@ -99,9 +99,9 @@ int bible_parse_verse(Bible *bible, u64 index, char *buf) {
 	// find book
 	if (bible->book_id_count == 0) {
 		// first book
-		bible->book_ids = malloc(sizeof(BibleBookIdMap));
+		bible->book_ids = mymalloc(sizeof(BibleBookIdMap));
 		bible->book_ids[0].book_id = 0;
-		bible->book_ids[0].name = malloc(sizeof(char) * (strlen(bookname) + 1));
+		bible->book_ids[0].name = mymalloc(sizeof(char) * (strlen(bookname) + 1));
 		strcpy(bible->book_ids[0].name, bookname);
 		bible->book_id_count += 1;
 		bible->verses[index].book_id = 0;
@@ -115,7 +115,7 @@ int bible_parse_verse(Bible *bible, u64 index, char *buf) {
 			// new book, update book ids
 			bible->verses[index].book_id = bible->book_ids[bible->book_id_count - 1].book_id + 1;
 			void *tmp =
-				realloc(bible->book_ids, sizeof(BibleBookIdMap) * (bible->book_id_count + 1));
+				myrealloc(bible->book_ids, sizeof(BibleBookIdMap) * (bible->book_id_count + 1));
 			if (!tmp)
 				return -1;
 			bible->book_ids = tmp;
@@ -123,7 +123,7 @@ int bible_parse_verse(Bible *bible, u64 index, char *buf) {
 			bible->book_ids[bible->book_id_count].book_id =
 				bible->book_ids[bible->book_id_count - 1].book_id + 1;
 			bible->book_ids[bible->book_id_count].name =
-				malloc(sizeof(char) * (strlen(bookname) + 1));
+				mymalloc(sizeof(char) * (strlen(bookname) + 1));
 			strcpy(bible->book_ids[bible->book_id_count].name, bookname);
 			bible->verses[index].book_id = bible->book_ids[bible->book_id_count].book_id;
 			bible->book_id_count += 1;
@@ -138,7 +138,7 @@ int bible_book_id_map_compare(const void *a, const void *b) {
 }
 
 int bible_build(Bible *bible, char *path) {
-	FILE *fp = fopen(path, "r");
+	FILE *fp = myfopen(path, "r");
 	if (fp == NULL) {
 		return -1;
 	}
@@ -164,11 +164,11 @@ int bible_build(Bible *bible, char *path) {
 		if (strlen(buf) > max_len)
 			max_len = strlen(buf);
 		if (bible->verse_count == 0) {
-			bible->verses = malloc(sizeof(BibleVerse));
+			bible->verses = mymalloc(sizeof(BibleVerse));
 			if (bible->verses == NULL)
 				return -1;
 		} else {
-			void *tmp = realloc(bible->verses, sizeof(BibleVerse) * (bible->verse_count + 1));
+			void *tmp = myrealloc(bible->verses, sizeof(BibleVerse) * (bible->verse_count + 1));
 			if (tmp == NULL)
 				return -1;
 			bible->verses = tmp;
@@ -184,25 +184,25 @@ int bible_build(Bible *bible, char *path) {
 	}
 
 	// sort the books for quicker lookups
-	bible->book_ids_sorted = malloc(sizeof(BibleVerse) * (bible->verse_count));
+	bible->book_ids_sorted = mymalloc(sizeof(BibleVerse) * (bible->verse_count));
 	if (bible->book_ids_sorted == NULL)
 		return -1;
 	memcpy(bible->book_ids_sorted, bible->book_ids, bible->book_id_count * sizeof(BibleBookIdMap));
 	qsort(bible->book_ids_sorted, bible->book_id_count, sizeof(BibleBookIdMap),
 		  bible_book_id_map_compare);
 
-	fclose(fp);
+	myfclose(fp);
 	return 0;
 }
 
 void bible_cleanup(Bible *bible) {
 	for (int i = 0; i < bible->verse_count; i++)
-		free(bible->verses[i].text);
+		myfree(bible->verses[i].text);
 	for (int i = 0; i < bible->book_id_count; i++)
-		free(bible->book_ids[i].name);
-	free(bible->verses);
-	free(bible->book_ids);
-	free(bible->book_ids_sorted);
+		myfree(bible->book_ids[i].name);
+	myfree(bible->verses);
+	myfree(bible->book_ids);
+	myfree(bible->book_ids_sorted);
 }
 
 int format_verse(Bible *bible, int index, char *buf, int buf_len, bool colors) {

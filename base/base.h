@@ -19,4 +19,5 @@
 #include <base/lock.h>
 #include <base/panic.h>
 #include <base/rand.h>
+#include <base/resources.h>
 #include <base/sha256.h>

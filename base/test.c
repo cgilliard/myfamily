@@ -11,3 +11,25 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+#include <base/base.h>
+#include <base/test.h>
+
+MySuite(base);
+
+MyTest(base, test_mymalloc) {
+	u64 begin_mymalloc_sum = mymalloc_sum();
+	u64 begin_myfree_sum = myfree_sum();
+	u64 begin_diff = begin_mymalloc_sum - begin_myfree_sum;
+	u64 diff = mymalloc_sum - myfree_sum;
+	void *tmp = mymalloc(100);
+	u64 end_mymalloc_sum = mymalloc_sum();
+	u64 end_myfree_sum = myfree_sum();
+	u64 end_diff = end_mymalloc_sum - end_myfree_sum;
+	cr_assert_neq(end_diff, begin_diff);
+	myfree(tmp);
+	end_mymalloc_sum = mymalloc_sum();
+	end_myfree_sum = myfree_sum();
+	end_diff = end_mymalloc_sum - end_myfree_sum;
+	cr_assert_eq(end_diff, begin_diff);
+}

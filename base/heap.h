@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_HEAP__
-#define _CORE_HEAP__
+#ifndef _BASE_HEAP__
+#define _BASE_HEAP__
 
 /**
  * @file
@@ -257,4 +257,4 @@ void do_free(void *ptr);
 u64 fat_ptr_id(const FatPtr *ptr);
 #endif // TEST
 
-#endif // _CORE_HEAP__
+#endif // _BASE_HEAP__

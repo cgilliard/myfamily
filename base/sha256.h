@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_SHA256__
-#define _CORE_SHA256__
+#ifndef _BASE_SHA256__
+#define _BASE_SHA256__
 
 char *SHA256(char *data);
 
-#endif // _CORE_SHA256__
+#endif // _BASE_SHA256__

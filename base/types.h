@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_TYPES__
-#define _CORE_TYPES__
+#ifndef _BASE_TYPES__
+#define _BASE_TYPES__
 
 #include <inttypes.h>
 #include <limits.h>
@@ -36,5 +36,6 @@
 #define i128 __int128_t
 #define f64 double
 #define f32 float
+#define usize size_t
 
-#endif // _CORE_TYPES__
+#endif // _BASE_TYPES__

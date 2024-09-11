@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_LOCK__
-#define _CORE_LOCK__
+#ifndef _BASE_LOCK__
+#define _BASE_LOCK__
 
 #include <base/types.h>
 #include <pthread.h>
@@ -59,4 +59,4 @@ void Lock_notify_all(Lock *lock);
 		exe                                                                                        \
 	} while (0);
 
-#endif // _CORE_LOCK__
+#endif // _BASE_LOCK__

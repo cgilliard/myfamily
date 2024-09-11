@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/test.h>
 #include <bible/bible.h>
-#include <criterion/criterion.h>
 
-/*
-Test(bible, test_bible_basic) {
+MySuite(bible);
+
+MyTest(bible, test_bible_basic) {
 	Bible bible;
 	char bible_path[100];
 	strcpy(bible_path, "./resources/akjv.txt");
@@ -113,11 +114,10 @@ Test(bible, test_bible_basic) {
 	bible_cleanup(&bible);
 }
 
-Test(bible, load_basic) {
+MyTest(bible, load_basic) {
 	Bible bible;
 	char bible_path[100];
 	strcpy(bible_path, "./resources/akjv.txt");
 	cr_assert(!bible_build(&bible, bible_path));
 	bible_cleanup(&bible);
 }
-*/

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_CHAIN_ALLOCATOR__
-#define _CORE_CHAIN_ALLOCATOR__
+#ifndef _BASE_CHAIN_ALLOCATOR__
+#define _BASE_CHAIN_ALLOCATOR__
 
 #include <base/chain_allocator.h>
 #include <base/heap.h>
@@ -199,4 +199,4 @@ void thread_local_allocator_cleanup();
 		ret;                                                                                       \
 	})
 
-#endif // _CORE_CHAIN_ALLOCATOR__
+#endif // _BASE_CHAIN_ALLOCATOR__

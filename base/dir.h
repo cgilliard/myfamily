@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_DIR__
-#define _CORE_DIR__
+#ifndef _BASE_DIR__
+#define _BASE_DIR__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,4 +43,4 @@ static const char *get_home_directory() {
 	return home;
 }
 
-#endif // _CORE_DIR__
+#endif // _BASE_DIR__

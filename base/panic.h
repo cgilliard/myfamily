@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CORE_PANIC__
-#define _CORE_PANIC__
+#ifndef _BASE_PANIC__
+#define _BASE_PANIC__
 
 #include <base/types.h>
 #include <setjmp.h>
@@ -36,4 +36,4 @@ void panic(const char *format, ...);
 		_value__ != 0;                                                                             \
 	})
 
-#endif // _CORE_PANIC__
+#endif // _BASE_PANIC__

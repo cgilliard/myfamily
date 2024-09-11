@@ -3,7 +3,8 @@ OBJS := panic.o \
 	rand.o \
 	sha256.o \
 	heap.o \
-	lock.o
+	lock.o \
+	resources.o
 
 TEST_OBJS := $(OBJS)
 
