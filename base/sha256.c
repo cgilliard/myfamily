@@ -153,7 +153,7 @@ char *SHA256(unsigned char *data) {
 
 	char s[3];
 	for (int i = 0; i < 32; i++) {
-		sprintf(s, "%02x", hash[i]);
+		snprintf(s, 3, "%02x", hash[i]);
 		strcat(hashStr, s);
 	}
 
