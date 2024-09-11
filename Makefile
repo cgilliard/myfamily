@@ -122,7 +122,7 @@ coverage: coverage_build
 	$(call run_tests,$(COVERAGE_FLAGS),test,coverage);
 
 testsan: san_build
-	$(call run_tests,$(SAN_FLAGS),test)
+	$(call run_tests,$(SAN_FLAGS),testnc)
 
 testnc: test_build
 	$(call run_tests,$(TEST_FLAGS),testnc)

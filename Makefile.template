@@ -11,7 +11,7 @@ test: test.c $(TEST_OBJS)
 	$(CC) $(FLAG_OPTIONS) $(CC_TEST_FLAGS) $(TEST_OBJS) -I.. -o bin/test test.c
 	./bin/test --timeout 60 -f
 	@rm -rf bin
-testnc: test.c
+testnc: test.c $(TEST_OBJS)
 	mkdir -p bin
 	rm -rf bin/test
 	touch bin/nocapture
