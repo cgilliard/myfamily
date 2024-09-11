@@ -144,7 +144,7 @@ char *SHA256(unsigned char *data) {
 	int strLen = strlen((const char *)data);
 	SHA256_CTX ctx;
 	unsigned char hash[32];
-	char *hashStr = malloc(65);
+	char hashStr[65];
 	strcpy(hashStr, "");
 
 	SHA256Init(&ctx);

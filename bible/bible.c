@@ -49,7 +49,14 @@ int bible_parse_verse(Bible *bible, u64 index, char *buf) {
 	bookname[end_book] = 0;
 
 	int start_chapter = end_book + 2;
-	int end_chapter = strstr(buf + start_chapter, "|") - buf;
+	const char *end_chapter_str = strstr(buf + start_chapter, "|");
+	if (end_chapter_str == NULL) {
+		fprintf(stderr, "invalid line %s, index=%" PRIu64 ", end_chapter=%i,start_chap=%i\n", buf,
+				index, end_chapter, start_chapter);
+		errno = EINVAL;
+		return -1;
+	}
+	int end_chapter = end_chapter_str - buf;
 	if (end_chapter < start_chapter) {
 		fprintf(stderr, "invalid line %s, index=%" PRIu64 ", end_chapter=%i,start_chap=%i\n", buf,
 				index, end_chapter, start_chapter);
@@ -62,7 +69,14 @@ int bible_parse_verse(Bible *bible, u64 index, char *buf) {
 	chapter[end_chapter - start_chapter] = 0;
 
 	int start_verse = end_chapter + 2;
-	int end_verse = strstr(buf + start_verse, "|") - buf;
+	const char *end_verse_str = strstr(buf + start_verse, "|");
+	if (end_verse_str == NULL) {
+		fprintf(stderr, "invalid line %s, index=%" PRIu64 ", end_chapter=%i,start_chap=%i\n", buf,
+				index, end_verse, start_verse);
+		errno = EINVAL;
+		return -1;
+	}
+	int end_verse = end_verse_str - buf;
 
 	if (end_verse < start_verse) {
 		fprintf(stderr, "invalid line %s, index=%" PRIu64 ", end_chapter=%i,start_chap=%i\n", buf,
