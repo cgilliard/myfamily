@@ -13,4 +13,6 @@
 // limitations under the License.
 
 #include <main/main.h>
-int main(int argc, char** argv) { return 0; }
+int main(int argc, char **argv) {
+	return real_main(argc, argv);
+}

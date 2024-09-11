@@ -1,6 +1,8 @@
 OBJS := heap.o \
 	panic.o \
 	chain_allocator.o \
+	rand.o \
+	sha256.o \
 	lock.o \
 	thread.o \
 	prim.o \
