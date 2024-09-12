@@ -101,6 +101,8 @@ test_build:
 	done;
 
 release_build:
+	$(CC) -o bin/xxdir build_utils/xxdir.c
+	bin/xxdir main/resources main/resources.h fam
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir FLAG_OPTIONS="$(RELEASE_FLAGS)"; \
 	done;
