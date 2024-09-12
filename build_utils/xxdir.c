@@ -108,8 +108,15 @@ int main(int argc, char **argv)
 	}
 
 	char initial_text[1024];
-	snprintf(initial_text, 1024, "char *%sxxdir_file_names[] = {", namespace);
-	// add three bytes for the last strcat
+	if (strlen(namespace) > 128) {
+		fprintf(stderr, "namespace is too long. Max len = 128 bytes.");
+		exit(-1);
+	}
+	strcpy(initial_text, "char *");
+	strcat(initial_text, namespace);
+	strcat(initial_text, "xxdir_file_names[] = {");
+	// snprintf(initial_text, 1024, "char *%sxxdir_file_names[] = {", namespace);
+	//  add three bytes for the last strcat
 	char *buf = malloc(sizeof(char) * (strlen(initial_text) + 7));
 	int cur_alloc = strlen(initial_text);
 	strcpy(buf, initial_text);
