@@ -34,20 +34,20 @@ int args_param_build(ArgsParam *ap, char *name, char *help, char *short_name, bo
 	ap->short_name = NULL;
 	ap->default_value = NULL;
 
-	ap->name = malloc((1 + strlen(name)) * sizeof(char));
+	ap->name = mymalloc((1 + strlen(name)) * sizeof(char));
 	if (ap->name == NULL) {
 		return -1;
 	}
 	strcpy(ap->name, name);
 
-	ap->help = malloc((1 + strlen(help)) * sizeof(char));
+	ap->help = mymalloc((1 + strlen(help)) * sizeof(char));
 	if (ap->help == NULL) {
 		args_param_cleanup(ap);
 		return -1;
 	}
 	strcpy(ap->help, help);
 
-	ap->short_name = malloc((1 + strlen(short_name)) * sizeof(char));
+	ap->short_name = mymalloc((1 + strlen(short_name)) * sizeof(char));
 	if (ap->short_name == NULL) {
 		args_param_cleanup(ap);
 		return -1;
@@ -58,7 +58,7 @@ int args_param_build(ArgsParam *ap, char *name, char *help, char *short_name, bo
 	ap->multiple = multiple;
 
 	if (default_value) {
-		ap->default_value = malloc((1 + strlen(default_value)) * sizeof(char));
+		ap->default_value = mymalloc((1 + strlen(default_value)) * sizeof(char));
 		if (ap->default_value == NULL) {
 			args_param_cleanup(ap);
 			return -1;
@@ -71,19 +71,19 @@ int args_param_build(ArgsParam *ap, char *name, char *help, char *short_name, bo
 }
 void args_param_cleanup(ArgsParam *ap) {
 	if (ap->name) {
-		free(ap->name);
+		myfree(ap->name);
 		ap->name = NULL;
 	}
 	if (ap->short_name) {
-		free(ap->short_name);
+		myfree(ap->short_name);
 		ap->short_name = NULL;
 	}
 	if (ap->help) {
-		free(ap->help);
+		myfree(ap->help);
 		ap->help = NULL;
 	}
 	if (ap->default_value) {
-		free(ap->default_value);
+		myfree(ap->default_value);
 		ap->default_value = NULL;
 	}
 }
@@ -99,21 +99,21 @@ int sub_command_build(SubCommand *sc, char *name, char *help, u32 min_args, u32 
 	sc->arg_doc = NULL;
 	sc->params_count = 0;
 
-	sc->name = malloc((1 + strlen(name)) * sizeof(char));
+	sc->name = mymalloc((1 + strlen(name)) * sizeof(char));
 	if (sc->name == NULL) {
 		sub_command_cleanup(sc);
 		return -1;
 	}
 	strcpy(sc->name, name);
 
-	sc->help = malloc((1 + strlen(help)) * sizeof(char));
+	sc->help = mymalloc((1 + strlen(help)) * sizeof(char));
 	if (sc->help == NULL) {
 		sub_command_cleanup(sc);
 		return -1;
 	}
 	strcpy(sc->help, help);
 
-	sc->arg_doc = malloc((1 + strlen(arg_doc)) * sizeof(char));
+	sc->arg_doc = mymalloc((1 + strlen(arg_doc)) * sizeof(char));
 	if (sc->arg_doc == NULL) {
 		sub_command_cleanup(sc);
 		return -1;
@@ -126,17 +126,17 @@ int sub_command_build(SubCommand *sc, char *name, char *help, u32 min_args, u32 
 }
 void sub_command_cleanup(SubCommand *sc) {
 	if (sc->name) {
-		free(sc->name);
+		myfree(sc->name);
 		sc->name = NULL;
 	}
 
 	if (sc->help) {
-		free(sc->help);
+		myfree(sc->help);
 		sc->help = NULL;
 	}
 
 	if (sc->arg_doc) {
-		free(sc->arg_doc);
+		myfree(sc->arg_doc);
 		sc->arg_doc = NULL;
 	}
 
@@ -145,8 +145,8 @@ void sub_command_cleanup(SubCommand *sc) {
 			args_param_cleanup(&sc->params[i]);
 		}
 
-		free(sc->params);
-		free(sc->params_state);
+		myfree(sc->params);
+		myfree(sc->params_state);
 		sc->params = NULL;
 		sc->params_state = NULL;
 		sc->params_count = 0;
@@ -158,8 +158,8 @@ int sub_command_add_param(SubCommand *sc, ArgsParam *ap) {
 		return -1;
 	}
 	if (sc->params_count == 0) {
-		sc->params = malloc(sizeof(ArgsParam));
-		sc->params_state = malloc(sizeof(ArgsParamState));
+		sc->params = mymalloc(sizeof(ArgsParam));
+		sc->params_state = mymalloc(sizeof(ArgsParamState));
 
 		if (sc->params == NULL || sc->params_state == NULL) {
 
@@ -169,28 +169,28 @@ int sub_command_add_param(SubCommand *sc, ArgsParam *ap) {
 		sc->params_count = 1;
 	} else {
 		sc->params_count += 1;
-		void *tmp1 = realloc(sc->params, sizeof(ArgsParam) * sc->params_count);
-		void *tmp2 = realloc(sc->params_state, sizeof(ArgsParamState) * sc->params_count);
+		void *tmp1 = myrealloc(sc->params, sizeof(ArgsParam) * sc->params_count);
+		void *tmp2 = myrealloc(sc->params_state, sizeof(ArgsParamState) * sc->params_count);
 
 		sc->params = tmp1;
 		sc->params_state = tmp2;
 	}
 	u64 index = sc->params_count - 1;
 
-	sc->params[index].name = malloc((strlen(ap->name) + 1) * sizeof(char));
+	sc->params[index].name = mymalloc((strlen(ap->name) + 1) * sizeof(char));
 	strcpy(sc->params[index].name, ap->name);
 
-	sc->params[index].help = malloc((strlen(ap->help) + 1) * sizeof(char));
+	sc->params[index].help = mymalloc((strlen(ap->help) + 1) * sizeof(char));
 	strcpy(sc->params[index].help, ap->help);
 
-	sc->params[index].short_name = malloc((strlen(ap->short_name) + 1) * sizeof(char));
+	sc->params[index].short_name = mymalloc((strlen(ap->short_name) + 1) * sizeof(char));
 	strcpy(sc->params[index].short_name, ap->short_name);
 
 	sc->params[index].takes_value = ap->takes_value;
 	sc->params[index].multiple = ap->multiple;
 
 	if (ap->default_value) {
-		sc->params[index].default_value = malloc((strlen(ap->default_value) + 1) * sizeof(char));
+		sc->params[index].default_value = mymalloc((strlen(ap->default_value) + 1) * sizeof(char));
 		if (sc->params[index].default_value == NULL) {
 			sub_command_cleanup(sc);
 			return -1;
@@ -221,9 +221,9 @@ int args_build(Args *args, char *prog, char *version, char *author, u32 min_args
 	args->argc = 0;
 	args->debug_flags = debug_flags;
 
-	args->prog = malloc(sizeof(char) * (1 + strlen(prog)));
-	args->version = malloc(sizeof(char) * (1 + strlen(version)));
-	args->author = malloc(sizeof(char) * (1 + strlen(author)));
+	args->prog = mymalloc(sizeof(char) * (1 + strlen(prog)));
+	args->version = mymalloc(sizeof(char) * (1 + strlen(version)));
+	args->author = mymalloc(sizeof(char) * (1 + strlen(author)));
 
 	if (args->prog == NULL || args->version == NULL || args->author == NULL) {
 		args_cleanup(args);
@@ -245,34 +245,34 @@ int args_build(Args *args, char *prog, char *version, char *author, u32 min_args
 void args_cleanup(Args *args) {
 	if (args->argc) {
 		for (u64 i = 0; i < args->argc; i++) {
-			free(args->argv[i]);
+			myfree(args->argv[i]);
 		}
-		free(args->argv);
+		myfree(args->argv);
 		args->argc = 0;
 	}
 
 	if (args->prog) {
-		free(args->prog);
+		myfree(args->prog);
 		args->prog = NULL;
 	}
 
 	if (args->author) {
-		free(args->author);
+		myfree(args->author);
 		args->author = NULL;
 	}
 
 	if (args->version) {
-		free(args->version);
+		myfree(args->version);
 		args->version = NULL;
 	}
 
 	if (args->subs_count) {
 		for (u64 i = 0; i < args->subs_count; i++) {
 			sub_command_cleanup(args->subs[i]);
-			free(args->subs[i]);
+			myfree(args->subs[i]);
 		}
 
-		free(args->subs);
+		myfree(args->subs);
 	}
 }
 int args_add_param(Args *args, ArgsParam *ap) {
@@ -281,13 +281,13 @@ int args_add_param(Args *args, ArgsParam *ap) {
 
 int args_add_sub_command(Args *args, SubCommand *sc) {
 	if (args->subs_count == 0) {
-		args->subs = malloc(sizeof(SubCommand *));
+		args->subs = mymalloc(sizeof(SubCommand *));
 		if (args->subs == NULL) {
 			fprintf(stderr, "add subcommand %s failed!\n", sc->name);
 			return -1;
 		}
 	} else {
-		SubCommand **tmp = realloc(args->subs, sizeof(SubCommand *) * (1 + args->subs_count));
+		SubCommand **tmp = myrealloc(args->subs, sizeof(SubCommand *) * (1 + args->subs_count));
 
 		if (tmp == NULL) {
 			fprintf(stderr, "add subcommand %s failed!\n", sc->name);
@@ -297,7 +297,7 @@ int args_add_sub_command(Args *args, SubCommand *sc) {
 		args->subs = tmp;
 	}
 
-	args->subs[args->subs_count] = malloc(sizeof(SubCommand));
+	args->subs[args->subs_count] = mymalloc(sizeof(SubCommand));
 	if (args->subs[args->subs_count] == NULL) {
 		fprintf(stderr, "add subcommand %s failed!\n", sc->name);
 		return -1;
@@ -306,7 +306,7 @@ int args_add_sub_command(Args *args, SubCommand *sc) {
 	if (sub_command_build(args->subs[args->subs_count], sc->name, sc->help, sc->min_args,
 						  sc->max_args, sc->arg_doc)) {
 		fprintf(stderr, "add subcommand %s failed!\n", sc->name);
-		free(args->subs[args->subs_count]);
+		myfree(args->subs[args->subs_count]);
 		return -1;
 	}
 	for (u64 i = 0; i < sc->params_count; i++) {
@@ -498,7 +498,7 @@ void args_check_validity(Args *args, int argc, char **argv) {
 
 int args_init(Args *args, int argc, char **argv) {
 	args->argc = argc;
-	args->argv = malloc(sizeof(char *) * argc);
+	args->argv = mymalloc(sizeof(char *) * argc);
 
 	if (args->argv == NULL) {
 		args->argc = 0;
@@ -506,14 +506,14 @@ int args_init(Args *args, int argc, char **argv) {
 	}
 
 	for (u64 i = 0; i < argc; i++) {
-		args->argv[i] = malloc(sizeof(char) * (strlen(argv[i]) + 1));
+		args->argv[i] = mymalloc(sizeof(char) * (strlen(argv[i]) + 1));
 		if (args->argv[i]) {
 			strcpy(args->argv[i], argv[i]);
 		} else {
 			for (u64 j = i - 1; j >= 0; j--) {
-				free(args->argv[j]);
+				myfree(args->argv[j]);
 			}
-			free(args->argv);
+			myfree(args->argv);
 			args->argc = 0;
 			return -1;
 		}

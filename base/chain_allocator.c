@@ -14,6 +14,7 @@
 
 #include <base/chain_allocator.h>
 #include <base/panic.h>
+#include <base/resources.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -100,16 +101,16 @@ int build_default_heap_allocator(HeapAllocator *ptr) {
 // init the global sync allocator
 void global_sync_allocator_init() {
 	// allocate for the data structure
-	__global_sync_allocator = malloc(sizeof(HeapAllocator));
-	__global_sync_allocator_lock = malloc(sizeof(Lock));
+	__global_sync_allocator = mymalloc(sizeof(HeapAllocator));
+	__global_sync_allocator_lock = mymalloc(sizeof(Lock));
 
 	// check for failures
 	if (__global_sync_allocator_lock == NULL || __global_sync_allocator == NULL) {
 		// deallocate and panic
 		if (__global_sync_allocator_lock != NULL)
-			free(__global_sync_allocator_lock);
+			myfree(__global_sync_allocator_lock);
 		if (__global_sync_allocator != NULL)
-			free(__global_sync_allocator);
+			myfree(__global_sync_allocator);
 		panic("Could not initialize the global sync HeapAllocator");
 	}
 
@@ -118,7 +119,7 @@ void global_sync_allocator_init() {
 
 	// build with the default configurations
 	if (build_default_heap_allocator(__global_sync_allocator)) {
-		free(__global_sync_allocator);
+		myfree(__global_sync_allocator);
 		panic("Could not initialize the global sync HeapAllocator");
 	}
 }
@@ -169,12 +170,12 @@ int chain_malloc(FatPtr *ptr, u64 size) {
 	if (__thread_local_chain_allocator_index == 0) {
 		// thread local allocator has not been initialized. Create it
 		// now.
-		HeapAllocator *ha = malloc(sizeof(HeapAllocator));
+		HeapAllocator *ha = mymalloc(sizeof(HeapAllocator));
 		if (!ha)
 			return -1;
 
 		if (build_default_heap_allocator(ha)) {
-			free(ha);
+			myfree(ha);
 			return -1;
 		};
 

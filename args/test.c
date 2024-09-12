@@ -13,9 +13,11 @@
 // limitations under the License.
 
 #include <args/args.h>
-#include <criterion/criterion.h>
+#include <base/test.h>
 
-Test(args, test_args_param) {
+MySuite(args);
+
+MyTest(args, test_args_param) {
 	ArgsParam ap;
 	args_param_build(&ap, "threads", "number of threads to execute", "t", true, false, "1");
 
@@ -32,7 +34,7 @@ Test(args, test_args_param) {
 	args_param_cleanup(&ap);
 }
 
-Test(args, test_sub_command) {
+MyTest(args, test_sub_command) {
 	SubCommand sc;
 	ArgsParam ap1, ap2, ap3;
 
@@ -65,7 +67,7 @@ Test(args, test_sub_command) {
 	cr_assert(sub_command_build(&sc, "ok", "adkflaljdf", 3, 2, "arg doc"));
 }
 
-Test(args, test_args) {
+MyTest(args, test_args) {
 	Args args;
 	args_build(&args, "myprog", "1.0", "myfamily devs", 0, 1, 0);
 	char *argv[] = {"test", "test2"};
