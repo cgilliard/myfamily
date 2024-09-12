@@ -6,4 +6,5 @@
 **/bin
 /bin/*
 /doc/*
+/main/resources.h
 /Makefile.config

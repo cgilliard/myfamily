@@ -11,3 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+#include <stdio.h>
+
+int proc_build_init(const char *proj_name, const char *proj_path)
+{
+	printf("prj_build_init=%s,projpath=%s\n", proj_name, proj_path);
+	return 0;
+}

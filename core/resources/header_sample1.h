@@ -1,15 +1,17 @@
 // 1.) Imports
 
-$abc::def::t1;			 // import from module path abc::def the type 't1';
+$abc::def::t1; // import from module path abc::def the type 't1';
 $abc::def::t2(TestType); // import from module path abc::def the type 't2' as 'TestType';
-$abc::def::mymod::*;	 // import from the module path abc::def::mymod all types.
+$abc::def::mymod::*; // import from the module path abc::def::mymod all types.
 
 // 2.) Modules
 // Modules can be define in two ways:
 // - Inline: using the 'mod' keyword:
-MyOuterType {
+MyOuterType
+{
 }
-mod testmod {
+mod testmod
+{
 	$..::MyOuterType; // import up one level to get a type from the outer
 					  // namespace.
 	MyInnerType(u32 x, MyOuterType y);
@@ -21,19 +23,20 @@ mod mymod; // This imports mymod.h or mymod/mod.h (only one must exist)
 
 // 3.) Types
 // declare a type name MyTestType
-MyTestType {
-	i8 a;	// i8 instance field
-	i16 b;	// i16 instance field
-	i32 c;	// i32 instance field
-	i64 d;	// i64 instance field
+MyTestType
+{
+	i8 a; // i8 instance field
+	i16 b; // i16 instance field
+	i32 c; // i32 instance field
+	i64 d; // i64 instance field
 	i128 e; // i128 instance field
-	u8 f;	// u8 instance field
-	u16 g;	// u16 instance field
-	u32 h;	// u32 instance field
-	u64 i;	// u64 instance field
+	u8 f; // u8 instance field
+	u16 g; // u16 instance field
+	u32 h; // u32 instance field
+	u64 i; // u64 instance field
 	u128 j; // u128 instance field
-	f32 k;	// f32 instance field
-	f64 l;	// f64 instance field
+	f32 k; // f32 instance field
+	f64 l; // f64 instance field
 	bool m; // bool instance field
 }
 
@@ -45,7 +48,8 @@ MyTestType {
 // programming languages. Incomplete types may NOT have fields. 'incomplete'
 // types are denoted with the '@' symbol. This indicates that the type is
 // 'incomplete'.
-@MyIncompleteType {
+@MyIncompleteType
+{
 	// This method which is also marked with the '@' must be implemented by
 	// the completing type. Note that there is an implicit 'self' variable
 	// that is not listed here but will be the first parameter passed to
@@ -62,7 +66,8 @@ MyTestType {
 // methods of the types it completes. In this case, 'my_required_method'. It can
 // optionally override the default method  'my_default_implemented_method'. All
 // of this is done in MyCompleteType's .c file.
-MyCompleteType {
+MyCompleteType
+{
 	i32 my_data;
 	i64 my_other_data;
 	// In 'complete' (or concrete) types, we use the '$' to indicate which
@@ -87,14 +92,16 @@ MyCompleteType::MyIncompleteType;
 
 // 5.) Mutability - the keyword mut can be used to indicate a method is mutable.
 // The default is that a function is immutable if 'mut' is not specified.
-MyType {
+MyType
+{
 	$mut insert(i32 key, i32 value) -> bool;
 	$mut remove(i32 key, i32 value) -> bool;
 	$ get(i32 key) -> i32;
 }
 
 // 6.) Parameter mutability - parameters may also be mutable or immutable.
-MyType {
+MyType
+{
 	// In this example the instance method 'do_thing1 has four parameters.
 	// The two primitive parameters are marked mutable and implicitly
 	// immutable respectively. The same is the case for the 'MyOtherType'
@@ -104,7 +111,8 @@ MyType {
 
 // 7.) References - We replace the '*' syntax from C with '&' syntax here in
 // methods.
-MyType {
+MyType
+{
 	// In this example we demonstrate the notation for passing by reference
 	// vs. passing by value. The '&' is used to denote that these values are
 	// passed by reference. If a type instance is passed by value, the
@@ -128,19 +136,22 @@ MyType {
 // external level and modules, the keyword 'pub' can be used to indicate that a
 // type or module can be imported into another module. See the following example
 // to illustrate:
-pub mod mymod {
-	MySubType {
+pub mod mymod
+{
+	MySubType
+	{
 		i64 v;
 	}
 
-	pub MyType {
+	pub MyType
+	{
 		i32 x;
 		u64 y;
 		MySubType z;
 	}
 }
 
-$mymod::MyType;	   // this is ok because MyType is 'pub'
+$mymod::MyType; // this is ok because MyType is 'pub'
 $mymod::MySubType; // this is not ok because MySubType is not 'pub'
 
 // Imports may also use the keyword 'pub' to indicate a type from another
@@ -154,7 +165,8 @@ pub $mymod::MyType; // now MyType can be accessed from other modules,
 // This example shows how to refer to the completing type from an incomplete
 // type. Since it is not known by the incomplete type and could be different if
 // multiple types complete the incomplete type.
-@Clone {
+@Clone
+{
 	// The symbol '$' is used to denote the unknown completing type.
 	@clone()->$;
 
@@ -166,12 +178,14 @@ pub $mymod::MyType; // now MyType can be accessed from other modules,
 // In addition to $ there are two other special symbols that may be used in incomplete types:
 // $Config and $Bindings. These have special meanings and are typically used in the Build
 // trait to pass in a configuration and generic bindings for the specific Type.
-@Build {
+@Build
+{
 	@build($Config & config, $Bindings & bindings);
 }
 
 // Here's what drop would look like.
-@Drop {
+@Drop
+{
 	@mut drop();
 }
 
@@ -179,9 +193,11 @@ pub $mymod::MyType; // now MyType can be accessed from other modules,
 // types described all have a single variant. Here's an example of a multi-variant type
 // Multi-variant types must be complete, they may complete incomplete types, and they may specify
 // their own methods. Method specification occurs at the outer most level of the type as below.
-MyEnum {
+MyEnum
+{
 	// struct like syntax supported
-	Variant1 {
+	Variant1
+	{
 		i32 x;
 		u64 y;
 	};
@@ -192,12 +208,15 @@ MyEnum {
 	// type like syntax
 	Variant4 i64;
 	// nested
-	Variant5 {
-		Nested1 {
+	Variant5
+	{
+		Nested1
+		{
 			i32 inner_value;
 		};
 		Netsted2;
-		Nested3 {
+		Nested3
+		{
 			DoubleNested1;
 			DoubleNested2(i32 x, u64 y);
 		}
@@ -209,9 +228,10 @@ MyEnum::Equal; // My enum completes the Equal incomplete type.
 
 // 11.) Arrays/Vectors (we support built-in types of arrays and dynamic arrays (Vector-like
 // structures)
-TestArrays {
+TestArrays
+{
 	static_size_arr[u8; 100]; // a statically sized array of 100 u8 elements
-	dynamic_arr[u64];		  // a dynamically sized array of u64 elements
+	dynamic_arr[u64]; // a dynamically sized array of u64 elements
 }
 
 // since the special incomplete type Builder is specified, we must specify a builder config
@@ -234,9 +254,10 @@ TestArrays::TryBuild;
 // Result<Unit, Error> which can be processed using match functionality.
 
 // 12.) Arrays with types - The previous works with Types as well as primitive arrays:
-TestTypedArrays {
+TestTypedArrays
+{
 	static_size_arr[MyType; 100]; // a statically sized array of 100 MyType elements
-	dynamic_arr[MyOtherType];	  // a dynamically sized array of MyOtherType elements
+	dynamic_arr[MyOtherType]; // a dynamically sized array of MyOtherType elements
 }
 
 // The additional specifications on build indicate build options for the build spec.
@@ -249,7 +270,8 @@ TestArrays::TryBuild; // TryBuild requires Build and uses its options
 // 13.) Generics
 // Types (both complete and incomplete may specify generics). Functions may also specify generics.
 // Complete type example:
-MyType<T> {
+MyType<T>
+{
 	T gen_field;
 	i32 other_field;
 	$mut set_gen_field(T gen_field);
@@ -260,7 +282,8 @@ MyType::Drop;
 
 // Incomplete type example (with bound)
 // In this example T is bound types that complete the Clone incomplete type.
-@ClonableIterator<T : Clone> {
+@ClonableIterator<T : Clone>
+{
 	// This method is required and returns the Type Option<T>. The <T> syntax mirrors that of
 	// languages like C++ and Rust for generics.
 	@mut next() -> Option<T>;
@@ -271,7 +294,8 @@ MyType::Drop;
 }
 
 // This generic refers to the type's own generic
-MyClonableIterator<R : Equal> {
+MyClonableIterator<R : Equal>
+{
 	R x;
 	i32 y;
 }
@@ -289,18 +313,21 @@ MyClonableItterator::ClonableIterator where T : I32;
 // specific statements must be on unique complete types.
 
 // Function level generics syntax
-Test {
+Test
+{
 	$my_fun<T : Equal, R : Clone>(T value, R clonable)->i32;
 }
 
 // 14.) Tuples - standard tuple syntax. Tuples can be a field within a Type.
-Test {
+Test
+{
 	(i32, MyTestType) x;
 	(i32, Test2, Abc) y;
 }
 
 // nested generics
-Test {
+Test
+{
 	HashMap<String, LinkedList<(u32, u64, MyType)>> hash;
 }
 

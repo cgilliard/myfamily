@@ -14,15 +14,19 @@
 
 #include <args/args.h>
 #include <bible/bible.h>
+#include <build/build.h>
 #include <core/std.h>
 #include <dirent.h>
 #include <errno.h>
+#include <main/main.h>
+#include <main/resources.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-void build_args(Args *args) {
+void build_args(Args *args)
+{
 	const char *home_dir = get_home_directory();
 
 	args_build(args, "fam", "0.0.1-alpha.1", "The MyFamily Developers", 0, 0, 0);
@@ -31,9 +35,9 @@ void build_args(Args *args) {
 	SubCommand init;
 	ArgsParam cfg_dir;
 	args_param_build(&cfg_dir, "dir",
-					 "Directory to initialize the project in (defaults to "
-					 "the project name if not specified)",
-					 "p", true, false, NULL);
+		"Directory to initialize the project in (defaults to "
+		"the project name if not specified)",
+		"p", true, false, NULL);
 	sub_command_build(&init, "init", "Initialize project", 1, 1, "<project_name>");
 	sub_command_add_param(&init, &cfg_dir);
 
@@ -67,19 +71,18 @@ void build_args(Args *args) {
 	SubCommand verse;
 	sub_command_build(&verse, "verse", "Print a random Bible verse", 0, 0, "");
 	ArgsParam no_colors_param, book_param, chapter_param, verse_param;
-	args_param_build(&no_colors_param, "no_colors", "Do not display colors", "n", false, false,
-					 NULL);
+	args_param_build(
+		&no_colors_param, "no_colors", "Do not display colors", "n", false, false, NULL);
 	args_param_build(&book_param, "book",
-					 "Randomly select a verse from the specified book of the Bible", "b", true,
-					 false, NULL);
+		"Randomly select a verse from the specified book of the Bible", "b", true, false, NULL);
 	args_param_build(&chapter_param, "chapter",
-					 "Randomly select a verse from the specified chapter of the Bible. "
-					 "This option requires that --book be specified as well.",
-					 "x", true, false, NULL);
+		"Randomly select a verse from the specified chapter of the Bible. "
+		"This option requires that --book be specified as well.",
+		"x", true, false, NULL);
 	args_param_build(&verse_param, "verse",
-					 "Select the specified verse. This option requires "
-					 "that --book and --chapter be specified as well.",
-					 "v", true, false, NULL);
+		"Select the specified verse. This option requires "
+		"that --book and --chapter be specified as well.",
+		"v", true, false, NULL);
 
 	sub_command_add_param(&verse, &no_colors_param);
 	sub_command_add_param(&verse, &book_param);
@@ -91,10 +94,10 @@ void build_args(Args *args) {
 	// build the node SubCommand
 	SubCommand node;
 	ArgsParam cfg_threads, cfg_show;
-	args_param_build(&cfg_show, "show_request", "Show request information", "s", false, false,
-					 NULL);
-	args_param_build(&cfg_threads, "threads", "Number of threads to execute", "t", true, false,
-					 "1");
+	args_param_build(
+		&cfg_show, "show_request", "Show request information", "s", false, false, NULL);
+	args_param_build(
+		&cfg_threads, "threads", "Number of threads to execute", "t", true, false, "1");
 
 	sub_command_build(&node, "node", "Run full node", 0, 0, "");
 	sub_command_add_param(&node, &cfg_threads);
@@ -106,20 +109,20 @@ void build_args(Args *args) {
 	ArgsParam cfg_config_dir;
 	ArgsParam cfg_debug;
 
-	args_param_build(&cfg_debug, "debug", "Prints additional debugging information", "d", false,
-					 false, NULL);
+	args_param_build(
+		&cfg_debug, "debug", "Prints additional debugging information", "d", false, false, NULL);
 
 	char default_config_dir[strlen(home_dir) + 100];
 	snprintf(default_config_dir, strlen(home_dir) + 100, "%s/.fam", home_dir);
 	args_param_build(&cfg_config_dir, "config_dir",
-					 "Directory where configuration files are stored", "c", true, false,
-					 default_config_dir);
+		"Directory where configuration files are stored", "c", true, false, default_config_dir);
 
 	args_add_param(args, &cfg_debug);
 	args_add_param(args, &cfg_config_dir);
 }
 
-void process_verse(Args *args, char *config_dir) {
+void process_verse(Args *args, char *config_dir)
+{
 	bool no_colors = args_value_of(args, "no_colors", NULL, 0, 0) >= 0;
 	char book[100];
 	args_value_of(args, "book", book, 100, 0);
@@ -128,8 +131,9 @@ void process_verse(Args *args, char *config_dir) {
 	if (args_value_of(args, "chapter", chapter_buf, 100, 0) != -1) {
 		chapter_int = atoi(chapter_buf);
 		if (chapter_int <= 0 || chapter_int > 255) {
-			fprintf(stderr, "The chapter specified must be a positive "
-							"integer which is equal to or less than 255.\n");
+			fprintf(stderr,
+				"The chapter specified must be a positive "
+				"integer which is equal to or less than 255.\n");
 			exit(-1);
 		}
 	}
@@ -138,8 +142,9 @@ void process_verse(Args *args, char *config_dir) {
 	if (args_value_of(args, "verse", verse_buf, 100, 0) != -1) {
 		verse_int = atoi(verse_buf);
 		if (verse_int <= 0 || verse_int > 255) {
-			fprintf(stderr, "The verse specified must be a positive "
-							"integer which is equal to or less than 255.\n");
+			fprintf(stderr,
+				"The verse specified must be a positive "
+				"integer which is equal to or less than 255.\n");
 			exit(-1);
 		}
 	}
@@ -169,17 +174,19 @@ void process_verse(Args *args, char *config_dir) {
 	}
 
 	if (verse_int != -1 && chapter_int == -1) {
-		fprintf(stderr, "If --verse is specified, --chapter must also "
-						"be specified\n");
+		fprintf(stderr,
+			"If --verse is specified, --chapter must also "
+			"be specified\n");
 		exit(-1);
 	}
 	if (chapter_int != -1 && (strlen(book) == 0)) {
-		fprintf(stderr, "If --chapter is specified, --book must also "
-						"be specified\n");
+		fprintf(stderr,
+			"If --chapter is specified, --book must also "
+			"be specified\n");
 		exit(-1);
 	}
-	if (bible_random_verse_to_string(&bible, buf, 1024, !no_colors, book, chapter_ptr, verse_ptr) <
-		0) {
+	if (bible_random_verse_to_string(&bible, buf, 1024, !no_colors, book, chapter_ptr, verse_ptr)
+		< 0) {
 		fprintf(stderr, "Could not find random verse due to: %s\n", strerror(errno));
 		exit(-1);
 	}
@@ -188,7 +195,38 @@ void process_verse(Args *args, char *config_dir) {
 	bible_cleanup(&bible);
 }
 
-int real_main(int argc, char **argv) {
+void process_init(Args *args, char *config_dir)
+{
+	char proj_name[128];
+	strcpy(proj_name, "");
+	args_get_argument(args, 1, proj_name, 128);
+	char proj_path[1024];
+	strcpy(proj_path, proj_name);
+	args_value_of(args, "dir", proj_path, 1024, 0);
+	proc_build_init(proj_name, proj_path);
+}
+
+void setup_config_dir(const char *config_dir)
+{
+	if (mkdir(config_dir, 0700)) {
+		perror("Failed to create specified config directory");
+		exit(-1);
+	}
+
+	char resources_dir[strlen(config_dir) + 100];
+	strcpy(resources_dir, config_dir);
+	strcat(resources_dir, "/resources");
+
+	if (mkdir(resources_dir, 0700)) {
+		perror("Failed to create specified resources directory");
+		exit(-1);
+	}
+
+	BUILD_RESOURCE_DIR(resources_dir, fam);
+}
+
+int real_main(int argc, char **argv)
+{
 	Args args;
 	build_args(&args);
 	args_init(&args, argc, argv);
@@ -198,10 +236,7 @@ int real_main(int argc, char **argv) {
 	char config_dir[config_dir_len + 1];
 	args_value_of(&args, "config_dir", config_dir, config_dir_len + 1, 0);
 	if (access(config_dir, F_OK)) {
-		if (mkdir(config_dir, 0700)) {
-			perror("Failed to create specified config directory");
-			exit(-1);
-		}
+		setup_config_dir(config_dir);
 	}
 
 	// get first argument (subcommand)
@@ -210,11 +245,14 @@ int real_main(int argc, char **argv) {
 	if (ret > 0) {
 		if (!strcmp(command, "verse")) {
 			process_verse(&args, config_dir);
+		} else if (!strcmp(command, "init")) {
+			process_init(&args, config_dir);
 		} else {
 			printf("Not implemented!\n");
 		}
 	}
 
 	args_cleanup(&args);
+
 	return 0;
 }
