@@ -2,11 +2,13 @@ steps:
   - script: |
       source venv/bin/activate
       ./configure
+      make clean all
       make clean testsan
     displayName: macOS Test
     condition: eq( variables['Agent.OS'], 'Darwin' )
   - script: |
       ./configure
+      make clean all
       make clean testsan
     displayName: Linux Test
     condition: eq( variables['Agent.OS'], 'Linux' )
