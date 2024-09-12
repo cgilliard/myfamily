@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['joinresult_807',['JoinResult',['../structJoinResult.html',1,'']]]
+  ['fatptr_951',['FatPtr',['../structFatPtr.html',1,'']]]
 ];

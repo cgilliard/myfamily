@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['selfcleanupimpl_1280',['SelfCleanupImpl',['../type_8h.html#a5796fa21fb1fe0f979f17051f4eb3e61',1,'type.h']]]
+  ['lockguardptr_1549',['LockGuardPtr',['../lock_8h.html#acdd269c5ab65bd7a20e7c2746c157280',1,'lock.h']]],
+  ['lockptr_1550',['LockPtr',['../lock_8h.html#a9a044721dc39928f80247e5555bd85b8',1,'lock.h']]]
 ];

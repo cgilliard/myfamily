@@ -155,12 +155,15 @@ var menudata={children:[
 {text:"y",url:"globals_vars.html#index_y"}]},
 {text:"Typedefs",url:"globals_type.html",children:[
 {text:"_",url:"globals_type.html#index__5F"},
+{text:"a",url:"globals_type.html#index_a"},
+{text:"b",url:"globals_type.html#index_b"},
 {text:"c",url:"globals_type.html#index_c"},
 {text:"f",url:"globals_type.html#index_f"},
 {text:"h",url:"globals_type.html#index_h"},
 {text:"j",url:"globals_type.html#index_j"},
 {text:"l",url:"globals_type.html#index_l"},
 {text:"o",url:"globals_type.html#index_o"},
+{text:"r",url:"globals_type.html#index_r"},
 {text:"s",url:"globals_type.html#index_s"},
 {text:"t",url:"globals_type.html#index_t"},
 {text:"v",url:"globals_type.html#index_v"}]},
@@ -189,4 +192,5 @@ var menudata={children:[
 {text:"v",url:"globals_defs_v.html#index_v"},
 {text:"w",url:"globals_defs_w.html#index_w"},
 {text:"x",url:"globals_defs_x.html#index_x"},
+{text:"y",url:"globals_defs_y.html#index_y"},
 {text:"π",url:"globals_defs_0xcf80.html#index_a0xcf80"}]}]}]}]}

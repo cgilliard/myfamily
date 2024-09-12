@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['vtabletraitentry_1294',['VtableTraitEntry',['../type_8h.html#a63338e751335ad4f44c66f1ff050f2c9',1,'type.h']]]
+  ['resourcestats_1552',['ResourceStats',['../resources_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'resources.h']]]
 ];

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['selfcleanupimpl_811',['SelfCleanupImpl',['../structSelfCleanupImpl.html',1,'']]]
+  ['lockguardptr_959',['LockGuardPtr',['../structLockGuardPtr.html',1,'']]],
+  ['lockptr_960',['LockPtr',['../structLockPtr.html',1,'']]]
 ];

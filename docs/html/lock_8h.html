@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Family: core/lock.h File Reference</title>
+<title>My Family: base/lock.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_4270bfced15e0e73154b13468c7c9ad9.html">core</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_e914ee4d4a44400f1fdb170cb4ead18a.html">base</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -75,7 +75,7 @@ $(function() {
 <div class="title">lock.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">core/types.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 <code>#include &lt;pthread.h&gt;</code><br />
 <code>#include &lt;stdatomic.h&gt;</code><br />
 </div>
@@ -92,7 +92,7 @@ Classes</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:a0918621ef865e4bfda79b010db52367d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a>&#160;&#160;&#160;<a class="el" href="structLockPtr.html">LockPtr</a> <a class="el" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="lock_8h.html#ae13e924c8c7cc5b8ee7f88e219d0b241">Lock_cleanup</a>)))</td></tr>
 <tr class="separator:a0918621ef865e4bfda79b010db52367d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc37b5ae502cbe90cde7bb660c40d614"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#afc37b5ae502cbe90cde7bb660c40d614">LockGuard</a></td></tr>
+<tr class="memitem:afc37b5ae502cbe90cde7bb660c40d614"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#afc37b5ae502cbe90cde7bb660c40d614">LockGuard</a>&#160;&#160;&#160;<a class="el" href="structLockGuardPtr.html">LockGuardPtr</a> <a class="el" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a>)))</td></tr>
 <tr class="separator:afc37b5ae502cbe90cde7bb660c40d614"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefb7db7456a848e7cefe90816a5aaa88"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#aefb7db7456a848e7cefe90816a5aaa88">LOCK</a>()&#160;&#160;&#160;<a class="el" href="lock_8h.html#ad2b937c09217ad140001c5f97dbc395c">Lock_build</a>()</td></tr>
 <tr class="separator:aefb7db7456a848e7cefe90816a5aaa88"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -186,15 +186,11 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define LockGuard</td>
+          <td class="memname">#define LockGuard&#160;&#160;&#160;<a class="el" href="structLockGuardPtr.html">LockGuardPtr</a> <a class="el" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a>)))</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">LockGuardPtr \</a></div>
-<div class="line"><a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">	    __attribute__</a>((warn_unused_result, cleanup(<a class="code" href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a>)))</div>
-<div class="ttc" id="alock_8h_html_a7c2e32969ff851fb0a311f9491011b52"><div class="ttname"><a href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a></div><div class="ttdeci">void Lockguard_cleanup(LockGuardPtr *ptr)</div><div class="ttdef"><b>Definition:</b> lock.c:98</div></div>
-<div class="ttc" id="atype_8c_html_afd02bb0f6a745c39d5e3417493995c71"><div class="ttname"><a href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a></div><div class="ttdeci">void __attribute__((constructor))</div><div class="ttdef"><b>Definition:</b> type.c:24</div></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a id="a35d42cc801623f1ddf20ccc2981d968b"></a>
@@ -222,12 +218,11 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span>                                     \</div>
-<div class="line">    {                                      \</div>
-<div class="line">        LockGuard __lg__ = <a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>(&amp;ptr); \</div>
-<div class="line">        exe                            \</div>
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                                           \</div>
+<div class="line">        LockGuard __lg__ = <a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>(&amp;ptr);                                                             \</div>
+<div class="line">        exe                                                                                        \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0);</div>
-<div class="ttc" id="alock_8h_html_aedb785bacae99330d760b55c4cdaa4dd"><div class="ttname"><a href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a></div><div class="ttdeci">LockGuard lock(Lock *lock)</div><div class="ttdef"><b>Definition:</b> lock.c:73</div></div>
+<div class="ttc" id="alock_8h_html_aedb785bacae99330d760b55c4cdaa4dd"><div class="ttname"><a href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a></div><div class="ttdeci">LockGuard lock(Lock *lock)</div><div class="ttdef"><b>Definition:</b> lock.c:74</div></div>
 </div><!-- fragment -->
 </div>
 </div>

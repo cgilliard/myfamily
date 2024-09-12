@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Family: core/panic.h File Reference</title>
+<title>My Family: base/panic.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_4270bfced15e0e73154b13468c7c9ad9.html">core</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_e914ee4d4a44400f1fdb170cb4ead18a.html">base</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -74,7 +74,7 @@ $(function() {
 <div class="title">panic.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">core/types.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 <code>#include &lt;setjmp.h&gt;</code><br />
 </div>
 <p><a href="panic_8h_source.html">Go to the source code of this file.</a></p>
@@ -113,10 +113,10 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ({                                         \</div>
-<div class="line">        jmp_return_set = <span class="keyword">true</span>;             \</div>
-<div class="line">        int _value__ = setjmp(<a class="code" href="panic_8h.html#a9b2ef860ddf9f6950da834c0b674ea5f">return_jmp</a>); \</div>
-<div class="line">        _value__ != 0;                     \</div>
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
+<div class="line">        jmp_return_set = <span class="keyword">true</span>;                                                                     \</div>
+<div class="line">        int _value__ = setjmp(<a class="code" href="panic_8h.html#a9b2ef860ddf9f6950da834c0b674ea5f">return_jmp</a>);                                                         \</div>
+<div class="line">        _value__ != 0;                                                                             \</div>
 <div class="line">    })</div>
 <div class="ttc" id="apanic_8h_html_a9b2ef860ddf9f6950da834c0b674ea5f"><div class="ttname"><a href="panic_8h.html#a9b2ef860ddf9f6950da834c0b674ea5f">return_jmp</a></div><div class="ttdeci">_Thread_local jmp_buf return_jmp</div><div class="ttdef"><b>Definition:</b> panic.c:24</div></div>
 </div><!-- fragment -->

@@ -1,9 +1,6 @@
 var searchData=
 [
-  ['heapallocator_1270',['HeapAllocator',['../heap_8h.html#ae86ebae08344fd8320173256e9f59872',1,'heap.h']]],
-  ['heapallocatorconfig_1271',['HeapAllocatorConfig',['../heap_8h.html#abab7807967a3bd6b6578ef41981aef1f',1,'heap.h']]],
-  ['heapallocatorimpl_1272',['HeapAllocatorImpl',['../heap_8c.html#a9be3b2420b29c648206490facf5665dd',1,'HeapAllocatorImpl():&#160;heap.c'],['../heap_8h.html#a9be3b2420b29c648206490facf5665dd',1,'HeapAllocatorImpl():&#160;heap.h']]],
-  ['heapdata_1273',['HeapData',['../heap_8c.html#abe23522c0bd39b8ab8afed77c23e3773',1,'heap.c']]],
-  ['heapdataparams_1274',['HeapDataParams',['../heap_8c.html#a10328963333146d120e9282b1f4f38e4',1,'heap.c']]],
-  ['heapdataparamsconfig_1275',['HeapDataParamsConfig',['../heap_8h.html#ab3580ee1cd3b7571f43cfefa06f90bd3',1,'heap.h']]]
+  ['chainconfig_1538',['ChainConfig',['../chain__allocator_8h.html#a5af7013d38b21564ca3dcb12c769d6ce',1,'chain_allocator.h']]],
+  ['chainguardentry_1539',['ChainGuardEntry',['../chain__allocator_8c.html#a75e50a043100b00eed7fa9dc3ceb661d',1,'chain_allocator.c']]],
+  ['context_5ft_1540',['context_t',['../toml_8c.html#afde0fcb21678582c657bc6d18032620f',1,'toml.c']]]
 ];
