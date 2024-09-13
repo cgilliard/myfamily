@@ -89,7 +89,8 @@ MyTest(base, test_path)
 
 	Path path6;
 	cr_assert(!path_for(&path6, "~/.fam/resources"));
-	cr_assert(!path_canonicalize(&path6));
+	// don't attempt to canonicalize because it fails when .fam doesn't exist
+	// cr_assert(!path_canonicalize(&path6));
 	// we find this at the end (comment out, this works but if .fam doesn't
 	// exist it's an error. We will keep tests from creating directories outside
 	// of the project directory.
