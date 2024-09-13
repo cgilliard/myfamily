@@ -18,6 +18,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #define PATH_SEPARATOR "/"
 #define PATH_SEPARATOR_CHAR '/'
@@ -138,4 +139,34 @@ int path_pop(Path *p)
 char *path_to_string(Path *p)
 {
 	return p->ptr.data;
+}
+
+bool path_exists(Path *p)
+{
+	if (p->ptr.data == NULL && p->ptr.len == 0) {
+		errno = EINVAL;
+		return false;
+	}
+	return access(p->ptr.data, F_OK) == 0;
+}
+bool path_is_dir(Path *p)
+{
+	if (p->ptr.data == NULL && p->ptr.len == 0) {
+		errno = EINVAL;
+		return false;
+	}
+	struct stat s;
+	if (stat(p->ptr.data, &s) == 0) {
+		return s.st_mode & S_IFDIR;
+	}
+	return false;
+}
+
+bool path_mkdir(Path *p, mode_t mode)
+{
+	if (p->ptr.data == NULL && p->ptr.len == 0) {
+		errno = EINVAL;
+		return false;
+	}
+	return mkdir(p->ptr.data, 0700) != 0;
 }

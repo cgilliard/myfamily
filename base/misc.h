@@ -13,3 +13,4 @@
 // limitations under the License.
 
 char *rstrstr(char *s1, char *s2);
+int copy_file(const char *dst, const char *src);

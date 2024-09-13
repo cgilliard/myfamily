@@ -1,0 +1,16 @@
+[version=REPLACE_FAM_VERSION]
+
+[package]
+name = "REPLACE_NAME"
+version = "0.0.1"
+authors = [REPLACE_AUTHORS]
+description = "REPLACE_DESCRIPTION"
+
+[dependencies]
+main = { path = "./main" }
+util = { path = "./util" }
+
+[test-dependencies]
+
+testframework = { path = "./test" }
+

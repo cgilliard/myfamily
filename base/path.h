@@ -30,5 +30,8 @@ int path_canonicalize(Path *p);
 int path_push(Path *p, const char *next);
 int path_pop(Path *p);
 char *path_to_string(Path *p);
+bool path_exists(Path *p);
+bool path_is_dir(Path *p);
+bool path_mkdir(Path *p, mode_t mode);
 
 #endif // _BASE_PATH__
