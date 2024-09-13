@@ -78,7 +78,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="chain__allocator_8h_source.html">base/chain_allocator.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="panic_8h_source.html">base/panic.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="base_2resources_8h_source.html">base/resources.h</a>&gt;</code><br />
 <code>#include &lt;errno.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
@@ -194,6 +194,20 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Builds a heap_allocator based on the current default settings. This is the same as the global heap allocator and the thread local heap allocators. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ptr</td><td>A pointer to the location where the <a class="el" href="structHeapAllocator.html">HeapAllocator</a> to be configured is stored. This pointer must not be NULL. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success -1 on error with the appropriate errno value set. </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#a9f08a0124120fbf0cda9563502f780fa">heap_allocator_allocate</a>] </dd>
+<dd>
+[<a class="el" href="heap_8h.html#ac75241ce08a968d8baf3c6c8d9f97cde">heap_allocator_free</a>] </dd>
+<dd>
+[<a class="el" href="heap_8h.html#aa798be4af0288b37bf349b3fd178efed">heap_allocator_cleanup</a>] </dd>
+<dd>
+[<a class="el" href="heap_8h.html#a9883e6ead40a99cbd04b70e7078b71e1">heap_allocator_build</a>] </dd></dl>
 
 </div>
 </div>
