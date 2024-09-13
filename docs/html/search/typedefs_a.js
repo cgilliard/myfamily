@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['selfcleanupimpl_1553',['SelfCleanupImpl',['../type_8h.html#a5796fa21fb1fe0f979f17051f4eb3e61',1,'type.h']]],
-  ['subcommand_1554',['SubCommand',['../args_8h.html#a87a53c87231cf00fe98e41f84d8330b2',1,'args.h']]]
+  ['resourcestats_1627',['ResourceStats',['../base_2resources_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'resources.h']]]
 ];

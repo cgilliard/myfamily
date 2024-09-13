@@ -130,6 +130,8 @@ Functions</h2></td></tr>
 <tr class="separator:ac8c5b096a887a7d6d07185223809ff1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedd6a141c4788cea879156da8782eaec"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#aedd6a141c4788cea879156da8782eaec">heap_data_free</a> (<a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> index, <a class="el" href="structHeapData.html">HeapData</a> *hd, <a class="el" href="structFatPtr.html">FatPtr</a> *fptr)</td></tr>
 <tr class="separator:aedd6a141c4788cea879156da8782eaec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af61ba5db2b6480cad67a6f64c3ffac3c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#af61ba5db2b6480cad67a6f64c3ffac3c">heap_allocator_cur_slabs_allocated</a> (<a class="el" href="structHeapAllocator.html">HeapAllocator</a> *ptr)</td></tr>
+<tr class="separator:af61ba5db2b6480cad67a6f64c3ffac3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f08a0124120fbf0cda9563502f780fa"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#a9f08a0124120fbf0cda9563502f780fa">heap_allocator_allocate</a> (<a class="el" href="structHeapAllocator.html">HeapAllocator</a> *ptr, <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>, <a class="el" href="structFatPtr.html">FatPtr</a> *fptr)</td></tr>
 <tr class="separator:a9f08a0124120fbf0cda9563502f780fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac75241ce08a968d8baf3c6c8d9f97cde"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="heap_8c.html#ac75241ce08a968d8baf3c6c8d9f97cde">heap_allocator_free</a> (<a class="el" href="structHeapAllocator.html">HeapAllocator</a> *ptr, <a class="el" href="structFatPtr.html">FatPtr</a> *fptr)</td></tr>
@@ -522,6 +524,25 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 on success -1 on error with the appropriate errno value set. </dd></dl>
 <dl class="section see"><dt>See also</dt><dd>[<a class="el" href="heap_8h.html#ac75241ce08a968d8baf3c6c8d9f97cde">heap_allocator_free</a>] </dd></dl>
+
+</div>
+</div>
+<a id="af61ba5db2b6480cad67a6f64c3ffac3c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af61ba5db2b6480cad67a6f64c3ffac3c">&#9670;&nbsp;</a></span>heap_allocator_cur_slabs_allocated()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> heap_allocator_cur_slabs_allocated </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structHeapAllocator.html">HeapAllocator</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Return the total number of slabs allocated for this <a class="el" href="structHeapAllocator.html">HeapAllocator</a>. </p>
 
 </div>
 </div>

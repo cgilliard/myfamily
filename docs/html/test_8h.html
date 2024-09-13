@@ -72,8 +72,9 @@ $(function() {
 <div class="title">test.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="colors_8h_source.html">base/colors.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="chain__allocator_8h_source.html">base/chain_allocator.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="colors_8h_source.html">base/colors.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="base_2resources_8h_source.html">base/resources.h</a>&gt;</code><br />
 <code>#include &lt;criterion/criterion.h&gt;</code><br />
 <code>#include &lt;fcntl.h&gt;</code><br />
 <code>#include &lt;signal.h&gt;</code><br />
@@ -132,35 +133,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordtype">void</span> setup_##test(<span class="keywordtype">void</span>) {                                                                      \</div>
-<div class="line">        u64 cur_alloc_count = <a class="code" href="resources_8c.html#a53b7591c92f2b5fede4be13fffafa06f">mymalloc_sum</a>();                                                      \</div>
-<div class="line">        u64 cur_free_count = <a class="code" href="resources_8c.html#a27f00bbe657b85df0e0565e41b2be409">myfree_sum</a>();                                                         \</div>
-<div class="line">        u64 diff = cur_alloc_count - cur_free_count;                                               \</div>
-<div class="line">        initial_alloc_diff = diff;                                                                 \</div>
-<div class="line">        initial_file_diff = <a class="code" href="resources_8c.html#aa7957c38f9bfd6b25748cb16ff615fca">myfopen_sum</a>() - <a class="code" href="resources_8c.html#a0b809890b8c686fb2e74bc782d0fc28a">myfclose_sum</a>();                                        \</div>
-<div class="line">        u64 initial_file_diff = <a class="code" href="resources_8c.html#aa7957c38f9bfd6b25748cb16ff615fca">myfopen_sum</a>() - <a class="code" href="resources_8c.html#a0b809890b8c686fb2e74bc782d0fc28a">myfclose_sum</a>();                                    \</div>
-<div class="line">        cur_name = #test;                                                                          \</div>
-<div class="line">        if (access(<span class="stringliteral">&quot;bin/nocapture&quot;</span>, F_OK) != 0) {                                                  \</div>
-<div class="line">            char s[100];                                                                           \</div>
-<div class="line">            snprintf(s, 100, <span class="stringliteral">&quot;bin/output_%s.log&quot;</span>, #test);                                          \</div>
-<div class="line">            log_fd = open(s, O_WRONLY | O_CREAT | O_TRUNC, 0644);                                  \</div>
-<div class="line">            dup2(log_fd, STDOUT_FILENO);                                                           \</div>
-<div class="line">            dup2(log_fd, STDERR_FILENO);                                                           \</div>
-<div class="line">        } <span class="keywordflow">else</span> {                                                                                   \</div>
-<div class="line">            log_fd = -1;                                                                           \</div>
-<div class="line">        }                                                                                          \</div>
-<div class="line">    }                                                                                              \</div>
-<div class="line">    void test_##suite##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##test();                                                                  \</div>
-<div class="line">    Test(suite, test, .init = setup_##test, .fini = tear_down) {                                   \</div>
-<div class="line">        test_##suite##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##test();                                                                   \</div>
-<div class="line">    }                                                                                              \</div>
-<div class="line">    void test_##suite##<a class="code" href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a>##test()</div>
-<div class="ttc" id="aenum_8h_html_a6bae5ab157437fc2f69924192746a577"><div class="ttname"><a href="enum_8h.html#a6bae5ab157437fc2f69924192746a577">_</a></div><div class="ttdeci">#define _(name, variant, v)</div><div class="ttdef"><b>Definition:</b> enum.h:202</div></div>
-<div class="ttc" id="aresources_8c_html_a0b809890b8c686fb2e74bc782d0fc28a"><div class="ttname"><a href="resources_8c.html#a0b809890b8c686fb2e74bc782d0fc28a">myfclose_sum</a></div><div class="ttdeci">u64 myfclose_sum()</div><div class="ttdef"><b>Definition:</b> resources.c:66</div></div>
-<div class="ttc" id="aresources_8c_html_a27f00bbe657b85df0e0565e41b2be409"><div class="ttname"><a href="resources_8c.html#a27f00bbe657b85df0e0565e41b2be409">myfree_sum</a></div><div class="ttdeci">u64 myfree_sum()</div><div class="ttdef"><b>Definition:</b> resources.c:60</div></div>
-<div class="ttc" id="aresources_8c_html_a53b7591c92f2b5fede4be13fffafa06f"><div class="ttname"><a href="resources_8c.html#a53b7591c92f2b5fede4be13fffafa06f">mymalloc_sum</a></div><div class="ttdeci">u64 mymalloc_sum()</div><div class="ttdef"><b>Definition:</b> resources.c:54</div></div>
-<div class="ttc" id="aresources_8c_html_aa7957c38f9bfd6b25748cb16ff615fca"><div class="ttname"><a href="resources_8c.html#aa7957c38f9bfd6b25748cb16ff615fca">myfopen_sum</a></div><div class="ttdeci">u64 myfopen_sum()</div><div class="ttdef"><b>Definition:</b> resources.c:63</div></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 </div><!-- contents -->
