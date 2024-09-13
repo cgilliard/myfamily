@@ -43,8 +43,37 @@ int path_for(Path *p, const char *path)
 	strcpy(p->ptr.data, path);
 	return 0;
 }
+
+int path_replace_home(Path *p)
+{
+	const char *home_dir = getenv("HOME");
+	if (home_dir == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+	if (((char *)(p->ptr.data))[0] == '~') {
+		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr.data);
+		if (nlen >= PATH_MAX) {
+			errno = E2BIG;
+			return -1;
+		}
+		if (nlen >= p->ptr.len) {
+			FatPtr nptr;
+			if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+				return -1;
+			p->ptr = nptr;
+		}
+		char buf[PATH_MAX + 1];
+		snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr.data + 1));
+		strcpy(p->ptr.data, buf);
+	}
+	return 0;
+}
+
 int path_canonicalize(Path *p)
 {
+	if (path_replace_home(p))
+		return -1;
 	char buf[PATH_MAX];
 	errno = 0;
 	if (realpath(p->ptr.data, buf) == NULL) {
@@ -83,12 +112,14 @@ int path_push(Path *p, const char *next)
 	int nlen = slen + strlen(next);
 	if (need_sep)
 		nlen += strlen(PATH_SEPARATOR);
+
 	if (nlen >= p->ptr.len) {
 		FatPtr nptr;
 		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
 			return -1;
 		p->ptr = nptr;
 	}
+
 	if (need_sep)
 		strcat(p->ptr.data, PATH_SEPARATOR);
 	strcat(p->ptr.data, next);

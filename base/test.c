@@ -86,4 +86,12 @@ MyTest(base, test_path)
 
 	// we find this at the end
 	cr_assert(strstr(path_to_string(&path5), "resources/test1.txt"));
+
+	Path path6;
+	cr_assert(!path_for(&path6, "~/.fam/resources"));
+	cr_assert(!path_canonicalize(&path6));
+	// we find this at the end (comment out, this works but if .fam doesn't
+	// exist it's an error. We will keep tests from creating directories outside
+	// of the project directory.
+	// cr_assert(strstr(path_to_string(&path6), ".fam/resources"));
 }
