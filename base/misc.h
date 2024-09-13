@@ -12,13 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/chain_allocator.h>
-#include <base/colors.h>
-#include <base/dir.h>
-#include <base/heap.h>
-#include <base/lock.h>
-#include <base/panic.h>
-#include <base/path.h>
-#include <base/rand.h>
-#include <base/resources.h>
-#include <base/sha256.h>
+char *rstrstr(char *s1, char *s2);

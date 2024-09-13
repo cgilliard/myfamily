@@ -12,13 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef _BASE_PATH__
+#define _BASE_PATH__
+
 #include <base/chain_allocator.h>
-#include <base/colors.h>
-#include <base/dir.h>
-#include <base/heap.h>
-#include <base/lock.h>
-#include <base/panic.h>
-#include <base/path.h>
-#include <base/rand.h>
-#include <base/resources.h>
-#include <base/sha256.h>
+
+typedef struct PathImpl {
+	FatPtr ptr;
+} PathImpl;
+
+void path_cleanup(PathImpl *ptr);
+
+#define Path PathImpl __attribute__((warn_unused_result, cleanup(path_cleanup)))
+
+int path_for(Path *dst, const char *path);
+int path_canonicalize(Path *p);
+int path_push(Path *p, const char *next);
+int path_pop(Path *p);
+char *path_to_string(Path *p);
+
+#endif // _BASE_PATH__

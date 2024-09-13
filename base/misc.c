@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/chain_allocator.h>
-#include <base/colors.h>
-#include <base/dir.h>
-#include <base/heap.h>
-#include <base/lock.h>
-#include <base/panic.h>
-#include <base/path.h>
-#include <base/rand.h>
-#include <base/resources.h>
-#include <base/sha256.h>
+#include <string.h>
+
+char *rstrstr(char *s1, char *s2)
+{
+	size_t s1len = strlen(s1);
+	size_t s2len = strlen(s2);
+	char *s;
+
+	if (s2len > s1len)
+		return NULL;
+	for (s = s1 + s1len - s2len; s >= s1; --s)
+		if (strncmp(s, s2, s2len) == 0)
+			return s;
+	return NULL;
+}

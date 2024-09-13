@@ -337,3 +337,11 @@ Test
 
 // 16.) Attributes
 // #[name] and #[function(param1, param2, ...)] is allowed.
+
+// Potential c syntax usage:
+let path = 🤔(_(Path, "test/path.txt"));
+var file = 🤔(_(File, path));
+var reader = 🤔(_(BufReader, (With(readable, file), With(capacity, 1024))));
+foreach (String, line, 🤔(_(Iterator, reader))) {
+	🤔(debug("line={}", line));
+}

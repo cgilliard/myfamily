@@ -140,8 +140,8 @@ typedef struct HeapAllocator {
  * @see [heap_allocator_cleanup]
  * @see [heap_allocator_build_arr]
  */
-int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
-						 int heap_data_params_count, ...);
+int heap_allocator_build(
+	HeapAllocator *ptr, HeapAllocatorConfig *config, int heap_data_params_count, ...);
 
 /**
  * Builds a heap_allocator based on the specified #HeapAllocatorConfig and
@@ -161,7 +161,20 @@ int heap_allocator_build(HeapAllocator *ptr, HeapAllocatorConfig *config,
  * @see [heap_allocator_build]
  */
 int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
-							 HeapDataParamsConfig arr[], u64 heap_data_params_count);
+	HeapDataParamsConfig arr[], u64 heap_data_params_count);
+
+/**
+ * Builds a heap_allocator based on the current default settings. This is the same as the global
+ * heap allocator and the thread local heap allocators.
+ * @param ptr A pointer to the location where the #HeapAllocator to be
+ * configured is stored. This pointer must not be NULL.
+ * @return 0 on success -1 on error with the appropriate errno value set.
+ * @see [heap_allocator_allocate]
+ * @see [heap_allocator_free]
+ * @see [heap_allocator_cleanup]
+ * @see [heap_allocator_build]
+ */
+int build_default_heap_allocator(HeapAllocator *ptr);
 
 /**
  * Allocates a #FatPtr from the #HeapAllocator (if possible). Note that
@@ -183,6 +196,11 @@ int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
  * @see [heap_allocator_cleanup]
  */
 int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr);
+
+/**
+ * Return the total number of slabs allocated for this #HeapAllocator.
+ */
+u64 heap_allocator_cur_slabs_allocated(HeapAllocator *ptr);
 
 /**
  * Free the data associated with this #FatPtr releasing it back to the
@@ -223,9 +241,9 @@ void *fat_ptr_data(const FatPtr *ptr);
  */
 u64 fat_ptr_len(const FatPtr *ptr);
 
-#define FAT_PTR_INIT {0, NULL, 0};
+#define FAT_PTR_INIT { 0, NULL, 0 };
 
-#define HA_CONFIG_DEFAULT {false, false}
+#define HA_CONFIG_DEFAULT { false, false }
 #define HAP_CONFIG(slab_size, slabs_per_resize, initial_chunks, max_slabs)                         \
 	({                                                                                             \
 		HeapDataParamsConfig _ret__ = {                                                            \

@@ -4,7 +4,9 @@ OBJS := panic.o \
 	sha256.o \
 	heap.o \
 	lock.o \
-	resources.o
+	resources.o \
+	path.o \
+	misc.o
 
 TEST_OBJS := $(OBJS)
 

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/chain_allocator.h>
 #include <base/colors.h>
 #include <base/resources.h>
 #include <criterion/criterion.h>
@@ -20,17 +21,20 @@
 #include <unistd.h>
 
 #define MySuite(name)                                                                              \
-	void setup_suite(void) {                                                                       \
+	void setup_suite(void)                                                                         \
+	{                                                                                              \
 		printf("[%s====%s] Running %s%s%s test suite...\n", BLUE, RESET, GREEN, #name, RESET);     \
 	}                                                                                              \
-	Test(init, init, .init = setup_suite) {                                                        \
+	Test(init, init, .init = setup_suite)                                                          \
+	{                                                                                              \
 	}                                                                                              \
 	static int test_count = 0;                                                                     \
 	static u64 initial_alloc_diff;                                                                 \
 	static u64 initial_file_diff;                                                                  \
 	static char *cur_name = "";                                                                    \
 	static int log_fd = -1;                                                                        \
-	void tear_down() {                                                                             \
+	void tear_down()                                                                               \
+	{                                                                                              \
 		u64 cur_alloc_count = mymalloc_sum();                                                      \
 		u64 cur_free_count = myfree_sum();                                                         \
 		u64 diff = cur_alloc_count - cur_free_count;                                               \
@@ -40,10 +44,10 @@
 				   "'%s%s%s'.\n[%s====%s] Number of allocations not "                              \
 				   "equal to number "                                                              \
 				   "of frees. Memory leak?\n",                                                     \
-				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
+				BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                     \
 			printf("[%s====%s] "                                                                   \
 				   "initial_alloc_diff=%" PRIu64 ",diff=%" PRIu64 "\n",                            \
-				   BLUE, RESET, initial_alloc_diff, diff);                                         \
+				BLUE, RESET, initial_alloc_diff, diff);                                            \
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
 		} else if (file_diff != initial_file_diff) {                                               \
@@ -51,10 +55,10 @@
 				   "'%s%s%s'.\n[%s====%s] Number of file opens not "                               \
 				   "equal to number "                                                              \
 				   "of file closes. File handle leak?\n",                                          \
-				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
+				BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                     \
 			printf("[%s====%s] "                                                                   \
 				   "initial_file_diff=%" PRIu64 ",diff=%" PRIu64 "\n",                             \
-				   BLUE, RESET, initial_file_diff, file_diff);                                     \
+				BLUE, RESET, initial_file_diff, file_diff);                                        \
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
 		}                                                                                          \
@@ -63,7 +67,8 @@
 	}
 
 #define MyTest(suite, test)                                                                        \
-	void setup_##test(void) {                                                                      \
+	void setup_##test(void)                                                                        \
+	{                                                                                              \
 		u64 cur_alloc_count = mymalloc_sum();                                                      \
 		u64 cur_free_count = myfree_sum();                                                         \
 		u64 diff = cur_alloc_count - cur_free_count;                                               \
@@ -82,7 +87,15 @@
 		}                                                                                          \
 	}                                                                                              \
 	void test_##suite##_##test();                                                                  \
-	Test(suite, test, .init = setup_##test, .fini = tear_down) {                                   \
+	Test(suite, test, .init = setup_##test, .fini = tear_down)                                     \
+	{                                                                                              \
+		HeapAllocator ha;                                                                          \
+		build_default_heap_allocator(&ha);                                                         \
+		ChainGuard cg = SCOPED_ALLOCATOR(&ha, false);                                              \
 		test_##suite##_##test();                                                                   \
+		u64 cur_slabs = heap_allocator_cur_slabs_allocated(&ha);                                   \
+		if (cur_slabs != 0)                                                                        \
+			printf("some slabs were not deallocated! (%" PRIu64 ")\n", cur_slabs);                 \
+		cr_assert_eq(cur_slabs, 0);                                                                \
 	}                                                                                              \
 	void test_##suite##_##test()
