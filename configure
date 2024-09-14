@@ -12,9 +12,17 @@ command -v make >/dev/null 2>&1 || { echo >&2 "Make is required but not installe
 
 # If minimal build, exit here
 if [ "$MINIMAL_BUILD" = true ]; then
+  # Configure Makefile with Criterion paths
   cp Makefile.config.in Makefile.config
-  sed -i '' "s|REPLACE_CRITERION_INCLUDE||g" Makefile.config
-  sed -i '' "s|REPLACE_CRITERION_LIB||g" Makefile.config
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS (BSD sed)
+    sed -i '' "s|REPLACE_CRITERION_INCLUDE||g" Makefile.config
+    sed -i '' "s|REPLACE_CRITERION_LIB||g" Makefile.config
+  else
+    # Linux (GNU sed)
+    sed -i "s|REPLACE_CRITERION_INCLUDE||g" Makefile.config
+    sed -i "s|REPLACE_CRITERION_LIB||g" Makefile.config
+  fi
   echo "Minimal build setup complete."
   exit 0
 fi
@@ -49,7 +57,14 @@ done
 
 # Configure Makefile with Criterion paths
 cp Makefile.config.in Makefile.config
-sed -i '' "s|REPLACE_CRITERION_INCLUDE|${include}|g" Makefile.config
-sed -i '' "s|REPLACE_CRITERION_LIB|${lib}|g" Makefile.config
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS (BSD sed)
+    sed -i '' "s|REPLACE_CRITERION_INCLUDE|${include}|g" Makefile.config
+    sed -i '' "s|REPLACE_CRITERION_LIB||g" Makefile.config
+else
+    # Linux (GNU sed)
+    sed -i "s|REPLACE_CRITERION_INCLUDE|${include}|g" Makefile.config
+    sed -i "s|REPLACE_CRITERION_LIB||g" Makefile.config
+fi
 
 echo "Full development environment setup complete."
