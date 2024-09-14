@@ -109,6 +109,7 @@ MyTest(util, test_suffix_tree)
 	u64 pattern_len = strlen(pattern);
 	suffix_tree_build(&t1, text);
 	int r1 = suffix_tree_search(&t1, pattern, matches, 10);
+	suffix_tree_sort_results(matches, r1);
 	printf("r1=%i\n", r1);
 	for (int i = 0; i < r1; i++) {
 		printf("match[%i]=%" PRIu64 "\n", i, matches[i].offset);

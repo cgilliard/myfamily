@@ -134,13 +134,7 @@ int suffix_tree_search(SuffixTree *ptr, const char *pattern, SuffixTreeMatch *re
 	loop
 	{
 		i64 mid = min + ((max - min) / 2);
-		u64 len = si->suffix_array_len - suffix_arr[mid];
-		u64 copy_len = pattern_len;
-		if (len < copy_len)
-			copy_len = len;
-		memcpy(buf, (char *)(si->text + suffix_arr[mid]), copy_len * sizeof(char));
-		buf[copy_len] = 0;
-		int cmp = strcmp(pattern, buf);
+		int cmp = strncmp(pattern, si->text + suffix_arr[mid], pattern_len);
 		if (cmp < 0) {
 			max = mid - 1;
 		} else if (cmp > 0) {
@@ -164,18 +158,9 @@ int suffix_tree_search(SuffixTree *ptr, const char *pattern, SuffixTreeMatch *re
 		{
 			if (last_match >= si->suffix_array_len)
 				break;
-			u64 len = si->suffix_array_len - suffix_arr[last_match + 1];
-			u64 copy_len = pattern_len;
-			if (len < copy_len)
-				copy_len = len;
-
-			memcpy(buf, (char *)(si->text + suffix_arr[last_match + 1]), copy_len * sizeof(char));
-			buf[copy_len] = 0;
-			if (!strcmp(buf, pattern)) {
-				last_match++;
-			} else {
+			if (strncmp(pattern, si->text + suffix_arr[last_match + 1], pattern_len))
 				break;
-			}
+			last_match++;
 		}
 	}
 
@@ -185,25 +170,22 @@ int suffix_tree_search(SuffixTree *ptr, const char *pattern, SuffixTreeMatch *re
 		{
 			if (count > last_match || count >= limit)
 				break;
-			u64 len = si->suffix_array_len - suffix_arr[last_match - count];
-			u64 copy_len = pattern_len;
-			if (len < copy_len)
-				copy_len = len;
-			memcpy(
-				buf, (char *)(si->text + suffix_arr[last_match - count]), copy_len * sizeof(char));
-			if (!strcmp(buf, pattern)) {
-				ret[count].offset = suffix_arr[last_match - count];
-				count++;
-			} else {
+			if (strncmp(pattern, si->text + suffix_arr[last_match - count], pattern_len))
 				break;
-			}
+			ret[count].offset = suffix_arr[last_match - count];
+			count++;
 		}
-		qsort(ret, count, sizeof(SuffixTreeMatch), suffix_match_compare);
 		return count;
+	} else {
+		return 0;
 	}
-
-	return 0;
 }
+
+void suffix_tree_sort_results(SuffixTreeMatch *ret, u64 count)
+{
+	qsort(ret, count, sizeof(SuffixTreeMatch), suffix_match_compare);
+}
+
 int suffix_tree_longest_repeated_substring(SuffixTree *ptr, SuffixTreeMatch *ret)
 {
 	return 0;

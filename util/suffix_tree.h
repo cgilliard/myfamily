@@ -33,6 +33,7 @@ void suffix_tree_cleanup(SuffixTreeNc *ptr);
 
 int suffix_tree_build(SuffixTree *ptr, const char *text);
 int suffix_tree_search(SuffixTree *ptr, const char *pattern, SuffixTreeMatch *ret, u64 limit);
+void suffix_tree_sort_results(SuffixTreeMatch *ret, u64 count);
 int suffix_tree_longest_repeated_substring(SuffixTree *ptr, SuffixTreeMatch *ret);
 
 #endif // _UTIL_SUFFIX_TREE__
