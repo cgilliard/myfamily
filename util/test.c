@@ -17,7 +17,7 @@
 
 MySuite(util);
 
-MyTest(util, test_trie)
+Test(util, test_trie)
 {
 	// create a match array to get the results
 	TrieMatch tm[10];

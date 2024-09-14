@@ -17,7 +17,8 @@
 
 MySuite(args);
 
-MyTest(args, test_args_param) {
+Test(args, test_args_param)
+{
 	ArgsParam ap;
 	args_param_build(&ap, "threads", "number of threads to execute", "t", true, false, "1");
 
@@ -34,7 +35,8 @@ MyTest(args, test_args_param) {
 	args_param_cleanup(&ap);
 }
 
-MyTest(args, test_sub_command) {
+Test(args, test_sub_command)
+{
 	SubCommand sc;
 	ArgsParam ap1, ap2, ap3;
 
@@ -67,10 +69,11 @@ MyTest(args, test_sub_command) {
 	cr_assert(sub_command_build(&sc, "ok", "adkflaljdf", 3, 2, "arg doc"));
 }
 
-MyTest(args, test_args) {
+Test(args, test_args)
+{
 	Args args;
 	args_build(&args, "myprog", "1.0", "myfamily devs", 0, 1, 0);
-	char *argv[] = {"test", "test2"};
+	char *argv[] = { "test", "test2" };
 	args_init(&args, 2, argv);
 
 	SubCommand sc;

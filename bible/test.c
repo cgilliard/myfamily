@@ -17,7 +17,8 @@
 
 MySuite(bible);
 
-MyTest(bible, test_bible_basic) {
+Test(bible, test_bible_basic)
+{
 	Bible bible;
 	char bible_path[100];
 	strcpy(bible_path, "./resources/akjv.txt");
@@ -87,8 +88,8 @@ MyTest(bible, test_bible_basic) {
 		snprintf(compare, 1024, "[%s:%i:%i] %s", bookname, chapter_int, verse_int, text);
 
 		char buf_out[1024];
-		int res =
-			bible_verse_to_string(&bible, bookname, chapter_int, verse_int, buf_out, 1024, false);
+		int res
+			= bible_verse_to_string(&bible, bookname, chapter_int, verse_int, buf_out, 1024, false);
 
 		cr_assert(res != -1);
 
@@ -97,15 +98,15 @@ MyTest(bible, test_bible_basic) {
 		if (last_chapter != chapter_int) {
 			// try to get invalid verse
 			if (line_num != 0) {
-				res = bible_verse_to_string(&bible, last_book, last_chapter, last_verse + 1,
-											buf_out, 1024, false);
+				res = bible_verse_to_string(
+					&bible, last_book, last_chapter, last_verse + 1, buf_out, 1024, false);
 				cr_assert_eq(res, -1);
 			}
 		}
 		if (strcmp(last_book, bookname) && strcmp(last_book, "")) {
 			// new book try to get invalid chapter
-			res =
-				bible_verse_to_string(&bible, last_book, last_chapter + 1, 1, buf_out, 1024, false);
+			res = bible_verse_to_string(
+				&bible, last_book, last_chapter + 1, 1, buf_out, 1024, false);
 			cr_assert_eq(res, -1);
 		}
 
@@ -125,7 +126,8 @@ MyTest(bible, test_bible_basic) {
 	bible_cleanup(&bible);
 }
 
-MyTest(bible, load_basic) {
+Test(bible, load_basic)
+{
 	Bible bible;
 	char bible_path[100];
 	strcpy(bible_path, "./resources/akjv.txt");
