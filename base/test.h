@@ -97,5 +97,6 @@
 		if (cur_slabs != 0)                                                                        \
 			printf("some slabs were not deallocated! (%" PRIu64 ")\n", cur_slabs);                 \
 		cr_assert_eq(cur_slabs, 0);                                                                \
+		cr_assert_eq(heap_allocator_cleanup(&ha), 0);                                              \
 	}                                                                                              \
 	void test_##suite##_##test()

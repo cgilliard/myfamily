@@ -17,7 +17,7 @@
 
 MySuite(base);
 
-Test(base, test_mymalloc)
+MyTest(base, test_mymalloc)
 {
 	u64 begin_mymalloc_sum = mymalloc_sum();
 	u64 begin_myfree_sum = myfree_sum();
@@ -35,7 +35,7 @@ Test(base, test_mymalloc)
 	cr_assert_eq(end_diff, begin_diff);
 }
 
-Test(base, test_path)
+MyTest(base, test_path)
 {
 	Path path;
 	// create a path

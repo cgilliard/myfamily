@@ -17,7 +17,7 @@
 
 MySuite(bible);
 
-Test(bible, test_bible_basic)
+MyTest(bible, test_bible_basic)
 {
 	Bible bible;
 	char bible_path[100];
@@ -126,7 +126,7 @@ Test(bible, test_bible_basic)
 	bible_cleanup(&bible);
 }
 
-Test(bible, load_basic)
+MyTest(bible, load_basic)
 {
 	Bible bible;
 	char bible_path[100];

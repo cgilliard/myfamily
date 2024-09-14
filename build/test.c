@@ -16,5 +16,6 @@
 
 MySuite(build);
 
-MyTest(build, test_build) {
+MyTest(build, test_build)
+{
 }
