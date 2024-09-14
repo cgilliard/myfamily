@@ -16,6 +16,7 @@
 #define _BASE_PATH__
 
 #include <base/chain_allocator.h>
+#include <sys/types.h>
 
 typedef struct PathImpl {
 	FatPtr ptr;
