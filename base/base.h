@@ -17,6 +17,7 @@
 #include <base/dir.h>
 #include <base/heap.h>
 #include <base/lock.h>
+#include <base/macro_utils.h>
 #include <base/panic.h>
 #include <base/path.h>
 #include <base/rand.h>

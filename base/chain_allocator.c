@@ -29,77 +29,48 @@ HeapAllocator *__global_sync_allocator = NULL;
 Lock *__global_sync_allocator_lock = NULL;
 
 // default heap allocator config (no_malloc and zeroed are disabled)
-HeapAllocatorConfig __default_hconfig_ = {false, false};
+HeapAllocatorConfig __default_hconfig_ = { false, false };
 
 // create default slab sizes for the heap allocator with alignment in mind
-#define HD_CFG(size) {size, 10, 0, UINT32_MAX}
-HeapDataParamsConfig __default_hdpc_arr_value[] = {HD_CFG(8),
-												   HD_CFG(16),
-												   HD_CFG(32),
-												   HD_CFG(48),
-												   HD_CFG(64),
-												   HD_CFG(80),
-												   HD_CFG(96),
-												   HD_CFG(112),
-												   HD_CFG(128),
-												   HD_CFG(144),
-												   HD_CFG(160),
-												   HD_CFG(176),
-												   HD_CFG(192),
-												   HD_CFG(208),
-												   HD_CFG(224),
-												   HD_CFG(240),
-												   HD_CFG(256),
-												   HD_CFG(272),
-												   HD_CFG(288),
-												   HD_CFG(304),
-												   HD_CFG(320),
-												   HD_CFG(336),
-												   HD_CFG(352),
-												   HD_CFG(368),
-												   HD_CFG(384),
-												   HD_CFG(400),
-												   HD_CFG(416),
-												   HD_CFG(432),
-												   HD_CFG(448),
-												   HD_CFG(464),
-												   HD_CFG(480),
-												   HD_CFG(496),
-												   HD_CFG(512),
-												   HD_CFG(1024),
-												   HD_CFG(2048),
-												   HD_CFG(4096),
-												   HD_CFG(8192),
-												   {16384, 5, 0, UINT32_MAX},
-												   {32768, 5, 0, UINT32_MAX},
-												   {65536, 2, 0, UINT32_MAX}};
+#define HD_CFG(size) { size, 10, 0, UINT32_MAX }
+HeapDataParamsConfig __default_hdpc_arr_value[] = { HD_CFG(8), HD_CFG(16), HD_CFG(32), HD_CFG(48),
+	HD_CFG(64), HD_CFG(80), HD_CFG(96), HD_CFG(112), HD_CFG(128), HD_CFG(144), HD_CFG(160),
+	HD_CFG(176), HD_CFG(192), HD_CFG(208), HD_CFG(224), HD_CFG(240), HD_CFG(256), HD_CFG(272),
+	HD_CFG(288), HD_CFG(304), HD_CFG(320), HD_CFG(336), HD_CFG(352), HD_CFG(368), HD_CFG(384),
+	HD_CFG(400), HD_CFG(416), HD_CFG(432), HD_CFG(448), HD_CFG(464), HD_CFG(480), HD_CFG(496),
+	HD_CFG(512), HD_CFG(1024), HD_CFG(2048), HD_CFG(4096), HD_CFG(8192),
+	{ 16384, 5, 0, UINT32_MAX }, { 32768, 5, 0, UINT32_MAX }, { 65536, 2, 0, UINT32_MAX } };
 
 // heap allocator config
 HeapDataParamsConfig *__default_hdpc_arr_ = __default_hdpc_arr_value;
 
 // the size of the default array
-u64 __default_hdpc_arr_size =
-	sizeof(__default_hdpc_arr_value) / sizeof(__default_hdpc_arr_value[0]);
+u64 __default_hdpc_arr_size
+	= sizeof(__default_hdpc_arr_value) / sizeof(__default_hdpc_arr_value[0]);
 
 // allows for overwriting the hconfig
-void set_default_hconfig(HeapAllocatorConfig *hconfig) {
+void set_default_hconfig(HeapAllocatorConfig *hconfig)
+{
 	__default_hconfig_ = *hconfig;
 }
 
 // allows for overwriting of the default hdpc array
-void set_default_hdpc_arr(HeapDataParamsConfig arr[], u64 size) {
+void set_default_hdpc_arr(HeapDataParamsConfig arr[], u64 size)
+{
 	__default_hdpc_arr_ = arr;
 	__default_hdpc_arr_size = size;
 }
 
 // build the using the default heap allocator config
-int build_default_heap_allocator(HeapAllocator *ptr) {
-	return heap_allocator_build_arr(ptr, &__default_hconfig_, __default_hdpc_arr_,
-									__default_hdpc_arr_size);
+int build_default_heap_allocator(HeapAllocator *ptr)
+{
+	return heap_allocator_build_arr(
+		ptr, &__default_hconfig_, __default_hdpc_arr_, __default_hdpc_arr_size);
 }
 
 // init the global sync allocator
-void global_sync_allocator_init() {
+void global_sync_allocator_init()
+{
 	// allocate for the data structure
 	__global_sync_allocator = mymalloc(sizeof(HeapAllocator));
 	__global_sync_allocator_lock = mymalloc(sizeof(Lock));
@@ -136,27 +107,31 @@ _Thread_local ChainGuardEntry __thread_local_chain_allocator[MAX_CHAIN_ALLOCATOR
 _Thread_local u64 __thread_local_chain_allocator_index = 0;
 
 // cleanup the local thread allocator (used when threads terminate)
-void thread_local_allocator_cleanup() {
+void thread_local_allocator_cleanup()
+{
 	if (__thread_local_chain_allocator_index > 0)
 		heap_allocator_cleanup(
 			__thread_local_chain_allocator[__thread_local_chain_allocator_index].ha);
 }
 
-void global_sync_allocator_cleanup() {
+void global_sync_allocator_cleanup()
+{
 	if (__global_sync_allocator != NULL)
 		heap_allocator_cleanup(__global_sync_allocator);
 }
 
-void chain_guard_cleanup(ChainGuard *ptr) {
+void chain_guard_cleanup(ChainGuard *ptr)
+{
 	__thread_local_chain_allocator_index--;
 }
 
-ChainGuard chain_guard(ChainConfig *config) {
+ChainGuard chain_guard(ChainConfig *config)
+{
 	if (__thread_local_chain_allocator_index >= MAX_CHAIN_ALLOCATOR_DEPTH)
 		panic("too many chain allocators");
 
-	ChainGuardPtr ret = {__thread_local_chain_allocator_index, config->ha, config->is_sync,
-						 config->lock};
+	ChainGuardPtr ret
+		= { __thread_local_chain_allocator_index, config->ha, config->is_sync, config->lock };
 
 	__thread_local_chain_allocator[__thread_local_chain_allocator_index].ha = config->ha;
 	__thread_local_chain_allocator[__thread_local_chain_allocator_index].is_sync = config->is_sync;
@@ -166,7 +141,8 @@ ChainGuard chain_guard(ChainConfig *config) {
 	return ret;
 }
 
-int chain_malloc(FatPtr *ptr, u64 size) {
+int chain_malloc(FatPtr *ptr, u64 size)
+{
 	if (__thread_local_chain_allocator_index == 0) {
 		// thread local allocator has not been initialized. Create it
 		// now.
@@ -201,7 +177,8 @@ int chain_malloc(FatPtr *ptr, u64 size) {
 
 	return ret;
 }
-int chain_realloc(FatPtr *dst, FatPtr *src, u64 size) {
+int chain_realloc(FatPtr *dst, FatPtr *src, u64 size)
+{
 	if (__thread_local_chain_allocator_index == 0) {
 		return -1;
 	}
@@ -230,7 +207,8 @@ int chain_realloc(FatPtr *dst, FatPtr *src, u64 size) {
 
 	return ret;
 }
-int chain_free(FatPtr *ptr) {
+int chain_free(FatPtr *ptr)
+{
 	if (__thread_local_chain_allocator_index == 0) {
 		errno = ERANGE;
 		return -1;

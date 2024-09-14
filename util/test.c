@@ -14,6 +14,7 @@
 
 #include <base/test.h>
 #include <util/replace.h>
+#include <util/suffix_tree.h>
 #include <util/trie.h>
 
 MySuite(util);
@@ -96,4 +97,42 @@ MyTest(util, test_replace)
 	const bool is_case_sensitive[] = { true, true, true };
 	const char *replace[] = { "mytext1", "mytext2", "mytext3" };
 	replace_file(&pin, &pout, patterns_in, is_case_sensitive, replace, 3);
+}
+
+MyTest(util, test_suffix_tree)
+{
+	SuffixTreeMatch matches[10];
+	SuffixTree t1;
+	const char *text = "the sixth shieks sixth sheep's sick";
+	u64 text_len = strlen(text);
+	const char *pattern = "s";
+	u64 pattern_len = strlen(pattern);
+	suffix_tree_build(&t1, text);
+	int r1 = suffix_tree_search(&t1, pattern, matches, 10);
+	printf("r1=%i\n", r1);
+	for (int i = 0; i < r1; i++) {
+		printf("match[%i]=%" PRIu64 "\n", i, matches[i].offset);
+	}
+	u64 itt = 0;
+	printf("'");
+	for (int x = 0; x < r1; x++) {
+		u64 index = matches[x].offset;
+		printf("%s", DIMMED);
+		for (u64 i = itt; i < index; i++) {
+			printf("%c", text[i]);
+		}
+		printf("%s", RESET);
+
+		for (u64 i = index; i < pattern_len + index; i++) {
+			printf("%s", GREEN);
+			printf("%c", text[i]);
+			printf("%s", RESET);
+		}
+		itt = pattern_len + index;
+	}
+	printf("%s", DIMMED);
+	for (u64 i = itt; i < text_len; i++)
+		printf("%c", text[i]);
+	printf("%s", RESET);
+	printf("'\n");
 }
