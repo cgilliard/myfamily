@@ -27,9 +27,6 @@ command -v pip3 >/dev/null 2>&1 || { echo >&2 "Pip is required but not installed
 # Check for Doxygen
 command -v doxygen >/dev/null 2>&1 || { echo >&2 "Doxygen is not installed. Documentation will not be built."; }
 
-# Check for Criterion
-command -v criterion >/dev/null 2>&1 || { echo >&2 "Criterion is not installed. Tests will not be run."; }
-
 # Ensure pre-commit is setup
 rm -f .git/hooks/pre-commit
 pre-commit install -f
