@@ -3,12 +3,16 @@ steps:
       source venv/bin/activate
       ./configure
       make clean all
+      ./bin/fam init test1
+      test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
       make clean testsan
     displayName: macOS Test
     condition: eq( variables['Agent.OS'], 'Darwin' )
   - script: |
       ./configure
       make clean all
+      ./bin/fam init test1
+      test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
       make clean testsan
     displayName: Linux Test
     condition: eq( variables['Agent.OS'], 'Linux' )
