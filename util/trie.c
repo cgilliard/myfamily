@@ -103,6 +103,23 @@ int trie_build(Trie *ptr, const char *search_strings[], const bool is_case_sensi
 
 	return 0;
 }
+
+int trie_compare(const void *m1, const void *m2)
+{
+	const TrieMatch *tm1 = m1;
+	const TrieMatch *tm2 = m2;
+	if (tm1->offset < tm2->offset)
+		return -1;
+	else if (tm1->offset > tm2->offset)
+		return 1;
+	return 0;
+}
+
+int trie_sort(TrieMatch ret[], int count)
+{
+	return qsort(ret, count, sizeof(TrieMatch), trie_compare);
+}
+
 int trie_match(Trie *ptr, const char *text, TrieMatch ret[], u64 limit)
 {
 	TrieMatch ci_matches[limit];
@@ -137,6 +154,7 @@ int trie_match(Trie *ptr, const char *text, TrieMatch ret[], u64 limit)
 		}
 	}
 
+	bool has_case_sensitive = false;
 	if (match_count < limit) {
 		for (int i = 0; i < tlen; i++) {
 			char next = text[i];
@@ -157,6 +175,7 @@ int trie_match(Trie *ptr, const char *text, TrieMatch ret[], u64 limit)
 					}
 
 					if (!duplicate) {
+						has_case_sensitive = true;
 						ret[match_count].pattern_id = itt->pattern_id;
 						ret[match_count].offset = i - match_len;
 						ret[match_count].len = match_len + 1;
@@ -173,5 +192,8 @@ int trie_match(Trie *ptr, const char *text, TrieMatch ret[], u64 limit)
 			}
 		}
 	}
+
+	if (has_case_sensitive)
+		trie_sort(ret, match_count);
 	return match_count;
 }

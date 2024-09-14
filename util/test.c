@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/test.h>
+#include <util/replace.h>
 #include <util/trie.h>
 
 MySuite(util);
@@ -67,12 +68,12 @@ MyTest(util, test_trie)
 
 	int res5 = trie_match(&t2, "abOtHeRctest1MATCH1bctest2oktest", tm, 10);
 	cr_assert_eq(res5, 2);
-	cr_assert_eq(tm[0].pattern_id, 0);
-	cr_assert_eq(tm[0].offset, 13);
-	cr_assert_eq(tm[0].len, 6);
-	cr_assert_eq(tm[1].pattern_id, 1);
-	cr_assert_eq(tm[1].offset, 2);
-	cr_assert_eq(tm[1].len, 5);
+	cr_assert_eq(tm[1].pattern_id, 0);
+	cr_assert_eq(tm[1].offset, 13);
+	cr_assert_eq(tm[1].len, 6);
+	cr_assert_eq(tm[0].pattern_id, 1);
+	cr_assert_eq(tm[0].offset, 2);
+	cr_assert_eq(tm[0].len, 5);
 
 	int res6 = trie_match(&t2, "abOtHeRctest1mATCH1bctest2oktest", tm, 10);
 	cr_assert_eq(res6, 1);
@@ -83,4 +84,16 @@ MyTest(util, test_trie)
 	// this time the case sensitive is not a match
 	int res7 = trie_match(&t2, "abOtHERctest1mATCH1bctest2oktest", tm, 10);
 	cr_assert_eq(res7, 1);
+}
+
+MyTest(util, test_replace)
+{
+	Path pin;
+	Path pout;
+	path_for(&pin, "./resources/test_replace.txt");
+	path_for(&pout, "/tmp/test_replace.txt.out");
+	const char *patterns_in[] = { "REPLACE1", "REPLACE2", "REPLACE3" };
+	const bool is_case_sensitive[] = { true, true, true };
+	const char *replace[] = { "mytext1", "mytext2", "mytext3" };
+	replace_file(&pin, &pout, patterns_in, is_case_sensitive, replace, 3);
 }
