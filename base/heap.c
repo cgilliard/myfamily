@@ -40,6 +40,7 @@ typedef struct HeapAllocatorImpl {
 	u32 hd_size; // number of sizes available
 	HeapAllocatorConfig config; // the configuration
 	HeapData *hd_arr; // The array of heap data.
+	u32 cur_malloc_slabs_allocated; // the number of slabs currently allocated directly via malloc
 } HeapAllocatorImpl;
 
 // debugging options/counters
@@ -208,6 +209,7 @@ int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
 	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
 		return -1;
 
+	ptr->impl->cur_malloc_slabs_allocated = 0;
 	ptr->impl->hd_size = 0;
 
 	// copy the config
@@ -408,7 +410,7 @@ int heap_data_free(u64 index, HeapData *hd, FatPtr *fptr)
 
 u64 heap_allocator_cur_slabs_allocated(HeapAllocator *ptr)
 {
-	u64 ret = 0;
+	u64 ret = ptr->impl->cur_malloc_slabs_allocated;
 	for (int i = 0; i < ptr->impl->hd_size; i++) {
 		ret += ptr->impl->hd_arr[i].cur_slabs_allocated;
 	}
@@ -426,8 +428,10 @@ int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr)
 	if (index < 0) {
 		if (!ptr->impl->config.no_malloc) {
 			fptr->data = NULL;
-			if (!__debug_build_allocator_malloc_fail6)
+			if (!__debug_build_allocator_malloc_fail6) {
+				ptr->impl->cur_malloc_slabs_allocated++;
 				fptr->data = do_malloc(size);
+			}
 			if (fptr->data == NULL) {
 				fptr->len = 0;
 				ret = -1;
@@ -479,6 +483,7 @@ int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr)
 		// malloc allocated
 
 		if (fptr->data) {
+			ptr->impl->cur_malloc_slabs_allocated--;
 			do_free(fptr->data);
 			fptr->data = NULL;
 		}

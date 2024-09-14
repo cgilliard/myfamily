@@ -26,8 +26,8 @@ COVERAGE_FLAGS=--coverage -DTEST
 INSTALL_DIR=/usr/local/bin
 
 # Object directories
-ALL_OBJS=main/*.o toml/*.o core/*.o base/*.o build/*.o args/*.o bible/*.o
-SUBDIRS := main toml core base build args bible
+ALL_OBJS=main/*.o toml/*.o core/*.o base/*.o build/*.o args/*.o bible/*.o util/*.o
+SUBDIRS := main toml core base build args bible util
 SUBDIRS_RELEASE := $(SUBDIRS)
 HEADERS := $(wildcard main/*.h) \
            $(wildcard toml/*.h) \
@@ -35,4 +35,5 @@ HEADERS := $(wildcard main/*.h) \
 	   $(wildcard base/*.h) \
 	   $(wildcard build/*.h) \
 	   $(wildcard args/*.h) \
-	   $(wildcard bible/*.h)
+	   $(wildcard bible/*.h) \
+	   $(wildcard util/*.h)
