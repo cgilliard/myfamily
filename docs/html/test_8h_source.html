@@ -169,8 +169,9 @@ $(function() {
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        if (cur_slabs != 0)                                                                        \</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            printf(&quot;some slabs were not deallocated! (%&quot; PRIu64 &quot;)\n&quot;, cur_slabs);                 \</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        cr_assert_eq(cur_slabs, 0);                                                                \</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    }                                                                                              \</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    void test_##suite##_##test()</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        cr_assert_eq(heap_allocator_cleanup(&amp;ha), 0);                                              \</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    }                                                                                              \</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    void test_##suite##_##test()</div>
 <div class="ttc" id="abase_2resources_8h_html"><div class="ttname"><a href="base_2resources_8h.html">resources.h</a></div></div>
 <div class="ttc" id="achain__allocator_8h_html"><div class="ttname"><a href="chain__allocator_8h.html">chain_allocator.h</a></div><div class="ttdoc">This file contains definitions for the chain_allocator.</div></div>
 <div class="ttc" id="acolors_8h_html"><div class="ttname"><a href="colors_8h.html">colors.h</a></div></div>
