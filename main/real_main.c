@@ -237,7 +237,7 @@ void process_init(Args *args, char *config_dir)
 
 	char description[1024];
 	args_value_of(args, "description", description, 1023, 0);
-	proc_build_init(proj_name, proj_path, (char **)author, count, lib, description);
+	proc_build_init(proj_name, proj_path, author, count, lib, description);
 }
 
 void setup_config_dir(const char *config_dir)

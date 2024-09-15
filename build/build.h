@@ -15,7 +15,7 @@
 #ifndef _BUILD_BUILD__
 #define _BUILD_BUILD__
 
-int proc_build_init(const char *proj_name, const char *proj_path, char **authors, int author_count,
-	bool lib, char *description);
+int proc_build_init(const char *proj_name, const char *proj_path, char authors[11][1024],
+	int author_count, bool lib, char *description);
 
 #endif // _BUILD_BUILD__

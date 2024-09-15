@@ -23,7 +23,7 @@
 int proc_build_init(const char *proj_name, const char *proj_path, char authors[11][1024],
 	int author_count, bool lib, char *description)
 {
-	int author_len = 0;
+	int author_len = 1;
 	for (int i = 0; i < author_count; i++) {
 		author_len += strlen(authors[i]) + 10;
 	}
