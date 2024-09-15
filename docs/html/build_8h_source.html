@@ -84,8 +84,14 @@ $(function() {
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// See the License for the specific language governing permissions and</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// limitations under the License.</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keywordtype">int</span> <a class="code" href="build_8h.html#a1ccf8739458b8dfddfa1ed0fe2f7e783">proc_build_init</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *proj_name, <span class="keyword">const</span> <span class="keywordtype">char</span> *proj_path);</div>
-<div class="ttc" id="abuild_8h_html_a1ccf8739458b8dfddfa1ed0fe2f7e783"><div class="ttname"><a href="build_8h.html#a1ccf8739458b8dfddfa1ed0fe2f7e783">proc_build_init</a></div><div class="ttdeci">int proc_build_init(const char *proj_name, const char *proj_path)</div><div class="ttdef"><b>Definition:</b> build.c:20</div></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _BUILD_BUILD__</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _BUILD_BUILD__</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="build_8h.html#a50164ce19e1628ab20ded320b29ad797">   18</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="build_8h.html#a50164ce19e1628ab20ded320b29ad797">proc_build_init</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *proj_name, <span class="keyword">const</span> <span class="keywordtype">char</span> *proj_path, <span class="keywordtype">char</span> **authors, <span class="keywordtype">int</span> author_count,</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordtype">bool</span> lib, <span class="keywordtype">char</span> *description);</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _BUILD_BUILD__</span></div>
+<div class="ttc" id="abuild_8h_html_a50164ce19e1628ab20ded320b29ad797"><div class="ttname"><a href="build_8h.html#a50164ce19e1628ab20ded320b29ad797">proc_build_init</a></div><div class="ttdeci">int proc_build_init(const char *proj_name, const char *proj_path, char **authors, int author_count, bool lib, char *description)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

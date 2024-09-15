@@ -67,43 +67,31 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">misc.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;stdio.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<code>#include &lt;dirent.h&gt;</code><br />
+<code>#include &lt;limits.h&gt;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;sys/stat.h&gt;</code><br />
+<code>#include &lt;unistd.h&gt;</code><br />
 </div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:a6b20d41d6252e9871430c242cb1a56e7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a6b20d41d6252e9871430c242cb1a56e7">BUFFER_SIZE</a>&#160;&#160;&#160;1024</td></tr>
-<tr class="separator:a6b20d41d6252e9871430c242cb1a56e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac877865d29dafc82b5a1682d4e67f678"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#ac877865d29dafc82b5a1682d4e67f678">rstrstr</a> (char *s1, char *s2)</td></tr>
-<tr class="separator:ac877865d29dafc82b5a1682d4e67f678"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2401671be38c7a45eea5e003dc55889"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#ac2401671be38c7a45eea5e003dc55889">rstrstr</a> (const char *s1, const char *s2)</td></tr>
+<tr class="separator:ac2401671be38c7a45eea5e003dc55889"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c97a6ddc4da1d6b512e0c18ce650d65"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a0c97a6ddc4da1d6b512e0c18ce650d65">read_all</a> (void *buffer, size_t <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>, size_t <a class="el" href="header__sample1_8h.html#a3cf0f269cb7018481132ba4597dddde7">count</a>, FILE *stream)</td></tr>
+<tr class="separator:a0c97a6ddc4da1d6b512e0c18ce650d65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0128c17294655e800cec2066b3e0e2a9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a0128c17294655e800cec2066b3e0e2a9">copy_file</a> (const char *dst, const char *src)</td></tr>
 <tr class="separator:a0128c17294655e800cec2066b3e0e2a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89e255ab73fedc9351160e41f6d28925"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a89e255ab73fedc9351160e41f6d28925">remove_directory</a> (const char *<a class="el" href="header__sample1_8h.html#af6b46818cfa690027c8616652a03d6af">path</a>)</td></tr>
+<tr class="separator:a89e255ab73fedc9351160e41f6d28925"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a6b20d41d6252e9871430c242cb1a56e7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b20d41d6252e9871430c242cb1a56e7">&#9670;&nbsp;</a></span>BUFFER_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BUFFER_SIZE&#160;&#160;&#160;1024</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a0128c17294655e800cec2066b3e0e2a9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0128c17294655e800cec2066b3e0e2a9">&#9670;&nbsp;</a></span>copy_file()</h2>
@@ -133,22 +121,80 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ac877865d29dafc82b5a1682d4e67f678"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac877865d29dafc82b5a1682d4e67f678">&#9670;&nbsp;</a></span>rstrstr()</h2>
+<a id="a0c97a6ddc4da1d6b512e0c18ce650d65"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c97a6ddc4da1d6b512e0c18ce650d65">&#9670;&nbsp;</a></span>read_all()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* rstrstr </td>
+          <td class="memname">size_t read_all </td>
           <td>(</td>
-          <td class="paramtype">char *&#160;</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>stream</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a89e255ab73fedc9351160e41f6d28925"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89e255ab73fedc9351160e41f6d28925">&#9670;&nbsp;</a></span>remove_directory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int remove_directory </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac2401671be38c7a45eea5e003dc55889"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2401671be38c7a45eea5e003dc55889">&#9670;&nbsp;</a></span>rstrstr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* rstrstr </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>s1</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char *&#160;</td>
+          <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>s2</em>&#160;</td>
         </tr>
         <tr>

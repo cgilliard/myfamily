@@ -74,17 +74,20 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="path_8h_source.html">base/path.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="version_8h_source.html">base/version.h</a>&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;<a class="el" href="replace_8h_source.html">util/replace.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1ccf8739458b8dfddfa1ed0fe2f7e783"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#a1ccf8739458b8dfddfa1ed0fe2f7e783">proc_build_init</a> (const char *proj_name, const char *proj_path)</td></tr>
-<tr class="separator:a1ccf8739458b8dfddfa1ed0fe2f7e783"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d05691c062bb9c3b92f5ad83959103c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#a4d05691c062bb9c3b92f5ad83959103c">proc_build_init</a> (const char *proj_name, const char *proj_path, char authors[11][1024], int author_count, bool lib, char *description)</td></tr>
+<tr class="separator:a4d05691c062bb9c3b92f5ad83959103c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a1ccf8739458b8dfddfa1ed0fe2f7e783"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1ccf8739458b8dfddfa1ed0fe2f7e783">&#9670;&nbsp;</a></span>proc_build_init()</h2>
+<a id="a4d05691c062bb9c3b92f5ad83959103c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d05691c062bb9c3b92f5ad83959103c">&#9670;&nbsp;</a></span>proc_build_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -99,7 +102,31 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>proj_path</em>&#160;</td>
+          <td class="paramname"><em>proj_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char&#160;</td>
+          <td class="paramname"><em>authors</em>[11][1024], </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>author_count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>lib</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>description</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

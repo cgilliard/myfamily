@@ -20,6 +20,302 @@
     #####:   16:int main(int argc, char **argv) {
     #####:   17:	return real_main(argc, argv);
         -:   18:}
+        -:    0:Source:real_main.c
+        -:    0:Graph:real_main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <args/args.h>
+        -:   16:#include <base/version.h>
+        -:   17:#include <bible/bible.h>
+        -:   18:#include <build/build.h>
+        -:   19:#include <core/std.h>
+        -:   20:#include <dirent.h>
+        -:   21:#include <errno.h>
+        -:   22:#include <main/main.h>
+        -:   23:#include <main/resources.h>
+        -:   24:#include <stdio.h>
+        -:   25:#include <string.h>
+        -:   26:#include <sys/stat.h>
+        -:   27:#include <unistd.h>
+        -:   28:
+    #####:   29:void build_args(Args *args)
+    #####:   30:{
+    #####:   31:	const char *home_dir = get_home_directory();
+        -:   32:
+    #####:   33:	args_build(args, "fam", FAM_VERSION, "The MyFamily Developers", 0, 0, 0);
+        -:   34:
+        -:   35:	// build the init SubCommand
+        -:   36:	SubCommand init;
+        -:   37:	ArgsParam cfg_dir;
+    #####:   38:	args_param_build(&cfg_dir, "dir",
+        -:   39:		"Directory to initialize the project in (defaults to "
+        -:   40:		"the project name if not specified)",
+        -:   41:		"p", true, false, NULL);
+        -:   42:	ArgsParam cfg_authors;
+    #####:   43:	args_param_build(&cfg_authors, "author", "Author of this project", "a", true, true,
+        -:   44:		"The MyFamily Developers");
+        -:   45:	ArgsParam cfg_lib;
+    #####:   46:	args_param_build(&cfg_lib, "lib",
+        -:   47:		"Initialize the project as a library project. (If not set, the project will be a binary "
+        -:   48:		"project)",
+        -:   49:		"l", false, false, NULL);
+        -:   50:	ArgsParam cfg_description;
+    #####:   51:	args_param_build(&cfg_description, "description",
+        -:   52:		"Project description (defaults to the project name)", "d", true, false, NULL);
+    #####:   53:	sub_command_build(&init, "init", "Initialize project", 1, 1, "<project_name>");
+    #####:   54:	sub_command_add_param(&init, &cfg_dir);
+    #####:   55:	sub_command_add_param(&init, &cfg_authors);
+    #####:   56:	sub_command_add_param(&init, &cfg_lib);
+    #####:   57:	sub_command_add_param(&init, &cfg_description);
+        -:   58:
+    #####:   59:	args_add_sub_command(args, &init);
+        -:   60:
+        -:   61:	// build the build SubCommand
+        -:   62:	SubCommand build;
+    #####:   63:	sub_command_build(&build, "build", "Build project in release mode", 0, 0, "");
+        -:   64:
+    #####:   65:	args_add_sub_command(args, &build);
+        -:   66:
+        -:   67:	// build the debug SubCommand
+        -:   68:	SubCommand bdebug;
+    #####:   69:	sub_command_build(&bdebug, "debug", "Build project in debug mode", 0, 0, "");
+        -:   70:
+    #####:   71:	args_add_sub_command(args, &bdebug);
+        -:   72:
+        -:   73:	// build the test SubCommand
+        -:   74:	SubCommand test;
+    #####:   75:	sub_command_build(&test, "test", "Run tests", 0, 0, "");
+        -:   76:
+    #####:   77:	args_add_sub_command(args, &test);
+        -:   78:
+        -:   79:	// build the doc SubCommand
+        -:   80:	SubCommand doc;
+    #####:   81:	sub_command_build(&doc, "doc", "Build documentation", 0, 0, "");
+        -:   82:
+    #####:   83:	args_add_sub_command(args, &doc);
+        -:   84:
+        -:   85:	// build the verse SubCommand
+        -:   86:	SubCommand verse;
+    #####:   87:	sub_command_build(&verse, "verse", "Print a random Bible verse", 0, 0, "");
+        -:   88:	ArgsParam no_colors_param, book_param, chapter_param, verse_param;
+    #####:   89:	args_param_build(
+        -:   90:		&no_colors_param, "no_colors", "Do not display colors", "n", false, false, NULL);
+    #####:   91:	args_param_build(&book_param, "book",
+        -:   92:		"Randomly select a verse from the specified book of the Bible", "b", true, false, NULL);
+    #####:   93:	args_param_build(&chapter_param, "chapter",
+        -:   94:		"Randomly select a verse from the specified chapter of the Bible. "
+        -:   95:		"This option requires that --book be specified as well.",
+        -:   96:		"x", true, false, NULL);
+    #####:   97:	args_param_build(&verse_param, "verse",
+        -:   98:		"Select the specified verse. This option requires "
+        -:   99:		"that --book and --chapter be specified as well.",
+        -:  100:		"v", true, false, NULL);
+        -:  101:
+    #####:  102:	sub_command_add_param(&verse, &no_colors_param);
+    #####:  103:	sub_command_add_param(&verse, &book_param);
+    #####:  104:	sub_command_add_param(&verse, &chapter_param);
+    #####:  105:	sub_command_add_param(&verse, &verse_param);
+        -:  106:
+    #####:  107:	args_add_sub_command(args, &verse);
+        -:  108:
+        -:  109:	// build the node SubCommand
+        -:  110:	SubCommand node;
+        -:  111:	ArgsParam cfg_threads, cfg_show;
+    #####:  112:	args_param_build(
+        -:  113:		&cfg_show, "show_request", "Show request information", "s", false, false, NULL);
+    #####:  114:	args_param_build(
+        -:  115:		&cfg_threads, "threads", "Number of threads to execute", "t", true, false, "1");
+        -:  116:
+    #####:  117:	sub_command_build(&node, "node", "Run full node", 0, 0, "");
+    #####:  118:	sub_command_add_param(&node, &cfg_threads);
+    #####:  119:	sub_command_add_param(&node, &cfg_show);
+        -:  120:
+    #####:  121:	args_add_sub_command(args, &node);
+        -:  122:
+        -:  123:	// build core options
+        -:  124:	ArgsParam cfg_config_dir;
+        -:  125:	ArgsParam cfg_debug;
+        -:  126:
+    #####:  127:	args_param_build(
+        -:  128:		&cfg_debug, "debug", "Prints additional debugging information", "d", false, false, NULL);
+        -:  129:
+    #####:  130:	char default_config_dir[strlen(home_dir) + 100];
+    #####:  131:	snprintf(default_config_dir, strlen(home_dir) + 100, "%s/.fam", home_dir);
+    #####:  132:	args_param_build(&cfg_config_dir, "config_dir",
+        -:  133:		"Directory where configuration files are stored", "c", true, false, default_config_dir);
+        -:  134:
+    #####:  135:	args_add_param(args, &cfg_debug);
+    #####:  136:	args_add_param(args, &cfg_config_dir);
+    #####:  137:}
+        -:  138:
+    #####:  139:void process_verse(Args *args, char *config_dir)
+    #####:  140:{
+    #####:  141:	bool no_colors = args_value_of(args, "no_colors", NULL, 0, 0) >= 0;
+        -:  142:	char book[100];
+    #####:  143:	args_value_of(args, "book", book, 100, 0);
+        -:  144:	char chapter_buf[100];
+    #####:  145:	int chapter_int = -1;
+    #####:  146:	if (args_value_of(args, "chapter", chapter_buf, 100, 0) != -1) {
+    #####:  147:		chapter_int = atoi(chapter_buf);
+    #####:  148:		if (chapter_int <= 0 || chapter_int > 255) {
+    #####:  149:			fprintf(stderr,
+        -:  150:				"The chapter specified must be a positive "
+        -:  151:				"integer which is equal to or less than 255.\n");
+    #####:  152:			exit(-1);
+        -:  153:		}
+        -:  154:	}
+        -:  155:	char verse_buf[100];
+    #####:  156:	int verse_int = -1;
+    #####:  157:	if (args_value_of(args, "verse", verse_buf, 100, 0) != -1) {
+    #####:  158:		verse_int = atoi(verse_buf);
+    #####:  159:		if (verse_int <= 0 || verse_int > 255) {
+    #####:  160:			fprintf(stderr,
+        -:  161:				"The verse specified must be a positive "
+        -:  162:				"integer which is equal to or less than 255.\n");
+    #####:  163:			exit(-1);
+        -:  164:		}
+        -:  165:	}
+        -:  166:
+        -:  167:	Bible bible;
+    #####:  168:	char bible_path[strlen(config_dir) + 10];
+    #####:  169:	strcpy(bible_path, config_dir);
+    #####:  170:	strcat(bible_path, "/resources/akjv.txt");
+    #####:  171:	if (bible_build(&bible, bible_path)) {
+    #####:  172:		fprintf(stderr, "Could not load bible at path %s: %s\n", bible_path, strerror(errno));
+    #####:  173:		exit(-1);
+        -:  174:	}
+        -:  175:
+        -:  176:	char buf[1024];
+        -:  177:	char book_buf[100];
+        -:  178:	u8 chapter, verse;
+        -:  179:
+    #####:  180:	u8 *chapter_ptr = NULL;
+    #####:  181:	if (chapter_int != -1) {
+    #####:  182:		chapter = chapter_int;
+    #####:  183:		chapter_ptr = &chapter;
+        -:  184:	}
+    #####:  185:	u8 *verse_ptr = NULL;
+    #####:  186:	if (verse_int != -1) {
+    #####:  187:		verse = verse_int;
+    #####:  188:		verse_ptr = &verse;
+        -:  189:	}
+        -:  190:
+    #####:  191:	if (verse_int != -1 && chapter_int == -1) {
+    #####:  192:		fprintf(stderr,
+        -:  193:			"If --verse is specified, --chapter must also "
+        -:  194:			"be specified\n");
+    #####:  195:		exit(-1);
+        -:  196:	}
+    #####:  197:	if (chapter_int != -1 && (strlen(book) == 0)) {
+    #####:  198:		fprintf(stderr,
+        -:  199:			"If --chapter is specified, --book must also "
+        -:  200:			"be specified\n");
+    #####:  201:		exit(-1);
+        -:  202:	}
+    #####:  203:	if (bible_random_verse_to_string(&bible, buf, 1024, !no_colors, book, chapter_ptr, verse_ptr)
+        -:  204:		< 0) {
+    #####:  205:		fprintf(stderr, "Could not find random verse due to: %s\n", strerror(errno));
+    #####:  206:		exit(-1);
+        -:  207:	}
+        -:  208:
+    #####:  209:	printf("%s\n", buf);
+    #####:  210:	bible_cleanup(&bible);
+    #####:  211:}
+        -:  212:
+    #####:  213:void process_init(Args *args, char *config_dir)
+        -:  214:{
+        -:  215:	char proj_name[128];
+    #####:  216:	strcpy(proj_name, "");
+    #####:  217:	args_get_argument(args, 1, proj_name, 127);
+        -:  218:	char proj_path[1024];
+    #####:  219:	strcpy(proj_path, proj_name);
+    #####:  220:	args_value_of(args, "dir", proj_path, 1023, 0);
+        -:  221:
+        -:  222:	char author[11][1024];
+    #####:  223:	int count = 0;
+        -:  224:	loop
+    #####:  225:	{
+    #####:  226:		int v = args_value_of(args, "author", author[count], 1023, count);
+    #####:  227:		if (v == -1)
+    #####:  228:			break;
+    #####:  229:		count++;
+    #####:  230:		if (count >= 10) {
+    #####:  231:			fprintf(stderr, "A maximum of 10 authors is allowed.");
+    #####:  232:			exit(-1);
+        -:  233:		}
+        -:  234:	}
+        -:  235:
+    #####:  236:	bool lib = args_value_of(args, "lib", NULL, 0, 0) >= 0;
+        -:  237:
+        -:  238:	char description[1024];
+    #####:  239:	args_value_of(args, "description", description, 1023, 0);
+    #####:  240:	proc_build_init(proj_name, proj_path, (char **)author, count, lib, description);
+    #####:  241:}
+        -:  242:
+    #####:  243:void setup_config_dir(const char *config_dir)
+    #####:  244:{
+    #####:  245:	if (mkdir(config_dir, 0700)) {
+    #####:  246:		perror("Failed to create specified config directory");
+    #####:  247:		exit(-1);
+        -:  248:	}
+        -:  249:
+    #####:  250:	char resources_dir[strlen(config_dir) + 100];
+    #####:  251:	strcpy(resources_dir, config_dir);
+    #####:  252:	strcat(resources_dir, "/resources");
+        -:  253:
+    #####:  254:	if (mkdir(resources_dir, 0700)) {
+    #####:  255:		perror("Failed to create specified resources directory");
+    #####:  256:		exit(-1);
+        -:  257:	}
+        -:  258:
+    #####:  259:	BUILD_RESOURCE_DIR(resources_dir, fam);
+    #####:  260:}
+        -:  261:
+    #####:  262:int real_main(int argc, char **argv)
+    #####:  263:{
+        -:  264:	Args args;
+    #####:  265:	build_args(&args);
+    #####:  266:	args_init(&args, argc, argv);
+        -:  267:
+        -:  268:	// we always ensure that the config directory exists.
+    #####:  269:	int config_dir_len = args_value_of(&args, "config_dir", NULL, 0, 0);
+    #####:  270:	char config_dir[config_dir_len + 1];
+    #####:  271:	args_value_of(&args, "config_dir", config_dir, config_dir_len + 1, 0);
+    #####:  272:	if (access(config_dir, F_OK)) {
+    #####:  273:		setup_config_dir(config_dir);
+        -:  274:	}
+        -:  275:
+        -:  276:	// get first argument (subcommand)
+        -:  277:	char command[100];
+    #####:  278:	int ret = args_get_argument(&args, 0, command, 100);
+    #####:  279:	if (ret > 0) {
+    #####:  280:		if (!strcmp(command, "verse")) {
+    #####:  281:			process_verse(&args, config_dir);
+    #####:  282:		} else if (!strcmp(command, "init")) {
+    #####:  283:			process_init(&args, config_dir);
+        -:  284:		} else {
+    #####:  285:			printf("Not implemented!\n");
+        -:  286:		}
+        -:  287:	}
+        -:  288:
+    #####:  289:	args_cleanup(&args);
+        -:  290:
+    #####:  291:	return 0;
+        -:  292:}
         -:    0:Source:toml.c
         -:    0:Graph:toml.gcno
         -:    0:Data:toml.gcda
@@ -4014,7 +4310,7 @@ Unit_size:
         -:    0:Source:chain_allocator.c
         -:    0:Graph:chain_allocator.gcno
         -:    0:Data:chain_allocator.gcda
-        -:    0:Runs:53
+        -:    0:Runs:55
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4046,229 +4342,207 @@ Unit_size:
         -:   29:Lock *__global_sync_allocator_lock = NULL;
         -:   30:
         -:   31:// default heap allocator config (no_malloc and zeroed are disabled)
-        -:   32:HeapAllocatorConfig __default_hconfig_ = {false, false};
+        -:   32:HeapAllocatorConfig __default_hconfig_ = { false, false };
         -:   33:
         -:   34:// create default slab sizes for the heap allocator with alignment in mind
-        -:   35:#define HD_CFG(size) {size, 10, 0, UINT32_MAX}
-        -:   36:HeapDataParamsConfig __default_hdpc_arr_value[] = {HD_CFG(8),
-        -:   37:												   HD_CFG(16),
-        -:   38:												   HD_CFG(32),
-        -:   39:												   HD_CFG(48),
-        -:   40:												   HD_CFG(64),
-        -:   41:												   HD_CFG(80),
-        -:   42:												   HD_CFG(96),
-        -:   43:												   HD_CFG(112),
-        -:   44:												   HD_CFG(128),
-        -:   45:												   HD_CFG(144),
-        -:   46:												   HD_CFG(160),
-        -:   47:												   HD_CFG(176),
-        -:   48:												   HD_CFG(192),
-        -:   49:												   HD_CFG(208),
-        -:   50:												   HD_CFG(224),
-        -:   51:												   HD_CFG(240),
-        -:   52:												   HD_CFG(256),
-        -:   53:												   HD_CFG(272),
-        -:   54:												   HD_CFG(288),
-        -:   55:												   HD_CFG(304),
-        -:   56:												   HD_CFG(320),
-        -:   57:												   HD_CFG(336),
-        -:   58:												   HD_CFG(352),
-        -:   59:												   HD_CFG(368),
-        -:   60:												   HD_CFG(384),
-        -:   61:												   HD_CFG(400),
-        -:   62:												   HD_CFG(416),
-        -:   63:												   HD_CFG(432),
-        -:   64:												   HD_CFG(448),
-        -:   65:												   HD_CFG(464),
-        -:   66:												   HD_CFG(480),
-        -:   67:												   HD_CFG(496),
-        -:   68:												   HD_CFG(512),
-        -:   69:												   HD_CFG(1024),
-        -:   70:												   HD_CFG(2048),
-        -:   71:												   HD_CFG(4096),
-        -:   72:												   HD_CFG(8192),
-        -:   73:												   {16384, 5, 0, UINT32_MAX},
-        -:   74:												   {32768, 5, 0, UINT32_MAX},
-        -:   75:												   {65536, 2, 0, UINT32_MAX}};
-        -:   76:
-        -:   77:// heap allocator config
-        -:   78:HeapDataParamsConfig *__default_hdpc_arr_ = __default_hdpc_arr_value;
-        -:   79:
-        -:   80:// the size of the default array
-        -:   81:u64 __default_hdpc_arr_size =
-        -:   82:	sizeof(__default_hdpc_arr_value) / sizeof(__default_hdpc_arr_value[0]);
-        -:   83:
-        -:   84:// allows for overwriting the hconfig
-    #####:   85:void set_default_hconfig(HeapAllocatorConfig *hconfig) {
-    #####:   86:	__default_hconfig_ = *hconfig;
-    #####:   87:}
-        -:   88:
-        -:   89:// allows for overwriting of the default hdpc array
-        2:   90:void set_default_hdpc_arr(HeapDataParamsConfig arr[], u64 size) {
-        2:   91:	__default_hdpc_arr_ = arr;
-        2:   92:	__default_hdpc_arr_size = size;
-        2:   93:}
-        -:   94:
-        -:   95:// build the using the default heap allocator config
-       38:   96:int build_default_heap_allocator(HeapAllocator *ptr) {
-       38:   97:	return heap_allocator_build_arr(ptr, &__default_hconfig_, __default_hdpc_arr_,
-        -:   98:									__default_hdpc_arr_size);
-        -:   99:}
-        -:  100:
-        -:  101:// init the global sync allocator
-        4:  102:void global_sync_allocator_init() {
-        -:  103:	// allocate for the data structure
-        4:  104:	__global_sync_allocator = mymalloc(sizeof(HeapAllocator));
-        4:  105:	__global_sync_allocator_lock = mymalloc(sizeof(Lock));
-        -:  106:
-        -:  107:	// check for failures
-        4:  108:	if (__global_sync_allocator_lock == NULL || __global_sync_allocator == NULL) {
-        -:  109:		// deallocate and panic
-    #####:  110:		if (__global_sync_allocator_lock != NULL)
-    #####:  111:			myfree(__global_sync_allocator_lock);
-    #####:  112:		if (__global_sync_allocator != NULL)
-    #####:  113:			myfree(__global_sync_allocator);
-    #####:  114:		panic("Could not initialize the global sync HeapAllocator");
-        -:  115:	}
+        -:   35:#define HD_CFG(size) { size, 10, 0, UINT32_MAX }
+        -:   36:HeapDataParamsConfig __default_hdpc_arr_value[] = { HD_CFG(8), HD_CFG(16), HD_CFG(32), HD_CFG(48),
+        -:   37:	HD_CFG(64), HD_CFG(80), HD_CFG(96), HD_CFG(112), HD_CFG(128), HD_CFG(144), HD_CFG(160),
+        -:   38:	HD_CFG(176), HD_CFG(192), HD_CFG(208), HD_CFG(224), HD_CFG(240), HD_CFG(256), HD_CFG(272),
+        -:   39:	HD_CFG(288), HD_CFG(304), HD_CFG(320), HD_CFG(336), HD_CFG(352), HD_CFG(368), HD_CFG(384),
+        -:   40:	HD_CFG(400), HD_CFG(416), HD_CFG(432), HD_CFG(448), HD_CFG(464), HD_CFG(480), HD_CFG(496),
+        -:   41:	HD_CFG(512), HD_CFG(1024), HD_CFG(2048), HD_CFG(4096), HD_CFG(8192),
+        -:   42:	{ 16384, 5, 0, UINT32_MAX }, { 32768, 5, 0, UINT32_MAX }, { 65536, 2, 0, UINT32_MAX } };
+        -:   43:
+        -:   44:// heap allocator config
+        -:   45:HeapDataParamsConfig *__default_hdpc_arr_ = __default_hdpc_arr_value;
+        -:   46:
+        -:   47:// the size of the default array
+        -:   48:u64 __default_hdpc_arr_size
+        -:   49:	= sizeof(__default_hdpc_arr_value) / sizeof(__default_hdpc_arr_value[0]);
+        -:   50:
+        -:   51:// allows for overwriting the hconfig
+    #####:   52:void set_default_hconfig(HeapAllocatorConfig *hconfig)
+        -:   53:{
+    #####:   54:	__default_hconfig_ = *hconfig;
+    #####:   55:}
+        -:   56:
+        -:   57:// allows for overwriting of the default hdpc array
+        2:   58:void set_default_hdpc_arr(HeapDataParamsConfig arr[], u64 size)
+        -:   59:{
+        2:   60:	__default_hdpc_arr_ = arr;
+        2:   61:	__default_hdpc_arr_size = size;
+        2:   62:}
+        -:   63:
+        -:   64:// build the using the default heap allocator config
+       40:   65:int build_default_heap_allocator(HeapAllocator *ptr)
+        -:   66:{
+       40:   67:	return heap_allocator_build_arr(
+        -:   68:		ptr, &__default_hconfig_, __default_hdpc_arr_, __default_hdpc_arr_size);
+        -:   69:}
+        -:   70:
+        -:   71:// init the global sync allocator
+        4:   72:void global_sync_allocator_init()
+        -:   73:{
+        -:   74:	// allocate for the data structure
+        4:   75:	__global_sync_allocator = mymalloc(sizeof(HeapAllocator));
+        4:   76:	__global_sync_allocator_lock = mymalloc(sizeof(Lock));
+        -:   77:
+        -:   78:	// check for failures
+        4:   79:	if (__global_sync_allocator_lock == NULL || __global_sync_allocator == NULL) {
+        -:   80:		// deallocate and panic
+    #####:   81:		if (__global_sync_allocator_lock != NULL)
+    #####:   82:			myfree(__global_sync_allocator_lock);
+    #####:   83:		if (__global_sync_allocator != NULL)
+    #####:   84:			myfree(__global_sync_allocator);
+    #####:   85:		panic("Could not initialize the global sync HeapAllocator");
+        -:   86:	}
+        -:   87:
+        -:   88:	// setup the lock
+        4:   89:	*__global_sync_allocator_lock = LOCK();
+        -:   90:
+        -:   91:	// build with the default configurations
+        4:   92:	if (build_default_heap_allocator(__global_sync_allocator)) {
+    #####:   93:		myfree(__global_sync_allocator);
+    #####:   94:		panic("Could not initialize the global sync HeapAllocator");
+        -:   95:	}
+        4:   96:}
+        -:   97:
+        -:   98:// Entry for the chain allocator stack.
+        -:   99:typedef struct ChainGuardEntry {
+        -:  100:	HeapAllocator *ha;
+        -:  101:	bool is_sync;
+        -:  102:	Lock *lock;
+        -:  103:} ChainGuardEntry;
+        -:  104:
+        -:  105:// stack for chain allocators
+        -:  106:_Thread_local ChainGuardEntry __thread_local_chain_allocator[MAX_CHAIN_ALLOCATOR_DEPTH];
+        -:  107:_Thread_local u64 __thread_local_chain_allocator_index = 0;
+        -:  108:
+        -:  109:// cleanup the local thread allocator (used when threads terminate)
+        1:  110:void thread_local_allocator_cleanup()
+        -:  111:{
+        1:  112:	if (__thread_local_chain_allocator_index > 0)
+        1:  113:		heap_allocator_cleanup(
+        -:  114:			__thread_local_chain_allocator[__thread_local_chain_allocator_index].ha);
+        1:  115:}
         -:  116:
-        -:  117:	// setup the lock
-        4:  118:	*__global_sync_allocator_lock = LOCK();
-        -:  119:
-        -:  120:	// build with the default configurations
-        4:  121:	if (build_default_heap_allocator(__global_sync_allocator)) {
-    #####:  122:		myfree(__global_sync_allocator);
-    #####:  123:		panic("Could not initialize the global sync HeapAllocator");
-        -:  124:	}
-        4:  125:}
-        -:  126:
-        -:  127:// Entry for the chain allocator stack.
-        -:  128:typedef struct ChainGuardEntry {
-        -:  129:	HeapAllocator *ha;
-        -:  130:	bool is_sync;
-        -:  131:	Lock *lock;
-        -:  132:} ChainGuardEntry;
-        -:  133:
-        -:  134:// stack for chain allocators
-        -:  135:_Thread_local ChainGuardEntry __thread_local_chain_allocator[MAX_CHAIN_ALLOCATOR_DEPTH];
-        -:  136:_Thread_local u64 __thread_local_chain_allocator_index = 0;
-        -:  137:
-        -:  138:// cleanup the local thread allocator (used when threads terminate)
-        1:  139:void thread_local_allocator_cleanup() {
-        1:  140:	if (__thread_local_chain_allocator_index > 0)
-        1:  141:		heap_allocator_cleanup(
-        -:  142:			__thread_local_chain_allocator[__thread_local_chain_allocator_index].ha);
-        1:  143:}
-        -:  144:
-        1:  145:void global_sync_allocator_cleanup() {
-        1:  146:	if (__global_sync_allocator != NULL)
-        1:  147:		heap_allocator_cleanup(__global_sync_allocator);
-        1:  148:}
-        -:  149:
-       16:  150:void chain_guard_cleanup(ChainGuard *ptr) {
-       16:  151:	__thread_local_chain_allocator_index--;
-       16:  152:}
-        -:  153:
-       19:  154:ChainGuard chain_guard(ChainConfig *config) {
-       19:  155:	if (__thread_local_chain_allocator_index >= MAX_CHAIN_ALLOCATOR_DEPTH)
-    #####:  156:		panic("too many chain allocators");
+        1:  117:void global_sync_allocator_cleanup()
+        -:  118:{
+        1:  119:	if (__global_sync_allocator != NULL)
+        1:  120:		heap_allocator_cleanup(__global_sync_allocator);
+        1:  121:}
+        -:  122:
+       18:  123:void chain_guard_cleanup(ChainGuard *ptr)
+        -:  124:{
+       18:  125:	__thread_local_chain_allocator_index--;
+       18:  126:}
+        -:  127:
+       21:  128:ChainGuard chain_guard(ChainConfig *config)
+        -:  129:{
+       21:  130:	if (__thread_local_chain_allocator_index >= MAX_CHAIN_ALLOCATOR_DEPTH)
+    #####:  131:		panic("too many chain allocators");
+        -:  132:
+       21:  133:	ChainGuardPtr ret
+       21:  134:		= { __thread_local_chain_allocator_index, config->ha, config->is_sync, config->lock };
+        -:  135:
+       21:  136:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].ha = config->ha;
+       21:  137:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].is_sync = config->is_sync;
+       21:  138:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].lock = config->lock;
+        -:  139:
+       21:  140:	__thread_local_chain_allocator_index++;
+       21:  141:	return ret;
+        -:  142:}
+        -:  143:
+      262:  144:int chain_malloc(FatPtr *ptr, u64 size)
+        -:  145:{
+      262:  146:	if (__thread_local_chain_allocator_index == 0) {
+        -:  147:		// thread local allocator has not been initialized. Create it
+        -:  148:		// now.
+       25:  149:		HeapAllocator *ha = mymalloc(sizeof(HeapAllocator));
+       25:  150:		if (!ha)
+    #####:  151:			return -1;
+        -:  152:
+       25:  153:		if (build_default_heap_allocator(ha)) {
+    #####:  154:			myfree(ha);
+    #####:  155:			return -1;
+        -:  156:		};
         -:  157:
-       19:  158:	ChainGuardPtr ret = {__thread_local_chain_allocator_index, config->ha, config->is_sync,
-       19:  159:						 config->lock};
-        -:  160:
-       19:  161:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].ha = config->ha;
-       19:  162:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].is_sync = config->is_sync;
-       19:  163:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].lock = config->lock;
-        -:  164:
-       19:  165:	__thread_local_chain_allocator_index++;
-       19:  166:	return ret;
-        -:  167:}
+       25:  158:		__default_tl_heap_allocator = ha;
+       25:  159:		__thread_local_chain_allocator[0].ha = ha;
+       25:  160:		__thread_local_chain_allocator[0].is_sync = false;
+       25:  161:		__thread_local_chain_allocator_index++;
+        -:  162:	}
+      262:  163:	if (size == 0)
+    #####:  164:		return -1;
+        -:  165:
+      262:  166:	u64 index = __thread_local_chain_allocator_index - 1;
+      262:  167:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  168:
-      244:  169:int chain_malloc(FatPtr *ptr, u64 size) {
-      244:  170:	if (__thread_local_chain_allocator_index == 0) {
-        -:  171:		// thread local allocator has not been initialized. Create it
-        -:  172:		// now.
-       25:  173:		HeapAllocator *ha = mymalloc(sizeof(HeapAllocator));
-       25:  174:		if (!ha)
-    #####:  175:			return -1;
-        -:  176:
-       25:  177:		if (build_default_heap_allocator(ha)) {
-    #####:  178:			myfree(ha);
-    #####:  179:			return -1;
-        -:  180:		};
-        -:  181:
-       25:  182:		__default_tl_heap_allocator = ha;
-       25:  183:		__thread_local_chain_allocator[0].ha = ha;
-       25:  184:		__thread_local_chain_allocator[0].is_sync = false;
-       25:  185:		__thread_local_chain_allocator_index++;
-        -:  186:	}
-      244:  187:	if (size == 0)
-    #####:  188:		return -1;
-        -:  189:
-      244:  190:	u64 index = __thread_local_chain_allocator_index - 1;
-      244:  191:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
-        -:  192:
-        -:  193:	int ret;
-        -:  194:	{
-      244:  195:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-      244:  196:		if (is_sync)
-        5:  197:			lg = lock(__thread_local_chain_allocator[index].lock);
-        -:  198:
-      244:  199:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, ptr);
-        -:  200:	}
-        -:  201:
-      244:  202:	return ret;
-        -:  203:}
-        7:  204:int chain_realloc(FatPtr *dst, FatPtr *src, u64 size) {
-        7:  205:	if (__thread_local_chain_allocator_index == 0) {
-    #####:  206:		return -1;
-        -:  207:	}
-        7:  208:	if (size == 0) {
-    #####:  209:		errno = EINVAL;
-    #####:  210:		return -1;
-        -:  211:	}
-        7:  212:	u64 index = __thread_local_chain_allocator_index - 1;
-        7:  213:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
-        -:  214:
-        -:  215:	int ret;
-        -:  216:	{
-        7:  217:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-        7:  218:		if (is_sync)
-    #####:  219:			lg = lock(__thread_local_chain_allocator[index].lock);
-        -:  220:
-        7:  221:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, dst);
-        7:  222:		if (!ret) {
-        7:  223:			void *src_data = fat_ptr_data(src);
-        7:  224:			void *dst_data = fat_ptr_data(dst);
-        7:  225:			u64 len = fat_ptr_len(src);
-        7:  226:			memcpy(dst_data, src_data, len);
-        7:  227:			ret = chain_free(src);
-        -:  228:		}
-        -:  229:	}
-        -:  230:
-        7:  231:	return ret;
-        -:  232:}
-      214:  233:int chain_free(FatPtr *ptr) {
-      214:  234:	if (__thread_local_chain_allocator_index == 0) {
-    #####:  235:		errno = ERANGE;
-    #####:  236:		return -1;
-        -:  237:	}
-      214:  238:	u64 index = __thread_local_chain_allocator_index - 1;
-      214:  239:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
-        -:  240:
-        -:  241:	int ret;
-        -:  242:	{
-      214:  243:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-      214:  244:		if (is_sync)
-        4:  245:			lg = lock(__thread_local_chain_allocator[index].lock);
-        -:  246:
-      214:  247:		ret = heap_allocator_free(__thread_local_chain_allocator[index].ha, ptr);
-        -:  248:	}
-      214:  249:	return ret;
-        -:  250:}
+        -:  169:	int ret;
+        -:  170:	{
+      262:  171:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+      262:  172:		if (is_sync)
+        5:  173:			lg = lock(__thread_local_chain_allocator[index].lock);
+        -:  174:
+      262:  175:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, ptr);
+        -:  176:	}
+        -:  177:
+      262:  178:	return ret;
+        -:  179:}
+       19:  180:int chain_realloc(FatPtr *dst, FatPtr *src, u64 size)
+        -:  181:{
+       19:  182:	if (__thread_local_chain_allocator_index == 0) {
+    #####:  183:		return -1;
+        -:  184:	}
+       19:  185:	if (size == 0) {
+    #####:  186:		errno = EINVAL;
+    #####:  187:		return -1;
+        -:  188:	}
+       19:  189:	u64 index = __thread_local_chain_allocator_index - 1;
+       19:  190:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+        -:  191:
+        -:  192:	int ret;
+        -:  193:	{
+       19:  194:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+       19:  195:		if (is_sync)
+    #####:  196:			lg = lock(__thread_local_chain_allocator[index].lock);
+        -:  197:
+       19:  198:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, dst);
+       19:  199:		if (!ret) {
+       19:  200:			void *src_data = fat_ptr_data(src);
+       19:  201:			void *dst_data = fat_ptr_data(dst);
+       19:  202:			u64 len = fat_ptr_len(src);
+       19:  203:			memcpy(dst_data, src_data, len);
+       19:  204:			ret = chain_free(src);
+        -:  205:		}
+        -:  206:	}
+        -:  207:
+       19:  208:	return ret;
+        -:  209:}
+      244:  210:int chain_free(FatPtr *ptr)
+        -:  211:{
+      244:  212:	if (__thread_local_chain_allocator_index == 0) {
+    #####:  213:		errno = ERANGE;
+    #####:  214:		return -1;
+        -:  215:	}
+      244:  216:	u64 index = __thread_local_chain_allocator_index - 1;
+      244:  217:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+        -:  218:
+        -:  219:	int ret;
+        -:  220:	{
+      244:  221:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+      244:  222:		if (is_sync)
+        4:  223:			lg = lock(__thread_local_chain_allocator[index].lock);
+        -:  224:
+      244:  225:		ret = heap_allocator_free(__thread_local_chain_allocator[index].ha, ptr);
+        -:  226:	}
+      244:  227:	return ret;
+        -:  228:}
         -:    0:Source:heap.c
         -:    0:Graph:heap.gcno
         -:    0:Data:heap.gcda
-        -:    0:Runs:53
+        -:    0:Runs:55
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4326,20 +4600,20 @@ Unit_size:
         -:   55:bool __debug_build_allocator_malloc_fail7 = false;
         -:   56:bool __debug_build_allocator_malloc_fail8 = false;
         -:   57:
-      374:   58:void *do_malloc(size_t size)
+      453:   58:void *do_malloc(size_t size)
         -:   59:{
-      374:   60:	__malloc_count += 1;
-      374:   61:	void *ret = malloc(size);
+      453:   60:	__malloc_count += 1;
+      453:   61:	void *ret = malloc(size);
         -:   62:	// printf("malloc %zu [%p (%llu)]\n", size, ret, __malloc_count);
-      374:   63:	return ret;
+      453:   63:	return ret;
         -:   64:}
         -:   65:
-      182:   66:void do_free(void *ptr)
+      261:   66:void do_free(void *ptr)
         -:   67:{
-      182:   68:	__free_count += 1;
+      261:   68:	__free_count += 1;
         -:   69:	// printf("free %p (%llu)\n", ptr, __free_count);
-      182:   70:	free(ptr);
-      182:   71:}
+      261:   70:	free(ptr);
+      261:   71:}
         -:   72:
        35:   73:void *do_realloc(void *ptr, size_t size)
         -:   74:{
@@ -4348,14 +4622,14 @@ Unit_size:
        35:   77:	return ret;
         -:   78:}
         -:   79:
-      174:   80:void *fat_ptr_data(const FatPtr *ptr)
+      198:   80:void *fat_ptr_data(const FatPtr *ptr)
         -:   81:{
-      174:   82:	return ptr->data;
+      198:   82:	return ptr->data;
         -:   83:}
         -:   84:
-       19:   85:u64 fat_ptr_len(const FatPtr *ptr)
+       31:   85:u64 fat_ptr_len(const FatPtr *ptr)
         -:   86:{
-       19:   87:	return ptr->len;
+       31:   87:	return ptr->len;
         -:   88:}
         -:   89:
         5:   90:u64 fat_ptr_id(const FatPtr *ptr)
@@ -4363,77 +4637,77 @@ Unit_size:
         5:   92:	return ptr->id;
         -:   93:}
         -:   94:
-       93:   95:int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs, bool last_is_uint_max)
+      118:   95:int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs, bool last_is_uint_max)
         -:   96:{
-       93:   97:	hd->data[index] = NULL; // set to NULL for cleanup consistency
+      118:   97:	hd->data[index] = NULL; // set to NULL for cleanup consistency
         -:   98:
         -:   99:	// allocate memory for slabs
-       93:  100:	if (!__debug_build_allocator_malloc_fail4)
-       91:  101:		hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
-       93:  102:	if (hd->data[index] == NULL)
+      118:  100:	if (!__debug_build_allocator_malloc_fail4)
+      116:  101:		hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
+      118:  102:	if (hd->data[index] == NULL)
         2:  103:		return -1;
         -:  104:
-       91:  105:	void *tmp = NULL;
+      116:  105:	void *tmp = NULL;
         -:  106:
         -:  107:	// allocate / or reallocate the freelist
-       91:  108:	if (!__debug_build_allocator_malloc_fail5) {
-       89:  109:		if (index == 0)
-       72:  110:			tmp = do_malloc(sizeof(u32) * slabs);
+      116:  108:	if (!__debug_build_allocator_malloc_fail5) {
+      114:  109:		if (index == 0)
+       97:  110:			tmp = do_malloc(sizeof(u32) * slabs);
         -:  111:		else {
        17:  112:			tmp = do_realloc(hd->free_list, sizeof(u32) * (hd->cur_slabs + slabs));
         -:  113:		}
         -:  114:	}
         -:  115:
-       91:  116:	if (!tmp) {
+      116:  116:	if (!tmp) {
         2:  117:		do_free(hd->data[index]);
         2:  118:		return -1;
         -:  119:	}
         -:  120:
-       89:  121:	hd->free_list = tmp;
+      114:  121:	hd->free_list = tmp;
         -:  122:
         -:  123:	// initialize the values of the free list.
-       89:  124:	u32 offset = index * hd->hdp.config.slabs_per_resize;
-     1097:  125:	for (u64 i = 0; i < slabs; i++) {
-     1008:  126:		if ((i == (slabs - 1)) && last_is_uint_max)
-       88:  127:			hd->free_list[i + offset] = UINT32_MAX;
+      114:  124:	u32 offset = index * hd->hdp.config.slabs_per_resize;
+     1367:  125:	for (u64 i = 0; i < slabs; i++) {
+     1253:  126:		if ((i == (slabs - 1)) && last_is_uint_max)
+      113:  127:			hd->free_list[i + offset] = UINT32_MAX;
         -:  128:		else
-      920:  129:			hd->free_list[i + offset] = offset + i + 1;
+     1140:  129:			hd->free_list[i + offset] = offset + i + 1;
         -:  130:	}
         -:  131:
-       89:  132:	return 0;
+      114:  132:	return 0;
         -:  133:}
         -:  134:
         -:  135:// compare function used for sorting.
-     3615:  136:int heap_data_compare(const void *p1, const void *p2)
+     3815:  136:int heap_data_compare(const void *p1, const void *p2)
         -:  137:{
-     3615:  138:	int ret = 0;
+     3815:  138:	int ret = 0;
         -:  139:
-     3615:  140:	HeapData d1 = *(HeapData *)p1;
-     3615:  141:	HeapData d2 = *(HeapData *)p2;
+     3815:  140:	HeapData d1 = *(HeapData *)p1;
+     3815:  141:	HeapData d2 = *(HeapData *)p2;
         -:  142:
-     3615:  143:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
+     3815:  143:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
         1:  144:		ret = 1;
-     3614:  145:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
-     3613:  146:		ret = -1;
+     3814:  145:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
+     3813:  146:		ret = -1;
         -:  147:
-     3615:  148:	return ret;
+     3815:  148:	return ret;
         -:  149:}
         -:  150:
         -:  151:// initialize the heap data params
-     1475:  152:int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp, u64 index)
+     1555:  152:int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp, u64 index)
         -:  153:{
         -:  154:
         -:  155:	// set some value in case of a failure below such that cleanup can
         -:  156:	// succeed
-     1475:  157:	int ret = 0;
-     1475:  158:	ptr->impl->hd_arr[index].hdp.config = *hdp;
-     1475:  159:	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
-     1475:  160:	ptr->impl->hd_arr[index].cur_slabs = 0;
-     1475:  161:	ptr->impl->hd_arr[index].cur_slabs_allocated = 0;
-     1475:  162:	ptr->impl->hd_arr[index].count = ptr->impl->hd_arr[index].hdp.config.initial_chunks;
+     1555:  157:	int ret = 0;
+     1555:  158:	ptr->impl->hd_arr[index].hdp.config = *hdp;
+     1555:  159:	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
+     1555:  160:	ptr->impl->hd_arr[index].cur_slabs = 0;
+     1555:  161:	ptr->impl->hd_arr[index].cur_slabs_allocated = 0;
+     1555:  162:	ptr->impl->hd_arr[index].count = ptr->impl->hd_arr[index].hdp.config.initial_chunks;
         -:  163:
         -:  164:	// if we have initial chunks, initialize them
-     1475:  165:	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks) {
+     1555:  165:	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks) {
        23:  166:		ptr->impl->hd_arr[index].data = NULL;
         -:  167:
         -:  168:		// try to allocate space for the data for this size
@@ -4461,48 +4735,48 @@ Unit_size:
         2:  190:				ret = -1;
         -:  191:		}
         -:  192:	} else
-     1452:  193:		ptr->impl->hd_arr[index].data = NULL;
-     1474:  194:	return ret;
+     1532:  193:		ptr->impl->hd_arr[index].data = NULL;
+     1554:  194:	return ret;
         -:  195:}
         -:  196:
-       64:  197:int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
+       66:  197:int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
         -:  198:	HeapDataParamsConfig arr[], u64 heap_data_params_count)
         -:  199:{
         -:  200:	// check inputs
-       64:  201:	if (ptr == NULL || config == NULL || heap_data_params_count >= 256) {
+       66:  201:	if (ptr == NULL || config == NULL || heap_data_params_count >= 256) {
         1:  202:		errno = EINVAL;
         1:  203:		return -1;
         -:  204:	}
         -:  205:
         -:  206:	// allocate the HeapAllocatorImpl
-       63:  207:	if (!__debug_build_allocator_malloc_fail1)
-       62:  208:		ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
-       63:  209:	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
+       65:  207:	if (!__debug_build_allocator_malloc_fail1)
+       64:  208:		ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
+       65:  209:	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
         1:  210:		return -1;
         -:  211:
-       62:  212:	ptr->impl->cur_malloc_slabs_allocated = 0;
-       62:  213:	ptr->impl->hd_size = 0;
+       64:  212:	ptr->impl->cur_malloc_slabs_allocated = 0;
+       64:  213:	ptr->impl->hd_size = 0;
         -:  214:
         -:  215:	// copy the config
-       62:  216:	ptr->impl->config = *config;
+       64:  216:	ptr->impl->config = *config;
         -:  217:
         -:  218:	// allocate heap data array
-       62:  219:	ptr->impl->hd_arr = NULL;
-       62:  220:	if (!__debug_build_allocator_malloc_fail2)
-       61:  221:		ptr->impl->hd_arr = do_malloc(sizeof(HeapData) * heap_data_params_count);
-       62:  222:	if (ptr->impl->hd_arr == NULL || __debug_build_allocator_malloc_fail2) {
+       64:  219:	ptr->impl->hd_arr = NULL;
+       64:  220:	if (!__debug_build_allocator_malloc_fail2)
+       63:  221:		ptr->impl->hd_arr = do_malloc(sizeof(HeapData) * heap_data_params_count);
+       64:  222:	if (ptr->impl->hd_arr == NULL || __debug_build_allocator_malloc_fail2) {
         1:  223:		heap_allocator_cleanup(ptr);
         1:  224:		return -1;
         -:  225:	}
-       61:  226:	ptr->impl->hd_size = heap_data_params_count;
+       63:  226:	ptr->impl->hd_size = heap_data_params_count;
         -:  227:
         -:  228:	// iterate through specified heap data params
-     1533:  229:	for (u64 i = 0; i < heap_data_params_count; i++) {
-     1476:  230:		HeapDataParamsConfig hdp = arr[i];
-     1476:  231:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
-     1476:  232:		ptr->impl->hd_arr[i].data = NULL;
-     1476:  233:		if ((__debug_build_allocator_malloc_fail3 && i > 0)
-     1475:  234:			|| heap_allocator_init_hdp(ptr, &hdp, i)) {
+     1615:  229:	for (u64 i = 0; i < heap_data_params_count; i++) {
+     1556:  230:		HeapDataParamsConfig hdp = arr[i];
+     1556:  231:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
+     1556:  232:		ptr->impl->hd_arr[i].data = NULL;
+     1556:  233:		if ((__debug_build_allocator_malloc_fail3 && i > 0)
+     1555:  234:			|| heap_allocator_init_hdp(ptr, &hdp, i)) {
         4:  235:			ptr->impl->hd_size = i; // update for cleanup, others
         -:  236:									// did not get allocated
         4:  237:			if (ptr->impl->hd_arr[i].data) {
@@ -4513,30 +4787,30 @@ Unit_size:
         -:  242:		}
         -:  243:	}
         -:  244:
-       57:  245:	if (heap_data_params_count) {
-       55:  246:		qsort(ptr->impl->hd_arr, heap_data_params_count, sizeof(HeapData), heap_data_compare);
+       59:  245:	if (heap_data_params_count) {
+       57:  246:		qsort(ptr->impl->hd_arr, heap_data_params_count, sizeof(HeapData), heap_data_compare);
         -:  247:	}
         -:  248:
         -:  249:	// check invalid configurations
-       57:  250:	u64 last_size = 0;
-     1526:  251:	for (u64 i = 0; i < heap_data_params_count; i++) {
-     1471:  252:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == 0) {
+       59:  250:	u64 last_size = 0;
+     1608:  251:	for (u64 i = 0; i < heap_data_params_count; i++) {
+     1551:  252:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == 0) {
         -:  253:			// no 0 sized slabs allowed
         1:  254:			errno = EINVAL;
         1:  255:			heap_allocator_cleanup(ptr);
         1:  256:			return -1;
         -:  257:		}
         -:  258:		// note: logic correct because array is sorted.
-     1470:  259:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == last_size) {
+     1550:  259:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == last_size) {
         -:  260:			// Duplicate slab_size
         1:  261:			errno = EEXIST;
         1:  262:			heap_allocator_cleanup(ptr);
         1:  263:			return -1;
         -:  264:		}
-     1469:  265:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
+     1549:  265:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
         -:  266:	}
         -:  267:
-       55:  268:	return 0;
+       57:  268:	return 0;
         -:  269:}
         -:  270:
        26:  271:int heap_allocator_build(
@@ -4563,140 +4837,140 @@ Unit_size:
         -:  292:}
         -:  293:
         -:  294:// binary search for the correct slab size
-      641:  295:int heap_allocator_index(HeapAllocator *ptr, u64 size)
+      671:  295:int heap_allocator_index(HeapAllocator *ptr, u64 size)
         -:  296:{
-      641:  297:	int ret = -1;
-      641:  298:	if (ptr->impl->hd_size == 0)
+      671:  297:	int ret = -1;
+      671:  298:	if (ptr->impl->hd_size == 0)
         2:  299:		return ret;
         -:  300:
-      639:  301:	int left = 0;
-      639:  302:	int right = ptr->impl->hd_size - 1;
+      669:  301:	int left = 0;
+      669:  302:	int right = ptr->impl->hd_size - 1;
         -:  303:
-     1902:  304:	while (left <= right) {
-     1749:  305:		int mid = left + (right - left) / 2;
-     1749:  306:		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
-     1749:  307:		if (slab_size == size) {
-      486:  308:			ret = mid;
-      486:  309:			break;
-     1263:  310:		} else if (slab_size > size)
-      975:  311:			right = mid - 1;
+     2085:  304:	while (left <= right) {
+     1906:  305:		int mid = left + (right - left) / 2;
+     1906:  306:		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
+     1906:  307:		if (slab_size == size) {
+      490:  308:			ret = mid;
+      490:  309:			break;
+     1416:  310:		} else if (slab_size > size)
+     1073:  311:			right = mid - 1;
         -:  312:		else
-      288:  313:			left = mid + 1;
+      343:  313:			left = mid + 1;
         -:  314:	}
         -:  315:
-      639:  316:	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1) {
-      141:  317:		return right + 1;
+      669:  316:	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1) {
+      167:  317:		return right + 1;
         -:  318:	}
         -:  319:
-      498:  320:	return ret;
+      502:  320:	return ret;
         -:  321:}
         -:  322:
-       78:  323:int heap_data_resize(u64 index, HeapData *hd)
+      103:  323:int heap_data_resize(u64 index, HeapData *hd)
         -:  324:{
         -:  325:	// check that we can resize this hdp
-       78:  326:	if (hd->cur_slabs < hd->hdp.config.max_slabs) {
+      103:  326:	if (hd->cur_slabs < hd->hdp.config.max_slabs) {
         -:  327:		// calculate the new slabs
-       71:  328:		u32 nslabs_count = hd->hdp.config.slabs_per_resize + hd->cur_slabs;
-       71:  329:		if (nslabs_count > hd->hdp.config.max_slabs)
+       96:  328:		u32 nslabs_count = hd->hdp.config.slabs_per_resize + hd->cur_slabs;
+       96:  329:		if (nslabs_count > hd->hdp.config.max_slabs)
         2:  330:			nslabs_count = hd->hdp.config.max_slabs;
         -:  331:
         -:  332:		// determine slabs to allocate
-       71:  333:		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
+       96:  333:		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
         -:  334:
         -:  335:		// attempt to allocate
-       71:  336:		void *tmp = NULL;
-       71:  337:		if (!__debug_build_allocator_malloc_fail7) {
-       70:  338:			if (hd->data)
+       96:  336:		void *tmp = NULL;
+       96:  337:		if (!__debug_build_allocator_malloc_fail7) {
+       95:  338:			if (hd->data)
        18:  339:				tmp = do_realloc(hd->data, (hd->count + 1) * sizeof(void *));
         -:  340:			else
-       52:  341:				tmp = do_malloc((hd->count + 1) * sizeof(void **));
+       77:  341:				tmp = do_malloc((hd->count + 1) * sizeof(void **));
         -:  342:		}
         -:  343:
-       71:  344:		if (tmp == NULL)
+       96:  344:		if (tmp == NULL)
         1:  345:			return -1;
-       70:  346:		hd->data = tmp;
+       95:  346:		hd->data = tmp;
         -:  347:
         -:  348:		// initialize the new part of the free list
-       70:  349:		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc, true))
+       95:  349:		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc, true))
         2:  350:			return -1;
-       68:  351:		hd->hdp.free_list_head = hd->cur_slabs;
-       68:  352:		hd->cur_slabs = nslabs_count;
-       68:  353:		hd->count += 1;
-       68:  354:		return 0;
+       93:  351:		hd->hdp.free_list_head = hd->cur_slabs;
+       93:  352:		hd->cur_slabs = nslabs_count;
+       93:  353:		hd->count += 1;
+       93:  354:		return 0;
         -:  355:	}
         7:  356:	return -1;
         -:  357:}
         -:  358:
-      643:  359:int heap_data_allocate(u64 index, HeapData *hd, FatPtr *fptr)
+      673:  359:int heap_data_allocate(u64 index, HeapData *hd, FatPtr *fptr)
         -:  360:{
-      643:  361:	if (hd->cur_slabs == 0) {
+      673:  361:	if (hd->cur_slabs == 0) {
         -:  362:		// this hd initially had 0 slabs
         -:  363:		// resize it
-       53:  364:		if (heap_data_resize(index, hd))
+       78:  364:		if (heap_data_resize(index, hd))
         1:  365:			return -1;
         -:  366:	}
         -:  367:
         -:  368:	// no more slabs, return error
-      642:  369:	if (hd->hdp.free_list_head == UINT32_MAX)
+      672:  369:	if (hd->hdp.free_list_head == UINT32_MAX)
        24:  370:		return -1;
         -:  371:
         -:  372:	// get next free slab
-      618:  373:	u64 id = hd->hdp.free_list_head;
+      648:  373:	u64 id = hd->hdp.free_list_head;
         -:  374:
         -:  375:	// update free list head
-      618:  376:	hd->hdp.free_list_head = hd->free_list[id];
+      648:  376:	hd->hdp.free_list_head = hd->free_list[id];
         -:  377:
         -:  378:	// update with the specific index (differing slab sizes)
-      618:  379:	fptr->id = id | (index << 56);
-      618:  380:	fptr->len = hd->hdp.config.slab_size;
+      648:  379:	fptr->id = id | (index << 56);
+      648:  380:	fptr->len = hd->hdp.config.slab_size;
         -:  381:
-      618:  382:	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
-      618:  383:	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
+      648:  382:	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
+      648:  383:	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
         -:  384:
         -:  385:	// set the data of the fptr
-      618:  386:	fptr->data = hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
-      618:  387:	hd->cur_slabs_allocated++;
+      648:  386:	fptr->data = hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
+      648:  387:	hd->cur_slabs_allocated++;
         -:  388:
-      618:  389:	return 0;
+      648:  389:	return 0;
         -:  390:}
         -:  391:
         -:  392:// free data in this HeapData
-      331:  393:int heap_data_free(u64 index, HeapData *hd, FatPtr *fptr)
+      361:  393:int heap_data_free(u64 index, HeapData *hd, FatPtr *fptr)
         -:  394:{
-      331:  395:	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
+      361:  395:	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
         -:  396:
         -:  397:	// if this is invalid return an error
-      331:  398:	if (rel >= hd->cur_slabs)
+      361:  398:	if (rel >= hd->cur_slabs)
         1:  399:		return -1;
         -:  400:
         -:  401:	// update head and rest of the list
-      330:  402:	u64 head = hd->hdp.free_list_head;
-      330:  403:	hd->hdp.free_list_head = rel;
-      330:  404:	hd->free_list[rel] = head;
+      360:  402:	u64 head = hd->hdp.free_list_head;
+      360:  403:	hd->hdp.free_list_head = rel;
+      360:  404:	hd->free_list[rel] = head;
         -:  405:
-      330:  406:	hd->cur_slabs_allocated--;
+      360:  406:	hd->cur_slabs_allocated--;
         -:  407:
-      330:  408:	return 0;
+      360:  408:	return 0;
         -:  409:}
         -:  410:
-        9:  411:u64 heap_allocator_cur_slabs_allocated(HeapAllocator *ptr)
+       11:  411:u64 heap_allocator_cur_slabs_allocated(HeapAllocator *ptr)
         -:  412:{
-        9:  413:	u64 ret = ptr->impl->cur_malloc_slabs_allocated;
-      369:  414:	for (int i = 0; i < ptr->impl->hd_size; i++) {
-      360:  415:		ret += ptr->impl->hd_arr[i].cur_slabs_allocated;
+       11:  413:	u64 ret = ptr->impl->cur_malloc_slabs_allocated;
+      451:  414:	for (int i = 0; i < ptr->impl->hd_size; i++) {
+      440:  415:		ret += ptr->impl->hd_arr[i].cur_slabs_allocated;
         -:  416:	}
-        9:  417:	return ret;
+       11:  417:	return ret;
         -:  418:}
         -:  419:
         -:  420:// main allocation function
-      641:  421:int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr)
+      671:  421:int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr)
         -:  422:{
-      641:  423:	int ret = -1;
+      671:  423:	int ret = -1;
         -:  424:	// determine the index via binary search
-      641:  425:	int index = heap_allocator_index(ptr, size);
+      671:  425:	int index = heap_allocator_index(ptr, size);
         -:  426:
         -:  427:	// if this index is not found (too big) fall back to malloc
-      641:  428:	if (index < 0) {
+      671:  428:	if (index < 0) {
        14:  429:		if (!ptr->impl->config.no_malloc) {
        12:  430:			fptr->data = NULL;
        12:  431:			if (!__debug_build_allocator_malloc_fail6) {
@@ -4713,9 +4987,9 @@ Unit_size:
         -:  442:			}
         -:  443:		}
         -:  444:	} else {
-      627:  445:		HeapData *hd = &ptr->impl->hd_arr[index];
-      627:  446:		ret = heap_data_allocate(index, hd, fptr);
-      627:  447:		if (ret) {
+      657:  445:		HeapData *hd = &ptr->impl->hd_arr[index];
+      657:  446:		ret = heap_data_allocate(index, hd, fptr);
+      657:  447:		if (ret) {
         -:  448:			// there are no more slabs. Try to resize
        25:  449:			if (!heap_data_resize(index, hd)) {
         -:  450:				// successful resize, allocate should always
@@ -4740,17 +5014,17 @@ Unit_size:
         -:  469:	}
         -:  470:
         -:  471:	// if zeroed is configured set all memory of allocated slabs to 0.
-      641:  472:	if (!ret && ptr->impl->config.zeroed) {
+      671:  472:	if (!ret && ptr->impl->config.zeroed) {
        44:  473:		memset(fptr->data, 0, fptr->len);
         -:  474:	}
         -:  475:
-      641:  476:	return ret;
+      671:  476:	return ret;
         -:  477:}
         -:  478:
-      346:  479:int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr)
+      376:  479:int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr)
         -:  480:{
-      346:  481:	int ret = 0;
-      346:  482:	if (fptr->id == UINT64_MAX) {
+      376:  481:	int ret = 0;
+      376:  482:	if (fptr->id == UINT64_MAX) {
         -:  483:		// malloc allocated
         -:  484:
        14:  485:		if (fptr->data) {
@@ -4762,58 +5036,58 @@ Unit_size:
        14:  491:		ret = 0;
         -:  492:	} else {
         -:  493:
-      332:  494:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
+      362:  494:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
         -:  495:
-      332:  496:		if (index >= ptr->impl->hd_size) {
+      362:  496:		if (index >= ptr->impl->hd_size) {
         1:  497:			errno = EINVAL;
         1:  498:			ret = -1; // invalid index
         -:  499:		} else {
-      331:  500:			HeapData *hd = &ptr->impl->hd_arr[index];
-      331:  501:			ret = heap_data_free(index, hd, fptr);
+      361:  500:			HeapData *hd = &ptr->impl->hd_arr[index];
+      361:  501:			ret = heap_data_free(index, hd, fptr);
         -:  502:		}
         -:  503:	}
         -:  504:
-      346:  505:	if (!ret && ptr->impl->config.zeroed) {
+      376:  505:	if (!ret && ptr->impl->config.zeroed) {
         1:  506:		memset(fptr->data, 0, fptr->len);
         -:  507:	}
         -:  508:
-      346:  509:	return ret;
+      376:  509:	return ret;
         -:  510:}
         -:  511:
-       38:  512:int heap_allocator_cleanup(HeapAllocator *ptr)
+       40:  512:int heap_allocator_cleanup(HeapAllocator *ptr)
         -:  513:{
         -:  514:	// check for impl and deallocate
-       38:  515:	if (ptr->impl) {
-      422:  516:		for (u32 i = 0; i < ptr->impl->hd_size; i++) {
-      388:  517:			if (ptr->impl->hd_arr[i].count) {
+       40:  515:	if (ptr->impl) {
+      504:  516:		for (u32 i = 0; i < ptr->impl->hd_size; i++) {
+      468:  517:			if (ptr->impl->hd_arr[i].count) {
         -:  518:				// check that it's not an unallocated heap data
-       29:  519:				if (ptr->impl->hd_arr[i].free_list) {
-       29:  520:					do_free(ptr->impl->hd_arr[i].free_list);
-       29:  521:					ptr->impl->hd_arr[i].free_list = NULL;
+       54:  519:				if (ptr->impl->hd_arr[i].free_list) {
+       54:  520:					do_free(ptr->impl->hd_arr[i].free_list);
+       54:  521:					ptr->impl->hd_arr[i].free_list = NULL;
         -:  522:				}
-       68:  523:				for (u64 j = 0; j < ptr->impl->hd_arr[i].count; j++) {
-       39:  524:					do_free(ptr->impl->hd_arr[i].data[j]);
+      118:  523:				for (u64 j = 0; j < ptr->impl->hd_arr[i].count; j++) {
+       64:  524:					do_free(ptr->impl->hd_arr[i].data[j]);
         -:  525:				}
-       29:  526:				if (ptr->impl->hd_arr[i].data) {
-       29:  527:					do_free(ptr->impl->hd_arr[i].data);
-       29:  528:					ptr->impl->hd_arr[i].data = NULL;
+       54:  526:				if (ptr->impl->hd_arr[i].data) {
+       54:  527:					do_free(ptr->impl->hd_arr[i].data);
+       54:  528:					ptr->impl->hd_arr[i].data = NULL;
         -:  529:				}
         -:  530:			}
         -:  531:		}
         -:  532:
-       34:  533:		if (ptr->impl->hd_arr) {
-       33:  534:			do_free(ptr->impl->hd_arr);
-       33:  535:			ptr->impl->hd_arr = NULL;
+       36:  533:		if (ptr->impl->hd_arr) {
+       35:  534:			do_free(ptr->impl->hd_arr);
+       35:  535:			ptr->impl->hd_arr = NULL;
         -:  536:		}
-       34:  537:		do_free(ptr->impl);
-       34:  538:		ptr->impl = NULL;
+       36:  537:		do_free(ptr->impl);
+       36:  538:		ptr->impl = NULL;
         -:  539:	}
-       38:  540:	return 0;
+       40:  540:	return 0;
         -:  541:}
         -:    0:Source:lock.c
         -:    0:Graph:lock.gcno
         -:    0:Data:lock.gcda
-        -:    0:Runs:53
+        -:    0:Runs:55
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4911,13 +5185,13 @@ Unit_size:
        15:   95:	return ret;
         -:   96:}
         -:   97:
-      470:   98:void Lockguard_cleanup(LockGuardPtr *ptr) {
-      470:   99:	if (ptr && ptr->ref) {
+      530:   98:void Lockguard_cleanup(LockGuardPtr *ptr) {
+      530:   99:	if (ptr && ptr->ref) {
        14:  100:		atomic_exchange(&ptr->ref->is_locked, false);
        14:  101:		pthread_mutex_unlock(&ptr->ref->lock);
        14:  102:		delete_active_lock(ptr->ref);
         -:  103:	}
-      470:  104:}
+      530:  104:}
         -:  105:
         3:  106:void Lock_mark_poisoned() {
         3:  107:	if (__active_lock_count_) {
@@ -4969,7 +5243,7 @@ Unit_size:
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:53
+        -:    0:Runs:55
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4984,67 +5258,153 @@ Unit_size:
         -:   12:// See the License for the specific language governing permissions and
         -:   13:// limitations under the License.
         -:   14:
-        -:   15:#include <stdio.h>
-        -:   16:#include <stdlib.h>
-        -:   17:#include <string.h>
-        -:   18:
-        2:   19:char *rstrstr(char *s1, char *s2)
-        -:   20:{
-        2:   21:	size_t s1len = strlen(s1);
-        2:   22:	size_t s2len = strlen(s2);
-        -:   23:	char *s;
-        -:   24:
-        2:   25:	if (s2len > s1len)
-    #####:   26:		return NULL;
-       14:   27:	for (s = s1 + s1len - s2len; s >= s1; --s)
-       14:   28:		if (strncmp(s, s2, s2len) == 0)
-        2:   29:			return s;
-    #####:   30:	return NULL;
-        -:   31:}
-        -:   32:
-        -:   33:#define BUFFER_SIZE 1024
-        -:   34:
-    #####:   35:int copy_file(const char *dst, const char *src)
-        -:   36:{
-        -:   37:	FILE *source_file, *dest_file;
-        -:   38:	char buffer[BUFFER_SIZE];
-        -:   39:	size_t bytes;
-        -:   40:
-        -:   41:	// Open the source file in binary read mode
-    #####:   42:	source_file = fopen(src, "rb");
-    #####:   43:	if (source_file == NULL) {
-    #####:   44:		perror("Error opening source file");
-    #####:   45:		return -1;
-        -:   46:	}
-        -:   47:
-        -:   48:	// Open the destination file in binary write mode
-    #####:   49:	dest_file = fopen(dst, "wb");
-    #####:   50:	if (dest_file == NULL) {
-    #####:   51:		perror("Error opening destination file");
-    #####:   52:		fclose(source_file);
-    #####:   53:		return -1;
-        -:   54:	}
-        -:   55:
-        -:   56:	// Copy the file content
-    #####:   57:	while ((bytes = fread(buffer, 1, BUFFER_SIZE, source_file)) > 0) {
-    #####:   58:		if (fwrite(buffer, 1, bytes, dest_file) != bytes) {
-    #####:   59:			perror("Error writing to destination file");
-    #####:   60:			fclose(source_file);
-    #####:   61:			fclose(dest_file);
-    #####:   62:			return -1;
-        -:   63:		}
-        -:   64:	}
+        -:   15:#include <base/resources.h>
+        -:   16:#include <dirent.h>
+        -:   17:#include <limits.h>
+        -:   18:#include <stdio.h>
+        -:   19:#include <stdlib.h>
+        -:   20:#include <string.h>
+        -:   21:#include <sys/stat.h>
+        -:   22:#include <unistd.h>
+        -:   23:
+        3:   24:const char *rstrstr(const char *s1, const char *s2)
+        -:   25:{
+        3:   26:	size_t s1len = strlen(s1);
+        3:   27:	size_t s2len = strlen(s2);
+        -:   28:	const char *s;
+        -:   29:
+        3:   30:	if (s2len > s1len)
+    #####:   31:		return NULL;
+       25:   32:	for (s = s1 + s1len - s2len; s >= s1; --s)
+       25:   33:		if (strncmp(s, s2, s2len) == 0)
+        3:   34:			return s;
+    #####:   35:	return NULL;
+        -:   36:}
+        -:   37:
+        1:   38:size_t read_all(void *buffer, size_t size, size_t count, FILE *stream)
+        -:   39:{
+        1:   40:	size_t total_read = 0;
+        1:   41:	size_t bytes_to_read = size * count;
+        -:   42:	size_t bytes_read;
+        -:   43:
+        2:   44:	while (total_read < bytes_to_read) {
+        1:   45:		bytes_read = fread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
+        1:   46:		if (bytes_read == 0) {
+        -:   47:			// Check for EOF or error
+    #####:   48:			if (feof(stream)) {
+    #####:   49:				break; // End of file reached
+    #####:   50:			} else if (ferror(stream)) {
+    #####:   51:				perror("Read error");
+    #####:   52:				break; // Error occurred
+        -:   53:			}
+        -:   54:		}
+        1:   55:		total_read += bytes_read;
+        -:   56:	}
+        -:   57:
+        1:   58:	return total_read;
+        -:   59:}
+        -:   60:
+    #####:   61:int copy_file(const char *dst, const char *src)
+    #####:   62:{
+        -:   63:	FILE *source_file, *dest_file;
+        -:   64:	size_t bytes;
         -:   65:
-        -:   66:	// Close both files
-    #####:   67:	fclose(source_file);
-    #####:   68:	fclose(dest_file);
-        -:   69:
-    #####:   70:	return 0;
-        -:   71:}
+        -:   66:	// Open the source file in binary read mode
+    #####:   67:	source_file = myfopen(src, "rb");
+    #####:   68:	if (source_file == NULL) {
+    #####:   69:		perror("Error opening source file");
+    #####:   70:		return -1;
+        -:   71:	}
+        -:   72:
+        -:   73:	// Determine the file size
+    #####:   74:	fseek(source_file, 0, SEEK_END);
+    #####:   75:	long file_size = ftell(source_file);
+    #####:   76:	fseek(source_file, 0, SEEK_SET);
+    #####:   77:	char buffer[file_size];
+        -:   78:
+        -:   79:	// Open the destination file in binary write mode
+    #####:   80:	dest_file = myfopen(dst, "wb");
+    #####:   81:	if (dest_file == NULL) {
+    #####:   82:		perror("Error opening destination file");
+    #####:   83:		fclose(source_file);
+    #####:   84:		return -1;
+        -:   85:	}
+        -:   86:
+        -:   87:	// Copy the file content
+    #####:   88:	while ((bytes = fread(buffer, 1, file_size, source_file)) > 0) {
+    #####:   89:		if (fwrite(buffer, 1, bytes, dest_file) != bytes) {
+    #####:   90:			perror("Error writing to destination file");
+    #####:   91:			fclose(source_file);
+    #####:   92:			fclose(dest_file);
+    #####:   93:			return -1;
+        -:   94:		}
+        -:   95:	}
+        -:   96:
+        -:   97:	// Close both files
+    #####:   98:	myfclose(source_file);
+    #####:   99:	myfclose(dest_file);
+        -:  100:
+    #####:  101:	return 0;
+        -:  102:}
+        -:  103:
+        -:  104:// Function to recursively remove a directory and its contents
+       22:  105:int remove_directory(const char *path)
+        -:  106:{
+        -:  107:	struct dirent *entry;
+       22:  108:	DIR *dir = opendir(path);
+        -:  109:
+       22:  110:	if (dir == NULL) {
+       11:  111:		return -1;
+        -:  112:	}
+        -:  113:
+       34:  114:	while ((entry = readdir(dir)) != NULL) {
+        -:  115:		char full_path[PATH_MAX];
+        -:  116:
+        -:  117:		// Skip the special entries "." and ".."
+       23:  118:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+       22:  119:			continue;
+        -:  120:		}
+        -:  121:
+        -:  122:		// Construct the full path to the file/directory
+        1:  123:		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
+        -:  124:
+        -:  125:		struct stat statbuf;
+        1:  126:		if (stat(full_path, &statbuf) == -1) {
+    #####:  127:			perror("stat");
+    #####:  128:			closedir(dir);
+    #####:  129:			return -1;
+        -:  130:		}
+        -:  131:
+        1:  132:		if (S_ISDIR(statbuf.st_mode)) {
+        -:  133:			// It's a directory, recurse into it
+    #####:  134:			if (remove_directory(full_path) == -1) {
+    #####:  135:				closedir(dir);
+    #####:  136:				return -1;
+        -:  137:			}
+        -:  138:		} else {
+        -:  139:			// It's a file, unlink (delete) it
+        1:  140:			if (unlink(full_path) == -1) {
+    #####:  141:				perror("unlink");
+    #####:  142:				closedir(dir);
+    #####:  143:				return -1;
+        -:  144:			}
+        -:  145:		}
+        -:  146:	}
+        -:  147:
+       11:  148:	closedir(dir);
+        -:  149:
+        -:  150:	// Now the directory is empty, so we can remove it
+       11:  151:	if (rmdir(path) == -1) {
+    #####:  152:		perror("rmdir");
+    #####:  153:		return -1;
+        -:  154:	}
+        -:  155:
+       11:  156:	return 0;
+        -:  157:}
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
-        -:    0:Runs:53
+        -:    0:Runs:55
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5095,7 +5455,7 @@ Unit_size:
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:53
+        -:    0:Runs:55
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5121,36 +5481,36 @@ Unit_size:
         -:   23:#define PATH_SEPARATOR "/"
         -:   24:#define PATH_SEPARATOR_CHAR '/'
         -:   25:
-        6:   26:void path_cleanup(PathImpl *ptr)
+       19:   26:void path_cleanup(PathImpl *ptr)
         -:   27:{
-        6:   28:	chain_free(&ptr->ptr);
-        6:   29:}
+       19:   28:	chain_free(&ptr->ptr);
+       19:   29:}
         -:   30:
-        6:   31:int path_for(Path *p, const char *path)
+       19:   31:int path_for(Path *p, const char *path)
         -:   32:{
-        6:   33:	if (path == NULL) {
+       19:   33:	if (path == NULL) {
     #####:   34:		errno = EINVAL;
     #####:   35:		return -1;
         -:   36:	}
-        6:   37:	int len = strlen(path);
-        6:   38:	if (len == 0) {
+       19:   37:	int len = strlen(path);
+       19:   38:	if (len == 0) {
     #####:   39:		errno = EINVAL;
     #####:   40:		return -1;
         -:   41:	}
-        6:   42:	if (chain_malloc(&p->ptr, len + 1))
+       19:   42:	if (chain_malloc(&p->ptr, len + 1))
     #####:   43:		return -1;
-        6:   44:	strcpy(p->ptr.data, path);
-        6:   45:	return 0;
+       19:   44:	strcpy(p->ptr.data, path);
+       19:   45:	return 0;
         -:   46:}
         -:   47:
-        7:   48:int path_replace_home(Path *p)
+       18:   48:int path_replace_home(Path *p)
         -:   49:{
-        7:   50:	const char *home_dir = getenv("HOME");
-        7:   51:	if (home_dir == NULL) {
+       18:   50:	const char *home_dir = getenv("HOME");
+       18:   51:	if (home_dir == NULL) {
     #####:   52:		errno = EINVAL;
     #####:   53:		return -1;
         -:   54:	}
-        7:   55:	if (((char *)(p->ptr.data))[0] == '~') {
+       18:   55:	if (((char *)(p->ptr.data))[0] == '~') {
     #####:   56:		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr.data);
     #####:   57:		if (nlen >= PATH_MAX) {
     #####:   58:			errno = E2BIG;
@@ -5166,63 +5526,63 @@ Unit_size:
     #####:   68:		snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr.data + 1));
     #####:   69:		strcpy(p->ptr.data, buf);
         -:   70:	}
-        7:   71:	return 0;
+       18:   71:	return 0;
         -:   72:}
         -:   73:
-        7:   74:int path_canonicalize(Path *p)
+       18:   74:int path_canonicalize(Path *p)
         -:   75:{
-        7:   76:	if (path_replace_home(p))
+       18:   76:	if (path_replace_home(p))
     #####:   77:		return -1;
         -:   78:	char buf[PATH_MAX];
-        7:   79:	errno = 0;
-        7:   80:	if (realpath(p->ptr.data, buf) == NULL) {
+       18:   79:	errno = 0;
+       18:   80:	if (realpath(p->ptr.data, buf) == NULL) {
         2:   81:		return -1;
         -:   82:	}
-        5:   83:	int nlen = strlen(buf);
-        5:   84:	if (nlen == 0) {
+       16:   83:	int nlen = strlen(buf);
+       16:   84:	if (nlen == 0) {
     #####:   85:		errno = EFAULT;
     #####:   86:		return -1;
         -:   87:	}
-        5:   88:	if (nlen >= p->ptr.len) {
+       16:   88:	if (nlen >= p->ptr.len) {
         -:   89:		FatPtr nptr;
-        4:   90:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+       15:   90:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
     #####:   91:			return -1;
-        4:   92:		p->ptr = nptr;
+       15:   92:		p->ptr = nptr;
         -:   93:	}
-        5:   94:	strcpy(p->ptr.data, buf);
-        5:   95:	return 0;
+       16:   94:	strcpy(p->ptr.data, buf);
+       16:   95:	return 0;
         -:   96:}
-        4:   97:int path_push(Path *p, const char *next)
+        5:   97:int path_push(Path *p, const char *next)
         -:   98:{
-        4:   99:	if (next == NULL) {
+        5:   99:	if (next == NULL) {
     #####:  100:		errno = EINVAL;
     #####:  101:		return -1;
         -:  102:	}
-        4:  103:	int slen = strlen(p->ptr.data);
-        4:  104:	if (slen <= 0) {
+        5:  103:	int slen = strlen(p->ptr.data);
+        5:  104:	if (slen <= 0) {
     #####:  105:		errno = EFAULT;
     #####:  106:		return -1;
         -:  107:	}
-        4:  108:	bool need_sep = false;
-        4:  109:	if (((char *)p->ptr.data)[slen - 1] != PATH_SEPARATOR_CHAR) {
-        3:  110:		need_sep = true;
+        5:  108:	bool need_sep = false;
+        5:  109:	if (((char *)p->ptr.data)[slen - 1] != PATH_SEPARATOR_CHAR) {
+        4:  110:		need_sep = true;
         -:  111:	}
         -:  112:
-        4:  113:	int nlen = slen + strlen(next);
-        4:  114:	if (need_sep)
-        3:  115:		nlen += strlen(PATH_SEPARATOR);
+        5:  113:	int nlen = slen + strlen(next);
+        5:  114:	if (need_sep)
+        4:  115:		nlen += strlen(PATH_SEPARATOR);
         -:  116:
-        4:  117:	if (nlen >= p->ptr.len) {
+        5:  117:	if (nlen >= p->ptr.len) {
         -:  118:		FatPtr nptr;
-        2:  119:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+        3:  119:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
     #####:  120:			return -1;
-        2:  121:		p->ptr = nptr;
+        3:  121:		p->ptr = nptr;
         -:  122:	}
         -:  123:
-        4:  124:	if (need_sep)
-        3:  125:		strcat(p->ptr.data, PATH_SEPARATOR);
-        4:  126:	strcat(p->ptr.data, next);
-        4:  127:	return 0;
+        5:  124:	if (need_sep)
+        4:  125:		strcat(p->ptr.data, PATH_SEPARATOR);
+        5:  126:	strcat(p->ptr.data, next);
+        5:  127:	return 0;
         -:  128:}
         2:  129:int path_pop(Path *p)
         -:  130:{
@@ -5234,44 +5594,49 @@ Unit_size:
         2:  136:	return 0;
         -:  137:}
         -:  138:
-        4:  139:char *path_to_string(Path *p)
+        8:  139:char *path_to_string(Path *p)
         -:  140:{
-        4:  141:	return p->ptr.data;
+        8:  141:	return p->ptr.data;
         -:  142:}
         -:  143:
-    #####:  144:bool path_exists(Path *p)
+    #####:  144:char *path_file_name(Path *p)
         -:  145:{
-    #####:  146:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  147:		errno = EINVAL;
-    #####:  148:		return false;
-        -:  149:	}
-    #####:  150:	return access(p->ptr.data, F_OK) == 0;
-        -:  151:}
-    #####:  152:bool path_is_dir(Path *p)
-        -:  153:{
-    #####:  154:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  155:		errno = EINVAL;
-    #####:  156:		return false;
-        -:  157:	}
-        -:  158:	struct stat s;
-    #####:  159:	if (stat(p->ptr.data, &s) == 0) {
-    #####:  160:		return s.st_mode & S_IFDIR;
-        -:  161:	}
-    #####:  162:	return false;
-        -:  163:}
-        -:  164:
-    #####:  165:bool path_mkdir(Path *p, mode_t mode)
-        -:  166:{
-    #####:  167:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  168:		errno = EINVAL;
-    #####:  169:		return false;
-        -:  170:	}
-    #####:  171:	return mkdir(p->ptr.data, 0700) != 0;
-        -:  172:}
+    #####:  146:	return rstrstr(p->ptr.data, PATH_SEPARATOR);
+        -:  147:}
+        -:  148:
+    #####:  149:bool path_exists(Path *p)
+        -:  150:{
+    #####:  151:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  152:		errno = EINVAL;
+    #####:  153:		return false;
+        -:  154:	}
+    #####:  155:	return access(p->ptr.data, F_OK) == 0;
+        -:  156:}
+    #####:  157:bool path_is_dir(Path *p)
+        -:  158:{
+    #####:  159:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  160:		errno = EINVAL;
+    #####:  161:		return false;
+        -:  162:	}
+        -:  163:	struct stat s;
+    #####:  164:	if (stat(p->ptr.data, &s) == 0) {
+    #####:  165:		return s.st_mode & S_IFDIR;
+        -:  166:	}
+    #####:  167:	return false;
+        -:  168:}
+        -:  169:
+    #####:  170:bool path_mkdir(Path *p, mode_t mode)
+        -:  171:{
+    #####:  172:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  173:		errno = EINVAL;
+    #####:  174:		return false;
+        -:  175:	}
+    #####:  176:	return mkdir(p->ptr.data, 0700) != 0;
+        -:  177:}
         -:    0:Source:rand.c
         -:    0:Graph:rand.gcno
         -:    0:Data:rand.gcda
-        -:    0:Runs:53
+        -:    0:Runs:55
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5336,7 +5701,7 @@ Unit_size:
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:53
+        -:    0:Runs:55
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5354,61 +5719,71 @@ Unit_size:
         -:   15:#include <base/resources.h>
         -:   16:#include <stdlib.h>
         -:   17:
-        -:   18:_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
+        -:   18:_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = { 0, 0, 0, 0, 0 };
         -:   19:
-    62463:   20:void *mymalloc(usize size) {
-        -:   21:	void *ret;
-    62463:   22:	ret = malloc(size);
-        -:   23:
-    62463:   24:	if (ret) {
-    62463:   25:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
-        -:   26:	}
-    62463:   27:	return ret;
-        -:   28:}
-    62349:   29:void *myrealloc(void *ptr, usize size) {
-        -:   30:	void *ret;
-    62349:   31:	ret = realloc(ptr, size);
-        -:   32:
-    62349:   33:	if (ret) {
-    62349:   34:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
-        -:   35:	}
-    62349:   36:	return ret;
-        -:   37:}
-    62430:   38:void myfree(void *ptr) {
-    62430:   39:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-    62430:   40:	free(ptr);
-    62430:   41:}
-        2:   42:FILE *myfopen(char *path, const char *mode) {
-        2:   43:	FILE *ret = fopen(path, mode);
-        -:   44:
-        2:   45:	if (ret) {
-        2:   46:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
-        -:   47:	}
-        2:   48:	return ret;
-        -:   49:}
-        2:   50:void myfclose(FILE *ptr) {
-        2:   51:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
-        2:   52:	fclose(ptr);
-        2:   53:}
-       21:   54:u64 mymalloc_sum() {
-       21:   55:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
-        -:   56:}
-    #####:   57:u64 myrealloc_sum() {
-    #####:   58:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
-        -:   59:}
-       21:   60:u64 myfree_sum() {
-       21:   61:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+    62464:   20:void *mymalloc(usize size)
+        -:   21:{
+        -:   22:	void *ret;
+    62464:   23:	ret = malloc(size);
+        -:   24:
+    62464:   25:	if (ret) {
+    62464:   26:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+        -:   27:	}
+    62464:   28:	return ret;
+        -:   29:}
+    62349:   30:void *myrealloc(void *ptr, usize size)
+        -:   31:{
+        -:   32:	void *ret;
+    62349:   33:	ret = realloc(ptr, size);
+        -:   34:
+    62349:   35:	if (ret) {
+    62349:   36:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+        -:   37:	}
+    62349:   38:	return ret;
+        -:   39:}
+    62431:   40:void myfree(void *ptr)
+        -:   41:{
+    62431:   42:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+    62431:   43:	free(ptr);
+    62431:   44:}
+        4:   45:FILE *myfopen(const char *path, const char *mode)
+        -:   46:{
+        4:   47:	FILE *ret = fopen(path, mode);
+        -:   48:
+        4:   49:	if (ret) {
+        4:   50:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
+        -:   51:	}
+        4:   52:	return ret;
+        -:   53:}
+        4:   54:void myfclose(FILE *ptr)
+        -:   55:{
+        4:   56:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
+        4:   57:	fclose(ptr);
+        4:   58:}
+       25:   59:u64 mymalloc_sum()
+        -:   60:{
+       25:   61:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
         -:   62:}
-       27:   63:u64 myfopen_sum() {
-       27:   64:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
-        -:   65:}
-       27:   66:u64 myfclose_sum() {
-       27:   67:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
-        -:   68:}
+    #####:   63:u64 myrealloc_sum()
+        -:   64:{
+    #####:   65:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
+        -:   66:}
+       25:   67:u64 myfree_sum()
+        -:   68:{
+       25:   69:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+        -:   70:}
+       33:   71:u64 myfopen_sum()
+        -:   72:{
+       33:   73:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+        -:   74:}
+       33:   75:u64 myfclose_sum()
+        -:   76:{
+       33:   77:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+        -:   78:}
         -:    0:Source:sha256.c
         -:    0:Graph:sha256.gcno
         -:    0:Data:sha256.gcda
-        -:    0:Runs:53
+        -:    0:Runs:55
         -:    1:#include <stdio.h>
         -:    2:#include <stdlib.h>
         -:    3:#include <string.h>
@@ -5591,38 +5966,71 @@ Unit_size:
         -:   14:
         -:   15:#include <base/misc.h>
         -:   16:#include <base/path.h>
-        -:   17:#include <stdio.h>
-        -:   18:#include <stdlib.h>
-        -:   19:
-    #####:   20:int proc_build_init(const char *proj_name, const char *proj_path)
-        -:   21:{
-    #####:   22:	Path path;
-    #####:   23:	path_for(&path, proj_path);
-    #####:   24:	if (path_exists(&path)) {
-    #####:   25:		fprintf(stderr, "Path: '%s' already exists!\n", proj_path);
-    #####:   26:		exit(-1);
-        -:   27:	}
-    #####:   28:	if (path_mkdir(&path, 0700)) {
-    #####:   29:		perror("Error: could not create directory for project");
-    #####:   30:		exit(-1);
-        -:   31:	}
-        -:   32:
-    #####:   33:	path_push(&path, "fam.toml");
-    #####:   34:	Path template;
-    #####:   35:	path_for(&template, "~/.fam/resources/fam.toml");
-    #####:   36:	path_canonicalize(&template);
-    #####:   37:	if (copy_file(path_to_string(&path), path_to_string(&template)) != 0) {
-    #####:   38:		perror("Error: copying file");
-    #####:   39:		exit(-1);
-        -:   40:	}
-        -:   41:
-    #####:   42:	Path proj_dir;
-    #####:   43:	path_for(&proj_dir, proj_path);
-    #####:   44:	path_canonicalize(&proj_dir);
-    #####:   45:	printf("Project successfully created in '%s'.\n", path_to_string(&proj_dir));
-        -:   46:
-    #####:   47:	return 0;
-        -:   48:}
+        -:   17:#include <base/version.h>
+        -:   18:#include <stdio.h>
+        -:   19:#include <stdlib.h>
+        -:   20:#include <string.h>
+        -:   21:#include <util/replace.h>
+        -:   22:
+    #####:   23:int proc_build_init(const char *proj_name, const char *proj_path, char authors[11][1024],
+        -:   24:	int author_count, bool lib, char *description)
+    #####:   25:{
+    #####:   26:	int author_len = 0;
+    #####:   27:	for (int i = 0; i < author_count; i++) {
+    #####:   28:		author_len += strlen(authors[i]) + 10;
+        -:   29:	}
+    #####:   30:	char author_replace[author_len];
+    #####:   31:	strcpy(author_replace, "");
+    #####:   32:	for (int i = 0; i < author_count; i++) {
+    #####:   33:		strcat(author_replace, "\"");
+    #####:   34:		strcat(author_replace, authors[i]);
+    #####:   35:		if (i == author_count - 1)
+    #####:   36:			strcat(author_replace, "\"");
+        -:   37:		else
+    #####:   38:			strcat(author_replace, "\", ");
+        -:   39:	}
+    #####:   40:	Path path;
+    #####:   41:	path_for(&path, proj_path);
+    #####:   42:	if (path_exists(&path)) {
+    #####:   43:		path_canonicalize(&path);
+    #####:   44:		fprintf(stderr, "Path: '%s' already exists!\n", path_to_string(&path));
+    #####:   45:		exit(-1);
+        -:   46:	}
+    #####:   47:	if (path_mkdir(&path, 0700)) {
+    #####:   48:		perror("Error: could not create directory for project");
+    #####:   49:		exit(-1);
+        -:   50:	}
+        -:   51:
+    #####:   52:	path_push(&path, "fam.toml");
+    #####:   53:	Path template;
+    #####:   54:	if (lib)
+    #####:   55:		path_for(&template, "~/.fam/resources/fam.lib.toml");
+        -:   56:	else
+    #####:   57:		path_for(&template, "~/.fam/resources/fam.toml");
+    #####:   58:	path_canonicalize(&template);
+    #####:   59:	if (copy_file(path_to_string(&path), path_to_string(&template)) != 0) {
+    #####:   60:		perror("Error: copying file");
+    #####:   61:		exit(-1);
+        -:   62:	}
+        -:   63:
+    #####:   64:	const char *patterns_in[]
+        -:   65:		= { "REPLACE_FAM_VERSION", "REPLACE_NAME", "REPLACE_AUTHORS", "REPLACE_DESCRIPTION" };
+    #####:   66:	const bool is_case_sensitive[] = { true, true, true };
+        -:   67:	char desc[1024];
+    #####:   68:	if (strlen(description) > 0)
+    #####:   69:		strcpy(desc, description);
+        -:   70:	else
+    #####:   71:		strcpy(desc, proj_name);
+    #####:   72:	const char *replace[] = { FAM_VERSION, proj_name, author_replace, desc };
+    #####:   73:	replace_file(&path, &path, patterns_in, is_case_sensitive, replace, 4);
+        -:   74:
+    #####:   75:	Path proj_dir;
+    #####:   76:	path_for(&proj_dir, proj_path);
+    #####:   77:	path_canonicalize(&proj_dir);
+    #####:   78:	printf("Project successfully created in '%s'.\n", path_to_string(&proj_dir));
+        -:   79:
+    #####:   80:	return 0;
+        -:   81:}
         -:    0:Source:args.c
         -:    0:Graph:args.gcno
         -:    0:Data:args.gcda
@@ -5647,938 +6055,958 @@ Unit_size:
         -:   18:#include <string.h>
         -:   19:
         8:   20:int args_param_build(ArgsParam *ap, char *name, char *help, char *short_name, bool takes_value,
-        -:   21:					 bool multiple, char *default_value) {
-        8:   22:	if (ap == NULL || name == NULL || help == NULL || short_name == NULL) {
-    #####:   23:		errno = EINVAL;
-    #####:   24:		return -1;
-        -:   25:	}
-        -:   26:
-        8:   27:	if (strlen(short_name) > strlen(name)) {
-    #####:   28:		fprintf(stderr, "short_name cannot be longer than name\n");
-    #####:   29:		return -1;
-        -:   30:	}
-        -:   31:
-        8:   32:	ap->name = NULL;
-        8:   33:	ap->help = NULL;
-        8:   34:	ap->short_name = NULL;
-        8:   35:	ap->default_value = NULL;
-        -:   36:
-        8:   37:	ap->name = mymalloc((1 + strlen(name)) * sizeof(char));
-        8:   38:	if (ap->name == NULL) {
-    #####:   39:		return -1;
-        -:   40:	}
-        8:   41:	strcpy(ap->name, name);
-        -:   42:
-        8:   43:	ap->help = mymalloc((1 + strlen(help)) * sizeof(char));
-        8:   44:	if (ap->help == NULL) {
-    #####:   45:		args_param_cleanup(ap);
-    #####:   46:		return -1;
-        -:   47:	}
-        8:   48:	strcpy(ap->help, help);
-        -:   49:
-        8:   50:	ap->short_name = mymalloc((1 + strlen(short_name)) * sizeof(char));
-        8:   51:	if (ap->short_name == NULL) {
-    #####:   52:		args_param_cleanup(ap);
-    #####:   53:		return -1;
-        -:   54:	}
-        8:   55:	strcpy(ap->short_name, short_name);
-        -:   56:
-        8:   57:	ap->takes_value = takes_value;
-        8:   58:	ap->multiple = multiple;
-        -:   59:
-        8:   60:	if (default_value) {
-        5:   61:		ap->default_value = mymalloc((1 + strlen(default_value)) * sizeof(char));
-        5:   62:		if (ap->default_value == NULL) {
-    #####:   63:			args_param_cleanup(ap);
-    #####:   64:			return -1;
-        -:   65:		}
-        5:   66:		strcpy(ap->default_value, default_value);
-        -:   67:	} else
-        3:   68:		ap->default_value = NULL;
-        -:   69:
-        8:   70:	return 0;
-        -:   71:}
-       15:   72:void args_param_cleanup(ArgsParam *ap) {
-       15:   73:	if (ap->name) {
-       15:   74:		myfree(ap->name);
-       15:   75:		ap->name = NULL;
-        -:   76:	}
-       15:   77:	if (ap->short_name) {
-       15:   78:		myfree(ap->short_name);
-       15:   79:		ap->short_name = NULL;
-        -:   80:	}
-       15:   81:	if (ap->help) {
-       15:   82:		myfree(ap->help);
-       15:   83:		ap->help = NULL;
-        -:   84:	}
-       15:   85:	if (ap->default_value) {
-       10:   86:		myfree(ap->default_value);
-       10:   87:		ap->default_value = NULL;
-        -:   88:	}
-       15:   89:}
-        7:   90:int sub_command_build(SubCommand *sc, char *name, char *help, u32 min_args, u32 max_args,
-        -:   91:					  char *arg_doc) {
-        7:   92:	if (name == NULL || help == NULL || min_args > max_args || arg_doc == NULL) {
-        2:   93:		errno = EINVAL;
-        2:   94:		return -1;
-        -:   95:	}
-        -:   96:
-        5:   97:	sc->name = NULL;
-        5:   98:	sc->help = NULL;
-        5:   99:	sc->arg_doc = NULL;
-        5:  100:	sc->params_count = 0;
-        -:  101:
-        5:  102:	sc->name = mymalloc((1 + strlen(name)) * sizeof(char));
-        5:  103:	if (sc->name == NULL) {
-    #####:  104:		sub_command_cleanup(sc);
-    #####:  105:		return -1;
-        -:  106:	}
-        5:  107:	strcpy(sc->name, name);
-        -:  108:
-        5:  109:	sc->help = mymalloc((1 + strlen(help)) * sizeof(char));
-        5:  110:	if (sc->help == NULL) {
-    #####:  111:		sub_command_cleanup(sc);
-    #####:  112:		return -1;
-        -:  113:	}
-        5:  114:	strcpy(sc->help, help);
-        -:  115:
-        5:  116:	sc->arg_doc = mymalloc((1 + strlen(arg_doc)) * sizeof(char));
-        5:  117:	if (sc->arg_doc == NULL) {
-    #####:  118:		sub_command_cleanup(sc);
-    #####:  119:		return -1;
-        -:  120:	}
-        5:  121:	strcpy(sc->arg_doc, arg_doc);
-        -:  122:
-        5:  123:	sc->min_args = min_args;
-        5:  124:	sc->max_args = max_args;
-        5:  125:	return 0;
-        -:  126:}
-        5:  127:void sub_command_cleanup(SubCommand *sc) {
-        5:  128:	if (sc->name) {
-        5:  129:		myfree(sc->name);
-        5:  130:		sc->name = NULL;
-        -:  131:	}
-        -:  132:
-        5:  133:	if (sc->help) {
-        5:  134:		myfree(sc->help);
-        5:  135:		sc->help = NULL;
-        -:  136:	}
-        -:  137:
-        5:  138:	if (sc->arg_doc) {
-        5:  139:		myfree(sc->arg_doc);
-        5:  140:		sc->arg_doc = NULL;
-        -:  141:	}
-        -:  142:
-        5:  143:	if (sc->params_count != 0) {
-       11:  144:		for (u64 i = 0; i < sc->params_count; i++) {
-        7:  145:			args_param_cleanup(&sc->params[i]);
-        -:  146:		}
-        -:  147:
-        4:  148:		myfree(sc->params);
-        4:  149:		myfree(sc->params_state);
-        4:  150:		sc->params = NULL;
-        4:  151:		sc->params_state = NULL;
-        4:  152:		sc->params_count = 0;
-        -:  153:	}
-        5:  154:}
-        7:  155:int sub_command_add_param(SubCommand *sc, ArgsParam *ap) {
-        7:  156:	if (ap->name == NULL || ap->help == NULL || ap->short_name == NULL) {
-    #####:  157:		errno = EINVAL;
-    #####:  158:		return -1;
-        -:  159:	}
-        7:  160:	if (sc->params_count == 0) {
-        4:  161:		sc->params = mymalloc(sizeof(ArgsParam));
-        4:  162:		sc->params_state = mymalloc(sizeof(ArgsParamState));
-        -:  163:
-        4:  164:		if (sc->params == NULL || sc->params_state == NULL) {
-        -:  165:
-    #####:  166:			sub_command_cleanup(sc);
-    #####:  167:			return -1;
-        -:  168:		}
-        4:  169:		sc->params_count = 1;
-        -:  170:	} else {
-        3:  171:		sc->params_count += 1;
-        3:  172:		void *tmp1 = myrealloc(sc->params, sizeof(ArgsParam) * sc->params_count);
-        3:  173:		void *tmp2 = myrealloc(sc->params_state, sizeof(ArgsParamState) * sc->params_count);
-        -:  174:
-        3:  175:		sc->params = tmp1;
-        3:  176:		sc->params_state = tmp2;
-        -:  177:	}
-        7:  178:	u64 index = sc->params_count - 1;
+        -:   21:	bool multiple, char *default_value)
+        -:   22:{
+        8:   23:	if (ap == NULL || name == NULL || help == NULL || short_name == NULL) {
+    #####:   24:		errno = EINVAL;
+    #####:   25:		return -1;
+        -:   26:	}
+        -:   27:
+        8:   28:	if (strlen(short_name) > strlen(name)) {
+    #####:   29:		fprintf(stderr, "short_name cannot be longer than name\n");
+    #####:   30:		return -1;
+        -:   31:	}
+        -:   32:
+        8:   33:	ap->name = NULL;
+        8:   34:	ap->help = NULL;
+        8:   35:	ap->short_name = NULL;
+        8:   36:	ap->default_value = NULL;
+        -:   37:
+        8:   38:	ap->name = mymalloc((1 + strlen(name)) * sizeof(char));
+        8:   39:	if (ap->name == NULL) {
+    #####:   40:		return -1;
+        -:   41:	}
+        8:   42:	strcpy(ap->name, name);
+        -:   43:
+        8:   44:	ap->help = mymalloc((1 + strlen(help)) * sizeof(char));
+        8:   45:	if (ap->help == NULL) {
+    #####:   46:		args_param_cleanup(ap);
+    #####:   47:		return -1;
+        -:   48:	}
+        8:   49:	strcpy(ap->help, help);
+        -:   50:
+        8:   51:	ap->short_name = mymalloc((1 + strlen(short_name)) * sizeof(char));
+        8:   52:	if (ap->short_name == NULL) {
+    #####:   53:		args_param_cleanup(ap);
+    #####:   54:		return -1;
+        -:   55:	}
+        8:   56:	strcpy(ap->short_name, short_name);
+        -:   57:
+        8:   58:	ap->takes_value = takes_value;
+        8:   59:	ap->multiple = multiple;
+        -:   60:
+        8:   61:	if (default_value) {
+        5:   62:		ap->default_value = mymalloc((1 + strlen(default_value)) * sizeof(char));
+        5:   63:		if (ap->default_value == NULL) {
+    #####:   64:			args_param_cleanup(ap);
+    #####:   65:			return -1;
+        -:   66:		}
+        5:   67:		strcpy(ap->default_value, default_value);
+        -:   68:	} else
+        3:   69:		ap->default_value = NULL;
+        -:   70:
+        8:   71:	return 0;
+        -:   72:}
+       15:   73:void args_param_cleanup(ArgsParam *ap)
+        -:   74:{
+       15:   75:	if (ap->name) {
+       15:   76:		myfree(ap->name);
+       15:   77:		ap->name = NULL;
+        -:   78:	}
+       15:   79:	if (ap->short_name) {
+       15:   80:		myfree(ap->short_name);
+       15:   81:		ap->short_name = NULL;
+        -:   82:	}
+       15:   83:	if (ap->help) {
+       15:   84:		myfree(ap->help);
+       15:   85:		ap->help = NULL;
+        -:   86:	}
+       15:   87:	if (ap->default_value) {
+       10:   88:		myfree(ap->default_value);
+       10:   89:		ap->default_value = NULL;
+        -:   90:	}
+       15:   91:}
+        7:   92:int sub_command_build(
+        -:   93:	SubCommand *sc, char *name, char *help, u32 min_args, u32 max_args, char *arg_doc)
+        -:   94:{
+        7:   95:	if (name == NULL || help == NULL || min_args > max_args || arg_doc == NULL) {
+        2:   96:		errno = EINVAL;
+        2:   97:		return -1;
+        -:   98:	}
+        -:   99:
+        5:  100:	sc->name = NULL;
+        5:  101:	sc->help = NULL;
+        5:  102:	sc->arg_doc = NULL;
+        5:  103:	sc->params_count = 0;
+        -:  104:
+        5:  105:	sc->name = mymalloc((1 + strlen(name)) * sizeof(char));
+        5:  106:	if (sc->name == NULL) {
+    #####:  107:		sub_command_cleanup(sc);
+    #####:  108:		return -1;
+        -:  109:	}
+        5:  110:	strcpy(sc->name, name);
+        -:  111:
+        5:  112:	sc->help = mymalloc((1 + strlen(help)) * sizeof(char));
+        5:  113:	if (sc->help == NULL) {
+    #####:  114:		sub_command_cleanup(sc);
+    #####:  115:		return -1;
+        -:  116:	}
+        5:  117:	strcpy(sc->help, help);
+        -:  118:
+        5:  119:	sc->arg_doc = mymalloc((1 + strlen(arg_doc)) * sizeof(char));
+        5:  120:	if (sc->arg_doc == NULL) {
+    #####:  121:		sub_command_cleanup(sc);
+    #####:  122:		return -1;
+        -:  123:	}
+        5:  124:	strcpy(sc->arg_doc, arg_doc);
+        -:  125:
+        5:  126:	sc->min_args = min_args;
+        5:  127:	sc->max_args = max_args;
+        5:  128:	return 0;
+        -:  129:}
+        5:  130:void sub_command_cleanup(SubCommand *sc)
+        -:  131:{
+        5:  132:	if (sc->name) {
+        5:  133:		myfree(sc->name);
+        5:  134:		sc->name = NULL;
+        -:  135:	}
+        -:  136:
+        5:  137:	if (sc->help) {
+        5:  138:		myfree(sc->help);
+        5:  139:		sc->help = NULL;
+        -:  140:	}
+        -:  141:
+        5:  142:	if (sc->arg_doc) {
+        5:  143:		myfree(sc->arg_doc);
+        5:  144:		sc->arg_doc = NULL;
+        -:  145:	}
+        -:  146:
+        5:  147:	if (sc->params_count != 0) {
+       11:  148:		for (u64 i = 0; i < sc->params_count; i++) {
+        7:  149:			args_param_cleanup(&sc->params[i]);
+        -:  150:		}
+        -:  151:
+        4:  152:		myfree(sc->params);
+        4:  153:		myfree(sc->params_state);
+        4:  154:		sc->params = NULL;
+        4:  155:		sc->params_state = NULL;
+        4:  156:		sc->params_count = 0;
+        -:  157:	}
+        5:  158:}
+        7:  159:int sub_command_add_param(SubCommand *sc, ArgsParam *ap)
+        -:  160:{
+        7:  161:	if (ap->name == NULL || ap->help == NULL || ap->short_name == NULL) {
+    #####:  162:		errno = EINVAL;
+    #####:  163:		return -1;
+        -:  164:	}
+        7:  165:	if (sc->params_count == 0) {
+        4:  166:		sc->params = mymalloc(sizeof(ArgsParam));
+        4:  167:		sc->params_state = mymalloc(sizeof(ArgsParamState));
+        -:  168:
+        4:  169:		if (sc->params == NULL || sc->params_state == NULL) {
+        -:  170:
+    #####:  171:			sub_command_cleanup(sc);
+    #####:  172:			return -1;
+        -:  173:		}
+        4:  174:		sc->params_count = 1;
+        -:  175:	} else {
+        3:  176:		sc->params_count += 1;
+        3:  177:		void *tmp1 = myrealloc(sc->params, sizeof(ArgsParam) * sc->params_count);
+        3:  178:		void *tmp2 = myrealloc(sc->params_state, sizeof(ArgsParamState) * sc->params_count);
         -:  179:
-        7:  180:	sc->params[index].name = mymalloc((strlen(ap->name) + 1) * sizeof(char));
-        7:  181:	strcpy(sc->params[index].name, ap->name);
-        -:  182:
-        7:  183:	sc->params[index].help = mymalloc((strlen(ap->help) + 1) * sizeof(char));
-        7:  184:	strcpy(sc->params[index].help, ap->help);
-        -:  185:
-        7:  186:	sc->params[index].short_name = mymalloc((strlen(ap->short_name) + 1) * sizeof(char));
-        7:  187:	strcpy(sc->params[index].short_name, ap->short_name);
-        -:  188:
-        7:  189:	sc->params[index].takes_value = ap->takes_value;
-        7:  190:	sc->params[index].multiple = ap->multiple;
-        -:  191:
-        7:  192:	if (ap->default_value) {
-        5:  193:		sc->params[index].default_value = mymalloc((strlen(ap->default_value) + 1) * sizeof(char));
-        5:  194:		if (sc->params[index].default_value == NULL) {
-    #####:  195:			sub_command_cleanup(sc);
-    #####:  196:			return -1;
-        -:  197:		}
-        5:  198:		strcpy(sc->params[index].default_value, ap->default_value);
-        -:  199:	} else {
-        2:  200:		sc->params[index].default_value = NULL;
-        -:  201:	}
-        -:  202:
-        7:  203:	sc->params_state[index].specified = false;
-        -:  204:
-        7:  205:	if (sc->params[index].name == NULL || sc->params[index].help == NULL ||
-        7:  206:		sc->params[index].short_name == NULL) {
-    #####:  207:		sub_command_cleanup(sc);
-    #####:  208:		return -1;
-        -:  209:	}
-        -:  210:
-        7:  211:	return 0;
-        -:  212:}
-        -:  213:
-        1:  214:int args_build(Args *args, char *prog, char *version, char *author, u32 min_args, u32 max_args,
-        -:  215:			   u64 debug_flags) {
-       1*:  216:	if (prog == NULL && version == NULL && author == NULL) {
-    #####:  217:		errno = EINVAL;
-    #####:  218:		return -1;
-        -:  219:	}
-        1:  220:	args->subs_count = 0;
-        1:  221:	args->argc = 0;
-        1:  222:	args->debug_flags = debug_flags;
-        -:  223:
-        1:  224:	args->prog = mymalloc(sizeof(char) * (1 + strlen(prog)));
-        1:  225:	args->version = mymalloc(sizeof(char) * (1 + strlen(version)));
-        1:  226:	args->author = mymalloc(sizeof(char) * (1 + strlen(author)));
-        -:  227:
-        1:  228:	if (args->prog == NULL || args->version == NULL || args->author == NULL) {
-    #####:  229:		args_cleanup(args);
-    #####:  230:		return -1;
-        -:  231:	}
-        1:  232:	strcpy(args->prog, prog);
-        1:  233:	strcpy(args->version, version);
-        1:  234:	strcpy(args->author, author);
-        -:  235:
-        -:  236:	// first subcommand is our params
-        -:  237:	SubCommand sc;
-        1:  238:	sub_command_build(&sc, "", "", min_args, max_args, "");
-        1:  239:	args_add_sub_command(args, &sc);
-        1:  240:	sub_command_cleanup(&sc);
+        3:  180:		sc->params = tmp1;
+        3:  181:		sc->params_state = tmp2;
+        -:  182:	}
+        7:  183:	u64 index = sc->params_count - 1;
+        -:  184:
+        7:  185:	sc->params[index].name = mymalloc((strlen(ap->name) + 1) * sizeof(char));
+        7:  186:	strcpy(sc->params[index].name, ap->name);
+        -:  187:
+        7:  188:	sc->params[index].help = mymalloc((strlen(ap->help) + 1) * sizeof(char));
+        7:  189:	strcpy(sc->params[index].help, ap->help);
+        -:  190:
+        7:  191:	sc->params[index].short_name = mymalloc((strlen(ap->short_name) + 1) * sizeof(char));
+        7:  192:	strcpy(sc->params[index].short_name, ap->short_name);
+        -:  193:
+        7:  194:	sc->params[index].takes_value = ap->takes_value;
+        7:  195:	sc->params[index].multiple = ap->multiple;
+        -:  196:
+        7:  197:	if (ap->default_value) {
+        5:  198:		sc->params[index].default_value = mymalloc((strlen(ap->default_value) + 1) * sizeof(char));
+        5:  199:		if (sc->params[index].default_value == NULL) {
+    #####:  200:			sub_command_cleanup(sc);
+    #####:  201:			return -1;
+        -:  202:		}
+        5:  203:		strcpy(sc->params[index].default_value, ap->default_value);
+        -:  204:	} else {
+        2:  205:		sc->params[index].default_value = NULL;
+        -:  206:	}
+        -:  207:
+        7:  208:	sc->params_state[index].specified = false;
+        -:  209:
+        7:  210:	if (sc->params[index].name == NULL || sc->params[index].help == NULL
+        7:  211:		|| sc->params[index].short_name == NULL) {
+    #####:  212:		sub_command_cleanup(sc);
+    #####:  213:		return -1;
+        -:  214:	}
+        -:  215:
+        7:  216:	return 0;
+        -:  217:}
+        -:  218:
+        1:  219:int args_build(Args *args, char *prog, char *version, char *author, u32 min_args, u32 max_args,
+        -:  220:	u64 debug_flags)
+        -:  221:{
+       1*:  222:	if (prog == NULL && version == NULL && author == NULL) {
+    #####:  223:		errno = EINVAL;
+    #####:  224:		return -1;
+        -:  225:	}
+        1:  226:	args->subs_count = 0;
+        1:  227:	args->argc = 0;
+        1:  228:	args->debug_flags = debug_flags;
+        -:  229:
+        1:  230:	args->prog = mymalloc(sizeof(char) * (1 + strlen(prog)));
+        1:  231:	args->version = mymalloc(sizeof(char) * (1 + strlen(version)));
+        1:  232:	args->author = mymalloc(sizeof(char) * (1 + strlen(author)));
+        -:  233:
+        1:  234:	if (args->prog == NULL || args->version == NULL || args->author == NULL) {
+    #####:  235:		args_cleanup(args);
+    #####:  236:		return -1;
+        -:  237:	}
+        1:  238:	strcpy(args->prog, prog);
+        1:  239:	strcpy(args->version, version);
+        1:  240:	strcpy(args->author, author);
         -:  241:
-        1:  242:	return 0;
-        -:  243:}
-        -:  244:
-        1:  245:void args_cleanup(Args *args) {
-        1:  246:	if (args->argc) {
-        3:  247:		for (u64 i = 0; i < args->argc; i++) {
-        2:  248:			myfree(args->argv[i]);
-        -:  249:		}
-        1:  250:		myfree(args->argv);
-        1:  251:		args->argc = 0;
-        -:  252:	}
-        -:  253:
-        1:  254:	if (args->prog) {
-        1:  255:		myfree(args->prog);
-        1:  256:		args->prog = NULL;
-        -:  257:	}
-        -:  258:
-        1:  259:	if (args->author) {
-        1:  260:		myfree(args->author);
-        1:  261:		args->author = NULL;
-        -:  262:	}
-        -:  263:
-        1:  264:	if (args->version) {
-        1:  265:		myfree(args->version);
-        1:  266:		args->version = NULL;
-        -:  267:	}
-        -:  268:
-        1:  269:	if (args->subs_count) {
-        3:  270:		for (u64 i = 0; i < args->subs_count; i++) {
-        2:  271:			sub_command_cleanup(args->subs[i]);
-        2:  272:			myfree(args->subs[i]);
-        -:  273:		}
-        -:  274:
-        1:  275:		myfree(args->subs);
-        -:  276:	}
-        1:  277:}
-        2:  278:int args_add_param(Args *args, ArgsParam *ap) {
-        2:  279:	return sub_command_add_param(args->subs[0], ap);
-        -:  280:}
+        -:  242:	// first subcommand is our params
+        -:  243:	SubCommand sc;
+        1:  244:	sub_command_build(&sc, "", "", min_args, max_args, "");
+        1:  245:	args_add_sub_command(args, &sc);
+        1:  246:	sub_command_cleanup(&sc);
+        -:  247:
+        1:  248:	return 0;
+        -:  249:}
+        -:  250:
+        1:  251:void args_cleanup(Args *args)
+        -:  252:{
+        1:  253:	if (args->argc) {
+        3:  254:		for (u64 i = 0; i < args->argc; i++) {
+        2:  255:			myfree(args->argv[i]);
+        -:  256:		}
+        1:  257:		myfree(args->argv);
+        1:  258:		args->argc = 0;
+        -:  259:	}
+        -:  260:
+        1:  261:	if (args->prog) {
+        1:  262:		myfree(args->prog);
+        1:  263:		args->prog = NULL;
+        -:  264:	}
+        -:  265:
+        1:  266:	if (args->author) {
+        1:  267:		myfree(args->author);
+        1:  268:		args->author = NULL;
+        -:  269:	}
+        -:  270:
+        1:  271:	if (args->version) {
+        1:  272:		myfree(args->version);
+        1:  273:		args->version = NULL;
+        -:  274:	}
+        -:  275:
+        1:  276:	if (args->subs_count) {
+        3:  277:		for (u64 i = 0; i < args->subs_count; i++) {
+        2:  278:			sub_command_cleanup(args->subs[i]);
+        2:  279:			myfree(args->subs[i]);
+        -:  280:		}
         -:  281:
-        2:  282:int args_add_sub_command(Args *args, SubCommand *sc) {
-        2:  283:	if (args->subs_count == 0) {
-        1:  284:		args->subs = mymalloc(sizeof(SubCommand *));
-        1:  285:		if (args->subs == NULL) {
-    #####:  286:			fprintf(stderr, "add subcommand %s failed!\n", sc->name);
-    #####:  287:			return -1;
-        -:  288:		}
-        -:  289:	} else {
-        1:  290:		SubCommand **tmp = myrealloc(args->subs, sizeof(SubCommand *) * (1 + args->subs_count));
-        -:  291:
-        1:  292:		if (tmp == NULL) {
-    #####:  293:			fprintf(stderr, "add subcommand %s failed!\n", sc->name);
-    #####:  294:			return -1;
-        -:  295:		}
-        -:  296:
-        1:  297:		args->subs = tmp;
-        -:  298:	}
-        -:  299:
-        2:  300:	args->subs[args->subs_count] = mymalloc(sizeof(SubCommand));
-        2:  301:	if (args->subs[args->subs_count] == NULL) {
-    #####:  302:		fprintf(stderr, "add subcommand %s failed!\n", sc->name);
-    #####:  303:		return -1;
-        -:  304:	}
+        1:  282:		myfree(args->subs);
+        -:  283:	}
+        1:  284:}
+        2:  285:int args_add_param(Args *args, ArgsParam *ap)
+        -:  286:{
+        2:  287:	return sub_command_add_param(args->subs[0], ap);
+        -:  288:}
+        -:  289:
+        2:  290:int args_add_sub_command(Args *args, SubCommand *sc)
+        -:  291:{
+        2:  292:	if (args->subs_count == 0) {
+        1:  293:		args->subs = mymalloc(sizeof(SubCommand *));
+        1:  294:		if (args->subs == NULL) {
+    #####:  295:			fprintf(stderr, "add subcommand %s failed!\n", sc->name);
+    #####:  296:			return -1;
+        -:  297:		}
+        -:  298:	} else {
+        1:  299:		SubCommand **tmp = myrealloc(args->subs, sizeof(SubCommand *) * (1 + args->subs_count));
+        -:  300:
+        1:  301:		if (tmp == NULL) {
+    #####:  302:			fprintf(stderr, "add subcommand %s failed!\n", sc->name);
+    #####:  303:			return -1;
+        -:  304:		}
         -:  305:
-        2:  306:	if (sub_command_build(args->subs[args->subs_count], sc->name, sc->help, sc->min_args,
-        -:  307:						  sc->max_args, sc->arg_doc)) {
-    #####:  308:		fprintf(stderr, "add subcommand %s failed!\n", sc->name);
-    #####:  309:		myfree(args->subs[args->subs_count]);
-    #####:  310:		return -1;
-        -:  311:	}
-        3:  312:	for (u64 i = 0; i < sc->params_count; i++) {
-        1:  313:		if (sub_command_add_param(args->subs[args->subs_count], &sc->params[i])) {
-    #####:  314:			fprintf(stderr, "add param [%s] subcommand %s failed!\n", sc->params[i].name, sc->name);
-        -:  315:		}
-        -:  316:	}
-        -:  317:
-        2:  318:	args->subs_count += 1;
-        2:  319:	return 0;
-        -:  320:}
-        -:  321:
-    #####:  322:bool args_sub_takes_value(Args *args, u64 subi, char *name, bool is_short) {
-    #####:  323:	for (u64 i = 0; i < args->subs[subi]->params_count; i++) {
-    #####:  324:		if (is_short && !strcmp(name, args->subs[subi]->params[i].short_name)) {
-    #####:  325:			if (args->subs[subi]->params[i].takes_value) {
-    #####:  326:				return true;
-        -:  327:			} else
-    #####:  328:				break;
-    #####:  329:		} else if (!strcmp(name, args->subs[subi]->params[i].name)) {
-    #####:  330:			if (args->subs[subi]->params[i].takes_value) {
-    #####:  331:				return true;
-        -:  332:			} else
-    #####:  333:				break;
-        -:  334:		}
-        -:  335:	}
-    #####:  336:	return false;
-        -:  337:}
-        -:  338:
-    #####:  339:void args_exit_error(Args *args, char *format, ...) {
-        -:  340:	va_list va_args;
-    #####:  341:	va_start(va_args, format);
-    #####:  342:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
-    #####:  343:	vfprintf(stderr, format, va_args);
-    #####:  344:	fprintf(stderr, "\n\n");
-    #####:  345:	fprintf(stderr,
-        -:  346:			"%sUSAGE%s:\n    %s%s%s [%sOPTIONS%s]\n\nFor more information "
-        -:  347:			"try %s--help%s\n",
-        -:  348:			DIMMED, RESET, BRIGHT_RED, args->prog, RESET, DIMMED, RESET, GREEN, RESET);
-    #####:  349:	va_end(va_args);
-    #####:  350:	u64 debug_flags = args->debug_flags;
-    #####:  351:	if (!(debug_flags & DEBUG_INIT_NO_EXIT))
-    #####:  352:		exit(-1);
-    #####:  353:}
-        -:  354:
-    #####:  355:u64 args_subi_for(Args *args, char *sub) {
-    #####:  356:	u64 subi = 0;
-    #####:  357:	for (u64 i = 1; i < args->subs_count; i++) {
-    #####:  358:		if (!strcmp(sub, args->subs[i]->name)) {
-    #####:  359:			subi = i;
-        -:  360:		}
-        -:  361:	}
-    #####:  362:	return subi;
-        -:  363:}
-        -:  364:
-    #####:  365:bool args_check_option(Args *args, u64 subi, char *name, bool is_short, char *argv) {
-    #####:  366:	bool found = false;
-    #####:  367:	for (u64 j = 0; j < args->subs[subi]->params_count; j++) {
-    #####:  368:		bool multi = args->subs[subi]->params[j].multiple;
-    #####:  369:		if (is_short && !strcmp(args->subs[subi]->params[j].short_name, name)) {
-    #####:  370:			found = true;
-    #####:  371:			if (args->subs[subi]->params_state[j].specified && !multi)
-    #####:  372:				args_exit_error(args, "Option: %s was spsecified more than once ", argv);
-    #####:  373:			args->subs[subi]->params_state[j].specified = true;
-    #####:  374:			break;
-    #####:  375:		} else if (!is_short && !strcmp(args->subs[subi]->params[j].name, name)) {
-    #####:  376:			found = true;
-    #####:  377:			if (args->subs[subi]->params_state[j].specified && !multi)
-    #####:  378:				args_exit_error(args, "Option: %s was spsecified more than once ", argv);
-    #####:  379:			args->subs[subi]->params_state[j].specified = true;
-    #####:  380:			break;
-        -:  381:		}
-        -:  382:	}
-    #####:  383:	return found;
-        -:  384:}
-        -:  385:
-        1:  386:void args_check_validity(Args *args, int argc, char **argv) {
-        -:  387:	// check if there's a sub command and check arg count
-        1:  388:	char *sub = NULL;
-        1:  389:	u32 arg_count = 0;
-        1:  390:	u64 subi = 0;
-        1:  391:	u64 sub_arg = ULONG_MAX;
-        2:  392:	for (u64 i = 1; i < argc; i++) {
-        1:  393:		u64 len = strlen(argv[i]);
-       1*:  394:		if (len > 0 && argv[i][0] == '-') {
-    #####:  395:			char name[len];
-        -:  396:			bool is_short;
-    #####:  397:			bool found = false;
-    #####:  398:			if (len > 1 && args->argv[i][1] == '-') {
-    #####:  399:				strcpy(name, args->argv[i] + 2);
-    #####:  400:				is_short = false;
-        -:  401:			} else {
-    #####:  402:				strcpy(name, args->argv[i] + 1);
-    #####:  403:				is_short = true;
-        -:  404:			}
-    #####:  405:			if (args_sub_takes_value(args, subi, name, is_short)) {
-    #####:  406:				i += 1;
-        -:  407:			}
-        -:  408:		} else {
-        1:  409:			if (!sub && args->subs_count > 1) {
-    #####:  410:				sub = argv[i];
-    #####:  411:				sub_arg = i;
-    #####:  412:				subi = args_subi_for(args, sub);
-        -:  413:			} else
-        1:  414:				arg_count += 1;
-        -:  415:		}
-        -:  416:	}
-        -:  417:
-        1:  418:	u64 sub_index = 0;
-        -:  419:
-        1:  420:	if (sub) {
-        -:  421:		// there's a sub so validate it
-    #####:  422:		bool valid = false;
-    #####:  423:		for (u64 i = 1; i < args->subs_count; i++) {
-    #####:  424:			if (!strcmp(sub, args->subs[i]->name)) {
-    #####:  425:				valid = true;
-    #####:  426:				if (arg_count > args->subs[i]->max_args || arg_count < args->subs[i]->min_args) {
-    #####:  427:					args_exit_error(args,
-        -:  428:									"Incorrect number of "
-        -:  429:									"arguments for sub command '%s' "
-        -:  430:									"(%i specified). "
-        -:  431:									"Number of arguments must be "
-        -:  432:									"between %i and %i.",
-    #####:  433:									args->subs[i]->name, arg_count, args->subs[i]->min_args,
-    #####:  434:									args->subs[i]->max_args);
-        -:  435:				}
-    #####:  436:				sub_index = i;
-        -:  437:
-    #####:  438:				break;
-        -:  439:			}
-        -:  440:		}
-    #####:  441:		if (!valid) {
-    #####:  442:			args_exit_error(args, "Unknown SubCommand \"%s\"", sub);
-        -:  443:		}
-        1:  444:	} else if (args->subs_count > 1) {
-    #####:  445:		args_usage(args, NULL);
-        -:  446:	} else {
-        -:  447:		// check number of args
-        1:  448:		if (arg_count > args->subs[0]->max_args || arg_count < args->subs[0]->min_args) {
-    #####:  449:			args_exit_error(args,
-        -:  450:							"Incorrect number of arguments "
-        -:  451:							"(%i specified). "
-        -:  452:							"Number of arguments must be "
-        -:  453:							"between %i and %i.",
-    #####:  454:							arg_count, args->subs[0]->min_args, args->subs[0]->max_args);
-        -:  455:		}
-        -:  456:	}
-        -:  457:
-        -:  458:	// check options
-        2:  459:	for (u64 i = 1; i < argc; i++) {
-        -:  460:		u64 subi;
-        1:  461:		if (i <= sub_arg) {
-        1:  462:			subi = 0;
-        -:  463:		} else {
-    #####:  464:			subi = sub_index;
-        -:  465:		}
-        -:  466:
-        1:  467:		u64 len = strlen(argv[i]);
-       1*:  468:		if (len > 0 && argv[i][0] == '-') {
-        -:  469:			// option to check
-    #####:  470:			char name[len];
-        -:  471:			bool is_short;
-    #####:  472:			bool found = false;
-    #####:  473:			if (len > 1 && args->argv[i][1] == '-') {
-    #####:  474:				strcpy(name, args->argv[i] + 2);
-    #####:  475:				is_short = false;
-        -:  476:			} else {
-    #####:  477:				strcpy(name, args->argv[i] + 1);
-    #####:  478:				is_short = true;
-        -:  479:			}
+        1:  306:		args->subs = tmp;
+        -:  307:	}
+        -:  308:
+        2:  309:	args->subs[args->subs_count] = mymalloc(sizeof(SubCommand));
+        2:  310:	if (args->subs[args->subs_count] == NULL) {
+    #####:  311:		fprintf(stderr, "add subcommand %s failed!\n", sc->name);
+    #####:  312:		return -1;
+        -:  313:	}
+        -:  314:
+        2:  315:	if (sub_command_build(args->subs[args->subs_count], sc->name, sc->help, sc->min_args,
+        -:  316:			sc->max_args, sc->arg_doc)) {
+    #####:  317:		fprintf(stderr, "add subcommand %s failed!\n", sc->name);
+    #####:  318:		myfree(args->subs[args->subs_count]);
+    #####:  319:		return -1;
+        -:  320:	}
+        3:  321:	for (u64 i = 0; i < sc->params_count; i++) {
+        1:  322:		if (sub_command_add_param(args->subs[args->subs_count], &sc->params[i])) {
+    #####:  323:			fprintf(stderr, "add param [%s] subcommand %s failed!\n", sc->params[i].name, sc->name);
+        -:  324:		}
+        -:  325:	}
+        -:  326:
+        2:  327:	args->subs_count += 1;
+        2:  328:	return 0;
+        -:  329:}
+        -:  330:
+    #####:  331:bool args_sub_takes_value(Args *args, u64 subi, char *name, bool is_short)
+        -:  332:{
+    #####:  333:	for (u64 i = 0; i < args->subs[subi]->params_count; i++) {
+    #####:  334:		if (is_short && !strcmp(name, args->subs[subi]->params[i].short_name)) {
+    #####:  335:			if (args->subs[subi]->params[i].takes_value) {
+    #####:  336:				return true;
+        -:  337:			} else
+    #####:  338:				break;
+    #####:  339:		} else if (!strcmp(name, args->subs[subi]->params[i].name)) {
+    #####:  340:			if (args->subs[subi]->params[i].takes_value) {
+    #####:  341:				return true;
+        -:  342:			} else
+    #####:  343:				break;
+        -:  344:		}
+        -:  345:	}
+    #####:  346:	return false;
+        -:  347:}
+        -:  348:
+    #####:  349:void args_exit_error(Args *args, char *format, ...)
+        -:  350:{
+        -:  351:	va_list va_args;
+    #####:  352:	va_start(va_args, format);
+    #####:  353:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+    #####:  354:	vfprintf(stderr, format, va_args);
+    #####:  355:	fprintf(stderr, "\n\n");
+    #####:  356:	fprintf(stderr,
+        -:  357:		"%sUSAGE%s:\n    %s%s%s [%sOPTIONS%s]\n\nFor more information "
+        -:  358:		"try %s--help%s\n",
+        -:  359:		DIMMED, RESET, BRIGHT_RED, args->prog, RESET, DIMMED, RESET, GREEN, RESET);
+    #####:  360:	va_end(va_args);
+    #####:  361:	u64 debug_flags = args->debug_flags;
+    #####:  362:	if (!(debug_flags & DEBUG_INIT_NO_EXIT))
+    #####:  363:		exit(-1);
+    #####:  364:}
+        -:  365:
+    #####:  366:u64 args_subi_for(Args *args, char *sub)
+        -:  367:{
+    #####:  368:	u64 subi = 0;
+    #####:  369:	for (u64 i = 1; i < args->subs_count; i++) {
+    #####:  370:		if (!strcmp(sub, args->subs[i]->name)) {
+    #####:  371:			subi = i;
+        -:  372:		}
+        -:  373:	}
+    #####:  374:	return subi;
+        -:  375:}
+        -:  376:
+    #####:  377:bool args_check_option(Args *args, u64 subi, char *name, bool is_short, char *argv)
+        -:  378:{
+    #####:  379:	bool found = false;
+    #####:  380:	for (u64 j = 0; j < args->subs[subi]->params_count; j++) {
+    #####:  381:		bool multi = args->subs[subi]->params[j].multiple;
+    #####:  382:		if (is_short && !strcmp(args->subs[subi]->params[j].short_name, name)) {
+    #####:  383:			found = true;
+    #####:  384:			if (args->subs[subi]->params_state[j].specified && !multi)
+    #####:  385:				args_exit_error(args, "Option: %s was spsecified more than once ", argv);
+    #####:  386:			args->subs[subi]->params_state[j].specified = true;
+    #####:  387:			break;
+    #####:  388:		} else if (!is_short && !strcmp(args->subs[subi]->params[j].name, name)) {
+    #####:  389:			found = true;
+    #####:  390:			if (args->subs[subi]->params_state[j].specified && !multi)
+    #####:  391:				args_exit_error(args, "Option: %s was spsecified more than once ", argv);
+    #####:  392:			args->subs[subi]->params_state[j].specified = true;
+    #####:  393:			break;
+        -:  394:		}
+        -:  395:	}
+    #####:  396:	return found;
+        -:  397:}
+        -:  398:
+        1:  399:void args_check_validity(Args *args, int argc, char **argv)
+        -:  400:{
+        -:  401:	// check if there's a sub command and check arg count
+        1:  402:	char *sub = NULL;
+        1:  403:	u32 arg_count = 0;
+        1:  404:	u64 subi = 0;
+        1:  405:	u64 sub_arg = ULONG_MAX;
+        2:  406:	for (u64 i = 1; i < argc; i++) {
+        1:  407:		u64 len = strlen(argv[i]);
+       1*:  408:		if (len > 0 && argv[i][0] == '-') {
+    #####:  409:			char name[len];
+        -:  410:			bool is_short;
+    #####:  411:			bool found = false;
+    #####:  412:			if (len > 1 && args->argv[i][1] == '-') {
+    #####:  413:				strcpy(name, args->argv[i] + 2);
+    #####:  414:				is_short = false;
+        -:  415:			} else {
+    #####:  416:				strcpy(name, args->argv[i] + 1);
+    #####:  417:				is_short = true;
+        -:  418:			}
+    #####:  419:			if (args_sub_takes_value(args, subi, name, is_short)) {
+    #####:  420:				i += 1;
+        -:  421:			}
+        -:  422:		} else {
+        1:  423:			if (!sub && args->subs_count > 1) {
+    #####:  424:				sub = argv[i];
+    #####:  425:				sub_arg = i;
+    #####:  426:				subi = args_subi_for(args, sub);
+        -:  427:			} else
+        1:  428:				arg_count += 1;
+        -:  429:		}
+        -:  430:	}
+        -:  431:
+        1:  432:	u64 sub_index = 0;
+        -:  433:
+        1:  434:	if (sub) {
+        -:  435:		// there's a sub so validate it
+    #####:  436:		bool valid = false;
+    #####:  437:		for (u64 i = 1; i < args->subs_count; i++) {
+    #####:  438:			if (!strcmp(sub, args->subs[i]->name)) {
+    #####:  439:				valid = true;
+    #####:  440:				if (arg_count > args->subs[i]->max_args || arg_count < args->subs[i]->min_args) {
+    #####:  441:					args_exit_error(args,
+        -:  442:						"Incorrect number of "
+        -:  443:						"arguments for sub command '%s' "
+        -:  444:						"(%i specified). "
+        -:  445:						"Number of arguments must be "
+        -:  446:						"between %i and %i.",
+    #####:  447:						args->subs[i]->name, arg_count, args->subs[i]->min_args,
+    #####:  448:						args->subs[i]->max_args);
+        -:  449:				}
+    #####:  450:				sub_index = i;
+        -:  451:
+    #####:  452:				break;
+        -:  453:			}
+        -:  454:		}
+    #####:  455:		if (!valid) {
+    #####:  456:			args_exit_error(args, "Unknown SubCommand \"%s\"", sub);
+        -:  457:		}
+        1:  458:	} else if (args->subs_count > 1) {
+    #####:  459:		args_usage(args, NULL);
+        -:  460:	} else {
+        -:  461:		// check number of args
+        1:  462:		if (arg_count > args->subs[0]->max_args || arg_count < args->subs[0]->min_args) {
+    #####:  463:			args_exit_error(args,
+        -:  464:				"Incorrect number of arguments "
+        -:  465:				"(%i specified). "
+        -:  466:				"Number of arguments must be "
+        -:  467:				"between %i and %i.",
+    #####:  468:				arg_count, args->subs[0]->min_args, args->subs[0]->max_args);
+        -:  469:		}
+        -:  470:	}
+        -:  471:
+        -:  472:	// check options
+        2:  473:	for (u64 i = 1; i < argc; i++) {
+        -:  474:		u64 subi;
+        1:  475:		if (i <= sub_arg) {
+        1:  476:			subi = 0;
+        -:  477:		} else {
+    #####:  478:			subi = sub_index;
+        -:  479:		}
         -:  480:
-    #####:  481:			found = args_check_option(args, subi, name, is_short, argv[i]);
-    #####:  482:			if (args_sub_takes_value(args, subi, name, is_short)) {
-    #####:  483:				i += 1;
-        -:  484:			}
-    #####:  485:			if (!found) {
-    #####:  486:				if (subi == 0) {
-    #####:  487:					args_exit_error(args, "Unknown option: %s", argv[i]);
-        -:  488:				} else {
-    #####:  489:					args_exit_error(args,
-        -:  490:									"Unknown option: %s. Not valid for "
-        -:  491:									"SubCommand \"%s\".",
-    #####:  492:									argv[i], args->subs[subi]->name);
-        -:  493:				}
-        -:  494:			}
-        -:  495:		}
-        -:  496:	}
-        1:  497:}
-        -:  498:
-        1:  499:int args_init(Args *args, int argc, char **argv) {
-        1:  500:	args->argc = argc;
-        1:  501:	args->argv = mymalloc(sizeof(char *) * argc);
-        -:  502:
-        1:  503:	if (args->argv == NULL) {
-    #####:  504:		args->argc = 0;
-    #####:  505:		return -1;
-        -:  506:	}
-        -:  507:
-        3:  508:	for (u64 i = 0; i < argc; i++) {
-        2:  509:		args->argv[i] = mymalloc(sizeof(char) * (strlen(argv[i]) + 1));
-        2:  510:		if (args->argv[i]) {
-        2:  511:			strcpy(args->argv[i], argv[i]);
-        -:  512:		} else {
-    #####:  513:			for (u64 j = i - 1; j >= 0; j--) {
-    #####:  514:				myfree(args->argv[j]);
-        -:  515:			}
-        -:  516:			myfree(args->argv);
-        -:  517:			args->argc = 0;
-        -:  518:			return -1;
-        -:  519:		}
-        -:  520:	}
-        -:  521:
-        2:  522:	for (u64 i = 1; i < argc; i++) {
-        1:  523:		if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-V")) {
-    #####:  524:			args_print_version(args);
-        -:  525:		}
-        1:  526:		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
-    #####:  527:			char *sub = NULL;
-    #####:  528:			for (u64 j = 1; j < i; j++) {
-    #####:  529:				u64 len = strlen(argv[j]);
-    #####:  530:				if (len > 0) {
-    #####:  531:					if (argv[j][0] != '-') {
-    #####:  532:						sub = argv[j];
-    #####:  533:						break;
-    #####:  534:					} else {
-    #####:  535:						char name[len];
-        -:  536:						bool is_short;
-    #####:  537:						if (len > 1 && args->argv[j][1] == '-') {
-    #####:  538:							strcpy(name, args->argv[j] + 2);
-    #####:  539:							is_short = false;
-        -:  540:						} else {
-    #####:  541:							strcpy(name, args->argv[j] + 1);
-    #####:  542:							is_short = true;
-        -:  543:						}
-        -:  544:
-    #####:  545:						u64 subi = 0;
-    #####:  546:						if (sub)
-    #####:  547:							subi = args_subi_for(args, sub);
-        -:  548:
-    #####:  549:						if (args_sub_takes_value(args, subi, name, is_short)) {
-    #####:  550:							j += 1;
-        -:  551:						}
-        -:  552:					}
-        -:  553:				}
-        -:  554:			}
-    #####:  555:			args_usage(args, sub);
-        -:  556:		}
-        -:  557:	}
-        -:  558:
-        1:  559:	args_check_validity(args, argc, argv);
-        -:  560:
-        1:  561:	return 0;
-        -:  562:}
+        1:  481:		u64 len = strlen(argv[i]);
+       1*:  482:		if (len > 0 && argv[i][0] == '-') {
+        -:  483:			// option to check
+    #####:  484:			char name[len];
+        -:  485:			bool is_short;
+    #####:  486:			bool found = false;
+    #####:  487:			if (len > 1 && args->argv[i][1] == '-') {
+    #####:  488:				strcpy(name, args->argv[i] + 2);
+    #####:  489:				is_short = false;
+        -:  490:			} else {
+    #####:  491:				strcpy(name, args->argv[i] + 1);
+    #####:  492:				is_short = true;
+        -:  493:			}
+        -:  494:
+    #####:  495:			found = args_check_option(args, subi, name, is_short, argv[i]);
+    #####:  496:			if (args_sub_takes_value(args, subi, name, is_short)) {
+    #####:  497:				i += 1;
+        -:  498:			}
+    #####:  499:			if (!found) {
+    #####:  500:				if (subi == 0) {
+    #####:  501:					args_exit_error(args, "Unknown option: %s", argv[i]);
+        -:  502:				} else {
+    #####:  503:					args_exit_error(args,
+        -:  504:						"Unknown option: %s. Not valid for "
+        -:  505:						"SubCommand \"%s\".",
+    #####:  506:						argv[i], args->subs[subi]->name);
+        -:  507:				}
+        -:  508:			}
+        -:  509:		}
+        -:  510:	}
+        1:  511:}
+        -:  512:
+        1:  513:int args_init(Args *args, int argc, char **argv)
+        -:  514:{
+        1:  515:	args->argc = argc;
+        1:  516:	args->argv = mymalloc(sizeof(char *) * argc);
+        -:  517:
+        1:  518:	if (args->argv == NULL) {
+    #####:  519:		args->argc = 0;
+    #####:  520:		return -1;
+        -:  521:	}
+        -:  522:
+        3:  523:	for (u64 i = 0; i < argc; i++) {
+        2:  524:		args->argv[i] = mymalloc(sizeof(char) * (strlen(argv[i]) + 1));
+        2:  525:		if (args->argv[i]) {
+        2:  526:			strcpy(args->argv[i], argv[i]);
+        -:  527:		} else {
+    #####:  528:			for (u64 j = i - 1; j >= 0; j--) {
+    #####:  529:				myfree(args->argv[j]);
+        -:  530:			}
+        -:  531:			myfree(args->argv);
+        -:  532:			args->argc = 0;
+        -:  533:			return -1;
+        -:  534:		}
+        -:  535:	}
+        -:  536:
+        2:  537:	for (u64 i = 1; i < argc; i++) {
+        1:  538:		if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-V")) {
+    #####:  539:			args_print_version(args);
+        -:  540:		}
+        1:  541:		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
+    #####:  542:			char *sub = NULL;
+    #####:  543:			for (u64 j = 1; j < i; j++) {
+    #####:  544:				u64 len = strlen(argv[j]);
+    #####:  545:				if (len > 0) {
+    #####:  546:					if (argv[j][0] != '-') {
+    #####:  547:						sub = argv[j];
+    #####:  548:						break;
+    #####:  549:					} else {
+    #####:  550:						char name[len];
+        -:  551:						bool is_short;
+    #####:  552:						if (len > 1 && args->argv[j][1] == '-') {
+    #####:  553:							strcpy(name, args->argv[j] + 2);
+    #####:  554:							is_short = false;
+        -:  555:						} else {
+    #####:  556:							strcpy(name, args->argv[j] + 1);
+    #####:  557:							is_short = true;
+        -:  558:						}
+        -:  559:
+    #####:  560:						u64 subi = 0;
+    #####:  561:						if (sub)
+    #####:  562:							subi = args_subi_for(args, sub);
         -:  563:
-    #####:  564:int args_value_of(Args *args, char *param_name, char *value_buf, u64 max_value_len, u64 index) {
-    #####:  565:	if (args == NULL || param_name == NULL) {
-    #####:  566:		errno = EINVAL;
-    #####:  567:		return -1;
-        -:  568:	}
-        -:  569:
-    #####:  570:	char param_name_buf[strlen(param_name) + 3];
-    #####:  571:	strcpy(param_name_buf, "--");
-    #####:  572:	strcat(param_name_buf, param_name);
+    #####:  564:						if (args_sub_takes_value(args, subi, name, is_short)) {
+    #####:  565:							j += 1;
+        -:  566:						}
+        -:  567:					}
+        -:  568:				}
+        -:  569:			}
+    #####:  570:			args_usage(args, sub);
+        -:  571:		}
+        -:  572:	}
         -:  573:
-    #####:  574:	char short_name_buf[strlen(param_name) + 3];
-    #####:  575:	strcpy(short_name_buf, "-");
-    #####:  576:	bool found = false;
-    #####:  577:	char *default_value = NULL;
-    #####:  578:	bool takes_value = false;
-    #####:  579:	for (u64 i = 0; i < args->subs_count; i++) {
-    #####:  580:		for (u64 j = 0; j < args->subs[i]->params_count; j++) {
-    #####:  581:			if (!strcmp(args->subs[i]->params[j].name, param_name)) {
-    #####:  582:				found = true;
-    #####:  583:				strcat(short_name_buf, args->subs[i]->params[j].short_name);
-    #####:  584:				default_value = args->subs[i]->params[j].default_value;
-    #####:  585:				takes_value = args->subs[i]->params[j].takes_value;
-        -:  586:			}
-        -:  587:		}
-        -:  588:	}
+        1:  574:	args_check_validity(args, argc, argv);
+        -:  575:
+        1:  576:	return 0;
+        -:  577:}
+        -:  578:
+    #####:  579:int args_value_of(Args *args, char *param_name, char *value_buf, u64 max_value_len, u64 index)
+    #####:  580:{
+    #####:  581:	if (args == NULL || param_name == NULL) {
+    #####:  582:		errno = EINVAL;
+    #####:  583:		return -1;
+        -:  584:	}
+        -:  585:
+    #####:  586:	char param_name_buf[strlen(param_name) + 3];
+    #####:  587:	strcpy(param_name_buf, "--");
+    #####:  588:	strcat(param_name_buf, param_name);
         -:  589:
-    #####:  590:	if (!found) {
-    #####:  591:		errno = ENOENT;
-    #####:  592:		return -1;
-        -:  593:	}
-    #####:  594:	u64 itt_index = 0;
-    #####:  595:	for (u64 i = 1; i < args->argc; i++) {
-    #####:  596:		if (!strcmp(args->argv[i], param_name_buf) || !strcmp(args->argv[i], short_name_buf)) {
-    #####:  597:			if (itt_index == index) {
-    #####:  598:				if (takes_value && i + 1 < args->argc) {
-    #####:  599:					return snprintf(value_buf, max_value_len, "%s", args->argv[i + 1]);
-    #####:  600:				} else if (takes_value && max_value_len > 1) {
-    #####:  601:					strcpy(value_buf, "");
-    #####:  602:					return 0;
-        -:  603:				} else {
-    #####:  604:					return 0;
-        -:  605:				}
-        -:  606:			} else {
-    #####:  607:				itt_index += 1;
-        -:  608:			}
-        -:  609:		}
-        -:  610:	}
-        -:  611:
-    #####:  612:	if (default_value != NULL && index == 0) {
-    #####:  613:		return snprintf(value_buf, max_value_len, "%s", default_value);
-        -:  614:	}
-        -:  615:
-    #####:  616:	errno = ENOENT;
-    #####:  617:	return -1;
-        -:  618:}
-    #####:  619:int args_get_argument(Args *args, u64 index, char *value_buf, u64 max_value_len) {
-    #####:  620:	u64 index_itt = 0;
-    #####:  621:	for (u64 i = 1; i < args->argc; i++) {
-    #####:  622:		i32 len = strlen(args->argv[i]);
-    #####:  623:		if (len > 1 && args->argv[i][0] == '-') {
-    #####:  624:			char name[len];
-        -:  625:			bool is_short;
-    #####:  626:			bool found = false;
-    #####:  627:			if (len > 1 && args->argv[i][1] == '-') {
-    #####:  628:				strcpy(name, args->argv[i] + 2);
-    #####:  629:				is_short = false;
-        -:  630:			} else {
-    #####:  631:				strcpy(name, args->argv[i] + 1);
-    #####:  632:				is_short = true;
-        -:  633:			}
-        -:  634:
-    #####:  635:			for (u64 k = 0; k < args->subs_count; k++) {
-    #####:  636:				for (u64 j = 0; j < args->subs[k]->params_count; j++) {
-    #####:  637:					if (is_short && !strcmp(name, args->subs[k]->params[j].short_name)) {
-    #####:  638:						if (args->subs[k]->params[j].takes_value) {
-    #####:  639:							i += 1;
-    #####:  640:							found = true;
-    #####:  641:							break;
-        -:  642:						}
-    #####:  643:					} else if (!strcmp(name, args->subs[k]->params[j].name)) {
-    #####:  644:						if (args->subs[k]->params[j].takes_value) {
-    #####:  645:							i += 1;
-    #####:  646:							found = true;
-    #####:  647:							break;
-        -:  648:						}
-        -:  649:					}
-        -:  650:				}
-        -:  651:			}
-        -:  652:		} else {
-    #####:  653:			if (index_itt == index) {
-    #####:  654:				snprintf(value_buf, max_value_len, "%s", args->argv[i]);
-    #####:  655:				return 1;
-        -:  656:			}
-    #####:  657:			index_itt += 1;
-        -:  658:		}
-        -:  659:	}
-    #####:  660:	return 0;
-        -:  661:}
-        -:  662:
-    #####:  663:void args_print_version(Args *args) {
-    #####:  664:	char *prog = args->prog;
-    #####:  665:	char *version = args->version;
-    #####:  666:	fprintf(stderr, "%s%s%s %s%s%s\n", BRIGHT_RED, prog, RESET, CYAN, version, RESET);
-    #####:  667:	exit(0);
-        -:  668:}
-        -:  669:
-    #####:  670:void args_usage(Args *args, char *sub_command) {
-    #####:  671:	bool found = false;
-    #####:  672:	u64 subs_count = args->subs_count;
-    #####:  673:	u64 sub_index = 0;
-        -:  674:
-    #####:  675:	if (sub_command) {
-    #####:  676:		for (u64 i = 1; i < subs_count; i++) {
-    #####:  677:			char *name = args->subs[i]->name;
-    #####:  678:			if (!strcmp(name, sub_command)) {
-    #####:  679:				sub_index = i;
-    #####:  680:				found = true;
-        -:  681:			}
-        -:  682:		}
-        -:  683:	} else // general help displayed
-    #####:  684:		found = true;
-        -:  685:
-    #####:  686:	if (!found) {
-    #####:  687:		args_exit_error(args, "Unknown SubCommand \"%s\"", sub_command);
-        -:  688:	}
-        -:  689:
-    #####:  690:	SubCommand **subs = args->subs;
-    #####:  691:	ArgsParam *params = args->subs[0]->params;
-    #####:  692:	u64 count = args->subs[0]->params_count;
-    #####:  693:	u64 max_len = 0;
-    #####:  694:	for (u64 i = 0; i < count; i++) {
-    #####:  695:		bool takes_value = args->subs[0]->params[i].takes_value;
-    #####:  696:		bool multi = args->subs[0]->params[i].multiple;
-    #####:  697:		char *name = args->subs[0]->params[i].name;
-    #####:  698:		char *short_name = args->subs[0]->params[i].short_name;
-        -:  699:		u64 len;
-    #####:  700:		if (!takes_value)
-    #####:  701:			len = snprintf(NULL, 0, "    -%s, --%s", short_name, name);
-    #####:  702:		else if (multi)
-    #####:  703:			len = snprintf(NULL, 0, "    -%s, --%s (<%s>, ...)", short_name, name, name);
-        -:  704:		else
-    #####:  705:			len = snprintf(NULL, 0, "    -%s, --%s <%s>", short_name, name, name);
-    #####:  706:		if (len > max_len)
-    #####:  707:			max_len = len;
-        -:  708:	}
-        -:  709:
-    #####:  710:	max_len += 4;
-        -:  711:
-    #####:  712:	if (max_len < 17)
-    #####:  713:		max_len = 17;
-        -:  714:
-    #####:  715:	char *prog = args->prog;
-    #####:  716:	char *author = args->author;
-    #####:  717:	char *version = args->version;
-        -:  718:	char buffer[1025];
-        -:  719:	char buffer2[1025];
-        -:  720:	u64 i;
-    #####:  721:	for (i = 0; i < max_len - 13 && i < 1024; i++)
-    #####:  722:		buffer[i] = ' ';
-    #####:  723:	buffer[i] = 0;
-        -:  724:
-    #####:  725:	for (i = 0; i < max_len - 16 && i < 1024; i++)
-    #####:  726:		buffer2[i] = ' ';
-    #####:  727:	buffer2[i] = 0;
-        -:  728:	u64 sub_command_str_len;
-    #####:  729:	if (sub_command)
-    #####:  730:		sub_command_str_len = strlen(sub_command);
-        -:  731:	else
-    #####:  732:		sub_command_str_len = 0;
-    #####:  733:	char sub_command_str[sub_command_str_len + 30];
-    #####:  734:	char *sub_arg_doc_str = "";
-    #####:  735:	if (sub_command) {
-    #####:  736:		snprintf(sub_command_str, sub_command_str_len + 30, "%s%s%s", BRIGHT_RED, sub_command,
-        -:  737:				 RESET);
-    #####:  738:		sub_arg_doc_str = args->subs[sub_index]->arg_doc;
-        -:  739:	} else {
-    #####:  740:		snprintf(sub_command_str, sub_command_str_len + 30, "[%sSUB_COMMAND%s]", DIMMED, RESET);
-        -:  741:	}
-        -:  742:
-    #####:  743:	fprintf(stderr,
-        -:  744:			"%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s "
-        -:  745:			"[%sCORE_OPTIONS%s] %s [%sSUB_OPTIONS%s] %s\n\n"
-        -:  746:			"%sCORE_FLAGS%s:\n"
-        -:  747:			"    %s-h%s, %s--help%s%sPrints help information\n"
-        -:  748:			"    %s-V%s, %s--version%s%sPrints version "
-        -:  749:			"information\n",
-        -:  750:			CYAN, prog, RESET, YELLOW, version, RESET, GREEN, author, RESET, DIMMED, RESET,
-        -:  751:			BRIGHT_RED, prog, RESET, DIMMED, RESET, sub_command_str, DIMMED, RESET, sub_arg_doc_str,
-        -:  752:			DIMMED, RESET, CYAN, RESET, YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET, buffer2);
-        -:  753:
-    #####:  754:	for (u64 i = 0; i < count; i++) {
-    #####:  755:		bool takes_value = params[i].takes_value;
-    #####:  756:		if (!takes_value) {
-    #####:  757:			char *name = params[i].name;
-    #####:  758:			char *short_name = params[i].short_name;
-    #####:  759:			char *help = params[i].help;
-    #####:  760:			u64 len = snprintf(NULL, 0, "    -%s, --%s", short_name, name);
-    #####:  761:			if (len > max_len)
-    #####:  762:				len = max_len;
-        -:  763:			u64 i;
-    #####:  764:			for (i = 0; i < max_len - len && i < 1024; i++)
-    #####:  765:				buffer[i] = ' ';
-    #####:  766:			buffer[i] = 0;
-    #####:  767:			fprintf(stderr, "    %s-%s%s, %s--%s%s %s%s\n", CYAN, short_name, RESET, YELLOW, name,
-        -:  768:					RESET, buffer, help);
-        -:  769:		}
-        -:  770:	}
-        -:  771:
-    #####:  772:	if (count) {
-    #####:  773:		fprintf(stderr, "\n%sCORE_OPTIONS%s:\n", DIMMED, RESET);
-        -:  774:
-    #####:  775:		for (u64 i = 0; i < count; i++) {
-    #####:  776:			bool takes_value = params[i].takes_value;
-    #####:  777:			if (takes_value) {
-    #####:  778:				char *name = params[i].name;
-    #####:  779:				char *short_name = params[i].short_name;
-    #####:  780:				char *help = params[i].help;
-    #####:  781:				bool multi = params[i].multiple;
-    #####:  782:				char *default_value = params[i].default_value;
-        -:  783:				u64 default_value_str_len;
-    #####:  784:				if (default_value == NULL) {
-    #####:  785:					default_value_str_len = 1;
-        -:  786:				} else {
-    #####:  787:					default_value_str_len = strlen(default_value) + 100;
-        -:  788:				}
-    #####:  789:				char default_value_str[default_value_str_len];
-    #####:  790:				if (default_value == NULL)
-    #####:  791:					strcpy(default_value_str, "");
-        -:  792:				else
-    #####:  793:					snprintf(default_value_str, default_value_str_len, " (default value: '%s')",
-        -:  794:							 default_value);
-        -:  795:
-    #####:  796:				if (multi) {
-    #####:  797:					u64 len = snprintf(NULL, 0, "    -%s, --%s <%s>, ...", short_name, name, name);
-    #####:  798:					if (len > max_len)
-    #####:  799:						len = max_len;
-        -:  800:					u64 i;
-    #####:  801:					for (i = 0; i < max_len - len && i < 1024; i++)
-    #####:  802:						buffer[i] = ' ';
-    #####:  803:					buffer[i] = 0;
-    #####:  804:					fprintf(stderr,
-        -:  805:							"    %s-%s%s, %s--%s%s "
-        -:  806:							"<%s>, "
-        -:  807:							"... %s%s%s\n",
-        -:  808:							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-        -:  809:							default_value_str);
-        -:  810:				} else {
-        -:  811:
-    #####:  812:					u64 len = snprintf(NULL, 0, "    -%s, --%s <%s>", short_name, name, name);
-    #####:  813:					if (len > max_len)
-    #####:  814:						len = max_len;
-        -:  815:					u64 i;
-    #####:  816:					for (i = 0; i < max_len - len && i < 1024; i++)
-    #####:  817:						buffer[i] = ' ';
-    #####:  818:					buffer[i] = 0;
-        -:  819:
-    #####:  820:					fprintf(stderr,
-        -:  821:							"    %s-%s%s, %s--%s%s "
-        -:  822:							"<%s> "
-        -:  823:							"%s%s%s\n",
-        -:  824:							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-        -:  825:							default_value_str);
-        -:  826:				}
-        -:  827:			}
-        -:  828:		}
-        -:  829:	}
+    #####:  590:	char short_name_buf[strlen(param_name) + 3];
+    #####:  591:	strcpy(short_name_buf, "-");
+    #####:  592:	bool found = false;
+    #####:  593:	char *default_value = NULL;
+    #####:  594:	bool takes_value = false;
+    #####:  595:	for (u64 i = 0; i < args->subs_count; i++) {
+    #####:  596:		for (u64 j = 0; j < args->subs[i]->params_count; j++) {
+    #####:  597:			if (!strcmp(args->subs[i]->params[j].name, param_name)) {
+    #####:  598:				found = true;
+    #####:  599:				strcat(short_name_buf, args->subs[i]->params[j].short_name);
+    #####:  600:				default_value = args->subs[i]->params[j].default_value;
+    #####:  601:				takes_value = args->subs[i]->params[j].takes_value;
+        -:  602:			}
+        -:  603:		}
+        -:  604:	}
+        -:  605:
+    #####:  606:	if (!found) {
+    #####:  607:		errno = ENOENT;
+    #####:  608:		return -1;
+        -:  609:	}
+    #####:  610:	u64 itt_index = 0;
+    #####:  611:	for (u64 i = 1; i < args->argc; i++) {
+    #####:  612:		if (!strcmp(args->argv[i], param_name_buf) || !strcmp(args->argv[i], short_name_buf)) {
+    #####:  613:			if (itt_index == index) {
+    #####:  614:				if (takes_value && i + 1 < args->argc) {
+    #####:  615:					return snprintf(value_buf, max_value_len, "%s", args->argv[i + 1]);
+    #####:  616:				} else if (takes_value && max_value_len > 1) {
+    #####:  617:					strcpy(value_buf, "");
+    #####:  618:					return 0;
+        -:  619:				} else {
+    #####:  620:					return 0;
+        -:  621:				}
+        -:  622:			} else {
+    #####:  623:				itt_index += 1;
+        -:  624:			}
+        -:  625:		}
+        -:  626:	}
+        -:  627:
+    #####:  628:	if (default_value != NULL && index == 0) {
+    #####:  629:		return snprintf(value_buf, max_value_len, "%s", default_value);
+        -:  630:	}
+        -:  631:
+    #####:  632:	errno = ENOENT;
+    #####:  633:	return -1;
+        -:  634:}
+    #####:  635:int args_get_argument(Args *args, u64 index, char *value_buf, u64 max_value_len)
+        -:  636:{
+    #####:  637:	u64 index_itt = 0;
+    #####:  638:	for (u64 i = 1; i < args->argc; i++) {
+    #####:  639:		i32 len = strlen(args->argv[i]);
+    #####:  640:		if (len > 1 && args->argv[i][0] == '-') {
+    #####:  641:			char name[len];
+        -:  642:			bool is_short;
+    #####:  643:			bool found = false;
+    #####:  644:			if (len > 1 && args->argv[i][1] == '-') {
+    #####:  645:				strcpy(name, args->argv[i] + 2);
+    #####:  646:				is_short = false;
+        -:  647:			} else {
+    #####:  648:				strcpy(name, args->argv[i] + 1);
+    #####:  649:				is_short = true;
+        -:  650:			}
+        -:  651:
+    #####:  652:			for (u64 k = 0; k < args->subs_count; k++) {
+    #####:  653:				for (u64 j = 0; j < args->subs[k]->params_count; j++) {
+    #####:  654:					if (is_short && !strcmp(name, args->subs[k]->params[j].short_name)) {
+    #####:  655:						if (args->subs[k]->params[j].takes_value) {
+    #####:  656:							i += 1;
+    #####:  657:							found = true;
+    #####:  658:							break;
+        -:  659:						}
+    #####:  660:					} else if (!strcmp(name, args->subs[k]->params[j].name)) {
+    #####:  661:						if (args->subs[k]->params[j].takes_value) {
+    #####:  662:							i += 1;
+    #####:  663:							found = true;
+    #####:  664:							break;
+        -:  665:						}
+        -:  666:					}
+        -:  667:				}
+        -:  668:			}
+        -:  669:		} else {
+    #####:  670:			if (index_itt == index) {
+    #####:  671:				snprintf(value_buf, max_value_len, "%s", args->argv[i]);
+    #####:  672:				return 1;
+        -:  673:			}
+    #####:  674:			index_itt += 1;
+        -:  675:		}
+        -:  676:	}
+    #####:  677:	return 0;
+        -:  678:}
+        -:  679:
+    #####:  680:void args_print_version(Args *args)
+        -:  681:{
+    #####:  682:	char *prog = args->prog;
+    #####:  683:	char *version = args->version;
+    #####:  684:	fprintf(stderr, "%s%s%s %s%s%s\n", BRIGHT_RED, prog, RESET, CYAN, version, RESET);
+    #####:  685:	exit(0);
+        -:  686:}
+        -:  687:
+    #####:  688:void args_usage(Args *args, char *sub_command)
+    #####:  689:{
+    #####:  690:	bool found = false;
+    #####:  691:	u64 subs_count = args->subs_count;
+    #####:  692:	u64 sub_index = 0;
+        -:  693:
+    #####:  694:	if (sub_command) {
+    #####:  695:		for (u64 i = 1; i < subs_count; i++) {
+    #####:  696:			char *name = args->subs[i]->name;
+    #####:  697:			if (!strcmp(name, sub_command)) {
+    #####:  698:				sub_index = i;
+    #####:  699:				found = true;
+        -:  700:			}
+        -:  701:		}
+        -:  702:	} else // general help displayed
+    #####:  703:		found = true;
+        -:  704:
+    #####:  705:	if (!found) {
+    #####:  706:		args_exit_error(args, "Unknown SubCommand \"%s\"", sub_command);
+        -:  707:	}
+        -:  708:
+    #####:  709:	SubCommand **subs = args->subs;
+    #####:  710:	ArgsParam *params = args->subs[0]->params;
+    #####:  711:	u64 count = args->subs[0]->params_count;
+    #####:  712:	u64 max_len = 0;
+    #####:  713:	for (u64 i = 0; i < count; i++) {
+    #####:  714:		bool takes_value = args->subs[0]->params[i].takes_value;
+    #####:  715:		bool multi = args->subs[0]->params[i].multiple;
+    #####:  716:		char *name = args->subs[0]->params[i].name;
+    #####:  717:		char *short_name = args->subs[0]->params[i].short_name;
+        -:  718:		u64 len;
+    #####:  719:		if (!takes_value)
+    #####:  720:			len = snprintf(NULL, 0, "    -%s, --%s", short_name, name);
+    #####:  721:		else if (multi)
+    #####:  722:			len = snprintf(NULL, 0, "    -%s, --%s (<%s>, ...)", short_name, name, name);
+        -:  723:		else
+    #####:  724:			len = snprintf(NULL, 0, "    -%s, --%s <%s>", short_name, name, name);
+    #####:  725:		if (len > max_len)
+    #####:  726:			max_len = len;
+        -:  727:	}
+        -:  728:
+    #####:  729:	max_len += 4;
+        -:  730:
+    #####:  731:	if (max_len < 17)
+    #####:  732:		max_len = 17;
+        -:  733:
+    #####:  734:	char *prog = args->prog;
+    #####:  735:	char *author = args->author;
+    #####:  736:	char *version = args->version;
+        -:  737:	char buffer[1025];
+        -:  738:	char buffer2[1025];
+        -:  739:	u64 i;
+    #####:  740:	for (i = 0; i < max_len - 13 && i < 1024; i++)
+    #####:  741:		buffer[i] = ' ';
+    #####:  742:	buffer[i] = 0;
+        -:  743:
+    #####:  744:	for (i = 0; i < max_len - 16 && i < 1024; i++)
+    #####:  745:		buffer2[i] = ' ';
+    #####:  746:	buffer2[i] = 0;
+        -:  747:	u64 sub_command_str_len;
+    #####:  748:	if (sub_command)
+    #####:  749:		sub_command_str_len = strlen(sub_command);
+        -:  750:	else
+    #####:  751:		sub_command_str_len = 0;
+    #####:  752:	char sub_command_str[sub_command_str_len + 30];
+    #####:  753:	char *sub_arg_doc_str = "";
+    #####:  754:	if (sub_command) {
+    #####:  755:		snprintf(
+        -:  756:			sub_command_str, sub_command_str_len + 30, "%s%s%s", BRIGHT_RED, sub_command, RESET);
+    #####:  757:		sub_arg_doc_str = args->subs[sub_index]->arg_doc;
+        -:  758:	} else {
+    #####:  759:		snprintf(sub_command_str, sub_command_str_len + 30, "[%sSUB_COMMAND%s]", DIMMED, RESET);
+        -:  760:	}
+        -:  761:
+    #####:  762:	fprintf(stderr,
+        -:  763:		"%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s "
+        -:  764:		"[%sCORE_OPTIONS%s] %s [%sSUB_OPTIONS%s] %s\n\n"
+        -:  765:		"%sCORE_FLAGS%s:\n"
+        -:  766:		"    %s-h%s, %s--help%s%sPrints help information\n"
+        -:  767:		"    %s-V%s, %s--version%s%sPrints version "
+        -:  768:		"information\n",
+        -:  769:		CYAN, prog, RESET, YELLOW, version, RESET, GREEN, author, RESET, DIMMED, RESET, BRIGHT_RED,
+        -:  770:		prog, RESET, DIMMED, RESET, sub_command_str, DIMMED, RESET, sub_arg_doc_str, DIMMED, RESET,
+        -:  771:		CYAN, RESET, YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET, buffer2);
+        -:  772:
+    #####:  773:	for (u64 i = 0; i < count; i++) {
+    #####:  774:		bool takes_value = params[i].takes_value;
+    #####:  775:		if (!takes_value) {
+    #####:  776:			char *name = params[i].name;
+    #####:  777:			char *short_name = params[i].short_name;
+    #####:  778:			char *help = params[i].help;
+    #####:  779:			u64 len = snprintf(NULL, 0, "    -%s, --%s", short_name, name);
+    #####:  780:			if (len > max_len)
+    #####:  781:				len = max_len;
+        -:  782:			u64 i;
+    #####:  783:			for (i = 0; i < max_len - len && i < 1024; i++)
+    #####:  784:				buffer[i] = ' ';
+    #####:  785:			buffer[i] = 0;
+    #####:  786:			fprintf(stderr, "    %s-%s%s, %s--%s%s %s%s\n", CYAN, short_name, RESET, YELLOW, name,
+        -:  787:				RESET, buffer, help);
+        -:  788:		}
+        -:  789:	}
+        -:  790:
+    #####:  791:	if (count) {
+    #####:  792:		fprintf(stderr, "\n%sCORE_OPTIONS%s:\n", DIMMED, RESET);
+        -:  793:
+    #####:  794:		for (u64 i = 0; i < count; i++) {
+    #####:  795:			bool takes_value = params[i].takes_value;
+    #####:  796:			if (takes_value) {
+    #####:  797:				char *name = params[i].name;
+    #####:  798:				char *short_name = params[i].short_name;
+    #####:  799:				char *help = params[i].help;
+    #####:  800:				bool multi = params[i].multiple;
+    #####:  801:				char *default_value = params[i].default_value;
+        -:  802:				u64 default_value_str_len;
+    #####:  803:				if (default_value == NULL) {
+    #####:  804:					default_value_str_len = 1;
+        -:  805:				} else {
+    #####:  806:					default_value_str_len = strlen(default_value) + 100;
+        -:  807:				}
+    #####:  808:				char default_value_str[default_value_str_len];
+    #####:  809:				if (default_value == NULL)
+    #####:  810:					strcpy(default_value_str, "");
+        -:  811:				else
+    #####:  812:					snprintf(default_value_str, default_value_str_len, " (default value: '%s')",
+        -:  813:						default_value);
+        -:  814:
+    #####:  815:				if (multi) {
+    #####:  816:					u64 len = snprintf(NULL, 0, "    -%s, --%s <%s>, ...", short_name, name, name);
+    #####:  817:					if (len > max_len)
+    #####:  818:						len = max_len;
+        -:  819:					u64 i;
+    #####:  820:					for (i = 0; i < max_len - len && i < 1024; i++)
+    #####:  821:						buffer[i] = ' ';
+    #####:  822:					buffer[i] = 0;
+    #####:  823:					fprintf(stderr,
+        -:  824:						"    %s-%s%s, %s--%s%s "
+        -:  825:						"<%s>, "
+        -:  826:						"... %s%s%s\n",
+        -:  827:						CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+        -:  828:						default_value_str);
+        -:  829:				} else {
         -:  830:
-    #####:  831:	if (subs_count > 1 && sub_command == NULL) {
-    #####:  832:		fprintf(stderr, "\n%sSUB_COMMANDS%s:\n", DIMMED, RESET);
-    #####:  833:		for (u64 i = 1; i < subs_count; i++) {
-        -:  834:
-    #####:  835:			char *name = args->subs[i]->name;
-    #####:  836:			char *help = args->subs[i]->help;
-    #####:  837:			char *arg_doc = args->subs[i]->arg_doc;
+    #####:  831:					u64 len = snprintf(NULL, 0, "    -%s, --%s <%s>", short_name, name, name);
+    #####:  832:					if (len > max_len)
+    #####:  833:						len = max_len;
+        -:  834:					u64 i;
+    #####:  835:					for (i = 0; i < max_len - len && i < 1024; i++)
+    #####:  836:						buffer[i] = ' ';
+    #####:  837:					buffer[i] = 0;
         -:  838:
-    #####:  839:			u64 len = strlen(name) + strlen(arg_doc) + 4;
-    #####:  840:			if (len > max_len)
-    #####:  841:				len = max_len;
-        -:  842:			char buffer[1025];
-        -:  843:			u64 j;
-    #####:  844:			for (j = 0; j < (max_len - len) && j < 1024; j++)
-    #####:  845:				buffer[j] = ' ';
-    #####:  846:			buffer[j] = 0;
-        -:  847:
-    #####:  848:			fprintf(stderr, "    %s%s%s %s%s%s\n", CYAN, name, RESET, arg_doc, buffer, help);
-        -:  849:		}
-        -:  850:	}
-        -:  851:
-    #####:  852:	if (sub_command) {
-    #####:  853:		u64 param_index = 0;
-    #####:  854:		for (u64 i = 1; i < subs_count; i++) {
-    #####:  855:			char *name = args->subs[i]->name;
-    #####:  856:			if (!strcmp(name, sub_command)) {
-    #####:  857:				param_index = i;
-        -:  858:			}
-        -:  859:		}
-        -:  860:
-    #####:  861:		if (param_index > 0) {
-    #####:  862:			params = args->subs[param_index]->params;
-        -:  863:
-    #####:  864:			count = args->subs[param_index]->params_count;
-    #####:  865:			fprintf(stderr, "\n%sSUB_FLAGS%s (%s%s%s):\n", DIMMED, RESET, BRIGHT_RED, sub_command,
-        -:  866:					RESET);
-        -:  867:
-    #####:  868:			for (u64 i = 0; i < count; i++) {
-    #####:  869:				char *name = params[i].name;
-    #####:  870:				char *short_name = params[i].short_name;
-    #####:  871:				bool takes_value = params[i].takes_value;
-    #####:  872:				char *help = params[i].help;
-        -:  873:
-    #####:  874:				if (!takes_value) {
-    #####:  875:					u64 len = strlen(name) + 10;
-    #####:  876:					if (len > max_len)
-    #####:  877:						len = max_len;
-        -:  878:					char buffer[1025];
-        -:  879:					u64 j;
-    #####:  880:					for (j = 0; j < (max_len - len) && j < 1024; j++)
-    #####:  881:						buffer[j] = ' ';
-    #####:  882:					buffer[j] = 0;
-    #####:  883:					fprintf(stderr,
-        -:  884:							"    %s-%s%s, "
-        -:  885:							"%s--%s%s%s %s\n",
-        -:  886:							CYAN, short_name, RESET, YELLOW, name, RESET, buffer, help);
-        -:  887:				}
-        -:  888:			}
-    #####:  889:			fprintf(stderr, "\n%sSUB_OPTIONS%s (%s%s%s):\n", DIMMED, RESET, BRIGHT_RED, sub_command,
-        -:  890:					RESET);
-    #####:  891:			for (u64 i = 0; i < count; i++) {
-    #####:  892:				char *name = params[i].name;
-    #####:  893:				char *short_name = params[i].short_name;
-    #####:  894:				bool takes_value = params[i].takes_value;
-    #####:  895:				char *help = params[i].help;
-    #####:  896:				bool multiple = params[i].multiple;
-        -:  897:
-    #####:  898:				char *default_value = params[i].default_value;
-        -:  899:				u64 default_value_str_len;
-    #####:  900:				if (default_value == NULL) {
-    #####:  901:					default_value_str_len = 1;
-        -:  902:				} else {
-    #####:  903:					default_value_str_len = strlen(default_value) + 100;
-        -:  904:				}
-    #####:  905:				char default_value_str[default_value_str_len];
-    #####:  906:				if (default_value == NULL)
-    #####:  907:					strcpy(default_value_str, "");
-        -:  908:				else
-    #####:  909:					snprintf(default_value_str, default_value_str_len, " (default value: %s)",
-        -:  910:							 default_value);
-        -:  911:
-    #####:  912:				if (takes_value) {
-    #####:  913:					if (multiple) {
-    #####:  914:						u64 len = 2 * strlen(name) + 19;
-        -:  915:						char buffer[1025];
-        -:  916:						u64 j;
-    #####:  917:						if (len > max_len)
-    #####:  918:							len = max_len;
-    #####:  919:						for (j = 0; j < (max_len - len) && j < 1024; j++)
-    #####:  920:							buffer[j] = ' ';
-    #####:  921:						buffer[j] = 0;
-    #####:  922:						fprintf(stderr,
-        -:  923:								"    %s-%s%s, "
-        -:  924:								"%s--%s%s "
-        -:  925:								"<%s>, ...%s %s"
-        -:  926:								"%s\n",
-        -:  927:								CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-        -:  928:								default_value_str);
-        -:  929:					} else {
-    #####:  930:						u64 len = 2 * strlen(name) + 13;
-        -:  931:						char buffer[1025];
-        -:  932:						u64 j;
-    #####:  933:						if (len > max_len)
-    #####:  934:							len = max_len;
-    #####:  935:						for (j = 0; j < (max_len - len) && j < 1024; j++)
-    #####:  936:							buffer[j] = ' ';
-    #####:  937:						buffer[j] = 0;
-    #####:  938:						fprintf(stderr,
-        -:  939:								"    %s-%s%s, "
-        -:  940:								"%s--%s%s "
-        -:  941:								"<%s>%s "
-        -:  942:								"%s%s\n",
-        -:  943:								CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-        -:  944:								default_value_str);
-        -:  945:					}
-        -:  946:				}
-        -:  947:			}
-        -:  948:		}
-        -:  949:	}
-        -:  950:
-    #####:  951:	exit(0);
-        -:  952:}
+    #####:  839:					fprintf(stderr,
+        -:  840:						"    %s-%s%s, %s--%s%s "
+        -:  841:						"<%s> "
+        -:  842:						"%s%s%s\n",
+        -:  843:						CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+        -:  844:						default_value_str);
+        -:  845:				}
+        -:  846:			}
+        -:  847:		}
+        -:  848:	}
+        -:  849:
+    #####:  850:	if (subs_count > 1 && sub_command == NULL) {
+    #####:  851:		fprintf(stderr, "\n%sSUB_COMMANDS%s:\n", DIMMED, RESET);
+    #####:  852:		for (u64 i = 1; i < subs_count; i++) {
+        -:  853:
+    #####:  854:			char *name = args->subs[i]->name;
+    #####:  855:			char *help = args->subs[i]->help;
+    #####:  856:			char *arg_doc = args->subs[i]->arg_doc;
+        -:  857:
+    #####:  858:			u64 len = strlen(name) + strlen(arg_doc) + 4;
+    #####:  859:			if (len > max_len)
+    #####:  860:				len = max_len;
+        -:  861:			char buffer[1025];
+        -:  862:			u64 j;
+    #####:  863:			for (j = 0; j < (max_len - len) && j < 1024; j++)
+    #####:  864:				buffer[j] = ' ';
+    #####:  865:			buffer[j] = 0;
+        -:  866:
+    #####:  867:			fprintf(stderr, "    %s%s%s %s%s%s\n", CYAN, name, RESET, arg_doc, buffer, help);
+        -:  868:		}
+        -:  869:	}
+        -:  870:
+    #####:  871:	if (sub_command) {
+    #####:  872:		u64 param_index = 0;
+    #####:  873:		for (u64 i = 1; i < subs_count; i++) {
+    #####:  874:			char *name = args->subs[i]->name;
+    #####:  875:			if (!strcmp(name, sub_command)) {
+    #####:  876:				param_index = i;
+        -:  877:			}
+        -:  878:		}
+        -:  879:
+    #####:  880:		if (param_index > 0) {
+    #####:  881:			params = args->subs[param_index]->params;
+        -:  882:
+    #####:  883:			count = args->subs[param_index]->params_count;
+    #####:  884:			fprintf(stderr, "\n%sSUB_FLAGS%s (%s%s%s):\n", DIMMED, RESET, BRIGHT_RED, sub_command,
+        -:  885:				RESET);
+        -:  886:
+    #####:  887:			for (u64 i = 0; i < count; i++) {
+    #####:  888:				char *name = params[i].name;
+    #####:  889:				char *short_name = params[i].short_name;
+    #####:  890:				bool takes_value = params[i].takes_value;
+    #####:  891:				char *help = params[i].help;
+        -:  892:
+    #####:  893:				if (!takes_value) {
+    #####:  894:					u64 len = strlen(name) + 10;
+    #####:  895:					if (len > max_len)
+    #####:  896:						len = max_len;
+        -:  897:					char buffer[1025];
+        -:  898:					u64 j;
+    #####:  899:					for (j = 0; j < (max_len - len) && j < 1024; j++)
+    #####:  900:						buffer[j] = ' ';
+    #####:  901:					buffer[j] = 0;
+    #####:  902:					fprintf(stderr,
+        -:  903:						"    %s-%s%s, "
+        -:  904:						"%s--%s%s%s %s\n",
+        -:  905:						CYAN, short_name, RESET, YELLOW, name, RESET, buffer, help);
+        -:  906:				}
+        -:  907:			}
+    #####:  908:			fprintf(stderr, "\n%sSUB_OPTIONS%s (%s%s%s):\n", DIMMED, RESET, BRIGHT_RED, sub_command,
+        -:  909:				RESET);
+    #####:  910:			for (u64 i = 0; i < count; i++) {
+    #####:  911:				char *name = params[i].name;
+    #####:  912:				char *short_name = params[i].short_name;
+    #####:  913:				bool takes_value = params[i].takes_value;
+    #####:  914:				char *help = params[i].help;
+    #####:  915:				bool multiple = params[i].multiple;
+        -:  916:
+    #####:  917:				char *default_value = params[i].default_value;
+        -:  918:				u64 default_value_str_len;
+    #####:  919:				if (default_value == NULL) {
+    #####:  920:					default_value_str_len = 1;
+        -:  921:				} else {
+    #####:  922:					default_value_str_len = strlen(default_value) + 100;
+        -:  923:				}
+    #####:  924:				char default_value_str[default_value_str_len];
+    #####:  925:				if (default_value == NULL)
+    #####:  926:					strcpy(default_value_str, "");
+        -:  927:				else
+    #####:  928:					snprintf(default_value_str, default_value_str_len, " (default value: %s)",
+        -:  929:						default_value);
+        -:  930:
+    #####:  931:				if (takes_value) {
+    #####:  932:					if (multiple) {
+    #####:  933:						u64 len = 2 * strlen(name) + 19;
+        -:  934:						char buffer[1025];
+        -:  935:						u64 j;
+    #####:  936:						if (len > max_len)
+    #####:  937:							len = max_len;
+    #####:  938:						for (j = 0; j < (max_len - len) && j < 1024; j++)
+    #####:  939:							buffer[j] = ' ';
+    #####:  940:						buffer[j] = ' ';
+    #####:  941:						buffer[j + 1] = 0;
+    #####:  942:						fprintf(stderr,
+        -:  943:							"    %s-%s%s, "
+        -:  944:							"%s--%s%s "
+        -:  945:							"<%s>, ...%s %s"
+        -:  946:							"%s\n",
+        -:  947:							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+        -:  948:							default_value_str);
+        -:  949:					} else {
+    #####:  950:						u64 len = 2 * strlen(name) + 13;
+        -:  951:						char buffer[1025];
+        -:  952:						u64 j;
+    #####:  953:						if (len > max_len)
+    #####:  954:							len = max_len;
+    #####:  955:						for (j = 0; j < (max_len - len) && j < 1024; j++)
+    #####:  956:							buffer[j] = ' ';
+    #####:  957:						buffer[j] = 0;
+    #####:  958:						fprintf(stderr,
+        -:  959:							"    %s-%s%s, "
+        -:  960:							"%s--%s%s "
+        -:  961:							"<%s>%s "
+        -:  962:							"%s%s\n",
+        -:  963:							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+        -:  964:							default_value_str);
+        -:  965:					}
+        -:  966:				}
+        -:  967:			}
+        -:  968:		}
+        -:  969:	}
+        -:  970:
+    #####:  971:	exit(0);
+        -:  972:}
         -:    0:Source:bible.c
         -:    0:Graph:bible.gcno
         -:    0:Data:bible.gcda
@@ -6931,10 +7359,379 @@ Unit_size:
     #####:  346:		r %= bible->verse_count;
     31102:  347:	return format_verse(bible, r, buf, buf_len, colors);
         -:  348:}
+        -:    0:Source:replace.c
+        -:    0:Graph:replace.gcno
+        -:    0:Data:replace.gcda
+        -:    0:Runs:6
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/resources.h>
+        -:   16:#include <stdio.h>
+        -:   17:#include <util/replace.h>
+        -:   18:#include <util/trie.h>
+        -:   19:
+        1:   20:int replace_file(Path *in_path, Path *out_path, const char *patterns_in[],
+        -:   21:	const bool is_case_sensisitive[], const char *replace[], int count)
+        1:   22:{
+        1:   23:	FILE *file = myfopen(path_to_string(in_path), "rb"); // Open the file in binary mode
+        1:   24:	if (!file) {
+    #####:   25:		perror("File opening failed");
+    #####:   26:		return -1;
+        -:   27:	}
+        -:   28:
+        -:   29:	// Move the file pointer to the end of the file to get its size
+        1:   30:	fseek(file, 0, SEEK_END);
+        1:   31:	long file_size = ftell(file); // Get the size of the file
+        1:   32:	fseek(file, 0, SEEK_SET); // Move file pointer back to the beginning
+        -:   33:
+        -:   34:	// Allocate memory to store the contents (+1 for null terminator)
+        1:   35:	char buffer[file_size + 1];
+        -:   36:
+        -:   37:	// Read the contents of the file into the buffer
+        1:   38:	if (fread(buffer, 1, file_size, file) < file_size) {
+    #####:   39:		perror("fread");
+    #####:   40:		myfclose(file);
+    #####:   41:		return -1;
+        -:   42:	}
+        1:   43:	buffer[file_size] = '\0'; // Null-terminate the buffer
+        -:   44:
+        1:   45:	myfclose(file); // Close the file
+        -:   46:
+        1:   47:	TrieMatch tm[count];
+        1:   48:	Trie t;
+        1:   49:	trie_build(&t, patterns_in, is_case_sensisitive, count);
+        1:   50:	int matches = trie_match(&t, buffer, tm, count);
+        -:   51:
+        1:   52:	file = myfopen(path_to_string(out_path), "wb"); // Open file for writing
+        1:   53:	if (!file) {
+    #####:   54:		perror("File opening failed");
+    #####:   55:		return -1;
+        -:   56:	}
+        -:   57:
+        1:   58:	int itt = 0;
+        -:   59:
+        4:   60:	for (int i = 0; i < matches; i++) {
+        3:   61:		if (tm[i].offset > itt) {
+        3:   62:			int v = fwrite(buffer + itt, sizeof(char), tm[i].offset - itt, file);
+        3:   63:			if (v < tm[i].offset - itt) {
+    #####:   64:				perror("fwrite");
+    #####:   65:				myfclose(file);
+    #####:   66:				return -1;
+        -:   67:			}
+        3:   68:			itt = tm[i].offset;
+        -:   69:		}
+        3:   70:		fprintf(file, "%s", replace[tm[i].pattern_id]);
+        3:   71:		itt += tm[i].len;
+        -:   72:	}
+        1:   73:	if (itt < file_size) {
+        1:   74:		if (fwrite(buffer + itt, sizeof(char), file_size - itt, file) < file_size - itt) {
+    #####:   75:			perror("fwrite");
+    #####:   76:			myfclose(file);
+    #####:   77:			return -1;
+        -:   78:		}
+        -:   79:	}
+        -:   80:
+        1:   81:	myfclose(file);
+        -:   82:
+        1:   83:	return 0;
+        -:   84:}
+        -:    0:Source:suffix_tree.c
+        -:    0:Graph:suffix_tree.gcno
+        -:    0:Data:suffix_tree.gcda
+        -:    0:Runs:6
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/base.h>
+        -:   16:#include <errno.h>
+        -:   17:#include <string.h>
+        -:   18:#include <util/suffix_tree.h>
+        -:   19:
+        -:   20:// The suffix pair represents the index and it's corresponding suffix. This is used to calcualte the
+        -:   21:// suffix tree efficiently.
+        -:   22:typedef struct SuffixPair {
+        -:   23:	u64 index; // index (where does this suffix start within the text)
+        -:   24:	const char *suffix; // the actual suffix
+        -:   25:} SuffixPair;
+        -:   26:
+        -:   27:// The opaque SuffixTreeImpl
+        -:   28:typedef struct SuffixTreeImpl {
+        -:   29:	FatPtr suffix_array; // The array of u64 offsets
+        -:   30:	FatPtr lcp_array; // The array of least common prefixes
+        -:   31:	char *text; // The text for this suffix tree
+        -:   32:	u64 suffix_array_len; // The length of the suffix array
+        -:   33:} SuffixTreeImpl;
+        -:   34:
+        -:   35:// Deallocate all memory associated with the suffix tree
+        1:   36:void suffix_tree_cleanup(SuffixTree *ptr)
+        -:   37:{
+        1:   38:	if (ptr->impl.data) {
+        1:   39:		SuffixTreeImpl *si = ptr->impl.data;
+        1:   40:		if (si->suffix_array.data) {
+        1:   41:			chain_free(&si->suffix_array);
+        -:   42:		}
+        1:   43:		if (si->lcp_array.data) {
+        1:   44:			chain_free(&si->lcp_array);
+        -:   45:		}
+        1:   46:		if (si->text) {
+        1:   47:			myfree(si->text);
+        1:   48:			si->text = NULL;
+        -:   49:		}
+        1:   50:		chain_free(&ptr->impl);
+        -:   51:	}
+        1:   52:}
+        -:   53:
+        -:   54:// Compare suffix pairs (for qsort)
+      142:   55:int suffix_pair_compare(const void *p1, const void *p2)
+        -:   56:{
+      142:   57:	const SuffixPair *sp1 = p1;
+      142:   58:	const SuffixPair *sp2 = p2;
+      142:   59:	return strcmp(sp1->suffix, sp2->suffix);
+        -:   60:}
+        -:   61:
+        -:   62:// Compare suffix matches (for qsort)
+       15:   63:int suffix_match_compare(const void *s1, const void *s2)
+        -:   64:{
+       15:   65:	const SuffixTreeMatch *sm1 = s1;
+       15:   66:	const SuffixTreeMatch *sm2 = s2;
+       15:   67:	if (sm1->offset < sm2->offset)
+        7:   68:		return -1;
+        8:   69:	else if (sm1->offset > sm2->offset)
+        8:   70:		return 1;
+    #####:   71:	return 0;
+        -:   72:}
+        -:   73:
+        -:   74:// build a suffix tree
+        1:   75:int suffix_tree_build(SuffixTree *ptr, const char *text)
+        1:   76:{
+        -:   77:	// validate input
+        1:   78:	if (text == NULL) {
+    #####:   79:		errno = EINVAL;
+    #####:   80:		return -1;
+        -:   81:	}
+        1:   82:	int text_len = strlen(text);
+        1:   83:	if (text_len == 0) {
+    #####:   84:		errno = EINVAL;
+    #####:   85:		return -1;
+        -:   86:	}
+        -:   87:
+        -:   88:	// allocate the needed memory for the SuffixTreeImpl
+        1:   89:	if (chain_malloc(&ptr->impl, sizeof(SuffixTreeImpl))) {
+    #####:   90:		return -1;
+        -:   91:	}
+        -:   92:
+        -:   93:	// Pointer to our suffix tree impl
+        1:   94:	SuffixTreeImpl *si = ptr->impl.data;
+        -:   95:
+        -:   96:	// allocate the suffix array
+        1:   97:	if (chain_malloc(&si->suffix_array, sizeof(u64) * text_len)) {
+    #####:   98:		chain_free(&ptr->impl);
+    #####:   99:		return -1;
+        -:  100:	}
+        -:  101:
+        -:  102:	// allocate the lcp array
+        1:  103:	if (chain_malloc(&si->lcp_array, sizeof(u64) * text_len)) {
+    #####:  104:		chain_free(&si->suffix_array);
+    #####:  105:		chain_free(&ptr->impl);
+    #####:  106:		return -1;
+        -:  107:	}
+        -:  108:
+        -:  109:	// allocate the text
+        1:  110:	si->text = mymalloc(sizeof(char) * text_len + 1);
+        1:  111:	if (si->text == NULL) {
+    #####:  112:		chain_free(&si->suffix_array);
+    #####:  113:		chain_free(&si->lcp_array);
+    #####:  114:		chain_free(&ptr->impl);
+    #####:  115:		return -1;
+        -:  116:	}
+        -:  117:
+        -:  118:	// create a suffix array to build our suffixes.
+        1:  119:	SuffixPair arr[text_len];
+        1:  120:	u64 rank[text_len];
+        1:  121:	u64 *lcp_arr = si->lcp_array.data;
+        -:  122:
+        -:  123:	// initialize the values of the suffix array.
+       37:  124:	for (u64 i = 0; i < text_len; i++) {
+       36:  125:		arr[i].index = i;
+       36:  126:		arr[i].suffix = (char *)(text + i);
+        -:  127:	}
+        -:  128:
+        -:  129:	// sort them
+        1:  130:	qsort(arr, text_len, sizeof(SuffixPair), suffix_pair_compare);
+        -:  131:
+        -:  132:	// initialize rank and lcp to 0
+        1:  133:	memset(rank, 0, sizeof(u64) * text_len);
+        1:  134:	memset(lcp_arr, 0, sizeof(u64) * text_len);
+        -:  135:
+        -:  136:	// update the data in our array and initialize 'rank' for LCP calc.
+        1:  137:	u64 *suffix_arr = si->suffix_array.data;
+       37:  138:	for (u64 i = 0; i < text_len; i++) {
+       36:  139:		suffix_arr[i] = arr[i].index;
+       36:  140:		rank[arr[i].index] = i;
+        -:  141:	}
+        -:  142:
+        -:  143:	// calculate the LCP
+        1:  144:	u64 h = 0; // Length of the common prefix
+       37:  145:	for (u64 i = 0; i < text_len; i++) {
+       36:  146:		u64 r = rank[i];
+       36:  147:		if (r > 0) {
+        -:  148:			// Previous suffix in sorted order
+       35:  149:			u64 j = suffix_arr[r - 1];
+        -:  150:
+        -:  151:			// Compare characters
+       60:  152:			while (i + h < text_len && j + h < text_len && text[i + h] == text[j + h]) {
+       25:  153:				h++;
+        -:  154:			}
+       35:  155:			lcp_arr[r] = h; // Set LCP value
+       35:  156:			if (h > 0) {
+       25:  157:				h--; // Decrease h for the next suffix
+        -:  158:			}
+        -:  159:		}
+        -:  160:	}
+        -:  161:
+        -:  162:	// copy the text and set the suffix_array_len
+        1:  163:	strcpy(si->text, text);
+        1:  164:	si->suffix_array_len = text_len;
+        -:  165:
+        1:  166:	return 0;
+        -:  167:}
+        -:  168:
+        -:  169:// search our suffix tree for the specified pattern. Return up to limit entries in the
+        -:  170:// SuffixTreeMatch.
+        3:  171:int suffix_tree_search(SuffixTree *ptr, const char *pattern, SuffixTreeMatch *ret, u64 limit)
+        -:  172:{
+        -:  173:	// validate input
+        3:  174:	if (pattern == NULL) {
+    #####:  175:		errno = EINVAL;
+    #####:  176:		return -1;
+        -:  177:	}
+        -:  178:
+        3:  179:	SuffixTreeImpl *si = ptr->impl.data;
+        3:  180:	if (si->suffix_array_len == 0) {
+    #####:  181:		errno = EINVAL;
+    #####:  182:		return -1;
+        -:  183:	}
+        -:  184:
+        3:  185:	u64 pattern_len = strlen(pattern);
+        3:  186:	if (pattern_len == 0 || limit == 0) {
+    #####:  187:		errno = EINVAL;
+    #####:  188:		return -1;
+        -:  189:	}
+        -:  190:
+        -:  191:	// init other variables
+        3:  192:	u64 *suffix_arr = si->suffix_array.data;
+        3:  193:	u64 *lcp_arr = si->lcp_array.data;
+        3:  194:	i32 min = 0;
+        3:  195:	i32 max = si->suffix_array_len - 1;
+        3:  196:	u64 match_index = UINT64_MAX;
+        -:  197:
+        -:  198:	// do a binary search to find a match
+        -:  199:	loop
+        7:  200:	{
+        -:  201:		// take midpoint
+       10:  202:		i64 mid = min + ((max - min) / 2);
+        -:  203:		// compare
+       10:  204:		int cmp = strncmp(pattern, si->text + suffix_arr[mid], pattern_len);
+       10:  205:		if (cmp < 0) {
+        -:  206:			// it's less so max must be lower
+        3:  207:			max = mid - 1;
+        7:  208:		} else if (cmp > 0) {
+        -:  209:			// it's greater so min must be higher
+        5:  210:			min = mid + 1;
+        -:  211:		} else {
+        -:  212:			// match found
+        2:  213:			match_index = mid;
+        2:  214:			break;
+        -:  215:		}
+        -:  216:		// can't go any further
+        8:  217:		if (max < min)
+        1:  218:			break;
+        -:  219:	}
+        -:  220:
+        3:  221:	int count = 0;
+        -:  222:	// If we have a match, iterate through up to limit times and set the ret[i].offset
+        -:  223:	// appropriately.
+        3:  224:	if (match_index != UINT64_MAX) {
+        -:  225:		// populate first entry of the return array
+        2:  226:		count++;
+        2:  227:		ret[0].offset = suffix_arr[match_index];
+        -:  228:
+        -:  229:		// set direction to iterate up
+        2:  230:		bool up = true;
+        -:  231:		// initialize the match iterator
+        2:  232:		u64 match_itt = match_index;
+        -:  233:
+        -:  234:		loop
+        -:  235:		{
+        -:  236:			// if count exceeds our limit break
+       11:  237:			if (count >= limit)
+    #####:  238:				break;
+        -:  239:
+       11:  240:			if (up) {
+        -:  241:				// we are going up check lcp array upwards if it's lcp is greater than or equal to
+        -:  242:				// pattern_len we know it's also a match.
+        7:  243:				if (match_itt + 1 < si->suffix_array_len && lcp_arr[match_itt + 1] >= pattern_len) {
+        -:  244:					// update the return array with this value
+        5:  245:					ret[count].offset = suffix_arr[match_itt + 1];
+        5:  246:					count++;
+        5:  247:					match_itt++;
+        -:  248:				} else {
+        -:  249:					// it's not a match switch to downward direction and reset match index to our
+        -:  250:					// original match
+        2:  251:					up = false;
+        2:  252:					match_itt = match_index;
+        -:  253:				}
+        -:  254:			} else {
+        -:  255:				// we are now oriented downward check if the lcp for our current entry is greater
+        -:  256:				// than pattern_len. If so we know the previous value must be a match.
+        4:  257:				if (match_itt - 1 >= 0 && lcp_arr[match_itt] >= pattern_len) {
+        -:  258:					// update the return array with this value
+        2:  259:					ret[count].offset = suffix_arr[match_itt - 1];
+        2:  260:					count++;
+        2:  261:					match_itt--;
+        -:  262:				} else {
+        -:  263:					// it's not a match. break - no more matches.
+        2:  264:					break;
+        -:  265:				}
+        -:  266:			}
+        -:  267:		}
+        -:  268:	}
+        -:  269:	// return count
+        3:  270:	return count;
+        -:  271:}
+        -:  272:
+        -:  273:// sort the suffix tree using qsort
+        2:  274:void suffix_tree_sort_results(SuffixTreeMatch *ret, u64 count)
+        -:  275:{
+        2:  276:	qsort(ret, count, sizeof(SuffixTreeMatch), suffix_match_compare);
+        2:  277:}
         -:    0:Source:trie.c
         -:    0:Graph:trie.gcno
         -:    0:Data:trie.gcda
-        -:    0:Runs:2
+        -:    0:Runs:6
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -6964,151 +7761,173 @@ Unit_size:
         -:   27:	u32 cur;
         -:   28:} TrieImpl;
         -:   29:
-        2:   30:void trie_cleanup(TrieNc *ptr)
+        3:   30:void trie_cleanup(TrieNc *ptr)
         -:   31:{
-        2:   32:	if (ptr->impl.data) {
-        2:   33:		TrieImpl *ti = ptr->impl.data;
-        2:   34:		if (ti)
-        2:   35:			chain_free(&ti->memory_block);
-        2:   36:		chain_free(&ptr->impl);
+        3:   32:	if (ptr->impl.data) {
+        3:   33:		TrieImpl *ti = ptr->impl.data;
+        3:   34:		if (ti)
+        3:   35:			chain_free(&ti->memory_block);
+        3:   36:		chain_free(&ptr->impl);
         -:   37:	}
-        2:   38:}
+        3:   38:}
         -:   39:
-       23:   40:int trie_init_node(TrieNode *ptr)
+       34:   40:int trie_init_node(TrieNode *ptr)
         -:   41:{
-       23:   42:	ptr->pattern_id = UINT32_MAX;
-     5911:   43:	for (int i = 0; i < 256; i++)
-     5888:   44:		ptr->children[i] = UINT32_MAX;
-       23:   45:	return 0;
+       34:   42:	ptr->pattern_id = UINT32_MAX;
+     8738:   43:	for (int i = 0; i < 256; i++)
+     8704:   44:		ptr->children[i] = UINT32_MAX;
+       34:   45:	return 0;
         -:   46:}
         -:   47:
-        5:   48:int trie_insert(Trie *ptr, const char *str, bool is_case_sensitive, int pattern_id)
+        8:   48:int trie_insert(Trie *ptr, const char *str, bool is_case_sensitive, int pattern_id)
         -:   49:{
-        5:   50:	TrieImpl *ti = ptr->impl.data;
-        5:   51:	int slen = strlen(str);
-        5:   52:	TrieNode *itt = ti->root;
-       30:   53:	for (int i = 0; i < slen; i++) {
-       25:   54:		char next = str[i];
-       25:   55:		if (!is_case_sensitive) {
+        8:   50:	TrieImpl *ti = ptr->impl.data;
+        8:   51:	int slen = strlen(str);
+        8:   52:	TrieNode *itt = ti->root;
+       57:   53:	for (int i = 0; i < slen; i++) {
+       49:   54:		char next = str[i];
+       49:   55:		if (!is_case_sensitive) {
         5:   56:			if (next >= 'A' && next <= 'Z')
         3:   57:				next += 32;
         -:   58:		}
-       25:   59:		u32 offset = itt->children[next];
-       25:   60:		if (offset == UINT32_MAX) {
+       49:   59:		u32 offset = itt->children[next];
+       49:   60:		if (offset == UINT32_MAX) {
         -:   61:			// new node needed
-       21:   62:			itt->children[next] = ti->cur;
-       21:   63:			trie_init_node((TrieNode *)(ti->memory_block.data + ti->cur * sizeof(TrieNode)));
-       21:   64:			offset = ti->cur;
-       21:   65:			ti->cur++;
+       31:   62:			itt->children[next] = ti->cur;
+       31:   63:			trie_init_node((TrieNode *)(ti->memory_block.data + ti->cur * sizeof(TrieNode)));
+       31:   64:			offset = ti->cur;
+       31:   65:			ti->cur++;
         -:   66:
         -:   67:		} else {
         -:   68:			// node exists follow it
         -:   69:		}
-       25:   70:		itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
+       49:   70:		itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
         -:   71:	}
         -:   72:
-        5:   73:	itt->pattern_id = pattern_id;
+        8:   73:	itt->pattern_id = pattern_id;
         -:   74:
-        5:   75:	return 0;
+        8:   75:	return 0;
         -:   76:}
         -:   77:
-        2:   78:int trie_build(Trie *ptr, const char *search_strings[], const bool is_case_sensitive[], int count)
+        3:   78:int trie_build(Trie *ptr, const char *search_strings[], const bool is_case_sensitive[], int count)
         -:   79:{
-        2:   80:	int m = 1; // 1 for root
-        7:   81:	for (int i = 0; i < count; i++) {
-        5:   82:		m += strlen(search_strings[i]);
+        3:   80:	int m = 1; // 1 for root
+       11:   81:	for (int i = 0; i < count; i++) {
+        8:   82:		m += strlen(search_strings[i]);
         -:   83:	}
-        2:   84:	if (chain_malloc(&ptr->impl, sizeof(TrieImpl)))
+        3:   84:	if (chain_malloc(&ptr->impl, sizeof(TrieImpl)))
     #####:   85:		return -1;
         -:   86:
-        2:   87:	TrieImpl *ti = ptr->impl.data;
-        2:   88:	ti->cur = 1;
+        3:   87:	TrieImpl *ti = ptr->impl.data;
+        3:   88:	ti->cur = 1;
         -:   89:
-        2:   90:	if (chain_malloc(&ti->memory_block, m * sizeof(TrieNode))) {
+        3:   90:	if (chain_malloc(&ti->memory_block, m * sizeof(TrieNode))) {
     #####:   91:		chain_free(&ptr->impl);
     #####:   92:		return -1;
         -:   93:	}
-        2:   94:	ti->root = ti->memory_block.data;
-        2:   95:	trie_init_node(ti->root);
+        3:   94:	ti->root = ti->memory_block.data;
+        3:   95:	trie_init_node(ti->root);
         -:   96:
-        7:   97:	for (int i = 0; i < count; i++) {
-        5:   98:		if (trie_insert(ptr, search_strings[i], is_case_sensitive[i], i)) {
+       11:   97:	for (int i = 0; i < count; i++) {
+        8:   98:		if (trie_insert(ptr, search_strings[i], is_case_sensitive[i], i)) {
     #####:   99:			trie_cleanup(ptr);
     #####:  100:			return -1;
         -:  101:		}
         -:  102:	}
         -:  103:
-        2:  104:	return 0;
+        3:  104:	return 0;
         -:  105:}
-        7:  106:int trie_match(Trie *ptr, const char *text, TrieMatch ret[], u64 limit)
-        7:  107:{
-        7:  108:	TrieMatch ci_matches[limit];
-        7:  109:	int ci_match_count = 0;
-        7:  110:	int match_count = 0;
-        7:  111:	int tlen = strlen(text);
-        7:  112:	TrieImpl *ti = ptr->impl.data;
-        7:  113:	TrieNode *itt = ti->root;
-        7:  114:	int match_len = 0;
-      173:  115:	for (int i = 0; i < tlen; i++) {
-      167:  116:		char next = text[i];
-      167:  117:		u32 offset = itt->children[next];
-      167:  118:		if (offset != UINT32_MAX) {
-        -:  119:			// found the node
-       42:  120:			itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
-       42:  121:			if (itt->pattern_id != UINT32_MAX) {
-        6:  122:				ret[match_count].pattern_id = itt->pattern_id;
-        6:  123:				ret[match_count].offset = i - match_len;
-        6:  124:				ret[match_count].len = match_len + 1;
-        6:  125:				ci_matches[ci_match_count].pattern_id = itt->pattern_id;
-        6:  126:				ci_matches[ci_match_count].offset = i - match_len;
-        6:  127:				ci_match_count++;
-        6:  128:				match_count++;
-        -:  129:			}
-       42:  130:			match_len++;
-       42:  131:			if (match_count == limit)
-        1:  132:				break;
-        -:  133:		} else {
-        -:  134:			// not found, return to root
-      125:  135:			itt = ti->root;
-      125:  136:			match_len = 0;
-        -:  137:		}
-        -:  138:	}
-        -:  139:
-        7:  140:	if (match_count < limit) {
-      165:  141:		for (int i = 0; i < tlen; i++) {
-      159:  142:			char next = text[i];
-      159:  143:			if (next >= 'A' && next <= 'Z')
-       28:  144:				next += 32;
-      159:  145:			u32 offset = itt->children[next];
-      159:  146:			if (offset != UINT32_MAX) {
-        -:  147:				// found the node
-       40:  148:				itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
-       40:  149:				if (itt->pattern_id != UINT32_MAX) {
-        -:  150:
-        6:  151:					bool duplicate = false;
-       12:  152:					for (int j = 0; j < ci_match_count; j++) {
-        6:  153:						if (ci_matches[j].pattern_id == itt->pattern_id
-        3:  154:							&& ci_matches[j].offset == i - match_len) {
-        3:  155:							duplicate = true;
-        -:  156:						}
-        -:  157:					}
-        -:  158:
-        6:  159:					if (!duplicate) {
-        3:  160:						ret[match_count].pattern_id = itt->pattern_id;
-        3:  161:						ret[match_count].offset = i - match_len;
-        3:  162:						ret[match_count].len = match_len + 1;
-        3:  163:						match_count++;
-        -:  164:					}
-        -:  165:				}
-       40:  166:				match_len++;
-       40:  167:				if (match_count == limit)
-    #####:  168:					break;
-        -:  169:			} else {
-        -:  170:				// not found, return to root
-      119:  171:				itt = ti->root;
-      119:  172:				match_len = 0;
-        -:  173:			}
-        -:  174:		}
-        -:  175:	}
-        7:  176:	return match_count;
-        -:  177:}
+        -:  106:
+        1:  107:int trie_compare(const void *m1, const void *m2)
+        -:  108:{
+        1:  109:	const TrieMatch *tm1 = m1;
+        1:  110:	const TrieMatch *tm2 = m2;
+        1:  111:	if (tm1->offset < tm2->offset)
+    #####:  112:		return -1;
+        1:  113:	else if (tm1->offset > tm2->offset)
+        1:  114:		return 1;
+    #####:  115:	return 0;
+        -:  116:}
+        -:  117:
+        3:  118:int trie_sort(TrieMatch ret[], int count)
+        -:  119:{
+        3:  120:	return qsort(ret, count, sizeof(TrieMatch), trie_compare);
+        -:  121:}
+        -:  122:
+        8:  123:int trie_match(Trie *ptr, const char *text, TrieMatch ret[], u64 limit)
+        8:  124:{
+        8:  125:	TrieMatch ci_matches[limit];
+        8:  126:	int ci_match_count = 0;
+        8:  127:	int match_count = 0;
+        8:  128:	int tlen = strlen(text);
+        8:  129:	TrieImpl *ti = ptr->impl.data;
+        8:  130:	TrieNode *itt = ti->root;
+        8:  131:	int match_len = 0;
+      220:  132:	for (int i = 0; i < tlen; i++) {
+      214:  133:		char next = text[i];
+      214:  134:		u32 offset = itt->children[next];
+      214:  135:		if (offset != UINT32_MAX) {
+        -:  136:			// found the node
+       66:  137:			itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
+       66:  138:			if (itt->pattern_id != UINT32_MAX) {
+        9:  139:				ret[match_count].pattern_id = itt->pattern_id;
+        9:  140:				ret[match_count].offset = i - match_len;
+        9:  141:				ret[match_count].len = match_len + 1;
+        9:  142:				ci_matches[ci_match_count].pattern_id = itt->pattern_id;
+        9:  143:				ci_matches[ci_match_count].offset = i - match_len;
+        9:  144:				ci_match_count++;
+        9:  145:				match_count++;
+        -:  146:			}
+       66:  147:			match_len++;
+       66:  148:			if (match_count == limit)
+        2:  149:				break;
+        -:  150:		} else {
+        -:  151:			// not found, return to root
+      148:  152:			itt = ti->root;
+      148:  153:			match_len = 0;
+        -:  154:		}
+        -:  155:	}
+        -:  156:
+        8:  157:	bool has_case_sensitive = false;
+        8:  158:	if (match_count < limit) {
+      165:  159:		for (int i = 0; i < tlen; i++) {
+      159:  160:			char next = text[i];
+      159:  161:			if (next >= 'A' && next <= 'Z')
+       28:  162:				next += 32;
+      159:  163:			u32 offset = itt->children[next];
+      159:  164:			if (offset != UINT32_MAX) {
+        -:  165:				// found the node
+       40:  166:				itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
+       40:  167:				if (itt->pattern_id != UINT32_MAX) {
+        -:  168:
+        6:  169:					bool duplicate = false;
+       12:  170:					for (int j = 0; j < ci_match_count; j++) {
+        6:  171:						if (ci_matches[j].pattern_id == itt->pattern_id
+        3:  172:							&& ci_matches[j].offset == i - match_len) {
+        3:  173:							duplicate = true;
+        -:  174:						}
+        -:  175:					}
+        -:  176:
+        6:  177:					if (!duplicate) {
+        3:  178:						has_case_sensitive = true;
+        3:  179:						ret[match_count].pattern_id = itt->pattern_id;
+        3:  180:						ret[match_count].offset = i - match_len;
+        3:  181:						ret[match_count].len = match_len + 1;
+        3:  182:						match_count++;
+        -:  183:					}
+        -:  184:				}
+       40:  185:				match_len++;
+       40:  186:				if (match_count == limit)
+    #####:  187:					break;
+        -:  188:			} else {
+        -:  189:				// not found, return to root
+      119:  190:				itt = ti->root;
+      119:  191:				match_len = 0;
+        -:  192:			}
+        -:  193:		}
+        -:  194:	}
+        -:  195:
+        8:  196:	if (has_case_sensitive)
+        3:  197:		trie_sort(ret, match_count);
+        8:  198:	return match_count;
+        -:  199:}
