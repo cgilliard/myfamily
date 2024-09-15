@@ -937,7 +937,8 @@ void args_usage(Args *args, char *sub_command)
 							len = max_len;
 						for (j = 0; j < (max_len - len) && j < 1024; j++)
 							buffer[j] = ' ';
-						buffer[j] = 0;
+						buffer[j] = ' ';
+						buffer[j + 1] = 0;
 						fprintf(stderr,
 							"    %s-%s%s, "
 							"%s--%s%s "
