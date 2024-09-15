@@ -12,5 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-char *rstrstr(char *s1, char *s2);
+char *rstrstr(const char *s1, const char *s2);
 int copy_file(const char *dst, const char *src);

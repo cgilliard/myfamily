@@ -16,11 +16,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-char *rstrstr(char *s1, char *s2)
+const char *rstrstr(const char *s1, const char *s2)
 {
 	size_t s1len = strlen(s1);
 	size_t s2len = strlen(s2);
-	char *s;
+	const char *s;
 
 	if (s2len > s1len)
 		return NULL;

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/misc.h>
 #include <base/test.h>
 #include <util/replace.h>
 #include <util/suffix_tree.h>
@@ -101,15 +102,35 @@ MyTest(util, test_replace)
 
 MyTest(util, test_suffix_tree)
 {
+	// init a SuffixTreeMatch array
 	SuffixTreeMatch matches[10];
+	// declare a SuffixTree
 	SuffixTree t1;
+	// text for testing search
 	const char *text = "the sixth shieks sixth sheep's sick";
 	u64 text_len = strlen(text);
+
+	// search pattern
 	const char *pattern = "s";
 	u64 pattern_len = strlen(pattern);
+	// build tree
 	suffix_tree_build(&t1, text);
+	// search
 	int r1 = suffix_tree_search(&t1, pattern, matches, 10);
+	// sort results
 	suffix_tree_sort_results(matches, r1);
+
+	// seven 's's in this string
+	cr_assert_eq(r1, 7);
+	cr_assert_eq(matches[0].offset, 4);
+	cr_assert_eq(matches[1].offset, 10);
+	cr_assert_eq(matches[2].offset, 15);
+	cr_assert_eq(matches[3].offset, 17);
+	cr_assert_eq(matches[4].offset, 23);
+	cr_assert_eq(matches[5].offset, 29);
+	cr_assert_eq(matches[6].offset, 31);
+
+	// display them in a color coded manner
 	printf("r1=%i\n", r1);
 	for (int i = 0; i < r1; i++) {
 		printf("match[%i]=%" PRIu64 "\n", i, matches[i].offset);
@@ -136,4 +157,23 @@ MyTest(util, test_suffix_tree)
 		printf("%c", text[i]);
 	printf("%s", RESET);
 	printf("'\n");
+
+	// search for 'sh'
+	cr_assert_eq(suffix_tree_search(&t1, "sh", matches, 10), 2);
+	// sort results.
+	suffix_tree_sort_results(matches, 2);
+	// find the first occurance of 'sh' using other methods.
+	char *off = strstr(text, "sh");
+	// assert it's equal to our first match
+	cr_assert_eq((u64)off - (u64)text, matches[0].offset);
+	// find the second occurance of 'sh' using other methods.
+	char *off2 = rstrstr(text, "sh");
+	// assert it's equal to our second match
+	cr_assert_eq((u64)off2 - (u64)text, matches[1].offset);
+
+	// search something with no matches
+	cr_assert(!suffix_tree_search(&t1, "blah", matches, 10));
+
+	SuffixTree t2;
+	suffix_tree_build(&t2, "banana");
 }
