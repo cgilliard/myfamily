@@ -18,7 +18,8 @@
 #include <string.h>
 
 int args_param_build(ArgsParam *ap, char *name, char *help, char *short_name, bool takes_value,
-					 bool multiple, char *default_value) {
+	bool multiple, char *default_value)
+{
 	if (ap == NULL || name == NULL || help == NULL || short_name == NULL) {
 		errno = EINVAL;
 		return -1;
@@ -69,7 +70,8 @@ int args_param_build(ArgsParam *ap, char *name, char *help, char *short_name, bo
 
 	return 0;
 }
-void args_param_cleanup(ArgsParam *ap) {
+void args_param_cleanup(ArgsParam *ap)
+{
 	if (ap->name) {
 		myfree(ap->name);
 		ap->name = NULL;
@@ -87,8 +89,9 @@ void args_param_cleanup(ArgsParam *ap) {
 		ap->default_value = NULL;
 	}
 }
-int sub_command_build(SubCommand *sc, char *name, char *help, u32 min_args, u32 max_args,
-					  char *arg_doc) {
+int sub_command_build(
+	SubCommand *sc, char *name, char *help, u32 min_args, u32 max_args, char *arg_doc)
+{
 	if (name == NULL || help == NULL || min_args > max_args || arg_doc == NULL) {
 		errno = EINVAL;
 		return -1;
@@ -124,7 +127,8 @@ int sub_command_build(SubCommand *sc, char *name, char *help, u32 min_args, u32 
 	sc->max_args = max_args;
 	return 0;
 }
-void sub_command_cleanup(SubCommand *sc) {
+void sub_command_cleanup(SubCommand *sc)
+{
 	if (sc->name) {
 		myfree(sc->name);
 		sc->name = NULL;
@@ -152,7 +156,8 @@ void sub_command_cleanup(SubCommand *sc) {
 		sc->params_count = 0;
 	}
 }
-int sub_command_add_param(SubCommand *sc, ArgsParam *ap) {
+int sub_command_add_param(SubCommand *sc, ArgsParam *ap)
+{
 	if (ap->name == NULL || ap->help == NULL || ap->short_name == NULL) {
 		errno = EINVAL;
 		return -1;
@@ -202,8 +207,8 @@ int sub_command_add_param(SubCommand *sc, ArgsParam *ap) {
 
 	sc->params_state[index].specified = false;
 
-	if (sc->params[index].name == NULL || sc->params[index].help == NULL ||
-		sc->params[index].short_name == NULL) {
+	if (sc->params[index].name == NULL || sc->params[index].help == NULL
+		|| sc->params[index].short_name == NULL) {
 		sub_command_cleanup(sc);
 		return -1;
 	}
@@ -212,7 +217,8 @@ int sub_command_add_param(SubCommand *sc, ArgsParam *ap) {
 }
 
 int args_build(Args *args, char *prog, char *version, char *author, u32 min_args, u32 max_args,
-			   u64 debug_flags) {
+	u64 debug_flags)
+{
 	if (prog == NULL && version == NULL && author == NULL) {
 		errno = EINVAL;
 		return -1;
@@ -242,7 +248,8 @@ int args_build(Args *args, char *prog, char *version, char *author, u32 min_args
 	return 0;
 }
 
-void args_cleanup(Args *args) {
+void args_cleanup(Args *args)
+{
 	if (args->argc) {
 		for (u64 i = 0; i < args->argc; i++) {
 			myfree(args->argv[i]);
@@ -275,11 +282,13 @@ void args_cleanup(Args *args) {
 		myfree(args->subs);
 	}
 }
-int args_add_param(Args *args, ArgsParam *ap) {
+int args_add_param(Args *args, ArgsParam *ap)
+{
 	return sub_command_add_param(args->subs[0], ap);
 }
 
-int args_add_sub_command(Args *args, SubCommand *sc) {
+int args_add_sub_command(Args *args, SubCommand *sc)
+{
 	if (args->subs_count == 0) {
 		args->subs = mymalloc(sizeof(SubCommand *));
 		if (args->subs == NULL) {
@@ -304,7 +313,7 @@ int args_add_sub_command(Args *args, SubCommand *sc) {
 	}
 
 	if (sub_command_build(args->subs[args->subs_count], sc->name, sc->help, sc->min_args,
-						  sc->max_args, sc->arg_doc)) {
+			sc->max_args, sc->arg_doc)) {
 		fprintf(stderr, "add subcommand %s failed!\n", sc->name);
 		myfree(args->subs[args->subs_count]);
 		return -1;
@@ -319,7 +328,8 @@ int args_add_sub_command(Args *args, SubCommand *sc) {
 	return 0;
 }
 
-bool args_sub_takes_value(Args *args, u64 subi, char *name, bool is_short) {
+bool args_sub_takes_value(Args *args, u64 subi, char *name, bool is_short)
+{
 	for (u64 i = 0; i < args->subs[subi]->params_count; i++) {
 		if (is_short && !strcmp(name, args->subs[subi]->params[i].short_name)) {
 			if (args->subs[subi]->params[i].takes_value) {
@@ -336,23 +346,25 @@ bool args_sub_takes_value(Args *args, u64 subi, char *name, bool is_short) {
 	return false;
 }
 
-void args_exit_error(Args *args, char *format, ...) {
+void args_exit_error(Args *args, char *format, ...)
+{
 	va_list va_args;
 	va_start(va_args, format);
 	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
 	vfprintf(stderr, format, va_args);
 	fprintf(stderr, "\n\n");
 	fprintf(stderr,
-			"%sUSAGE%s:\n    %s%s%s [%sOPTIONS%s]\n\nFor more information "
-			"try %s--help%s\n",
-			DIMMED, RESET, BRIGHT_RED, args->prog, RESET, DIMMED, RESET, GREEN, RESET);
+		"%sUSAGE%s:\n    %s%s%s [%sOPTIONS%s]\n\nFor more information "
+		"try %s--help%s\n",
+		DIMMED, RESET, BRIGHT_RED, args->prog, RESET, DIMMED, RESET, GREEN, RESET);
 	va_end(va_args);
 	u64 debug_flags = args->debug_flags;
 	if (!(debug_flags & DEBUG_INIT_NO_EXIT))
 		exit(-1);
 }
 
-u64 args_subi_for(Args *args, char *sub) {
+u64 args_subi_for(Args *args, char *sub)
+{
 	u64 subi = 0;
 	for (u64 i = 1; i < args->subs_count; i++) {
 		if (!strcmp(sub, args->subs[i]->name)) {
@@ -362,7 +374,8 @@ u64 args_subi_for(Args *args, char *sub) {
 	return subi;
 }
 
-bool args_check_option(Args *args, u64 subi, char *name, bool is_short, char *argv) {
+bool args_check_option(Args *args, u64 subi, char *name, bool is_short, char *argv)
+{
 	bool found = false;
 	for (u64 j = 0; j < args->subs[subi]->params_count; j++) {
 		bool multi = args->subs[subi]->params[j].multiple;
@@ -383,7 +396,8 @@ bool args_check_option(Args *args, u64 subi, char *name, bool is_short, char *ar
 	return found;
 }
 
-void args_check_validity(Args *args, int argc, char **argv) {
+void args_check_validity(Args *args, int argc, char **argv)
+{
 	// check if there's a sub command and check arg count
 	char *sub = NULL;
 	u32 arg_count = 0;
@@ -425,13 +439,13 @@ void args_check_validity(Args *args, int argc, char **argv) {
 				valid = true;
 				if (arg_count > args->subs[i]->max_args || arg_count < args->subs[i]->min_args) {
 					args_exit_error(args,
-									"Incorrect number of "
-									"arguments for sub command '%s' "
-									"(%i specified). "
-									"Number of arguments must be "
-									"between %i and %i.",
-									args->subs[i]->name, arg_count, args->subs[i]->min_args,
-									args->subs[i]->max_args);
+						"Incorrect number of "
+						"arguments for sub command '%s' "
+						"(%i specified). "
+						"Number of arguments must be "
+						"between %i and %i.",
+						args->subs[i]->name, arg_count, args->subs[i]->min_args,
+						args->subs[i]->max_args);
 				}
 				sub_index = i;
 
@@ -447,11 +461,11 @@ void args_check_validity(Args *args, int argc, char **argv) {
 		// check number of args
 		if (arg_count > args->subs[0]->max_args || arg_count < args->subs[0]->min_args) {
 			args_exit_error(args,
-							"Incorrect number of arguments "
-							"(%i specified). "
-							"Number of arguments must be "
-							"between %i and %i.",
-							arg_count, args->subs[0]->min_args, args->subs[0]->max_args);
+				"Incorrect number of arguments "
+				"(%i specified). "
+				"Number of arguments must be "
+				"between %i and %i.",
+				arg_count, args->subs[0]->min_args, args->subs[0]->max_args);
 		}
 	}
 
@@ -487,16 +501,17 @@ void args_check_validity(Args *args, int argc, char **argv) {
 					args_exit_error(args, "Unknown option: %s", argv[i]);
 				} else {
 					args_exit_error(args,
-									"Unknown option: %s. Not valid for "
-									"SubCommand \"%s\".",
-									argv[i], args->subs[subi]->name);
+						"Unknown option: %s. Not valid for "
+						"SubCommand \"%s\".",
+						argv[i], args->subs[subi]->name);
 				}
 			}
 		}
 	}
 }
 
-int args_init(Args *args, int argc, char **argv) {
+int args_init(Args *args, int argc, char **argv)
+{
 	args->argc = argc;
 	args->argv = mymalloc(sizeof(char *) * argc);
 
@@ -561,7 +576,8 @@ int args_init(Args *args, int argc, char **argv) {
 	return 0;
 }
 
-int args_value_of(Args *args, char *param_name, char *value_buf, u64 max_value_len, u64 index) {
+int args_value_of(Args *args, char *param_name, char *value_buf, u64 max_value_len, u64 index)
+{
 	if (args == NULL || param_name == NULL) {
 		errno = EINVAL;
 		return -1;
@@ -616,7 +632,8 @@ int args_value_of(Args *args, char *param_name, char *value_buf, u64 max_value_l
 	errno = ENOENT;
 	return -1;
 }
-int args_get_argument(Args *args, u64 index, char *value_buf, u64 max_value_len) {
+int args_get_argument(Args *args, u64 index, char *value_buf, u64 max_value_len)
+{
 	u64 index_itt = 0;
 	for (u64 i = 1; i < args->argc; i++) {
 		i32 len = strlen(args->argv[i]);
@@ -660,14 +677,16 @@ int args_get_argument(Args *args, u64 index, char *value_buf, u64 max_value_len)
 	return 0;
 }
 
-void args_print_version(Args *args) {
+void args_print_version(Args *args)
+{
 	char *prog = args->prog;
 	char *version = args->version;
 	fprintf(stderr, "%s%s%s %s%s%s\n", BRIGHT_RED, prog, RESET, CYAN, version, RESET);
 	exit(0);
 }
 
-void args_usage(Args *args, char *sub_command) {
+void args_usage(Args *args, char *sub_command)
+{
 	bool found = false;
 	u64 subs_count = args->subs_count;
 	u64 sub_index = 0;
@@ -733,23 +752,23 @@ void args_usage(Args *args, char *sub_command) {
 	char sub_command_str[sub_command_str_len + 30];
 	char *sub_arg_doc_str = "";
 	if (sub_command) {
-		snprintf(sub_command_str, sub_command_str_len + 30, "%s%s%s", BRIGHT_RED, sub_command,
-				 RESET);
+		snprintf(
+			sub_command_str, sub_command_str_len + 30, "%s%s%s", BRIGHT_RED, sub_command, RESET);
 		sub_arg_doc_str = args->subs[sub_index]->arg_doc;
 	} else {
 		snprintf(sub_command_str, sub_command_str_len + 30, "[%sSUB_COMMAND%s]", DIMMED, RESET);
 	}
 
 	fprintf(stderr,
-			"%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s "
-			"[%sCORE_OPTIONS%s] %s [%sSUB_OPTIONS%s] %s\n\n"
-			"%sCORE_FLAGS%s:\n"
-			"    %s-h%s, %s--help%s%sPrints help information\n"
-			"    %s-V%s, %s--version%s%sPrints version "
-			"information\n",
-			CYAN, prog, RESET, YELLOW, version, RESET, GREEN, author, RESET, DIMMED, RESET,
-			BRIGHT_RED, prog, RESET, DIMMED, RESET, sub_command_str, DIMMED, RESET, sub_arg_doc_str,
-			DIMMED, RESET, CYAN, RESET, YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET, buffer2);
+		"%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s "
+		"[%sCORE_OPTIONS%s] %s [%sSUB_OPTIONS%s] %s\n\n"
+		"%sCORE_FLAGS%s:\n"
+		"    %s-h%s, %s--help%s%sPrints help information\n"
+		"    %s-V%s, %s--version%s%sPrints version "
+		"information\n",
+		CYAN, prog, RESET, YELLOW, version, RESET, GREEN, author, RESET, DIMMED, RESET, BRIGHT_RED,
+		prog, RESET, DIMMED, RESET, sub_command_str, DIMMED, RESET, sub_arg_doc_str, DIMMED, RESET,
+		CYAN, RESET, YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET, buffer2);
 
 	for (u64 i = 0; i < count; i++) {
 		bool takes_value = params[i].takes_value;
@@ -765,7 +784,7 @@ void args_usage(Args *args, char *sub_command) {
 				buffer[i] = ' ';
 			buffer[i] = 0;
 			fprintf(stderr, "    %s-%s%s, %s--%s%s %s%s\n", CYAN, short_name, RESET, YELLOW, name,
-					RESET, buffer, help);
+				RESET, buffer, help);
 		}
 	}
 
@@ -791,7 +810,7 @@ void args_usage(Args *args, char *sub_command) {
 					strcpy(default_value_str, "");
 				else
 					snprintf(default_value_str, default_value_str_len, " (default value: '%s')",
-							 default_value);
+						default_value);
 
 				if (multi) {
 					u64 len = snprintf(NULL, 0, "    -%s, --%s <%s>, ...", short_name, name, name);
@@ -802,11 +821,11 @@ void args_usage(Args *args, char *sub_command) {
 						buffer[i] = ' ';
 					buffer[i] = 0;
 					fprintf(stderr,
-							"    %s-%s%s, %s--%s%s "
-							"<%s>, "
-							"... %s%s%s\n",
-							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-							default_value_str);
+						"    %s-%s%s, %s--%s%s "
+						"<%s>, "
+						"... %s%s%s\n",
+						CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+						default_value_str);
 				} else {
 
 					u64 len = snprintf(NULL, 0, "    -%s, --%s <%s>", short_name, name, name);
@@ -818,11 +837,11 @@ void args_usage(Args *args, char *sub_command) {
 					buffer[i] = 0;
 
 					fprintf(stderr,
-							"    %s-%s%s, %s--%s%s "
-							"<%s> "
-							"%s%s%s\n",
-							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-							default_value_str);
+						"    %s-%s%s, %s--%s%s "
+						"<%s> "
+						"%s%s%s\n",
+						CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+						default_value_str);
 				}
 			}
 		}
@@ -863,7 +882,7 @@ void args_usage(Args *args, char *sub_command) {
 
 			count = args->subs[param_index]->params_count;
 			fprintf(stderr, "\n%sSUB_FLAGS%s (%s%s%s):\n", DIMMED, RESET, BRIGHT_RED, sub_command,
-					RESET);
+				RESET);
 
 			for (u64 i = 0; i < count; i++) {
 				char *name = params[i].name;
@@ -881,13 +900,13 @@ void args_usage(Args *args, char *sub_command) {
 						buffer[j] = ' ';
 					buffer[j] = 0;
 					fprintf(stderr,
-							"    %s-%s%s, "
-							"%s--%s%s%s %s\n",
-							CYAN, short_name, RESET, YELLOW, name, RESET, buffer, help);
+						"    %s-%s%s, "
+						"%s--%s%s%s %s\n",
+						CYAN, short_name, RESET, YELLOW, name, RESET, buffer, help);
 				}
 			}
 			fprintf(stderr, "\n%sSUB_OPTIONS%s (%s%s%s):\n", DIMMED, RESET, BRIGHT_RED, sub_command,
-					RESET);
+				RESET);
 			for (u64 i = 0; i < count; i++) {
 				char *name = params[i].name;
 				char *short_name = params[i].short_name;
@@ -907,7 +926,7 @@ void args_usage(Args *args, char *sub_command) {
 					strcpy(default_value_str, "");
 				else
 					snprintf(default_value_str, default_value_str_len, " (default value: %s)",
-							 default_value);
+						default_value);
 
 				if (takes_value) {
 					if (multiple) {
@@ -920,12 +939,12 @@ void args_usage(Args *args, char *sub_command) {
 							buffer[j] = ' ';
 						buffer[j] = 0;
 						fprintf(stderr,
-								"    %s-%s%s, "
-								"%s--%s%s "
-								"<%s>, ...%s %s"
-								"%s\n",
-								CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-								default_value_str);
+							"    %s-%s%s, "
+							"%s--%s%s "
+							"<%s>, ...%s %s"
+							"%s\n",
+							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+							default_value_str);
 					} else {
 						u64 len = 2 * strlen(name) + 13;
 						char buffer[1025];
@@ -936,12 +955,12 @@ void args_usage(Args *args, char *sub_command) {
 							buffer[j] = ' ';
 						buffer[j] = 0;
 						fprintf(stderr,
-								"    %s-%s%s, "
-								"%s--%s%s "
-								"<%s>%s "
-								"%s%s\n",
-								CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-								default_value_str);
+							"    %s-%s%s, "
+							"%s--%s%s "
+							"<%s>%s "
+							"%s%s\n",
+							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+							default_value_str);
 					}
 				}
 			}

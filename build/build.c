@@ -23,11 +23,8 @@
 int proc_build_init(
 	const char *proj_name, const char *proj_path, char authors[11][1024], int author_count)
 {
-	printf("acount=%i\n", author_count);
 	int author_len = 0;
 	for (int i = 0; i < author_count; i++) {
-		printf("author %i\n", i);
-		printf("author[%i]=%s\n", i, authors[i]);
 		author_len += strlen(authors[i]) + 10;
 	}
 	char author_replace[author_len];
@@ -43,7 +40,8 @@ int proc_build_init(
 	Path path;
 	path_for(&path, proj_path);
 	if (path_exists(&path)) {
-		fprintf(stderr, "Path: '%s' already exists!\n", proj_path);
+		path_canonicalize(&path);
+		fprintf(stderr, "Path: '%s' already exists!\n", path_to_string(&path));
 		exit(-1);
 	}
 	if (path_mkdir(&path, 0700)) {

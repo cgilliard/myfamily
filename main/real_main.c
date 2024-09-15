@@ -216,14 +216,12 @@ void process_init(Args *args, char *config_dir)
 		int v = args_value_of(args, "author", author[count], 1024, count);
 		if (v == -1)
 			break;
-		printf("a=%s\n", author[count]);
 		count++;
 		if (count >= 10) {
 			fprintf(stderr, "A maximum of 10 authors is allowed.");
 			exit(-1);
 		}
 	}
-	printf("acount=%i\n", count);
 	proc_build_init(proj_name, proj_path, (char **)author, count);
 }
 
