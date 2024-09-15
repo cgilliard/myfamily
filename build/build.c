@@ -20,8 +20,8 @@
 #include <string.h>
 #include <util/replace.h>
 
-int proc_build_init(
-	const char *proj_name, const char *proj_path, char authors[11][1024], int author_count)
+int proc_build_init(const char *proj_name, const char *proj_path, char authors[11][1024],
+	int author_count, bool lib, char *description)
 {
 	int author_len = 0;
 	for (int i = 0; i < author_count; i++) {
@@ -51,7 +51,10 @@ int proc_build_init(
 
 	path_push(&path, "fam.toml");
 	Path template;
-	path_for(&template, "~/.fam/resources/fam.toml");
+	if (lib)
+		path_for(&template, "~/.fam/resources/fam.lib.toml");
+	else
+		path_for(&template, "~/.fam/resources/fam.toml");
 	path_canonicalize(&template);
 	if (copy_file(path_to_string(&path), path_to_string(&template)) != 0) {
 		perror("Error: copying file");
@@ -61,7 +64,12 @@ int proc_build_init(
 	const char *patterns_in[]
 		= { "REPLACE_FAM_VERSION", "REPLACE_NAME", "REPLACE_AUTHORS", "REPLACE_DESCRIPTION" };
 	const bool is_case_sensitive[] = { true, true, true };
-	const char *replace[] = { FAM_VERSION, proj_name, author_replace, proj_name };
+	char desc[1024];
+	if (strlen(description) > 0)
+		strcpy(desc, description);
+	else
+		strcpy(desc, proj_name);
+	const char *replace[] = { FAM_VERSION, proj_name, author_replace, desc };
 	replace_file(&path, &path, patterns_in, is_case_sensitive, replace, 4);
 
 	Path proj_dir;

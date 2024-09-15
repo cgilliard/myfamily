@@ -12,4 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-int proc_build_init(const char *proj_name, const char *proj_path, char **authors, int author_count);
+#ifndef _BUILD_BUILD__
+#define _BUILD_BUILD__
+
+int proc_build_init(const char *proj_name, const char *proj_path, char **authors, int author_count,
+	bool lib, char *description);
+
+#endif // _BUILD_BUILD__

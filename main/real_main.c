@@ -42,9 +42,19 @@ void build_args(Args *args)
 	ArgsParam cfg_authors;
 	args_param_build(&cfg_authors, "author", "Author of this project", "a", true, true,
 		"The MyFamily Developers");
+	ArgsParam cfg_lib;
+	args_param_build(&cfg_lib, "lib",
+		"Initialize the project as a library project. (If not set, the project will be a binary "
+		"project)",
+		"l", false, false, NULL);
+	ArgsParam cfg_description;
+	args_param_build(&cfg_description, "description",
+		"Project description (defaults to the project name)", "d", true, false, NULL);
 	sub_command_build(&init, "init", "Initialize project", 1, 1, "<project_name>");
 	sub_command_add_param(&init, &cfg_dir);
 	sub_command_add_param(&init, &cfg_authors);
+	sub_command_add_param(&init, &cfg_lib);
+	sub_command_add_param(&init, &cfg_description);
 
 	args_add_sub_command(args, &init);
 
@@ -204,16 +214,16 @@ void process_init(Args *args, char *config_dir)
 {
 	char proj_name[128];
 	strcpy(proj_name, "");
-	args_get_argument(args, 1, proj_name, 128);
+	args_get_argument(args, 1, proj_name, 127);
 	char proj_path[1024];
 	strcpy(proj_path, proj_name);
-	args_value_of(args, "dir", proj_path, 1024, 0);
+	args_value_of(args, "dir", proj_path, 1023, 0);
 
 	char author[11][1024];
 	int count = 0;
 	loop
 	{
-		int v = args_value_of(args, "author", author[count], 1024, count);
+		int v = args_value_of(args, "author", author[count], 1023, count);
 		if (v == -1)
 			break;
 		count++;
@@ -222,7 +232,12 @@ void process_init(Args *args, char *config_dir)
 			exit(-1);
 		}
 	}
-	proc_build_init(proj_name, proj_path, (char **)author, count);
+
+	bool lib = args_value_of(args, "lib", NULL, 0, 0) >= 0;
+
+	char description[1024];
+	args_value_of(args, "description", description, 1023, 0);
+	proc_build_init(proj_name, proj_path, (char **)author, count, lib, description);
 }
 
 void setup_config_dir(const char *config_dir)
