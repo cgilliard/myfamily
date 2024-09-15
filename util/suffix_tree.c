@@ -183,7 +183,7 @@ int suffix_tree_search(SuffixTree *ptr, const char *pattern, SuffixTreeMatch *re
 	}
 
 	u64 pattern_len = strlen(pattern);
-	if (pattern_len == 0) {
+	if (pattern_len == 0 || limit == 0) {
 		errno = EINVAL;
 		return -1;
 	}
@@ -218,58 +218,56 @@ int suffix_tree_search(SuffixTree *ptr, const char *pattern, SuffixTreeMatch *re
 			break;
 	}
 
-	// We know the last_match is at least (match_index). Start there.
-	u64 last_match = match_index;
-
-	// do something like a binary search to find the last index.
+	int count = 0;
+	// If we have a match, iterate through up to limit times and set the ret[i].offset
+	// appropriately.
 	if (match_index != UINT64_MAX) {
-		// max is the last entry.
-		i64 max = si->suffix_array_len - 1;
-		// check that there are common prefixes, if not we have a single match and we need not find
-		// a range.
-		if (lcp_arr[match_index] >= pattern_len) {
-			// there are common prefixes that are at least the length of our pattern. Use binary
-			// search to find the last one.
-			loop
-			{
-				i64 test = last_match + ((max - last_match) / 2);
-				if (strncmp(pattern, si->text + suffix_arr[test], pattern_len)) {
-					// not a match, test is too high
-					max = test;
+		// populate first entry of the return array
+		count++;
+		ret[0].offset = suffix_arr[match_index];
+
+		// set direction to iterate up
+		bool up = true;
+		// initialize the match iterator
+		u64 match_itt = match_index;
+
+		loop
+		{
+			// if count exceeds our limit break
+			if (count >= limit)
+				break;
+
+			if (up) {
+				// we are going up check lcp array upwards if it's lcp is greater than or equal to
+				// pattern_len we know it's also a match.
+				if (match_itt + 1 < si->suffix_array_len && lcp_arr[match_itt + 1] >= pattern_len) {
+					// update the return array with this value
+					ret[count].offset = suffix_arr[match_itt + 1];
+					count++;
+					match_itt++;
 				} else {
-					// they match, last_match could be higher
-					last_match = test;
+					// it's not a match switch to downward direction and reset match index to our
+					// original match
+					up = false;
+					match_itt = match_index;
 				}
-				if (last_match >= max - 1) {
-					// as high as it could be, break.
+			} else {
+				// we are now oriented downward check if the lcp for our current entry is greater
+				// than pattern_len. If so we know the previous value must be a match.
+				if (match_itt - 1 >= 0 && lcp_arr[match_itt] >= pattern_len) {
+					// update the return array with this value
+					ret[count].offset = suffix_arr[match_itt - 1];
+					count++;
+					match_itt--;
+				} else {
+					// it's not a match. break - no more matches.
 					break;
 				}
 			}
 		}
 	}
-
-	// If we have a match, iterate through up to limit times and set the ret[i].offset
-	// appropriately.
-	if (match_index != UINT64_MAX) {
-		int count = 0;
-		loop
-		{
-			// if count is greater than last match or count is greater than equal to limit break
-			if (count > last_match || count >= limit)
-				break;
-			// If the pattern no longer matches, break
-			if (strncmp(pattern, si->text + suffix_arr[last_match - count], pattern_len))
-				break;
-			// set the offset and increment count
-			ret[count].offset = suffix_arr[last_match - count];
-			count++;
-		}
-		// return count
-		return count;
-	} else {
-		// no matches, return 0.
-		return 0;
-	}
+	// return count
+	return count;
 }
 
 // sort the suffix tree using qsort
