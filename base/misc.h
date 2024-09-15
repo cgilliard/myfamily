@@ -12,5 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef _BASE_MISC__
+#define _BASE_MISC__
+
+#include <stddef.h>
+#include <stdio.h>
+
 char *rstrstr(const char *s1, const char *s2);
 int copy_file(const char *dst, const char *src);
+int remove_directory(const char *path);
+size_t read_all(void *buffer, size_t size, size_t count, FILE *stream);
+
+#endif // _BASE_MISC__

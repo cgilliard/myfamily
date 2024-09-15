@@ -93,11 +93,23 @@ MyTest(util, test_replace)
 	Path pin;
 	Path pout;
 	path_for(&pin, "./resources/test_replace.txt");
-	path_for(&pout, "/tmp/test_replace.txt.out");
+	path_for(&pout, path_to_string(test_dir));
+	path_push(&pout, "test_replace.txt.out");
 	const char *patterns_in[] = { "REPLACE1", "REPLACE2", "REPLACE3" };
 	const bool is_case_sensitive[] = { true, true, true };
 	const char *replace[] = { "mytext1", "mytext2", "mytext3" };
 	replace_file(&pin, &pout, patterns_in, is_case_sensitive, replace, 3);
+
+	FILE *file = fopen(path_to_string(&pout), "rb");
+	// Determine the file size
+	fseek(file, 0, SEEK_END);
+	long file_size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	char buffer[file_size + 1];
+	buffer[file_size] = 0;
+	cr_assert_eq(read_all(buffer, file_size, sizeof(char), file), file_size);
+	cr_assert(!strcmp(buffer, "x'mytext3' ok yes 'mytext2'\nanother 'mytext1'\n"));
 }
 
 MyTest(util, test_suffix_tree)
@@ -107,7 +119,7 @@ MyTest(util, test_suffix_tree)
 	// declare a SuffixTree
 	SuffixTree t1;
 	// text for testing search
-	const char *text = "the sixth shieks sixth sheep's sick";
+	const char *text = "the sixth sheik's sixth sheep's sick";
 	u64 text_len = strlen(text);
 
 	// search pattern
@@ -124,11 +136,11 @@ MyTest(util, test_suffix_tree)
 	cr_assert_eq(r1, 7);
 	cr_assert_eq(matches[0].offset, 4);
 	cr_assert_eq(matches[1].offset, 10);
-	cr_assert_eq(matches[2].offset, 15);
-	cr_assert_eq(matches[3].offset, 17);
-	cr_assert_eq(matches[4].offset, 23);
-	cr_assert_eq(matches[5].offset, 29);
-	cr_assert_eq(matches[6].offset, 31);
+	cr_assert_eq(matches[2].offset, 16);
+	cr_assert_eq(matches[3].offset, 18);
+	cr_assert_eq(matches[4].offset, 24);
+	cr_assert_eq(matches[5].offset, 30);
+	cr_assert_eq(matches[6].offset, 32);
 
 	// display them in a color coded manner
 	printf("r1=%i\n", r1);
@@ -173,7 +185,4 @@ MyTest(util, test_suffix_tree)
 
 	// search something with no matches
 	cr_assert(!suffix_tree_search(&t1, "blah", matches, 10));
-
-	SuffixTree t2;
-	suffix_tree_build(&t2, "banana");
 }

@@ -14,11 +14,15 @@
 
 #include <base/chain_allocator.h>
 #include <base/colors.h>
+#include <base/macro_utils.h>
+#include <base/misc.h>
+#include <base/path.h>
 #include <base/resources.h>
 #include <criterion/criterion.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #define MySuite(name)                                                                              \
 	void setup_suite(void)                                                                         \
@@ -86,17 +90,31 @@
 			log_fd = -1;                                                                           \
 		}                                                                                          \
 	}                                                                                              \
-	void test_##suite##_##test();                                                                  \
+	void test_##suite##_##test(Path *test_dir);                                                    \
 	Test(suite, test, .init = setup_##test, .fini = tear_down)                                     \
 	{                                                                                              \
 		HeapAllocator ha;                                                                          \
 		build_default_heap_allocator(&ha);                                                         \
 		ChainGuard cg = SCOPED_ALLOCATOR(&ha, false);                                              \
-		test_##suite##_##test();                                                                   \
+		{                                                                                          \
+			char path[1024];                                                                       \
+			strcpy(path, ".");                                                                     \
+			strcat(path, #suite);                                                                  \
+			strcat(path, "_");                                                                     \
+			strcat(path, #test);                                                                   \
+			strcat(path, ".fam");                                                                  \
+			remove_directory(path);                                                                \
+			mkdir(path, 0700);                                                                     \
+			Path dir;                                                                              \
+			path_for(&dir, path);                                                                  \
+			path_canonicalize(&dir);                                                               \
+			test_##suite##_##test(&dir);                                                           \
+			remove_directory(path);                                                                \
+		}                                                                                          \
 		u64 cur_slabs = heap_allocator_cur_slabs_allocated(&ha);                                   \
 		if (cur_slabs != 0)                                                                        \
 			printf("some slabs were not deallocated! (%" PRIu64 ")\n", cur_slabs);                 \
 		cr_assert_eq(cur_slabs, 0);                                                                \
 		cr_assert_eq(heap_allocator_cleanup(&ha), 0);                                              \
 	}                                                                                              \
-	void test_##suite##_##test()
+	void test_##suite##_##test(Path *test_dir)
