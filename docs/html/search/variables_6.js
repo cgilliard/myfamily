@@ -1,22 +1,14 @@
 var searchData=
 [
-  ['f_1502',['f',['../header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699',1,'header_sample1.h']]],
-  ['fam_5fxxdir_5ffile_5f0_1503',['fam_xxdir_file_0',['../main_2resources_8h.html#a692e7ef0c04e01d072a85baa5ea85d8b',1,'resources.h']]],
-  ['fam_5fxxdir_5ffile_5f1_1504',['fam_xxdir_file_1',['../main_2resources_8h.html#a4fffd0e86e695eb86b6922cc44b55965',1,'resources.h']]],
-  ['fam_5fxxdir_5ffile_5fcount_1505',['fam_xxdir_file_count',['../main_2resources_8h.html#ac375d3a0442e31fa939e707bf5a1c830',1,'resources.h']]],
-  ['fam_5fxxdir_5ffile_5fnames_1506',['fam_xxdir_file_names',['../main_2resources_8h.html#aaec17a4f851255f7c9f197c16ba77156',1,'resources.h']]],
-  ['fam_5fxxdir_5ffile_5fsize_5f0_1507',['fam_xxdir_file_size_0',['../main_2resources_8h.html#a6be61a7892c4154233d4c09c260014d8',1,'resources.h']]],
-  ['fam_5fxxdir_5ffile_5fsize_5f1_1508',['fam_xxdir_file_size_1',['../main_2resources_8h.html#a4470f361361ee034f0c018d13cd78251',1,'resources.h']]],
-  ['fam_5fxxdir_5ffile_5fsizes_1509',['fam_xxdir_file_sizes',['../main_2resources_8h.html#abb219d63fd4b97f7b1237c602f6d133f',1,'resources.h']]],
-  ['fam_5fxxdir_5ffiles_1510',['fam_xxdir_files',['../main_2resources_8h.html#adf28783888016b921bcdcb305e82061b',1,'resources.h']]],
-  ['fclose_5fsum_1511',['fclose_sum',['../structResourceStats.html#ac0d083893a67bb29d7a6f91bbc817b94',1,'ResourceStats']]],
-  ['file_1512',['file',['../header__sample1_8h.html#a14523cb74edc3f6175c54e598a379c27',1,'header_sample1.h']]],
-  ['file_5fcount_1513',['file_count',['../xxdir_8c.html#abd3633577cf354ae9e2c69a018cfe999',1,'xxdir.c']]],
-  ['file_5fsizes_1514',['file_sizes',['../xxdir_8c.html#aab1026987f4e2b9d406e52e915a4cc2b',1,'xxdir.c']]],
-  ['flags_1515',['flags',['../structObj.html#a3fd645d469fabcc2be3caf4156c22139',1,'Obj']]],
-  ['fn_5fptr_1516',['fn_ptr',['../structVtableEntry.html#adbda011856bedb6edbc95a98d2a5e951',1,'VtableEntry']]],
-  ['fopen_5fsum_1517',['fopen_sum',['../structResourceStats.html#a219fe4bda1b0a3dda0c08c617756dc83',1,'ResourceStats']]],
-  ['free_5flist_1518',['free_list',['../structHeapData.html#a29975f1d8bcf6d1c834d51434dd04a1f',1,'HeapData']]],
-  ['free_5flist_5fhead_1519',['free_list_head',['../structHeapDataParams.html#a9ee738ee4ef37e4094185578b034a89b',1,'HeapDataParams']]],
-  ['free_5fsum_1520',['free_sum',['../structResourceStats.html#a3938200a8370093ec9738263d1947a34',1,'ResourceStats']]]
+  ['f_1541',['f',['../header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699',1,'header_sample1.h']]],
+  ['fclose_5fsum_1542',['fclose_sum',['../structResourceStats.html#ac0d083893a67bb29d7a6f91bbc817b94',1,'ResourceStats']]],
+  ['file_1543',['file',['../header__sample1_8h.html#a14523cb74edc3f6175c54e598a379c27',1,'header_sample1.h']]],
+  ['file_5fcount_1544',['file_count',['../xxdir_8c.html#abd3633577cf354ae9e2c69a018cfe999',1,'xxdir.c']]],
+  ['file_5fsizes_1545',['file_sizes',['../xxdir_8c.html#aab1026987f4e2b9d406e52e915a4cc2b',1,'xxdir.c']]],
+  ['flags_1546',['flags',['../structObj.html#a3fd645d469fabcc2be3caf4156c22139',1,'Obj']]],
+  ['fn_5fptr_1547',['fn_ptr',['../structVtableEntry.html#adbda011856bedb6edbc95a98d2a5e951',1,'VtableEntry']]],
+  ['fopen_5fsum_1548',['fopen_sum',['../structResourceStats.html#a219fe4bda1b0a3dda0c08c617756dc83',1,'ResourceStats']]],
+  ['free_5flist_1549',['free_list',['../structHeapData.html#a29975f1d8bcf6d1c834d51434dd04a1f',1,'HeapData']]],
+  ['free_5flist_5fhead_1550',['free_list_head',['../structHeapDataParams.html#a9ee738ee4ef37e4094185578b034a89b',1,'HeapDataParams']]],
+  ['free_5fsum_1551',['free_sum',['../structResourceStats.html#a3938200a8370093ec9738263d1947a34',1,'ResourceStats']]]
 ];

@@ -78,7 +78,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="chain__allocator_8h_source.html">base/chain_allocator.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="panic_8h_source.html">base/panic.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="base_2resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
 <code>#include &lt;errno.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
@@ -90,7 +90,7 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a07a6a21305ea4faf794728aba3620e23"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(<a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>)&#160;&#160;&#160;{<a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>, 10, 0, UINT32_MAX}</td></tr>
+<tr class="memitem:a07a6a21305ea4faf794728aba3620e23"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(<a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>)&#160;&#160;&#160;{ <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>, 10, 0, UINT32_MAX }</td></tr>
 <tr class="separator:a07a6a21305ea4faf794728aba3620e23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
@@ -131,13 +131,13 @@ Variables</h2></td></tr>
 <tr class="separator:a78281631a068160585f291c1008be6a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a056b083c03dcecdc263ff590f67a5669"><td class="memItemLeft" align="right" valign="top"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a056b083c03dcecdc263ff590f67a5669">__global_sync_allocator_lock</a> = NULL</td></tr>
 <tr class="separator:a056b083c03dcecdc263ff590f67a5669"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aafa38721651819c348c2d3dccceaff22"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structHeapAllocatorConfig.html">HeapAllocatorConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#aafa38721651819c348c2d3dccceaff22">__default_hconfig_</a> = {false, false}</td></tr>
+<tr class="memitem:aafa38721651819c348c2d3dccceaff22"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structHeapAllocatorConfig.html">HeapAllocatorConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#aafa38721651819c348c2d3dccceaff22">__default_hconfig_</a> = { false, false }</td></tr>
 <tr class="separator:aafa38721651819c348c2d3dccceaff22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add9f5a74c73caad1f1599ddbffdfb88e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structHeapDataParamsConfig.html">HeapDataParamsConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a> []</td></tr>
 <tr class="separator:add9f5a74c73caad1f1599ddbffdfb88e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad09fb2a24755bca224bd076e6d818aec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structHeapDataParamsConfig.html">HeapDataParamsConfig</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#ad09fb2a24755bca224bd076e6d818aec">__default_hdpc_arr_</a> = <a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a></td></tr>
 <tr class="separator:ad09fb2a24755bca224bd076e6d818aec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb5d070ac2ed7841c63e686177e6fc79"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#acb5d070ac2ed7841c63e686177e6fc79">__default_hdpc_arr_size</a></td></tr>
+<tr class="memitem:acb5d070ac2ed7841c63e686177e6fc79"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#acb5d070ac2ed7841c63e686177e6fc79">__default_hdpc_arr_size</a> = sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>) / sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>[0])</td></tr>
 <tr class="separator:acb5d070ac2ed7841c63e686177e6fc79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26f0241573b4b4f69e5559c1d7b209e1"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a26f0241573b4b4f69e5559c1d7b209e1">__thread_local_chain_allocator</a> [<a class="el" href="chain__allocator_8h.html#ab53a76916d5a7c5966fc994b1d02dbff">MAX_CHAIN_ALLOCATOR_DEPTH</a>]</td></tr>
 <tr class="separator:a26f0241573b4b4f69e5559c1d7b209e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -156,7 +156,7 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a></td><td>)</td>
-          <td>&#160;&#160;&#160;{<a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>, 10, 0, UINT32_MAX}</td>
+          <td>&#160;&#160;&#160;{ <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>, 10, 0, UINT32_MAX }</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -475,7 +475,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structHeapAllocatorConfig.html">HeapAllocatorConfig</a> __default_hconfig_ = {false, false}</td>
+          <td class="memname"><a class="el" href="structHeapAllocatorConfig.html">HeapAllocatorConfig</a> __default_hconfig_ = { false, false }</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -503,14 +503,11 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> __default_hdpc_arr_size</td>
+          <td class="memname"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> __default_hdpc_arr_size = sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>) / sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>[0])</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=</div>
-<div class="line">    <span class="keyword">sizeof</span>(<a class="code" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>) / <span class="keyword">sizeof</span>(<a class="code" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>[0])</div>
-<div class="ttc" id="achain__allocator_8c_html_add9f5a74c73caad1f1599ddbffdfb88e"><div class="ttname"><a href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a></div><div class="ttdeci">HeapDataParamsConfig __default_hdpc_arr_value[]</div><div class="ttdef"><b>Definition:</b> chain_allocator.c:36</div></div>
-</div><!-- fragment -->
+
 </div>
 </div>
 <a id="add9f5a74c73caad1f1599ddbffdfb88e"></a>
@@ -524,7 +521,15 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Initial value:</b><div class="fragment"><div class="line">= { <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(8), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(16), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(32), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(48),</div>
+<div class="line">    <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(64), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(80), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(96), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(112), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(128), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(144), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(160),</div>
+<div class="line">    <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(176), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(192), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(208), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(224), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(240), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(256), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(272),</div>
+<div class="line">    <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(288), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(304), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(320), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(336), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(352), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(368), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(384),</div>
+<div class="line">    <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(400), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(416), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(432), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(448), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(464), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(480), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(496),</div>
+<div class="line">    <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(512), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(1024), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(2048), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(4096), <a class="code" href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a>(8192),</div>
+<div class="line">    { 16384, 5, 0, UINT32_MAX }, { 32768, 5, 0, UINT32_MAX }, { 65536, 2, 0, UINT32_MAX } }</div>
+<div class="ttc" id="achain__allocator_8c_html_a07a6a21305ea4faf794728aba3620e23"><div class="ttname"><a href="chain__allocator_8c.html#a07a6a21305ea4faf794728aba3620e23">HD_CFG</a></div><div class="ttdeci">#define HD_CFG(size)</div><div class="ttdef"><b>Definition:</b> chain_allocator.c:35</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a89a0b0126a544f4d152c9b6d9d381209"></a>
