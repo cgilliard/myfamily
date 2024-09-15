@@ -35,5 +35,6 @@ void trie_cleanup(TrieNc *ptr);
 
 int trie_build(Trie *ptr, const char *search_strings[], const bool is_case_sensitive[], int count);
 int trie_match(Trie *ptr, const char *text, TrieMatch ret[], u64 limit);
+void trie_sort(TrieMatch ret[], u64 count);
 
 #endif // _UTIL_TRIE__

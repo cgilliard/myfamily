@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/chain_allocator.h>
+#include <stdlib.h>
 #include <string.h>
 #include <util/trie.h>
 
@@ -115,9 +116,9 @@ int trie_compare(const void *m1, const void *m2)
 	return 0;
 }
 
-int trie_sort(TrieMatch ret[], int count)
+void trie_sort(TrieMatch ret[], u64 count)
 {
-	return qsort(ret, count, sizeof(TrieMatch), trie_compare);
+	qsort(ret, count, sizeof(TrieMatch), trie_compare);
 }
 
 int trie_match(Trie *ptr, const char *text, TrieMatch ret[], u64 limit)
