@@ -15,9 +15,10 @@
 #include <base/resources.h>
 #include <stdlib.h>
 
-_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
+_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = { 0, 0, 0, 0, 0 };
 
-void *mymalloc(usize size) {
+void *mymalloc(usize size)
+{
 	void *ret;
 	ret = malloc(size);
 
@@ -26,7 +27,8 @@ void *mymalloc(usize size) {
 	}
 	return ret;
 }
-void *myrealloc(void *ptr, usize size) {
+void *myrealloc(void *ptr, usize size)
+{
 	void *ret;
 	ret = realloc(ptr, size);
 
@@ -35,11 +37,13 @@ void *myrealloc(void *ptr, usize size) {
 	}
 	return ret;
 }
-void myfree(void *ptr) {
+void myfree(void *ptr)
+{
 	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
 	free(ptr);
 }
-FILE *myfopen(char *path, const char *mode) {
+FILE *myfopen(const char *path, const char *mode)
+{
 	FILE *ret = fopen(path, mode);
 
 	if (ret) {
@@ -47,22 +51,28 @@ FILE *myfopen(char *path, const char *mode) {
 	}
 	return ret;
 }
-void myfclose(FILE *ptr) {
+void myfclose(FILE *ptr)
+{
 	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
 	fclose(ptr);
 }
-u64 mymalloc_sum() {
+u64 mymalloc_sum()
+{
 	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
 }
-u64 myrealloc_sum() {
+u64 myrealloc_sum()
+{
 	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
 }
-u64 myfree_sum() {
+u64 myfree_sum()
+{
 	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
 }
-u64 myfopen_sum() {
+u64 myfopen_sum()
+{
 	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
 }
-u64 myfclose_sum() {
+u64 myfclose_sum()
+{
 	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
 }

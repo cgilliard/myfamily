@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <args/args.h>
+#include <base/version.h>
 #include <bible/bible.h>
 #include <build/build.h>
 #include <core/std.h>
@@ -29,7 +30,7 @@ void build_args(Args *args)
 {
 	const char *home_dir = get_home_directory();
 
-	args_build(args, "fam", "0.0.1-alpha.1", "The MyFamily Developers", 0, 0, 0);
+	args_build(args, "fam", FAM_VERSION, "The MyFamily Developers", 0, 0, 0);
 
 	// build the init SubCommand
 	SubCommand init;
@@ -38,8 +39,12 @@ void build_args(Args *args)
 		"Directory to initialize the project in (defaults to "
 		"the project name if not specified)",
 		"p", true, false, NULL);
+	ArgsParam cfg_authors;
+	args_param_build(&cfg_authors, "author", "Author of this project", "a", true, true,
+		"The MyFamily Developers");
 	sub_command_build(&init, "init", "Initialize project", 1, 1, "<project_name>");
 	sub_command_add_param(&init, &cfg_dir);
+	sub_command_add_param(&init, &cfg_authors);
 
 	args_add_sub_command(args, &init);
 
@@ -152,7 +157,7 @@ void process_verse(Args *args, char *config_dir)
 	Bible bible;
 	char bible_path[strlen(config_dir) + 10];
 	strcpy(bible_path, config_dir);
-	strcat(bible_path, "/akjv.txt");
+	strcat(bible_path, "/resources/akjv.txt");
 	if (bible_build(&bible, bible_path)) {
 		fprintf(stderr, "Could not load bible at path %s: %s\n", bible_path, strerror(errno));
 		exit(-1);
@@ -203,7 +208,23 @@ void process_init(Args *args, char *config_dir)
 	char proj_path[1024];
 	strcpy(proj_path, proj_name);
 	args_value_of(args, "dir", proj_path, 1024, 0);
-	proc_build_init(proj_name, proj_path);
+
+	char author[11][1024];
+	int count = 0;
+	loop
+	{
+		int v = args_value_of(args, "author", author[count], 1024, count);
+		if (v == -1)
+			break;
+		printf("a=%s\n", author[count]);
+		count++;
+		if (count >= 10) {
+			fprintf(stderr, "A maximum of 10 authors is allowed.");
+			exit(-1);
+		}
+	}
+	printf("acount=%i\n", count);
+	proc_build_init(proj_name, proj_path, (char **)author, count);
 }
 
 void setup_config_dir(const char *config_dir)

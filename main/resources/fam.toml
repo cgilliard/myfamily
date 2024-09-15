@@ -1,4 +1,4 @@
-[version=REPLACE_FAM_VERSION]
+[fam_version="REPLACE_FAM_VERSION"]
 
 [package]
 name = "REPLACE_NAME"

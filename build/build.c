@@ -14,11 +14,32 @@
 
 #include <base/misc.h>
 #include <base/path.h>
+#include <base/version.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <util/replace.h>
 
-int proc_build_init(const char *proj_name, const char *proj_path)
+int proc_build_init(
+	const char *proj_name, const char *proj_path, char authors[11][1024], int author_count)
 {
+	printf("acount=%i\n", author_count);
+	int author_len = 0;
+	for (int i = 0; i < author_count; i++) {
+		printf("author %i\n", i);
+		printf("author[%i]=%s\n", i, authors[i]);
+		author_len += strlen(authors[i]) + 10;
+	}
+	char author_replace[author_len];
+	strcpy(author_replace, "");
+	for (int i = 0; i < author_count; i++) {
+		strcat(author_replace, "\"");
+		strcat(author_replace, authors[i]);
+		if (i == author_count - 1)
+			strcat(author_replace, "\"");
+		else
+			strcat(author_replace, "\", ");
+	}
 	Path path;
 	path_for(&path, proj_path);
 	if (path_exists(&path)) {
@@ -38,6 +59,12 @@ int proc_build_init(const char *proj_name, const char *proj_path)
 		perror("Error: copying file");
 		exit(-1);
 	}
+
+	const char *patterns_in[]
+		= { "REPLACE_FAM_VERSION", "REPLACE_NAME", "REPLACE_AUTHORS", "REPLACE_DESCRIPTION" };
+	const bool is_case_sensitive[] = { true, true, true };
+	const char *replace[] = { FAM_VERSION, proj_name, author_replace, proj_name };
+	replace_file(&path, &path, patterns_in, is_case_sensitive, replace, 4);
 
 	Path proj_dir;
 	path_for(&proj_dir, proj_path);

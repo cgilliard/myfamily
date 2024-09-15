@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/resources.h>
 #include <dirent.h>
 #include <limits.h>
 #include <stdio.h>
@@ -63,7 +64,7 @@ int copy_file(const char *dst, const char *src)
 	size_t bytes;
 
 	// Open the source file in binary read mode
-	source_file = fopen(src, "rb");
+	source_file = myfopen(src, "rb");
 	if (source_file == NULL) {
 		perror("Error opening source file");
 		return -1;
@@ -76,7 +77,7 @@ int copy_file(const char *dst, const char *src)
 	char buffer[file_size];
 
 	// Open the destination file in binary write mode
-	dest_file = fopen(dst, "wb");
+	dest_file = myfopen(dst, "wb");
 	if (dest_file == NULL) {
 		perror("Error opening destination file");
 		fclose(source_file);
@@ -94,8 +95,8 @@ int copy_file(const char *dst, const char *src)
 	}
 
 	// Close both files
-	fclose(source_file);
-	fclose(dest_file);
+	myfclose(source_file);
+	myfclose(dest_file);
 
 	return 0;
 }

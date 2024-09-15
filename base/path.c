@@ -141,6 +141,11 @@ char *path_to_string(Path *p)
 	return p->ptr.data;
 }
 
+char *path_file_name(Path *p)
+{
+	return rstrstr(p->ptr.data, PATH_SEPARATOR);
+}
+
 bool path_exists(Path *p)
 {
 	if (p->ptr.data == NULL && p->ptr.len == 0) {
