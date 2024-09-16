@@ -16,6 +16,7 @@
 #include <base/path.h>
 #include <base/resources.h>
 #include <build/build.h>
+#include <build/parser.h>
 #include <glob.h>
 #include <stdlib.h>
 #include <toml/toml.h>
@@ -29,6 +30,44 @@ void build_libs(const char *base_dir)
 	path_push(&lib_h, "lib.h");
 	if (path_exists(&lib_h)) {
 		printf("found lib.h!\n");
+		char **header_list = mymalloc(sizeof(char *) * 10);
+		int header_to_parse = 0;
+		Vec headers;
+		vec_init(&headers, 10, sizeof(HeaderInfo));
+		printf("headers size=%" PRIu64 "\n", vec_size(&headers));
+		path_canonicalize(&lib_h);
+		parse_header(&lib_h, &headers);
+		printf("headers size=%" PRIu64 "\n", vec_size(&headers));
+
+		while (vec_size(&headers)) {
+			HeaderInfo *next = vec_pop(&headers);
+			printf("next header = %s\n", next->path);
+			Path next_path;
+			path_for(&next_path, next->path);
+			if (path_exists(&next_path) && path_is_dir(&next_path)) {
+				printf("path directory exists!\n");
+				path_push(&next_path, "mod.h");
+				if (path_exists(&next_path)) {
+					printf("mod.h exists\n");
+					parse_header(&next_path, &headers);
+				}
+			} else {
+				printf("path does not exist. check file.\n");
+				char file_buf[PATH_MAX];
+				printf("fname='%s'\n", path_file_name(&next_path));
+				snprintf(file_buf, PATH_MAX - 1, "%s%s", path_file_name(&next_path), ".h");
+				path_pop(&next_path);
+				printf("checking %s\n", path_to_string(&next_path));
+
+				path_push(&next_path, file_buf);
+				printf("checking %s\n", path_to_string(&next_path));
+				if (path_exists(&next_path) && !path_is_dir(&next_path)) {
+					printf("file %s exists!\n", path_to_string(&next_path));
+					// parse header
+					parse_header(&next_path, &headers);
+				}
+			}
+		}
 	}
 }
 
@@ -82,6 +121,9 @@ int proc_build(const char *base_dir)
 				if (path_mkdir(&target, 0700))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
 			}
+
+			// change to the base directory
+			chdir(base_dir);
 
 			build_libs(base_dir);
 

@@ -132,21 +132,28 @@ int path_pop(Path *p)
 	if (res) {
 		int index = res - (char *)p->ptr.data;
 		((char *)(p->ptr.data))[index] = 0;
+	} else {
+		((char *)(p->ptr.data))[0] = '.';
+		((char *)(p->ptr.data))[1] = 0;
 	}
 	return 0;
 }
 
-char *path_to_string(Path *p)
+char *path_to_string(const Path *p)
 {
 	return p->ptr.data;
 }
 
-char *path_file_name(Path *p)
+char *path_file_name(const Path *p)
 {
-	return rstrstr(p->ptr.data, PATH_SEPARATOR);
+	char *ret = rstrstr(p->ptr.data, PATH_SEPARATOR);
+	if (ret != NULL && strlen(ret) > 0)
+		return ret + 1;
+
+	return ret;
 }
 
-bool path_exists(Path *p)
+bool path_exists(const Path *p)
 {
 	if (p->ptr.data == NULL && p->ptr.len == 0) {
 		errno = EINVAL;
@@ -154,7 +161,7 @@ bool path_exists(Path *p)
 	}
 	return access(p->ptr.data, F_OK) == 0;
 }
-bool path_is_dir(Path *p)
+bool path_is_dir(const Path *p)
 {
 	if (p->ptr.data == NULL && p->ptr.len == 0) {
 		errno = EINVAL;

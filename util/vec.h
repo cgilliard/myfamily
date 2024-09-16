@@ -12,26 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _UTIL_SUFFIX_TREE__
-#define _UTIL_SUFFIX_TREE__
+#ifndef _UTIL_VEC__
+#define _UTIL_VEC__
 
+#include <base/heap.h>
 #include <base/types.h>
 
-typedef struct SuffixTreeMatch {
-	u64 offset;
-} SuffixTreeMatch;
+typedef struct VecImpl VecImpl;
 
-typedef struct SuffixTreeImpl SuffixTreeImpl;
-
-typedef struct SuffixTreeNc {
+typedef struct VecNc {
 	FatPtr impl;
-} SuffixTreeNc;
+} VecNc;
 
-void suffix_tree_cleanup(SuffixTreeNc *ptr);
-#define SuffixTree SuffixTreeNc __attribute__((warn_unused_result, cleanup(suffix_tree_cleanup)))
+void vec_cleanup(VecNc *p);
 
-int suffix_tree_build(SuffixTree *ptr, const char *text);
-int suffix_tree_search(SuffixTree *ptr, const char *pattern, SuffixTreeMatch *ret, u64 limit);
-void suffix_tree_sort_results(SuffixTreeMatch *ret, u64 count);
+#define Vec VecNc __attribute__((warn_unused_result, cleanup(vec_cleanup)))
 
-#endif // _UTIL_SUFFIX_TREE__
+int vec_init(Vec *p, u64 initial_capacity, u64 size_of_entry);
+int vec_push(Vec *p, void *entry);
+void *vec_element_at(Vec *p, u64 index);
+int vec_remove(Vec *p, u64 index);
+void *vec_pop(Vec *p);
+int vec_resize(Vec *p, u64 new_size);
+int vec_truncate(Vec *p, u64 new_size);
+int vec_clear(Vec *p);
+u64 vec_size(Vec *p);
+u64 vec_capacity(Vec *p);
+
+#endif // _UTIL_VEC__

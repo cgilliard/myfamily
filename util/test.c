@@ -17,6 +17,7 @@
 #include <util/replace.h>
 #include <util/suffix_tree.h>
 #include <util/trie.h>
+#include <util/vec.h>
 
 MySuite(util);
 
@@ -185,4 +186,38 @@ MyTest(util, test_suffix_tree)
 
 	// search something with no matches
 	cr_assert(!suffix_tree_search(&t1, "blah", matches, 10));
+}
+
+MyTest(util, test_vec)
+{
+	Vec v1;
+	vec_init(&v1, 5, sizeof(int));
+	cr_assert_eq(vec_capacity(&v1), 5);
+	cr_assert_eq(vec_size(&v1), 0);
+	for (int i = 0; i < 10; i++) {
+		int value = i + 10;
+		vec_push(&v1, &value);
+	}
+	for (int i = 0; i < 10; i++) {
+		int *value = vec_element_at(&v1, i);
+		cr_assert_eq(*value, i + 10);
+	}
+	cr_assert_eq(vec_capacity(&v1), 15);
+	cr_assert_eq(vec_size(&v1), 10);
+	int *popped = vec_pop(&v1);
+	cr_assert_eq(*popped, 19);
+	cr_assert_eq(vec_capacity(&v1), 15);
+	cr_assert_eq(vec_size(&v1), 9);
+
+	vec_remove(&v1, 4);
+	cr_assert_eq(vec_capacity(&v1), 15);
+	cr_assert_eq(vec_size(&v1), 8);
+	int j = 0;
+	for (int i = 0; i < 8; i++) {
+		if (i == 4)
+			j++;
+		int *value = vec_element_at(&v1, i);
+		cr_assert_eq(*value, j + 10);
+		j++;
+	}
 }

@@ -30,10 +30,10 @@ int path_for(Path *dst, const char *path);
 int path_canonicalize(Path *p);
 int path_push(Path *p, const char *next);
 int path_pop(Path *p);
-char *path_to_string(Path *p);
-bool path_exists(Path *p);
-bool path_is_dir(Path *p);
+char *path_to_string(const Path *p);
+bool path_exists(const Path *p);
+bool path_is_dir(const Path *p);
 bool path_mkdir(Path *p, mode_t mode);
-char *path_file_name(Path *p);
+char *path_file_name(const Path *p);
 
 #endif // _BASE_PATH__
