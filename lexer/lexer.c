@@ -155,7 +155,7 @@ int lexer_next_token(Lexer *l, Token *token)
 		if (line == NULL)
 			token->span = NULL;
 		else {
-			int num_width = snprintf(NULL, 0, "%llu", l->line_num);
+			int num_width = snprintf(NULL, 0, "%" PRIu64, l->line_num);
 			int token_width = snprintf(NULL, 0, "%s", token->token);
 			char spacer[100];
 			int lsl = (l->tokenizer->pos + 1) - (token_width - 1);
@@ -181,7 +181,7 @@ int lexer_next_token(Lexer *l, Token *token)
 				spacer[num_width] = 0;
 
 			int span_len = snprintf(NULL, 0,
-				"%s%s-->%s %s:%llu:%i\n%s %s|\n%llu | %s%s"
+				"%s%s-->%s %s:%" PRIu64 ":%i\n%s %s|\n%" PRIu64 " | %s%s"
 				"%s %s|%s%s^\n",
 				spacer, CYAN, RESET, l->file, l->line_num, lsl, spacer, CYAN, l->line_num, RESET,
 				line, spacer, CYAN, RESET, long_spacer);
@@ -191,7 +191,7 @@ int lexer_next_token(Lexer *l, Token *token)
 				return LexerStateErr;
 			}
 			snprintf(token->span, span_len + 1,
-				"%s%s-->%s %s:%llu:%i\n%s %s|\n%llu | %s%s"
+				"%s%s-->%s %s:%" PRIu64 ":%i\n%s %s|\n%" PRIu64 " | %s%s"
 				"%s %s|%s%s^\n",
 				spacer, CYAN, RESET, l->file, l->line_num, lsl, spacer, CYAN, l->line_num, RESET,
 				line, spacer, CYAN, RESET, long_spacer);
