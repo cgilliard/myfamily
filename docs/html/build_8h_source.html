@@ -87,11 +87,17 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _BUILD_BUILD__</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _BUILD_BUILD__</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="build_8h.html#a50164ce19e1628ab20ded320b29ad797">   18</a></span>&#160;<span class="keywordtype">int</span> <a class="code" href="build_8h.html#a50164ce19e1628ab20ded320b29ad797">proc_build_init</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *proj_name, <span class="keyword">const</span> <span class="keywordtype">char</span> *proj_path, <span class="keywordtype">char</span> **authors, <span class="keywordtype">int</span> author_count,</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    <span class="keywordtype">bool</span> lib, <span class="keywordtype">char</span> *description);</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _BUILD_BUILD__</span></div>
-<div class="ttc" id="abuild_8h_html_a50164ce19e1628ab20ded320b29ad797"><div class="ttname"><a href="build_8h.html#a50164ce19e1628ab20ded320b29ad797">proc_build_init</a></div><div class="ttdeci">int proc_build_init(const char *proj_name, const char *proj_path, char **authors, int author_count, bool lib, char *description)</div></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">base/types.h</a>&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keywordtype">int</span> <a class="code" href="build_8h.html#af416a142ba1fc58ff6f05ad1e59b36d3">proc_build_init</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *config_dir, <span class="keyword">const</span> <span class="keywordtype">char</span> *proj_name, <span class="keyword">const</span> <span class="keywordtype">char</span> *proj_path,</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keywordtype">char</span> authors[11][1024], <span class="keywordtype">int</span> author_count, <span class="keywordtype">bool</span> lib, <span class="keywordtype">char</span> *description);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keywordtype">int</span> <a class="code" href="build_8h.html#aabf899149368773bfd90317ca0833a0b">proc_build</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *base_dir);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _BUILD_BUILD__</span></div>
+<div class="ttc" id="abuild_8h_html_aabf899149368773bfd90317ca0833a0b"><div class="ttname"><a href="build_8h.html#aabf899149368773bfd90317ca0833a0b">proc_build</a></div><div class="ttdeci">int proc_build(const char *base_dir)</div><div class="ttdef"><b>Definition:</b> build.c:35</div></div>
+<div class="ttc" id="abuild_8h_html_af416a142ba1fc58ff6f05ad1e59b36d3"><div class="ttname"><a href="build_8h.html#af416a142ba1fc58ff6f05ad1e59b36d3">proc_build_init</a></div><div class="ttdeci">int proc_build_init(const char *config_dir, const char *proj_name, const char *proj_path, char authors[11][1024], int author_count, bool lib, char *description)</div><div class="ttdef"><b>Definition:</b> init.c:24</div></div>
+<div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

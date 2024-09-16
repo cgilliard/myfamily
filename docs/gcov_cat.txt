@@ -17,9 +17,10 @@
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <main/main.h>
-    #####:   16:int main(int argc, char **argv) {
-    #####:   17:	return real_main(argc, argv);
-        -:   18:}
+    #####:   16:int main(int argc, char **argv)
+        -:   17:{
+    #####:   18:	return real_main(argc, argv);
+        -:   19:}
         -:    0:Source:real_main.c
         -:    0:Graph:real_main.gcno
         -:    0:Data:-
@@ -86,240 +87,253 @@
         -:   60:
         -:   61:	// build the build SubCommand
         -:   62:	SubCommand build;
-    #####:   63:	sub_command_build(&build, "build", "Build project in release mode", 0, 0, "");
-        -:   64:
-    #####:   65:	args_add_sub_command(args, &build);
-        -:   66:
-        -:   67:	// build the debug SubCommand
-        -:   68:	SubCommand bdebug;
-    #####:   69:	sub_command_build(&bdebug, "debug", "Build project in debug mode", 0, 0, "");
+        -:   63:	ArgsParam cfg_base;
+    #####:   64:	args_param_build(&cfg_base, "base", "The base directory of the project. (defaults to '.')", "b",
+        -:   65:		true, false, ".");
+    #####:   66:	sub_command_build(&build, "build", "Build project in release mode", 0, 0, "");
+    #####:   67:	sub_command_add_param(&build, &cfg_base);
+        -:   68:
+    #####:   69:	args_add_sub_command(args, &build);
         -:   70:
-    #####:   71:	args_add_sub_command(args, &bdebug);
-        -:   72:
-        -:   73:	// build the test SubCommand
-        -:   74:	SubCommand test;
-    #####:   75:	sub_command_build(&test, "test", "Run tests", 0, 0, "");
+        -:   71:	// build the debug SubCommand
+        -:   72:	SubCommand bdebug;
+    #####:   73:	sub_command_build(&bdebug, "debug", "Build project in debug mode", 0, 0, "");
+        -:   74:
+    #####:   75:	args_add_sub_command(args, &bdebug);
         -:   76:
-    #####:   77:	args_add_sub_command(args, &test);
-        -:   78:
-        -:   79:	// build the doc SubCommand
-        -:   80:	SubCommand doc;
-    #####:   81:	sub_command_build(&doc, "doc", "Build documentation", 0, 0, "");
+        -:   77:	// build the test SubCommand
+        -:   78:	SubCommand test;
+    #####:   79:	sub_command_build(&test, "test", "Run tests", 0, 0, "");
+        -:   80:
+    #####:   81:	args_add_sub_command(args, &test);
         -:   82:
-    #####:   83:	args_add_sub_command(args, &doc);
-        -:   84:
-        -:   85:	// build the verse SubCommand
-        -:   86:	SubCommand verse;
-    #####:   87:	sub_command_build(&verse, "verse", "Print a random Bible verse", 0, 0, "");
-        -:   88:	ArgsParam no_colors_param, book_param, chapter_param, verse_param;
-    #####:   89:	args_param_build(
-        -:   90:		&no_colors_param, "no_colors", "Do not display colors", "n", false, false, NULL);
-    #####:   91:	args_param_build(&book_param, "book",
-        -:   92:		"Randomly select a verse from the specified book of the Bible", "b", true, false, NULL);
-    #####:   93:	args_param_build(&chapter_param, "chapter",
-        -:   94:		"Randomly select a verse from the specified chapter of the Bible. "
-        -:   95:		"This option requires that --book be specified as well.",
-        -:   96:		"x", true, false, NULL);
-    #####:   97:	args_param_build(&verse_param, "verse",
-        -:   98:		"Select the specified verse. This option requires "
-        -:   99:		"that --book and --chapter be specified as well.",
-        -:  100:		"v", true, false, NULL);
-        -:  101:
-    #####:  102:	sub_command_add_param(&verse, &no_colors_param);
-    #####:  103:	sub_command_add_param(&verse, &book_param);
-    #####:  104:	sub_command_add_param(&verse, &chapter_param);
-    #####:  105:	sub_command_add_param(&verse, &verse_param);
-        -:  106:
-    #####:  107:	args_add_sub_command(args, &verse);
-        -:  108:
-        -:  109:	// build the node SubCommand
-        -:  110:	SubCommand node;
-        -:  111:	ArgsParam cfg_threads, cfg_show;
-    #####:  112:	args_param_build(
-        -:  113:		&cfg_show, "show_request", "Show request information", "s", false, false, NULL);
-    #####:  114:	args_param_build(
-        -:  115:		&cfg_threads, "threads", "Number of threads to execute", "t", true, false, "1");
-        -:  116:
-    #####:  117:	sub_command_build(&node, "node", "Run full node", 0, 0, "");
-    #####:  118:	sub_command_add_param(&node, &cfg_threads);
-    #####:  119:	sub_command_add_param(&node, &cfg_show);
+        -:   83:	// build the doc SubCommand
+        -:   84:	SubCommand doc;
+    #####:   85:	sub_command_build(&doc, "doc", "Build documentation", 0, 0, "");
+        -:   86:
+    #####:   87:	args_add_sub_command(args, &doc);
+        -:   88:
+        -:   89:	// build the verse SubCommand
+        -:   90:	SubCommand verse;
+    #####:   91:	sub_command_build(&verse, "verse", "Print a random Bible verse", 0, 0, "");
+        -:   92:	ArgsParam no_colors_param, book_param, chapter_param, verse_param;
+    #####:   93:	args_param_build(
+        -:   94:		&no_colors_param, "no_colors", "Do not display colors", "n", false, false, NULL);
+    #####:   95:	args_param_build(&book_param, "book",
+        -:   96:		"Randomly select a verse from the specified book of the Bible", "b", true, false, NULL);
+    #####:   97:	args_param_build(&chapter_param, "chapter",
+        -:   98:		"Randomly select a verse from the specified chapter of the Bible. "
+        -:   99:		"This option requires that --book be specified as well.",
+        -:  100:		"x", true, false, NULL);
+    #####:  101:	args_param_build(&verse_param, "verse",
+        -:  102:		"Select the specified verse. This option requires "
+        -:  103:		"that --book and --chapter be specified as well.",
+        -:  104:		"v", true, false, NULL);
+        -:  105:
+    #####:  106:	sub_command_add_param(&verse, &no_colors_param);
+    #####:  107:	sub_command_add_param(&verse, &book_param);
+    #####:  108:	sub_command_add_param(&verse, &chapter_param);
+    #####:  109:	sub_command_add_param(&verse, &verse_param);
+        -:  110:
+    #####:  111:	args_add_sub_command(args, &verse);
+        -:  112:
+        -:  113:	// build the node SubCommand
+        -:  114:	SubCommand node;
+        -:  115:	ArgsParam cfg_threads, cfg_show;
+    #####:  116:	args_param_build(
+        -:  117:		&cfg_show, "show_request", "Show request information", "s", false, false, NULL);
+    #####:  118:	args_param_build(
+        -:  119:		&cfg_threads, "threads", "Number of threads to execute", "t", true, false, "1");
         -:  120:
-    #####:  121:	args_add_sub_command(args, &node);
-        -:  122:
-        -:  123:	// build core options
-        -:  124:	ArgsParam cfg_config_dir;
-        -:  125:	ArgsParam cfg_debug;
+    #####:  121:	sub_command_build(&node, "node", "Run full node", 0, 0, "");
+    #####:  122:	sub_command_add_param(&node, &cfg_threads);
+    #####:  123:	sub_command_add_param(&node, &cfg_show);
+        -:  124:
+    #####:  125:	args_add_sub_command(args, &node);
         -:  126:
-    #####:  127:	args_param_build(
-        -:  128:		&cfg_debug, "debug", "Prints additional debugging information", "d", false, false, NULL);
-        -:  129:
-    #####:  130:	char default_config_dir[strlen(home_dir) + 100];
-    #####:  131:	snprintf(default_config_dir, strlen(home_dir) + 100, "%s/.fam", home_dir);
-    #####:  132:	args_param_build(&cfg_config_dir, "config_dir",
-        -:  133:		"Directory where configuration files are stored", "c", true, false, default_config_dir);
-        -:  134:
-    #####:  135:	args_add_param(args, &cfg_debug);
-    #####:  136:	args_add_param(args, &cfg_config_dir);
-    #####:  137:}
+        -:  127:	// build core options
+        -:  128:	ArgsParam cfg_config_dir;
+        -:  129:	ArgsParam cfg_debug;
+        -:  130:
+    #####:  131:	args_param_build(
+        -:  132:		&cfg_debug, "debug", "Prints additional debugging information", "d", false, false, NULL);
+        -:  133:
+    #####:  134:	char default_config_dir[strlen(home_dir) + 100];
+    #####:  135:	snprintf(default_config_dir, strlen(home_dir) + 100, "%s/.fam", home_dir);
+    #####:  136:	args_param_build(&cfg_config_dir, "config_dir",
+        -:  137:		"Directory where configuration files are stored", "c", true, false, default_config_dir);
         -:  138:
-    #####:  139:void process_verse(Args *args, char *config_dir)
-    #####:  140:{
-    #####:  141:	bool no_colors = args_value_of(args, "no_colors", NULL, 0, 0) >= 0;
-        -:  142:	char book[100];
-    #####:  143:	args_value_of(args, "book", book, 100, 0);
-        -:  144:	char chapter_buf[100];
-    #####:  145:	int chapter_int = -1;
-    #####:  146:	if (args_value_of(args, "chapter", chapter_buf, 100, 0) != -1) {
-    #####:  147:		chapter_int = atoi(chapter_buf);
-    #####:  148:		if (chapter_int <= 0 || chapter_int > 255) {
-    #####:  149:			fprintf(stderr,
-        -:  150:				"The chapter specified must be a positive "
-        -:  151:				"integer which is equal to or less than 255.\n");
-    #####:  152:			exit(-1);
-        -:  153:		}
-        -:  154:	}
-        -:  155:	char verse_buf[100];
-    #####:  156:	int verse_int = -1;
-    #####:  157:	if (args_value_of(args, "verse", verse_buf, 100, 0) != -1) {
-    #####:  158:		verse_int = atoi(verse_buf);
-    #####:  159:		if (verse_int <= 0 || verse_int > 255) {
-    #####:  160:			fprintf(stderr,
-        -:  161:				"The verse specified must be a positive "
-        -:  162:				"integer which is equal to or less than 255.\n");
-    #####:  163:			exit(-1);
-        -:  164:		}
-        -:  165:	}
-        -:  166:
-        -:  167:	Bible bible;
-    #####:  168:	char bible_path[strlen(config_dir) + 10];
-    #####:  169:	strcpy(bible_path, config_dir);
-    #####:  170:	strcat(bible_path, "/resources/akjv.txt");
-    #####:  171:	if (bible_build(&bible, bible_path)) {
-    #####:  172:		fprintf(stderr, "Could not load bible at path %s: %s\n", bible_path, strerror(errno));
-    #####:  173:		exit(-1);
-        -:  174:	}
-        -:  175:
-        -:  176:	char buf[1024];
-        -:  177:	char book_buf[100];
-        -:  178:	u8 chapter, verse;
+    #####:  139:	args_add_param(args, &cfg_debug);
+    #####:  140:	args_add_param(args, &cfg_config_dir);
+    #####:  141:}
+        -:  142:
+    #####:  143:void process_verse(Args *args, char *config_dir)
+    #####:  144:{
+    #####:  145:	bool no_colors = args_value_of(args, "no_colors", NULL, 0, 0) >= 0;
+        -:  146:	char book[100];
+    #####:  147:	args_value_of(args, "book", book, 100, 0);
+        -:  148:	char chapter_buf[100];
+    #####:  149:	int chapter_int = -1;
+    #####:  150:	if (args_value_of(args, "chapter", chapter_buf, 100, 0) != -1) {
+    #####:  151:		chapter_int = atoi(chapter_buf);
+    #####:  152:		if (chapter_int <= 0 || chapter_int > 255) {
+    #####:  153:			fprintf(stderr,
+        -:  154:				"The chapter specified must be a positive "
+        -:  155:				"integer which is equal to or less than 255.\n");
+    #####:  156:			exit(-1);
+        -:  157:		}
+        -:  158:	}
+        -:  159:	char verse_buf[100];
+    #####:  160:	int verse_int = -1;
+    #####:  161:	if (args_value_of(args, "verse", verse_buf, 100, 0) != -1) {
+    #####:  162:		verse_int = atoi(verse_buf);
+    #####:  163:		if (verse_int <= 0 || verse_int > 255) {
+    #####:  164:			fprintf(stderr,
+        -:  165:				"The verse specified must be a positive "
+        -:  166:				"integer which is equal to or less than 255.\n");
+    #####:  167:			exit(-1);
+        -:  168:		}
+        -:  169:	}
+        -:  170:
+        -:  171:	Bible bible;
+    #####:  172:	char bible_path[strlen(config_dir) + 10];
+    #####:  173:	strcpy(bible_path, config_dir);
+    #####:  174:	strcat(bible_path, "/resources/akjv.txt");
+    #####:  175:	if (bible_build(&bible, bible_path)) {
+    #####:  176:		fprintf(stderr, "Could not load bible at path %s: %s\n", bible_path, strerror(errno));
+    #####:  177:		exit(-1);
+        -:  178:	}
         -:  179:
-    #####:  180:	u8 *chapter_ptr = NULL;
-    #####:  181:	if (chapter_int != -1) {
-    #####:  182:		chapter = chapter_int;
-    #####:  183:		chapter_ptr = &chapter;
-        -:  184:	}
-    #####:  185:	u8 *verse_ptr = NULL;
-    #####:  186:	if (verse_int != -1) {
-    #####:  187:		verse = verse_int;
-    #####:  188:		verse_ptr = &verse;
-        -:  189:	}
-        -:  190:
-    #####:  191:	if (verse_int != -1 && chapter_int == -1) {
-    #####:  192:		fprintf(stderr,
-        -:  193:			"If --verse is specified, --chapter must also "
-        -:  194:			"be specified\n");
-    #####:  195:		exit(-1);
-        -:  196:	}
-    #####:  197:	if (chapter_int != -1 && (strlen(book) == 0)) {
-    #####:  198:		fprintf(stderr,
-        -:  199:			"If --chapter is specified, --book must also "
-        -:  200:			"be specified\n");
-    #####:  201:		exit(-1);
-        -:  202:	}
-    #####:  203:	if (bible_random_verse_to_string(&bible, buf, 1024, !no_colors, book, chapter_ptr, verse_ptr)
-        -:  204:		< 0) {
-    #####:  205:		fprintf(stderr, "Could not find random verse due to: %s\n", strerror(errno));
-    #####:  206:		exit(-1);
-        -:  207:	}
-        -:  208:
-    #####:  209:	printf("%s\n", buf);
-    #####:  210:	bible_cleanup(&bible);
-    #####:  211:}
+        -:  180:	char buf[1024];
+        -:  181:	char book_buf[100];
+        -:  182:	u8 chapter, verse;
+        -:  183:
+    #####:  184:	u8 *chapter_ptr = NULL;
+    #####:  185:	if (chapter_int != -1) {
+    #####:  186:		chapter = chapter_int;
+    #####:  187:		chapter_ptr = &chapter;
+        -:  188:	}
+    #####:  189:	u8 *verse_ptr = NULL;
+    #####:  190:	if (verse_int != -1) {
+    #####:  191:		verse = verse_int;
+    #####:  192:		verse_ptr = &verse;
+        -:  193:	}
+        -:  194:
+    #####:  195:	if (verse_int != -1 && chapter_int == -1) {
+    #####:  196:		fprintf(stderr,
+        -:  197:			"If --verse is specified, --chapter must also "
+        -:  198:			"be specified\n");
+    #####:  199:		exit(-1);
+        -:  200:	}
+    #####:  201:	if (chapter_int != -1 && (strlen(book) == 0)) {
+    #####:  202:		fprintf(stderr,
+        -:  203:			"If --chapter is specified, --book must also "
+        -:  204:			"be specified\n");
+    #####:  205:		exit(-1);
+        -:  206:	}
+    #####:  207:	if (bible_random_verse_to_string(&bible, buf, 1024, !no_colors, book, chapter_ptr, verse_ptr)
+        -:  208:		< 0) {
+    #####:  209:		fprintf(stderr, "Could not find random verse due to: %s\n", strerror(errno));
+    #####:  210:		exit(-1);
+        -:  211:	}
         -:  212:
-    #####:  213:void process_init(Args *args, char *config_dir)
-        -:  214:{
-        -:  215:	char proj_name[128];
-    #####:  216:	strcpy(proj_name, "");
-    #####:  217:	args_get_argument(args, 1, proj_name, 127);
-        -:  218:	char proj_path[1024];
-    #####:  219:	strcpy(proj_path, proj_name);
-    #####:  220:	args_value_of(args, "dir", proj_path, 1023, 0);
-        -:  221:
-        -:  222:	char author[11][1024];
-    #####:  223:	int count = 0;
-        -:  224:	loop
-    #####:  225:	{
-    #####:  226:		int v = args_value_of(args, "author", author[count], 1023, count);
-    #####:  227:		if (v == -1)
-    #####:  228:			break;
-    #####:  229:		count++;
-    #####:  230:		if (count >= 10) {
-    #####:  231:			fprintf(stderr, "A maximum of 10 authors is allowed.");
-    #####:  232:			exit(-1);
-        -:  233:		}
-        -:  234:	}
-        -:  235:
-    #####:  236:	bool lib = args_value_of(args, "lib", NULL, 0, 0) >= 0;
-        -:  237:
-        -:  238:	char description[1024];
-    #####:  239:	args_value_of(args, "description", description, 1023, 0);
-    #####:  240:	proc_build_init(proj_name, proj_path, (char **)author, count, lib, description);
-    #####:  241:}
-        -:  242:
-    #####:  243:void setup_config_dir(const char *config_dir)
-    #####:  244:{
-    #####:  245:	if (mkdir(config_dir, 0700)) {
-    #####:  246:		perror("Failed to create specified config directory");
-    #####:  247:		exit(-1);
-        -:  248:	}
-        -:  249:
-    #####:  250:	char resources_dir[strlen(config_dir) + 100];
-    #####:  251:	strcpy(resources_dir, config_dir);
-    #####:  252:	strcat(resources_dir, "/resources");
+    #####:  213:	printf("%s\n", buf);
+    #####:  214:	bible_cleanup(&bible);
+    #####:  215:}
+        -:  216:
+    #####:  217:void process_build(Args *args, char *config_dir)
+        -:  218:{
+        -:  219:	char base_dir[PATH_MAX];
+    #####:  220:	args_value_of(args, "base", base_dir, PATH_MAX - 1, 0);
+    #####:  221:	proc_build(base_dir);
+    #####:  222:}
+        -:  223:
+    #####:  224:void process_init(Args *args, char *config_dir)
+        -:  225:{
+        -:  226:	char proj_name[128];
+    #####:  227:	strcpy(proj_name, "");
+    #####:  228:	args_get_argument(args, 1, proj_name, 127);
+        -:  229:	char proj_path[PATH_MAX];
+    #####:  230:	strcpy(proj_path, proj_name);
+    #####:  231:	args_value_of(args, "dir", proj_path, 1023, 0);
+        -:  232:
+        -:  233:	char author[11][1024];
+    #####:  234:	int count = 0;
+        -:  235:	loop
+    #####:  236:	{
+    #####:  237:		int v = args_value_of(args, "author", author[count], 1023, count);
+    #####:  238:		if (v == -1)
+    #####:  239:			break;
+    #####:  240:		count++;
+    #####:  241:		if (count >= 10) {
+    #####:  242:			fprintf(stderr, "A maximum of 10 authors is allowed.");
+    #####:  243:			exit(-1);
+        -:  244:		}
+        -:  245:	}
+        -:  246:
+    #####:  247:	bool lib = args_value_of(args, "lib", NULL, 0, 0) >= 0;
+        -:  248:
+        -:  249:	char description[1024];
+    #####:  250:	args_value_of(args, "description", description, 1023, 0);
+    #####:  251:	proc_build_init(config_dir, proj_name, proj_path, author, count, lib, description);
+    #####:  252:}
         -:  253:
-    #####:  254:	if (mkdir(resources_dir, 0700)) {
-    #####:  255:		perror("Failed to create specified resources directory");
-    #####:  256:		exit(-1);
-        -:  257:	}
-        -:  258:
-    #####:  259:	BUILD_RESOURCE_DIR(resources_dir, fam);
-    #####:  260:}
-        -:  261:
-    #####:  262:int real_main(int argc, char **argv)
-    #####:  263:{
-        -:  264:	Args args;
-    #####:  265:	build_args(&args);
-    #####:  266:	args_init(&args, argc, argv);
-        -:  267:
-        -:  268:	// we always ensure that the config directory exists.
-    #####:  269:	int config_dir_len = args_value_of(&args, "config_dir", NULL, 0, 0);
-    #####:  270:	char config_dir[config_dir_len + 1];
-    #####:  271:	args_value_of(&args, "config_dir", config_dir, config_dir_len + 1, 0);
-    #####:  272:	if (access(config_dir, F_OK)) {
-    #####:  273:		setup_config_dir(config_dir);
-        -:  274:	}
-        -:  275:
-        -:  276:	// get first argument (subcommand)
-        -:  277:	char command[100];
-    #####:  278:	int ret = args_get_argument(&args, 0, command, 100);
-    #####:  279:	if (ret > 0) {
-    #####:  280:		if (!strcmp(command, "verse")) {
-    #####:  281:			process_verse(&args, config_dir);
-    #####:  282:		} else if (!strcmp(command, "init")) {
-    #####:  283:			process_init(&args, config_dir);
-        -:  284:		} else {
-    #####:  285:			printf("Not implemented!\n");
-        -:  286:		}
-        -:  287:	}
-        -:  288:
-    #####:  289:	args_cleanup(&args);
-        -:  290:
-    #####:  291:	return 0;
-        -:  292:}
+    #####:  254:void setup_config_dir(const char *config_dir)
+    #####:  255:{
+    #####:  256:	if (mkdir(config_dir, 0700)) {
+    #####:  257:		perror("Failed to create specified config directory");
+    #####:  258:		exit(-1);
+        -:  259:	}
+        -:  260:
+    #####:  261:	char resources_dir[strlen(config_dir) + 100];
+    #####:  262:	strcpy(resources_dir, config_dir);
+    #####:  263:	strcat(resources_dir, "/resources");
+        -:  264:
+    #####:  265:	if (mkdir(resources_dir, 0700)) {
+    #####:  266:		perror("Failed to create specified resources directory");
+    #####:  267:		exit(-1);
+        -:  268:	}
+        -:  269:
+    #####:  270:	BUILD_RESOURCE_DIR(resources_dir, fam);
+    #####:  271:}
+        -:  272:
+    #####:  273:int real_main(int argc, char **argv)
+    #####:  274:{
+        -:  275:	Args args;
+    #####:  276:	build_args(&args);
+    #####:  277:	args_init(&args, argc, argv);
+        -:  278:
+        -:  279:	// we always ensure that the config directory exists.
+    #####:  280:	int config_dir_len = args_value_of(&args, "config_dir", NULL, 0, 0);
+    #####:  281:	char config_dir[config_dir_len + 1];
+    #####:  282:	args_value_of(&args, "config_dir", config_dir, config_dir_len + 1, 0);
+    #####:  283:	if (access(config_dir, F_OK)) {
+    #####:  284:		setup_config_dir(config_dir);
+        -:  285:	}
+        -:  286:
+        -:  287:	// get first argument (subcommand)
+        -:  288:	char command[100];
+    #####:  289:	int ret = args_get_argument(&args, 0, command, 100);
+    #####:  290:	if (ret > 0) {
+    #####:  291:		if (!strcmp(command, "verse")) {
+    #####:  292:			process_verse(&args, config_dir);
+    #####:  293:		} else if (!strcmp(command, "init")) {
+    #####:  294:			process_init(&args, config_dir);
+    #####:  295:		} else if (!strcmp(command, "build")) {
+    #####:  296:			process_build(&args, config_dir);
+        -:  297:		} else {
+    #####:  298:			printf("Not implemented!\n");
+        -:  299:		}
+        -:  300:	}
+        -:  301:
+    #####:  302:	args_cleanup(&args);
+        -:  303:
+    #####:  304:	return 0;
+        -:  305:}
         -:    0:Source:toml.c
         -:    0:Graph:toml.gcno
         -:    0:Data:toml.gcda
-        -:    0:Runs:1
+        -:    0:Runs:3
         -:    1:/*
         -:    2:
         -:    3:  MIT License
@@ -3016,7 +3030,7 @@
         -:    0:Source:prim.c
         -:    0:Graph:prim.gcno
         -:    0:Data:prim.gcda
-        -:    0:Runs:39
+        -:    0:Runs:52
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3049,7 +3063,7 @@
         -:   30:	}
         -:   31:
         -:   32:#define IMPL U8
-      51*:   33:DEFINE_PRIM(u, U, 8);
+      64*:   33:DEFINE_PRIM(u, U, 8);
 ------------------
 U8_equal:
     #####:   33:DEFINE_PRIM(u, U, 8);
@@ -3061,7 +3075,7 @@ U8_build:
         2:   33:DEFINE_PRIM(u, U, 8);
 ------------------
 __add_impls_U8_vtable:
-       39:   33:DEFINE_PRIM(u, U, 8);
+       52:   33:DEFINE_PRIM(u, U, 8);
 ------------------
 U8_drop_internal:
         2:   33:DEFINE_PRIM(u, U, 8);
@@ -3075,7 +3089,7 @@ U8_size:
         -:   34:#undef IMPL
         -:   35:
         -:   36:#define IMPL U16
-      51*:   37:DEFINE_PRIM(u, U, 16);
+      64*:   37:DEFINE_PRIM(u, U, 16);
 ------------------
 U16_equal:
     #####:   37:DEFINE_PRIM(u, U, 16);
@@ -3087,7 +3101,7 @@ U16_build:
         2:   37:DEFINE_PRIM(u, U, 16);
 ------------------
 __add_impls_U16_vtable:
-       39:   37:DEFINE_PRIM(u, U, 16);
+       52:   37:DEFINE_PRIM(u, U, 16);
 ------------------
 U16_drop_internal:
         2:   37:DEFINE_PRIM(u, U, 16);
@@ -3101,7 +3115,7 @@ U16_size:
         -:   38:#undef IMPL
         -:   39:
         -:   40:#define IMPL U32
-      69*:   41:DEFINE_PRIM(u, U, 32);
+      82*:   41:DEFINE_PRIM(u, U, 32);
 ------------------
 U32_equal:
     #####:   41:DEFINE_PRIM(u, U, 32);
@@ -3113,7 +3127,7 @@ U32_build:
         5:   41:DEFINE_PRIM(u, U, 32);
 ------------------
 __add_impls_U32_vtable:
-       39:   41:DEFINE_PRIM(u, U, 32);
+       52:   41:DEFINE_PRIM(u, U, 32);
 ------------------
 U32_drop_internal:
         5:   41:DEFINE_PRIM(u, U, 32);
@@ -3127,7 +3141,7 @@ U32_size:
         -:   42:#undef IMPL
         -:   43:
         -:   44:#define IMPL U64
-       81:   45:DEFINE_PRIM(u, U, 64);
+       94:   45:DEFINE_PRIM(u, U, 64);
 ------------------
 U64_equal:
         2:   45:DEFINE_PRIM(u, U, 64);
@@ -3139,7 +3153,7 @@ U64_build:
         8:   45:DEFINE_PRIM(u, U, 64);
 ------------------
 __add_impls_U64_vtable:
-       39:   45:DEFINE_PRIM(u, U, 64);
+       52:   45:DEFINE_PRIM(u, U, 64);
 ------------------
 U64_drop_internal:
         4:   45:DEFINE_PRIM(u, U, 64);
@@ -3153,7 +3167,7 @@ U64_size:
         -:   46:#undef IMPL
         -:   47:
         -:   48:#define IMPL U128
-      51*:   49:DEFINE_PRIM(u, U, 128);
+      64*:   49:DEFINE_PRIM(u, U, 128);
 ------------------
 U128_equal:
     #####:   49:DEFINE_PRIM(u, U, 128);
@@ -3165,7 +3179,7 @@ U128_build:
         2:   49:DEFINE_PRIM(u, U, 128);
 ------------------
 __add_impls_U128_vtable:
-       39:   49:DEFINE_PRIM(u, U, 128);
+       52:   49:DEFINE_PRIM(u, U, 128);
 ------------------
 U128_drop_internal:
         2:   49:DEFINE_PRIM(u, U, 128);
@@ -3179,7 +3193,7 @@ U128_size:
         -:   50:#undef IMPL
         -:   51:
         -:   52:#define IMPL I8
-      51*:   53:DEFINE_PRIM(i, I, 8);
+      64*:   53:DEFINE_PRIM(i, I, 8);
 ------------------
 I8_equal:
     #####:   53:DEFINE_PRIM(i, I, 8);
@@ -3191,7 +3205,7 @@ I8_build:
         2:   53:DEFINE_PRIM(i, I, 8);
 ------------------
 __add_impls_I8_vtable:
-       39:   53:DEFINE_PRIM(i, I, 8);
+       52:   53:DEFINE_PRIM(i, I, 8);
 ------------------
 I8_drop_internal:
         2:   53:DEFINE_PRIM(i, I, 8);
@@ -3205,7 +3219,7 @@ I8_size:
         -:   54:#undef IMPL
         -:   55:
         -:   56:#define IMPL I16
-      51*:   57:DEFINE_PRIM(i, I, 16);
+      64*:   57:DEFINE_PRIM(i, I, 16);
 ------------------
 I16_equal:
     #####:   57:DEFINE_PRIM(i, I, 16);
@@ -3217,7 +3231,7 @@ I16_build:
         2:   57:DEFINE_PRIM(i, I, 16);
 ------------------
 __add_impls_I16_vtable:
-       39:   57:DEFINE_PRIM(i, I, 16);
+       52:   57:DEFINE_PRIM(i, I, 16);
 ------------------
 I16_drop_internal:
         2:   57:DEFINE_PRIM(i, I, 16);
@@ -3231,7 +3245,7 @@ I16_size:
         -:   58:#undef IMPL
         -:   59:
         -:   60:#define IMPL I32
-       88:   61:DEFINE_PRIM(i, I, 32);
+      101:   61:DEFINE_PRIM(i, I, 32);
 ------------------
 I32_equal:
         4:   61:DEFINE_PRIM(i, I, 32);
@@ -3243,7 +3257,7 @@ I32_build:
         9:   61:DEFINE_PRIM(i, I, 32);
 ------------------
 __add_impls_I32_vtable:
-       39:   61:DEFINE_PRIM(i, I, 32);
+       52:   61:DEFINE_PRIM(i, I, 32);
 ------------------
 I32_drop_internal:
         6:   61:DEFINE_PRIM(i, I, 32);
@@ -3257,7 +3271,7 @@ I32_size:
         -:   62:#undef IMPL
         -:   63:
         -:   64:#define IMPL I64
-      51*:   65:DEFINE_PRIM(i, I, 64);
+      64*:   65:DEFINE_PRIM(i, I, 64);
 ------------------
 I64_equal:
     #####:   65:DEFINE_PRIM(i, I, 64);
@@ -3269,7 +3283,7 @@ I64_build:
         2:   65:DEFINE_PRIM(i, I, 64);
 ------------------
 __add_impls_I64_vtable:
-       39:   65:DEFINE_PRIM(i, I, 64);
+       52:   65:DEFINE_PRIM(i, I, 64);
 ------------------
 I64_drop_internal:
         2:   65:DEFINE_PRIM(i, I, 64);
@@ -3283,7 +3297,7 @@ I64_size:
         -:   66:#undef IMPL
         -:   67:
         -:   68:#define IMPL I128
-      51*:   69:DEFINE_PRIM(i, I, 128);
+      64*:   69:DEFINE_PRIM(i, I, 128);
 ------------------
 I128_equal:
     #####:   69:DEFINE_PRIM(i, I, 128);
@@ -3295,7 +3309,7 @@ I128_build:
         2:   69:DEFINE_PRIM(i, I, 128);
 ------------------
 __add_impls_I128_vtable:
-       39:   69:DEFINE_PRIM(i, I, 128);
+       52:   69:DEFINE_PRIM(i, I, 128);
 ------------------
 I128_drop_internal:
         2:   69:DEFINE_PRIM(i, I, 128);
@@ -3309,7 +3323,7 @@ I128_size:
         -:   70:#undef IMPL
         -:   71:
         -:   72:#define IMPL F32
-      51*:   73:DEFINE_PRIM(f, F, 32);
+      64*:   73:DEFINE_PRIM(f, F, 32);
 ------------------
 F32_equal:
     #####:   73:DEFINE_PRIM(f, F, 32);
@@ -3321,7 +3335,7 @@ F32_build:
         2:   73:DEFINE_PRIM(f, F, 32);
 ------------------
 __add_impls_F32_vtable:
-       39:   73:DEFINE_PRIM(f, F, 32);
+       52:   73:DEFINE_PRIM(f, F, 32);
 ------------------
 F32_drop_internal:
         2:   73:DEFINE_PRIM(f, F, 32);
@@ -3335,7 +3349,7 @@ F32_size:
         -:   74:#undef IMPL
         -:   75:
         -:   76:#define IMPL F64
-      51*:   77:DEFINE_PRIM(f, F, 64);
+      64*:   77:DEFINE_PRIM(f, F, 64);
 ------------------
 F64_equal:
     #####:   77:DEFINE_PRIM(f, F, 64);
@@ -3347,7 +3361,7 @@ F64_build:
         2:   77:DEFINE_PRIM(f, F, 64);
 ------------------
 __add_impls_F64_vtable:
-       39:   77:DEFINE_PRIM(f, F, 64);
+       52:   77:DEFINE_PRIM(f, F, 64);
 ------------------
 F64_drop_internal:
         2:   77:DEFINE_PRIM(f, F, 64);
@@ -3361,10 +3375,10 @@ F64_size:
         -:   78:#undef IMPL
         -:   79:
         -:   80:#define IMPL Bool
-       71:   81:Type(Bool, Field(bool, value));
+       84:   81:Type(Bool, Field(bool, value));
 ------------------
 __add_impls_Bool_vtable:
-       39:   81:Type(Bool, Field(bool, value));
+       52:   81:Type(Bool, Field(bool, value));
 ------------------
 Bool_drop_internal:
         8:   81:Type(Bool, Field(bool, value));
@@ -3391,7 +3405,7 @@ Bool_size:
         -:    0:Source:rc.c
         -:    0:Graph:rc.gcno
         -:    0:Data:rc.gcda
-        -:    0:Runs:39
+        -:    0:Runs:52
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3411,10 +3425,10 @@ Bool_size:
         -:   17:
         -:   18:// Rc has two 'FatPtr's The first is a counter and the second is holds the value. The value
         -:   19:// can be any object (Obj).
-      151:   20:Type(Rc, Field(FatPtr, counter), Field(FatPtr, value));
+      164:   20:Type(Rc, Field(FatPtr, counter), Field(FatPtr, value));
 ------------------
 __add_impls_Rc_vtable:
-       39:   20:Type(Rc, Field(FatPtr, counter), Field(FatPtr, value));
+       52:   20:Type(Rc, Field(FatPtr, counter), Field(FatPtr, value));
 ------------------
 Rc_drop_internal:
        16:   20:Type(Rc, Field(FatPtr, counter), Field(FatPtr, value));
@@ -3515,7 +3529,7 @@ Rc_size:
         -:    0:Source:test_encapsulation.c
         -:    0:Graph:test_encapsulation.gcno
         -:    0:Data:test_encapsulation.gcda
-        -:    0:Runs:38
+        -:    0:Runs:51
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3534,10 +3548,10 @@ Rc_size:
         -:   16:#include <core/traits.h>
         -:   17:#include <core/type.h>
         -:   18:
-       45:   19:Type(HiddenDrop);
+       58:   19:Type(HiddenDrop);
 ------------------
 __add_impls_HiddenDrop_vtable:
-       38:   19:Type(HiddenDrop);
+       51:   19:Type(HiddenDrop);
 ------------------
 HiddenDrop_drop_internal:
         1:   19:Type(HiddenDrop);
@@ -3549,23 +3563,23 @@ HiddenDrop_size:
         4:   19:Type(HiddenDrop);
 ------------------
         -:   20:Builder(HiddenDrop);
-       76:   21:Impl(HiddenDrop, Drop);
+      102:   21:Impl(HiddenDrop, Drop);
 ------------------
 vtable_add_trait_impl_HiddenDrop_Drop:
-       38:   21:Impl(HiddenDrop, Drop);
+       51:   21:Impl(HiddenDrop, Drop);
 ------------------
 __required_add__HiddenDrop_drop:
-       38:   21:Impl(HiddenDrop, Drop);
+       51:   21:Impl(HiddenDrop, Drop);
 ------------------
         -:   22:
         -:   23:#define IMPL HiddenDrop
         1:   24:void HiddenDrop_drop() {}
         -:   25:#undef IMPL
         -:   26:
-     123*:   27:Type(
+     162*:   27:Type(
 ------------------
 __add_impls_Hidden_vtable:
-       38:   27:Type(
+       51:   27:Type(
 ------------------
 Hidden_drop_internal:
         1:   27:Type(
@@ -3574,7 +3588,7 @@ Hidden_build_internal:
        4*:   27:Type(
 ------------------
 __add_where_Hidden_T_vtable:
-       76:   27:Type(
+      102:   27:Type(
 ------------------
 Hidden_size:
         4:   27:Type(
@@ -3613,7 +3627,7 @@ Hidden_size:
         3:   59:}
         -:   60:#undef IMPL
         -:   61:
-      63*:   62:EnumImpl(HiddenEnum);
+      76*:   62:EnumImpl(HiddenEnum);
 ------------------
 HiddenEnum_as_ref:
         5:   62:EnumImpl(HiddenEnum);
@@ -3625,7 +3639,7 @@ HiddenEnum_build:
        3*:   62:EnumImpl(HiddenEnum);
 ------------------
 __add_impls_HiddenEnum_vtable:
-       38:   62:EnumImpl(HiddenEnum);
+       51:   62:EnumImpl(HiddenEnum);
 ------------------
 HiddenEnum_drop_internal:
         3:   62:EnumImpl(HiddenEnum);
@@ -3639,7 +3653,7 @@ HiddenEnum_size:
         -:    0:Source:test_server.c
         -:    0:Graph:test_server.gcno
         -:    0:Data:test_server.gcda
-        -:    0:Runs:38
+        -:    0:Runs:51
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3664,10 +3678,10 @@ HiddenEnum_size:
         -:   22:// the trait bound of HttpServer in our example. We also call the required macros
         -:   23:// to minimally intialize this type and declare that the Drop trait will be
         -:   24:// implemented.
-       42:   25:Type(CanDrop);
+       55:   25:Type(CanDrop);
 ------------------
 __add_impls_CanDrop_vtable:
-       38:   25:Type(CanDrop);
+       51:   25:Type(CanDrop);
 ------------------
 CanDrop_drop_internal:
         1:   25:Type(CanDrop);
@@ -3679,13 +3693,13 @@ CanDrop_size:
         2:   25:Type(CanDrop);
 ------------------
         -:   26:Builder(CanDrop);
-       76:   27:Impl(CanDrop, Drop);
+      102:   27:Impl(CanDrop, Drop);
 ------------------
 vtable_add_trait_impl_CanDrop_Drop:
-       38:   27:Impl(CanDrop, Drop);
+       51:   27:Impl(CanDrop, Drop);
 ------------------
 __required_add__CanDrop_drop:
-       38:   27:Impl(CanDrop, Drop);
+       51:   27:Impl(CanDrop, Drop);
 ------------------
         -:   28:
         -:   29:// Do the drop implementation for this type. By defining 'IMPL', we have access
@@ -3696,10 +3710,10 @@ __required_add__CanDrop_drop:
         -:   34:
         -:   35:// Now we declare a second type which will demonstrate concrete types. This type
         -:   36:// also has some data fields which are used and a Builder which allows configuration.
-       42:   37:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
+       55:   37:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
 ------------------
 __add_impls_HttpServerComponent_vtable:
-       38:   37:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
+       51:   37:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
 ------------------
 HttpServerComponent_drop_internal:
         1:   37:Type(HttpServerComponent, Field(u64, state), Field(void*, alloc_mem));
@@ -3713,21 +3727,21 @@ HttpServerComponent_size:
         -:   38:Builder(HttpServerComponent, Config(u64, state));
         -:   39:
         -:   40:// Implement Drop and Build for this type.
-       76:   41:Impl(HttpServerComponent, Drop);
+      102:   41:Impl(HttpServerComponent, Drop);
 ------------------
 vtable_add_trait_impl_HttpServerComponent_Drop:
-       38:   41:Impl(HttpServerComponent, Drop);
+       51:   41:Impl(HttpServerComponent, Drop);
 ------------------
 __required_add__HttpServerComponent_drop:
-       38:   41:Impl(HttpServerComponent, Drop);
+       51:   41:Impl(HttpServerComponent, Drop);
 ------------------
-       76:   42:Impl(HttpServerComponent, Build);
+      102:   42:Impl(HttpServerComponent, Build);
 ------------------
 vtable_add_trait_impl_HttpServerComponent_Build:
-       38:   42:Impl(HttpServerComponent, Build);
+       51:   42:Impl(HttpServerComponent, Build);
 ------------------
 __required_add__HttpServerComponent_build:
-       38:   42:Impl(HttpServerComponent, Build);
+       51:   42:Impl(HttpServerComponent, Build);
 ------------------
         -:   43:
         -:   44:// Here we implement drop and build, the required methods for our traits.
@@ -3758,10 +3772,10 @@ __required_add__HttpServerComponent_build:
         -:   69:// data is defined in our .c file and treated as an opaque pointer.
         -:   70:// The HttpServer type demonstrates the 'Where' clause for defining generics and the usage
         -:   71:// of all three types of data members (Generic, Object, and Field).
-     119*:   72:Type(
+     158*:   72:Type(
 ------------------
 __add_impls_HttpServer_vtable:
-       38:   72:Type(
+       51:   72:Type(
 ------------------
 HttpServer_drop_internal:
         1:   72:Type(
@@ -3770,7 +3784,7 @@ HttpServer_build_internal:
        2*:   72:Type(
 ------------------
 __add_where_HttpServer_T_vtable:
-       76:   72:Type(
+      102:   72:Type(
 ------------------
 HttpServer_size:
         2:   72:Type(
@@ -3862,7 +3876,7 @@ HttpServer_size:
         -:    0:Source:thread.c
         -:    0:Graph:thread.gcno
         -:    0:Data:thread.gcda
-        -:    0:Runs:39
+        -:    0:Runs:52
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3973,7 +3987,7 @@ HttpServer_size:
         -:    0:Source:traits.c
         -:    0:Graph:traits.gcno
         -:    0:Data:traits.gcda
-        -:    0:Runs:39
+        -:    0:Runs:52
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4047,7 +4061,7 @@ HttpServer_size:
         -:    0:Source:type.c
         -:    0:Graph:type.gcno
         -:    0:Data:type.gcda
-        -:    0:Runs:39
+        -:    0:Runs:52
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4071,9 +4085,9 @@ HttpServer_size:
         -:   21:_Thread_local Obj *__thread_local_self_Var = NULL;
         -:   22:
         -:   23:atomic_ullong __global_counter__;
-       39:   24:void __attribute__((constructor)) init_global_counter() {
-       39:   25:	atomic_init(&__global_counter__, 1);
-       39:   26:}
+       52:   24:void __attribute__((constructor)) init_global_counter() {
+       52:   25:	atomic_init(&__global_counter__, 1);
+       52:   26:}
         -:   27:
     #####:   28:u64 unique_id() {
     #####:   29:	u64 ret = atomic_fetch_add(&__global_counter__, 1);
@@ -4090,32 +4104,32 @@ HttpServer_size:
       152:   40:	return ret;
         -:   41:}
         -:   42:
-   111991:   43:int compare_vtable_entry(const void *ent1, const void *ent2) {
-   111991:   44:	const VtableEntry *vtent1 = ent1;
-   111991:   45:	const VtableEntry *vtent2 = ent2;
-   111991:   46:	return strcmp(vtent1->name, vtent2->name);
+   126486:   43:int compare_vtable_entry(const void *ent1, const void *ent2) {
+   126486:   44:	const VtableEntry *vtent1 = ent1;
+   126486:   45:	const VtableEntry *vtent2 = ent2;
+   126486:   46:	return strcmp(vtent1->name, vtent2->name);
         -:   47:}
         -:   48:
-    14264:   49:void sort_vtable(Vtable *table) {
-    14264:   50:	qsort(table->entries, table->len, sizeof(VtableEntry), compare_vtable_entry);
-    14264:   51:}
+    16474:   49:void sort_vtable(Vtable *table) {
+    16474:   50:	qsort(table->entries, table->len, sizeof(VtableEntry), compare_vtable_entry);
+    16474:   51:}
         -:   52:
-    14264:   53:void vtable_add_entry(Vtable *table, VtableEntry entry) {
-    14264:   54:	if (table->entries == NULL) {
-     1725:   55:		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
-     1725:   56:		if (table->entries == NULL)
+    16474:   53:void vtable_add_entry(Vtable *table, VtableEntry entry) {
+    16474:   54:	if (table->entries == NULL) {
+     1998:   55:		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
+     1998:   56:		if (table->entries == NULL)
     #####:   57:			panic("Couldn't allocate memory for vtable");
         -:   58:	} else {
-    12539:   59:		void *tmp = realloc(table->entries, sizeof(VtableEntry) * (table->len + 1));
-    12539:   60:		if (tmp == NULL)
+    14476:   59:		void *tmp = realloc(table->entries, sizeof(VtableEntry) * (table->len + 1));
+    14476:   60:		if (tmp == NULL)
     #####:   61:			panic("Couldn't allocate memory for vtable");
-    12539:   62:		table->entries = tmp;
+    14476:   62:		table->entries = tmp;
         -:   63:	}
         -:   64:
-    14264:   65:	memcpy(&table->entries[table->len], &entry, sizeof(VtableEntry));
-    14264:   66:	table->len += 1;
-    14264:   67:	sort_vtable(table);
-    14264:   68:}
+    16474:   65:	memcpy(&table->entries[table->len], &entry, sizeof(VtableEntry));
+    16474:   66:	table->len += 1;
+    16474:   67:	sort_vtable(table);
+    16474:   68:}
         -:   69:
        38:   70:void vtable_override(Vtable *table, VtableEntry entry) {
       228:   71:	for (int i = 0; i < table->len; i++) {
@@ -4125,41 +4139,41 @@ HttpServer_size:
         -:   75:	}
        38:   76:}
         -:   77:
-      304:   78:bool vtable_check_impl_trait(const Vtable *table, const char *trait) {
-      304:   79:	bool ret = false;
+      330:   78:bool vtable_check_impl_trait(const Vtable *table, const char *trait) {
+      330:   79:	bool ret = false;
         -:   80:
-      494:   81:	for (u64 i = 0; i < table->trait_len; i++) {
-      494:   82:		if (!strcmp(table->trait_entries[i].trait_name, trait)) {
-      304:   83:			ret = true;
-      304:   84:			break;
+      546:   81:	for (u64 i = 0; i < table->trait_len; i++) {
+      546:   82:		if (!strcmp(table->trait_entries[i].trait_name, trait)) {
+      330:   83:			ret = true;
+      330:   84:			break;
         -:   85:		}
         -:   86:	}
         -:   87:
-      304:   88:	return ret;
+      330:   88:	return ret;
         -:   89:}
         -:   90:
-     8252:   91:void vtable_add_trait(Vtable *table, char *trait) {
-     8252:   92:	if (table->trait_entries == NULL) {
-     1724:   93:		table->trait_entries = malloc(sizeof(VtableTraitEntry) * (table->trait_len + 1));
-     1724:   94:		if (table->trait_entries == NULL)
+     9578:   91:void vtable_add_trait(Vtable *table, char *trait) {
+     9578:   92:	if (table->trait_entries == NULL) {
+     2010:   93:		table->trait_entries = malloc(sizeof(VtableTraitEntry) * (table->trait_len + 1));
+     2010:   94:		if (table->trait_entries == NULL)
     #####:   95:			panic("Couldn't allocate memory for vtable");
         -:   96:	} else {
         -:   97:		void *tmp =
-     6528:   98:			realloc(table->trait_entries, sizeof(VtableTraitEntry) * (table->trait_len + 1));
-     6528:   99:		if (tmp == NULL)
+     7568:   98:			realloc(table->trait_entries, sizeof(VtableTraitEntry) * (table->trait_len + 1));
+     7568:   99:		if (tmp == NULL)
     #####:  100:			panic("Couldn't allocate memory for vtable");
-     6528:  101:		table->trait_entries = tmp;
+     7568:  101:		table->trait_entries = tmp;
         -:  102:	}
         -:  103:
         -:  104:	VtableTraitEntry entry;
-     8252:  105:	if (strlen(trait) >= MAX_TRAIT_NAME_LEN)
+     9578:  105:	if (strlen(trait) >= MAX_TRAIT_NAME_LEN)
     #####:  106:		panic("trait name [%s] is too long. MAX_TRAIT_NAME_LEN = %i\n", trait,
         -:  107:			  MAX_TRAIT_NAME_LEN - 1);
-     8252:  108:	strcpy(entry.trait_name, trait);
+     9578:  108:	strcpy(entry.trait_name, trait);
         -:  109:
-     8252:  110:	memcpy(&table->trait_entries[table->trait_len], &entry, sizeof(VtableTraitEntry));
-     8252:  111:	table->trait_len += 1;
-     8252:  112:}
+     9578:  110:	memcpy(&table->trait_entries[table->trait_len], &entry, sizeof(VtableTraitEntry));
+     9578:  111:	table->trait_len += 1;
+     9578:  112:}
         -:  113:
       795:  114:void *find_fn(const Obj *obj, const char *name) {
       795:  115:	int left = 0;
@@ -4276,7 +4290,7 @@ HttpServer_size:
         -:    0:Source:unit.c
         -:    0:Graph:unit.gcno
         -:    0:Data:unit.gcda
-        -:    0:Runs:39
+        -:    0:Runs:52
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4293,10 +4307,10 @@ HttpServer_size:
         -:   14:
         -:   15:#include <core/unit.h>
         -:   16:
-      39*:   17:Type(Unit);
+      52*:   17:Type(Unit);
 ------------------
 __add_impls_Unit_vtable:
-       39:   17:Type(Unit);
+       52:   17:Type(Unit);
 ------------------
 Unit_drop_internal:
     #####:   17:Type(Unit);
@@ -4310,7 +4324,7 @@ Unit_size:
         -:    0:Source:chain_allocator.c
         -:    0:Graph:chain_allocator.gcno
         -:    0:Data:chain_allocator.gcda
-        -:    0:Runs:55
+        -:    0:Runs:68
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4375,9 +4389,9 @@ Unit_size:
         2:   62:}
         -:   63:
         -:   64:// build the using the default heap allocator config
-       40:   65:int build_default_heap_allocator(HeapAllocator *ptr)
+       52:   65:int build_default_heap_allocator(HeapAllocator *ptr)
         -:   66:{
-       40:   67:	return heap_allocator_build_arr(
+       52:   67:	return heap_allocator_build_arr(
         -:   68:		ptr, &__default_hconfig_, __default_hdpc_arr_, __default_hdpc_arr_size);
         -:   69:}
         -:   70:
@@ -4433,30 +4447,30 @@ Unit_size:
         1:  120:		heap_allocator_cleanup(__global_sync_allocator);
         1:  121:}
         -:  122:
-       18:  123:void chain_guard_cleanup(ChainGuard *ptr)
+       30:  123:void chain_guard_cleanup(ChainGuard *ptr)
         -:  124:{
-       18:  125:	__thread_local_chain_allocator_index--;
-       18:  126:}
+       30:  125:	__thread_local_chain_allocator_index--;
+       30:  126:}
         -:  127:
-       21:  128:ChainGuard chain_guard(ChainConfig *config)
+       33:  128:ChainGuard chain_guard(ChainConfig *config)
         -:  129:{
-       21:  130:	if (__thread_local_chain_allocator_index >= MAX_CHAIN_ALLOCATOR_DEPTH)
+       33:  130:	if (__thread_local_chain_allocator_index >= MAX_CHAIN_ALLOCATOR_DEPTH)
     #####:  131:		panic("too many chain allocators");
         -:  132:
-       21:  133:	ChainGuardPtr ret
-       21:  134:		= { __thread_local_chain_allocator_index, config->ha, config->is_sync, config->lock };
+       33:  133:	ChainGuardPtr ret
+       33:  134:		= { __thread_local_chain_allocator_index, config->ha, config->is_sync, config->lock };
         -:  135:
-       21:  136:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].ha = config->ha;
-       21:  137:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].is_sync = config->is_sync;
-       21:  138:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].lock = config->lock;
+       33:  136:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].ha = config->ha;
+       33:  137:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].is_sync = config->is_sync;
+       33:  138:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].lock = config->lock;
         -:  139:
-       21:  140:	__thread_local_chain_allocator_index++;
-       21:  141:	return ret;
+       33:  140:	__thread_local_chain_allocator_index++;
+       33:  141:	return ret;
         -:  142:}
         -:  143:
-      262:  144:int chain_malloc(FatPtr *ptr, u64 size)
+      274:  144:int chain_malloc(FatPtr *ptr, u64 size)
         -:  145:{
-      262:  146:	if (__thread_local_chain_allocator_index == 0) {
+      274:  146:	if (__thread_local_chain_allocator_index == 0) {
         -:  147:		// thread local allocator has not been initialized. Create it
         -:  148:		// now.
        25:  149:		HeapAllocator *ha = mymalloc(sizeof(HeapAllocator));
@@ -4473,76 +4487,76 @@ Unit_size:
        25:  160:		__thread_local_chain_allocator[0].is_sync = false;
        25:  161:		__thread_local_chain_allocator_index++;
         -:  162:	}
-      262:  163:	if (size == 0)
+      274:  163:	if (size == 0)
     #####:  164:		return -1;
         -:  165:
-      262:  166:	u64 index = __thread_local_chain_allocator_index - 1;
-      262:  167:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+      274:  166:	u64 index = __thread_local_chain_allocator_index - 1;
+      274:  167:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  168:
         -:  169:	int ret;
         -:  170:	{
-      262:  171:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-      262:  172:		if (is_sync)
+      274:  171:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+      274:  172:		if (is_sync)
         5:  173:			lg = lock(__thread_local_chain_allocator[index].lock);
         -:  174:
-      262:  175:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, ptr);
+      274:  175:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, ptr);
         -:  176:	}
         -:  177:
-      262:  178:	return ret;
+      274:  178:	return ret;
         -:  179:}
-       19:  180:int chain_realloc(FatPtr *dst, FatPtr *src, u64 size)
+       31:  180:int chain_realloc(FatPtr *dst, FatPtr *src, u64 size)
         -:  181:{
-       19:  182:	if (__thread_local_chain_allocator_index == 0) {
+       31:  182:	if (__thread_local_chain_allocator_index == 0) {
     #####:  183:		return -1;
         -:  184:	}
-       19:  185:	if (size == 0) {
+       31:  185:	if (size == 0) {
     #####:  186:		errno = EINVAL;
     #####:  187:		return -1;
         -:  188:	}
-       19:  189:	u64 index = __thread_local_chain_allocator_index - 1;
-       19:  190:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+       31:  189:	u64 index = __thread_local_chain_allocator_index - 1;
+       31:  190:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  191:
         -:  192:	int ret;
         -:  193:	{
-       19:  194:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-       19:  195:		if (is_sync)
+       31:  194:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+       31:  195:		if (is_sync)
     #####:  196:			lg = lock(__thread_local_chain_allocator[index].lock);
         -:  197:
-       19:  198:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, dst);
-       19:  199:		if (!ret) {
-       19:  200:			void *src_data = fat_ptr_data(src);
-       19:  201:			void *dst_data = fat_ptr_data(dst);
-       19:  202:			u64 len = fat_ptr_len(src);
-       19:  203:			memcpy(dst_data, src_data, len);
-       19:  204:			ret = chain_free(src);
+       31:  198:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, dst);
+       31:  199:		if (!ret) {
+       31:  200:			void *src_data = fat_ptr_data(src);
+       31:  201:			void *dst_data = fat_ptr_data(dst);
+       31:  202:			u64 len = fat_ptr_len(src);
+       31:  203:			memcpy(dst_data, src_data, len);
+       31:  204:			ret = chain_free(src);
         -:  205:		}
         -:  206:	}
         -:  207:
-       19:  208:	return ret;
+       31:  208:	return ret;
         -:  209:}
-      244:  210:int chain_free(FatPtr *ptr)
+      268:  210:int chain_free(FatPtr *ptr)
         -:  211:{
-      244:  212:	if (__thread_local_chain_allocator_index == 0) {
+      268:  212:	if (__thread_local_chain_allocator_index == 0) {
     #####:  213:		errno = ERANGE;
     #####:  214:		return -1;
         -:  215:	}
-      244:  216:	u64 index = __thread_local_chain_allocator_index - 1;
-      244:  217:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+      268:  216:	u64 index = __thread_local_chain_allocator_index - 1;
+      268:  217:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  218:
         -:  219:	int ret;
         -:  220:	{
-      244:  221:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-      244:  222:		if (is_sync)
+      268:  221:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+      268:  222:		if (is_sync)
         4:  223:			lg = lock(__thread_local_chain_allocator[index].lock);
         -:  224:
-      244:  225:		ret = heap_allocator_free(__thread_local_chain_allocator[index].ha, ptr);
+      268:  225:		ret = heap_allocator_free(__thread_local_chain_allocator[index].ha, ptr);
         -:  226:	}
-      244:  227:	return ret;
+      268:  227:	return ret;
         -:  228:}
         -:    0:Source:heap.c
         -:    0:Graph:heap.gcno
         -:    0:Data:heap.gcda
-        -:    0:Runs:55
+        -:    0:Runs:68
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4600,20 +4614,20 @@ Unit_size:
         -:   55:bool __debug_build_allocator_malloc_fail7 = false;
         -:   56:bool __debug_build_allocator_malloc_fail8 = false;
         -:   57:
-      453:   58:void *do_malloc(size_t size)
+      549:   58:void *do_malloc(size_t size)
         -:   59:{
-      453:   60:	__malloc_count += 1;
-      453:   61:	void *ret = malloc(size);
+      549:   60:	__malloc_count += 1;
+      549:   61:	void *ret = malloc(size);
         -:   62:	// printf("malloc %zu [%p (%llu)]\n", size, ret, __malloc_count);
-      453:   63:	return ret;
+      549:   63:	return ret;
         -:   64:}
         -:   65:
-      261:   66:void do_free(void *ptr)
+      357:   66:void do_free(void *ptr)
         -:   67:{
-      261:   68:	__free_count += 1;
+      357:   68:	__free_count += 1;
         -:   69:	// printf("free %p (%llu)\n", ptr, __free_count);
-      261:   70:	free(ptr);
-      261:   71:}
+      357:   70:	free(ptr);
+      357:   71:}
         -:   72:
        35:   73:void *do_realloc(void *ptr, size_t size)
         -:   74:{
@@ -4622,14 +4636,14 @@ Unit_size:
        35:   77:	return ret;
         -:   78:}
         -:   79:
-      198:   80:void *fat_ptr_data(const FatPtr *ptr)
+      222:   80:void *fat_ptr_data(const FatPtr *ptr)
         -:   81:{
-      198:   82:	return ptr->data;
+      222:   82:	return ptr->data;
         -:   83:}
         -:   84:
-       31:   85:u64 fat_ptr_len(const FatPtr *ptr)
+       43:   85:u64 fat_ptr_len(const FatPtr *ptr)
         -:   86:{
-       31:   87:	return ptr->len;
+       43:   87:	return ptr->len;
         -:   88:}
         -:   89:
         5:   90:u64 fat_ptr_id(const FatPtr *ptr)
@@ -4637,77 +4651,77 @@ Unit_size:
         5:   92:	return ptr->id;
         -:   93:}
         -:   94:
-      118:   95:int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs, bool last_is_uint_max)
+      142:   95:int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs, bool last_is_uint_max)
         -:   96:{
-      118:   97:	hd->data[index] = NULL; // set to NULL for cleanup consistency
+      142:   97:	hd->data[index] = NULL; // set to NULL for cleanup consistency
         -:   98:
         -:   99:	// allocate memory for slabs
-      118:  100:	if (!__debug_build_allocator_malloc_fail4)
-      116:  101:		hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
-      118:  102:	if (hd->data[index] == NULL)
+      142:  100:	if (!__debug_build_allocator_malloc_fail4)
+      140:  101:		hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
+      142:  102:	if (hd->data[index] == NULL)
         2:  103:		return -1;
         -:  104:
-      116:  105:	void *tmp = NULL;
+      140:  105:	void *tmp = NULL;
         -:  106:
         -:  107:	// allocate / or reallocate the freelist
-      116:  108:	if (!__debug_build_allocator_malloc_fail5) {
-      114:  109:		if (index == 0)
-       97:  110:			tmp = do_malloc(sizeof(u32) * slabs);
+      140:  108:	if (!__debug_build_allocator_malloc_fail5) {
+      138:  109:		if (index == 0)
+      121:  110:			tmp = do_malloc(sizeof(u32) * slabs);
         -:  111:		else {
        17:  112:			tmp = do_realloc(hd->free_list, sizeof(u32) * (hd->cur_slabs + slabs));
         -:  113:		}
         -:  114:	}
         -:  115:
-      116:  116:	if (!tmp) {
+      140:  116:	if (!tmp) {
         2:  117:		do_free(hd->data[index]);
         2:  118:		return -1;
         -:  119:	}
         -:  120:
-      114:  121:	hd->free_list = tmp;
+      138:  121:	hd->free_list = tmp;
         -:  122:
         -:  123:	// initialize the values of the free list.
-      114:  124:	u32 offset = index * hd->hdp.config.slabs_per_resize;
-     1367:  125:	for (u64 i = 0; i < slabs; i++) {
-     1253:  126:		if ((i == (slabs - 1)) && last_is_uint_max)
-      113:  127:			hd->free_list[i + offset] = UINT32_MAX;
+      138:  124:	u32 offset = index * hd->hdp.config.slabs_per_resize;
+     1631:  125:	for (u64 i = 0; i < slabs; i++) {
+     1493:  126:		if ((i == (slabs - 1)) && last_is_uint_max)
+      137:  127:			hd->free_list[i + offset] = UINT32_MAX;
         -:  128:		else
-     1140:  129:			hd->free_list[i + offset] = offset + i + 1;
+     1356:  129:			hd->free_list[i + offset] = offset + i + 1;
         -:  130:	}
         -:  131:
-      114:  132:	return 0;
+      138:  132:	return 0;
         -:  133:}
         -:  134:
         -:  135:// compare function used for sorting.
-     3815:  136:int heap_data_compare(const void *p1, const void *p2)
+     5015:  136:int heap_data_compare(const void *p1, const void *p2)
         -:  137:{
-     3815:  138:	int ret = 0;
+     5015:  138:	int ret = 0;
         -:  139:
-     3815:  140:	HeapData d1 = *(HeapData *)p1;
-     3815:  141:	HeapData d2 = *(HeapData *)p2;
+     5015:  140:	HeapData d1 = *(HeapData *)p1;
+     5015:  141:	HeapData d2 = *(HeapData *)p2;
         -:  142:
-     3815:  143:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
+     5015:  143:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
         1:  144:		ret = 1;
-     3814:  145:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
-     3813:  146:		ret = -1;
+     5014:  145:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
+     5013:  146:		ret = -1;
         -:  147:
-     3815:  148:	return ret;
+     5015:  148:	return ret;
         -:  149:}
         -:  150:
         -:  151:// initialize the heap data params
-     1555:  152:int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp, u64 index)
+     2035:  152:int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp, u64 index)
         -:  153:{
         -:  154:
         -:  155:	// set some value in case of a failure below such that cleanup can
         -:  156:	// succeed
-     1555:  157:	int ret = 0;
-     1555:  158:	ptr->impl->hd_arr[index].hdp.config = *hdp;
-     1555:  159:	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
-     1555:  160:	ptr->impl->hd_arr[index].cur_slabs = 0;
-     1555:  161:	ptr->impl->hd_arr[index].cur_slabs_allocated = 0;
-     1555:  162:	ptr->impl->hd_arr[index].count = ptr->impl->hd_arr[index].hdp.config.initial_chunks;
+     2035:  157:	int ret = 0;
+     2035:  158:	ptr->impl->hd_arr[index].hdp.config = *hdp;
+     2035:  159:	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
+     2035:  160:	ptr->impl->hd_arr[index].cur_slabs = 0;
+     2035:  161:	ptr->impl->hd_arr[index].cur_slabs_allocated = 0;
+     2035:  162:	ptr->impl->hd_arr[index].count = ptr->impl->hd_arr[index].hdp.config.initial_chunks;
         -:  163:
         -:  164:	// if we have initial chunks, initialize them
-     1555:  165:	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks) {
+     2035:  165:	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks) {
        23:  166:		ptr->impl->hd_arr[index].data = NULL;
         -:  167:
         -:  168:		// try to allocate space for the data for this size
@@ -4735,48 +4749,48 @@ Unit_size:
         2:  190:				ret = -1;
         -:  191:		}
         -:  192:	} else
-     1532:  193:		ptr->impl->hd_arr[index].data = NULL;
-     1554:  194:	return ret;
+     2012:  193:		ptr->impl->hd_arr[index].data = NULL;
+     2034:  194:	return ret;
         -:  195:}
         -:  196:
-       66:  197:int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
+       78:  197:int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
         -:  198:	HeapDataParamsConfig arr[], u64 heap_data_params_count)
         -:  199:{
         -:  200:	// check inputs
-       66:  201:	if (ptr == NULL || config == NULL || heap_data_params_count >= 256) {
+       78:  201:	if (ptr == NULL || config == NULL || heap_data_params_count >= 256) {
         1:  202:		errno = EINVAL;
         1:  203:		return -1;
         -:  204:	}
         -:  205:
         -:  206:	// allocate the HeapAllocatorImpl
-       65:  207:	if (!__debug_build_allocator_malloc_fail1)
-       64:  208:		ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
-       65:  209:	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
+       77:  207:	if (!__debug_build_allocator_malloc_fail1)
+       76:  208:		ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
+       77:  209:	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
         1:  210:		return -1;
         -:  211:
-       64:  212:	ptr->impl->cur_malloc_slabs_allocated = 0;
-       64:  213:	ptr->impl->hd_size = 0;
+       76:  212:	ptr->impl->cur_malloc_slabs_allocated = 0;
+       76:  213:	ptr->impl->hd_size = 0;
         -:  214:
         -:  215:	// copy the config
-       64:  216:	ptr->impl->config = *config;
+       76:  216:	ptr->impl->config = *config;
         -:  217:
         -:  218:	// allocate heap data array
-       64:  219:	ptr->impl->hd_arr = NULL;
-       64:  220:	if (!__debug_build_allocator_malloc_fail2)
-       63:  221:		ptr->impl->hd_arr = do_malloc(sizeof(HeapData) * heap_data_params_count);
-       64:  222:	if (ptr->impl->hd_arr == NULL || __debug_build_allocator_malloc_fail2) {
+       76:  219:	ptr->impl->hd_arr = NULL;
+       76:  220:	if (!__debug_build_allocator_malloc_fail2)
+       75:  221:		ptr->impl->hd_arr = do_malloc(sizeof(HeapData) * heap_data_params_count);
+       76:  222:	if (ptr->impl->hd_arr == NULL || __debug_build_allocator_malloc_fail2) {
         1:  223:		heap_allocator_cleanup(ptr);
         1:  224:		return -1;
         -:  225:	}
-       63:  226:	ptr->impl->hd_size = heap_data_params_count;
+       75:  226:	ptr->impl->hd_size = heap_data_params_count;
         -:  227:
         -:  228:	// iterate through specified heap data params
-     1615:  229:	for (u64 i = 0; i < heap_data_params_count; i++) {
-     1556:  230:		HeapDataParamsConfig hdp = arr[i];
-     1556:  231:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
-     1556:  232:		ptr->impl->hd_arr[i].data = NULL;
-     1556:  233:		if ((__debug_build_allocator_malloc_fail3 && i > 0)
-     1555:  234:			|| heap_allocator_init_hdp(ptr, &hdp, i)) {
+     2107:  229:	for (u64 i = 0; i < heap_data_params_count; i++) {
+     2036:  230:		HeapDataParamsConfig hdp = arr[i];
+     2036:  231:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
+     2036:  232:		ptr->impl->hd_arr[i].data = NULL;
+     2036:  233:		if ((__debug_build_allocator_malloc_fail3 && i > 0)
+     2035:  234:			|| heap_allocator_init_hdp(ptr, &hdp, i)) {
         4:  235:			ptr->impl->hd_size = i; // update for cleanup, others
         -:  236:									// did not get allocated
         4:  237:			if (ptr->impl->hd_arr[i].data) {
@@ -4787,30 +4801,30 @@ Unit_size:
         -:  242:		}
         -:  243:	}
         -:  244:
-       59:  245:	if (heap_data_params_count) {
-       57:  246:		qsort(ptr->impl->hd_arr, heap_data_params_count, sizeof(HeapData), heap_data_compare);
+       71:  245:	if (heap_data_params_count) {
+       69:  246:		qsort(ptr->impl->hd_arr, heap_data_params_count, sizeof(HeapData), heap_data_compare);
         -:  247:	}
         -:  248:
         -:  249:	// check invalid configurations
-       59:  250:	u64 last_size = 0;
-     1608:  251:	for (u64 i = 0; i < heap_data_params_count; i++) {
-     1551:  252:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == 0) {
+       71:  250:	u64 last_size = 0;
+     2100:  251:	for (u64 i = 0; i < heap_data_params_count; i++) {
+     2031:  252:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == 0) {
         -:  253:			// no 0 sized slabs allowed
         1:  254:			errno = EINVAL;
         1:  255:			heap_allocator_cleanup(ptr);
         1:  256:			return -1;
         -:  257:		}
         -:  258:		// note: logic correct because array is sorted.
-     1550:  259:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == last_size) {
+     2030:  259:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == last_size) {
         -:  260:			// Duplicate slab_size
         1:  261:			errno = EEXIST;
         1:  262:			heap_allocator_cleanup(ptr);
         1:  263:			return -1;
         -:  264:		}
-     1549:  265:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
+     2029:  265:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
         -:  266:	}
         -:  267:
-       57:  268:	return 0;
+       69:  268:	return 0;
         -:  269:}
         -:  270:
        26:  271:int heap_allocator_build(
@@ -4837,140 +4851,140 @@ Unit_size:
         -:  292:}
         -:  293:
         -:  294:// binary search for the correct slab size
-      671:  295:int heap_allocator_index(HeapAllocator *ptr, u64 size)
+      695:  295:int heap_allocator_index(HeapAllocator *ptr, u64 size)
         -:  296:{
-      671:  297:	int ret = -1;
-      671:  298:	if (ptr->impl->hd_size == 0)
+      695:  297:	int ret = -1;
+      695:  298:	if (ptr->impl->hd_size == 0)
         2:  299:		return ret;
         -:  300:
-      669:  301:	int left = 0;
-      669:  302:	int right = ptr->impl->hd_size - 1;
+      693:  301:	int left = 0;
+      693:  302:	int right = ptr->impl->hd_size - 1;
         -:  303:
-     2085:  304:	while (left <= right) {
-     1906:  305:		int mid = left + (right - left) / 2;
-     1906:  306:		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
-     1906:  307:		if (slab_size == size) {
+     2230:  304:	while (left <= right) {
+     2027:  305:		int mid = left + (right - left) / 2;
+     2027:  306:		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
+     2027:  307:		if (slab_size == size) {
       490:  308:			ret = mid;
       490:  309:			break;
-     1416:  310:		} else if (slab_size > size)
-     1073:  311:			right = mid - 1;
+     1537:  310:		} else if (slab_size > size)
+     1168:  311:			right = mid - 1;
         -:  312:		else
-      343:  313:			left = mid + 1;
+      369:  313:			left = mid + 1;
         -:  314:	}
         -:  315:
-      669:  316:	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1) {
-      167:  317:		return right + 1;
+      693:  316:	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1) {
+      191:  317:		return right + 1;
         -:  318:	}
         -:  319:
       502:  320:	return ret;
         -:  321:}
         -:  322:
-      103:  323:int heap_data_resize(u64 index, HeapData *hd)
+      127:  323:int heap_data_resize(u64 index, HeapData *hd)
         -:  324:{
         -:  325:	// check that we can resize this hdp
-      103:  326:	if (hd->cur_slabs < hd->hdp.config.max_slabs) {
+      127:  326:	if (hd->cur_slabs < hd->hdp.config.max_slabs) {
         -:  327:		// calculate the new slabs
-       96:  328:		u32 nslabs_count = hd->hdp.config.slabs_per_resize + hd->cur_slabs;
-       96:  329:		if (nslabs_count > hd->hdp.config.max_slabs)
+      120:  328:		u32 nslabs_count = hd->hdp.config.slabs_per_resize + hd->cur_slabs;
+      120:  329:		if (nslabs_count > hd->hdp.config.max_slabs)
         2:  330:			nslabs_count = hd->hdp.config.max_slabs;
         -:  331:
         -:  332:		// determine slabs to allocate
-       96:  333:		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
+      120:  333:		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
         -:  334:
         -:  335:		// attempt to allocate
-       96:  336:		void *tmp = NULL;
-       96:  337:		if (!__debug_build_allocator_malloc_fail7) {
-       95:  338:			if (hd->data)
+      120:  336:		void *tmp = NULL;
+      120:  337:		if (!__debug_build_allocator_malloc_fail7) {
+      119:  338:			if (hd->data)
        18:  339:				tmp = do_realloc(hd->data, (hd->count + 1) * sizeof(void *));
         -:  340:			else
-       77:  341:				tmp = do_malloc((hd->count + 1) * sizeof(void **));
+      101:  341:				tmp = do_malloc((hd->count + 1) * sizeof(void **));
         -:  342:		}
         -:  343:
-       96:  344:		if (tmp == NULL)
+      120:  344:		if (tmp == NULL)
         1:  345:			return -1;
-       95:  346:		hd->data = tmp;
+      119:  346:		hd->data = tmp;
         -:  347:
         -:  348:		// initialize the new part of the free list
-       95:  349:		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc, true))
+      119:  349:		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc, true))
         2:  350:			return -1;
-       93:  351:		hd->hdp.free_list_head = hd->cur_slabs;
-       93:  352:		hd->cur_slabs = nslabs_count;
-       93:  353:		hd->count += 1;
-       93:  354:		return 0;
+      117:  351:		hd->hdp.free_list_head = hd->cur_slabs;
+      117:  352:		hd->cur_slabs = nslabs_count;
+      117:  353:		hd->count += 1;
+      117:  354:		return 0;
         -:  355:	}
         7:  356:	return -1;
         -:  357:}
         -:  358:
-      673:  359:int heap_data_allocate(u64 index, HeapData *hd, FatPtr *fptr)
+      697:  359:int heap_data_allocate(u64 index, HeapData *hd, FatPtr *fptr)
         -:  360:{
-      673:  361:	if (hd->cur_slabs == 0) {
+      697:  361:	if (hd->cur_slabs == 0) {
         -:  362:		// this hd initially had 0 slabs
         -:  363:		// resize it
-       78:  364:		if (heap_data_resize(index, hd))
+      102:  364:		if (heap_data_resize(index, hd))
         1:  365:			return -1;
         -:  366:	}
         -:  367:
         -:  368:	// no more slabs, return error
-      672:  369:	if (hd->hdp.free_list_head == UINT32_MAX)
+      696:  369:	if (hd->hdp.free_list_head == UINT32_MAX)
        24:  370:		return -1;
         -:  371:
         -:  372:	// get next free slab
-      648:  373:	u64 id = hd->hdp.free_list_head;
+      672:  373:	u64 id = hd->hdp.free_list_head;
         -:  374:
         -:  375:	// update free list head
-      648:  376:	hd->hdp.free_list_head = hd->free_list[id];
+      672:  376:	hd->hdp.free_list_head = hd->free_list[id];
         -:  377:
         -:  378:	// update with the specific index (differing slab sizes)
-      648:  379:	fptr->id = id | (index << 56);
-      648:  380:	fptr->len = hd->hdp.config.slab_size;
+      672:  379:	fptr->id = id | (index << 56);
+      672:  380:	fptr->len = hd->hdp.config.slab_size;
         -:  381:
-      648:  382:	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
-      648:  383:	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
+      672:  382:	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
+      672:  383:	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
         -:  384:
         -:  385:	// set the data of the fptr
-      648:  386:	fptr->data = hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
-      648:  387:	hd->cur_slabs_allocated++;
+      672:  386:	fptr->data = hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
+      672:  387:	hd->cur_slabs_allocated++;
         -:  388:
-      648:  389:	return 0;
+      672:  389:	return 0;
         -:  390:}
         -:  391:
         -:  392:// free data in this HeapData
-      361:  393:int heap_data_free(u64 index, HeapData *hd, FatPtr *fptr)
+      385:  393:int heap_data_free(u64 index, HeapData *hd, FatPtr *fptr)
         -:  394:{
-      361:  395:	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
+      385:  395:	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
         -:  396:
         -:  397:	// if this is invalid return an error
-      361:  398:	if (rel >= hd->cur_slabs)
+      385:  398:	if (rel >= hd->cur_slabs)
         1:  399:		return -1;
         -:  400:
         -:  401:	// update head and rest of the list
-      360:  402:	u64 head = hd->hdp.free_list_head;
-      360:  403:	hd->hdp.free_list_head = rel;
-      360:  404:	hd->free_list[rel] = head;
+      384:  402:	u64 head = hd->hdp.free_list_head;
+      384:  403:	hd->hdp.free_list_head = rel;
+      384:  404:	hd->free_list[rel] = head;
         -:  405:
-      360:  406:	hd->cur_slabs_allocated--;
+      384:  406:	hd->cur_slabs_allocated--;
         -:  407:
-      360:  408:	return 0;
+      384:  408:	return 0;
         -:  409:}
         -:  410:
-       11:  411:u64 heap_allocator_cur_slabs_allocated(HeapAllocator *ptr)
+       23:  411:u64 heap_allocator_cur_slabs_allocated(HeapAllocator *ptr)
         -:  412:{
-       11:  413:	u64 ret = ptr->impl->cur_malloc_slabs_allocated;
-      451:  414:	for (int i = 0; i < ptr->impl->hd_size; i++) {
-      440:  415:		ret += ptr->impl->hd_arr[i].cur_slabs_allocated;
+       23:  413:	u64 ret = ptr->impl->cur_malloc_slabs_allocated;
+      943:  414:	for (int i = 0; i < ptr->impl->hd_size; i++) {
+      920:  415:		ret += ptr->impl->hd_arr[i].cur_slabs_allocated;
         -:  416:	}
-       11:  417:	return ret;
+       23:  417:	return ret;
         -:  418:}
         -:  419:
         -:  420:// main allocation function
-      671:  421:int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr)
+      695:  421:int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr)
         -:  422:{
-      671:  423:	int ret = -1;
+      695:  423:	int ret = -1;
         -:  424:	// determine the index via binary search
-      671:  425:	int index = heap_allocator_index(ptr, size);
+      695:  425:	int index = heap_allocator_index(ptr, size);
         -:  426:
         -:  427:	// if this index is not found (too big) fall back to malloc
-      671:  428:	if (index < 0) {
+      695:  428:	if (index < 0) {
        14:  429:		if (!ptr->impl->config.no_malloc) {
        12:  430:			fptr->data = NULL;
        12:  431:			if (!__debug_build_allocator_malloc_fail6) {
@@ -4987,9 +5001,9 @@ Unit_size:
         -:  442:			}
         -:  443:		}
         -:  444:	} else {
-      657:  445:		HeapData *hd = &ptr->impl->hd_arr[index];
-      657:  446:		ret = heap_data_allocate(index, hd, fptr);
-      657:  447:		if (ret) {
+      681:  445:		HeapData *hd = &ptr->impl->hd_arr[index];
+      681:  446:		ret = heap_data_allocate(index, hd, fptr);
+      681:  447:		if (ret) {
         -:  448:			// there are no more slabs. Try to resize
        25:  449:			if (!heap_data_resize(index, hd)) {
         -:  450:				// successful resize, allocate should always
@@ -5014,17 +5028,17 @@ Unit_size:
         -:  469:	}
         -:  470:
         -:  471:	// if zeroed is configured set all memory of allocated slabs to 0.
-      671:  472:	if (!ret && ptr->impl->config.zeroed) {
+      695:  472:	if (!ret && ptr->impl->config.zeroed) {
        44:  473:		memset(fptr->data, 0, fptr->len);
         -:  474:	}
         -:  475:
-      671:  476:	return ret;
+      695:  476:	return ret;
         -:  477:}
         -:  478:
-      376:  479:int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr)
+      400:  479:int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr)
         -:  480:{
-      376:  481:	int ret = 0;
-      376:  482:	if (fptr->id == UINT64_MAX) {
+      400:  481:	int ret = 0;
+      400:  482:	if (fptr->id == UINT64_MAX) {
         -:  483:		// malloc allocated
         -:  484:
        14:  485:		if (fptr->data) {
@@ -5036,58 +5050,58 @@ Unit_size:
        14:  491:		ret = 0;
         -:  492:	} else {
         -:  493:
-      362:  494:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
+      386:  494:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
         -:  495:
-      362:  496:		if (index >= ptr->impl->hd_size) {
+      386:  496:		if (index >= ptr->impl->hd_size) {
         1:  497:			errno = EINVAL;
         1:  498:			ret = -1; // invalid index
         -:  499:		} else {
-      361:  500:			HeapData *hd = &ptr->impl->hd_arr[index];
-      361:  501:			ret = heap_data_free(index, hd, fptr);
+      385:  500:			HeapData *hd = &ptr->impl->hd_arr[index];
+      385:  501:			ret = heap_data_free(index, hd, fptr);
         -:  502:		}
         -:  503:	}
         -:  504:
-      376:  505:	if (!ret && ptr->impl->config.zeroed) {
+      400:  505:	if (!ret && ptr->impl->config.zeroed) {
         1:  506:		memset(fptr->data, 0, fptr->len);
         -:  507:	}
         -:  508:
-      376:  509:	return ret;
+      400:  509:	return ret;
         -:  510:}
         -:  511:
-       40:  512:int heap_allocator_cleanup(HeapAllocator *ptr)
+       52:  512:int heap_allocator_cleanup(HeapAllocator *ptr)
         -:  513:{
         -:  514:	// check for impl and deallocate
-       40:  515:	if (ptr->impl) {
-      504:  516:		for (u32 i = 0; i < ptr->impl->hd_size; i++) {
-      468:  517:			if (ptr->impl->hd_arr[i].count) {
+       52:  515:	if (ptr->impl) {
+      996:  516:		for (u32 i = 0; i < ptr->impl->hd_size; i++) {
+      948:  517:			if (ptr->impl->hd_arr[i].count) {
         -:  518:				// check that it's not an unallocated heap data
-       54:  519:				if (ptr->impl->hd_arr[i].free_list) {
-       54:  520:					do_free(ptr->impl->hd_arr[i].free_list);
-       54:  521:					ptr->impl->hd_arr[i].free_list = NULL;
+       78:  519:				if (ptr->impl->hd_arr[i].free_list) {
+       78:  520:					do_free(ptr->impl->hd_arr[i].free_list);
+       78:  521:					ptr->impl->hd_arr[i].free_list = NULL;
         -:  522:				}
-      118:  523:				for (u64 j = 0; j < ptr->impl->hd_arr[i].count; j++) {
-       64:  524:					do_free(ptr->impl->hd_arr[i].data[j]);
+      166:  523:				for (u64 j = 0; j < ptr->impl->hd_arr[i].count; j++) {
+       88:  524:					do_free(ptr->impl->hd_arr[i].data[j]);
         -:  525:				}
-       54:  526:				if (ptr->impl->hd_arr[i].data) {
-       54:  527:					do_free(ptr->impl->hd_arr[i].data);
-       54:  528:					ptr->impl->hd_arr[i].data = NULL;
+       78:  526:				if (ptr->impl->hd_arr[i].data) {
+       78:  527:					do_free(ptr->impl->hd_arr[i].data);
+       78:  528:					ptr->impl->hd_arr[i].data = NULL;
         -:  529:				}
         -:  530:			}
         -:  531:		}
         -:  532:
-       36:  533:		if (ptr->impl->hd_arr) {
-       35:  534:			do_free(ptr->impl->hd_arr);
-       35:  535:			ptr->impl->hd_arr = NULL;
+       48:  533:		if (ptr->impl->hd_arr) {
+       47:  534:			do_free(ptr->impl->hd_arr);
+       47:  535:			ptr->impl->hd_arr = NULL;
         -:  536:		}
-       36:  537:		do_free(ptr->impl);
-       36:  538:		ptr->impl = NULL;
+       48:  537:		do_free(ptr->impl);
+       48:  538:		ptr->impl = NULL;
         -:  539:	}
-       40:  540:	return 0;
+       52:  540:	return 0;
         -:  541:}
         -:    0:Source:lock.c
         -:    0:Graph:lock.gcno
         -:    0:Data:lock.gcda
-        -:    0:Runs:55
+        -:    0:Runs:68
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5185,13 +5199,13 @@ Unit_size:
        15:   95:	return ret;
         -:   96:}
         -:   97:
-      530:   98:void Lockguard_cleanup(LockGuardPtr *ptr) {
-      530:   99:	if (ptr && ptr->ref) {
+      578:   98:void Lockguard_cleanup(LockGuardPtr *ptr) {
+      578:   99:	if (ptr && ptr->ref) {
        14:  100:		atomic_exchange(&ptr->ref->is_locked, false);
        14:  101:		pthread_mutex_unlock(&ptr->ref->lock);
        14:  102:		delete_active_lock(ptr->ref);
         -:  103:	}
-      530:  104:}
+      578:  104:}
         -:  105:
         3:  106:void Lock_mark_poisoned() {
         3:  107:	if (__active_lock_count_) {
@@ -5243,7 +5257,7 @@ Unit_size:
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:55
+        -:    0:Runs:68
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5258,153 +5272,165 @@ Unit_size:
         -:   12:// See the License for the specific language governing permissions and
         -:   13:// limitations under the License.
         -:   14:
-        -:   15:#include <base/resources.h>
-        -:   16:#include <dirent.h>
-        -:   17:#include <limits.h>
-        -:   18:#include <stdio.h>
-        -:   19:#include <stdlib.h>
-        -:   20:#include <string.h>
-        -:   21:#include <sys/stat.h>
-        -:   22:#include <unistd.h>
-        -:   23:
-        3:   24:const char *rstrstr(const char *s1, const char *s2)
-        -:   25:{
-        3:   26:	size_t s1len = strlen(s1);
-        3:   27:	size_t s2len = strlen(s2);
-        -:   28:	const char *s;
-        -:   29:
-        3:   30:	if (s2len > s1len)
-    #####:   31:		return NULL;
-       25:   32:	for (s = s1 + s1len - s2len; s >= s1; --s)
-       25:   33:		if (strncmp(s, s2, s2len) == 0)
-        3:   34:			return s;
-    #####:   35:	return NULL;
-        -:   36:}
-        -:   37:
-        1:   38:size_t read_all(void *buffer, size_t size, size_t count, FILE *stream)
-        -:   39:{
-        1:   40:	size_t total_read = 0;
-        1:   41:	size_t bytes_to_read = size * count;
-        -:   42:	size_t bytes_read;
-        -:   43:
-        2:   44:	while (total_read < bytes_to_read) {
-        1:   45:		bytes_read = fread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
-        1:   46:		if (bytes_read == 0) {
-        -:   47:			// Check for EOF or error
-    #####:   48:			if (feof(stream)) {
-    #####:   49:				break; // End of file reached
-    #####:   50:			} else if (ferror(stream)) {
-    #####:   51:				perror("Read error");
-    #####:   52:				break; // Error occurred
-        -:   53:			}
-        -:   54:		}
-        1:   55:		total_read += bytes_read;
-        -:   56:	}
-        -:   57:
-        1:   58:	return total_read;
-        -:   59:}
-        -:   60:
-    #####:   61:int copy_file(const char *dst, const char *src)
-    #####:   62:{
-        -:   63:	FILE *source_file, *dest_file;
-        -:   64:	size_t bytes;
-        -:   65:
-        -:   66:	// Open the source file in binary read mode
-    #####:   67:	source_file = myfopen(src, "rb");
-    #####:   68:	if (source_file == NULL) {
-    #####:   69:		perror("Error opening source file");
-    #####:   70:		return -1;
-        -:   71:	}
-        -:   72:
-        -:   73:	// Determine the file size
-    #####:   74:	fseek(source_file, 0, SEEK_END);
-    #####:   75:	long file_size = ftell(source_file);
-    #####:   76:	fseek(source_file, 0, SEEK_SET);
-    #####:   77:	char buffer[file_size];
-        -:   78:
-        -:   79:	// Open the destination file in binary write mode
-    #####:   80:	dest_file = myfopen(dst, "wb");
-    #####:   81:	if (dest_file == NULL) {
-    #####:   82:		perror("Error opening destination file");
-    #####:   83:		fclose(source_file);
-    #####:   84:		return -1;
-        -:   85:	}
-        -:   86:
-        -:   87:	// Copy the file content
-    #####:   88:	while ((bytes = fread(buffer, 1, file_size, source_file)) > 0) {
-    #####:   89:		if (fwrite(buffer, 1, bytes, dest_file) != bytes) {
-    #####:   90:			perror("Error writing to destination file");
-    #####:   91:			fclose(source_file);
-    #####:   92:			fclose(dest_file);
-    #####:   93:			return -1;
-        -:   94:		}
-        -:   95:	}
-        -:   96:
-        -:   97:	// Close both files
-    #####:   98:	myfclose(source_file);
-    #####:   99:	myfclose(dest_file);
-        -:  100:
-    #####:  101:	return 0;
-        -:  102:}
-        -:  103:
-        -:  104:// Function to recursively remove a directory and its contents
-       22:  105:int remove_directory(const char *path)
-        -:  106:{
-        -:  107:	struct dirent *entry;
-       22:  108:	DIR *dir = opendir(path);
-        -:  109:
-       22:  110:	if (dir == NULL) {
-       11:  111:		return -1;
-        -:  112:	}
-        -:  113:
-       34:  114:	while ((entry = readdir(dir)) != NULL) {
-        -:  115:		char full_path[PATH_MAX];
-        -:  116:
-        -:  117:		// Skip the special entries "." and ".."
-       23:  118:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-       22:  119:			continue;
-        -:  120:		}
-        -:  121:
-        -:  122:		// Construct the full path to the file/directory
-        1:  123:		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
-        -:  124:
-        -:  125:		struct stat statbuf;
-        1:  126:		if (stat(full_path, &statbuf) == -1) {
-    #####:  127:			perror("stat");
-    #####:  128:			closedir(dir);
-    #####:  129:			return -1;
-        -:  130:		}
-        -:  131:
-        1:  132:		if (S_ISDIR(statbuf.st_mode)) {
-        -:  133:			// It's a directory, recurse into it
-    #####:  134:			if (remove_directory(full_path) == -1) {
-    #####:  135:				closedir(dir);
-    #####:  136:				return -1;
-        -:  137:			}
-        -:  138:		} else {
-        -:  139:			// It's a file, unlink (delete) it
-        1:  140:			if (unlink(full_path) == -1) {
-    #####:  141:				perror("unlink");
-    #####:  142:				closedir(dir);
-    #####:  143:				return -1;
-        -:  144:			}
-        -:  145:		}
-        -:  146:	}
-        -:  147:
-       11:  148:	closedir(dir);
-        -:  149:
-        -:  150:	// Now the directory is empty, so we can remove it
-       11:  151:	if (rmdir(path) == -1) {
-    #####:  152:		perror("rmdir");
-    #####:  153:		return -1;
-        -:  154:	}
-        -:  155:
-       11:  156:	return 0;
-        -:  157:}
+        -:   15:#include <base/colors.h>
+        -:   16:#include <base/resources.h>
+        -:   17:#include <dirent.h>
+        -:   18:#include <limits.h>
+        -:   19:#include <stdio.h>
+        -:   20:#include <stdlib.h>
+        -:   21:#include <string.h>
+        -:   22:#include <sys/stat.h>
+        -:   23:#include <unistd.h>
+        -:   24:
+        3:   25:const char *rstrstr(const char *s1, const char *s2)
+        -:   26:{
+        3:   27:	size_t s1len = strlen(s1);
+        3:   28:	size_t s2len = strlen(s2);
+        -:   29:	const char *s;
+        -:   30:
+        3:   31:	if (s2len > s1len)
+    #####:   32:		return NULL;
+       25:   33:	for (s = s1 + s1len - s2len; s >= s1; --s)
+       25:   34:		if (strncmp(s, s2, s2len) == 0)
+        3:   35:			return s;
+    #####:   36:	return NULL;
+        -:   37:}
+        -:   38:
+        1:   39:size_t read_all(void *buffer, size_t size, size_t count, FILE *stream)
+        -:   40:{
+        1:   41:	size_t total_read = 0;
+        1:   42:	size_t bytes_to_read = size * count;
+        -:   43:	size_t bytes_read;
+        -:   44:
+        2:   45:	while (total_read < bytes_to_read) {
+        1:   46:		bytes_read = fread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
+        1:   47:		if (bytes_read == 0) {
+        -:   48:			// Check for EOF or error
+    #####:   49:			if (feof(stream)) {
+    #####:   50:				break; // End of file reached
+    #####:   51:			} else if (ferror(stream)) {
+    #####:   52:				perror("Read error");
+    #####:   53:				break; // Error occurred
+        -:   54:			}
+        -:   55:		}
+        1:   56:		total_read += bytes_read;
+        -:   57:	}
+        -:   58:
+        1:   59:	return total_read;
+        -:   60:}
+        -:   61:
+    #####:   62:int copy_file(const char *dst, const char *src)
+    #####:   63:{
+        -:   64:	FILE *source_file, *dest_file;
+        -:   65:	size_t bytes;
+        -:   66:
+        -:   67:	// Open the source file in binary read mode
+    #####:   68:	source_file = myfopen(src, "rb");
+    #####:   69:	if (source_file == NULL) {
+    #####:   70:		perror("Error opening source file");
+    #####:   71:		return -1;
+        -:   72:	}
+        -:   73:
+        -:   74:	// Determine the file size
+    #####:   75:	fseek(source_file, 0, SEEK_END);
+    #####:   76:	long file_size = ftell(source_file);
+    #####:   77:	fseek(source_file, 0, SEEK_SET);
+    #####:   78:	char buffer[file_size];
+        -:   79:
+        -:   80:	// Open the destination file in binary write mode
+    #####:   81:	dest_file = myfopen(dst, "wb");
+    #####:   82:	if (dest_file == NULL) {
+    #####:   83:		perror("Error opening destination file");
+    #####:   84:		fclose(source_file);
+    #####:   85:		return -1;
+        -:   86:	}
+        -:   87:
+        -:   88:	// Copy the file content
+    #####:   89:	while ((bytes = fread(buffer, 1, file_size, source_file)) > 0) {
+    #####:   90:		if (fwrite(buffer, 1, bytes, dest_file) != bytes) {
+    #####:   91:			perror("Error writing to destination file");
+    #####:   92:			fclose(source_file);
+    #####:   93:			fclose(dest_file);
+    #####:   94:			return -1;
+        -:   95:		}
+        -:   96:	}
+        -:   97:
+        -:   98:	// Close both files
+    #####:   99:	myfclose(source_file);
+    #####:  100:	myfclose(dest_file);
+        -:  101:
+    #####:  102:	return 0;
+        -:  103:}
+        -:  104:
+        -:  105:// Function to recursively remove a directory and its contents
+       46:  106:int remove_directory(const char *path)
+        -:  107:{
+        -:  108:	struct dirent *entry;
+       46:  109:	DIR *dir = opendir(path);
+        -:  110:
+       46:  111:	if (dir == NULL) {
+       23:  112:		return -1;
+        -:  113:	}
+        -:  114:
+       70:  115:	while ((entry = readdir(dir)) != NULL) {
+        -:  116:		char full_path[PATH_MAX];
+        -:  117:
+        -:  118:		// Skip the special entries "." and ".."
+       47:  119:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+       46:  120:			continue;
+        -:  121:		}
+        -:  122:
+        -:  123:		// Construct the full path to the file/directory
+        1:  124:		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
+        -:  125:
+        -:  126:		struct stat statbuf;
+        1:  127:		if (stat(full_path, &statbuf) == -1) {
+    #####:  128:			perror("stat");
+    #####:  129:			closedir(dir);
+    #####:  130:			return -1;
+        -:  131:		}
+        -:  132:
+        1:  133:		if (S_ISDIR(statbuf.st_mode)) {
+        -:  134:			// It's a directory, recurse into it
+    #####:  135:			if (remove_directory(full_path) == -1) {
+    #####:  136:				closedir(dir);
+    #####:  137:				return -1;
+        -:  138:			}
+        -:  139:		} else {
+        -:  140:			// It's a file, unlink (delete) it
+        1:  141:			if (unlink(full_path) == -1) {
+    #####:  142:				perror("unlink");
+    #####:  143:				closedir(dir);
+    #####:  144:				return -1;
+        -:  145:			}
+        -:  146:		}
+        -:  147:	}
+        -:  148:
+       23:  149:	closedir(dir);
+        -:  150:
+        -:  151:	// Now the directory is empty, so we can remove it
+       23:  152:	if (rmdir(path) == -1) {
+    #####:  153:		perror("rmdir");
+    #####:  154:		return -1;
+        -:  155:	}
+        -:  156:
+       23:  157:	return 0;
+        -:  158:}
+        -:  159:
+    #####:  160:void exit_error(char *format, ...)
+        -:  161:{
+        -:  162:	va_list va_args;
+    #####:  163:	va_start(va_args, format);
+    #####:  164:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+    #####:  165:	vfprintf(stderr, format, va_args);
+    #####:  166:	fprintf(stderr, "\n");
+    #####:  167:	va_end(va_args);
+    #####:  168:	exit(-1);
+        -:  169:}
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
-        -:    0:Runs:55
+        -:    0:Runs:68
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5455,7 +5481,7 @@ Unit_size:
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:55
+        -:    0:Runs:68
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5481,36 +5507,36 @@ Unit_size:
         -:   23:#define PATH_SEPARATOR "/"
         -:   24:#define PATH_SEPARATOR_CHAR '/'
         -:   25:
-       19:   26:void path_cleanup(PathImpl *ptr)
+       31:   26:void path_cleanup(PathImpl *ptr)
         -:   27:{
-       19:   28:	chain_free(&ptr->ptr);
-       19:   29:}
+       31:   28:	chain_free(&ptr->ptr);
+       31:   29:}
         -:   30:
-       19:   31:int path_for(Path *p, const char *path)
+       31:   31:int path_for(Path *p, const char *path)
         -:   32:{
-       19:   33:	if (path == NULL) {
+       31:   33:	if (path == NULL) {
     #####:   34:		errno = EINVAL;
     #####:   35:		return -1;
         -:   36:	}
-       19:   37:	int len = strlen(path);
-       19:   38:	if (len == 0) {
+       31:   37:	int len = strlen(path);
+       31:   38:	if (len == 0) {
     #####:   39:		errno = EINVAL;
     #####:   40:		return -1;
         -:   41:	}
-       19:   42:	if (chain_malloc(&p->ptr, len + 1))
+       31:   42:	if (chain_malloc(&p->ptr, len + 1))
     #####:   43:		return -1;
-       19:   44:	strcpy(p->ptr.data, path);
-       19:   45:	return 0;
+       31:   44:	strcpy(p->ptr.data, path);
+       31:   45:	return 0;
         -:   46:}
         -:   47:
-       18:   48:int path_replace_home(Path *p)
+       30:   48:int path_replace_home(Path *p)
         -:   49:{
-       18:   50:	const char *home_dir = getenv("HOME");
-       18:   51:	if (home_dir == NULL) {
+       30:   50:	const char *home_dir = getenv("HOME");
+       30:   51:	if (home_dir == NULL) {
     #####:   52:		errno = EINVAL;
     #####:   53:		return -1;
         -:   54:	}
-       18:   55:	if (((char *)(p->ptr.data))[0] == '~') {
+       30:   55:	if (((char *)(p->ptr.data))[0] == '~') {
     #####:   56:		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr.data);
     #####:   57:		if (nlen >= PATH_MAX) {
     #####:   58:			errno = E2BIG;
@@ -5526,31 +5552,31 @@ Unit_size:
     #####:   68:		snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr.data + 1));
     #####:   69:		strcpy(p->ptr.data, buf);
         -:   70:	}
-       18:   71:	return 0;
+       30:   71:	return 0;
         -:   72:}
         -:   73:
-       18:   74:int path_canonicalize(Path *p)
+       30:   74:int path_canonicalize(Path *p)
         -:   75:{
-       18:   76:	if (path_replace_home(p))
+       30:   76:	if (path_replace_home(p))
     #####:   77:		return -1;
         -:   78:	char buf[PATH_MAX];
-       18:   79:	errno = 0;
-       18:   80:	if (realpath(p->ptr.data, buf) == NULL) {
+       30:   79:	errno = 0;
+       30:   80:	if (realpath(p->ptr.data, buf) == NULL) {
         2:   81:		return -1;
         -:   82:	}
-       16:   83:	int nlen = strlen(buf);
-       16:   84:	if (nlen == 0) {
+       28:   83:	int nlen = strlen(buf);
+       28:   84:	if (nlen == 0) {
     #####:   85:		errno = EFAULT;
     #####:   86:		return -1;
         -:   87:	}
-       16:   88:	if (nlen >= p->ptr.len) {
+       28:   88:	if (nlen >= p->ptr.len) {
         -:   89:		FatPtr nptr;
-       15:   90:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+       27:   90:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
     #####:   91:			return -1;
-       15:   92:		p->ptr = nptr;
+       27:   92:		p->ptr = nptr;
         -:   93:	}
-       16:   94:	strcpy(p->ptr.data, buf);
-       16:   95:	return 0;
+       28:   94:	strcpy(p->ptr.data, buf);
+       28:   95:	return 0;
         -:   96:}
         5:   97:int path_push(Path *p, const char *next)
         -:   98:{
@@ -5636,7 +5662,7 @@ Unit_size:
         -:    0:Source:rand.c
         -:    0:Graph:rand.gcno
         -:    0:Data:rand.gcda
-        -:    0:Runs:55
+        -:    0:Runs:68
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5701,7 +5727,7 @@ Unit_size:
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:55
+        -:    0:Runs:68
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5721,69 +5747,69 @@ Unit_size:
         -:   17:
         -:   18:_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = { 0, 0, 0, 0, 0 };
         -:   19:
-    62464:   20:void *mymalloc(usize size)
+    66173:   20:void *mymalloc(usize size)
         -:   21:{
         -:   22:	void *ret;
-    62464:   23:	ret = malloc(size);
+    66173:   23:	ret = malloc(size);
         -:   24:
-    62464:   25:	if (ret) {
-    62464:   26:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+    66173:   25:	if (ret) {
+    66173:   26:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   27:	}
-    62464:   28:	return ret;
+    66173:   28:	return ret;
         -:   29:}
-    62349:   30:void *myrealloc(void *ptr, usize size)
+    62351:   30:void *myrealloc(void *ptr, usize size)
         -:   31:{
         -:   32:	void *ret;
-    62349:   33:	ret = realloc(ptr, size);
+    62351:   33:	ret = realloc(ptr, size);
         -:   34:
-    62349:   35:	if (ret) {
-    62349:   36:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+    62351:   35:	if (ret) {
+    62351:   36:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   37:	}
-    62349:   38:	return ret;
+    62351:   38:	return ret;
         -:   39:}
-    62431:   40:void myfree(void *ptr)
+    66140:   40:void myfree(void *ptr)
         -:   41:{
-    62431:   42:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-    62431:   43:	free(ptr);
-    62431:   44:}
-        4:   45:FILE *myfopen(const char *path, const char *mode)
+    66140:   42:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+    66140:   43:	free(ptr);
+    66140:   44:}
+        9:   45:FILE *myfopen(const char *path, const char *mode)
         -:   46:{
-        4:   47:	FILE *ret = fopen(path, mode);
+        9:   47:	FILE *ret = fopen(path, mode);
         -:   48:
-        4:   49:	if (ret) {
-        4:   50:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
+        9:   49:	if (ret) {
+        9:   50:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
         -:   51:	}
-        4:   52:	return ret;
+        9:   52:	return ret;
         -:   53:}
-        4:   54:void myfclose(FILE *ptr)
+        9:   54:void myfclose(FILE *ptr)
         -:   55:{
-        4:   56:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
-        4:   57:	fclose(ptr);
-        4:   58:}
-       25:   59:u64 mymalloc_sum()
+        9:   56:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
+        9:   57:	fclose(ptr);
+        9:   58:}
+       49:   59:u64 mymalloc_sum()
         -:   60:{
-       25:   61:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
+       49:   61:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
         -:   62:}
     #####:   63:u64 myrealloc_sum()
         -:   64:{
     #####:   65:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
         -:   66:}
-       25:   67:u64 myfree_sum()
+       49:   67:u64 myfree_sum()
         -:   68:{
-       25:   69:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+       49:   69:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
         -:   70:}
-       33:   71:u64 myfopen_sum()
+       69:   71:u64 myfopen_sum()
         -:   72:{
-       33:   73:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+       69:   73:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
         -:   74:}
-       33:   75:u64 myfclose_sum()
+       69:   75:u64 myfclose_sum()
         -:   76:{
-       33:   77:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+       69:   77:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
         -:   78:}
         -:    0:Source:sha256.c
         -:    0:Graph:sha256.gcno
         -:    0:Data:sha256.gcda
-        -:    0:Runs:55
+        -:    0:Runs:68
         -:    1:#include <stdio.h>
         -:    2:#include <stdlib.h>
         -:    3:#include <string.h>
@@ -5966,71 +5992,204 @@ Unit_size:
         -:   14:
         -:   15:#include <base/misc.h>
         -:   16:#include <base/path.h>
-        -:   17:#include <base/version.h>
-        -:   18:#include <stdio.h>
-        -:   19:#include <stdlib.h>
-        -:   20:#include <string.h>
-        -:   21:#include <util/replace.h>
-        -:   22:
-    #####:   23:int proc_build_init(const char *proj_name, const char *proj_path, char authors[11][1024],
-        -:   24:	int author_count, bool lib, char *description)
-    #####:   25:{
-    #####:   26:	int author_len = 0;
-    #####:   27:	for (int i = 0; i < author_count; i++) {
-    #####:   28:		author_len += strlen(authors[i]) + 10;
-        -:   29:	}
-    #####:   30:	char author_replace[author_len];
-    #####:   31:	strcpy(author_replace, "");
-    #####:   32:	for (int i = 0; i < author_count; i++) {
-    #####:   33:		strcat(author_replace, "\"");
-    #####:   34:		strcat(author_replace, authors[i]);
-    #####:   35:		if (i == author_count - 1)
-    #####:   36:			strcat(author_replace, "\"");
-        -:   37:		else
-    #####:   38:			strcat(author_replace, "\", ");
-        -:   39:	}
-    #####:   40:	Path path;
-    #####:   41:	path_for(&path, proj_path);
-    #####:   42:	if (path_exists(&path)) {
-    #####:   43:		path_canonicalize(&path);
-    #####:   44:		fprintf(stderr, "Path: '%s' already exists!\n", path_to_string(&path));
-    #####:   45:		exit(-1);
-        -:   46:	}
-    #####:   47:	if (path_mkdir(&path, 0700)) {
-    #####:   48:		perror("Error: could not create directory for project");
-    #####:   49:		exit(-1);
-        -:   50:	}
-        -:   51:
-    #####:   52:	path_push(&path, "fam.toml");
-    #####:   53:	Path template;
-    #####:   54:	if (lib)
-    #####:   55:		path_for(&template, "~/.fam/resources/fam.lib.toml");
-        -:   56:	else
-    #####:   57:		path_for(&template, "~/.fam/resources/fam.toml");
-    #####:   58:	path_canonicalize(&template);
-    #####:   59:	if (copy_file(path_to_string(&path), path_to_string(&template)) != 0) {
-    #####:   60:		perror("Error: copying file");
-    #####:   61:		exit(-1);
-        -:   62:	}
-        -:   63:
-    #####:   64:	const char *patterns_in[]
-        -:   65:		= { "REPLACE_FAM_VERSION", "REPLACE_NAME", "REPLACE_AUTHORS", "REPLACE_DESCRIPTION" };
-    #####:   66:	const bool is_case_sensitive[] = { true, true, true };
-        -:   67:	char desc[1024];
-    #####:   68:	if (strlen(description) > 0)
-    #####:   69:		strcpy(desc, description);
-        -:   70:	else
-    #####:   71:		strcpy(desc, proj_name);
-    #####:   72:	const char *replace[] = { FAM_VERSION, proj_name, author_replace, desc };
-    #####:   73:	replace_file(&path, &path, patterns_in, is_case_sensitive, replace, 4);
+        -:   17:#include <base/resources.h>
+        -:   18:#include <build/build.h>
+        -:   19:#include <glob.h>
+        -:   20:#include <stdlib.h>
+        -:   21:#include <toml/toml.h>
+        -:   22:#include <util/proc_executor.h>
+        -:   23:
+    #####:   24:void build_libs(const char *base_dir)
+        -:   25:{
+    #####:   26:	printf("build libs: %s\n", base_dir);
+    #####:   27:	Path lib_h;
+    #####:   28:	path_for(&lib_h, base_dir);
+    #####:   29:	path_push(&lib_h, "lib.h");
+    #####:   30:	if (path_exists(&lib_h)) {
+    #####:   31:		printf("found lib.h!\n");
+        -:   32:	}
+    #####:   33:}
+        -:   34:
+    #####:   35:int proc_build(const char *base_dir)
+        -:   36:{
+    #####:   37:	Path base;
+    #####:   38:	path_for(&base, base_dir);
+    #####:   39:	if (path_canonicalize(&base)) {
+    #####:   40:		exit_error("Directory ('%s') not found.", base_dir);
+        -:   41:	}
+    #####:   42:	Path toml;
+    #####:   43:	path_for(&toml, base_dir);
+    #####:   44:	path_push(&toml, "fam.toml");
+    #####:   45:	if (path_canonicalize(&toml)) {
+    #####:   46:		exit_error("Toml file ('%s') not found.", path_to_string(&toml));
+        -:   47:	}
+        -:   48:
+    #####:   49:	FILE *toml_fp = myfopen(path_to_string(&toml), "r");
+        -:   50:	char errbuf[1024];
+    #####:   51:	toml_table_t *table = toml_parse_file(toml_fp, errbuf, sizeof(errbuf));
+        -:   52:
+    #####:   53:	if (table == NULL) {
+    #####:   54:		exit_error("Could not parse toml file due to '%s'", errbuf);
+        -:   55:	}
+        -:   56:
+    #####:   57:	myfclose(toml_fp);
+        -:   58:
+    #####:   59:	toml_raw_t raw_fam_version = toml_raw_in(table, "fam_version");
+        -:   60:	char *fam_version;
+    #####:   61:	if (raw_fam_version) {
+    #####:   62:		toml_rtos(raw_fam_version, &fam_version);
+    #####:   63:		fprintf(stderr, "Toml generated by fam version: %s\n", fam_version);
+    #####:   64:		free((void *)fam_version); // Clean up after toml_rtos
+        -:   65:	}
+        -:   66:
+    #####:   67:	toml_table_t *package_table = toml_table_in(table, "package");
+    #####:   68:	if (package_table) {
+    #####:   69:		toml_raw_t raw_name = toml_raw_in(package_table, "name");
+        -:   70:		char *name;
+    #####:   71:		if (raw_name) {
+    #####:   72:			toml_rtos(raw_name, &name);
+    #####:   73:			fprintf(stderr, "Building Project: '%s'\n", name);
         -:   74:
-    #####:   75:	Path proj_dir;
-    #####:   76:	path_for(&proj_dir, proj_path);
-    #####:   77:	path_canonicalize(&proj_dir);
-    #####:   78:	printf("Project successfully created in '%s'.\n", path_to_string(&proj_dir));
-        -:   79:
-    #####:   80:	return 0;
-        -:   81:}
+    #####:   75:			Path target;
+    #####:   76:			path_for(&target, base_dir);
+    #####:   77:			path_push(&target, "target");
+    #####:   78:			if (!path_exists(&target)) {
+    #####:   79:				if (path_mkdir(&target, 0700))
+    #####:   80:					exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:   81:				path_push(&target, "objs");
+    #####:   82:				if (path_mkdir(&target, 0700))
+    #####:   83:					exit_error("Could not create directory '%s'.", path_to_string(&target));
+        -:   84:			}
+        -:   85:
+    #####:   86:			build_libs(base_dir);
+        -:   87:
+    #####:   88:			char *args[] = { "cc", "-c", "-o", "target/objs/main.o", "main.c", NULL };
+    #####:   89:			if (execute_process(args)) {
+    #####:   90:				exit_error("execution of process '%s' failed", args[0]);
+        -:   91:			}
+        -:   92:
+        -:   93:			glob_t glob_result;
+    #####:   94:			glob("target/objs/*.o", 0, NULL, &glob_result);
+        -:   95:
+        -:   96:			// Construct the argument array for exec
+    #####:   97:			char *link[5 + glob_result.gl_pathc + 1];
+    #####:   98:			Path output_file;
+    #####:   99:			path_for(&output_file, "target");
+    #####:  100:			path_push(&output_file, name);
+    #####:  101:			link[0] = "cc";
+    #####:  102:			link[1] = "-o";
+    #####:  103:			link[2] = path_to_string(&output_file);
+        -:  104:
+        -:  105:			// Add all the .o files from glob to the argument list
+    #####:  106:			for (size_t i = 0; i < glob_result.gl_pathc; i++) {
+    #####:  107:				link[3 + i] = glob_result.gl_pathv[i];
+        -:  108:			}
+    #####:  109:			link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
+        -:  110:
+    #####:  111:			if (execute_process(link)) {
+    #####:  112:				exit_error("execution of process '%s' failed", link[0]);
+        -:  113:			}
+        -:  114:
+    #####:  115:			free((void *)name); // Cleanup after toml_rtos
+        -:  116:			// Free the TOML table when done
+    #####:  117:			toml_free(table);
+        -:  118:		} else {
+    #####:  119:			exit_error("project name not found!");
+        -:  120:		}
+        -:  121:	} else {
+    #####:  122:		exit_error("[package] directive not found!");
+        -:  123:	}
+        -:  124:
+    #####:  125:	return 0;
+        -:  126:}
+        -:    0:Source:init.c
+        -:    0:Graph:init.gcno
+        -:    0:Data:init.gcda
+        -:    0:Runs:2
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/misc.h>
+        -:   16:#include <base/path.h>
+        -:   17:#include <base/version.h>
+        -:   18:#include <build/build.h>
+        -:   19:#include <stdio.h>
+        -:   20:#include <stdlib.h>
+        -:   21:#include <string.h>
+        -:   22:#include <util/replace.h>
+        -:   23:
+    #####:   24:int proc_build_init(const char *config_dir, const char *proj_name, const char *proj_path,
+        -:   25:	char authors[11][1024], int author_count, bool lib, char *description)
+    #####:   26:{
+    #####:   27:	int author_len = 1;
+    #####:   28:	for (int i = 0; i < author_count; i++) {
+    #####:   29:		author_len += strlen(authors[i]) + 10;
+        -:   30:	}
+    #####:   31:	char author_replace[author_len];
+    #####:   32:	strcpy(author_replace, "");
+    #####:   33:	for (int i = 0; i < author_count; i++) {
+    #####:   34:		strcat(author_replace, "\"");
+    #####:   35:		strcat(author_replace, authors[i]);
+    #####:   36:		if (i == author_count - 1)
+    #####:   37:			strcat(author_replace, "\"");
+        -:   38:		else
+    #####:   39:			strcat(author_replace, "\", ");
+        -:   40:	}
+    #####:   41:	Path path;
+    #####:   42:	path_for(&path, proj_path);
+    #####:   43:	if (path_exists(&path)) {
+    #####:   44:		path_canonicalize(&path);
+    #####:   45:		fprintf(stderr, "Path: '%s' already exists!\n", path_to_string(&path));
+    #####:   46:		exit(-1);
+        -:   47:	}
+    #####:   48:	if (path_mkdir(&path, 0700)) {
+    #####:   49:		perror("Error: could not create directory for project");
+    #####:   50:		exit(-1);
+        -:   51:	}
+        -:   52:
+    #####:   53:	path_push(&path, "fam.toml");
+    #####:   54:	Path template;
+    #####:   55:	path_for(&template, config_dir);
+    #####:   56:	path_push(&template, "resources");
+    #####:   57:	if (lib)
+    #####:   58:		path_push(&template, "fam.lib.toml");
+        -:   59:	else
+    #####:   60:		path_push(&template, "fam.toml");
+    #####:   61:	path_canonicalize(&template);
+    #####:   62:	if (copy_file(path_to_string(&path), path_to_string(&template)) != 0) {
+    #####:   63:		perror("Error: copying file");
+    #####:   64:		exit(-1);
+        -:   65:	}
+        -:   66:
+    #####:   67:	const char *patterns_in[]
+        -:   68:		= { "REPLACE_FAM_VERSION", "REPLACE_NAME", "REPLACE_AUTHORS", "REPLACE_DESCRIPTION" };
+    #####:   69:	const bool is_case_sensitive[] = { true, true, true };
+        -:   70:	char desc[1024];
+    #####:   71:	if (strlen(description) > 0)
+    #####:   72:		strcpy(desc, description);
+        -:   73:	else
+    #####:   74:		strcpy(desc, proj_name);
+    #####:   75:	const char *replace[] = { FAM_VERSION, proj_name, author_replace, desc };
+    #####:   76:	replace_file(&path, &path, patterns_in, is_case_sensitive, replace, 4);
+        -:   77:
+    #####:   78:	Path proj_dir;
+    #####:   79:	path_for(&proj_dir, proj_path);
+    #####:   80:	path_canonicalize(&proj_dir);
+    #####:   81:	printf("Project successfully created in '%s'.\n", path_to_string(&proj_dir));
+        -:   82:
+    #####:   83:	return 0;
+        -:   84:}
         -:    0:Source:args.c
         -:    0:Graph:args.gcno
         -:    0:Data:args.gcda
@@ -7359,6 +7518,50 @@ Unit_size:
     #####:  346:		r %= bible->verse_count;
     31102:  347:	return format_verse(bible, r, buf, buf_len, colors);
         -:  348:}
+        -:    0:Source:proc_executor.c
+        -:    0:Graph:proc_executor.gcno
+        -:    0:Data:proc_executor.gcda
+        -:    0:Runs:6
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/misc.h>
+        -:   16:#include <sys/wait.h>
+        -:   17:#include <unistd.h>
+        -:   18:
+    #####:   19:int execute_process(char *args[])
+        -:   20:{
+    #####:   21:	printf("Executing: ");
+    #####:   22:	for (int i = 0; args[i]; i++) {
+    #####:   23:		printf("%s ", args[i]);
+        -:   24:	}
+    #####:   25:	printf("\n");
+        -:   26:
+    #####:   27:	pid_t pid = fork();
+        -:   28:
+    #####:   29:	if (pid < 0) {
+    #####:   30:		return -1;
+    #####:   31:	} else if (pid == 0) {
+    #####:   32:		execvp(args[0], args);
+    #####:   33:		perror("execvp");
+    #####:   34:		return -1;
+        -:   35:	} else {
+        -:   36:		int status;
+    #####:   37:		waitpid(pid, &status, 0); // Wait for child process to finish
+    #####:   38:		return status;
+        -:   39:	}
+        -:   40:}
         -:    0:Source:replace.c
         -:    0:Graph:replace.gcno
         -:    0:Data:replace.gcda
@@ -7747,187 +7950,909 @@ Unit_size:
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <base/chain_allocator.h>
-        -:   16:#include <string.h>
-        -:   17:#include <util/trie.h>
-        -:   18:
-        -:   19:typedef struct TrieNode {
-        -:   20:	u32 children[256];
-        -:   21:	u32 pattern_id;
-        -:   22:} TrieNode;
-        -:   23:
-        -:   24:typedef struct TrieImpl {
-        -:   25:	FatPtr memory_block;
-        -:   26:	TrieNode *root;
-        -:   27:	u32 cur;
-        -:   28:} TrieImpl;
-        -:   29:
-        3:   30:void trie_cleanup(TrieNc *ptr)
-        -:   31:{
-        3:   32:	if (ptr->impl.data) {
-        3:   33:		TrieImpl *ti = ptr->impl.data;
-        3:   34:		if (ti)
-        3:   35:			chain_free(&ti->memory_block);
-        3:   36:		chain_free(&ptr->impl);
-        -:   37:	}
-        3:   38:}
-        -:   39:
-       34:   40:int trie_init_node(TrieNode *ptr)
-        -:   41:{
-       34:   42:	ptr->pattern_id = UINT32_MAX;
-     8738:   43:	for (int i = 0; i < 256; i++)
-     8704:   44:		ptr->children[i] = UINT32_MAX;
-       34:   45:	return 0;
-        -:   46:}
-        -:   47:
-        8:   48:int trie_insert(Trie *ptr, const char *str, bool is_case_sensitive, int pattern_id)
-        -:   49:{
-        8:   50:	TrieImpl *ti = ptr->impl.data;
-        8:   51:	int slen = strlen(str);
-        8:   52:	TrieNode *itt = ti->root;
-       57:   53:	for (int i = 0; i < slen; i++) {
-       49:   54:		char next = str[i];
-       49:   55:		if (!is_case_sensitive) {
-        5:   56:			if (next >= 'A' && next <= 'Z')
-        3:   57:				next += 32;
-        -:   58:		}
-       49:   59:		u32 offset = itt->children[next];
-       49:   60:		if (offset == UINT32_MAX) {
-        -:   61:			// new node needed
-       31:   62:			itt->children[next] = ti->cur;
-       31:   63:			trie_init_node((TrieNode *)(ti->memory_block.data + ti->cur * sizeof(TrieNode)));
-       31:   64:			offset = ti->cur;
-       31:   65:			ti->cur++;
-        -:   66:
-        -:   67:		} else {
-        -:   68:			// node exists follow it
-        -:   69:		}
-       49:   70:		itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
-        -:   71:	}
-        -:   72:
-        8:   73:	itt->pattern_id = pattern_id;
-        -:   74:
-        8:   75:	return 0;
-        -:   76:}
-        -:   77:
-        3:   78:int trie_build(Trie *ptr, const char *search_strings[], const bool is_case_sensitive[], int count)
-        -:   79:{
-        3:   80:	int m = 1; // 1 for root
-       11:   81:	for (int i = 0; i < count; i++) {
-        8:   82:		m += strlen(search_strings[i]);
-        -:   83:	}
-        3:   84:	if (chain_malloc(&ptr->impl, sizeof(TrieImpl)))
-    #####:   85:		return -1;
-        -:   86:
-        3:   87:	TrieImpl *ti = ptr->impl.data;
-        3:   88:	ti->cur = 1;
-        -:   89:
-        3:   90:	if (chain_malloc(&ti->memory_block, m * sizeof(TrieNode))) {
-    #####:   91:		chain_free(&ptr->impl);
-    #####:   92:		return -1;
-        -:   93:	}
-        3:   94:	ti->root = ti->memory_block.data;
-        3:   95:	trie_init_node(ti->root);
-        -:   96:
-       11:   97:	for (int i = 0; i < count; i++) {
-        8:   98:		if (trie_insert(ptr, search_strings[i], is_case_sensitive[i], i)) {
-    #####:   99:			trie_cleanup(ptr);
-    #####:  100:			return -1;
-        -:  101:		}
+        -:   16:#include <stdlib.h>
+        -:   17:#include <string.h>
+        -:   18:#include <util/trie.h>
+        -:   19:
+        -:   20:typedef struct TrieNode {
+        -:   21:	u32 children[256];
+        -:   22:	u32 pattern_id;
+        -:   23:} TrieNode;
+        -:   24:
+        -:   25:typedef struct TrieImpl {
+        -:   26:	FatPtr memory_block;
+        -:   27:	TrieNode *root;
+        -:   28:	u32 cur;
+        -:   29:} TrieImpl;
+        -:   30:
+        3:   31:void trie_cleanup(TrieNc *ptr)
+        -:   32:{
+        3:   33:	if (ptr->impl.data) {
+        3:   34:		TrieImpl *ti = ptr->impl.data;
+        3:   35:		if (ti)
+        3:   36:			chain_free(&ti->memory_block);
+        3:   37:		chain_free(&ptr->impl);
+        -:   38:	}
+        3:   39:}
+        -:   40:
+       34:   41:int trie_init_node(TrieNode *ptr)
+        -:   42:{
+       34:   43:	ptr->pattern_id = UINT32_MAX;
+     8738:   44:	for (int i = 0; i < 256; i++)
+     8704:   45:		ptr->children[i] = UINT32_MAX;
+       34:   46:	return 0;
+        -:   47:}
+        -:   48:
+        8:   49:int trie_insert(Trie *ptr, const char *str, bool is_case_sensitive, int pattern_id)
+        -:   50:{
+        8:   51:	TrieImpl *ti = ptr->impl.data;
+        8:   52:	int slen = strlen(str);
+        8:   53:	TrieNode *itt = ti->root;
+       57:   54:	for (int i = 0; i < slen; i++) {
+       49:   55:		char next = str[i];
+       49:   56:		if (!is_case_sensitive) {
+        5:   57:			if (next >= 'A' && next <= 'Z')
+        3:   58:				next += 32;
+        -:   59:		}
+       49:   60:		u32 offset = itt->children[next];
+       49:   61:		if (offset == UINT32_MAX) {
+        -:   62:			// new node needed
+       31:   63:			itt->children[next] = ti->cur;
+       31:   64:			trie_init_node((TrieNode *)(ti->memory_block.data + ti->cur * sizeof(TrieNode)));
+       31:   65:			offset = ti->cur;
+       31:   66:			ti->cur++;
+        -:   67:
+        -:   68:		} else {
+        -:   69:			// node exists follow it
+        -:   70:		}
+       49:   71:		itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
+        -:   72:	}
+        -:   73:
+        8:   74:	itt->pattern_id = pattern_id;
+        -:   75:
+        8:   76:	return 0;
+        -:   77:}
+        -:   78:
+        3:   79:int trie_build(Trie *ptr, const char *search_strings[], const bool is_case_sensitive[], int count)
+        -:   80:{
+        3:   81:	int m = 1; // 1 for root
+       11:   82:	for (int i = 0; i < count; i++) {
+        8:   83:		m += strlen(search_strings[i]);
+        -:   84:	}
+        3:   85:	if (chain_malloc(&ptr->impl, sizeof(TrieImpl)))
+    #####:   86:		return -1;
+        -:   87:
+        3:   88:	TrieImpl *ti = ptr->impl.data;
+        3:   89:	ti->cur = 1;
+        -:   90:
+        3:   91:	if (chain_malloc(&ti->memory_block, m * sizeof(TrieNode))) {
+    #####:   92:		chain_free(&ptr->impl);
+    #####:   93:		return -1;
+        -:   94:	}
+        3:   95:	ti->root = ti->memory_block.data;
+        3:   96:	trie_init_node(ti->root);
+        -:   97:
+       11:   98:	for (int i = 0; i < count; i++) {
+        8:   99:		if (trie_insert(ptr, search_strings[i], is_case_sensitive[i], i)) {
+    #####:  100:			trie_cleanup(ptr);
+    #####:  101:			return -1;
+        -:  102:		}
+        -:  103:	}
+        -:  104:
+        3:  105:	return 0;
+        -:  106:}
+        -:  107:
+        1:  108:int trie_compare(const void *m1, const void *m2)
+        -:  109:{
+        1:  110:	const TrieMatch *tm1 = m1;
+        1:  111:	const TrieMatch *tm2 = m2;
+        1:  112:	if (tm1->offset < tm2->offset)
+    #####:  113:		return -1;
+        1:  114:	else if (tm1->offset > tm2->offset)
+        1:  115:		return 1;
+    #####:  116:	return 0;
+        -:  117:}
+        -:  118:
+        3:  119:void trie_sort(TrieMatch ret[], u64 count)
+        -:  120:{
+        3:  121:	qsort(ret, count, sizeof(TrieMatch), trie_compare);
+        3:  122:}
+        -:  123:
+        8:  124:int trie_match(Trie *ptr, const char *text, TrieMatch ret[], u64 limit)
+        8:  125:{
+        8:  126:	TrieMatch ci_matches[limit];
+        8:  127:	int ci_match_count = 0;
+        8:  128:	int match_count = 0;
+        8:  129:	int tlen = strlen(text);
+        8:  130:	TrieImpl *ti = ptr->impl.data;
+        8:  131:	TrieNode *itt = ti->root;
+        8:  132:	int match_len = 0;
+      220:  133:	for (int i = 0; i < tlen; i++) {
+      214:  134:		char next = text[i];
+      214:  135:		u32 offset = itt->children[next];
+      214:  136:		if (offset != UINT32_MAX) {
+        -:  137:			// found the node
+       66:  138:			itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
+       66:  139:			if (itt->pattern_id != UINT32_MAX) {
+        9:  140:				ret[match_count].pattern_id = itt->pattern_id;
+        9:  141:				ret[match_count].offset = i - match_len;
+        9:  142:				ret[match_count].len = match_len + 1;
+        9:  143:				ci_matches[ci_match_count].pattern_id = itt->pattern_id;
+        9:  144:				ci_matches[ci_match_count].offset = i - match_len;
+        9:  145:				ci_match_count++;
+        9:  146:				match_count++;
+        -:  147:			}
+       66:  148:			match_len++;
+       66:  149:			if (match_count == limit)
+        2:  150:				break;
+        -:  151:		} else {
+        -:  152:			// not found, return to root
+      148:  153:			itt = ti->root;
+      148:  154:			match_len = 0;
+        -:  155:		}
+        -:  156:	}
+        -:  157:
+        8:  158:	bool has_case_sensitive = false;
+        8:  159:	if (match_count < limit) {
+      165:  160:		for (int i = 0; i < tlen; i++) {
+      159:  161:			char next = text[i];
+      159:  162:			if (next >= 'A' && next <= 'Z')
+       28:  163:				next += 32;
+      159:  164:			u32 offset = itt->children[next];
+      159:  165:			if (offset != UINT32_MAX) {
+        -:  166:				// found the node
+       40:  167:				itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
+       40:  168:				if (itt->pattern_id != UINT32_MAX) {
+        -:  169:
+        6:  170:					bool duplicate = false;
+       12:  171:					for (int j = 0; j < ci_match_count; j++) {
+        6:  172:						if (ci_matches[j].pattern_id == itt->pattern_id
+        3:  173:							&& ci_matches[j].offset == i - match_len) {
+        3:  174:							duplicate = true;
+        -:  175:						}
+        -:  176:					}
+        -:  177:
+        6:  178:					if (!duplicate) {
+        3:  179:						has_case_sensitive = true;
+        3:  180:						ret[match_count].pattern_id = itt->pattern_id;
+        3:  181:						ret[match_count].offset = i - match_len;
+        3:  182:						ret[match_count].len = match_len + 1;
+        3:  183:						match_count++;
+        -:  184:					}
+        -:  185:				}
+       40:  186:				match_len++;
+       40:  187:				if (match_count == limit)
+    #####:  188:					break;
+        -:  189:			} else {
+        -:  190:				// not found, return to root
+      119:  191:				itt = ti->root;
+      119:  192:				match_len = 0;
+        -:  193:			}
+        -:  194:		}
+        -:  195:	}
+        -:  196:
+        8:  197:	if (has_case_sensitive)
+        3:  198:		trie_sort(ret, match_count);
+        8:  199:	return match_count;
+        -:  200:}
+        -:    0:Source:lexer.c
+        -:    0:Graph:lexer.gcno
+        -:    0:Data:lexer.gcda
+        -:    0:Runs:13
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/colors.h>
+        -:   16:#include <base/resources.h>
+        -:   17:#include <errno.h>
+        -:   18:#include <lexer/lexer.h>
+        -:   19:#include <stdlib.h>
+        -:   20:#include <string.h>
+        -:   21:
+      297:   22:char *lexer_read_line(Lexer *l)
+        -:   23:{
+      297:   24:	char *ret = NULL;
+      297:   25:	u64 count = 0;
+        2:   26:	while (true) {
+      299:   27:		if (ret == NULL) {
+      297:   28:			ret = mymalloc(sizeof(char) * LEXER_BUF_SIZE);
+      297:   29:			strcpy(ret, "");
+        -:   30:		} else {
+        2:   31:			char *tmp = myrealloc(ret, sizeof(char) * LEXER_BUF_SIZE * (1 + count));
+        2:   32:			if (tmp == NULL) {
+    #####:   33:				myfree(ret);
+    #####:   34:				return NULL;
+        -:   35:			}
+        2:   36:			ret = tmp;
+        -:   37:		}
+      299:   38:		u64 str_len = strlen(ret);
+      299:   39:		if (fgets(ret + str_len, LEXER_BUF_SIZE, l->fp) == NULL) {
+        5:   40:			myfree(ret);
+        5:   41:			return NULL;
+        -:   42:		}
+        -:   43:
+      294:   44:		count += 1;
+      294:   45:		str_len = strlen(ret);
+      294:   46:		if (str_len >= (count * (LEXER_BUF_SIZE - 1)))
+        2:   47:			continue;
+        -:   48:
+      292:   49:		return ret;
+        -:   50:	}
+        -:   51:}
+        -:   52:
+        5:   53:int lexer_init(Lexer *l, char *file)
+        -:   54:{
+        -:   55:	// file/lexer cannot be null
+        5:   56:	if (file == NULL || l == NULL) {
+    #####:   57:		errno = EINVAL;
+    #####:   58:		return LexerStateErr;
+        -:   59:	}
+        -:   60:
+        5:   61:	l->fp = NULL;
+        5:   62:	l->tokenizer = NULL;
+        5:   63:	l->line_num = 1;
+        5:   64:	l->file = mymalloc(sizeof(char) * (strlen(file) + 1));
+        5:   65:	if (l->file == NULL) {
+    #####:   66:		lexer_cleanup(l);
+    #####:   67:		return -1;
+        -:   68:	}
+        5:   69:	strcpy(l->file, file);
+        -:   70:
+        -:   71:	// open the file for reading
+        5:   72:	l->fp = myfopen(file, "r");
+        -:   73:
+        -:   74:	// if file cannot be read return error
+        5:   75:	if (l->fp == NULL) {
+    #####:   76:		return LexerStateErr;
+        -:   77:	}
+        -:   78:
+        -:   79:	// allocate memory for the tokenizer
+        5:   80:	l->tokenizer = mymalloc(sizeof(Tokenizer));
+        -:   81:
+        5:   82:	if (l->tokenizer == NULL) {
+        -:   83:		// memory allocation err
+    #####:   84:		lexer_cleanup(l);
+    #####:   85:		return LexerStateErr;
+        -:   86:	}
+        -:   87:
+        5:   88:	char *buf = lexer_read_line(l);
+        5:   89:	if (buf == NULL) {
+    #####:   90:		lexer_cleanup(l);
+    #####:   91:		return LexerStateErr;
+        -:   92:	}
+        -:   93:
+        -:   94:	// try to init the tokenizer
+        5:   95:	if (tokenizer_init(l->tokenizer, buf) != TokenizerStateOk) {
+    #####:   96:		lexer_cleanup(l);
+    #####:   97:		myfree(buf);
+    #####:   98:		return LexerStateErr;
+        -:   99:	} else {
+        5:  100:		myfree(buf);
+        5:  101:		return LexerStateOk;
         -:  102:	}
-        -:  103:
-        3:  104:	return 0;
-        -:  105:}
-        -:  106:
-        1:  107:int trie_compare(const void *m1, const void *m2)
-        -:  108:{
-        1:  109:	const TrieMatch *tm1 = m1;
-        1:  110:	const TrieMatch *tm2 = m2;
-        1:  111:	if (tm1->offset < tm2->offset)
-    #####:  112:		return -1;
-        1:  113:	else if (tm1->offset > tm2->offset)
-        1:  114:		return 1;
-    #####:  115:	return 0;
-        -:  116:}
+        -:  103:}
+        -:  104:
+      959:  105:int lexer_next_token(Lexer *l, Token *token)
+        -:  106:{
+        -:  107:	// read the next token
+      959:  108:	int state = tokenizer_next_token(l->tokenizer, token);
+      959:  109:	char *line = NULL;
+      959:  110:	token->span = NULL;
+        -:  111:
+        -:  112:	// if we're complete keep trying to get more lines until we have a token
+        -:  113:	// or we're at the end of file
+     1246:  114:	while (state == TokenizerStateComplete || state == TokenizerStateCompleteInComment) {
+        -:  115:		// cleanup the previous tokenizer
+      292:  116:		tokenizer_cleanup(l->tokenizer);
         -:  117:
-        3:  118:int trie_sort(TrieMatch ret[], int count)
-        -:  119:{
-        3:  120:	return qsort(ret, count, sizeof(TrieMatch), trie_compare);
-        -:  121:}
-        -:  122:
-        8:  123:int trie_match(Trie *ptr, const char *text, TrieMatch ret[], u64 limit)
-        8:  124:{
-        8:  125:	TrieMatch ci_matches[limit];
-        8:  126:	int ci_match_count = 0;
-        8:  127:	int match_count = 0;
-        8:  128:	int tlen = strlen(text);
-        8:  129:	TrieImpl *ti = ptr->impl.data;
-        8:  130:	TrieNode *itt = ti->root;
-        8:  131:	int match_len = 0;
-      220:  132:	for (int i = 0; i < tlen; i++) {
-      214:  133:		char next = text[i];
-      214:  134:		u32 offset = itt->children[next];
-      214:  135:		if (offset != UINT32_MAX) {
-        -:  136:			// found the node
-       66:  137:			itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
-       66:  138:			if (itt->pattern_id != UINT32_MAX) {
-        9:  139:				ret[match_count].pattern_id = itt->pattern_id;
-        9:  140:				ret[match_count].offset = i - match_len;
-        9:  141:				ret[match_count].len = match_len + 1;
-        9:  142:				ci_matches[ci_match_count].pattern_id = itt->pattern_id;
-        9:  143:				ci_matches[ci_match_count].offset = i - match_len;
-        9:  144:				ci_match_count++;
-        9:  145:				match_count++;
-        -:  146:			}
-       66:  147:			match_len++;
-       66:  148:			if (match_count == limit)
-        2:  149:				break;
-        -:  150:		} else {
-        -:  151:			// not found, return to root
-      148:  152:			itt = ti->root;
-      148:  153:			match_len = 0;
-        -:  154:		}
-        -:  155:	}
-        -:  156:
-        8:  157:	bool has_case_sensitive = false;
-        8:  158:	if (match_count < limit) {
-      165:  159:		for (int i = 0; i < tlen; i++) {
-      159:  160:			char next = text[i];
-      159:  161:			if (next >= 'A' && next <= 'Z')
-       28:  162:				next += 32;
-      159:  163:			u32 offset = itt->children[next];
-      159:  164:			if (offset != UINT32_MAX) {
-        -:  165:				// found the node
-       40:  166:				itt = (TrieNode *)(ti->memory_block.data + offset * sizeof(TrieNode));
-       40:  167:				if (itt->pattern_id != UINT32_MAX) {
-        -:  168:
-        6:  169:					bool duplicate = false;
-       12:  170:					for (int j = 0; j < ci_match_count; j++) {
-        6:  171:						if (ci_matches[j].pattern_id == itt->pattern_id
-        3:  172:							&& ci_matches[j].offset == i - match_len) {
-        3:  173:							duplicate = true;
-        -:  174:						}
-        -:  175:					}
-        -:  176:
-        6:  177:					if (!duplicate) {
-        3:  178:						has_case_sensitive = true;
-        3:  179:						ret[match_count].pattern_id = itt->pattern_id;
-        3:  180:						ret[match_count].offset = i - match_len;
-        3:  181:						ret[match_count].len = match_len + 1;
-        3:  182:						match_count++;
-        -:  183:					}
-        -:  184:				}
-       40:  185:				match_len++;
-       40:  186:				if (match_count == limit)
-    #####:  187:					break;
-        -:  188:			} else {
-        -:  189:				// not found, return to root
-      119:  190:				itt = ti->root;
-      119:  191:				match_len = 0;
+      292:  118:		char *buf = lexer_read_line(l);
+        -:  119:
+      292:  120:		if (buf == NULL) {
+        5:  121:			if (line)
+        1:  122:				myfree(line);
+        5:  123:			if (state == TokenizerStateCompleteInComment)
+    #####:  124:				return LexerStateErr;
+        -:  125:			else
+        5:  126:				return LexerStateComplete;
+        -:  127:		}
+        -:  128:
+      287:  129:		l->line_num += 1;
+        -:  130:
+        -:  131:		// try to init again
+      287:  132:		if (tokenizer_init(l->tokenizer, buf) != TokenizerStateOk) {
+    #####:  133:			myfree(buf);
+    #####:  134:			if (line) {
+    #####:  135:				myfree(line);
+        -:  136:			}
+    #####:  137:			return LexerStateErr;
+        -:  138:		}
+        -:  139:
+      287:  140:		state = tokenizer_next_token(l->tokenizer, token);
+      287:  141:		if (line)
+       89:  142:			myfree(line);
+      287:  143:		line = mymalloc(sizeof(char) * (1 + strlen(buf)));
+      287:  144:		strcpy(line, buf);
+      287:  145:		myfree(buf);
+        -:  146:	}
+        -:  147:
+      954:  148:	if (line == NULL) {
+      757:  149:		line = mymalloc((strlen(l->tokenizer->s) + 1) * sizeof(char));
+      757:  150:		strcpy(line, l->tokenizer->s);
+        -:  151:	}
+        -:  152:
+      954:  153:	if (state == TokenizerStateOk) {
+      954:  154:		token->line_num = l->line_num;
+      954:  155:		if (line == NULL)
+    #####:  156:			token->span = NULL;
+      954:  157:		else {
+      954:  158:			int num_width = snprintf(NULL, 0, "%" PRIu64, l->line_num);
+      954:  159:			int token_width = snprintf(NULL, 0, "%s", token->token);
+        -:  160:			char spacer[100];
+      954:  161:			int lsl = (l->tokenizer->pos + 1) - (token_width - 1);
+      954:  162:			if (lsl <= 0)
+    #####:  163:				lsl = 1;
+      954:  164:			char long_spacer[lsl];
+      954:  165:			bool has_tab = false;
+    39723:  166:			for (int i = 0; i < lsl; i++) {
+    38769:  167:				if (i < l->tokenizer->pos && l->tokenizer->s[i] == '\t') {
+     1419:  168:					has_tab = true;
+     1419:  169:					long_spacer[i] = '\t';
+        -:  170:				} else {
+    37350:  171:					long_spacer[i] = ' ';
+        -:  172:				}
+        -:  173:			}
+      954:  174:			if (has_tab)
+      796:  175:				long_spacer[lsl - 2] = 0;
+      954:  176:			long_spacer[lsl - 1] = 0;
+     3393:  177:			for (int i = 0; i < num_width && i < 100; i++) {
+     2439:  178:				spacer[i] = ' ';
+        -:  179:			}
+      954:  180:			if (num_width < 100)
+      954:  181:				spacer[num_width] = 0;
+        -:  182:
+      954:  183:			int span_len = snprintf(NULL, 0,
+        -:  184:				"%s%s-->%s %s:%" PRIu64 ":%i\n%s %s|\n%" PRIu64 " | %s%s"
+        -:  185:				"%s %s|%s%s^\n",
+        -:  186:				spacer, CYAN, RESET, l->file, l->line_num, lsl, spacer, CYAN, l->line_num, RESET,
+        -:  187:				line, spacer, CYAN, RESET, long_spacer);
+      954:  188:			token->span = mymalloc((span_len + 1) * sizeof(char));
+      954:  189:			if (token->span == NULL) {
+    #####:  190:				myfree(line);
+    #####:  191:				return LexerStateErr;
         -:  192:			}
-        -:  193:		}
-        -:  194:	}
-        -:  195:
-        8:  196:	if (has_case_sensitive)
-        3:  197:		trie_sort(ret, match_count);
-        8:  198:	return match_count;
-        -:  199:}
+      954:  193:			snprintf(token->span, span_len + 1,
+        -:  194:				"%s%s-->%s %s:%" PRIu64 ":%i\n%s %s|\n%" PRIu64 " | %s%s"
+        -:  195:				"%s %s|%s%s^\n",
+        -:  196:				spacer, CYAN, RESET, l->file, l->line_num, lsl, spacer, CYAN, l->line_num, RESET,
+        -:  197:				line, spacer, CYAN, RESET, long_spacer);
+      954:  198:			myfree(line);
+        -:  199:		}
+        -:  200:
+      954:  201:		return LexerStateOk;
+        -:  202:	} else {
+    #####:  203:		if (line)
+    #####:  204:			myfree(line);
+    #####:  205:		return LexerStateErr;
+        -:  206:	}
+        -:  207:}
+        -:  208:
+        5:  209:void lexer_cleanup(Lexer *l)
+        -:  210:{
+        -:  211:	// check if fp is NULL and close it then set to NULL so this can be
+        -:  212:	// called multiple times
+        5:  213:	if (l->fp != NULL) {
+        5:  214:		myfclose(l->fp);
+        5:  215:		l->fp = NULL;
+        -:  216:	}
+        -:  217:
+        -:  218:	// same for the tokenizer
+        5:  219:	if (l->tokenizer != NULL) {
+        5:  220:		tokenizer_cleanup(l->tokenizer);
+        5:  221:		myfree(l->tokenizer);
+        -:  222:	}
+        -:  223:
+        -:  224:	// same for file
+        5:  225:	if (l->file != NULL) {
+        5:  226:		myfree(l->file);
+        5:  227:		l->file = NULL;
+        -:  228:	}
+        5:  229:}
+        -:    0:Source:tokenizer.c
+        -:    0:Graph:tokenizer.gcno
+        -:    0:Data:tokenizer.gcda
+        -:    0:Runs:13
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/colors.h>
+        -:   16:#include <base/resources.h>
+        -:   17:#include <errno.h>
+        -:   18:#include <lexer/tokenizer.h>
+        -:   19:#include <string.h>
+        -:   20:
+      315:   21:int tokenizer_init(Tokenizer *t, char *line)
+        -:   22:{
+        -:   23:	// check input
+      315:   24:	if (line == NULL || t == NULL) {
+    #####:   25:		errno = EINVAL;
+    #####:   26:		return TokenizerStateErr;
+        -:   27:	}
+        -:   28:
+        -:   29:	// copy the input string
+      315:   30:	t->len = strlen(line);
+      315:   31:	t->s = mymalloc(sizeof(char) * (1 + t->len));
+      315:   32:	if (t->s == NULL) {
+    #####:   33:		return TokenizerStateErr;
+        -:   34:	}
+      315:   35:	strcpy(t->s, line);
+        -:   36:
+        -:   37:	// set pos to 0
+      315:   38:	t->pos = 0;
+        -:   39:
+      315:   40:	t->in_comment = false;
+        -:   41:
+      315:   42:	return TokenizerStateOk;
+        -:   43:}
+        -:   44:
+     2500:   45:bool tokenizer_is_white_space(Tokenizer *t)
+        -:   46:{
+     2500:   47:	char ch = t->s[t->pos];
+        -:   48:	// check for std whitespace chars
+     2500:   49:	if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\v' || ch == '\f' || ch == '\r')
+     1225:   50:		return true;
+     1275:   51:	return false;
+        -:   52:}
+        -:   53:
+     1481:   54:int tokenizer_skip_comments(Tokenizer *t, Token *next)
+        -:   55:{
+     1481:   56:	if (t->pos + 1 >= t->len)
+      312:   57:		return TokenizerStateOk;
+        -:   58:
+     1169:   59:	char ch1 = t->s[t->pos];
+     1169:   60:	char ch2 = t->s[t->pos + 1];
+     1169:   61:	bool is_doc_comment = false;
+        -:   62:
+     1261:   63:	if (ch1 == '/' && ch2 == '/') {
+       92:   64:		u64 start_doc = t->pos;
+       92:   65:		if (t->pos + 2 < t->len) {
+        -:   66:			// check if we're in a doc comment
+       91:   67:			if (t->s[t->pos + 2] == '/') {
+        -:   68:				// in doc comment
+       13:   69:				is_doc_comment = true;
+       13:   70:				t->pos = t->pos + 3;
+       13:   71:				start_doc = t->pos;
+        -:   72:			}
+        -:   73:		}
+        -:   74:
+       92:   75:		bool found_start = false;
+        -:   76:
+        -:   77:		while (true) {
+     3861:   78:			if (t->pos >= t->len || t->s[t->pos] == '\n')
+        -:   79:				break;
+        -:   80:
+     3769:   81:			if (!found_start && tokenizer_is_white_space(t)) {
+       23:   82:				start_doc = t->pos + 1;
+        -:   83:			} else {
+     3746:   84:				found_start = true;
+        -:   85:			}
+     3769:   86:			t->pos += 1;
+        -:   87:		}
+        -:   88:
+       92:   89:		if (is_doc_comment) {
+       13:   90:			next->type = TokenTypeDoc;
+       13:   91:			u64 end_doc = t->pos;
+       13:   92:			if (end_doc < start_doc)
+    #####:   93:				end_doc = start_doc;
+       13:   94:			u64 doc_size = end_doc - start_doc;
+       13:   95:			next->token = mymalloc(sizeof(char) * (doc_size + 1));
+       13:   96:			memcpy(next->token, t->s + start_doc, doc_size);
+       13:   97:			next->token[doc_size] = 0;
+        -:   98:		}
+        -:   99:
+     1077:  100:	} else if (ch1 == '/' && ch2 == '*') {
+       12:  101:		t->in_comment = true;
+       12:  102:		t->pos += 1;
+        -:  103:		while (true) {
+      172:  104:			if (t->pos >= t->len || (t->s[t->pos - 1] == '*' && t->s[t->pos] == '/')) {
+       12:  105:				if (t->pos < t->len) {
+       11:  106:					t->in_comment = false;
+       11:  107:					t->pos += 1;
+        -:  108:				}
+        -:  109:
+       16:  110:				while (t->pos < t->len) {
+       12:  111:					if (!tokenizer_is_white_space(t))
+        8:  112:						break;
+        4:  113:					t->pos += 1;
+        -:  114:				}
+       12:  115:				break;
+        -:  116:			}
+      160:  117:			t->pos += 1;
+        -:  118:		}
+        -:  119:	}
+        -:  120:
+     1169:  121:	return TokenizerStateOk;
+        -:  122:}
+        -:  123:
+     2679:  124:int tokenizer_skip_white_space(Tokenizer *t, Token *next)
+        -:  125:{
+        -:  126:	while (true) {
+        -:  127:		// if we're at the end of the string or not in white space break
+     2679:  128:		if (t->pos >= t->len || !tokenizer_is_white_space(t))
+        -:  129:			break;
+        -:  130:
+     1198:  131:		t->pos += 1;
+        -:  132:	}
+        -:  133:
+     1481:  134:	return TokenizerStateOk;
+        -:  135:}
+        -:  136:
+     1481:  137:int tokenizer_skip_to_token(Tokenizer *t, Token *next)
+        -:  138:{
+        -:  139:	while (true) {
+     1481:  140:		tokenizer_skip_white_space(t, next);
+     1481:  141:		tokenizer_skip_comments(t, next);
+        -:  142:
+     1481:  143:		if (t->pos >= t->len || (t->s[t->pos] != '\n' && t->s[t->pos] != '/')
+       89:  144:			|| next->type == TokenTypeDoc)
+        -:  145:			break;
+        -:  146:	}
+        -:  147:
+     1404:  148:	if (t->pos >= t->len && next->type != TokenTypeDoc) {
+      315:  149:		if (t->in_comment)
+        1:  150:			return TokenizerStateCompleteInComment;
+      314:  151:		return TokenizerStateComplete;
+        -:  152:	}
+        -:  153:
+     1089:  154:	return TokenizerStateOk;
+        -:  155:}
+        -:  156:
+      413:  157:int tokenizer_proc_ident(Tokenizer *t, Token *next)
+        -:  158:{
+      413:  159:	next->type = TokenTypeIdent;
+      413:  160:	u64 start = t->pos;
+     3587:  161:	while (true) {
+        -:  162:		// if we're at the end of the string, break
+     4000:  163:		if (t->pos >= t->len)
+        3:  164:			break;
+        -:  165:
+     3997:  166:		char ch = t->s[t->pos];
+        -:  167:
+        -:  168:		// continue until non-ident char
+     3997:  169:		if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_'
+     2427:  170:				|| (ch >= '0' && ch <= '9'))) {
+        -:  171:			break;
+        -:  172:		}
+     3587:  173:		t->pos += 1;
+        -:  174:	}
+      413:  175:	u64 end = t->pos;
+      413:  176:	u64 tlen = end - start;
+        -:  177:
+        -:  178:	// allocate and copy over the token
+      413:  179:	next->token = mymalloc(sizeof(char) * (tlen + 1));
+      413:  180:	if (next->token == NULL)
+    #####:  181:		return TokenizerStateErr;
+      413:  182:	memcpy(next->token, t->s + start, tlen);
+      413:  183:	next->token[tlen] = 0;
+        -:  184:
+      413:  185:	return TokenizerStateOk;
+        -:  186:}
+        -:  187:
+       12:  188:int tokenizer_proc_string_literal(Tokenizer *t, Token *next)
+        -:  189:{
+       12:  190:	next->type = TokenTypeLiteral;
+       12:  191:	u64 start = t->pos;
+       97:  192:	while (true) {
+        -:  193:		// if we're at the end of the string, break
+      109:  194:		if (t->pos >= t->len)
+    #####:  195:			break;
+        -:  196:
+      109:  197:		char ch = t->s[t->pos];
+        -:  198:
+        -:  199:		// continue until literal termination char
+      109:  200:		if (ch == '\"' && t->pos != start) {
+       12:  201:			t->pos += 1;
+       12:  202:			break;
+        -:  203:		}
+       97:  204:		t->pos += 1;
+        -:  205:	}
+       12:  206:	u64 end = t->pos;
+       12:  207:	u64 tlen = end - start;
+        -:  208:
+        -:  209:	// allocate and copy over the token
+       12:  210:	next->token = mymalloc(sizeof(char) * (tlen + 1));
+       12:  211:	if (next->token == NULL)
+    #####:  212:		return TokenizerStateErr;
+       12:  213:	memcpy(next->token, t->s + start, tlen);
+       12:  214:	next->token[tlen] = 0;
+        -:  215:
+       12:  216:	return TokenizerStateOk;
+        -:  217:}
+        -:  218:
+        1:  219:int tokenizer_proc_char_literal(Tokenizer *t, Token *next)
+        -:  220:{
+        1:  221:	next->type = TokenTypeLiteral;
+        1:  222:	u64 start = t->pos;
+        2:  223:	while (true) {
+        -:  224:		// if we're at the end of the string, break
+        3:  225:		if (t->pos >= t->len)
+    #####:  226:			break;
+        -:  227:
+        3:  228:		char ch = t->s[t->pos];
+        -:  229:
+        -:  230:		// continue until literal termination char
+        3:  231:		if (ch == '\'' && t->pos != start) {
+        1:  232:			t->pos += 1;
+        1:  233:			break;
+        -:  234:		}
+        2:  235:		t->pos += 1;
+        -:  236:	}
+        1:  237:	u64 end = t->pos;
+        1:  238:	u64 tlen = end - start;
+        -:  239:
+        -:  240:	// allocate and copy over the token
+        1:  241:	next->token = mymalloc(sizeof(char) * (tlen + 1));
+        1:  242:	if (next->token == NULL)
+    #####:  243:		return TokenizerStateErr;
+        1:  244:	memcpy(next->token, t->s + start, tlen);
+        1:  245:	next->token[tlen] = 0;
+        -:  246:
+        1:  247:	return TokenizerStateOk;
+        -:  248:}
+        -:  249:
+       75:  250:int tokenizer_proc_num_literal(Tokenizer *t, Token *next)
+        -:  251:{
+       75:  252:	int ret = TokenizerStateOk;
+       75:  253:	next->type = TokenTypeLiteral;
+       75:  254:	u64 start = t->pos;
+      194:  255:	while (true) {
+        -:  256:		// if we're at the end of the string, break
+      269:  257:		if (t->pos >= t->len)
+        4:  258:			break;
+        -:  259:
+      265:  260:		char ch = t->s[t->pos];
+        -:  261:
+        -:  262:		// continue until literal termination char (we allow all
+        -:  263:		// chars needed for the various types at the tokenizer
+        -:  264:		// level. Checking the order, etc is done at a later
+        -:  265:		// phase)
+      265:  266:		if (t->pos == start) {
+       75:  267:			if (!(ch == '-' || (ch >= '0' && ch <= '9')))
+        -:  268:				break;
+      263:  269:		} else if (!((ch >= '0' && ch <= '9') || ch == '.' || ch == '_' || ch == 'u' || ch == 'i'
+       82:  270:					   || ch == 's' || ch == 'z' || ch == 'e' || ch == 'f' || ch == 'x'))
+       71:  271:			break;
+      194:  272:		t->pos += 1;
+        -:  273:	}
+       75:  274:	u64 end = t->pos;
+       75:  275:	u64 tlen = end - start;
+        -:  276:
+        -:  277:	// special case of lone minus sign is a punct, not a literal
+       75:  278:	if (tlen == 1 && t->s[start] == '-') {
+       20:  279:		next->type = TokenTypePunct;
+        -:  280:		// we also must deal with these: -= and ->
+       20:  281:		if (t->pos < t->len) {
+       20:  282:			if (t->s[t->pos] == '=' || t->s[t->pos] == '>') {
+       18:  283:				t->pos += 1;
+       18:  284:				end = t->pos;
+       18:  285:				tlen = end - start;
+        -:  286:			}
+        -:  287:		}
+        -:  288:	}
+        -:  289:
+        -:  290:	// allocate and copy over the token
+       75:  291:	next->token = mymalloc(sizeof(char) * (tlen + 1));
+       75:  292:	if (next->token == NULL)
+    #####:  293:		return TokenizerStateErr;
+       75:  294:	memcpy(next->token, t->s + start, tlen);
+       75:  295:	next->token[tlen] = 0;
+        -:  296:
+       75:  297:	return ret;
+        -:  298:}
+        -:  299:
+      570:  300:bool is_second_punct(char ch1, char ch2)
+        -:  301:{
+      570:  302:	if (ch1 == '!' && ch2 == '=')
+        2:  303:		return true;
+     568*:  304:	if (ch1 == '%' && ch2 == '%')
+    #####:  305:		return true;
+      568:  306:	if (ch1 == '&' && (ch2 == '&' || ch2 == '='))
+    #####:  307:		return true;
+      568:  308:	if (ch1 == '*' && ch2 == '=')
+    #####:  309:		return true;
+      568:  310:	if (ch1 == '+' && ch2 == '=')
+        2:  311:		return true;
+     566*:  312:	if (ch1 == '-' && (ch2 == '=' || ch2 == '>'))
+    #####:  313:		return true;
+     566*:  314:	if (ch1 == '/' && ch2 == '=')
+    #####:  315:		return true;
+     566*:  316:	if (ch1 == '^' && ch2 == '=')
+    #####:  317:		return true;
+      566:  318:	if (ch1 == '|' && (ch2 == '=' || ch2 == '|'))
+    #####:  319:		return true;
+      566:  320:	if (ch1 == '=' && (ch2 == '>' || ch2 == '='))
+        6:  321:		return true;
+      560:  322:	if (ch1 == ':' && ch2 == ':')
+       17:  323:		return true;
+      543:  324:	if (ch1 == '<' && (ch2 == '<' || ch2 == '=' || ch2 == '-'))
+    #####:  325:		return true;
+      543:  326:	if (ch1 == '>' && (ch2 == '>' || ch2 == '='))
+    #####:  327:		return true;
+      543:  328:	if (ch1 == '.' && ch2 == '.')
+    #####:  329:		return true;
+        -:  330:
+      543:  331:	return false;
+        -:  332:}
+    #####:  333:bool is_third_punct(char ch1, char ch2, char ch3)
+        -:  334:{
+    #####:  335:	if (ch1 == '<' && ch2 == '<' && ch3 == '=')
+    #####:  336:		return true;
+    #####:  337:	if (ch1 == '>' && ch2 == '>' && ch3 == '=')
+    #####:  338:		return true;
+    #####:  339:	if (ch1 == '.' && ch2 == '.' && ch3 == '.')
+    #####:  340:		return true;
+    #####:  341:	if (ch1 == '.' && ch2 == '.' && ch3 == '=')
+    #####:  342:		return true;
+    #####:  343:	return false;
+        -:  344:}
+        -:  345:
+      575:  346:int tokenizer_proc_punct(Tokenizer *t, Token *next)
+        -:  347:{
+      575:  348:	next->type = TokenTypePunct;
+        -:  349:
+      575:  350:	char ch1 = t->s[t->pos];
+      575:  351:	char ch2 = t->pos + 1 < t->len && is_second_punct(ch1, t->s[t->pos + 1]) ? t->s[t->pos + 1] : 0;
+     575*:  352:	char ch3 = t->pos + 2 < t->len && ch3 != 0 && is_third_punct(ch1, ch2, t->s[t->pos + 2])
+    #####:  353:		? t->s[t->pos + 2]
+        -:  354:		: 0;
+        -:  355:
+        -:  356:	// allocate and copy over the token
+      575:  357:	next->token = mymalloc(sizeof(char) * 5);
+      575:  358:	if (next->token == NULL)
+    #####:  359:		return TokenizerStateErr;
+        -:  360:
+      575:  361:	next->token[0] = ch1;
+      575:  362:	next->token[1] = ch2;
+      575:  363:	next->token[2] = ch3;
+      575:  364:	next->token[4] = 0;
+        -:  365:
+      575:  366:	t->pos += 1;
+      575:  367:	if (ch2 != 0)
+       27:  368:		t->pos += 1;
+     575*:  369:	if (ch3 != 0 && ch2 != 0)
+    #####:  370:		t->pos += 1;
+        -:  371:
+      575:  372:	return TokenizerStateOk;
+        -:  373:}
+        -:  374:
+     1404:  375:int tokenizer_next_token(Tokenizer *t, Token *next)
+        -:  376:{
+     1404:  377:	next->span = NULL;
+     1404:  378:	next->type = TokenTypeIdent; // init so that we know when it's been set to doc
+        -:  379:	// first skip all whitespace / comments
+     1404:  380:	int skip = tokenizer_skip_to_token(t, next);
+     1404:  381:	if (skip != TokenizerStateOk || next->type == TokenTypeDoc)
+      328:  382:		return skip;
+        -:  383:
+        -:  384:	// check first char to determine which type of token we're in
+     1076:  385:	char first = t->s[t->pos];
+     1076:  386:	if ((first >= 'a' && first <= 'z') || (first >= 'A' && first <= 'Z') || first == '_') {
+        -:  387:		// ident
+      413:  388:		int ret = tokenizer_proc_ident(t, next);
+        -:  389:
+        -:  390:		// special cases
+      413:  391:		if (ret == TokenizerStateOk
+      413:  392:			&& (!strcmp(next->token, "true") || !strcmp(next->token, "false"))) {
+        3:  393:			next->type = TokenTypeLiteral;
+        -:  394:		}
+      413:  395:		return ret;
+      663:  396:	} else if (first == '\"') {
+        -:  397:		// string literal
+       12:  398:		return tokenizer_proc_string_literal(t, next);
+      651:  399:	} else if (first == '\'') {
+        -:  400:		// char literal
+        1:  401:		return tokenizer_proc_char_literal(t, next);
+      650:  402:	} else if ((first >= '0' && first <= '9') || first == '-') {
+        -:  403:		// number literal
+       75:  404:		return tokenizer_proc_num_literal(t, next);
+        -:  405:	} else {
+        -:  406:		// punct or error
+      575:  407:		return tokenizer_proc_punct(t, next);
+        -:  408:	}
+        -:  409:}
+        -:  410:
+      320:  411:void tokenizer_cleanup(Tokenizer *t)
+        -:  412:{
+        -:  413:	// check if it's null to be safe in case it's called twice
+      320:  414:	if (t->s != NULL) {
+      315:  415:		myfree(t->s);
+      315:  416:		t->s = NULL;
+        -:  417:	}
+      320:  418:}
+        -:  419:
+     1089:  420:void token_cleanup(Token *t)
+        -:  421:{
+        -:  422:	// check if it's null to be safe in case it's called twice
+     1089:  423:	if (t->token != NULL) {
+     1089:  424:		myfree(t->token);
+     1089:  425:		t->token = NULL;
+        -:  426:	}
+        -:  427:
+        -:  428:	// check if it's null to be safe in case it's called twice
+     1089:  429:	if (t->span != NULL) {
+      954:  430:		myfree(t->span);
+      954:  431:		t->span = NULL;
+        -:  432:	}
+     1089:  433:}
+        -:  434:
+        -:  435:typedef enum TokenDisplayType {
+        -:  436:	TokenDisplayTypeError = 0,
+        -:  437:	TokenDisplayTypeWarning = 1
+        -:  438:} TokenDisplayType;
+        -:  439:
+    #####:  440:int token_display_impl(Token *token, TokenDisplayType type, char *fmt, va_list va_args)
+        -:  441:{
+    #####:  442:	if (type == TokenDisplayTypeError)
+    #####:  443:		fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+        -:  444:	else
+    #####:  445:		fprintf(stderr, "%sWarning%s: ", YELLOW, RESET);
+    #####:  446:	vfprintf(stderr, fmt, va_args);
+    #####:  447:	fprintf(stderr, "\n%s", token->span);
+    #####:  448:	return 0;
+        -:  449:}
+        -:  450:
+    #####:  451:int token_display_error(Token *token, char *fmt, ...)
+        -:  452:{
+        -:  453:	va_list va_args;
+    #####:  454:	va_start(va_args, fmt);
+    #####:  455:	int ret = token_display_impl(token, TokenDisplayTypeError, fmt, va_args);
+    #####:  456:	va_end(va_args);
+    #####:  457:	return ret;
+        -:  458:
+        -:  459:	/*
+        -:  460:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+        -:  461:	vfprintf(stderr, fmt, va_args);
+        -:  462:	va_end(va_args);
+        -:  463:	fprintf(stderr, "\n%s", token->span);
+        -:  464:	return 0;
+        -:  465:	*/
+        -:  466:}
+        -:  467:
+    #####:  468:int token_display_warning(Token *token, char *fmt, ...)
+        -:  469:{
+        -:  470:	va_list va_args;
+    #####:  471:	va_start(va_args, fmt);
+    #####:  472:	int ret = token_display_impl(token, TokenDisplayTypeWarning, fmt, va_args);
+    #####:  473:	va_end(va_args);
+    #####:  474:	return ret;
+        -:  475:	/*
+        -:  476:	va_list va_args;
+        -:  477:	va_start(va_args, fmt);
+        -:  478:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+        -:  479:	vfprintf(stderr, fmt, va_args);
+        -:  480:	va_end(va_args);
+        -:  481:	fprintf(stderr, "\n%s", token->span);
+        -:  482:	return 0;
+        -:  483:	*/
+        -:  484:}

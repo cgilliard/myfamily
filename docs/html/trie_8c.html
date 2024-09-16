@@ -75,6 +75,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="chain__allocator_8h_source.html">base/chain_allocator.h</a>&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="trie_8h_source.html">util/trie.h</a>&gt;</code><br />
 </div><table class="memberdecls">
@@ -104,8 +105,8 @@ Functions</h2></td></tr>
 <tr class="separator:a46fbd5a1d2658f7e19bbea498cb8941c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada748497ace425c3c2f260bb3c497967"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="trie_8c.html#ada748497ace425c3c2f260bb3c497967">trie_compare</a> (const void *m1, const void *m2)</td></tr>
 <tr class="separator:ada748497ace425c3c2f260bb3c497967"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73f4361a4f86dab94d6e987aee402069"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="trie_8c.html#a73f4361a4f86dab94d6e987aee402069">trie_sort</a> (<a class="el" href="structTrieMatch.html">TrieMatch</a> ret[], int <a class="el" href="header__sample1_8h.html#a3cf0f269cb7018481132ba4597dddde7">count</a>)</td></tr>
-<tr class="separator:a73f4361a4f86dab94d6e987aee402069"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c5fc429d0604cd04a9925dd0a7982b4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="trie_8c.html#a2c5fc429d0604cd04a9925dd0a7982b4">trie_sort</a> (<a class="el" href="structTrieMatch.html">TrieMatch</a> ret[], <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="el" href="header__sample1_8h.html#a3cf0f269cb7018481132ba4597dddde7">count</a>)</td></tr>
+<tr class="separator:a2c5fc429d0604cd04a9925dd0a7982b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad9970a806433a3fc1c418832ffcc7219"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="trie_8c.html#ad9970a806433a3fc1c418832ffcc7219">trie_match</a> (<a class="el" href="trie_8h.html#a5c4b93cc636196bf6a27b2783b3e6f55">Trie</a> *ptr, const char *text, <a class="el" href="structTrieMatch.html">TrieMatch</a> ret[], <a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> limit)</td></tr>
 <tr class="separator:ad9970a806433a3fc1c418832ffcc7219"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -323,14 +324,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a73f4361a4f86dab94d6e987aee402069"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a73f4361a4f86dab94d6e987aee402069">&#9670;&nbsp;</a></span>trie_sort()</h2>
+<a id="a2c5fc429d0604cd04a9925dd0a7982b4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c5fc429d0604cd04a9925dd0a7982b4">&#9670;&nbsp;</a></span>trie_sort()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int trie_sort </td>
+          <td class="memname">void trie_sort </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structTrieMatch.html">TrieMatch</a>&#160;</td>
           <td class="paramname"><em>ret</em>[], </td>
@@ -338,7 +339,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
           <td class="paramname"><em>count</em>&#160;</td>
         </tr>
         <tr>

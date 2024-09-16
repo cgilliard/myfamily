@@ -72,17 +72,38 @@ $(function() {
 <div class="title">build.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
+<div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
+</div>
 <p><a href="build_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a50164ce19e1628ab20ded320b29ad797"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8h.html#a50164ce19e1628ab20ded320b29ad797">proc_build_init</a> (const char *proj_name, const char *proj_path, char **authors, int author_count, bool lib, char *description)</td></tr>
-<tr class="separator:a50164ce19e1628ab20ded320b29ad797"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af416a142ba1fc58ff6f05ad1e59b36d3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8h.html#af416a142ba1fc58ff6f05ad1e59b36d3">proc_build_init</a> (const char *config_dir, const char *proj_name, const char *proj_path, char authors[11][1024], int author_count, bool lib, char *description)</td></tr>
+<tr class="separator:af416a142ba1fc58ff6f05ad1e59b36d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabf899149368773bfd90317ca0833a0b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8h.html#aabf899149368773bfd90317ca0833a0b">proc_build</a> (const char *base_dir)</td></tr>
+<tr class="separator:aabf899149368773bfd90317ca0833a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a50164ce19e1628ab20ded320b29ad797"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50164ce19e1628ab20ded320b29ad797">&#9670;&nbsp;</a></span>proc_build_init()</h2>
+<a id="aabf899149368773bfd90317ca0833a0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aabf899149368773bfd90317ca0833a0b">&#9670;&nbsp;</a></span>proc_build()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int proc_build </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>base_dir</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af416a142ba1fc58ff6f05ad1e59b36d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af416a142ba1fc58ff6f05ad1e59b36d3">&#9670;&nbsp;</a></span>proc_build_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -90,6 +111,12 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int proc_build_init </td>
           <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>config_dir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>proj_name</em>, </td>
         </tr>
@@ -102,8 +129,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">char **&#160;</td>
-          <td class="paramname"><em>authors</em>, </td>
+          <td class="paramtype">char&#160;</td>
+          <td class="paramname"><em>authors</em>[11][1024], </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
