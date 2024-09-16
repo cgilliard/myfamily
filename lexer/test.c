@@ -18,7 +18,7 @@
 
 MySuite(lexer);
 
-MyTest(lexer, test_parser_basic)
+MyTest(lexer, test_parser_basic1)
 {
 	Tokenizer t;
 	Token tk;
@@ -68,6 +68,12 @@ MyTest(lexer, test_parser_basic)
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
+}
+
+MyTest(lexer, test_parser_basic2)
+{
+	Tokenizer t;
+	Token tk;
 
 	// init tokenizer
 	cr_assert_eq(tokenizer_init(&t, "1234 ok 5.9"), TokenizerStateOk);
@@ -120,6 +126,12 @@ MyTest(lexer, test_parser_basic)
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
+}
+
+MyTest(lexer, test_parser_basic3)
+{
+	Tokenizer t;
+	Token tk;
 
 	// init tokenizer
 	cr_assert_eq(tokenizer_init(&t, "1234; ok - != 5"), TokenizerStateOk);
@@ -197,6 +209,12 @@ MyTest(lexer, test_parser_basic)
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
+}
+
+MyTest(lexer, test_parser_basic4)
+{
+	Tokenizer t;
+	Token tk;
 
 	// init tokenizer
 	cr_assert_eq(tokenizer_init(&t,
@@ -381,6 +399,12 @@ MyTest(lexer, test_parser_basic)
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
+}
+
+MyTest(lexer, test_parser_basic5)
+{
+	Tokenizer t;
+	Token tk;
 
 	// init tokenizer
 	cr_assert_eq(
@@ -408,6 +432,12 @@ MyTest(lexer, test_parser_basic)
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
+}
+
+MyTest(lexer, test_parser_basic6)
+{
+	Tokenizer t;
+	Token tk;
 
 	// init tokenizer
 	cr_assert_eq(tokenizer_init(&t, "if x // this is a comment \n // ; 8 ok \"abc\"\nhi;"),
@@ -464,6 +494,12 @@ MyTest(lexer, test_parser_basic)
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
+}
+
+MyTest(lexer, test_parser_basic7)
+{
+	Tokenizer t;
+	Token tk;
 
 	// init tokenizer
 	cr_assert_eq(tokenizer_init(&t,
@@ -551,6 +587,12 @@ MyTest(lexer, test_parser_basic)
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
+}
+
+MyTest(lexer, test_parser_basic8)
+{
+	Tokenizer t;
+	Token tk;
 
 	// init tokenizer
 	cr_assert_eq(tokenizer_init(&t,
@@ -645,7 +687,12 @@ MyTest(lexer, test_parser_basic)
 
 	cr_assert_eq(tokenizer_next_token(&t, &tk), TokenizerStateComplete);
 	tokenizer_cleanup(&t);
+}
 
+MyTest(lexer, test_parser_basic9)
+{
+	Tokenizer t;
+	Token tk;
 	// init tokenizer
 	cr_assert_eq(tokenizer_init(&t,
 					 "if x /// this is a test\n"
