@@ -1072,7 +1072,9 @@ Test(lexer, test3_fam_file)
 		if (res == LexerStateComplete) {
 			break;
 		}
+		token_cleanup(&tk);
 	}
+	lexer_cleanup(&l1);
 }
 
 Test(lexer, test_lexer_test3lex)
