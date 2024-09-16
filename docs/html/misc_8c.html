@@ -72,7 +72,8 @@ $(function() {
 <div class="title">misc.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="colors_8h_source.html">base/colors.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
 <code>#include &lt;dirent.h&gt;</code><br />
 <code>#include &lt;limits.h&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
@@ -91,6 +92,8 @@ Functions</h2></td></tr>
 <tr class="separator:a0128c17294655e800cec2066b3e0e2a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89e255ab73fedc9351160e41f6d28925"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a89e255ab73fedc9351160e41f6d28925">remove_directory</a> (const char *<a class="el" href="header__sample1_8h.html#af6b46818cfa690027c8616652a03d6af">path</a>)</td></tr>
 <tr class="separator:a89e255ab73fedc9351160e41f6d28925"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04d2c2dc4f9a32fccb11ff65d07bf171"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a04d2c2dc4f9a32fccb11ff65d07bf171">exit_error</a> (char *format,...)</td></tr>
+<tr class="separator:a04d2c2dc4f9a32fccb11ff65d07bf171"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a0128c17294655e800cec2066b3e0e2a9"></a>
@@ -110,6 +113,34 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>src</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a04d2c2dc4f9a32fccb11ff65d07bf171"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04d2c2dc4f9a32fccb11ff65d07bf171">&#9670;&nbsp;</a></span>exit_error()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void exit_error </td>
+          <td>(</td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>format</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
