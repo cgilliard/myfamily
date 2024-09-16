@@ -1059,7 +1059,7 @@ MyTest(lexer, test_lexer)
 	lexer_cleanup(&l1);
 }
 
-Test(lexer, test3_fam_file)
+MyTest(lexer, test3_fam_file)
 {
 	Lexer l1;
 	Token tk;
@@ -1077,7 +1077,7 @@ Test(lexer, test3_fam_file)
 	lexer_cleanup(&l1);
 }
 
-Test(lexer, test_lexer_test3lex)
+MyTest(lexer, test_lexer_test3lex)
 {
 	Lexer l1;
 	Token tk;
