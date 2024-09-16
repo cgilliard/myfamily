@@ -123,7 +123,9 @@ int proc_build(const char *base_dir)
 			}
 
 			// change to the base directory
-			chdir(base_dir);
+			if (chdir(base_dir)) {
+				fprintf(stderr, "Could not change directory to the project directory");
+			}
 
 			build_libs(base_dir);
 
