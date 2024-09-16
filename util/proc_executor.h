@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_MISC__
-#define _BASE_MISC__
+#ifndef _UTIL_PROC_EXECUTOR__
+#define _UTIL_PROC_EXECUTOR__
 
-#include <stddef.h>
-#include <stdio.h>
+int execute_process(char *args[]);
 
-char *rstrstr(const char *s1, const char *s2);
-int copy_file(const char *dst, const char *src);
-int remove_directory(const char *path);
-size_t read_all(void *buffer, size_t size, size_t count, FILE *stream);
-void exit_error(char *format, ...);
-
-#endif // _BASE_MISC__
+#endif // _UTIL_PROC_EXECUTOR__

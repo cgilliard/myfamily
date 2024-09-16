@@ -12,16 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_MISC__
-#define _BASE_MISC__
+#include <base/misc.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-#include <stddef.h>
-#include <stdio.h>
+int execute_process(char *args[])
+{
+	printf("Executing: ");
+	for (int i = 0; args[i]; i++) {
+		printf("%s ", args[i]);
+	}
+	printf("\n");
 
-char *rstrstr(const char *s1, const char *s2);
-int copy_file(const char *dst, const char *src);
-int remove_directory(const char *path);
-size_t read_all(void *buffer, size_t size, size_t count, FILE *stream);
-void exit_error(char *format, ...);
+	pid_t pid = fork();
 
-#endif // _BASE_MISC__
+	if (pid < 0) {
+		return -1;
+	} else if (pid == 0) {
+		execvp(args[0], args);
+		perror("execvp");
+		return -1;
+	} else {
+		int status;
+		waitpid(pid, &status, 0); // Wait for child process to finish
+		return status;
+	}
+}

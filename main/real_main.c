@@ -60,7 +60,11 @@ void build_args(Args *args)
 
 	// build the build SubCommand
 	SubCommand build;
+	ArgsParam cfg_base;
+	args_param_build(&cfg_base, "base", "The base directory of the project. (defaults to '.')", "b",
+		true, false, ".");
 	sub_command_build(&build, "build", "Build project in release mode", 0, 0, "");
+	sub_command_add_param(&build, &cfg_base);
 
 	args_add_sub_command(args, &build);
 
@@ -210,12 +214,19 @@ void process_verse(Args *args, char *config_dir)
 	bible_cleanup(&bible);
 }
 
+void process_build(Args *args, char *config_dir)
+{
+	char base_dir[PATH_MAX];
+	args_value_of(args, "base", base_dir, PATH_MAX - 1, 0);
+	proc_build(base_dir);
+}
+
 void process_init(Args *args, char *config_dir)
 {
 	char proj_name[128];
 	strcpy(proj_name, "");
 	args_get_argument(args, 1, proj_name, 127);
-	char proj_path[1024];
+	char proj_path[PATH_MAX];
 	strcpy(proj_path, proj_name);
 	args_value_of(args, "dir", proj_path, 1023, 0);
 
@@ -237,7 +248,7 @@ void process_init(Args *args, char *config_dir)
 
 	char description[1024];
 	args_value_of(args, "description", description, 1023, 0);
-	proc_build_init(proj_name, proj_path, author, count, lib, description);
+	proc_build_init(config_dir, proj_name, proj_path, author, count, lib, description);
 }
 
 void setup_config_dir(const char *config_dir)
@@ -281,6 +292,8 @@ int real_main(int argc, char **argv)
 			process_verse(&args, config_dir);
 		} else if (!strcmp(command, "init")) {
 			process_init(&args, config_dir);
+		} else if (!strcmp(command, "build")) {
+			process_build(&args, config_dir);
 		} else {
 			printf("Not implemented!\n");
 		}

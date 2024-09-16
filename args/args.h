@@ -55,14 +55,14 @@ typedef struct Args {
 } Args;
 
 int args_param_build(ArgsParam *ap, char *name, char *help, char *short_name, bool takes_value,
-					 bool multiple, char *default_value);
+	bool multiple, char *default_value);
 void args_param_cleanup(ArgsParam *ap);
-int sub_command_build(SubCommand *sc, char *name, char *help, u32 min_args, u32 max_args,
-					  char *arg_doc);
+int sub_command_build(
+	SubCommand *sc, char *name, char *help, u32 min_args, u32 max_args, char *arg_doc);
 int sub_command_add_param(SubCommand *sc, ArgsParam *ap);
 void sub_command_cleanup(SubCommand *sc);
 int args_build(Args *args, char *prog, char *version, char *author, u32 min_args, u32 max_args,
-			   u64 debug_flags);
+	u64 debug_flags);
 void args_cleanup(Args *args);
 int args_add_param(Args *args, ArgsParam *ap);
 int args_add_sub_command(Args *args, SubCommand *sc);

@@ -12,16 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_MISC__
-#define _BASE_MISC__
+#ifndef _LEXER_LEXER__
+#define _LEXER_LEXER__
 
-#include <stddef.h>
-#include <stdio.h>
+#include <lexer/tokenizer.h>
 
-char *rstrstr(const char *s1, const char *s2);
-int copy_file(const char *dst, const char *src);
-int remove_directory(const char *path);
-size_t read_all(void *buffer, size_t size, size_t count, FILE *stream);
-void exit_error(char *format, ...);
+#define LEXER_BUF_SIZE 1024
 
-#endif // _BASE_MISC__
+typedef enum LexerState { LexerStateOk = 0, LexerStateErr = 1, LexerStateComplete = 2 } LexerState;
+
+typedef struct Lexer {
+	Tokenizer *tokenizer;
+	FILE *fp;
+	char *file;
+	u64 line_num;
+} Lexer;
+
+int lexer_init(Lexer *l, char *file);
+int lexer_next_token(Lexer *l, Token *token);
+char *lexer_read_line(Lexer *l);
+void lexer_cleanup(Lexer *l);
+
+#endif // _LEXER_LEXER__

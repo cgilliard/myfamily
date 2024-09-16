@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/colors.h>
 #include <base/resources.h>
 #include <dirent.h>
 #include <limits.h>
@@ -154,4 +155,15 @@ int remove_directory(const char *path)
 	}
 
 	return 0;
+}
+
+void exit_error(char *format, ...)
+{
+	va_list va_args;
+	va_start(va_args, format);
+	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+	vfprintf(stderr, format, va_args);
+	fprintf(stderr, "\n");
+	va_end(va_args);
+	exit(-1);
 }

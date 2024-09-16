@@ -1,0 +1,270 @@
+// rust equiv: use abc::def::ghi as ghi2;
+@abc::def::ghi(ghi2);
+// rust equiv: use ghi::abc::{x, y as y2};
+@ghi::abc::{x, y(y2)};
+// rust equiv: use xyz::*;
+@xyz::*;
+
+module mymod; // file based module defns
+// in file module defns
+module mymod2 {
+	MyMod2Class {
+		x: usize;
+	}
+}
+
+// incomplete class (trait)
+Clone {
+	// immutable. '_' is a special return type which means the implementing type.
+	@clone() -> _;
+}
+
+// Any class that completes SuperClone must also complete Clone.
+// incomplete classes may not define fields
+// incomplete classes may also NOT have more than one variant
+SuperClone: Clone {
+	@super_clone() -> _;
+}
+
+// Classes are actually enums. By default they have a single variant.
+// to access the enum we use Rust style EnumTest::V1, EnumTest::V2
+EnumTest {
+	V1,
+	V2,
+}
+
+// Enums can have fields and functions:
+EnumTest2 {
+	V1 {
+		x: i32;
+		y: u64;
+		build(x: i32, y: u64) {
+			@ {
+                                x,
+                                y,
+                        }
+		}
+	},
+	V2 {
+		x: usize;
+		y: i128;
+		build(x: usize, y: i128) {
+			@ {
+				x,
+				y,
+			}
+		}
+	},
+}
+
+// to implement functions applicable for all variants of an enum another block must be used
+EnumTest2 {
+	pub say_hello(v: i32) {
+		match @ {
+			// regarding println, The '!' indicates this is a native function call.
+			// TODO: in config, we need the ability to specify c files which implement
+			// these.
+			V1 {x,y} => { println!("V1: x={},y={}", x, y); }
+			V2 {x,y} => { println!("V2: x={},y={}", x, y); }
+		}
+	}
+}
+
+// complete clone for EnumTest2
+EnumTest2::Clone {
+	@clone -> _ {
+		match @ {
+			V1{x, y} => @{
+				x, y
+			},
+			V2{x, y} => @{
+				x, y
+			}
+		}
+	}
+}
+
+UseEnumTest2 {
+	pub test() {
+		let v1 = EnumTest2::V1::build(-1, 100);
+		let v2 = EnumTest2::V2::build(1, 1);
+		v1.say_hello();
+		v2.say_hello();
+	}
+}
+
+// a more standard class. This is actually an enum with a single variant.
+pub MyClass {
+	x: i32;
+	y: i64;
+	z: EnumTest2;
+	// Dynamically sized arrays act like pointers, however with some safety. The alloc!([T], usize) and dealloc!([T])
+	// functions, which execute native C code to allocate/deallocate memory allow for safe access to dynamicly
+        // sized contigious memory. Like arrays, attempting to access 'out of bounds' items will result in a 
+	// thread panic. The user is responsible for allocating/deallocating memory with these types.
+	ptr: [u8];
+	arr: [u32; 10];
+
+	// Slices are allowed in function calls, but not as fields in classes. They cannot be returned from functions
+	// as no references can. Also this function has the default visibility which is pub(package).
+	slice_test(arr: &[i64]) {
+		// define an unsized array
+		let mut x: [u8];
+		// define a sized array and initialize it.
+		let mut y: [u8; 100];
+		for i in 0..y.len() {
+			y[i] = i;
+		}
+		alloc!(&mut x, 100);
+		for i in 0..x.len() {
+			x[i] = y[i];
+		}
+
+		// ... use x
+
+		// deallocate x so there is no memory leak
+		dealloc!(&mut x);
+	}
+
+	// a function which is '@' which means it's not static. @ is similar to 'self' in rust.
+	@my_fun1(x: i32, y: [i64; 10]) -> bool {
+		// slices can be local variables
+		let a: &[i64] = y[3..];
+		slice_test(a);
+	}
+
+	// a function that is mutable and non-static explicitly. It returns '$' which is the unit
+	// type.
+	@mut my_fun2() {
+		println!("this is a test");
+	}
+
+	// while this function does not specify that it is non-static, mutable, or a return type
+	// it implicitly defines all three. First, it is non-static because it references @.
+	// second it is mutable because @x is modified. Third, its return type is i64 becuse
+	// y's type is i64.
+	pub my_fun3() {
+		@x += 1;
+		@y
+	}
+
+	// this function is static because it does not reference @. It explicitly is an i32
+	// return type
+	priv my_fun4(x: i32) -> i32 {
+		println!("x={}", x);
+		x + 1
+	}
+
+	// This is a static function that returns an instance of MyClass '_'.
+	build(x: i32, y: i64, x: EnumTest2) -> _ {
+		@ {
+			x,
+			y,
+			z,
+		}
+	}
+}
+
+MyClass::Clone {
+	@clone -> _ {
+                @ {
+                        x: @x,
+                        y: @y,
+			z: @z.clone(),
+                }
+        }
+}
+
+priv MyClassWithTuplesAndClosures {
+	x: (u32, i64);
+	y: Option<|usize, i128| -> usize>;
+	z: |isize, u128| -> MyClass;
+}
+
+MyError {
+	Ekind1,
+	Ekind2,
+}
+
+TestReturnEnum <T, E> {
+	Ok(T),
+	Err(E),
+}
+
+TestOptionEnum <T> {
+	Some(T),
+	None,
+}
+
+// '?' and '!' syntax
+TestReturns {
+	x: u32;
+	y: u64;
+
+	fn1(x: u32) -> TestReturnEnum<u32, MyError> {
+		if(x>100)
+			TestReturnEnum::Err(MyError::Ekind1)
+		else
+			Ok(x + 10)
+			
+	}
+
+	// demonstrate the question mark operator
+	fn2() -> TestReturnEnum<$, MyError> {
+		println!("x={},y={}", @x, @y);
+		// question mark operator will return the second variant if enum in
+		// question (i.e. the returned value from fn1), contains the second
+		// variant, otherwise, it returns the value of the first variant.
+
+		let res = fn1(10)?;
+		println!("res={}", res); // prints 20
+		let res = fn1(110)?; // this will return an error
+		
+		// if this line were ever reached, it would return Ok with
+		// the unit primitive '$'.
+		TestReturnEnum::Ok($)
+	}
+
+	// demonstrate the '!' operator. This is ok to use in any
+	// type of function not just those that return an Enum with two variants
+	// '!' panics if the second variant is returned (i.e. an error).
+	// otherwise it reutrns the contents of the first variant.
+	fn3() {
+		let res = fn1(10)!; // this will not panic
+		println!("res={}", res); // prints 20
+		let res = fn1(110)!; // this line will panic
+		println!("res={}", res); // would never be reached
+	}
+
+	fn4(x: u32) -> TestOptionEnum<u32> {
+		if(x>100)
+			TestOptionEnum::None
+		else
+			TestOptionEnum::Some(x + 10)
+	}
+
+	fn5() -> TestReturnEnum<$, MyError> {
+		let res = fn4(10)?;
+		println!("res={}", res); // prints 20
+		let res = fn4(110)?; // returns an error because the second variant is returned.
+		Ok($)
+	}
+
+	/// Doc comment
+	/// @param abc an unsigned 32 bit int
+	/// @return the input value plus 1
+	fn6(abc: u32) -> u32 {
+		let res: u32 = fn4(10)!; // this is ok because first variant returned.
+		let res: u32 = fn4(110)!; // this panics because second variant returns.
+		abc + 1
+	}
+}
+
+/// This is a doc comment for the below class
+#[custom_proc]
+DocClass {
+	#[custom_proc(multiple => tokens)]
+	fn1() -> TestReturnEnum<$, MyError> {
+		TestReturnEnum::Ok($)
+	}
+}

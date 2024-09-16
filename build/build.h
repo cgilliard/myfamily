@@ -15,7 +15,11 @@
 #ifndef _BUILD_BUILD__
 #define _BUILD_BUILD__
 
-int proc_build_init(const char *proj_name, const char *proj_path, char authors[11][1024],
-	int author_count, bool lib, char *description);
+#include <base/types.h>
+
+int proc_build_init(const char *config_dir, const char *proj_name, const char *proj_path,
+	char authors[11][1024], int author_count, bool lib, char *description);
+
+int proc_build(const char *base_dir);
 
 #endif // _BUILD_BUILD__

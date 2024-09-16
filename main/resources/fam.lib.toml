@@ -1,4 +1,4 @@
-[fam_version="REPLACE_FAM_VERSION"]
+fam_version = "REPLACE_FAM_VERSION"
 
 [package]
 name = "REPLACE_NAME"
@@ -8,10 +8,6 @@ description = "REPLACE_DESCRIPTION"
 lib = true
 
 [dependencies]
-main = { path = "./main" }
-util = { path = "./util" }
 
 [test-dependencies]
-
-testframework = { path = "./test" }
 

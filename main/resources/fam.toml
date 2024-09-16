@@ -1,4 +1,4 @@
-[fam_version="REPLACE_FAM_VERSION"]
+fam_version = "REPLACE_FAM_VERSION"
 
 [package]
 name = "REPLACE_NAME"
@@ -7,10 +7,6 @@ authors = [REPLACE_AUTHORS]
 description = "REPLACE_DESCRIPTION"
 
 [dependencies]
-main = { path = "./main" }
-util = { path = "./util" }
 
 [test-dependencies]
-
-testframework = { path = "./test" }
 
