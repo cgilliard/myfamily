@@ -188,14 +188,14 @@ int proc_build(const char *base_dir, const char *config_dir)
 			path_for(&target, base_dir);
 			path_push(&target, "target");
 			if (!path_exists(&target)) {
-				if (path_mkdir(&target, 0700))
+				if (path_mkdir(&target, 0700, false))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
 				path_push(&target, "objs");
-				if (path_mkdir(&target, 0700))
+				if (path_mkdir(&target, 0700, false))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
 				path_pop(&target);
 				path_push(&target, "build");
-				if (path_mkdir(&target, 0700))
+				if (path_mkdir(&target, 0700, false))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
 			}
 

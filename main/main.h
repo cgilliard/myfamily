@@ -24,6 +24,10 @@ int real_main(int argc, char **argv);
 		char path[1024];                                                                           \
 		snprintf(path, sizeof(path), "%s/%s", dir, filename);                                      \
 		printf("path=%s\n", path);                                                                 \
+		Path ensure_parent;                                                                        \
+		path_for(&ensure_parent, path);                                                            \
+		path_pop(&ensure_parent);                                                                  \
+		path_mkdir(&ensure_parent, 0700, true);                                                    \
 		FILE *f = fopen(path, "wb");                                                               \
 		if (f) {                                                                                   \
 			fwrite(data, 1, size, f);                                                              \

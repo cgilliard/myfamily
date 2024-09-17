@@ -174,13 +174,76 @@ bool path_is_dir(const Path *p)
 	return false;
 }
 
-bool path_mkdir(Path *p, mode_t mode)
+bool path_mkdir(Path *p, mode_t mode, bool parent)
 {
 	if (p->ptr.data == NULL && p->ptr.len == 0) {
 		errno = EINVAL;
 		return false;
 	}
-	return mkdir(p->ptr.data, 0700) != 0;
+
+	struct stat s;
+
+	// Check if the path exists
+	if (stat(p->ptr.data, &s) == 0) {
+		// If the path exists and it's a directory, return success
+		if (s.st_mode & S_IFDIR) {
+			return true;
+		} else {
+			// Path exists but it's not a directory
+			errno = ENOTDIR;
+			return false;
+		}
+	}
+
+	// If parent is false, attempt to create only the target directory
+	if (!parent) {
+		if (mkdir(p->ptr.data, mode) != 0) {
+			return false;
+		}
+		return true;
+	}
+
+	// Create the directory structure (parent is true)
+	Path temp_path;
+	if (path_copy(&temp_path, p) != 0) {
+		return false;
+	}
+
+	char *dir_part = strtok(temp_path.ptr.data, PATH_SEPARATOR);
+	Path current_path;
+	path_for(&current_path, PATH_SEPARATOR);
+
+	// Iterate through each part of the path and create directories as needed
+	while (dir_part != NULL) {
+		if (path_push(&current_path, dir_part) != 0) {
+			path_cleanup(&temp_path);
+			path_cleanup(&current_path);
+			return false;
+		}
+
+		// Check if the current part of the path exists, and if not, create it
+		if (stat(current_path.ptr.data, &s) != 0) {
+			// Directory does not exist, so create it
+			if (mkdir(current_path.ptr.data, mode) != 0) {
+				path_cleanup(&temp_path);
+				path_cleanup(&current_path);
+				return false;
+			}
+		} else if (!(s.st_mode & S_IFDIR)) {
+			// Path exists but is not a directory
+			errno = ENOTDIR;
+			path_cleanup(&temp_path);
+			path_cleanup(&current_path);
+			return false;
+		}
+
+		dir_part = strtok(NULL, PATH_SEPARATOR);
+	}
+
+	// Cleanup temp and current paths
+	path_cleanup(&temp_path);
+	path_cleanup(&current_path);
+	return true;
 }
 
 int path_copy(Path *dst, Path *src)

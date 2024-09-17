@@ -16,9 +16,11 @@
 // in binaries.
 
 #include <dirent.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 int file_count = 0;
 #define MAX_FILES 4096
@@ -27,9 +29,9 @@ int file_sizes[MAX_FILES];
 void print_hex(
 	const unsigned char *data, size_t size, FILE *out, const char *file, const char *namespace)
 {
-	char buf[strlen(file) + 100];
-	snprintf(
-		buf, strlen(file) + 100, "unsigned char %sxxdir_file_%i[] = {\n", namespace, file_count);
+	char buf[strlen(namespace) + 100];
+	snprintf(buf, strlen(namespace) + 100, "unsigned char %sxxdir_file_%i[] = {\n", namespace,
+		file_count);
 	for (int i = 0; i < strlen(buf); i++)
 		if (buf[i] == '.')
 			buf[i] = '_';
@@ -77,6 +79,55 @@ void proc_file(const char *file_path, const char *output_header, FILE *out, cons
 	free(data);
 }
 
+void include_dir(const char *dir_path, const char *base, char *buf, const char *output_header,
+	FILE *out, const char *namespace)
+{
+	DIR *dir = opendir(dir_path);
+	if (dir == NULL) {
+		perror("Error opening directory");
+		exit(-1);
+	}
+
+	struct dirent *entry;
+	while ((entry = readdir(dir)) != NULL) {
+		// Skip the "." and ".." entries
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+			continue;
+		}
+
+		// Print the name of the file or directory
+		printf("Including: %s\n", entry->d_name);
+
+		char full_path[strlen(entry->d_name) + strlen(dir_path) + 100];
+		strcpy(full_path, dir_path);
+		strcat(full_path, "/");
+		strcat(full_path, entry->d_name);
+
+		struct stat s;
+		if (stat(full_path, &s) == 0 && s.st_mode & S_IFDIR) {
+			printf("is_dir\n");
+			char next_level[PATH_MAX];
+			strcpy(next_level, base);
+			if (strlen(base) > 0)
+				strcat(next_level, "/");
+			strcat(next_level, entry->d_name);
+			include_dir(full_path, next_level, buf, output_header, out, namespace);
+		} else {
+
+			proc_file(full_path, output_header, out, namespace);
+
+			strcat(buf, "\"");
+			if (strlen(base) > 0) {
+				// it's in a subdirectory
+				strcat(buf, base);
+				strcat(buf, "/");
+			}
+			strcat(buf, entry->d_name);
+			strcat(buf, "\", ");
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
 	if (argc != 3 && argc != 4) {
@@ -101,12 +152,6 @@ int main(int argc, char **argv)
 		exit(-1);
 	}
 
-	DIR *dir = opendir(dir_path);
-	if (dir == NULL) {
-		perror("Error opening directory");
-		exit(-1);
-	}
-
 	char initial_text[1024];
 	if (strlen(namespace) > 128) {
 		fprintf(stderr, "namespace is too long. Max len = 128 bytes.");
@@ -115,44 +160,46 @@ int main(int argc, char **argv)
 	strcpy(initial_text, "char *");
 	strcat(initial_text, namespace);
 	strcat(initial_text, "xxdir_file_names[] = {");
-	// snprintf(initial_text, 1024, "char *%sxxdir_file_names[] = {", namespace);
-	//  add three bytes for the last strcat
-	char *buf = malloc(sizeof(char) * (strlen(initial_text) + 7));
-	int cur_alloc = strlen(initial_text);
+	char buf[1024 * 1024];
 	strcpy(buf, initial_text);
 
-	struct dirent *entry;
-	while ((entry = readdir(dir)) != NULL) {
-		// Skip the "." and ".." entries
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-			continue;
-		}
-
-		// Print the name of the file or directory
-		printf("Including: %s\n", entry->d_name);
-		char full_path[strlen(entry->d_name) + strlen(dir_path) + 100];
-		strcpy(full_path, dir_path);
-		strcat(full_path, "/");
-		strcat(full_path, entry->d_name);
-
-		proc_file(full_path, output_header, out, namespace);
-
-		char *tmp = realloc(buf, cur_alloc + strlen(entry->d_name) + 3);
-		if (tmp == NULL) {
-			fprintf(stderr, "Alloc error!\n");
+	include_dir(dir_path, "", buf, output_header, out, namespace);
+	/*
+		DIR *dir = opendir(dir_path);
+		if (dir == NULL) {
+			perror("Error opening directory");
 			exit(-1);
 		}
-		cur_alloc += strlen(entry->d_name) + 4;
-		buf = tmp;
-		strcat(buf, "\"");
-		strcat(buf, entry->d_name);
-		strcat(buf, "\", ");
-	}
 
-	// 7 bytes preallocated
+		struct dirent *entry;
+		while ((entry = readdir(dir)) != NULL) {
+			// Skip the "." and ".." entries
+			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+				continue;
+			}
+
+			// Print the name of the file or directory
+			printf("Including: %s\n", entry->d_name);
+
+			char full_path[strlen(entry->d_name) + strlen(dir_path) + 100];
+			strcpy(full_path, dir_path);
+			strcat(full_path, "/");
+			strcat(full_path, entry->d_name);
+
+			struct stat s;
+			if (stat(full_path, &s) == 0 && s.st_mode & S_IFDIR) {
+				printf("is_dir\n");
+			}
+
+			proc_file(full_path, output_header, out, namespace);
+
+			strcat(buf, "\"");
+			strcat(buf, entry->d_name);
+			strcat(buf, "\", ");
+		}
+		*/
+
 	strcat(buf, "NULL};");
-	// write the names to the file
-	// fprintf(out, "%s", namespace);
 	fprintf(out, "%s", buf);
 
 	fprintf(out, "\nint %sxxdir_file_count=%i;\n", namespace, file_count);
@@ -165,8 +212,6 @@ int main(int argc, char **argv)
 	for (int i = 0; i < file_count; i++)
 		fprintf(out, "%i, ", file_sizes[i]);
 	fprintf(out, "0};\n");
-
-	free(buf);
 
 	fclose(out);
 

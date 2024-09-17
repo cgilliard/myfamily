@@ -33,7 +33,7 @@ int path_pop(Path *p);
 char *path_to_string(const Path *p);
 bool path_exists(const Path *p);
 bool path_is_dir(const Path *p);
-bool path_mkdir(Path *p, mode_t mode);
+bool path_mkdir(Path *p, mode_t mode, bool parent);
 char *path_file_name(const Path *p);
 int path_copy(Path *dst, Path *src);
 
