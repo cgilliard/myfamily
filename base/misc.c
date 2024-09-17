@@ -103,7 +103,7 @@ int copy_file(const char *dst, const char *src)
 }
 
 // Function to recursively remove a directory and its contents
-int remove_directory(const char *path)
+int remove_directory(const char *path, bool preserve_dir)
 {
 	struct dirent *entry;
 	DIR *dir = opendir(path);
@@ -132,7 +132,7 @@ int remove_directory(const char *path)
 
 		if (S_ISDIR(statbuf.st_mode)) {
 			// It's a directory, recurse into it
-			if (remove_directory(full_path) == -1) {
+			if (remove_directory(full_path, false) == -1) {
 				closedir(dir);
 				return -1;
 			}
@@ -149,9 +149,11 @@ int remove_directory(const char *path)
 	closedir(dir);
 
 	// Now the directory is empty, so we can remove it
-	if (rmdir(path) == -1) {
-		perror("rmdir");
-		return -1;
+	if (!preserve_dir) {
+		if (rmdir(path) == -1) {
+			perror("rmdir");
+			return -1;
+		}
 	}
 
 	return 0;

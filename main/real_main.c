@@ -218,7 +218,7 @@ void process_build(Args *args, char *config_dir)
 {
 	char base_dir[PATH_MAX];
 	args_value_of(args, "base", base_dir, PATH_MAX - 1, 0);
-	proc_build(base_dir);
+	proc_build(base_dir, config_dir);
 }
 
 void process_init(Args *args, char *config_dir)

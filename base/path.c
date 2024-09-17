@@ -182,3 +182,8 @@ bool path_mkdir(Path *p, mode_t mode)
 	}
 	return mkdir(p->ptr.data, 0700) != 0;
 }
+
+int path_copy(Path *dst, Path *src)
+{
+	return path_for(dst, path_to_string(src));
+}

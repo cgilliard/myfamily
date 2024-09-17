@@ -35,5 +35,6 @@ bool path_exists(const Path *p);
 bool path_is_dir(const Path *p);
 bool path_mkdir(Path *p, mode_t mode);
 char *path_file_name(const Path *p);
+int path_copy(Path *dst, Path *src);
 
 #endif // _BASE_PATH__

@@ -15,12 +15,13 @@
 #ifndef _BASE_MISC__
 #define _BASE_MISC__
 
+#include <base/types.h>
 #include <stddef.h>
 #include <stdio.h>
 
 char *rstrstr(const char *s1, const char *s2);
 int copy_file(const char *dst, const char *src);
-int remove_directory(const char *path);
+int remove_directory(const char *path, bool preserve_dir);
 size_t read_all(void *buffer, size_t size, size_t count, FILE *stream);
 void exit_error(char *format, ...);
 

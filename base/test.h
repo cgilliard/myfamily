@@ -103,13 +103,13 @@
 			strcat(path, "_");                                                                     \
 			strcat(path, #test);                                                                   \
 			strcat(path, ".fam");                                                                  \
-			remove_directory(path);                                                                \
+			remove_directory(path, false);                                                         \
 			mkdir(path, 0700);                                                                     \
 			Path dir;                                                                              \
 			path_for(&dir, path);                                                                  \
 			path_canonicalize(&dir);                                                               \
 			test_##suite##_##test(&dir);                                                           \
-			remove_directory(path);                                                                \
+			remove_directory(path, false);                                                         \
 		}                                                                                          \
 		u64 cur_slabs = heap_allocator_cur_slabs_allocated(&ha);                                   \
 		if (cur_slabs != 0)                                                                        \

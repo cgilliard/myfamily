@@ -19,15 +19,24 @@
 #include <build/parser.h>
 #include <glob.h>
 #include <stdlib.h>
+#include <string.h>
 #include <toml/toml.h>
 #include <util/proc_executor.h>
 
-void build_libs(const char *base_dir)
+void build_libs(const char *base_dir, const char *config_dir)
 {
 	printf("build libs: %s\n", base_dir);
+	Path build_dir;
+	path_for(&build_dir, base_dir);
+	path_push(&build_dir, "target");
+	path_push(&build_dir, "build");
+	path_canonicalize(&build_dir);
 	Path lib_h;
 	path_for(&lib_h, base_dir);
 	path_push(&lib_h, "lib.h");
+	Path base_path;
+	path_for(&base_path, base_dir);
+	path_canonicalize(&base_path);
 	if (path_exists(&lib_h)) {
 		printf("found lib.h!\n");
 		char **header_list = mymalloc(sizeof(char *) * 10);
@@ -72,12 +81,61 @@ void build_libs(const char *base_dir)
 		}
 
 		printf("types count = %" PRIu64 "\n", vec_size(&types));
+		if (chdir(path_to_string(&build_dir))) {
+			fprintf(stderr, "Could not change directory to the build directory");
+		}
+
 		while (vec_size(&types)) {
 			TypeInfo *next = vec_pop(&types);
 			printf("file to compile: %s\n", next->path);
 			Path next_path;
 			path_for(&next_path, next->path);
 			if (path_exists(&next_path) && !path_is_dir(&next_path)) {
+				remove_directory(path_to_string(&build_dir), true);
+				path_push(&build_dir, path_file_name(&next_path));
+				copy_file(path_to_string(&build_dir), path_to_string(&next_path));
+				path_pop(&build_dir);
+
+				char modules[PATH_MAX];
+				char *file_name = path_file_name(&next_path);
+				strcpy(modules, "");
+				printf("file=%s,base=%s\n", path_to_string(&next_path), path_to_string(&base_path));
+				for (int i = 0; i < 3; i++) {
+					path_pop(&next_path);
+					char *modname = path_file_name(&next_path);
+					printf("file_pop[%i]=%s\n", i, path_to_string(&next_path));
+					if (!strcmp(path_to_string(&next_path), path_to_string(&base_path))) {
+						printf("match\n");
+						break;
+					}
+					if (strlen(path_to_string(&next_path)) < strlen(path_to_string(&base_path))) {
+						exit_error("could not find the base path");
+					}
+
+					strcat(modules, modname);
+					strcat(modules, "_");
+				}
+
+				strcat(modules, file_name);
+
+				int modules_len = strlen(modules);
+				if (modules_len < 3) {
+					exit_error("unexpectedly short name for object file: %s\n", modules);
+				}
+				if (modules[modules_len - 1] != 'c' || modules[modules_len - 2] != '.') {
+					exit_error("expected file to end in .c");
+				}
+				modules[modules_len - 1] = 'o';
+				printf("modules: %s\n", modules);
+				char obj_path[PATH_MAX];
+				strcpy(obj_path, "../objs/");
+				strcat(obj_path, modules);
+
+				char *args[] = { "cc", "-c", "-o", obj_path, "Server.c", NULL };
+				if (execute_process(args)) {
+					exit_error("execution of process '%s' failed", args[0]);
+				}
+
 			} else {
 				exit_error(
 					"Implementation not found. Expected at '%s'.\n", path_to_string(&next_path));
@@ -86,7 +144,7 @@ void build_libs(const char *base_dir)
 	}
 }
 
-int proc_build(const char *base_dir)
+int proc_build(const char *base_dir, const char *config_dir)
 {
 	Path base;
 	path_for(&base, base_dir);
@@ -135,14 +193,19 @@ int proc_build(const char *base_dir)
 				path_push(&target, "objs");
 				if (path_mkdir(&target, 0700))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
+				path_pop(&target);
+				path_push(&target, "build");
+				if (path_mkdir(&target, 0700))
+					exit_error("Could not create directory '%s'.", path_to_string(&target));
 			}
+
+			build_libs(base_dir, config_dir);
 
 			// change to the base directory
-			if (chdir(base_dir)) {
+			printf("chdir %s\n", base_dir);
+			if (chdir(path_to_string(&base))) {
 				fprintf(stderr, "Could not change directory to the project directory");
 			}
-
-			build_libs(base_dir);
 
 			char *args[] = { "cc", "-c", "-o", "target/objs/main.o", "main.c", NULL };
 			if (execute_process(args)) {

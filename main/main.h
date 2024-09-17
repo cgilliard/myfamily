@@ -23,6 +23,7 @@ int real_main(int argc, char **argv);
 	do {                                                                                           \
 		char path[1024];                                                                           \
 		snprintf(path, sizeof(path), "%s/%s", dir, filename);                                      \
+		printf("path=%s\n", path);                                                                 \
 		FILE *f = fopen(path, "wb");                                                               \
 		if (f) {                                                                                   \
 			fwrite(data, 1, size, f);                                                              \
