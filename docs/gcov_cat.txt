@@ -4324,7 +4324,7 @@ Unit_size:
         -:    0:Source:chain_allocator.c
         -:    0:Graph:chain_allocator.gcno
         -:    0:Data:chain_allocator.gcda
-        -:    0:Runs:68
+        -:    0:Runs:69
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4389,9 +4389,9 @@ Unit_size:
         2:   62:}
         -:   63:
         -:   64:// build the using the default heap allocator config
-       52:   65:int build_default_heap_allocator(HeapAllocator *ptr)
+       53:   65:int build_default_heap_allocator(HeapAllocator *ptr)
         -:   66:{
-       52:   67:	return heap_allocator_build_arr(
+       53:   67:	return heap_allocator_build_arr(
         -:   68:		ptr, &__default_hconfig_, __default_hdpc_arr_, __default_hdpc_arr_size);
         -:   69:}
         -:   70:
@@ -4447,30 +4447,30 @@ Unit_size:
         1:  120:		heap_allocator_cleanup(__global_sync_allocator);
         1:  121:}
         -:  122:
-       30:  123:void chain_guard_cleanup(ChainGuard *ptr)
+       31:  123:void chain_guard_cleanup(ChainGuard *ptr)
         -:  124:{
-       30:  125:	__thread_local_chain_allocator_index--;
-       30:  126:}
+       31:  125:	__thread_local_chain_allocator_index--;
+       31:  126:}
         -:  127:
-       33:  128:ChainGuard chain_guard(ChainConfig *config)
+       34:  128:ChainGuard chain_guard(ChainConfig *config)
         -:  129:{
-       33:  130:	if (__thread_local_chain_allocator_index >= MAX_CHAIN_ALLOCATOR_DEPTH)
+       34:  130:	if (__thread_local_chain_allocator_index >= MAX_CHAIN_ALLOCATOR_DEPTH)
     #####:  131:		panic("too many chain allocators");
         -:  132:
-       33:  133:	ChainGuardPtr ret
-       33:  134:		= { __thread_local_chain_allocator_index, config->ha, config->is_sync, config->lock };
+       34:  133:	ChainGuardPtr ret
+       34:  134:		= { __thread_local_chain_allocator_index, config->ha, config->is_sync, config->lock };
         -:  135:
-       33:  136:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].ha = config->ha;
-       33:  137:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].is_sync = config->is_sync;
-       33:  138:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].lock = config->lock;
+       34:  136:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].ha = config->ha;
+       34:  137:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].is_sync = config->is_sync;
+       34:  138:	__thread_local_chain_allocator[__thread_local_chain_allocator_index].lock = config->lock;
         -:  139:
-       33:  140:	__thread_local_chain_allocator_index++;
-       33:  141:	return ret;
+       34:  140:	__thread_local_chain_allocator_index++;
+       34:  141:	return ret;
         -:  142:}
         -:  143:
-      274:  144:int chain_malloc(FatPtr *ptr, u64 size)
+      276:  144:int chain_malloc(FatPtr *ptr, u64 size)
         -:  145:{
-      274:  146:	if (__thread_local_chain_allocator_index == 0) {
+      276:  146:	if (__thread_local_chain_allocator_index == 0) {
         -:  147:		// thread local allocator has not been initialized. Create it
         -:  148:		// now.
        25:  149:		HeapAllocator *ha = mymalloc(sizeof(HeapAllocator));
@@ -4487,76 +4487,76 @@ Unit_size:
        25:  160:		__thread_local_chain_allocator[0].is_sync = false;
        25:  161:		__thread_local_chain_allocator_index++;
         -:  162:	}
-      274:  163:	if (size == 0)
+      276:  163:	if (size == 0)
     #####:  164:		return -1;
         -:  165:
-      274:  166:	u64 index = __thread_local_chain_allocator_index - 1;
-      274:  167:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+      276:  166:	u64 index = __thread_local_chain_allocator_index - 1;
+      276:  167:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  168:
         -:  169:	int ret;
         -:  170:	{
-      274:  171:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-      274:  172:		if (is_sync)
+      276:  171:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+      276:  172:		if (is_sync)
         5:  173:			lg = lock(__thread_local_chain_allocator[index].lock);
         -:  174:
-      274:  175:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, ptr);
+      276:  175:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, ptr);
         -:  176:	}
         -:  177:
-      274:  178:	return ret;
+      276:  178:	return ret;
         -:  179:}
-       31:  180:int chain_realloc(FatPtr *dst, FatPtr *src, u64 size)
+       32:  180:int chain_realloc(FatPtr *dst, FatPtr *src, u64 size)
         -:  181:{
-       31:  182:	if (__thread_local_chain_allocator_index == 0) {
+       32:  182:	if (__thread_local_chain_allocator_index == 0) {
     #####:  183:		return -1;
         -:  184:	}
-       31:  185:	if (size == 0) {
+       32:  185:	if (size == 0) {
     #####:  186:		errno = EINVAL;
     #####:  187:		return -1;
         -:  188:	}
-       31:  189:	u64 index = __thread_local_chain_allocator_index - 1;
-       31:  190:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+       32:  189:	u64 index = __thread_local_chain_allocator_index - 1;
+       32:  190:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  191:
         -:  192:	int ret;
         -:  193:	{
-       31:  194:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-       31:  195:		if (is_sync)
+       32:  194:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+       32:  195:		if (is_sync)
     #####:  196:			lg = lock(__thread_local_chain_allocator[index].lock);
         -:  197:
-       31:  198:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, dst);
-       31:  199:		if (!ret) {
-       31:  200:			void *src_data = fat_ptr_data(src);
-       31:  201:			void *dst_data = fat_ptr_data(dst);
-       31:  202:			u64 len = fat_ptr_len(src);
-       31:  203:			memcpy(dst_data, src_data, len);
-       31:  204:			ret = chain_free(src);
+       32:  198:		ret = heap_allocator_allocate(__thread_local_chain_allocator[index].ha, size, dst);
+       32:  199:		if (!ret) {
+       32:  200:			void *src_data = fat_ptr_data(src);
+       32:  201:			void *dst_data = fat_ptr_data(dst);
+       32:  202:			u64 len = fat_ptr_len(src);
+       32:  203:			memcpy(dst_data, src_data, len);
+       32:  204:			ret = chain_free(src);
         -:  205:		}
         -:  206:	}
         -:  207:
-       31:  208:	return ret;
+       32:  208:	return ret;
         -:  209:}
-      268:  210:int chain_free(FatPtr *ptr)
+      271:  210:int chain_free(FatPtr *ptr)
         -:  211:{
-      268:  212:	if (__thread_local_chain_allocator_index == 0) {
+      271:  212:	if (__thread_local_chain_allocator_index == 0) {
     #####:  213:		errno = ERANGE;
     #####:  214:		return -1;
         -:  215:	}
-      268:  216:	u64 index = __thread_local_chain_allocator_index - 1;
-      268:  217:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
+      271:  216:	u64 index = __thread_local_chain_allocator_index - 1;
+      271:  217:	bool is_sync = __thread_local_chain_allocator[index].is_sync;
         -:  218:
         -:  219:	int ret;
         -:  220:	{
-      268:  221:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
-      268:  222:		if (is_sync)
+      271:  221:		LockGuard lg = LOCK_GUARD_CLEANUP_SAFE;
+      271:  222:		if (is_sync)
         4:  223:			lg = lock(__thread_local_chain_allocator[index].lock);
         -:  224:
-      268:  225:		ret = heap_allocator_free(__thread_local_chain_allocator[index].ha, ptr);
+      271:  225:		ret = heap_allocator_free(__thread_local_chain_allocator[index].ha, ptr);
         -:  226:	}
-      268:  227:	return ret;
+      271:  227:	return ret;
         -:  228:}
         -:    0:Source:heap.c
         -:    0:Graph:heap.gcno
         -:    0:Data:heap.gcda
-        -:    0:Runs:68
+        -:    0:Runs:69
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4614,20 +4614,20 @@ Unit_size:
         -:   55:bool __debug_build_allocator_malloc_fail7 = false;
         -:   56:bool __debug_build_allocator_malloc_fail8 = false;
         -:   57:
-      549:   58:void *do_malloc(size_t size)
+      557:   58:void *do_malloc(size_t size)
         -:   59:{
-      549:   60:	__malloc_count += 1;
-      549:   61:	void *ret = malloc(size);
+      557:   60:	__malloc_count += 1;
+      557:   61:	void *ret = malloc(size);
         -:   62:	// printf("malloc %zu [%p (%llu)]\n", size, ret, __malloc_count);
-      549:   63:	return ret;
+      557:   63:	return ret;
         -:   64:}
         -:   65:
-      357:   66:void do_free(void *ptr)
+      365:   66:void do_free(void *ptr)
         -:   67:{
-      357:   68:	__free_count += 1;
+      365:   68:	__free_count += 1;
         -:   69:	// printf("free %p (%llu)\n", ptr, __free_count);
-      357:   70:	free(ptr);
-      357:   71:}
+      365:   70:	free(ptr);
+      365:   71:}
         -:   72:
        35:   73:void *do_realloc(void *ptr, size_t size)
         -:   74:{
@@ -4636,14 +4636,14 @@ Unit_size:
        35:   77:	return ret;
         -:   78:}
         -:   79:
-      222:   80:void *fat_ptr_data(const FatPtr *ptr)
+      224:   80:void *fat_ptr_data(const FatPtr *ptr)
         -:   81:{
-      222:   82:	return ptr->data;
+      224:   82:	return ptr->data;
         -:   83:}
         -:   84:
-       43:   85:u64 fat_ptr_len(const FatPtr *ptr)
+       44:   85:u64 fat_ptr_len(const FatPtr *ptr)
         -:   86:{
-       43:   87:	return ptr->len;
+       44:   87:	return ptr->len;
         -:   88:}
         -:   89:
         5:   90:u64 fat_ptr_id(const FatPtr *ptr)
@@ -4651,77 +4651,77 @@ Unit_size:
         5:   92:	return ptr->id;
         -:   93:}
         -:   94:
-      142:   95:int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs, bool last_is_uint_max)
+      144:   95:int heap_allocator_init_free_list(HeapData *hd, u64 index, u32 slabs, bool last_is_uint_max)
         -:   96:{
-      142:   97:	hd->data[index] = NULL; // set to NULL for cleanup consistency
+      144:   97:	hd->data[index] = NULL; // set to NULL for cleanup consistency
         -:   98:
         -:   99:	// allocate memory for slabs
-      142:  100:	if (!__debug_build_allocator_malloc_fail4)
-      140:  101:		hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
-      142:  102:	if (hd->data[index] == NULL)
+      144:  100:	if (!__debug_build_allocator_malloc_fail4)
+      142:  101:		hd->data[index] = do_malloc(hd->hdp.config.slab_size * slabs);
+      144:  102:	if (hd->data[index] == NULL)
         2:  103:		return -1;
         -:  104:
-      140:  105:	void *tmp = NULL;
+      142:  105:	void *tmp = NULL;
         -:  106:
         -:  107:	// allocate / or reallocate the freelist
-      140:  108:	if (!__debug_build_allocator_malloc_fail5) {
-      138:  109:		if (index == 0)
-      121:  110:			tmp = do_malloc(sizeof(u32) * slabs);
+      142:  108:	if (!__debug_build_allocator_malloc_fail5) {
+      140:  109:		if (index == 0)
+      123:  110:			tmp = do_malloc(sizeof(u32) * slabs);
         -:  111:		else {
        17:  112:			tmp = do_realloc(hd->free_list, sizeof(u32) * (hd->cur_slabs + slabs));
         -:  113:		}
         -:  114:	}
         -:  115:
-      140:  116:	if (!tmp) {
+      142:  116:	if (!tmp) {
         2:  117:		do_free(hd->data[index]);
         2:  118:		return -1;
         -:  119:	}
         -:  120:
-      138:  121:	hd->free_list = tmp;
+      140:  121:	hd->free_list = tmp;
         -:  122:
         -:  123:	// initialize the values of the free list.
-      138:  124:	u32 offset = index * hd->hdp.config.slabs_per_resize;
-     1631:  125:	for (u64 i = 0; i < slabs; i++) {
-     1493:  126:		if ((i == (slabs - 1)) && last_is_uint_max)
-      137:  127:			hd->free_list[i + offset] = UINT32_MAX;
+      140:  124:	u32 offset = index * hd->hdp.config.slabs_per_resize;
+     1653:  125:	for (u64 i = 0; i < slabs; i++) {
+     1513:  126:		if ((i == (slabs - 1)) && last_is_uint_max)
+      139:  127:			hd->free_list[i + offset] = UINT32_MAX;
         -:  128:		else
-     1356:  129:			hd->free_list[i + offset] = offset + i + 1;
+     1374:  129:			hd->free_list[i + offset] = offset + i + 1;
         -:  130:	}
         -:  131:
-      138:  132:	return 0;
+      140:  132:	return 0;
         -:  133:}
         -:  134:
         -:  135:// compare function used for sorting.
-     5015:  136:int heap_data_compare(const void *p1, const void *p2)
+     5115:  136:int heap_data_compare(const void *p1, const void *p2)
         -:  137:{
-     5015:  138:	int ret = 0;
+     5115:  138:	int ret = 0;
         -:  139:
-     5015:  140:	HeapData d1 = *(HeapData *)p1;
-     5015:  141:	HeapData d2 = *(HeapData *)p2;
+     5115:  140:	HeapData d1 = *(HeapData *)p1;
+     5115:  141:	HeapData d2 = *(HeapData *)p2;
         -:  142:
-     5015:  143:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
+     5115:  143:	if (d1.hdp.config.slab_size > d2.hdp.config.slab_size)
         1:  144:		ret = 1;
-     5014:  145:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
-     5013:  146:		ret = -1;
+     5114:  145:	else if (d1.hdp.config.slab_size < d2.hdp.config.slab_size)
+     5113:  146:		ret = -1;
         -:  147:
-     5015:  148:	return ret;
+     5115:  148:	return ret;
         -:  149:}
         -:  150:
         -:  151:// initialize the heap data params
-     2035:  152:int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp, u64 index)
+     2075:  152:int heap_allocator_init_hdp(HeapAllocator *ptr, HeapDataParamsConfig *hdp, u64 index)
         -:  153:{
         -:  154:
         -:  155:	// set some value in case of a failure below such that cleanup can
         -:  156:	// succeed
-     2035:  157:	int ret = 0;
-     2035:  158:	ptr->impl->hd_arr[index].hdp.config = *hdp;
-     2035:  159:	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
-     2035:  160:	ptr->impl->hd_arr[index].cur_slabs = 0;
-     2035:  161:	ptr->impl->hd_arr[index].cur_slabs_allocated = 0;
-     2035:  162:	ptr->impl->hd_arr[index].count = ptr->impl->hd_arr[index].hdp.config.initial_chunks;
+     2075:  157:	int ret = 0;
+     2075:  158:	ptr->impl->hd_arr[index].hdp.config = *hdp;
+     2075:  159:	ptr->impl->hd_arr[index].hdp.free_list_head = 0;
+     2075:  160:	ptr->impl->hd_arr[index].cur_slabs = 0;
+     2075:  161:	ptr->impl->hd_arr[index].cur_slabs_allocated = 0;
+     2075:  162:	ptr->impl->hd_arr[index].count = ptr->impl->hd_arr[index].hdp.config.initial_chunks;
         -:  163:
         -:  164:	// if we have initial chunks, initialize them
-     2035:  165:	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks) {
+     2075:  165:	if (ptr->impl->hd_arr[index].hdp.config.initial_chunks) {
        23:  166:		ptr->impl->hd_arr[index].data = NULL;
         -:  167:
         -:  168:		// try to allocate space for the data for this size
@@ -4749,48 +4749,48 @@ Unit_size:
         2:  190:				ret = -1;
         -:  191:		}
         -:  192:	} else
-     2012:  193:		ptr->impl->hd_arr[index].data = NULL;
-     2034:  194:	return ret;
+     2052:  193:		ptr->impl->hd_arr[index].data = NULL;
+     2074:  194:	return ret;
         -:  195:}
         -:  196:
-       78:  197:int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
+       79:  197:int heap_allocator_build_arr(HeapAllocator *ptr, HeapAllocatorConfig *config,
         -:  198:	HeapDataParamsConfig arr[], u64 heap_data_params_count)
         -:  199:{
         -:  200:	// check inputs
-       78:  201:	if (ptr == NULL || config == NULL || heap_data_params_count >= 256) {
+       79:  201:	if (ptr == NULL || config == NULL || heap_data_params_count >= 256) {
         1:  202:		errno = EINVAL;
         1:  203:		return -1;
         -:  204:	}
         -:  205:
         -:  206:	// allocate the HeapAllocatorImpl
-       77:  207:	if (!__debug_build_allocator_malloc_fail1)
-       76:  208:		ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
-       77:  209:	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
+       78:  207:	if (!__debug_build_allocator_malloc_fail1)
+       77:  208:		ptr->impl = do_malloc(sizeof(HeapAllocatorImpl));
+       78:  209:	if (ptr->impl == NULL || __debug_build_allocator_malloc_fail1)
         1:  210:		return -1;
         -:  211:
-       76:  212:	ptr->impl->cur_malloc_slabs_allocated = 0;
-       76:  213:	ptr->impl->hd_size = 0;
+       77:  212:	ptr->impl->cur_malloc_slabs_allocated = 0;
+       77:  213:	ptr->impl->hd_size = 0;
         -:  214:
         -:  215:	// copy the config
-       76:  216:	ptr->impl->config = *config;
+       77:  216:	ptr->impl->config = *config;
         -:  217:
         -:  218:	// allocate heap data array
-       76:  219:	ptr->impl->hd_arr = NULL;
-       76:  220:	if (!__debug_build_allocator_malloc_fail2)
-       75:  221:		ptr->impl->hd_arr = do_malloc(sizeof(HeapData) * heap_data_params_count);
-       76:  222:	if (ptr->impl->hd_arr == NULL || __debug_build_allocator_malloc_fail2) {
+       77:  219:	ptr->impl->hd_arr = NULL;
+       77:  220:	if (!__debug_build_allocator_malloc_fail2)
+       76:  221:		ptr->impl->hd_arr = do_malloc(sizeof(HeapData) * heap_data_params_count);
+       77:  222:	if (ptr->impl->hd_arr == NULL || __debug_build_allocator_malloc_fail2) {
         1:  223:		heap_allocator_cleanup(ptr);
         1:  224:		return -1;
         -:  225:	}
-       75:  226:	ptr->impl->hd_size = heap_data_params_count;
+       76:  226:	ptr->impl->hd_size = heap_data_params_count;
         -:  227:
         -:  228:	// iterate through specified heap data params
-     2107:  229:	for (u64 i = 0; i < heap_data_params_count; i++) {
-     2036:  230:		HeapDataParamsConfig hdp = arr[i];
-     2036:  231:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
-     2036:  232:		ptr->impl->hd_arr[i].data = NULL;
-     2036:  233:		if ((__debug_build_allocator_malloc_fail3 && i > 0)
-     2035:  234:			|| heap_allocator_init_hdp(ptr, &hdp, i)) {
+     2148:  229:	for (u64 i = 0; i < heap_data_params_count; i++) {
+     2076:  230:		HeapDataParamsConfig hdp = arr[i];
+     2076:  231:		ptr->impl->hd_arr[i].count = 0; // init to 0 for safe cleanup
+     2076:  232:		ptr->impl->hd_arr[i].data = NULL;
+     2076:  233:		if ((__debug_build_allocator_malloc_fail3 && i > 0)
+     2075:  234:			|| heap_allocator_init_hdp(ptr, &hdp, i)) {
         4:  235:			ptr->impl->hd_size = i; // update for cleanup, others
         -:  236:									// did not get allocated
         4:  237:			if (ptr->impl->hd_arr[i].data) {
@@ -4801,30 +4801,30 @@ Unit_size:
         -:  242:		}
         -:  243:	}
         -:  244:
-       71:  245:	if (heap_data_params_count) {
-       69:  246:		qsort(ptr->impl->hd_arr, heap_data_params_count, sizeof(HeapData), heap_data_compare);
+       72:  245:	if (heap_data_params_count) {
+       70:  246:		qsort(ptr->impl->hd_arr, heap_data_params_count, sizeof(HeapData), heap_data_compare);
         -:  247:	}
         -:  248:
         -:  249:	// check invalid configurations
-       71:  250:	u64 last_size = 0;
-     2100:  251:	for (u64 i = 0; i < heap_data_params_count; i++) {
-     2031:  252:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == 0) {
+       72:  250:	u64 last_size = 0;
+     2141:  251:	for (u64 i = 0; i < heap_data_params_count; i++) {
+     2071:  252:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == 0) {
         -:  253:			// no 0 sized slabs allowed
         1:  254:			errno = EINVAL;
         1:  255:			heap_allocator_cleanup(ptr);
         1:  256:			return -1;
         -:  257:		}
         -:  258:		// note: logic correct because array is sorted.
-     2030:  259:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == last_size) {
+     2070:  259:		if (ptr->impl->hd_arr[i].hdp.config.slab_size == last_size) {
         -:  260:			// Duplicate slab_size
         1:  261:			errno = EEXIST;
         1:  262:			heap_allocator_cleanup(ptr);
         1:  263:			return -1;
         -:  264:		}
-     2029:  265:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
+     2069:  265:		last_size = ptr->impl->hd_arr[i].hdp.config.slab_size;
         -:  266:	}
         -:  267:
-       69:  268:	return 0;
+       70:  268:	return 0;
         -:  269:}
         -:  270:
        26:  271:int heap_allocator_build(
@@ -4851,140 +4851,140 @@ Unit_size:
         -:  292:}
         -:  293:
         -:  294:// binary search for the correct slab size
-      695:  295:int heap_allocator_index(HeapAllocator *ptr, u64 size)
+      698:  295:int heap_allocator_index(HeapAllocator *ptr, u64 size)
         -:  296:{
-      695:  297:	int ret = -1;
-      695:  298:	if (ptr->impl->hd_size == 0)
+      698:  297:	int ret = -1;
+      698:  298:	if (ptr->impl->hd_size == 0)
         2:  299:		return ret;
         -:  300:
-      693:  301:	int left = 0;
-      693:  302:	int right = ptr->impl->hd_size - 1;
+      696:  301:	int left = 0;
+      696:  302:	int right = ptr->impl->hd_size - 1;
         -:  303:
-     2230:  304:	while (left <= right) {
-     2027:  305:		int mid = left + (right - left) / 2;
-     2027:  306:		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
-     2027:  307:		if (slab_size == size) {
-      490:  308:			ret = mid;
-      490:  309:			break;
-     1537:  310:		} else if (slab_size > size)
-     1168:  311:			right = mid - 1;
+     2248:  304:	while (left <= right) {
+     2043:  305:		int mid = left + (right - left) / 2;
+     2043:  306:		u64 slab_size = ptr->impl->hd_arr[mid].hdp.config.slab_size;
+     2043:  307:		if (slab_size == size) {
+      491:  308:			ret = mid;
+      491:  309:			break;
+     1552:  310:		} else if (slab_size > size)
+     1178:  311:			right = mid - 1;
         -:  312:		else
-      369:  313:			left = mid + 1;
+      374:  313:			left = mid + 1;
         -:  314:	}
         -:  315:
-      693:  316:	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1) {
-      191:  317:		return right + 1;
+      696:  316:	if (ret == -1 && right + 1 <= ptr->impl->hd_size - 1) {
+      193:  317:		return right + 1;
         -:  318:	}
         -:  319:
-      502:  320:	return ret;
+      503:  320:	return ret;
         -:  321:}
         -:  322:
-      127:  323:int heap_data_resize(u64 index, HeapData *hd)
+      129:  323:int heap_data_resize(u64 index, HeapData *hd)
         -:  324:{
         -:  325:	// check that we can resize this hdp
-      127:  326:	if (hd->cur_slabs < hd->hdp.config.max_slabs) {
+      129:  326:	if (hd->cur_slabs < hd->hdp.config.max_slabs) {
         -:  327:		// calculate the new slabs
-      120:  328:		u32 nslabs_count = hd->hdp.config.slabs_per_resize + hd->cur_slabs;
-      120:  329:		if (nslabs_count > hd->hdp.config.max_slabs)
+      122:  328:		u32 nslabs_count = hd->hdp.config.slabs_per_resize + hd->cur_slabs;
+      122:  329:		if (nslabs_count > hd->hdp.config.max_slabs)
         2:  330:			nslabs_count = hd->hdp.config.max_slabs;
         -:  331:
         -:  332:		// determine slabs to allocate
-      120:  333:		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
+      122:  333:		u32 slabs_to_alloc = nslabs_count - hd->cur_slabs;
         -:  334:
         -:  335:		// attempt to allocate
-      120:  336:		void *tmp = NULL;
-      120:  337:		if (!__debug_build_allocator_malloc_fail7) {
-      119:  338:			if (hd->data)
+      122:  336:		void *tmp = NULL;
+      122:  337:		if (!__debug_build_allocator_malloc_fail7) {
+      121:  338:			if (hd->data)
        18:  339:				tmp = do_realloc(hd->data, (hd->count + 1) * sizeof(void *));
         -:  340:			else
-      101:  341:				tmp = do_malloc((hd->count + 1) * sizeof(void **));
+      103:  341:				tmp = do_malloc((hd->count + 1) * sizeof(void **));
         -:  342:		}
         -:  343:
-      120:  344:		if (tmp == NULL)
+      122:  344:		if (tmp == NULL)
         1:  345:			return -1;
-      119:  346:		hd->data = tmp;
+      121:  346:		hd->data = tmp;
         -:  347:
         -:  348:		// initialize the new part of the free list
-      119:  349:		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc, true))
+      121:  349:		if (heap_allocator_init_free_list(hd, hd->count, slabs_to_alloc, true))
         2:  350:			return -1;
-      117:  351:		hd->hdp.free_list_head = hd->cur_slabs;
-      117:  352:		hd->cur_slabs = nslabs_count;
-      117:  353:		hd->count += 1;
-      117:  354:		return 0;
+      119:  351:		hd->hdp.free_list_head = hd->cur_slabs;
+      119:  352:		hd->cur_slabs = nslabs_count;
+      119:  353:		hd->count += 1;
+      119:  354:		return 0;
         -:  355:	}
         7:  356:	return -1;
         -:  357:}
         -:  358:
-      697:  359:int heap_data_allocate(u64 index, HeapData *hd, FatPtr *fptr)
+      700:  359:int heap_data_allocate(u64 index, HeapData *hd, FatPtr *fptr)
         -:  360:{
-      697:  361:	if (hd->cur_slabs == 0) {
+      700:  361:	if (hd->cur_slabs == 0) {
         -:  362:		// this hd initially had 0 slabs
         -:  363:		// resize it
-      102:  364:		if (heap_data_resize(index, hd))
+      104:  364:		if (heap_data_resize(index, hd))
         1:  365:			return -1;
         -:  366:	}
         -:  367:
         -:  368:	// no more slabs, return error
-      696:  369:	if (hd->hdp.free_list_head == UINT32_MAX)
+      699:  369:	if (hd->hdp.free_list_head == UINT32_MAX)
        24:  370:		return -1;
         -:  371:
         -:  372:	// get next free slab
-      672:  373:	u64 id = hd->hdp.free_list_head;
+      675:  373:	u64 id = hd->hdp.free_list_head;
         -:  374:
         -:  375:	// update free list head
-      672:  376:	hd->hdp.free_list_head = hd->free_list[id];
+      675:  376:	hd->hdp.free_list_head = hd->free_list[id];
         -:  377:
         -:  378:	// update with the specific index (differing slab sizes)
-      672:  379:	fptr->id = id | (index << 56);
-      672:  380:	fptr->len = hd->hdp.config.slab_size;
+      675:  379:	fptr->id = id | (index << 56);
+      675:  380:	fptr->len = hd->hdp.config.slab_size;
         -:  381:
-      672:  382:	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
-      672:  383:	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
+      675:  382:	u64 heap_data_index = id / hd->hdp.config.slabs_per_resize;
+      675:  383:	u64 offset_mod = id % hd->hdp.config.slabs_per_resize;
         -:  384:
         -:  385:	// set the data of the fptr
-      672:  386:	fptr->data = hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
-      672:  387:	hd->cur_slabs_allocated++;
+      675:  386:	fptr->data = hd->data[heap_data_index] + offset_mod * hd->hdp.config.slab_size;
+      675:  387:	hd->cur_slabs_allocated++;
         -:  388:
-      672:  389:	return 0;
+      675:  389:	return 0;
         -:  390:}
         -:  391:
         -:  392:// free data in this HeapData
-      385:  393:int heap_data_free(u64 index, HeapData *hd, FatPtr *fptr)
+      388:  393:int heap_data_free(u64 index, HeapData *hd, FatPtr *fptr)
         -:  394:{
-      385:  395:	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
+      388:  395:	u64 rel = fptr->id & 0x00FFFFFFFFFFFFFF; // Extract the relative ID
         -:  396:
         -:  397:	// if this is invalid return an error
-      385:  398:	if (rel >= hd->cur_slabs)
+      388:  398:	if (rel >= hd->cur_slabs)
         1:  399:		return -1;
         -:  400:
         -:  401:	// update head and rest of the list
-      384:  402:	u64 head = hd->hdp.free_list_head;
-      384:  403:	hd->hdp.free_list_head = rel;
-      384:  404:	hd->free_list[rel] = head;
+      387:  402:	u64 head = hd->hdp.free_list_head;
+      387:  403:	hd->hdp.free_list_head = rel;
+      387:  404:	hd->free_list[rel] = head;
         -:  405:
-      384:  406:	hd->cur_slabs_allocated--;
+      387:  406:	hd->cur_slabs_allocated--;
         -:  407:
-      384:  408:	return 0;
+      387:  408:	return 0;
         -:  409:}
         -:  410:
-       23:  411:u64 heap_allocator_cur_slabs_allocated(HeapAllocator *ptr)
+       24:  411:u64 heap_allocator_cur_slabs_allocated(HeapAllocator *ptr)
         -:  412:{
-       23:  413:	u64 ret = ptr->impl->cur_malloc_slabs_allocated;
-      943:  414:	for (int i = 0; i < ptr->impl->hd_size; i++) {
-      920:  415:		ret += ptr->impl->hd_arr[i].cur_slabs_allocated;
+       24:  413:	u64 ret = ptr->impl->cur_malloc_slabs_allocated;
+      984:  414:	for (int i = 0; i < ptr->impl->hd_size; i++) {
+      960:  415:		ret += ptr->impl->hd_arr[i].cur_slabs_allocated;
         -:  416:	}
-       23:  417:	return ret;
+       24:  417:	return ret;
         -:  418:}
         -:  419:
         -:  420:// main allocation function
-      695:  421:int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr)
+      698:  421:int heap_allocator_allocate(HeapAllocator *ptr, u64 size, FatPtr *fptr)
         -:  422:{
-      695:  423:	int ret = -1;
+      698:  423:	int ret = -1;
         -:  424:	// determine the index via binary search
-      695:  425:	int index = heap_allocator_index(ptr, size);
+      698:  425:	int index = heap_allocator_index(ptr, size);
         -:  426:
         -:  427:	// if this index is not found (too big) fall back to malloc
-      695:  428:	if (index < 0) {
+      698:  428:	if (index < 0) {
        14:  429:		if (!ptr->impl->config.no_malloc) {
        12:  430:			fptr->data = NULL;
        12:  431:			if (!__debug_build_allocator_malloc_fail6) {
@@ -5001,9 +5001,9 @@ Unit_size:
         -:  442:			}
         -:  443:		}
         -:  444:	} else {
-      681:  445:		HeapData *hd = &ptr->impl->hd_arr[index];
-      681:  446:		ret = heap_data_allocate(index, hd, fptr);
-      681:  447:		if (ret) {
+      684:  445:		HeapData *hd = &ptr->impl->hd_arr[index];
+      684:  446:		ret = heap_data_allocate(index, hd, fptr);
+      684:  447:		if (ret) {
         -:  448:			// there are no more slabs. Try to resize
        25:  449:			if (!heap_data_resize(index, hd)) {
         -:  450:				// successful resize, allocate should always
@@ -5028,17 +5028,17 @@ Unit_size:
         -:  469:	}
         -:  470:
         -:  471:	// if zeroed is configured set all memory of allocated slabs to 0.
-      695:  472:	if (!ret && ptr->impl->config.zeroed) {
+      698:  472:	if (!ret && ptr->impl->config.zeroed) {
        44:  473:		memset(fptr->data, 0, fptr->len);
         -:  474:	}
         -:  475:
-      695:  476:	return ret;
+      698:  476:	return ret;
         -:  477:}
         -:  478:
-      400:  479:int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr)
+      403:  479:int heap_allocator_free(HeapAllocator *ptr, FatPtr *fptr)
         -:  480:{
-      400:  481:	int ret = 0;
-      400:  482:	if (fptr->id == UINT64_MAX) {
+      403:  481:	int ret = 0;
+      403:  482:	if (fptr->id == UINT64_MAX) {
         -:  483:		// malloc allocated
         -:  484:
        14:  485:		if (fptr->data) {
@@ -5050,58 +5050,58 @@ Unit_size:
        14:  491:		ret = 0;
         -:  492:	} else {
         -:  493:
-      386:  494:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
+      389:  494:		u64 index = (fptr->id >> 56) & 0xFF; // Extract the index
         -:  495:
-      386:  496:		if (index >= ptr->impl->hd_size) {
+      389:  496:		if (index >= ptr->impl->hd_size) {
         1:  497:			errno = EINVAL;
         1:  498:			ret = -1; // invalid index
         -:  499:		} else {
-      385:  500:			HeapData *hd = &ptr->impl->hd_arr[index];
-      385:  501:			ret = heap_data_free(index, hd, fptr);
+      388:  500:			HeapData *hd = &ptr->impl->hd_arr[index];
+      388:  501:			ret = heap_data_free(index, hd, fptr);
         -:  502:		}
         -:  503:	}
         -:  504:
-      400:  505:	if (!ret && ptr->impl->config.zeroed) {
+      403:  505:	if (!ret && ptr->impl->config.zeroed) {
         1:  506:		memset(fptr->data, 0, fptr->len);
         -:  507:	}
         -:  508:
-      400:  509:	return ret;
+      403:  509:	return ret;
         -:  510:}
         -:  511:
-       52:  512:int heap_allocator_cleanup(HeapAllocator *ptr)
+       53:  512:int heap_allocator_cleanup(HeapAllocator *ptr)
         -:  513:{
         -:  514:	// check for impl and deallocate
-       52:  515:	if (ptr->impl) {
-      996:  516:		for (u32 i = 0; i < ptr->impl->hd_size; i++) {
-      948:  517:			if (ptr->impl->hd_arr[i].count) {
+       53:  515:	if (ptr->impl) {
+     1037:  516:		for (u32 i = 0; i < ptr->impl->hd_size; i++) {
+      988:  517:			if (ptr->impl->hd_arr[i].count) {
         -:  518:				// check that it's not an unallocated heap data
-       78:  519:				if (ptr->impl->hd_arr[i].free_list) {
-       78:  520:					do_free(ptr->impl->hd_arr[i].free_list);
-       78:  521:					ptr->impl->hd_arr[i].free_list = NULL;
+       80:  519:				if (ptr->impl->hd_arr[i].free_list) {
+       80:  520:					do_free(ptr->impl->hd_arr[i].free_list);
+       80:  521:					ptr->impl->hd_arr[i].free_list = NULL;
         -:  522:				}
-      166:  523:				for (u64 j = 0; j < ptr->impl->hd_arr[i].count; j++) {
-       88:  524:					do_free(ptr->impl->hd_arr[i].data[j]);
+      170:  523:				for (u64 j = 0; j < ptr->impl->hd_arr[i].count; j++) {
+       90:  524:					do_free(ptr->impl->hd_arr[i].data[j]);
         -:  525:				}
-       78:  526:				if (ptr->impl->hd_arr[i].data) {
-       78:  527:					do_free(ptr->impl->hd_arr[i].data);
-       78:  528:					ptr->impl->hd_arr[i].data = NULL;
+       80:  526:				if (ptr->impl->hd_arr[i].data) {
+       80:  527:					do_free(ptr->impl->hd_arr[i].data);
+       80:  528:					ptr->impl->hd_arr[i].data = NULL;
         -:  529:				}
         -:  530:			}
         -:  531:		}
         -:  532:
-       48:  533:		if (ptr->impl->hd_arr) {
-       47:  534:			do_free(ptr->impl->hd_arr);
-       47:  535:			ptr->impl->hd_arr = NULL;
+       49:  533:		if (ptr->impl->hd_arr) {
+       48:  534:			do_free(ptr->impl->hd_arr);
+       48:  535:			ptr->impl->hd_arr = NULL;
         -:  536:		}
-       48:  537:		do_free(ptr->impl);
-       48:  538:		ptr->impl = NULL;
+       49:  537:		do_free(ptr->impl);
+       49:  538:		ptr->impl = NULL;
         -:  539:	}
-       52:  540:	return 0;
+       53:  540:	return 0;
         -:  541:}
         -:    0:Source:lock.c
         -:    0:Graph:lock.gcno
         -:    0:Data:lock.gcda
-        -:    0:Runs:68
+        -:    0:Runs:69
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5199,13 +5199,13 @@ Unit_size:
        15:   95:	return ret;
         -:   96:}
         -:   97:
-      578:   98:void Lockguard_cleanup(LockGuardPtr *ptr) {
-      578:   99:	if (ptr && ptr->ref) {
+      584:   98:void Lockguard_cleanup(LockGuardPtr *ptr) {
+      584:   99:	if (ptr && ptr->ref) {
        14:  100:		atomic_exchange(&ptr->ref->is_locked, false);
        14:  101:		pthread_mutex_unlock(&ptr->ref->lock);
        14:  102:		delete_active_lock(ptr->ref);
         -:  103:	}
-      578:  104:}
+      584:  104:}
         -:  105:
         3:  106:void Lock_mark_poisoned() {
         3:  107:	if (__active_lock_count_) {
@@ -5257,7 +5257,7 @@ Unit_size:
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:68
+        -:    0:Runs:69
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5363,21 +5363,21 @@ Unit_size:
         -:  103:}
         -:  104:
         -:  105:// Function to recursively remove a directory and its contents
-       46:  106:int remove_directory(const char *path)
+       48:  106:int remove_directory(const char *path)
         -:  107:{
         -:  108:	struct dirent *entry;
-       46:  109:	DIR *dir = opendir(path);
+       48:  109:	DIR *dir = opendir(path);
         -:  110:
-       46:  111:	if (dir == NULL) {
-       23:  112:		return -1;
+       48:  111:	if (dir == NULL) {
+       24:  112:		return -1;
         -:  113:	}
         -:  114:
-       70:  115:	while ((entry = readdir(dir)) != NULL) {
+       73:  115:	while ((entry = readdir(dir)) != NULL) {
         -:  116:		char full_path[PATH_MAX];
         -:  117:
         -:  118:		// Skip the special entries "." and ".."
-       47:  119:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-       46:  120:			continue;
+       49:  119:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+       48:  120:			continue;
         -:  121:		}
         -:  122:
         -:  123:		// Construct the full path to the file/directory
@@ -5406,15 +5406,15 @@ Unit_size:
         -:  146:		}
         -:  147:	}
         -:  148:
-       23:  149:	closedir(dir);
+       24:  149:	closedir(dir);
         -:  150:
         -:  151:	// Now the directory is empty, so we can remove it
-       23:  152:	if (rmdir(path) == -1) {
+       24:  152:	if (rmdir(path) == -1) {
     #####:  153:		perror("rmdir");
     #####:  154:		return -1;
         -:  155:	}
         -:  156:
-       23:  157:	return 0;
+       24:  157:	return 0;
         -:  158:}
         -:  159:
     #####:  160:void exit_error(char *format, ...)
@@ -5430,7 +5430,7 @@ Unit_size:
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
-        -:    0:Runs:68
+        -:    0:Runs:69
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5481,7 +5481,7 @@ Unit_size:
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:68
+        -:    0:Runs:69
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5507,36 +5507,36 @@ Unit_size:
         -:   23:#define PATH_SEPARATOR "/"
         -:   24:#define PATH_SEPARATOR_CHAR '/'
         -:   25:
-       31:   26:void path_cleanup(PathImpl *ptr)
+       32:   26:void path_cleanup(PathImpl *ptr)
         -:   27:{
-       31:   28:	chain_free(&ptr->ptr);
-       31:   29:}
+       32:   28:	chain_free(&ptr->ptr);
+       32:   29:}
         -:   30:
-       31:   31:int path_for(Path *p, const char *path)
+       32:   31:int path_for(Path *p, const char *path)
         -:   32:{
-       31:   33:	if (path == NULL) {
+       32:   33:	if (path == NULL) {
     #####:   34:		errno = EINVAL;
     #####:   35:		return -1;
         -:   36:	}
-       31:   37:	int len = strlen(path);
-       31:   38:	if (len == 0) {
+       32:   37:	int len = strlen(path);
+       32:   38:	if (len == 0) {
     #####:   39:		errno = EINVAL;
     #####:   40:		return -1;
         -:   41:	}
-       31:   42:	if (chain_malloc(&p->ptr, len + 1))
+       32:   42:	if (chain_malloc(&p->ptr, len + 1))
     #####:   43:		return -1;
-       31:   44:	strcpy(p->ptr.data, path);
-       31:   45:	return 0;
+       32:   44:	strcpy(p->ptr.data, path);
+       32:   45:	return 0;
         -:   46:}
         -:   47:
-       30:   48:int path_replace_home(Path *p)
+       31:   48:int path_replace_home(Path *p)
         -:   49:{
-       30:   50:	const char *home_dir = getenv("HOME");
-       30:   51:	if (home_dir == NULL) {
+       31:   50:	const char *home_dir = getenv("HOME");
+       31:   51:	if (home_dir == NULL) {
     #####:   52:		errno = EINVAL;
     #####:   53:		return -1;
         -:   54:	}
-       30:   55:	if (((char *)(p->ptr.data))[0] == '~') {
+       31:   55:	if (((char *)(p->ptr.data))[0] == '~') {
     #####:   56:		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr.data);
     #####:   57:		if (nlen >= PATH_MAX) {
     #####:   58:			errno = E2BIG;
@@ -5552,31 +5552,31 @@ Unit_size:
     #####:   68:		snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr.data + 1));
     #####:   69:		strcpy(p->ptr.data, buf);
         -:   70:	}
-       30:   71:	return 0;
+       31:   71:	return 0;
         -:   72:}
         -:   73:
-       30:   74:int path_canonicalize(Path *p)
+       31:   74:int path_canonicalize(Path *p)
         -:   75:{
-       30:   76:	if (path_replace_home(p))
+       31:   76:	if (path_replace_home(p))
     #####:   77:		return -1;
         -:   78:	char buf[PATH_MAX];
-       30:   79:	errno = 0;
-       30:   80:	if (realpath(p->ptr.data, buf) == NULL) {
+       31:   79:	errno = 0;
+       31:   80:	if (realpath(p->ptr.data, buf) == NULL) {
         2:   81:		return -1;
         -:   82:	}
-       28:   83:	int nlen = strlen(buf);
-       28:   84:	if (nlen == 0) {
+       29:   83:	int nlen = strlen(buf);
+       29:   84:	if (nlen == 0) {
     #####:   85:		errno = EFAULT;
     #####:   86:		return -1;
         -:   87:	}
-       28:   88:	if (nlen >= p->ptr.len) {
+       29:   88:	if (nlen >= p->ptr.len) {
         -:   89:		FatPtr nptr;
-       27:   90:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+       28:   90:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
     #####:   91:			return -1;
-       27:   92:		p->ptr = nptr;
+       28:   92:		p->ptr = nptr;
         -:   93:	}
-       28:   94:	strcpy(p->ptr.data, buf);
-       28:   95:	return 0;
+       29:   94:	strcpy(p->ptr.data, buf);
+       29:   95:	return 0;
         -:   96:}
         5:   97:int path_push(Path *p, const char *next)
         -:   98:{
@@ -5616,53 +5616,60 @@ Unit_size:
         2:  132:	if (res) {
         2:  133:		int index = res - (char *)p->ptr.data;
         2:  134:		((char *)(p->ptr.data))[index] = 0;
-        -:  135:	}
-        2:  136:	return 0;
-        -:  137:}
-        -:  138:
-        8:  139:char *path_to_string(Path *p)
-        -:  140:{
-        8:  141:	return p->ptr.data;
-        -:  142:}
-        -:  143:
-    #####:  144:char *path_file_name(Path *p)
-        -:  145:{
-    #####:  146:	return rstrstr(p->ptr.data, PATH_SEPARATOR);
-        -:  147:}
-        -:  148:
-    #####:  149:bool path_exists(Path *p)
-        -:  150:{
-    #####:  151:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  152:		errno = EINVAL;
-    #####:  153:		return false;
-        -:  154:	}
-    #####:  155:	return access(p->ptr.data, F_OK) == 0;
-        -:  156:}
-    #####:  157:bool path_is_dir(Path *p)
-        -:  158:{
-    #####:  159:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  160:		errno = EINVAL;
-    #####:  161:		return false;
-        -:  162:	}
-        -:  163:	struct stat s;
-    #####:  164:	if (stat(p->ptr.data, &s) == 0) {
-    #####:  165:		return s.st_mode & S_IFDIR;
-        -:  166:	}
-    #####:  167:	return false;
-        -:  168:}
-        -:  169:
-    #####:  170:bool path_mkdir(Path *p, mode_t mode)
-        -:  171:{
-    #####:  172:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  173:		errno = EINVAL;
-    #####:  174:		return false;
-        -:  175:	}
-    #####:  176:	return mkdir(p->ptr.data, 0700) != 0;
-        -:  177:}
+        -:  135:	} else {
+    #####:  136:		((char *)(p->ptr.data))[0] = '.';
+    #####:  137:		((char *)(p->ptr.data))[1] = 0;
+        -:  138:	}
+        2:  139:	return 0;
+        -:  140:}
+        -:  141:
+        8:  142:char *path_to_string(const Path *p)
+        -:  143:{
+        8:  144:	return p->ptr.data;
+        -:  145:}
+        -:  146:
+    #####:  147:char *path_file_name(const Path *p)
+        -:  148:{
+    #####:  149:	char *ret = rstrstr(p->ptr.data, PATH_SEPARATOR);
+    #####:  150:	if (ret != NULL && strlen(ret) > 0)
+    #####:  151:		return ret + 1;
+        -:  152:
+    #####:  153:	return ret;
+        -:  154:}
+        -:  155:
+    #####:  156:bool path_exists(const Path *p)
+        -:  157:{
+    #####:  158:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  159:		errno = EINVAL;
+    #####:  160:		return false;
+        -:  161:	}
+    #####:  162:	return access(p->ptr.data, F_OK) == 0;
+        -:  163:}
+    #####:  164:bool path_is_dir(const Path *p)
+        -:  165:{
+    #####:  166:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  167:		errno = EINVAL;
+    #####:  168:		return false;
+        -:  169:	}
+        -:  170:	struct stat s;
+    #####:  171:	if (stat(p->ptr.data, &s) == 0) {
+    #####:  172:		return s.st_mode & S_IFDIR;
+        -:  173:	}
+    #####:  174:	return false;
+        -:  175:}
+        -:  176:
+    #####:  177:bool path_mkdir(Path *p, mode_t mode)
+        -:  178:{
+    #####:  179:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  180:		errno = EINVAL;
+    #####:  181:		return false;
+        -:  182:	}
+    #####:  183:	return mkdir(p->ptr.data, 0700) != 0;
+        -:  184:}
         -:    0:Source:rand.c
         -:    0:Graph:rand.gcno
         -:    0:Data:rand.gcda
-        -:    0:Runs:68
+        -:    0:Runs:69
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5727,7 +5734,7 @@ Unit_size:
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:68
+        -:    0:Runs:69
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -5747,31 +5754,31 @@ Unit_size:
         -:   17:
         -:   18:_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = { 0, 0, 0, 0, 0 };
         -:   19:
-    66173:   20:void *mymalloc(usize size)
+    66174:   20:void *mymalloc(usize size)
         -:   21:{
         -:   22:	void *ret;
-    66173:   23:	ret = malloc(size);
+    66174:   23:	ret = malloc(size);
         -:   24:
-    66173:   25:	if (ret) {
-    66173:   26:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+    66174:   25:	if (ret) {
+    66174:   26:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   27:	}
-    66173:   28:	return ret;
+    66174:   28:	return ret;
         -:   29:}
-    62351:   30:void *myrealloc(void *ptr, usize size)
+    62352:   30:void *myrealloc(void *ptr, usize size)
         -:   31:{
         -:   32:	void *ret;
-    62351:   33:	ret = realloc(ptr, size);
+    62352:   33:	ret = realloc(ptr, size);
         -:   34:
-    62351:   35:	if (ret) {
-    62351:   36:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+    62352:   35:	if (ret) {
+    62352:   36:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   37:	}
-    62351:   38:	return ret;
+    62352:   38:	return ret;
         -:   39:}
-    66140:   40:void myfree(void *ptr)
+    66141:   40:void myfree(void *ptr)
         -:   41:{
-    66140:   42:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-    66140:   43:	free(ptr);
-    66140:   44:}
+    66141:   42:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+    66141:   43:	free(ptr);
+    66141:   44:}
         9:   45:FILE *myfopen(const char *path, const char *mode)
         -:   46:{
         9:   47:	FILE *ret = fopen(path, mode);
@@ -5786,30 +5793,30 @@ Unit_size:
         9:   56:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
         9:   57:	fclose(ptr);
         9:   58:}
-       49:   59:u64 mymalloc_sum()
+       51:   59:u64 mymalloc_sum()
         -:   60:{
-       49:   61:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
+       51:   61:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
         -:   62:}
     #####:   63:u64 myrealloc_sum()
         -:   64:{
     #####:   65:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
         -:   66:}
-       49:   67:u64 myfree_sum()
+       51:   67:u64 myfree_sum()
         -:   68:{
-       49:   69:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+       51:   69:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
         -:   70:}
-       69:   71:u64 myfopen_sum()
+       72:   71:u64 myfopen_sum()
         -:   72:{
-       69:   73:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+       72:   73:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
         -:   74:}
-       69:   75:u64 myfclose_sum()
+       72:   75:u64 myfclose_sum()
         -:   76:{
-       69:   77:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+       72:   77:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
         -:   78:}
         -:    0:Source:sha256.c
         -:    0:Graph:sha256.gcno
         -:    0:Data:sha256.gcda
-        -:    0:Runs:68
+        -:    0:Runs:69
         -:    1:#include <stdio.h>
         -:    2:#include <stdlib.h>
         -:    3:#include <string.h>
@@ -5994,114 +6001,173 @@ Unit_size:
         -:   16:#include <base/path.h>
         -:   17:#include <base/resources.h>
         -:   18:#include <build/build.h>
-        -:   19:#include <glob.h>
-        -:   20:#include <stdlib.h>
-        -:   21:#include <toml/toml.h>
-        -:   22:#include <util/proc_executor.h>
-        -:   23:
-    #####:   24:void build_libs(const char *base_dir)
-        -:   25:{
-    #####:   26:	printf("build libs: %s\n", base_dir);
-    #####:   27:	Path lib_h;
-    #####:   28:	path_for(&lib_h, base_dir);
-    #####:   29:	path_push(&lib_h, "lib.h");
-    #####:   30:	if (path_exists(&lib_h)) {
-    #####:   31:		printf("found lib.h!\n");
-        -:   32:	}
-    #####:   33:}
-        -:   34:
-    #####:   35:int proc_build(const char *base_dir)
-        -:   36:{
-    #####:   37:	Path base;
-    #####:   38:	path_for(&base, base_dir);
-    #####:   39:	if (path_canonicalize(&base)) {
-    #####:   40:		exit_error("Directory ('%s') not found.", base_dir);
-        -:   41:	}
-    #####:   42:	Path toml;
-    #####:   43:	path_for(&toml, base_dir);
-    #####:   44:	path_push(&toml, "fam.toml");
-    #####:   45:	if (path_canonicalize(&toml)) {
-    #####:   46:		exit_error("Toml file ('%s') not found.", path_to_string(&toml));
-        -:   47:	}
-        -:   48:
-    #####:   49:	FILE *toml_fp = myfopen(path_to_string(&toml), "r");
-        -:   50:	char errbuf[1024];
-    #####:   51:	toml_table_t *table = toml_parse_file(toml_fp, errbuf, sizeof(errbuf));
-        -:   52:
-    #####:   53:	if (table == NULL) {
-    #####:   54:		exit_error("Could not parse toml file due to '%s'", errbuf);
-        -:   55:	}
-        -:   56:
-    #####:   57:	myfclose(toml_fp);
-        -:   58:
-    #####:   59:	toml_raw_t raw_fam_version = toml_raw_in(table, "fam_version");
-        -:   60:	char *fam_version;
-    #####:   61:	if (raw_fam_version) {
-    #####:   62:		toml_rtos(raw_fam_version, &fam_version);
-    #####:   63:		fprintf(stderr, "Toml generated by fam version: %s\n", fam_version);
-    #####:   64:		free((void *)fam_version); // Clean up after toml_rtos
-        -:   65:	}
-        -:   66:
-    #####:   67:	toml_table_t *package_table = toml_table_in(table, "package");
-    #####:   68:	if (package_table) {
-    #####:   69:		toml_raw_t raw_name = toml_raw_in(package_table, "name");
-        -:   70:		char *name;
-    #####:   71:		if (raw_name) {
-    #####:   72:			toml_rtos(raw_name, &name);
-    #####:   73:			fprintf(stderr, "Building Project: '%s'\n", name);
-        -:   74:
-    #####:   75:			Path target;
-    #####:   76:			path_for(&target, base_dir);
-    #####:   77:			path_push(&target, "target");
-    #####:   78:			if (!path_exists(&target)) {
-    #####:   79:				if (path_mkdir(&target, 0700))
-    #####:   80:					exit_error("Could not create directory '%s'.", path_to_string(&target));
-    #####:   81:				path_push(&target, "objs");
-    #####:   82:				if (path_mkdir(&target, 0700))
-    #####:   83:					exit_error("Could not create directory '%s'.", path_to_string(&target));
+        -:   19:#include <build/parser.h>
+        -:   20:#include <glob.h>
+        -:   21:#include <stdlib.h>
+        -:   22:#include <toml/toml.h>
+        -:   23:#include <util/proc_executor.h>
+        -:   24:
+    #####:   25:void build_libs(const char *base_dir)
+        -:   26:{
+    #####:   27:	printf("build libs: %s\n", base_dir);
+    #####:   28:	Path lib_h;
+    #####:   29:	path_for(&lib_h, base_dir);
+    #####:   30:	path_push(&lib_h, "lib.h");
+    #####:   31:	if (path_exists(&lib_h)) {
+    #####:   32:		printf("found lib.h!\n");
+    #####:   33:		char **header_list = mymalloc(sizeof(char *) * 10);
+    #####:   34:		int header_to_parse = 0;
+    #####:   35:		Vec headers;
+    #####:   36:		vec_init(&headers, 10, sizeof(HeaderInfo));
+    #####:   37:		Vec types;
+    #####:   38:		vec_init(&types, 10, sizeof(TypeInfo));
+    #####:   39:		printf("headers size=%" PRIu64 "\n", vec_size(&headers));
+    #####:   40:		path_canonicalize(&lib_h);
+    #####:   41:		parse_header(&lib_h, &headers, &types);
+    #####:   42:		printf("headers size=%" PRIu64 "\n", vec_size(&headers));
+        -:   43:
+    #####:   44:		while (vec_size(&headers)) {
+    #####:   45:			HeaderInfo *next = vec_pop(&headers);
+    #####:   46:			printf("next header = %s\n", next->path);
+    #####:   47:			Path next_path;
+    #####:   48:			path_for(&next_path, next->path);
+    #####:   49:			if (path_exists(&next_path) && path_is_dir(&next_path)) {
+    #####:   50:				printf("path directory exists!\n");
+    #####:   51:				path_push(&next_path, "mod.h");
+    #####:   52:				if (path_exists(&next_path)) {
+    #####:   53:					printf("mod.h exists\n");
+    #####:   54:					parse_header(&next_path, &headers, &types);
+        -:   55:				}
+        -:   56:			} else {
+    #####:   57:				printf("path does not exist. check file.\n");
+        -:   58:				char file_buf[PATH_MAX];
+    #####:   59:				printf("fname='%s'\n", path_file_name(&next_path));
+    #####:   60:				snprintf(file_buf, PATH_MAX - 1, "%s%s", path_file_name(&next_path), ".h");
+    #####:   61:				path_pop(&next_path);
+    #####:   62:				printf("checking %s\n", path_to_string(&next_path));
+        -:   63:
+    #####:   64:				path_push(&next_path, file_buf);
+    #####:   65:				printf("checking %s\n", path_to_string(&next_path));
+    #####:   66:				if (path_exists(&next_path) && !path_is_dir(&next_path)) {
+    #####:   67:					printf("file %s exists!\n", path_to_string(&next_path));
+        -:   68:					// parse header
+    #####:   69:					parse_header(&next_path, &headers, &types);
+        -:   70:				}
+        -:   71:			}
+        -:   72:		}
+        -:   73:
+    #####:   74:		printf("types count = %" PRIu64 "\n", vec_size(&types));
+    #####:   75:		while (vec_size(&types)) {
+    #####:   76:			TypeInfo *next = vec_pop(&types);
+    #####:   77:			printf("file to compile: %s\n", next->path);
+    #####:   78:			Path next_path;
+    #####:   79:			path_for(&next_path, next->path);
+    #####:   80:			if (path_exists(&next_path) && !path_is_dir(&next_path)) {
+        -:   81:			} else {
+    #####:   82:				exit_error(
+        -:   83:					"Implementation not found. Expected at '%s'.\n", path_to_string(&next_path));
         -:   84:			}
-        -:   85:
-    #####:   86:			build_libs(base_dir);
-        -:   87:
-    #####:   88:			char *args[] = { "cc", "-c", "-o", "target/objs/main.o", "main.c", NULL };
-    #####:   89:			if (execute_process(args)) {
-    #####:   90:				exit_error("execution of process '%s' failed", args[0]);
-        -:   91:			}
-        -:   92:
-        -:   93:			glob_t glob_result;
-    #####:   94:			glob("target/objs/*.o", 0, NULL, &glob_result);
-        -:   95:
-        -:   96:			// Construct the argument array for exec
-    #####:   97:			char *link[5 + glob_result.gl_pathc + 1];
-    #####:   98:			Path output_file;
-    #####:   99:			path_for(&output_file, "target");
-    #####:  100:			path_push(&output_file, name);
-    #####:  101:			link[0] = "cc";
-    #####:  102:			link[1] = "-o";
-    #####:  103:			link[2] = path_to_string(&output_file);
-        -:  104:
-        -:  105:			// Add all the .o files from glob to the argument list
-    #####:  106:			for (size_t i = 0; i < glob_result.gl_pathc; i++) {
-    #####:  107:				link[3 + i] = glob_result.gl_pathv[i];
-        -:  108:			}
-    #####:  109:			link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
+        -:   85:		}
+        -:   86:	}
+    #####:   87:}
+        -:   88:
+    #####:   89:int proc_build(const char *base_dir)
+        -:   90:{
+    #####:   91:	Path base;
+    #####:   92:	path_for(&base, base_dir);
+    #####:   93:	if (path_canonicalize(&base)) {
+    #####:   94:		exit_error("Directory ('%s') not found.", base_dir);
+        -:   95:	}
+    #####:   96:	Path toml;
+    #####:   97:	path_for(&toml, base_dir);
+    #####:   98:	path_push(&toml, "fam.toml");
+    #####:   99:	if (path_canonicalize(&toml)) {
+    #####:  100:		exit_error("fam.toml file ('%s') not found.", path_to_string(&toml));
+        -:  101:	}
+        -:  102:
+    #####:  103:	FILE *toml_fp = myfopen(path_to_string(&toml), "r");
+        -:  104:	char errbuf[1024];
+    #####:  105:	toml_table_t *table = toml_parse_file(toml_fp, errbuf, sizeof(errbuf));
+        -:  106:
+    #####:  107:	if (table == NULL) {
+    #####:  108:		exit_error("Could not parse toml file due to '%s'", errbuf);
+        -:  109:	}
         -:  110:
-    #####:  111:			if (execute_process(link)) {
-    #####:  112:				exit_error("execution of process '%s' failed", link[0]);
-        -:  113:			}
-        -:  114:
-    #####:  115:			free((void *)name); // Cleanup after toml_rtos
-        -:  116:			// Free the TOML table when done
-    #####:  117:			toml_free(table);
-        -:  118:		} else {
-    #####:  119:			exit_error("project name not found!");
-        -:  120:		}
-        -:  121:	} else {
-    #####:  122:		exit_error("[package] directive not found!");
-        -:  123:	}
-        -:  124:
-    #####:  125:	return 0;
-        -:  126:}
+    #####:  111:	myfclose(toml_fp);
+        -:  112:
+    #####:  113:	toml_raw_t raw_fam_version = toml_raw_in(table, "fam_version");
+        -:  114:	char *fam_version;
+    #####:  115:	if (raw_fam_version) {
+    #####:  116:		toml_rtos(raw_fam_version, &fam_version);
+    #####:  117:		fprintf(stderr, "fam.toml generated by fam version: %s\n", fam_version);
+    #####:  118:		free((void *)fam_version); // Clean up after toml_rtos
+        -:  119:	}
+        -:  120:
+    #####:  121:	toml_table_t *package_table = toml_table_in(table, "package");
+    #####:  122:	if (package_table) {
+    #####:  123:		toml_raw_t raw_name = toml_raw_in(package_table, "name");
+        -:  124:		char *name;
+    #####:  125:		if (raw_name) {
+    #####:  126:			toml_rtos(raw_name, &name);
+    #####:  127:			fprintf(stderr, "Building Project: '%s'\n", name);
+        -:  128:
+    #####:  129:			Path target;
+    #####:  130:			path_for(&target, base_dir);
+    #####:  131:			path_push(&target, "target");
+    #####:  132:			if (!path_exists(&target)) {
+    #####:  133:				if (path_mkdir(&target, 0700))
+    #####:  134:					exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:  135:				path_push(&target, "objs");
+    #####:  136:				if (path_mkdir(&target, 0700))
+    #####:  137:					exit_error("Could not create directory '%s'.", path_to_string(&target));
+        -:  138:			}
+        -:  139:
+        -:  140:			// change to the base directory
+    #####:  141:			if (chdir(base_dir)) {
+    #####:  142:				fprintf(stderr, "Could not change directory to the project directory");
+        -:  143:			}
+        -:  144:
+    #####:  145:			build_libs(base_dir);
+        -:  146:
+    #####:  147:			char *args[] = { "cc", "-c", "-o", "target/objs/main.o", "main.c", NULL };
+    #####:  148:			if (execute_process(args)) {
+    #####:  149:				exit_error("execution of process '%s' failed", args[0]);
+        -:  150:			}
+        -:  151:
+        -:  152:			glob_t glob_result;
+    #####:  153:			glob("target/objs/*.o", 0, NULL, &glob_result);
+        -:  154:
+        -:  155:			// Construct the argument array for exec
+    #####:  156:			char *link[5 + glob_result.gl_pathc + 1];
+    #####:  157:			Path output_file;
+    #####:  158:			path_for(&output_file, "target");
+    #####:  159:			path_push(&output_file, name);
+    #####:  160:			link[0] = "cc";
+    #####:  161:			link[1] = "-o";
+    #####:  162:			link[2] = path_to_string(&output_file);
+        -:  163:
+        -:  164:			// Add all the .o files from glob to the argument list
+    #####:  165:			for (size_t i = 0; i < glob_result.gl_pathc; i++) {
+    #####:  166:				link[3 + i] = glob_result.gl_pathv[i];
+        -:  167:			}
+    #####:  168:			link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
+        -:  169:
+    #####:  170:			if (execute_process(link)) {
+    #####:  171:				exit_error("execution of process '%s' failed", link[0]);
+        -:  172:			}
+        -:  173:
+    #####:  174:			free((void *)name); // Cleanup after toml_rtos
+        -:  175:			// Free the TOML table when done
+    #####:  176:			toml_free(table);
+        -:  177:		} else {
+    #####:  178:			exit_error("project name not found!");
+        -:  179:		}
+        -:  180:	} else {
+    #####:  181:		exit_error("[package] directive not found!");
+        -:  182:	}
+        -:  183:
+    #####:  184:	return 0;
+        -:  185:}
         -:    0:Source:init.c
         -:    0:Graph:init.gcno
         -:    0:Data:init.gcda
@@ -6190,6 +6256,117 @@ Unit_size:
         -:   82:
     #####:   83:	return 0;
         -:   84:}
+        -:    0:Source:parser.c
+        -:    0:Graph:parser.gcno
+        -:    0:Data:parser.gcda
+        -:    0:Runs:2
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/misc.h>
+        -:   16:#include <base/path.h>
+        -:   17:#include <build/parser.h>
+        -:   18:#include <lexer/lexer.h>
+        -:   19:#include <limits.h>
+        -:   20:#include <string.h>
+        -:   21:
+        -:   22:typedef enum ParserState {
+        -:   23:	ParserStateBeginStatement = 0,
+        -:   24:	ParserStateExpectModuleName = 1,
+        -:   25:	ParserStateExpectBracket = 2,
+        -:   26:	ParserStateOther = 3,
+        -:   27:} ParserState;
+        -:   28:
+        -:   29:#define MAX_NAME_LEN 1024
+        -:   30:
+    #####:   31:void parse_header(const Path *path, Vec *headers, Vec *types)
+        -:   32:{
+    #####:   33:	printf("================Parsing header at path = '%s'\n", path_to_string(path));
+        -:   34:	Lexer l;
+    #####:   35:	char *path_str = path_to_string(path);
+    #####:   36:	if (lexer_init(&l, path_str))
+    #####:   37:		exit_error("Could not open header file %s", path_str);
+        -:   38:
+    #####:   39:	int state = ParserStateBeginStatement;
+        -:   40:	char type_name[MAX_NAME_LEN + 1];
+        -:   41:
+    #####:   42:	while (true) {
+        -:   43:		Token tk;
+    #####:   44:		int res = lexer_next_token(&l, &tk);
+    #####:   45:		if (res == LexerStateComplete) {
+    #####:   46:			break;
+        -:   47:		}
+        -:   48:		// printf("state=%i,token_type=%i,token_value='%s'\n", state, tk.type, tk.token);
+    #####:   49:		if (tk.type == TokenTypeDoc) {
+        -:   50:			// skip over doc comments for these purposes
+    #####:   51:			continue;
+    #####:   52:		} else if (state == ParserStateBeginStatement) {
+    #####:   53:			if (tk.type == TokenTypeIdent) {
+    #####:   54:				if (!strcmp(tk.token, "mod")) {
+    #####:   55:					state = ParserStateExpectModuleName;
+        -:   56:				} else {
+    #####:   57:					if (strlen(tk.token) > MAX_NAME_LEN) {
+    #####:   58:						token_display_error(
+        -:   59:							&tk, "token name is longer than MAX_NAME_LEN (%i)\n", MAX_NAME_LEN);
+        -:   60:					} else {
+    #####:   61:						strcpy(type_name, tk.token);
+        -:   62:					}
+    #####:   63:					state = ParserStateExpectBracket;
+        -:   64:				}
+    #####:   65:			} else if (tk.type == TokenTypePunct && !strcmp(tk.token, "}"))
+    #####:   66:				state = ParserStateBeginStatement;
+        -:   67:			else
+    #####:   68:				state = ParserStateOther;
+    #####:   69:		} else if (state == ParserStateExpectModuleName) {
+    #####:   70:			if (tk.type != TokenTypeIdent) {
+    #####:   71:				token_display_error(&tk, "Expected module name, found '%s'\n", tk.token);
+        -:   72:			} else {
+    #####:   73:				if (strlen(tk.token) >= PATH_MAX) {
+    #####:   74:					token_display_error(&tk, "Path is longer than max path (%i)\n", PATH_MAX);
+        -:   75:				} else {
+        -:   76:					HeaderInfo hi;
+    #####:   77:					Path npath;
+    #####:   78:					path_for(&npath, path_str);
+    #####:   79:					path_pop(&npath);
+    #####:   80:					path_push(&npath, tk.token);
+    #####:   81:					strncpy(hi.path, path_to_string(&npath), PATH_MAX);
+    #####:   82:					vec_push(headers, &hi);
+        -:   83:				}
+    #####:   84:				state = ParserStateOther;
+        -:   85:			}
+    #####:   86:		} else if (tk.type == TokenTypePunct) {
+    #####:   87:			if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
+    #####:   88:				state = ParserStateBeginStatement;
+    #####:   89:			} else if (!strcmp(tk.token, "{") && state == ParserStateExpectBracket) {
+    #####:   90:				printf("=====we found a type name: '%s'\n", type_name);
+        -:   91:				TypeInfo ti;
+    #####:   92:				Path npath;
+    #####:   93:				path_for(&npath, path_str);
+    #####:   94:				path_pop(&npath);
+    #####:   95:				path_push(&npath, type_name);
+    #####:   96:				strncpy(ti.path, path_to_string(&npath), PATH_MAX);
+    #####:   97:				strcat(ti.path, ".c");
+    #####:   98:				vec_push(types, &ti);
+    #####:   99:				state = ParserStateOther;
+        -:  100:			} else
+    #####:  101:				state = ParserStateOther;
+        -:  102:		}
+    #####:  103:		token_cleanup(&tk);
+        -:  104:	}
+        -:  105:
+    #####:  106:	lexer_cleanup(&l);
+    #####:  107:}
         -:    0:Source:args.c
         -:    0:Graph:args.gcno
         -:    0:Data:args.gcda
@@ -7521,7 +7698,7 @@ Unit_size:
         -:    0:Source:proc_executor.c
         -:    0:Graph:proc_executor.gcno
         -:    0:Data:proc_executor.gcda
-        -:    0:Runs:6
+        -:    0:Runs:7
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -7565,7 +7742,7 @@ Unit_size:
         -:    0:Source:replace.c
         -:    0:Graph:replace.gcno
         -:    0:Data:replace.gcda
-        -:    0:Runs:6
+        -:    0:Runs:7
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -7653,7 +7830,7 @@ Unit_size:
         -:    0:Source:suffix_tree.c
         -:    0:Graph:suffix_tree.gcno
         -:    0:Data:suffix_tree.gcda
-        -:    0:Runs:6
+        -:    0:Runs:7
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -7934,7 +8111,7 @@ Unit_size:
         -:    0:Source:trie.c
         -:    0:Graph:trie.gcno
         -:    0:Data:trie.gcda
-        -:    0:Runs:6
+        -:    0:Runs:7
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -8135,10 +8312,163 @@ Unit_size:
         3:  198:		trie_sort(ret, match_count);
         8:  199:	return match_count;
         -:  200:}
+        -:    0:Source:vec.c
+        -:    0:Graph:vec.gcno
+        -:    0:Data:vec.gcda
+        -:    0:Runs:7
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/chain_allocator.h>
+        -:   16:#include <base/resources.h>
+        -:   17:#include <errno.h>
+        -:   18:#include <string.h>
+        -:   19:#include <util/vec.h>
+        -:   20:
+        -:   21:typedef struct VecImpl {
+        -:   22:	void *data;
+        -:   23:	u64 capacity;
+        -:   24:	u64 cur;
+        -:   25:	u64 size_of_entry;
+        -:   26:} VecImpl;
+        -:   27:
+        1:   28:void vec_cleanup(Vec *p)
+        -:   29:{
+        1:   30:	if (p->impl.data) {
+        1:   31:		VecImpl *vi = p->impl.data;
+        1:   32:		if (vi->data) {
+        1:   33:			myfree(vi->data);
+        1:   34:			vi->data = NULL;
+        -:   35:		}
+        1:   36:		chain_free(&p->impl);
+        -:   37:	}
+        1:   38:}
+        -:   39:
+        1:   40:int vec_init(Vec *p, u64 initial_capacity, u64 size_of_entry)
+        -:   41:{
+        1:   42:	if (chain_malloc(&p->impl, sizeof(VecImpl))) {
+    #####:   43:		return -1;
+        -:   44:	}
+        -:   45:
+        1:   46:	VecImpl *vi = p->impl.data;
+        1:   47:	if (initial_capacity) {
+        1:   48:		vi->data = mymalloc(size_of_entry * initial_capacity);
+        1:   49:		if (p->impl.data == NULL) {
+    #####:   50:			chain_free(&p->impl);
+    #####:   51:			return -1;
+        -:   52:		}
+        -:   53:	}
+        -:   54:
+        1:   55:	vi->cur = 0;
+        1:   56:	vi->capacity = initial_capacity;
+        1:   57:	vi->size_of_entry = size_of_entry;
+        -:   58:
+        1:   59:	return 0;
+        -:   60:}
+       10:   61:int vec_push(Vec *p, void *entry)
+        -:   62:{
+       10:   63:	VecImpl *vi = p->impl.data;
+       10:   64:	if (vi->cur >= vi->capacity) {
+        1:   65:		if (vec_resize(p, vi->capacity + 10)) {
+    #####:   66:			return -1;
+        -:   67:		}
+        -:   68:	}
+        -:   69:
+       10:   70:	memcpy(vi->data + (vi->cur * vi->size_of_entry), entry, vi->size_of_entry);
+       10:   71:	vi->cur++;
+       10:   72:	return 0;
+        -:   73:}
+       19:   74:void *vec_element_at(Vec *p, u64 index)
+        -:   75:{
+       19:   76:	VecImpl *vi = p->impl.data;
+       19:   77:	if (index >= vi->cur)
+    #####:   78:		return NULL;
+       19:   79:	return vi->data + (index * vi->size_of_entry);
+        -:   80:}
+        1:   81:int vec_remove(Vec *p, u64 index)
+        -:   82:{
+        1:   83:	VecImpl *vi = p->impl.data;
+        1:   84:	char *arr = (char *)vi->data;
+        1:   85:	if (index >= vi->cur) {
+    #####:   86:		errno = EOVERFLOW;
+    #####:   87:		return -1;
+        -:   88:	}
+        1:   89:	char *start = arr + index * vi->size_of_entry;
+        1:   90:	u64 bytes_to_move = (vi->cur - index - 1) * vi->size_of_entry;
+        1:   91:	if (bytes_to_move > 0) {
+        1:   92:		memmove(start, start + vi->size_of_entry, bytes_to_move);
+        -:   93:	}
+        1:   94:	vi->cur--;
+        -:   95:
+        1:   96:	return 0;
+        -:   97:}
+        1:   98:void *vec_pop(Vec *p)
+        -:   99:{
+        1:  100:	VecImpl *vi = p->impl.data;
+        1:  101:	if (vi->cur == 0)
+    #####:  102:		return NULL;
+        1:  103:	void *ret = vec_element_at(p, vi->cur - 1);
+        1:  104:	vi->cur--;
+        1:  105:	return ret;
+        -:  106:}
+        1:  107:int vec_resize(Vec *p, u64 new_size)
+        -:  108:{
+        1:  109:	VecImpl *vi = p->impl.data;
+        1:  110:	if (new_size < vi->cur)
+    #####:  111:		new_size = vi->cur;
+        1:  112:	void *tmp = myrealloc(vi->data, new_size * vi->size_of_entry);
+        1:  113:	if (tmp == NULL)
+    #####:  114:		return -1;
+        1:  115:	vi->data = tmp;
+        1:  116:	vi->capacity = new_size;
+        -:  117:
+        1:  118:	return 0;
+        -:  119:}
+    #####:  120:int vec_truncate(Vec *p, u64 new_size)
+        -:  121:{
+    #####:  122:	VecImpl *vi = p->impl.data;
+    #####:  123:	if (new_size == 0) {
+    #####:  124:		myfree(vi->data);
+        -:  125:	} else {
+    #####:  126:		void *tmp = myrealloc(vi->data, new_size * vi->size_of_entry);
+    #####:  127:		if (tmp == NULL)
+    #####:  128:			return -1;
+    #####:  129:		vi->data = tmp;
+        -:  130:	}
+    #####:  131:	vi->capacity = new_size;
+    #####:  132:	return 0;
+        -:  133:}
+    #####:  134:int vec_clear(Vec *p)
+        -:  135:{
+    #####:  136:	return vec_truncate(p, 0);
+        -:  137:}
+        -:  138:
+        4:  139:u64 vec_size(Vec *p)
+        -:  140:{
+        4:  141:	VecImpl *vi = p->impl.data;
+        4:  142:	return vi->cur;
+        -:  143:}
+        -:  144:
+        4:  145:u64 vec_capacity(Vec *p)
+        -:  146:{
+        4:  147:	VecImpl *vi = p->impl.data;
+        4:  148:	return vi->capacity;
+        -:  149:}
         -:    0:Source:lexer.c
         -:    0:Graph:lexer.gcno
         -:    0:Data:lexer.gcda
-        -:    0:Runs:13
+        -:    0:Runs:15
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -8371,7 +8701,7 @@ Unit_size:
         -:    0:Source:tokenizer.c
         -:    0:Graph:tokenizer.gcno
         -:    0:Data:tokenizer.gcda
-        -:    0:Runs:13
+        -:    0:Runs:15
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
