@@ -30,7 +30,7 @@ typedef enum ParserState {
 
 void parse_header(const Path *path, Vec *headers, Vec *types)
 {
-	printf("================Parsing header at path = '%s'\n", path_to_string(path));
+	printf("Parsing header ['%s'].\n", path_to_string(path));
 	Lexer l;
 	char *path_str = path_to_string(path);
 	if (lexer_init(&l, path_str))
@@ -87,7 +87,7 @@ void parse_header(const Path *path, Vec *headers, Vec *types)
 			if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
 				state = ParserStateBeginStatement;
 			} else if (!strcmp(tk.token, "{") && state == ParserStateExpectBracket) {
-				printf("=====we found a type name: '%s'\n", type_name);
+				printf("Type: %s::['%s'].\n", path_str, type_name);
 				TypeInfo ti;
 				Path npath;
 				path_for(&npath, path_str);

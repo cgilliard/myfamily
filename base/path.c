@@ -213,8 +213,6 @@ bool path_mkdir(Path *p, mode_t mode, bool parent)
 	// Iterate through each part of the path and create directories as needed
 	while (dir_part != NULL) {
 		if (path_push(&current_path, dir_part) != 0) {
-			path_cleanup(&temp_path);
-			path_cleanup(&current_path);
 			return false;
 		}
 
@@ -222,24 +220,17 @@ bool path_mkdir(Path *p, mode_t mode, bool parent)
 		if (stat(current_path.ptr.data, &s) != 0) {
 			// Directory does not exist, so create it
 			if (mkdir(current_path.ptr.data, mode) != 0) {
-				path_cleanup(&temp_path);
-				path_cleanup(&current_path);
 				return false;
 			}
 		} else if (!(s.st_mode & S_IFDIR)) {
 			// Path exists but is not a directory
 			errno = ENOTDIR;
-			path_cleanup(&temp_path);
-			path_cleanup(&current_path);
 			return false;
 		}
 
 		dir_part = strtok(NULL, PATH_SEPARATOR);
 	}
 
-	// Cleanup temp and current paths
-	path_cleanup(&temp_path);
-	path_cleanup(&current_path);
 	return true;
 }
 
