@@ -20,11 +20,15 @@
 #include <string.h>
 
 typedef enum ParserState {
-	ParserStateStart = 0,
+	ParserStateBeginStatement = 0,
 	ParserStateExpectModuleName = 1,
+	ParserStateExpectBracket = 2,
+	ParserStateOther = 3,
 } ParserState;
 
-void parse_header(const Path *path, Vec *headers)
+#define MAX_NAME_LEN 1024
+
+void parse_header(const Path *path, Vec *headers, Vec *types)
 {
 	printf("================Parsing header at path = '%s'\n", path_to_string(path));
 	Lexer l;
@@ -32,7 +36,8 @@ void parse_header(const Path *path, Vec *headers)
 	if (lexer_init(&l, path_str))
 		exit_error("Could not open header file %s", path_str);
 
-	int state = ParserStateStart;
+	int state = ParserStateBeginStatement;
+	char type_name[MAX_NAME_LEN + 1];
 
 	while (true) {
 		Token tk;
@@ -40,11 +45,27 @@ void parse_header(const Path *path, Vec *headers)
 		if (res == LexerStateComplete) {
 			break;
 		}
-		printf("token_type=%i,token_value='%s'\n", tk.type, tk.token);
-		if (state == ParserStateStart) {
-			if (tk.type == TokenTypeIdent && !strcmp(tk.token, "mod")) {
-				state = ParserStateExpectModuleName;
-			}
+		// printf("state=%i,token_type=%i,token_value='%s'\n", state, tk.type, tk.token);
+		if (tk.type == TokenTypeDoc) {
+			// skip over doc comments for these purposes
+			continue;
+		} else if (state == ParserStateBeginStatement) {
+			if (tk.type == TokenTypeIdent) {
+				if (!strcmp(tk.token, "mod")) {
+					state = ParserStateExpectModuleName;
+				} else {
+					if (strlen(tk.token) > MAX_NAME_LEN) {
+						token_display_error(
+							&tk, "token name is longer than MAX_NAME_LEN (%i)\n", MAX_NAME_LEN);
+					} else {
+						strcpy(type_name, tk.token);
+					}
+					state = ParserStateExpectBracket;
+				}
+			} else if (tk.type == TokenTypePunct && !strcmp(tk.token, "}"))
+				state = ParserStateBeginStatement;
+			else
+				state = ParserStateOther;
 		} else if (state == ParserStateExpectModuleName) {
 			if (tk.type != TokenTypeIdent) {
 				token_display_error(&tk, "Expected module name, found '%s'\n", tk.token);
@@ -52,7 +73,6 @@ void parse_header(const Path *path, Vec *headers)
 				if (strlen(tk.token) >= PATH_MAX) {
 					token_display_error(&tk, "Path is longer than max path (%i)\n", PATH_MAX);
 				} else {
-					printf("found a module: %s\n", tk.token);
 					HeaderInfo hi;
 					Path npath;
 					path_for(&npath, path_str);
@@ -61,8 +81,24 @@ void parse_header(const Path *path, Vec *headers)
 					strncpy(hi.path, path_to_string(&npath), PATH_MAX);
 					vec_push(headers, &hi);
 				}
-				state = ParserStateStart;
+				state = ParserStateOther;
 			}
+		} else if (tk.type == TokenTypePunct) {
+			if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
+				state = ParserStateBeginStatement;
+			} else if (!strcmp(tk.token, "{") && state == ParserStateExpectBracket) {
+				printf("=====we found a type name: '%s'\n", type_name);
+				TypeInfo ti;
+				Path npath;
+				path_for(&npath, path_str);
+				path_pop(&npath);
+				path_push(&npath, type_name);
+				strncpy(ti.path, path_to_string(&npath), PATH_MAX);
+				strcat(ti.path, ".c");
+				vec_push(types, &ti);
+				state = ParserStateOther;
+			} else
+				state = ParserStateOther;
 		}
 		token_cleanup(&tk);
 	}
