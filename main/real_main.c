@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <args/args.h>
+#include <base/misc.h>
 #include <base/version.h>
 #include <bible/bible.h>
 #include <build/build.h>
@@ -282,6 +283,25 @@ int real_main(int argc, char **argv)
 	args_value_of(&args, "config_dir", config_dir, config_dir_len + 1, 0);
 	if (access(config_dir, F_OK)) {
 		setup_config_dir(config_dir);
+		WRITE_BUILD_ID(config_dir);
+	} else {
+		// check build id
+		char bid_file[PATH_MAX];
+		strcpy(bid_file, config_dir);
+		strcat(bid_file, PATH_SEPARATOR);
+		strcat(bid_file, "build_id");
+		FILE *fp = myfopen(bid_file, "r");
+		if (!fp) {
+			exit_error("could not open the build file");
+		}
+		char bid_file_contents[1024];
+		size_t rlen = read_all(bid_file_contents, 1, 100, fp);
+		bid_file_contents[rlen] = 0;
+		if (strcmp(bid_file_contents, BUILD_ID)) {
+			remove_directory(config_dir, false);
+			setup_config_dir(config_dir);
+			WRITE_BUILD_ID(config_dir);
+		}
 	}
 
 	// get first argument (subcommand)

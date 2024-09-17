@@ -16,6 +16,8 @@
 #define _MAIN_MAIN__
 
 #include <base/macro_utils.h>
+#include <base/version.h>
+#include <string.h>
 
 int real_main(int argc, char **argv);
 
@@ -36,6 +38,8 @@ int real_main(int argc, char **argv);
 			perror("Could not open file for writing");                                             \
 		}                                                                                          \
 	} while (0)
+
+#define WRITE_BUILD_ID(dir) WRITE_RESOURCE_TO_DISK(dir, "build_id", BUILD_ID, strlen(BUILD_ID))
 
 #define BUILD_RESOURCE_DIR_(dir, namespace)                                                        \
 	for (int i = 0; i < namespace##xxdir_file_count; i++)                                          \

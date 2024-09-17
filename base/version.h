@@ -12,4 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef _BASE_VERSION__
+#define _BASE_VERSION__
+
+#include <string.h>
+
 #define FAM_VERSION "0.0.1-alpha.1"
+#define BUILD_ID __DATE__ " " __TIME__
+
+#endif // _BASE_VERSION__

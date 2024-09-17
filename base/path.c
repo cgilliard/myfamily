@@ -20,9 +20,6 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#define PATH_SEPARATOR "/"
-#define PATH_SEPARATOR_CHAR '/'
-
 void path_cleanup(PathImpl *ptr)
 {
 	chain_free(&ptr->ptr);

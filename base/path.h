@@ -18,6 +18,9 @@
 #include <base/chain_allocator.h>
 #include <sys/types.h>
 
+#define PATH_SEPARATOR "/"
+#define PATH_SEPARATOR_CHAR '/'
+
 typedef struct PathImpl {
 	FatPtr ptr;
 } PathImpl;
