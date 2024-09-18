@@ -234,7 +234,7 @@ bool path_mkdir(Path *p, mode_t mode, bool parent)
 	return true;
 }
 
-int path_copy(Path *dst, Path *src)
+int path_copy(Path *dst, const Path *src)
 {
 	return path_for(dst, path_to_string(src));
 }

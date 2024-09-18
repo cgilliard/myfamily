@@ -109,10 +109,16 @@ int vec_resize(Vec *p, u64 new_size)
 	VecImpl *vi = p->impl.data;
 	if (new_size < vi->cur)
 		new_size = vi->cur;
-	void *tmp = myrealloc(vi->data, new_size * vi->size_of_entry);
-	if (tmp == NULL)
-		return -1;
-	vi->data = tmp;
+	if (vi->data == NULL && new_size != 0) {
+		vi->data = mymalloc(new_size * vi->size_of_entry);
+		if (vi->data == NULL)
+			return -1;
+	} else {
+		void *tmp = myrealloc(vi->data, new_size * vi->size_of_entry);
+		if (tmp == NULL)
+			return -1;
+		vi->data = tmp;
+	}
 	vi->capacity = new_size;
 
 	return 0;
@@ -122,6 +128,7 @@ int vec_truncate(Vec *p, u64 new_size)
 	VecImpl *vi = p->impl.data;
 	if (new_size == 0) {
 		myfree(vi->data);
+		vi->data = NULL;
 	} else {
 		void *tmp = myrealloc(vi->data, new_size * vi->size_of_entry);
 		if (tmp == NULL)
@@ -133,7 +140,9 @@ int vec_truncate(Vec *p, u64 new_size)
 }
 int vec_clear(Vec *p)
 {
-	return vec_truncate(p, 0);
+	VecImpl *vi = p->impl.data;
+	vi->cur = 0;
+	return 0;
 }
 
 u64 vec_size(Vec *p)

@@ -25,9 +25,38 @@
 
 void build_obj(char *include_param, char *obj_path, char *file_name)
 {
-	char *args[] = { "cc", include_param, "-c", "-o", obj_path, file_name, NULL };
+	char *args[] = { "gcc", include_param, "-I.", "-c", "-o", obj_path, file_name, NULL };
 	if (execute_process(args)) {
 		exit_error("execution of process '%s' failed", args[0]);
+	}
+}
+
+void build_module_list(Vec *module_info, const Path *path, const Path *base_path)
+{
+	Path next_path;
+	path_copy(&next_path, path);
+	Vec module_info_reverse;
+	vec_init(&module_info_reverse, 10, sizeof(ModuleInfo));
+	for (int i = 0; i < 10; i++) {
+		if (!strcmp(path_to_string(&next_path), path_to_string(base_path))) {
+
+			break;
+		}
+		if (strlen(path_to_string(&next_path)) < strlen(path_to_string(base_path))) {
+			exit_error("could not find the base path");
+		}
+		char *modname = path_file_name(&next_path);
+		path_pop(&next_path);
+		ModuleInfo mi;
+		strcpy(mi.name, modname);
+		vec_push(&module_info_reverse, &mi);
+	}
+	while (vec_size(&module_info_reverse) > 0) {
+		ModuleInfo *next = vec_pop(&module_info_reverse);
+		if (vec_size(&module_info_reverse) > 0) {
+			vec_push(module_info, next);
+			char *modname = next->name;
+		}
 	}
 }
 
@@ -56,7 +85,10 @@ void build_libs(const char *base_dir, const char *config_dir)
 		Vec types;
 		vec_init(&types, 10, sizeof(TypeInfo));
 		path_canonicalize(&lib_h);
-		parse_header(&lib_h, &headers, &types);
+
+		Vec module_info;
+		vec_init(&module_info, 10, sizeof(ModuleInfo));
+		parse_header(&lib_h, &headers, &types, &module_info);
 
 		while (vec_size(&headers)) {
 			HeaderInfo *next = vec_pop(&headers);
@@ -64,8 +96,10 @@ void build_libs(const char *base_dir, const char *config_dir)
 			path_for(&next_path, next->path);
 			if (path_exists(&next_path) && path_is_dir(&next_path)) {
 				path_push(&next_path, "mod.h");
+				vec_clear(&module_info);
+				build_module_list(&module_info, &next_path, &base_path);
 				if (path_exists(&next_path)) {
-					parse_header(&next_path, &headers, &types);
+					parse_header(&next_path, &headers, &types, &module_info);
 				}
 			} else {
 				char file_buf[PATH_MAX];
@@ -74,8 +108,12 @@ void build_libs(const char *base_dir, const char *config_dir)
 
 				path_push(&next_path, file_buf);
 				if (path_exists(&next_path) && !path_is_dir(&next_path)) {
+					vec_clear(&module_info);
+					build_module_list(&module_info, &next_path, &base_path);
 					// parse header
-					parse_header(&next_path, &headers, &types);
+					parse_header(&next_path, &headers, &types, &module_info);
+				} else {
+					exit_error("Module not found. Expected at '%s'.", path_to_string(&next_path));
 				}
 			}
 		}
@@ -98,17 +136,14 @@ void build_libs(const char *base_dir, const char *config_dir)
 				char modules[PATH_MAX];
 				char *file_name = path_file_name(&next_path);
 				strcpy(modules, "");
-				for (int i = 0; i < 3; i++) {
-					path_pop(&next_path);
-					char *modname = path_file_name(&next_path);
-					if (!strcmp(path_to_string(&next_path), path_to_string(&base_path))) {
-						break;
-					}
-					if (strlen(path_to_string(&next_path)) < strlen(path_to_string(&base_path))) {
-						exit_error("could not find the base path");
-					}
 
-					strcat(modules, modname);
+				Vec module_info;
+				vec_init(&module_info, 10, sizeof(ModuleInfo));
+				build_module_list(&module_info, &next_path, &base_path);
+
+				for (u64 i = 0; i < vec_size(&module_info); i++) {
+					ModuleInfo *next = vec_element_at(&module_info, i);
+					strcat(modules, next->name);
 					strcat(modules, "_");
 				}
 
@@ -131,11 +166,28 @@ void build_libs(const char *base_dir, const char *config_dir)
 				strcpy(include_param, "-I");
 				strcat(include_param, include_full_path);
 
+				Path build_specific_dst;
+				Path build_specific_src;
+				path_for(&build_specific_dst, path_to_string(&build_dir));
+				path_push(&build_specific_dst, "build_specific.h");
+				path_for(&build_specific_src, config_dir);
+				path_push(&build_specific_src, "resources");
+				path_push(&build_specific_src, "build_specific.h");
+				copy_file(path_to_string(&build_specific_dst), path_to_string(&build_specific_src));
+
+				char module_str[PATH_MAX + 1024];
+				strcpy(module_str, "");
+				int vec_sz = vec_size(&module_info);
+				for (int i = 0; i < vec_sz; i++) {
+					strcat(module_str, vec_element_at(&module_info, i));
+					strcat(module_str, "::");
+				}
+				printf("Parsing type: %s[%s].\n", module_str, file_name);
 				build_obj(include_param, obj_path, file_name);
 
 			} else {
 				exit_error(
-					"Implementation not found. Expected at '%s'.\n", path_to_string(&next_path));
+					"Implementation not found. Expected at '%s'.", path_to_string(&next_path));
 			}
 		}
 	}
@@ -223,7 +275,7 @@ int proc_build(const char *base_dir, const char *config_dir)
 			Path output_file;
 			path_for(&output_file, "target");
 			path_push(&output_file, name);
-			link[0] = "cc";
+			link[0] = "gcc";
 			link[1] = "-o";
 			link[2] = path_to_string(&output_file);
 

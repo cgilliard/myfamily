@@ -5,21 +5,8 @@ $abc::def::t2(TestType); // import from module path abc::def the type 't2' as 'T
 $abc::def::mymod::*; // import from the module path abc::def::mymod all types.
 
 // 2.) Modules
-// Modules can be define in two ways:
-// - Inline: using the 'mod' keyword:
-MyOuterType
-{
-}
-mod testmod
-{
-	$..::MyOuterType; // import up one level to get a type from the outer
-					  // namespace.
-	MyInnerType(u32 x, MyOuterType y);
-}
-
-// - External modules
-
-mod mymod; // This imports mymod.h or mymod/mod.h (only one must exist)
+mod mymod; // This tells the build tool to expect either mymod.h or mymod/mod.h (only one must
+		   // exist)
 
 // 3.) Types
 // declare a type name MyTestType
@@ -237,9 +224,7 @@ TestArrays
 // since the special incomplete type Builder is specified, we must specify a builder config
 // these are passed to the 'build' function and can be used to configure the instance.
 // The allowed types are primtives and char[].
-Builder::Options((u64, size), (u32, value), (char[], name));
-
-TestArrays::Build;
+TestArrays::Build((u64, size), (u32, value), (char[], name));
 TestArrays::TryBuild;
 
 // In the .c file in the 'build' method, memory could be allocated for the dynamically sized array

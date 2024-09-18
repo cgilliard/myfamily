@@ -26,6 +26,6 @@ typedef struct TypeInfo {
 	char path[PATH_MAX];
 } TypeInfo;
 
-void parse_header(const Path *path, Vec *headers, Vec *types);
+void parse_header(const Path *path, Vec *headers, Vec *types, Vec *module_list);
 
 #endif // _BUILD_PARSER__

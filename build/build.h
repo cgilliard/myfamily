@@ -16,6 +16,11 @@
 #define _BUILD_BUILD__
 
 #include <base/types.h>
+#include <limits.h>
+
+typedef struct ModuleInfo {
+	char name[PATH_MAX];
+} ModuleInfo;
 
 int proc_build_init(const char *config_dir, const char *proj_name, const char *proj_path,
 	char authors[11][1024], int author_count, bool lib, char *description);
