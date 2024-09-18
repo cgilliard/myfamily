@@ -75,9 +75,11 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;dirent.h&gt;</code><br />
+<code>#include &lt;limits.h&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;sys/stat.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
@@ -90,6 +92,8 @@ Functions</h2></td></tr>
 <tr class="separator:a00c97ad6de71e5ff6016f84c76e06458"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8071c588b0037587224a40257b7040e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="xxdir_8c.html#ad8071c588b0037587224a40257b7040e">proc_file</a> (const char *file_path, const char *output_header, FILE *out, const char *namespace)</td></tr>
 <tr class="separator:ad8071c588b0037587224a40257b7040e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2333cdf73b7a682358ac3c66b7c99029"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029">include_dir</a> (const char *dir_path, const char *base, char *buf, const char *output_header, FILE *out, const char *namespace)</td></tr>
+<tr class="separator:a2333cdf73b7a682358ac3c66b7c99029"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c04138a5bfe5d72780bb7e82a18e627"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="xxdir_8c.html#a3c04138a5bfe5d72780bb7e82a18e627">main</a> (int argc, char **argv)</td></tr>
 <tr class="separator:a3c04138a5bfe5d72780bb7e82a18e627"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -116,6 +120,58 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a2333cdf73b7a682358ac3c66b7c99029"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2333cdf73b7a682358ac3c66b7c99029">&#9670;&nbsp;</a></span>include_dir()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void include_dir </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>dir_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>base</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>output_header</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>namespace</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a3c04138a5bfe5d72780bb7e82a18e627"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3c04138a5bfe5d72780bb7e82a18e627">&#9670;&nbsp;</a></span>main()</h2>
 

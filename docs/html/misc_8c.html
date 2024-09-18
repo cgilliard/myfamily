@@ -90,8 +90,8 @@ Functions</h2></td></tr>
 <tr class="separator:a0c97a6ddc4da1d6b512e0c18ce650d65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0128c17294655e800cec2066b3e0e2a9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a0128c17294655e800cec2066b3e0e2a9">copy_file</a> (const char *dst, const char *src)</td></tr>
 <tr class="separator:a0128c17294655e800cec2066b3e0e2a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89e255ab73fedc9351160e41f6d28925"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a89e255ab73fedc9351160e41f6d28925">remove_directory</a> (const char *<a class="el" href="header__sample1_8h.html#af6b46818cfa690027c8616652a03d6af">path</a>)</td></tr>
-<tr class="separator:a89e255ab73fedc9351160e41f6d28925"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaafa479e74ac34e8265a9472cd18a8ae"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#aaafa479e74ac34e8265a9472cd18a8ae">remove_directory</a> (const char *<a class="el" href="header__sample1_8h.html#af6b46818cfa690027c8616652a03d6af">path</a>, bool preserve_dir)</td></tr>
+<tr class="separator:aaafa479e74ac34e8265a9472cd18a8ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04d2c2dc4f9a32fccb11ff65d07bf171"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a04d2c2dc4f9a32fccb11ff65d07bf171">exit_error</a> (char *format,...)</td></tr>
 <tr class="separator:a04d2c2dc4f9a32fccb11ff65d07bf171"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -192,8 +192,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a89e255ab73fedc9351160e41f6d28925"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a89e255ab73fedc9351160e41f6d28925">&#9670;&nbsp;</a></span>remove_directory()</h2>
+<a id="aaafa479e74ac34e8265a9472cd18a8ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaafa479e74ac34e8265a9472cd18a8ae">&#9670;&nbsp;</a></span>remove_directory()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -202,8 +202,18 @@ Functions</h2></td></tr>
           <td class="memname">int remove_directory </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>path</em></td><td>)</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>preserve_dir</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

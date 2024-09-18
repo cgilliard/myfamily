@@ -79,19 +79,22 @@ $(function() {
 <code>#include &lt;<a class="el" href="parser_8h_source.html">build/parser.h</a>&gt;</code><br />
 <code>#include &lt;glob.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="toml_8h_source.html">toml/toml.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="proc__executor_8h_source.html">util/proc_executor.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1b2dd3c2b4cabd1c82f6c40a76ca5e06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#a1b2dd3c2b4cabd1c82f6c40a76ca5e06">build_libs</a> (const char *base_dir)</td></tr>
-<tr class="separator:a1b2dd3c2b4cabd1c82f6c40a76ca5e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aabf899149368773bfd90317ca0833a0b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#aabf899149368773bfd90317ca0833a0b">proc_build</a> (const char *base_dir)</td></tr>
-<tr class="separator:aabf899149368773bfd90317ca0833a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a647f25efe7a125defb4d2d90b1b73113"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#a647f25efe7a125defb4d2d90b1b73113">build_obj</a> (char *include_param, char *obj_path, char *file_name)</td></tr>
+<tr class="separator:a647f25efe7a125defb4d2d90b1b73113"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25fcf7327ee387291b11a70d07a89484"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#a25fcf7327ee387291b11a70d07a89484">build_libs</a> (const char *base_dir, const char *config_dir)</td></tr>
+<tr class="separator:a25fcf7327ee387291b11a70d07a89484"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf67d6fd01799d8ca1e86c86f15a7aa2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#abf67d6fd01799d8ca1e86c86f15a7aa2">proc_build</a> (const char *base_dir, const char *config_dir)</td></tr>
+<tr class="separator:abf67d6fd01799d8ca1e86c86f15a7aa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a1b2dd3c2b4cabd1c82f6c40a76ca5e06"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1b2dd3c2b4cabd1c82f6c40a76ca5e06">&#9670;&nbsp;</a></span>build_libs()</h2>
+<a id="a25fcf7327ee387291b11a70d07a89484"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25fcf7327ee387291b11a70d07a89484">&#9670;&nbsp;</a></span>build_libs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -100,16 +103,60 @@ Functions</h2></td></tr>
           <td class="memname">void build_libs </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>base_dir</em></td><td>)</td>
+          <td class="paramname"><em>base_dir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>config_dir</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="aabf899149368773bfd90317ca0833a0b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aabf899149368773bfd90317ca0833a0b">&#9670;&nbsp;</a></span>proc_build()</h2>
+<a id="a647f25efe7a125defb4d2d90b1b73113"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a647f25efe7a125defb4d2d90b1b73113">&#9670;&nbsp;</a></span>build_obj()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void build_obj </td>
+          <td>(</td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>include_param</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>obj_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>file_name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abf67d6fd01799d8ca1e86c86f15a7aa2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf67d6fd01799d8ca1e86c86f15a7aa2">&#9670;&nbsp;</a></span>proc_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -118,8 +165,18 @@ Functions</h2></td></tr>
           <td class="memname">int proc_build </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>base_dir</em></td><td>)</td>
+          <td class="paramname"><em>base_dir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>config_dir</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

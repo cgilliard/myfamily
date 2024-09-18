@@ -87,6 +87,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a256a5721249aa3309437212cc21a9fe4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#a256a5721249aa3309437212cc21a9fe4">PATH_SEPARATOR</a>&#160;&#160;&#160;&quot;/&quot;</td></tr>
+<tr class="separator:a256a5721249aa3309437212cc21a9fe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a581727c17b559af16969b4073417701d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#a581727c17b559af16969b4073417701d">PATH_SEPARATOR_CHAR</a>&#160;&#160;&#160;'/'</td></tr>
+<tr class="separator:a581727c17b559af16969b4073417701d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a4b261ee74f577bbd57315cb754f607"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a>&#160;&#160;&#160;<a class="el" href="structPathImpl.html">PathImpl</a> <a class="el" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="path_8h.html#af2abcd42f8ea2c07c2333f60d578f1a0">path_cleanup</a>)))</td></tr>
 <tr class="separator:a9a4b261ee74f577bbd57315cb754f607"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -113,10 +117,12 @@ Functions</h2></td></tr>
 <tr class="separator:a668e7b18d0178b35a818d3f3f302981c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a90b6a2154ce88049f2620729fe258aa0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#a90b6a2154ce88049f2620729fe258aa0">path_is_dir</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
 <tr class="separator:a90b6a2154ce88049f2620729fe258aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a335da87e18cab797d2416a4ffa9fa241"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#a335da87e18cab797d2416a4ffa9fa241">path_mkdir</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, mode_t mode)</td></tr>
-<tr class="separator:a335da87e18cab797d2416a4ffa9fa241"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a810e528679c28c58abf077a70af8d9b6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#a810e528679c28c58abf077a70af8d9b6">path_mkdir</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, mode_t mode, bool parent)</td></tr>
+<tr class="separator:a810e528679c28c58abf077a70af8d9b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af10ae67a25a622c875723410d59fd633"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#af10ae67a25a622c875723410d59fd633">path_file_name</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
 <tr class="separator:af10ae67a25a622c875723410d59fd633"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec5d3461e3fd132e9e87f644d64d2ae5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#aec5d3461e3fd132e9e87f644d64d2ae5">path_copy</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *dst, <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *src)</td></tr>
+<tr class="separator:aec5d3461e3fd132e9e87f644d64d2ae5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a9a4b261ee74f577bbd57315cb754f607"></a>
@@ -127,6 +133,34 @@ Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define Path&#160;&#160;&#160;<a class="el" href="structPathImpl.html">PathImpl</a> <a class="el" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="path_8h.html#af2abcd42f8ea2c07c2333f60d578f1a0">path_cleanup</a>)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a256a5721249aa3309437212cc21a9fe4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a256a5721249aa3309437212cc21a9fe4">&#9670;&nbsp;</a></span>PATH_SEPARATOR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PATH_SEPARATOR&#160;&#160;&#160;&quot;/&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a581727c17b559af16969b4073417701d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a581727c17b559af16969b4073417701d">&#9670;&nbsp;</a></span>PATH_SEPARATOR_CHAR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PATH_SEPARATOR_CHAR&#160;&#160;&#160;'/'</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -179,6 +213,34 @@ Functions</h2></td></tr>
           <td class="paramtype"><a class="el" href="structPathImpl.html">PathImpl</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aec5d3461e3fd132e9e87f644d64d2ae5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec5d3461e3fd132e9e87f644d64d2ae5">&#9670;&nbsp;</a></span>path_copy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int path_copy </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
+          <td class="paramname"><em>src</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -267,8 +329,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a335da87e18cab797d2416a4ffa9fa241"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a335da87e18cab797d2416a4ffa9fa241">&#9670;&nbsp;</a></span>path_mkdir()</h2>
+<a id="a810e528679c28c58abf077a70af8d9b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a810e528679c28c58abf077a70af8d9b6">&#9670;&nbsp;</a></span>path_mkdir()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -283,7 +345,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">mode_t&#160;</td>
-          <td class="paramname"><em>mode</em>&#160;</td>
+          <td class="paramname"><em>mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>parent</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
