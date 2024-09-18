@@ -40,296 +40,316 @@
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <args/args.h>
-        -:   16:#include <base/version.h>
-        -:   17:#include <bible/bible.h>
-        -:   18:#include <build/build.h>
-        -:   19:#include <core/std.h>
-        -:   20:#include <dirent.h>
-        -:   21:#include <errno.h>
-        -:   22:#include <main/main.h>
-        -:   23:#include <main/resources.h>
-        -:   24:#include <stdio.h>
-        -:   25:#include <string.h>
-        -:   26:#include <sys/stat.h>
-        -:   27:#include <unistd.h>
-        -:   28:
-    #####:   29:void build_args(Args *args)
-    #####:   30:{
-    #####:   31:	const char *home_dir = get_home_directory();
-        -:   32:
-    #####:   33:	args_build(args, "fam", FAM_VERSION, "The MyFamily Developers", 0, 0, 0);
-        -:   34:
-        -:   35:	// build the init SubCommand
-        -:   36:	SubCommand init;
-        -:   37:	ArgsParam cfg_dir;
-    #####:   38:	args_param_build(&cfg_dir, "dir",
-        -:   39:		"Directory to initialize the project in (defaults to "
-        -:   40:		"the project name if not specified)",
-        -:   41:		"p", true, false, NULL);
-        -:   42:	ArgsParam cfg_authors;
-    #####:   43:	args_param_build(&cfg_authors, "author", "Author of this project", "a", true, true,
-        -:   44:		"The MyFamily Developers");
-        -:   45:	ArgsParam cfg_lib;
-    #####:   46:	args_param_build(&cfg_lib, "lib",
-        -:   47:		"Initialize the project as a library project. (If not set, the project will be a binary "
-        -:   48:		"project)",
-        -:   49:		"l", false, false, NULL);
-        -:   50:	ArgsParam cfg_description;
-    #####:   51:	args_param_build(&cfg_description, "description",
-        -:   52:		"Project description (defaults to the project name)", "d", true, false, NULL);
-    #####:   53:	sub_command_build(&init, "init", "Initialize project", 1, 1, "<project_name>");
-    #####:   54:	sub_command_add_param(&init, &cfg_dir);
-    #####:   55:	sub_command_add_param(&init, &cfg_authors);
-    #####:   56:	sub_command_add_param(&init, &cfg_lib);
-    #####:   57:	sub_command_add_param(&init, &cfg_description);
-        -:   58:
-    #####:   59:	args_add_sub_command(args, &init);
-        -:   60:
-        -:   61:	// build the build SubCommand
-        -:   62:	SubCommand build;
-        -:   63:	ArgsParam cfg_base;
-    #####:   64:	args_param_build(&cfg_base, "base", "The base directory of the project. (defaults to '.')", "b",
-        -:   65:		true, false, ".");
-    #####:   66:	sub_command_build(&build, "build", "Build project in release mode", 0, 0, "");
-    #####:   67:	sub_command_add_param(&build, &cfg_base);
-        -:   68:
-    #####:   69:	args_add_sub_command(args, &build);
-        -:   70:
-        -:   71:	// build the debug SubCommand
-        -:   72:	SubCommand bdebug;
-    #####:   73:	sub_command_build(&bdebug, "debug", "Build project in debug mode", 0, 0, "");
-        -:   74:
-    #####:   75:	args_add_sub_command(args, &bdebug);
-        -:   76:
-        -:   77:	// build the test SubCommand
-        -:   78:	SubCommand test;
-    #####:   79:	sub_command_build(&test, "test", "Run tests", 0, 0, "");
-        -:   80:
-    #####:   81:	args_add_sub_command(args, &test);
-        -:   82:
-        -:   83:	// build the doc SubCommand
-        -:   84:	SubCommand doc;
-    #####:   85:	sub_command_build(&doc, "doc", "Build documentation", 0, 0, "");
-        -:   86:
-    #####:   87:	args_add_sub_command(args, &doc);
-        -:   88:
-        -:   89:	// build the verse SubCommand
-        -:   90:	SubCommand verse;
-    #####:   91:	sub_command_build(&verse, "verse", "Print a random Bible verse", 0, 0, "");
-        -:   92:	ArgsParam no_colors_param, book_param, chapter_param, verse_param;
-    #####:   93:	args_param_build(
-        -:   94:		&no_colors_param, "no_colors", "Do not display colors", "n", false, false, NULL);
-    #####:   95:	args_param_build(&book_param, "book",
-        -:   96:		"Randomly select a verse from the specified book of the Bible", "b", true, false, NULL);
-    #####:   97:	args_param_build(&chapter_param, "chapter",
-        -:   98:		"Randomly select a verse from the specified chapter of the Bible. "
-        -:   99:		"This option requires that --book be specified as well.",
-        -:  100:		"x", true, false, NULL);
-    #####:  101:	args_param_build(&verse_param, "verse",
-        -:  102:		"Select the specified verse. This option requires "
-        -:  103:		"that --book and --chapter be specified as well.",
-        -:  104:		"v", true, false, NULL);
-        -:  105:
-    #####:  106:	sub_command_add_param(&verse, &no_colors_param);
-    #####:  107:	sub_command_add_param(&verse, &book_param);
-    #####:  108:	sub_command_add_param(&verse, &chapter_param);
-    #####:  109:	sub_command_add_param(&verse, &verse_param);
-        -:  110:
-    #####:  111:	args_add_sub_command(args, &verse);
-        -:  112:
-        -:  113:	// build the node SubCommand
-        -:  114:	SubCommand node;
-        -:  115:	ArgsParam cfg_threads, cfg_show;
-    #####:  116:	args_param_build(
-        -:  117:		&cfg_show, "show_request", "Show request information", "s", false, false, NULL);
-    #####:  118:	args_param_build(
-        -:  119:		&cfg_threads, "threads", "Number of threads to execute", "t", true, false, "1");
-        -:  120:
-    #####:  121:	sub_command_build(&node, "node", "Run full node", 0, 0, "");
-    #####:  122:	sub_command_add_param(&node, &cfg_threads);
-    #####:  123:	sub_command_add_param(&node, &cfg_show);
-        -:  124:
-    #####:  125:	args_add_sub_command(args, &node);
-        -:  126:
-        -:  127:	// build core options
-        -:  128:	ArgsParam cfg_config_dir;
-        -:  129:	ArgsParam cfg_debug;
-        -:  130:
-    #####:  131:	args_param_build(
-        -:  132:		&cfg_debug, "debug", "Prints additional debugging information", "d", false, false, NULL);
-        -:  133:
-    #####:  134:	char default_config_dir[strlen(home_dir) + 100];
-    #####:  135:	snprintf(default_config_dir, strlen(home_dir) + 100, "%s/.fam", home_dir);
-    #####:  136:	args_param_build(&cfg_config_dir, "config_dir",
-        -:  137:		"Directory where configuration files are stored", "c", true, false, default_config_dir);
-        -:  138:
-    #####:  139:	args_add_param(args, &cfg_debug);
-    #####:  140:	args_add_param(args, &cfg_config_dir);
-    #####:  141:}
-        -:  142:
-    #####:  143:void process_verse(Args *args, char *config_dir)
-    #####:  144:{
-    #####:  145:	bool no_colors = args_value_of(args, "no_colors", NULL, 0, 0) >= 0;
-        -:  146:	char book[100];
-    #####:  147:	args_value_of(args, "book", book, 100, 0);
-        -:  148:	char chapter_buf[100];
-    #####:  149:	int chapter_int = -1;
-    #####:  150:	if (args_value_of(args, "chapter", chapter_buf, 100, 0) != -1) {
-    #####:  151:		chapter_int = atoi(chapter_buf);
-    #####:  152:		if (chapter_int <= 0 || chapter_int > 255) {
-    #####:  153:			fprintf(stderr,
-        -:  154:				"The chapter specified must be a positive "
-        -:  155:				"integer which is equal to or less than 255.\n");
-    #####:  156:			exit(-1);
-        -:  157:		}
-        -:  158:	}
-        -:  159:	char verse_buf[100];
-    #####:  160:	int verse_int = -1;
-    #####:  161:	if (args_value_of(args, "verse", verse_buf, 100, 0) != -1) {
-    #####:  162:		verse_int = atoi(verse_buf);
-    #####:  163:		if (verse_int <= 0 || verse_int > 255) {
-    #####:  164:			fprintf(stderr,
-        -:  165:				"The verse specified must be a positive "
-        -:  166:				"integer which is equal to or less than 255.\n");
-    #####:  167:			exit(-1);
-        -:  168:		}
-        -:  169:	}
-        -:  170:
-        -:  171:	Bible bible;
-    #####:  172:	char bible_path[strlen(config_dir) + 10];
-    #####:  173:	strcpy(bible_path, config_dir);
-    #####:  174:	strcat(bible_path, "/resources/akjv.txt");
-    #####:  175:	if (bible_build(&bible, bible_path)) {
-    #####:  176:		fprintf(stderr, "Could not load bible at path %s: %s\n", bible_path, strerror(errno));
-    #####:  177:		exit(-1);
-        -:  178:	}
-        -:  179:
-        -:  180:	char buf[1024];
-        -:  181:	char book_buf[100];
-        -:  182:	u8 chapter, verse;
-        -:  183:
-    #####:  184:	u8 *chapter_ptr = NULL;
-    #####:  185:	if (chapter_int != -1) {
-    #####:  186:		chapter = chapter_int;
-    #####:  187:		chapter_ptr = &chapter;
-        -:  188:	}
-    #####:  189:	u8 *verse_ptr = NULL;
-    #####:  190:	if (verse_int != -1) {
-    #####:  191:		verse = verse_int;
-    #####:  192:		verse_ptr = &verse;
-        -:  193:	}
-        -:  194:
-    #####:  195:	if (verse_int != -1 && chapter_int == -1) {
-    #####:  196:		fprintf(stderr,
-        -:  197:			"If --verse is specified, --chapter must also "
-        -:  198:			"be specified\n");
-    #####:  199:		exit(-1);
-        -:  200:	}
-    #####:  201:	if (chapter_int != -1 && (strlen(book) == 0)) {
-    #####:  202:		fprintf(stderr,
-        -:  203:			"If --chapter is specified, --book must also "
-        -:  204:			"be specified\n");
-    #####:  205:		exit(-1);
-        -:  206:	}
-    #####:  207:	if (bible_random_verse_to_string(&bible, buf, 1024, !no_colors, book, chapter_ptr, verse_ptr)
-        -:  208:		< 0) {
-    #####:  209:		fprintf(stderr, "Could not find random verse due to: %s\n", strerror(errno));
-    #####:  210:		exit(-1);
-        -:  211:	}
-        -:  212:
-    #####:  213:	printf("%s\n", buf);
-    #####:  214:	bible_cleanup(&bible);
-    #####:  215:}
-        -:  216:
-    #####:  217:void process_build(Args *args, char *config_dir)
-        -:  218:{
-        -:  219:	char base_dir[PATH_MAX];
-    #####:  220:	args_value_of(args, "base", base_dir, PATH_MAX - 1, 0);
-    #####:  221:	proc_build(base_dir);
-    #####:  222:}
-        -:  223:
-    #####:  224:void process_init(Args *args, char *config_dir)
-        -:  225:{
-        -:  226:	char proj_name[128];
-    #####:  227:	strcpy(proj_name, "");
-    #####:  228:	args_get_argument(args, 1, proj_name, 127);
-        -:  229:	char proj_path[PATH_MAX];
-    #####:  230:	strcpy(proj_path, proj_name);
-    #####:  231:	args_value_of(args, "dir", proj_path, 1023, 0);
-        -:  232:
-        -:  233:	char author[11][1024];
-    #####:  234:	int count = 0;
-        -:  235:	loop
-    #####:  236:	{
-    #####:  237:		int v = args_value_of(args, "author", author[count], 1023, count);
-    #####:  238:		if (v == -1)
-    #####:  239:			break;
-    #####:  240:		count++;
-    #####:  241:		if (count >= 10) {
-    #####:  242:			fprintf(stderr, "A maximum of 10 authors is allowed.");
-    #####:  243:			exit(-1);
-        -:  244:		}
-        -:  245:	}
-        -:  246:
-    #####:  247:	bool lib = args_value_of(args, "lib", NULL, 0, 0) >= 0;
-        -:  248:
-        -:  249:	char description[1024];
-    #####:  250:	args_value_of(args, "description", description, 1023, 0);
-    #####:  251:	proc_build_init(config_dir, proj_name, proj_path, author, count, lib, description);
-    #####:  252:}
-        -:  253:
-    #####:  254:void setup_config_dir(const char *config_dir)
-    #####:  255:{
-    #####:  256:	if (mkdir(config_dir, 0700)) {
-    #####:  257:		perror("Failed to create specified config directory");
-    #####:  258:		exit(-1);
-        -:  259:	}
-        -:  260:
-    #####:  261:	char resources_dir[strlen(config_dir) + 100];
-    #####:  262:	strcpy(resources_dir, config_dir);
-    #####:  263:	strcat(resources_dir, "/resources");
-        -:  264:
-    #####:  265:	if (mkdir(resources_dir, 0700)) {
-    #####:  266:		perror("Failed to create specified resources directory");
-    #####:  267:		exit(-1);
-        -:  268:	}
-        -:  269:
-    #####:  270:	BUILD_RESOURCE_DIR(resources_dir, fam);
-    #####:  271:}
-        -:  272:
-    #####:  273:int real_main(int argc, char **argv)
-    #####:  274:{
-        -:  275:	Args args;
-    #####:  276:	build_args(&args);
-    #####:  277:	args_init(&args, argc, argv);
-        -:  278:
-        -:  279:	// we always ensure that the config directory exists.
-    #####:  280:	int config_dir_len = args_value_of(&args, "config_dir", NULL, 0, 0);
-    #####:  281:	char config_dir[config_dir_len + 1];
-    #####:  282:	args_value_of(&args, "config_dir", config_dir, config_dir_len + 1, 0);
-    #####:  283:	if (access(config_dir, F_OK)) {
-    #####:  284:		setup_config_dir(config_dir);
-        -:  285:	}
-        -:  286:
-        -:  287:	// get first argument (subcommand)
-        -:  288:	char command[100];
-    #####:  289:	int ret = args_get_argument(&args, 0, command, 100);
-    #####:  290:	if (ret > 0) {
-    #####:  291:		if (!strcmp(command, "verse")) {
-    #####:  292:			process_verse(&args, config_dir);
-    #####:  293:		} else if (!strcmp(command, "init")) {
-    #####:  294:			process_init(&args, config_dir);
-    #####:  295:		} else if (!strcmp(command, "build")) {
-    #####:  296:			process_build(&args, config_dir);
-        -:  297:		} else {
-    #####:  298:			printf("Not implemented!\n");
-        -:  299:		}
-        -:  300:	}
-        -:  301:
-    #####:  302:	args_cleanup(&args);
-        -:  303:
-    #####:  304:	return 0;
-        -:  305:}
+        -:   16:#include <base/misc.h>
+        -:   17:#include <base/version.h>
+        -:   18:#include <bible/bible.h>
+        -:   19:#include <build/build.h>
+        -:   20:#include <core/std.h>
+        -:   21:#include <dirent.h>
+        -:   22:#include <errno.h>
+        -:   23:#include <main/main.h>
+        -:   24:#include <main/resources.h>
+        -:   25:#include <stdio.h>
+        -:   26:#include <string.h>
+        -:   27:#include <sys/stat.h>
+        -:   28:#include <unistd.h>
+        -:   29:
+    #####:   30:void build_args(Args *args)
+    #####:   31:{
+    #####:   32:	const char *home_dir = get_home_directory();
+        -:   33:
+    #####:   34:	args_build(args, "fam", FAM_VERSION, "The MyFamily Developers", 0, 0, 0);
+        -:   35:
+        -:   36:	// build the init SubCommand
+        -:   37:	SubCommand init;
+        -:   38:	ArgsParam cfg_dir;
+    #####:   39:	args_param_build(&cfg_dir, "dir",
+        -:   40:		"Directory to initialize the project in (defaults to "
+        -:   41:		"the project name if not specified)",
+        -:   42:		"p", true, false, NULL);
+        -:   43:	ArgsParam cfg_authors;
+    #####:   44:	args_param_build(&cfg_authors, "author", "Author of this project", "a", true, true,
+        -:   45:		"The MyFamily Developers");
+        -:   46:	ArgsParam cfg_lib;
+    #####:   47:	args_param_build(&cfg_lib, "lib",
+        -:   48:		"Initialize the project as a library project. (If not set, the project will be a binary "
+        -:   49:		"project)",
+        -:   50:		"l", false, false, NULL);
+        -:   51:	ArgsParam cfg_description;
+    #####:   52:	args_param_build(&cfg_description, "description",
+        -:   53:		"Project description (defaults to the project name)", "d", true, false, NULL);
+    #####:   54:	sub_command_build(&init, "init", "Initialize project", 1, 1, "<project_name>");
+    #####:   55:	sub_command_add_param(&init, &cfg_dir);
+    #####:   56:	sub_command_add_param(&init, &cfg_authors);
+    #####:   57:	sub_command_add_param(&init, &cfg_lib);
+    #####:   58:	sub_command_add_param(&init, &cfg_description);
+        -:   59:
+    #####:   60:	args_add_sub_command(args, &init);
+        -:   61:
+        -:   62:	// build the build SubCommand
+        -:   63:	SubCommand build;
+        -:   64:	ArgsParam cfg_base;
+    #####:   65:	args_param_build(&cfg_base, "base", "The base directory of the project. (defaults to '.')", "b",
+        -:   66:		true, false, ".");
+    #####:   67:	sub_command_build(&build, "build", "Build project in release mode", 0, 0, "");
+    #####:   68:	sub_command_add_param(&build, &cfg_base);
+        -:   69:
+    #####:   70:	args_add_sub_command(args, &build);
+        -:   71:
+        -:   72:	// build the debug SubCommand
+        -:   73:	SubCommand bdebug;
+    #####:   74:	sub_command_build(&bdebug, "debug", "Build project in debug mode", 0, 0, "");
+        -:   75:
+    #####:   76:	args_add_sub_command(args, &bdebug);
+        -:   77:
+        -:   78:	// build the test SubCommand
+        -:   79:	SubCommand test;
+    #####:   80:	sub_command_build(&test, "test", "Run tests", 0, 0, "");
+        -:   81:
+    #####:   82:	args_add_sub_command(args, &test);
+        -:   83:
+        -:   84:	// build the doc SubCommand
+        -:   85:	SubCommand doc;
+    #####:   86:	sub_command_build(&doc, "doc", "Build documentation", 0, 0, "");
+        -:   87:
+    #####:   88:	args_add_sub_command(args, &doc);
+        -:   89:
+        -:   90:	// build the verse SubCommand
+        -:   91:	SubCommand verse;
+    #####:   92:	sub_command_build(&verse, "verse", "Print a random Bible verse", 0, 0, "");
+        -:   93:	ArgsParam no_colors_param, book_param, chapter_param, verse_param;
+    #####:   94:	args_param_build(
+        -:   95:		&no_colors_param, "no_colors", "Do not display colors", "n", false, false, NULL);
+    #####:   96:	args_param_build(&book_param, "book",
+        -:   97:		"Randomly select a verse from the specified book of the Bible", "b", true, false, NULL);
+    #####:   98:	args_param_build(&chapter_param, "chapter",
+        -:   99:		"Randomly select a verse from the specified chapter of the Bible. "
+        -:  100:		"This option requires that --book be specified as well.",
+        -:  101:		"x", true, false, NULL);
+    #####:  102:	args_param_build(&verse_param, "verse",
+        -:  103:		"Select the specified verse. This option requires "
+        -:  104:		"that --book and --chapter be specified as well.",
+        -:  105:		"v", true, false, NULL);
+        -:  106:
+    #####:  107:	sub_command_add_param(&verse, &no_colors_param);
+    #####:  108:	sub_command_add_param(&verse, &book_param);
+    #####:  109:	sub_command_add_param(&verse, &chapter_param);
+    #####:  110:	sub_command_add_param(&verse, &verse_param);
+        -:  111:
+    #####:  112:	args_add_sub_command(args, &verse);
+        -:  113:
+        -:  114:	// build the node SubCommand
+        -:  115:	SubCommand node;
+        -:  116:	ArgsParam cfg_threads, cfg_show;
+    #####:  117:	args_param_build(
+        -:  118:		&cfg_show, "show_request", "Show request information", "s", false, false, NULL);
+    #####:  119:	args_param_build(
+        -:  120:		&cfg_threads, "threads", "Number of threads to execute", "t", true, false, "1");
+        -:  121:
+    #####:  122:	sub_command_build(&node, "node", "Run full node", 0, 0, "");
+    #####:  123:	sub_command_add_param(&node, &cfg_threads);
+    #####:  124:	sub_command_add_param(&node, &cfg_show);
+        -:  125:
+    #####:  126:	args_add_sub_command(args, &node);
+        -:  127:
+        -:  128:	// build core options
+        -:  129:	ArgsParam cfg_config_dir;
+        -:  130:	ArgsParam cfg_debug;
+        -:  131:
+    #####:  132:	args_param_build(
+        -:  133:		&cfg_debug, "debug", "Prints additional debugging information", "d", false, false, NULL);
+        -:  134:
+    #####:  135:	char default_config_dir[strlen(home_dir) + 100];
+    #####:  136:	snprintf(default_config_dir, strlen(home_dir) + 100, "%s/.fam", home_dir);
+    #####:  137:	args_param_build(&cfg_config_dir, "config_dir",
+        -:  138:		"Directory where configuration files are stored", "c", true, false, default_config_dir);
+        -:  139:
+    #####:  140:	args_add_param(args, &cfg_debug);
+    #####:  141:	args_add_param(args, &cfg_config_dir);
+    #####:  142:}
+        -:  143:
+    #####:  144:void process_verse(Args *args, char *config_dir)
+    #####:  145:{
+    #####:  146:	bool no_colors = args_value_of(args, "no_colors", NULL, 0, 0) >= 0;
+        -:  147:	char book[100];
+    #####:  148:	args_value_of(args, "book", book, 100, 0);
+        -:  149:	char chapter_buf[100];
+    #####:  150:	int chapter_int = -1;
+    #####:  151:	if (args_value_of(args, "chapter", chapter_buf, 100, 0) != -1) {
+    #####:  152:		chapter_int = atoi(chapter_buf);
+    #####:  153:		if (chapter_int <= 0 || chapter_int > 255) {
+    #####:  154:			fprintf(stderr,
+        -:  155:				"The chapter specified must be a positive "
+        -:  156:				"integer which is equal to or less than 255.\n");
+    #####:  157:			exit(-1);
+        -:  158:		}
+        -:  159:	}
+        -:  160:	char verse_buf[100];
+    #####:  161:	int verse_int = -1;
+    #####:  162:	if (args_value_of(args, "verse", verse_buf, 100, 0) != -1) {
+    #####:  163:		verse_int = atoi(verse_buf);
+    #####:  164:		if (verse_int <= 0 || verse_int > 255) {
+    #####:  165:			fprintf(stderr,
+        -:  166:				"The verse specified must be a positive "
+        -:  167:				"integer which is equal to or less than 255.\n");
+    #####:  168:			exit(-1);
+        -:  169:		}
+        -:  170:	}
+        -:  171:
+        -:  172:	Bible bible;
+    #####:  173:	char bible_path[strlen(config_dir) + 10];
+    #####:  174:	strcpy(bible_path, config_dir);
+    #####:  175:	strcat(bible_path, "/resources/akjv.txt");
+    #####:  176:	if (bible_build(&bible, bible_path)) {
+    #####:  177:		fprintf(stderr, "Could not load bible at path %s: %s\n", bible_path, strerror(errno));
+    #####:  178:		exit(-1);
+        -:  179:	}
+        -:  180:
+        -:  181:	char buf[1024];
+        -:  182:	char book_buf[100];
+        -:  183:	u8 chapter, verse;
+        -:  184:
+    #####:  185:	u8 *chapter_ptr = NULL;
+    #####:  186:	if (chapter_int != -1) {
+    #####:  187:		chapter = chapter_int;
+    #####:  188:		chapter_ptr = &chapter;
+        -:  189:	}
+    #####:  190:	u8 *verse_ptr = NULL;
+    #####:  191:	if (verse_int != -1) {
+    #####:  192:		verse = verse_int;
+    #####:  193:		verse_ptr = &verse;
+        -:  194:	}
+        -:  195:
+    #####:  196:	if (verse_int != -1 && chapter_int == -1) {
+    #####:  197:		fprintf(stderr,
+        -:  198:			"If --verse is specified, --chapter must also "
+        -:  199:			"be specified\n");
+    #####:  200:		exit(-1);
+        -:  201:	}
+    #####:  202:	if (chapter_int != -1 && (strlen(book) == 0)) {
+    #####:  203:		fprintf(stderr,
+        -:  204:			"If --chapter is specified, --book must also "
+        -:  205:			"be specified\n");
+    #####:  206:		exit(-1);
+        -:  207:	}
+    #####:  208:	if (bible_random_verse_to_string(&bible, buf, 1024, !no_colors, book, chapter_ptr, verse_ptr)
+        -:  209:		< 0) {
+    #####:  210:		fprintf(stderr, "Could not find random verse due to: %s\n", strerror(errno));
+    #####:  211:		exit(-1);
+        -:  212:	}
+        -:  213:
+    #####:  214:	printf("%s\n", buf);
+    #####:  215:	bible_cleanup(&bible);
+    #####:  216:}
+        -:  217:
+    #####:  218:void process_build(Args *args, char *config_dir)
+        -:  219:{
+        -:  220:	char base_dir[PATH_MAX];
+    #####:  221:	args_value_of(args, "base", base_dir, PATH_MAX - 1, 0);
+    #####:  222:	proc_build(base_dir, config_dir);
+    #####:  223:}
+        -:  224:
+    #####:  225:void process_init(Args *args, char *config_dir)
+        -:  226:{
+        -:  227:	char proj_name[128];
+    #####:  228:	strcpy(proj_name, "");
+    #####:  229:	args_get_argument(args, 1, proj_name, 127);
+        -:  230:	char proj_path[PATH_MAX];
+    #####:  231:	strcpy(proj_path, proj_name);
+    #####:  232:	args_value_of(args, "dir", proj_path, 1023, 0);
+        -:  233:
+        -:  234:	char author[11][1024];
+    #####:  235:	int count = 0;
+        -:  236:	loop
+    #####:  237:	{
+    #####:  238:		int v = args_value_of(args, "author", author[count], 1023, count);
+    #####:  239:		if (v == -1)
+    #####:  240:			break;
+    #####:  241:		count++;
+    #####:  242:		if (count >= 10) {
+    #####:  243:			fprintf(stderr, "A maximum of 10 authors is allowed.");
+    #####:  244:			exit(-1);
+        -:  245:		}
+        -:  246:	}
+        -:  247:
+    #####:  248:	bool lib = args_value_of(args, "lib", NULL, 0, 0) >= 0;
+        -:  249:
+        -:  250:	char description[1024];
+    #####:  251:	args_value_of(args, "description", description, 1023, 0);
+    #####:  252:	proc_build_init(config_dir, proj_name, proj_path, author, count, lib, description);
+    #####:  253:}
+        -:  254:
+    #####:  255:void setup_config_dir(const char *config_dir)
+    #####:  256:{
+    #####:  257:	if (mkdir(config_dir, 0700)) {
+    #####:  258:		perror("Failed to create specified config directory");
+    #####:  259:		exit(-1);
+        -:  260:	}
+        -:  261:
+    #####:  262:	char resources_dir[strlen(config_dir) + 100];
+    #####:  263:	strcpy(resources_dir, config_dir);
+    #####:  264:	strcat(resources_dir, "/resources");
+        -:  265:
+    #####:  266:	if (mkdir(resources_dir, 0700)) {
+    #####:  267:		perror("Failed to create specified resources directory");
+    #####:  268:		exit(-1);
+        -:  269:	}
+        -:  270:
+    #####:  271:	BUILD_RESOURCE_DIR(resources_dir, fam);
+    #####:  272:}
+        -:  273:
+    #####:  274:int real_main(int argc, char **argv)
+    #####:  275:{
+        -:  276:	Args args;
+    #####:  277:	build_args(&args);
+    #####:  278:	args_init(&args, argc, argv);
+        -:  279:
+        -:  280:	// we always ensure that the config directory exists.
+    #####:  281:	int config_dir_len = args_value_of(&args, "config_dir", NULL, 0, 0);
+    #####:  282:	char config_dir[config_dir_len + 1];
+    #####:  283:	args_value_of(&args, "config_dir", config_dir, config_dir_len + 1, 0);
+    #####:  284:	if (access(config_dir, F_OK)) {
+    #####:  285:		setup_config_dir(config_dir);
+    #####:  286:		WRITE_BUILD_ID(config_dir);
+        -:  287:	} else {
+        -:  288:		// check build id
+        -:  289:		char bid_file[PATH_MAX];
+    #####:  290:		strcpy(bid_file, config_dir);
+    #####:  291:		strcat(bid_file, PATH_SEPARATOR);
+    #####:  292:		strcat(bid_file, "build_id");
+    #####:  293:		FILE *fp = myfopen(bid_file, "r");
+    #####:  294:		if (!fp) {
+    #####:  295:			exit_error("could not open the build file");
+        -:  296:		}
+        -:  297:		char bid_file_contents[1024];
+    #####:  298:		size_t rlen = read_all(bid_file_contents, 1, 100, fp);
+    #####:  299:		bid_file_contents[rlen] = 0;
+    #####:  300:		if (strcmp(bid_file_contents, BUILD_ID)) {
+    #####:  301:			remove_directory(config_dir, false);
+    #####:  302:			setup_config_dir(config_dir);
+    #####:  303:			WRITE_BUILD_ID(config_dir);
+        -:  304:		}
+        -:  305:	}
+        -:  306:
+        -:  307:	// get first argument (subcommand)
+        -:  308:	char command[100];
+    #####:  309:	int ret = args_get_argument(&args, 0, command, 100);
+    #####:  310:	if (ret > 0) {
+    #####:  311:		if (!strcmp(command, "verse")) {
+    #####:  312:			process_verse(&args, config_dir);
+    #####:  313:		} else if (!strcmp(command, "init")) {
+    #####:  314:			process_init(&args, config_dir);
+    #####:  315:		} else if (!strcmp(command, "build")) {
+    #####:  316:			process_build(&args, config_dir);
+        -:  317:		} else {
+    #####:  318:			printf("Not implemented!\n");
+        -:  319:		}
+        -:  320:	}
+        -:  321:
+    #####:  322:	args_cleanup(&args);
+        -:  323:
+    #####:  324:	return 0;
+        -:  325:}
         -:    0:Source:toml.c
         -:    0:Graph:toml.gcno
         -:    0:Data:toml.gcda
@@ -5363,7 +5383,7 @@ Unit_size:
         -:  103:}
         -:  104:
         -:  105:// Function to recursively remove a directory and its contents
-       48:  106:int remove_directory(const char *path)
+       48:  106:int remove_directory(const char *path, bool preserve_dir)
         -:  107:{
         -:  108:	struct dirent *entry;
        48:  109:	DIR *dir = opendir(path);
@@ -5392,7 +5412,7 @@ Unit_size:
         -:  132:
         1:  133:		if (S_ISDIR(statbuf.st_mode)) {
         -:  134:			// It's a directory, recurse into it
-    #####:  135:			if (remove_directory(full_path) == -1) {
+    #####:  135:			if (remove_directory(full_path, false) == -1) {
     #####:  136:				closedir(dir);
     #####:  137:				return -1;
         -:  138:			}
@@ -5409,24 +5429,26 @@ Unit_size:
        24:  149:	closedir(dir);
         -:  150:
         -:  151:	// Now the directory is empty, so we can remove it
-       24:  152:	if (rmdir(path) == -1) {
-    #####:  153:		perror("rmdir");
-    #####:  154:		return -1;
-        -:  155:	}
-        -:  156:
-       24:  157:	return 0;
-        -:  158:}
-        -:  159:
-    #####:  160:void exit_error(char *format, ...)
-        -:  161:{
-        -:  162:	va_list va_args;
-    #####:  163:	va_start(va_args, format);
-    #####:  164:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
-    #####:  165:	vfprintf(stderr, format, va_args);
-    #####:  166:	fprintf(stderr, "\n");
-    #####:  167:	va_end(va_args);
-    #####:  168:	exit(-1);
-        -:  169:}
+       24:  152:	if (!preserve_dir) {
+       24:  153:		if (rmdir(path) == -1) {
+    #####:  154:			perror("rmdir");
+    #####:  155:			return -1;
+        -:  156:		}
+        -:  157:	}
+        -:  158:
+       24:  159:	return 0;
+        -:  160:}
+        -:  161:
+    #####:  162:void exit_error(char *format, ...)
+        -:  163:{
+        -:  164:	va_list va_args;
+    #####:  165:	va_start(va_args, format);
+    #####:  166:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+    #####:  167:	vfprintf(stderr, format, va_args);
+    #####:  168:	fprintf(stderr, "\n");
+    #####:  169:	va_end(va_args);
+    #####:  170:	exit(-1);
+        -:  171:}
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
@@ -5504,168 +5526,224 @@ Unit_size:
         -:   20:#include <string.h>
         -:   21:#include <sys/stat.h>
         -:   22:
-        -:   23:#define PATH_SEPARATOR "/"
-        -:   24:#define PATH_SEPARATOR_CHAR '/'
-        -:   25:
-       32:   26:void path_cleanup(PathImpl *ptr)
-        -:   27:{
-       32:   28:	chain_free(&ptr->ptr);
-       32:   29:}
-        -:   30:
-       32:   31:int path_for(Path *p, const char *path)
-        -:   32:{
-       32:   33:	if (path == NULL) {
-    #####:   34:		errno = EINVAL;
-    #####:   35:		return -1;
-        -:   36:	}
-       32:   37:	int len = strlen(path);
-       32:   38:	if (len == 0) {
-    #####:   39:		errno = EINVAL;
+       32:   23:void path_cleanup(PathImpl *ptr)
+        -:   24:{
+       32:   25:	chain_free(&ptr->ptr);
+       32:   26:}
+        -:   27:
+       32:   28:int path_for(Path *p, const char *path)
+        -:   29:{
+       32:   30:	if (path == NULL) {
+    #####:   31:		errno = EINVAL;
+    #####:   32:		return -1;
+        -:   33:	}
+       32:   34:	int len = strlen(path);
+       32:   35:	if (len == 0) {
+    #####:   36:		errno = EINVAL;
+    #####:   37:		return -1;
+        -:   38:	}
+       32:   39:	if (chain_malloc(&p->ptr, len + 1))
     #####:   40:		return -1;
-        -:   41:	}
-       32:   42:	if (chain_malloc(&p->ptr, len + 1))
-    #####:   43:		return -1;
-       32:   44:	strcpy(p->ptr.data, path);
-       32:   45:	return 0;
-        -:   46:}
-        -:   47:
-       31:   48:int path_replace_home(Path *p)
-        -:   49:{
-       31:   50:	const char *home_dir = getenv("HOME");
-       31:   51:	if (home_dir == NULL) {
-    #####:   52:		errno = EINVAL;
-    #####:   53:		return -1;
-        -:   54:	}
-       31:   55:	if (((char *)(p->ptr.data))[0] == '~') {
-    #####:   56:		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr.data);
-    #####:   57:		if (nlen >= PATH_MAX) {
-    #####:   58:			errno = E2BIG;
-    #####:   59:			return -1;
-        -:   60:		}
-    #####:   61:		if (nlen >= p->ptr.len) {
-        -:   62:			FatPtr nptr;
-    #####:   63:			if (chain_realloc(&nptr, &p->ptr, nlen + 1))
-    #####:   64:				return -1;
-    #####:   65:			p->ptr = nptr;
-        -:   66:		}
-        -:   67:		char buf[PATH_MAX + 1];
-    #####:   68:		snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr.data + 1));
-    #####:   69:		strcpy(p->ptr.data, buf);
-        -:   70:	}
-       31:   71:	return 0;
-        -:   72:}
-        -:   73:
-       31:   74:int path_canonicalize(Path *p)
-        -:   75:{
-       31:   76:	if (path_replace_home(p))
-    #####:   77:		return -1;
-        -:   78:	char buf[PATH_MAX];
-       31:   79:	errno = 0;
-       31:   80:	if (realpath(p->ptr.data, buf) == NULL) {
-        2:   81:		return -1;
-        -:   82:	}
-       29:   83:	int nlen = strlen(buf);
-       29:   84:	if (nlen == 0) {
-    #####:   85:		errno = EFAULT;
-    #####:   86:		return -1;
-        -:   87:	}
-       29:   88:	if (nlen >= p->ptr.len) {
-        -:   89:		FatPtr nptr;
-       28:   90:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
-    #####:   91:			return -1;
-       28:   92:		p->ptr = nptr;
-        -:   93:	}
-       29:   94:	strcpy(p->ptr.data, buf);
-       29:   95:	return 0;
-        -:   96:}
-        5:   97:int path_push(Path *p, const char *next)
-        -:   98:{
-        5:   99:	if (next == NULL) {
-    #####:  100:		errno = EINVAL;
-    #####:  101:		return -1;
-        -:  102:	}
-        5:  103:	int slen = strlen(p->ptr.data);
-        5:  104:	if (slen <= 0) {
-    #####:  105:		errno = EFAULT;
-    #####:  106:		return -1;
-        -:  107:	}
-        5:  108:	bool need_sep = false;
-        5:  109:	if (((char *)p->ptr.data)[slen - 1] != PATH_SEPARATOR_CHAR) {
-        4:  110:		need_sep = true;
-        -:  111:	}
-        -:  112:
-        5:  113:	int nlen = slen + strlen(next);
-        5:  114:	if (need_sep)
-        4:  115:		nlen += strlen(PATH_SEPARATOR);
-        -:  116:
-        5:  117:	if (nlen >= p->ptr.len) {
-        -:  118:		FatPtr nptr;
-        3:  119:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
-    #####:  120:			return -1;
-        3:  121:		p->ptr = nptr;
-        -:  122:	}
-        -:  123:
-        5:  124:	if (need_sep)
-        4:  125:		strcat(p->ptr.data, PATH_SEPARATOR);
-        5:  126:	strcat(p->ptr.data, next);
-        5:  127:	return 0;
-        -:  128:}
-        2:  129:int path_pop(Path *p)
-        -:  130:{
-        2:  131:	char *res = rstrstr(p->ptr.data, PATH_SEPARATOR);
-        2:  132:	if (res) {
-        2:  133:		int index = res - (char *)p->ptr.data;
-        2:  134:		((char *)(p->ptr.data))[index] = 0;
-        -:  135:	} else {
-    #####:  136:		((char *)(p->ptr.data))[0] = '.';
-    #####:  137:		((char *)(p->ptr.data))[1] = 0;
-        -:  138:	}
-        2:  139:	return 0;
-        -:  140:}
-        -:  141:
-        8:  142:char *path_to_string(const Path *p)
-        -:  143:{
-        8:  144:	return p->ptr.data;
-        -:  145:}
-        -:  146:
-    #####:  147:char *path_file_name(const Path *p)
-        -:  148:{
-    #####:  149:	char *ret = rstrstr(p->ptr.data, PATH_SEPARATOR);
-    #####:  150:	if (ret != NULL && strlen(ret) > 0)
-    #####:  151:		return ret + 1;
+       32:   41:	strcpy(p->ptr.data, path);
+       32:   42:	return 0;
+        -:   43:}
+        -:   44:
+       31:   45:int path_replace_home(Path *p)
+        -:   46:{
+       31:   47:	const char *home_dir = getenv("HOME");
+       31:   48:	if (home_dir == NULL) {
+    #####:   49:		errno = EINVAL;
+    #####:   50:		return -1;
+        -:   51:	}
+       31:   52:	if (((char *)(p->ptr.data))[0] == '~') {
+    #####:   53:		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr.data);
+    #####:   54:		if (nlen >= PATH_MAX) {
+    #####:   55:			errno = E2BIG;
+    #####:   56:			return -1;
+        -:   57:		}
+    #####:   58:		if (nlen >= p->ptr.len) {
+        -:   59:			FatPtr nptr;
+    #####:   60:			if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+    #####:   61:				return -1;
+    #####:   62:			p->ptr = nptr;
+        -:   63:		}
+        -:   64:		char buf[PATH_MAX + 1];
+    #####:   65:		snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr.data + 1));
+    #####:   66:		strcpy(p->ptr.data, buf);
+        -:   67:	}
+       31:   68:	return 0;
+        -:   69:}
+        -:   70:
+       31:   71:int path_canonicalize(Path *p)
+        -:   72:{
+       31:   73:	if (path_replace_home(p))
+    #####:   74:		return -1;
+        -:   75:	char buf[PATH_MAX];
+       31:   76:	errno = 0;
+       31:   77:	if (realpath(p->ptr.data, buf) == NULL) {
+        2:   78:		return -1;
+        -:   79:	}
+       29:   80:	int nlen = strlen(buf);
+       29:   81:	if (nlen == 0) {
+    #####:   82:		errno = EFAULT;
+    #####:   83:		return -1;
+        -:   84:	}
+       29:   85:	if (nlen >= p->ptr.len) {
+        -:   86:		FatPtr nptr;
+       28:   87:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+    #####:   88:			return -1;
+       28:   89:		p->ptr = nptr;
+        -:   90:	}
+       29:   91:	strcpy(p->ptr.data, buf);
+       29:   92:	return 0;
+        -:   93:}
+        5:   94:int path_push(Path *p, const char *next)
+        -:   95:{
+        5:   96:	if (next == NULL) {
+    #####:   97:		errno = EINVAL;
+    #####:   98:		return -1;
+        -:   99:	}
+        5:  100:	int slen = strlen(p->ptr.data);
+        5:  101:	if (slen <= 0) {
+    #####:  102:		errno = EFAULT;
+    #####:  103:		return -1;
+        -:  104:	}
+        5:  105:	bool need_sep = false;
+        5:  106:	if (((char *)p->ptr.data)[slen - 1] != PATH_SEPARATOR_CHAR) {
+        4:  107:		need_sep = true;
+        -:  108:	}
+        -:  109:
+        5:  110:	int nlen = slen + strlen(next);
+        5:  111:	if (need_sep)
+        4:  112:		nlen += strlen(PATH_SEPARATOR);
+        -:  113:
+        5:  114:	if (nlen >= p->ptr.len) {
+        -:  115:		FatPtr nptr;
+        3:  116:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+    #####:  117:			return -1;
+        3:  118:		p->ptr = nptr;
+        -:  119:	}
+        -:  120:
+        5:  121:	if (need_sep)
+        4:  122:		strcat(p->ptr.data, PATH_SEPARATOR);
+        5:  123:	strcat(p->ptr.data, next);
+        5:  124:	return 0;
+        -:  125:}
+        2:  126:int path_pop(Path *p)
+        -:  127:{
+        2:  128:	char *res = rstrstr(p->ptr.data, PATH_SEPARATOR);
+        2:  129:	if (res) {
+        2:  130:		int index = res - (char *)p->ptr.data;
+        2:  131:		((char *)(p->ptr.data))[index] = 0;
+        -:  132:	} else {
+    #####:  133:		((char *)(p->ptr.data))[0] = '.';
+    #####:  134:		((char *)(p->ptr.data))[1] = 0;
+        -:  135:	}
+        2:  136:	return 0;
+        -:  137:}
+        -:  138:
+        8:  139:char *path_to_string(const Path *p)
+        -:  140:{
+        8:  141:	return p->ptr.data;
+        -:  142:}
+        -:  143:
+    #####:  144:char *path_file_name(const Path *p)
+        -:  145:{
+    #####:  146:	char *ret = rstrstr(p->ptr.data, PATH_SEPARATOR);
+    #####:  147:	if (ret != NULL && strlen(ret) > 0)
+    #####:  148:		return ret + 1;
+        -:  149:
+    #####:  150:	return ret;
+        -:  151:}
         -:  152:
-    #####:  153:	return ret;
-        -:  154:}
-        -:  155:
-    #####:  156:bool path_exists(const Path *p)
-        -:  157:{
-    #####:  158:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  159:		errno = EINVAL;
-    #####:  160:		return false;
-        -:  161:	}
-    #####:  162:	return access(p->ptr.data, F_OK) == 0;
-        -:  163:}
-    #####:  164:bool path_is_dir(const Path *p)
-        -:  165:{
-    #####:  166:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  167:		errno = EINVAL;
-    #####:  168:		return false;
-        -:  169:	}
-        -:  170:	struct stat s;
-    #####:  171:	if (stat(p->ptr.data, &s) == 0) {
-    #####:  172:		return s.st_mode & S_IFDIR;
-        -:  173:	}
-    #####:  174:	return false;
-        -:  175:}
-        -:  176:
-    #####:  177:bool path_mkdir(Path *p, mode_t mode)
-        -:  178:{
-    #####:  179:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  180:		errno = EINVAL;
-    #####:  181:		return false;
-        -:  182:	}
-    #####:  183:	return mkdir(p->ptr.data, 0700) != 0;
-        -:  184:}
+    #####:  153:bool path_exists(const Path *p)
+        -:  154:{
+    #####:  155:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  156:		errno = EINVAL;
+    #####:  157:		return false;
+        -:  158:	}
+    #####:  159:	return access(p->ptr.data, F_OK) == 0;
+        -:  160:}
+    #####:  161:bool path_is_dir(const Path *p)
+        -:  162:{
+    #####:  163:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  164:		errno = EINVAL;
+    #####:  165:		return false;
+        -:  166:	}
+        -:  167:	struct stat s;
+    #####:  168:	if (stat(p->ptr.data, &s) == 0) {
+    #####:  169:		return s.st_mode & S_IFDIR;
+        -:  170:	}
+    #####:  171:	return false;
+        -:  172:}
+        -:  173:
+    #####:  174:bool path_mkdir(Path *p, mode_t mode, bool parent)
+        -:  175:{
+    #####:  176:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  177:		errno = EINVAL;
+    #####:  178:		return false;
+        -:  179:	}
+        -:  180:
+        -:  181:	struct stat s;
+        -:  182:
+        -:  183:	// Check if the path exists
+    #####:  184:	if (stat(p->ptr.data, &s) == 0) {
+        -:  185:		// If the path exists and it's a directory, return success
+    #####:  186:		if (s.st_mode & S_IFDIR) {
+    #####:  187:			return true;
+        -:  188:		} else {
+        -:  189:			// Path exists but it's not a directory
+    #####:  190:			errno = ENOTDIR;
+    #####:  191:			return false;
+        -:  192:		}
+        -:  193:	}
+        -:  194:
+        -:  195:	// If parent is false, attempt to create only the target directory
+    #####:  196:	if (!parent) {
+    #####:  197:		if (mkdir(p->ptr.data, mode) != 0) {
+    #####:  198:			return false;
+        -:  199:		}
+    #####:  200:		return true;
+        -:  201:	}
+        -:  202:
+        -:  203:	// Create the directory structure (parent is true)
+    #####:  204:	Path temp_path;
+    #####:  205:	if (path_copy(&temp_path, p) != 0) {
+    #####:  206:		return false;
+        -:  207:	}
+        -:  208:
+    #####:  209:	char *dir_part = strtok(temp_path.ptr.data, PATH_SEPARATOR);
+    #####:  210:	Path current_path;
+    #####:  211:	path_for(&current_path, PATH_SEPARATOR);
+        -:  212:
+        -:  213:	// Iterate through each part of the path and create directories as needed
+    #####:  214:	while (dir_part != NULL) {
+    #####:  215:		if (path_push(&current_path, dir_part) != 0) {
+    #####:  216:			return false;
+        -:  217:		}
+        -:  218:
+        -:  219:		// Check if the current part of the path exists, and if not, create it
+    #####:  220:		if (stat(current_path.ptr.data, &s) != 0) {
+        -:  221:			// Directory does not exist, so create it
+    #####:  222:			if (mkdir(current_path.ptr.data, mode) != 0) {
+    #####:  223:				return false;
+        -:  224:			}
+    #####:  225:		} else if (!(s.st_mode & S_IFDIR)) {
+        -:  226:			// Path exists but is not a directory
+    #####:  227:			errno = ENOTDIR;
+    #####:  228:			return false;
+        -:  229:		}
+        -:  230:
+    #####:  231:		dir_part = strtok(NULL, PATH_SEPARATOR);
+        -:  232:	}
+        -:  233:
+    #####:  234:	return true;
+        -:  235:}
+        -:  236:
+    #####:  237:int path_copy(Path *dst, Path *src)
+        -:  238:{
+    #####:  239:	return path_for(dst, path_to_string(src));
+        -:  240:}
         -:    0:Source:rand.c
         -:    0:Graph:rand.gcno
         -:    0:Data:rand.gcda
@@ -6004,170 +6082,236 @@ Unit_size:
         -:   19:#include <build/parser.h>
         -:   20:#include <glob.h>
         -:   21:#include <stdlib.h>
-        -:   22:#include <toml/toml.h>
-        -:   23:#include <util/proc_executor.h>
-        -:   24:
-    #####:   25:void build_libs(const char *base_dir)
-        -:   26:{
-    #####:   27:	printf("build libs: %s\n", base_dir);
-    #####:   28:	Path lib_h;
-    #####:   29:	path_for(&lib_h, base_dir);
-    #####:   30:	path_push(&lib_h, "lib.h");
-    #####:   31:	if (path_exists(&lib_h)) {
-    #####:   32:		printf("found lib.h!\n");
-    #####:   33:		char **header_list = mymalloc(sizeof(char *) * 10);
-    #####:   34:		int header_to_parse = 0;
-    #####:   35:		Vec headers;
-    #####:   36:		vec_init(&headers, 10, sizeof(HeaderInfo));
-    #####:   37:		Vec types;
-    #####:   38:		vec_init(&types, 10, sizeof(TypeInfo));
-    #####:   39:		printf("headers size=%" PRIu64 "\n", vec_size(&headers));
-    #####:   40:		path_canonicalize(&lib_h);
-    #####:   41:		parse_header(&lib_h, &headers, &types);
-    #####:   42:		printf("headers size=%" PRIu64 "\n", vec_size(&headers));
-        -:   43:
-    #####:   44:		while (vec_size(&headers)) {
-    #####:   45:			HeaderInfo *next = vec_pop(&headers);
-    #####:   46:			printf("next header = %s\n", next->path);
-    #####:   47:			Path next_path;
-    #####:   48:			path_for(&next_path, next->path);
-    #####:   49:			if (path_exists(&next_path) && path_is_dir(&next_path)) {
-    #####:   50:				printf("path directory exists!\n");
-    #####:   51:				path_push(&next_path, "mod.h");
-    #####:   52:				if (path_exists(&next_path)) {
-    #####:   53:					printf("mod.h exists\n");
-    #####:   54:					parse_header(&next_path, &headers, &types);
-        -:   55:				}
-        -:   56:			} else {
-    #####:   57:				printf("path does not exist. check file.\n");
-        -:   58:				char file_buf[PATH_MAX];
-    #####:   59:				printf("fname='%s'\n", path_file_name(&next_path));
-    #####:   60:				snprintf(file_buf, PATH_MAX - 1, "%s%s", path_file_name(&next_path), ".h");
-    #####:   61:				path_pop(&next_path);
-    #####:   62:				printf("checking %s\n", path_to_string(&next_path));
-        -:   63:
-    #####:   64:				path_push(&next_path, file_buf);
-    #####:   65:				printf("checking %s\n", path_to_string(&next_path));
-    #####:   66:				if (path_exists(&next_path) && !path_is_dir(&next_path)) {
-    #####:   67:					printf("file %s exists!\n", path_to_string(&next_path));
-        -:   68:					// parse header
-    #####:   69:					parse_header(&next_path, &headers, &types);
-        -:   70:				}
-        -:   71:			}
-        -:   72:		}
-        -:   73:
-    #####:   74:		printf("types count = %" PRIu64 "\n", vec_size(&types));
-    #####:   75:		while (vec_size(&types)) {
-    #####:   76:			TypeInfo *next = vec_pop(&types);
-    #####:   77:			printf("file to compile: %s\n", next->path);
-    #####:   78:			Path next_path;
-    #####:   79:			path_for(&next_path, next->path);
-    #####:   80:			if (path_exists(&next_path) && !path_is_dir(&next_path)) {
-        -:   81:			} else {
-    #####:   82:				exit_error(
-        -:   83:					"Implementation not found. Expected at '%s'.\n", path_to_string(&next_path));
-        -:   84:			}
+        -:   22:#include <string.h>
+        -:   23:#include <toml/toml.h>
+        -:   24:#include <util/proc_executor.h>
+        -:   25:
+    #####:   26:void build_obj(char *include_param, char *obj_path, char *file_name)
+        -:   27:{
+    #####:   28:	char *args[] = { "cc", include_param, "-c", "-o", obj_path, file_name, NULL };
+    #####:   29:	if (execute_process(args)) {
+    #####:   30:		exit_error("execution of process '%s' failed", args[0]);
+        -:   31:	}
+    #####:   32:}
+        -:   33:
+    #####:   34:void build_libs(const char *base_dir, const char *config_dir)
+        -:   35:{
+    #####:   36:	Path include_dir;
+    #####:   37:	path_for(&include_dir, config_dir);
+    #####:   38:	path_push(&include_dir, "resources");
+    #####:   39:	path_push(&include_dir, "include");
+    #####:   40:	path_canonicalize(&include_dir);
+    #####:   41:	Path build_dir;
+    #####:   42:	path_for(&build_dir, base_dir);
+    #####:   43:	path_push(&build_dir, "target");
+    #####:   44:	path_push(&build_dir, "build");
+    #####:   45:	path_canonicalize(&build_dir);
+    #####:   46:	Path lib_h;
+    #####:   47:	path_for(&lib_h, base_dir);
+    #####:   48:	path_push(&lib_h, "lib.h");
+    #####:   49:	Path base_path;
+    #####:   50:	path_for(&base_path, base_dir);
+    #####:   51:	path_canonicalize(&base_path);
+    #####:   52:	printf("build libs: %s\n", path_to_string(&base_path));
+    #####:   53:	if (path_exists(&lib_h)) {
+    #####:   54:		Vec headers;
+    #####:   55:		vec_init(&headers, 10, sizeof(HeaderInfo));
+    #####:   56:		Vec types;
+    #####:   57:		vec_init(&types, 10, sizeof(TypeInfo));
+    #####:   58:		path_canonicalize(&lib_h);
+    #####:   59:		parse_header(&lib_h, &headers, &types);
+        -:   60:
+    #####:   61:		while (vec_size(&headers)) {
+    #####:   62:			HeaderInfo *next = vec_pop(&headers);
+    #####:   63:			Path next_path;
+    #####:   64:			path_for(&next_path, next->path);
+    #####:   65:			if (path_exists(&next_path) && path_is_dir(&next_path)) {
+    #####:   66:				path_push(&next_path, "mod.h");
+    #####:   67:				if (path_exists(&next_path)) {
+    #####:   68:					parse_header(&next_path, &headers, &types);
+        -:   69:				}
+        -:   70:			} else {
+        -:   71:				char file_buf[PATH_MAX];
+    #####:   72:				snprintf(file_buf, PATH_MAX - 1, "%s%s", path_file_name(&next_path), ".h");
+    #####:   73:				path_pop(&next_path);
+        -:   74:
+    #####:   75:				path_push(&next_path, file_buf);
+    #####:   76:				if (path_exists(&next_path) && !path_is_dir(&next_path)) {
+        -:   77:					// parse header
+    #####:   78:					parse_header(&next_path, &headers, &types);
+        -:   79:				}
+        -:   80:			}
+        -:   81:		}
+        -:   82:
+    #####:   83:		if (chdir(path_to_string(&build_dir))) {
+    #####:   84:			fprintf(stderr, "Could not change directory to the build directory");
         -:   85:		}
-        -:   86:	}
-    #####:   87:}
-        -:   88:
-    #####:   89:int proc_build(const char *base_dir)
-        -:   90:{
-    #####:   91:	Path base;
-    #####:   92:	path_for(&base, base_dir);
-    #####:   93:	if (path_canonicalize(&base)) {
-    #####:   94:		exit_error("Directory ('%s') not found.", base_dir);
-        -:   95:	}
-    #####:   96:	Path toml;
-    #####:   97:	path_for(&toml, base_dir);
-    #####:   98:	path_push(&toml, "fam.toml");
-    #####:   99:	if (path_canonicalize(&toml)) {
-    #####:  100:		exit_error("fam.toml file ('%s') not found.", path_to_string(&toml));
-        -:  101:	}
-        -:  102:
-    #####:  103:	FILE *toml_fp = myfopen(path_to_string(&toml), "r");
-        -:  104:	char errbuf[1024];
-    #####:  105:	toml_table_t *table = toml_parse_file(toml_fp, errbuf, sizeof(errbuf));
-        -:  106:
-    #####:  107:	if (table == NULL) {
-    #####:  108:		exit_error("Could not parse toml file due to '%s'", errbuf);
-        -:  109:	}
+        -:   86:
+    #####:   87:		while (vec_size(&types)) {
+    #####:   88:			TypeInfo *next = vec_pop(&types);
+    #####:   89:			Path next_path;
+    #####:   90:			path_for(&next_path, next->path);
+    #####:   91:			if (path_exists(&next_path) && !path_is_dir(&next_path)) {
+    #####:   92:				remove_directory(path_to_string(&build_dir), true);
+    #####:   93:				Path file_path;
+    #####:   94:				path_copy(&file_path, &build_dir);
+    #####:   95:				path_push(&file_path, path_file_name(&next_path));
+    #####:   96:				copy_file(path_to_string(&file_path), path_to_string(&next_path));
+        -:   97:
+        -:   98:				char modules[PATH_MAX];
+    #####:   99:				char *file_name = path_file_name(&next_path);
+    #####:  100:				strcpy(modules, "");
+    #####:  101:				for (int i = 0; i < 3; i++) {
+    #####:  102:					path_pop(&next_path);
+    #####:  103:					char *modname = path_file_name(&next_path);
+    #####:  104:					if (!strcmp(path_to_string(&next_path), path_to_string(&base_path))) {
+    #####:  105:						break;
+        -:  106:					}
+    #####:  107:					if (strlen(path_to_string(&next_path)) < strlen(path_to_string(&base_path))) {
+    #####:  108:						exit_error("could not find the base path");
+        -:  109:					}
         -:  110:
-    #####:  111:	myfclose(toml_fp);
-        -:  112:
-    #####:  113:	toml_raw_t raw_fam_version = toml_raw_in(table, "fam_version");
-        -:  114:	char *fam_version;
-    #####:  115:	if (raw_fam_version) {
-    #####:  116:		toml_rtos(raw_fam_version, &fam_version);
-    #####:  117:		fprintf(stderr, "fam.toml generated by fam version: %s\n", fam_version);
-    #####:  118:		free((void *)fam_version); // Clean up after toml_rtos
-        -:  119:	}
-        -:  120:
-    #####:  121:	toml_table_t *package_table = toml_table_in(table, "package");
-    #####:  122:	if (package_table) {
-    #####:  123:		toml_raw_t raw_name = toml_raw_in(package_table, "name");
-        -:  124:		char *name;
-    #####:  125:		if (raw_name) {
-    #####:  126:			toml_rtos(raw_name, &name);
-    #####:  127:			fprintf(stderr, "Building Project: '%s'\n", name);
+    #####:  111:					strcat(modules, modname);
+    #####:  112:					strcat(modules, "_");
+        -:  113:				}
+        -:  114:
+    #####:  115:				strcat(modules, file_name);
+        -:  116:
+    #####:  117:				int modules_len = strlen(modules);
+    #####:  118:				if (modules_len < 3) {
+    #####:  119:					exit_error("unexpectedly short name for object file: %s\n", modules);
+        -:  120:				}
+    #####:  121:				if (modules[modules_len - 1] != 'c' || modules[modules_len - 2] != '.') {
+    #####:  122:					exit_error("expected file to end in .c");
+        -:  123:				}
+    #####:  124:				modules[modules_len - 1] = 'o';
+        -:  125:				char obj_path[PATH_MAX];
+    #####:  126:				strcpy(obj_path, "../objs/");
+    #####:  127:				strcat(obj_path, modules);
         -:  128:
-    #####:  129:			Path target;
-    #####:  130:			path_for(&target, base_dir);
-    #####:  131:			path_push(&target, "target");
-    #####:  132:			if (!path_exists(&target)) {
-    #####:  133:				if (path_mkdir(&target, 0700))
-    #####:  134:					exit_error("Could not create directory '%s'.", path_to_string(&target));
-    #####:  135:				path_push(&target, "objs");
-    #####:  136:				if (path_mkdir(&target, 0700))
-    #####:  137:					exit_error("Could not create directory '%s'.", path_to_string(&target));
-        -:  138:			}
-        -:  139:
-        -:  140:			// change to the base directory
-    #####:  141:			if (chdir(base_dir)) {
-    #####:  142:				fprintf(stderr, "Could not change directory to the project directory");
-        -:  143:			}
-        -:  144:
-    #####:  145:			build_libs(base_dir);
-        -:  146:
-    #####:  147:			char *args[] = { "cc", "-c", "-o", "target/objs/main.o", "main.c", NULL };
-    #####:  148:			if (execute_process(args)) {
-    #####:  149:				exit_error("execution of process '%s' failed", args[0]);
-        -:  150:			}
+    #####:  129:				char *include_full_path = path_to_string(&include_dir);
+    #####:  130:				char include_param[strlen(include_full_path) + 10];
+    #####:  131:				strcpy(include_param, "-I");
+    #####:  132:				strcat(include_param, include_full_path);
+        -:  133:
+    #####:  134:				build_obj(include_param, obj_path, file_name);
+        -:  135:
+        -:  136:			} else {
+    #####:  137:				exit_error(
+        -:  138:					"Implementation not found. Expected at '%s'.\n", path_to_string(&next_path));
+        -:  139:			}
+        -:  140:		}
+        -:  141:	}
+    #####:  142:}
+        -:  143:
+    #####:  144:int proc_build(const char *base_dir, const char *config_dir)
+        -:  145:{
+    #####:  146:	Path include_dir;
+    #####:  147:	path_for(&include_dir, config_dir);
+    #####:  148:	path_push(&include_dir, "resources");
+    #####:  149:	path_push(&include_dir, "include");
+    #####:  150:	path_canonicalize(&include_dir);
         -:  151:
-        -:  152:			glob_t glob_result;
-    #####:  153:			glob("target/objs/*.o", 0, NULL, &glob_result);
-        -:  154:
-        -:  155:			// Construct the argument array for exec
-    #####:  156:			char *link[5 + glob_result.gl_pathc + 1];
-    #####:  157:			Path output_file;
-    #####:  158:			path_for(&output_file, "target");
-    #####:  159:			path_push(&output_file, name);
-    #####:  160:			link[0] = "cc";
-    #####:  161:			link[1] = "-o";
-    #####:  162:			link[2] = path_to_string(&output_file);
+    #####:  152:	Path base;
+    #####:  153:	path_for(&base, base_dir);
+    #####:  154:	if (path_canonicalize(&base)) {
+    #####:  155:		exit_error("Directory ('%s') not found.", base_dir);
+        -:  156:	}
+    #####:  157:	Path toml;
+    #####:  158:	path_for(&toml, base_dir);
+    #####:  159:	path_push(&toml, "fam.toml");
+    #####:  160:	if (path_canonicalize(&toml)) {
+    #####:  161:		exit_error("fam.toml file ('%s') not found.", path_to_string(&toml));
+        -:  162:	}
         -:  163:
-        -:  164:			// Add all the .o files from glob to the argument list
-    #####:  165:			for (size_t i = 0; i < glob_result.gl_pathc; i++) {
-    #####:  166:				link[3 + i] = glob_result.gl_pathv[i];
-        -:  167:			}
-    #####:  168:			link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
-        -:  169:
-    #####:  170:			if (execute_process(link)) {
-    #####:  171:				exit_error("execution of process '%s' failed", link[0]);
-        -:  172:			}
+    #####:  164:	FILE *toml_fp = myfopen(path_to_string(&toml), "r");
+        -:  165:	char errbuf[1024];
+    #####:  166:	toml_table_t *table = toml_parse_file(toml_fp, errbuf, sizeof(errbuf));
+        -:  167:
+    #####:  168:	if (table == NULL) {
+    #####:  169:		exit_error("Could not parse toml file due to '%s'", errbuf);
+        -:  170:	}
+        -:  171:
+    #####:  172:	myfclose(toml_fp);
         -:  173:
-    #####:  174:			free((void *)name); // Cleanup after toml_rtos
-        -:  175:			// Free the TOML table when done
-    #####:  176:			toml_free(table);
-        -:  177:		} else {
-    #####:  178:			exit_error("project name not found!");
-        -:  179:		}
-        -:  180:	} else {
-    #####:  181:		exit_error("[package] directive not found!");
-        -:  182:	}
-        -:  183:
-    #####:  184:	return 0;
-        -:  185:}
+    #####:  174:	toml_raw_t raw_fam_version = toml_raw_in(table, "fam_version");
+        -:  175:	char *fam_version;
+    #####:  176:	if (raw_fam_version) {
+    #####:  177:		toml_rtos(raw_fam_version, &fam_version);
+    #####:  178:		fprintf(stderr, "fam.toml generated by fam version: %s\n", fam_version);
+    #####:  179:		free((void *)fam_version); // Clean up after toml_rtos
+        -:  180:	}
+        -:  181:
+    #####:  182:	toml_table_t *package_table = toml_table_in(table, "package");
+    #####:  183:	if (package_table) {
+    #####:  184:		toml_raw_t raw_name = toml_raw_in(package_table, "name");
+        -:  185:		char *name;
+    #####:  186:		if (raw_name) {
+    #####:  187:			toml_rtos(raw_name, &name);
+    #####:  188:			fprintf(stderr, "Building Project: '%s'\n", name);
+        -:  189:
+    #####:  190:			Path target;
+    #####:  191:			path_for(&target, base_dir);
+    #####:  192:			path_push(&target, "target");
+    #####:  193:			if (!path_exists(&target)) {
+    #####:  194:				if (path_mkdir(&target, 0700, false))
+    #####:  195:					exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:  196:				path_push(&target, "objs");
+    #####:  197:				if (path_mkdir(&target, 0700, false))
+    #####:  198:					exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:  199:				path_pop(&target);
+    #####:  200:				path_push(&target, "build");
+    #####:  201:				if (path_mkdir(&target, 0700, false))
+    #####:  202:					exit_error("Could not create directory '%s'.", path_to_string(&target));
+        -:  203:			}
+        -:  204:
+    #####:  205:			build_libs(base_dir, config_dir);
+        -:  206:
+        -:  207:			// change to the base directory
+    #####:  208:			if (chdir(path_to_string(&base))) {
+    #####:  209:				fprintf(stderr, "Could not change directory to the project directory");
+        -:  210:			}
+        -:  211:
+    #####:  212:			char *include_full_path = path_to_string(&include_dir);
+    #####:  213:			char include_param[strlen(include_full_path) + 10];
+    #####:  214:			strcpy(include_param, "-I");
+    #####:  215:			strcat(include_param, include_full_path);
+    #####:  216:			build_obj(include_param, "target/objs/main.o", "main.c");
+        -:  217:
+        -:  218:			glob_t glob_result;
+    #####:  219:			glob("target/objs/*.o", 0, NULL, &glob_result);
+        -:  220:
+        -:  221:			// Construct the argument array for exec
+    #####:  222:			char *link[5 + glob_result.gl_pathc + 1];
+    #####:  223:			Path output_file;
+    #####:  224:			path_for(&output_file, "target");
+    #####:  225:			path_push(&output_file, name);
+    #####:  226:			link[0] = "cc";
+    #####:  227:			link[1] = "-o";
+    #####:  228:			link[2] = path_to_string(&output_file);
+        -:  229:
+        -:  230:			// Add all the .o files from glob to the argument list
+    #####:  231:			for (size_t i = 0; i < glob_result.gl_pathc; i++) {
+    #####:  232:				link[3 + i] = glob_result.gl_pathv[i];
+        -:  233:			}
+    #####:  234:			link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
+        -:  235:
+    #####:  236:			if (execute_process(link)) {
+    #####:  237:				exit_error("execution of process '%s' failed", link[0]);
+        -:  238:			}
+        -:  239:
+    #####:  240:			free((void *)name); // Cleanup after toml_rtos
+        -:  241:			// Free the TOML table when done
+    #####:  242:			toml_free(table);
+        -:  243:		} else {
+    #####:  244:			exit_error("project name not found!");
+        -:  245:		}
+        -:  246:	} else {
+    #####:  247:		exit_error("[package] directive not found!");
+        -:  248:	}
+        -:  249:
+    #####:  250:	return 0;
+        -:  251:}
         -:    0:Source:init.c
         -:    0:Graph:init.gcno
         -:    0:Data:init.gcda
@@ -6219,7 +6363,7 @@ Unit_size:
     #####:   45:		fprintf(stderr, "Path: '%s' already exists!\n", path_to_string(&path));
     #####:   46:		exit(-1);
         -:   47:	}
-    #####:   48:	if (path_mkdir(&path, 0700)) {
+    #####:   48:	if (path_mkdir(&path, 0700, false)) {
     #####:   49:		perror("Error: could not create directory for project");
     #####:   50:		exit(-1);
         -:   51:	}
@@ -6292,7 +6436,7 @@ Unit_size:
         -:   30:
     #####:   31:void parse_header(const Path *path, Vec *headers, Vec *types)
         -:   32:{
-    #####:   33:	printf("================Parsing header at path = '%s'\n", path_to_string(path));
+    #####:   33:	printf("Parsing header ['%s'].\n", path_to_string(path));
         -:   34:	Lexer l;
     #####:   35:	char *path_str = path_to_string(path);
     #####:   36:	if (lexer_init(&l, path_str))
@@ -6349,7 +6493,7 @@ Unit_size:
     #####:   87:			if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
     #####:   88:				state = ParserStateBeginStatement;
     #####:   89:			} else if (!strcmp(tk.token, "{") && state == ParserStateExpectBracket) {
-    #####:   90:				printf("=====we found a type name: '%s'\n", type_name);
+    #####:   90:				printf("Type: %s::['%s'].\n", path_str, type_name);
         -:   91:				TypeInfo ti;
     #####:   92:				Path npath;
     #####:   93:				path_for(&npath, path_str);

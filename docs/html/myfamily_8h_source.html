@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Family: build/build.h Source File</title>
+<title>My Family: main/resources/include/myfamily.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,15 +62,15 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_4fef79e7177ba769987a8da36c892c5f.html">build</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_5c982d53a68cdbcd421152b4020263a9.html">main</a></li><li class="navelem"><a class="el" href="dir_9d7055c7cf746286d8b994cd4552c63b.html">resources</a></li><li class="navelem"><a class="el" href="dir_d77657a5ead22d4673cd6afeab5488a9.html">include</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">build.h</div>  </div>
+<div class="title">myfamily.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="build_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (c) 2024, The MyFamily Developers</span></div>
+<a href="myfamily_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (c) 2024, The MyFamily Developers</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// you may not use this file except in compliance with the License.</span></div>
@@ -83,21 +83,6 @@ $(function() {
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// See the License for the specific language governing permissions and</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// limitations under the License.</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _BUILD_BUILD__</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _BUILD_BUILD__</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">base/types.h</a>&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keywordtype">int</span> <a class="code" href="build_8h.html#af416a142ba1fc58ff6f05ad1e59b36d3">proc_build_init</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *config_dir, <span class="keyword">const</span> <span class="keywordtype">char</span> *proj_name, <span class="keyword">const</span> <span class="keywordtype">char</span> *proj_path,</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="keywordtype">char</span> authors[11][1024], <span class="keywordtype">int</span> author_count, <span class="keywordtype">bool</span> lib, <span class="keywordtype">char</span> *description);</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keywordtype">int</span> <a class="code" href="build_8h.html#abf67d6fd01799d8ca1e86c86f15a7aa2">proc_build</a>(<span class="keyword">const</span> <span class="keywordtype">char</span> *base_dir, <span class="keyword">const</span> <span class="keywordtype">char</span> *config_dir);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _BUILD_BUILD__</span></div>
-<div class="ttc" id="abuild_8h_html_abf67d6fd01799d8ca1e86c86f15a7aa2"><div class="ttname"><a href="build_8h.html#abf67d6fd01799d8ca1e86c86f15a7aa2">proc_build</a></div><div class="ttdeci">int proc_build(const char *base_dir, const char *config_dir)</div><div class="ttdef"><b>Definition:</b> build.c:144</div></div>
-<div class="ttc" id="abuild_8h_html_af416a142ba1fc58ff6f05ad1e59b36d3"><div class="ttname"><a href="build_8h.html#af416a142ba1fc58ff6f05ad1e59b36d3">proc_build_init</a></div><div class="ttdeci">int proc_build_init(const char *config_dir, const char *proj_name, const char *proj_path, char authors[11][1024], int author_count, bool lib, char *description)</div><div class="ttdef"><b>Definition:</b> init.c:24</div></div>
-<div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
