@@ -44,13 +44,15 @@ typedef enum ParserStateEnum {
 	ParserStateBeginStatement = 0,
 	ParserStateExpectModuleName = 1,
 	ParserStateExpectBracket = 2,
-	ParserStateOther = 3,
+	ParserStateExpectType = 3,
+	ParserStateOther = 4,
 } ParserStateEnum;
 
 typedef struct ParserState {
 	ParserStateEnum state;
-	Vec *headers;
+	Vec *header_files;
 	char *path_str;
+	Vec *types;
 	char type_name[MAX_TYPE_NAME_LEN + 1];
 } ParserState;
 
@@ -90,7 +92,7 @@ void proc_ParserStateExpectModuleName(ParserState *state, Token *tk)
 			path_pop(&npath);
 			path_push(&npath, tk->token);
 			strcpy(hi.path, path_to_string(&npath));
-			vec_push(state->headers, &hi);
+			vec_push(state->header_files, &hi);
 		}
 		state->state = ParserStateOther;
 	}
@@ -111,7 +113,9 @@ void parse_header(const Path *path, Vec *headers, Vec *types, Vec *module_info)
 	if (lexer_init(&l, path_str))
 		exit_error("Could not open header file %s", path_str);
 
-	ParserState state = { ParserStateBeginStatement, headers, path_str };
+	Vec types_holder;
+	vec_init(&types_holder, 10, sizeof(HeaderType));
+	ParserState state = { ParserStateBeginStatement, headers, path_str, &types_holder };
 
 	while (true) {
 		Token tk;
@@ -127,24 +131,6 @@ void parse_header(const Path *path, Vec *headers, Vec *types, Vec *module_info)
 			proc_ParserStateBeginStatement(&state, &tk);
 		} else if (state.state == ParserStateExpectModuleName) {
 			proc_ParserStateExpectModuleName(&state, &tk);
-			/*
-			if (tk.type != TokenTypeIdent) {
-				token_display_error(&tk, "Expected module name, found '%s'\n", tk.token);
-			} else {
-				if (strlen(tk.token) >= PATH_MAX) {
-					token_display_error(&tk, "Path is longer than max path (%i)\n", PATH_MAX);
-				} else {
-					HeaderInfo hi;
-					Path npath;
-					path_for(&npath, path_str);
-					path_pop(&npath);
-					path_push(&npath, tk.token);
-					strcpy(hi.path, path_to_string(&npath));
-					vec_push(headers, &hi);
-				}
-				state.state = ParserStateOther;
-			}
-			*/
 		} else if (tk.type == TokenTypePunct) {
 			if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
 				state.state = ParserStateBeginStatement;
