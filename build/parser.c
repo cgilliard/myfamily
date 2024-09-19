@@ -14,6 +14,7 @@
 
 #include <base/misc.h>
 #include <base/path.h>
+#include <base/resources.h>
 #include <build/parser.h>
 #include <lexer/lexer.h>
 #include <limits.h>
@@ -31,32 +32,80 @@ typedef struct HeaderNameInfo {
 	char name[MAX_VAR_NAME_LEN];
 } HeaderNameInfo;
 
-typedef struct HeaderType {
+typedef struct HeaderTypes {
 	Vec types;
 	Vec names;
-} HeaderType;
-
-typedef struct HeaderFile {
-	HeaderType ht;
-} HeaderFile;
+} HeaderTypes;
 
 typedef enum ParserStateEnum {
 	ParserStateBeginStatement = 0,
 	ParserStateExpectModuleName = 1,
 	ParserStateExpectBracket = 2,
 	ParserStateExpectType = 3,
-	ParserStateOther = 4,
+	ParserStateExpectName = 4,
+	ParserStateInTypeExpectSemi = 5,
+	ParserStateOther = 6,
 } ParserStateEnum;
 
 typedef struct ParserState {
 	ParserStateEnum state;
 	Vec *header_files;
 	char *path_str;
-	Vec *types;
+	HeaderTypes *ht;
+	char *gen_header;
+	u64 header_capacity;
 	char type_name[MAX_TYPE_NAME_LEN + 1];
 } ParserState;
 
-#define MAX_NAME_LEN 1024
+#define INITIAL_HEADER_CAPACITY (1024 * 25)
+
+void append_to_header(ParserState *state, const char *text, ...)
+{
+	u64 length;
+	va_list args;
+
+	va_start(args, text);
+	length = vsnprintf(NULL, 0, text, args);
+	va_end(args);
+
+	if (state->header_capacity == 0) {
+		u64 size = sizeof(char) * INITIAL_HEADER_CAPACITY;
+		if (length >= size)
+			size = length + 1;
+		state->gen_header = mymalloc(size);
+		if (state->gen_header == NULL)
+			exit_error("Could not allocate sufficient memory to continue!");
+		va_start(args, text);
+		vsnprintf(state->gen_header, size, text, args);
+		va_end(args);
+
+	} else {
+		u64 size = state->header_capacity;
+		if (length + strlen(state->gen_header) + 1 >= state->header_capacity) {
+			size = state->header_capacity + INITIAL_HEADER_CAPACITY;
+			if (length + strlen(state->gen_header) + 1
+				>= state->header_capacity + INITIAL_HEADER_CAPACITY) {
+				size = length + strlen(state->gen_header) + 1;
+			}
+			state->gen_header = myrealloc(state->gen_header, sizeof(char) * (size));
+			if (state->gen_header == NULL)
+				exit_error("Could not allocate sufficient memory to continue!");
+		}
+
+		va_start(args, text);
+		vsnprintf(state->gen_header + strlen(state->gen_header), size - strlen(state->gen_header),
+			text, args);
+		va_end(args);
+	}
+
+	state->header_capacity += INITIAL_HEADER_CAPACITY;
+}
+
+void free_gen_header(ParserState *state)
+{
+	if (state->gen_header)
+		myfree(state->gen_header);
+}
 
 void proc_ParserStateBeginStatement(ParserState *state, Token *tk)
 {
@@ -64,9 +113,9 @@ void proc_ParserStateBeginStatement(ParserState *state, Token *tk)
 		if (!strcmp(tk->token, "mod")) {
 			state->state = ParserStateExpectModuleName;
 		} else {
-			if (strlen(tk->token) > MAX_NAME_LEN) {
+			if (strlen(tk->token) > MAX_TYPE_NAME_LEN) {
 				token_display_error(
-					tk, "token name is longer than MAX_NAME_LEN (%i)\n", MAX_NAME_LEN);
+					tk, "token name is longer than MAX_TYPE_NAME_LEN (%i)", MAX_TYPE_NAME_LEN);
 			} else {
 				strcpy(state->type_name, tk->token);
 			}
@@ -78,13 +127,75 @@ void proc_ParserStateBeginStatement(ParserState *state, Token *tk)
 		state->state = ParserStateOther;
 }
 
+void proc_ParserStateExpectType(ParserState *state, Token *tk)
+{
+	if (tk->type != TokenTypeIdent) {
+		if (!strcmp(tk->token, "}")) {
+			u64 count = vec_size(&state->ht->types);
+			printf("types count = %" PRIu64 "\n", count);
+			append_to_header(state, "typedef struct %s {\n", state->type_name);
+			for (u64 i = 0; i < count; i++) {
+				HeaderNameInfo *ni;
+				HeaderTypeInfo *ti;
+				ti = vec_element_at(&state->ht->types, i);
+				ni = vec_element_at(&state->ht->names, i);
+				printf("[%" PRIu64 "]=%s,%s\n", i, ti->type, ni->name);
+				append_to_header(state, "%s %s;\n", ti->type, ni->name);
+			}
+			append_to_header(state, "} %s;\n\n", state->type_name);
+			vec_clear(&state->ht->types);
+			vec_clear(&state->ht->names);
+			state->state = ParserStateBeginStatement;
+		} else {
+			token_display_error(tk, "Expected type name. Found [%s]", tk->token);
+			state->state = ParserStateOther;
+		}
+	} else {
+		if (strlen(tk->token) > MAX_TYPE_NAME_LEN) {
+			token_display_error(tk, "Name [%s] is too long.", tk->token);
+			state->state = ParserStateOther;
+		} else {
+			HeaderTypeInfo hti;
+			strcpy(hti.type, tk->token);
+			vec_push(&state->ht->types, &hti);
+			state->state = ParserStateExpectName;
+		}
+	}
+}
+
+void proc_ParserStateExpectName(ParserState *state, Token *tk)
+{
+	if (tk->type != TokenTypeIdent) {
+		token_display_error(tk, "Expected name. Found [%s]", tk->token);
+		state->state = ParserStateOther;
+	} else {
+		if (strlen(tk->token) > MAX_VAR_NAME_LEN) {
+			token_display_error(tk, "Name [%s] is too long.", tk->token);
+			state->state = ParserStateOther;
+		} else {
+			HeaderNameInfo hti;
+			strcpy(hti.name, tk->token);
+			vec_push(&state->ht->names, &hti);
+			state->state = ParserStateInTypeExpectSemi;
+		}
+	}
+}
+
+void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk)
+{
+	if (strcmp(tk->token, ";")) {
+		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
+	}
+	state->state = ParserStateExpectType;
+}
+
 void proc_ParserStateExpectModuleName(ParserState *state, Token *tk)
 {
 	if (tk->type != TokenTypeIdent) {
-		token_display_error(tk, "Expected module name, found '%s'\n", tk->token);
+		token_display_error(tk, "Expected module name, found '%s'", tk->token);
 	} else {
 		if (strlen(tk->token) >= PATH_MAX) {
-			token_display_error(tk, "Path is longer than max path (%i)\n", PATH_MAX);
+			token_display_error(tk, "Path is longer than max path (%i)", PATH_MAX);
 		} else {
 			HeaderInfo hi;
 			Path npath;
@@ -98,14 +209,19 @@ void proc_ParserStateExpectModuleName(ParserState *state, Token *tk)
 	}
 }
 
-void parse_header(const Path *path, Vec *headers, Vec *types, Vec *module_info)
+void parse_header(
+	const char *base_dir, const Path *path, Vec *headers, Vec *types, Vec *module_info)
 {
 	char module_str[PATH_MAX + 1024];
 	int vec_sz = vec_size(module_info);
 	strcpy(module_str, "");
+	char module_path[PATH_MAX + 1024];
+	strcpy(module_path, "");
 	for (int i = 0; i < vec_sz; i++) {
 		strcat(module_str, vec_element_at(module_info, i));
 		strcat(module_str, "::");
+		strcat(module_path, vec_element_at(module_info, i));
+		strcat(module_path, "_");
 	}
 	printf("Parsing header %s['%s'].\n", module_str, path_file_name(path));
 	Lexer l;
@@ -113,9 +229,11 @@ void parse_header(const Path *path, Vec *headers, Vec *types, Vec *module_info)
 	if (lexer_init(&l, path_str))
 		exit_error("Could not open header file %s", path_str);
 
-	Vec types_holder;
-	vec_init(&types_holder, 10, sizeof(HeaderType));
-	ParserState state = { ParserStateBeginStatement, headers, path_str, &types_holder };
+	HeaderTypes ht;
+
+	vec_init(&ht.names, 10, sizeof(HeaderNameInfo));
+	vec_init(&ht.types, 10, sizeof(HeaderTypeInfo));
+	ParserState state = { ParserStateBeginStatement, headers, path_str, &ht, NULL, 0 };
 
 	while (true) {
 		Token tk;
@@ -123,7 +241,7 @@ void parse_header(const Path *path, Vec *headers, Vec *types, Vec *module_info)
 		if (res == LexerStateComplete) {
 			break;
 		}
-		// printf("state=%i,token_type=%i,token_value='%s'\n", state, tk.type, tk.token);
+		printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
 		if (tk.type == TokenTypeDoc) {
 			// skip over doc comments for these purposes
 			continue;
@@ -131,6 +249,12 @@ void parse_header(const Path *path, Vec *headers, Vec *types, Vec *module_info)
 			proc_ParserStateBeginStatement(&state, &tk);
 		} else if (state.state == ParserStateExpectModuleName) {
 			proc_ParserStateExpectModuleName(&state, &tk);
+		} else if (state.state == ParserStateExpectType) {
+			proc_ParserStateExpectType(&state, &tk);
+		} else if (state.state == ParserStateExpectName) {
+			proc_ParserStateExpectName(&state, &tk);
+		} else if (state.state == ParserStateInTypeExpectSemi) {
+			proc_ParserStateInTypeExpectSemi(&state, &tk);
 		} else if (tk.type == TokenTypePunct) {
 			if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
 				state.state = ParserStateBeginStatement;
@@ -140,15 +264,41 @@ void parse_header(const Path *path, Vec *headers, Vec *types, Vec *module_info)
 				path_for(&npath, path_str);
 				path_pop(&npath);
 				path_push(&npath, state.type_name);
-				strncpy(ti.path, path_to_string(&npath), PATH_MAX);
+				strcpy(ti.path, path_to_string(&npath));
 				strcat(ti.path, ".c");
+				char *file_name = path_file_name(path);
+				if (!strcmp(file_name, "mod.h"))
+					strcpy(ti.module_file_name, "");
+				else
+					strncpy(ti.module_file_name, file_name, strlen(file_name) - 2);
 				vec_push(types, &ti);
-				state.state = ParserStateOther;
+				state.state = ParserStateExpectType;
 			} else
 				state.state = ParserStateOther;
 		}
 		token_cleanup(&tk);
 	}
+
+	if (state.gen_header) {
+		printf("Generated header: '%s'\n", state.gen_header);
+	}
+
+	strcat(module_path, path_file_name(path));
+	Path header_include;
+	path_for(&header_include, base_dir);
+	path_push(&header_include, "target");
+	path_push(&header_include, "include");
+	path_push(&header_include, module_path);
+	path_canonicalize(&header_include);
+	printf("write to %s\n", path_to_string(&header_include));
+	FILE *fp = myfopen(path_to_string(&header_include), "w");
+	if (state.gen_header) {
+		if (fprintf(fp, "%s", state.gen_header) < strlen(state.gen_header))
+			fprintf(
+				stderr, "Partial write of header: %s occurred!\n", path_to_string(&header_include));
+	}
+	myfclose(fp);
+	free_gen_header(&state);
 
 	lexer_cleanup(&l);
 }

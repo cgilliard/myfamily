@@ -24,8 +24,10 @@ typedef struct HeaderInfo {
 
 typedef struct TypeInfo {
 	char path[PATH_MAX];
+	char module_file_name[PATH_MAX];
 } TypeInfo;
 
-void parse_header(const Path *path, Vec *headers, Vec *types, Vec *module_list);
+void parse_header(
+	const char *base_dir, const Path *path, Vec *headers, Vec *types, Vec *module_list);
 
 #endif // _BUILD_PARSER__

@@ -37,7 +37,9 @@ void build_module_list(Vec *module_info, const Path *path, const Path *base_path
 	path_copy(&next_path, path);
 	Vec module_info_reverse;
 	vec_init(&module_info_reverse, 10, sizeof(ModuleInfo));
+	printf("build_path module list for %s\n", path_to_string(path));
 	for (int i = 0; i < 10; i++) {
+
 		if (!strcmp(path_to_string(&next_path), path_to_string(base_path))) {
 
 			break;
@@ -72,6 +74,11 @@ void build_libs(const char *base_dir, const char *config_dir)
 	path_push(&build_dir, "target");
 	path_push(&build_dir, "build");
 	path_canonicalize(&build_dir);
+	Path include_build_dir;
+	path_for(&include_build_dir, base_dir);
+	path_push(&include_build_dir, "target");
+	path_push(&include_build_dir, "include");
+	path_canonicalize(&include_build_dir);
 	Path lib_h;
 	path_for(&lib_h, base_dir);
 	path_push(&lib_h, "lib.h");
@@ -88,7 +95,7 @@ void build_libs(const char *base_dir, const char *config_dir)
 
 		Vec module_info;
 		vec_init(&module_info, 10, sizeof(ModuleInfo));
-		parse_header(&lib_h, &headers, &types, &module_info);
+		parse_header(base_dir, &lib_h, &headers, &types, &module_info);
 
 		while (vec_size(&headers)) {
 			HeaderInfo *next = vec_pop(&headers);
@@ -99,7 +106,7 @@ void build_libs(const char *base_dir, const char *config_dir)
 				vec_clear(&module_info);
 				build_module_list(&module_info, &next_path, &base_path);
 				if (path_exists(&next_path)) {
-					parse_header(&next_path, &headers, &types, &module_info);
+					parse_header(base_dir, &next_path, &headers, &types, &module_info);
 				}
 			} else {
 				char file_buf[PATH_MAX];
@@ -111,7 +118,7 @@ void build_libs(const char *base_dir, const char *config_dir)
 					vec_clear(&module_info);
 					build_module_list(&module_info, &next_path, &base_path);
 					// parse header
-					parse_header(&next_path, &headers, &types, &module_info);
+					parse_header(base_dir, &next_path, &headers, &types, &module_info);
 				} else {
 					exit_error("Module not found. Expected at '%s'.", path_to_string(&next_path));
 				}
@@ -140,6 +147,11 @@ void build_libs(const char *base_dir, const char *config_dir)
 				Vec module_info;
 				vec_init(&module_info, 10, sizeof(ModuleInfo));
 				build_module_list(&module_info, &next_path, &base_path);
+				if (strlen(next->module_file_name) > 0) {
+					ModuleInfo mi;
+					strcpy(mi.name, next->module_file_name);
+					vec_push(&module_info, &mi);
+				}
 
 				for (u64 i = 0; i < vec_size(&module_info); i++) {
 					ModuleInfo *next = vec_element_at(&module_info, i);
@@ -166,22 +178,32 @@ void build_libs(const char *base_dir, const char *config_dir)
 				strcpy(include_param, "-I");
 				strcat(include_param, include_full_path);
 
+				char module_str[PATH_MAX + 1024];
+				char module_path[PATH_MAX + 1024];
+				strcpy(module_str, "");
+				strcpy(module_path, "");
+				int vec_sz = vec_size(&module_info);
+				for (int i = 0; i < vec_sz; i++) {
+					strcat(module_str, vec_element_at(&module_info, i));
+					strcat(module_path, vec_element_at(&module_info, i));
+					if (i != vec_sz - 1) {
+						strcat(module_str, "::");
+						strcat(module_path, "_");
+					}
+				}
+				strcat(module_path, ".h");
+
 				Path build_specific_dst;
 				Path build_specific_src;
 				path_for(&build_specific_dst, path_to_string(&build_dir));
 				path_push(&build_specific_dst, "build_specific.h");
-				path_for(&build_specific_src, config_dir);
-				path_push(&build_specific_src, "resources");
-				path_push(&build_specific_src, "build_specific.h");
+				path_for(&build_specific_src, path_to_string(&include_build_dir));
+				path_push(&build_specific_src, module_path);
+				printf("header name %s\n", next->module_file_name);
+				printf("copy from %s -> %s\n", path_to_string(&build_specific_dst),
+					path_to_string(&build_specific_src));
 				copy_file(path_to_string(&build_specific_dst), path_to_string(&build_specific_src));
 
-				char module_str[PATH_MAX + 1024];
-				strcpy(module_str, "");
-				int vec_sz = vec_size(&module_info);
-				for (int i = 0; i < vec_sz; i++) {
-					strcat(module_str, vec_element_at(&module_info, i));
-					strcat(module_str, "::");
-				}
 				printf("Parsing type: %s[%s].\n", module_str, file_name);
 				build_obj(include_param, obj_path, file_name);
 
@@ -242,16 +264,25 @@ int proc_build(const char *base_dir, const char *config_dir)
 			Path target;
 			path_for(&target, base_dir);
 			path_push(&target, "target");
+			path_canonicalize(&target);
 			if (!path_exists(&target)) {
-				if (path_mkdir(&target, 0700, false))
+				printf("mkdir\n");
+				if (!path_mkdir(&target, 0700, false))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
+				printf("ok\n");
 				path_push(&target, "objs");
-				if (path_mkdir(&target, 0700, false))
+				if (!path_mkdir(&target, 0700, false))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
 				path_pop(&target);
 				path_push(&target, "build");
-				if (path_mkdir(&target, 0700, false))
+				if (!path_mkdir(&target, 0700, false))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
+				path_pop(&target);
+				path_push(&target, "include");
+				printf("x\n");
+				if (!path_mkdir(&target, 0700, false))
+					exit_error("Could not create directory '%s'.", path_to_string(&target));
+				printf("y\n");
 			}
 
 			build_libs(base_dir, config_dir);
