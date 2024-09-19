@@ -131,8 +131,8 @@ $(function() {
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">// These will be validated and defaults set in the Builder trait implementation for this type.</span></div>
 <div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="test__server_8h.html#a87d38240ba720a1816642201b17b201c">   60</a></span>&#160;<a class="code" href="test__server_8h.html#a87d38240ba720a1816642201b17b201c">Builder</a>(</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    HttpServer,</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="code" href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, threads),</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="code" href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port),</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="code" href="base_2types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a>, threads),</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<a class="code" href="base_2types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a>, port),</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<span class="keywordtype">char</span>*, host));</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">// Call Impl for all four traits that the HttpServer will implement. Note that HttpServerCore must</span></div>
@@ -144,8 +144,10 @@ $(function() {
 <div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="test__server_8h.html#af58397daeeb44d390bc6194d60c0f12b">   72</a></span>&#160;<a class="code" href="test__server_8h.html#a64ade9768334c2dc08b7a246c5d0727e">Impl</a>(HttpServer, <a class="code" href="test__server_8h.html#a2d520a656b41a0bf7d8ad6d961972597">HttpServerApi</a>);</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_TEST_SERVER__</span></div>
-<div class="ttc" id="aheader__sample1_8h_html_aac73670368932bd81ac1d4bfaa94586b"><div class="ttname"><a href="header__sample1_8h.html#aac73670368932bd81ac1d4bfaa94586b">Build</a></div><div class="ttdeci">Build</div><div class="ttdef"><b>Definition:</b> header_sample1.h:182</div></div>
-<div class="ttc" id="aheader__sample1_8h_html_aee543dbbc83f9e450f4549594d813729"><div class="ttname"><a href="header__sample1_8h.html#aee543dbbc83f9e450f4549594d813729">Drop</a></div><div class="ttdeci">Drop</div><div class="ttdef"><b>Definition:</b> header_sample1.h:188</div></div>
+<div class="ttc" id="abase_2types_8h_html_a2b19d553290a8d4a083d3c03280ea800"><div class="ttname"><a href="base_2types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a></div><div class="ttdeci">#define u16</div><div class="ttdef"><b>Definition:</b> types.h:29</div></div>
+<div class="ttc" id="abase_2types_8h_html_a332ccd83dfe2973e6cb2b61e4f3ab7e6"><div class="ttname"><a href="base_2types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a></div><div class="ttdeci">#define u32</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
+<div class="ttc" id="aheader__sample1_8h_html_aac73670368932bd81ac1d4bfaa94586b"><div class="ttname"><a href="header__sample1_8h.html#aac73670368932bd81ac1d4bfaa94586b">Build</a></div><div class="ttdeci">Build</div><div class="ttdef"><b>Definition:</b> header_sample1.h:169</div></div>
+<div class="ttc" id="aheader__sample1_8h_html_aee543dbbc83f9e450f4549594d813729"><div class="ttname"><a href="header__sample1_8h.html#aee543dbbc83f9e450f4549594d813729">Drop</a></div><div class="ttdeci">Drop</div><div class="ttdef"><b>Definition:</b> header_sample1.h:175</div></div>
 <div class="ttc" id="atest__server_8h_html_a2d520a656b41a0bf7d8ad6d961972597"><div class="ttname"><a href="test__server_8h.html#a2d520a656b41a0bf7d8ad6d961972597">HttpServerApi</a></div><div class="ttdeci">#define HttpServerApi</div><div class="ttdef"><b>Definition:</b> test_server.h:47</div></div>
 <div class="ttc" id="atest__server_8h_html_a64ade9768334c2dc08b7a246c5d0727e"><div class="ttname"><a href="test__server_8h.html#a64ade9768334c2dc08b7a246c5d0727e">Impl</a></div><div class="ttdeci">Impl(HttpServer, Drop)</div></div>
 <div class="ttc" id="atest__server_8h_html_a87d38240ba720a1816642201b17b201c"><div class="ttname"><a href="test__server_8h.html#a87d38240ba720a1816642201b17b201c">Builder</a></div><div class="ttdeci">Builder(HttpServer, Config(u32, threads), Config(u16, port), Config(char *, host))</div></div>
@@ -154,8 +156,6 @@ $(function() {
 <div class="ttc" id="atraits_8h_html"><div class="ttname"><a href="traits_8h.html">traits.h</a></div></div>
 <div class="ttc" id="atype_8h_html"><div class="ttname"><a href="type_8h.html">type.h</a></div></div>
 <div class="ttc" id="atype_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
-<div class="ttc" id="atypes_8h_html_a2b19d553290a8d4a083d3c03280ea800"><div class="ttname"><a href="types_8h.html#a2b19d553290a8d4a083d3c03280ea800">u16</a></div><div class="ttdeci">#define u16</div><div class="ttdef"><b>Definition:</b> types.h:29</div></div>
-<div class="ttc" id="atypes_8h_html_a332ccd83dfe2973e6cb2b61e4f3ab7e6"><div class="ttname"><a href="types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a></div><div class="ttdeci">#define u32</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

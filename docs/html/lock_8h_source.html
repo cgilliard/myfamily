@@ -87,7 +87,7 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _BASE_LOCK__</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _BASE_LOCK__</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">base/types.h</a>&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="base_2types_8h.html">base/types.h</a>&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;pthread.h&gt;</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;stdatomic.h&gt;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
@@ -118,7 +118,7 @@ $(function() {
 <div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="lock_8h.html#afc37b5ae502cbe90cde7bb660c40d614">   46</a></span>&#160;<span class="preprocessor">#define LockGuard LockGuardPtr __attribute__((warn_unused_result, cleanup(Lockguard_cleanup)))</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<a class="code" href="lock_8h.html#afc37b5ae502cbe90cde7bb660c40d614">LockGuard</a> <a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>(<a class="code" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>);</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keywordtype">void</span> <a class="code" href="lock_8h.html#ae0380d1a8f37c56da96002505cb82be8">Lock_wait</a>(<a class="code" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>, <a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> nanos);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keywordtype">void</span> <a class="code" href="lock_8h.html#ae0380d1a8f37c56da96002505cb82be8">Lock_wait</a>(<a class="code" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>, <a class="code" href="base_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> nanos);</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keywordtype">void</span> <a class="code" href="lock_8h.html#afbf3f1cbd7698cc6874d44772f2418fb">Lock_notify</a>(<a class="code" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>);</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keywordtype">void</span> <a class="code" href="lock_8h.html#ab3051561f8d709ec70cc4d95a6189bd6">Lock_notify_all</a>(<a class="code" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>);</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
@@ -132,6 +132,8 @@ $(function() {
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">    } while (0);</span></div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _BASE_LOCK__</span></div>
+<div class="ttc" id="abase_2types_8h_html"><div class="ttname"><a href="base_2types_8h.html">types.h</a></div></div>
+<div class="ttc" id="abase_2types_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="base_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:33</div></div>
 <div class="ttc" id="alock_8h_html_a0918621ef865e4bfda79b010db52367d"><div class="ttname"><a href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a></div><div class="ttdeci">#define Lock</div><div class="ttdef"><b>Definition:</b> lock.h:32</div></div>
 <div class="ttc" id="alock_8h_html_a2770800af86ad11c0f650c2d5752065f"><div class="ttname"><a href="lock_8h.html#a2770800af86ad11c0f650c2d5752065f">Lock_is_poisoned</a></div><div class="ttdeci">bool Lock_is_poisoned(Lock *ptr)</div><div class="ttdef"><b>Definition:</b> lock.c:58</div></div>
 <div class="ttc" id="alock_8h_html_a6ddfddb89959aa58bdad77959a416bac"><div class="ttname"><a href="lock_8h.html#a6ddfddb89959aa58bdad77959a416bac">Lock_clear_poison</a></div><div class="ttdeci">void Lock_clear_poison(Lock *ptr)</div><div class="ttdef"><b>Definition:</b> lock.c:61</div></div>
@@ -155,8 +157,6 @@ $(function() {
 <div class="ttc" id="astructLockPtr_html_aa3d6266b7a81191e096edd34604a2308"><div class="ttname"><a href="structLockPtr.html#aa3d6266b7a81191e096edd34604a2308">LockPtr::poison</a></div><div class="ttdeci">atomic_bool poison</div><div class="ttdef"><b>Definition:</b> lock.h:27</div></div>
 <div class="ttc" id="astructLockPtr_html_aab9dc995cfded20eb94267be7646b25d"><div class="ttname"><a href="structLockPtr.html#aab9dc995cfded20eb94267be7646b25d">LockPtr::tid</a></div><div class="ttdeci">atomic_ullong tid</div><div class="ttdef"><b>Definition:</b> lock.h:25</div></div>
 <div class="ttc" id="astructLockPtr_html_ac778dda7d4da5eafdf7cbdf9140b1c62"><div class="ttname"><a href="structLockPtr.html#ac778dda7d4da5eafdf7cbdf9140b1c62">LockPtr::is_locked</a></div><div class="ttdeci">atomic_bool is_locked</div><div class="ttdef"><b>Definition:</b> lock.h:26</div></div>
-<div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div></div>
-<div class="ttc" id="atypes_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:33</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
