@@ -23,6 +23,37 @@
 #include <toml/toml.h>
 #include <util/proc_executor.h>
 
+void build_main(char *include_param, char *obj_path, char *file_name, const char *base_dir,
+	const char *config_dir)
+{
+	Path build_path;
+	path_for(&build_path, base_dir);
+	path_push(&build_path, "target");
+	path_push(&build_path, "build");
+	path_canonicalize(&build_path);
+	remove_directory(path_to_string(&build_path), true);
+
+	char *include_full_path = path_to_string(&build_path);
+	char include_param2[strlen(include_full_path) + 10];
+	strcpy(include_param2, "-I");
+	strcat(include_param2, include_full_path);
+
+	path_push(&build_path, "build_specific.h");
+
+	Path build_specific;
+	path_for(&build_specific, base_dir);
+	path_push(&build_specific, "target");
+	path_push(&build_specific, "include");
+	path_push(&build_specific, "lib.h");
+	copy_file(path_to_string(&build_path), path_to_string(&build_specific));
+
+	char *args[]
+		= { "gcc", include_param, include_param2, "-I.", "-c", "-o", obj_path, file_name, NULL };
+	if (execute_process(args)) {
+		exit_error("execution of process '%s' failed", args[0]);
+	}
+}
+
 void build_obj(char *include_param, char *obj_path, char *file_name)
 {
 	char *args[] = { "gcc", include_param, "-I.", "-c", "-o", obj_path, file_name, NULL };
@@ -37,7 +68,6 @@ void build_module_list(Vec *module_info, const Path *path, const Path *base_path
 	path_copy(&next_path, path);
 	Vec module_info_reverse;
 	vec_init(&module_info_reverse, 10, sizeof(ModuleInfo));
-	printf("build_path module list for %s\n", path_to_string(path));
 	for (int i = 0; i < 10; i++) {
 
 		if (!strcmp(path_to_string(&next_path), path_to_string(base_path))) {
@@ -59,6 +89,44 @@ void build_module_list(Vec *module_info, const Path *path, const Path *base_path
 			vec_push(module_info, next);
 			char *modname = next->name;
 		}
+	}
+}
+
+void build_internal(const char *base_dir, const char *config_dir)
+{
+	Path build_path;
+	path_for(&build_path, base_dir);
+	path_push(&build_path, "target");
+	path_push(&build_path, "build");
+	remove_directory(path_to_string(&build_path), true);
+
+	Path config_src;
+	path_for(&config_src, config_dir);
+	path_push(&config_src, "resources");
+	path_push(&config_src, "src");
+	path_push(&config_src, "*.c");
+
+	Path include_dir;
+	path_for(&include_dir, config_dir);
+	path_push(&include_dir, "resources");
+	path_push(&include_dir, "include");
+
+	char *include_full_path = path_to_string(&include_dir);
+	char include_param[strlen(include_full_path) + 10];
+	strcpy(include_param, "-I");
+	strcat(include_param, include_full_path);
+
+	glob_t glob_result;
+	glob(path_to_string(&config_src), 0, NULL, &glob_result);
+
+	for (u64 i = 0; i < glob_result.gl_pathc; i++) {
+		char obj_path[PATH_MAX];
+		strcpy(obj_path, "../objs/_internal_obj_prefix_");
+		Path src_file_path;
+		path_for(&src_file_path, glob_result.gl_pathv[i]);
+		strcat(obj_path, path_file_name(&src_file_path));
+		obj_path[strlen(obj_path) - 1] = 'o';
+		build_obj(include_param, obj_path, glob_result.gl_pathv[i]);
 	}
 }
 
@@ -199,9 +267,6 @@ void build_libs(const char *base_dir, const char *config_dir)
 				path_push(&build_specific_dst, "build_specific.h");
 				path_for(&build_specific_src, path_to_string(&include_build_dir));
 				path_push(&build_specific_src, module_path);
-				printf("header name %s\n", next->module_file_name);
-				printf("copy from %s -> %s\n", path_to_string(&build_specific_dst),
-					path_to_string(&build_specific_src));
 				copy_file(path_to_string(&build_specific_dst), path_to_string(&build_specific_src));
 
 				printf("Parsing type: %s[%s].\n", module_str, file_name);
@@ -266,10 +331,8 @@ int proc_build(const char *base_dir, const char *config_dir)
 			path_push(&target, "target");
 			path_canonicalize(&target);
 			if (!path_exists(&target)) {
-				printf("mkdir\n");
 				if (!path_mkdir(&target, 0700, false))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
-				printf("ok\n");
 				path_push(&target, "objs");
 				if (!path_mkdir(&target, 0700, false))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
@@ -279,13 +342,12 @@ int proc_build(const char *base_dir, const char *config_dir)
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
 				path_pop(&target);
 				path_push(&target, "include");
-				printf("x\n");
 				if (!path_mkdir(&target, 0700, false))
 					exit_error("Could not create directory '%s'.", path_to_string(&target));
-				printf("y\n");
 			}
 
 			build_libs(base_dir, config_dir);
+			build_internal(base_dir, config_dir);
 
 			// change to the base directory
 			if (chdir(path_to_string(&base))) {
@@ -296,7 +358,7 @@ int proc_build(const char *base_dir, const char *config_dir)
 			char include_param[strlen(include_full_path) + 10];
 			strcpy(include_param, "-I");
 			strcat(include_param, include_full_path);
-			build_obj(include_param, "target/objs/main.o", "main.c");
+			build_main(include_param, "target/objs/main.o", "main.c", base_dir, config_dir);
 
 			glob_t glob_result;
 			glob("target/objs/*.o", 0, NULL, &glob_result);

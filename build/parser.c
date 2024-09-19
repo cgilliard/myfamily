@@ -138,15 +138,16 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk)
 			strncat(module_path, state->module_path, strlen(state->module_path) - 2);
 			strcat(module_path, "_");
 			strcat(module_path, state->type_name);
-			printf("types count = %" PRIu64 ",path_str=%s\n", count, module_path);
 			append_to_header(state, "typedef struct %s {\n", module_path);
 			for (u64 i = 0; i < count; i++) {
 				HeaderNameInfo *ni;
 				HeaderTypeInfo *ti;
 				ti = vec_element_at(&state->ht->types, i);
 				ni = vec_element_at(&state->ht->names, i);
-				printf("[%" PRIu64 "]=%s,%s\n", i, ti->type, ni->name);
 				append_to_header(state, "%s %s;\n", ti->type, ni->name);
+			}
+			if (count == 0) {
+				append_to_header(state, "char dummy;\n");
 			}
 			append_to_header(state, "} %s;\n\n", module_path);
 			append_to_header(state, "#define %s %s\n", state->type_name, module_path);
@@ -253,7 +254,7 @@ void parse_header(
 		if (res == LexerStateComplete) {
 			break;
 		}
-		printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
+		// printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
 		if (tk.type == TokenTypeDoc) {
 			// skip over doc comments for these purposes
 			continue;
@@ -292,7 +293,7 @@ void parse_header(
 	}
 
 	if (state.gen_header) {
-		printf("Generated header: '%s'\n", state.gen_header);
+		// printf("Generated header: '%s'\n", state.gen_header);
 	}
 
 	Path header_include;
@@ -301,7 +302,6 @@ void parse_header(
 	path_push(&header_include, "include");
 	path_push(&header_include, module_path);
 	path_canonicalize(&header_include);
-	printf("write to %s\n", path_to_string(&header_include));
 	FILE *fp = myfopen(path_to_string(&header_include), "w");
 	if (state.gen_header) {
 		if (fprintf(fp, "%s", state.gen_header) < strlen(state.gen_header))

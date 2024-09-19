@@ -175,7 +175,6 @@ bool path_mkdir(Path *p, mode_t mode, bool parent)
 {
 	if (p->ptr.data == NULL && p->ptr.len == 0) {
 		errno = EINVAL;
-		printf("einval\n");
 		return false;
 	}
 
@@ -188,7 +187,6 @@ bool path_mkdir(Path *p, mode_t mode, bool parent)
 			return true;
 		} else {
 			// Path exists but it's not a directory
-			printf("exists");
 			errno = ENOTDIR;
 			return false;
 		}
@@ -196,9 +194,7 @@ bool path_mkdir(Path *p, mode_t mode, bool parent)
 
 	// If parent is false, attempt to create only the target directory
 	if (!parent) {
-		printf("!parent\n");
 		if (mkdir(p->ptr.data, mode) != 0) {
-			printf("parent false return false\n");
 			return false;
 		}
 		return true;

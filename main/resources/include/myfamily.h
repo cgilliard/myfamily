@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <types.h>
+#include <core/panic.h>
+#include <core/types.h>
 
 #include <build_specific.h>
