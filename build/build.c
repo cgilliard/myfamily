@@ -48,7 +48,7 @@ void build_main(char *include_param, char *obj_path, char *file_name, const char
 	copy_file(path_to_string(&build_path), path_to_string(&build_specific));
 
 	char *args[]
-		= { "gcc", include_param, include_param2, "-I.", "-c", "-o", obj_path, file_name, NULL };
+		= { "cc", include_param, include_param2, "-I.", "-c", "-o", obj_path, file_name, NULL };
 	if (execute_process(args)) {
 		exit_error("execution of process '%s' failed", args[0]);
 	}
@@ -56,7 +56,7 @@ void build_main(char *include_param, char *obj_path, char *file_name, const char
 
 void build_obj(char *include_param, char *obj_path, char *file_name)
 {
-	char *args[] = { "gcc", include_param, "-I.", "-c", "-o", obj_path, file_name, NULL };
+	char *args[] = { "cc", include_param, "-I.", "-c", "-o", obj_path, file_name, NULL };
 	if (execute_process(args)) {
 		exit_error("execution of process '%s' failed", args[0]);
 	}
@@ -206,7 +206,12 @@ void build_libs(const char *base_dir, const char *config_dir)
 				Path file_path;
 				path_copy(&file_path, &build_dir);
 				path_push(&file_path, path_file_name(&next_path));
-				copy_file(path_to_string(&file_path), path_to_string(&next_path));
+				printf(
+					"copy from %s -> %s\n", path_to_string(&next_path), path_to_string(&file_path));
+				if (copy_file(path_to_string(&file_path), path_to_string(&next_path))) {
+					exit_error("Failed to copy file %s -> %s", path_to_string(&next_path),
+						path_to_string(&file_path));
+				};
 
 				char modules[PATH_MAX];
 				char *file_name = path_file_name(&next_path);
@@ -267,9 +272,14 @@ void build_libs(const char *base_dir, const char *config_dir)
 				path_push(&build_specific_dst, "build_specific.h");
 				path_for(&build_specific_src, path_to_string(&include_build_dir));
 				path_push(&build_specific_src, module_path);
-				copy_file(path_to_string(&build_specific_dst), path_to_string(&build_specific_src));
+				if (copy_file(
+						path_to_string(&build_specific_dst), path_to_string(&build_specific_src))) {
+					printf("module_path=%s\n", module_path);
+					exit_error("Failed to copy %s -> %s", path_to_string(&build_specific_src),
+						path_to_string(&build_specific_dst));
+				}
 
-				printf("Parsing type: %s[%s].\n", module_str, file_name);
+				printf("Parsing type: %s::[%s].\n", module_str, file_name);
 				build_obj(include_param, obj_path, file_name);
 
 			} else {
@@ -368,7 +378,7 @@ int proc_build(const char *base_dir, const char *config_dir)
 			Path output_file;
 			path_for(&output_file, "target");
 			path_push(&output_file, name);
-			link[0] = "gcc";
+			link[0] = "cc";
 			link[1] = "-o";
 			link[2] = path_to_string(&output_file);
 

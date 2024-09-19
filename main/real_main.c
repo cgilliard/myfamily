@@ -302,6 +302,7 @@ int real_main(int argc, char **argv)
 			setup_config_dir(config_dir);
 			WRITE_BUILD_ID(config_dir);
 		}
+		myfclose(fp);
 	}
 
 	// get first argument (subcommand)

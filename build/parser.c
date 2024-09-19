@@ -15,6 +15,7 @@
 #include <base/misc.h>
 #include <base/path.h>
 #include <base/resources.h>
+#include <build/build.h>
 #include <build/parser.h>
 #include <lexer/lexer.h>
 #include <limits.h>
@@ -44,7 +45,9 @@ typedef enum ParserStateEnum {
 	ParserStateExpectType = 3,
 	ParserStateExpectName = 4,
 	ParserStateInTypeExpectSemi = 5,
-	ParserStateOther = 6,
+	ParserStateInImportListExpectModuleName = 6,
+	ParserStateInImportListExpectSeparator = 7,
+	ParserStateOther = 1000000,
 } ParserStateEnum;
 
 typedef struct ParserState {
@@ -55,6 +58,7 @@ typedef struct ParserState {
 	char *gen_header;
 	u64 header_capacity;
 	char *module_path;
+	Vec import_list;
 	char type_name[MAX_TYPE_NAME_LEN + 1];
 } ParserState;
 
@@ -122,10 +126,61 @@ void proc_ParserStateBeginStatement(ParserState *state, Token *tk)
 			}
 			state->state = ParserStateExpectBracket;
 		}
-	} else if (tk->type == TokenTypePunct && !strcmp(tk->token, "}"))
-		state->state = ParserStateBeginStatement;
-	else
+	} else if (tk->type == TokenTypePunct) {
+		if (!strcmp(tk->token, "}"))
+			state->state = ParserStateBeginStatement;
+		else if (!strcmp(tk->token, "$")) {
+			vec_clear(&state->import_list);
+			state->state = ParserStateInImportListExpectModuleName;
+		} else
+			state->state = ParserStateOther;
+	} else
 		state->state = ParserStateOther;
+}
+
+void proc_ParserStateInImportListExpectModuleName(ParserState *state, Token *tk)
+{
+	printf("expect import list item\n");
+	if (tk->type != TokenTypeIdent) {
+		token_display_error(tk, "Expected module name. Found [%s]", tk->token);
+	} else {
+		printf("pushing %s\n", tk->token);
+		ModuleInfo mi;
+		strcpy(mi.name, tk->token);
+		vec_push(&state->import_list, &mi);
+		state->state = ParserStateInImportListExpectSeparator;
+	}
+}
+
+void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk)
+{
+	printf("expect import list separator\n");
+	if (!strcmp(tk->token, "::")) {
+		state->state = ParserStateInImportListExpectModuleName;
+	} else if (!strcmp(tk->token, ";")) {
+		u64 import_list_size = vec_size(&state->import_list);
+		printf("found a module with count = %" PRIu64 "\n", import_list_size);
+		if (import_list_size == 0) {
+			token_display_error(tk, "Expected at least one module name here");
+		} else {
+
+			ModuleInfo *mi = vec_element_at(&state->import_list, import_list_size - 1);
+
+			char module_path2[PATH_MAX + 1024];
+			strcpy(module_path2, "_type");
+
+			for (u64 i = 0; i < import_list_size; i++) {
+				ModuleInfo *next = vec_element_at(&state->import_list, i);
+				// strcat(module_path2, "_");
+				//		strcat(module_path, next->name);
+			}
+
+			// append_to_header(state, "#define %s %s\n", mi->name, module_path);
+			state->state = ParserStateBeginStatement;
+		}
+	} else {
+		token_display_error(tk, "Expected one of [';', '::']. Found [%s]", tk->token);
+	}
 }
 
 void proc_ParserStateExpectType(ParserState *state, Token *tk)
@@ -242,11 +297,11 @@ void parse_header(
 
 	vec_init(&ht.names, 10, sizeof(HeaderNameInfo));
 	vec_init(&ht.types, 10, sizeof(HeaderTypeInfo));
-	ParserState state = { ParserStateBeginStatement, headers, path_str, &ht, NULL, 0, module_path };
-	/*
-	if (strlen(module_path) > 2)
-		strncpy(state.module_path, module_path, strlen(module_path) - 2);
-		*/
+
+	Vec import_list;
+	vec_init(&import_list, 10, sizeof(ModuleInfo));
+	ParserState state
+		= { ParserStateBeginStatement, headers, path_str, &ht, NULL, 0, module_path, import_list };
 
 	while (true) {
 		Token tk;
@@ -254,7 +309,7 @@ void parse_header(
 		if (res == LexerStateComplete) {
 			break;
 		}
-		// printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
+		printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
 		if (tk.type == TokenTypeDoc) {
 			// skip over doc comments for these purposes
 			continue;
@@ -268,6 +323,10 @@ void parse_header(
 			proc_ParserStateExpectName(&state, &tk);
 		} else if (state.state == ParserStateInTypeExpectSemi) {
 			proc_ParserStateInTypeExpectSemi(&state, &tk);
+		} else if (state.state == ParserStateInImportListExpectModuleName) {
+			proc_ParserStateInImportListExpectModuleName(&state, &tk);
+		} else if (state.state == ParserStateInImportListExpectSeparator) {
+			proc_ParserStateInImportListExpectSeparator(&state, &tk);
 		} else if (tk.type == TokenTypePunct) {
 			if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
 				state.state = ParserStateBeginStatement;
