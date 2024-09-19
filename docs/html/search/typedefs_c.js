@@ -1,26 +1,9 @@
 var searchData=
 [
-  ['tabpath_5ft_1898',['tabpath_t',['../toml_8c.html#a1cc7416ff038349309ad5a808ed40201',1,'toml.c']]],
-  ['threadargswrapper_1899',['ThreadArgsWrapper',['../thread_8c.html#a294af5dcbc4a34d804d3da0c8cf96734',1,'thread.c']]],
-  ['threadimpl_1900',['ThreadImpl',['../thread_8c.html#a1fcb281eef9ba2d26e1718ae1e6c2194',1,'ThreadImpl():&#160;thread.c'],['../thread_8h.html#a1fcb281eef9ba2d26e1718ae1e6c2194',1,'ThreadImpl():&#160;thread.h']]],
-  ['threadptr_1901',['ThreadPtr',['../thread_8h.html#a5ca72c256079b70d06ec6c01884eaf9f',1,'thread.h']]],
-  ['token_1902',['Token',['../tokenizer_8h.html#ae88d5c0259051080fda097b92d99d7ee',1,'tokenizer.h']]],
-  ['token_5ft_1903',['token_t',['../toml_8c.html#add6dc27869d5a65a366b082fc965546a',1,'toml.c']]],
-  ['tokendisplaytype_1904',['TokenDisplayType',['../tokenizer_8c.html#aca916cdf494603a5c54b5021c95f73e4',1,'tokenizer.c']]],
-  ['tokenizer_1905',['Tokenizer',['../tokenizer_8h.html#a1f59ce852a607d9c28540edaa95dc20d',1,'tokenizer.h']]],
-  ['tokenizerstate_1906',['TokenizerState',['../tokenizer_8h.html#a5e3b6d0d96462a71ec656b8e3b2fb9cd',1,'tokenizer.h']]],
-  ['tokentype_1907',['TokenType',['../tokenizer_8h.html#a223ce5df2488277839246d7ebf52a7f8',1,'tokenizer.h']]],
-  ['tokentype_5ft_1908',['tokentype_t',['../toml_8c.html#ae600f4346700c8c97612df5e3e44f172',1,'toml.c']]],
-  ['toml_5farray_5ft_1909',['toml_array_t',['../toml_8h.html#ab3bb94ded84db4ae46a4b896ea652781',1,'toml.h']]],
-  ['toml_5farritem_5ft_1910',['toml_arritem_t',['../toml_8c.html#a3306795a01edf3e375a33df2758505f5',1,'toml.c']]],
-  ['toml_5fdatum_5ft_1911',['toml_datum_t',['../toml_8h.html#a7f97e6966a8fd32cdddeb22f9e9558c1',1,'toml.h']]],
-  ['toml_5fkeyval_5ft_1912',['toml_keyval_t',['../toml_8c.html#a8a57f78a5850fa0184d5c398ef917271',1,'toml.c']]],
-  ['toml_5fraw_5ft_1913',['toml_raw_t',['../toml_8h.html#a3d7c3bb08927eaba1727564cea9f8b84',1,'toml.h']]],
-  ['toml_5ftable_5ft_1914',['toml_table_t',['../toml_8h.html#ab4632a008de097480ac9ffe8ac44f685',1,'toml.h']]],
-  ['toml_5ftimestamp_5ft_1915',['toml_timestamp_t',['../toml_8h.html#a6641342a27386481c2e8c0dad02b3e67',1,'toml.h']]],
-  ['trieimpl_1916',['TrieImpl',['../trie_8c.html#a0632fc9e9b164e4dbfd04df38ac4c1ec',1,'TrieImpl():&#160;trie.c'],['../trie_8h.html#a0632fc9e9b164e4dbfd04df38ac4c1ec',1,'TrieImpl():&#160;trie.h']]],
-  ['triematch_1917',['TrieMatch',['../trie_8h.html#aaa83763428fd25b7b233987d449a2697',1,'trie.h']]],
-  ['trienc_1918',['TrieNc',['../trie_8h.html#a99584f47330ce2e32ced9d262c51f535',1,'trie.h']]],
-  ['trienode_1919',['TrieNode',['../trie_8c.html#a22b4927ee63317210a9969d17f3c9a49',1,'trie.c']]],
-  ['typeinfo_1920',['TypeInfo',['../parser_8h.html#a49b184c67666cebc8e96337d84d37ccf',1,'parser.h']]]
+  ['selfcleanupimpl_1945',['SelfCleanupImpl',['../type_8h.html#a5796fa21fb1fe0f979f17051f4eb3e61',1,'type.h']]],
+  ['subcommand_1946',['SubCommand',['../args_8h.html#a87a53c87231cf00fe98e41f84d8330b2',1,'args.h']]],
+  ['suffixpair_1947',['SuffixPair',['../suffix__tree_8c.html#a2b8934fc45bbc5a58b80f979d32603b2',1,'suffix_tree.c']]],
+  ['suffixtreeimpl_1948',['SuffixTreeImpl',['../suffix__tree_8c.html#ab2eb362ecf5b32f74f8cfffa75a83c09',1,'SuffixTreeImpl():&#160;suffix_tree.c'],['../suffix__tree_8h.html#ab2eb362ecf5b32f74f8cfffa75a83c09',1,'SuffixTreeImpl():&#160;suffix_tree.h']]],
+  ['suffixtreematch_1949',['SuffixTreeMatch',['../suffix__tree_8h.html#a6d0901d66318d6b87cd5735e84befae6',1,'suffix_tree.h']]],
+  ['suffixtreenc_1950',['SuffixTreeNc',['../suffix__tree_8h.html#abb0985c04303a5f94b393c057b34ce23',1,'suffix_tree.h']]]
 ];

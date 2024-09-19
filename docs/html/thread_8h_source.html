@@ -87,7 +87,7 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _CORE_THREAD__</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _CORE_THREAD__</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">base/types.h</a>&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="base_2types_8h.html">base/types.h</a>&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
 <div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="structJoinResult.html">   20</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="structJoinResult.html">JoinResult</a> {</div>
 <div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="structJoinResult.html#a537951e0112ba2746dd35a54a169dcfb">   21</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="structJoinResult.html#a537951e0112ba2746dd35a54a169dcfb">is_panic</a>;</div>
@@ -105,13 +105,15 @@ $(function() {
 <div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="thread_8h.html#a7add35317e384cd14231f428e57531ca">   33</a></span>&#160;<span class="preprocessor">#define Thread ThreadPtr __attribute__((warn_unused_result, cleanup(Thread_cleanup)))</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keywordtype">int</span> <a class="code" href="thread_8h.html#a79e01929285c6242b4446717a627546c">Thread_start</a>(<a class="code" href="thread_8h.html#a7add35317e384cd14231f428e57531ca">Thread</a> *ptr, <span class="keywordtype">void</span> (*start_routine)(<span class="keywordtype">void</span> *), <span class="keywordtype">void</span> *args);</div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="thread_8h.html#aa8e55986295a6f519462c911b2441638">   36</a></span>&#160;<a class="code" href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="code" href="thread_8h.html#aa8e55986295a6f519462c911b2441638">Thread_id</a>(<a class="code" href="thread_8h.html#a7add35317e384cd14231f428e57531ca">Thread</a> *ptr);</div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="thread_8h.html#aa8e55986295a6f519462c911b2441638">   36</a></span>&#160;<a class="code" href="base_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="code" href="thread_8h.html#aa8e55986295a6f519462c911b2441638">Thread_id</a>(<a class="code" href="thread_8h.html#a7add35317e384cd14231f428e57531ca">Thread</a> *ptr);</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<a class="code" href="structJoinResult.html">JoinResult</a> <a class="code" href="thread_8h.html#a21b1b7e0af8fb717d9cb5bcf89cb3464">Thread_join</a>(<a class="code" href="thread_8h.html#a7add35317e384cd14231f428e57531ca">Thread</a> *ptr);</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="thread_8h.html#a14e02096381381115aa4414c9dc2c2d2">JoinResult_is_panic</a>(<a class="code" href="structJoinResult.html">JoinResult</a> *jr);</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="thread_8h.html#a4c18a95ecf555aea4764fca1b98172e2">JoinResult_is_error</a>(<a class="code" href="structJoinResult.html">JoinResult</a> *jr);</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_THREAD__</span></div>
+<div class="ttc" id="abase_2types_8h_html"><div class="ttname"><a href="base_2types_8h.html">types.h</a></div></div>
+<div class="ttc" id="abase_2types_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="base_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:33</div></div>
 <div class="ttc" id="astructFatPtr_html"><div class="ttname"><a href="structFatPtr.html">FatPtr</a></div><div class="ttdef"><b>Definition:</b> heap.h:102</div></div>
 <div class="ttc" id="astructJoinResult_html"><div class="ttname"><a href="structJoinResult.html">JoinResult</a></div><div class="ttdef"><b>Definition:</b> thread.h:20</div></div>
 <div class="ttc" id="astructJoinResult_html_a537951e0112ba2746dd35a54a169dcfb"><div class="ttname"><a href="structJoinResult.html#a537951e0112ba2746dd35a54a169dcfb">JoinResult::is_panic</a></div><div class="ttdeci">bool is_panic</div><div class="ttdef"><b>Definition:</b> thread.h:21</div></div>
@@ -128,8 +130,6 @@ $(function() {
 <div class="ttc" id="athread_8h_html_a7add35317e384cd14231f428e57531ca"><div class="ttname"><a href="thread_8h.html#a7add35317e384cd14231f428e57531ca">Thread</a></div><div class="ttdeci">#define Thread</div><div class="ttdef"><b>Definition:</b> thread.h:33</div></div>
 <div class="ttc" id="athread_8h_html_a9efd08a295f14ef511ffc636642ff5fe"><div class="ttname"><a href="thread_8h.html#a9efd08a295f14ef511ffc636642ff5fe">Thread_cleanup</a></div><div class="ttdeci">void Thread_cleanup(ThreadPtr *ptr)</div></div>
 <div class="ttc" id="athread_8h_html_aa8e55986295a6f519462c911b2441638"><div class="ttname"><a href="thread_8h.html#aa8e55986295a6f519462c911b2441638">Thread_id</a></div><div class="ttdeci">u64 Thread_id(Thread *ptr)</div></div>
-<div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div></div>
-<div class="ttc" id="atypes_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:33</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
