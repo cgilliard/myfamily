@@ -54,6 +54,7 @@ typedef struct ParserState {
 	HeaderTypes *ht;
 	char *gen_header;
 	u64 header_capacity;
+	char *module_path;
 	char type_name[MAX_TYPE_NAME_LEN + 1];
 } ParserState;
 
@@ -132,8 +133,13 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk)
 	if (tk->type != TokenTypeIdent) {
 		if (!strcmp(tk->token, "}")) {
 			u64 count = vec_size(&state->ht->types);
-			printf("types count = %" PRIu64 "\n", count);
-			append_to_header(state, "typedef struct %s {\n", state->type_name);
+			char module_path[strlen(state->module_path) + strlen(state->type_name) + 10];
+			strcpy(module_path, "_type_");
+			strncat(module_path, state->module_path, strlen(state->module_path) - 2);
+			strcat(module_path, "_");
+			strcat(module_path, state->type_name);
+			printf("types count = %" PRIu64 ",path_str=%s\n", count, module_path);
+			append_to_header(state, "typedef struct %s {\n", module_path);
 			for (u64 i = 0; i < count; i++) {
 				HeaderNameInfo *ni;
 				HeaderTypeInfo *ti;
@@ -142,7 +148,8 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk)
 				printf("[%" PRIu64 "]=%s,%s\n", i, ti->type, ni->name);
 				append_to_header(state, "%s %s;\n", ti->type, ni->name);
 			}
-			append_to_header(state, "} %s;\n\n", state->type_name);
+			append_to_header(state, "} %s;\n\n", module_path);
+			append_to_header(state, "#define %s %s\n", state->type_name, module_path);
 			vec_clear(&state->ht->types);
 			vec_clear(&state->ht->names);
 			state->state = ParserStateBeginStatement;
@@ -223,6 +230,7 @@ void parse_header(
 		strcat(module_path, vec_element_at(module_info, i));
 		strcat(module_path, "_");
 	}
+	strcat(module_path, path_file_name(path));
 	printf("Parsing header %s['%s'].\n", module_str, path_file_name(path));
 	Lexer l;
 	char *path_str = path_to_string(path);
@@ -233,7 +241,11 @@ void parse_header(
 
 	vec_init(&ht.names, 10, sizeof(HeaderNameInfo));
 	vec_init(&ht.types, 10, sizeof(HeaderTypeInfo));
-	ParserState state = { ParserStateBeginStatement, headers, path_str, &ht, NULL, 0 };
+	ParserState state = { ParserStateBeginStatement, headers, path_str, &ht, NULL, 0, module_path };
+	/*
+	if (strlen(module_path) > 2)
+		strncpy(state.module_path, module_path, strlen(module_path) - 2);
+		*/
 
 	while (true) {
 		Token tk;
@@ -283,7 +295,6 @@ void parse_header(
 		printf("Generated header: '%s'\n", state.gen_header);
 	}
 
-	strcat(module_path, path_file_name(path));
 	Path header_include;
 	path_for(&header_include, base_dir);
 	path_push(&header_include, "target");

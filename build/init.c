@@ -45,7 +45,7 @@ int proc_build_init(const char *config_dir, const char *proj_name, const char *p
 		fprintf(stderr, "Path: '%s' already exists!\n", path_to_string(&path));
 		exit(-1);
 	}
-	if (path_mkdir(&path, 0700, false)) {
+	if (!path_mkdir(&path, 0700, false)) {
 		perror("Error: could not create directory for project");
 		exit(-1);
 	}
