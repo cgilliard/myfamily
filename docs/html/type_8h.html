@@ -80,7 +80,7 @@ $(function() {
 <code>#include &lt;<a class="el" href="chain__allocator_8h_source.html">base/chain_allocator.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="heap_8h_source.html">base/heap.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="macro__utils_8h_source.html">base/macro_utils.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="panic_8h_source.html">base/panic.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="base_2panic_8h_source.html">base/panic.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="base_2types_8h_source.html">base/types.h</a>&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
@@ -413,9 +413,9 @@ Functions</h2></td></tr>
 <tr class="separator:a5513975c8def3d8423a6c1583dcf30e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0dd925401fb1753f59b9c1c82a9d660"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#ac0dd925401fb1753f59b9c1c82a9d660">find_fn</a> (const <a class="el" href="structObj.html">Obj</a> *obj, const char *name)</td></tr>
 <tr class="separator:ac0dd925401fb1753f59b9c1c82a9d660"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2106e13dbac6575e8d701b9f1f4aa79d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a> ()</td></tr>
+<tr class="memitem:a2106e13dbac6575e8d701b9f1f4aa79d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a2106e13dbac6575e8d701b9f1f4aa79d">unique_id</a> ()</td></tr>
 <tr class="separator:a2106e13dbac6575e8d701b9f1f4aa79d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a909192bbfb2649a87561595bca24acaa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structFatPtr.html">FatPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a> (<a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>)</td></tr>
+<tr class="memitem:a909192bbfb2649a87561595bca24acaa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structFatPtr.html">FatPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a> (<a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>)</td></tr>
 <tr class="separator:a909192bbfb2649a87561595bca24acaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
@@ -2098,9 +2098,9 @@ Variables</h2></td></tr>
 <div class="line">                              (*((<a class="code" href="structObj.html">Obj</a> *)dst)).vtable-&gt;trait_entries[<a class="code" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>],                            \</div>
 <div class="line">                              (*((<a class="code" href="structObj.html">Obj</a> *)src)).vtable-&gt;name);                                       \</div>
 <div class="line">                }                                                                                  \</div>
-<div class="line">            } <span class="comment">/* This is a concrete type */</span>                                                        <a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">\</a></div>
-<div class="line"><a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">			else                                                                                   \</a></div>
-<div class="line"><a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">				panic</a>(<span class="stringliteral">&quot;Vtable mismatch! Trying to set type %s to &quot;</span>                                 \</div>
+<div class="line">            } <span class="comment">/* This is a concrete type */</span>                                                        <a class="code" href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">\</a></div>
+<div class="line"><a class="code" href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">			else                                                                                   \</a></div>
+<div class="line"><a class="code" href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">				panic</a>(<span class="stringliteral">&quot;Vtable mismatch! Trying to set type %s to &quot;</span>                                 \</div>
 <div class="line">                      <span class="stringliteral">&quot;type %s!&quot;</span>,                                                                  \</div>
 <div class="line">                      ((*((<a class="code" href="structObj.html">Obj</a> *)dst)).vtable)-&gt;name, ((*((<a class="code" href="structObj.html">Obj</a> *)src)).vtable)-&gt;name);             \</div>
 <div class="line">        }                                                                                          \</div>
@@ -2113,7 +2113,7 @@ Variables</h2></td></tr>
 <div class="line">        <span class="comment">/* Set src&#39;s flags to consumed and no_cleanup as the ownership is moved. */</span>                \</div>
 <div class="line">        (*((<a class="code" href="structObj.html">Obj</a> *)src)).flags |= <a class="code" href="type_8h.html#abce3941cffbfc1da12a115314260d72d">OBJECT_FLAGS_CONSUMED</a> | <a class="code" href="type_8h.html#a290aa2e7fa12d86c057232b0c798fc98">OBJECT_FLAGS_NO_CLEANUP</a>;                  \</div>
 <div class="line">    })</div>
-<div class="ttc" id="apanic_8c_html_ad1f1a1dc0581a11b597453f148106393"><div class="ttname"><a href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a></div><div class="ttdeci">void panic(const char *fmt,...)</div><div class="ttdef"><b>Definition:</b> panic.c:27</div></div>
+<div class="ttc" id="abase_2panic_8c_html_ad1f1a1dc0581a11b597453f148106393"><div class="ttname"><a href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a></div><div class="ttdeci">void panic(const char *fmt,...)</div><div class="ttdef"><b>Definition:</b> panic.c:27</div></div>
 <div class="ttc" id="astructObj_html"><div class="ttname"><a href="structObj.html">Obj</a></div><div class="ttdef"><b>Definition:</b> type.h:58</div></div>
 <div class="ttc" id="atype_8h_html_a290aa2e7fa12d86c057232b0c798fc98"><div class="ttname"><a href="type_8h.html#a290aa2e7fa12d86c057232b0c798fc98">OBJECT_FLAGS_NO_CLEANUP</a></div><div class="ttdeci">#define OBJECT_FLAGS_NO_CLEANUP</div><div class="ttdef"><b>Definition:</b> type.h:30</div></div>
 <div class="ttc" id="atype_8h_html_a96880c4154e8b61f307c31dbbd0cccd4"><div class="ttname"><a href="type_8h.html#a96880c4154e8b61f307c31dbbd0cccd4">Implements</a></div><div class="ttdeci">#define Implements(obj, trait)</div><div class="ttdef"><b>Definition:</b> type.h:109</div></div>
@@ -2724,9 +2724,9 @@ Variables</h2></td></tr>
 <div class="line">        UNEXPECTED_FLAGS(self-&gt;flags);                                                             \</div>
 <div class="line">        if (self-&gt;flags &amp; <a class="code" href="type_8h.html#abce3941cffbfc1da12a115314260d72d">OBJECT_FLAGS_CONSUMED</a>) {                                                 \</div>
 <div class="line">            if (self-&gt;vtable == NULL)                                                              \</div>
-<div class="line">                panic(<span class="stringliteral">&quot;Runtime error: Obj has not been instantiated!&quot;</span>);                            <a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">\</a></div>
-<div class="line"><a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">			else                                                                                   \</a></div>
-<div class="line"><a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">				panic</a>(<span class="stringliteral">&quot;Runtime error: Obj [%s@%&quot;</span> PRIu64 <span class="stringliteral">&quot;] has already been consumed!&quot;</span>,            \</div>
+<div class="line">                panic(<span class="stringliteral">&quot;Runtime error: Obj has not been instantiated!&quot;</span>);                            <a class="code" href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">\</a></div>
+<div class="line"><a class="code" href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">			else                                                                                   \</a></div>
+<div class="line"><a class="code" href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">				panic</a>(<span class="stringliteral">&quot;Runtime error: Obj [%s@%&quot;</span> PRIu64 <span class="stringliteral">&quot;] has already been consumed!&quot;</span>,            \</div>
 <div class="line">                      self-&gt;vtable-&gt;name, self-&gt;ptr.id);                                           \</div>
 <div class="line">        }                                                                                          \</div>
 <div class="line">        return_type (*impl)(<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a>(__VA_ARGS__))) = <a class="code" href="type_8h.html#ac0dd925401fb1753f59b9c1c82a9d660">find_fn</a>(<span class="keyword">self</span>, #fn_name);    \</div>
@@ -2846,9 +2846,9 @@ Variables</h2></td></tr>
 <div class="line">        UNEXPECTED_FLAGS(self-&gt;flags);                                                             \</div>
 <div class="line">        if (self-&gt;flags &amp; <a class="code" href="type_8h.html#abce3941cffbfc1da12a115314260d72d">OBJECT_FLAGS_CONSUMED</a>) {                                                 \</div>
 <div class="line">            if (self-&gt;vtable == NULL)                                                              \</div>
-<div class="line">                panic(<span class="stringliteral">&quot;Runtime error: Obj has not been instantiated!&quot;</span>);                            <a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">\</a></div>
-<div class="line"><a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">			else                                                                                   \</a></div>
-<div class="line"><a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">				panic</a>(<span class="stringliteral">&quot;Runtime error: Obj [%s@%&quot;</span> PRIu64 <span class="stringliteral">&quot;] has already been consumed!&quot;</span>,            \</div>
+<div class="line">                panic(<span class="stringliteral">&quot;Runtime error: Obj has not been instantiated!&quot;</span>);                            <a class="code" href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">\</a></div>
+<div class="line"><a class="code" href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">			else                                                                                   \</a></div>
+<div class="line"><a class="code" href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">				panic</a>(<span class="stringliteral">&quot;Runtime error: Obj [%s@%&quot;</span> PRIu64 <span class="stringliteral">&quot;] has already been consumed!&quot;</span>,            \</div>
 <div class="line">                      self-&gt;vtable-&gt;name, self-&gt;ptr.id);                                           \</div>
 <div class="line">        }                                                                                          \</div>
 <div class="line">        return_type (*impl)(<a class="code" href="type_8h.html#a28e76886e9ffe1b9d71ae38254b2be20">__VA_OPT__</a>(<a class="code" href="type_8h.html#a7807ba2c750e8fd2ad770bdde7b0a601">PROCESS_FN_SIG</a>(__VA_ARGS__))) = <a class="code" href="type_8h.html#ac0dd925401fb1753f59b9c1c82a9d660">find_fn</a>(<span class="keyword">self</span>, #fn_name);    \</div>
@@ -4013,11 +4013,12 @@ Variables</h2></td></tr>
 <div class="line">    static_value <span class="keywordtype">void</span> <a class="code" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((constructor)) __add_impls_##name##_vtable() {                 \</div>
 <div class="line">        VtableEntry <a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a> = {<span class="stringliteral">&quot;size&quot;</span>, name##_size};                                                  \</div>
 <div class="line">        vtable_add_entry(&amp;name##_Vtable__, <a class="code" href="traits_8c.html#a56165321ab30e10af6d42752217d1be1">size</a>);                                                  \</div>
-<div class="line">        VtableEntry build_internal = {<span class="stringliteral">&quot;build_internal&quot;</span>, name##_build_internal};                    \</div>
-<div class="line">        vtable_add_entry(&amp;name##_Vtable__, build_internal);                                        \</div>
+<div class="line">        VtableEntry <a class="code" href="build_8c.html#a1886c18d9a4b558db435714fabb7c1ac">build_internal</a> = {<span class="stringliteral">&quot;build_internal&quot;</span>, name##_build_internal};                    \</div>
+<div class="line">        vtable_add_entry(&amp;name##_Vtable__, <a class="code" href="build_8c.html#a1886c18d9a4b558db435714fabb7c1ac">build_internal</a>);                                        \</div>
 <div class="line">        VtableEntry drop_internal = {<span class="stringliteral">&quot;drop_internal&quot;</span>, name##_drop_internal};                       \</div>
 <div class="line">        vtable_add_entry(&amp;name##_Vtable__, drop_internal);                                         \</div>
 <div class="line">    }</div>
+<div class="ttc" id="abuild_8c_html_a1886c18d9a4b558db435714fabb7c1ac"><div class="ttname"><a href="build_8c.html#a1886c18d9a4b558db435714fabb7c1ac">build_internal</a></div><div class="ttdeci">void build_internal(const char *base_dir, const char *config_dir)</div><div class="ttdef"><b>Definition:</b> build.c:319</div></div>
 <div class="ttc" id="atype_8h_html_a372b84f095719af8ef049f09a8deda3a"><div class="ttname"><a href="type_8h.html#a372b84f095719af8ef049f09a8deda3a">PROCESS_WHERE</a></div><div class="ttdeci">#define PROCESS_WHERE(name, where)</div></div>
 <div class="ttc" id="atype_8h_html_a9f390c60f8ae86116dbff32d97046ccf"><div class="ttname"><a href="type_8h.html#a9f390c60f8ae86116dbff32d97046ccf">BUILD_OBJECTS</a></div><div class="ttdeci">#define BUILD_OBJECTS(name, inner)</div></div>
 <div class="ttc" id="atype_8h_html_ac80e1c5ec6591a85b92849d0d066e9be"><div class="ttname"><a href="type_8h.html#ac80e1c5ec6591a85b92849d0d066e9be">DROP_OBJECTS</a></div><div class="ttdeci">#define DROP_OBJECTS(name, inner)</div></div>
@@ -4336,7 +4337,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="structFatPtr.html">FatPtr</a> build_fat_ptr </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
           <td class="paramname"><em>size</em></td><td>)</td>
           <td></td>
         </tr>
@@ -4544,7 +4545,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> unique_id </td>
+          <td class="memname"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> unique_id </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>

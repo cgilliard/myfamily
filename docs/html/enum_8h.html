@@ -891,8 +891,8 @@ Macros</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    ({\</div>
 <div class="line">    char* found_name = <a class="code" href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a>(v);\</div>
 <div class="line">    char *exp_name = _Enum_variant_Global_##variant##__;\</div>
-<div class="line">if (strcmp(exp_name, found_name)) { <span class="keywordflow">if</span> (!is_prim_match(exp_name, found_name)) <a class="code" href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a>(<span class="stringliteral">&quot;Enum type mismatch! Expected [%s]. Found [%s].&quot;</span>, exp_name, found_name); } })</div>
-<div class="ttc" id="apanic_8c_html_ad1f1a1dc0581a11b597453f148106393"><div class="ttname"><a href="panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a></div><div class="ttdeci">void panic(const char *fmt,...)</div><div class="ttdef"><b>Definition:</b> panic.c:27</div></div>
+<div class="line">if (strcmp(exp_name, found_name)) { <span class="keywordflow">if</span> (!is_prim_match(exp_name, found_name)) <a class="code" href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a>(<span class="stringliteral">&quot;Enum type mismatch! Expected [%s]. Found [%s].&quot;</span>, exp_name, found_name); } })</div>
+<div class="ttc" id="abase_2panic_8c_html_ad1f1a1dc0581a11b597453f148106393"><div class="ttname"><a href="base_2panic_8c.html#ad1f1a1dc0581a11b597453f148106393">panic</a></div><div class="ttdeci">void panic(const char *fmt,...)</div><div class="ttdef"><b>Definition:</b> panic.c:27</div></div>
 <div class="ttc" id="atype_8h_html_aa7740fc1c5505b37330419fd68f73345"><div class="ttname"><a href="type_8h.html#aa7740fc1c5505b37330419fd68f73345">TypeName</a></div><div class="ttdeci">#define TypeName(obj)</div><div class="ttdef"><b>Definition:</b> type.h:108</div></div>
 </div><!-- fragment -->
 </div>

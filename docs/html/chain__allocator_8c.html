@@ -77,7 +77,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="chain__allocator_8h_source.html">base/chain_allocator.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="panic_8h_source.html">base/panic.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="base_2panic_8h_source.html">base/panic.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
 <code>#include &lt;errno.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
@@ -102,7 +102,7 @@ Typedefs</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:a0050f8533288c2e5b15d631f27a209e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a0050f8533288c2e5b15d631f27a209e1">set_default_hconfig</a> (<a class="el" href="structHeapAllocatorConfig.html">HeapAllocatorConfig</a> *hconfig)</td></tr>
 <tr class="separator:a0050f8533288c2e5b15d631f27a209e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a925509968cee221c2ca1e0cfda302e28"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a925509968cee221c2ca1e0cfda302e28">set_default_hdpc_arr</a> (<a class="el" href="structHeapDataParamsConfig.html">HeapDataParamsConfig</a> arr[], <a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>)</td></tr>
+<tr class="memitem:a925509968cee221c2ca1e0cfda302e28"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a925509968cee221c2ca1e0cfda302e28">set_default_hdpc_arr</a> (<a class="el" href="structHeapDataParamsConfig.html">HeapDataParamsConfig</a> arr[], <a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>)</td></tr>
 <tr class="separator:a925509968cee221c2ca1e0cfda302e28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f8d40666dc744311ad38fc2ffa19187"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a7f8d40666dc744311ad38fc2ffa19187">build_default_heap_allocator</a> (<a class="el" href="structHeapAllocator.html">HeapAllocator</a> *ptr)</td></tr>
 <tr class="separator:a7f8d40666dc744311ad38fc2ffa19187"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,9 +116,9 @@ Functions</h2></td></tr>
 <tr class="separator:a1f1e1ac1879df2b39e2a25d7085832d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac92857a1ff9f368c8dec8d4a0894d238"><td class="memItemLeft" align="right" valign="top"><a class="el" href="chain__allocator_8h.html#a9a8623cb74a147abf95752a87e262c09">ChainGuard</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#ac92857a1ff9f368c8dec8d4a0894d238">chain_guard</a> (<a class="el" href="structChainConfig.html">ChainConfig</a> *config)</td></tr>
 <tr class="separator:ac92857a1ff9f368c8dec8d4a0894d238"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b4433e7d057a87fdf1fa33006dc6d43"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a6b4433e7d057a87fdf1fa33006dc6d43">chain_malloc</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr, <a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>)</td></tr>
+<tr class="memitem:a6b4433e7d057a87fdf1fa33006dc6d43"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a6b4433e7d057a87fdf1fa33006dc6d43">chain_malloc</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr, <a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>)</td></tr>
 <tr class="separator:a6b4433e7d057a87fdf1fa33006dc6d43"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64f481aa76ea155a58cc2a4d8778e0d4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a64f481aa76ea155a58cc2a4d8778e0d4">chain_realloc</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *dst, <a class="el" href="structFatPtr.html">FatPtr</a> *src, <a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>)</td></tr>
+<tr class="memitem:a64f481aa76ea155a58cc2a4d8778e0d4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a64f481aa76ea155a58cc2a4d8778e0d4">chain_realloc</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *dst, <a class="el" href="structFatPtr.html">FatPtr</a> *src, <a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>)</td></tr>
 <tr class="separator:a64f481aa76ea155a58cc2a4d8778e0d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abce9c8f3105d54e0cf1e80cfd0688c42"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#abce9c8f3105d54e0cf1e80cfd0688c42">chain_free</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
 <tr class="separator:abce9c8f3105d54e0cf1e80cfd0688c42"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,11 +137,11 @@ Variables</h2></td></tr>
 <tr class="separator:add9f5a74c73caad1f1599ddbffdfb88e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad09fb2a24755bca224bd076e6d818aec"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structHeapDataParamsConfig.html">HeapDataParamsConfig</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#ad09fb2a24755bca224bd076e6d818aec">__default_hdpc_arr_</a> = <a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a></td></tr>
 <tr class="separator:ad09fb2a24755bca224bd076e6d818aec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb5d070ac2ed7841c63e686177e6fc79"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#acb5d070ac2ed7841c63e686177e6fc79">__default_hdpc_arr_size</a> = sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>) / sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>[0])</td></tr>
+<tr class="memitem:acb5d070ac2ed7841c63e686177e6fc79"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#acb5d070ac2ed7841c63e686177e6fc79">__default_hdpc_arr_size</a> = sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>) / sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>[0])</td></tr>
 <tr class="separator:acb5d070ac2ed7841c63e686177e6fc79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26f0241573b4b4f69e5559c1d7b209e1"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#a26f0241573b4b4f69e5559c1d7b209e1">__thread_local_chain_allocator</a> [<a class="el" href="chain__allocator_8h.html#ab53a76916d5a7c5966fc994b1d02dbff">MAX_CHAIN_ALLOCATOR_DEPTH</a>]</td></tr>
 <tr class="separator:a26f0241573b4b4f69e5559c1d7b209e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1142069a8e3a2876e39aa13e67b035c"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#ac1142069a8e3a2876e39aa13e67b035c">__thread_local_chain_allocator_index</a> = 0</td></tr>
+<tr class="memitem:ac1142069a8e3a2876e39aa13e67b035c"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__allocator_8c.html#ac1142069a8e3a2876e39aa13e67b035c">__thread_local_chain_allocator_index</a> = 0</td></tr>
 <tr class="separator:ac1142069a8e3a2876e39aa13e67b035c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -294,7 +294,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
           <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
@@ -336,7 +336,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
           <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
@@ -428,7 +428,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
           <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
@@ -503,7 +503,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> __default_hdpc_arr_size = sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>) / sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>[0])</td>
+          <td class="memname"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> __default_hdpc_arr_size = sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>) / sizeof(<a class="el" href="chain__allocator_8c.html#add9f5a74c73caad1f1599ddbffdfb88e">__default_hdpc_arr_value</a>[0])</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -595,7 +595,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">_Thread_local <a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> __thread_local_chain_allocator_index = 0</td>
+          <td class="memname">_Thread_local <a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> __thread_local_chain_allocator_index = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">
