@@ -12,19 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/*
-#include <base/misc.h>
-#include <base/path.h>
-#include <base/resources.h>
-#include <build/build.h>
-#include <build/parser.h>
-#include <glob.h>
-#include <stdlib.h>
-#include <string.h>
-#include <toml/toml.h>
-#include <util/proc_executor.h>
-*/
-
 #include <base/misc.h>
 #include <base/path.h>
 #include <base/resources.h>
@@ -270,14 +257,15 @@ void build_obj(const char *cc, const char *include_dir, const char *obj_dir, con
 		char config_include_param[strlen(config_include) + 5];
 		strcpy(config_include_param, "-I");
 		strcat(config_include_param, config_include);
-		const char *args[] = { cc, include_param, config_include_param, "-I.", "-c", "-o",
-			path_to_string(&obj_path), path_to_string(&src_path), NULL };
+		const char *args[] = { cc, "-Wno-attributes", "-Wno-ignored-attributes", include_param,
+			config_include_param, "-c", "-o", path_to_string(&obj_path), path_to_string(&src_path),
+			NULL };
 		if (execute_process(args)) {
 			exit_error("execution of process '%s' failed", args[0]);
 		}
 	} else {
-		const char *args[] = { cc, include_param, "-I.", "-c", "-o", path_to_string(&obj_path),
-			path_to_string(&src_path), NULL };
+		const char *args[] = { cc, "-Wno-attributes", "-Wno-ignored-attributes", include_param,
+			"-c", "-o", path_to_string(&obj_path), path_to_string(&src_path), NULL };
 		if (execute_process(args)) {
 			exit_error("execution of process '%s' failed", args[0]);
 		}

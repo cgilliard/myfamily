@@ -79,7 +79,10 @@ void append_to_header(ParserState *state, const char *text, ...)
 		if (state->gen_header == NULL)
 			exit_error("Could not allocate sufficient memory to continue!");
 		va_start(args, text);
-		vsnprintf(state->gen_header, size, text, args);
+		char text_with_nl[strlen(text) + 2];
+		strcpy(text_with_nl, text);
+		strcat(text_with_nl, "\n");
+		vsnprintf(state->gen_header, size, text_with_nl, args);
 		va_end(args);
 
 	} else {
@@ -96,8 +99,11 @@ void append_to_header(ParserState *state, const char *text, ...)
 		}
 
 		va_start(args, text);
+		char text_with_nl[strlen(text) + 2];
+		strcpy(text_with_nl, text);
+		strcat(text_with_nl, "\n");
 		vsnprintf(state->gen_header + strlen(state->gen_header), size - strlen(state->gen_header),
-			text, args);
+			text_with_nl, args);
 		va_end(args);
 	}
 
@@ -160,10 +166,11 @@ void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk)
 		if (import_list_size == 0) {
 			token_display_error(tk, "Expected at least one module name here");
 		} else {
-			char buf[PATH_MAX + 1];
-			module_to_type_string(&state->import_module_info, buf, PATH_MAX);
+			char type_name[PATH_MAX + 1];
+			module_to_type_string(&state->import_module_info, type_name, PATH_MAX);
 			char *last = state->import_module_info.module_list[import_list_size - 1].name;
-			append_to_header(state, "#define %s %s\n", last, buf);
+			append_to_header(state, "typedef struct %s %s;", type_name, type_name);
+			append_to_header(state, "#define %s %s", last, type_name);
 			state->state = ParserStateBeginStatement;
 		}
 	} else {
@@ -179,18 +186,30 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk)
 			char type_name[PATH_MAX];
 			TypeInfo *ti = vec_element_at(state->types, vec_size(state->types) - 1);
 			type_info_to_string(ti, type_name, PATH_MAX);
-			append_to_header(state, "typedef struct %s {\n", type_name);
+			append_to_header(state, "typedef struct %s %s;", type_name, type_name);
+			append_to_header(state, "typedef struct %s {", type_name);
 			for (u64 i = 0; i < count; i++) {
 				HeaderNameInfo *ni;
 				HeaderTypeInfo *ti;
 				ti = vec_element_at(&(state->ht.types), i);
 				ni = vec_element_at(&(state->ht.names), i);
-				append_to_header(state, "%s %s;\n", ti->type, ni->name);
+				append_to_header(state, "%s %s;", ti->type, ni->name);
 			}
 			if (count == 0) {
-				append_to_header(state, "char dummy;\n");
+				append_to_header(state, "char dummy;");
 			}
-			append_to_header(state, "} %s;\n\n", type_name);
+			append_to_header(state, "} %s;\n", type_name);
+			append_to_header(state,
+				"static Vtable %s_Vtable__ = {\"%s\", 0, NULL, 0, NULL, false};\n", type_name,
+				type_name);
+			append_to_header(
+				state, "static u64 %s_size() {return sizeof(%s); }", type_name, type_name);
+
+			append_to_header(state, "\
+ 				\nstatic void __attribute__((constructor)) __add_impls_%s_vtable() { \
+                		\nVtableEntry size = {\"size\", %s_size};                            \
+                		\nvtable_add_entry(&%s_Vtable__, size); \n}",
+				type_name, type_name, type_name);
 			append_to_header(state, "#define %s %s\n", state->type_name, type_name);
 			vec_clear(&(state->ht.types));
 			vec_clear(&(state->ht.names));

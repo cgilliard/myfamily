@@ -12,8 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <core/panic.h>
-#include <core/type.h>
-#include <core/types.h>
+#ifndef _CORE_RESOURCES__
+#define _CORE_RESOURCES__
 
-#include <build_specific.h>
+#include <core/types.h>
+#include <stddef.h>
+
+typedef struct ResourceStats {
+	u64 malloc_sum;
+	u64 realloc_sum;
+	u64 free_sum;
+	u64 fopen_sum;
+	u64 fclose_sum;
+} ResourceStats;
+
+void *mymalloc(usize size);
+void *myrealloc(void *ptr, usize size);
+void myfree(void *ptr);
+FILE *myfopen(const char *path, const char *mode);
+void myfclose(FILE *ptr);
+u64 mymalloc_sum();
+u64 myrealloc_sum();
+u64 myfree_sum();
+u64 myfopen_sum();
+u64 myfclose_sum();
+
+#endif // _CORE_RESOURCES__
