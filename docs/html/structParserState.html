@@ -74,22 +74,56 @@ $(function() {
 Public Attributes</h2></td></tr>
 <tr class="memitem:a2ad1929c22af0b273522a72e002d5669"><td class="memItemLeft" align="right" valign="top"><a class="el" href="parser_8c.html#ae3db5225dd960f18d1392680f2e230a4">ParserStateEnum</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#a2ad1929c22af0b273522a72e002d5669">state</a></td></tr>
 <tr class="separator:a2ad1929c22af0b273522a72e002d5669"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace3e38f8b29cec2f6b1ce772143e2069"><td class="memItemLeft" align="right" valign="top"><a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#ace3e38f8b29cec2f6b1ce772143e2069">header_files</a></td></tr>
-<tr class="separator:ace3e38f8b29cec2f6b1ce772143e2069"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a917c2cd0a13e996db99363dc174274e3"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#a917c2cd0a13e996db99363dc174274e3">path_str</a></td></tr>
-<tr class="separator:a917c2cd0a13e996db99363dc174274e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fae301a0f89180c83101b7b07313ed9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structHeaderTypes.html">HeaderTypes</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#a8fae301a0f89180c83101b7b07313ed9">ht</a></td></tr>
-<tr class="separator:a8fae301a0f89180c83101b7b07313ed9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a661b224a130efb124d0bacf892ae8b31"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structModuleInfo.html">ModuleInfo</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#a661b224a130efb124d0bacf892ae8b31">cur</a></td></tr>
+<tr class="separator:a661b224a130efb124d0bacf892ae8b31"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ce3c05463de7e5287cecbe472b843a7"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#a7ce3c05463de7e5287cecbe472b843a7">gen_header</a></td></tr>
 <tr class="separator:a7ce3c05463de7e5287cecbe472b843a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedc97b2a33911a272961c6f2910aa18e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#aedc97b2a33911a272961c6f2910aa18e">header_capacity</a></td></tr>
+<tr class="memitem:aedc97b2a33911a272961c6f2910aa18e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#aedc97b2a33911a272961c6f2910aa18e">header_capacity</a></td></tr>
 <tr class="separator:aedc97b2a33911a272961c6f2910aa18e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7451c00947944b21823d4b5480cdeb76"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#a7451c00947944b21823d4b5480cdeb76">module_path</a></td></tr>
-<tr class="separator:a7451c00947944b21823d4b5480cdeb76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abbf6069901df90f4dfa3f315d13a4e38"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#abbf6069901df90f4dfa3f315d13a4e38">type_name</a> [<a class="el" href="parser_8c.html#a2b5112254a307d0fb60af076af2fc581">MAX_TYPE_NAME_LEN</a>+1]</td></tr>
-<tr class="separator:abbf6069901df90f4dfa3f315d13a4e38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace9018c0c45864d8603856a91d656b4d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#ace9018c0c45864d8603856a91d656b4d">modules</a></td></tr>
+<tr class="separator:ace9018c0c45864d8603856a91d656b4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ae57f9239bdab29c5fca648606973c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#a9ae57f9239bdab29c5fca648606973c0">types</a></td></tr>
+<tr class="separator:a9ae57f9239bdab29c5fca648606973c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7f56c6daf8367ce5b8b0c8251a35139"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#ae7f56c6daf8367ce5b8b0c8251a35139">type_name</a> [<a class="el" href="build_8h.html#afd709f201d7643c3909621f620ea648a">MAX_NAME_LEN</a>+1]</td></tr>
+<tr class="separator:ae7f56c6daf8367ce5b8b0c8251a35139"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a105811f03e6b76b25c8e922d05360149"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structHeaderTypes.html">HeaderTypes</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#a105811f03e6b76b25c8e922d05360149">ht</a></td></tr>
+<tr class="separator:a105811f03e6b76b25c8e922d05360149"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd33f933f836cb9afccf5139f9632eaa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structModuleInfo.html">ModuleInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#acd33f933f836cb9afccf5139f9632eaa">import_module_info</a></td></tr>
+<tr class="separator:acd33f933f836cb9afccf5139f9632eaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeaba1f92b1d5a2630b26db13f8140892"><td class="memItemLeft" align="right" valign="top"><a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#aeaba1f92b1d5a2630b26db13f8140892">import_list</a></td></tr>
+<tr class="separator:aeaba1f92b1d5a2630b26db13f8140892"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12d9b1016852c02668dbcd5d87f4d3be"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structParserState.html#a12d9b1016852c02668dbcd5d87f4d3be">gen_file_counter</a></td></tr>
+<tr class="separator:a12d9b1016852c02668dbcd5d87f4d3be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a661b224a130efb124d0bacf892ae8b31"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a661b224a130efb124d0bacf892ae8b31">&#9670;&nbsp;</a></span>cur</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structModuleInfo.html">ModuleInfo</a>* ParserState::cur</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a12d9b1016852c02668dbcd5d87f4d3be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12d9b1016852c02668dbcd5d87f4d3be">&#9670;&nbsp;</a></span>gen_file_counter</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> ParserState::gen_file_counter</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a7ce3c05463de7e5287cecbe472b843a7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7ce3c05463de7e5287cecbe472b843a7">&#9670;&nbsp;</a></span>gen_header</h2>
 
@@ -111,63 +145,63 @@ Public Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="main_2resources_2include_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> ParserState::header_capacity</td>
+          <td class="memname"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> ParserState::header_capacity</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="ace3e38f8b29cec2f6b1ce772143e2069"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ace3e38f8b29cec2f6b1ce772143e2069">&#9670;&nbsp;</a></span>header_files</h2>
+<a id="a105811f03e6b76b25c8e922d05360149"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a105811f03e6b76b25c8e922d05360149">&#9670;&nbsp;</a></span>ht</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a>* ParserState::header_files</td>
+          <td class="memname"><a class="el" href="structHeaderTypes.html">HeaderTypes</a> ParserState::ht</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a8fae301a0f89180c83101b7b07313ed9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8fae301a0f89180c83101b7b07313ed9">&#9670;&nbsp;</a></span>ht</h2>
+<a id="aeaba1f92b1d5a2630b26db13f8140892"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeaba1f92b1d5a2630b26db13f8140892">&#9670;&nbsp;</a></span>import_list</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structHeaderTypes.html">HeaderTypes</a>* ParserState::ht</td>
+          <td class="memname"><a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> ParserState::import_list</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a7451c00947944b21823d4b5480cdeb76"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7451c00947944b21823d4b5480cdeb76">&#9670;&nbsp;</a></span>module_path</h2>
+<a id="acd33f933f836cb9afccf5139f9632eaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd33f933f836cb9afccf5139f9632eaa">&#9670;&nbsp;</a></span>import_module_info</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* ParserState::module_path</td>
+          <td class="memname"><a class="el" href="structModuleInfo.html">ModuleInfo</a> ParserState::import_module_info</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a917c2cd0a13e996db99363dc174274e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a917c2cd0a13e996db99363dc174274e3">&#9670;&nbsp;</a></span>path_str</h2>
+<a id="ace9018c0c45864d8603856a91d656b4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace9018c0c45864d8603856a91d656b4d">&#9670;&nbsp;</a></span>modules</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* ParserState::path_str</td>
+          <td class="memname"><a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a>* ParserState::modules</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -188,14 +222,28 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="abbf6069901df90f4dfa3f315d13a4e38"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abbf6069901df90f4dfa3f315d13a4e38">&#9670;&nbsp;</a></span>type_name</h2>
+<a id="ae7f56c6daf8367ce5b8b0c8251a35139"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7f56c6daf8367ce5b8b0c8251a35139">&#9670;&nbsp;</a></span>type_name</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char ParserState::type_name[<a class="el" href="parser_8c.html#a2b5112254a307d0fb60af076af2fc581">MAX_TYPE_NAME_LEN</a>+1]</td>
+          <td class="memname">char ParserState::type_name[<a class="el" href="build_8h.html#afd709f201d7643c3909621f620ea648a">MAX_NAME_LEN</a>+1]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9ae57f9239bdab29c5fca648606973c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ae57f9239bdab29c5fca648606973c0">&#9670;&nbsp;</a></span>types</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a>* ParserState::types</td>
         </tr>
       </table>
 </div><div class="memdoc">

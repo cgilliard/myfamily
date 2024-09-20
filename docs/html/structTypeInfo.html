@@ -70,38 +70,54 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;<a class="el" href="parser_8h_source.html">parser.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="build_8h_source.html">build.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:aa5966d5ccd141d1666cfcde770ef3816"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTypeInfo.html#aa5966d5ccd141d1666cfcde770ef3816">path</a> [PATH_MAX]</td></tr>
-<tr class="separator:aa5966d5ccd141d1666cfcde770ef3816"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac084ef3c96d7a9fa4286dc5aea05c944"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTypeInfo.html#ac084ef3c96d7a9fa4286dc5aea05c944">module_file_name</a> [PATH_MAX]</td></tr>
-<tr class="separator:ac084ef3c96d7a9fa4286dc5aea05c944"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82ee3af39ee2a0b47782c32568f13064"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTypeInfo.html#a82ee3af39ee2a0b47782c32568f13064">type_name</a> [<a class="el" href="build_8h.html#afd709f201d7643c3909621f620ea648a">MAX_NAME_LEN</a>]</td></tr>
+<tr class="separator:a82ee3af39ee2a0b47782c32568f13064"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47c3e7044c87ce552d02ec5f722c98b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structModuleInfo.html">ModuleInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTypeInfo.html#a47c3e7044c87ce552d02ec5f722c98b2">mi</a></td></tr>
+<tr class="separator:a47c3e7044c87ce552d02ec5f722c98b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3b5eb091b85094307578bdcacb1f17c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTypeInfo.html#af3b5eb091b85094307578bdcacb1f17c">gen_file_counter</a></td></tr>
+<tr class="separator:af3b5eb091b85094307578bdcacb1f17c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="ac084ef3c96d7a9fa4286dc5aea05c944"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac084ef3c96d7a9fa4286dc5aea05c944">&#9670;&nbsp;</a></span>module_file_name</h2>
+<a id="af3b5eb091b85094307578bdcacb1f17c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3b5eb091b85094307578bdcacb1f17c">&#9670;&nbsp;</a></span>gen_file_counter</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char TypeInfo::module_file_name[PATH_MAX]</td>
+          <td class="memname"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> TypeInfo::gen_file_counter</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="aa5966d5ccd141d1666cfcde770ef3816"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa5966d5ccd141d1666cfcde770ef3816">&#9670;&nbsp;</a></span>path</h2>
+<a id="a47c3e7044c87ce552d02ec5f722c98b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47c3e7044c87ce552d02ec5f722c98b2">&#9670;&nbsp;</a></span>mi</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char TypeInfo::path[PATH_MAX]</td>
+          <td class="memname"><a class="el" href="structModuleInfo.html">ModuleInfo</a> TypeInfo::mi</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a82ee3af39ee2a0b47782c32568f13064"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a82ee3af39ee2a0b47782c32568f13064">&#9670;&nbsp;</a></span>type_name</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char TypeInfo::type_name[<a class="el" href="build_8h.html#afd709f201d7643c3909621f620ea648a">MAX_NAME_LEN</a>]</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -109,7 +125,7 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>build/<a class="el" href="parser_8h_source.html">parser.h</a></li>
+<li>build/<a class="el" href="build_8h_source.html">build.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

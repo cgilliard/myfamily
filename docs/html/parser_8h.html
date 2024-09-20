@@ -67,69 +67,26 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">parser.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;limits.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="path_8h_source.html">base/path.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="build_8h_source.html">build/build.h</a>&gt;</code><br />
+<code>#include &lt;limits.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="vec_8h_source.html">util/vec.h</a>&gt;</code><br />
 </div>
 <p><a href="parser_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structHeaderInfo.html">HeaderInfo</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structTypeInfo.html">TypeInfo</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:a75b0b271666dd991abf20fd98aa2445a"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structHeaderInfo.html">HeaderInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8h.html#a75b0b271666dd991abf20fd98aa2445a">HeaderInfo</a></td></tr>
-<tr class="separator:a75b0b271666dd991abf20fd98aa2445a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49b184c67666cebc8e96337d84d37ccf"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structTypeInfo.html">TypeInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8h.html#a49b184c67666cebc8e96337d84d37ccf">TypeInfo</a></td></tr>
-<tr class="separator:a49b184c67666cebc8e96337d84d37ccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:abbd2ecd75d7f3e4264928b5b78c071be"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8h.html#abbd2ecd75d7f3e4264928b5b78c071be">parse_header</a> (const char *base_dir, const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *<a class="el" href="header__sample1_8h.html#af6b46818cfa690027c8616652a03d6af">path</a>, <a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> *headers, <a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> *types, <a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> *module_list)</td></tr>
-<tr class="separator:abbd2ecd75d7f3e4264928b5b78c071be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a121b30710cf2a3fdaeec902e583a332e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8h.html#a121b30710cf2a3fdaeec902e583a332e">parse_header</a> (const char *config_dir, const char *base_dir, <a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> *modules, <a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> *types, const <a class="el" href="structModuleInfo.html">ModuleInfo</a> *self_info)</td></tr>
+<tr class="separator:a121b30710cf2a3fdaeec902e583a332e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a id="a75b0b271666dd991abf20fd98aa2445a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a75b0b271666dd991abf20fd98aa2445a">&#9670;&nbsp;</a></span>HeaderInfo</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="structHeaderInfo.html">HeaderInfo</a> <a class="el" href="structHeaderInfo.html">HeaderInfo</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a49b184c67666cebc8e96337d84d37ccf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a49b184c67666cebc8e96337d84d37ccf">&#9670;&nbsp;</a></span>TypeInfo</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="structTypeInfo.html">TypeInfo</a> <a class="el" href="structTypeInfo.html">TypeInfo</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="abbd2ecd75d7f3e4264928b5b78c071be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abbd2ecd75d7f3e4264928b5b78c071be">&#9670;&nbsp;</a></span>parse_header()</h2>
+<a id="a121b30710cf2a3fdaeec902e583a332e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a121b30710cf2a3fdaeec902e583a332e">&#9670;&nbsp;</a></span>parse_header()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -138,19 +95,19 @@ Functions</h2></td></tr>
           <td class="memname">void parse_header </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>config_dir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>base_dir</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
-          <td class="paramname"><em>path</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype"><a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> *&#160;</td>
-          <td class="paramname"><em>headers</em>, </td>
+          <td class="paramname"><em>modules</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -161,8 +118,8 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="vec_8h.html#a7e0778e721c84fc0667d59f6115155cd">Vec</a> *&#160;</td>
-          <td class="paramname"><em>module_list</em>&#160;</td>
+          <td class="paramtype">const <a class="el" href="structModuleInfo.html">ModuleInfo</a> *&#160;</td>
+          <td class="paramname"><em>self_info</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

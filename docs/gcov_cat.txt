@@ -329,27 +329,28 @@
     #####:  302:			setup_config_dir(config_dir);
     #####:  303:			WRITE_BUILD_ID(config_dir);
         -:  304:		}
-        -:  305:	}
-        -:  306:
-        -:  307:	// get first argument (subcommand)
-        -:  308:	char command[100];
-    #####:  309:	int ret = args_get_argument(&args, 0, command, 100);
-    #####:  310:	if (ret > 0) {
-    #####:  311:		if (!strcmp(command, "verse")) {
-    #####:  312:			process_verse(&args, config_dir);
-    #####:  313:		} else if (!strcmp(command, "init")) {
-    #####:  314:			process_init(&args, config_dir);
-    #####:  315:		} else if (!strcmp(command, "build")) {
-    #####:  316:			process_build(&args, config_dir);
-        -:  317:		} else {
-    #####:  318:			printf("Not implemented!\n");
-        -:  319:		}
-        -:  320:	}
-        -:  321:
-    #####:  322:	args_cleanup(&args);
-        -:  323:
-    #####:  324:	return 0;
-        -:  325:}
+    #####:  305:		myfclose(fp);
+        -:  306:	}
+        -:  307:
+        -:  308:	// get first argument (subcommand)
+        -:  309:	char command[100];
+    #####:  310:	int ret = args_get_argument(&args, 0, command, 100);
+    #####:  311:	if (ret > 0) {
+    #####:  312:		if (!strcmp(command, "verse")) {
+    #####:  313:			process_verse(&args, config_dir);
+    #####:  314:		} else if (!strcmp(command, "init")) {
+    #####:  315:			process_init(&args, config_dir);
+    #####:  316:		} else if (!strcmp(command, "build")) {
+    #####:  317:			process_build(&args, config_dir);
+        -:  318:		} else {
+    #####:  319:			printf("Not implemented!\n");
+        -:  320:		}
+        -:  321:	}
+        -:  322:
+    #####:  323:	args_cleanup(&args);
+        -:  324:
+    #####:  325:	return 0;
+        -:  326:}
         -:    0:Source:toml.c
         -:    0:Graph:toml.gcno
         -:    0:Data:toml.gcda
@@ -5681,73 +5682,82 @@ Unit_size:
         -:  175:{
     #####:  176:	if (p->ptr.data == NULL && p->ptr.len == 0) {
     #####:  177:		errno = EINVAL;
-    #####:  178:		printf("einval\n");
-    #####:  179:		return false;
-        -:  180:	}
-        -:  181:
-        -:  182:	struct stat s;
-        -:  183:
-        -:  184:	// Check if the path exists
-    #####:  185:	if (stat(p->ptr.data, &s) == 0) {
-        -:  186:		// If the path exists and it's a directory, return success
-    #####:  187:		if (s.st_mode & S_IFDIR) {
-    #####:  188:			return true;
-        -:  189:		} else {
-        -:  190:			// Path exists but it's not a directory
-    #####:  191:			printf("exists");
-    #####:  192:			errno = ENOTDIR;
-    #####:  193:			return false;
-        -:  194:		}
-        -:  195:	}
-        -:  196:
-        -:  197:	// If parent is false, attempt to create only the target directory
-    #####:  198:	if (!parent) {
-    #####:  199:		printf("!parent\n");
-    #####:  200:		if (mkdir(p->ptr.data, mode) != 0) {
-    #####:  201:			printf("parent false return false\n");
-    #####:  202:			return false;
-        -:  203:		}
-    #####:  204:		return true;
-        -:  205:	}
-        -:  206:
-        -:  207:	// Create the directory structure (parent is true)
-    #####:  208:	Path temp_path;
-    #####:  209:	if (path_copy(&temp_path, p) != 0) {
-    #####:  210:		return false;
-        -:  211:	}
+    #####:  178:		return false;
+        -:  179:	}
+        -:  180:
+        -:  181:	struct stat s;
+        -:  182:
+        -:  183:	// Check if the path exists
+    #####:  184:	if (stat(p->ptr.data, &s) == 0) {
+        -:  185:		// If the path exists and it's a directory, return success
+    #####:  186:		if (s.st_mode & S_IFDIR) {
+    #####:  187:			return true;
+        -:  188:		} else {
+        -:  189:			// Path exists but it's not a directory
+    #####:  190:			errno = ENOTDIR;
+    #####:  191:			return false;
+        -:  192:		}
+        -:  193:	}
+        -:  194:
+        -:  195:	// If parent is false, attempt to create only the target directory
+    #####:  196:	if (!parent) {
+    #####:  197:		if (mkdir(p->ptr.data, mode) != 0) {
+    #####:  198:			return false;
+        -:  199:		}
+    #####:  200:		return true;
+        -:  201:	}
+        -:  202:
+        -:  203:	// Create the directory structure (parent is true)
+    #####:  204:	Path temp_path;
+    #####:  205:	if (path_copy(&temp_path, p) != 0) {
+    #####:  206:		return false;
+        -:  207:	}
+        -:  208:
+    #####:  209:	char *dir_part = strtok(temp_path.ptr.data, PATH_SEPARATOR);
+    #####:  210:	Path current_path;
+    #####:  211:	path_for(&current_path, PATH_SEPARATOR);
         -:  212:
-    #####:  213:	char *dir_part = strtok(temp_path.ptr.data, PATH_SEPARATOR);
-    #####:  214:	Path current_path;
-    #####:  215:	path_for(&current_path, PATH_SEPARATOR);
-        -:  216:
-        -:  217:	// Iterate through each part of the path and create directories as needed
-    #####:  218:	while (dir_part != NULL) {
-    #####:  219:		if (path_push(&current_path, dir_part) != 0) {
-    #####:  220:			return false;
-        -:  221:		}
-        -:  222:
-        -:  223:		// Check if the current part of the path exists, and if not, create it
-    #####:  224:		if (stat(current_path.ptr.data, &s) != 0) {
-        -:  225:			// Directory does not exist, so create it
-    #####:  226:			if (mkdir(current_path.ptr.data, mode) != 0) {
-    #####:  227:				return false;
-        -:  228:			}
-    #####:  229:		} else if (!(s.st_mode & S_IFDIR)) {
-        -:  230:			// Path exists but is not a directory
-    #####:  231:			errno = ENOTDIR;
-    #####:  232:			return false;
-        -:  233:		}
-        -:  234:
-    #####:  235:		dir_part = strtok(NULL, PATH_SEPARATOR);
-        -:  236:	}
-        -:  237:
-    #####:  238:	return true;
-        -:  239:}
-        -:  240:
-    #####:  241:int path_copy(Path *dst, const Path *src)
-        -:  242:{
-    #####:  243:	return path_for(dst, path_to_string(src));
-        -:  244:}
+        -:  213:	// Iterate through each part of the path and create directories as needed
+    #####:  214:	while (dir_part != NULL) {
+    #####:  215:		if (path_push(&current_path, dir_part) != 0) {
+    #####:  216:			return false;
+        -:  217:		}
+        -:  218:
+        -:  219:		// Check if the current part of the path exists, and if not, create it
+    #####:  220:		if (stat(current_path.ptr.data, &s) != 0) {
+        -:  221:			// Directory does not exist, so create it
+    #####:  222:			if (mkdir(current_path.ptr.data, mode) != 0) {
+    #####:  223:				return false;
+        -:  224:			}
+    #####:  225:		} else if (!(s.st_mode & S_IFDIR)) {
+        -:  226:			// Path exists but is not a directory
+    #####:  227:			errno = ENOTDIR;
+    #####:  228:			return false;
+        -:  229:		}
+        -:  230:
+    #####:  231:		dir_part = strtok(NULL, PATH_SEPARATOR);
+        -:  232:	}
+        -:  233:
+    #####:  234:	return true;
+        -:  235:}
+        -:  236:
+    #####:  237:int path_copy(Path *dst, const Path *src)
+        -:  238:{
+    #####:  239:	return path_for(dst, path_to_string(src));
+        -:  240:}
+        -:  241:
+    #####:  242:int path_file_stem(const Path *p, char *buf, u64 limit)
+        -:  243:{
+    #####:  244:	strncpy(buf, path_file_name(p), limit);
+    #####:  245:	for (u64 i = strlen(buf) - 1; i >= 0; i--) {
+    #####:  246:		if (buf[i] == '.') {
+    #####:  247:			buf[i] = 0;
+    #####:  248:			break;
+    #####:  249:		} else if (buf[i] == '/')
+    #####:  250:			break;
+        -:  251:	}
+    #####:  252:	return 0;
+        -:  253:}
         -:    0:Source:rand.c
         -:    0:Graph:rand.gcno
         -:    0:Data:rand.gcda
@@ -6079,326 +6089,441 @@ Unit_size:
         -:   12:// See the License for the specific language governing permissions and
         -:   13:// limitations under the License.
         -:   14:
-        -:   15:#include <base/misc.h>
-        -:   16:#include <base/path.h>
-        -:   17:#include <base/resources.h>
-        -:   18:#include <build/build.h>
-        -:   19:#include <build/parser.h>
-        -:   20:#include <glob.h>
-        -:   21:#include <stdlib.h>
-        -:   22:#include <string.h>
-        -:   23:#include <toml/toml.h>
-        -:   24:#include <util/proc_executor.h>
-        -:   25:
-    #####:   26:void build_obj(char *include_param, char *obj_path, char *file_name)
-        -:   27:{
-    #####:   28:	char *args[] = { "gcc", include_param, "-I.", "-c", "-o", obj_path, file_name, NULL };
-    #####:   29:	if (execute_process(args)) {
-    #####:   30:		exit_error("execution of process '%s' failed", args[0]);
-        -:   31:	}
-    #####:   32:}
-        -:   33:
-    #####:   34:void build_module_list(Vec *module_info, const Path *path, const Path *base_path)
-        -:   35:{
-    #####:   36:	Path next_path;
-    #####:   37:	path_copy(&next_path, path);
-    #####:   38:	Vec module_info_reverse;
-    #####:   39:	vec_init(&module_info_reverse, 10, sizeof(ModuleInfo));
-    #####:   40:	printf("build_path module list for %s\n", path_to_string(path));
-    #####:   41:	for (int i = 0; i < 10; i++) {
-        -:   42:
-    #####:   43:		if (!strcmp(path_to_string(&next_path), path_to_string(base_path))) {
+        -:   15:/*
+        -:   16:#include <base/misc.h>
+        -:   17:#include <base/path.h>
+        -:   18:#include <base/resources.h>
+        -:   19:#include <build/build.h>
+        -:   20:#include <build/parser.h>
+        -:   21:#include <glob.h>
+        -:   22:#include <stdlib.h>
+        -:   23:#include <string.h>
+        -:   24:#include <toml/toml.h>
+        -:   25:#include <util/proc_executor.h>
+        -:   26:*/
+        -:   27:
+        -:   28:#include <base/misc.h>
+        -:   29:#include <base/path.h>
+        -:   30:#include <base/resources.h>
+        -:   31:#include <build/build.h>
+        -:   32:#include <build/parser.h>
+        -:   33:#include <glob.h>
+        -:   34:#include <stdio.h>
+        -:   35:#include <stdlib.h>
+        -:   36:#include <string.h>
+        -:   37:#include <toml/toml.h>
+        -:   38:#include <util/proc_executor.h>
+        -:   39:
+        -:   40:typedef struct FamTomlInfo {
+        -:   41:	char name[MAX_NAME_LEN];
+        -:   42:	char version[MAX_NAME_LEN];
+        -:   43:} FamTomlInfo;
         -:   44:
-    #####:   45:			break;
-        -:   46:		}
-    #####:   47:		if (strlen(path_to_string(&next_path)) < strlen(path_to_string(base_path))) {
-    #####:   48:			exit_error("could not find the base path");
-        -:   49:		}
-    #####:   50:		char *modname = path_file_name(&next_path);
-    #####:   51:		path_pop(&next_path);
-        -:   52:		ModuleInfo mi;
-    #####:   53:		strcpy(mi.name, modname);
-    #####:   54:		vec_push(&module_info_reverse, &mi);
-        -:   55:	}
-    #####:   56:	while (vec_size(&module_info_reverse) > 0) {
-    #####:   57:		ModuleInfo *next = vec_pop(&module_info_reverse);
-    #####:   58:		if (vec_size(&module_info_reverse) > 0) {
-    #####:   59:			vec_push(module_info, next);
-    #####:   60:			char *modname = next->name;
-        -:   61:		}
-        -:   62:	}
-    #####:   63:}
+    #####:   45:FamTomlInfo extract_toml_info(const char *base_dir)
+        -:   46:{
+    #####:   47:	Path toml;
+    #####:   48:	path_for(&toml, base_dir);
+    #####:   49:	path_push(&toml, "fam.toml");
+        -:   50:
+    #####:   51:	if (path_canonicalize(&toml)) {
+    #####:   52:		exit_error("fam.toml file ('%s') not found.", path_to_string(&toml));
+        -:   53:	}
+        -:   54:
+    #####:   55:	FILE *toml_fp = myfopen(path_to_string(&toml), "r");
+        -:   56:	char errbuf[1024];
+    #####:   57:	toml_table_t *table = toml_parse_file(toml_fp, errbuf, sizeof(errbuf));
+        -:   58:
+    #####:   59:	if (table == NULL) {
+    #####:   60:		exit_error("Could not parse toml file due to '%s'", errbuf);
+        -:   61:	}
+        -:   62:
+        -:   63:	FamTomlInfo ret;
         -:   64:
-    #####:   65:void build_libs(const char *base_dir, const char *config_dir)
-        -:   66:{
-    #####:   67:	Path include_dir;
-    #####:   68:	path_for(&include_dir, config_dir);
-    #####:   69:	path_push(&include_dir, "resources");
-    #####:   70:	path_push(&include_dir, "include");
-    #####:   71:	path_canonicalize(&include_dir);
-    #####:   72:	Path build_dir;
-    #####:   73:	path_for(&build_dir, base_dir);
-    #####:   74:	path_push(&build_dir, "target");
-    #####:   75:	path_push(&build_dir, "build");
-    #####:   76:	path_canonicalize(&build_dir);
-    #####:   77:	Path include_build_dir;
-    #####:   78:	path_for(&include_build_dir, base_dir);
-    #####:   79:	path_push(&include_build_dir, "target");
-    #####:   80:	path_push(&include_build_dir, "include");
-    #####:   81:	path_canonicalize(&include_build_dir);
-    #####:   82:	Path lib_h;
-    #####:   83:	path_for(&lib_h, base_dir);
-    #####:   84:	path_push(&lib_h, "lib.h");
-    #####:   85:	Path base_path;
-    #####:   86:	path_for(&base_path, base_dir);
-    #####:   87:	path_canonicalize(&base_path);
-    #####:   88:	printf("build libs: %s\n", path_to_string(&base_path));
-    #####:   89:	if (path_exists(&lib_h)) {
-    #####:   90:		Vec headers;
-    #####:   91:		vec_init(&headers, 10, sizeof(HeaderInfo));
-    #####:   92:		Vec types;
-    #####:   93:		vec_init(&types, 10, sizeof(TypeInfo));
-    #####:   94:		path_canonicalize(&lib_h);
-        -:   95:
-    #####:   96:		Vec module_info;
-    #####:   97:		vec_init(&module_info, 10, sizeof(ModuleInfo));
-    #####:   98:		parse_header(base_dir, &lib_h, &headers, &types, &module_info);
-        -:   99:
-    #####:  100:		while (vec_size(&headers)) {
-    #####:  101:			HeaderInfo *next = vec_pop(&headers);
-    #####:  102:			Path next_path;
-    #####:  103:			path_for(&next_path, next->path);
-    #####:  104:			if (path_exists(&next_path) && path_is_dir(&next_path)) {
-    #####:  105:				path_push(&next_path, "mod.h");
-    #####:  106:				vec_clear(&module_info);
-    #####:  107:				build_module_list(&module_info, &next_path, &base_path);
-    #####:  108:				if (path_exists(&next_path)) {
-    #####:  109:					parse_header(base_dir, &next_path, &headers, &types, &module_info);
-        -:  110:				}
-        -:  111:			} else {
-        -:  112:				char file_buf[PATH_MAX];
-    #####:  113:				snprintf(file_buf, PATH_MAX - 1, "%s%s", path_file_name(&next_path), ".h");
-    #####:  114:				path_pop(&next_path);
-        -:  115:
-    #####:  116:				path_push(&next_path, file_buf);
-    #####:  117:				if (path_exists(&next_path) && !path_is_dir(&next_path)) {
-    #####:  118:					vec_clear(&module_info);
-    #####:  119:					build_module_list(&module_info, &next_path, &base_path);
-        -:  120:					// parse header
-    #####:  121:					parse_header(base_dir, &next_path, &headers, &types, &module_info);
-        -:  122:				} else {
-    #####:  123:					exit_error("Module not found. Expected at '%s'.", path_to_string(&next_path));
-        -:  124:				}
-        -:  125:			}
-        -:  126:		}
-        -:  127:
-    #####:  128:		if (chdir(path_to_string(&build_dir))) {
-    #####:  129:			fprintf(stderr, "Could not change directory to the build directory");
-        -:  130:		}
-        -:  131:
-    #####:  132:		while (vec_size(&types)) {
-    #####:  133:			TypeInfo *next = vec_pop(&types);
-    #####:  134:			Path next_path;
-    #####:  135:			path_for(&next_path, next->path);
-    #####:  136:			if (path_exists(&next_path) && !path_is_dir(&next_path)) {
-    #####:  137:				remove_directory(path_to_string(&build_dir), true);
-    #####:  138:				Path file_path;
-    #####:  139:				path_copy(&file_path, &build_dir);
-    #####:  140:				path_push(&file_path, path_file_name(&next_path));
-    #####:  141:				copy_file(path_to_string(&file_path), path_to_string(&next_path));
-        -:  142:
-        -:  143:				char modules[PATH_MAX];
-    #####:  144:				char *file_name = path_file_name(&next_path);
-    #####:  145:				strcpy(modules, "");
-        -:  146:
-    #####:  147:				Vec module_info;
-    #####:  148:				vec_init(&module_info, 10, sizeof(ModuleInfo));
-    #####:  149:				build_module_list(&module_info, &next_path, &base_path);
-    #####:  150:				if (strlen(next->module_file_name) > 0) {
-        -:  151:					ModuleInfo mi;
-    #####:  152:					strcpy(mi.name, next->module_file_name);
-    #####:  153:					vec_push(&module_info, &mi);
-        -:  154:				}
-        -:  155:
-    #####:  156:				for (u64 i = 0; i < vec_size(&module_info); i++) {
-    #####:  157:					ModuleInfo *next = vec_element_at(&module_info, i);
-    #####:  158:					strcat(modules, next->name);
-    #####:  159:					strcat(modules, "_");
-        -:  160:				}
-        -:  161:
-    #####:  162:				strcat(modules, file_name);
-        -:  163:
-    #####:  164:				int modules_len = strlen(modules);
-    #####:  165:				if (modules_len < 3) {
-    #####:  166:					exit_error("unexpectedly short name for object file: %s\n", modules);
-        -:  167:				}
-    #####:  168:				if (modules[modules_len - 1] != 'c' || modules[modules_len - 2] != '.') {
-    #####:  169:					exit_error("expected file to end in .c");
-        -:  170:				}
-    #####:  171:				modules[modules_len - 1] = 'o';
-        -:  172:				char obj_path[PATH_MAX];
-    #####:  173:				strcpy(obj_path, "../objs/");
-    #####:  174:				strcat(obj_path, modules);
-        -:  175:
-    #####:  176:				char *include_full_path = path_to_string(&include_dir);
-    #####:  177:				char include_param[strlen(include_full_path) + 10];
-    #####:  178:				strcpy(include_param, "-I");
-    #####:  179:				strcat(include_param, include_full_path);
-        -:  180:
-        -:  181:				char module_str[PATH_MAX + 1024];
-        -:  182:				char module_path[PATH_MAX + 1024];
-    #####:  183:				strcpy(module_str, "");
-    #####:  184:				strcpy(module_path, "");
-    #####:  185:				int vec_sz = vec_size(&module_info);
-    #####:  186:				for (int i = 0; i < vec_sz; i++) {
-    #####:  187:					strcat(module_str, vec_element_at(&module_info, i));
-    #####:  188:					strcat(module_path, vec_element_at(&module_info, i));
-    #####:  189:					if (i != vec_sz - 1) {
-    #####:  190:						strcat(module_str, "::");
-    #####:  191:						strcat(module_path, "_");
-        -:  192:					}
-        -:  193:				}
-    #####:  194:				strcat(module_path, ".h");
+    #####:   65:	myfclose(toml_fp);
+        -:   66:
+    #####:   67:	toml_raw_t raw_fam_version = toml_raw_in(table, "fam_version");
+        -:   68:	char *fam_version;
+    #####:   69:	if (raw_fam_version) {
+    #####:   70:		toml_rtos(raw_fam_version, &fam_version);
+    #####:   71:		strcpy(ret.version, fam_version);
+    #####:   72:		free((void *)fam_version); // Clean up after toml_rtos
+        -:   73:	} else {
+    #####:   74:		exit_error("fam_version not specified in '%s'", path_to_string(&toml));
+        -:   75:	}
+        -:   76:
+    #####:   77:	toml_table_t *package_table = toml_table_in(table, "package");
+    #####:   78:	if (package_table) {
+    #####:   79:		toml_raw_t raw_name = toml_raw_in(package_table, "name");
+        -:   80:		char *name;
+    #####:   81:		if (raw_name) {
+    #####:   82:			toml_rtos(raw_name, &name);
+    #####:   83:			strcpy(ret.name, name);
+        -:   84:		} else {
+    #####:   85:			exit_error("name not specified in fam.toml!");
+        -:   86:		}
+        -:   87:	} else {
+    #####:   88:		exit_error("package not found in fam.toml");
+        -:   89:	}
+        -:   90:
+    #####:   91:	return ret;
+        -:   92:}
+        -:   93:
+    #####:   94:void ensure_target_structure(const char *base_dir)
+        -:   95:{
+    #####:   96:	Path target;
+    #####:   97:	path_for(&target, base_dir);
+    #####:   98:	path_push(&target, "target");
+    #####:   99:	if (!path_exists(&target)) {
+    #####:  100:		if (!path_mkdir(&target, 0700, false))
+    #####:  101:			exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:  102:		path_push(&target, "objs");
+    #####:  103:		if (!path_mkdir(&target, 0700, false))
+    #####:  104:			exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:  105:		path_pop(&target);
+    #####:  106:		path_push(&target, "build");
+    #####:  107:		if (!path_mkdir(&target, 0700, false))
+    #####:  108:			exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:  109:		path_pop(&target);
+    #####:  110:		path_push(&target, "include");
+    #####:  111:		if (!path_mkdir(&target, 0700, false))
+    #####:  112:			exit_error("Could not create directory '%s'.", path_to_string(&target));
+        -:  113:	}
+        -:  114:
+    #####:  115:	if (path_canonicalize(&target)) {
+    #####:  116:		exit_error("Could not create path: %s\n", path_to_string(&target));
+        -:  117:	}
+    #####:  118:}
+        -:  119:
+    #####:  120:u64 module_to_string(const ModuleInfo *module_info, char *buf, u64 limit)
+        -:  121:{
+    #####:  122:	u64 itt = 0;
+    #####:  123:	strncpy(buf, "", limit);
+    #####:  124:	for (u64 i = 0; i < module_info->sub_module_count; i++) {
+    #####:  125:		if (itt < limit)
+    #####:  126:			strncat(buf, module_info->module_list[i].name, limit - itt);
+    #####:  127:		itt += strlen(module_info->module_list[i].name);
+    #####:  128:		if (i != module_info->sub_module_count - 1) {
+    #####:  129:			if (itt < limit)
+    #####:  130:				strncat(buf, "/", limit - itt);
+    #####:  131:			itt += 1;
+        -:  132:		}
+        -:  133:	}
+        -:  134:
+    #####:  135:	return itt;
+        -:  136:}
+        -:  137:
+    #####:  138:u64 module_to_type_string(const ModuleInfo *type_info, char *buf, u64 limit)
+        -:  139:{
+    #####:  140:	u64 itt = 0;
+    #####:  141:	strncpy(buf, "_type_____", limit);
+    #####:  142:	itt += 10;
+    #####:  143:	for (u64 i = 0; i < type_info->sub_module_count; i++) {
+    #####:  144:		if (itt < limit)
+    #####:  145:			strncat(buf, type_info->module_list[i].name, limit - itt);
+    #####:  146:		itt += strlen(type_info->module_list[i].name);
+    #####:  147:		if (1 + i < type_info->sub_module_count) {
+    #####:  148:			if (itt < limit)
+    #####:  149:				strncat(buf, "_____", limit - itt);
+    #####:  150:			itt += 5;
+        -:  151:		}
+        -:  152:	}
+        -:  153:
+    #####:  154:	return itt;
+        -:  155:}
+        -:  156:
+    #####:  157:u64 type_info_to_string(const TypeInfo *type_info, char *buf, u64 limit)
+        -:  158:{
+    #####:  159:	u64 itt = 0;
+    #####:  160:	strncpy(buf, "_type_____", limit);
+    #####:  161:	itt += 10;
+    #####:  162:	for (u64 i = 0; i < type_info->mi.sub_module_count; i++) {
+    #####:  163:		if (itt < limit)
+    #####:  164:			strncat(buf, type_info->mi.module_list[i].name, limit - itt);
+    #####:  165:		itt += strlen(type_info->mi.module_list[i].name);
+    #####:  166:		if (itt < limit)
+    #####:  167:			strncat(buf, "_____", limit - itt);
+    #####:  168:		itt += 5;
+        -:  169:	}
+    #####:  170:	if (itt < limit)
+    #####:  171:		strncat(buf, type_info->type_name, limit - itt);
+    #####:  172:	itt += strlen(type_info->type_name);
+        -:  173:
+    #####:  174:	return itt;
+        -:  175:}
+        -:  176:
+    #####:  177:u64 type_info_to_path(const TypeInfo *type_info, char *buf, u64 limit)
+        -:  178:{
+    #####:  179:	u64 itt = 0;
+    #####:  180:	strncpy(buf, "", limit);
+    #####:  181:	for (u64 i = 0; i < type_info->mi.sub_module_count; i++) {
+    #####:  182:		if (itt < limit)
+    #####:  183:			strncat(buf, type_info->mi.module_list[i].name, limit - itt);
+    #####:  184:		itt += strlen(type_info->mi.module_list[i].name);
+    #####:  185:		if (itt < limit)
+    #####:  186:			strncat(buf, "/", limit - itt);
+    #####:  187:		itt += 1;
+        -:  188:	}
+    #####:  189:	if (itt < limit)
+    #####:  190:		strncat(buf, type_info->type_name, limit - itt);
+    #####:  191:	itt += strlen(type_info->type_name);
+        -:  192:
+    #####:  193:	return itt;
+        -:  194:}
         -:  195:
-    #####:  196:				Path build_specific_dst;
-    #####:  197:				Path build_specific_src;
-    #####:  198:				path_for(&build_specific_dst, path_to_string(&build_dir));
-    #####:  199:				path_push(&build_specific_dst, "build_specific.h");
-    #####:  200:				path_for(&build_specific_src, path_to_string(&include_build_dir));
-    #####:  201:				path_push(&build_specific_src, module_path);
-    #####:  202:				printf("header name %s\n", next->module_file_name);
-    #####:  203:				printf("copy from %s -> %s\n", path_to_string(&build_specific_dst),
-        -:  204:					path_to_string(&build_specific_src));
-    #####:  205:				copy_file(path_to_string(&build_specific_dst), path_to_string(&build_specific_src));
-        -:  206:
-    #####:  207:				printf("Parsing type: %s[%s].\n", module_str, file_name);
-    #####:  208:				build_obj(include_param, obj_path, file_name);
-        -:  209:
-        -:  210:			} else {
-    #####:  211:				exit_error(
-        -:  212:					"Implementation not found. Expected at '%s'.", path_to_string(&next_path));
-        -:  213:			}
-        -:  214:		}
-        -:  215:	}
-    #####:  216:}
-        -:  217:
-    #####:  218:int proc_build(const char *base_dir, const char *config_dir)
-        -:  219:{
-    #####:  220:	Path include_dir;
-    #####:  221:	path_for(&include_dir, config_dir);
-    #####:  222:	path_push(&include_dir, "resources");
-    #####:  223:	path_push(&include_dir, "include");
-    #####:  224:	path_canonicalize(&include_dir);
-        -:  225:
-    #####:  226:	Path base;
-    #####:  227:	path_for(&base, base_dir);
-    #####:  228:	if (path_canonicalize(&base)) {
-    #####:  229:		exit_error("Directory ('%s') not found.", base_dir);
-        -:  230:	}
-    #####:  231:	Path toml;
-    #####:  232:	path_for(&toml, base_dir);
-    #####:  233:	path_push(&toml, "fam.toml");
-    #####:  234:	if (path_canonicalize(&toml)) {
-    #####:  235:		exit_error("fam.toml file ('%s') not found.", path_to_string(&toml));
-        -:  236:	}
-        -:  237:
-    #####:  238:	FILE *toml_fp = myfopen(path_to_string(&toml), "r");
-        -:  239:	char errbuf[1024];
-    #####:  240:	toml_table_t *table = toml_parse_file(toml_fp, errbuf, sizeof(errbuf));
-        -:  241:
-    #####:  242:	if (table == NULL) {
-    #####:  243:		exit_error("Could not parse toml file due to '%s'", errbuf);
-        -:  244:	}
-        -:  245:
-    #####:  246:	myfclose(toml_fp);
-        -:  247:
-    #####:  248:	toml_raw_t raw_fam_version = toml_raw_in(table, "fam_version");
-        -:  249:	char *fam_version;
-    #####:  250:	if (raw_fam_version) {
-    #####:  251:		toml_rtos(raw_fam_version, &fam_version);
-    #####:  252:		fprintf(stderr, "fam.toml generated by fam version: %s\n", fam_version);
-    #####:  253:		free((void *)fam_version); // Clean up after toml_rtos
-        -:  254:	}
+    #####:  196:u64 type_info_module_file(const char *base_dir, const TypeInfo *type_info, char *buf, u64 limit)
+        -:  197:{
+    #####:  198:	Path p;
+    #####:  199:	path_for(&p, base_dir);
+    #####:  200:	if (type_info->mi.sub_module_count) {
+    #####:  201:		for (u64 i = 0; i < type_info->mi.sub_module_count - 1; i++) {
+    #####:  202:			path_push(&p, type_info->mi.module_list[i].name);
+        -:  203:		}
+        -:  204:	}
+    #####:  205:	if (type_info->mi.sub_module_count) {
+        -:  206:		char header_name[PATH_MAX];
+    #####:  207:		strcpy(header_name, type_info->mi.module_list[type_info->mi.sub_module_count - 1].name);
+    #####:  208:		strcat(header_name, ".h");
+    #####:  209:		path_push(&p, header_name);
+        -:  210:
+    #####:  211:		if (path_exists(&p)) {
+    #####:  212:			strncpy(buf, path_to_string(&p), limit);
+    #####:  213:			return strlen(path_to_string(&p));
+        -:  214:		} else {
+    #####:  215:			path_pop(&p);
+    #####:  216:			path_push(&p, type_info->mi.module_list[type_info->mi.sub_module_count - 1].name);
+    #####:  217:			path_push(&p, "mod.h");
+    #####:  218:			if (path_exists(&p)) {
+    #####:  219:				strncpy(buf, path_to_string(&p), limit);
+    #####:  220:				return strlen(path_to_string(&p));
+        -:  221:			} else {
+    #####:  222:				exit_error("header file did not exist at path '%s'", path_to_string(&p));
+        -:  223:			}
+        -:  224:		}
+        -:  225:	} else {
+    #####:  226:		path_push(&p, "mod.h");
+    #####:  227:		strncpy(buf, path_to_string(&p), limit);
+    #####:  228:		return strlen(path_to_string(&p));
+        -:  229:	}
+        -:  230:
+        -:  231:	// should never get here
+    #####:  232:	return 0;
+        -:  233:}
+        -:  234:
+    #####:  235:void build_obj(const char *cc, const char *include_dir, const char *obj_dir, const char *src_dir,
+        -:  236:	const TypeInfo *type_info, const char *obj_prefix, const char *config_include)
+    #####:  237:{
+    #####:  238:	Path obj_path;
+    #####:  239:	path_for(&obj_path, obj_dir);
+        -:  240:
+    #####:  241:	u64 obj_prefix_len = 0;
+    #####:  242:	if (obj_prefix)
+    #####:  243:		obj_prefix_len = strlen(obj_prefix);
+    #####:  244:	char obj_file_name[obj_prefix_len + strlen(type_info->type_name) + 5];
+    #####:  245:	if (obj_prefix) {
+    #####:  246:		strcpy(obj_file_name, obj_prefix);
+    #####:  247:		strcat(obj_file_name, type_info->type_name);
+    #####:  248:		strcat(obj_file_name, ".o");
+        -:  249:	} else {
+    #####:  250:		strcpy(obj_file_name, type_info->type_name);
+    #####:  251:		strcat(obj_file_name, ".o");
+        -:  252:	}
+        -:  253:
+    #####:  254:	path_push(&obj_path, obj_file_name);
         -:  255:
-    #####:  256:	toml_table_t *package_table = toml_table_in(table, "package");
-    #####:  257:	if (package_table) {
-    #####:  258:		toml_raw_t raw_name = toml_raw_in(package_table, "name");
-        -:  259:		char *name;
-    #####:  260:		if (raw_name) {
-    #####:  261:			toml_rtos(raw_name, &name);
-    #####:  262:			fprintf(stderr, "Building Project: '%s'\n", name);
-        -:  263:
-    #####:  264:			Path target;
-    #####:  265:			path_for(&target, base_dir);
-    #####:  266:			path_push(&target, "target");
-    #####:  267:			path_canonicalize(&target);
-    #####:  268:			if (!path_exists(&target)) {
-    #####:  269:				printf("mkdir\n");
-    #####:  270:				if (!path_mkdir(&target, 0700, false))
-    #####:  271:					exit_error("Could not create directory '%s'.", path_to_string(&target));
-    #####:  272:				printf("ok\n");
-    #####:  273:				path_push(&target, "objs");
-    #####:  274:				if (!path_mkdir(&target, 0700, false))
-    #####:  275:					exit_error("Could not create directory '%s'.", path_to_string(&target));
-    #####:  276:				path_pop(&target);
-    #####:  277:				path_push(&target, "build");
-    #####:  278:				if (!path_mkdir(&target, 0700, false))
-    #####:  279:					exit_error("Could not create directory '%s'.", path_to_string(&target));
-    #####:  280:				path_pop(&target);
-    #####:  281:				path_push(&target, "include");
-    #####:  282:				printf("x\n");
-    #####:  283:				if (!path_mkdir(&target, 0700, false))
-    #####:  284:					exit_error("Could not create directory '%s'.", path_to_string(&target));
-    #####:  285:				printf("y\n");
-        -:  286:			}
-        -:  287:
-    #####:  288:			build_libs(base_dir, config_dir);
-        -:  289:
-        -:  290:			// change to the base directory
-    #####:  291:			if (chdir(path_to_string(&base))) {
-    #####:  292:				fprintf(stderr, "Could not change directory to the project directory");
-        -:  293:			}
-        -:  294:
-    #####:  295:			char *include_full_path = path_to_string(&include_dir);
-    #####:  296:			char include_param[strlen(include_full_path) + 10];
-    #####:  297:			strcpy(include_param, "-I");
-    #####:  298:			strcat(include_param, include_full_path);
-    #####:  299:			build_obj(include_param, "target/objs/main.o", "main.c");
-        -:  300:
-        -:  301:			glob_t glob_result;
-    #####:  302:			glob("target/objs/*.o", 0, NULL, &glob_result);
-        -:  303:
-        -:  304:			// Construct the argument array for exec
-    #####:  305:			char *link[5 + glob_result.gl_pathc + 1];
-    #####:  306:			Path output_file;
-    #####:  307:			path_for(&output_file, "target");
-    #####:  308:			path_push(&output_file, name);
-    #####:  309:			link[0] = "gcc";
-    #####:  310:			link[1] = "-o";
-    #####:  311:			link[2] = path_to_string(&output_file);
-        -:  312:
-        -:  313:			// Add all the .o files from glob to the argument list
-    #####:  314:			for (size_t i = 0; i < glob_result.gl_pathc; i++) {
-    #####:  315:				link[3 + i] = glob_result.gl_pathv[i];
-        -:  316:			}
-    #####:  317:			link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
+    #####:  256:	u64 needed = type_info_to_path(type_info, NULL, 0);
+    #####:  257:	char file_name[needed + 3];
+    #####:  258:	type_info_to_path(type_info, file_name, needed);
+    #####:  259:	strcat(file_name, ".c");
+        -:  260:
+    #####:  261:	Path src_path;
+    #####:  262:	path_for(&src_path, src_dir);
+    #####:  263:	path_push(&src_path, file_name);
+        -:  264:
+    #####:  265:	char include_param[strlen(include_dir) + 5];
+    #####:  266:	strcpy(include_param, "-I");
+    #####:  267:	strcat(include_param, include_dir);
+        -:  268:
+    #####:  269:	if (config_include) {
+    #####:  270:		char config_include_param[strlen(config_include) + 5];
+    #####:  271:		strcpy(config_include_param, "-I");
+    #####:  272:		strcat(config_include_param, config_include);
+    #####:  273:		const char *args[] = { cc, include_param, config_include_param, "-I.", "-c", "-o",
+    #####:  274:			path_to_string(&obj_path), path_to_string(&src_path), NULL };
+    #####:  275:		if (execute_process(args)) {
+    #####:  276:			exit_error("execution of process '%s' failed", args[0]);
+        -:  277:		}
+        -:  278:	} else {
+    #####:  279:		const char *args[] = { cc, include_param, "-I.", "-c", "-o", path_to_string(&obj_path),
+    #####:  280:			path_to_string(&src_path), NULL };
+    #####:  281:		if (execute_process(args)) {
+    #####:  282:			exit_error("execution of process '%s' failed", args[0]);
+        -:  283:		}
+        -:  284:	}
+    #####:  285:}
+        -:  286:
+    #####:  287:void link_objs(const char *objs_path, const char *base_dir, const char *name)
+    #####:  288:{
+        -:  289:	glob_t glob_result;
+    #####:  290:	Path objs_dir;
+    #####:  291:	path_for(&objs_dir, base_dir);
+    #####:  292:	path_push(&objs_dir, "target/objs/*.o");
+        -:  293:
+    #####:  294:	glob(path_to_string(&objs_dir), 0, NULL, &glob_result);
+        -:  295:
+        -:  296:	// Construct the argument array for exec
+    #####:  297:	char *link[5 + glob_result.gl_pathc + 1];
+    #####:  298:	Path output_file;
+    #####:  299:	path_for(&output_file, base_dir);
+    #####:  300:	path_push(&output_file, "target");
+    #####:  301:	path_push(&output_file, name);
+    #####:  302:	link[0] = "cc";
+    #####:  303:	link[1] = "-o";
+    #####:  304:	link[2] = path_to_string(&output_file);
+        -:  305:
+        -:  306:	// Add all the .o files from glob to the argument list
+    #####:  307:	for (size_t i = 0; i < glob_result.gl_pathc; i++) {
+    #####:  308:		link[3 + i] = glob_result.gl_pathv[i];
+        -:  309:	}
+    #####:  310:	link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
+        -:  311:
+    #####:  312:	const char **link_const = (const char **)&link;
+        -:  313:
+    #####:  314:	if (execute_process(link_const)) {
+    #####:  315:		exit_error("execution of process '%s' failed", link[0]);
+        -:  316:	}
+    #####:  317:}
         -:  318:
-    #####:  319:			if (execute_process(link)) {
-    #####:  320:				exit_error("execution of process '%s' failed", link[0]);
-        -:  321:			}
-        -:  322:
-    #####:  323:			free((void *)name); // Cleanup after toml_rtos
-        -:  324:			// Free the TOML table when done
-    #####:  325:			toml_free(table);
-        -:  326:		} else {
-    #####:  327:			exit_error("project name not found!");
-        -:  328:		}
-        -:  329:	} else {
-    #####:  330:		exit_error("[package] directive not found!");
-        -:  331:	}
-        -:  332:
-    #####:  333:	return 0;
-        -:  334:}
+    #####:  319:void build_internal(const char *base_dir, const char *config_dir)
+        -:  320:{
+    #####:  321:	Path build_path;
+    #####:  322:	path_for(&build_path, base_dir);
+    #####:  323:	path_push(&build_path, "target");
+    #####:  324:	path_push(&build_path, "build");
+    #####:  325:	remove_directory(path_to_string(&build_path), true);
+        -:  326:
+    #####:  327:	Path objs_path;
+    #####:  328:	path_for(&objs_path, base_dir);
+    #####:  329:	path_push(&objs_path, "target");
+    #####:  330:	path_push(&objs_path, "objs");
+        -:  331:
+    #####:  332:	Path config_src;
+    #####:  333:	path_for(&config_src, config_dir);
+    #####:  334:	path_push(&config_src, "resources");
+    #####:  335:	path_push(&config_src, "src");
+    #####:  336:	path_push(&config_src, "*.c");
+        -:  337:
+    #####:  338:	Path include_dir;
+    #####:  339:	path_for(&include_dir, config_dir);
+    #####:  340:	path_push(&include_dir, "resources");
+    #####:  341:	path_push(&include_dir, "include");
+        -:  342:
+        -:  343:	/*
+        -:  344:	char *include_full_path = path_to_string(&include_dir);
+        -:  345:	char include_param[strlen(include_full_path) + 10];
+        -:  346:	strcpy(include_param, "-I");
+        -:  347:	strcat(include_param, include_full_path);
+        -:  348:	*/
+        -:  349:
+        -:  350:	glob_t glob_result;
+    #####:  351:	glob(path_to_string(&config_src), 0, NULL, &glob_result);
+        -:  352:
+    #####:  353:	Path config_dir_src_path;
+    #####:  354:	path_for(&config_dir_src_path, config_dir);
+    #####:  355:	path_push(&config_dir_src_path, "resources");
+    #####:  356:	path_push(&config_dir_src_path, "src");
+        -:  357:
+    #####:  358:	for (u64 i = 0; i < glob_result.gl_pathc; i++) {
+        -:  359:		TypeInfo ti;
+    #####:  360:		ti.mi.sub_module_count = 0;
+    #####:  361:		if (strlen(glob_result.gl_pathv[i]) >= MAX_NAME_LEN) {
+    #####:  362:			exit_error("name too long! [%s]", glob_result.gl_pathv[i]);
+        -:  363:		}
+    #####:  364:		Path glob_path;
+    #####:  365:		path_for(&glob_path, glob_result.gl_pathv[i]);
+    #####:  366:		char path_stem[strlen(path_file_name(&glob_path)) + 1];
+    #####:  367:		path_file_stem(&glob_path, path_stem, strlen(path_file_name(&glob_path)));
+    #####:  368:		strcpy(ti.type_name, path_stem);
+    #####:  369:		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path),
+    #####:  370:			path_to_string(&config_dir_src_path), &ti, "___internal_objs_", NULL);
+        -:  371:	}
+    #####:  372:}
+        -:  373:
+    #####:  374:int proc_build(const char *base_dir, const char *config_dir)
+        -:  375:{
+    #####:  376:	fprintf(stderr, "proc build %s %s\n", base_dir, config_dir);
+    #####:  377:	FamTomlInfo fti = extract_toml_info(base_dir);
+    #####:  378:	fprintf(stderr, "building project %s. fam.toml generated by %s.\n", fti.name, fti.version);
+    #####:  379:	ensure_target_structure(base_dir);
+        -:  380:
+    #####:  381:	Path config_include_dir;
+    #####:  382:	path_for(&config_include_dir, config_dir);
+    #####:  383:	path_push(&config_include_dir, "resources");
+    #####:  384:	path_push(&config_include_dir, "include");
+        -:  385:
+    #####:  386:	Path include_dir;
+    #####:  387:	path_for(&include_dir, base_dir);
+    #####:  388:	path_push(&include_dir, "target");
+    #####:  389:	path_push(&include_dir, "include");
+        -:  390:
+    #####:  391:	Path objs_path;
+    #####:  392:	path_for(&objs_path, base_dir);
+    #####:  393:	path_push(&objs_path, "target");
+    #####:  394:	path_push(&objs_path, "objs");
+        -:  395:
+    #####:  396:	build_internal(base_dir, config_dir);
+    #####:  397:	Path modh;
+    #####:  398:	path_for(&modh, base_dir);
+    #####:  399:	path_push(&modh, "mod.h");
+        -:  400:
+    #####:  401:	Vec headers;
+    #####:  402:	vec_init(&headers, 10, sizeof(ModuleInfo));
+    #####:  403:	Vec types;
+    #####:  404:	vec_init(&types, 10, sizeof(TypeInfo));
+    #####:  405:	Vec module_list;
+    #####:  406:	vec_init(&module_list, 10, sizeof(ModuleInfo));
+        -:  407:
+    #####:  408:	path_canonicalize(&modh);
+        -:  409:
+        -:  410:	ModuleInfo self_info;
+    #####:  411:	self_info.sub_module_count = 0;
+    #####:  412:	parse_header(config_dir, base_dir, &headers, &types, &self_info);
+        -:  413:
+    #####:  414:	while (vec_size(&headers)) {
+    #####:  415:		ModuleInfo *next = vec_pop(&headers);
+    #####:  416:		parse_header(config_dir, base_dir, &headers, &types, next);
+        -:  417:	}
+        -:  418:
+    #####:  419:	while (vec_size(&types)) {
+    #####:  420:		TypeInfo *next = vec_pop(&types);
+        -:  421:		char type_prefix[PATH_MAX];
+    #####:  422:		type_info_to_string(next, type_prefix, PATH_MAX);
+    #####:  423:		strcat(type_prefix, "_");
+        -:  424:		char gen_header_bs_dir[PATH_MAX];
+    #####:  425:		snprintf(gen_header_bs_dir, PATH_MAX, "f%" PRIu64, next->gen_file_counter);
+        -:  426:
+    #####:  427:		path_push(&include_dir, gen_header_bs_dir);
+        -:  428:
+    #####:  429:		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, next,
+    #####:  430:			type_prefix, path_to_string(&config_include_dir));
+        -:  431:
+    #####:  432:		path_pop(&include_dir);
+        -:  433:	}
+        -:  434:
+    #####:  435:	path_push(&include_dir, "f0");
+        -:  436:	TypeInfo main_ti;
+    #####:  437:	strcpy(main_ti.type_name, "main");
+    #####:  438:	main_ti.mi.sub_module_count = 0;
+    #####:  439:	main_ti.gen_file_counter = 0;
+        -:  440:
+        -:  441:	// build main
+    #####:  442:	build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, &main_ti,
+    #####:  443:		"_type_____", path_to_string(&config_include_dir));
+        -:  444:
+        -:  445:	// link objects
+    #####:  446:	link_objs(path_to_string(&objs_path), base_dir, fti.name);
+        -:  447:
+    #####:  448:	return 0;
+        -:  449:}
         -:    0:Source:init.c
         -:    0:Graph:init.gcno
         -:    0:Data:init.gcda
@@ -6506,306 +6631,376 @@ Unit_size:
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <base/misc.h>
-        -:   16:#include <base/path.h>
-        -:   17:#include <base/resources.h>
-        -:   18:#include <build/parser.h>
-        -:   19:#include <lexer/lexer.h>
-        -:   20:#include <limits.h>
-        -:   21:#include <string.h>
-        -:   22:#include <util/vec.h>
+        -:   16:#include <base/resources.h>
+        -:   17:#include <build/parser.h>
+        -:   18:#include <lexer/lexer.h>
+        -:   19:#include <limits.h>
+        -:   20:#include <string.h>
+        -:   21:
+        -:   22:u64 gen_file_counter = 0;
         -:   23:
-        -:   24:#define MAX_TYPE_NAME_LEN 128
-        -:   25:#define MAX_VAR_NAME_LEN 128
-        -:   26:
-        -:   27:typedef struct HeaderTypeInfo {
-        -:   28:	char type[MAX_TYPE_NAME_LEN];
-        -:   29:} HeaderTypeInfo;
-        -:   30:
-        -:   31:typedef struct HeaderNameInfo {
-        -:   32:	char name[MAX_VAR_NAME_LEN];
-        -:   33:} HeaderNameInfo;
-        -:   34:
-        -:   35:typedef struct HeaderTypes {
-        -:   36:	Vec types;
-        -:   37:	Vec names;
-        -:   38:} HeaderTypes;
-        -:   39:
-        -:   40:typedef enum ParserStateEnum {
-        -:   41:	ParserStateBeginStatement = 0,
-        -:   42:	ParserStateExpectModuleName = 1,
-        -:   43:	ParserStateExpectBracket = 2,
-        -:   44:	ParserStateExpectType = 3,
-        -:   45:	ParserStateExpectName = 4,
-        -:   46:	ParserStateInTypeExpectSemi = 5,
-        -:   47:	ParserStateOther = 6,
-        -:   48:} ParserStateEnum;
-        -:   49:
-        -:   50:typedef struct ParserState {
-        -:   51:	ParserStateEnum state;
-        -:   52:	Vec *header_files;
-        -:   53:	char *path_str;
-        -:   54:	HeaderTypes *ht;
-        -:   55:	char *gen_header;
-        -:   56:	u64 header_capacity;
-        -:   57:	char *module_path;
-        -:   58:	char type_name[MAX_TYPE_NAME_LEN + 1];
-        -:   59:} ParserState;
-        -:   60:
-        -:   61:#define INITIAL_HEADER_CAPACITY (1024 * 25)
+        -:   24:typedef struct HeaderTypeInfo {
+        -:   25:	char type[MAX_NAME_LEN];
+        -:   26:} HeaderTypeInfo;
+        -:   27:
+        -:   28:typedef struct HeaderNameInfo {
+        -:   29:	char name[MAX_NAME_LEN];
+        -:   30:} HeaderNameInfo;
+        -:   31:
+        -:   32:typedef struct HeaderTypes {
+        -:   33:	Vec types;
+        -:   34:	Vec names;
+        -:   35:} HeaderTypes;
+        -:   36:
+        -:   37:typedef enum ParserStateEnum {
+        -:   38:	ParserStateBeginStatement = 0,
+        -:   39:	ParserStateExpectModuleName = 1,
+        -:   40:	ParserStateExpectBracket = 2,
+        -:   41:	ParserStateExpectType = 3,
+        -:   42:	ParserStateExpectName = 4,
+        -:   43:	ParserStateInTypeExpectSemi = 5,
+        -:   44:	ParserStateInImportListExpectModuleName = 6,
+        -:   45:	ParserStateInImportListExpectSeparator = 7,
+        -:   46:	ParserStateOther = 1000000,
+        -:   47:} ParserStateEnum;
+        -:   48:
+        -:   49:typedef struct ParserState {
+        -:   50:	ParserStateEnum state;
+        -:   51:	const ModuleInfo *cur;
+        -:   52:	char *gen_header;
+        -:   53:	u64 header_capacity;
+        -:   54:	Vec *modules;
+        -:   55:	Vec *types;
+        -:   56:	char type_name[MAX_NAME_LEN + 1];
+        -:   57:	HeaderTypes ht;
+        -:   58:	ModuleInfo import_module_info;
+        -:   59:	Vec import_list;
+        -:   60:	u64 gen_file_counter;
+        -:   61:} ParserState;
         -:   62:
-    #####:   63:void append_to_header(ParserState *state, const char *text, ...)
-        -:   64:{
-        -:   65:	u64 length;
-        -:   66:	va_list args;
-        -:   67:
-    #####:   68:	va_start(args, text);
-    #####:   69:	length = vsnprintf(NULL, 0, text, args);
-    #####:   70:	va_end(args);
-        -:   71:
-    #####:   72:	if (state->header_capacity == 0) {
-    #####:   73:		u64 size = sizeof(char) * INITIAL_HEADER_CAPACITY;
-    #####:   74:		if (length >= size)
-    #####:   75:			size = length + 1;
-    #####:   76:		state->gen_header = mymalloc(size);
-    #####:   77:		if (state->gen_header == NULL)
-    #####:   78:			exit_error("Could not allocate sufficient memory to continue!");
-    #####:   79:		va_start(args, text);
-    #####:   80:		vsnprintf(state->gen_header, size, text, args);
-    #####:   81:		va_end(args);
-        -:   82:
-        -:   83:	} else {
-    #####:   84:		u64 size = state->header_capacity;
-    #####:   85:		if (length + strlen(state->gen_header) + 1 >= state->header_capacity) {
-    #####:   86:			size = state->header_capacity + INITIAL_HEADER_CAPACITY;
-    #####:   87:			if (length + strlen(state->gen_header) + 1
-    #####:   88:				>= state->header_capacity + INITIAL_HEADER_CAPACITY) {
-    #####:   89:				size = length + strlen(state->gen_header) + 1;
-        -:   90:			}
-    #####:   91:			state->gen_header = myrealloc(state->gen_header, sizeof(char) * (size));
-    #####:   92:			if (state->gen_header == NULL)
-    #####:   93:				exit_error("Could not allocate sufficient memory to continue!");
-        -:   94:		}
-        -:   95:
-    #####:   96:		va_start(args, text);
-    #####:   97:		vsnprintf(state->gen_header + strlen(state->gen_header), size - strlen(state->gen_header),
-        -:   98:			text, args);
-    #####:   99:		va_end(args);
-        -:  100:	}
-        -:  101:
-    #####:  102:	state->header_capacity += INITIAL_HEADER_CAPACITY;
-    #####:  103:}
-        -:  104:
-    #####:  105:void free_gen_header(ParserState *state)
-        -:  106:{
-    #####:  107:	if (state->gen_header)
-    #####:  108:		myfree(state->gen_header);
-    #####:  109:}
-        -:  110:
-    #####:  111:void proc_ParserStateBeginStatement(ParserState *state, Token *tk)
-        -:  112:{
-    #####:  113:	if (tk->type == TokenTypeIdent) {
-    #####:  114:		if (!strcmp(tk->token, "mod")) {
-    #####:  115:			state->state = ParserStateExpectModuleName;
-        -:  116:		} else {
-    #####:  117:			if (strlen(tk->token) > MAX_TYPE_NAME_LEN) {
-    #####:  118:				token_display_error(
-        -:  119:					tk, "token name is longer than MAX_TYPE_NAME_LEN (%i)", MAX_TYPE_NAME_LEN);
-        -:  120:			} else {
-    #####:  121:				strcpy(state->type_name, tk->token);
-        -:  122:			}
-    #####:  123:			state->state = ParserStateExpectBracket;
-        -:  124:		}
-    #####:  125:	} else if (tk->type == TokenTypePunct && !strcmp(tk->token, "}"))
-    #####:  126:		state->state = ParserStateBeginStatement;
-        -:  127:	else
-    #####:  128:		state->state = ParserStateOther;
-    #####:  129:}
-        -:  130:
-    #####:  131:void proc_ParserStateExpectType(ParserState *state, Token *tk)
-        -:  132:{
-    #####:  133:	if (tk->type != TokenTypeIdent) {
-    #####:  134:		if (!strcmp(tk->token, "}")) {
-    #####:  135:			u64 count = vec_size(&state->ht->types);
-    #####:  136:			char module_path[strlen(state->module_path) + strlen(state->type_name) + 10];
-    #####:  137:			strcpy(module_path, "_type_");
-    #####:  138:			strncat(module_path, state->module_path, strlen(state->module_path) - 2);
-    #####:  139:			strcat(module_path, "_");
-    #####:  140:			strcat(module_path, state->type_name);
-    #####:  141:			printf("types count = %" PRIu64 ",path_str=%s\n", count, module_path);
-    #####:  142:			append_to_header(state, "typedef struct %s {\n", module_path);
-    #####:  143:			for (u64 i = 0; i < count; i++) {
-        -:  144:				HeaderNameInfo *ni;
-        -:  145:				HeaderTypeInfo *ti;
-    #####:  146:				ti = vec_element_at(&state->ht->types, i);
-    #####:  147:				ni = vec_element_at(&state->ht->names, i);
-    #####:  148:				printf("[%" PRIu64 "]=%s,%s\n", i, ti->type, ni->name);
-    #####:  149:				append_to_header(state, "%s %s;\n", ti->type, ni->name);
-        -:  150:			}
-    #####:  151:			append_to_header(state, "} %s;\n\n", module_path);
-    #####:  152:			append_to_header(state, "#define %s %s\n", state->type_name, module_path);
-    #####:  153:			vec_clear(&state->ht->types);
-    #####:  154:			vec_clear(&state->ht->names);
-    #####:  155:			state->state = ParserStateBeginStatement;
-        -:  156:		} else {
-    #####:  157:			token_display_error(tk, "Expected type name. Found [%s]", tk->token);
-    #####:  158:			state->state = ParserStateOther;
-        -:  159:		}
-        -:  160:	} else {
-    #####:  161:		if (strlen(tk->token) > MAX_TYPE_NAME_LEN) {
-    #####:  162:			token_display_error(tk, "Name [%s] is too long.", tk->token);
-    #####:  163:			state->state = ParserStateOther;
-        -:  164:		} else {
-        -:  165:			HeaderTypeInfo hti;
-    #####:  166:			strcpy(hti.type, tk->token);
-    #####:  167:			vec_push(&state->ht->types, &hti);
-    #####:  168:			state->state = ParserStateExpectName;
-        -:  169:		}
-        -:  170:	}
-    #####:  171:}
-        -:  172:
-    #####:  173:void proc_ParserStateExpectName(ParserState *state, Token *tk)
-        -:  174:{
-    #####:  175:	if (tk->type != TokenTypeIdent) {
-    #####:  176:		token_display_error(tk, "Expected name. Found [%s]", tk->token);
-    #####:  177:		state->state = ParserStateOther;
-        -:  178:	} else {
-    #####:  179:		if (strlen(tk->token) > MAX_VAR_NAME_LEN) {
-    #####:  180:			token_display_error(tk, "Name [%s] is too long.", tk->token);
-    #####:  181:			state->state = ParserStateOther;
-        -:  182:		} else {
-        -:  183:			HeaderNameInfo hti;
-    #####:  184:			strcpy(hti.name, tk->token);
-    #####:  185:			vec_push(&state->ht->names, &hti);
-    #####:  186:			state->state = ParserStateInTypeExpectSemi;
-        -:  187:		}
-        -:  188:	}
-    #####:  189:}
-        -:  190:
-    #####:  191:void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk)
-        -:  192:{
-    #####:  193:	if (strcmp(tk->token, ";")) {
-    #####:  194:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
-        -:  195:	}
-    #####:  196:	state->state = ParserStateExpectType;
-    #####:  197:}
-        -:  198:
-    #####:  199:void proc_ParserStateExpectModuleName(ParserState *state, Token *tk)
-        -:  200:{
-    #####:  201:	if (tk->type != TokenTypeIdent) {
-    #####:  202:		token_display_error(tk, "Expected module name, found '%s'", tk->token);
-        -:  203:	} else {
-    #####:  204:		if (strlen(tk->token) >= PATH_MAX) {
-    #####:  205:			token_display_error(tk, "Path is longer than max path (%i)", PATH_MAX);
+        -:   63:#define INITIAL_HEADER_CAPACITY (1024 * 25)
+        -:   64:
+    #####:   65:void append_to_header(ParserState *state, const char *text, ...)
+        -:   66:{
+        -:   67:	u64 length;
+        -:   68:	va_list args;
+        -:   69:
+    #####:   70:	va_start(args, text);
+    #####:   71:	length = vsnprintf(NULL, 0, text, args);
+    #####:   72:	va_end(args);
+        -:   73:
+    #####:   74:	if (state->header_capacity == 0) {
+    #####:   75:		u64 size = sizeof(char) * INITIAL_HEADER_CAPACITY;
+    #####:   76:		if (length >= size)
+    #####:   77:			size = length + 1;
+    #####:   78:		state->gen_header = mymalloc(size);
+    #####:   79:		if (state->gen_header == NULL)
+    #####:   80:			exit_error("Could not allocate sufficient memory to continue!");
+    #####:   81:		va_start(args, text);
+    #####:   82:		vsnprintf(state->gen_header, size, text, args);
+    #####:   83:		va_end(args);
+        -:   84:
+        -:   85:	} else {
+    #####:   86:		u64 size = state->header_capacity;
+    #####:   87:		if (length + strlen(state->gen_header) + 1 >= state->header_capacity) {
+    #####:   88:			size = state->header_capacity + INITIAL_HEADER_CAPACITY;
+    #####:   89:			if (length + strlen(state->gen_header) + 1
+    #####:   90:				>= state->header_capacity + INITIAL_HEADER_CAPACITY) {
+    #####:   91:				size = length + strlen(state->gen_header) + 1;
+        -:   92:			}
+    #####:   93:			state->gen_header = myrealloc(state->gen_header, sizeof(char) * (size));
+    #####:   94:			if (state->gen_header == NULL)
+    #####:   95:				exit_error("Could not allocate sufficient memory to continue!");
+        -:   96:		}
+        -:   97:
+    #####:   98:		va_start(args, text);
+    #####:   99:		vsnprintf(state->gen_header + strlen(state->gen_header), size - strlen(state->gen_header),
+        -:  100:			text, args);
+    #####:  101:		va_end(args);
+        -:  102:	}
+        -:  103:
+    #####:  104:	state->header_capacity += INITIAL_HEADER_CAPACITY;
+    #####:  105:}
+        -:  106:
+    #####:  107:void free_gen_header(ParserState *state)
+        -:  108:{
+    #####:  109:	if (state->gen_header)
+    #####:  110:		myfree(state->gen_header);
+    #####:  111:}
+        -:  112:
+    #####:  113:void proc_ParserStateBeginStatement(ParserState *state, Token *tk)
+        -:  114:{
+    #####:  115:	if (tk->type == TokenTypeIdent) {
+    #####:  116:		if (!strcmp(tk->token, "mod")) {
+    #####:  117:			state->state = ParserStateExpectModuleName;
+        -:  118:		} else {
+    #####:  119:			if (strlen(tk->token) > MAX_NAME_LEN) {
+    #####:  120:				token_display_error(
+        -:  121:					tk, "token name is longer than MAX_NAME_LEN (%i)", MAX_NAME_LEN);
+        -:  122:			} else {
+    #####:  123:				strcpy(state->type_name, tk->token);
+        -:  124:			}
+    #####:  125:			state->state = ParserStateExpectBracket;
+        -:  126:		}
+    #####:  127:	} else if (tk->type == TokenTypePunct) {
+    #####:  128:		if (!strcmp(tk->token, "}"))
+    #####:  129:			state->state = ParserStateBeginStatement;
+    #####:  130:		else if (!strcmp(tk->token, "$")) {
+    #####:  131:			state->import_module_info.sub_module_count = 0;
+    #####:  132:			state->state = ParserStateInImportListExpectModuleName;
+        -:  133:		} else
+    #####:  134:			state->state = ParserStateOther;
+        -:  135:	} else
+    #####:  136:		state->state = ParserStateOther;
+    #####:  137:}
+        -:  138:
+    #####:  139:void proc_ParserStateInImportListExpectModuleName(ParserState *state, Token *tk)
+        -:  140:{
+    #####:  141:	if (tk->type != TokenTypeIdent) {
+    #####:  142:		token_display_error(tk, "Expected module name. Found [%s]", tk->token);
+        -:  143:	} else {
+        -:  144:		SubModuleInfo mi;
+    #####:  145:		strcpy(mi.name, tk->token);
+    #####:  146:		strcpy(
+    #####:  147:			state->import_module_info.module_list[state->import_module_info.sub_module_count].name,
+    #####:  148:			tk->token);
+    #####:  149:		state->import_module_info.sub_module_count++;
+    #####:  150:		state->state = ParserStateInImportListExpectSeparator;
+        -:  151:	}
+    #####:  152:}
+        -:  153:
+    #####:  154:void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk)
+        -:  155:{
+    #####:  156:	if (!strcmp(tk->token, "::")) {
+    #####:  157:		state->state = ParserStateInImportListExpectModuleName;
+    #####:  158:	} else if (!strcmp(tk->token, ";")) {
+    #####:  159:		u64 import_list_size = state->import_module_info.sub_module_count;
+    #####:  160:		if (import_list_size == 0) {
+    #####:  161:			token_display_error(tk, "Expected at least one module name here");
+        -:  162:		} else {
+        -:  163:			char buf[PATH_MAX + 1];
+    #####:  164:			module_to_type_string(&state->import_module_info, buf, PATH_MAX);
+    #####:  165:			char *last = state->import_module_info.module_list[import_list_size - 1].name;
+    #####:  166:			append_to_header(state, "#define %s %s\n", last, buf);
+    #####:  167:			state->state = ParserStateBeginStatement;
+        -:  168:		}
+        -:  169:	} else {
+    #####:  170:		token_display_error(tk, "Expected one of [';', '::']. Found [%s]", tk->token);
+        -:  171:	}
+    #####:  172:}
+        -:  173:
+    #####:  174:void proc_ParserStateExpectType(ParserState *state, Token *tk)
+        -:  175:{
+    #####:  176:	if (tk->type != TokenTypeIdent) {
+    #####:  177:		if (!strcmp(tk->token, "}")) {
+    #####:  178:			u64 count = vec_size(&(state->ht.types));
+        -:  179:			char type_name[PATH_MAX];
+    #####:  180:			TypeInfo *ti = vec_element_at(state->types, vec_size(state->types) - 1);
+    #####:  181:			type_info_to_string(ti, type_name, PATH_MAX);
+    #####:  182:			append_to_header(state, "typedef struct %s {\n", type_name);
+    #####:  183:			for (u64 i = 0; i < count; i++) {
+        -:  184:				HeaderNameInfo *ni;
+        -:  185:				HeaderTypeInfo *ti;
+    #####:  186:				ti = vec_element_at(&(state->ht.types), i);
+    #####:  187:				ni = vec_element_at(&(state->ht.names), i);
+    #####:  188:				append_to_header(state, "%s %s;\n", ti->type, ni->name);
+        -:  189:			}
+    #####:  190:			if (count == 0) {
+    #####:  191:				append_to_header(state, "char dummy;\n");
+        -:  192:			}
+    #####:  193:			append_to_header(state, "} %s;\n\n", type_name);
+    #####:  194:			append_to_header(state, "#define %s %s\n", state->type_name, type_name);
+    #####:  195:			vec_clear(&(state->ht.types));
+    #####:  196:			vec_clear(&(state->ht.names));
+    #####:  197:			state->state = ParserStateBeginStatement;
+        -:  198:		} else {
+    #####:  199:			token_display_error(tk, "Expected type name. Found [%s]", tk->token);
+    #####:  200:			state->state = ParserStateOther;
+        -:  201:		}
+        -:  202:	} else {
+    #####:  203:		if (strlen(tk->token) > MAX_NAME_LEN) {
+    #####:  204:			token_display_error(tk, "Name [%s] is too long.", tk->token);
+    #####:  205:			state->state = ParserStateOther;
         -:  206:		} else {
-        -:  207:			HeaderInfo hi;
-    #####:  208:			Path npath;
-    #####:  209:			path_for(&npath, state->path_str);
-    #####:  210:			path_pop(&npath);
-    #####:  211:			path_push(&npath, tk->token);
-    #####:  212:			strcpy(hi.path, path_to_string(&npath));
-    #####:  213:			vec_push(state->header_files, &hi);
-        -:  214:		}
-    #####:  215:		state->state = ParserStateOther;
-        -:  216:	}
-    #####:  217:}
-        -:  218:
-    #####:  219:void parse_header(
-        -:  220:	const char *base_dir, const Path *path, Vec *headers, Vec *types, Vec *module_info)
-        -:  221:{
-        -:  222:	char module_str[PATH_MAX + 1024];
-    #####:  223:	int vec_sz = vec_size(module_info);
-    #####:  224:	strcpy(module_str, "");
-        -:  225:	char module_path[PATH_MAX + 1024];
-    #####:  226:	strcpy(module_path, "");
-    #####:  227:	for (int i = 0; i < vec_sz; i++) {
-    #####:  228:		strcat(module_str, vec_element_at(module_info, i));
-    #####:  229:		strcat(module_str, "::");
-    #####:  230:		strcat(module_path, vec_element_at(module_info, i));
-    #####:  231:		strcat(module_path, "_");
-        -:  232:	}
-    #####:  233:	strcat(module_path, path_file_name(path));
-    #####:  234:	printf("Parsing header %s['%s'].\n", module_str, path_file_name(path));
-        -:  235:	Lexer l;
-    #####:  236:	char *path_str = path_to_string(path);
-    #####:  237:	if (lexer_init(&l, path_str))
-    #####:  238:		exit_error("Could not open header file %s", path_str);
-        -:  239:
-        -:  240:	HeaderTypes ht;
-        -:  241:
-    #####:  242:	vec_init(&ht.names, 10, sizeof(HeaderNameInfo));
-    #####:  243:	vec_init(&ht.types, 10, sizeof(HeaderTypeInfo));
-    #####:  244:	ParserState state = { ParserStateBeginStatement, headers, path_str, &ht, NULL, 0, module_path };
-        -:  245:	/*
-        -:  246:	if (strlen(module_path) > 2)
-        -:  247:		strncpy(state.module_path, module_path, strlen(module_path) - 2);
-        -:  248:		*/
-        -:  249:
-    #####:  250:	while (true) {
-        -:  251:		Token tk;
-    #####:  252:		int res = lexer_next_token(&l, &tk);
-    #####:  253:		if (res == LexerStateComplete) {
-    #####:  254:			break;
-        -:  255:		}
-    #####:  256:		printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
-    #####:  257:		if (tk.type == TokenTypeDoc) {
-        -:  258:			// skip over doc comments for these purposes
-    #####:  259:			continue;
-    #####:  260:		} else if (state.state == ParserStateBeginStatement) {
-    #####:  261:			proc_ParserStateBeginStatement(&state, &tk);
-    #####:  262:		} else if (state.state == ParserStateExpectModuleName) {
-    #####:  263:			proc_ParserStateExpectModuleName(&state, &tk);
-    #####:  264:		} else if (state.state == ParserStateExpectType) {
-    #####:  265:			proc_ParserStateExpectType(&state, &tk);
-    #####:  266:		} else if (state.state == ParserStateExpectName) {
-    #####:  267:			proc_ParserStateExpectName(&state, &tk);
-    #####:  268:		} else if (state.state == ParserStateInTypeExpectSemi) {
-    #####:  269:			proc_ParserStateInTypeExpectSemi(&state, &tk);
-    #####:  270:		} else if (tk.type == TokenTypePunct) {
-    #####:  271:			if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
-    #####:  272:				state.state = ParserStateBeginStatement;
-    #####:  273:			} else if (!strcmp(tk.token, "{") && state.state == ParserStateExpectBracket) {
-        -:  274:				TypeInfo ti;
-    #####:  275:				Path npath;
-    #####:  276:				path_for(&npath, path_str);
-    #####:  277:				path_pop(&npath);
-    #####:  278:				path_push(&npath, state.type_name);
-    #####:  279:				strcpy(ti.path, path_to_string(&npath));
-    #####:  280:				strcat(ti.path, ".c");
-    #####:  281:				char *file_name = path_file_name(path);
-    #####:  282:				if (!strcmp(file_name, "mod.h"))
-    #####:  283:					strcpy(ti.module_file_name, "");
-        -:  284:				else
-    #####:  285:					strncpy(ti.module_file_name, file_name, strlen(file_name) - 2);
-    #####:  286:				vec_push(types, &ti);
-    #####:  287:				state.state = ParserStateExpectType;
-        -:  288:			} else
-    #####:  289:				state.state = ParserStateOther;
-        -:  290:		}
-    #####:  291:		token_cleanup(&tk);
-        -:  292:	}
-        -:  293:
-    #####:  294:	if (state.gen_header) {
-    #####:  295:		printf("Generated header: '%s'\n", state.gen_header);
-        -:  296:	}
-        -:  297:
-    #####:  298:	Path header_include;
-    #####:  299:	path_for(&header_include, base_dir);
-    #####:  300:	path_push(&header_include, "target");
-    #####:  301:	path_push(&header_include, "include");
-    #####:  302:	path_push(&header_include, module_path);
-    #####:  303:	path_canonicalize(&header_include);
-    #####:  304:	printf("write to %s\n", path_to_string(&header_include));
-    #####:  305:	FILE *fp = myfopen(path_to_string(&header_include), "w");
-    #####:  306:	if (state.gen_header) {
-    #####:  307:		if (fprintf(fp, "%s", state.gen_header) < strlen(state.gen_header))
-    #####:  308:			fprintf(
-        -:  309:				stderr, "Partial write of header: %s occurred!\n", path_to_string(&header_include));
-        -:  310:	}
-    #####:  311:	myfclose(fp);
-    #####:  312:	free_gen_header(&state);
-        -:  313:
-    #####:  314:	lexer_cleanup(&l);
-    #####:  315:}
+        -:  207:			HeaderTypeInfo hti;
+    #####:  208:			strcpy(hti.type, tk->token);
+    #####:  209:			vec_push(&(state->ht.types), &hti);
+    #####:  210:			state->state = ParserStateExpectName;
+        -:  211:		}
+        -:  212:	}
+    #####:  213:}
+        -:  214:
+    #####:  215:void proc_ParserStateExpectName(ParserState *state, Token *tk)
+        -:  216:{
+    #####:  217:	if (tk->type != TokenTypeIdent) {
+    #####:  218:		token_display_error(tk, "Expected name. Found [%s]", tk->token);
+    #####:  219:		state->state = ParserStateOther;
+        -:  220:	} else {
+    #####:  221:		if (strlen(tk->token) > MAX_NAME_LEN) {
+    #####:  222:			token_display_error(tk, "Name [%s] is too long.", tk->token);
+    #####:  223:			state->state = ParserStateOther;
+        -:  224:		} else {
+        -:  225:			HeaderNameInfo hti;
+    #####:  226:			strcpy(hti.name, tk->token);
+    #####:  227:			vec_push(&(state->ht.names), &hti);
+    #####:  228:			state->state = ParserStateInTypeExpectSemi;
+        -:  229:		}
+        -:  230:	}
+    #####:  231:}
+        -:  232:
+    #####:  233:void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk)
+        -:  234:{
+    #####:  235:	if (strcmp(tk->token, ";")) {
+    #####:  236:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
+        -:  237:	}
+    #####:  238:	state->state = ParserStateExpectType;
+    #####:  239:}
+        -:  240:
+    #####:  241:void proc_ParserStateExpectModuleName(ParserState *state, Token *tk)
+        -:  242:{
+    #####:  243:	if (tk->type != TokenTypeIdent) {
+    #####:  244:		token_display_error(tk, "Expected module name, found '%s'", tk->token);
+        -:  245:	} else {
+    #####:  246:		if (strlen(tk->token) >= PATH_MAX) {
+    #####:  247:			token_display_error(tk, "Path is longer than max path (%i)", PATH_MAX);
+        -:  248:		} else {
+        -:  249:			ModuleInfo mi;
+    #####:  250:			mi.sub_module_count = state->cur->sub_module_count + 1;
+    #####:  251:			for (u64 i = 0; i < state->cur->sub_module_count; i++) {
+    #####:  252:				strcpy(mi.module_list[i].name, state->cur->module_list[i].name);
+        -:  253:			}
+    #####:  254:			strcpy(mi.module_list[state->cur->sub_module_count].name, tk->token);
+    #####:  255:			vec_push(state->modules, &mi);
+        -:  256:		}
+    #####:  257:		state->state = ParserStateOther;
+        -:  258:	}
+    #####:  259:}
+        -:  260:
+    #####:  261:void file_for(const char *base_dir, const ModuleInfo *self_info, char buf[PATH_MAX])
+        -:  262:{
+    #####:  263:	Path ret;
+    #####:  264:	path_for(&ret, base_dir);
+    #####:  265:	for (u64 i = 0; self_info->sub_module_count != 0 && i < self_info->sub_module_count; i++) {
+    #####:  266:		path_push(&ret, self_info->module_list[i].name);
+        -:  267:	}
+    #####:  268:	if (self_info->sub_module_count == 0) {
+    #####:  269:		path_push(&ret, "mod.h");
+        -:  270:	} else {
+        -:  271:		char module_file_f[PATH_MAX];
+    #####:  272:		strcpy(module_file_f, path_to_string(&ret));
+    #####:  273:		strcat(module_file_f, ".h");
+        -:  274:
+    #####:  275:		Path test_f;
+    #####:  276:		path_for(&test_f, module_file_f);
+    #####:  277:		if (path_exists(&test_f)) {
+    #####:  278:			path_cleanup(&ret);
+    #####:  279:			path_copy(&ret, &test_f);
+        -:  280:		} else {
+    #####:  281:			path_pop(&ret);
+    #####:  282:			path_push(&ret, self_info->module_list[self_info->sub_module_count - 1].name);
+    #####:  283:			path_push(&ret, "mod.h");
+    #####:  284:			if (!path_exists(&ret)) {
+    #####:  285:				exit_error("Module: [%s] not found!", path_to_string(&ret));
+        -:  286:			}
+        -:  287:		}
+        -:  288:	}
+    #####:  289:	if (path_canonicalize(&ret)) {
+    #####:  290:		exit_error("Path %s does not exist.", path_to_string(&ret));
+        -:  291:	}
+    #####:  292:	strcpy(buf, path_to_string(&ret));
+    #####:  293:}
+        -:  294:
+    #####:  295:void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Vec *types,
+        -:  296:	const ModuleInfo *self_info)
+        -:  297:{
+        -:  298:	char file[PATH_MAX];
+    #####:  299:	file_for(base_dir, self_info, file);
+        -:  300:	Lexer l;
+    #####:  301:	if (lexer_init(&l, file)) {
+    #####:  302:		exit_error("Could not open module file: '%s'", file);
+        -:  303:	}
+        -:  304:
+    #####:  305:	ParserState state = {
+        -:  306:		.state = ParserStateBeginStatement,
+        -:  307:		.modules = modules,
+        -:  308:		.gen_header = NULL,
+        -:  309:		.header_capacity = 0,
+        -:  310:		.cur = self_info,
+        -:  311:		.types = types,
+        -:  312:		.gen_file_counter = gen_file_counter,
+        -:  313:	};
+    #####:  314:	gen_file_counter++;
+        -:  315:
+    #####:  316:	vec_init(&state.ht.names, 10, sizeof(HeaderNameInfo));
+    #####:  317:	vec_init(&state.ht.types, 10, sizeof(HeaderTypeInfo));
+    #####:  318:	vec_init(&state.import_list, 10, sizeof(SubModuleInfo));
+        -:  319:
+    #####:  320:	while (true) {
+        -:  321:		Token tk;
+    #####:  322:		int res = lexer_next_token(&l, &tk);
+    #####:  323:		if (res == LexerStateComplete) {
+    #####:  324:			break;
+        -:  325:		}
+        -:  326:		// printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
+    #####:  327:		if (tk.type != TokenTypeDoc) {
+        -:  328:			// skip over doc comments for these purposes
+    #####:  329:			if (state.state == ParserStateBeginStatement) {
+    #####:  330:				proc_ParserStateBeginStatement(&state, &tk);
+    #####:  331:			} else if (state.state == ParserStateExpectModuleName) {
+    #####:  332:				proc_ParserStateExpectModuleName(&state, &tk);
+    #####:  333:			} else if (state.state == ParserStateExpectType) {
+    #####:  334:				proc_ParserStateExpectType(&state, &tk);
+    #####:  335:			} else if (state.state == ParserStateExpectName) {
+    #####:  336:				proc_ParserStateExpectName(&state, &tk);
+    #####:  337:			} else if (state.state == ParserStateInTypeExpectSemi) {
+    #####:  338:				proc_ParserStateInTypeExpectSemi(&state, &tk);
+    #####:  339:			} else if (state.state == ParserStateInImportListExpectModuleName) {
+    #####:  340:				proc_ParserStateInImportListExpectModuleName(&state, &tk);
+    #####:  341:			} else if (state.state == ParserStateInImportListExpectSeparator) {
+    #####:  342:				proc_ParserStateInImportListExpectSeparator(&state, &tk);
+    #####:  343:			} else if (tk.type == TokenTypePunct) {
+    #####:  344:				if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
+    #####:  345:					state.state = ParserStateBeginStatement;
+    #####:  346:				} else if (!strcmp(tk.token, "{") && state.state == ParserStateExpectBracket) {
+        -:  347:					TypeInfo ti;
+    #####:  348:					ti.mi = *state.cur;
+    #####:  349:					strcpy(ti.type_name, state.type_name);
+    #####:  350:					ti.gen_file_counter = state.gen_file_counter;
+    #####:  351:					vec_push(types, &ti);
+    #####:  352:					state.state = ParserStateExpectType;
+        -:  353:				} else
+    #####:  354:					state.state = ParserStateOther;
+        -:  355:			}
+        -:  356:		}
+        -:  357:
+    #####:  358:		token_cleanup(&tk);
+        -:  359:	}
+        -:  360:
+    #####:  361:	Path gen_header_name;
+        -:  362:	char header_name[128];
+    #####:  363:	snprintf(header_name, 128, "f%" PRIu64 "", state.gen_file_counter);
+    #####:  364:	path_for(&gen_header_name, base_dir);
+    #####:  365:	path_push(&gen_header_name, "target");
+    #####:  366:	path_push(&gen_header_name, "include");
+    #####:  367:	path_push(&gen_header_name, header_name);
+    #####:  368:	path_mkdir(&gen_header_name, 0700, false);
+    #####:  369:	path_push(&gen_header_name, "build_specific.h");
+        -:  370:
+    #####:  371:	append_to_header(&state, "");
+        -:  372:
+    #####:  373:	FILE *fp = myfopen(path_to_string(&gen_header_name), "w");
+    #####:  374:	if (fprintf(fp, "%s", state.gen_header) < strlen(state.gen_header))
+    #####:  375:		fprintf(
+        -:  376:			stderr, "Partial write of header: %s occurred!\n", path_to_string(&gen_header_name));
+        -:  377:
+    #####:  378:	myfclose(fp);
+    #####:  379:	free_gen_header(&state);
+    #####:  380:	vec_cleanup(&state.ht.names);
+    #####:  381:	vec_cleanup(&state.ht.types);
+    #####:  382:	vec_cleanup(&state.import_list);
+        -:  383:
+    #####:  384:	lexer_cleanup(&l);
+    #####:  385:}
         -:    0:Source:args.c
         -:    0:Graph:args.gcno
         -:    0:Data:args.gcda
