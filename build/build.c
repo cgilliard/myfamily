@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/*
 #include <base/misc.h>
 #include <base/path.h>
 #include <base/resources.h>
@@ -22,290 +23,31 @@
 #include <string.h>
 #include <toml/toml.h>
 #include <util/proc_executor.h>
+*/
 
-void build_main(char *include_param, char *obj_path, char *file_name, const char *base_dir,
-	const char *config_dir)
+#include <base/misc.h>
+#include <base/path.h>
+#include <base/resources.h>
+#include <build/build.h>
+#include <build/parser.h>
+#include <glob.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <toml/toml.h>
+#include <util/proc_executor.h>
+
+typedef struct FamTomlInfo {
+	char name[MAX_NAME_LEN];
+	char version[MAX_NAME_LEN];
+} FamTomlInfo;
+
+FamTomlInfo extract_toml_info(const char *base_dir)
 {
-	Path build_path;
-	path_for(&build_path, base_dir);
-	path_push(&build_path, "target");
-	path_push(&build_path, "build");
-	path_canonicalize(&build_path);
-	remove_directory(path_to_string(&build_path), true);
-
-	char *include_full_path = path_to_string(&build_path);
-	char include_param2[strlen(include_full_path) + 10];
-	strcpy(include_param2, "-I");
-	strcat(include_param2, include_full_path);
-
-	path_push(&build_path, "build_specific.h");
-
-	Path build_specific;
-	path_for(&build_specific, base_dir);
-	path_push(&build_specific, "target");
-	path_push(&build_specific, "include");
-	path_push(&build_specific, "lib.h");
-	copy_file(path_to_string(&build_path), path_to_string(&build_specific));
-
-	char *args[]
-		= { "cc", include_param, include_param2, "-I.", "-c", "-o", obj_path, file_name, NULL };
-	if (execute_process(args)) {
-		exit_error("execution of process '%s' failed", args[0]);
-	}
-}
-
-void build_obj(char *include_param, char *obj_path, char *file_name)
-{
-	char *args[] = { "cc", include_param, "-I.", "-c", "-o", obj_path, file_name, NULL };
-	if (execute_process(args)) {
-		exit_error("execution of process '%s' failed", args[0]);
-	}
-}
-
-void build_module_list(Vec *module_info, const Path *path, const Path *base_path)
-{
-	Path next_path;
-	path_copy(&next_path, path);
-	Vec module_info_reverse;
-	vec_init(&module_info_reverse, 10, sizeof(ModuleInfo));
-	for (int i = 0; i < 10; i++) {
-
-		if (!strcmp(path_to_string(&next_path), path_to_string(base_path))) {
-
-			break;
-		}
-		if (strlen(path_to_string(&next_path)) < strlen(path_to_string(base_path))) {
-			exit_error("could not find the base path");
-		}
-		char *modname = path_file_name(&next_path);
-		path_pop(&next_path);
-		ModuleInfo mi;
-		strcpy(mi.name, modname);
-		vec_push(&module_info_reverse, &mi);
-	}
-	while (vec_size(&module_info_reverse) > 0) {
-		ModuleInfo *next = vec_pop(&module_info_reverse);
-		if (vec_size(&module_info_reverse) > 0) {
-			vec_push(module_info, next);
-			char *modname = next->name;
-		}
-	}
-}
-
-void build_internal(const char *base_dir, const char *config_dir)
-{
-	Path build_path;
-	path_for(&build_path, base_dir);
-	path_push(&build_path, "target");
-	path_push(&build_path, "build");
-	remove_directory(path_to_string(&build_path), true);
-
-	Path config_src;
-	path_for(&config_src, config_dir);
-	path_push(&config_src, "resources");
-	path_push(&config_src, "src");
-	path_push(&config_src, "*.c");
-
-	Path include_dir;
-	path_for(&include_dir, config_dir);
-	path_push(&include_dir, "resources");
-	path_push(&include_dir, "include");
-
-	char *include_full_path = path_to_string(&include_dir);
-	char include_param[strlen(include_full_path) + 10];
-	strcpy(include_param, "-I");
-	strcat(include_param, include_full_path);
-
-	glob_t glob_result;
-	glob(path_to_string(&config_src), 0, NULL, &glob_result);
-
-	for (u64 i = 0; i < glob_result.gl_pathc; i++) {
-		char obj_path[PATH_MAX];
-		strcpy(obj_path, "../objs/_internal_obj_prefix_");
-		Path src_file_path;
-		path_for(&src_file_path, glob_result.gl_pathv[i]);
-		strcat(obj_path, path_file_name(&src_file_path));
-		obj_path[strlen(obj_path) - 1] = 'o';
-		build_obj(include_param, obj_path, glob_result.gl_pathv[i]);
-	}
-}
-
-void build_libs(const char *base_dir, const char *config_dir)
-{
-	Path include_dir;
-	path_for(&include_dir, config_dir);
-	path_push(&include_dir, "resources");
-	path_push(&include_dir, "include");
-	path_canonicalize(&include_dir);
-	Path build_dir;
-	path_for(&build_dir, base_dir);
-	path_push(&build_dir, "target");
-	path_push(&build_dir, "build");
-	path_canonicalize(&build_dir);
-	Path include_build_dir;
-	path_for(&include_build_dir, base_dir);
-	path_push(&include_build_dir, "target");
-	path_push(&include_build_dir, "include");
-	path_canonicalize(&include_build_dir);
-	Path lib_h;
-	path_for(&lib_h, base_dir);
-	path_push(&lib_h, "lib.h");
-	Path base_path;
-	path_for(&base_path, base_dir);
-	path_canonicalize(&base_path);
-	printf("build libs: %s\n", path_to_string(&base_path));
-	if (path_exists(&lib_h)) {
-		Vec headers;
-		vec_init(&headers, 10, sizeof(HeaderInfo));
-		Vec types;
-		vec_init(&types, 10, sizeof(TypeInfo));
-		path_canonicalize(&lib_h);
-
-		Vec module_info;
-		vec_init(&module_info, 10, sizeof(ModuleInfo));
-		parse_header(base_dir, &lib_h, &headers, &types, &module_info);
-
-		while (vec_size(&headers)) {
-			HeaderInfo *next = vec_pop(&headers);
-			Path next_path;
-			path_for(&next_path, next->path);
-			if (path_exists(&next_path) && path_is_dir(&next_path)) {
-				path_push(&next_path, "mod.h");
-				vec_clear(&module_info);
-				build_module_list(&module_info, &next_path, &base_path);
-				if (path_exists(&next_path)) {
-					parse_header(base_dir, &next_path, &headers, &types, &module_info);
-				}
-			} else {
-				char file_buf[PATH_MAX];
-				snprintf(file_buf, PATH_MAX - 1, "%s%s", path_file_name(&next_path), ".h");
-				path_pop(&next_path);
-
-				path_push(&next_path, file_buf);
-				if (path_exists(&next_path) && !path_is_dir(&next_path)) {
-					vec_clear(&module_info);
-					build_module_list(&module_info, &next_path, &base_path);
-					// parse header
-					parse_header(base_dir, &next_path, &headers, &types, &module_info);
-				} else {
-					exit_error("Module not found. Expected at '%s'.", path_to_string(&next_path));
-				}
-			}
-		}
-
-		if (chdir(path_to_string(&build_dir))) {
-			fprintf(stderr, "Could not change directory to the build directory");
-		}
-
-		while (vec_size(&types)) {
-			TypeInfo *next = vec_pop(&types);
-			Path next_path;
-			path_for(&next_path, next->path);
-			if (path_exists(&next_path) && !path_is_dir(&next_path)) {
-				remove_directory(path_to_string(&build_dir), true);
-				Path file_path;
-				path_copy(&file_path, &build_dir);
-				path_push(&file_path, path_file_name(&next_path));
-				printf(
-					"copy from %s -> %s\n", path_to_string(&next_path), path_to_string(&file_path));
-				if (copy_file(path_to_string(&file_path), path_to_string(&next_path))) {
-					exit_error("Failed to copy file %s -> %s", path_to_string(&next_path),
-						path_to_string(&file_path));
-				};
-
-				char modules[PATH_MAX];
-				char *file_name = path_file_name(&next_path);
-				strcpy(modules, "");
-
-				Vec module_info;
-				vec_init(&module_info, 10, sizeof(ModuleInfo));
-				build_module_list(&module_info, &next_path, &base_path);
-				if (strlen(next->module_file_name) > 0) {
-					ModuleInfo mi;
-					strcpy(mi.name, next->module_file_name);
-					vec_push(&module_info, &mi);
-				}
-
-				for (u64 i = 0; i < vec_size(&module_info); i++) {
-					ModuleInfo *next = vec_element_at(&module_info, i);
-					strcat(modules, next->name);
-					strcat(modules, "_");
-				}
-
-				strcat(modules, file_name);
-
-				int modules_len = strlen(modules);
-				if (modules_len < 3) {
-					exit_error("unexpectedly short name for object file: %s\n", modules);
-				}
-				if (modules[modules_len - 1] != 'c' || modules[modules_len - 2] != '.') {
-					exit_error("expected file to end in .c");
-				}
-				modules[modules_len - 1] = 'o';
-				char obj_path[PATH_MAX];
-				strcpy(obj_path, "../objs/");
-				strcat(obj_path, modules);
-
-				char *include_full_path = path_to_string(&include_dir);
-				char include_param[strlen(include_full_path) + 10];
-				strcpy(include_param, "-I");
-				strcat(include_param, include_full_path);
-
-				char module_str[PATH_MAX + 1024];
-				char module_path[PATH_MAX + 1024];
-				strcpy(module_str, "");
-				strcpy(module_path, "");
-				int vec_sz = vec_size(&module_info);
-				for (int i = 0; i < vec_sz; i++) {
-					strcat(module_str, vec_element_at(&module_info, i));
-					strcat(module_path, vec_element_at(&module_info, i));
-					if (i != vec_sz - 1) {
-						strcat(module_str, "::");
-						strcat(module_path, "_");
-					}
-				}
-				strcat(module_path, ".h");
-
-				Path build_specific_dst;
-				Path build_specific_src;
-				path_for(&build_specific_dst, path_to_string(&build_dir));
-				path_push(&build_specific_dst, "build_specific.h");
-				path_for(&build_specific_src, path_to_string(&include_build_dir));
-				path_push(&build_specific_src, module_path);
-				if (copy_file(
-						path_to_string(&build_specific_dst), path_to_string(&build_specific_src))) {
-					printf("module_path=%s\n", module_path);
-					exit_error("Failed to copy %s -> %s", path_to_string(&build_specific_src),
-						path_to_string(&build_specific_dst));
-				}
-
-				printf("Parsing type: %s::[%s].\n", module_str, file_name);
-				build_obj(include_param, obj_path, file_name);
-
-			} else {
-				exit_error(
-					"Implementation not found. Expected at '%s'.", path_to_string(&next_path));
-			}
-		}
-	}
-}
-
-int proc_build(const char *base_dir, const char *config_dir)
-{
-	Path include_dir;
-	path_for(&include_dir, config_dir);
-	path_push(&include_dir, "resources");
-	path_push(&include_dir, "include");
-	path_canonicalize(&include_dir);
-
-	Path base;
-	path_for(&base, base_dir);
-	if (path_canonicalize(&base)) {
-		exit_error("Directory ('%s') not found.", base_dir);
-	}
 	Path toml;
 	path_for(&toml, base_dir);
 	path_push(&toml, "fam.toml");
+
 	if (path_canonicalize(&toml)) {
 		exit_error("fam.toml file ('%s') not found.", path_to_string(&toml));
 	}
@@ -318,14 +60,18 @@ int proc_build(const char *base_dir, const char *config_dir)
 		exit_error("Could not parse toml file due to '%s'", errbuf);
 	}
 
+	FamTomlInfo ret;
+
 	myfclose(toml_fp);
 
 	toml_raw_t raw_fam_version = toml_raw_in(table, "fam_version");
 	char *fam_version;
 	if (raw_fam_version) {
 		toml_rtos(raw_fam_version, &fam_version);
-		fprintf(stderr, "fam.toml generated by fam version: %s\n", fam_version);
+		strcpy(ret.version, fam_version);
 		free((void *)fam_version); // Clean up after toml_rtos
+	} else {
+		exit_error("fam_version not specified in '%s'", path_to_string(&toml));
 	}
 
 	toml_table_t *package_table = toml_table_in(table, "package");
@@ -334,73 +80,370 @@ int proc_build(const char *base_dir, const char *config_dir)
 		char *name;
 		if (raw_name) {
 			toml_rtos(raw_name, &name);
-			fprintf(stderr, "Building Project: '%s'\n", name);
-
-			Path target;
-			path_for(&target, base_dir);
-			path_push(&target, "target");
-			path_canonicalize(&target);
-			if (!path_exists(&target)) {
-				if (!path_mkdir(&target, 0700, false))
-					exit_error("Could not create directory '%s'.", path_to_string(&target));
-				path_push(&target, "objs");
-				if (!path_mkdir(&target, 0700, false))
-					exit_error("Could not create directory '%s'.", path_to_string(&target));
-				path_pop(&target);
-				path_push(&target, "build");
-				if (!path_mkdir(&target, 0700, false))
-					exit_error("Could not create directory '%s'.", path_to_string(&target));
-				path_pop(&target);
-				path_push(&target, "include");
-				if (!path_mkdir(&target, 0700, false))
-					exit_error("Could not create directory '%s'.", path_to_string(&target));
-			}
-
-			build_libs(base_dir, config_dir);
-			build_internal(base_dir, config_dir);
-
-			// change to the base directory
-			if (chdir(path_to_string(&base))) {
-				fprintf(stderr, "Could not change directory to the project directory");
-			}
-
-			char *include_full_path = path_to_string(&include_dir);
-			char include_param[strlen(include_full_path) + 10];
-			strcpy(include_param, "-I");
-			strcat(include_param, include_full_path);
-			build_main(include_param, "target/objs/main.o", "main.c", base_dir, config_dir);
-
-			glob_t glob_result;
-			glob("target/objs/*.o", 0, NULL, &glob_result);
-
-			// Construct the argument array for exec
-			char *link[5 + glob_result.gl_pathc + 1];
-			Path output_file;
-			path_for(&output_file, "target");
-			path_push(&output_file, name);
-			link[0] = "cc";
-			link[1] = "-o";
-			link[2] = path_to_string(&output_file);
-
-			// Add all the .o files from glob to the argument list
-			for (size_t i = 0; i < glob_result.gl_pathc; i++) {
-				link[3 + i] = glob_result.gl_pathv[i];
-			}
-			link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
-
-			if (execute_process(link)) {
-				exit_error("execution of process '%s' failed", link[0]);
-			}
-
-			free((void *)name); // Cleanup after toml_rtos
-			// Free the TOML table when done
-			toml_free(table);
+			strcpy(ret.name, name);
 		} else {
-			exit_error("project name not found!");
+			exit_error("name not specified in fam.toml!");
 		}
 	} else {
-		exit_error("[package] directive not found!");
+		exit_error("package not found in fam.toml");
 	}
+
+	return ret;
+}
+
+void ensure_target_structure(const char *base_dir)
+{
+	Path target;
+	path_for(&target, base_dir);
+	path_push(&target, "target");
+	if (!path_exists(&target)) {
+		if (!path_mkdir(&target, 0700, false))
+			exit_error("Could not create directory '%s'.", path_to_string(&target));
+		path_push(&target, "objs");
+		if (!path_mkdir(&target, 0700, false))
+			exit_error("Could not create directory '%s'.", path_to_string(&target));
+		path_pop(&target);
+		path_push(&target, "build");
+		if (!path_mkdir(&target, 0700, false))
+			exit_error("Could not create directory '%s'.", path_to_string(&target));
+		path_pop(&target);
+		path_push(&target, "include");
+		if (!path_mkdir(&target, 0700, false))
+			exit_error("Could not create directory '%s'.", path_to_string(&target));
+	}
+
+	if (path_canonicalize(&target)) {
+		exit_error("Could not create path: %s\n", path_to_string(&target));
+	}
+}
+
+u64 module_to_string(const ModuleInfo *module_info, char *buf, u64 limit)
+{
+	u64 itt = 0;
+	strncpy(buf, "", limit);
+	for (u64 i = 0; i < module_info->sub_module_count; i++) {
+		if (itt < limit)
+			strncat(buf, module_info->module_list[i].name, limit - itt);
+		itt += strlen(module_info->module_list[i].name);
+		if (i != module_info->sub_module_count - 1) {
+			if (itt < limit)
+				strncat(buf, "/", limit - itt);
+			itt += 1;
+		}
+	}
+
+	return itt;
+}
+
+u64 module_to_type_string(const ModuleInfo *type_info, char *buf, u64 limit)
+{
+	u64 itt = 0;
+	strncpy(buf, "_type_____", limit);
+	itt += 10;
+	for (u64 i = 0; i < type_info->sub_module_count; i++) {
+		if (itt < limit)
+			strncat(buf, type_info->module_list[i].name, limit - itt);
+		itt += strlen(type_info->module_list[i].name);
+		if (1 + i < type_info->sub_module_count) {
+			if (itt < limit)
+				strncat(buf, "_____", limit - itt);
+			itt += 5;
+		}
+	}
+
+	return itt;
+}
+
+u64 type_info_to_string(const TypeInfo *type_info, char *buf, u64 limit)
+{
+	u64 itt = 0;
+	strncpy(buf, "_type_____", limit);
+	itt += 10;
+	for (u64 i = 0; i < type_info->mi.sub_module_count; i++) {
+		if (itt < limit)
+			strncat(buf, type_info->mi.module_list[i].name, limit - itt);
+		itt += strlen(type_info->mi.module_list[i].name);
+		if (itt < limit)
+			strncat(buf, "_____", limit - itt);
+		itt += 5;
+	}
+	if (itt < limit)
+		strncat(buf, type_info->type_name, limit - itt);
+	itt += strlen(type_info->type_name);
+
+	return itt;
+}
+
+u64 type_info_to_path(const TypeInfo *type_info, char *buf, u64 limit)
+{
+	u64 itt = 0;
+	strncpy(buf, "", limit);
+	for (u64 i = 0; i < type_info->mi.sub_module_count; i++) {
+		if (itt < limit)
+			strncat(buf, type_info->mi.module_list[i].name, limit - itt);
+		itt += strlen(type_info->mi.module_list[i].name);
+		if (itt < limit)
+			strncat(buf, "/", limit - itt);
+		itt += 1;
+	}
+	if (itt < limit)
+		strncat(buf, type_info->type_name, limit - itt);
+	itt += strlen(type_info->type_name);
+
+	return itt;
+}
+
+u64 type_info_module_file(const char *base_dir, const TypeInfo *type_info, char *buf, u64 limit)
+{
+	Path p;
+	path_for(&p, base_dir);
+	if (type_info->mi.sub_module_count) {
+		for (u64 i = 0; i < type_info->mi.sub_module_count - 1; i++) {
+			path_push(&p, type_info->mi.module_list[i].name);
+		}
+	}
+	if (type_info->mi.sub_module_count) {
+		char header_name[PATH_MAX];
+		strcpy(header_name, type_info->mi.module_list[type_info->mi.sub_module_count - 1].name);
+		strcat(header_name, ".h");
+		path_push(&p, header_name);
+
+		if (path_exists(&p)) {
+			strncpy(buf, path_to_string(&p), limit);
+			return strlen(path_to_string(&p));
+		} else {
+			path_pop(&p);
+			path_push(&p, type_info->mi.module_list[type_info->mi.sub_module_count - 1].name);
+			path_push(&p, "mod.h");
+			if (path_exists(&p)) {
+				strncpy(buf, path_to_string(&p), limit);
+				return strlen(path_to_string(&p));
+			} else {
+				exit_error("header file did not exist at path '%s'", path_to_string(&p));
+			}
+		}
+	} else {
+		path_push(&p, "mod.h");
+		strncpy(buf, path_to_string(&p), limit);
+		return strlen(path_to_string(&p));
+	}
+
+	// should never get here
+	return 0;
+}
+
+void build_obj(const char *cc, const char *include_dir, const char *obj_dir, const char *src_dir,
+	const TypeInfo *type_info, const char *obj_prefix, const char *config_include)
+{
+	Path obj_path;
+	path_for(&obj_path, obj_dir);
+
+	u64 obj_prefix_len = 0;
+	if (obj_prefix)
+		obj_prefix_len = strlen(obj_prefix);
+	char obj_file_name[obj_prefix_len + strlen(type_info->type_name) + 5];
+	if (obj_prefix) {
+		strcpy(obj_file_name, obj_prefix);
+		strcat(obj_file_name, type_info->type_name);
+		strcat(obj_file_name, ".o");
+	} else {
+		strcpy(obj_file_name, type_info->type_name);
+		strcat(obj_file_name, ".o");
+	}
+
+	path_push(&obj_path, obj_file_name);
+
+	u64 needed = type_info_to_path(type_info, NULL, 0);
+	char file_name[needed + 3];
+	type_info_to_path(type_info, file_name, needed);
+	strcat(file_name, ".c");
+
+	Path src_path;
+	path_for(&src_path, src_dir);
+	path_push(&src_path, file_name);
+
+	char include_param[strlen(include_dir) + 5];
+	strcpy(include_param, "-I");
+	strcat(include_param, include_dir);
+
+	if (config_include) {
+		char config_include_param[strlen(config_include) + 5];
+		strcpy(config_include_param, "-I");
+		strcat(config_include_param, config_include);
+		const char *args[] = { cc, include_param, config_include_param, "-I.", "-c", "-o",
+			path_to_string(&obj_path), path_to_string(&src_path), NULL };
+		if (execute_process(args)) {
+			exit_error("execution of process '%s' failed", args[0]);
+		}
+	} else {
+		const char *args[] = { cc, include_param, "-I.", "-c", "-o", path_to_string(&obj_path),
+			path_to_string(&src_path), NULL };
+		if (execute_process(args)) {
+			exit_error("execution of process '%s' failed", args[0]);
+		}
+	}
+}
+
+void link_objs(const char *objs_path, const char *base_dir, const char *name)
+{
+	glob_t glob_result;
+	Path objs_dir;
+	path_for(&objs_dir, base_dir);
+	path_push(&objs_dir, "target/objs/*.o");
+
+	glob(path_to_string(&objs_dir), 0, NULL, &glob_result);
+
+	// Construct the argument array for exec
+	char *link[5 + glob_result.gl_pathc + 1];
+	Path output_file;
+	path_for(&output_file, base_dir);
+	path_push(&output_file, "target");
+	path_push(&output_file, name);
+	link[0] = "cc";
+	link[1] = "-o";
+	link[2] = path_to_string(&output_file);
+
+	// Add all the .o files from glob to the argument list
+	for (size_t i = 0; i < glob_result.gl_pathc; i++) {
+		link[3 + i] = glob_result.gl_pathv[i];
+	}
+	link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
+
+	const char **link_const = (const char **)&link;
+
+	if (execute_process(link_const)) {
+		exit_error("execution of process '%s' failed", link[0]);
+	}
+}
+
+void build_internal(const char *base_dir, const char *config_dir)
+{
+	Path build_path;
+	path_for(&build_path, base_dir);
+	path_push(&build_path, "target");
+	path_push(&build_path, "build");
+	remove_directory(path_to_string(&build_path), true);
+
+	Path objs_path;
+	path_for(&objs_path, base_dir);
+	path_push(&objs_path, "target");
+	path_push(&objs_path, "objs");
+
+	Path config_src;
+	path_for(&config_src, config_dir);
+	path_push(&config_src, "resources");
+	path_push(&config_src, "src");
+	path_push(&config_src, "*.c");
+
+	Path include_dir;
+	path_for(&include_dir, config_dir);
+	path_push(&include_dir, "resources");
+	path_push(&include_dir, "include");
+
+	/*
+	char *include_full_path = path_to_string(&include_dir);
+	char include_param[strlen(include_full_path) + 10];
+	strcpy(include_param, "-I");
+	strcat(include_param, include_full_path);
+	*/
+
+	glob_t glob_result;
+	glob(path_to_string(&config_src), 0, NULL, &glob_result);
+
+	Path config_dir_src_path;
+	path_for(&config_dir_src_path, config_dir);
+	path_push(&config_dir_src_path, "resources");
+	path_push(&config_dir_src_path, "src");
+
+	for (u64 i = 0; i < glob_result.gl_pathc; i++) {
+		TypeInfo ti;
+		ti.mi.sub_module_count = 0;
+		if (strlen(glob_result.gl_pathv[i]) >= MAX_NAME_LEN) {
+			exit_error("name too long! [%s]", glob_result.gl_pathv[i]);
+		}
+		Path glob_path;
+		path_for(&glob_path, glob_result.gl_pathv[i]);
+		char path_stem[strlen(path_file_name(&glob_path)) + 1];
+		path_file_stem(&glob_path, path_stem, strlen(path_file_name(&glob_path)));
+		strcpy(ti.type_name, path_stem);
+		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path),
+			path_to_string(&config_dir_src_path), &ti, "___internal_objs_", NULL);
+	}
+}
+
+int proc_build(const char *base_dir, const char *config_dir)
+{
+	fprintf(stderr, "proc build %s %s\n", base_dir, config_dir);
+	FamTomlInfo fti = extract_toml_info(base_dir);
+	fprintf(stderr, "building project %s. fam.toml generated by %s.\n", fti.name, fti.version);
+	ensure_target_structure(base_dir);
+
+	Path config_include_dir;
+	path_for(&config_include_dir, config_dir);
+	path_push(&config_include_dir, "resources");
+	path_push(&config_include_dir, "include");
+
+	Path include_dir;
+	path_for(&include_dir, base_dir);
+	path_push(&include_dir, "target");
+	path_push(&include_dir, "include");
+
+	Path objs_path;
+	path_for(&objs_path, base_dir);
+	path_push(&objs_path, "target");
+	path_push(&objs_path, "objs");
+
+	build_internal(base_dir, config_dir);
+	Path modh;
+	path_for(&modh, base_dir);
+	path_push(&modh, "mod.h");
+
+	Vec headers;
+	vec_init(&headers, 10, sizeof(ModuleInfo));
+	Vec types;
+	vec_init(&types, 10, sizeof(TypeInfo));
+	Vec module_list;
+	vec_init(&module_list, 10, sizeof(ModuleInfo));
+
+	path_canonicalize(&modh);
+
+	ModuleInfo self_info;
+	self_info.sub_module_count = 0;
+	parse_header(config_dir, base_dir, &headers, &types, &self_info);
+
+	while (vec_size(&headers)) {
+		ModuleInfo *next = vec_pop(&headers);
+		parse_header(config_dir, base_dir, &headers, &types, next);
+	}
+
+	while (vec_size(&types)) {
+		TypeInfo *next = vec_pop(&types);
+		char type_prefix[PATH_MAX];
+		type_info_to_string(next, type_prefix, PATH_MAX);
+		strcat(type_prefix, "_");
+		char gen_header_bs_dir[PATH_MAX];
+		snprintf(gen_header_bs_dir, PATH_MAX, "f%" PRIu64, next->gen_file_counter);
+
+		path_push(&include_dir, gen_header_bs_dir);
+
+		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, next,
+			type_prefix, path_to_string(&config_include_dir));
+
+		path_pop(&include_dir);
+	}
+
+	path_push(&include_dir, "f0");
+	TypeInfo main_ti;
+	strcpy(main_ti.type_name, "main");
+	main_ti.mi.sub_module_count = 0;
+	main_ti.gen_file_counter = 0;
+
+	// build main
+	build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, &main_ti,
+		"_type_____", path_to_string(&config_include_dir));
+
+	// link objects
+	link_objs(path_to_string(&objs_path), base_dir, fti.name);
 
 	return 0;
 }

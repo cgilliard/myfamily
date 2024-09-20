@@ -15,19 +15,12 @@
 #ifndef _BUILD_PARSER__
 #define _BUILD_PARSER__
 
+#include <base/path.h>
+#include <build/build.h>
 #include <limits.h>
 #include <util/vec.h>
 
-typedef struct HeaderInfo {
-	char path[PATH_MAX];
-} HeaderInfo;
-
-typedef struct TypeInfo {
-	char path[PATH_MAX];
-	char module_file_name[PATH_MAX];
-} TypeInfo;
-
-void parse_header(
-	const char *base_dir, const Path *path, Vec *headers, Vec *types, Vec *module_list);
+void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Vec *types,
+	const ModuleInfo *self_info);
 
 #endif // _BUILD_PARSER__

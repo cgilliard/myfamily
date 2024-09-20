@@ -38,6 +38,7 @@ bool path_exists(const Path *p);
 bool path_is_dir(const Path *p);
 bool path_mkdir(Path *p, mode_t mode, bool parent);
 char *path_file_name(const Path *p);
+int path_file_stem(const Path *p, char *buf, u64 limit);
 int path_copy(Path *dst, const Path *src);
 
 #endif // _BASE_PATH__

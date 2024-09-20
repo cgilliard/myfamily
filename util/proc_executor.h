@@ -15,6 +15,6 @@
 #ifndef _UTIL_PROC_EXECUTOR__
 #define _UTIL_PROC_EXECUTOR__
 
-int execute_process(char *args[]);
+int execute_process(const char *args[]);
 
 #endif // _UTIL_PROC_EXECUTOR__

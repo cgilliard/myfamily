@@ -238,3 +238,16 @@ int path_copy(Path *dst, const Path *src)
 {
 	return path_for(dst, path_to_string(src));
 }
+
+int path_file_stem(const Path *p, char *buf, u64 limit)
+{
+	strncpy(buf, path_file_name(p), limit);
+	for (u64 i = strlen(buf) - 1; i >= 0; i--) {
+		if (buf[i] == '.') {
+			buf[i] = 0;
+			break;
+		} else if (buf[i] == '/')
+			break;
+	}
+	return 0;
+}
