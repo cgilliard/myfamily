@@ -71,7 +71,7 @@ int vec_push(Vec *p, void *entry)
 	vi->cur++;
 	return 0;
 }
-void *vec_element_at(Vec *p, u64 index)
+void *vec_element_at(const Vec *p, u64 index)
 {
 	VecImpl *vi = p->impl.data;
 	if (index >= vi->cur)
@@ -145,13 +145,13 @@ int vec_clear(Vec *p)
 	return 0;
 }
 
-u64 vec_size(Vec *p)
+u64 vec_size(const Vec *p)
 {
 	VecImpl *vi = p->impl.data;
 	return vi->cur;
 }
 
-u64 vec_capacity(Vec *p)
+u64 vec_capacity(const Vec *p)
 {
 	VecImpl *vi = p->impl.data;
 	return vi->capacity;

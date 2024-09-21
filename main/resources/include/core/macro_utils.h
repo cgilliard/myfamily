@@ -28,7 +28,6 @@
 #define SECOND(x, y) y
 #define BOTH(x, y) x y
 
-#define mut is_mut,
 #define loop while (true)
 #define π(...)                                                                                     \
 	while (true)                                                                                   \

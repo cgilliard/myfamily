@@ -30,13 +30,13 @@ void vec_cleanup(VecNc *p);
 
 int vec_init(Vec *p, u64 initial_capacity, u64 size_of_entry);
 int vec_push(Vec *p, void *entry);
-void *vec_element_at(Vec *p, u64 index);
+void *vec_element_at(const Vec *p, u64 index);
 int vec_remove(Vec *p, u64 index);
 void *vec_pop(Vec *p);
 int vec_resize(Vec *p, u64 new_size);
 int vec_truncate(Vec *p, u64 new_size);
 int vec_clear(Vec *p);
-u64 vec_size(Vec *p);
-u64 vec_capacity(Vec *p);
+u64 vec_size(const Vec *p);
+u64 vec_capacity(const Vec *p);
 
 #endif // _UTIL_VEC__

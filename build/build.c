@@ -125,7 +125,7 @@ u64 module_to_string(const ModuleInfo *module_info, char *buf, u64 limit)
 u64 module_to_type_string(const ModuleInfo *type_info, char *buf, u64 limit)
 {
 	u64 itt = 0;
-	strncpy(buf, "_type_____", limit);
+	strncpy(buf, "type_____", limit);
 	itt += 10;
 	for (u64 i = 0; i < type_info->sub_module_count; i++) {
 		if (itt < limit)
@@ -144,7 +144,7 @@ u64 module_to_type_string(const ModuleInfo *type_info, char *buf, u64 limit)
 u64 type_info_to_string(const TypeInfo *type_info, char *buf, u64 limit)
 {
 	u64 itt = 0;
-	strncpy(buf, "_type_____", limit);
+	strncpy(buf, "type_____", limit);
 	itt += 10;
 	for (u64 i = 0; i < type_info->mi.sub_module_count; i++) {
 		if (itt < limit)
@@ -428,7 +428,7 @@ int proc_build(const char *base_dir, const char *config_dir)
 
 	// build main
 	build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, &main_ti,
-		"_type_____", path_to_string(&config_include_dir));
+		"type_____", path_to_string(&config_include_dir));
 
 	// link objects
 	link_objs(path_to_string(&objs_path), base_dir, fti.name);

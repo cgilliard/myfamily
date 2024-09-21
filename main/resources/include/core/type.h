@@ -93,4 +93,31 @@ FatPtr build_fat_ptr(u64 size);
 
 #define TypeName(obj) (obj).vtable->name
 
+#define mut Cleanup
+#define let const Cleanup
+
+#define SET_PARAM__(name, value) __config_.name = value;
+#define SET_PARAM_(...) SET_PARAM__(__VA_ARGS__)
+#define SET_PARAM(ptr, value) SET_PARAM_(EXPAND_ALL value)
+#define With(x, y) (x, y)
+
+// TODO: _fptr__.data may be NULL, need to handle better. Once we have
+// 'Result' implement two versions of this macro. One which
+// panics and one which returns error.
+#define _Impl(name, ...)                                                                           \
+	({                                                                                             \
+		FatPtr _fptr__ = build_fat_ptr(name##_size());                                             \
+		if (_fptr__.data == NULL)                                                                  \
+			panic("Could not allocate sufficient memory");                                         \
+		Obj _ret__ = { &name##_Vtable__, 0, _fptr__ };                                             \
+		Obj_build_int(&_ret__);                                                                    \
+		name##Config __config_;                                                                    \
+		memset(&__config_, 0, sizeof(name##Config));                                               \
+		__VA_OPT__(FOR_EACH(SET_PARAM, (&__config_, name##Config), (), __VA_ARGS__))               \
+		Obj_build(&_ret__, &__config_);                                                            \
+		_ret__;                                                                                    \
+	})
+
+#define _(name, ...) _Impl(name, __VA_ARGS__)
+
 #endif // _CORE_TYPE__
