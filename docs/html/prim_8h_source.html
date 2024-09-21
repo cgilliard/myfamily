@@ -88,7 +88,7 @@ $(function() {
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _CORE_PRIM__</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="traits_8h.html">core/traits.h</a>&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="type_8h.html">core/type.h</a>&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;core/type.h&gt;</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
 <div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="prim_8h.html#a8b9d32d6227b13b8d62d7aa1acd8c326">   21</a></span>&#160;<span class="preprocessor">#define DEFINE_PRIM_HEADER(lower, upper, bits)            \</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">    Builder(upper##bits, Config(lower##bits, value)); \</span></div>
@@ -109,7 +109,7 @@ $(function() {
 <div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="prim_8h.html#afe53bd51e4453d62fae4e67e8f6669ff">   37</a></span>&#160;<a class="code" href="prim_8h.html#a8b9d32d6227b13b8d62d7aa1acd8c326">DEFINE_PRIM_HEADER</a>(<a class="code" href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a>, F, 32);</div>
 <div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="prim_8h.html#a6f5cde2649f96c9042afe84868915bbe">   38</a></span>&#160;<a class="code" href="prim_8h.html#a8b9d32d6227b13b8d62d7aa1acd8c326">DEFINE_PRIM_HEADER</a>(<a class="code" href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a>, F, 64);</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="prim_8h.html#ae557fffdebf1f47edabd367209f93202">   40</a></span>&#160;<a class="code" href="prim_8h.html#ae557fffdebf1f47edabd367209f93202">Builder</a>(Bool, <a class="code" href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<span class="keywordtype">bool</span>, value));</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="prim_8h.html#ae557fffdebf1f47edabd367209f93202">   40</a></span>&#160;<a class="code" href="prim_8h.html#ae557fffdebf1f47edabd367209f93202">Builder</a>(Bool, <a class="code" href="core_2type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>(<span class="keywordtype">bool</span>, value));</div>
 <div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="prim_8h.html#a44fa0713e599853155c9a82e26e7081b">   41</a></span>&#160;<a class="code" href="prim_8h.html#a44fa0713e599853155c9a82e26e7081b">Impl</a>(Bool, <a class="code" href="header__sample1_8h.html#aac73670368932bd81ac1d4bfaa94586b">Build</a>);</div>
 <div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="prim_8h.html#ab7787f41d2c2e94eda3cf8da34e24e80">   42</a></span>&#160;<a class="code" href="prim_8h.html#a44fa0713e599853155c9a82e26e7081b">Impl</a>(Bool, <a class="code" href="traits_8h.html#a1a931293931f7a689e732d365b5662ba">ValueOf</a>);</div>
 <div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="prim_8h.html#a5984b738595f912124842208b91ebdca">   43</a></span>&#160;<a class="code" href="prim_8h.html#a44fa0713e599853155c9a82e26e7081b">Impl</a>(Bool, <a class="code" href="traits_8h.html#a40c9b8ed733e623e6cd95857dcbc425e">Equal</a>);</div>
@@ -155,6 +155,7 @@ $(function() {
 <div class="line"><a name="l00083"></a><span class="lineno"><a class="line" href="prim_8h.html#a50410f6d180882ef6c3ab96f94142ce2">   83</a></span>&#160;<span class="preprocessor">#define Unbox(v, to) value_of(&amp;v, &amp;to)</span></div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_PRIM__</span></div>
+<div class="ttc" id="acore_2type_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="core_2type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
 <div class="ttc" id="aheader__sample1_8h_html_a53325e9cd3d483310ad0ba8384682699"><div class="ttname"><a href="header__sample1_8h.html#a53325e9cd3d483310ad0ba8384682699">f</a></div><div class="ttdeci">u8 f</div><div class="ttdef"><b>Definition:</b> header_sample1.h:20</div></div>
 <div class="ttc" id="aheader__sample1_8h_html_aac73670368932bd81ac1d4bfaa94586b"><div class="ttname"><a href="header__sample1_8h.html#aac73670368932bd81ac1d4bfaa94586b">Build</a></div><div class="ttdeci">Build</div><div class="ttdef"><b>Definition:</b> header_sample1.h:169</div></div>
 <div class="ttc" id="aheader__sample1_8h_html_af6fde94d1594d8b6e626117cde7005ab"><div class="ttname"><a href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a></div><div class="ttdeci">u64 i</div><div class="ttdef"><b>Definition:</b> header_sample1.h:23</div></div>
@@ -164,8 +165,6 @@ $(function() {
 <div class="ttc" id="atraits_8h_html"><div class="ttname"><a href="traits_8h.html">traits.h</a></div></div>
 <div class="ttc" id="atraits_8h_html_a1a931293931f7a689e732d365b5662ba"><div class="ttname"><a href="traits_8h.html#a1a931293931f7a689e732d365b5662ba">ValueOf</a></div><div class="ttdeci">#define ValueOf</div><div class="ttdef"><b>Definition:</b> traits.h:53</div></div>
 <div class="ttc" id="atraits_8h_html_a40c9b8ed733e623e6cd95857dcbc425e"><div class="ttname"><a href="traits_8h.html#a40c9b8ed733e623e6cd95857dcbc425e">Equal</a></div><div class="ttdeci">#define Equal</div><div class="ttdef"><b>Definition:</b> traits.h:36</div></div>
-<div class="ttc" id="atype_8h_html"><div class="ttname"><a href="type_8h.html">type.h</a></div></div>
-<div class="ttc" id="atype_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

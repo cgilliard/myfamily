@@ -79,7 +79,7 @@ $(function() {
 <code>#include &lt;pthread.h&gt;</code><br />
 <code>#include &lt;stdatomic.h&gt;</code><br />
 </div>
-<p><a href="lock_8h_source.html">Go to the source code of this file.</a></p>
+<p><a href="base_2lock_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -90,47 +90,47 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a0918621ef865e4bfda79b010db52367d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a>&#160;&#160;&#160;<a class="el" href="structLockPtr.html">LockPtr</a> <a class="el" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="lock_8h.html#ae13e924c8c7cc5b8ee7f88e219d0b241">Lock_cleanup</a>)))</td></tr>
+<tr class="memitem:a0918621ef865e4bfda79b010db52367d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a>&#160;&#160;&#160;<a class="el" href="structLockPtr.html">LockPtr</a> <a class="el" href="main_2resources_2src_2type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="main_2resources_2src_2lock_8c.html#ae13e924c8c7cc5b8ee7f88e219d0b241">Lock_cleanup</a>)))</td></tr>
 <tr class="separator:a0918621ef865e4bfda79b010db52367d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc37b5ae502cbe90cde7bb660c40d614"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#afc37b5ae502cbe90cde7bb660c40d614">LockGuard</a>&#160;&#160;&#160;<a class="el" href="structLockGuardPtr.html">LockGuardPtr</a> <a class="el" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a>)))</td></tr>
+<tr class="memitem:afc37b5ae502cbe90cde7bb660c40d614"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#afc37b5ae502cbe90cde7bb660c40d614">LockGuard</a>&#160;&#160;&#160;<a class="el" href="structLockGuardPtr.html">LockGuardPtr</a> <a class="el" href="main_2resources_2src_2type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="main_2resources_2src_2lock_8c.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a>)))</td></tr>
 <tr class="separator:afc37b5ae502cbe90cde7bb660c40d614"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefb7db7456a848e7cefe90816a5aaa88"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#aefb7db7456a848e7cefe90816a5aaa88">LOCK</a>()&#160;&#160;&#160;<a class="el" href="lock_8h.html#ad2b937c09217ad140001c5f97dbc395c">Lock_build</a>()</td></tr>
+<tr class="memitem:aefb7db7456a848e7cefe90816a5aaa88"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#aefb7db7456a848e7cefe90816a5aaa88">LOCK</a>()&#160;&#160;&#160;<a class="el" href="main_2resources_2src_2lock_8c.html#ad2b937c09217ad140001c5f97dbc395c">Lock_build</a>()</td></tr>
 <tr class="separator:aefb7db7456a848e7cefe90816a5aaa88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc1d8e926cf1f2b3887e2c155eb8b8ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#abc1d8e926cf1f2b3887e2c155eb8b8ab">LOCK_GUARD_CLEANUP_SAFE</a>&#160;&#160;&#160;{NULL};</td></tr>
+<tr class="memitem:abc1d8e926cf1f2b3887e2c155eb8b8ab"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#abc1d8e926cf1f2b3887e2c155eb8b8ab">LOCK_GUARD_CLEANUP_SAFE</a>&#160;&#160;&#160;{NULL};</td></tr>
 <tr class="separator:abc1d8e926cf1f2b3887e2c155eb8b8ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35d42cc801623f1ddf20ccc2981d968b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#a35d42cc801623f1ddf20ccc2981d968b">synchronized</a>(ptr,  exe)</td></tr>
+<tr class="memitem:a35d42cc801623f1ddf20ccc2981d968b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#a35d42cc801623f1ddf20ccc2981d968b">synchronized</a>(ptr,  exe)</td></tr>
 <tr class="separator:a35d42cc801623f1ddf20ccc2981d968b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a9a044721dc39928f80247e5555bd85b8"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structLockPtr.html">LockPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#a9a044721dc39928f80247e5555bd85b8">LockPtr</a></td></tr>
+<tr class="memitem:a9a044721dc39928f80247e5555bd85b8"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structLockPtr.html">LockPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#a9a044721dc39928f80247e5555bd85b8">LockPtr</a></td></tr>
 <tr class="separator:a9a044721dc39928f80247e5555bd85b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acdd269c5ab65bd7a20e7c2746c157280"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structLockGuardPtr.html">LockGuardPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#acdd269c5ab65bd7a20e7c2746c157280">LockGuardPtr</a></td></tr>
+<tr class="memitem:acdd269c5ab65bd7a20e7c2746c157280"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structLockGuardPtr.html">LockGuardPtr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#acdd269c5ab65bd7a20e7c2746c157280">LockGuardPtr</a></td></tr>
 <tr class="separator:acdd269c5ab65bd7a20e7c2746c157280"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae13e924c8c7cc5b8ee7f88e219d0b241"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#ae13e924c8c7cc5b8ee7f88e219d0b241">Lock_cleanup</a> (<a class="el" href="structLockPtr.html">LockPtr</a> *ptr)</td></tr>
+<tr class="memitem:ae13e924c8c7cc5b8ee7f88e219d0b241"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#ae13e924c8c7cc5b8ee7f88e219d0b241">Lock_cleanup</a> (<a class="el" href="structLockPtr.html">LockPtr</a> *ptr)</td></tr>
 <tr class="separator:ae13e924c8c7cc5b8ee7f88e219d0b241"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae292adfca00eab58bb5a4113256127f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#ae292adfca00eab58bb5a4113256127f5">Lock_set_poison</a> (<a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *ptr)</td></tr>
+<tr class="memitem:ae292adfca00eab58bb5a4113256127f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#ae292adfca00eab58bb5a4113256127f5">Lock_set_poison</a> (<a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *ptr)</td></tr>
 <tr class="separator:ae292adfca00eab58bb5a4113256127f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2770800af86ad11c0f650c2d5752065f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#a2770800af86ad11c0f650c2d5752065f">Lock_is_poisoned</a> (<a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *ptr)</td></tr>
+<tr class="memitem:a2770800af86ad11c0f650c2d5752065f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#a2770800af86ad11c0f650c2d5752065f">Lock_is_poisoned</a> (<a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *ptr)</td></tr>
 <tr class="separator:a2770800af86ad11c0f650c2d5752065f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ddfddb89959aa58bdad77959a416bac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#a6ddfddb89959aa58bdad77959a416bac">Lock_clear_poison</a> (<a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *ptr)</td></tr>
+<tr class="memitem:a6ddfddb89959aa58bdad77959a416bac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#a6ddfddb89959aa58bdad77959a416bac">Lock_clear_poison</a> (<a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *ptr)</td></tr>
 <tr class="separator:a6ddfddb89959aa58bdad77959a416bac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74fda8b1db7e1e59cc70225f58f9b50b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#a74fda8b1db7e1e59cc70225f58f9b50b">Lock_mark_poisoned</a> ()</td></tr>
+<tr class="memitem:a74fda8b1db7e1e59cc70225f58f9b50b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#a74fda8b1db7e1e59cc70225f58f9b50b">Lock_mark_poisoned</a> ()</td></tr>
 <tr class="separator:a74fda8b1db7e1e59cc70225f58f9b50b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c2e32969ff851fb0a311f9491011b52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a> (<a class="el" href="structLockGuardPtr.html">LockGuardPtr</a> *ptr)</td></tr>
+<tr class="memitem:a7c2e32969ff851fb0a311f9491011b52"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a> (<a class="el" href="structLockGuardPtr.html">LockGuardPtr</a> *ptr)</td></tr>
 <tr class="separator:a7c2e32969ff851fb0a311f9491011b52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad2b937c09217ad140001c5f97dbc395c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#ad2b937c09217ad140001c5f97dbc395c">Lock_build</a> ()</td></tr>
+<tr class="memitem:ad2b937c09217ad140001c5f97dbc395c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#ad2b937c09217ad140001c5f97dbc395c">Lock_build</a> ()</td></tr>
 <tr class="separator:ad2b937c09217ad140001c5f97dbc395c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedb785bacae99330d760b55c4cdaa4dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="lock_8h.html#afc37b5ae502cbe90cde7bb660c40d614">LockGuard</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a> (<a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *lock)</td></tr>
+<tr class="memitem:aedb785bacae99330d760b55c4cdaa4dd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#afc37b5ae502cbe90cde7bb660c40d614">LockGuard</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a> (<a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *lock)</td></tr>
 <tr class="separator:aedb785bacae99330d760b55c4cdaa4dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae0380d1a8f37c56da96002505cb82be8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#ae0380d1a8f37c56da96002505cb82be8">Lock_wait</a> (<a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="el" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>, <a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> nanos)</td></tr>
+<tr class="memitem:ae0380d1a8f37c56da96002505cb82be8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#ae0380d1a8f37c56da96002505cb82be8">Lock_wait</a> (<a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="el" href="main_2resources_2src_2lock_8c.html#a44855168001873bc8e9fe7d06b3a5104">lock</a>, <a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> nanos)</td></tr>
 <tr class="separator:ae0380d1a8f37c56da96002505cb82be8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbf3f1cbd7698cc6874d44772f2418fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#afbf3f1cbd7698cc6874d44772f2418fb">Lock_notify</a> (<a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="el" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>)</td></tr>
+<tr class="memitem:afbf3f1cbd7698cc6874d44772f2418fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#afbf3f1cbd7698cc6874d44772f2418fb">Lock_notify</a> (<a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="el" href="main_2resources_2src_2lock_8c.html#a44855168001873bc8e9fe7d06b3a5104">lock</a>)</td></tr>
 <tr class="separator:afbf3f1cbd7698cc6874d44772f2418fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3051561f8d709ec70cc4d95a6189bd6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="lock_8h.html#ab3051561f8d709ec70cc4d95a6189bd6">Lock_notify_all</a> (<a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="el" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>)</td></tr>
+<tr class="memitem:ab3051561f8d709ec70cc4d95a6189bd6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2lock_8h.html#ab3051561f8d709ec70cc4d95a6189bd6">Lock_notify_all</a> (<a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *<a class="el" href="main_2resources_2src_2lock_8c.html#a44855168001873bc8e9fe7d06b3a5104">lock</a>)</td></tr>
 <tr class="separator:ab3051561f8d709ec70cc4d95a6189bd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -141,7 +141,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define Lock&#160;&#160;&#160;<a class="el" href="structLockPtr.html">LockPtr</a> <a class="el" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="lock_8h.html#ae13e924c8c7cc5b8ee7f88e219d0b241">Lock_cleanup</a>)))</td>
+          <td class="memname">#define Lock&#160;&#160;&#160;<a class="el" href="structLockPtr.html">LockPtr</a> <a class="el" href="main_2resources_2src_2type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="main_2resources_2src_2lock_8c.html#ae13e924c8c7cc5b8ee7f88e219d0b241">Lock_cleanup</a>)))</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -158,7 +158,7 @@ Functions</h2></td></tr>
           <td class="memname">#define LOCK</td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="lock_8h.html#ad2b937c09217ad140001c5f97dbc395c">Lock_build</a>()</td>
+          <td>&#160;&#160;&#160;<a class="el" href="main_2resources_2src_2lock_8c.html#ad2b937c09217ad140001c5f97dbc395c">Lock_build</a>()</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -186,7 +186,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define LockGuard&#160;&#160;&#160;<a class="el" href="structLockGuardPtr.html">LockGuardPtr</a> <a class="el" href="type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="lock_8h.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a>)))</td>
+          <td class="memname">#define LockGuard&#160;&#160;&#160;<a class="el" href="structLockGuardPtr.html">LockGuardPtr</a> <a class="el" href="main_2resources_2src_2type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="main_2resources_2src_2lock_8c.html#a7c2e32969ff851fb0a311f9491011b52">Lockguard_cleanup</a>)))</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -219,10 +219,10 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> {                                                                                           \</div>
-<div class="line">        LockGuard __lg__ = <a class="code" href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>(&amp;ptr);                                                             \</div>
+<div class="line">        LockGuard __lg__ = <a class="code" href="base_2lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a>(&amp;ptr);                                                             \</div>
 <div class="line">        exe                                                                                        \</div>
 <div class="line">    } <span class="keywordflow">while</span> (0);</div>
-<div class="ttc" id="alock_8h_html_aedb785bacae99330d760b55c4cdaa4dd"><div class="ttname"><a href="lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a></div><div class="ttdeci">LockGuard lock(Lock *lock)</div><div class="ttdef"><b>Definition:</b> lock.c:74</div></div>
+<div class="ttc" id="abase_2lock_8h_html_aedb785bacae99330d760b55c4cdaa4dd"><div class="ttname"><a href="base_2lock_8h.html#aedb785bacae99330d760b55c4cdaa4dd">lock</a></div><div class="ttdeci">LockGuard lock(Lock *lock)</div><div class="ttdef"><b>Definition:</b> lock.c:74</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -263,9 +263,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="lock_8h.html#afc37b5ae502cbe90cde7bb660c40d614">LockGuard</a> lock </td>
+          <td class="memname"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#afc37b5ae502cbe90cde7bb660c40d614">LockGuard</a> lock </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
           <td class="paramname"><em>lock</em></td><td>)</td>
           <td></td>
         </tr>
@@ -281,7 +281,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> Lock_build </td>
+          <td class="memname"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> Lock_build </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -318,7 +318,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void Lock_clear_poison </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>
@@ -336,7 +336,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">bool Lock_is_poisoned </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>
@@ -371,7 +371,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void Lock_notify </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
           <td class="paramname"><em>lock</em></td><td>)</td>
           <td></td>
         </tr>
@@ -389,7 +389,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void Lock_notify_all </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
           <td class="paramname"><em>lock</em></td><td>)</td>
           <td></td>
         </tr>
@@ -407,7 +407,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void Lock_set_poison </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>
@@ -425,7 +425,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void Lock_wait </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2lock_8h.html#a0918621ef865e4bfda79b010db52367d">Lock</a> *&#160;</td>
           <td class="paramname"><em>lock</em>, </td>
         </tr>
         <tr>
