@@ -112,8 +112,8 @@ Functions</h2></td></tr>
 <tr class="separator:af1f19e38fa1fea4380d4c10c4ce1e6e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4562baf48cdfc11df1764bf222bd6f63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#a4562baf48cdfc11df1764bf222bd6f63">type_info_module_file</a> (const char *base_dir, const <a class="el" href="structTypeInfo.html">TypeInfo</a> *type_info, char *buf, <a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> limit)</td></tr>
 <tr class="separator:a4562baf48cdfc11df1764bf222bd6f63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad49019681ecebb0db719d6111b5b8f90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#ad49019681ecebb0db719d6111b5b8f90">build_obj</a> (const char *cc, const char *<a class="el" href="xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029">include_dir</a>, const char *obj_dir, const char *src_dir, const <a class="el" href="structTypeInfo.html">TypeInfo</a> *type_info, const char *obj_prefix, const char *config_include)</td></tr>
-<tr class="separator:ad49019681ecebb0db719d6111b5b8f90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0274b491e70c725c06840a87307bb3a1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#a0274b491e70c725c06840a87307bb3a1">build_obj</a> (const char *cc, const char *<a class="el" href="xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029">include_dir</a>, const char *obj_dir, const char *src_dir, const <a class="el" href="structTypeInfo.html">TypeInfo</a> *type_info, const char *obj_prefix, const char *config_include, const char *impl_def, const char *implconfig_def, const char *args_path)</td></tr>
+<tr class="separator:a0274b491e70c725c06840a87307bb3a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac92dfb6bd3df0d1641e8aa18768e180"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#aac92dfb6bd3df0d1641e8aa18768e180">link_objs</a> (const char *objs_path, const char *base_dir, const char *name)</td></tr>
 <tr class="separator:aac92dfb6bd3df0d1641e8aa18768e180"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1886c18d9a4b558db435714fabb7c1ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="build_8c.html#a1886c18d9a4b558db435714fabb7c1ac">build_internal</a> (const char *base_dir, const char *config_dir)</td></tr>
@@ -165,8 +165,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ad49019681ecebb0db719d6111b5b8f90"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad49019681ecebb0db719d6111b5b8f90">&#9670;&nbsp;</a></span>build_obj()</h2>
+<a id="a0274b491e70c725c06840a87307bb3a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0274b491e70c725c06840a87307bb3a1">&#9670;&nbsp;</a></span>build_obj()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -211,7 +211,25 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>config_include</em>&#160;</td>
+          <td class="paramname"><em>config_include</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>impl_def</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>implconfig_def</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>args_path</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

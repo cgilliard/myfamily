@@ -165,7 +165,50 @@ $(function() {
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
 <div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="main_2resources_2include_2core_2type_8h.html#aa7740fc1c5505b37330419fd68f73345">   94</a></span>&#160;<span class="preprocessor">#define TypeName(obj) (obj).vtable-&gt;name</span></div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_TYPE__</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="main_2resources_2include_2core_2type_8h.html#a7a2d23dc04a724b1476b186e6490a936">   96</a></span>&#160;<span class="preprocessor">#define mut Cleanup</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="main_2resources_2include_2core_2type_8h.html#a045dd54932944d8830380f4596d64446">   97</a></span>&#160;<span class="preprocessor">#define let const Cleanup</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno"><a class="line" href="main_2resources_2include_2core_2type_8h.html#af9be48efc9c3ef877c167dc63ad37031">   99</a></span>&#160;<span class="preprocessor">#define SET_PARAM__(name, value) __config_.name = value;</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="main_2resources_2include_2core_2type_8h.html#aa99e7f621261fe31d667cb3a9c6229c6">  100</a></span>&#160;<span class="preprocessor">#define SET_PARAM_(...) SET_PARAM__(__VA_ARGS__)</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="main_2resources_2include_2core_2type_8h.html#a59184228fa29efbc3df1901ae6da28a2">  101</a></span>&#160;<span class="preprocessor">#define SET_PARAM(ptr, value) SET_PARAM_(EXPAND_ALL value)</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="main_2resources_2include_2core_2type_8h.html#a83dd37cc0bb92d715fc246014e02b359">  102</a></span>&#160;<span class="preprocessor">#define With(x, y) (x, y)</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="comment">// TODO: _fptr__.data may be NULL, need to handle better. Once we have</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="comment">// &#39;Result&#39; implement two versions of this macro. One which</span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="comment">// panics and one which returns error.</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno"><a class="line" href="main_2resources_2include_2core_2type_8h.html#a8c2061699ff9b4bd7cccf3888fb68f53">  107</a></span>&#160;<span class="preprocessor">#define _Impl(name, ...)                                                                           \</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">    ({                                                                                             \</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="preprocessor">        FatPtr _fptr__ = build_fat_ptr(name##_size());                                             \</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">        if (_fptr__.data == NULL)                                                                  \</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">            panic(&quot;Could not allocate sufficient memory&quot;</span>);                                         \</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        Obj _ret__ = { &amp;name##_Vtable__, 0, _fptr__ };                                             \</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        Obj_build_int(&amp;_ret__);                                                                    \</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        name##Config __config_;                                                                    \</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        memset(&amp;__config_, 0, sizeof(name##Config));                                               \</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        __VA_OPT__(FOR_EACH(SET_PARAM, (&amp;__config_, name##Config), (), __VA_ARGS__))               \</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        Obj_build(&amp;_ret__, &amp;__config_);                                                            \</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        _ret__;                                                                                    \</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    })</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
+<div class="line"><a name="l00121"></a><span class="lineno"><a class="line" href="main_2resources_2include_2core_2type_8h.html#a09bee0ae3c92fed40d815295f5b2f0a7">  121</a></span>&#160;<span class="preprocessor">#define _(name, ...) _Impl(name, __VA_ARGS__)</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160; </div>
+<div class="line"><a name="l00123"></a><span class="lineno"><a class="line" href="main_2resources_2include_2core_2type_8h.html#a672c790e598df0e74f506a3c800b255a">  123</a></span>&#160;<span class="preprocessor">#define $Mut(...)                                                                                  \</span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="preprocessor">    __VA_OPT__(((IMPL *)__thread_local_self_Var-&gt;ptr.data)-&gt;__VA_ARGS__)                           \</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="preprocessor">    __VA_OPT__(NONE)                                                                               \</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor">    (__thread_local_self_Var)</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">#define $(...)                                                                                     \</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">    __VA_OPT__(((const IMPL *)__thread_local_self_Const-&gt;ptr.data)-&gt;__VA_ARGS__)                   \</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="preprocessor">    __VA_OPT__(NONE)                                                                               \</span></div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">    (__thread_local_self_Const)</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160; </div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="preprocessor">#define $Config(...) (((const IMPLCONFIG *)(__selfconfig__))-&gt;__VA_ARGS__)</span></div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="preprocessor">#define Fn__(v, i) Fn_expand_##v##_return CAT(i, Fn_expand_##v##_params)</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor">#define Fn_(v) Fn__(v, IMPL)</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">#define Fn(v) Fn_(v)</span></div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160; </div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _CORE_TYPE__</span></div>
 <div class="ttc" id="abase_2types_8h_html_a969c7c1ebb4f70581e040a3034b14ee0"><div class="ttname"><a href="base_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a></div><div class="ttdeci">#define u64</div><div class="ttdef"><b>Definition:</b> types.h:33</div></div>
 <div class="ttc" id="abase_2types_8h_html_af3b86d961da0a3575b4f99c9ffaf01fd"><div class="ttname"><a href="base_2types_8h.html#af3b86d961da0a3575b4f99c9ffaf01fd">u8</a></div><div class="ttdeci">#define u8</div><div class="ttdef"><b>Definition:</b> types.h:27</div></div>
 <div class="ttc" id="acore_2type_8h_html_a093dfe4d6724a8edb8096178edfda2c9"><div class="ttname"><a href="core_2type_8h.html#a093dfe4d6724a8edb8096178edfda2c9">Obj_build_int</a></div><div class="ttdeci">void Obj_build_int(Obj *ptr)</div><div class="ttdef"><b>Definition:</b> type.c:149</div></div>

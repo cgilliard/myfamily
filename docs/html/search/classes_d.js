@@ -1,21 +1,4 @@
 var searchData=
 [
-  ['tabpath_5ft_1212',['tabpath_t',['../structtabpath__t.html',1,'']]],
-  ['threadargswrapper_1213',['ThreadArgsWrapper',['../structThreadArgsWrapper.html',1,'']]],
-  ['threadimpl_1214',['ThreadImpl',['../structThreadImpl.html',1,'']]],
-  ['threadptr_1215',['ThreadPtr',['../structThreadPtr.html',1,'']]],
-  ['token_1216',['Token',['../structToken.html',1,'']]],
-  ['token_5ft_1217',['token_t',['../structtoken__t.html',1,'']]],
-  ['tokenizer_1218',['Tokenizer',['../structTokenizer.html',1,'']]],
-  ['toml_5farray_5ft_1219',['toml_array_t',['../structtoml__array__t.html',1,'']]],
-  ['toml_5farritem_5ft_1220',['toml_arritem_t',['../structtoml__arritem__t.html',1,'']]],
-  ['toml_5fdatum_5ft_1221',['toml_datum_t',['../structtoml__datum__t.html',1,'']]],
-  ['toml_5fkeyval_5ft_1222',['toml_keyval_t',['../structtoml__keyval__t.html',1,'']]],
-  ['toml_5ftable_5ft_1223',['toml_table_t',['../structtoml__table__t.html',1,'']]],
-  ['toml_5ftimestamp_5ft_1224',['toml_timestamp_t',['../structtoml__timestamp__t.html',1,'']]],
-  ['trieimpl_1225',['TrieImpl',['../structTrieImpl.html',1,'']]],
-  ['triematch_1226',['TrieMatch',['../structTrieMatch.html',1,'']]],
-  ['trienc_1227',['TrieNc',['../structTrieNc.html',1,'']]],
-  ['trienode_1228',['TrieNode',['../structTrieNode.html',1,'']]],
-  ['typeinfo_1229',['TypeInfo',['../structTypeInfo.html',1,'']]]
+  ['resourcestats_1273',['ResourceStats',['../structResourceStats.html',1,'']]]
 ];

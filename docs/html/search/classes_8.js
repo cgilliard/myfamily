@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['moduleinfo_1199',['ModuleInfo',['../structModuleInfo.html',1,'']]]
+  ['joinresult_1265',['JoinResult',['../structJoinResult.html',1,'']]]
 ];

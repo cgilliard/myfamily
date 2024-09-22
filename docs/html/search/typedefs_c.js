@@ -1,10 +1,6 @@
 var searchData=
 [
-  ['selfcleanupimpl_1978',['SelfCleanupImpl',['../core_2type_8h.html#a5796fa21fb1fe0f979f17051f4eb3e61',1,'SelfCleanupImpl():&#160;type.h'],['../main_2resources_2include_2core_2type_8h.html#a5796fa21fb1fe0f979f17051f4eb3e61',1,'SelfCleanupImpl():&#160;type.h']]],
-  ['subcommand_1979',['SubCommand',['../args_8h.html#a87a53c87231cf00fe98e41f84d8330b2',1,'args.h']]],
-  ['submoduleinfo_1980',['SubModuleInfo',['../build_8h.html#a2178033cf4e1ae6e9a06b39cf460a2c8',1,'build.h']]],
-  ['suffixpair_1981',['SuffixPair',['../suffix__tree_8c.html#a2b8934fc45bbc5a58b80f979d32603b2',1,'suffix_tree.c']]],
-  ['suffixtreeimpl_1982',['SuffixTreeImpl',['../suffix__tree_8c.html#ab2eb362ecf5b32f74f8cfffa75a83c09',1,'SuffixTreeImpl():&#160;suffix_tree.c'],['../suffix__tree_8h.html#ab2eb362ecf5b32f74f8cfffa75a83c09',1,'SuffixTreeImpl():&#160;suffix_tree.h']]],
-  ['suffixtreematch_1983',['SuffixTreeMatch',['../suffix__tree_8h.html#a6d0901d66318d6b87cd5735e84befae6',1,'suffix_tree.h']]],
-  ['suffixtreenc_1984',['SuffixTreeNc',['../suffix__tree_8h.html#abb0985c04303a5f94b393c057b34ce23',1,'suffix_tree.h']]]
+  ['parserstate_2083',['ParserState',['../parser_8c.html#a0d2a0ce5e4496436db0feb671c86d50c',1,'parser.c']]],
+  ['parserstateenum_2084',['ParserStateEnum',['../parser_8c.html#a0fb2faae4a25f64a347efc12469a6313',1,'parser.c']]],
+  ['pathimpl_2085',['PathImpl',['../path_8h.html#a10c4728e0d825b7a52e8a9939d4f93ff',1,'path.h']]]
 ];
