@@ -51,6 +51,7 @@ typedef struct FnParam {
 
 typedef struct IncompleteFn {
 	char name[MAX_NAME_LEN];
+	bool is_mut;
 	Vec params;
 	char return_type[MAX_NAME_LEN];
 } IncompleteFn;
@@ -66,16 +67,16 @@ typedef struct GlobalIncompleteList {
 	IncompleteType *types;
 } GlobalIncompleteList;
 
-GlobalIncompleteList global_incomplete_list = { 0, NULL };
+GlobalIncompleteList global_incomplete_list = {0, NULL};
 
-void add_to_global_incomplete_list(
-	const char *type_name, const Vec *incomplete_fns, const char *args_file)
-{
+void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_fns,
+								   const char *args_file) {
 	if (global_incomplete_list.count == 0) {
 		global_incomplete_list.types = mymalloc(sizeof(IncompleteType));
 	} else {
-		global_incomplete_list.types = myrealloc(global_incomplete_list.types,
-			sizeof(IncompleteType) * (global_incomplete_list.count + 1));
+		global_incomplete_list.types =
+			myrealloc(global_incomplete_list.types,
+					  sizeof(IncompleteType) * (global_incomplete_list.count + 1));
 	}
 
 	IncompleteType *next = &global_incomplete_list.types[global_incomplete_list.count];
@@ -104,7 +105,11 @@ void add_to_global_incomplete_list(
 			if (!strcmp(param->type, "__config__")) {
 				fprintf(fp, " void *__selfconfig__%s", comma);
 			} else {
-				fprintf(fp, " %s %s%s", param->type, param->name, comma);
+				if (param->is_mut) {
+					fprintf(fp, " %s %s%s", param->type, param->name, comma);
+				} else {
+					fprintf(fp, " const %s %s%s", param->type, param->name, comma);
+				}
 			}
 		}
 		fprintf(fp, ")\"\n");
@@ -114,8 +119,7 @@ void add_to_global_incomplete_list(
 	global_incomplete_list.count++;
 }
 
-void incomplete_fns_cleanup(Vec *incomplete_fns)
-{
+void incomplete_fns_cleanup(Vec *incomplete_fns) {
 	while (vec_size(incomplete_fns)) {
 		IncompleteFn *next = vec_pop(incomplete_fns);
 		vec_cleanup(&next->params);
@@ -152,6 +156,7 @@ typedef enum ParserStateEnum {
 	ParserStateIncompleteExpectReturnType = 26,
 	ParserStateExpectIncompleteNameForImpl = 27,
 	ParserStateImplExpectSemi = 28,
+	ParserStateExpectIncompleteMutFnName = 29,
 	ParserStateOther = 1000000,
 } ParserStateEnum;
 
@@ -174,8 +179,7 @@ typedef struct ParserState {
 
 #define INITIAL_HEADER_CAPACITY (1024 * 25)
 
-void append_to_header(ParserState *state, const char *text, ...)
-{
+void append_to_header(ParserState *state, const char *text, ...) {
 	u64 length;
 	va_list args;
 
@@ -201,8 +205,8 @@ void append_to_header(ParserState *state, const char *text, ...)
 		u64 size = state->header_capacity;
 		if (length + strlen(state->gen_header) + 1 >= state->header_capacity) {
 			size = state->header_capacity + INITIAL_HEADER_CAPACITY;
-			if (length + strlen(state->gen_header) + 1
-				>= state->header_capacity + INITIAL_HEADER_CAPACITY) {
+			if (length + strlen(state->gen_header) + 1 >=
+				state->header_capacity + INITIAL_HEADER_CAPACITY) {
 				size = length + strlen(state->gen_header) + 1;
 			}
 			state->gen_header = myrealloc(state->gen_header, sizeof(char) * (size));
@@ -215,28 +219,26 @@ void append_to_header(ParserState *state, const char *text, ...)
 		strcpy(text_with_nl, text);
 		strcat(text_with_nl, "\n");
 		vsnprintf(state->gen_header + strlen(state->gen_header), size - strlen(state->gen_header),
-			text_with_nl, args);
+				  text_with_nl, args);
 		va_end(args);
 	}
 
 	state->header_capacity += INITIAL_HEADER_CAPACITY;
 }
 
-void free_gen_header(ParserState *state)
-{
+void free_gen_header(ParserState *state) {
 	if (state->gen_header)
 		myfree(state->gen_header);
 }
 
-void proc_ParserStateBeginStatement(ParserState *state, Token *tk)
-{
+void proc_ParserStateBeginStatement(ParserState *state, Token *tk) {
 	if (tk->type == TokenTypeIdent) {
 		if (!strcmp(tk->token, "mod")) {
 			state->state = ParserStateExpectModuleName;
 		} else {
 			if (strlen(tk->token) > MAX_NAME_LEN) {
-				token_display_error(
-					tk, "token name is longer than MAX_NAME_LEN (%i)", MAX_NAME_LEN);
+				token_display_error(tk, "token name is longer than MAX_NAME_LEN (%i)",
+									MAX_NAME_LEN);
 			} else {
 				strcpy(state->type_name, tk->token);
 			}
@@ -256,8 +258,7 @@ void proc_ParserStateBeginStatement(ParserState *state, Token *tk)
 		state->state = ParserStateOther;
 }
 
-void proc_ParserStateInImportListExpectModuleName(ParserState *state, Token *tk)
-{
+void proc_ParserStateInImportListExpectModuleName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
 		token_display_error(tk, "Expected module name. Found [%s]", tk->token);
 	} else {
@@ -271,8 +272,7 @@ void proc_ParserStateInImportListExpectModuleName(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk)
-{
+void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "::")) {
 		state->state = ParserStateInImportListExpectModuleName;
 	} else if (!strcmp(tk->token, ";")) {
@@ -292,8 +292,7 @@ void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectParenBuildDefn(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectParenBuildDefn(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "("))
 		state->state = ParserStateExpectConfigParen;
 	else {
@@ -302,8 +301,7 @@ void proc_ParserStateExpectParenBuildDefn(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectConfigParen(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectConfigParen(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "(")) {
 		state->state = ParserStateExpectConfigType;
 	} else {
@@ -312,17 +310,17 @@ void proc_ParserStateExpectConfigParen(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectConfigType(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectConfigType(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
 		token_display_error(tk, "Expected Type name. Found [%s]", tk->token);
 		state->state = ParserStateBeginStatement;
 	} else {
-		if (strcmp(tk->token, "u8") && strcmp(tk->token, "u16") && strcmp(tk->token, "u32")
-			&& strcmp(tk->token, "u64") && strcmp(tk->token, "u128") && strcmp(tk->token, "bool")
-			&& strcmp(tk->token, "String")) {
-			token_display_error(tk,
-				"Expected one of [u8, u16, u32, u64, u128, bool, String]. Found [%s]", tk->token);
+		if (strcmp(tk->token, "u8") && strcmp(tk->token, "u16") && strcmp(tk->token, "u32") &&
+			strcmp(tk->token, "u64") && strcmp(tk->token, "u128") && strcmp(tk->token, "bool") &&
+			strcmp(tk->token, "String")) {
+			token_display_error(
+				tk, "Expected one of [u8, u16, u32, u64, u128, bool, String]. Found [%s]",
+				tk->token);
 		} else {
 			ConfigType ct;
 			strcpy(ct.type_name, tk->token);
@@ -333,8 +331,7 @@ void proc_ParserStateExpectConfigType(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectConfigComma(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectConfigComma(ParserState *state, Token *tk) {
 	if (strcmp(tk->token, ",")) {
 		state->state = ParserStateBeginStatement;
 		token_display_error(tk, "Expected ','. Found [%s]", tk->token);
@@ -343,8 +340,7 @@ void proc_ParserStateExpectConfigComma(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectConfigName(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectConfigName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
 		token_display_error(tk, "Expected config name. Found [%s]", tk->token);
 		state->state = ParserStateBeginStatement;
@@ -357,8 +353,7 @@ void proc_ParserStateExpectConfigName(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectConfigCloseParen(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectConfigCloseParen(ParserState *state, Token *tk) {
 	if (strcmp(tk->token, ")")) {
 		state->state = ParserStateBeginStatement;
 		token_display_error(tk, "Expected ')'. Found [%s]", tk->token);
@@ -367,8 +362,7 @@ void proc_ParserStateExpectConfigCloseParen(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectConfigCommaOrParenEnd(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectConfigCommaOrParenEnd(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, ",")) {
 		state->state = ParserStateExpectConfigParen;
 	} else if (!strcmp(tk->token, ")")) {
@@ -379,8 +373,7 @@ void proc_ParserStateExpectConfigCommaOrParenEnd(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectType(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectType(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "$")) {
 		// Config definition
 		vec_clear(&state->config_names);
@@ -406,10 +399,10 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk)
 			}
 			append_to_header(state, "} %s;\n", type_name);
 			append_to_header(state,
-				"static Vtable %s_Vtable__ = {\"%s\", 0, NULL, 0, NULL, false};\n", type_name,
-				type_name);
-			append_to_header(
-				state, "static u64 %s_size() {return sizeof(%s); }", type_name, type_name);
+							 "static Vtable %s_Vtable__ = {\"%s\", 0, NULL, 0, NULL, false};\n",
+							 type_name, type_name);
+			append_to_header(state, "static u64 %s_size() {return sizeof(%s); }", type_name,
+							 type_name);
 
 			append_to_header(state, "static void %s_drop_internal(Obj *ptr) {}", type_name);
 
@@ -417,7 +410,7 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk)
                 		\nu64 size = %s_size();                     \
                 		\nmemset(ptr->ptr.data, 0, size);           \
         			\n}",
-				type_name, type_name);
+							 type_name, type_name);
 
 			append_to_header(state, "\
  				\nstatic void __attribute__((constructor)) __add_impls_%s_vtable() {    \
@@ -428,7 +421,8 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk)
 				\nVtableEntry drop_internal = {\"drop_internal\", %s_drop_internal}; \
                                 \nvtable_add_entry(&%s_Vtable__, drop_internal);                       \
 				\n}",
-				type_name, type_name, type_name, type_name, type_name, type_name, type_name);
+							 type_name, type_name, type_name, type_name, type_name, type_name,
+							 type_name);
 
 			u64 count_configs = vec_size(&state->config_types);
 			u64 count_config_names = vec_size(&state->config_names);
@@ -444,8 +438,6 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk)
 			}
 			append_to_header(state, "} %sConfig;", type_name);
 
-			// append_to_header(
-			// state, "typedef struct %sConfig {char dummy; } %sConfig;", type_name, type_name);
 			append_to_header(state, "#define %s %s\n", state->type_name, type_name);
 			vec_clear(&(state->ht.types));
 			vec_clear(&(state->ht.names));
@@ -467,8 +459,7 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectName(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
 		token_display_error(tk, "Expected name. Found [%s]", tk->token);
 		state->state = ParserStateOther;
@@ -485,16 +476,14 @@ void proc_ParserStateExpectName(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk)
-{
+void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk) {
 	if (strcmp(tk->token, ";")) {
 		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
 	}
 	state->state = ParserStateExpectType;
 }
 
-void proc_ParserStateExpectModuleName(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectModuleName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
 		token_display_error(tk, "Expected module name, Found [%s]", tk->token);
 	} else {
@@ -513,8 +502,7 @@ void proc_ParserStateExpectModuleName(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateIncompleteName(ParserState *state, Token *tk)
-{
+void proc_ParserStateIncompleteName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
 		state->state = ParserStateBeginStatement;
 		token_display_error(tk, "Expected incomplete type name. Found [%s]", tk->token);
@@ -524,8 +512,7 @@ void proc_ParserStateIncompleteName(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk)
-{
+void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "{")) {
 		state->state = ParserStateExpectAt;
 	} else {
@@ -534,8 +521,7 @@ void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk)
 	}
 }
 
-void expand_params(ParserState *state, IncompleteFn *fn)
-{
+void expand_params(ParserState *state, IncompleteFn *fn) {
 	u64 param_count = vec_size(&fn->params);
 	if (param_count)
 		append_to_header(state, ",");
@@ -550,13 +536,16 @@ void expand_params(ParserState *state, IncompleteFn *fn)
 		if (!strcmp("__config__", fp->type)) {
 			append_to_header(state, "void *%s%s", fp->name, comma);
 		} else {
-			append_to_header(state, "%s %s%s", fp->type, fp->name, comma);
+			if (fp->is_mut) {
+				append_to_header(state, "%s %s%s", fp->type, fp->name, comma);
+			} else {
+				append_to_header(state, "const %s %s%s", fp->type, fp->name, comma);
+			}
 		}
 	}
 }
 
-void expand_vars(ParserState *state, IncompleteFn *fn)
-{
+void expand_vars(ParserState *state, IncompleteFn *fn) {
 	u64 param_count = vec_size(&fn->params);
 	if (param_count)
 		append_to_header(state, ",");
@@ -571,8 +560,7 @@ void expand_vars(ParserState *state, IncompleteFn *fn)
 	}
 }
 
-void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_file)
-{
+void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_file) {
 	if (!strcmp(tk->token, "@")) {
 		state->state = ParserStateExpectIncompleteFnName;
 	} else if (!strcmp(tk->token, "}")) {
@@ -594,7 +582,11 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 			append_to_header(
 				state, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
 			append_to_header(state, "__thread_local_self_Const = self;");
-			append_to_header(state, "__thread_local_self_Var = self;");
+			if (fn->is_mut) {
+				append_to_header(state, "__thread_local_self_Var = self;");
+			} else {
+				append_to_header(state, "__thread_local_self_Var = NULL;");
+			}
 
 			append_to_header(state, "return impl(self");
 			expand_vars(state, fn);
@@ -612,13 +604,13 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 	}
 }
 
-void proc_ParserStateExpectIncompleteFnName(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectIncompleteMutFnName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
 		state->state = ParserStateBeginStatement;
 		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
 	} else {
 		IncompleteFn fn;
+		fn.is_mut = true;
 		strcpy(fn.name, tk->token);
 		vec_init(&fn.params, 3, sizeof(FnParam));
 		strcpy(fn.return_type, "void");
@@ -627,8 +619,26 @@ void proc_ParserStateExpectIncompleteFnName(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectIncompleteFnParenStart(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectIncompleteFnName(ParserState *state, Token *tk) {
+	if (tk->type != TokenTypeIdent) {
+		state->state = ParserStateBeginStatement;
+		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
+	} else {
+		if (!strcmp(tk->token, "mut")) {
+			state->state = ParserStateExpectIncompleteMutFnName;
+		} else {
+			IncompleteFn fn;
+			fn.is_mut = false;
+			strcpy(fn.name, tk->token);
+			vec_init(&fn.params, 3, sizeof(FnParam));
+			strcpy(fn.return_type, "void");
+			vec_push(&state->incomplete_fns, &fn);
+			state->state = ParserStateExpectIncompleteFnParenStart;
+		}
+	}
+}
+
+void proc_ParserStateExpectIncompleteFnParenStart(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "(")) {
 		state->state = ParserStateExpectIncompleteFnMutOrType;
 	} else {
@@ -637,8 +647,7 @@ void proc_ParserStateExpectIncompleteFnParenStart(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectIncompleteFnType(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectIncompleteFnType(ParserState *state, Token *tk) {
 	if (tk->type == TokenTypeIdent) {
 		u64 last = vec_size(&state->incomplete_fns);
 		if (last == 0) {
@@ -665,8 +674,7 @@ void proc_ParserStateExpectIncompleteFnType(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectIncompleteFnParamName(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectIncompleteFnParamName(ParserState *state, Token *tk) {
 	if (tk->type == TokenTypeIdent) {
 		u64 last = vec_size(&state->incomplete_fns);
 		if (last == 0) {
@@ -693,8 +701,7 @@ void proc_ParserStateExpectIncompleteFnParamName(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectIncompleteFnParamCommaOrEnd(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectIncompleteFnParamCommaOrEnd(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, ",")) {
 		// look for the next param
 		state->state = ParserStateExpectIncompleteFnMutOrType;
@@ -706,8 +713,7 @@ void proc_ParserStateExpectIncompleteFnParamCommaOrEnd(ParserState *state, Token
 	}
 }
 
-void proc_ParserStateIncompleteExpectSemi(ParserState *state, Token *tk)
-{
+void proc_ParserStateIncompleteExpectSemi(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, ";")) {
 		state->state = ParserStateExpectAt;
 	} else {
@@ -716,8 +722,7 @@ void proc_ParserStateIncompleteExpectSemi(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateIncompleteExpectSemiOrTypeArrow(ParserState *state, Token *tk)
-{
+void proc_ParserStateIncompleteExpectSemiOrTypeArrow(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "->")) {
 		state->state = ParserStateIncompleteExpectReturnType;
 	} else if (!strcmp(tk->token, ";")) {
@@ -728,8 +733,7 @@ void proc_ParserStateIncompleteExpectSemiOrTypeArrow(ParserState *state, Token *
 	}
 }
 
-void proc_ParserStateIncompleteExpectReturnType(ParserState *state, Token *tk)
-{
+void proc_ParserStateIncompleteExpectReturnType(ParserState *state, Token *tk) {
 	if (tk->type == TokenTypeIdent) {
 		u64 last = vec_size(&state->incomplete_fns);
 		if (last == 0) {
@@ -748,8 +752,7 @@ void proc_ParserStateIncompleteExpectReturnType(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "mut")) {
 		u64 last = vec_size(&state->incomplete_fns);
 		if (last == 0) {
@@ -778,6 +781,9 @@ void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk)
 			vec_push(&fn->params, &param);
 			proc_ParserStateExpectIncompleteFnType(state, tk);
 		}
+	} else if (!strcmp(tk->token, ")")) {
+		// this is a parameterless function
+		state->state = ParserStateIncompleteExpectSemiOrTypeArrow;
 	} else {
 		// unexpected - error
 		state->state = ParserStateBeginStatement;
@@ -785,8 +791,7 @@ void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk)
-{
+void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk) {
 	if (tk->type == TokenTypeIdent) {
 		// state.type_name = incomplete type name in this context
 
@@ -804,16 +809,17 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk)
 				for (u64 j = 0; j < inc->count; j++) {
 
 					append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
-						complete_type, inc->fns[j].name);
+									 complete_type, inc->fns[j].name);
 
 					expand_params(state, &inc->fns[j]);
 					append_to_header(state, ");");
 				}
-				append_to_header(state,
-					"static void __attribute__((constructor)) vtable_add_inc_impl_%s_%s() {",
+				append_to_header(
+					state, "static void __attribute__((constructor)) vtable_add_inc_impl_%s_%s() {",
 					complete_type, incomplete_type);
 				for (u64 j = 0; j < inc->count; j++) {
-					append_to_header(state,
+					append_to_header(
+						state,
 						"VtableEntry next_%" PRIu64
 						" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
 						j, inc->fns[j].name, complete_type, inc->fns[j].name, complete_type, j);
@@ -824,8 +830,8 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk)
 		}
 
 		if (!found) {
-			token_display_error(
-				tk, "Attempt to complete an unknown incomplete type [%s]", incomplete_type);
+			token_display_error(tk, "Attempt to complete an unknown incomplete type [%s]",
+								incomplete_type);
 		}
 		state->state = ParserStateImplExpectSemi;
 	} else {
@@ -834,8 +840,7 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk)
 	}
 }
 
-void proc_ParserStateImplExpectSemi(ParserState *state, Token *tk)
-{
+void proc_ParserStateImplExpectSemi(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, ";")) {
 		state->state = ParserStateBeginStatement;
 	} else {
@@ -844,8 +849,7 @@ void proc_ParserStateImplExpectSemi(ParserState *state, Token *tk)
 	}
 }
 
-void file_for(const char *base_dir, const ModuleInfo *self_info, char buf[PATH_MAX])
-{
+void file_for(const char *base_dir, const ModuleInfo *self_info, char buf[PATH_MAX]) {
 	Path ret;
 	path_for(&ret, base_dir);
 	for (u64 i = 0; self_info->sub_module_count != 0 && i < self_info->sub_module_count; i++) {
@@ -878,15 +882,14 @@ void file_for(const char *base_dir, const ModuleInfo *self_info, char buf[PATH_M
 	strcpy(buf, path_to_string(&ret));
 }
 
-void init_parser(const char *args_file)
-{
+void init_parser(const char *args_file) {
 	Vec build_fns;
 	vec_init(&build_fns, 1, sizeof(IncompleteFn));
 	IncompleteFn build;
 	strcpy(build.name, "build");
 	strcpy(build.return_type, "void");
 	vec_init(&build.params, 1, sizeof(FnParam));
-	FnParam config = { .is_mut = true };
+	FnParam config = {.is_mut = true};
 	strcpy(config.type, "__config__");
 	strcpy(config.name, "__selfconfig__");
 	vec_push(&build.params, &config);
@@ -903,22 +906,10 @@ void init_parser(const char *args_file)
 	vec_push(&drop_fns, &drop);
 
 	add_to_global_incomplete_list("Drop", &drop_fns, args_file);
-
-	/*
-	FILE *fp = myfopen(args_file, "a");
-
-	fprintf(fp, "-DFn_expand_drop_params=\"_drop(Obj *self)\"\
-		\n-DFn_expand_drop_return=\"void\"\
-		\n-DFn_expand_build_params=\"_build(Obj *self, void *__selfconfig__)\"\
-		\n-DFn_expand_build_return=\"void\"");
-
-	myfclose(fp);
-	*/
 }
 
 void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Vec *types,
-	const ModuleInfo *self_info)
-{
+				  const ModuleInfo *self_info) {
 
 	Path args_path;
 	path_for(&args_path, base_dir);
@@ -1016,6 +1007,8 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 				proc_ParserStateExpectIncompleteNameForImpl(&state, &tk);
 			} else if (state.state == ParserStateImplExpectSemi) {
 				proc_ParserStateImplExpectSemi(&state, &tk);
+			} else if (state.state == ParserStateExpectIncompleteMutFnName) {
+				proc_ParserStateExpectIncompleteMutFnName(&state, &tk);
 			} else if (tk.type == TokenTypePunct) {
 				if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
 					state.state = ParserStateBeginStatement;
@@ -1051,8 +1044,8 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 
 	FILE *fp = myfopen(path_to_string(&gen_header_name), "w");
 	if (fprintf(fp, "%s", state.gen_header) < strlen(state.gen_header))
-		fprintf(
-			stderr, "Partial write of header: %s occurred!\n", path_to_string(&gen_header_name));
+		fprintf(stderr, "Partial write of header: %s occurred!\n",
+				path_to_string(&gen_header_name));
 
 	myfclose(fp);
 	free_gen_header(&state);

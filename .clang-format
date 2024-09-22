@@ -1,4 +1,4 @@
-BasedOnStyle: Webkit
+BasedOnStyle: LLVM
 PointerAlignment: Right
 SpacesInParentheses: false
 DerivePointerAlignment: false
@@ -7,3 +7,6 @@ IndentWidth: 4
 TabWidth: 4
 UseTab: Always
 AllowShortFunctionsOnASingleLine: None
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeParens: ControlStatements
+SpacesInAngles: true
