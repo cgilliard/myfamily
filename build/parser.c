@@ -67,6 +67,63 @@ typedef struct GlobalIncompleteList {
 
 GlobalIncompleteList global_incomplete_list = { 0, NULL };
 
+void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_fns)
+{
+	printf("add to implement list: %s\n", type_name);
+	if (global_incomplete_list.count == 0) {
+		global_incomplete_list.types = mymalloc(sizeof(IncompleteType));
+	} else {
+		global_incomplete_list.types = myrealloc(global_incomplete_list.types,
+			sizeof(IncompleteType) * (global_incomplete_list.count + 1));
+	}
+
+	IncompleteType *next = &global_incomplete_list.types[global_incomplete_list.count];
+	strcpy(next->name, type_name);
+	next->count = vec_size(incomplete_fns);
+	next->fns = mymalloc(sizeof(IncompleteFn) * next->count);
+	for (u64 i = 0; i < next->count; i++) {
+		IncompleteFn *fn = vec_element_at(incomplete_fns, i);
+		strcpy(next->fns[i].name, fn->name);
+		strcpy(next->fns[i].return_type, fn->return_type);
+		vec_init(&next->fns[i].params, 3, sizeof(FnParam));
+		printf("sz=vec_size(&fn->params) %" PRIu64 "\n", vec_size(&fn->params));
+		for (u64 j = 0; j < vec_size(&fn->params); j++) {
+			void *param = vec_element_at(&fn->params, j);
+			vec_push(&next->fns[i].params, param);
+		}
+	}
+
+	global_incomplete_list.count++;
+}
+
+// Add build/drop (internal implementations here)
+void __attribute__((constructor)) __add_global_internal()
+{
+	Vec build_fns;
+	vec_init(&build_fns, 1, sizeof(IncompleteFn));
+	IncompleteFn build;
+	strcpy(build.name, "build");
+	strcpy(build.return_type, "void");
+	vec_init(&build.params, 1, sizeof(FnParam));
+	FnParam config = { .is_mut = true };
+	strcpy(config.type, "__config__");
+	strcpy(config.name, "__selfconfig__");
+	vec_push(&build.params, &config);
+	vec_push(&build_fns, &build);
+
+	add_to_global_incomplete_list("Build", &build_fns);
+
+	Vec drop_fns;
+	vec_init(&drop_fns, 1, sizeof(IncompleteFn));
+	IncompleteFn drop;
+	strcpy(drop.name, "drop");
+	strcpy(drop.return_type, "void");
+	vec_init(&drop.params, 1, sizeof(FnParam));
+	vec_push(&drop_fns, &drop);
+
+	add_to_global_incomplete_list("Drop", &drop_fns);
+}
+
 void incomplete_fns_cleanup(Vec *incomplete_fns)
 {
 	while (vec_size(incomplete_fns)) {
@@ -492,6 +549,7 @@ void expand_params(ParserState *state, IncompleteFn *fn)
 	u64 param_count = vec_size(&fn->params);
 	if (param_count)
 		append_to_header(state, ",");
+	printf("param count = %" PRIu64 "\n", param_count);
 	for (u64 i = 0; i < param_count; i++) {
 		FnParam *fp = vec_element_at(&fn->params, i);
 		char *comma;
@@ -499,7 +557,12 @@ void expand_params(ParserState *state, IncompleteFn *fn)
 			comma = ", ";
 		else
 			comma = "";
-		append_to_header(state, "%s %s%s", fp->type, fp->name, comma);
+		// handle special case for __config__ (in build)
+		if (!strcmp("__config__", fp->type)) {
+			append_to_header(state, "void *%s%s", fp->name, comma);
+		} else {
+			append_to_header(state, "%s %s%s", fp->type, fp->name, comma);
+		}
 	}
 }
 
@@ -517,34 +580,6 @@ void expand_vars(ParserState *state, IncompleteFn *fn)
 			comma = "";
 		append_to_header(state, "%s%s", fp->name, comma);
 	}
-}
-
-void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_fns)
-{
-	printf("add to implement list: %s\n", type_name);
-	if (global_incomplete_list.count == 0) {
-		global_incomplete_list.types = mymalloc(sizeof(IncompleteType));
-	} else {
-		global_incomplete_list.types = myrealloc(global_incomplete_list.types,
-			sizeof(IncompleteType) * (global_incomplete_list.count + 1));
-	}
-
-	IncompleteType *next = &global_incomplete_list.types[global_incomplete_list.count];
-	strcpy(next->name, type_name);
-	next->count = vec_size(incomplete_fns);
-	next->fns = mymalloc(sizeof(IncompleteFn) * next->count);
-	for (u64 i = 0; i < next->count; i++) {
-		IncompleteFn *fn = vec_element_at(incomplete_fns, i);
-		strcpy(next->fns[i].name, fn->name);
-		strcpy(next->fns[i].return_type, fn->return_type);
-		vec_init(&next->fns[i].params, 3, sizeof(FnParam));
-		for (u64 j = 0; j < vec_size(&fn->params); j++) {
-			void *param = vec_element_at(&fn->params, j);
-			vec_push(&next->fns[i].params, param);
-		}
-	}
-
-	global_incomplete_list.count++;
 }
 
 void proc_ParserStateExpectAt(ParserState *state, Token *tk)
@@ -567,13 +602,16 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk)
 			append_to_header(state, ") = find_fn(self, \"%s\");", fn->name);
 			append_to_header(
 				state, "if(impl == NULL) panic(\"Implementation for [%s] not found!\");", fn->name);
-			append_to_header(state, "printf(\"about to call impl\\n\");");
+
+			append_to_header(
+				state, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
+			append_to_header(state, "__thread_local_self_Const = self;");
+			append_to_header(state, "__thread_local_self_Var = self;");
+
 			append_to_header(state, "return impl(self");
 			expand_vars(state, fn);
 			append_to_header(state, ");");
 			append_to_header(state, "}");
-
-			printf("------->fn name = %s,return_type=%s\n", fn->name, fn->return_type);
 		}
 
 		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns);

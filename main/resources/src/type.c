@@ -170,14 +170,14 @@ void Obj_build_int(Obj *ptr)
 
 void Obj_build(Obj *ptr, const void *config)
 {
-	void (*do_build)(const void *config) = find_fn(ptr, "build");
+	void (*do_build)(Obj *ptr, const void *config) = find_fn(ptr, "build");
 	if (do_build) {
 		// setup self references
 		Obj *tmp_Var = __thread_local_self_Var;
 		const Obj *tmp_Const = __thread_local_self_Const;
 		__thread_local_self_Const = ptr;
 		__thread_local_self_Var = ptr;
-		do_build(config);
+		do_build(ptr, config);
 		// revert
 		__thread_local_self_Var = tmp_Var;
 		__thread_local_self_Const = tmp_Const;

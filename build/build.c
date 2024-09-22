@@ -220,7 +220,8 @@ u64 type_info_module_file(const char *base_dir, const TypeInfo *type_info, char 
 }
 
 void build_obj(const char *cc, const char *include_dir, const char *obj_dir, const char *src_dir,
-	const TypeInfo *type_info, const char *obj_prefix, const char *config_include)
+	const TypeInfo *type_info, const char *obj_prefix, const char *config_include,
+	const char *impl_def, const char *implconfig_def)
 {
 	Path obj_path;
 	path_for(&obj_path, obj_dir);
@@ -259,13 +260,14 @@ void build_obj(const char *cc, const char *include_dir, const char *obj_dir, con
 		strcat(config_include_param, config_include);
 		const char *args[] = { cc, "-Wno-attributes", "-Wno-ignored-attributes", include_param,
 			config_include_param, "-c", "-o", path_to_string(&obj_path), path_to_string(&src_path),
-			NULL };
+			impl_def, implconfig_def, NULL };
 		if (execute_process(args)) {
 			exit_error("execution of process '%s' failed", args[0]);
 		}
 	} else {
 		const char *args[] = { cc, "-Wno-attributes", "-Wno-ignored-attributes", include_param,
-			"-c", "-o", path_to_string(&obj_path), path_to_string(&src_path), NULL };
+			"-c", "-o", path_to_string(&obj_path), path_to_string(&src_path), impl_def,
+			implconfig_def, NULL };
 		if (execute_process(args)) {
 			exit_error("execution of process '%s' failed", args[0]);
 		}
@@ -328,13 +330,6 @@ void build_internal(const char *base_dir, const char *config_dir)
 	path_push(&include_dir, "resources");
 	path_push(&include_dir, "include");
 
-	/*
-	char *include_full_path = path_to_string(&include_dir);
-	char include_param[strlen(include_full_path) + 10];
-	strcpy(include_param, "-I");
-	strcat(include_param, include_full_path);
-	*/
-
 	glob_t glob_result;
 	glob(path_to_string(&config_src), 0, NULL, &glob_result);
 
@@ -355,7 +350,8 @@ void build_internal(const char *base_dir, const char *config_dir)
 		path_file_stem(&glob_path, path_stem, strlen(path_file_name(&glob_path)));
 		strcpy(ti.type_name, path_stem);
 		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path),
-			path_to_string(&config_dir_src_path), &ti, "___internal_objs_", NULL);
+			path_to_string(&config_dir_src_path), &ti, "___internal_objs_", NULL,
+			"-DIMPL=", "-DIMPLCONFIG=");
 	}
 }
 
@@ -414,8 +410,21 @@ int proc_build(const char *base_dir, const char *config_dir)
 
 		path_push(&include_dir, gen_header_bs_dir);
 
+		char type_str[PATH_MAX * 2];
+		type_info_to_string(next, type_str, PATH_MAX * 2);
+		printf("type=%s\n", type_str);
+
+		char dimpl[(PATH_MAX * 2) + 30];
+		strcpy(dimpl, "-DIMPL=");
+		strcat(dimpl, type_str);
+
+		char dimplconfig[(PATH_MAX * 2) + 30];
+		strcpy(dimplconfig, "-DIMPLCONFIG=");
+		strcat(dimplconfig, type_str);
+		strcat(dimplconfig, "Config");
+
 		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, next,
-			type_prefix, path_to_string(&config_include_dir));
+			type_prefix, path_to_string(&config_include_dir), dimpl, dimplconfig);
 
 		path_pop(&include_dir);
 	}
@@ -428,7 +437,7 @@ int proc_build(const char *base_dir, const char *config_dir)
 
 	// build main
 	build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, &main_ti,
-		"type_____", path_to_string(&config_include_dir));
+		"type_____", path_to_string(&config_include_dir), "-DIMPL=", "-DIMPLCONFIG=");
 
 	// link objects
 	link_objs(path_to_string(&objs_path), base_dir, fti.name);

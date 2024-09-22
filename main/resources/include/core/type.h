@@ -120,4 +120,18 @@ FatPtr build_fat_ptr(u64 size);
 
 #define _(name, ...) _Impl(name, __VA_ARGS__)
 
+#define $Mut(...)                                                                                  \
+	__VA_OPT__(((IMPL *)__thread_local_self_Var->ptr.data)->__VA_ARGS__)                           \
+	__VA_OPT__(NONE)                                                                               \
+	(__thread_local_self_Var)
+
+#define $(...)                                                                                     \
+	__VA_OPT__(((const IMPL *)__thread_local_self_Const->ptr.data)->__VA_ARGS__)                   \
+	__VA_OPT__(NONE)                                                                               \
+	(__thread_local_self_Const)
+
+#define $Config(...) (((const IMPLCONFIG *)(__selfconfig__))->__VA_ARGS__)
+
+#define Fn(v) EXPAND(CAT(Fn_expand_, v))
+
 #endif // _CORE_TYPE__
