@@ -17,3 +17,7 @@
 #include <core/types.h>
 
 #include <build_specific.h>
+
+#ifdef IMPL
+TYPE_EXPAND(IMPL)
+#endif // IMPL

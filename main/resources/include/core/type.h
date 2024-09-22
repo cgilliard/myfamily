@@ -136,4 +136,10 @@ FatPtr build_fat_ptr(u64 size);
 #define fn_(v) fn__(v, IMPL)
 #define fn(v) fn_(v)
 
+#define TYPE_EXPAND_(t) Type_Expand_##t##_
+#define TYPE_EXPAND(t) TYPE_EXPAND_(t)
+// this is to handle cases where -DIMPL is set to an empty string. We want to do nothing in those
+// cases.
+#define Type_Expand__
+
 #endif // _CORE_TYPE__

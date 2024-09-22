@@ -373,7 +373,7 @@ void proc_ParserStateExpectConfigCommaOrParenEnd(ParserState *state, Token *tk) 
 	}
 }
 
-void proc_ParserStateExpectType(ParserState *state, Token *tk) {
+void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_file) {
 	if (!strcmp(tk->token, "$")) {
 		// Config definition
 		vec_clear(&state->config_names);
@@ -398,31 +398,52 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk) {
 				append_to_header(state, "char dummy;");
 			}
 			append_to_header(state, "} %s;\n", type_name);
-			append_to_header(state,
-							 "static Vtable %s_Vtable__ = {\"%s\", 0, NULL, 0, NULL, false};\n",
-							 type_name, type_name);
-			append_to_header(state, "static u64 %s_size() {return sizeof(%s); }", type_name,
-							 type_name);
 
-			append_to_header(state, "static void %s_drop_internal(Obj *ptr) {}", type_name);
+			append_to_header(state, "extern Vtable %s_Vtable__;", type_name);
+			append_to_header(state, "u64 %s_size();", type_name);
+			append_to_header(state, "void %s_drop_internal(Obj *ptr);", type_name);
+			append_to_header(state, "void %s_build_internal(Obj *ptr);", type_name);
 
-			append_to_header(state, "static void %s_build_internal(Obj *ptr) {  \
-                		\nu64 size = %s_size();                     \
-                		\nmemset(ptr->ptr.data, 0, size);           \
-        			\n}",
-							 type_name, type_name);
+			// add to args
+			FILE *fp = myfopen(args_file, "a");
+			fprintf(fp, "-DType_Expand_%s_=\"", type_name);
+			fprintf(fp, "Vtable %s_Vtable__ = {\\\"%s\\\", 0, NULL, 0, NULL, false};\
+				u64 %s_size() {return sizeof(%s); }\
+				void %s_drop_internal(Obj *ptr) {}\
+				void %s_build_internal(Obj *ptr) {\
+				u64 size = %s_size();                     \
+				memset(ptr->ptr.data, 0, size);           \
+				}",
+					type_name, type_name, type_name, type_name, type_name, type_name, type_name);
+			fprintf(fp, "\"\n");
+			myfclose(fp);
+			/*
+						append_to_header(state,
+										 "staticVtable %s_Vtable__ = {\"%s\", 0, NULL, 0, NULL,
+			   false};\n", type_name, type_name); append_to_header(state, "static u64 %s_size()
+			   {return sizeof(%s); }", type_name, type_name);
 
-			append_to_header(state, "\
- 				\nstatic void __attribute__((constructor)) __add_impls_%s_vtable() {    \
-                		\nVtableEntry size = {\"size\", %s_size};                               \
-                		\nvtable_add_entry(&%s_Vtable__, size);                                 \
-				\nVtableEntry build_internal = {\"build_internal\", %s_build_internal}; \
-                                \nvtable_add_entry(&%s_Vtable__, build_internal);                       \
-				\nVtableEntry drop_internal = {\"drop_internal\", %s_drop_internal}; \
-                                \nvtable_add_entry(&%s_Vtable__, drop_internal);                       \
-				\n}",
-							 type_name, type_name, type_name, type_name, type_name, type_name,
-							 type_name);
+						append_to_header(state, "static void %s_drop_internal(Obj *ptr) {}",
+			   type_name);
+
+						append_to_header(state, "static void %s_build_internal(Obj *ptr) {  \
+									\nu64 size = %s_size();                     \
+									\nmemset(ptr->ptr.data, 0, size);           \
+								\n}",
+										 type_name, type_name);
+
+										 */
+			append_to_header(
+				state, "static void __attribute__((constructor)) __add_impls_%s_vtable() {\
+				\nVtableEntry size =\
+				{\
+				\"size\", %s_size}; \
+									\nvtable_add_entry(&%s_Vtable__, size); \
+							\nVtableEntry build_internal = {\"build_internal\", %s_build_internal};\
+											\nvtable_add_entry(& % s_Vtable__, build_internal);\
+							\nVtableEntry drop_internal = {\"drop_internal\", %s_drop_internal}; \
+											\nvtable_add_entry(&%s_Vtable__, drop_internal);  \n}",
+				type_name, type_name, type_name, type_name, type_name, type_name, type_name);
 
 			u64 count_configs = vec_size(&state->config_types);
 			u64 count_config_names = vec_size(&state->config_names);
@@ -956,7 +977,7 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 			} else if (state.state == ParserStateExpectModuleName) {
 				proc_ParserStateExpectModuleName(&state, &tk);
 			} else if (state.state == ParserStateExpectType) {
-				proc_ParserStateExpectType(&state, &tk);
+				proc_ParserStateExpectType(&state, &tk, args_file);
 			} else if (state.state == ParserStateExpectName) {
 				proc_ParserStateExpectName(&state, &tk);
 			} else if (state.state == ParserStateInTypeExpectSemi) {
