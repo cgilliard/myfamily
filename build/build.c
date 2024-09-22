@@ -29,8 +29,7 @@ typedef struct FamTomlInfo {
 	char version[MAX_NAME_LEN];
 } FamTomlInfo;
 
-FamTomlInfo extract_toml_info(const char *base_dir)
-{
+FamTomlInfo extract_toml_info(const char *base_dir) {
 	Path toml;
 	path_for(&toml, base_dir);
 	path_push(&toml, "fam.toml");
@@ -78,8 +77,7 @@ FamTomlInfo extract_toml_info(const char *base_dir)
 	return ret;
 }
 
-void ensure_target_structure(const char *base_dir)
-{
+void ensure_target_structure(const char *base_dir) {
 	Path target;
 	path_for(&target, base_dir);
 	path_push(&target, "target");
@@ -108,8 +106,7 @@ void ensure_target_structure(const char *base_dir)
 	}
 }
 
-u64 module_to_string(const ModuleInfo *module_info, char *buf, u64 limit)
-{
+u64 module_to_string(const ModuleInfo *module_info, char *buf, u64 limit) {
 	u64 itt = 0;
 	strncpy(buf, "", limit);
 	for (u64 i = 0; i < module_info->sub_module_count; i++) {
@@ -126,8 +123,7 @@ u64 module_to_string(const ModuleInfo *module_info, char *buf, u64 limit)
 	return itt;
 }
 
-u64 module_to_type_string(const ModuleInfo *type_info, char *buf, u64 limit)
-{
+u64 module_to_type_string(const ModuleInfo *type_info, char *buf, u64 limit) {
 	u64 itt = 0;
 	strncpy(buf, "type_____", limit);
 	itt += 10;
@@ -145,8 +141,7 @@ u64 module_to_type_string(const ModuleInfo *type_info, char *buf, u64 limit)
 	return itt;
 }
 
-u64 type_info_to_string(const TypeInfo *type_info, char *buf, u64 limit)
-{
+u64 type_info_to_string(const TypeInfo *type_info, char *buf, u64 limit) {
 	u64 itt = 0;
 	strncpy(buf, "type_____", limit);
 	itt += 10;
@@ -165,8 +160,7 @@ u64 type_info_to_string(const TypeInfo *type_info, char *buf, u64 limit)
 	return itt;
 }
 
-u64 type_info_to_path(const TypeInfo *type_info, char *buf, u64 limit)
-{
+u64 type_info_to_path(const TypeInfo *type_info, char *buf, u64 limit) {
 	u64 itt = 0;
 	strncpy(buf, "", limit);
 	for (u64 i = 0; i < type_info->mi.sub_module_count; i++) {
@@ -184,8 +178,7 @@ u64 type_info_to_path(const TypeInfo *type_info, char *buf, u64 limit)
 	return itt;
 }
 
-u64 type_info_module_file(const char *base_dir, const TypeInfo *type_info, char *buf, u64 limit)
-{
+u64 type_info_module_file(const char *base_dir, const TypeInfo *type_info, char *buf, u64 limit) {
 	Path p;
 	path_for(&p, base_dir);
 	if (type_info->mi.sub_module_count) {
@@ -224,9 +217,8 @@ u64 type_info_module_file(const char *base_dir, const TypeInfo *type_info, char 
 }
 
 void build_obj(const char *cc, const char *include_dir, const char *obj_dir, const char *src_dir,
-	const TypeInfo *type_info, const char *obj_prefix, const char *config_include,
-	const char *impl_def, const char *implconfig_def, const char *args_path)
-{
+			   const TypeInfo *type_info, const char *obj_prefix, const char *config_include,
+			   const char *impl_def, const char *implconfig_def, const char *args_path) {
 	Path obj_path;
 	path_for(&obj_path, obj_dir);
 
@@ -266,24 +258,42 @@ void build_obj(const char *cc, const char *include_dir, const char *obj_dir, con
 		char config_include_param[strlen(config_include) + 5];
 		strcpy(config_include_param, "-I");
 		strcat(config_include_param, config_include);
-		const char *args[] = { cc, "-Wno-attributes", "-Wno-ignored-attributes", include_param,
-			config_include_param, "-c", "-o", path_to_string(&obj_path), path_to_string(&src_path),
-			impl_def, implconfig_def, args_path_with_at, NULL };
+		const char *args[] = {cc,
+							  "-Wno-attributes",
+							  "-Wno-ignored-attributes",
+							  include_param,
+							  config_include_param,
+							  "-c",
+							  "-o",
+							  path_to_string(&obj_path),
+							  path_to_string(&src_path),
+							  impl_def,
+							  implconfig_def,
+							  args_path_with_at,
+							  NULL};
 		if (execute_process(args)) {
 			exit_error("execution of process '%s' failed", args[0]);
 		}
 	} else {
-		const char *args[] = { cc, "-Wno-attributes", "-Wno-ignored-attributes", include_param,
-			"-c", "-o", path_to_string(&obj_path), path_to_string(&src_path), impl_def,
-			implconfig_def, args_path_with_at, NULL };
+		const char *args[] = {cc,
+							  "-Wno-attributes",
+							  "-Wno-ignored-attributes",
+							  include_param,
+							  "-c",
+							  "-o",
+							  path_to_string(&obj_path),
+							  path_to_string(&src_path),
+							  impl_def,
+							  implconfig_def,
+							  args_path_with_at,
+							  NULL};
 		if (execute_process(args)) {
 			exit_error("execution of process '%s' failed", args[0]);
 		}
 	}
 }
 
-void link_objs(const char *objs_path, const char *base_dir, const char *name)
-{
+void link_objs(const char *objs_path, const char *base_dir, const char *name) {
 	glob_t glob_result;
 	Path objs_dir;
 	path_for(&objs_dir, base_dir);
@@ -314,8 +324,7 @@ void link_objs(const char *objs_path, const char *base_dir, const char *name)
 	}
 }
 
-void build_internal(const char *base_dir, const char *config_dir)
-{
+void build_internal(const char *base_dir, const char *config_dir) {
 	Path build_path;
 	path_for(&build_path, base_dir);
 	path_push(&build_path, "target");
@@ -364,13 +373,12 @@ void build_internal(const char *base_dir, const char *config_dir)
 		path_file_stem(&glob_path, path_stem, strlen(path_file_name(&glob_path)));
 		strcpy(ti.type_name, path_stem);
 		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path),
-			path_to_string(&config_dir_src_path), &ti, "___internal_objs_", NULL,
-			"-DIMPL=", "-DIMPLCONFIG=", path_to_string(&args_path));
+				  path_to_string(&config_dir_src_path), &ti, "___internal_objs_", NULL,
+				  "-DIMPL=", "-DIMPLCONFIG=", path_to_string(&args_path));
 	}
 }
 
-int proc_build(const char *base_dir, const char *config_dir)
-{
+int proc_build(const char *base_dir, const char *config_dir) {
 	fprintf(stderr, "proc build %s %s\n", base_dir, config_dir);
 	FamTomlInfo fti = extract_toml_info(base_dir);
 	fprintf(stderr, "building project %s. fam.toml generated by %s.\n", fti.name, fti.version);
@@ -430,7 +438,12 @@ int proc_build(const char *base_dir, const char *config_dir)
 
 	while (vec_size(&headers)) {
 		ModuleInfo *next = vec_pop(&headers);
-		parse_header(config_dir, base_dir, &headers, &types, next);
+		ModuleInfo n;
+		n.sub_module_count = next->sub_module_count;
+		for (u64 i = 0; i < n.sub_module_count; i++) {
+			strcpy(n.module_list[i].name, next->module_list[i].name);
+		}
+		parse_header(config_dir, base_dir, &headers, &types, &n);
 	}
 
 	while (vec_size(&types)) {
@@ -457,8 +470,8 @@ int proc_build(const char *base_dir, const char *config_dir)
 		strcat(dimplconfig, "Config");
 
 		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, next,
-			type_prefix, path_to_string(&config_include_dir), dimpl, dimplconfig,
-			path_to_string(&args_path));
+				  type_prefix, path_to_string(&config_include_dir), dimpl, dimplconfig,
+				  path_to_string(&args_path));
 
 		path_pop(&include_dir);
 	}
@@ -471,8 +484,8 @@ int proc_build(const char *base_dir, const char *config_dir)
 
 	// build main
 	build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, &main_ti,
-		"type_____", path_to_string(&config_include_dir),
-		"-DIMPL=", "-DIMPLCONFIG=", path_to_string(&args_path));
+			  "type_____", path_to_string(&config_include_dir),
+			  "-DIMPL=", "-DIMPLCONFIG=", path_to_string(&args_path));
 
 	// link objects
 	link_objs(path_to_string(&objs_path), base_dir, fti.name);

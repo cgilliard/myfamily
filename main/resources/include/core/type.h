@@ -109,7 +109,7 @@ FatPtr build_fat_ptr(u64 size);
 		FatPtr _fptr__ = build_fat_ptr(name##_size());                                             \
 		if (_fptr__.data == NULL)                                                                  \
 			panic("Could not allocate sufficient memory");                                         \
-		Obj _ret__ = { &name##_Vtable__, 0, _fptr__ };                                             \
+		Obj _ret__ = {&name##_Vtable__, 0, _fptr__};                                               \
 		Obj_build_int(&_ret__);                                                                    \
 		name##Config __config_;                                                                    \
 		memset(&__config_, 0, sizeof(name##Config));                                               \
@@ -132,8 +132,8 @@ FatPtr build_fat_ptr(u64 size);
 
 #define $Config(...) (((const IMPLCONFIG *)(__selfconfig__))->__VA_ARGS__)
 
-#define Fn__(v, i) Fn_expand_##v##_return CAT(i, Fn_expand_##v##_params)
-#define Fn_(v) Fn__(v, IMPL)
-#define Fn(v) Fn_(v)
+#define fn__(v, i) Fn_expand_##v##_return CAT(i, Fn_expand_##v##_params)
+#define fn_(v) fn__(v, IMPL)
+#define fn(v) fn_(v)
 
 #endif // _CORE_TYPE__
