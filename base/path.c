@@ -20,13 +20,11 @@
 #include <string.h>
 #include <sys/stat.h>
 
-void path_cleanup(PathImpl *ptr)
-{
+void path_cleanup(PathImpl *ptr) {
 	chain_free(&ptr->ptr);
 }
 
-int path_for(Path *p, const char *path)
-{
+int path_for(Path *p, const char *path) {
 	if (path == NULL) {
 		errno = EINVAL;
 		return -1;
@@ -42,8 +40,7 @@ int path_for(Path *p, const char *path)
 	return 0;
 }
 
-int path_replace_home(Path *p)
-{
+int path_replace_home(Path *p) {
 	const char *home_dir = getenv("HOME");
 	if (home_dir == NULL) {
 		errno = EINVAL;
@@ -68,8 +65,7 @@ int path_replace_home(Path *p)
 	return 0;
 }
 
-int path_canonicalize(Path *p)
-{
+int path_canonicalize(Path *p) {
 	if (path_replace_home(p))
 		return -1;
 	char buf[PATH_MAX];
@@ -91,8 +87,7 @@ int path_canonicalize(Path *p)
 	strcpy(p->ptr.data, buf);
 	return 0;
 }
-int path_push(Path *p, const char *next)
-{
+int path_push(Path *p, const char *next) {
 	if (next == NULL) {
 		errno = EINVAL;
 		return -1;
@@ -123,8 +118,7 @@ int path_push(Path *p, const char *next)
 	strcat(p->ptr.data, next);
 	return 0;
 }
-int path_pop(Path *p)
-{
+int path_pop(Path *p) {
 	char *res = rstrstr(p->ptr.data, PATH_SEPARATOR);
 	if (res) {
 		int index = res - (char *)p->ptr.data;
@@ -136,13 +130,11 @@ int path_pop(Path *p)
 	return 0;
 }
 
-char *path_to_string(const Path *p)
-{
+char *path_to_string(const Path *p) {
 	return p->ptr.data;
 }
 
-char *path_file_name(const Path *p)
-{
+char *path_file_name(const Path *p) {
 	char *ret = rstrstr(p->ptr.data, PATH_SEPARATOR);
 	if (ret != NULL && strlen(ret) > 0)
 		return ret + 1;
@@ -150,16 +142,14 @@ char *path_file_name(const Path *p)
 	return ret;
 }
 
-bool path_exists(const Path *p)
-{
+bool path_exists(const Path *p) {
 	if (p->ptr.data == NULL && p->ptr.len == 0) {
 		errno = EINVAL;
 		return false;
 	}
 	return access(p->ptr.data, F_OK) == 0;
 }
-bool path_is_dir(const Path *p)
-{
+bool path_is_dir(const Path *p) {
 	if (p->ptr.data == NULL && p->ptr.len == 0) {
 		errno = EINVAL;
 		return false;
@@ -171,8 +161,7 @@ bool path_is_dir(const Path *p)
 	return false;
 }
 
-bool path_mkdir(Path *p, mode_t mode, bool parent)
-{
+bool path_mkdir(Path *p, mode_t mode, bool parent) {
 	if (p->ptr.data == NULL && p->ptr.len == 0) {
 		errno = EINVAL;
 		return false;
@@ -234,20 +223,23 @@ bool path_mkdir(Path *p, mode_t mode, bool parent)
 	return true;
 }
 
-int path_copy(Path *dst, const Path *src)
-{
+int path_copy(Path *dst, const Path *src) {
 	return path_for(dst, path_to_string(src));
 }
 
-int path_file_stem(const Path *p, char *buf, u64 limit)
-{
-	strncpy(buf, path_file_name(p), limit);
-	for (u64 i = strlen(buf) - 1; i >= 0; i--) {
+int path_file_stem(const Path *p, char *buf, u64 limit) {
+	// Copy the file name into the buffer, ensuring proper null termination
+	strncpy(buf, path_file_name(p), limit - 1);
+	buf[limit - 1] = '\0'; // Manually ensure null-termination
+
+	u64 buflen = strlen(buf); // Compute length once
+	for (ssize_t i = buflen - 1; i >= 0; i--) {
 		if (buf[i] == '.') {
-			buf[i] = 0;
+			buf[i] = '\0'; // Null-terminate at the dot
 			break;
-		} else if (buf[i] == '/')
-			break;
+		} else if (buf[i] == '/') {
+			break; // Stop if we encounter a directory separator
+		}
 	}
 	return 0;
 }

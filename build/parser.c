@@ -285,6 +285,7 @@ void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk) 
 			char *last = state->import_module_info.module_list[import_list_size - 1].name;
 			append_to_header(state, "typedef struct %s %s;", type_name, type_name);
 			append_to_header(state, "#define %s %s", last, type_name);
+			append_to_header(state, "Type_Import_Expand_%s_", type_name);
 			state->state = ParserStateBeginStatement;
 		}
 	} else {
@@ -416,48 +417,42 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 				}",
 					type_name, type_name, type_name, type_name, type_name, type_name, type_name);
 			fprintf(fp, "\"\n");
-			myfclose(fp);
-			/*
-						append_to_header(state,
-										 "staticVtable %s_Vtable__ = {\"%s\", 0, NULL, 0, NULL,
-			   false};\n", type_name, type_name); append_to_header(state, "static u64 %s_size()
-			   {return sizeof(%s); }", type_name, type_name);
-
-						append_to_header(state, "static void %s_drop_internal(Obj *ptr) {}",
-			   type_name);
-
-						append_to_header(state, "static void %s_build_internal(Obj *ptr) {  \
-									\nu64 size = %s_size();                     \
-									\nmemset(ptr->ptr.data, 0, size);           \
-								\n}",
-										 type_name, type_name);
-
-										 */
 			append_to_header(
 				state, "static void __attribute__((constructor)) __add_impls_%s_vtable() {\
 				\nVtableEntry size =\
 				{\
 				\"size\", %s_size}; \
-									\nvtable_add_entry(&%s_Vtable__, size); \
-							\nVtableEntry build_internal = {\"build_internal\", %s_build_internal};\
-											\nvtable_add_entry(& % s_Vtable__, build_internal);\
-							\nVtableEntry drop_internal = {\"drop_internal\", %s_drop_internal}; \
-											\nvtable_add_entry(&%s_Vtable__, drop_internal);  \n}",
+				\nvtable_add_entry(&%s_Vtable__, size); \
+				\nVtableEntry build_internal = {\"build_internal\", %s_build_internal};\
+				\nvtable_add_entry(& % s_Vtable__, build_internal);\
+				\nVtableEntry drop_internal = {\"drop_internal\", %s_drop_internal}; \
+				\nvtable_add_entry(&%s_Vtable__, drop_internal);  \n}",
 				type_name, type_name, type_name, type_name, type_name, type_name, type_name);
 
 			u64 count_configs = vec_size(&state->config_types);
 			u64 count_config_names = vec_size(&state->config_names);
 			append_to_header(state, "typedef struct %sConfig {", type_name);
+			fprintf(fp, "-DType_Import_Expand_%s_=\"", type_name);
+			fprintf(fp, "u64 %s_size();", type_name);
+			fprintf(fp, "extern Vtable %s_Vtable__;", type_name);
+			fprintf(fp, "typedef struct %sConfig {", type_name);
+
 			if (count_configs == count_config_names && count_configs > 0) {
 				for (u64 i = 0; i < count_configs; i++) {
 					ConfigType *t = vec_element_at(&state->config_types, i);
 					ConfigName *n = vec_element_at(&state->config_names, i);
 					append_to_header(state, "%s %s;", t->type_name, n->name);
+					fprintf(fp, "%s %s;", t->type_name, n->name);
 				}
 			} else {
 				append_to_header(state, "char dummy;");
+				fprintf(fp, "char dummy;");
 			}
 			append_to_header(state, "} %sConfig;", type_name);
+			fprintf(fp, "} %sConfig;", type_name);
+			fprintf(fp, "\"\n");
+
+			myfclose(fp);
 
 			append_to_header(state, "#define %s %s\n", state->type_name, type_name);
 			vec_clear(&(state->ht.types));
