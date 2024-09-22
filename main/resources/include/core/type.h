@@ -132,6 +132,8 @@ FatPtr build_fat_ptr(u64 size);
 
 #define $Config(...) (((const IMPLCONFIG *)(__selfconfig__))->__VA_ARGS__)
 
-#define Fn(v) EXPAND(CAT(Fn_expand_, v))
+#define Fn__(v, i) Fn_expand_##v##_return CAT(i, Fn_expand_##v##_params)
+#define Fn_(v) Fn__(v, IMPL)
+#define Fn(v) Fn_(v)
 
 #endif // _CORE_TYPE__

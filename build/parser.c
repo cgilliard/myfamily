@@ -86,7 +86,6 @@ void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_
 		strcpy(next->fns[i].name, fn->name);
 		strcpy(next->fns[i].return_type, fn->return_type);
 		vec_init(&next->fns[i].params, 3, sizeof(FnParam));
-		printf("sz=vec_size(&fn->params) %" PRIu64 "\n", vec_size(&fn->params));
 		for (u64 j = 0; j < vec_size(&fn->params); j++) {
 			void *param = vec_element_at(&fn->params, j);
 			vec_push(&next->fns[i].params, param);
