@@ -23,4 +23,6 @@
 void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Vec *types,
 	const ModuleInfo *self_info);
 
+void init_parser(const char *args_file);
+
 #endif // _BUILD_PARSER__

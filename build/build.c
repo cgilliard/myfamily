@@ -380,7 +380,11 @@ int proc_build(const char *base_dir, const char *config_dir)
 	path_for(&args_dir, base_dir);
 	path_push(&args_dir, "target");
 	path_push(&args_dir, "args");
-	// remove_directory(path_to_string(&args_dir), true);
+	remove_directory(path_to_string(&args_dir), true);
+	path_push(&args_dir, "args.txt");
+	// create empty file
+	FILE *fp = myfopen(path_to_string(&args_dir), "a");
+	myfclose(fp);
 
 	Path config_include_dir;
 	path_for(&config_include_dir, config_dir);
@@ -416,6 +420,9 @@ int proc_build(const char *base_dir, const char *config_dir)
 	vec_init(&module_list, 10, sizeof(ModuleInfo));
 
 	path_canonicalize(&modh);
+
+	const char *args_file = path_to_string(&args_path);
+	init_parser(args_file);
 
 	ModuleInfo self_info;
 	self_info.sub_module_count = 0;

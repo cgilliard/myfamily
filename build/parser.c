@@ -17,6 +17,7 @@
 #include <build/parser.h>
 #include <lexer/lexer.h>
 #include <limits.h>
+#include <stdio.h>
 #include <string.h>
 
 u64 gen_file_counter = 0;
@@ -67,9 +68,9 @@ typedef struct GlobalIncompleteList {
 
 GlobalIncompleteList global_incomplete_list = { 0, NULL };
 
-void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_fns)
+void add_to_global_incomplete_list(
+	const char *type_name, const Vec *incomplete_fns, const char *args_file)
 {
-	printf("add to implement list: %s\n", type_name);
 	if (global_incomplete_list.count == 0) {
 		global_incomplete_list.types = mymalloc(sizeof(IncompleteType));
 	} else {
@@ -81,46 +82,36 @@ void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_
 	strcpy(next->name, type_name);
 	next->count = vec_size(incomplete_fns);
 	next->fns = mymalloc(sizeof(IncompleteFn) * next->count);
+
 	for (u64 i = 0; i < next->count; i++) {
 		IncompleteFn *fn = vec_element_at(incomplete_fns, i);
 		strcpy(next->fns[i].name, fn->name);
 		strcpy(next->fns[i].return_type, fn->return_type);
 		vec_init(&next->fns[i].params, 3, sizeof(FnParam));
+		FILE *fp = myfopen(args_file, "a");
+		fprintf(fp, "-DFn_expand_%s_return=\"%s\"\n", fn->name, fn->return_type);
+		fprintf(fp, "-DFn_expand_%s_params=\"_%s(Obj *self", fn->name, fn->name);
+		if (vec_size(&fn->params))
+			fprintf(fp, ",");
 		for (u64 j = 0; j < vec_size(&fn->params); j++) {
-			void *param = vec_element_at(&fn->params, j);
+			FnParam *param = vec_element_at(&fn->params, j);
 			vec_push(&next->fns[i].params, param);
+			char *comma;
+			if (j != vec_size(&fn->params) - 1)
+				comma = ",";
+			else
+				comma = "";
+			if (!strcmp(param->type, "__config__")) {
+				fprintf(fp, " void *__selfconfig__%s", comma);
+			} else {
+				fprintf(fp, " %s %s%s", param->type, param->name, comma);
+			}
 		}
+		fprintf(fp, ")\"\n");
+		myfclose(fp);
 	}
 
 	global_incomplete_list.count++;
-}
-
-// Add build/drop (internal implementations here)
-void __attribute__((constructor)) __add_global_internal()
-{
-	Vec build_fns;
-	vec_init(&build_fns, 1, sizeof(IncompleteFn));
-	IncompleteFn build;
-	strcpy(build.name, "build");
-	strcpy(build.return_type, "void");
-	vec_init(&build.params, 1, sizeof(FnParam));
-	FnParam config = { .is_mut = true };
-	strcpy(config.type, "__config__");
-	strcpy(config.name, "__selfconfig__");
-	vec_push(&build.params, &config);
-	vec_push(&build_fns, &build);
-
-	add_to_global_incomplete_list("Build", &build_fns);
-
-	Vec drop_fns;
-	vec_init(&drop_fns, 1, sizeof(IncompleteFn));
-	IncompleteFn drop;
-	strcpy(drop.name, "drop");
-	strcpy(drop.return_type, "void");
-	vec_init(&drop.params, 1, sizeof(FnParam));
-	vec_push(&drop_fns, &drop);
-
-	add_to_global_incomplete_list("Drop", &drop_fns);
 }
 
 void incomplete_fns_cleanup(Vec *incomplete_fns)
@@ -548,7 +539,6 @@ void expand_params(ParserState *state, IncompleteFn *fn)
 	u64 param_count = vec_size(&fn->params);
 	if (param_count)
 		append_to_header(state, ",");
-	printf("param count = %" PRIu64 "\n", param_count);
 	for (u64 i = 0; i < param_count; i++) {
 		FnParam *fp = vec_element_at(&fn->params, i);
 		char *comma;
@@ -581,13 +571,12 @@ void expand_vars(ParserState *state, IncompleteFn *fn)
 	}
 }
 
-void proc_ParserStateExpectAt(ParserState *state, Token *tk)
+void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_file)
 {
 	if (!strcmp(tk->token, "@")) {
 		state->state = ParserStateExpectIncompleteFnName;
 	} else if (!strcmp(tk->token, "}")) {
 		// end incomplete type
-		printf("complete type end fn count = %" PRIu64 "\n", vec_size(&state->incomplete_fns));
 		state->state = ParserStateBeginStatement;
 		u64 fn_count = vec_size(&state->incomplete_fns);
 		for (u64 i = 0; i < fn_count; i++) {
@@ -613,7 +602,7 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk)
 			append_to_header(state, "}");
 		}
 
-		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns);
+		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns, args_file);
 
 		incomplete_fns_cleanup(&state->incomplete_fns);
 
@@ -729,7 +718,6 @@ void proc_ParserStateIncompleteExpectSemi(ParserState *state, Token *tk)
 
 void proc_ParserStateIncompleteExpectSemiOrTypeArrow(ParserState *state, Token *tk)
 {
-	printf("in proc_ParserStateIncompleteExpectSemiOrTypeArrow tk = %s\n", tk->token);
 	if (!strcmp(tk->token, "->")) {
 		state->state = ParserStateIncompleteExpectReturnType;
 	} else if (!strcmp(tk->token, ";")) {
@@ -809,13 +797,9 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk)
 		char complete_type[PATH_MAX + 1];
 		type_info_to_string(&ti, complete_type, PATH_MAX);
 		char *incomplete_type = tk->token;
-		printf("trait impl for inc type = %s, type = %s\n", incomplete_type, complete_type);
-		printf("count=%" PRIu64 "\n", global_incomplete_list.count);
 		bool found = false;
 		for (u64 i = 0; i < global_incomplete_list.count; i++) {
-			printf("name=%s\n", global_incomplete_list.types->name);
 			if (!strcmp(incomplete_type, global_incomplete_list.types[i].name)) {
-				printf("found global list at %" PRIu64 "\n", i);
 				IncompleteType *inc = &global_incomplete_list.types[i];
 				for (u64 j = 0; j < inc->count; j++) {
 
@@ -894,9 +878,54 @@ void file_for(const char *base_dir, const ModuleInfo *self_info, char buf[PATH_M
 	strcpy(buf, path_to_string(&ret));
 }
 
+void init_parser(const char *args_file)
+{
+	Vec build_fns;
+	vec_init(&build_fns, 1, sizeof(IncompleteFn));
+	IncompleteFn build;
+	strcpy(build.name, "build");
+	strcpy(build.return_type, "void");
+	vec_init(&build.params, 1, sizeof(FnParam));
+	FnParam config = { .is_mut = true };
+	strcpy(config.type, "__config__");
+	strcpy(config.name, "__selfconfig__");
+	vec_push(&build.params, &config);
+	vec_push(&build_fns, &build);
+
+	add_to_global_incomplete_list("Build", &build_fns, args_file);
+
+	Vec drop_fns;
+	vec_init(&drop_fns, 1, sizeof(IncompleteFn));
+	IncompleteFn drop;
+	strcpy(drop.name, "drop");
+	strcpy(drop.return_type, "void");
+	vec_init(&drop.params, 1, sizeof(FnParam));
+	vec_push(&drop_fns, &drop);
+
+	add_to_global_incomplete_list("Drop", &drop_fns, args_file);
+
+	/*
+	FILE *fp = myfopen(args_file, "a");
+
+	fprintf(fp, "-DFn_expand_drop_params=\"_drop(Obj *self)\"\
+		\n-DFn_expand_drop_return=\"void\"\
+		\n-DFn_expand_build_params=\"_build(Obj *self, void *__selfconfig__)\"\
+		\n-DFn_expand_build_return=\"void\"");
+
+	myfclose(fp);
+	*/
+}
+
 void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Vec *types,
 	const ModuleInfo *self_info)
 {
+
+	Path args_path;
+	path_for(&args_path, base_dir);
+	path_push(&args_path, "target");
+	path_push(&args_path, "args");
+	path_push(&args_path, "args.txt");
+	const char *args_file = path_to_string(&args_path);
 	char file[PATH_MAX];
 	file_for(base_dir, self_info, file);
 	Lexer l;
@@ -928,7 +957,7 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 		if (res == LexerStateComplete) {
 			break;
 		}
-		printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
+		// printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
 		if (tk.type != TokenTypeDoc) {
 			// skip over doc comments for these purposes
 			if (state.state == ParserStateBeginStatement) {
@@ -964,7 +993,7 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 			} else if (state.state == ParserIncompleteExpectBrace) {
 				proc_ParserIncompleteExpectBrace(&state, &tk);
 			} else if (state.state == ParserStateExpectAt) {
-				proc_ParserStateExpectAt(&state, &tk);
+				proc_ParserStateExpectAt(&state, &tk, args_file);
 			} else if (state.state == ParserStateExpectIncompleteFnMutOrType) {
 				proc_ParserStateExpectIncompleteFnMutOrType(&state, &tk);
 			} else if (state.state == ParserStateExpectIncompleteFnName) {
