@@ -21,19 +21,16 @@ _Thread_local const Obj *__thread_local_self_Const = NULL;
 _Thread_local Obj *__thread_local_self_Var = NULL;
 
 atomic_ullong __global_counter__;
-void __attribute__((constructor)) init_global_counter()
-{
+void __attribute__((constructor)) init_global_counter() {
 	atomic_init(&__global_counter__, 1);
 }
 
-u64 unique_id()
-{
+u64 unique_id() {
 	u64 ret = atomic_fetch_add(&__global_counter__, 1);
 	return ret;
 }
 
-FatPtr build_fat_ptr(u64 size)
-{
+FatPtr build_fat_ptr(u64 size) {
 	FatPtr ret;
 	if (chain_malloc(&ret, size)) {
 		// if chain_malloc is an error we set data to NULL and caller to
@@ -43,20 +40,17 @@ FatPtr build_fat_ptr(u64 size)
 	return ret;
 }
 
-int compare_vtable_entry(const void *ent1, const void *ent2)
-{
+int compare_vtable_entry(const void *ent1, const void *ent2) {
 	const VtableEntry *vtent1 = ent1;
 	const VtableEntry *vtent2 = ent2;
 	return strcmp(vtent1->name, vtent2->name);
 }
 
-void sort_vtable(Vtable *table)
-{
+void sort_vtable(Vtable *table) {
 	qsort(table->entries, table->len, sizeof(VtableEntry), compare_vtable_entry);
 }
 
-void vtable_add_entry(Vtable *table, VtableEntry entry)
-{
+void vtable_add_entry(Vtable *table, VtableEntry entry) {
 	if (table->entries == NULL) {
 		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
 		if (table->entries == NULL)
@@ -73,8 +67,7 @@ void vtable_add_entry(Vtable *table, VtableEntry entry)
 	sort_vtable(table);
 }
 
-void vtable_override(Vtable *table, VtableEntry entry)
-{
+void vtable_override(Vtable *table, VtableEntry entry) {
 	for (int i = 0; i < table->len; i++) {
 		if (!strcmp(entry.name, table->entries[i].name)) {
 			table->entries[i].fn_ptr = entry.fn_ptr;
@@ -82,8 +75,7 @@ void vtable_override(Vtable *table, VtableEntry entry)
 	}
 }
 
-bool vtable_check_impl_trait(const Vtable *table, const char *trait)
-{
+bool vtable_check_impl_trait(const Vtable *table, const char *trait) {
 	bool ret = false;
 
 	for (u64 i = 0; i < table->trait_len; i++) {
@@ -96,15 +88,14 @@ bool vtable_check_impl_trait(const Vtable *table, const char *trait)
 	return ret;
 }
 
-void vtable_add_trait(Vtable *table, char *trait)
-{
+void vtable_add_trait(Vtable *table, char *trait) {
 	if (table->trait_entries == NULL) {
 		table->trait_entries = malloc(sizeof(VtableTraitEntry) * (table->trait_len + 1));
 		if (table->trait_entries == NULL)
 			panic("Couldn't allocate memory for vtable");
 	} else {
-		void *tmp
-			= realloc(table->trait_entries, sizeof(VtableTraitEntry) * (table->trait_len + 1));
+		void *tmp =
+			realloc(table->trait_entries, sizeof(VtableTraitEntry) * (table->trait_len + 1));
 		if (tmp == NULL)
 			panic("Couldn't allocate memory for vtable");
 		table->trait_entries = tmp;
@@ -113,15 +104,14 @@ void vtable_add_trait(Vtable *table, char *trait)
 	VtableTraitEntry entry;
 	if (strlen(trait) >= MAX_TRAIT_NAME_LEN)
 		panic("trait name [%s] is too long. MAX_TRAIT_NAME_LEN = %i\n", trait,
-			MAX_TRAIT_NAME_LEN - 1);
+			  MAX_TRAIT_NAME_LEN - 1);
 	strcpy(entry.trait_name, trait);
 
 	memcpy(&table->trait_entries[table->trait_len], &entry, sizeof(VtableTraitEntry));
 	table->trait_len += 1;
 }
 
-void *find_fn(const Obj *obj, const char *name)
-{
+void *find_fn(const Obj *obj, const char *name) {
 	int left = 0;
 	int right = obj->vtable->len - 1;
 	while (left <= right) {
@@ -139,28 +129,24 @@ void *find_fn(const Obj *obj, const char *name)
 	return NULL;
 }
 
-void SelfCleanupImpl_update(SelfCleanupImpl *ptr)
-{
+void SelfCleanupImpl_update(SelfCleanupImpl *ptr) {
 	__thread_local_self_Const = ptr->prev_tl_self_Const;
 	__thread_local_self_Var = ptr->prev_tl_self_Var;
 }
 
-void Obj_check_param(const Obj *obj)
-{
+void Obj_check_param(const Obj *obj) {
 	if (obj && (obj->flags & OBJECT_FLAGS_CONSUMED) != 0)
 		panic("Passing a consumed object as a function "
 			  "parameter!");
 }
 
-bool Obj_is_type(const Obj *ptr, char *ref)
-{
+bool Obj_is_type(const Obj *ptr, char *ref) {
 	if (!strcmp(TypeName((*ptr)), ref))
 		return true;
 	return false;
 }
 
-void Obj_build_int(Obj *ptr)
-{
+void Obj_build_int(Obj *ptr) {
 	// call internal build handler
 	void (*build_int)(Obj *ptr) = find_fn(ptr, "build_internal");
 	if (!build_int)
@@ -168,8 +154,7 @@ void Obj_build_int(Obj *ptr)
 	build_int(ptr);
 }
 
-void Obj_build(Obj *ptr, const void *config)
-{
+void Obj_build(Obj *ptr, const void *config) {
 	void (*do_build)(Obj *ptr, const void *config) = find_fn(ptr, "build");
 	if (do_build) {
 		// setup self references
@@ -194,15 +179,21 @@ void Obj_build(Obj *ptr, const void *config)
 #else
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
-void Obj_cleanup(const Obj *ptr)
-{
+void Obj_cleanup(const Obj *ptr) {
 	Obj *unconst = ptr;
 	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0) {
 		// call internal drop handler
+		Obj *tmp_Var = __thread_local_self_Var;
+		Obj *tmp_Const = __thread_local_self_Const;
+		__thread_local_self_Const = unconst;
+		__thread_local_self_Var = unconst;
 		void (*drop_int)(Obj *ptr) = find_fn(ptr, "drop_internal");
 		if (!drop_int)
 			panic("no internal drop handler found");
 		drop_int(unconst);
+		// revert
+		__thread_local_self_Var = tmp_Var;
+		__thread_local_self_Const = tmp_Const;
 
 		// call defined drop handler
 		void (*drop)(Obj *ptr) = find_fn(ptr, "drop");
@@ -234,8 +225,7 @@ void Obj_cleanup(const Obj *ptr)
 #else
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
-void Obj_mark_consumed(const Obj *ptr)
-{
+void Obj_mark_consumed(const Obj *ptr) {
 	Obj *unconst = ptr;
 	unconst->flags |= OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED;
 }

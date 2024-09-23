@@ -131,6 +131,32 @@ FatPtr build_fat_ptr(u64 size);
 	__VA_OPT__(NONE)                                                                               \
 	(__thread_local_self_Const)
 
+#define $Alloc(name, size)                                                                         \
+	({                                                                                             \
+		if (size <= 0) {                                                                           \
+			$Free(name);                                                                           \
+		} else {                                                                                   \
+			if ($Mut(name##_fat_ptr__.data) == NULL) {                                             \
+				if (chain_malloc(&$Mut(name##_fat_ptr__), size))                                   \
+					panic("Could not allocate sufficient memory");                                 \
+			} else {                                                                               \
+				void *_tmp__;                                                                      \
+				if (chain_realloc(&$Mut(name##_fat_ptr__), &$Mut(name##_fat_ptr__), size))         \
+					panic("Could not allocate sufficient memory");                                 \
+			}                                                                                      \
+			$Mut(name) = $(name##_fat_ptr__).data;                                                 \
+		}                                                                                          \
+	})
+
+#define $Free(name)                                                                                \
+	({                                                                                             \
+		if ($(name##_fat_ptr__).data) {                                                            \
+			chain_free(&$Mut(name##_fat_ptr__));                                                   \
+			$Mut(name##_fat_ptr__).data = NULL;                                                    \
+			$Mut(name) = NULL;                                                                     \
+		}                                                                                          \
+	})
+
 #define $Config(...) (((const IMPLCONFIG *)(__selfconfig__))->__VA_ARGS__)
 
 #define $IsSet(...) (((const IMPLCONFIG *)(__selfconfig__))->__VA_ARGS__##_is_set__)

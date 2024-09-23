@@ -400,8 +400,15 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 				ti = vec_element_at(&(state->ht.types), i);
 				ni = vec_element_at(&(state->ht.names), i);
 				if (ti->is_arr) {
-					append_to_header(state, "%s %s[%" PRIu64 "];", ti->type, ni->name,
-									 ti->arr_size);
+					if (ti->arr_size == UINT64_MAX) {
+						// dynamic array
+						append_to_header(state, "%s *%s; FatPtr %s_fat_ptr__;", ti->type, ni->name,
+										 ni->name);
+					} else {
+						// static array
+						append_to_header(state, "%s %s[%" PRIu64 "];", ti->type, ni->name,
+										 ti->arr_size);
+					}
 				} else {
 					append_to_header(state, "%s %s;", ti->type, ni->name);
 				}
@@ -421,12 +428,23 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 			fprintf(fp, "-DType_Expand_%s_=\"", type_name);
 			fprintf(fp, "Vtable %s_Vtable__ = {\\\"%s\\\", 0, NULL, 0, NULL, false};\
 				u64 %s_size() {return sizeof(%s); }\
-				void %s_drop_internal(Obj *ptr) {}\
+				void %s_drop_internal(Obj *ptr) { ",
+					type_name, type_name, type_name, type_name, type_name);
+			for (u64 i = 0; i < count; i++) {
+				HeaderNameInfo *ni;
+				HeaderTypeInfo *ti;
+				ti = vec_element_at(&(state->ht.types), i);
+				ni = vec_element_at(&(state->ht.names), i);
+				if (ti->is_arr && ti->arr_size == UINT64_MAX) {
+					fprintf(fp, "$Free(%s);", ni->name);
+				}
+			}
+			fprintf(fp, "}\
 				void %s_build_internal(Obj *ptr) {\
 				u64 size = %s_size();                     \
 				memset(ptr->ptr.data, 0, size);           \
 				}",
-					type_name, type_name, type_name, type_name, type_name, type_name, type_name);
+					type_name, type_name);
 			fprintf(fp, "\"\n");
 			append_to_header(
 				state, "static void __attribute__((constructor)) __add_impls_%s_vtable() {\
@@ -497,6 +515,13 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 void proc_ParserStateExpectPipe(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "|")) {
 		state->state = ParserStateExpectArraySize;
+	} else if (!strcmp(tk->token, "]")) {
+		// dynamic array
+		HeaderTypeInfo *hti;
+		hti = vec_element_at(&(state->ht.types), vec_size(&(state->ht.types)) - 1);
+		// use UINT65_MAX to indicate dynamic array
+		hti->arr_size = UINT64_MAX;
+		state->state = ParserStateExpectName;
 	} else {
 		state->has_errors = true;
 		token_display_error(tk, "Expected ['|']. Found [%s]", tk->token);
