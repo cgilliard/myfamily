@@ -5527,237 +5527,229 @@ Unit_size:
         -:   20:#include <string.h>
         -:   21:#include <sys/stat.h>
         -:   22:
-       32:   23:void path_cleanup(PathImpl *ptr)
-        -:   24:{
-       32:   25:	chain_free(&ptr->ptr);
-       32:   26:}
-        -:   27:
-       32:   28:int path_for(Path *p, const char *path)
-        -:   29:{
-       32:   30:	if (path == NULL) {
-    #####:   31:		errno = EINVAL;
-    #####:   32:		return -1;
-        -:   33:	}
-       32:   34:	int len = strlen(path);
-       32:   35:	if (len == 0) {
-    #####:   36:		errno = EINVAL;
-    #####:   37:		return -1;
-        -:   38:	}
-       32:   39:	if (chain_malloc(&p->ptr, len + 1))
-    #####:   40:		return -1;
-       32:   41:	strcpy(p->ptr.data, path);
-       32:   42:	return 0;
-        -:   43:}
-        -:   44:
-       31:   45:int path_replace_home(Path *p)
-        -:   46:{
-       31:   47:	const char *home_dir = getenv("HOME");
-       31:   48:	if (home_dir == NULL) {
-    #####:   49:		errno = EINVAL;
-    #####:   50:		return -1;
-        -:   51:	}
-       31:   52:	if (((char *)(p->ptr.data))[0] == '~') {
-    #####:   53:		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr.data);
-    #####:   54:		if (nlen >= PATH_MAX) {
-    #####:   55:			errno = E2BIG;
-    #####:   56:			return -1;
-        -:   57:		}
-    #####:   58:		if (nlen >= p->ptr.len) {
-        -:   59:			FatPtr nptr;
-    #####:   60:			if (chain_realloc(&nptr, &p->ptr, nlen + 1))
-    #####:   61:				return -1;
-    #####:   62:			p->ptr = nptr;
-        -:   63:		}
-        -:   64:		char buf[PATH_MAX + 1];
-    #####:   65:		snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr.data + 1));
-    #####:   66:		strcpy(p->ptr.data, buf);
-        -:   67:	}
-       31:   68:	return 0;
-        -:   69:}
-        -:   70:
-       31:   71:int path_canonicalize(Path *p)
-        -:   72:{
-       31:   73:	if (path_replace_home(p))
-    #####:   74:		return -1;
-        -:   75:	char buf[PATH_MAX];
-       31:   76:	errno = 0;
-       31:   77:	if (realpath(p->ptr.data, buf) == NULL) {
-        2:   78:		return -1;
-        -:   79:	}
-       29:   80:	int nlen = strlen(buf);
-       29:   81:	if (nlen == 0) {
-    #####:   82:		errno = EFAULT;
-    #####:   83:		return -1;
-        -:   84:	}
-       29:   85:	if (nlen >= p->ptr.len) {
-        -:   86:		FatPtr nptr;
-       28:   87:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
-    #####:   88:			return -1;
-       28:   89:		p->ptr = nptr;
-        -:   90:	}
-       29:   91:	strcpy(p->ptr.data, buf);
-       29:   92:	return 0;
-        -:   93:}
-        5:   94:int path_push(Path *p, const char *next)
-        -:   95:{
-        5:   96:	if (next == NULL) {
-    #####:   97:		errno = EINVAL;
+       32:   23:void path_cleanup(PathImpl *ptr) {
+       32:   24:	chain_free(&ptr->ptr);
+       32:   25:}
+        -:   26:
+       32:   27:int path_for(Path *p, const char *path) {
+       32:   28:	if (path == NULL) {
+    #####:   29:		errno = EINVAL;
+    #####:   30:		return -1;
+        -:   31:	}
+       32:   32:	int len = strlen(path);
+       32:   33:	if (len == 0) {
+    #####:   34:		errno = EINVAL;
+    #####:   35:		return -1;
+        -:   36:	}
+       32:   37:	if (chain_malloc(&p->ptr, len + 1))
+    #####:   38:		return -1;
+       32:   39:	strcpy(p->ptr.data, path);
+       32:   40:	return 0;
+        -:   41:}
+        -:   42:
+       31:   43:int path_replace_home(Path *p) {
+       31:   44:	const char *home_dir = getenv("HOME");
+       31:   45:	if (home_dir == NULL) {
+    #####:   46:		errno = EINVAL;
+    #####:   47:		return -1;
+        -:   48:	}
+       31:   49:	if (((char *)(p->ptr.data))[0] == '~') {
+    #####:   50:		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr.data);
+    #####:   51:		if (nlen >= PATH_MAX) {
+    #####:   52:			errno = E2BIG;
+    #####:   53:			return -1;
+        -:   54:		}
+    #####:   55:		if (nlen >= p->ptr.len) {
+        -:   56:			FatPtr nptr;
+    #####:   57:			if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+    #####:   58:				return -1;
+    #####:   59:			p->ptr = nptr;
+        -:   60:		}
+        -:   61:		char buf[PATH_MAX + 1];
+    #####:   62:		snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr.data + 1));
+    #####:   63:		strcpy(p->ptr.data, buf);
+        -:   64:	}
+       31:   65:	return 0;
+        -:   66:}
+        -:   67:
+       31:   68:int path_canonicalize(Path *p) {
+       31:   69:	if (path_replace_home(p))
+    #####:   70:		return -1;
+        -:   71:	char buf[PATH_MAX];
+       31:   72:	errno = 0;
+       31:   73:	if (realpath(p->ptr.data, buf) == NULL) {
+        2:   74:		return -1;
+        -:   75:	}
+       29:   76:	int nlen = strlen(buf);
+       29:   77:	if (nlen == 0) {
+    #####:   78:		errno = EFAULT;
+    #####:   79:		return -1;
+        -:   80:	}
+       29:   81:	if (nlen >= p->ptr.len) {
+        -:   82:		FatPtr nptr;
+       28:   83:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+    #####:   84:			return -1;
+       28:   85:		p->ptr = nptr;
+        -:   86:	}
+       29:   87:	strcpy(p->ptr.data, buf);
+       29:   88:	return 0;
+        -:   89:}
+        5:   90:int path_push(Path *p, const char *next) {
+        5:   91:	if (next == NULL) {
+    #####:   92:		errno = EINVAL;
+    #####:   93:		return -1;
+        -:   94:	}
+        5:   95:	int slen = strlen(p->ptr.data);
+        5:   96:	if (slen <= 0) {
+    #####:   97:		errno = EFAULT;
     #####:   98:		return -1;
         -:   99:	}
-        5:  100:	int slen = strlen(p->ptr.data);
-        5:  101:	if (slen <= 0) {
-    #####:  102:		errno = EFAULT;
-    #####:  103:		return -1;
-        -:  104:	}
-        5:  105:	bool need_sep = false;
-        5:  106:	if (((char *)p->ptr.data)[slen - 1] != PATH_SEPARATOR_CHAR) {
-        4:  107:		need_sep = true;
-        -:  108:	}
-        -:  109:
-        5:  110:	int nlen = slen + strlen(next);
-        5:  111:	if (need_sep)
-        4:  112:		nlen += strlen(PATH_SEPARATOR);
-        -:  113:
-        5:  114:	if (nlen >= p->ptr.len) {
-        -:  115:		FatPtr nptr;
-        3:  116:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
-    #####:  117:			return -1;
-        3:  118:		p->ptr = nptr;
-        -:  119:	}
-        -:  120:
-        5:  121:	if (need_sep)
-        4:  122:		strcat(p->ptr.data, PATH_SEPARATOR);
-        5:  123:	strcat(p->ptr.data, next);
-        5:  124:	return 0;
-        -:  125:}
-        2:  126:int path_pop(Path *p)
-        -:  127:{
-        2:  128:	char *res = rstrstr(p->ptr.data, PATH_SEPARATOR);
-        2:  129:	if (res) {
-        2:  130:		int index = res - (char *)p->ptr.data;
-        2:  131:		((char *)(p->ptr.data))[index] = 0;
-        -:  132:	} else {
-    #####:  133:		((char *)(p->ptr.data))[0] = '.';
-    #####:  134:		((char *)(p->ptr.data))[1] = 0;
-        -:  135:	}
-        2:  136:	return 0;
-        -:  137:}
-        -:  138:
-        8:  139:char *path_to_string(const Path *p)
-        -:  140:{
-        8:  141:	return p->ptr.data;
-        -:  142:}
-        -:  143:
-    #####:  144:char *path_file_name(const Path *p)
-        -:  145:{
-    #####:  146:	char *ret = rstrstr(p->ptr.data, PATH_SEPARATOR);
-    #####:  147:	if (ret != NULL && strlen(ret) > 0)
-    #####:  148:		return ret + 1;
-        -:  149:
-    #####:  150:	return ret;
+        5:  100:	bool need_sep = false;
+        5:  101:	if (((char *)p->ptr.data)[slen - 1] != PATH_SEPARATOR_CHAR) {
+        4:  102:		need_sep = true;
+        -:  103:	}
+        -:  104:
+        5:  105:	int nlen = slen + strlen(next);
+        5:  106:	if (need_sep)
+        4:  107:		nlen += strlen(PATH_SEPARATOR);
+        -:  108:
+        5:  109:	if (nlen >= p->ptr.len) {
+        -:  110:		FatPtr nptr;
+        3:  111:		if (chain_realloc(&nptr, &p->ptr, nlen + 1))
+    #####:  112:			return -1;
+        3:  113:		p->ptr = nptr;
+        -:  114:	}
+        -:  115:
+        5:  116:	if (need_sep)
+        4:  117:		strcat(p->ptr.data, PATH_SEPARATOR);
+        5:  118:	strcat(p->ptr.data, next);
+        5:  119:	return 0;
+        -:  120:}
+        2:  121:int path_pop(Path *p) {
+        2:  122:	char *res = rstrstr(p->ptr.data, PATH_SEPARATOR);
+        2:  123:	if (res) {
+        2:  124:		int index = res - (char *)p->ptr.data;
+        2:  125:		((char *)(p->ptr.data))[index] = 0;
+        -:  126:	} else {
+    #####:  127:		((char *)(p->ptr.data))[0] = '.';
+    #####:  128:		((char *)(p->ptr.data))[1] = 0;
+        -:  129:	}
+        2:  130:	return 0;
+        -:  131:}
+        -:  132:
+        8:  133:char *path_to_string(const Path *p) {
+        8:  134:	return p->ptr.data;
+        -:  135:}
+        -:  136:
+    #####:  137:char *path_file_name(const Path *p) {
+    #####:  138:	char *ret = rstrstr(p->ptr.data, PATH_SEPARATOR);
+    #####:  139:	if (ret != NULL && strlen(ret) > 0)
+    #####:  140:		return ret + 1;
+        -:  141:
+    #####:  142:	return ret;
+        -:  143:}
+        -:  144:
+    #####:  145:bool path_exists(const Path *p) {
+    #####:  146:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  147:		errno = EINVAL;
+    #####:  148:		return false;
+        -:  149:	}
+    #####:  150:	return access(p->ptr.data, F_OK) == 0;
         -:  151:}
-        -:  152:
-    #####:  153:bool path_exists(const Path *p)
-        -:  154:{
-    #####:  155:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  156:		errno = EINVAL;
-    #####:  157:		return false;
-        -:  158:	}
-    #####:  159:	return access(p->ptr.data, F_OK) == 0;
-        -:  160:}
-    #####:  161:bool path_is_dir(const Path *p)
-        -:  162:{
-    #####:  163:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  164:		errno = EINVAL;
-    #####:  165:		return false;
-        -:  166:	}
-        -:  167:	struct stat s;
-    #####:  168:	if (stat(p->ptr.data, &s) == 0) {
-    #####:  169:		return s.st_mode & S_IFDIR;
-        -:  170:	}
-    #####:  171:	return false;
-        -:  172:}
-        -:  173:
-    #####:  174:bool path_mkdir(Path *p, mode_t mode, bool parent)
-        -:  175:{
-    #####:  176:	if (p->ptr.data == NULL && p->ptr.len == 0) {
-    #####:  177:		errno = EINVAL;
-    #####:  178:		return false;
-        -:  179:	}
-        -:  180:
-        -:  181:	struct stat s;
-        -:  182:
-        -:  183:	// Check if the path exists
-    #####:  184:	if (stat(p->ptr.data, &s) == 0) {
-        -:  185:		// If the path exists and it's a directory, return success
-    #####:  186:		if (s.st_mode & S_IFDIR) {
-    #####:  187:			return true;
-        -:  188:		} else {
-        -:  189:			// Path exists but it's not a directory
-    #####:  190:			errno = ENOTDIR;
-    #####:  191:			return false;
-        -:  192:		}
-        -:  193:	}
-        -:  194:
-        -:  195:	// If parent is false, attempt to create only the target directory
-    #####:  196:	if (!parent) {
-    #####:  197:		if (mkdir(p->ptr.data, mode) != 0) {
-    #####:  198:			return false;
-        -:  199:		}
-    #####:  200:		return true;
-        -:  201:	}
-        -:  202:
-        -:  203:	// Create the directory structure (parent is true)
-    #####:  204:	Path temp_path;
-    #####:  205:	if (path_copy(&temp_path, p) != 0) {
-    #####:  206:		return false;
-        -:  207:	}
-        -:  208:
-    #####:  209:	char *dir_part = strtok(temp_path.ptr.data, PATH_SEPARATOR);
-    #####:  210:	Path current_path;
-    #####:  211:	path_for(&current_path, PATH_SEPARATOR);
-        -:  212:
-        -:  213:	// Iterate through each part of the path and create directories as needed
-    #####:  214:	while (dir_part != NULL) {
-    #####:  215:		if (path_push(&current_path, dir_part) != 0) {
-    #####:  216:			return false;
-        -:  217:		}
-        -:  218:
-        -:  219:		// Check if the current part of the path exists, and if not, create it
-    #####:  220:		if (stat(current_path.ptr.data, &s) != 0) {
-        -:  221:			// Directory does not exist, so create it
-    #####:  222:			if (mkdir(current_path.ptr.data, mode) != 0) {
-    #####:  223:				return false;
-        -:  224:			}
-    #####:  225:		} else if (!(s.st_mode & S_IFDIR)) {
-        -:  226:			// Path exists but is not a directory
-    #####:  227:			errno = ENOTDIR;
-    #####:  228:			return false;
-        -:  229:		}
-        -:  230:
-    #####:  231:		dir_part = strtok(NULL, PATH_SEPARATOR);
-        -:  232:	}
-        -:  233:
-    #####:  234:	return true;
-        -:  235:}
-        -:  236:
-    #####:  237:int path_copy(Path *dst, const Path *src)
-        -:  238:{
-    #####:  239:	return path_for(dst, path_to_string(src));
-        -:  240:}
-        -:  241:
-    #####:  242:int path_file_stem(const Path *p, char *buf, u64 limit)
-        -:  243:{
-    #####:  244:	strncpy(buf, path_file_name(p), limit);
-    #####:  245:	for (u64 i = strlen(buf) - 1; i >= 0; i--) {
-    #####:  246:		if (buf[i] == '.') {
-    #####:  247:			buf[i] = 0;
-    #####:  248:			break;
-    #####:  249:		} else if (buf[i] == '/')
-    #####:  250:			break;
-        -:  251:	}
-    #####:  252:	return 0;
-        -:  253:}
+    #####:  152:bool path_is_dir(const Path *p) {
+    #####:  153:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  154:		errno = EINVAL;
+    #####:  155:		return false;
+        -:  156:	}
+        -:  157:	struct stat s;
+    #####:  158:	if (stat(p->ptr.data, &s) == 0) {
+    #####:  159:		return s.st_mode & S_IFDIR;
+        -:  160:	}
+    #####:  161:	return false;
+        -:  162:}
+        -:  163:
+    #####:  164:bool path_mkdir(Path *p, mode_t mode, bool parent) {
+    #####:  165:	if (p->ptr.data == NULL && p->ptr.len == 0) {
+    #####:  166:		errno = EINVAL;
+    #####:  167:		return false;
+        -:  168:	}
+        -:  169:
+        -:  170:	struct stat s;
+        -:  171:
+        -:  172:	// Check if the path exists
+    #####:  173:	if (stat(p->ptr.data, &s) == 0) {
+        -:  174:		// If the path exists and it's a directory, return success
+    #####:  175:		if (s.st_mode & S_IFDIR) {
+    #####:  176:			return true;
+        -:  177:		} else {
+        -:  178:			// Path exists but it's not a directory
+    #####:  179:			errno = ENOTDIR;
+    #####:  180:			return false;
+        -:  181:		}
+        -:  182:	}
+        -:  183:
+        -:  184:	// If parent is false, attempt to create only the target directory
+    #####:  185:	if (!parent) {
+    #####:  186:		if (mkdir(p->ptr.data, mode) != 0) {
+    #####:  187:			return false;
+        -:  188:		}
+    #####:  189:		return true;
+        -:  190:	}
+        -:  191:
+        -:  192:	// Create the directory structure (parent is true)
+    #####:  193:	Path temp_path;
+    #####:  194:	if (path_copy(&temp_path, p) != 0) {
+    #####:  195:		return false;
+        -:  196:	}
+        -:  197:
+    #####:  198:	char *dir_part = strtok(temp_path.ptr.data, PATH_SEPARATOR);
+    #####:  199:	Path current_path;
+    #####:  200:	path_for(&current_path, PATH_SEPARATOR);
+        -:  201:
+        -:  202:	// Iterate through each part of the path and create directories as needed
+    #####:  203:	while (dir_part != NULL) {
+    #####:  204:		if (path_push(&current_path, dir_part) != 0) {
+    #####:  205:			return false;
+        -:  206:		}
+        -:  207:
+        -:  208:		// Check if the current part of the path exists, and if not, create it
+    #####:  209:		if (stat(current_path.ptr.data, &s) != 0) {
+        -:  210:			// Directory does not exist, so create it
+    #####:  211:			if (mkdir(current_path.ptr.data, mode) != 0) {
+    #####:  212:				return false;
+        -:  213:			}
+    #####:  214:		} else if (!(s.st_mode & S_IFDIR)) {
+        -:  215:			// Path exists but is not a directory
+    #####:  216:			errno = ENOTDIR;
+    #####:  217:			return false;
+        -:  218:		}
+        -:  219:
+    #####:  220:		dir_part = strtok(NULL, PATH_SEPARATOR);
+        -:  221:	}
+        -:  222:
+    #####:  223:	return true;
+        -:  224:}
+        -:  225:
+    #####:  226:int path_copy(Path *dst, const Path *src) {
+    #####:  227:	return path_for(dst, path_to_string(src));
+        -:  228:}
+        -:  229:
+    #####:  230:int path_file_stem(const Path *p, char *buf, u64 limit) {
+        -:  231:	// Copy the file name into the buffer, ensuring proper null termination
+    #####:  232:	strncpy(buf, path_file_name(p), limit - 1);
+    #####:  233:	buf[limit - 1] = '\0'; // Manually ensure null-termination
+        -:  234:
+    #####:  235:	u64 buflen = strlen(buf); // Compute length once
+    #####:  236:	for (ssize_t i = buflen - 1; i >= 0; i--) {
+    #####:  237:		if (buf[i] == '.') {
+    #####:  238:			buf[i] = '\0'; // Null-terminate at the dot
+    #####:  239:			break;
+    #####:  240:		} else if (buf[i] == '/') {
+    #####:  241:			break; // Stop if we encounter a directory separator
+        -:  242:		}
+        -:  243:	}
+    #####:  244:	return 0;
+        -:  245:}
         -:    0:Source:rand.c
         -:    0:Graph:rand.gcno
         -:    0:Data:rand.gcda
@@ -6106,456 +6098,468 @@ Unit_size:
         -:   29:	char version[MAX_NAME_LEN];
         -:   30:} FamTomlInfo;
         -:   31:
-    #####:   32:FamTomlInfo extract_toml_info(const char *base_dir)
-        -:   33:{
-    #####:   34:	Path toml;
-    #####:   35:	path_for(&toml, base_dir);
-    #####:   36:	path_push(&toml, "fam.toml");
-        -:   37:
-    #####:   38:	if (path_canonicalize(&toml)) {
-    #####:   39:		exit_error("fam.toml file ('%s') not found.", path_to_string(&toml));
-        -:   40:	}
-        -:   41:
-    #####:   42:	FILE *toml_fp = myfopen(path_to_string(&toml), "r");
-        -:   43:	char errbuf[1024];
-    #####:   44:	toml_table_t *table = toml_parse_file(toml_fp, errbuf, sizeof(errbuf));
-        -:   45:
-    #####:   46:	if (table == NULL) {
-    #####:   47:		exit_error("Could not parse toml file due to '%s'", errbuf);
-        -:   48:	}
-        -:   49:
-        -:   50:	FamTomlInfo ret;
-        -:   51:
-    #####:   52:	myfclose(toml_fp);
-        -:   53:
-    #####:   54:	toml_raw_t raw_fam_version = toml_raw_in(table, "fam_version");
-        -:   55:	char *fam_version;
-    #####:   56:	if (raw_fam_version) {
-    #####:   57:		toml_rtos(raw_fam_version, &fam_version);
-    #####:   58:		strcpy(ret.version, fam_version);
-    #####:   59:		free((void *)fam_version); // Clean up after toml_rtos
-        -:   60:	} else {
-    #####:   61:		exit_error("fam_version not specified in '%s'", path_to_string(&toml));
-        -:   62:	}
-        -:   63:
-    #####:   64:	toml_table_t *package_table = toml_table_in(table, "package");
-    #####:   65:	if (package_table) {
-    #####:   66:		toml_raw_t raw_name = toml_raw_in(package_table, "name");
-        -:   67:		char *name;
-    #####:   68:		if (raw_name) {
-    #####:   69:			toml_rtos(raw_name, &name);
-    #####:   70:			strcpy(ret.name, name);
-        -:   71:		} else {
-    #####:   72:			exit_error("name not specified in fam.toml!");
-        -:   73:		}
-        -:   74:	} else {
-    #####:   75:		exit_error("package not found in fam.toml");
-        -:   76:	}
-        -:   77:
-    #####:   78:	return ret;
-        -:   79:}
-        -:   80:
-    #####:   81:void ensure_target_structure(const char *base_dir)
-        -:   82:{
-    #####:   83:	Path target;
-    #####:   84:	path_for(&target, base_dir);
-    #####:   85:	path_push(&target, "target");
-    #####:   86:	if (!path_exists(&target)) {
-    #####:   87:		if (!path_mkdir(&target, 0700, false))
-    #####:   88:			exit_error("Could not create directory '%s'.", path_to_string(&target));
-    #####:   89:		path_push(&target, "objs");
-    #####:   90:		if (!path_mkdir(&target, 0700, false))
-    #####:   91:			exit_error("Could not create directory '%s'.", path_to_string(&target));
-    #####:   92:		path_pop(&target);
-    #####:   93:		path_push(&target, "build");
-    #####:   94:		if (!path_mkdir(&target, 0700, false))
-    #####:   95:			exit_error("Could not create directory '%s'.", path_to_string(&target));
-    #####:   96:		path_pop(&target);
-    #####:   97:		path_push(&target, "include");
-    #####:   98:		if (!path_mkdir(&target, 0700, false))
-    #####:   99:			exit_error("Could not create directory '%s'.", path_to_string(&target));
-    #####:  100:		path_pop(&target);
-    #####:  101:		path_push(&target, "args");
-    #####:  102:		if (!path_mkdir(&target, 0700, false))
-    #####:  103:			exit_error("Could not create directory '%s'.", path_to_string(&target));
-        -:  104:	}
-        -:  105:
-    #####:  106:	if (path_canonicalize(&target)) {
-    #####:  107:		exit_error("Could not create path: %s\n", path_to_string(&target));
-        -:  108:	}
-    #####:  109:}
-        -:  110:
-    #####:  111:u64 module_to_string(const ModuleInfo *module_info, char *buf, u64 limit)
-        -:  112:{
-    #####:  113:	u64 itt = 0;
-    #####:  114:	strncpy(buf, "", limit);
-    #####:  115:	for (u64 i = 0; i < module_info->sub_module_count; i++) {
-    #####:  116:		if (itt < limit)
-    #####:  117:			strncat(buf, module_info->module_list[i].name, limit - itt);
-    #####:  118:		itt += strlen(module_info->module_list[i].name);
-    #####:  119:		if (i != module_info->sub_module_count - 1) {
-    #####:  120:			if (itt < limit)
-    #####:  121:				strncat(buf, "/", limit - itt);
-    #####:  122:			itt += 1;
-        -:  123:		}
-        -:  124:	}
+    #####:   32:FamTomlInfo extract_toml_info(const char *base_dir) {
+    #####:   33:	Path toml;
+    #####:   34:	path_for(&toml, base_dir);
+    #####:   35:	path_push(&toml, "fam.toml");
+        -:   36:
+    #####:   37:	if (path_canonicalize(&toml)) {
+    #####:   38:		exit_error("fam.toml file ('%s') not found.", path_to_string(&toml));
+        -:   39:	}
+        -:   40:
+    #####:   41:	FILE *toml_fp = myfopen(path_to_string(&toml), "r");
+        -:   42:	char errbuf[1024];
+    #####:   43:	toml_table_t *table = toml_parse_file(toml_fp, errbuf, sizeof(errbuf));
+        -:   44:
+    #####:   45:	if (table == NULL) {
+    #####:   46:		exit_error("Could not parse toml file due to '%s'", errbuf);
+        -:   47:	}
+        -:   48:
+        -:   49:	FamTomlInfo ret;
+        -:   50:
+    #####:   51:	myfclose(toml_fp);
+        -:   52:
+    #####:   53:	toml_raw_t raw_fam_version = toml_raw_in(table, "fam_version");
+        -:   54:	char *fam_version;
+    #####:   55:	if (raw_fam_version) {
+    #####:   56:		toml_rtos(raw_fam_version, &fam_version);
+    #####:   57:		strcpy(ret.version, fam_version);
+    #####:   58:		free((void *)fam_version); // Clean up after toml_rtos
+        -:   59:	} else {
+    #####:   60:		exit_error("fam_version not specified in '%s'", path_to_string(&toml));
+        -:   61:	}
+        -:   62:
+    #####:   63:	toml_table_t *package_table = toml_table_in(table, "package");
+    #####:   64:	if (package_table) {
+    #####:   65:		toml_raw_t raw_name = toml_raw_in(package_table, "name");
+        -:   66:		char *name;
+    #####:   67:		if (raw_name) {
+    #####:   68:			toml_rtos(raw_name, &name);
+    #####:   69:			strcpy(ret.name, name);
+        -:   70:		} else {
+    #####:   71:			exit_error("name not specified in fam.toml!");
+        -:   72:		}
+        -:   73:	} else {
+    #####:   74:		exit_error("package not found in fam.toml");
+        -:   75:	}
+        -:   76:
+    #####:   77:	return ret;
+        -:   78:}
+        -:   79:
+    #####:   80:void ensure_target_structure(const char *base_dir) {
+    #####:   81:	Path target;
+    #####:   82:	path_for(&target, base_dir);
+    #####:   83:	path_push(&target, "target");
+    #####:   84:	if (!path_exists(&target)) {
+    #####:   85:		if (!path_mkdir(&target, 0700, false))
+    #####:   86:			exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:   87:		path_push(&target, "objs");
+    #####:   88:		if (!path_mkdir(&target, 0700, false))
+    #####:   89:			exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:   90:		path_pop(&target);
+    #####:   91:		path_push(&target, "build");
+    #####:   92:		if (!path_mkdir(&target, 0700, false))
+    #####:   93:			exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:   94:		path_pop(&target);
+    #####:   95:		path_push(&target, "include");
+    #####:   96:		if (!path_mkdir(&target, 0700, false))
+    #####:   97:			exit_error("Could not create directory '%s'.", path_to_string(&target));
+    #####:   98:		path_pop(&target);
+    #####:   99:		path_push(&target, "args");
+    #####:  100:		if (!path_mkdir(&target, 0700, false))
+    #####:  101:			exit_error("Could not create directory '%s'.", path_to_string(&target));
+        -:  102:	}
+        -:  103:
+    #####:  104:	if (path_canonicalize(&target)) {
+    #####:  105:		exit_error("Could not create path: %s\n", path_to_string(&target));
+        -:  106:	}
+    #####:  107:}
+        -:  108:
+    #####:  109:u64 module_to_string(const ModuleInfo *module_info, char *buf, u64 limit) {
+    #####:  110:	u64 itt = 0;
+    #####:  111:	strncpy(buf, "", limit);
+    #####:  112:	for (u64 i = 0; i < module_info->sub_module_count; i++) {
+    #####:  113:		if (itt < limit)
+    #####:  114:			strncat(buf, module_info->module_list[i].name, limit - itt);
+    #####:  115:		itt += strlen(module_info->module_list[i].name);
+    #####:  116:		if (i != module_info->sub_module_count - 1) {
+    #####:  117:			if (itt < limit)
+    #####:  118:				strncat(buf, "/", limit - itt);
+    #####:  119:			itt += 1;
+        -:  120:		}
+        -:  121:	}
+        -:  122:
+    #####:  123:	return itt;
+        -:  124:}
         -:  125:
-    #####:  126:	return itt;
-        -:  127:}
-        -:  128:
-    #####:  129:u64 module_to_type_string(const ModuleInfo *type_info, char *buf, u64 limit)
-        -:  130:{
-    #####:  131:	u64 itt = 0;
-    #####:  132:	strncpy(buf, "type_____", limit);
-    #####:  133:	itt += 10;
-    #####:  134:	for (u64 i = 0; i < type_info->sub_module_count; i++) {
-    #####:  135:		if (itt < limit)
-    #####:  136:			strncat(buf, type_info->module_list[i].name, limit - itt);
-    #####:  137:		itt += strlen(type_info->module_list[i].name);
-    #####:  138:		if (1 + i < type_info->sub_module_count) {
-    #####:  139:			if (itt < limit)
-    #####:  140:				strncat(buf, "_____", limit - itt);
-    #####:  141:			itt += 5;
-        -:  142:		}
-        -:  143:	}
-        -:  144:
-    #####:  145:	return itt;
-        -:  146:}
-        -:  147:
-    #####:  148:u64 type_info_to_string(const TypeInfo *type_info, char *buf, u64 limit)
-        -:  149:{
-    #####:  150:	u64 itt = 0;
-    #####:  151:	strncpy(buf, "type_____", limit);
-    #####:  152:	itt += 10;
-    #####:  153:	for (u64 i = 0; i < type_info->mi.sub_module_count; i++) {
-    #####:  154:		if (itt < limit)
-    #####:  155:			strncat(buf, type_info->mi.module_list[i].name, limit - itt);
-    #####:  156:		itt += strlen(type_info->mi.module_list[i].name);
-    #####:  157:		if (itt < limit)
-    #####:  158:			strncat(buf, "_____", limit - itt);
-    #####:  159:		itt += 5;
-        -:  160:	}
-    #####:  161:	if (itt < limit)
-    #####:  162:		strncat(buf, type_info->type_name, limit - itt);
-    #####:  163:	itt += strlen(type_info->type_name);
-        -:  164:
-    #####:  165:	return itt;
-        -:  166:}
-        -:  167:
-    #####:  168:u64 type_info_to_path(const TypeInfo *type_info, char *buf, u64 limit)
-        -:  169:{
-    #####:  170:	u64 itt = 0;
-    #####:  171:	strncpy(buf, "", limit);
-    #####:  172:	for (u64 i = 0; i < type_info->mi.sub_module_count; i++) {
-    #####:  173:		if (itt < limit)
-    #####:  174:			strncat(buf, type_info->mi.module_list[i].name, limit - itt);
-    #####:  175:		itt += strlen(type_info->mi.module_list[i].name);
-    #####:  176:		if (itt < limit)
-    #####:  177:			strncat(buf, "/", limit - itt);
-    #####:  178:		itt += 1;
-        -:  179:	}
-    #####:  180:	if (itt < limit)
-    #####:  181:		strncat(buf, type_info->type_name, limit - itt);
-    #####:  182:	itt += strlen(type_info->type_name);
-        -:  183:
-    #####:  184:	return itt;
-        -:  185:}
-        -:  186:
-    #####:  187:u64 type_info_module_file(const char *base_dir, const TypeInfo *type_info, char *buf, u64 limit)
-        -:  188:{
-    #####:  189:	Path p;
-    #####:  190:	path_for(&p, base_dir);
-    #####:  191:	if (type_info->mi.sub_module_count) {
-    #####:  192:		for (u64 i = 0; i < type_info->mi.sub_module_count - 1; i++) {
-    #####:  193:			path_push(&p, type_info->mi.module_list[i].name);
-        -:  194:		}
-        -:  195:	}
-    #####:  196:	if (type_info->mi.sub_module_count) {
-        -:  197:		char header_name[PATH_MAX];
-    #####:  198:		strcpy(header_name, type_info->mi.module_list[type_info->mi.sub_module_count - 1].name);
-    #####:  199:		strcat(header_name, ".h");
-    #####:  200:		path_push(&p, header_name);
-        -:  201:
-    #####:  202:		if (path_exists(&p)) {
-    #####:  203:			strncpy(buf, path_to_string(&p), limit);
-    #####:  204:			return strlen(path_to_string(&p));
-        -:  205:		} else {
-    #####:  206:			path_pop(&p);
-    #####:  207:			path_push(&p, type_info->mi.module_list[type_info->mi.sub_module_count - 1].name);
-    #####:  208:			path_push(&p, "mod.h");
-    #####:  209:			if (path_exists(&p)) {
-    #####:  210:				strncpy(buf, path_to_string(&p), limit);
-    #####:  211:				return strlen(path_to_string(&p));
-        -:  212:			} else {
-    #####:  213:				exit_error("header file did not exist at path '%s'", path_to_string(&p));
-        -:  214:			}
-        -:  215:		}
-        -:  216:	} else {
-    #####:  217:		path_push(&p, "mod.h");
-    #####:  218:		strncpy(buf, path_to_string(&p), limit);
-    #####:  219:		return strlen(path_to_string(&p));
-        -:  220:	}
-        -:  221:
-        -:  222:	// should never get here
-    #####:  223:	return 0;
-        -:  224:}
-        -:  225:
-    #####:  226:void build_obj(const char *cc, const char *include_dir, const char *obj_dir, const char *src_dir,
-        -:  227:	const TypeInfo *type_info, const char *obj_prefix, const char *config_include,
-        -:  228:	const char *impl_def, const char *implconfig_def, const char *args_path)
-    #####:  229:{
-    #####:  230:	Path obj_path;
-    #####:  231:	path_for(&obj_path, obj_dir);
-        -:  232:
-    #####:  233:	u64 obj_prefix_len = 0;
-    #####:  234:	if (obj_prefix)
-    #####:  235:		obj_prefix_len = strlen(obj_prefix);
-    #####:  236:	char obj_file_name[obj_prefix_len + strlen(type_info->type_name) + 5];
-    #####:  237:	if (obj_prefix) {
-    #####:  238:		strcpy(obj_file_name, obj_prefix);
-    #####:  239:		strcat(obj_file_name, type_info->type_name);
-    #####:  240:		strcat(obj_file_name, ".o");
-        -:  241:	} else {
-    #####:  242:		strcpy(obj_file_name, type_info->type_name);
-    #####:  243:		strcat(obj_file_name, ".o");
-        -:  244:	}
-        -:  245:
-    #####:  246:	path_push(&obj_path, obj_file_name);
-        -:  247:
-    #####:  248:	u64 needed = type_info_to_path(type_info, NULL, 0);
-    #####:  249:	char file_name[needed + 3];
-    #####:  250:	type_info_to_path(type_info, file_name, needed);
-    #####:  251:	strcat(file_name, ".c");
+    #####:  126:u64 module_to_type_string(const ModuleInfo *type_info, char *buf, u64 limit) {
+    #####:  127:	u64 itt = 0;
+    #####:  128:	strncpy(buf, "type_____", limit);
+    #####:  129:	itt += 10;
+    #####:  130:	for (u64 i = 0; i < type_info->sub_module_count; i++) {
+    #####:  131:		if (itt < limit)
+    #####:  132:			strncat(buf, type_info->module_list[i].name, limit - itt);
+    #####:  133:		itt += strlen(type_info->module_list[i].name);
+    #####:  134:		if (1 + i < type_info->sub_module_count) {
+    #####:  135:			if (itt < limit)
+    #####:  136:				strncat(buf, "_____", limit - itt);
+    #####:  137:			itt += 5;
+        -:  138:		}
+        -:  139:	}
+        -:  140:
+    #####:  141:	return itt;
+        -:  142:}
+        -:  143:
+    #####:  144:u64 type_info_to_string(const TypeInfo *type_info, char *buf, u64 limit) {
+    #####:  145:	u64 itt = 0;
+    #####:  146:	strncpy(buf, "type_____", limit);
+    #####:  147:	itt += 10;
+    #####:  148:	for (u64 i = 0; i < type_info->mi.sub_module_count; i++) {
+    #####:  149:		if (itt < limit)
+    #####:  150:			strncat(buf, type_info->mi.module_list[i].name, limit - itt);
+    #####:  151:		itt += strlen(type_info->mi.module_list[i].name);
+    #####:  152:		if (itt < limit)
+    #####:  153:			strncat(buf, "_____", limit - itt);
+    #####:  154:		itt += 5;
+        -:  155:	}
+    #####:  156:	if (itt < limit)
+    #####:  157:		strncat(buf, type_info->type_name, limit - itt);
+    #####:  158:	itt += strlen(type_info->type_name);
+        -:  159:
+    #####:  160:	return itt;
+        -:  161:}
+        -:  162:
+    #####:  163:u64 type_info_to_path(const TypeInfo *type_info, char *buf, u64 limit) {
+    #####:  164:	u64 itt = 0;
+    #####:  165:	strncpy(buf, "", limit);
+    #####:  166:	for (u64 i = 0; i < type_info->mi.sub_module_count; i++) {
+    #####:  167:		if (itt < limit)
+    #####:  168:			strncat(buf, type_info->mi.module_list[i].name, limit - itt);
+    #####:  169:		itt += strlen(type_info->mi.module_list[i].name);
+    #####:  170:		if (itt < limit)
+    #####:  171:			strncat(buf, "/", limit - itt);
+    #####:  172:		itt += 1;
+        -:  173:	}
+    #####:  174:	if (itt < limit)
+    #####:  175:		strncat(buf, type_info->type_name, limit - itt);
+    #####:  176:	itt += strlen(type_info->type_name);
+        -:  177:
+    #####:  178:	return itt;
+        -:  179:}
+        -:  180:
+    #####:  181:u64 type_info_module_file(const char *base_dir, const TypeInfo *type_info, char *buf, u64 limit) {
+    #####:  182:	Path p;
+    #####:  183:	path_for(&p, base_dir);
+    #####:  184:	if (type_info->mi.sub_module_count) {
+    #####:  185:		for (u64 i = 0; i < type_info->mi.sub_module_count - 1; i++) {
+    #####:  186:			path_push(&p, type_info->mi.module_list[i].name);
+        -:  187:		}
+        -:  188:	}
+    #####:  189:	if (type_info->mi.sub_module_count) {
+        -:  190:		char header_name[PATH_MAX];
+    #####:  191:		strcpy(header_name, type_info->mi.module_list[type_info->mi.sub_module_count - 1].name);
+    #####:  192:		strcat(header_name, ".h");
+    #####:  193:		path_push(&p, header_name);
+        -:  194:
+    #####:  195:		if (path_exists(&p)) {
+    #####:  196:			strncpy(buf, path_to_string(&p), limit);
+    #####:  197:			return strlen(path_to_string(&p));
+        -:  198:		} else {
+    #####:  199:			path_pop(&p);
+    #####:  200:			path_push(&p, type_info->mi.module_list[type_info->mi.sub_module_count - 1].name);
+    #####:  201:			path_push(&p, "mod.h");
+    #####:  202:			if (path_exists(&p)) {
+    #####:  203:				strncpy(buf, path_to_string(&p), limit);
+    #####:  204:				return strlen(path_to_string(&p));
+        -:  205:			} else {
+    #####:  206:				exit_error("header file did not exist at path '%s'", path_to_string(&p));
+        -:  207:			}
+        -:  208:		}
+        -:  209:	} else {
+    #####:  210:		path_push(&p, "mod.h");
+    #####:  211:		strncpy(buf, path_to_string(&p), limit);
+    #####:  212:		return strlen(path_to_string(&p));
+        -:  213:	}
+        -:  214:
+        -:  215:	// should never get here
+    #####:  216:	return 0;
+        -:  217:}
+        -:  218:
+    #####:  219:void build_obj(const char *cc, const char *include_dir, const char *obj_dir, const char *src_dir,
+        -:  220:			   const TypeInfo *type_info, const char *obj_prefix, const char *config_include,
+    #####:  221:			   const char *impl_def, const char *implconfig_def, const char *args_path) {
+    #####:  222:	Path obj_path;
+    #####:  223:	path_for(&obj_path, obj_dir);
+        -:  224:
+    #####:  225:	u64 obj_prefix_len = 0;
+    #####:  226:	if (obj_prefix)
+    #####:  227:		obj_prefix_len = strlen(obj_prefix);
+    #####:  228:	char obj_file_name[obj_prefix_len + strlen(type_info->type_name) + 5];
+    #####:  229:	if (obj_prefix) {
+    #####:  230:		strcpy(obj_file_name, obj_prefix);
+    #####:  231:		strcat(obj_file_name, type_info->type_name);
+    #####:  232:		strcat(obj_file_name, ".o");
+        -:  233:	} else {
+    #####:  234:		strcpy(obj_file_name, type_info->type_name);
+    #####:  235:		strcat(obj_file_name, ".o");
+        -:  236:	}
+        -:  237:
+    #####:  238:	path_push(&obj_path, obj_file_name);
+        -:  239:
+    #####:  240:	u64 needed = type_info_to_path(type_info, NULL, 0);
+    #####:  241:	char file_name[needed + 3];
+    #####:  242:	type_info_to_path(type_info, file_name, needed);
+    #####:  243:	strcat(file_name, ".c");
+        -:  244:
+    #####:  245:	Path src_path;
+    #####:  246:	path_for(&src_path, src_dir);
+    #####:  247:	path_push(&src_path, file_name);
+        -:  248:
+    #####:  249:	char include_param[strlen(include_dir) + 5];
+    #####:  250:	strcpy(include_param, "-I");
+    #####:  251:	strcat(include_param, include_dir);
         -:  252:
-    #####:  253:	Path src_path;
-    #####:  254:	path_for(&src_path, src_dir);
-    #####:  255:	path_push(&src_path, file_name);
+    #####:  253:	char args_path_with_at[strlen(args_path) + 2];
+    #####:  254:	strcpy(args_path_with_at, "@");
+    #####:  255:	strcat(args_path_with_at, args_path);
         -:  256:
-    #####:  257:	char include_param[strlen(include_dir) + 5];
-    #####:  258:	strcpy(include_param, "-I");
-    #####:  259:	strcat(include_param, include_dir);
-        -:  260:
-    #####:  261:	char args_path_with_at[strlen(args_path) + 2];
-    #####:  262:	strcpy(args_path_with_at, "@");
-    #####:  263:	strcat(args_path_with_at, args_path);
-        -:  264:
-    #####:  265:	if (config_include) {
-    #####:  266:		char config_include_param[strlen(config_include) + 5];
-    #####:  267:		strcpy(config_include_param, "-I");
-    #####:  268:		strcat(config_include_param, config_include);
-    #####:  269:		const char *args[] = { cc, "-Wno-attributes", "-Wno-ignored-attributes", include_param,
-    #####:  270:			config_include_param, "-c", "-o", path_to_string(&obj_path), path_to_string(&src_path),
-        -:  271:			impl_def, implconfig_def, args_path_with_at, NULL };
-    #####:  272:		if (execute_process(args)) {
-    #####:  273:			exit_error("execution of process '%s' failed", args[0]);
-        -:  274:		}
-        -:  275:	} else {
-    #####:  276:		const char *args[] = { cc, "-Wno-attributes", "-Wno-ignored-attributes", include_param,
-    #####:  277:			"-c", "-o", path_to_string(&obj_path), path_to_string(&src_path), impl_def,
-        -:  278:			implconfig_def, args_path_with_at, NULL };
-    #####:  279:		if (execute_process(args)) {
-    #####:  280:			exit_error("execution of process '%s' failed", args[0]);
-        -:  281:		}
-        -:  282:	}
-    #####:  283:}
-        -:  284:
-    #####:  285:void link_objs(const char *objs_path, const char *base_dir, const char *name)
-    #####:  286:{
-        -:  287:	glob_t glob_result;
-    #####:  288:	Path objs_dir;
-    #####:  289:	path_for(&objs_dir, base_dir);
-    #####:  290:	path_push(&objs_dir, "target/objs/*.o");
-        -:  291:
-    #####:  292:	glob(path_to_string(&objs_dir), 0, NULL, &glob_result);
-        -:  293:
-        -:  294:	// Construct the argument array for exec
-    #####:  295:	char *link[5 + glob_result.gl_pathc + 1];
-    #####:  296:	Path output_file;
-    #####:  297:	path_for(&output_file, base_dir);
-    #####:  298:	path_push(&output_file, "target");
-    #####:  299:	path_push(&output_file, name);
-    #####:  300:	link[0] = "cc";
-    #####:  301:	link[1] = "-o";
-    #####:  302:	link[2] = path_to_string(&output_file);
+    #####:  257:	if (config_include) {
+    #####:  258:		char config_include_param[strlen(config_include) + 5];
+    #####:  259:		strcpy(config_include_param, "-I");
+    #####:  260:		strcat(config_include_param, config_include);
+    #####:  261:		const char *args[] = {cc,
+        -:  262:							  "-Wno-attributes",
+        -:  263:							  "-Wno-ignored-attributes",
+        -:  264:							  include_param,
+        -:  265:							  config_include_param,
+        -:  266:							  "-c",
+        -:  267:							  "-o",
+    #####:  268:							  path_to_string(&obj_path),
+    #####:  269:							  path_to_string(&src_path),
+        -:  270:							  impl_def,
+        -:  271:							  implconfig_def,
+        -:  272:							  args_path_with_at,
+        -:  273:							  NULL};
+    #####:  274:		if (execute_process(args)) {
+    #####:  275:			exit_error("execution of process '%s' failed", args[0]);
+        -:  276:		}
+        -:  277:	} else {
+    #####:  278:		const char *args[] = {cc,
+        -:  279:							  "-Wno-attributes",
+        -:  280:							  "-Wno-ignored-attributes",
+        -:  281:							  include_param,
+        -:  282:							  "-c",
+        -:  283:							  "-o",
+    #####:  284:							  path_to_string(&obj_path),
+    #####:  285:							  path_to_string(&src_path),
+        -:  286:							  impl_def,
+        -:  287:							  implconfig_def,
+        -:  288:							  args_path_with_at,
+        -:  289:							  NULL};
+    #####:  290:		if (execute_process(args)) {
+    #####:  291:			exit_error("execution of process '%s' failed", args[0]);
+        -:  292:		}
+        -:  293:	}
+    #####:  294:}
+        -:  295:
+    #####:  296:void link_objs(const char *objs_path, const char *base_dir, const char *name) {
+        -:  297:	glob_t glob_result;
+    #####:  298:	Path objs_dir;
+    #####:  299:	path_for(&objs_dir, base_dir);
+    #####:  300:	path_push(&objs_dir, "target/objs/*.o");
+        -:  301:
+    #####:  302:	glob(path_to_string(&objs_dir), 0, NULL, &glob_result);
         -:  303:
-        -:  304:	// Add all the .o files from glob to the argument list
-    #####:  305:	for (size_t i = 0; i < glob_result.gl_pathc; i++) {
-    #####:  306:		link[3 + i] = glob_result.gl_pathv[i];
-        -:  307:	}
-    #####:  308:	link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
-        -:  309:
-    #####:  310:	const char **link_const = (const char **)&link;
-        -:  311:
-    #####:  312:	if (execute_process(link_const)) {
-    #####:  313:		exit_error("execution of process '%s' failed", link[0]);
-        -:  314:	}
-    #####:  315:}
-        -:  316:
-    #####:  317:void build_internal(const char *base_dir, const char *config_dir)
-        -:  318:{
-    #####:  319:	Path build_path;
-    #####:  320:	path_for(&build_path, base_dir);
-    #####:  321:	path_push(&build_path, "target");
-    #####:  322:	path_push(&build_path, "build");
-    #####:  323:	remove_directory(path_to_string(&build_path), true);
-        -:  324:
-    #####:  325:	Path objs_path;
-    #####:  326:	path_for(&objs_path, base_dir);
-    #####:  327:	path_push(&objs_path, "target");
-    #####:  328:	path_push(&objs_path, "objs");
-        -:  329:
-    #####:  330:	Path config_src;
-    #####:  331:	path_for(&config_src, config_dir);
-    #####:  332:	path_push(&config_src, "resources");
-    #####:  333:	path_push(&config_src, "src");
-    #####:  334:	path_push(&config_src, "*.c");
-        -:  335:
-    #####:  336:	Path args_path;
-    #####:  337:	path_for(&args_path, base_dir);
-    #####:  338:	path_push(&args_path, "target");
-    #####:  339:	path_push(&args_path, "args");
-    #####:  340:	path_push(&args_path, "args.txt");
-        -:  341:
-    #####:  342:	Path include_dir;
-    #####:  343:	path_for(&include_dir, config_dir);
-    #####:  344:	path_push(&include_dir, "resources");
-    #####:  345:	path_push(&include_dir, "include");
-        -:  346:
-        -:  347:	glob_t glob_result;
-    #####:  348:	glob(path_to_string(&config_src), 0, NULL, &glob_result);
-        -:  349:
-    #####:  350:	Path config_dir_src_path;
-    #####:  351:	path_for(&config_dir_src_path, config_dir);
-    #####:  352:	path_push(&config_dir_src_path, "resources");
-    #####:  353:	path_push(&config_dir_src_path, "src");
-        -:  354:
-    #####:  355:	for (u64 i = 0; i < glob_result.gl_pathc; i++) {
-        -:  356:		TypeInfo ti;
-    #####:  357:		ti.mi.sub_module_count = 0;
-    #####:  358:		if (strlen(glob_result.gl_pathv[i]) >= MAX_NAME_LEN) {
-    #####:  359:			exit_error("name too long! [%s]", glob_result.gl_pathv[i]);
-        -:  360:		}
-    #####:  361:		Path glob_path;
-    #####:  362:		path_for(&glob_path, glob_result.gl_pathv[i]);
-    #####:  363:		char path_stem[strlen(path_file_name(&glob_path)) + 1];
-    #####:  364:		path_file_stem(&glob_path, path_stem, strlen(path_file_name(&glob_path)));
-    #####:  365:		strcpy(ti.type_name, path_stem);
-    #####:  366:		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path),
-    #####:  367:			path_to_string(&config_dir_src_path), &ti, "___internal_objs_", NULL,
-    #####:  368:			"-DIMPL=", "-DIMPLCONFIG=", path_to_string(&args_path));
-        -:  369:	}
-    #####:  370:}
-        -:  371:
-    #####:  372:int proc_build(const char *base_dir, const char *config_dir)
-        -:  373:{
-    #####:  374:	fprintf(stderr, "proc build %s %s\n", base_dir, config_dir);
-    #####:  375:	FamTomlInfo fti = extract_toml_info(base_dir);
-    #####:  376:	fprintf(stderr, "building project %s. fam.toml generated by %s.\n", fti.name, fti.version);
-    #####:  377:	ensure_target_structure(base_dir);
-        -:  378:
-    #####:  379:	Path args_dir;
-    #####:  380:	path_for(&args_dir, base_dir);
-    #####:  381:	path_push(&args_dir, "target");
-    #####:  382:	path_push(&args_dir, "args");
-    #####:  383:	remove_directory(path_to_string(&args_dir), true);
-    #####:  384:	path_push(&args_dir, "args.txt");
-        -:  385:	// create empty file
-    #####:  386:	FILE *fp = myfopen(path_to_string(&args_dir), "a");
-    #####:  387:	myfclose(fp);
-        -:  388:
-    #####:  389:	Path config_include_dir;
-    #####:  390:	path_for(&config_include_dir, config_dir);
-    #####:  391:	path_push(&config_include_dir, "resources");
-    #####:  392:	path_push(&config_include_dir, "include");
-        -:  393:
-    #####:  394:	Path include_dir;
-    #####:  395:	path_for(&include_dir, base_dir);
-    #####:  396:	path_push(&include_dir, "target");
-    #####:  397:	path_push(&include_dir, "include");
-        -:  398:
-    #####:  399:	Path objs_path;
-    #####:  400:	path_for(&objs_path, base_dir);
-    #####:  401:	path_push(&objs_path, "target");
-    #####:  402:	path_push(&objs_path, "objs");
-        -:  403:
-    #####:  404:	Path args_path;
-    #####:  405:	path_for(&args_path, base_dir);
-    #####:  406:	path_push(&args_path, "target");
-    #####:  407:	path_push(&args_path, "args");
-    #####:  408:	path_push(&args_path, "args.txt");
-        -:  409:
-    #####:  410:	build_internal(base_dir, config_dir);
-    #####:  411:	Path modh;
-    #####:  412:	path_for(&modh, base_dir);
-    #####:  413:	path_push(&modh, "mod.h");
-        -:  414:
-    #####:  415:	Vec headers;
-    #####:  416:	vec_init(&headers, 10, sizeof(ModuleInfo));
-    #####:  417:	Vec types;
-    #####:  418:	vec_init(&types, 10, sizeof(TypeInfo));
-    #####:  419:	Vec module_list;
-    #####:  420:	vec_init(&module_list, 10, sizeof(ModuleInfo));
-        -:  421:
-    #####:  422:	path_canonicalize(&modh);
-        -:  423:
-    #####:  424:	const char *args_file = path_to_string(&args_path);
-    #####:  425:	init_parser(args_file);
-        -:  426:
-        -:  427:	ModuleInfo self_info;
-    #####:  428:	self_info.sub_module_count = 0;
-    #####:  429:	parse_header(config_dir, base_dir, &headers, &types, &self_info);
-        -:  430:
-    #####:  431:	while (vec_size(&headers)) {
-    #####:  432:		ModuleInfo *next = vec_pop(&headers);
-    #####:  433:		parse_header(config_dir, base_dir, &headers, &types, next);
-        -:  434:	}
-        -:  435:
-    #####:  436:	while (vec_size(&types)) {
-    #####:  437:		TypeInfo *next = vec_pop(&types);
-        -:  438:		char type_prefix[PATH_MAX];
-    #####:  439:		type_info_to_string(next, type_prefix, PATH_MAX);
-    #####:  440:		strcat(type_prefix, "_");
-        -:  441:		char gen_header_bs_dir[PATH_MAX];
-    #####:  442:		snprintf(gen_header_bs_dir, PATH_MAX, "f%" PRIu64, next->gen_file_counter);
-        -:  443:
-    #####:  444:		path_push(&include_dir, gen_header_bs_dir);
-        -:  445:
-        -:  446:		char type_str[PATH_MAX * 2];
-    #####:  447:		type_info_to_string(next, type_str, PATH_MAX * 2);
-    #####:  448:		printf("type=%s\n", type_str);
-        -:  449:
-        -:  450:		char dimpl[(PATH_MAX * 2) + 30];
-    #####:  451:		strcpy(dimpl, "-DIMPL=");
-    #####:  452:		strcat(dimpl, type_str);
-        -:  453:
-        -:  454:		char dimplconfig[(PATH_MAX * 2) + 30];
-    #####:  455:		strcpy(dimplconfig, "-DIMPLCONFIG=");
-    #####:  456:		strcat(dimplconfig, type_str);
-    #####:  457:		strcat(dimplconfig, "Config");
+        -:  304:	// Construct the argument array for exec
+    #####:  305:	char *link[5 + glob_result.gl_pathc + 1];
+    #####:  306:	Path output_file;
+    #####:  307:	path_for(&output_file, base_dir);
+    #####:  308:	path_push(&output_file, "target");
+    #####:  309:	path_push(&output_file, name);
+    #####:  310:	link[0] = "cc";
+    #####:  311:	link[1] = "-o";
+    #####:  312:	link[2] = path_to_string(&output_file);
+        -:  313:
+        -:  314:	// Add all the .o files from glob to the argument list
+    #####:  315:	for (size_t i = 0; i < glob_result.gl_pathc; i++) {
+    #####:  316:		link[3 + i] = glob_result.gl_pathv[i];
+        -:  317:	}
+    #####:  318:	link[3 + glob_result.gl_pathc] = NULL; // Terminate the argument list
+        -:  319:
+    #####:  320:	const char **link_const = (const char **)&link;
+        -:  321:
+    #####:  322:	if (execute_process(link_const)) {
+    #####:  323:		exit_error("execution of process '%s' failed", link[0]);
+        -:  324:	}
+    #####:  325:}
+        -:  326:
+    #####:  327:void build_internal(const char *base_dir, const char *config_dir) {
+    #####:  328:	Path build_path;
+    #####:  329:	path_for(&build_path, base_dir);
+    #####:  330:	path_push(&build_path, "target");
+    #####:  331:	path_push(&build_path, "build");
+    #####:  332:	remove_directory(path_to_string(&build_path), true);
+        -:  333:
+    #####:  334:	Path objs_path;
+    #####:  335:	path_for(&objs_path, base_dir);
+    #####:  336:	path_push(&objs_path, "target");
+    #####:  337:	path_push(&objs_path, "objs");
+        -:  338:
+    #####:  339:	Path config_src;
+    #####:  340:	path_for(&config_src, config_dir);
+    #####:  341:	path_push(&config_src, "resources");
+    #####:  342:	path_push(&config_src, "src");
+    #####:  343:	path_push(&config_src, "*.c");
+        -:  344:
+    #####:  345:	Path args_path;
+    #####:  346:	path_for(&args_path, base_dir);
+    #####:  347:	path_push(&args_path, "target");
+    #####:  348:	path_push(&args_path, "args");
+    #####:  349:	path_push(&args_path, "args.txt");
+        -:  350:
+    #####:  351:	Path include_dir;
+    #####:  352:	path_for(&include_dir, config_dir);
+    #####:  353:	path_push(&include_dir, "resources");
+    #####:  354:	path_push(&include_dir, "include");
+        -:  355:
+        -:  356:	glob_t glob_result;
+    #####:  357:	glob(path_to_string(&config_src), 0, NULL, &glob_result);
+        -:  358:
+    #####:  359:	Path config_dir_src_path;
+    #####:  360:	path_for(&config_dir_src_path, config_dir);
+    #####:  361:	path_push(&config_dir_src_path, "resources");
+    #####:  362:	path_push(&config_dir_src_path, "src");
+        -:  363:
+    #####:  364:	for (u64 i = 0; i < glob_result.gl_pathc; i++) {
+        -:  365:		TypeInfo ti;
+    #####:  366:		ti.mi.sub_module_count = 0;
+    #####:  367:		if (strlen(glob_result.gl_pathv[i]) >= MAX_NAME_LEN) {
+    #####:  368:			exit_error("name too long! [%s]", glob_result.gl_pathv[i]);
+        -:  369:		}
+    #####:  370:		Path glob_path;
+    #####:  371:		path_for(&glob_path, glob_result.gl_pathv[i]);
+    #####:  372:		char path_stem[strlen(path_file_name(&glob_path)) + 1];
+    #####:  373:		path_file_stem(&glob_path, path_stem, strlen(path_file_name(&glob_path)));
+    #####:  374:		strcpy(ti.type_name, path_stem);
+    #####:  375:		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path),
+    #####:  376:				  path_to_string(&config_dir_src_path), &ti, "___internal_objs_", NULL,
+    #####:  377:				  "-DIMPL=", "-DIMPLCONFIG=", path_to_string(&args_path));
+        -:  378:	}
+    #####:  379:}
+        -:  380:
+    #####:  381:int proc_build(const char *base_dir, const char *config_dir) {
+    #####:  382:	fprintf(stderr, "proc build %s %s\n", base_dir, config_dir);
+    #####:  383:	FamTomlInfo fti = extract_toml_info(base_dir);
+    #####:  384:	fprintf(stderr, "building project %s. fam.toml generated by %s.\n", fti.name, fti.version);
+    #####:  385:	ensure_target_structure(base_dir);
+        -:  386:
+    #####:  387:	Path args_dir;
+    #####:  388:	path_for(&args_dir, base_dir);
+    #####:  389:	path_push(&args_dir, "target");
+    #####:  390:	path_push(&args_dir, "args");
+    #####:  391:	remove_directory(path_to_string(&args_dir), true);
+    #####:  392:	path_push(&args_dir, "args.txt");
+        -:  393:	// create empty file
+    #####:  394:	FILE *fp = myfopen(path_to_string(&args_dir), "a");
+    #####:  395:	myfclose(fp);
+        -:  396:
+    #####:  397:	Path config_include_dir;
+    #####:  398:	path_for(&config_include_dir, config_dir);
+    #####:  399:	path_push(&config_include_dir, "resources");
+    #####:  400:	path_push(&config_include_dir, "include");
+        -:  401:
+    #####:  402:	Path include_dir;
+    #####:  403:	path_for(&include_dir, base_dir);
+    #####:  404:	path_push(&include_dir, "target");
+    #####:  405:	path_push(&include_dir, "include");
+        -:  406:
+    #####:  407:	Path objs_path;
+    #####:  408:	path_for(&objs_path, base_dir);
+    #####:  409:	path_push(&objs_path, "target");
+    #####:  410:	path_push(&objs_path, "objs");
+        -:  411:
+    #####:  412:	Path args_path;
+    #####:  413:	path_for(&args_path, base_dir);
+    #####:  414:	path_push(&args_path, "target");
+    #####:  415:	path_push(&args_path, "args");
+    #####:  416:	path_push(&args_path, "args.txt");
+        -:  417:
+    #####:  418:	build_internal(base_dir, config_dir);
+    #####:  419:	Path modh;
+    #####:  420:	path_for(&modh, base_dir);
+    #####:  421:	path_push(&modh, "mod.h");
+        -:  422:
+    #####:  423:	Vec headers;
+    #####:  424:	vec_init(&headers, 10, sizeof(ModuleInfo));
+    #####:  425:	Vec types;
+    #####:  426:	vec_init(&types, 10, sizeof(TypeInfo));
+    #####:  427:	Vec module_list;
+    #####:  428:	vec_init(&module_list, 10, sizeof(ModuleInfo));
+        -:  429:
+    #####:  430:	path_canonicalize(&modh);
+        -:  431:
+    #####:  432:	const char *args_file = path_to_string(&args_path);
+    #####:  433:	init_parser(args_file);
+        -:  434:
+        -:  435:	ModuleInfo self_info;
+    #####:  436:	self_info.sub_module_count = 0;
+    #####:  437:	parse_header(config_dir, base_dir, &headers, &types, &self_info);
+        -:  438:
+    #####:  439:	while (vec_size(&headers)) {
+    #####:  440:		ModuleInfo *next = vec_pop(&headers);
+        -:  441:		ModuleInfo n;
+    #####:  442:		n.sub_module_count = next->sub_module_count;
+    #####:  443:		for (u64 i = 0; i < n.sub_module_count; i++) {
+    #####:  444:			strcpy(n.module_list[i].name, next->module_list[i].name);
+        -:  445:		}
+    #####:  446:		parse_header(config_dir, base_dir, &headers, &types, &n);
+        -:  447:	}
+        -:  448:
+    #####:  449:	while (vec_size(&types)) {
+    #####:  450:		TypeInfo *next = vec_pop(&types);
+        -:  451:		char type_prefix[PATH_MAX];
+    #####:  452:		type_info_to_string(next, type_prefix, PATH_MAX);
+    #####:  453:		strcat(type_prefix, "_");
+        -:  454:		char gen_header_bs_dir[PATH_MAX];
+    #####:  455:		snprintf(gen_header_bs_dir, PATH_MAX, "f%" PRIu64, next->gen_file_counter);
+        -:  456:
+    #####:  457:		path_push(&include_dir, gen_header_bs_dir);
         -:  458:
-    #####:  459:		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, next,
-    #####:  460:			type_prefix, path_to_string(&config_include_dir), dimpl, dimplconfig,
-    #####:  461:			path_to_string(&args_path));
-        -:  462:
-    #####:  463:		path_pop(&include_dir);
-        -:  464:	}
+        -:  459:		char type_str[PATH_MAX * 2];
+    #####:  460:		type_info_to_string(next, type_str, PATH_MAX * 2);
+        -:  461:
+        -:  462:		char dimpl[(PATH_MAX * 2) + 30];
+    #####:  463:		strcpy(dimpl, "-DIMPL=");
+    #####:  464:		strcat(dimpl, type_str);
         -:  465:
-    #####:  466:	path_push(&include_dir, "f0");
-        -:  467:	TypeInfo main_ti;
-    #####:  468:	strcpy(main_ti.type_name, "main");
-    #####:  469:	main_ti.mi.sub_module_count = 0;
-    #####:  470:	main_ti.gen_file_counter = 0;
-        -:  471:
-        -:  472:	// build main
-    #####:  473:	build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, &main_ti,
-    #####:  474:		"type_____", path_to_string(&config_include_dir),
-    #####:  475:		"-DIMPL=", "-DIMPLCONFIG=", path_to_string(&args_path));
-        -:  476:
-        -:  477:	// link objects
-    #####:  478:	link_objs(path_to_string(&objs_path), base_dir, fti.name);
-        -:  479:
-    #####:  480:	return 0;
-        -:  481:}
+        -:  466:		char dimplconfig[(PATH_MAX * 2) + 30];
+    #####:  467:		strcpy(dimplconfig, "-DIMPLCONFIG=");
+    #####:  468:		strcat(dimplconfig, type_str);
+    #####:  469:		strcat(dimplconfig, "Config");
+        -:  470:
+    #####:  471:		build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, next,
+    #####:  472:				  type_prefix, path_to_string(&config_include_dir), dimpl, dimplconfig,
+    #####:  473:				  path_to_string(&args_path));
+        -:  474:
+    #####:  475:		path_pop(&include_dir);
+        -:  476:	}
+        -:  477:
+    #####:  478:	path_push(&include_dir, "f0");
+        -:  479:	TypeInfo main_ti;
+    #####:  480:	strcpy(main_ti.type_name, "main");
+    #####:  481:	main_ti.mi.sub_module_count = 0;
+    #####:  482:	main_ti.gen_file_counter = 0;
+        -:  483:
+        -:  484:	// build main
+    #####:  485:	build_obj("cc", path_to_string(&include_dir), path_to_string(&objs_path), base_dir, &main_ti,
+    #####:  486:			  "type_____", path_to_string(&config_include_dir),
+    #####:  487:			  "-DIMPL=", "-DIMPLCONFIG=", path_to_string(&args_path));
+        -:  488:
+        -:  489:	// link objects
+    #####:  490:	link_objs(path_to_string(&objs_path), base_dir, fti.name);
+        -:  491:
+    #####:  492:	return 0;
+        -:  493:}
         -:    0:Source:init.c
         -:    0:Graph:init.gcno
         -:    0:Data:init.gcda
@@ -6668,1053 +6672,1228 @@ Unit_size:
         -:   18:#include <lexer/lexer.h>
         -:   19:#include <limits.h>
         -:   20:#include <stdio.h>
-        -:   21:#include <string.h>
-        -:   22:
-        -:   23:u64 gen_file_counter = 0;
-        -:   24:
-        -:   25:typedef struct HeaderTypeInfo {
-        -:   26:	char type[MAX_NAME_LEN];
-        -:   27:} HeaderTypeInfo;
-        -:   28:
-        -:   29:typedef struct HeaderNameInfo {
-        -:   30:	char name[MAX_NAME_LEN];
-        -:   31:} HeaderNameInfo;
-        -:   32:
-        -:   33:typedef struct HeaderTypes {
-        -:   34:	Vec types;
-        -:   35:	Vec names;
-        -:   36:} HeaderTypes;
-        -:   37:
-        -:   38:typedef struct ConfigType {
-        -:   39:	char type_name[MAX_NAME_LEN];
-        -:   40:} ConfigType;
-        -:   41:
-        -:   42:typedef struct ConfigName {
-        -:   43:	char name[MAX_NAME_LEN];
-        -:   44:} ConfigName;
-        -:   45:
-        -:   46:typedef struct FnParam {
-        -:   47:	bool is_mut;
-        -:   48:	char type[MAX_NAME_LEN];
-        -:   49:	char name[MAX_NAME_LEN];
-        -:   50:} FnParam;
-        -:   51:
-        -:   52:typedef struct IncompleteFn {
-        -:   53:	char name[MAX_NAME_LEN];
-        -:   54:	Vec params;
-        -:   55:	char return_type[MAX_NAME_LEN];
-        -:   56:} IncompleteFn;
-        -:   57:
-        -:   58:typedef struct IncompleteType {
-        -:   59:	u64 count;
-        -:   60:	IncompleteFn *fns;
-        -:   61:	char name[MAX_NAME_LEN];
-        -:   62:} IncompleteType;
-        -:   63:
-        -:   64:typedef struct GlobalIncompleteList {
-        -:   65:	u64 count;
-        -:   66:	IncompleteType *types;
-        -:   67:} GlobalIncompleteList;
-        -:   68:
-        -:   69:GlobalIncompleteList global_incomplete_list = { 0, NULL };
-        -:   70:
-    #####:   71:void add_to_global_incomplete_list(
-        -:   72:	const char *type_name, const Vec *incomplete_fns, const char *args_file)
-        -:   73:{
-    #####:   74:	if (global_incomplete_list.count == 0) {
-    #####:   75:		global_incomplete_list.types = mymalloc(sizeof(IncompleteType));
-        -:   76:	} else {
-    #####:   77:		global_incomplete_list.types = myrealloc(global_incomplete_list.types,
-    #####:   78:			sizeof(IncompleteType) * (global_incomplete_list.count + 1));
-        -:   79:	}
-        -:   80:
-    #####:   81:	IncompleteType *next = &global_incomplete_list.types[global_incomplete_list.count];
-    #####:   82:	strcpy(next->name, type_name);
-    #####:   83:	next->count = vec_size(incomplete_fns);
-    #####:   84:	next->fns = mymalloc(sizeof(IncompleteFn) * next->count);
-        -:   85:
-    #####:   86:	for (u64 i = 0; i < next->count; i++) {
-    #####:   87:		IncompleteFn *fn = vec_element_at(incomplete_fns, i);
-    #####:   88:		strcpy(next->fns[i].name, fn->name);
-    #####:   89:		strcpy(next->fns[i].return_type, fn->return_type);
-    #####:   90:		vec_init(&next->fns[i].params, 3, sizeof(FnParam));
-    #####:   91:		FILE *fp = myfopen(args_file, "a");
-    #####:   92:		fprintf(fp, "-DFn_expand_%s_return=\"%s\"\n", fn->name, fn->return_type);
-    #####:   93:		fprintf(fp, "-DFn_expand_%s_params=\"_%s(Obj *self", fn->name, fn->name);
-    #####:   94:		if (vec_size(&fn->params))
-    #####:   95:			fprintf(fp, ",");
-    #####:   96:		for (u64 j = 0; j < vec_size(&fn->params); j++) {
-    #####:   97:			FnParam *param = vec_element_at(&fn->params, j);
-    #####:   98:			vec_push(&next->fns[i].params, param);
-        -:   99:			char *comma;
-    #####:  100:			if (j != vec_size(&fn->params) - 1)
-    #####:  101:				comma = ",";
-        -:  102:			else
-    #####:  103:				comma = "";
-    #####:  104:			if (!strcmp(param->type, "__config__")) {
-    #####:  105:				fprintf(fp, " void *__selfconfig__%s", comma);
-        -:  106:			} else {
-    #####:  107:				fprintf(fp, " %s %s%s", param->type, param->name, comma);
-        -:  108:			}
-        -:  109:		}
-    #####:  110:		fprintf(fp, ")\"\n");
-    #####:  111:		myfclose(fp);
-        -:  112:	}
-        -:  113:
-    #####:  114:	global_incomplete_list.count++;
-    #####:  115:}
-        -:  116:
-    #####:  117:void incomplete_fns_cleanup(Vec *incomplete_fns)
-        -:  118:{
-    #####:  119:	while (vec_size(incomplete_fns)) {
-    #####:  120:		IncompleteFn *next = vec_pop(incomplete_fns);
-    #####:  121:		vec_cleanup(&next->params);
-        -:  122:	}
+        -:   21:#include <stdlib.h>
+        -:   22:#include <string.h>
+        -:   23:
+        -:   24:u64 gen_file_counter = 0;
+        -:   25:
+        -:   26:typedef struct HeaderTypeInfo {
+        -:   27:	char type[MAX_NAME_LEN];
+        -:   28:	bool is_arr;
+        -:   29:	u64 arr_size;
+        -:   30:} HeaderTypeInfo;
+        -:   31:
+        -:   32:typedef struct HeaderNameInfo {
+        -:   33:	char name[MAX_NAME_LEN];
+        -:   34:} HeaderNameInfo;
+        -:   35:
+        -:   36:typedef struct HeaderTypes {
+        -:   37:	Vec types;
+        -:   38:	Vec names;
+        -:   39:} HeaderTypes;
+        -:   40:
+        -:   41:typedef struct ConfigType {
+        -:   42:	char type_name[MAX_NAME_LEN];
+        -:   43:} ConfigType;
+        -:   44:
+        -:   45:typedef struct ConfigName {
+        -:   46:	char name[MAX_NAME_LEN];
+        -:   47:} ConfigName;
+        -:   48:
+        -:   49:typedef struct FnParam {
+        -:   50:	bool is_mut;
+        -:   51:	char type[MAX_NAME_LEN];
+        -:   52:	char name[MAX_NAME_LEN];
+        -:   53:} FnParam;
+        -:   54:
+        -:   55:typedef struct IncompleteFn {
+        -:   56:	char name[MAX_NAME_LEN];
+        -:   57:	bool is_mut;
+        -:   58:	Vec params;
+        -:   59:	char return_type[MAX_NAME_LEN];
+        -:   60:} IncompleteFn;
+        -:   61:
+        -:   62:typedef struct IncompleteType {
+        -:   63:	u64 count;
+        -:   64:	IncompleteFn *fns;
+        -:   65:	char name[MAX_NAME_LEN];
+        -:   66:} IncompleteType;
+        -:   67:
+        -:   68:typedef struct GlobalIncompleteList {
+        -:   69:	u64 count;
+        -:   70:	IncompleteType *types;
+        -:   71:} GlobalIncompleteList;
+        -:   72:
+        -:   73:GlobalIncompleteList global_incomplete_list = {0, NULL};
+        -:   74:
+    #####:   75:void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_fns,
+        -:   76:								   const char *args_file) {
+    #####:   77:	if (global_incomplete_list.count == 0) {
+    #####:   78:		global_incomplete_list.types = mymalloc(sizeof(IncompleteType));
+        -:   79:	} else {
+    #####:   80:		global_incomplete_list.types =
+    #####:   81:			myrealloc(global_incomplete_list.types,
+    #####:   82:					  sizeof(IncompleteType) * (global_incomplete_list.count + 1));
+        -:   83:	}
+        -:   84:
+    #####:   85:	IncompleteType *next = &global_incomplete_list.types[global_incomplete_list.count];
+    #####:   86:	strcpy(next->name, type_name);
+    #####:   87:	next->count = vec_size(incomplete_fns);
+    #####:   88:	next->fns = mymalloc(sizeof(IncompleteFn) * next->count);
+        -:   89:
+    #####:   90:	for (u64 i = 0; i < next->count; i++) {
+    #####:   91:		IncompleteFn *fn = vec_element_at(incomplete_fns, i);
+    #####:   92:		strcpy(next->fns[i].name, fn->name);
+    #####:   93:		strcpy(next->fns[i].return_type, fn->return_type);
+    #####:   94:		vec_init(&next->fns[i].params, 3, sizeof(FnParam));
+    #####:   95:		FILE *fp = myfopen(args_file, "a");
+    #####:   96:		fprintf(fp, "-DFn_expand_%s_return=\"%s\"\n", fn->name, fn->return_type);
+    #####:   97:		fprintf(fp, "-DFn_expand_%s_params=\"_%s(Obj *self", fn->name, fn->name);
+    #####:   98:		if (vec_size(&fn->params))
+    #####:   99:			fprintf(fp, ",");
+    #####:  100:		for (u64 j = 0; j < vec_size(&fn->params); j++) {
+    #####:  101:			FnParam *param = vec_element_at(&fn->params, j);
+    #####:  102:			vec_push(&next->fns[i].params, param);
+        -:  103:			char *comma;
+    #####:  104:			if (j != vec_size(&fn->params) - 1)
+    #####:  105:				comma = ",";
+        -:  106:			else
+    #####:  107:				comma = "";
+    #####:  108:			if (!strcmp(param->type, "__config__")) {
+    #####:  109:				fprintf(fp, " void *__selfconfig__%s", comma);
+        -:  110:			} else {
+    #####:  111:				if (param->is_mut) {
+    #####:  112:					fprintf(fp, " %s %s%s", param->type, param->name, comma);
+        -:  113:				} else {
+    #####:  114:					fprintf(fp, " const %s %s%s", param->type, param->name, comma);
+        -:  115:				}
+        -:  116:			}
+        -:  117:		}
+    #####:  118:		fprintf(fp, ")\"\n");
+    #####:  119:		myfclose(fp);
+        -:  120:	}
+        -:  121:
+    #####:  122:	global_incomplete_list.count++;
     #####:  123:}
         -:  124:
-        -:  125:typedef enum ParserStateEnum {
-        -:  126:	ParserStateBeginStatement = 0,
-        -:  127:	ParserStateExpectModuleName = 1,
-        -:  128:	ParserStateExpectBrace = 2,
-        -:  129:	ParserStateExpectType = 3,
-        -:  130:	ParserStateExpectName = 4,
-        -:  131:	ParserStateInTypeExpectSemi = 5,
-        -:  132:	ParserStateInImportListExpectModuleName = 6,
-        -:  133:	ParserStateInImportListExpectSeparator = 7,
-        -:  134:	ParserStateExpectParenBuildDefn = 8,
-        -:  135:	ParserStateExpectConfigParen = 9,
-        -:  136:	ParserStateExpectConfigType = 10,
-        -:  137:	ParserStateExpectConfigComma = 11,
-        -:  138:	ParserStateExpectConfigName = 12,
-        -:  139:	ParserStateExpectConfigCloseParen = 13,
-        -:  140:	ParserStateExpectConfigCommaOrParenEnd = 14,
-        -:  141:	ParserStateIncompleteName = 15,
-        -:  142:	ParserIncompleteExpectBrace = 16,
-        -:  143:	ParserStateExpectAt = 17,
-        -:  144:	ParserStateExpectIncompleteFnName = 18,
-        -:  145:	ParserStateExpectIncompleteFnParenStart = 19,
-        -:  146:	ParserStateExpectIncompleteFnMutOrType = 20,
-        -:  147:	ParserStateExpectIncompleteFnType = 21,
-        -:  148:	ParserStateExpectIncompleteFnParamName = 22,
-        -:  149:	ParserStateExpectIncompleteFnParamCommaOrEnd = 23,
-        -:  150:	ParserStateIncompleteExpectSemi = 24,
-        -:  151:	ParserStateIncompleteExpectSemiOrTypeArrow = 25,
-        -:  152:	ParserStateIncompleteExpectReturnType = 26,
-        -:  153:	ParserStateExpectIncompleteNameForImpl = 27,
-        -:  154:	ParserStateImplExpectSemi = 28,
-        -:  155:	ParserStateOther = 1000000,
-        -:  156:} ParserStateEnum;
-        -:  157:
-        -:  158:typedef struct ParserState {
-        -:  159:	ParserStateEnum state;
-        -:  160:	const ModuleInfo *cur;
-        -:  161:	char *gen_header;
-        -:  162:	u64 header_capacity;
-        -:  163:	Vec *modules;
-        -:  164:	Vec *types;
-        -:  165:	char type_name[MAX_NAME_LEN + 1];
-        -:  166:	HeaderTypes ht;
-        -:  167:	ModuleInfo import_module_info;
-        -:  168:	Vec import_list;
-        -:  169:	u64 gen_file_counter;
-        -:  170:	Vec config_types;
-        -:  171:	Vec config_names;
-        -:  172:	Vec incomplete_fns;
-        -:  173:} ParserState;
-        -:  174:
-        -:  175:#define INITIAL_HEADER_CAPACITY (1024 * 25)
-        -:  176:
-    #####:  177:void append_to_header(ParserState *state, const char *text, ...)
-        -:  178:{
-        -:  179:	u64 length;
-        -:  180:	va_list args;
-        -:  181:
-    #####:  182:	va_start(args, text);
-    #####:  183:	length = vsnprintf(NULL, 0, text, args);
-    #####:  184:	va_end(args);
-        -:  185:
-    #####:  186:	if (state->header_capacity == 0) {
-    #####:  187:		u64 size = sizeof(char) * INITIAL_HEADER_CAPACITY;
-    #####:  188:		if (length >= size)
-    #####:  189:			size = length + 1;
-    #####:  190:		state->gen_header = mymalloc(size);
-    #####:  191:		if (state->gen_header == NULL)
-    #####:  192:			exit_error("Could not allocate sufficient memory to continue!");
-    #####:  193:		va_start(args, text);
-    #####:  194:		char text_with_nl[strlen(text) + 2];
-    #####:  195:		strcpy(text_with_nl, text);
-    #####:  196:		strcat(text_with_nl, "\n");
-    #####:  197:		vsnprintf(state->gen_header, size, text_with_nl, args);
-    #####:  198:		va_end(args);
-        -:  199:
-    #####:  200:	} else {
-    #####:  201:		u64 size = state->header_capacity;
-    #####:  202:		if (length + strlen(state->gen_header) + 1 >= state->header_capacity) {
-    #####:  203:			size = state->header_capacity + INITIAL_HEADER_CAPACITY;
-    #####:  204:			if (length + strlen(state->gen_header) + 1
-    #####:  205:				>= state->header_capacity + INITIAL_HEADER_CAPACITY) {
-    #####:  206:				size = length + strlen(state->gen_header) + 1;
-        -:  207:			}
-    #####:  208:			state->gen_header = myrealloc(state->gen_header, sizeof(char) * (size));
-    #####:  209:			if (state->gen_header == NULL)
-    #####:  210:				exit_error("Could not allocate sufficient memory to continue!");
-        -:  211:		}
-        -:  212:
-    #####:  213:		va_start(args, text);
-    #####:  214:		char text_with_nl[strlen(text) + 2];
-    #####:  215:		strcpy(text_with_nl, text);
-    #####:  216:		strcat(text_with_nl, "\n");
-    #####:  217:		vsnprintf(state->gen_header + strlen(state->gen_header), size - strlen(state->gen_header),
-        -:  218:			text_with_nl, args);
-    #####:  219:		va_end(args);
-        -:  220:	}
-        -:  221:
-    #####:  222:	state->header_capacity += INITIAL_HEADER_CAPACITY;
-    #####:  223:}
+    #####:  125:void incomplete_fns_cleanup(Vec *incomplete_fns) {
+    #####:  126:	while (vec_size(incomplete_fns)) {
+    #####:  127:		IncompleteFn *next = vec_pop(incomplete_fns);
+    #####:  128:		vec_cleanup(&next->params);
+        -:  129:	}
+    #####:  130:}
+        -:  131:
+        -:  132:typedef enum ParserStateEnum {
+        -:  133:	ParserStateBeginStatement = 0,
+        -:  134:	ParserStateExpectModuleName = 1,
+        -:  135:	ParserStateExpectBrace = 2,
+        -:  136:	ParserStateExpectType = 3,
+        -:  137:	ParserStateExpectName = 4,
+        -:  138:	ParserStateInTypeExpectSemi = 5,
+        -:  139:	ParserStateInImportListExpectModuleName = 6,
+        -:  140:	ParserStateInImportListExpectSeparator = 7,
+        -:  141:	ParserStateExpectParenBuildDefn = 8,
+        -:  142:	ParserStateExpectConfigParen = 9,
+        -:  143:	ParserStateExpectConfigType = 10,
+        -:  144:	ParserStateExpectConfigComma = 11,
+        -:  145:	ParserStateExpectConfigName = 12,
+        -:  146:	ParserStateExpectConfigCloseParen = 13,
+        -:  147:	ParserStateExpectConfigCommaOrParenEnd = 14,
+        -:  148:	ParserStateIncompleteName = 15,
+        -:  149:	ParserIncompleteExpectBrace = 16,
+        -:  150:	ParserStateExpectAt = 17,
+        -:  151:	ParserStateExpectIncompleteFnName = 18,
+        -:  152:	ParserStateExpectIncompleteFnParenStart = 19,
+        -:  153:	ParserStateExpectIncompleteFnMutOrType = 20,
+        -:  154:	ParserStateExpectIncompleteFnType = 21,
+        -:  155:	ParserStateExpectIncompleteFnParamName = 22,
+        -:  156:	ParserStateExpectIncompleteFnParamCommaOrEnd = 23,
+        -:  157:	ParserStateIncompleteExpectSemi = 24,
+        -:  158:	ParserStateIncompleteExpectSemiOrTypeArrow = 25,
+        -:  159:	ParserStateIncompleteExpectReturnType = 26,
+        -:  160:	ParserStateExpectIncompleteNameForImpl = 27,
+        -:  161:	ParserStateImplExpectSemi = 28,
+        -:  162:	ParserStateExpectIncompleteMutFnName = 29,
+        -:  163:	ParserStateExpectPipe = 30,
+        -:  164:	ParserStateExpectArraySize = 31,
+        -:  165:	ParserStateExpectEndArray = 32,
+        -:  166:	ParserStateOther = 1000000,
+        -:  167:} ParserStateEnum;
+        -:  168:
+        -:  169:typedef struct ParserState {
+        -:  170:	ParserStateEnum state;
+        -:  171:	const ModuleInfo *cur;
+        -:  172:	char *gen_header;
+        -:  173:	u64 header_capacity;
+        -:  174:	Vec *modules;
+        -:  175:	Vec *types;
+        -:  176:	char type_name[MAX_NAME_LEN + 1];
+        -:  177:	HeaderTypes ht;
+        -:  178:	ModuleInfo import_module_info;
+        -:  179:	Vec import_list;
+        -:  180:	u64 gen_file_counter;
+        -:  181:	Vec config_types;
+        -:  182:	Vec config_names;
+        -:  183:	Vec incomplete_fns;
+        -:  184:	bool has_errors;
+        -:  185:	bool cur_is_array;
+        -:  186:} ParserState;
+        -:  187:
+        -:  188:#define INITIAL_HEADER_CAPACITY (1024 * 25)
+        -:  189:
+    #####:  190:void append_to_header(ParserState *state, const char *text, ...) {
+        -:  191:	u64 length;
+        -:  192:	va_list args;
+        -:  193:
+    #####:  194:	va_start(args, text);
+    #####:  195:	length = vsnprintf(NULL, 0, text, args);
+    #####:  196:	va_end(args);
+        -:  197:
+    #####:  198:	if (state->header_capacity == 0) {
+    #####:  199:		u64 size = sizeof(char) * INITIAL_HEADER_CAPACITY;
+    #####:  200:		if (length >= size)
+    #####:  201:			size = length + 1;
+    #####:  202:		state->gen_header = mymalloc(size);
+    #####:  203:		if (state->gen_header == NULL)
+    #####:  204:			exit_error("Could not allocate sufficient memory to continue!");
+    #####:  205:		va_start(args, text);
+    #####:  206:		char text_with_nl[strlen(text) + 2];
+    #####:  207:		strcpy(text_with_nl, text);
+    #####:  208:		strcat(text_with_nl, "\n");
+    #####:  209:		vsnprintf(state->gen_header, size, text_with_nl, args);
+    #####:  210:		va_end(args);
+        -:  211:
+    #####:  212:	} else {
+    #####:  213:		u64 size = state->header_capacity;
+    #####:  214:		if (length + strlen(state->gen_header) + 1 >= state->header_capacity) {
+    #####:  215:			size = state->header_capacity + INITIAL_HEADER_CAPACITY;
+    #####:  216:			if (length + strlen(state->gen_header) + 1 >=
+    #####:  217:				state->header_capacity + INITIAL_HEADER_CAPACITY) {
+    #####:  218:				size = length + strlen(state->gen_header) + 1;
+        -:  219:			}
+    #####:  220:			state->gen_header = myrealloc(state->gen_header, sizeof(char) * (size));
+    #####:  221:			if (state->gen_header == NULL)
+    #####:  222:				exit_error("Could not allocate sufficient memory to continue!");
+        -:  223:		}
         -:  224:
-    #####:  225:void free_gen_header(ParserState *state)
-        -:  226:{
-    #####:  227:	if (state->gen_header)
-    #####:  228:		myfree(state->gen_header);
-    #####:  229:}
-        -:  230:
-    #####:  231:void proc_ParserStateBeginStatement(ParserState *state, Token *tk)
-        -:  232:{
-    #####:  233:	if (tk->type == TokenTypeIdent) {
-    #####:  234:		if (!strcmp(tk->token, "mod")) {
-    #####:  235:			state->state = ParserStateExpectModuleName;
-        -:  236:		} else {
-    #####:  237:			if (strlen(tk->token) > MAX_NAME_LEN) {
-    #####:  238:				token_display_error(
-        -:  239:					tk, "token name is longer than MAX_NAME_LEN (%i)", MAX_NAME_LEN);
-        -:  240:			} else {
-    #####:  241:				strcpy(state->type_name, tk->token);
-        -:  242:			}
-    #####:  243:			state->state = ParserStateExpectBrace;
-        -:  244:		}
-    #####:  245:	} else if (tk->type == TokenTypePunct) {
-    #####:  246:		if (!strcmp(tk->token, "}"))
-    #####:  247:			state->state = ParserStateBeginStatement;
-    #####:  248:		else if (!strcmp(tk->token, "$")) {
-    #####:  249:			state->import_module_info.sub_module_count = 0;
-    #####:  250:			state->state = ParserStateInImportListExpectModuleName;
-    #####:  251:		} else if (!strcmp(tk->token, "@")) {
-    #####:  252:			state->state = ParserStateIncompleteName;
-        -:  253:		} else
-    #####:  254:			state->state = ParserStateOther;
-        -:  255:	} else
-    #####:  256:		state->state = ParserStateOther;
-    #####:  257:}
-        -:  258:
-    #####:  259:void proc_ParserStateInImportListExpectModuleName(ParserState *state, Token *tk)
-        -:  260:{
-    #####:  261:	if (tk->type != TokenTypeIdent) {
-    #####:  262:		token_display_error(tk, "Expected module name. Found [%s]", tk->token);
-        -:  263:	} else {
-        -:  264:		SubModuleInfo mi;
-    #####:  265:		strcpy(mi.name, tk->token);
-    #####:  266:		strcpy(
-    #####:  267:			state->import_module_info.module_list[state->import_module_info.sub_module_count].name,
-    #####:  268:			tk->token);
-    #####:  269:		state->import_module_info.sub_module_count++;
-    #####:  270:		state->state = ParserStateInImportListExpectSeparator;
-        -:  271:	}
-    #####:  272:}
-        -:  273:
-    #####:  274:void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk)
-        -:  275:{
-    #####:  276:	if (!strcmp(tk->token, "::")) {
-    #####:  277:		state->state = ParserStateInImportListExpectModuleName;
-    #####:  278:	} else if (!strcmp(tk->token, ";")) {
-    #####:  279:		u64 import_list_size = state->import_module_info.sub_module_count;
-    #####:  280:		if (import_list_size == 0) {
-    #####:  281:			token_display_error(tk, "Expected at least one module name here");
-        -:  282:		} else {
-        -:  283:			char type_name[PATH_MAX + 1];
-    #####:  284:			module_to_type_string(&state->import_module_info, type_name, PATH_MAX);
-    #####:  285:			char *last = state->import_module_info.module_list[import_list_size - 1].name;
-    #####:  286:			append_to_header(state, "typedef struct %s %s;", type_name, type_name);
-    #####:  287:			append_to_header(state, "#define %s %s", last, type_name);
-    #####:  288:			state->state = ParserStateBeginStatement;
-        -:  289:		}
-        -:  290:	} else {
-    #####:  291:		token_display_error(tk, "Expected one of [';', '::']. Found [%s]", tk->token);
-        -:  292:	}
-    #####:  293:}
-        -:  294:
-    #####:  295:void proc_ParserStateExpectParenBuildDefn(ParserState *state, Token *tk)
-        -:  296:{
-    #####:  297:	if (!strcmp(tk->token, "("))
-    #####:  298:		state->state = ParserStateExpectConfigParen;
-        -:  299:	else {
-    #####:  300:		token_display_error(tk, "Expected '('. Found [%s]", tk->token);
-    #####:  301:		state->state = ParserStateBeginStatement;
-        -:  302:	}
-    #####:  303:}
-        -:  304:
-    #####:  305:void proc_ParserStateExpectConfigParen(ParserState *state, Token *tk)
-        -:  306:{
-    #####:  307:	if (!strcmp(tk->token, "(")) {
-    #####:  308:		state->state = ParserStateExpectConfigType;
-        -:  309:	} else {
-    #####:  310:		token_display_error(tk, "Expected '(' or ')'. Found [%s]", tk->token);
-    #####:  311:		state->state = ParserStateBeginStatement;
-        -:  312:	}
-    #####:  313:}
-        -:  314:
-    #####:  315:void proc_ParserStateExpectConfigType(ParserState *state, Token *tk)
-        -:  316:{
-    #####:  317:	if (tk->type != TokenTypeIdent) {
-    #####:  318:		token_display_error(tk, "Expected Type name. Found [%s]", tk->token);
-    #####:  319:		state->state = ParserStateBeginStatement;
-        -:  320:	} else {
-    #####:  321:		if (strcmp(tk->token, "u8") && strcmp(tk->token, "u16") && strcmp(tk->token, "u32")
-    #####:  322:			&& strcmp(tk->token, "u64") && strcmp(tk->token, "u128") && strcmp(tk->token, "bool")
-    #####:  323:			&& strcmp(tk->token, "String")) {
-    #####:  324:			token_display_error(tk,
-        -:  325:				"Expected one of [u8, u16, u32, u64, u128, bool, String]. Found [%s]", tk->token);
-        -:  326:		} else {
-        -:  327:			ConfigType ct;
-    #####:  328:			strcpy(ct.type_name, tk->token);
-    #####:  329:			vec_push(&state->config_types, &ct);
-        -:  330:		}
-        -:  331:
-    #####:  332:		state->state = ParserStateExpectConfigComma;
-        -:  333:	}
-    #####:  334:}
-        -:  335:
-    #####:  336:void proc_ParserStateExpectConfigComma(ParserState *state, Token *tk)
-        -:  337:{
-    #####:  338:	if (strcmp(tk->token, ",")) {
-    #####:  339:		state->state = ParserStateBeginStatement;
-    #####:  340:		token_display_error(tk, "Expected ','. Found [%s]", tk->token);
-        -:  341:	} else {
-    #####:  342:		state->state = ParserStateExpectConfigName;
-        -:  343:	}
-    #####:  344:}
-        -:  345:
-    #####:  346:void proc_ParserStateExpectConfigName(ParserState *state, Token *tk)
-        -:  347:{
-    #####:  348:	if (tk->type != TokenTypeIdent) {
-    #####:  349:		token_display_error(tk, "Expected config name. Found [%s]", tk->token);
-    #####:  350:		state->state = ParserStateBeginStatement;
-        -:  351:	} else {
-        -:  352:		ConfigName cn;
-    #####:  353:		strcpy(cn.name, tk->token);
-    #####:  354:		vec_push(&state->config_names, &cn);
-        -:  355:
-    #####:  356:		state->state = ParserStateExpectConfigCloseParen;
-        -:  357:	}
-    #####:  358:}
-        -:  359:
-    #####:  360:void proc_ParserStateExpectConfigCloseParen(ParserState *state, Token *tk)
-        -:  361:{
-    #####:  362:	if (strcmp(tk->token, ")")) {
-    #####:  363:		state->state = ParserStateBeginStatement;
-    #####:  364:		token_display_error(tk, "Expected ')'. Found [%s]", tk->token);
-        -:  365:	} else {
-    #####:  366:		state->state = ParserStateExpectConfigCommaOrParenEnd;
-        -:  367:	}
-    #####:  368:}
-        -:  369:
-    #####:  370:void proc_ParserStateExpectConfigCommaOrParenEnd(ParserState *state, Token *tk)
-        -:  371:{
-    #####:  372:	if (!strcmp(tk->token, ",")) {
-    #####:  373:		state->state = ParserStateExpectConfigParen;
-    #####:  374:	} else if (!strcmp(tk->token, ")")) {
-    #####:  375:		state->state = ParserStateInTypeExpectSemi;
-        -:  376:	} else {
-    #####:  377:		state->state = ParserStateBeginStatement;
-    #####:  378:		token_display_error(tk, "Expected one of [')', ',']. Found [%s]", tk->token);
-        -:  379:	}
-    #####:  380:}
-        -:  381:
-    #####:  382:void proc_ParserStateExpectType(ParserState *state, Token *tk)
-        -:  383:{
-    #####:  384:	if (!strcmp(tk->token, "$")) {
-        -:  385:		// Config definition
-    #####:  386:		vec_clear(&state->config_names);
-    #####:  387:		vec_clear(&state->config_types);
-    #####:  388:		state->state = ParserStateExpectParenBuildDefn;
-    #####:  389:	} else if (tk->type != TokenTypeIdent) {
-    #####:  390:		if (!strcmp(tk->token, "}")) {
-    #####:  391:			u64 count = vec_size(&(state->ht.types));
-        -:  392:			char type_name[PATH_MAX];
-    #####:  393:			TypeInfo *ti = vec_element_at(state->types, vec_size(state->types) - 1);
-    #####:  394:			type_info_to_string(ti, type_name, PATH_MAX);
-    #####:  395:			append_to_header(state, "typedef struct %s %s;", type_name, type_name);
-    #####:  396:			append_to_header(state, "typedef struct %s {", type_name);
-    #####:  397:			for (u64 i = 0; i < count; i++) {
-        -:  398:				HeaderNameInfo *ni;
-        -:  399:				HeaderTypeInfo *ti;
-    #####:  400:				ti = vec_element_at(&(state->ht.types), i);
-    #####:  401:				ni = vec_element_at(&(state->ht.names), i);
-    #####:  402:				append_to_header(state, "%s %s;", ti->type, ni->name);
-        -:  403:			}
-    #####:  404:			if (count == 0) {
-    #####:  405:				append_to_header(state, "char dummy;");
-        -:  406:			}
-    #####:  407:			append_to_header(state, "} %s;\n", type_name);
-    #####:  408:			append_to_header(state,
-        -:  409:				"static Vtable %s_Vtable__ = {\"%s\", 0, NULL, 0, NULL, false};\n", type_name,
-        -:  410:				type_name);
-    #####:  411:			append_to_header(
-        -:  412:				state, "static u64 %s_size() {return sizeof(%s); }", type_name, type_name);
-        -:  413:
-    #####:  414:			append_to_header(state, "static void %s_drop_internal(Obj *ptr) {}", type_name);
-        -:  415:
-    #####:  416:			append_to_header(state, "static void %s_build_internal(Obj *ptr) {  \
-        -:  417:                		\nu64 size = %s_size();                     \
-        -:  418:                		\nmemset(ptr->ptr.data, 0, size);           \
-        -:  419:        			\n}",
-        -:  420:				type_name, type_name);
-        -:  421:
-    #####:  422:			append_to_header(state, "\
-        -:  423: 				\nstatic void __attribute__((constructor)) __add_impls_%s_vtable() {    \
-        -:  424:                		\nVtableEntry size = {\"size\", %s_size};                               \
-        -:  425:                		\nvtable_add_entry(&%s_Vtable__, size);                                 \
-        -:  426:				\nVtableEntry build_internal = {\"build_internal\", %s_build_internal}; \
-        -:  427:                                \nvtable_add_entry(&%s_Vtable__, build_internal);                       \
-        -:  428:				\nVtableEntry drop_internal = {\"drop_internal\", %s_drop_internal}; \
-        -:  429:                                \nvtable_add_entry(&%s_Vtable__, drop_internal);                       \
-        -:  430:				\n}",
-        -:  431:				type_name, type_name, type_name, type_name, type_name, type_name, type_name);
-        -:  432:
-    #####:  433:			u64 count_configs = vec_size(&state->config_types);
-    #####:  434:			u64 count_config_names = vec_size(&state->config_names);
-    #####:  435:			append_to_header(state, "typedef struct %sConfig {", type_name);
-    #####:  436:			if (count_configs == count_config_names && count_configs > 0) {
-    #####:  437:				for (u64 i = 0; i < count_configs; i++) {
-    #####:  438:					ConfigType *t = vec_element_at(&state->config_types, i);
-    #####:  439:					ConfigName *n = vec_element_at(&state->config_names, i);
-    #####:  440:					append_to_header(state, "%s %s;", t->type_name, n->name);
-        -:  441:				}
-        -:  442:			} else {
-    #####:  443:				append_to_header(state, "char dummy;");
-        -:  444:			}
-    #####:  445:			append_to_header(state, "} %sConfig;", type_name);
-        -:  446:
-        -:  447:			// append_to_header(
-        -:  448:			// state, "typedef struct %sConfig {char dummy; } %sConfig;", type_name, type_name);
-    #####:  449:			append_to_header(state, "#define %s %s\n", state->type_name, type_name);
-    #####:  450:			vec_clear(&(state->ht.types));
-    #####:  451:			vec_clear(&(state->ht.names));
-    #####:  452:			state->state = ParserStateBeginStatement;
-        -:  453:		} else {
-    #####:  454:			token_display_error(tk, "Expected type name. Found [%s]", tk->token);
-    #####:  455:			state->state = ParserStateOther;
-        -:  456:		}
-        -:  457:	} else {
-    #####:  458:		if (strlen(tk->token) > MAX_NAME_LEN) {
-    #####:  459:			token_display_error(tk, "Name [%s] is too long.", tk->token);
-    #####:  460:			state->state = ParserStateOther;
-        -:  461:		} else {
-        -:  462:			HeaderTypeInfo hti;
-    #####:  463:			strcpy(hti.type, tk->token);
-    #####:  464:			vec_push(&(state->ht.types), &hti);
-    #####:  465:			state->state = ParserStateExpectName;
-        -:  466:		}
-        -:  467:	}
-    #####:  468:}
-        -:  469:
-    #####:  470:void proc_ParserStateExpectName(ParserState *state, Token *tk)
-        -:  471:{
-    #####:  472:	if (tk->type != TokenTypeIdent) {
-    #####:  473:		token_display_error(tk, "Expected name. Found [%s]", tk->token);
-    #####:  474:		state->state = ParserStateOther;
-        -:  475:	} else {
-    #####:  476:		if (strlen(tk->token) > MAX_NAME_LEN) {
-    #####:  477:			token_display_error(tk, "Name [%s] is too long.", tk->token);
-    #####:  478:			state->state = ParserStateOther;
-        -:  479:		} else {
-        -:  480:			HeaderNameInfo hti;
-    #####:  481:			strcpy(hti.name, tk->token);
-    #####:  482:			vec_push(&(state->ht.names), &hti);
-    #####:  483:			state->state = ParserStateInTypeExpectSemi;
-        -:  484:		}
-        -:  485:	}
-    #####:  486:}
+    #####:  225:		va_start(args, text);
+    #####:  226:		char text_with_nl[strlen(text) + 2];
+    #####:  227:		strcpy(text_with_nl, text);
+    #####:  228:		strcat(text_with_nl, "\n");
+    #####:  229:		vsnprintf(state->gen_header + strlen(state->gen_header), size - strlen(state->gen_header),
+        -:  230:				  text_with_nl, args);
+    #####:  231:		va_end(args);
+        -:  232:	}
+        -:  233:
+    #####:  234:	state->header_capacity += INITIAL_HEADER_CAPACITY;
+    #####:  235:}
+        -:  236:
+    #####:  237:void free_gen_header(ParserState *state) {
+    #####:  238:	if (state->gen_header)
+    #####:  239:		myfree(state->gen_header);
+    #####:  240:}
+        -:  241:
+    #####:  242:void proc_ParserStateBeginStatement(ParserState *state, Token *tk) {
+    #####:  243:	if (tk->type == TokenTypeIdent) {
+    #####:  244:		if (!strcmp(tk->token, "mod")) {
+    #####:  245:			state->state = ParserStateExpectModuleName;
+        -:  246:		} else {
+    #####:  247:			if (strlen(tk->token) > MAX_NAME_LEN) {
+    #####:  248:				state->has_errors = true;
+    #####:  249:				token_display_error(tk, "token name is longer than MAX_NAME_LEN (%i)",
+        -:  250:									MAX_NAME_LEN);
+        -:  251:			} else {
+    #####:  252:				strcpy(state->type_name, tk->token);
+        -:  253:			}
+    #####:  254:			state->state = ParserStateExpectBrace;
+        -:  255:		}
+    #####:  256:	} else if (tk->type == TokenTypePunct) {
+    #####:  257:		if (!strcmp(tk->token, "}"))
+    #####:  258:			state->state = ParserStateBeginStatement;
+    #####:  259:		else if (!strcmp(tk->token, "$")) {
+    #####:  260:			state->import_module_info.sub_module_count = 0;
+    #####:  261:			state->state = ParserStateInImportListExpectModuleName;
+    #####:  262:		} else if (!strcmp(tk->token, "@")) {
+    #####:  263:			state->state = ParserStateIncompleteName;
+        -:  264:		} else
+    #####:  265:			state->state = ParserStateOther;
+        -:  266:	} else
+    #####:  267:		state->state = ParserStateOther;
+    #####:  268:}
+        -:  269:
+    #####:  270:void proc_ParserStateInImportListExpectModuleName(ParserState *state, Token *tk) {
+    #####:  271:	if (tk->type != TokenTypeIdent) {
+    #####:  272:		state->has_errors = true;
+    #####:  273:		token_display_error(tk, "Expected module name. Found [%s]", tk->token);
+        -:  274:	} else {
+        -:  275:		SubModuleInfo mi;
+    #####:  276:		strcpy(mi.name, tk->token);
+    #####:  277:		strcpy(
+    #####:  278:			state->import_module_info.module_list[state->import_module_info.sub_module_count].name,
+    #####:  279:			tk->token);
+    #####:  280:		state->import_module_info.sub_module_count++;
+    #####:  281:		state->state = ParserStateInImportListExpectSeparator;
+        -:  282:	}
+    #####:  283:}
+        -:  284:
+    #####:  285:void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk) {
+    #####:  286:	if (!strcmp(tk->token, "::")) {
+    #####:  287:		state->state = ParserStateInImportListExpectModuleName;
+    #####:  288:	} else if (!strcmp(tk->token, ";")) {
+    #####:  289:		u64 import_list_size = state->import_module_info.sub_module_count;
+    #####:  290:		if (import_list_size == 0) {
+    #####:  291:			state->has_errors = true;
+    #####:  292:			token_display_error(tk, "Expected at least one module name here");
+        -:  293:		} else {
+        -:  294:			char type_name[PATH_MAX + 1];
+    #####:  295:			module_to_type_string(&state->import_module_info, type_name, PATH_MAX);
+    #####:  296:			char *last = state->import_module_info.module_list[import_list_size - 1].name;
+    #####:  297:			append_to_header(state, "typedef struct %s %s;", type_name, type_name);
+    #####:  298:			append_to_header(state, "#define %s %s", last, type_name);
+    #####:  299:			append_to_header(state, "Type_Import_Expand_%s_", type_name);
+    #####:  300:			state->state = ParserStateBeginStatement;
+        -:  301:		}
+        -:  302:	} else {
+    #####:  303:		state->has_errors = true;
+    #####:  304:		token_display_error(tk, "Expected one of [';', '::']. Found [%s]", tk->token);
+        -:  305:	}
+    #####:  306:}
+        -:  307:
+    #####:  308:void proc_ParserStateExpectParenBuildDefn(ParserState *state, Token *tk) {
+    #####:  309:	if (!strcmp(tk->token, "("))
+    #####:  310:		state->state = ParserStateExpectConfigParen;
+        -:  311:	else {
+    #####:  312:		state->has_errors = true;
+    #####:  313:		token_display_error(tk, "Expected '('. Found [%s]", tk->token);
+    #####:  314:		state->state = ParserStateBeginStatement;
+        -:  315:	}
+    #####:  316:}
+        -:  317:
+    #####:  318:void proc_ParserStateExpectConfigParen(ParserState *state, Token *tk) {
+    #####:  319:	if (!strcmp(tk->token, "(")) {
+    #####:  320:		state->state = ParserStateExpectConfigType;
+        -:  321:	} else {
+    #####:  322:		state->has_errors = true;
+    #####:  323:		token_display_error(tk, "Expected '(' or ')'. Found [%s]", tk->token);
+    #####:  324:		state->state = ParserStateBeginStatement;
+        -:  325:	}
+    #####:  326:}
+        -:  327:
+    #####:  328:void proc_ParserStateExpectConfigType(ParserState *state, Token *tk) {
+    #####:  329:	if (tk->type != TokenTypeIdent) {
+    #####:  330:		state->has_errors = true;
+    #####:  331:		token_display_error(tk, "Expected Type name. Found [%s]", tk->token);
+    #####:  332:		state->state = ParserStateBeginStatement;
+        -:  333:	} else {
+    #####:  334:		if (strcmp(tk->token, "u8") && strcmp(tk->token, "u16") && strcmp(tk->token, "u32") &&
+    #####:  335:			strcmp(tk->token, "u64") && strcmp(tk->token, "u128") && strcmp(tk->token, "bool") &&
+    #####:  336:			strcmp(tk->token, "String")) {
+    #####:  337:			state->has_errors = true;
+    #####:  338:			token_display_error(
+        -:  339:				tk, "Expected one of [u8, u16, u32, u64, u128, bool, String]. Found [%s]",
+        -:  340:				tk->token);
+        -:  341:		} else {
+        -:  342:			ConfigType ct;
+    #####:  343:			if (!strcmp(tk->token, "String"))
+    #####:  344:				strcpy(ct.type_name, "char *");
+        -:  345:			else
+    #####:  346:				strcpy(ct.type_name, tk->token);
+    #####:  347:			vec_push(&state->config_types, &ct);
+        -:  348:		}
+        -:  349:
+    #####:  350:		state->state = ParserStateExpectConfigComma;
+        -:  351:	}
+    #####:  352:}
+        -:  353:
+    #####:  354:void proc_ParserStateExpectConfigComma(ParserState *state, Token *tk) {
+    #####:  355:	if (strcmp(tk->token, ",")) {
+    #####:  356:		state->state = ParserStateBeginStatement;
+    #####:  357:		state->has_errors = true;
+    #####:  358:		token_display_error(tk, "Expected ','. Found [%s]", tk->token);
+        -:  359:	} else {
+    #####:  360:		state->state = ParserStateExpectConfigName;
+        -:  361:	}
+    #####:  362:}
+        -:  363:
+    #####:  364:void proc_ParserStateExpectConfigName(ParserState *state, Token *tk) {
+    #####:  365:	if (tk->type != TokenTypeIdent) {
+    #####:  366:		state->has_errors = true;
+    #####:  367:		token_display_error(tk, "Expected config name. Found [%s]", tk->token);
+    #####:  368:		state->state = ParserStateBeginStatement;
+        -:  369:	} else {
+        -:  370:		ConfigName cn;
+    #####:  371:		strcpy(cn.name, tk->token);
+    #####:  372:		vec_push(&state->config_names, &cn);
+        -:  373:
+    #####:  374:		state->state = ParserStateExpectConfigCloseParen;
+        -:  375:	}
+    #####:  376:}
+        -:  377:
+    #####:  378:void proc_ParserStateExpectConfigCloseParen(ParserState *state, Token *tk) {
+    #####:  379:	if (strcmp(tk->token, ")")) {
+    #####:  380:		state->state = ParserStateBeginStatement;
+    #####:  381:		state->has_errors = true;
+    #####:  382:		token_display_error(tk, "Expected ')'. Found [%s]", tk->token);
+        -:  383:	} else {
+    #####:  384:		state->state = ParserStateExpectConfigCommaOrParenEnd;
+        -:  385:	}
+    #####:  386:}
+        -:  387:
+    #####:  388:void proc_ParserStateExpectConfigCommaOrParenEnd(ParserState *state, Token *tk) {
+    #####:  389:	if (!strcmp(tk->token, ",")) {
+    #####:  390:		state->state = ParserStateExpectConfigParen;
+    #####:  391:	} else if (!strcmp(tk->token, ")")) {
+    #####:  392:		state->state = ParserStateInTypeExpectSemi;
+        -:  393:	} else {
+    #####:  394:		state->state = ParserStateBeginStatement;
+    #####:  395:		state->has_errors = true;
+    #####:  396:		token_display_error(tk, "Expected one of [')', ',']. Found [%s]", tk->token);
+        -:  397:	}
+    #####:  398:}
+        -:  399:
+    #####:  400:void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_file) {
+    #####:  401:	if (!strcmp(tk->token, "$")) {
+        -:  402:		// Config definition
+    #####:  403:		vec_clear(&state->config_names);
+    #####:  404:		vec_clear(&state->config_types);
+    #####:  405:		state->state = ParserStateExpectParenBuildDefn;
+    #####:  406:	} else if (!strcmp(tk->token, "[")) {
+        -:  407:		// array
+    #####:  408:		state->cur_is_array = true;
+    #####:  409:		state->state = ParserStateExpectType;
+    #####:  410:	} else if (tk->type != TokenTypeIdent) {
+    #####:  411:		if (!strcmp(tk->token, "}")) {
+    #####:  412:			u64 count = vec_size(&(state->ht.types));
+        -:  413:			char type_name[PATH_MAX];
+    #####:  414:			TypeInfo *ti = vec_element_at(state->types, vec_size(state->types) - 1);
+    #####:  415:			type_info_to_string(ti, type_name, PATH_MAX);
+    #####:  416:			append_to_header(state, "typedef struct %s %s;", type_name, type_name);
+    #####:  417:			append_to_header(state, "typedef struct %s {", type_name);
+    #####:  418:			for (u64 i = 0; i < count; i++) {
+        -:  419:				HeaderNameInfo *ni;
+        -:  420:				HeaderTypeInfo *ti;
+    #####:  421:				ti = vec_element_at(&(state->ht.types), i);
+    #####:  422:				ni = vec_element_at(&(state->ht.names), i);
+    #####:  423:				if (ti->is_arr) {
+    #####:  424:					append_to_header(state, "%s %s[%" PRIu64 "];", ti->type, ni->name,
+        -:  425:									 ti->arr_size);
+        -:  426:				} else {
+    #####:  427:					append_to_header(state, "%s %s;", ti->type, ni->name);
+        -:  428:				}
+        -:  429:			}
+    #####:  430:			if (count == 0) {
+    #####:  431:				append_to_header(state, "char dummy;");
+        -:  432:			}
+    #####:  433:			append_to_header(state, "} %s;\n", type_name);
+        -:  434:
+    #####:  435:			append_to_header(state, "extern Vtable %s_Vtable__;", type_name);
+    #####:  436:			append_to_header(state, "u64 %s_size();", type_name);
+    #####:  437:			append_to_header(state, "void %s_drop_internal(Obj *ptr);", type_name);
+    #####:  438:			append_to_header(state, "void %s_build_internal(Obj *ptr);", type_name);
+        -:  439:
+        -:  440:			// add to args
+    #####:  441:			FILE *fp = myfopen(args_file, "a");
+    #####:  442:			fprintf(fp, "-DType_Expand_%s_=\"", type_name);
+    #####:  443:			fprintf(fp, "Vtable %s_Vtable__ = {\\\"%s\\\", 0, NULL, 0, NULL, false};\
+        -:  444:				u64 %s_size() {return sizeof(%s); }\
+        -:  445:				void %s_drop_internal(Obj *ptr) {}\
+        -:  446:				void %s_build_internal(Obj *ptr) {\
+        -:  447:				u64 size = %s_size();                     \
+        -:  448:				memset(ptr->ptr.data, 0, size);           \
+        -:  449:				}",
+        -:  450:					type_name, type_name, type_name, type_name, type_name, type_name, type_name);
+    #####:  451:			fprintf(fp, "\"\n");
+    #####:  452:			append_to_header(
+        -:  453:				state, "static void __attribute__((constructor)) __add_impls_%s_vtable() {\
+        -:  454:				\nVtableEntry size =\
+        -:  455:				{\
+        -:  456:				\"size\", %s_size}; \
+        -:  457:				\nvtable_add_entry(&%s_Vtable__, size); \
+        -:  458:				\nVtableEntry build_internal = {\"build_internal\", %s_build_internal};\
+        -:  459:				\nvtable_add_entry(& % s_Vtable__, build_internal);\
+        -:  460:				\nVtableEntry drop_internal = {\"drop_internal\", %s_drop_internal}; \
+        -:  461:				\nvtable_add_entry(&%s_Vtable__, drop_internal);  \n}",
+        -:  462:				type_name, type_name, type_name, type_name, type_name, type_name, type_name);
+        -:  463:
+    #####:  464:			u64 count_configs = vec_size(&state->config_types);
+    #####:  465:			u64 count_config_names = vec_size(&state->config_names);
+    #####:  466:			append_to_header(state, "typedef struct %sConfig {", type_name);
+    #####:  467:			fprintf(fp, "-DType_Import_Expand_%s_=\"", type_name);
+    #####:  468:			fprintf(fp, "u64 %s_size();", type_name);
+    #####:  469:			fprintf(fp, "extern Vtable %s_Vtable__;", type_name);
+    #####:  470:			fprintf(fp, "typedef struct %sConfig {", type_name);
+        -:  471:
+    #####:  472:			if (count_configs == count_config_names && count_configs > 0) {
+    #####:  473:				for (u64 i = 0; i < count_configs; i++) {
+    #####:  474:					ConfigType *t = vec_element_at(&state->config_types, i);
+    #####:  475:					ConfigName *n = vec_element_at(&state->config_names, i);
+    #####:  476:					append_to_header(state, "%s %s; bool %s_is_set__;", t->type_name, n->name,
+    #####:  477:									 n->name);
+    #####:  478:					fprintf(fp, "%s %s; bool %s_is_set__;", t->type_name, n->name, n->name);
+        -:  479:				}
+        -:  480:			} else {
+    #####:  481:				append_to_header(state, "char dummy;");
+    #####:  482:				fprintf(fp, "char dummy;");
+        -:  483:			}
+    #####:  484:			append_to_header(state, "} %sConfig;", type_name);
+    #####:  485:			fprintf(fp, "} %sConfig;", type_name);
+    #####:  486:			fprintf(fp, "\"\n");
         -:  487:
-    #####:  488:void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk)
-        -:  489:{
-    #####:  490:	if (strcmp(tk->token, ";")) {
-    #####:  491:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
-        -:  492:	}
-    #####:  493:	state->state = ParserStateExpectType;
-    #####:  494:}
-        -:  495:
-    #####:  496:void proc_ParserStateExpectModuleName(ParserState *state, Token *tk)
-        -:  497:{
-    #####:  498:	if (tk->type != TokenTypeIdent) {
-    #####:  499:		token_display_error(tk, "Expected module name, Found [%s]", tk->token);
-        -:  500:	} else {
-    #####:  501:		if (strlen(tk->token) >= PATH_MAX) {
-    #####:  502:			token_display_error(tk, "Path is longer than max path (%i)", PATH_MAX);
-        -:  503:		} else {
-        -:  504:			ModuleInfo mi;
-    #####:  505:			mi.sub_module_count = state->cur->sub_module_count + 1;
-    #####:  506:			for (u64 i = 0; i < state->cur->sub_module_count; i++) {
-    #####:  507:				strcpy(mi.module_list[i].name, state->cur->module_list[i].name);
-        -:  508:			}
-    #####:  509:			strcpy(mi.module_list[state->cur->sub_module_count].name, tk->token);
-    #####:  510:			vec_push(state->modules, &mi);
-        -:  511:		}
-    #####:  512:		state->state = ParserStateOther;
-        -:  513:	}
-    #####:  514:}
-        -:  515:
-    #####:  516:void proc_ParserStateIncompleteName(ParserState *state, Token *tk)
-        -:  517:{
-    #####:  518:	if (tk->type != TokenTypeIdent) {
-    #####:  519:		state->state = ParserStateBeginStatement;
-    #####:  520:		token_display_error(tk, "Expected incomplete type name. Found [%s]", tk->token);
+    #####:  488:			myfclose(fp);
+        -:  489:
+    #####:  490:			append_to_header(state, "#define %s %s\n", state->type_name, type_name);
+    #####:  491:			vec_clear(&(state->ht.types));
+    #####:  492:			vec_clear(&(state->ht.names));
+    #####:  493:			state->state = ParserStateBeginStatement;
+        -:  494:		} else {
+    #####:  495:			state->has_errors = true;
+    #####:  496:			token_display_error(tk, "Expected type name. Found [%s]", tk->token);
+    #####:  497:			state->state = ParserStateOther;
+        -:  498:		}
+        -:  499:	} else {
+    #####:  500:		if (strlen(tk->token) > MAX_NAME_LEN) {
+    #####:  501:			state->has_errors = true;
+    #####:  502:			token_display_error(tk, "Name [%s] is too long.", tk->token);
+    #####:  503:			state->state = ParserStateOther;
+        -:  504:		} else {
+        -:  505:			HeaderTypeInfo hti;
+    #####:  506:			hti.is_arr = state->cur_is_array;
+    #####:  507:			strcpy(hti.type, tk->token);
+    #####:  508:			vec_push(&(state->ht.types), &hti);
+    #####:  509:			if (state->cur_is_array) {
+    #####:  510:				state->state = ParserStateExpectPipe;
+        -:  511:			} else {
+    #####:  512:				state->state = ParserStateExpectName;
+        -:  513:			}
+        -:  514:		}
+        -:  515:	}
+    #####:  516:}
+        -:  517:
+    #####:  518:void proc_ParserStateExpectPipe(ParserState *state, Token *tk) {
+    #####:  519:	if (!strcmp(tk->token, "|")) {
+    #####:  520:		state->state = ParserStateExpectArraySize;
         -:  521:	} else {
-    #####:  522:		state->state = ParserIncompleteExpectBrace;
-    #####:  523:		strcpy(state->type_name, tk->token);
+    #####:  522:		state->has_errors = true;
+    #####:  523:		token_display_error(tk, "Expected ['|']. Found [%s]", tk->token);
         -:  524:	}
     #####:  525:}
         -:  526:
-    #####:  527:void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk)
-        -:  528:{
-    #####:  529:	if (!strcmp(tk->token, "{")) {
-    #####:  530:		state->state = ParserStateExpectAt;
-        -:  531:	} else {
-    #####:  532:		state->state = ParserStateBeginStatement;
-    #####:  533:		token_display_error(tk, "Expected '{'. Found [%s]", tk->token);
-        -:  534:	}
-    #####:  535:}
-        -:  536:
-    #####:  537:void expand_params(ParserState *state, IncompleteFn *fn)
-        -:  538:{
-    #####:  539:	u64 param_count = vec_size(&fn->params);
-    #####:  540:	if (param_count)
-    #####:  541:		append_to_header(state, ",");
-    #####:  542:	for (u64 i = 0; i < param_count; i++) {
-    #####:  543:		FnParam *fp = vec_element_at(&fn->params, i);
-        -:  544:		char *comma;
-    #####:  545:		if (i != param_count - 1)
-    #####:  546:			comma = ", ";
-        -:  547:		else
-    #####:  548:			comma = "";
-        -:  549:		// handle special case for __config__ (in build)
-    #####:  550:		if (!strcmp("__config__", fp->type)) {
-    #####:  551:			append_to_header(state, "void *%s%s", fp->name, comma);
-        -:  552:		} else {
-    #####:  553:			append_to_header(state, "%s %s%s", fp->type, fp->name, comma);
-        -:  554:		}
-        -:  555:	}
-    #####:  556:}
-        -:  557:
-    #####:  558:void expand_vars(ParserState *state, IncompleteFn *fn)
-        -:  559:{
-    #####:  560:	u64 param_count = vec_size(&fn->params);
-    #####:  561:	if (param_count)
-    #####:  562:		append_to_header(state, ",");
-    #####:  563:	for (u64 i = 0; i < param_count; i++) {
-    #####:  564:		FnParam *fp = vec_element_at(&fn->params, i);
-        -:  565:		char *comma;
-    #####:  566:		if (i != param_count - 1)
-    #####:  567:			comma = ", ";
-        -:  568:		else
-    #####:  569:			comma = "";
-    #####:  570:		append_to_header(state, "%s%s", fp->name, comma);
-        -:  571:	}
-    #####:  572:}
-        -:  573:
-    #####:  574:void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_file)
-        -:  575:{
-    #####:  576:	if (!strcmp(tk->token, "@")) {
-    #####:  577:		state->state = ParserStateExpectIncompleteFnName;
-    #####:  578:	} else if (!strcmp(tk->token, "}")) {
-        -:  579:		// end incomplete type
-    #####:  580:		state->state = ParserStateBeginStatement;
-    #####:  581:		u64 fn_count = vec_size(&state->incomplete_fns);
-    #####:  582:		for (u64 i = 0; i < fn_count; i++) {
-    #####:  583:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, i);
-        -:  584:
-    #####:  585:			append_to_header(state, "static %s %s(Obj *self", fn->return_type, fn->name);
-    #####:  586:			expand_params(state, fn);
-    #####:  587:			append_to_header(state, ") {");
-    #####:  588:			append_to_header(state, "%s (*impl)(Obj *self", fn->return_type);
-    #####:  589:			expand_params(state, fn);
-    #####:  590:			append_to_header(state, ") = find_fn(self, \"%s\");", fn->name);
-    #####:  591:			append_to_header(
-    #####:  592:				state, "if(impl == NULL) panic(\"Implementation for [%s] not found!\");", fn->name);
-        -:  593:
-    #####:  594:			append_to_header(
-        -:  595:				state, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
-    #####:  596:			append_to_header(state, "__thread_local_self_Const = self;");
-    #####:  597:			append_to_header(state, "__thread_local_self_Var = self;");
-        -:  598:
-    #####:  599:			append_to_header(state, "return impl(self");
-    #####:  600:			expand_vars(state, fn);
-    #####:  601:			append_to_header(state, ");");
-    #####:  602:			append_to_header(state, "}");
+    #####:  527:void proc_ParserStateExpectArraySize(ParserState *state, Token *tk) {
+    #####:  528:	if (tk->type == TokenTypeLiteral) {
+    #####:  529:		char first = tk->token[0];
+    #####:  530:		if (!(first >= '0' && first <= '9')) {
+    #####:  531:			state->has_errors = true;
+    #####:  532:			token_display_error(tk, "Expected number literal. Found [%s]", tk->token);
+    #####:  533:			state->state = ParserStateBeginStatement;
+        -:  534:		} else {
+        -:  535:			char *endptr;
+        -:  536:			HeaderTypeInfo *hti;
+    #####:  537:			hti = vec_element_at(&(state->ht.types), vec_size(&(state->ht.types)) - 1);
+    #####:  538:			hti->arr_size = strtoull(tk->token, &endptr, 10);
+        -:  539:
+    #####:  540:			state->state = ParserStateExpectEndArray;
+        -:  541:		}
+        -:  542:	} else {
+    #####:  543:		state->has_errors = true;
+    #####:  544:		token_display_error(tk, "Expected number literal. Found [%s]", tk->token);
+    #####:  545:		state->state = ParserStateBeginStatement;
+        -:  546:	}
+    #####:  547:}
+        -:  548:
+    #####:  549:void proc_ParserStateExpectEndArray(ParserState *state, Token *tk) {
+    #####:  550:	if (!strcmp(tk->token, "]")) {
+    #####:  551:		state->state = ParserStateExpectName;
+        -:  552:	} else {
+    #####:  553:		state->has_errors = true;
+    #####:  554:		token_display_error(tk, "Expected [']']. Found [%s]", tk->token);
+    #####:  555:		state->state = ParserStateBeginStatement;
+        -:  556:	}
+    #####:  557:}
+        -:  558:
+    #####:  559:void proc_ParserStateExpectName(ParserState *state, Token *tk) {
+    #####:  560:	if (tk->type != TokenTypeIdent) {
+    #####:  561:		state->has_errors = true;
+    #####:  562:		token_display_error(tk, "Expected name. Found [%s]", tk->token);
+    #####:  563:		state->state = ParserStateOther;
+        -:  564:	} else {
+    #####:  565:		if (strlen(tk->token) > MAX_NAME_LEN) {
+    #####:  566:			state->has_errors = true;
+    #####:  567:			token_display_error(tk, "Name [%s] is too long.", tk->token);
+    #####:  568:			state->state = ParserStateOther;
+        -:  569:		} else {
+        -:  570:			HeaderNameInfo hti;
+    #####:  571:			strcpy(hti.name, tk->token);
+    #####:  572:			vec_push(&(state->ht.names), &hti);
+    #####:  573:			state->state = ParserStateInTypeExpectSemi;
+        -:  574:		}
+        -:  575:	}
+    #####:  576:}
+        -:  577:
+    #####:  578:void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk) {
+    #####:  579:	if (strcmp(tk->token, ";")) {
+    #####:  580:		state->has_errors = true;
+    #####:  581:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
+        -:  582:	}
+    #####:  583:	state->state = ParserStateExpectType;
+    #####:  584:	state->cur_is_array = false;
+    #####:  585:}
+        -:  586:
+    #####:  587:void proc_ParserStateExpectModuleName(ParserState *state, Token *tk) {
+    #####:  588:	if (tk->type != TokenTypeIdent) {
+    #####:  589:		state->has_errors = true;
+    #####:  590:		token_display_error(tk, "Expected module name, Found [%s]", tk->token);
+        -:  591:	} else {
+    #####:  592:		if (strlen(tk->token) >= PATH_MAX) {
+    #####:  593:			state->has_errors = true;
+    #####:  594:			token_display_error(tk, "Path is longer than max path (%i)", PATH_MAX);
+        -:  595:		} else {
+        -:  596:			ModuleInfo mi;
+    #####:  597:			mi.sub_module_count = state->cur->sub_module_count + 1;
+    #####:  598:			for (u64 i = 0; i < state->cur->sub_module_count; i++) {
+    #####:  599:				strcpy(mi.module_list[i].name, state->cur->module_list[i].name);
+        -:  600:			}
+    #####:  601:			strcpy(mi.module_list[state->cur->sub_module_count].name, tk->token);
+    #####:  602:			vec_push(state->modules, &mi);
         -:  603:		}
-        -:  604:
-    #####:  605:		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns, args_file);
-        -:  606:
-    #####:  607:		incomplete_fns_cleanup(&state->incomplete_fns);
-        -:  608:
-        -:  609:	} else {
+    #####:  604:		state->state = ParserStateOther;
+        -:  605:	}
+    #####:  606:}
+        -:  607:
+    #####:  608:void proc_ParserStateIncompleteName(ParserState *state, Token *tk) {
+    #####:  609:	if (tk->type != TokenTypeIdent) {
     #####:  610:		state->state = ParserStateBeginStatement;
-    #####:  611:		token_display_error(tk, "Expected '@'. Found [%s]", tk->token);
-        -:  612:	}
-    #####:  613:}
-        -:  614:
-    #####:  615:void proc_ParserStateExpectIncompleteFnName(ParserState *state, Token *tk)
-        -:  616:{
-    #####:  617:	if (tk->type != TokenTypeIdent) {
-    #####:  618:		state->state = ParserStateBeginStatement;
-    #####:  619:		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
-        -:  620:	} else {
-        -:  621:		IncompleteFn fn;
-    #####:  622:		strcpy(fn.name, tk->token);
-    #####:  623:		vec_init(&fn.params, 3, sizeof(FnParam));
-    #####:  624:		strcpy(fn.return_type, "void");
-    #####:  625:		vec_push(&state->incomplete_fns, &fn);
-    #####:  626:		state->state = ParserStateExpectIncompleteFnParenStart;
-        -:  627:	}
-    #####:  628:}
-        -:  629:
-    #####:  630:void proc_ParserStateExpectIncompleteFnParenStart(ParserState *state, Token *tk)
-        -:  631:{
-    #####:  632:	if (!strcmp(tk->token, "(")) {
-    #####:  633:		state->state = ParserStateExpectIncompleteFnMutOrType;
-        -:  634:	} else {
-    #####:  635:		state->state = ParserStateBeginStatement;
-    #####:  636:		token_display_error(tk, "Expected '('. Found [%s]", tk->token);
-        -:  637:	}
-    #####:  638:}
-        -:  639:
-    #####:  640:void proc_ParserStateExpectIncompleteFnType(ParserState *state, Token *tk)
-        -:  641:{
-    #####:  642:	if (tk->type == TokenTypeIdent) {
-    #####:  643:		u64 last = vec_size(&state->incomplete_fns);
-    #####:  644:		if (last == 0) {
-    #####:  645:			token_display_error(tk, "internal error: Expected type here!");
-    #####:  646:			state->state = ParserStateBeginStatement;
-        -:  647:		} else {
-    #####:  648:			last--;
-    #####:  649:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
-    #####:  650:			u64 last_param = vec_size(&fn->params);
-    #####:  651:			if (last_param == 0) {
-    #####:  652:				token_display_error(tk, "internal error: Expected a param here!");
-    #####:  653:				state->state = ParserStateBeginStatement;
-        -:  654:			} else {
-    #####:  655:				last_param--;
-    #####:  656:				FnParam *p = vec_element_at(&fn->params, last_param);
-    #####:  657:				strcpy(p->type, tk->token);
-    #####:  658:				state->state = ParserStateExpectIncompleteFnParamName;
-        -:  659:			}
-        -:  660:		}
-        -:  661:	} else {
-        -:  662:		// unexpected - error
-    #####:  663:		state->state = ParserStateBeginStatement;
-    #####:  664:		token_display_error(tk, "Expected type name. Found [%s]", tk->token);
-        -:  665:	}
-    #####:  666:}
-        -:  667:
-    #####:  668:void proc_ParserStateExpectIncompleteFnParamName(ParserState *state, Token *tk)
-        -:  669:{
-    #####:  670:	if (tk->type == TokenTypeIdent) {
-    #####:  671:		u64 last = vec_size(&state->incomplete_fns);
-    #####:  672:		if (last == 0) {
-    #####:  673:			token_display_error(tk, "internal error: Expected a name here!");
-    #####:  674:			state->state = ParserStateBeginStatement;
-        -:  675:		} else {
-    #####:  676:			last--;
-    #####:  677:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
-    #####:  678:			u64 last_param = vec_size(&fn->params);
-    #####:  679:			if (last_param == 0) {
-    #####:  680:				token_display_error(tk, "internal error: Expected a param here!");
-    #####:  681:				state->state = ParserStateBeginStatement;
-        -:  682:			} else {
-    #####:  683:				last_param--;
-    #####:  684:				FnParam *p = vec_element_at(&fn->params, last_param);
-    #####:  685:				strcpy(p->name, tk->token);
-    #####:  686:				state->state = ParserStateExpectIncompleteFnParamCommaOrEnd;
-        -:  687:			}
-        -:  688:		}
-        -:  689:	} else {
-        -:  690:		// unexpected - error
-    #####:  691:		state->state = ParserStateBeginStatement;
-    #####:  692:		token_display_error(tk, "Expected param name. Found [%s]", tk->token);
-        -:  693:	}
-    #####:  694:}
-        -:  695:
-    #####:  696:void proc_ParserStateExpectIncompleteFnParamCommaOrEnd(ParserState *state, Token *tk)
-        -:  697:{
-    #####:  698:	if (!strcmp(tk->token, ",")) {
-        -:  699:		// look for the next param
-    #####:  700:		state->state = ParserStateExpectIncompleteFnMutOrType;
-    #####:  701:	} else if (!strcmp(tk->token, ")")) {
-    #####:  702:		state->state = ParserStateIncompleteExpectSemiOrTypeArrow;
-        -:  703:	} else {
-    #####:  704:		state->state = ParserStateBeginStatement;
-    #####:  705:		token_display_error(tk, "Expected [',' or ')']. Found [%s]", tk->token);
-        -:  706:	}
-    #####:  707:}
-        -:  708:
-    #####:  709:void proc_ParserStateIncompleteExpectSemi(ParserState *state, Token *tk)
-        -:  710:{
-    #####:  711:	if (!strcmp(tk->token, ";")) {
-    #####:  712:		state->state = ParserStateExpectAt;
-        -:  713:	} else {
-    #####:  714:		state->state = ParserStateBeginStatement;
-    #####:  715:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
-        -:  716:	}
-    #####:  717:}
+    #####:  611:		state->has_errors = true;
+    #####:  612:		token_display_error(tk, "Expected incomplete type name. Found [%s]", tk->token);
+        -:  613:	} else {
+    #####:  614:		state->state = ParserIncompleteExpectBrace;
+    #####:  615:		strcpy(state->type_name, tk->token);
+        -:  616:	}
+    #####:  617:}
+        -:  618:
+    #####:  619:void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk) {
+    #####:  620:	if (!strcmp(tk->token, "{")) {
+    #####:  621:		state->state = ParserStateExpectAt;
+        -:  622:	} else {
+    #####:  623:		state->state = ParserStateBeginStatement;
+    #####:  624:		state->has_errors = true;
+    #####:  625:		token_display_error(tk, "Expected '{'. Found [%s]", tk->token);
+        -:  626:	}
+    #####:  627:}
+        -:  628:
+    #####:  629:void expand_params(ParserState *state, IncompleteFn *fn, FILE *fp) {
+    #####:  630:	u64 param_count = vec_size(&fn->params);
+    #####:  631:	if (param_count) {
+    #####:  632:		append_to_header(state, ",");
+    #####:  633:		if (fp) {
+    #####:  634:			fprintf(fp, ",");
+        -:  635:		}
+        -:  636:	}
+    #####:  637:	for (u64 i = 0; i < param_count; i++) {
+    #####:  638:		FnParam *fparam = vec_element_at(&fn->params, i);
+        -:  639:		char *comma;
+    #####:  640:		if (i != param_count - 1)
+    #####:  641:			comma = ", ";
+        -:  642:		else
+    #####:  643:			comma = "";
+        -:  644:		// handle special case for __config__ (in build)
+    #####:  645:		if (!strcmp("__config__", fparam->type)) {
+    #####:  646:			append_to_header(state, "void *%s%s", fparam->name, comma);
+    #####:  647:			if (fp) {
+    #####:  648:				fprintf(fp, "void *%s%s", fparam->name, comma);
+        -:  649:			}
+        -:  650:		} else {
+    #####:  651:			if (fparam->is_mut) {
+    #####:  652:				append_to_header(state, "%s %s%s", fparam->type, fparam->name, comma);
+    #####:  653:				if (fp) {
+    #####:  654:					fprintf(fp, "%s %s%s", fparam->type, fparam->name, comma);
+        -:  655:				}
+        -:  656:			} else {
+    #####:  657:				append_to_header(state, "const %s %s%s", fparam->type, fparam->name, comma);
+    #####:  658:				if (fp) {
+    #####:  659:					fprintf(fp, "const %s %s%s", fparam->type, fparam->name, comma);
+        -:  660:				}
+        -:  661:			}
+        -:  662:		}
+        -:  663:	}
+    #####:  664:}
+        -:  665:
+    #####:  666:void expand_vars(ParserState *state, IncompleteFn *fn, FILE *fp) {
+    #####:  667:	u64 param_count = vec_size(&fn->params);
+    #####:  668:	if (param_count) {
+    #####:  669:		append_to_header(state, ",");
+    #####:  670:		if (fp) {
+    #####:  671:			fprintf(fp, ",");
+        -:  672:		}
+        -:  673:	}
+    #####:  674:	for (u64 i = 0; i < param_count; i++) {
+    #####:  675:		FnParam *fparam = vec_element_at(&fn->params, i);
+        -:  676:		char *comma;
+    #####:  677:		if (i != param_count - 1)
+    #####:  678:			comma = ", ";
+        -:  679:		else
+    #####:  680:			comma = "";
+    #####:  681:		append_to_header(state, "%s%s", fparam->name, comma);
+    #####:  682:		if (fp)
+    #####:  683:			fprintf(fp, "%s%s", fparam->name, comma);
+        -:  684:	}
+    #####:  685:}
+        -:  686:
+    #####:  687:void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_file) {
+    #####:  688:	if (!strcmp(tk->token, "@")) {
+    #####:  689:		state->state = ParserStateExpectIncompleteFnName;
+    #####:  690:	} else if (!strcmp(tk->token, "}")) {
+        -:  691:		// end incomplete type
+    #####:  692:		state->state = ParserStateBeginStatement;
+    #####:  693:		u64 fn_count = vec_size(&state->incomplete_fns);
+        -:  694:
+    #####:  695:		FILE *fp = myfopen(args_file, "a");
+        -:  696:		TypeInfo ti;
+    #####:  697:		ti.mi = *state->cur;
+    #####:  698:		strcpy(ti.type_name, state->type_name);
+        -:  699:
+        -:  700:		char incomplete_type[PATH_MAX + 1];
+    #####:  701:		type_info_to_string(&ti, incomplete_type, PATH_MAX);
+    #####:  702:		fprintf(fp, "-DType_Import_Expand_%s_=\"", incomplete_type);
+    #####:  703:		for (u64 i = 0; i < fn_count; i++) {
+    #####:  704:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, i);
+        -:  705:
+    #####:  706:			append_to_header(state, "static %s %s(Obj *self", fn->return_type, fn->name);
+    #####:  707:			fprintf(fp, "static %s %s(Obj *self ", fn->return_type, fn->name);
+    #####:  708:			expand_params(state, fn, fp);
+    #####:  709:			append_to_header(state, ") {");
+    #####:  710:			fprintf(fp, ") {");
+    #####:  711:			append_to_header(state, "%s (*impl)(Obj *self", fn->return_type);
+    #####:  712:			fprintf(fp, "%s (*impl)(Obj *self", fn->return_type);
+    #####:  713:			expand_params(state, fn, fp);
+    #####:  714:			append_to_header(state, ") = find_fn(self, \"%s\");", fn->name);
+    #####:  715:			fprintf(fp, ") = find_fn(self, \\\"%s\\\");", fn->name);
+    #####:  716:			append_to_header(
+    #####:  717:				state, "if(impl == NULL) panic(\"Implementation for [%s] not found!\");", fn->name);
         -:  718:
-    #####:  719:void proc_ParserStateIncompleteExpectSemiOrTypeArrow(ParserState *state, Token *tk)
-        -:  720:{
-    #####:  721:	if (!strcmp(tk->token, "->")) {
-    #####:  722:		state->state = ParserStateIncompleteExpectReturnType;
-    #####:  723:	} else if (!strcmp(tk->token, ";")) {
-    #####:  724:		state->state = ParserStateExpectAt;
-        -:  725:	} else {
-    #####:  726:		state->state = ParserStateBeginStatement;
-    #####:  727:		token_display_error(tk, "Expected [';' or '->']. Found [%s]", tk->token);
-        -:  728:	}
-    #####:  729:}
-        -:  730:
-    #####:  731:void proc_ParserStateIncompleteExpectReturnType(ParserState *state, Token *tk)
-        -:  732:{
-    #####:  733:	if (tk->type == TokenTypeIdent) {
-    #####:  734:		u64 last = vec_size(&state->incomplete_fns);
-    #####:  735:		if (last == 0) {
-    #####:  736:			token_display_error(tk, "internal error: Expected return type here!");
-    #####:  737:			state->state = ParserStateBeginStatement;
-        -:  738:		} else {
-    #####:  739:			last--;
-    #####:  740:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
-    #####:  741:			strcpy(fn->return_type, tk->token);
-    #####:  742:			state->state = ParserStateIncompleteExpectSemi;
-        -:  743:		}
-        -:  744:	} else {
-        -:  745:		// unexpected - error
-    #####:  746:		state->state = ParserStateBeginStatement;
-    #####:  747:		token_display_error(tk, "Expected return type. Found [%s]", tk->token);
-        -:  748:	}
-    #####:  749:}
-        -:  750:
-    #####:  751:void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk)
-        -:  752:{
-    #####:  753:	if (!strcmp(tk->token, "mut")) {
-    #####:  754:		u64 last = vec_size(&state->incomplete_fns);
-    #####:  755:		if (last == 0) {
-    #####:  756:			token_display_error(tk, "internal error: Expected an incomplete function here!");
-    #####:  757:			state->state = ParserStateBeginStatement;
-        -:  758:		} else {
-    #####:  759:			last--;
-    #####:  760:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
-        -:  761:			FnParam param;
-    #####:  762:			param.is_mut = true;
-    #####:  763:			vec_push(&fn->params, &param);
-    #####:  764:			state->state = ParserStateExpectIncompleteFnType;
-        -:  765:		}
-    #####:  766:	} else if (tk->type == TokenTypeIdent) {
-        -:  767:		// It's a type name pass on to Type fn
-    #####:  768:		u64 last = vec_size(&state->incomplete_fns);
-    #####:  769:		if (last == 0) {
-    #####:  770:			token_display_error(tk, "internal error: Expected an incomplete function here!");
-    #####:  771:			state->state = ParserStateBeginStatement;
-        -:  772:		} else {
-    #####:  773:			last--;
-    #####:  774:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
-        -:  775:			FnParam param;
-    #####:  776:			param.is_mut = false;
-    #####:  777:			vec_init(&fn->params, 3, sizeof(FnParam));
-    #####:  778:			vec_push(&fn->params, &param);
-    #####:  779:			proc_ParserStateExpectIncompleteFnType(state, tk);
-        -:  780:		}
-        -:  781:	} else {
-        -:  782:		// unexpected - error
-    #####:  783:		state->state = ParserStateBeginStatement;
-    #####:  784:		token_display_error(tk, "Expected 'mut' or type name. Found [%s]", tk->token);
-        -:  785:	}
-    #####:  786:}
-        -:  787:
-    #####:  788:void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk)
-        -:  789:{
-    #####:  790:	if (tk->type == TokenTypeIdent) {
-        -:  791:		// state.type_name = incomplete type name in this context
+    #####:  719:			fprintf(fp, "if(impl == NULL) panic(\\\"Implementation for [%s] not found!\\\");",
+    #####:  720:					fn->name);
+    #####:  721:			append_to_header(
+        -:  722:				state, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
+    #####:  723:			fprintf(fp, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
+    #####:  724:			append_to_header(state, "__thread_local_self_Const = self;");
+    #####:  725:			fprintf(fp, "__thread_local_self_Const = self;");
+    #####:  726:			if (fn->is_mut) {
+    #####:  727:				append_to_header(state, "__thread_local_self_Var = self;");
+    #####:  728:				fprintf(fp, "__thread_local_self_Var = self;");
+        -:  729:			} else {
+    #####:  730:				append_to_header(state, "__thread_local_self_Var = NULL;");
+    #####:  731:				fprintf(fp, "__thread_local_self_Var = NULL;");
+        -:  732:			}
+        -:  733:
+    #####:  734:			append_to_header(state, "return impl(self");
+    #####:  735:			fprintf(fp, "return impl(self");
+    #####:  736:			expand_vars(state, fn, fp);
+    #####:  737:			append_to_header(state, ");");
+    #####:  738:			fprintf(fp, ");");
+    #####:  739:			append_to_header(state, "}");
+    #####:  740:			fprintf(fp, "}");
+        -:  741:		}
+        -:  742:
+    #####:  743:		fprintf(fp, "\"\n");
+    #####:  744:		myfclose(fp);
+        -:  745:
+    #####:  746:		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns, args_file);
+        -:  747:
+    #####:  748:		incomplete_fns_cleanup(&state->incomplete_fns);
+        -:  749:
+        -:  750:	} else {
+    #####:  751:		state->state = ParserStateBeginStatement;
+    #####:  752:		state->has_errors = true;
+    #####:  753:		token_display_error(tk, "Expected '@'. Found [%s]", tk->token);
+        -:  754:	}
+    #####:  755:}
+        -:  756:
+    #####:  757:void proc_ParserStateExpectIncompleteMutFnName(ParserState *state, Token *tk) {
+    #####:  758:	if (tk->type != TokenTypeIdent) {
+    #####:  759:		state->state = ParserStateBeginStatement;
+    #####:  760:		state->has_errors = true;
+    #####:  761:		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
+        -:  762:	} else {
+        -:  763:		IncompleteFn fn;
+    #####:  764:		fn.is_mut = true;
+    #####:  765:		strcpy(fn.name, tk->token);
+    #####:  766:		vec_init(&fn.params, 3, sizeof(FnParam));
+    #####:  767:		strcpy(fn.return_type, "void");
+    #####:  768:		vec_push(&state->incomplete_fns, &fn);
+    #####:  769:		state->state = ParserStateExpectIncompleteFnParenStart;
+        -:  770:	}
+    #####:  771:}
+        -:  772:
+    #####:  773:void proc_ParserStateExpectIncompleteFnName(ParserState *state, Token *tk) {
+    #####:  774:	if (tk->type != TokenTypeIdent) {
+    #####:  775:		state->state = ParserStateBeginStatement;
+    #####:  776:		state->has_errors = true;
+    #####:  777:		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
+        -:  778:	} else {
+    #####:  779:		if (!strcmp(tk->token, "mut")) {
+    #####:  780:			state->state = ParserStateExpectIncompleteMutFnName;
+        -:  781:		} else {
+        -:  782:			IncompleteFn fn;
+    #####:  783:			fn.is_mut = false;
+    #####:  784:			strcpy(fn.name, tk->token);
+    #####:  785:			vec_init(&fn.params, 3, sizeof(FnParam));
+    #####:  786:			strcpy(fn.return_type, "void");
+    #####:  787:			vec_push(&state->incomplete_fns, &fn);
+    #####:  788:			state->state = ParserStateExpectIncompleteFnParenStart;
+        -:  789:		}
+        -:  790:	}
+    #####:  791:}
         -:  792:
-        -:  793:		TypeInfo ti;
-    #####:  794:		ti.mi = *state->cur;
-    #####:  795:		strcpy(ti.type_name, state->type_name);
-        -:  796:
-        -:  797:		char complete_type[PATH_MAX + 1];
-    #####:  798:		type_info_to_string(&ti, complete_type, PATH_MAX);
-    #####:  799:		char *incomplete_type = tk->token;
-    #####:  800:		bool found = false;
-    #####:  801:		for (u64 i = 0; i < global_incomplete_list.count; i++) {
-    #####:  802:			if (!strcmp(incomplete_type, global_incomplete_list.types[i].name)) {
-    #####:  803:				IncompleteType *inc = &global_incomplete_list.types[i];
-    #####:  804:				for (u64 j = 0; j < inc->count; j++) {
-        -:  805:
-    #####:  806:					append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
-    #####:  807:						complete_type, inc->fns[j].name);
-        -:  808:
-    #####:  809:					expand_params(state, &inc->fns[j]);
-    #####:  810:					append_to_header(state, ");");
-        -:  811:				}
-    #####:  812:				append_to_header(state,
-        -:  813:					"static void __attribute__((constructor)) vtable_add_inc_impl_%s_%s() {",
-        -:  814:					complete_type, incomplete_type);
-    #####:  815:				for (u64 j = 0; j < inc->count; j++) {
-    #####:  816:					append_to_header(state,
-        -:  817:						"VtableEntry next_%" PRIu64
-        -:  818:						" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
-    #####:  819:						j, inc->fns[j].name, complete_type, inc->fns[j].name, complete_type, j);
-        -:  820:				}
-    #####:  821:				append_to_header(state, "}");
-    #####:  822:				found = true;
+    #####:  793:void proc_ParserStateExpectIncompleteFnParenStart(ParserState *state, Token *tk) {
+    #####:  794:	if (!strcmp(tk->token, "(")) {
+    #####:  795:		state->state = ParserStateExpectIncompleteFnMutOrType;
+        -:  796:	} else {
+    #####:  797:		state->state = ParserStateBeginStatement;
+    #####:  798:		state->has_errors = true;
+    #####:  799:		token_display_error(tk, "Expected '('. Found [%s]", tk->token);
+        -:  800:	}
+    #####:  801:}
+        -:  802:
+    #####:  803:void proc_ParserStateExpectIncompleteFnType(ParserState *state, Token *tk) {
+    #####:  804:	if (tk->type == TokenTypeIdent) {
+    #####:  805:		u64 last = vec_size(&state->incomplete_fns);
+    #####:  806:		if (last == 0) {
+    #####:  807:			state->has_errors = true;
+    #####:  808:			token_display_error(tk, "internal error: Expected type here!");
+    #####:  809:			state->state = ParserStateBeginStatement;
+        -:  810:		} else {
+    #####:  811:			last--;
+    #####:  812:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
+    #####:  813:			u64 last_param = vec_size(&fn->params);
+    #####:  814:			if (last_param == 0) {
+    #####:  815:				state->has_errors = true;
+    #####:  816:				token_display_error(tk, "internal error: Expected a param here!");
+    #####:  817:				state->state = ParserStateBeginStatement;
+        -:  818:			} else {
+    #####:  819:				last_param--;
+    #####:  820:				FnParam *p = vec_element_at(&fn->params, last_param);
+    #####:  821:				strcpy(p->type, tk->token);
+    #####:  822:				state->state = ParserStateExpectIncompleteFnParamName;
         -:  823:			}
         -:  824:		}
-        -:  825:
-    #####:  826:		if (!found) {
-    #####:  827:			token_display_error(
-        -:  828:				tk, "Attempt to complete an unknown incomplete type [%s]", incomplete_type);
-        -:  829:		}
-    #####:  830:		state->state = ParserStateImplExpectSemi;
-        -:  831:	} else {
-    #####:  832:		state->state = ParserStateBeginStatement;
-    #####:  833:		token_display_error(tk, "Expected type name. Found [%s]", tk->token);
-        -:  834:	}
-    #####:  835:}
-        -:  836:
-    #####:  837:void proc_ParserStateImplExpectSemi(ParserState *state, Token *tk)
-        -:  838:{
-    #####:  839:	if (!strcmp(tk->token, ";")) {
-    #####:  840:		state->state = ParserStateBeginStatement;
-        -:  841:	} else {
-    #####:  842:		state->state = ParserStateBeginStatement;
-    #####:  843:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
-        -:  844:	}
-    #####:  845:}
-        -:  846:
-    #####:  847:void file_for(const char *base_dir, const ModuleInfo *self_info, char buf[PATH_MAX])
-        -:  848:{
-    #####:  849:	Path ret;
-    #####:  850:	path_for(&ret, base_dir);
-    #####:  851:	for (u64 i = 0; self_info->sub_module_count != 0 && i < self_info->sub_module_count; i++) {
-    #####:  852:		path_push(&ret, self_info->module_list[i].name);
-        -:  853:	}
-    #####:  854:	if (self_info->sub_module_count == 0) {
-    #####:  855:		path_push(&ret, "mod.h");
-        -:  856:	} else {
-        -:  857:		char module_file_f[PATH_MAX];
-    #####:  858:		strcpy(module_file_f, path_to_string(&ret));
-    #####:  859:		strcat(module_file_f, ".h");
-        -:  860:
-    #####:  861:		Path test_f;
-    #####:  862:		path_for(&test_f, module_file_f);
-    #####:  863:		if (path_exists(&test_f)) {
-    #####:  864:			path_cleanup(&ret);
-    #####:  865:			path_copy(&ret, &test_f);
-        -:  866:		} else {
-    #####:  867:			path_pop(&ret);
-    #####:  868:			path_push(&ret, self_info->module_list[self_info->sub_module_count - 1].name);
-    #####:  869:			path_push(&ret, "mod.h");
-    #####:  870:			if (!path_exists(&ret)) {
-    #####:  871:				exit_error("Module: [%s] not found!", path_to_string(&ret));
-        -:  872:			}
-        -:  873:		}
-        -:  874:	}
-    #####:  875:	if (path_canonicalize(&ret)) {
-    #####:  876:		exit_error("Path %s does not exist.", path_to_string(&ret));
-        -:  877:	}
-    #####:  878:	strcpy(buf, path_to_string(&ret));
-    #####:  879:}
-        -:  880:
-    #####:  881:void init_parser(const char *args_file)
-        -:  882:{
-    #####:  883:	Vec build_fns;
-    #####:  884:	vec_init(&build_fns, 1, sizeof(IncompleteFn));
-        -:  885:	IncompleteFn build;
-    #####:  886:	strcpy(build.name, "build");
-    #####:  887:	strcpy(build.return_type, "void");
-    #####:  888:	vec_init(&build.params, 1, sizeof(FnParam));
-    #####:  889:	FnParam config = { .is_mut = true };
-    #####:  890:	strcpy(config.type, "__config__");
-    #####:  891:	strcpy(config.name, "__selfconfig__");
-    #####:  892:	vec_push(&build.params, &config);
-    #####:  893:	vec_push(&build_fns, &build);
-        -:  894:
-    #####:  895:	add_to_global_incomplete_list("Build", &build_fns, args_file);
-        -:  896:
-    #####:  897:	Vec drop_fns;
-    #####:  898:	vec_init(&drop_fns, 1, sizeof(IncompleteFn));
-        -:  899:	IncompleteFn drop;
-    #####:  900:	strcpy(drop.name, "drop");
-    #####:  901:	strcpy(drop.return_type, "void");
-    #####:  902:	vec_init(&drop.params, 1, sizeof(FnParam));
-    #####:  903:	vec_push(&drop_fns, &drop);
-        -:  904:
-    #####:  905:	add_to_global_incomplete_list("Drop", &drop_fns, args_file);
-        -:  906:
-        -:  907:	/*
-        -:  908:	FILE *fp = myfopen(args_file, "a");
-        -:  909:
-        -:  910:	fprintf(fp, "-DFn_expand_drop_params=\"_drop(Obj *self)\"\
-        -:  911:		\n-DFn_expand_drop_return=\"void\"\
-        -:  912:		\n-DFn_expand_build_params=\"_build(Obj *self, void *__selfconfig__)\"\
-        -:  913:		\n-DFn_expand_build_return=\"void\"");
-        -:  914:
-        -:  915:	myfclose(fp);
-        -:  916:	*/
+        -:  825:	} else {
+        -:  826:		// unexpected - error
+    #####:  827:		state->state = ParserStateBeginStatement;
+    #####:  828:		state->has_errors = true;
+    #####:  829:		token_display_error(tk, "Expected type name. Found [%s]", tk->token);
+        -:  830:	}
+    #####:  831:}
+        -:  832:
+    #####:  833:void proc_ParserStateExpectIncompleteFnParamName(ParserState *state, Token *tk) {
+    #####:  834:	if (tk->type == TokenTypeIdent) {
+    #####:  835:		u64 last = vec_size(&state->incomplete_fns);
+    #####:  836:		if (last == 0) {
+    #####:  837:			state->has_errors = true;
+    #####:  838:			token_display_error(tk, "internal error: Expected a name here!");
+    #####:  839:			state->state = ParserStateBeginStatement;
+        -:  840:		} else {
+    #####:  841:			last--;
+    #####:  842:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
+    #####:  843:			u64 last_param = vec_size(&fn->params);
+    #####:  844:			if (last_param == 0) {
+    #####:  845:				state->has_errors = true;
+    #####:  846:				token_display_error(tk, "internal error: Expected a param here!");
+    #####:  847:				state->state = ParserStateBeginStatement;
+        -:  848:			} else {
+    #####:  849:				last_param--;
+    #####:  850:				FnParam *p = vec_element_at(&fn->params, last_param);
+    #####:  851:				strcpy(p->name, tk->token);
+    #####:  852:				state->state = ParserStateExpectIncompleteFnParamCommaOrEnd;
+        -:  853:			}
+        -:  854:		}
+        -:  855:	} else {
+        -:  856:		// unexpected - error
+    #####:  857:		state->state = ParserStateBeginStatement;
+    #####:  858:		state->has_errors = true;
+    #####:  859:		token_display_error(tk, "Expected param name. Found [%s]", tk->token);
+        -:  860:	}
+    #####:  861:}
+        -:  862:
+    #####:  863:void proc_ParserStateExpectIncompleteFnParamCommaOrEnd(ParserState *state, Token *tk) {
+    #####:  864:	if (!strcmp(tk->token, ",")) {
+        -:  865:		// look for the next param
+    #####:  866:		state->state = ParserStateExpectIncompleteFnMutOrType;
+    #####:  867:	} else if (!strcmp(tk->token, ")")) {
+    #####:  868:		state->state = ParserStateIncompleteExpectSemiOrTypeArrow;
+        -:  869:	} else {
+    #####:  870:		state->state = ParserStateBeginStatement;
+    #####:  871:		state->has_errors = true;
+    #####:  872:		token_display_error(tk, "Expected [',' or ')']. Found [%s]", tk->token);
+        -:  873:	}
+    #####:  874:}
+        -:  875:
+    #####:  876:void proc_ParserStateIncompleteExpectSemi(ParserState *state, Token *tk) {
+    #####:  877:	if (!strcmp(tk->token, ";")) {
+    #####:  878:		state->state = ParserStateExpectAt;
+        -:  879:	} else {
+    #####:  880:		state->state = ParserStateBeginStatement;
+    #####:  881:		state->has_errors = true;
+    #####:  882:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
+        -:  883:	}
+    #####:  884:}
+        -:  885:
+    #####:  886:void proc_ParserStateIncompleteExpectSemiOrTypeArrow(ParserState *state, Token *tk) {
+    #####:  887:	if (!strcmp(tk->token, "->")) {
+    #####:  888:		state->state = ParserStateIncompleteExpectReturnType;
+    #####:  889:	} else if (!strcmp(tk->token, ";")) {
+    #####:  890:		state->state = ParserStateExpectAt;
+        -:  891:	} else {
+    #####:  892:		state->state = ParserStateBeginStatement;
+    #####:  893:		state->has_errors = true;
+    #####:  894:		token_display_error(tk, "Expected [';' or '->']. Found [%s]", tk->token);
+        -:  895:	}
+    #####:  896:}
+        -:  897:
+    #####:  898:void proc_ParserStateIncompleteExpectReturnType(ParserState *state, Token *tk) {
+    #####:  899:	if (tk->type == TokenTypeIdent) {
+    #####:  900:		u64 last = vec_size(&state->incomplete_fns);
+    #####:  901:		if (last == 0) {
+    #####:  902:			state->has_errors = true;
+    #####:  903:			token_display_error(tk, "internal error: Expected return type here!");
+    #####:  904:			state->state = ParserStateBeginStatement;
+        -:  905:		} else {
+    #####:  906:			last--;
+    #####:  907:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
+    #####:  908:			strcpy(fn->return_type, tk->token);
+    #####:  909:			state->state = ParserStateIncompleteExpectSemi;
+        -:  910:		}
+        -:  911:	} else {
+        -:  912:		// unexpected - error
+    #####:  913:		state->state = ParserStateBeginStatement;
+    #####:  914:		state->has_errors = true;
+    #####:  915:		token_display_error(tk, "Expected return type. Found [%s]", tk->token);
+        -:  916:	}
     #####:  917:}
         -:  918:
-    #####:  919:void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Vec *types,
-        -:  920:	const ModuleInfo *self_info)
-        -:  921:{
-        -:  922:
-    #####:  923:	Path args_path;
-    #####:  924:	path_for(&args_path, base_dir);
-    #####:  925:	path_push(&args_path, "target");
-    #####:  926:	path_push(&args_path, "args");
-    #####:  927:	path_push(&args_path, "args.txt");
-    #####:  928:	const char *args_file = path_to_string(&args_path);
-        -:  929:	char file[PATH_MAX];
-    #####:  930:	file_for(base_dir, self_info, file);
-        -:  931:	Lexer l;
-    #####:  932:	if (lexer_init(&l, file)) {
-    #####:  933:		exit_error("Could not open module file: '%s'", file);
-        -:  934:	}
-        -:  935:
-    #####:  936:	ParserState state = {
-        -:  937:		.state = ParserStateBeginStatement,
-        -:  938:		.modules = modules,
-        -:  939:		.gen_header = NULL,
-        -:  940:		.header_capacity = 0,
-        -:  941:		.cur = self_info,
-        -:  942:		.types = types,
-        -:  943:		.gen_file_counter = gen_file_counter,
-        -:  944:	};
-    #####:  945:	gen_file_counter++;
-        -:  946:
-    #####:  947:	vec_init(&state.config_types, 3, sizeof(ConfigType));
-    #####:  948:	vec_init(&state.config_names, 3, sizeof(ConfigName));
-    #####:  949:	vec_init(&state.ht.names, 3, sizeof(HeaderNameInfo));
-    #####:  950:	vec_init(&state.ht.types, 3, sizeof(HeaderTypeInfo));
-    #####:  951:	vec_init(&state.import_list, 3, sizeof(SubModuleInfo));
-    #####:  952:	vec_init(&state.incomplete_fns, 3, sizeof(IncompleteFn));
-        -:  953:
-    #####:  954:	while (true) {
-        -:  955:		Token tk;
-    #####:  956:		int res = lexer_next_token(&l, &tk);
-    #####:  957:		if (res == LexerStateComplete) {
-    #####:  958:			break;
-        -:  959:		}
-        -:  960:		// printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
-    #####:  961:		if (tk.type != TokenTypeDoc) {
-        -:  962:			// skip over doc comments for these purposes
-    #####:  963:			if (state.state == ParserStateBeginStatement) {
-    #####:  964:				proc_ParserStateBeginStatement(&state, &tk);
-    #####:  965:			} else if (state.state == ParserStateExpectModuleName) {
-    #####:  966:				proc_ParserStateExpectModuleName(&state, &tk);
-    #####:  967:			} else if (state.state == ParserStateExpectType) {
-    #####:  968:				proc_ParserStateExpectType(&state, &tk);
-    #####:  969:			} else if (state.state == ParserStateExpectName) {
-    #####:  970:				proc_ParserStateExpectName(&state, &tk);
-    #####:  971:			} else if (state.state == ParserStateInTypeExpectSemi) {
-    #####:  972:				proc_ParserStateInTypeExpectSemi(&state, &tk);
-    #####:  973:			} else if (state.state == ParserStateInImportListExpectModuleName) {
-    #####:  974:				proc_ParserStateInImportListExpectModuleName(&state, &tk);
-    #####:  975:			} else if (state.state == ParserStateInImportListExpectSeparator) {
-    #####:  976:				proc_ParserStateInImportListExpectSeparator(&state, &tk);
-    #####:  977:			} else if (state.state == ParserStateExpectParenBuildDefn) {
-    #####:  978:				proc_ParserStateExpectParenBuildDefn(&state, &tk);
-    #####:  979:			} else if (state.state == ParserStateExpectConfigParen) {
-    #####:  980:				proc_ParserStateExpectConfigParen(&state, &tk);
-    #####:  981:			} else if (state.state == ParserStateExpectConfigName) {
-    #####:  982:				proc_ParserStateExpectConfigName(&state, &tk);
-    #####:  983:			} else if (state.state == ParserStateExpectConfigComma) {
-    #####:  984:				proc_ParserStateExpectConfigComma(&state, &tk);
-    #####:  985:			} else if (state.state == ParserStateExpectConfigType) {
-    #####:  986:				proc_ParserStateExpectConfigType(&state, &tk);
-    #####:  987:			} else if (state.state == ParserStateExpectConfigCloseParen) {
-    #####:  988:				proc_ParserStateExpectConfigCloseParen(&state, &tk);
-    #####:  989:			} else if (state.state == ParserStateExpectConfigCommaOrParenEnd) {
-    #####:  990:				proc_ParserStateExpectConfigCommaOrParenEnd(&state, &tk);
-    #####:  991:			} else if (state.state == ParserStateIncompleteName) {
-    #####:  992:				proc_ParserStateIncompleteName(&state, &tk);
-    #####:  993:			} else if (state.state == ParserIncompleteExpectBrace) {
-    #####:  994:				proc_ParserIncompleteExpectBrace(&state, &tk);
-    #####:  995:			} else if (state.state == ParserStateExpectAt) {
-    #####:  996:				proc_ParserStateExpectAt(&state, &tk, args_file);
-    #####:  997:			} else if (state.state == ParserStateExpectIncompleteFnMutOrType) {
-    #####:  998:				proc_ParserStateExpectIncompleteFnMutOrType(&state, &tk);
-    #####:  999:			} else if (state.state == ParserStateExpectIncompleteFnName) {
-    #####: 1000:				proc_ParserStateExpectIncompleteFnName(&state, &tk);
-    #####: 1001:			} else if (state.state == ParserStateExpectIncompleteFnParenStart) {
-    #####: 1002:				proc_ParserStateExpectIncompleteFnParenStart(&state, &tk);
-    #####: 1003:			} else if (state.state == ParserStateExpectIncompleteFnType) {
-    #####: 1004:				proc_ParserStateExpectIncompleteFnType(&state, &tk);
-    #####: 1005:			} else if (state.state == ParserStateExpectIncompleteFnParamName) {
-    #####: 1006:				proc_ParserStateExpectIncompleteFnParamName(&state, &tk);
-    #####: 1007:			} else if (state.state == ParserStateExpectIncompleteFnParamCommaOrEnd) {
-    #####: 1008:				proc_ParserStateExpectIncompleteFnParamCommaOrEnd(&state, &tk);
-    #####: 1009:			} else if (state.state == ParserStateIncompleteExpectSemi) {
-    #####: 1010:				proc_ParserStateIncompleteExpectSemi(&state, &tk);
-    #####: 1011:			} else if (state.state == ParserStateIncompleteExpectSemiOrTypeArrow) {
-    #####: 1012:				proc_ParserStateIncompleteExpectSemiOrTypeArrow(&state, &tk);
-    #####: 1013:			} else if (state.state == ParserStateIncompleteExpectReturnType) {
-    #####: 1014:				proc_ParserStateIncompleteExpectReturnType(&state, &tk);
-    #####: 1015:			} else if (state.state == ParserStateExpectIncompleteNameForImpl) {
-    #####: 1016:				proc_ParserStateExpectIncompleteNameForImpl(&state, &tk);
-    #####: 1017:			} else if (state.state == ParserStateImplExpectSemi) {
-    #####: 1018:				proc_ParserStateImplExpectSemi(&state, &tk);
-    #####: 1019:			} else if (tk.type == TokenTypePunct) {
-    #####: 1020:				if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
-    #####: 1021:					state.state = ParserStateBeginStatement;
-    #####: 1022:				} else if (!strcmp(tk.token, "{") && state.state == ParserStateExpectBrace) {
-        -: 1023:					TypeInfo ti;
-    #####: 1024:					ti.mi = *state.cur;
-    #####: 1025:					strcpy(ti.type_name, state.type_name);
-    #####: 1026:					ti.gen_file_counter = state.gen_file_counter;
-    #####: 1027:					vec_push(types, &ti);
-    #####: 1028:					state.state = ParserStateExpectType;
-    #####: 1029:				} else if (!strcmp(tk.token, "::") && state.state == ParserStateExpectBrace) {
-        -: 1030:					// This is an implementation statement
-    #####: 1031:					state.state = ParserStateExpectIncompleteNameForImpl;
-        -: 1032:				} else
-    #####: 1033:					state.state = ParserStateOther;
-        -: 1034:			}
-        -: 1035:		}
-        -: 1036:
-    #####: 1037:		token_cleanup(&tk);
-        -: 1038:	}
-        -: 1039:
-    #####: 1040:	Path gen_header_name;
-        -: 1041:	char header_name[128];
-    #####: 1042:	snprintf(header_name, 128, "f%" PRIu64 "", state.gen_file_counter);
-    #####: 1043:	path_for(&gen_header_name, base_dir);
-    #####: 1044:	path_push(&gen_header_name, "target");
-    #####: 1045:	path_push(&gen_header_name, "include");
-    #####: 1046:	path_push(&gen_header_name, header_name);
-    #####: 1047:	path_mkdir(&gen_header_name, 0700, false);
-    #####: 1048:	path_push(&gen_header_name, "build_specific.h");
-        -: 1049:
-    #####: 1050:	append_to_header(&state, "");
-        -: 1051:
-    #####: 1052:	FILE *fp = myfopen(path_to_string(&gen_header_name), "w");
-    #####: 1053:	if (fprintf(fp, "%s", state.gen_header) < strlen(state.gen_header))
-    #####: 1054:		fprintf(
-        -: 1055:			stderr, "Partial write of header: %s occurred!\n", path_to_string(&gen_header_name));
-        -: 1056:
-    #####: 1057:	myfclose(fp);
-    #####: 1058:	free_gen_header(&state);
-    #####: 1059:	vec_cleanup(&state.ht.names);
-    #####: 1060:	vec_cleanup(&state.ht.types);
-    #####: 1061:	vec_cleanup(&state.import_list);
-    #####: 1062:	vec_cleanup(&state.config_types);
-    #####: 1063:	vec_cleanup(&state.config_names);
-    #####: 1064:	vec_cleanup(&state.incomplete_fns);
-        -: 1065:
-    #####: 1066:	lexer_cleanup(&l);
-    #####: 1067:}
+    #####:  919:void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk) {
+    #####:  920:	if (!strcmp(tk->token, "mut")) {
+    #####:  921:		u64 last = vec_size(&state->incomplete_fns);
+    #####:  922:		if (last == 0) {
+    #####:  923:			state->has_errors = true;
+    #####:  924:			token_display_error(tk, "internal error: Expected an incomplete function here!");
+    #####:  925:			state->state = ParserStateBeginStatement;
+        -:  926:		} else {
+    #####:  927:			last--;
+    #####:  928:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
+        -:  929:			FnParam param;
+    #####:  930:			param.is_mut = true;
+    #####:  931:			vec_push(&fn->params, &param);
+    #####:  932:			state->state = ParserStateExpectIncompleteFnType;
+        -:  933:		}
+    #####:  934:	} else if (tk->type == TokenTypeIdent) {
+        -:  935:		// It's a type name pass on to Type fn
+    #####:  936:		u64 last = vec_size(&state->incomplete_fns);
+    #####:  937:		if (last == 0) {
+    #####:  938:			state->has_errors = true;
+    #####:  939:			token_display_error(tk, "internal error: Expected an incomplete function here!");
+    #####:  940:			state->state = ParserStateBeginStatement;
+        -:  941:		} else {
+    #####:  942:			last--;
+    #####:  943:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
+        -:  944:			FnParam param;
+    #####:  945:			param.is_mut = false;
+    #####:  946:			vec_init(&fn->params, 3, sizeof(FnParam));
+    #####:  947:			vec_push(&fn->params, &param);
+    #####:  948:			proc_ParserStateExpectIncompleteFnType(state, tk);
+        -:  949:		}
+    #####:  950:	} else if (!strcmp(tk->token, ")")) {
+        -:  951:		// this is a parameterless function
+    #####:  952:		state->state = ParserStateIncompleteExpectSemiOrTypeArrow;
+        -:  953:	} else {
+        -:  954:		// unexpected - error
+    #####:  955:		state->state = ParserStateBeginStatement;
+    #####:  956:		state->has_errors = true;
+    #####:  957:		token_display_error(tk, "Expected 'mut' or type name. Found [%s]", tk->token);
+        -:  958:	}
+    #####:  959:}
+        -:  960:
+    #####:  961:void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk) {
+    #####:  962:	if (tk->type == TokenTypeIdent) {
+        -:  963:		// state.type_name = incomplete type name in this context
+        -:  964:
+        -:  965:		TypeInfo ti;
+    #####:  966:		ti.mi = *state->cur;
+    #####:  967:		strcpy(ti.type_name, state->type_name);
+        -:  968:
+        -:  969:		char complete_type[PATH_MAX + 1];
+    #####:  970:		type_info_to_string(&ti, complete_type, PATH_MAX);
+    #####:  971:		char *incomplete_type = tk->token;
+    #####:  972:		bool found = false;
+    #####:  973:		for (u64 i = 0; i < global_incomplete_list.count; i++) {
+    #####:  974:			if (!strcmp(incomplete_type, global_incomplete_list.types[i].name)) {
+    #####:  975:				IncompleteType *inc = &global_incomplete_list.types[i];
+    #####:  976:				for (u64 j = 0; j < inc->count; j++) {
+        -:  977:
+    #####:  978:					append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
+    #####:  979:									 complete_type, inc->fns[j].name);
+        -:  980:
+    #####:  981:					expand_params(state, &inc->fns[j], NULL);
+    #####:  982:					append_to_header(state, ");");
+        -:  983:				}
+    #####:  984:				append_to_header(
+        -:  985:					state, "static void __attribute__((constructor)) vtable_add_inc_impl_%s_%s() {",
+        -:  986:					complete_type, incomplete_type);
+    #####:  987:				for (u64 j = 0; j < inc->count; j++) {
+    #####:  988:					append_to_header(
+        -:  989:						state,
+        -:  990:						"VtableEntry next_%" PRIu64
+        -:  991:						" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
+    #####:  992:						j, inc->fns[j].name, complete_type, inc->fns[j].name, complete_type, j);
+        -:  993:				}
+    #####:  994:				append_to_header(state, "}");
+    #####:  995:				found = true;
+        -:  996:			}
+        -:  997:		}
+        -:  998:
+    #####:  999:		if (!found) {
+    #####: 1000:			state->has_errors = true;
+    #####: 1001:			token_display_error(tk, "Attempt to complete an unknown incomplete type [%s]",
+        -: 1002:								incomplete_type);
+        -: 1003:		}
+    #####: 1004:		state->state = ParserStateImplExpectSemi;
+        -: 1005:	} else {
+    #####: 1006:		state->state = ParserStateBeginStatement;
+    #####: 1007:		state->has_errors = true;
+    #####: 1008:		token_display_error(tk, "Expected type name. Found [%s]", tk->token);
+        -: 1009:	}
+    #####: 1010:}
+        -: 1011:
+    #####: 1012:void proc_ParserStateImplExpectSemi(ParserState *state, Token *tk) {
+    #####: 1013:	if (!strcmp(tk->token, ";")) {
+    #####: 1014:		state->state = ParserStateBeginStatement;
+        -: 1015:	} else {
+    #####: 1016:		state->state = ParserStateBeginStatement;
+    #####: 1017:		state->has_errors = true;
+    #####: 1018:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
+        -: 1019:	}
+    #####: 1020:}
+        -: 1021:
+    #####: 1022:void file_for(const char *base_dir, const ModuleInfo *self_info, char buf[PATH_MAX]) {
+    #####: 1023:	Path ret;
+    #####: 1024:	path_for(&ret, base_dir);
+    #####: 1025:	for (u64 i = 0; self_info->sub_module_count != 0 && i < self_info->sub_module_count; i++) {
+    #####: 1026:		path_push(&ret, self_info->module_list[i].name);
+        -: 1027:	}
+    #####: 1028:	if (self_info->sub_module_count == 0) {
+    #####: 1029:		path_push(&ret, "mod.h");
+        -: 1030:	} else {
+        -: 1031:		char module_file_f[PATH_MAX];
+    #####: 1032:		strcpy(module_file_f, path_to_string(&ret));
+    #####: 1033:		strcat(module_file_f, ".h");
+        -: 1034:
+    #####: 1035:		Path test_f;
+    #####: 1036:		path_for(&test_f, module_file_f);
+    #####: 1037:		if (path_exists(&test_f)) {
+    #####: 1038:			path_cleanup(&ret);
+    #####: 1039:			path_copy(&ret, &test_f);
+        -: 1040:		} else {
+    #####: 1041:			path_pop(&ret);
+    #####: 1042:			path_push(&ret, self_info->module_list[self_info->sub_module_count - 1].name);
+    #####: 1043:			path_push(&ret, "mod.h");
+    #####: 1044:			if (!path_exists(&ret)) {
+    #####: 1045:				exit_error("Module: [%s] not found!", path_to_string(&ret));
+        -: 1046:			}
+        -: 1047:		}
+        -: 1048:	}
+    #####: 1049:	if (path_canonicalize(&ret)) {
+    #####: 1050:		exit_error("Path %s does not exist.", path_to_string(&ret));
+        -: 1051:	}
+    #####: 1052:	strcpy(buf, path_to_string(&ret));
+    #####: 1053:}
+        -: 1054:
+    #####: 1055:void init_parser(const char *args_file) {
+    #####: 1056:	Vec build_fns;
+    #####: 1057:	vec_init(&build_fns, 1, sizeof(IncompleteFn));
+        -: 1058:	IncompleteFn build;
+    #####: 1059:	strcpy(build.name, "build");
+    #####: 1060:	strcpy(build.return_type, "void");
+    #####: 1061:	vec_init(&build.params, 1, sizeof(FnParam));
+    #####: 1062:	FnParam config = {.is_mut = true};
+    #####: 1063:	strcpy(config.type, "__config__");
+    #####: 1064:	strcpy(config.name, "__selfconfig__");
+    #####: 1065:	vec_push(&build.params, &config);
+    #####: 1066:	vec_push(&build_fns, &build);
+        -: 1067:
+    #####: 1068:	add_to_global_incomplete_list("Build", &build_fns, args_file);
+        -: 1069:
+    #####: 1070:	Vec drop_fns;
+    #####: 1071:	vec_init(&drop_fns, 1, sizeof(IncompleteFn));
+        -: 1072:	IncompleteFn drop;
+    #####: 1073:	strcpy(drop.name, "drop");
+    #####: 1074:	strcpy(drop.return_type, "void");
+    #####: 1075:	vec_init(&drop.params, 1, sizeof(FnParam));
+    #####: 1076:	vec_push(&drop_fns, &drop);
+        -: 1077:
+    #####: 1078:	add_to_global_incomplete_list("Drop", &drop_fns, args_file);
+    #####: 1079:}
+        -: 1080:
+    #####: 1081:void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Vec *types,
+        -: 1082:				  const ModuleInfo *self_info) {
+        -: 1083:
+    #####: 1084:	Path args_path;
+    #####: 1085:	path_for(&args_path, base_dir);
+    #####: 1086:	path_push(&args_path, "target");
+    #####: 1087:	path_push(&args_path, "args");
+    #####: 1088:	path_push(&args_path, "args.txt");
+    #####: 1089:	const char *args_file = path_to_string(&args_path);
+        -: 1090:	char file[PATH_MAX];
+    #####: 1091:	file_for(base_dir, self_info, file);
+        -: 1092:	Lexer l;
+    #####: 1093:	if (lexer_init(&l, file)) {
+    #####: 1094:		exit_error("Could not open module file: '%s'", file);
+        -: 1095:	}
+        -: 1096:
+    #####: 1097:	ParserState state = {
+        -: 1098:		.state = ParserStateBeginStatement,
+        -: 1099:		.modules = modules,
+        -: 1100:		.gen_header = NULL,
+        -: 1101:		.header_capacity = 0,
+        -: 1102:		.cur = self_info,
+        -: 1103:		.types = types,
+        -: 1104:		.gen_file_counter = gen_file_counter,
+        -: 1105:		.has_errors = false,
+        -: 1106:	};
+    #####: 1107:	gen_file_counter++;
+        -: 1108:
+    #####: 1109:	vec_init(&state.config_types, 3, sizeof(ConfigType));
+    #####: 1110:	vec_init(&state.config_names, 3, sizeof(ConfigName));
+    #####: 1111:	vec_init(&state.ht.names, 3, sizeof(HeaderNameInfo));
+    #####: 1112:	vec_init(&state.ht.types, 3, sizeof(HeaderTypeInfo));
+    #####: 1113:	vec_init(&state.import_list, 3, sizeof(SubModuleInfo));
+    #####: 1114:	vec_init(&state.incomplete_fns, 3, sizeof(IncompleteFn));
+        -: 1115:
+    #####: 1116:	while (true) {
+        -: 1117:		Token tk;
+    #####: 1118:		int res = lexer_next_token(&l, &tk);
+    #####: 1119:		if (res == LexerStateComplete) {
+    #####: 1120:			break;
+        -: 1121:		}
+        -: 1122:		// printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
+    #####: 1123:		if (tk.type != TokenTypeDoc) {
+        -: 1124:			// skip over doc comments for these purposes
+    #####: 1125:			if (state.state == ParserStateBeginStatement) {
+    #####: 1126:				proc_ParserStateBeginStatement(&state, &tk);
+    #####: 1127:			} else if (state.state == ParserStateExpectModuleName) {
+    #####: 1128:				proc_ParserStateExpectModuleName(&state, &tk);
+    #####: 1129:			} else if (state.state == ParserStateExpectType) {
+    #####: 1130:				proc_ParserStateExpectType(&state, &tk, args_file);
+    #####: 1131:			} else if (state.state == ParserStateExpectName) {
+    #####: 1132:				proc_ParserStateExpectName(&state, &tk);
+    #####: 1133:			} else if (state.state == ParserStateInTypeExpectSemi) {
+    #####: 1134:				proc_ParserStateInTypeExpectSemi(&state, &tk);
+    #####: 1135:			} else if (state.state == ParserStateInImportListExpectModuleName) {
+    #####: 1136:				proc_ParserStateInImportListExpectModuleName(&state, &tk);
+    #####: 1137:			} else if (state.state == ParserStateInImportListExpectSeparator) {
+    #####: 1138:				proc_ParserStateInImportListExpectSeparator(&state, &tk);
+    #####: 1139:			} else if (state.state == ParserStateExpectParenBuildDefn) {
+    #####: 1140:				proc_ParserStateExpectParenBuildDefn(&state, &tk);
+    #####: 1141:			} else if (state.state == ParserStateExpectConfigParen) {
+    #####: 1142:				proc_ParserStateExpectConfigParen(&state, &tk);
+    #####: 1143:			} else if (state.state == ParserStateExpectConfigName) {
+    #####: 1144:				proc_ParserStateExpectConfigName(&state, &tk);
+    #####: 1145:			} else if (state.state == ParserStateExpectConfigComma) {
+    #####: 1146:				proc_ParserStateExpectConfigComma(&state, &tk);
+    #####: 1147:			} else if (state.state == ParserStateExpectConfigType) {
+    #####: 1148:				proc_ParserStateExpectConfigType(&state, &tk);
+    #####: 1149:			} else if (state.state == ParserStateExpectConfigCloseParen) {
+    #####: 1150:				proc_ParserStateExpectConfigCloseParen(&state, &tk);
+    #####: 1151:			} else if (state.state == ParserStateExpectConfigCommaOrParenEnd) {
+    #####: 1152:				proc_ParserStateExpectConfigCommaOrParenEnd(&state, &tk);
+    #####: 1153:			} else if (state.state == ParserStateIncompleteName) {
+    #####: 1154:				proc_ParserStateIncompleteName(&state, &tk);
+    #####: 1155:			} else if (state.state == ParserIncompleteExpectBrace) {
+    #####: 1156:				proc_ParserIncompleteExpectBrace(&state, &tk);
+    #####: 1157:			} else if (state.state == ParserStateExpectAt) {
+    #####: 1158:				proc_ParserStateExpectAt(&state, &tk, args_file);
+    #####: 1159:			} else if (state.state == ParserStateExpectIncompleteFnMutOrType) {
+    #####: 1160:				proc_ParserStateExpectIncompleteFnMutOrType(&state, &tk);
+    #####: 1161:			} else if (state.state == ParserStateExpectIncompleteFnName) {
+    #####: 1162:				proc_ParserStateExpectIncompleteFnName(&state, &tk);
+    #####: 1163:			} else if (state.state == ParserStateExpectIncompleteFnParenStart) {
+    #####: 1164:				proc_ParserStateExpectIncompleteFnParenStart(&state, &tk);
+    #####: 1165:			} else if (state.state == ParserStateExpectIncompleteFnType) {
+    #####: 1166:				proc_ParserStateExpectIncompleteFnType(&state, &tk);
+    #####: 1167:			} else if (state.state == ParserStateExpectIncompleteFnParamName) {
+    #####: 1168:				proc_ParserStateExpectIncompleteFnParamName(&state, &tk);
+    #####: 1169:			} else if (state.state == ParserStateExpectIncompleteFnParamCommaOrEnd) {
+    #####: 1170:				proc_ParserStateExpectIncompleteFnParamCommaOrEnd(&state, &tk);
+    #####: 1171:			} else if (state.state == ParserStateIncompleteExpectSemi) {
+    #####: 1172:				proc_ParserStateIncompleteExpectSemi(&state, &tk);
+    #####: 1173:			} else if (state.state == ParserStateIncompleteExpectSemiOrTypeArrow) {
+    #####: 1174:				proc_ParserStateIncompleteExpectSemiOrTypeArrow(&state, &tk);
+    #####: 1175:			} else if (state.state == ParserStateIncompleteExpectReturnType) {
+    #####: 1176:				proc_ParserStateIncompleteExpectReturnType(&state, &tk);
+    #####: 1177:			} else if (state.state == ParserStateExpectIncompleteNameForImpl) {
+    #####: 1178:				proc_ParserStateExpectIncompleteNameForImpl(&state, &tk);
+    #####: 1179:			} else if (state.state == ParserStateImplExpectSemi) {
+    #####: 1180:				proc_ParserStateImplExpectSemi(&state, &tk);
+    #####: 1181:			} else if (state.state == ParserStateExpectIncompleteMutFnName) {
+    #####: 1182:				proc_ParserStateExpectIncompleteMutFnName(&state, &tk);
+    #####: 1183:			} else if (state.state == ParserStateExpectPipe) {
+    #####: 1184:				proc_ParserStateExpectPipe(&state, &tk);
+    #####: 1185:			} else if (state.state == ParserStateExpectArraySize) {
+    #####: 1186:				proc_ParserStateExpectArraySize(&state, &tk);
+    #####: 1187:			} else if (state.state == ParserStateExpectEndArray) {
+    #####: 1188:				proc_ParserStateExpectEndArray(&state, &tk);
+    #####: 1189:			} else if (tk.type == TokenTypePunct) {
+    #####: 1190:				if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
+    #####: 1191:					state.state = ParserStateBeginStatement;
+    #####: 1192:				} else if (!strcmp(tk.token, "{") && state.state == ParserStateExpectBrace) {
+        -: 1193:					TypeInfo ti;
+    #####: 1194:					ti.mi = *state.cur;
+    #####: 1195:					strcpy(ti.type_name, state.type_name);
+    #####: 1196:					ti.gen_file_counter = state.gen_file_counter;
+    #####: 1197:					vec_push(types, &ti);
+    #####: 1198:					state.state = ParserStateExpectType;
+    #####: 1199:					state.cur_is_array = false;
+    #####: 1200:				} else if (!strcmp(tk.token, "::") && state.state == ParserStateExpectBrace) {
+        -: 1201:					// This is an implementation statement
+    #####: 1202:					state.state = ParserStateExpectIncompleteNameForImpl;
+        -: 1203:				} else
+    #####: 1204:					state.state = ParserStateOther;
+        -: 1205:			}
+        -: 1206:		}
+        -: 1207:
+    #####: 1208:		token_cleanup(&tk);
+        -: 1209:	}
+        -: 1210:
+    #####: 1211:	Path gen_header_name;
+        -: 1212:	char header_name[128];
+    #####: 1213:	snprintf(header_name, 128, "f%" PRIu64 "", state.gen_file_counter);
+    #####: 1214:	path_for(&gen_header_name, base_dir);
+    #####: 1215:	path_push(&gen_header_name, "target");
+    #####: 1216:	path_push(&gen_header_name, "include");
+    #####: 1217:	path_push(&gen_header_name, header_name);
+    #####: 1218:	path_mkdir(&gen_header_name, 0700, false);
+    #####: 1219:	path_push(&gen_header_name, "build_specific.h");
+        -: 1220:
+    #####: 1221:	append_to_header(&state, "");
+        -: 1222:
+    #####: 1223:	FILE *fp = myfopen(path_to_string(&gen_header_name), "w");
+    #####: 1224:	if (fprintf(fp, "%s", state.gen_header) < strlen(state.gen_header))
+    #####: 1225:		fprintf(stderr, "Partial write of header: %s occurred!\n",
+        -: 1226:				path_to_string(&gen_header_name));
+        -: 1227:
+    #####: 1228:	myfclose(fp);
+    #####: 1229:	free_gen_header(&state);
+    #####: 1230:	vec_cleanup(&state.ht.names);
+    #####: 1231:	vec_cleanup(&state.ht.types);
+    #####: 1232:	vec_cleanup(&state.import_list);
+    #####: 1233:	vec_cleanup(&state.config_types);
+    #####: 1234:	vec_cleanup(&state.config_names);
+    #####: 1235:	vec_cleanup(&state.incomplete_fns);
+        -: 1236:
+    #####: 1237:	lexer_cleanup(&l);
+        -: 1238:
+    #####: 1239:	if (state.has_errors) {
+    #####: 1240:		exit_error("Compilation of file: %s failed!", file);
+        -: 1241:	}
+    #####: 1242:}
         -:    0:Source:args.c
         -:    0:Graph:args.gcno
         -:    0:Data:args.gcda
