@@ -83,6 +83,7 @@ $(function() {
 <code>#include &lt;<a class="el" href="lexer_8h_source.html">lexer/lexer.h</a>&gt;</code><br />
 <code>#include &lt;limits.h&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -177,6 +178,11 @@ Enumerations</h2></td></tr>
 , <a class="el" href="parser_8c.html#ae3db5225dd960f18d1392680f2e230a4a96f7c0624c2ade035f5e931570862bef">ParserStateExpectIncompleteNameForImpl</a> = 27
 , <br />
 &#160;&#160;<a class="el" href="parser_8c.html#ae3db5225dd960f18d1392680f2e230a4a20bd9f20f68f691682f2e82dee944125">ParserStateImplExpectSemi</a> = 28
+, <a class="el" href="parser_8c.html#ae3db5225dd960f18d1392680f2e230a4a18ae395a3207110dd6dc2fd02d95f9a0">ParserStateExpectIncompleteMutFnName</a> = 29
+, <a class="el" href="parser_8c.html#ae3db5225dd960f18d1392680f2e230a4ac3cb8797bd6b0d6a98c98dbd94948a7d">ParserStateExpectPipe</a> = 30
+, <a class="el" href="parser_8c.html#ae3db5225dd960f18d1392680f2e230a4ab86fada29f4135c4b222aa8ec3589e00">ParserStateExpectArraySize</a> = 31
+, <br />
+&#160;&#160;<a class="el" href="parser_8c.html#ae3db5225dd960f18d1392680f2e230a4a94c04c54a08fddb2f2c958cc1e7e5a72">ParserStateExpectEndArray</a> = 32
 , <a class="el" href="parser_8c.html#ae3db5225dd960f18d1392680f2e230a4a2f986b50e27f7657a3725bccee737989">ParserStateOther</a> = 1000000
 <br />
  }</td></tr>
@@ -212,8 +218,14 @@ Functions</h2></td></tr>
 <tr class="separator:a0285192e54ca68343d3ebec37b7eb08f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3edcfcf45d530825e4b21205602a3b5d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a3edcfcf45d530825e4b21205602a3b5d">proc_ParserStateExpectConfigCommaOrParenEnd</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
 <tr class="separator:a3edcfcf45d530825e4b21205602a3b5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0786a4376e7e1d37172c4453185b2597"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a0786a4376e7e1d37172c4453185b2597">proc_ParserStateExpectType</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
-<tr class="separator:a0786a4376e7e1d37172c4453185b2597"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69099f2b9e528ea29296dc8ee8cacc81"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a69099f2b9e528ea29296dc8ee8cacc81">proc_ParserStateExpectType</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk, const char *args_file)</td></tr>
+<tr class="separator:a69099f2b9e528ea29296dc8ee8cacc81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b96d05617ae931be7b7bf66aa5bf462"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a8b96d05617ae931be7b7bf66aa5bf462">proc_ParserStateExpectPipe</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
+<tr class="separator:a8b96d05617ae931be7b7bf66aa5bf462"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a276a79096541d2cea0ff0ad7694c36c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a276a79096541d2cea0ff0ad7694c36c9">proc_ParserStateExpectArraySize</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
+<tr class="separator:a276a79096541d2cea0ff0ad7694c36c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acab40bd0068e74e5ddf11a090c963aaf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#acab40bd0068e74e5ddf11a090c963aaf">proc_ParserStateExpectEndArray</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
+<tr class="separator:acab40bd0068e74e5ddf11a090c963aaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5afba2c854e43572ef0f31f5286bc7ff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a5afba2c854e43572ef0f31f5286bc7ff">proc_ParserStateExpectName</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
 <tr class="separator:a5afba2c854e43572ef0f31f5286bc7ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac740040a0f74b9a03218229260fda048"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#ac740040a0f74b9a03218229260fda048">proc_ParserStateInTypeExpectSemi</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
@@ -224,12 +236,14 @@ Functions</h2></td></tr>
 <tr class="separator:a0608120e0e371a18182ebf472d4f0d01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42a74eb8182b1c6ae22a4e0688f67f18"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a42a74eb8182b1c6ae22a4e0688f67f18">proc_ParserIncompleteExpectBrace</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
 <tr class="separator:a42a74eb8182b1c6ae22a4e0688f67f18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a98c1a75c55d5d0ac071e55e0a9c69db0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a98c1a75c55d5d0ac071e55e0a9c69db0">expand_params</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structIncompleteFn.html">IncompleteFn</a> *fn)</td></tr>
-<tr class="separator:a98c1a75c55d5d0ac071e55e0a9c69db0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c0b881a8b62a7d1161db5d3d369b3f9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a0c0b881a8b62a7d1161db5d3d369b3f9">expand_vars</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structIncompleteFn.html">IncompleteFn</a> *fn)</td></tr>
-<tr class="separator:a0c0b881a8b62a7d1161db5d3d369b3f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfbc34ea5d1feec5c78995ed8729b41d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#abfbc34ea5d1feec5c78995ed8729b41d">expand_params</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structIncompleteFn.html">IncompleteFn</a> *<a class="el" href="main_2resources_2include_2core_2type_8h.html#a6c4c53f6a68a8c2fdc3e916c51e880f4">fn</a>, FILE *fp)</td></tr>
+<tr class="separator:abfbc34ea5d1feec5c78995ed8729b41d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb4bf3e17c02a4763db82029e2e4f772"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#adb4bf3e17c02a4763db82029e2e4f772">expand_vars</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structIncompleteFn.html">IncompleteFn</a> *<a class="el" href="main_2resources_2include_2core_2type_8h.html#a6c4c53f6a68a8c2fdc3e916c51e880f4">fn</a>, FILE *fp)</td></tr>
+<tr class="separator:adb4bf3e17c02a4763db82029e2e4f772"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aedd0e8f7cdedfcee3f66003a21b439bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#aedd0e8f7cdedfcee3f66003a21b439bd">proc_ParserStateExpectAt</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk, const char *args_file)</td></tr>
 <tr class="separator:aedd0e8f7cdedfcee3f66003a21b439bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a143af22d0af3c4f48f16eff9d6c5b559"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a143af22d0af3c4f48f16eff9d6c5b559">proc_ParserStateExpectIncompleteMutFnName</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
+<tr class="separator:a143af22d0af3c4f48f16eff9d6c5b559"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2b2b6a15896e1e838115325943d178a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#ae2b2b6a15896e1e838115325943d178a">proc_ParserStateExpectIncompleteFnName</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
 <tr class="separator:ae2b2b6a15896e1e838115325943d178a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1858801e16b2d8832872118b2e42f928"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#a1858801e16b2d8832872118b2e42f928">proc_ParserStateExpectIncompleteFnParenStart</a> (<a class="el" href="structParserState.html">ParserState</a> *state, <a class="el" href="structToken.html">Token</a> *tk)</td></tr>
@@ -263,7 +277,7 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:abbf8fe75ce8d0828c74409ef677367c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#abbf8fe75ce8d0828c74409ef677367c1">gen_file_counter</a> = 0</td></tr>
 <tr class="separator:abbf8fe75ce8d0828c74409ef677367c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6a116283e512cb53ae58c5eac9dfd9f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structGlobalIncompleteList.html">GlobalIncompleteList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#ac6a116283e512cb53ae58c5eac9dfd9f">global_incomplete_list</a> = { 0, NULL }</td></tr>
+<tr class="memitem:ac6a116283e512cb53ae58c5eac9dfd9f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structGlobalIncompleteList.html">GlobalIncompleteList</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="parser_8c.html#ac6a116283e512cb53ae58c5eac9dfd9f">global_incomplete_list</a> = {0, NULL}</td></tr>
 <tr class="separator:ac6a116283e512cb53ae58c5eac9dfd9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -478,6 +492,10 @@ Variables</h2></td></tr>
 <tr><td class="fieldname"><a id="ae3db5225dd960f18d1392680f2e230a4a6f5d7d902f1de0aa3d7a96905e0db91f"></a>ParserStateIncompleteExpectReturnType&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ae3db5225dd960f18d1392680f2e230a4a96f7c0624c2ade035f5e931570862bef"></a>ParserStateExpectIncompleteNameForImpl&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ae3db5225dd960f18d1392680f2e230a4a20bd9f20f68f691682f2e82dee944125"></a>ParserStateImplExpectSemi&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae3db5225dd960f18d1392680f2e230a4a18ae395a3207110dd6dc2fd02d95f9a0"></a>ParserStateExpectIncompleteMutFnName&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae3db5225dd960f18d1392680f2e230a4ac3cb8797bd6b0d6a98c98dbd94948a7d"></a>ParserStateExpectPipe&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae3db5225dd960f18d1392680f2e230a4ab86fada29f4135c4b222aa8ec3589e00"></a>ParserStateExpectArraySize&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="ae3db5225dd960f18d1392680f2e230a4a94c04c54a08fddb2f2c958cc1e7e5a72"></a>ParserStateExpectEndArray&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="ae3db5225dd960f18d1392680f2e230a4a2f986b50e27f7657a3725bccee737989"></a>ParserStateOther&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
@@ -552,8 +570,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a98c1a75c55d5d0ac071e55e0a9c69db0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a98c1a75c55d5d0ac071e55e0a9c69db0">&#9670;&nbsp;</a></span>expand_params()</h2>
+<a id="abfbc34ea5d1feec5c78995ed8729b41d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfbc34ea5d1feec5c78995ed8729b41d">&#9670;&nbsp;</a></span>expand_params()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -568,7 +586,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="structIncompleteFn.html">IncompleteFn</a> *&#160;</td>
-          <td class="paramname"><em>fn</em>&#160;</td>
+          <td class="paramname"><em>fn</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>fp</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -580,8 +604,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a0c0b881a8b62a7d1161db5d3d369b3f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0c0b881a8b62a7d1161db5d3d369b3f9">&#9670;&nbsp;</a></span>expand_vars()</h2>
+<a id="adb4bf3e17c02a4763db82029e2e4f772"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb4bf3e17c02a4763db82029e2e4f772">&#9670;&nbsp;</a></span>expand_vars()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -596,7 +620,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="structIncompleteFn.html">IncompleteFn</a> *&#160;</td>
-          <td class="paramname"><em>fn</em>&#160;</td>
+          <td class="paramname"><em>fn</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramname"><em>fp</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -778,6 +808,34 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">void proc_ParserStateBeginStatement </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structParserState.html">ParserState</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structToken.html">Token</a> *&#160;</td>
+          <td class="paramname"><em>tk</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a276a79096541d2cea0ff0ad7694c36c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a276a79096541d2cea0ff0ad7694c36c9">&#9670;&nbsp;</a></span>proc_ParserStateExpectArraySize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void proc_ParserStateExpectArraySize </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structParserState.html">ParserState</a> *&#160;</td>
           <td class="paramname"><em>state</em>, </td>
@@ -1000,6 +1058,34 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="acab40bd0068e74e5ddf11a090c963aaf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acab40bd0068e74e5ddf11a090c963aaf">&#9670;&nbsp;</a></span>proc_ParserStateExpectEndArray()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void proc_ParserStateExpectEndArray </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structParserState.html">ParserState</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structToken.html">Token</a> *&#160;</td>
+          <td class="paramname"><em>tk</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a94de0edd3d1ae1357c92c0e263080e0d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a94de0edd3d1ae1357c92c0e263080e0d">&#9670;&nbsp;</a></span>proc_ParserStateExpectIncompleteFnMutOrType()</h2>
 
@@ -1168,6 +1254,34 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a143af22d0af3c4f48f16eff9d6c5b559"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a143af22d0af3c4f48f16eff9d6c5b559">&#9670;&nbsp;</a></span>proc_ParserStateExpectIncompleteMutFnName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void proc_ParserStateExpectIncompleteMutFnName </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structParserState.html">ParserState</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structToken.html">Token</a> *&#160;</td>
+          <td class="paramname"><em>tk</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a3d1a9db5de5dd6d755ec92e6272d2e1a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3d1a9db5de5dd6d755ec92e6272d2e1a">&#9670;&nbsp;</a></span>proc_ParserStateExpectIncompleteNameForImpl()</h2>
 
@@ -1280,8 +1394,36 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a0786a4376e7e1d37172c4453185b2597"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0786a4376e7e1d37172c4453185b2597">&#9670;&nbsp;</a></span>proc_ParserStateExpectType()</h2>
+<a id="a8b96d05617ae931be7b7bf66aa5bf462"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b96d05617ae931be7b7bf66aa5bf462">&#9670;&nbsp;</a></span>proc_ParserStateExpectPipe()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void proc_ParserStateExpectPipe </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structParserState.html">ParserState</a> *&#160;</td>
+          <td class="paramname"><em>state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structToken.html">Token</a> *&#160;</td>
+          <td class="paramname"><em>tk</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a69099f2b9e528ea29296dc8ee8cacc81"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69099f2b9e528ea29296dc8ee8cacc81">&#9670;&nbsp;</a></span>proc_ParserStateExpectType()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1296,7 +1438,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="structToken.html">Token</a> *&#160;</td>
-          <td class="paramname"><em>tk</em>&#160;</td>
+          <td class="paramname"><em>tk</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>args_file</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1554,7 +1702,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structGlobalIncompleteList.html">GlobalIncompleteList</a> global_incomplete_list = { 0, NULL }</td>
+          <td class="memname"><a class="el" href="structGlobalIncompleteList.html">GlobalIncompleteList</a> global_incomplete_list = {0, NULL}</td>
         </tr>
       </table>
 </div><div class="memdoc">

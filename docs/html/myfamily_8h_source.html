@@ -89,8 +89,14 @@ $(function() {
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="main_2resources_2include_2core_2types_8h.html">core/types.h</a>&gt;</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;build_specific.h&gt;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#ifdef IMPL</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<a class="code" href="main_2resources_2include_2core_2type_8h.html#a99d68b0cf2a4331efbe00e16b3cd1274">TYPE_EXPAND</a>(<a class="code" href="prim_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a>)</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// IMPL</span></div>
 <div class="ttc" id="amain_2resources_2include_2core_2panic_8h_html"><div class="ttname"><a href="main_2resources_2include_2core_2panic_8h.html">panic.h</a></div></div>
+<div class="ttc" id="amain_2resources_2include_2core_2type_8h_html_a99d68b0cf2a4331efbe00e16b3cd1274"><div class="ttname"><a href="main_2resources_2include_2core_2type_8h.html#a99d68b0cf2a4331efbe00e16b3cd1274">TYPE_EXPAND</a></div><div class="ttdeci">#define TYPE_EXPAND(t)</div></div>
 <div class="ttc" id="amain_2resources_2include_2core_2types_8h_html"><div class="ttname"><a href="main_2resources_2include_2core_2types_8h.html">types.h</a></div></div>
+<div class="ttc" id="aprim_8c_html_a750877e0398a37cb8f03443558fb7f6f"><div class="ttname"><a href="prim_8c.html#a750877e0398a37cb8f03443558fb7f6f">IMPL</a></div><div class="ttdeci">#define IMPL</div><div class="ttdef"><b>Definition:</b> prim.c:80</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
