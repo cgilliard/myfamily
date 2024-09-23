@@ -458,7 +458,6 @@ int proc_build(const char *base_dir, const char *config_dir) {
 
 		char type_str[PATH_MAX * 2];
 		type_info_to_string(next, type_str, PATH_MAX * 2);
-		printf("type=%s\n", type_str);
 
 		char dimpl[(PATH_MAX * 2) + 30];
 		strcpy(dimpl, "-DIMPL=");

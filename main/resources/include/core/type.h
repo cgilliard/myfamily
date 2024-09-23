@@ -96,7 +96,9 @@ FatPtr build_fat_ptr(u64 size);
 #define mut Cleanup
 #define let const Cleanup
 
-#define SET_PARAM__(name, value) __config_.name = value;
+#define SET_PARAM__(name, value)                                                                   \
+	__config_.name = value;                                                                        \
+	__config_.name##_is_set__ = true;
 #define SET_PARAM_(...) SET_PARAM__(__VA_ARGS__)
 #define SET_PARAM(ptr, value) SET_PARAM_(EXPAND_ALL value)
 #define With(x, y) (x, y)
@@ -131,6 +133,8 @@ FatPtr build_fat_ptr(u64 size);
 	(__thread_local_self_Const)
 
 #define $Config(...) (((const IMPLCONFIG *)(__selfconfig__))->__VA_ARGS__)
+
+#define $IsSet(...) (((const IMPLCONFIG *)(__selfconfig__))->__VA_ARGS__##_is_set__)
 
 #define fn__(v, i) Fn_expand_##v##_return CAT(i, Fn_expand_##v##_params)
 #define fn_(v) fn__(v, IMPL)

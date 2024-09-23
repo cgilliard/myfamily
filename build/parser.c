@@ -18,12 +18,15 @@
 #include <lexer/lexer.h>
 #include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 u64 gen_file_counter = 0;
 
 typedef struct HeaderTypeInfo {
 	char type[MAX_NAME_LEN];
+	bool is_arr;
+	u64 arr_size;
 } HeaderTypeInfo;
 
 typedef struct HeaderNameInfo {
@@ -157,6 +160,9 @@ typedef enum ParserStateEnum {
 	ParserStateExpectIncompleteNameForImpl = 27,
 	ParserStateImplExpectSemi = 28,
 	ParserStateExpectIncompleteMutFnName = 29,
+	ParserStateExpectPipe = 30,
+	ParserStateExpectArraySize = 31,
+	ParserStateExpectEndArray = 32,
 	ParserStateOther = 1000000,
 } ParserStateEnum;
 
@@ -176,6 +182,7 @@ typedef struct ParserState {
 	Vec config_names;
 	Vec incomplete_fns;
 	bool has_errors;
+	bool cur_is_array;
 } ParserState;
 
 #define INITIAL_HEADER_CAPACITY (1024 * 25)
@@ -396,6 +403,10 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 		vec_clear(&state->config_names);
 		vec_clear(&state->config_types);
 		state->state = ParserStateExpectParenBuildDefn;
+	} else if (!strcmp(tk->token, "[")) {
+		// array
+		state->cur_is_array = true;
+		state->state = ParserStateExpectType;
 	} else if (tk->type != TokenTypeIdent) {
 		if (!strcmp(tk->token, "}")) {
 			u64 count = vec_size(&(state->ht.types));
@@ -409,7 +420,12 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 				HeaderTypeInfo *ti;
 				ti = vec_element_at(&(state->ht.types), i);
 				ni = vec_element_at(&(state->ht.names), i);
-				append_to_header(state, "%s %s;", ti->type, ni->name);
+				if (ti->is_arr) {
+					append_to_header(state, "%s %s[%" PRIu64 "];", ti->type, ni->name,
+									 ti->arr_size);
+				} else {
+					append_to_header(state, "%s %s;", ti->type, ni->name);
+				}
 			}
 			if (count == 0) {
 				append_to_header(state, "char dummy;");
@@ -457,8 +473,9 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 				for (u64 i = 0; i < count_configs; i++) {
 					ConfigType *t = vec_element_at(&state->config_types, i);
 					ConfigName *n = vec_element_at(&state->config_names, i);
-					append_to_header(state, "%s %s;", t->type_name, n->name);
-					fprintf(fp, "%s %s;", t->type_name, n->name);
+					append_to_header(state, "%s %s; bool %s_is_set__;", t->type_name, n->name,
+									 n->name);
+					fprintf(fp, "%s %s; bool %s_is_set__;", t->type_name, n->name, n->name);
 				}
 			} else {
 				append_to_header(state, "char dummy;");
@@ -486,10 +503,56 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 			state->state = ParserStateOther;
 		} else {
 			HeaderTypeInfo hti;
+			hti.is_arr = state->cur_is_array;
 			strcpy(hti.type, tk->token);
 			vec_push(&(state->ht.types), &hti);
-			state->state = ParserStateExpectName;
+			if (state->cur_is_array) {
+				state->state = ParserStateExpectPipe;
+			} else {
+				state->state = ParserStateExpectName;
+			}
 		}
+	}
+}
+
+void proc_ParserStateExpectPipe(ParserState *state, Token *tk) {
+	if (!strcmp(tk->token, "|")) {
+		state->state = ParserStateExpectArraySize;
+	} else {
+		state->has_errors = true;
+		token_display_error(tk, "Expected ['|']. Found [%s]", tk->token);
+	}
+}
+
+void proc_ParserStateExpectArraySize(ParserState *state, Token *tk) {
+	if (tk->type == TokenTypeLiteral) {
+		char first = tk->token[0];
+		if (!(first >= '0' && first <= '9')) {
+			state->has_errors = true;
+			token_display_error(tk, "Expected number literal. Found [%s]", tk->token);
+			state->state = ParserStateBeginStatement;
+		} else {
+			char *endptr;
+			HeaderTypeInfo *hti;
+			hti = vec_element_at(&(state->ht.types), vec_size(&(state->ht.types)) - 1);
+			hti->arr_size = strtoull(tk->token, &endptr, 10);
+
+			state->state = ParserStateExpectEndArray;
+		}
+	} else {
+		state->has_errors = true;
+		token_display_error(tk, "Expected number literal. Found [%s]", tk->token);
+		state->state = ParserStateBeginStatement;
+	}
+}
+
+void proc_ParserStateExpectEndArray(ParserState *state, Token *tk) {
+	if (!strcmp(tk->token, "]")) {
+		state->state = ParserStateExpectName;
+	} else {
+		state->has_errors = true;
+		token_display_error(tk, "Expected [']']. Found [%s]", tk->token);
+		state->state = ParserStateBeginStatement;
 	}
 }
 
@@ -518,6 +581,7 @@ void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk) {
 		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
 	}
 	state->state = ParserStateExpectType;
+	state->cur_is_array = false;
 }
 
 void proc_ParserStateExpectModuleName(ParserState *state, Token *tk) {
@@ -627,21 +691,6 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 		// end incomplete type
 		state->state = ParserStateBeginStatement;
 		u64 fn_count = vec_size(&state->incomplete_fns);
-
-		/*
-		 *  FILE *fp = myfopen(args_file, "a");
-								fprintf(fp, "-DType_Expand_%s_=\"", type_name);
-								fprintf(fp, "Vtable %s_Vtable__ = {\\\"%s\\\", 0, NULL, 0, NULL,
-		 false};\
-										u64 %s_size() {return sizeof(%s); }\
-										void %s_drop_internal(Obj *ptr) {}\
-										void %s_build_internal(Obj *ptr) {\
-										u64 size = %s_size();                     \
-										memset(ptr->ptr.data, 0, size);           \
-										}",
-												type_name, type_name, type_name, type_name,
-		 type_name, type_name, type_name); fprintf(fp, "\"\n");
-					*/
 
 		FILE *fp = myfopen(args_file, "a");
 		TypeInfo ti;
@@ -1131,6 +1180,12 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 				proc_ParserStateImplExpectSemi(&state, &tk);
 			} else if (state.state == ParserStateExpectIncompleteMutFnName) {
 				proc_ParserStateExpectIncompleteMutFnName(&state, &tk);
+			} else if (state.state == ParserStateExpectPipe) {
+				proc_ParserStateExpectPipe(&state, &tk);
+			} else if (state.state == ParserStateExpectArraySize) {
+				proc_ParserStateExpectArraySize(&state, &tk);
+			} else if (state.state == ParserStateExpectEndArray) {
+				proc_ParserStateExpectEndArray(&state, &tk);
 			} else if (tk.type == TokenTypePunct) {
 				if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
 					state.state = ParserStateBeginStatement;
@@ -1141,6 +1196,7 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 					ti.gen_file_counter = state.gen_file_counter;
 					vec_push(types, &ti);
 					state.state = ParserStateExpectType;
+					state.cur_is_array = false;
 				} else if (!strcmp(tk.token, "::") && state.state == ParserStateExpectBrace) {
 					// This is an implementation statement
 					state.state = ParserStateExpectIncompleteNameForImpl;
