@@ -57,6 +57,7 @@ typedef struct IncompleteFn {
 	bool is_mut;
 	Vec params;
 	char return_type[MAX_NAME_LEN];
+	bool has_impl;
 } IncompleteFn;
 
 typedef struct IncompleteType {
@@ -89,6 +90,7 @@ void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_
 
 	for (u64 i = 0; i < next->count; i++) {
 		IncompleteFn *fn = vec_element_at(incomplete_fns, i);
+		next->fns[i].has_impl = fn->has_impl;
 		strcpy(next->fns[i].name, fn->name);
 		strcpy(next->fns[i].return_type, fn->return_type);
 		vec_init(&next->fns[i].params, 3, sizeof(FnParam));
@@ -632,6 +634,7 @@ void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk) {
 
 void expand_params(ParserState *state, IncompleteFn *fn, FILE *fp) {
 	u64 param_count = vec_size(&fn->params);
+	printf("param count for %s = %" PRIu64 "\n", fn->name, param_count);
 	if (param_count) {
 		append_to_header(state, ",");
 		if (fp) {
@@ -747,10 +750,25 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 		fprintf(fp, "\"\n");
 		myfclose(fp);
 
+		printf("add to inc list %s\n", state->type_name);
 		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns, args_file);
 
 		incomplete_fns_cleanup(&state->incomplete_fns);
 
+	} else if (tk->type == TokenTypeIdent) {
+		// required method with an implementation.
+		if (!strcmp(tk->token, "mut")) {
+			state->state = ParserStateExpectIncompleteMutFnName;
+		} else {
+			IncompleteFn fn;
+			fn.has_impl = true;
+			fn.is_mut = false;
+			strcpy(fn.name, tk->token);
+			vec_init(&fn.params, 3, sizeof(FnParam));
+			strcpy(fn.return_type, "void");
+			vec_push(&state->incomplete_fns, &fn);
+			state->state = ParserStateExpectIncompleteFnParenStart;
+		}
 	} else {
 		state->state = ParserStateBeginStatement;
 		state->has_errors = true;
@@ -765,6 +783,7 @@ void proc_ParserStateExpectIncompleteMutFnName(ParserState *state, Token *tk) {
 		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
 	} else {
 		IncompleteFn fn;
+		fn.has_impl = false;
 		fn.is_mut = true;
 		strcpy(fn.name, tk->token);
 		vec_init(&fn.params, 3, sizeof(FnParam));
@@ -784,6 +803,7 @@ void proc_ParserStateExpectIncompleteFnName(ParserState *state, Token *tk) {
 			state->state = ParserStateExpectIncompleteMutFnName;
 		} else {
 			IncompleteFn fn;
+			fn.has_impl = false;
 			fn.is_mut = false;
 			strcpy(fn.name, tk->token);
 			vec_init(&fn.params, 3, sizeof(FnParam));
@@ -947,7 +967,6 @@ void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk) 
 			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
 			FnParam param;
 			param.is_mut = false;
-			vec_init(&fn->params, 3, sizeof(FnParam));
 			vec_push(&fn->params, &param);
 			proc_ParserStateExpectIncompleteFnType(state, tk);
 		}
@@ -962,25 +981,39 @@ void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk) 
 	}
 }
 
-void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk) {
+void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk,
+												 const char *args_file) {
 	if (tk->type == TokenTypeIdent) {
-		// state.type_name = incomplete type name in this context
-
 		TypeInfo ti;
 		ti.mi = *state->cur;
 		strcpy(ti.type_name, state->type_name);
+
+		TypeInfo ti_inc;
+		ti_inc.mi = *state->cur;
+		strcpy(ti_inc.type_name, tk->token);
+		char incomplete_full_type[PATH_MAX + 1];
+		type_info_to_string(&ti_inc, incomplete_full_type, PATH_MAX);
 
 		char complete_type[PATH_MAX + 1];
 		type_info_to_string(&ti, complete_type, PATH_MAX);
 		char *incomplete_type = tk->token;
 		bool found = false;
+		bool has_impl = false;
 		for (u64 i = 0; i < global_incomplete_list.count; i++) {
 			if (!strcmp(incomplete_type, global_incomplete_list.types[i].name)) {
 				IncompleteType *inc = &global_incomplete_list.types[i];
 				for (u64 j = 0; j < inc->count; j++) {
-
-					append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
-									 complete_type, inc->fns[j].name);
+					if (inc->fns[j].has_impl)
+						has_impl = true;
+					printf("inc->fns[j].name=%s,has_impl=%i\n", inc->fns[j].name,
+						   inc->fns[j].has_impl);
+					if (inc->fns[j].has_impl) {
+						append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
+										 incomplete_full_type, inc->fns[j].name);
+					} else {
+						append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
+										 complete_type, inc->fns[j].name);
+					}
 
 					expand_params(state, &inc->fns[j], NULL);
 					append_to_header(state, ");");
@@ -989,15 +1022,36 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk) 
 					state, "static void __attribute__((constructor)) vtable_add_inc_impl_%s_%s() {",
 					complete_type, incomplete_type);
 				for (u64 j = 0; j < inc->count; j++) {
-					append_to_header(
-						state,
-						"VtableEntry next_%" PRIu64
-						" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
-						j, inc->fns[j].name, complete_type, inc->fns[j].name, complete_type, j);
+					if (inc->fns[j].has_impl) {
+						append_to_header(
+							state,
+							"VtableEntry next_%" PRIu64
+							" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
+							j, inc->fns[j].name, incomplete_full_type, inc->fns[j].name,
+							complete_type, j);
+					} else {
+						append_to_header(
+							state,
+							"VtableEntry next_%" PRIu64
+							" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
+							j, inc->fns[j].name, complete_type, inc->fns[j].name, complete_type, j);
+					}
 				}
 				append_to_header(state, "}");
 				found = true;
 			}
+		}
+
+		if (has_impl) {
+			TypeInfo ti;
+			ti.mi = *(state->cur);
+			strcpy(ti.type_name, incomplete_type);
+			ti.gen_file_counter = state->gen_file_counter;
+			vec_push(state->types, &ti);
+
+			FILE *fp = myfopen(args_file, "a");
+			fprintf(fp, "-DType_Expand_%s_=\"\"", incomplete_full_type);
+			myfclose(fp);
 		}
 
 		if (!found) {
@@ -1060,6 +1114,7 @@ void init_parser(const char *args_file) {
 	Vec build_fns;
 	vec_init(&build_fns, 1, sizeof(IncompleteFn));
 	IncompleteFn build;
+	build.has_impl = false;
 	strcpy(build.name, "build");
 	strcpy(build.return_type, "void");
 	vec_init(&build.params, 1, sizeof(FnParam));
@@ -1074,6 +1129,7 @@ void init_parser(const char *args_file) {
 	Vec drop_fns;
 	vec_init(&drop_fns, 1, sizeof(IncompleteFn));
 	IncompleteFn drop;
+	drop.has_impl = false;
 	strcpy(drop.name, "drop");
 	strcpy(drop.return_type, "void");
 	vec_init(&drop.params, 1, sizeof(FnParam));
@@ -1173,7 +1229,7 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 			} else if (state.state == ParserStateIncompleteExpectReturnType) {
 				proc_ParserStateIncompleteExpectReturnType(&state, &tk);
 			} else if (state.state == ParserStateExpectIncompleteNameForImpl) {
-				proc_ParserStateExpectIncompleteNameForImpl(&state, &tk);
+				proc_ParserStateExpectIncompleteNameForImpl(&state, &tk, args_file);
 			} else if (state.state == ParserStateImplExpectSemi) {
 				proc_ParserStateImplExpectSemi(&state, &tk);
 			} else if (state.state == ParserStateExpectIncompleteMutFnName) {
