@@ -175,6 +175,7 @@ typedef struct ParserState {
 	Vec config_types;
 	Vec config_names;
 	Vec incomplete_fns;
+	bool has_errors;
 } ParserState;
 
 #define INITIAL_HEADER_CAPACITY (1024 * 25)
@@ -237,6 +238,7 @@ void proc_ParserStateBeginStatement(ParserState *state, Token *tk) {
 			state->state = ParserStateExpectModuleName;
 		} else {
 			if (strlen(tk->token) > MAX_NAME_LEN) {
+				state->has_errors = true;
 				token_display_error(tk, "token name is longer than MAX_NAME_LEN (%i)",
 									MAX_NAME_LEN);
 			} else {
@@ -260,6 +262,7 @@ void proc_ParserStateBeginStatement(ParserState *state, Token *tk) {
 
 void proc_ParserStateInImportListExpectModuleName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
+		state->has_errors = true;
 		token_display_error(tk, "Expected module name. Found [%s]", tk->token);
 	} else {
 		SubModuleInfo mi;
@@ -278,6 +281,7 @@ void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk) 
 	} else if (!strcmp(tk->token, ";")) {
 		u64 import_list_size = state->import_module_info.sub_module_count;
 		if (import_list_size == 0) {
+			state->has_errors = true;
 			token_display_error(tk, "Expected at least one module name here");
 		} else {
 			char type_name[PATH_MAX + 1];
@@ -289,6 +293,7 @@ void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk) 
 			state->state = ParserStateBeginStatement;
 		}
 	} else {
+		state->has_errors = true;
 		token_display_error(tk, "Expected one of [';', '::']. Found [%s]", tk->token);
 	}
 }
@@ -297,6 +302,7 @@ void proc_ParserStateExpectParenBuildDefn(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "("))
 		state->state = ParserStateExpectConfigParen;
 	else {
+		state->has_errors = true;
 		token_display_error(tk, "Expected '('. Found [%s]", tk->token);
 		state->state = ParserStateBeginStatement;
 	}
@@ -306,6 +312,7 @@ void proc_ParserStateExpectConfigParen(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "(")) {
 		state->state = ParserStateExpectConfigType;
 	} else {
+		state->has_errors = true;
 		token_display_error(tk, "Expected '(' or ')'. Found [%s]", tk->token);
 		state->state = ParserStateBeginStatement;
 	}
@@ -313,12 +320,14 @@ void proc_ParserStateExpectConfigParen(ParserState *state, Token *tk) {
 
 void proc_ParserStateExpectConfigType(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
+		state->has_errors = true;
 		token_display_error(tk, "Expected Type name. Found [%s]", tk->token);
 		state->state = ParserStateBeginStatement;
 	} else {
 		if (strcmp(tk->token, "u8") && strcmp(tk->token, "u16") && strcmp(tk->token, "u32") &&
 			strcmp(tk->token, "u64") && strcmp(tk->token, "u128") && strcmp(tk->token, "bool") &&
 			strcmp(tk->token, "String")) {
+			state->has_errors = true;
 			token_display_error(
 				tk, "Expected one of [u8, u16, u32, u64, u128, bool, String]. Found [%s]",
 				tk->token);
@@ -338,6 +347,7 @@ void proc_ParserStateExpectConfigType(ParserState *state, Token *tk) {
 void proc_ParserStateExpectConfigComma(ParserState *state, Token *tk) {
 	if (strcmp(tk->token, ",")) {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected ','. Found [%s]", tk->token);
 	} else {
 		state->state = ParserStateExpectConfigName;
@@ -346,6 +356,7 @@ void proc_ParserStateExpectConfigComma(ParserState *state, Token *tk) {
 
 void proc_ParserStateExpectConfigName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
+		state->has_errors = true;
 		token_display_error(tk, "Expected config name. Found [%s]", tk->token);
 		state->state = ParserStateBeginStatement;
 	} else {
@@ -360,6 +371,7 @@ void proc_ParserStateExpectConfigName(ParserState *state, Token *tk) {
 void proc_ParserStateExpectConfigCloseParen(ParserState *state, Token *tk) {
 	if (strcmp(tk->token, ")")) {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected ')'. Found [%s]", tk->token);
 	} else {
 		state->state = ParserStateExpectConfigCommaOrParenEnd;
@@ -373,6 +385,7 @@ void proc_ParserStateExpectConfigCommaOrParenEnd(ParserState *state, Token *tk) 
 		state->state = ParserStateInTypeExpectSemi;
 	} else {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected one of [')', ',']. Found [%s]", tk->token);
 	}
 }
@@ -462,11 +475,13 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 			vec_clear(&(state->ht.names));
 			state->state = ParserStateBeginStatement;
 		} else {
+			state->has_errors = true;
 			token_display_error(tk, "Expected type name. Found [%s]", tk->token);
 			state->state = ParserStateOther;
 		}
 	} else {
 		if (strlen(tk->token) > MAX_NAME_LEN) {
+			state->has_errors = true;
 			token_display_error(tk, "Name [%s] is too long.", tk->token);
 			state->state = ParserStateOther;
 		} else {
@@ -480,10 +495,12 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 
 void proc_ParserStateExpectName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
+		state->has_errors = true;
 		token_display_error(tk, "Expected name. Found [%s]", tk->token);
 		state->state = ParserStateOther;
 	} else {
 		if (strlen(tk->token) > MAX_NAME_LEN) {
+			state->has_errors = true;
 			token_display_error(tk, "Name [%s] is too long.", tk->token);
 			state->state = ParserStateOther;
 		} else {
@@ -497,6 +514,7 @@ void proc_ParserStateExpectName(ParserState *state, Token *tk) {
 
 void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk) {
 	if (strcmp(tk->token, ";")) {
+		state->has_errors = true;
 		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
 	}
 	state->state = ParserStateExpectType;
@@ -504,9 +522,11 @@ void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk) {
 
 void proc_ParserStateExpectModuleName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
+		state->has_errors = true;
 		token_display_error(tk, "Expected module name, Found [%s]", tk->token);
 	} else {
 		if (strlen(tk->token) >= PATH_MAX) {
+			state->has_errors = true;
 			token_display_error(tk, "Path is longer than max path (%i)", PATH_MAX);
 		} else {
 			ModuleInfo mi;
@@ -524,6 +544,7 @@ void proc_ParserStateExpectModuleName(ParserState *state, Token *tk) {
 void proc_ParserStateIncompleteName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected incomplete type name. Found [%s]", tk->token);
 	} else {
 		state->state = ParserIncompleteExpectBrace;
@@ -536,6 +557,7 @@ void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk) {
 		state->state = ParserStateExpectAt;
 	} else {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected '{'. Found [%s]", tk->token);
 	}
 }
@@ -678,6 +700,7 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 
 	} else {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected '@'. Found [%s]", tk->token);
 	}
 }
@@ -685,6 +708,7 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 void proc_ParserStateExpectIncompleteMutFnName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
 	} else {
 		IncompleteFn fn;
@@ -700,6 +724,7 @@ void proc_ParserStateExpectIncompleteMutFnName(ParserState *state, Token *tk) {
 void proc_ParserStateExpectIncompleteFnName(ParserState *state, Token *tk) {
 	if (tk->type != TokenTypeIdent) {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
 	} else {
 		if (!strcmp(tk->token, "mut")) {
@@ -721,6 +746,7 @@ void proc_ParserStateExpectIncompleteFnParenStart(ParserState *state, Token *tk)
 		state->state = ParserStateExpectIncompleteFnMutOrType;
 	} else {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected '('. Found [%s]", tk->token);
 	}
 }
@@ -729,6 +755,7 @@ void proc_ParserStateExpectIncompleteFnType(ParserState *state, Token *tk) {
 	if (tk->type == TokenTypeIdent) {
 		u64 last = vec_size(&state->incomplete_fns);
 		if (last == 0) {
+			state->has_errors = true;
 			token_display_error(tk, "internal error: Expected type here!");
 			state->state = ParserStateBeginStatement;
 		} else {
@@ -736,6 +763,7 @@ void proc_ParserStateExpectIncompleteFnType(ParserState *state, Token *tk) {
 			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
 			u64 last_param = vec_size(&fn->params);
 			if (last_param == 0) {
+				state->has_errors = true;
 				token_display_error(tk, "internal error: Expected a param here!");
 				state->state = ParserStateBeginStatement;
 			} else {
@@ -748,6 +776,7 @@ void proc_ParserStateExpectIncompleteFnType(ParserState *state, Token *tk) {
 	} else {
 		// unexpected - error
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected type name. Found [%s]", tk->token);
 	}
 }
@@ -756,6 +785,7 @@ void proc_ParserStateExpectIncompleteFnParamName(ParserState *state, Token *tk) 
 	if (tk->type == TokenTypeIdent) {
 		u64 last = vec_size(&state->incomplete_fns);
 		if (last == 0) {
+			state->has_errors = true;
 			token_display_error(tk, "internal error: Expected a name here!");
 			state->state = ParserStateBeginStatement;
 		} else {
@@ -763,6 +793,7 @@ void proc_ParserStateExpectIncompleteFnParamName(ParserState *state, Token *tk) 
 			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
 			u64 last_param = vec_size(&fn->params);
 			if (last_param == 0) {
+				state->has_errors = true;
 				token_display_error(tk, "internal error: Expected a param here!");
 				state->state = ParserStateBeginStatement;
 			} else {
@@ -775,6 +806,7 @@ void proc_ParserStateExpectIncompleteFnParamName(ParserState *state, Token *tk) 
 	} else {
 		// unexpected - error
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected param name. Found [%s]", tk->token);
 	}
 }
@@ -787,6 +819,7 @@ void proc_ParserStateExpectIncompleteFnParamCommaOrEnd(ParserState *state, Token
 		state->state = ParserStateIncompleteExpectSemiOrTypeArrow;
 	} else {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected [',' or ')']. Found [%s]", tk->token);
 	}
 }
@@ -796,6 +829,7 @@ void proc_ParserStateIncompleteExpectSemi(ParserState *state, Token *tk) {
 		state->state = ParserStateExpectAt;
 	} else {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
 	}
 }
@@ -807,6 +841,7 @@ void proc_ParserStateIncompleteExpectSemiOrTypeArrow(ParserState *state, Token *
 		state->state = ParserStateExpectAt;
 	} else {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected [';' or '->']. Found [%s]", tk->token);
 	}
 }
@@ -815,6 +850,7 @@ void proc_ParserStateIncompleteExpectReturnType(ParserState *state, Token *tk) {
 	if (tk->type == TokenTypeIdent) {
 		u64 last = vec_size(&state->incomplete_fns);
 		if (last == 0) {
+			state->has_errors = true;
 			token_display_error(tk, "internal error: Expected return type here!");
 			state->state = ParserStateBeginStatement;
 		} else {
@@ -826,6 +862,7 @@ void proc_ParserStateIncompleteExpectReturnType(ParserState *state, Token *tk) {
 	} else {
 		// unexpected - error
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected return type. Found [%s]", tk->token);
 	}
 }
@@ -834,6 +871,7 @@ void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk) 
 	if (!strcmp(tk->token, "mut")) {
 		u64 last = vec_size(&state->incomplete_fns);
 		if (last == 0) {
+			state->has_errors = true;
 			token_display_error(tk, "internal error: Expected an incomplete function here!");
 			state->state = ParserStateBeginStatement;
 		} else {
@@ -848,6 +886,7 @@ void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk) 
 		// It's a type name pass on to Type fn
 		u64 last = vec_size(&state->incomplete_fns);
 		if (last == 0) {
+			state->has_errors = true;
 			token_display_error(tk, "internal error: Expected an incomplete function here!");
 			state->state = ParserStateBeginStatement;
 		} else {
@@ -865,6 +904,7 @@ void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk) 
 	} else {
 		// unexpected - error
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected 'mut' or type name. Found [%s]", tk->token);
 	}
 }
@@ -908,12 +948,14 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk) 
 		}
 
 		if (!found) {
+			state->has_errors = true;
 			token_display_error(tk, "Attempt to complete an unknown incomplete type [%s]",
 								incomplete_type);
 		}
 		state->state = ParserStateImplExpectSemi;
 	} else {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected type name. Found [%s]", tk->token);
 	}
 }
@@ -923,6 +965,7 @@ void proc_ParserStateImplExpectSemi(ParserState *state, Token *tk) {
 		state->state = ParserStateBeginStatement;
 	} else {
 		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
 		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
 	}
 }
@@ -1010,6 +1053,7 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 		.cur = self_info,
 		.types = types,
 		.gen_file_counter = gen_file_counter,
+		.has_errors = false,
 	};
 	gen_file_counter++;
 
@@ -1135,4 +1179,8 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 	vec_cleanup(&state.incomplete_fns);
 
 	lexer_cleanup(&l);
+
+	if (state.has_errors) {
+		exit_error("Compilation of file: %s failed!", file);
+	}
 }
