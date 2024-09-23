@@ -89,10 +89,9 @@ FatPtr build_fat_ptr(u64 size);
 #define SelfCleanup                                                                                \
 	SelfCleanupImpl __attribute__((warn_unused_result, cleanup(SelfCleanupImpl_update)))
 
-#define Cleanup Obj __attribute__((warn_unused_result, cleanup(Obj_cleanup)))
-
 #define TypeName(obj) (obj).vtable->name
 
+#define Cleanup Obj __attribute__((warn_unused_result, cleanup(Obj_cleanup)))
 #define mut Cleanup
 #define let const Cleanup
 

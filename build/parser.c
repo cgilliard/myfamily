@@ -130,40 +130,39 @@ void incomplete_fns_cleanup(Vec *incomplete_fns) {
 }
 
 typedef enum ParserStateEnum {
-	ParserStateBeginStatement = 0,
-	ParserStateExpectModuleName = 1,
-	ParserStateExpectBrace = 2,
-	ParserStateExpectType = 3,
-	ParserStateExpectName = 4,
-	ParserStateInTypeExpectSemi = 5,
-	ParserStateInImportListExpectModuleName = 6,
-	ParserStateInImportListExpectSeparator = 7,
-	ParserStateExpectParenBuildDefn = 8,
-	ParserStateExpectConfigParen = 9,
-	ParserStateExpectConfigType = 10,
-	ParserStateExpectConfigComma = 11,
-	ParserStateExpectConfigName = 12,
-	ParserStateExpectConfigCloseParen = 13,
-	ParserStateExpectConfigCommaOrParenEnd = 14,
-	ParserStateIncompleteName = 15,
-	ParserIncompleteExpectBrace = 16,
-	ParserStateExpectAt = 17,
-	ParserStateExpectIncompleteFnName = 18,
-	ParserStateExpectIncompleteFnParenStart = 19,
-	ParserStateExpectIncompleteFnMutOrType = 20,
-	ParserStateExpectIncompleteFnType = 21,
-	ParserStateExpectIncompleteFnParamName = 22,
-	ParserStateExpectIncompleteFnParamCommaOrEnd = 23,
-	ParserStateIncompleteExpectSemi = 24,
-	ParserStateIncompleteExpectSemiOrTypeArrow = 25,
-	ParserStateIncompleteExpectReturnType = 26,
-	ParserStateExpectIncompleteNameForImpl = 27,
-	ParserStateImplExpectSemi = 28,
-	ParserStateExpectIncompleteMutFnName = 29,
-	ParserStateExpectPipe = 30,
-	ParserStateExpectArraySize = 31,
-	ParserStateExpectEndArray = 32,
-	ParserStateOther = 1000000,
+	ParserStateBeginStatement,
+	ParserStateExpectModuleName,
+	ParserStateExpectBrace,
+	ParserStateExpectType,
+	ParserStateExpectName,
+	ParserStateInTypeExpectSemi,
+	ParserStateInImportListExpectModuleName,
+	ParserStateInImportListExpectSeparator,
+	ParserStateExpectParenBuildDefn,
+	ParserStateExpectConfigParen,
+	ParserStateExpectConfigType,
+	ParserStateExpectConfigComma,
+	ParserStateExpectConfigName,
+	ParserStateIncompleteName,
+	ParserIncompleteExpectBrace,
+	ParserStateExpectAt,
+	ParserStateExpectIncompleteFnName,
+	ParserStateExpectIncompleteFnParenStart,
+	ParserStateExpectIncompleteFnMutOrType,
+	ParserStateExpectIncompleteFnType,
+	ParserStateExpectIncompleteFnParamName,
+	ParserStateExpectIncompleteFnParamCommaOrEnd,
+	ParserStateIncompleteExpectSemi,
+	ParserStateIncompleteExpectSemiOrTypeArrow,
+	ParserStateIncompleteExpectReturnType,
+	ParserStateExpectIncompleteNameForImpl,
+	ParserStateImplExpectSemi,
+	ParserStateExpectIncompleteMutFnName,
+	ParserStateExpectPipe,
+	ParserStateExpectArraySize,
+	ParserStateExpectEndArray,
+	ParserStateExpectConfigKeyword,
+	ParserStateOther,
 } ParserStateEnum;
 
 typedef struct ParserState {
@@ -305,22 +304,22 @@ void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk) 
 	}
 }
 
-void proc_ParserStateExpectParenBuildDefn(ParserState *state, Token *tk) {
-	if (!strcmp(tk->token, "("))
-		state->state = ParserStateExpectConfigParen;
-	else {
+void proc_ParserStateExpectConfigKeyword(ParserState *state, Token *tk) {
+	if (!strcmp(tk->token, "Config")) {
+		state->state = ParserStateExpectParenBuildDefn;
+	} else {
 		state->has_errors = true;
-		token_display_error(tk, "Expected '('. Found [%s]", tk->token);
+		token_display_error(tk, "Expected ['Config']. Found [%s]", tk->token);
 		state->state = ParserStateBeginStatement;
 	}
 }
 
-void proc_ParserStateExpectConfigParen(ParserState *state, Token *tk) {
-	if (!strcmp(tk->token, "(")) {
+void proc_ParserStateExpectParenBuildDefn(ParserState *state, Token *tk) {
+	if (!strcmp(tk->token, "("))
 		state->state = ParserStateExpectConfigType;
-	} else {
+	else {
 		state->has_errors = true;
-		token_display_error(tk, "Expected '(' or ')'. Found [%s]", tk->token);
+		token_display_error(tk, "Expected ['(']. Found [%s]", tk->token);
 		state->state = ParserStateBeginStatement;
 	}
 }
@@ -347,17 +346,19 @@ void proc_ParserStateExpectConfigType(ParserState *state, Token *tk) {
 			vec_push(&state->config_types, &ct);
 		}
 
-		state->state = ParserStateExpectConfigComma;
+		state->state = ParserStateExpectConfigName;
 	}
 }
 
 void proc_ParserStateExpectConfigComma(ParserState *state, Token *tk) {
-	if (strcmp(tk->token, ",")) {
+	if (!strcmp(tk->token, ",")) {
+		state->state = ParserStateExpectConfigType;
+	} else if (!strcmp(tk->token, ")")) {
+		state->state = ParserStateInTypeExpectSemi;
+	} else {
 		state->state = ParserStateBeginStatement;
 		state->has_errors = true;
 		token_display_error(tk, "Expected ','. Found [%s]", tk->token);
-	} else {
-		state->state = ParserStateExpectConfigName;
 	}
 }
 
@@ -371,29 +372,7 @@ void proc_ParserStateExpectConfigName(ParserState *state, Token *tk) {
 		strcpy(cn.name, tk->token);
 		vec_push(&state->config_names, &cn);
 
-		state->state = ParserStateExpectConfigCloseParen;
-	}
-}
-
-void proc_ParserStateExpectConfigCloseParen(ParserState *state, Token *tk) {
-	if (strcmp(tk->token, ")")) {
-		state->state = ParserStateBeginStatement;
-		state->has_errors = true;
-		token_display_error(tk, "Expected ')'. Found [%s]", tk->token);
-	} else {
-		state->state = ParserStateExpectConfigCommaOrParenEnd;
-	}
-}
-
-void proc_ParserStateExpectConfigCommaOrParenEnd(ParserState *state, Token *tk) {
-	if (!strcmp(tk->token, ",")) {
-		state->state = ParserStateExpectConfigParen;
-	} else if (!strcmp(tk->token, ")")) {
-		state->state = ParserStateInTypeExpectSemi;
-	} else {
-		state->state = ParserStateBeginStatement;
-		state->has_errors = true;
-		token_display_error(tk, "Expected one of [')', ',']. Found [%s]", tk->token);
+		state->state = ParserStateExpectConfigComma;
 	}
 }
 
@@ -402,7 +381,7 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 		// Config definition
 		vec_clear(&state->config_names);
 		vec_clear(&state->config_types);
-		state->state = ParserStateExpectParenBuildDefn;
+		state->state = ParserStateExpectConfigKeyword;
 	} else if (!strcmp(tk->token, "[")) {
 		// array
 		state->cur_is_array = true;
@@ -796,7 +775,7 @@ void proc_ParserStateExpectIncompleteFnParenStart(ParserState *state, Token *tk)
 	} else {
 		state->state = ParserStateBeginStatement;
 		state->has_errors = true;
-		token_display_error(tk, "Expected '('. Found [%s]", tk->token);
+		token_display_error(tk, "Expected ['(']. Found [%s]", tk->token);
 	}
 }
 
@@ -1138,18 +1117,12 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 				proc_ParserStateInImportListExpectSeparator(&state, &tk);
 			} else if (state.state == ParserStateExpectParenBuildDefn) {
 				proc_ParserStateExpectParenBuildDefn(&state, &tk);
-			} else if (state.state == ParserStateExpectConfigParen) {
-				proc_ParserStateExpectConfigParen(&state, &tk);
 			} else if (state.state == ParserStateExpectConfigName) {
 				proc_ParserStateExpectConfigName(&state, &tk);
 			} else if (state.state == ParserStateExpectConfigComma) {
 				proc_ParserStateExpectConfigComma(&state, &tk);
 			} else if (state.state == ParserStateExpectConfigType) {
 				proc_ParserStateExpectConfigType(&state, &tk);
-			} else if (state.state == ParserStateExpectConfigCloseParen) {
-				proc_ParserStateExpectConfigCloseParen(&state, &tk);
-			} else if (state.state == ParserStateExpectConfigCommaOrParenEnd) {
-				proc_ParserStateExpectConfigCommaOrParenEnd(&state, &tk);
 			} else if (state.state == ParserStateIncompleteName) {
 				proc_ParserStateIncompleteName(&state, &tk);
 			} else if (state.state == ParserIncompleteExpectBrace) {
@@ -1186,6 +1159,8 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 				proc_ParserStateExpectArraySize(&state, &tk);
 			} else if (state.state == ParserStateExpectEndArray) {
 				proc_ParserStateExpectEndArray(&state, &tk);
+			} else if (state.state == ParserStateExpectConfigKeyword) {
+				proc_ParserStateExpectConfigKeyword(&state, &tk);
 			} else if (tk.type == TokenTypePunct) {
 				if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
 					state.state = ParserStateBeginStatement;
