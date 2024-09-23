@@ -324,7 +324,10 @@ void proc_ParserStateExpectConfigType(ParserState *state, Token *tk) {
 				tk->token);
 		} else {
 			ConfigType ct;
-			strcpy(ct.type_name, tk->token);
+			if (!strcmp(tk->token, "String"))
+				strcpy(ct.type_name, "char *");
+			else
+				strcpy(ct.type_name, tk->token);
 			vec_push(&state->config_types, &ct);
 		}
 
