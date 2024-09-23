@@ -537,42 +537,61 @@ void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk) {
 	}
 }
 
-void expand_params(ParserState *state, IncompleteFn *fn) {
+void expand_params(ParserState *state, IncompleteFn *fn, FILE *fp) {
 	u64 param_count = vec_size(&fn->params);
-	if (param_count)
+	if (param_count) {
 		append_to_header(state, ",");
+		if (fp) {
+			fprintf(fp, ",");
+		}
+	}
 	for (u64 i = 0; i < param_count; i++) {
-		FnParam *fp = vec_element_at(&fn->params, i);
+		FnParam *fparam = vec_element_at(&fn->params, i);
 		char *comma;
 		if (i != param_count - 1)
 			comma = ", ";
 		else
 			comma = "";
 		// handle special case for __config__ (in build)
-		if (!strcmp("__config__", fp->type)) {
-			append_to_header(state, "void *%s%s", fp->name, comma);
+		if (!strcmp("__config__", fparam->type)) {
+			append_to_header(state, "void *%s%s", fparam->name, comma);
+			if (fp) {
+				fprintf(fp, "void *%s%s", fparam->name, comma);
+			}
 		} else {
-			if (fp->is_mut) {
-				append_to_header(state, "%s %s%s", fp->type, fp->name, comma);
+			if (fparam->is_mut) {
+				append_to_header(state, "%s %s%s", fparam->type, fparam->name, comma);
+				if (fp) {
+					fprintf(fp, "%s %s%s", fparam->type, fparam->name, comma);
+				}
 			} else {
-				append_to_header(state, "const %s %s%s", fp->type, fp->name, comma);
+				append_to_header(state, "const %s %s%s", fparam->type, fparam->name, comma);
+				if (fp) {
+					fprintf(fp, "const %s %s%s", fparam->type, fparam->name, comma);
+				}
 			}
 		}
 	}
 }
 
-void expand_vars(ParserState *state, IncompleteFn *fn) {
+void expand_vars(ParserState *state, IncompleteFn *fn, FILE *fp) {
 	u64 param_count = vec_size(&fn->params);
-	if (param_count)
+	if (param_count) {
 		append_to_header(state, ",");
+		if (fp) {
+			fprintf(fp, ",");
+		}
+	}
 	for (u64 i = 0; i < param_count; i++) {
-		FnParam *fp = vec_element_at(&fn->params, i);
+		FnParam *fparam = vec_element_at(&fn->params, i);
 		char *comma;
 		if (i != param_count - 1)
 			comma = ", ";
 		else
 			comma = "";
-		append_to_header(state, "%s%s", fp->name, comma);
+		append_to_header(state, "%s%s", fparam->name, comma);
+		if (fp)
+			fprintf(fp, "%s%s", fparam->name, comma);
 	}
 }
 
@@ -583,32 +602,72 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 		// end incomplete type
 		state->state = ParserStateBeginStatement;
 		u64 fn_count = vec_size(&state->incomplete_fns);
+
+		/*
+		 *  FILE *fp = myfopen(args_file, "a");
+								fprintf(fp, "-DType_Expand_%s_=\"", type_name);
+								fprintf(fp, "Vtable %s_Vtable__ = {\\\"%s\\\", 0, NULL, 0, NULL,
+		 false};\
+										u64 %s_size() {return sizeof(%s); }\
+										void %s_drop_internal(Obj *ptr) {}\
+										void %s_build_internal(Obj *ptr) {\
+										u64 size = %s_size();                     \
+										memset(ptr->ptr.data, 0, size);           \
+										}",
+												type_name, type_name, type_name, type_name,
+		 type_name, type_name, type_name); fprintf(fp, "\"\n");
+					*/
+
+		FILE *fp = myfopen(args_file, "a");
+		TypeInfo ti;
+		ti.mi = *state->cur;
+		strcpy(ti.type_name, state->type_name);
+
+		char incomplete_type[PATH_MAX + 1];
+		type_info_to_string(&ti, incomplete_type, PATH_MAX);
+		fprintf(fp, "-DType_Import_Expand_%s_=\"", incomplete_type);
 		for (u64 i = 0; i < fn_count; i++) {
 			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, i);
 
 			append_to_header(state, "static %s %s(Obj *self", fn->return_type, fn->name);
-			expand_params(state, fn);
+			fprintf(fp, "static %s %s(Obj *self ", fn->return_type, fn->name);
+			expand_params(state, fn, fp);
 			append_to_header(state, ") {");
+			fprintf(fp, ") {");
 			append_to_header(state, "%s (*impl)(Obj *self", fn->return_type);
-			expand_params(state, fn);
+			fprintf(fp, "%s (*impl)(Obj *self", fn->return_type);
+			expand_params(state, fn, fp);
 			append_to_header(state, ") = find_fn(self, \"%s\");", fn->name);
+			fprintf(fp, ") = find_fn(self, \\\"%s\\\");", fn->name);
 			append_to_header(
 				state, "if(impl == NULL) panic(\"Implementation for [%s] not found!\");", fn->name);
 
+			fprintf(fp, "if(impl == NULL) panic(\\\"Implementation for [%s] not found!\\\");",
+					fn->name);
 			append_to_header(
 				state, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
+			fprintf(fp, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
 			append_to_header(state, "__thread_local_self_Const = self;");
+			fprintf(fp, "__thread_local_self_Const = self;");
 			if (fn->is_mut) {
 				append_to_header(state, "__thread_local_self_Var = self;");
+				fprintf(fp, "__thread_local_self_Var = self;");
 			} else {
 				append_to_header(state, "__thread_local_self_Var = NULL;");
+				fprintf(fp, "__thread_local_self_Var = NULL;");
 			}
 
 			append_to_header(state, "return impl(self");
-			expand_vars(state, fn);
+			fprintf(fp, "return impl(self");
+			expand_vars(state, fn, fp);
 			append_to_header(state, ");");
+			fprintf(fp, ");");
 			append_to_header(state, "}");
+			fprintf(fp, "}");
 		}
+
+		fprintf(fp, "\"\n");
+		myfclose(fp);
 
 		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns, args_file);
 
@@ -827,7 +886,7 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk) 
 					append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
 									 complete_type, inc->fns[j].name);
 
-					expand_params(state, &inc->fns[j]);
+					expand_params(state, &inc->fns[j], NULL);
 					append_to_header(state, ");");
 				}
 				append_to_header(
