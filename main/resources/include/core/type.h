@@ -148,6 +148,8 @@ FatPtr build_fat_ptr(u64 size);
 
 #define Ref(dst, src)                                                                              \
 	({                                                                                             \
+		if (src == NULL || dst == NULL)                                                            \
+			panic("NULL pointer passed to 'Ref' macro");                                           \
 		if (((*((Obj *)src)).flags & OBJECT_FLAGS_CONSUMED) != 0)                                  \
 			panic("src object has already been consumed\n");                                       \
 		if (((*((Obj *)dst)).vtable != NULL &&                                                     \
@@ -169,6 +171,8 @@ FatPtr build_fat_ptr(u64 size);
 
 #define Move(dst, src)                                                                             \
 	({                                                                                             \
+		if (src == NULL || dst == NULL)                                                            \
+			panic("NULL pointer passed to 'Move' macro");                                          \
 		if (((*((Obj *)src)).flags & OBJECT_FLAGS_CONSUMED) != 0)                                  \
 			panic("src object has already been consumed\n");                                       \
 		if (((*((Obj *)dst)).vtable != NULL &&                                                     \
