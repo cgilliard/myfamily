@@ -95,11 +95,12 @@ FatPtr build_fat_ptr(u64 size);
 #define mut Cleanup
 #define let const Cleanup
 
-#define SET_PARAM__(name, value)                                                                   \
-	__config_.name = value;                                                                        \
-	__config_.name##_is_set__ = true;
+#define SET_PARAM__(single, name, ...)                                                             \
+	__VA_OPT__(__config_.name = __VA_ARGS__; __config_.name##_is_set__ = true;)                    \
+	__VA_OPT__(NONE)(__config_.value = EXPAND single);
+
 #define SET_PARAM_(...) SET_PARAM__(__VA_ARGS__)
-#define SET_PARAM(ptr, value) SET_PARAM_(EXPAND_ALL value)
+#define SET_PARAM(single, value) SET_PARAM_(single, EXPAND_ALL value)
 #define With(x, y) (x, y)
 
 // TODO: _fptr__.data may be NULL, need to handle better. Once we have
@@ -114,7 +115,7 @@ FatPtr build_fat_ptr(u64 size);
 		Obj_build_int(&_ret__);                                                                    \
 		name##Config __config_;                                                                    \
 		memset(&__config_, 0, sizeof(name##Config));                                               \
-		__VA_OPT__(FOR_EACH(SET_PARAM, (&__config_, name##Config), (), __VA_ARGS__))               \
+		__VA_OPT__(FOR_EACH(SET_PARAM, (__VA_ARGS__), (), __VA_ARGS__))                            \
 		Obj_build(&_ret__, &__config_);                                                            \
 		_ret__;                                                                                    \
 	})

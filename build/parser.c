@@ -913,6 +913,7 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 
 		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns, args_file,
 									  &state->super_traits, incomplete_type);
+		vec_clear(&state->super_traits);
 
 		incomplete_fns_cleanup(&state->incomplete_fns);
 
