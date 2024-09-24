@@ -50,7 +50,30 @@ void sort_vtable(Vtable *table) {
 	qsort(table->entries, table->len, sizeof(VtableEntry), compare_vtable_entry);
 }
 
+void *find_fn_vtable(Vtable *vtable, const char *name) {
+	int left = 0;
+	int right = vtable->len - 1;
+	while (left <= right) {
+		int mid = left + (right - left) / 2;
+		int cmp = strcmp(name, vtable->entries[mid].name);
+
+		if (cmp == 0) {
+			return vtable->entries[mid].fn_ptr;
+		} else if (cmp < 0) {
+			right = mid - 1;
+		} else {
+			left = mid + 1;
+		}
+	}
+	return NULL;
+}
+
 void vtable_add_entry(Vtable *table, VtableEntry entry) {
+	// check if it's already present. We don't want to add because it could be an out of order
+	// default impl.
+	if (find_fn_vtable(table, entry.name) != NULL)
+		return;
+
 	if (table->entries == NULL) {
 		table->entries = malloc(sizeof(VtableEntry) * (table->len + 1));
 		if (table->entries == NULL)
@@ -112,21 +135,7 @@ void vtable_add_trait(Vtable *table, char *trait) {
 }
 
 void *find_fn(const Obj *obj, const char *name) {
-	int left = 0;
-	int right = obj->vtable->len - 1;
-	while (left <= right) {
-		int mid = left + (right - left) / 2;
-		int cmp = strcmp(name, obj->vtable->entries[mid].name);
-
-		if (cmp == 0) {
-			return obj->vtable->entries[mid].fn_ptr;
-		} else if (cmp < 0) {
-			right = mid - 1;
-		} else {
-			left = mid + 1;
-		}
-	}
-	return NULL;
+	return find_fn_vtable(obj->vtable, name);
 }
 
 void SelfCleanupImpl_update(SelfCleanupImpl *ptr) {

@@ -1224,7 +1224,8 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk,
 					if (inc->fns[j].has_impl) {
 						append_to_header(
 							state,
-							"VtableEntry next_%" PRIu64
+							"VtableEntry "
+							"next_%" PRIu64
 							" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
 							j, inc->fns[j].name, incomplete_full_type, inc->fns[j].name,
 							complete_type, j);
