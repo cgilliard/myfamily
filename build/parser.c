@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/misc.h>
+#include <base/panic.h>
 #include <base/resources.h>
 #include <build/parser.h>
 #include <lexer/lexer.h>
@@ -60,10 +61,17 @@ typedef struct IncompleteFn {
 	bool has_impl;
 } IncompleteFn;
 
+typedef struct SuperTraitInfo {
+	char name[MAX_NAME_LEN];
+} SuperTraitInfo;
+
 typedef struct IncompleteType {
 	u64 count;
 	IncompleteFn *fns;
 	char name[MAX_NAME_LEN];
+	char path_name[PATH_MAX];
+	SuperTraitInfo *si;
+	u64 si_count;
 } IncompleteType;
 
 typedef struct GlobalIncompleteList {
@@ -71,10 +79,69 @@ typedef struct GlobalIncompleteList {
 	IncompleteType *types;
 } GlobalIncompleteList;
 
+typedef struct ImplPair {
+	char type[MAX_NAME_LEN];
+	char trait[MAX_NAME_LEN];
+} ImplPair;
+
+typedef struct GlobalImplList {
+	u64 count;
+	ImplPair *impls;
+} GlobalImplList;
+
+GlobalImplList global_impl_list = {0, NULL};
 GlobalIncompleteList global_incomplete_list = {0, NULL};
 
+// TODO: these functions work, but use linear search. Move to something like an RB Tree.
+void add_super_trait_list(const char *trait_name, const Vec *super_traits) {
+	for (u64 i = 0; i < vec_size(super_traits); i++) {
+		SuperTraitInfo *si = vec_element_at(super_traits, i);
+	}
+}
+
+void add_trait_impl(const char *trait_name, const char *type_name) {
+	if (global_impl_list.count == 0) {
+		global_impl_list.impls = mymalloc(sizeof(ImplPair));
+		if (global_impl_list.impls == NULL)
+			panic("Could not allocate sufficient memory");
+
+	} else {
+		global_impl_list.impls =
+			myrealloc(global_impl_list.impls, sizeof(ImplPair) * (global_impl_list.count + 1));
+		if (global_impl_list.impls == NULL)
+			panic("Could not allocate sufficient memory");
+	}
+	strcpy(global_impl_list.impls[global_impl_list.count].type, type_name);
+	strcpy(global_impl_list.impls[global_impl_list.count].trait, trait_name);
+	global_impl_list.count++;
+}
+
+bool check_super_traits(const char *type_name, const char *trait_name) {
+	for (u64 i = 0; i < global_incomplete_list.count; i++) {
+		if (!strcmp(global_incomplete_list.types[i].path_name, trait_name)) {
+			for (u64 j = 0; j < global_incomplete_list.types[i].si_count; j++) {
+				char *required_trait = global_incomplete_list.types[i].si[j].name;
+				bool impl = false;
+				for (u64 k = 0; k < global_impl_list.count; k++) {
+					if (!strcmp(global_impl_list.impls[k].trait, required_trait) &&
+						!strcmp(global_impl_list.impls[k].type, type_name)) {
+						impl = true;
+						break;
+					}
+				}
+				if (!impl)
+					return false;
+			}
+		}
+	}
+	return true;
+}
+
 void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_fns,
-								   const char *args_file) {
+								   const char *args_file, Vec *super_traits,
+								   const char *trait_full_name) {
+	if (super_traits != NULL)
+		add_super_trait_list(trait_full_name, super_traits);
 	if (global_incomplete_list.count == 0) {
 		global_incomplete_list.types = mymalloc(sizeof(IncompleteType));
 	} else {
@@ -85,8 +152,22 @@ void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_
 
 	IncompleteType *next = &global_incomplete_list.types[global_incomplete_list.count];
 	strcpy(next->name, type_name);
+	if (trait_full_name)
+		strcpy(next->path_name, trait_full_name);
+	else
+		strcpy(next->path_name, "");
 	next->count = vec_size(incomplete_fns);
 	next->fns = mymalloc(sizeof(IncompleteFn) * next->count);
+	if (super_traits) {
+		next->si = mymalloc(sizeof(SuperTraitInfo) * vec_size(super_traits));
+		next->si_count = vec_size(super_traits);
+		for (u64 i = 0; i < vec_size(super_traits); i++) {
+			SuperTraitInfo *sti = vec_element_at(super_traits, i);
+			strcpy(next->si[i].name, sti->name);
+		}
+	} else {
+		next->si = NULL;
+	}
 
 	for (u64 i = 0; i < next->count; i++) {
 		IncompleteFn *fn = vec_element_at(incomplete_fns, i);
@@ -95,13 +176,51 @@ void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_
 		strcpy(next->fns[i].return_type, fn->return_type);
 		vec_init(&next->fns[i].params, 3, sizeof(FnParam));
 		FILE *fp = myfopen(args_file, "a");
-		fprintf(fp, "-DFn_expand_%s_return=\"%s\"\n", fn->name, fn->return_type);
-		fprintf(fp, "-DFn_expand_%s_params=\"_%s(Obj *self", fn->name, fn->name);
+
+		/*
+		 * static void __attribute__((constructor)) ov__##name##_##trait##_vtable() { \
+				VtableEntry next = {#trait, implfn}; \
+				vtable_override(&name##_Vtable__, next); \
+		}*/
+
+		fprintf(fp, "-DFn_override_%s_return=\"%s\"\n", fn->name, fn->return_type);
+		if (next->fns[i].is_mut) {
+			fprintf(fp, "-DFn_override_%s_params=\"_%s(Obj *self", fn->name, fn->name);
+		} else {
+			fprintf(fp, "-DFn_override_%s_params=\"_%s(const Obj *self", fn->name, fn->name);
+		}
 		if (vec_size(&fn->params))
 			fprintf(fp, ",");
 		for (u64 j = 0; j < vec_size(&fn->params); j++) {
 			FnParam *param = vec_element_at(&fn->params, j);
 			vec_push(&next->fns[i].params, param);
+			char *comma;
+			if (j != vec_size(&fn->params) - 1)
+				comma = ",";
+			else
+				comma = "";
+			if (!strcmp(param->type, "__config__")) {
+				fprintf(fp, " void *__selfconfig__%s", comma);
+			} else {
+				if (param->is_mut) {
+					fprintf(fp, " %s %s%s", param->type, param->name, comma);
+				} else {
+					fprintf(fp, " const %s %s%s", param->type, param->name, comma);
+				}
+			}
+		}
+		fprintf(fp, ")\"\n");
+
+		fprintf(fp, "-DFn_expand_%s_return=\"%s\"\n", fn->name, fn->return_type);
+		if (next->fns[i].is_mut) {
+			fprintf(fp, "-DFn_expand_%s_params=\"_%s(Obj *self", fn->name, fn->name);
+		} else {
+			fprintf(fp, "-DFn_expand_%s_params=\"_%s(const Obj *self", fn->name, fn->name);
+		}
+		if (vec_size(&fn->params))
+			fprintf(fp, ",");
+		for (u64 j = 0; j < vec_size(&fn->params); j++) {
+			FnParam *param = vec_element_at(&fn->params, j);
 			char *comma;
 			if (j != vec_size(&fn->params) - 1)
 				comma = ",";
@@ -164,6 +283,9 @@ typedef enum ParserStateEnum {
 	ParserStateExpectArraySize,
 	ParserStateExpectEndArray,
 	ParserStateExpectConfigKeyword,
+	ParserStateExpectIncompleteMutFnNameWithDefaultImpl,
+	ParserStateExpectSuperTrait,
+	ParserStateExpectPlusOrBrace,
 	ParserStateOther,
 } ParserStateEnum;
 
@@ -184,6 +306,7 @@ typedef struct ParserState {
 	Vec incomplete_fns;
 	bool has_errors;
 	bool cur_is_array;
+	Vec super_traits;
 } ParserState;
 
 #define INITIAL_HEADER_CAPACITY (1024 * 25)
@@ -521,7 +644,7 @@ void proc_ParserStateExpectPipe(ParserState *state, Token *tk) {
 		// dynamic array
 		HeaderTypeInfo *hti;
 		hti = vec_element_at(&(state->ht.types), vec_size(&(state->ht.types)) - 1);
-		// use UINT65_MAX to indicate dynamic array
+		// use UINT64_MAX to indicate dynamic array
 		hti->arr_size = UINT64_MAX;
 		state->state = ParserStateExpectName;
 	} else {
@@ -622,9 +745,41 @@ void proc_ParserStateIncompleteName(ParserState *state, Token *tk) {
 	}
 }
 
+void proc_ParserStateExpectPlusOrBrace(ParserState *state, Token *tk) {
+	if (!strcmp(tk->token, "+"))
+		state->state = ParserStateExpectSuperTrait;
+	else if (!strcmp(tk->token, "{"))
+		state->state = ParserStateExpectAt;
+	else {
+		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
+		token_display_error(tk, "Expected '+' or '{'. Found [%s]", tk->token);
+	}
+}
+
+void proc_ParserStateExpectSuperTrait(ParserState *state, Token *tk) {
+	if (tk->type != TokenTypeIdent) {
+		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
+		token_display_error(tk, "Expected super trait name. Found [%s]", tk->token);
+	} else {
+		state->state = ParserStateExpectPlusOrBrace;
+		SuperTraitInfo si;
+		TypeInfo ti;
+		ti.mi = *state->cur;
+		strcpy(ti.type_name, tk->token);
+
+		type_info_to_string(&ti, si.name, MAX_NAME_LEN);
+		vec_push(&state->super_traits, &si);
+	}
+}
+
 void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk) {
 	if (!strcmp(tk->token, "{")) {
 		state->state = ParserStateExpectAt;
+	} else if (!strcmp(tk->token, ":")) {
+		vec_clear(&state->super_traits);
+		state->state = ParserStateExpectSuperTrait;
 	} else {
 		state->state = ParserStateBeginStatement;
 		state->has_errors = true;
@@ -634,7 +789,6 @@ void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk) {
 
 void expand_params(ParserState *state, IncompleteFn *fn, FILE *fp) {
 	u64 param_count = vec_size(&fn->params);
-	printf("param count for %s = %" PRIu64 "\n", fn->name, param_count);
 	if (param_count) {
 		append_to_header(state, ",");
 		if (fp) {
@@ -710,13 +864,24 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 		for (u64 i = 0; i < fn_count; i++) {
 			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, i);
 
-			append_to_header(state, "static %s %s(Obj *self", fn->return_type, fn->name);
-			fprintf(fp, "static %s %s(Obj *self ", fn->return_type, fn->name);
+			if (fn->is_mut) {
+				append_to_header(state, "static %s %s(Obj *self", fn->return_type, fn->name);
+				fprintf(fp, "static %s %s(Obj *self ", fn->return_type, fn->name);
+			} else {
+				append_to_header(state, "static %s %s(const Obj *self", fn->return_type, fn->name);
+				fprintf(fp, "static %s %s(const Obj *self ", fn->return_type, fn->name);
+			}
 			expand_params(state, fn, fp);
 			append_to_header(state, ") {");
 			fprintf(fp, ") {");
-			append_to_header(state, "%s (*impl)(Obj *self", fn->return_type);
-			fprintf(fp, "%s (*impl)(Obj *self", fn->return_type);
+
+			if (fn->is_mut) {
+				append_to_header(state, "%s (*impl)(Obj *self", fn->return_type);
+				fprintf(fp, "%s (*impl)(Obj *self", fn->return_type);
+			} else {
+				append_to_header(state, "%s (*impl)(const Obj *self", fn->return_type);
+				fprintf(fp, "%s (*impl)(const Obj *self", fn->return_type);
+			}
 			expand_params(state, fn, fp);
 			append_to_header(state, ") = find_fn(self, \"%s\");", fn->name);
 			fprintf(fp, ") = find_fn(self, \\\"%s\\\");", fn->name);
@@ -750,15 +915,15 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 		fprintf(fp, "\"\n");
 		myfclose(fp);
 
-		printf("add to inc list %s\n", state->type_name);
-		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns, args_file);
+		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns, args_file,
+									  &state->super_traits, incomplete_type);
 
 		incomplete_fns_cleanup(&state->incomplete_fns);
 
 	} else if (tk->type == TokenTypeIdent) {
 		// required method with an implementation.
 		if (!strcmp(tk->token, "mut")) {
-			state->state = ParserStateExpectIncompleteMutFnName;
+			state->state = ParserStateExpectIncompleteMutFnNameWithDefaultImpl;
 		} else {
 			IncompleteFn fn;
 			fn.has_impl = true;
@@ -773,6 +938,23 @@ void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_fi
 		state->state = ParserStateBeginStatement;
 		state->has_errors = true;
 		token_display_error(tk, "Expected '@'. Found [%s]", tk->token);
+	}
+}
+
+void proc_ParserStateExpectIncompleteMutFnNameWithDefaultImpl(ParserState *state, Token *tk) {
+	if (tk->type != TokenTypeIdent) {
+		state->state = ParserStateBeginStatement;
+		state->has_errors = true;
+		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
+	} else {
+		IncompleteFn fn;
+		fn.has_impl = true;
+		fn.is_mut = true;
+		strcpy(fn.name, tk->token);
+		vec_init(&fn.params, 3, sizeof(FnParam));
+		strcpy(fn.return_type, "void");
+		vec_push(&state->incomplete_fns, &fn);
+		state->state = ParserStateExpectIncompleteFnParenStart;
 	}
 }
 
@@ -999,20 +1181,37 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk,
 		char *incomplete_type = tk->token;
 		bool found = false;
 		bool has_impl = false;
+		bool ret = check_super_traits(complete_type, incomplete_full_type);
+		if (!ret) {
+			state->has_errors = true;
+			token_display_error(tk, "All super traits not implemented for type [%s]",
+								state->type_name);
+		}
+		add_trait_impl(incomplete_full_type, complete_type);
 		for (u64 i = 0; i < global_incomplete_list.count; i++) {
 			if (!strcmp(incomplete_type, global_incomplete_list.types[i].name)) {
 				IncompleteType *inc = &global_incomplete_list.types[i];
 				for (u64 j = 0; j < inc->count; j++) {
 					if (inc->fns[j].has_impl)
 						has_impl = true;
-					printf("inc->fns[j].name=%s,has_impl=%i\n", inc->fns[j].name,
-						   inc->fns[j].has_impl);
 					if (inc->fns[j].has_impl) {
-						append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
-										 incomplete_full_type, inc->fns[j].name);
+						if (inc->fns[j].is_mut) {
+							append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
+											 incomplete_full_type, inc->fns[j].name);
+						} else {
+							append_to_header(state, "%s %s_%s(const Obj *self",
+											 inc->fns[j].return_type, incomplete_full_type,
+											 inc->fns[j].name);
+						}
 					} else {
-						append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
-										 complete_type, inc->fns[j].name);
+						if (inc->fns[j].is_mut) {
+							append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
+											 complete_type, inc->fns[j].name);
+						} else {
+							append_to_header(state, "%s %s_%s(const Obj *self",
+											 inc->fns[j].return_type, complete_type,
+											 inc->fns[j].name);
+						}
 					}
 
 					expand_params(state, &inc->fns[j], NULL);
@@ -1124,7 +1323,7 @@ void init_parser(const char *args_file) {
 	vec_push(&build.params, &config);
 	vec_push(&build_fns, &build);
 
-	add_to_global_incomplete_list("Build", &build_fns, args_file);
+	add_to_global_incomplete_list("Build", &build_fns, args_file, NULL, NULL);
 
 	Vec drop_fns;
 	vec_init(&drop_fns, 1, sizeof(IncompleteFn));
@@ -1135,7 +1334,7 @@ void init_parser(const char *args_file) {
 	vec_init(&drop.params, 1, sizeof(FnParam));
 	vec_push(&drop_fns, &drop);
 
-	add_to_global_incomplete_list("Drop", &drop_fns, args_file);
+	add_to_global_incomplete_list("Drop", &drop_fns, args_file, NULL, NULL);
 }
 
 void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Vec *types,
@@ -1172,6 +1371,7 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 	vec_init(&state.ht.types, 3, sizeof(HeaderTypeInfo));
 	vec_init(&state.import_list, 3, sizeof(SubModuleInfo));
 	vec_init(&state.incomplete_fns, 3, sizeof(IncompleteFn));
+	vec_init(&state.super_traits, 3, sizeof(SuperTraitInfo));
 
 	while (true) {
 		Token tk;
@@ -1242,6 +1442,12 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 				proc_ParserStateExpectEndArray(&state, &tk);
 			} else if (state.state == ParserStateExpectConfigKeyword) {
 				proc_ParserStateExpectConfigKeyword(&state, &tk);
+			} else if (state.state == ParserStateExpectIncompleteMutFnNameWithDefaultImpl) {
+				proc_ParserStateExpectIncompleteMutFnNameWithDefaultImpl(&state, &tk);
+			} else if (state.state == ParserStateExpectPlusOrBrace) {
+				proc_ParserStateExpectPlusOrBrace(&state, &tk);
+			} else if (state.state == ParserStateExpectSuperTrait) {
+				proc_ParserStateExpectSuperTrait(&state, &tk);
 			} else if (tk.type == TokenTypePunct) {
 				if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
 					state.state = ParserStateBeginStatement;
@@ -1289,6 +1495,7 @@ void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Ve
 	vec_cleanup(&state.config_types);
 	vec_cleanup(&state.config_names);
 	vec_cleanup(&state.incomplete_fns);
+	vec_cleanup(&state.super_traits);
 
 	lexer_cleanup(&l);
 

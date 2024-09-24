@@ -131,6 +131,7 @@ FatPtr build_fat_ptr(u64 size);
 	__VA_OPT__(NONE)                                                                               \
 	(__thread_local_self_Const)
 
+// TODO: currently we allocate 'size' in bytes need to check the size of the underlying type
 #define $Alloc(name, size)                                                                         \
 	({                                                                                             \
 		if (size <= 0) {                                                                           \
@@ -164,6 +165,16 @@ FatPtr build_fat_ptr(u64 size);
 #define fn__(v, i) Fn_expand_##v##_return CAT(i, Fn_expand_##v##_params)
 #define fn_(v) fn__(v, IMPL)
 #define fn(v) fn_(v)
+
+#define override__(v, i)                                                                           \
+	Fn_override_##v##_return CAT(i, Fn_override_##v##_params);                                     \
+	static void __attribute__((constructor)) CAT(i, _ov_##v##__()) {                               \
+		VtableEntry next = {#v, CAT(i, _##v)};                                                     \
+		vtable_override(&CAT(i, _Vtable__), next);                                                 \
+	}                                                                                              \
+	Fn_override_##v##_return CAT(i, Fn_override_##v##_params)
+#define override_(v) override__(v, IMPL)
+#define override(v) override_(v)
 
 #define TYPE_EXPAND_(t) Type_Expand_##t##_
 #define TYPE_EXPAND(t) TYPE_EXPAND_(t)
