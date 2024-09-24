@@ -22,6 +22,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define INITIAL_HEADER_CAPACITY (1024 * 25)
+
 u64 gen_file_counter = 0;
 
 typedef struct HeaderTypeInfo {
@@ -116,7 +118,7 @@ void add_trait_impl(const char *trait_name, const char *type_name) {
 	global_impl_list.count++;
 }
 
-bool check_super_traits(const char *type_name, const char *trait_name) {
+bool check_super_traits(const char *type_name, const char *trait_name, char *buf, u64 limit) {
 	for (u64 i = 0; i < global_incomplete_list.count; i++) {
 		if (!strcmp(global_incomplete_list.types[i].path_name, trait_name)) {
 			for (u64 j = 0; j < global_incomplete_list.types[i].si_count; j++) {
@@ -129,8 +131,10 @@ bool check_super_traits(const char *type_name, const char *trait_name) {
 						break;
 					}
 				}
-				if (!impl)
+				if (!impl) {
+					strncpy(buf, required_trait, limit);
 					return false;
+				}
 			}
 		}
 	}
@@ -176,12 +180,6 @@ void add_to_global_incomplete_list(const char *type_name, const Vec *incomplete_
 		strcpy(next->fns[i].return_type, fn->return_type);
 		vec_init(&next->fns[i].params, 3, sizeof(FnParam));
 		FILE *fp = myfopen(args_file, "a");
-
-		/*
-		 * static void __attribute__((constructor)) ov__##name##_##trait##_vtable() { \
-				VtableEntry next = {#trait, implfn}; \
-				vtable_override(&name##_Vtable__, next); \
-		}*/
 
 		fprintf(fp, "-DFn_override_%s_return=\"%s\"\n", fn->name, fn->return_type);
 		if (next->fns[i].is_mut) {
@@ -308,8 +306,6 @@ typedef struct ParserState {
 	bool cur_is_array;
 	Vec super_traits;
 } ParserState;
-
-#define INITIAL_HEADER_CAPACITY (1024 * 25)
 
 void append_to_header(ParserState *state, const char *text, ...) {
 	u64 length;
@@ -1181,11 +1177,15 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk,
 		char *incomplete_type = tk->token;
 		bool found = false;
 		bool has_impl = false;
-		bool ret = check_super_traits(complete_type, incomplete_full_type);
+		char required_trait[PATH_MAX + 1];
+		bool ret =
+			check_super_traits(complete_type, incomplete_full_type, required_trait, PATH_MAX);
 		if (!ret) {
 			state->has_errors = true;
-			token_display_error(tk, "All super traits not implemented for type [%s]",
-								state->type_name);
+			// TODO: switch to path version of missing trait mod1::mod2::MyTrait
+			token_display_error(
+				tk, "All super traits not implemented for type [%s]. Missing trait [%s]",
+				state->type_name, required_trait);
 		}
 		add_trait_impl(incomplete_full_type, complete_type);
 		for (u64 i = 0; i < global_incomplete_list.count; i++) {
@@ -1249,7 +1249,7 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk,
 			vec_push(state->types, &ti);
 
 			FILE *fp = myfopen(args_file, "a");
-			fprintf(fp, "-DType_Expand_%s_=\"\"", incomplete_full_type);
+			fprintf(fp, "-DType_Expand_%s_=\"\"\n", incomplete_full_type);
 			myfclose(fp);
 		}
 
