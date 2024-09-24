@@ -198,34 +198,36 @@ void Obj_build(Obj *ptr, const void *config) {
 void Obj_cleanup(const Obj *ptr) {
 	Obj *unconst = ptr;
 	if ((unconst->flags & OBJECT_FLAGS_NO_CLEANUP) == 0) {
-		// call internal drop handler
-		Obj *tmp_Var = __thread_local_self_Var;
-		Obj *tmp_Const = __thread_local_self_Const;
-		__thread_local_self_Const = unconst;
-		__thread_local_self_Var = unconst;
-		void (*drop_int)(Obj *ptr) = find_fn(ptr, "drop_internal");
-		if (!drop_int)
-			panic("no internal drop handler found");
-		drop_int(unconst);
-		// revert
-		__thread_local_self_Var = tmp_Var;
-		__thread_local_self_Const = tmp_Const;
-
-		// call defined drop handler
-		void (*drop)(Obj *ptr) = find_fn(ptr, "drop");
-		if (drop) {
-			// setup self references
+		if (--(*((u32 *)unconst->ref_count.data)) == 0) {
+			// call internal drop handler
 			Obj *tmp_Var = __thread_local_self_Var;
 			Obj *tmp_Const = __thread_local_self_Const;
 			__thread_local_self_Const = unconst;
 			__thread_local_self_Var = unconst;
-			drop(ptr);
+			void (*drop_int)(Obj *ptr) = find_fn(ptr, "drop_internal");
+			if (!drop_int)
+				panic("no internal drop handler found");
+			drop_int(unconst);
 			// revert
 			__thread_local_self_Var = tmp_Var;
 			__thread_local_self_Const = tmp_Const;
-		}
-		if (fat_ptr_data(&unconst->ptr)) {
-			chain_free(&unconst->ptr);
+
+			// call defined drop handler
+			void (*drop)(Obj *ptr) = find_fn(ptr, "drop");
+			if (drop) {
+				// setup self references
+				Obj *tmp_Var = __thread_local_self_Var;
+				Obj *tmp_Const = __thread_local_self_Const;
+				__thread_local_self_Const = unconst;
+				__thread_local_self_Var = unconst;
+				drop(ptr);
+				// revert
+				__thread_local_self_Var = tmp_Var;
+				__thread_local_self_Const = tmp_Const;
+			}
+			if (fat_ptr_data(&unconst->ptr)) {
+				chain_free(&unconst->ptr);
+			}
 		}
 	}
 }

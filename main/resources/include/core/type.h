@@ -29,7 +29,7 @@
 
 #define OBJECT_FLAGS_NO_CLEANUP (0x1 << 0)
 #define OBJECT_FLAGS_CONSUMED (0x1 << 1)
-#define OBJECT_FLAG_HAS_MULTI_VARIANT (0x1 << 2)
+#define OBJECT_FLAGS_RESERVED6 (0x1 << 2)
 #define OBJECT_FLAGS_RESERVED5 (0x1 << 3)
 #define OBJECT_FLAGS_RESERVED4 (0x1 << 4)
 #define OBJECT_FLAGS_RESERVED3 (0x1 << 5)
@@ -59,6 +59,7 @@ typedef struct Obj {
 	Vtable *vtable;
 	u8 flags;
 	FatPtr ptr;
+	FatPtr ref_count;
 } Obj;
 
 typedef struct SelfCleanupImpl {
@@ -111,7 +112,13 @@ FatPtr build_fat_ptr(u64 size);
 		FatPtr _fptr__ = build_fat_ptr(name##_size());                                             \
 		if (_fptr__.data == NULL)                                                                  \
 			panic("Could not allocate sufficient memory");                                         \
-		Obj _ret__ = {&name##_Vtable__, 0, _fptr__};                                               \
+		FatPtr _ref_count__ = build_fat_ptr(sizeof(u32));                                          \
+		if (_ref_count__.data == NULL) {                                                           \
+			chain_free(&_fptr__);                                                                  \
+			panic("Could not allocate sufficient memory");                                         \
+		}                                                                                          \
+		*((u32 *)(_ref_count__.data)) = 1;                                                         \
+		Obj _ret__ = {&name##_Vtable__, 0, _fptr__, _ref_count__};                                 \
 		Obj_build_int(&_ret__);                                                                    \
 		name##Config __config_;                                                                    \
 		memset(&__config_, 0, sizeof(name##Config));                                               \
@@ -135,8 +142,29 @@ FatPtr build_fat_ptr(u64 size);
 #define OBJECT_INIT                                                                                \
 	({                                                                                             \
 		FatPtr _fptr__ = FAT_PTR_INIT;                                                             \
-		Obj _ret__ = {NULL, OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED, _fptr__};             \
+		Obj _ret__ = {NULL, OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED, _fptr__, _fptr__};    \
 		_ret__;                                                                                    \
+	})
+
+#define Ref(dst, src)                                                                              \
+	({                                                                                             \
+		if (((*((Obj *)src)).flags & OBJECT_FLAGS_CONSUMED) != 0)                                  \
+			panic("src object has already been consumed\n");                                       \
+		if (((*((Obj *)dst)).vtable != NULL &&                                                     \
+			 ((*((Obj *)dst)).vtable != ((*((Obj *)src)).vtable)))) {                              \
+			panic("Vtable mismatch! Trying to set type %s to "                                     \
+				  "type %s!",                                                                      \
+				  ((*((Obj *)dst)).vtable)->name, ((*((Obj *)src)).vtable)->name);                 \
+		}                                                                                          \
+		/* This is non-atomic TODO: handle atomic reference counting. */                           \
+		(*((u32 *)((*((Obj *)src)).ref_count.data)))++;                                            \
+		if (((*((Obj *)dst)).flags & OBJECT_FLAGS_CONSUMED) == 0)                                  \
+			Obj_cleanup(dst);                                                                      \
+		/* We copy the flags and vtable from src and the Obj data (ptr).*/                         \
+		(*((Obj *)dst)).vtable = (*((Obj *)src)).vtable;                                           \
+		(*((Obj *)dst)).flags = (*((Obj *)src)).flags;                                             \
+		(*((Obj *)dst)).ptr = (*((Obj *)src)).ptr;                                                 \
+		(*((Obj *)dst)).ref_count = (*((Obj *)src)).ref_count;                                     \
 	})
 
 #define Move(dst, src)                                                                             \
@@ -154,6 +182,7 @@ FatPtr build_fat_ptr(u64 size);
 		/* We copy the flags and vtable from src and the Obj data (ptr).*/                         \
 		(*((Obj *)dst)).vtable = (*((Obj *)src)).vtable;                                           \
 		(*((Obj *)dst)).flags = (*((Obj *)src)).flags;                                             \
+		(*((Obj *)dst)).ref_count = (*((Obj *)src)).ref_count;                                     \
 		(*((Obj *)dst)).ptr = (*((Obj *)src)).ptr;                                                 \
 		/* Set src's flags to consumed and no_cleanup as the ownership is moved. */                \
 		(*((Obj *)src)).flags |= OBJECT_FLAGS_CONSUMED | OBJECT_FLAGS_NO_CLEANUP;                  \
