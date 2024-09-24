@@ -531,7 +531,16 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 										 ti->arr_size);
 					}
 				} else {
-					append_to_header(state, "%s %s;", ti->type, ni->name);
+					if (!strcmp(ti->type, "u8") || !strcmp(ti->type, "u16") ||
+						!strcmp(ti->type, "u32") || !strcmp(ti->type, "u64") ||
+						!strcmp(ti->type, "u128") || !strcmp(ti->type, "i8") ||
+						!strcmp(ti->type, "i16") || !strcmp(ti->type, "i32") ||
+						!strcmp(ti->type, "i64") || !strcmp(ti->type, "i128") ||
+						!strcmp(ti->type, "f32") || !strcmp(ti->type, "f64") ||
+						!strcmp(ti->type, "bool"))
+						append_to_header(state, "%s %s;", ti->type, ni->name);
+					else
+						append_to_header(state, "Obj %s;", ni->name);
 				}
 			}
 			if (count == 0) {
@@ -558,14 +567,46 @@ void proc_ParserStateExpectType(ParserState *state, Token *tk, const char *args_
 				ni = vec_element_at(&(state->ht.names), i);
 				if (ti->is_arr && ti->arr_size == UINT64_MAX) {
 					fprintf(fp, "$Free(%s);", ni->name);
+				} else if (!ti->is_arr) {
+					if (!(!strcmp(ti->type, "u8") || !strcmp(ti->type, "u16") ||
+						  !strcmp(ti->type, "u32") || !strcmp(ti->type, "u64") ||
+						  !strcmp(ti->type, "u128") || !strcmp(ti->type, "i8") ||
+						  !strcmp(ti->type, "i16") || !strcmp(ti->type, "i32") ||
+						  !strcmp(ti->type, "i64") || !strcmp(ti->type, "i128") ||
+						  !strcmp(ti->type, "f32") || !strcmp(ti->type, "f64") ||
+						  !strcmp(ti->type, "bool"))) {
+						// not a prim
+						fprintf(fp, "Obj_cleanup(&$Mut(%s));", ni->name);
+					}
 				}
 			}
 			fprintf(fp, "}\
 				void %s_build_internal(Obj *ptr) {\
 				u64 size = %s_size();                     \
 				memset(ptr->ptr.data, 0, size);           \
-				}",
+				",
 					type_name, type_name);
+
+			for (u64 i = 0; i < count; i++) {
+				HeaderNameInfo *ni;
+				HeaderTypeInfo *ti;
+				ti = vec_element_at(&(state->ht.types), i);
+				ni = vec_element_at(&(state->ht.names), i);
+				if (ti->is_arr) {
+				} else {
+					if (!(!strcmp(ti->type, "u8") || !strcmp(ti->type, "u16") ||
+						  !strcmp(ti->type, "u32") || !strcmp(ti->type, "u64") ||
+						  !strcmp(ti->type, "u128") || !strcmp(ti->type, "i8") ||
+						  !strcmp(ti->type, "i16") || !strcmp(ti->type, "i32") ||
+						  !strcmp(ti->type, "i64") || !strcmp(ti->type, "i128") ||
+						  !strcmp(ti->type, "f32") || !strcmp(ti->type, "f64") ||
+						  !strcmp(ti->type, "bool"))) {
+						fprintf(fp, "$Mut(%s) = OBJECT_INIT;", ni->name);
+					}
+				}
+			}
+
+			fprintf(fp, "}");
 			fprintf(fp, "\"\n");
 			append_to_header(
 				state, "static void __attribute__((constructor)) __add_impls_%s_vtable() {\

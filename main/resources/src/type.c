@@ -160,7 +160,14 @@ void Obj_build_int(Obj *ptr) {
 	void (*build_int)(Obj *ptr) = find_fn(ptr, "build_internal");
 	if (!build_int)
 		panic("no internal build handler found");
+	Obj *tmp_Var = __thread_local_self_Var;
+	const Obj *tmp_Const = __thread_local_self_Const;
+	__thread_local_self_Const = ptr;
+	__thread_local_self_Var = ptr;
 	build_int(ptr);
+	// revert
+	__thread_local_self_Var = tmp_Var;
+	__thread_local_self_Const = tmp_Const;
 }
 
 void Obj_build(Obj *ptr, const void *config) {

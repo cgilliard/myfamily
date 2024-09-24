@@ -132,6 +132,33 @@ FatPtr build_fat_ptr(u64 size);
 	__VA_OPT__(NONE)                                                                               \
 	(__thread_local_self_Const)
 
+#define OBJECT_INIT                                                                                \
+	({                                                                                             \
+		FatPtr _fptr__ = FAT_PTR_INIT;                                                             \
+		Obj _ret__ = {NULL, OBJECT_FLAGS_NO_CLEANUP | OBJECT_FLAGS_CONSUMED, _fptr__};             \
+		_ret__;                                                                                    \
+	})
+
+#define Move(dst, src)                                                                             \
+	({                                                                                             \
+		if (((*((Obj *)src)).flags & OBJECT_FLAGS_CONSUMED) != 0)                                  \
+			panic("src object has already been consumed\n");                                       \
+		if (((*((Obj *)dst)).vtable != NULL &&                                                     \
+			 ((*((Obj *)dst)).vtable != ((*((Obj *)src)).vtable)))) {                              \
+			panic("Vtable mismatch! Trying to set type %s to "                                     \
+				  "type %s!",                                                                      \
+				  ((*((Obj *)dst)).vtable)->name, ((*((Obj *)src)).vtable)->name);                 \
+		}                                                                                          \
+		if (((*((Obj *)dst)).flags & OBJECT_FLAGS_CONSUMED) == 0)                                  \
+			Obj_cleanup(dst);                                                                      \
+		/* We copy the flags and vtable from src and the Obj data (ptr).*/                         \
+		(*((Obj *)dst)).vtable = (*((Obj *)src)).vtable;                                           \
+		(*((Obj *)dst)).flags = (*((Obj *)src)).flags;                                             \
+		(*((Obj *)dst)).ptr = (*((Obj *)src)).ptr;                                                 \
+		/* Set src's flags to consumed and no_cleanup as the ownership is moved. */                \
+		(*((Obj *)src)).flags |= OBJECT_FLAGS_CONSUMED | OBJECT_FLAGS_NO_CLEANUP;                  \
+	})
+
 // TODO: currently we allocate 'size' in bytes need to check the size of the underlying type
 #define $Alloc(name, size)                                                                         \
 	({                                                                                             \
