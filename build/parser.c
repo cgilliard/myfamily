@@ -1259,6 +1259,7 @@ void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk,
 					expand_params(state, &inc->fns[j], NULL);
 					append_to_header(state, ");");
 				}
+				append_to_header(state, "extern Vtable %s_Vtable__;", complete_type);
 				append_to_header(
 					state, "static void __attribute__((constructor)) vtable_add_inc_impl_%s_%s() {",
 					complete_type, incomplete_type);
