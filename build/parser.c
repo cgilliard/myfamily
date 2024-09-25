@@ -426,11 +426,11 @@ void proc_ParserStateInImportListExpectSeparator(ParserState *state, Token *tk) 
 }
 
 void proc_ParserStateExpectConfigKeyword(ParserState *state, Token *tk) {
-	if (!strcmp(tk->token, "Config")) {
+	if (!strcmp(tk->token, "Options")) {
 		state->state = ParserStateExpectParenBuildDefn;
 	} else {
 		state->has_errors = true;
-		token_display_error(tk, "Expected ['Config']. Found [%s]", tk->token);
+		token_display_error(tk, "Expected ['Options']. Found [%s]", tk->token);
 		state->state = ParserStateBeginStatement;
 	}
 }
