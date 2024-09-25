@@ -6590,66 +6590,91 @@ Unit_size:
         -:   22:#include <util/replace.h>
         -:   23:
     #####:   24:int proc_build_init(const char *config_dir, const char *proj_name, const char *proj_path,
-        -:   25:	char authors[11][1024], int author_count, bool lib, char *description)
-    #####:   26:{
-    #####:   27:	int author_len = 1;
-    #####:   28:	for (int i = 0; i < author_count; i++) {
-    #####:   29:		author_len += strlen(authors[i]) + 10;
-        -:   30:	}
-    #####:   31:	char author_replace[author_len];
-    #####:   32:	strcpy(author_replace, "");
-    #####:   33:	for (int i = 0; i < author_count; i++) {
-    #####:   34:		strcat(author_replace, "\"");
-    #####:   35:		strcat(author_replace, authors[i]);
-    #####:   36:		if (i == author_count - 1)
-    #####:   37:			strcat(author_replace, "\"");
-        -:   38:		else
-    #####:   39:			strcat(author_replace, "\", ");
-        -:   40:	}
-    #####:   41:	Path path;
-    #####:   42:	path_for(&path, proj_path);
-    #####:   43:	if (path_exists(&path)) {
-    #####:   44:		path_canonicalize(&path);
-    #####:   45:		fprintf(stderr, "Path: '%s' already exists!\n", path_to_string(&path));
-    #####:   46:		exit(-1);
-        -:   47:	}
-    #####:   48:	if (!path_mkdir(&path, 0700, false)) {
-    #####:   49:		perror("Error: could not create directory for project");
-    #####:   50:		exit(-1);
-        -:   51:	}
-        -:   52:
-    #####:   53:	path_push(&path, "fam.toml");
-    #####:   54:	Path template;
-    #####:   55:	path_for(&template, config_dir);
-    #####:   56:	path_push(&template, "resources");
-    #####:   57:	if (lib)
-    #####:   58:		path_push(&template, "fam.lib.toml");
-        -:   59:	else
-    #####:   60:		path_push(&template, "fam.toml");
-    #####:   61:	path_canonicalize(&template);
-    #####:   62:	if (copy_file(path_to_string(&path), path_to_string(&template)) != 0) {
-    #####:   63:		perror("Error: copying file");
-    #####:   64:		exit(-1);
-        -:   65:	}
-        -:   66:
-    #####:   67:	const char *patterns_in[]
-        -:   68:		= { "REPLACE_FAM_VERSION", "REPLACE_NAME", "REPLACE_AUTHORS", "REPLACE_DESCRIPTION" };
-    #####:   69:	const bool is_case_sensitive[] = { true, true, true };
-        -:   70:	char desc[1024];
-    #####:   71:	if (strlen(description) > 0)
-    #####:   72:		strcpy(desc, description);
-        -:   73:	else
-    #####:   74:		strcpy(desc, proj_name);
-    #####:   75:	const char *replace[] = { FAM_VERSION, proj_name, author_replace, desc };
-    #####:   76:	replace_file(&path, &path, patterns_in, is_case_sensitive, replace, 4);
-        -:   77:
-    #####:   78:	Path proj_dir;
-    #####:   79:	path_for(&proj_dir, proj_path);
-    #####:   80:	path_canonicalize(&proj_dir);
-    #####:   81:	printf("Project successfully created in '%s'.\n", path_to_string(&proj_dir));
-        -:   82:
-    #####:   83:	return 0;
-        -:   84:}
+    #####:   25:					char authors[11][1024], int author_count, bool lib, char *description) {
+    #####:   26:	int author_len = 1;
+    #####:   27:	for (int i = 0; i < author_count; i++) {
+    #####:   28:		author_len += strlen(authors[i]) + 10;
+        -:   29:	}
+    #####:   30:	char author_replace[author_len];
+    #####:   31:	strcpy(author_replace, "");
+    #####:   32:	for (int i = 0; i < author_count; i++) {
+    #####:   33:		strcat(author_replace, "\"");
+    #####:   34:		strcat(author_replace, authors[i]);
+    #####:   35:		if (i == author_count - 1)
+    #####:   36:			strcat(author_replace, "\"");
+        -:   37:		else
+    #####:   38:			strcat(author_replace, "\", ");
+        -:   39:	}
+    #####:   40:	Path path;
+    #####:   41:	path_for(&path, proj_path);
+    #####:   42:	if (path_exists(&path)) {
+    #####:   43:		path_canonicalize(&path);
+    #####:   44:		fprintf(stderr, "Path: '%s' already exists!\n", path_to_string(&path));
+    #####:   45:		exit(-1);
+        -:   46:	}
+    #####:   47:	if (!path_mkdir(&path, 0700, false)) {
+    #####:   48:		perror("Error: could not create directory for project");
+    #####:   49:		exit(-1);
+        -:   50:	}
+        -:   51:
+    #####:   52:	path_push(&path, "fam.toml");
+    #####:   53:	Path template;
+    #####:   54:	path_for(&template, config_dir);
+    #####:   55:	path_push(&template, "resources");
+    #####:   56:	if (lib)
+    #####:   57:		path_push(&template, "fam.lib.toml");
+        -:   58:	else
+    #####:   59:		path_push(&template, "fam.toml");
+    #####:   60:	path_canonicalize(&template);
+    #####:   61:	if (copy_file(path_to_string(&path), path_to_string(&template)) != 0) {
+    #####:   62:		perror("Error: copying file");
+    #####:   63:		exit(-1);
+        -:   64:	}
+        -:   65:
+    #####:   66:	const char *patterns_in[] = {"REPLACE_FAM_VERSION", "REPLACE_NAME", "REPLACE_AUTHORS",
+        -:   67:								 "REPLACE_DESCRIPTION"};
+    #####:   68:	const bool is_case_sensitive[] = {true, true, true};
+        -:   69:	char desc[1024];
+    #####:   70:	if (strlen(description) > 0)
+    #####:   71:		strcpy(desc, description);
+        -:   72:	else
+    #####:   73:		strcpy(desc, proj_name);
+    #####:   74:	const char *replace[] = {FAM_VERSION, proj_name, author_replace, desc};
+    #####:   75:	replace_file(&path, &path, patterns_in, is_case_sensitive, replace, 4);
+        -:   76:
+    #####:   77:	Path main_c;
+    #####:   78:	path_for(&main_c, proj_path);
+    #####:   79:	path_push(&main_c, "main.c");
+        -:   80:
+    #####:   81:	Path main_c_src;
+    #####:   82:	path_for(&main_c_src, config_dir);
+    #####:   83:	path_push(&main_c_src, "resources");
+    #####:   84:	path_push(&main_c_src, "main.c");
+    #####:   85:	if (copy_file(path_to_string(&main_c), path_to_string(&main_c_src)) != 0) {
+    #####:   86:		perror("Error: copying file");
+    #####:   87:		exit(-1);
+        -:   88:	}
+        -:   89:
+    #####:   90:	Path mod_h;
+    #####:   91:	path_for(&mod_h, proj_path);
+    #####:   92:	path_push(&mod_h, "mod.h");
+        -:   93:
+    #####:   94:	Path mod_h_src;
+    #####:   95:	path_for(&mod_h_src, config_dir);
+    #####:   96:	path_push(&mod_h_src, "resources");
+    #####:   97:	path_push(&mod_h_src, "mod.h");
+    #####:   98:	if (copy_file(path_to_string(&mod_h), path_to_string(&mod_h_src)) != 0) {
+    #####:   99:		perror("Error: copying file");
+    #####:  100:		exit(-1);
+        -:  101:	}
+        -:  102:
+    #####:  103:	Path proj_dir;
+    #####:  104:	path_for(&proj_dir, proj_path);
+    #####:  105:	path_canonicalize(&proj_dir);
+    #####:  106:	printf("Project successfully created in '%s'.\n", path_to_string(&proj_dir));
+        -:  107:
+    #####:  108:	return 0;
+        -:  109:}
         -:    0:Source:parser.c
         -:    0:Graph:parser.gcno
         -:    0:Data:parser.gcda
@@ -7187,978 +7212,1022 @@ Unit_size:
         -:  531:										 ti->arr_size);
         -:  532:					}
         -:  533:				} else {
-    #####:  534:					append_to_header(state, "%s %s;", ti->type, ni->name);
-        -:  535:				}
-        -:  536:			}
-    #####:  537:			if (count == 0) {
-    #####:  538:				append_to_header(state, "char dummy;");
-        -:  539:			}
-    #####:  540:			append_to_header(state, "} %s;\n", type_name);
-        -:  541:
-    #####:  542:			append_to_header(state, "extern Vtable %s_Vtable__;", type_name);
-    #####:  543:			append_to_header(state, "u64 %s_size();", type_name);
-    #####:  544:			append_to_header(state, "void %s_drop_internal(Obj *ptr);", type_name);
-    #####:  545:			append_to_header(state, "void %s_build_internal(Obj *ptr);", type_name);
-        -:  546:
-        -:  547:			// add to args
-    #####:  548:			FILE *fp = myfopen(args_file, "a");
-    #####:  549:			fprintf(fp, "-DType_Expand_%s_=\"", type_name);
-    #####:  550:			fprintf(fp, "Vtable %s_Vtable__ = {\\\"%s\\\", 0, NULL, 0, NULL, false};\
-        -:  551:				u64 %s_size() {return sizeof(%s); }\
-        -:  552:				void %s_drop_internal(Obj *ptr) { ",
-        -:  553:					type_name, type_name, type_name, type_name, type_name);
-    #####:  554:			for (u64 i = 0; i < count; i++) {
-        -:  555:				HeaderNameInfo *ni;
-        -:  556:				HeaderTypeInfo *ti;
-    #####:  557:				ti = vec_element_at(&(state->ht.types), i);
-    #####:  558:				ni = vec_element_at(&(state->ht.names), i);
-    #####:  559:				if (ti->is_arr && ti->arr_size == UINT64_MAX) {
-    #####:  560:					fprintf(fp, "$Free(%s);", ni->name);
-        -:  561:				}
-        -:  562:			}
-    #####:  563:			fprintf(fp, "}\
-        -:  564:				void %s_build_internal(Obj *ptr) {\
-        -:  565:				u64 size = %s_size();                     \
-        -:  566:				memset(ptr->ptr.data, 0, size);           \
-        -:  567:				}",
-        -:  568:					type_name, type_name);
-    #####:  569:			fprintf(fp, "\"\n");
-    #####:  570:			append_to_header(
-        -:  571:				state, "static void __attribute__((constructor)) __add_impls_%s_vtable() {\
-        -:  572:				\nVtableEntry size =\
-        -:  573:				{\
-        -:  574:				\"size\", %s_size}; \
-        -:  575:				\nvtable_add_entry(&%s_Vtable__, size); \
-        -:  576:				\nVtableEntry build_internal = {\"build_internal\", %s_build_internal};\
-        -:  577:				\nvtable_add_entry(& % s_Vtable__, build_internal);\
-        -:  578:				\nVtableEntry drop_internal = {\"drop_internal\", %s_drop_internal}; \
-        -:  579:				\nvtable_add_entry(&%s_Vtable__, drop_internal);  \n}",
-        -:  580:				type_name, type_name, type_name, type_name, type_name, type_name, type_name);
-        -:  581:
-    #####:  582:			u64 count_configs = vec_size(&state->config_types);
-    #####:  583:			u64 count_config_names = vec_size(&state->config_names);
-    #####:  584:			append_to_header(state, "typedef struct %sConfig {", type_name);
-    #####:  585:			fprintf(fp, "-DType_Import_Expand_%s_=\"", type_name);
-    #####:  586:			fprintf(fp, "u64 %s_size();", type_name);
-    #####:  587:			fprintf(fp, "extern Vtable %s_Vtable__;", type_name);
-    #####:  588:			fprintf(fp, "typedef struct %sConfig {", type_name);
+    #####:  534:					if (!strcmp(ti->type, "u8") || !strcmp(ti->type, "u16") ||
+    #####:  535:						!strcmp(ti->type, "u32") || !strcmp(ti->type, "u64") ||
+    #####:  536:						!strcmp(ti->type, "u128") || !strcmp(ti->type, "i8") ||
+    #####:  537:						!strcmp(ti->type, "i16") || !strcmp(ti->type, "i32") ||
+    #####:  538:						!strcmp(ti->type, "i64") || !strcmp(ti->type, "i128") ||
+    #####:  539:						!strcmp(ti->type, "f32") || !strcmp(ti->type, "f64") ||
+    #####:  540:						!strcmp(ti->type, "bool"))
+    #####:  541:						append_to_header(state, "%s %s;", ti->type, ni->name);
+        -:  542:					else
+    #####:  543:						append_to_header(state, "Obj %s;", ni->name);
+        -:  544:				}
+        -:  545:			}
+    #####:  546:			if (count == 0) {
+    #####:  547:				append_to_header(state, "char dummy;");
+        -:  548:			}
+    #####:  549:			append_to_header(state, "} %s;\n", type_name);
+        -:  550:
+    #####:  551:			append_to_header(state, "extern Vtable %s_Vtable__;", type_name);
+    #####:  552:			append_to_header(state, "u64 %s_size();", type_name);
+    #####:  553:			append_to_header(state, "void %s_drop_internal(Obj *ptr);", type_name);
+    #####:  554:			append_to_header(state, "void %s_build_internal(Obj *ptr);", type_name);
+        -:  555:
+        -:  556:			// add to args
+    #####:  557:			FILE *fp = myfopen(args_file, "a");
+    #####:  558:			fprintf(fp, "-DType_Expand_%s_=\"", type_name);
+    #####:  559:			fprintf(fp, "Vtable %s_Vtable__ = {\\\"%s\\\", 0, NULL, 0, NULL, false};\
+        -:  560:				u64 %s_size() {return sizeof(%s); }\
+        -:  561:				void %s_drop_internal(Obj *ptr) { ",
+        -:  562:					type_name, type_name, type_name, type_name, type_name);
+    #####:  563:			for (u64 i = 0; i < count; i++) {
+        -:  564:				HeaderNameInfo *ni;
+        -:  565:				HeaderTypeInfo *ti;
+    #####:  566:				ti = vec_element_at(&(state->ht.types), i);
+    #####:  567:				ni = vec_element_at(&(state->ht.names), i);
+    #####:  568:				if (ti->is_arr && ti->arr_size == UINT64_MAX) {
+    #####:  569:					fprintf(fp, "$Free(%s);", ni->name);
+    #####:  570:				} else if (!ti->is_arr) {
+    #####:  571:					if (!(!strcmp(ti->type, "u8") || !strcmp(ti->type, "u16") ||
+    #####:  572:						  !strcmp(ti->type, "u32") || !strcmp(ti->type, "u64") ||
+    #####:  573:						  !strcmp(ti->type, "u128") || !strcmp(ti->type, "i8") ||
+    #####:  574:						  !strcmp(ti->type, "i16") || !strcmp(ti->type, "i32") ||
+    #####:  575:						  !strcmp(ti->type, "i64") || !strcmp(ti->type, "i128") ||
+    #####:  576:						  !strcmp(ti->type, "f32") || !strcmp(ti->type, "f64") ||
+    #####:  577:						  !strcmp(ti->type, "bool"))) {
+        -:  578:						// not a prim
+    #####:  579:						fprintf(fp, "Obj_cleanup(&$Mut(%s));", ni->name);
+        -:  580:					}
+        -:  581:				}
+        -:  582:			}
+    #####:  583:			fprintf(fp, "}\
+        -:  584:				void %s_build_internal(Obj *ptr) {\
+        -:  585:				u64 size = %s_size();                     \
+        -:  586:				memset(ptr->ptr.data, 0, size);           \
+        -:  587:				",
+        -:  588:					type_name, type_name);
         -:  589:
-    #####:  590:			if (count_configs == count_config_names && count_configs > 0) {
-    #####:  591:				for (u64 i = 0; i < count_configs; i++) {
-    #####:  592:					ConfigType *t = vec_element_at(&state->config_types, i);
-    #####:  593:					ConfigName *n = vec_element_at(&state->config_names, i);
-    #####:  594:					append_to_header(state, "%s %s; bool %s_is_set__;", t->type_name, n->name,
-    #####:  595:									 n->name);
-    #####:  596:					fprintf(fp, "%s %s; bool %s_is_set__;", t->type_name, n->name, n->name);
-        -:  597:				}
-        -:  598:			} else {
-    #####:  599:				append_to_header(state, "char dummy;");
-    #####:  600:				fprintf(fp, "char dummy;");
-        -:  601:			}
-    #####:  602:			append_to_header(state, "} %sConfig;", type_name);
-    #####:  603:			fprintf(fp, "} %sConfig;", type_name);
-    #####:  604:			fprintf(fp, "\"\n");
-        -:  605:
-    #####:  606:			myfclose(fp);
-        -:  607:
-    #####:  608:			append_to_header(state, "#define %s %s\n", state->type_name, type_name);
-    #####:  609:			vec_clear(&(state->ht.types));
-    #####:  610:			vec_clear(&(state->ht.names));
-    #####:  611:			state->state = ParserStateBeginStatement;
-        -:  612:		} else {
-    #####:  613:			state->has_errors = true;
-    #####:  614:			token_display_error(tk, "Expected type name. Found [%s]", tk->token);
-    #####:  615:			state->state = ParserStateOther;
-        -:  616:		}
-        -:  617:	} else {
-    #####:  618:		if (strlen(tk->token) > MAX_NAME_LEN) {
-    #####:  619:			state->has_errors = true;
-    #####:  620:			token_display_error(tk, "Name [%s] is too long.", tk->token);
-    #####:  621:			state->state = ParserStateOther;
-        -:  622:		} else {
-        -:  623:			HeaderTypeInfo hti;
-    #####:  624:			hti.is_arr = state->cur_is_array;
-    #####:  625:			strcpy(hti.type, tk->token);
-    #####:  626:			vec_push(&(state->ht.types), &hti);
-    #####:  627:			if (state->cur_is_array) {
-    #####:  628:				state->state = ParserStateExpectPipe;
-        -:  629:			} else {
-    #####:  630:				state->state = ParserStateExpectName;
-        -:  631:			}
-        -:  632:		}
-        -:  633:	}
-    #####:  634:}
-        -:  635:
-    #####:  636:void proc_ParserStateExpectPipe(ParserState *state, Token *tk) {
-    #####:  637:	if (!strcmp(tk->token, "|")) {
-    #####:  638:		state->state = ParserStateExpectArraySize;
-    #####:  639:	} else if (!strcmp(tk->token, "]")) {
-        -:  640:		// dynamic array
-        -:  641:		HeaderTypeInfo *hti;
-    #####:  642:		hti = vec_element_at(&(state->ht.types), vec_size(&(state->ht.types)) - 1);
-        -:  643:		// use UINT64_MAX to indicate dynamic array
-    #####:  644:		hti->arr_size = UINT64_MAX;
-    #####:  645:		state->state = ParserStateExpectName;
-        -:  646:	} else {
-    #####:  647:		state->has_errors = true;
-    #####:  648:		token_display_error(tk, "Expected ['|']. Found [%s]", tk->token);
-        -:  649:	}
-    #####:  650:}
-        -:  651:
-    #####:  652:void proc_ParserStateExpectArraySize(ParserState *state, Token *tk) {
-    #####:  653:	if (tk->type == TokenTypeLiteral) {
-    #####:  654:		char first = tk->token[0];
-    #####:  655:		if (!(first >= '0' && first <= '9')) {
-    #####:  656:			state->has_errors = true;
-    #####:  657:			token_display_error(tk, "Expected number literal. Found [%s]", tk->token);
-    #####:  658:			state->state = ParserStateBeginStatement;
-        -:  659:		} else {
-        -:  660:			char *endptr;
-        -:  661:			HeaderTypeInfo *hti;
-    #####:  662:			hti = vec_element_at(&(state->ht.types), vec_size(&(state->ht.types)) - 1);
-    #####:  663:			hti->arr_size = strtoull(tk->token, &endptr, 10);
-        -:  664:
-    #####:  665:			state->state = ParserStateExpectEndArray;
-        -:  666:		}
-        -:  667:	} else {
-    #####:  668:		state->has_errors = true;
-    #####:  669:		token_display_error(tk, "Expected number literal. Found [%s]", tk->token);
-    #####:  670:		state->state = ParserStateBeginStatement;
-        -:  671:	}
-    #####:  672:}
-        -:  673:
-    #####:  674:void proc_ParserStateExpectEndArray(ParserState *state, Token *tk) {
-    #####:  675:	if (!strcmp(tk->token, "]")) {
-    #####:  676:		state->state = ParserStateExpectName;
-        -:  677:	} else {
-    #####:  678:		state->has_errors = true;
-    #####:  679:		token_display_error(tk, "Expected [']']. Found [%s]", tk->token);
-    #####:  680:		state->state = ParserStateBeginStatement;
-        -:  681:	}
-    #####:  682:}
-        -:  683:
-    #####:  684:void proc_ParserStateExpectName(ParserState *state, Token *tk) {
-    #####:  685:	if (tk->type != TokenTypeIdent) {
-    #####:  686:		state->has_errors = true;
-    #####:  687:		token_display_error(tk, "Expected name. Found [%s]", tk->token);
-    #####:  688:		state->state = ParserStateOther;
-        -:  689:	} else {
-    #####:  690:		if (strlen(tk->token) > MAX_NAME_LEN) {
-    #####:  691:			state->has_errors = true;
-    #####:  692:			token_display_error(tk, "Name [%s] is too long.", tk->token);
-    #####:  693:			state->state = ParserStateOther;
-        -:  694:		} else {
-        -:  695:			HeaderNameInfo hti;
-    #####:  696:			strcpy(hti.name, tk->token);
-    #####:  697:			vec_push(&(state->ht.names), &hti);
-    #####:  698:			state->state = ParserStateInTypeExpectSemi;
-        -:  699:		}
-        -:  700:	}
-    #####:  701:}
-        -:  702:
-    #####:  703:void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk) {
-    #####:  704:	if (strcmp(tk->token, ";")) {
-    #####:  705:		state->has_errors = true;
-    #####:  706:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
-        -:  707:	}
-    #####:  708:	state->state = ParserStateExpectType;
-    #####:  709:	state->cur_is_array = false;
-    #####:  710:}
-        -:  711:
-    #####:  712:void proc_ParserStateExpectModuleName(ParserState *state, Token *tk) {
-    #####:  713:	if (tk->type != TokenTypeIdent) {
-    #####:  714:		state->has_errors = true;
-    #####:  715:		token_display_error(tk, "Expected module name, Found [%s]", tk->token);
-        -:  716:	} else {
-    #####:  717:		if (strlen(tk->token) >= PATH_MAX) {
-    #####:  718:			state->has_errors = true;
-    #####:  719:			token_display_error(tk, "Path is longer than max path (%i)", PATH_MAX);
-        -:  720:		} else {
-        -:  721:			ModuleInfo mi;
-    #####:  722:			mi.sub_module_count = state->cur->sub_module_count + 1;
-    #####:  723:			for (u64 i = 0; i < state->cur->sub_module_count; i++) {
-    #####:  724:				strcpy(mi.module_list[i].name, state->cur->module_list[i].name);
-        -:  725:			}
-    #####:  726:			strcpy(mi.module_list[state->cur->sub_module_count].name, tk->token);
-    #####:  727:			vec_push(state->modules, &mi);
-        -:  728:		}
+    #####:  590:			for (u64 i = 0; i < count; i++) {
+        -:  591:				HeaderNameInfo *ni;
+        -:  592:				HeaderTypeInfo *ti;
+    #####:  593:				ti = vec_element_at(&(state->ht.types), i);
+    #####:  594:				ni = vec_element_at(&(state->ht.names), i);
+    #####:  595:				if (ti->is_arr) {
+        -:  596:				} else {
+    #####:  597:					if (!(!strcmp(ti->type, "u8") || !strcmp(ti->type, "u16") ||
+    #####:  598:						  !strcmp(ti->type, "u32") || !strcmp(ti->type, "u64") ||
+    #####:  599:						  !strcmp(ti->type, "u128") || !strcmp(ti->type, "i8") ||
+    #####:  600:						  !strcmp(ti->type, "i16") || !strcmp(ti->type, "i32") ||
+    #####:  601:						  !strcmp(ti->type, "i64") || !strcmp(ti->type, "i128") ||
+    #####:  602:						  !strcmp(ti->type, "f32") || !strcmp(ti->type, "f64") ||
+    #####:  603:						  !strcmp(ti->type, "bool"))) {
+    #####:  604:						fprintf(fp, "$Mut(%s) = OBJECT_INIT;", ni->name);
+        -:  605:					}
+        -:  606:				}
+        -:  607:			}
+        -:  608:
+    #####:  609:			fprintf(fp, "}");
+    #####:  610:			fprintf(fp, "\"\n");
+    #####:  611:			append_to_header(
+        -:  612:				state, "static void __attribute__((constructor)) __add_impls_%s_vtable() {\
+        -:  613:				\nVtableEntry size =\
+        -:  614:				{\
+        -:  615:				\"size\", %s_size}; \
+        -:  616:				\nvtable_add_entry(&%s_Vtable__, size); \
+        -:  617:				\nVtableEntry build_internal = {\"build_internal\", %s_build_internal};\
+        -:  618:				\nvtable_add_entry(& % s_Vtable__, build_internal);\
+        -:  619:				\nVtableEntry drop_internal = {\"drop_internal\", %s_drop_internal}; \
+        -:  620:				\nvtable_add_entry(&%s_Vtable__, drop_internal);  \n}",
+        -:  621:				type_name, type_name, type_name, type_name, type_name, type_name, type_name);
+        -:  622:
+    #####:  623:			u64 count_configs = vec_size(&state->config_types);
+    #####:  624:			u64 count_config_names = vec_size(&state->config_names);
+    #####:  625:			append_to_header(state, "typedef struct %sConfig {", type_name);
+    #####:  626:			fprintf(fp, "-DType_Import_Expand_%s_=\"", type_name);
+    #####:  627:			fprintf(fp, "u64 %s_size();", type_name);
+    #####:  628:			fprintf(fp, "extern Vtable %s_Vtable__;", type_name);
+    #####:  629:			fprintf(fp, "typedef struct %sConfig {", type_name);
+        -:  630:
+    #####:  631:			if (count_configs == count_config_names && count_configs > 0) {
+    #####:  632:				for (u64 i = 0; i < count_configs; i++) {
+    #####:  633:					ConfigType *t = vec_element_at(&state->config_types, i);
+    #####:  634:					ConfigName *n = vec_element_at(&state->config_names, i);
+    #####:  635:					append_to_header(state, "%s %s; bool %s_is_set__;", t->type_name, n->name,
+    #####:  636:									 n->name);
+    #####:  637:					fprintf(fp, "%s %s; bool %s_is_set__;", t->type_name, n->name, n->name);
+        -:  638:				}
+        -:  639:			} else {
+    #####:  640:				append_to_header(state, "char dummy;");
+    #####:  641:				fprintf(fp, "char dummy;");
+        -:  642:			}
+    #####:  643:			append_to_header(state, "} %sConfig;", type_name);
+    #####:  644:			fprintf(fp, "} %sConfig;", type_name);
+    #####:  645:			fprintf(fp, "\"\n");
+        -:  646:
+    #####:  647:			myfclose(fp);
+        -:  648:
+    #####:  649:			append_to_header(state, "#define %s %s\n", state->type_name, type_name);
+    #####:  650:			vec_clear(&(state->ht.types));
+    #####:  651:			vec_clear(&(state->ht.names));
+    #####:  652:			state->state = ParserStateBeginStatement;
+        -:  653:		} else {
+    #####:  654:			state->has_errors = true;
+    #####:  655:			token_display_error(tk, "Expected type name. Found [%s]", tk->token);
+    #####:  656:			state->state = ParserStateOther;
+        -:  657:		}
+        -:  658:	} else {
+    #####:  659:		if (strlen(tk->token) > MAX_NAME_LEN) {
+    #####:  660:			state->has_errors = true;
+    #####:  661:			token_display_error(tk, "Name [%s] is too long.", tk->token);
+    #####:  662:			state->state = ParserStateOther;
+        -:  663:		} else {
+        -:  664:			HeaderTypeInfo hti;
+    #####:  665:			hti.is_arr = state->cur_is_array;
+    #####:  666:			strcpy(hti.type, tk->token);
+    #####:  667:			vec_push(&(state->ht.types), &hti);
+    #####:  668:			if (state->cur_is_array) {
+    #####:  669:				state->state = ParserStateExpectPipe;
+        -:  670:			} else {
+    #####:  671:				state->state = ParserStateExpectName;
+        -:  672:			}
+        -:  673:		}
+        -:  674:	}
+    #####:  675:}
+        -:  676:
+    #####:  677:void proc_ParserStateExpectPipe(ParserState *state, Token *tk) {
+    #####:  678:	if (!strcmp(tk->token, "|")) {
+    #####:  679:		state->state = ParserStateExpectArraySize;
+    #####:  680:	} else if (!strcmp(tk->token, "]")) {
+        -:  681:		// dynamic array
+        -:  682:		HeaderTypeInfo *hti;
+    #####:  683:		hti = vec_element_at(&(state->ht.types), vec_size(&(state->ht.types)) - 1);
+        -:  684:		// use UINT64_MAX to indicate dynamic array
+    #####:  685:		hti->arr_size = UINT64_MAX;
+    #####:  686:		state->state = ParserStateExpectName;
+        -:  687:	} else {
+    #####:  688:		state->has_errors = true;
+    #####:  689:		token_display_error(tk, "Expected ['|']. Found [%s]", tk->token);
+        -:  690:	}
+    #####:  691:}
+        -:  692:
+    #####:  693:void proc_ParserStateExpectArraySize(ParserState *state, Token *tk) {
+    #####:  694:	if (tk->type == TokenTypeLiteral) {
+    #####:  695:		char first = tk->token[0];
+    #####:  696:		if (!(first >= '0' && first <= '9')) {
+    #####:  697:			state->has_errors = true;
+    #####:  698:			token_display_error(tk, "Expected number literal. Found [%s]", tk->token);
+    #####:  699:			state->state = ParserStateBeginStatement;
+        -:  700:		} else {
+        -:  701:			char *endptr;
+        -:  702:			HeaderTypeInfo *hti;
+    #####:  703:			hti = vec_element_at(&(state->ht.types), vec_size(&(state->ht.types)) - 1);
+    #####:  704:			hti->arr_size = strtoull(tk->token, &endptr, 10);
+        -:  705:
+    #####:  706:			state->state = ParserStateExpectEndArray;
+        -:  707:		}
+        -:  708:	} else {
+    #####:  709:		state->has_errors = true;
+    #####:  710:		token_display_error(tk, "Expected number literal. Found [%s]", tk->token);
+    #####:  711:		state->state = ParserStateBeginStatement;
+        -:  712:	}
+    #####:  713:}
+        -:  714:
+    #####:  715:void proc_ParserStateExpectEndArray(ParserState *state, Token *tk) {
+    #####:  716:	if (!strcmp(tk->token, "]")) {
+    #####:  717:		state->state = ParserStateExpectName;
+        -:  718:	} else {
+    #####:  719:		state->has_errors = true;
+    #####:  720:		token_display_error(tk, "Expected [']']. Found [%s]", tk->token);
+    #####:  721:		state->state = ParserStateBeginStatement;
+        -:  722:	}
+    #####:  723:}
+        -:  724:
+    #####:  725:void proc_ParserStateExpectName(ParserState *state, Token *tk) {
+    #####:  726:	if (tk->type != TokenTypeIdent) {
+    #####:  727:		state->has_errors = true;
+    #####:  728:		token_display_error(tk, "Expected name. Found [%s]", tk->token);
     #####:  729:		state->state = ParserStateOther;
-        -:  730:	}
-    #####:  731:}
-        -:  732:
-    #####:  733:void proc_ParserStateIncompleteName(ParserState *state, Token *tk) {
-    #####:  734:	if (tk->type != TokenTypeIdent) {
-    #####:  735:		state->state = ParserStateBeginStatement;
-    #####:  736:		state->has_errors = true;
-    #####:  737:		token_display_error(tk, "Expected incomplete type name. Found [%s]", tk->token);
-        -:  738:	} else {
-    #####:  739:		state->state = ParserIncompleteExpectBrace;
-    #####:  740:		strcpy(state->type_name, tk->token);
+        -:  730:	} else {
+    #####:  731:		if (strlen(tk->token) > MAX_NAME_LEN) {
+    #####:  732:			state->has_errors = true;
+    #####:  733:			token_display_error(tk, "Name [%s] is too long.", tk->token);
+    #####:  734:			state->state = ParserStateOther;
+        -:  735:		} else {
+        -:  736:			HeaderNameInfo hti;
+    #####:  737:			strcpy(hti.name, tk->token);
+    #####:  738:			vec_push(&(state->ht.names), &hti);
+    #####:  739:			state->state = ParserStateInTypeExpectSemi;
+        -:  740:		}
         -:  741:	}
     #####:  742:}
         -:  743:
-    #####:  744:void proc_ParserStateExpectPlusOrBrace(ParserState *state, Token *tk) {
-    #####:  745:	if (!strcmp(tk->token, "+"))
-    #####:  746:		state->state = ParserStateExpectSuperTrait;
-    #####:  747:	else if (!strcmp(tk->token, "{"))
-    #####:  748:		state->state = ParserStateExpectAt;
-        -:  749:	else {
-    #####:  750:		state->state = ParserStateBeginStatement;
-    #####:  751:		state->has_errors = true;
-    #####:  752:		token_display_error(tk, "Expected '+' or '{'. Found [%s]", tk->token);
-        -:  753:	}
-    #####:  754:}
-        -:  755:
-    #####:  756:void proc_ParserStateExpectSuperTrait(ParserState *state, Token *tk) {
-    #####:  757:	if (tk->type != TokenTypeIdent) {
-    #####:  758:		state->state = ParserStateBeginStatement;
-    #####:  759:		state->has_errors = true;
-    #####:  760:		token_display_error(tk, "Expected super trait name. Found [%s]", tk->token);
-        -:  761:	} else {
-    #####:  762:		state->state = ParserStateExpectPlusOrBrace;
-        -:  763:		SuperTraitInfo si;
-        -:  764:		TypeInfo ti;
-    #####:  765:		ti.mi = *state->cur;
-    #####:  766:		strcpy(ti.type_name, tk->token);
-        -:  767:
-    #####:  768:		type_info_to_string(&ti, si.name, MAX_NAME_LEN);
-    #####:  769:		vec_push(&state->super_traits, &si);
-        -:  770:	}
-    #####:  771:}
-        -:  772:
-    #####:  773:void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk) {
-    #####:  774:	if (!strcmp(tk->token, "{")) {
-    #####:  775:		state->state = ParserStateExpectAt;
-    #####:  776:	} else if (!strcmp(tk->token, ":")) {
-    #####:  777:		vec_clear(&state->super_traits);
-    #####:  778:		state->state = ParserStateExpectSuperTrait;
+    #####:  744:void proc_ParserStateInTypeExpectSemi(ParserState *state, Token *tk) {
+    #####:  745:	if (strcmp(tk->token, ";")) {
+    #####:  746:		state->has_errors = true;
+    #####:  747:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
+        -:  748:	}
+    #####:  749:	state->state = ParserStateExpectType;
+    #####:  750:	state->cur_is_array = false;
+    #####:  751:}
+        -:  752:
+    #####:  753:void proc_ParserStateExpectModuleName(ParserState *state, Token *tk) {
+    #####:  754:	if (tk->type != TokenTypeIdent) {
+    #####:  755:		state->has_errors = true;
+    #####:  756:		token_display_error(tk, "Expected module name, Found [%s]", tk->token);
+        -:  757:	} else {
+    #####:  758:		if (strlen(tk->token) >= PATH_MAX) {
+    #####:  759:			state->has_errors = true;
+    #####:  760:			token_display_error(tk, "Path is longer than max path (%i)", PATH_MAX);
+        -:  761:		} else {
+        -:  762:			ModuleInfo mi;
+    #####:  763:			mi.sub_module_count = state->cur->sub_module_count + 1;
+    #####:  764:			for (u64 i = 0; i < state->cur->sub_module_count; i++) {
+    #####:  765:				strcpy(mi.module_list[i].name, state->cur->module_list[i].name);
+        -:  766:			}
+    #####:  767:			strcpy(mi.module_list[state->cur->sub_module_count].name, tk->token);
+    #####:  768:			vec_push(state->modules, &mi);
+        -:  769:		}
+    #####:  770:		state->state = ParserStateOther;
+        -:  771:	}
+    #####:  772:}
+        -:  773:
+    #####:  774:void proc_ParserStateIncompleteName(ParserState *state, Token *tk) {
+    #####:  775:	if (tk->type != TokenTypeIdent) {
+    #####:  776:		state->state = ParserStateBeginStatement;
+    #####:  777:		state->has_errors = true;
+    #####:  778:		token_display_error(tk, "Expected incomplete type name. Found [%s]", tk->token);
         -:  779:	} else {
-    #####:  780:		state->state = ParserStateBeginStatement;
-    #####:  781:		state->has_errors = true;
-    #####:  782:		token_display_error(tk, "Expected '{'. Found [%s]", tk->token);
-        -:  783:	}
-    #####:  784:}
-        -:  785:
-    #####:  786:void expand_params(ParserState *state, IncompleteFn *fn, FILE *fp) {
-    #####:  787:	u64 param_count = vec_size(&fn->params);
-    #####:  788:	if (param_count) {
-    #####:  789:		append_to_header(state, ",");
-    #####:  790:		if (fp) {
-    #####:  791:			fprintf(fp, ",");
-        -:  792:		}
-        -:  793:	}
-    #####:  794:	for (u64 i = 0; i < param_count; i++) {
-    #####:  795:		FnParam *fparam = vec_element_at(&fn->params, i);
-        -:  796:		char *comma;
-    #####:  797:		if (i != param_count - 1)
-    #####:  798:			comma = ", ";
-        -:  799:		else
-    #####:  800:			comma = "";
-        -:  801:		// handle special case for __config__ (in build)
-    #####:  802:		if (!strcmp("__config__", fparam->type)) {
-    #####:  803:			append_to_header(state, "void *%s%s", fparam->name, comma);
-    #####:  804:			if (fp) {
-    #####:  805:				fprintf(fp, "void *%s%s", fparam->name, comma);
-        -:  806:			}
-        -:  807:		} else {
-    #####:  808:			if (fparam->is_mut) {
-    #####:  809:				append_to_header(state, "%s %s%s", fparam->type, fparam->name, comma);
-    #####:  810:				if (fp) {
-    #####:  811:					fprintf(fp, "%s %s%s", fparam->type, fparam->name, comma);
-        -:  812:				}
-        -:  813:			} else {
-    #####:  814:				append_to_header(state, "const %s %s%s", fparam->type, fparam->name, comma);
-    #####:  815:				if (fp) {
-    #####:  816:					fprintf(fp, "const %s %s%s", fparam->type, fparam->name, comma);
-        -:  817:				}
-        -:  818:			}
-        -:  819:		}
-        -:  820:	}
-    #####:  821:}
-        -:  822:
-    #####:  823:void expand_vars(ParserState *state, IncompleteFn *fn, FILE *fp) {
-    #####:  824:	u64 param_count = vec_size(&fn->params);
-    #####:  825:	if (param_count) {
-    #####:  826:		append_to_header(state, ",");
-    #####:  827:		if (fp) {
-    #####:  828:			fprintf(fp, ",");
-        -:  829:		}
-        -:  830:	}
-    #####:  831:	for (u64 i = 0; i < param_count; i++) {
-    #####:  832:		FnParam *fparam = vec_element_at(&fn->params, i);
-        -:  833:		char *comma;
-    #####:  834:		if (i != param_count - 1)
-    #####:  835:			comma = ", ";
-        -:  836:		else
-    #####:  837:			comma = "";
-    #####:  838:		append_to_header(state, "%s%s", fparam->name, comma);
-    #####:  839:		if (fp)
-    #####:  840:			fprintf(fp, "%s%s", fparam->name, comma);
-        -:  841:	}
-    #####:  842:}
-        -:  843:
-    #####:  844:void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_file) {
-    #####:  845:	if (!strcmp(tk->token, "@")) {
-    #####:  846:		state->state = ParserStateExpectIncompleteFnName;
-    #####:  847:	} else if (!strcmp(tk->token, "}")) {
-        -:  848:		// end incomplete type
-    #####:  849:		state->state = ParserStateBeginStatement;
-    #####:  850:		u64 fn_count = vec_size(&state->incomplete_fns);
-        -:  851:
-    #####:  852:		FILE *fp = myfopen(args_file, "a");
-        -:  853:		TypeInfo ti;
-    #####:  854:		ti.mi = *state->cur;
-    #####:  855:		strcpy(ti.type_name, state->type_name);
-        -:  856:
-        -:  857:		char incomplete_type[PATH_MAX + 1];
-    #####:  858:		type_info_to_string(&ti, incomplete_type, PATH_MAX);
-    #####:  859:		fprintf(fp, "-DType_Import_Expand_%s_=\"", incomplete_type);
-    #####:  860:		for (u64 i = 0; i < fn_count; i++) {
-    #####:  861:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, i);
-        -:  862:
-    #####:  863:			if (fn->is_mut) {
-    #####:  864:				append_to_header(state, "static %s %s(Obj *self", fn->return_type, fn->name);
-    #####:  865:				fprintf(fp, "static %s %s(Obj *self ", fn->return_type, fn->name);
-        -:  866:			} else {
-    #####:  867:				append_to_header(state, "static %s %s(const Obj *self", fn->return_type, fn->name);
-    #####:  868:				fprintf(fp, "static %s %s(const Obj *self ", fn->return_type, fn->name);
-        -:  869:			}
-    #####:  870:			expand_params(state, fn, fp);
-    #####:  871:			append_to_header(state, ") {");
-    #####:  872:			fprintf(fp, ") {");
-        -:  873:
-    #####:  874:			if (fn->is_mut) {
-    #####:  875:				append_to_header(state, "%s (*impl)(Obj *self", fn->return_type);
-    #####:  876:				fprintf(fp, "%s (*impl)(Obj *self", fn->return_type);
-        -:  877:			} else {
-    #####:  878:				append_to_header(state, "%s (*impl)(const Obj *self", fn->return_type);
-    #####:  879:				fprintf(fp, "%s (*impl)(const Obj *self", fn->return_type);
-        -:  880:			}
-    #####:  881:			expand_params(state, fn, fp);
-    #####:  882:			append_to_header(state, ") = find_fn(self, \"%s\");", fn->name);
-    #####:  883:			fprintf(fp, ") = find_fn(self, \\\"%s\\\");", fn->name);
-    #####:  884:			append_to_header(
-    #####:  885:				state, "if(impl == NULL) panic(\"Implementation for [%s] not found!\");", fn->name);
-        -:  886:
-    #####:  887:			fprintf(fp, "if(impl == NULL) panic(\\\"Implementation for [%s] not found!\\\");",
-    #####:  888:					fn->name);
-    #####:  889:			append_to_header(
-        -:  890:				state, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
-    #####:  891:			fprintf(fp, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
-    #####:  892:			append_to_header(state, "__thread_local_self_Const = self;");
-    #####:  893:			fprintf(fp, "__thread_local_self_Const = self;");
-    #####:  894:			if (fn->is_mut) {
-    #####:  895:				append_to_header(state, "__thread_local_self_Var = self;");
-    #####:  896:				fprintf(fp, "__thread_local_self_Var = self;");
-        -:  897:			} else {
-    #####:  898:				append_to_header(state, "__thread_local_self_Var = NULL;");
-    #####:  899:				fprintf(fp, "__thread_local_self_Var = NULL;");
-        -:  900:			}
-        -:  901:
-    #####:  902:			append_to_header(state, "return impl(self");
-    #####:  903:			fprintf(fp, "return impl(self");
-    #####:  904:			expand_vars(state, fn, fp);
-    #####:  905:			append_to_header(state, ");");
-    #####:  906:			fprintf(fp, ");");
-    #####:  907:			append_to_header(state, "}");
-    #####:  908:			fprintf(fp, "}");
-        -:  909:		}
-        -:  910:
-    #####:  911:		fprintf(fp, "\"\n");
-    #####:  912:		myfclose(fp);
-        -:  913:
-    #####:  914:		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns, args_file,
-        -:  915:									  &state->super_traits, incomplete_type);
-        -:  916:
-    #####:  917:		incomplete_fns_cleanup(&state->incomplete_fns);
-        -:  918:
-    #####:  919:	} else if (tk->type == TokenTypeIdent) {
-        -:  920:		// required method with an implementation.
-    #####:  921:		if (!strcmp(tk->token, "mut")) {
-    #####:  922:			state->state = ParserStateExpectIncompleteMutFnNameWithDefaultImpl;
-        -:  923:		} else {
-        -:  924:			IncompleteFn fn;
-    #####:  925:			fn.has_impl = true;
-    #####:  926:			fn.is_mut = false;
-    #####:  927:			strcpy(fn.name, tk->token);
-    #####:  928:			vec_init(&fn.params, 3, sizeof(FnParam));
-    #####:  929:			strcpy(fn.return_type, "void");
-    #####:  930:			vec_push(&state->incomplete_fns, &fn);
-    #####:  931:			state->state = ParserStateExpectIncompleteFnParenStart;
-        -:  932:		}
-        -:  933:	} else {
-    #####:  934:		state->state = ParserStateBeginStatement;
-    #####:  935:		state->has_errors = true;
-    #####:  936:		token_display_error(tk, "Expected '@'. Found [%s]", tk->token);
-        -:  937:	}
-    #####:  938:}
-        -:  939:
-    #####:  940:void proc_ParserStateExpectIncompleteMutFnNameWithDefaultImpl(ParserState *state, Token *tk) {
-    #####:  941:	if (tk->type != TokenTypeIdent) {
-    #####:  942:		state->state = ParserStateBeginStatement;
-    #####:  943:		state->has_errors = true;
-    #####:  944:		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
-        -:  945:	} else {
-        -:  946:		IncompleteFn fn;
-    #####:  947:		fn.has_impl = true;
-    #####:  948:		fn.is_mut = true;
-    #####:  949:		strcpy(fn.name, tk->token);
-    #####:  950:		vec_init(&fn.params, 3, sizeof(FnParam));
-    #####:  951:		strcpy(fn.return_type, "void");
-    #####:  952:		vec_push(&state->incomplete_fns, &fn);
-    #####:  953:		state->state = ParserStateExpectIncompleteFnParenStart;
-        -:  954:	}
-    #####:  955:}
-        -:  956:
-    #####:  957:void proc_ParserStateExpectIncompleteMutFnName(ParserState *state, Token *tk) {
-    #####:  958:	if (tk->type != TokenTypeIdent) {
-    #####:  959:		state->state = ParserStateBeginStatement;
-    #####:  960:		state->has_errors = true;
-    #####:  961:		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
-        -:  962:	} else {
-        -:  963:		IncompleteFn fn;
-    #####:  964:		fn.has_impl = false;
-    #####:  965:		fn.is_mut = true;
-    #####:  966:		strcpy(fn.name, tk->token);
-    #####:  967:		vec_init(&fn.params, 3, sizeof(FnParam));
-    #####:  968:		strcpy(fn.return_type, "void");
-    #####:  969:		vec_push(&state->incomplete_fns, &fn);
-    #####:  970:		state->state = ParserStateExpectIncompleteFnParenStart;
-        -:  971:	}
-    #####:  972:}
-        -:  973:
-    #####:  974:void proc_ParserStateExpectIncompleteFnName(ParserState *state, Token *tk) {
-    #####:  975:	if (tk->type != TokenTypeIdent) {
+    #####:  780:		state->state = ParserIncompleteExpectBrace;
+    #####:  781:		strcpy(state->type_name, tk->token);
+        -:  782:	}
+    #####:  783:}
+        -:  784:
+    #####:  785:void proc_ParserStateExpectPlusOrBrace(ParserState *state, Token *tk) {
+    #####:  786:	if (!strcmp(tk->token, "+"))
+    #####:  787:		state->state = ParserStateExpectSuperTrait;
+    #####:  788:	else if (!strcmp(tk->token, "{"))
+    #####:  789:		state->state = ParserStateExpectAt;
+        -:  790:	else {
+    #####:  791:		state->state = ParserStateBeginStatement;
+    #####:  792:		state->has_errors = true;
+    #####:  793:		token_display_error(tk, "Expected '+' or '{'. Found [%s]", tk->token);
+        -:  794:	}
+    #####:  795:}
+        -:  796:
+    #####:  797:void proc_ParserStateExpectSuperTrait(ParserState *state, Token *tk) {
+    #####:  798:	if (tk->type != TokenTypeIdent) {
+    #####:  799:		state->state = ParserStateBeginStatement;
+    #####:  800:		state->has_errors = true;
+    #####:  801:		token_display_error(tk, "Expected super trait name. Found [%s]", tk->token);
+        -:  802:	} else {
+    #####:  803:		state->state = ParserStateExpectPlusOrBrace;
+        -:  804:		SuperTraitInfo si;
+        -:  805:		TypeInfo ti;
+    #####:  806:		ti.mi = *state->cur;
+    #####:  807:		strcpy(ti.type_name, tk->token);
+        -:  808:
+    #####:  809:		type_info_to_string(&ti, si.name, MAX_NAME_LEN);
+    #####:  810:		vec_push(&state->super_traits, &si);
+        -:  811:	}
+    #####:  812:}
+        -:  813:
+    #####:  814:void proc_ParserIncompleteExpectBrace(ParserState *state, Token *tk) {
+    #####:  815:	if (!strcmp(tk->token, "{")) {
+    #####:  816:		state->state = ParserStateExpectAt;
+    #####:  817:	} else if (!strcmp(tk->token, ":")) {
+    #####:  818:		vec_clear(&state->super_traits);
+    #####:  819:		state->state = ParserStateExpectSuperTrait;
+        -:  820:	} else {
+    #####:  821:		state->state = ParserStateBeginStatement;
+    #####:  822:		state->has_errors = true;
+    #####:  823:		token_display_error(tk, "Expected '{'. Found [%s]", tk->token);
+        -:  824:	}
+    #####:  825:}
+        -:  826:
+    #####:  827:void expand_params(ParserState *state, IncompleteFn *fn, FILE *fp) {
+    #####:  828:	u64 param_count = vec_size(&fn->params);
+    #####:  829:	if (param_count) {
+    #####:  830:		append_to_header(state, ",");
+    #####:  831:		if (fp) {
+    #####:  832:			fprintf(fp, ",");
+        -:  833:		}
+        -:  834:	}
+    #####:  835:	for (u64 i = 0; i < param_count; i++) {
+    #####:  836:		FnParam *fparam = vec_element_at(&fn->params, i);
+        -:  837:		char *comma;
+    #####:  838:		if (i != param_count - 1)
+    #####:  839:			comma = ", ";
+        -:  840:		else
+    #####:  841:			comma = "";
+        -:  842:		// handle special case for __config__ (in build)
+    #####:  843:		if (!strcmp("__config__", fparam->type)) {
+    #####:  844:			append_to_header(state, "void *%s%s", fparam->name, comma);
+    #####:  845:			if (fp) {
+    #####:  846:				fprintf(fp, "void *%s%s", fparam->name, comma);
+        -:  847:			}
+        -:  848:		} else {
+    #####:  849:			if (fparam->is_mut) {
+    #####:  850:				append_to_header(state, "%s %s%s", fparam->type, fparam->name, comma);
+    #####:  851:				if (fp) {
+    #####:  852:					fprintf(fp, "%s %s%s", fparam->type, fparam->name, comma);
+        -:  853:				}
+        -:  854:			} else {
+    #####:  855:				append_to_header(state, "const %s %s%s", fparam->type, fparam->name, comma);
+    #####:  856:				if (fp) {
+    #####:  857:					fprintf(fp, "const %s %s%s", fparam->type, fparam->name, comma);
+        -:  858:				}
+        -:  859:			}
+        -:  860:		}
+        -:  861:	}
+    #####:  862:}
+        -:  863:
+    #####:  864:void expand_vars(ParserState *state, IncompleteFn *fn, FILE *fp) {
+    #####:  865:	u64 param_count = vec_size(&fn->params);
+    #####:  866:	if (param_count) {
+    #####:  867:		append_to_header(state, ",");
+    #####:  868:		if (fp) {
+    #####:  869:			fprintf(fp, ",");
+        -:  870:		}
+        -:  871:	}
+    #####:  872:	for (u64 i = 0; i < param_count; i++) {
+    #####:  873:		FnParam *fparam = vec_element_at(&fn->params, i);
+        -:  874:		char *comma;
+    #####:  875:		if (i != param_count - 1)
+    #####:  876:			comma = ", ";
+        -:  877:		else
+    #####:  878:			comma = "";
+    #####:  879:		append_to_header(state, "%s%s", fparam->name, comma);
+    #####:  880:		if (fp)
+    #####:  881:			fprintf(fp, "%s%s", fparam->name, comma);
+        -:  882:	}
+    #####:  883:}
+        -:  884:
+    #####:  885:void proc_ParserStateExpectAt(ParserState *state, Token *tk, const char *args_file) {
+    #####:  886:	if (!strcmp(tk->token, "@")) {
+    #####:  887:		state->state = ParserStateExpectIncompleteFnName;
+    #####:  888:	} else if (!strcmp(tk->token, "}")) {
+        -:  889:		// end incomplete type
+    #####:  890:		state->state = ParserStateBeginStatement;
+    #####:  891:		u64 fn_count = vec_size(&state->incomplete_fns);
+        -:  892:
+    #####:  893:		FILE *fp = myfopen(args_file, "a");
+        -:  894:		TypeInfo ti;
+    #####:  895:		ti.mi = *state->cur;
+    #####:  896:		strcpy(ti.type_name, state->type_name);
+        -:  897:
+        -:  898:		char incomplete_type[PATH_MAX + 1];
+    #####:  899:		type_info_to_string(&ti, incomplete_type, PATH_MAX);
+    #####:  900:		fprintf(fp, "-DType_Import_Expand_%s_=\"", incomplete_type);
+    #####:  901:		for (u64 i = 0; i < fn_count; i++) {
+    #####:  902:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, i);
+        -:  903:
+    #####:  904:			if (fn->is_mut) {
+    #####:  905:				append_to_header(state, "static %s %s(Obj *self", fn->return_type, fn->name);
+    #####:  906:				fprintf(fp, "static %s %s(Obj *self ", fn->return_type, fn->name);
+        -:  907:			} else {
+    #####:  908:				append_to_header(state, "static %s %s(const Obj *self", fn->return_type, fn->name);
+    #####:  909:				fprintf(fp, "static %s %s(const Obj *self ", fn->return_type, fn->name);
+        -:  910:			}
+    #####:  911:			expand_params(state, fn, fp);
+    #####:  912:			append_to_header(state, ") {");
+    #####:  913:			fprintf(fp, ") {");
+        -:  914:
+    #####:  915:			if (fn->is_mut) {
+    #####:  916:				append_to_header(state, "%s (*impl)(Obj *self", fn->return_type);
+    #####:  917:				fprintf(fp, "%s (*impl)(Obj *self", fn->return_type);
+        -:  918:			} else {
+    #####:  919:				append_to_header(state, "%s (*impl)(const Obj *self", fn->return_type);
+    #####:  920:				fprintf(fp, "%s (*impl)(const Obj *self", fn->return_type);
+        -:  921:			}
+    #####:  922:			expand_params(state, fn, fp);
+    #####:  923:			append_to_header(state, ") = find_fn(self, \"%s\");", fn->name);
+    #####:  924:			fprintf(fp, ") = find_fn(self, \\\"%s\\\");", fn->name);
+    #####:  925:			append_to_header(
+    #####:  926:				state, "if(impl == NULL) panic(\"Implementation for [%s] not found!\");", fn->name);
+        -:  927:
+    #####:  928:			fprintf(fp, "if(impl == NULL) panic(\\\"Implementation for [%s] not found!\\\");",
+    #####:  929:					fn->name);
+    #####:  930:			append_to_header(
+        -:  931:				state, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
+    #####:  932:			fprintf(fp, "SelfCleanup sc = {__thread_local_self_Const, __thread_local_self_Var};");
+    #####:  933:			append_to_header(state, "__thread_local_self_Const = self;");
+    #####:  934:			fprintf(fp, "__thread_local_self_Const = self;");
+    #####:  935:			if (fn->is_mut) {
+    #####:  936:				append_to_header(state, "__thread_local_self_Var = self;");
+    #####:  937:				fprintf(fp, "__thread_local_self_Var = self;");
+        -:  938:			} else {
+    #####:  939:				append_to_header(state, "__thread_local_self_Var = NULL;");
+    #####:  940:				fprintf(fp, "__thread_local_self_Var = NULL;");
+        -:  941:			}
+        -:  942:
+    #####:  943:			append_to_header(state, "return impl(self");
+    #####:  944:			fprintf(fp, "return impl(self");
+    #####:  945:			expand_vars(state, fn, fp);
+    #####:  946:			append_to_header(state, ");");
+    #####:  947:			fprintf(fp, ");");
+    #####:  948:			append_to_header(state, "}");
+    #####:  949:			fprintf(fp, "}");
+        -:  950:		}
+        -:  951:
+    #####:  952:		fprintf(fp, "\"\n");
+    #####:  953:		myfclose(fp);
+        -:  954:
+    #####:  955:		add_to_global_incomplete_list(state->type_name, &state->incomplete_fns, args_file,
+        -:  956:									  &state->super_traits, incomplete_type);
+    #####:  957:		vec_clear(&state->super_traits);
+        -:  958:
+    #####:  959:		incomplete_fns_cleanup(&state->incomplete_fns);
+        -:  960:
+    #####:  961:	} else if (tk->type == TokenTypeIdent) {
+        -:  962:		// required method with an implementation.
+    #####:  963:		if (!strcmp(tk->token, "mut")) {
+    #####:  964:			state->state = ParserStateExpectIncompleteMutFnNameWithDefaultImpl;
+        -:  965:		} else {
+        -:  966:			IncompleteFn fn;
+    #####:  967:			fn.has_impl = true;
+    #####:  968:			fn.is_mut = false;
+    #####:  969:			strcpy(fn.name, tk->token);
+    #####:  970:			vec_init(&fn.params, 3, sizeof(FnParam));
+    #####:  971:			strcpy(fn.return_type, "void");
+    #####:  972:			vec_push(&state->incomplete_fns, &fn);
+    #####:  973:			state->state = ParserStateExpectIncompleteFnParenStart;
+        -:  974:		}
+        -:  975:	} else {
     #####:  976:		state->state = ParserStateBeginStatement;
     #####:  977:		state->has_errors = true;
-    #####:  978:		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
-        -:  979:	} else {
-    #####:  980:		if (!strcmp(tk->token, "mut")) {
-    #####:  981:			state->state = ParserStateExpectIncompleteMutFnName;
-        -:  982:		} else {
-        -:  983:			IncompleteFn fn;
-    #####:  984:			fn.has_impl = false;
-    #####:  985:			fn.is_mut = false;
-    #####:  986:			strcpy(fn.name, tk->token);
-    #####:  987:			vec_init(&fn.params, 3, sizeof(FnParam));
-    #####:  988:			strcpy(fn.return_type, "void");
-    #####:  989:			vec_push(&state->incomplete_fns, &fn);
-    #####:  990:			state->state = ParserStateExpectIncompleteFnParenStart;
-        -:  991:		}
-        -:  992:	}
-    #####:  993:}
-        -:  994:
-    #####:  995:void proc_ParserStateExpectIncompleteFnParenStart(ParserState *state, Token *tk) {
-    #####:  996:	if (!strcmp(tk->token, "(")) {
-    #####:  997:		state->state = ParserStateExpectIncompleteFnMutOrType;
-        -:  998:	} else {
-    #####:  999:		state->state = ParserStateBeginStatement;
-    #####: 1000:		state->has_errors = true;
-    #####: 1001:		token_display_error(tk, "Expected ['(']. Found [%s]", tk->token);
-        -: 1002:	}
-    #####: 1003:}
-        -: 1004:
-    #####: 1005:void proc_ParserStateExpectIncompleteFnType(ParserState *state, Token *tk) {
-    #####: 1006:	if (tk->type == TokenTypeIdent) {
-    #####: 1007:		u64 last = vec_size(&state->incomplete_fns);
-    #####: 1008:		if (last == 0) {
-    #####: 1009:			state->has_errors = true;
-    #####: 1010:			token_display_error(tk, "internal error: Expected type here!");
-    #####: 1011:			state->state = ParserStateBeginStatement;
-        -: 1012:		} else {
-    #####: 1013:			last--;
-    #####: 1014:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
-    #####: 1015:			u64 last_param = vec_size(&fn->params);
-    #####: 1016:			if (last_param == 0) {
-    #####: 1017:				state->has_errors = true;
-    #####: 1018:				token_display_error(tk, "internal error: Expected a param here!");
-    #####: 1019:				state->state = ParserStateBeginStatement;
-        -: 1020:			} else {
-    #####: 1021:				last_param--;
-    #####: 1022:				FnParam *p = vec_element_at(&fn->params, last_param);
-    #####: 1023:				strcpy(p->type, tk->token);
-    #####: 1024:				state->state = ParserStateExpectIncompleteFnParamName;
-        -: 1025:			}
-        -: 1026:		}
-        -: 1027:	} else {
-        -: 1028:		// unexpected - error
-    #####: 1029:		state->state = ParserStateBeginStatement;
-    #####: 1030:		state->has_errors = true;
-    #####: 1031:		token_display_error(tk, "Expected type name. Found [%s]", tk->token);
-        -: 1032:	}
-    #####: 1033:}
-        -: 1034:
-    #####: 1035:void proc_ParserStateExpectIncompleteFnParamName(ParserState *state, Token *tk) {
-    #####: 1036:	if (tk->type == TokenTypeIdent) {
-    #####: 1037:		u64 last = vec_size(&state->incomplete_fns);
-    #####: 1038:		if (last == 0) {
-    #####: 1039:			state->has_errors = true;
-    #####: 1040:			token_display_error(tk, "internal error: Expected a name here!");
-    #####: 1041:			state->state = ParserStateBeginStatement;
-        -: 1042:		} else {
-    #####: 1043:			last--;
-    #####: 1044:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
-    #####: 1045:			u64 last_param = vec_size(&fn->params);
-    #####: 1046:			if (last_param == 0) {
-    #####: 1047:				state->has_errors = true;
-    #####: 1048:				token_display_error(tk, "internal error: Expected a param here!");
-    #####: 1049:				state->state = ParserStateBeginStatement;
-        -: 1050:			} else {
-    #####: 1051:				last_param--;
-    #####: 1052:				FnParam *p = vec_element_at(&fn->params, last_param);
-    #####: 1053:				strcpy(p->name, tk->token);
-    #####: 1054:				state->state = ParserStateExpectIncompleteFnParamCommaOrEnd;
-        -: 1055:			}
-        -: 1056:		}
-        -: 1057:	} else {
-        -: 1058:		// unexpected - error
-    #####: 1059:		state->state = ParserStateBeginStatement;
-    #####: 1060:		state->has_errors = true;
-    #####: 1061:		token_display_error(tk, "Expected param name. Found [%s]", tk->token);
-        -: 1062:	}
-    #####: 1063:}
-        -: 1064:
-    #####: 1065:void proc_ParserStateExpectIncompleteFnParamCommaOrEnd(ParserState *state, Token *tk) {
-    #####: 1066:	if (!strcmp(tk->token, ",")) {
-        -: 1067:		// look for the next param
-    #####: 1068:		state->state = ParserStateExpectIncompleteFnMutOrType;
-    #####: 1069:	} else if (!strcmp(tk->token, ")")) {
-    #####: 1070:		state->state = ParserStateIncompleteExpectSemiOrTypeArrow;
-        -: 1071:	} else {
-    #####: 1072:		state->state = ParserStateBeginStatement;
-    #####: 1073:		state->has_errors = true;
-    #####: 1074:		token_display_error(tk, "Expected [',' or ')']. Found [%s]", tk->token);
-        -: 1075:	}
-    #####: 1076:}
-        -: 1077:
-    #####: 1078:void proc_ParserStateIncompleteExpectSemi(ParserState *state, Token *tk) {
-    #####: 1079:	if (!strcmp(tk->token, ";")) {
-    #####: 1080:		state->state = ParserStateExpectAt;
-        -: 1081:	} else {
-    #####: 1082:		state->state = ParserStateBeginStatement;
-    #####: 1083:		state->has_errors = true;
-    #####: 1084:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
-        -: 1085:	}
-    #####: 1086:}
-        -: 1087:
-    #####: 1088:void proc_ParserStateIncompleteExpectSemiOrTypeArrow(ParserState *state, Token *tk) {
-    #####: 1089:	if (!strcmp(tk->token, "->")) {
-    #####: 1090:		state->state = ParserStateIncompleteExpectReturnType;
-    #####: 1091:	} else if (!strcmp(tk->token, ";")) {
-    #####: 1092:		state->state = ParserStateExpectAt;
-        -: 1093:	} else {
-    #####: 1094:		state->state = ParserStateBeginStatement;
-    #####: 1095:		state->has_errors = true;
-    #####: 1096:		token_display_error(tk, "Expected [';' or '->']. Found [%s]", tk->token);
-        -: 1097:	}
-    #####: 1098:}
-        -: 1099:
-    #####: 1100:void proc_ParserStateIncompleteExpectReturnType(ParserState *state, Token *tk) {
-    #####: 1101:	if (tk->type == TokenTypeIdent) {
-    #####: 1102:		u64 last = vec_size(&state->incomplete_fns);
-    #####: 1103:		if (last == 0) {
-    #####: 1104:			state->has_errors = true;
-    #####: 1105:			token_display_error(tk, "internal error: Expected return type here!");
-    #####: 1106:			state->state = ParserStateBeginStatement;
-        -: 1107:		} else {
-    #####: 1108:			last--;
-    #####: 1109:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
-    #####: 1110:			strcpy(fn->return_type, tk->token);
-    #####: 1111:			state->state = ParserStateIncompleteExpectSemi;
-        -: 1112:		}
+    #####:  978:		token_display_error(tk, "Expected '@'. Found [%s]", tk->token);
+        -:  979:	}
+    #####:  980:}
+        -:  981:
+    #####:  982:void proc_ParserStateExpectIncompleteMutFnNameWithDefaultImpl(ParserState *state, Token *tk) {
+    #####:  983:	if (tk->type != TokenTypeIdent) {
+    #####:  984:		state->state = ParserStateBeginStatement;
+    #####:  985:		state->has_errors = true;
+    #####:  986:		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
+        -:  987:	} else {
+        -:  988:		IncompleteFn fn;
+    #####:  989:		fn.has_impl = true;
+    #####:  990:		fn.is_mut = true;
+    #####:  991:		strcpy(fn.name, tk->token);
+    #####:  992:		vec_init(&fn.params, 3, sizeof(FnParam));
+    #####:  993:		strcpy(fn.return_type, "void");
+    #####:  994:		vec_push(&state->incomplete_fns, &fn);
+    #####:  995:		state->state = ParserStateExpectIncompleteFnParenStart;
+        -:  996:	}
+    #####:  997:}
+        -:  998:
+    #####:  999:void proc_ParserStateExpectIncompleteMutFnName(ParserState *state, Token *tk) {
+    #####: 1000:	if (tk->type != TokenTypeIdent) {
+    #####: 1001:		state->state = ParserStateBeginStatement;
+    #####: 1002:		state->has_errors = true;
+    #####: 1003:		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
+        -: 1004:	} else {
+        -: 1005:		IncompleteFn fn;
+    #####: 1006:		fn.has_impl = false;
+    #####: 1007:		fn.is_mut = true;
+    #####: 1008:		strcpy(fn.name, tk->token);
+    #####: 1009:		vec_init(&fn.params, 3, sizeof(FnParam));
+    #####: 1010:		strcpy(fn.return_type, "void");
+    #####: 1011:		vec_push(&state->incomplete_fns, &fn);
+    #####: 1012:		state->state = ParserStateExpectIncompleteFnParenStart;
+        -: 1013:	}
+    #####: 1014:}
+        -: 1015:
+    #####: 1016:void proc_ParserStateExpectIncompleteFnName(ParserState *state, Token *tk) {
+    #####: 1017:	if (tk->type != TokenTypeIdent) {
+    #####: 1018:		state->state = ParserStateBeginStatement;
+    #####: 1019:		state->has_errors = true;
+    #####: 1020:		token_display_error(tk, "Expected required function name. Found [%s]", tk->token);
+        -: 1021:	} else {
+    #####: 1022:		if (!strcmp(tk->token, "mut")) {
+    #####: 1023:			state->state = ParserStateExpectIncompleteMutFnName;
+        -: 1024:		} else {
+        -: 1025:			IncompleteFn fn;
+    #####: 1026:			fn.has_impl = false;
+    #####: 1027:			fn.is_mut = false;
+    #####: 1028:			strcpy(fn.name, tk->token);
+    #####: 1029:			vec_init(&fn.params, 3, sizeof(FnParam));
+    #####: 1030:			strcpy(fn.return_type, "void");
+    #####: 1031:			vec_push(&state->incomplete_fns, &fn);
+    #####: 1032:			state->state = ParserStateExpectIncompleteFnParenStart;
+        -: 1033:		}
+        -: 1034:	}
+    #####: 1035:}
+        -: 1036:
+    #####: 1037:void proc_ParserStateExpectIncompleteFnParenStart(ParserState *state, Token *tk) {
+    #####: 1038:	if (!strcmp(tk->token, "(")) {
+    #####: 1039:		state->state = ParserStateExpectIncompleteFnMutOrType;
+        -: 1040:	} else {
+    #####: 1041:		state->state = ParserStateBeginStatement;
+    #####: 1042:		state->has_errors = true;
+    #####: 1043:		token_display_error(tk, "Expected ['(']. Found [%s]", tk->token);
+        -: 1044:	}
+    #####: 1045:}
+        -: 1046:
+    #####: 1047:void proc_ParserStateExpectIncompleteFnType(ParserState *state, Token *tk) {
+    #####: 1048:	if (tk->type == TokenTypeIdent) {
+    #####: 1049:		u64 last = vec_size(&state->incomplete_fns);
+    #####: 1050:		if (last == 0) {
+    #####: 1051:			state->has_errors = true;
+    #####: 1052:			token_display_error(tk, "internal error: Expected type here!");
+    #####: 1053:			state->state = ParserStateBeginStatement;
+        -: 1054:		} else {
+    #####: 1055:			last--;
+    #####: 1056:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
+    #####: 1057:			u64 last_param = vec_size(&fn->params);
+    #####: 1058:			if (last_param == 0) {
+    #####: 1059:				state->has_errors = true;
+    #####: 1060:				token_display_error(tk, "internal error: Expected a param here!");
+    #####: 1061:				state->state = ParserStateBeginStatement;
+        -: 1062:			} else {
+    #####: 1063:				last_param--;
+    #####: 1064:				FnParam *p = vec_element_at(&fn->params, last_param);
+    #####: 1065:				strcpy(p->type, tk->token);
+    #####: 1066:				state->state = ParserStateExpectIncompleteFnParamName;
+        -: 1067:			}
+        -: 1068:		}
+        -: 1069:	} else {
+        -: 1070:		// unexpected - error
+    #####: 1071:		state->state = ParserStateBeginStatement;
+    #####: 1072:		state->has_errors = true;
+    #####: 1073:		token_display_error(tk, "Expected type name. Found [%s]", tk->token);
+        -: 1074:	}
+    #####: 1075:}
+        -: 1076:
+    #####: 1077:void proc_ParserStateExpectIncompleteFnParamName(ParserState *state, Token *tk) {
+    #####: 1078:	if (tk->type == TokenTypeIdent) {
+    #####: 1079:		u64 last = vec_size(&state->incomplete_fns);
+    #####: 1080:		if (last == 0) {
+    #####: 1081:			state->has_errors = true;
+    #####: 1082:			token_display_error(tk, "internal error: Expected a name here!");
+    #####: 1083:			state->state = ParserStateBeginStatement;
+        -: 1084:		} else {
+    #####: 1085:			last--;
+    #####: 1086:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
+    #####: 1087:			u64 last_param = vec_size(&fn->params);
+    #####: 1088:			if (last_param == 0) {
+    #####: 1089:				state->has_errors = true;
+    #####: 1090:				token_display_error(tk, "internal error: Expected a param here!");
+    #####: 1091:				state->state = ParserStateBeginStatement;
+        -: 1092:			} else {
+    #####: 1093:				last_param--;
+    #####: 1094:				FnParam *p = vec_element_at(&fn->params, last_param);
+    #####: 1095:				strcpy(p->name, tk->token);
+    #####: 1096:				state->state = ParserStateExpectIncompleteFnParamCommaOrEnd;
+        -: 1097:			}
+        -: 1098:		}
+        -: 1099:	} else {
+        -: 1100:		// unexpected - error
+    #####: 1101:		state->state = ParserStateBeginStatement;
+    #####: 1102:		state->has_errors = true;
+    #####: 1103:		token_display_error(tk, "Expected param name. Found [%s]", tk->token);
+        -: 1104:	}
+    #####: 1105:}
+        -: 1106:
+    #####: 1107:void proc_ParserStateExpectIncompleteFnParamCommaOrEnd(ParserState *state, Token *tk) {
+    #####: 1108:	if (!strcmp(tk->token, ",")) {
+        -: 1109:		// look for the next param
+    #####: 1110:		state->state = ParserStateExpectIncompleteFnMutOrType;
+    #####: 1111:	} else if (!strcmp(tk->token, ")")) {
+    #####: 1112:		state->state = ParserStateIncompleteExpectSemiOrTypeArrow;
         -: 1113:	} else {
-        -: 1114:		// unexpected - error
-    #####: 1115:		state->state = ParserStateBeginStatement;
-    #####: 1116:		state->has_errors = true;
-    #####: 1117:		token_display_error(tk, "Expected return type. Found [%s]", tk->token);
-        -: 1118:	}
-    #####: 1119:}
-        -: 1120:
-    #####: 1121:void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk) {
-    #####: 1122:	if (!strcmp(tk->token, "mut")) {
-    #####: 1123:		u64 last = vec_size(&state->incomplete_fns);
-    #####: 1124:		if (last == 0) {
-    #####: 1125:			state->has_errors = true;
-    #####: 1126:			token_display_error(tk, "internal error: Expected an incomplete function here!");
-    #####: 1127:			state->state = ParserStateBeginStatement;
-        -: 1128:		} else {
-    #####: 1129:			last--;
-    #####: 1130:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
-        -: 1131:			FnParam param;
-    #####: 1132:			param.is_mut = true;
-    #####: 1133:			vec_push(&fn->params, &param);
-    #####: 1134:			state->state = ParserStateExpectIncompleteFnType;
-        -: 1135:		}
-    #####: 1136:	} else if (tk->type == TokenTypeIdent) {
-        -: 1137:		// It's a type name pass on to Type fn
-    #####: 1138:		u64 last = vec_size(&state->incomplete_fns);
-    #####: 1139:		if (last == 0) {
-    #####: 1140:			state->has_errors = true;
-    #####: 1141:			token_display_error(tk, "internal error: Expected an incomplete function here!");
-    #####: 1142:			state->state = ParserStateBeginStatement;
-        -: 1143:		} else {
-    #####: 1144:			last--;
-    #####: 1145:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
-        -: 1146:			FnParam param;
-    #####: 1147:			param.is_mut = false;
-    #####: 1148:			vec_push(&fn->params, &param);
-    #####: 1149:			proc_ParserStateExpectIncompleteFnType(state, tk);
-        -: 1150:		}
-    #####: 1151:	} else if (!strcmp(tk->token, ")")) {
-        -: 1152:		// this is a parameterless function
-    #####: 1153:		state->state = ParserStateIncompleteExpectSemiOrTypeArrow;
-        -: 1154:	} else {
-        -: 1155:		// unexpected - error
-    #####: 1156:		state->state = ParserStateBeginStatement;
-    #####: 1157:		state->has_errors = true;
-    #####: 1158:		token_display_error(tk, "Expected 'mut' or type name. Found [%s]", tk->token);
-        -: 1159:	}
-    #####: 1160:}
-        -: 1161:
-    #####: 1162:void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk,
-        -: 1163:												 const char *args_file) {
-    #####: 1164:	if (tk->type == TokenTypeIdent) {
-        -: 1165:		TypeInfo ti;
-    #####: 1166:		ti.mi = *state->cur;
-    #####: 1167:		strcpy(ti.type_name, state->type_name);
-        -: 1168:
-        -: 1169:		TypeInfo ti_inc;
-    #####: 1170:		ti_inc.mi = *state->cur;
-    #####: 1171:		strcpy(ti_inc.type_name, tk->token);
-        -: 1172:		char incomplete_full_type[PATH_MAX + 1];
-    #####: 1173:		type_info_to_string(&ti_inc, incomplete_full_type, PATH_MAX);
-        -: 1174:
-        -: 1175:		char complete_type[PATH_MAX + 1];
-    #####: 1176:		type_info_to_string(&ti, complete_type, PATH_MAX);
-    #####: 1177:		char *incomplete_type = tk->token;
-    #####: 1178:		bool found = false;
-    #####: 1179:		bool has_impl = false;
-        -: 1180:		char required_trait[PATH_MAX + 1];
-        -: 1181:		bool ret =
-    #####: 1182:			check_super_traits(complete_type, incomplete_full_type, required_trait, PATH_MAX);
-    #####: 1183:		if (!ret) {
-    #####: 1184:			state->has_errors = true;
-        -: 1185:			// TODO: switch to path version of missing trait mod1::mod2::MyTrait
-    #####: 1186:			token_display_error(
-        -: 1187:				tk, "All super traits not implemented for type [%s]. Missing trait [%s]",
-    #####: 1188:				state->type_name, required_trait);
-        -: 1189:		}
-    #####: 1190:		add_trait_impl(incomplete_full_type, complete_type);
-    #####: 1191:		for (u64 i = 0; i < global_incomplete_list.count; i++) {
-    #####: 1192:			if (!strcmp(incomplete_type, global_incomplete_list.types[i].name)) {
-    #####: 1193:				IncompleteType *inc = &global_incomplete_list.types[i];
-    #####: 1194:				for (u64 j = 0; j < inc->count; j++) {
-    #####: 1195:					if (inc->fns[j].has_impl)
-    #####: 1196:						has_impl = true;
-    #####: 1197:					if (inc->fns[j].has_impl) {
-    #####: 1198:						if (inc->fns[j].is_mut) {
-    #####: 1199:							append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
-    #####: 1200:											 incomplete_full_type, inc->fns[j].name);
-        -: 1201:						} else {
-    #####: 1202:							append_to_header(state, "%s %s_%s(const Obj *self",
-    #####: 1203:											 inc->fns[j].return_type, incomplete_full_type,
-    #####: 1204:											 inc->fns[j].name);
-        -: 1205:						}
-        -: 1206:					} else {
-    #####: 1207:						if (inc->fns[j].is_mut) {
-    #####: 1208:							append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
-    #####: 1209:											 complete_type, inc->fns[j].name);
-        -: 1210:						} else {
-    #####: 1211:							append_to_header(state, "%s %s_%s(const Obj *self",
-    #####: 1212:											 inc->fns[j].return_type, complete_type,
-    #####: 1213:											 inc->fns[j].name);
-        -: 1214:						}
-        -: 1215:					}
+    #####: 1114:		state->state = ParserStateBeginStatement;
+    #####: 1115:		state->has_errors = true;
+    #####: 1116:		token_display_error(tk, "Expected [',' or ')']. Found [%s]", tk->token);
+        -: 1117:	}
+    #####: 1118:}
+        -: 1119:
+    #####: 1120:void proc_ParserStateIncompleteExpectSemi(ParserState *state, Token *tk) {
+    #####: 1121:	if (!strcmp(tk->token, ";")) {
+    #####: 1122:		state->state = ParserStateExpectAt;
+        -: 1123:	} else {
+    #####: 1124:		state->state = ParserStateBeginStatement;
+    #####: 1125:		state->has_errors = true;
+    #####: 1126:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
+        -: 1127:	}
+    #####: 1128:}
+        -: 1129:
+    #####: 1130:void proc_ParserStateIncompleteExpectSemiOrTypeArrow(ParserState *state, Token *tk) {
+    #####: 1131:	if (!strcmp(tk->token, "->")) {
+    #####: 1132:		state->state = ParserStateIncompleteExpectReturnType;
+    #####: 1133:	} else if (!strcmp(tk->token, ";")) {
+    #####: 1134:		state->state = ParserStateExpectAt;
+        -: 1135:	} else {
+    #####: 1136:		state->state = ParserStateBeginStatement;
+    #####: 1137:		state->has_errors = true;
+    #####: 1138:		token_display_error(tk, "Expected [';' or '->']. Found [%s]", tk->token);
+        -: 1139:	}
+    #####: 1140:}
+        -: 1141:
+    #####: 1142:void proc_ParserStateIncompleteExpectReturnType(ParserState *state, Token *tk) {
+    #####: 1143:	if (tk->type == TokenTypeIdent) {
+    #####: 1144:		u64 last = vec_size(&state->incomplete_fns);
+    #####: 1145:		if (last == 0) {
+    #####: 1146:			state->has_errors = true;
+    #####: 1147:			token_display_error(tk, "internal error: Expected return type here!");
+    #####: 1148:			state->state = ParserStateBeginStatement;
+        -: 1149:		} else {
+    #####: 1150:			last--;
+    #####: 1151:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
+    #####: 1152:			strcpy(fn->return_type, tk->token);
+    #####: 1153:			state->state = ParserStateIncompleteExpectSemi;
+        -: 1154:		}
+        -: 1155:	} else {
+        -: 1156:		// unexpected - error
+    #####: 1157:		state->state = ParserStateBeginStatement;
+    #####: 1158:		state->has_errors = true;
+    #####: 1159:		token_display_error(tk, "Expected return type. Found [%s]", tk->token);
+        -: 1160:	}
+    #####: 1161:}
+        -: 1162:
+    #####: 1163:void proc_ParserStateExpectIncompleteFnMutOrType(ParserState *state, Token *tk) {
+    #####: 1164:	if (!strcmp(tk->token, "mut")) {
+    #####: 1165:		u64 last = vec_size(&state->incomplete_fns);
+    #####: 1166:		if (last == 0) {
+    #####: 1167:			state->has_errors = true;
+    #####: 1168:			token_display_error(tk, "internal error: Expected an incomplete function here!");
+    #####: 1169:			state->state = ParserStateBeginStatement;
+        -: 1170:		} else {
+    #####: 1171:			last--;
+    #####: 1172:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
+        -: 1173:			FnParam param;
+    #####: 1174:			param.is_mut = true;
+    #####: 1175:			vec_push(&fn->params, &param);
+    #####: 1176:			state->state = ParserStateExpectIncompleteFnType;
+        -: 1177:		}
+    #####: 1178:	} else if (tk->type == TokenTypeIdent) {
+        -: 1179:		// It's a type name pass on to Type fn
+    #####: 1180:		u64 last = vec_size(&state->incomplete_fns);
+    #####: 1181:		if (last == 0) {
+    #####: 1182:			state->has_errors = true;
+    #####: 1183:			token_display_error(tk, "internal error: Expected an incomplete function here!");
+    #####: 1184:			state->state = ParserStateBeginStatement;
+        -: 1185:		} else {
+    #####: 1186:			last--;
+    #####: 1187:			IncompleteFn *fn = vec_element_at(&state->incomplete_fns, last);
+        -: 1188:			FnParam param;
+    #####: 1189:			param.is_mut = false;
+    #####: 1190:			vec_push(&fn->params, &param);
+    #####: 1191:			proc_ParserStateExpectIncompleteFnType(state, tk);
+        -: 1192:		}
+    #####: 1193:	} else if (!strcmp(tk->token, ")")) {
+        -: 1194:		// this is a parameterless function
+    #####: 1195:		state->state = ParserStateIncompleteExpectSemiOrTypeArrow;
+        -: 1196:	} else {
+        -: 1197:		// unexpected - error
+    #####: 1198:		state->state = ParserStateBeginStatement;
+    #####: 1199:		state->has_errors = true;
+    #####: 1200:		token_display_error(tk, "Expected 'mut' or type name. Found [%s]", tk->token);
+        -: 1201:	}
+    #####: 1202:}
+        -: 1203:
+    #####: 1204:void proc_ParserStateExpectIncompleteNameForImpl(ParserState *state, Token *tk,
+        -: 1205:												 const char *args_file) {
+    #####: 1206:	if (tk->type == TokenTypeIdent) {
+        -: 1207:		TypeInfo ti;
+    #####: 1208:		ti.mi = *state->cur;
+    #####: 1209:		strcpy(ti.type_name, state->type_name);
+        -: 1210:
+        -: 1211:		TypeInfo ti_inc;
+    #####: 1212:		ti_inc.mi = *state->cur;
+    #####: 1213:		strcpy(ti_inc.type_name, tk->token);
+        -: 1214:		char incomplete_full_type[PATH_MAX + 1];
+    #####: 1215:		type_info_to_string(&ti_inc, incomplete_full_type, PATH_MAX);
         -: 1216:
-    #####: 1217:					expand_params(state, &inc->fns[j], NULL);
-    #####: 1218:					append_to_header(state, ");");
-        -: 1219:				}
-    #####: 1220:				append_to_header(
-        -: 1221:					state, "static void __attribute__((constructor)) vtable_add_inc_impl_%s_%s() {",
-        -: 1222:					complete_type, incomplete_type);
-    #####: 1223:				for (u64 j = 0; j < inc->count; j++) {
-    #####: 1224:					if (inc->fns[j].has_impl) {
-    #####: 1225:						append_to_header(
-        -: 1226:							state,
-        -: 1227:							"VtableEntry next_%" PRIu64
-        -: 1228:							" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
-    #####: 1229:							j, inc->fns[j].name, incomplete_full_type, inc->fns[j].name,
-        -: 1230:							complete_type, j);
-        -: 1231:					} else {
-    #####: 1232:						append_to_header(
-        -: 1233:							state,
-        -: 1234:							"VtableEntry next_%" PRIu64
-        -: 1235:							" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
-    #####: 1236:							j, inc->fns[j].name, complete_type, inc->fns[j].name, complete_type, j);
-        -: 1237:					}
-        -: 1238:				}
-    #####: 1239:				append_to_header(state, "}");
-    #####: 1240:				found = true;
-        -: 1241:			}
-        -: 1242:		}
-        -: 1243:
-    #####: 1244:		if (has_impl) {
-        -: 1245:			TypeInfo ti;
-    #####: 1246:			ti.mi = *(state->cur);
-    #####: 1247:			strcpy(ti.type_name, incomplete_type);
-    #####: 1248:			ti.gen_file_counter = state->gen_file_counter;
-    #####: 1249:			vec_push(state->types, &ti);
-        -: 1250:
-    #####: 1251:			FILE *fp = myfopen(args_file, "a");
-    #####: 1252:			fprintf(fp, "-DType_Expand_%s_=\"\"\n", incomplete_full_type);
-    #####: 1253:			myfclose(fp);
-        -: 1254:		}
-        -: 1255:
-    #####: 1256:		if (!found) {
-    #####: 1257:			state->has_errors = true;
-    #####: 1258:			token_display_error(tk, "Attempt to complete an unknown incomplete type [%s]",
-        -: 1259:								incomplete_type);
-        -: 1260:		}
-    #####: 1261:		state->state = ParserStateImplExpectSemi;
-        -: 1262:	} else {
-    #####: 1263:		state->state = ParserStateBeginStatement;
-    #####: 1264:		state->has_errors = true;
-    #####: 1265:		token_display_error(tk, "Expected type name. Found [%s]", tk->token);
-        -: 1266:	}
-    #####: 1267:}
-        -: 1268:
-    #####: 1269:void proc_ParserStateImplExpectSemi(ParserState *state, Token *tk) {
-    #####: 1270:	if (!strcmp(tk->token, ";")) {
-    #####: 1271:		state->state = ParserStateBeginStatement;
-        -: 1272:	} else {
-    #####: 1273:		state->state = ParserStateBeginStatement;
-    #####: 1274:		state->has_errors = true;
-    #####: 1275:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
-        -: 1276:	}
-    #####: 1277:}
-        -: 1278:
-    #####: 1279:void file_for(const char *base_dir, const ModuleInfo *self_info, char buf[PATH_MAX]) {
-    #####: 1280:	Path ret;
-    #####: 1281:	path_for(&ret, base_dir);
-    #####: 1282:	for (u64 i = 0; self_info->sub_module_count != 0 && i < self_info->sub_module_count; i++) {
-    #####: 1283:		path_push(&ret, self_info->module_list[i].name);
-        -: 1284:	}
-    #####: 1285:	if (self_info->sub_module_count == 0) {
-    #####: 1286:		path_push(&ret, "mod.h");
-        -: 1287:	} else {
-        -: 1288:		char module_file_f[PATH_MAX];
-    #####: 1289:		strcpy(module_file_f, path_to_string(&ret));
-    #####: 1290:		strcat(module_file_f, ".h");
-        -: 1291:
-    #####: 1292:		Path test_f;
-    #####: 1293:		path_for(&test_f, module_file_f);
-    #####: 1294:		if (path_exists(&test_f)) {
-    #####: 1295:			path_cleanup(&ret);
-    #####: 1296:			path_copy(&ret, &test_f);
-        -: 1297:		} else {
-    #####: 1298:			path_pop(&ret);
-    #####: 1299:			path_push(&ret, self_info->module_list[self_info->sub_module_count - 1].name);
-    #####: 1300:			path_push(&ret, "mod.h");
-    #####: 1301:			if (!path_exists(&ret)) {
-    #####: 1302:				exit_error("Module: [%s] not found!", path_to_string(&ret));
-        -: 1303:			}
+        -: 1217:		char complete_type[PATH_MAX + 1];
+    #####: 1218:		type_info_to_string(&ti, complete_type, PATH_MAX);
+    #####: 1219:		char *incomplete_type = tk->token;
+    #####: 1220:		bool found = false;
+    #####: 1221:		bool has_impl = false;
+        -: 1222:		char required_trait[PATH_MAX + 1];
+        -: 1223:		bool ret =
+    #####: 1224:			check_super_traits(complete_type, incomplete_full_type, required_trait, PATH_MAX);
+    #####: 1225:		if (!ret) {
+    #####: 1226:			state->has_errors = true;
+        -: 1227:			// TODO: switch to path version of missing trait mod1::mod2::MyTrait
+    #####: 1228:			token_display_error(
+        -: 1229:				tk, "All super traits not implemented for type [%s]. Missing trait [%s]",
+    #####: 1230:				state->type_name, required_trait);
+        -: 1231:		}
+    #####: 1232:		add_trait_impl(incomplete_full_type, complete_type);
+    #####: 1233:		for (u64 i = 0; i < global_incomplete_list.count; i++) {
+    #####: 1234:			if (!strcmp(incomplete_type, global_incomplete_list.types[i].name)) {
+    #####: 1235:				IncompleteType *inc = &global_incomplete_list.types[i];
+    #####: 1236:				for (u64 j = 0; j < inc->count; j++) {
+    #####: 1237:					if (inc->fns[j].has_impl)
+    #####: 1238:						has_impl = true;
+    #####: 1239:					if (inc->fns[j].has_impl) {
+    #####: 1240:						if (inc->fns[j].is_mut) {
+    #####: 1241:							append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
+    #####: 1242:											 incomplete_full_type, inc->fns[j].name);
+        -: 1243:						} else {
+    #####: 1244:							append_to_header(state, "%s %s_%s(const Obj *self",
+    #####: 1245:											 inc->fns[j].return_type, incomplete_full_type,
+    #####: 1246:											 inc->fns[j].name);
+        -: 1247:						}
+        -: 1248:					} else {
+    #####: 1249:						if (inc->fns[j].is_mut) {
+    #####: 1250:							append_to_header(state, "%s %s_%s(Obj *self", inc->fns[j].return_type,
+    #####: 1251:											 complete_type, inc->fns[j].name);
+        -: 1252:						} else {
+    #####: 1253:							append_to_header(state, "%s %s_%s(const Obj *self",
+    #####: 1254:											 inc->fns[j].return_type, complete_type,
+    #####: 1255:											 inc->fns[j].name);
+        -: 1256:						}
+        -: 1257:					}
+        -: 1258:
+    #####: 1259:					expand_params(state, &inc->fns[j], NULL);
+    #####: 1260:					append_to_header(state, ");");
+        -: 1261:				}
+    #####: 1262:				append_to_header(state, "extern Vtable %s_Vtable__;", complete_type);
+    #####: 1263:				append_to_header(
+        -: 1264:					state, "static void __attribute__((constructor)) vtable_add_inc_impl_%s_%s() {",
+        -: 1265:					complete_type, incomplete_type);
+    #####: 1266:				for (u64 j = 0; j < inc->count; j++) {
+    #####: 1267:					if (inc->fns[j].has_impl) {
+    #####: 1268:						append_to_header(
+        -: 1269:							state,
+        -: 1270:							"VtableEntry "
+        -: 1271:							"next_%" PRIu64
+        -: 1272:							" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
+    #####: 1273:							j, inc->fns[j].name, incomplete_full_type, inc->fns[j].name,
+        -: 1274:							complete_type, j);
+        -: 1275:					} else {
+    #####: 1276:						append_to_header(
+        -: 1277:							state,
+        -: 1278:							"VtableEntry next_%" PRIu64
+        -: 1279:							" = {\"%s\", %s_%s}; vtable_add_entry(&%s_Vtable__, next_%" PRIu64 ");",
+    #####: 1280:							j, inc->fns[j].name, complete_type, inc->fns[j].name, complete_type, j);
+        -: 1281:					}
+        -: 1282:				}
+    #####: 1283:				append_to_header(state, "}");
+    #####: 1284:				found = true;
+        -: 1285:			}
+        -: 1286:		}
+        -: 1287:
+    #####: 1288:		if (has_impl) {
+        -: 1289:			TypeInfo ti;
+    #####: 1290:			ti.mi = *(state->cur);
+    #####: 1291:			strcpy(ti.type_name, incomplete_type);
+    #####: 1292:			ti.gen_file_counter = state->gen_file_counter;
+    #####: 1293:			vec_push(state->types, &ti);
+        -: 1294:
+    #####: 1295:			FILE *fp = myfopen(args_file, "a");
+    #####: 1296:			fprintf(fp, "-DType_Expand_%s_=\"\"\n", incomplete_full_type);
+    #####: 1297:			myfclose(fp);
+        -: 1298:		}
+        -: 1299:
+    #####: 1300:		if (!found) {
+    #####: 1301:			state->has_errors = true;
+    #####: 1302:			token_display_error(tk, "Attempt to complete an unknown incomplete type [%s]",
+        -: 1303:								incomplete_type);
         -: 1304:		}
-        -: 1305:	}
-    #####: 1306:	if (path_canonicalize(&ret)) {
-    #####: 1307:		exit_error("Path %s does not exist.", path_to_string(&ret));
-        -: 1308:	}
-    #####: 1309:	strcpy(buf, path_to_string(&ret));
-    #####: 1310:}
-        -: 1311:
-    #####: 1312:void init_parser(const char *args_file) {
-    #####: 1313:	Vec build_fns;
-    #####: 1314:	vec_init(&build_fns, 1, sizeof(IncompleteFn));
-        -: 1315:	IncompleteFn build;
-    #####: 1316:	build.has_impl = false;
-    #####: 1317:	strcpy(build.name, "build");
-    #####: 1318:	strcpy(build.return_type, "void");
-    #####: 1319:	vec_init(&build.params, 1, sizeof(FnParam));
-    #####: 1320:	FnParam config = {.is_mut = true};
-    #####: 1321:	strcpy(config.type, "__config__");
-    #####: 1322:	strcpy(config.name, "__selfconfig__");
-    #####: 1323:	vec_push(&build.params, &config);
-    #####: 1324:	vec_push(&build_fns, &build);
-        -: 1325:
-    #####: 1326:	add_to_global_incomplete_list("Build", &build_fns, args_file, NULL, NULL);
-        -: 1327:
-    #####: 1328:	Vec drop_fns;
-    #####: 1329:	vec_init(&drop_fns, 1, sizeof(IncompleteFn));
-        -: 1330:	IncompleteFn drop;
-    #####: 1331:	drop.has_impl = false;
-    #####: 1332:	strcpy(drop.name, "drop");
-    #####: 1333:	strcpy(drop.return_type, "void");
-    #####: 1334:	vec_init(&drop.params, 1, sizeof(FnParam));
-    #####: 1335:	vec_push(&drop_fns, &drop);
-        -: 1336:
-    #####: 1337:	add_to_global_incomplete_list("Drop", &drop_fns, args_file, NULL, NULL);
-    #####: 1338:}
-        -: 1339:
-    #####: 1340:void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Vec *types,
-        -: 1341:				  const ModuleInfo *self_info) {
-        -: 1342:
-    #####: 1343:	Path args_path;
-    #####: 1344:	path_for(&args_path, base_dir);
-    #####: 1345:	path_push(&args_path, "target");
-    #####: 1346:	path_push(&args_path, "args");
-    #####: 1347:	path_push(&args_path, "args.txt");
-    #####: 1348:	const char *args_file = path_to_string(&args_path);
-        -: 1349:	char file[PATH_MAX];
-    #####: 1350:	file_for(base_dir, self_info, file);
-        -: 1351:	Lexer l;
-    #####: 1352:	if (lexer_init(&l, file)) {
-    #####: 1353:		exit_error("Could not open module file: '%s'", file);
-        -: 1354:	}
+    #####: 1305:		state->state = ParserStateImplExpectSemi;
+        -: 1306:	} else {
+    #####: 1307:		state->state = ParserStateBeginStatement;
+    #####: 1308:		state->has_errors = true;
+    #####: 1309:		token_display_error(tk, "Expected type name. Found [%s]", tk->token);
+        -: 1310:	}
+    #####: 1311:}
+        -: 1312:
+    #####: 1313:void proc_ParserStateImplExpectSemi(ParserState *state, Token *tk) {
+    #####: 1314:	if (!strcmp(tk->token, ";")) {
+    #####: 1315:		state->state = ParserStateBeginStatement;
+        -: 1316:	} else {
+    #####: 1317:		state->state = ParserStateBeginStatement;
+    #####: 1318:		state->has_errors = true;
+    #####: 1319:		token_display_error(tk, "Expected ';'. Found [%s]", tk->token);
+        -: 1320:	}
+    #####: 1321:}
+        -: 1322:
+    #####: 1323:void file_for(const char *base_dir, const ModuleInfo *self_info, char buf[PATH_MAX]) {
+    #####: 1324:	Path ret;
+    #####: 1325:	path_for(&ret, base_dir);
+    #####: 1326:	for (u64 i = 0; self_info->sub_module_count != 0 && i < self_info->sub_module_count; i++) {
+    #####: 1327:		path_push(&ret, self_info->module_list[i].name);
+        -: 1328:	}
+    #####: 1329:	if (self_info->sub_module_count == 0) {
+    #####: 1330:		path_push(&ret, "mod.h");
+        -: 1331:	} else {
+        -: 1332:		char module_file_f[PATH_MAX];
+    #####: 1333:		strcpy(module_file_f, path_to_string(&ret));
+    #####: 1334:		strcat(module_file_f, ".h");
+        -: 1335:
+    #####: 1336:		Path test_f;
+    #####: 1337:		path_for(&test_f, module_file_f);
+    #####: 1338:		if (path_exists(&test_f)) {
+    #####: 1339:			path_cleanup(&ret);
+    #####: 1340:			path_copy(&ret, &test_f);
+        -: 1341:		} else {
+    #####: 1342:			path_pop(&ret);
+    #####: 1343:			path_push(&ret, self_info->module_list[self_info->sub_module_count - 1].name);
+    #####: 1344:			path_push(&ret, "mod.h");
+    #####: 1345:			if (!path_exists(&ret)) {
+    #####: 1346:				exit_error("Module: [%s] not found!", path_to_string(&ret));
+        -: 1347:			}
+        -: 1348:		}
+        -: 1349:	}
+    #####: 1350:	if (path_canonicalize(&ret)) {
+    #####: 1351:		exit_error("Path %s does not exist.", path_to_string(&ret));
+        -: 1352:	}
+    #####: 1353:	strcpy(buf, path_to_string(&ret));
+    #####: 1354:}
         -: 1355:
-    #####: 1356:	ParserState state = {
-        -: 1357:		.state = ParserStateBeginStatement,
-        -: 1358:		.modules = modules,
-        -: 1359:		.gen_header = NULL,
-        -: 1360:		.header_capacity = 0,
-        -: 1361:		.cur = self_info,
-        -: 1362:		.types = types,
-        -: 1363:		.gen_file_counter = gen_file_counter,
-        -: 1364:		.has_errors = false,
-        -: 1365:	};
-    #####: 1366:	gen_file_counter++;
-        -: 1367:
-    #####: 1368:	vec_init(&state.config_types, 3, sizeof(ConfigType));
-    #####: 1369:	vec_init(&state.config_names, 3, sizeof(ConfigName));
-    #####: 1370:	vec_init(&state.ht.names, 3, sizeof(HeaderNameInfo));
-    #####: 1371:	vec_init(&state.ht.types, 3, sizeof(HeaderTypeInfo));
-    #####: 1372:	vec_init(&state.import_list, 3, sizeof(SubModuleInfo));
-    #####: 1373:	vec_init(&state.incomplete_fns, 3, sizeof(IncompleteFn));
-    #####: 1374:	vec_init(&state.super_traits, 3, sizeof(SuperTraitInfo));
-        -: 1375:
-    #####: 1376:	while (true) {
-        -: 1377:		Token tk;
-    #####: 1378:		int res = lexer_next_token(&l, &tk);
-    #####: 1379:		if (res == LexerStateComplete) {
-    #####: 1380:			break;
-        -: 1381:		}
-        -: 1382:		// printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
-    #####: 1383:		if (tk.type != TokenTypeDoc) {
-        -: 1384:			// skip over doc comments for these purposes
-    #####: 1385:			if (state.state == ParserStateBeginStatement) {
-    #####: 1386:				proc_ParserStateBeginStatement(&state, &tk);
-    #####: 1387:			} else if (state.state == ParserStateExpectModuleName) {
-    #####: 1388:				proc_ParserStateExpectModuleName(&state, &tk);
-    #####: 1389:			} else if (state.state == ParserStateExpectType) {
-    #####: 1390:				proc_ParserStateExpectType(&state, &tk, args_file);
-    #####: 1391:			} else if (state.state == ParserStateExpectName) {
-    #####: 1392:				proc_ParserStateExpectName(&state, &tk);
-    #####: 1393:			} else if (state.state == ParserStateInTypeExpectSemi) {
-    #####: 1394:				proc_ParserStateInTypeExpectSemi(&state, &tk);
-    #####: 1395:			} else if (state.state == ParserStateInImportListExpectModuleName) {
-    #####: 1396:				proc_ParserStateInImportListExpectModuleName(&state, &tk);
-    #####: 1397:			} else if (state.state == ParserStateInImportListExpectSeparator) {
-    #####: 1398:				proc_ParserStateInImportListExpectSeparator(&state, &tk);
-    #####: 1399:			} else if (state.state == ParserStateExpectParenBuildDefn) {
-    #####: 1400:				proc_ParserStateExpectParenBuildDefn(&state, &tk);
-    #####: 1401:			} else if (state.state == ParserStateExpectConfigName) {
-    #####: 1402:				proc_ParserStateExpectConfigName(&state, &tk);
-    #####: 1403:			} else if (state.state == ParserStateExpectConfigComma) {
-    #####: 1404:				proc_ParserStateExpectConfigComma(&state, &tk);
-    #####: 1405:			} else if (state.state == ParserStateExpectConfigType) {
-    #####: 1406:				proc_ParserStateExpectConfigType(&state, &tk);
-    #####: 1407:			} else if (state.state == ParserStateIncompleteName) {
-    #####: 1408:				proc_ParserStateIncompleteName(&state, &tk);
-    #####: 1409:			} else if (state.state == ParserIncompleteExpectBrace) {
-    #####: 1410:				proc_ParserIncompleteExpectBrace(&state, &tk);
-    #####: 1411:			} else if (state.state == ParserStateExpectAt) {
-    #####: 1412:				proc_ParserStateExpectAt(&state, &tk, args_file);
-    #####: 1413:			} else if (state.state == ParserStateExpectIncompleteFnMutOrType) {
-    #####: 1414:				proc_ParserStateExpectIncompleteFnMutOrType(&state, &tk);
-    #####: 1415:			} else if (state.state == ParserStateExpectIncompleteFnName) {
-    #####: 1416:				proc_ParserStateExpectIncompleteFnName(&state, &tk);
-    #####: 1417:			} else if (state.state == ParserStateExpectIncompleteFnParenStart) {
-    #####: 1418:				proc_ParserStateExpectIncompleteFnParenStart(&state, &tk);
-    #####: 1419:			} else if (state.state == ParserStateExpectIncompleteFnType) {
-    #####: 1420:				proc_ParserStateExpectIncompleteFnType(&state, &tk);
-    #####: 1421:			} else if (state.state == ParserStateExpectIncompleteFnParamName) {
-    #####: 1422:				proc_ParserStateExpectIncompleteFnParamName(&state, &tk);
-    #####: 1423:			} else if (state.state == ParserStateExpectIncompleteFnParamCommaOrEnd) {
-    #####: 1424:				proc_ParserStateExpectIncompleteFnParamCommaOrEnd(&state, &tk);
-    #####: 1425:			} else if (state.state == ParserStateIncompleteExpectSemi) {
-    #####: 1426:				proc_ParserStateIncompleteExpectSemi(&state, &tk);
-    #####: 1427:			} else if (state.state == ParserStateIncompleteExpectSemiOrTypeArrow) {
-    #####: 1428:				proc_ParserStateIncompleteExpectSemiOrTypeArrow(&state, &tk);
-    #####: 1429:			} else if (state.state == ParserStateIncompleteExpectReturnType) {
-    #####: 1430:				proc_ParserStateIncompleteExpectReturnType(&state, &tk);
-    #####: 1431:			} else if (state.state == ParserStateExpectIncompleteNameForImpl) {
-    #####: 1432:				proc_ParserStateExpectIncompleteNameForImpl(&state, &tk, args_file);
-    #####: 1433:			} else if (state.state == ParserStateImplExpectSemi) {
-    #####: 1434:				proc_ParserStateImplExpectSemi(&state, &tk);
-    #####: 1435:			} else if (state.state == ParserStateExpectIncompleteMutFnName) {
-    #####: 1436:				proc_ParserStateExpectIncompleteMutFnName(&state, &tk);
-    #####: 1437:			} else if (state.state == ParserStateExpectPipe) {
-    #####: 1438:				proc_ParserStateExpectPipe(&state, &tk);
-    #####: 1439:			} else if (state.state == ParserStateExpectArraySize) {
-    #####: 1440:				proc_ParserStateExpectArraySize(&state, &tk);
-    #####: 1441:			} else if (state.state == ParserStateExpectEndArray) {
-    #####: 1442:				proc_ParserStateExpectEndArray(&state, &tk);
-    #####: 1443:			} else if (state.state == ParserStateExpectConfigKeyword) {
-    #####: 1444:				proc_ParserStateExpectConfigKeyword(&state, &tk);
-    #####: 1445:			} else if (state.state == ParserStateExpectIncompleteMutFnNameWithDefaultImpl) {
-    #####: 1446:				proc_ParserStateExpectIncompleteMutFnNameWithDefaultImpl(&state, &tk);
-    #####: 1447:			} else if (state.state == ParserStateExpectPlusOrBrace) {
-    #####: 1448:				proc_ParserStateExpectPlusOrBrace(&state, &tk);
-    #####: 1449:			} else if (state.state == ParserStateExpectSuperTrait) {
-    #####: 1450:				proc_ParserStateExpectSuperTrait(&state, &tk);
-    #####: 1451:			} else if (tk.type == TokenTypePunct) {
-    #####: 1452:				if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
-    #####: 1453:					state.state = ParserStateBeginStatement;
-    #####: 1454:				} else if (!strcmp(tk.token, "{") && state.state == ParserStateExpectBrace) {
-        -: 1455:					TypeInfo ti;
-    #####: 1456:					ti.mi = *state.cur;
-    #####: 1457:					strcpy(ti.type_name, state.type_name);
-    #####: 1458:					ti.gen_file_counter = state.gen_file_counter;
-    #####: 1459:					vec_push(types, &ti);
-    #####: 1460:					state.state = ParserStateExpectType;
-    #####: 1461:					state.cur_is_array = false;
-    #####: 1462:				} else if (!strcmp(tk.token, "::") && state.state == ParserStateExpectBrace) {
-        -: 1463:					// This is an implementation statement
-    #####: 1464:					state.state = ParserStateExpectIncompleteNameForImpl;
-        -: 1465:				} else
-    #####: 1466:					state.state = ParserStateOther;
-        -: 1467:			}
-        -: 1468:		}
-        -: 1469:
-    #####: 1470:		token_cleanup(&tk);
-        -: 1471:	}
-        -: 1472:
-    #####: 1473:	Path gen_header_name;
-        -: 1474:	char header_name[128];
-    #####: 1475:	snprintf(header_name, 128, "f%" PRIu64 "", state.gen_file_counter);
-    #####: 1476:	path_for(&gen_header_name, base_dir);
-    #####: 1477:	path_push(&gen_header_name, "target");
-    #####: 1478:	path_push(&gen_header_name, "include");
-    #####: 1479:	path_push(&gen_header_name, header_name);
-    #####: 1480:	path_mkdir(&gen_header_name, 0700, false);
-    #####: 1481:	path_push(&gen_header_name, "build_specific.h");
-        -: 1482:
-    #####: 1483:	append_to_header(&state, "");
-        -: 1484:
-    #####: 1485:	FILE *fp = myfopen(path_to_string(&gen_header_name), "w");
-    #####: 1486:	if (fprintf(fp, "%s", state.gen_header) < strlen(state.gen_header))
-    #####: 1487:		fprintf(stderr, "Partial write of header: %s occurred!\n",
-        -: 1488:				path_to_string(&gen_header_name));
-        -: 1489:
-    #####: 1490:	myfclose(fp);
-    #####: 1491:	free_gen_header(&state);
-    #####: 1492:	vec_cleanup(&state.ht.names);
-    #####: 1493:	vec_cleanup(&state.ht.types);
-    #####: 1494:	vec_cleanup(&state.import_list);
-    #####: 1495:	vec_cleanup(&state.config_types);
-    #####: 1496:	vec_cleanup(&state.config_names);
-    #####: 1497:	vec_cleanup(&state.incomplete_fns);
-    #####: 1498:	vec_cleanup(&state.super_traits);
-        -: 1499:
-    #####: 1500:	lexer_cleanup(&l);
-        -: 1501:
-    #####: 1502:	if (state.has_errors) {
-    #####: 1503:		exit_error("Compilation of file: %s failed!", file);
-        -: 1504:	}
-    #####: 1505:}
+    #####: 1356:void init_parser(const char *args_file) {
+    #####: 1357:	Vec build_fns;
+    #####: 1358:	vec_init(&build_fns, 1, sizeof(IncompleteFn));
+        -: 1359:	IncompleteFn build;
+    #####: 1360:	build.has_impl = false;
+    #####: 1361:	strcpy(build.name, "build");
+    #####: 1362:	strcpy(build.return_type, "void");
+    #####: 1363:	vec_init(&build.params, 1, sizeof(FnParam));
+    #####: 1364:	FnParam config = {.is_mut = true};
+    #####: 1365:	strcpy(config.type, "__config__");
+    #####: 1366:	strcpy(config.name, "__selfconfig__");
+    #####: 1367:	vec_push(&build.params, &config);
+    #####: 1368:	vec_push(&build_fns, &build);
+        -: 1369:
+    #####: 1370:	add_to_global_incomplete_list("Build", &build_fns, args_file, NULL, NULL);
+        -: 1371:
+    #####: 1372:	Vec drop_fns;
+    #####: 1373:	vec_init(&drop_fns, 1, sizeof(IncompleteFn));
+        -: 1374:	IncompleteFn drop;
+    #####: 1375:	drop.has_impl = false;
+    #####: 1376:	strcpy(drop.name, "drop");
+    #####: 1377:	strcpy(drop.return_type, "void");
+    #####: 1378:	vec_init(&drop.params, 1, sizeof(FnParam));
+    #####: 1379:	vec_push(&drop_fns, &drop);
+        -: 1380:
+    #####: 1381:	add_to_global_incomplete_list("Drop", &drop_fns, args_file, NULL, NULL);
+    #####: 1382:}
+        -: 1383:
+    #####: 1384:void parse_header(const char *config_dir, const char *base_dir, Vec *modules, Vec *types,
+        -: 1385:				  const ModuleInfo *self_info) {
+        -: 1386:
+    #####: 1387:	Path args_path;
+    #####: 1388:	path_for(&args_path, base_dir);
+    #####: 1389:	path_push(&args_path, "target");
+    #####: 1390:	path_push(&args_path, "args");
+    #####: 1391:	path_push(&args_path, "args.txt");
+    #####: 1392:	const char *args_file = path_to_string(&args_path);
+        -: 1393:	char file[PATH_MAX];
+    #####: 1394:	file_for(base_dir, self_info, file);
+        -: 1395:	Lexer l;
+    #####: 1396:	if (lexer_init(&l, file)) {
+    #####: 1397:		exit_error("Could not open module file: '%s'", file);
+        -: 1398:	}
+        -: 1399:
+    #####: 1400:	ParserState state = {
+        -: 1401:		.state = ParserStateBeginStatement,
+        -: 1402:		.modules = modules,
+        -: 1403:		.gen_header = NULL,
+        -: 1404:		.header_capacity = 0,
+        -: 1405:		.cur = self_info,
+        -: 1406:		.types = types,
+        -: 1407:		.gen_file_counter = gen_file_counter,
+        -: 1408:		.has_errors = false,
+        -: 1409:	};
+    #####: 1410:	gen_file_counter++;
+        -: 1411:
+    #####: 1412:	vec_init(&state.config_types, 3, sizeof(ConfigType));
+    #####: 1413:	vec_init(&state.config_names, 3, sizeof(ConfigName));
+    #####: 1414:	vec_init(&state.ht.names, 3, sizeof(HeaderNameInfo));
+    #####: 1415:	vec_init(&state.ht.types, 3, sizeof(HeaderTypeInfo));
+    #####: 1416:	vec_init(&state.import_list, 3, sizeof(SubModuleInfo));
+    #####: 1417:	vec_init(&state.incomplete_fns, 3, sizeof(IncompleteFn));
+    #####: 1418:	vec_init(&state.super_traits, 3, sizeof(SuperTraitInfo));
+        -: 1419:
+    #####: 1420:	while (true) {
+        -: 1421:		Token tk;
+    #####: 1422:		int res = lexer_next_token(&l, &tk);
+    #####: 1423:		if (res == LexerStateComplete) {
+    #####: 1424:			break;
+        -: 1425:		}
+        -: 1426:		// printf("state=%i,token_type=%i,token_value='%s'\n", state.state, tk.type, tk.token);
+    #####: 1427:		if (tk.type != TokenTypeDoc) {
+        -: 1428:			// skip over doc comments for these purposes
+    #####: 1429:			if (state.state == ParserStateBeginStatement) {
+    #####: 1430:				proc_ParserStateBeginStatement(&state, &tk);
+    #####: 1431:			} else if (state.state == ParserStateExpectModuleName) {
+    #####: 1432:				proc_ParserStateExpectModuleName(&state, &tk);
+    #####: 1433:			} else if (state.state == ParserStateExpectType) {
+    #####: 1434:				proc_ParserStateExpectType(&state, &tk, args_file);
+    #####: 1435:			} else if (state.state == ParserStateExpectName) {
+    #####: 1436:				proc_ParserStateExpectName(&state, &tk);
+    #####: 1437:			} else if (state.state == ParserStateInTypeExpectSemi) {
+    #####: 1438:				proc_ParserStateInTypeExpectSemi(&state, &tk);
+    #####: 1439:			} else if (state.state == ParserStateInImportListExpectModuleName) {
+    #####: 1440:				proc_ParserStateInImportListExpectModuleName(&state, &tk);
+    #####: 1441:			} else if (state.state == ParserStateInImportListExpectSeparator) {
+    #####: 1442:				proc_ParserStateInImportListExpectSeparator(&state, &tk);
+    #####: 1443:			} else if (state.state == ParserStateExpectParenBuildDefn) {
+    #####: 1444:				proc_ParserStateExpectParenBuildDefn(&state, &tk);
+    #####: 1445:			} else if (state.state == ParserStateExpectConfigName) {
+    #####: 1446:				proc_ParserStateExpectConfigName(&state, &tk);
+    #####: 1447:			} else if (state.state == ParserStateExpectConfigComma) {
+    #####: 1448:				proc_ParserStateExpectConfigComma(&state, &tk);
+    #####: 1449:			} else if (state.state == ParserStateExpectConfigType) {
+    #####: 1450:				proc_ParserStateExpectConfigType(&state, &tk);
+    #####: 1451:			} else if (state.state == ParserStateIncompleteName) {
+    #####: 1452:				proc_ParserStateIncompleteName(&state, &tk);
+    #####: 1453:			} else if (state.state == ParserIncompleteExpectBrace) {
+    #####: 1454:				proc_ParserIncompleteExpectBrace(&state, &tk);
+    #####: 1455:			} else if (state.state == ParserStateExpectAt) {
+    #####: 1456:				proc_ParserStateExpectAt(&state, &tk, args_file);
+    #####: 1457:			} else if (state.state == ParserStateExpectIncompleteFnMutOrType) {
+    #####: 1458:				proc_ParserStateExpectIncompleteFnMutOrType(&state, &tk);
+    #####: 1459:			} else if (state.state == ParserStateExpectIncompleteFnName) {
+    #####: 1460:				proc_ParserStateExpectIncompleteFnName(&state, &tk);
+    #####: 1461:			} else if (state.state == ParserStateExpectIncompleteFnParenStart) {
+    #####: 1462:				proc_ParserStateExpectIncompleteFnParenStart(&state, &tk);
+    #####: 1463:			} else if (state.state == ParserStateExpectIncompleteFnType) {
+    #####: 1464:				proc_ParserStateExpectIncompleteFnType(&state, &tk);
+    #####: 1465:			} else if (state.state == ParserStateExpectIncompleteFnParamName) {
+    #####: 1466:				proc_ParserStateExpectIncompleteFnParamName(&state, &tk);
+    #####: 1467:			} else if (state.state == ParserStateExpectIncompleteFnParamCommaOrEnd) {
+    #####: 1468:				proc_ParserStateExpectIncompleteFnParamCommaOrEnd(&state, &tk);
+    #####: 1469:			} else if (state.state == ParserStateIncompleteExpectSemi) {
+    #####: 1470:				proc_ParserStateIncompleteExpectSemi(&state, &tk);
+    #####: 1471:			} else if (state.state == ParserStateIncompleteExpectSemiOrTypeArrow) {
+    #####: 1472:				proc_ParserStateIncompleteExpectSemiOrTypeArrow(&state, &tk);
+    #####: 1473:			} else if (state.state == ParserStateIncompleteExpectReturnType) {
+    #####: 1474:				proc_ParserStateIncompleteExpectReturnType(&state, &tk);
+    #####: 1475:			} else if (state.state == ParserStateExpectIncompleteNameForImpl) {
+    #####: 1476:				proc_ParserStateExpectIncompleteNameForImpl(&state, &tk, args_file);
+    #####: 1477:			} else if (state.state == ParserStateImplExpectSemi) {
+    #####: 1478:				proc_ParserStateImplExpectSemi(&state, &tk);
+    #####: 1479:			} else if (state.state == ParserStateExpectIncompleteMutFnName) {
+    #####: 1480:				proc_ParserStateExpectIncompleteMutFnName(&state, &tk);
+    #####: 1481:			} else if (state.state == ParserStateExpectPipe) {
+    #####: 1482:				proc_ParserStateExpectPipe(&state, &tk);
+    #####: 1483:			} else if (state.state == ParserStateExpectArraySize) {
+    #####: 1484:				proc_ParserStateExpectArraySize(&state, &tk);
+    #####: 1485:			} else if (state.state == ParserStateExpectEndArray) {
+    #####: 1486:				proc_ParserStateExpectEndArray(&state, &tk);
+    #####: 1487:			} else if (state.state == ParserStateExpectConfigKeyword) {
+    #####: 1488:				proc_ParserStateExpectConfigKeyword(&state, &tk);
+    #####: 1489:			} else if (state.state == ParserStateExpectIncompleteMutFnNameWithDefaultImpl) {
+    #####: 1490:				proc_ParserStateExpectIncompleteMutFnNameWithDefaultImpl(&state, &tk);
+    #####: 1491:			} else if (state.state == ParserStateExpectPlusOrBrace) {
+    #####: 1492:				proc_ParserStateExpectPlusOrBrace(&state, &tk);
+    #####: 1493:			} else if (state.state == ParserStateExpectSuperTrait) {
+    #####: 1494:				proc_ParserStateExpectSuperTrait(&state, &tk);
+    #####: 1495:			} else if (tk.type == TokenTypePunct) {
+    #####: 1496:				if (!strcmp(tk.token, "}") || !strcmp(tk.token, ";")) {
+    #####: 1497:					state.state = ParserStateBeginStatement;
+    #####: 1498:				} else if (!strcmp(tk.token, "{") && state.state == ParserStateExpectBrace) {
+        -: 1499:					TypeInfo ti;
+    #####: 1500:					ti.mi = *state.cur;
+    #####: 1501:					strcpy(ti.type_name, state.type_name);
+    #####: 1502:					ti.gen_file_counter = state.gen_file_counter;
+    #####: 1503:					vec_push(types, &ti);
+    #####: 1504:					state.state = ParserStateExpectType;
+    #####: 1505:					state.cur_is_array = false;
+    #####: 1506:				} else if (!strcmp(tk.token, "::") && state.state == ParserStateExpectBrace) {
+        -: 1507:					// This is an implementation statement
+    #####: 1508:					state.state = ParserStateExpectIncompleteNameForImpl;
+        -: 1509:				} else
+    #####: 1510:					state.state = ParserStateOther;
+        -: 1511:			}
+        -: 1512:		}
+        -: 1513:
+    #####: 1514:		token_cleanup(&tk);
+        -: 1515:	}
+        -: 1516:
+    #####: 1517:	Path gen_header_name;
+        -: 1518:	char header_name[128];
+    #####: 1519:	snprintf(header_name, 128, "f%" PRIu64 "", state.gen_file_counter);
+    #####: 1520:	path_for(&gen_header_name, base_dir);
+    #####: 1521:	path_push(&gen_header_name, "target");
+    #####: 1522:	path_push(&gen_header_name, "include");
+    #####: 1523:	path_push(&gen_header_name, header_name);
+    #####: 1524:	path_mkdir(&gen_header_name, 0700, false);
+    #####: 1525:	path_push(&gen_header_name, "build_specific.h");
+        -: 1526:
+    #####: 1527:	append_to_header(&state, "");
+        -: 1528:
+    #####: 1529:	FILE *fp = myfopen(path_to_string(&gen_header_name), "w");
+    #####: 1530:	if (fprintf(fp, "%s", state.gen_header) < strlen(state.gen_header))
+    #####: 1531:		fprintf(stderr, "Partial write of header: %s occurred!\n",
+        -: 1532:				path_to_string(&gen_header_name));
+        -: 1533:
+    #####: 1534:	myfclose(fp);
+    #####: 1535:	free_gen_header(&state);
+    #####: 1536:	vec_cleanup(&state.ht.names);
+    #####: 1537:	vec_cleanup(&state.ht.types);
+    #####: 1538:	vec_cleanup(&state.import_list);
+    #####: 1539:	vec_cleanup(&state.config_types);
+    #####: 1540:	vec_cleanup(&state.config_names);
+    #####: 1541:	vec_cleanup(&state.incomplete_fns);
+    #####: 1542:	vec_cleanup(&state.super_traits);
+        -: 1543:
+    #####: 1544:	lexer_cleanup(&l);
+        -: 1545:
+    #####: 1546:	if (state.has_errors) {
+    #####: 1547:		exit_error("Compilation of file: %s failed!", file);
+        -: 1548:	}
+    #####: 1549:}
         -:    0:Source:args.c
         -:    0:Graph:args.gcno
         -:    0:Data:args.gcda
