@@ -22,8 +22,7 @@
 #include <util/replace.h>
 
 int proc_build_init(const char *config_dir, const char *proj_name, const char *proj_path,
-	char authors[11][1024], int author_count, bool lib, char *description)
-{
+					char authors[11][1024], int author_count, bool lib, char *description) {
 	int author_len = 1;
 	for (int i = 0; i < author_count; i++) {
 		author_len += strlen(authors[i]) + 10;
@@ -64,16 +63,42 @@ int proc_build_init(const char *config_dir, const char *proj_name, const char *p
 		exit(-1);
 	}
 
-	const char *patterns_in[]
-		= { "REPLACE_FAM_VERSION", "REPLACE_NAME", "REPLACE_AUTHORS", "REPLACE_DESCRIPTION" };
-	const bool is_case_sensitive[] = { true, true, true };
+	const char *patterns_in[] = {"REPLACE_FAM_VERSION", "REPLACE_NAME", "REPLACE_AUTHORS",
+								 "REPLACE_DESCRIPTION"};
+	const bool is_case_sensitive[] = {true, true, true};
 	char desc[1024];
 	if (strlen(description) > 0)
 		strcpy(desc, description);
 	else
 		strcpy(desc, proj_name);
-	const char *replace[] = { FAM_VERSION, proj_name, author_replace, desc };
+	const char *replace[] = {FAM_VERSION, proj_name, author_replace, desc};
 	replace_file(&path, &path, patterns_in, is_case_sensitive, replace, 4);
+
+	Path main_c;
+	path_for(&main_c, proj_path);
+	path_push(&main_c, "main.c");
+
+	Path main_c_src;
+	path_for(&main_c_src, config_dir);
+	path_push(&main_c_src, "resources");
+	path_push(&main_c_src, "main.c");
+	if (copy_file(path_to_string(&main_c), path_to_string(&main_c_src)) != 0) {
+		perror("Error: copying file");
+		exit(-1);
+	}
+
+	Path mod_h;
+	path_for(&mod_h, proj_path);
+	path_push(&mod_h, "mod.h");
+
+	Path mod_h_src;
+	path_for(&mod_h_src, config_dir);
+	path_push(&mod_h_src, "resources");
+	path_push(&mod_h_src, "mod.h");
+	if (copy_file(path_to_string(&mod_h), path_to_string(&mod_h_src)) != 0) {
+		perror("Error: copying file");
+		exit(-1);
+	}
 
 	Path proj_dir;
 	path_for(&proj_dir, proj_path);
