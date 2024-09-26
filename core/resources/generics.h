@@ -2,17 +2,17 @@
 // This example shows how to refer to the implementing type from a trait.
 // Since it is not known by the trait and could be different if
 // multiple types implement this trait.
-@Clone {
-	// The symbol '$' is used to denote the unknown implementing type.
-	@clone()->$;
+@Clone(T[Self]) {
+	// The symbol 'T' is used to denote the unknown implementing type.
+	@clone()->T;
 
 	// This mutable function has a default implementation so no '@'. 'source' is of type '$'
 	// (completing type) and it is passed by reference '&'.
-	mut clone_from($ & source);
+	mut clone_from(T & source);
 }
 
 // SuperClone has two super traits 'Clone' and 'PartialEq'
-@SuperClone(T[Copy]) : Clone + PartialEq + MyOtherTrait(T) {
+@SuperClone(T[Copy]) : Clone, PartialEq, MyOtherTrait(T) {
 }
 
 // Trait ServerApi has a single generic which is declared as 'T'. There is also a trait bound. T

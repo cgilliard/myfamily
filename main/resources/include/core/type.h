@@ -95,6 +95,8 @@ FatPtr build_fat_ptr(u64 size);
 #define Cleanup Obj __attribute__((warn_unused_result, cleanup(Obj_cleanup)))
 #define mut Cleanup
 #define let const Cleanup
+#define returnlet const Obj
+#define returnmut Obj
 
 #define SET_PARAM__(single, name, ...)                                                             \
 	__VA_OPT__(__config_.name = __VA_ARGS__; __config_.name##_is_set__ = true;)                    \
