@@ -1,2 +1,0 @@
-x'REPLACE3' ok yes 'REPLACE2'
-another 'REPLACE1'

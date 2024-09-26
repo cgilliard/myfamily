@@ -11,13 +11,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-#include <core/panic.h>
-#include <core/type.h>
-#include <core/types.h>
-
-#include <build_specific.h>
-
-#ifdef IMPL
-TYPE_EXPAND(IMPL)
-#endif // IMPL
