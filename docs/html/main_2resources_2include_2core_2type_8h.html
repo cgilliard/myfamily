@@ -157,8 +157,8 @@ Macros</h2></td></tr>
 <tr class="separator:a80f494d2c78fd710f754f517a6079ed7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf216de893e7b14b84b2afeadbc84ecb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_2resources_2include_2core_2type_8h.html#aaf216de893e7b14b84b2afeadbc84ecb">Free</a>(name)</td></tr>
 <tr class="separator:aaf216de893e7b14b84b2afeadbc84ecb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a264e888f4090dc780bd6fe2d16396489"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_2resources_2include_2core_2type_8h.html#a264e888f4090dc780bd6fe2d16396489">Config</a>(...)&#160;&#160;&#160;(((const IMPLCONFIG *)(__selfconfig__))-&gt;__VA_ARGS__)</td></tr>
-<tr class="separator:a264e888f4090dc780bd6fe2d16396489"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26c5f175965acbaa4c5719db77465a15"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_2resources_2include_2core_2type_8h.html#a26c5f175965acbaa4c5719db77465a15">Options</a>(...)&#160;&#160;&#160;(((const IMPLCONFIG *)(__selfconfig__))-&gt;__VA_ARGS__)</td></tr>
+<tr class="separator:a26c5f175965acbaa4c5719db77465a15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69a96157d78167e6acc05f14d0fe87c2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_2resources_2include_2core_2type_8h.html#a69a96157d78167e6acc05f14d0fe87c2">IsSet</a>(...)&#160;&#160;&#160;(((const IMPLCONFIG *)(__selfconfig__))-&gt;__VA_ARGS__##_is_set__)</td></tr>
 <tr class="separator:a69a96157d78167e6acc05f14d0fe87c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad144168389ae2595d8de744b0555659f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_2resources_2include_2core_2type_8h.html#ad144168389ae2595d8de744b0555659f">fn__</a>(v,  <a class="el" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>)&#160;&#160;&#160;Fn_expand_##v##_return <a class="el" href="main_2resources_2include_2core_2macro__utils_8h.html#ac2c0beae88659357798c2fddb38a6518">CAT</a>(<a class="el" href="header__sample1_8h.html#af6fde94d1594d8b6e626117cde7005ab">i</a>, Fn_expand_##v##_params)</td></tr>
@@ -319,8 +319,8 @@ Variables</h2></td></tr>
 <div class="line">        *((<a class="code" href="base_2types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a> *)(_ref_count__.data)) = 1;                                                         \</div>
 <div class="line">        Obj _ret__ = {&amp;name##_Vtable__, 0, _fptr__, _ref_count__};                                 \</div>
 <div class="line">        Obj_build_int(&amp;_ret__);                                                                    \</div>
-<div class="line">        name##<a class="code" href="main_2resources_2include_2core_2type_8h.html#a264e888f4090dc780bd6fe2d16396489">Config</a> __config_;                                                                    \</div>
-<div class="line">        memset(&amp;__config_, 0, <span class="keyword">sizeof</span>(name##<a class="code" href="main_2resources_2include_2core_2type_8h.html#a264e888f4090dc780bd6fe2d16396489">Config</a>));                                               \</div>
+<div class="line">        name##<a class="code" href="core_2type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a> __config_;                                                                    \</div>
+<div class="line">        memset(&amp;__config_, 0, <span class="keyword">sizeof</span>(name##<a class="code" href="core_2type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a>));                                               \</div>
 <div class="line">        __VA_OPT__(<a class="code" href="base_2macro__utils_8h.html#a57f29b9285b9beab8c788f98b08e3e5e">FOR_EACH</a>(<a class="code" href="main_2resources_2include_2core_2type_8h.html#ac982fb623ab44d3384ab70f592113c58">SET_PARAM</a>, (__VA_ARGS__), (), __VA_ARGS__))                            \</div>
 <div class="line">        Obj_build(&amp;_ret__, &amp;__config_);                                                            \</div>
 <div class="line">        _ret__;                                                                                    \</div>
@@ -328,7 +328,7 @@ Variables</h2></td></tr>
 <div class="ttc" id="abase_2macro__utils_8h_html_a57f29b9285b9beab8c788f98b08e3e5e"><div class="ttname"><a href="base_2macro__utils_8h.html#a57f29b9285b9beab8c788f98b08e3e5e">FOR_EACH</a></div><div class="ttdeci">#define FOR_EACH(m, arg, delim,...)</div><div class="ttdef"><b>Definition:</b> macro_utils.h:97</div></div>
 <div class="ttc" id="abase_2types_8h_html_a332ccd83dfe2973e6cb2b61e4f3ab7e6"><div class="ttname"><a href="base_2types_8h.html#a332ccd83dfe2973e6cb2b61e4f3ab7e6">u32</a></div><div class="ttdeci">#define u32</div><div class="ttdef"><b>Definition:</b> types.h:31</div></div>
 <div class="ttc" id="acore_2type_8h_html_a909192bbfb2649a87561595bca24acaa"><div class="ttname"><a href="core_2type_8h.html#a909192bbfb2649a87561595bca24acaa">build_fat_ptr</a></div><div class="ttdeci">FatPtr build_fat_ptr(u64 size)</div><div class="ttdef"><b>Definition:</b> type.c:33</div></div>
-<div class="ttc" id="amain_2resources_2include_2core_2type_8h_html_a264e888f4090dc780bd6fe2d16396489"><div class="ttname"><a href="main_2resources_2include_2core_2type_8h.html#a264e888f4090dc780bd6fe2d16396489">Config</a></div><div class="ttdeci">#define Config(...)</div></div>
+<div class="ttc" id="acore_2type_8h_html_ad8ab251a24209cfce663a91274994199"><div class="ttname"><a href="core_2type_8h.html#ad8ab251a24209cfce663a91274994199">Config</a></div><div class="ttdeci">#define Config(field_type, field_name)</div></div>
 <div class="ttc" id="amain_2resources_2include_2core_2type_8h_html_ac982fb623ab44d3384ab70f592113c58"><div class="ttname"><a href="main_2resources_2include_2core_2type_8h.html#ac982fb623ab44d3384ab70f592113c58">SET_PARAM</a></div><div class="ttdeci">#define SET_PARAM(single, value)</div><div class="ttdef"><b>Definition:</b> type.h:104</div></div>
 </div><!-- fragment -->
 </div>
@@ -387,24 +387,6 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define Cleanup&#160;&#160;&#160;<a class="el" href="structObj.html">Obj</a> <a class="el" href="main_2resources_2src_2type_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="main_2resources_2src_2type_8c.html#a755c650048dad76731e21e92e73fbd34">Obj_cleanup</a>)))</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a264e888f4090dc780bd6fe2d16396489"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a264e888f4090dc780bd6fe2d16396489">&#9670;&nbsp;</a></span>Config</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define Config</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em></td><td>)</td>
-          <td>&#160;&#160;&#160;(((const IMPLCONFIG *)(__selfconfig__))-&gt;__VA_ARGS__)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -766,6 +748,24 @@ Variables</h2></td></tr>
 <div class="line">    })</div>
 <div class="ttc" id="abase_2heap_8h_html_a958edf5a6e8f13cf7ecc993ca5be7f66"><div class="ttname"><a href="base_2heap_8h.html#a958edf5a6e8f13cf7ecc993ca5be7f66">FAT_PTR_INIT</a></div><div class="ttdeci">#define FAT_PTR_INIT</div><div class="ttdef"><b>Definition:</b> heap.h:244</div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a26c5f175965acbaa4c5719db77465a15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26c5f175965acbaa4c5719db77465a15">&#9670;&nbsp;</a></span>Options</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define Options</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;(((const IMPLCONFIG *)(__selfconfig__))-&gt;__VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
 </div>
 </div>
 <a id="ac9636558921eb2d23aaefa6913d9e0b7"></a>

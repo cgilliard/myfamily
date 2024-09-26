@@ -7107,11 +7107,11 @@ Unit_size:
     #####:  426:}
         -:  427:
     #####:  428:void proc_ParserStateExpectConfigKeyword(ParserState *state, Token *tk) {
-    #####:  429:	if (!strcmp(tk->token, "Config")) {
+    #####:  429:	if (!strcmp(tk->token, "Options")) {
     #####:  430:		state->state = ParserStateExpectParenBuildDefn;
         -:  431:	} else {
     #####:  432:		state->has_errors = true;
-    #####:  433:		token_display_error(tk, "Expected ['Config']. Found [%s]", tk->token);
+    #####:  433:		token_display_error(tk, "Expected ['Options']. Found [%s]", tk->token);
     #####:  434:		state->state = ParserStateBeginStatement;
         -:  435:	}
     #####:  436:}
