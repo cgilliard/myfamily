@@ -26,12 +26,11 @@ int file_count = 0;
 #define MAX_FILES 4096
 int file_sizes[MAX_FILES];
 
-void print_hex(
-	const unsigned char *data, size_t size, FILE *out, const char *file, const char *namespace)
-{
+void print_hex(const unsigned char *data, size_t size, FILE *out, const char *file,
+			   const char *namespace) {
 	char buf[strlen(namespace) + 100];
 	snprintf(buf, strlen(namespace) + 100, "unsigned char %sxxdir_file_%i[] = {\n", namespace,
-		file_count);
+			 file_count);
 	for (int i = 0; i < strlen(buf); i++)
 		if (buf[i] == '.')
 			buf[i] = '_';
@@ -48,8 +47,7 @@ void print_hex(
 	fprintf(out, "0x00};\nsize_t %sxxdir_file_size_%i = %zu;\n", namespace, file_count, size);
 }
 
-void proc_file(const char *file_path, const char *output_header, FILE *out, const char *namespace)
-{
+void proc_file(const char *file_path, const char *output_header, FILE *out, const char *namespace) {
 	FILE *file = fopen(file_path, "rb");
 	if (file == NULL) {
 		perror("Failed to open file");
@@ -80,8 +78,7 @@ void proc_file(const char *file_path, const char *output_header, FILE *out, cons
 }
 
 void include_dir(const char *dir_path, const char *base, char *buf, const char *output_header,
-	FILE *out, const char *namespace)
-{
+				 FILE *out, const char *namespace) {
 	DIR *dir = opendir(dir_path);
 	if (dir == NULL) {
 		perror("Error opening directory");
@@ -95,9 +92,6 @@ void include_dir(const char *dir_path, const char *base, char *buf, const char *
 			continue;
 		}
 
-		// Print the name of the file or directory
-		printf("Including: %s\n", entry->d_name);
-
 		char full_path[strlen(entry->d_name) + strlen(dir_path) + 100];
 		strcpy(full_path, dir_path);
 		strcat(full_path, "/");
@@ -105,7 +99,6 @@ void include_dir(const char *dir_path, const char *base, char *buf, const char *
 
 		struct stat s;
 		if (stat(full_path, &s) == 0 && s.st_mode & S_IFDIR) {
-			printf("is_dir\n");
 			char next_level[PATH_MAX];
 			strcpy(next_level, base);
 			if (strlen(base) > 0)
@@ -128,8 +121,7 @@ void include_dir(const char *dir_path, const char *base, char *buf, const char *
 	}
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	if (argc != 3 && argc != 4) {
 		fprintf(stderr, "Usage: xxdir <resource_directory> <header name> <optional namespace>");
 		exit(-1);

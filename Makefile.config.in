@@ -26,7 +26,9 @@ COVERAGE_FLAGS=--coverage -DTEST
 INSTALL_DIR=/usr/local/bin
 
 # Object directories
-ALL_OBJS=main/*.o
-SUBDIRS := main
+ALL_OBJS=main/*.o args/*.o base/*.o
+SUBDIRS := main args base
 SUBDIRS_RELEASE := $(SUBDIRS)
 HEADERS := $(wildcard main/*.h) \
+	   $(wildcard base/*.h) \
+	   $(wildcard args/*.h) \
