@@ -219,7 +219,7 @@ FatPtr build_fat_ptr(u64 size);
 		}                                                                                          \
 	})
 
-#define $Config(...) (((const IMPLCONFIG *)(__selfconfig__))->__VA_ARGS__)
+#define $Options(...) (((const IMPLCONFIG *)(__selfconfig__))->__VA_ARGS__)
 
 #define $IsSet(...) (((const IMPLCONFIG *)(__selfconfig__))->__VA_ARGS__##_is_set__)
 
