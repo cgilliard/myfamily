@@ -7,7 +7,7 @@ fi
 
 # Check for essential build tools
 echo "Checking for essential build tools..."
-command -v cc >/dev/null 2>&1 || { echo >&2 "GCC is required but not installed. Aborting."; exit 1; }
+command -v cc >/dev/null 2>&1 || { echo >&2 "cc is required but not installed. Aborting."; exit 1; }
 command -v make >/dev/null 2>&1 || { echo >&2 "Make is required but not installed. Aborting."; exit 1; }
 command -v sed >/dev/null 2>&1 }|| { echo >&2 "sed is required but not installed. Aborting."; exit 1; }
 
