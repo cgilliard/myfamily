@@ -16,13 +16,20 @@
 #define _BASE_TYPES__
 
 #include <base/mylimits.h>
-#include <base/mystdint.h>
 
+typedef unsigned char u8;		// 8 bits
+typedef unsigned short u16;		// 16 bits
+typedef unsigned int u32;		// 32 bits
+typedef unsigned long long u64; // 64 bits
+typedef signed char i8;			// 8 bits
+typedef signed short i16;		// 16 bits
+typedef signed int i32;			// 32 bits
+typedef signed long long i64;	// 64 bits
+#define usize u64				// 64 bit only supported type.c guards this
 #define u128 __uint128_t
 #define i128 __int128_t
 #define f64 double
 #define f32 float
-#define usize size_t
 #define bool _Bool
 #define false 0
 #define true 1

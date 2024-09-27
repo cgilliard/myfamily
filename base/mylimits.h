@@ -31,9 +31,7 @@
 typedef __int128 int128_t;
 typedef unsigned __int128 uint128_t;
 
-/*
 // Define limits for these types (assuming they match 128-bit values)
 #define UINT128_MAX ((uint128_t)~0ULL >> 1)			  // 2^128 - 1
 #define INT128_MAX ((int128_t)(UINT128_MAX >> 1))	  // 2^127 - 1
 #define INT128_MIN ((int128_t)(UINT128_MAX >> 1) + 1) // -2^127
-							 */
