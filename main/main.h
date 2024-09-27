@@ -37,4 +37,10 @@ void write_to_disk(const char *dir, const char *file_name, const unsigned char *
 	for (int i = 0; i < namespace##_##xxdir_file_count; i++)                                       \
 	WRITE_RESOURCE_TO_DISK(dir, namespace##_##xxdir_file_names[i], namespace##_##xxdir_files[i],   \
 						   namespace##_##xxdir_file_sizes[i])
+
+#define MAIN                                                                                       \
+	int main(int argc, char **argv) {                                                              \
+		return real_main(argc, argv);                                                              \
+	}
+
 #endif // _MAIN_MAIN__
