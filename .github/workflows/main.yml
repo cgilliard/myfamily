@@ -19,6 +19,9 @@ jobs:
       matrix:
         platform: [linux-amd64]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Check uname
         run: uname -a
       
@@ -41,6 +44,9 @@ jobs:
       matrix:
         platform: [macos]
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Check macOS Version
         run: sw_vers
       
