@@ -348,3 +348,48 @@ MyTest(base, test_other_misc_situations) {
 	exit_error("test");
 	__is_debug_misc_no_exit = false;
 }
+
+MyTest(base, test_path_other_situations) {
+	Path test1;
+	path_copy(&test1, test_dir);
+	path_push(&test1, "other");
+	path_push(&test1, "stemless");
+	char buf[10];
+	path_file_stem(&test1, buf, 10);
+	cr_assert(!strcmp(buf, "stemless"));
+
+	Path test2;
+	path_for(&test2, ".");
+	path_canonicalize(&test2);
+
+	Path test3;
+	path_for(&test3, ".");
+	__is_debug_realloc = true;
+	path_canonicalize(&test3);
+	__is_debug_realloc = false;
+
+	// succeeded canonicalized path of '.' would be longer.
+	cr_assert(strlen(path_to_string(&test2)) > strlen("."));
+	// this failed so we have the original path '.'.
+	cr_assert(strlen(path_to_string(&test3)) == strlen("."));
+
+	Path test4;
+	path_for(&test4, "~");
+	__is_debug_path_homedir_null = true;
+	cr_assert(path_canonicalize(&test4));
+	__is_debug_path_homedir_null = false;
+
+	Path test5;
+	char pmax[PATH_MAX + 1];
+	for (int i = 0; i < PATH_MAX; i++)
+		pmax[i] = 'z';
+	pmax[PATH_MAX] = 0;
+	path_for(&test5, "~");
+	path_push(&test5, pmax);
+	cr_assert(path_canonicalize(&test5));
+
+	Path test6;
+	path_for(&test6, "~");
+	path_push(&test6, "test/");
+	cr_assert(path_canonicalize(&test6));
+}

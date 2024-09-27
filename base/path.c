@@ -23,6 +23,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+bool __is_debug_path_homedir_null = false;
+
 void path_cleanup(PathImpl *ptr) {
 	if (ptr->ptr)
 		myfree(ptr->ptr);
@@ -54,7 +56,7 @@ int path_for(Path *p, const char *path) {
 
 int path_replace_home(Path *p) {
 	const char *home_dir = getenv("HOME");
-	if (home_dir == NULL) {
+	if (home_dir == NULL || __is_debug_path_homedir_null) {
 		errno = EINVAL;
 		return -1;
 	}
@@ -82,18 +84,13 @@ int path_replace_home(Path *p) {
 }
 
 int path_canonicalize(Path *p) {
-	if (path_replace_home(p))
-		return -1;
 	char buf[PATH_MAX];
+	int nlen;
+	if (path_replace_home(p) || realpath(p->ptr, buf) == NULL || (nlen = strlen(buf)) == 0) {
+		errno = EINVAL;
+		return -1;
+	}
 	errno = 0;
-	if (realpath(p->ptr, buf) == NULL) {
-		return -1;
-	}
-	int nlen = strlen(buf);
-	if (nlen == 0) {
-		errno = EFAULT;
-		return -1;
-	}
 	if (nlen >= p->len) {
 		void *nptr = myrealloc(p->ptr, nlen + 1);
 		if (nptr == NULL)
@@ -219,23 +216,19 @@ bool path_mkdir(Path *p, u64 mode, bool parent) {
 
 	int i = 0;
 	char path_bufs[20][PATH_MAX];
-	while (true) {
+	while (i < 20 && path_file_name(&temp_path) != NULL) {
 		if (path_mkdir(&temp_path, mode, false)) {
-			for (int j = i - 1; j >= 0; j--) {
+			bool ret = true;
+			for (int j = i - 1; ret && j >= 0; j--) {
 				path_push(&temp_path, path_bufs[j]);
-				if (!path_mkdir(&temp_path, mode, false))
-					return false;
+				ret = path_mkdir(&temp_path, mode, false);
 			}
 			return true;
 		}
 		const char *dir_part = path_file_name(&temp_path);
 		path_pop(&temp_path);
 		strcpy(path_bufs[i], dir_part);
-		if (path_file_name(&temp_path) == NULL)
-			break;
 		i++;
-		if (i == 20)
-			break;
 	}
 	return false;
 }
@@ -250,12 +243,10 @@ int path_file_stem(const Path *p, char *buf, u64 limit) {
 	buf[limit - 1] = '\0'; // Manually ensure null-termination
 
 	u64 buflen = strlen(buf); // Compute length once
-	for (ssize_t i = buflen - 1; i >= 0; i--) {
+	for (u64 i = buflen - 1; i >= 0; i--) {
 		if (buf[i] == '.') {
 			buf[i] = '\0'; // Null-terminate at the dot
 			break;
-		} else if (buf[i] == '/') {
-			break; // Stop if we encounter a directory separator
 		}
 	}
 	return 0;
