@@ -51,6 +51,7 @@ bool check_build_id(const char *config_dir) {
 	MYFILE *fp = myfopen(&bid_file, "r");
 	if (!fp) {
 		exit_error("could not open the build file");
+		return false;
 	}
 	char bid_file_contents[1024];
 	size_t rlen = read_all(bid_file_contents, 1, 100, fp);

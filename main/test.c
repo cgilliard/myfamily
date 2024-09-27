@@ -76,7 +76,21 @@ MyTest(main, test_main) {
 MyTest(main, test_real_main) {
 	char *rmain[2] = {"fam", NULL};
 	real_main(1, rmain);
-	// Path rmtestdir;
-	// path_for(&rmtestdir
-	// remove_directory(".fam", false);
+	Path rmtestdir;
+	path_for(&rmtestdir, ".fam");
+	remove_directory(&rmtestdir, false);
+
+	__is_debug_misc_no_exit = true;
+	write_to_disk("abc123", "test", NULL, 0);
+	__is_debug_misc_no_exit = false;
+	Path test;
+	path_for(&test, "abc123");
+	cr_assert(!path_exists(&test));
+
+	__is_debug_misc_no_exit = true;
+	check_build_id("abc123");
+	__is_debug_misc_no_exit = false;
+	Path test2;
+	path_for(&test2, "abc123");
+	cr_assert(!path_exists(&test2));
 }
