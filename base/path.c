@@ -83,6 +83,18 @@ int path_replace_home(Path *p) {
 	return 0;
 }
 
+u64 path_file_size(Path *p) {
+	MYFILE *fp = myfopen(p, "r");
+	if (!fp) {
+		errno = EIO;
+		return 0;
+	}
+	myfseek(fp, 0L, SEEK_END);
+	u64 ret = myftell(fp);
+	myfclose(fp);
+	return ret;
+}
+
 int path_canonicalize(Path *p) {
 	char buf[PATH_MAX];
 	int nlen;

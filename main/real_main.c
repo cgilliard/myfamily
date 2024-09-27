@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <string.h>
 
+bool __is_debug_real_main_res_mkdir = false;
+
 void write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size) {
 	char path[PATH_MAX + 1];
 	snprintf(path, sizeof(path), "%s/%s", dir, file_name);
@@ -53,6 +55,7 @@ bool check_build_id(const char *config_dir) {
 	char bid_file_contents[1024];
 	size_t rlen = read_all(bid_file_contents, 1, 100, fp);
 	bid_file_contents[rlen] = 0;
+	myfclose(fp);
 	return !strcmp(bid_file_contents, BUILD_ID);
 }
 
@@ -66,16 +69,18 @@ void setup_config_dir(const char *config_dir) {
 		remove_directory(&cd, false);
 	}
 	fprintf(stderr, "Installing config directory at %s. Build id = %s\n", config_dir, BUILD_ID);
-	if (!path_mkdir(&cd, 0700, true)) {
+	if (!path_mkdir(&cd, 0700, false)) {
 		exit_error("Could not create config directory at path [%s].", path_to_string(&cd));
+		return;
 	}
 
 	Path rd;
 	path_copy(&rd, &cd);
 	path_push(&rd, "resources");
 
-	if (!path_mkdir(&rd, 0700, true)) {
+	if (__is_debug_real_main_res_mkdir || !path_mkdir(&rd, 0700, true)) {
 		exit_error("Could not create resources directory at path [%s].", path_to_string(&rd));
+		return;
 	}
 
 	BUILD_RESOURCE_DIR(path_to_string(&rd), fam);
@@ -83,6 +88,6 @@ void setup_config_dir(const char *config_dir) {
 }
 
 int real_main(int argc, char **argv) {
-	setup_config_dir("~/.fam");
+	setup_config_dir(DEFAULT_CONFIG_DIR);
 	return 0;
 }

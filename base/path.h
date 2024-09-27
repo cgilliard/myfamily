@@ -40,6 +40,7 @@ bool path_mkdir(Path *p, u64 mode, bool parent);
 const char *path_file_name(const Path *p);
 int path_file_stem(const Path *p, char *buf, u64 limit);
 int path_copy(Path *dst, const Path *src);
+u64 path_file_size(Path *p);
 
 #ifdef TEST
 extern bool __is_debug_path_homedir_null;

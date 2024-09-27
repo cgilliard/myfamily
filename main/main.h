@@ -26,6 +26,8 @@
 #define BUILD_ID __DATE__ " " __TIME__
 
 int real_main(int argc, char **argv);
+void setup_config_dir(const char *config_dir);
+bool check_build_id(const char *config_dir);
 void write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size);
 
 #define WRITE_RESOURCE_TO_DISK(dir, filename, data, size) write_to_disk(dir, filename, data, size)
@@ -42,5 +44,15 @@ void write_to_disk(const char *dir, const char *file_name, const unsigned char *
 	int main(int argc, char **argv) {                                                              \
 		return real_main(argc, argv);                                                              \
 	}
+
+#ifdef TEST
+extern bool __is_debug_real_main_res_mkdir;
+#endif // TEST
+
+#ifdef TEST
+#define DEFAULT_CONFIG_DIR "./.fam"
+#else
+#define DEFAULT_CONFIG_DIR "~/.fam"
+#endif // TEST
 
 #endif // _MAIN_MAIN__

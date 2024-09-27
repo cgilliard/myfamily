@@ -357,6 +357,9 @@ MyTest(base, test_path_other_situations) {
 	char buf[10];
 	path_file_stem(&test1, buf, 10);
 	cr_assert(!strcmp(buf, "stemless"));
+	errno = 0;
+	cr_assert(!path_file_size(&test1));
+	cr_assert_eq(errno, EIO);
 
 	Path test2;
 	path_for(&test2, ".");
