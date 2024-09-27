@@ -87,10 +87,10 @@ jobs:
      
       - name: Run MacOS Tests (gcc)
         run: |
-          ./configure --with-cc=gcc
+          ./scripts/configure_homebrew.sh --with-cc=gcc
           make clean testsan
       
       - name: Run MacOS Tests (clang)
         run: |
-          ./configure --with-cc=clang
+          ./script/configure_homebrew.sh --with-cc=clang
           make clean testsan 
