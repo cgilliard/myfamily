@@ -25,6 +25,30 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream) {
+	return fread(buffer, size, count, (FILE *)stream);
+}
+
+u64 myfwrite(const void *buffer, u64 size, u64 count, MYFILE *stream) {
+	return fwrite(buffer, size, count, (FILE *)stream);
+}
+
+int myfeof(MYFILE *stream) {
+	return feof((FILE *)stream);
+}
+
+int myferror(MYFILE *stream) {
+	return ferror((FILE *)stream);
+}
+
+long myftell(MYFILE *stream) {
+	return ftell((FILE *)stream);
+}
+
+int myfseek(MYFILE *stream, long pos, int type) {
+	return fseek((FILE *)stream, pos, type);
+}
+
 const char *rstrstr(const char *s1, const char *s2) {
 	size_t s1len = strlen(s1);
 	size_t s2len = strlen(s2);
@@ -38,18 +62,18 @@ const char *rstrstr(const char *s1, const char *s2) {
 	return NULL;
 }
 
-u64 read_all(void *buffer, size_t size, size_t count, FILE *stream) {
+u64 read_all(void *buffer, size_t size, size_t count, MYFILE *stream) {
 	size_t total_read = 0;
 	size_t bytes_to_read = size * count;
 	size_t bytes_read;
 
 	while (total_read < bytes_to_read) {
-		bytes_read = fread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
+		bytes_read = myfread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
 		if (bytes_read == 0) {
 			// Check for EOF or error
-			if (feof(stream)) {
+			if (myfeof(stream)) {
 				break; // End of file reached
-			} else if (ferror(stream)) {
+			} else if (myferror(stream)) {
 				perror("Read error");
 				break; // Error occurred
 			}
@@ -65,43 +89,43 @@ int copy_file(const Path *dst_path, const Path *src_path) {
 		errno = EINVAL;
 		return -1;
 	}
-	FILE *source_file, *dest_file;
+	MYFILE *source_file, *dest_file;
 	size_t bytes;
 
 	// Open the source file in binary read mode
-	source_file = (FILE *)myfopen(src_path, "rb");
+	source_file = myfopen(src_path, "rb");
 	if (source_file == NULL) {
 		errno = EINVAL;
 		return -1;
 	}
 
 	// Determine the file size
-	fseek(source_file, 0, SEEK_END);
-	long file_size = ftell(source_file);
-	fseek(source_file, 0, SEEK_SET);
+	myfseek(source_file, 0, SEEK_END);
+	long file_size = myftell(source_file);
+	myfseek(source_file, 0, SEEK_SET);
 	char buffer[file_size];
 
 	// Open the destination file in binary write mode
-	dest_file = (FILE *)myfopen(dst_path, "wb");
+	dest_file = myfopen(dst_path, "wb");
 	if (dest_file == NULL) {
 		errno = ENOENT;
-		myfclose((MYFILE *)source_file);
+		myfclose(source_file);
 		return -1;
 	}
 
 	// Copy the file content
-	while ((bytes = fread(buffer, 1, file_size, source_file)) > 0) {
-		if (fwrite(buffer, 1, bytes, dest_file) != bytes) {
+	while ((bytes = myfread(buffer, 1, file_size, source_file)) > 0) {
+		if (myfwrite(buffer, 1, bytes, dest_file) != bytes) {
 			errno = EIO;
-			myfclose((MYFILE *)source_file);
-			myfclose((MYFILE *)dest_file);
+			myfclose(source_file);
+			myfclose(dest_file);
 			return -1;
 		}
 	}
 
 	// Close both files
-	myfclose((MYFILE *)source_file);
-	myfclose((MYFILE *)dest_file);
+	myfclose(source_file);
+	myfclose(dest_file);
 
 	return 0;
 }

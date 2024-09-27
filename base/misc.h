@@ -24,5 +24,11 @@ int copy_file(const Path *dst, const Path *src);
 int remove_directory(const Path *path, bool preserve_dir);
 u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream);
 void exit_error(char *format, ...);
+u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream);
+u64 myfwrite(const void *buffer, u64 size, u64 count, MYFILE *stream);
+int myfeof(MYFILE *stream);
+int myferror(MYFILE *stream);
+long myftell(MYFILE *stream);
+int myfseek(MYFILE *stream, long pos, int type);
 
 #endif // _BASE_MISC__
