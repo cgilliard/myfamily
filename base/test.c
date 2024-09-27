@@ -300,7 +300,6 @@ MyTest(base, test_other_misc_situations) {
 	MYFILE *stream = myfopen(&test, "r");
 	__is_debug_misc_ferror = true;
 	errno = 0;
-	cr_assert_eq(errno, 0);
 	read_all(buf, 1, 1, stream);
 	cr_assert_eq(errno, EIO);
 	__is_debug_misc_ferror = false;
@@ -340,10 +339,12 @@ MyTest(base, test_other_misc_situations) {
 	cr_assert(remove_directory(&dirtest1, false));
 	__is_debug_misc_unlink = false;
 
+	__is_debug_misc_preserve = true;
+	cr_assert(remove_directory(&dirtest1, false));
+	__is_debug_misc_preserve = false;
+
 	__is_debug_misc_no_exit = true;
 	// will not return because of debug flag
 	exit_error("test");
-	__is_debug_misc_no_exit = false;
-
 	__is_debug_misc_no_exit = false;
 }

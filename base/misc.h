@@ -43,6 +43,7 @@ extern bool __is_debug_misc_stat;
 extern bool __is_debug_misc_remove_dir;
 extern bool __is_debug_misc_unlink;
 extern bool __is_debug_misc_no_exit;
+extern bool __is_debug_misc_preserve;
 #endif // TEST
 
 #endif // _BASE_MISC__

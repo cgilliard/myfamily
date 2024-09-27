@@ -32,6 +32,7 @@ bool __is_debug_misc_stat = false;
 bool __is_debug_misc_remove_dir = false;
 bool __is_debug_misc_unlink = false;
 bool __is_debug_misc_no_exit = false;
+bool __is_debug_misc_preserve = false;
 
 u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream) {
 	return fread(buffer, size, count, (FILE *)stream);
@@ -87,14 +88,14 @@ u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream) {
 		bytes_read = myfread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
 		if (bytes_read == 0 || __is_debug_misc_ferror) {
 			// Check for EOF or error
-			if (myfeof(stream)) {
-				break; // End of file reached
-			} else if (myferror(stream) || __is_debug_misc_ferror) {
+			if (myferror(stream) || __is_debug_misc_ferror) {
 				errno = EIO;
 				break; // Error occurred
 			}
 		}
 		total_read += bytes_read;
+		if (myfeof(stream))
+			break;
 	}
 
 	return total_read;
@@ -197,7 +198,7 @@ int remove_directory(const Path *p, bool preserve_dir) {
 
 	// Now the directory is empty, so we can remove it
 	if (!preserve_dir) {
-		if (rmdir(path) == -1) {
+		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
 			errno = EIO;
 			return -1;
 		}
