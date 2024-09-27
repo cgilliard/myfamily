@@ -34,7 +34,7 @@ jobs:
 
       - name: Test Linux Build
         run: |
-          ./configure
+          ./configure --minimal
           make clean all
           ./bin/fam init test1
           test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
@@ -80,7 +80,7 @@ jobs:
 
       - name: Test MacOS Build
         run: |
-          ./scripts/configure_homebrew.sh
+          ./scripts/configure_homebrew.sh --minimal
           make clean all
           ./bin/fam init test1
           test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }

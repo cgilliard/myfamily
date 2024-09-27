@@ -51,6 +51,9 @@ void sub_command_cleanup(SubCommandImpl *ptr);
 
 #define SubCommand SubCommandImpl __attribute__((warn_unused_result, cleanup(sub_command_cleanup)))
 
+int sub_command_build(SubCommand *sc, const char *name, const char *help, const u32 min_args,
+					  const u32 max_args, const char *arg_doc);
+
 typedef struct ArgsImpl {
 	char prog[ARGS_MAX_DETAIL_LENGTH + 1];
 	char version[ARGS_MAX_DETAIL_LENGTH + 1];
@@ -64,5 +67,8 @@ typedef struct ArgsImpl {
 void args_cleanup(ArgsImpl *ptr);
 
 #define Args ArgsImpl __attribute__((warn_unused_result, cleanup(args_cleanup)))
+
+int args_build(Args *args, const char *prog, const char *version, const char *author,
+			   const u32 min_args, const u32 max_args);
 
 #endif // _ARGS_ARGS__
