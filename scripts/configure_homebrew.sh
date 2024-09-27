@@ -1,8 +1,8 @@
 #!/bin/bash
 
-brew --prefix criterion
+CRIT=`brew --prefix criterion`
 
 ./configure --minimal=false \
-	--with-criterion-include=${HOME}/homebrew/Cellar/criterion/2.4.2/include \
-	--with-criterion-lib=${HOME}/homebrew/Cellar/criterion/2.4.2/lib
+	--with-criterion-include=${CRIT}/include \
+	--with-criterion-lib=${CRIT}/lib
 
