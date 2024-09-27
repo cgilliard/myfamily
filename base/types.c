@@ -18,7 +18,7 @@
 
 // Compile-time check
 #if SIZE_MAX != 0xFFFFFFFFFFFFFFFF
-#error "This code is intended for 64-bit architectures only."
+// #error "This code is intended for 64-bit architectures only."
 #endif
 
 void __attribute__((constructor)) __check_64bit_arch__() {
