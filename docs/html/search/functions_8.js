@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['test_243',['Test',['../args_2test_8c.html#a1823023f28d5735aadb85271bd6caa6a',1,'Test(args, test_args):&#160;test.c'],['../main_2test_8c.html#a268ebe98aa9feb8f63dec06a89f735c8',1,'Test(main, test_main):&#160;test.c']]]
+  ['setup_5fconfig_5fdir_252',['setup_config_dir',['../real__main_8c.html#aadd7ec11c1873b232827eddb9a17c911',1,'real_main.c']]]
 ];

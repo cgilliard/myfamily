@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['read_5fall_239',['read_all',['../misc_8c.html#a9dd6bb5100330160c77b5daa0a157e1e',1,'read_all(void *buffer, size_t size, size_t count, FILE *stream):&#160;misc.c'],['../misc_8h.html#af88b4147d246cf562900b5939bc10984',1,'read_all(void *buffer, u64 size, u64 count, MYFILE *stream):&#160;misc.h']]],
-  ['real_5fmain_240',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]],
-  ['remove_5fdirectory_241',['remove_directory',['../misc_8c.html#a0f31f3ead33bb24a33ccfcd11c580aed',1,'remove_directory(const Path *p, bool preserve_dir):&#160;misc.c'],['../misc_8h.html#ac670968c9a6ae10fbdd37a7206afc50b',1,'remove_directory(const Path *path, bool preserve_dir):&#160;misc.c']]],
-  ['rstrstr_242',['rstrstr',['../misc_8c.html#ac2401671be38c7a45eea5e003dc55889',1,'rstrstr(const char *s1, const char *s2):&#160;misc.c'],['../misc_8h.html#aa9a7b3f78c4917215b2f8ff8d8756e9f',1,'rstrstr(const char *s1, const char *s2):&#160;misc.c']]]
+  ['read_5fall_248',['read_all',['../misc_8c.html#a9dd6bb5100330160c77b5daa0a157e1e',1,'read_all(void *buffer, size_t size, size_t count, FILE *stream):&#160;misc.c'],['../misc_8h.html#af88b4147d246cf562900b5939bc10984',1,'read_all(void *buffer, u64 size, u64 count, MYFILE *stream):&#160;misc.h']]],
+  ['real_5fmain_249',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]],
+  ['remove_5fdirectory_250',['remove_directory',['../misc_8c.html#a0f31f3ead33bb24a33ccfcd11c580aed',1,'remove_directory(const Path *p, bool preserve_dir):&#160;misc.c'],['../misc_8h.html#ac670968c9a6ae10fbdd37a7206afc50b',1,'remove_directory(const Path *path, bool preserve_dir):&#160;misc.c']]],
+  ['rstrstr_251',['rstrstr',['../misc_8c.html#ac2401671be38c7a45eea5e003dc55889',1,'rstrstr(const char *s1, const char *s2):&#160;misc.c'],['../misc_8h.html#aa9a7b3f78c4917215b2f8ff8d8756e9f',1,'rstrstr(const char *s1, const char *s2):&#160;misc.c']]]
 ];
