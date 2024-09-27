@@ -59,7 +59,7 @@ MyTest(base, test_colors) {
 
 	MYFILE *ptr4 = myfopen(&file2, "r");
 	char buf2[1024];
-	fgets(buf2, 1024, (FILE *)ptr4);
+	read_all(buf2, 1, 1024, ptr4);
 	brackets = 0;
 	for (int i = 0; i < strlen(buf2); i++) {
 		if (buf2[i] == '[')
