@@ -42,6 +42,8 @@ jobs:
           if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             echo "running build docs";
             ./scripts/build_docs.sh "$MyFamilyPat" "$GITHUB_SHA"
+          else
+            echo "not running build docs event: $GITHUB_EVENT_NAME";
           fi          
   macos:
     runs-on: macos-latest
