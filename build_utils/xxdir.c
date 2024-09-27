@@ -22,20 +22,22 @@
 #include <string.h>
 #include <sys/stat.h>
 
+typedef unsigned long long u64; // 64 bits
+
 int file_count = 0;
 #define MAX_FILES 4096
 int file_sizes[MAX_FILES];
 
-void print_hex(const unsigned char *data, size_t size, FILE *out, const char *file,
+void print_hex(const unsigned char *data, u64 size, FILE *out, const char *file,
 			   const char *namespace) {
 	char buf[strlen(namespace) + 100];
-	snprintf(buf, strlen(namespace) + 100, "unsigned char %sxxdir_file_%i[] = {\n", namespace,
-			 file_count);
+	snprintf(buf, strlen(namespace) + 100, "static unsigned char %sxxdir_file_%i[] = {\n",
+			 namespace, file_count);
 	for (int i = 0; i < strlen(buf); i++)
 		if (buf[i] == '.')
 			buf[i] = '_';
 	fprintf(out, "%s", buf);
-	for (size_t i = 0; i < size; i++) {
+	for (u64 i = 0; i < size; i++) {
 		fprintf(out, "0x%02x, ", data[i]);
 		if ((i + 1) % 16 == 0) {
 			fprintf(out, "\n");
@@ -44,7 +46,7 @@ void print_hex(const unsigned char *data, size_t size, FILE *out, const char *fi
 		}
 	}
 	file_sizes[file_count] = size;
-	fprintf(out, "0x00};\nsize_t %sxxdir_file_size_%i = %zu;\n", namespace, file_count, size);
+	fprintf(out, "0x00};\nstatic u64 %sxxdir_file_size_%i = %llu;\n", namespace, file_count, size);
 }
 
 void proc_file(const char *file_path, const char *output_header, FILE *out, const char *namespace) {
@@ -149,58 +151,24 @@ int main(int argc, char **argv) {
 		fprintf(stderr, "namespace is too long. Max len = 128 bytes.");
 		exit(-1);
 	}
-	strcpy(initial_text, "char *");
+	strcpy(initial_text, "static char *");
 	strcat(initial_text, namespace);
 	strcat(initial_text, "xxdir_file_names[] = {");
 	char buf[1024 * 1024];
 	strcpy(buf, initial_text);
 
 	include_dir(dir_path, "", buf, output_header, out, namespace);
-	/*
-		DIR *dir = opendir(dir_path);
-		if (dir == NULL) {
-			perror("Error opening directory");
-			exit(-1);
-		}
 
-		struct dirent *entry;
-		while ((entry = readdir(dir)) != NULL) {
-			// Skip the "." and ".." entries
-			if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-				continue;
-			}
-
-			// Print the name of the file or directory
-			printf("Including: %s\n", entry->d_name);
-
-			char full_path[strlen(entry->d_name) + strlen(dir_path) + 100];
-			strcpy(full_path, dir_path);
-			strcat(full_path, "/");
-			strcat(full_path, entry->d_name);
-
-			struct stat s;
-			if (stat(full_path, &s) == 0 && s.st_mode & S_IFDIR) {
-				printf("is_dir\n");
-			}
-
-			proc_file(full_path, output_header, out, namespace);
-
-			strcat(buf, "\"");
-			strcat(buf, entry->d_name);
-			strcat(buf, "\", ");
-		}
-		*/
-
-	strcat(buf, "NULL};");
+	strcat(buf, "(void*)0};");
 	fprintf(out, "%s", buf);
 
-	fprintf(out, "\nint %sxxdir_file_count=%i;\n", namespace, file_count);
+	fprintf(out, "\nstatic int %sxxdir_file_count=%i;\n", namespace, file_count);
 
-	fprintf(out, "unsigned char *%sxxdir_files[] = {", namespace);
+	fprintf(out, "static unsigned char *%sxxdir_files[] = {", namespace);
 	for (int i = 0; i < file_count; i++)
 		fprintf(out, "%sxxdir_file_%i,", namespace, i);
-	fprintf(out, "NULL};\n");
-	fprintf(out, "size_t %sxxdir_file_sizes[] = { ", namespace);
+	fprintf(out, "(void*)0};\n");
+	fprintf(out, "static u64 %sxxdir_file_sizes[] = { ", namespace);
 	for (int i = 0; i < file_count; i++)
 		fprintf(out, "%i, ", file_sizes[i]);
 	fprintf(out, "0};\n");

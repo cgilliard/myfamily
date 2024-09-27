@@ -15,8 +15,26 @@
 #ifndef _MAIN_MAIN__
 #define _MAIN_MAIN__
 
-#include <string.h>
+#include <base/macro_utils.h>
+#include <base/misc.h>
+#include <base/resources.h>
+#include <base/types.h>
+
+#include <main/resources.h>
+
+#define FAM_VERSION "0.0.1-alpha.1"
+#define BUILD_ID __DATE__ " " __TIME__
 
 int real_main(int argc, char **argv);
+void write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size);
 
+#define WRITE_RESOURCE_TO_DISK(dir, filename, data, size) write_to_disk(dir, filename, data, size)
+
+#define WRITE_BUILD_ID(dir)                                                                        \
+	WRITE_RESOURCE_TO_DISK(dir, "build_id", (const unsigned char *)BUILD_ID, strlen(BUILD_ID))
+
+#define BUILD_RESOURCE_DIR(dir, namespace)                                                         \
+	for (int i = 0; i < namespace##_##xxdir_file_count; i++)                                       \
+	WRITE_RESOURCE_TO_DISK(dir, namespace##_##xxdir_file_names[i], namespace##_##xxdir_files[i],   \
+						   namespace##_##xxdir_file_sizes[i])
 #endif // _MAIN_MAIN__

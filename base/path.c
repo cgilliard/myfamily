@@ -72,7 +72,10 @@ int path_replace_home(Path *p) {
 			p->len = nlen;
 		}
 		char buf[PATH_MAX + 1];
-		snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr + 1));
+		if (strlen(p->ptr) > 1 && ((char *)(p->ptr))[1] == PATH_SEPARATOR_CHAR)
+			snprintf(buf, PATH_MAX, "%s%s", home_dir, (char *)(p->ptr + 1));
+		else
+			snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr + 1));
 		strcpy(p->ptr, buf);
 	}
 	return 0;
