@@ -255,7 +255,7 @@ int path_file_stem(const Path *p, char *buf, u64 limit) {
 	buf[limit - 1] = '\0'; // Manually ensure null-termination
 
 	u64 buflen = strlen(buf); // Compute length once
-	for (u64 i = buflen - 1; i >= 0; i--) {
+	for (u64 i = buflen - 1; i > 0; i--) {
 		if (buf[i] == '.') {
 			buf[i] = '\0'; // Null-terminate at the dot
 			break;
