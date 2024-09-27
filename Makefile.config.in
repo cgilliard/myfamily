@@ -4,10 +4,10 @@ CC=cc
 MAKE=make
 
 # FLags
-CC_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -Wno-int-to-pointer-cast -Wno-compound-token-split-by-macro
+CC_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes
 CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
 CRITERION_LIB=-LREPLACE_CRITERION_LIB
-CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -Wno-int-to-pointer-cast -Wno-compound-token-split-by-macro -lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB)
+CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB)
 ifeq ($(shell $(CC) -dM -E - < /dev/null | grep '__clang__'),)
     # If GCC is detected
     CC_FLAGS += -Werror=discarded-qualifiers
