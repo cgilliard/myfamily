@@ -68,6 +68,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -86,10 +87,15 @@ Macros</h2></td></tr>
 <tr class="memitem:a2c5eecb22513a88c24ae5831a3265e54"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="xxdir_8c.html#a2c5eecb22513a88c24ae5831a3265e54">MAX_FILES</a>&#160;&#160;&#160;4096</td></tr>
 <tr class="separator:a2c5eecb22513a88c24ae5831a3265e54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:ad758b7a5c3f18ed79d2fcd23d9f16357"><td class="memItemLeft" align="right" valign="top">typedef unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="xxdir_8c.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a></td></tr>
+<tr class="separator:ad758b7a5c3f18ed79d2fcd23d9f16357"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a00c97ad6de71e5ff6016f84c76e06458"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="xxdir_8c.html#a00c97ad6de71e5ff6016f84c76e06458">print_hex</a> (const unsigned char *data, size_t size, FILE *out, const char *file, const char *namespace)</td></tr>
-<tr class="separator:a00c97ad6de71e5ff6016f84c76e06458"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af45e49d375ec15a3ad54c524c0fb7855"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="xxdir_8c.html#af45e49d375ec15a3ad54c524c0fb7855">print_hex</a> (const unsigned char *data, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size, FILE *out, const char *file, const char *namespace)</td></tr>
+<tr class="separator:af45e49d375ec15a3ad54c524c0fb7855"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8071c588b0037587224a40257b7040e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="xxdir_8c.html#ad8071c588b0037587224a40257b7040e">proc_file</a> (const char *file_path, const char *output_header, FILE *out, const char *namespace)</td></tr>
 <tr class="separator:ad8071c588b0037587224a40257b7040e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2333cdf73b7a682358ac3c66b7c99029"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029">include_dir</a> (const char *dir_path, const char *base, char *buf, const char *output_header, FILE *out, const char *namespace)</td></tr>
@@ -113,6 +119,21 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define MAX_FILES&#160;&#160;&#160;4096</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="ad758b7a5c3f18ed79d2fcd23d9f16357"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad758b7a5c3f18ed79d2fcd23d9f16357">&#9670;&nbsp;</a></span>u64</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef unsigned long long <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -200,8 +221,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a00c97ad6de71e5ff6016f84c76e06458"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a00c97ad6de71e5ff6016f84c76e06458">&#9670;&nbsp;</a></span>print_hex()</h2>
+<a id="af45e49d375ec15a3ad54c524c0fb7855"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af45e49d375ec15a3ad54c524c0fb7855">&#9670;&nbsp;</a></span>print_hex()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -215,7 +236,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
           <td class="paramname"><em>size</em>, </td>
         </tr>
         <tr>

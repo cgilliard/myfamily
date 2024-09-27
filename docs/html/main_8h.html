@@ -67,20 +67,159 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">main.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;string.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="macro__utils_8h_source.html">base/macro_utils.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
+<code>#include &lt;main/resources.h&gt;</code><br />
 </div>
 <p><a href="main_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a6b03bd88de1312952a0ffd36dd4b7215"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8h.html#a6b03bd88de1312952a0ffd36dd4b7215">FAM_VERSION</a>&#160;&#160;&#160;&quot;0.0.1-alpha.1&quot;</td></tr>
+<tr class="separator:a6b03bd88de1312952a0ffd36dd4b7215"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af652e7dd456fccd389b083823682768e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8h.html#af652e7dd456fccd389b083823682768e">BUILD_ID</a>&#160;&#160;&#160;__DATE__ &quot; &quot; __TIME__</td></tr>
+<tr class="separator:af652e7dd456fccd389b083823682768e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2aac8abe3f147c537d075c60f15c0342"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8h.html#a2aac8abe3f147c537d075c60f15c0342">WRITE_RESOURCE_TO_DISK</a>(dir,  filename,  data,  size)&#160;&#160;&#160;<a class="el" href="real__main_8c.html#add780f582425ce6db96ba74b6f83f88b">write_to_disk</a>(dir, filename, data, size)</td></tr>
+<tr class="separator:a2aac8abe3f147c537d075c60f15c0342"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a191664d4632d30202b7cac784e969530"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8h.html#a191664d4632d30202b7cac784e969530">WRITE_BUILD_ID</a>(dir)&#160;&#160;&#160;	<a class="el" href="main_8h.html#a2aac8abe3f147c537d075c60f15c0342">WRITE_RESOURCE_TO_DISK</a>(dir, &quot;build_id&quot;, (const unsigned char *)<a class="el" href="main_8h.html#af652e7dd456fccd389b083823682768e">BUILD_ID</a>, strlen(<a class="el" href="main_8h.html#af652e7dd456fccd389b083823682768e">BUILD_ID</a>))</td></tr>
+<tr class="separator:a191664d4632d30202b7cac784e969530"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad66b198b16bec450355402608acd77ec"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8h.html#ad66b198b16bec450355402608acd77ec">BUILD_RESOURCE_DIR</a>(dir,  namespace)</td></tr>
+<tr class="separator:ad66b198b16bec450355402608acd77ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a813033ab922b78183e69871180bdc9cf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8h.html#a813033ab922b78183e69871180bdc9cf">real_main</a> (int argc, char **argv)</td></tr>
 <tr class="separator:a813033ab922b78183e69871180bdc9cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add780f582425ce6db96ba74b6f83f88b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8h.html#add780f582425ce6db96ba74b6f83f88b">write_to_disk</a> (const char *dir, const char *file_name, const unsigned char *data, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size)</td></tr>
+<tr class="separator:add780f582425ce6db96ba74b6f83f88b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="af652e7dd456fccd389b083823682768e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af652e7dd456fccd389b083823682768e">&#9670;&nbsp;</a></span>BUILD_ID</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BUILD_ID&#160;&#160;&#160;__DATE__ &quot; &quot; __TIME__</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad66b198b16bec450355402608acd77ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad66b198b16bec450355402608acd77ec">&#9670;&nbsp;</a></span>BUILD_RESOURCE_DIR</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define BUILD_RESOURCE_DIR</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">dir, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">namespace&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <span class="keyword">namespace</span>##_##xxdir_file_count; i++)                                       \</div>
+<div class="line">    <a class="code" href="main_8h.html#a2aac8abe3f147c537d075c60f15c0342">WRITE_RESOURCE_TO_DISK</a>(dir, <span class="keyword">namespace</span>##_##xxdir_file_names[i], <span class="keyword">namespace</span>##_##xxdir_files[i],   \</div>
+<div class="line">                           <span class="keyword">namespace</span>##_##xxdir_file_sizes[i])</div>
+<div class="ttc" id="amain_8h_html_a2aac8abe3f147c537d075c60f15c0342"><div class="ttname"><a href="main_8h.html#a2aac8abe3f147c537d075c60f15c0342">WRITE_RESOURCE_TO_DISK</a></div><div class="ttdeci">#define WRITE_RESOURCE_TO_DISK(dir, filename, data, size)</div><div class="ttdef"><b>Definition:</b> main.h:31</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a6b03bd88de1312952a0ffd36dd4b7215"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b03bd88de1312952a0ffd36dd4b7215">&#9670;&nbsp;</a></span>FAM_VERSION</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define FAM_VERSION&#160;&#160;&#160;&quot;0.0.1-alpha.1&quot;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a191664d4632d30202b7cac784e969530"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a191664d4632d30202b7cac784e969530">&#9670;&nbsp;</a></span>WRITE_BUILD_ID</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define WRITE_BUILD_ID</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">dir</td><td>)</td>
+          <td>&#160;&#160;&#160;	<a class="el" href="main_8h.html#a2aac8abe3f147c537d075c60f15c0342">WRITE_RESOURCE_TO_DISK</a>(dir, &quot;build_id&quot;, (const unsigned char *)<a class="el" href="main_8h.html#af652e7dd456fccd389b083823682768e">BUILD_ID</a>, strlen(<a class="el" href="main_8h.html#af652e7dd456fccd389b083823682768e">BUILD_ID</a>))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2aac8abe3f147c537d075c60f15c0342"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2aac8abe3f147c537d075c60f15c0342">&#9670;&nbsp;</a></span>WRITE_RESOURCE_TO_DISK</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define WRITE_RESOURCE_TO_DISK</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">dir, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">filename, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">data, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">size&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="real__main_8c.html#add780f582425ce6db96ba74b6f83f88b">write_to_disk</a>(dir, filename, data, size)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a813033ab922b78183e69871180bdc9cf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a813033ab922b78183e69871180bdc9cf">&#9670;&nbsp;</a></span>real_main()</h2>
@@ -99,6 +238,46 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">char **&#160;</td>
           <td class="paramname"><em>argv</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="add780f582425ce6db96ba74b6f83f88b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add780f582425ce6db96ba74b6f83f88b">&#9670;&nbsp;</a></span>write_to_disk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void write_to_disk </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>dir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>file_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const unsigned char *&#160;</td>
+          <td class="paramname"><em>data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

@@ -39,9 +39,80 @@
         -:   12:// See the License for the specific language governing permissions and
         -:   13:// limitations under the License.
         -:   14:
-    #####:   15:int real_main(int argc, char **argv) {
-    #####:   16:	return 0;
-        -:   17:}
+        -:   15:#include <base/misc.h>
+        -:   16:#include <base/path.h>
+        -:   17:#include <limits.h>
+        -:   18:#include <main/main.h>
+        -:   19:#include <stdio.h>
+        -:   20:#include <string.h>
+        -:   21:
+    #####:   22:void write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size) {
+        -:   23:	char path[PATH_MAX + 1];
+    #####:   24:	snprintf(path, sizeof(path), "%s/%s", dir, file_name);
+    #####:   25:	Path ensure_parent;
+    #####:   26:	path_for(&ensure_parent, path);
+    #####:   27:	char *pfile_name = path_file_name(&ensure_parent);
+        -:   28:	char pfile_name_copy[PATH_MAX + 1];
+    #####:   29:	strcpy(pfile_name_copy, pfile_name);
+    #####:   30:	path_pop(&ensure_parent);
+    #####:   31:	path_canonicalize(&ensure_parent);
+    #####:   32:	path_mkdir(&ensure_parent, 0700, true);
+    #####:   33:	path_push(&ensure_parent, pfile_name_copy);
+    #####:   34:	MYFILE *f = myfopen(&ensure_parent, "wb");
+    #####:   35:	if (f) {
+    #####:   36:		fwrite(data, 1, size, (FILE *)f);
+    #####:   37:		myfclose(f);
+        -:   38:	} else {
+    #####:   39:		exit_error("Could not open file for writing");
+        -:   40:	}
+    #####:   41:}
+        -:   42:
+    #####:   43:bool check_build_id(const char *config_dir) {
+    #####:   44:	Path bid_file;
+    #####:   45:	path_for(&bid_file, config_dir);
+    #####:   46:	path_push(&bid_file, "build_id");
+    #####:   47:	path_canonicalize(&bid_file);
+        -:   48:	// check build id
+    #####:   49:	MYFILE *fp = myfopen(&bid_file, "r");
+    #####:   50:	if (!fp) {
+    #####:   51:		exit_error("could not open the build file");
+        -:   52:	}
+        -:   53:	char bid_file_contents[1024];
+    #####:   54:	size_t rlen = read_all(bid_file_contents, 1, 100, fp);
+    #####:   55:	bid_file_contents[rlen] = 0;
+    #####:   56:	return !strcmp(bid_file_contents, BUILD_ID);
+        -:   57:}
+        -:   58:
+    #####:   59:void setup_config_dir(const char *config_dir) {
+    #####:   60:	Path cd;
+    #####:   61:	path_for(&cd, config_dir);
+    #####:   62:	path_canonicalize(&cd);
+    #####:   63:	if (path_exists(&cd)) {
+    #####:   64:		if (check_build_id(config_dir))
+    #####:   65:			return;
+    #####:   66:		remove_directory(&cd, false);
+        -:   67:	}
+    #####:   68:	fprintf(stderr, "Installing config directory at %s. Build id = %s\n", config_dir, BUILD_ID);
+    #####:   69:	if (!path_mkdir(&cd, 0700, true)) {
+    #####:   70:		exit_error("Could not create config directory at path [%s].", path_to_string(&cd));
+        -:   71:	}
+        -:   72:
+    #####:   73:	Path rd;
+    #####:   74:	path_copy(&rd, &cd);
+    #####:   75:	path_push(&rd, "resources");
+        -:   76:
+    #####:   77:	if (!path_mkdir(&rd, 0700, true)) {
+    #####:   78:		exit_error("Could not create resources directory at path [%s].", path_to_string(&rd));
+        -:   79:	}
+        -:   80:
+    #####:   81:	BUILD_RESOURCE_DIR(path_to_string(&rd), fam);
+    #####:   82:	WRITE_BUILD_ID(config_dir);
+        -:   83:}
+        -:   84:
+    #####:   85:int real_main(int argc, char **argv) {
+    #####:   86:	setup_config_dir("~/.fam");
+    #####:   87:	return 0;
+        -:   88:}
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
@@ -396,191 +467,194 @@
         1:   72:			p->len = nlen;
         -:   73:		}
         -:   74:		char buf[PATH_MAX + 1];
-        1:   75:		snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr + 1));
-        1:   76:		strcpy(p->ptr, buf);
-        -:   77:	}
-        1:   78:	return 0;
-        -:   79:}
-        -:   80:
-        2:   81:int path_canonicalize(Path *p) {
-        2:   82:	if (path_replace_home(p))
-        1:   83:		return -1;
-        -:   84:	char buf[PATH_MAX];
-        1:   85:	errno = 0;
-        1:   86:	if (realpath(p->ptr, buf) == NULL) {
-    #####:   87:		return -1;
-        -:   88:	}
-        1:   89:	int nlen = strlen(buf);
-        1:   90:	if (nlen == 0) {
-    #####:   91:		errno = EFAULT;
-    #####:   92:		return -1;
-        -:   93:	}
-        1:   94:	if (nlen >= p->len) {
-    #####:   95:		void *nptr = myrealloc(p->ptr, nlen + 1);
-    #####:   96:		if (nptr == NULL)
-    #####:   97:			return -1;
-    #####:   98:		p->ptr = nptr;
-    #####:   99:		p->len = nlen;
-        -:  100:	}
-        1:  101:	strcpy(p->ptr, buf);
-        1:  102:	return 0;
-        -:  103:}
-       65:  104:int path_push(Path *p, const char *next) {
-       65:  105:	if (p == NULL) {
-        1:  106:		errno = EINVAL;
-        1:  107:		return -1;
-        -:  108:	}
-       64:  109:	if (next == NULL) {
-        1:  110:		errno = EINVAL;
-        1:  111:		return -1;
-        -:  112:	}
-       63:  113:	int slen = strlen(p->ptr);
-       63:  114:	if (slen <= 0 || strlen(next) == 0) {
-        1:  115:		errno = EFAULT;
-        1:  116:		return -1;
-        -:  117:	}
-       62:  118:	bool need_sep = false;
-       62:  119:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
-       62:  120:		need_sep = true;
-        -:  121:	}
-        -:  122:
-       62:  123:	int nlen = slen + strlen(next);
-       62:  124:	if (need_sep)
-       62:  125:		nlen += strlen(PATH_SEPARATOR);
-        -:  126:
-       62:  127:	if (nlen >= p->len) {
-       60:  128:		void *nptr = myrealloc(p->ptr, nlen + 1);
-       60:  129:		if (nptr == NULL)
-        1:  130:			return -1;
-       59:  131:		p->ptr = nptr;
-       59:  132:		p->len = nlen;
-        -:  133:	}
-        -:  134:
-       61:  135:	if (need_sep)
-       61:  136:		strcat(p->ptr, PATH_SEPARATOR);
-       61:  137:	strcat(p->ptr, next);
-       61:  138:	return 0;
-        -:  139:}
-       27:  140:int path_pop(Path *p) {
-       27:  141:	char *res = rstrstr(p->ptr, PATH_SEPARATOR);
-       27:  142:	if (res) {
-       26:  143:		int index = res - (char *)p->ptr;
-       26:  144:		((char *)(p->ptr))[index] = 0;
-        -:  145:	} else {
-        1:  146:		((char *)(p->ptr))[0] = '.';
-        1:  147:		((char *)(p->ptr))[1] = 0;
-        -:  148:	}
-       27:  149:	return 0;
-        -:  150:}
-        -:  151:
-       58:  152:char *path_to_string(const Path *p) {
-       58:  153:	return p->ptr;
-        -:  154:}
-        -:  155:
-       51:  156:char *path_file_name(const Path *p) {
-       51:  157:	char *ret = rstrstr(p->ptr, PATH_SEPARATOR);
-       51:  158:	if (ret != NULL && strlen(ret) > 0)
-       50:  159:		return ret + 1;
-        -:  160:
-        1:  161:	return ret;
-        -:  162:}
+       1*:   75:		if (strlen(p->ptr) > 1 && ((char *)(p->ptr))[1] == PATH_SEPARATOR_CHAR)
+    #####:   76:			snprintf(buf, PATH_MAX, "%s%s", home_dir, (char *)(p->ptr + 1));
+        -:   77:		else
+        1:   78:			snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr + 1));
+        1:   79:		strcpy(p->ptr, buf);
+        -:   80:	}
+        1:   81:	return 0;
+        -:   82:}
+        -:   83:
+        2:   84:int path_canonicalize(Path *p) {
+        2:   85:	if (path_replace_home(p))
+        1:   86:		return -1;
+        -:   87:	char buf[PATH_MAX];
+        1:   88:	errno = 0;
+        1:   89:	if (realpath(p->ptr, buf) == NULL) {
+    #####:   90:		return -1;
+        -:   91:	}
+        1:   92:	int nlen = strlen(buf);
+        1:   93:	if (nlen == 0) {
+    #####:   94:		errno = EFAULT;
+    #####:   95:		return -1;
+        -:   96:	}
+        1:   97:	if (nlen >= p->len) {
+    #####:   98:		void *nptr = myrealloc(p->ptr, nlen + 1);
+    #####:   99:		if (nptr == NULL)
+    #####:  100:			return -1;
+    #####:  101:		p->ptr = nptr;
+    #####:  102:		p->len = nlen;
+        -:  103:	}
+        1:  104:	strcpy(p->ptr, buf);
+        1:  105:	return 0;
+        -:  106:}
+       65:  107:int path_push(Path *p, const char *next) {
+       65:  108:	if (p == NULL) {
+        1:  109:		errno = EINVAL;
+        1:  110:		return -1;
+        -:  111:	}
+       64:  112:	if (next == NULL) {
+        1:  113:		errno = EINVAL;
+        1:  114:		return -1;
+        -:  115:	}
+       63:  116:	int slen = strlen(p->ptr);
+       63:  117:	if (slen <= 0 || strlen(next) == 0) {
+        1:  118:		errno = EFAULT;
+        1:  119:		return -1;
+        -:  120:	}
+       62:  121:	bool need_sep = false;
+       62:  122:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
+       62:  123:		need_sep = true;
+        -:  124:	}
+        -:  125:
+       62:  126:	int nlen = slen + strlen(next);
+       62:  127:	if (need_sep)
+       62:  128:		nlen += strlen(PATH_SEPARATOR);
+        -:  129:
+       62:  130:	if (nlen >= p->len) {
+       60:  131:		void *nptr = myrealloc(p->ptr, nlen + 1);
+       60:  132:		if (nptr == NULL)
+        1:  133:			return -1;
+       59:  134:		p->ptr = nptr;
+       59:  135:		p->len = nlen;
+        -:  136:	}
+        -:  137:
+       61:  138:	if (need_sep)
+       61:  139:		strcat(p->ptr, PATH_SEPARATOR);
+       61:  140:	strcat(p->ptr, next);
+       61:  141:	return 0;
+        -:  142:}
+       27:  143:int path_pop(Path *p) {
+       27:  144:	char *res = rstrstr(p->ptr, PATH_SEPARATOR);
+       27:  145:	if (res) {
+       26:  146:		int index = res - (char *)p->ptr;
+       26:  147:		((char *)(p->ptr))[index] = 0;
+        -:  148:	} else {
+        1:  149:		((char *)(p->ptr))[0] = '.';
+        1:  150:		((char *)(p->ptr))[1] = 0;
+        -:  151:	}
+       27:  152:	return 0;
+        -:  153:}
+        -:  154:
+       58:  155:char *path_to_string(const Path *p) {
+       58:  156:	return p->ptr;
+        -:  157:}
+        -:  158:
+       51:  159:char *path_file_name(const Path *p) {
+       51:  160:	char *ret = rstrstr(p->ptr, PATH_SEPARATOR);
+       51:  161:	if (ret != NULL && strlen(ret) > 0)
+       50:  162:		return ret + 1;
         -:  163:
-       11:  164:bool path_exists(const Path *p) {
-       11:  165:	if (p->ptr == NULL || p->len == 0) {
-        1:  166:		errno = EINVAL;
-        1:  167:		return false;
-        -:  168:	}
-       10:  169:	return access(p->ptr, F_OK) == 0;
-        -:  170:}
-        6:  171:bool path_is_dir(const Path *p) {
-        6:  172:	if (p->ptr == NULL || p->len == 0) {
-        1:  173:		errno = EINVAL;
-        1:  174:		return false;
-        -:  175:	}
-        -:  176:	struct stat s;
-        5:  177:	if (stat(p->ptr, &s) == 0) {
-        2:  178:		return s.st_mode & S_IFDIR;
-        -:  179:	}
-        3:  180:	return false;
-        -:  181:}
-        -:  182:
-       44:  183:bool path_mkdir(Path *p, u64 mode, bool parent) {
-       44:  184:	if (p->ptr == NULL || p->len == 0) {
-        1:  185:		errno = EINVAL;
-        1:  186:		return false;
-        -:  187:	}
-        -:  188:
-        -:  189:	struct stat s;
-        -:  190:
-        -:  191:	// Check if the path exists
-       43:  192:	if (stat(p->ptr, &s) == 0) {
-        -:  193:		// If the path exists and it's a directory, return success
-        2:  194:		if (s.st_mode & S_IFDIR) {
-        1:  195:			return true;
-        -:  196:		} else {
-        -:  197:			// Path exists but it's not a directory
-        1:  198:			errno = ENOTDIR;
-        1:  199:			return false;
-        -:  200:		}
-        -:  201:	}
-        -:  202:
-        -:  203:	// If parent is false, attempt to create only the target directory
-       41:  204:	if (!parent) {
-       37:  205:		if (mkdir(p->ptr, mode) != 0) {
-       25:  206:			return false;
-        -:  207:		}
-       12:  208:		return true;
-        -:  209:	}
-        -:  210:
-        -:  211:	// Create the directory structure (parent is true)
-        4:  212:	Path temp_path;
-        4:  213:	if (path_copy(&temp_path, p) != 0) {
-        1:  214:		return false;
-        -:  215:	}
-        -:  216:
-        3:  217:	int i = 0;
-        -:  218:	char path_bufs[20][PATH_MAX];
-       23:  219:	while (true) {
-       26:  220:		if (path_mkdir(&temp_path, mode, false)) {
-        6:  221:			for (int j = i - 1; j >= 0; j--) {
-        4:  222:				path_push(&temp_path, path_bufs[j]);
-        4:  223:				if (!path_mkdir(&temp_path, mode, false))
-    #####:  224:					return false;
-        -:  225:			}
-        2:  226:			return true;
-        -:  227:		}
-       24:  228:		const char *dir_part = path_file_name(&temp_path);
-       24:  229:		path_pop(&temp_path);
-       24:  230:		strcpy(path_bufs[i], dir_part);
-       24:  231:		if (path_file_name(&temp_path) == NULL)
-    #####:  232:			break;
-       24:  233:		i++;
-       24:  234:		if (i == 20)
-        1:  235:			break;
-        -:  236:	}
-        1:  237:	return false;
-        -:  238:}
-        -:  239:
-       24:  240:int path_copy(Path *dst, const Path *src) {
-       24:  241:	return path_for(dst, path_to_string(src));
-        -:  242:}
-        -:  243:
-        1:  244:int path_file_stem(const Path *p, char *buf, u64 limit) {
-        -:  245:	// Copy the file name into the buffer, ensuring proper null termination
-        1:  246:	strncpy(buf, path_file_name(p), limit - 1);
-        1:  247:	buf[limit - 1] = '\0'; // Manually ensure null-termination
-        -:  248:
-        1:  249:	u64 buflen = strlen(buf); // Compute length once
-        4:  250:	for (ssize_t i = buflen - 1; i >= 0; i--) {
-        4:  251:		if (buf[i] == '.') {
-        1:  252:			buf[i] = '\0'; // Null-terminate at the dot
-        1:  253:			break;
-        3:  254:		} else if (buf[i] == '/') {
-    #####:  255:			break; // Stop if we encounter a directory separator
-        -:  256:		}
-        -:  257:	}
-        1:  258:	return 0;
-        -:  259:}
+        1:  164:	return ret;
+        -:  165:}
+        -:  166:
+       11:  167:bool path_exists(const Path *p) {
+       11:  168:	if (p->ptr == NULL || p->len == 0) {
+        1:  169:		errno = EINVAL;
+        1:  170:		return false;
+        -:  171:	}
+       10:  172:	return access(p->ptr, F_OK) == 0;
+        -:  173:}
+        6:  174:bool path_is_dir(const Path *p) {
+        6:  175:	if (p->ptr == NULL || p->len == 0) {
+        1:  176:		errno = EINVAL;
+        1:  177:		return false;
+        -:  178:	}
+        -:  179:	struct stat s;
+        5:  180:	if (stat(p->ptr, &s) == 0) {
+        2:  181:		return s.st_mode & S_IFDIR;
+        -:  182:	}
+        3:  183:	return false;
+        -:  184:}
+        -:  185:
+       44:  186:bool path_mkdir(Path *p, u64 mode, bool parent) {
+       44:  187:	if (p->ptr == NULL || p->len == 0) {
+        1:  188:		errno = EINVAL;
+        1:  189:		return false;
+        -:  190:	}
+        -:  191:
+        -:  192:	struct stat s;
+        -:  193:
+        -:  194:	// Check if the path exists
+       43:  195:	if (stat(p->ptr, &s) == 0) {
+        -:  196:		// If the path exists and it's a directory, return success
+        2:  197:		if (s.st_mode & S_IFDIR) {
+        1:  198:			return true;
+        -:  199:		} else {
+        -:  200:			// Path exists but it's not a directory
+        1:  201:			errno = ENOTDIR;
+        1:  202:			return false;
+        -:  203:		}
+        -:  204:	}
+        -:  205:
+        -:  206:	// If parent is false, attempt to create only the target directory
+       41:  207:	if (!parent) {
+       37:  208:		if (mkdir(p->ptr, mode) != 0) {
+       25:  209:			return false;
+        -:  210:		}
+       12:  211:		return true;
+        -:  212:	}
+        -:  213:
+        -:  214:	// Create the directory structure (parent is true)
+        4:  215:	Path temp_path;
+        4:  216:	if (path_copy(&temp_path, p) != 0) {
+        1:  217:		return false;
+        -:  218:	}
+        -:  219:
+        3:  220:	int i = 0;
+        -:  221:	char path_bufs[20][PATH_MAX];
+       23:  222:	while (true) {
+       26:  223:		if (path_mkdir(&temp_path, mode, false)) {
+        6:  224:			for (int j = i - 1; j >= 0; j--) {
+        4:  225:				path_push(&temp_path, path_bufs[j]);
+        4:  226:				if (!path_mkdir(&temp_path, mode, false))
+    #####:  227:					return false;
+        -:  228:			}
+        2:  229:			return true;
+        -:  230:		}
+       24:  231:		const char *dir_part = path_file_name(&temp_path);
+       24:  232:		path_pop(&temp_path);
+       24:  233:		strcpy(path_bufs[i], dir_part);
+       24:  234:		if (path_file_name(&temp_path) == NULL)
+    #####:  235:			break;
+       24:  236:		i++;
+       24:  237:		if (i == 20)
+        1:  238:			break;
+        -:  239:	}
+        1:  240:	return false;
+        -:  241:}
+        -:  242:
+       24:  243:int path_copy(Path *dst, const Path *src) {
+       24:  244:	return path_for(dst, path_to_string(src));
+        -:  245:}
+        -:  246:
+        1:  247:int path_file_stem(const Path *p, char *buf, u64 limit) {
+        -:  248:	// Copy the file name into the buffer, ensuring proper null termination
+        1:  249:	strncpy(buf, path_file_name(p), limit - 1);
+        1:  250:	buf[limit - 1] = '\0'; // Manually ensure null-termination
+        -:  251:
+        1:  252:	u64 buflen = strlen(buf); // Compute length once
+        4:  253:	for (ssize_t i = buflen - 1; i >= 0; i--) {
+        4:  254:		if (buf[i] == '.') {
+        1:  255:			buf[i] = '\0'; // Null-terminate at the dot
+        1:  256:			break;
+        3:  257:		} else if (buf[i] == '/') {
+    #####:  258:			break; // Stop if we encounter a directory separator
+        -:  259:		}
+        -:  260:	}
+        1:  261:	return 0;
+        -:  262:}
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
