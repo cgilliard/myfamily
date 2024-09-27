@@ -38,7 +38,11 @@ jobs:
           ./bin/fam init test1
           test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
           make clean testsan
-          
+          # Build documentation for Linux only when the pipeline is triggered manually or on schedule
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            echo "running build docs";
+            ./scripts/build_docs.sh "$MyFamilyPat" "$GITHUB_SHA"
+          fi          
   macos:
     runs-on: macos-latest
     strategy:
