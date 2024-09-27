@@ -1,5 +1,5 @@
 # Executables
-SHELL := /bin/bash
+SHELL := /bin/sh
 CC=REPLACE_CC
 MAKE=make
 
