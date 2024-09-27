@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <criterion/criterion.h>
+#include <base/test.h>
 
-Test(args, test_args) {
+MySuite(args);
+
+MyTest(args, test_args) {
 }

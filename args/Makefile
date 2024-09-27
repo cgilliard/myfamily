@@ -1,4 +1,4 @@
 OBJS := args.o
-TEST_OBJS := $(OBJS)
+TEST_OBJS := ../base/*.o $(OBJS)
 
 include ../Makefile.template
