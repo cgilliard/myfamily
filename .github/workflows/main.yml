@@ -26,18 +26,18 @@ jobs:
       - name: Check uname
         run: uname -a
       
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install libcriterion-dev doxygen python3-pip
-          sudo pip3 install pre-commit
-
       - name: Test Linux Build
         run: |
           ./configure --minimal
           make clean all
           ./bin/fam init test1
           test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
+
+      - name: Install Test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install libcriterion-dev doxygen python3-pip
+          sudo pip3 install pre-commit
 
       - name: Run Linux Tests (gcc)
         run: |
@@ -70,6 +70,13 @@ jobs:
       - name: Check macOS Version
         run: sw_vers
       
+      - name: Test MacOS Build
+        run: |
+          ./scripts/configure_homebrew.sh --minimal
+          make clean all
+          ./bin/fam init test1
+          test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
+
       - name: Install dependencies
         run: |
           brew install criterion
@@ -77,13 +84,6 @@ jobs:
           source venv/bin/activate
           pip install pre-commit
           pre-commit install
-
-      - name: Test MacOS Build
-        run: |
-          ./scripts/configure_homebrew.sh --minimal
-          make clean all
-          ./bin/fam init test1
-          test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
      
       - name: Run MacOS Tests (gcc)
         run: |
