@@ -87,94 +87,43 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _BASE_COLORS__</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _BASE_COLORS__</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;stdlib.h&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#ifdef __linux__</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#define getenv(x) secure_getenv(x)</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// __linux__</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keywordtype">char</span> *<a class="code" href="colors_8h.html#a8352ca2c4def591153d1ef0dfeccd33a">get_dimmed</a>();</div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="colors_8h.html#a3e288bbc66ee9a6658a68db03109e644">   19</a></span>&#160;<span class="preprocessor">#define DIMMED get_dimmed()</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keywordtype">char</span> *<a class="code" href="colors_8h.html#a7de89b09310f0019151eef52d36bcba1">get_red</a>();</div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="colors_8h.html#a8d23feea868a983c8c2b661e1e16972f">   22</a></span>&#160;<span class="preprocessor">#define RED get_red()</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">static</span> <span class="keywordtype">char</span> *get_dimmed() {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keywordflow">if</span> (getenv(<span class="stringliteral">&quot;NO_COLOR&quot;</span>) != NULL) {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;\x1b[2m&quot;</span>;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    }</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;}</div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="colors_8h.html#a3e288bbc66ee9a6658a68db03109e644">   31</a></span>&#160;<span class="preprocessor">#define DIMMED get_dimmed()</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keywordtype">char</span> *<a class="code" href="colors_8h.html#af4050e1645d57e5b4747d640921bdd40">get_bright_red</a>();</div>
+<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="colors_8h.html#a458d388b2fc60518af3517f52f9e7e2a">   25</a></span>&#160;<span class="preprocessor">#define BRIGHT_RED get_bright_red()</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keywordtype">char</span> *<a class="code" href="colors_8h.html#ae6970a174f281327799a59817ecbb08b">get_green</a>();</div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="colors_8h.html#acfbc006ea433ad708fdee3e82996e721">   28</a></span>&#160;<span class="preprocessor">#define GREEN get_green()</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keywordtype">char</span> *<a class="code" href="colors_8h.html#a096f44e2a7d8adac10a86d8afcf500e8">get_yellow</a>();</div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="colors_8h.html#abf681265909adf3d3e8116c93c0ba179">   31</a></span>&#160;<span class="preprocessor">#define YELLOW get_yellow()</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">static</span> <span class="keywordtype">char</span> *get_red() {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keywordflow">if</span> (getenv(<span class="stringliteral">&quot;NO_COLOR&quot;</span>) != NULL) {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;\x1b[31m&quot;</span>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    }</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;}</div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="colors_8h.html#a8d23feea868a983c8c2b661e1e16972f">   40</a></span>&#160;<span class="preprocessor">#define RED get_red()</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keywordtype">char</span> *<a class="code" href="colors_8h.html#aa94e77be0345202999d85fbb9ff08d66">get_cyan</a>();</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="colors_8h.html#ad243f93c16bc4c1d3e0a13b84421d760">   34</a></span>&#160;<span class="preprocessor">#define CYAN get_cyan()</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keywordtype">char</span> *<a class="code" href="colors_8h.html#a7d1a2b7df538201e5c6580b1c61e281a">get_magenta</a>();</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="colors_8h.html#a6f699060902f800f12aaae150f3a708e">   37</a></span>&#160;<span class="preprocessor">#define MAGENTA get_magenta()</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keywordtype">char</span> *<a class="code" href="colors_8h.html#af2177401c986d357c238151d4a2d88c9">get_blue</a>();</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="colors_8h.html#a79d10e672abb49ad63eeaa8aaef57c38">   40</a></span>&#160;<span class="preprocessor">#define BLUE get_blue()</span></div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">static</span> <span class="keywordtype">char</span> *get_bright_red() {</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordflow">if</span> (getenv(<span class="stringliteral">&quot;NO_COLOR&quot;</span>) != NULL) {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;\x1b[91m&quot;</span>;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;}</div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="colors_8h.html#a458d388b2fc60518af3517f52f9e7e2a">   49</a></span>&#160;<span class="preprocessor">#define BRIGHT_RED get_bright_red()</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">static</span> <span class="keywordtype">char</span> *get_green() {</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordflow">if</span> (getenv(<span class="stringliteral">&quot;NO_COLOR&quot;</span>) != NULL) {</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;\x1b[32m&quot;</span>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    }</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;}</div>
-<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="colors_8h.html#acfbc006ea433ad708fdee3e82996e721">   58</a></span>&#160;<span class="preprocessor">#define GREEN get_green()</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">static</span> <span class="keywordtype">char</span> *get_yellow() {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordflow">if</span> (getenv(<span class="stringliteral">&quot;NO_COLOR&quot;</span>) != NULL) {</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;\x1b[33m&quot;</span>;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    }</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;}</div>
-<div class="line"><a name="l00067"></a><span class="lineno"><a class="line" href="colors_8h.html#abf681265909adf3d3e8116c93c0ba179">   67</a></span>&#160;<span class="preprocessor">#define YELLOW get_yellow()</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">static</span> <span class="keywordtype">char</span> *get_cyan() {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keywordflow">if</span> (getenv(<span class="stringliteral">&quot;NO_COLOR&quot;</span>) != NULL) {</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;\x1b[36m&quot;</span>;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;}</div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="colors_8h.html#ad243f93c16bc4c1d3e0a13b84421d760">   76</a></span>&#160;<span class="preprocessor">#define CYAN get_cyan()</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keyword">static</span> <span class="keywordtype">char</span> *get_magenta() {</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordflow">if</span> (getenv(<span class="stringliteral">&quot;NO_COLOR&quot;</span>) != NULL) {</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;\x1b[35m&quot;</span>;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    }</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;}</div>
-<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="colors_8h.html#a6f699060902f800f12aaae150f3a708e">   85</a></span>&#160;<span class="preprocessor">#define MAGENTA get_magenta()</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="keyword">static</span> <span class="keywordtype">char</span> *get_blue() {</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordflow">if</span> (getenv(<span class="stringliteral">&quot;NO_COLOR&quot;</span>) != NULL) {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;\x1b[34m&quot;</span>;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    }</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;}</div>
-<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="colors_8h.html#a79d10e672abb49ad63eeaa8aaef57c38">   94</a></span>&#160;<span class="preprocessor">#define BLUE get_blue()</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keyword">static</span> <span class="keywordtype">char</span> *get_reset() {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordflow">if</span> (getenv(<span class="stringliteral">&quot;NO_COLOR&quot;</span>) != NULL) {</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&quot;\x1b[0m&quot;</span>;</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    }</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;}</div>
-<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="colors_8h.html#ab702106cf3b3e96750b6845ded4e0299">  103</a></span>&#160;<span class="preprocessor">#define RESET get_reset()</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _BASE_COLORS__</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keywordtype">char</span> *<a class="code" href="colors_8h.html#a30d13b098fb3242212fbaf097c671aba">get_reset</a>();</div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="colors_8h.html#ab702106cf3b3e96750b6845ded4e0299">   43</a></span>&#160;<span class="preprocessor">#define RESET get_reset()</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _BASE_COLORS__</span></div>
+<div class="ttc" id="acolors_8h_html_a096f44e2a7d8adac10a86d8afcf500e8"><div class="ttname"><a href="colors_8h.html#a096f44e2a7d8adac10a86d8afcf500e8">get_yellow</a></div><div class="ttdeci">char * get_yellow()</div><div class="ttdef"><b>Definition:</b> colors.c:54</div></div>
+<div class="ttc" id="acolors_8h_html_a30d13b098fb3242212fbaf097c671aba"><div class="ttname"><a href="colors_8h.html#a30d13b098fb3242212fbaf097c671aba">get_reset</a></div><div class="ttdeci">char * get_reset()</div><div class="ttdef"><b>Definition:</b> colors.c:86</div></div>
+<div class="ttc" id="acolors_8h_html_a7d1a2b7df538201e5c6580b1c61e281a"><div class="ttname"><a href="colors_8h.html#a7d1a2b7df538201e5c6580b1c61e281a">get_magenta</a></div><div class="ttdeci">char * get_magenta()</div><div class="ttdef"><b>Definition:</b> colors.c:70</div></div>
+<div class="ttc" id="acolors_8h_html_a7de89b09310f0019151eef52d36bcba1"><div class="ttname"><a href="colors_8h.html#a7de89b09310f0019151eef52d36bcba1">get_red</a></div><div class="ttdeci">char * get_red()</div><div class="ttdef"><b>Definition:</b> colors.c:30</div></div>
+<div class="ttc" id="acolors_8h_html_a8352ca2c4def591153d1ef0dfeccd33a"><div class="ttname"><a href="colors_8h.html#a8352ca2c4def591153d1ef0dfeccd33a">get_dimmed</a></div><div class="ttdeci">char * get_dimmed()</div><div class="ttdef"><b>Definition:</b> colors.c:22</div></div>
+<div class="ttc" id="acolors_8h_html_aa94e77be0345202999d85fbb9ff08d66"><div class="ttname"><a href="colors_8h.html#aa94e77be0345202999d85fbb9ff08d66">get_cyan</a></div><div class="ttdeci">char * get_cyan()</div><div class="ttdef"><b>Definition:</b> colors.c:62</div></div>
+<div class="ttc" id="acolors_8h_html_ae6970a174f281327799a59817ecbb08b"><div class="ttname"><a href="colors_8h.html#ae6970a174f281327799a59817ecbb08b">get_green</a></div><div class="ttdeci">char * get_green()</div><div class="ttdef"><b>Definition:</b> colors.c:46</div></div>
+<div class="ttc" id="acolors_8h_html_af2177401c986d357c238151d4a2d88c9"><div class="ttname"><a href="colors_8h.html#af2177401c986d357c238151d4a2d88c9">get_blue</a></div><div class="ttdeci">char * get_blue()</div><div class="ttdef"><b>Definition:</b> colors.c:78</div></div>
+<div class="ttc" id="acolors_8h_html_af4050e1645d57e5b4747d640921bdd40"><div class="ttname"><a href="colors_8h.html#af4050e1645d57e5b4747d640921bdd40">get_bright_red</a></div><div class="ttdeci">char * get_bright_red()</div><div class="ttdef"><b>Definition:</b> colors.c:38</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

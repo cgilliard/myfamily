@@ -74,17 +74,20 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="path_8h_source.html">base/path.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
 <code>#include &lt;errno.h&gt;</code><br />
 <code>#include &lt;limits.h&gt;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
 <code>#include &lt;sys/stat.h&gt;</code><br />
+<code>#include &lt;unistd.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:af2abcd42f8ea2c07c2333f60d578f1a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#af2abcd42f8ea2c07c2333f60d578f1a0">path_cleanup</a> (<a class="el" href="structPathImpl.html">PathImpl</a> *ptr)</td></tr>
 <tr class="separator:af2abcd42f8ea2c07c2333f60d578f1a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47f54247ef0bb3f24d2ff02d206f55f6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#a47f54247ef0bb3f24d2ff02d206f55f6">path_for</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, const char *<a class="el" href="header__sample1_8h.html#af6b46818cfa690027c8616652a03d6af">path</a>)</td></tr>
+<tr class="memitem:a47f54247ef0bb3f24d2ff02d206f55f6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#a47f54247ef0bb3f24d2ff02d206f55f6">path_for</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, const char *path)</td></tr>
 <tr class="separator:a47f54247ef0bb3f24d2ff02d206f55f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a68220aefa3e453991b743ae05c8229f7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#a68220aefa3e453991b743ae05c8229f7">path_replace_home</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
 <tr class="separator:a68220aefa3e453991b743ae05c8229f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -98,15 +101,15 @@ Functions</h2></td></tr>
 <tr class="separator:aca543d50b7beb40ebb9584fec3e2eb6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af10ae67a25a622c875723410d59fd633"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#af10ae67a25a622c875723410d59fd633">path_file_name</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
 <tr class="separator:af10ae67a25a622c875723410d59fd633"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a668e7b18d0178b35a818d3f3f302981c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#a668e7b18d0178b35a818d3f3f302981c">path_exists</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
+<tr class="memitem:a668e7b18d0178b35a818d3f3f302981c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#a668e7b18d0178b35a818d3f3f302981c">path_exists</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
 <tr class="separator:a668e7b18d0178b35a818d3f3f302981c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90b6a2154ce88049f2620729fe258aa0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#a90b6a2154ce88049f2620729fe258aa0">path_is_dir</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
+<tr class="memitem:a90b6a2154ce88049f2620729fe258aa0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#a90b6a2154ce88049f2620729fe258aa0">path_is_dir</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
 <tr class="separator:a90b6a2154ce88049f2620729fe258aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a810e528679c28c58abf077a70af8d9b6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#a810e528679c28c58abf077a70af8d9b6">path_mkdir</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, mode_t mode, bool parent)</td></tr>
-<tr class="separator:a810e528679c28c58abf077a70af8d9b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af458685a462418befcec814730830591"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#af458685a462418befcec814730830591">path_mkdir</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> mode, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> parent)</td></tr>
+<tr class="separator:af458685a462418befcec814730830591"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa74390413dcff75de2298054879f7ab6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#aa74390413dcff75de2298054879f7ab6">path_copy</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *dst, const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *src)</td></tr>
 <tr class="separator:aa74390413dcff75de2298054879f7ab6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fa4b1ecae63e57f8e33be12867398fc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#a9fa4b1ecae63e57f8e33be12867398fc">path_file_stem</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, char *buf, <a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a> limit)</td></tr>
+<tr class="memitem:a9fa4b1ecae63e57f8e33be12867398fc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8c.html#a9fa4b1ecae63e57f8e33be12867398fc">path_file_stem</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, char *buf, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> limit)</td></tr>
 <tr class="separator:a9fa4b1ecae63e57f8e33be12867398fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -181,7 +184,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool path_exists </td>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> path_exists </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
           <td class="paramname"><em>p</em></td><td>)</td>
@@ -231,7 +234,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="main_2resources_2include_2core_2types_8h.html#a969c7c1ebb4f70581e040a3034b14ee0">u64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
           <td class="paramname"><em>limit</em>&#160;</td>
         </tr>
         <tr>
@@ -279,7 +282,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool path_is_dir </td>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> path_is_dir </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
           <td class="paramname"><em>p</em></td><td>)</td>
@@ -290,14 +293,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a810e528679c28c58abf077a70af8d9b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a810e528679c28c58abf077a70af8d9b6">&#9670;&nbsp;</a></span>path_mkdir()</h2>
+<a id="af458685a462418befcec814730830591"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af458685a462418befcec814730830591">&#9670;&nbsp;</a></span>path_mkdir()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool path_mkdir </td>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> path_mkdir </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
           <td class="paramname"><em>p</em>, </td>
@@ -305,13 +308,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">mode_t&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
           <td class="paramname"><em>mode</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
           <td class="paramname"><em>parent</em>&#160;</td>
         </tr>
         <tr>
