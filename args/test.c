@@ -12,9 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <args/args.h>
 #include <base/test.h>
 
 MySuite(args);
 
-MyTest(args, test_args) {
+MyTest(args, test_args_params) {
+	ArgsParam p1;
+	cr_assert(!args_param_build(&p1, "name", "name help here", "n", false, false, "myname"));
+	cr_assert(!strcmp(p1.name, "name"));
+	cr_assert(!strcmp(p1.help, "name help here"));
+	cr_assert(!strcmp(p1.short_name, "n"));
+	cr_assert_eq(p1.takes_value, false);
+	cr_assert_eq(p1.multiple, false);
+	cr_assert(!strcmp(p1.default_value, "myname"));
+
+	ArgsParamImpl p2;
+	char name[ARGS_MAX_ARGUMENT_NAME_LENGTH + 2];
+	for (int i = 0; i < ARGS_MAX_ARGUMENT_NAME_LENGTH + 1; i++)
+		name[i] = '1';
+	name[ARGS_MAX_ARGUMENT_NAME_LENGTH + 1] = 0;
+	cr_assert(args_param_build(NULL, NULL, NULL, NULL, false, false, NULL));
+	cr_assert(args_param_build(&p2, name, "name help here", "n", false, false, "myname"));
+
+	__is_debug_malloc = true;
+	cr_assert(args_param_build(&p2, "name", "name help here", "n", false, false, "myname"));
+	__is_debug_malloc = false;
+
+	ArgsParam p3;
+	cr_assert(!args_param_build(&p3, "name", "name help here", "n", false, false, NULL));
+	cr_assert(!strcmp(p3.name, "name"));
+	cr_assert(!strcmp(p3.help, "name help here"));
+	cr_assert(!strcmp(p3.short_name, "n"));
+	cr_assert_eq(p3.takes_value, false);
+	cr_assert_eq(p3.multiple, false);
+	cr_assert_eq(p3.default_value, NULL);
 }

@@ -53,6 +53,7 @@ void sub_command_cleanup(SubCommandImpl *ptr);
 
 int sub_command_build(SubCommand *sc, const char *name, const char *help, const u32 min_args,
 					  const u32 max_args, const char *arg_doc);
+int sub_command_add_param(SubCommand *sc, const ArgsParam *ap);
 
 typedef struct ArgsImpl {
 	char prog[ARGS_MAX_DETAIL_LENGTH + 1];
@@ -70,5 +71,13 @@ void args_cleanup(ArgsImpl *ptr);
 
 int args_build(Args *args, const char *prog, const char *version, const char *author,
 			   const u32 min_args, const u32 max_args);
+
+int args_add_param(Args *args, const ArgsParam *ap);
+int args_init(Args *args, const int argc, const char **argv);
+int args_value_of(const Args *args, const char *param_name, char *value_buf,
+				  const u64 max_value_len, const u64 index);
+int args_get_argument(const Args *args, const u64 index, char *value_buf, const u64 max_value_len);
+void args_print_version(const Args *args);
+void args_usage(const Args *args, const char *sub);
 
 #endif // _ARGS_ARGS__
