@@ -34,7 +34,10 @@ jobs:
       - name: Run Linux Tests
         run: |
           ./configure
-          make clean test
+          make clean all
+          ./bin/fam init test1
+          test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
+          make clean testsan
           
   macos:
     runs-on: macos-latest
@@ -59,4 +62,7 @@ jobs:
       - name: Run MacOS Tests
         run: |
           ./scripts/configure_homebrew.sh
-          make clean test
+          make clean all
+          ./bin/fam init test1
+          test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
+          make clean testsan
