@@ -16,6 +16,7 @@
 #include <base/resources.h>
 #include <base/types.h>
 #include <dirent.h>
+#include <errno.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -60,13 +61,17 @@ u64 read_all(void *buffer, size_t size, size_t count, FILE *stream) {
 }
 
 int copy_file(const Path *dst_path, const Path *src_path) {
+	if (dst_path == NULL || src_path == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
 	FILE *source_file, *dest_file;
 	size_t bytes;
 
 	// Open the source file in binary read mode
 	source_file = (FILE *)myfopen(src_path, "rb");
 	if (source_file == NULL) {
-		perror("Error opening source file");
+		errno = EINVAL;
 		return -1;
 	}
 
@@ -79,17 +84,17 @@ int copy_file(const Path *dst_path, const Path *src_path) {
 	// Open the destination file in binary write mode
 	dest_file = (FILE *)myfopen(dst_path, "wb");
 	if (dest_file == NULL) {
-		perror("Error opening destination file");
-		fclose(source_file);
+		errno = ENOENT;
+		myfclose((MYFILE *)source_file);
 		return -1;
 	}
 
 	// Copy the file content
 	while ((bytes = fread(buffer, 1, file_size, source_file)) > 0) {
 		if (fwrite(buffer, 1, bytes, dest_file) != bytes) {
-			perror("Error writing to destination file");
-			fclose(source_file);
-			fclose(dest_file);
+			errno = EIO;
+			myfclose((MYFILE *)source_file);
+			myfclose((MYFILE *)dest_file);
 			return -1;
 		}
 	}

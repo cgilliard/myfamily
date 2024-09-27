@@ -200,3 +200,91 @@ MyTest(base, test_path) {
 	path_file_stem(&file_stem_test1, buf, PATH_MAX);
 	cr_assert(!strcmp(buf, "file"));
 }
+
+MyTest(base, test_misc) {
+	cr_assert(!rstrstr("test", "test1"));
+
+	Path file;
+	path_copy(&file, test_dir);
+	path_push(&file, "file.txt");
+
+	Path file2;
+	path_copy(&file2, test_dir);
+	path_push(&file2, "file2.txt");
+
+	MYFILE *ptr = myfopen(&file, "w");
+
+	char *testline = "testline";
+	fprintf((FILE *)ptr, "%s", testline);
+
+	myfclose(ptr);
+
+	cr_assert(!path_exists(&file2));
+	copy_file(&file2, &file);
+	cr_assert(path_exists(&file2));
+
+	MYFILE *ptr2 = myfopen(&file, "r");
+	char buf[1024];
+	strcpy(buf, "");
+	u64 v = read_all(buf, 1, 1024, ptr2);
+	buf[v] = 0;
+	cr_assert_eq(v, strlen(testline));
+	cr_assert(!strcmp(testline, buf));
+	myfclose(ptr2);
+
+	Path file3;
+	path_copy(&file3, test_dir);
+	path_push(&file3, "abc");
+	Path file4;
+	path_copy(&file4, test_dir);
+	path_push(&file4, "def");
+	cr_assert(copy_file(&file4, &file3));
+
+	cr_assert(copy_file(NULL, &file));
+
+	Path file5;
+	path_copy(&file5, test_dir);
+	path_push(&file5, "a");
+	path_push(&file5, "a");
+	path_push(&file5, "a");
+	path_push(&file5, "a");
+
+	cr_assert(copy_file(&file5, &file));
+}
+
+MyTest(base, test_remove_dir) {
+	Path file;
+	path_copy(&file, test_dir);
+	path_push(&file, "mydir");
+	path_push(&file, "sub1");
+
+	path_mkdir(&file, 0700, true);
+
+	Path text;
+	path_copy(&text, &file);
+	path_push(&text, "file1.txt");
+
+	MYFILE *ptr = myfopen(&text, "w");
+	fprintf((FILE *)ptr, "test1");
+	myfclose(ptr);
+
+	cr_assert(path_exists(&text));
+	Path text2;
+	path_copy(&text2, test_dir);
+	path_push(&text2, "mydir");
+	path_push(&text2, "file2.txt");
+	MYFILE *ptr2 = myfopen(&text2, "w");
+	fprintf((FILE *)ptr2, "test2");
+	myfclose(ptr2);
+
+	Path rem;
+	path_copy(&rem, test_dir);
+	path_push(&rem, "mydir");
+	cr_assert(path_exists(&rem));
+	remove_directory(&rem, true);
+
+	cr_assert(path_exists(&rem));
+	remove_directory(&rem, false);
+
+	cr_assert(!path_exists(&rem));
+}
