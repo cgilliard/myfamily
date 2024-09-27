@@ -16,42 +16,40 @@
 #define _BASE_MYSTDINT__
 
 // Include standard int if specified
-// #ifdef USE_STDINT
+#ifdef USE_STDINT
 #include <stdint.h>
-// #endif // USE_STDINT
+#endif // USE_STDINT
 
-/*
 #ifndef UINT8_T
-typedef unsigned char uint8_t; // 8 bits
+typedef unsigned char u8; // 8 bits
 #endif
 
 #ifndef UINT16_T
-typedef unsigned short uint16_t; // 16 bits
+typedef unsigned short u16; // 16 bits
 #endif
 
 #ifndef UINT32_T
-typedef unsigned int uint32_t; // 32 bits
+typedef unsigned int u32; // 32 bits
 #endif
 
 #ifndef UINT64_T
-typedef unsigned long long uint64_t; // 64 bits
+typedef unsigned long long u64; // 64 bits
 #endif
 
 #ifndef INT8_T
-typedef signed char int8_t; // 8 bits
+typedef signed char i8; // 8 bits
 #endif
 
 #ifndef INT16_T
-typedef signed short int16_t; // 16 bits
+typedef signed short i16; // 16 bits
 #endif
 
 #ifndef INT32_T
-typedef signed int int32_t; // 32 bits
+typedef signed int i32; // 32 bits
 #endif
 
 #ifndef INT64_T
-typedef signed long long int64_t; // 64 bits
+typedef signed long long i64; // 64 bits
 #endif
-*/
 
 #endif // _BASE_MYSTDINT__
