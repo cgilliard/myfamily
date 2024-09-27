@@ -46,8 +46,8 @@ jobs:
           brew install criterion
           python3 -m venv venv
           source venv/bin/activate
-          pip install pre-commit
-          pre-commit install
+          # pip install pre-commit
+          # pre-commit install
       
       - name: Run MacOS Tests
         run: |
