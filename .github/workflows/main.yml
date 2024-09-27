@@ -42,7 +42,7 @@ jobs:
           # Build documentation for Linux only when the pipeline is triggered manually or on schedule
           if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             echo "running build docs";
-            ./scripts/build_docs.sh "${{ secrets.MyFamilyPat }}" "$GITHUB_SHA"
+            ./scripts/build_docs.sh "${MYFAMILYPAT}" "$GITHUB_SHA"
           else
             echo "not running build docs event: $GITHUB_EVENT_NAME";
           fi          
