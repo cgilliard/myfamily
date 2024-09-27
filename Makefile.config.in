@@ -1,6 +1,6 @@
 # Executables
 SHELL := /bin/bash
-CC=cc
+CC=REPLACE_CC
 MAKE=make
 
 # FLags

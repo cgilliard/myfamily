@@ -39,6 +39,8 @@ command -v doxygen >/dev/null 2>&1 || { echo >&2 "Doxygen is not installed. Docu
 rm -f .git/hooks/pre-commit
 pre-commit install -f
 
+cc=cc
+
 for var in "$@"
 do
 
@@ -53,6 +55,11 @@ if [[ $var == --with-criterion-lib=* ]]; then
         echo "crit lib = $lib";
 fi
 
+if [[ $var == --with-cc=* ]]; then
+	cc=${var#*=}
+	echo "cc = $cc";
+fi
+
 done
 
 # Configure Makefile with Criterion paths
@@ -61,10 +68,12 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS (BSD sed)
     sed -i '' "s|REPLACE_CRITERION_INCLUDE|${include}|g" Makefile.config
     sed -i '' "s|REPLACE_CRITERION_LIB|${lib}|g" Makefile.config
+    sed -i '' "s|REPLACE_CC|${cc}|g" Makefile.config
 else
     # Linux (GNU sed)
     sed -i "s|REPLACE_CRITERION_INCLUDE|${include}|g" Makefile.config
     sed -i "s|REPLACE_CRITERION_LIB|${lib}|g" Makefile.config
+    sed -i "s|REPLACE_CC|${cc}|g" Makefile.config
 fi
 
 echo "Full development environment setup complete."
