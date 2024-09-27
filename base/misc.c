@@ -49,6 +49,14 @@ int myfseek(MYFILE *stream, long pos, int type) {
 	return fseek((FILE *)stream, pos, type);
 }
 
+int myfprintf(MYFILE *fptr, const char *str, ...) {
+	va_list args;
+	va_start(args, str);
+	int ret = vfprintf((FILE *)fptr, str, args);
+	va_end(args);
+	return ret;
+}
+
 const char *rstrstr(const char *s1, const char *s2) {
 	size_t s1len = strlen(s1);
 	size_t s2len = strlen(s2);

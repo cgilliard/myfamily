@@ -33,8 +33,8 @@ MyTest(base, test_colors) {
 
 	MYFILE *ptr = myfopen(&file, "w");
 
-	fprintf((FILE *)ptr, "%s%s%s%s%s%s%s%s%s", DIMMED, MAGENTA, BRIGHT_RED, RED, BLUE, CYAN, YELLOW,
-			GREEN, RESET);
+	myfprintf(ptr, "%s%s%s%s%s%s%s%s%s", DIMMED, MAGENTA, BRIGHT_RED, RED, BLUE, CYAN, YELLOW,
+			  GREEN, RESET);
 
 	myfclose(ptr);
 
@@ -52,8 +52,8 @@ MyTest(base, test_colors) {
 	// set no color
 	setenv("NO_COLOR", "true", 1);
 	MYFILE *ptr3 = myfopen(&file2, "w");
-	fprintf((FILE *)ptr3, "%s%s%s%s%s%s%s%s%s", DIMMED, MAGENTA, BRIGHT_RED, RED, BLUE, CYAN,
-			YELLOW, GREEN, RESET);
+	myfprintf(ptr3, "%s%s%s%s%s%s%s%s%s", DIMMED, MAGENTA, BRIGHT_RED, RED, BLUE, CYAN, YELLOW,
+			  GREEN, RESET);
 
 	myfclose(ptr3);
 
@@ -215,7 +215,7 @@ MyTest(base, test_misc) {
 	MYFILE *ptr = myfopen(&file, "w");
 
 	char *testline = "testline";
-	fprintf((FILE *)ptr, "%s", testline);
+	myfprintf(ptr, "%s", testline);
 
 	myfclose(ptr);
 
@@ -265,7 +265,7 @@ MyTest(base, test_remove_dir) {
 	path_push(&text, "file1.txt");
 
 	MYFILE *ptr = myfopen(&text, "w");
-	fprintf((FILE *)ptr, "test1");
+	myfprintf(ptr, "test1");
 	myfclose(ptr);
 
 	cr_assert(path_exists(&text));
@@ -274,7 +274,7 @@ MyTest(base, test_remove_dir) {
 	path_push(&text2, "mydir");
 	path_push(&text2, "file2.txt");
 	MYFILE *ptr2 = myfopen(&text2, "w");
-	fprintf((FILE *)ptr2, "test2");
+	myfprintf(ptr2, "test2");
 	myfclose(ptr2);
 
 	Path rem;

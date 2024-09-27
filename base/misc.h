@@ -30,5 +30,6 @@ int myfeof(MYFILE *stream);
 int myferror(MYFILE *stream);
 long myftell(MYFILE *stream);
 int myfseek(MYFILE *stream, long pos, int type);
+int myfprintf(MYFILE *fptr, const char *str, ...);
 
 #endif // _BASE_MISC__

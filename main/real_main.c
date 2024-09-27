@@ -33,7 +33,7 @@ void write_to_disk(const char *dir, const char *file_name, const unsigned char *
 	path_push(&ensure_parent, pfile_name_copy);
 	MYFILE *f = myfopen(&ensure_parent, "wb");
 	if (f) {
-		fwrite(data, 1, size, (FILE *)f);
+		myfwrite(data, 1, size, f);
 		myfclose(f);
 	} else {
 		exit_error("Could not open file for writing");
