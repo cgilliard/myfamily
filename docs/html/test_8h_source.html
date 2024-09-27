@@ -156,7 +156,7 @@ $(function() {
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            log_fd = -1;                                                                           \</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        }                                                                                          \</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    }                                                                                              \</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    void test_##suite##_##test(const Path *test_dir);                                              \</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    void test_##suite##_##test(const Path *test_dir, const Path *resources_dir);                   \</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    Test(suite, test, .init = setup_##test, .fini = tear_down) {                                   \</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        {                                                                                          \</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;            char path[1024];                                                                       \</div>
@@ -167,14 +167,16 @@ $(function() {
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            strcat(path, &quot;.fam&quot;);                                                                  \</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            Path dir;                                                                              \</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            path_for(&amp;dir, path);                                                                  \</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            <span class="comment">/*path_canonicalize(&amp;dir); */</span><span class="preprocessor">                                                          \</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor">            remove_directory(&amp;dir, false);                                                         \</span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="preprocessor">            path_mkdir(&amp;dir, 0700, false);                                                         \</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">            test_##suite##_##test(&amp;dir);                                                           \</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor">            remove_directory(&amp;dir, false);                                                         \</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">        }                                                                                          \</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">    }                                                                                              \</span></div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">    void test_##suite##_##test(const Path *test_dir)</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            remove_directory(&amp;dir, false);                                                         \</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            path_mkdir(&amp;dir, 0700, false);                                                         \</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            Path res;                                                                              \</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;            path_for(&amp;res, &quot;.&quot;);                                                                   \</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;            path_push(&amp;res, &quot;resources&quot;);                                                          \</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            test_##suite##_##test(&amp;dir, &amp;res);                                                     \</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            remove_directory(&amp;dir, false);                                                         \</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        }                                                                                          \</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    }                                                                                              \</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    void test_##suite##_##test(const Path *test_dir, const Path *resources_dir)</div>
 <div class="ttc" id="acolors_8h_html"><div class="ttname"><a href="colors_8h.html">colors.h</a></div></div>
 <div class="ttc" id="amisc_8h_html"><div class="ttname"><a href="misc_8h.html">misc.h</a></div></div>
 <div class="ttc" id="apath_8h_html"><div class="ttname"><a href="path_8h.html">path.h</a></div></div>

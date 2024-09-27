@@ -1,30 +1,7 @@
-        -:    0:Source:main.c
-        -:    0:Graph:main.gcno
-        -:    0:Data:-
-        -:    0:Runs:0
-        -:    1:// Copyright (c) 2024, The MyFamily Developers
-        -:    2://
-        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
-        -:    4:// you may not use this file except in compliance with the License.
-        -:    5:// You may obtain a copy of the License at
-        -:    6://
-        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
-        -:    8://
-        -:    9:// Unless required by applicable law or agreed to in writing, software
-        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
-        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        -:   12:// See the License for the specific language governing permissions and
-        -:   13:// limitations under the License.
-        -:   14:
-        -:   15:#include <main/main.h>
-        -:   16:
-    #####:   17:int main(int argc, char **argv) {
-    #####:   18:	return real_main(argc, argv);
-        -:   19:}
         -:    0:Source:real_main.c
         -:    0:Graph:real_main.gcno
-        -:    0:Data:-
-        -:    0:Runs:0
+        -:    0:Data:real_main.gcda
+        -:    0:Runs:3
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,77 +23,83 @@
         -:   19:#include <stdio.h>
         -:   20:#include <string.h>
         -:   21:
-    #####:   22:void write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size) {
-        -:   23:	char path[PATH_MAX + 1];
-    #####:   24:	snprintf(path, sizeof(path), "%s/%s", dir, file_name);
-    #####:   25:	Path ensure_parent;
-    #####:   26:	path_for(&ensure_parent, path);
-    #####:   27:	char *pfile_name = path_file_name(&ensure_parent);
-        -:   28:	char pfile_name_copy[PATH_MAX + 1];
-    #####:   29:	strcpy(pfile_name_copy, pfile_name);
-    #####:   30:	path_pop(&ensure_parent);
-    #####:   31:	path_canonicalize(&ensure_parent);
-    #####:   32:	path_mkdir(&ensure_parent, 0700, true);
-    #####:   33:	path_push(&ensure_parent, pfile_name_copy);
-    #####:   34:	MYFILE *f = myfopen(&ensure_parent, "wb");
-    #####:   35:	if (f) {
-    #####:   36:		fwrite(data, 1, size, (FILE *)f);
-    #####:   37:		myfclose(f);
-        -:   38:	} else {
-    #####:   39:		exit_error("Could not open file for writing");
-        -:   40:	}
-    #####:   41:}
-        -:   42:
-    #####:   43:bool check_build_id(const char *config_dir) {
-    #####:   44:	Path bid_file;
-    #####:   45:	path_for(&bid_file, config_dir);
-    #####:   46:	path_push(&bid_file, "build_id");
-    #####:   47:	path_canonicalize(&bid_file);
-        -:   48:	// check build id
-    #####:   49:	MYFILE *fp = myfopen(&bid_file, "r");
-    #####:   50:	if (!fp) {
-    #####:   51:		exit_error("could not open the build file");
-        -:   52:	}
-        -:   53:	char bid_file_contents[1024];
-    #####:   54:	size_t rlen = read_all(bid_file_contents, 1, 100, fp);
-    #####:   55:	bid_file_contents[rlen] = 0;
-    #####:   56:	return !strcmp(bid_file_contents, BUILD_ID);
-        -:   57:}
-        -:   58:
-    #####:   59:void setup_config_dir(const char *config_dir) {
-    #####:   60:	Path cd;
-    #####:   61:	path_for(&cd, config_dir);
-    #####:   62:	path_canonicalize(&cd);
-    #####:   63:	if (path_exists(&cd)) {
-    #####:   64:		if (check_build_id(config_dir))
-    #####:   65:			return;
-    #####:   66:		remove_directory(&cd, false);
-        -:   67:	}
-    #####:   68:	fprintf(stderr, "Installing config directory at %s. Build id = %s\n", config_dir, BUILD_ID);
-    #####:   69:	if (!path_mkdir(&cd, 0700, true)) {
-    #####:   70:		exit_error("Could not create config directory at path [%s].", path_to_string(&cd));
+        -:   22:bool __is_debug_real_main_res_mkdir = false;
+        -:   23:
+       16:   24:void write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size) {
+        -:   25:	char path[PATH_MAX + 1];
+       16:   26:	snprintf(path, sizeof(path), "%s/%s", dir, file_name);
+       16:   27:	Path ensure_parent;
+       16:   28:	path_for(&ensure_parent, path);
+       16:   29:	const char *pfile_name = path_file_name(&ensure_parent);
+        -:   30:	char pfile_name_copy[PATH_MAX + 1];
+       16:   31:	strcpy(pfile_name_copy, pfile_name);
+       16:   32:	path_pop(&ensure_parent);
+       16:   33:	path_canonicalize(&ensure_parent);
+       16:   34:	path_mkdir(&ensure_parent, 0700, true);
+       16:   35:	path_push(&ensure_parent, pfile_name_copy);
+       16:   36:	MYFILE *f = myfopen(&ensure_parent, "wb");
+       16:   37:	if (f) {
+       15:   38:		myfwrite(data, 1, size, f);
+       15:   39:		myfclose(f);
+        -:   40:	} else {
+        1:   41:		exit_error("Could not open file for writing");
+        -:   42:	}
+       16:   43:}
+        -:   44:
+        4:   45:bool check_build_id(const char *config_dir) {
+        4:   46:	Path bid_file;
+        4:   47:	path_for(&bid_file, config_dir);
+        4:   48:	path_push(&bid_file, "build_id");
+        4:   49:	path_canonicalize(&bid_file);
+        -:   50:	// check build id
+        4:   51:	MYFILE *fp = myfopen(&bid_file, "r");
+        4:   52:	if (!fp) {
+        1:   53:		exit_error("could not open the build file");
+        1:   54:		return false;
+        -:   55:	}
+        -:   56:	char bid_file_contents[1024];
+        3:   57:	size_t rlen = read_all(bid_file_contents, 1, 100, fp);
+        3:   58:	bid_file_contents[rlen] = 0;
+        3:   59:	myfclose(fp);
+        3:   60:	return !strcmp(bid_file_contents, BUILD_ID);
+        -:   61:}
+        -:   62:
+        6:   63:void setup_config_dir(const char *config_dir) {
+        6:   64:	Path cd;
+        6:   65:	path_for(&cd, config_dir);
+        6:   66:	path_canonicalize(&cd);
+        6:   67:	if (path_exists(&cd)) {
+        2:   68:		if (check_build_id(config_dir))
+        1:   69:			return;
+        1:   70:		remove_directory(&cd, false);
         -:   71:	}
-        -:   72:
-    #####:   73:	Path rd;
-    #####:   74:	path_copy(&rd, &cd);
-    #####:   75:	path_push(&rd, "resources");
-        -:   76:
-    #####:   77:	if (!path_mkdir(&rd, 0700, true)) {
-    #####:   78:		exit_error("Could not create resources directory at path [%s].", path_to_string(&rd));
-        -:   79:	}
-        -:   80:
-    #####:   81:	BUILD_RESOURCE_DIR(path_to_string(&rd), fam);
-    #####:   82:	WRITE_BUILD_ID(config_dir);
-        -:   83:}
-        -:   84:
-    #####:   85:int real_main(int argc, char **argv) {
-    #####:   86:	setup_config_dir("~/.fam");
-    #####:   87:	return 0;
-        -:   88:}
+        5:   72:	fprintf(stderr, "Installing config directory at %s. Build id = %s\n", config_dir, BUILD_ID);
+        5:   73:	if (!path_mkdir(&cd, 0700, false)) {
+        1:   74:		exit_error("Could not create config directory at path [%s].", path_to_string(&cd));
+        1:   75:		return;
+        -:   76:	}
+        -:   77:
+        4:   78:	Path rd;
+        4:   79:	path_copy(&rd, &cd);
+        4:   80:	path_push(&rd, "resources");
+        -:   81:
+        4:   82:	if (__is_debug_real_main_res_mkdir || !path_mkdir(&rd, 0700, true)) {
+        1:   83:		exit_error("Could not create resources directory at path [%s].", path_to_string(&rd));
+        1:   84:		return;
+        -:   85:	}
+        -:   86:
+       15:   87:	BUILD_RESOURCE_DIR(path_to_string(&rd), fam);
+        3:   88:	WRITE_BUILD_ID(config_dir);
+        -:   89:}
+        -:   90:
+        1:   91:int real_main(int argc, char **argv) {
+        1:   92:	setup_config_dir(DEFAULT_CONFIG_DIR);
+        1:   93:	return 0;
+        -:   94:}
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:6
+        -:    0:Runs:11
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -154,11 +137,11 @@
         -:   35:	}
         -:   36:}
         -:   37:
-        2:   38:char *get_bright_red() {
-        2:   39:	if (getenv("NO_COLOR") != NULL) {
+        7:   38:char *get_bright_red() {
+        7:   39:	if (getenv("NO_COLOR") != NULL) {
         1:   40:		return "";
         -:   41:	} else {
-        1:   42:		return "\x1b[91m";
+        6:   42:		return "\x1b[91m";
         -:   43:	}
         -:   44:}
         -:   45:
@@ -202,17 +185,17 @@
         -:   83:	}
         -:   84:}
         -:   85:
-        2:   86:char *get_reset() {
-        2:   87:	if (getenv("NO_COLOR") != NULL) {
+        7:   86:char *get_reset() {
+        7:   87:	if (getenv("NO_COLOR") != NULL) {
         1:   88:		return "";
         -:   89:	} else {
-        1:   90:		return "\x1b[0m";
+        6:   90:		return "\x1b[0m";
         -:   91:	}
         -:   92:}
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:6
+        -:    0:Runs:11
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -228,171 +211,213 @@
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <base/colors.h>
-        -:   16:#include <base/resources.h>
-        -:   17:#include <base/types.h>
-        -:   18:#include <dirent.h>
-        -:   19:#include <errno.h>
-        -:   20:#include <limits.h>
-        -:   21:#include <stdarg.h>
-        -:   22:#include <stdio.h>
-        -:   23:#include <stdlib.h>
-        -:   24:#include <string.h>
-        -:   25:#include <sys/stat.h>
-        -:   26:#include <unistd.h>
-        -:   27:
-       79:   28:const char *rstrstr(const char *s1, const char *s2) {
-       79:   29:	size_t s1len = strlen(s1);
-       79:   30:	size_t s2len = strlen(s2);
-        -:   31:	const char *s;
-        -:   32:
-       79:   33:	if (s2len > s1len)
-        1:   34:		return NULL;
-      270:   35:	for (s = s1 + s1len - s2len; s >= s1; --s)
-      268:   36:		if (strncmp(s, s2, s2len) == 0)
-       76:   37:			return s;
-        2:   38:	return NULL;
+        -:   16:#include <base/misc.h>
+        -:   17:#include <base/resources.h>
+        -:   18:#include <base/types.h>
+        -:   19:#include <dirent.h>
+        -:   20:#include <errno.h>
+        -:   21:#include <limits.h>
+        -:   22:#include <stdarg.h>
+        -:   23:#include <stdio.h>
+        -:   24:#include <stdlib.h>
+        -:   25:#include <string.h>
+        -:   26:#include <sys/stat.h>
+        -:   27:#include <unistd.h>
+        -:   28:
+        -:   29:bool __is_debug_misc_ferror = false;
+        -:   30:bool __is_debug_misc_fwrite = false;
+        -:   31:bool __is_debug_misc_stat = false;
+        -:   32:bool __is_debug_misc_remove_dir = false;
+        -:   33:bool __is_debug_misc_unlink = false;
+        -:   34:bool __is_debug_misc_no_exit = false;
+        -:   35:bool __is_debug_misc_preserve = false;
+        -:   36:
+       12:   37:u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream) {
+       12:   38:	return fread(buffer, size, count, (FILE *)stream);
         -:   39:}
         -:   40:
-        3:   41:u64 read_all(void *buffer, size_t size, size_t count, FILE *stream) {
-        3:   42:	size_t total_read = 0;
-        3:   43:	size_t bytes_to_read = size * count;
-        -:   44:	size_t bytes_read;
-        -:   45:
-        5:   46:	while (total_read < bytes_to_read) {
-        5:   47:		bytes_read = fread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
-        5:   48:		if (bytes_read == 0) {
-        -:   49:			// Check for EOF or error
-        3:   50:			if (feof(stream)) {
-        3:   51:				break; // End of file reached
-    #####:   52:			} else if (ferror(stream)) {
-    #####:   53:				perror("Read error");
-    #####:   54:				break; // Error occurred
-        -:   55:			}
-        -:   56:		}
-        2:   57:		total_read += bytes_read;
-        -:   58:	}
-        -:   59:
-        3:   60:	return total_read;
-        -:   61:}
-        -:   62:
-        4:   63:int copy_file(const Path *dst_path, const Path *src_path) {
-        4:   64:	if (dst_path == NULL || src_path == NULL) {
-        1:   65:		errno = EINVAL;
-        1:   66:		return -1;
-        -:   67:	}
-        -:   68:	FILE *source_file, *dest_file;
-        -:   69:	size_t bytes;
-        -:   70:
-        -:   71:	// Open the source file in binary read mode
-        3:   72:	source_file = (FILE *)myfopen(src_path, "rb");
-        3:   73:	if (source_file == NULL) {
-        1:   74:		errno = EINVAL;
-        1:   75:		return -1;
-        -:   76:	}
-        -:   77:
-        -:   78:	// Determine the file size
-        2:   79:	fseek(source_file, 0, SEEK_END);
-        2:   80:	long file_size = ftell(source_file);
-        2:   81:	fseek(source_file, 0, SEEK_SET);
-        2:   82:	char buffer[file_size];
-        -:   83:
-        -:   84:	// Open the destination file in binary write mode
-        2:   85:	dest_file = (FILE *)myfopen(dst_path, "wb");
-        2:   86:	if (dest_file == NULL) {
-        1:   87:		errno = ENOENT;
-        1:   88:		myfclose((MYFILE *)source_file);
-        1:   89:		return -1;
-        -:   90:	}
-        -:   91:
-        -:   92:	// Copy the file content
-        2:   93:	while ((bytes = fread(buffer, 1, file_size, source_file)) > 0) {
-        1:   94:		if (fwrite(buffer, 1, bytes, dest_file) != bytes) {
-    #####:   95:			errno = EIO;
-    #####:   96:			myfclose((MYFILE *)source_file);
-    #####:   97:			myfclose((MYFILE *)dest_file);
-    #####:   98:			return -1;
-        -:   99:		}
-        -:  100:	}
-        -:  101:
-        -:  102:	// Close both files
-        1:  103:	myfclose((MYFILE *)source_file);
-        1:  104:	myfclose((MYFILE *)dest_file);
-        -:  105:
-        1:  106:	return 0;
-        -:  107:}
-        -:  108:
-        -:  109:// Function to recursively remove a directory and its contents
-       18:  110:int remove_directory(const Path *p, bool preserve_dir) {
-       18:  111:	const char *path = path_to_string(p);
-        -:  112:	struct dirent *entry;
-       18:  113:	DIR *dir = opendir(path);
-        -:  114:
-       18:  115:	if (dir == NULL) {
-        5:  116:		return -1;
+       18:   41:u64 myfwrite(const void *buffer, u64 size, u64 count, MYFILE *stream) {
+       18:   42:	return fwrite(buffer, size, count, (FILE *)stream);
+        -:   43:}
+        -:   44:
+        6:   45:int myfeof(MYFILE *stream) {
+        6:   46:	return feof((FILE *)stream);
+        -:   47:}
+        -:   48:
+        6:   49:int myferror(MYFILE *stream) {
+        6:   50:	return ferror((FILE *)stream);
+        -:   51:}
+        -:   52:
+        6:   53:long myftell(MYFILE *stream) {
+        6:   54:	return ftell((FILE *)stream);
+        -:   55:}
+        -:   56:
+       10:   57:int myfseek(MYFILE *stream, long pos, int type) {
+       10:   58:	return fseek((FILE *)stream, pos, type);
+        -:   59:}
+        -:   60:
+        6:   61:int myfprintf(MYFILE *fptr, const char *str, ...) {
+        -:   62:	va_list args;
+        6:   63:	va_start(args, str);
+        6:   64:	int ret = vfprintf((FILE *)fptr, str, args);
+        6:   65:	va_end(args);
+        6:   66:	return ret;
+        -:   67:}
+        -:   68:
+      137:   69:const char *rstrstr(const char *s1, const char *s2) {
+      137:   70:	size_t s1len = strlen(s1);
+      137:   71:	size_t s2len = strlen(s2);
+        -:   72:	const char *s;
+        -:   73:
+      137:   74:	if (s2len > s1len)
+        1:   75:		return NULL;
+      753:   76:	for (s = s1 + s1len - s2len; s >= s1; --s)
+      750:   77:		if (strncmp(s, s2, s2len) == 0)
+      133:   78:			return s;
+        3:   79:	return NULL;
+        -:   80:}
+        -:   81:
+        7:   82:u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream) {
+        7:   83:	size_t total_read = 0;
+        7:   84:	size_t bytes_to_read = size * count;
+        -:   85:	size_t bytes_read;
+        -:   86:
+       7*:   87:	while (total_read < bytes_to_read || __is_debug_misc_ferror) {
+        7:   88:		bytes_read = myfread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
+        7:   89:		if (bytes_read == 0 || __is_debug_misc_ferror) {
+        -:   90:			// Check for EOF or error
+        2:   91:			if (myferror(stream) || __is_debug_misc_ferror) {
+        1:   92:				errno = EIO;
+        1:   93:				break; // Error occurred
+        -:   94:			}
+        -:   95:		}
+        6:   96:		total_read += bytes_read;
+        6:   97:		if (myfeof(stream))
+        6:   98:			break;
+        -:   99:	}
+        -:  100:
+        7:  101:	return total_read;
+        -:  102:}
+        -:  103:
+        6:  104:int copy_file(const Path *dst_path, const Path *src_path) {
+        6:  105:	if (dst_path == NULL || src_path == NULL) {
+        1:  106:		errno = EINVAL;
+        1:  107:		return -1;
+        -:  108:	}
+        -:  109:	MYFILE *source_file, *dest_file;
+        -:  110:	size_t bytes;
+        -:  111:
+        -:  112:	// Open the source file in binary read mode
+        5:  113:	source_file = myfopen(src_path, "rb");
+        5:  114:	if (source_file == NULL) {
+        1:  115:		errno = EINVAL;
+        1:  116:		return -1;
         -:  117:	}
         -:  118:
-       52:  119:	while ((entry = readdir(dir)) != NULL) {
-        -:  120:		char full_path[PATH_MAX];
-        -:  121:
-        -:  122:		// Skip the special entries "." and ".."
-       39:  123:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-       26:  124:			continue;
-        -:  125:		}
-        -:  126:
-        -:  127:		// Construct the full path to the file/directory
-       13:  128:		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
-        -:  129:
-        -:  130:		struct stat statbuf;
-       13:  131:		if (stat(full_path, &statbuf) == -1) {
-    #####:  132:			perror("stat");
-    #####:  133:			closedir(dir);
-    #####:  134:			return -1;
-        -:  135:		}
-        -:  136:
-       13:  137:		if (S_ISDIR(statbuf.st_mode)) {
-        -:  138:			// It's a directory, recurse into it
-        6:  139:			Path full_path_p;
-        6:  140:			path_for(&full_path_p, full_path);
-        6:  141:			if (remove_directory(&full_path_p, false) == -1) {
-    #####:  142:				closedir(dir);
-    #####:  143:				return -1;
-        -:  144:			}
-        -:  145:		} else {
-        -:  146:			// It's a file, unlink (delete) it
-        7:  147:			if (unlink(full_path) == -1) {
-    #####:  148:				perror("unlink");
-    #####:  149:				closedir(dir);
-    #####:  150:				return -1;
-        -:  151:			}
-        -:  152:		}
-        -:  153:	}
-        -:  154:
-       13:  155:	closedir(dir);
+        -:  119:	// Determine the file size
+        4:  120:	myfseek(source_file, 0, SEEK_END);
+        4:  121:	long file_size = myftell(source_file);
+        4:  122:	myfseek(source_file, 0, SEEK_SET);
+        4:  123:	char buffer[file_size];
+        -:  124:
+        -:  125:	// Open the destination file in binary write mode
+        4:  126:	dest_file = myfopen(dst_path, "wb");
+        4:  127:	if (dest_file == NULL) {
+        1:  128:		errno = ENOENT;
+        1:  129:		myfclose(source_file);
+        1:  130:		return -1;
+        -:  131:	}
+        -:  132:
+        -:  133:	// Copy the file content
+        5:  134:	while ((bytes = myfread(buffer, 1, file_size, source_file)) > 0) {
+        3:  135:		if (myferror(source_file) || myfwrite(buffer, 1, bytes, dest_file) != bytes ||
+        -:  136:			__is_debug_misc_fwrite) {
+        1:  137:			errno = EIO;
+        1:  138:			myfclose(source_file);
+        1:  139:			myfclose(dest_file);
+        1:  140:			return -1;
+        -:  141:		}
+        -:  142:	}
+        -:  143:
+        -:  144:	// Close both files
+        2:  145:	myfclose(source_file);
+        2:  146:	myfclose(dest_file);
+        -:  147:
+        2:  148:	return 0;
+        -:  149:}
+        -:  150:
+        -:  151:// Function to recursively remove a directory and its contents
+       50:  152:int remove_directory(const Path *p, bool preserve_dir) {
+       50:  153:	const char *path = path_to_string(p);
+        -:  154:	struct dirent *entry;
+       50:  155:	DIR *dir = opendir(path);
         -:  156:
-        -:  157:	// Now the directory is empty, so we can remove it
-       13:  158:	if (!preserve_dir) {
-       12:  159:		if (rmdir(path) == -1) {
-    #####:  160:			perror("rmdir");
-    #####:  161:			return -1;
-        -:  162:		}
-        -:  163:	}
-        -:  164:
-       13:  165:	return 0;
-        -:  166:}
-        -:  167:
-    #####:  168:void exit_error(char *format, ...) {
-        -:  169:	va_list va_args;
-    #####:  170:	va_start(va_args, format);
-    #####:  171:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
-    #####:  172:	vfprintf(stderr, format, va_args);
-    #####:  173:	fprintf(stderr, "\n");
-    #####:  174:	va_end(va_args);
-    #####:  175:	exit(-1);
-        -:  176:}
+       50:  157:	if (dir == NULL) {
+        9:  158:		return -1;
+        -:  159:	}
+        -:  160:
+      166:  161:	while ((entry = readdir(dir)) != NULL) {
+        -:  162:		char full_path[PATH_MAX];
+        -:  163:
+        -:  164:		// Skip the special entries "." and ".."
+      130:  165:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+       81:  166:			continue;
+        -:  167:		}
+        -:  168:
+        -:  169:		// Construct the full path to the file/directory
+       49:  170:		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
+        -:  171:
+        -:  172:		struct stat statbuf;
+       49:  173:		if (stat(full_path, &statbuf) == -1 || __is_debug_misc_stat) {
+        1:  174:			errno = EIO;
+        1:  175:			closedir(dir);
+        5:  176:			return -1;
+        -:  177:		}
+        -:  178:
+       48:  179:		if (S_ISDIR(statbuf.st_mode)) {
+        -:  180:			// It's a directory, recurse into it
+       24:  181:			Path full_path_p;
+       24:  182:			path_for(&full_path_p, full_path);
+       24:  183:			if (remove_directory(&full_path_p, false) == -1 || __is_debug_misc_remove_dir) {
+        3:  184:				closedir(dir);
+        3:  185:				return -1;
+        -:  186:			}
+        -:  187:		} else {
+        -:  188:			// It's a file, unlink (delete) it
+       24:  189:			if (unlink(full_path) == -1 || __is_debug_misc_unlink) {
+        1:  190:				errno = EIO;
+        1:  191:				closedir(dir);
+        1:  192:				return -1;
+        -:  193:			}
+        -:  194:		}
+        -:  195:	}
+        -:  196:
+       36:  197:	closedir(dir);
+        -:  198:
+        -:  199:	// Now the directory is empty, so we can remove it
+       36:  200:	if (!preserve_dir) {
+       35:  201:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
+        1:  202:			errno = EIO;
+        1:  203:			return -1;
+        -:  204:		}
+        -:  205:	}
+        -:  206:
+       35:  207:	return 0;
+        -:  208:}
+        -:  209:
+        5:  210:void exit_error(char *format, ...) {
+        -:  211:	va_list va_args;
+        5:  212:	va_start(va_args, format);
+        5:  213:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+        5:  214:	vfprintf(stderr, format, va_args);
+        5:  215:	fprintf(stderr, "\n");
+        5:  216:	va_end(va_args);
+       5*:  217:	EXIT_ERR_IF_NO_DEBUG();
+        5:  218:}
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:6
+        -:    0:Runs:11
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -418,247 +443,250 @@
         -:   23:#include <sys/stat.h>
         -:   24:#include <unistd.h>
         -:   25:
-       41:   26:void path_cleanup(PathImpl *ptr) {
-       41:   27:	if (ptr->ptr)
-       38:   28:		myfree(ptr->ptr);
-       41:   29:}
-        -:   30:
-       43:   31:int path_for(Path *p, const char *path) {
-       43:   32:	if (p == NULL) {
-        1:   33:		errno = EINVAL;
-        1:   34:		return -1;
-        -:   35:	}
-       42:   36:	if (path == NULL) {
-        1:   37:		errno = EINVAL;
-        1:   38:		p->ptr = NULL;
-        1:   39:		return -1;
-        -:   40:	}
-       41:   41:	int len = strlen(path);
-       41:   42:	if (len == 0) {
-        1:   43:		errno = EINVAL;
-        1:   44:		p->ptr = NULL;
-        1:   45:		return -1;
-        -:   46:	}
-       40:   47:	p->ptr = mymalloc(len + 1);
-       40:   48:	if (!p->ptr)
-        2:   49:		return -1;
-       38:   50:	p->len = len;
-       38:   51:	strcpy(p->ptr, path);
-       38:   52:	return 0;
-        -:   53:}
-        -:   54:
-        2:   55:int path_replace_home(Path *p) {
-        2:   56:	const char *home_dir = getenv("HOME");
-        2:   57:	if (home_dir == NULL) {
-    #####:   58:		errno = EINVAL;
-    #####:   59:		return -1;
-        -:   60:	}
-        2:   61:	if (((char *)(p->ptr))[0] == '~') {
-        2:   62:		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr);
-        2:   63:		if (nlen >= PATH_MAX) {
-    #####:   64:			errno = E2BIG;
-       1*:   65:			return -1;
-        -:   66:		}
-        2:   67:		if (nlen >= p->len) {
-        2:   68:			void *nptr = myrealloc(p->ptr, nlen + 1);
-        2:   69:			if (nptr == NULL)
-        1:   70:				return -1;
-        1:   71:			p->ptr = nptr;
-        1:   72:			p->len = nlen;
-        -:   73:		}
-        -:   74:		char buf[PATH_MAX + 1];
-       1*:   75:		if (strlen(p->ptr) > 1 && ((char *)(p->ptr))[1] == PATH_SEPARATOR_CHAR)
-    #####:   76:			snprintf(buf, PATH_MAX, "%s%s", home_dir, (char *)(p->ptr + 1));
-        -:   77:		else
-        1:   78:			snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr + 1));
-        1:   79:		strcpy(p->ptr, buf);
-        -:   80:	}
-        1:   81:	return 0;
-        -:   82:}
-        -:   83:
-        2:   84:int path_canonicalize(Path *p) {
-        2:   85:	if (path_replace_home(p))
-        1:   86:		return -1;
-        -:   87:	char buf[PATH_MAX];
-        1:   88:	errno = 0;
-        1:   89:	if (realpath(p->ptr, buf) == NULL) {
-    #####:   90:		return -1;
+        -:   26:bool __is_debug_path_homedir_null = false;
+        -:   27:
+      131:   28:void path_cleanup(PathImpl *ptr) {
+      131:   29:	if (ptr->ptr)
+      128:   30:		myfree(ptr->ptr);
+      131:   31:}
+        -:   32:
+      133:   33:int path_for(Path *p, const char *path) {
+      133:   34:	if (p == NULL) {
+        1:   35:		errno = EINVAL;
+        1:   36:		return -1;
+        -:   37:	}
+      132:   38:	if (path == NULL) {
+        1:   39:		errno = EINVAL;
+        1:   40:		p->ptr = NULL;
+        1:   41:		return -1;
+        -:   42:	}
+      131:   43:	int len = strlen(path);
+      131:   44:	if (len == 0) {
+        1:   45:		errno = EINVAL;
+        1:   46:		p->ptr = NULL;
+        1:   47:		return -1;
+        -:   48:	}
+      130:   49:	p->ptr = mymalloc(len + 1);
+      130:   50:	if (!p->ptr)
+        2:   51:		return -1;
+      128:   52:	p->len = len;
+      128:   53:	strcpy(p->ptr, path);
+      128:   54:	return 0;
+        -:   55:}
+        -:   56:
+       33:   57:int path_replace_home(Path *p) {
+       33:   58:	const char *home_dir = getenv("HOME");
+       33:   59:	if (home_dir == NULL || __is_debug_path_homedir_null) {
+        1:   60:		errno = EINVAL;
+        1:   61:		return -1;
+        -:   62:	}
+       32:   63:	if (((char *)(p->ptr))[0] == '~') {
+        4:   64:		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr);
+        4:   65:		if (nlen >= PATH_MAX) {
+        1:   66:			errno = E2BIG;
+        2:   67:			return -1;
+        -:   68:		}
+        3:   69:		if (nlen >= p->len) {
+        3:   70:			void *nptr = myrealloc(p->ptr, nlen + 1);
+        3:   71:			if (nptr == NULL)
+        1:   72:				return -1;
+        2:   73:			p->ptr = nptr;
+        2:   74:			p->len = nlen;
+        -:   75:		}
+        -:   76:		char buf[PATH_MAX + 1];
+        2:   77:		if (strlen(p->ptr) > 1 && ((char *)(p->ptr))[1] == PATH_SEPARATOR_CHAR)
+        1:   78:			snprintf(buf, PATH_MAX, "%s%s", home_dir, (char *)(p->ptr + 1));
+        -:   79:		else
+        1:   80:			snprintf(buf, PATH_MAX, "%s%s%s", home_dir, PATH_SEPARATOR, (char *)(p->ptr + 1));
+        2:   81:		strcpy(p->ptr, buf);
+        -:   82:	}
+       30:   83:	return 0;
+        -:   84:}
+        -:   85:
+        3:   86:u64 path_file_size(Path *p) {
+        3:   87:	MYFILE *fp = myfopen(p, "r");
+        3:   88:	if (!fp) {
+        1:   89:		errno = EIO;
+        1:   90:		return 0;
         -:   91:	}
-        1:   92:	int nlen = strlen(buf);
-        1:   93:	if (nlen == 0) {
-    #####:   94:		errno = EFAULT;
-    #####:   95:		return -1;
-        -:   96:	}
-        1:   97:	if (nlen >= p->len) {
-    #####:   98:		void *nptr = myrealloc(p->ptr, nlen + 1);
-    #####:   99:		if (nptr == NULL)
-    #####:  100:			return -1;
-    #####:  101:		p->ptr = nptr;
-    #####:  102:		p->len = nlen;
-        -:  103:	}
-        1:  104:	strcpy(p->ptr, buf);
-        1:  105:	return 0;
-        -:  106:}
-       65:  107:int path_push(Path *p, const char *next) {
-       65:  108:	if (p == NULL) {
-        1:  109:		errno = EINVAL;
-        1:  110:		return -1;
-        -:  111:	}
-       64:  112:	if (next == NULL) {
-        1:  113:		errno = EINVAL;
-        1:  114:		return -1;
-        -:  115:	}
-       63:  116:	int slen = strlen(p->ptr);
-       63:  117:	if (slen <= 0 || strlen(next) == 0) {
-        1:  118:		errno = EFAULT;
+        2:   92:	myfseek(fp, 0L, SEEK_END);
+        2:   93:	u64 ret = myftell(fp);
+        2:   94:	myfclose(fp);
+        2:   95:	return ret;
+        -:   96:}
+        -:   97:
+       33:   98:int path_canonicalize(Path *p) {
+        -:   99:	char buf[PATH_MAX];
+        -:  100:	int nlen;
+       33:  101:	if (path_replace_home(p) || realpath(p->ptr, buf) == NULL || (nlen = strlen(buf)) == 0) {
+       19:  102:		errno = EINVAL;
+       19:  103:		return -1;
+        -:  104:	}
+       14:  105:	errno = 0;
+       14:  106:	if (nlen >= p->len) {
+       12:  107:		void *nptr = myrealloc(p->ptr, nlen + 1);
+       12:  108:		if (nptr == NULL)
+        1:  109:			return -1;
+       11:  110:		p->ptr = nptr;
+       11:  111:		p->len = nlen;
+        -:  112:	}
+       13:  113:	strcpy(p->ptr, buf);
+       13:  114:	return 0;
+        -:  115:}
+      118:  116:int path_push(Path *p, const char *next) {
+      118:  117:	if (p == NULL) {
+        1:  118:		errno = EINVAL;
         1:  119:		return -1;
         -:  120:	}
-       62:  121:	bool need_sep = false;
-       62:  122:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
-       62:  123:		need_sep = true;
+      117:  121:	if (next == NULL) {
+        1:  122:		errno = EINVAL;
+        1:  123:		return -1;
         -:  124:	}
-        -:  125:
-       62:  126:	int nlen = slen + strlen(next);
-       62:  127:	if (need_sep)
-       62:  128:		nlen += strlen(PATH_SEPARATOR);
-        -:  129:
-       62:  130:	if (nlen >= p->len) {
-       60:  131:		void *nptr = myrealloc(p->ptr, nlen + 1);
-       60:  132:		if (nptr == NULL)
-        1:  133:			return -1;
-       59:  134:		p->ptr = nptr;
-       59:  135:		p->len = nlen;
-        -:  136:	}
-        -:  137:
-       61:  138:	if (need_sep)
-       61:  139:		strcat(p->ptr, PATH_SEPARATOR);
-       61:  140:	strcat(p->ptr, next);
-       61:  141:	return 0;
-        -:  142:}
-       27:  143:int path_pop(Path *p) {
-       27:  144:	char *res = rstrstr(p->ptr, PATH_SEPARATOR);
-       27:  145:	if (res) {
-       26:  146:		int index = res - (char *)p->ptr;
-       26:  147:		((char *)(p->ptr))[index] = 0;
-        -:  148:	} else {
-        1:  149:		((char *)(p->ptr))[0] = '.';
-        1:  150:		((char *)(p->ptr))[1] = 0;
-        -:  151:	}
-       27:  152:	return 0;
-        -:  153:}
-        -:  154:
-       58:  155:char *path_to_string(const Path *p) {
-       58:  156:	return p->ptr;
-        -:  157:}
-        -:  158:
-       51:  159:char *path_file_name(const Path *p) {
-       51:  160:	char *ret = rstrstr(p->ptr, PATH_SEPARATOR);
-       51:  161:	if (ret != NULL && strlen(ret) > 0)
-       50:  162:		return ret + 1;
+      116:  125:	int slen = strlen(p->ptr);
+      116:  126:	if (slen <= 0 || strlen(next) == 0) {
+        1:  127:		errno = EFAULT;
+        1:  128:		return -1;
+        -:  129:	}
+      115:  130:	bool need_sep = false;
+      115:  131:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
+      115:  132:		need_sep = true;
+        -:  133:	}
+        -:  134:
+      115:  135:	int nlen = slen + strlen(next);
+      115:  136:	if (need_sep)
+      115:  137:		nlen += strlen(PATH_SEPARATOR);
+        -:  138:
+      115:  139:	if (nlen >= p->len) {
+      111:  140:		void *nptr = myrealloc(p->ptr, nlen + 1);
+      111:  141:		if (nptr == NULL)
+        1:  142:			return -1;
+      110:  143:		p->ptr = nptr;
+      110:  144:		p->len = nlen;
+        -:  145:	}
+        -:  146:
+      114:  147:	if (need_sep)
+      114:  148:		strcat(p->ptr, PATH_SEPARATOR);
+      114:  149:	strcat(p->ptr, next);
+      114:  150:	return 0;
+        -:  151:}
+       48:  152:int path_pop(Path *p) {
+       48:  153:	const char *res = rstrstr(p->ptr, PATH_SEPARATOR);
+       48:  154:	if (res) {
+       47:  155:		int index = res - (char *)p->ptr;
+       47:  156:		((char *)(p->ptr))[index] = 0;
+        -:  157:	} else {
+        1:  158:		((char *)(p->ptr))[0] = '.';
+        1:  159:		((char *)(p->ptr))[1] = 0;
+        -:  160:	}
+       48:  161:	return 0;
+        -:  162:}
         -:  163:
-        1:  164:	return ret;
-        -:  165:}
-        -:  166:
-       11:  167:bool path_exists(const Path *p) {
-       11:  168:	if (p->ptr == NULL || p->len == 0) {
-        1:  169:		errno = EINVAL;
-        1:  170:		return false;
-        -:  171:	}
-       10:  172:	return access(p->ptr, F_OK) == 0;
-        -:  173:}
-        6:  174:bool path_is_dir(const Path *p) {
-        6:  175:	if (p->ptr == NULL || p->len == 0) {
-        1:  176:		errno = EINVAL;
-        1:  177:		return false;
-        -:  178:	}
-        -:  179:	struct stat s;
-        5:  180:	if (stat(p->ptr, &s) == 0) {
-        2:  181:		return s.st_mode & S_IFDIR;
-        -:  182:	}
-        3:  183:	return false;
-        -:  184:}
-        -:  185:
-       44:  186:bool path_mkdir(Path *p, u64 mode, bool parent) {
-       44:  187:	if (p->ptr == NULL || p->len == 0) {
-        1:  188:		errno = EINVAL;
-        1:  189:		return false;
-        -:  190:	}
-        -:  191:
-        -:  192:	struct stat s;
-        -:  193:
-        -:  194:	// Check if the path exists
-       43:  195:	if (stat(p->ptr, &s) == 0) {
-        -:  196:		// If the path exists and it's a directory, return success
-        2:  197:		if (s.st_mode & S_IFDIR) {
-        1:  198:			return true;
-        -:  199:		} else {
-        -:  200:			// Path exists but it's not a directory
-        1:  201:			errno = ENOTDIR;
-        1:  202:			return false;
-        -:  203:		}
-        -:  204:	}
-        -:  205:
-        -:  206:	// If parent is false, attempt to create only the target directory
-       41:  207:	if (!parent) {
-       37:  208:		if (mkdir(p->ptr, mode) != 0) {
-       25:  209:			return false;
-        -:  210:		}
-       12:  211:		return true;
-        -:  212:	}
-        -:  213:
-        -:  214:	// Create the directory structure (parent is true)
-        4:  215:	Path temp_path;
-        4:  216:	if (path_copy(&temp_path, p) != 0) {
-        1:  217:		return false;
-        -:  218:	}
-        -:  219:
-        3:  220:	int i = 0;
-        -:  221:	char path_bufs[20][PATH_MAX];
-       23:  222:	while (true) {
-       26:  223:		if (path_mkdir(&temp_path, mode, false)) {
-        6:  224:			for (int j = i - 1; j >= 0; j--) {
-        4:  225:				path_push(&temp_path, path_bufs[j]);
-        4:  226:				if (!path_mkdir(&temp_path, mode, false))
-    #####:  227:					return false;
-        -:  228:			}
-        2:  229:			return true;
-        -:  230:		}
-       24:  231:		const char *dir_part = path_file_name(&temp_path);
-       24:  232:		path_pop(&temp_path);
-       24:  233:		strcpy(path_bufs[i], dir_part);
-       24:  234:		if (path_file_name(&temp_path) == NULL)
-    #####:  235:			break;
-       24:  236:		i++;
-       24:  237:		if (i == 20)
-        1:  238:			break;
-        -:  239:	}
-        1:  240:	return false;
-        -:  241:}
-        -:  242:
-       24:  243:int path_copy(Path *dst, const Path *src) {
-       24:  244:	return path_for(dst, path_to_string(src));
-        -:  245:}
-        -:  246:
-        1:  247:int path_file_stem(const Path *p, char *buf, u64 limit) {
-        -:  248:	// Copy the file name into the buffer, ensuring proper null termination
-        1:  249:	strncpy(buf, path_file_name(p), limit - 1);
-        1:  250:	buf[limit - 1] = '\0'; // Manually ensure null-termination
+      166:  164:char *path_to_string(const Path *p) {
+      166:  165:	return p->ptr;
+        -:  166:}
+        -:  167:
+       88:  168:const char *path_file_name(const Path *p) {
+       88:  169:	const char *ret = rstrstr(p->ptr, PATH_SEPARATOR);
+       88:  170:	if (ret != NULL && strlen(ret) > 0)
+       86:  171:		return ret + 1;
+        -:  172:
+        2:  173:	return ret;
+        -:  174:}
+        -:  175:
+       24:  176:bool path_exists(const Path *p) {
+       24:  177:	if (p->ptr == NULL || p->len == 0) {
+        1:  178:		errno = EINVAL;
+        1:  179:		return false;
+        -:  180:	}
+       23:  181:	return access(p->ptr, F_OK) == 0;
+        -:  182:}
+        6:  183:bool path_is_dir(const Path *p) {
+        6:  184:	if (p->ptr == NULL || p->len == 0) {
+        1:  185:		errno = EINVAL;
+        1:  186:		return false;
+        -:  187:	}
+        -:  188:	struct stat s;
+        5:  189:	if (stat(p->ptr, &s) == 0) {
+        2:  190:		return s.st_mode & S_IFDIR;
+        -:  191:	}
+        3:  192:	return false;
+        -:  193:}
+        -:  194:
+       90:  195:bool path_mkdir(Path *p, u64 mode, bool parent) {
+       90:  196:	if (p->ptr == NULL || p->len == 0) {
+        1:  197:		errno = EINVAL;
+        1:  198:		return false;
+        -:  199:	}
+        -:  200:
+        -:  201:	struct stat s;
+        -:  202:
+        -:  203:	// Check if the path exists
+       89:  204:	if (stat(p->ptr, &s) == 0) {
+        -:  205:		// If the path exists and it's a directory, return success
+        8:  206:		if (s.st_mode & S_IFDIR) {
+        7:  207:			return true;
+        -:  208:		} else {
+        -:  209:			// Path exists but it's not a directory
+        1:  210:			errno = ENOTDIR;
+        1:  211:			return false;
+        -:  212:		}
+        -:  213:	}
+        -:  214:
+        -:  215:	// If parent is false, attempt to create only the target directory
+       81:  216:	if (!parent) {
+       63:  217:		if (mkdir(p->ptr, mode) != 0) {
+       28:  218:			return false;
+        -:  219:		}
+       35:  220:		return true;
+        -:  221:	}
+        -:  222:
+        -:  223:	// Create the directory structure (parent is true)
+       18:  224:	Path temp_path;
+       18:  225:	if (path_copy(&temp_path, p) != 0) {
+        1:  226:		return false;
+        -:  227:	}
+        -:  228:
+       17:  229:	int i = 0;
+        -:  230:	char path_bufs[20][PATH_MAX];
+       43:  231:	while (i < 20 && path_file_name(&temp_path) != NULL) {
+       41:  232:		if (path_mkdir(&temp_path, mode, false)) {
+       15:  233:			bool ret = true;
+       21:  234:			for (int j = i - 1; ret && j >= 0; j--) {
+        6:  235:				path_push(&temp_path, path_bufs[j]);
+        6:  236:				ret = path_mkdir(&temp_path, mode, false);
+        -:  237:			}
+       15:  238:			return true;
+        -:  239:		}
+       26:  240:		const char *dir_part = path_file_name(&temp_path);
+       26:  241:		path_pop(&temp_path);
+       26:  242:		strcpy(path_bufs[i], dir_part);
+       26:  243:		i++;
+        -:  244:	}
+        2:  245:	return false;
+        -:  246:}
+        -:  247:
+       49:  248:int path_copy(Path *dst, const Path *src) {
+       49:  249:	return path_for(dst, path_to_string(src));
+        -:  250:}
         -:  251:
-        1:  252:	u64 buflen = strlen(buf); // Compute length once
-        4:  253:	for (ssize_t i = buflen - 1; i >= 0; i--) {
-        4:  254:		if (buf[i] == '.') {
-        1:  255:			buf[i] = '\0'; // Null-terminate at the dot
-        1:  256:			break;
-        3:  257:		} else if (buf[i] == '/') {
-    #####:  258:			break; // Stop if we encounter a directory separator
-        -:  259:		}
-        -:  260:	}
-        1:  261:	return 0;
-        -:  262:}
+        2:  252:int path_file_stem(const Path *p, char *buf, u64 limit) {
+        -:  253:	// Copy the file name into the buffer, ensuring proper null termination
+        2:  254:	strncpy(buf, path_file_name(p), limit - 1);
+        2:  255:	buf[limit - 1] = '\0'; // Manually ensure null-termination
+        -:  256:
+        2:  257:	u64 buflen = strlen(buf); // Compute length once
+       12:  258:	for (u64 i = buflen - 1; i > 0; i--) {
+       11:  259:		if (buf[i] == '.') {
+        1:  260:			buf[i] = '\0'; // Null-terminate at the dot
+        1:  261:			break;
+        -:  262:		}
+        -:  263:	}
+        2:  264:	return 0;
+        -:  265:}
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:6
+        -:    0:Runs:11
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -684,69 +712,69 @@
         -:   23:bool __is_debug_realloc = false;
         -:   24:#endif // TEST
         -:   25:
-       41:   26:void *mymalloc(u64 size) {
+      131:   26:void *mymalloc(u64 size) {
         -:   27:#ifdef TEST
-       41:   28:	if (__is_debug_malloc) {
+      131:   28:	if (__is_debug_malloc) {
         2:   29:		return NULL;
         -:   30:	}
         -:   31:#endif // TEST
         -:   32:	void *ret;
-       39:   33:	ret = malloc(size);
+      129:   33:	ret = malloc(size);
         -:   34:
-       39:   35:	if (ret) {
-       39:   36:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+      129:   35:	if (ret) {
+      129:   36:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   37:	}
-       39:   38:	return ret;
+      129:   38:	return ret;
         -:   39:}
-       63:   40:void *myrealloc(void *ptr, u64 size) {
+      127:   40:void *myrealloc(void *ptr, u64 size) {
         -:   41:#ifdef TEST
-       63:   42:	if (__is_debug_realloc) {
-        2:   43:		return NULL;
+      127:   42:	if (__is_debug_realloc) {
+        3:   43:		return NULL;
         -:   44:	}
         -:   45:#endif // TEST
         -:   46:	void *ret;
-       61:   47:	ret = realloc(ptr, size);
+      124:   47:	ret = realloc(ptr, size);
         -:   48:
-       61:   49:	if (ret) {
-       61:   50:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+      124:   49:	if (ret) {
+      124:   50:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   51:	}
-       61:   52:	return ret;
+      124:   52:	return ret;
         -:   53:}
-       39:   54:void myfree(void *ptr) {
-       39:   55:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-       39:   56:	free(ptr);
-       39:   57:}
-       14:   58:MYFILE *myfopen(const Path *path, const char *mode) {
-       14:   59:	const char *path_str = path_to_string(path);
-       14:   60:	FILE *ret = fopen(path_str, mode);
-       14:   61:	if (ret) {
-       12:   62:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
+      129:   54:void myfree(void *ptr) {
+      129:   55:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+      129:   56:	free(ptr);
+      129:   57:}
+       43:   58:MYFILE *myfopen(const Path *path, const char *mode) {
+       43:   59:	const char *path_str = path_to_string(path);
+       43:   60:	FILE *ret = fopen(path_str, mode);
+       43:   61:	if (ret) {
+       38:   62:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
         -:   63:	}
-       14:   64:	return (MYFILE *)ret;
+       43:   64:	return (MYFILE *)ret;
         -:   65:}
-       12:   66:void myfclose(MYFILE *ptr) {
-       12:   67:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
-       12:   68:	fclose((FILE *)ptr);
-       12:   69:}
-       12:   70:u64 mymalloc_sum() {
-       12:   71:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
+       38:   66:void myfclose(MYFILE *ptr) {
+       38:   67:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
+       38:   68:	fclose((FILE *)ptr);
+       38:   69:}
+       20:   70:u64 mymalloc_sum() {
+       20:   71:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
         -:   72:}
         2:   73:u64 myrealloc_sum() {
         2:   74:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
         -:   75:}
-       12:   76:u64 myfree_sum() {
-       12:   77:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+       20:   76:u64 myfree_sum() {
+       20:   77:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
         -:   78:}
-       15:   79:u64 myfopen_sum() {
-       15:   80:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+       27:   79:u64 myfopen_sum() {
+       27:   80:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
         -:   81:}
-       15:   82:u64 myfclose_sum() {
-       15:   83:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+       27:   82:u64 myfclose_sum() {
+       27:   83:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
         -:   84:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:6
+        -:    0:Runs:11
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -765,9 +793,9 @@
         -:   16:#include <stdio.h>
         -:   17:#include <stdlib.h>
         -:   18:
-        6:   19:void __attribute__((constructor)) __check_64bit_arch__() {
+       11:   19:void __attribute__((constructor)) __check_64bit_arch__() {
         -:   20:	if (sizeof(size_t) != 8) {
         -:   21:		fprintf(stderr, "Error: This program requires a 64-bit architecture to run.\n");
         -:   22:		exit(EXIT_FAILURE);
         -:   23:	}
-        6:   24:}
+       11:   24:}

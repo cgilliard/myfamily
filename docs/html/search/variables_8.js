@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['short_5fname_268',['short_name',['../structArgsParam.html#a9ba253e5eb08fc497ceb03f6206b45cc',1,'ArgsParam']]]
+  ['realloc_5fsum_306',['realloc_sum',['../structResourceStats.html#afdc805f76b576e0ba036aa2ff91ddc48',1,'ResourceStats']]]
 ];

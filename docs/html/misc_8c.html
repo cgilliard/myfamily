@@ -67,12 +67,14 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">misc.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="colors_8h_source.html">base/colors.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 <code>#include &lt;dirent.h&gt;</code><br />
@@ -87,16 +89,47 @@ $(function() {
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a3200797b0d2080b73c1615f330b59135"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a3200797b0d2080b73c1615f330b59135">myfread</a> (void *buffer, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> count, <a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:a3200797b0d2080b73c1615f330b59135"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a621c6d95d19accbd0c461bcd096f8c61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a621c6d95d19accbd0c461bcd096f8c61">myfwrite</a> (const void *buffer, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> count, <a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:a621c6d95d19accbd0c461bcd096f8c61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1402ddcc5ddd7838bd0694afcd29213"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#aa1402ddcc5ddd7838bd0694afcd29213">myfeof</a> (<a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:aa1402ddcc5ddd7838bd0694afcd29213"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3febf3e8abaaf522409a3c1f8632930"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#ae3febf3e8abaaf522409a3c1f8632930">myferror</a> (<a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:ae3febf3e8abaaf522409a3c1f8632930"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50eb178e52829fac509b3de1a4e0cf39"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a50eb178e52829fac509b3de1a4e0cf39">myftell</a> (<a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:a50eb178e52829fac509b3de1a4e0cf39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafb4368374c63e29bedc71aa24dc0026"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#aafb4368374c63e29bedc71aa24dc0026">myfseek</a> (<a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream, long pos, int type)</td></tr>
+<tr class="separator:aafb4368374c63e29bedc71aa24dc0026"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68948bfd3aa81e69a959892896625613"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a68948bfd3aa81e69a959892896625613">myfprintf</a> (<a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *fptr, const char *str,...)</td></tr>
+<tr class="separator:a68948bfd3aa81e69a959892896625613"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2401671be38c7a45eea5e003dc55889"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#ac2401671be38c7a45eea5e003dc55889">rstrstr</a> (const char *s1, const char *s2)</td></tr>
 <tr class="separator:ac2401671be38c7a45eea5e003dc55889"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9dd6bb5100330160c77b5daa0a157e1e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a9dd6bb5100330160c77b5daa0a157e1e">read_all</a> (void *buffer, size_t size, size_t count, FILE *stream)</td></tr>
-<tr class="separator:a9dd6bb5100330160c77b5daa0a157e1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af88b4147d246cf562900b5939bc10984"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#af88b4147d246cf562900b5939bc10984">read_all</a> (void *buffer, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> count, <a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:af88b4147d246cf562900b5939bc10984"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd350a7f7e18c0019216191cd029f61d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#afd350a7f7e18c0019216191cd029f61d">copy_file</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *dst_path, const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *src_path)</td></tr>
 <tr class="separator:afd350a7f7e18c0019216191cd029f61d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f31f3ead33bb24a33ccfcd11c580aed"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a0f31f3ead33bb24a33ccfcd11c580aed">remove_directory</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> preserve_dir)</td></tr>
 <tr class="separator:a0f31f3ead33bb24a33ccfcd11c580aed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04d2c2dc4f9a32fccb11ff65d07bf171"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a04d2c2dc4f9a32fccb11ff65d07bf171">exit_error</a> (char *format,...)</td></tr>
 <tr class="separator:a04d2c2dc4f9a32fccb11ff65d07bf171"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a8eecffb0ac75a27cef38e142e8217dd2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a8eecffb0ac75a27cef38e142e8217dd2">__is_debug_misc_ferror</a> = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td></tr>
+<tr class="separator:a8eecffb0ac75a27cef38e142e8217dd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ad79d81f1a9c15a507169fe0694c951"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a7ad79d81f1a9c15a507169fe0694c951">__is_debug_misc_fwrite</a> = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td></tr>
+<tr class="separator:a7ad79d81f1a9c15a507169fe0694c951"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbad7eb089e0244e512b217fd1fb4476"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#afbad7eb089e0244e512b217fd1fb4476">__is_debug_misc_stat</a> = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td></tr>
+<tr class="separator:afbad7eb089e0244e512b217fd1fb4476"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a894e985f2a9e7fbd82abbc3b612468c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a894e985f2a9e7fbd82abbc3b612468c2">__is_debug_misc_remove_dir</a> = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td></tr>
+<tr class="separator:a894e985f2a9e7fbd82abbc3b612468c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e52e6f3afe14f291dedb506d842927f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a5e52e6f3afe14f291dedb506d842927f">__is_debug_misc_unlink</a> = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td></tr>
+<tr class="separator:a5e52e6f3afe14f291dedb506d842927f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a490da13aa9867289904f68ca2daa8480"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#a490da13aa9867289904f68ca2daa8480">__is_debug_misc_no_exit</a> = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td></tr>
+<tr class="separator:a490da13aa9867289904f68ca2daa8480"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4340d723fc3f9fe72bc23952ed11212"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8c.html#aa4340d723fc3f9fe72bc23952ed11212">__is_debug_misc_preserve</a> = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td></tr>
+<tr class="separator:aa4340d723fc3f9fe72bc23952ed11212"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="afd350a7f7e18c0019216191cd029f61d"></a>
@@ -155,8 +188,210 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a9dd6bb5100330160c77b5daa0a157e1e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9dd6bb5100330160c77b5daa0a157e1e">&#9670;&nbsp;</a></span>read_all()</h2>
+<a id="aa1402ddcc5ddd7838bd0694afcd29213"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1402ddcc5ddd7838bd0694afcd29213">&#9670;&nbsp;</a></span>myfeof()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int myfeof </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae3febf3e8abaaf522409a3c1f8632930"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3febf3e8abaaf522409a3c1f8632930">&#9670;&nbsp;</a></span>myferror()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int myferror </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a68948bfd3aa81e69a959892896625613"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68948bfd3aa81e69a959892896625613">&#9670;&nbsp;</a></span>myfprintf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int myfprintf </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>fptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>str</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3200797b0d2080b73c1615f330b59135"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3200797b0d2080b73c1615f330b59135">&#9670;&nbsp;</a></span>myfread()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> myfread </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aafb4368374c63e29bedc71aa24dc0026"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafb4368374c63e29bedc71aa24dc0026">&#9670;&nbsp;</a></span>myfseek()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int myfseek </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long&#160;</td>
+          <td class="paramname"><em>pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a50eb178e52829fac509b3de1a4e0cf39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50eb178e52829fac509b3de1a4e0cf39">&#9670;&nbsp;</a></span>myftell()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long myftell </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a621c6d95d19accbd0c461bcd096f8c61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a621c6d95d19accbd0c461bcd096f8c61">&#9670;&nbsp;</a></span>myfwrite()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> myfwrite </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af88b4147d246cf562900b5939bc10984"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af88b4147d246cf562900b5939bc10984">&#9670;&nbsp;</a></span>read_all()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -170,19 +405,19 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
           <td class="paramname"><em>size</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
           <td class="paramname"><em>count</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
           <td class="paramname"><em>stream</em>&#160;</td>
         </tr>
         <tr>
@@ -245,6 +480,105 @@ Functions</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a8eecffb0ac75a27cef38e142e8217dd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8eecffb0ac75a27cef38e142e8217dd2">&#9670;&nbsp;</a></span>__is_debug_misc_ferror</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> __is_debug_misc_ferror = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7ad79d81f1a9c15a507169fe0694c951"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ad79d81f1a9c15a507169fe0694c951">&#9670;&nbsp;</a></span>__is_debug_misc_fwrite</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> __is_debug_misc_fwrite = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a490da13aa9867289904f68ca2daa8480"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a490da13aa9867289904f68ca2daa8480">&#9670;&nbsp;</a></span>__is_debug_misc_no_exit</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> __is_debug_misc_no_exit = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa4340d723fc3f9fe72bc23952ed11212"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4340d723fc3f9fe72bc23952ed11212">&#9670;&nbsp;</a></span>__is_debug_misc_preserve</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> __is_debug_misc_preserve = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a894e985f2a9e7fbd82abbc3b612468c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a894e985f2a9e7fbd82abbc3b612468c2">&#9670;&nbsp;</a></span>__is_debug_misc_remove_dir</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> __is_debug_misc_remove_dir = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afbad7eb089e0244e512b217fd1fb4476"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afbad7eb089e0244e512b217fd1fb4476">&#9670;&nbsp;</a></span>__is_debug_misc_stat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> __is_debug_misc_stat = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5e52e6f3afe14f291dedb506d842927f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e52e6f3afe14f291dedb506d842927f">&#9670;&nbsp;</a></span>__is_debug_misc_unlink</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> __is_debug_misc_unlink = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td>
         </tr>
       </table>
 </div><div class="memdoc">

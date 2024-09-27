@@ -118,12 +118,14 @@ Functions</h2></td></tr>
 <tr class="separator:a90b6a2154ce88049f2620729fe258aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af458685a462418befcec814730830591"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#af458685a462418befcec814730830591">path_mkdir</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> mode, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> parent)</td></tr>
 <tr class="separator:af458685a462418befcec814730830591"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af10ae67a25a622c875723410d59fd633"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#af10ae67a25a622c875723410d59fd633">path_file_name</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
-<tr class="separator:af10ae67a25a622c875723410d59fd633"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02bcc34b38eb83baffcacd38ab76591c"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#a02bcc34b38eb83baffcacd38ab76591c">path_file_name</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
+<tr class="separator:a02bcc34b38eb83baffcacd38ab76591c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9fa4b1ecae63e57f8e33be12867398fc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#a9fa4b1ecae63e57f8e33be12867398fc">path_file_stem</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, char *buf, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> limit)</td></tr>
 <tr class="separator:a9fa4b1ecae63e57f8e33be12867398fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa74390413dcff75de2298054879f7ab6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#aa74390413dcff75de2298054879f7ab6">path_copy</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *dst, const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *src)</td></tr>
 <tr class="separator:aa74390413dcff75de2298054879f7ab6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a688bfc7f2a979489ffe58ec96d804193"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="path_8h.html#a688bfc7f2a979489ffe58ec96d804193">path_file_size</a> (<a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p)</td></tr>
+<tr class="separator:a688bfc7f2a979489ffe58ec96d804193"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a9a4b261ee74f577bbd57315cb754f607"></a>
@@ -266,16 +268,34 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="af10ae67a25a622c875723410d59fd633"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af10ae67a25a622c875723410d59fd633">&#9670;&nbsp;</a></span>path_file_name()</h2>
+<a id="a02bcc34b38eb83baffcacd38ab76591c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02bcc34b38eb83baffcacd38ab76591c">&#9670;&nbsp;</a></span>path_file_name()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* path_file_name </td>
+          <td class="memname">const char* path_file_name </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
+          <td class="paramname"><em>p</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a688bfc7f2a979489ffe58ec96d804193"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a688bfc7f2a979489ffe58ec96d804193">&#9670;&nbsp;</a></span>path_file_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> path_file_size </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
           <td class="paramname"><em>p</em></td><td>)</td>
           <td></td>
         </tr>

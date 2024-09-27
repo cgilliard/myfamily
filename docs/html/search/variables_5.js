@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['name_265',['name',['../structArgsParam.html#a6eb7181833ba7bb3472f2d8ec8ce9b74',1,'ArgsParam']]]
+  ['malloc_5fsum_302',['malloc_sum',['../structResourceStats.html#ae9eb0fbcddc4ae13b289b50f89cd0750',1,'ResourceStats']]],
+  ['multiple_303',['multiple',['../structArgsParam.html#ab53f0bf632079538c4a69ea670622f68',1,'ArgsParam']]]
 ];

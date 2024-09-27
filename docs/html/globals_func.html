@@ -73,7 +73,8 @@ $(function() {
 
 <h3><a id="index_c"></a>- c -</h3><ul>
 <li>check_build_id()
-: <a class="el" href="real__main_8c.html#af43092959d8b9ac00da999ee1d16e152">real_main.c</a>
+: <a class="el" href="main_8h.html#af43092959d8b9ac00da999ee1d16e152">main.h</a>
+, <a class="el" href="real__main_8c.html#af43092959d8b9ac00da999ee1d16e152">real_main.c</a>
 </li>
 <li>copy_file()
 : <a class="el" href="misc_8c.html#afd350a7f7e18c0019216191cd029f61d">misc.c</a>
@@ -139,8 +140,7 @@ $(function() {
 
 <h3><a id="index_m"></a>- m -</h3><ul>
 <li>main()
-: <a class="el" href="main_8c.html#a3c04138a5bfe5d72780bb7e82a18e627">main.c</a>
-, <a class="el" href="xxdir_8c.html#a3c04138a5bfe5d72780bb7e82a18e627">xxdir.c</a>
+: <a class="el" href="xxdir_8c.html#a3c04138a5bfe5d72780bb7e82a18e627">xxdir.c</a>
 </li>
 <li>myfclose()
 : <a class="el" href="resources_8c.html#ad580b52d74a685f19c494532bcb781fe">resources.c</a>
@@ -150,6 +150,14 @@ $(function() {
 : <a class="el" href="resources_8c.html#a0b809890b8c686fb2e74bc782d0fc28a">resources.c</a>
 , <a class="el" href="resources_8h.html#a0b809890b8c686fb2e74bc782d0fc28a">resources.h</a>
 </li>
+<li>myfeof()
+: <a class="el" href="misc_8c.html#aa1402ddcc5ddd7838bd0694afcd29213">misc.c</a>
+, <a class="el" href="misc_8h.html#aa1402ddcc5ddd7838bd0694afcd29213">misc.h</a>
+</li>
+<li>myferror()
+: <a class="el" href="misc_8c.html#ae3febf3e8abaaf522409a3c1f8632930">misc.c</a>
+, <a class="el" href="misc_8h.html#ae3febf3e8abaaf522409a3c1f8632930">misc.h</a>
+</li>
 <li>myfopen()
 : <a class="el" href="resources_8c.html#a6fb137452d444132e9958b1c08a7d812">resources.c</a>
 , <a class="el" href="resources_8h.html#a6fb137452d444132e9958b1c08a7d812">resources.h</a>
@@ -158,6 +166,14 @@ $(function() {
 : <a class="el" href="resources_8c.html#aa7957c38f9bfd6b25748cb16ff615fca">resources.c</a>
 , <a class="el" href="resources_8h.html#aa7957c38f9bfd6b25748cb16ff615fca">resources.h</a>
 </li>
+<li>myfprintf()
+: <a class="el" href="misc_8c.html#a68948bfd3aa81e69a959892896625613">misc.c</a>
+, <a class="el" href="misc_8h.html#a68948bfd3aa81e69a959892896625613">misc.h</a>
+</li>
+<li>myfread()
+: <a class="el" href="misc_8c.html#a3200797b0d2080b73c1615f330b59135">misc.c</a>
+, <a class="el" href="misc_8h.html#a3200797b0d2080b73c1615f330b59135">misc.h</a>
+</li>
 <li>myfree()
 : <a class="el" href="resources_8c.html#a7baeff92dbc77e87e5ebe617db46bd06">resources.c</a>
 , <a class="el" href="resources_8h.html#a7baeff92dbc77e87e5ebe617db46bd06">resources.h</a>
@@ -165,6 +181,18 @@ $(function() {
 <li>myfree_sum()
 : <a class="el" href="resources_8c.html#a27f00bbe657b85df0e0565e41b2be409">resources.c</a>
 , <a class="el" href="resources_8h.html#a27f00bbe657b85df0e0565e41b2be409">resources.h</a>
+</li>
+<li>myfseek()
+: <a class="el" href="misc_8c.html#aafb4368374c63e29bedc71aa24dc0026">misc.c</a>
+, <a class="el" href="misc_8h.html#aafb4368374c63e29bedc71aa24dc0026">misc.h</a>
+</li>
+<li>myftell()
+: <a class="el" href="misc_8c.html#a50eb178e52829fac509b3de1a4e0cf39">misc.c</a>
+, <a class="el" href="misc_8h.html#a50eb178e52829fac509b3de1a4e0cf39">misc.h</a>
+</li>
+<li>myfwrite()
+: <a class="el" href="misc_8c.html#a621c6d95d19accbd0c461bcd096f8c61">misc.c</a>
+, <a class="el" href="misc_8h.html#a621c6d95d19accbd0c461bcd096f8c61">misc.h</a>
 </li>
 <li>mymalloc()
 : <a class="el" href="resources_8c.html#ac80b946cc2591fa752ba6928eb3acf15">resources.c</a>
@@ -209,16 +237,20 @@ $(function() {
 , <a class="el" href="path_8h.html#a668e7b18d0178b35a818d3f3f302981c">path.h</a>
 </li>
 <li>path_file_name()
-: <a class="el" href="path_8c.html#af10ae67a25a622c875723410d59fd633">path.c</a>
-, <a class="el" href="path_8h.html#af10ae67a25a622c875723410d59fd633">path.h</a>
+: <a class="el" href="path_8c.html#a02bcc34b38eb83baffcacd38ab76591c">path.c</a>
+, <a class="el" href="path_8h.html#a02bcc34b38eb83baffcacd38ab76591c">path.h</a>
+</li>
+<li>path_file_size()
+: <a class="el" href="path_8c.html#a688bfc7f2a979489ffe58ec96d804193">path.c</a>
+, <a class="el" href="path_8h.html#a688bfc7f2a979489ffe58ec96d804193">path.h</a>
 </li>
 <li>path_file_stem()
 : <a class="el" href="path_8c.html#a9fa4b1ecae63e57f8e33be12867398fc">path.c</a>
 , <a class="el" href="path_8h.html#a9fa4b1ecae63e57f8e33be12867398fc">path.h</a>
 </li>
 <li>path_for()
-: <a class="el" href="path_8h.html#abdb6bed2483f79b5d2672cdc0e51685f">path.h</a>
-, <a class="el" href="path_8c.html#a47f54247ef0bb3f24d2ff02d206f55f6">path.c</a>
+: <a class="el" href="path_8c.html#a47f54247ef0bb3f24d2ff02d206f55f6">path.c</a>
+, <a class="el" href="path_8h.html#abdb6bed2483f79b5d2672cdc0e51685f">path.h</a>
 </li>
 <li>path_is_dir()
 : <a class="el" href="path_8c.html#a90b6a2154ce88049f2620729fe258aa0">path.c</a>
@@ -254,7 +286,7 @@ $(function() {
 
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>read_all()
-: <a class="el" href="misc_8c.html#a9dd6bb5100330160c77b5daa0a157e1e">misc.c</a>
+: <a class="el" href="misc_8c.html#af88b4147d246cf562900b5939bc10984">misc.c</a>
 , <a class="el" href="misc_8h.html#af88b4147d246cf562900b5939bc10984">misc.h</a>
 </li>
 <li>real_main()
@@ -267,14 +299,15 @@ $(function() {
 </li>
 <li>rstrstr()
 : <a class="el" href="misc_8c.html#ac2401671be38c7a45eea5e003dc55889">misc.c</a>
-, <a class="el" href="misc_8h.html#aa9a7b3f78c4917215b2f8ff8d8756e9f">misc.h</a>
+, <a class="el" href="misc_8h.html#ac2401671be38c7a45eea5e003dc55889">misc.h</a>
 </li>
 </ul>
 
 
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>setup_config_dir()
-: <a class="el" href="real__main_8c.html#aadd7ec11c1873b232827eddb9a17c911">real_main.c</a>
+: <a class="el" href="main_8h.html#aadd7ec11c1873b232827eddb9a17c911">main.h</a>
+, <a class="el" href="real__main_8c.html#aadd7ec11c1873b232827eddb9a17c911">real_main.c</a>
 </li>
 </ul>
 

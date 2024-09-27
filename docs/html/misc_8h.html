@@ -67,6 +67,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">misc.h File Reference</div>  </div>
@@ -78,10 +79,15 @@ $(function() {
 </div>
 <p><a href="misc_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a68d540859c9f9fa6a1a368a1479d70f0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#a68d540859c9f9fa6a1a368a1479d70f0">EXIT_ERR_IF_NO_DEBUG</a>()</td></tr>
+<tr class="separator:a68d540859c9f9fa6a1a368a1479d70f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa9a7b3f78c4917215b2f8ff8d8756e9f"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#aa9a7b3f78c4917215b2f8ff8d8756e9f">rstrstr</a> (const char *s1, const char *s2)</td></tr>
-<tr class="separator:aa9a7b3f78c4917215b2f8ff8d8756e9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2401671be38c7a45eea5e003dc55889"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#ac2401671be38c7a45eea5e003dc55889">rstrstr</a> (const char *s1, const char *s2)</td></tr>
+<tr class="separator:ac2401671be38c7a45eea5e003dc55889"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5a851f57e7a29d68e705f0a04826f50"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#aa5a851f57e7a29d68e705f0a04826f50">copy_file</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *dst, const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *src)</td></tr>
 <tr class="separator:aa5a851f57e7a29d68e705f0a04826f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac670968c9a6ae10fbdd37a7206afc50b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#ac670968c9a6ae10fbdd37a7206afc50b">remove_directory</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *path, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> preserve_dir)</td></tr>
@@ -90,7 +96,42 @@ Functions</h2></td></tr>
 <tr class="separator:af88b4147d246cf562900b5939bc10984"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04d2c2dc4f9a32fccb11ff65d07bf171"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#a04d2c2dc4f9a32fccb11ff65d07bf171">exit_error</a> (char *format,...)</td></tr>
 <tr class="separator:a04d2c2dc4f9a32fccb11ff65d07bf171"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3200797b0d2080b73c1615f330b59135"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#a3200797b0d2080b73c1615f330b59135">myfread</a> (void *buffer, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> count, <a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:a3200797b0d2080b73c1615f330b59135"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a621c6d95d19accbd0c461bcd096f8c61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#a621c6d95d19accbd0c461bcd096f8c61">myfwrite</a> (const void *buffer, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> count, <a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:a621c6d95d19accbd0c461bcd096f8c61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1402ddcc5ddd7838bd0694afcd29213"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#aa1402ddcc5ddd7838bd0694afcd29213">myfeof</a> (<a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:aa1402ddcc5ddd7838bd0694afcd29213"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3febf3e8abaaf522409a3c1f8632930"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#ae3febf3e8abaaf522409a3c1f8632930">myferror</a> (<a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:ae3febf3e8abaaf522409a3c1f8632930"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50eb178e52829fac509b3de1a4e0cf39"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#a50eb178e52829fac509b3de1a4e0cf39">myftell</a> (<a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:a50eb178e52829fac509b3de1a4e0cf39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafb4368374c63e29bedc71aa24dc0026"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#aafb4368374c63e29bedc71aa24dc0026">myfseek</a> (<a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream, long pos, int type)</td></tr>
+<tr class="separator:aafb4368374c63e29bedc71aa24dc0026"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68948bfd3aa81e69a959892896625613"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#a68948bfd3aa81e69a959892896625613">myfprintf</a> (<a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *fptr, const char *str,...)</td></tr>
+<tr class="separator:a68948bfd3aa81e69a959892896625613"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a68d540859c9f9fa6a1a368a1479d70f0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68d540859c9f9fa6a1a368a1479d70f0">&#9670;&nbsp;</a></span>EXIT_ERR_IF_NO_DEBUG</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EXIT_ERR_IF_NO_DEBUG</td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">if</span> (!<a class="code" href="misc_8c.html#a490da13aa9867289904f68ca2daa8480">__is_debug_misc_no_exit</a>)                                                                  \</div>
+<div class="line">        exit(-1);</div>
+<div class="ttc" id="amisc_8c_html_a490da13aa9867289904f68ca2daa8480"><div class="ttname"><a href="misc_8c.html#a490da13aa9867289904f68ca2daa8480">__is_debug_misc_no_exit</a></div><div class="ttdeci">bool __is_debug_misc_no_exit</div><div class="ttdef"><b>Definition:</b> misc.c:34</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="aa5a851f57e7a29d68e705f0a04826f50"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa5a851f57e7a29d68e705f0a04826f50">&#9670;&nbsp;</a></span>copy_file()</h2>
@@ -137,6 +178,208 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa1402ddcc5ddd7838bd0694afcd29213"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa1402ddcc5ddd7838bd0694afcd29213">&#9670;&nbsp;</a></span>myfeof()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int myfeof </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae3febf3e8abaaf522409a3c1f8632930"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3febf3e8abaaf522409a3c1f8632930">&#9670;&nbsp;</a></span>myferror()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int myferror </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a68948bfd3aa81e69a959892896625613"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68948bfd3aa81e69a959892896625613">&#9670;&nbsp;</a></span>myfprintf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int myfprintf </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>fptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>str</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3200797b0d2080b73c1615f330b59135"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3200797b0d2080b73c1615f330b59135">&#9670;&nbsp;</a></span>myfread()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> myfread </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aafb4368374c63e29bedc71aa24dc0026"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafb4368374c63e29bedc71aa24dc0026">&#9670;&nbsp;</a></span>myfseek()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int myfseek </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">long&#160;</td>
+          <td class="paramname"><em>pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a50eb178e52829fac509b3de1a4e0cf39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50eb178e52829fac509b3de1a4e0cf39">&#9670;&nbsp;</a></span>myftell()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">long myftell </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a621c6d95d19accbd0c461bcd096f8c61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a621c6d95d19accbd0c461bcd096f8c61">&#9670;&nbsp;</a></span>myfwrite()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> myfwrite </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
+          <td class="paramname"><em>stream</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -216,14 +459,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa9a7b3f78c4917215b2f8ff8d8756e9f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa9a7b3f78c4917215b2f8ff8d8756e9f">&#9670;&nbsp;</a></span>rstrstr()</h2>
+<a id="ac2401671be38c7a45eea5e003dc55889"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2401671be38c7a45eea5e003dc55889">&#9670;&nbsp;</a></span>rstrstr()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* rstrstr </td>
+          <td class="memname">const char* rstrstr </td>
           <td>(</td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>s1</em>, </td>

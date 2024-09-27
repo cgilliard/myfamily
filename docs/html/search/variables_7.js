@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['realloc_5fsum_267',['realloc_sum',['../structResourceStats.html#afdc805f76b576e0ba036aa2ff91ddc48',1,'ResourceStats']]]
+  ['ptr_305',['ptr',['../structPathImpl.html#a38ef32862a839b839545d2a664deb315',1,'PathImpl']]]
 ];
