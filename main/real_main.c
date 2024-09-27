@@ -24,7 +24,7 @@ void write_to_disk(const char *dir, const char *file_name, const unsigned char *
 	snprintf(path, sizeof(path), "%s/%s", dir, file_name);
 	Path ensure_parent;
 	path_for(&ensure_parent, path);
-	char *pfile_name = path_file_name(&ensure_parent);
+	const char *pfile_name = path_file_name(&ensure_parent);
 	char pfile_name_copy[PATH_MAX + 1];
 	strcpy(pfile_name_copy, pfile_name);
 	path_pop(&ensure_parent);

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/colors.h>
+#include <base/misc.h>
 #include <base/resources.h>
 #include <base/types.h>
 #include <dirent.h>
@@ -24,6 +25,13 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+bool __is_debug_misc_ferror = false;
+bool __is_debug_misc_fwrite = false;
+bool __is_debug_misc_stat = false;
+bool __is_debug_misc_remove_dir = false;
+bool __is_debug_misc_unlink = false;
+bool __is_debug_misc_no_exit = false;
 
 u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream) {
 	return fread(buffer, size, count, (FILE *)stream);
@@ -70,19 +78,19 @@ const char *rstrstr(const char *s1, const char *s2) {
 	return NULL;
 }
 
-u64 read_all(void *buffer, size_t size, size_t count, MYFILE *stream) {
+u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream) {
 	size_t total_read = 0;
 	size_t bytes_to_read = size * count;
 	size_t bytes_read;
 
-	while (total_read < bytes_to_read) {
+	while (total_read < bytes_to_read || __is_debug_misc_ferror) {
 		bytes_read = myfread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
-		if (bytes_read == 0) {
+		if (bytes_read == 0 || __is_debug_misc_ferror) {
 			// Check for EOF or error
 			if (myfeof(stream)) {
 				break; // End of file reached
-			} else if (myferror(stream)) {
-				perror("Read error");
+			} else if (myferror(stream) || __is_debug_misc_ferror) {
+				errno = EIO;
 				break; // Error occurred
 			}
 		}
@@ -123,7 +131,8 @@ int copy_file(const Path *dst_path, const Path *src_path) {
 
 	// Copy the file content
 	while ((bytes = myfread(buffer, 1, file_size, source_file)) > 0) {
-		if (myfwrite(buffer, 1, bytes, dest_file) != bytes) {
+		if (myferror(source_file) || myfwrite(buffer, 1, bytes, dest_file) != bytes ||
+			__is_debug_misc_fwrite) {
 			errno = EIO;
 			myfclose(source_file);
 			myfclose(dest_file);
@@ -160,8 +169,8 @@ int remove_directory(const Path *p, bool preserve_dir) {
 		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
 
 		struct stat statbuf;
-		if (stat(full_path, &statbuf) == -1) {
-			perror("stat");
+		if (stat(full_path, &statbuf) == -1 || __is_debug_misc_stat) {
+			errno = EIO;
 			closedir(dir);
 			return -1;
 		}
@@ -170,14 +179,14 @@ int remove_directory(const Path *p, bool preserve_dir) {
 			// It's a directory, recurse into it
 			Path full_path_p;
 			path_for(&full_path_p, full_path);
-			if (remove_directory(&full_path_p, false) == -1) {
+			if (remove_directory(&full_path_p, false) == -1 || __is_debug_misc_remove_dir) {
 				closedir(dir);
 				return -1;
 			}
 		} else {
 			// It's a file, unlink (delete) it
-			if (unlink(full_path) == -1) {
-				perror("unlink");
+			if (unlink(full_path) == -1 || __is_debug_misc_unlink) {
+				errno = EIO;
 				closedir(dir);
 				return -1;
 			}
@@ -189,7 +198,7 @@ int remove_directory(const Path *p, bool preserve_dir) {
 	// Now the directory is empty, so we can remove it
 	if (!preserve_dir) {
 		if (rmdir(path) == -1) {
-			perror("rmdir");
+			errno = EIO;
 			return -1;
 		}
 	}
@@ -204,5 +213,5 @@ void exit_error(char *format, ...) {
 	vfprintf(stderr, format, va_args);
 	fprintf(stderr, "\n");
 	va_end(va_args);
-	exit(-1);
+	EXIT_ERR_IF_NO_DEBUG();
 }

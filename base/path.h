@@ -37,7 +37,7 @@ char *path_to_string(const Path *p);
 bool path_exists(const Path *p);
 bool path_is_dir(const Path *p);
 bool path_mkdir(Path *p, u64 mode, bool parent);
-char *path_file_name(const Path *p);
+const char *path_file_name(const Path *p);
 int path_file_stem(const Path *p, char *buf, u64 limit);
 int path_copy(Path *dst, const Path *src);
 

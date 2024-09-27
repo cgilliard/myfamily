@@ -19,7 +19,7 @@
 #include <base/resources.h>
 #include <base/types.h>
 
-char *rstrstr(const char *s1, const char *s2);
+const char *rstrstr(const char *s1, const char *s2);
 int copy_file(const Path *dst, const Path *src);
 int remove_directory(const Path *path, bool preserve_dir);
 u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream);
@@ -31,5 +31,18 @@ int myferror(MYFILE *stream);
 long myftell(MYFILE *stream);
 int myfseek(MYFILE *stream, long pos, int type);
 int myfprintf(MYFILE *fptr, const char *str, ...);
+
+#define EXIT_ERR_IF_NO_DEBUG()                                                                     \
+	if (!__is_debug_misc_no_exit)                                                                  \
+		exit(-1);
+
+#ifdef TEST
+extern bool __is_debug_misc_ferror;
+extern bool __is_debug_misc_fwrite;
+extern bool __is_debug_misc_stat;
+extern bool __is_debug_misc_remove_dir;
+extern bool __is_debug_misc_unlink;
+extern bool __is_debug_misc_no_exit;
+#endif // TEST
 
 #endif // _BASE_MISC__

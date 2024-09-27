@@ -141,7 +141,7 @@ int path_push(Path *p, const char *next) {
 	return 0;
 }
 int path_pop(Path *p) {
-	char *res = rstrstr(p->ptr, PATH_SEPARATOR);
+	const char *res = rstrstr(p->ptr, PATH_SEPARATOR);
 	if (res) {
 		int index = res - (char *)p->ptr;
 		((char *)(p->ptr))[index] = 0;
@@ -156,8 +156,8 @@ char *path_to_string(const Path *p) {
 	return p->ptr;
 }
 
-char *path_file_name(const Path *p) {
-	char *ret = rstrstr(p->ptr, PATH_SEPARATOR);
+const char *path_file_name(const Path *p) {
+	const char *ret = rstrstr(p->ptr, PATH_SEPARATOR);
 	if (ret != NULL && strlen(ret) > 0)
 		return ret + 1;
 

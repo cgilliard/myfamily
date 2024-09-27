@@ -15,6 +15,7 @@
 #include <base/colors.h>
 #include <base/misc.h>
 #include <base/test.h>
+#include <errno.h>
 #include <limits.h>
 #ifdef __linux__
 #include <linux/limits.h>
@@ -35,6 +36,7 @@ MyTest(base, test_colors) {
 
 	myfprintf(ptr, "%s%s%s%s%s%s%s%s%s", DIMMED, MAGENTA, BRIGHT_RED, RED, BLUE, CYAN, YELLOW,
 			  GREEN, RESET);
+	cr_assert(!myferror(ptr));
 
 	myfclose(ptr);
 
@@ -287,4 +289,61 @@ MyTest(base, test_remove_dir) {
 	remove_directory(&rem, false);
 
 	cr_assert(!path_exists(&rem));
+}
+
+MyTest(base, test_other_misc_situations) {
+	char buf[1];
+	Path test;
+	path_copy(&test, resources_dir);
+	path_push(&test, "simple.txt");
+
+	MYFILE *stream = myfopen(&test, "r");
+	__is_debug_misc_ferror = true;
+	errno = 0;
+	cr_assert_eq(errno, 0);
+	read_all(buf, 1, 1, stream);
+	cr_assert_eq(errno, EIO);
+	__is_debug_misc_ferror = false;
+	myfclose(stream);
+
+	Path dst;
+	path_copy(&dst, test_dir);
+	path_push(&dst, "tmp.txt");
+	__is_debug_misc_fwrite = true;
+	// write error simulated
+	cr_assert(copy_file(&dst, &test));
+	__is_debug_misc_fwrite = false;
+
+	__is_debug_misc_stat = true;
+	cr_assert(remove_directory(test_dir, true));
+	__is_debug_misc_stat = false;
+
+	Path dirtest1;
+	path_copy(&dirtest1, test_dir);
+	path_push(&dirtest1, "testsub1");
+	path_push(&dirtest1, "testsub2");
+	path_push(&dirtest1, "testsub3");
+	path_mkdir(&dirtest1, 0700, true);
+	// pop back to testsub1
+	path_pop(&dirtest1);
+	path_pop(&dirtest1);
+
+	__is_debug_misc_remove_dir = true;
+	cr_assert(remove_directory(&dirtest1, false));
+	__is_debug_misc_remove_dir = false;
+
+	path_push(&dirtest1, "f.txt");
+	copy_file(&dirtest1, &test);
+	path_pop(&dirtest1);
+
+	__is_debug_misc_unlink = true;
+	cr_assert(remove_directory(&dirtest1, false));
+	__is_debug_misc_unlink = false;
+
+	__is_debug_misc_no_exit = true;
+	// will not return because of debug flag
+	exit_error("test");
+	__is_debug_misc_no_exit = false;
+
+	__is_debug_misc_no_exit = false;
 }

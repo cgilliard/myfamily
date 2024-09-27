@@ -84,7 +84,7 @@
 			log_fd = -1;                                                                           \
 		}                                                                                          \
 	}                                                                                              \
-	void test_##suite##_##test(const Path *test_dir);                                              \
+	void test_##suite##_##test(const Path *test_dir, const Path *resources_dir);                   \
 	Test(suite, test, .init = setup_##test, .fini = tear_down) {                                   \
 		{                                                                                          \
 			char path[1024];                                                                       \
@@ -95,11 +95,13 @@
 			strcat(path, ".fam");                                                                  \
 			Path dir;                                                                              \
 			path_for(&dir, path);                                                                  \
-			/*path_canonicalize(&dir); */                                                          \
 			remove_directory(&dir, false);                                                         \
 			path_mkdir(&dir, 0700, false);                                                         \
-			test_##suite##_##test(&dir);                                                           \
+			Path res;                                                                              \
+			path_for(&res, ".");                                                                   \
+			path_push(&res, "resources");                                                          \
+			test_##suite##_##test(&dir, &res);                                                     \
 			remove_directory(&dir, false);                                                         \
 		}                                                                                          \
 	}                                                                                              \
-	void test_##suite##_##test(const Path *test_dir)
+	void test_##suite##_##test(const Path *test_dir, const Path *resources_dir)
