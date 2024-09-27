@@ -287,4 +287,5 @@ MyTest(base, test_remove_dir) {
 	remove_directory(&rem, false);
 
 	cr_assert(!path_exists(&rem));
+	cr_assert(false);
 }
