@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 MINIMAL_BUILD=false
 if [ "$1" = "--minimal" ]; then
