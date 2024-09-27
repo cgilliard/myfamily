@@ -92,5 +92,5 @@ jobs:
       
       - name: Run MacOS Tests (clang)
         run: |
-          ./script/configure_homebrew.sh --with-cc=clang
+          ./scripts/configure_homebrew.sh --with-cc=clang
           make clean testsan 
