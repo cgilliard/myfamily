@@ -16,11 +16,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Compile-time check
-#if SIZE_MAX != 0xFFFFFFFFFFFFFFFF
-// #error "This code is intended for 64-bit architectures only."
-#endif
-
 void __attribute__((constructor)) __check_64bit_arch__() {
 	if (sizeof(size_t) != 8) {
 		fprintf(stderr, "Error: This program requires a 64-bit architecture to run.\n");
