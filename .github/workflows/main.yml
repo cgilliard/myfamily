@@ -30,6 +30,8 @@ jobs:
       
       - name: Run Linux Tests
         run: |
+          ls -laR
+          pwd
           ./configure
           make clean test
           
@@ -52,5 +54,7 @@ jobs:
       
       - name: Run MacOS Tests
         run: |
+          ls -laR
+          pwd
           ./configure
           make clean test
