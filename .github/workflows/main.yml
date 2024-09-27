@@ -31,14 +31,26 @@ jobs:
           sudo apt-get update
           sudo apt-get install libcriterion-dev doxygen python3-pip
           sudo pip3 install pre-commit
-      
-      - name: Run Linux Tests
+
+      - name: Test Linux Build
         run: |
           ./configure
           make clean all
           ./bin/fam init test1
           test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
+
+      - name: Run Linux Tests (gcc)
+        run: |
+          ./configure --with-cc=gcc
           make clean testsan
+      
+      - name: Run Linux Tests (clang)
+        run: |
+          ./configure --with-cc=clang
+          make clean testsan
+
+      - name: Build Docs
+        run: |
           # Build documentation for Linux only when the pipeline is triggered manually or on schedule
           if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
             echo "running build docs";
@@ -65,11 +77,20 @@ jobs:
           source venv/bin/activate
           pip install pre-commit
           pre-commit install
-      
-      - name: Run MacOS Tests
+
+      - name: Test MacOS Build
         run: |
           ./scripts/configure_homebrew.sh
           make clean all
           ./bin/fam init test1
           test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
+     
+      - name: Run MacOS Tests (gcc)
+        run: |
+          ./configure --with-cc=gcc
           make clean testsan
+      
+      - name: Run MacOS Tests (clang)
+        run: |
+          ./configure --with-cc=clang
+          make clean testsan 
