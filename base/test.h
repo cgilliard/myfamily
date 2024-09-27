@@ -13,17 +13,13 @@
 // limitations under the License.
 
 #include <base/colors.h>
-#include <base/macro_utils.h>
 #include <base/misc.h>
 #include <base/path.h>
 #include <base/resources.h>
 #include <criterion/criterion.h>
 #include <fcntl.h>
-#include <inttypes.h>
 #include <signal.h>
 #include <stdio.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
 #define MySuite(name)                                                                              \
@@ -32,11 +28,11 @@
 	}                                                                                              \
 	Test(init, init, .init = setup_suite) {                                                        \
 	}                                                                                              \
-	static int test_count = 0;                                                                     \
+	static u64 test_count = 0;                                                                     \
 	static u64 initial_alloc_diff;                                                                 \
 	static u64 initial_file_diff;                                                                  \
 	static char *cur_name = "";                                                                    \
-	static int log_fd = -1;                                                                        \
+	static u64 log_fd = -1;                                                                        \
 	void tear_down() {                                                                             \
 		u64 cur_alloc_count = mymalloc_sum();                                                      \
 		u64 cur_free_count = myfree_sum();                                                         \

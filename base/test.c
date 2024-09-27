@@ -40,7 +40,7 @@ MyTest(base, test_colors) {
 
 	MYFILE *ptr2 = myfopen(&file, "r");
 	char buf[1024];
-	read_all(buf, 1, 1024, ptr2);
+	u64 v = read_all(buf, 1, 1024, ptr2);
 	int brackets = 0;
 	for (int i = 0; i < strlen(buf); i++) {
 		if (buf[i] == '[')
@@ -59,7 +59,8 @@ MyTest(base, test_colors) {
 
 	MYFILE *ptr4 = myfopen(&file2, "r");
 	char buf2[1024];
-	read_all(buf2, 1, 1024, ptr4);
+	strcpy(buf2, "");
+	v = read_all(buf2, 1, 1024, ptr4);
 	brackets = 0;
 	for (int i = 0; i < strlen(buf2); i++) {
 		if (buf2[i] == '[')
