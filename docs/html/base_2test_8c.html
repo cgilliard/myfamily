@@ -72,17 +72,25 @@ $(function() {
 <div class="title">test.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="base_8h_source.html">base/base.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="colors_8h_source.html">base/colors.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="test_8h_source.html">base/test.h</a>&gt;</code><br />
+<code>#include &lt;limits.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a61ea0cfb59042365b198297ef6530441"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2test_8c.html#a61ea0cfb59042365b198297ef6530441">MySuite</a> (base)</td></tr>
 <tr class="separator:a61ea0cfb59042365b198297ef6530441"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91dc733486f7d17b5d18d6c1045ede27"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2test_8c.html#a91dc733486f7d17b5d18d6c1045ede27">MyTest</a> (base, test_mymalloc)</td></tr>
-<tr class="separator:a91dc733486f7d17b5d18d6c1045ede27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4360359371940ff9792f7305ba46017d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2test_8c.html#a4360359371940ff9792f7305ba46017d">MyTest</a> (base, test_colors)</td></tr>
+<tr class="separator:a4360359371940ff9792f7305ba46017d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff3b7f3387469485b59c6a3cdfb81c90"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2test_8c.html#aff3b7f3387469485b59c6a3cdfb81c90">MyTest</a> (base, test_resources)</td></tr>
+<tr class="separator:aff3b7f3387469485b59c6a3cdfb81c90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4de73717d31e91fade6b9cb5a4cd8381"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2test_8c.html#a4de73717d31e91fade6b9cb5a4cd8381">MyTest</a> (base, test_path)</td></tr>
 <tr class="separator:a4de73717d31e91fade6b9cb5a4cd8381"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5fcf1e0f610fac672bce53ede48d383"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2test_8c.html#af5fcf1e0f610fac672bce53ede48d383">MyTest</a> (base, test_misc)</td></tr>
+<tr class="separator:af5fcf1e0f610fac672bce53ede48d383"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a1358ecbb28d59ffd7f01c091428591"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2test_8c.html#a5a1358ecbb28d59ffd7f01c091428591">MyTest</a> (base, test_remove_dir)</td></tr>
+<tr class="separator:a5a1358ecbb28d59ffd7f01c091428591"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a61ea0cfb59042365b198297ef6530441"></a>
@@ -103,8 +111,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a91dc733486f7d17b5d18d6c1045ede27"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a91dc733486f7d17b5d18d6c1045ede27">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[1/2]</span></h2>
+<a id="a4360359371940ff9792f7305ba46017d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4360359371940ff9792f7305ba46017d">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -118,7 +126,35 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">test_mymalloc&#160;</td>
+          <td class="paramtype">test_colors&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af5fcf1e0f610fac672bce53ede48d383"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5fcf1e0f610fac672bce53ede48d383">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[2/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MyTest </td>
+          <td>(</td>
+          <td class="paramtype">base&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_misc&#160;</td>
           <td class="paramname">&#160;</td>
         </tr>
         <tr>
@@ -132,7 +168,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="a4de73717d31e91fade6b9cb5a4cd8381"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4de73717d31e91fade6b9cb5a4cd8381">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a4de73717d31e91fade6b9cb5a4cd8381">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[3/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -147,6 +183,62 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">test_path&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5a1358ecbb28d59ffd7f01c091428591"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a1358ecbb28d59ffd7f01c091428591">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[4/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MyTest </td>
+          <td>(</td>
+          <td class="paramtype">base&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_remove_dir&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aff3b7f3387469485b59c6a3cdfb81c90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff3b7f3387469485b59c6a3cdfb81c90">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[5/5]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MyTest </td>
+          <td>(</td>
+          <td class="paramtype">base&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_resources&#160;</td>
           <td class="paramname">&#160;</td>
         </tr>
         <tr>

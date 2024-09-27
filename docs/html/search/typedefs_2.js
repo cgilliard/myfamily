@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['bible_2138',['Bible',['../bible_8h.html#aa11dee65d32372c52f9deb257977e224',1,'bible.h']]],
-  ['biblebookidmap_2139',['BibleBookIdMap',['../bible_8h.html#ad051ff755db08b92ff22b2d3633d541d',1,'bible.h']]],
-  ['bibleverse_2140',['BibleVerse',['../bible_8h.html#a1f7233a2d00c5a9717c0ec6382c91e86',1,'bible.h']]]
+  ['myfile_266',['MYFILE',['../resources_8h.html#a012ce0acafda66602db742b71ec8d26c',1,'resources.h']]]
 ];

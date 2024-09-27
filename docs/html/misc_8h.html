@@ -72,9 +72,9 @@ $(function() {
 <div class="title">misc.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="base_2types_8h_source.html">base/types.h</a>&gt;</code><br />
-<code>#include &lt;stddef.h&gt;</code><br />
-<code>#include &lt;stdio.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="path_8h_source.html">base/path.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 </div>
 <p><a href="misc_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -82,18 +82,18 @@ $(function() {
 Functions</h2></td></tr>
 <tr class="memitem:aa9a7b3f78c4917215b2f8ff8d8756e9f"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#aa9a7b3f78c4917215b2f8ff8d8756e9f">rstrstr</a> (const char *s1, const char *s2)</td></tr>
 <tr class="separator:aa9a7b3f78c4917215b2f8ff8d8756e9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0128c17294655e800cec2066b3e0e2a9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#a0128c17294655e800cec2066b3e0e2a9">copy_file</a> (const char *dst, const char *src)</td></tr>
-<tr class="separator:a0128c17294655e800cec2066b3e0e2a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaafa479e74ac34e8265a9472cd18a8ae"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#aaafa479e74ac34e8265a9472cd18a8ae">remove_directory</a> (const char *<a class="el" href="header__sample1_8h.html#af6b46818cfa690027c8616652a03d6af">path</a>, bool preserve_dir)</td></tr>
-<tr class="separator:aaafa479e74ac34e8265a9472cd18a8ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c97a6ddc4da1d6b512e0c18ce650d65"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#a0c97a6ddc4da1d6b512e0c18ce650d65">read_all</a> (void *buffer, size_t <a class="el" href="traits_8h.html#a56165321ab30e10af6d42752217d1be1">size</a>, size_t <a class="el" href="header__sample1_8h.html#a3cf0f269cb7018481132ba4597dddde7">count</a>, FILE *stream)</td></tr>
-<tr class="separator:a0c97a6ddc4da1d6b512e0c18ce650d65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5a851f57e7a29d68e705f0a04826f50"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#aa5a851f57e7a29d68e705f0a04826f50">copy_file</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *dst, const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *src)</td></tr>
+<tr class="separator:aa5a851f57e7a29d68e705f0a04826f50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac670968c9a6ae10fbdd37a7206afc50b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#ac670968c9a6ae10fbdd37a7206afc50b">remove_directory</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *path, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> preserve_dir)</td></tr>
+<tr class="separator:ac670968c9a6ae10fbdd37a7206afc50b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af88b4147d246cf562900b5939bc10984"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#af88b4147d246cf562900b5939bc10984">read_all</a> (void *buffer, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> count, <a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *stream)</td></tr>
+<tr class="separator:af88b4147d246cf562900b5939bc10984"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04d2c2dc4f9a32fccb11ff65d07bf171"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="misc_8h.html#a04d2c2dc4f9a32fccb11ff65d07bf171">exit_error</a> (char *format,...)</td></tr>
 <tr class="separator:a04d2c2dc4f9a32fccb11ff65d07bf171"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a0128c17294655e800cec2066b3e0e2a9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0128c17294655e800cec2066b3e0e2a9">&#9670;&nbsp;</a></span>copy_file()</h2>
+<a id="aa5a851f57e7a29d68e705f0a04826f50"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5a851f57e7a29d68e705f0a04826f50">&#9670;&nbsp;</a></span>copy_file()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -101,13 +101,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int copy_file </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype">const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype">const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
           <td class="paramname"><em>src</em>&#160;</td>
         </tr>
         <tr>
@@ -148,14 +148,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0c97a6ddc4da1d6b512e0c18ce650d65"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0c97a6ddc4da1d6b512e0c18ce650d65">&#9670;&nbsp;</a></span>read_all()</h2>
+<a id="af88b4147d246cf562900b5939bc10984"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af88b4147d246cf562900b5939bc10984">&#9670;&nbsp;</a></span>read_all()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">size_t read_all </td>
+          <td class="memname"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> read_all </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>buffer</em>, </td>
@@ -163,19 +163,19 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
           <td class="paramname"><em>size</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
           <td class="paramname"><em>count</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">FILE *&#160;</td>
+          <td class="paramtype"><a class="el" href="resources_8h.html#a012ce0acafda66602db742b71ec8d26c">MYFILE</a> *&#160;</td>
           <td class="paramname"><em>stream</em>&#160;</td>
         </tr>
         <tr>
@@ -188,8 +188,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aaafa479e74ac34e8265a9472cd18a8ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaafa479e74ac34e8265a9472cd18a8ae">&#9670;&nbsp;</a></span>remove_directory()</h2>
+<a id="ac670968c9a6ae10fbdd37a7206afc50b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac670968c9a6ae10fbdd37a7206afc50b">&#9670;&nbsp;</a></span>remove_directory()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -197,13 +197,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">int remove_directory </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype">const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
           <td class="paramname"><em>path</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
           <td class="paramname"><em>preserve_dir</em>&#160;</td>
         </tr>
         <tr>

@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['famtomlinfo_2146',['FamTomlInfo',['../build_8c.html#ac707ace14b681605ba5ad2ccc967dbba',1,'build.c']]],
-  ['fatptr_2147',['FatPtr',['../base_2heap_8h.html#a699932104dc21b9953a234a0421ed0a9',1,'FatPtr():&#160;heap.h'],['../main_2resources_2include_2core_2heap_8h.html#a699932104dc21b9953a234a0421ed0a9',1,'FatPtr():&#160;heap.h']]],
-  ['fnparam_2148',['FnParam',['../parser_8c.html#ae6fda5256ca562f811010c1551aa3f47',1,'parser.c']]]
+  ['resourcestats_268',['ResourceStats',['../resources_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'resources.h']]]
 ];

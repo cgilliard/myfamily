@@ -87,46 +87,12 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _MAIN_MAIN__</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _MAIN_MAIN__</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="base_2macro__utils_8h.html">base/macro_utils.h</a>&gt;</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="version_8h.html">base/version.h</a>&gt;</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;string.h&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;string.h&gt;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keywordtype">int</span> <a class="code" href="main_8h.html#a813033ab922b78183e69871180bdc9cf">real_main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv);</div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keywordtype">int</span> <a class="code" href="main_8h.html#a813033ab922b78183e69871180bdc9cf">real_main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> **argv);</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="main_8h.html#a2aac8abe3f147c537d075c60f15c0342">   24</a></span>&#160;<span class="preprocessor">#define WRITE_RESOURCE_TO_DISK(dir, filename, data, size)                                          \</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">    do {                                                                                           \</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">        char path[1024];                                                                           \</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">        snprintf(path, sizeof(path), &quot;%s/%s&quot;</span>, dir, filename);                                      \</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;        printf(&quot;path=%s\n&quot;, path);                                                                 \</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        Path ensure_parent;                                                                        \</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        path_for(&amp;ensure_parent, path);                                                            \</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        path_pop(&amp;ensure_parent);                                                                  \</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        path_mkdir(&amp;ensure_parent, 0700, true);                                                    \</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        FILE *f = fopen(path, &quot;wb&quot;);                                                               \</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        if (f) {                                                                                   \</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;            fwrite(data, 1, size, f);                                                              \</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;            fclose(f);                                                                             \</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;        } else {                                                                                   \</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;            perror(&quot;Could not open file for writing&quot;);                                             \</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        }                                                                                          \</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    } while (0)</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="main_8h.html#a191664d4632d30202b7cac784e969530">   42</a></span>&#160;<span class="preprocessor">#define WRITE_BUILD_ID(dir) WRITE_RESOURCE_TO_DISK(dir, &quot;build_id&quot;</span>, BUILD_ID, strlen(BUILD_ID))</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
-<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="main_8h.html#ab8f4c9f80603d925ebe5c13c4c542e09">   44</a></span>&#160;<span class="preprocessor">#define BUILD_RESOURCE_DIR_(dir, namespace)                                                        \</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">    for (int i = 0; i &lt; namespace##xxdir_file_count; i++)                                          \</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">    WRITE_RESOURCE_TO_DISK(dir, namespace##xxdir_file_names[i], namespace##xxdir_files[i],         \</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">        namespace##xxdir_file_sizes[i])</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="main_8h.html#ac0a5ba78603081144c4b5d394646668a">   48</a></span>&#160;<span class="preprocessor">#define BUILD_RESOURCE_DIR_NAMESPACE(dir, namespace)                                               \</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">    printf(&quot;Building Resource Directory: &#39;%s&#39; &#39;%s&#39;\n&quot;</span>, dir, #namespace);                           \</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    BUILD_RESOURCE_DIR_(dir, namespace##_)</div>
-<div class="line"><a name="l00051"></a><span class="lineno"><a class="line" href="main_8h.html#a18cf40c793f6a349dec00423bc18b3b4">   51</a></span>&#160;<span class="preprocessor">#define BUILD_RESOURCE_DIR(dir, ...)                                                               \</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">    MULTI_SWITCH2(BUILD_RESOURCE_DIR_NAMESPACE, BUILD_RESOURCE_DIR_, dir, __VA_ARGS__)</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _MAIN_MAIN__</span></div>
-<div class="ttc" id="abase_2macro__utils_8h_html"><div class="ttname"><a href="base_2macro__utils_8h.html">macro_utils.h</a></div></div>
-<div class="ttc" id="amain_8h_html_a813033ab922b78183e69871180bdc9cf"><div class="ttname"><a href="main_8h.html#a813033ab922b78183e69871180bdc9cf">real_main</a></div><div class="ttdeci">int real_main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> real_main.c:274</div></div>
-<div class="ttc" id="aversion_8h_html"><div class="ttname"><a href="version_8h.html">version.h</a></div></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _MAIN_MAIN__</span></div>
+<div class="ttc" id="amain_8h_html_a813033ab922b78183e69871180bdc9cf"><div class="ttname"><a href="main_8h.html#a813033ab922b78183e69871180bdc9cf">real_main</a></div><div class="ttdeci">int real_main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> real_main.c:15</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

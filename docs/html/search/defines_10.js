@@ -1,31 +1,4 @@
 var searchData=
 [
-  ['scoped_5fallocator_2582',['SCOPED_ALLOCATOR',['../main_2resources_2include_2core_2chain__allocator_8h.html#a5f80eb18a2917d69e22f6414ba4cb167',1,'SCOPED_ALLOCATOR():&#160;chain_allocator.h'],['../base_2chain__allocator_8h.html#a5f80eb18a2917d69e22f6414ba4cb167',1,'SCOPED_ALLOCATOR():&#160;chain_allocator.h']]],
-  ['second_2583',['SECOND',['../main_2resources_2include_2core_2macro__utils_8h.html#a8cf792fb70b4f3de790edeb87b0665a3',1,'SECOND():&#160;macro_utils.h'],['../base_2macro__utils_8h.html#a8cf792fb70b4f3de790edeb87b0665a3',1,'SECOND():&#160;macro_utils.h']]],
-  ['second_5fall_2584',['SECOND_ALL',['../core_2type_8h.html#abead0bbf4c2b9ff02131b2dddde1bea2',1,'type.h']]],
-  ['self_2585',['Self',['../core_2type_8h.html#ab62fe8af4b04c09836d70b6919770480',1,'type.h']]],
-  ['selfcleanup_2586',['SelfCleanup',['../core_2type_8h.html#ae0bd899b6febf24ca768f2a88bd30c67',1,'SelfCleanup():&#160;type.h'],['../main_2resources_2include_2core_2type_8h.html#ae0bd899b6febf24ca768f2a88bd30c67',1,'SelfCleanup():&#160;type.h']]],
-  ['selfconfig_2587',['SelfConfig',['../core_2type_8h.html#a24b964809ef9205d71b39380ea974ddf',1,'type.h']]],
-  ['serverapi_2588',['ServerApi',['../core_2test_8c.html#aadd5f518ef7d243f2bc2b9b97ddad0e9',1,'test.c']]],
-  ['set_5foffset_5fof_2589',['SET_OFFSET_OF',['../core_2type_8h.html#abca5f6ccf1375a60458378849f687dc4',1,'type.h']]],
-  ['set_5foffset_5fof_5fimpl_2590',['SET_OFFSET_OF_IMPL',['../core_2type_8h.html#a0feaf5965e7d2e7d774c329691d6681d',1,'type.h']]],
-  ['set_5fparam_2591',['SET_PARAM',['../core_2type_8h.html#a59184228fa29efbc3df1901ae6da28a2',1,'SET_PARAM():&#160;type.h'],['../main_2resources_2include_2core_2type_8h.html#ac982fb623ab44d3384ab70f592113c58',1,'SET_PARAM():&#160;type.h']]],
-  ['set_5fparam_5f_2592',['SET_PARAM_',['../main_2resources_2include_2core_2type_8h.html#aa99e7f621261fe31d667cb3a9c6229c6',1,'type.h']]],
-  ['set_5fparam_5f_5f_2593',['SET_PARAM__',['../main_2resources_2include_2core_2type_8h.html#a411cd19689c2e443bb1ccb3949e5b541',1,'type.h']]],
-  ['setcomptrait_2594',['SetCompTrait',['../core_2test_8c.html#a141a85243ffd654ce0a1aeadc6b08796',1,'test.c']]],
-  ['sig0_2595',['SIG0',['../sha256_8c.html#a2f0da11cf6577ba2dd4aea7685d0268e',1,'sha256.c']]],
-  ['sig1_2596',['SIG1',['../sha256_8c.html#a865de5131d1e990ca62d66220a527d2c',1,'sha256.c']]],
-  ['simpleoptionimpl_2597',['SimpleOptionImpl',['../core_2test_8c.html#a1ce2980db3e3753df758d5fdea0c0146',1,'test.c']]],
-  ['single_5fparam_2598',['SINGLE_PARAM',['../base_2macro__utils_8h.html#acccf4a6a4c7fd681bf65a4a90c3f2b9a',1,'SINGLE_PARAM():&#160;macro_utils.h'],['../main_2resources_2include_2core_2macro__utils_8h.html#acccf4a6a4c7fd681bf65a4a90c3f2b9a',1,'SINGLE_PARAM():&#160;macro_utils.h']]],
-  ['statictype_2599',['StaticType',['../core_2type_8h.html#a81606b7d618c53af1b6e95797079106c',1,'type.h']]],
-  ['strdup_2600',['strdup',['../toml_8c.html#a2f35dff70d447197a36db45d9c42be30',1,'toml.c']]],
-  ['stringify_2601',['STRINGIFY',['../base_2macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7',1,'STRINGIFY():&#160;macro_utils.h'],['../main_2resources_2include_2core_2macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7',1,'STRINGIFY():&#160;macro_utils.h'],['../toml_8c.html#a6df1d22fb5f09eccc23b9f399670cfd7',1,'STRINGIFY():&#160;toml.c']]],
-  ['strndup_2602',['strndup',['../toml_8c.html#a7c3972b4ab432d88f0a2b046e3f613aa',1,'toml.c']]],
-  ['suffixtree_2603',['SuffixTree',['../suffix__tree_8h.html#add3ed4c018ee4f0461d8aab69447b987',1,'suffix_tree.h']]],
-  ['super_2604',['Super',['../core_2type_8h.html#a8300c58c407762ef5e63f1fc9cbaefd2',1,'type.h']]],
-  ['super_5fproc_2605',['SUPER_PROC',['../core_2type_8h.html#adb5afa6c222fc461f382b281b140047f',1,'type.h']]],
-  ['super_5ftrait_5fconfig_2606',['SUPER_TRAIT_CONFIG',['../core_2type_8h.html#ace32668f4d3f22420af6e24df949131f',1,'type.h']]],
-  ['superdupertest_2607',['SuperDuperTest',['../core_2test_8c.html#a3929e1f44fd545056a7fd9069f113c2f',1,'test.c']]],
-  ['supertest_2608',['SuperTest',['../core_2test_8c.html#af96d530aa4d1a1a9ef8c924c426dca61',1,'test.c']]],
-  ['synchronized_2609',['synchronized',['../base_2lock_8h.html#a35d42cc801623f1ddf20ccc2981d968b',1,'synchronized():&#160;lock.h'],['../main_2resources_2include_2core_2lock_8h.html#a35d42cc801623f1ddf20ccc2981d968b',1,'synchronized():&#160;lock.h']]]
+  ['yellow_343',['YELLOW',['../colors_8h.html#abf681265909adf3d3e8116c93c0ba179',1,'colors.h']]]
 ];

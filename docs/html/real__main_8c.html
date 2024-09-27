@@ -72,139 +72,13 @@ $(function() {
 <div class="title">real_main.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="args_8h_source.html">args/args.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="version_8h_source.html">base/version.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="bible_8h_source.html">bible/bible.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="build_8h_source.html">build/build.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="std_8h_source.html">core/std.h</a>&gt;</code><br />
-<code>#include &lt;dirent.h&gt;</code><br />
-<code>#include &lt;errno.h&gt;</code><br />
-<code>#include &lt;<a class="el" href="main_8h_source.html">main/main.h</a>&gt;</code><br />
-<code>#include &lt;main/resources.h&gt;</code><br />
-<code>#include &lt;stdio.h&gt;</code><br />
-<code>#include &lt;string.h&gt;</code><br />
-<code>#include &lt;sys/stat.h&gt;</code><br />
-<code>#include &lt;unistd.h&gt;</code><br />
-</div><table class="memberdecls">
+<table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad741ff05c06326368773694a87db7fe6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#ad741ff05c06326368773694a87db7fe6">build_args</a> (<a class="el" href="structArgs.html">Args</a> *args)</td></tr>
-<tr class="separator:ad741ff05c06326368773694a87db7fe6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acfdf235444b39ca151149cb623ee4f42"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#acfdf235444b39ca151149cb623ee4f42">process_verse</a> (<a class="el" href="structArgs.html">Args</a> *args, char *config_dir)</td></tr>
-<tr class="separator:acfdf235444b39ca151149cb623ee4f42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62da8b782a1edb3caa365cb1918b8eb4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#a62da8b782a1edb3caa365cb1918b8eb4">process_build</a> (<a class="el" href="structArgs.html">Args</a> *args, char *config_dir)</td></tr>
-<tr class="separator:a62da8b782a1edb3caa365cb1918b8eb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13db30d30bec76de34f62b396933af5f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#a13db30d30bec76de34f62b396933af5f">process_init</a> (<a class="el" href="structArgs.html">Args</a> *args, char *config_dir)</td></tr>
-<tr class="separator:a13db30d30bec76de34f62b396933af5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadd7ec11c1873b232827eddb9a17c911"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#aadd7ec11c1873b232827eddb9a17c911">setup_config_dir</a> (const char *config_dir)</td></tr>
-<tr class="separator:aadd7ec11c1873b232827eddb9a17c911"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a813033ab922b78183e69871180bdc9cf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#a813033ab922b78183e69871180bdc9cf">real_main</a> (int argc, char **argv)</td></tr>
 <tr class="separator:a813033ab922b78183e69871180bdc9cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ad741ff05c06326368773694a87db7fe6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad741ff05c06326368773694a87db7fe6">&#9670;&nbsp;</a></span>build_args()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void build_args </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structArgs.html">Args</a> *&#160;</td>
-          <td class="paramname"><em>args</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a62da8b782a1edb3caa365cb1918b8eb4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62da8b782a1edb3caa365cb1918b8eb4">&#9670;&nbsp;</a></span>process_build()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void process_build </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structArgs.html">Args</a> *&#160;</td>
-          <td class="paramname"><em>args</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>config_dir</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a13db30d30bec76de34f62b396933af5f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a13db30d30bec76de34f62b396933af5f">&#9670;&nbsp;</a></span>process_init()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void process_init </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structArgs.html">Args</a> *&#160;</td>
-          <td class="paramname"><em>args</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>config_dir</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="acfdf235444b39ca151149cb623ee4f42"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acfdf235444b39ca151149cb623ee4f42">&#9670;&nbsp;</a></span>process_verse()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void process_verse </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structArgs.html">Args</a> *&#160;</td>
-          <td class="paramname"><em>args</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>config_dir</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a813033ab922b78183e69871180bdc9cf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a813033ab922b78183e69871180bdc9cf">&#9670;&nbsp;</a></span>real_main()</h2>
 
@@ -227,24 +101,6 @@ Functions</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aadd7ec11c1873b232827eddb9a17c911"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aadd7ec11c1873b232827eddb9a17c911">&#9670;&nbsp;</a></span>setup_config_dir()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void setup_config_dir </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>config_dir</em></td><td>)</td>
-          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
