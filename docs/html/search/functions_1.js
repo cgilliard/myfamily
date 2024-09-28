@@ -1,13 +1,20 @@
 var searchData=
 [
-  ['args_5fadd_5fparam_262',['args_add_param',['../args_8h.html#a471eecf2217d505d06a49e209f3cd85c',1,'args.h']]],
-  ['args_5fbuild_263',['args_build',['../args_8h.html#ad93cf4b8dce3bd5fa60059fab5e90563',1,'args.h']]],
-  ['args_5fcleanup_264',['args_cleanup',['../args_8h.html#ab4637081f01532584954d036764e3ab4',1,'args.h']]],
-  ['args_5fget_5fargument_265',['args_get_argument',['../args_8h.html#a15e48bc9590ee332817a68ca4c42441d',1,'args.h']]],
-  ['args_5finit_266',['args_init',['../args_8h.html#a5edd894f104baa890b4be892f63ecd10',1,'args.h']]],
-  ['args_5fparam_5fbuild_267',['args_param_build',['../args_8c.html#ad91b03fb000b05a559f0e8d5cbe9251e',1,'args_param_build(ArgsParam *ptr, const char *name, const char *help, const char *short_name, const bool takes_value, const bool multiple, const char *default_value):&#160;args.c'],['../args_8h.html#ad91b03fb000b05a559f0e8d5cbe9251e',1,'args_param_build(ArgsParam *ptr, const char *name, const char *help, const char *short_name, const bool takes_value, const bool multiple, const char *default_value):&#160;args.c']]],
-  ['args_5fparam_5fcleanup_268',['args_param_cleanup',['../args_8c.html#a2aa75722abb50e0dcc246094d53abb38',1,'args_param_cleanup(ArgsParamImpl *ptr):&#160;args.c'],['../args_8h.html#a2aa75722abb50e0dcc246094d53abb38',1,'args_param_cleanup(ArgsParamImpl *ptr):&#160;args.c']]],
-  ['args_5fprint_5fversion_269',['args_print_version',['../args_8h.html#a4a69b093e12fcf4b70cdcfdd3bd4b827',1,'args.h']]],
-  ['args_5fusage_270',['args_usage',['../args_8h.html#ad213f59ddb6988854c01e10cea68a73b',1,'args.h']]],
-  ['args_5fvalue_5fof_271',['args_value_of',['../args_8h.html#a737f867613b78aa329d83a9d8c7eff6c',1,'args.h']]]
+  ['args_5fadd_5fparam_271',['args_add_param',['../args_8h.html#a471eecf2217d505d06a49e209f3cd85c',1,'args_add_param(Args *args, const ArgsParam *ap):&#160;args.c'],['../args_8c.html#a471eecf2217d505d06a49e209f3cd85c',1,'args_add_param(Args *args, const ArgsParam *ap):&#160;args.c']]],
+  ['args_5fadd_5fsub_5fcommand_272',['args_add_sub_command',['../args_8c.html#a6f5048d0360c5fba3969731324968176',1,'args_add_sub_command(Args *args, SubCommand *sc):&#160;args.c'],['../args_8h.html#a6f5048d0360c5fba3969731324968176',1,'args_add_sub_command(Args *args, SubCommand *sc):&#160;args.c']]],
+  ['args_5fbuild_273',['args_build',['../args_8c.html#ad93cf4b8dce3bd5fa60059fab5e90563',1,'args_build(Args *args, const char *prog, const char *version, const char *author, const u32 min_args, const u32 max_args):&#160;args.c'],['../args_8h.html#ad93cf4b8dce3bd5fa60059fab5e90563',1,'args_build(Args *args, const char *prog, const char *version, const char *author, const u32 min_args, const u32 max_args):&#160;args.c']]],
+  ['args_5fcheck_5foption_274',['args_check_option',['../args_8c.html#a686fd596d50a46dfda418a781c675cbf',1,'args.c']]],
+  ['args_5fcheck_5fvalidity_275',['args_check_validity',['../args_8c.html#ad991413eb99bc5614697b633fffac323',1,'args.c']]],
+  ['args_5fcleanup_276',['args_cleanup',['../args_8c.html#ab4637081f01532584954d036764e3ab4',1,'args_cleanup(ArgsImpl *ptr):&#160;args.c'],['../args_8h.html#ab4637081f01532584954d036764e3ab4',1,'args_cleanup(ArgsImpl *ptr):&#160;args.c']]],
+  ['args_5fexit_5ferror_277',['args_exit_error',['../args_8c.html#a075df82b64ecd2ea9d83ac8756daa47a',1,'args.c']]],
+  ['args_5fget_5fargument_278',['args_get_argument',['../args_8c.html#a329460dc41ca3f0d3ad9f5afb2dfb3a5',1,'args_get_argument(const Args *args, const u32 index, char *value_buf, const u64 max_value_len):&#160;args.c'],['../args_8h.html#a329460dc41ca3f0d3ad9f5afb2dfb3a5',1,'args_get_argument(const Args *args, const u32 index, char *value_buf, const u64 max_value_len):&#160;args.c']]],
+  ['args_5finit_279',['args_init',['../args_8h.html#a5edd894f104baa890b4be892f63ecd10',1,'args_init(Args *args, const int argc, const char **argv):&#160;args.c'],['../args_8c.html#a5edd894f104baa890b4be892f63ecd10',1,'args_init(Args *args, const int argc, const char **argv):&#160;args.c']]],
+  ['args_5fparam_5fbuild_280',['args_param_build',['../args_8c.html#ad91b03fb000b05a559f0e8d5cbe9251e',1,'args_param_build(ArgsParam *ptr, const char *name, const char *help, const char *short_name, const bool takes_value, const bool multiple, const char *default_value):&#160;args.c'],['../args_8h.html#ad91b03fb000b05a559f0e8d5cbe9251e',1,'args_param_build(ArgsParam *ptr, const char *name, const char *help, const char *short_name, const bool takes_value, const bool multiple, const char *default_value):&#160;args.c']]],
+  ['args_5fparam_5fcleanup_281',['args_param_cleanup',['../args_8c.html#a2aa75722abb50e0dcc246094d53abb38',1,'args_param_cleanup(ArgsParamImpl *ptr):&#160;args.c'],['../args_8h.html#a2aa75722abb50e0dcc246094d53abb38',1,'args_param_cleanup(ArgsParamImpl *ptr):&#160;args.c']]],
+  ['args_5fparam_5fcopy_282',['args_param_copy',['../args_8c.html#aec9425817de0d7d4a004822e7c45cacb',1,'args.c']]],
+  ['args_5fprint_5fversion_283',['args_print_version',['../args_8c.html#a4a69b093e12fcf4b70cdcfdd3bd4b827',1,'args_print_version(const Args *args):&#160;args.c'],['../args_8h.html#a4a69b093e12fcf4b70cdcfdd3bd4b827',1,'args_print_version(const Args *args):&#160;args.c']]],
+  ['args_5fsub_5ftakes_5fvalue_284',['args_sub_takes_value',['../args_8c.html#a32e3c5093bf9758099c1e349f09055ef',1,'args.c']]],
+  ['args_5fsubi_5ffor_285',['args_subi_for',['../args_8c.html#ac3c1aaa57b2624c50a98429687e7f759',1,'args.c']]],
+  ['args_5fusage_286',['args_usage',['../args_8c.html#ad213f59ddb6988854c01e10cea68a73b',1,'args_usage(const Args *args, const char *sub):&#160;args.c'],['../args_8h.html#ad213f59ddb6988854c01e10cea68a73b',1,'args_usage(const Args *args, const char *sub):&#160;args.c']]],
+  ['args_5fvalue_5fof_287',['args_value_of',['../args_8c.html#aca3a764da124161e9294d4f1c4055313',1,'args_value_of(const Args *args, const char *param_name, char *value_buf, const u64 max_value_len, const u32 index):&#160;args.c'],['../args_8h.html#aca3a764da124161e9294d4f1c4055313',1,'args_value_of(const Args *args, const char *param_name, char *value_buf, const u64 max_value_len, const u32 index):&#160;args.c']]]
 ];
