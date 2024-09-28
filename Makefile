@@ -58,14 +58,14 @@ define run_tests
                    gcno_file="$${file%.c}.gcno"; \
 		   if [ -f "$$gcno_file" ]; then \
 		       percent=`gcov $$file | grep "^Lines" | head -1 | cut -f2 -d ' ' | cut -f2 -d ':' | cut -f1 -d '%' | tr -d \\n`; \
-		       if [ "$$percent" == "" ]; then \
+		       if [ "$$percent" = "" ]; then \
 		           percent=0.00; \
 		       fi; \
                        lines=`gcov $$file | grep "^Lines" | head -1 | cut -f4 -d ' ' | tr -d \\n`; \
 		       gcov_file="$$file.gcov"; \
 		       if [ -f "$$file.gcov" ]; then \
 		           cat $$gcov_file >> /tmp/gcov_cat.txt; \
-		           if [ "$$lines" == "" ]; then \
+		           if [ "$$lines" = "" ]; then \
                                lines=0; \
                            fi; \
 		           ratio=`awk "BEGIN {print $$percent / 100}"`; \
