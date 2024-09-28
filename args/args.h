@@ -41,10 +41,11 @@ typedef struct SubCommandImpl {
 	char name[ARGS_MAX_SUBCOMMAND_LENGTH + 1];
 	ArgsParam *params;
 	bool *is_specified;
+	u32 param_count;
 	u32 min_args;
 	u32 max_args;
 	char *help;
-	char *sub_arg_doc;
+	char *arg_doc;
 } SubCommandImpl;
 
 void sub_command_cleanup(SubCommandImpl *ptr);
@@ -59,8 +60,8 @@ typedef struct ArgsImpl {
 	char prog[ARGS_MAX_DETAIL_LENGTH + 1];
 	char version[ARGS_MAX_DETAIL_LENGTH + 1];
 	char author[ARGS_MAX_DETAIL_LENGTH + 1];
-	SubCommand **subs;
-	u64 subs_count;
+	SubCommand *subs;
+	u32 subs_count;
 	char **argv;
 	int argc;
 } ArgsImpl;
@@ -73,10 +74,11 @@ int args_build(Args *args, const char *prog, const char *version, const char *au
 			   const u32 min_args, const u32 max_args);
 
 int args_add_param(Args *args, const ArgsParam *ap);
+int args_add_sub_command(Args *args, SubCommand *sc);
 int args_init(Args *args, const int argc, const char **argv);
 int args_value_of(const Args *args, const char *param_name, char *value_buf,
-				  const u64 max_value_len, const u64 index);
-int args_get_argument(const Args *args, const u64 index, char *value_buf, const u64 max_value_len);
+				  const u64 max_value_len, const u32 index);
+int args_get_argument(const Args *args, const u32 index, char *value_buf, const u64 max_value_len);
 void args_print_version(const Args *args);
 void args_usage(const Args *args, const char *sub);
 
