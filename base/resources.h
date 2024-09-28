@@ -42,6 +42,8 @@ u64 myfclose_sum();
 #ifdef TEST
 extern bool __is_debug_malloc;
 extern bool __is_debug_realloc;
+extern u64 __is_debug_malloc_counter_;
+extern u64 __is_debug_realloc_counter_;
 #endif // TEST
 
 #endif // _BASE_RESOURCES__

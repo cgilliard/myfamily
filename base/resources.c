@@ -21,13 +21,17 @@ _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 #ifdef TEST
 bool __is_debug_malloc = false;
 bool __is_debug_realloc = false;
+u64 __is_debug_malloc_counter_ = UINT64_MAX;
+u64 __is_debug_realloc_counter_ = UINT64_MAX;
 #endif // TEST
 
 void *mymalloc(u64 size) {
 #ifdef TEST
-	if (__is_debug_malloc) {
+	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
+		__is_debug_malloc_counter_ = UINT64_MAX;
 		return NULL;
 	}
+	__is_debug_malloc_counter_--;
 #endif // TEST
 	void *ret;
 	ret = malloc(size);
@@ -39,9 +43,11 @@ void *mymalloc(u64 size) {
 }
 void *myrealloc(void *ptr, u64 size) {
 #ifdef TEST
-	if (__is_debug_realloc) {
+	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
+		__is_debug_realloc_counter_ = UINT64_MAX;
 		return NULL;
 	}
+	__is_debug_realloc_counter_--;
 #endif // TEST
 	void *ret;
 	ret = realloc(ptr, size);

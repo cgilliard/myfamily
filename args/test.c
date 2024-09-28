@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <args/args.h>
+#include <base/resources.h>
 #include <base/test.h>
 #include <errno.h>
 
@@ -115,7 +116,6 @@ MyTest(args, test_arg_population) {
 
 	const char *argv1[1] = {"test1"};
 	args_init(&args1, 1, argv1);
-	printf("vers\n");
 	args_print_version(&args1);
 }
 
@@ -220,4 +220,103 @@ MyTest(args, test_usage) {
 	args_add_param(&args1, &p2);
 	args_add_sub_command(&args1, &sc1);
 	args_usage(&args1, NULL);
+}
+
+MyTest(args, test_args_param_copy) {
+	char big[ARGS_MAX_ARGUMENT_NAME_LENGTH + 10];
+	for (int i = 0; i < ARGS_MAX_ARGUMENT_NAME_LENGTH + 10; i++) {
+		big[i] = 'a';
+	}
+	big[ARGS_MAX_ARGUMENT_NAME_LENGTH + 9] = 0;
+
+	ArgsParam p1;
+	ArgsParamImpl p2;
+	cr_assert(!args_param_build(&p1, "", "name help here", "n", false, false, "myname"));
+
+	__is_debug_malloc = true;
+	cr_assert(!args_param_copy(&p2, &p1));
+	__is_debug_malloc = false;
+
+	__is_debug_malloc_counter_ = 1;
+	cr_assert(!args_param_copy(&p2, &p1));
+	__is_debug_malloc_counter_ = UINT64_MAX;
+}
+
+MyTest(args, test_sub_command_other) {
+	SubCommand sc1;
+	SubCommandImpl sc2;
+	if (sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"))
+		exit_error("Could not build subcommand.");
+	__is_debug_malloc = true;
+	cr_assert(!sub_command_copy(&sc2, &sc1));
+	__is_debug_malloc = false;
+
+	__is_debug_malloc_counter_ = 1;
+	cr_assert(!sub_command_copy(&sc2, &sc1));
+	__is_debug_malloc_counter_ = UINT64_MAX;
+
+	ArgsParam p1;
+	if (args_param_build(&p1, "name", "name help here", "n", false, false, "myname"))
+		exit_error("Could not build param");
+	sub_command_add_param(&sc1, &p1);
+
+	__is_debug_malloc_counter_ = 2;
+	cr_assert(!sub_command_copy(&sc2, &sc1));
+	__is_debug_malloc_counter_ = UINT64_MAX;
+
+	__is_debug_malloc_counter_ = 3;
+	cr_assert(!sub_command_copy(&sc2, &sc1));
+	__is_debug_malloc_counter_ = UINT64_MAX;
+
+	SubCommandImpl sc0;
+	sc0.help = NULL;
+	strcpy(sc0.name, "test");
+	sc0.min_args = 0;
+	sc0.max_args = 0;
+	sc0.arg_doc = NULL;
+	sc0.params = NULL;
+	sc0.is_specified = NULL;
+	sc0.param_count = 0;
+	cr_assert(!sub_command_copy(&sc2, &sc0));
+
+	SubCommand sc3;
+	if (sub_command_build(&sc3, "sc3", "sc3 help", 3, 7, NULL))
+		exit_error("Could not build subcommand.");
+
+	SubCommand sc4;
+	cr_assert(sub_command_copy(&sc4, &sc3));
+
+	cr_assert(sub_command_build(NULL, NULL, NULL, 0, 0, NULL));
+
+	char big[ARGS_MAX_SUBCOMMAND_LENGTH + 100];
+	for (int i = 0; i < ARGS_MAX_SUBCOMMAND_LENGTH + 10; i++) {
+		big[i] = '0';
+	}
+	big[ARGS_MAX_SUBCOMMAND_LENGTH + 10] = 0;
+
+	cr_assert(sub_command_build(&sc2, big, "help1", 3, 7, NULL));
+
+	__is_debug_malloc = true;
+	cr_assert(sub_command_build(&sc2, "abc", "def", 4, 5, NULL));
+	__is_debug_malloc = false;
+
+	__is_debug_malloc_counter_ = 1;
+	cr_assert(sub_command_build(&sc2, "abc", "def", 4, 5, "test"));
+	__is_debug_malloc_counter_ = UINT64_MAX;
+
+	__is_debug_realloc = true;
+	cr_assert(sub_command_add_param(&sc1, &p1));
+	__is_debug_realloc = false;
+
+	__is_debug_realloc_counter_ = 1;
+	cr_assert(sub_command_add_param(&sc1, &p1));
+	__is_debug_realloc_counter_ = UINT64_MAX;
+
+	__is_debug_malloc_counter_ = 0;
+	cr_assert(sub_command_add_param(&sc3, &p1));
+	__is_debug_malloc_counter_ = UINT64_MAX;
+
+	__is_debug_malloc_counter_ = 1;
+	cr_assert(sub_command_add_param(&sc3, &p1));
+	__is_debug_malloc_counter_ = UINT64_MAX;
 }

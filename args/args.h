@@ -83,4 +83,9 @@ int args_get_argument(const Args *args, const u32 index, char *value_buf, const 
 void args_print_version(const Args *args);
 void args_usage(const Args *args, const char *sub);
 
+#ifdef TEST
+bool args_param_copy(ArgsParam *dst, const ArgsParam *src);
+bool sub_command_copy(SubCommand *dst, const SubCommand *src);
+#endif // TEST
+
 #endif // _ARGS_ARGS__

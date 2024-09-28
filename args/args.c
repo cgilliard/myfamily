@@ -23,11 +23,6 @@
 #include <string.h>
 
 bool args_param_copy(ArgsParam *dst, const ArgsParam *src) {
-	if (strlen(src->name) > ARGS_MAX_ARGUMENT_NAME_LENGTH)
-		return false;
-	if (strlen(src->short_name) > ARGS_MAX_ARGUMENT_NAME_LENGTH)
-		return false;
-
 	dst->help = mymalloc(strlen(src->help) + 1);
 	if (dst->help == NULL)
 		return false;
@@ -108,17 +103,18 @@ int args_param_build(ArgsParam *ptr, const char *name, const char *help, const c
 }
 
 bool sub_command_copy(SubCommand *dst, const SubCommand *src) {
-	if (strlen(src->name) > ARGS_MAX_SUBCOMMAND_LENGTH)
+	if (src->help == NULL)
 		return false;
-
 	dst->help = mymalloc(strlen(src->help) + 1);
 	if (dst->help == NULL)
 		return false;
 
-	dst->arg_doc = mymalloc(strlen(src->arg_doc) + 1);
-	if (dst->arg_doc == NULL) {
-		myfree(dst->help);
-		return false;
+	if (src->arg_doc) {
+		dst->arg_doc = mymalloc(strlen(src->arg_doc) + 1);
+		if (dst->arg_doc == NULL) {
+			myfree(dst->help);
+			return false;
+		}
 	}
 
 	if (src->param_count == 0) {
@@ -138,6 +134,7 @@ bool sub_command_copy(SubCommand *dst, const SubCommand *src) {
 				myfree(dst->help);
 			if (dst->arg_doc)
 				myfree(dst->arg_doc);
+			return false;
 		}
 
 		memcpy(dst->is_specified, src->is_specified, sizeof(bool) * src->param_count);
@@ -148,10 +145,7 @@ bool sub_command_copy(SubCommand *dst, const SubCommand *src) {
 	}
 
 	strcpy(dst->name, src->name);
-	if (src->help)
-		strcpy(dst->help, src->help);
-	else
-		dst->help = NULL;
+	strcpy(dst->help, src->help);
 	if (src->arg_doc)
 		strcpy(dst->arg_doc, src->arg_doc);
 	else
@@ -256,10 +250,14 @@ int sub_command_add_param(SubCommand *sc, const ArgsParam *ap) {
 		sc->is_specified = mymalloc(sizeof(bool));
 
 		if (sc->params == NULL || sc->is_specified == NULL) {
-			if (sc->params)
+			if (sc->params) {
 				myfree(sc->params);
-			if (sc->is_specified)
+				sc->params = NULL;
+			}
+			if (sc->is_specified) {
 				myfree(sc->is_specified);
+				sc->is_specified = NULL;
+			}
 			print_error("Could not allocate sufficient memory");
 			return -1;
 		}
