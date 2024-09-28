@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['argsparam_310',['ArgsParam',['../args_8h.html#a9767ff8c397fbbbc88e961b519179429',1,'args.h']]]
+  ['argsimpl_367',['ArgsImpl',['../args_8h.html#ab90b53aa980ca3b2da3aef0420e2592b',1,'args.h']]],
+  ['argsparamimpl_368',['ArgsParamImpl',['../args_8h.html#a5c891b74b9c8c37dc9e81d16d02b5e94',1,'args.h']]]
 ];

@@ -1,7 +1,19 @@
 var searchData=
 [
-  ['read_5fall_278',['read_all',['../misc_8c.html#af88b4147d246cf562900b5939bc10984',1,'read_all(void *buffer, u64 size, u64 count, MYFILE *stream):&#160;misc.c'],['../misc_8h.html#af88b4147d246cf562900b5939bc10984',1,'read_all(void *buffer, u64 size, u64 count, MYFILE *stream):&#160;misc.c']]],
-  ['real_5fmain_279',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]],
-  ['remove_5fdirectory_280',['remove_directory',['../misc_8c.html#a0f31f3ead33bb24a33ccfcd11c580aed',1,'remove_directory(const Path *p, bool preserve_dir):&#160;misc.c'],['../misc_8h.html#ac670968c9a6ae10fbdd37a7206afc50b',1,'remove_directory(const Path *path, bool preserve_dir):&#160;misc.c']]],
-  ['rstrstr_281',['rstrstr',['../misc_8c.html#ac2401671be38c7a45eea5e003dc55889',1,'rstrstr(const char *s1, const char *s2):&#160;misc.c'],['../misc_8h.html#ac2401671be38c7a45eea5e003dc55889',1,'rstrstr(const char *s1, const char *s2):&#160;misc.c']]]
+  ['path_5fcanonicalize_305',['path_canonicalize',['../path_8h.html#a7c8217dbbe751d9ece0cd155afc672e7',1,'path_canonicalize(Path *p):&#160;path.c'],['../path_8c.html#a7c8217dbbe751d9ece0cd155afc672e7',1,'path_canonicalize(Path *p):&#160;path.c']]],
+  ['path_5fcleanup_306',['path_cleanup',['../path_8c.html#af2abcd42f8ea2c07c2333f60d578f1a0',1,'path_cleanup(PathImpl *ptr):&#160;path.c'],['../path_8h.html#af2abcd42f8ea2c07c2333f60d578f1a0',1,'path_cleanup(PathImpl *ptr):&#160;path.c']]],
+  ['path_5fcopy_307',['path_copy',['../path_8c.html#aa74390413dcff75de2298054879f7ab6',1,'path_copy(Path *dst, const Path *src):&#160;path.c'],['../path_8h.html#aa74390413dcff75de2298054879f7ab6',1,'path_copy(Path *dst, const Path *src):&#160;path.c']]],
+  ['path_5fexists_308',['path_exists',['../path_8c.html#a668e7b18d0178b35a818d3f3f302981c',1,'path_exists(const Path *p):&#160;path.c'],['../path_8h.html#a668e7b18d0178b35a818d3f3f302981c',1,'path_exists(const Path *p):&#160;path.c']]],
+  ['path_5ffile_5fname_309',['path_file_name',['../path_8c.html#a02bcc34b38eb83baffcacd38ab76591c',1,'path_file_name(const Path *p):&#160;path.c'],['../path_8h.html#a02bcc34b38eb83baffcacd38ab76591c',1,'path_file_name(const Path *p):&#160;path.c']]],
+  ['path_5ffile_5fsize_310',['path_file_size',['../path_8c.html#a688bfc7f2a979489ffe58ec96d804193',1,'path_file_size(Path *p):&#160;path.c'],['../path_8h.html#a688bfc7f2a979489ffe58ec96d804193',1,'path_file_size(Path *p):&#160;path.c']]],
+  ['path_5ffile_5fstem_311',['path_file_stem',['../path_8c.html#a9fa4b1ecae63e57f8e33be12867398fc',1,'path_file_stem(const Path *p, char *buf, u64 limit):&#160;path.c'],['../path_8h.html#a9fa4b1ecae63e57f8e33be12867398fc',1,'path_file_stem(const Path *p, char *buf, u64 limit):&#160;path.c']]],
+  ['path_5ffor_312',['path_for',['../path_8c.html#a47f54247ef0bb3f24d2ff02d206f55f6',1,'path_for(Path *p, const char *path):&#160;path.c'],['../path_8h.html#abdb6bed2483f79b5d2672cdc0e51685f',1,'path_for(Path *dst, const char *path):&#160;path.c']]],
+  ['path_5fis_5fdir_313',['path_is_dir',['../path_8c.html#a90b6a2154ce88049f2620729fe258aa0',1,'path_is_dir(const Path *p):&#160;path.c'],['../path_8h.html#a90b6a2154ce88049f2620729fe258aa0',1,'path_is_dir(const Path *p):&#160;path.c']]],
+  ['path_5fmkdir_314',['path_mkdir',['../path_8c.html#af458685a462418befcec814730830591',1,'path_mkdir(Path *p, u64 mode, bool parent):&#160;path.c'],['../path_8h.html#af458685a462418befcec814730830591',1,'path_mkdir(Path *p, u64 mode, bool parent):&#160;path.c']]],
+  ['path_5fpop_315',['path_pop',['../path_8c.html#ab89335465f835076656cffe70adcc697',1,'path_pop(Path *p):&#160;path.c'],['../path_8h.html#ab89335465f835076656cffe70adcc697',1,'path_pop(Path *p):&#160;path.c']]],
+  ['path_5fpush_316',['path_push',['../path_8c.html#aa1f3796e0c4b638b3f9d6cae8610f775',1,'path_push(Path *p, const char *next):&#160;path.c'],['../path_8h.html#aa1f3796e0c4b638b3f9d6cae8610f775',1,'path_push(Path *p, const char *next):&#160;path.c']]],
+  ['path_5freplace_5fhome_317',['path_replace_home',['../path_8c.html#a68220aefa3e453991b743ae05c8229f7',1,'path.c']]],
+  ['path_5fto_5fstring_318',['path_to_string',['../path_8c.html#aca543d50b7beb40ebb9584fec3e2eb6f',1,'path_to_string(const Path *p):&#160;path.c'],['../path_8h.html#aca543d50b7beb40ebb9584fec3e2eb6f',1,'path_to_string(const Path *p):&#160;path.c']]],
+  ['print_5fhex_319',['print_hex',['../xxdir_8c.html#af45e49d375ec15a3ad54c524c0fb7855',1,'xxdir.c']]],
+  ['proc_5ffile_320',['proc_file',['../xxdir_8c.html#ad8071c588b0037587224a40257b7040e',1,'xxdir.c']]]
 ];

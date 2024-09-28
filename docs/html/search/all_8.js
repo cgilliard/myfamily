@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['help_71',['help',['../structArgsParam.html#aede3ae54a85b667c8fb35f4ba002fefb',1,'ArgsParam']]]
+  ['help_90',['help',['../structArgsParamImpl.html#aeea680c4105332fc147cbf36b5a0a002',1,'ArgsParamImpl::help()'],['../structSubCommandImpl.html#aa6be90e026a1151170036cf4f314796d',1,'SubCommandImpl::help()']]]
 ];

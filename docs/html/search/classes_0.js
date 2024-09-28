@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['argsparam_200',['ArgsParam',['../structArgsParam.html',1,'']]]
+  ['argsimpl_231',['ArgsImpl',['../structArgsImpl.html',1,'']]],
+  ['argsparamimpl_232',['ArgsParamImpl',['../structArgsParamImpl.html',1,'']]]
 ];

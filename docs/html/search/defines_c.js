@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['red_386',['RED',['../colors_8h.html#a8d23feea868a983c8c2b661e1e16972f',1,'colors.h']]],
-  ['reset_387',['RESET',['../colors_8h.html#ab702106cf3b3e96750b6845ded4e0299',1,'colors.h']]]
+  ['paren_444',['PAREN',['../macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787',1,'macro_utils.h']]],
+  ['paren_5fend_445',['PAREN_END',['../macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21',1,'macro_utils.h']]],
+  ['path_446',['Path',['../path_8h.html#a9a4b261ee74f577bbd57315cb754f607',1,'path.h']]],
+  ['path_5fseparator_447',['PATH_SEPARATOR',['../path_8h.html#a256a5721249aa3309437212cc21a9fe4',1,'path.h']]],
+  ['path_5fseparator_5fchar_448',['PATH_SEPARATOR_CHAR',['../path_8h.html#a581727c17b559af16969b4073417701d',1,'path.h']]]
 ];
