@@ -76,7 +76,7 @@ int args_build(Args *args, const char *prog, const char *version, const char *au
 
 int args_add_param(Args *args, const ArgsParam *ap);
 int args_add_sub_command(Args *args, SubCommand *sc);
-int args_init(Args *args, const int argc, const char **argv);
+void args_init(Args *args, const int argc, const char **argv);
 int args_value_of(const Args *args, const char *param_name, char *value_buf,
 				  const u64 max_value_len, const u32 index);
 int args_get_argument(const Args *args, const u32 index, char *value_buf, const u64 max_value_len);

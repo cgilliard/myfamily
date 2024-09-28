@@ -531,19 +531,18 @@ void args_check_validity(const Args *args, int argc, const char **argv) {
 	}
 }
 
-int process_lines(Args *args, const char *arg1, char config_file[], size_t fsize) {
+void process_lines(Args *args, const char *arg1, char config_file[], size_t fsize) {
 
 	args->argv = mymalloc(sizeof(char *));
 	if (args->argv == NULL) {
-		print_error("Could not allocate sufficient memory");
-		return -1;
+		args_exit_error(args, "Could not allocate sufficient memory");
+		return;
 	}
 
 	args->argv[0] = mymalloc(sizeof(char) * (strlen(arg1) + 1));
 	if (args->argv[0] == NULL) {
-		print_error("Could not allocate sufficient memory");
-		myfree(args->argv);
-		return -1;
+		args_exit_error(args, "Could not allocate sufficient memory");
+		return;
 	}
 	strcpy(args->argv[0], arg1);
 
@@ -570,22 +569,14 @@ int process_lines(Args *args, const char *arg1, char config_file[], size_t fsize
 
 		void *tmp = myrealloc(args->argv, sizeof(char *) * (args->argc + 1));
 		if (tmp == NULL) {
-			for (u64 i = 0; i < args->argc; i++) {
-				myfree(args->argv[i]);
-			}
-			myfree(args->argv);
-			print_error("Could not allocate sufficient memory");
-			return -1;
+			args_exit_error(args, "Could not allocate sufficient memory");
+			return;
 		}
 		args->argv = tmp;
 		args->argv[args->argc] = mymalloc(sizeof(char) * (strlen(trimmed) + 1));
 		if (args->argv[args->argc] == NULL) {
-			for (u64 i = 0; i < args->argc; i++) {
-				myfree(args->argv[i]);
-			}
-			myfree(args->argv);
-			print_error("Could not allocate sufficient memory");
-			return -1;
+			args_exit_error(args, "Could not allocate sufficient memory");
+			return;
 		}
 		strcpy(args->argv[args->argc], trimmed);
 		args->argc++;
@@ -593,8 +584,6 @@ int process_lines(Args *args, const char *arg1, char config_file[], size_t fsize
 		// Get the next line
 		line = strtok(NULL, "\n");
 	}
-
-	return 0;
 }
 
 // Return 1 on successful file config created
@@ -618,7 +607,7 @@ int check_file_config(Args *args, const int argc, const char **argv) {
 	Path path;
 	path_for(&path, file_name);
 	if (!path_exists(&path) || path_is_dir(&path)) {
-		print_error("File not found at '%s'", path_to_string(&path));
+		args_exit_error(args, "File not found at '%s'", path_to_string(&path));
 		return -1;
 	}
 	u64 fsize = path_file_size(&path);
@@ -629,28 +618,23 @@ int check_file_config(Args *args, const int argc, const char **argv) {
 	config_file[fsize] = 0;
 	myfclose(fp);
 
-	if (process_lines(args, argv[0], config_file, fsize))
-		return -1;
+	process_lines(args, argv[0], config_file, fsize);
 
 	return 1;
 }
 
-int args_init(Args *args, const int argc, const char **argv) {
+void args_init(Args *args, const int argc, const char **argv) {
 	// check for NULLs (not allowed)
 	for (int i = 0; i < argc; i++) {
 		if (argv[i] == NULL) {
-			print_error("argv may not have NULL value where i < argc");
-			errno = EINVAL;
-			return -1;
+			args_exit_error(args, "argv may not have NULL value where i < argc");
+			return;
 		}
 	}
 	int r;
-	if ((r = check_file_config(args, argc, argv)) != 0) {
-		// this means successful file config setup.
-		if (r > 0)
-			return 0;
-		// this means an error occurred. return it.
-		return r;
+	if (check_file_config(args, argc, argv)) {
+		// if true the file config as been loaded
+		return;
 	}
 
 	// scan args for an arg starting with '@'. Not valid here. It must be the first and only param.
@@ -660,26 +644,23 @@ int args_init(Args *args, const int argc, const char **argv) {
 	for (u64 i = 1; i < argc; i++) {
 		u64 arg_len = strlen(argv[i]);
 		if (arg_len > 0 && argv[i][0] == '@') {
-			print_error("File speicified with the '@' symbol must be the first argument.");
-			return -1;
+			args_exit_error(args,
+							"File speicified with the '@' symbol must be the first argument.");
+			return;
 		}
 	}
 
 	args->argc = argc;
 	args->argv = mymalloc(sizeof(char *) * argc);
 	if (args->argv == NULL) {
-		print_error("Could not allocate sufficient memory");
-		return -1;
+		args_exit_error(args, "Could not allocate sufficient memory");
+		return;
 	}
 	for (u64 i = 0; i < argc; i++) {
 		args->argv[i] = mymalloc(sizeof(char) * (strlen(argv[i]) + 1));
 		if (args->argv[i] == NULL) {
-			for (u64 j = 0; j < i; j++) {
-				myfree(args->argv[j]);
-			}
-			myfree(args->argv);
-			print_error("Could not allocate sufficient memory");
-			return -1;
+			args_exit_error(args, "Could not allocate sufficient memory");
+			return;
 		}
 		strcpy(args->argv[i], argv[i]);
 	}
@@ -722,8 +703,6 @@ int args_init(Args *args, const int argc, const char **argv) {
 	}
 
 	args_check_validity(args, argc, argv);
-
-	return 0;
 }
 
 // Returns -2 if an error occurs and sets errno.

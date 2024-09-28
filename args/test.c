@@ -182,8 +182,7 @@ MyTest(args, test_args_value_of) {
 	args_build(&args2, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
 	args_add_param(&args2, &p2);
 	args_add_sub_command(&args2, &sc1);
-	ret = args_init(&args2, 2, argv2);
-	cr_assert_eq(ret, 0);
+	args_init(&args2, 2, argv2);
 
 	ret = args_get_argument(&args2, 0, buf, 1024);
 	cr_assert_eq(ret, 3);
