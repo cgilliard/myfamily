@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['default_5fconfig_5fdir_334',['DEFAULT_CONFIG_DIR',['../main_8h.html#a3e535652a6a9608e8bda98044454fa89',1,'main.h']]],
-  ['defer1_335',['DEFER1',['../macro__utils_8h.html#ab076327c62d116fed42cc989fffc1171',1,'macro_utils.h']]],
-  ['dimmed_336',['DIMMED',['../colors_8h.html#a3e288bbc66ee9a6658a68db03109e644',1,'colors.h']]]
+  ['cat_395',['CAT',['../macro__utils_8h.html#ac2c0beae88659357798c2fddb38a6518',1,'macro_utils.h']]],
+  ['cati_396',['CATI',['../macro__utils_8h.html#a5cc8b4a50caacab5cbfb24c7e9e44431',1,'macro_utils.h']]],
+  ['cyan_397',['CYAN',['../colors_8h.html#ad243f93c16bc4c1d3e0a13b84421d760',1,'colors.h']]]
 ];

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['second_388',['SECOND',['../macro__utils_8h.html#a8cf792fb70b4f3de790edeb87b0665a3',1,'macro_utils.h']]],
-  ['stringify_389',['STRINGIFY',['../macro__utils_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7',1,'macro_utils.h']]]
+  ['red_449',['RED',['../colors_8h.html#a8d23feea868a983c8c2b661e1e16972f',1,'colors.h']]],
+  ['reset_450',['RESET',['../colors_8h.html#ab702106cf3b3e96750b6845ded4e0299',1,'colors.h']]]
 ];

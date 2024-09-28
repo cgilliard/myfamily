@@ -69,7 +69,8 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">args.h File Reference</div>  </div>
 </div><!--header-->
@@ -80,28 +81,145 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structArgsParam.html">ArgsParam</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structArgsParamImpl.html">ArgsParamImpl</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSubCommandImpl.html">SubCommandImpl</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structArgsImpl.html">ArgsImpl</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ac02aa59e77ec20fd0f20e953f4998794"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#ac02aa59e77ec20fd0f20e953f4998794">MAX_ARGUMENT_NAME_LENGTH</a>&#160;&#160;&#160;128</td></tr>
-<tr class="separator:ac02aa59e77ec20fd0f20e953f4998794"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a746ef862d3a7fc7ccb325999aaf2d9e3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a746ef862d3a7fc7ccb325999aaf2d9e3">ARGS_MAX_ARGUMENT_NAME_LENGTH</a>&#160;&#160;&#160;128</td></tr>
+<tr class="separator:a746ef862d3a7fc7ccb325999aaf2d9e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ee33878fe241ff69a3e665e6d15de16"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a9ee33878fe241ff69a3e665e6d15de16">ARGS_MAX_SUBCOMMAND_LENGTH</a>&#160;&#160;&#160;128</td></tr>
+<tr class="separator:a9ee33878fe241ff69a3e665e6d15de16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f2b356feff08d58b824bb0a3dff2562"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a6f2b356feff08d58b824bb0a3dff2562">ARGS_MAX_DETAIL_LENGTH</a>&#160;&#160;&#160;256</td></tr>
+<tr class="separator:a6f2b356feff08d58b824bb0a3dff2562"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9733cf4848d00d666a76e4991404a60a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a9733cf4848d00d666a76e4991404a60a">ArgsParam</a>&#160;&#160;&#160;<a class="el" href="structArgsParamImpl.html">ArgsParamImpl</a> <a class="el" href="types_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="args_8h.html#a2aa75722abb50e0dcc246094d53abb38">args_param_cleanup</a>)))</td></tr>
+<tr class="separator:a9733cf4848d00d666a76e4991404a60a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e99564eeec5ddc7ecd78648c2ff0d7d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a1e99564eeec5ddc7ecd78648c2ff0d7d">SubCommand</a>&#160;&#160;&#160;<a class="el" href="structSubCommandImpl.html">SubCommandImpl</a> <a class="el" href="types_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="args_8h.html#a85c5defcfe56ea3ff20efef6cd60fcce">sub_command_cleanup</a>)))</td></tr>
+<tr class="separator:a1e99564eeec5ddc7ecd78648c2ff0d7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aade2f2c283bbf4709360d3a4711ae0af"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a>&#160;&#160;&#160;<a class="el" href="structArgsImpl.html">ArgsImpl</a> <a class="el" href="types_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="args_8h.html#ab4637081f01532584954d036764e3ab4">args_cleanup</a>)))</td></tr>
+<tr class="separator:aade2f2c283bbf4709360d3a4711ae0af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a9767ff8c397fbbbc88e961b519179429"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structArgsParam.html">ArgsParam</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a9767ff8c397fbbbc88e961b519179429">ArgsParam</a></td></tr>
-<tr class="separator:a9767ff8c397fbbbc88e961b519179429"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c891b74b9c8c37dc9e81d16d02b5e94"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structArgsParamImpl.html">ArgsParamImpl</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a5c891b74b9c8c37dc9e81d16d02b5e94">ArgsParamImpl</a></td></tr>
+<tr class="separator:a5c891b74b9c8c37dc9e81d16d02b5e94"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a452f3d70a0c13e94b67229e3379e5c22"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structSubCommandImpl.html">SubCommandImpl</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a452f3d70a0c13e94b67229e3379e5c22">SubCommandImpl</a></td></tr>
+<tr class="separator:a452f3d70a0c13e94b67229e3379e5c22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab90b53aa980ca3b2da3aef0420e2592b"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structArgsImpl.html">ArgsImpl</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#ab90b53aa980ca3b2da3aef0420e2592b">ArgsImpl</a></td></tr>
+<tr class="separator:ab90b53aa980ca3b2da3aef0420e2592b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a2aa75722abb50e0dcc246094d53abb38"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a2aa75722abb50e0dcc246094d53abb38">args_param_cleanup</a> (<a class="el" href="structArgsParamImpl.html">ArgsParamImpl</a> *ptr)</td></tr>
+<tr class="separator:a2aa75722abb50e0dcc246094d53abb38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad91b03fb000b05a559f0e8d5cbe9251e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#ad91b03fb000b05a559f0e8d5cbe9251e">args_param_build</a> (<a class="el" href="args_8h.html#a9733cf4848d00d666a76e4991404a60a">ArgsParam</a> *ptr, const char *name, const char *help, const char *short_name, const <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> takes_value, const <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> multiple, const char *default_value)</td></tr>
+<tr class="separator:ad91b03fb000b05a559f0e8d5cbe9251e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85c5defcfe56ea3ff20efef6cd60fcce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a85c5defcfe56ea3ff20efef6cd60fcce">sub_command_cleanup</a> (<a class="el" href="structSubCommandImpl.html">SubCommandImpl</a> *ptr)</td></tr>
+<tr class="separator:a85c5defcfe56ea3ff20efef6cd60fcce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1db7f2c7199b92fc427c789e1f5da4ed"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a1db7f2c7199b92fc427c789e1f5da4ed">sub_command_build</a> (<a class="el" href="args_8h.html#a1e99564eeec5ddc7ecd78648c2ff0d7d">SubCommand</a> *sc, const char *name, const char *help, const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> min_args, const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> max_args, const char *arg_doc)</td></tr>
+<tr class="separator:a1db7f2c7199b92fc427c789e1f5da4ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b3a814e3eec35c0dcfbb785f6f3dd58"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a6b3a814e3eec35c0dcfbb785f6f3dd58">sub_command_add_param</a> (<a class="el" href="args_8h.html#a1e99564eeec5ddc7ecd78648c2ff0d7d">SubCommand</a> *sc, const <a class="el" href="args_8h.html#a9733cf4848d00d666a76e4991404a60a">ArgsParam</a> *ap)</td></tr>
+<tr class="separator:a6b3a814e3eec35c0dcfbb785f6f3dd58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4637081f01532584954d036764e3ab4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#ab4637081f01532584954d036764e3ab4">args_cleanup</a> (<a class="el" href="structArgsImpl.html">ArgsImpl</a> *ptr)</td></tr>
+<tr class="separator:ab4637081f01532584954d036764e3ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad93cf4b8dce3bd5fa60059fab5e90563"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#ad93cf4b8dce3bd5fa60059fab5e90563">args_build</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const char *prog, const char *version, const char *author, const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> min_args, const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> max_args)</td></tr>
+<tr class="separator:ad93cf4b8dce3bd5fa60059fab5e90563"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a471eecf2217d505d06a49e209f3cd85c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a471eecf2217d505d06a49e209f3cd85c">args_add_param</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const <a class="el" href="args_8h.html#a9733cf4848d00d666a76e4991404a60a">ArgsParam</a> *ap)</td></tr>
+<tr class="separator:a471eecf2217d505d06a49e209f3cd85c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5edd894f104baa890b4be892f63ecd10"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a5edd894f104baa890b4be892f63ecd10">args_init</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const int argc, const char **argv)</td></tr>
+<tr class="separator:a5edd894f104baa890b4be892f63ecd10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a737f867613b78aa329d83a9d8c7eff6c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a737f867613b78aa329d83a9d8c7eff6c">args_value_of</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const char *param_name, char *value_buf, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> max_value_len, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> index)</td></tr>
+<tr class="separator:a737f867613b78aa329d83a9d8c7eff6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15e48bc9590ee332817a68ca4c42441d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a15e48bc9590ee332817a68ca4c42441d">args_get_argument</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> index, char *value_buf, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> max_value_len)</td></tr>
+<tr class="separator:a15e48bc9590ee332817a68ca4c42441d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a69b093e12fcf4b70cdcfdd3bd4b827"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#a4a69b093e12fcf4b70cdcfdd3bd4b827">args_print_version</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args)</td></tr>
+<tr class="separator:a4a69b093e12fcf4b70cdcfdd3bd4b827"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad213f59ddb6988854c01e10cea68a73b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8h.html#ad213f59ddb6988854c01e10cea68a73b">args_usage</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const char *sub)</td></tr>
+<tr class="separator:ad213f59ddb6988854c01e10cea68a73b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="ac02aa59e77ec20fd0f20e953f4998794"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac02aa59e77ec20fd0f20e953f4998794">&#9670;&nbsp;</a></span>MAX_ARGUMENT_NAME_LENGTH</h2>
+<a id="aade2f2c283bbf4709360d3a4711ae0af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aade2f2c283bbf4709360d3a4711ae0af">&#9670;&nbsp;</a></span>Args</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MAX_ARGUMENT_NAME_LENGTH&#160;&#160;&#160;128</td>
+          <td class="memname">#define Args&#160;&#160;&#160;<a class="el" href="structArgsImpl.html">ArgsImpl</a> <a class="el" href="types_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="args_8h.html#ab4637081f01532584954d036764e3ab4">args_cleanup</a>)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a746ef862d3a7fc7ccb325999aaf2d9e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a746ef862d3a7fc7ccb325999aaf2d9e3">&#9670;&nbsp;</a></span>ARGS_MAX_ARGUMENT_NAME_LENGTH</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ARGS_MAX_ARGUMENT_NAME_LENGTH&#160;&#160;&#160;128</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6f2b356feff08d58b824bb0a3dff2562"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f2b356feff08d58b824bb0a3dff2562">&#9670;&nbsp;</a></span>ARGS_MAX_DETAIL_LENGTH</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ARGS_MAX_DETAIL_LENGTH&#160;&#160;&#160;256</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9ee33878fe241ff69a3e665e6d15de16"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ee33878fe241ff69a3e665e6d15de16">&#9670;&nbsp;</a></span>ARGS_MAX_SUBCOMMAND_LENGTH</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ARGS_MAX_SUBCOMMAND_LENGTH&#160;&#160;&#160;128</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9733cf4848d00d666a76e4991404a60a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9733cf4848d00d666a76e4991404a60a">&#9670;&nbsp;</a></span>ArgsParam</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ArgsParam&#160;&#160;&#160;<a class="el" href="structArgsParamImpl.html">ArgsParamImpl</a> <a class="el" href="types_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="args_8h.html#a2aa75722abb50e0dcc246094d53abb38">args_param_cleanup</a>)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1e99564eeec5ddc7ecd78648c2ff0d7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e99564eeec5ddc7ecd78648c2ff0d7d">&#9670;&nbsp;</a></span>SubCommand</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SubCommand&#160;&#160;&#160;<a class="el" href="structSubCommandImpl.html">SubCommandImpl</a> <a class="el" href="types_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="args_8h.html#a85c5defcfe56ea3ff20efef6cd60fcce">sub_command_cleanup</a>)))</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -109,14 +227,481 @@ Typedefs</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="a9767ff8c397fbbbc88e961b519179429"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9767ff8c397fbbbc88e961b519179429">&#9670;&nbsp;</a></span>ArgsParam</h2>
+<a id="ab90b53aa980ca3b2da3aef0420e2592b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab90b53aa980ca3b2da3aef0420e2592b">&#9670;&nbsp;</a></span>ArgsImpl</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="structArgsParam.html">ArgsParam</a> <a class="el" href="structArgsParam.html">ArgsParam</a></td>
+          <td class="memname">typedef struct <a class="el" href="structArgsImpl.html">ArgsImpl</a> <a class="el" href="structArgsImpl.html">ArgsImpl</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5c891b74b9c8c37dc9e81d16d02b5e94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c891b74b9c8c37dc9e81d16d02b5e94">&#9670;&nbsp;</a></span>ArgsParamImpl</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structArgsParamImpl.html">ArgsParamImpl</a> <a class="el" href="structArgsParamImpl.html">ArgsParamImpl</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a452f3d70a0c13e94b67229e3379e5c22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a452f3d70a0c13e94b67229e3379e5c22">&#9670;&nbsp;</a></span>SubCommandImpl</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structSubCommandImpl.html">SubCommandImpl</a> <a class="el" href="structSubCommandImpl.html">SubCommandImpl</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a471eecf2217d505d06a49e209f3cd85c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a471eecf2217d505d06a49e209f3cd85c">&#9670;&nbsp;</a></span>args_add_param()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int args_add_param </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="args_8h.html#a9733cf4848d00d666a76e4991404a60a">ArgsParam</a> *&#160;</td>
+          <td class="paramname"><em>ap</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad93cf4b8dce3bd5fa60059fab5e90563"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad93cf4b8dce3bd5fa60059fab5e90563">&#9670;&nbsp;</a></span>args_build()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int args_build </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>prog</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>version</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>author</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a>&#160;</td>
+          <td class="paramname"><em>min_args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a>&#160;</td>
+          <td class="paramname"><em>max_args</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab4637081f01532584954d036764e3ab4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4637081f01532584954d036764e3ab4">&#9670;&nbsp;</a></span>args_cleanup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void args_cleanup </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structArgsImpl.html">ArgsImpl</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a15e48bc9590ee332817a68ca4c42441d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a15e48bc9590ee332817a68ca4c42441d">&#9670;&nbsp;</a></span>args_get_argument()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int args_get_argument </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>value_buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>max_value_len</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5edd894f104baa890b4be892f63ecd10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5edd894f104baa890b4be892f63ecd10">&#9670;&nbsp;</a></span>args_init()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int args_init </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>argc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>argv</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad91b03fb000b05a559f0e8d5cbe9251e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad91b03fb000b05a559f0e8d5cbe9251e">&#9670;&nbsp;</a></span>args_param_build()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int args_param_build </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="args_8h.html#a9733cf4848d00d666a76e4991404a60a">ArgsParam</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>help</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>short_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>takes_value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>multiple</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>default_value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2aa75722abb50e0dcc246094d53abb38"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2aa75722abb50e0dcc246094d53abb38">&#9670;&nbsp;</a></span>args_param_cleanup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void args_param_cleanup </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structArgsParamImpl.html">ArgsParamImpl</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4a69b093e12fcf4b70cdcfdd3bd4b827"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a69b093e12fcf4b70cdcfdd3bd4b827">&#9670;&nbsp;</a></span>args_print_version()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void args_print_version </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
+          <td class="paramname"><em>args</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad213f59ddb6988854c01e10cea68a73b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad213f59ddb6988854c01e10cea68a73b">&#9670;&nbsp;</a></span>args_usage()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void args_usage </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>sub</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a737f867613b78aa329d83a9d8c7eff6c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a737f867613b78aa329d83a9d8c7eff6c">&#9670;&nbsp;</a></span>args_value_of()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int args_value_of </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>param_name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>value_buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>max_value_len</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6b3a814e3eec35c0dcfbb785f6f3dd58"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b3a814e3eec35c0dcfbb785f6f3dd58">&#9670;&nbsp;</a></span>sub_command_add_param()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int sub_command_add_param </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="args_8h.html#a1e99564eeec5ddc7ecd78648c2ff0d7d">SubCommand</a> *&#160;</td>
+          <td class="paramname"><em>sc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="args_8h.html#a9733cf4848d00d666a76e4991404a60a">ArgsParam</a> *&#160;</td>
+          <td class="paramname"><em>ap</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1db7f2c7199b92fc427c789e1f5da4ed"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1db7f2c7199b92fc427c789e1f5da4ed">&#9670;&nbsp;</a></span>sub_command_build()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int sub_command_build </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="args_8h.html#a1e99564eeec5ddc7ecd78648c2ff0d7d">SubCommand</a> *&#160;</td>
+          <td class="paramname"><em>sc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>help</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a>&#160;</td>
+          <td class="paramname"><em>min_args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a>&#160;</td>
+          <td class="paramname"><em>max_args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>arg_doc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a85c5defcfe56ea3ff20efef6cd60fcce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85c5defcfe56ea3ff20efef6cd60fcce">&#9670;&nbsp;</a></span>sub_command_cleanup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void sub_command_cleanup </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structSubCommandImpl.html">SubCommandImpl</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">

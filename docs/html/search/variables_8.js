@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['realloc_5fsum_306',['realloc_sum',['../structResourceStats.html#afdc805f76b576e0ba036aa2ff91ddc48',1,'ResourceStats']]]
+  ['name_355',['name',['../structArgsParamImpl.html#a4db159c7f846ed3cac400564c5e1647c',1,'ArgsParamImpl::name()'],['../structSubCommandImpl.html#aa7c882a1cb30dc1d444ca623e7b6db97',1,'SubCommandImpl::name()']]]
 ];
