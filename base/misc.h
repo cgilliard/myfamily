@@ -18,12 +18,14 @@
 #include <base/path.h>
 #include <base/resources.h>
 #include <base/types.h>
+#include <ctype.h>
 
 const char *rstrstr(const char *s1, const char *s2);
 int copy_file(const Path *dst, const Path *src);
 int remove_directory(const Path *path, bool preserve_dir);
 u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream);
 void exit_error(char *format, ...);
+void print_error(char *format, ...);
 u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream);
 u64 myfwrite(const void *buffer, u64 size, u64 count, MYFILE *stream);
 int myfeof(MYFILE *stream);
@@ -31,6 +33,7 @@ int myferror(MYFILE *stream);
 long myftell(MYFILE *stream);
 int myfseek(MYFILE *stream, long pos, int type);
 int myfprintf(MYFILE *fptr, const char *str, ...);
+char *trim_whitespace(char *str);
 
 #define EXIT_ERR_IF_NO_DEBUG()                                                                     \
 	if (!__is_debug_misc_no_exit)                                                                  \

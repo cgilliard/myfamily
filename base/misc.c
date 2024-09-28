@@ -216,3 +216,25 @@ void exit_error(char *format, ...) {
 	va_end(va_args);
 	EXIT_ERR_IF_NO_DEBUG();
 }
+
+void print_error(char *format, ...) {
+	va_list va_args;
+	va_start(va_args, format);
+	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+	vfprintf(stderr, format, va_args);
+	fprintf(stderr, "\n");
+	va_end(va_args);
+}
+
+// Helper function to trim leading and trailing whitespace
+char *trim_whitespace(char *str) {
+	// Trim leading whitespace
+	while (isspace((unsigned char)*str))
+		str++;
+	// Trim trailing whitespace
+	char *end = str + strlen(str) - 1;
+	while (end > str && isspace((unsigned char)*end))
+		end--;
+	*(end + 1) = '\0'; // Null-terminate the trimmed string
+	return str;		   // Return the trimmed string
+}

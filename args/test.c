@@ -14,6 +14,7 @@
 
 #include <args/args.h>
 #include <base/test.h>
+#include <errno.h>
 
 MySuite(args);
 
@@ -88,7 +89,7 @@ MyTest(args, test_arg_population) {
 	cr_assert(!args_param_build(&p2, "name2", "name2 help here", "x", true, false, NULL));
 
 	Args args1;
-	args_build(&args1, "prog", "ver1.0", "me", 2, 3);
+	args_build(&args1, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
 	args_add_param(&args1, &p2);
 	args_add_sub_command(&args1, &sc1);
 
@@ -114,4 +115,110 @@ MyTest(args, test_arg_population) {
 
 	const char *argv1[1] = {"test1"};
 	args_init(&args1, 1, argv1);
+	printf("vers\n");
+	args_print_version(&args1);
+}
+
+MyTest(args, test_args_value_of) {
+	Args args1;
+	SubCommand sc1;
+	if (sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"))
+		exit_error("Could not build subcommand.");
+	ArgsParam p1;
+	if (args_param_build(&p1, "name", "name help here", "n", false, false, "myname"))
+		exit_error("Could not build param");
+	sub_command_add_param(&sc1, &p1);
+
+	ArgsParam p2;
+	args_param_build(&p2, "name2", "name2 help here", "x", true, false, NULL);
+
+	args_build(&args1, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	args_add_param(&args1, &p2);
+	args_add_sub_command(&args1, &sc1);
+
+	const char *argv[5] = {"myprog", "sc1", "--name", "1", "22"};
+	args_init(&args1, 5, argv);
+
+	char buf[1024];
+	int ret = args_value_of(&args1, "name", buf, 1024, 0);
+	// This a 'takes_value == false or flag'. So, return is 0 because it's found.
+	cr_assert_eq(ret, 0);
+	ret = args_value_of(&args1, "name2", buf, 1024, 0);
+	// This is a 'takes_value == false or flag' So return is -1 because it's not found.
+	cr_assert_eq(ret, -1);
+	ret = args_value_of(&args1, "name22", buf, 1024, 0);
+	// This is not a valid flag. So it's an error -2.
+	cr_assert_eq(ret, -2);
+
+	// We have two arguments in addition to the subcommand (index = 0)
+	ret = args_get_argument(&args1, 0, buf, 1024);
+	// first argument is our subcommand name
+	cr_assert_eq(ret, 3);
+	cr_assert(!strcmp(buf, "sc1"));
+
+	// next is the argument '1' as specified.
+	ret = args_get_argument(&args1, 1, buf, 1024);
+	cr_assert_eq(ret, 1);
+	cr_assert(!strcmp(buf, "1"));
+
+	// next is '22' as specified.
+	ret = args_get_argument(&args1, 2, buf, 1024);
+	cr_assert_eq(ret, 2);
+	cr_assert(!strcmp(buf, "22"));
+
+	// When we attempt to access an additional argument we get -1
+	ret = args_get_argument(&args1, 3, buf, 1024);
+	cr_assert_eq(ret, -1);
+
+	// This is distinct from the error of -2 return when we pass in a NULL pointer
+	// in place our args pointer. (einval also set to errno in this case)
+	errno = 0;
+	ret = args_get_argument(NULL, 0, buf, 1024);
+	cr_assert_eq(ret, -2);
+	cr_assert_eq(errno, EINVAL);
+
+	const char *argv2[2] = {"myprog", "@./resources/test.txt"};
+	Args args2;
+	args_build(&args2, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	args_add_param(&args2, &p2);
+	args_add_sub_command(&args2, &sc1);
+	ret = args_init(&args2, 2, argv2);
+	cr_assert_eq(ret, 0);
+
+	ret = args_get_argument(&args2, 0, buf, 1024);
+	cr_assert_eq(ret, 3);
+	cr_assert(!strcmp(buf, "sc1"));
+
+	// next is the argument '9' as specified in file.
+	ret = args_get_argument(&args2, 1, buf, 1024);
+	cr_assert_eq(ret, 1);
+	cr_assert(!strcmp(buf, "9"));
+
+	// next is '92' as specified in file.
+	ret = args_get_argument(&args2, 2, buf, 1024);
+	cr_assert_eq(ret, 2);
+	cr_assert(!strcmp(buf, "92"));
+
+	// When we attempt to access an additional argument we get -1
+	ret = args_get_argument(&args2, 3, buf, 1024);
+	cr_assert_eq(ret, -1);
+}
+
+MyTest(args, test_usage) {
+	Args args1;
+	SubCommand sc1;
+	if (sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"))
+		exit_error("Could not build subcommand.");
+	ArgsParam p1;
+	if (args_param_build(&p1, "name", "name help here", "n", false, false, "myname"))
+		exit_error("Could not build param");
+	sub_command_add_param(&sc1, &p1);
+
+	ArgsParam p2;
+	args_param_build(&p2, "name2", "name2 help here", "x", true, false, NULL);
+
+	args_build(&args1, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	args_add_param(&args1, &p2);
+	args_add_sub_command(&args1, &sc1);
+	args_usage(&args1, NULL);
 }

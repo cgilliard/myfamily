@@ -1,0 +1,6 @@
+sc1
+	--name     # name option
+		9  # the value 
+
+		92 # another value
+
