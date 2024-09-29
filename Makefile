@@ -50,7 +50,7 @@ define run_tests
         coveredsum=0; \
 	rm -f /tmp/gcov_cat.txt; \
         for dir in  $(SUBDIRS); do \
-	    echo "=====================================$$dir====================================="; \
+	    echo "========================================$$dir========================================"; \
 	    cd $$dir; \
 	    for file in *.c; do \
 	       if [ $$file != "test.c" ]; then \
@@ -79,7 +79,7 @@ define run_tests
 		   else \
 		       echo "-->No gcno file for $$file. Not including in results."; \
 		   fi; \
-		   echo "------------------------------------------------------------------------------"; \
+		   echo "------------------------------------------------------------------------------------"; \
                fi; \
 	    done; \
 	    cd ..; \
@@ -87,7 +87,7 @@ define run_tests
         codecov=`awk "BEGIN {print 100 * $$coveredsum / $$linessum}"` \
         codecov=`printf "%.2f" $$codecov`; \
 	echo "$$codecov" > /tmp/cc_final; \
-	echo "===================================SUMMARY===================================="; \
+	echo "======================================SUMMARY======================================="; \
 	timestamp=$$(date +%s); \
         echo "CodeCoverage=$$codecov%, CoveredLines=($$coveredsum of $$linessum)."; \
 	echo "$$timestamp $$codecov $$coveredsum $$linessum" > /tmp/codecov; \
