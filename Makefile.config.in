@@ -26,9 +26,10 @@ COVERAGE_FLAGS=--coverage -DTEST
 INSTALL_DIR=/usr/local/bin
 
 # Object directories
-ALL_OBJS=main/*.o args/*.o base/*.o
-SUBDIRS := main args base
+ALL_OBJS=main/*.o args/*.o base/*.o lexer/*.o
+SUBDIRS := main args base lexer
 SUBDIRS_RELEASE := $(SUBDIRS)
 HEADERS := $(wildcard main/*.h) \
-	   $(wildcard base/*.h) \
-	   $(wildcard args/*.h) \
+           $(wildcard base/*.h) \
+           $(wildcard args/*.h) \
+           $(wildcard lexer/*.h)
