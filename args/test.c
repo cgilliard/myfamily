@@ -574,3 +574,130 @@ MyTest(args, test_arguments) {
 
 	__is_debug_misc_no_exit = false;
 }
+
+MyTest(args, test_other_situations) {
+	__is_debug_misc_no_exit = true;
+	ArgsParam p1;
+	cr_assert(!args_param_build(&p1, "threads", "number of threads", "t", true, false, "6"));
+	ArgsParam p2;
+	cr_assert(!args_param_build(&p2, "port", "tcp/ip port", "p", true, false, "9090"));
+	ArgsParam p3;
+	cr_assert(!args_param_build(&p3, "host", "tcp/ip host", "h", true, true, "127.0.0.1"));
+	ArgsParam p4;
+	cr_assert(!args_param_build(&p4, "debug", "print debug info", "d", false, false, NULL));
+
+	SubCommand sc1;
+	cr_assert(!sub_command_build(&sc1, "start", "start the server", 2, 3, "<test> <test2>"));
+
+	Args args1;
+	cr_assert(!args_build(&args1, "fastserver", "1.0", "me", 0, 0, "Darwin arm64"));
+
+	args_add_sub_command(&args1, &sc1);
+	args_add_param(&args1, &p1);
+	args_add_param(&args1, &p2);
+	args_add_param(&args1, &p3);
+	args_add_param(&args1, &p4);
+
+	const char *argv[9] = {"prog", "-d", "--h", "0.0.0.0", "-p", "9999", "start", "0", "1"};
+	cr_assert_eq(args1.argc, 0);
+	args_init(&args1, 9, argv);
+	cr_assert_eq(args1.argc, 9);
+
+	char buf[1024];
+	cr_assert_eq(args_value_of(&args1, "debug", buf, 1024, 0), 0);
+
+	Args args2;
+	cr_assert(!args_build(&args2, "fastserver", "1.0", "me", 0, 0, "Darwin arm64"));
+	args_add_param(&args2, &p1);
+	const char *argv2[8] = {"prog", "-t", "1", "-t", "2", "start", "9", "10"};
+	args_init(&args2, 8, argv2);
+	cr_assert_eq(args2.argc, 8);
+
+	Args args3;
+	cr_assert(!args_build(&args3, "fastserver", "1.0", "me", 0, 0, "Darwin arm64"));
+	args_add_param(&args3, &p1);
+	const char *argv3[8] = {"prog", "--threads", "1", "--threads", "2", "start", "9", "10"};
+	args_init(&args3, 8, argv3);
+	cr_assert_eq(args3.argc, 8);
+
+	Args args4;
+	cr_assert(!args_build(&args4, "fastserver", "1.0", "me", 0, 0, "Darwin arm64"));
+	args_add_param(&args4, &p1);
+	const char *argv4[2] = {"prog", "@./resources/test.txt"};
+	__is_debug_malloc_counter_ = 1;
+	args_init(&args4, 2, argv4);
+	__is_debug_malloc_counter_ = UINT64_MAX;
+	cr_assert_eq(args4.argc, 0);
+
+	Args args5;
+	cr_assert(!args_build(&args5, "fastserver", "1.0", "me", 0, 0, "Darwin arm64"));
+	args_add_param(&args5, &p1);
+	const char *argv5[2] = {"prog", "@./resources/test.txt"};
+	__is_debug_malloc_counter_ = 2;
+	args_init(&args5, 2, argv5);
+	__is_debug_malloc_counter_ = UINT64_MAX;
+	cr_assert_eq(args5.argc, 0);
+
+	Args args6;
+	cr_assert(!args_build(&args6, "fastserver", "1.0", "me", 0, 0, "Darwin arm64"));
+	args_add_param(&args6, &p1);
+	const char *argv6[2] = {"prog", "@./resources/test.txt"};
+	__is_debug_malloc_counter_ = 3;
+	args_init(&args6, 2, argv6);
+	__is_debug_malloc_counter_ = UINT64_MAX;
+	cr_assert_neq(args6.argc, 0);
+
+	Args args7;
+	cr_assert(!args_build(&args7, "fastserver", "1.0", "me", 0, 0, "Darwin arm64"));
+	args_add_param(&args7, &p1);
+	const char *argv7[2] = {"prog", "@./resources/test.txt"};
+	__is_debug_realloc_counter_ = 0;
+	args_init(&args7, 2, argv7);
+	__is_debug_realloc_counter_ = UINT64_MAX;
+	cr_assert_neq(args7.argc, 0);
+
+	Args args8;
+	cr_assert(!args_build(&args8, "fastserver", "1.0", "me", 0, 0, "Darwin arm64"));
+	args_add_param(&args8, &p1);
+	const char *argv8[2] = {"prog", "@./resources/blah.txt"};
+	__is_debug_realloc_counter_ = 0;
+	args_init(&args8, 2, argv8);
+	__is_debug_realloc_counter_ = UINT64_MAX;
+	cr_assert_eq(args8.argc, 0);
+}
+
+MyTest(args, test_usage2) {
+	__is_debug_misc_no_exit = true;
+	ArgsParam p1;
+	cr_assert(!args_param_build(&p1, "threads________________________________________________",
+								"number of threads", "t", true, false, "6"));
+	ArgsParam p2;
+	cr_assert(!args_param_build(&p2, "port________________________________________________",
+								"tcp/ip port", "p", true, false, "9090"));
+	ArgsParam p3;
+	cr_assert(!args_param_build(&p3, "host________________________________________________",
+								"tcp/ip host", "h", true, true, "127.0.0.1"));
+	ArgsParam p4;
+	cr_assert(!args_param_build(&p4, "debug", "print debug info", "d", false, false, NULL));
+	ArgsParam p5;
+	cr_assert(!args_param_build(&p5, "hint", "hint info", "q", false, false, NULL));
+
+	SubCommand sc1;
+	cr_assert(!sub_command_build(&sc1, "start", "start the server", 2, 3, "<test> <test2>"));
+
+	Args args1;
+	cr_assert(!args_build(&args1, "fastserver", "1.0", "me", 0, 0, "Darwin arm64"));
+	args_add_param(&args1, &p5);
+
+	args_add_sub_command(&args1, &sc1);
+	args_add_param(&args1, &p1);
+	args_add_param(&args1, &p2);
+	args_add_param(&args1, &p3);
+	args_add_param(&args1, &p4);
+
+	args_usage(&args1, "blah");
+	args_usage(&args1, "start");
+	args_usage(&args1, NULL);
+
+	__is_debug_misc_no_exit = false;
+}

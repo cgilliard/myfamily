@@ -407,14 +407,18 @@ bool args_check_option(const Args *args, u64 subi, const char *name, bool is_sho
 		bool multi = args->subs[subi].params[j].multiple;
 		if (is_short && !strcmp(args->subs[subi].params[j].short_name, name)) {
 			found = true;
-			if (args->subs[subi].is_specified[j] && !multi)
+			if (args->subs[subi].is_specified[j] && !multi) {
 				args_exit_error(args, "Option: %s was spsecified more than once ", argv);
+				return false;
+			}
 			args->subs[subi].is_specified[j] = true;
 			break;
 		} else if (!is_short && !strcmp(args->subs[subi].params[j].name, name)) {
 			found = true;
-			if (args->subs[subi].is_specified[j] && !multi)
+			if (args->subs[subi].is_specified[j] && !multi) {
 				args_exit_error(args, "Option: %s was spsecified more than once ", argv);
+				return false;
+			}
 			args->subs[subi].is_specified[j] = true;
 			break;
 		}
@@ -545,6 +549,7 @@ void process_lines(Args *args, const char *arg1, char config_file[], size_t fsiz
 
 	args->argv[0] = mymalloc(sizeof(char) * (strlen(arg1) + 1));
 	if (args->argv[0] == NULL) {
+		myfree(args->argv);
 		args_exit_error(args, "Could not allocate sufficient memory");
 		return;
 	}
@@ -873,6 +878,7 @@ void args_usage(const Args *args, const char *sub_command) {
 
 	if (!found) {
 		args_exit_error(args, "Unknown SubCommand \"%s\"", sub_command);
+		return;
 	}
 
 	u64 count = args->subs[0].param_count;

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <args/args.h>
+#include <assert.h>
 #include <base/misc.h>
 #include <base/path.h>
 #include <limits.h>
@@ -91,11 +92,9 @@ void setup_config_dir(const char *config_dir) {
 
 void build_args(Args *args, int argc, char **argv) {
 	SubCommand sc1;
-	if (sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"))
-		exit_error("Could not build subcommand.");
+	assert(!sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"));
 	ArgsParam p1;
-	if (args_param_build(&p1, "name", "name help here", "n", false, false, "myname"))
-		exit_error("Could not build param");
+	assert(!args_param_build(&p1, "name", "name help here", "n", false, false, "myname"));
 	sub_command_add_param(&sc1, &p1);
 
 	ArgsParam p2;
