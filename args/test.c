@@ -532,3 +532,45 @@ MyTest(args, test_value_of) {
 
 	__is_debug_misc_no_exit = false;
 }
+
+MyTest(args, test_arguments) {
+	__is_debug_misc_no_exit = true;
+	ArgsParam p1;
+	cr_assert(!args_param_build(&p1, "threads", "number of threads", "t", true, false, "6"));
+	ArgsParam p2;
+	cr_assert(!args_param_build(&p2, "port", "tcp/ip port", "p", true, false, "9090"));
+	ArgsParam p3;
+	cr_assert(!args_param_build(&p3, "host", "tcp/ip host", "h", true, true, "127.0.0.1"));
+
+	SubCommand sc1;
+	cr_assert(!sub_command_build(&sc1, "start", "start the server", 2, 3, "<test> <test2>"));
+
+	Args args1;
+	cr_assert(!args_build(&args1, "fastserver", "1.0", "me", 0, 0, "Darwin arm64"));
+
+	args_add_sub_command(&args1, &sc1);
+	args_add_param(&args1, &p1);
+	args_add_param(&args1, &p2);
+	args_add_param(&args1, &p3);
+
+	const char *argv[8] = {"prog", "--host", "0.0.0.0", "-p", "9999", "start", "0", "1"};
+	cr_assert_eq(args1.argc, 0);
+	args_init(&args1, 8, argv);
+	cr_assert_eq(args1.argc, 8);
+
+	char buf[1024];
+	cr_assert_eq(args_get_argument(&args1, 0, buf, 1024), 5);
+	cr_assert(!strcmp(buf, "start"));
+
+	cr_assert_eq(args_get_argument(&args1, 1, buf, 1024), 1);
+	cr_assert(!strcmp(buf, "0"));
+
+	cr_assert_eq(args_get_argument(&args1, 2, buf, 1024), 1);
+	cr_assert(!strcmp(buf, "1"));
+
+	cr_assert_eq(args_get_argument(&args1, 3, buf, 1024), -1);
+
+	cr_assert_eq(args_get_argument(&args1, 2, NULL, 1024), -2);
+
+	__is_debug_misc_no_exit = false;
+}

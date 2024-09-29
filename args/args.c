@@ -482,6 +482,7 @@ void args_check_validity(const Args *args, int argc, const char **argv) {
 	} else if (args->subs_count > 1) {
 		args_usage(args, NULL);
 	} else {
+		// no sub commands so we check the base min/max args.
 		// check number of args
 		if (arg_count > args->subs[0].max_args || arg_count < args->subs[0].min_args) {
 			args_exit_error(args,
