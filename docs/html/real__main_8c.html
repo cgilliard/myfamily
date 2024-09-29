@@ -73,7 +73,8 @@ $(function() {
 <div class="title">real_main.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="args_8h_source.html">args/args.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="path_8h_source.html">base/path.h</a>&gt;</code><br />
 <code>#include &lt;limits.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="main_8h_source.html">main/main.h</a>&gt;</code><br />
@@ -88,6 +89,8 @@ Functions</h2></td></tr>
 <tr class="separator:af43092959d8b9ac00da999ee1d16e152"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadd7ec11c1873b232827eddb9a17c911"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#aadd7ec11c1873b232827eddb9a17c911">setup_config_dir</a> (const char *config_dir)</td></tr>
 <tr class="separator:aadd7ec11c1873b232827eddb9a17c911"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b51243bbc81f0329a7cb22a38c32790"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#a9b51243bbc81f0329a7cb22a38c32790">build_args</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, int argc, char **argv)</td></tr>
+<tr class="separator:a9b51243bbc81f0329a7cb22a38c32790"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a813033ab922b78183e69871180bdc9cf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#a813033ab922b78183e69871180bdc9cf">real_main</a> (int argc, char **argv)</td></tr>
 <tr class="separator:a813033ab922b78183e69871180bdc9cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -97,6 +100,40 @@ Variables</h2></td></tr>
 <tr class="separator:a66e95d5efa5afec8af0ba8eefdb08b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a9b51243bbc81f0329a7cb22a38c32790"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b51243bbc81f0329a7cb22a38c32790">&#9670;&nbsp;</a></span>build_args()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void build_args </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>argc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **&#160;</td>
+          <td class="paramname"><em>argv</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="af43092959d8b9ac00da999ee1d16e152"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af43092959d8b9ac00da999ee1d16e152">&#9670;&nbsp;</a></span>check_build_id()</h2>
 
