@@ -1266,7 +1266,7 @@
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:28
+        -:    0:Runs:43
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1304,11 +1304,11 @@
         -:   35:	}
         -:   36:}
         -:   37:
-      109:   38:char *get_bright_red() {
-      109:   39:	if (getenv("NO_COLOR") != NULL) {
+      110:   38:char *get_bright_red() {
+      110:   39:	if (getenv("NO_COLOR") != NULL) {
         1:   40:		return "";
         -:   41:	} else {
-      108:   42:		return "\x1b[91m";
+      109:   42:		return "\x1b[91m";
         -:   43:	}
         -:   44:}
         -:   45:
@@ -1320,19 +1320,19 @@
         -:   51:	}
         -:   52:}
         -:   53:
-       49:   54:char *get_yellow() {
-       49:   55:	if (getenv("NO_COLOR") != NULL) {
+       50:   54:char *get_yellow() {
+       50:   55:	if (getenv("NO_COLOR") != NULL) {
         1:   56:		return "";
         -:   57:	} else {
-       48:   58:		return "\x1b[33m";
+       49:   58:		return "\x1b[33m";
         -:   59:	}
         -:   60:}
         -:   61:
-       52:   62:char *get_cyan() {
-       52:   63:	if (getenv("NO_COLOR") != NULL) {
+     5788:   62:char *get_cyan() {
+     5788:   63:	if (getenv("NO_COLOR") != NULL) {
         1:   64:		return "";
         -:   65:	} else {
-       51:   66:		return "\x1b[36m";
+     5787:   66:		return "\x1b[36m";
         -:   67:	}
         -:   68:}
         -:   69:
@@ -1352,17 +1352,17 @@
         -:   83:	}
         -:   84:}
         -:   85:
-      356:   86:char *get_reset() {
-      356:   87:	if (getenv("NO_COLOR") != NULL) {
+     6094:   86:char *get_reset() {
+     6094:   87:	if (getenv("NO_COLOR") != NULL) {
         1:   88:		return "";
         -:   89:	} else {
-      355:   90:		return "\x1b[0m";
+     6093:   90:		return "\x1b[0m";
         -:   91:	}
         -:   92:}
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:28
+        -:    0:Runs:43
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1399,8 +1399,8 @@
         -:   34:bool __is_debug_misc_no_exit = false;
         -:   35:bool __is_debug_misc_preserve = false;
         -:   36:
-    #####:   37:char *myfgets(char *str, int n, MYFILE *stream) {
-    #####:   38:	return fgets(str, n, (FILE *)stream);
+      299:   37:char *myfgets(char *str, int n, MYFILE *stream) {
+      299:   38:	return fgets(str, n, (FILE *)stream);
         -:   39:}
         -:   40:
        17:   41:u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream) {
@@ -1518,21 +1518,21 @@
         -:  153:}
         -:  154:
         -:  155:// Function to recursively remove a directory and its contents
-       79:  156:int remove_directory(const Path *p, bool preserve_dir) {
-       79:  157:	const char *path = path_to_string(p);
+      107:  156:int remove_directory(const Path *p, bool preserve_dir) {
+      107:  157:	const char *path = path_to_string(p);
         -:  158:	struct dirent *entry;
-       79:  159:	DIR *dir = opendir(path);
+      107:  159:	DIR *dir = opendir(path);
         -:  160:
-       79:  161:	if (dir == NULL) {
-       25:  162:		return -1;
+      107:  161:	if (dir == NULL) {
+       39:  162:		return -1;
         -:  163:	}
         -:  164:
-      205:  165:	while ((entry = readdir(dir)) != NULL) {
+      247:  165:	while ((entry = readdir(dir)) != NULL) {
         -:  166:		char full_path[PATH_MAX];
         -:  167:
         -:  168:		// Skip the special entries "." and ".."
-      156:  169:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-      107:  170:			continue;
+      184:  169:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+      135:  170:			continue;
         -:  171:		}
         -:  172:
         -:  173:		// Construct the full path to the file/directory
@@ -1563,17 +1563,17 @@
         -:  198:		}
         -:  199:	}
         -:  200:
-       49:  201:	closedir(dir);
+       63:  201:	closedir(dir);
         -:  202:
         -:  203:	// Now the directory is empty, so we can remove it
-       49:  204:	if (!preserve_dir) {
-       48:  205:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
+       63:  204:	if (!preserve_dir) {
+       62:  205:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
         1:  206:			errno = EIO;
         1:  207:			return -1;
         -:  208:		}
         -:  209:	}
         -:  210:
-       48:  211:	return 0;
+       62:  211:	return 0;
         -:  212:}
         -:  213:
         5:  214:void exit_error(char *format, ...) {
@@ -1610,7 +1610,7 @@
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:28
+        -:    0:Runs:43
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1638,35 +1638,35 @@
         -:   25:
         -:   26:bool __is_debug_path_homedir_null = false;
         -:   27:
-      163:   28:void path_cleanup(PathImpl *ptr) {
-      163:   29:	if (ptr->ptr) {
-      160:   30:		myfree(ptr->ptr);
-      160:   31:		ptr->ptr = NULL;
+      204:   28:void path_cleanup(PathImpl *ptr) {
+      204:   29:	if (ptr->ptr) {
+      198:   30:		myfree(ptr->ptr);
+      198:   31:		ptr->ptr = NULL;
         -:   32:	}
-      163:   33:}
+      204:   33:}
         -:   34:
-      171:   35:int path_for(Path *p, const char *path) {
-      171:   36:	if (p == NULL) {
+      209:   35:int path_for(Path *p, const char *path) {
+      209:   36:	if (p == NULL) {
         1:   37:		errno = EINVAL;
         1:   38:		return -1;
         -:   39:	}
-      170:   40:	if (path == NULL) {
+      208:   40:	if (path == NULL) {
         1:   41:		errno = EINVAL;
         1:   42:		p->ptr = NULL;
         1:   43:		return -1;
         -:   44:	}
-      169:   45:	int len = strlen(path);
-      169:   46:	if (len == 0) {
+      207:   45:	int len = strlen(path);
+      207:   46:	if (len == 0) {
         1:   47:		errno = EINVAL;
         1:   48:		p->ptr = NULL;
         1:   49:		return -1;
         -:   50:	}
-      168:   51:	p->ptr = mymalloc(len + 1);
-      168:   52:	if (!p->ptr)
+      206:   51:	p->ptr = mymalloc(len + 1);
+      206:   52:	if (!p->ptr)
         2:   53:		return -1;
-      166:   54:	p->len = len;
-      166:   55:	strcpy(p->ptr, path);
-      166:   56:	return 0;
+      204:   54:	p->len = len;
+      204:   55:	strcpy(p->ptr, path);
+      204:   56:	return 0;
         -:   57:}
         -:   58:
        33:   59:int path_replace_home(Path *p) {
@@ -1728,41 +1728,41 @@
        13:  115:	strcpy(p->ptr, buf);
        13:  116:	return 0;
         -:  117:}
-      134:  118:int path_push(Path *p, const char *next) {
-      134:  119:	if (p == NULL) {
+      148:  118:int path_push(Path *p, const char *next) {
+      148:  119:	if (p == NULL) {
         1:  120:		errno = EINVAL;
         1:  121:		return -1;
         -:  122:	}
-      133:  123:	if (next == NULL) {
+      147:  123:	if (next == NULL) {
         1:  124:		errno = EINVAL;
         1:  125:		return -1;
         -:  126:	}
-      132:  127:	int slen = strlen(p->ptr);
-      132:  128:	if (slen <= 0 || strlen(next) == 0) {
+      146:  127:	int slen = strlen(p->ptr);
+      146:  128:	if (slen <= 0 || strlen(next) == 0) {
         1:  129:		errno = EFAULT;
         1:  130:		return -1;
         -:  131:	}
-      131:  132:	bool need_sep = false;
-      131:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
-      131:  134:		need_sep = true;
+      145:  132:	bool need_sep = false;
+      145:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
+      145:  134:		need_sep = true;
         -:  135:	}
         -:  136:
-      131:  137:	int nlen = slen + strlen(next);
-      131:  138:	if (need_sep)
-      131:  139:		nlen += strlen(PATH_SEPARATOR);
+      145:  137:	int nlen = slen + strlen(next);
+      145:  138:	if (need_sep)
+      145:  139:		nlen += strlen(PATH_SEPARATOR);
         -:  140:
-      131:  141:	if (nlen >= p->len) {
-      127:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
-      127:  143:		if (nptr == NULL)
+      145:  141:	if (nlen >= p->len) {
+      141:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
+      141:  143:		if (nptr == NULL)
         1:  144:			return -1;
-      126:  145:		p->ptr = nptr;
-      126:  146:		p->len = nlen;
+      140:  145:		p->ptr = nptr;
+      140:  146:		p->len = nlen;
         -:  147:	}
         -:  148:
-      130:  149:	if (need_sep)
-      130:  150:		strcat(p->ptr, PATH_SEPARATOR);
-      130:  151:	strcat(p->ptr, next);
-      130:  152:	return 0;
+      144:  149:	if (need_sep)
+      144:  150:		strcat(p->ptr, PATH_SEPARATOR);
+      144:  151:	strcat(p->ptr, next);
+      144:  152:	return 0;
         -:  153:}
        48:  154:int path_pop(Path *p) {
        48:  155:	const char *res = rstrstr(p->ptr, PATH_SEPARATOR);
@@ -1776,8 +1776,8 @@
        48:  163:	return 0;
         -:  164:}
         -:  165:
-      206:  166:char *path_to_string(const Path *p) {
-      206:  167:	return p->ptr;
+     2156:  166:char *path_to_string(const Path *p) {
+     2156:  167:	return p->ptr;
         -:  168:}
         -:  169:
        88:  170:const char *path_file_name(const Path *p) {
@@ -1807,8 +1807,8 @@
         3:  194:	return false;
         -:  195:}
         -:  196:
-      106:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
-      106:  198:	if (p->ptr == NULL || p->len == 0) {
+      120:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
+      120:  198:	if (p->ptr == NULL || p->len == 0) {
         1:  199:		errno = EINVAL;
         1:  200:		return false;
         -:  201:	}
@@ -1816,7 +1816,7 @@
         -:  203:	struct stat s;
         -:  204:
         -:  205:	// Check if the path exists
-      105:  206:	if (stat(p->ptr, &s) == 0) {
+      119:  206:	if (stat(p->ptr, &s) == 0) {
         -:  207:		// If the path exists and it's a directory, return success
         8:  208:		if (s.st_mode & S_IFDIR) {
         7:  209:			return true;
@@ -1828,11 +1828,11 @@
         -:  215:	}
         -:  216:
         -:  217:	// If parent is false, attempt to create only the target directory
-       97:  218:	if (!parent) {
-       79:  219:		if (mkdir(p->ptr, mode) != 0) {
+      111:  218:	if (!parent) {
+       93:  219:		if (mkdir(p->ptr, mode) != 0) {
        28:  220:			return false;
         -:  221:		}
-       51:  222:		return true;
+       65:  222:		return true;
         -:  223:	}
         -:  224:
         -:  225:	// Create the directory structure (parent is true)
@@ -1860,8 +1860,8 @@
         2:  247:	return false;
         -:  248:}
         -:  249:
-       49:  250:int path_copy(Path *dst, const Path *src) {
-       49:  251:	return path_for(dst, path_to_string(src));
+       54:  250:int path_copy(Path *dst, const Path *src) {
+       54:  251:	return path_for(dst, path_to_string(src));
         -:  252:}
         -:  253:
         2:  254:int path_file_stem(const Path *p, char *buf, u64 limit) {
@@ -1881,7 +1881,7 @@
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:28
+        -:    0:Runs:43
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1909,73 +1909,73 @@
         -:   25:u64 __is_debug_realloc_counter_ = UINT64_MAX;
         -:   26:#endif // TEST
         -:   27:
-      710:   28:void *mymalloc(u64 size) {
+     4465:   28:void *mymalloc(u64 size) {
         -:   29:#ifdef TEST
-      710:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
-       20:   31:		__is_debug_malloc_counter_ = UINT64_MAX;
-       20:   32:		return NULL;
+     4465:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
+       21:   31:		__is_debug_malloc_counter_ = UINT64_MAX;
+       21:   32:		return NULL;
         -:   33:	}
-      690:   34:	__is_debug_malloc_counter_--;
+     4444:   34:	__is_debug_malloc_counter_--;
         -:   35:#endif // TEST
         -:   36:	void *ret;
-      690:   37:	ret = malloc(size);
+     4444:   37:	ret = malloc(size);
         -:   38:
-      690:   39:	if (ret) {
-      690:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+     4444:   39:	if (ret) {
+     4444:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   41:	}
-      690:   42:	return ret;
+     4444:   42:	return ret;
         -:   43:}
-      191:   44:void *myrealloc(void *ptr, u64 size) {
+      207:   44:void *myrealloc(void *ptr, u64 size) {
         -:   45:#ifdef TEST
-      191:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
+      207:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
         7:   47:		__is_debug_realloc_counter_ = UINT64_MAX;
         7:   48:		return NULL;
         -:   49:	}
-      184:   50:	__is_debug_realloc_counter_--;
+      200:   50:	__is_debug_realloc_counter_--;
         -:   51:#endif // TEST
         -:   52:	void *ret;
-      184:   53:	ret = realloc(ptr, size);
+      200:   53:	ret = realloc(ptr, size);
         -:   54:
-      184:   55:	if (ret) {
-      184:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+      200:   55:	if (ret) {
+      200:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   57:	}
-      184:   58:	return ret;
+      200:   58:	return ret;
         -:   59:}
-      634:   60:void myfree(void *ptr) {
-      634:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-      634:   62:	free(ptr);
-      634:   63:}
-       53:   64:MYFILE *myfopen(const Path *path, const char *mode) {
-       53:   65:	const char *path_str = path_to_string(path);
-       53:   66:	FILE *ret = fopen(path_str, mode);
-       53:   67:	if (ret) {
-       48:   68:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
+     4388:   60:void myfree(void *ptr) {
+     4388:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+     4388:   62:	free(ptr);
+     4388:   63:}
+       58:   64:MYFILE *myfopen(const Path *path, const char *mode) {
+       58:   65:	const char *path_str = path_to_string(path);
+       58:   66:	FILE *ret = fopen(path_str, mode);
+       58:   67:	if (ret) {
+       53:   68:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
         -:   69:	}
-       53:   70:	return (MYFILE *)ret;
+       58:   70:	return (MYFILE *)ret;
         -:   71:}
-       48:   72:void myfclose(MYFILE *ptr) {
-       48:   73:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
-       48:   74:	fclose((FILE *)ptr);
-       48:   75:}
-       49:   76:u64 mymalloc_sum() {
-       49:   77:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
+       53:   72:void myfclose(MYFILE *ptr) {
+       53:   73:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
+       53:   74:	fclose((FILE *)ptr);
+       53:   75:}
+       77:   76:u64 mymalloc_sum() {
+       77:   77:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
         -:   78:}
         2:   79:u64 myrealloc_sum() {
         2:   80:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
         -:   81:}
-       49:   82:u64 myfree_sum() {
-       49:   83:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+       77:   82:u64 myfree_sum() {
+       77:   83:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
         -:   84:}
-       72:   85:u64 myfopen_sum() {
-       72:   86:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+      114:   85:u64 myfopen_sum() {
+      114:   86:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
         -:   87:}
-       72:   88:u64 myfclose_sum() {
-       72:   89:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+      114:   88:u64 myfclose_sum() {
+      114:   89:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
         -:   90:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:28
+        -:    0:Runs:43
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1994,9 +1994,702 @@
         -:   16:#include <stdio.h>
         -:   17:#include <stdlib.h>
         -:   18:
-       28:   19:void __attribute__((constructor)) __check_64bit_arch__() {
+       43:   19:void __attribute__((constructor)) __check_64bit_arch__() {
         -:   20:	if (sizeof(size_t) != 8) {
         -:   21:		fprintf(stderr, "Error: This program requires a 64-bit architecture to run.\n");
         -:   22:		exit(EXIT_FAILURE);
         -:   23:	}
-       28:   24:}
+       43:   24:}
+        -:    0:Source:lexer.c
+        -:    0:Graph:lexer.gcno
+        -:    0:Data:lexer.gcda
+        -:    0:Runs:15
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/colors.h>
+        -:   16:#include <base/misc.h>
+        -:   17:#include <errno.h>
+        -:   18:#include <lexer/lexer.h>
+        -:   19:#include <lexer/lexer_state.h>
+        -:   20:#include <lexer/tokenizer_state.h>
+        -:   21:#include <stdio.h>
+        -:   22:#include <stdlib.h>
+        -:   23:#include <string.h>
+        -:   24:
+      297:   25:char *lexer_read_line(Lexer *l) {
+      297:   26:	char *ret = NULL;
+      297:   27:	u64 count = 0;
+        2:   28:	while (true) {
+      299:   29:		if (ret == NULL) {
+      297:   30:			ret = mymalloc(sizeof(char) * LEXER_BUF_SIZE);
+      297:   31:			strcpy(ret, "");
+        -:   32:		} else {
+        2:   33:			char *tmp = myrealloc(ret, sizeof(char) * LEXER_BUF_SIZE * (1 + count));
+        2:   34:			if (tmp == NULL) {
+    #####:   35:				myfree(ret);
+    #####:   36:				return NULL;
+        -:   37:			}
+        2:   38:			ret = tmp;
+        -:   39:		}
+      299:   40:		u64 str_len = strlen(ret);
+      299:   41:		if (myfgets(ret + str_len, LEXER_BUF_SIZE, l->fp) == NULL) {
+        5:   42:			myfree(ret);
+        5:   43:			return NULL;
+        -:   44:		}
+        -:   45:
+      294:   46:		count += 1;
+      294:   47:		str_len = strlen(ret);
+      294:   48:		if (str_len >= (count * (LEXER_BUF_SIZE - 1)))
+        2:   49:			continue;
+        -:   50:
+      292:   51:		return ret;
+        -:   52:	}
+        -:   53:}
+        -:   54:
+        5:   55:int lexer_init(Lexer *l, Path *file) {
+        -:   56:	// file/lexer cannot be null
+        5:   57:	if (file == NULL || l == NULL) {
+    #####:   58:		errno = EINVAL;
+    #####:   59:		return LexerStateErr;
+        -:   60:	}
+        -:   61:
+        5:   62:	l->fp = NULL;
+        5:   63:	l->tokenizer = NULL;
+        5:   64:	l->line_num = 1;
+        -:   65:
+        5:   66:	if (path_copy(&l->file, file)) {
+    #####:   67:		errno = ENOMEM;
+    #####:   68:		return LexerStateErr;
+        -:   69:	}
+        -:   70:
+        -:   71:	// open the file for reading
+        5:   72:	l->fp = myfopen(file, "r");
+        -:   73:
+        -:   74:	// if file cannot be read return error
+        5:   75:	if (l->fp == NULL) {
+    #####:   76:		return LexerStateErr;
+        -:   77:	}
+        -:   78:
+        -:   79:	// allocate memory for the tokenizer
+        5:   80:	l->tokenizer = mymalloc(sizeof(Tokenizer));
+        -:   81:
+        5:   82:	if (l->tokenizer == NULL) {
+        -:   83:		// memory allocation err
+    #####:   84:		lexer_cleanup(l);
+    #####:   85:		return LexerStateErr;
+        -:   86:	}
+        -:   87:
+        5:   88:	char *buf = lexer_read_line(l);
+        5:   89:	if (buf == NULL) {
+    #####:   90:		lexer_cleanup(l);
+    #####:   91:		return LexerStateErr;
+        -:   92:	}
+        -:   93:
+        -:   94:	// try to init the tokenizer
+        5:   95:	if (tokenizer_init(l->tokenizer, buf) != TokenizerStateOk) {
+    #####:   96:		lexer_cleanup(l);
+    #####:   97:		myfree(buf);
+    #####:   98:		return LexerStateErr;
+        -:   99:	} else {
+        5:  100:		myfree(buf);
+        5:  101:		return LexerStateOk;
+        -:  102:	}
+        -:  103:}
+        -:  104:
+      964:  105:int lexer_next_token(Lexer *l, Token *token) {
+        -:  106:	// read the next token
+      964:  107:	int state = tokenizer_next_token(l->tokenizer, token);
+      964:  108:	char *line = NULL;
+      964:  109:	token->span = NULL;
+        -:  110:
+        -:  111:	// if we're complete keep trying to get more lines until we have a token
+        -:  112:	// or we're at the end of file
+     1251:  113:	while (state == TokenizerStateComplete || state == TokenizerStateCompleteInComment) {
+        -:  114:		// cleanup the previous tokenizer
+      292:  115:		tokenizer_cleanup(l->tokenizer);
+        -:  116:
+      292:  117:		char *buf = lexer_read_line(l);
+        -:  118:
+      292:  119:		if (buf == NULL) {
+        5:  120:			if (line)
+        1:  121:				myfree(line);
+        5:  122:			if (state == TokenizerStateCompleteInComment)
+    #####:  123:				return LexerStateErr;
+        -:  124:			else
+        5:  125:				return LexerStateComplete;
+        -:  126:		}
+        -:  127:
+      287:  128:		l->line_num += 1;
+        -:  129:
+        -:  130:		// try to init again
+      287:  131:		if (tokenizer_init(l->tokenizer, buf) != TokenizerStateOk) {
+    #####:  132:			myfree(buf);
+    #####:  133:			if (line) {
+    #####:  134:				myfree(line);
+        -:  135:			}
+    #####:  136:			return LexerStateErr;
+        -:  137:		}
+        -:  138:
+      287:  139:		state = tokenizer_next_token(l->tokenizer, token);
+      287:  140:		if (line)
+       89:  141:			myfree(line);
+      287:  142:		line = mymalloc(sizeof(char) * (1 + strlen(buf)));
+      287:  143:		strcpy(line, buf);
+      287:  144:		myfree(buf);
+        -:  145:	}
+        -:  146:
+      959:  147:	if (line == NULL) {
+      762:  148:		line = mymalloc((strlen(l->tokenizer->s) + 1) * sizeof(char));
+      762:  149:		strcpy(line, l->tokenizer->s);
+        -:  150:	}
+        -:  151:
+      959:  152:	if (state == TokenizerStateOk) {
+      956:  153:		token->line_num = l->line_num;
+      956:  154:		if (line == NULL)
+    #####:  155:			token->span = NULL;
+      956:  156:		else {
+      956:  157:			int num_width = snprintf(NULL, 0, "%llu", l->line_num);
+      956:  158:			int token_width = snprintf(NULL, 0, "%s", token->token);
+        -:  159:			char spacer[100];
+      956:  160:			int lsl = (l->tokenizer->pos + 1) - (token_width - 1);
+      956:  161:			if (lsl <= 0)
+    #####:  162:				lsl = 1;
+      956:  163:			char long_spacer[lsl];
+      956:  164:			bool has_tab = false;
+    39764:  165:			for (int i = 0; i < lsl; i++) {
+    38808:  166:				if (i < l->tokenizer->pos && l->tokenizer->s[i] == '\t') {
+     1423:  167:					has_tab = true;
+     1423:  168:					long_spacer[i] = '\t';
+        -:  169:				} else {
+    37385:  170:					long_spacer[i] = ' ';
+        -:  171:				}
+        -:  172:			}
+      956:  173:			if (has_tab)
+      798:  174:				long_spacer[lsl - 2] = 0;
+      956:  175:			long_spacer[lsl - 1] = 0;
+     3401:  176:			for (int i = 0; i < num_width && i < 100; i++) {
+     2445:  177:				spacer[i] = ' ';
+        -:  178:			}
+      956:  179:			if (num_width < 100)
+      956:  180:				spacer[num_width] = 0;
+        -:  181:
+        -:  182:			int span_len =
+     1912:  183:				snprintf(NULL, 0,
+        -:  184:						 "%s%s-->%s %s:%llu:%i\n%s %s|\n%llu | %s%s"
+        -:  185:						 "%s %s|%s%s^\n",
+      956:  186:						 spacer, CYAN, RESET, path_to_string(&l->file), l->line_num, lsl, spacer,
+        -:  187:						 CYAN, l->line_num, RESET, line, spacer, CYAN, RESET, long_spacer);
+      956:  188:			token->span = mymalloc((span_len + 1) * sizeof(char));
+      956:  189:			if (token->span == NULL) {
+    #####:  190:				myfree(line);
+    #####:  191:				return LexerStateErr;
+        -:  192:			}
+     1912:  193:			snprintf(token->span, span_len + 1,
+        -:  194:					 "%s%s-->%s %s:%llu:%i\n%s %s|\n%llu | %s%s"
+        -:  195:					 "%s %s|%s%s^\n",
+      956:  196:					 spacer, CYAN, RESET, path_to_string(&l->file), l->line_num, lsl, spacer, CYAN,
+        -:  197:					 l->line_num, RESET, line, spacer, CYAN, RESET, long_spacer);
+      956:  198:			myfree(line);
+        -:  199:		}
+        -:  200:
+      956:  201:		return LexerStateOk;
+        -:  202:	} else {
+        3:  203:		if (line)
+        3:  204:			myfree(line);
+        3:  205:		return LexerStateErr;
+        -:  206:	}
+        -:  207:}
+        -:  208:
+        8:  209:void lexer_cleanup(Lexer *l) {
+        -:  210:	// check if fp is NULL and close it then set to NULL so this can be
+        -:  211:	// called multiple times
+        8:  212:	if (l->fp != NULL) {
+        5:  213:		myfclose(l->fp);
+        5:  214:		l->fp = NULL;
+        -:  215:	}
+        -:  216:
+        -:  217:	// same for the tokenizer
+        8:  218:	if (l->tokenizer != NULL) {
+        5:  219:		tokenizer_cleanup(l->tokenizer);
+        5:  220:		myfree(l->tokenizer);
+        5:  221:		l->tokenizer = NULL;
+        -:  222:	}
+        -:  223:
+        -:  224:	// cleanup file path
+        8:  225:	path_cleanup(&l->file);
+        8:  226:}
+        -:    0:Source:tokenizer.c
+        -:    0:Graph:tokenizer.gcno
+        -:    0:Data:tokenizer.gcda
+        -:    0:Runs:15
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/colors.h>
+        -:   16:#include <base/resources.h>
+        -:   17:#include <errno.h>
+        -:   18:#include <lexer/tokenizer.h>
+        -:   19:#include <lexer/tokenizer_state.h>
+        -:   20:#include <stdarg.h>
+        -:   21:#include <stdio.h>
+        -:   22:#include <string.h>
+        -:   23:
+      318:   24:int tokenizer_init(Tokenizer *t, char *line) {
+        -:   25:	// check input
+      318:   26:	if (line == NULL || t == NULL) {
+        1:   27:		errno = EINVAL;
+        1:   28:		return TokenizerStateErr;
+        -:   29:	}
+        -:   30:
+        -:   31:	// copy the input string
+      317:   32:	t->len = strlen(line);
+      317:   33:	t->s = mymalloc(sizeof(char) * (1 + t->len));
+      317:   34:	if (t->s == NULL) {
+        1:   35:		return TokenizerStateErr;
+        -:   36:	}
+      316:   37:	strcpy(t->s, line);
+        -:   38:
+        -:   39:	// set pos to 0
+      316:   40:	t->pos = 0;
+        -:   41:
+      316:   42:	t->in_comment = false;
+        -:   43:
+      316:   44:	return TokenizerStateOk;
+        -:   45:}
+        -:   46:
+     2506:   47:bool tokenizer_is_white_space(Tokenizer *t) {
+     2506:   48:	char ch = t->s[t->pos];
+        -:   49:	// check for std whitespace chars
+     2506:   50:	if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\v' || ch == '\f' || ch == '\r')
+     1225:   51:		return true;
+     1281:   52:	return false;
+        -:   53:}
+        -:   54:
+     1487:   55:int tokenizer_skip_comments(Tokenizer *t, Token *next) {
+     1487:   56:	if (t->pos + 1 >= t->len)
+      312:   57:		return TokenizerStateOk;
+        -:   58:
+     1175:   59:	char ch1 = t->s[t->pos];
+     1175:   60:	char ch2 = t->s[t->pos + 1];
+     1175:   61:	bool is_doc_comment = false;
+        -:   62:
+     1267:   63:	if (ch1 == '/' && ch2 == '/') {
+       92:   64:		u64 start_doc = t->pos;
+       92:   65:		if (t->pos + 2 < t->len) {
+        -:   66:			// check if we're in a doc comment
+       91:   67:			if (t->s[t->pos + 2] == '/') {
+        -:   68:				// in doc comment
+       13:   69:				is_doc_comment = true;
+       13:   70:				t->pos = t->pos + 3;
+       13:   71:				start_doc = t->pos;
+        -:   72:			}
+        -:   73:		}
+        -:   74:
+       92:   75:		bool found_start = false;
+        -:   76:
+        -:   77:		while (true) {
+     3861:   78:			if (t->pos >= t->len || t->s[t->pos] == '\n')
+        -:   79:				break;
+        -:   80:
+     3769:   81:			if (!found_start && tokenizer_is_white_space(t)) {
+       23:   82:				start_doc = t->pos + 1;
+        -:   83:			} else {
+     3746:   84:				found_start = true;
+        -:   85:			}
+     3769:   86:			t->pos += 1;
+        -:   87:		}
+        -:   88:
+       92:   89:		if (is_doc_comment) {
+       13:   90:			next->type = TokenTypeDoc;
+       13:   91:			u64 end_doc = t->pos;
+       13:   92:			if (end_doc < start_doc)
+    #####:   93:				end_doc = start_doc;
+       13:   94:			u64 doc_size = end_doc - start_doc;
+       13:   95:			next->token = mymalloc(sizeof(char) * (doc_size + 1));
+       13:   96:			memcpy(next->token, t->s + start_doc, doc_size);
+       13:   97:			next->token[doc_size] = 0;
+        -:   98:		}
+        -:   99:
+     1083:  100:	} else if (ch1 == '/' && ch2 == '*') {
+       12:  101:		t->in_comment = true;
+       12:  102:		t->pos += 1;
+        -:  103:		while (true) {
+      172:  104:			if (t->pos >= t->len || (t->s[t->pos - 1] == '*' && t->s[t->pos] == '/')) {
+       12:  105:				if (t->pos < t->len) {
+       11:  106:					t->in_comment = false;
+       11:  107:					t->pos += 1;
+        -:  108:				}
+        -:  109:
+       16:  110:				while (t->pos < t->len) {
+       12:  111:					if (!tokenizer_is_white_space(t))
+        8:  112:						break;
+        4:  113:					t->pos += 1;
+        -:  114:				}
+       12:  115:				break;
+        -:  116:			}
+      160:  117:			t->pos += 1;
+        -:  118:		}
+        -:  119:	}
+        -:  120:
+     1175:  121:	return TokenizerStateOk;
+        -:  122:}
+        -:  123:
+     2685:  124:int tokenizer_skip_white_space(Tokenizer *t, Token *next) {
+        -:  125:	while (true) {
+        -:  126:		// if we're at the end of the string or not in white space break
+     2685:  127:		if (t->pos >= t->len || !tokenizer_is_white_space(t))
+        -:  128:			break;
+        -:  129:
+     1198:  130:		t->pos += 1;
+        -:  131:	}
+        -:  132:
+     1487:  133:	return TokenizerStateOk;
+        -:  134:}
+        -:  135:
+     1487:  136:int tokenizer_skip_to_token(Tokenizer *t, Token *next) {
+        -:  137:	while (true) {
+     1487:  138:		tokenizer_skip_white_space(t, next);
+     1487:  139:		tokenizer_skip_comments(t, next);
+        -:  140:
+     1487:  141:		if (t->pos >= t->len || (t->s[t->pos] != '\n' && t->s[t->pos] != '/') ||
+       89:  142:			next->type == TokenTypeDoc)
+        -:  143:			break;
+        -:  144:	}
+        -:  145:
+     1410:  146:	if (t->pos >= t->len && next->type != TokenTypeDoc) {
+      315:  147:		if (t->in_comment)
+        1:  148:			return TokenizerStateCompleteInComment;
+      314:  149:		return TokenizerStateComplete;
+        -:  150:	}
+        -:  151:
+     1095:  152:	return TokenizerStateOk;
+        -:  153:}
+        -:  154:
+      414:  155:int tokenizer_proc_ident(Tokenizer *t, Token *next) {
+      414:  156:	next->type = TokenTypeIdent;
+      414:  157:	u64 start = t->pos;
+     3588:  158:	while (true) {
+        -:  159:		// if we're at the end of the string, break
+     4002:  160:		if (t->pos >= t->len)
+        3:  161:			break;
+        -:  162:
+     3999:  163:		char ch = t->s[t->pos];
+        -:  164:
+        -:  165:		// continue until non-ident char
+     3999:  166:		if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_' ||
+     2427:  167:			  (ch >= '0' && ch <= '9'))) {
+        -:  168:			break;
+        -:  169:		}
+     3588:  170:		t->pos += 1;
+        -:  171:	}
+      414:  172:	u64 end = t->pos;
+      414:  173:	u64 tlen = end - start;
+        -:  174:
+        -:  175:	// allocate and copy over the token
+      414:  176:	next->token = mymalloc(sizeof(char) * (tlen + 1));
+      414:  177:	if (next->token == NULL)
+    #####:  178:		return TokenizerStateErr;
+      414:  179:	memcpy(next->token, t->s + start, tlen);
+      414:  180:	next->token[tlen] = 0;
+        -:  181:
+      414:  182:	return TokenizerStateOk;
+        -:  183:}
+        -:  184:
+       12:  185:int tokenizer_proc_string_literal(Tokenizer *t, Token *next) {
+       12:  186:	next->type = TokenTypeStringLiteral;
+       12:  187:	u64 start = t->pos;
+       97:  188:	while (true) {
+        -:  189:		// if we're at the end of the string, break
+      109:  190:		if (t->pos >= t->len)
+    #####:  191:			break;
+        -:  192:
+      109:  193:		char ch = t->s[t->pos];
+        -:  194:
+        -:  195:		// continue until literal termination char
+      109:  196:		if (ch == '\"' && t->pos != start) {
+       12:  197:			t->pos += 1;
+       12:  198:			break;
+        -:  199:		}
+       97:  200:		t->pos += 1;
+        -:  201:	}
+       12:  202:	u64 end = t->pos;
+       12:  203:	u64 tlen = end - start;
+        -:  204:
+        -:  205:	// allocate and copy over the token
+       12:  206:	next->token = mymalloc(sizeof(char) * (tlen + 1));
+       12:  207:	if (next->token == NULL)
+    #####:  208:		return TokenizerStateErr;
+       12:  209:	memcpy(next->token, t->s + start, tlen);
+       12:  210:	next->token[tlen] = 0;
+        -:  211:
+       12:  212:	return TokenizerStateOk;
+        -:  213:}
+        -:  214:
+        1:  215:int tokenizer_proc_char_literal(Tokenizer *t, Token *next) {
+        1:  216:	next->type = TokenTypeCharLiteral;
+        1:  217:	u64 start = t->pos;
+        2:  218:	while (true) {
+        -:  219:		// if we're at the end of the string, break
+        3:  220:		if (t->pos >= t->len)
+    #####:  221:			break;
+        -:  222:
+        3:  223:		char ch = t->s[t->pos];
+        -:  224:
+        -:  225:		// continue until literal termination char
+        3:  226:		if (ch == '\'' && t->pos != start) {
+        1:  227:			t->pos += 1;
+        1:  228:			break;
+        -:  229:		}
+        2:  230:		t->pos += 1;
+        -:  231:	}
+        1:  232:	u64 end = t->pos;
+        1:  233:	u64 tlen = end - start;
+        -:  234:
+        -:  235:	// allocate and copy over the token
+        1:  236:	next->token = mymalloc(sizeof(char) * (tlen + 1));
+        1:  237:	if (next->token == NULL)
+    #####:  238:		return TokenizerStateErr;
+        1:  239:	memcpy(next->token, t->s + start, tlen);
+        1:  240:	next->token[tlen] = 0;
+        -:  241:
+        1:  242:	return TokenizerStateOk;
+        -:  243:}
+        -:  244:
+       76:  245:int tokenizer_proc_num_literal(Tokenizer *t, Token *next) {
+       76:  246:	int ret = TokenizerStateOk;
+       76:  247:	next->type = TokenTypeNumLiteral;
+       76:  248:	u64 start = t->pos;
+      195:  249:	while (true) {
+        -:  250:		// if we're at the end of the string, break
+      271:  251:		if (t->pos >= t->len)
+        4:  252:			break;
+        -:  253:
+      267:  254:		char ch = t->s[t->pos];
+        -:  255:
+        -:  256:		// continue until literal termination char (we allow all
+        -:  257:		// chars needed for the various types at the tokenizer
+        -:  258:		// level. Checking the order, etc is done at a later
+        -:  259:		// phase)
+      267:  260:		if (t->pos == start) {
+       76:  261:			if (!(ch == '-' || (ch >= '0' && ch <= '9')))
+        -:  262:				break;
+      261:  263:		} else if (!((ch >= '0' && ch <= '9') || ch == '.' || ch == '_' || ch == 'u' || ch == 'i' ||
+       77:  264:					 ch == 's' || ch == 'z' || ch == 'e' || ch == 'f' || ch == 'x'))
+       69:  265:			break;
+      198:  266:		if (ch == '.') {
+       10:  267:			if (next->type == TokenTypeFloatLiteral) {
+        -:  268:				// cannot have more than one dot.
+        3:  269:				return TokenizerStateErr;
+        -:  270:			}
+        7:  271:			next->type = TokenTypeFloatLiteral;
+        -:  272:		}
+      195:  273:		t->pos += 1;
+        -:  274:	}
+       73:  275:	u64 end = t->pos;
+       73:  276:	u64 tlen = end - start;
+        -:  277:
+        -:  278:	// special case of lone minus sign is a punct, not a literal
+       73:  279:	if (tlen == 1 && t->s[start] == '-') {
+       20:  280:		next->type = TokenTypePunct;
+        -:  281:		// we also must deal with these: -= and ->
+       20:  282:		if (t->pos < t->len) {
+       20:  283:			if (t->s[t->pos] == '=' || t->s[t->pos] == '>') {
+       18:  284:				t->pos += 1;
+       18:  285:				end = t->pos;
+       18:  286:				tlen = end - start;
+        -:  287:			}
+        -:  288:		}
+        -:  289:	}
+        -:  290:
+        -:  291:	// allocate and copy over the token
+       73:  292:	next->token = mymalloc(sizeof(char) * (tlen + 1));
+       73:  293:	if (next->token == NULL)
+    #####:  294:		return TokenizerStateErr;
+       73:  295:	memcpy(next->token, t->s + start, tlen);
+       73:  296:	next->token[tlen] = 0;
+        -:  297:
+       73:  298:	return ret;
+        -:  299:}
+        -:  300:
+      574:  301:bool is_second_punct(char ch1, char ch2) {
+      574:  302:	if (ch1 == '!' && ch2 == '=')
+        2:  303:		return true;
+     572*:  304:	if (ch1 == '%' && ch2 == '%')
+    #####:  305:		return true;
+      572:  306:	if (ch1 == '&' && (ch2 == '&' || ch2 == '='))
+    #####:  307:		return true;
+      572:  308:	if (ch1 == '*' && ch2 == '=')
+    #####:  309:		return true;
+      572:  310:	if (ch1 == '+' && ch2 == '=')
+        2:  311:		return true;
+     570*:  312:	if (ch1 == '-' && (ch2 == '=' || ch2 == '>'))
+    #####:  313:		return true;
+     570*:  314:	if (ch1 == '/' && ch2 == '=')
+    #####:  315:		return true;
+     570*:  316:	if (ch1 == '^' && ch2 == '=')
+    #####:  317:		return true;
+      570:  318:	if (ch1 == '|' && (ch2 == '=' || ch2 == '|'))
+    #####:  319:		return true;
+      570:  320:	if (ch1 == '=' && (ch2 == '>' || ch2 == '='))
+        6:  321:		return true;
+      564:  322:	if (ch1 == ':' && ch2 == ':')
+       17:  323:		return true;
+      547:  324:	if (ch1 == '<' && (ch2 == '<' || ch2 == '=' || ch2 == '-'))
+    #####:  325:		return true;
+      547:  326:	if (ch1 == '>' && (ch2 == '>' || ch2 == '='))
+    #####:  327:		return true;
+      547:  328:	if (ch1 == '.' && ch2 == '.')
+    #####:  329:		return true;
+        -:  330:
+      547:  331:	return false;
+        -:  332:}
+    #####:  333:bool is_third_punct(char ch1, char ch2, char ch3) {
+    #####:  334:	if (ch1 == '<' && ch2 == '<' && ch3 == '=')
+    #####:  335:		return true;
+    #####:  336:	if (ch1 == '>' && ch2 == '>' && ch3 == '=')
+    #####:  337:		return true;
+    #####:  338:	if (ch1 == '.' && ch2 == '.' && ch3 == '.')
+    #####:  339:		return true;
+    #####:  340:	if (ch1 == '.' && ch2 == '.' && ch3 == '=')
+    #####:  341:		return true;
+    #####:  342:	return false;
+        -:  343:}
+        -:  344:
+      579:  345:int tokenizer_proc_punct(Tokenizer *t, Token *next) {
+      579:  346:	next->type = TokenTypePunct;
+        -:  347:
+      579:  348:	char ch1 = t->s[t->pos];
+      579:  349:	char ch2 = t->pos + 1 < t->len && is_second_punct(ch1, t->s[t->pos + 1]) ? t->s[t->pos + 1] : 0;
+     579*:  350:	char ch3 = t->pos + 2 < t->len && ch3 != 0 && is_third_punct(ch1, ch2, t->s[t->pos + 2])
+    #####:  351:				   ? t->s[t->pos + 2]
+        -:  352:				   : 0;
+        -:  353:
+        -:  354:	// allocate and copy over the token
+      579:  355:	next->token = mymalloc(sizeof(char) * 5);
+      579:  356:	if (next->token == NULL)
+    #####:  357:		return TokenizerStateErr;
+        -:  358:
+      579:  359:	next->token[0] = ch1;
+      579:  360:	next->token[1] = ch2;
+      579:  361:	next->token[2] = ch3;
+      579:  362:	next->token[4] = 0;
+        -:  363:
+      579:  364:	t->pos += 1;
+      579:  365:	if (ch2 != 0)
+       27:  366:		t->pos += 1;
+     579*:  367:	if (ch3 != 0 && ch2 != 0)
+    #####:  368:		t->pos += 1;
+        -:  369:
+      579:  370:	return TokenizerStateOk;
+        -:  371:}
+        -:  372:
+     1410:  373:int tokenizer_next_token(Tokenizer *t, Token *next) {
+     1410:  374:	next->span = NULL;
+     1410:  375:	next->type = TokenTypeIdent; // init so that we know when it's been set to doc
+        -:  376:	// first skip all whitespace / comments
+     1410:  377:	int skip = tokenizer_skip_to_token(t, next);
+     1410:  378:	if (skip != TokenizerStateOk || next->type == TokenTypeDoc)
+      328:  379:		return skip;
+        -:  380:
+        -:  381:	// check first char to determine which type of token we're in
+     1082:  382:	char first = t->s[t->pos];
+     1082:  383:	if ((first >= 'a' && first <= 'z') || (first >= 'A' && first <= 'Z') || first == '_') {
+        -:  384:		// ident
+      414:  385:		int ret = tokenizer_proc_ident(t, next);
+        -:  386:
+        -:  387:		// special cases
+      414:  388:		if (ret == TokenizerStateOk &&
+      414:  389:			(!strcmp(next->token, "true") || !strcmp(next->token, "false"))) {
+        3:  390:			next->type = TokenTypeBoolLiteral;
+        -:  391:		}
+      414:  392:		return ret;
+      668:  393:	} else if (first == '\"') {
+        -:  394:		// string literal
+       12:  395:		return tokenizer_proc_string_literal(t, next);
+      656:  396:	} else if (first == '\'') {
+        -:  397:		// char literal
+        1:  398:		return tokenizer_proc_char_literal(t, next);
+      655:  399:	} else if ((first >= '0' && first <= '9') || first == '-') {
+        -:  400:		// number literal
+       76:  401:		return tokenizer_proc_num_literal(t, next);
+        -:  402:	} else {
+        -:  403:		// punct or error
+      579:  404:		return tokenizer_proc_punct(t, next);
+        -:  405:	}
+        -:  406:}
+        -:  407:
+      326:  408:void tokenizer_cleanup(Tokenizer *t) {
+        -:  409:	// check if it's null to be safe in case it's called twice
+      326:  410:	if (t->s != NULL) {
+      316:  411:		myfree(t->s);
+      316:  412:		t->s = NULL;
+        -:  413:	}
+      326:  414:}
+        -:  415:
+     1107:  416:void token_cleanup(Token *t) {
+        -:  417:	// check if it's null to be safe in case it's called twice
+     1107:  418:	if (t->token != NULL) {
+     1092:  419:		myfree(t->token);
+     1092:  420:		t->token = NULL;
+        -:  421:	}
+        -:  422:
+        -:  423:	// check if it's null to be safe in case it's called twice
+     1107:  424:	if (t->span != NULL) {
+      957:  425:		myfree(t->span);
+      957:  426:		t->span = NULL;
+        -:  427:	}
+     1107:  428:}
+        -:  429:
+        -:  430:typedef enum TokenDisplayType {
+        -:  431:	TokenDisplayTypeError = 0,
+        -:  432:	TokenDisplayTypeWarning = 1
+        -:  433:} TokenDisplayType;
+        -:  434:
+        2:  435:int token_display_impl(Token *token, TokenDisplayType type, char *fmt, va_list va_args) {
+        2:  436:	if (type == TokenDisplayTypeError)
+        1:  437:		fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+        -:  438:	else
+        1:  439:		fprintf(stderr, "%sWarning%s: ", YELLOW, RESET);
+        2:  440:	vfprintf(stderr, fmt, va_args);
+        2:  441:	fprintf(stderr, "\n%s", token->span);
+        2:  442:	return 0;
+        -:  443:}
+        -:  444:
+        1:  445:int token_display_error(Token *token, char *fmt, ...) {
+        -:  446:	va_list va_args;
+        1:  447:	va_start(va_args, fmt);
+        1:  448:	int ret = token_display_impl(token, TokenDisplayTypeError, fmt, va_args);
+        1:  449:	va_end(va_args);
+        1:  450:	return ret;
+        -:  451:}
+        -:  452:
+        1:  453:int token_display_warning(Token *token, char *fmt, ...) {
+        -:  454:	va_list va_args;
+        1:  455:	va_start(va_args, fmt);
+        1:  456:	int ret = token_display_impl(token, TokenDisplayTypeWarning, fmt, va_args);
+        1:  457:	va_end(va_args);
+        1:  458:	return ret;
+        -:  459:}
