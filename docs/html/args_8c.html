@@ -74,6 +74,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="args_8h_source.html">args/args.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="colors_8h_source.html">base/colors.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
 <code>#include &lt;errno.h&gt;</code><br />
 <code>#include &lt;stdarg.h&gt;</code><br />
@@ -99,8 +100,8 @@ Functions</h2></td></tr>
 <tr class="separator:a6b3a814e3eec35c0dcfbb785f6f3dd58"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4637081f01532584954d036764e3ab4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#ab4637081f01532584954d036764e3ab4">args_cleanup</a> (<a class="el" href="structArgsImpl.html">ArgsImpl</a> *ptr)</td></tr>
 <tr class="separator:ab4637081f01532584954d036764e3ab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad93cf4b8dce3bd5fa60059fab5e90563"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#ad93cf4b8dce3bd5fa60059fab5e90563">args_build</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const char *prog, const char *version, const char *author, const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> min_args, const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> max_args)</td></tr>
-<tr class="separator:ad93cf4b8dce3bd5fa60059fab5e90563"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9b00dbcd34a42d246485a1d57b13a2e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#af9b00dbcd34a42d246485a1d57b13a2e">args_build</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const char *prog, const char *version, const char *author, const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> min_args, const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> max_args, const char *arch)</td></tr>
+<tr class="separator:af9b00dbcd34a42d246485a1d57b13a2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a075df82b64ecd2ea9d83ac8756daa47a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#a075df82b64ecd2ea9d83ac8756daa47a">args_exit_error</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, char *format,...)</td></tr>
 <tr class="separator:a075df82b64ecd2ea9d83ac8756daa47a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a471eecf2217d505d06a49e209f3cd85c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#a471eecf2217d505d06a49e209f3cd85c">args_add_param</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const <a class="el" href="args_8h.html#a9733cf4848d00d666a76e4991404a60a">ArgsParam</a> *ap)</td></tr>
@@ -115,16 +116,20 @@ Functions</h2></td></tr>
 <tr class="separator:a686fd596d50a46dfda418a781c675cbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad991413eb99bc5614697b633fffac323"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#ad991413eb99bc5614697b633fffac323">args_check_validity</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, int argc, const char **argv)</td></tr>
 <tr class="separator:ad991413eb99bc5614697b633fffac323"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5edd894f104baa890b4be892f63ecd10"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#a5edd894f104baa890b4be892f63ecd10">args_init</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const int argc, const char **argv)</td></tr>
-<tr class="separator:a5edd894f104baa890b4be892f63ecd10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff4b61d8b8eb5e476c22ea7f71f60c03"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#aff4b61d8b8eb5e476c22ea7f71f60c03">process_lines</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const char *arg1, char config_file[], size_t fsize)</td></tr>
+<tr class="separator:aff4b61d8b8eb5e476c22ea7f71f60c03"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a533d263739d41fedd471a185283d5332"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#a533d263739d41fedd471a185283d5332">check_file_config</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const int argc, const char **argv)</td></tr>
+<tr class="separator:a533d263739d41fedd471a185283d5332"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b39ef6a212f9eb92fe243e6fceb2a08"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#a6b39ef6a212f9eb92fe243e6fceb2a08">args_init</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const int argc, const char **argv)</td></tr>
+<tr class="separator:a6b39ef6a212f9eb92fe243e6fceb2a08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca3a764da124161e9294d4f1c4055313"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#aca3a764da124161e9294d4f1c4055313">args_value_of</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const char *param_name, char *value_buf, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> max_value_len, const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> index)</td></tr>
 <tr class="separator:aca3a764da124161e9294d4f1c4055313"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a329460dc41ca3f0d3ad9f5afb2dfb3a5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#a329460dc41ca3f0d3ad9f5afb2dfb3a5">args_get_argument</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> index, char *value_buf, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> max_value_len)</td></tr>
 <tr class="separator:a329460dc41ca3f0d3ad9f5afb2dfb3a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a69b093e12fcf4b70cdcfdd3bd4b827"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#a4a69b093e12fcf4b70cdcfdd3bd4b827">args_print_version</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args)</td></tr>
 <tr class="separator:a4a69b093e12fcf4b70cdcfdd3bd4b827"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad213f59ddb6988854c01e10cea68a73b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#ad213f59ddb6988854c01e10cea68a73b">args_usage</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const char *sub)</td></tr>
-<tr class="separator:ad213f59ddb6988854c01e10cea68a73b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae797e903def6469557e0ac6ee8c3200e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="args_8c.html#ae797e903def6469557e0ac6ee8c3200e">args_usage</a> (const <a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, const char *sub_command)</td></tr>
+<tr class="separator:ae797e903def6469557e0ac6ee8c3200e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a471eecf2217d505d06a49e209f3cd85c"></a>
@@ -183,8 +188,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ad93cf4b8dce3bd5fa60059fab5e90563"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad93cf4b8dce3bd5fa60059fab5e90563">&#9670;&nbsp;</a></span>args_build()</h2>
+<a id="af9b00dbcd34a42d246485a1d57b13a2e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9b00dbcd34a42d246485a1d57b13a2e">&#9670;&nbsp;</a></span>args_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -223,7 +228,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a>&#160;</td>
-          <td class="paramname"><em>max_args</em>&#160;</td>
+          <td class="paramname"><em>max_args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>arch</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -407,14 +418,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a5edd894f104baa890b4be892f63ecd10"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5edd894f104baa890b4be892f63ecd10">&#9670;&nbsp;</a></span>args_init()</h2>
+<a id="a6b39ef6a212f9eb92fe243e6fceb2a08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b39ef6a212f9eb92fe243e6fceb2a08">&#9670;&nbsp;</a></span>args_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int args_init </td>
+          <td class="memname">void args_init </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
           <td class="paramname"><em>args</em>, </td>
@@ -631,8 +642,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ad213f59ddb6988854c01e10cea68a73b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad213f59ddb6988854c01e10cea68a73b">&#9670;&nbsp;</a></span>args_usage()</h2>
+<a id="ae797e903def6469557e0ac6ee8c3200e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae797e903def6469557e0ac6ee8c3200e">&#9670;&nbsp;</a></span>args_usage()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -647,7 +658,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>sub</em>&#160;</td>
+          <td class="paramname"><em>sub_command</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -694,6 +705,80 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">const <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a>&#160;</td>
           <td class="paramname"><em>index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a533d263739d41fedd471a185283d5332"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a533d263739d41fedd471a185283d5332">&#9670;&nbsp;</a></span>check_file_config()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int check_file_config </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>argc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char **&#160;</td>
+          <td class="paramname"><em>argv</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aff4b61d8b8eb5e476c22ea7f71f60c03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aff4b61d8b8eb5e476c22ea7f71f60c03">&#9670;&nbsp;</a></span>process_lines()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void process_lines </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
+          <td class="paramname"><em>args</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>arg1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char&#160;</td>
+          <td class="paramname"><em>config_file</em>[], </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>fsize</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
