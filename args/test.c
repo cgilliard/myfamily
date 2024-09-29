@@ -203,6 +203,22 @@ MyTest(args, test_args_value_of) {
 	cr_assert_eq(ret, -1);
 }
 
+MyTest(args, test_help_and_version) {
+	Args args3;
+	args_build(&args3, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	const char *argv3[2] = {"myprog", "--help"};
+	cr_assert_eq(args3.argc, 0);
+	args_init(&args3, 2, argv3);
+	cr_assert_eq(args3.argc, 2);
+
+	Args args4;
+	args_build(&args4, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	const char *argv4[2] = {"myprog", "-v"};
+	cr_assert_eq(args4.argc, 0);
+	args_init(&args4, 2, argv4);
+	cr_assert_eq(args4.argc, 2);
+}
+
 MyTest(args, test_usage) {
 	Args args1;
 	SubCommand sc1;
@@ -319,4 +335,50 @@ MyTest(args, test_sub_command_other) {
 	__is_debug_malloc_counter_ = 1;
 	cr_assert(sub_command_add_param(&sc3, &p1));
 	__is_debug_malloc_counter_ = UINT64_MAX;
+}
+
+MyTest(args, test_args_build_exit) {
+	cr_assert(args_build(NULL, NULL, NULL, NULL, 0, 1, NULL));
+	char big[ARGS_MAX_DETAIL_LENGTH + 100];
+	for (int i = 0; i < ARGS_MAX_DETAIL_LENGTH + 10; i++) {
+		big[i] = '0';
+	}
+	ArgsImpl args1;
+	// name too long
+	cr_assert(args_build(&args1, big, "ver1.0", "me", 2, 3, "Darwin arm64"));
+
+	// min greater than max
+	cr_assert(args_build(&args1, "ok", "ver1.0", "me", 3, 2, "Darwin arm64"));
+	Args args2;
+	cr_assert(!args_build(&args2, "name", "ver1.0", "me", 2, 3, NULL));
+
+	__is_debug_misc_no_exit = true;
+	args_exit_error(&args2, "test");
+	__is_debug_misc_no_exit = false;
+
+	SubCommand sc;
+	cr_assert(!sub_command_build(&sc, "abc", "def", 4, 5, "test"));
+	__is_debug_realloc = true;
+	cr_assert(args_add_sub_command(&args2, &sc));
+	__is_debug_realloc = false;
+
+	ArgsImpl testadd_sub;
+	testadd_sub.subs_count = 0;
+	__is_debug_malloc = true;
+	cr_assert(args_add_sub_command(&testadd_sub, &sc));
+	__is_debug_malloc = false;
+
+	Args args3;
+	cr_assert(!args_build(&args3, "name", "ver1.0", "me", 2, 3, NULL));
+	SubCommandImpl scerr;
+	scerr.help = NULL;
+	cr_assert(args_add_sub_command(&args3, &scerr));
+}
+
+MyTest(args, test_print_version) {
+	Args args;
+	cr_assert(!args_build(&args, "name", "ver1.0", "me", 2, 3, NULL));
+	__is_debug_misc_no_exit = true;
+	args_print_version(&args);
+	__is_debug_misc_no_exit = false;
 }

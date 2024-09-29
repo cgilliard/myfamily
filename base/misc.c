@@ -214,7 +214,7 @@ void exit_error(char *format, ...) {
 	vfprintf(stderr, format, va_args);
 	fprintf(stderr, "\n");
 	va_end(va_args);
-	EXIT_ERR_IF_NO_DEBUG();
+	EXIT_ERR_IF_NO_DEBUG(-1);
 }
 
 void print_error(char *format, ...) {

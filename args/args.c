@@ -273,6 +273,7 @@ void args_cleanup(ArgsImpl *ptr) {
 	for (u32 i = 0; i < ptr->subs_count; i++) {
 		sub_command_cleanup(&ptr->subs[i]);
 	}
+	ptr->subs_count = 0;
 	if (ptr->subs) {
 		myfree(ptr->subs);
 		ptr->subs = NULL;
@@ -288,7 +289,7 @@ void args_cleanup(ArgsImpl *ptr) {
 
 int args_build(Args *args, const char *prog, const char *version, const char *author,
 			   const u32 min_args, const u32 max_args, const char *arch) {
-	if (prog == NULL || version == NULL || author == NULL || min_args > max_args) {
+	if (prog == NULL || version == NULL || author == NULL) {
 		print_error("Input may not be NULL");
 		errno = EINVAL;
 		return -1;
@@ -305,10 +306,14 @@ int args_build(Args *args, const char *prog, const char *version, const char *au
 	args->subs_count = 0;
 	args->subs = NULL;
 
-	SubCommand sc;
-	if (sub_command_build(&sc, "", "", min_args, max_args, ""))
+	SubCommandImpl sc;
+	if (sub_command_build(&sc, "", "", min_args, max_args, "")) {
+		args->subs_count = 0;
+		args->subs = NULL;
 		return -1;
+	}
 	args_add_sub_command(args, &sc);
+	sub_command_cleanup(&sc);
 
 	strcpy(args->prog, prog);
 	strcpy(args->version, version);
@@ -336,7 +341,7 @@ void args_exit_error(const Args *args, char *format, ...) {
 			"try %s--help%s\n",
 			DIMMED, RESET, BRIGHT_RED, args->prog, RESET, DIMMED, RESET, GREEN, RESET);
 	va_end(va_args);
-	exit(-1);
+	EXIT_ERR_IF_NO_DEBUG(-1);
 }
 
 int args_add_param(Args *args, const ArgsParam *ap) {
@@ -846,7 +851,7 @@ void args_print_version(const Args *args) {
 	}
 	fprintf(stderr, "%s%s%s %s%s%s (%s%s%s)\n", BRIGHT_RED, prog, RESET, CYAN, version, RESET,
 			YELLOW, arch, RESET);
-	exit(0);
+	EXIT_ERR_IF_NO_DEBUG(0);
 }
 
 void args_usage(const Args *args, const char *sub_command) {

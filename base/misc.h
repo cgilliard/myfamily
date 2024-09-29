@@ -35,9 +35,9 @@ int myfseek(MYFILE *stream, long pos, int type);
 int myfprintf(MYFILE *fptr, const char *str, ...);
 char *trim_whitespace(char *str);
 
-#define EXIT_ERR_IF_NO_DEBUG()                                                                     \
+#define EXIT_ERR_IF_NO_DEBUG(num)                                                                  \
 	if (!__is_debug_misc_no_exit)                                                                  \
-		exit(-1);
+		exit(num);
 
 #ifdef TEST
 extern bool __is_debug_misc_ferror;
