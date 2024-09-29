@@ -656,12 +656,15 @@ void args_init(Args *args, const int argc, const char **argv) {
 	args->argc = argc;
 	args->argv = mymalloc(sizeof(char *) * argc);
 	if (args->argv == NULL) {
+		args->argc = 0;
 		args_exit_error(args, "Could not allocate sufficient memory");
 		return;
 	}
 	for (u64 i = 0; i < argc; i++) {
 		args->argv[i] = mymalloc(sizeof(char) * (strlen(argv[i]) + 1));
 		if (args->argv[i] == NULL) {
+			args->argc = 0;
+			myfree(args->argv);
 			args_exit_error(args, "Could not allocate sufficient memory");
 			return;
 		}
@@ -681,7 +684,7 @@ void args_init(Args *args, const int argc, const char **argv) {
 						sub = argv[j];
 						break;
 					} else {
-						char name[len];
+						char name[len + 1];
 						bool is_short;
 						if (len > 1 && args->argv[j][1] == '-') {
 							strcpy(name, args->argv[j] + 2);
@@ -692,9 +695,6 @@ void args_init(Args *args, const int argc, const char **argv) {
 						}
 
 						u64 subi = 0;
-						if (sub)
-							subi = args_subi_for(args, sub);
-
 						if (args_sub_takes_value(args, subi, name, is_short)) {
 							j += 1;
 						}
@@ -759,7 +759,7 @@ int args_value_of(const Args *args, const char *param_name, char *value_buf,
 						return -2;
 					}
 					return snprintf(value_buf, max_value_len, "%s", args->argv[i + 1]);
-				} else if (takes_value && max_value_len > 1) {
+				} else if (takes_value && max_value_len > 0) {
 					if (value_buf == NULL) {
 						errno = EINVAL;
 						print_error("Input may not be NULL");
@@ -777,7 +777,7 @@ int args_value_of(const Args *args, const char *param_name, char *value_buf,
 	}
 
 	if (default_value != NULL && index == 0) {
-		if (value_buf == NULL) {
+		if (value_buf == NULL && max_value_len > 0) {
 			errno = EINVAL;
 			print_error("Input may not be NULL");
 			return -2;
@@ -1132,5 +1132,5 @@ void args_usage(const Args *args, const char *sub_command) {
 		}
 	}
 
-	exit(0);
+	EXIT_ERR_IF_NO_DEBUG(0);
 }

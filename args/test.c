@@ -382,3 +382,153 @@ MyTest(args, test_print_version) {
 	args_print_version(&args);
 	__is_debug_misc_no_exit = false;
 }
+
+MyTest(args, test_args_init_err) {
+	Args args1;
+	cr_assert(!args_build(&args1, "name", "ver1.0", "me", 2, 3, NULL));
+	const char *argv1[2] = {"prog", NULL};
+	__is_debug_misc_no_exit = true;
+	args_init(&args1, 2, argv1);
+	__is_debug_misc_no_exit = false;
+	// failed due to NULL so argc not set
+	cr_assert_eq(args1.argc, 0);
+
+	const char *argv2[3] = {"prog", "test", "@abc"};
+	__is_debug_misc_no_exit = true;
+	args_init(&args1, 3, argv2);
+	__is_debug_misc_no_exit = false;
+	// failed due to '@' so argc not set
+	cr_assert_eq(args1.argc, 0);
+
+	__is_debug_malloc = true;
+	// with len 2 it should succeed, but malloc fails
+	__is_debug_misc_no_exit = true;
+	args_init(&args1, 2, argv2);
+	__is_debug_misc_no_exit = false;
+	__is_debug_malloc = false;
+	cr_assert_eq(args1.argc, 0);
+
+	__is_debug_malloc_counter_ = 1;
+	__is_debug_misc_no_exit = true;
+	args_init(&args1, 2, argv2);
+	__is_debug_malloc_counter_ = UINT64_MAX;
+	__is_debug_misc_no_exit = false;
+	cr_assert_eq(args1.argc, 0);
+}
+
+MyTest(args, test_help_subs) {
+	__is_debug_misc_no_exit = true;
+	SubCommand sc1;
+	cr_assert(!sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"));
+	ArgsParam p1;
+	cr_assert(!args_param_build(&p1, "name", "name help here", "n", false, false, "myname"));
+	sub_command_add_param(&sc1, &p1);
+
+	ArgsParam p2;
+	cr_assert(!args_param_build(&p2, "name2", "name2 help here", "x", true, false, NULL));
+
+	Args args1;
+	args_build(&args1, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	args_add_param(&args1, &p2);
+	args_add_sub_command(&args1, &sc1);
+	const char *argv1[5] = {"prog", "--name2", "ok", "sc1", "--help"};
+	cr_assert_eq(args1.argc, 0);
+	args_init(&args1, 5, argv1);
+	cr_assert_eq(args1.argc, 5);
+
+	Args args2;
+	args_build(&args2, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	args_add_param(&args2, &p2);
+	args_add_sub_command(&args2, &sc1);
+	const char *argv2[5] = {"prog", "-x", "ok2", "sc1", "--help"};
+	cr_assert_eq(args2.argc, 0);
+	args_init(&args2, 5, argv2);
+	cr_assert_eq(args2.argc, 5);
+
+	Args args3;
+	args_build(&args3, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	sub_command_add_param(&sc1, &p2);
+	args_add_sub_command(&args3, &sc1);
+	const char *argv3[5] = {"prog", "sc1", "-x", "ok", "--help"};
+	cr_assert_eq(args3.argc, 0);
+	args_init(&args3, 5, argv3);
+	cr_assert_eq(args3.argc, 5);
+
+	__is_debug_misc_no_exit = false;
+}
+
+MyTest(args, test_value_of) {
+	__is_debug_misc_no_exit = true;
+
+	ArgsParam p2;
+	cr_assert(!args_param_build(&p2, "name2", "name2 help here", "x", true, true, "mydef"));
+
+	SubCommand sc1;
+	cr_assert(!sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"));
+	Args args1;
+	args_build(&args1, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	args_add_param(&args1, &p2);
+	args_add_sub_command(&args1, &sc1);
+
+	const char *argv1[5] = {"prog", "--name2", "ok", "sc1", "--help"};
+	cr_assert_eq(args1.argc, 0);
+	args_init(&args1, 5, argv1);
+	cr_assert_eq(args1.argc, 5);
+	cr_assert_eq(args_value_of(NULL, NULL, NULL, 0, 0), -2);
+
+	cr_assert_eq(args_value_of(&args1, "name2", NULL, 1, 0), -2);
+
+	char buf[2];
+	buf[0] = 0;
+	buf[1] = 0;
+	cr_assert_eq(args_value_of(&args1, "name2", buf, 2, 0), 2);
+	cr_assert(!strcmp(buf, "o"));
+
+	Args args2;
+	args_build(&args2, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	args_add_param(&args2, &p2);
+	sub_command_add_param(&sc1, &p2);
+	args_add_sub_command(&args2, &sc1);
+
+	const char *argv2[4] = {"prog", "sc1", "0", "--name2"};
+	cr_assert_eq(args2.argc, 0);
+	args_init(&args2, 4, argv2);
+	cr_assert_eq(args2.argc, 4);
+
+	cr_assert_eq(args_value_of(&args2, "name2", buf, 1, 0), 0);
+	cr_assert_eq(args_value_of(&args2, "name2", NULL, 10, 0), -2);
+
+	Args args3;
+	args_build(&args3, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	args_add_param(&args3, &p2);
+	args_add_sub_command(&args3, &sc1);
+
+	const char *argv3[8] = {"prog", "--name2", "ok1", "--name2", "ok2", "sc1", "0", "1"};
+	cr_assert_eq(args3.argc, 0);
+	args_init(&args3, 8, argv3);
+	cr_assert_eq(args3.argc, 8);
+
+	char buf2[20];
+	cr_assert_eq(args_value_of(&args3, "name2", buf2, 20, 0), 3);
+	cr_assert(!strcmp(buf2, "ok1"));
+	cr_assert_eq(args_value_of(&args3, "name2", buf2, 20, 1), 3);
+	cr_assert(!strcmp(buf2, "ok2"));
+
+	Args args4;
+	args_build(&args4, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+	args_add_param(&args4, &p2);
+	args_add_sub_command(&args4, &sc1);
+
+	const char *argv4[3] = {"prog", "sc1", "0"};
+	cr_assert_eq(args4.argc, 0);
+	args_init(&args4, 3, argv4);
+	cr_assert_eq(args4.argc, 3);
+
+	cr_assert_eq(args_value_of(&args4, "name2", buf2, 20, 0), 5);
+	cr_assert(!strcmp(buf2, "mydef"));
+
+	// if max_len > 0, buf cannot be NULL
+	cr_assert_eq(args_value_of(&args4, "name2", NULL, 1, 0), -2);
+
+	__is_debug_misc_no_exit = false;
+}
