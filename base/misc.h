@@ -32,6 +32,7 @@ int myfeof(MYFILE *stream);
 int myferror(MYFILE *stream);
 long myftell(MYFILE *stream);
 int myfseek(MYFILE *stream, long pos, int type);
+char *myfgets(char *str, int n, MYFILE *stream);
 int myfprintf(MYFILE *fptr, const char *str, ...);
 char *trim_whitespace(char *str);
 

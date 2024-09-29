@@ -26,8 +26,10 @@
 bool __is_debug_path_homedir_null = false;
 
 void path_cleanup(PathImpl *ptr) {
-	if (ptr->ptr)
+	if (ptr->ptr) {
 		myfree(ptr->ptr);
+		ptr->ptr = NULL;
+	}
 }
 
 int path_for(Path *p, const char *path) {

@@ -34,6 +34,10 @@ bool __is_debug_misc_unlink = false;
 bool __is_debug_misc_no_exit = false;
 bool __is_debug_misc_preserve = false;
 
+char *myfgets(char *str, int n, MYFILE *stream) {
+	return fgets(str, n, (FILE *)stream);
+}
+
 u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream) {
 	return fread(buffer, size, count, (FILE *)stream);
 }
