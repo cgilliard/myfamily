@@ -1,4 +1,20 @@
 var searchData=
 [
-  ['write_5fto_5fdisk_357',['write_to_disk',['../main_8h.html#add780f582425ce6db96ba74b6f83f88b',1,'write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size):&#160;real_main.c'],['../real__main_8c.html#add780f582425ce6db96ba74b6f83f88b',1,'write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size):&#160;real_main.c']]]
+  ['token_5fcleanup_440',['token_cleanup',['../tokenizer_8h.html#a2b4ba0afc028aa5248fcee7eade6b41c',1,'token_cleanup(TokenImpl *t):&#160;tokenizer.h'],['../tokenizer_8c.html#ac52728cdefef956e91f1e1725aedfdc6',1,'token_cleanup(Token *t):&#160;tokenizer.c']]],
+  ['token_5fdisplay_5ferror_441',['token_display_error',['../tokenizer_8c.html#a2919f2e8bd42e57fe0306a97ea2310e0',1,'token_display_error(Token *token, char *fmt,...):&#160;tokenizer.c'],['../tokenizer_8h.html#a2919f2e8bd42e57fe0306a97ea2310e0',1,'token_display_error(Token *token, char *fmt,...):&#160;tokenizer.c']]],
+  ['token_5fdisplay_5fimpl_442',['token_display_impl',['../tokenizer_8c.html#a52b3d5e18a43babc05afec7faab34437',1,'tokenizer.c']]],
+  ['token_5fdisplay_5fwarning_443',['token_display_warning',['../tokenizer_8c.html#a3c419f6aa683992d09c43bdea7d571e7',1,'token_display_warning(Token *token, char *fmt,...):&#160;tokenizer.c'],['../tokenizer_8h.html#a3c419f6aa683992d09c43bdea7d571e7',1,'token_display_warning(Token *token, char *fmt,...):&#160;tokenizer.c']]],
+  ['tokenizer_5fcleanup_444',['tokenizer_cleanup',['../tokenizer_8c.html#a6953ca728aeb2ce805e28f7450199d7e',1,'tokenizer_cleanup(Tokenizer *t):&#160;tokenizer.c'],['../tokenizer_8h.html#ae6a7e30d92890193c75f879fdbd70eac',1,'tokenizer_cleanup(TokenizerImpl *t):&#160;tokenizer.h']]],
+  ['tokenizer_5finit_445',['tokenizer_init',['../tokenizer_8c.html#a5f644351e0d1f202fe7a5c693084b8b5',1,'tokenizer_init(Tokenizer *t, char *line):&#160;tokenizer.c'],['../tokenizer_8h.html#a5f644351e0d1f202fe7a5c693084b8b5',1,'tokenizer_init(Tokenizer *t, char *line):&#160;tokenizer.c']]],
+  ['tokenizer_5fis_5fwhite_5fspace_446',['tokenizer_is_white_space',['../tokenizer_8c.html#a6f27b6b12c541757d046c8b71fbbaa7a',1,'tokenizer.c']]],
+  ['tokenizer_5fnext_5ftoken_447',['tokenizer_next_token',['../tokenizer_8c.html#a9e8bcd8048427ab1975d4c1a28a9139c',1,'tokenizer_next_token(Tokenizer *t, Token *next):&#160;tokenizer.c'],['../tokenizer_8h.html#a9e8bcd8048427ab1975d4c1a28a9139c',1,'tokenizer_next_token(Tokenizer *t, Token *next):&#160;tokenizer.c']]],
+  ['tokenizer_5fproc_5fchar_5fliteral_448',['tokenizer_proc_char_literal',['../tokenizer_8c.html#af6a0a27475b09215151b94e2ff786c9d',1,'tokenizer.c']]],
+  ['tokenizer_5fproc_5fident_449',['tokenizer_proc_ident',['../tokenizer_8c.html#a60fdf448e1fa56cc24b3a74ec9591a9a',1,'tokenizer.c']]],
+  ['tokenizer_5fproc_5fnum_5fliteral_450',['tokenizer_proc_num_literal',['../tokenizer_8c.html#a8f4100560232e41e299bf41f57d43829',1,'tokenizer.c']]],
+  ['tokenizer_5fproc_5fpunct_451',['tokenizer_proc_punct',['../tokenizer_8c.html#a12501b296edb3ee471704b1a50aacb54',1,'tokenizer.c']]],
+  ['tokenizer_5fproc_5fstring_5fliteral_452',['tokenizer_proc_string_literal',['../tokenizer_8c.html#aa7c6c8c3122adaf3ca43fe7285bda6e1',1,'tokenizer.c']]],
+  ['tokenizer_5fskip_5fcomments_453',['tokenizer_skip_comments',['../tokenizer_8c.html#ae94b2b4289e50c05b34d3ad9a3513e34',1,'tokenizer.c']]],
+  ['tokenizer_5fskip_5fto_5ftoken_454',['tokenizer_skip_to_token',['../tokenizer_8c.html#a81377f447852cd00f4c6fd29bf6d9f06',1,'tokenizer.c']]],
+  ['tokenizer_5fskip_5fwhite_5fspace_455',['tokenizer_skip_white_space',['../tokenizer_8c.html#a1096c017a6cd8334d5d03dd9413a25c5',1,'tokenizer.c']]],
+  ['trim_5fwhitespace_456',['trim_whitespace',['../misc_8c.html#ab9d9e7f95e187ee7b2eeb3fc8b67d4e8',1,'trim_whitespace(char *str):&#160;misc.c'],['../misc_8h.html#ab9d9e7f95e187ee7b2eeb3fc8b67d4e8',1,'trim_whitespace(char *str):&#160;misc.c']]]
 ];
