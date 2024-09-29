@@ -17,110 +17,109 @@
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <args/args.h>
-        -:   16:#include <base/misc.h>
-        -:   17:#include <base/path.h>
-        -:   18:#include <limits.h>
-        -:   19:#include <main/main.h>
-        -:   20:#include <stdio.h>
-        -:   21:#include <string.h>
-        -:   22:
-        -:   23:bool __is_debug_real_main_res_mkdir = false;
-        -:   24:
-       16:   25:void write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size) {
-        -:   26:	char path[PATH_MAX + 1];
-       16:   27:	snprintf(path, sizeof(path), "%s/%s", dir, file_name);
-       16:   28:	Path ensure_parent;
-       16:   29:	path_for(&ensure_parent, path);
-       16:   30:	const char *pfile_name = path_file_name(&ensure_parent);
-        -:   31:	char pfile_name_copy[PATH_MAX + 1];
-       16:   32:	strcpy(pfile_name_copy, pfile_name);
-       16:   33:	path_pop(&ensure_parent);
-       16:   34:	path_canonicalize(&ensure_parent);
-       16:   35:	path_mkdir(&ensure_parent, 0700, true);
-       16:   36:	path_push(&ensure_parent, pfile_name_copy);
-       16:   37:	MYFILE *f = myfopen(&ensure_parent, "wb");
-       16:   38:	if (f) {
-       15:   39:		myfwrite(data, 1, size, f);
-       15:   40:		myfclose(f);
-        -:   41:	} else {
-        1:   42:		exit_error("Could not open file for writing");
-        -:   43:	}
-       16:   44:}
-        -:   45:
-        4:   46:bool check_build_id(const char *config_dir) {
-        4:   47:	Path bid_file;
-        4:   48:	path_for(&bid_file, config_dir);
-        4:   49:	path_push(&bid_file, "build_id");
-        4:   50:	path_canonicalize(&bid_file);
-        -:   51:	// check build id
-        4:   52:	MYFILE *fp = myfopen(&bid_file, "r");
-        4:   53:	if (!fp) {
-        1:   54:		exit_error("could not open the build file");
-        1:   55:		return false;
-        -:   56:	}
-        -:   57:	char bid_file_contents[1024];
-        3:   58:	size_t rlen = read_all(bid_file_contents, 1, 100, fp);
-        3:   59:	bid_file_contents[rlen] = 0;
-        3:   60:	myfclose(fp);
-        3:   61:	return !strcmp(bid_file_contents, BUILD_ID);
-        -:   62:}
-        -:   63:
-        6:   64:void setup_config_dir(const char *config_dir) {
-        6:   65:	Path cd;
-        6:   66:	path_for(&cd, config_dir);
-        6:   67:	path_canonicalize(&cd);
-        6:   68:	if (path_exists(&cd)) {
-        2:   69:		if (check_build_id(config_dir))
-        1:   70:			return;
-        1:   71:		remove_directory(&cd, false);
-        -:   72:	}
-        5:   73:	fprintf(stderr, "Installing config directory at %s. Build id = %s\n", config_dir, BUILD_ID);
-        5:   74:	if (!path_mkdir(&cd, 0700, false)) {
-        1:   75:		exit_error("Could not create config directory at path [%s].", path_to_string(&cd));
-        1:   76:		return;
-        -:   77:	}
-        -:   78:
-        4:   79:	Path rd;
-        4:   80:	path_copy(&rd, &cd);
-        4:   81:	path_push(&rd, "resources");
-        -:   82:
-        4:   83:	if (__is_debug_real_main_res_mkdir || !path_mkdir(&rd, 0700, true)) {
-        1:   84:		exit_error("Could not create resources directory at path [%s].", path_to_string(&rd));
-        1:   85:		return;
-        -:   86:	}
-        -:   87:
-       15:   88:	BUILD_RESOURCE_DIR(path_to_string(&rd), fam);
-        3:   89:	WRITE_BUILD_ID(config_dir);
-        -:   90:}
-        -:   91:
-        1:   92:void build_args(Args *args, int argc, char **argv) {
-        1:   93:	SubCommand sc1;
-        1:   94:	if (sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"))
-    #####:   95:		exit_error("Could not build subcommand.");
+        -:   16:#include <assert.h>
+        -:   17:#include <base/misc.h>
+        -:   18:#include <base/path.h>
+        -:   19:#include <limits.h>
+        -:   20:#include <main/main.h>
+        -:   21:#include <stdio.h>
+        -:   22:#include <string.h>
+        -:   23:
+        -:   24:bool __is_debug_real_main_res_mkdir = false;
+        -:   25:
+       16:   26:void write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size) {
+        -:   27:	char path[PATH_MAX + 1];
+       16:   28:	snprintf(path, sizeof(path), "%s/%s", dir, file_name);
+       16:   29:	Path ensure_parent;
+       16:   30:	path_for(&ensure_parent, path);
+       16:   31:	const char *pfile_name = path_file_name(&ensure_parent);
+        -:   32:	char pfile_name_copy[PATH_MAX + 1];
+       16:   33:	strcpy(pfile_name_copy, pfile_name);
+       16:   34:	path_pop(&ensure_parent);
+       16:   35:	path_canonicalize(&ensure_parent);
+       16:   36:	path_mkdir(&ensure_parent, 0700, true);
+       16:   37:	path_push(&ensure_parent, pfile_name_copy);
+       16:   38:	MYFILE *f = myfopen(&ensure_parent, "wb");
+       16:   39:	if (f) {
+       15:   40:		myfwrite(data, 1, size, f);
+       15:   41:		myfclose(f);
+        -:   42:	} else {
+        1:   43:		exit_error("Could not open file for writing");
+        -:   44:	}
+       16:   45:}
+        -:   46:
+        4:   47:bool check_build_id(const char *config_dir) {
+        4:   48:	Path bid_file;
+        4:   49:	path_for(&bid_file, config_dir);
+        4:   50:	path_push(&bid_file, "build_id");
+        4:   51:	path_canonicalize(&bid_file);
+        -:   52:	// check build id
+        4:   53:	MYFILE *fp = myfopen(&bid_file, "r");
+        4:   54:	if (!fp) {
+        1:   55:		exit_error("could not open the build file");
+        1:   56:		return false;
+        -:   57:	}
+        -:   58:	char bid_file_contents[1024];
+        3:   59:	size_t rlen = read_all(bid_file_contents, 1, 100, fp);
+        3:   60:	bid_file_contents[rlen] = 0;
+        3:   61:	myfclose(fp);
+        3:   62:	return !strcmp(bid_file_contents, BUILD_ID);
+        -:   63:}
+        -:   64:
+        6:   65:void setup_config_dir(const char *config_dir) {
+        6:   66:	Path cd;
+        6:   67:	path_for(&cd, config_dir);
+        6:   68:	path_canonicalize(&cd);
+        6:   69:	if (path_exists(&cd)) {
+        2:   70:		if (check_build_id(config_dir))
+        1:   71:			return;
+        1:   72:		remove_directory(&cd, false);
+        -:   73:	}
+        5:   74:	fprintf(stderr, "Installing config directory at %s. Build id = %s\n", config_dir, BUILD_ID);
+        5:   75:	if (!path_mkdir(&cd, 0700, false)) {
+        1:   76:		exit_error("Could not create config directory at path [%s].", path_to_string(&cd));
+        1:   77:		return;
+        -:   78:	}
+        -:   79:
+        4:   80:	Path rd;
+        4:   81:	path_copy(&rd, &cd);
+        4:   82:	path_push(&rd, "resources");
+        -:   83:
+        4:   84:	if (__is_debug_real_main_res_mkdir || !path_mkdir(&rd, 0700, true)) {
+        1:   85:		exit_error("Could not create resources directory at path [%s].", path_to_string(&rd));
+        1:   86:		return;
+        -:   87:	}
+        -:   88:
+       15:   89:	BUILD_RESOURCE_DIR(path_to_string(&rd), fam);
+        3:   90:	WRITE_BUILD_ID(config_dir);
+        -:   91:}
+        -:   92:
+        1:   93:void build_args(Args *args, int argc, char **argv) {
+        1:   94:	SubCommand sc1;
+       1*:   95:	assert(!sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"));
         1:   96:	ArgsParam p1;
-        1:   97:	if (args_param_build(&p1, "name", "name help here", "n", false, false, "myname"))
-    #####:   98:		exit_error("Could not build param");
-        1:   99:	sub_command_add_param(&sc1, &p1);
-        -:  100:
-        1:  101:	ArgsParam p2;
-        1:  102:	args_param_build(&p2, "name2", "name2 help here", "x", true, false, NULL);
-        -:  103:
-        1:  104:	args_build(args, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
-        1:  105:	args_add_param(args, &p2);
-        1:  106:	args_add_sub_command(args, &sc1);
-        1:  107:}
-        -:  108:
-        1:  109:int real_main(int argc, char **argv) {
-        1:  110:	Args args;
-        1:  111:	build_args(&args, argc, argv);
-        -:  112:
-        1:  113:	setup_config_dir(DEFAULT_CONFIG_DIR);
-        1:  114:	return 0;
-        -:  115:}
+       1*:   97:	assert(!args_param_build(&p1, "name", "name help here", "n", false, false, "myname"));
+        1:   98:	sub_command_add_param(&sc1, &p1);
+        -:   99:
+        1:  100:	ArgsParam p2;
+        1:  101:	args_param_build(&p2, "name2", "name2 help here", "x", true, false, NULL);
+        -:  102:
+        1:  103:	args_build(args, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+        1:  104:	args_add_param(args, &p2);
+        1:  105:	args_add_sub_command(args, &sc1);
+        1:  106:}
+        -:  107:
+        1:  108:int real_main(int argc, char **argv) {
+        1:  109:	Args args;
+        1:  110:	build_args(&args, argc, argv);
+        -:  111:
+        1:  112:	setup_config_dir(DEFAULT_CONFIG_DIR);
+        1:  113:	return 0;
+        -:  114:}
         -:    0:Source:args.c
         -:    0:Graph:args.gcno
         -:    0:Data:args.gcda
-        -:    0:Runs:17
+        -:    0:Runs:20
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -145,105 +144,105 @@
         -:   22:#include <stdlib.h>
         -:   23:#include <string.h>
         -:   24:
-       35:   25:bool args_param_copy(ArgsParam *dst, const ArgsParam *src) {
-       35:   26:	dst->help = mymalloc(strlen(src->help) + 1);
-       35:   27:	if (dst->help == NULL)
+       54:   25:bool args_param_copy(ArgsParam *dst, const ArgsParam *src) {
+       54:   26:	dst->help = mymalloc(strlen(src->help) + 1);
+       54:   27:	if (dst->help == NULL)
         1:   28:		return false;
         -:   29:
-       34:   30:	if (src->default_value) {
-       24:   31:		dst->default_value = mymalloc(strlen(src->default_value) + 1);
-       24:   32:		if (dst->default_value == NULL) {
+       53:   30:	if (src->default_value) {
+       40:   31:		dst->default_value = mymalloc(strlen(src->default_value) + 1);
+       40:   32:		if (dst->default_value == NULL) {
         1:   33:			myfree(dst->help);
         1:   34:			return false;
         -:   35:		}
         -:   36:	}
         -:   37:
-       33:   38:	strcpy(dst->name, src->name);
-       33:   39:	strcpy(dst->help, src->help);
-       33:   40:	strcpy(dst->short_name, src->short_name);
-       33:   41:	dst->takes_value = src->takes_value;
-       33:   42:	dst->multiple = src->multiple;
-       33:   43:	if (src->default_value)
-       23:   44:		strcpy(dst->default_value, src->default_value);
+       52:   38:	strcpy(dst->name, src->name);
+       52:   39:	strcpy(dst->help, src->help);
+       52:   40:	strcpy(dst->short_name, src->short_name);
+       52:   41:	dst->takes_value = src->takes_value;
+       52:   42:	dst->multiple = src->multiple;
+       52:   43:	if (src->default_value)
+       39:   44:		strcpy(dst->default_value, src->default_value);
         -:   45:	else
-       10:   46:		dst->default_value = NULL;
+       13:   46:		dst->default_value = NULL;
         -:   47:
-       33:   48:	return true;
+       52:   48:	return true;
         -:   49:}
         -:   50:
-       41:   51:void args_param_cleanup(ArgsParamImpl *ptr) {
-       41:   52:	if (ptr->help) {
-       40:   53:		myfree(ptr->help);
-       40:   54:		ptr->help = NULL;
+       72:   51:void args_param_cleanup(ArgsParamImpl *ptr) {
+       72:   52:	if (ptr->help) {
+       71:   53:		myfree(ptr->help);
+       71:   54:		ptr->help = NULL;
         -:   55:	}
-       41:   56:	if (ptr->default_value) {
-       27:   57:		myfree(ptr->default_value);
-       27:   58:		ptr->default_value = NULL;
+       72:   56:	if (ptr->default_value) {
+       52:   57:		myfree(ptr->default_value);
+       52:   58:		ptr->default_value = NULL;
         -:   59:	}
-       41:   60:}
+       72:   60:}
         -:   61:
-       20:   62:int args_param_build(ArgsParam *ptr, const char *name, const char *help, const char *short_name,
+       32:   62:int args_param_build(ArgsParam *ptr, const char *name, const char *help, const char *short_name,
         -:   63:					 const bool takes_value, const bool multiple, const char *default_value) {
-       20:   64:	if (ptr == NULL || name == NULL || help == NULL || short_name == NULL) {
+       32:   64:	if (ptr == NULL || name == NULL || help == NULL || short_name == NULL) {
         1:   65:		print_error("Input may not be NULL");
         1:   66:		errno = EINVAL;
         1:   67:		return -1;
         -:   68:	}
         -:   69:
-       19:   70:	if (strlen(name) > ARGS_MAX_ARGUMENT_NAME_LENGTH ||
-       18:   71:		strlen(short_name) > ARGS_MAX_ARGUMENT_NAME_LENGTH) {
+       31:   70:	if (strlen(name) > ARGS_MAX_ARGUMENT_NAME_LENGTH ||
+       30:   71:		strlen(short_name) > ARGS_MAX_ARGUMENT_NAME_LENGTH) {
         1:   72:		print_error("Input too long");
         1:   73:		errno = EINVAL;
         1:   74:		return -1;
         -:   75:	}
         -:   76:
-       18:   77:	u64 help_len = strlen(help);
-       18:   78:	u64 default_value_len = 0;
-       18:   79:	if (default_value)
-       11:   80:		default_value_len = strlen(default_value);
+       30:   77:	u64 help_len = strlen(help);
+       30:   78:	u64 default_value_len = 0;
+       30:   79:	if (default_value)
+       20:   80:		default_value_len = strlen(default_value);
         -:   81:
-       18:   82:	ptr->help = mymalloc(sizeof(char) * (help_len + 1));
-       18:   83:	if (default_value)
-       11:   84:		ptr->default_value = mymalloc(sizeof(char) * (default_value_len + 1));
+       30:   82:	ptr->help = mymalloc(sizeof(char) * (help_len + 1));
+       30:   83:	if (default_value)
+       20:   84:		ptr->default_value = mymalloc(sizeof(char) * (default_value_len + 1));
         -:   85:
-       18:   86:	if (ptr->help == NULL || (ptr->default_value == NULL && default_value)) {
+       30:   86:	if (ptr->help == NULL || (ptr->default_value == NULL && default_value)) {
         1:   87:		print_error("Input may not be NULL");
         1:   88:		args_param_cleanup(ptr);
         1:   89:		return -1;
         -:   90:	}
         -:   91:
-       17:   92:	strcpy(ptr->name, name);
-       17:   93:	strcpy(ptr->short_name, short_name);
-       17:   94:	strcpy(ptr->help, help);
-       17:   95:	if (default_value)
-       10:   96:		strcpy(ptr->default_value, default_value);
+       29:   92:	strcpy(ptr->name, name);
+       29:   93:	strcpy(ptr->short_name, short_name);
+       29:   94:	strcpy(ptr->help, help);
+       29:   95:	if (default_value)
+       19:   96:		strcpy(ptr->default_value, default_value);
         -:   97:	else
-        7:   98:		ptr->default_value = NULL;
-       17:   99:	ptr->takes_value = takes_value;
-       17:  100:	ptr->multiple = multiple;
+       10:   98:		ptr->default_value = NULL;
+       29:   99:	ptr->takes_value = takes_value;
+       29:  100:	ptr->multiple = multiple;
         -:  101:
-       17:  102:	return 0;
+       29:  102:	return 0;
         -:  103:}
         -:  104:
-       36:  105:bool sub_command_copy(SubCommand *dst, const SubCommand *src) {
-       36:  106:	if (src->help == NULL)
+       49:  105:bool sub_command_copy(SubCommand *dst, const SubCommand *src) {
+       49:  106:	if (src->help == NULL)
         2:  107:		return false;
-       34:  108:	dst->help = mymalloc(strlen(src->help) + 1);
-       34:  109:	if (dst->help == NULL)
+       47:  108:	dst->help = mymalloc(strlen(src->help) + 1);
+       47:  109:	if (dst->help == NULL)
         1:  110:		return false;
         -:  111:
-       33:  112:	if (src->arg_doc) {
-       32:  113:		dst->arg_doc = mymalloc(strlen(src->arg_doc) + 1);
-       32:  114:		if (dst->arg_doc == NULL) {
+       46:  112:	if (src->arg_doc) {
+       45:  113:		dst->arg_doc = mymalloc(strlen(src->arg_doc) + 1);
+       45:  114:		if (dst->arg_doc == NULL) {
         1:  115:			myfree(dst->help);
         1:  116:			return false;
         -:  117:		}
         -:  118:	}
         -:  119:
-       32:  120:	if (src->param_count == 0) {
-       19:  121:		dst->param_count = 0;
-       19:  122:		dst->is_specified = NULL;
-       19:  123:		dst->params = NULL;
+       45:  120:	if (src->param_count == 0) {
+       32:  121:		dst->param_count = 0;
+       32:  122:		dst->is_specified = NULL;
+       32:  123:		dst->params = NULL;
         -:  124:	} else {
        13:  125:		dst->params = mymalloc(sizeof(ArgsParam) * src->param_count);
        13:  126:		dst->is_specified = mymalloc(sizeof(bool) * src->param_count);
@@ -267,112 +266,112 @@
        11:  144:		dst->param_count = src->param_count;
         -:  145:	}
         -:  146:
-       30:  147:	strcpy(dst->name, src->name);
-       30:  148:	strcpy(dst->help, src->help);
-       30:  149:	if (src->arg_doc)
-       29:  150:		strcpy(dst->arg_doc, src->arg_doc);
+       43:  147:	strcpy(dst->name, src->name);
+       43:  148:	strcpy(dst->help, src->help);
+       43:  149:	if (src->arg_doc)
+       42:  150:		strcpy(dst->arg_doc, src->arg_doc);
         -:  151:	else
         1:  152:		dst->arg_doc = NULL;
         -:  153:
-       30:  154:	dst->min_args = src->min_args;
-       30:  155:	dst->max_args = src->max_args;
+       43:  154:	dst->min_args = src->min_args;
+       43:  155:	dst->max_args = src->max_args;
         -:  156:
-       30:  157:	return true;
+       43:  157:	return true;
         -:  158:}
         -:  159:
-       51:  160:void sub_command_cleanup(SubCommandImpl *sc) {
-       78:  161:	for (u32 i = 0; i < sc->param_count; i++) {
-       27:  162:		args_param_cleanup(&sc->params[i]);
+       77:  160:void sub_command_cleanup(SubCommandImpl *sc) {
+      123:  161:	for (u32 i = 0; i < sc->param_count; i++) {
+       46:  162:		args_param_cleanup(&sc->params[i]);
         -:  163:	}
-       51:  164:	if (sc->params) {
-       24:  165:		myfree(sc->params);
-       24:  166:		sc->params = NULL;
+       77:  164:	if (sc->params) {
+       34:  165:		myfree(sc->params);
+       34:  166:		sc->params = NULL;
         -:  167:	}
-       51:  168:	if (sc->help) {
-       51:  169:		myfree(sc->help);
-       51:  170:		sc->help = NULL;
+       77:  168:	if (sc->help) {
+       77:  169:		myfree(sc->help);
+       77:  170:		sc->help = NULL;
         -:  171:	}
-       51:  172:	if (sc->arg_doc) {
-       48:  173:		myfree(sc->arg_doc);
-       48:  174:		sc->arg_doc = NULL;
+       77:  172:	if (sc->arg_doc) {
+       74:  173:		myfree(sc->arg_doc);
+       74:  174:		sc->arg_doc = NULL;
         -:  175:	}
-       51:  176:	if (sc->is_specified) {
-       24:  177:		myfree(sc->is_specified);
-       24:  178:		sc->is_specified = NULL;
+       77:  176:	if (sc->is_specified) {
+       34:  177:		myfree(sc->is_specified);
+       34:  178:		sc->is_specified = NULL;
         -:  179:	}
-       51:  180:}
+       77:  180:}
         -:  181:
-       32:  182:int sub_command_build(SubCommand *sc, const char *name, const char *help, const u32 min_args,
+       45:  182:int sub_command_build(SubCommand *sc, const char *name, const char *help, const u32 min_args,
         -:  183:					  const u32 max_args, const char *arg_doc) {
-       32:  184:	if (sc == NULL || name == NULL || help == NULL || min_args > max_args) {
+       45:  184:	if (sc == NULL || name == NULL || help == NULL || min_args > max_args) {
         2:  185:		errno = EINVAL;
         2:  186:		print_error("Invalid input");
         2:  187:		return -1;
         -:  188:	}
-       30:  189:	sc->params = NULL;
-       30:  190:	sc->help = NULL;
-       30:  191:	sc->arg_doc = NULL;
-       30:  192:	sc->is_specified = NULL;
-       30:  193:	sc->param_count = 0;
+       43:  189:	sc->params = NULL;
+       43:  190:	sc->help = NULL;
+       43:  191:	sc->arg_doc = NULL;
+       43:  192:	sc->is_specified = NULL;
+       43:  193:	sc->param_count = 0;
         -:  194:
-       30:  195:	if (strlen(name) > ARGS_MAX_SUBCOMMAND_LENGTH || min_args > max_args) {
+       43:  195:	if (strlen(name) > ARGS_MAX_SUBCOMMAND_LENGTH || min_args > max_args) {
         1:  196:		print_error("Invalid input");
         1:  197:		errno = EINVAL;
         1:  198:		return -1;
         -:  199:	}
         -:  200:
-       29:  201:	if (help) {
-       29:  202:		sc->help = mymalloc(sizeof(char) * strlen(help) + 1);
-       29:  203:		if (sc->help == NULL) {
+       42:  201:	if (help) {
+       42:  202:		sc->help = mymalloc(sizeof(char) * strlen(help) + 1);
+       42:  203:		if (sc->help == NULL) {
         1:  204:			print_error("Could not allocate sufficient memory");
         1:  205:			return -1;
         -:  206:		}
-       28:  207:		strcpy(sc->help, help);
+       41:  207:		strcpy(sc->help, help);
         -:  208:	}
         -:  209:
-       28:  210:	if (arg_doc) {
-       27:  211:		sc->arg_doc = mymalloc(sizeof(char) * strlen(arg_doc) + 1);
-       27:  212:		if (sc->arg_doc == NULL) {
+       41:  210:	if (arg_doc) {
+       40:  211:		sc->arg_doc = mymalloc(sizeof(char) * strlen(arg_doc) + 1);
+       40:  212:		if (sc->arg_doc == NULL) {
         1:  213:			print_error("Could not allocate sufficient memory");
         1:  214:			sub_command_cleanup(sc);
         1:  215:			return -1;
         -:  216:		}
-       26:  217:		strcpy(sc->arg_doc, arg_doc);
+       39:  217:		strcpy(sc->arg_doc, arg_doc);
         -:  218:	}
         -:  219:
-       27:  220:	strcpy(sc->name, name);
-       27:  221:	sc->min_args = min_args;
-       27:  222:	sc->max_args = max_args;
+       40:  220:	strcpy(sc->name, name);
+       40:  221:	sc->min_args = min_args;
+       40:  222:	sc->max_args = max_args;
         -:  223:
-       27:  224:	return 0;
+       40:  224:	return 0;
         -:  225:}
         -:  226:
-       25:  227:int sub_command_add_param(SubCommand *sc, const ArgsParam *ap) {
-       25:  228:	if (sc->params) {
+       44:  227:int sub_command_add_param(SubCommand *sc, const ArgsParam *ap) {
+       44:  228:	if (sc->params) {
         -:  229:		// already exists so realloc
         -:  230:		void *tmp;
-        4:  231:		tmp = myrealloc(sc->params, sizeof(ArgsParam) * (sc->param_count + 1));
-        4:  232:		if (tmp == NULL) {
+       13:  231:		tmp = myrealloc(sc->params, sizeof(ArgsParam) * (sc->param_count + 1));
+       13:  232:		if (tmp == NULL) {
         1:  233:			print_error("Could not allocate sufficient memory");
         1:  234:			return -1;
         -:  235:		}
-        3:  236:		sc->params = tmp;
-        3:  237:		tmp = myrealloc(sc->is_specified, sizeof(bool) * (sc->param_count + 1));
-        3:  238:		if (tmp == NULL) {
+       12:  236:		sc->params = tmp;
+       12:  237:		tmp = myrealloc(sc->is_specified, sizeof(bool) * (sc->param_count + 1));
+       12:  238:		if (tmp == NULL) {
         1:  239:			print_error("Could not allocate sufficient memory");
         1:  240:			return -1;
         -:  241:		}
-        2:  242:		sc->is_specified = tmp;
+       11:  242:		sc->is_specified = tmp;
         -:  243:
-        2:  244:		args_param_copy(&sc->params[sc->param_count], ap);
-        2:  245:		sc->is_specified[sc->param_count] = false;
+       11:  244:		args_param_copy(&sc->params[sc->param_count], ap);
+       11:  245:		sc->is_specified[sc->param_count] = false;
         -:  246:
-        2:  247:		sc->param_count += 1;
+       11:  247:		sc->param_count += 1;
         -:  248:	} else {
-       21:  249:		sc->params = mymalloc(sizeof(ArgsParam));
-       21:  250:		sc->is_specified = mymalloc(sizeof(bool));
+       31:  249:		sc->params = mymalloc(sizeof(ArgsParam));
+       31:  250:		sc->is_specified = mymalloc(sizeof(bool));
         -:  251:
-       21:  252:		if (sc->params == NULL || sc->is_specified == NULL) {
+       31:  252:		if (sc->params == NULL || sc->is_specified == NULL) {
         2:  253:			if (sc->params) {
         1:  254:				myfree(sc->params);
         1:  255:				sc->params = NULL;
@@ -385,882 +384,889 @@
         2:  262:			return -1;
         -:  263:		}
         -:  264:
-       19:  265:		args_param_copy(&sc->params[sc->param_count], ap);
-       19:  266:		sc->is_specified[sc->param_count] = false;
-       19:  267:		sc->param_count += 1;
+       29:  265:		args_param_copy(&sc->params[sc->param_count], ap);
+       29:  266:		sc->is_specified[sc->param_count] = false;
+       29:  267:		sc->param_count += 1;
         -:  268:	}
-       21:  269:	return 0;
+       40:  269:	return 0;
         -:  270:}
         -:  271:
-       14:  272:void args_cleanup(ArgsImpl *ptr) {
-       38:  273:	for (u32 i = 0; i < ptr->subs_count; i++) {
-       24:  274:		sub_command_cleanup(&ptr->subs[i]);
+       24:  272:void args_cleanup(ArgsImpl *ptr) {
+       61:  273:	for (u32 i = 0; i < ptr->subs_count; i++) {
+       37:  274:		sub_command_cleanup(&ptr->subs[i]);
         -:  275:	}
-       14:  276:	ptr->subs_count = 0;
-       14:  277:	if (ptr->subs) {
-       14:  278:		myfree(ptr->subs);
-       14:  279:		ptr->subs = NULL;
+       24:  276:	ptr->subs_count = 0;
+       24:  277:	if (ptr->subs) {
+       24:  278:		myfree(ptr->subs);
+       24:  279:		ptr->subs = NULL;
         -:  280:	}
-       59:  281:	for (u64 i = 0; i < ptr->argc; i++) {
-       45:  282:		myfree(ptr->argv[i]);
+      104:  281:	for (u64 i = 0; i < ptr->argc; i++) {
+       80:  282:		myfree(ptr->argv[i]);
         -:  283:	}
-       14:  284:	if (ptr->argc) {
-        9:  285:		myfree(ptr->argv);
-        9:  286:		ptr->argc = 0;
+       24:  284:	if (ptr->argc) {
+       15:  285:		myfree(ptr->argv);
+       15:  286:		ptr->argc = 0;
         -:  287:	}
-       14:  288:}
+       24:  288:}
         -:  289:
-       20:  290:int args_build(Args *args, const char *prog, const char *version, const char *author,
+       30:  290:int args_build(Args *args, const char *prog, const char *version, const char *author,
         -:  291:			   const u32 min_args, const u32 max_args, const char *arch) {
-       20:  292:	if (prog == NULL || version == NULL || author == NULL) {
+       30:  292:	if (prog == NULL || version == NULL || author == NULL) {
         1:  293:		print_error("Input may not be NULL");
         1:  294:		errno = EINVAL;
         1:  295:		return -1;
         -:  296:	}
         -:  297:
-       19:  298:	if (strlen(prog) > ARGS_MAX_DETAIL_LENGTH || strlen(version) > ARGS_MAX_DETAIL_LENGTH ||
-       18:  299:		strlen(author) > ARGS_MAX_DETAIL_LENGTH) {
+       29:  298:	if (strlen(prog) > ARGS_MAX_DETAIL_LENGTH || strlen(version) > ARGS_MAX_DETAIL_LENGTH ||
+       28:  299:		strlen(author) > ARGS_MAX_DETAIL_LENGTH) {
         1:  300:		print_error("Input too long");
         1:  301:		errno = EINVAL;
         1:  302:		return -1;
         -:  303:	}
         -:  304:
         -:  305:	// first subcommand is our params (set it up)
-       18:  306:	args->subs_count = 0;
-       18:  307:	args->subs = NULL;
+       28:  306:	args->subs_count = 0;
+       28:  307:	args->subs = NULL;
         -:  308:
         -:  309:	SubCommandImpl sc;
-       18:  310:	if (sub_command_build(&sc, "", "", min_args, max_args, "")) {
+       28:  310:	if (sub_command_build(&sc, "", "", min_args, max_args, "")) {
         1:  311:		args->subs_count = 0;
         1:  312:		args->subs = NULL;
         1:  313:		return -1;
         -:  314:	}
-       17:  315:	args_add_sub_command(args, &sc);
-       17:  316:	sub_command_cleanup(&sc);
+       27:  315:	args_add_sub_command(args, &sc);
+       27:  316:	sub_command_cleanup(&sc);
         -:  317:
-       17:  318:	strcpy(args->prog, prog);
-       17:  319:	strcpy(args->version, version);
-       17:  320:	strcpy(args->author, author);
+       27:  318:	strcpy(args->prog, prog);
+       27:  319:	strcpy(args->version, version);
+       27:  320:	strcpy(args->author, author);
         -:  321:
-       17:  322:	if (arch != NULL)
-       13:  323:		strcpy(args->arch, arch);
+       27:  322:	if (arch != NULL)
+       23:  323:		strcpy(args->arch, arch);
         -:  324:	else
         4:  325:		strcpy(args->arch, "");
         -:  326:
-       17:  327:	args->argv = NULL;
-       17:  328:	args->argc = 0;
+       27:  327:	args->argv = NULL;
+       27:  328:	args->argc = 0;
         -:  329:
-       17:  330:	return 0;
+       27:  330:	return 0;
         -:  331:}
         -:  332:
-       13:  333:void args_exit_error(const Args *args, char *format, ...) {
+       27:  333:void args_exit_error(const Args *args, char *format, ...) {
         -:  334:	va_list va_args;
-       13:  335:	va_start(va_args, format);
-       13:  336:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
-       13:  337:	vfprintf(stderr, format, va_args);
-       13:  338:	fprintf(stderr, "\n\n");
-       26:  339:	fprintf(stderr,
+       27:  335:	va_start(va_args, format);
+       27:  336:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+       27:  337:	vfprintf(stderr, format, va_args);
+       27:  338:	fprintf(stderr, "\n\n");
+       54:  339:	fprintf(stderr,
         -:  340:			"%sUSAGE%s:\n    %s%s%s [%sOPTIONS%s]\n\nFor more information "
         -:  341:			"try %s--help%s\n",
-       13:  342:			DIMMED, RESET, BRIGHT_RED, args->prog, RESET, DIMMED, RESET, GREEN, RESET);
-       13:  343:	va_end(va_args);
-      13*:  344:	EXIT_ERR_IF_NO_DEBUG(-1);
-       13:  345:}
+       27:  342:			DIMMED, RESET, BRIGHT_RED, args->prog, RESET, DIMMED, RESET, GREEN, RESET);
+       27:  343:	va_end(va_args);
+      27*:  344:	EXIT_ERR_IF_NO_DEBUG(-1);
+       27:  345:}
         -:  346:
-       11:  347:int args_add_param(Args *args, const ArgsParam *ap) {
-       11:  348:	return sub_command_add_param(&args->subs[0], ap);
+       30:  347:int args_add_param(Args *args, const ArgsParam *ap) {
+       30:  348:	return sub_command_add_param(&args->subs[0], ap);
         -:  349:}
-       32:  350:int args_add_sub_command(Args *args, SubCommand *sc) {
-       32:  351:	if (args->subs_count == 0) {
-       18:  352:		args->subs = mymalloc(sizeof(SubCommand));
-       18:  353:		if (args->subs == NULL) {
+       45:  350:int args_add_sub_command(Args *args, SubCommand *sc) {
+       45:  351:	if (args->subs_count == 0) {
+       28:  352:		args->subs = mymalloc(sizeof(SubCommand));
+       28:  353:		if (args->subs == NULL) {
         1:  354:			print_error("Could not allocate sufficient memory");
         1:  355:			return -1;
         -:  356:		}
         -:  357:	} else {
-       14:  358:		void *tmp = myrealloc(args->subs, sizeof(SubCommand) * (args->subs_count + 1));
-       14:  359:		if (tmp == NULL) {
+       17:  358:		void *tmp = myrealloc(args->subs, sizeof(SubCommand) * (args->subs_count + 1));
+       17:  359:		if (tmp == NULL) {
         1:  360:			print_error("Could not allocate sufficient memory");
         1:  361:			return -1;
         -:  362:		}
-       13:  363:		args->subs = tmp;
+       16:  363:		args->subs = tmp;
         -:  364:	}
         -:  365:
-       30:  366:	bool ret = sub_command_copy(&args->subs[args->subs_count], sc);
-       30:  367:	if (ret)
-       29:  368:		args->subs_count++;
+       43:  366:	bool ret = sub_command_copy(&args->subs[args->subs_count], sc);
+       43:  367:	if (ret)
+       42:  368:		args->subs_count++;
         -:  369:
-       30:  370:	if (ret)
-       29:  371:		return 0;
+       43:  370:	if (ret)
+       42:  371:		return 0;
         -:  372:	else
         1:  373:		return -1;
         -:  374:}
         -:  375:
-        8:  376:u64 args_subi_for(const Args *args, const char *sub) {
-        8:  377:	u64 subi = 0;
-       16:  378:	for (u64 i = 1; i < args->subs_count; i++) {
-        8:  379:		if (!strcmp(sub, args->subs[i].name)) {
-        8:  380:			subi = i;
+       10:  376:u64 args_subi_for(const Args *args, const char *sub) {
+       10:  377:	u64 subi = 0;
+       20:  378:	for (u64 i = 1; i < args->subs_count; i++) {
+       10:  379:		if (!strcmp(sub, args->subs[i].name)) {
+        9:  380:			subi = i;
         -:  381:		}
         -:  382:	}
-        8:  383:	return subi;
+       10:  383:	return subi;
         -:  384:}
         -:  385:
-       27:  386:bool args_sub_takes_value(const Args *args, u64 subi, const char *name, bool is_short) {
-       37:  387:	for (u64 i = 0; i < args->subs[subi].param_count; i++) {
-       29:  388:		if (is_short && !strcmp(name, args->subs[subi].params[i].short_name)) {
-        5:  389:			if (args->subs[subi].params[i].takes_value) {
-        5:  390:				return true;
+       45:  386:bool args_sub_takes_value(const Args *args, u64 subi, const char *name, bool is_short) {
+       77:  387:	for (u64 i = 0; i < args->subs[subi].param_count; i++) {
+       67:  388:		if (is_short && !strcmp(name, args->subs[subi].params[i].short_name)) {
+       15:  389:			if (args->subs[subi].params[i].takes_value) {
+       13:  390:				return true;
         -:  391:			} else
-    #####:  392:				break;
-       24:  393:		} else if (!strcmp(name, args->subs[subi].params[i].name)) {
-       14:  394:			if (args->subs[subi].params[i].takes_value) {
-       12:  395:				return true;
+        2:  392:				break;
+       52:  393:		} else if (!strcmp(name, args->subs[subi].params[i].name)) {
+       20:  394:			if (args->subs[subi].params[i].takes_value) {
+       18:  395:				return true;
         -:  396:			} else
         2:  397:				break;
         -:  398:		}
         -:  399:	}
-       10:  400:	return false;
+       14:  400:	return false;
         -:  401:}
         -:  402:
-       12:  403:bool args_check_option(const Args *args, u64 subi, const char *name, bool is_short,
+       21:  403:bool args_check_option(const Args *args, u64 subi, const char *name, bool is_short,
         -:  404:					   const char *argv) {
-       12:  405:	bool found = false;
-       17:  406:	for (u64 j = 0; j < args->subs[subi].param_count; j++) {
-       13:  407:		bool multi = args->subs[subi].params[j].multiple;
-       13:  408:		if (is_short && !strcmp(args->subs[subi].params[j].short_name, name)) {
-        2:  409:			found = true;
-       2*:  410:			if (args->subs[subi].is_specified[j] && !multi)
-    #####:  411:				args_exit_error(args, "Option: %s was spsecified more than once ", argv);
-        2:  412:			args->subs[subi].is_specified[j] = true;
-        2:  413:			break;
-       11:  414:		} else if (!is_short && !strcmp(args->subs[subi].params[j].name, name)) {
-        6:  415:			found = true;
-        6:  416:			if (args->subs[subi].is_specified[j] && !multi)
-    #####:  417:				args_exit_error(args, "Option: %s was spsecified more than once ", argv);
-        6:  418:			args->subs[subi].is_specified[j] = true;
-        6:  419:			break;
-        -:  420:		}
-        -:  421:	}
-       12:  422:	return found;
-        -:  423:}
-        -:  424:
-        9:  425:void args_check_validity(const Args *args, int argc, const char **argv) {
-        -:  426:	// check if there's a sub command and check arg count
-        9:  427:	const char *sub = NULL;
-        9:  428:	u32 arg_count = 0;
-        9:  429:	u64 subi = 0;
-        9:  430:	u64 sub_arg = UINT64_MAX;
-       35:  431:	for (u64 i = 1; i < argc; i++) {
-       26:  432:		u64 len = strlen(argv[i]);
-       38:  433:		if (len > 0 && argv[i][0] == '-') {
-       12:  434:			char name[len];
-        -:  435:			bool is_short;
-       12:  436:			bool found = false;
-       12:  437:			if (len > 1 && args->argv[i][1] == '-') {
-       10:  438:				strcpy(name, args->argv[i] + 2);
-       10:  439:				is_short = false;
-        -:  440:			} else {
-        2:  441:				strcpy(name, args->argv[i] + 1);
-        2:  442:				is_short = true;
-        -:  443:			}
-       12:  444:			if (args_sub_takes_value(args, subi, name, is_short)) {
-        7:  445:				i += 1;
-        -:  446:			}
-        -:  447:		} else {
-       14:  448:			if (!sub && args->subs_count > 1) {
-        8:  449:				sub = argv[i];
-        8:  450:				sub_arg = i;
-        8:  451:				subi = args_subi_for(args, sub);
-        -:  452:			} else
-        6:  453:				arg_count += 1;
-        -:  454:		}
-        -:  455:	}
-        -:  456:
-        9:  457:	u64 sub_index = 0;
-        9:  458:	if (sub) {
-        -:  459:		// there's a sub so validate it
-        8:  460:		bool valid = false;
-       8*:  461:		for (u64 i = 1; i < args->subs_count; i++) {
-        8:  462:			if (!strcmp(sub, args->subs[i].name)) {
-        8:  463:				valid = true;
-        8:  464:				if (arg_count > args->subs[i].max_args || arg_count < args->subs[i].min_args) {
-        4:  465:					args_exit_error(args,
-        -:  466:									"Incorrect number of "
-        -:  467:									"arguments for sub command '%s' "
-        -:  468:									"(%i specified). "
-        -:  469:									"Number of arguments must be "
-        -:  470:									"between %i and %i.",
-        4:  471:									args->subs[i].name, arg_count, args->subs[i].min_args,
-        4:  472:									args->subs[i].max_args);
-        -:  473:				}
-        8:  474:				sub_index = i;
-        -:  475:
-        8:  476:				break;
-        -:  477:			}
-        -:  478:		}
-        8:  479:		if (!valid) {
-    #####:  480:			args_exit_error(args, "Unknown SubCommand \"%s\"", sub);
-        -:  481:		}
-        1:  482:	} else if (args->subs_count > 1) {
-        1:  483:		args_usage(args, NULL);
-        -:  484:	} else {
-        -:  485:		// check number of args
-    #####:  486:		if (arg_count > args->subs[0].max_args || arg_count < args->subs[0].min_args) {
-    #####:  487:			args_exit_error(args,
-        -:  488:							"Incorrect number of arguments "
-        -:  489:							"(%i specified). "
-        -:  490:							"Number of arguments must be "
-        -:  491:							"between %i and %i.",
-    #####:  492:							arg_count, args->subs[0].min_args, args->subs[0].max_args);
-        -:  493:		}
-        -:  494:	}
-        -:  495:
-        -:  496:	// check options
-       34:  497:	for (u64 i = 1; i < argc; i++) {
-        -:  498:		u64 subi;
-       26:  499:		if (i <= sub_arg) {
-       13:  500:			subi = 0;
-        -:  501:		} else {
-       13:  502:			subi = sub_index;
-        -:  503:		}
-        -:  504:
-       26:  505:		u64 len = strlen(argv[i]);
-       26:  506:		if (len > 0 && argv[i][0] == '-') {
-        -:  507:			// option to check
-       12:  508:			char name[len];
-        -:  509:			bool is_short;
-       12:  510:			bool found = false;
-       12:  511:			if (len > 1 && args->argv[i][1] == '-') {
-       10:  512:				strcpy(name, args->argv[i] + 2);
-       10:  513:				is_short = false;
-        -:  514:			} else {
-        2:  515:				strcpy(name, args->argv[i] + 1);
-        2:  516:				is_short = true;
-        -:  517:			}
-        -:  518:
-       12:  519:			found = args_check_option(args, subi, name, is_short, argv[i]);
-       12:  520:			if (args_sub_takes_value(args, subi, name, is_short)) {
-        7:  521:				i += 1;
+       21:  405:	bool found = false;
+       37:  406:	for (u64 j = 0; j < args->subs[subi].param_count; j++) {
+       32:  407:		bool multi = args->subs[subi].params[j].multiple;
+       32:  408:		if (is_short && !strcmp(args->subs[subi].params[j].short_name, name)) {
+        7:  409:			found = true;
+        7:  410:			if (args->subs[subi].is_specified[j] && !multi) {
+        1:  411:				args_exit_error(args, "Option: %s was spsecified more than once ", argv);
+        1:  412:				return false;
+        -:  413:			}
+        6:  414:			args->subs[subi].is_specified[j] = true;
+        6:  415:			break;
+       25:  416:		} else if (!is_short && !strcmp(args->subs[subi].params[j].name, name)) {
+        9:  417:			found = true;
+        9:  418:			if (args->subs[subi].is_specified[j] && !multi) {
+        1:  419:				args_exit_error(args, "Option: %s was spsecified more than once ", argv);
+        1:  420:				return false;
+        -:  421:			}
+        8:  422:			args->subs[subi].is_specified[j] = true;
+        8:  423:			break;
+        -:  424:		}
+        -:  425:	}
+       19:  426:	return found;
+        -:  427:}
+        -:  428:
+       13:  429:void args_check_validity(const Args *args, int argc, const char **argv) {
+        -:  430:	// check if there's a sub command and check arg count
+       13:  431:	const char *sub = NULL;
+       13:  432:	u32 arg_count = 0;
+       13:  433:	u64 subi = 0;
+       13:  434:	u64 sub_arg = UINT64_MAX;
+       61:  435:	for (u64 i = 1; i < argc; i++) {
+       48:  436:		u64 len = strlen(argv[i]);
+       69:  437:		if (len > 0 && argv[i][0] == '-') {
+       21:  438:			char name[len];
+        -:  439:			bool is_short;
+       21:  440:			bool found = false;
+       21:  441:			if (len > 1 && args->argv[i][1] == '-') {
+       14:  442:				strcpy(name, args->argv[i] + 2);
+       14:  443:				is_short = false;
+        -:  444:			} else {
+        7:  445:				strcpy(name, args->argv[i] + 1);
+        7:  446:				is_short = true;
+        -:  447:			}
+       21:  448:			if (args_sub_takes_value(args, subi, name, is_short)) {
+       14:  449:				i += 1;
+        -:  450:			}
+        -:  451:		} else {
+       27:  452:			if (!sub && args->subs_count > 1) {
+       10:  453:				sub = argv[i];
+       10:  454:				sub_arg = i;
+       10:  455:				subi = args_subi_for(args, sub);
+        -:  456:			} else
+       17:  457:				arg_count += 1;
+        -:  458:		}
+        -:  459:	}
+        -:  460:
+       13:  461:	u64 sub_index = 0;
+       13:  462:	if (sub) {
+        -:  463:		// there's a sub so validate it
+       10:  464:		bool valid = false;
+       11:  465:		for (u64 i = 1; i < args->subs_count; i++) {
+       10:  466:			if (!strcmp(sub, args->subs[i].name)) {
+        9:  467:				valid = true;
+        9:  468:				if (arg_count > args->subs[i].max_args || arg_count < args->subs[i].min_args) {
+        4:  469:					args_exit_error(args,
+        -:  470:									"Incorrect number of "
+        -:  471:									"arguments for sub command '%s' "
+        -:  472:									"(%i specified). "
+        -:  473:									"Number of arguments must be "
+        -:  474:									"between %i and %i.",
+        4:  475:									args->subs[i].name, arg_count, args->subs[i].min_args,
+        4:  476:									args->subs[i].max_args);
+        -:  477:				}
+        9:  478:				sub_index = i;
+        -:  479:
+        9:  480:				break;
+        -:  481:			}
+        -:  482:		}
+       10:  483:		if (!valid) {
+        1:  484:			args_exit_error(args, "Unknown SubCommand \"%s\"", sub);
+        -:  485:		}
+        3:  486:	} else if (args->subs_count > 1) {
+        1:  487:		args_usage(args, NULL);
+        -:  488:	} else {
+        -:  489:		// no sub commands so we check the base min/max args.
+        -:  490:		// check number of args
+       2*:  491:		if (arg_count > args->subs[0].max_args || arg_count < args->subs[0].min_args) {
+        2:  492:			args_exit_error(args,
+        -:  493:							"Incorrect number of arguments "
+        -:  494:							"(%i specified). "
+        -:  495:							"Number of arguments must be "
+        -:  496:							"between %i and %i.",
+        2:  497:							arg_count, args->subs[0].min_args, args->subs[0].max_args);
+        -:  498:		}
+        -:  499:	}
+        -:  500:
+        -:  501:	// check options
+       60:  502:	for (u64 i = 1; i < argc; i++) {
+        -:  503:		u64 subi;
+       48:  504:		if (i <= sub_arg) {
+       29:  505:			subi = 0;
+        -:  506:		} else {
+       19:  507:			subi = sub_index;
+        -:  508:		}
+        -:  509:
+       48:  510:		u64 len = strlen(argv[i]);
+       48:  511:		if (len > 0 && argv[i][0] == '-') {
+        -:  512:			// option to check
+       21:  513:			char name[len];
+        -:  514:			bool is_short;
+       21:  515:			bool found = false;
+       21:  516:			if (len > 1 && args->argv[i][1] == '-') {
+       14:  517:				strcpy(name, args->argv[i] + 2);
+       14:  518:				is_short = false;
+        -:  519:			} else {
+        7:  520:				strcpy(name, args->argv[i] + 1);
+        7:  521:				is_short = true;
         -:  522:			}
-       12:  523:			if (!found) {
-        4:  524:				if (subi == 0) {
-    #####:  525:					args_exit_error(args, "Unknown option: %s", argv[i]);
-        -:  526:				} else {
-        4:  527:					args_exit_error(args,
-        -:  528:									"Unknown option: %s. Not valid for "
-        -:  529:									"SubCommand \"%s\".",
-        4:  530:									argv[i], args->subs[subi].name);
-        -:  531:				}
-        -:  532:			}
-        -:  533:		}
-        -:  534:	}
-        8:  535:}
-        -:  536:
-        1:  537:void process_lines(Args *args, const char *arg1, char config_file[], size_t fsize) {
-        -:  538:
-        1:  539:	args->argv = mymalloc(sizeof(char *));
-        1:  540:	if (args->argv == NULL) {
-    #####:  541:		args_exit_error(args, "Could not allocate sufficient memory");
-    #####:  542:		return;
-        -:  543:	}
-        -:  544:
-        1:  545:	args->argv[0] = mymalloc(sizeof(char) * (strlen(arg1) + 1));
-        1:  546:	if (args->argv[0] == NULL) {
-    #####:  547:		args_exit_error(args, "Could not allocate sufficient memory");
-    #####:  548:		return;
-        -:  549:	}
-        1:  550:	strcpy(args->argv[0], arg1);
-        -:  551:
-        1:  552:	args->argc = 1;
-        -:  553:
-        -:  554:	// Use strtok to split the string into lines
-        1:  555:	char *line = strtok(config_file, "\n");
-        -:  556:
-        5:  557:	while (line != NULL) {
-        -:  558:		// allow for comments using '#'.
-       29:  559:		for (int i = 0; i < strlen(line); i++) {
-       28:  560:			if (line[i] == '#') {
-        3:  561:				line[i] = 0;
-        3:  562:				break;
-        -:  563:			}
-        -:  564:		}
-        -:  565:		// trim
-        4:  566:		char *trimmed = trim_whitespace(line);
-        -:  567:
-       4*:  568:		if (*trimmed == '\0') {
-    #####:  569:			line = strtok(NULL, "\n"); // Skip empty lines
-    #####:  570:			continue;
-        -:  571:		}
-        -:  572:
-        4:  573:		void *tmp = myrealloc(args->argv, sizeof(char *) * (args->argc + 1));
-        4:  574:		if (tmp == NULL) {
-    #####:  575:			args_exit_error(args, "Could not allocate sufficient memory");
-    #####:  576:			return;
+        -:  523:
+       21:  524:			found = args_check_option(args, subi, name, is_short, argv[i]);
+       21:  525:			if (args_sub_takes_value(args, subi, name, is_short)) {
+       14:  526:				i += 1;
+        -:  527:			}
+       21:  528:			if (!found) {
+        7:  529:				if (subi == 0) {
+        3:  530:					args_exit_error(args, "Unknown option: %s", argv[i]);
+        -:  531:				} else {
+        4:  532:					args_exit_error(args,
+        -:  533:									"Unknown option: %s. Not valid for "
+        -:  534:									"SubCommand \"%s\".",
+        4:  535:									argv[i], args->subs[subi].name);
+        -:  536:				}
+        -:  537:			}
+        -:  538:		}
+        -:  539:	}
+       12:  540:}
+        -:  541:
+        5:  542:void process_lines(Args *args, const char *arg1, char config_file[], size_t fsize) {
+        -:  543:
+        5:  544:	args->argv = mymalloc(sizeof(char *));
+        5:  545:	if (args->argv == NULL) {
+        1:  546:		args_exit_error(args, "Could not allocate sufficient memory");
+        1:  547:		return;
+        -:  548:	}
+        -:  549:
+        4:  550:	args->argv[0] = mymalloc(sizeof(char) * (strlen(arg1) + 1));
+        4:  551:	if (args->argv[0] == NULL) {
+        1:  552:		myfree(args->argv);
+        1:  553:		args_exit_error(args, "Could not allocate sufficient memory");
+        1:  554:		return;
+        -:  555:	}
+        3:  556:	strcpy(args->argv[0], arg1);
+        -:  557:
+        3:  558:	args->argc = 1;
+        -:  559:
+        -:  560:	// Use strtok to split the string into lines
+        3:  561:	char *line = strtok(config_file, "\n");
+        -:  562:
+        8:  563:	while (line != NULL) {
+        -:  564:		// allow for comments using '#'.
+       41:  565:		for (int i = 0; i < strlen(line); i++) {
+       37:  566:			if (line[i] == '#') {
+        3:  567:				line[i] = 0;
+        3:  568:				break;
+        -:  569:			}
+        -:  570:		}
+        -:  571:		// trim
+        7:  572:		char *trimmed = trim_whitespace(line);
+        -:  573:
+        7:  574:		if (*trimmed == '\0') {
+        1:  575:			line = strtok(NULL, "\n"); // Skip empty lines
+        1:  576:			continue;
         -:  577:		}
-        4:  578:		args->argv = tmp;
-        4:  579:		args->argv[args->argc] = mymalloc(sizeof(char) * (strlen(trimmed) + 1));
-        4:  580:		if (args->argv[args->argc] == NULL) {
-    #####:  581:			args_exit_error(args, "Could not allocate sufficient memory");
-    #####:  582:			return;
+        -:  578:
+        6:  579:		void *tmp = myrealloc(args->argv, sizeof(char *) * (args->argc + 1));
+        6:  580:		if (tmp == NULL) {
+        1:  581:			args_exit_error(args, "Could not allocate sufficient memory");
+        1:  582:			return;
         -:  583:		}
-        4:  584:		strcpy(args->argv[args->argc], trimmed);
-        4:  585:		args->argc++;
-        -:  586:
-        -:  587:		// Get the next line
-        4:  588:		line = strtok(NULL, "\n");
-        -:  589:	}
-        -:  590:}
-        -:  591:
-        -:  592:// Return 1 on successful file config created
-        -:  593:// Return 0 if no file was specified
-        -:  594:// Return -1 if an error occurs
-       14:  595:int check_file_config(Args *args, const int argc, const char **argv) {
-        -:  596:	// if file config is used there must be exactly two arguments fam @config.txt for example
-       14:  597:	if (argc != 2)
-       10:  598:		return 0;
-        -:  599:
-        -:  600:	// If the second argument does not start with an '@' symbol it is not a file.
-        4:  601:	u64 arg_len = strlen(argv[1]);
-        4:  602:	if (arg_len > 0 && argv[1][0] != '@') {
-        3:  603:		return 0;
-        -:  604:	}
+        5:  584:		args->argv = tmp;
+        5:  585:		args->argv[args->argc] = mymalloc(sizeof(char) * (strlen(trimmed) + 1));
+        5:  586:		if (args->argv[args->argc] == NULL) {
+        1:  587:			args_exit_error(args, "Could not allocate sufficient memory");
+        1:  588:			return;
+        -:  589:		}
+        4:  590:		strcpy(args->argv[args->argc], trimmed);
+        4:  591:		args->argc++;
+        -:  592:
+        -:  593:		// Get the next line
+        4:  594:		line = strtok(NULL, "\n");
+        -:  595:	}
+        -:  596:}
+        -:  597:
+        -:  598:// Return 1 on successful file config created
+        -:  599:// Return 0 if no file was specified
+        -:  600:// Return -1 if an error occurs
+       23:  601:int check_file_config(Args *args, const int argc, const char **argv) {
+        -:  602:	// if file config is used there must be exactly two arguments fam @config.txt for example
+       23:  603:	if (argc != 2)
+       14:  604:		return 0;
         -:  605:
-        -:  606:	// We have a file config process it.
-        -:  607:	// get file size
-        1:  608:	const char *file_name = argv[1] + 1;
-        -:  609:
-        1:  610:	Path path;
-        1:  611:	path_for(&path, file_name);
-        1:  612:	if (!path_exists(&path) || path_is_dir(&path)) {
-    #####:  613:		args_exit_error(args, "File not found at '%s'", path_to_string(&path));
-    #####:  614:		return -1;
-        -:  615:	}
-        1:  616:	u64 fsize = path_file_size(&path);
-        -:  617:
-        1:  618:	char config_file[fsize + 1];
-        1:  619:	MYFILE *fp = myfopen(&path, "r");
-        1:  620:	read_all(config_file, 1, fsize, fp);
-        1:  621:	config_file[fsize] = 0;
-        1:  622:	myfclose(fp);
+        -:  606:	// If the second argument does not start with an '@' symbol it is not a file.
+        9:  607:	u64 arg_len = strlen(argv[1]);
+        9:  608:	if (arg_len > 0 && argv[1][0] != '@') {
+        3:  609:		return 0;
+        -:  610:	}
+        -:  611:
+        -:  612:	// We have a file config process it.
+        -:  613:	// get file size
+        6:  614:	const char *file_name = argv[1] + 1;
+        -:  615:
+        6:  616:	Path path;
+        6:  617:	path_for(&path, file_name);
+        6:  618:	if (!path_exists(&path) || path_is_dir(&path)) {
+        1:  619:		args_exit_error(args, "File not found at '%s'", path_to_string(&path));
+        1:  620:		return -1;
+        -:  621:	}
+        5:  622:	u64 fsize = path_file_size(&path);
         -:  623:
-        1:  624:	process_lines(args, argv[0], config_file, fsize);
-        -:  625:
-        1:  626:	return 1;
-        -:  627:}
-        -:  628:
-       15:  629:void args_init(Args *args, const int argc, const char **argv) {
-        -:  630:	// check for NULLs (not allowed)
-       68:  631:	for (int i = 0; i < argc; i++) {
-       54:  632:		if (argv[i] == NULL) {
-        1:  633:			args_exit_error(args, "argv may not have NULL value where i < argc");
-        1:  634:			return;
-        -:  635:		}
-        -:  636:	}
-        -:  637:	int r;
-       14:  638:	if (check_file_config(args, argc, argv)) {
-        -:  639:		// if true the file config as been loaded
-        1:  640:		return;
-        -:  641:	}
-        -:  642:
-        -:  643:	// scan args for an arg starting with '@'. Not valid here. It must be the first and only param.
-        -:  644:	// Report error.
-        -:  645:
-        -:  646:	// If any args start with '@' it's an error because we already checked for file config
-       49:  647:	for (u64 i = 1; i < argc; i++) {
-       37:  648:		u64 arg_len = strlen(argv[i]);
-       37:  649:		if (arg_len > 0 && argv[i][0] == '@') {
-        1:  650:			args_exit_error(args,
-        -:  651:							"File speicified with the '@' symbol must be the first argument.");
-        1:  652:			return;
-        -:  653:		}
-        -:  654:	}
-        -:  655:
-       12:  656:	args->argc = argc;
-       12:  657:	args->argv = mymalloc(sizeof(char *) * argc);
-       12:  658:	if (args->argv == NULL) {
-        1:  659:		args->argc = 0;
-        1:  660:		args_exit_error(args, "Could not allocate sufficient memory");
-        1:  661:		return;
-        -:  662:	}
-       54:  663:	for (u64 i = 0; i < argc; i++) {
-       44:  664:		args->argv[i] = mymalloc(sizeof(char) * (strlen(argv[i]) + 1));
-       44:  665:		if (args->argv[i] == NULL) {
-        1:  666:			args->argc = 0;
-        1:  667:			myfree(args->argv);
-        1:  668:			args_exit_error(args, "Could not allocate sufficient memory");
-        1:  669:			return;
-        -:  670:		}
-       43:  671:		strcpy(args->argv[i], argv[i]);
-        -:  672:	}
-        -:  673:
-       42:  674:	for (u64 i = 1; i < argc; i++) {
-       33:  675:		if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-V")) {
-    #####:  676:			args_print_version(args);
-        -:  677:		}
-       33:  678:		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
-        5:  679:			const char *sub = NULL;
-        8:  680:			for (u64 j = 1; j < i; j++) {
-        7:  681:				u64 len = strlen(argv[j]);
-        7:  682:				if (len > 0) {
-        7:  683:					if (argv[j][0] != '-') {
-        4:  684:						sub = argv[j];
-        4:  685:						break;
-        3:  686:					} else {
-        3:  687:						char name[len + 1];
-        -:  688:						bool is_short;
-        3:  689:						if (len > 1 && args->argv[j][1] == '-') {
-        2:  690:							strcpy(name, args->argv[j] + 2);
-        2:  691:							is_short = false;
-        -:  692:						} else {
-        1:  693:							strcpy(name, args->argv[j] + 1);
-        1:  694:							is_short = true;
-        -:  695:						}
-        -:  696:
-        3:  697:						u64 subi = 0;
-        3:  698:						if (args_sub_takes_value(args, subi, name, is_short)) {
-        3:  699:							j += 1;
-        -:  700:						}
-        -:  701:					}
-        -:  702:				}
-        -:  703:			}
-        5:  704:			args_usage(args, sub);
-        -:  705:		}
-        -:  706:	}
-        -:  707:
-        9:  708:	args_check_validity(args, argc, argv);
-        -:  709:}
-        -:  710:
-        -:  711:// Returns -2 if an error occurs and sets errno.
-        -:  712:// Returns -1 if the value is not present.
-        -:  713:// Returns 0 if the value is found (flags or max_value_len == 0)
-        -:  714:// Returns the length of the value (takes_value true and max_value_len > 0)
-       12:  715:int args_value_of(const Args *args, const char *param_name, char *value_buf,
-       12:  716:				  const u64 max_value_len, const u32 index) {
-       12:  717:	if (args == NULL || param_name == NULL) {
-        1:  718:		errno = EINVAL;
-        1:  719:		print_error("Input may not be NULL");
-        1:  720:		return -2;
-        -:  721:	}
-       11:  722:	u64 plen = strlen(param_name);
-        -:  723:
-       11:  724:	char param_name_buf[plen + 3];
-       11:  725:	strcpy(param_name_buf, "--");
-       11:  726:	strcat(param_name_buf, param_name);
-        -:  727:
-       11:  728:	char short_name_buf[plen + 3];
-       11:  729:	strcpy(short_name_buf, "-");
-       11:  730:	bool found = false;
-       11:  731:	char *default_value = NULL;
-       11:  732:	bool takes_value = false;
+        5:  624:	char config_file[fsize + 1];
+        5:  625:	MYFILE *fp = myfopen(&path, "r");
+        5:  626:	read_all(config_file, 1, fsize, fp);
+        5:  627:	config_file[fsize] = 0;
+        5:  628:	myfclose(fp);
+        -:  629:
+        5:  630:	process_lines(args, argv[0], config_file, fsize);
+        -:  631:
+        5:  632:	return 1;
+        -:  633:}
+        -:  634:
+       24:  635:void args_init(Args *args, const int argc, const char **argv) {
+        -:  636:	// check for NULLs (not allowed)
+      120:  637:	for (int i = 0; i < argc; i++) {
+       97:  638:		if (argv[i] == NULL) {
+        1:  639:			args_exit_error(args, "argv may not have NULL value where i < argc");
+        1:  640:			return;
+        -:  641:		}
+        -:  642:	}
+        -:  643:	int r;
+       23:  644:	if (check_file_config(args, argc, argv)) {
+        -:  645:		// if true the file config as been loaded
+        6:  646:		return;
+        -:  647:	}
+        -:  648:
+        -:  649:	// scan args for an arg starting with '@'. Not valid here. It must be the first and only param.
+        -:  650:	// Report error.
+        -:  651:
+        -:  652:	// If any args start with '@' it's an error because we already checked for file config
+       82:  653:	for (u64 i = 1; i < argc; i++) {
+       66:  654:		u64 arg_len = strlen(argv[i]);
+       66:  655:		if (arg_len > 0 && argv[i][0] == '@') {
+        1:  656:			args_exit_error(args,
+        -:  657:							"File speicified with the '@' symbol must be the first argument.");
+        1:  658:			return;
+        -:  659:		}
+        -:  660:	}
+        -:  661:
+       16:  662:	args->argc = argc;
+       16:  663:	args->argv = mymalloc(sizeof(char *) * argc);
+       16:  664:	if (args->argv == NULL) {
+        1:  665:		args->argc = 0;
+        1:  666:		args_exit_error(args, "Could not allocate sufficient memory");
+        1:  667:		return;
+        -:  668:	}
+       91:  669:	for (u64 i = 0; i < argc; i++) {
+       77:  670:		args->argv[i] = mymalloc(sizeof(char) * (strlen(argv[i]) + 1));
+       77:  671:		if (args->argv[i] == NULL) {
+        1:  672:			args->argc = 0;
+        1:  673:			myfree(args->argv);
+        1:  674:			args_exit_error(args, "Could not allocate sufficient memory");
+        1:  675:			return;
+        -:  676:		}
+       76:  677:		strcpy(args->argv[i], argv[i]);
+        -:  678:	}
+        -:  679:
+       75:  680:	for (u64 i = 1; i < argc; i++) {
+       62:  681:		if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-V")) {
+    #####:  682:			args_print_version(args);
+        -:  683:		}
+       62:  684:		if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
+        5:  685:			const char *sub = NULL;
+        8:  686:			for (u64 j = 1; j < i; j++) {
+        7:  687:				u64 len = strlen(argv[j]);
+        7:  688:				if (len > 0) {
+        7:  689:					if (argv[j][0] != '-') {
+        4:  690:						sub = argv[j];
+        4:  691:						break;
+        3:  692:					} else {
+        3:  693:						char name[len + 1];
+        -:  694:						bool is_short;
+        3:  695:						if (len > 1 && args->argv[j][1] == '-') {
+        2:  696:							strcpy(name, args->argv[j] + 2);
+        2:  697:							is_short = false;
+        -:  698:						} else {
+        1:  699:							strcpy(name, args->argv[j] + 1);
+        1:  700:							is_short = true;
+        -:  701:						}
+        -:  702:
+        3:  703:						u64 subi = 0;
+        3:  704:						if (args_sub_takes_value(args, subi, name, is_short)) {
+        3:  705:							j += 1;
+        -:  706:						}
+        -:  707:					}
+        -:  708:				}
+        -:  709:			}
+        5:  710:			args_usage(args, sub);
+        -:  711:		}
+        -:  712:	}
+        -:  713:
+       13:  714:	args_check_validity(args, argc, argv);
+        -:  715:}
+        -:  716:
+        -:  717:// Returns -2 if an error occurs and sets errno.
+        -:  718:// Returns -1 if the value is not present.
+        -:  719:// Returns 0 if the value is found (flags or max_value_len == 0)
+        -:  720:// Returns the length of the value (takes_value true and max_value_len > 0)
+       13:  721:int args_value_of(const Args *args, const char *param_name, char *value_buf,
+       13:  722:				  const u64 max_value_len, const u32 index) {
+       13:  723:	if (args == NULL || param_name == NULL) {
+        1:  724:		errno = EINVAL;
+        1:  725:		print_error("Input may not be NULL");
+        1:  726:		return -2;
+        -:  727:	}
+       12:  728:	u64 plen = strlen(param_name);
+        -:  729:
+       12:  730:	char param_name_buf[plen + 3];
+       12:  731:	strcpy(param_name_buf, "--");
+       12:  732:	strcat(param_name_buf, param_name);
         -:  733:
-        -:  734:	// linear search through all elements. Potential to improve here.
-       33:  735:	for (u64 i = 0; i < args->subs_count; i++) {
-       42:  736:		for (u64 j = 0; j < args->subs[i].param_count; j++) {
-       20:  737:			if (!strcmp(args->subs[i].params[j].name, param_name)) {
-       16:  738:				found = true;
-       16:  739:				strcat(short_name_buf, args->subs[i].params[j].short_name);
-       16:  740:				default_value = args->subs[i].params[j].default_value;
-       16:  741:				takes_value = args->subs[i].params[j].takes_value;
-        -:  742:			}
-        -:  743:		}
-        -:  744:	}
-        -:  745:
-       11:  746:	if (!found) {
-        1:  747:		print_error("Unknown parameter tested");
-        1:  748:		errno = ENOENT;
-        1:  749:		return -2;
+       12:  734:	char short_name_buf[plen + 3];
+       12:  735:	strcpy(short_name_buf, "-");
+       12:  736:	bool found = false;
+       12:  737:	char *default_value = NULL;
+       12:  738:	bool takes_value = false;
+        -:  739:
+        -:  740:	// linear search through all elements. Potential to improve here.
+       36:  741:	for (u64 i = 0; i < args->subs_count; i++) {
+       48:  742:		for (u64 j = 0; j < args->subs[i].param_count; j++) {
+       24:  743:			if (!strcmp(args->subs[i].params[j].name, param_name)) {
+       17:  744:				found = true;
+       17:  745:				strcat(short_name_buf, args->subs[i].params[j].short_name);
+       17:  746:				default_value = args->subs[i].params[j].default_value;
+       17:  747:				takes_value = args->subs[i].params[j].takes_value;
+        -:  748:			}
+        -:  749:		}
         -:  750:	}
-       10:  751:	u64 itt_index = 0;
-       25:  752:	for (u64 i = 1; i < args->argc; i++) {
-       22:  753:		if (!strcmp(args->argv[i], param_name_buf) || !strcmp(args->argv[i], short_name_buf)) {
-        8:  754:			if (itt_index == index) {
-        7:  755:				if (takes_value && i + 1 < args->argc) {
-        4:  756:					if (value_buf == NULL) {
-        1:  757:						errno = EINVAL;
-        1:  758:						print_error("Input may not be NULL");
-        1:  759:						return -2;
-        -:  760:					}
-        3:  761:					return snprintf(value_buf, max_value_len, "%s", args->argv[i + 1]);
-        3:  762:				} else if (takes_value && max_value_len > 0) {
-        2:  763:					if (value_buf == NULL) {
-        1:  764:						errno = EINVAL;
-        1:  765:						print_error("Input may not be NULL");
-        1:  766:						return -2;
-        -:  767:					}
-        1:  768:					strcpy(value_buf, "");
-        1:  769:					return 0;
-        -:  770:				} else {
-        1:  771:					return 0;
-        -:  772:				}
-        -:  773:			} else {
-        1:  774:				itt_index += 1;
-        -:  775:			}
-        -:  776:		}
-        -:  777:	}
-        -:  778:
-        3:  779:	if (default_value != NULL && index == 0) {
-        2:  780:		if (value_buf == NULL && max_value_len > 0) {
-        1:  781:			errno = EINVAL;
-        1:  782:			print_error("Input may not be NULL");
-        1:  783:			return -2;
-        -:  784:		}
-        1:  785:		return snprintf(value_buf, max_value_len, "%s", default_value);
-        -:  786:	}
-        -:  787:
-        1:  788:	return -1;
-        -:  789:}
-        -:  790:
-        9:  791:int args_get_argument(const Args *args, const u32 index, char *value_buf, const u64 max_value_len) {
-        9:  792:	if (args == NULL) {
-        1:  793:		print_error("Input may not be NULL");
-        1:  794:		errno = EINVAL;
-        1:  795:		return -2;
-        -:  796:	}
-        8:  797:	u64 index_itt = 0;
-       26:  798:	for (u64 i = 1; i < args->argc; i++) {
-       24:  799:		i32 len = strlen(args->argv[i]);
-       30:  800:		if (len > 1 && args->argv[i][0] == '-') {
-        6:  801:			char name[len];
-        -:  802:			bool is_short;
-        6:  803:			bool found = false;
-        6:  804:			if (len > 1 && args->argv[i][1] == '-') {
-        6:  805:				strcpy(name, args->argv[i] + 2);
-        6:  806:				is_short = false;
-        -:  807:			} else {
-    #####:  808:				strcpy(name, args->argv[i] + 1);
-    #####:  809:				is_short = true;
-        -:  810:			}
-        -:  811:
-        -:  812:			// linear search through all elements. Potential to improve here.
-       18:  813:			for (u64 k = 0; k < args->subs_count; k++) {
-       24:  814:				for (u64 j = 0; j < args->subs[k].param_count; j++) {
-      12*:  815:					if (is_short && !strcmp(name, args->subs[k].params[j].short_name)) {
-    #####:  816:						if (args->subs[k].params[j].takes_value) {
-    #####:  817:							i += 1;
-    #####:  818:							found = true;
-    #####:  819:							break;
-        -:  820:						}
-       12:  821:					} else if (!strcmp(name, args->subs[k].params[j].name)) {
-        6:  822:						if (args->subs[k].params[j].takes_value) {
-    #####:  823:							i += 1;
-    #####:  824:							found = true;
-    #####:  825:							break;
+        -:  751:
+       12:  752:	if (!found) {
+        1:  753:		print_error("Unknown parameter tested");
+        1:  754:		errno = ENOENT;
+        1:  755:		return -2;
+        -:  756:	}
+       11:  757:	u64 itt_index = 0;
+       26:  758:	for (u64 i = 1; i < args->argc; i++) {
+       23:  759:		if (!strcmp(args->argv[i], param_name_buf) || !strcmp(args->argv[i], short_name_buf)) {
+        9:  760:			if (itt_index == index) {
+        8:  761:				if (takes_value && i + 1 < args->argc) {
+        4:  762:					if (value_buf == NULL) {
+        1:  763:						errno = EINVAL;
+        1:  764:						print_error("Input may not be NULL");
+        1:  765:						return -2;
+        -:  766:					}
+        3:  767:					return snprintf(value_buf, max_value_len, "%s", args->argv[i + 1]);
+        4:  768:				} else if (takes_value && max_value_len > 0) {
+        2:  769:					if (value_buf == NULL) {
+        1:  770:						errno = EINVAL;
+        1:  771:						print_error("Input may not be NULL");
+        1:  772:						return -2;
+        -:  773:					}
+        1:  774:					strcpy(value_buf, "");
+        1:  775:					return 0;
+        -:  776:				} else {
+        2:  777:					return 0;
+        -:  778:				}
+        -:  779:			} else {
+        1:  780:				itt_index += 1;
+        -:  781:			}
+        -:  782:		}
+        -:  783:	}
+        -:  784:
+        3:  785:	if (default_value != NULL && index == 0) {
+        2:  786:		if (value_buf == NULL && max_value_len > 0) {
+        1:  787:			errno = EINVAL;
+        1:  788:			print_error("Input may not be NULL");
+        1:  789:			return -2;
+        -:  790:		}
+        1:  791:		return snprintf(value_buf, max_value_len, "%s", default_value);
+        -:  792:	}
+        -:  793:
+        1:  794:	return -1;
+        -:  795:}
+        -:  796:
+       14:  797:int args_get_argument(const Args *args, const u32 index, char *value_buf, const u64 max_value_len) {
+       14:  798:	if (args == NULL) {
+        1:  799:		print_error("Input may not be NULL");
+        1:  800:		errno = EINVAL;
+        1:  801:		return -2;
+        -:  802:	}
+       13:  803:	u64 index_itt = 0;
+       49:  804:	for (u64 i = 1; i < args->argc; i++) {
+       46:  805:		i32 len = strlen(args->argv[i]);
+       62:  806:		if (len > 1 && args->argv[i][0] == '-') {
+       16:  807:			char name[len];
+        -:  808:			bool is_short;
+       16:  809:			bool found = false;
+       16:  810:			if (len > 1 && args->argv[i][1] == '-') {
+       11:  811:				strcpy(name, args->argv[i] + 2);
+       11:  812:				is_short = false;
+        -:  813:			} else {
+        5:  814:				strcpy(name, args->argv[i] + 1);
+        5:  815:				is_short = true;
+        -:  816:			}
+        -:  817:
+        -:  818:			// linear search through all elements. Potential to improve here.
+       48:  819:			for (u64 k = 0; k < args->subs_count; k++) {
+       59:  820:				for (u64 j = 0; j < args->subs[k].param_count; j++) {
+       37:  821:					if (is_short && !strcmp(name, args->subs[k].params[j].short_name)) {
+        5:  822:						if (args->subs[k].params[j].takes_value) {
+        5:  823:							i += 1;
+        5:  824:							found = true;
+        5:  825:							break;
         -:  826:						}
-        -:  827:					}
-        -:  828:				}
-        -:  829:			}
-        -:  830:		} else {
-       18:  831:			if (index_itt == index) {
-       6*:  832:				if (value_buf == NULL && max_value_len != 0) {
-    #####:  833:					print_error("Input may not be NULL");
-    #####:  834:					errno = EINVAL;
-    #####:  835:					return -2;
-        -:  836:				}
-        6:  837:				return snprintf(value_buf, max_value_len, "%s", args->argv[i]);
-        -:  838:			}
-       12:  839:			index_itt += 1;
-        -:  840:		}
-        -:  841:	}
-        2:  842:	return -1;
-        -:  843:}
-        -:  844:
-        1:  845:void args_print_version(const Args *args) {
-        1:  846:	const char *prog = args->prog;
-        1:  847:	const char *version = args->version;
-        1:  848:	const char *arch = args->arch;
-        1:  849:	if (strlen(arch) == 0) {
-        1:  850:		arch = "";
-        -:  851:	}
-        1:  852:	fprintf(stderr, "%s%s%s %s%s%s (%s%s%s)\n", BRIGHT_RED, prog, RESET, CYAN, version, RESET,
-        -:  853:			YELLOW, arch, RESET);
-       1*:  854:	EXIT_ERR_IF_NO_DEBUG(0);
-        1:  855:}
-        -:  856:
-        7:  857:void args_usage(const Args *args, const char *sub_command) {
-        7:  858:	bool found = false;
-        7:  859:	u64 subs_count = args->subs_count;
-        7:  860:	u64 sub_index = 0;
-        -:  861:
-        7:  862:	if (sub_command) {
-        8:  863:		for (u64 i = 1; i < subs_count; i++) {
-        4:  864:			char *name = args->subs[i].name;
-        4:  865:			if (!strcmp(name, sub_command)) {
-        4:  866:				sub_index = i;
-        4:  867:				found = true;
-        -:  868:			}
-        -:  869:		}
-        -:  870:	} else // general help displayed
-        3:  871:		found = true;
-        -:  872:
-        7:  873:	if (!found) {
-    #####:  874:		args_exit_error(args, "Unknown SubCommand \"%s\"", sub_command);
-        -:  875:	}
-        -:  876:
-        7:  877:	u64 count = args->subs[0].param_count;
-        7:  878:	u64 max_len = 0;
-       12:  879:	for (u64 i = 0; i < count; i++) {
-        5:  880:		bool takes_value = args->subs[0].params[i].takes_value;
-        5:  881:		bool multi = args->subs[0].params[i].multiple;
-        5:  882:		char *name = args->subs[0].params[i].name;
-        5:  883:		char *short_name = args->subs[0].params[i].short_name;
-        -:  884:		u64 len;
-        5:  885:		if (!takes_value)
-    #####:  886:			len = snprintf(NULL, 0, "    -%s, --%s", short_name, name);
-        5:  887:		else if (multi)
-        1:  888:			len = snprintf(NULL, 0, "    -%s, --%s (<%s>, ...)", short_name, name, name);
-        -:  889:		else
-        4:  890:			len = snprintf(NULL, 0, "    -%s, --%s <%s>", short_name, name, name);
-        5:  891:		if (len > max_len)
-        5:  892:			max_len = len;
-        -:  893:	}
-        -:  894:
-        7:  895:	max_len += 4;
-        -:  896:
-        7:  897:	if (max_len < 17)
-        2:  898:		max_len = 17;
-        -:  899:
-        7:  900:	const char *prog = args->prog;
-        7:  901:	const char *author = args->author;
-        7:  902:	const char *version = args->version;
-        -:  903:	char buffer[1025];
-        -:  904:	char buffer2[1025];
-        -:  905:	u64 i;
-       92:  906:	for (i = 0; i < max_len - 13 && i < 1024; i++)
-       85:  907:		buffer[i] = ' ';
-        7:  908:	buffer[i] = 0;
-        -:  909:
-       71:  910:	for (i = 0; i < max_len - 16 && i < 1024; i++)
-       64:  911:		buffer2[i] = ' ';
-        7:  912:	buffer2[i] = 0;
-        -:  913:	u64 sub_command_str_len;
-        7:  914:	if (sub_command)
-        4:  915:		sub_command_str_len = strlen(sub_command);
-        -:  916:	else
-        3:  917:		sub_command_str_len = 0;
-        7:  918:	char sub_command_str[sub_command_str_len + 30];
-        7:  919:	char *sub_arg_doc_str = "";
-        -:  920:
-        7:  921:	if (sub_command) {
-        4:  922:		snprintf(sub_command_str, sub_command_str_len + 30, "%s%s%s", BRIGHT_RED, sub_command,
-        -:  923:				 RESET);
-        4:  924:		sub_arg_doc_str = args->subs[sub_index].arg_doc;
-        -:  925:	} else {
-        3:  926:		snprintf(sub_command_str, sub_command_str_len + 30, "[%sSUB_COMMAND%s]", DIMMED, RESET);
-        -:  927:	}
-        -:  928:
-        7:  929:	fprintf(stderr,
-        -:  930:			"%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s "
-        -:  931:			"[%sCORE_OPTIONS%s] %s [%sSUB_OPTIONS%s] %s\n\n"
-        -:  932:			"%sCORE_FLAGS%s:\n"
-        -:  933:			"    %s-h%s, %s--help%s%sPrints help information\n"
-        -:  934:			"    %s-V%s, %s--version%s%sPrints version "
-        -:  935:			"information\n",
-        -:  936:			CYAN, prog, RESET, YELLOW, version, RESET, GREEN, author, RESET, DIMMED, RESET,
-        -:  937:			BRIGHT_RED, prog, RESET, DIMMED, RESET, sub_command_str, DIMMED, RESET, sub_arg_doc_str,
-        -:  938:			DIMMED, RESET, CYAN, RESET, YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET, buffer2);
-        -:  939:
-       12:  940:	for (u64 i = 0; i < count; i++) {
-        5:  941:		bool takes_value = args->subs[0].params[i].takes_value;
-        5:  942:		if (!takes_value) {
-    #####:  943:			char *name = args->subs[0].params[i].name;
-    #####:  944:			char *short_name = args->subs[0].params[i].short_name;
-    #####:  945:			char *help = args->subs[0].params[i].help;
-    #####:  946:			u64 len = snprintf(NULL, 0, "    -%s, --%s", short_name, name);
-    #####:  947:			if (len > max_len)
-    #####:  948:				len = max_len;
-        -:  949:			u64 i;
-    #####:  950:			for (i = 0; i < max_len - len && i < 1024; i++)
-    #####:  951:				buffer[i] = ' ';
-    #####:  952:			buffer[i] = 0;
-    #####:  953:			fprintf(stderr, "    %s-%s%s, %s--%s%s %s%s\n", CYAN, short_name, RESET, YELLOW, name,
-        -:  954:					RESET, buffer, help);
-        -:  955:		}
-        -:  956:	}
-        -:  957:
-        7:  958:	if (count) {
-        5:  959:		fprintf(stderr, "\n%sCORE_OPTIONS%s:\n", DIMMED, RESET);
-        -:  960:
-       10:  961:		for (u64 i = 0; i < count; i++) {
-        5:  962:			bool takes_value = args->subs[0].params[i].takes_value;
-        5:  963:			if (takes_value) {
-        5:  964:				char *name = args->subs[0].params[i].name;
-        5:  965:				char *short_name = args->subs[0].params[i].short_name;
-        5:  966:				char *help = args->subs[0].params[i].help;
-        5:  967:				bool multi = args->subs[0].params[i].multiple;
-        5:  968:				char *default_value = args->subs[0].params[i].default_value;
-        -:  969:				u64 default_value_str_len;
-        5:  970:				if (default_value == NULL) {
-        4:  971:					default_value_str_len = 1;
-        -:  972:				} else {
-        1:  973:					default_value_str_len = strlen(default_value) + 100;
-        -:  974:				}
-        5:  975:				char default_value_str[default_value_str_len];
-        5:  976:				if (default_value == NULL)
-        4:  977:					strcpy(default_value_str, "");
-        -:  978:				else
-        1:  979:					snprintf(default_value_str, default_value_str_len, " (default value: '%s')",
-        -:  980:							 default_value);
-        -:  981:
-        5:  982:				if (multi) {
-        1:  983:					u64 len = snprintf(NULL, 0, "    -%s, --%s <%s>, ...", short_name, name, name);
-        1:  984:					if (len > max_len)
-    #####:  985:						len = max_len;
-        -:  986:					u64 i;
-        7:  987:					for (i = 0; i < max_len - len && i < 1024; i++)
-        6:  988:						buffer[i] = ' ';
-        1:  989:					buffer[i] = 0;
-        1:  990:					fprintf(stderr,
-        -:  991:							"    %s-%s%s, %s--%s%s "
-        -:  992:							"<%s>, "
-        -:  993:							"... %s%s%s\n",
-        -:  994:							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-        -:  995:							default_value_str);
-        -:  996:				} else {
-        -:  997:
-        4:  998:					u64 len = snprintf(NULL, 0, "    -%s, --%s <%s>", short_name, name, name);
-        4:  999:					if (len > max_len)
-    #####: 1000:						len = max_len;
-        -: 1001:					u64 i;
-       20: 1002:					for (i = 0; i < max_len - len && i < 1024; i++)
-       16: 1003:						buffer[i] = ' ';
-        4: 1004:					buffer[i] = 0;
-        -: 1005:
-        4: 1006:					fprintf(stderr,
-        -: 1007:							"    %s-%s%s, %s--%s%s "
-        -: 1008:							"<%s> "
-        -: 1009:							"%s%s%s\n",
-        -: 1010:							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-        -: 1011:							default_value_str);
-        -: 1012:				}
-        -: 1013:			}
-        -: 1014:		}
-        -: 1015:	}
-        -: 1016:
-        7: 1017:	if (subs_count > 1 && sub_command == NULL) {
-        2: 1018:		fprintf(stderr, "\n%sSUB_COMMANDS%s:\n", DIMMED, RESET);
-        4: 1019:		for (u64 i = 1; i < subs_count; i++) {
-        -: 1020:
-        2: 1021:			char *name = args->subs[i].name;
-        2: 1022:			char *help = args->subs[i].help;
-        2: 1023:			char *arg_doc = args->subs[i].arg_doc;
-        -: 1024:
-        2: 1025:			u64 len = strlen(name) + strlen(arg_doc) + 4;
-        2: 1026:			if (len > max_len)
-    #####: 1027:				len = max_len;
-        -: 1028:			char buffer[1025];
-        -: 1029:			u64 j;
-       24: 1030:			for (j = 0; j < (max_len - len) && j < 1024; j++)
-       22: 1031:				buffer[j] = ' ';
-        2: 1032:			buffer[j] = 0;
-        -: 1033:
-        2: 1034:			fprintf(stderr, "    %s%s%s %s%s%s\n", CYAN, name, RESET, arg_doc, buffer, help);
-        -: 1035:		}
-        -: 1036:	}
-        7: 1037:	if (sub_command) {
-        4: 1038:		u64 param_index = 0;
-        8: 1039:		for (u64 i = 1; i < subs_count; i++) {
-        4: 1040:			char *name = args->subs[i].name;
-        4: 1041:			if (!strcmp(name, sub_command)) {
-        4: 1042:				param_index = i;
-        -: 1043:			}
-        -: 1044:		}
-        -: 1045:
-        4: 1046:		if (param_index > 0) {
-        4: 1047:			count = args->subs[param_index].param_count;
-        4: 1048:			fprintf(stderr, "\n%sSUB_FLAGS%s (%s%s%s):\n", DIMMED, RESET, BRIGHT_RED, sub_command,
-        -: 1049:					RESET);
-        -: 1050:
-        8: 1051:			for (u64 i = 0; i < count; i++) {
-        4: 1052:				char *name = args->subs[param_index].params[i].name;
-        4: 1053:				char *short_name = args->subs[param_index].params[i].short_name;
-        4: 1054:				bool takes_value = args->subs[param_index].params[i].takes_value;
-        4: 1055:				char *help = args->subs[param_index].params[i].help;
-        -: 1056:
-        4: 1057:				if (!takes_value) {
-        3: 1058:					u64 len = strlen(name) + 10;
-        3: 1059:					if (len > max_len)
-    #####: 1060:						len = max_len;
-        -: 1061:					char buffer[1025];
-        -: 1062:					u64 j;
-       32: 1063:					for (j = 0; j < (max_len - len) && j < 1024; j++)
-       29: 1064:						buffer[j] = ' ';
-        3: 1065:					buffer[j] = 0;
-        3: 1066:					fprintf(stderr,
-        -: 1067:							"    %s-%s%s, "
-        -: 1068:							"%s--%s%s%s %s\n",
-        -: 1069:							CYAN, short_name, RESET, YELLOW, name, RESET, buffer, help);
-        -: 1070:				}
-        -: 1071:			}
-        4: 1072:			fprintf(stderr, "\n%sSUB_OPTIONS%s (%s%s%s):\n", DIMMED, RESET, BRIGHT_RED, sub_command,
-        -: 1073:					RESET);
-        8: 1074:			for (u64 i = 0; i < count; i++) {
-        4: 1075:				char *name = args->subs[param_index].params[i].name;
-        4: 1076:				char *short_name = args->subs[param_index].params[i].short_name;
-        4: 1077:				bool takes_value = args->subs[param_index].params[i].takes_value;
-        4: 1078:				char *help = args->subs[param_index].params[i].help;
-        4: 1079:				bool multiple = args->subs[param_index].params[i].multiple;
-        -: 1080:
-        4: 1081:				char *default_value = args->subs[param_index].params[i].default_value;
-        -: 1082:				u64 default_value_str_len;
-        4: 1083:				if (default_value == NULL) {
-        1: 1084:					default_value_str_len = 1;
-        -: 1085:				} else {
-        3: 1086:					default_value_str_len = strlen(default_value) + 100;
-        -: 1087:				}
-        4: 1088:				char default_value_str[default_value_str_len];
-        4: 1089:				if (default_value == NULL)
-        1: 1090:					strcpy(default_value_str, "");
-        -: 1091:				else
-        3: 1092:					snprintf(default_value_str, default_value_str_len, " (default value: %s)",
-        -: 1093:							 default_value);
-        -: 1094:
-        4: 1095:				if (takes_value) {
-        1: 1096:					if (multiple) {
-    #####: 1097:						u64 len = 2 * strlen(name) + 19;
-        -: 1098:						char buffer[1025];
-        -: 1099:						u64 j;
-    #####: 1100:						if (len > max_len)
-    #####: 1101:							len = max_len;
-    #####: 1102:						for (j = 0; j < (max_len - len) && j < 1024; j++)
-    #####: 1103:							buffer[j] = ' ';
-    #####: 1104:						buffer[j] = ' ';
-    #####: 1105:						buffer[j + 1] = 0;
-    #####: 1106:						fprintf(stderr,
-        -: 1107:								"    %s-%s%s, "
-        -: 1108:								"%s--%s%s "
-        -: 1109:								"<%s>, ...%s %s"
-        -: 1110:								"%s\n",
-        -: 1111:								CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-        -: 1112:								default_value_str);
-        -: 1113:					} else {
-        1: 1114:						u64 len = 2 * strlen(name) + 13;
-        -: 1115:						char buffer[1025];
-        -: 1116:						u64 j;
-        1: 1117:						if (len > max_len)
-        1: 1118:							len = max_len;
-       1*: 1119:						for (j = 0; j < (max_len - len) && j < 1024; j++)
-    #####: 1120:							buffer[j] = ' ';
-        1: 1121:						buffer[j] = 0;
-        1: 1122:						fprintf(stderr,
-        -: 1123:								"    %s-%s%s, "
-        -: 1124:								"%s--%s%s "
-        -: 1125:								"<%s>%s "
-        -: 1126:								"%s%s\n",
-        -: 1127:								CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
-        -: 1128:								default_value_str);
-        -: 1129:					}
-        -: 1130:				}
-        -: 1131:			}
-        -: 1132:		}
-        -: 1133:	}
-        -: 1134:
-        7: 1135:	EXIT_ERR_IF_NO_DEBUG(0);
-        4: 1136:}
+       32:  827:					} else if (!strcmp(name, args->subs[k].params[j].name)) {
+       11:  828:						if (args->subs[k].params[j].takes_value) {
+        5:  829:							i += 1;
+        5:  830:							found = true;
+        5:  831:							break;
+        -:  832:						}
+        -:  833:					}
+        -:  834:				}
+        -:  835:			}
+        -:  836:		} else {
+       30:  837:			if (index_itt == index) {
+       10:  838:				if (value_buf == NULL && max_value_len != 0) {
+        1:  839:					print_error("Input may not be NULL");
+        1:  840:					errno = EINVAL;
+        1:  841:					return -2;
+        -:  842:				}
+        9:  843:				return snprintf(value_buf, max_value_len, "%s", args->argv[i]);
+        -:  844:			}
+       20:  845:			index_itt += 1;
+        -:  846:		}
+        -:  847:	}
+        3:  848:	return -1;
+        -:  849:}
+        -:  850:
+        1:  851:void args_print_version(const Args *args) {
+        1:  852:	const char *prog = args->prog;
+        1:  853:	const char *version = args->version;
+        1:  854:	const char *arch = args->arch;
+        1:  855:	if (strlen(arch) == 0) {
+        1:  856:		arch = "";
+        -:  857:	}
+        1:  858:	fprintf(stderr, "%s%s%s %s%s%s (%s%s%s)\n", BRIGHT_RED, prog, RESET, CYAN, version, RESET,
+        -:  859:			YELLOW, arch, RESET);
+       1*:  860:	EXIT_ERR_IF_NO_DEBUG(0);
+        1:  861:}
+        -:  862:
+       10:  863:void args_usage(const Args *args, const char *sub_command) {
+       10:  864:	bool found = false;
+       10:  865:	u64 subs_count = args->subs_count;
+       10:  866:	u64 sub_index = 0;
+        -:  867:
+       10:  868:	if (sub_command) {
+       12:  869:		for (u64 i = 1; i < subs_count; i++) {
+        6:  870:			char *name = args->subs[i].name;
+        6:  871:			if (!strcmp(name, sub_command)) {
+        5:  872:				sub_index = i;
+        5:  873:				found = true;
+        -:  874:			}
+        -:  875:		}
+        -:  876:	} else // general help displayed
+        4:  877:		found = true;
+        -:  878:
+       10:  879:	if (!found) {
+        1:  880:		args_exit_error(args, "Unknown SubCommand \"%s\"", sub_command);
+        1:  881:		return;
+        -:  882:	}
+        -:  883:
+        9:  884:	u64 count = args->subs[0].param_count;
+        9:  885:	u64 max_len = 0;
+       24:  886:	for (u64 i = 0; i < count; i++) {
+       15:  887:		bool takes_value = args->subs[0].params[i].takes_value;
+       15:  888:		bool multi = args->subs[0].params[i].multiple;
+       15:  889:		char *name = args->subs[0].params[i].name;
+       15:  890:		char *short_name = args->subs[0].params[i].short_name;
+        -:  891:		u64 len;
+       15:  892:		if (!takes_value)
+        4:  893:			len = snprintf(NULL, 0, "    -%s, --%s", short_name, name);
+       11:  894:		else if (multi)
+        3:  895:			len = snprintf(NULL, 0, "    -%s, --%s (<%s>, ...)", short_name, name, name);
+        -:  896:		else
+        8:  897:			len = snprintf(NULL, 0, "    -%s, --%s <%s>", short_name, name, name);
+       15:  898:		if (len > max_len)
+       11:  899:			max_len = len;
+        -:  900:	}
+        -:  901:
+        9:  902:	max_len += 4;
+        -:  903:
+        9:  904:	if (max_len < 17)
+        2:  905:		max_len = 17;
+        -:  906:
+        9:  907:	const char *prog = args->prog;
+        9:  908:	const char *author = args->author;
+        9:  909:	const char *version = args->version;
+        -:  910:	char buffer[1025];
+        -:  911:	char buffer2[1025];
+        -:  912:	u64 i;
+      324:  913:	for (i = 0; i < max_len - 13 && i < 1024; i++)
+      315:  914:		buffer[i] = ' ';
+        9:  915:	buffer[i] = 0;
+        -:  916:
+      297:  917:	for (i = 0; i < max_len - 16 && i < 1024; i++)
+      288:  918:		buffer2[i] = ' ';
+        9:  919:	buffer2[i] = 0;
+        -:  920:	u64 sub_command_str_len;
+        9:  921:	if (sub_command)
+        5:  922:		sub_command_str_len = strlen(sub_command);
+        -:  923:	else
+        4:  924:		sub_command_str_len = 0;
+        9:  925:	char sub_command_str[sub_command_str_len + 30];
+        9:  926:	char *sub_arg_doc_str = "";
+        -:  927:
+        9:  928:	if (sub_command) {
+        5:  929:		snprintf(sub_command_str, sub_command_str_len + 30, "%s%s%s", BRIGHT_RED, sub_command,
+        -:  930:				 RESET);
+        5:  931:		sub_arg_doc_str = args->subs[sub_index].arg_doc;
+        -:  932:	} else {
+        4:  933:		snprintf(sub_command_str, sub_command_str_len + 30, "[%sSUB_COMMAND%s]", DIMMED, RESET);
+        -:  934:	}
+        -:  935:
+        9:  936:	fprintf(stderr,
+        -:  937:			"%s%s%s %s%s%s\n%s%s%s\n\n%sUSAGE%s:\n    %s%s%s "
+        -:  938:			"[%sCORE_OPTIONS%s] %s [%sSUB_OPTIONS%s] %s\n\n"
+        -:  939:			"%sCORE_FLAGS%s:\n"
+        -:  940:			"    %s-h%s, %s--help%s%sPrints help information\n"
+        -:  941:			"    %s-V%s, %s--version%s%sPrints version "
+        -:  942:			"information\n",
+        -:  943:			CYAN, prog, RESET, YELLOW, version, RESET, GREEN, author, RESET, DIMMED, RESET,
+        -:  944:			BRIGHT_RED, prog, RESET, DIMMED, RESET, sub_command_str, DIMMED, RESET, sub_arg_doc_str,
+        -:  945:			DIMMED, RESET, CYAN, RESET, YELLOW, RESET, buffer, CYAN, RESET, YELLOW, RESET, buffer2);
+        -:  946:
+       24:  947:	for (u64 i = 0; i < count; i++) {
+       15:  948:		bool takes_value = args->subs[0].params[i].takes_value;
+       15:  949:		if (!takes_value) {
+        4:  950:			char *name = args->subs[0].params[i].name;
+        4:  951:			char *short_name = args->subs[0].params[i].short_name;
+        4:  952:			char *help = args->subs[0].params[i].help;
+        4:  953:			u64 len = snprintf(NULL, 0, "    -%s, --%s", short_name, name);
+        4:  954:			if (len > max_len)
+    #####:  955:				len = max_len;
+        -:  956:			u64 i;
+      458:  957:			for (i = 0; i < max_len - len && i < 1024; i++)
+      454:  958:				buffer[i] = ' ';
+        4:  959:			buffer[i] = 0;
+        4:  960:			fprintf(stderr, "    %s-%s%s, %s--%s%s %s%s\n", CYAN, short_name, RESET, YELLOW, name,
+        -:  961:					RESET, buffer, help);
+        -:  962:		}
+        -:  963:	}
+        -:  964:
+        9:  965:	if (count) {
+        7:  966:		fprintf(stderr, "\n%sCORE_OPTIONS%s:\n", DIMMED, RESET);
+        -:  967:
+       22:  968:		for (u64 i = 0; i < count; i++) {
+       15:  969:			bool takes_value = args->subs[0].params[i].takes_value;
+       15:  970:			if (takes_value) {
+       11:  971:				char *name = args->subs[0].params[i].name;
+       11:  972:				char *short_name = args->subs[0].params[i].short_name;
+       11:  973:				char *help = args->subs[0].params[i].help;
+       11:  974:				bool multi = args->subs[0].params[i].multiple;
+       11:  975:				char *default_value = args->subs[0].params[i].default_value;
+        -:  976:				u64 default_value_str_len;
+       11:  977:				if (default_value == NULL) {
+        4:  978:					default_value_str_len = 1;
+        -:  979:				} else {
+        7:  980:					default_value_str_len = strlen(default_value) + 100;
+        -:  981:				}
+       11:  982:				char default_value_str[default_value_str_len];
+       11:  983:				if (default_value == NULL)
+        4:  984:					strcpy(default_value_str, "");
+        -:  985:				else
+        7:  986:					snprintf(default_value_str, default_value_str_len, " (default value: '%s')",
+        -:  987:							 default_value);
+        -:  988:
+       11:  989:				if (multi) {
+        3:  990:					u64 len = snprintf(NULL, 0, "    -%s, --%s <%s>, ...", short_name, name, name);
+        3:  991:					if (len > max_len)
+    #####:  992:						len = max_len;
+        -:  993:					u64 i;
+       21:  994:					for (i = 0; i < max_len - len && i < 1024; i++)
+       18:  995:						buffer[i] = ' ';
+        3:  996:					buffer[i] = 0;
+        3:  997:					fprintf(stderr,
+        -:  998:							"    %s-%s%s, %s--%s%s "
+        -:  999:							"<%s>, "
+        -: 1000:							"... %s%s%s\n",
+        -: 1001:							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+        -: 1002:							default_value_str);
+        -: 1003:				} else {
+        -: 1004:
+        8: 1005:					u64 len = snprintf(NULL, 0, "    -%s, --%s <%s>", short_name, name, name);
+        8: 1006:					if (len > max_len)
+    #####: 1007:						len = max_len;
+        -: 1008:					u64 i;
+       56: 1009:					for (i = 0; i < max_len - len && i < 1024; i++)
+       48: 1010:						buffer[i] = ' ';
+        8: 1011:					buffer[i] = 0;
+        -: 1012:
+        8: 1013:					fprintf(stderr,
+        -: 1014:							"    %s-%s%s, %s--%s%s "
+        -: 1015:							"<%s> "
+        -: 1016:							"%s%s%s\n",
+        -: 1017:							CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+        -: 1018:							default_value_str);
+        -: 1019:				}
+        -: 1020:			}
+        -: 1021:		}
+        -: 1022:	}
+        -: 1023:
+        9: 1024:	if (subs_count > 1 && sub_command == NULL) {
+        3: 1025:		fprintf(stderr, "\n%sSUB_COMMANDS%s:\n", DIMMED, RESET);
+        6: 1026:		for (u64 i = 1; i < subs_count; i++) {
+        -: 1027:
+        3: 1028:			char *name = args->subs[i].name;
+        3: 1029:			char *help = args->subs[i].help;
+        3: 1030:			char *arg_doc = args->subs[i].arg_doc;
+        -: 1031:
+        3: 1032:			u64 len = strlen(name) + strlen(arg_doc) + 4;
+        3: 1033:			if (len > max_len)
+    #####: 1034:				len = max_len;
+        -: 1035:			char buffer[1025];
+        -: 1036:			u64 j;
+      130: 1037:			for (j = 0; j < (max_len - len) && j < 1024; j++)
+      127: 1038:				buffer[j] = ' ';
+        3: 1039:			buffer[j] = 0;
+        -: 1040:
+        3: 1041:			fprintf(stderr, "    %s%s%s %s%s%s\n", CYAN, name, RESET, arg_doc, buffer, help);
+        -: 1042:		}
+        -: 1043:	}
+        9: 1044:	if (sub_command) {
+        5: 1045:		u64 param_index = 0;
+       10: 1046:		for (u64 i = 1; i < subs_count; i++) {
+        5: 1047:			char *name = args->subs[i].name;
+        5: 1048:			if (!strcmp(name, sub_command)) {
+        5: 1049:				param_index = i;
+        -: 1050:			}
+        -: 1051:		}
+        -: 1052:
+        5: 1053:		if (param_index > 0) {
+        5: 1054:			count = args->subs[param_index].param_count;
+        5: 1055:			fprintf(stderr, "\n%sSUB_FLAGS%s (%s%s%s):\n", DIMMED, RESET, BRIGHT_RED, sub_command,
+        -: 1056:					RESET);
+        -: 1057:
+        9: 1058:			for (u64 i = 0; i < count; i++) {
+        4: 1059:				char *name = args->subs[param_index].params[i].name;
+        4: 1060:				char *short_name = args->subs[param_index].params[i].short_name;
+        4: 1061:				bool takes_value = args->subs[param_index].params[i].takes_value;
+        4: 1062:				char *help = args->subs[param_index].params[i].help;
+        -: 1063:
+        4: 1064:				if (!takes_value) {
+        3: 1065:					u64 len = strlen(name) + 10;
+        3: 1066:					if (len > max_len)
+    #####: 1067:						len = max_len;
+        -: 1068:					char buffer[1025];
+        -: 1069:					u64 j;
+       32: 1070:					for (j = 0; j < (max_len - len) && j < 1024; j++)
+       29: 1071:						buffer[j] = ' ';
+        3: 1072:					buffer[j] = 0;
+        3: 1073:					fprintf(stderr,
+        -: 1074:							"    %s-%s%s, "
+        -: 1075:							"%s--%s%s%s %s\n",
+        -: 1076:							CYAN, short_name, RESET, YELLOW, name, RESET, buffer, help);
+        -: 1077:				}
+        -: 1078:			}
+        5: 1079:			fprintf(stderr, "\n%sSUB_OPTIONS%s (%s%s%s):\n", DIMMED, RESET, BRIGHT_RED, sub_command,
+        -: 1080:					RESET);
+        9: 1081:			for (u64 i = 0; i < count; i++) {
+        4: 1082:				char *name = args->subs[param_index].params[i].name;
+        4: 1083:				char *short_name = args->subs[param_index].params[i].short_name;
+        4: 1084:				bool takes_value = args->subs[param_index].params[i].takes_value;
+        4: 1085:				char *help = args->subs[param_index].params[i].help;
+        4: 1086:				bool multiple = args->subs[param_index].params[i].multiple;
+        -: 1087:
+        4: 1088:				char *default_value = args->subs[param_index].params[i].default_value;
+        -: 1089:				u64 default_value_str_len;
+        4: 1090:				if (default_value == NULL) {
+        1: 1091:					default_value_str_len = 1;
+        -: 1092:				} else {
+        3: 1093:					default_value_str_len = strlen(default_value) + 100;
+        -: 1094:				}
+        4: 1095:				char default_value_str[default_value_str_len];
+        4: 1096:				if (default_value == NULL)
+        1: 1097:					strcpy(default_value_str, "");
+        -: 1098:				else
+        3: 1099:					snprintf(default_value_str, default_value_str_len, " (default value: %s)",
+        -: 1100:							 default_value);
+        -: 1101:
+        4: 1102:				if (takes_value) {
+        1: 1103:					if (multiple) {
+    #####: 1104:						u64 len = 2 * strlen(name) + 19;
+        -: 1105:						char buffer[1025];
+        -: 1106:						u64 j;
+    #####: 1107:						if (len > max_len)
+    #####: 1108:							len = max_len;
+    #####: 1109:						for (j = 0; j < (max_len - len) && j < 1024; j++)
+    #####: 1110:							buffer[j] = ' ';
+    #####: 1111:						buffer[j] = ' ';
+    #####: 1112:						buffer[j + 1] = 0;
+    #####: 1113:						fprintf(stderr,
+        -: 1114:								"    %s-%s%s, "
+        -: 1115:								"%s--%s%s "
+        -: 1116:								"<%s>, ...%s %s"
+        -: 1117:								"%s\n",
+        -: 1118:								CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+        -: 1119:								default_value_str);
+        -: 1120:					} else {
+        1: 1121:						u64 len = 2 * strlen(name) + 13;
+        -: 1122:						char buffer[1025];
+        -: 1123:						u64 j;
+        1: 1124:						if (len > max_len)
+        1: 1125:							len = max_len;
+       1*: 1126:						for (j = 0; j < (max_len - len) && j < 1024; j++)
+    #####: 1127:							buffer[j] = ' ';
+        1: 1128:						buffer[j] = 0;
+        1: 1129:						fprintf(stderr,
+        -: 1130:								"    %s-%s%s, "
+        -: 1131:								"%s--%s%s "
+        -: 1132:								"<%s>%s "
+        -: 1133:								"%s%s\n",
+        -: 1134:								CYAN, short_name, RESET, YELLOW, name, RESET, name, buffer, help,
+        -: 1135:								default_value_str);
+        -: 1136:					}
+        -: 1137:				}
+        -: 1138:			}
+        -: 1139:		}
+        -: 1140:	}
+        -: 1141:
+        9: 1142:	EXIT_ERR_IF_NO_DEBUG(0);
+        -: 1143:}
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:25
+        -:    0:Runs:28
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1282,11 +1288,11 @@
         -:   19:#define getenv(x) secure_getenv(x)
         -:   20:#endif // __linux__
         -:   21:
-       74:   22:char *get_dimmed() {
-       74:   23:	if (getenv("NO_COLOR") != NULL) {
+      116:   22:char *get_dimmed() {
+      116:   23:	if (getenv("NO_COLOR") != NULL) {
         1:   24:		return "";
         -:   25:	} else {
-       73:   26:		return "\x1b[2m";
+      115:   26:		return "\x1b[2m";
         -:   27:	}
         -:   28:}
         -:   29:
@@ -1298,35 +1304,35 @@
         -:   35:	}
         -:   36:}
         -:   37:
-       75:   38:char *get_bright_red() {
-       75:   39:	if (getenv("NO_COLOR") != NULL) {
+      109:   38:char *get_bright_red() {
+      109:   39:	if (getenv("NO_COLOR") != NULL) {
         1:   40:		return "";
         -:   41:	} else {
-       74:   42:		return "\x1b[91m";
+      108:   42:		return "\x1b[91m";
         -:   43:	}
         -:   44:}
         -:   45:
-       22:   46:char *get_green() {
-       22:   47:	if (getenv("NO_COLOR") != NULL) {
+       38:   46:char *get_green() {
+       38:   47:	if (getenv("NO_COLOR") != NULL) {
         1:   48:		return "";
         -:   49:	} else {
-       21:   50:		return "\x1b[32m";
+       37:   50:		return "\x1b[32m";
         -:   51:	}
         -:   52:}
         -:   53:
-       33:   54:char *get_yellow() {
-       33:   55:	if (getenv("NO_COLOR") != NULL) {
+       49:   54:char *get_yellow() {
+       49:   55:	if (getenv("NO_COLOR") != NULL) {
         1:   56:		return "";
         -:   57:	} else {
-       32:   58:		return "\x1b[33m";
+       48:   58:		return "\x1b[33m";
         -:   59:	}
         -:   60:}
         -:   61:
-       35:   62:char *get_cyan() {
-       35:   63:	if (getenv("NO_COLOR") != NULL) {
+       52:   62:char *get_cyan() {
+       52:   63:	if (getenv("NO_COLOR") != NULL) {
         1:   64:		return "";
         -:   65:	} else {
-       34:   66:		return "\x1b[36m";
+       51:   66:		return "\x1b[36m";
         -:   67:	}
         -:   68:}
         -:   69:
@@ -1346,17 +1352,17 @@
         -:   83:	}
         -:   84:}
         -:   85:
-      231:   86:char *get_reset() {
-      231:   87:	if (getenv("NO_COLOR") != NULL) {
+      356:   86:char *get_reset() {
+      356:   87:	if (getenv("NO_COLOR") != NULL) {
         1:   88:		return "";
         -:   89:	} else {
-      230:   90:		return "\x1b[0m";
+      355:   90:		return "\x1b[0m";
         -:   91:	}
         -:   92:}
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:25
+        -:    0:Runs:28
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1393,28 +1399,28 @@
         -:   34:bool __is_debug_misc_no_exit = false;
         -:   35:bool __is_debug_misc_preserve = false;
         -:   36:
-       13:   37:u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream) {
-       13:   38:	return fread(buffer, size, count, (FILE *)stream);
+       17:   37:u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream) {
+       17:   38:	return fread(buffer, size, count, (FILE *)stream);
         -:   39:}
         -:   40:
        18:   41:u64 myfwrite(const void *buffer, u64 size, u64 count, MYFILE *stream) {
        18:   42:	return fwrite(buffer, size, count, (FILE *)stream);
         -:   43:}
         -:   44:
-        7:   45:int myfeof(MYFILE *stream) {
-        7:   46:	return feof((FILE *)stream);
+       11:   45:int myfeof(MYFILE *stream) {
+       11:   46:	return feof((FILE *)stream);
         -:   47:}
         -:   48:
         6:   49:int myferror(MYFILE *stream) {
         6:   50:	return ferror((FILE *)stream);
         -:   51:}
         -:   52:
-        7:   53:long myftell(MYFILE *stream) {
-        7:   54:	return ftell((FILE *)stream);
+       11:   53:long myftell(MYFILE *stream) {
+       11:   54:	return ftell((FILE *)stream);
         -:   55:}
         -:   56:
-       11:   57:int myfseek(MYFILE *stream, long pos, int type) {
-       11:   58:	return fseek((FILE *)stream, pos, type);
+       15:   57:int myfseek(MYFILE *stream, long pos, int type) {
+       15:   58:	return fseek((FILE *)stream, pos, type);
         -:   59:}
         -:   60:
         6:   61:int myfprintf(MYFILE *fptr, const char *str, ...) {
@@ -1438,26 +1444,26 @@
         3:   79:	return NULL;
         -:   80:}
         -:   81:
-        8:   82:u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream) {
-        8:   83:	size_t total_read = 0;
-        8:   84:	size_t bytes_to_read = size * count;
+       12:   82:u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream) {
+       12:   83:	size_t total_read = 0;
+       12:   84:	size_t bytes_to_read = size * count;
         -:   85:	size_t bytes_read;
         -:   86:
-        9:   87:	while (total_read < bytes_to_read || __is_debug_misc_ferror) {
-        8:   88:		bytes_read = myfread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
-        8:   89:		if (bytes_read == 0 || __is_debug_misc_ferror) {
+       17:   87:	while (total_read < bytes_to_read || __is_debug_misc_ferror) {
+       12:   88:		bytes_read = myfread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
+       12:   89:		if (bytes_read == 0 || __is_debug_misc_ferror) {
         -:   90:			// Check for EOF or error
         2:   91:			if (myferror(stream) || __is_debug_misc_ferror) {
         1:   92:				errno = EIO;
         1:   93:				break; // Error occurred
         -:   94:			}
         -:   95:		}
-        7:   96:		total_read += bytes_read;
-        7:   97:		if (myfeof(stream))
+       11:   96:		total_read += bytes_read;
+       11:   97:		if (myfeof(stream))
         6:   98:			break;
         -:   99:	}
         -:  100:
-        8:  101:	return total_read;
+       12:  101:	return total_read;
         -:  102:}
         -:  103:
         6:  104:int copy_file(const Path *dst_path, const Path *src_path) {
@@ -1508,21 +1514,21 @@
         -:  149:}
         -:  150:
         -:  151:// Function to recursively remove a directory and its contents
-       73:  152:int remove_directory(const Path *p, bool preserve_dir) {
-       73:  153:	const char *path = path_to_string(p);
+       79:  152:int remove_directory(const Path *p, bool preserve_dir) {
+       79:  153:	const char *path = path_to_string(p);
         -:  154:	struct dirent *entry;
-       73:  155:	DIR *dir = opendir(path);
+       79:  155:	DIR *dir = opendir(path);
         -:  156:
-       73:  157:	if (dir == NULL) {
-       22:  158:		return -1;
+       79:  157:	if (dir == NULL) {
+       25:  158:		return -1;
         -:  159:	}
         -:  160:
-      196:  161:	while ((entry = readdir(dir)) != NULL) {
+      205:  161:	while ((entry = readdir(dir)) != NULL) {
         -:  162:		char full_path[PATH_MAX];
         -:  163:
         -:  164:		// Skip the special entries "." and ".."
-      150:  165:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-      101:  166:			continue;
+      156:  165:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+      107:  166:			continue;
         -:  167:		}
         -:  168:
         -:  169:		// Construct the full path to the file/directory
@@ -1553,17 +1559,17 @@
         -:  194:		}
         -:  195:	}
         -:  196:
-       46:  197:	closedir(dir);
+       49:  197:	closedir(dir);
         -:  198:
         -:  199:	// Now the directory is empty, so we can remove it
-       46:  200:	if (!preserve_dir) {
-       45:  201:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
+       49:  200:	if (!preserve_dir) {
+       48:  201:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
         1:  202:			errno = EIO;
         1:  203:			return -1;
         -:  204:		}
         -:  205:	}
         -:  206:
-       45:  207:	return 0;
+       48:  207:	return 0;
         -:  208:}
         -:  209:
         5:  210:void exit_error(char *format, ...) {
@@ -1576,31 +1582,31 @@
        5*:  217:	EXIT_ERR_IF_NO_DEBUG(-1);
         5:  218:}
         -:  219:
-       22:  220:void print_error(char *format, ...) {
+       23:  220:void print_error(char *format, ...) {
         -:  221:	va_list va_args;
-       22:  222:	va_start(va_args, format);
-       22:  223:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
-       22:  224:	vfprintf(stderr, format, va_args);
-       22:  225:	fprintf(stderr, "\n");
-       22:  226:	va_end(va_args);
-       22:  227:}
+       23:  222:	va_start(va_args, format);
+       23:  223:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+       23:  224:	vfprintf(stderr, format, va_args);
+       23:  225:	fprintf(stderr, "\n");
+       23:  226:	va_end(va_args);
+       23:  227:}
         -:  228:
         -:  229:// Helper function to trim leading and trailing whitespace
-        4:  230:char *trim_whitespace(char *str) {
+        7:  230:char *trim_whitespace(char *str) {
         -:  231:	// Trim leading whitespace
-        9:  232:	while (isspace((unsigned char)*str))
-        5:  233:		str++;
+       15:  232:	while (isspace((unsigned char)*str))
+        8:  233:		str++;
         -:  234:	// Trim trailing whitespace
-        4:  235:	char *end = str + strlen(str) - 1;
-       12:  236:	while (end > str && isspace((unsigned char)*end))
+        7:  235:	char *end = str + strlen(str) - 1;
+       15:  236:	while (end > str && isspace((unsigned char)*end))
         8:  237:		end--;
-        4:  238:	*(end + 1) = '\0'; // Null-terminate the trimmed string
-        4:  239:	return str;		   // Return the trimmed string
+        7:  238:	*(end + 1) = '\0'; // Null-terminate the trimmed string
+        7:  239:	return str;		   // Return the trimmed string
         -:  240:}
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:25
+        -:    0:Runs:28
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1628,33 +1634,33 @@
         -:   25:
         -:   26:bool __is_debug_path_homedir_null = false;
         -:   27:
-      152:   28:void path_cleanup(PathImpl *ptr) {
-      152:   29:	if (ptr->ptr)
-      149:   30:		myfree(ptr->ptr);
-      152:   31:}
+      163:   28:void path_cleanup(PathImpl *ptr) {
+      163:   29:	if (ptr->ptr)
+      160:   30:		myfree(ptr->ptr);
+      163:   31:}
         -:   32:
-      160:   33:int path_for(Path *p, const char *path) {
-      160:   34:	if (p == NULL) {
+      171:   33:int path_for(Path *p, const char *path) {
+      171:   34:	if (p == NULL) {
         1:   35:		errno = EINVAL;
         1:   36:		return -1;
         -:   37:	}
-      159:   38:	if (path == NULL) {
+      170:   38:	if (path == NULL) {
         1:   39:		errno = EINVAL;
         1:   40:		p->ptr = NULL;
         1:   41:		return -1;
         -:   42:	}
-      158:   43:	int len = strlen(path);
-      158:   44:	if (len == 0) {
+      169:   43:	int len = strlen(path);
+      169:   44:	if (len == 0) {
         1:   45:		errno = EINVAL;
         1:   46:		p->ptr = NULL;
         1:   47:		return -1;
         -:   48:	}
-      157:   49:	p->ptr = mymalloc(len + 1);
-      157:   50:	if (!p->ptr)
+      168:   49:	p->ptr = mymalloc(len + 1);
+      168:   50:	if (!p->ptr)
         2:   51:		return -1;
-      155:   52:	p->len = len;
-      155:   53:	strcpy(p->ptr, path);
-      155:   54:	return 0;
+      166:   52:	p->len = len;
+      166:   53:	strcpy(p->ptr, path);
+      166:   54:	return 0;
         -:   55:}
         -:   56:
        33:   57:int path_replace_home(Path *p) {
@@ -1686,16 +1692,16 @@
        30:   83:	return 0;
         -:   84:}
         -:   85:
-        4:   86:u64 path_file_size(Path *p) {
-        4:   87:	MYFILE *fp = myfopen(p, "r");
-        4:   88:	if (!fp) {
+        8:   86:u64 path_file_size(Path *p) {
+        8:   87:	MYFILE *fp = myfopen(p, "r");
+        8:   88:	if (!fp) {
         1:   89:		errno = EIO;
         1:   90:		return 0;
         -:   91:	}
-        3:   92:	myfseek(fp, 0L, SEEK_END);
-        3:   93:	u64 ret = myftell(fp);
-        3:   94:	myfclose(fp);
-        3:   95:	return ret;
+        7:   92:	myfseek(fp, 0L, SEEK_END);
+        7:   93:	u64 ret = myftell(fp);
+        7:   94:	myfclose(fp);
+        7:   95:	return ret;
         -:   96:}
         -:   97:
        33:   98:int path_canonicalize(Path *p) {
@@ -1716,41 +1722,41 @@
        13:  113:	strcpy(p->ptr, buf);
        13:  114:	return 0;
         -:  115:}
-      131:  116:int path_push(Path *p, const char *next) {
-      131:  117:	if (p == NULL) {
+      134:  116:int path_push(Path *p, const char *next) {
+      134:  117:	if (p == NULL) {
         1:  118:		errno = EINVAL;
         1:  119:		return -1;
         -:  120:	}
-      130:  121:	if (next == NULL) {
+      133:  121:	if (next == NULL) {
         1:  122:		errno = EINVAL;
         1:  123:		return -1;
         -:  124:	}
-      129:  125:	int slen = strlen(p->ptr);
-      129:  126:	if (slen <= 0 || strlen(next) == 0) {
+      132:  125:	int slen = strlen(p->ptr);
+      132:  126:	if (slen <= 0 || strlen(next) == 0) {
         1:  127:		errno = EFAULT;
         1:  128:		return -1;
         -:  129:	}
-      128:  130:	bool need_sep = false;
-      128:  131:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
-      128:  132:		need_sep = true;
+      131:  130:	bool need_sep = false;
+      131:  131:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
+      131:  132:		need_sep = true;
         -:  133:	}
         -:  134:
-      128:  135:	int nlen = slen + strlen(next);
-      128:  136:	if (need_sep)
-      128:  137:		nlen += strlen(PATH_SEPARATOR);
+      131:  135:	int nlen = slen + strlen(next);
+      131:  136:	if (need_sep)
+      131:  137:		nlen += strlen(PATH_SEPARATOR);
         -:  138:
-      128:  139:	if (nlen >= p->len) {
-      124:  140:		void *nptr = myrealloc(p->ptr, nlen + 1);
-      124:  141:		if (nptr == NULL)
+      131:  139:	if (nlen >= p->len) {
+      127:  140:		void *nptr = myrealloc(p->ptr, nlen + 1);
+      127:  141:		if (nptr == NULL)
         1:  142:			return -1;
-      123:  143:		p->ptr = nptr;
-      123:  144:		p->len = nlen;
+      126:  143:		p->ptr = nptr;
+      126:  144:		p->len = nlen;
         -:  145:	}
         -:  146:
-      127:  147:	if (need_sep)
-      127:  148:		strcat(p->ptr, PATH_SEPARATOR);
-      127:  149:	strcat(p->ptr, next);
-      127:  150:	return 0;
+      130:  147:	if (need_sep)
+      130:  148:		strcat(p->ptr, PATH_SEPARATOR);
+      130:  149:	strcat(p->ptr, next);
+      130:  150:	return 0;
         -:  151:}
        48:  152:int path_pop(Path *p) {
        48:  153:	const char *res = rstrstr(p->ptr, PATH_SEPARATOR);
@@ -1764,8 +1770,8 @@
        48:  161:	return 0;
         -:  162:}
         -:  163:
-      191:  164:char *path_to_string(const Path *p) {
-      191:  165:	return p->ptr;
+      206:  164:char *path_to_string(const Path *p) {
+      206:  165:	return p->ptr;
         -:  166:}
         -:  167:
        88:  168:const char *path_file_name(const Path *p) {
@@ -1776,27 +1782,27 @@
         2:  173:	return ret;
         -:  174:}
         -:  175:
-       25:  176:bool path_exists(const Path *p) {
-       25:  177:	if (p->ptr == NULL || p->len == 0) {
+       30:  176:bool path_exists(const Path *p) {
+       30:  177:	if (p->ptr == NULL || p->len == 0) {
         1:  178:		errno = EINVAL;
         1:  179:		return false;
         -:  180:	}
-       24:  181:	return access(p->ptr, F_OK) == 0;
+       29:  181:	return access(p->ptr, F_OK) == 0;
         -:  182:}
-        7:  183:bool path_is_dir(const Path *p) {
-        7:  184:	if (p->ptr == NULL || p->len == 0) {
+       11:  183:bool path_is_dir(const Path *p) {
+       11:  184:	if (p->ptr == NULL || p->len == 0) {
         1:  185:		errno = EINVAL;
         1:  186:		return false;
         -:  187:	}
         -:  188:	struct stat s;
-        6:  189:	if (stat(p->ptr, &s) == 0) {
-        3:  190:		return s.st_mode & S_IFDIR;
+       10:  189:	if (stat(p->ptr, &s) == 0) {
+        7:  190:		return s.st_mode & S_IFDIR;
         -:  191:	}
         3:  192:	return false;
         -:  193:}
         -:  194:
-      103:  195:bool path_mkdir(Path *p, u64 mode, bool parent) {
-      103:  196:	if (p->ptr == NULL || p->len == 0) {
+      106:  195:bool path_mkdir(Path *p, u64 mode, bool parent) {
+      106:  196:	if (p->ptr == NULL || p->len == 0) {
         1:  197:		errno = EINVAL;
         1:  198:		return false;
         -:  199:	}
@@ -1804,7 +1810,7 @@
         -:  201:	struct stat s;
         -:  202:
         -:  203:	// Check if the path exists
-      102:  204:	if (stat(p->ptr, &s) == 0) {
+      105:  204:	if (stat(p->ptr, &s) == 0) {
         -:  205:		// If the path exists and it's a directory, return success
         8:  206:		if (s.st_mode & S_IFDIR) {
         7:  207:			return true;
@@ -1816,11 +1822,11 @@
         -:  213:	}
         -:  214:
         -:  215:	// If parent is false, attempt to create only the target directory
-       94:  216:	if (!parent) {
-       76:  217:		if (mkdir(p->ptr, mode) != 0) {
+       97:  216:	if (!parent) {
+       79:  217:		if (mkdir(p->ptr, mode) != 0) {
        28:  218:			return false;
         -:  219:		}
-       48:  220:		return true;
+       51:  220:		return true;
         -:  221:	}
         -:  222:
         -:  223:	// Create the directory structure (parent is true)
@@ -1869,7 +1875,7 @@
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:25
+        -:    0:Runs:28
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1897,73 +1903,73 @@
         -:   25:u64 __is_debug_realloc_counter_ = UINT64_MAX;
         -:   26:#endif // TEST
         -:   27:
-      516:   28:void *mymalloc(u64 size) {
+      710:   28:void *mymalloc(u64 size) {
         -:   29:#ifdef TEST
-      516:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
-       17:   31:		__is_debug_malloc_counter_ = UINT64_MAX;
-       17:   32:		return NULL;
+      710:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
+       20:   31:		__is_debug_malloc_counter_ = UINT64_MAX;
+       20:   32:		return NULL;
         -:   33:	}
-      499:   34:	__is_debug_malloc_counter_--;
+      690:   34:	__is_debug_malloc_counter_--;
         -:   35:#endif // TEST
         -:   36:	void *ret;
-      499:   37:	ret = malloc(size);
+      690:   37:	ret = malloc(size);
         -:   38:
-      499:   39:	if (ret) {
-      499:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+      690:   39:	if (ret) {
+      690:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   41:	}
-      499:   42:	return ret;
+      690:   42:	return ret;
         -:   43:}
-      165:   44:void *myrealloc(void *ptr, u64 size) {
+      191:   44:void *myrealloc(void *ptr, u64 size) {
         -:   45:#ifdef TEST
-      165:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
-        6:   47:		__is_debug_realloc_counter_ = UINT64_MAX;
-        6:   48:		return NULL;
+      191:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
+        7:   47:		__is_debug_realloc_counter_ = UINT64_MAX;
+        7:   48:		return NULL;
         -:   49:	}
-      159:   50:	__is_debug_realloc_counter_--;
+      184:   50:	__is_debug_realloc_counter_--;
         -:   51:#endif // TEST
         -:   52:	void *ret;
-      159:   53:	ret = realloc(ptr, size);
+      184:   53:	ret = realloc(ptr, size);
         -:   54:
-      159:   55:	if (ret) {
-      159:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+      184:   55:	if (ret) {
+      184:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   57:	}
-      159:   58:	return ret;
+      184:   58:	return ret;
         -:   59:}
-      443:   60:void myfree(void *ptr) {
-      443:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-      443:   62:	free(ptr);
-      443:   63:}
-       45:   64:MYFILE *myfopen(const Path *path, const char *mode) {
-       45:   65:	const char *path_str = path_to_string(path);
-       45:   66:	FILE *ret = fopen(path_str, mode);
-       45:   67:	if (ret) {
-       40:   68:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
+      634:   60:void myfree(void *ptr) {
+      634:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+      634:   62:	free(ptr);
+      634:   63:}
+       53:   64:MYFILE *myfopen(const Path *path, const char *mode) {
+       53:   65:	const char *path_str = path_to_string(path);
+       53:   66:	FILE *ret = fopen(path_str, mode);
+       53:   67:	if (ret) {
+       48:   68:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
         -:   69:	}
-       45:   70:	return (MYFILE *)ret;
+       53:   70:	return (MYFILE *)ret;
         -:   71:}
-       40:   72:void myfclose(MYFILE *ptr) {
-       40:   73:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
-       40:   74:	fclose((FILE *)ptr);
-       40:   75:}
-       43:   76:u64 mymalloc_sum() {
-       43:   77:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
+       48:   72:void myfclose(MYFILE *ptr) {
+       48:   73:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
+       48:   74:	fclose((FILE *)ptr);
+       48:   75:}
+       49:   76:u64 mymalloc_sum() {
+       49:   77:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
         -:   78:}
         2:   79:u64 myrealloc_sum() {
         2:   80:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
         -:   81:}
-       43:   82:u64 myfree_sum() {
-       43:   83:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+       49:   82:u64 myfree_sum() {
+       49:   83:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
         -:   84:}
-       63:   85:u64 myfopen_sum() {
-       63:   86:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+       72:   85:u64 myfopen_sum() {
+       72:   86:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
         -:   87:}
-       63:   88:u64 myfclose_sum() {
-       63:   89:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+       72:   88:u64 myfclose_sum() {
+       72:   89:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
         -:   90:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:25
+        -:    0:Runs:28
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1982,9 +1988,9 @@
         -:   16:#include <stdio.h>
         -:   17:#include <stdlib.h>
         -:   18:
-       25:   19:void __attribute__((constructor)) __check_64bit_arch__() {
+       28:   19:void __attribute__((constructor)) __check_64bit_arch__() {
         -:   20:	if (sizeof(size_t) != 8) {
         -:   21:		fprintf(stderr, "Error: This program requires a 64-bit architecture to run.\n");
         -:   22:		exit(EXIT_FAILURE);
         -:   23:	}
-       25:   24:}
+       28:   24:}
