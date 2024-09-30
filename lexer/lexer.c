@@ -52,7 +52,7 @@ char *lexer_read_line(Lexer *l) {
 	}
 }
 
-int lexer_init(Lexer *l, Path *file) {
+int lexer_init(Lexer *l, const Path *file) {
 	// file/lexer cannot be null
 	if (file == NULL || l == NULL) {
 		errno = EINVAL;

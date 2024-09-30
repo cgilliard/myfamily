@@ -12,27 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _LEXER_LEXER__
-#define _LEXER_LEXER__
+#ifndef _FAML_PARSER__
+#define _FAML_PARSER__
 
 #include <base/path.h>
-#include <base/resources.h>
-#include <lexer/tokenizer.h>
+#include <faml/faml.h>
 
-#define LEXER_BUF_SIZE 1024
+typedef struct FamlParserImpl {
 
-typedef struct LexerImpl {
-	Tokenizer *tokenizer;
-	MYFILE *fp;
-	Path file;
-	u64 line_num;
-} LexerImpl;
+} FamlParserImpl;
 
-void lexer_cleanup(LexerImpl *l);
+void faml_parser_cleanup(FamlParserImpl *ptr);
 
-#define Lexer LexerImpl __attribute__((warn_unused_result, cleanup(lexer_cleanup)))
+#define FamlParser FamlParserImpl __attribute__((warn_unused_result, cleanup(faml_parser_cleanup)))
 
-int lexer_init(Lexer *l, const Path *file);
-int lexer_next_token(Lexer *l, Token *token);
+int faml_parse_file(FamlParser *parser, const Path *file, FamlObj *obj);
+int faml_parse(FamlParser *parser, const char *conf, FamlObj *obj);
+int faml_display_error(const FamlParser *parser);
 
-#endif // _LEXER_LEXER__
+int faml_array_len(const FamlObj *obj);
+
+#endif // _FAML_PARSER__

@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
-int tokenizer_init(Tokenizer *t, char *line) {
+int tokenizer_init(Tokenizer *t, const char *line) {
 	// check input
 	if (line == NULL || t == NULL) {
 		errno = EINVAL;
@@ -432,7 +432,8 @@ typedef enum TokenDisplayType {
 	TokenDisplayTypeWarning = 1
 } TokenDisplayType;
 
-int token_display_impl(Token *token, TokenDisplayType type, char *fmt, va_list va_args) {
+int token_display_impl(const Token *token, TokenDisplayType type, const char *fmt,
+					   va_list va_args) {
 	if (type == TokenDisplayTypeError)
 		fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
 	else
@@ -442,7 +443,7 @@ int token_display_impl(Token *token, TokenDisplayType type, char *fmt, va_list v
 	return 0;
 }
 
-int token_display_error(Token *token, char *fmt, ...) {
+int token_display_error(const Token *token, const char *fmt, ...) {
 	va_list va_args;
 	va_start(va_args, fmt);
 	int ret = token_display_impl(token, TokenDisplayTypeError, fmt, va_args);
@@ -450,7 +451,7 @@ int token_display_error(Token *token, char *fmt, ...) {
 	return ret;
 }
 
-int token_display_warning(Token *token, char *fmt, ...) {
+int token_display_warning(const Token *token, const char *fmt, ...) {
 	va_list va_args;
 	va_start(va_args, fmt);
 	int ret = token_display_impl(token, TokenDisplayTypeWarning, fmt, va_args);

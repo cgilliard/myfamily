@@ -12,27 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _LEXER_LEXER__
-#define _LEXER_LEXER__
+#include <base/test.h>
 
-#include <base/path.h>
-#include <base/resources.h>
-#include <lexer/tokenizer.h>
+MySuite(faml);
 
-#define LEXER_BUF_SIZE 1024
-
-typedef struct LexerImpl {
-	Tokenizer *tokenizer;
-	MYFILE *fp;
-	Path file;
-	u64 line_num;
-} LexerImpl;
-
-void lexer_cleanup(LexerImpl *l);
-
-#define Lexer LexerImpl __attribute__((warn_unused_result, cleanup(lexer_cleanup)))
-
-int lexer_init(Lexer *l, const Path *file);
-int lexer_next_token(Lexer *l, Token *token);
-
-#endif // _LEXER_LEXER__
+MyTest(faml, test_parser) {
+}

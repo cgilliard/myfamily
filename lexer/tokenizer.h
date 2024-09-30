@@ -48,9 +48,9 @@ void token_cleanup(TokenImpl *t);
 #define Token TokenImpl __attribute__((warn_unused_result, cleanup(token_cleanup)))
 #define Tokenizer TokenizerImpl __attribute__((warn_unused_result, cleanup(tokenizer_cleanup)))
 
-int token_display_error(Token *token, char *fmt, ...);
-int token_display_warning(Token *token, char *fmt, ...);
-int tokenizer_init(Tokenizer *t, char *line);
+int token_display_error(const Token *token, const char *fmt, ...);
+int token_display_warning(const Token *token, const char *fmt, ...);
+int tokenizer_init(Tokenizer *t, const char *line);
 int tokenizer_next_token(Tokenizer *t, Token *next);
 
 #endif // _LEXER_TOKENIZER__
