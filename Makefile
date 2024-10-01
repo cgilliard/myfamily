@@ -1,6 +1,6 @@
 include Makefile.config
 
-all_impl: release_build $(HEADERS)
+all: release_build $(HEADERS)
 	$(CC) $(RELEASE_FLAGS) $(CC_FLAGS) -o bin/fam $(ALL_OBJS)
 
 doc:

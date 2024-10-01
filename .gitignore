@@ -3,6 +3,7 @@
 **/*.gcov
 **/*.gcno
 **/*.gcda
+**/*.tmp
 **/bin
 /bin/*
 /doc/*
