@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/macro_utils.h>
 #include <base/resources.h>
+#include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <util/panic.h>
 #include <util/slabs.h>
 
@@ -222,10 +225,28 @@ void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
 }
 
 int slab_allocator_init_free_list(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
+	u64 slabs = st->initial_chunks * st->slabs_per_resize;
+	// initialize the values of the free list.
+	u32 offset = 0; // in this case offset is 0.
+	for (u64 i = 0; i < slabs; i++) {
+		if (i == (slabs - 1)) {
+			if (impl->is_64_bit)
+				((u64 *)(impl->sd_arr[index].free_list))[i + offset] = UINT64_MAX;
+			else
+				((u32 *)(impl->sd_arr[index].free_list))[i + offset] = UINT32_MAX;
+		} else {
+			if (impl->is_64_bit)
+				((u64 *)(impl->sd_arr[index].free_list))[i + offset] = offset + i + 1;
+			else
+				((u32 *)(impl->sd_arr[index].free_list))[i + offset] = offset + i + 1;
+		}
+	}
+
 	return 0;
 }
 
 int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
+	impl->sd_arr[index].type = *st;
 	impl->sd_arr[index].cur_slabs = 0;
 	impl->sd_arr[index].cur_chunks = st->initial_chunks;
 	impl->sd_arr[index].free_list_head = 0;
@@ -266,6 +287,30 @@ int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 ind
 	return 0;
 }
 
+int compare_sd(const void *a, const void *b) {
+	const SlabData *sda = a;
+	const SlabData *sdb = b;
+	if (sda->type.slab_size < sdb->type.slab_size)
+		return -1;
+	else if (sda->type.slab_size > sdb->type.slab_size)
+		return 1;
+	return 0;
+}
+
+int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
+	SlabAllocatorImpl *impl = ptr->impl;
+	qsort(impl->sd_arr, impl->sd_size, sizeof(SlabData), compare_sd);
+	u32 last_slab_size = 0;
+	for (u64 i = 0; i < impl->sd_size; i++) {
+		if (last_slab_size >= impl->sd_arr[i].type.slab_size) {
+			errno = EINVAL;
+			return -1;
+		}
+		last_slab_size = impl->sd_arr[i].type.slab_size;
+	}
+	return 0;
+}
+
 int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) {
 	ptr->impl = mymalloc(sizeof(SlabAllocatorImpl));
 	if (ptr->impl == NULL)
@@ -286,14 +331,109 @@ int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) 
 		if (slab_allocator_init_slab_data(impl, &config->slab_types[i], i))
 			return -1;
 	}
+	return slab_allocator_sort_slab_data(ptr);
+}
+
+int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
+	SlabAllocatorImpl *impl = ptr->impl;
+	int ret = -1;
+	if (impl->sd_size == 0)
+		return ret;
+
+	int left = 0;
+	int right = impl->sd_size - 1;
+
+	while (left <= right) {
+		int mid = left + (right - left) / 2;
+		u32 slab_size = impl->sd_arr[mid].type.slab_size;
+		if (slab_size == size) {
+			ret = mid;
+			break;
+		} else if (slab_size > size)
+			right = mid - 1;
+		else
+			left = mid + 1;
+	}
+
+	if (ret == -1 && right + 1 <= impl->sd_size - 1) {
+		return right + 1;
+	}
+
+	return ret;
+}
+
+int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
+	u64 id = sd->free_list_head;
+	if (is_64_bit && id == UINT64_MAX) {
+		return -1;
+	} else if (!is_64_bit && id == UINT32_MAX) {
+		return -1;
+	}
+
+	sd->free_list_head = ((u64 *)sd->free_list)[id];
+
+	// set to MAX-1 as a marker that this is allocated
+	// if any freed without this value, it's an error
+	if (is_64_bit)
+		((u64 *)sd->free_list)[id] = (UINT64_MAX - 1);
+	else
+		((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
+
+	u32 len = sd->type.slab_size;
+	u64 slab_data_index = id / sd->type.slabs_per_resize;
+	u64 offset_mod = id % sd->type.slabs_per_resize;
+
+	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
+	FatPtr64Impl *fptr64 = fptr->data;
+	fptr64->id = (id * 2) + 1;
+	fptr64->len = len - 2 * sizeof(u64);
+	fptr64->data = fptr->data + 2 * sizeof(u64);
+
+	sd->cur_slabs += 1;
 
 	return 0;
 }
+
+void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit) {
+	FatPtr64Impl *fptr64 = fptr->data;
+	u64 id = (fptr64->id - 1) / 2;
+	if (((u64 *)sd->free_list)[id] != (UINT64_MAX - 1)) {
+		panic("Potential double free. Id = %llu.\n", id);
+	}
+	((u64 *)sd->free_list)[id] = sd->free_list_head;
+	sd->free_list_head = id;
+	if (sd->cur_slabs == 0)
+		panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
+	sd->cur_slabs -= 1;
+}
+
 int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
-	return 0;
+	u32 needed = size + 2 * sizeof(u64);
+	int index = slab_allocator_index(ptr, needed);
+	if (index < 0) {
+		return -1;
+	}
+
+	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
+	return slab_data_allocate(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit);
 }
 void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
+	u32 needed = fat_ptr_len(fptr) + 2 * sizeof(u64);
+	int index = slab_allocator_index(ptr, needed);
+	if (index < 0)
+		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
+	FatPtr64Impl *fptr64 = fptr->data;
+	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
+	if (needed != sd->type.slab_size)
+		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
+	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit);
 }
 u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
-	return 0;
+	u64 ret = 0;
+	SlabAllocatorImpl *impl = ptr->impl;
+
+	for (u64 i = 0; i < impl->sd_size; i++) {
+		ret += impl->sd_arr[i].cur_slabs;
+	}
+	return ret;
 }
