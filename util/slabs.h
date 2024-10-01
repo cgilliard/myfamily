@@ -31,7 +31,7 @@ void *fat_ptr_data(const FatPtr *ptr);
 
 // Slab Type definition
 typedef struct SlabType {
-	u32 slab_size;
+	u64 slab_size;
 	u32 slabs_per_resize;
 	u32 initial_chunks;
 	u64 max_slabs;

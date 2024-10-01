@@ -34,22 +34,13 @@ typedef struct FatPtr32Impl {
 	void *data;
 } FatPtr32Impl;
 
-bool is_little_endian() {
-	u16 test = 0x1;
-	return (*(u8 *)&test == 0x1);
-}
-
 // deteremine which kind of fat pointer this is. 32 bit fat pointers are restricted to having an ID
 // that does not set the most significant bit. Therefore they must be less than 2^31 or the
 // maximum signed int value (INT32_MAX). Conversely, the 64 bit ids must have this bit set.
 // This is the slab allocator's responsibility to ensure the bit is set correctly.
 // Users need not worry about these details as they are handled internally.
 bool fat_ptr_is64(const FatPtr *ptr) {
-	if (is_little_endian()) {
-		return ((FatPtr32Impl *)ptr->data)->id & 0x1;
-	} else {
-		return ((FatPtr32Impl *)ptr->data)->id & 0x80000000;
-	}
+	return ((FatPtr32Impl *)ptr->data)->id & 0x1;
 }
 
 // Return the id of the FatPtr. First check bit for u64/u32 status, then return value.
@@ -108,34 +99,6 @@ void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len) {
 	fptr->id = id;
 	fptr->len = len;
 	fptr->data = ptr->data + 2 * sizeof(u32);
-}
-
-// map a sequential id to the 64 bit version for our slab allocator
-// slab allocators should use this function to map ids sequentially when configured to 64 bit
-// 0 -> 1, 1 -> 3, 2 -> 5,, ... slab allocators may use up to 2^63. Beyond that is out of bounds.
-// on big endian systems the MSB is set
-u64 map_id_64(u64 seq_id) {
-	if (seq_id & 0x8000000000000000)
-		panic("slab allocator: invalid 64 bit id");
-	if (is_little_endian()) {
-		return (seq_id * 2) + 1;
-	} else {
-		return seq_id | 0x8000000000000000;
-	}
-}
-
-// map a sequential id to the 32 bit version for our slab allocator
-// slab allocators should use this function to map ids sequentially when configured to 32 bit
-// 0 -> 0, 1 -> 2, 2 -> 4,, ... slab allocators may use up to 2^31. Beyond that is out of bounds.
-// on big endian systems the MSB is unset
-u32 map_id_32(u32 seq_id) {
-	if (seq_id & 0x80000000)
-		panic("slab allocator: invalid 32 bit id");
-	if (is_little_endian()) {
-		return seq_id * 2;
-	} else {
-		return seq_id & 0x7FFFFFFF;
-	}
 }
 
 // SlabAllocator Config
@@ -303,6 +266,19 @@ int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
 	u32 last_slab_size = 0;
 	for (u64 i = 0; i < impl->sd_size; i++) {
 		if (last_slab_size >= impl->sd_arr[i].type.slab_size) {
+			errno = EINVAL;
+			return -1;
+		}
+		// for alignment must be divisible by 8
+		if (impl->sd_arr[i].type.slab_size % 8 != 0) {
+			errno = EINVAL;
+			return -1;
+		}
+		// max slabs for 32 bit and 64 bit
+		if (impl->sd_arr[i].type.max_slabs > (INT32_MAX - 10) && !impl->is_64_bit) {
+			errno = EINVAL;
+			return -1;
+		} else if (impl->sd_arr[i].type.max_slabs > (INT64_MAX - 10) && impl->is_64_bit) {
 			errno = EINVAL;
 			return -1;
 		}
