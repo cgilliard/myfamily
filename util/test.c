@@ -65,13 +65,13 @@ MyTest(util, test_fat_ptr) {
 
 __attribute__((noreturn)) void on_panic(const char *msg) {
 	printf("on_panic = %s\n", msg);
+	cr_assert(!strcmp(msg, "test7"));
 	exit(0);
 }
 
 MyTest(util, test_panic) {
 	set_on_panic(on_panic);
-	int *ptr = NULL;
-	*ptr = 123;
+	panic("test7");
 	//   ensure we never get here
 	cr_assert(false);
 }
