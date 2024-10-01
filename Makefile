@@ -95,30 +95,26 @@ define run_tests
     exit $$ERROR
 endef
 
-test_build:
+xxdir:
 	$(CC) -o bin/xxdir build_utils/xxdir.c
 	bin/xxdir main/resources main/resources.h fam
+
+test_build:
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir FLAG_OPTIONS="$(TEST_FLAGS)"; \
 	done;
 
 release_build:
-	$(CC) -o bin/xxdir build_utils/xxdir.c
-	bin/xxdir main/resources main/resources.h fam
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir FLAG_OPTIONS="$(RELEASE_FLAGS)"; \
 	done;
 
 san_build:
-	$(CC) -o bin/xxdir build_utils/xxdir.c
-	bin/xxdir main/resources main/resources.h fam
 	 for dir in $(SUBDIRS); do \
 		 $(MAKE) -C $$dir FLAG_OPTIONS="$(SAN_FLAGS)"; \
 	done;
 
 coverage_build:
-	$(CC) -o bin/xxdir build_utils/xxdir.c
-	bin/xxdir main/resources main/resources.h fam
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir FLAG_OPTIONS="$(COVERAGE_FLAGS)"; \
 	done; \
