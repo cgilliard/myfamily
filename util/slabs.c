@@ -174,18 +174,18 @@ int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st) 
 // Slab Allocator
 
 typedef struct SlabData {
-	SlabType type;	// This slab data's type information (slab_size, slabs_per_resize, initial, max)
-	void **data;	// Pointers to each chunk
-	u32 *free_list; // The free list pointers
-	u32 cur_chunks; // number of chunks currently allocated
-	u32 cur_slabs;	// number of slabs currently allocated
-	u32 free_list_head; // the free list head
+	SlabType type; // This slab data's type information (slab_size, slabs_per_resize, initial, max)
+	void **data;   // Pointers to each chunk
+	void *free_list;	// The free list pointers
+	u64 cur_chunks;		// number of chunks currently allocated
+	u64 cur_slabs;		// number of slabs currently allocated
+	u64 free_list_head; // the free list head
 } SlabData;
 
 typedef struct SlabAllocatorImpl {
-	u32 sd_size;	  // size of the SlabData array
+	u64 sd_size;	  // size of the SlabData array
 	SlabData *sd_arr; // slab data array one for each SlabType
-	u32 cur_malloc;	  // number of slabs allocated via malloc
+	u64 cur_malloc;	  // number of slabs allocated via malloc
 	bool no_malloc;	  // config no_malloc
 	bool zeroed;	  // config zeroed
 	bool is_64_bit;	  // config 64 bit id/len
@@ -198,10 +198,21 @@ void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
 		if (impl->sd_arr) {
 			for (u64 i = 0; i < impl->sd_size; i++) {
 				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
-					myfree(impl->sd_arr[i].data[j]);
+					if (impl->sd_arr[i].data[j]) {
+						myfree(impl->sd_arr[i].data[j]);
+						impl->sd_arr[i].data[j] = NULL;
+					}
 				}
-				myfree(impl->sd_arr[i].data);
+				if (impl->sd_arr[i].data) {
+					myfree(impl->sd_arr[i].data);
+					impl->sd_arr[i].data = NULL;
+				}
+				if (impl->sd_arr[i].free_list) {
+					myfree(impl->sd_arr[i].free_list);
+					impl->sd_arr[i].free_list = NULL;
+				}
 			}
+
 			myfree(impl->sd_arr);
 			impl->sd_arr = NULL;
 		}
@@ -211,8 +222,6 @@ void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
 }
 
 int slab_allocator_init_free_list(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
-	for (u64 i = 0; i < index; i++) {
-	}
 	return 0;
 }
 
@@ -223,6 +232,23 @@ int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 ind
 	impl->sd_arr[index].data = mymalloc(sizeof(void *) * st->initial_chunks);
 	if (impl->sd_arr[index].data == NULL)
 		return -1;
+
+	if (st->initial_chunks > 0) {
+		if (impl->is_64_bit)
+			impl->sd_arr[index].free_list =
+				mymalloc(sizeof(u64) * st->slabs_per_resize * st->initial_chunks);
+		else
+			impl->sd_arr[index].free_list =
+				mymalloc(sizeof(u32) * st->slabs_per_resize * st->initial_chunks);
+	} else {
+		impl->sd_arr[index].free_list = NULL;
+	}
+
+	if (impl->sd_arr[index].free_list == NULL) {
+		myfree(impl->sd_arr[index].data);
+		return -1;
+	}
+
 	for (u64 i = 0; i < st->initial_chunks; i++) {
 		impl->sd_arr[index].data[i] = mymalloc(st->slab_size * st->slabs_per_resize);
 

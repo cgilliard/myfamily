@@ -34,7 +34,7 @@ typedef struct SlabType {
 	u32 slab_size;
 	u32 slabs_per_resize;
 	u32 initial_chunks;
-	u32 max_slabs;
+	u64 max_slabs;
 } SlabType;
 
 // Slab Allocator configuration
