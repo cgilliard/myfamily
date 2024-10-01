@@ -63,6 +63,9 @@ MyTest(util, test_fat_ptr) {
 	fat_ptr_free_test_obj32(&ptr2);
 }
 
+// Note: address sanatizer and criterion seem to have problems with this test on certain
+// platforms/configurations. I tested both on linux/mac in the actual binary and it works
+// for both explicit panic and signals. So, I think it works. Will leave this disabled for now.
 /*
 __attribute__((noreturn)) void on_panic(const char *msg) {
 	printf("on_panic = %s\n", msg);
