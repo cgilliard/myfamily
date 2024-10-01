@@ -17,6 +17,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+bool __is_little_endian() {
+	u16 test = 0x1;
+	return (*(u8 *)&test == 0x1);
+}
+
 void __attribute__((constructor)) __check_64bit_arch__() {
 	if (sizeof(size_t) != 8) {
 		fprintf(stderr, "Error: This program requires a 64-bit architecture to run.\n");
@@ -28,6 +33,11 @@ void __attribute__((constructor)) __check_64bit_arch__() {
 		sizeof(i64) != 8 || sizeof(i128) != 16 || sizeof(f32) != 4 || sizeof(f64) != 8 ||
 		sizeof(bool) != 1) {
 		fprintf(stderr, "Invalid data type size! Check your c compiler configuration options.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (!__is_little_endian()) {
+		fprintf(stderr, "Big endian systems not supported");
 		exit(EXIT_FAILURE);
 	}
 }
