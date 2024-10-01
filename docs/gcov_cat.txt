@@ -1266,7 +1266,7 @@
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:43
+        -:    0:Runs:50
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1362,7 +1362,7 @@
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:43
+        -:    0:Runs:50
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1518,21 +1518,21 @@
         -:  153:}
         -:  154:
         -:  155:// Function to recursively remove a directory and its contents
-      107:  156:int remove_directory(const Path *p, bool preserve_dir) {
-      107:  157:	const char *path = path_to_string(p);
+      117:  156:int remove_directory(const Path *p, bool preserve_dir) {
+      117:  157:	const char *path = path_to_string(p);
         -:  158:	struct dirent *entry;
-      107:  159:	DIR *dir = opendir(path);
+      117:  159:	DIR *dir = opendir(path);
         -:  160:
-      107:  161:	if (dir == NULL) {
-       39:  162:		return -1;
+      117:  161:	if (dir == NULL) {
+       44:  162:		return -1;
         -:  163:	}
         -:  164:
-      247:  165:	while ((entry = readdir(dir)) != NULL) {
+      262:  165:	while ((entry = readdir(dir)) != NULL) {
         -:  166:		char full_path[PATH_MAX];
         -:  167:
         -:  168:		// Skip the special entries "." and ".."
-      184:  169:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-      135:  170:			continue;
+      194:  169:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+      145:  170:			continue;
         -:  171:		}
         -:  172:
         -:  173:		// Construct the full path to the file/directory
@@ -1563,17 +1563,17 @@
         -:  198:		}
         -:  199:	}
         -:  200:
-       63:  201:	closedir(dir);
+       68:  201:	closedir(dir);
         -:  202:
         -:  203:	// Now the directory is empty, so we can remove it
-       63:  204:	if (!preserve_dir) {
-       62:  205:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
+       68:  204:	if (!preserve_dir) {
+       67:  205:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
         1:  206:			errno = EIO;
         1:  207:			return -1;
         -:  208:		}
         -:  209:	}
         -:  210:
-       62:  211:	return 0;
+       67:  211:	return 0;
         -:  212:}
         -:  213:
         5:  214:void exit_error(char *format, ...) {
@@ -1610,7 +1610,7 @@
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:43
+        -:    0:Runs:50
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1638,35 +1638,35 @@
         -:   25:
         -:   26:bool __is_debug_path_homedir_null = false;
         -:   27:
-      204:   28:void path_cleanup(PathImpl *ptr) {
-      204:   29:	if (ptr->ptr) {
-      198:   30:		myfree(ptr->ptr);
-      198:   31:		ptr->ptr = NULL;
+      214:   28:void path_cleanup(PathImpl *ptr) {
+      214:   29:	if (ptr->ptr) {
+      208:   30:		myfree(ptr->ptr);
+      208:   31:		ptr->ptr = NULL;
         -:   32:	}
-      204:   33:}
+      214:   33:}
         -:   34:
-      209:   35:int path_for(Path *p, const char *path) {
-      209:   36:	if (p == NULL) {
+      219:   35:int path_for(Path *p, const char *path) {
+      219:   36:	if (p == NULL) {
         1:   37:		errno = EINVAL;
         1:   38:		return -1;
         -:   39:	}
-      208:   40:	if (path == NULL) {
+      218:   40:	if (path == NULL) {
         1:   41:		errno = EINVAL;
         1:   42:		p->ptr = NULL;
         1:   43:		return -1;
         -:   44:	}
-      207:   45:	int len = strlen(path);
-      207:   46:	if (len == 0) {
+      217:   45:	int len = strlen(path);
+      217:   46:	if (len == 0) {
         1:   47:		errno = EINVAL;
         1:   48:		p->ptr = NULL;
         1:   49:		return -1;
         -:   50:	}
-      206:   51:	p->ptr = mymalloc(len + 1);
-      206:   52:	if (!p->ptr)
+      216:   51:	p->ptr = mymalloc(len + 1);
+      216:   52:	if (!p->ptr)
         2:   53:		return -1;
-      204:   54:	p->len = len;
-      204:   55:	strcpy(p->ptr, path);
-      204:   56:	return 0;
+      214:   54:	p->len = len;
+      214:   55:	strcpy(p->ptr, path);
+      214:   56:	return 0;
         -:   57:}
         -:   58:
        33:   59:int path_replace_home(Path *p) {
@@ -1728,41 +1728,41 @@
        13:  115:	strcpy(p->ptr, buf);
        13:  116:	return 0;
         -:  117:}
-      148:  118:int path_push(Path *p, const char *next) {
-      148:  119:	if (p == NULL) {
+      153:  118:int path_push(Path *p, const char *next) {
+      153:  119:	if (p == NULL) {
         1:  120:		errno = EINVAL;
         1:  121:		return -1;
         -:  122:	}
-      147:  123:	if (next == NULL) {
+      152:  123:	if (next == NULL) {
         1:  124:		errno = EINVAL;
         1:  125:		return -1;
         -:  126:	}
-      146:  127:	int slen = strlen(p->ptr);
-      146:  128:	if (slen <= 0 || strlen(next) == 0) {
+      151:  127:	int slen = strlen(p->ptr);
+      151:  128:	if (slen <= 0 || strlen(next) == 0) {
         1:  129:		errno = EFAULT;
         1:  130:		return -1;
         -:  131:	}
-      145:  132:	bool need_sep = false;
-      145:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
-      145:  134:		need_sep = true;
+      150:  132:	bool need_sep = false;
+      150:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
+      150:  134:		need_sep = true;
         -:  135:	}
         -:  136:
-      145:  137:	int nlen = slen + strlen(next);
-      145:  138:	if (need_sep)
-      145:  139:		nlen += strlen(PATH_SEPARATOR);
+      150:  137:	int nlen = slen + strlen(next);
+      150:  138:	if (need_sep)
+      150:  139:		nlen += strlen(PATH_SEPARATOR);
         -:  140:
-      145:  141:	if (nlen >= p->len) {
-      141:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
-      141:  143:		if (nptr == NULL)
+      150:  141:	if (nlen >= p->len) {
+      146:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
+      146:  143:		if (nptr == NULL)
         1:  144:			return -1;
-      140:  145:		p->ptr = nptr;
-      140:  146:		p->len = nlen;
+      145:  145:		p->ptr = nptr;
+      145:  146:		p->len = nlen;
         -:  147:	}
         -:  148:
-      144:  149:	if (need_sep)
-      144:  150:		strcat(p->ptr, PATH_SEPARATOR);
-      144:  151:	strcat(p->ptr, next);
-      144:  152:	return 0;
+      149:  149:	if (need_sep)
+      149:  150:		strcat(p->ptr, PATH_SEPARATOR);
+      149:  151:	strcat(p->ptr, next);
+      149:  152:	return 0;
         -:  153:}
        48:  154:int path_pop(Path *p) {
        48:  155:	const char *res = rstrstr(p->ptr, PATH_SEPARATOR);
@@ -1776,8 +1776,8 @@
        48:  163:	return 0;
         -:  164:}
         -:  165:
-     2156:  166:char *path_to_string(const Path *p) {
-     2156:  167:	return p->ptr;
+     2166:  166:char *path_to_string(const Path *p) {
+     2166:  167:	return p->ptr;
         -:  168:}
         -:  169:
        88:  170:const char *path_file_name(const Path *p) {
@@ -1807,8 +1807,8 @@
         3:  194:	return false;
         -:  195:}
         -:  196:
-      120:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
-      120:  198:	if (p->ptr == NULL || p->len == 0) {
+      125:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
+      125:  198:	if (p->ptr == NULL || p->len == 0) {
         1:  199:		errno = EINVAL;
         1:  200:		return false;
         -:  201:	}
@@ -1816,7 +1816,7 @@
         -:  203:	struct stat s;
         -:  204:
         -:  205:	// Check if the path exists
-      119:  206:	if (stat(p->ptr, &s) == 0) {
+      124:  206:	if (stat(p->ptr, &s) == 0) {
         -:  207:		// If the path exists and it's a directory, return success
         8:  208:		if (s.st_mode & S_IFDIR) {
         7:  209:			return true;
@@ -1828,11 +1828,11 @@
         -:  215:	}
         -:  216:
         -:  217:	// If parent is false, attempt to create only the target directory
-      111:  218:	if (!parent) {
-       93:  219:		if (mkdir(p->ptr, mode) != 0) {
+      116:  218:	if (!parent) {
+       98:  219:		if (mkdir(p->ptr, mode) != 0) {
        28:  220:			return false;
         -:  221:		}
-       65:  222:		return true;
+       70:  222:		return true;
         -:  223:	}
         -:  224:
         -:  225:	// Create the directory structure (parent is true)
@@ -1881,7 +1881,7 @@
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:43
+        -:    0:Runs:50
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1909,42 +1909,42 @@
         -:   25:u64 __is_debug_realloc_counter_ = UINT64_MAX;
         -:   26:#endif // TEST
         -:   27:
-     4465:   28:void *mymalloc(u64 size) {
+     4482:   28:void *mymalloc(u64 size) {
         -:   29:#ifdef TEST
-     4465:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
+     4482:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
        21:   31:		__is_debug_malloc_counter_ = UINT64_MAX;
        21:   32:		return NULL;
         -:   33:	}
-     4444:   34:	__is_debug_malloc_counter_--;
+     4461:   34:	__is_debug_malloc_counter_--;
         -:   35:#endif // TEST
         -:   36:	void *ret;
-     4444:   37:	ret = malloc(size);
+     4461:   37:	ret = malloc(size);
         -:   38:
-     4444:   39:	if (ret) {
-     4444:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+     4461:   39:	if (ret) {
+     4461:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   41:	}
-     4444:   42:	return ret;
+     4461:   42:	return ret;
         -:   43:}
-      207:   44:void *myrealloc(void *ptr, u64 size) {
+      213:   44:void *myrealloc(void *ptr, u64 size) {
         -:   45:#ifdef TEST
-      207:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
+      213:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
         7:   47:		__is_debug_realloc_counter_ = UINT64_MAX;
         7:   48:		return NULL;
         -:   49:	}
-      200:   50:	__is_debug_realloc_counter_--;
+      206:   50:	__is_debug_realloc_counter_--;
         -:   51:#endif // TEST
         -:   52:	void *ret;
-      200:   53:	ret = realloc(ptr, size);
+      206:   53:	ret = realloc(ptr, size);
         -:   54:
-      200:   55:	if (ret) {
-      200:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+      206:   55:	if (ret) {
+      206:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   57:	}
-      200:   58:	return ret;
+      206:   58:	return ret;
         -:   59:}
-     4388:   60:void myfree(void *ptr) {
-     4388:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-     4388:   62:	free(ptr);
-     4388:   63:}
+     4405:   60:void myfree(void *ptr) {
+     4405:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+     4405:   62:	free(ptr);
+     4405:   63:}
        58:   64:MYFILE *myfopen(const Path *path, const char *mode) {
        58:   65:	const char *path_str = path_to_string(path);
        58:   66:	FILE *ret = fopen(path_str, mode);
@@ -1957,25 +1957,25 @@
        53:   73:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
        53:   74:	fclose((FILE *)ptr);
        53:   75:}
-       77:   76:u64 mymalloc_sum() {
-       77:   77:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
+       87:   76:u64 mymalloc_sum() {
+       87:   77:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
         -:   78:}
         2:   79:u64 myrealloc_sum() {
         2:   80:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
         -:   81:}
-       77:   82:u64 myfree_sum() {
-       77:   83:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+       87:   82:u64 myfree_sum() {
+       87:   83:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
         -:   84:}
-      114:   85:u64 myfopen_sum() {
-      114:   86:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+      129:   85:u64 myfopen_sum() {
+      129:   86:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
         -:   87:}
-      114:   88:u64 myfclose_sum() {
-      114:   89:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+      129:   88:u64 myfclose_sum() {
+      129:   89:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
         -:   90:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:43
+        -:    0:Runs:50
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1994,16 +1994,16 @@
         -:   16:#include <stdio.h>
         -:   17:#include <stdlib.h>
         -:   18:
-       43:   19:void __attribute__((constructor)) __check_64bit_arch__() {
+       50:   19:void __attribute__((constructor)) __check_64bit_arch__() {
         -:   20:	if (sizeof(size_t) != 8) {
         -:   21:		fprintf(stderr, "Error: This program requires a 64-bit architecture to run.\n");
         -:   22:		exit(EXIT_FAILURE);
         -:   23:	}
-       43:   24:}
+       50:   24:}
         -:    0:Source:lexer.c
         -:    0:Graph:lexer.gcno
         -:    0:Data:lexer.gcda
-        -:    0:Runs:15
+        -:    0:Runs:17
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2058,7 +2058,7 @@
         -:   52:	}
         -:   53:}
         -:   54:
-        5:   55:int lexer_init(Lexer *l, Path *file) {
+        5:   55:int lexer_init(Lexer *l, const Path *file) {
         -:   56:	// file/lexer cannot be null
         5:   57:	if (file == NULL || l == NULL) {
     #####:   58:		errno = EINVAL;
@@ -2233,7 +2233,7 @@
         -:    0:Source:tokenizer.c
         -:    0:Graph:tokenizer.gcno
         -:    0:Data:tokenizer.gcda
-        -:    0:Runs:15
+        -:    0:Runs:17
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2257,7 +2257,7 @@
         -:   21:#include <stdio.h>
         -:   22:#include <string.h>
         -:   23:
-      318:   24:int tokenizer_init(Tokenizer *t, char *line) {
+      318:   24:int tokenizer_init(Tokenizer *t, const char *line) {
         -:   25:	// check input
       318:   26:	if (line == NULL || t == NULL) {
         1:   27:		errno = EINVAL;
@@ -2668,28 +2668,401 @@
         -:  432:	TokenDisplayTypeWarning = 1
         -:  433:} TokenDisplayType;
         -:  434:
-        2:  435:int token_display_impl(Token *token, TokenDisplayType type, char *fmt, va_list va_args) {
-        2:  436:	if (type == TokenDisplayTypeError)
-        1:  437:		fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
-        -:  438:	else
-        1:  439:		fprintf(stderr, "%sWarning%s: ", YELLOW, RESET);
-        2:  440:	vfprintf(stderr, fmt, va_args);
-        2:  441:	fprintf(stderr, "\n%s", token->span);
-        2:  442:	return 0;
-        -:  443:}
-        -:  444:
-        1:  445:int token_display_error(Token *token, char *fmt, ...) {
-        -:  446:	va_list va_args;
-        1:  447:	va_start(va_args, fmt);
-        1:  448:	int ret = token_display_impl(token, TokenDisplayTypeError, fmt, va_args);
-        1:  449:	va_end(va_args);
-        1:  450:	return ret;
-        -:  451:}
-        -:  452:
-        1:  453:int token_display_warning(Token *token, char *fmt, ...) {
-        -:  454:	va_list va_args;
-        1:  455:	va_start(va_args, fmt);
-        1:  456:	int ret = token_display_impl(token, TokenDisplayTypeWarning, fmt, va_args);
-        1:  457:	va_end(va_args);
-        1:  458:	return ret;
-        -:  459:}
+        2:  435:int token_display_impl(const Token *token, TokenDisplayType type, const char *fmt,
+        -:  436:					   va_list va_args) {
+        2:  437:	if (type == TokenDisplayTypeError)
+        1:  438:		fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+        -:  439:	else
+        1:  440:		fprintf(stderr, "%sWarning%s: ", YELLOW, RESET);
+        2:  441:	vfprintf(stderr, fmt, va_args);
+        2:  442:	fprintf(stderr, "\n%s", token->span);
+        2:  443:	return 0;
+        -:  444:}
+        -:  445:
+        1:  446:int token_display_error(const Token *token, const char *fmt, ...) {
+        -:  447:	va_list va_args;
+        1:  448:	va_start(va_args, fmt);
+        1:  449:	int ret = token_display_impl(token, TokenDisplayTypeError, fmt, va_args);
+        1:  450:	va_end(va_args);
+        1:  451:	return ret;
+        -:  452:}
+        -:  453:
+        1:  454:int token_display_warning(const Token *token, const char *fmt, ...) {
+        -:  455:	va_list va_args;
+        1:  456:	va_start(va_args, fmt);
+        1:  457:	int ret = token_display_impl(token, TokenDisplayTypeWarning, fmt, va_args);
+        1:  458:	va_end(va_args);
+        1:  459:	return ret;
+        -:  460:}
+        -:    0:Source:faml.c
+        -:    0:Graph:faml.gcno
+        -:    0:Data:faml.gcda
+        -:    0:Runs:2
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/resources.h>
+        -:   16:#include <faml/parser.h>
+        -:   17:
+        -:   18:typedef enum FamlType {
+        -:   19:	FamlTypeObj,
+        -:   20:	FamlTypeArray,
+        -:   21:	FamlTypeTuple,
+        -:   22:	FamlTypeI8,
+        -:   23:	FamlTypeI16,
+        -:   24:} FamlType;
+        -:   25:
+        -:   26:typedef struct FamlObjImpl {
+        -:   27:	FamlType *types;
+        -:   28:	void *data;
+        -:   29:} FamlObjImpl;
+        -:   30:
+        1:   31:void famlobj_cleanup(FamlObj *obj) {
+        1:   32:	if (obj->opaque) {
+        1:   33:		myfree(obj->opaque);
+        1:   34:		obj->opaque = NULL;
+        -:   35:	}
+        1:   36:}
+        -:   37:
+        1:   38:int famlobj_init(FamlObj *obj) {
+        1:   39:	obj->opaque = mymalloc(sizeof(FamlObjImpl));
+        1:   40:	if (obj->opaque == NULL)
+    #####:   41:		return -1;
+        1:   42:	return 0;
+        -:   43:}
+    #####:   44:int famlobj_add_i8(FamlObj *obj, const char *key, const i8 value) {
+    #####:   45:	return 0;
+        -:   46:}
+    #####:   47:int famlobj_add_i16(FamlObj *obj, const char *key, const i16 value) {
+    #####:   48:	return 0;
+        -:   49:}
+        -:    0:Source:panic.c
+        -:    0:Graph:panic.gcno
+        -:    0:Data:panic.gcda
+        -:    0:Runs:5
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <setjmp.h>
+        -:   16:#include <signal.h>
+        -:   17:#include <stdarg.h>
+        -:   18:#include <stdio.h>
+        -:   19:#include <stdlib.h>
+        -:   20:#include <string.h>
+        -:   21:#include <util/panic.h>
+        -:   22:
+        -:   23:void exit(int value);
+        -:   24:
+        -:   25:#define MAX_PANIC_MSG 1024
+        -:   26:
+        -:   27:_Thread_local jmp_buf return_jmp;
+        -:   28:_Thread_local bool jmp_return_set = false;
+        -:   29:_Thread_local char panic_buf[MAX_PANIC_MSG];
+        -:   30:
+    #####:   31:void panic(const char *fmt, ...) {
+        -:   32:	va_list args;
+        -:   33:
+    #####:   34:	fprintf(stderr, "thread panicked: ");
+    #####:   35:	va_start(args, fmt);
+    #####:   36:	vfprintf(stderr, fmt, args);
+    #####:   37:	vsnprintf(panic_buf, MAX_PANIC_MSG, fmt, args);
+    #####:   38:	va_end(args);
+    #####:   39:	fprintf(stderr, "\n");
+        -:   40:
+        -:   41:	// If jump return has not been set, we resort to an exit with an error
+        -:   42:	// status.
+    #####:   43:	if (!jmp_return_set)
+    #####:   44:		exit(-1);
+    #####:   45:	longjmp(return_jmp, THREAD_PANIC);
+        -:   46:}
+        -:   47:
+    #####:   48:void signal_handler(int signal) {
+        -:   49:	// Handle the signal and call the _on_panic function
+    #####:   50:	panic("Caught signal: %d", signal);
+    #####:   51:}
+        -:   52:
+    #####:   53:void set_on_panic(panic_handler_t on_panic) {
+        -:   54:	struct sigaction sa;
+    #####:   55:	memset(&sa, 0, sizeof(sa));
+    #####:   56:	sa.sa_handler = signal_handler;
+        -:   57:	// Catching only error signals
+    #####:   58:	sigaction(SIGSEGV, &sa, NULL); // Segmentation fault
+    #####:   59:	sigaction(SIGABRT, &sa, NULL); // Abort signal
+    #####:   60:	sigaction(SIGTRAP, &sa, NULL); // Signal trap
+    #####:   61:	sigaction(SIGILL, &sa, NULL);  // Illegal instruction
+    #####:   62:	sigaction(SIGFPE, &sa, NULL);  // Arithmetic error
+    #####:   63:	sigaction(SIGBUS, &sa, NULL);  // Bus error
+        -:   64:
+    #####:   65:	jmp_return_set = true;
+    #####:   66:	int value = setjmp(return_jmp);
+    #####:   67:	if (value)
+    #####:   68:		on_panic(panic_buf);
+    #####:   69:}
+        -:    0:Source:slabs.c
+        -:    0:Graph:slabs.gcno
+        -:    0:Data:slabs.gcda
+        -:    0:Runs:5
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/resources.h>
+        -:   16:#include <stdio.h>
+        -:   17:#include <util/panic.h>
+        -:   18:#include <util/slabs.h>
+        -:   19:
+        -:   20:// Define both 64/32 bit impls the slab allocator will build the approproate types
+        -:   21:// based on configuration.
+        -:   22:typedef struct FatPtr64Impl {
+        -:   23:	u64 id;
+        -:   24:	u64 len;
+        -:   25:	void *data;
+        -:   26:} FatPtr64Impl;
+        -:   27:
+        -:   28:typedef struct FatPtr32Impl {
+        -:   29:	u32 id;
+        -:   30:	u32 len;
+        -:   31:	void *data;
+        -:   32:} FatPtr32Impl;
+        -:   33:
+        6:   34:bool is_little_endian() {
+        6:   35:	u16 test = 0x1;
+        6:   36:	return (*(u8 *)&test == 0x1);
+        -:   37:}
+        -:   38:
+        -:   39:// deteremine which kind of fat pointer this is. 32 bit fat pointers are restricted to having an ID
+        -:   40:// that does not set the most significant bit. Therefore they must be less than 2^31 or the
+        -:   41:// maximum signed int value (INT32_MAX). Conversely, the 64 bit ids must have this bit set.
+        -:   42:// This is the slab allocator's responsibility to ensure the bit is set correctly.
+        -:   43:// Users need not worry about these details as they are handled internally.
+        6:   44:bool fat_ptr_is64(const FatPtr *ptr) {
+        6:   45:	if (is_little_endian()) {
+        6:   46:		return ((FatPtr32Impl *)ptr->data)->id & 0x1;
+        -:   47:	} else {
+    #####:   48:		return ((FatPtr32Impl *)ptr->data)->id & 0x80000000;
+        -:   49:	}
+        -:   50:}
+        -:   51:
+        -:   52:// Return the id of the FatPtr. First check bit for u64/u32 status, then return value.
+        2:   53:u64 fat_ptr_id(const FatPtr *ptr) {
+        2:   54:	if (fat_ptr_is64(ptr))
+        1:   55:		return ((FatPtr64Impl *)ptr->data)->id;
+        -:   56:	else
+        1:   57:		return ((FatPtr32Impl *)ptr->data)->id;
+        -:   58:}
+        -:   59:
+        -:   60:// Get the length of this FatPtr. Once again use the status bit in the id then return value.
+        2:   61:u64 fat_ptr_len(const FatPtr *ptr) {
+        2:   62:	if (fat_ptr_is64(ptr))
+        1:   63:		return ((FatPtr64Impl *)ptr->data)->len;
+        -:   64:	else
+        1:   65:		return ((FatPtr32Impl *)ptr->data)->len;
+        -:   66:}
+        -:   67:
+        -:   68:// Get the data pointer of this FatPtr. Once again use the status bit in the id then return value.
+        2:   69:void *fat_ptr_data(const FatPtr *ptr) {
+        2:   70:	if (fat_ptr_is64(ptr))
+        1:   71:		return ((FatPtr64Impl *)ptr->data)->data;
+        -:   72:	else
+        1:   73:		return ((FatPtr32Impl *)ptr->data)->data;
+        -:   74:}
+        -:   75:
+        -:   76:// Test function to free the 64 bit objects.
+        1:   77:void fat_ptr_free_test_obj64(FatPtr *ptr) {
+        1:   78:	if (ptr && ptr->data) {
+        1:   79:		myfree(ptr->data);
+        1:   80:		ptr->data = NULL;
+        -:   81:	}
+        1:   82:}
+        -:   83:
+        -:   84:// Test function to free the 32 bit objects.
+        1:   85:void fat_ptr_free_test_obj32(FatPtr *ptr) {
+        1:   86:	if (ptr && ptr->data) {
+        1:   87:		myfree(ptr->data);
+        1:   88:		ptr->data = NULL;
+        -:   89:	}
+        1:   90:}
+        -:   91:
+        -:   92:// Test function to allocate the 64 bit objects.
+        1:   93:void fat_ptr_test_obj64(FatPtr *ptr, u64 id, u64 len) {
+        1:   94:	ptr->data = mymalloc(2 * sizeof(u64) + len);
+        1:   95:	FatPtr64Impl *fptr = ptr->data;
+        1:   96:	fptr->id = id;
+        1:   97:	fptr->len = len;
+        1:   98:	fptr->data = ptr->data + 2 * sizeof(u64);
+        1:   99:}
+        -:  100:
+        -:  101:// Test function to allocate the 32 bit objects.
+        1:  102:void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len) {
+        1:  103:	ptr->data = mymalloc(2 * sizeof(u32) + len);
+        1:  104:	FatPtr32Impl *fptr = ptr->data;
+        1:  105:	fptr->id = id;
+        1:  106:	fptr->len = len;
+        1:  107:	fptr->data = ptr->data + 2 * sizeof(u32);
+        1:  108:}
+        -:  109:
+        -:  110:// map a sequential id to the 64 bit version for our slab allocator
+        -:  111:// slab allocators should use this function to map ids sequentially when configured to 64 bit
+        -:  112:// 0 -> 1, 1 -> 3, 2 -> 5,, ... slab allocators may use up to 2^63. Beyond that is out of bounds.
+        -:  113:// on big endian systems the MSB is set
+    #####:  114:u64 map_id_64(u64 seq_id) {
+    #####:  115:	if (seq_id & 0x8000000000000000)
+    #####:  116:		panic("slab allocator: invalid 64 bit id");
+    #####:  117:	if (is_little_endian()) {
+    #####:  118:		return (seq_id * 2) + 1;
+        -:  119:	} else {
+    #####:  120:		return seq_id | 0x8000000000000000;
+        -:  121:	}
+        -:  122:}
+        -:  123:
+        -:  124:// map a sequential id to the 32 bit version for our slab allocator
+        -:  125:// slab allocators should use this function to map ids sequentially when configured to 32 bit
+        -:  126:// 0 -> 0, 1 -> 2, 2 -> 4,, ... slab allocators may use up to 2^31. Beyond that is out of bounds.
+        -:  127:// on big endian systems the MSB is unset
+    #####:  128:u32 map_id_32(u32 seq_id) {
+    #####:  129:	if (seq_id & 0x80000000)
+    #####:  130:		panic("slab allocator: invalid 32 bit id");
+    #####:  131:	if (is_little_endian()) {
+    #####:  132:		return seq_id * 2;
+        -:  133:	} else {
+    #####:  134:		return seq_id & 0x7FFFFFFF;
+        -:  135:	}
+        -:  136:}
+        -:  137:
+        -:  138:// SlabAllocator Config
+        2:  139:void slab_allocator_config_cleanup(SlabAllocatorConfigNc *sc) {
+        2:  140:	if (sc->slab_types) {
+        2:  141:		myfree(sc->slab_types);
+        2:  142:		sc->slab_types = NULL;
+        -:  143:	}
+        2:  144:}
+        -:  145:
+        5:  146:int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeroed, bool no_malloc,
+        -:  147:								bool is_64_bit) {
+        5:  148:	sc->zeroed = zeroed;
+        5:  149:	sc->no_malloc = no_malloc;
+        5:  150:	sc->is_64_bit = is_64_bit;
+        5:  151:	sc->slab_types_count = 0;
+        5:  152:	sc->slab_types = NULL;
+        -:  153:
+        5:  154:	return 0;
+        -:  155:}
+        3:  156:int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st) {
+        3:  157:	if (sc->slab_types) {
+        1:  158:		void *tmp = myrealloc(sc->slab_types, sizeof(SlabType) * (1 + sc->slab_types_count));
+        1:  159:		if (tmp == NULL)
+    #####:  160:			return -1;
+        1:  161:		sc->slab_types = tmp;
+        -:  162:	} else {
+        2:  163:		sc->slab_types = mymalloc(sizeof(SlabType));
+        2:  164:		if (sc->slab_types == NULL)
+    #####:  165:			return -1;
+        -:  166:	}
+        -:  167:
+        3:  168:	sc->slab_types[sc->slab_types_count] = *st;
+        3:  169:	sc->slab_types_count++;
+        -:  170:
+        3:  171:	return 0;
+        -:  172:}
+        -:  173:
+        -:  174:// Slab Allocator
+        -:  175:
+        -:  176:typedef struct SlabData {
+        -:  177:	SlabType type;	// This slab data's type information (slab_size, slabs_per_resize, initial, max)
+        -:  178:	void **data;	// Pointers to each chunk
+        -:  179:	u32 *free_list; // The free list pointers
+        -:  180:	u32 cur_chunks; // number of chunks currently allocated
+        -:  181:	u32 cur_slabs;	// number of slabs currently allocated
+        -:  182:	u32 free_list_head; // the free list head
+        -:  183:} SlabData;
+        -:  184:
+        -:  185:typedef struct SlabAllocatorImpl {
+        -:  186:	u32 sd_size;	  // size of the SlabData array
+        -:  187:	SlabData *sd_arr; // slab data array one for each SlabType
+        -:  188:	u32 cur_malloc;	  // number of slabs allocated via malloc
+        -:  189:	bool no_malloc;	  // config no_malloc
+        -:  190:	bool zeroed;	  // config zeroed
+        -:  191:	bool is_64_bit;	  // config 64 bit id/len
+        -:  192:
+        -:  193:} SlabAllocatorImpl;
+        -:  194:
+        1:  195:void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
+        1:  196:	if (ptr->impl) {
+        1:  197:		SlabAllocatorImpl *impl = ptr->impl;
+        1:  198:		if (impl->sd_arr) {
+        1:  199:			myfree(impl->sd_arr);
+        1:  200:			impl->sd_arr = NULL;
+        -:  201:		}
+        1:  202:		myfree(ptr->impl);
+        1:  203:		ptr->impl = NULL;
+        -:  204:	}
+        1:  205:}
+        -:  206:
+        1:  207:int slab_allocator_init_slab_data(SlabAllocator *ptr, SlabType st) {
+        -:  208:
+        1:  209:	return 0;
+        -:  210:}
+        -:  211:
+        1:  212:int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) {
+        1:  213:	ptr->impl = mymalloc(sizeof(SlabAllocatorImpl));
+        1:  214:	if (ptr->impl == NULL)
+    #####:  215:		return -1;
+        1:  216:	SlabAllocatorImpl *impl = ptr->impl;
+        -:  217:
+        1:  218:	impl->no_malloc = config->no_malloc;
+        1:  219:	impl->zeroed = config->zeroed;
+        1:  220:	impl->is_64_bit = config->is_64_bit;
+        1:  221:	impl->sd_size = config->slab_types_count;
+        1:  222:	impl->sd_arr = mymalloc(sizeof(SlabData) * impl->sd_size);
+        1:  223:	if (impl->sd_arr == NULL) {
+    #####:  224:		myfree(ptr->impl);
+    #####:  225:		return -1;
+        -:  226:	}
+        -:  227:
+        2:  228:	for (u64 i = 0; i < config->slab_types_count; i++) {
+        1:  229:		if (slab_allocator_init_slab_data(ptr, config->slab_types[i]))
+    #####:  230:			return -1;
+        -:  231:	}
+        -:  232:
+        1:  233:	return 0;
+        -:  234:}
+    #####:  235:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
+    #####:  236:	return 0;
+        -:  237:}
+    #####:  238:void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
+    #####:  239:}
+    #####:  240:u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
+    #####:  241:	return 0;
+        -:  242:}

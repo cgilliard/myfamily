@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['subcommandimpl_319',['SubCommandImpl',['../structSubCommandImpl.html',1,'']]]
+  ['resourcestats_545',['ResourceStats',['../structResourceStats.html',1,'']]]
 ];

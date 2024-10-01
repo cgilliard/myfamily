@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['malloc_5fsum_485',['malloc_sum',['../structResourceStats.html#ae9eb0fbcddc4ae13b289b50f89cd0750',1,'ResourceStats']]],
-  ['max_5fargs_486',['max_args',['../structSubCommandImpl.html#aa0d744031fe55772f9023ed74b39a89d',1,'SubCommandImpl']]],
-  ['min_5fargs_487',['min_args',['../structSubCommandImpl.html#ae68fb27d14b94a18c40e33324f92b92e',1,'SubCommandImpl']]],
-  ['multiple_488',['multiple',['../structArgsParamImpl.html#a246d95c683a32fb0d4d35f14a742b708',1,'ArgsParamImpl']]]
+  ['id_882',['id',['../structFatPtr64Impl.html#a95c59aa763eb188f3e2a1b1a3272a027',1,'FatPtr64Impl::id()'],['../structFatPtr32Impl.html#ac29fff5c0bd2dd14eaf4b2615d929386',1,'FatPtr32Impl::id()']]],
+  ['impl_883',['impl',['../structSlabAllocatorNc.html#a8469315b4cf3305e8bc22c974bba6777',1,'SlabAllocatorNc']]],
+  ['in_5fcomment_884',['in_comment',['../structTokenizerIml.html#a3d362099abbedceb9c6cb37c6ba15be5',1,'TokenizerIml']]],
+  ['initial_5fchunks_885',['initial_chunks',['../structSlabType.html#a1a9e4ab0d6c54cebeeafa56225bfc748',1,'SlabType']]],
+  ['is_5f64_5fbit_886',['is_64_bit',['../structSlabAllocatorImpl.html#aa7a18b3ba39a784ceba1e7d4f33e8c9a',1,'SlabAllocatorImpl::is_64_bit()'],['../structSlabAllocatorConfigNc.html#a806def4806f64cee5038567f70c8b3ce',1,'SlabAllocatorConfigNc::is_64_bit()']]],
+  ['is_5fspecified_887',['is_specified',['../structSubCommandImpl.html#af078ca6b638684d48d2ace35e0b01226',1,'SubCommandImpl']]]
 ];

@@ -95,20 +95,31 @@ $(function() {
 <div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a181807730d4a375f848ba139813ce04f">   23</a></span>&#160;<span class="preprocessor">#define INT32_MAX 2147483647</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="mylimits_8h.html#ad0d744f05898e32d01f73f8af3cd2071">   24</a></span>&#160;<span class="preprocessor">#define INT64_MAX 9223372036854775807LL</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="mylimits_8h.html#aadcf2a81af243df333b31efa6461ab8e">   26</a></span>&#160;<span class="preprocessor">#define INT8_MIN (-INT8_MAX - 1)</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="mylimits_8h.html#ad4e9955955b27624963643eac448118a">   27</a></span>&#160;<span class="preprocessor">#define INT16_MIN (-INT16_MAX - 1)</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a688eb21a22db27c2b2bd5836943cdcbe">   28</a></span>&#160;<span class="preprocessor">#define INT32_MIN (-INT32_MAX - 1)</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="mylimits_8h.html#ab21f12f372f67b8ff0aa3432336ede67">   29</a></span>&#160;<span class="preprocessor">#define INT64_MIN (-INT64_MAX - 1)</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a811ec3b3c805bfd6b8ec302d59fc5a94">   31</a></span>&#160;<span class="keyword">typedef</span> __int128 <a class="code" href="mylimits_8h.html#a811ec3b3c805bfd6b8ec302d59fc5a94">int128_t</a>;</div>
-<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a396787e5ec029b1205bd3e4cd9763e7d">   32</a></span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> __int128 <a class="code" href="mylimits_8h.html#a396787e5ec029b1205bd3e4cd9763e7d">uint128_t</a>;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#ifndef INT8_MIN</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="mylimits_8h.html#aadcf2a81af243df333b31efa6461ab8e">   27</a></span>&#160;<span class="preprocessor">#define INT8_MIN (-INT8_MAX - 1)</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// INT8_MIN</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#ifndef INT16_MIN</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="mylimits_8h.html#ad4e9955955b27624963643eac448118a">   31</a></span>&#160;<span class="preprocessor">#define INT16_MIN (-INT16_MAX - 1)</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// INT16_MIN</span></div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">// Define limits for these types (assuming they match 128-bit values)</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="mylimits_8h.html#ae4472310e03cc4d8569d897c19637067">   35</a></span>&#160;<span class="preprocessor">#define UINT128_MAX ((uint128_t)~0ULL &gt;&gt; 1)           </span><span class="comment">// 2^128 - 1</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a7706db46d5f46c20fd6ed247bf716ebe">   36</a></span>&#160;<span class="preprocessor">#define INT128_MAX ((int128_t)(UINT128_MAX &gt;&gt; 1))     </span><span class="comment">// 2^127 - 1</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a999401b12d60d6c3e1bfa7f3135ac6b1">   37</a></span>&#160;<span class="preprocessor">#define INT128_MIN ((int128_t)(UINT128_MAX &gt;&gt; 1) + 1) </span><span class="comment">// -2^127</span></div>
-<div class="ttc" id="amylimits_8h_html_a396787e5ec029b1205bd3e4cd9763e7d"><div class="ttname"><a href="mylimits_8h.html#a396787e5ec029b1205bd3e4cd9763e7d">uint128_t</a></div><div class="ttdeci">unsigned __int128 uint128_t</div><div class="ttdef"><b>Definition:</b> mylimits.h:32</div></div>
-<div class="ttc" id="amylimits_8h_html_a811ec3b3c805bfd6b8ec302d59fc5a94"><div class="ttname"><a href="mylimits_8h.html#a811ec3b3c805bfd6b8ec302d59fc5a94">int128_t</a></div><div class="ttdeci">__int128 int128_t</div><div class="ttdef"><b>Definition:</b> mylimits.h:31</div></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#ifndef INT32_MIN</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a688eb21a22db27c2b2bd5836943cdcbe">   35</a></span>&#160;<span class="preprocessor">#define INT32_MIN (-INT32_MAX - 1)</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// INT32_MIN</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#ifndef INT64_MIN</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="mylimits_8h.html#ab21f12f372f67b8ff0aa3432336ede67">   39</a></span>&#160;<span class="preprocessor">#define INT64_MIN (-INT64_MAX - 1)</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// INT64_MIN</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a811ec3b3c805bfd6b8ec302d59fc5a94">   42</a></span>&#160;<span class="keyword">typedef</span> __int128 <a class="code" href="mylimits_8h.html#a811ec3b3c805bfd6b8ec302d59fc5a94">int128_t</a>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a396787e5ec029b1205bd3e4cd9763e7d">   43</a></span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> __int128 <a class="code" href="mylimits_8h.html#a396787e5ec029b1205bd3e4cd9763e7d">uint128_t</a>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">// Define limits for these types (assuming they match 128-bit values)</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="mylimits_8h.html#ae4472310e03cc4d8569d897c19637067">   46</a></span>&#160;<span class="preprocessor">#define UINT128_MAX ((uint128_t)~0ULL &gt;&gt; 1)           </span><span class="comment">// 2^128 - 1</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a7706db46d5f46c20fd6ed247bf716ebe">   47</a></span>&#160;<span class="preprocessor">#define INT128_MAX ((int128_t)(UINT128_MAX &gt;&gt; 1))     </span><span class="comment">// 2^127 - 1</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="mylimits_8h.html#a999401b12d60d6c3e1bfa7f3135ac6b1">   48</a></span>&#160;<span class="preprocessor">#define INT128_MIN ((int128_t)(UINT128_MAX &gt;&gt; 1) + 1) </span><span class="comment">// -2^127</span></div>
+<div class="ttc" id="amylimits_8h_html_a396787e5ec029b1205bd3e4cd9763e7d"><div class="ttname"><a href="mylimits_8h.html#a396787e5ec029b1205bd3e4cd9763e7d">uint128_t</a></div><div class="ttdeci">unsigned __int128 uint128_t</div><div class="ttdef"><b>Definition:</b> mylimits.h:43</div></div>
+<div class="ttc" id="amylimits_8h_html_a811ec3b3c805bfd6b8ec302d59fc5a94"><div class="ttname"><a href="mylimits_8h.html#a811ec3b3c805bfd6b8ec302d59fc5a94">int128_t</a></div><div class="ttdeci">__int128 int128_t</div><div class="ttdef"><b>Definition:</b> mylimits.h:42</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
