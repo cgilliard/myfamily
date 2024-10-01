@@ -370,7 +370,10 @@ int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
 		return -1;
 	}
 
-	sd->free_list_head = ((u64 *)sd->free_list)[id];
+	if (is_64_bit)
+		sd->free_list_head = ((u64 *)sd->free_list)[id];
+	else
+		sd->free_list_head = ((u32 *)sd->free_list)[id];
 
 	// set to MAX-1 as a marker that this is allocated
 	// if any freed without this value, it's an error
@@ -379,15 +382,23 @@ int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
 	else
 		((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
 
-	u32 len = sd->type.slab_size;
+	u64 len = sd->type.slab_size;
 	u64 slab_data_index = id / sd->type.slabs_per_resize;
 	u64 offset_mod = id % sd->type.slabs_per_resize;
 
 	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
-	FatPtr64Impl *fptr64 = fptr->data;
-	fptr64->id = (id * 2) + 1;
-	fptr64->len = len - 2 * sizeof(u64);
-	fptr64->data = fptr->data + 2 * sizeof(u64);
+
+	if (is_64_bit) {
+		FatPtr64Impl *fptr64 = fptr->data;
+		fptr64->id = (id * 2) + 1;
+		fptr64->len = len - 2 * sizeof(u64);
+		fptr64->data = fptr->data + 2 * sizeof(u64);
+	} else {
+		FatPtr32Impl *fptr32 = fptr->data;
+		fptr32->id = (id * 2);
+		fptr32->len = len - 2 * sizeof(u32);
+		fptr32->data = fptr->data + 2 * sizeof(u32);
+	}
 
 	sd->cur_slabs += 1;
 
@@ -395,30 +406,52 @@ int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
 }
 
 void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit) {
-	FatPtr64Impl *fptr64 = fptr->data;
-	u64 id = (fptr64->id - 1) / 2;
-	if (((u64 *)sd->free_list)[id] != (UINT64_MAX - 1)) {
-		panic("Potential double free. Id = %llu.\n", id);
+	if (is_64_bit) {
+		FatPtr64Impl *fptr64 = fptr->data;
+		u64 id = (fptr64->id - 1) / 2;
+		if (((u64 *)sd->free_list)[id] != (UINT64_MAX - 1)) {
+			panic("Potential double free. Id = %llu.\n", id);
+		}
+		((u64 *)sd->free_list)[id] = sd->free_list_head;
+		sd->free_list_head = id;
+		if (sd->cur_slabs == 0)
+			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
+		sd->cur_slabs -= 1;
+	} else {
+		FatPtr32Impl *fptr32 = fptr->data;
+		u32 id = (fptr32->id) / 2;
+		if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
+			panic("Potential double free. Id = %llu.\n", id);
+		}
+		((u32 *)sd->free_list)[id] = sd->free_list_head;
+		sd->free_list_head = id;
+		if (sd->cur_slabs == 0)
+			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
+		sd->cur_slabs -= 1;
 	}
-	((u64 *)sd->free_list)[id] = sd->free_list_head;
-	sd->free_list_head = id;
-	if (sd->cur_slabs == 0)
-		panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
-	sd->cur_slabs -= 1;
 }
 
 int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
-	u32 needed = size + 2 * sizeof(u64);
+	bool is_64_bit = ((SlabAllocatorImpl *)ptr->impl)->is_64_bit;
+	u32 needed;
+	if (is_64_bit)
+		needed = size + 2 * sizeof(u64);
+	else
+		needed = size + 2 * sizeof(u32);
 	int index = slab_allocator_index(ptr, needed);
 	if (index < 0) {
 		return -1;
 	}
-
 	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
-	return slab_data_allocate(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit);
+	return slab_data_allocate(sd, fptr, is_64_bit);
 }
 void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
-	u32 needed = fat_ptr_len(fptr) + 2 * sizeof(u64);
+	bool is_64_bit = ((SlabAllocatorImpl *)ptr->impl)->is_64_bit;
+	u32 needed;
+	if (is_64_bit)
+		needed = fat_ptr_len(fptr) + 2 * sizeof(u64);
+	else
+		needed = fat_ptr_len(fptr) + 2 * sizeof(u32);
 	int index = slab_allocator_index(ptr, needed);
 	if (index < 0)
 		panic("Freeing a slab with an unknown slab size %llu.\n", needed);

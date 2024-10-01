@@ -152,48 +152,46 @@ MyTest(util, test_slab_allocator) {
 MyTest(util, test_slab_allocator32) {
 	SlabAllocatorConfig sc;
 	slab_allocator_config_build(&sc, false, true, false);
-	SlabType t1 = {32, 10, 1, 10};
+	SlabType t1 = {24, 10, 1, 10};
 	slab_allocator_config_add_type(&sc, &t1);
 	SlabAllocator sa;
 	cr_assert(!slab_allocator_build(&sa, &sc));
-	/*
 
-		for (u64 i = 0; i < 10; i++) {
-			FatPtr fptr;
-			int ret = slab_allocator_allocate(&sa, 13, &fptr);
-			cr_assert_eq(ret, 0);
-			// it's rounded up to our nearest slab size
-			cr_assert_eq(fat_ptr_len(&fptr), 16);
-			slab_allocator_free(&sa, &fptr);
-		}
-
+	for (u64 i = 0; i < 10; i++) {
 		FatPtr fptr;
 		int ret = slab_allocator_allocate(&sa, 13, &fptr);
 		cr_assert_eq(ret, 0);
-		u64 x = 101;
-		u64 *ptr = fat_ptr_data(&fptr);
-		memcpy(ptr, &x, sizeof(u64));
-		cr_assert_eq(*ptr, 101);
+		// it's rounded up to our nearest slab size
+		cr_assert_eq(fat_ptr_len(&fptr), 16);
 		slab_allocator_free(&sa, &fptr);
+	}
 
-		FatPtr arr[10];
-		for (u64 i = 0; i < 10; i++) {
-			int ret = slab_allocator_allocate(&sa, 10, &arr[i]);
-			cr_assert_eq(ret, 0);
-			cr_assert_eq(fat_ptr_len(&fptr), 16);
-		}
+	FatPtr fptr;
+	int ret = slab_allocator_allocate(&sa, 13, &fptr);
+	cr_assert_eq(ret, 0);
+	u64 x = 101;
+	u64 *ptr = fat_ptr_data(&fptr);
+	memcpy(ptr, &x, sizeof(u64));
+	cr_assert_eq(*ptr, 101);
+	slab_allocator_free(&sa, &fptr);
 
-		cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 10);
+	FatPtr arr[10];
+	for (u64 i = 0; i < 10; i++) {
+		int ret = slab_allocator_allocate(&sa, 10, &arr[i]);
+		cr_assert_eq(ret, 0);
+		cr_assert_eq(fat_ptr_len(&fptr), 16);
+	}
 
-		// no more slabs
-		ret = slab_allocator_allocate(&sa, 10, &fptr);
-		// returns error neq(0)
-		cr_assert_neq(ret, 0);
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 10);
 
-		for (u64 i = 0; i < 10; i++) {
-			slab_allocator_free(&sa, &arr[i]);
-		}
-	*/
+	// no more slabs
+	ret = slab_allocator_allocate(&sa, 10, &fptr);
+	// returns error neq(0)
+	cr_assert_neq(ret, 0);
+
+	for (u64 i = 0; i < 10; i++) {
+		slab_allocator_free(&sa, &arr[i]);
+	}
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
 }
