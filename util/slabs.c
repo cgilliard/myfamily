@@ -210,15 +210,22 @@ void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
 	}
 }
 
-int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType st, u64 index) {
+int slab_allocator_init_free_list(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
+	for (u64 i = 0; i < index; i++) {
+	}
+	return 0;
+}
+
+int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
 	impl->sd_arr[index].cur_slabs = 0;
-	impl->sd_arr[index].cur_chunks = st.initial_chunks;
+	impl->sd_arr[index].cur_chunks = st->initial_chunks;
 	impl->sd_arr[index].free_list_head = 0;
-	impl->sd_arr[index].data = mymalloc(sizeof(void *) * st.initial_chunks);
+	impl->sd_arr[index].data = mymalloc(sizeof(void *) * st->initial_chunks);
 	if (impl->sd_arr[index].data == NULL)
 		return -1;
-	for (u64 i = 0; i < st.initial_chunks; i++) {
-		impl->sd_arr[index].data[i] = mymalloc(st.slab_size * st.slabs_per_resize);
+	for (u64 i = 0; i < st->initial_chunks; i++) {
+		impl->sd_arr[index].data[i] = mymalloc(st->slab_size * st->slabs_per_resize);
+
 		if (impl->sd_arr[index].data[i] == NULL) {
 			for (u64 j = 0; j < i; j++) {
 				myfree(impl->sd_arr[index].data[j]);
@@ -227,6 +234,8 @@ int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType st, u64 inde
 			return -1;
 		}
 	}
+
+	slab_allocator_init_free_list(impl, st, index);
 
 	return 0;
 }
@@ -248,7 +257,7 @@ int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) 
 	}
 
 	for (u64 i = 0; i < config->slab_types_count; i++) {
-		if (slab_allocator_init_slab_data(impl, config->slab_types[i], i))
+		if (slab_allocator_init_slab_data(impl, &config->slab_types[i], i))
 			return -1;
 	}
 
