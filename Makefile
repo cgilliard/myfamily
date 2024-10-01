@@ -13,6 +13,7 @@ clean:
 	rm -rf main/resources.h
 	rm -rf */*.o
 	rm -rf bin/*
+	rm -rf */bin
 	rm -rf */*.gcno
 	rm -rf */*.gcda
 	rm -rf */*.gcov

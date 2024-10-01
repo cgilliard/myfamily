@@ -5,20 +5,22 @@ SUB_HEADERS := $(wildcard *.h)
 %.o : %.c $(SUB_HEADERS)
 	$(CC) $(FLAG_OPTIONS) $(CC_FLAGS) -I.. -c -o $@ $<
 all: $(OBJS)
-test: test.c $(TEST_OBJS)
-	mkdir -p bin
-	rm -rf bin/test
+
+test_bin: bin/test
+
+bin/test: test.c $(TEST_OBJS)
+	mkdir bin
+	$(CC) $(FLAG_OPTIONS) $(CC_TEST_FLAGS) $(TEST_OBJS) -I.. -o bin/test test.c
+
+test: test_bin
 	rm -rf bin/nocapture
-	$(CC) $(FLAG_OPTIONS) $(CC_TEST_FLAGS) $(TEST_OBJS) -I.. -o bin/test test.c
 	./bin/test --timeout 60 -f
-	@rm -rf bin
-testnc: test.c $(TEST_OBJS)
-	mkdir -p bin
-	rm -rf bin/test
+
+
+testnc: test_bin
 	touch bin/nocapture
-	$(CC) $(FLAG_OPTIONS) $(CC_TEST_FLAGS) $(TEST_OBJS) -I.. -o bin/test test.c
 	./bin/test --timeout 60 -f
-	@rm -rf bin
+
 clean:
 	rm -rf *.o
 	rm -rf bin
