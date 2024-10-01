@@ -23,10 +23,21 @@
 #define INT32_MAX 2147483647
 #define INT64_MAX 9223372036854775807LL
 
+#ifndef INT8_MIN
 #define INT8_MIN (-INT8_MAX - 1)
+#endif // INT8_MIN
+
+#ifndef INT16_MIN
 #define INT16_MIN (-INT16_MAX - 1)
+#endif // INT16_MIN
+
+#ifndef INT32_MIN
 #define INT32_MIN (-INT32_MAX - 1)
+#endif // INT32_MIN
+
+#ifndef INT64_MIN
 #define INT64_MIN (-INT64_MAX - 1)
+#endif // INT64_MIN
 
 typedef __int128 int128_t;
 typedef unsigned __int128 uint128_t;

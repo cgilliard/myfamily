@@ -18,6 +18,8 @@
 #include <base/path.h>
 #include <base/types.h>
 
+#define NULL ((void *)0)
+
 typedef struct MYFILE MYFILE;
 
 typedef struct ResourceStats {

@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
-#include <faml/faml.h>
+#ifndef _BASE_PANIC__
+#define _BASE_PANIC__
 
-MySuite(faml);
+#include <base/types.h>
 
-MyTest(faml, test_parser) {
-	FamlObj obj;
-	cr_assert(!famlobj_init(&obj));
-}
+typedef void __attribute__((noreturn)) (*panic_handler_t)(const char *msg);
+
+#define THREAD_PANIC 1
+
+void panic(const char *format, ...);
+void set_on_panic(panic_handler_t on_panic);
+
+#endif // _BASE_PANIC__

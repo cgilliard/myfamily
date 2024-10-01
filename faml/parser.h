@@ -18,18 +18,17 @@
 #include <base/path.h>
 #include <faml/faml.h>
 
-typedef struct FamlParserImpl {
+typedef struct FamlParserImpl FamlParserImpl;
 
-} FamlParserImpl;
+typedef struct FamlParserNc {
+	FamlParserImpl *opaque;
+} FamlParserNc;
 
-void faml_parser_cleanup(FamlParserImpl *ptr);
+void faml_parser_cleanup(FamlParserNc *ptr);
 
-#define FamlParser FamlParserImpl __attribute__((warn_unused_result, cleanup(faml_parser_cleanup)))
+#define FamlParser FamlParserNc __attribute__((warn_unused_result, cleanup(faml_parser_cleanup)))
 
 int faml_parse_file(FamlParser *parser, const Path *file, FamlObj *obj);
 int faml_parse(FamlParser *parser, const char *conf, FamlObj *obj);
-int faml_display_error(const FamlParser *parser);
-
-int faml_array_len(const FamlObj *obj);
 
 #endif // _FAML_PARSER__

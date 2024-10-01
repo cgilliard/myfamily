@@ -12,4 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/resources.h>
 #include <faml/parser.h>
+
+typedef enum FamlType {
+	FamlTypeObj,
+	FamlTypeArray,
+	FamlTypeTuple,
+	FamlTypeI8,
+	FamlTypeI16,
+} FamlType;
+
+typedef struct FamlObjImpl {
+	FamlType *types;
+	void *data;
+} FamlObjImpl;
+
+void famlobj_cleanup(FamlObj *obj) {
+	if (obj->opaque) {
+		myfree(obj->opaque);
+		obj->opaque = NULL;
+	}
+}
+
+int famlobj_init(FamlObj *obj) {
+	obj->opaque = mymalloc(sizeof(FamlObjImpl));
+	if (obj->opaque == NULL)
+		return -1;
+	return 0;
+}
+int famlobj_add_i8(FamlObj *obj, const char *key, const i8 value) {
+	return 0;
+}
+int famlobj_add_i16(FamlObj *obj, const char *key, const i16 value) {
+	return 0;
+}

@@ -30,14 +30,15 @@ MyType2 {
 		1234,
 		1u32
 	);
-	e = MyType(With(a, 10), With(b, 3)); // With a previously defined type (overrides other values default)
+	e = MyType; // With a previously defined type. Defaults from MyType used.
 	f = MyType; // previously defined type with defaults
 	g = [u8 | 20]; // statically sized array defaults to 0
 	h = [u8]; // dynamically sized array must be allocated using $Alloc
 	i = [1,2,3,4]; // static array with 4 values initailized (defaults to i32)
 	j = [0u64, 1u64, 2u64]; // static array explicitly initialized to u64s.
 	k = [MyType | 20]; // with 20 instances default inits
-	l = [MyType(With(a, 10)), MyType, MyType, MyType(With(k, 0.3))]; // various default overrides
+	l = [MyType, MyType, MyType, MyType]; // 4 values all default
+	m = [u32 | 30 | 40] // statically sized array with 30 elements. Default value is 40.
 }
 
 // 3.) Enums
@@ -60,7 +61,7 @@ MyEnum {
 			v2 = 1u32;
 		};
 		Nested2;
-		Nested3: (-1u8, "test", MyType(With(k, 0.1)));
+		Nested3: (-1u8, "test", MyType);
 	}
 }
 
