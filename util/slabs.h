@@ -17,7 +17,7 @@
 
 #include <base/types.h>
 
-// Opaque FatPtr data type
+// FatPtr data type
 typedef struct FatPtr {
 	void *data;
 } FatPtr;
@@ -26,6 +26,49 @@ typedef struct FatPtr {
 // be able to read the length and the data pointer.
 u64 fat_ptr_len(const FatPtr *ptr);
 void *fat_ptr_data(const FatPtr *ptr);
+
+// Slab Allocator
+
+// Slab Type definition
+typedef struct SlabType {
+	u32 slab_size;
+	u32 slabs_per_resize;
+	u32 initial_chunks;
+	u32 max_slabs;
+} SlabType;
+
+// Slab Allocator configuration
+typedef struct SlabAllocatorConfigNc {
+	bool zeroed;
+	bool no_malloc;
+	bool is_64_bit;
+	u64 slab_types_count;
+	SlabType *slab_types;
+} SlabAllocatorConfigNc;
+
+void slab_allocator_config_cleanup(SlabAllocatorConfigNc *ptr);
+
+#define SlabAllocatorConfig                                                                        \
+	SlabAllocatorConfigNc                                                                          \
+		__attribute__((warn_unused_result, cleanup(slab_allocator_config_cleanup)))
+
+int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeored, bool no_malloc,
+								bool is_64_bit);
+int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st);
+
+typedef struct SlabAllocatorNc {
+	void *impl;
+} SlabAllocatorNc;
+
+void slab_allocator_cleanup(SlabAllocatorNc *ptr);
+
+#define SlabAllocator                                                                              \
+	SlabAllocatorNc __attribute__((warn_unused_result, cleanup(slab_allocator_cleanup)))
+
+int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config);
+int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr);
+void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr);
+u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr);
 
 // These are test helper functions
 #ifdef TEST

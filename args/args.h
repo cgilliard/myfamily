@@ -88,5 +88,5 @@ bool args_param_copy(ArgsParam *dst, const ArgsParam *src);
 bool sub_command_copy(SubCommand *dst, const SubCommand *src);
 void args_exit_error(const Args *args, char *format, ...);
 #endif // TEST
-
+// test
 #endif // _ARGS_ARGS__

@@ -63,6 +63,49 @@ MyTest(util, test_fat_ptr) {
 	fat_ptr_free_test_obj32(&ptr2);
 }
 
+MyTest(util, test_slab_config) {
+	SlabAllocatorConfig sc1;
+	slab_allocator_config_build(&sc1, true, true, true);
+	cr_assert_eq(sc1.no_malloc, true);
+	cr_assert_eq(sc1.zeroed, true);
+	cr_assert_eq(sc1.is_64_bit, true);
+
+	slab_allocator_config_build(&sc1, true, true, false);
+	cr_assert_eq(sc1.no_malloc, true);
+	cr_assert_eq(sc1.zeroed, true);
+	cr_assert_eq(sc1.is_64_bit, false);
+
+	slab_allocator_config_build(&sc1, true, false, true);
+	cr_assert_eq(sc1.no_malloc, false);
+	cr_assert_eq(sc1.zeroed, true);
+	cr_assert_eq(sc1.is_64_bit, true);
+
+	slab_allocator_config_build(&sc1, false, true, true);
+	cr_assert_eq(sc1.no_malloc, true);
+	cr_assert_eq(sc1.zeroed, false);
+	cr_assert_eq(sc1.is_64_bit, true);
+
+	SlabType t1 = {1, 2, 3, 4};
+	slab_allocator_config_add_type(&sc1, &t1);
+
+	SlabType t2 = {5, 6, 7, 8};
+	slab_allocator_config_add_type(&sc1, &t2);
+
+	cr_assert_eq(sc1.slab_types[0].slab_size, 1);
+	cr_assert_eq(sc1.slab_types[1].slab_size, 5);
+	cr_assert_eq(sc1.slab_types_count, 2);
+}
+
+MyTest(util, test_slab_allocator) {
+	SlabAllocatorConfig sc;
+	slab_allocator_config_build(&sc, false, false, true);
+	SlabType t1 = {16, 10, 10, 50};
+	SlabType t2 = {32, 20, 20, 70};
+	slab_allocator_config_add_type(&sc, &t1);
+	SlabAllocator sa;
+	slab_allocator_build(&sa, &sc);
+}
+
 // Note: address sanatizer and criterion seem to have problems with this test on certain
 // platforms/configurations. I tested both on linux/mac in the actual binary and it works
 // for both explicit panic and signals. So, I think it works. Will leave this disabled for now.

@@ -1,7 +1,8 @@
 include ../Makefile.config
 SOURCES := $(patsubst %.c,%.o,$(wildcard *.c))
+SUB_HEADERS := $(wildcard *.h)
 
-%.o : %.c $(HEADERS)
+%.o : %.c $(SUB_HEADERS)
 	$(CC) $(FLAG_OPTIONS) $(CC_FLAGS) -I.. -c -o $@ $<
 all: $(OBJS)
 test: test.c $(TEST_OBJS)

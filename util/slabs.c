@@ -14,6 +14,7 @@
 
 #include <base/resources.h>
 #include <stdio.h>
+#include <util/panic.h>
 #include <util/slabs.h>
 
 // Define both 64/32 bit impls the slab allocator will build the approproate types
@@ -111,6 +112,8 @@ void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len) {
 // 0 -> 1, 1 -> 3, 2 -> 5,, ... slab allocators may use up to 2^63. Beyond that is out of bounds.
 // on big endian systems the MSB is set
 u64 map_id_64(u64 seq_id) {
+	if (seq_id & 0x8000000000000000)
+		panic("slab allocator: invalid 64 bit id");
 	if (is_little_endian()) {
 		return (seq_id * 2) + 1;
 	} else {
@@ -123,9 +126,117 @@ u64 map_id_64(u64 seq_id) {
 // 0 -> 0, 1 -> 2, 2 -> 4,, ... slab allocators may use up to 2^31. Beyond that is out of bounds.
 // on big endian systems the MSB is unset
 u32 map_id_32(u32 seq_id) {
+	if (seq_id & 0x80000000)
+		panic("slab allocator: invalid 32 bit id");
 	if (is_little_endian()) {
 		return seq_id * 2;
 	} else {
 		return seq_id & 0x7FFFFFFF;
 	}
+}
+
+// SlabAllocator Config
+void slab_allocator_config_cleanup(SlabAllocatorConfigNc *sc) {
+	if (sc->slab_types) {
+		myfree(sc->slab_types);
+		sc->slab_types = NULL;
+	}
+}
+
+int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeroed, bool no_malloc,
+								bool is_64_bit) {
+	sc->zeroed = zeroed;
+	sc->no_malloc = no_malloc;
+	sc->is_64_bit = is_64_bit;
+	sc->slab_types_count = 0;
+	sc->slab_types = NULL;
+
+	return 0;
+}
+int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st) {
+	if (sc->slab_types) {
+		void *tmp = myrealloc(sc->slab_types, sizeof(SlabType) * (1 + sc->slab_types_count));
+		if (tmp == NULL)
+			return -1;
+		sc->slab_types = tmp;
+	} else {
+		sc->slab_types = mymalloc(sizeof(SlabType));
+		if (sc->slab_types == NULL)
+			return -1;
+	}
+
+	sc->slab_types[sc->slab_types_count] = *st;
+	sc->slab_types_count++;
+
+	return 0;
+}
+
+// Slab Allocator
+
+typedef struct SlabData {
+	SlabType type;	// This slab data's type information (slab_size, slabs_per_resize, initial, max)
+	void **data;	// Pointers to each chunk
+	u32 *free_list; // The free list pointers
+	u32 cur_chunks; // number of chunks currently allocated
+	u32 cur_slabs;	// number of slabs currently allocated
+	u32 free_list_head; // the free list head
+} SlabData;
+
+typedef struct SlabAllocatorImpl {
+	u32 sd_size;	  // size of the SlabData array
+	SlabData *sd_arr; // slab data array one for each SlabType
+	u32 cur_malloc;	  // number of slabs allocated via malloc
+	bool no_malloc;	  // config no_malloc
+	bool zeroed;	  // config zeroed
+	bool is_64_bit;	  // config 64 bit id/len
+
+} SlabAllocatorImpl;
+
+void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
+	if (ptr->impl) {
+		SlabAllocatorImpl *impl = ptr->impl;
+		if (impl->sd_arr) {
+			myfree(impl->sd_arr);
+			impl->sd_arr = NULL;
+		}
+		myfree(ptr->impl);
+		ptr->impl = NULL;
+	}
+}
+
+int slab_allocator_init_slab_data(SlabAllocator *ptr, SlabType st) {
+
+	return 0;
+}
+
+int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) {
+	ptr->impl = mymalloc(sizeof(SlabAllocatorImpl));
+	if (ptr->impl == NULL)
+		return -1;
+	SlabAllocatorImpl *impl = ptr->impl;
+
+	impl->no_malloc = config->no_malloc;
+	impl->zeroed = config->zeroed;
+	impl->is_64_bit = config->is_64_bit;
+	impl->sd_size = config->slab_types_count;
+	impl->sd_arr = mymalloc(sizeof(SlabData) * impl->sd_size);
+	if (impl->sd_arr == NULL) {
+		myfree(ptr->impl);
+		return -1;
+	}
+
+	for (u64 i = 0; i < config->slab_types_count; i++) {
+		if (slab_allocator_init_slab_data(ptr, config->slab_types[i]))
+			return -1;
+	}
+
+	return 0;
+}
+int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
+	return 0;
+}
+void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
+}
+u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
+	return 0;
 }
