@@ -1,6 +1,6 @@
 include Makefile.config
 
-all: release_build $(HEADERS)
+all_impl: release_build $(HEADERS)
 	$(CC) $(RELEASE_FLAGS) $(CC_FLAGS) -o bin/fam $(ALL_OBJS)
 
 doc:
@@ -10,6 +10,7 @@ install:
 	cp bin/fam $(INSTALL_DIR)
 
 clean:
+	rm -rf main/resources.h
 	rm -rf */*.o
 	rm -rf bin/*
 	rm -rf */*.gcno
@@ -100,21 +101,33 @@ xxdir:
 	bin/xxdir main/resources main/resources.h fam
 
 test_build:
+	if [ ! -e main/resources.h ]; then \
+                $(CC) -o bin/xxdir build_utils/xxdir.c; bin/xxdir main/resources main/resources.h fam; \
+        fi; \
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir FLAG_OPTIONS="$(TEST_FLAGS)"; \
 	done;
 
 release_build:
+	if [ ! -e main/resources.h ]; then \
+		$(CC) -o bin/xxdir build_utils/xxdir.c; bin/xxdir main/resources main/resources.h fam; \
+        fi; \
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir FLAG_OPTIONS="$(RELEASE_FLAGS)"; \
 	done;
 
 san_build:
-	 for dir in $(SUBDIRS); do \
+	if [ ! -e main/resources.h ]; then \
+                $(CC) -o bin/xxdir build_utils/xxdir.c; bin/xxdir main/resources main/resources.h fam; \
+        fi; \
+	for dir in $(SUBDIRS); do \
 		 $(MAKE) -C $$dir FLAG_OPTIONS="$(SAN_FLAGS)"; \
 	done;
 
 coverage_build:
+	if [ ! -e main/resources.h ]; then \
+                $(CC) -o bin/xxdir build_utils/xxdir.c; bin/xxdir main/resources main/resources.h fam; \
+        fi; \
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir FLAG_OPTIONS="$(COVERAGE_FLAGS)"; \
 	done; \
