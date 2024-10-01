@@ -32,7 +32,7 @@ define run_tests
             echo "[====] Running $$dir test suite..."; \
             $(MAKE) -C $$dir $(2) FLAG_OPTIONS="$(1)" || exit 1; \
         else \
-            if [[ "$$dir" == "$(TARGET)" ]]; then \
+            if [ "$$dir" = "$(TARGET)" ]; then \
                 if test -z $(FILTER); then \
                     echo "[====] Running $$dir test suite..."; \
                 else \
