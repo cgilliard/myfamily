@@ -49,20 +49,20 @@ for var in "$@"
 do
 
 # Parse command-line arguments for Criterion include and lib paths
-if [[ $var == --with-criterion-include=* ]]; then
+case "$var" in --with-criterion-include=*)
 	include=${var#*=}
 	echo "crit include = $include";
-fi
+esac
 
-if [[ $var == --with-criterion-lib=* ]]; then
+case "$var" in --with-criterion-lib=*)
         lib=${var#*=}
         echo "crit lib = $lib";
-fi
+esac
 
-if [[ $var == --with-cc=* ]]; then
+case "$var" in --with-cc=*)
 	cc=${var#*=}
 	echo "cc = $cc";
-fi
+esac
 
 done
 
