@@ -197,7 +197,6 @@ MyTest(util, test_slab_allocator32) {
 }
 
 MyTest(util, test_big32) {
-
 	SlabAllocatorConfig sc;
 	slab_allocator_config_build(&sc, false, true, false);
 	u64 size = 16;
@@ -211,11 +210,47 @@ MyTest(util, test_big32) {
 	arr = malloc(sizeof(FatPtr) * count);
 
 	for (u64 i = 0; i < count; i++) {
-		int ret = slab_allocator_allocate(&sa, 1, &arr[i]);
+		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
 		cr_assert_eq(fat_ptr_len(&arr[i]), size - 8);
 	}
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
+
+	for (u64 i = 0; i < count; i++) {
+		slab_allocator_free(&sa, &arr[i]);
+	}
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
+
+	free(arr);
+}
+
+MyTest(util, test_malloc) {
+	SlabAllocatorConfig sc;
+	slab_allocator_config_build(&sc, false, false, false);
+	u64 size = 16;
+	u64 count = 100;
+	SlabType t1 = {size, count, 1, count};
+	slab_allocator_config_add_type(&sc, &t1);
+	SlabAllocator sa;
+	cr_assert(!slab_allocator_build(&sa, &sc));
+
+	FatPtr *arr;
+	arr = malloc(sizeof(FatPtr) * count);
+
+	for (u64 i = 0; i < 100; i++) {
+		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
+		cr_assert_eq(ret, 0);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size - 8);
+	}
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
+
+	// works with malloc
+	FatPtr fptr;
+	int ret = slab_allocator_allocate(&sa, 8, &fptr);
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count + 1);
+	cr_assert_eq(ret, 0);
+	slab_allocator_free(&sa, &fptr);
 
 	for (u64 i = 0; i < count; i++) {
 		slab_allocator_free(&sa, &arr[i]);
