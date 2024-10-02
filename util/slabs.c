@@ -295,6 +295,12 @@ int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
 			errno = EINVAL;
 			return -1;
 		}
+
+		// max slabs must be dividisble by slabs_per_resize
+		if (impl->sd_arr[i].type.max_slabs % impl->sd_arr[i].type.slabs_per_resize) {
+			errno = EINVAL;
+			return -1;
+		}
 		last_slab_size = impl->sd_arr[i].type.slab_size;
 	}
 	return 0;
@@ -325,7 +331,10 @@ int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) 
 			return -1;
 		}
 	}
-	return slab_allocator_sort_slab_data(ptr);
+	int ret = slab_allocator_sort_slab_data(ptr);
+	if (ret)
+		slab_allocator_cleanup(ptr);
+	return ret;
 }
 
 int slab_allocator_index(const SlabAllocator *ptr, u32 size) {

@@ -331,12 +331,53 @@ MyTest(util, test_resize) {
 	// resize here
 	FatPtr fptr;
 	int ret = slab_allocator_allocate(&sa, 8, &fptr);
-	printf("ret=%i\n", ret);
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count + 1);
 	cr_assert_eq(ret, 0);
 	slab_allocator_free(&sa, &fptr);
 
 	for (u64 i = 0; i < count; i++) {
+		slab_allocator_free(&sa, &arr[i]);
+	}
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
+
+	free(arr);
+}
+
+MyTest(util, test_multi_resize) {
+	SlabAllocatorConfig sc;
+	slab_allocator_config_build(&sc, false, false, false);
+	u64 size = 24;
+	u64 count = 10;
+	SlabType t1 = {size, count, 1, 15};
+	slab_allocator_config_add_type(&sc, &t1);
+	SlabAllocator sa;
+	// max_slabs not divisible by slabs_per_resize
+	cr_assert(slab_allocator_build(&sa, &sc));
+
+	FatPtr *arr;
+	arr = malloc(sizeof(FatPtr) * count * 3);
+
+	SlabAllocatorConfig sc2;
+	slab_allocator_config_build(&sc2, false, true, false);
+	SlabType t2 = {size, count, 1, 30};
+
+	slab_allocator_config_add_type(&sc2, &t2);
+	cr_assert(!slab_allocator_build(&sa, &sc2));
+
+	int itt = 30;
+	for (u64 i = 0; i < itt; i++) {
+		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
+		cr_assert_eq(ret, 0);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
+	}
+
+	FatPtr tmp;
+	// This is an error because we are 'no_malloc' and we're over the limit of slabs.
+	cr_assert(slab_allocator_allocate(&sa, 8, &tmp));
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), itt);
+
+	for (u64 i = 0; i < itt; i++) {
 		slab_allocator_free(&sa, &arr[i]);
 	}
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
