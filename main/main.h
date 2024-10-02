@@ -18,13 +18,19 @@
 #include <base/macro_utils.h>
 #include <base/misc.h>
 #include <base/resources.h>
-#include <base/sha256.h>
+#include <base/sha3.h>
 #include <base/types.h>
 
 #include <main/resources.h>
 
 #define FAM_VERSION "0.0.1-alpha.1"
-#define BUILD_ID __DATE__ " " __TIME__
+#define DATE_TIME __DATE__ " " __TIME__
+static char _build_id__[65];
+static char *get_build_id() {
+	SHA3_HASH(DATE_TIME, _build_id__);
+	_build_id__[64] = 0;
+	return _build_id__;
+}
 
 int real_main(int argc, char **argv);
 void setup_config_dir(const char *config_dir);
@@ -34,7 +40,10 @@ void write_to_disk(const char *dir, const char *file_name, const unsigned char *
 #define WRITE_RESOURCE_TO_DISK(dir, filename, data, size) write_to_disk(dir, filename, data, size)
 
 #define WRITE_BUILD_ID(dir)                                                                        \
-	WRITE_RESOURCE_TO_DISK(dir, "build_id", (const unsigned char *)BUILD_ID, strlen(BUILD_ID))
+	({                                                                                             \
+		const char *_bid__ = get_build_id();                                                       \
+		WRITE_RESOURCE_TO_DISK(dir, "build_id", (const unsigned char *)_bid__, strlen(_bid__));    \
+	})
 
 #define BUILD_RESOURCE_DIR(dir, namespace)                                                         \
 	for (int i = 0; i < namespace##_##xxdir_file_count; i++)                                       \

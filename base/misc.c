@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/colors.h>
+#include <base/macro_utils.h>
 #include <base/misc.h>
 #include <base/resources.h>
 #include <base/types.h>
@@ -60,6 +61,15 @@ long myftell(MYFILE *stream) {
 
 int myfseek(MYFILE *stream, long pos, int type) {
 	return fseek((FILE *)stream, pos, type);
+}
+
+u64 mystrlen(const char *s) {
+	int ret = 0;
+	loop {
+		if (s[ret] == 0)
+			return ret;
+		ret++;
+	}
 }
 
 int myfprintf(MYFILE *fptr, const char *str, ...) {

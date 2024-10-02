@@ -18,7 +18,9 @@
 #include <base/path.h>
 #include <base/types.h>
 
+#ifndef NULL
 #define NULL ((void *)0)
+#endif // NULL
 
 typedef struct MYFILE MYFILE;
 

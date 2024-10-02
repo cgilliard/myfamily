@@ -34,6 +34,7 @@ long myftell(MYFILE *stream);
 int myfseek(MYFILE *stream, long pos, int type);
 char *myfgets(char *str, int n, MYFILE *stream);
 int myfprintf(MYFILE *fptr, const char *str, ...);
+u64 mystrlen(const char *s);
 char *trim_whitespace(char *str);
 
 #ifdef TEST
