@@ -35,6 +35,7 @@ typedef struct ResourceStats {
 void *mymalloc(u64 size);
 void *myrealloc(void *ptr, u64 size);
 void myfree(void *ptr);
+void *mymalloc_no_stat(u64 size);
 MYFILE *myfopen(const Path *path, const char *mode);
 void myfclose(MYFILE *ptr);
 u64 mymalloc_sum();

@@ -69,6 +69,11 @@ MYFILE *myfopen(const Path *path, const char *mode) {
 	}
 	return (MYFILE *)ret;
 }
+
+void *mymalloc_no_stat(u64 size) {
+	return malloc(size);
+}
+
 void myfclose(MYFILE *ptr) {
 	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
 	fclose((FILE *)ptr);

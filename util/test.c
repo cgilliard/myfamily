@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/test.h>
+#include <util/chain_alloc.h>
 #include <util/panic.h>
 #include <util/slabs.h>
 
@@ -457,6 +458,54 @@ MyTest(util, test_zeroed) {
 
 	dataptr = fat_ptr_data(&tmp);
 	cr_assert(!strcmp(dataptr, "test"));
+}
+
+MyTest(util, test_zero_size_initial) {
+	SlabAllocatorConfig sc;
+	slab_allocator_config_build(&sc, false, true, false);
+	u64 size = 24;
+	u64 count = 10;
+	SlabType t1 = {
+		.slab_size = size, .slabs_per_resize = 1, .initial_chunks = 0, .max_slabs = 3 * count};
+	slab_allocator_config_add_type(&sc, &t1);
+	SlabAllocator sa;
+	cr_assert(!slab_allocator_build(&sa, &sc));
+
+	FatPtr *arr;
+	int itt = count * 3;
+	arr = malloc(sizeof(FatPtr) * itt);
+
+	for (u64 i = 0; i < itt; i++) {
+		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
+		cr_assert_eq(ret, 0);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
+		char *test = fat_ptr_data(&arr[i]);
+		strcpy(test, "test");
+	}
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), itt);
+	FatPtr tmp;
+	// over capacity / no_malloc
+	cr_assert(slab_allocator_allocate(&sa, 8, &tmp));
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), itt);
+
+	for (u64 i = 0; i < itt; i++) {
+		char *test = fat_ptr_data(&arr[i]);
+		cr_assert(!strcmp(test, "test"));
+		slab_allocator_free(&sa, &arr[i]);
+	}
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
+
+	free(arr);
+}
+
+MyTest(util, test_chain_allocator) {
+	/*
+		FatPtr fptr;
+		chain_malloc(&fptr, 10);
+		chain_free(&fptr);
+	*/
 }
 
 // Note: address sanatizer and criterion seem to have problems with this test on certain
