@@ -307,6 +307,43 @@ MyTest(util, test_overwrite64) {
 	slab_allocator_free(&sa, &fptr);
 }
 
+MyTest(util, test_resize) {
+	SlabAllocatorConfig sc;
+	slab_allocator_config_build(&sc, false, false, false);
+	u64 size = 24;
+	u64 count = 10;
+	SlabType t1 = {size, count, 1, count * 3};
+	slab_allocator_config_add_type(&sc, &t1);
+	SlabAllocator sa;
+	cr_assert(!slab_allocator_build(&sa, &sc));
+
+	FatPtr *arr;
+	arr = malloc(sizeof(FatPtr) * count);
+
+	for (u64 i = 0; i < count; i++) {
+		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
+		cr_assert_eq(ret, 0);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
+	}
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
+
+	// resize here
+	FatPtr fptr;
+	int ret = slab_allocator_allocate(&sa, 8, &fptr);
+	printf("ret=%i\n", ret);
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count + 1);
+	cr_assert_eq(ret, 0);
+	slab_allocator_free(&sa, &fptr);
+
+	for (u64 i = 0; i < count; i++) {
+		slab_allocator_free(&sa, &arr[i]);
+	}
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
+
+	free(arr);
+}
+
 // Note: address sanatizer and criterion seem to have problems with this test on certain
 // platforms/configurations. I tested both on linux/mac in the actual binary and it works
 // for both explicit panic and signals. So, I think it works. Will leave this disabled for now.

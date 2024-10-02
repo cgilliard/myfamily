@@ -160,6 +160,8 @@ typedef struct SlabAllocatorImpl {
 	u64 cur_mallocs;  // number of slabs allocated via malloc
 } SlabAllocatorImpl;
 
+int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit);
+
 void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
 	if (ptr->impl) {
 		SlabAllocatorImpl *impl = ptr->impl;
@@ -189,21 +191,20 @@ void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
 	}
 }
 
-int slab_allocator_init_free_list(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
-	u64 slabs = st->initial_chunks * st->slabs_per_resize;
+int slab_allocator_init_free_list(SlabData *sd, u64 offset, bool is_64_bit) {
+	u64 slabs = sd->type.initial_chunks * sd->type.slabs_per_resize;
 	// initialize the values of the free list.
-	u32 offset = 0; // in this case offset is 0.
 	for (u64 i = 0; i < slabs; i++) {
 		if (i == (slabs - 1)) {
-			if (impl->is_64_bit)
-				((u64 *)(impl->sd_arr[index].free_list))[i + offset] = UINT64_MAX;
+			if (is_64_bit)
+				((u64 *)(sd->free_list))[i + offset] = UINT64_MAX;
 			else
-				((u32 *)(impl->sd_arr[index].free_list))[i + offset] = UINT32_MAX;
+				((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
 		} else {
-			if (impl->is_64_bit)
-				((u64 *)(impl->sd_arr[index].free_list))[i + offset] = offset + i + 1;
+			if (is_64_bit)
+				((u64 *)(sd->free_list))[i + offset] = offset + i + 1;
 			else
-				((u32 *)(impl->sd_arr[index].free_list))[i + offset] = offset + i + 1;
+				((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
 		}
 	}
 
@@ -215,7 +216,10 @@ int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 ind
 	impl->sd_arr[index].cur_slabs = 0;
 	impl->sd_arr[index].cur_chunks = st->initial_chunks;
 	impl->sd_arr[index].free_list_head = 0;
-	impl->sd_arr[index].data = mymalloc(sizeof(void *) * st->initial_chunks);
+	if (st->initial_chunks > 0)
+		impl->sd_arr[index].data = mymalloc(sizeof(void *) * st->initial_chunks);
+	else
+		impl->sd_arr[index].data = NULL;
 	if (impl->sd_arr[index].data == NULL)
 		return -1;
 
@@ -247,7 +251,8 @@ int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 ind
 		}
 	}
 
-	slab_allocator_init_free_list(impl, st, index);
+	bool is_64_bit = impl->is_64_bit;
+	slab_allocator_init_free_list(&impl->sd_arr[index], 0, is_64_bit);
 
 	return 0;
 }
@@ -351,18 +356,50 @@ int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
 	return ret;
 }
 
-/*
-typedef struct SlabData {
-		SlabType type; // This slab data's type information (slab_size, slabs_per_resize, initial,
-max) void **data;   // Pointers to each chunk void *free_list;        // The free list pointers u64
-cur_chunks;         // number of chunks currently allocated u64 cur_slabs;          // number of
-slabs currently allocated u64 free_list_head; // the free list head } SlabData;
-
-*/
-
 int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
 	if (sd->cur_slabs < sd->type.max_slabs) {
 		// we can try to resize
+
+		// first try to reallocate the free list
+		void *nfree_list = NULL;
+		u64 factor;
+		if (is_64_bit)
+			factor = sizeof(u64);
+		else
+			factor = sizeof(u32);
+		if (sd->free_list) {
+			nfree_list =
+				myrealloc(sd->free_list, (1 + sd->cur_chunks) * sd->type.slabs_per_resize * factor);
+		} else {
+
+			nfree_list = mymalloc(sd->type.slabs_per_resize * factor);
+		}
+		if (nfree_list == NULL)
+			return -1;
+		sd->free_list = nfree_list;
+
+		// now try to allocate more slab chunks
+		void *ndata;
+		if (sd->data == NULL) {
+			ndata = mymalloc(sizeof(void *));
+		} else {
+			ndata = myrealloc(sd->data, sizeof(void *) * (1 + sd->cur_chunks));
+		}
+		if (ndata == NULL) {
+			return -1;
+		}
+
+		sd->data = ndata;
+		sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
+		if (sd->data[sd->cur_chunks] == NULL)
+			return -1;
+
+		// data was successfully allocated, make updates.
+		slab_allocator_init_free_list(sd, sd->cur_slabs, is_64_bit);
+		sd->free_list_head = sd->cur_slabs;
+		sd->cur_chunks += 1;
+
+		return slab_data_allocate(sd, fptr, is_64_bit);
 	}
 	return -1;
 }
@@ -375,10 +412,12 @@ int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
 		return slab_data_try_resize(sd, fptr, is_64_bit);
 	}
 
-	if (is_64_bit)
+	if (is_64_bit) {
 		sd->free_list_head = ((u64 *)sd->free_list)[id];
-	else
+
+	} else {
 		sd->free_list_head = ((u32 *)sd->free_list)[id];
+	}
 
 	// set to MAX-1 as a marker that this is allocated
 	// if any freed without this value, it's an error
@@ -437,10 +476,6 @@ void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit) {
 }
 
 int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
-	if (size < 8) {
-		errno = EINVAL;
-		return -1;
-	}
 	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
 	bool is_64_bit = impl->is_64_bit;
 	u32 needed;
