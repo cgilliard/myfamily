@@ -61,10 +61,18 @@
 #define INT64_MIN (-INT64_MAX - 1)
 #endif // INT64_MIN
 
-typedef __int128 int128_t;
-typedef unsigned __int128 uint128_t;
+typedef __int128 myint128_t;
+typedef unsigned __int128 myuint128_t;
 
 // Define limits for these types (assuming they match 128-bit values)
-#define UINT128_MAX ((uint128_t)~0ULL >> 1)			  // 2^128 - 1
-#define INT128_MAX ((int128_t)(UINT128_MAX >> 1))	  // 2^127 - 1
-#define INT128_MIN ((int128_t)(UINT128_MAX >> 1) + 1) // -2^127
+#ifndef UINT128_MAX
+#define UINT128_MAX ((myuint128_t)~0ULL >> 1) // 2^128 - 1
+#endif										  // UINT128_MAX
+
+#ifndef INT128_MAX
+#define INT128_MAX ((myint128_t)(UINT128_MAX >> 1)) // 2^127 - 1
+#endif												// INT128_MAX
+
+#ifndef INT128_MIN
+#define INT128_MIN ((myint128_t)(UINT128_MAX >> 1) + 1) // -2^127
+#endif													// INT128_MIN
