@@ -385,6 +385,80 @@ MyTest(util, test_multi_resize) {
 	free(arr);
 }
 
+MyTest(util, test_zeroed) {
+	SlabAllocatorConfig sc;
+	slab_allocator_config_build(&sc, true, false, false);
+	u64 size = 24;
+	u64 count = 10;
+	SlabType t1 = {size, count, 1, count};
+	slab_allocator_config_add_type(&sc, &t1);
+	SlabAllocator sa;
+	cr_assert(!slab_allocator_build(&sa, &sc));
+
+	FatPtr *arr;
+	arr = malloc(sizeof(FatPtr) * count * 3);
+
+	int itt = 10;
+
+	for (u64 i = 0; i < itt; i++) {
+		FatPtr ptr1;
+		int ret = slab_allocator_allocate(&sa, 8, &ptr1);
+		cr_assert_eq(ret, 0);
+		cr_assert_eq(fat_ptr_len(&ptr1), size - 16);
+
+		char *dataptr = fat_ptr_data(&ptr1);
+		// memory is zeroed so even though we should have the same id as last time
+		// it's '0'
+		cr_assert_eq(dataptr[0], 0);
+		cr_assert_eq(dataptr[1], 0);
+		cr_assert_eq(dataptr[2], 0);
+		cr_assert_eq(dataptr[3], 0);
+		strcpy(dataptr, "1234");
+
+		slab_allocator_free(&sa, &ptr1);
+	}
+
+	for (u64 i = 0; i < itt; i++) {
+		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
+		cr_assert_eq(ret, 0);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
+	}
+
+	FatPtr tmp;
+	// This is ok because we will use malloc
+	cr_assert(!slab_allocator_allocate(&sa, 8, &tmp));
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), itt + 1);
+
+	for (u64 i = 0; i < itt; i++) {
+		slab_allocator_free(&sa, &arr[i]);
+	}
+
+	slab_allocator_free(&sa, &tmp);
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
+
+	free(arr);
+
+	// simple test of non-zeroed case to see data is still there
+	SlabAllocatorConfig sc2;
+	slab_allocator_config_build(&sc2, false, false, false);
+	slab_allocator_config_add_type(&sc2, &t1);
+	SlabAllocator sa2;
+	cr_assert(!slab_allocator_build(&sa2, &sc2));
+
+	cr_assert(!slab_allocator_allocate(&sa2, 8, &tmp));
+	char *dataptr = fat_ptr_data(&tmp);
+	strcpy(dataptr, "test");
+	cr_assert(!strcmp(dataptr, "test"));
+
+	slab_allocator_free(&sa2, &tmp);
+	cr_assert(!slab_allocator_allocate(&sa2, 8, &tmp));
+
+	dataptr = fat_ptr_data(&tmp);
+	cr_assert(!strcmp(dataptr, "test"));
+}
+
 // Note: address sanatizer and criterion seem to have problems with this test on certain
 // platforms/configurations. I tested both on linux/mac in the actual binary and it works
 // for both explicit panic and signals. So, I think it works. Will leave this disabled for now.

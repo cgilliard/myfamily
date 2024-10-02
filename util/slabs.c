@@ -160,7 +160,7 @@ typedef struct SlabAllocatorImpl {
 	u64 cur_mallocs;  // number of slabs allocated via malloc
 } SlabAllocatorImpl;
 
-int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit);
+int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed);
 
 void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
 	if (ptr->impl) {
@@ -365,7 +365,7 @@ int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
 	return ret;
 }
 
-int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
+int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
 	if (sd->cur_slabs < sd->type.max_slabs) {
 		// we can try to resize
 
@@ -408,17 +408,17 @@ int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
 		sd->free_list_head = sd->cur_slabs;
 		sd->cur_chunks += 1;
 
-		return slab_data_allocate(sd, fptr, is_64_bit);
+		return slab_data_allocate(sd, fptr, is_64_bit, zeroed);
 	}
 	return -1;
 }
 
-int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
+int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
 	u64 id = sd->free_list_head;
 	if (is_64_bit && id == UINT64_MAX) {
-		return slab_data_try_resize(sd, fptr, is_64_bit);
+		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
 	} else if (!is_64_bit && id == UINT32_MAX) {
-		return slab_data_try_resize(sd, fptr, is_64_bit);
+		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
 	}
 
 	if (is_64_bit) {
@@ -441,26 +441,41 @@ int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
 
 	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
 
+	u64 data_len;
+	u8 *data_ptr;
 	if (is_64_bit) {
 		FatPtr64Impl *fptr64 = fptr->data;
 		fptr64->id = (id * 2) + 1;
 		fptr64->len = len - 3 * sizeof(u64);
 		fptr64->data = fptr->data + 3 * sizeof(u64);
+		data_len = fptr64->len;
+		data_ptr = fptr64->data;
 	} else {
 		FatPtr32Impl *fptr32 = fptr->data;
 		fptr32->id = (id * 2);
 		fptr32->len = len - (2 * sizeof(u32) + sizeof(u64));
 		fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
+		data_len = fptr32->len;
+		data_ptr = fptr32->data;
 	}
 
 	sd->cur_slabs += 1;
+	if (zeroed) {
+		for (u64 i = 0; i < data_len; i++) {
+			data_ptr[i] = 0;
+		}
+	}
 
 	return 0;
 }
 
-void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit) {
+void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit, bool zeroed) {
+	u64 data_len;
+	u8 *data_ptr;
 	if (is_64_bit) {
 		FatPtr64Impl *fptr64 = fptr->data;
+		data_len = fptr64->len;
+		data_ptr = fptr64->data;
 		u64 id = (fptr64->id - 1) / 2;
 		if (((u64 *)sd->free_list)[id] != (UINT64_MAX - 1)) {
 			panic("Potential double free. Id = %llu.\n", id);
@@ -472,6 +487,8 @@ void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit) {
 		sd->cur_slabs -= 1;
 	} else {
 		FatPtr32Impl *fptr32 = fptr->data;
+		data_len = fptr32->len;
+		data_ptr = fptr32->data;
 		u32 id = (fptr32->id) / 2;
 		if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
 			panic("Potential double free. Id = %llu.\n", id);
@@ -482,11 +499,18 @@ void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit) {
 			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
 		sd->cur_slabs -= 1;
 	}
+
+	if (zeroed) {
+		for (u64 i = 0; i < data_len; i++) {
+			data_ptr[i] = 0;
+		}
+	}
 }
 
 int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
 	bool is_64_bit = impl->is_64_bit;
+	bool zeroed = impl->zeroed;
 	u32 needed;
 	if (is_64_bit)
 		needed = size + 3 * sizeof(u64);
@@ -497,19 +521,31 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 		return -1;
 	}
 	SlabData *sd = &impl->sd_arr[index];
-	int ret = slab_data_allocate(sd, fptr, is_64_bit);
+	int ret = slab_data_allocate(sd, fptr, is_64_bit, zeroed);
 
 	// we couldn't allocate via slabs. Use malloc if configured.
 	if (ret && !impl->no_malloc) {
 		void *val;
-		if (is_64_bit)
-			val = mymalloc(size + (3 * sizeof(u64)));
-		else
-			val = mymalloc(size + (2 * sizeof(u32) + sizeof(u64)));
+		u64 data_len;
+
+		if (is_64_bit) {
+			data_len = size + (3 * sizeof(u64));
+			val = mymalloc(data_len);
+		} else {
+			data_len = size + (2 * sizeof(u32) + sizeof(u64));
+			val = mymalloc(data_len);
+		}
 
 		// malloc error
 		if (!val)
 			return -1;
+
+		if (zeroed) {
+			for (u64 i = 0; i < data_len; i++) {
+				((u8 *)val)[i] = 0;
+			}
+		}
+
 		impl->cur_mallocs++;
 		ret = 0;
 		fptr->data = val;
@@ -536,6 +572,11 @@ void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
 		FatPtr64Impl *fptr64 = fptr->data;
 		if (fptr64->id == MALLOC_64_ID) {
 			if (fptr->data) {
+				if (impl->zeroed) {
+					for (u64 i = 0; i < fptr64->len + 3 * sizeof(u64); i++) {
+						((u8 *)fptr->data)[i] = 0;
+					}
+				}
 				if (impl->cur_mallocs == 0)
 					panic("Freeing malloc allocated pointer when none are pending. Double free?");
 				myfree(fptr->data);
@@ -547,6 +588,11 @@ void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
 		FatPtr32Impl *fptr32 = fptr->data;
 		if (fptr32->id == MALLOC_32_ID) {
 			if (fptr->data) {
+				if (impl->zeroed) {
+					for (u64 i = 0; i < fptr32->len + 2 * sizeof(u32) + sizeof(u64); i++) {
+						((u8 *)fptr->data)[i] = 0;
+					}
+				}
 				if (impl->cur_mallocs == 0)
 					panic("Freeing malloc allocated pointer when none are pending. Double free?");
 				myfree(fptr->data);
@@ -567,7 +613,8 @@ void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
 	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
 	if (needed != sd->type.slab_size)
 		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit);
+	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit,
+				   ((SlabAllocatorImpl *)ptr->impl)->zeroed);
 }
 u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
 	SlabAllocatorImpl *impl = ptr->impl;
