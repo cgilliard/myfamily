@@ -24,7 +24,7 @@
 #include <main/resources.h>
 
 #define FAM_VERSION "0.0.1-alpha.1"
-#define BUILD_ID SHA_256_HASH(__DATE__ " " __TIME__)
+#define BUILD_ID __DATE__ " " __TIME__
 
 int real_main(int argc, char **argv);
 void setup_config_dir(const char *config_dir);
