@@ -16,6 +16,7 @@
 #include <assert.h>
 #include <base/misc.h>
 #include <base/path.h>
+#include <base/sha256.h>
 #include <limits.h>
 #include <main/main.h>
 #include <stdio.h>
@@ -71,7 +72,8 @@ void setup_config_dir(const char *config_dir) {
 			return;
 		remove_directory(&cd, false);
 	}
-	fprintf(stderr, "Installing config directory at %s. Build id = %s\n", config_dir, BUILD_ID);
+	fprintf(stderr, "Installing config directory at %s. Build id = %s.\n", config_dir, BUILD_ID);
+
 	if (!path_mkdir(&cd, 0700, false)) {
 		exit_error("Could not create config directory at path [%s].", path_to_string(&cd));
 		return;
