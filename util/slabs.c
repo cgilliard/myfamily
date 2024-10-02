@@ -88,20 +88,20 @@ void fat_ptr_free_test_obj32(FatPtr *ptr) {
 
 // Test function to allocate the 64 bit objects.
 void fat_ptr_test_obj64(FatPtr *ptr, u64 id, u64 len) {
-	ptr->data = mymalloc(2 * sizeof(u64) + len);
+	ptr->data = mymalloc(3 * sizeof(u64) + len);
 	FatPtr64Impl *fptr = ptr->data;
 	fptr->id = id;
 	fptr->len = len;
-	fptr->data = ptr->data + 2 * sizeof(u64);
+	fptr->data = ptr->data + 3 * sizeof(u64);
 }
 
 // Test function to allocate the 32 bit objects.
 void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len) {
-	ptr->data = mymalloc(2 * sizeof(u32) + len);
+	ptr->data = mymalloc(2 * sizeof(u32) + sizeof(u64) + len);
 	FatPtr32Impl *fptr = ptr->data;
 	fptr->id = id;
 	fptr->len = len;
-	fptr->data = ptr->data + 2 * sizeof(u32);
+	fptr->data = ptr->data + 2 * sizeof(u32) + sizeof(u64);
 }
 
 // SlabAllocator Config
@@ -362,6 +362,7 @@ slabs currently allocated u64 free_list_head; // the free list head } SlabData;
 
 int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
 	if (sd->cur_slabs < sd->type.max_slabs) {
+		// we can try to resize
 	}
 	return -1;
 }
@@ -395,13 +396,13 @@ int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
 	if (is_64_bit) {
 		FatPtr64Impl *fptr64 = fptr->data;
 		fptr64->id = (id * 2) + 1;
-		fptr64->len = len - 2 * sizeof(u64);
-		fptr64->data = fptr->data + 2 * sizeof(u64);
+		fptr64->len = len - 3 * sizeof(u64);
+		fptr64->data = fptr->data + 3 * sizeof(u64);
 	} else {
 		FatPtr32Impl *fptr32 = fptr->data;
 		fptr32->id = (id * 2);
-		fptr32->len = len - 2 * sizeof(u32);
-		fptr32->data = fptr->data + 2 * sizeof(u32);
+		fptr32->len = len - (2 * sizeof(u32) + sizeof(u64));
+		fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
 	}
 
 	sd->cur_slabs += 1;
@@ -444,9 +445,9 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 	bool is_64_bit = impl->is_64_bit;
 	u32 needed;
 	if (is_64_bit)
-		needed = size + 2 * sizeof(u64);
+		needed = size + 3 * sizeof(u64);
 	else
-		needed = size + 2 * sizeof(u32);
+		needed = size + 2 * sizeof(u32) + sizeof(u64);
 	int index = slab_allocator_index(ptr, needed);
 	if (index < 0) {
 		return -1;
@@ -458,9 +459,9 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 	if (ret && !impl->no_malloc) {
 		void *val;
 		if (is_64_bit)
-			val = mymalloc(size + (2 * sizeof(u64)));
+			val = mymalloc(size + (3 * sizeof(u64)));
 		else
-			val = mymalloc(size + (2 * sizeof(u32)));
+			val = mymalloc(size + (2 * sizeof(u32) + sizeof(u64)));
 
 		// malloc error
 		if (!val)
@@ -473,12 +474,12 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 			FatPtr64Impl *fptr64 = fptr->data;
 			fptr64->id = MALLOC_64_ID;
 			fptr64->len = size;
-			fptr64->data = fptr->data + 2 * sizeof(u64);
+			fptr64->data = fptr->data + 3 * sizeof(u64);
 		} else {
 			FatPtr32Impl *fptr32 = fptr->data;
 			fptr32->id = MALLOC_32_ID;
 			fptr32->len = size;
-			fptr32->data = fptr->data + 2 * sizeof(u32);
+			fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
 		}
 	}
 	return ret;
@@ -513,9 +514,9 @@ void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
 
 	u32 needed;
 	if (is_64_bit)
-		needed = fat_ptr_len(fptr) + 2 * sizeof(u64);
+		needed = fat_ptr_len(fptr) + 3 * sizeof(u64);
 	else
-		needed = fat_ptr_len(fptr) + 2 * sizeof(u32);
+		needed = fat_ptr_len(fptr) + 2 * sizeof(u32) + sizeof(u64);
 	int index = slab_allocator_index(ptr, needed);
 	if (index < 0)
 		panic("Freeing a slab with an unknown slab size %llu.\n", needed);

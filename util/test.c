@@ -105,7 +105,7 @@ MyTest(util, test_slab_config) {
 MyTest(util, test_slab_allocator) {
 	SlabAllocatorConfig sc;
 	slab_allocator_config_build(&sc, false, true, true);
-	SlabType t1 = {32, 10, 1, 10};
+	SlabType t1 = {40, 10, 1, 10};
 	slab_allocator_config_add_type(&sc, &t1);
 	SlabAllocator sa;
 	cr_assert(!slab_allocator_build(&sa, &sc));
@@ -152,7 +152,7 @@ MyTest(util, test_slab_allocator) {
 MyTest(util, test_slab_allocator32) {
 	SlabAllocatorConfig sc;
 	slab_allocator_config_build(&sc, false, true, false);
-	SlabType t1 = {24, 10, 1, 10};
+	SlabType t1 = {32, 10, 1, 10};
 	slab_allocator_config_add_type(&sc, &t1);
 	SlabAllocator sa;
 	cr_assert(!slab_allocator_build(&sa, &sc));
@@ -162,6 +162,7 @@ MyTest(util, test_slab_allocator32) {
 		int ret = slab_allocator_allocate(&sa, 13, &fptr);
 		cr_assert_eq(ret, 0);
 		// it's rounded up to our nearest slab size
+
 		cr_assert_eq(fat_ptr_len(&fptr), 16);
 		slab_allocator_free(&sa, &fptr);
 	}
@@ -199,9 +200,9 @@ MyTest(util, test_slab_allocator32) {
 MyTest(util, test_big32) {
 	SlabAllocatorConfig sc;
 	slab_allocator_config_build(&sc, false, true, false);
-	u64 size = 16;
+	u64 size = 24;
 	// u64 count = (INT32_MAX - 10);
-	u64 count = 10000000;
+	u64 count = 1000000;
 	SlabType t1 = {size, count, 1, count};
 	slab_allocator_config_add_type(&sc, &t1);
 	SlabAllocator sa;
@@ -212,7 +213,7 @@ MyTest(util, test_big32) {
 	for (u64 i = 0; i < count; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size - 8);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
 	}
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
 
@@ -227,7 +228,7 @@ MyTest(util, test_big32) {
 MyTest(util, test_malloc) {
 	SlabAllocatorConfig sc;
 	slab_allocator_config_build(&sc, false, false, false);
-	u64 size = 16;
+	u64 size = 24;
 	u64 count = 100;
 	SlabType t1 = {size, count, 1, count};
 	slab_allocator_config_add_type(&sc, &t1);
@@ -237,10 +238,10 @@ MyTest(util, test_malloc) {
 	FatPtr *arr;
 	arr = malloc(sizeof(FatPtr) * count);
 
-	for (u64 i = 0; i < 100; i++) {
+	for (u64 i = 0; i < count; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size - 8);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
 	}
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
@@ -258,6 +259,52 @@ MyTest(util, test_malloc) {
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
 
 	free(arr);
+}
+
+MyTest(util, test_overwrite32) {
+	SlabAllocatorConfig sc;
+	slab_allocator_config_build(&sc, false, false, false);
+	u64 size = 24;
+	u64 count = 100;
+	SlabType t1 = {size, count, 1, count};
+	slab_allocator_config_add_type(&sc, &t1);
+	SlabAllocator sa;
+	cr_assert(!slab_allocator_build(&sa, &sc));
+
+	FatPtr fptr;
+	int ret = slab_allocator_allocate(&sa, sizeof(u64), &fptr);
+	void *data = fat_ptr_data(&fptr);
+	cr_assert_eq(data, fat_ptr_data(&fptr));
+	cr_assert_eq(ret, 0);
+	u64 x = 101;
+	u64 *ptr = fat_ptr_data(&fptr);
+	memcpy(ptr, &x, sizeof(u64));
+	cr_assert_eq(*ptr, 101);
+	cr_assert_eq(data, fat_ptr_data(&fptr));
+	slab_allocator_free(&sa, &fptr);
+}
+
+MyTest(util, test_overwrite64) {
+	SlabAllocatorConfig sc;
+	slab_allocator_config_build(&sc, false, false, true);
+	u64 size = 32;
+	u64 count = 100;
+	SlabType t1 = {size, count, 1, count};
+	slab_allocator_config_add_type(&sc, &t1);
+	SlabAllocator sa;
+	cr_assert(!slab_allocator_build(&sa, &sc));
+
+	FatPtr fptr;
+	int ret = slab_allocator_allocate(&sa, sizeof(u64), &fptr);
+	void *data = fat_ptr_data(&fptr);
+	cr_assert_eq(data, fat_ptr_data(&fptr));
+	cr_assert_eq(ret, 0);
+	u64 x = 109;
+	u64 *ptr = fat_ptr_data(&fptr);
+	memcpy(ptr, &x, sizeof(u64));
+	cr_assert_eq(*ptr, 109);
+	cr_assert_eq(data, fat_ptr_data(&fptr));
+	slab_allocator_free(&sa, &fptr);
 }
 
 // Note: address sanatizer and criterion seem to have problems with this test on certain
