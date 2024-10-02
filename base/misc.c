@@ -17,6 +17,7 @@
 #include <base/misc.h>
 #include <base/resources.h>
 #include <base/types.h>
+#include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>

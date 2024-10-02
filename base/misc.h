@@ -18,7 +18,6 @@
 #include <base/path.h>
 #include <base/resources.h>
 #include <base/types.h>
-#include <ctype.h>
 
 const char *rstrstr(const char *s1, const char *s2);
 int copy_file(const Path *dst, const Path *src);
