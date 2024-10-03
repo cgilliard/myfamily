@@ -1027,6 +1027,19 @@ MyTest(base, test_nil) {
 	cr_assert(nil(ptr));
 }
 
+MyTest(base, test_realloc) {
+	FatPtr ptr = null;
+	cr_assert(!chain_malloc(&ptr, 1000));
+	strcpy(fat_ptr_data(&ptr), "testing123");
+	cr_assert(!strcmp(fat_ptr_data(&ptr), "testing123"));
+	cr_assert(fat_ptr_len(&ptr) < 2000);
+	cr_assert(!chain_realloc(&ptr, 2000));
+	cr_assert(fat_ptr_len(&ptr) >= 2000);
+	cr_assert(!strcmp(fat_ptr_data(&ptr), "testing123"));
+
+	chain_free(&ptr);
+}
+
 // Note: address sanatizer and criterion seem to have problems with this test on certain
 // platforms/configurations. I tested both on linux/mac in the actual binary and it works
 // for both explicit panic and signals. So, I think it works. Will leave this disabled for now.

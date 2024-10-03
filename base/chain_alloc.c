@@ -15,7 +15,7 @@
 #include <base/chain_alloc.h>
 #include <base/panic.h>
 #include <base/resources.h>
-#include <stdio.h>
+#include <string.h>
 
 typedef struct ChainGuardEntry {
 	struct ChainGuardEntry *next;
@@ -112,6 +112,22 @@ int chain_malloc(FatPtr *ptr, u64 size) {
 int chain_realloc(FatPtr *ptr, u64 size) {
 	if (chain_guard_entry_root == NULL)
 		panic("Reallocating a FatPtr when it was never allocated!");
+	FatPtr tmp = null;
+	chain_malloc(&tmp, size);
+	if (nil(tmp)) {
+		return -1;
+	}
+
+	u64 len = fat_ptr_len(ptr);
+	u64 nlen = fat_ptr_len(&tmp);
+	if (nlen < len) {
+		len = nlen;
+	}
+
+	memcpy(fat_ptr_data(&tmp), fat_ptr_data(ptr), len);
+
+	chain_free(ptr);
+	*ptr = tmp;
 	return 0;
 }
 void chain_free(FatPtr *ptr) {
