@@ -212,12 +212,10 @@ int slab_allocator_init_free_list(SlabData *sd, u64 slabs, u64 offset, bool is_6
 
 int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
 	impl->sd_arr[index].type = *st;
-	/*
-		if (impl->is_64_bit)
-			impl->sd_arr[index].type.slab_size += sizeof(u64) * 3;
-		else
-			impl->sd_arr[index].type.slab_size += sizeof(u64) + sizeof(u32) * 2;
-	*/
+	if (impl->is_64_bit)
+		impl->sd_arr[index].type.slab_size += sizeof(u64) * 3;
+	else
+		impl->sd_arr[index].type.slab_size += sizeof(u64) + sizeof(u32) * 2;
 	impl->sd_arr[index].cur_slabs = 0;
 	impl->sd_arr[index].cur_chunks = st->initial_chunks;
 	if (st->initial_chunks > 0) {
@@ -249,7 +247,8 @@ int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 ind
 	}
 
 	for (u64 i = 0; i < st->initial_chunks; i++) {
-		impl->sd_arr[index].data[i] = mymalloc(st->slab_size * st->slabs_per_resize);
+		impl->sd_arr[index].data[i] =
+			mymalloc(impl->sd_arr[index].type.slab_size * st->slabs_per_resize);
 
 		if (impl->sd_arr[index].data[i] == NULL) {
 			for (u64 j = 0; j < i; j++) {

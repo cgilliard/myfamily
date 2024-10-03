@@ -496,7 +496,7 @@ MyTest(base, test_slab_allocator) {
 		FatPtr fptr;
 		int ret = slab_allocator_allocate(&sa, 13, &fptr);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&fptr), 16);
+		cr_assert_eq(fat_ptr_len(&fptr), 40);
 		slab_allocator_free(&sa, &fptr);
 	}
 
@@ -513,7 +513,7 @@ MyTest(base, test_slab_allocator) {
 	for (u64 i = 0; i < 10; i++) {
 		int ret = slab_allocator_allocate(&sa, 10, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), 40 - 24);
+		cr_assert_eq(fat_ptr_len(&arr[i]), 40);
 	}
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 10);
@@ -544,7 +544,7 @@ MyTest(base, test_slab_allocator32) {
 		cr_assert_eq(ret, 0);
 		// it's rounded up to our nearest slab size
 
-		cr_assert_eq(fat_ptr_len(&fptr), 32 - 16);
+		cr_assert_eq(fat_ptr_len(&fptr), 32);
 		slab_allocator_free(&sa, &fptr);
 	}
 
@@ -561,7 +561,7 @@ MyTest(base, test_slab_allocator32) {
 	for (u64 i = 0; i < 10; i++) {
 		int ret = slab_allocator_allocate(&sa, 10, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), 32 - 16);
+		cr_assert_eq(fat_ptr_len(&arr[i]), 32);
 	}
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 10);
@@ -594,7 +594,7 @@ MyTest(base, test_big32) {
 	for (u64 i = 0; i < count; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size);
 	}
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
 
@@ -622,7 +622,7 @@ MyTest(base, test_malloc) {
 	for (u64 i = 0; i < count; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size);
 	}
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
@@ -704,7 +704,7 @@ MyTest(base, test_resize) {
 	for (u64 i = 0; i < count; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size);
 	}
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
@@ -749,7 +749,7 @@ MyTest(base, test_multi_resize) {
 	for (u64 i = 0; i < itt; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size);
 	}
 
 	FatPtr tmp;
@@ -785,7 +785,7 @@ MyTest(base, test_zeroed) {
 		FatPtr ptr1;
 		int ret = slab_allocator_allocate(&sa, 8, &ptr1);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&ptr1), size - 16);
+		cr_assert_eq(fat_ptr_len(&ptr1), size);
 
 		char *dataptr = fat_ptr_data(&ptr1);
 		// memory is zeroed so even though we should have the same id as last time
@@ -802,7 +802,7 @@ MyTest(base, test_zeroed) {
 	for (u64 i = 0; i < itt; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size);
 	}
 
 	FatPtr tmp;
@@ -858,7 +858,7 @@ MyTest(base, test_zero_size_initial) {
 	for (u64 i = 0; i < itt; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size - 16);
+		cr_assert_eq(fat_ptr_len(&arr[i]), size);
 		char *test = fat_ptr_data(&arr[i]);
 		strcpy(test, "test");
 	}
