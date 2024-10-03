@@ -39,8 +39,8 @@
  * without having an effect on calling data types or data types it calls itself.
  */
 
-#ifndef _UTIL_CHAIN_ALLOC__
-#define _UTIL_CHAIN_ALLOC__
+#ifndef _BASE_CHAIN_ALLOC__
+#define _BASE_CHAIN_ALLOC__
 
 #include <base/slabs.h>
 
@@ -84,4 +84,4 @@ void cleanup_default_slab_allocator();
 u64 alloc_count_default_slab_allocator();
 #endif // TEST
 
-#endif // _UTIL_CHAIN_ALLOC__
+#endif // _BASE_CHAIN_ALLOC__

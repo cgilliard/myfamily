@@ -37,6 +37,9 @@ typedef struct FatPtr32Impl {
 	void *data;
 } FatPtr32Impl;
 
+const FatPtr32Impl fptr32null = {.id = 0, .len = 0, .data = NULL};
+const FatPtr null = {.data = (void *)&fptr32null};
+
 // deteremine which kind of fat pointer this is. 32 bit fat pointers are restricted to having an ID
 // that does not set the most significant bit. Therefore they must be less than 2^31 or the
 // maximum signed int value (INT32_MAX). Conversely, the 64 bit ids must have this bit set.
@@ -516,6 +519,10 @@ void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit, bool zeroe
 }
 
 int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
+	if (size == 0) {
+		errno = EINVAL;
+		return -1;
+	}
 	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
 	bool is_64_bit = impl->is_64_bit;
 	bool zeroed = impl->zeroed;
@@ -576,7 +583,7 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 	}
 	return ret;
 }
-void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
+void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
 	SlabAllocatorImpl *impl = ptr->impl;
 	bool is_64_bit = impl->is_64_bit;
 
@@ -594,6 +601,7 @@ void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
 				myfree(fptr->data);
 				impl->cur_mallocs--;
 			}
+			*fptr = null;
 			return;
 		}
 	} else {
@@ -610,6 +618,7 @@ void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
 				myfree(fptr->data);
 				impl->cur_mallocs--;
 			}
+			*fptr = null;
 			return;
 		}
 	}
@@ -627,6 +636,7 @@ void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
 		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
 	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit,
 				   ((SlabAllocatorImpl *)ptr->impl)->zeroed);
+	*fptr = null;
 }
 u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
 	SlabAllocatorImpl *impl = ptr->impl;

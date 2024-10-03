@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _UTIL_SLABS__
-#define _UTIL_SLABS__
+#ifndef _BASE_SLABS__
+#define _BASE_SLABS__
 
 #include <base/types.h>
 
@@ -21,6 +21,9 @@
 typedef struct FatPtr {
 	void *data;
 } FatPtr;
+
+extern const FatPtr null;
+#define nil(v) (fat_ptr_len(&v) == 0)
 
 // A slab allocator will always allocate these, so the user only needs to
 // be able to read the length and the data pointer.
@@ -67,7 +70,7 @@ void slab_allocator_cleanup(SlabAllocatorNc *ptr);
 
 int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config);
 int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr);
-void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr);
+void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr);
 u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr);
 
 // These are test helper functions
@@ -79,4 +82,4 @@ void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len);
 void fat_ptr_free_test_obj32(FatPtr *ptr);
 #endif // TEST
 
-#endif // _UTIL_SLABS__
+#endif // _BASE_SLABS__

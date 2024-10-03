@@ -110,10 +110,12 @@ int chain_malloc(FatPtr *ptr, u64 size) {
 	return ret;
 }
 int chain_realloc(FatPtr *ptr, u64 size) {
+	if (chain_guard_entry_root == NULL)
+		panic("Reallocating a FatPtr when it was never allocated!");
 	return 0;
 }
 void chain_free(FatPtr *ptr) {
 	if (chain_guard_entry_root == NULL)
-		panic("Freeing a slab when it was never allocated!");
+		panic("Freeing a FatPtr when it was never allocated!");
 	slab_allocator_free(chain_guard_entry_cur->sa, ptr);
 }

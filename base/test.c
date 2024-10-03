@@ -408,12 +408,20 @@ typedef struct TestData {
 } TestData;
 
 MyTest(base, test_fat_ptr) {
+	cr_assert_eq(fat_ptr_len(&null), 0);
+	cr_assert_eq(fat_ptr_data(&null), NULL);
+	FatPtr ptr = null;
+	cr_assert_eq(fat_ptr_data(&ptr), NULL);
+	cr_assert_eq(fat_ptr_len(&ptr), 0);
+	cr_assert(nil(ptr));
+
 	for (u64 i = 0; i < 100; i++) {
 		u64 id = (i * 2) + 1;
 		FatPtr ptr1;
 		// create a 64 bit test obj (the appropriate bit is set for this ID to be valid as 64 bit)
 		fat_ptr_test_obj64(&ptr1, id, sizeof(TestData));
 		// do assertions and use allocated data
+		cr_assert(!nil(ptr1));
 		cr_assert_eq(fat_ptr_len(&ptr1), sizeof(TestData));
 		cr_assert_eq(fat_ptr_id(&ptr1), id);
 		TestData *td = fat_ptr_data(&ptr1);
@@ -993,6 +1001,30 @@ MyTest(base, test_chain_allocator_multi_scope) {
 	FatPtr fptr;
 	cr_assert(!chain_malloc(&fptr, 1000));
 	chain_free(&fptr);
+}
+
+MyTest(base, test_nil) {
+	// 'null' and 'nil' macros may be used with the FatPtr type to simulate NULL/null/nil conditions
+	// in other languages. 'null' is a macro which is a FatPtr type and has a length of 0 and data
+	// == NULL. It is not possible to have a FatPtr with these values without the use of the 'null'
+	// macro or by calling one of the free functions because attempting to allocate a length of 0
+	// through the slab allocator will result in an error. The 'nil' macro just tests this property
+	// and returns a boolean. After calling free (either directly from a slab allocator or through
+	// chain_free as seen below), The value of the freed FatPtr will be 'null' and will return true
+	// when passed to the 'nil' macro.
+
+	// initialize a FatPtr to 'null'.
+	FatPtr ptr = null;
+	// assert that this ptr is 'nil'.
+	cr_assert(nil(ptr));
+	// call chain_malloc to allocate 1000 bytes to this FatPtr.
+	cr_assert(!chain_malloc(&ptr, 1000));
+	// assert that it is no longer 'nil'.
+	cr_assert(!nil(ptr));
+	// free the FatPtr via chain_free.
+	chain_free(&ptr);
+	// assert that the FatPtr is now 'nil'.
+	cr_assert(nil(ptr));
 }
 
 // Note: address sanatizer and criterion seem to have problems with this test on certain
