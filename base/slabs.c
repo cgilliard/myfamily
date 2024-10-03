@@ -13,12 +13,12 @@
 // limitations under the License.
 
 #include <base/macro_utils.h>
+#include <base/panic.h>
 #include <base/resources.h>
+#include <base/slabs.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <util/panic.h>
-#include <util/slabs.h>
 
 #define MALLOC_64_ID (INT64_MAX - 8)
 #define MALLOC_32_ID (INT32_MAX - 8)
@@ -212,6 +212,12 @@ int slab_allocator_init_free_list(SlabData *sd, u64 slabs, u64 offset, bool is_6
 
 int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
 	impl->sd_arr[index].type = *st;
+	/*
+		if (impl->is_64_bit)
+			impl->sd_arr[index].type.slab_size += sizeof(u64) * 3;
+		else
+			impl->sd_arr[index].type.slab_size += sizeof(u64) + sizeof(u32) * 2;
+	*/
 	impl->sd_arr[index].cur_slabs = 0;
 	impl->sd_arr[index].cur_chunks = st->initial_chunks;
 	if (st->initial_chunks > 0) {

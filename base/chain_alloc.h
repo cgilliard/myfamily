@@ -42,7 +42,7 @@
 #ifndef _UTIL_CHAIN_ALLOC__
 #define _UTIL_CHAIN_ALLOC__
 
-#include <util/slabs.h>
+#include <base/slabs.h>
 
 typedef struct ChainGuardNc {
 	void *impl;
@@ -81,6 +81,7 @@ void chain_free(FatPtr *ptr);
 
 #ifdef TEST
 void cleanup_default_slab_allocator();
+u64 alloc_count_default_slab_allocator();
 #endif // TEST
 
 #endif // _UTIL_CHAIN_ALLOC__

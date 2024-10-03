@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/chain_alloc.h>
+#include <base/panic.h>
 #include <base/resources.h>
 #include <stdio.h>
-#include <util/chain_alloc.h>
-#include <util/panic.h>
 
 typedef struct ChainGuardEntry {
 	struct ChainGuardEntry *next;
@@ -28,17 +28,25 @@ _Thread_local ChainGuardEntry *chain_guard_entry_root = NULL;
 _Thread_local ChainGuardEntry *chain_guard_entry_cur = NULL;
 
 SlabAllocator *init_default_slab_allocator() {
-	SlabAllocatorNc *sa = mymalloc_no_stat(sizeof(SlabAllocator));
+	SlabAllocatorNc *sa = mymalloc(sizeof(SlabAllocator));
 	SlabAllocatorConfig sac;
 
 	// default slab allocator no_malloc = false, zeroed = false, is_64_bit = false
 	slab_allocator_config_build(&sac, false, false, false);
 
-	for (i32 i = 0; i < 10; i++) {
+	u64 max_slabs = (INT32_MAX / 100) * 100;
+	for (i32 i = 0; i < 128; i++) {
 		SlabType st = {.slab_size = (i + 3) * 8,
-					   .slabs_per_resize = 10,
+					   .slabs_per_resize = 100,
 					   .initial_chunks = 0,
-					   .max_slabs = 1000000L};
+					   .max_slabs = max_slabs};
+		slab_allocator_config_add_type(&sac, &st);
+	}
+	for (i32 i = 0; i < 128; i++) {
+		SlabType st = {.slab_size = (128 + 3) * 8 + (i + 1) * 1024,
+					   .slabs_per_resize = 100,
+					   .initial_chunks = 0,
+					   .max_slabs = max_slabs};
 		slab_allocator_config_add_type(&sac, &st);
 	}
 
@@ -48,9 +56,17 @@ SlabAllocator *init_default_slab_allocator() {
 	return sa;
 }
 
+u64 alloc_count_default_slab_allocator() {
+	if (chain_guard_entry_root == NULL)
+		return 0;
+	return slab_allocator_cur_slabs_allocated(chain_guard_entry_root->sa);
+}
+
 void cleanup_default_slab_allocator() {
 	if (chain_guard_entry_root) {
 		slab_allocator_cleanup(chain_guard_entry_root->sa);
+		myfree(chain_guard_entry_root->sa);
+		myfree(chain_guard_entry_root);
 	}
 }
 
