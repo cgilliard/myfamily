@@ -20,6 +20,7 @@
 #include <base/test.h>
 #include <errno.h>
 #include <limits.h>
+#include <pthread.h>
 #ifdef __linux__
 #include <linux/limits.h>
 #endif // __linux__
@@ -1050,7 +1051,62 @@ MyTest(base, test_sync_allocator) {
 	cr_assert(nil(ptr));
 }
 
-// Note: address sanatizer and criterion seem to have problems with this test on certain
+// create some shared variables to demonstrate the sync_allocator
+FatPtr shared_ptr; // shared FatPtr
+// Initialize a condition/lock
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+// set  flag to false
+bool flag = false;
+
+// thread function
+void *start_thread_sync_test() {
+	// create scope to free our allocated FatPtr from the other thread
+	// if we did not use the global sync_allocator, it would result in
+	// a panic
+	{
+		ChainGuard cg = sync_allocator();
+		chain_free(&shared_ptr);
+	}
+
+	// set flag and notify the main thread that we're done
+	pthread_mutex_lock(&lock);
+	flag = true;
+	pthread_cond_signal(&cond);
+	pthread_mutex_unlock(&lock);
+
+	return NULL;
+}
+
+// Test main entry point
+MyTest(base, test_threaded_sync) {
+	pthread_t thread;
+	shared_ptr = null;
+
+	// create scope to get sync_allocator
+	{
+		ChainGuard cg = sync_allocator();
+		// allocate shared_ptr from the global sync allocator
+		cr_assert(nil(shared_ptr));
+		cr_assert(!chain_malloc(&shared_ptr, 100));
+		cr_assert(!nil(shared_ptr));
+	}
+
+	// spawn a new thread
+	cr_assert(!pthread_create(&thread, NULL, &start_thread_sync_test, NULL));
+
+	// wait for the condition to be met
+
+	pthread_mutex_lock(&lock);
+	while (!flag) {
+		pthread_cond_wait(&cond, &lock);
+	}
+	pthread_mutex_unlock(&lock);
+
+	cr_assert(!pthread_join(thread, NULL)); // Wait for thread to finish
+}
+
+// Note: address sanitizer and criterion seem to have problems with this test on certain
 // platforms/configurations. I tested both on linux/mac in the actual binary and it works
 // for both explicit panic and signals. So, I think it works. Will leave this disabled for now.
 /*
