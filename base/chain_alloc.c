@@ -16,6 +16,7 @@
 #include <base/panic.h>
 #include <base/resources.h>
 #include <errno.h>
+#include <pthread.h>
 #include <string.h>
 
 typedef struct ChainGuardEntry {
@@ -23,6 +24,8 @@ typedef struct ChainGuardEntry {
 	struct ChainGuardEntry *prev;
 	SlabAllocator *sa;
 	bool sync;
+	pthread_mutex_t lock;
+	bool is_locked; // used in case of a panic on cleanup to determine if we're locked
 } ChainGuardEntry;
 
 _Thread_local ChainGuardEntry *chain_guard_entry_root = NULL;
@@ -108,6 +111,9 @@ void chain_guard_cleanup(ChainGuardNc *ptr) {
 	ChainGuardEntry *entry = ptr->impl;
 	chain_guard_entry_cur = entry->prev;
 	chain_guard_entry_cur->next = NULL;
+	if (chain_guard_entry_cur->sync) {
+		pthread_mutex_destroy(&chain_guard_entry_cur->lock);
+	}
 	myfree(entry);
 }
 
@@ -118,6 +124,10 @@ ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {
 	ChainGuardEntry *entry = mymalloc(sizeof(ChainGuardEntry));
 	entry->sa = sa;
 	entry->sync = sync;
+	if (entry->sync) {
+		pthread_mutex_init(&entry->lock, NULL);
+	}
+	entry->is_locked = false;
 	entry->next = NULL;
 	entry->prev = chain_guard_entry_cur;
 	chain_guard_entry_cur->next = entry;
@@ -134,7 +144,19 @@ int chain_malloc(FatPtr *ptr, u64 size) {
 	if (chain_guard_entry_root == NULL) {
 		chain_guard_init_root();
 	}
-	return slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
+	if (chain_guard_entry_cur->sync) {
+	}
+	int ret;
+	if (chain_guard_entry_cur->sync) {
+		pthread_mutex_lock(&chain_guard_entry_cur->lock);
+		chain_guard_entry_cur->is_locked = true;
+		ret = slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
+		chain_guard_entry_cur->is_locked = false;
+		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
+	} else {
+		ret = slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
+	}
+	return ret;
 }
 int chain_realloc(FatPtr *ptr, u64 size) {
 	if (chain_guard_entry_root == NULL)
@@ -145,22 +167,34 @@ int chain_realloc(FatPtr *ptr, u64 size) {
 		return -1;
 	}
 
+	int ret = 0;
+
+	if (chain_guard_entry_cur->sync) {
+		pthread_mutex_lock(&chain_guard_entry_cur->lock);
+		chain_guard_entry_cur->is_locked = true;
+	}
+
 	FatPtr tmp = null;
 	chain_malloc(&tmp, size);
 	if (nil(tmp)) {
-		return -1;
+		ret = -1;
+	} else {
+
+		u64 len = fat_ptr_len(ptr);
+		u64 nlen = fat_ptr_len(&tmp);
+		if (nlen < len) {
+			len = nlen;
+		}
+
+		memcpy(fat_ptr_data(&tmp), fat_ptr_data(ptr), len);
+
+		chain_free(ptr);
+		*ptr = tmp;
 	}
-
-	u64 len = fat_ptr_len(ptr);
-	u64 nlen = fat_ptr_len(&tmp);
-	if (nlen < len) {
-		len = nlen;
+	if (chain_guard_entry_cur->sync) {
+		chain_guard_entry_cur->is_locked = false;
+		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
 	}
-
-	memcpy(fat_ptr_data(&tmp), fat_ptr_data(ptr), len);
-
-	chain_free(ptr);
-	*ptr = tmp;
 	return 0;
 }
 void chain_free(FatPtr *ptr) {
@@ -169,5 +203,14 @@ void chain_free(FatPtr *ptr) {
 	}
 	if (chain_guard_entry_root == NULL)
 		panic("Freeing a FatPtr when it was never allocated!");
-	slab_allocator_free(chain_guard_entry_cur->sa, ptr);
+
+	if (chain_guard_entry_cur->sync) {
+		pthread_mutex_lock(&chain_guard_entry_cur->lock);
+		chain_guard_entry_cur->is_locked = true;
+		slab_allocator_free(chain_guard_entry_cur->sa, ptr);
+		chain_guard_entry_cur->is_locked = false;
+		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
+	} else {
+		slab_allocator_free(chain_guard_entry_cur->sa, ptr);
+	}
 }

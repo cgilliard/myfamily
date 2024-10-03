@@ -1047,6 +1047,7 @@ MyTest(base, test_sync_allocator) {
 	chain_malloc(&ptr, 100);
 	cr_assert(!nil(ptr));
 	chain_free(&ptr);
+	cr_assert(nil(ptr));
 }
 
 // Note: address sanatizer and criterion seem to have problems with this test on certain
