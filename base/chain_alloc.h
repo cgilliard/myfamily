@@ -72,6 +72,9 @@ void chain_guard_cleanup(ChainGuardNc *ptr);
 // }
 ChainGuard set_slab_allocator(SlabAllocator *sa, bool is_sync);
 
+// Get a slab allocator that is used as a global sync allocator.
+SlabAllocator *get_global_sync_allocator();
+
 // Allocate a 'FatPtr' with the specified size with the current SlabAllocator.
 int chain_malloc(FatPtr *ptr, u64 size);
 // Re-allocate a 'FatPtr' with the specified size with the current SlabAllocator.
@@ -79,9 +82,17 @@ int chain_realloc(FatPtr *ptr, u64 size);
 // Free a 'FatPtr' to the current SlabAllocator.
 void chain_free(FatPtr *ptr);
 
+#define sync_allocator()                                                                           \
+	({                                                                                             \
+		SlabAllocatorNc *__sync_alloc_ = get_global_sync_allocator();                              \
+		ChainGuardNc __ret_ = set_slab_allocator(__sync_alloc_, true);                             \
+		__ret_;                                                                                    \
+	})
+
 #ifdef TEST
 void cleanup_default_slab_allocator();
 u64 alloc_count_default_slab_allocator();
+u64 alloc_count_global_sync_allocator();
 #endif // TEST
 
 #endif // _BASE_CHAIN_ALLOC__

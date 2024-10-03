@@ -15,6 +15,7 @@
 #include <base/chain_alloc.h>
 #include <base/panic.h>
 #include <base/resources.h>
+#include <errno.h>
 #include <string.h>
 
 typedef struct ChainGuardEntry {
@@ -26,13 +27,17 @@ typedef struct ChainGuardEntry {
 
 _Thread_local ChainGuardEntry *chain_guard_entry_root = NULL;
 _Thread_local ChainGuardEntry *chain_guard_entry_cur = NULL;
+SlabAllocator *global_sync_allocator = NULL;
 
 SlabAllocator *init_default_slab_allocator() {
 	SlabAllocatorNc *sa = mymalloc(sizeof(SlabAllocator));
+	if (sa == NULL)
+		panic("Could not initialize default slab allocator");
 	SlabAllocatorConfig sac;
 
 	// default slab allocator no_malloc = false, zeroed = false, is_64_bit = false
-	slab_allocator_config_build(&sac, false, false, false);
+	if (slab_allocator_config_build(&sac, false, false, false))
+		panic("Could not initialize config for default slab allocator");
 
 	u64 max_slabs = (INT32_MAX / 100) * 100;
 	for (i32 i = 0; i < 128; i++) {
@@ -40,20 +45,34 @@ SlabAllocator *init_default_slab_allocator() {
 					   .slabs_per_resize = 100,
 					   .initial_chunks = 0,
 					   .max_slabs = max_slabs};
-		slab_allocator_config_add_type(&sac, &st);
+		if (slab_allocator_config_add_type(&sac, &st))
+			panic("Could not add slab type to default slab allocator");
 	}
 	for (i32 i = 0; i < 128; i++) {
 		SlabType st = {.slab_size = (128 + 3) * 8 + (i + 1) * 1024,
 					   .slabs_per_resize = 100,
 					   .initial_chunks = 0,
 					   .max_slabs = max_slabs};
-		slab_allocator_config_add_type(&sac, &st);
+		if (slab_allocator_config_add_type(&sac, &st))
+			panic("Could not add config to default slab allocator");
 	}
 
 	if (slab_allocator_build(sa, &sac))
 		panic("Could not initialize default slab allocator");
 
 	return sa;
+}
+
+SlabAllocator *get_global_sync_allocator() {
+	if (global_sync_allocator == NULL)
+		global_sync_allocator = init_default_slab_allocator();
+	return global_sync_allocator;
+}
+
+u64 alloc_count_global_sync_allocator() {
+	if (global_sync_allocator == NULL)
+		return 0;
+	return slab_allocator_cur_slabs_allocated(global_sync_allocator);
 }
 
 u64 alloc_count_default_slab_allocator() {
@@ -68,6 +87,11 @@ void cleanup_default_slab_allocator() {
 		myfree(chain_guard_entry_root->sa);
 		myfree(chain_guard_entry_root);
 		chain_guard_entry_root = NULL;
+	}
+	if (global_sync_allocator) {
+		slab_allocator_cleanup(global_sync_allocator);
+		myfree(global_sync_allocator);
+		global_sync_allocator = NULL;
 	}
 }
 
@@ -103,15 +127,24 @@ ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {
 }
 
 int chain_malloc(FatPtr *ptr, u64 size) {
+	if (ptr == NULL || size == 0) {
+		errno = EINVAL;
+		return -1;
+	}
 	if (chain_guard_entry_root == NULL) {
 		chain_guard_init_root();
 	}
-	int ret = slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
-	return ret;
+	return slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
 }
 int chain_realloc(FatPtr *ptr, u64 size) {
 	if (chain_guard_entry_root == NULL)
 		panic("Reallocating a FatPtr when it was never allocated!");
+
+	if (ptr == NULL || nil(*ptr) || size == 0) {
+		errno = EINVAL;
+		return -1;
+	}
+
 	FatPtr tmp = null;
 	chain_malloc(&tmp, size);
 	if (nil(tmp)) {
@@ -131,6 +164,9 @@ int chain_realloc(FatPtr *ptr, u64 size) {
 	return 0;
 }
 void chain_free(FatPtr *ptr) {
+	if (ptr == NULL) {
+		panic("attempt to free a NULL FatPtr");
+	}
 	if (chain_guard_entry_root == NULL)
 		panic("Freeing a FatPtr when it was never allocated!");
 	slab_allocator_free(chain_guard_entry_cur->sa, ptr);

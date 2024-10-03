@@ -1040,6 +1040,15 @@ MyTest(base, test_realloc) {
 	chain_free(&ptr);
 }
 
+MyTest(base, test_sync_allocator) {
+	ChainGuard cg = sync_allocator();
+	FatPtr ptr = null;
+	cr_assert(nil(ptr));
+	chain_malloc(&ptr, 100);
+	cr_assert(!nil(ptr));
+	chain_free(&ptr);
+}
+
 // Note: address sanatizer and criterion seem to have problems with this test on certain
 // platforms/configurations. I tested both on linux/mac in the actual binary and it works
 // for both explicit panic and signals. So, I think it works. Will leave this disabled for now.

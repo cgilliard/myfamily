@@ -45,6 +45,16 @@
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
 		}                                                                                          \
+		slabs = alloc_count_global_sync_allocator();                                               \
+		if (slabs != 0) {                                                                          \
+			printf("[%s====%s] %sError in tear_down of test%s "                                    \
+				   "'%s%s%s'.\n[%s====%s] Number of slab global allocations not "                  \
+				   "equal to number "                                                              \
+				   "of frees. Memory leak?\n",                                                     \
+				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
+			pid_t iPid = getpid();                                                                 \
+			kill(iPid, SIGINT); /* trigger failure */                                              \
+		}                                                                                          \
 		cleanup_default_slab_allocator();                                                          \
 		u64 cur_alloc_count = mymalloc_sum();                                                      \
 		u64 cur_free_count = myfree_sum();                                                         \
