@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['name_908',['name',['../structArgsParamImpl.html#a4db159c7f846ed3cac400564c5e1647c',1,'ArgsParamImpl::name()'],['../structSubCommandImpl.html#aa7c882a1cb30dc1d444ca623e7b6db97',1,'SubCommandImpl::name()']]],
-  ['no_5fmalloc_909',['no_malloc',['../structSlabAllocatorImpl.html#a2cf9ac85d99d2ecdb853d10ba0c6ab73',1,'SlabAllocatorImpl::no_malloc()'],['../structSlabAllocatorConfigNc.html#a99d08cb35909df9ac0b01383895bf65c',1,'SlabAllocatorConfigNc::no_malloc()']]]
+  ['malloc_5fsum_1029',['malloc_sum',['../structResourceStats.html#ae9eb0fbcddc4ae13b289b50f89cd0750',1,'ResourceStats']]],
+  ['max_5fargs_1030',['max_args',['../structSubCommandImpl.html#aa0d744031fe55772f9023ed74b39a89d',1,'SubCommandImpl']]],
+  ['max_5fslabs_1031',['max_slabs',['../structSlabType.html#ae61a036c100b74d7749900d4a7a13588',1,'SlabType']]],
+  ['min_5fargs_1032',['min_args',['../structSubCommandImpl.html#ae68fb27d14b94a18c40e33324f92b92e',1,'SubCommandImpl']]],
+  ['multiple_1033',['multiple',['../structArgsParamImpl.html#a246d95c683a32fb0d4d35f14a742b708',1,'ArgsParamImpl']]]
 ];

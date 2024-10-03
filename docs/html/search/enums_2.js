@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['tokendisplaytype_983',['TokenDisplayType',['../tokenizer_8c.html#a445d6539d738f275a48259138e2f9427',1,'tokenizer.c']]],
-  ['tokenizerstate_984',['TokenizerState',['../tokenizer__state_8h.html#a5b1175f256359a25a7374d4ab1e5f845',1,'tokenizer_state.h']]],
-  ['tokentype_985',['TokenType',['../tokenizer_8h.html#aa520fbf142ba1e7e659590c07da31921',1,'tokenizer.h']]]
+  ['sha3_5fflags_1124',['SHA3_FLAGS',['../sha3_8h.html#aeafb3c3d4034b10ca45439626146202d',1,'sha3.h']]],
+  ['sha3_5freturn_1125',['SHA3_RETURN',['../sha3_8h.html#a4c7cb4d5ae71a49c9e882b9ccd61c836',1,'sha3.h']]]
 ];

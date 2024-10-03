@@ -20,102 +20,105 @@
         -:   16:#include <assert.h>
         -:   17:#include <base/misc.h>
         -:   18:#include <base/path.h>
-        -:   19:#include <limits.h>
-        -:   20:#include <main/main.h>
-        -:   21:#include <stdio.h>
-        -:   22:#include <string.h>
-        -:   23:
-        -:   24:bool __is_debug_real_main_res_mkdir = false;
-        -:   25:
-       16:   26:void write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size) {
-        -:   27:	char path[PATH_MAX + 1];
-       16:   28:	snprintf(path, sizeof(path), "%s/%s", dir, file_name);
-       16:   29:	Path ensure_parent;
-       16:   30:	path_for(&ensure_parent, path);
-       16:   31:	const char *pfile_name = path_file_name(&ensure_parent);
-        -:   32:	char pfile_name_copy[PATH_MAX + 1];
-       16:   33:	strcpy(pfile_name_copy, pfile_name);
-       16:   34:	path_pop(&ensure_parent);
-       16:   35:	path_canonicalize(&ensure_parent);
-       16:   36:	path_mkdir(&ensure_parent, 0700, true);
-       16:   37:	path_push(&ensure_parent, pfile_name_copy);
-       16:   38:	MYFILE *f = myfopen(&ensure_parent, "wb");
-       16:   39:	if (f) {
-       15:   40:		myfwrite(data, 1, size, f);
-       15:   41:		myfclose(f);
-        -:   42:	} else {
-        1:   43:		exit_error("Could not open file for writing");
-        -:   44:	}
-       16:   45:}
-        -:   46:
-        4:   47:bool check_build_id(const char *config_dir) {
-        4:   48:	Path bid_file;
-        4:   49:	path_for(&bid_file, config_dir);
-        4:   50:	path_push(&bid_file, "build_id");
-        4:   51:	path_canonicalize(&bid_file);
-        -:   52:	// check build id
-        4:   53:	MYFILE *fp = myfopen(&bid_file, "r");
-        4:   54:	if (!fp) {
-        1:   55:		exit_error("could not open the build file");
-        1:   56:		return false;
-        -:   57:	}
-        -:   58:	char bid_file_contents[1024];
-        3:   59:	size_t rlen = read_all(bid_file_contents, 1, 100, fp);
-        3:   60:	bid_file_contents[rlen] = 0;
-        3:   61:	myfclose(fp);
-        3:   62:	return !strcmp(bid_file_contents, BUILD_ID);
-        -:   63:}
-        -:   64:
-        6:   65:void setup_config_dir(const char *config_dir) {
-        6:   66:	Path cd;
-        6:   67:	path_for(&cd, config_dir);
-        6:   68:	path_canonicalize(&cd);
-        6:   69:	if (path_exists(&cd)) {
-        2:   70:		if (check_build_id(config_dir))
-        1:   71:			return;
-        1:   72:		remove_directory(&cd, false);
-        -:   73:	}
-        5:   74:	fprintf(stderr, "Installing config directory at %s. Build id = %s\n", config_dir, BUILD_ID);
-        5:   75:	if (!path_mkdir(&cd, 0700, false)) {
-        1:   76:		exit_error("Could not create config directory at path [%s].", path_to_string(&cd));
-        1:   77:		return;
-        -:   78:	}
-        -:   79:
-        4:   80:	Path rd;
-        4:   81:	path_copy(&rd, &cd);
-        4:   82:	path_push(&rd, "resources");
-        -:   83:
-        4:   84:	if (__is_debug_real_main_res_mkdir || !path_mkdir(&rd, 0700, true)) {
-        1:   85:		exit_error("Could not create resources directory at path [%s].", path_to_string(&rd));
-        1:   86:		return;
-        -:   87:	}
-        -:   88:
-       15:   89:	BUILD_RESOURCE_DIR(path_to_string(&rd), fam);
-        3:   90:	WRITE_BUILD_ID(config_dir);
-        -:   91:}
-        -:   92:
-        1:   93:void build_args(Args *args, int argc, char **argv) {
-        1:   94:	SubCommand sc1;
-       1*:   95:	assert(!sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"));
-        1:   96:	ArgsParam p1;
-       1*:   97:	assert(!args_param_build(&p1, "name", "name help here", "n", false, false, "myname"));
-        1:   98:	sub_command_add_param(&sc1, &p1);
-        -:   99:
-        1:  100:	ArgsParam p2;
-        1:  101:	args_param_build(&p2, "name2", "name2 help here", "x", true, false, NULL);
+        -:   19:#include <base/sha3.h>
+        -:   20:#include <limits.h>
+        -:   21:#include <main/main.h>
+        -:   22:#include <stdio.h>
+        -:   23:#include <string.h>
+        -:   24:
+        -:   25:bool __is_debug_real_main_res_mkdir = false;
+        -:   26:
+       16:   27:void write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size) {
+        -:   28:	char path[PATH_MAX + 1];
+       16:   29:	snprintf(path, sizeof(path), "%s/%s", dir, file_name);
+       16:   30:	Path ensure_parent;
+       16:   31:	path_for(&ensure_parent, path);
+       16:   32:	const char *pfile_name = path_file_name(&ensure_parent);
+        -:   33:	char pfile_name_copy[PATH_MAX + 1];
+       16:   34:	strcpy(pfile_name_copy, pfile_name);
+       16:   35:	path_pop(&ensure_parent);
+       16:   36:	path_canonicalize(&ensure_parent);
+       16:   37:	path_mkdir(&ensure_parent, 0700, true);
+       16:   38:	path_push(&ensure_parent, pfile_name_copy);
+       16:   39:	MYFILE *f = myfopen(&ensure_parent, "wb");
+       16:   40:	if (f) {
+       15:   41:		myfwrite(data, 1, size, f);
+       15:   42:		myfclose(f);
+        -:   43:	} else {
+        1:   44:		exit_error("Could not open file for writing");
+        -:   45:	}
+       16:   46:}
+        -:   47:
+        4:   48:bool check_build_id(const char *config_dir) {
+        4:   49:	Path bid_file;
+        4:   50:	path_for(&bid_file, config_dir);
+        4:   51:	path_push(&bid_file, "build_id");
+        4:   52:	path_canonicalize(&bid_file);
+        -:   53:	// check build id
+        4:   54:	MYFILE *fp = myfopen(&bid_file, "r");
+        4:   55:	if (!fp) {
+        1:   56:		exit_error("could not open the build file");
+        1:   57:		return false;
+        -:   58:	}
+        -:   59:	char bid_file_contents[1024];
+        3:   60:	size_t rlen = read_all(bid_file_contents, 1, 100, fp);
+        3:   61:	bid_file_contents[rlen] = 0;
+        3:   62:	myfclose(fp);
+        3:   63:	return !strcmp(bid_file_contents, get_build_id());
+        -:   64:}
+        -:   65:
+        6:   66:void setup_config_dir(const char *config_dir) {
+        6:   67:	Path cd;
+        6:   68:	path_for(&cd, config_dir);
+        6:   69:	path_canonicalize(&cd);
+        6:   70:	if (path_exists(&cd)) {
+        2:   71:		if (check_build_id(config_dir))
+        1:   72:			return;
+        1:   73:		remove_directory(&cd, false);
+        -:   74:	}
+        5:   75:	fprintf(stderr, "Installing config directory at %s. Build id = %s.\n", config_dir,
+        -:   76:			get_build_id());
+        -:   77:
+        5:   78:	if (!path_mkdir(&cd, 0700, false)) {
+        1:   79:		exit_error("Could not create config directory at path [%s].", path_to_string(&cd));
+        1:   80:		return;
+        -:   81:	}
+        -:   82:
+        4:   83:	Path rd;
+        4:   84:	path_copy(&rd, &cd);
+        4:   85:	path_push(&rd, "resources");
+        -:   86:
+        4:   87:	if (__is_debug_real_main_res_mkdir || !path_mkdir(&rd, 0700, true)) {
+        1:   88:		exit_error("Could not create resources directory at path [%s].", path_to_string(&rd));
+        1:   89:		return;
+        -:   90:	}
+        -:   91:
+       15:   92:	BUILD_RESOURCE_DIR(path_to_string(&rd), fam);
+        3:   93:	WRITE_BUILD_ID(config_dir);
+        -:   94:}
+        -:   95:
+        1:   96:void build_args(Args *args, int argc, char **argv) {
+        1:   97:	SubCommand sc1;
+       1*:   98:	assert(!sub_command_build(&sc1, "sc1", "sc1 help", 1, 2, "<arg doc>"));
+        1:   99:	ArgsParam p1;
+       1*:  100:	assert(!args_param_build(&p1, "name", "name help here", "n", false, false, "myname"));
+        1:  101:	sub_command_add_param(&sc1, &p1);
         -:  102:
-        1:  103:	args_build(args, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
-        1:  104:	args_add_param(args, &p2);
-        1:  105:	args_add_sub_command(args, &sc1);
-        1:  106:}
-        -:  107:
-        1:  108:int real_main(int argc, char **argv) {
-        1:  109:	Args args;
-        1:  110:	build_args(&args, argc, argv);
-        -:  111:
-        1:  112:	setup_config_dir(DEFAULT_CONFIG_DIR);
-        1:  113:	return 0;
-        -:  114:}
+        1:  103:	ArgsParam p2;
+        1:  104:	args_param_build(&p2, "name2", "name2 help here", "x", true, false, NULL);
+        -:  105:
+        1:  106:	args_build(args, "prog", "ver1.0", "me", 2, 3, "Darwin arm64");
+        1:  107:	args_add_param(args, &p2);
+        1:  108:	args_add_sub_command(args, &sc1);
+        1:  109:}
+        -:  110:
+        1:  111:int real_main(int argc, char **argv) {
+        1:  112:	Args args;
+        1:  113:	build_args(&args, argc, argv);
+        -:  114:
+        1:  115:	setup_config_dir(DEFAULT_CONFIG_DIR);
+        1:  116:	return 0;
+        -:  117:}
         -:    0:Source:args.c
         -:    0:Graph:args.gcno
         -:    0:Data:args.gcda
@@ -1263,10 +1266,187 @@
         -: 1141:
         9: 1142:	EXIT_ERR_IF_NO_DEBUG(0);
         -: 1143:}
+        -:    0:Source:chain_alloc.c
+        -:    0:Graph:chain_alloc.gcno
+        -:    0:Data:chain_alloc.gcda
+        -:    0:Runs:64
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/chain_alloc.h>
+        -:   16:#include <base/panic.h>
+        -:   17:#include <base/resources.h>
+        -:   18:#include <errno.h>
+        -:   19:#include <string.h>
+        -:   20:
+        -:   21:typedef struct ChainGuardEntry {
+        -:   22:	struct ChainGuardEntry *next;
+        -:   23:	struct ChainGuardEntry *prev;
+        -:   24:	SlabAllocator *sa;
+        -:   25:	bool sync;
+        -:   26:} ChainGuardEntry;
+        -:   27:
+        -:   28:_Thread_local ChainGuardEntry *chain_guard_entry_root = NULL;
+        -:   29:_Thread_local ChainGuardEntry *chain_guard_entry_cur = NULL;
+        -:   30:SlabAllocator *global_sync_allocator = NULL;
+        -:   31:
+        6:   32:SlabAllocator *init_default_slab_allocator() {
+        6:   33:	SlabAllocatorNc *sa = mymalloc(sizeof(SlabAllocator));
+        6:   34:	if (sa == NULL)
+    #####:   35:		panic("Could not initialize default slab allocator");
+        6:   36:	SlabAllocatorConfig sac;
+        -:   37:
+        -:   38:	// default slab allocator no_malloc = false, zeroed = false, is_64_bit = false
+        6:   39:	if (slab_allocator_config_build(&sac, false, false, false))
+    #####:   40:		panic("Could not initialize config for default slab allocator");
+        -:   41:
+        6:   42:	u64 max_slabs = (INT32_MAX / 100) * 100;
+      774:   43:	for (i32 i = 0; i < 128; i++) {
+      768:   44:		SlabType st = {.slab_size = (i + 3) * 8,
+        -:   45:					   .slabs_per_resize = 100,
+        -:   46:					   .initial_chunks = 0,
+        -:   47:					   .max_slabs = max_slabs};
+      768:   48:		if (slab_allocator_config_add_type(&sac, &st))
+    #####:   49:			panic("Could not add slab type to default slab allocator");
+        -:   50:	}
+      774:   51:	for (i32 i = 0; i < 128; i++) {
+      768:   52:		SlabType st = {.slab_size = (128 + 3) * 8 + (i + 1) * 1024,
+        -:   53:					   .slabs_per_resize = 100,
+        -:   54:					   .initial_chunks = 0,
+        -:   55:					   .max_slabs = max_slabs};
+      768:   56:		if (slab_allocator_config_add_type(&sac, &st))
+    #####:   57:			panic("Could not add config to default slab allocator");
+        -:   58:	}
+        -:   59:
+        6:   60:	if (slab_allocator_build(sa, &sac))
+    #####:   61:		panic("Could not initialize default slab allocator");
+        -:   62:
+        6:   63:	return sa;
+        -:   64:}
+        -:   65:
+        1:   66:SlabAllocator *get_global_sync_allocator() {
+        1:   67:	if (global_sync_allocator == NULL)
+        1:   68:		global_sync_allocator = init_default_slab_allocator();
+        1:   69:	return global_sync_allocator;
+        -:   70:}
+        -:   71:
+       55:   72:u64 alloc_count_global_sync_allocator() {
+       55:   73:	if (global_sync_allocator == NULL)
+       54:   74:		return 0;
+        1:   75:	return slab_allocator_cur_slabs_allocated(global_sync_allocator);
+        -:   76:}
+        -:   77:
+       55:   78:u64 alloc_count_default_slab_allocator() {
+       55:   79:	if (chain_guard_entry_root == NULL)
+       50:   80:		return 0;
+        5:   81:	return slab_allocator_cur_slabs_allocated(chain_guard_entry_root->sa);
+        -:   82:}
+        -:   83:
+       55:   84:void cleanup_default_slab_allocator() {
+       55:   85:	if (chain_guard_entry_root) {
+        5:   86:		slab_allocator_cleanup(chain_guard_entry_root->sa);
+        5:   87:		myfree(chain_guard_entry_root->sa);
+        5:   88:		myfree(chain_guard_entry_root);
+        5:   89:		chain_guard_entry_root = NULL;
+        -:   90:	}
+       55:   91:	if (global_sync_allocator) {
+        1:   92:		slab_allocator_cleanup(global_sync_allocator);
+        1:   93:		myfree(global_sync_allocator);
+        1:   94:		global_sync_allocator = NULL;
+        -:   95:	}
+       55:   96:}
+        -:   97:
+        5:   98:void chain_guard_init_root() {
+        5:   99:	chain_guard_entry_root = mymalloc(sizeof(ChainGuardEntry));
+        5:  100:	chain_guard_entry_cur = chain_guard_entry_root;
+        5:  101:	chain_guard_entry_root->next = NULL;
+        5:  102:	chain_guard_entry_root->prev = NULL;
+        5:  103:	chain_guard_entry_root->sync = false;
+        5:  104:	chain_guard_entry_root->sa = init_default_slab_allocator();
+        5:  105:}
+        -:  106:
+        6:  107:void chain_guard_cleanup(ChainGuardNc *ptr) {
+        6:  108:	ChainGuardEntry *entry = ptr->impl;
+        6:  109:	chain_guard_entry_cur = entry->prev;
+        6:  110:	chain_guard_entry_cur->next = NULL;
+        6:  111:	myfree(entry);
+        6:  112:}
+        -:  113:
+        6:  114:ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {
+        6:  115:	if (chain_guard_entry_root == NULL) {
+        2:  116:		chain_guard_init_root();
+        -:  117:	}
+        6:  118:	ChainGuardEntry *entry = mymalloc(sizeof(ChainGuardEntry));
+        6:  119:	entry->sa = sa;
+        6:  120:	entry->sync = sync;
+        6:  121:	entry->next = NULL;
+        6:  122:	entry->prev = chain_guard_entry_cur;
+        6:  123:	chain_guard_entry_cur->next = entry;
+        6:  124:	chain_guard_entry_cur = entry;
+        6:  125:	ChainGuardNc ret = {entry};
+        6:  126:	return ret;
+        -:  127:}
+        -:  128:
+       27:  129:int chain_malloc(FatPtr *ptr, u64 size) {
+       27:  130:	if (ptr == NULL || size == 0) {
+    #####:  131:		errno = EINVAL;
+    #####:  132:		return -1;
+        -:  133:	}
+       27:  134:	if (chain_guard_entry_root == NULL) {
+        3:  135:		chain_guard_init_root();
+        -:  136:	}
+       27:  137:	return slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
+        -:  138:}
+        1:  139:int chain_realloc(FatPtr *ptr, u64 size) {
+        1:  140:	if (chain_guard_entry_root == NULL)
+    #####:  141:		panic("Reallocating a FatPtr when it was never allocated!");
+        -:  142:
+        1:  143:	if (ptr == NULL || nil(*ptr) || size == 0) {
+    #####:  144:		errno = EINVAL;
+    #####:  145:		return -1;
+        -:  146:	}
+        -:  147:
+        1:  148:	FatPtr tmp = null;
+        1:  149:	chain_malloc(&tmp, size);
+        1:  150:	if (nil(tmp)) {
+    #####:  151:		return -1;
+        -:  152:	}
+        -:  153:
+        1:  154:	u64 len = fat_ptr_len(ptr);
+        1:  155:	u64 nlen = fat_ptr_len(&tmp);
+        1:  156:	if (nlen < len) {
+    #####:  157:		len = nlen;
+        -:  158:	}
+        -:  159:
+        1:  160:	memcpy(fat_ptr_data(&tmp), fat_ptr_data(ptr), len);
+        -:  161:
+        1:  162:	chain_free(ptr);
+        1:  163:	*ptr = tmp;
+        1:  164:	return 0;
+        -:  165:}
+       13:  166:void chain_free(FatPtr *ptr) {
+       13:  167:	if (ptr == NULL) {
+    #####:  168:		panic("attempt to free a NULL FatPtr");
+        -:  169:	}
+       13:  170:	if (chain_guard_entry_root == NULL)
+    #####:  171:		panic("Freeing a FatPtr when it was never allocated!");
+       13:  172:	slab_allocator_free(chain_guard_entry_cur->sa, ptr);
+       13:  173:}
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:56
+        -:    0:Runs:64
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1362,7 +1542,7 @@
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:56
+        -:    0:Runs:64
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1378,239 +1558,323 @@
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <base/colors.h>
-        -:   16:#include <base/misc.h>
-        -:   17:#include <base/resources.h>
-        -:   18:#include <base/types.h>
-        -:   19:#include <dirent.h>
-        -:   20:#include <errno.h>
-        -:   21:#include <limits.h>
-        -:   22:#include <stdarg.h>
-        -:   23:#include <stdio.h>
-        -:   24:#include <stdlib.h>
-        -:   25:#include <string.h>
-        -:   26:#include <sys/stat.h>
-        -:   27:#include <unistd.h>
-        -:   28:
-        -:   29:bool __is_debug_misc_ferror = false;
-        -:   30:bool __is_debug_misc_fwrite = false;
-        -:   31:bool __is_debug_misc_stat = false;
-        -:   32:bool __is_debug_misc_remove_dir = false;
-        -:   33:bool __is_debug_misc_unlink = false;
-        -:   34:bool __is_debug_misc_no_exit = false;
-        -:   35:bool __is_debug_misc_preserve = false;
-        -:   36:
-      299:   37:char *myfgets(char *str, int n, MYFILE *stream) {
-      299:   38:	return fgets(str, n, (FILE *)stream);
-        -:   39:}
-        -:   40:
-       17:   41:u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream) {
-       17:   42:	return fread(buffer, size, count, (FILE *)stream);
-        -:   43:}
-        -:   44:
-       18:   45:u64 myfwrite(const void *buffer, u64 size, u64 count, MYFILE *stream) {
-       18:   46:	return fwrite(buffer, size, count, (FILE *)stream);
-        -:   47:}
-        -:   48:
-       11:   49:int myfeof(MYFILE *stream) {
-       11:   50:	return feof((FILE *)stream);
-        -:   51:}
-        -:   52:
-        6:   53:int myferror(MYFILE *stream) {
-        6:   54:	return ferror((FILE *)stream);
-        -:   55:}
-        -:   56:
-       11:   57:long myftell(MYFILE *stream) {
-       11:   58:	return ftell((FILE *)stream);
-        -:   59:}
-        -:   60:
-       15:   61:int myfseek(MYFILE *stream, long pos, int type) {
-       15:   62:	return fseek((FILE *)stream, pos, type);
-        -:   63:}
-        -:   64:
-        6:   65:int myfprintf(MYFILE *fptr, const char *str, ...) {
-        -:   66:	va_list args;
-        6:   67:	va_start(args, str);
-        6:   68:	int ret = vfprintf((FILE *)fptr, str, args);
-        6:   69:	va_end(args);
-        6:   70:	return ret;
-        -:   71:}
-        -:   72:
-      137:   73:const char *rstrstr(const char *s1, const char *s2) {
-      137:   74:	size_t s1len = strlen(s1);
-      137:   75:	size_t s2len = strlen(s2);
-        -:   76:	const char *s;
-        -:   77:
-      137:   78:	if (s2len > s1len)
-        1:   79:		return NULL;
-      753:   80:	for (s = s1 + s1len - s2len; s >= s1; --s)
-      750:   81:		if (strncmp(s, s2, s2len) == 0)
-      133:   82:			return s;
-        3:   83:	return NULL;
-        -:   84:}
-        -:   85:
-       12:   86:u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream) {
-       12:   87:	size_t total_read = 0;
-       12:   88:	size_t bytes_to_read = size * count;
-        -:   89:	size_t bytes_read;
-        -:   90:
-       17:   91:	while (total_read < bytes_to_read || __is_debug_misc_ferror) {
-       12:   92:		bytes_read = myfread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
-       12:   93:		if (bytes_read == 0 || __is_debug_misc_ferror) {
-        -:   94:			// Check for EOF or error
-        2:   95:			if (myferror(stream) || __is_debug_misc_ferror) {
-        1:   96:				errno = EIO;
-        1:   97:				break; // Error occurred
-        -:   98:			}
-        -:   99:		}
-       11:  100:		total_read += bytes_read;
-       11:  101:		if (myfeof(stream))
-        6:  102:			break;
-        -:  103:	}
-        -:  104:
-       12:  105:	return total_read;
-        -:  106:}
-        -:  107:
-        6:  108:int copy_file(const Path *dst_path, const Path *src_path) {
-        6:  109:	if (dst_path == NULL || src_path == NULL) {
-        1:  110:		errno = EINVAL;
-        1:  111:		return -1;
-        -:  112:	}
-        -:  113:	MYFILE *source_file, *dest_file;
-        -:  114:	size_t bytes;
+        -:   16:#include <base/macro_utils.h>
+        -:   17:#include <base/misc.h>
+        -:   18:#include <base/resources.h>
+        -:   19:#include <base/types.h>
+        -:   20:#include <ctype.h>
+        -:   21:#include <dirent.h>
+        -:   22:#include <errno.h>
+        -:   23:#include <limits.h>
+        -:   24:#include <stdarg.h>
+        -:   25:#include <stdio.h>
+        -:   26:#include <stdlib.h>
+        -:   27:#include <string.h>
+        -:   28:#include <sys/stat.h>
+        -:   29:#include <unistd.h>
+        -:   30:
+        -:   31:bool __is_debug_misc_ferror = false;
+        -:   32:bool __is_debug_misc_fwrite = false;
+        -:   33:bool __is_debug_misc_stat = false;
+        -:   34:bool __is_debug_misc_remove_dir = false;
+        -:   35:bool __is_debug_misc_unlink = false;
+        -:   36:bool __is_debug_misc_no_exit = false;
+        -:   37:bool __is_debug_misc_preserve = false;
+        -:   38:
+      299:   39:char *myfgets(char *str, int n, MYFILE *stream) {
+      299:   40:	return fgets(str, n, (FILE *)stream);
+        -:   41:}
+        -:   42:
+       17:   43:u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream) {
+       17:   44:	return fread(buffer, size, count, (FILE *)stream);
+        -:   45:}
+        -:   46:
+       18:   47:u64 myfwrite(const void *buffer, u64 size, u64 count, MYFILE *stream) {
+       18:   48:	return fwrite(buffer, size, count, (FILE *)stream);
+        -:   49:}
+        -:   50:
+       11:   51:int myfeof(MYFILE *stream) {
+       11:   52:	return feof((FILE *)stream);
+        -:   53:}
+        -:   54:
+        6:   55:int myferror(MYFILE *stream) {
+        6:   56:	return ferror((FILE *)stream);
+        -:   57:}
+        -:   58:
+       11:   59:long myftell(MYFILE *stream) {
+       11:   60:	return ftell((FILE *)stream);
+        -:   61:}
+        -:   62:
+       15:   63:int myfseek(MYFILE *stream, long pos, int type) {
+       15:   64:	return fseek((FILE *)stream, pos, type);
+        -:   65:}
+        -:   66:
+       11:   67:u64 mystrlen(const char *s) {
+       11:   68:	int ret = 0;
+        -:   69:	loop {
+      231:   70:		if (s[ret] == 0)
+       11:   71:			return ret;
+      220:   72:		ret++;
+        -:   73:	}
+        -:   74:}
+        -:   75:
+        6:   76:int myfprintf(MYFILE *fptr, const char *str, ...) {
+        -:   77:	va_list args;
+        6:   78:	va_start(args, str);
+        6:   79:	int ret = vfprintf((FILE *)fptr, str, args);
+        6:   80:	va_end(args);
+        6:   81:	return ret;
+        -:   82:}
+        -:   83:
+      137:   84:const char *rstrstr(const char *s1, const char *s2) {
+      137:   85:	size_t s1len = strlen(s1);
+      137:   86:	size_t s2len = strlen(s2);
+        -:   87:	const char *s;
+        -:   88:
+      137:   89:	if (s2len > s1len)
+        1:   90:		return NULL;
+      753:   91:	for (s = s1 + s1len - s2len; s >= s1; --s)
+      750:   92:		if (strncmp(s, s2, s2len) == 0)
+      133:   93:			return s;
+        3:   94:	return NULL;
+        -:   95:}
+        -:   96:
+       12:   97:u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream) {
+       12:   98:	size_t total_read = 0;
+       12:   99:	size_t bytes_to_read = size * count;
+        -:  100:	size_t bytes_read;
+        -:  101:
+       17:  102:	while (total_read < bytes_to_read || __is_debug_misc_ferror) {
+       12:  103:		bytes_read = myfread((char *)buffer + total_read, 1, bytes_to_read - total_read, stream);
+       12:  104:		if (bytes_read == 0 || __is_debug_misc_ferror) {
+        -:  105:			// Check for EOF or error
+        2:  106:			if (myferror(stream) || __is_debug_misc_ferror) {
+        1:  107:				errno = EIO;
+        1:  108:				break; // Error occurred
+        -:  109:			}
+        -:  110:		}
+       11:  111:		total_read += bytes_read;
+       11:  112:		if (myfeof(stream))
+        6:  113:			break;
+        -:  114:	}
         -:  115:
-        -:  116:	// Open the source file in binary read mode
-        5:  117:	source_file = myfopen(src_path, "rb");
-        5:  118:	if (source_file == NULL) {
-        1:  119:		errno = EINVAL;
-        1:  120:		return -1;
-        -:  121:	}
-        -:  122:
-        -:  123:	// Determine the file size
-        4:  124:	myfseek(source_file, 0, SEEK_END);
-        4:  125:	long file_size = myftell(source_file);
-        4:  126:	myfseek(source_file, 0, SEEK_SET);
-        4:  127:	char buffer[file_size];
-        -:  128:
-        -:  129:	// Open the destination file in binary write mode
-        4:  130:	dest_file = myfopen(dst_path, "wb");
-        4:  131:	if (dest_file == NULL) {
-        1:  132:		errno = ENOENT;
-        1:  133:		myfclose(source_file);
-        1:  134:		return -1;
-        -:  135:	}
-        -:  136:
-        -:  137:	// Copy the file content
-        5:  138:	while ((bytes = myfread(buffer, 1, file_size, source_file)) > 0) {
-        3:  139:		if (myferror(source_file) || myfwrite(buffer, 1, bytes, dest_file) != bytes ||
-        -:  140:			__is_debug_misc_fwrite) {
-        1:  141:			errno = EIO;
-        1:  142:			myfclose(source_file);
-        1:  143:			myfclose(dest_file);
-        1:  144:			return -1;
-        -:  145:		}
+       12:  116:	return total_read;
+        -:  117:}
+        -:  118:
+        6:  119:int copy_file(const Path *dst_path, const Path *src_path) {
+        6:  120:	if (dst_path == NULL || src_path == NULL) {
+        1:  121:		errno = EINVAL;
+        1:  122:		return -1;
+        -:  123:	}
+        -:  124:	MYFILE *source_file, *dest_file;
+        -:  125:	size_t bytes;
+        -:  126:
+        -:  127:	// Open the source file in binary read mode
+        5:  128:	source_file = myfopen(src_path, "rb");
+        5:  129:	if (source_file == NULL) {
+        1:  130:		errno = EINVAL;
+        1:  131:		return -1;
+        -:  132:	}
+        -:  133:
+        -:  134:	// Determine the file size
+        4:  135:	myfseek(source_file, 0, SEEK_END);
+        4:  136:	long file_size = myftell(source_file);
+        4:  137:	myfseek(source_file, 0, SEEK_SET);
+        4:  138:	char buffer[file_size];
+        -:  139:
+        -:  140:	// Open the destination file in binary write mode
+        4:  141:	dest_file = myfopen(dst_path, "wb");
+        4:  142:	if (dest_file == NULL) {
+        1:  143:		errno = ENOENT;
+        1:  144:		myfclose(source_file);
+        1:  145:		return -1;
         -:  146:	}
         -:  147:
-        -:  148:	// Close both files
-        2:  149:	myfclose(source_file);
-        2:  150:	myfclose(dest_file);
-        -:  151:
-        2:  152:	return 0;
-        -:  153:}
-        -:  154:
-        -:  155:// Function to recursively remove a directory and its contents
-      129:  156:int remove_directory(const Path *p, bool preserve_dir) {
-      129:  157:	const char *path = path_to_string(p);
-        -:  158:	struct dirent *entry;
-      129:  159:	DIR *dir = opendir(path);
-        -:  160:
-      129:  161:	if (dir == NULL) {
-       50:  162:		return -1;
-        -:  163:	}
-        -:  164:
-      280:  165:	while ((entry = readdir(dir)) != NULL) {
-        -:  166:		char full_path[PATH_MAX];
-        -:  167:
-        -:  168:		// Skip the special entries "." and ".."
-      206:  169:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-      157:  170:			continue;
-        -:  171:		}
-        -:  172:
-        -:  173:		// Construct the full path to the file/directory
-       49:  174:		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
+        -:  148:	// Copy the file content
+        5:  149:	while ((bytes = myfread(buffer, 1, file_size, source_file)) > 0) {
+        3:  150:		if (myferror(source_file) || myfwrite(buffer, 1, bytes, dest_file) != bytes ||
+        -:  151:			__is_debug_misc_fwrite) {
+        1:  152:			errno = EIO;
+        1:  153:			myfclose(source_file);
+        1:  154:			myfclose(dest_file);
+        1:  155:			return -1;
+        -:  156:		}
+        -:  157:	}
+        -:  158:
+        -:  159:	// Close both files
+        2:  160:	myfclose(source_file);
+        2:  161:	myfclose(dest_file);
+        -:  162:
+        2:  163:	return 0;
+        -:  164:}
+        -:  165:
+        -:  166:// Function to recursively remove a directory and its contents
+      145:  167:int remove_directory(const Path *p, bool preserve_dir) {
+      145:  168:	const char *path = path_to_string(p);
+        -:  169:	struct dirent *entry;
+      145:  170:	DIR *dir = opendir(path);
+        -:  171:
+      145:  172:	if (dir == NULL) {
+       58:  173:		return -1;
+        -:  174:	}
         -:  175:
-        -:  176:		struct stat statbuf;
-       49:  177:		if (stat(full_path, &statbuf) == -1 || __is_debug_misc_stat) {
-        1:  178:			errno = EIO;
-        1:  179:			closedir(dir);
-        5:  180:			return -1;
-        -:  181:		}
-        -:  182:
-       48:  183:		if (S_ISDIR(statbuf.st_mode)) {
-        -:  184:			// It's a directory, recurse into it
-       24:  185:			Path full_path_p;
-       24:  186:			path_for(&full_path_p, full_path);
-       24:  187:			if (remove_directory(&full_path_p, false) == -1 || __is_debug_misc_remove_dir) {
-        3:  188:				closedir(dir);
-        3:  189:				return -1;
-        -:  190:			}
-        -:  191:		} else {
-        -:  192:			// It's a file, unlink (delete) it
-       24:  193:			if (unlink(full_path) == -1 || __is_debug_misc_unlink) {
-        1:  194:				errno = EIO;
-        1:  195:				closedir(dir);
-        1:  196:				return -1;
-        -:  197:			}
-        -:  198:		}
-        -:  199:	}
-        -:  200:
-       74:  201:	closedir(dir);
-        -:  202:
-        -:  203:	// Now the directory is empty, so we can remove it
-       74:  204:	if (!preserve_dir) {
-       73:  205:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
-        1:  206:			errno = EIO;
-        1:  207:			return -1;
-        -:  208:		}
-        -:  209:	}
-        -:  210:
-       73:  211:	return 0;
-        -:  212:}
+      304:  176:	while ((entry = readdir(dir)) != NULL) {
+        -:  177:		char full_path[PATH_MAX];
+        -:  178:
+        -:  179:		// Skip the special entries "." and ".."
+      222:  180:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+      173:  181:			continue;
+        -:  182:		}
+        -:  183:
+        -:  184:		// Construct the full path to the file/directory
+       49:  185:		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
+        -:  186:
+        -:  187:		struct stat statbuf;
+       49:  188:		if (stat(full_path, &statbuf) == -1 || __is_debug_misc_stat) {
+        1:  189:			errno = EIO;
+        1:  190:			closedir(dir);
+        5:  191:			return -1;
+        -:  192:		}
+        -:  193:
+       48:  194:		if (S_ISDIR(statbuf.st_mode)) {
+        -:  195:			// It's a directory, recurse into it
+       24:  196:			Path full_path_p;
+       24:  197:			path_for(&full_path_p, full_path);
+       24:  198:			if (remove_directory(&full_path_p, false) == -1 || __is_debug_misc_remove_dir) {
+        3:  199:				closedir(dir);
+        3:  200:				return -1;
+        -:  201:			}
+        -:  202:		} else {
+        -:  203:			// It's a file, unlink (delete) it
+       24:  204:			if (unlink(full_path) == -1 || __is_debug_misc_unlink) {
+        1:  205:				errno = EIO;
+        1:  206:				closedir(dir);
+        1:  207:				return -1;
+        -:  208:			}
+        -:  209:		}
+        -:  210:	}
+        -:  211:
+       82:  212:	closedir(dir);
         -:  213:
-        5:  214:void exit_error(char *format, ...) {
-        -:  215:	va_list va_args;
-        5:  216:	va_start(va_args, format);
-        5:  217:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
-        5:  218:	vfprintf(stderr, format, va_args);
-        5:  219:	fprintf(stderr, "\n");
-        5:  220:	va_end(va_args);
-       5*:  221:	EXIT_ERR_IF_NO_DEBUG(-1);
-        5:  222:}
-        -:  223:
-       23:  224:void print_error(char *format, ...) {
-        -:  225:	va_list va_args;
-       23:  226:	va_start(va_args, format);
-       23:  227:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
-       23:  228:	vfprintf(stderr, format, va_args);
-       23:  229:	fprintf(stderr, "\n");
-       23:  230:	va_end(va_args);
-       23:  231:}
-        -:  232:
-        -:  233:// Helper function to trim leading and trailing whitespace
-        7:  234:char *trim_whitespace(char *str) {
-        -:  235:	// Trim leading whitespace
-       15:  236:	while (isspace((unsigned char)*str))
-        8:  237:		str++;
-        -:  238:	// Trim trailing whitespace
-        7:  239:	char *end = str + strlen(str) - 1;
-       15:  240:	while (end > str && isspace((unsigned char)*end))
-        8:  241:		end--;
-        7:  242:	*(end + 1) = '\0'; // Null-terminate the trimmed string
-        7:  243:	return str;		   // Return the trimmed string
-        -:  244:}
+        -:  214:	// Now the directory is empty, so we can remove it
+       82:  215:	if (!preserve_dir) {
+       81:  216:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
+        1:  217:			errno = EIO;
+        1:  218:			return -1;
+        -:  219:		}
+        -:  220:	}
+        -:  221:
+       81:  222:	return 0;
+        -:  223:}
+        -:  224:
+        5:  225:void exit_error(char *format, ...) {
+        -:  226:	va_list va_args;
+        5:  227:	va_start(va_args, format);
+        5:  228:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+        5:  229:	vfprintf(stderr, format, va_args);
+        5:  230:	fprintf(stderr, "\n");
+        5:  231:	va_end(va_args);
+       5*:  232:	EXIT_ERR_IF_NO_DEBUG(-1);
+        5:  233:}
+        -:  234:
+       23:  235:void print_error(char *format, ...) {
+        -:  236:	va_list va_args;
+       23:  237:	va_start(va_args, format);
+       23:  238:	fprintf(stderr, "%sError%s: ", BRIGHT_RED, RESET);
+       23:  239:	vfprintf(stderr, format, va_args);
+       23:  240:	fprintf(stderr, "\n");
+       23:  241:	va_end(va_args);
+       23:  242:}
+        -:  243:
+        -:  244:// Helper function to trim leading and trailing whitespace
+        7:  245:char *trim_whitespace(char *str) {
+        -:  246:	// Trim leading whitespace
+       15:  247:	while (isspace((unsigned char)*str))
+        8:  248:		str++;
+        -:  249:	// Trim trailing whitespace
+        7:  250:	char *end = str + strlen(str) - 1;
+       15:  251:	while (end > str && isspace((unsigned char)*end))
+        8:  252:		end--;
+        7:  253:	*(end + 1) = '\0'; // Null-terminate the trimmed string
+        7:  254:	return str;		   // Return the trimmed string
+        -:  255:}
+        -:    0:Source:panic.c
+        -:    0:Graph:panic.gcno
+        -:    0:Data:panic.gcda
+        -:    0:Runs:64
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/panic.h>
+        -:   16:#include <setjmp.h>
+        -:   17:#include <signal.h>
+        -:   18:#include <stdarg.h>
+        -:   19:#include <stdio.h>
+        -:   20:#include <stdlib.h>
+        -:   21:#include <string.h>
+        -:   22:
+        -:   23:void exit(int value);
+        -:   24:
+        -:   25:#define MAX_PANIC_MSG 1024
+        -:   26:
+        -:   27:_Thread_local jmp_buf return_jmp;
+        -:   28:_Thread_local bool jmp_return_set = false;
+        -:   29:_Thread_local char panic_buf[MAX_PANIC_MSG];
+        -:   30:
+    #####:   31:void panic(const char *fmt, ...) {
+        -:   32:	va_list args;
+        -:   33:
+    #####:   34:	fprintf(stderr, "thread panicked: ");
+    #####:   35:	va_start(args, fmt);
+    #####:   36:	vfprintf(stderr, fmt, args);
+    #####:   37:	vsnprintf(panic_buf, MAX_PANIC_MSG, fmt, args);
+    #####:   38:	va_end(args);
+    #####:   39:	fprintf(stderr, "\n");
+        -:   40:
+        -:   41:	// If jump return has not been set, we resort to an exit with an error
+        -:   42:	// status.
+    #####:   43:	if (!jmp_return_set)
+    #####:   44:		exit(-1);
+    #####:   45:	longjmp(return_jmp, THREAD_PANIC);
+        -:   46:}
+        -:   47:
+    #####:   48:void signal_handler(int signal) {
+        -:   49:	// Handle the signal and call the _on_panic function
+    #####:   50:	panic("Caught signal: %d", signal);
+    #####:   51:}
+        -:   52:
+    #####:   53:void set_on_panic(panic_handler_t on_panic) {
+        -:   54:	struct sigaction sa;
+    #####:   55:	memset(&sa, 0, sizeof(sa));
+    #####:   56:	sa.sa_handler = signal_handler;
+        -:   57:	// Catching only error signals
+    #####:   58:	sigaction(SIGSEGV, &sa, NULL); // Segmentation fault
+    #####:   59:	sigaction(SIGABRT, &sa, NULL); // Abort signal
+    #####:   60:	sigaction(SIGTRAP, &sa, NULL); // Signal trap
+    #####:   61:	sigaction(SIGILL, &sa, NULL);  // Illegal instruction
+    #####:   62:	sigaction(SIGFPE, &sa, NULL);  // Arithmetic error
+    #####:   63:	sigaction(SIGBUS, &sa, NULL);  // Bus error
+        -:   64:
+    #####:   65:	jmp_return_set = true;
+    #####:   66:	int value = setjmp(return_jmp);
+    #####:   67:	if (value)
+    #####:   68:		on_panic(panic_buf);
+    #####:   69:}
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:56
+        -:    0:Runs:64
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1638,35 +1902,35 @@
         -:   25:
         -:   26:bool __is_debug_path_homedir_null = false;
         -:   27:
-      226:   28:void path_cleanup(PathImpl *ptr) {
-      226:   29:	if (ptr->ptr) {
-      220:   30:		myfree(ptr->ptr);
-      220:   31:		ptr->ptr = NULL;
+      242:   28:void path_cleanup(PathImpl *ptr) {
+      242:   29:	if (ptr->ptr) {
+      236:   30:		myfree(ptr->ptr);
+      236:   31:		ptr->ptr = NULL;
         -:   32:	}
-      226:   33:}
+      242:   33:}
         -:   34:
-      231:   35:int path_for(Path *p, const char *path) {
-      231:   36:	if (p == NULL) {
+      247:   35:int path_for(Path *p, const char *path) {
+      247:   36:	if (p == NULL) {
         1:   37:		errno = EINVAL;
         1:   38:		return -1;
         -:   39:	}
-      230:   40:	if (path == NULL) {
+      246:   40:	if (path == NULL) {
         1:   41:		errno = EINVAL;
         1:   42:		p->ptr = NULL;
         1:   43:		return -1;
         -:   44:	}
-      229:   45:	int len = strlen(path);
-      229:   46:	if (len == 0) {
+      245:   45:	int len = strlen(path);
+      245:   46:	if (len == 0) {
         1:   47:		errno = EINVAL;
         1:   48:		p->ptr = NULL;
         1:   49:		return -1;
         -:   50:	}
-      228:   51:	p->ptr = mymalloc(len + 1);
-      228:   52:	if (!p->ptr)
+      244:   51:	p->ptr = mymalloc(len + 1);
+      244:   52:	if (!p->ptr)
         2:   53:		return -1;
-      226:   54:	p->len = len;
-      226:   55:	strcpy(p->ptr, path);
-      226:   56:	return 0;
+      242:   54:	p->len = len;
+      242:   55:	strcpy(p->ptr, path);
+      242:   56:	return 0;
         -:   57:}
         -:   58:
        33:   59:int path_replace_home(Path *p) {
@@ -1728,41 +1992,41 @@
        13:  115:	strcpy(p->ptr, buf);
        13:  116:	return 0;
         -:  117:}
-      159:  118:int path_push(Path *p, const char *next) {
-      159:  119:	if (p == NULL) {
+      167:  118:int path_push(Path *p, const char *next) {
+      167:  119:	if (p == NULL) {
         1:  120:		errno = EINVAL;
         1:  121:		return -1;
         -:  122:	}
-      158:  123:	if (next == NULL) {
+      166:  123:	if (next == NULL) {
         1:  124:		errno = EINVAL;
         1:  125:		return -1;
         -:  126:	}
-      157:  127:	int slen = strlen(p->ptr);
-      157:  128:	if (slen <= 0 || strlen(next) == 0) {
+      165:  127:	int slen = strlen(p->ptr);
+      165:  128:	if (slen <= 0 || strlen(next) == 0) {
         1:  129:		errno = EFAULT;
         1:  130:		return -1;
         -:  131:	}
-      156:  132:	bool need_sep = false;
-      156:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
-      156:  134:		need_sep = true;
+      164:  132:	bool need_sep = false;
+      164:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
+      164:  134:		need_sep = true;
         -:  135:	}
         -:  136:
-      156:  137:	int nlen = slen + strlen(next);
-      156:  138:	if (need_sep)
-      156:  139:		nlen += strlen(PATH_SEPARATOR);
+      164:  137:	int nlen = slen + strlen(next);
+      164:  138:	if (need_sep)
+      164:  139:		nlen += strlen(PATH_SEPARATOR);
         -:  140:
-      156:  141:	if (nlen >= p->len) {
-      152:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
-      152:  143:		if (nptr == NULL)
+      164:  141:	if (nlen >= p->len) {
+      160:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
+      160:  143:		if (nptr == NULL)
         1:  144:			return -1;
-      151:  145:		p->ptr = nptr;
-      151:  146:		p->len = nlen;
+      159:  145:		p->ptr = nptr;
+      159:  146:		p->len = nlen;
         -:  147:	}
         -:  148:
-      155:  149:	if (need_sep)
-      155:  150:		strcat(p->ptr, PATH_SEPARATOR);
-      155:  151:	strcat(p->ptr, next);
-      155:  152:	return 0;
+      163:  149:	if (need_sep)
+      163:  150:		strcat(p->ptr, PATH_SEPARATOR);
+      163:  151:	strcat(p->ptr, next);
+      163:  152:	return 0;
         -:  153:}
        48:  154:int path_pop(Path *p) {
        48:  155:	const char *res = rstrstr(p->ptr, PATH_SEPARATOR);
@@ -1776,8 +2040,8 @@
        48:  163:	return 0;
         -:  164:}
         -:  165:
-     2178:  166:char *path_to_string(const Path *p) {
-     2178:  167:	return p->ptr;
+     2194:  166:char *path_to_string(const Path *p) {
+     2194:  167:	return p->ptr;
         -:  168:}
         -:  169:
        88:  170:const char *path_file_name(const Path *p) {
@@ -1807,8 +2071,8 @@
         3:  194:	return false;
         -:  195:}
         -:  196:
-      131:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
-      131:  198:	if (p->ptr == NULL || p->len == 0) {
+      139:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
+      139:  198:	if (p->ptr == NULL || p->len == 0) {
         1:  199:		errno = EINVAL;
         1:  200:		return false;
         -:  201:	}
@@ -1816,7 +2080,7 @@
         -:  203:	struct stat s;
         -:  204:
         -:  205:	// Check if the path exists
-      130:  206:	if (stat(p->ptr, &s) == 0) {
+      138:  206:	if (stat(p->ptr, &s) == 0) {
         -:  207:		// If the path exists and it's a directory, return success
         8:  208:		if (s.st_mode & S_IFDIR) {
         7:  209:			return true;
@@ -1828,11 +2092,11 @@
         -:  215:	}
         -:  216:
         -:  217:	// If parent is false, attempt to create only the target directory
-      122:  218:	if (!parent) {
-      104:  219:		if (mkdir(p->ptr, mode) != 0) {
+      130:  218:	if (!parent) {
+      112:  219:		if (mkdir(p->ptr, mode) != 0) {
        28:  220:			return false;
         -:  221:		}
-       76:  222:		return true;
+       84:  222:		return true;
         -:  223:	}
         -:  224:
         -:  225:	// Create the directory structure (parent is true)
@@ -1881,7 +2145,7 @@
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:56
+        -:    0:Runs:64
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1909,42 +2173,42 @@
         -:   25:u64 __is_debug_realloc_counter_ = UINT64_MAX;
         -:   26:#endif // TEST
         -:   27:
-     4733:   28:void *mymalloc(u64 size) {
+     4864:   28:void *mymalloc(u64 size) {
         -:   29:#ifdef TEST
-     4733:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
+     4864:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
        21:   31:		__is_debug_malloc_counter_ = UINT64_MAX;
        21:   32:		return NULL;
         -:   33:	}
-     4712:   34:	__is_debug_malloc_counter_--;
+     4843:   34:	__is_debug_malloc_counter_--;
         -:   35:#endif // TEST
         -:   36:	void *ret;
-     4712:   37:	ret = malloc(size);
+     4843:   37:	ret = malloc(size);
         -:   38:
-     4712:   39:	if (ret) {
-     4712:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+     4843:   39:	if (ret) {
+     4843:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   41:	}
-     4712:   42:	return ret;
+     4843:   42:	return ret;
         -:   43:}
-      221:   44:void *myrealloc(void *ptr, u64 size) {
+     1767:   44:void *myrealloc(void *ptr, u64 size) {
         -:   45:#ifdef TEST
-      221:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
+     1767:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
         7:   47:		__is_debug_realloc_counter_ = UINT64_MAX;
         7:   48:		return NULL;
         -:   49:	}
-      214:   50:	__is_debug_realloc_counter_--;
+     1760:   50:	__is_debug_realloc_counter_--;
         -:   51:#endif // TEST
         -:   52:	void *ret;
-      214:   53:	ret = realloc(ptr, size);
+     1760:   53:	ret = realloc(ptr, size);
         -:   54:
-      214:   55:	if (ret) {
-      214:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+     1760:   55:	if (ret) {
+     1760:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   57:	}
-      214:   58:	return ret;
+     1760:   58:	return ret;
         -:   59:}
-     4656:   60:void myfree(void *ptr) {
-     4656:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-     4656:   62:	free(ptr);
-     4656:   63:}
+     4787:   60:void myfree(void *ptr) {
+     4787:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+     4787:   62:	free(ptr);
+     4787:   63:}
        58:   64:MYFILE *myfopen(const Path *path, const char *mode) {
        58:   65:	const char *path_str = path_to_string(path);
        58:   66:	FILE *ret = fopen(path_str, mode);
@@ -1953,29 +2217,998 @@
         -:   69:	}
        58:   70:	return (MYFILE *)ret;
         -:   71:}
-       53:   72:void myfclose(MYFILE *ptr) {
-       53:   73:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
-       53:   74:	fclose((FILE *)ptr);
-       53:   75:}
-       99:   76:u64 mymalloc_sum() {
-       99:   77:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
-        -:   78:}
-        2:   79:u64 myrealloc_sum() {
-        2:   80:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
-        -:   81:}
-       99:   82:u64 myfree_sum() {
-       99:   83:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
-        -:   84:}
-      147:   85:u64 myfopen_sum() {
-      147:   86:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
-        -:   87:}
-      147:   88:u64 myfclose_sum() {
-      147:   89:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
-        -:   90:}
+        -:   72:
+    #####:   73:void *mymalloc_no_stat(u64 size) {
+    #####:   74:	return malloc(size);
+        -:   75:}
+        -:   76:
+       53:   77:void myfclose(MYFILE *ptr) {
+       53:   78:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
+       53:   79:	fclose((FILE *)ptr);
+       53:   80:}
+      115:   81:u64 mymalloc_sum() {
+      115:   82:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
+        -:   83:}
+        2:   84:u64 myrealloc_sum() {
+        2:   85:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
+        -:   86:}
+      115:   87:u64 myfree_sum() {
+      115:   88:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+        -:   89:}
+      171:   90:u64 myfopen_sum() {
+      171:   91:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+        -:   92:}
+      171:   93:u64 myfclose_sum() {
+      171:   94:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+        -:   95:}
+        -:    0:Source:sha3.c
+        -:    0:Graph:sha3.gcno
+        -:    0:Data:sha3.gcda
+        -:    0:Runs:64
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:/* -------------------------------------------------------------------------
+        -:   16: * Works when compiled for either 32-bit or 64-bit targets, optimized for
+        -:   17: * 64 bit.
+        -:   18: *
+        -:   19: * Canonical implementation of Init/Update/Finalize for SHA-3 byte input.
+        -:   20: *
+        -:   21: * SHA3-256, SHA3-384, SHA-512 are implemented. SHA-224 can easily be added.
+        -:   22: *
+        -:   23: * Based on code from http://keccak.noekeon.org/ .
+        -:   24: *
+        -:   25: * I place the code that I wrote into public domain, free to use.
+        -:   26: *
+        -:   27: * I would appreciate if you give credits to this work if you used it to
+        -:   28: * write or test * your code.
+        -:   29: *
+        -:   30: * Aug 2015. Andrey Jivsov. crypto@brainhub.org
+        -:   31: * ---------------------------------------------------------------------- */
+        -:   32:
+        -:   33:#include <stdint.h>
+        -:   34:#include <stdio.h>
+        -:   35:#include <string.h>
+        -:   36:
+        -:   37:#include <base/sha3.h>
+        -:   38:
+        -:   39:#define SHA3_ASSERT(x)
+        -:   40:#define SHA3_TRACE(format, ...)
+        -:   41:#define SHA3_TRACE_BUF(format, buf, l)
+        -:   42:
+        -:   43:/*
+        -:   44: * This flag is used to configure "pure" Keccak, as opposed to NIST SHA3.
+        -:   45: */
+        -:   46:#define SHA3_USE_KECCAK_FLAG 0x80000000
+        -:   47:#define SHA3_CW(x) ((x) & (~SHA3_USE_KECCAK_FLAG))
+        -:   48:
+        -:   49:#if defined(_MSC_VER)
+        -:   50:#define SHA3_CONST(x) x
+        -:   51:#else
+        -:   52:#define SHA3_CONST(x) x##L
+        -:   53:#endif
+        -:   54:
+        -:   55:#ifndef SHA3_ROTL64
+        -:   56:#define SHA3_ROTL64(x, y) (((x) << (y)) | ((x) >> ((sizeof(u64) * 8) - (y))))
+        -:   57:#endif
+        -:   58:
+        -:   59:static const u64 keccakf_rndc[24] = {
+        -:   60:	SHA3_CONST(0x0000000000000001UL), SHA3_CONST(0x0000000000008082UL),
+        -:   61:	SHA3_CONST(0x800000000000808aUL), SHA3_CONST(0x8000000080008000UL),
+        -:   62:	SHA3_CONST(0x000000000000808bUL), SHA3_CONST(0x0000000080000001UL),
+        -:   63:	SHA3_CONST(0x8000000080008081UL), SHA3_CONST(0x8000000000008009UL),
+        -:   64:	SHA3_CONST(0x000000000000008aUL), SHA3_CONST(0x0000000000000088UL),
+        -:   65:	SHA3_CONST(0x0000000080008009UL), SHA3_CONST(0x000000008000000aUL),
+        -:   66:	SHA3_CONST(0x000000008000808bUL), SHA3_CONST(0x800000000000008bUL),
+        -:   67:	SHA3_CONST(0x8000000000008089UL), SHA3_CONST(0x8000000000008003UL),
+        -:   68:	SHA3_CONST(0x8000000000008002UL), SHA3_CONST(0x8000000000000080UL),
+        -:   69:	SHA3_CONST(0x000000000000800aUL), SHA3_CONST(0x800000008000000aUL),
+        -:   70:	SHA3_CONST(0x8000000080008081UL), SHA3_CONST(0x8000000000008080UL),
+        -:   71:	SHA3_CONST(0x0000000080000001UL), SHA3_CONST(0x8000000080008008UL)};
+        -:   72:
+        -:   73:static const unsigned keccakf_rotc[24] = {1,  3,  6,  10, 15, 21, 28, 36, 45, 55, 2,  14,
+        -:   74:										  27, 41, 56, 8,  25, 43, 62, 18, 39, 61, 20, 44};
+        -:   75:
+        -:   76:static const unsigned keccakf_piln[24] = {10, 7,  11, 17, 18, 3, 5,	 16, 8,	 21, 24, 4,
+        -:   77:										  15, 23, 19, 13, 12, 2, 20, 14, 22, 9,	 6,	 1};
+        -:   78:
+        -:   79:/* generally called after SHA3_KECCAK_SPONGE_WORDS-ctx->capacityWords words
+        -:   80: * are XORed into the state s
+        -:   81: */
+       11:   82:static void keccakf(u64 s[25]) {
+        -:   83:	int i, j, round;
+        -:   84:	u64 t, bc[5];
+        -:   85:#define KECCAK_ROUNDS 24
+        -:   86:
+      275:   87:	for (round = 0; round < KECCAK_ROUNDS; round++) {
+        -:   88:
+        -:   89:		/* Theta */
+     1584:   90:		for (i = 0; i < 5; i++)
+     1320:   91:			bc[i] = s[i] ^ s[i + 5] ^ s[i + 10] ^ s[i + 15] ^ s[i + 20];
+        -:   92:
+     1584:   93:		for (i = 0; i < 5; i++) {
+     1320:   94:			t = bc[(i + 4) % 5] ^ SHA3_ROTL64(bc[(i + 1) % 5], 1);
+     7920:   95:			for (j = 0; j < 25; j += 5)
+     6600:   96:				s[j + i] ^= t;
+        -:   97:		}
+        -:   98:
+        -:   99:		/* Rho Pi */
+      264:  100:		t = s[1];
+     6600:  101:		for (i = 0; i < 24; i++) {
+     6336:  102:			j = keccakf_piln[i];
+     6336:  103:			bc[0] = s[j];
+     6336:  104:			s[j] = SHA3_ROTL64(t, keccakf_rotc[i]);
+     6336:  105:			t = bc[0];
+        -:  106:		}
+        -:  107:
+        -:  108:		/* Chi */
+     1584:  109:		for (j = 0; j < 25; j += 5) {
+     7920:  110:			for (i = 0; i < 5; i++)
+     6600:  111:				bc[i] = s[j + i];
+     7920:  112:			for (i = 0; i < 5; i++)
+     6600:  113:				s[j + i] ^= (~bc[(i + 1) % 5]) & bc[(i + 2) % 5];
+        -:  114:		}
+        -:  115:
+        -:  116:		/* Iota */
+      264:  117:		s[0] ^= keccakf_rndc[round];
+        -:  118:	}
+       11:  119:}
+        -:  120:
+        -:  121:/* *************************** Public Inteface ************************ */
+        -:  122:
+        -:  123:/* For Init or Reset call these: */
+       11:  124:sha3_return_t sha3_Init(void *priv, unsigned bitSize) {
+       11:  125:	sha3_context *ctx = (sha3_context *)priv;
+      11*:  126:	if (bitSize != 256 && bitSize != 384 && bitSize != 512)
+    #####:  127:		return SHA3_RETURN_BAD_PARAMS;
+       11:  128:	memset(ctx, 0, sizeof(*ctx));
+       11:  129:	ctx->capacityWords = 2 * bitSize / (8 * sizeof(u64));
+       11:  130:	return SHA3_RETURN_OK;
+        -:  131:}
+        -:  132:
+       11:  133:void sha3_Init256(void *priv) {
+       11:  134:	sha3_Init(priv, 256);
+       11:  135:}
+        -:  136:
+    #####:  137:void sha3_Init384(void *priv) {
+    #####:  138:	sha3_Init(priv, 384);
+    #####:  139:}
+        -:  140:
+    #####:  141:void sha3_Init512(void *priv) {
+    #####:  142:	sha3_Init(priv, 512);
+    #####:  143:}
+        -:  144:
+    #####:  145:enum SHA3_FLAGS sha3_SetFlags(void *priv, enum SHA3_FLAGS flags) {
+    #####:  146:	sha3_context *ctx = (sha3_context *)priv;
+    #####:  147:	flags &= SHA3_FLAGS_KECCAK;
+    #####:  148:	ctx->capacityWords |= (flags == SHA3_FLAGS_KECCAK ? SHA3_USE_KECCAK_FLAG : 0);
+    #####:  149:	return flags;
+        -:  150:}
+        -:  151:
+       11:  152:void sha3_Update(void *priv, void const *bufIn, u64 len) {
+       11:  153:	sha3_context *ctx = (sha3_context *)priv;
+        -:  154:
+        -:  155:	/* 0...7 -- how much is needed to have a word */
+       11:  156:	unsigned old_tail = (8 - ctx->byteIndex) & 7;
+        -:  157:
+        -:  158:	u64 words;
+        -:  159:	unsigned tail;
+        -:  160:	u64 i;
+        -:  161:
+       11:  162:	const u8 *buf = bufIn;
+        -:  163:
+        -:  164:	SHA3_TRACE_BUF("called to update with:", buf, len);
+        -:  165:
+        -:  166:	SHA3_ASSERT(ctx->byteIndex < 8);
+        -:  167:	SHA3_ASSERT(ctx->wordIndex < sizeof(ctx->u.s) / sizeof(ctx->u.s[0]));
+        -:  168:
+       11:  169:	if (len < old_tail) { /* have no complete word or haven't started
+        -:  170:						   * the word yet */
+        -:  171:		SHA3_TRACE("because %d<%d, store it and return", (unsigned)len, (unsigned)old_tail);
+        -:  172:		/* endian-independent code follows: */
+    #####:  173:		while (len--)
+    #####:  174:			ctx->saved |= (u64)(*(buf++)) << ((ctx->byteIndex++) * 8);
+        -:  175:		SHA3_ASSERT(ctx->byteIndex < 8);
+    #####:  176:		return;
+        -:  177:	}
+        -:  178:
+       11:  179:	if (old_tail) { /* will have one word to process */
+        -:  180:		SHA3_TRACE("completing one word with %d bytes", (unsigned)old_tail);
+        -:  181:		/* endian-independent code follows: */
+    #####:  182:		len -= old_tail;
+    #####:  183:		while (old_tail--)
+    #####:  184:			ctx->saved |= (u64)(*(buf++)) << ((ctx->byteIndex++) * 8);
+        -:  185:
+        -:  186:		/* now ready to add saved to the sponge */
+    #####:  187:		ctx->u.s[ctx->wordIndex] ^= ctx->saved;
+        -:  188:		SHA3_ASSERT(ctx->byteIndex == 8);
+    #####:  189:		ctx->byteIndex = 0;
+    #####:  190:		ctx->saved = 0;
+    #####:  191:		if (++ctx->wordIndex == (SHA3_KECCAK_SPONGE_WORDS - SHA3_CW(ctx->capacityWords))) {
+    #####:  192:			keccakf(ctx->u.s);
+    #####:  193:			ctx->wordIndex = 0;
+        -:  194:		}
+        -:  195:	}
+        -:  196:
+        -:  197:	/* now work in full words directly from input */
+        -:  198:
+        -:  199:	SHA3_ASSERT(ctx->byteIndex == 0);
+        -:  200:
+       11:  201:	words = len / sizeof(u64);
+       11:  202:	tail = len - words * sizeof(u64);
+        -:  203:
+        -:  204:	SHA3_TRACE("have %d full words to process", (unsigned)words);
+        -:  205:
+       33:  206:	for (i = 0; i < words; i++, buf += sizeof(u64)) {
+       22:  207:		const u64 t = (u64)(buf[0]) | ((u64)(buf[1]) << 8 * 1) | ((u64)(buf[2]) << 8 * 2) |
+       22:  208:					  ((u64)(buf[3]) << 8 * 3) | ((u64)(buf[4]) << 8 * 4) |
+       22:  209:					  ((u64)(buf[5]) << 8 * 5) | ((u64)(buf[6]) << 8 * 6) |
+       22:  210:					  ((u64)(buf[7]) << 8 * 7);
+        -:  211:#if defined(__x86_64__) || defined(__i386__)
+        -:  212:		SHA3_ASSERT(memcmp(&t, buf, 8) == 0);
+        -:  213:#endif
+       22:  214:		ctx->u.s[ctx->wordIndex] ^= t;
+       22:  215:		if (++ctx->wordIndex == (SHA3_KECCAK_SPONGE_WORDS - SHA3_CW(ctx->capacityWords))) {
+    #####:  216:			keccakf(ctx->u.s);
+    #####:  217:			ctx->wordIndex = 0;
+        -:  218:		}
+        -:  219:	}
+        -:  220:
+        -:  221:	SHA3_TRACE("have %d bytes left to process, save them", (unsigned)tail);
+        -:  222:
+        -:  223:	/* finally, save the partial word */
+        -:  224:	SHA3_ASSERT(ctx->byteIndex == 0 && tail < 8);
+       55:  225:	while (tail--) {
+        -:  226:		SHA3_TRACE("Store byte %02x '%c'", *buf, *buf);
+       44:  227:		ctx->saved |= (u64)(*(buf++)) << ((ctx->byteIndex++) * 8);
+        -:  228:	}
+        -:  229:	SHA3_ASSERT(ctx->byteIndex < 8);
+        -:  230:	SHA3_TRACE("Have saved=0x%016" PRIx64 " at the end", ctx->saved);
+        -:  231:}
+        -:  232:
+        -:  233:/* This is simply the 'update' with the padding block.
+        -:  234: * The padding block is 0x01 || 0x00* || 0x80. First 0x01 and last 0x80
+        -:  235: * bytes are always present, but they can be the same byte.
+        -:  236: */
+       11:  237:void const *sha3_Finalize(void *priv) {
+       11:  238:	sha3_context *ctx = (sha3_context *)priv;
+        -:  239:
+        -:  240:	SHA3_TRACE("called with %d bytes in the buffer", ctx->byteIndex);
+        -:  241:
+        -:  242:	/* Append 2-bit suffix 01, per SHA-3 spec. Instead of 1 for padding we
+        -:  243:	 * use 1<<2 below. The 0x02 below corresponds to the suffix 01.
+        -:  244:	 * Overall, we feed 0, then 1, and finally 1 to start padding. Without
+        -:  245:	 * M || 01, we would simply use 1 to start padding. */
+        -:  246:
+        -:  247:	u64 t;
+        -:  248:
+       11:  249:	if (ctx->capacityWords & SHA3_USE_KECCAK_FLAG) {
+        -:  250:		/* Keccak version */
+    #####:  251:		t = (u64)(((u64)1) << (ctx->byteIndex * 8));
+        -:  252:	} else {
+        -:  253:		/* SHA3 version */
+       11:  254:		t = (u64)(((u64)(0x02 | (1 << 2))) << ((ctx->byteIndex) * 8));
+        -:  255:	}
+        -:  256:
+       11:  257:	ctx->u.s[ctx->wordIndex] ^= ctx->saved ^ t;
+        -:  258:
+       11:  259:	ctx->u.s[SHA3_KECCAK_SPONGE_WORDS - SHA3_CW(ctx->capacityWords) - 1] ^=
+        -:  260:		SHA3_CONST(0x8000000000000000UL);
+       11:  261:	keccakf(ctx->u.s);
+        -:  262:
+        -:  263:	/* Return first bytes of the ctx->s. This conversion is not needed for
+        -:  264:	 * little-endian platforms e.g. wrap with #if !defined(__BYTE_ORDER__)
+        -:  265:	 * || !defined(__ORDER_LITTLE_ENDIAN__) || __BYTE_ORDER__!=__ORDER_LITTLE_ENDIAN__
+        -:  266:	 *    ... the conversion below ...
+        -:  267:	 * #endif */
+        -:  268:	{
+        -:  269:		unsigned i;
+      286:  270:		for (i = 0; i < SHA3_KECCAK_SPONGE_WORDS; i++) {
+      275:  271:			const unsigned t1 = (uint32_t)ctx->u.s[i];
+      275:  272:			const unsigned t2 = (uint32_t)((ctx->u.s[i] >> 16) >> 16);
+      275:  273:			ctx->u.sb[i * 8 + 0] = (uint8_t)(t1);
+      275:  274:			ctx->u.sb[i * 8 + 1] = (uint8_t)(t1 >> 8);
+      275:  275:			ctx->u.sb[i * 8 + 2] = (uint8_t)(t1 >> 16);
+      275:  276:			ctx->u.sb[i * 8 + 3] = (uint8_t)(t1 >> 24);
+      275:  277:			ctx->u.sb[i * 8 + 4] = (uint8_t)(t2);
+      275:  278:			ctx->u.sb[i * 8 + 5] = (uint8_t)(t2 >> 8);
+      275:  279:			ctx->u.sb[i * 8 + 6] = (uint8_t)(t2 >> 16);
+      275:  280:			ctx->u.sb[i * 8 + 7] = (uint8_t)(t2 >> 24);
+        -:  281:		}
+        -:  282:	}
+        -:  283:
+        -:  284:	SHA3_TRACE_BUF("Hash: (first 32 bytes)", ctx->u.sb, 256 / 8);
+        -:  285:
+       11:  286:	return (ctx->u.sb);
+        -:  287:}
+        -:  288:
+    #####:  289:sha3_return_t sha3_HashBuffer(unsigned bitSize, enum SHA3_FLAGS flags, const void *in,
+        -:  290:							  unsigned inBytes, void *out, unsigned outBytes) {
+        -:  291:	sha3_return_t err;
+        -:  292:	sha3_context c;
+        -:  293:
+    #####:  294:	err = sha3_Init(&c, bitSize);
+    #####:  295:	if (err != SHA3_RETURN_OK)
+    #####:  296:		return err;
+    #####:  297:	if (sha3_SetFlags(&c, flags) != flags) {
+    #####:  298:		return SHA3_RETURN_BAD_PARAMS;
+        -:  299:	}
+    #####:  300:	sha3_Update(&c, in, inBytes);
+    #####:  301:	const void *h = sha3_Finalize(&c);
+        -:  302:
+    #####:  303:	if (outBytes > bitSize / 8)
+    #####:  304:		outBytes = bitSize / 8;
+    #####:  305:	memcpy(out, h, outBytes);
+    #####:  306:	return SHA3_RETURN_OK;
+        -:  307:}
+        -:    0:Source:slabs.c
+        -:    0:Graph:slabs.gcno
+        -:    0:Data:slabs.gcda
+        -:    0:Runs:64
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/macro_utils.h>
+        -:   16:#include <base/panic.h>
+        -:   17:#include <base/resources.h>
+        -:   18:#include <base/slabs.h>
+        -:   19:#include <errno.h>
+        -:   20:#include <stdio.h>
+        -:   21:#include <stdlib.h>
+        -:   22:
+        -:   23:#define MALLOC_64_ID (INT64_MAX - 8)
+        -:   24:#define MALLOC_32_ID (INT32_MAX - 8)
+        -:   25:
+        -:   26:// Define both 64/32 bit impls the slab allocator will build the approproate types
+        -:   27:// based on configuration.
+        -:   28:typedef struct FatPtr64Impl {
+        -:   29:	u64 id;
+        -:   30:	u64 len;
+        -:   31:	void *data;
+        -:   32:} FatPtr64Impl;
+        -:   33:
+        -:   34:typedef struct FatPtr32Impl {
+        -:   35:	u32 id;
+        -:   36:	u32 len;
+        -:   37:	void *data;
+        -:   38:} FatPtr32Impl;
+        -:   39:
+        -:   40:const FatPtr32Impl fptr32null = {.id = 0, .len = 0, .data = NULL};
+        -:   41:const FatPtr null = {.data = (void *)&fptr32null};
+        -:   42:
+        -:   43:// deteremine which kind of fat pointer this is. 32 bit fat pointers are restricted to having an ID
+        -:   44:// that does not set the most significant bit. Therefore they must be less than 2^31 or the
+        -:   45:// maximum signed int value (INT32_MAX). Conversely, the 64 bit ids must have this bit set.
+        -:   46:// This is the slab allocator's responsibility to ensure the bit is set correctly.
+        -:   47:// Users need not worry about these details as they are handled internally.
+  2001102:   48:bool fat_ptr_is64(const FatPtr *ptr) {
+  2001102:   49:	return ((FatPtr32Impl *)ptr->data)->id & 0x1;
+        -:   50:}
+        -:   51:
+        -:   52:// Return the id of the FatPtr. First check bit for u64/u32 status, then return value.
+      200:   53:u64 fat_ptr_id(const FatPtr *ptr) {
+      200:   54:	if (fat_ptr_is64(ptr))
+      100:   55:		return ((FatPtr64Impl *)ptr->data)->id;
+        -:   56:	else
+      100:   57:		return ((FatPtr32Impl *)ptr->data)->id;
+        -:   58:}
+        -:   59:
+        -:   60:// Get the length of this FatPtr. Once again use the status bit in the id then return value.
+  2000613:   61:u64 fat_ptr_len(const FatPtr *ptr) {
+  2000613:   62:	if (fat_ptr_is64(ptr))
+      242:   63:		return ((FatPtr64Impl *)ptr->data)->len;
+        -:   64:	else
+  2000371:   65:		return ((FatPtr32Impl *)ptr->data)->len;
+        -:   66:}
+        -:   67:
+        -:   68:// Get the data pointer of this FatPtr. Once again use the status bit in the id then return value.
+      289:   69:void *fat_ptr_data(const FatPtr *ptr) {
+      289:   70:	if (fat_ptr_is64(ptr))
+      105:   71:		return ((FatPtr64Impl *)ptr->data)->data;
+        -:   72:	else
+      184:   73:		return ((FatPtr32Impl *)ptr->data)->data;
+        -:   74:}
+        -:   75:
+        -:   76:// Test function to free the 64 bit objects.
+      100:   77:void fat_ptr_free_test_obj64(FatPtr *ptr) {
+      100:   78:	if (ptr && ptr->data) {
+      100:   79:		myfree(ptr->data);
+      100:   80:		ptr->data = NULL;
+        -:   81:	}
+      100:   82:}
+        -:   83:
+        -:   84:// Test function to free the 32 bit objects.
+      100:   85:void fat_ptr_free_test_obj32(FatPtr *ptr) {
+      100:   86:	if (ptr && ptr->data) {
+      100:   87:		myfree(ptr->data);
+      100:   88:		ptr->data = NULL;
+        -:   89:	}
+      100:   90:}
+        -:   91:
+        -:   92:// Test function to allocate the 64 bit objects.
+      100:   93:void fat_ptr_test_obj64(FatPtr *ptr, u64 id, u64 len) {
+      100:   94:	ptr->data = mymalloc(3 * sizeof(u64) + len);
+      100:   95:	FatPtr64Impl *fptr = ptr->data;
+      100:   96:	fptr->id = id;
+      100:   97:	fptr->len = len;
+      100:   98:	fptr->data = ptr->data + 3 * sizeof(u64);
+      100:   99:}
+        -:  100:
+        -:  101:// Test function to allocate the 32 bit objects.
+      100:  102:void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len) {
+      100:  103:	ptr->data = mymalloc(2 * sizeof(u32) + sizeof(u64) + len);
+      100:  104:	FatPtr32Impl *fptr = ptr->data;
+      100:  105:	fptr->id = id;
+      100:  106:	fptr->len = len;
+      100:  107:	fptr->data = ptr->data + 2 * sizeof(u32) + sizeof(u64);
+      100:  108:}
+        -:  109:
+        -:  110:// SlabAllocator Config
+       24:  111:void slab_allocator_config_cleanup(SlabAllocatorConfigNc *sc) {
+       24:  112:	if (sc->slab_types) {
+       24:  113:		myfree(sc->slab_types);
+       24:  114:		sc->slab_types = NULL;
+        -:  115:	}
+       24:  116:}
+        -:  117:
+       27:  118:int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeroed, bool no_malloc,
+        -:  119:								bool is_64_bit) {
+       27:  120:	sc->zeroed = zeroed;
+       27:  121:	sc->no_malloc = no_malloc;
+       27:  122:	sc->is_64_bit = is_64_bit;
+       27:  123:	sc->slab_types_count = 0;
+       27:  124:	sc->slab_types = NULL;
+        -:  125:
+       27:  126:	return 0;
+        -:  127:}
+     1555:  128:int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st) {
+     1555:  129:	if (sc->slab_types) {
+     1531:  130:		void *tmp = myrealloc(sc->slab_types, sizeof(SlabType) * (1 + sc->slab_types_count));
+     1531:  131:		if (tmp == NULL)
+    #####:  132:			return -1;
+     1531:  133:		sc->slab_types = tmp;
+        -:  134:	} else {
+       24:  135:		sc->slab_types = mymalloc(sizeof(SlabType));
+       24:  136:		if (sc->slab_types == NULL)
+    #####:  137:			return -1;
+        -:  138:	}
+        -:  139:
+     1555:  140:	sc->slab_types[sc->slab_types_count] = *st;
+     1555:  141:	sc->slab_types_count++;
+        -:  142:
+     1555:  143:	return 0;
+        -:  144:}
+        -:  145:
+        -:  146:// Slab Allocator
+        -:  147:
+        -:  148:typedef struct SlabData {
+        -:  149:	SlabType type; // This slab data's type information (slab_size, slabs_per_resize, initial, max)
+        -:  150:	void **data;   // Pointers to each chunk
+        -:  151:	void *free_list;	// The free list pointers
+        -:  152:	u64 cur_chunks;		// number of chunks currently allocated
+        -:  153:	u64 cur_slabs;		// number of slabs currently allocated
+        -:  154:	u64 free_list_head; // the free list head
+        -:  155:} SlabData;
+        -:  156:
+        -:  157:typedef struct SlabAllocatorImpl {
+        -:  158:	u64 sd_size;	  // size of the SlabData array
+        -:  159:	SlabData *sd_arr; // slab data array one for each SlabType
+        -:  160:	bool no_malloc;	  // config no_malloc
+        -:  161:	bool zeroed;	  // config zeroed
+        -:  162:	bool is_64_bit;	  // config 64 bit id/len
+        -:  163:	u64 cur_mallocs;  // number of slabs allocated via malloc
+        -:  164:} SlabAllocatorImpl;
+        -:  165:
+        -:  166:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed);
+        -:  167:
+       23:  168:void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
+       23:  169:	if (ptr->impl) {
+       23:  170:		SlabAllocatorImpl *impl = ptr->impl;
+       23:  171:		if (impl->sd_arr) {
+     1576:  172:			for (u64 i = 0; i < impl->sd_size; i++) {
+     1580:  173:				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
+       27:  174:					if (impl->sd_arr[i].data[j]) {
+       27:  175:						myfree(impl->sd_arr[i].data[j]);
+       27:  176:						impl->sd_arr[i].data[j] = NULL;
+        -:  177:					}
+        -:  178:				}
+     1553:  179:				if (impl->sd_arr[i].data) {
+       22:  180:					myfree(impl->sd_arr[i].data);
+       22:  181:					impl->sd_arr[i].data = NULL;
+        -:  182:				}
+     1553:  183:				if (impl->sd_arr[i].free_list) {
+       22:  184:					myfree(impl->sd_arr[i].free_list);
+       22:  185:					impl->sd_arr[i].free_list = NULL;
+        -:  186:				}
+        -:  187:			}
+        -:  188:
+       23:  189:			myfree(impl->sd_arr);
+       23:  190:			impl->sd_arr = NULL;
+        -:  191:		}
+       23:  192:		myfree(ptr->impl);
+       23:  193:		ptr->impl = NULL;
+        -:  194:	}
+       23:  195:}
+        -:  196:
+     1569:  197:int slab_allocator_init_free_list(SlabData *sd, u64 slabs, u64 offset, bool is_64_bit) {
+        -:  198:	//  initialize the values of the free list.
+  1002513:  199:	for (u64 i = 0; i < slabs; i++) {
+  1000944:  200:		if (i == (slabs - 1)) {
+       27:  201:			if (is_64_bit)
+        2:  202:				((u64 *)(sd->free_list))[i + offset] = UINT64_MAX;
+        -:  203:			else
+       25:  204:				((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
+        -:  205:		} else {
+  1000917:  206:			if (is_64_bit)
+      108:  207:				((u64 *)(sd->free_list))[i + offset] = offset + i + 1;
+        -:  208:			else
+  1000809:  209:				((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
+        -:  210:		}
+        -:  211:	}
+        -:  212:
+     1569:  213:	return 0;
+        -:  214:}
+        -:  215:
+     1553:  216:int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
+     1553:  217:	impl->sd_arr[index].type = *st;
+     1553:  218:	if (impl->is_64_bit)
+        2:  219:		impl->sd_arr[index].type.slab_size += sizeof(u64) * 3;
+        -:  220:	else
+     1551:  221:		impl->sd_arr[index].type.slab_size += sizeof(u64) + sizeof(u32) * 2;
+     1553:  222:	impl->sd_arr[index].cur_slabs = 0;
+     1553:  223:	impl->sd_arr[index].cur_chunks = st->initial_chunks;
+     1553:  224:	if (st->initial_chunks > 0) {
+       11:  225:		impl->sd_arr[index].free_list_head = 0;
+       11:  226:		impl->sd_arr[index].data = mymalloc(sizeof(void *) * st->initial_chunks);
+       11:  227:		if (impl->sd_arr[index].data == NULL)
+    #####:  228:			return -1;
+        -:  229:	} else {
+     1542:  230:		impl->sd_arr[index].data = NULL;
+     1542:  231:		if (impl->is_64_bit)
+    #####:  232:			impl->sd_arr[index].free_list_head = UINT64_MAX;
+        -:  233:		else
+     1542:  234:			impl->sd_arr[index].free_list_head = UINT32_MAX;
+        -:  235:	}
+        -:  236:
+     1553:  237:	if (st->initial_chunks > 0) {
+       11:  238:		if (impl->is_64_bit)
+        2:  239:			impl->sd_arr[index].free_list =
+        2:  240:				mymalloc(sizeof(u64) * st->slabs_per_resize * st->initial_chunks);
+        -:  241:		else
+        9:  242:			impl->sd_arr[index].free_list =
+        9:  243:				mymalloc(sizeof(u32) * st->slabs_per_resize * st->initial_chunks);
+       11:  244:		if (impl->sd_arr[index].free_list == NULL) {
+    #####:  245:			myfree(impl->sd_arr[index].data);
+    #####:  246:			return -1;
+        -:  247:		}
+        -:  248:	} else {
+     1542:  249:		impl->sd_arr[index].free_list = NULL;
+        -:  250:	}
+        -:  251:
+     1564:  252:	for (u64 i = 0; i < st->initial_chunks; i++) {
+       22:  253:		impl->sd_arr[index].data[i] =
+       11:  254:			mymalloc(impl->sd_arr[index].type.slab_size * st->slabs_per_resize);
+        -:  255:
+       11:  256:		if (impl->sd_arr[index].data[i] == NULL) {
+    #####:  257:			for (u64 j = 0; j < i; j++) {
+    #####:  258:				myfree(impl->sd_arr[index].data[j]);
+        -:  259:			}
+    #####:  260:			myfree(impl->sd_arr[index].data);
+    #####:  261:			return -1;
+        -:  262:		}
+        -:  263:	}
+        -:  264:
+     1553:  265:	bool is_64_bit = impl->is_64_bit;
+     1553:  266:	slab_allocator_init_free_list(&impl->sd_arr[index], st->initial_chunks * st->slabs_per_resize,
+        -:  267:								  0, is_64_bit);
+        -:  268:
+     1553:  269:	return 0;
+        -:  270:}
+        -:  271:
+     6144:  272:int compare_sd(const void *a, const void *b) {
+     6144:  273:	const SlabData *sda = a;
+     6144:  274:	const SlabData *sdb = b;
+     6144:  275:	if (sda->type.slab_size < sdb->type.slab_size)
+     6144:  276:		return -1;
+    #####:  277:	else if (sda->type.slab_size > sdb->type.slab_size)
+    #####:  278:		return 1;
+    #####:  279:	return 0;
+        -:  280:}
+        -:  281:
+       23:  282:int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
+       23:  283:	SlabAllocatorImpl *impl = ptr->impl;
+       23:  284:	qsort(impl->sd_arr, impl->sd_size, sizeof(SlabData), compare_sd);
+       23:  285:	u32 last_slab_size = 0;
+     1575:  286:	for (u64 i = 0; i < impl->sd_size; i++) {
+     1553:  287:		if (last_slab_size >= impl->sd_arr[i].type.slab_size) {
+    #####:  288:			errno = EINVAL;
+    #####:  289:			return -1;
+        -:  290:		}
+        -:  291:		// for alignment, must be divisible by 8
+     1553:  292:		if (impl->sd_arr[i].type.slab_size % 8 != 0) {
+    #####:  293:			errno = EINVAL;
+    #####:  294:			return -1;
+        -:  295:		}
+        -:  296:		// can't have higher max slabs than initial
+     1553:  297:		if (impl->sd_arr[i].type.slabs_per_resize * impl->sd_arr[i].type.initial_chunks >
+     1553:  298:			impl->sd_arr[i].type.max_slabs) {
+    #####:  299:			errno = EINVAL;
+    #####:  300:			return -1;
+        -:  301:		}
+        -:  302:		// max slabs for 32 bit and 64 bit
+    1553*:  303:		if (impl->sd_arr[i].type.max_slabs > (INT32_MAX - 10) && !impl->is_64_bit) {
+    #####:  304:			errno = EINVAL;
+    #####:  305:			return -1;
+    1553*:  306:		} else if (impl->sd_arr[i].type.max_slabs > (INT64_MAX - 10) && impl->is_64_bit) {
+    #####:  307:			errno = EINVAL;
+    #####:  308:			return -1;
+        -:  309:		}
+        -:  310:
+        -:  311:		// max slabs must be dividisble by slabs_per_resize
+     1553:  312:		if (impl->sd_arr[i].type.max_slabs % impl->sd_arr[i].type.slabs_per_resize) {
+        1:  313:			errno = EINVAL;
+        1:  314:			return -1;
+        -:  315:		}
+     1552:  316:		last_slab_size = impl->sd_arr[i].type.slab_size;
+        -:  317:	}
+       22:  318:	return 0;
+        -:  319:}
+        -:  320:
+       23:  321:int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) {
+       23:  322:	ptr->impl = mymalloc(sizeof(SlabAllocatorImpl));
+       23:  323:	if (ptr->impl == NULL)
+    #####:  324:		return -1;
+       23:  325:	SlabAllocatorImpl *impl = ptr->impl;
+        -:  326:
+       23:  327:	impl->no_malloc = config->no_malloc;
+       23:  328:	impl->zeroed = config->zeroed;
+       23:  329:	impl->is_64_bit = config->is_64_bit;
+       23:  330:	impl->sd_size = config->slab_types_count;
+       23:  331:	impl->sd_arr = mymalloc(sizeof(SlabData) * impl->sd_size);
+       23:  332:	impl->cur_mallocs = 0;
+       23:  333:	if (impl->sd_arr == NULL) {
+    #####:  334:		myfree(ptr->impl);
+    #####:  335:		return -1;
+        -:  336:	}
+        -:  337:
+     1576:  338:	for (u64 i = 0; i < config->slab_types_count; i++) {
+     1553:  339:		if (slab_allocator_init_slab_data(impl, &config->slab_types[i], i)) {
+        -:  340:			// cleanup previously allocated slabs
+    #####:  341:			impl->sd_size = i;
+    #####:  342:			slab_allocator_cleanup(ptr);
+    #####:  343:			return -1;
+        -:  344:		}
+        -:  345:	}
+       23:  346:	int ret = slab_allocator_sort_slab_data(ptr);
+       23:  347:	if (ret)
+        1:  348:		slab_allocator_cleanup(ptr);
+       23:  349:	return ret;
+        -:  350:}
+        -:  351:
+  2000339:  352:int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
+  2000339:  353:	SlabAllocatorImpl *impl = ptr->impl;
+  2000339:  354:	int ret = -1;
+  2000339:  355:	if (impl->sd_size == 0)
+    #####:  356:		return ret;
+        -:  357:
+  2000339:  358:	int left = 0;
+  2000339:  359:	int right = impl->sd_size - 1;
+        -:  360:
+  3000586:  361:	while (left <= right) {
+  2000423:  362:		int mid = left + (right - left) / 2;
+  2000423:  363:		u32 slab_size = impl->sd_arr[mid].type.slab_size;
+  2000423:  364:		if (slab_size == size) {
+  1000176:  365:			ret = mid;
+  1000176:  366:			break;
+  1000247:  367:		} else if (slab_size > size)
+  1000204:  368:			right = mid - 1;
+        -:  369:		else
+       43:  370:			left = mid + 1;
+        -:  371:	}
+        -:  372:
+  2000339:  373:	if (ret == -1 && right + 1 <= impl->sd_size - 1) {
+  1000156:  374:		return right + 1;
+        -:  375:	}
+        -:  376:
+  1000183:  377:	return ret;
+        -:  378:}
+        -:  379:
+       29:  380:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
+       29:  381:	if (sd->cur_slabs < sd->type.max_slabs) {
+        -:  382:		// we can try to resize
+        -:  383:		// first try to reallocate the free list
+       16:  384:		void *nfree_list = NULL;
+        -:  385:		u64 factor;
+       16:  386:		if (is_64_bit)
+    #####:  387:			factor = sizeof(u64);
+        -:  388:		else
+       16:  389:			factor = sizeof(u32);
+       16:  390:		if (sd->free_list) {
+        -:  391:			nfree_list =
+        5:  392:				myrealloc(sd->free_list, (1 + sd->cur_chunks) * sd->type.slabs_per_resize * factor);
+        -:  393:		} else {
+        -:  394:
+       11:  395:			nfree_list = mymalloc(sd->type.slabs_per_resize * factor);
+        -:  396:		}
+       16:  397:		if (nfree_list == NULL)
+    #####:  398:			return -1;
+       16:  399:		sd->free_list = nfree_list;
+        -:  400:
+        -:  401:		// now try to allocate more slab chunks
+        -:  402:		void *ndata;
+       16:  403:		if (sd->data == NULL) {
+       11:  404:			ndata = mymalloc(sizeof(void *));
+        -:  405:		} else {
+        5:  406:			ndata = myrealloc(sd->data, sizeof(void *) * (1 + sd->cur_chunks));
+        -:  407:		}
+       16:  408:		if (ndata == NULL) {
+    #####:  409:			return -1;
+        -:  410:		}
+        -:  411:
+       16:  412:		sd->data = ndata;
+       16:  413:		sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
+       16:  414:		if (sd->data[sd->cur_chunks] == NULL)
+    #####:  415:			return -1;
+        -:  416:
+        -:  417:		// data was successfully allocated, make updates.
+       16:  418:		slab_allocator_init_free_list(sd, sd->type.slabs_per_resize, sd->cur_slabs, is_64_bit);
+       16:  419:		sd->free_list_head = sd->cur_slabs;
+       16:  420:		sd->cur_chunks += 1;
+        -:  421:
+       16:  422:		return slab_data_allocate(sd, fptr, is_64_bit, zeroed);
+        -:  423:	}
+       13:  424:	return -1;
+        -:  425:}
+        -:  426:
+  1000189:  427:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
+  1000189:  428:	u64 id = sd->free_list_head;
+  1000189:  429:	if (is_64_bit && id == UINT64_MAX) {
+        1:  430:		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
+  1000188:  431:	} else if (!is_64_bit && id == UINT32_MAX) {
+       28:  432:		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
+        -:  433:	}
+        -:  434:
+  1000160:  435:	if (is_64_bit) {
+       22:  436:		sd->free_list_head = ((u64 *)sd->free_list)[id];
+        -:  437:
+        -:  438:	} else {
+  1000138:  439:		sd->free_list_head = ((u32 *)sd->free_list)[id];
+        -:  440:	}
+        -:  441:
+        -:  442:	// set to MAX-1 as a marker that this is allocated
+        -:  443:	// if any freed without this value, it's an error
+  1000160:  444:	if (is_64_bit)
+       22:  445:		((u64 *)sd->free_list)[id] = (UINT64_MAX - 1);
+        -:  446:	else
+  1000138:  447:		((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
+        -:  448:
+  1000160:  449:	u64 len = sd->type.slab_size;
+  1000160:  450:	u64 slab_data_index = id / sd->type.slabs_per_resize;
+  1000160:  451:	u64 offset_mod = id % sd->type.slabs_per_resize;
+        -:  452:
+  1000160:  453:	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
+        -:  454:
+        -:  455:	u64 data_len;
+        -:  456:	u8 *data_ptr;
+  1000160:  457:	if (is_64_bit) {
+       22:  458:		FatPtr64Impl *fptr64 = fptr->data;
+       22:  459:		fptr64->id = (id * 2) + 1;
+       22:  460:		fptr64->len = len - 3 * sizeof(u64);
+       22:  461:		fptr64->data = fptr->data + 3 * sizeof(u64);
+       22:  462:		data_len = fptr64->len;
+       22:  463:		data_ptr = fptr64->data;
+        -:  464:	} else {
+  1000138:  465:		FatPtr32Impl *fptr32 = fptr->data;
+  1000138:  466:		fptr32->id = (id * 2);
+  1000138:  467:		fptr32->len = len - (2 * sizeof(u32) + sizeof(u64));
+  1000138:  468:		fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
+  1000138:  469:		data_len = fptr32->len;
+  1000138:  470:		data_ptr = fptr32->data;
+        -:  471:	}
+        -:  472:
+  1000160:  473:	sd->cur_slabs += 1;
+  1000160:  474:	if (zeroed) {
+      500:  475:		for (u64 i = 0; i < data_len; i++) {
+      480:  476:			data_ptr[i] = 0;
+        -:  477:		}
+        -:  478:	}
+        -:  479:
+  1000160:  480:	return 0;
+        -:  481:}
+        -:  482:
+  1000159:  483:void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit, bool zeroed) {
+        -:  484:	u64 data_len;
+        -:  485:	u8 *data_ptr;
+  1000159:  486:	if (is_64_bit) {
+       22:  487:		FatPtr64Impl *fptr64 = fptr->data;
+       22:  488:		data_len = fptr64->len;
+       22:  489:		data_ptr = fptr64->data;
+       22:  490:		u64 id = (fptr64->id - 1) / 2;
+       22:  491:		if (((u64 *)sd->free_list)[id] != (UINT64_MAX - 1)) {
+    #####:  492:			panic("Potential double free. Id = %llu.\n", id);
+        -:  493:		}
+       22:  494:		((u64 *)sd->free_list)[id] = sd->free_list_head;
+       22:  495:		sd->free_list_head = id;
+       22:  496:		if (sd->cur_slabs == 0)
+    #####:  497:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
+       22:  498:		sd->cur_slabs -= 1;
+        -:  499:	} else {
+  1000137:  500:		FatPtr32Impl *fptr32 = fptr->data;
+  1000137:  501:		data_len = fptr32->len;
+  1000137:  502:		data_ptr = fptr32->data;
+  1000137:  503:		u32 id = (fptr32->id) / 2;
+  1000137:  504:		if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
+    #####:  505:			panic("Potential double free. Id = %llu.\n", id);
+        -:  506:		}
+  1000137:  507:		((u32 *)sd->free_list)[id] = sd->free_list_head;
+  1000137:  508:		sd->free_list_head = id;
+  1000137:  509:		if (sd->cur_slabs == 0)
+    #####:  510:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
+  1000137:  511:		sd->cur_slabs -= 1;
+        -:  512:	}
+        -:  513:
+  1000159:  514:	if (zeroed) {
+      500:  515:		for (u64 i = 0; i < data_len; i++) {
+      480:  516:			data_ptr[i] = 0;
+        -:  517:		}
+        -:  518:	}
+  1000159:  519:}
+        -:  520:
+  1000180:  521:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
+  1000180:  522:	if (size == 0) {
+    #####:  523:		errno = EINVAL;
+    #####:  524:		return -1;
+        -:  525:	}
+  1000180:  526:	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
+  1000180:  527:	bool is_64_bit = impl->is_64_bit;
+  1000180:  528:	bool zeroed = impl->zeroed;
+        -:  529:	u32 needed;
+  1000180:  530:	if (is_64_bit)
+       23:  531:		needed = size + 3 * sizeof(u64);
+        -:  532:	else
+  1000157:  533:		needed = size + 2 * sizeof(u32) + sizeof(u64);
+  1000180:  534:	int index = slab_allocator_index(ptr, needed);
+        -:  535:	int ret;
+  1000180:  536:	if (impl->no_malloc && index < 0) {
+        7:  537:		return -1;
+  1000173:  538:	} else if (index < 0) {
+    #####:  539:		ret = -1;
+        -:  540:	} else {
+  1000173:  541:		SlabData *sd = &impl->sd_arr[index];
+  1000173:  542:		ret = slab_data_allocate(sd, fptr, is_64_bit, zeroed);
+        -:  543:	}
+        -:  544:
+        -:  545:	// we couldn't allocate via slabs. Use malloc if configured.
+  1000173:  546:	if (ret && !impl->no_malloc) {
+        -:  547:		void *val;
+        -:  548:		u64 data_len;
+        -:  549:
+        2:  550:		if (is_64_bit) {
+    #####:  551:			data_len = size + (3 * sizeof(u64));
+    #####:  552:			val = mymalloc(data_len);
+        -:  553:		} else {
+        2:  554:			data_len = size + (2 * sizeof(u32) + sizeof(u64));
+        2:  555:			val = mymalloc(data_len);
+        -:  556:		}
+        -:  557:
+        -:  558:		// malloc error
+        2:  559:		if (!val)
+    #####:  560:			return -1;
+        -:  561:
+        2:  562:		if (zeroed) {
+       25:  563:			for (u64 i = 0; i < data_len; i++) {
+       24:  564:				((u8 *)val)[i] = 0;
+        -:  565:			}
+        -:  566:		}
+        -:  567:
+        2:  568:		impl->cur_mallocs++;
+        2:  569:		ret = 0;
+        2:  570:		fptr->data = val;
+        -:  571:
+        2:  572:		if (is_64_bit) {
+    #####:  573:			FatPtr64Impl *fptr64 = fptr->data;
+    #####:  574:			fptr64->id = MALLOC_64_ID;
+    #####:  575:			fptr64->len = size;
+    #####:  576:			fptr64->data = fptr->data + 3 * sizeof(u64);
+        -:  577:		} else {
+        2:  578:			FatPtr32Impl *fptr32 = fptr->data;
+        2:  579:			fptr32->id = MALLOC_32_ID;
+        2:  580:			fptr32->len = size;
+        2:  581:			fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
+        -:  582:		}
+        -:  583:	}
+  1000173:  584:	return ret;
+        -:  585:}
+  1000161:  586:void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
+  1000161:  587:	SlabAllocatorImpl *impl = ptr->impl;
+  1000161:  588:	bool is_64_bit = impl->is_64_bit;
+        -:  589:
+  1000161:  590:	if (is_64_bit) {
+       22:  591:		FatPtr64Impl *fptr64 = fptr->data;
+       22:  592:		if (fptr64->id == MALLOC_64_ID) {
+    #####:  593:			if (fptr->data) {
+    #####:  594:				if (impl->zeroed) {
+    #####:  595:					for (u64 i = 0; i < fptr64->len + 3 * sizeof(u64); i++) {
+    #####:  596:						((u8 *)fptr->data)[i] = 0;
+        -:  597:					}
+        -:  598:				}
+    #####:  599:				if (impl->cur_mallocs == 0)
+    #####:  600:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
+    #####:  601:				myfree(fptr->data);
+    #####:  602:				impl->cur_mallocs--;
+        -:  603:			}
+    #####:  604:			*fptr = null;
+    #####:  605:			return;
+        -:  606:		}
+        -:  607:	} else {
+  1000139:  608:		FatPtr32Impl *fptr32 = fptr->data;
+  1000139:  609:		if (fptr32->id == MALLOC_32_ID) {
+        2:  610:			if (fptr->data) {
+        2:  611:				if (impl->zeroed) {
+       17:  612:					for (u64 i = 0; i < fptr32->len + 2 * sizeof(u32) + sizeof(u64); i++) {
+       16:  613:						((u8 *)fptr->data)[i] = 0;
+        -:  614:					}
+        -:  615:				}
+        2:  616:				if (impl->cur_mallocs == 0)
+    #####:  617:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
+        2:  618:				myfree(fptr->data);
+        2:  619:				impl->cur_mallocs--;
+        -:  620:			}
+        2:  621:			*fptr = null;
+        2:  622:			return;
+        -:  623:		}
+        -:  624:	}
+        -:  625:
+        -:  626:	u32 needed;
+  1000159:  627:	if (is_64_bit)
+       22:  628:		needed = fat_ptr_len(fptr) + 3 * sizeof(u64);
+        -:  629:	else
+  1000137:  630:		needed = fat_ptr_len(fptr) + 2 * sizeof(u32) + sizeof(u64);
+  1000159:  631:	int index = slab_allocator_index(ptr, needed);
+  1000159:  632:	if (index < 0)
+    #####:  633:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
+  1000159:  634:	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
+  1000159:  635:	if (needed != sd->type.slab_size)
+    #####:  636:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
+  1000159:  637:	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit,
+  1000159:  638:				   ((SlabAllocatorImpl *)ptr->impl)->zeroed);
+  1000159:  639:	*fptr = null;
+        -:  640:}
+       25:  641:u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
+       25:  642:	SlabAllocatorImpl *impl = ptr->impl;
+       25:  643:	u64 ret = impl->cur_mallocs;
+        -:  644:
+     1580:  645:	for (u64 i = 0; i < impl->sd_size; i++) {
+     1555:  646:		ret += impl->sd_arr[i].cur_slabs;
+        -:  647:	}
+       25:  648:	return ret;
+        -:  649:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:56
+        -:    0:Runs:64
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1995,12 +3228,12 @@
         -:   17:#include <stdio.h>
         -:   18:#include <stdlib.h>
         -:   19:
-       56:   20:bool __is_little_endian() {
-       56:   21:	u16 test = 0x1;
-       56:   22:	return (*(u8 *)&test == 0x1);
+       64:   20:bool __is_little_endian() {
+       64:   21:	u16 test = 0x1;
+       64:   22:	return (*(u8 *)&test == 0x1);
         -:   23:}
         -:   24:
-       56:   25:void __attribute__((constructor)) __check_64bit_arch__() {
+       64:   25:void __attribute__((constructor)) __check_64bit_arch__() {
         -:   26:	if (sizeof(size_t) != 8) {
         -:   27:		fprintf(stderr, "Error: This program requires a 64-bit architecture to run.\n");
         -:   28:		exit(EXIT_FAILURE);
@@ -2014,11 +3247,11 @@
         -:   36:		exit(EXIT_FAILURE);
         -:   37:	}
         -:   38:
-       56:   39:	if (!__is_little_endian()) {
+       64:   39:	if (!__is_little_endian()) {
     #####:   40:		fprintf(stderr, "Big endian systems not supported");
     #####:   41:		exit(EXIT_FAILURE);
         -:   42:	}
-       56:   43:}
+       64:   43:}
         -:    0:Source:lexer.c
         -:    0:Graph:lexer.gcno
         -:    0:Data:lexer.gcda
@@ -2766,651 +3999,3 @@
     #####:   47:int famlobj_add_i16(FamlObj *obj, const char *key, const i16 value) {
     #####:   48:	return 0;
         -:   49:}
-        -:    0:Source:panic.c
-        -:    0:Graph:panic.gcno
-        -:    0:Data:panic.gcda
-        -:    0:Runs:11
-        -:    1:// Copyright (c) 2024, The MyFamily Developers
-        -:    2://
-        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
-        -:    4:// you may not use this file except in compliance with the License.
-        -:    5:// You may obtain a copy of the License at
-        -:    6://
-        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
-        -:    8://
-        -:    9:// Unless required by applicable law or agreed to in writing, software
-        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
-        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        -:   12:// See the License for the specific language governing permissions and
-        -:   13:// limitations under the License.
-        -:   14:
-        -:   15:#include <setjmp.h>
-        -:   16:#include <signal.h>
-        -:   17:#include <stdarg.h>
-        -:   18:#include <stdio.h>
-        -:   19:#include <stdlib.h>
-        -:   20:#include <string.h>
-        -:   21:#include <util/panic.h>
-        -:   22:
-        -:   23:void exit(int value);
-        -:   24:
-        -:   25:#define MAX_PANIC_MSG 1024
-        -:   26:
-        -:   27:_Thread_local jmp_buf return_jmp;
-        -:   28:_Thread_local bool jmp_return_set = false;
-        -:   29:_Thread_local char panic_buf[MAX_PANIC_MSG];
-        -:   30:
-    #####:   31:void panic(const char *fmt, ...) {
-        -:   32:	va_list args;
-        -:   33:
-    #####:   34:	fprintf(stderr, "thread panicked: ");
-    #####:   35:	va_start(args, fmt);
-    #####:   36:	vfprintf(stderr, fmt, args);
-    #####:   37:	vsnprintf(panic_buf, MAX_PANIC_MSG, fmt, args);
-    #####:   38:	va_end(args);
-    #####:   39:	fprintf(stderr, "\n");
-        -:   40:
-        -:   41:	// If jump return has not been set, we resort to an exit with an error
-        -:   42:	// status.
-    #####:   43:	if (!jmp_return_set)
-    #####:   44:		exit(-1);
-    #####:   45:	longjmp(return_jmp, THREAD_PANIC);
-        -:   46:}
-        -:   47:
-    #####:   48:void signal_handler(int signal) {
-        -:   49:	// Handle the signal and call the _on_panic function
-    #####:   50:	panic("Caught signal: %d", signal);
-    #####:   51:}
-        -:   52:
-    #####:   53:void set_on_panic(panic_handler_t on_panic) {
-        -:   54:	struct sigaction sa;
-    #####:   55:	memset(&sa, 0, sizeof(sa));
-    #####:   56:	sa.sa_handler = signal_handler;
-        -:   57:	// Catching only error signals
-    #####:   58:	sigaction(SIGSEGV, &sa, NULL); // Segmentation fault
-    #####:   59:	sigaction(SIGABRT, &sa, NULL); // Abort signal
-    #####:   60:	sigaction(SIGTRAP, &sa, NULL); // Signal trap
-    #####:   61:	sigaction(SIGILL, &sa, NULL);  // Illegal instruction
-    #####:   62:	sigaction(SIGFPE, &sa, NULL);  // Arithmetic error
-    #####:   63:	sigaction(SIGBUS, &sa, NULL);  // Bus error
-        -:   64:
-    #####:   65:	jmp_return_set = true;
-    #####:   66:	int value = setjmp(return_jmp);
-    #####:   67:	if (value)
-    #####:   68:		on_panic(panic_buf);
-    #####:   69:}
-        -:    0:Source:slabs.c
-        -:    0:Graph:slabs.gcno
-        -:    0:Data:slabs.gcda
-        -:    0:Runs:11
-        -:    1:// Copyright (c) 2024, The MyFamily Developers
-        -:    2://
-        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
-        -:    4:// you may not use this file except in compliance with the License.
-        -:    5:// You may obtain a copy of the License at
-        -:    6://
-        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
-        -:    8://
-        -:    9:// Unless required by applicable law or agreed to in writing, software
-        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
-        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        -:   12:// See the License for the specific language governing permissions and
-        -:   13:// limitations under the License.
-        -:   14:
-        -:   15:#include <base/macro_utils.h>
-        -:   16:#include <base/resources.h>
-        -:   17:#include <errno.h>
-        -:   18:#include <stdio.h>
-        -:   19:#include <stdlib.h>
-        -:   20:#include <util/panic.h>
-        -:   21:#include <util/slabs.h>
-        -:   22:
-        -:   23:#define MALLOC_64_ID (INT64_MAX - 8)
-        -:   24:#define MALLOC_32_ID (INT32_MAX - 8)
-        -:   25:
-        -:   26:// Define both 64/32 bit impls the slab allocator will build the approproate types
-        -:   27:// based on configuration.
-        -:   28:typedef struct FatPtr64Impl {
-        -:   29:	u64 id;
-        -:   30:	u64 len;
-        -:   31:	void *data;
-        -:   32:} FatPtr64Impl;
-        -:   33:
-        -:   34:typedef struct FatPtr32Impl {
-        -:   35:	u32 id;
-        -:   36:	u32 len;
-        -:   37:	void *data;
-        -:   38:} FatPtr32Impl;
-        -:   39:
-        -:   40:// deteremine which kind of fat pointer this is. 32 bit fat pointers are restricted to having an ID
-        -:   41:// that does not set the most significant bit. Therefore they must be less than 2^31 or the
-        -:   42:// maximum signed int value (INT32_MAX). Conversely, the 64 bit ids must have this bit set.
-        -:   43:// This is the slab allocator's responsibility to ensure the bit is set correctly.
-        -:   44:// Users need not worry about these details as they are handled internally.
-  2000915:   45:bool fat_ptr_is64(const FatPtr *ptr) {
-  2000915:   46:	return ((FatPtr32Impl *)ptr->data)->id & 0x1;
-        -:   47:}
-        -:   48:
-        -:   49:// Return the id of the FatPtr. First check bit for u64/u32 status, then return value.
-      200:   50:u64 fat_ptr_id(const FatPtr *ptr) {
-      200:   51:	if (fat_ptr_is64(ptr))
-      100:   52:		return ((FatPtr64Impl *)ptr->data)->id;
-        -:   53:	else
-      100:   54:		return ((FatPtr32Impl *)ptr->data)->id;
-        -:   55:}
-        -:   56:
-        -:   57:// Get the length of this FatPtr. Once again use the status bit in the id then return value.
-  2000505:   58:u64 fat_ptr_len(const FatPtr *ptr) {
-  2000505:   59:	if (fat_ptr_is64(ptr))
-      142:   60:		return ((FatPtr64Impl *)ptr->data)->len;
-        -:   61:	else
-  2000363:   62:		return ((FatPtr32Impl *)ptr->data)->len;
-        -:   63:}
-        -:   64:
-        -:   65:// Get the data pointer of this FatPtr. Once again use the status bit in the id then return value.
-      210:   66:void *fat_ptr_data(const FatPtr *ptr) {
-      210:   67:	if (fat_ptr_is64(ptr))
-      105:   68:		return ((FatPtr64Impl *)ptr->data)->data;
-        -:   69:	else
-      105:   70:		return ((FatPtr32Impl *)ptr->data)->data;
-        -:   71:}
-        -:   72:
-        -:   73:// Test function to free the 64 bit objects.
-      100:   74:void fat_ptr_free_test_obj64(FatPtr *ptr) {
-      100:   75:	if (ptr && ptr->data) {
-      100:   76:		myfree(ptr->data);
-      100:   77:		ptr->data = NULL;
-        -:   78:	}
-      100:   79:}
-        -:   80:
-        -:   81:// Test function to free the 32 bit objects.
-      100:   82:void fat_ptr_free_test_obj32(FatPtr *ptr) {
-      100:   83:	if (ptr && ptr->data) {
-      100:   84:		myfree(ptr->data);
-      100:   85:		ptr->data = NULL;
-        -:   86:	}
-      100:   87:}
-        -:   88:
-        -:   89:// Test function to allocate the 64 bit objects.
-      100:   90:void fat_ptr_test_obj64(FatPtr *ptr, u64 id, u64 len) {
-      100:   91:	ptr->data = mymalloc(3 * sizeof(u64) + len);
-      100:   92:	FatPtr64Impl *fptr = ptr->data;
-      100:   93:	fptr->id = id;
-      100:   94:	fptr->len = len;
-      100:   95:	fptr->data = ptr->data + 3 * sizeof(u64);
-      100:   96:}
-        -:   97:
-        -:   98:// Test function to allocate the 32 bit objects.
-      100:   99:void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len) {
-      100:  100:	ptr->data = mymalloc(2 * sizeof(u32) + sizeof(u64) + len);
-      100:  101:	FatPtr32Impl *fptr = ptr->data;
-      100:  102:	fptr->id = id;
-      100:  103:	fptr->len = len;
-      100:  104:	fptr->data = ptr->data + 2 * sizeof(u32) + sizeof(u64);
-      100:  105:}
-        -:  106:
-        -:  107:// SlabAllocator Config
-        8:  108:void slab_allocator_config_cleanup(SlabAllocatorConfigNc *sc) {
-        8:  109:	if (sc->slab_types) {
-        8:  110:		myfree(sc->slab_types);
-        8:  111:		sc->slab_types = NULL;
-        -:  112:	}
-        8:  113:}
-        -:  114:
-       11:  115:int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeroed, bool no_malloc,
-        -:  116:								bool is_64_bit) {
-       11:  117:	sc->zeroed = zeroed;
-       11:  118:	sc->no_malloc = no_malloc;
-       11:  119:	sc->is_64_bit = is_64_bit;
-       11:  120:	sc->slab_types_count = 0;
-       11:  121:	sc->slab_types = NULL;
-        -:  122:
-       11:  123:	return 0;
-        -:  124:}
-        9:  125:int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st) {
-        9:  126:	if (sc->slab_types) {
-        1:  127:		void *tmp = myrealloc(sc->slab_types, sizeof(SlabType) * (1 + sc->slab_types_count));
-        1:  128:		if (tmp == NULL)
-    #####:  129:			return -1;
-        1:  130:		sc->slab_types = tmp;
-        -:  131:	} else {
-        8:  132:		sc->slab_types = mymalloc(sizeof(SlabType));
-        8:  133:		if (sc->slab_types == NULL)
-    #####:  134:			return -1;
-        -:  135:	}
-        -:  136:
-        9:  137:	sc->slab_types[sc->slab_types_count] = *st;
-        9:  138:	sc->slab_types_count++;
-        -:  139:
-        9:  140:	return 0;
-        -:  141:}
-        -:  142:
-        -:  143:// Slab Allocator
-        -:  144:
-        -:  145:typedef struct SlabData {
-        -:  146:	SlabType type; // This slab data's type information (slab_size, slabs_per_resize, initial, max)
-        -:  147:	void **data;   // Pointers to each chunk
-        -:  148:	void *free_list;	// The free list pointers
-        -:  149:	u64 cur_chunks;		// number of chunks currently allocated
-        -:  150:	u64 cur_slabs;		// number of slabs currently allocated
-        -:  151:	u64 free_list_head; // the free list head
-        -:  152:} SlabData;
-        -:  153:
-        -:  154:typedef struct SlabAllocatorImpl {
-        -:  155:	u64 sd_size;	  // size of the SlabData array
-        -:  156:	SlabData *sd_arr; // slab data array one for each SlabType
-        -:  157:	bool no_malloc;	  // config no_malloc
-        -:  158:	bool zeroed;	  // config zeroed
-        -:  159:	bool is_64_bit;	  // config 64 bit id/len
-        -:  160:	u64 cur_mallocs;  // number of slabs allocated via malloc
-        -:  161:} SlabAllocatorImpl;
-        -:  162:
-        -:  163:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit);
-        -:  164:
-        7:  165:void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
-        7:  166:	if (ptr->impl) {
-        7:  167:		SlabAllocatorImpl *impl = ptr->impl;
-        7:  168:		if (impl->sd_arr) {
-       14:  169:			for (u64 i = 0; i < impl->sd_size; i++) {
-       15:  170:				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
-        8:  171:					if (impl->sd_arr[i].data[j]) {
-        8:  172:						myfree(impl->sd_arr[i].data[j]);
-        8:  173:						impl->sd_arr[i].data[j] = NULL;
-        -:  174:					}
-        -:  175:				}
-        7:  176:				if (impl->sd_arr[i].data) {
-        7:  177:					myfree(impl->sd_arr[i].data);
-        7:  178:					impl->sd_arr[i].data = NULL;
-        -:  179:				}
-        7:  180:				if (impl->sd_arr[i].free_list) {
-        7:  181:					myfree(impl->sd_arr[i].free_list);
-        7:  182:					impl->sd_arr[i].free_list = NULL;
-        -:  183:				}
-        -:  184:			}
-        -:  185:
-        7:  186:			myfree(impl->sd_arr);
-        7:  187:			impl->sd_arr = NULL;
-        -:  188:		}
-        7:  189:		myfree(ptr->impl);
-        7:  190:		ptr->impl = NULL;
-        -:  191:	}
-        7:  192:}
-        -:  193:
-        8:  194:int slab_allocator_init_free_list(SlabData *sd, u64 offset, bool is_64_bit) {
-        8:  195:	u64 slabs = sd->type.initial_chunks * sd->type.slabs_per_resize;
-        -:  196:	// initialize the values of the free list.
-  1000348:  197:	for (u64 i = 0; i < slabs; i++) {
-  1000340:  198:		if (i == (slabs - 1)) {
-        8:  199:			if (is_64_bit)
-        2:  200:				((u64 *)(sd->free_list))[i + offset] = UINT64_MAX;
-        -:  201:			else
-        6:  202:				((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
-        -:  203:		} else {
-  1000332:  204:			if (is_64_bit)
-      108:  205:				((u64 *)(sd->free_list))[i + offset] = offset + i + 1;
-        -:  206:			else
-  1000224:  207:				((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
-        -:  208:		}
-        -:  209:	}
-        -:  210:
-        8:  211:	return 0;
-        -:  212:}
-        -:  213:
-        7:  214:int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
-        7:  215:	impl->sd_arr[index].type = *st;
-        7:  216:	impl->sd_arr[index].cur_slabs = 0;
-        7:  217:	impl->sd_arr[index].cur_chunks = st->initial_chunks;
-        7:  218:	impl->sd_arr[index].free_list_head = 0;
-        7:  219:	if (st->initial_chunks > 0)
-        7:  220:		impl->sd_arr[index].data = mymalloc(sizeof(void *) * st->initial_chunks);
-        -:  221:	else
-    #####:  222:		impl->sd_arr[index].data = NULL;
-        7:  223:	if (impl->sd_arr[index].data == NULL)
-    #####:  224:		return -1;
-        -:  225:
-        7:  226:	if (st->initial_chunks > 0) {
-        7:  227:		if (impl->is_64_bit)
-        2:  228:			impl->sd_arr[index].free_list =
-        2:  229:				mymalloc(sizeof(u64) * st->slabs_per_resize * st->initial_chunks);
-        -:  230:		else
-        5:  231:			impl->sd_arr[index].free_list =
-        5:  232:				mymalloc(sizeof(u32) * st->slabs_per_resize * st->initial_chunks);
-        -:  233:	} else {
-    #####:  234:		impl->sd_arr[index].free_list = NULL;
-        -:  235:	}
-        -:  236:
-        7:  237:	if (impl->sd_arr[index].free_list == NULL) {
-    #####:  238:		myfree(impl->sd_arr[index].data);
-    #####:  239:		return -1;
-        -:  240:	}
-        -:  241:
-       14:  242:	for (u64 i = 0; i < st->initial_chunks; i++) {
-        7:  243:		impl->sd_arr[index].data[i] = mymalloc(st->slab_size * st->slabs_per_resize);
-        -:  244:
-        7:  245:		if (impl->sd_arr[index].data[i] == NULL) {
-    #####:  246:			for (u64 j = 0; j < i; j++) {
-    #####:  247:				myfree(impl->sd_arr[index].data[j]);
-        -:  248:			}
-    #####:  249:			myfree(impl->sd_arr[index].data);
-    #####:  250:			return -1;
-        -:  251:		}
-        -:  252:	}
-        -:  253:
-        7:  254:	bool is_64_bit = impl->is_64_bit;
-        7:  255:	slab_allocator_init_free_list(&impl->sd_arr[index], 0, is_64_bit);
-        -:  256:
-        7:  257:	return 0;
-        -:  258:}
-        -:  259:
-    #####:  260:int compare_sd(const void *a, const void *b) {
-    #####:  261:	const SlabData *sda = a;
-    #####:  262:	const SlabData *sdb = b;
-    #####:  263:	if (sda->type.slab_size < sdb->type.slab_size)
-    #####:  264:		return -1;
-    #####:  265:	else if (sda->type.slab_size > sdb->type.slab_size)
-    #####:  266:		return 1;
-    #####:  267:	return 0;
-        -:  268:}
-        -:  269:
-        7:  270:int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
-        7:  271:	SlabAllocatorImpl *impl = ptr->impl;
-        7:  272:	qsort(impl->sd_arr, impl->sd_size, sizeof(SlabData), compare_sd);
-        7:  273:	u32 last_slab_size = 0;
-       14:  274:	for (u64 i = 0; i < impl->sd_size; i++) {
-        7:  275:		if (last_slab_size >= impl->sd_arr[i].type.slab_size) {
-    #####:  276:			errno = EINVAL;
-    #####:  277:			return -1;
-        -:  278:		}
-        -:  279:		// for alignment, must be divisible by 8
-        7:  280:		if (impl->sd_arr[i].type.slab_size % 8 != 0) {
-    #####:  281:			errno = EINVAL;
-    #####:  282:			return -1;
-        -:  283:		}
-        -:  284:		// can't have higher max slabs than initial
-        7:  285:		if (impl->sd_arr[i].type.slabs_per_resize * impl->sd_arr[i].type.initial_chunks >
-        7:  286:			impl->sd_arr[i].type.max_slabs) {
-    #####:  287:			errno = EINVAL;
-    #####:  288:			return -1;
-        -:  289:		}
-        -:  290:		// max slabs for 32 bit and 64 bit
-       7*:  291:		if (impl->sd_arr[i].type.max_slabs > (INT32_MAX - 10) && !impl->is_64_bit) {
-    #####:  292:			errno = EINVAL;
-    #####:  293:			return -1;
-       7*:  294:		} else if (impl->sd_arr[i].type.max_slabs > (INT64_MAX - 10) && impl->is_64_bit) {
-    #####:  295:			errno = EINVAL;
-    #####:  296:			return -1;
-        -:  297:		}
-        7:  298:		last_slab_size = impl->sd_arr[i].type.slab_size;
-        -:  299:	}
-        7:  300:	return 0;
-        -:  301:}
-        -:  302:
-        7:  303:int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) {
-        7:  304:	ptr->impl = mymalloc(sizeof(SlabAllocatorImpl));
-        7:  305:	if (ptr->impl == NULL)
-    #####:  306:		return -1;
-        7:  307:	SlabAllocatorImpl *impl = ptr->impl;
-        -:  308:
-        7:  309:	impl->no_malloc = config->no_malloc;
-        7:  310:	impl->zeroed = config->zeroed;
-        7:  311:	impl->is_64_bit = config->is_64_bit;
-        7:  312:	impl->sd_size = config->slab_types_count;
-        7:  313:	impl->sd_arr = mymalloc(sizeof(SlabData) * impl->sd_size);
-        7:  314:	impl->cur_mallocs = 0;
-        7:  315:	if (impl->sd_arr == NULL) {
-    #####:  316:		myfree(ptr->impl);
-    #####:  317:		return -1;
-        -:  318:	}
-        -:  319:
-       14:  320:	for (u64 i = 0; i < config->slab_types_count; i++) {
-        7:  321:		if (slab_allocator_init_slab_data(impl, &config->slab_types[i], i)) {
-        -:  322:			// cleanup previously allocated slabs
-    #####:  323:			impl->sd_size = i;
-    #####:  324:			slab_allocator_cleanup(ptr);
-    #####:  325:			return -1;
-        -:  326:		}
-        -:  327:	}
-        7:  328:	return slab_allocator_sort_slab_data(ptr);
-        -:  329:}
-        -:  330:
-  2000313:  331:int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
-  2000313:  332:	SlabAllocatorImpl *impl = ptr->impl;
-  2000313:  333:	int ret = -1;
-  2000313:  334:	if (impl->sd_size == 0)
-    #####:  335:		return ret;
-        -:  336:
-  2000313:  337:	int left = 0;
-  2000313:  338:	int right = impl->sd_size - 1;
-        -:  339:
-  2000357:  340:	while (left <= right) {
-  2000313:  341:		int mid = left + (right - left) / 2;
-  2000313:  342:		u32 slab_size = impl->sd_arr[mid].type.slab_size;
-  2000313:  343:		if (slab_size == size) {
-  2000269:  344:			ret = mid;
-  2000269:  345:			break;
-       44:  346:		} else if (slab_size > size)
-       44:  347:			right = mid - 1;
-        -:  348:		else
-    #####:  349:			left = mid + 1;
-        -:  350:	}
-        -:  351:
-  2000313:  352:	if (ret == -1 && right + 1 <= impl->sd_size - 1) {
-       44:  353:		return right + 1;
-        -:  354:	}
-        -:  355:
-  2000269:  356:	return ret;
-        -:  357:}
-        -:  358:
-        4:  359:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
-        4:  360:	if (sd->cur_slabs < sd->type.max_slabs) {
-        -:  361:		// we can try to resize
-        -:  362:
-        -:  363:		// first try to reallocate the free list
-        1:  364:		void *nfree_list = NULL;
-        -:  365:		u64 factor;
-        1:  366:		if (is_64_bit)
-    #####:  367:			factor = sizeof(u64);
-        -:  368:		else
-        1:  369:			factor = sizeof(u32);
-        1:  370:		if (sd->free_list) {
-        -:  371:			nfree_list =
-        1:  372:				myrealloc(sd->free_list, (1 + sd->cur_chunks) * sd->type.slabs_per_resize * factor);
-        -:  373:		} else {
-        -:  374:
-    #####:  375:			nfree_list = mymalloc(sd->type.slabs_per_resize * factor);
-        -:  376:		}
-        1:  377:		if (nfree_list == NULL)
-    #####:  378:			return -1;
-        1:  379:		sd->free_list = nfree_list;
-        -:  380:
-        -:  381:		// now try to allocate more slab chunks
-        -:  382:		void *ndata;
-        1:  383:		if (sd->data == NULL) {
-    #####:  384:			ndata = mymalloc(sizeof(void *));
-        -:  385:		} else {
-        1:  386:			ndata = myrealloc(sd->data, sizeof(void *) * (1 + sd->cur_chunks));
-        -:  387:		}
-        1:  388:		if (ndata == NULL) {
-    #####:  389:			return -1;
-        -:  390:		}
-        -:  391:
-        1:  392:		sd->data = ndata;
-        1:  393:		sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
-        1:  394:		if (sd->data[sd->cur_chunks] == NULL)
-    #####:  395:			return -1;
-        -:  396:
-        -:  397:		// data was successfully allocated, make updates.
-        1:  398:		slab_allocator_init_free_list(sd, sd->cur_slabs, is_64_bit);
-        1:  399:		sd->free_list_head = sd->cur_slabs;
-        1:  400:		sd->cur_chunks += 1;
-        -:  401:
-        1:  402:		return slab_data_allocate(sd, fptr, is_64_bit);
-        -:  403:	}
-        3:  404:	return -1;
-        -:  405:}
-        -:  406:
-  1000159:  407:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit) {
-  1000159:  408:	u64 id = sd->free_list_head;
-  1000159:  409:	if (is_64_bit && id == UINT64_MAX) {
-        1:  410:		return slab_data_try_resize(sd, fptr, is_64_bit);
-  1000158:  411:	} else if (!is_64_bit && id == UINT32_MAX) {
-        3:  412:		return slab_data_try_resize(sd, fptr, is_64_bit);
-        -:  413:	}
-        -:  414:
-  1000155:  415:	if (is_64_bit) {
-       22:  416:		sd->free_list_head = ((u64 *)sd->free_list)[id];
-        -:  417:
-        -:  418:	} else {
-  1000133:  419:		sd->free_list_head = ((u32 *)sd->free_list)[id];
-        -:  420:	}
-        -:  421:
-        -:  422:	// set to MAX-1 as a marker that this is allocated
-        -:  423:	// if any freed without this value, it's an error
-  1000155:  424:	if (is_64_bit)
-       22:  425:		((u64 *)sd->free_list)[id] = (UINT64_MAX - 1);
-        -:  426:	else
-  1000133:  427:		((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
-        -:  428:
-  1000155:  429:	u64 len = sd->type.slab_size;
-  1000155:  430:	u64 slab_data_index = id / sd->type.slabs_per_resize;
-  1000155:  431:	u64 offset_mod = id % sd->type.slabs_per_resize;
-        -:  432:
-  1000155:  433:	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
-        -:  434:
-  1000155:  435:	if (is_64_bit) {
-       22:  436:		FatPtr64Impl *fptr64 = fptr->data;
-       22:  437:		fptr64->id = (id * 2) + 1;
-       22:  438:		fptr64->len = len - 3 * sizeof(u64);
-       22:  439:		fptr64->data = fptr->data + 3 * sizeof(u64);
-        -:  440:	} else {
-  1000133:  441:		FatPtr32Impl *fptr32 = fptr->data;
-  1000133:  442:		fptr32->id = (id * 2);
-  1000133:  443:		fptr32->len = len - (2 * sizeof(u32) + sizeof(u64));
-  1000133:  444:		fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
-        -:  445:	}
-        -:  446:
-  1000155:  447:	sd->cur_slabs += 1;
-        -:  448:
-  1000155:  449:	return 0;
-        -:  450:}
-        -:  451:
-  1000155:  452:void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit) {
-  1000155:  453:	if (is_64_bit) {
-       22:  454:		FatPtr64Impl *fptr64 = fptr->data;
-       22:  455:		u64 id = (fptr64->id - 1) / 2;
-       22:  456:		if (((u64 *)sd->free_list)[id] != (UINT64_MAX - 1)) {
-    #####:  457:			panic("Potential double free. Id = %llu.\n", id);
-        -:  458:		}
-       22:  459:		((u64 *)sd->free_list)[id] = sd->free_list_head;
-       22:  460:		sd->free_list_head = id;
-       22:  461:		if (sd->cur_slabs == 0)
-    #####:  462:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
-       22:  463:		sd->cur_slabs -= 1;
-        -:  464:	} else {
-  1000133:  465:		FatPtr32Impl *fptr32 = fptr->data;
-  1000133:  466:		u32 id = (fptr32->id) / 2;
-  1000133:  467:		if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
-    #####:  468:			panic("Potential double free. Id = %llu.\n", id);
-        -:  469:		}
-  1000133:  470:		((u32 *)sd->free_list)[id] = sd->free_list_head;
-  1000133:  471:		sd->free_list_head = id;
-  1000133:  472:		if (sd->cur_slabs == 0)
-    #####:  473:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
-  1000133:  474:		sd->cur_slabs -= 1;
-        -:  475:	}
-  1000155:  476:}
-        -:  477:
-  1000158:  478:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
-  1000158:  479:	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
-  1000158:  480:	bool is_64_bit = impl->is_64_bit;
-        -:  481:	u32 needed;
-  1000158:  482:	if (is_64_bit)
-       23:  483:		needed = size + 3 * sizeof(u64);
-        -:  484:	else
-  1000135:  485:		needed = size + 2 * sizeof(u32) + sizeof(u64);
-  1000158:  486:	int index = slab_allocator_index(ptr, needed);
-  1000158:  487:	if (index < 0) {
-    #####:  488:		return -1;
-        -:  489:	}
-  1000158:  490:	SlabData *sd = &impl->sd_arr[index];
-  1000158:  491:	int ret = slab_data_allocate(sd, fptr, is_64_bit);
-        -:  492:
-        -:  493:	// we couldn't allocate via slabs. Use malloc if configured.
-  1000158:  494:	if (ret && !impl->no_malloc) {
-        -:  495:		void *val;
-        1:  496:		if (is_64_bit)
-    #####:  497:			val = mymalloc(size + (3 * sizeof(u64)));
-        -:  498:		else
-        1:  499:			val = mymalloc(size + (2 * sizeof(u32) + sizeof(u64)));
-        -:  500:
-        -:  501:		// malloc error
-        1:  502:		if (!val)
-    #####:  503:			return -1;
-        1:  504:		impl->cur_mallocs++;
-        1:  505:		ret = 0;
-        1:  506:		fptr->data = val;
-        -:  507:
-        1:  508:		if (is_64_bit) {
-    #####:  509:			FatPtr64Impl *fptr64 = fptr->data;
-    #####:  510:			fptr64->id = MALLOC_64_ID;
-    #####:  511:			fptr64->len = size;
-    #####:  512:			fptr64->data = fptr->data + 3 * sizeof(u64);
-        -:  513:		} else {
-        1:  514:			FatPtr32Impl *fptr32 = fptr->data;
-        1:  515:			fptr32->id = MALLOC_32_ID;
-        1:  516:			fptr32->len = size;
-        1:  517:			fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
-        -:  518:		}
-        -:  519:	}
-  1000158:  520:	return ret;
-        -:  521:}
-  1000156:  522:void slab_allocator_free(SlabAllocator *ptr, const FatPtr *fptr) {
-  1000156:  523:	SlabAllocatorImpl *impl = ptr->impl;
-  1000156:  524:	bool is_64_bit = impl->is_64_bit;
-        -:  525:
-  1000156:  526:	if (is_64_bit) {
-       22:  527:		FatPtr64Impl *fptr64 = fptr->data;
-       22:  528:		if (fptr64->id == MALLOC_64_ID) {
-    #####:  529:			if (fptr->data) {
-    #####:  530:				if (impl->cur_mallocs == 0)
-    #####:  531:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
-    #####:  532:				myfree(fptr->data);
-    #####:  533:				impl->cur_mallocs--;
-        -:  534:			}
-    #####:  535:			return;
-        -:  536:		}
-        -:  537:	} else {
-  1000134:  538:		FatPtr32Impl *fptr32 = fptr->data;
-  1000134:  539:		if (fptr32->id == MALLOC_32_ID) {
-        1:  540:			if (fptr->data) {
-        1:  541:				if (impl->cur_mallocs == 0)
-    #####:  542:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
-        1:  543:				myfree(fptr->data);
-        1:  544:				impl->cur_mallocs--;
-        -:  545:			}
-        1:  546:			return;
-        -:  547:		}
-        -:  548:	}
-        -:  549:
-        -:  550:	u32 needed;
-  1000155:  551:	if (is_64_bit)
-       22:  552:		needed = fat_ptr_len(fptr) + 3 * sizeof(u64);
-        -:  553:	else
-  1000133:  554:		needed = fat_ptr_len(fptr) + 2 * sizeof(u32) + sizeof(u64);
-  1000155:  555:	int index = slab_allocator_index(ptr, needed);
-  1000155:  556:	if (index < 0)
-    #####:  557:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-  1000155:  558:	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
-  1000155:  559:	if (needed != sd->type.slab_size)
-    #####:  560:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-  1000155:  561:	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit);
-        -:  562:}
-       12:  563:u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
-       12:  564:	SlabAllocatorImpl *impl = ptr->impl;
-       12:  565:	u64 ret = impl->cur_mallocs;
-        -:  566:
-       24:  567:	for (u64 i = 0; i < impl->sd_size; i++) {
-       12:  568:		ret += impl->sd_arr[i].cur_slabs;
-        -:  569:	}
-       12:  570:	return ret;
-        -:  571:}

@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['lexer_1065',['Lexer',['../lexer_8h.html#addc3f50e17505a212396bee6abe7d208',1,'lexer.h']]],
-  ['lexer_5fbuf_5fsize_1066',['LEXER_BUF_SIZE',['../lexer_8h.html#ab8cfdd1c48a96d1c1c34cc0895ff4945',1,'lexer.h']]],
-  ['loop_1067',['loop',['../macro__utils_8h.html#a8093cf142de43413a3649101cf95152c',1,'macro_utils.h']]]
+  ['keccak_5frounds_1213',['KECCAK_ROUNDS',['../sha3_8c.html#aaf66c2daa0f1fe906b80b79969f67424',1,'sha3.c']]]
 ];

@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['paren_1079',['PAREN',['../macro__utils_8h.html#a1c38cb40632dca8c8385d3cecea4b787',1,'macro_utils.h']]],
-  ['paren_5fend_1080',['PAREN_END',['../macro__utils_8h.html#a555e810f9d9a0f66c86e0ea873beda21',1,'macro_utils.h']]],
-  ['path_1081',['Path',['../path_8h.html#a9a4b261ee74f577bbd57315cb754f607',1,'path.h']]],
-  ['path_5fseparator_1082',['PATH_SEPARATOR',['../path_8h.html#a256a5721249aa3309437212cc21a9fe4',1,'path.h']]],
-  ['path_5fseparator_5fchar_1083',['PATH_SEPARATOR_CHAR',['../path_8h.html#a581727c17b559af16969b4073417701d',1,'path.h']]]
+  ['nil_1226',['nil',['../slabs_8h.html#ab217809047b5e19d1d0355c21f79f76d',1,'slabs.h']]],
+  ['none_1227',['NONE',['../macro__utils_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29',1,'macro_utils.h']]],
+  ['null_1228',['NULL',['../resources_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4',1,'resources.h']]]
 ];
