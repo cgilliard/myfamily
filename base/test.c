@@ -846,7 +846,7 @@ MyTest(base, test_zero_size_initial) {
 	u64 size = 24;
 	u64 count = 10;
 	SlabType t1 = {
-		.slab_size = size, .slabs_per_resize = 1, .initial_chunks = 0, .max_slabs = 3 * count};
+		.slab_size = size, .slabs_per_resize = 10, .initial_chunks = 0, .max_slabs = 3 * count};
 	slab_allocator_config_add_type(&sc, &t1);
 	SlabAllocator sa;
 	cr_assert(!slab_allocator_build(&sa, &sc));
@@ -883,6 +883,115 @@ MyTest(base, test_zero_size_initial) {
 MyTest(base, test_chain_allocator) {
 	FatPtr fptr;
 	cr_assert(!chain_malloc(&fptr, 10));
+	chain_free(&fptr);
+
+	{
+		SlabAllocatorConfig sc;
+		slab_allocator_config_build(&sc, false, true, false);
+		u64 size = 24;
+		u64 count = 10;
+		SlabType t1 = {
+			.slab_size = size, .slabs_per_resize = 1, .initial_chunks = 0, .max_slabs = 3 * count};
+		slab_allocator_config_add_type(&sc, &t1);
+		SlabAllocator sa;
+		cr_assert(!slab_allocator_build(&sa, &sc));
+		ChainGuard cg = set_slab_allocator(&sa, false);
+	}
+}
+
+MyTest(base, test_chain_allocator_multi_scope) {
+
+	{
+		SlabAllocatorConfig sc;
+		slab_allocator_config_build(&sc, false, true, false);
+		SlabType t = {.slab_size = 8, .slabs_per_resize = 1, .initial_chunks = 0, .max_slabs = 1};
+		cr_assert(!slab_allocator_config_add_type(&sc, &t));
+		SlabAllocator sa;
+		cr_assert(!slab_allocator_build(&sa, &sc));
+		ChainGuard cg = set_slab_allocator(&sa, false);
+
+		FatPtr fptr;
+
+		cr_assert(chain_malloc(&fptr, 9));
+		cr_assert(!chain_malloc(&fptr, 8));
+		cr_assert(chain_malloc(&fptr, 8));
+
+		{
+			SlabAllocatorConfig sc;
+			slab_allocator_config_build(&sc, false, true, false);
+			SlabType t = {
+				.slab_size = 16, .slabs_per_resize = 1, .initial_chunks = 0, .max_slabs = 1};
+			cr_assert(!slab_allocator_config_add_type(&sc, &t));
+			SlabAllocator sa;
+			cr_assert(!slab_allocator_build(&sa, &sc));
+			ChainGuard cg = set_slab_allocator(&sa, false);
+
+			FatPtr fptr;
+
+			cr_assert(chain_malloc(&fptr, 17));
+			cr_assert(!chain_malloc(&fptr, 16));
+			cr_assert(chain_malloc(&fptr, 16));
+
+			{
+				SlabAllocatorConfig sc;
+				slab_allocator_config_build(&sc, false, true, false);
+				SlabType t = {
+					.slab_size = 24, .slabs_per_resize = 1, .initial_chunks = 0, .max_slabs = 1};
+				cr_assert(!slab_allocator_config_add_type(&sc, &t));
+				SlabAllocator sa;
+				cr_assert(!slab_allocator_build(&sa, &sc));
+				ChainGuard cg = set_slab_allocator(&sa, false);
+
+				FatPtr fptr;
+
+				cr_assert(chain_malloc(&fptr, 25));
+				cr_assert(!chain_malloc(&fptr, 24));
+				cr_assert(chain_malloc(&fptr, 24));
+
+				{
+					SlabAllocatorConfig sc;
+					slab_allocator_config_build(&sc, false, true, false);
+					SlabType t = {.slab_size = 32,
+								  .slabs_per_resize = 1,
+								  .initial_chunks = 0,
+								  .max_slabs = 1};
+					cr_assert(!slab_allocator_config_add_type(&sc, &t));
+					SlabAllocator sa;
+					cr_assert(!slab_allocator_build(&sa, &sc));
+					ChainGuard cg = set_slab_allocator(&sa, false);
+
+					FatPtr fptr;
+
+					cr_assert(chain_malloc(&fptr, 33));
+					cr_assert(!chain_malloc(&fptr, 32));
+					cr_assert(chain_malloc(&fptr, 32));
+
+					chain_free(&fptr);
+				}
+
+				cr_assert(chain_malloc(&fptr, 24));
+				chain_free(&fptr);
+				cr_assert(chain_malloc(&fptr, 25));
+				cr_assert(!chain_malloc(&fptr, 24));
+				chain_free(&fptr);
+			}
+
+			cr_assert(chain_malloc(&fptr, 16));
+			chain_free(&fptr);
+			cr_assert(chain_malloc(&fptr, 17));
+			cr_assert(!chain_malloc(&fptr, 16));
+			chain_free(&fptr);
+		}
+
+		cr_assert(chain_malloc(&fptr, 8));
+		chain_free(&fptr);
+		cr_assert(chain_malloc(&fptr, 9));
+		cr_assert(!chain_malloc(&fptr, 8));
+		chain_free(&fptr);
+	}
+
+	FatPtr fptr;
+	cr_assert(!chain_malloc(&fptr, 1000));
 	chain_free(&fptr);
 }
 

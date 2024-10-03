@@ -67,6 +67,7 @@ void cleanup_default_slab_allocator() {
 		slab_allocator_cleanup(chain_guard_entry_root->sa);
 		myfree(chain_guard_entry_root->sa);
 		myfree(chain_guard_entry_root);
+		chain_guard_entry_root = NULL;
 	}
 }
 
@@ -80,17 +81,25 @@ void chain_guard_init_root() {
 }
 
 void chain_guard_cleanup(ChainGuardNc *ptr) {
+	ChainGuardEntry *entry = ptr->impl;
+	chain_guard_entry_cur = entry->prev;
+	chain_guard_entry_cur->next = NULL;
+	myfree(entry);
 }
 
-ChainGuard chain_guard_init(SlabAllocator *sa, bool is_sync) {
+ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {
 	if (chain_guard_entry_root == NULL) {
 		chain_guard_init_root();
-		ChainGuardNc ret = {chain_guard_entry_root};
-		return ret;
-	} else {
-		ChainGuardNc ret = {NULL};
-		return ret;
 	}
+	ChainGuardEntry *entry = mymalloc(sizeof(ChainGuardEntry));
+	entry->sa = sa;
+	entry->sync = sync;
+	entry->next = NULL;
+	entry->prev = chain_guard_entry_cur;
+	chain_guard_entry_cur->next = entry;
+	chain_guard_entry_cur = entry;
+	ChainGuardNc ret = {entry};
+	return ret;
 }
 
 int chain_malloc(FatPtr *ptr, u64 size) {
@@ -104,5 +113,7 @@ int chain_realloc(FatPtr *ptr, u64 size) {
 	return 0;
 }
 void chain_free(FatPtr *ptr) {
+	if (chain_guard_entry_root == NULL)
+		panic("Freeing a slab when it was never allocated!");
 	slab_allocator_free(chain_guard_entry_cur->sa, ptr);
 }

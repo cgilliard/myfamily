@@ -58,19 +58,19 @@ void chain_guard_cleanup(ChainGuardNc *ptr);
 // Important: This function must not be called more than once per scope or behaviour is undefined.
 // Example (Ok):
 // {
-//     ChainGuard c1 = chain_guard_init(&myallocator1, false);
+//     ChainGuard c1 = set_slab_allocator(&myallocator1, false);
 //     {
-//         ChainGuard c2 = chain_guard_init(&myallocator2, true);
+//         ChainGuard c2 = set_slab_allocator(&myallocator2, true);
 //         // ...
 //     }
 // }
 // Example (NOT Ok):
 // {
-//     ChainGuard c1 = chain_guard_init(&myallocator1, false);
-//     ChainGuard c2 = chain_guard_init(&myallocator2, true);
+//     ChainGuard c1 = set_slab_allocator(&myallocator1, false);
+//     ChainGuard c2 = set_slab_allocator(&myallocator2, true);
 //     // ...
 // }
-ChainGuard chain_guard_init(SlabAllocator *sa, bool is_sync);
+ChainGuard set_slab_allocator(SlabAllocator *sa, bool is_sync);
 
 // Allocate a 'FatPtr' with the specified size with the current SlabAllocator.
 int chain_malloc(FatPtr *ptr, u64 size);
