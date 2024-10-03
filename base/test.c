@@ -1052,7 +1052,7 @@ MyTest(base, test_sync_allocator) {
 }
 
 // create some shared variables to demonstrate the sync_allocator
-FatPtr shared_ptr; // shared FatPtr
+FatPtr shared_ptr = null; // shared FatPtr
 // Initialize a condition/lock
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
@@ -1081,7 +1081,6 @@ void *start_thread_sync_test() {
 // Test main entry point
 MyTest(base, test_threaded_sync) {
 	pthread_t thread;
-	shared_ptr = null;
 
 	// create scope to get sync_allocator
 	{

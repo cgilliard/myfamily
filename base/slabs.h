@@ -22,7 +22,18 @@ typedef struct FatPtr {
 	void *data;
 } FatPtr;
 
-extern const FatPtr null;
+// Internal representation for null
+typedef struct FatPtrZeroImpl {
+	u128 internal;
+} FatPtrZeroImpl;
+
+// Global constant that points to a zeroed-out implementation of FatPtrImpl
+static const FatPtrZeroImpl fatptr_impl_null = {0};
+#define null                                                                                       \
+	(const FatPtr) {                                                                               \
+		.data = (void *)&fatptr_impl_null                                                          \
+	}
+
 #define nil(v) (fat_ptr_len(&v) == 0)
 
 // A slab allocator will always allocate these, so the user only needs to

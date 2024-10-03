@@ -37,9 +37,6 @@ typedef struct FatPtr32Impl {
 	void *data;
 } FatPtr32Impl;
 
-const FatPtr32Impl fptr32null = {.id = 0, .len = 0, .data = NULL};
-const FatPtr null = {.data = (void *)&fptr32null};
-
 // deteremine which kind of fat pointer this is. 32 bit fat pointers are restricted to having an ID
 // that does not set the most significant bit. Therefore they must be less than 2^31 or the
 // maximum signed int value (INT32_MAX). Conversely, the 64 bit ids must have this bit set.
