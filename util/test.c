@@ -96,17 +96,14 @@ MyTest(util, test_rbtree) {
 
 	int i = 0;
 	loop {
-		const void *next = rbtree_iterator_next(&itt);
-		if (next == NULL)
+		RbTreeKeyValue kv;
+		bool has_next = rbtree_iterator_next(&itt, &kv);
+		if (!has_next)
 			break;
 
-		const void *next_value = next + 15 + sizeof(MyKey) + (16 - (sizeof(MyKey) % 16));
-
-		MyKey k1;
-		MyValue v1;
-		memcpy(&k1, next + 15, sizeof(MyKey));
-		memcpy(&v1, next_value, sizeof(MyValue));
-		printf("i=%i k1.v=%llu,value=%s\n", i++, k1.v, v1.buf);
+		MyKey *k1 = kv.key;
+		MyValue *v1 = kv.value;
+		printf("i=%i k1.v=%llu,value=%s\n", i++, k1->v, v1->buf);
 	}
 }
 

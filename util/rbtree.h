@@ -22,12 +22,17 @@ typedef struct RBTreeIteratorNc {
 	FatPtr impl;
 } RBTreeIteratorNc;
 
+typedef struct RbTreeKeyValue {
+	void *key;
+	void *value;
+} RbTreeKeyValue;
+
 void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr);
 
 #define RBTreeIterator                                                                             \
 	RBTreeIteratorNc __attribute__((warn_unused_result, cleanup(rbtree_iterator_cleanup)))
 
-const void *rbtree_iterator_next(RBTreeIterator *ptr);
+bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv);
 
 typedef struct RBTreeNc {
 	FatPtr impl;

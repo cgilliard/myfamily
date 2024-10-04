@@ -46,6 +46,7 @@ typedef struct RBTreeImpl {
 typedef struct RBTreeIteratorImpl {
 	RBTreeNode *cur;
 	RBTreeNode *stack[128];
+	u64 key_size;
 	u8 stack_pointer;
 	bool send;
 } RBTreeIteratorImpl;
@@ -62,12 +63,12 @@ void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
 	}
 }
 
-const void *rbtree_iterator_next(RBTreeIterator *ptr) {
+bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 	RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
 
 	// If the iterator is empty, we're done
 	if (!impl->cur && impl->stack_pointer == 0) {
-		return NULL; // No more nodes to traverse
+		return false; // No more nodes to traverse
 	}
 
 	// Traverse the tree
@@ -88,16 +89,18 @@ const void *rbtree_iterator_next(RBTreeIterator *ptr) {
 			impl->cur = impl->stack[--impl->stack_pointer];
 
 			// Store the current node's data to return
-			const void *ret = impl->cur->data;
+			void *ret = impl->cur->data;
 
 			// Move to the right child after visiting this node
 			impl->cur = impl->cur->right;
 
-			return ret; // Return the node's data
+			kv->key = ret + KEY_PAD;
+			kv->value = ret + KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size;
+			return true; // Return the node's data
 		}
 	}
 
-	return NULL; // Traversal complete
+	return false; // Traversal complete
 }
 
 // Utility function to perform left rotation
@@ -120,6 +123,7 @@ void leftRotate(RBTree *ptr, RBTreeNode *x) {
 	x->parent = y;
 }
 
+// Utility function to perform right rotation
 void rightRotate(RBTree *ptr, RBTreeNode *x) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	RBTreeNode *y = x->left;
@@ -502,5 +506,6 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
 	rbimpl->stack_pointer = 0;
 	rbimpl->cur = impl->root;
 	rbimpl->send = impl->send;
+	rbimpl->key_size = impl->key_size;
 	return 0;
 }
