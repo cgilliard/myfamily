@@ -520,6 +520,7 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 		errno = EINVAL;
 		return -1;
 	}
+
 	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
 	bool is_64_bit = impl->is_64_bit;
 	bool zeroed = impl->zeroed;
@@ -581,6 +582,9 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 	return ret;
 }
 void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
+	if (fptr == NULL || nil(*fptr)) {
+		panic("Freeing a slab that's already nil. Double free?");
+	}
 	SlabAllocatorImpl *impl = ptr->impl;
 	bool is_64_bit = impl->is_64_bit;
 

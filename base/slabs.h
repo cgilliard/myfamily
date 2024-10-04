@@ -41,6 +41,9 @@ static const FatPtrZeroImpl fatptr_impl_null = {0};
 u64 fat_ptr_len(const FatPtr *ptr);
 void *fat_ptr_data(const FatPtr *ptr);
 
+#define $Ref(v) (fat_ptr_data(v))
+#define $Len(v) (fat_ptr_len(v))
+
 // Slab Allocator
 
 // Slab Type definition

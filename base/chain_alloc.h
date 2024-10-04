@@ -42,11 +42,22 @@
 #ifndef _BASE_CHAIN_ALLOC__
 #define _BASE_CHAIN_ALLOC__
 
+#include <base/resources.h>
 #include <base/slabs.h>
 
 typedef struct ChainGuardNc {
 	void *impl;
 } ChainGuardNc;
+
+#define CHAIN_GUARD_INIT {NULL}
+#define ChainSend(v)                                                                               \
+	({                                                                                             \
+		ChainGuardNc _cg__ = CHAIN_GUARD_INIT;                                                     \
+		if (v) {                                                                                   \
+			_cg__ = sync_allocator();                                                              \
+		}                                                                                          \
+		_cg__;                                                                                     \
+	})
 
 void chain_guard_cleanup(ChainGuardNc *ptr);
 

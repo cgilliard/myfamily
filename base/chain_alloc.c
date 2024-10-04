@@ -17,6 +17,7 @@
 #include <base/resources.h>
 #include <errno.h>
 #include <pthread.h>
+#include <stdio.h>
 #include <string.h>
 
 typedef struct ChainGuardEntry {
@@ -108,13 +109,15 @@ void chain_guard_init_root() {
 }
 
 void chain_guard_cleanup(ChainGuardNc *ptr) {
-	ChainGuardEntry *entry = ptr->impl;
-	chain_guard_entry_cur = entry->prev;
-	chain_guard_entry_cur->next = NULL;
-	if (chain_guard_entry_cur->sync) {
-		pthread_mutex_destroy(&chain_guard_entry_cur->lock);
+	if (ptr->impl) {
+		ChainGuardEntry *entry = ptr->impl;
+		chain_guard_entry_cur = entry->prev;
+		chain_guard_entry_cur->next = NULL;
+		if (chain_guard_entry_cur->sync) {
+			pthread_mutex_destroy(&chain_guard_entry_cur->lock);
+		}
+		myfree(entry);
 	}
-	myfree(entry);
 }
 
 ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {

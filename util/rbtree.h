@@ -15,10 +15,11 @@
 #ifndef _UTIL_RBTREE__
 #define _UTIL_RBTREE__
 
+#include <base/slabs.h>
 #include <base/types.h>
 
 typedef struct RBTreeIteratorNc {
-	void *impl;
+	FatPtr impl;
 } RBTreeIteratorNc;
 
 void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr);
@@ -29,14 +30,15 @@ void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr);
 void *rbtree_iterator_next(RBTreeIterator *ptr);
 
 typedef struct RBTreeNc {
-	void *impl;
+	FatPtr impl;
 } RBTreeNc;
 
 void rbtree_cleanup(RBTreeNc *ptr);
 
 #define RBTree RBTreeNc __attribute__((warn_unused_result, cleanup(rbtree_cleanup)))
 
-int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size);
+int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
+				 int (*compare)(const void *, const void *), bool send);
 int rbtree_insert(RBTree *ptr, const void *key, const void *value);
 int rbtree_delete(RBTree *ptr, const void *key);
 const void *rbtree_get(const RBTree *ptr, const void *key);
