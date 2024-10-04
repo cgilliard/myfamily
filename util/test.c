@@ -100,11 +100,11 @@ MyTest(util, test_rbtree) {
 		if (next == NULL)
 			break;
 
-		const void *next_value = next + sizeof(MyKey);
+		const void *next_value = next + 15 + sizeof(MyKey);
 
 		MyKey k1;
 		MyValue v1;
-		memcpy(&k1, next, sizeof(MyKey));
+		memcpy(&k1, next + 15, sizeof(MyKey));
 		memcpy(&v1, next_value, sizeof(MyValue));
 		printf("i=%i k1.v=%llu,value=%s\n", i++, k1.v, v1.buf);
 	}

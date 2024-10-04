@@ -22,16 +22,14 @@
 #include <string.h>
 #include <util/rbtree.h>
 
+#define KEY_PAD 15
+
 typedef struct RBTreeNode {
 	FatPtr self;
 	struct RBTreeNode *right;
 	struct RBTreeNode *left;
 	struct RBTreeNode *parent;
 	bool red;
-	bool pad1;
-	bool pad2;
-	bool pad3;
-	u32 counter;
 	char data[];
 } RBTreeNode;
 
@@ -45,7 +43,6 @@ typedef struct RBTreeImpl {
 } RBTreeImpl;
 
 typedef struct RBTreeIteratorImpl {
-	const RBTree *ref;
 	RBTreeNode *cur;
 	RBTreeNode *stack[128];
 	u8 stack_pointer;
@@ -101,76 +98,6 @@ const void *rbtree_iterator_next(RBTreeIterator *ptr) {
 
 	return NULL; // Traversal complete
 }
-
-/*
-const void *rbtree_iterator_next(RBTreeIterator *ptr) {
-	RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
-
-	// Check if there are any nodes left to traverse
-	if (!impl->cur && impl->stack_pointer == 0) {
-		return NULL; // No more nodes to traverse
-	}
-
-	// If cur is non-null, we are at the first node (root in this case)
-	if (impl->cur) {
-		// Store the current node's data to return
-		const void *ret = impl->cur->data;
-		printf("case1\n");
-
-		// Now, we need to push the current node onto the stack and start the traversal
-		while (impl->cur || impl->stack_pointer > 0) {
-			// Traverse left subtree
-			if (impl->cur->left) {
-				if (impl->stack_pointer < 128) {
-					// Push current node onto the stack
-					impl->stack[impl->stack_pointer++] = *impl->cur;
-				} else {
-					panic("Iterator stack overflow");
-				}
-
-				// Move to the left child
-				impl->cur = impl->cur->left;
-			} else {
-				// Stop after returning the root and the traversal will continue from the left child
-				impl->cur = NULL;
-				break;
-			}
-		}
-
-		return ret; // Return the root node's data on the first call
-	}
-
-	// Traverse to the next node (after the first)
-	while (impl->cur || impl->stack_pointer > 0) {
-		if (impl->cur) {
-			if (impl->stack_pointer < 128) {
-				// Push current node onto the stack
-				impl->stack[impl->stack_pointer++] = *impl->cur;
-			} else {
-				// Handle overflow
-				panic("Iterator stack overflow");
-			}
-
-			// Move to the left child
-			impl->cur = impl->cur->left;
-		} else {
-			// Pop from the stack
-			impl->cur = &impl->stack[--impl->stack_pointer];
-
-			// We found the next node, store its data to return
-			const void *ret = impl->cur->data;
-			printf("case2\n");
-
-			// Move to the right child after visiting this node
-			impl->cur = impl->cur->right;
-
-			return ret; // Return the node's data
-		}
-	}
-
-	return NULL; // Finished traversal, no more nodes left
-}
-*/
 
 // Utility function to perform left rotation
 void leftRotate(RBTree *ptr, RBTreeNode *x) {
@@ -404,7 +331,8 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 		RBTreeNode *node = NULL;
 		if (check == NULL) {
 			FatPtr self;
-			u64 size = sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char);
+			u64 size =
+				sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char) + KEY_PAD;
 			if (chain_malloc(&self, size)) {
 				return -1;
 			}
@@ -416,20 +344,19 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 			else
 				parent->left = node;
 
-			memcpy((char *)node->data, key, impl->key_size);
-			memcpy(node->data + impl->key_size, value, impl->value_size);
+			memcpy((char *)node->data + KEY_PAD, key, impl->key_size);
+			memcpy(node->data + KEY_PAD + impl->key_size, value, impl->value_size);
 			node->self = self;
 			node->red = true;
 			node->right = NULL;
 			node->left = NULL;
 			node->parent = parent;
-			node->counter = 0;
 			impl->size++;
 			rbtree_fix_up(ptr, node);
 			break;
 		}
 		parent = check;
-		int v = impl->compare(check->data, key);
+		int v = impl->compare(check->data + KEY_PAD, key);
 		if (v == 0) {
 			return -1;
 		} else if (v < 0) {
@@ -460,7 +387,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 
 	// Find the node to delete
 	while (check != NULL) {
-		int v = impl->compare(check->data, key);
+		int v = impl->compare(check->data + KEY_PAD, key);
 		if (v == 0) {
 			nodeToDelete = check; // Found the node to delete
 			break;
@@ -487,7 +414,8 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		}
 
 		// Copy the successor's data to the node to delete
-		memcpy(nodeToDelete->data, successor->data, (impl->key_size + impl->value_size));
+		memcpy(nodeToDelete->data + KEY_PAD, successor->data + KEY_PAD,
+			   (impl->key_size + impl->value_size));
 		nodeToDelete->self = successor->self;
 
 		// Now we need to delete the successor
@@ -536,9 +464,9 @@ const void *rbtree_get(const RBTree *ptr, const void *key) {
 	loop {
 		if (check == NULL)
 			return NULL;
-		int v = impl->compare(check->data, key);
+		int v = impl->compare(check->data + KEY_PAD, key);
 		if (v == 0) {
-			return check->data + impl->key_size;
+			return check->data + KEY_PAD + impl->key_size;
 		} else if (v < 0) {
 			check = check->right;
 		} else {
@@ -570,7 +498,6 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
 	chain_malloc(&iter->impl, sizeof(RBTreeIteratorImpl));
 	RBTreeIteratorImpl *rbimpl = $Ref(&iter->impl);
 	rbimpl->stack_pointer = 0;
-	rbimpl->ref = ptr;
 	rbimpl->cur = impl->root;
 	rbimpl->send = impl->send;
 	return 0;
