@@ -42,7 +42,7 @@ int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 int rbtree_insert(RBTree *ptr, const void *key, const void *value);
 int rbtree_delete(RBTree *ptr, const void *key);
 const void *rbtree_get(const RBTree *ptr, const void *key);
-int rbtree_size(const RBTree *ptr);
+i64 rbtree_size(const RBTree *ptr);
 int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter);
 
 #endif // _UTIL_RBTREE__

@@ -19,7 +19,7 @@
 MySuite(util);
 
 typedef struct MyKey {
-	char buf[100];
+	u64 v;
 } MyKey;
 
 typedef struct MyValue {
@@ -29,44 +29,66 @@ typedef struct MyValue {
 int my_compare(const void *v1, const void *v2) {
 	const MyKey *k1 = v1;
 	const MyKey *k2 = v2;
-	return strcmp(k1->buf, k2->buf);
+	if (k1->v < k2->v)
+		return -1;
+	else if (k1->v > k2->v)
+		return 1;
+	return 0;
 }
 
 MyTest(util, test_rbtree) {
 	RBTree tree1;
 	rbtree_build(&tree1, sizeof(MyKey), sizeof(MyValue), my_compare, true);
-	MyKey k1;
-	strcpy(k1.buf, "test1");
+	MyKey k1 = {20};
 	MyValue v1;
-	strcpy(v1.buf, "value1");
+	strcpy(v1.buf, "value20");
 	rbtree_insert(&tree1, &k1, &v1);
 
-	MyKey k2;
-	strcpy(k2.buf, "test3");
+	MyKey k2 = {10};
 	MyValue v2;
-	strcpy(v2.buf, "value3");
+	strcpy(v2.buf, "value10");
 	rbtree_insert(&tree1, &k2, &v2);
 
-	MyKey k3;
-	strcpy(k3.buf, "test2");
+	MyKey k3 = {30};
 	MyValue v3;
-	strcpy(v3.buf, "value2");
+	strcpy(v3.buf, "value30");
 	rbtree_insert(&tree1, &k3, &v3);
-	// rbtree_insert(&tree1, &k3, &v3);
+
+	MyKey k4 = {40};
+	MyValue v4;
+	strcpy(v4.buf, "value40");
+	rbtree_insert(&tree1, &k4, &v4);
+
+	MyKey k5 = {35};
+	MyValue v5;
+	strcpy(v5.buf, "value35");
+	rbtree_insert(&tree1, &k5, &v5);
 
 	const MyValue *v1_out = rbtree_get(&tree1, &k1);
-	printf("v1_out='%s' %p\n", v1_out->buf, v1_out);
+	cr_assert(!strcmp(v1_out->buf, "value20"));
 
 	const MyValue *v2_out = rbtree_get(&tree1, &k2);
-	printf("v2_out='%s' %p\n", v2_out->buf, v2_out);
+	cr_assert(!strcmp(v2_out->buf, "value10"));
 
 	const MyValue *v3_out = rbtree_get(&tree1, &k3);
-	printf("v3_out='%s' %p\n", v3_out->buf, v3_out);
+	cr_assert(!strcmp(v3_out->buf, "value30"));
 
-	MyKey k4;
-	strcpy(k4.buf, "other");
-	const MyValue *v4_out = rbtree_get(&tree1, &k4);
-	cr_assert_eq(v4_out, NULL);
+	MyKey k41 = {4};
+	const MyValue *v41_out = rbtree_get(&tree1, &k41);
+	cr_assert_eq(v41_out, NULL);
+
+	cr_assert_eq(rbtree_size(&tree1), 5);
+	cr_assert(!rbtree_delete(&tree1, &k3));
+
+	const MyValue *v1_out2 = rbtree_get(&tree1, &k1);
+	cr_assert(!strcmp(v1_out2->buf, "value20"));
+
+	const MyValue *v2_out2 = rbtree_get(&tree1, &k2);
+	cr_assert(!strcmp(v2_out2->buf, "value10"));
+
+	const MyValue *v3_out2 = rbtree_get(&tree1, &k3);
+	cr_assert_eq(v3_out2, NULL);
+	cr_assert_eq(rbtree_size(&tree1), 4);
 }
 
 MyTest(util, test_move_fatptr) {
