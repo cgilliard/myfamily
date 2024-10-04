@@ -22,15 +22,18 @@
 #include <string.h>
 #include <util/rbtree.h>
 
-#define KEY_PAD 15
+#define BOOLEAN_SIZE 1
+#define KEY_PAD 0
 #define VALUE_PAD(key_size) (16 - (key_size % 16))
+#define RED_OFFSET(key_size, value_size) (KEY_PAD + key_size + value_size + VALUE_PAD(key_size))
+#define RED(node, key_size, value_size) *(bool *)(node->data + RED_OFFSET(key_size, value_size))
 
 typedef struct RBTreeNode {
 	FatPtr self;
 	struct RBTreeNode *right;
 	struct RBTreeNode *left;
 	struct RBTreeNode *parent;
-	bool red;
+	// bool red;
 	char data[];
 } RBTreeNode;
 
@@ -145,116 +148,132 @@ void rightRotate(RBTree *ptr, RBTreeNode *x) {
 
 void rbtree_fix_up(RBTree *ptr, RBTreeNode *k) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
+	u64 key_size = impl->key_size;
+	u64 value_size = impl->value_size;
 	RBTreeNode *root = impl->root;
 
-	while (k && k != root && k->parent && k->parent->red) {
+	// Using the RED macro to access the color of the root
+	printf("root->red=%i\n", RED(root, key_size, value_size));
+
+	while (k && k != root && k->parent && RED(k->parent, key_size, value_size)) {
 		if (k->parent == k->parent->parent->left) {
 			RBTreeNode *u = k->parent->parent->right; // uncle
-			if (u && u->red) {
-				k->parent->red = false;
-				u->red = false;
-				k->parent->parent->red = true;
+			if (u && RED(u, key_size, value_size)) {
+				// Change the colors of the parent and uncle to black
+				RED(k->parent, key_size, value_size) = false;		 // Using the macro here
+				RED(u, key_size, value_size) = false;				 // Using the macro here
+				RED(k->parent->parent, key_size, value_size) = true; // Using the macro here
 				k = k->parent->parent;
 			} else {
 				if (k == k->parent->right) {
 					k = k->parent;
 					leftRotate(ptr, k);
 				}
-				k->parent->red = false;
-				k->parent->parent->red = true;
+				// Change the colors for the rotations
+				RED(k->parent, key_size, value_size) = false;		 // Using the macro here
+				RED(k->parent->parent, key_size, value_size) = true; // Using the macro here
 				rightRotate(ptr, k->parent->parent);
 			}
 		} else {
 			RBTreeNode *u = k->parent->parent->left; // uncle
-			if (u && u->red) {
-				k->parent->red = false;
-				u->red = false;
-				k->parent->parent->red = true;
+			if (u && RED(u, key_size, value_size)) {
+				// Change the colors of the parent and uncle to black
+				RED(k->parent, key_size, value_size) = false;		 // Using the macro here
+				RED(u, key_size, value_size) = false;				 // Using the macro here
+				RED(k->parent->parent, key_size, value_size) = true; // Using the macro here
 				k = k->parent->parent;
 			} else {
 				if (k == k->parent->left) {
 					k = k->parent;
 					rightRotate(ptr, k);
 				}
-				k->parent->red = false;
-				k->parent->parent->red = true;
+				// Change the colors for the rotations
+				RED(k->parent, key_size, value_size) = false;		 // Using the macro here
+				RED(k->parent->parent, key_size, value_size) = true; // Using the macro here
 				leftRotate(ptr, k->parent->parent);
 			}
 		}
 	}
-	root->red = false;
+	// Set the root color to black
+	RED(root, key_size, value_size) = false; // Using the macro here
 }
 
 void rbtree_delete_fixup(RBTree *ptr, RBTreeNode *x) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
+	u64 key_size = impl->key_size;
+	u64 value_size = impl->value_size;
 	RBTreeNode *root = impl->root;
 
-	while (x != root && !x->red) {
+	while (x != root && !RED(x, key_size, value_size)) {
 		if (x == x->parent->left) {
 			RBTreeNode *w = x->parent->right; // sibling
 
-			if (w->red) {
-				w->red = false; // Case 1: Sibling is red
-				x->parent->red = true;
-				leftRotate(ptr, x->parent); // Rotate around parent
-				w = x->parent->right;		// Update w to the new sibling
+			if (RED(w, key_size, value_size)) {
+				RED(w, key_size, value_size) = false;		 // Case 1: Sibling is red
+				RED(x->parent, key_size, value_size) = true; // Parent becomes red
+				leftRotate(ptr, x->parent);					 // Rotate around parent
+				w = x->parent->right;						 // Update w to the new sibling
 			}
 
-			if ((!w->left || !w->left->red) && (!w->right || !w->right->red)) {
-				w->red = true; // Case 2: Both children are black
-				x = x->parent; // Move up the tree
+			if ((!w->left || !RED(w->left, key_size, value_size)) &&
+				(!w->right || !RED(w->right, key_size, value_size))) {
+				RED(w, key_size, value_size) = true; // Case 2: Both children are black
+				x = x->parent;						 // Move up the tree
 			} else {
-				if (!w->right || !w->right->red) {
+				if (!w->right || !RED(w->right, key_size, value_size)) {
 					// Case 3: Left child is red, right child is black
 					if (w->left)
-						w->left->red = false;
-					w->red = true;
-					rightRotate(ptr, w);  // Rotate around w
-					w = x->parent->right; // Update w
+						RED(w->left, key_size, value_size) = false; // Set left child to black
+					RED(w, key_size, value_size) = true;			// Set sibling to red
+					rightRotate(ptr, w);							// Rotate around w
+					w = x->parent->right;							// Update w
 				}
 
 				// Case 4: Right child is red
-				w->red = x->parent->red; // Copy the parent's color
-				x->parent->red = false;	 // Parent is now black
+				RED(w, key_size, value_size) =
+					RED(x->parent, key_size, value_size);	  // Copy parent's color
+				RED(x->parent, key_size, value_size) = false; // Parent becomes black
 				if (w->right)
-					w->right->red = false;	// Make the right child black
-				leftRotate(ptr, x->parent); // Rotate around parent
-				x = root;					// Break out of the loop
+					RED(w->right, key_size, value_size) = false; // Make the right child black
+				leftRotate(ptr, x->parent);						 // Rotate around parent
+				x = root;										 // Break out of the loop
 			}
 		} else {
 			RBTreeNode *w = x->parent->left; // sibling
 
-			if (w->red) {
-				w->red = false; // Case 1: Sibling is red
-				x->parent->red = true;
-				rightRotate(ptr, x->parent); // Rotate around parent
-				w = x->parent->left;		 // Update w to the new sibling
+			if (RED(w, key_size, value_size)) {
+				RED(w, key_size, value_size) = false;		 // Case 1: Sibling is red
+				RED(x->parent, key_size, value_size) = true; // Parent becomes red
+				rightRotate(ptr, x->parent);				 // Rotate around parent
+				w = x->parent->left;						 // Update w to the new sibling
 			}
 
-			if ((!w->right || !w->right->red) && (!w->left || !w->left->red)) {
-				w->red = true; // Case 2: Both children are black
-				x = x->parent; // Move up the tree
+			if ((!w->right || !RED(w->right, key_size, value_size)) &&
+				(!w->left || !RED(w->left, key_size, value_size))) {
+				RED(w, key_size, value_size) = true; // Case 2: Both children are black
+				x = x->parent;						 // Move up the tree
 			} else {
-				if (!w->left || !w->left->red) {
+				if (!w->left || !RED(w->left, key_size, value_size)) {
 					// Case 3: Right child is red, left child is black
 					if (w->right)
-						w->right->red = false;
-					w->red = true;
-					leftRotate(ptr, w);	 // Rotate around w
-					w = x->parent->left; // Update w
+						RED(w->right, key_size, value_size) = false; // Set right child to black
+					RED(w, key_size, value_size) = true;			 // Set sibling to red
+					leftRotate(ptr, w);								 // Rotate around w
+					w = x->parent->left;							 // Update w
 				}
 
 				// Case 4: Left child is red
-				w->red = x->parent->red; // Copy the parent's color
-				x->parent->red = false;	 // Parent is now black
+				RED(w, key_size, value_size) =
+					RED(x->parent, key_size, value_size);	  // Copy parent's color
+				RED(x->parent, key_size, value_size) = false; // Parent becomes black
 				if (w->left)
-					w->left->red = false;	 // Make the left child black
-				rightRotate(ptr, x->parent); // Rotate around parent
-				x = root;					 // Break out of the loop
+					RED(w->left, key_size, value_size) = false; // Make the left child black
+				rightRotate(ptr, x->parent);					// Rotate around parent
+				x = root;										// Break out of the loop
 			}
 		}
 	}
-	x->red = false; // Ensure the root is black
+	RED(x, key_size, value_size) = false; // Ensure the root is black
 }
 
 // Rbtree build function has the 'send' parameter. This parameter indicates whether or
@@ -337,7 +356,7 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 		if (check == NULL) {
 			FatPtr self;
 			u64 size = sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char) +
-					   KEY_PAD + VALUE_PAD(impl->key_size);
+					   KEY_PAD + VALUE_PAD(impl->key_size) + BOOLEAN_SIZE;
 			if (chain_malloc(&self, size)) {
 				return -1;
 			}
@@ -352,8 +371,9 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 			memcpy((char *)node->data + KEY_PAD, key, impl->key_size);
 			memcpy(node->data + KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size, value,
 				   impl->value_size);
+			node->data[KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size + impl->value_size] =
+				true;
 			node->self = self;
-			node->red = true;
 			node->right = NULL;
 			node->left = NULL;
 			node->parent = parent;
@@ -384,6 +404,8 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	}
 
 	RBTreeImpl *impl = $Ref(&ptr->impl);
+	u64 key_size = impl->key_size;
+	u64 value_size = impl->value_size;
 	ChainGuard _ = ChainSend(impl->send);
 
 	RBTreeNode *check = impl->root;
@@ -409,7 +431,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	}
 
 	// Store the color of the node to delete
-	wasBlack = !nodeToDelete->red;
+	wasBlack = !RED(nodeToDelete, key_size, value_size);
 
 	// Case 1: Node has two children
 	if (nodeToDelete->left != NULL && nodeToDelete->right != NULL) {
@@ -421,7 +443,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 
 		// Copy the successor's data to the node to delete
 		memcpy(nodeToDelete->data + KEY_PAD, successor->data + KEY_PAD,
-			   (impl->key_size + impl->value_size + VALUE_PAD(impl->key_size)));
+			   (impl->key_size + impl->value_size + VALUE_PAD(impl->key_size)) + BOOLEAN_SIZE);
 		nodeToDelete->self = successor->self;
 
 		// Now we need to delete the successor
