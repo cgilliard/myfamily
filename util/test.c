@@ -100,7 +100,7 @@ MyTest(util, test_rbtree) {
 		if (next == NULL)
 			break;
 
-		const void *next_value = next + 15 + sizeof(MyKey);
+		const void *next_value = next + 15 + sizeof(MyKey) + (16 - (sizeof(MyKey) % 16));
 
 		MyKey k1;
 		MyValue v1;

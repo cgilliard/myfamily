@@ -23,6 +23,7 @@
 #include <util/rbtree.h>
 
 #define KEY_PAD 15
+#define VALUE_PAD(key_size) (16 - (key_size % 16))
 
 typedef struct RBTreeNode {
 	FatPtr self;
@@ -331,8 +332,8 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 		RBTreeNode *node = NULL;
 		if (check == NULL) {
 			FatPtr self;
-			u64 size =
-				sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char) + KEY_PAD;
+			u64 size = sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char) +
+					   KEY_PAD + VALUE_PAD(impl->key_size);
 			if (chain_malloc(&self, size)) {
 				return -1;
 			}
@@ -345,7 +346,8 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 				parent->left = node;
 
 			memcpy((char *)node->data + KEY_PAD, key, impl->key_size);
-			memcpy(node->data + KEY_PAD + impl->key_size, value, impl->value_size);
+			memcpy(node->data + KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size, value,
+				   impl->value_size);
 			node->self = self;
 			node->red = true;
 			node->right = NULL;
@@ -415,7 +417,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 
 		// Copy the successor's data to the node to delete
 		memcpy(nodeToDelete->data + KEY_PAD, successor->data + KEY_PAD,
-			   (impl->key_size + impl->value_size));
+			   (impl->key_size + impl->value_size + VALUE_PAD(impl->key_size)));
 		nodeToDelete->self = successor->self;
 
 		// Now we need to delete the successor
@@ -466,7 +468,7 @@ const void *rbtree_get(const RBTree *ptr, const void *key) {
 			return NULL;
 		int v = impl->compare(check->data + KEY_PAD, key);
 		if (v == 0) {
-			return check->data + KEY_PAD + impl->key_size;
+			return check->data + KEY_PAD + impl->key_size + VALUE_PAD(impl->key_size);
 		} else if (v < 0) {
 			check = check->right;
 		} else {
