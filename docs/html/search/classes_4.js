@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['pathimpl_632',['PathImpl',['../structPathImpl.html',1,'']]]
+  ['mykey_663',['MyKey',['../structMyKey.html',1,'']]],
+  ['myvalue_664',['MyValue',['../structMyValue.html',1,'']]]
 ];

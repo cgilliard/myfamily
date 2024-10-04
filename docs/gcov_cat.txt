@@ -1269,7 +1269,7 @@
         -:    0:Source:chain_alloc.c
         -:    0:Graph:chain_alloc.gcno
         -:    0:Data:chain_alloc.gcda
-        -:    0:Runs:64
+        -:    0:Runs:67
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1288,165 +1288,211 @@
         -:   16:#include <base/panic.h>
         -:   17:#include <base/resources.h>
         -:   18:#include <errno.h>
-        -:   19:#include <string.h>
-        -:   20:
-        -:   21:typedef struct ChainGuardEntry {
-        -:   22:	struct ChainGuardEntry *next;
-        -:   23:	struct ChainGuardEntry *prev;
-        -:   24:	SlabAllocator *sa;
-        -:   25:	bool sync;
-        -:   26:} ChainGuardEntry;
-        -:   27:
-        -:   28:_Thread_local ChainGuardEntry *chain_guard_entry_root = NULL;
-        -:   29:_Thread_local ChainGuardEntry *chain_guard_entry_cur = NULL;
-        -:   30:SlabAllocator *global_sync_allocator = NULL;
+        -:   19:#include <pthread.h>
+        -:   20:#include <stdio.h>
+        -:   21:#include <string.h>
+        -:   22:
+        -:   23:typedef struct ChainGuardEntry {
+        -:   24:	struct ChainGuardEntry *next;
+        -:   25:	struct ChainGuardEntry *prev;
+        -:   26:	SlabAllocator *sa;
+        -:   27:	bool sync;
+        -:   28:	pthread_mutex_t lock;
+        -:   29:	bool is_locked; // used in case of a panic on cleanup to determine if we're locked
+        -:   30:} ChainGuardEntry;
         -:   31:
-        6:   32:SlabAllocator *init_default_slab_allocator() {
-        6:   33:	SlabAllocatorNc *sa = mymalloc(sizeof(SlabAllocator));
-        6:   34:	if (sa == NULL)
-    #####:   35:		panic("Could not initialize default slab allocator");
-        6:   36:	SlabAllocatorConfig sac;
-        -:   37:
-        -:   38:	// default slab allocator no_malloc = false, zeroed = false, is_64_bit = false
-        6:   39:	if (slab_allocator_config_build(&sac, false, false, false))
-    #####:   40:		panic("Could not initialize config for default slab allocator");
+        -:   32:_Thread_local ChainGuardEntry *chain_guard_entry_root = NULL;
+        -:   33:_Thread_local ChainGuardEntry *chain_guard_entry_cur = NULL;
+        -:   34:SlabAllocator *global_sync_allocator = NULL;
+        -:   35:
+       12:   36:SlabAllocator *init_default_slab_allocator() {
+       12:   37:	SlabAllocatorNc *sa = mymalloc(sizeof(SlabAllocator));
+       12:   38:	if (sa == NULL)
+    #####:   39:		panic("Could not initialize default slab allocator");
+       12:   40:	SlabAllocatorConfig sac;
         -:   41:
-        6:   42:	u64 max_slabs = (INT32_MAX / 100) * 100;
-      774:   43:	for (i32 i = 0; i < 128; i++) {
-      768:   44:		SlabType st = {.slab_size = (i + 3) * 8,
-        -:   45:					   .slabs_per_resize = 100,
-        -:   46:					   .initial_chunks = 0,
-        -:   47:					   .max_slabs = max_slabs};
-      768:   48:		if (slab_allocator_config_add_type(&sac, &st))
-    #####:   49:			panic("Could not add slab type to default slab allocator");
-        -:   50:	}
-      774:   51:	for (i32 i = 0; i < 128; i++) {
-      768:   52:		SlabType st = {.slab_size = (128 + 3) * 8 + (i + 1) * 1024,
-        -:   53:					   .slabs_per_resize = 100,
-        -:   54:					   .initial_chunks = 0,
-        -:   55:					   .max_slabs = max_slabs};
-      768:   56:		if (slab_allocator_config_add_type(&sac, &st))
-    #####:   57:			panic("Could not add config to default slab allocator");
-        -:   58:	}
-        -:   59:
-        6:   60:	if (slab_allocator_build(sa, &sac))
-    #####:   61:		panic("Could not initialize default slab allocator");
-        -:   62:
-        6:   63:	return sa;
-        -:   64:}
-        -:   65:
-        1:   66:SlabAllocator *get_global_sync_allocator() {
-        1:   67:	if (global_sync_allocator == NULL)
-        1:   68:		global_sync_allocator = init_default_slab_allocator();
-        1:   69:	return global_sync_allocator;
-        -:   70:}
-        -:   71:
-       55:   72:u64 alloc_count_global_sync_allocator() {
-       55:   73:	if (global_sync_allocator == NULL)
-       54:   74:		return 0;
-        1:   75:	return slab_allocator_cur_slabs_allocated(global_sync_allocator);
-        -:   76:}
-        -:   77:
-       55:   78:u64 alloc_count_default_slab_allocator() {
-       55:   79:	if (chain_guard_entry_root == NULL)
-       50:   80:		return 0;
-        5:   81:	return slab_allocator_cur_slabs_allocated(chain_guard_entry_root->sa);
-        -:   82:}
-        -:   83:
-       55:   84:void cleanup_default_slab_allocator() {
-       55:   85:	if (chain_guard_entry_root) {
-        5:   86:		slab_allocator_cleanup(chain_guard_entry_root->sa);
-        5:   87:		myfree(chain_guard_entry_root->sa);
-        5:   88:		myfree(chain_guard_entry_root);
-        5:   89:		chain_guard_entry_root = NULL;
-        -:   90:	}
-       55:   91:	if (global_sync_allocator) {
-        1:   92:		slab_allocator_cleanup(global_sync_allocator);
-        1:   93:		myfree(global_sync_allocator);
-        1:   94:		global_sync_allocator = NULL;
-        -:   95:	}
-       55:   96:}
-        -:   97:
-        5:   98:void chain_guard_init_root() {
-        5:   99:	chain_guard_entry_root = mymalloc(sizeof(ChainGuardEntry));
-        5:  100:	chain_guard_entry_cur = chain_guard_entry_root;
-        5:  101:	chain_guard_entry_root->next = NULL;
-        5:  102:	chain_guard_entry_root->prev = NULL;
-        5:  103:	chain_guard_entry_root->sync = false;
-        5:  104:	chain_guard_entry_root->sa = init_default_slab_allocator();
-        5:  105:}
-        -:  106:
-        6:  107:void chain_guard_cleanup(ChainGuardNc *ptr) {
-        6:  108:	ChainGuardEntry *entry = ptr->impl;
-        6:  109:	chain_guard_entry_cur = entry->prev;
-        6:  110:	chain_guard_entry_cur->next = NULL;
-        6:  111:	myfree(entry);
-        6:  112:}
-        -:  113:
-        6:  114:ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {
-        6:  115:	if (chain_guard_entry_root == NULL) {
-        2:  116:		chain_guard_init_root();
-        -:  117:	}
-        6:  118:	ChainGuardEntry *entry = mymalloc(sizeof(ChainGuardEntry));
-        6:  119:	entry->sa = sa;
-        6:  120:	entry->sync = sync;
-        6:  121:	entry->next = NULL;
-        6:  122:	entry->prev = chain_guard_entry_cur;
-        6:  123:	chain_guard_entry_cur->next = entry;
-        6:  124:	chain_guard_entry_cur = entry;
-        6:  125:	ChainGuardNc ret = {entry};
-        6:  126:	return ret;
-        -:  127:}
-        -:  128:
-       27:  129:int chain_malloc(FatPtr *ptr, u64 size) {
-       27:  130:	if (ptr == NULL || size == 0) {
-    #####:  131:		errno = EINVAL;
-    #####:  132:		return -1;
-        -:  133:	}
-       27:  134:	if (chain_guard_entry_root == NULL) {
-        3:  135:		chain_guard_init_root();
-        -:  136:	}
-       27:  137:	return slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
-        -:  138:}
-        1:  139:int chain_realloc(FatPtr *ptr, u64 size) {
-        1:  140:	if (chain_guard_entry_root == NULL)
-    #####:  141:		panic("Reallocating a FatPtr when it was never allocated!");
-        -:  142:
-        1:  143:	if (ptr == NULL || nil(*ptr) || size == 0) {
+        -:   42:	// default slab allocator no_malloc = false, zeroed = false, is_64_bit = false
+       12:   43:	if (slab_allocator_config_build(&sac, false, false, false))
+    #####:   44:		panic("Could not initialize config for default slab allocator");
+        -:   45:
+       12:   46:	u64 max_slabs = (INT32_MAX / 100) * 100;
+     1548:   47:	for (i32 i = 0; i < 128; i++) {
+     1536:   48:		SlabType st = {.slab_size = (i + 3) * 8,
+        -:   49:					   .slabs_per_resize = 100,
+        -:   50:					   .initial_chunks = 0,
+        -:   51:					   .max_slabs = max_slabs};
+     1536:   52:		if (slab_allocator_config_add_type(&sac, &st))
+    #####:   53:			panic("Could not add slab type to default slab allocator");
+        -:   54:	}
+     1548:   55:	for (i32 i = 0; i < 128; i++) {
+     1536:   56:		SlabType st = {.slab_size = (128 + 3) * 8 + (i + 1) * 1024,
+        -:   57:					   .slabs_per_resize = 100,
+        -:   58:					   .initial_chunks = 0,
+        -:   59:					   .max_slabs = max_slabs};
+     1536:   60:		if (slab_allocator_config_add_type(&sac, &st))
+    #####:   61:			panic("Could not add config to default slab allocator");
+        -:   62:	}
+        -:   63:
+       12:   64:	if (slab_allocator_build(sa, &sac))
+    #####:   65:		panic("Could not initialize default slab allocator");
+        -:   66:
+       12:   67:	return sa;
+        -:   68:}
+        -:   69:
+       12:   70:SlabAllocator *get_global_sync_allocator() {
+       12:   71:	if (global_sync_allocator == NULL)
+        3:   72:		global_sync_allocator = init_default_slab_allocator();
+       12:   73:	return global_sync_allocator;
+        -:   74:}
+        -:   75:
+       58:   76:u64 alloc_count_global_sync_allocator() {
+       58:   77:	if (global_sync_allocator == NULL)
+       55:   78:		return 0;
+        3:   79:	return slab_allocator_cur_slabs_allocated(global_sync_allocator);
+        -:   80:}
+        -:   81:
+       58:   82:u64 alloc_count_default_slab_allocator() {
+       58:   83:	if (chain_guard_entry_root == NULL)
+       50:   84:		return 0;
+        8:   85:	return slab_allocator_cur_slabs_allocated(chain_guard_entry_root->sa);
+        -:   86:}
+        -:   87:
+       58:   88:void cleanup_default_slab_allocator() {
+       58:   89:	if (chain_guard_entry_root) {
+        8:   90:		slab_allocator_cleanup(chain_guard_entry_root->sa);
+        8:   91:		myfree(chain_guard_entry_root->sa);
+        8:   92:		myfree(chain_guard_entry_root);
+        8:   93:		chain_guard_entry_root = NULL;
+        -:   94:	}
+       58:   95:	if (global_sync_allocator) {
+        3:   96:		slab_allocator_cleanup(global_sync_allocator);
+        3:   97:		myfree(global_sync_allocator);
+        3:   98:		global_sync_allocator = NULL;
+        -:   99:	}
+       58:  100:}
+        -:  101:
+        9:  102:void chain_guard_init_root() {
+        9:  103:	chain_guard_entry_root = mymalloc(sizeof(ChainGuardEntry));
+        9:  104:	chain_guard_entry_cur = chain_guard_entry_root;
+        9:  105:	chain_guard_entry_root->next = NULL;
+        9:  106:	chain_guard_entry_root->prev = NULL;
+        9:  107:	chain_guard_entry_root->sync = false;
+        9:  108:	chain_guard_entry_root->sa = init_default_slab_allocator();
+        9:  109:}
+        -:  110:
+       17:  111:void chain_guard_cleanup(ChainGuardNc *ptr) {
+       17:  112:	if (ptr->impl) {
+       17:  113:		ChainGuardEntry *entry = ptr->impl;
+       17:  114:		chain_guard_entry_cur = entry->prev;
+       17:  115:		chain_guard_entry_cur->next = NULL;
+       17:  116:		if (chain_guard_entry_cur->sync) {
+    #####:  117:			pthread_mutex_destroy(&chain_guard_entry_cur->lock);
+        -:  118:		}
+       17:  119:		myfree(entry);
+        -:  120:	}
+       17:  121:}
+        -:  122:
+       17:  123:ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {
+       17:  124:	if (chain_guard_entry_root == NULL) {
+        5:  125:		chain_guard_init_root();
+        -:  126:	}
+       17:  127:	ChainGuardEntry *entry = mymalloc(sizeof(ChainGuardEntry));
+       17:  128:	entry->sa = sa;
+       17:  129:	entry->sync = sync;
+       17:  130:	if (entry->sync) {
+       12:  131:		pthread_mutex_init(&entry->lock, NULL);
+        -:  132:	}
+       17:  133:	entry->is_locked = false;
+       17:  134:	entry->next = NULL;
+       17:  135:	entry->prev = chain_guard_entry_cur;
+       17:  136:	chain_guard_entry_cur->next = entry;
+       17:  137:	chain_guard_entry_cur = entry;
+       17:  138:	ChainGuardNc ret = {entry};
+       17:  139:	return ret;
+        -:  140:}
+        -:  141:
+       33:  142:int chain_malloc(FatPtr *ptr, u64 size) {
+       33:  143:	if (ptr == NULL || size == 0) {
     #####:  144:		errno = EINVAL;
     #####:  145:		return -1;
         -:  146:	}
-        -:  147:
-        1:  148:	FatPtr tmp = null;
-        1:  149:	chain_malloc(&tmp, size);
-        1:  150:	if (nil(tmp)) {
-    #####:  151:		return -1;
-        -:  152:	}
-        -:  153:
-        1:  154:	u64 len = fat_ptr_len(ptr);
-        1:  155:	u64 nlen = fat_ptr_len(&tmp);
-        1:  156:	if (nlen < len) {
-    #####:  157:		len = nlen;
-        -:  158:	}
-        -:  159:
-        1:  160:	memcpy(fat_ptr_data(&tmp), fat_ptr_data(ptr), len);
-        -:  161:
-        1:  162:	chain_free(ptr);
-        1:  163:	*ptr = tmp;
-        1:  164:	return 0;
-        -:  165:}
-       13:  166:void chain_free(FatPtr *ptr) {
-       13:  167:	if (ptr == NULL) {
-    #####:  168:		panic("attempt to free a NULL FatPtr");
-        -:  169:	}
-       13:  170:	if (chain_guard_entry_root == NULL)
-    #####:  171:		panic("Freeing a FatPtr when it was never allocated!");
-       13:  172:	slab_allocator_free(chain_guard_entry_cur->sa, ptr);
-       13:  173:}
+       33:  147:	if (chain_guard_entry_root == NULL) {
+        4:  148:		chain_guard_init_root();
+        -:  149:	}
+       33:  150:	if (chain_guard_entry_cur->sync) {
+        -:  151:	}
+        -:  152:	int ret;
+       33:  153:	if (chain_guard_entry_cur->sync) {
+        6:  154:		pthread_mutex_lock(&chain_guard_entry_cur->lock);
+        6:  155:		chain_guard_entry_cur->is_locked = true;
+        6:  156:		ret = slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
+        6:  157:		chain_guard_entry_cur->is_locked = false;
+        6:  158:		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
+        -:  159:	} else {
+       27:  160:		ret = slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
+        -:  161:	}
+       33:  162:	return ret;
+        -:  163:}
+        1:  164:int chain_realloc(FatPtr *ptr, u64 size) {
+        1:  165:	if (chain_guard_entry_root == NULL)
+    #####:  166:		panic("Reallocating a FatPtr when it was never allocated!");
+        -:  167:
+        1:  168:	if (ptr == NULL || nil(*ptr) || size == 0) {
+    #####:  169:		errno = EINVAL;
+    #####:  170:		return -1;
+        -:  171:	}
+        -:  172:
+        1:  173:	int ret = 0;
+        -:  174:
+        1:  175:	if (chain_guard_entry_cur->sync) {
+    #####:  176:		pthread_mutex_lock(&chain_guard_entry_cur->lock);
+    #####:  177:		chain_guard_entry_cur->is_locked = true;
+        -:  178:	}
+        -:  179:
+        1:  180:	FatPtr tmp = null;
+        1:  181:	chain_malloc(&tmp, size);
+        1:  182:	if (nil(tmp)) {
+    #####:  183:		ret = -1;
+        -:  184:	} else {
+        -:  185:
+        1:  186:		u64 len = fat_ptr_len(ptr);
+        1:  187:		u64 nlen = fat_ptr_len(&tmp);
+        1:  188:		if (nlen < len) {
+    #####:  189:			len = nlen;
+        -:  190:		}
+        -:  191:
+        1:  192:		memcpy(fat_ptr_data(&tmp), fat_ptr_data(ptr), len);
+        -:  193:
+        1:  194:		chain_free(ptr);
+        1:  195:		*ptr = tmp;
+        -:  196:	}
+        1:  197:	if (chain_guard_entry_cur->sync) {
+    #####:  198:		chain_guard_entry_cur->is_locked = false;
+    #####:  199:		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
+        -:  200:	}
+        1:  201:	return 0;
+        -:  202:}
+       19:  203:void chain_free(FatPtr *ptr) {
+       19:  204:	if (ptr == NULL) {
+    #####:  205:		panic("attempt to free a NULL FatPtr");
+        -:  206:	}
+       19:  207:	if (chain_guard_entry_root == NULL)
+    #####:  208:		panic("Freeing a FatPtr when it was never allocated!");
+        -:  209:
+       19:  210:	if (chain_guard_entry_cur->sync) {
+        6:  211:		pthread_mutex_lock(&chain_guard_entry_cur->lock);
+        6:  212:		chain_guard_entry_cur->is_locked = true;
+        6:  213:		slab_allocator_free(chain_guard_entry_cur->sa, ptr);
+        6:  214:		chain_guard_entry_cur->is_locked = false;
+        6:  215:		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
+        -:  216:	} else {
+       13:  217:		slab_allocator_free(chain_guard_entry_cur->sa, ptr);
+        -:  218:	}
+       19:  219:}
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:64
+        -:    0:Runs:67
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1542,7 +1588,7 @@
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:64
+        -:    0:Runs:67
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1709,21 +1755,21 @@
         -:  164:}
         -:  165:
         -:  166:// Function to recursively remove a directory and its contents
-      145:  167:int remove_directory(const Path *p, bool preserve_dir) {
-      145:  168:	const char *path = path_to_string(p);
+      151:  167:int remove_directory(const Path *p, bool preserve_dir) {
+      151:  168:	const char *path = path_to_string(p);
         -:  169:	struct dirent *entry;
-      145:  170:	DIR *dir = opendir(path);
+      151:  170:	DIR *dir = opendir(path);
         -:  171:
-      145:  172:	if (dir == NULL) {
-       58:  173:		return -1;
+      151:  172:	if (dir == NULL) {
+       61:  173:		return -1;
         -:  174:	}
         -:  175:
-      304:  176:	while ((entry = readdir(dir)) != NULL) {
+      313:  176:	while ((entry = readdir(dir)) != NULL) {
         -:  177:		char full_path[PATH_MAX];
         -:  178:
         -:  179:		// Skip the special entries "." and ".."
-      222:  180:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-      173:  181:			continue;
+      228:  180:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+      179:  181:			continue;
         -:  182:		}
         -:  183:
         -:  184:		// Construct the full path to the file/directory
@@ -1754,17 +1800,17 @@
         -:  209:		}
         -:  210:	}
         -:  211:
-       82:  212:	closedir(dir);
+       85:  212:	closedir(dir);
         -:  213:
         -:  214:	// Now the directory is empty, so we can remove it
-       82:  215:	if (!preserve_dir) {
-       81:  216:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
+       85:  215:	if (!preserve_dir) {
+       84:  216:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
         1:  217:			errno = EIO;
         1:  218:			return -1;
         -:  219:		}
         -:  220:	}
         -:  221:
-       81:  222:	return 0;
+       84:  222:	return 0;
         -:  223:}
         -:  224:
         5:  225:void exit_error(char *format, ...) {
@@ -1801,7 +1847,7 @@
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
-        -:    0:Runs:64
+        -:    0:Runs:67
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1874,7 +1920,7 @@
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:64
+        -:    0:Runs:67
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1902,35 +1948,35 @@
         -:   25:
         -:   26:bool __is_debug_path_homedir_null = false;
         -:   27:
-      242:   28:void path_cleanup(PathImpl *ptr) {
-      242:   29:	if (ptr->ptr) {
-      236:   30:		myfree(ptr->ptr);
-      236:   31:		ptr->ptr = NULL;
+      248:   28:void path_cleanup(PathImpl *ptr) {
+      248:   29:	if (ptr->ptr) {
+      242:   30:		myfree(ptr->ptr);
+      242:   31:		ptr->ptr = NULL;
         -:   32:	}
-      242:   33:}
+      248:   33:}
         -:   34:
-      247:   35:int path_for(Path *p, const char *path) {
-      247:   36:	if (p == NULL) {
+      253:   35:int path_for(Path *p, const char *path) {
+      253:   36:	if (p == NULL) {
         1:   37:		errno = EINVAL;
         1:   38:		return -1;
         -:   39:	}
-      246:   40:	if (path == NULL) {
+      252:   40:	if (path == NULL) {
         1:   41:		errno = EINVAL;
         1:   42:		p->ptr = NULL;
         1:   43:		return -1;
         -:   44:	}
-      245:   45:	int len = strlen(path);
-      245:   46:	if (len == 0) {
+      251:   45:	int len = strlen(path);
+      251:   46:	if (len == 0) {
         1:   47:		errno = EINVAL;
         1:   48:		p->ptr = NULL;
         1:   49:		return -1;
         -:   50:	}
-      244:   51:	p->ptr = mymalloc(len + 1);
-      244:   52:	if (!p->ptr)
+      250:   51:	p->ptr = mymalloc(len + 1);
+      250:   52:	if (!p->ptr)
         2:   53:		return -1;
-      242:   54:	p->len = len;
-      242:   55:	strcpy(p->ptr, path);
-      242:   56:	return 0;
+      248:   54:	p->len = len;
+      248:   55:	strcpy(p->ptr, path);
+      248:   56:	return 0;
         -:   57:}
         -:   58:
        33:   59:int path_replace_home(Path *p) {
@@ -1992,41 +2038,41 @@
        13:  115:	strcpy(p->ptr, buf);
        13:  116:	return 0;
         -:  117:}
-      167:  118:int path_push(Path *p, const char *next) {
-      167:  119:	if (p == NULL) {
+      170:  118:int path_push(Path *p, const char *next) {
+      170:  119:	if (p == NULL) {
         1:  120:		errno = EINVAL;
         1:  121:		return -1;
         -:  122:	}
-      166:  123:	if (next == NULL) {
+      169:  123:	if (next == NULL) {
         1:  124:		errno = EINVAL;
         1:  125:		return -1;
         -:  126:	}
-      165:  127:	int slen = strlen(p->ptr);
-      165:  128:	if (slen <= 0 || strlen(next) == 0) {
+      168:  127:	int slen = strlen(p->ptr);
+      168:  128:	if (slen <= 0 || strlen(next) == 0) {
         1:  129:		errno = EFAULT;
         1:  130:		return -1;
         -:  131:	}
-      164:  132:	bool need_sep = false;
-      164:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
-      164:  134:		need_sep = true;
+      167:  132:	bool need_sep = false;
+      167:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
+      167:  134:		need_sep = true;
         -:  135:	}
         -:  136:
-      164:  137:	int nlen = slen + strlen(next);
-      164:  138:	if (need_sep)
-      164:  139:		nlen += strlen(PATH_SEPARATOR);
+      167:  137:	int nlen = slen + strlen(next);
+      167:  138:	if (need_sep)
+      167:  139:		nlen += strlen(PATH_SEPARATOR);
         -:  140:
-      164:  141:	if (nlen >= p->len) {
-      160:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
-      160:  143:		if (nptr == NULL)
+      167:  141:	if (nlen >= p->len) {
+      163:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
+      163:  143:		if (nptr == NULL)
         1:  144:			return -1;
-      159:  145:		p->ptr = nptr;
-      159:  146:		p->len = nlen;
+      162:  145:		p->ptr = nptr;
+      162:  146:		p->len = nlen;
         -:  147:	}
         -:  148:
-      163:  149:	if (need_sep)
-      163:  150:		strcat(p->ptr, PATH_SEPARATOR);
-      163:  151:	strcat(p->ptr, next);
-      163:  152:	return 0;
+      166:  149:	if (need_sep)
+      166:  150:		strcat(p->ptr, PATH_SEPARATOR);
+      166:  151:	strcat(p->ptr, next);
+      166:  152:	return 0;
         -:  153:}
        48:  154:int path_pop(Path *p) {
        48:  155:	const char *res = rstrstr(p->ptr, PATH_SEPARATOR);
@@ -2040,8 +2086,8 @@
        48:  163:	return 0;
         -:  164:}
         -:  165:
-     2194:  166:char *path_to_string(const Path *p) {
-     2194:  167:	return p->ptr;
+     2200:  166:char *path_to_string(const Path *p) {
+     2200:  167:	return p->ptr;
         -:  168:}
         -:  169:
        88:  170:const char *path_file_name(const Path *p) {
@@ -2071,8 +2117,8 @@
         3:  194:	return false;
         -:  195:}
         -:  196:
-      139:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
-      139:  198:	if (p->ptr == NULL || p->len == 0) {
+      142:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
+      142:  198:	if (p->ptr == NULL || p->len == 0) {
         1:  199:		errno = EINVAL;
         1:  200:		return false;
         -:  201:	}
@@ -2080,7 +2126,7 @@
         -:  203:	struct stat s;
         -:  204:
         -:  205:	// Check if the path exists
-      138:  206:	if (stat(p->ptr, &s) == 0) {
+      141:  206:	if (stat(p->ptr, &s) == 0) {
         -:  207:		// If the path exists and it's a directory, return success
         8:  208:		if (s.st_mode & S_IFDIR) {
         7:  209:			return true;
@@ -2092,11 +2138,11 @@
         -:  215:	}
         -:  216:
         -:  217:	// If parent is false, attempt to create only the target directory
-      130:  218:	if (!parent) {
-      112:  219:		if (mkdir(p->ptr, mode) != 0) {
+      133:  218:	if (!parent) {
+      115:  219:		if (mkdir(p->ptr, mode) != 0) {
        28:  220:			return false;
         -:  221:		}
-       84:  222:		return true;
+       87:  222:		return true;
         -:  223:	}
         -:  224:
         -:  225:	// Create the directory structure (parent is true)
@@ -2145,7 +2191,7 @@
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:64
+        -:    0:Runs:67
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2173,42 +2219,42 @@
         -:   25:u64 __is_debug_realloc_counter_ = UINT64_MAX;
         -:   26:#endif // TEST
         -:   27:
-     4864:   28:void *mymalloc(u64 size) {
+     4921:   28:void *mymalloc(u64 size) {
         -:   29:#ifdef TEST
-     4864:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
+     4921:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
        21:   31:		__is_debug_malloc_counter_ = UINT64_MAX;
        21:   32:		return NULL;
         -:   33:	}
-     4843:   34:	__is_debug_malloc_counter_--;
+     4900:   34:	__is_debug_malloc_counter_--;
         -:   35:#endif // TEST
         -:   36:	void *ret;
-     4843:   37:	ret = malloc(size);
+     4900:   37:	ret = malloc(size);
         -:   38:
-     4843:   39:	if (ret) {
-     4843:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+     4900:   39:	if (ret) {
+     4900:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   41:	}
-     4843:   42:	return ret;
+     4900:   42:	return ret;
         -:   43:}
-     1767:   44:void *myrealloc(void *ptr, u64 size) {
+     3300:   44:void *myrealloc(void *ptr, u64 size) {
         -:   45:#ifdef TEST
-     1767:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
+     3300:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
         7:   47:		__is_debug_realloc_counter_ = UINT64_MAX;
         7:   48:		return NULL;
         -:   49:	}
-     1760:   50:	__is_debug_realloc_counter_--;
+     3293:   50:	__is_debug_realloc_counter_--;
         -:   51:#endif // TEST
         -:   52:	void *ret;
-     1760:   53:	ret = realloc(ptr, size);
+     3293:   53:	ret = realloc(ptr, size);
         -:   54:
-     1760:   55:	if (ret) {
-     1760:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+     3293:   55:	if (ret) {
+     3293:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   57:	}
-     1760:   58:	return ret;
+     3293:   58:	return ret;
         -:   59:}
-     4787:   60:void myfree(void *ptr) {
-     4787:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-     4787:   62:	free(ptr);
-     4787:   63:}
+     4840:   60:void myfree(void *ptr) {
+     4840:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+     4840:   62:	free(ptr);
+     4840:   63:}
        58:   64:MYFILE *myfopen(const Path *path, const char *mode) {
        58:   65:	const char *path_str = path_to_string(path);
        58:   66:	FILE *ret = fopen(path_str, mode);
@@ -2226,25 +2272,25 @@
        53:   78:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
        53:   79:	fclose((FILE *)ptr);
        53:   80:}
-      115:   81:u64 mymalloc_sum() {
-      115:   82:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
+      121:   81:u64 mymalloc_sum() {
+      121:   82:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
         -:   83:}
         2:   84:u64 myrealloc_sum() {
         2:   85:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
         -:   86:}
-      115:   87:u64 myfree_sum() {
-      115:   88:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+      121:   87:u64 myfree_sum() {
+      121:   88:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
         -:   89:}
-      171:   90:u64 myfopen_sum() {
-      171:   91:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+      180:   90:u64 myfopen_sum() {
+      180:   91:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
         -:   92:}
-      171:   93:u64 myfclose_sum() {
-      171:   94:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+      180:   93:u64 myfclose_sum() {
+      180:   94:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
         -:   95:}
         -:    0:Source:sha3.c
         -:    0:Graph:sha3.gcno
         -:    0:Data:sha3.gcda
-        -:    0:Runs:64
+        -:    0:Runs:67
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2555,7 +2601,7 @@
         -:    0:Source:slabs.c
         -:    0:Graph:slabs.gcno
         -:    0:Data:slabs.gcda
-        -:    0:Runs:64
+        -:    0:Runs:67
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2595,620 +2641,621 @@
         -:   37:	void *data;
         -:   38:} FatPtr32Impl;
         -:   39:
-        -:   40:const FatPtr32Impl fptr32null = {.id = 0, .len = 0, .data = NULL};
-        -:   41:const FatPtr null = {.data = (void *)&fptr32null};
-        -:   42:
-        -:   43:// deteremine which kind of fat pointer this is. 32 bit fat pointers are restricted to having an ID
-        -:   44:// that does not set the most significant bit. Therefore they must be less than 2^31 or the
-        -:   45:// maximum signed int value (INT32_MAX). Conversely, the 64 bit ids must have this bit set.
-        -:   46:// This is the slab allocator's responsibility to ensure the bit is set correctly.
-        -:   47:// Users need not worry about these details as they are handled internally.
-  2001102:   48:bool fat_ptr_is64(const FatPtr *ptr) {
-  2001102:   49:	return ((FatPtr32Impl *)ptr->data)->id & 0x1;
-        -:   50:}
-        -:   51:
-        -:   52:// Return the id of the FatPtr. First check bit for u64/u32 status, then return value.
-      200:   53:u64 fat_ptr_id(const FatPtr *ptr) {
-      200:   54:	if (fat_ptr_is64(ptr))
-      100:   55:		return ((FatPtr64Impl *)ptr->data)->id;
-        -:   56:	else
-      100:   57:		return ((FatPtr32Impl *)ptr->data)->id;
-        -:   58:}
-        -:   59:
-        -:   60:// Get the length of this FatPtr. Once again use the status bit in the id then return value.
-  2000613:   61:u64 fat_ptr_len(const FatPtr *ptr) {
-  2000613:   62:	if (fat_ptr_is64(ptr))
-      242:   63:		return ((FatPtr64Impl *)ptr->data)->len;
-        -:   64:	else
-  2000371:   65:		return ((FatPtr32Impl *)ptr->data)->len;
-        -:   66:}
-        -:   67:
-        -:   68:// Get the data pointer of this FatPtr. Once again use the status bit in the id then return value.
-      289:   69:void *fat_ptr_data(const FatPtr *ptr) {
-      289:   70:	if (fat_ptr_is64(ptr))
-      105:   71:		return ((FatPtr64Impl *)ptr->data)->data;
-        -:   72:	else
-      184:   73:		return ((FatPtr32Impl *)ptr->data)->data;
-        -:   74:}
-        -:   75:
-        -:   76:// Test function to free the 64 bit objects.
-      100:   77:void fat_ptr_free_test_obj64(FatPtr *ptr) {
-      100:   78:	if (ptr && ptr->data) {
-      100:   79:		myfree(ptr->data);
-      100:   80:		ptr->data = NULL;
-        -:   81:	}
-      100:   82:}
-        -:   83:
-        -:   84:// Test function to free the 32 bit objects.
-      100:   85:void fat_ptr_free_test_obj32(FatPtr *ptr) {
-      100:   86:	if (ptr && ptr->data) {
-      100:   87:		myfree(ptr->data);
-      100:   88:		ptr->data = NULL;
-        -:   89:	}
-      100:   90:}
-        -:   91:
-        -:   92:// Test function to allocate the 64 bit objects.
-      100:   93:void fat_ptr_test_obj64(FatPtr *ptr, u64 id, u64 len) {
-      100:   94:	ptr->data = mymalloc(3 * sizeof(u64) + len);
-      100:   95:	FatPtr64Impl *fptr = ptr->data;
-      100:   96:	fptr->id = id;
-      100:   97:	fptr->len = len;
-      100:   98:	fptr->data = ptr->data + 3 * sizeof(u64);
-      100:   99:}
-        -:  100:
-        -:  101:// Test function to allocate the 32 bit objects.
-      100:  102:void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len) {
-      100:  103:	ptr->data = mymalloc(2 * sizeof(u32) + sizeof(u64) + len);
-      100:  104:	FatPtr32Impl *fptr = ptr->data;
-      100:  105:	fptr->id = id;
-      100:  106:	fptr->len = len;
-      100:  107:	fptr->data = ptr->data + 2 * sizeof(u32) + sizeof(u64);
-      100:  108:}
-        -:  109:
-        -:  110:// SlabAllocator Config
-       24:  111:void slab_allocator_config_cleanup(SlabAllocatorConfigNc *sc) {
-       24:  112:	if (sc->slab_types) {
-       24:  113:		myfree(sc->slab_types);
-       24:  114:		sc->slab_types = NULL;
-        -:  115:	}
-       24:  116:}
-        -:  117:
-       27:  118:int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeroed, bool no_malloc,
-        -:  119:								bool is_64_bit) {
-       27:  120:	sc->zeroed = zeroed;
-       27:  121:	sc->no_malloc = no_malloc;
-       27:  122:	sc->is_64_bit = is_64_bit;
-       27:  123:	sc->slab_types_count = 0;
-       27:  124:	sc->slab_types = NULL;
-        -:  125:
-       27:  126:	return 0;
-        -:  127:}
-     1555:  128:int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st) {
-     1555:  129:	if (sc->slab_types) {
-     1531:  130:		void *tmp = myrealloc(sc->slab_types, sizeof(SlabType) * (1 + sc->slab_types_count));
-     1531:  131:		if (tmp == NULL)
-    #####:  132:			return -1;
-     1531:  133:		sc->slab_types = tmp;
-        -:  134:	} else {
-       24:  135:		sc->slab_types = mymalloc(sizeof(SlabType));
-       24:  136:		if (sc->slab_types == NULL)
-    #####:  137:			return -1;
-        -:  138:	}
+        -:   40:// deteremine which kind of fat pointer this is. 32 bit fat pointers are restricted to having an ID
+        -:   41:// that does not set the most significant bit. Therefore they must be less than 2^31 or the
+        -:   42:// maximum signed int value (INT32_MAX). Conversely, the 64 bit ids must have this bit set.
+        -:   43:// This is the slab allocator's responsibility to ensure the bit is set correctly.
+        -:   44:// Users need not worry about these details as they are handled internally.
+  3001353:   45:bool fat_ptr_is64(const FatPtr *ptr) {
+  3001353:   46:	return ((FatPtr32Impl *)ptr->data)->id & 0x1;
+        -:   47:}
+        -:   48:
+        -:   49:// Return the id of the FatPtr. First check bit for u64/u32 status, then return value.
+      200:   50:u64 fat_ptr_id(const FatPtr *ptr) {
+      200:   51:	if (fat_ptr_is64(ptr))
+      100:   52:		return ((FatPtr64Impl *)ptr->data)->id;
+        -:   53:	else
+      100:   54:		return ((FatPtr32Impl *)ptr->data)->id;
+        -:   55:}
+        -:   56:
+        -:   57:// Get the length of this FatPtr. Once again use the status bit in the id then return value.
+  3000821:   58:u64 fat_ptr_len(const FatPtr *ptr) {
+  3000821:   59:	if (fat_ptr_is64(ptr))
+      266:   60:		return ((FatPtr64Impl *)ptr->data)->len;
+        -:   61:	else
+  3000555:   62:		return ((FatPtr32Impl *)ptr->data)->len;
+        -:   63:}
+        -:   64:
+        -:   65:// Get the data pointer of this FatPtr. Once again use the status bit in the id then return value.
+      332:   66:void *fat_ptr_data(const FatPtr *ptr) {
+      332:   67:	if (fat_ptr_is64(ptr))
+      105:   68:		return ((FatPtr64Impl *)ptr->data)->data;
+        -:   69:	else
+      227:   70:		return ((FatPtr32Impl *)ptr->data)->data;
+        -:   71:}
+        -:   72:
+        -:   73:// Test function to free the 64 bit objects.
+      100:   74:void fat_ptr_free_test_obj64(FatPtr *ptr) {
+      100:   75:	if (ptr && ptr->data) {
+      100:   76:		myfree(ptr->data);
+      100:   77:		ptr->data = NULL;
+        -:   78:	}
+      100:   79:}
+        -:   80:
+        -:   81:// Test function to free the 32 bit objects.
+      100:   82:void fat_ptr_free_test_obj32(FatPtr *ptr) {
+      100:   83:	if (ptr && ptr->data) {
+      100:   84:		myfree(ptr->data);
+      100:   85:		ptr->data = NULL;
+        -:   86:	}
+      100:   87:}
+        -:   88:
+        -:   89:// Test function to allocate the 64 bit objects.
+      100:   90:void fat_ptr_test_obj64(FatPtr *ptr, u64 id, u64 len) {
+      100:   91:	ptr->data = mymalloc(3 * sizeof(u64) + len);
+      100:   92:	FatPtr64Impl *fptr = ptr->data;
+      100:   93:	fptr->id = id;
+      100:   94:	fptr->len = len;
+      100:   95:	fptr->data = ptr->data + 3 * sizeof(u64);
+      100:   96:}
+        -:   97:
+        -:   98:// Test function to allocate the 32 bit objects.
+      100:   99:void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len) {
+      100:  100:	ptr->data = mymalloc(2 * sizeof(u32) + sizeof(u64) + len);
+      100:  101:	FatPtr32Impl *fptr = ptr->data;
+      100:  102:	fptr->id = id;
+      100:  103:	fptr->len = len;
+      100:  104:	fptr->data = ptr->data + 2 * sizeof(u32) + sizeof(u64);
+      100:  105:}
+        -:  106:
+        -:  107:// SlabAllocator Config
+       30:  108:void slab_allocator_config_cleanup(SlabAllocatorConfigNc *sc) {
+       30:  109:	if (sc->slab_types) {
+       30:  110:		myfree(sc->slab_types);
+       30:  111:		sc->slab_types = NULL;
+        -:  112:	}
+       30:  113:}
+        -:  114:
+       33:  115:int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeroed, bool no_malloc,
+        -:  116:								bool is_64_bit) {
+       33:  117:	sc->zeroed = zeroed;
+       33:  118:	sc->no_malloc = no_malloc;
+       33:  119:	sc->is_64_bit = is_64_bit;
+       33:  120:	sc->slab_types_count = 0;
+       33:  121:	sc->slab_types = NULL;
+        -:  122:
+       33:  123:	return 0;
+        -:  124:}
+     3091:  125:int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st) {
+     3091:  126:	if (sc->slab_types) {
+     3061:  127:		void *tmp = myrealloc(sc->slab_types, sizeof(SlabType) * (1 + sc->slab_types_count));
+     3061:  128:		if (tmp == NULL)
+    #####:  129:			return -1;
+     3061:  130:		sc->slab_types = tmp;
+        -:  131:	} else {
+       30:  132:		sc->slab_types = mymalloc(sizeof(SlabType));
+       30:  133:		if (sc->slab_types == NULL)
+    #####:  134:			return -1;
+        -:  135:	}
+        -:  136:
+     3091:  137:	sc->slab_types[sc->slab_types_count] = *st;
+     3091:  138:	sc->slab_types_count++;
         -:  139:
-     1555:  140:	sc->slab_types[sc->slab_types_count] = *st;
-     1555:  141:	sc->slab_types_count++;
+     3091:  140:	return 0;
+        -:  141:}
         -:  142:
-     1555:  143:	return 0;
-        -:  144:}
-        -:  145:
-        -:  146:// Slab Allocator
-        -:  147:
-        -:  148:typedef struct SlabData {
-        -:  149:	SlabType type; // This slab data's type information (slab_size, slabs_per_resize, initial, max)
-        -:  150:	void **data;   // Pointers to each chunk
-        -:  151:	void *free_list;	// The free list pointers
-        -:  152:	u64 cur_chunks;		// number of chunks currently allocated
-        -:  153:	u64 cur_slabs;		// number of slabs currently allocated
-        -:  154:	u64 free_list_head; // the free list head
-        -:  155:} SlabData;
-        -:  156:
-        -:  157:typedef struct SlabAllocatorImpl {
-        -:  158:	u64 sd_size;	  // size of the SlabData array
-        -:  159:	SlabData *sd_arr; // slab data array one for each SlabType
-        -:  160:	bool no_malloc;	  // config no_malloc
-        -:  161:	bool zeroed;	  // config zeroed
-        -:  162:	bool is_64_bit;	  // config 64 bit id/len
-        -:  163:	u64 cur_mallocs;  // number of slabs allocated via malloc
-        -:  164:} SlabAllocatorImpl;
-        -:  165:
-        -:  166:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed);
-        -:  167:
-       23:  168:void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
-       23:  169:	if (ptr->impl) {
-       23:  170:		SlabAllocatorImpl *impl = ptr->impl;
-       23:  171:		if (impl->sd_arr) {
-     1576:  172:			for (u64 i = 0; i < impl->sd_size; i++) {
-     1580:  173:				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
-       27:  174:					if (impl->sd_arr[i].data[j]) {
-       27:  175:						myfree(impl->sd_arr[i].data[j]);
-       27:  176:						impl->sd_arr[i].data[j] = NULL;
-        -:  177:					}
-        -:  178:				}
-     1553:  179:				if (impl->sd_arr[i].data) {
-       22:  180:					myfree(impl->sd_arr[i].data);
-       22:  181:					impl->sd_arr[i].data = NULL;
-        -:  182:				}
-     1553:  183:				if (impl->sd_arr[i].free_list) {
-       22:  184:					myfree(impl->sd_arr[i].free_list);
-       22:  185:					impl->sd_arr[i].free_list = NULL;
-        -:  186:				}
-        -:  187:			}
-        -:  188:
-       23:  189:			myfree(impl->sd_arr);
-       23:  190:			impl->sd_arr = NULL;
-        -:  191:		}
-       23:  192:		myfree(ptr->impl);
-       23:  193:		ptr->impl = NULL;
-        -:  194:	}
-       23:  195:}
-        -:  196:
-     1569:  197:int slab_allocator_init_free_list(SlabData *sd, u64 slabs, u64 offset, bool is_64_bit) {
-        -:  198:	//  initialize the values of the free list.
-  1002513:  199:	for (u64 i = 0; i < slabs; i++) {
-  1000944:  200:		if (i == (slabs - 1)) {
-       27:  201:			if (is_64_bit)
-        2:  202:				((u64 *)(sd->free_list))[i + offset] = UINT64_MAX;
-        -:  203:			else
-       25:  204:				((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
-        -:  205:		} else {
-  1000917:  206:			if (is_64_bit)
-      108:  207:				((u64 *)(sd->free_list))[i + offset] = offset + i + 1;
-        -:  208:			else
-  1000809:  209:				((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
-        -:  210:		}
-        -:  211:	}
+        -:  143:// Slab Allocator
+        -:  144:
+        -:  145:typedef struct SlabData {
+        -:  146:	SlabType type; // This slab data's type information (slab_size, slabs_per_resize, initial, max)
+        -:  147:	void **data;   // Pointers to each chunk
+        -:  148:	void *free_list;	// The free list pointers
+        -:  149:	u64 cur_chunks;		// number of chunks currently allocated
+        -:  150:	u64 cur_slabs;		// number of slabs currently allocated
+        -:  151:	u64 free_list_head; // the free list head
+        -:  152:} SlabData;
+        -:  153:
+        -:  154:typedef struct SlabAllocatorImpl {
+        -:  155:	u64 sd_size;	  // size of the SlabData array
+        -:  156:	SlabData *sd_arr; // slab data array one for each SlabType
+        -:  157:	bool no_malloc;	  // config no_malloc
+        -:  158:	bool zeroed;	  // config zeroed
+        -:  159:	bool is_64_bit;	  // config 64 bit id/len
+        -:  160:	u64 cur_mallocs;  // number of slabs allocated via malloc
+        -:  161:} SlabAllocatorImpl;
+        -:  162:
+        -:  163:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed);
+        -:  164:
+       28:  165:void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
+       28:  166:	if (ptr->impl) {
+       28:  167:		SlabAllocatorImpl *impl = ptr->impl;
+       28:  168:		if (impl->sd_arr) {
+     2861:  169:			for (u64 i = 0; i < impl->sd_size; i++) {
+     2864:  170:				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
+       31:  171:					if (impl->sd_arr[i].data[j]) {
+       31:  172:						myfree(impl->sd_arr[i].data[j]);
+       31:  173:						impl->sd_arr[i].data[j] = NULL;
+        -:  174:					}
+        -:  175:				}
+     2833:  176:				if (impl->sd_arr[i].data) {
+       26:  177:					myfree(impl->sd_arr[i].data);
+       26:  178:					impl->sd_arr[i].data = NULL;
+        -:  179:				}
+     2833:  180:				if (impl->sd_arr[i].free_list) {
+       26:  181:					myfree(impl->sd_arr[i].free_list);
+       26:  182:					impl->sd_arr[i].free_list = NULL;
+        -:  183:				}
+        -:  184:			}
+        -:  185:
+       28:  186:			myfree(impl->sd_arr);
+       28:  187:			impl->sd_arr = NULL;
+        -:  188:		}
+       28:  189:		myfree(ptr->impl);
+       28:  190:		ptr->impl = NULL;
+        -:  191:	}
+       28:  192:}
+        -:  193:
+     3109:  194:int slab_allocator_init_free_list(SlabData *sd, u64 slabs, u64 offset, bool is_64_bit) {
+        -:  195:	//  initialize the values of the free list.
+  1004453:  196:	for (u64 i = 0; i < slabs; i++) {
+  1001344:  197:		if (i == (slabs - 1)) {
+       31:  198:			if (is_64_bit)
+        2:  199:				((u64 *)(sd->free_list))[i + offset] = UINT64_MAX;
+        -:  200:			else
+       29:  201:				((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
+        -:  202:		} else {
+  1001313:  203:			if (is_64_bit)
+      108:  204:				((u64 *)(sd->free_list))[i + offset] = offset + i + 1;
+        -:  205:			else
+  1001205:  206:				((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
+        -:  207:		}
+        -:  208:	}
+        -:  209:
+     3109:  210:	return 0;
+        -:  211:}
         -:  212:
-     1569:  213:	return 0;
-        -:  214:}
-        -:  215:
-     1553:  216:int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
-     1553:  217:	impl->sd_arr[index].type = *st;
-     1553:  218:	if (impl->is_64_bit)
-        2:  219:		impl->sd_arr[index].type.slab_size += sizeof(u64) * 3;
-        -:  220:	else
-     1551:  221:		impl->sd_arr[index].type.slab_size += sizeof(u64) + sizeof(u32) * 2;
-     1553:  222:	impl->sd_arr[index].cur_slabs = 0;
-     1553:  223:	impl->sd_arr[index].cur_chunks = st->initial_chunks;
-     1553:  224:	if (st->initial_chunks > 0) {
-       11:  225:		impl->sd_arr[index].free_list_head = 0;
-       11:  226:		impl->sd_arr[index].data = mymalloc(sizeof(void *) * st->initial_chunks);
-       11:  227:		if (impl->sd_arr[index].data == NULL)
-    #####:  228:			return -1;
-        -:  229:	} else {
-     1542:  230:		impl->sd_arr[index].data = NULL;
-     1542:  231:		if (impl->is_64_bit)
-    #####:  232:			impl->sd_arr[index].free_list_head = UINT64_MAX;
-        -:  233:		else
-     1542:  234:			impl->sd_arr[index].free_list_head = UINT32_MAX;
-        -:  235:	}
-        -:  236:
-     1553:  237:	if (st->initial_chunks > 0) {
-       11:  238:		if (impl->is_64_bit)
-        2:  239:			impl->sd_arr[index].free_list =
-        2:  240:				mymalloc(sizeof(u64) * st->slabs_per_resize * st->initial_chunks);
-        -:  241:		else
-        9:  242:			impl->sd_arr[index].free_list =
-        9:  243:				mymalloc(sizeof(u32) * st->slabs_per_resize * st->initial_chunks);
-       11:  244:		if (impl->sd_arr[index].free_list == NULL) {
-    #####:  245:			myfree(impl->sd_arr[index].data);
-    #####:  246:			return -1;
-        -:  247:		}
-        -:  248:	} else {
-     1542:  249:		impl->sd_arr[index].free_list = NULL;
-        -:  250:	}
-        -:  251:
-     1564:  252:	for (u64 i = 0; i < st->initial_chunks; i++) {
-       22:  253:		impl->sd_arr[index].data[i] =
-       11:  254:			mymalloc(impl->sd_arr[index].type.slab_size * st->slabs_per_resize);
-        -:  255:
-       11:  256:		if (impl->sd_arr[index].data[i] == NULL) {
-    #####:  257:			for (u64 j = 0; j < i; j++) {
-    #####:  258:				myfree(impl->sd_arr[index].data[j]);
-        -:  259:			}
-    #####:  260:			myfree(impl->sd_arr[index].data);
-    #####:  261:			return -1;
-        -:  262:		}
-        -:  263:	}
-        -:  264:
-     1553:  265:	bool is_64_bit = impl->is_64_bit;
-     1553:  266:	slab_allocator_init_free_list(&impl->sd_arr[index], st->initial_chunks * st->slabs_per_resize,
-        -:  267:								  0, is_64_bit);
+     3089:  213:int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
+     3089:  214:	impl->sd_arr[index].type = *st;
+     3089:  215:	if (impl->is_64_bit)
+        2:  216:		impl->sd_arr[index].type.slab_size += sizeof(u64) * 3;
+        -:  217:	else
+     3087:  218:		impl->sd_arr[index].type.slab_size += sizeof(u64) + sizeof(u32) * 2;
+     3089:  219:	impl->sd_arr[index].cur_slabs = 0;
+     3089:  220:	impl->sd_arr[index].cur_chunks = st->initial_chunks;
+     3089:  221:	if (st->initial_chunks > 0) {
+       11:  222:		impl->sd_arr[index].free_list_head = 0;
+       11:  223:		impl->sd_arr[index].data = mymalloc(sizeof(void *) * st->initial_chunks);
+       11:  224:		if (impl->sd_arr[index].data == NULL)
+    #####:  225:			return -1;
+        -:  226:	} else {
+     3078:  227:		impl->sd_arr[index].data = NULL;
+     3078:  228:		if (impl->is_64_bit)
+    #####:  229:			impl->sd_arr[index].free_list_head = UINT64_MAX;
+        -:  230:		else
+     3078:  231:			impl->sd_arr[index].free_list_head = UINT32_MAX;
+        -:  232:	}
+        -:  233:
+     3089:  234:	if (st->initial_chunks > 0) {
+       11:  235:		if (impl->is_64_bit)
+        2:  236:			impl->sd_arr[index].free_list =
+        2:  237:				mymalloc(sizeof(u64) * st->slabs_per_resize * st->initial_chunks);
+        -:  238:		else
+        9:  239:			impl->sd_arr[index].free_list =
+        9:  240:				mymalloc(sizeof(u32) * st->slabs_per_resize * st->initial_chunks);
+       11:  241:		if (impl->sd_arr[index].free_list == NULL) {
+    #####:  242:			myfree(impl->sd_arr[index].data);
+    #####:  243:			return -1;
+        -:  244:		}
+        -:  245:	} else {
+     3078:  246:		impl->sd_arr[index].free_list = NULL;
+        -:  247:	}
+        -:  248:
+     3100:  249:	for (u64 i = 0; i < st->initial_chunks; i++) {
+       22:  250:		impl->sd_arr[index].data[i] =
+       11:  251:			mymalloc(impl->sd_arr[index].type.slab_size * st->slabs_per_resize);
+        -:  252:
+       11:  253:		if (impl->sd_arr[index].data[i] == NULL) {
+    #####:  254:			for (u64 j = 0; j < i; j++) {
+    #####:  255:				myfree(impl->sd_arr[index].data[j]);
+        -:  256:			}
+    #####:  257:			myfree(impl->sd_arr[index].data);
+    #####:  258:			return -1;
+        -:  259:		}
+        -:  260:	}
+        -:  261:
+     3089:  262:	bool is_64_bit = impl->is_64_bit;
+     3089:  263:	slab_allocator_init_free_list(&impl->sd_arr[index], st->initial_chunks * st->slabs_per_resize,
+        -:  264:								  0, is_64_bit);
+        -:  265:
+     3089:  266:	return 0;
+        -:  267:}
         -:  268:
-     1553:  269:	return 0;
-        -:  270:}
-        -:  271:
-     6144:  272:int compare_sd(const void *a, const void *b) {
-     6144:  273:	const SlabData *sda = a;
-     6144:  274:	const SlabData *sdb = b;
-     6144:  275:	if (sda->type.slab_size < sdb->type.slab_size)
-     6144:  276:		return -1;
-    #####:  277:	else if (sda->type.slab_size > sdb->type.slab_size)
-    #####:  278:		return 1;
-    #####:  279:	return 0;
-        -:  280:}
-        -:  281:
-       23:  282:int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
-       23:  283:	SlabAllocatorImpl *impl = ptr->impl;
-       23:  284:	qsort(impl->sd_arr, impl->sd_size, sizeof(SlabData), compare_sd);
-       23:  285:	u32 last_slab_size = 0;
-     1575:  286:	for (u64 i = 0; i < impl->sd_size; i++) {
-     1553:  287:		if (last_slab_size >= impl->sd_arr[i].type.slab_size) {
-    #####:  288:			errno = EINVAL;
-    #####:  289:			return -1;
-        -:  290:		}
-        -:  291:		// for alignment, must be divisible by 8
-     1553:  292:		if (impl->sd_arr[i].type.slab_size % 8 != 0) {
-    #####:  293:			errno = EINVAL;
-    #####:  294:			return -1;
-        -:  295:		}
-        -:  296:		// can't have higher max slabs than initial
-     1553:  297:		if (impl->sd_arr[i].type.slabs_per_resize * impl->sd_arr[i].type.initial_chunks >
-     1553:  298:			impl->sd_arr[i].type.max_slabs) {
-    #####:  299:			errno = EINVAL;
-    #####:  300:			return -1;
-        -:  301:		}
-        -:  302:		// max slabs for 32 bit and 64 bit
-    1553*:  303:		if (impl->sd_arr[i].type.max_slabs > (INT32_MAX - 10) && !impl->is_64_bit) {
+    12288:  269:int compare_sd(const void *a, const void *b) {
+    12288:  270:	const SlabData *sda = a;
+    12288:  271:	const SlabData *sdb = b;
+    12288:  272:	if (sda->type.slab_size < sdb->type.slab_size)
+    12288:  273:		return -1;
+    #####:  274:	else if (sda->type.slab_size > sdb->type.slab_size)
+    #####:  275:		return 1;
+    #####:  276:	return 0;
+        -:  277:}
+        -:  278:
+       29:  279:int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
+       29:  280:	SlabAllocatorImpl *impl = ptr->impl;
+       29:  281:	qsort(impl->sd_arr, impl->sd_size, sizeof(SlabData), compare_sd);
+       29:  282:	u32 last_slab_size = 0;
+     3117:  283:	for (u64 i = 0; i < impl->sd_size; i++) {
+     3089:  284:		if (last_slab_size >= impl->sd_arr[i].type.slab_size) {
+    #####:  285:			errno = EINVAL;
+    #####:  286:			return -1;
+        -:  287:		}
+        -:  288:		// for alignment, must be divisible by 8
+     3089:  289:		if (impl->sd_arr[i].type.slab_size % 8 != 0) {
+    #####:  290:			errno = EINVAL;
+    #####:  291:			return -1;
+        -:  292:		}
+        -:  293:		// can't have higher max slabs than initial
+     3089:  294:		if (impl->sd_arr[i].type.slabs_per_resize * impl->sd_arr[i].type.initial_chunks >
+     3089:  295:			impl->sd_arr[i].type.max_slabs) {
+    #####:  296:			errno = EINVAL;
+    #####:  297:			return -1;
+        -:  298:		}
+        -:  299:		// max slabs for 32 bit and 64 bit
+    3089*:  300:		if (impl->sd_arr[i].type.max_slabs > (INT32_MAX - 10) && !impl->is_64_bit) {
+    #####:  301:			errno = EINVAL;
+    #####:  302:			return -1;
+    3089*:  303:		} else if (impl->sd_arr[i].type.max_slabs > (INT64_MAX - 10) && impl->is_64_bit) {
     #####:  304:			errno = EINVAL;
     #####:  305:			return -1;
-    1553*:  306:		} else if (impl->sd_arr[i].type.max_slabs > (INT64_MAX - 10) && impl->is_64_bit) {
-    #####:  307:			errno = EINVAL;
-    #####:  308:			return -1;
-        -:  309:		}
-        -:  310:
-        -:  311:		// max slabs must be dividisble by slabs_per_resize
-     1553:  312:		if (impl->sd_arr[i].type.max_slabs % impl->sd_arr[i].type.slabs_per_resize) {
-        1:  313:			errno = EINVAL;
-        1:  314:			return -1;
-        -:  315:		}
-     1552:  316:		last_slab_size = impl->sd_arr[i].type.slab_size;
-        -:  317:	}
-       22:  318:	return 0;
-        -:  319:}
-        -:  320:
-       23:  321:int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) {
-       23:  322:	ptr->impl = mymalloc(sizeof(SlabAllocatorImpl));
-       23:  323:	if (ptr->impl == NULL)
-    #####:  324:		return -1;
-       23:  325:	SlabAllocatorImpl *impl = ptr->impl;
-        -:  326:
-       23:  327:	impl->no_malloc = config->no_malloc;
-       23:  328:	impl->zeroed = config->zeroed;
-       23:  329:	impl->is_64_bit = config->is_64_bit;
-       23:  330:	impl->sd_size = config->slab_types_count;
-       23:  331:	impl->sd_arr = mymalloc(sizeof(SlabData) * impl->sd_size);
-       23:  332:	impl->cur_mallocs = 0;
-       23:  333:	if (impl->sd_arr == NULL) {
-    #####:  334:		myfree(ptr->impl);
-    #####:  335:		return -1;
-        -:  336:	}
-        -:  337:
-     1576:  338:	for (u64 i = 0; i < config->slab_types_count; i++) {
-     1553:  339:		if (slab_allocator_init_slab_data(impl, &config->slab_types[i], i)) {
-        -:  340:			// cleanup previously allocated slabs
-    #####:  341:			impl->sd_size = i;
-    #####:  342:			slab_allocator_cleanup(ptr);
-    #####:  343:			return -1;
-        -:  344:		}
-        -:  345:	}
-       23:  346:	int ret = slab_allocator_sort_slab_data(ptr);
-       23:  347:	if (ret)
-        1:  348:		slab_allocator_cleanup(ptr);
-       23:  349:	return ret;
-        -:  350:}
-        -:  351:
-  2000339:  352:int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
-  2000339:  353:	SlabAllocatorImpl *impl = ptr->impl;
-  2000339:  354:	int ret = -1;
-  2000339:  355:	if (impl->sd_size == 0)
-    #####:  356:		return ret;
+        -:  306:		}
+        -:  307:
+        -:  308:		// max slabs must be dividisble by slabs_per_resize
+     3089:  309:		if (impl->sd_arr[i].type.max_slabs % impl->sd_arr[i].type.slabs_per_resize) {
+        1:  310:			errno = EINVAL;
+        1:  311:			return -1;
+        -:  312:		}
+     3088:  313:		last_slab_size = impl->sd_arr[i].type.slab_size;
+        -:  314:	}
+       28:  315:	return 0;
+        -:  316:}
+        -:  317:
+       29:  318:int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) {
+       29:  319:	ptr->impl = mymalloc(sizeof(SlabAllocatorImpl));
+       29:  320:	if (ptr->impl == NULL)
+    #####:  321:		return -1;
+       29:  322:	SlabAllocatorImpl *impl = ptr->impl;
+        -:  323:
+       29:  324:	impl->no_malloc = config->no_malloc;
+       29:  325:	impl->zeroed = config->zeroed;
+       29:  326:	impl->is_64_bit = config->is_64_bit;
+       29:  327:	impl->sd_size = config->slab_types_count;
+       29:  328:	impl->sd_arr = mymalloc(sizeof(SlabData) * impl->sd_size);
+       29:  329:	impl->cur_mallocs = 0;
+       29:  330:	if (impl->sd_arr == NULL) {
+    #####:  331:		myfree(ptr->impl);
+    #####:  332:		return -1;
+        -:  333:	}
+        -:  334:
+     3118:  335:	for (u64 i = 0; i < config->slab_types_count; i++) {
+     3089:  336:		if (slab_allocator_init_slab_data(impl, &config->slab_types[i], i)) {
+        -:  337:			// cleanup previously allocated slabs
+    #####:  338:			impl->sd_size = i;
+    #####:  339:			slab_allocator_cleanup(ptr);
+    #####:  340:			return -1;
+        -:  341:		}
+        -:  342:	}
+       29:  343:	int ret = slab_allocator_sort_slab_data(ptr);
+       29:  344:	if (ret)
+        1:  345:		slab_allocator_cleanup(ptr);
+       29:  346:	return ret;
+        -:  347:}
+        -:  348:
+  2000351:  349:int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
+  2000351:  350:	SlabAllocatorImpl *impl = ptr->impl;
+  2000351:  351:	int ret = -1;
+  2000351:  352:	if (impl->sd_size == 0)
+    #####:  353:		return ret;
+        -:  354:
+  2000351:  355:	int left = 0;
+  2000351:  356:	int right = impl->sd_size - 1;
         -:  357:
-  2000339:  358:	int left = 0;
-  2000339:  359:	int right = impl->sd_size - 1;
-        -:  360:
-  3000586:  361:	while (left <= right) {
-  2000423:  362:		int mid = left + (right - left) / 2;
-  2000423:  363:		u32 slab_size = impl->sd_arr[mid].type.slab_size;
-  2000423:  364:		if (slab_size == size) {
-  1000176:  365:			ret = mid;
-  1000176:  366:			break;
-  1000247:  367:		} else if (slab_size > size)
-  1000204:  368:			right = mid - 1;
-        -:  369:		else
-       43:  370:			left = mid + 1;
-        -:  371:	}
-        -:  372:
-  2000339:  373:	if (ret == -1 && right + 1 <= impl->sd_size - 1) {
-  1000156:  374:		return right + 1;
-        -:  375:	}
+  3000678:  358:	while (left <= right) {
+  2000510:  359:		int mid = left + (right - left) / 2;
+  2000510:  360:		u32 slab_size = impl->sd_arr[mid].type.slab_size;
+  2000510:  361:		if (slab_size == size) {
+  1000183:  362:			ret = mid;
+  1000183:  363:			break;
+  1000327:  364:		} else if (slab_size > size)
+  1000259:  365:			right = mid - 1;
+        -:  366:		else
+       68:  367:			left = mid + 1;
+        -:  368:	}
+        -:  369:
+  2000351:  370:	if (ret == -1 && right + 1 <= impl->sd_size - 1) {
+  1000161:  371:		return right + 1;
+        -:  372:	}
+        -:  373:
+  1000190:  374:	return ret;
+        -:  375:}
         -:  376:
-  1000183:  377:	return ret;
-        -:  378:}
-        -:  379:
-       29:  380:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
-       29:  381:	if (sd->cur_slabs < sd->type.max_slabs) {
-        -:  382:		// we can try to resize
-        -:  383:		// first try to reallocate the free list
-       16:  384:		void *nfree_list = NULL;
-        -:  385:		u64 factor;
-       16:  386:		if (is_64_bit)
-    #####:  387:			factor = sizeof(u64);
-        -:  388:		else
-       16:  389:			factor = sizeof(u32);
-       16:  390:		if (sd->free_list) {
-        -:  391:			nfree_list =
-        5:  392:				myrealloc(sd->free_list, (1 + sd->cur_chunks) * sd->type.slabs_per_resize * factor);
-        -:  393:		} else {
-        -:  394:
-       11:  395:			nfree_list = mymalloc(sd->type.slabs_per_resize * factor);
-        -:  396:		}
-       16:  397:		if (nfree_list == NULL)
-    #####:  398:			return -1;
-       16:  399:		sd->free_list = nfree_list;
-        -:  400:
-        -:  401:		// now try to allocate more slab chunks
-        -:  402:		void *ndata;
-       16:  403:		if (sd->data == NULL) {
-       11:  404:			ndata = mymalloc(sizeof(void *));
-        -:  405:		} else {
-        5:  406:			ndata = myrealloc(sd->data, sizeof(void *) * (1 + sd->cur_chunks));
+       33:  377:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
+       33:  378:	if (sd->cur_slabs < sd->type.max_slabs) {
+        -:  379:		// we can try to resize
+        -:  380:		// first try to reallocate the free list
+       20:  381:		void *nfree_list = NULL;
+        -:  382:		u64 factor;
+       20:  383:		if (is_64_bit)
+    #####:  384:			factor = sizeof(u64);
+        -:  385:		else
+       20:  386:			factor = sizeof(u32);
+       20:  387:		if (sd->free_list) {
+        -:  388:			nfree_list =
+        5:  389:				myrealloc(sd->free_list, (1 + sd->cur_chunks) * sd->type.slabs_per_resize * factor);
+        -:  390:		} else {
+        -:  391:
+       15:  392:			nfree_list = mymalloc(sd->type.slabs_per_resize * factor);
+        -:  393:		}
+       20:  394:		if (nfree_list == NULL)
+    #####:  395:			return -1;
+       20:  396:		sd->free_list = nfree_list;
+        -:  397:
+        -:  398:		// now try to allocate more slab chunks
+        -:  399:		void *ndata;
+       20:  400:		if (sd->data == NULL) {
+       15:  401:			ndata = mymalloc(sizeof(void *));
+        -:  402:		} else {
+        5:  403:			ndata = myrealloc(sd->data, sizeof(void *) * (1 + sd->cur_chunks));
+        -:  404:		}
+       20:  405:		if (ndata == NULL) {
+    #####:  406:			return -1;
         -:  407:		}
-       16:  408:		if (ndata == NULL) {
-    #####:  409:			return -1;
-        -:  410:		}
-        -:  411:
-       16:  412:		sd->data = ndata;
-       16:  413:		sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
-       16:  414:		if (sd->data[sd->cur_chunks] == NULL)
-    #####:  415:			return -1;
-        -:  416:
-        -:  417:		// data was successfully allocated, make updates.
-       16:  418:		slab_allocator_init_free_list(sd, sd->type.slabs_per_resize, sd->cur_slabs, is_64_bit);
-       16:  419:		sd->free_list_head = sd->cur_slabs;
-       16:  420:		sd->cur_chunks += 1;
-        -:  421:
-       16:  422:		return slab_data_allocate(sd, fptr, is_64_bit, zeroed);
-        -:  423:	}
-       13:  424:	return -1;
-        -:  425:}
-        -:  426:
-  1000189:  427:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
-  1000189:  428:	u64 id = sd->free_list_head;
-  1000189:  429:	if (is_64_bit && id == UINT64_MAX) {
-        1:  430:		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
-  1000188:  431:	} else if (!is_64_bit && id == UINT32_MAX) {
-       28:  432:		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
-        -:  433:	}
+        -:  408:
+       20:  409:		sd->data = ndata;
+       20:  410:		sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
+       20:  411:		if (sd->data[sd->cur_chunks] == NULL)
+    #####:  412:			return -1;
+        -:  413:
+        -:  414:		// data was successfully allocated, make updates.
+       20:  415:		slab_allocator_init_free_list(sd, sd->type.slabs_per_resize, sd->cur_slabs, is_64_bit);
+       20:  416:		sd->free_list_head = sd->cur_slabs;
+       20:  417:		sd->cur_chunks += 1;
+        -:  418:
+       20:  419:		return slab_data_allocate(sd, fptr, is_64_bit, zeroed);
+        -:  420:	}
+       13:  421:	return -1;
+        -:  422:}
+        -:  423:
+  1000199:  424:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
+  1000199:  425:	u64 id = sd->free_list_head;
+  1000199:  426:	if (is_64_bit && id == UINT64_MAX) {
+        1:  427:		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
+  1000198:  428:	} else if (!is_64_bit && id == UINT32_MAX) {
+       32:  429:		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
+        -:  430:	}
+        -:  431:
+  1000166:  432:	if (is_64_bit) {
+       22:  433:		sd->free_list_head = ((u64 *)sd->free_list)[id];
         -:  434:
-  1000160:  435:	if (is_64_bit) {
-       22:  436:		sd->free_list_head = ((u64 *)sd->free_list)[id];
-        -:  437:
-        -:  438:	} else {
-  1000138:  439:		sd->free_list_head = ((u32 *)sd->free_list)[id];
-        -:  440:	}
-        -:  441:
-        -:  442:	// set to MAX-1 as a marker that this is allocated
-        -:  443:	// if any freed without this value, it's an error
-  1000160:  444:	if (is_64_bit)
-       22:  445:		((u64 *)sd->free_list)[id] = (UINT64_MAX - 1);
-        -:  446:	else
-  1000138:  447:		((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
-        -:  448:
-  1000160:  449:	u64 len = sd->type.slab_size;
-  1000160:  450:	u64 slab_data_index = id / sd->type.slabs_per_resize;
-  1000160:  451:	u64 offset_mod = id % sd->type.slabs_per_resize;
-        -:  452:
-  1000160:  453:	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
-        -:  454:
-        -:  455:	u64 data_len;
-        -:  456:	u8 *data_ptr;
-  1000160:  457:	if (is_64_bit) {
-       22:  458:		FatPtr64Impl *fptr64 = fptr->data;
-       22:  459:		fptr64->id = (id * 2) + 1;
-       22:  460:		fptr64->len = len - 3 * sizeof(u64);
-       22:  461:		fptr64->data = fptr->data + 3 * sizeof(u64);
-       22:  462:		data_len = fptr64->len;
-       22:  463:		data_ptr = fptr64->data;
-        -:  464:	} else {
-  1000138:  465:		FatPtr32Impl *fptr32 = fptr->data;
-  1000138:  466:		fptr32->id = (id * 2);
-  1000138:  467:		fptr32->len = len - (2 * sizeof(u32) + sizeof(u64));
-  1000138:  468:		fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
-  1000138:  469:		data_len = fptr32->len;
-  1000138:  470:		data_ptr = fptr32->data;
-        -:  471:	}
-        -:  472:
-  1000160:  473:	sd->cur_slabs += 1;
-  1000160:  474:	if (zeroed) {
-      500:  475:		for (u64 i = 0; i < data_len; i++) {
-      480:  476:			data_ptr[i] = 0;
-        -:  477:		}
-        -:  478:	}
+        -:  435:	} else {
+  1000144:  436:		sd->free_list_head = ((u32 *)sd->free_list)[id];
+        -:  437:	}
+        -:  438:
+        -:  439:	// set to MAX-1 as a marker that this is allocated
+        -:  440:	// if any freed without this value, it's an error
+  1000166:  441:	if (is_64_bit)
+       22:  442:		((u64 *)sd->free_list)[id] = (UINT64_MAX - 1);
+        -:  443:	else
+  1000144:  444:		((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
+        -:  445:
+  1000166:  446:	u64 len = sd->type.slab_size;
+  1000166:  447:	u64 slab_data_index = id / sd->type.slabs_per_resize;
+  1000166:  448:	u64 offset_mod = id % sd->type.slabs_per_resize;
+        -:  449:
+  1000166:  450:	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
+        -:  451:
+        -:  452:	u64 data_len;
+        -:  453:	u8 *data_ptr;
+  1000166:  454:	if (is_64_bit) {
+       22:  455:		FatPtr64Impl *fptr64 = fptr->data;
+       22:  456:		fptr64->id = (id * 2) + 1;
+       22:  457:		fptr64->len = len - 3 * sizeof(u64);
+       22:  458:		fptr64->data = fptr->data + 3 * sizeof(u64);
+       22:  459:		data_len = fptr64->len;
+       22:  460:		data_ptr = fptr64->data;
+        -:  461:	} else {
+  1000144:  462:		FatPtr32Impl *fptr32 = fptr->data;
+  1000144:  463:		fptr32->id = (id * 2);
+  1000144:  464:		fptr32->len = len - (2 * sizeof(u32) + sizeof(u64));
+  1000144:  465:		fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
+  1000144:  466:		data_len = fptr32->len;
+  1000144:  467:		data_ptr = fptr32->data;
+        -:  468:	}
+        -:  469:
+  1000166:  470:	sd->cur_slabs += 1;
+  1000166:  471:	if (zeroed) {
+      500:  472:		for (u64 i = 0; i < data_len; i++) {
+      480:  473:			data_ptr[i] = 0;
+        -:  474:		}
+        -:  475:	}
+        -:  476:
+  1000166:  477:	return 0;
+        -:  478:}
         -:  479:
-  1000160:  480:	return 0;
-        -:  481:}
-        -:  482:
-  1000159:  483:void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit, bool zeroed) {
-        -:  484:	u64 data_len;
-        -:  485:	u8 *data_ptr;
-  1000159:  486:	if (is_64_bit) {
-       22:  487:		FatPtr64Impl *fptr64 = fptr->data;
-       22:  488:		data_len = fptr64->len;
-       22:  489:		data_ptr = fptr64->data;
-       22:  490:		u64 id = (fptr64->id - 1) / 2;
-       22:  491:		if (((u64 *)sd->free_list)[id] != (UINT64_MAX - 1)) {
-    #####:  492:			panic("Potential double free. Id = %llu.\n", id);
-        -:  493:		}
-       22:  494:		((u64 *)sd->free_list)[id] = sd->free_list_head;
-       22:  495:		sd->free_list_head = id;
-       22:  496:		if (sd->cur_slabs == 0)
-    #####:  497:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
-       22:  498:		sd->cur_slabs -= 1;
-        -:  499:	} else {
-  1000137:  500:		FatPtr32Impl *fptr32 = fptr->data;
-  1000137:  501:		data_len = fptr32->len;
-  1000137:  502:		data_ptr = fptr32->data;
-  1000137:  503:		u32 id = (fptr32->id) / 2;
-  1000137:  504:		if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
-    #####:  505:			panic("Potential double free. Id = %llu.\n", id);
-        -:  506:		}
-  1000137:  507:		((u32 *)sd->free_list)[id] = sd->free_list_head;
-  1000137:  508:		sd->free_list_head = id;
-  1000137:  509:		if (sd->cur_slabs == 0)
-    #####:  510:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
-  1000137:  511:		sd->cur_slabs -= 1;
-        -:  512:	}
-        -:  513:
-  1000159:  514:	if (zeroed) {
-      500:  515:		for (u64 i = 0; i < data_len; i++) {
-      480:  516:			data_ptr[i] = 0;
-        -:  517:		}
-        -:  518:	}
-  1000159:  519:}
-        -:  520:
-  1000180:  521:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
-  1000180:  522:	if (size == 0) {
-    #####:  523:		errno = EINVAL;
-    #####:  524:		return -1;
-        -:  525:	}
-  1000180:  526:	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
-  1000180:  527:	bool is_64_bit = impl->is_64_bit;
-  1000180:  528:	bool zeroed = impl->zeroed;
-        -:  529:	u32 needed;
-  1000180:  530:	if (is_64_bit)
-       23:  531:		needed = size + 3 * sizeof(u64);
-        -:  532:	else
-  1000157:  533:		needed = size + 2 * sizeof(u32) + sizeof(u64);
-  1000180:  534:	int index = slab_allocator_index(ptr, needed);
-        -:  535:	int ret;
-  1000180:  536:	if (impl->no_malloc && index < 0) {
-        7:  537:		return -1;
-  1000173:  538:	} else if (index < 0) {
-    #####:  539:		ret = -1;
-        -:  540:	} else {
-  1000173:  541:		SlabData *sd = &impl->sd_arr[index];
-  1000173:  542:		ret = slab_data_allocate(sd, fptr, is_64_bit, zeroed);
-        -:  543:	}
-        -:  544:
-        -:  545:	// we couldn't allocate via slabs. Use malloc if configured.
-  1000173:  546:	if (ret && !impl->no_malloc) {
-        -:  547:		void *val;
-        -:  548:		u64 data_len;
-        -:  549:
-        2:  550:		if (is_64_bit) {
-    #####:  551:			data_len = size + (3 * sizeof(u64));
-    #####:  552:			val = mymalloc(data_len);
-        -:  553:		} else {
-        2:  554:			data_len = size + (2 * sizeof(u32) + sizeof(u64));
-        2:  555:			val = mymalloc(data_len);
-        -:  556:		}
-        -:  557:
-        -:  558:		// malloc error
-        2:  559:		if (!val)
-    #####:  560:			return -1;
-        -:  561:
-        2:  562:		if (zeroed) {
-       25:  563:			for (u64 i = 0; i < data_len; i++) {
-       24:  564:				((u8 *)val)[i] = 0;
-        -:  565:			}
-        -:  566:		}
-        -:  567:
-        2:  568:		impl->cur_mallocs++;
-        2:  569:		ret = 0;
-        2:  570:		fptr->data = val;
-        -:  571:
-        2:  572:		if (is_64_bit) {
-    #####:  573:			FatPtr64Impl *fptr64 = fptr->data;
-    #####:  574:			fptr64->id = MALLOC_64_ID;
-    #####:  575:			fptr64->len = size;
-    #####:  576:			fptr64->data = fptr->data + 3 * sizeof(u64);
-        -:  577:		} else {
-        2:  578:			FatPtr32Impl *fptr32 = fptr->data;
-        2:  579:			fptr32->id = MALLOC_32_ID;
-        2:  580:			fptr32->len = size;
-        2:  581:			fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
-        -:  582:		}
-        -:  583:	}
-  1000173:  584:	return ret;
-        -:  585:}
-  1000161:  586:void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
-  1000161:  587:	SlabAllocatorImpl *impl = ptr->impl;
-  1000161:  588:	bool is_64_bit = impl->is_64_bit;
-        -:  589:
-  1000161:  590:	if (is_64_bit) {
-       22:  591:		FatPtr64Impl *fptr64 = fptr->data;
-       22:  592:		if (fptr64->id == MALLOC_64_ID) {
-    #####:  593:			if (fptr->data) {
-    #####:  594:				if (impl->zeroed) {
-    #####:  595:					for (u64 i = 0; i < fptr64->len + 3 * sizeof(u64); i++) {
-    #####:  596:						((u8 *)fptr->data)[i] = 0;
-        -:  597:					}
-        -:  598:				}
-    #####:  599:				if (impl->cur_mallocs == 0)
-    #####:  600:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
-    #####:  601:				myfree(fptr->data);
-    #####:  602:				impl->cur_mallocs--;
-        -:  603:			}
-    #####:  604:			*fptr = null;
-    #####:  605:			return;
-        -:  606:		}
-        -:  607:	} else {
-  1000139:  608:		FatPtr32Impl *fptr32 = fptr->data;
-  1000139:  609:		if (fptr32->id == MALLOC_32_ID) {
-        2:  610:			if (fptr->data) {
-        2:  611:				if (impl->zeroed) {
-       17:  612:					for (u64 i = 0; i < fptr32->len + 2 * sizeof(u32) + sizeof(u64); i++) {
-       16:  613:						((u8 *)fptr->data)[i] = 0;
-        -:  614:					}
-        -:  615:				}
-        2:  616:				if (impl->cur_mallocs == 0)
-    #####:  617:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
-        2:  618:				myfree(fptr->data);
-        2:  619:				impl->cur_mallocs--;
-        -:  620:			}
-        2:  621:			*fptr = null;
-        2:  622:			return;
-        -:  623:		}
-        -:  624:	}
-        -:  625:
-        -:  626:	u32 needed;
-  1000159:  627:	if (is_64_bit)
-       22:  628:		needed = fat_ptr_len(fptr) + 3 * sizeof(u64);
-        -:  629:	else
-  1000137:  630:		needed = fat_ptr_len(fptr) + 2 * sizeof(u32) + sizeof(u64);
-  1000159:  631:	int index = slab_allocator_index(ptr, needed);
-  1000159:  632:	if (index < 0)
-    #####:  633:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-  1000159:  634:	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
-  1000159:  635:	if (needed != sd->type.slab_size)
-    #####:  636:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-  1000159:  637:	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit,
-  1000159:  638:				   ((SlabAllocatorImpl *)ptr->impl)->zeroed);
-  1000159:  639:	*fptr = null;
-        -:  640:}
-       25:  641:u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
-       25:  642:	SlabAllocatorImpl *impl = ptr->impl;
-       25:  643:	u64 ret = impl->cur_mallocs;
-        -:  644:
-     1580:  645:	for (u64 i = 0; i < impl->sd_size; i++) {
-     1555:  646:		ret += impl->sd_arr[i].cur_slabs;
-        -:  647:	}
-       25:  648:	return ret;
-        -:  649:}
+  1000165:  480:void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit, bool zeroed) {
+        -:  481:	u64 data_len;
+        -:  482:	u8 *data_ptr;
+  1000165:  483:	if (is_64_bit) {
+       22:  484:		FatPtr64Impl *fptr64 = fptr->data;
+       22:  485:		data_len = fptr64->len;
+       22:  486:		data_ptr = fptr64->data;
+       22:  487:		u64 id = (fptr64->id - 1) / 2;
+       22:  488:		if (((u64 *)sd->free_list)[id] != (UINT64_MAX - 1)) {
+    #####:  489:			panic("Potential double free. Id = %llu.\n", id);
+        -:  490:		}
+       22:  491:		((u64 *)sd->free_list)[id] = sd->free_list_head;
+       22:  492:		sd->free_list_head = id;
+       22:  493:		if (sd->cur_slabs == 0)
+    #####:  494:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
+       22:  495:		sd->cur_slabs -= 1;
+        -:  496:	} else {
+  1000143:  497:		FatPtr32Impl *fptr32 = fptr->data;
+  1000143:  498:		data_len = fptr32->len;
+  1000143:  499:		data_ptr = fptr32->data;
+  1000143:  500:		u32 id = (fptr32->id) / 2;
+  1000143:  501:		if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
+    #####:  502:			panic("Potential double free. Id = %llu.\n", id);
+        -:  503:		}
+  1000143:  504:		((u32 *)sd->free_list)[id] = sd->free_list_head;
+  1000143:  505:		sd->free_list_head = id;
+  1000143:  506:		if (sd->cur_slabs == 0)
+    #####:  507:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
+  1000143:  508:		sd->cur_slabs -= 1;
+        -:  509:	}
+        -:  510:
+  1000165:  511:	if (zeroed) {
+      500:  512:		for (u64 i = 0; i < data_len; i++) {
+      480:  513:			data_ptr[i] = 0;
+        -:  514:		}
+        -:  515:	}
+  1000165:  516:}
+        -:  517:
+  1000186:  518:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
+  1000186:  519:	if (size == 0) {
+    #####:  520:		errno = EINVAL;
+    #####:  521:		return -1;
+        -:  522:	}
+        -:  523:
+  1000186:  524:	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
+  1000186:  525:	bool is_64_bit = impl->is_64_bit;
+  1000186:  526:	bool zeroed = impl->zeroed;
+        -:  527:	u32 needed;
+  1000186:  528:	if (is_64_bit)
+       23:  529:		needed = size + 3 * sizeof(u64);
+        -:  530:	else
+  1000163:  531:		needed = size + 2 * sizeof(u32) + sizeof(u64);
+  1000186:  532:	int index = slab_allocator_index(ptr, needed);
+        -:  533:	int ret;
+  1000186:  534:	if (impl->no_malloc && index < 0) {
+        7:  535:		return -1;
+  1000179:  536:	} else if (index < 0) {
+    #####:  537:		ret = -1;
+        -:  538:	} else {
+  1000179:  539:		SlabData *sd = &impl->sd_arr[index];
+  1000179:  540:		ret = slab_data_allocate(sd, fptr, is_64_bit, zeroed);
+        -:  541:	}
+        -:  542:
+        -:  543:	// we couldn't allocate via slabs. Use malloc if configured.
+  1000179:  544:	if (ret && !impl->no_malloc) {
+        -:  545:		void *val;
+        -:  546:		u64 data_len;
+        -:  547:
+        2:  548:		if (is_64_bit) {
+    #####:  549:			data_len = size + (3 * sizeof(u64));
+    #####:  550:			val = mymalloc(data_len);
+        -:  551:		} else {
+        2:  552:			data_len = size + (2 * sizeof(u32) + sizeof(u64));
+        2:  553:			val = mymalloc(data_len);
+        -:  554:		}
+        -:  555:
+        -:  556:		// malloc error
+        2:  557:		if (!val)
+    #####:  558:			return -1;
+        -:  559:
+        2:  560:		if (zeroed) {
+       25:  561:			for (u64 i = 0; i < data_len; i++) {
+       24:  562:				((u8 *)val)[i] = 0;
+        -:  563:			}
+        -:  564:		}
+        -:  565:
+        2:  566:		impl->cur_mallocs++;
+        2:  567:		ret = 0;
+        2:  568:		fptr->data = val;
+        -:  569:
+        2:  570:		if (is_64_bit) {
+    #####:  571:			FatPtr64Impl *fptr64 = fptr->data;
+    #####:  572:			fptr64->id = MALLOC_64_ID;
+    #####:  573:			fptr64->len = size;
+    #####:  574:			fptr64->data = fptr->data + 3 * sizeof(u64);
+        -:  575:		} else {
+        2:  576:			FatPtr32Impl *fptr32 = fptr->data;
+        2:  577:			fptr32->id = MALLOC_32_ID;
+        2:  578:			fptr32->len = size;
+        2:  579:			fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
+        -:  580:		}
+        -:  581:	}
+  1000179:  582:	return ret;
+        -:  583:}
+  1000167:  584:void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
+  1000167:  585:	if (fptr == NULL || nil(*fptr)) {
+    #####:  586:		panic("Freeing a slab that's already nil. Double free?");
+        -:  587:	}
+  1000167:  588:	SlabAllocatorImpl *impl = ptr->impl;
+  1000167:  589:	bool is_64_bit = impl->is_64_bit;
+        -:  590:
+  1000167:  591:	if (is_64_bit) {
+       22:  592:		FatPtr64Impl *fptr64 = fptr->data;
+       22:  593:		if (fptr64->id == MALLOC_64_ID) {
+    #####:  594:			if (fptr->data) {
+    #####:  595:				if (impl->zeroed) {
+    #####:  596:					for (u64 i = 0; i < fptr64->len + 3 * sizeof(u64); i++) {
+    #####:  597:						((u8 *)fptr->data)[i] = 0;
+        -:  598:					}
+        -:  599:				}
+    #####:  600:				if (impl->cur_mallocs == 0)
+    #####:  601:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
+    #####:  602:				myfree(fptr->data);
+    #####:  603:				impl->cur_mallocs--;
+        -:  604:			}
+    #####:  605:			*fptr = null;
+    #####:  606:			return;
+        -:  607:		}
+        -:  608:	} else {
+  1000145:  609:		FatPtr32Impl *fptr32 = fptr->data;
+  1000145:  610:		if (fptr32->id == MALLOC_32_ID) {
+        2:  611:			if (fptr->data) {
+        2:  612:				if (impl->zeroed) {
+       17:  613:					for (u64 i = 0; i < fptr32->len + 2 * sizeof(u32) + sizeof(u64); i++) {
+       16:  614:						((u8 *)fptr->data)[i] = 0;
+        -:  615:					}
+        -:  616:				}
+        2:  617:				if (impl->cur_mallocs == 0)
+    #####:  618:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
+        2:  619:				myfree(fptr->data);
+        2:  620:				impl->cur_mallocs--;
+        -:  621:			}
+        2:  622:			*fptr = null;
+        2:  623:			return;
+        -:  624:		}
+        -:  625:	}
+        -:  626:
+        -:  627:	u32 needed;
+  1000165:  628:	if (is_64_bit)
+       22:  629:		needed = fat_ptr_len(fptr) + 3 * sizeof(u64);
+        -:  630:	else
+  1000143:  631:		needed = fat_ptr_len(fptr) + 2 * sizeof(u32) + sizeof(u64);
+  1000165:  632:	int index = slab_allocator_index(ptr, needed);
+  1000165:  633:	if (index < 0)
+    #####:  634:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
+  1000165:  635:	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
+  1000165:  636:	if (needed != sd->type.slab_size)
+    #####:  637:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
+  1000165:  638:	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit,
+  1000165:  639:				   ((SlabAllocatorImpl *)ptr->impl)->zeroed);
+  1000165:  640:	*fptr = null;
+        -:  641:}
+       30:  642:u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
+       30:  643:	SlabAllocatorImpl *impl = ptr->impl;
+       30:  644:	u64 ret = impl->cur_mallocs;
+        -:  645:
+     2865:  646:	for (u64 i = 0; i < impl->sd_size; i++) {
+     2835:  647:		ret += impl->sd_arr[i].cur_slabs;
+        -:  648:	}
+       30:  649:	return ret;
+        -:  650:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:64
+        -:    0:Runs:67
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3228,12 +3275,12 @@
         -:   17:#include <stdio.h>
         -:   18:#include <stdlib.h>
         -:   19:
-       64:   20:bool __is_little_endian() {
-       64:   21:	u16 test = 0x1;
-       64:   22:	return (*(u8 *)&test == 0x1);
+       67:   20:bool __is_little_endian() {
+       67:   21:	u16 test = 0x1;
+       67:   22:	return (*(u8 *)&test == 0x1);
         -:   23:}
         -:   24:
-       64:   25:void __attribute__((constructor)) __check_64bit_arch__() {
+       67:   25:void __attribute__((constructor)) __check_64bit_arch__() {
         -:   26:	if (sizeof(size_t) != 8) {
         -:   27:		fprintf(stderr, "Error: This program requires a 64-bit architecture to run.\n");
         -:   28:		exit(EXIT_FAILURE);
@@ -3247,11 +3294,11 @@
         -:   36:		exit(EXIT_FAILURE);
         -:   37:	}
         -:   38:
-       64:   39:	if (!__is_little_endian()) {
+       67:   39:	if (!__is_little_endian()) {
     #####:   40:		fprintf(stderr, "Big endian systems not supported");
     #####:   41:		exit(EXIT_FAILURE);
         -:   42:	}
-       64:   43:}
+       67:   43:}
         -:    0:Source:lexer.c
         -:    0:Graph:lexer.gcno
         -:    0:Data:lexer.gcda
@@ -3999,3 +4046,535 @@
     #####:   47:int famlobj_add_i16(FamlObj *obj, const char *key, const i16 value) {
     #####:   48:	return 0;
         -:   49:}
+        -:    0:Source:rbtree.c
+        -:    0:Graph:rbtree.gcno
+        -:    0:Data:rbtree.gcda
+        -:    0:Runs:3
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <assert.h>
+        -:   16:#include <base/chain_alloc.h>
+        -:   17:#include <base/macro_utils.h>
+        -:   18:#include <base/panic.h>
+        -:   19:#include <base/resources.h>
+        -:   20:#include <errno.h>
+        -:   21:#include <stdio.h>
+        -:   22:#include <string.h>
+        -:   23:#include <util/rbtree.h>
+        -:   24:
+        -:   25:typedef struct RBTreeNode {
+        -:   26:	FatPtr right;
+        -:   27:	FatPtr left;
+        -:   28:	FatPtr parent;
+        -:   29:	bool red;
+        -:   30:	char data[];
+        -:   31:} RBTreeNode;
+        -:   32:
+        -:   33:typedef struct RBTreeImpl {
+        -:   34:	u64 key_size;
+        -:   35:	u64 value_size;
+        -:   36:	int (*compare)(const void *, const void *);
+        -:   37:	FatPtr root;
+        -:   38:	bool send;
+        -:   39:} RBTreeImpl;
+        -:   40:
+    #####:   41:void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
+    #####:   42:}
+        -:   43:
+    #####:   44:void *rbtree_iterator_next(RBTreeIterator *ptr) {
+    #####:   45:	return NULL;
+        -:   46:}
+        -:   47:
+    #####:   48:FatPtr create_fatptr_from_node(RBTreeNode *node) {
+        -:   49:	FatPtr fp;
+    #####:   50:	fp.data = node; // set node
+    #####:   51:	return fp;
+        -:   52:}
+        -:   53:
+        -:   54:/*
+        -:   55:// Utility function to perform left rotation
+        -:   56:	void leftRotate(Node* x)
+        -:   57:	{
+        -:   58:		Node* y = x->right;
+        -:   59:		x->right = y->left;
+        -:   60:		if (y->left != NIL) {
+        -:   61:			y->left->parent = x;
+        -:   62:		}
+        -:   63:		y->parent = x->parent;
+        -:   64:		if (x->parent == nullptr) {
+        -:   65:			root = y;
+        -:   66:		}
+        -:   67:		else if (x == x->parent->left) {
+        -:   68:			x->parent->left = y;
+        -:   69:		}
+        -:   70:		else {
+        -:   71:			x->parent->right = y;
+        -:   72:		}
+        -:   73:		y->left = x;
+        -:   74:		x->parent = y;
+        -:   75:	}
+        -:   76:*/
+        -:   77:
+        -:   78:/*
+        -:   79:void rbtree_rotate_left(RBTree *ptr, FatPtr *node) {
+        -:   80:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        -:   81:	printf("rotate left\n");
+        -:   82:	RBTreeNode *target = $Ref(node);
+        -:   83:	FatPtr y = target->right;
+        -:   84:	RBTreeNode *ynode = $Ref(&y);
+        -:   85:	target->right = ynode->left;
+        -:   86:	FatPtr yleft = null;
+        -:   87:	if (ynode && !nil(ynode->left)) {
+        -:   88:		RBTreeNode *ynode_left = $Ref(&ynode->left);
+        -:   89:		ynode_left->parent = *node;
+        -:   90:	}
+        -:   91:	ynode->parent = target->parent;
+        -:   92:
+        -:   93:	if (nil(target->parent)) {
+        -:   94:		printf("!!!!!!parent target null\n");
+        -:   95:		impl->root = y;
+        -:   96:	} else {
+        -:   97:		RBTreeNode *parent = $Ref(&target->parent);
+        -:   98:		RBTreeNode *parent_left = $Ref(&parent->left);
+        -:   99:		if (target == parent_left) {
+        -:  100:			printf("==parent_left\n");
+        -:  101:			parent->left = y;
+        -:  102:		} else {
+        -:  103:			printf("==parent_right\n");
+        -:  104:			parent->right = y;
+        -:  105:		}
+        -:  106:	}
+        -:  107:	ynode->left = *node;
+        -:  108:	target->parent = y;
+        -:  109:	printf("complete!!!!!!\n");
+        -:  110:}
+        -:  111:*/
+        -:  112:
+        1:  113:void rbtree_rotate_left(RBTree *ptr, FatPtr *node) {
+        1:  114:	return;
+        -:  115:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        -:  116:	printf("rotate left\n");
+        -:  117:
+        -:  118:	// Get the target node and its right child (y)
+        -:  119:	RBTreeNode *target = $Ref(node); // target is of type RBTreeNode*
+        -:  120:	FatPtr y = target->right;		 // y is of type FatPtr
+        -:  121:	RBTreeNode *ynode = $Ref(&y);	 // ynode is of type RBTreeNode*
+        -:  122:
+        -:  123:	// Move y's left subtree into target's right subtree
+        -:  124:	target->right = ynode->left;
+        -:  125:	if (!nil(ynode->left)) {
+        -:  126:		RBTreeNode *yleft = $Ref(&ynode->left);
+        -:  127:		yleft->parent = *node; // Correctly set the parent of left child to target.
+        -:  128:	}
+        -:  129:
+        -:  130:	assert(target != ynode && "Target and Ynode cannot be the same!");
+        -:  131:	assert(&target->right != node && "Target's right child cannot be itself!");
+        -:  132:
+        -:  133:	// Temporarily store parent and sibling
+        -:  134:	FatPtr tempParent = target->parent; // Store target's parent temporarily
+        -:  135:	FatPtr tempLeft = ynode->left;		// Store y's left child temporarily
+        -:  136:
+        -:  137:	// Set y's parent to target's parent
+        -:  138:	ynode->parent = tempParent;
+        -:  139:
+        -:  140:	// Update the root if target was the root
+        -:  141:	if (nil(tempParent)) {
+        -:  142:		printf("!!!!!!parent target null\n");
+        -:  143:		impl->root = y; // `y` becomes the new root.
+        -:  144:	} else {
+        -:  145:		// Update the correct child reference of target's parent
+        -:  146:		FatPtr *parentPtr = &tempParent; // Use a pointer to FatPtr
+        -:  147:		RBTreeNode *parent = $Ref(parentPtr);
+        -:  148:		if (target == $Ref(&parent->left)) {
+        -:  149:			printf("==parent_left\n");
+        -:  150:			parent->left = y;
+        -:  151:		} else {
+        -:  152:			printf("==parent_right\n");
+        -:  153:			parent->right = y;
+        -:  154:		}
+        -:  155:	}
+        -:  156:
+        -:  157:	// Make target the left child of y
+        -:  158:	ynode->left = *node; // Set the left of y to target
+        -:  159:
+        -:  160:	// Update the parent of target to be y
+        -:  161:	target->parent = y; // ynode; // Correctly set target's parent to y
+        -:  162:
+        -:  163:	// Update assertions to check pointers directly
+        -:  164:	// assert((FatPtr)ynode->parent != (FatPtr)target && "Ynode's parent cannot be Target!");
+        -:  165:	// assert(tempLeft != (FatPtr)node && "Ynode's left child cannot be Node!");
+        -:  166:
+        -:  167:	printf("complete!!!!!!\n");
+        -:  168:}
+        -:  169:
+        -:  170:/*
+        -:  171:void rbtree_rotate_left(RBTree *ptr, FatPtr *node) {
+        -:  172:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        -:  173:	printf("rotate left\n");
+        -:  174:
+        -:  175:	// Get the target node and its right child (y)
+        -:  176:	RBTreeNode *target = $Ref(node);
+        -:  177:	FatPtr y = target->right;
+        -:  178:	RBTreeNode *ynode = $Ref(&y);
+        -:  179:
+        -:  180:	// Move y's left subtree into target's right subtree
+        -:  181:	target->right = ynode->left;
+        -:  182:	if (!nil(ynode->left)) {
+        -:  183:		RBTreeNode *yleft = $Ref(&ynode->left);
+        -:  184:		yleft->parent = *node;
+        -:  185:	}
+        -:  186:
+        -:  187:	assert(target != ynode && "Target and Ynode cannot be the same!");
+        -:  188:	assert(&target->right != node && "Target's right child cannot be itself!");
+        -:  189:
+        -:  190:	// Set y's parent to target's parent
+        -:  191:	ynode->parent = target->parent;
+        -:  192:
+        -:  193:	// Update the root if target was the root
+        -:  194:	if (nil(target->parent)) {
+        -:  195:		printf("!!!!!!parent target null\n");
+        -:  196:		impl->root = y;
+        -:  197:	} else {
+        -:  198:		// Update the correct child reference of target's parent
+        -:  199:		RBTreeNode *parent = $Ref(&target->parent);
+        -:  200:		if (target == $Ref(&parent->left)) {
+        -:  201:			printf("==parent_left\n");
+        -:  202:			parent->left = y;
+        -:  203:		} else {
+        -:  204:			printf("==parent_right\n");
+        -:  205:			parent->right = y;
+        -:  206:		}
+        -:  207:	}
+        -:  208:
+        -:  209:	// Make target the left child of y
+        -:  210:	ynode->left = *node;
+        -:  211:	target->parent = y;
+        -:  212:
+        -:  213:	assert(&ynode->parent != node && "Ynode's parent cannot be Target!");
+        -:  214:
+        -:  215:	printf("complete!!!!!!\n");
+        -:  216:}
+        -:  217:*/
+        -:  218:
+        -:  219:/*
+        -:  220:void rbtree_rotate_right(RBTree *ptr, FatPtr *node) {
+        -:  221:	printf("rotate right\n");
+        -:  222:}
+        -:  223:*/
+        -:  224:
+        1:  225:void rbtree_rotate_right(RBTree *ptr, FatPtr *node) {
+        1:  226:	return;
+        -:  227:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        -:  228:	printf("rotate right\n");
+        -:  229:
+        -:  230:	// Get the target node and its left child (y)
+        -:  231:	RBTreeNode *target = $Ref(node);
+        -:  232:	FatPtr y = target->left;
+        -:  233:	RBTreeNode *ynode = $Ref(&y);
+        -:  234:
+        -:  235:	// Move y's right subtree into target's left subtree
+        -:  236:	target->left = ynode->right;
+        -:  237:	if (!nil(ynode->right)) {
+        -:  238:		RBTreeNode *yright = $Ref(&ynode->right);
+        -:  239:		yright->parent = *node;
+        -:  240:	}
+        -:  241:
+        -:  242:	// Set y's parent to target's parent
+        -:  243:	ynode->parent = target->parent;
+        -:  244:
+        -:  245:	// Update the root if target was the root
+        -:  246:	if (nil(target->parent)) {
+        -:  247:		impl->root = y;
+        -:  248:	} else {
+        -:  249:		// Update the correct child reference of target's parent
+        -:  250:		RBTreeNode *parent = $Ref(&target->parent);
+        -:  251:		if (target == $Ref(&parent->left)) {
+        -:  252:			parent->left = y;
+        -:  253:		} else {
+        -:  254:			parent->right = y;
+        -:  255:		}
+        -:  256:	}
+        -:  257:
+        -:  258:	// Make target the right child of y
+        -:  259:	ynode->right = *node;
+        -:  260:	target->parent = y;
+        -:  261:
+        -:  262:	printf("complete right rotation\n");
+        -:  263:}
+        -:  264:
+        -:  265:/*
+        -:  266:void fixInsert(Node* k)
+        -:  267:	{
+        -:  268:		while (k != root && k->parent->color == "RED") {
+        -:  269:			if (k->parent == k->parent->parent->left) {
+        -:  270:				Node* u = k->parent->parent->right; // uncle
+        -:  271:				if (u->color == "RED") {
+        -:  272:					k->parent->color = "BLACK";
+        -:  273:					u->color = "BLACK";
+        -:  274:					k->parent->parent->color = "RED";
+        -:  275:					k = k->parent->parent;
+        -:  276:				}
+        -:  277:				else {
+        -:  278:					if (k == k->parent->right) {
+        -:  279:						k = k->parent;
+        -:  280:						leftRotate(k);
+        -:  281:					}
+        -:  282:					k->parent->color = "BLACK";
+        -:  283:					k->parent->parent->color = "RED";
+        -:  284:					rightRotate(k->parent->parent);
+        -:  285:				}
+        -:  286:			}
+        -:  287:			else {
+        -:  288:				Node* u = k->parent->parent->left; // uncle
+        -:  289:				if (u->color == "RED") {
+        -:  290:					k->parent->color = "BLACK";
+        -:  291:					u->color = "BLACK";
+        -:  292:					k->parent->parent->color = "RED";
+        -:  293:					k = k->parent->parent;
+        -:  294:				}
+        -:  295:				else {
+        -:  296:					if (k == k->parent->left) {
+        -:  297:						k = k->parent;
+        -:  298:						rightRotate(k);
+        -:  299:					}
+        -:  300:					k->parent->color = "BLACK";
+        -:  301:					k->parent->parent->color = "RED";
+        -:  302:					leftRotate(k->parent->parent);
+        -:  303:				}
+        -:  304:			}
+        -:  305:		}
+        -:  306:		root->color = "BLACK";
+        -:  307:	}
+        -:  308:*/
+        -:  309:
+        3:  310:void rbtree_fix_up(RBTree *ptr, FatPtr *fptr) {
+        3:  311:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        3:  312:	RBTreeNode *root = $Ref(&impl->root);
+        1:  313:	loop {
+        4:  314:		RBTreeNode *k = $Ref(fptr);
+        4:  315:		if (k == root)
+        1:  316:			break;
+        3:  317:		RBTreeNode *parent = $Ref(&k->parent);
+        3:  318:		if (!parent->red)
+        1:  319:			break;
+        2:  320:		RBTreeNode *gp = $Ref(&parent->parent);
+        2:  321:		if (gp == NULL)
+        1:  322:			break;
+        -:  323:
+        2:  324:		if (!nil(gp->left) && $Ref(&gp->left) == parent) {
+        1:  325:			printf("===============left uncle\n");
+        1:  326:			FatPtr ufat = gp->right; // uncle
+        1:  327:			RBTreeNode *u = $Ref(&ufat);
+       1*:  328:			if (u != NULL && u->red) {
+    #####:  329:				parent->red = false;
+    #####:  330:				u->red = false;
+    #####:  331:				gp->red = true;
+    #####:  332:				fptr = &parent->parent;
+        -:  333:			} else {
+        1:  334:				printf("else le\n");
+        1:  335:				if (k == $Ref(&parent->right)) {
+        1:  336:					fptr = &k->parent;
+        1:  337:					rbtree_rotate_left(ptr, fptr);
+        -:  338:				}
+        1:  339:				parent->red = false;
+        1:  340:				gp->red = true;
+        1:  341:				rbtree_rotate_right(ptr, &parent->parent);
+        -:  342:			}
+        -:  343:		} else {
+    #####:  344:			printf("===============right uncle\n");
+    #####:  345:			FatPtr ufat = gp->left; // uncle
+    #####:  346:			RBTreeNode *u = $Ref(&ufat);
+    #####:  347:			if (u != NULL && u->red) {
+    #####:  348:				parent->red = false;
+    #####:  349:				u->red = false;
+    #####:  350:				gp->red = true;
+    #####:  351:				fptr = &parent->parent;
+        -:  352:			} else {
+    #####:  353:				if (k == $Ref(&parent->left)) {
+    #####:  354:					fptr = &k->parent;
+    #####:  355:					rbtree_rotate_right(ptr, fptr);
+        -:  356:				}
+    #####:  357:				parent->red = false;
+    #####:  358:				gp->red = true;
+    #####:  359:				rbtree_rotate_left(ptr, &parent->parent);
+        -:  360:			}
+        -:  361:		}
+        -:  362:
+        1:  363:		printf("loop continues\n");
+        -:  364:	}
+        3:  365:	root->red = false;
+        3:  366:}
+        -:  367:
+        -:  368:// Rbtree build function has the 'send' parameter. This parameter indicates whether or
+        -:  369:// not the Rbtree can be send into another thread. If it can be sent into another
+        -:  370:// thread, the globaly sync allocator is used for all functions.
+        1:  371:int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
+        -:  372:				 int (*compare)(const void *, const void *), bool send) {
+        -:  373:	// Obtain the chainguard based on the boolean 'send'. If this is a send, the
+        -:  374:	// ChainGuard macro returns the global sync allocator's send guard and all memory
+        -:  375:	// allocations will use the thread-safe global_sync allocator. Otherwise, the thread
+        -:  376:	// local version will be used.
+        2:  377:	ChainGuard _ = ChainSend(send);
+        -:  378:
+        -:  379:	// validate input
+        1:  380:	if (ptr == NULL || key_size == 0 || value_size == 0 || compare == NULL) {
+    #####:  381:		errno = EINVAL;
+    #####:  382:		return -1;
+        -:  383:	}
+        -:  384:
+        -:  385:	// try to allocate required size for RBTreeImpl
+        1:  386:	if (chain_malloc(&ptr->impl, sizeof(RBTreeImpl))) {
+        -:  387:		// set the fatptr to null so it's not cleaned up in cleanup function
+    #####:  388:		ptr->impl = null;
+    #####:  389:		return -1;
+        -:  390:	}
+        -:  391:
+        -:  392:	// Obtain the reference to the fat pointers data using the $Ref macro
+        1:  393:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        -:  394:
+        -:  395:	// initialize values of the RBTree structure
+        1:  396:	impl->send = send;
+        1:  397:	impl->key_size = key_size;
+        1:  398:	impl->value_size = value_size;
+        1:  399:	impl->compare = compare;
+        1:  400:	impl->root = null;
+        -:  401:
+        -:  402:	// return success
+        1:  403:	return 0;
+        -:  404:}
+        -:  405:
+        3:  406:void rbtree_free_node(FatPtr *ptr) {
+        3:  407:	if (ptr != NULL && !nil(*ptr)) {
+        3:  408:		RBTreeNode *node = $Ref(ptr);
+        3:  409:		if (!nil(node->right))
+        1:  410:			rbtree_free_node(&node->right);
+        3:  411:		if (!nil(node->left))
+        1:  412:			rbtree_free_node(&node->left);
+        3:  413:		printf("free %p %p\n", ptr, ptr->data);
+        3:  414:		chain_free(ptr);
+        -:  415:	}
+        3:  416:}
+        -:  417:
+        -:  418:// cleanup function selects appropriate ChainGuard based on configuration and
+        -:  419:// deallocates memory
+        1:  420:void rbtree_cleanup(RBTreeNc *ptr) {
+        1:  421:	printf("rbtree cleanup\n");
+        -:  422:	// check non-initialized conditions
+        1:  423:	if (ptr != NULL && !nil(ptr->impl)) {
+        -:  424:		// obtain referent to internal RBTree structure
+        1:  425:		RBTreeImpl *impl = $Ref(&ptr->impl);
+        -:  426:		// set appropriate chainguard status
+        2:  427:		ChainGuard _ = ChainSend(impl->send);
+        -:  428:
+        1:  429:		rbtree_free_node(&impl->root);
+        -:  430:
+        -:  431:		// free RBTreeImpl structure
+        1:  432:		chain_free(&ptr->impl);
+        -:  433:	}
+        1:  434:}
+        -:  435:
+        3:  436:int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
+        3:  437:	if (ptr == NULL || nil(ptr->impl)) {
+    #####:  438:		errno = EINVAL;
+    #####:  439:		return -1;
+        -:  440:	}
+        3:  441:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        6:  442:	ChainGuard _ = ChainSend(impl->send);
+        -:  443:
+        3:  444:	FatPtr parent = null;
+        3:  445:	FatPtr *check = &impl->root;
+        -:  446:
+        3:  447:	printf("insert\n");
+        3:  448:	loop {
+        -:  449:
+        6:  450:		if (nil(*check)) {
+        3:  451:			u64 size = sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char);
+        3:  452:			if (chain_malloc(check, size)) {
+    #####:  453:				return -1;
+        -:  454:			}
+        3:  455:			RBTreeNode *node = $Ref(check);
+        3:  456:			memcpy((char *)node->data, key, impl->key_size);
+        3:  457:			memcpy(node->data + impl->key_size, value, impl->value_size);
+        3:  458:			node->red = true;
+        3:  459:			node->right = null;
+        3:  460:			node->left = null;
+        3:  461:			node->parent = parent;
+        3:  462:			break;
+        -:  463:		}
+        3:  464:		parent = *check;
+        3:  465:		RBTreeNode *cur = $Ref(check);
+        3:  466:		int v = impl->compare(cur->data, key);
+        3:  467:		if (v == 0) {
+    #####:  468:			return -1;
+        3:  469:		} else if (v > 0) {
+        1:  470:			printf("go right\n");
+        1:  471:			check = &cur->right;
+        -:  472:		} else {
+        2:  473:			printf("go left\n");
+        2:  474:			check = &cur->left;
+        -:  475:		}
+        -:  476:	}
+        -:  477:
+        3:  478:	printf("calling fix up\n");
+        3:  479:	rbtree_fix_up(ptr, check);
+        3:  480:	return 0;
+        -:  481:}
+        -:  482:
+    #####:  483:int rbtree_delete(RBTree *ptr, const void *key) {
+    #####:  484:	return 0;
+        -:  485:}
+        -:  486:
+        4:  487:const void *rbtree_get(const RBTree *ptr, const void *key) {
+        4:  488:	if (ptr == NULL || nil(ptr->impl)) {
+    #####:  489:		errno = EINVAL;
+    #####:  490:		return NULL;
+        -:  491:	}
+        4:  492:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        8:  493:	ChainGuard _ = ChainSend(impl->send);
+        -:  494:
+        4:  495:	FatPtr *check = &impl->root;
+        -:  496:
+        4:  497:	int counter = 0;
+        4:  498:	loop {
+        8:  499:		if (nil(*check)) {
+        1:  500:			return NULL;
+        -:  501:		}
+        7:  502:		RBTreeNode *cur = $Ref(check);
+        7:  503:		int v = impl->compare(cur->data, key);
+        7:  504:		if (v == 0) {
+        3:  505:			printf("found at %p\n", check->data);
+        3:  506:			return cur->data + impl->key_size;
+        4:  507:		} else if (v > 0) {
+        2:  508:			printf("check=%p,cur->right=%p\n", check, &cur->right);
+        2:  509:			check = &cur->right;
+        -:  510:		} else {
+        2:  511:			printf("check=%p,cur->left=%p\n", check, &cur->left);
+        2:  512:			check = &cur->left;
+        -:  513:		}
+        4:  514:		counter++;
+        4:  515:		if (counter == 10)
+    #####:  516:			panic("too many loops");
+        -:  517:	}
+        -:  518:
+        -:  519:	return NULL;
+        -:  520:}
+        -:  521:
+    #####:  522:int rbtree_size(const RBTree *ptr) {
+    #####:  523:	return 0;
+        -:  524:}
+        -:  525:
+    #####:  526:int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
+    #####:  527:	return 0;
+        -:  528:}

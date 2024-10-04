@@ -75,7 +75,8 @@ $(function() {
 <div class="title">rbtree.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="slabs_8h_source.html">base/slabs.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 </div>
 <p><a href="rbtree_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -108,8 +109,8 @@ Functions</h2></td></tr>
 <tr class="separator:a994a943743a2a3622308f32426ff903e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade19eed118d206e58c9836543cd4122a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#ade19eed118d206e58c9836543cd4122a">rbtree_cleanup</a> (<a class="el" href="structRBTreeNc.html">RBTreeNc</a> *ptr)</td></tr>
 <tr class="separator:ade19eed118d206e58c9836543cd4122a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ec36678a4770aa7cb0e6512df3b1bf7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#a5ec36678a4770aa7cb0e6512df3b1bf7">rbtree_build</a> (<a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> key_size, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> value_size)</td></tr>
-<tr class="separator:a5ec36678a4770aa7cb0e6512df3b1bf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01e9623222fd5c188083c98821104b9d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#a01e9623222fd5c188083c98821104b9d">rbtree_build</a> (<a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> key_size, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> value_size, int(*compare)(const void *, const void *), <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> send)</td></tr>
+<tr class="separator:a01e9623222fd5c188083c98821104b9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae8cfda87dfe2f830785ee9510596f5c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#aae8cfda87dfe2f830785ee9510596f5c">rbtree_insert</a> (<a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const void *key, const void *value)</td></tr>
 <tr class="separator:aae8cfda87dfe2f830785ee9510596f5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f2febac551af938e5345f5b0e30ca0a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#a6f2febac551af938e5345f5b0e30ca0a">rbtree_delete</a> (<a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const void *key)</td></tr>
@@ -180,8 +181,8 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a5ec36678a4770aa7cb0e6512df3b1bf7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5ec36678a4770aa7cb0e6512df3b1bf7">&#9670;&nbsp;</a></span>rbtree_build()</h2>
+<a id="a01e9623222fd5c188083c98821104b9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a01e9623222fd5c188083c98821104b9d">&#9670;&nbsp;</a></span>rbtree_build()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -202,7 +203,19 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
-          <td class="paramname"><em>value_size</em>&#160;</td>
+          <td class="paramname"><em>value_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int(*)(const void *, const void *)&#160;</td>
+          <td class="paramname"><em>compare</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>send</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

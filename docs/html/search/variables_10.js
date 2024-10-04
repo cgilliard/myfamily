@@ -1,18 +1,8 @@
 var searchData=
 [
-  ['s_1048',['s',['../structsha3__context__.html#adb683b8795b46c665d4a6d0435c32c59',1,'sha3_context_::s()'],['../structTokenizerIml.html#a510e8c6b0d53a32022f7276d8e24e0e5',1,'TokenizerIml::s()']]],
-  ['sa_1049',['sa',['../structChainGuardEntry.html#a257fc575812a985fe98f2b9ed6bf14f8',1,'ChainGuardEntry']]],
-  ['saved_1050',['saved',['../structsha3__context__.html#a0975e246a8a9c67763f01c6f272ae813',1,'sha3_context_']]],
-  ['sb_1051',['sb',['../structsha3__context__.html#ac1e7b9f70e82f3c4e1e2ddeb0b945d4f',1,'sha3_context_']]],
-  ['sd_5farr_1052',['sd_arr',['../structSlabAllocatorImpl.html#a5e7c4f07f6f1f244e1d1221dfdf92e48',1,'SlabAllocatorImpl']]],
-  ['sd_5fsize_1053',['sd_size',['../structSlabAllocatorImpl.html#a9609487a2922df902fe5763b2126b2e1',1,'SlabAllocatorImpl']]],
-  ['short_5fname_1054',['short_name',['../structArgsParamImpl.html#a50545f26c08044072e638222863d6fff',1,'ArgsParamImpl']]],
-  ['slab_5fsize_1055',['slab_size',['../structSlabType.html#a8ad4222a29996ea7ec85381c2e6f8a9a',1,'SlabType']]],
-  ['slab_5ftypes_1056',['slab_types',['../structSlabAllocatorConfigNc.html#a6dc6dd63dcfa60d360cdebf5b1746bde',1,'SlabAllocatorConfigNc']]],
-  ['slab_5ftypes_5fcount_1057',['slab_types_count',['../structSlabAllocatorConfigNc.html#a0dbae6d00a8e7249ae3e6d78b871bba3',1,'SlabAllocatorConfigNc']]],
-  ['slabs_5fper_5fresize_1058',['slabs_per_resize',['../structSlabType.html#a31b72a60c523699b301633df8e99f318',1,'SlabType']]],
-  ['span_1059',['span',['../structTokenImpl.html#a30cb4616f78175c06bde0308e89886f3',1,'TokenImpl']]],
-  ['subs_1060',['subs',['../structArgsImpl.html#aaa708eb01bbbcc2a9cff1d2157a5a9a9',1,'ArgsImpl']]],
-  ['subs_5fcount_1061',['subs_count',['../structArgsImpl.html#aeff7493b0f58045fc0d83223fe273eb6',1,'ArgsImpl']]],
-  ['sync_1062',['sync',['../structChainGuardEntry.html#ac3bede5e90d3836e1616c0d9903a012c',1,'ChainGuardEntry']]]
+  ['realloc_5fsum_1095',['realloc_sum',['../structResourceStats.html#afdc805f76b576e0ba036aa2ff91ddc48',1,'ResourceStats']]],
+  ['red_1096',['red',['../structRBTreeNode.html#a7e7cd847fb95bc38fafbeedfb22f6003',1,'RBTreeNode']]],
+  ['return_5fjmp_1097',['return_jmp',['../panic_8c.html#a9b2ef860ddf9f6950da834c0b674ea5f',1,'panic.c']]],
+  ['right_1098',['right',['../structRBTreeNode.html#afcf79def0fa44b5effc7498c2ecb5ece',1,'RBTreeNode']]],
+  ['root_1099',['root',['../structRBTreeImpl.html#aaa619a56271ba345adaeebc61e75e2aa',1,'RBTreeImpl']]]
 ];
