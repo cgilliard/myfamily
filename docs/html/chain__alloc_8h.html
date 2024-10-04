@@ -78,7 +78,8 @@ $(function() {
 
 <p>This file contains definitions for the chain_allocator.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;<a class="el" href="slabs_8h_source.html">base/slabs.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="slabs_8h_source.html">base/slabs.h</a>&gt;</code><br />
 </div>
 <p><a href="chain__alloc_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -89,6 +90,10 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:afab15376bc4702c1aef06131b69f0bef"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8h.html#afab15376bc4702c1aef06131b69f0bef">CHAIN_GUARD_INIT</a>&#160;&#160;&#160;{<a class="el" href="resources_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>}</td></tr>
+<tr class="separator:afab15376bc4702c1aef06131b69f0bef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43af973b3fa137fe309d4a5e9bcfd209"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8h.html#a43af973b3fa137fe309d4a5e9bcfd209">ChainSend</a>(v)</td></tr>
+<tr class="separator:a43af973b3fa137fe309d4a5e9bcfd209"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a8623cb74a147abf95752a87e262c09"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8h.html#a9a8623cb74a147abf95752a87e262c09">ChainGuard</a>&#160;&#160;&#160;<a class="el" href="structChainGuardNc.html">ChainGuardNc</a> <a class="el" href="types_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="chain__alloc_8h.html#a849afb2f6a8c5640494bf4965c5ab07c">chain_guard_cleanup</a>)))</td></tr>
 <tr class="separator:a9a8623cb74a147abf95752a87e262c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a396e07a139256b7a3968b20e04f83537"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8h.html#a396e07a139256b7a3968b20e04f83537">sync_allocator</a>()</td></tr>
@@ -121,6 +126,20 @@ Overview</h1>
 <p>The chain allocator is a data structure which allows for chaining of the <a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> structure. These slab allocators can be added to the chain and when the scope that they were added in ends, they are automatically removed from the chain and the previous chain allocator becomes active once again. The purpose is to allow for scope specific slab allocator. This allows data structures to use a specific slab allocator during their function calls.</p>
 <p>For instance, I might have a Queue data type which has a synchronized configuration parameter. If synchronized is false, the Queue can use the default thread local slab allocator to allocate memory. However, if the queue is meant to be thread safe, the Queue may want to have either a global synchornized SlabAllocator or a custom SlabAllocator that is only used for this Queue. All these options are possible with the chain allocator and additionally, the previous stack of slab allocators is restored after the Queue's functions end. This is accomplished with the 'ChainGuard' type and its <b>attribute</b> cleanup functon which automatically restores state when the guard goes out of scope. So, let's say my Queue is configured to use a synchronized slab allocator, the queue can use it in it's function call simply by calling: ChainGuard guard = chain_guard_init(sync_slabs, true); Then, when this guard goes out of scope (at the end of the Queue's function call), the previous SlabAllocator is restored. If no additional slab allocators are left, the default slab allocator remains. This way a data type can use a memory allocation method that meets its requirements without having an effect on calling data types or data types it calls itself. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="afab15376bc4702c1aef06131b69f0bef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afab15376bc4702c1aef06131b69f0bef">&#9670;&nbsp;</a></span>CHAIN_GUARD_INIT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define CHAIN_GUARD_INIT&#160;&#160;&#160;{<a class="el" href="resources_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a9a8623cb74a147abf95752a87e262c09"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9a8623cb74a147abf95752a87e262c09">&#9670;&nbsp;</a></span>ChainGuard</h2>
 
@@ -133,6 +152,33 @@ Overview</h1>
       </table>
 </div><div class="memdoc">
 
+</div>
+</div>
+<a id="a43af973b3fa137fe309d4a5e9bcfd209"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43af973b3fa137fe309d4a5e9bcfd209">&#9670;&nbsp;</a></span>ChainSend</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ChainSend</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
+<div class="line">        ChainGuardNc _cg__ = <a class="code" href="chain__alloc_8h.html#afab15376bc4702c1aef06131b69f0bef">CHAIN_GUARD_INIT</a>;                                                     \</div>
+<div class="line">        if (v) {                                                                                   \</div>
+<div class="line">            _cg__ = <a class="code" href="chain__alloc_8h.html#a396e07a139256b7a3968b20e04f83537">sync_allocator</a>();                                                              \</div>
+<div class="line">        }                                                                                          \</div>
+<div class="line">        _cg__;                                                                                     \</div>
+<div class="line">    })</div>
+<div class="ttc" id="achain__alloc_8h_html_a396e07a139256b7a3968b20e04f83537"><div class="ttname"><a href="chain__alloc_8h.html#a396e07a139256b7a3968b20e04f83537">sync_allocator</a></div><div class="ttdeci">#define sync_allocator()</div><div class="ttdef"><b>Definition:</b> chain_alloc.h:96</div></div>
+<div class="ttc" id="achain__alloc_8h_html_afab15376bc4702c1aef06131b69f0bef"><div class="ttname"><a href="chain__alloc_8h.html#afab15376bc4702c1aef06131b69f0bef">CHAIN_GUARD_INIT</a></div><div class="ttdeci">#define CHAIN_GUARD_INIT</div><div class="ttdef"><b>Definition:</b> chain_alloc.h:52</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a396e07a139256b7a3968b20e04f83537"></a>
@@ -154,8 +200,8 @@ Overview</h1>
 <div class="line">        ChainGuardNc __ret_ = <a class="code" href="chain__alloc_8h.html#aabfc2c8286d9abaf9668fb459e9516ea">set_slab_allocator</a>(__sync_alloc_, <span class="keyword">true</span>);                             \</div>
 <div class="line">        __ret_;                                                                                    \</div>
 <div class="line">    })</div>
-<div class="ttc" id="achain__alloc_8h_html_a337698d87c79c3c56f2e8d9f5db24214"><div class="ttname"><a href="chain__alloc_8h.html#a337698d87c79c3c56f2e8d9f5db24214">get_global_sync_allocator</a></div><div class="ttdeci">SlabAllocator * get_global_sync_allocator()</div><div class="ttdef"><b>Definition:</b> chain_alloc.c:66</div></div>
-<div class="ttc" id="achain__alloc_8h_html_aabfc2c8286d9abaf9668fb459e9516ea"><div class="ttname"><a href="chain__alloc_8h.html#aabfc2c8286d9abaf9668fb459e9516ea">set_slab_allocator</a></div><div class="ttdeci">ChainGuard set_slab_allocator(SlabAllocator *sa, bool is_sync)</div><div class="ttdef"><b>Definition:</b> chain_alloc.c:114</div></div>
+<div class="ttc" id="achain__alloc_8h_html_a337698d87c79c3c56f2e8d9f5db24214"><div class="ttname"><a href="chain__alloc_8h.html#a337698d87c79c3c56f2e8d9f5db24214">get_global_sync_allocator</a></div><div class="ttdeci">SlabAllocator * get_global_sync_allocator()</div><div class="ttdef"><b>Definition:</b> chain_alloc.c:70</div></div>
+<div class="ttc" id="achain__alloc_8h_html_aabfc2c8286d9abaf9668fb459e9516ea"><div class="ttname"><a href="chain__alloc_8h.html#aabfc2c8286d9abaf9668fb459e9516ea">set_slab_allocator</a></div><div class="ttdeci">ChainGuard set_slab_allocator(SlabAllocator *sa, bool is_sync)</div><div class="ttdef"><b>Definition:</b> chain_alloc.c:123</div></div>
 </div><!-- fragment -->
 </div>
 </div>

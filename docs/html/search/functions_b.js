@@ -1,16 +1,20 @@
 var searchData=
 [
-  ['rbtree_5fbuild_922',['rbtree_build',['../rbtree_8h.html#a5ec36678a4770aa7cb0e6512df3b1bf7',1,'rbtree.h']]],
-  ['rbtree_5fcleanup_923',['rbtree_cleanup',['../rbtree_8h.html#ade19eed118d206e58c9836543cd4122a',1,'rbtree.h']]],
-  ['rbtree_5fdelete_924',['rbtree_delete',['../rbtree_8h.html#a6f2febac551af938e5345f5b0e30ca0a',1,'rbtree.h']]],
-  ['rbtree_5fget_925',['rbtree_get',['../rbtree_8h.html#abb0622d260fa94b7cc066f774fbc4cb4',1,'rbtree.h']]],
-  ['rbtree_5finsert_926',['rbtree_insert',['../rbtree_8h.html#aae8cfda87dfe2f830785ee9510596f5c',1,'rbtree.h']]],
-  ['rbtree_5fiterator_927',['rbtree_iterator',['../rbtree_8h.html#a46699bbeb46d3521b3ae3f208a04cffa',1,'rbtree.h']]],
-  ['rbtree_5fiterator_5fcleanup_928',['rbtree_iterator_cleanup',['../rbtree_8h.html#a159636545fda721edb3fb250a877d4de',1,'rbtree.h']]],
-  ['rbtree_5fiterator_5fnext_929',['rbtree_iterator_next',['../rbtree_8h.html#a994a943743a2a3622308f32426ff903e',1,'rbtree.h']]],
-  ['rbtree_5fsize_930',['rbtree_size',['../rbtree_8h.html#a6b99f34f7e3fdfeb81cfed0cc97791b5',1,'rbtree.h']]],
-  ['read_5fall_931',['read_all',['../misc_8c.html#af88b4147d246cf562900b5939bc10984',1,'read_all(void *buffer, u64 size, u64 count, MYFILE *stream):&#160;misc.c'],['../misc_8h.html#af88b4147d246cf562900b5939bc10984',1,'read_all(void *buffer, u64 size, u64 count, MYFILE *stream):&#160;misc.c']]],
-  ['real_5fmain_932',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]],
-  ['remove_5fdirectory_933',['remove_directory',['../misc_8c.html#a0f31f3ead33bb24a33ccfcd11c580aed',1,'remove_directory(const Path *p, bool preserve_dir):&#160;misc.c'],['../misc_8h.html#ac670968c9a6ae10fbdd37a7206afc50b',1,'remove_directory(const Path *path, bool preserve_dir):&#160;misc.c']]],
-  ['rstrstr_934',['rstrstr',['../misc_8c.html#ac2401671be38c7a45eea5e003dc55889',1,'rstrstr(const char *s1, const char *s2):&#160;misc.c'],['../misc_8h.html#ac2401671be38c7a45eea5e003dc55889',1,'rstrstr(const char *s1, const char *s2):&#160;misc.c']]]
+  ['rbtree_5fbuild_959',['rbtree_build',['../rbtree_8h.html#a01e9623222fd5c188083c98821104b9d',1,'rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size, int(*compare)(const void *, const void *), bool send):&#160;rbtree.c'],['../rbtree_8c.html#a01e9623222fd5c188083c98821104b9d',1,'rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size, int(*compare)(const void *, const void *), bool send):&#160;rbtree.c']]],
+  ['rbtree_5fcleanup_960',['rbtree_cleanup',['../rbtree_8c.html#ade19eed118d206e58c9836543cd4122a',1,'rbtree_cleanup(RBTreeNc *ptr):&#160;rbtree.c'],['../rbtree_8h.html#ade19eed118d206e58c9836543cd4122a',1,'rbtree_cleanup(RBTreeNc *ptr):&#160;rbtree.c']]],
+  ['rbtree_5fdelete_961',['rbtree_delete',['../rbtree_8c.html#a6f2febac551af938e5345f5b0e30ca0a',1,'rbtree_delete(RBTree *ptr, const void *key):&#160;rbtree.c'],['../rbtree_8h.html#a6f2febac551af938e5345f5b0e30ca0a',1,'rbtree_delete(RBTree *ptr, const void *key):&#160;rbtree.c']]],
+  ['rbtree_5ffix_5fup_962',['rbtree_fix_up',['../rbtree_8c.html#a6c18d1c9af5344ebc6f57f80c764fc11',1,'rbtree.c']]],
+  ['rbtree_5ffree_5fnode_963',['rbtree_free_node',['../rbtree_8c.html#a99433a33eb84cb8ddbbd502c6ffaece1',1,'rbtree.c']]],
+  ['rbtree_5fget_964',['rbtree_get',['../rbtree_8c.html#abb0622d260fa94b7cc066f774fbc4cb4',1,'rbtree_get(const RBTree *ptr, const void *key):&#160;rbtree.c'],['../rbtree_8h.html#abb0622d260fa94b7cc066f774fbc4cb4',1,'rbtree_get(const RBTree *ptr, const void *key):&#160;rbtree.c']]],
+  ['rbtree_5finsert_965',['rbtree_insert',['../rbtree_8c.html#aae8cfda87dfe2f830785ee9510596f5c',1,'rbtree_insert(RBTree *ptr, const void *key, const void *value):&#160;rbtree.c'],['../rbtree_8h.html#aae8cfda87dfe2f830785ee9510596f5c',1,'rbtree_insert(RBTree *ptr, const void *key, const void *value):&#160;rbtree.c']]],
+  ['rbtree_5fiterator_966',['rbtree_iterator',['../rbtree_8c.html#a46699bbeb46d3521b3ae3f208a04cffa',1,'rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter):&#160;rbtree.c'],['../rbtree_8h.html#a46699bbeb46d3521b3ae3f208a04cffa',1,'rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter):&#160;rbtree.c']]],
+  ['rbtree_5fiterator_5fcleanup_967',['rbtree_iterator_cleanup',['../rbtree_8h.html#a159636545fda721edb3fb250a877d4de',1,'rbtree_iterator_cleanup(RBTreeIteratorNc *ptr):&#160;rbtree.c'],['../rbtree_8c.html#a159636545fda721edb3fb250a877d4de',1,'rbtree_iterator_cleanup(RBTreeIteratorNc *ptr):&#160;rbtree.c']]],
+  ['rbtree_5fiterator_5fnext_968',['rbtree_iterator_next',['../rbtree_8c.html#a994a943743a2a3622308f32426ff903e',1,'rbtree_iterator_next(RBTreeIterator *ptr):&#160;rbtree.c'],['../rbtree_8h.html#a994a943743a2a3622308f32426ff903e',1,'rbtree_iterator_next(RBTreeIterator *ptr):&#160;rbtree.c']]],
+  ['rbtree_5frotate_5fleft_969',['rbtree_rotate_left',['../rbtree_8c.html#acca13afd2bb9d70f12d9bf4c90c37e65',1,'rbtree.c']]],
+  ['rbtree_5frotate_5fright_970',['rbtree_rotate_right',['../rbtree_8c.html#a9a8f6555c6829dacd005f9f6ed909099',1,'rbtree.c']]],
+  ['rbtree_5fsize_971',['rbtree_size',['../rbtree_8c.html#a6b99f34f7e3fdfeb81cfed0cc97791b5',1,'rbtree_size(const RBTree *ptr):&#160;rbtree.c'],['../rbtree_8h.html#a6b99f34f7e3fdfeb81cfed0cc97791b5',1,'rbtree_size(const RBTree *ptr):&#160;rbtree.c']]],
+  ['read_5fall_972',['read_all',['../misc_8c.html#af88b4147d246cf562900b5939bc10984',1,'read_all(void *buffer, u64 size, u64 count, MYFILE *stream):&#160;misc.c'],['../misc_8h.html#af88b4147d246cf562900b5939bc10984',1,'read_all(void *buffer, u64 size, u64 count, MYFILE *stream):&#160;misc.c']]],
+  ['real_5fmain_973',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]],
+  ['remove_5fdirectory_974',['remove_directory',['../misc_8c.html#a0f31f3ead33bb24a33ccfcd11c580aed',1,'remove_directory(const Path *p, bool preserve_dir):&#160;misc.c'],['../misc_8h.html#ac670968c9a6ae10fbdd37a7206afc50b',1,'remove_directory(const Path *path, bool preserve_dir):&#160;misc.c']]],
+  ['rstrstr_975',['rstrstr',['../misc_8c.html#ac2401671be38c7a45eea5e003dc55889',1,'rstrstr(const char *s1, const char *s2):&#160;misc.c'],['../misc_8h.html#ac2401671be38c7a45eea5e003dc55889',1,'rstrstr(const char *s1, const char *s2):&#160;misc.c']]]
 ];
