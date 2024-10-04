@@ -27,7 +27,7 @@ void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr);
 #define RBTreeIterator                                                                             \
 	RBTreeIteratorNc __attribute__((warn_unused_result, cleanup(rbtree_iterator_cleanup)))
 
-void *rbtree_iterator_next(RBTreeIterator *ptr);
+const void *rbtree_iterator_next(RBTreeIterator *ptr);
 
 typedef struct RBTreeNc {
 	FatPtr impl;

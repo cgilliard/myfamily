@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/macro_utils.h>
 #include <base/test.h>
 #include <string.h>
 #include <util/rbtree.h>
@@ -89,6 +90,24 @@ MyTest(util, test_rbtree) {
 	const MyValue *v3_out2 = rbtree_get(&tree1, &k3);
 	cr_assert_eq(v3_out2, NULL);
 	cr_assert_eq(rbtree_size(&tree1), 4);
+
+	RBTreeIterator itt;
+	cr_assert(!rbtree_iterator(&tree1, &itt));
+
+	int i = 0;
+	loop {
+		const void *next = rbtree_iterator_next(&itt);
+		if (next == NULL)
+			break;
+
+		const void *next_value = next + sizeof(MyKey);
+
+		MyKey k1;
+		MyValue v1;
+		memcpy(&k1, next, sizeof(MyKey));
+		memcpy(&v1, next_value, sizeof(MyValue));
+		printf("i=%i k1.v=%llu,value=%s\n", i++, k1.v, v1.buf);
+	}
 }
 
 MyTest(util, test_move_fatptr) {

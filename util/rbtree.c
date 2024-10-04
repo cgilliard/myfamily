@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <assert.h>
 #include <base/chain_alloc.h>
 #include <base/macro_utils.h>
 #include <base/panic.h>
 #include <base/resources.h>
 #include <errno.h>
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include <util/rbtree.h>
-
-u32 global_count = 0;
 
 typedef struct RBTreeNode {
 	FatPtr self;
@@ -46,12 +44,133 @@ typedef struct RBTreeImpl {
 	bool send;
 } RBTreeImpl;
 
+typedef struct RBTreeIteratorImpl {
+	const RBTree *ref;
+	RBTreeNode *cur;
+	RBTreeNode *stack[128];
+	u8 stack_pointer;
+	bool send;
+} RBTreeIteratorImpl;
+
 void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
+	if (ptr != NULL && !nil(ptr->impl)) {
+		// obtain referent to internal RBTreeImpl structure
+		RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
+		// set appropriate chainguard status
+		ChainGuard _ = ChainSend(impl->send);
+
+		// free RBTreeImpl structure
+		chain_free(&ptr->impl);
+	}
 }
 
-void *rbtree_iterator_next(RBTreeIterator *ptr) {
-	return NULL;
+const void *rbtree_iterator_next(RBTreeIterator *ptr) {
+	RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
+
+	// If the iterator is empty, we're done
+	if (!impl->cur && impl->stack_pointer == 0) {
+		return NULL; // No more nodes to traverse
+	}
+
+	// Traverse the tree
+	while (impl->cur || impl->stack_pointer > 0) {
+		// Traverse left subtree
+		if (impl->cur) {
+			if (impl->stack_pointer < 128) {
+				// Push the current node pointer onto the stack
+				impl->stack[impl->stack_pointer++] = impl->cur;
+			} else {
+				panic("Iterator stack overflow");
+			}
+
+			// Move to the left child
+			impl->cur = impl->cur->left;
+		} else {
+			// Pop the top node from the stack
+			impl->cur = impl->stack[--impl->stack_pointer];
+
+			// Store the current node's data to return
+			const void *ret = impl->cur->data;
+
+			// Move to the right child after visiting this node
+			impl->cur = impl->cur->right;
+
+			return ret; // Return the node's data
+		}
+	}
+
+	return NULL; // Traversal complete
 }
+
+/*
+const void *rbtree_iterator_next(RBTreeIterator *ptr) {
+	RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
+
+	// Check if there are any nodes left to traverse
+	if (!impl->cur && impl->stack_pointer == 0) {
+		return NULL; // No more nodes to traverse
+	}
+
+	// If cur is non-null, we are at the first node (root in this case)
+	if (impl->cur) {
+		// Store the current node's data to return
+		const void *ret = impl->cur->data;
+		printf("case1\n");
+
+		// Now, we need to push the current node onto the stack and start the traversal
+		while (impl->cur || impl->stack_pointer > 0) {
+			// Traverse left subtree
+			if (impl->cur->left) {
+				if (impl->stack_pointer < 128) {
+					// Push current node onto the stack
+					impl->stack[impl->stack_pointer++] = *impl->cur;
+				} else {
+					panic("Iterator stack overflow");
+				}
+
+				// Move to the left child
+				impl->cur = impl->cur->left;
+			} else {
+				// Stop after returning the root and the traversal will continue from the left child
+				impl->cur = NULL;
+				break;
+			}
+		}
+
+		return ret; // Return the root node's data on the first call
+	}
+
+	// Traverse to the next node (after the first)
+	while (impl->cur || impl->stack_pointer > 0) {
+		if (impl->cur) {
+			if (impl->stack_pointer < 128) {
+				// Push current node onto the stack
+				impl->stack[impl->stack_pointer++] = *impl->cur;
+			} else {
+				// Handle overflow
+				panic("Iterator stack overflow");
+			}
+
+			// Move to the left child
+			impl->cur = impl->cur->left;
+		} else {
+			// Pop from the stack
+			impl->cur = &impl->stack[--impl->stack_pointer];
+
+			// We found the next node, store its data to return
+			const void *ret = impl->cur->data;
+			printf("case2\n");
+
+			// Move to the right child after visiting this node
+			impl->cur = impl->cur->right;
+
+			return ret; // Return the node's data
+		}
+	}
+
+	return NULL; // Finished traversal, no more nodes left
+}
+*/
 
 // Utility function to perform left rotation
 void leftRotate(RBTree *ptr, RBTreeNode *x) {
@@ -304,7 +423,7 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 			node->right = NULL;
 			node->left = NULL;
 			node->parent = parent;
-			node->counter = global_count++;
+			node->counter = 0;
 			impl->size++;
 			rbtree_fix_up(ptr, node);
 			break;
@@ -440,5 +559,19 @@ i64 rbtree_size(const RBTree *ptr) {
 }
 
 int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
+	if (ptr == NULL || nil(ptr->impl)) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	ChainGuard _ = ChainSend(impl->send);
+
+	chain_malloc(&iter->impl, sizeof(RBTreeIteratorImpl));
+	RBTreeIteratorImpl *rbimpl = $Ref(&iter->impl);
+	rbimpl->stack_pointer = 0;
+	rbimpl->ref = ptr;
+	rbimpl->cur = impl->root;
+	rbimpl->send = impl->send;
 	return 0;
 }
