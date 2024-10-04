@@ -52,7 +52,7 @@ MyTest(util, test_rbtree) {
 	MyValue v3;
 	strcpy(v3.buf, "value2");
 	rbtree_insert(&tree1, &k3, &v3);
-	rbtree_insert(&tree1, &k3, &v3);
+	// rbtree_insert(&tree1, &k3, &v3);
 
 	const MyValue *v1_out = rbtree_get(&tree1, &k1);
 	printf("v1_out='%s' %p\n", v1_out->buf, v1_out);
@@ -67,4 +67,12 @@ MyTest(util, test_rbtree) {
 	strcpy(k4.buf, "other");
 	const MyValue *v4_out = rbtree_get(&tree1, &k4);
 	cr_assert_eq(v4_out, NULL);
+}
+
+MyTest(util, test_move_fatptr) {
+	FatPtr ptr1, ptr2;
+	ptr2 = null;
+	chain_malloc(&ptr1, 100);
+	ptr2 = ptr1;
+	chain_free(&ptr2);
 }

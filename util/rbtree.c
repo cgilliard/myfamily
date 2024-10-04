@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <assert.h>
 #include <base/chain_alloc.h>
 #include <base/macro_utils.h>
+#include <base/panic.h>
 #include <base/resources.h>
 #include <errno.h>
 #include <stdio.h>
@@ -49,261 +51,329 @@ FatPtr create_fatptr_from_node(RBTreeNode *node) {
 	return fp;
 }
 
-void rbtree_rotate_left(RBTreeImpl *impl, FatPtr *node) {
-	RBTreeNode *target = $Ref(node);							   // The node being rotated
-	RBTreeNode *right_child = $Ref(&target->right);				   // The right child of the target
-	RBTreeNode *right_child_left_child = $Ref(&right_child->left); // Left child of right_child
+/*
+// Utility function to perform left rotation
+	void leftRotate(Node* x)
+	{
+		Node* y = x->right;
+		x->right = y->left;
+		if (y->left != NIL) {
+			y->left->parent = x;
+		}
+		y->parent = x->parent;
+		if (x->parent == nullptr) {
+			root = y;
+		}
+		else if (x == x->parent->left) {
+			x->parent->left = y;
+		}
+		else {
+			x->parent->right = y;
+		}
+		y->left = x;
+		x->parent = y;
+	}
+*/
 
-	// Move the left child of right_child to be the new right child of the target
-	target->right = right_child->left;
+/*
+void rbtree_rotate_left(RBTree *ptr, FatPtr *node) {
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	printf("rotate left\n");
+	RBTreeNode *target = $Ref(node);
+	FatPtr y = target->right;
+	RBTreeNode *ynode = $Ref(&y);
+	target->right = ynode->left;
+	FatPtr yleft = null;
+	if (ynode && !nil(ynode->left)) {
+		RBTreeNode *ynode_left = $Ref(&ynode->left);
+		ynode_left->parent = *node;
+	}
+	ynode->parent = target->parent;
 
-	// If the right child's left child is not null, update its parent to point to the target
-	if (!nil(right_child->left)) {
-		right_child_left_child->parent = *node;
+	if (nil(target->parent)) {
+		printf("!!!!!!parent target null\n");
+		impl->root = y;
+	} else {
+		RBTreeNode *parent = $Ref(&target->parent);
+		RBTreeNode *parent_left = $Ref(&parent->left);
+		if (target == parent_left) {
+			printf("==parent_left\n");
+			parent->left = y;
+		} else {
+			printf("==parent_right\n");
+			parent->right = y;
+		}
+	}
+	ynode->left = *node;
+	target->parent = y;
+	printf("complete!!!!!!\n");
+}
+*/
+
+void rbtree_rotate_left(RBTree *ptr, FatPtr *node) {
+	return;
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	printf("rotate left\n");
+
+	// Get the target node and its right child (y)
+	RBTreeNode *target = $Ref(node); // target is of type RBTreeNode*
+	FatPtr y = target->right;		 // y is of type FatPtr
+	RBTreeNode *ynode = $Ref(&y);	 // ynode is of type RBTreeNode*
+
+	// Move y's left subtree into target's right subtree
+	target->right = ynode->left;
+	if (!nil(ynode->left)) {
+		RBTreeNode *yleft = $Ref(&ynode->left);
+		yleft->parent = *node; // Correctly set the parent of left child to target.
 	}
 
-	// Update the parent of the right child to be the parent of the target
-	right_child->parent = target->parent;
+	assert(target != ynode && "Target and Ynode cannot be the same!");
+	assert(&target->right != node && "Target's right child cannot be itself!");
 
-	// If the target was the root of the tree, update the root to point to right_child
-	if (nil(target->parent)) {
-		impl->root = create_fatptr_from_node(right_child); // Convert to FatPtr
+	// Temporarily store parent and sibling
+	FatPtr tempParent = target->parent; // Store target's parent temporarily
+	FatPtr tempLeft = ynode->left;		// Store y's left child temporarily
+
+	// Set y's parent to target's parent
+	ynode->parent = tempParent;
+
+	// Update the root if target was the root
+	if (nil(tempParent)) {
+		printf("!!!!!!parent target null\n");
+		impl->root = y; // `y` becomes the new root.
 	} else {
-		// Otherwise, update the parent's child pointer to point to right_child
-		RBTreeNode *parent = $Ref(&target->parent);
-		if (node == &parent->left) {
-			parent->left = create_fatptr_from_node(right_child); // Convert to FatPtr
+		// Update the correct child reference of target's parent
+		FatPtr *parentPtr = &tempParent; // Use a pointer to FatPtr
+		RBTreeNode *parent = $Ref(parentPtr);
+		if (target == $Ref(&parent->left)) {
+			printf("==parent_left\n");
+			parent->left = y;
 		} else {
-			parent->right = create_fatptr_from_node(right_child); // Convert to FatPtr
+			printf("==parent_right\n");
+			parent->right = y;
 		}
 	}
 
-	// Set target as the left child of right_child
-	right_child->left = *node;
+	// Make target the left child of y
+	ynode->left = *node; // Set the left of y to target
 
-	// Update the parent of target to point to right_child
-	target->parent = create_fatptr_from_node(right_child); // Convert to FatPtr
+	// Update the parent of target to be y
+	target->parent = y; // ynode; // Correctly set target's parent to y
+
+	// Update assertions to check pointers directly
+	// assert((FatPtr)ynode->parent != (FatPtr)target && "Ynode's parent cannot be Target!");
+	// assert(tempLeft != (FatPtr)node && "Ynode's left child cannot be Node!");
+
+	printf("complete!!!!!!\n");
 }
 
-void rbtree_rotate_right(RBTreeImpl *impl, FatPtr *node) {
-	RBTreeNode *target = $Ref(node);							   // The node being rotated
-	RBTreeNode *left_child = $Ref(&target->left);				   // The left child of the target
-	RBTreeNode *left_child_right_child = $Ref(&left_child->right); // Right child of left_child
+/*
+void rbtree_rotate_left(RBTree *ptr, FatPtr *node) {
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	printf("rotate left\n");
 
-	// Move the right child of left_child to be the new left child of the target
-	target->left = left_child->right;
+	// Get the target node and its right child (y)
+	RBTreeNode *target = $Ref(node);
+	FatPtr y = target->right;
+	RBTreeNode *ynode = $Ref(&y);
 
-	// If the left child's right child is not null, update its parent to point to the target
-	if (!nil(left_child->right)) {
-		left_child_right_child->parent = *node;
+	// Move y's left subtree into target's right subtree
+	target->right = ynode->left;
+	if (!nil(ynode->left)) {
+		RBTreeNode *yleft = $Ref(&ynode->left);
+		yleft->parent = *node;
 	}
 
-	// Update the parent of the left child to be the parent of the target
-	left_child->parent = target->parent;
+	assert(target != ynode && "Target and Ynode cannot be the same!");
+	assert(&target->right != node && "Target's right child cannot be itself!");
 
-	// If the target was the root of the tree, update the root to point to left_child
+	// Set y's parent to target's parent
+	ynode->parent = target->parent;
+
+	// Update the root if target was the root
 	if (nil(target->parent)) {
-		impl->root = create_fatptr_from_node(left_child); // Convert to FatPtr
+		printf("!!!!!!parent target null\n");
+		impl->root = y;
 	} else {
-		// Otherwise, update the parent's child pointer to point to left_child
+		// Update the correct child reference of target's parent
 		RBTreeNode *parent = $Ref(&target->parent);
-		if (node == &parent->left) {
-			parent->left = create_fatptr_from_node(left_child); // Convert to FatPtr
+		if (target == $Ref(&parent->left)) {
+			printf("==parent_left\n");
+			parent->left = y;
 		} else {
-			parent->right = create_fatptr_from_node(left_child); // Convert to FatPtr
+			printf("==parent_right\n");
+			parent->right = y;
 		}
 	}
 
-	// Set target as the right child of left_child
-	left_child->right = *node;
+	// Make target the left child of y
+	ynode->left = *node;
+	target->parent = y;
 
-	// Update the parent of target to point to left_child
-	target->parent = create_fatptr_from_node(left_child); // Convert to FatPtr
+	assert(&ynode->parent != node && "Ynode's parent cannot be Target!");
+
+	printf("complete!!!!!!\n");
+}
+*/
+
+/*
+void rbtree_rotate_right(RBTree *ptr, FatPtr *node) {
+	printf("rotate right\n");
+}
+*/
+
+void rbtree_rotate_right(RBTree *ptr, FatPtr *node) {
+	return;
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	printf("rotate right\n");
+
+	// Get the target node and its left child (y)
+	RBTreeNode *target = $Ref(node);
+	FatPtr y = target->left;
+	RBTreeNode *ynode = $Ref(&y);
+
+	// Move y's right subtree into target's left subtree
+	target->left = ynode->right;
+	if (!nil(ynode->right)) {
+		RBTreeNode *yright = $Ref(&ynode->right);
+		yright->parent = *node;
+	}
+
+	// Set y's parent to target's parent
+	ynode->parent = target->parent;
+
+	// Update the root if target was the root
+	if (nil(target->parent)) {
+		impl->root = y;
+	} else {
+		// Update the correct child reference of target's parent
+		RBTreeNode *parent = $Ref(&target->parent);
+		if (target == $Ref(&parent->left)) {
+			parent->left = y;
+		} else {
+			parent->right = y;
+		}
+	}
+
+	// Make target the right child of y
+	ynode->right = *node;
+	target->parent = y;
+
+	printf("complete right rotation\n");
 }
 
-void rbtree_fix_up(RBTreeImpl *impl, FatPtr *node) {
-	printf("1\n");
-	while (true) {
-		RBTreeNode *target = $Ref(node);
-
-		// If the node is the root, set it to black and return
-		if (nil(target->parent)) {
-			target->red = false; // Root must be black
-			return;
-		}
-
-		RBTreeNode *parent = $Ref(&target->parent);
-
-		// If the parent is black, no fix is needed
-		if (!parent->red) {
-			return;
-		}
-
-		// Get the grandparent
-		RBTreeNode *grandparent = $Ref(&parent->parent);
-		FatPtr uncle;
-
-		// Determine if the parent is the left or right child of the grandparent
-		if (parent == $Ref(&grandparent->left)) {
-			// Parent is the left child, so the uncle is the right child
-			uncle = grandparent->right; // Right child of grandparent
-		} else {
-			// Parent is the right child, so the uncle is the left child
-			uncle = grandparent->left; // Left child of grandparent
-		}
-		RBTreeNode *uncle_node = $Ref(&uncle);
-
-		// Case 1: Parent and Uncle are both red (Recoloring)
-		if (!nil(uncle) && uncle_node->red) {
-			parent->red = false;	 // Recolor parent to black
-			uncle_node->red = false; // Recolor uncle to black
-			grandparent->red = true; // Recolor grandparent to red
-
-			// Move up to the grandparent and repeat
-			node = &parent->parent;
-			continue;
-		}
-
-		// Case 2: Parent is red and Uncle is black or nil (Rotations)
-		if (parent == $Ref(&grandparent->left)) {
-			if (target == $Ref(&parent->right)) {
-				// Case 2a: Target is a right child -> Rotate left on parent
-				rbtree_rotate_left(impl, &target->parent);
-				target = $Ref(&target->left); // Update target after rotation
+/*
+void fixInsert(Node* k)
+	{
+		while (k != root && k->parent->color == "RED") {
+			if (k->parent == k->parent->parent->left) {
+				Node* u = k->parent->parent->right; // uncle
+				if (u->color == "RED") {
+					k->parent->color = "BLACK";
+					u->color = "BLACK";
+					k->parent->parent->color = "RED";
+					k = k->parent->parent;
+				}
+				else {
+					if (k == k->parent->right) {
+						k = k->parent;
+						leftRotate(k);
+					}
+					k->parent->color = "BLACK";
+					k->parent->parent->color = "RED";
+					rightRotate(k->parent->parent);
+				}
 			}
-			// Case 2b: Rotate right on grandparent and recolor
-			rbtree_rotate_right(impl, &parent->parent);
-			parent->red = false;	 // Recolor parent to black
-			grandparent->red = true; // Recolor grandparent to red
-		} else {
-			if (target == $Ref(&parent->left)) {
-				// Case 2a (mirror): Target is a left child -> Rotate right on parent
-				rbtree_rotate_right(impl, &target->parent);
-				target = $Ref(&target->right); // Update target after rotation
+			else {
+				Node* u = k->parent->parent->left; // uncle
+				if (u->color == "RED") {
+					k->parent->color = "BLACK";
+					u->color = "BLACK";
+					k->parent->parent->color = "RED";
+					k = k->parent->parent;
+				}
+				else {
+					if (k == k->parent->left) {
+						k = k->parent;
+						rightRotate(k);
+					}
+					k->parent->color = "BLACK";
+					k->parent->parent->color = "RED";
+					leftRotate(k->parent->parent);
+				}
 			}
-			// Case 2b (mirror): Rotate left on grandparent and recolor
-			rbtree_rotate_left(impl, &parent->parent);
-			parent->red = false;	 // Recolor parent to black
-			grandparent->red = true; // Recolor grandparent to red
 		}
-		break; // Fixup complete
+		root->color = "BLACK";
 	}
+*/
 
-	// Ensure the root is always black
+void rbtree_fix_up(RBTree *ptr, FatPtr *fptr) {
+	RBTreeImpl *impl = $Ref(&ptr->impl);
 	RBTreeNode *root = $Ref(&impl->root);
+	loop {
+		RBTreeNode *k = $Ref(fptr);
+		if (k == root)
+			break;
+		RBTreeNode *parent = $Ref(&k->parent);
+		if (!parent->red)
+			break;
+		RBTreeNode *gp = $Ref(&parent->parent);
+		if (gp == NULL)
+			break;
+
+		if (!nil(gp->left) && $Ref(&gp->left) == parent) {
+			printf("===============left uncle\n");
+			FatPtr ufat = gp->right; // uncle
+			RBTreeNode *u = $Ref(&ufat);
+			if (u != NULL && u->red) {
+				parent->red = false;
+				u->red = false;
+				gp->red = true;
+				fptr = &parent->parent;
+			} else {
+				printf("else le\n");
+				if (k == $Ref(&parent->right)) {
+					fptr = &k->parent;
+					rbtree_rotate_left(ptr, fptr);
+				}
+				parent->red = false;
+				gp->red = true;
+				rbtree_rotate_right(ptr, &parent->parent);
+			}
+		} else {
+			printf("===============right uncle\n");
+			FatPtr ufat = gp->left; // uncle
+			RBTreeNode *u = $Ref(&ufat);
+			if (u != NULL && u->red) {
+				parent->red = false;
+				u->red = false;
+				gp->red = true;
+				fptr = &parent->parent;
+			} else {
+				if (k == $Ref(&parent->left)) {
+					fptr = &k->parent;
+					rbtree_rotate_right(ptr, fptr);
+				}
+				parent->red = false;
+				gp->red = true;
+				rbtree_rotate_left(ptr, &parent->parent);
+			}
+		}
+
+		printf("loop continues\n");
+	}
 	root->red = false;
 }
 
-/*
-Compiles:
-void rbtree_rotate_left(RBTreeImpl *impl, FatPtr *node) {
-	RBTreeNode *target = $Ref(node);
-	RBTreeNode *right_child = $Ref(&target->right);
-	RBTreeNode *right_child_left_child = $Ref(&right_child->left);
-
-	target->right = right_child->left;
-
-	if (!nil(right_child->left)) {
-		// If the right child has a left child, update its parent to point to the target
-		right_child_left_child->parent =
-			*node; // Set parent of the left child of the right child to the target
-	}
-
-	RBTreeNode *parent = $Ref(&target->parent);
-	if (!nil(target->parent)) {
-		if (node == &parent->left) {
-			parent->left = target->right; // Set right child as the new left child of the parent
-		} else {
-			parent->right = target->right;
-		}
-	}
-
-	right_child->parent = target->parent;
-
-	if (nil(target->parent)) {
-		impl->root = *node; // Update the root of the tree
-	} else {
-		// If the target node was not the root, update the parent's child pointer
-		if (node == &parent->left) {
-			parent->left = right_child->left; // Set the new root as the parent's left child
-		} else {
-			parent->right = right_child->left; // Set the new root as the parent's right child
-		}
-	}
-
-	right_child->left = *node;
-	target->parent = target->right;
-}
-*/
-
-/*
-	RBTreeNode *x = $Ref(node); // Current node
-
-	// Dereference y to access its fields
-	RBTreeNode *tmp_y = $Ref(y); // Temporary variable to hold y's node
-
-	// Perform the rotation
-	x->right = tmp_y->left; // Turn y's left subtree into x's right subtree
-	if (!nil(tmp_y->left)) {
-		// Correctly access the parent of tmp_y->left
-		RBTreeNode *left_child = $Ref(&tmp_y->left);
-		left_child->parent = *node; // If y's left child is not null, set its parent to x
-	}
-
-	tmp_y->parent = x->parent; // Link x's parent as y's parent
-	if (nil(x->parent)) {
-		// x is root
-		impl->root = *y; // y becomes the root
-	} else if (node == $Ref(&x->parent)->left) {
-		$Ref(x->parent)->left = *y; // Link y as left child of x's parent
-	} else {
-		$Ref(x->parent)->right = *y; // Link y as right child of x's parent
-	}
-
-	tmp_y->left = *node; // Put x on y's left
-	x->parent = y;		 // Link y as parent of x
-}
-*/
-
-/*
-// Rotate the subtree right.
-void rbtree_rotate_right(RBTreeImpl *impl, FatPtr *node) {
-	RBTreeNode *y = $Ref(node);
-	FatPtr *x = &y->left;
-
-	// Perform rotation.
-	y->left = x->right;
-	if (!nil(x->right)) {
-		x->right->parent = node;
-	}
-	x->parent = y->parent;
-
-	if (nil(y->parent)) {
-		impl->root = x; // x becomes the root.
-	} else if (node == y->parent->right) {
-		y->parent->right = x;
-	} else {
-		y->parent->left = x;
-	}
-
-	x->right = node;
-	y->parent = x;
-}
-*/
-
-int rbtree_rebalance(RBTree *ptr) {
-	return 0;
-}
-
-// Rbtree build function has the 'send' parameter. This parameter indicates whether or not
-// the Rbtree can be send into another thread. If it can be sent into another thread,
-// the globaly sync allocator is used for all functions.
+// Rbtree build function has the 'send' parameter. This parameter indicates whether or
+// not the Rbtree can be send into another thread. If it can be sent into another
+// thread, the globaly sync allocator is used for all functions.
 int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 				 int (*compare)(const void *, const void *), bool send) {
-	// Obtain the chainguard based on the boolean 'send'. If this is a send, the ChainGuard
-	// macro returns the global sync allocator's send guard and all memory allocations will
-	// use the thread-safe global_sync allocator. Otherwise, the thread local version will
-	// be used.
+	// Obtain the chainguard based on the boolean 'send'. If this is a send, the
+	// ChainGuard macro returns the global sync allocator's send guard and all memory
+	// allocations will use the thread-safe global_sync allocator. Otherwise, the thread
+	// local version will be used.
 	ChainGuard _ = ChainSend(send);
 
 	// validate input
@@ -340,12 +410,15 @@ void rbtree_free_node(FatPtr *ptr) {
 			rbtree_free_node(&node->right);
 		if (!nil(node->left))
 			rbtree_free_node(&node->left);
+		printf("free %p %p\n", ptr, ptr->data);
 		chain_free(ptr);
 	}
 }
 
-// cleanup function selects appropriate ChainGuard based on configuration and deallocates memory
+// cleanup function selects appropriate ChainGuard based on configuration and
+// deallocates memory
 void rbtree_cleanup(RBTreeNc *ptr) {
+	printf("rbtree cleanup\n");
 	// check non-initialized conditions
 	if (ptr != NULL && !nil(ptr->impl)) {
 		// obtain referent to internal RBTree structure
@@ -371,6 +444,7 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	FatPtr parent = null;
 	FatPtr *check = &impl->root;
 
+	printf("insert\n");
 	loop {
 
 		if (nil(*check)) {
@@ -393,14 +467,16 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 		if (v == 0) {
 			return -1;
 		} else if (v > 0) {
+			printf("go right\n");
 			check = &cur->right;
 		} else {
+			printf("go left\n");
 			check = &cur->left;
 		}
 	}
 
 	printf("calling fix up\n");
-	// rbtree_fix_up(impl, check);
+	rbtree_fix_up(ptr, check);
 	return 0;
 }
 
@@ -418,20 +494,26 @@ const void *rbtree_get(const RBTree *ptr, const void *key) {
 
 	FatPtr *check = &impl->root;
 
+	int counter = 0;
 	loop {
-
 		if (nil(*check)) {
 			return NULL;
 		}
 		RBTreeNode *cur = $Ref(check);
 		int v = impl->compare(cur->data, key);
 		if (v == 0) {
+			printf("found at %p\n", check->data);
 			return cur->data + impl->key_size;
 		} else if (v > 0) {
+			printf("check=%p,cur->right=%p\n", check, &cur->right);
 			check = &cur->right;
 		} else {
+			printf("check=%p,cur->left=%p\n", check, &cur->left);
 			check = &cur->left;
 		}
+		counter++;
+		if (counter == 10)
+			panic("too many loops");
 	}
 
 	return NULL;

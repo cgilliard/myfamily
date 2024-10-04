@@ -38,20 +38,20 @@
 		u64 slabs = alloc_count_default_slab_allocator();                                          \
 		if (slabs != 0) {                                                                          \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
-				   "'%s%s%s'.\n[%s====%s] Number of slab allocations not "                         \
+				   "'%s%s%s'.\n[%s====%s] Number of slab allocations [%lli] not "                  \
 				   "equal to number "                                                              \
 				   "of frees. Memory leak?\n",                                                     \
-				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
+				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET, slabs);           \
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
 		}                                                                                          \
 		slabs = alloc_count_global_sync_allocator();                                               \
 		if (slabs != 0) {                                                                          \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
-				   "'%s%s%s'.\n[%s====%s] Number of slab global allocations not "                  \
+				   "'%s%s%s'.\n[%s====%s] Number of slab global allocations [%lli] not "           \
 				   "equal to number "                                                              \
 				   "of frees. Memory leak?\n",                                                     \
-				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
+				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET, slabs);           \
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
 		}                                                                                          \
