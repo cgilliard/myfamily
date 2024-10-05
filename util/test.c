@@ -164,7 +164,6 @@ MyTest(util, test_random_rbtree) {
 	u64 size = 1000;
 	u64 arr[size];
 	for (u64 i = 0; i < size; i++) {
-		// printf("i=%llu\n", i);
 		cr_assert(!rand_u64(&arr[i]));
 		arr[i] %= INT64_MAX;
 		u64 k = arr[i];
@@ -200,15 +199,14 @@ MyTest(util, test_random_rbtree) {
 
 	cr_assert_eq(rbtree_size(&rand1), size);
 
-	i = size;
+	i = 0;
 	loop {
-		i--;
-		if (i == UINT64_MAX)
+		if (i == size)
 			break;
 		cr_assert(!rbtree_delete(&rand1, &arr[i]));
-		cr_assert_eq(rbtree_size(&rand1), i);
-		// printf("validate delete height = %llu\n", i);
-		//		cr_assert(rbtree_validate(&rand1));
+		cr_assert_eq(rbtree_size(&rand1), (size - 1) - i);
+		// printf("validate tree i = %llu\n", i);
+		i++;
 	}
 
 	cr_assert_eq(rbtree_size(&rand1), 0);
@@ -226,19 +224,20 @@ MyTest(util, validate_tree) {
 	RBTree valid1;
 	u64 k, v;
 	cr_assert(!rbtree_build(&valid1, sizeof(u64), sizeof(u64), u64_compare, false));
-	k = 1;
-	v = 1;
-	printf("insert1\n");
-	cr_assert(!rbtree_insert(&valid1, &k, &v));
-	cr_assert(rbtree_validate(&valid1));
-	k = 2;
-	v = 2;
-	printf("insert2\n");
-	cr_assert(!rbtree_insert(&valid1, &k, &v));
-	cr_assert(rbtree_validate(&valid1));
-	k = 3;
-	v = 3;
-	printf("isnert3\n");
-	cr_assert(!rbtree_insert(&valid1, &k, &v));
-	cr_assert(rbtree_validate(&valid1));
+
+	u64 max = 1;
+	for (u64 i = 0; i < max; i++) {
+		printf("insert i = %llu\n", i);
+		k = i;
+		v = i + 10;
+		cr_assert(!rbtree_insert(&valid1, &k, &v));
+		cr_assert(rbtree_validate(&valid1));
+	}
+	for (u64 i = 0; i < max; i++) {
+		printf("delete i = %llu\n", i);
+		k = i;
+		v = i + 10;
+		cr_assert(!rbtree_delete(&valid1, &k));
+		cr_assert(rbtree_validate(&valid1));
+	}
 }
