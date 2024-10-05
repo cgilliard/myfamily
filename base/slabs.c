@@ -480,6 +480,10 @@ int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) 
 void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit, bool zeroed) {
 	u64 data_len;
 	u8 *data_ptr;
+	if (sd->free_list == NULL) {
+		panic("free list not initialized (wrong slab allocator?)");
+	}
+
 	if (is_64_bit) {
 		FatPtr64Impl *fptr64 = fptr->data;
 		data_len = fptr64->len;
