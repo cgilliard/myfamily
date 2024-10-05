@@ -152,9 +152,6 @@ void rbtree_fix_up(RBTree *ptr, RBTreeNode *k) {
 	u64 value_size = impl->value_size;
 	RBTreeNode *root = impl->root;
 
-	// Using the RED macro to access the color of the root
-	printf("root->red=%i\n", RED(root, key_size, value_size));
-
 	while (k && k != root && k->parent && RED(k->parent, key_size, value_size)) {
 		if (k->parent == k->parent->parent->left) {
 			RBTreeNode *u = k->parent->parent->right; // uncle
@@ -204,76 +201,96 @@ void rbtree_delete_fixup(RBTree *ptr, RBTreeNode *x) {
 	u64 value_size = impl->value_size;
 	RBTreeNode *root = impl->root;
 
-	while (x != root && !RED(x, key_size, value_size)) {
+	int counter = 0;
+
+	while (x != impl->root && (!x || !RED(x, key_size, value_size))) {
+		if (++counter > 1000) {
+			panic("looped 1000");
+		}
+
+		if (x == NULL || x->parent == NULL) {
+			break; // No more fixup needed, exit the loop
+		}
+
 		if (x == x->parent->left) {
 			RBTreeNode *w = x->parent->right; // sibling
 
-			if (RED(w, key_size, value_size)) {
+			if (w != NULL && RED(w, key_size, value_size)) {
 				RED(w, key_size, value_size) = false;		 // Case 1: Sibling is red
 				RED(x->parent, key_size, value_size) = true; // Parent becomes red
 				leftRotate(ptr, x->parent);					 // Rotate around parent
 				w = x->parent->right;						 // Update w to the new sibling
 			}
 
-			if ((!w->left || !RED(w->left, key_size, value_size)) &&
-				(!w->right || !RED(w->right, key_size, value_size))) {
+			if (w == NULL) {
+				x = x->parent; // Move up the tree if the sibling is NULL
+			} else if ((!w->left || !RED(w->left, key_size, value_size)) &&
+					   (!w->right || !RED(w->right, key_size, value_size))) {
 				RED(w, key_size, value_size) = true; // Case 2: Both children are black
 				x = x->parent;						 // Move up the tree
 			} else {
 				if (!w->right || !RED(w->right, key_size, value_size)) {
 					// Case 3: Left child is red, right child is black
-					if (w->left)
+					if (w->left) {
 						RED(w->left, key_size, value_size) = false; // Set left child to black
-					RED(w, key_size, value_size) = true;			// Set sibling to red
-					rightRotate(ptr, w);							// Rotate around w
-					w = x->parent->right;							// Update w
+					}
+					RED(w, key_size, value_size) = true; // Set sibling to red
+					rightRotate(ptr, w);				 // Rotate around w
+					w = x->parent->right;				 // Update w
 				}
 
 				// Case 4: Right child is red
 				RED(w, key_size, value_size) =
 					RED(x->parent, key_size, value_size);	  // Copy parent's color
 				RED(x->parent, key_size, value_size) = false; // Parent becomes black
-				if (w->right)
+				if (w->right) {
 					RED(w->right, key_size, value_size) = false; // Make the right child black
-				leftRotate(ptr, x->parent);						 // Rotate around parent
-				x = root;										 // Break out of the loop
+				}
+				leftRotate(ptr, x->parent); // Rotate around parent
+				x = root;					// Break out of the loop
 			}
 		} else {
 			RBTreeNode *w = x->parent->left; // sibling
 
-			if (RED(w, key_size, value_size)) {
+			if (w != NULL && RED(w, key_size, value_size)) {
 				RED(w, key_size, value_size) = false;		 // Case 1: Sibling is red
 				RED(x->parent, key_size, value_size) = true; // Parent becomes red
 				rightRotate(ptr, x->parent);				 // Rotate around parent
 				w = x->parent->left;						 // Update w to the new sibling
 			}
 
-			if ((!w->right || !RED(w->right, key_size, value_size)) &&
-				(!w->left || !RED(w->left, key_size, value_size))) {
+			if (w == NULL) {
+				x = x->parent; // Move up the tree if the sibling is NULL
+			} else if ((!w->right || !RED(w->right, key_size, value_size)) &&
+					   (!w->left || !RED(w->left, key_size, value_size))) {
 				RED(w, key_size, value_size) = true; // Case 2: Both children are black
 				x = x->parent;						 // Move up the tree
 			} else {
 				if (!w->left || !RED(w->left, key_size, value_size)) {
 					// Case 3: Right child is red, left child is black
-					if (w->right)
+					if (w->right) {
 						RED(w->right, key_size, value_size) = false; // Set right child to black
-					RED(w, key_size, value_size) = true;			 // Set sibling to red
-					leftRotate(ptr, w);								 // Rotate around w
-					w = x->parent->left;							 // Update w
+					}
+					RED(w, key_size, value_size) = true; // Set sibling to red
+					leftRotate(ptr, w);					 // Rotate around w
+					w = x->parent->left;				 // Update w
 				}
 
 				// Case 4: Left child is red
 				RED(w, key_size, value_size) =
 					RED(x->parent, key_size, value_size);	  // Copy parent's color
 				RED(x->parent, key_size, value_size) = false; // Parent becomes black
-				if (w->left)
+				if (w->left) {
 					RED(w->left, key_size, value_size) = false; // Make the left child black
-				rightRotate(ptr, x->parent);					// Rotate around parent
-				x = root;										// Break out of the loop
+				}
+				rightRotate(ptr, x->parent); // Rotate around parent
+				x = root;					 // Break out of the loop
 			}
 		}
 	}
-	RED(x, key_size, value_size) = false; // Ensure the root is black
+	if (impl->size != 0 && x) {
+		RED(x, key_size, value_size) = false; // Ensure the root is black
+	}
 }
 
 // Rbtree build function has the 'send' parameter. This parameter indicates whether or
@@ -432,7 +449,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 
 	// Store the color of the node to delete
 	wasBlack = !RED(nodeToDelete, key_size, value_size);
-
+	FatPtr fptr_to_delete = nodeToDelete->self;
 	// Case 1: Node has two children
 	if (nodeToDelete->left != NULL && nodeToDelete->right != NULL) {
 		// Find the in-order successor (smallest node in the right subtree)
@@ -444,6 +461,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		// Copy the successor's data to the node to delete
 		memcpy(nodeToDelete->data + KEY_PAD, successor->data + KEY_PAD,
 			   (impl->key_size + impl->value_size + VALUE_PAD(impl->key_size)) + BOOLEAN_SIZE);
+
 		nodeToDelete->self = successor->self;
 
 		// Now we need to delete the successor
@@ -471,13 +489,13 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	}
 
 	// Free the node
-	chain_free(&nodeToDelete->self);
+	chain_free(&fptr_to_delete);
 
+	impl->size--;
 	// If the deleted node was black, we need to fix up the tree
 	if (wasBlack) {
 		rbtree_delete_fixup(ptr, child); // Call fix-up function
 	}
-	impl->size--;
 	return 0; // Successful deletion
 }
 
@@ -530,4 +548,65 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
 	rbimpl->send = impl->send;
 	rbimpl->key_size = impl->key_size;
 	return 0;
+}
+
+bool validate_rbtree(const RBTree *ptr, const RBTreeNode *node, int *black_count,
+					 int current_black_count) {
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	u64 key_size = impl->key_size;
+	u64 value_size = impl->value_size;
+
+	// Base case: when we reach a NIL node
+	if (node == NULL) {
+		// If this is the first NIL node reached, set the black count
+		if (*black_count == 0) {
+			*black_count = current_black_count; // Set the black count for the first path
+		} else {
+			// Check for black count consistency
+			if (current_black_count != *black_count) {
+				printf("NIL node reached: current_black_count = %d, expected_black_count = %d\n",
+					   current_black_count, *black_count);
+				return false; // If counts do not match, return false
+			}
+		}
+		return true; // Return true for NIL nodes
+	}
+
+	// Increment black count if the current node is black
+	if (!RED(node, key_size, value_size)) {
+		printf("------------------------------------found a black node\n");
+		current_black_count++;
+	} else {
+		printf("------------------------------------found a red node\n");
+		// Check if the node is red
+		// If the parent is red, return false (Red property violation)
+		if (node->parent != NULL && RED(node->parent, key_size, value_size)) {
+			printf("Red property violation at node with key\n");
+			return false;
+		}
+	}
+
+	// Recursive calls for left and right children
+	printf("validate left side\n");
+	bool left_valid = validate_rbtree(ptr, node->left, black_count, current_black_count);
+
+	printf("validate right side\n");
+	bool right_valid = validate_rbtree(ptr, node->right, black_count, current_black_count);
+
+	return left_valid && right_valid;
+}
+
+bool rbtree_validate(const RBTree *ptr) {
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	int black_count = 0;
+	// Validate from the root and check if the root is black
+	if (impl->root != NULL) {
+		if (!RED(impl->root, impl->key_size, impl->value_size)) {
+			bool ret = validate_rbtree(ptr, impl->root, &black_count, 0);
+			return ret;
+		}
+		printf("root is not black\n");
+		return false; // Root should be black
+	}
+	return true;
 }

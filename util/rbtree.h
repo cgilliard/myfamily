@@ -50,4 +50,8 @@ const void *rbtree_get(const RBTree *ptr, const void *key);
 i64 rbtree_size(const RBTree *ptr);
 int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter);
 
+#ifdef TEST
+bool rbtree_validate(const RBTree *ptr);
+#endif // TEST
+
 #endif // _UTIL_RBTREE__
