@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['date_5ftime_1232',['DATE_TIME',['../main_8h.html#a3407660c70340dd2cdbe27260c5ccc59',1,'main.h']]],
-  ['default_5fconfig_5fdir_1233',['DEFAULT_CONFIG_DIR',['../main_8h.html#a3e535652a6a9608e8bda98044454fa89',1,'main.h']]],
-  ['defer1_1234',['DEFER1',['../macro__utils_8h.html#ab076327c62d116fed42cc989fffc1171',1,'macro_utils.h']]],
-  ['dimmed_1235',['DIMMED',['../colors_8h.html#a3e288bbc66ee9a6658a68db03109e644',1,'colors.h']]]
+  ['date_5ftime_1291',['DATE_TIME',['../main_8h.html#a3407660c70340dd2cdbe27260c5ccc59',1,'main.h']]],
+  ['default_5fconfig_5fdir_1292',['DEFAULT_CONFIG_DIR',['../main_8h.html#a3e535652a6a9608e8bda98044454fa89',1,'main.h']]],
+  ['defer1_1293',['DEFER1',['../macro__utils_8h.html#ab076327c62d116fed42cc989fffc1171',1,'macro_utils.h']]],
+  ['dimmed_1294',['DIMMED',['../colors_8h.html#a3e288bbc66ee9a6658a68db03109e644',1,'colors.h']]]
 ];

@@ -74,7 +74,9 @@ $(function() {
 <div class="title">test.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="test_8h_source.html">base/test.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="macro__utils_8h_source.html">base/macro_utils.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="rand_8h_source.html">base/rand.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="test_8h_source.html">base/test.h</a>&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="rbtree_8h_source.html">util/rbtree.h</a>&gt;</code><br />
 </div><table class="memberdecls">
@@ -100,8 +102,14 @@ Functions</h2></td></tr>
 <tr class="separator:a822fbeafd5da2da582763f5159039336"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf8a1f5851e22a18b37990ed22d6b850"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#abf8a1f5851e22a18b37990ed22d6b850">MyTest</a> (util, test_rbtree)</td></tr>
 <tr class="separator:abf8a1f5851e22a18b37990ed22d6b850"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a146d06dae3702da4363a1626e2e4d003"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#a146d06dae3702da4363a1626e2e4d003">u64_compare</a> (const void *v1, const void *v2)</td></tr>
+<tr class="separator:a146d06dae3702da4363a1626e2e4d003"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af098b914ac674665a3d48197955579f7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#af098b914ac674665a3d48197955579f7">MyTest</a> (util, test_random_rbtree)</td></tr>
+<tr class="separator:af098b914ac674665a3d48197955579f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afdb13cd7b82816bf69e72b06567c909a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#afdb13cd7b82816bf69e72b06567c909a">MyTest</a> (util, test_move_fatptr)</td></tr>
 <tr class="separator:afdb13cd7b82816bf69e72b06567c909a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8d4608ab5d4453305f7d24a8f2f6b80"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#ae8d4608ab5d4453305f7d24a8f2f6b80">MyTest</a> (util, validate_tree)</td></tr>
+<tr class="separator:ae8d4608ab5d4453305f7d24a8f2f6b80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="af768133b508a1c6e49ef9aa7d3939ea6"></a>
@@ -180,7 +188,7 @@ Functions</h2></td></tr>
 </div>
 </div>
 <a id="afdb13cd7b82816bf69e72b06567c909a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdb13cd7b82816bf69e72b06567c909a">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#afdb13cd7b82816bf69e72b06567c909a">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -207,8 +215,36 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="af098b914ac674665a3d48197955579f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af098b914ac674665a3d48197955579f7">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[2/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MyTest </td>
+          <td>(</td>
+          <td class="paramtype">util&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_random_rbtree&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="abf8a1f5851e22a18b37990ed22d6b850"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf8a1f5851e22a18b37990ed22d6b850">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abf8a1f5851e22a18b37990ed22d6b850">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -224,6 +260,62 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">test_rbtree&#160;</td>
           <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae8d4608ab5d4453305f7d24a8f2f6b80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8d4608ab5d4453305f7d24a8f2f6b80">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[4/4]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MyTest </td>
+          <td>(</td>
+          <td class="paramtype">util&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">validate_tree&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a146d06dae3702da4363a1626e2e4d003"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a146d06dae3702da4363a1626e2e4d003">&#9670;&nbsp;</a></span>u64_compare()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int u64_compare </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>v1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>v2</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
