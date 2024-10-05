@@ -584,12 +584,8 @@ bool validate_rbtree(const RBTree *ptr, const RBTreeNode *node, int *black_count
 
 	// Increment black count if the current node is black
 	if (!RED(node, key_size, value_size)) {
-		u64 id = fat_ptr_id(&node->self);
-		// printf("------------------------------------found a black node %llu\n", id);
 		current_black_count++;
 	} else {
-		u64 id = fat_ptr_id(&node->self);
-		// printf("------------------------------------found a red node %llu\n", id);
 		//  Check if the node is red
 		//  If the parent is red, return false (Red property violation)
 		if (node->parent != NULL && RED(node->parent, key_size, value_size)) {
@@ -599,10 +595,8 @@ bool validate_rbtree(const RBTree *ptr, const RBTreeNode *node, int *black_count
 	}
 
 	// Recursive calls for left and right children
-	// printf("validate left side\n");
 	bool left_valid = validate_rbtree(ptr, node->left, black_count, current_black_count);
 
-	// printf("validate right side\n");
 	bool right_valid = validate_rbtree(ptr, node->right, black_count, current_black_count);
 
 	return left_valid && right_valid;
