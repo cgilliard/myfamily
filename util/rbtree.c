@@ -29,29 +29,32 @@
 #define RED_OFFSET(key_size, value_size) (KEY_PAD + key_size + value_size + VALUE_PAD(key_size))
 #define SET_RED(impl, node)                                                                        \
 	({                                                                                             \
-		if (node && node != NIL)                                                                   \
-			*(bool *)(node->data + RED_OFFSET(impl->key_size, impl->value_size)) = true;           \
+		if (node && node != NIL) {                                                                 \
+			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
+			*(bool *)(node->data + offset) = true;                                                 \
+		}                                                                                          \
 	})
 #define SET_BLACK(impl, node)                                                                      \
 	({                                                                                             \
 		if (node && node != NIL) {                                                                 \
-			*(bool *)(node->data + RED_OFFSET(impl->key_size, impl->value_size)) = false;          \
+			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
+			*(bool *)(node->data + offset) = false;                                                \
 		}                                                                                          \
 	})
 
 #define IS_RED(impl, node)                                                                         \
 	({                                                                                             \
 		bool ret = false;                                                                          \
-		if (node && node != NIL && node->data &&                                                   \
-			*(bool *)(node->data + RED_OFFSET(impl->key_size, impl->value_size)))                  \
+		u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                                 \
+		if (node && node != NIL && node->data && *(bool *)(node->data + offset))                   \
 			ret = true;                                                                            \
 		ret;                                                                                       \
 	})
 #define IS_BLACK(impl, node)                                                                       \
 	({                                                                                             \
 		bool ret = true;                                                                           \
-		if (node && node != NIL && node->data &&                                                   \
-			*(bool *)(node->data + RED_OFFSET(impl->key_size, impl->value_size)))                  \
+		u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                                 \
+		if (node && node != NIL && node->data && *(bool *)(node->data + offset))                   \
 			ret = false;                                                                           \
 		ret;                                                                                       \
 	})
@@ -63,8 +66,10 @@ typedef struct RBTreeNode {
 	struct RBTreeNode *right;
 	struct RBTreeNode *left;
 	struct RBTreeNode *parent;
+#ifdef TEST
 	u64 node_id;
 	u64 pad;
+#endif // TEST
 	char data[];
 } RBTreeNode;
 
@@ -364,7 +369,6 @@ void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
 }
 
 void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
-	// printf("delete fixup with node id = %llu\n", x->node_id);
 	int i = 0;
 	while (x != impl->root && IS_BLACK(impl, x)) {
 		if (x == x->parent->left) {
@@ -565,7 +569,9 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
 }
 
 bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_count,
-						  int current_black_count) {
+						  int current_black_count, int *max_depth, int cur_depth) {
+	if (cur_depth > *max_depth)
+		*max_depth = cur_depth;
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	u64 key_size = impl->key_size;
 	u64 value_size = impl->value_size;
@@ -583,34 +589,23 @@ bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 			else
 				diff = *black_count - current_black_count;
 			if (diff > 1) {
-				printf("NIL node reached: current_black_count = %d, expected_black_count = %d\n",
+				printf("NIL node reached: current_black_count = %d, "
+					   "expected_black_count = %d\n",
 					   current_black_count, *black_count);
 				return false;
 			}
 			if (diff != 0)
-				;
-			// printf("WARN: diff of 1 in heights\n");
+				printf("WARN: diff of 1 in heights\n");
 		}
 		return true; // Return true for NIL nodes
 	}
 
 	// Increment black count if the current node is black
 	if (IS_BLACK(impl, node)) {
-#ifdef TEST
-		if (node == NIL)
-			;
-		// printf("======================NIL\n");
-		else
-			;
-			// printf("======================black node %llu\n", node->node_id);
-#endif // TEST
 		current_black_count++;
 	} else {
-#ifdef TEST
-		// printf("======================red node %llu\n", node->node_id);
-#endif // TEST
-	   //  Check if the node is red
-	   //  If the parent is red, return false (Red property violation)
+		//  Check if the node is red
+		//  If the parent is red, return false (Red property violation)
 		if (node->parent != NONE && IS_RED(impl, node->parent)) {
 			printf("Red property violation at node with key\n");
 			return false;
@@ -618,10 +613,10 @@ bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 	}
 
 	// Recursive calls for left and right children
-	// printf("go left\n");
-	bool left_valid = rbtree_validate_node(ptr, node->left, black_count, current_black_count);
-	// printf("go right\n");
-	bool right_valid = rbtree_validate_node(ptr, node->right, black_count, current_black_count);
+	bool left_valid = rbtree_validate_node(ptr, node->left, black_count, current_black_count,
+										   max_depth, cur_depth + 1);
+	bool right_valid = rbtree_validate_node(ptr, node->right, black_count, current_black_count,
+											max_depth, cur_depth + 1);
 
 	return left_valid && right_valid;
 }
@@ -629,15 +624,13 @@ bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 bool rbtree_validate(const RBTree *ptr) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	int black_count = 0;
+	int max_depth = 0;
 	// Validate from the root and check if the root is black
 	if (impl->root != NULL) {
 		if (IS_BLACK(impl, impl->root)) {
-			bool ret = rbtree_validate_node(ptr, impl->root, &black_count, 0);
+			bool ret = rbtree_validate_node(ptr, impl->root, &black_count, 0, &max_depth, 0);
 			return ret;
 		}
-#ifdef TEST
-//		printf("======================red node %llu\n", fat_ptr_id(&impl->root->self));
-#endif // TEST
 		printf("root is not black\n");
 		return false; // Root should be black
 	}
