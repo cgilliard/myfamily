@@ -27,19 +27,18 @@
 #define KEY_PAD 0
 #define VALUE_PAD(key_size) (16 - (key_size % 16))
 #define RED_OFFSET(key_size, value_size) (KEY_PAD + key_size + value_size + VALUE_PAD(key_size))
-#define RED(node, key_size, value_size) *(bool *)(node->data + RED_OFFSET(key_size, value_size))
-#define SET_RED(node, impl)                                                                        \
+#define SET_RED(impl, node)                                                                        \
 	({                                                                                             \
 		assert(node);                                                                              \
 		*(bool *)(node->data + RED_OFFSET(impl->key_size, impl->value_size)) = true;               \
 	})
-#define SET_BLACK(node, impl)                                                                      \
+#define SET_BLACK(impl, node)                                                                      \
 	({                                                                                             \
 		if (node)                                                                                  \
 			*(bool *)(node->data + RED_OFFSET(impl->key_size, impl->value_size)) = false;          \
 	})
 
-#define IS_RED(node, impl)                                                                         \
+#define IS_RED(impl, node)                                                                         \
 	({                                                                                             \
 		bool ret = false;                                                                          \
 		if (node && node->data &&                                                                  \
@@ -47,7 +46,7 @@
 			ret = true;                                                                            \
 		ret;                                                                                       \
 	})
-#define IS_BLACK(node, impl)                                                                       \
+#define IS_BLACK(impl, node)                                                                       \
 	({                                                                                             \
 		bool ret = true;                                                                           \
 		if (node && node->data &&                                                                  \
@@ -135,8 +134,7 @@ bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 }
 
 // Utility function to perform left rotation
-void leftRotate(RBTree *ptr, RBTreeNode *x) {
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+void leftRotate(RBTreeImpl *impl, RBTreeNode *x) {
 	RBTreeNode *y = x->right;
 	x->right = y->left;
 	if (y->left != NULL) {
@@ -155,8 +153,7 @@ void leftRotate(RBTree *ptr, RBTreeNode *x) {
 }
 
 // Utility function to perform right rotation
-void rightRotate(RBTree *ptr, RBTreeNode *x) {
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+void rightRotate(RBTreeImpl *impl, RBTreeNode *x) {
 	RBTreeNode *y = x->left;
 	x->left = y->right;
 	if (y->right != NULL) {
@@ -179,55 +176,45 @@ void rbtree_fix_up(RBTree *ptr, RBTreeNode *k) {
 	u64 key_size = impl->key_size;
 	u64 value_size = impl->value_size;
 
-	while (k && k != impl->root && IS_RED(k->parent, impl)) {
+	while (k && k != impl->root && IS_RED(impl, k->parent)) {
 
 		if (k->parent == k->parent->parent->left) {
-			RBTreeNode *u = k->parent->parent->right; // Uncle
+			RBTreeNode *u = k->parent->parent->right;
 
-			if (IS_RED(u, impl)) {
-				// Case 1: Uncle is red
-				SET_BLACK(k->parent, impl);
-				SET_BLACK(u, impl);
-				SET_RED(k->parent->parent, impl);
-				k = k->parent->parent; // Move up
+			if (IS_RED(impl, u)) {
+				SET_BLACK(impl, k->parent);
+				SET_BLACK(impl, u);
+				SET_RED(impl, k->parent->parent);
+				k = k->parent->parent;
 			} else {
-				// Case 2: Uncle is black or NULL
 				if (k == k->parent->right) {
 					k = k->parent;
-					leftRotate(ptr, k);
+					leftRotate(impl, k);
 				}
-				SET_BLACK(k->parent, impl);
-				SET_RED(k->parent->parent, impl);
-				rightRotate(ptr, k->parent->parent);
+				SET_BLACK(impl, k->parent);
+				SET_RED(impl, k->parent->parent);
+				rightRotate(impl, k->parent->parent);
 			}
 		} else {
-			RBTreeNode *u = k->parent->parent->left; // Uncle
+			RBTreeNode *u = k->parent->parent->left;
 
-			if (IS_RED(u, impl)) {
-				// Case 1: Uncle is red
-				SET_BLACK(k->parent, impl);
-				SET_BLACK(u, impl);
-				SET_RED(k->parent->parent, impl);
-				k = k->parent->parent; // Move up
+			if (IS_RED(impl, u)) {
+				SET_BLACK(impl, k->parent);
+				SET_BLACK(impl, u);
+				SET_RED(impl, k->parent->parent);
+				k = k->parent->parent;
 			} else {
-				// Case 2: Uncle is black or NULL
 				if (k == k->parent->left) {
 					k = k->parent;
-					rightRotate(ptr, k);
+					rightRotate(impl, k);
 				}
-				SET_BLACK(k->parent, impl);
-				SET_RED(k->parent->parent, impl);
-				leftRotate(ptr, k->parent->parent);
+				SET_BLACK(impl, k->parent);
+				SET_RED(impl, k->parent->parent);
+				leftRotate(impl, k->parent->parent);
 			}
 		}
-
-		// After the adjustments, check the colors again for debugging
 	}
-
-	// Ensure the root is always black
-	if (impl->root) {
-		SET_BLACK(impl->root, impl);
-	}
+	SET_BLACK(impl, impl->root);
 }
 
 void rbtree_delete_fixup(RBTree *ptr, RBTreeNode *x) {
@@ -235,102 +222,95 @@ void rbtree_delete_fixup(RBTree *ptr, RBTreeNode *x) {
 	RBTreeNode *w;
 
 	if (impl->size > 1)
-		SET_BLACK(impl->root, impl);
+		SET_BLACK(impl, impl->root);
 	/*
 
-		while (x != impl->root && IS_BLACK(x, impl)) {
+		while (x != impl->root && IS_BLACK(impl, x )) {
 			if (x->parent == NULL)
 				break;
 			if (x == x->parent->left) {
 				w = x->parent->right;
 				if (w == NULL) {
-					SET_BLACK(x, impl);
+					SET_BLACK(impl, x );
 					break;
 				}
 
 				// type 1
-				if (IS_RED(w, impl)) {
-					SET_BLACK(w, impl);
-					SET_RED(x->parent, impl);
-					leftRotate(ptr, x->parent);
+				if (IS_RED(impl, w )) {
+					SET_BLACK(impl, w );
+					SET_RED(impl, x->parent );
+					leftRotate(impl, x->parent);
 					w = x->parent->right;
 				}
 				// type 2
-				if (w == NULL || (IS_BLACK(w->left, impl) && IS_BLACK(w->right, impl))) {
-					SET_RED(w, impl);
+				if (w == NULL || (IS_BLACK(impl, w->left ) && IS_BLACK(impl, w->right ))) {
+					SET_RED(impl, w );
 					x = x->parent;
 				} else {
 					// type 3
-					if (IS_BLACK(w->right, impl)) {
-						SET_BLACK(w->left, impl);
-						SET_RED(w, impl);
-						rightRotate(ptr, w);
+					if (IS_BLACK(impl, w->right)) {
+						SET_BLACK(impl, w->left );
+						SET_RED(impl, w );
+						rightRotate(impl, w);
 						w = x->parent->right;
 					}
 					// type 4
-					if (IS_BLACK(w, impl))
-						SET_BLACK(x->parent, impl);
+					if (IS_BLACK(impl, w ))
+						SET_BLACK(impl, x->parent );
 					else
-						SET_RED(x->parent, impl);
-					SET_BLACK(x->parent, impl);
-					SET_BLACK(w->right, impl);
-					leftRotate(ptr, x->parent);
+						SET_RED(impl, x->parent );
+					SET_BLACK(impl, x->parent );
+					SET_BLACK(impl, w->right );
+					leftRotate(impl, x->parent);
 					x = impl->root;
 				}
 			} else {
 				w = x->parent->left;
 
 				if (w == NULL) {
-					SET_BLACK(x, impl);
+					SET_BLACK(impl, x );
 					break;
 				}
 
 				// type1
-				if (IS_RED(w, impl)) {
-					SET_BLACK(w, impl);
-					SET_RED(x->parent, impl);
-					rightRotate(ptr, x);
+				if (IS_RED(impl, w )) {
+					SET_BLACK(impl, w );
+					SET_RED(impl, x->parent );
+					rightRotate(impl, x);
 					w = x->parent->left;
 				}
 
 				printf("w=%p\n", w);
 				// type2
-				if (w == NULL || (IS_BLACK(w->right, impl) && IS_BLACK(w->left, impl))) {
-					SET_RED(w, impl);
+				if (w == NULL || (IS_BLACK(impl, w->right ) && IS_BLACK(impl, w->left ))) {
+					SET_RED(impl, w );
 					x = x->parent;
 				} else {
 					// type 3
-					if (IS_BLACK(w->left, impl)) {
-						SET_BLACK(w->right, impl);
-						SET_RED(w, impl);
-						leftRotate(ptr, w);
+					if (IS_BLACK(impl, w->left )) {
+						SET_BLACK(impl, w->right );
+						SET_RED(impl, w );
+						leftRotate(impl, w);
 						w = x->parent->left;
 					}
 					// type 4
-					if (IS_BLACK(w, impl))
-						SET_BLACK(x->parent, impl);
+					if (IS_BLACK(impl, w ))
+						SET_BLACK(impl, x->parent );
 					else
-						SET_RED(x->parent, impl);
-					SET_BLACK(x->parent, impl);
-					SET_BLACK(w->left, impl);
-					rightRotate(ptr, x->parent);
+						SET_RED(impl, x->parent );
+					SET_BLACK(impl, x->parent );
+					SET_BLACK(impl, w->left );
+					rightRotate(impl, x->parent);
 					x = impl->root;
 				}
 			}
 		}
-		SET_BLACK(x, impl);
+		SET_BLACK(impl, x );
 	*/
 }
 
-// Rbtree build function has the 'send' parameter. This parameter indicates whether or
-// not the Rbtree can be send into another thread. If it can be sent into another
-// thread, the globaly sync allocator is used for all functions.
 int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 				 int (*compare)(const void *, const void *), bool send) {
-	// Obtain the chainguard based on the boolean 'send'. If this is a send, the
-	// ChainGuard macro returns the global sync allocator's send guard and all memory
-	// allocations will use the thread-safe global_sync allocator. Otherwise, the thread
-	// local version will be used.
 	ChainGuard _ = ChainSend(send);
 
 	// validate input
@@ -363,8 +343,11 @@ int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 
 void rbtree_free_node(RBTreeNode *ptr) {
 	if (ptr != NULL) {
+		// recursively free right node
 		rbtree_free_node(ptr->right);
+		// recursively free left node
 		rbtree_free_node(ptr->left);
+		// chain free current node
 		chain_free(&ptr->self);
 	}
 }
@@ -386,13 +369,46 @@ void rbtree_cleanup(RBTreeNc *ptr) {
 	}
 }
 
+int rbtree_insert_node(RBTree *ptr, RBTreeNode *parent, bool is_right, const void *key,
+					   const void *value) {
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	ChainGuard _ = ChainSend(impl->send);
+	RBTreeNode *node;
+
+	FatPtr self;
+	u64 size = sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char) + KEY_PAD +
+			   VALUE_PAD(impl->key_size) + BOOLEAN_SIZE;
+	if (chain_malloc(&self, size)) {
+		return -1;
+	}
+	node = $Ref(&self);
+	if (impl->root == NULL)
+		impl->root = node;
+	else if (is_right)
+		parent->right = node;
+	else
+		parent->left = node;
+
+	memcpy((char *)node->data + KEY_PAD, key, impl->key_size);
+	memcpy(node->data + KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size, value,
+		   impl->value_size);
+	node->data[KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size + impl->value_size] = true;
+	node->self = self;
+	node->right = NULL;
+	node->left = NULL;
+	node->parent = parent;
+	impl->size++;
+	rbtree_fix_up(ptr, node);
+
+	return 0;
+}
+
 int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	if (ptr == NULL || nil(ptr->impl)) {
 		errno = EINVAL;
 		return -1;
 	}
 	RBTreeImpl *impl = $Ref(&ptr->impl);
-	ChainGuard _ = ChainSend(impl->send);
 	RBTreeNode *parent = NULL;
 	RBTreeNode *check = impl->root;
 	bool is_right = false;
@@ -400,31 +416,8 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	loop {
 		RBTreeNode *node = NULL;
 		if (check == NULL) {
-			FatPtr self;
-			u64 size = sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char) +
-					   KEY_PAD + VALUE_PAD(impl->key_size) + BOOLEAN_SIZE;
-			if (chain_malloc(&self, size)) {
+			if (rbtree_insert_node(ptr, parent, is_right, key, value))
 				return -1;
-			}
-			node = $Ref(&self);
-			if (impl->root == NULL)
-				impl->root = node;
-			else if (is_right)
-				parent->right = node;
-			else
-				parent->left = node;
-
-			memcpy((char *)node->data + KEY_PAD, key, impl->key_size);
-			memcpy(node->data + KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size, value,
-				   impl->value_size);
-			node->data[KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size + impl->value_size] =
-				true;
-			node->self = self;
-			node->right = NULL;
-			node->left = NULL;
-			node->parent = parent;
-			impl->size++;
-			rbtree_fix_up(ptr, node);
 			break;
 		}
 		parent = check;
@@ -477,7 +470,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	}
 
 	// Store the color of the node to delete
-	wasBlack = !RED(nodeToDelete, key_size, value_size);
+	wasBlack = IS_BLACK(impl, nodeToDelete);
 	FatPtr fptr_to_delete = nodeToDelete->self;
 	// Case 1: Node has two children
 	if (nodeToDelete->left != NULL && nodeToDelete->right != NULL) {
@@ -603,7 +596,7 @@ bool validate_rbtree(const RBTree *ptr, const RBTreeNode *node, int *black_count
 	}
 
 	// Increment black count if the current node is black
-	if (!RED(node, key_size, value_size)) {
+	if (IS_BLACK(impl, node)) {
 #ifdef TEST
 		// printf("======================black node %llu\n", fat_ptr_id(&node->self));
 #endif // TEST
@@ -614,7 +607,7 @@ bool validate_rbtree(const RBTree *ptr, const RBTreeNode *node, int *black_count
 #endif // TEST
 	   //  Check if the node is red
 	   //  If the parent is red, return false (Red property violation)
-		if (node->parent != NULL && RED(node->parent, key_size, value_size)) {
+		if (node->parent != NULL && IS_RED(impl, node->parent)) {
 			printf("Red property violation at node with key\n");
 			return false;
 		}
@@ -634,7 +627,7 @@ bool rbtree_validate(const RBTree *ptr) {
 	int black_count = 0;
 	// Validate from the root and check if the root is black
 	if (impl->root != NULL) {
-		if (!RED(impl->root, impl->key_size, impl->value_size)) {
+		if (IS_BLACK(impl, impl->root)) {
 			bool ret = validate_rbtree(ptr, impl->root, &black_count, 0);
 			return ret;
 		}
