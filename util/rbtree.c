@@ -314,7 +314,9 @@ int rbtree_insert_node(RBTree *ptr, RBTreeNode *parent, bool is_right, const voi
 	node->right = NIL;
 	node->left = NIL;
 	node->parent = parent;
+#ifdef TEST
 	node->node_id = node_id_counter++;
+#endif // TEST
 	impl->size++;
 	rbtree_fix_up(ptr, node);
 
