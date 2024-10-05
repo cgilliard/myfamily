@@ -30,18 +30,21 @@
 #define SET_RED(impl, node)                                                                        \
 	({                                                                                             \
 		assert(node);                                                                              \
+		assert(node != NIL);                                                                       \
 		*(bool *)(node->data + RED_OFFSET(impl->key_size, impl->value_size)) = true;               \
 	})
 #define SET_BLACK(impl, node)                                                                      \
 	({                                                                                             \
-		if (node)                                                                                  \
+		if (node && node != NIL) {                                                                 \
 			*(bool *)(node->data + RED_OFFSET(impl->key_size, impl->value_size)) = false;          \
+			printf("setting node %llu black\n", fat_ptr_id(&node->self));                          \
+		}                                                                                          \
 	})
 
 #define IS_RED(impl, node)                                                                         \
 	({                                                                                             \
 		bool ret = false;                                                                          \
-		if (node && node->data &&                                                                  \
+		if (node && node != NIL && node->data &&                                                   \
 			*(bool *)(node->data + RED_OFFSET(impl->key_size, impl->value_size)))                  \
 			ret = true;                                                                            \
 		ret;                                                                                       \
@@ -49,7 +52,7 @@
 #define IS_BLACK(impl, node)                                                                       \
 	({                                                                                             \
 		bool ret = true;                                                                           \
-		if (node && node->data &&                                                                  \
+		if (node && node != NIL && node->data &&                                                   \
 			*(bool *)(node->data + RED_OFFSET(impl->key_size, impl->value_size)))                  \
 			ret = false;                                                                           \
 		ret;                                                                                       \
@@ -60,7 +63,6 @@ typedef struct RBTreeNode {
 	struct RBTreeNode *right;
 	struct RBTreeNode *left;
 	struct RBTreeNode *parent;
-	// bool red;
 	char data[];
 } RBTreeNode;
 
@@ -81,8 +83,13 @@ typedef struct RBTreeIteratorImpl {
 	bool send;
 } RBTreeIteratorImpl;
 
+static RBTreeNode NIL_DEFN = {.self = null};
+static RBTreeNode *NIL = &NIL_DEFN;
+static RBTreeNode NONE_DEFN = {.self = null};
+static RBTreeNode *NONE = &NONE_DEFN;
+
 void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
-	if (ptr != NULL && !nil(ptr->impl)) {
+	if (!nil(ptr->impl)) {
 		// obtain referent to internal RBTreeImpl structure
 		RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
 		// set appropriate chainguard status
@@ -102,9 +109,9 @@ bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 	}
 
 	// Traverse the tree
-	while (impl->cur || impl->stack_pointer > 0) {
+	while (impl->cur != NIL || impl->stack_pointer > 0) {
 		// Traverse left subtree
-		if (impl->cur) {
+		if (impl->cur != NIL) {
 			if (impl->stack_pointer < 128) {
 				// Push the current node pointer onto the stack
 				impl->stack[impl->stack_pointer++] = impl->cur;
@@ -137,11 +144,9 @@ bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 void leftRotate(RBTreeImpl *impl, RBTreeNode *x) {
 	RBTreeNode *y = x->right;
 	x->right = y->left;
-	if (y->left != NULL) {
-		y->left->parent = x;
-	}
+	y->left->parent = x;
 	y->parent = x->parent;
-	if (x->parent == NULL) {
+	if (x->parent == NONE) {
 		impl->root = y;
 	} else if (x == x->parent->left) {
 		x->parent->left = y;
@@ -156,11 +161,9 @@ void leftRotate(RBTreeImpl *impl, RBTreeNode *x) {
 void rightRotate(RBTreeImpl *impl, RBTreeNode *x) {
 	RBTreeNode *y = x->left;
 	x->left = y->right;
-	if (y->right != NULL) {
-		y->right->parent = x;
-	}
+	y->right->parent = x;
 	y->parent = x->parent;
-	if (x->parent == NULL) {
+	if (x->parent == NONE) {
 		impl->root = y;
 	} else if (x == x->parent->right) {
 		x->parent->right = y;
@@ -173,8 +176,6 @@ void rightRotate(RBTreeImpl *impl, RBTreeNode *x) {
 
 void rbtree_fix_up(RBTree *ptr, RBTreeNode *k) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
-	u64 key_size = impl->key_size;
-	u64 value_size = impl->value_size;
 
 	while (k && k != impl->root && IS_RED(impl, k->parent)) {
 
@@ -217,98 +218,6 @@ void rbtree_fix_up(RBTree *ptr, RBTreeNode *k) {
 	SET_BLACK(impl, impl->root);
 }
 
-void rbtree_delete_fixup(RBTree *ptr, RBTreeNode *x) {
-	RBTreeImpl *impl = $Ref(&ptr->impl);
-	RBTreeNode *w;
-
-	if (impl->size > 1)
-		SET_BLACK(impl, impl->root);
-	/*
-
-		while (x != impl->root && IS_BLACK(impl, x )) {
-			if (x->parent == NULL)
-				break;
-			if (x == x->parent->left) {
-				w = x->parent->right;
-				if (w == NULL) {
-					SET_BLACK(impl, x );
-					break;
-				}
-
-				// type 1
-				if (IS_RED(impl, w )) {
-					SET_BLACK(impl, w );
-					SET_RED(impl, x->parent );
-					leftRotate(impl, x->parent);
-					w = x->parent->right;
-				}
-				// type 2
-				if (w == NULL || (IS_BLACK(impl, w->left ) && IS_BLACK(impl, w->right ))) {
-					SET_RED(impl, w );
-					x = x->parent;
-				} else {
-					// type 3
-					if (IS_BLACK(impl, w->right)) {
-						SET_BLACK(impl, w->left );
-						SET_RED(impl, w );
-						rightRotate(impl, w);
-						w = x->parent->right;
-					}
-					// type 4
-					if (IS_BLACK(impl, w ))
-						SET_BLACK(impl, x->parent );
-					else
-						SET_RED(impl, x->parent );
-					SET_BLACK(impl, x->parent );
-					SET_BLACK(impl, w->right );
-					leftRotate(impl, x->parent);
-					x = impl->root;
-				}
-			} else {
-				w = x->parent->left;
-
-				if (w == NULL) {
-					SET_BLACK(impl, x );
-					break;
-				}
-
-				// type1
-				if (IS_RED(impl, w )) {
-					SET_BLACK(impl, w );
-					SET_RED(impl, x->parent );
-					rightRotate(impl, x);
-					w = x->parent->left;
-				}
-
-				printf("w=%p\n", w);
-				// type2
-				if (w == NULL || (IS_BLACK(impl, w->right ) && IS_BLACK(impl, w->left ))) {
-					SET_RED(impl, w );
-					x = x->parent;
-				} else {
-					// type 3
-					if (IS_BLACK(impl, w->left )) {
-						SET_BLACK(impl, w->right );
-						SET_RED(impl, w );
-						leftRotate(impl, w);
-						w = x->parent->left;
-					}
-					// type 4
-					if (IS_BLACK(impl, w ))
-						SET_BLACK(impl, x->parent );
-					else
-						SET_RED(impl, x->parent );
-					SET_BLACK(impl, x->parent );
-					SET_BLACK(impl, w->left );
-					rightRotate(impl, x->parent);
-					x = impl->root;
-				}
-			}
-		}
-		SET_BLACK(impl, x );
-	*/
-}
-
 int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 				 int (*compare)(const void *, const void *), bool send) {
 	ChainGuard _ = ChainSend(send);
@@ -334,7 +243,7 @@ int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 	impl->key_size = key_size;
 	impl->value_size = value_size;
 	impl->compare = compare;
-	impl->root = NULL;
+	impl->root = NIL;
 	impl->size = 0;
 
 	// return success
@@ -342,7 +251,7 @@ int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 }
 
 void rbtree_free_node(RBTreeNode *ptr) {
-	if (ptr != NULL) {
+	if (ptr != NIL) {
 		// recursively free right node
 		rbtree_free_node(ptr->right);
 		// recursively free left node
@@ -356,7 +265,7 @@ void rbtree_free_node(RBTreeNode *ptr) {
 // deallocates memory
 void rbtree_cleanup(RBTreeNc *ptr) {
 	// check non-initialized conditions
-	if (ptr != NULL && !nil(ptr->impl)) {
+	if (!nil(ptr->impl)) {
 		// obtain referent to internal RBTree structure
 		RBTreeImpl *impl = $Ref(&ptr->impl);
 		// set appropriate chainguard status
@@ -382,7 +291,7 @@ int rbtree_insert_node(RBTree *ptr, RBTreeNode *parent, bool is_right, const voi
 		return -1;
 	}
 	node = $Ref(&self);
-	if (impl->root == NULL)
+	if (impl->root == NIL)
 		impl->root = node;
 	else if (is_right)
 		parent->right = node;
@@ -394,8 +303,8 @@ int rbtree_insert_node(RBTree *ptr, RBTreeNode *parent, bool is_right, const voi
 		   impl->value_size);
 	node->data[KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size + impl->value_size] = true;
 	node->self = self;
-	node->right = NULL;
-	node->left = NULL;
+	node->right = NIL;
+	node->left = NIL;
 	node->parent = parent;
 	impl->size++;
 	rbtree_fix_up(ptr, node);
@@ -409,13 +318,12 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 		return -1;
 	}
 	RBTreeImpl *impl = $Ref(&ptr->impl);
-	RBTreeNode *parent = NULL;
+	RBTreeNode *parent = NONE;
 	RBTreeNode *check = impl->root;
 	bool is_right = false;
 
 	loop {
-		RBTreeNode *node = NULL;
-		if (check == NULL) {
+		if (check == NIL) {
 			if (rbtree_insert_node(ptr, parent, is_right, key, value))
 				return -1;
 			break;
@@ -436,6 +344,119 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	return 0;
 }
 
+void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
+	if (dst->parent == NONE)
+		impl->root = src;
+	else if (dst == dst->parent->left)
+		dst->parent->left = src;
+	else
+		dst->parent->right = src;
+	if (src)
+		src->parent = dst->parent;
+}
+
+void rbtree_delete_fixup(RBTree *ptr, RBTreeNode *x) {
+	if (x != NULL)
+		printf("delete fixup node %llu\n", fat_ptr_id(&x->self));
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeNode *w;
+
+	while (x != impl->root && IS_BLACK(impl, x)) {
+		printf("loop\n");
+		if (x == NULL || x->parent == NULL) {
+			break;
+		}
+		if (x == x->parent->left) {
+			w = x->parent->right;
+
+			// If w is NULL, treat it as black and handle accordingly
+			if (w == NULL) {
+				x = x->parent; // Move up the tree
+			} else {
+				// type 1
+				if (IS_RED(impl, w)) {
+					SET_BLACK(impl, w);
+					SET_RED(impl, x->parent);
+					leftRotate(impl, x->parent);
+					w = x->parent->right; // Update w after rotation
+				}
+
+				// type 2
+				if (IS_BLACK(impl, w->left) && IS_BLACK(impl, w->right)) {
+					SET_RED(impl, w);
+					x = x->parent; // Move up the tree
+				} else {
+					// type 3
+					if (IS_BLACK(impl, w->right)) {
+						SET_BLACK(impl, w->left);
+						SET_RED(impl, w);
+						rightRotate(impl, w);
+						w = x->parent->right; // Update w after rotation
+					}
+					// type 4
+					if (IS_BLACK(impl, w)) {
+						SET_BLACK(impl, x->parent);
+					} else {
+						SET_RED(impl, x->parent);
+					}
+					SET_BLACK(impl, w->right);
+					leftRotate(impl, x->parent);
+					x = impl->root; // Reset x to root
+				}
+			}
+		} else {
+			w = x->parent->left;
+
+			// If w is NULL, treat it as black and handle accordingly
+			if (w == NULL) {
+				x = x->parent; // Move up the tree
+			} else {
+				// type 1
+				if (IS_RED(impl, w)) {
+					SET_BLACK(impl, w);
+					SET_RED(impl, x->parent);
+					rightRotate(impl, x);
+					w = x->parent->left; // Update w after rotation
+				}
+
+				// type 2
+				if (IS_BLACK(impl, w->right) && IS_BLACK(impl, w->left)) {
+					SET_RED(impl, w);
+					x = x->parent; // Move up the tree
+				} else {
+					// type 3
+					if (IS_BLACK(impl, w->left)) {
+						SET_BLACK(impl, w->right);
+						SET_RED(impl, w);
+						leftRotate(impl, w);
+						w = x->parent->left; // Update w after rotation
+					}
+					// type 4
+					if (IS_BLACK(impl, w)) {
+						SET_BLACK(impl, x->parent);
+					} else {
+						SET_RED(impl, x->parent);
+					}
+					SET_BLACK(impl, w->left);
+					rightRotate(impl, x->parent);
+					x = impl->root; // Reset x to root
+				}
+			}
+		}
+	}
+
+	printf("set x black\n");
+	if (x)
+		SET_BLACK(impl, x); // Finally, ensure x is black
+}
+
+/*
+transplant(self, u, v)
+: if u.p
+== None : self.root = v elif u == u.p.left : u.p.left = v else : u.p.right = v v.p =
+u.p
+*/
+
 int rbtree_delete(RBTree *ptr, const void *key) {
 	if (ptr == NULL || nil(ptr->impl)) {
 		errno = EINVAL;
@@ -450,7 +471,9 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	RBTreeNode *check = impl->root;
 	RBTreeNode *nodeToDelete = NULL; // Node to be deleted
 	RBTreeNode *child = NULL;		 // Child to replace the node
-	bool wasBlack = false;			 // To track if the deleted node is black
+	RBTreeNode *successor = NULL;
+	RBTreeNode *x = NULL;
+	bool wasBlack = false; // To track if the deleted node is black
 
 	// Find the node to delete
 	while (check != NULL) {
@@ -471,50 +494,31 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 
 	// Store the color of the node to delete
 	wasBlack = IS_BLACK(impl, nodeToDelete);
-	FatPtr fptr_to_delete = nodeToDelete->self;
-	// Case 1: Node has two children
-	if (nodeToDelete->left != NULL && nodeToDelete->right != NULL) {
+
+	if (nodeToDelete->left == NULL) {
+		printf("1\n");
+		x = nodeToDelete->left;
+		rbtree_transplant(impl, nodeToDelete, nodeToDelete->right);
+	} else if (nodeToDelete->right == NULL) {
+		printf("2\n");
+		x = nodeToDelete->right;
+		rbtree_transplant(impl, nodeToDelete, nodeToDelete->left);
+	} else {
+		printf("3\n");
 		// Find the in-order successor (smallest node in the right subtree)
 		RBTreeNode *successor = nodeToDelete->right;
 		while (successor->left != NULL) {
 			successor = successor->left;
 		}
-
-		// Copy the successor's data to the node to delete
-		memcpy(nodeToDelete->data + KEY_PAD, successor->data + KEY_PAD,
-			   (impl->key_size + impl->value_size + VALUE_PAD(impl->key_size)) + BOOLEAN_SIZE);
-
-		nodeToDelete->self = successor->self;
-
-		// Now we need to delete the successor
-		nodeToDelete = successor; // Update to the successor nodeAA
-	}
-
-	// Case 2: Node has at most one child
-	child = (nodeToDelete->left != NULL) ? nodeToDelete->left : nodeToDelete->right;
-
-	// Remove nodeToDelete from the tree
-	if (child != NULL) {
-		child->parent = nodeToDelete->parent; // Update child’s parent
-	}
-
-	if (nodeToDelete->parent == NULL) {
-		// Node is root
-		impl->root = child; // Update the root if necessary
-	} else {
-		// Update the parent's child pointer
-		if (nodeToDelete == nodeToDelete->parent->left) {
-			nodeToDelete->parent->left = child; // Update left child
-		} else {
-			nodeToDelete->parent->right = child; // Update right child
-		}
+		x = successor->right;
+		rbtree_transplant(impl, nodeToDelete, successor);
 	}
 
 	if (wasBlack)
-		rbtree_delete_fixup(ptr, nodeToDelete); // Call fix-up function
+		rbtree_delete_fixup(ptr, x); // Call fix-up function
 
-	// Free the node
-	chain_free(&fptr_to_delete);
+	// Free the node which has been transplanted
+	chain_free(&nodeToDelete->self);
 
 	impl->size--;
 
@@ -531,7 +535,7 @@ const void *rbtree_get(const RBTree *ptr, const void *key) {
 
 	RBTreeNode *check = impl->root;
 	loop {
-		if (check == NULL)
+		if (check == NIL)
 			return NULL;
 		int v = impl->compare(check->data + KEY_PAD, key);
 		if (v == 0) {
@@ -573,13 +577,13 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
 	return 0;
 }
 
-bool validate_rbtree(const RBTree *ptr, const RBTreeNode *node, int *black_count,
-					 int current_black_count) {
+bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_count,
+						  int current_black_count) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	u64 key_size = impl->key_size;
 	u64 value_size = impl->value_size;
 
-	// Base case: when we reach a NIL node
+	// Base case: when we reach a NIL node's pointer to actual NULL
 	if (node == NULL) {
 		// If this is the first NIL node reached, set the black count
 		if (*black_count == 0) {
@@ -598,16 +602,20 @@ bool validate_rbtree(const RBTree *ptr, const RBTreeNode *node, int *black_count
 	// Increment black count if the current node is black
 	if (IS_BLACK(impl, node)) {
 #ifdef TEST
-		// printf("======================black node %llu\n", fat_ptr_id(&node->self));
+		if (node == NIL)
+			;
+		//			printf("======================NIL\n");
+		else
+//			printf("======================black node %llu\n", fat_ptr_id(&node->self));
 #endif // TEST
-		current_black_count++;
+			current_black_count++;
 	} else {
 #ifdef TEST
-		// printf("======================red node %llu\n", fat_ptr_id(&node->self));
+//		printf("======================red node %llu\n", fat_ptr_id(&node->self));
 #endif // TEST
 	   //  Check if the node is red
 	   //  If the parent is red, return false (Red property violation)
-		if (node->parent != NULL && IS_RED(impl, node->parent)) {
+		if (node->parent != NONE && IS_RED(impl, node->parent)) {
 			printf("Red property violation at node with key\n");
 			return false;
 		}
@@ -615,9 +623,9 @@ bool validate_rbtree(const RBTree *ptr, const RBTreeNode *node, int *black_count
 
 	// Recursive calls for left and right children
 	// printf("go left\n");
-	bool left_valid = validate_rbtree(ptr, node->left, black_count, current_black_count);
+	bool left_valid = rbtree_validate_node(ptr, node->left, black_count, current_black_count);
 	// printf("go right\n");
-	bool right_valid = validate_rbtree(ptr, node->right, black_count, current_black_count);
+	bool right_valid = rbtree_validate_node(ptr, node->right, black_count, current_black_count);
 
 	return left_valid && right_valid;
 }
@@ -628,9 +636,12 @@ bool rbtree_validate(const RBTree *ptr) {
 	// Validate from the root and check if the root is black
 	if (impl->root != NULL) {
 		if (IS_BLACK(impl, impl->root)) {
-			bool ret = validate_rbtree(ptr, impl->root, &black_count, 0);
+			bool ret = rbtree_validate_node(ptr, impl->root, &black_count, 0);
 			return ret;
 		}
+#ifdef TEST
+//		printf("======================red node %llu\n", fat_ptr_id(&impl->root->self));
+#endif // TEST
 		printf("root is not black\n");
 		return false; // Root should be black
 	}
