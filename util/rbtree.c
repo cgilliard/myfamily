@@ -32,14 +32,16 @@
 		if (node && node != NIL) {                                                                 \
 			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
 			*(bool *)(node->data + offset) = true;                                                 \
-		}                                                                                          \
+		} else                                                                                     \
+			printf("WARN: SET_RED on invalid node\n");                                             \
 	})
 #define SET_BLACK(impl, node)                                                                      \
 	({                                                                                             \
 		if (node && node != NIL) {                                                                 \
 			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
 			*(bool *)(node->data + offset) = false;                                                \
-		}                                                                                          \
+		} else                                                                                     \
+			printf("WARN: SET_BLACK on invalid node\n");                                           \
 	})
 
 #define IS_RED(impl, node)                                                                         \
@@ -371,6 +373,7 @@ void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
 }
 
 void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
+	printf("delete fixup\n");
 	int i = 0;
 	while (x != impl->root && IS_BLACK(impl, x)) {
 		if (x == x->parent->left) {
@@ -441,7 +444,8 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 			}
 		}
 	}
-	SET_BLACK(impl, x);
+	if (impl->root != NIL)
+		SET_BLACK(impl, x);
 }
 
 int rbtree_delete(RBTree *ptr, const void *key) {
@@ -505,7 +509,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 			SET_BLACK(impl, successor);
 	}
 
-	if (!y_is_red && x != NIL) {
+	if (!y_is_red) {
 		rbtree_delete_fixup(impl, x);
 	}
 
