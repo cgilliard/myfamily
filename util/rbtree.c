@@ -148,38 +148,42 @@ bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 
 // Utility function to perform left rotation
 void leftRotate(RBTreeImpl *impl, RBTreeNode *x) {
+	assert(x->node_id != 0);
 	RBTreeNode *y = x->right;
-	x->right = y->left;
-	if (y->left)
+	if (y->left) {
+		x->right = y->left;
 		y->left->parent = x;
-	y->parent = x->parent;
-	if (x->parent == NONE) {
-		impl->root = y;
-	} else if (x == x->parent->left) {
-		x->parent->left = y;
-	} else {
-		x->parent->right = y;
+		y->parent = x->parent;
+		if (x->parent == NONE) {
+			impl->root = y;
+		} else if (x == x->parent->left) {
+			x->parent->left = y;
+		} else {
+			x->parent->right = y;
+		}
+		y->left = x;
+		x->parent = y;
 	}
-	y->left = x;
-	x->parent = y;
 }
 
 // Utility function to perform right rotation
 void rightRotate(RBTreeImpl *impl, RBTreeNode *x) {
+	assert(x->node_id != 0);
 	RBTreeNode *y = x->left;
-	x->left = y->right;
-	if (y->right)
+	if (y->right) {
+		x->left = y->right;
 		y->right->parent = x;
-	y->parent = x->parent;
-	if (x->parent == NONE) {
-		impl->root = y;
-	} else if (x == x->parent->right) {
-		x->parent->right = y;
-	} else {
-		x->parent->left = y;
+		y->parent = x->parent;
+		if (x->parent == NONE) {
+			impl->root = y;
+		} else if (x == x->parent->right) {
+			x->parent->right = y;
+		} else {
+			x->parent->left = y;
+		}
+		y->right = x;
+		x->parent = y;
 	}
-	y->right = x;
-	x->parent = y;
 }
 
 void rbtree_fix_up(RBTree *ptr, RBTreeNode *k) {
@@ -371,6 +375,14 @@ void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
 	}
 }
 
+void set_color_based_on_parent(RBTreeImpl *impl, RBTreeNode *child, RBTreeNode *parent) {
+	if (IS_RED(impl, parent)) {
+		SET_RED(impl, child);
+	} else {
+		SET_BLACK(impl, child);
+	}
+}
+
 void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 	while (x != impl->root && IS_BLACK(impl, x)) {
 		if (x == x->parent->left) {
@@ -379,9 +391,7 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 			// Case 1: Sibling is red
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
-				// printf("calling set red 1\n");
 				SET_RED(impl, x->parent);
-				// printf("set red 1 complete\n");
 				leftRotate(impl, x->parent);
 				w = x->parent->right;
 			}
@@ -400,18 +410,16 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 				}
 
 				// Case 4: Sibling's right child is red
-				if (IS_RED(impl, x->parent)) {
-					SET_RED(impl, w);
-				} else {
-					SET_BLACK(impl, w);
-				}
+				set_color_based_on_parent(impl, w, x->parent);
 				SET_BLACK(impl, x->parent);
 				SET_BLACK(impl, w->right);
 				leftRotate(impl, x->parent);
-				x = impl->root;
+				x = impl->root; // Set x to root at the end, only once
 			}
 		} else { // Symmetric case: x is the right child
 			RBTreeNode *w = x->parent->left;
+
+			// Case 1: Sibling is red
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
 				SET_RED(impl, x->parent);
@@ -419,31 +427,31 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 				w = x->parent->left;
 			}
 
+			// Case 2: Sibling's children are both black
 			if (IS_BLACK(impl, w->right) && IS_BLACK(impl, w->left)) {
-				SET_RED(impl, w);
+				// SET_RED(impl, w);
 				x = x->parent;
 			} else {
+				// Case 3: Sibling's left child is black, right child is red
 				if (IS_BLACK(impl, w->left)) {
 					SET_BLACK(impl, w->right);
 					SET_RED(impl, w);
 					leftRotate(impl, w);
 					w = x->parent->left;
 				}
-
-				if (IS_RED(impl, x->parent)) {
-					SET_RED(impl, w);
-				} else {
-					SET_BLACK(impl, w);
-				}
+				// Case 4: Sibling's left child is red
+				set_color_based_on_parent(impl, w, x->parent);
 				SET_BLACK(impl, x->parent);
 				SET_BLACK(impl, w->left);
 				rightRotate(impl, x->parent);
-				x = impl->root;
+				x = impl->root; // Set x to root at the end, only once
 			}
 		}
 	}
-	if (impl->root != NIL && impl->root != NONE)
+	// Ensure x is black at the end of fixup
+	if (x != NIL && x != NONE) {
 		SET_BLACK(impl, x);
+	}
 }
 
 int rbtree_delete(RBTree *ptr, const void *key) {
@@ -475,15 +483,24 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	RBTreeNode *y = node_to_delete;
 	RBTreeNode *yp = node_to_delete->parent;
 	RBTreeNode *x = NULL;
-	bool y_is_red = IS_RED(impl, y);
+	bool call_fixup = IS_BLACK(impl, y);
 
 	if (node_to_delete->left == NIL) {
 		x = node_to_delete->right;
+		if (x == NIL)
+			x->parent = yp;
+		if (node_to_delete->right != NIL)
+			call_fixup = true;
 		rbtree_transplant(impl, node_to_delete, node_to_delete->right);
 	} else if (node_to_delete->right == NIL) {
 		x = node_to_delete->left;
+		if (x == NIL)
+			x->parent = yp;
+		if (node_to_delete->left != NIL)
+			call_fixup = true;
 		rbtree_transplant(impl, node_to_delete, node_to_delete->left);
 	} else {
+		call_fixup = true;
 		// Find the in-order successor (smallest node in the right subtree)
 		RBTreeNode *successor = node_to_delete->right;
 		while (successor->left != NIL) {
@@ -492,8 +509,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		x = successor->right;
 
 		if (successor->parent == node_to_delete) {
-			if (x != NIL)
-				x->parent = successor;
+			x->parent = successor;
 		} else {
 			rbtree_transplant(impl, successor, successor->right);
 			successor->right = node_to_delete->right;
@@ -508,10 +524,8 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 			SET_BLACK(impl, successor);
 	}
 
-	if (!y_is_red) {
-		if (x != NIL)
-			rbtree_delete_fixup(impl, x);
-	}
+	if (call_fixup)
+		rbtree_delete_fixup(impl, x);
 
 	// Free the node which has been transplanted
 	{
