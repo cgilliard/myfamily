@@ -1380,8 +1380,8 @@
        11:  108:	chain_guard_entry_root->sa = init_default_slab_allocator();
        11:  109:}
         -:  110:
-     2036:  111:void chain_guard_cleanup(ChainGuardNc *ptr) {
-     2036:  112:	if (ptr->impl) {
+    22033:  111:void chain_guard_cleanup(ChainGuardNc *ptr) {
+    22033:  112:	if (ptr->impl) {
        18:  113:		ChainGuardEntry *entry = ptr->impl;
        18:  114:		chain_guard_entry_cur = entry->prev;
        18:  115:		chain_guard_entry_cur->next = NULL;
@@ -1390,7 +1390,7 @@
         -:  118:		}
        18:  119:		myfree(entry);
         -:  120:	}
-     2036:  121:}
+    22033:  121:}
         -:  122:
        18:  123:ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {
        18:  124:	if (chain_guard_entry_root == NULL) {
@@ -1411,27 +1411,27 @@
        18:  139:	return ret;
         -:  140:}
         -:  141:
-     1047:  142:int chain_malloc(FatPtr *ptr, u64 size) {
-     1047:  143:	if (ptr == NULL || size == 0) {
+    11044:  142:int chain_malloc(FatPtr *ptr, u64 size) {
+    11044:  143:	if (ptr == NULL || size == 0) {
     #####:  144:		errno = EINVAL;
     #####:  145:		return -1;
         -:  146:	}
-     1047:  147:	if (chain_guard_entry_root == NULL) {
+    11044:  147:	if (chain_guard_entry_root == NULL) {
         6:  148:		chain_guard_init_root();
         -:  149:	}
-     1047:  150:	if (chain_guard_entry_cur->sync) {
+    11044:  150:	if (chain_guard_entry_cur->sync) {
         -:  151:	}
         -:  152:	int ret;
-     1047:  153:	if (chain_guard_entry_cur->sync) {
+    11044:  153:	if (chain_guard_entry_cur->sync) {
         9:  154:		pthread_mutex_lock(&chain_guard_entry_cur->lock);
         9:  155:		chain_guard_entry_cur->is_locked = true;
         9:  156:		ret = slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
         9:  157:		chain_guard_entry_cur->is_locked = false;
         9:  158:		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
         -:  159:	} else {
-     1038:  160:		ret = slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
+    11035:  160:		ret = slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
         -:  161:	}
-     1047:  162:	return ret;
+    11044:  162:	return ret;
         -:  163:}
         1:  164:int chain_realloc(FatPtr *ptr, u64 size) {
         1:  165:	if (chain_guard_entry_root == NULL)
@@ -1472,23 +1472,23 @@
         -:  200:	}
         1:  201:	return 0;
         -:  202:}
-     1033:  203:void chain_free(FatPtr *ptr) {
-     1033:  204:	if (ptr == NULL) {
+    11030:  203:void chain_free(FatPtr *ptr) {
+    11030:  204:	if (ptr == NULL) {
     #####:  205:		panic("attempt to free a NULL FatPtr");
         -:  206:	}
-     1033:  207:	if (chain_guard_entry_root == NULL)
+    11030:  207:	if (chain_guard_entry_root == NULL)
     #####:  208:		panic("Freeing a FatPtr when it was never allocated!");
         -:  209:
-     1033:  210:	if (chain_guard_entry_cur->sync) {
+    11030:  210:	if (chain_guard_entry_cur->sync) {
         9:  211:		pthread_mutex_lock(&chain_guard_entry_cur->lock);
         9:  212:		chain_guard_entry_cur->is_locked = true;
         9:  213:		slab_allocator_free(chain_guard_entry_cur->sa, ptr);
         9:  214:		chain_guard_entry_cur->is_locked = false;
         9:  215:		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
         -:  216:	} else {
-     1024:  217:		slab_allocator_free(chain_guard_entry_cur->sa, ptr);
+    11021:  217:		slab_allocator_free(chain_guard_entry_cur->sa, ptr);
         -:  218:	}
-     1033:  219:}
+    11030:  219:}
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
@@ -2284,42 +2284,42 @@
         -:   25:u64 __is_debug_realloc_counter_ = UINT64_MAX;
         -:   26:#endif // TEST
         -:   27:
-     4972:   28:void *mymalloc(u64 size) {
+     5071:   28:void *mymalloc(u64 size) {
         -:   29:#ifdef TEST
-     4972:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
+     5071:   30:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
        21:   31:		__is_debug_malloc_counter_ = UINT64_MAX;
        21:   32:		return NULL;
         -:   33:	}
-     4951:   34:	__is_debug_malloc_counter_--;
+     5050:   34:	__is_debug_malloc_counter_--;
         -:   35:#endif // TEST
         -:   36:	void *ret;
-     4951:   37:	ret = malloc(size);
+     5050:   37:	ret = malloc(size);
         -:   38:
-     4951:   39:	if (ret) {
-     4951:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+     5050:   39:	if (ret) {
+     5050:   40:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   41:	}
-     4951:   42:	return ret;
+     5050:   42:	return ret;
         -:   43:}
-     3830:   44:void *myrealloc(void *ptr, u64 size) {
+     4028:   44:void *myrealloc(void *ptr, u64 size) {
         -:   45:#ifdef TEST
-     3830:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
+     4028:   46:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
         7:   47:		__is_debug_realloc_counter_ = UINT64_MAX;
         7:   48:		return NULL;
         -:   49:	}
-     3823:   50:	__is_debug_realloc_counter_--;
+     4021:   50:	__is_debug_realloc_counter_--;
         -:   51:#endif // TEST
         -:   52:	void *ret;
-     3823:   53:	ret = realloc(ptr, size);
+     4021:   53:	ret = realloc(ptr, size);
         -:   54:
-     3823:   55:	if (ret) {
-     3823:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+     4021:   55:	if (ret) {
+     4021:   56:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   57:	}
-     3823:   58:	return ret;
+     4021:   58:	return ret;
         -:   59:}
-     4891:   60:void myfree(void *ptr) {
-     4891:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-     4891:   62:	free(ptr);
-     4891:   63:}
+     4990:   60:void myfree(void *ptr) {
+     4990:   61:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+     4990:   62:	free(ptr);
+     4990:   63:}
        58:   64:MYFILE *myfopen(const Path *path, const char *mode) {
        58:   65:	const char *path_str = path_to_string(path);
        58:   66:	FILE *ret = fopen(path_str, mode);
@@ -2711,8 +2711,8 @@
         -:   42:// maximum signed int value (INT32_MAX). Conversely, the 64 bit ids must have this bit set.
         -:   43:// This is the slab allocator's responsibility to ensure the bit is set correctly.
         -:   44:// Users need not worry about these details as they are handled internally.
-  4018651:   45:bool fat_ptr_is64(const FatPtr *ptr) {
-  4018651:   46:	return ((FatPtr32Impl *)ptr->data)->id & 0x1;
+205211417:   45:bool fat_ptr_is64(const FatPtr *ptr) {
+205211417:   46:	return ((FatPtr32Impl *)ptr->data)->id & 0x1;
         -:   47:}
         -:   48:
         -:   49:// Return the id of the FatPtr. First check bit for u64/u32 status, then return value.
@@ -2724,19 +2724,19 @@
         -:   55:}
         -:   56:
         -:   57:// Get the length of this FatPtr. Once again use the status bit in the id then return value.
-  3006860:   58:u64 fat_ptr_len(const FatPtr *ptr) {
-  3006860:   59:	if (fat_ptr_is64(ptr))
+  3066851:   58:u64 fat_ptr_len(const FatPtr *ptr) {
+  3066851:   59:	if (fat_ptr_is64(ptr))
       266:   60:		return ((FatPtr64Impl *)ptr->data)->len;
         -:   61:	else
-  3006594:   62:		return ((FatPtr32Impl *)ptr->data)->len;
+  3066585:   62:		return ((FatPtr32Impl *)ptr->data)->len;
         -:   63:}
         -:   64:
         -:   65:// Get the data pointer of this FatPtr. Once again use the status bit in the id then return value.
-  1011591:   66:void *fat_ptr_data(const FatPtr *ptr) {
-  1011591:   67:	if (fat_ptr_is64(ptr))
+202144366:   66:void *fat_ptr_data(const FatPtr *ptr) {
+202144366:   67:	if (fat_ptr_is64(ptr))
       105:   68:		return ((FatPtr64Impl *)ptr->data)->data;
         -:   69:	else
-  1011486:   70:		return ((FatPtr32Impl *)ptr->data)->data;
+202144261:   70:		return ((FatPtr32Impl *)ptr->data)->data;
         -:   71:}
         -:   72:
         -:   73:// Test function to free the 64 bit objects.
@@ -2836,10 +2836,10 @@
        30:  167:		SlabAllocatorImpl *impl = ptr->impl;
        30:  168:		if (impl->sd_arr) {
      3375:  169:			for (u64 i = 0; i < impl->sd_size; i++) {
-     3394:  170:				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
-       49:  171:					if (impl->sd_arr[i].data[j]) {
-       49:  172:						myfree(impl->sd_arr[i].data[j]);
-       49:  173:						impl->sd_arr[i].data[j] = NULL;
+     3493:  170:				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
+      148:  171:					if (impl->sd_arr[i].data[j]) {
+      148:  172:						myfree(impl->sd_arr[i].data[j]);
+      148:  173:						impl->sd_arr[i].data[j] = NULL;
         -:  174:					}
         -:  175:				}
      3345:  176:				if (impl->sd_arr[i].data) {
@@ -2860,23 +2860,23 @@
         -:  191:	}
        30:  192:}
         -:  193:
-     3639:  194:int slab_allocator_init_free_list(SlabData *sd, u64 slabs, u64 offset, bool is_64_bit) {
+     3738:  194:int slab_allocator_init_free_list(SlabData *sd, u64 slabs, u64 offset, bool is_64_bit) {
         -:  195:	//  initialize the values of the free list.
-  1006783:  196:	for (u64 i = 0; i < slabs; i++) {
-  1003144:  197:		if (i == (slabs - 1)) {
-       49:  198:			if (is_64_bit)
+  1016782:  196:	for (u64 i = 0; i < slabs; i++) {
+  1013044:  197:		if (i == (slabs - 1)) {
+      148:  198:			if (is_64_bit)
         2:  199:				((u64 *)(sd->free_list))[i + offset] = UINT64_MAX;
         -:  200:			else
-       47:  201:				((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
+      146:  201:				((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
         -:  202:		} else {
-  1003095:  203:			if (is_64_bit)
+  1012896:  203:			if (is_64_bit)
       108:  204:				((u64 *)(sd->free_list))[i + offset] = offset + i + 1;
         -:  205:			else
-  1002987:  206:				((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
+  1012788:  206:				((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
         -:  207:		}
         -:  208:	}
         -:  209:
-     3639:  210:	return 0;
+     3738:  210:	return 0;
         -:  211:}
         -:  212:
      3601:  213:int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
@@ -3015,112 +3015,112 @@
        31:  346:	return ret;
         -:  347:}
         -:  348:
-  2002379:  349:int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
-  2002379:  350:	SlabAllocatorImpl *impl = ptr->impl;
-  2002379:  351:	int ret = -1;
-  2002379:  352:	if (impl->sd_size == 0)
+  2022373:  349:int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
+  2022373:  350:	SlabAllocatorImpl *impl = ptr->impl;
+  2022373:  351:	int ret = -1;
+  2022373:  352:	if (impl->sd_size == 0)
     #####:  353:		return ret;
         -:  354:
-  2002379:  355:	int left = 0;
-  2002379:  356:	int right = impl->sd_size - 1;
+  2022373:  355:	int left = 0;
+  2022373:  356:	int right = impl->sd_size - 1;
         -:  357:
-  3016896:  358:	while (left <= right) {
-  2015717:  359:		int mid = left + (right - left) / 2;
-  2015717:  360:		u32 slab_size = impl->sd_arr[mid].type.slab_size;
-  2015717:  361:		if (slab_size == size) {
-  1001200:  362:			ret = mid;
-  1001200:  363:			break;
-  1014517:  364:		} else if (slab_size > size)
-  1011400:  365:			right = mid - 1;
+  3154820:  358:	while (left <= right) {
+  2143644:  359:		int mid = left + (right - left) / 2;
+  2143644:  360:		u32 slab_size = impl->sd_arr[mid].type.slab_size;
+  2143644:  361:		if (slab_size == size) {
+  1011197:  362:			ret = mid;
+  1011197:  363:			break;
+  1132447:  364:		} else if (slab_size > size)
+  1099353:  365:			right = mid - 1;
         -:  366:		else
-     3117:  367:			left = mid + 1;
+    33094:  367:			left = mid + 1;
         -:  368:	}
         -:  369:
-  2002379:  370:	if (ret == -1 && right + 1 <= impl->sd_size - 1) {
-  1001172:  371:		return right + 1;
+  2022373:  370:	if (ret == -1 && right + 1 <= impl->sd_size - 1) {
+  1011169:  371:		return right + 1;
         -:  372:	}
         -:  373:
-  1001207:  374:	return ret;
+  1011204:  374:	return ret;
         -:  375:}
         -:  376:
-       51:  377:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
-       51:  378:	if (sd->cur_slabs < sd->type.max_slabs) {
+      150:  377:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
+      150:  378:	if (sd->cur_slabs < sd->type.max_slabs) {
         -:  379:		// we can try to resize
         -:  380:		// first try to reallocate the free list
-       38:  381:		void *nfree_list = NULL;
+      137:  381:		void *nfree_list = NULL;
         -:  382:		u64 factor;
-       38:  383:		if (is_64_bit)
+      137:  383:		if (is_64_bit)
     #####:  384:			factor = sizeof(u64);
         -:  385:		else
-       38:  386:			factor = sizeof(u32);
-       38:  387:		if (sd->free_list) {
+      137:  386:			factor = sizeof(u32);
+      137:  387:		if (sd->free_list) {
         -:  388:			nfree_list =
-       14:  389:				myrealloc(sd->free_list, (1 + sd->cur_chunks) * sd->type.slabs_per_resize * factor);
+      113:  389:				myrealloc(sd->free_list, (1 + sd->cur_chunks) * sd->type.slabs_per_resize * factor);
         -:  390:		} else {
         -:  391:
        24:  392:			nfree_list = mymalloc(sd->type.slabs_per_resize * factor);
         -:  393:		}
-       38:  394:		if (nfree_list == NULL)
+      137:  394:		if (nfree_list == NULL)
     #####:  395:			return -1;
-       38:  396:		sd->free_list = nfree_list;
+      137:  396:		sd->free_list = nfree_list;
         -:  397:
         -:  398:		// now try to allocate more slab chunks
         -:  399:		void *ndata;
-       38:  400:		if (sd->data == NULL) {
+      137:  400:		if (sd->data == NULL) {
        24:  401:			ndata = mymalloc(sizeof(void *));
         -:  402:		} else {
-       14:  403:			ndata = myrealloc(sd->data, sizeof(void *) * (1 + sd->cur_chunks));
+      113:  403:			ndata = myrealloc(sd->data, sizeof(void *) * (1 + sd->cur_chunks));
         -:  404:		}
-       38:  405:		if (ndata == NULL) {
+      137:  405:		if (ndata == NULL) {
     #####:  406:			return -1;
         -:  407:		}
         -:  408:
-       38:  409:		sd->data = ndata;
-       38:  410:		sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
-       38:  411:		if (sd->data[sd->cur_chunks] == NULL)
+      137:  409:		sd->data = ndata;
+      137:  410:		sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
+      137:  411:		if (sd->data[sd->cur_chunks] == NULL)
     #####:  412:			return -1;
         -:  413:
         -:  414:		// data was successfully allocated, make updates.
-       38:  415:		slab_allocator_init_free_list(sd, sd->type.slabs_per_resize, sd->cur_slabs, is_64_bit);
-       38:  416:		sd->free_list_head = sd->cur_slabs;
-       38:  417:		sd->cur_chunks += 1;
+      137:  415:		slab_allocator_init_free_list(sd, sd->type.slabs_per_resize, sd->cur_slabs, is_64_bit);
+      137:  416:		sd->free_list_head = sd->cur_slabs;
+      137:  417:		sd->cur_chunks += 1;
         -:  418:
-       38:  419:		return slab_data_allocate(sd, fptr, is_64_bit, zeroed);
+      137:  419:		return slab_data_allocate(sd, fptr, is_64_bit, zeroed);
         -:  420:	}
        13:  421:	return -1;
         -:  422:}
         -:  423:
-  1001231:  424:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
-  1001231:  425:	u64 id = sd->free_list_head;
-  1001231:  426:	if (is_64_bit && id == UINT64_MAX) {
+  1011327:  424:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool is_64_bit, bool zeroed) {
+  1011327:  425:	u64 id = sd->free_list_head;
+  1011327:  426:	if (is_64_bit && id == UINT64_MAX) {
         1:  427:		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
-  1001230:  428:	} else if (!is_64_bit && id == UINT32_MAX) {
-       50:  429:		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
+  1011326:  428:	} else if (!is_64_bit && id == UINT32_MAX) {
+      149:  429:		return slab_data_try_resize(sd, fptr, is_64_bit, zeroed);
         -:  430:	}
         -:  431:
-  1001180:  432:	if (is_64_bit) {
+  1011177:  432:	if (is_64_bit) {
        22:  433:		sd->free_list_head = ((u64 *)sd->free_list)[id];
         -:  434:
         -:  435:	} else {
-  1001158:  436:		sd->free_list_head = ((u32 *)sd->free_list)[id];
+  1011155:  436:		sd->free_list_head = ((u32 *)sd->free_list)[id];
         -:  437:	}
         -:  438:
         -:  439:	// set to MAX-1 as a marker that this is allocated
         -:  440:	// if any freed without this value, it's an error
-  1001180:  441:	if (is_64_bit)
+  1011177:  441:	if (is_64_bit)
        22:  442:		((u64 *)sd->free_list)[id] = (UINT64_MAX - 1);
         -:  443:	else
-  1001158:  444:		((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
+  1011155:  444:		((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
         -:  445:
-  1001180:  446:	u64 len = sd->type.slab_size;
-  1001180:  447:	u64 slab_data_index = id / sd->type.slabs_per_resize;
-  1001180:  448:	u64 offset_mod = id % sd->type.slabs_per_resize;
+  1011177:  446:	u64 len = sd->type.slab_size;
+  1011177:  447:	u64 slab_data_index = id / sd->type.slabs_per_resize;
+  1011177:  448:	u64 offset_mod = id % sd->type.slabs_per_resize;
         -:  449:
-  1001180:  450:	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
+  1011177:  450:	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
         -:  451:
         -:  452:	u64 data_len;
         -:  453:	u8 *data_ptr;
-  1001180:  454:	if (is_64_bit) {
+  1011177:  454:	if (is_64_bit) {
        22:  455:		FatPtr64Impl *fptr64 = fptr->data;
        22:  456:		fptr64->id = (id * 2) + 1;
        22:  457:		fptr64->len = len - 3 * sizeof(u64);
@@ -3128,195 +3128,199 @@
        22:  459:		data_len = fptr64->len;
        22:  460:		data_ptr = fptr64->data;
         -:  461:	} else {
-  1001158:  462:		FatPtr32Impl *fptr32 = fptr->data;
-  1001158:  463:		fptr32->id = (id * 2);
-  1001158:  464:		fptr32->len = len - (2 * sizeof(u32) + sizeof(u64));
-  1001158:  465:		fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
-  1001158:  466:		data_len = fptr32->len;
-  1001158:  467:		data_ptr = fptr32->data;
+  1011155:  462:		FatPtr32Impl *fptr32 = fptr->data;
+  1011155:  463:		fptr32->id = (id * 2);
+  1011155:  464:		fptr32->len = len - (2 * sizeof(u32) + sizeof(u64));
+  1011155:  465:		fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
+  1011155:  466:		data_len = fptr32->len;
+  1011155:  467:		data_ptr = fptr32->data;
         -:  468:	}
         -:  469:
-  1001180:  470:	sd->cur_slabs += 1;
-  1001180:  471:	if (zeroed) {
+  1011177:  470:	sd->cur_slabs += 1;
+  1011177:  471:	if (zeroed) {
       500:  472:		for (u64 i = 0; i < data_len; i++) {
       480:  473:			data_ptr[i] = 0;
         -:  474:		}
         -:  475:	}
         -:  476:
-  1001180:  477:	return 0;
+  1011177:  477:	return 0;
         -:  478:}
         -:  479:
-  1001179:  480:void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit, bool zeroed) {
+  1011176:  480:void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit, bool zeroed) {
         -:  481:	u64 data_len;
         -:  482:	u8 *data_ptr;
-  1001179:  483:	if (is_64_bit) {
-       22:  484:		FatPtr64Impl *fptr64 = fptr->data;
-       22:  485:		data_len = fptr64->len;
-       22:  486:		data_ptr = fptr64->data;
-       22:  487:		u64 id = (fptr64->id - 1) / 2;
-       22:  488:		if (((u64 *)sd->free_list)[id] != (UINT64_MAX - 1)) {
-    #####:  489:			panic("Potential double free. Id = %llu.\n", id);
-        -:  490:		}
-       22:  491:		((u64 *)sd->free_list)[id] = sd->free_list_head;
-       22:  492:		sd->free_list_head = id;
-       22:  493:		if (sd->cur_slabs == 0)
-    #####:  494:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
-       22:  495:		sd->cur_slabs -= 1;
-        -:  496:	} else {
-  1001157:  497:		FatPtr32Impl *fptr32 = fptr->data;
-  1001157:  498:		data_len = fptr32->len;
-  1001157:  499:		data_ptr = fptr32->data;
-  1001157:  500:		u32 id = (fptr32->id) / 2;
-  1001157:  501:		if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
-    #####:  502:			panic("Potential double free. Id = %llu.\n", id);
-        -:  503:		}
-  1001157:  504:		((u32 *)sd->free_list)[id] = sd->free_list_head;
-  1001157:  505:		sd->free_list_head = id;
-  1001157:  506:		if (sd->cur_slabs == 0)
-    #####:  507:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
-  1001157:  508:		sd->cur_slabs -= 1;
-        -:  509:	}
-        -:  510:
-  1001179:  511:	if (zeroed) {
-      500:  512:		for (u64 i = 0; i < data_len; i++) {
-      480:  513:			data_ptr[i] = 0;
-        -:  514:		}
-        -:  515:	}
-  1001179:  516:}
-        -:  517:
-  1001200:  518:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
-  1001200:  519:	if (size == 0) {
-    #####:  520:		errno = EINVAL;
-    #####:  521:		return -1;
-        -:  522:	}
-        -:  523:
-  1001200:  524:	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
-  1001200:  525:	bool is_64_bit = impl->is_64_bit;
-  1001200:  526:	bool zeroed = impl->zeroed;
-        -:  527:	u32 needed;
-  1001200:  528:	if (is_64_bit)
-       23:  529:		needed = size + 3 * sizeof(u64);
-        -:  530:	else
-  1001177:  531:		needed = size + 2 * sizeof(u32) + sizeof(u64);
-  1001200:  532:	int index = slab_allocator_index(ptr, needed);
-        -:  533:	int ret;
-  1001200:  534:	if (impl->no_malloc && index < 0) {
-        7:  535:		return -1;
-  1001193:  536:	} else if (index < 0) {
-    #####:  537:		ret = -1;
-        -:  538:	} else {
-  1001193:  539:		SlabData *sd = &impl->sd_arr[index];
-  1001193:  540:		ret = slab_data_allocate(sd, fptr, is_64_bit, zeroed);
-        -:  541:	}
-        -:  542:
-        -:  543:	// we couldn't allocate via slabs. Use malloc if configured.
-  1001193:  544:	if (ret && !impl->no_malloc) {
-        -:  545:		void *val;
-        -:  546:		u64 data_len;
-        -:  547:
-        2:  548:		if (is_64_bit) {
-    #####:  549:			data_len = size + (3 * sizeof(u64));
-    #####:  550:			val = mymalloc(data_len);
-        -:  551:		} else {
-        2:  552:			data_len = size + (2 * sizeof(u32) + sizeof(u64));
-        2:  553:			val = mymalloc(data_len);
-        -:  554:		}
-        -:  555:
-        -:  556:		// malloc error
-        2:  557:		if (!val)
-    #####:  558:			return -1;
+  1011176:  483:	if (sd->free_list == NULL) {
+    #####:  484:		panic("free list not initialized (wrong slab allocator?)");
+        -:  485:	}
+        -:  486:
+  1011176:  487:	if (is_64_bit) {
+       22:  488:		FatPtr64Impl *fptr64 = fptr->data;
+       22:  489:		data_len = fptr64->len;
+       22:  490:		data_ptr = fptr64->data;
+       22:  491:		u64 id = (fptr64->id - 1) / 2;
+       22:  492:		if (((u64 *)sd->free_list)[id] != (UINT64_MAX - 1)) {
+    #####:  493:			panic("Potential double free. Id = %llu.\n", id);
+        -:  494:		}
+       22:  495:		((u64 *)sd->free_list)[id] = sd->free_list_head;
+       22:  496:		sd->free_list_head = id;
+       22:  497:		if (sd->cur_slabs == 0)
+    #####:  498:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
+       22:  499:		sd->cur_slabs -= 1;
+        -:  500:	} else {
+  1011154:  501:		FatPtr32Impl *fptr32 = fptr->data;
+  1011154:  502:		data_len = fptr32->len;
+  1011154:  503:		data_ptr = fptr32->data;
+  1011154:  504:		u32 id = (fptr32->id) / 2;
+  1011154:  505:		if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
+    #####:  506:			panic("Potential double free. Id = %llu.\n", id);
+        -:  507:		}
+  1011154:  508:		((u32 *)sd->free_list)[id] = sd->free_list_head;
+  1011154:  509:		sd->free_list_head = id;
+  1011154:  510:		if (sd->cur_slabs == 0)
+    #####:  511:			panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
+  1011154:  512:		sd->cur_slabs -= 1;
+        -:  513:	}
+        -:  514:
+  1011176:  515:	if (zeroed) {
+      500:  516:		for (u64 i = 0; i < data_len; i++) {
+      480:  517:			data_ptr[i] = 0;
+        -:  518:		}
+        -:  519:	}
+  1011176:  520:}
+        -:  521:
+  1011197:  522:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
+  1011197:  523:	if (size == 0) {
+    #####:  524:		errno = EINVAL;
+    #####:  525:		return -1;
+        -:  526:	}
+        -:  527:
+  1011197:  528:	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
+  1011197:  529:	bool is_64_bit = impl->is_64_bit;
+  1011197:  530:	bool zeroed = impl->zeroed;
+        -:  531:	u32 needed;
+  1011197:  532:	if (is_64_bit)
+       23:  533:		needed = size + 3 * sizeof(u64);
+        -:  534:	else
+  1011174:  535:		needed = size + 2 * sizeof(u32) + sizeof(u64);
+  1011197:  536:	int index = slab_allocator_index(ptr, needed);
+        -:  537:	int ret;
+  1011197:  538:	if (impl->no_malloc && index < 0) {
+        7:  539:		return -1;
+  1011190:  540:	} else if (index < 0) {
+    #####:  541:		ret = -1;
+        -:  542:	} else {
+  1011190:  543:		SlabData *sd = &impl->sd_arr[index];
+  1011190:  544:		ret = slab_data_allocate(sd, fptr, is_64_bit, zeroed);
+        -:  545:	}
+        -:  546:
+        -:  547:	// we couldn't allocate via slabs. Use malloc if configured.
+  1011190:  548:	if (ret && !impl->no_malloc) {
+        -:  549:		void *val;
+        -:  550:		u64 data_len;
+        -:  551:
+        2:  552:		if (is_64_bit) {
+    #####:  553:			data_len = size + (3 * sizeof(u64));
+    #####:  554:			val = mymalloc(data_len);
+        -:  555:		} else {
+        2:  556:			data_len = size + (2 * sizeof(u32) + sizeof(u64));
+        2:  557:			val = mymalloc(data_len);
+        -:  558:		}
         -:  559:
-        2:  560:		if (zeroed) {
-       25:  561:			for (u64 i = 0; i < data_len; i++) {
-       24:  562:				((u8 *)val)[i] = 0;
-        -:  563:			}
-        -:  564:		}
-        -:  565:
-        2:  566:		impl->cur_mallocs++;
-        2:  567:		ret = 0;
-        2:  568:		fptr->data = val;
+        -:  560:		// malloc error
+        2:  561:		if (!val)
+    #####:  562:			return -1;
+        -:  563:
+        2:  564:		if (zeroed) {
+       25:  565:			for (u64 i = 0; i < data_len; i++) {
+       24:  566:				((u8 *)val)[i] = 0;
+        -:  567:			}
+        -:  568:		}
         -:  569:
-        2:  570:		if (is_64_bit) {
-    #####:  571:			FatPtr64Impl *fptr64 = fptr->data;
-    #####:  572:			fptr64->id = MALLOC_64_ID;
-    #####:  573:			fptr64->len = size;
-    #####:  574:			fptr64->data = fptr->data + 3 * sizeof(u64);
-        -:  575:		} else {
-        2:  576:			FatPtr32Impl *fptr32 = fptr->data;
-        2:  577:			fptr32->id = MALLOC_32_ID;
-        2:  578:			fptr32->len = size;
-        2:  579:			fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
-        -:  580:		}
-        -:  581:	}
-  1001193:  582:	return ret;
-        -:  583:}
-  1001181:  584:void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
-  1001181:  585:	if (fptr == NULL || nil(*fptr)) {
-    #####:  586:		panic("Freeing a slab that's already nil. Double free?");
-        -:  587:	}
-  1001181:  588:	SlabAllocatorImpl *impl = ptr->impl;
-  1001181:  589:	bool is_64_bit = impl->is_64_bit;
-        -:  590:
-  1001181:  591:	if (is_64_bit) {
-       22:  592:		FatPtr64Impl *fptr64 = fptr->data;
-       22:  593:		if (fptr64->id == MALLOC_64_ID) {
-    #####:  594:			if (fptr->data) {
-    #####:  595:				if (impl->zeroed) {
-    #####:  596:					for (u64 i = 0; i < fptr64->len + 3 * sizeof(u64); i++) {
-    #####:  597:						((u8 *)fptr->data)[i] = 0;
-        -:  598:					}
-        -:  599:				}
-    #####:  600:				if (impl->cur_mallocs == 0)
-    #####:  601:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
-    #####:  602:				myfree(fptr->data);
-    #####:  603:				impl->cur_mallocs--;
-        -:  604:			}
-    #####:  605:			*fptr = null;
-    #####:  606:			return;
-        -:  607:		}
-        -:  608:	} else {
-  1001159:  609:		FatPtr32Impl *fptr32 = fptr->data;
-  1001159:  610:		if (fptr32->id == MALLOC_32_ID) {
-        2:  611:			if (fptr->data) {
-        2:  612:				if (impl->zeroed) {
-       17:  613:					for (u64 i = 0; i < fptr32->len + 2 * sizeof(u32) + sizeof(u64); i++) {
-       16:  614:						((u8 *)fptr->data)[i] = 0;
-        -:  615:					}
-        -:  616:				}
-        2:  617:				if (impl->cur_mallocs == 0)
-    #####:  618:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
-        2:  619:				myfree(fptr->data);
-        2:  620:				impl->cur_mallocs--;
-        -:  621:			}
-        2:  622:			*fptr = null;
-        2:  623:			return;
-        -:  624:		}
-        -:  625:	}
-        -:  626:
-        -:  627:	u32 needed;
-  1001179:  628:	if (is_64_bit)
-       22:  629:		needed = fat_ptr_len(fptr) + 3 * sizeof(u64);
-        -:  630:	else
-  1001157:  631:		needed = fat_ptr_len(fptr) + 2 * sizeof(u32) + sizeof(u64);
-  1001179:  632:	int index = slab_allocator_index(ptr, needed);
-  1001179:  633:	if (index < 0)
-    #####:  634:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-  1001179:  635:	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
-  1001179:  636:	if (needed != sd->type.slab_size)
-    #####:  637:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-  1001179:  638:	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit,
-  1001179:  639:				   ((SlabAllocatorImpl *)ptr->impl)->zeroed);
-  1001179:  640:	*fptr = null;
-        -:  641:}
-       32:  642:u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
-       32:  643:	SlabAllocatorImpl *impl = ptr->impl;
-       32:  644:	u64 ret = impl->cur_mallocs;
-        -:  645:
-     3379:  646:	for (u64 i = 0; i < impl->sd_size; i++) {
-     3347:  647:		ret += impl->sd_arr[i].cur_slabs;
-        -:  648:	}
-       32:  649:	return ret;
-        -:  650:}
+        2:  570:		impl->cur_mallocs++;
+        2:  571:		ret = 0;
+        2:  572:		fptr->data = val;
+        -:  573:
+        2:  574:		if (is_64_bit) {
+    #####:  575:			FatPtr64Impl *fptr64 = fptr->data;
+    #####:  576:			fptr64->id = MALLOC_64_ID;
+    #####:  577:			fptr64->len = size;
+    #####:  578:			fptr64->data = fptr->data + 3 * sizeof(u64);
+        -:  579:		} else {
+        2:  580:			FatPtr32Impl *fptr32 = fptr->data;
+        2:  581:			fptr32->id = MALLOC_32_ID;
+        2:  582:			fptr32->len = size;
+        2:  583:			fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
+        -:  584:		}
+        -:  585:	}
+  1011190:  586:	return ret;
+        -:  587:}
+  1011178:  588:void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
+  1011178:  589:	if (fptr == NULL || nil(*fptr)) {
+    #####:  590:		panic("Freeing a slab that's already nil. Double free?");
+        -:  591:	}
+  1011178:  592:	SlabAllocatorImpl *impl = ptr->impl;
+  1011178:  593:	bool is_64_bit = impl->is_64_bit;
+        -:  594:
+  1011178:  595:	if (is_64_bit) {
+       22:  596:		FatPtr64Impl *fptr64 = fptr->data;
+       22:  597:		if (fptr64->id == MALLOC_64_ID) {
+    #####:  598:			if (fptr->data) {
+    #####:  599:				if (impl->zeroed) {
+    #####:  600:					for (u64 i = 0; i < fptr64->len + 3 * sizeof(u64); i++) {
+    #####:  601:						((u8 *)fptr->data)[i] = 0;
+        -:  602:					}
+        -:  603:				}
+    #####:  604:				if (impl->cur_mallocs == 0)
+    #####:  605:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
+    #####:  606:				myfree(fptr->data);
+    #####:  607:				impl->cur_mallocs--;
+        -:  608:			}
+    #####:  609:			*fptr = null;
+    #####:  610:			return;
+        -:  611:		}
+        -:  612:	} else {
+  1011156:  613:		FatPtr32Impl *fptr32 = fptr->data;
+  1011156:  614:		if (fptr32->id == MALLOC_32_ID) {
+        2:  615:			if (fptr->data) {
+        2:  616:				if (impl->zeroed) {
+       17:  617:					for (u64 i = 0; i < fptr32->len + 2 * sizeof(u32) + sizeof(u64); i++) {
+       16:  618:						((u8 *)fptr->data)[i] = 0;
+        -:  619:					}
+        -:  620:				}
+        2:  621:				if (impl->cur_mallocs == 0)
+    #####:  622:					panic("Freeing malloc allocated pointer when none are pending. Double free?");
+        2:  623:				myfree(fptr->data);
+        2:  624:				impl->cur_mallocs--;
+        -:  625:			}
+        2:  626:			*fptr = null;
+        2:  627:			return;
+        -:  628:		}
+        -:  629:	}
+        -:  630:
+        -:  631:	u32 needed;
+  1011176:  632:	if (is_64_bit)
+       22:  633:		needed = fat_ptr_len(fptr) + 3 * sizeof(u64);
+        -:  634:	else
+  1011154:  635:		needed = fat_ptr_len(fptr) + 2 * sizeof(u32) + sizeof(u64);
+  1011176:  636:	int index = slab_allocator_index(ptr, needed);
+  1011176:  637:	if (index < 0)
+    #####:  638:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
+  1011176:  639:	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
+  1011176:  640:	if (needed != sd->type.slab_size)
+    #####:  641:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
+  1011176:  642:	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->is_64_bit,
+  1011176:  643:				   ((SlabAllocatorImpl *)ptr->impl)->zeroed);
+  1011176:  644:	*fptr = null;
+        -:  645:}
+       32:  646:u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
+       32:  647:	SlabAllocatorImpl *impl = ptr->impl;
+       32:  648:	u64 ret = impl->cur_mallocs;
+        -:  649:
+     3379:  650:	for (u64 i = 0; i < impl->sd_size; i++) {
+     3347:  651:		ret += impl->sd_arr[i].cur_slabs;
+        -:  652:	}
+       32:  653:	return ret;
+        -:  654:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
@@ -4144,592 +4148,675 @@
         -:   27:#define KEY_PAD 0
         -:   28:#define VALUE_PAD(key_size) (16 - (key_size % 16))
         -:   29:#define RED_OFFSET(key_size, value_size) (KEY_PAD + key_size + value_size + VALUE_PAD(key_size))
-        -:   30:#define RED(node, key_size, value_size) *(bool *)(node->data + RED_OFFSET(key_size, value_size))
-        -:   31:
-        -:   32:typedef struct RBTreeNode {
-        -:   33:	FatPtr self;
-        -:   34:	struct RBTreeNode *right;
-        -:   35:	struct RBTreeNode *left;
-        -:   36:	struct RBTreeNode *parent;
-        -:   37:	// bool red;
-        -:   38:	char data[];
-        -:   39:} RBTreeNode;
-        -:   40:
-        -:   41:typedef struct RBTreeImpl {
-        -:   42:	u64 key_size;
-        -:   43:	u64 value_size;
-        -:   44:	int (*compare)(const void *, const void *);
-        -:   45:	RBTreeNode *root;
-        -:   46:	u64 size;
-        -:   47:	bool send;
-        -:   48:} RBTreeImpl;
-        -:   49:
-        -:   50:typedef struct RBTreeIteratorImpl {
-        -:   51:	RBTreeNode *cur;
-        -:   52:	RBTreeNode *stack[128];
-        -:   53:	u64 key_size;
-        -:   54:	u8 stack_pointer;
-        -:   55:	bool send;
-        -:   56:} RBTreeIteratorImpl;
-        -:   57:
-        4:   58:void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
-        4:   59:	if (ptr != NULL && !nil(ptr->impl)) {
-        -:   60:		// obtain referent to internal RBTreeImpl structure
-        4:   61:		RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
-        -:   62:		// set appropriate chainguard status
-        8:   63:		ChainGuard _ = ChainSend(impl->send);
-        -:   64:
-        -:   65:		// free RBTreeImpl structure
-        4:   66:		chain_free(&ptr->impl);
-        -:   67:	}
-        4:   68:}
-        -:   69:
-     1008:   70:bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
-     1008:   71:	RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
-        -:   72:
-        -:   73:	// If the iterator is empty, we're done
-     1008:   74:	if (!impl->cur && impl->stack_pointer == 0) {
-        3:   75:		return false; // No more nodes to traverse
-        -:   76:	}
+        -:   30:#define SET_RED(impl, node)                                                                        \
+        -:   31:	({                                                                                             \
+        -:   32:		if (node && node != NIL) {                                                                 \
+        -:   33:			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
+        -:   34:			*(bool *)(node->data + offset) = true;                                                 \
+        -:   35:		} else                                                                                     \
+        -:   36:			printf("WARN: SET_RED on invalid node. node is NIL.\n");                               \
+        -:   37:	})
+        -:   38:#define SET_BLACK(impl, node)                                                                      \
+        -:   39:	({                                                                                             \
+        -:   40:		if (node && node != NIL) {                                                                 \
+        -:   41:			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
+        -:   42:			*(bool *)(node->data + offset) = false;                                                \
+        -:   43:		} else                                                                                     \
+        -:   44:			printf("WARN: SET_BLACK on invalid node. node is NIL.\n");                             \
+        -:   45:	})
+        -:   46:
+        -:   47:#define IS_RED(impl, node)                                                                         \
+        -:   48:	({                                                                                             \
+        -:   49:		bool ret = false;                                                                          \
+        -:   50:		u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                                 \
+        -:   51:		if (node && node != NIL && node->data && *(bool *)(node->data + offset))                   \
+        -:   52:			ret = true;                                                                            \
+        -:   53:		ret;                                                                                       \
+        -:   54:	})
+        -:   55:#define IS_BLACK(impl, node)                                                                       \
+        -:   56:	({                                                                                             \
+        -:   57:		bool ret = true;                                                                           \
+        -:   58:		u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                                 \
+        -:   59:		if (node && node != NIL && node->data && *(bool *)(node->data + offset))                   \
+        -:   60:			ret = false;                                                                           \
+        -:   61:		ret;                                                                                       \
+        -:   62:	})
+        -:   63:
+        -:   64:static u64 node_id_counter = 10;
+        -:   65:
+        -:   66:typedef struct RBTreeNode {
+        -:   67:	FatPtr self;
+        -:   68:	struct RBTreeNode *right;
+        -:   69:	struct RBTreeNode *left;
+        -:   70:	struct RBTreeNode *parent;
+        -:   71:#ifdef TEST
+        -:   72:	u64 node_id;
+        -:   73:	u64 pad;
+        -:   74:#endif // TEST
+        -:   75:	char data[];
+        -:   76:} RBTreeNode;
         -:   77:
-        -:   78:	// Traverse the tree
-     2010:   79:	while (impl->cur || impl->stack_pointer > 0) {
-        -:   80:		// Traverse left subtree
-     2010:   81:		if (impl->cur) {
-     1005:   82:			if (impl->stack_pointer < 128) {
-        -:   83:				// Push the current node pointer onto the stack
-     1005:   84:				impl->stack[impl->stack_pointer++] = impl->cur;
-        -:   85:			} else {
-    #####:   86:				panic("Iterator stack overflow");
-        -:   87:			}
-        -:   88:
-        -:   89:			// Move to the left child
-     1005:   90:			impl->cur = impl->cur->left;
-        -:   91:		} else {
-        -:   92:			// Pop the top node from the stack
-     1005:   93:			impl->cur = impl->stack[--impl->stack_pointer];
+        -:   78:typedef struct RBTreeImpl {
+        -:   79:	u64 key_size;
+        -:   80:	u64 value_size;
+        -:   81:	int (*compare)(const void *, const void *);
+        -:   82:	RBTreeNode *root;
+        -:   83:	u64 size;
+        -:   84:	bool send;
+        -:   85:} RBTreeImpl;
+        -:   86:
+        -:   87:typedef struct RBTreeIteratorImpl {
+        -:   88:	RBTreeNode *cur;
+        -:   89:	RBTreeNode *stack[128];
+        -:   90:	u64 key_size;
+        -:   91:	u8 stack_pointer;
+        -:   92:	bool send;
+        -:   93:} RBTreeIteratorImpl;
         -:   94:
-        -:   95:			// Store the current node's data to return
-     1005:   96:			void *ret = impl->cur->data;
-        -:   97:
-        -:   98:			// Move to the right child after visiting this node
-     1005:   99:			impl->cur = impl->cur->right;
-        -:  100:
-     1005:  101:			kv->key = ret + KEY_PAD;
-     1005:  102:			kv->value = ret + KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size;
-     1005:  103:			return true; // Return the node's data
-        -:  104:		}
-        -:  105:	}
+        -:   95:static RBTreeNode NIL_DEFN = {.self = null};
+        -:   96:static RBTreeNode *NIL = &NIL_DEFN;
+        -:   97:static RBTreeNode NONE_DEFN = {.self = null};
+        -:   98:static RBTreeNode *NONE = &NONE_DEFN;
+        -:   99:
+        4:  100:void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
+        4:  101:	if (!nil(ptr->impl)) {
+        -:  102:		// obtain referent to internal RBTreeImpl structure
+        4:  103:		RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
+        -:  104:		// set appropriate chainguard status
+        8:  105:		ChainGuard _ = ChainSend(impl->send);
         -:  106:
-    #####:  107:	return false; // Traversal complete
-        -:  108:}
-        -:  109:
-        -:  110:// Utility function to perform left rotation
-      323:  111:void leftRotate(RBTree *ptr, RBTreeNode *x) {
-      323:  112:	RBTreeImpl *impl = $Ref(&ptr->impl);
-      323:  113:	RBTreeNode *y = x->right;
-      323:  114:	x->right = y->left;
-      323:  115:	if (y->left != NULL) {
-       98:  116:		y->left->parent = x;
-        -:  117:	}
-      323:  118:	y->parent = x->parent;
-      323:  119:	if (x->parent == NULL) {
-        4:  120:		impl->root = y;
-      319:  121:	} else if (x == x->parent->left) {
-      187:  122:		x->parent->left = y;
-        -:  123:	} else {
-      132:  124:		x->parent->right = y;
-        -:  125:	}
-      323:  126:	y->left = x;
-      323:  127:	x->parent = y;
-      323:  128:}
-        -:  129:
-        -:  130:// Utility function to perform right rotation
-      321:  131:void rightRotate(RBTree *ptr, RBTreeNode *x) {
-      321:  132:	RBTreeImpl *impl = $Ref(&ptr->impl);
-      321:  133:	RBTreeNode *y = x->left;
-      321:  134:	x->left = y->right;
-      321:  135:	if (y->right != NULL) {
-       97:  136:		y->right->parent = x;
-        -:  137:	}
-      321:  138:	y->parent = x->parent;
-      321:  139:	if (x->parent == NULL) {
-        3:  140:		impl->root = y;
-      318:  141:	} else if (x == x->parent->right) {
-      209:  142:		x->parent->right = y;
-        -:  143:	} else {
-      109:  144:		x->parent->left = y;
-        -:  145:	}
-      321:  146:	y->right = x;
-      321:  147:	x->parent = y;
-      321:  148:}
-        -:  149:
-     1010:  150:void rbtree_fix_up(RBTree *ptr, RBTreeNode *k) {
-     1010:  151:	RBTreeImpl *impl = $Ref(&ptr->impl);
-     1010:  152:	u64 key_size = impl->key_size;
-     1010:  153:	u64 value_size = impl->value_size;
-        -:  154:
-     1902:  155:	while (k && k != impl->root && k->parent && RED(k->parent, key_size, value_size)) {
-        -:  156:
-      892:  157:		if (k->parent == k->parent->parent->left) {
-      440:  158:			RBTreeNode *u = k->parent->parent->right; // Uncle
-        -:  159:
-      440:  160:			if (u && RED(u, key_size, value_size)) {
-        -:  161:				// Case 1: Uncle is red
-      260:  162:				RED(k->parent, key_size, value_size) = false;		 // Parent to black
-      260:  163:				RED(u, key_size, value_size) = false;				 // Uncle to black
-      260:  164:				RED(k->parent->parent, key_size, value_size) = true; // GP to red
-      260:  165:				k = k->parent->parent;								 // Move up
-        -:  166:			} else {
-        -:  167:				// Case 2: Uncle is black or NULL
-      180:  168:				if (k == k->parent->right) {
-       89:  169:					k = k->parent;
-       89:  170:					leftRotate(ptr, k);
-        -:  171:				}
-      180:  172:				RED(k->parent, key_size, value_size) = false;		 // Parent to black
-      180:  173:				RED(k->parent->parent, key_size, value_size) = true; // GP to red
-      180:  174:				rightRotate(ptr, k->parent->parent);
-        -:  175:			}
-        -:  176:		} else {
-      452:  177:			RBTreeNode *u = k->parent->parent->left; // Uncle
-        -:  178:
-      452:  179:			if (u && RED(u, key_size, value_size)) {
-        -:  180:				// Case 1: Uncle is red
-      249:  181:				RED(k->parent, key_size, value_size) = false;		 // Parent to black
-      249:  182:				RED(u, key_size, value_size) = false;				 // Uncle to black
-      249:  183:				RED(k->parent->parent, key_size, value_size) = true; // GP to red
-      249:  184:				k = k->parent->parent;								 // Move up
-        -:  185:			} else {
-        -:  186:				// Case 2: Uncle is black or NULL
-      203:  187:				if (k == k->parent->left) {
-      100:  188:					k = k->parent;
-      100:  189:					rightRotate(ptr, k);
-        -:  190:				}
-      203:  191:				RED(k->parent, key_size, value_size) = false;		 // Parent to black
-      203:  192:				RED(k->parent->parent, key_size, value_size) = true; // GP to red
-      203:  193:				leftRotate(ptr, k->parent->parent);
-        -:  194:			}
-        -:  195:		}
-        -:  196:
-        -:  197:		// After the adjustments, check the colors again for debugging
-        -:  198:	}
-        -:  199:
-        -:  200:	// Ensure the root is always black
-     1010:  201:	if (impl->root) {
-     1010:  202:		RED(impl->root, key_size, value_size) = false;
-        -:  203:	}
-     1010:  204:}
-        -:  205:
-      561:  206:void rbtree_delete_fixup(RBTree *ptr, RBTreeNode *x) {
-      561:  207:	RBTreeImpl *impl = $Ref(&ptr->impl);
-      561:  208:	u64 key_size = impl->key_size;
-      561:  209:	u64 value_size = impl->value_size;
-        -:  210:
-      735:  211:	while (x != impl->root && (!x || !RED(x, key_size, value_size))) {
-      573:  212:		if (x == NULL || x->parent == NULL) {
-        -:  213:			break; // No more fixup needed, exit the loop
-        -:  214:		}
-        -:  215:
-      174:  216:		if (x == x->parent->left) {
-       78:  217:			RBTreeNode *w = x->parent->right; // sibling
-        -:  218:
-       78:  219:			if (w != NULL && RED(w, key_size, value_size)) {
-       12:  220:				RED(w, key_size, value_size) = false;		 // Case 1: Sibling is red
-       12:  221:				RED(x->parent, key_size, value_size) = true; // Parent becomes red
-       12:  222:				leftRotate(ptr, x->parent);					 // Rotate around parent
-       12:  223:				w = x->parent->right;						 // Update w to the new sibling
-        -:  224:			}
-        -:  225:
-       78:  226:			if (w == NULL) {
-       14:  227:				x = x->parent; // Move up the tree if the sibling is NULL
-       64:  228:			} else if ((!w->left || !RED(w->left, key_size, value_size)) &&
-       53:  229:					   (!w->right || !RED(w->right, key_size, value_size))) {
-       48:  230:				RED(w, key_size, value_size) = true; // Case 2: Both children are black
-       48:  231:				x = x->parent;						 // Move up the tree
-        -:  232:			} else {
-       16:  233:				if (!w->right || !RED(w->right, key_size, value_size)) {
-        -:  234:					// Case 3: Left child is red, right child is black
-        7:  235:					if (w->left) {
-        7:  236:						RED(w->left, key_size, value_size) = false; // Set left child to black
-        -:  237:					}
-        7:  238:					RED(w, key_size, value_size) = true; // Set sibling to red
-        7:  239:					rightRotate(ptr, w);				 // Rotate around w
-        7:  240:					w = x->parent->right;				 // Update w
-        -:  241:				}
-        -:  242:
-        -:  243:				// Case 4: Right child is red
-       16:  244:				RED(w, key_size, value_size) =
-       16:  245:					RED(x->parent, key_size, value_size);	  // Copy parent's color
-       16:  246:				RED(x->parent, key_size, value_size) = false; // Parent becomes black
-       16:  247:				if (w->right) {
-       16:  248:					RED(w->right, key_size, value_size) = false; // Make the right child black
-        -:  249:				}
-       16:  250:				leftRotate(ptr, x->parent); // Rotate around parent
-       16:  251:				x = impl->root;				// Break out of the loop
-        -:  252:			}
-        -:  253:		} else {
-       96:  254:			RBTreeNode *w = x->parent->left; // sibling
-        -:  255:
-       96:  256:			if (w != NULL && RED(w, key_size, value_size)) {
-       16:  257:				RED(w, key_size, value_size) = false;		 // Case 1: Sibling is red
-       16:  258:				RED(x->parent, key_size, value_size) = true; // Parent becomes red
-       16:  259:				rightRotate(ptr, x->parent);				 // Rotate around parent
-       16:  260:				w = x->parent->left;						 // Update w to the new sibling
-        -:  261:			}
-        -:  262:
-       96:  263:			if (w == NULL) {
-        9:  264:				x = x->parent; // Move up the tree if the sibling is NULL
-       87:  265:			} else if ((!w->right || !RED(w->right, key_size, value_size)) &&
-       84:  266:					   (!w->left || !RED(w->left, key_size, value_size))) {
-       69:  267:				RED(w, key_size, value_size) = true; // Case 2: Both children are black
-       69:  268:				x = x->parent;						 // Move up the tree
-        -:  269:			} else {
-       18:  270:				if (!w->left || !RED(w->left, key_size, value_size)) {
-        -:  271:					// Case 3: Right child is red, left child is black
-        3:  272:					if (w->right) {
-        3:  273:						RED(w->right, key_size, value_size) = false; // Set right child to black
-        -:  274:					}
-        3:  275:					RED(w, key_size, value_size) = true; // Set sibling to red
-        3:  276:					leftRotate(ptr, w);					 // Rotate around w
-        3:  277:					w = x->parent->left;				 // Update w
-        -:  278:				}
-        -:  279:
-        -:  280:				// Case 4: Left child is red
-       18:  281:				RED(w, key_size, value_size) =
-       18:  282:					RED(x->parent, key_size, value_size);	  // Copy parent's color
-       18:  283:				RED(x->parent, key_size, value_size) = false; // Parent becomes black
-       18:  284:				if (w->left) {
-       18:  285:					RED(w->left, key_size, value_size) = false; // Make the left child black
-        -:  286:				}
-       18:  287:				rightRotate(ptr, x->parent); // Rotate around parent
-       18:  288:				x = impl->root;				 // Break out of the loop
-        -:  289:			}
-        -:  290:		}
-        -:  291:	}
-      561:  292:	if (impl->size != 0 && x) {
-      160:  293:		RED(x, key_size, value_size) = false; // Ensure the root is black
-        -:  294:	}
-      561:  295:}
-        -:  296:
-        -:  297:// Rbtree build function has the 'send' parameter. This parameter indicates whether or
-        -:  298:// not the Rbtree can be send into another thread. If it can be sent into another
-        -:  299:// thread, the globaly sync allocator is used for all functions.
-        4:  300:int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
-        -:  301:				 int (*compare)(const void *, const void *), bool send) {
-        -:  302:	// Obtain the chainguard based on the boolean 'send'. If this is a send, the
-        -:  303:	// ChainGuard macro returns the global sync allocator's send guard and all memory
-        -:  304:	// allocations will use the thread-safe global_sync allocator. Otherwise, the thread
-        -:  305:	// local version will be used.
-        8:  306:	ChainGuard _ = ChainSend(send);
-        -:  307:
-        -:  308:	// validate input
-        4:  309:	if (ptr == NULL || key_size == 0 || value_size == 0 || compare == NULL) {
-    #####:  310:		errno = EINVAL;
-    #####:  311:		return -1;
-        -:  312:	}
-        -:  313:
-        -:  314:	// try to allocate required size for RBTreeImpl
-        4:  315:	if (chain_malloc(&ptr->impl, sizeof(RBTreeImpl))) {
-        -:  316:		// set the fatptr to null so it's not cleaned up in cleanup function
-    #####:  317:		ptr->impl = null;
-    #####:  318:		return -1;
-        -:  319:	}
-        -:  320:
-        -:  321:	// Obtain the reference to the fat pointers data using the $Ref macro
-        4:  322:	RBTreeImpl *impl = $Ref(&ptr->impl);
-        -:  323:
-        -:  324:	// initialize values of the RBTree structure
-        4:  325:	impl->send = send;
-        4:  326:	impl->key_size = key_size;
-        4:  327:	impl->value_size = value_size;
-        4:  328:	impl->compare = compare;
-        4:  329:	impl->root = NULL;
-        4:  330:	impl->size = 0;
-        -:  331:
-        -:  332:	// return success
-        4:  333:	return 0;
-        -:  334:}
-        -:  335:
-       20:  336:void rbtree_free_node(RBTreeNode *ptr) {
-       20:  337:	if (ptr != NULL) {
-        8:  338:		rbtree_free_node(ptr->right);
-        8:  339:		rbtree_free_node(ptr->left);
-        8:  340:		chain_free(&ptr->self);
-        -:  341:	}
-       20:  342:}
-        -:  343:
-        -:  344:// cleanup function selects appropriate ChainGuard based on configuration and
-        -:  345:// deallocates memory
-        4:  346:void rbtree_cleanup(RBTreeNc *ptr) {
-        -:  347:	// check non-initialized conditions
-        4:  348:	if (ptr != NULL && !nil(ptr->impl)) {
-        -:  349:		// obtain referent to internal RBTree structure
-        4:  350:		RBTreeImpl *impl = $Ref(&ptr->impl);
-        -:  351:		// set appropriate chainguard status
-        8:  352:		ChainGuard _ = ChainSend(impl->send);
-        -:  353:
-        4:  354:		rbtree_free_node(impl->root);
-        -:  355:
-        -:  356:		// free RBTreeImpl structure
-        4:  357:		chain_free(&ptr->impl);
-        -:  358:	}
-        4:  359:}
-        -:  360:
-     1010:  361:int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
-     1010:  362:	if (ptr == NULL || nil(ptr->impl)) {
-    #####:  363:		errno = EINVAL;
-    #####:  364:		return -1;
-        -:  365:	}
-     1010:  366:	RBTreeImpl *impl = $Ref(&ptr->impl);
-     2020:  367:	ChainGuard _ = ChainSend(impl->send);
-     1010:  368:	RBTreeNode *parent = NULL;
-     1010:  369:	RBTreeNode *check = impl->root;
-     1010:  370:	bool is_right = false;
-        -:  371:
-     8811:  372:	loop {
-     9821:  373:		RBTreeNode *node = NULL;
-     9821:  374:		if (check == NULL) {
-        -:  375:			FatPtr self;
-     1010:  376:			u64 size = sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char) +
-     1010:  377:					   KEY_PAD + VALUE_PAD(impl->key_size) + BOOLEAN_SIZE;
-     1010:  378:			if (chain_malloc(&self, size)) {
-    #####:  379:				return -1;
-        -:  380:			}
-     1010:  381:			node = $Ref(&self);
-     1010:  382:			if (impl->root == NULL)
-        5:  383:				impl->root = node;
-     1005:  384:			else if (is_right)
-      502:  385:				parent->right = node;
-        -:  386:			else
-      503:  387:				parent->left = node;
-        -:  388:
-     1010:  389:			memcpy((char *)node->data + KEY_PAD, key, impl->key_size);
-     1010:  390:			memcpy(node->data + KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size, value,
-     1010:  391:				   impl->value_size);
-     1010:  392:			node->data[KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size + impl->value_size] =
-        -:  393:				true;
-     1010:  394:			node->self = self;
-     1010:  395:			node->right = NULL;
-     1010:  396:			node->left = NULL;
-     1010:  397:			node->parent = parent;
-     1010:  398:			impl->size++;
-     1010:  399:			rbtree_fix_up(ptr, node);
-     1010:  400:			break;
-        -:  401:		}
-     8811:  402:		parent = check;
-     8811:  403:		int v = impl->compare(check->data + KEY_PAD, key);
-     8811:  404:		if (v == 0) {
-    #####:  405:			return -1;
-     8811:  406:		} else if (v < 0) {
-     4350:  407:			is_right = true;
-     4350:  408:			check = check->right;
-        -:  409:		} else {
-     4461:  410:			is_right = false;
-     4461:  411:			check = check->left;
-        -:  412:		}
-        -:  413:	}
-        -:  414:
-     1010:  415:	return 0;
-        -:  416:}
-        -:  417:
-     1002:  418:int rbtree_delete(RBTree *ptr, const void *key) {
-     1002:  419:	if (ptr == NULL || nil(ptr->impl)) {
-    #####:  420:		errno = EINVAL;
-    #####:  421:		return -1;
-        -:  422:	}
-        -:  423:
-     1002:  424:	RBTreeImpl *impl = $Ref(&ptr->impl);
-     1002:  425:	u64 key_size = impl->key_size;
-     1002:  426:	u64 value_size = impl->value_size;
-     2004:  427:	ChainGuard _ = ChainSend(impl->send);
-        -:  428:
-     1002:  429:	RBTreeNode *check = impl->root;
-     1002:  430:	RBTreeNode *nodeToDelete = NULL; // Node to be deleted
-     1002:  431:	RBTreeNode *child = NULL;		 // Child to replace the node
-     1002:  432:	bool wasBlack = false;			 // To track if the deleted node is black
-        -:  433:
-        -:  434:	// Find the node to delete
-     8727:  435:	while (check != NULL) {
-     8727:  436:		int v = impl->compare(check->data + KEY_PAD, key);
-     8727:  437:		if (v == 0) {
-     1002:  438:			nodeToDelete = check; // Found the node to delete
-     1002:  439:			break;
-     7725:  440:		} else if (v < 0) {
-     3740:  441:			check = check->right;
-        -:  442:		} else {
-     3985:  443:			check = check->left;
-        -:  444:		}
-        -:  445:	}
-        -:  446:
-     1002:  447:	if (nodeToDelete == NULL) {
-    #####:  448:		return -1; // Node not found
+        -:  107:		// free RBTreeImpl structure
+        4:  108:		chain_free(&ptr->impl);
+        -:  109:	}
+        4:  110:}
+        -:  111:
+     1008:  112:bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
+     1008:  113:	RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
+        -:  114:
+        -:  115:	// If the iterator is empty, we're done
+    1008*:  116:	if (!impl->cur && impl->stack_pointer == 0) {
+    #####:  117:		return false; // No more nodes to traverse
+        -:  118:	}
+        -:  119:
+        -:  120:	// Traverse the tree
+     2013:  121:	while (impl->cur != NIL || impl->stack_pointer > 0) {
+        -:  122:		// Traverse left subtree
+     2010:  123:		if (impl->cur != NIL) {
+     1005:  124:			if (impl->stack_pointer < 128) {
+        -:  125:				// Push the current node pointer onto the stack
+     1005:  126:				impl->stack[impl->stack_pointer++] = impl->cur;
+        -:  127:			} else {
+    #####:  128:				panic("Iterator stack overflow");
+        -:  129:			}
+        -:  130:
+        -:  131:			// Move to the left child
+     1005:  132:			impl->cur = impl->cur->left;
+        -:  133:		} else {
+        -:  134:			// Pop the top node from the stack
+     1005:  135:			impl->cur = impl->stack[--impl->stack_pointer];
+        -:  136:
+        -:  137:			// Store the current node's data to return
+     1005:  138:			void *ret = impl->cur->data;
+        -:  139:
+        -:  140:			// Move to the right child after visiting this node
+     1005:  141:			impl->cur = impl->cur->right;
+        -:  142:
+     1005:  143:			kv->key = ret + KEY_PAD;
+     1005:  144:			kv->value = ret + KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size;
+     1005:  145:			return true; // Return the node's data
+        -:  146:		}
+        -:  147:	}
+        -:  148:
+        3:  149:	return false; // Traversal complete
+        -:  150:}
+        -:  151:
+        -:  152:// Utility function to perform left rotation
+    12828:  153:void leftRotate(RBTreeImpl *impl, RBTreeNode *x) {
+    12828:  154:	RBTreeNode *y = x->right;
+    12828:  155:	x->right = y->left;
+    12828:  156:	if (y->left)
+    12828:  157:		y->left->parent = x;
+    12828:  158:	y->parent = x->parent;
+    12828:  159:	if (x->parent == NONE) {
+       32:  160:		impl->root = y;
+    12796:  161:	} else if (x == x->parent->left) {
+     2707:  162:		x->parent->left = y;
+        -:  163:	} else {
+    10089:  164:		x->parent->right = y;
+        -:  165:	}
+    12828:  166:	y->left = x;
+    12828:  167:	x->parent = y;
+    12828:  168:}
+        -:  169:
+        -:  170:// Utility function to perform right rotation
+      349:  171:void rightRotate(RBTreeImpl *impl, RBTreeNode *x) {
+      349:  172:	RBTreeNode *y = x->left;
+      349:  173:	x->left = y->right;
+      349:  174:	if (y->right)
+      349:  175:		y->right->parent = x;
+      349:  176:	y->parent = x->parent;
+      349:  177:	if (x->parent == NONE) {
+        2:  178:		impl->root = y;
+      347:  179:	} else if (x == x->parent->right) {
+      231:  180:		x->parent->right = y;
+        -:  181:	} else {
+      116:  182:		x->parent->left = y;
+        -:  183:	}
+      349:  184:	y->right = x;
+      349:  185:	x->parent = y;
+      349:  186:}
+        -:  187:
+    11007:  188:void rbtree_fix_up(RBTree *ptr, RBTreeNode *k) {
+    11007:  189:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        -:  190:
+    31845:  191:	while (k && k != impl->root && IS_RED(impl, k->parent)) {
+        -:  192:
+    20838:  193:		if (k->parent == k->parent->parent->left) {
+      422:  194:			RBTreeNode *u = k->parent->parent->right;
+        -:  195:
+      422:  196:			if (IS_RED(impl, u)) {
+     240*:  197:				SET_BLACK(impl, k->parent);
+     240*:  198:				SET_BLACK(impl, u);
+     240*:  199:				SET_RED(impl, k->parent->parent);
+      240:  200:				k = k->parent->parent;
+        -:  201:			} else {
+      182:  202:				if (k == k->parent->right) {
+       96:  203:					k = k->parent;
+       96:  204:					leftRotate(impl, k);
+        -:  205:				}
+     182*:  206:				SET_BLACK(impl, k->parent);
+     182*:  207:				SET_RED(impl, k->parent->parent);
+      182:  208:				rightRotate(impl, k->parent->parent);
+        -:  209:			}
+        -:  210:		} else {
+    20416:  211:			RBTreeNode *u = k->parent->parent->left;
+        -:  212:
+    20416:  213:			if (IS_RED(impl, u)) {
+   10234*:  214:				SET_BLACK(impl, k->parent);
+   10234*:  215:				SET_BLACK(impl, u);
+   10234*:  216:				SET_RED(impl, k->parent->parent);
+    10234:  217:				k = k->parent->parent;
+        -:  218:			} else {
+    10182:  219:				if (k == k->parent->left) {
+      111:  220:					k = k->parent;
+      111:  221:					rightRotate(impl, k);
+        -:  222:				}
+   10182*:  223:				SET_BLACK(impl, k->parent);
+   10182*:  224:				SET_RED(impl, k->parent->parent);
+    10182:  225:				leftRotate(impl, k->parent->parent);
+        -:  226:			}
+        -:  227:		}
+        -:  228:	}
+   11007*:  229:	SET_BLACK(impl, impl->root);
+    11007:  230:}
+        -:  231:
+        4:  232:int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
+        -:  233:				 int (*compare)(const void *, const void *), bool send) {
+        8:  234:	ChainGuard _ = ChainSend(send);
+        -:  235:
+        -:  236:	// validate input
+        4:  237:	if (ptr == NULL || key_size == 0 || value_size == 0 || compare == NULL) {
+    #####:  238:		errno = EINVAL;
+    #####:  239:		return -1;
+        -:  240:	}
+        -:  241:
+        -:  242:	// try to allocate required size for RBTreeImpl
+        4:  243:	if (chain_malloc(&ptr->impl, sizeof(RBTreeImpl))) {
+        -:  244:		// set the fatptr to null so it's not cleaned up in cleanup function
+    #####:  245:		ptr->impl = null;
+    #####:  246:		return -1;
+        -:  247:	}
+        -:  248:
+        -:  249:	// Obtain the reference to the fat pointers data using the $Ref macro
+        4:  250:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        -:  251:
+        -:  252:	// initialize values of the RBTree structure
+        4:  253:	impl->send = send;
+        4:  254:	impl->key_size = key_size;
+        4:  255:	impl->value_size = value_size;
+        4:  256:	impl->compare = compare;
+        4:  257:	impl->root = NIL;
+        4:  258:	impl->size = 0;
+        -:  259:
+        -:  260:	// return success
+        4:  261:	return 0;
+        -:  262:}
+        -:  263:
+       14:  264:void rbtree_free_node(RBTreeNode *ptr) {
+       14:  265:	if (ptr != NIL) {
+        -:  266:		// recursively free right node
+        5:  267:		rbtree_free_node(ptr->right);
+        -:  268:		// recursively free left node
+        5:  269:		rbtree_free_node(ptr->left);
+        -:  270:		// chain free current node
+        5:  271:		chain_free(&ptr->self);
+        -:  272:	}
+       14:  273:}
+        -:  274:
+        -:  275:// cleanup function selects appropriate ChainGuard based on configuration and
+        -:  276:// deallocates memory
+        4:  277:void rbtree_cleanup(RBTreeNc *ptr) {
+        -:  278:	// check non-initialized conditions
+        4:  279:	if (!nil(ptr->impl)) {
+        -:  280:		// obtain referent to internal RBTree structure
+        4:  281:		RBTreeImpl *impl = $Ref(&ptr->impl);
+        -:  282:		// set appropriate chainguard status
+        8:  283:		ChainGuard _ = ChainSend(impl->send);
+        -:  284:
+        4:  285:		rbtree_free_node(impl->root);
+        -:  286:
+        -:  287:		// free RBTreeImpl structure
+        4:  288:		chain_free(&ptr->impl);
+        -:  289:	}
+        4:  290:}
+        -:  291:
+    11007:  292:int rbtree_insert_node(RBTree *ptr, RBTreeNode *parent, bool is_right, const void *key,
+        -:  293:					   const void *value) {
+    11007:  294:	RBTreeImpl *impl = $Ref(&ptr->impl);
+    22014:  295:	ChainGuard _ = ChainSend(impl->send);
+        -:  296:	RBTreeNode *node;
+        -:  297:
+        -:  298:	FatPtr self;
+    11007:  299:	u64 size = sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char) + KEY_PAD +
+    11007:  300:			   VALUE_PAD(impl->key_size) + BOOLEAN_SIZE;
+    11007:  301:	if (chain_malloc(&self, size)) {
+    #####:  302:		return -1;
+        -:  303:	}
+        -:  304:
+    11007:  305:	node = $Ref(&self);
+    11007:  306:	if (impl->root == NIL)
+        5:  307:		impl->root = node;
+    11002:  308:	else if (is_right)
+    10504:  309:		parent->right = node;
+        -:  310:	else
+      498:  311:		parent->left = node;
+        -:  312:
+    11007:  313:	memcpy((char *)node->data + KEY_PAD, key, impl->key_size);
+    11007:  314:	memcpy(node->data + KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size, value,
+    11007:  315:		   impl->value_size);
+    11007:  316:	node->data[KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size + impl->value_size] = true;
+    11007:  317:	node->self = self;
+    11007:  318:	node->right = NIL;
+    11007:  319:	node->left = NIL;
+    11007:  320:	node->parent = parent;
+        -:  321:#ifdef TEST
+    11007:  322:	node->node_id = node_id_counter++;
+        -:  323:#endif // TEST
+    11007:  324:	impl->size++;
+    11007:  325:	rbtree_fix_up(ptr, node);
+        -:  326:
+    11007:  327:	return 0;
+        -:  328:}
+        -:  329:
+    11007:  330:int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
+    11007:  331:	if (ptr == NULL || nil(ptr->impl)) {
+    #####:  332:		errno = EINVAL;
+    #####:  333:		return -1;
+        -:  334:	}
+    11007:  335:	RBTreeImpl *impl = $Ref(&ptr->impl);
+    11007:  336:	RBTreeNode *parent = NONE;
+    11007:  337:	RBTreeNode *check = impl->root;
+    11007:  338:	bool is_right = false;
+        -:  339:
+   220154:  340:	loop {
+   231161:  341:		if (check == NIL) {
+    11007:  342:			if (rbtree_insert_node(ptr, parent, is_right, key, value))
+    #####:  343:				return -1;
+    11007:  344:			break;
+        -:  345:		}
+   220154:  346:		parent = check;
+   220154:  347:		int v = impl->compare(check->data + KEY_PAD, key);
+   220154:  348:		if (v == 0) {
+    #####:  349:			return -1;
+   220154:  350:		} else if (v < 0) {
+   215976:  351:			is_right = true;
+   215976:  352:			check = check->right;
+        -:  353:		} else {
+     4178:  354:			is_right = false;
+     4178:  355:			check = check->left;
+        -:  356:		}
+        -:  357:	}
+        -:  358:
+    11007:  359:	return 0;
+        -:  360:}
+        -:  361:
+    11353:  362:void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
+    11353:  363:	if (dst->parent == NONE)
+       11:  364:		impl->root = src;
+    11342:  365:	else if (dst == dst->parent->left)
+    10836:  366:		dst->parent->left = src;
+        -:  367:	else
+      506:  368:		dst->parent->right = src;
+    11353:  369:	if (src != NIL) {
+     5825:  370:		src->parent = dst->parent;
+        -:  371:	}
+    11353:  372:	if (src == NIL && dst->parent == NONE) {
+        3:  373:		impl->root = NIL;
+        -:  374:	}
+    11353:  375:}
+        -:  376:
+     5279:  377:void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
+    10439:  378:	while (x != impl->root && IS_BLACK(impl, x)) {
+     5160:  379:		if (x == x->parent->left) {
+     5082:  380:			RBTreeNode *w = x->parent->right; // Sibling of x
+        -:  381:
+        -:  382:			// Case 1: Sibling is red
+     5082:  383:			if (IS_RED(impl, w)) {
+    2500*:  384:				SET_BLACK(impl, w);
+        -:  385:				// printf("calling set red 1\n");
+    2500*:  386:				SET_RED(impl, x->parent);
+        -:  387:				// printf("set red 1 complete\n");
+     2500:  388:				leftRotate(impl, x->parent);
+     2500:  389:				w = x->parent->right;
+        -:  390:			}
+        -:  391:
+        -:  392:			// Case 2: Sibling's children are both black
+     5082:  393:			if (IS_BLACK(impl, w->left) && IS_BLACK(impl, w->right)) {
+     5044:  394:				SET_RED(impl, w);
+     5044:  395:				x = x->parent;
+        -:  396:			} else {
+        -:  397:				// Case 3: Sibling's right child is black, left child is red
+       38:  398:				if (IS_BLACK(impl, w->right)) {
+      14*:  399:					SET_BLACK(impl, w->left);
+      14*:  400:					SET_RED(impl, w);
+       14:  401:					rightRotate(impl, w);
+       14:  402:					w = x->parent->right;
+        -:  403:				}
+        -:  404:
+        -:  405:				// Case 4: Sibling's right child is red
+       38:  406:				if (IS_RED(impl, x->parent)) {
+      19*:  407:					SET_RED(impl, w);
+        -:  408:				} else {
+      19*:  409:					SET_BLACK(impl, w);
+        -:  410:				}
+      38*:  411:				SET_BLACK(impl, x->parent);
+      38*:  412:				SET_BLACK(impl, w->right);
+       38:  413:				leftRotate(impl, x->parent);
+       38:  414:				x = impl->root;
+        -:  415:			}
+        -:  416:		} else { // Symmetric case: x is the right child
+       78:  417:			RBTreeNode *w = x->parent->left;
+       78:  418:			if (w == NULL)
+    #####:  419:				return;
+       78:  420:			if (IS_RED(impl, w)) {
+      18*:  421:				SET_BLACK(impl, w);
+      18*:  422:				SET_RED(impl, x->parent);
+       18:  423:				rightRotate(impl, x->parent);
+       18:  424:				w = x->parent->left;
+        -:  425:			}
+        -:  426:
+       78:  427:			if (IS_BLACK(impl, w->right) && IS_BLACK(impl, w->left)) {
+       54:  428:				SET_RED(impl, w);
+       54:  429:				x = x->parent;
+        -:  430:			} else {
+       24:  431:				if (IS_BLACK(impl, w->left)) {
+      12*:  432:					SET_BLACK(impl, w->right);
+      12*:  433:					SET_RED(impl, w);
+       12:  434:					leftRotate(impl, w);
+       12:  435:					w = x->parent->left;
+        -:  436:				}
+        -:  437:
+       24:  438:				if (IS_RED(impl, x->parent)) {
+       9*:  439:					SET_RED(impl, w);
+        -:  440:				} else {
+      15*:  441:					SET_BLACK(impl, w);
+        -:  442:				}
+      24*:  443:				SET_BLACK(impl, x->parent);
+      24*:  444:				SET_BLACK(impl, w->left);
+       24:  445:				rightRotate(impl, x->parent);
+       24:  446:				x = impl->root;
+        -:  447:			}
+        -:  448:		}
         -:  449:	}
-        -:  450:
-        -:  451:	// Store the color of the node to delete
-     1002:  452:	wasBlack = !RED(nodeToDelete, key_size, value_size);
-     1002:  453:	FatPtr fptr_to_delete = nodeToDelete->self;
-        -:  454:	// Case 1: Node has two children
-     1002:  455:	if (nodeToDelete->left != NULL && nodeToDelete->right != NULL) {
-        -:  456:		// Find the in-order successor (smallest node in the right subtree)
-      187:  457:		RBTreeNode *successor = nodeToDelete->right;
-      254:  458:		while (successor->left != NULL) {
-       67:  459:			successor = successor->left;
-        -:  460:		}
-        -:  461:
-        -:  462:		// Copy the successor's data to the node to delete
-      187:  463:		memcpy(nodeToDelete->data + KEY_PAD, successor->data + KEY_PAD,
-      187:  464:			   (impl->key_size + impl->value_size + VALUE_PAD(impl->key_size)) + BOOLEAN_SIZE);
-        -:  465:
-      187:  466:		nodeToDelete->self = successor->self;
-        -:  467:
-        -:  468:		// Now we need to delete the successor
-      187:  469:		nodeToDelete = successor; // Update to the successor nodeAA
-        -:  470:	}
-        -:  471:
-        -:  472:	// Case 2: Node has at most one child
-     1002:  473:	child = (nodeToDelete->left != NULL) ? nodeToDelete->left : nodeToDelete->right;
-        -:  474:
-        -:  475:	// Remove nodeToDelete from the tree
-     1002:  476:	if (child != NULL) {
-      225:  477:		child->parent = nodeToDelete->parent; // Update child’s parent
+     5279:  450:	if (impl->root != NIL && impl->root != NONE)
+    5279*:  451:		SET_BLACK(impl, x);
+        -:  452:}
+        -:  453:
+    11002:  454:int rbtree_delete(RBTree *ptr, const void *key) {
+    11002:  455:	if (ptr == NULL || nil(ptr->impl)) {
+    #####:  456:		errno = EINVAL;
+    #####:  457:		return -1;
+        -:  458:	}
+    11002:  459:	RBTreeImpl *impl = $Ref(&ptr->impl);
+    11002:  460:	RBTreeNode *node_to_delete = NULL;
+    11002:  461:	RBTreeNode *check = impl->root;
+        -:  462:
+        -:  463:	// Find the node to delete
+   111050:  464:	while (check != NIL) {
+   111050:  465:		int v = impl->compare(check->data + KEY_PAD, key);
+   111050:  466:		if (v == 0) {
+    11002:  467:			node_to_delete = check; // Found the node to delete
+    11002:  468:			break;
+   100048:  469:		} else if (v < 0) {
+     3379:  470:			check = check->right;
+        -:  471:		} else {
+    96669:  472:			check = check->left;
+        -:  473:		}
+        -:  474:	}
+        -:  475:
+    11002:  476:	if (node_to_delete == NULL) {
+    #####:  477:		return -1; // Node not found
         -:  478:	}
         -:  479:
-     1002:  480:	if (nodeToDelete->parent == NULL) {
-        -:  481:		// Node is root
-        2:  482:		impl->root = child; // Update the root if necessary
-        -:  483:	} else {
-        -:  484:		// Update the parent's child pointer
-     1000:  485:		if (nodeToDelete == nodeToDelete->parent->left) {
-      469:  486:			nodeToDelete->parent->left = child; // Update left child
-        -:  487:		} else {
-      531:  488:			nodeToDelete->parent->right = child; // Update right child
-        -:  489:		}
-        -:  490:	}
-        -:  491:
-        -:  492:	// Free the node
-     1002:  493:	chain_free(&fptr_to_delete);
-        -:  494:
-     1002:  495:	impl->size--;
-        -:  496:	// If the deleted node was black, we need to fix up the tree
-     1002:  497:	if (wasBlack) {
-      561:  498:		rbtree_delete_fixup(ptr, child); // Call fix-up function
-        -:  499:	}
-     1002:  500:	return 0; // Successful deletion
-        -:  501:}
-        -:  502:
-        -:  503:int max_depth = 0;
-        -:  504:
-     1011:  505:const void *rbtree_get(const RBTree *ptr, const void *key) {
-     1011:  506:	if (ptr == NULL || nil(ptr->impl)) {
-    #####:  507:		errno = EINVAL;
-    #####:  508:		return NULL;
-        -:  509:	}
-     1011:  510:	RBTreeImpl *impl = $Ref(&ptr->impl);
-        -:  511:
-     1011:  512:	RBTreeNode *check = impl->root;
-     1011:  513:	int local_depth = 0;
-     8286:  514:	loop {
-     9297:  515:		if (check == NULL)
-        4:  516:			return NULL;
-     9293:  517:		int v = impl->compare(check->data + KEY_PAD, key);
-     9293:  518:		if (v == 0) {
-     1007:  519:			return check->data + KEY_PAD + impl->key_size + VALUE_PAD(impl->key_size);
-     8286:  520:		} else if (v < 0) {
-     4103:  521:			check = check->right;
-        -:  522:		} else {
-     4183:  523:			check = check->left;
-        -:  524:		}
-     8286:  525:		local_depth++;
-     8286:  526:		if (local_depth > max_depth) {
-        -:  527:
-       13:  528:			max_depth = local_depth;
-       13:  529:			printf("new max_depth=%i\n", max_depth);
-        -:  530:		}
-        -:  531:	}
-        -:  532:
-        -:  533:	return NULL;
-        -:  534:}
-        -:  535:
-     1008:  536:i64 rbtree_size(const RBTree *ptr) {
-     1008:  537:	if (ptr == NULL || nil(ptr->impl)) {
-    #####:  538:		errno = EINVAL;
-    #####:  539:		return -1;
-        -:  540:	}
-     1008:  541:	RBTreeImpl *impl = $Ref(&ptr->impl);
-     1008:  542:	return impl->size;
-        -:  543:}
-        -:  544:
-        4:  545:int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
-        4:  546:	if (ptr == NULL || nil(ptr->impl)) {
-    #####:  547:		errno = EINVAL;
-    #####:  548:		return -1;
-        -:  549:	}
-        -:  550:
-        4:  551:	RBTreeImpl *impl = $Ref(&ptr->impl);
-        4:  552:	ChainGuard _ = ChainSend(impl->send);
-        -:  553:
-        4:  554:	chain_malloc(&iter->impl, sizeof(RBTreeIteratorImpl));
-        4:  555:	RBTreeIteratorImpl *rbimpl = $Ref(&iter->impl);
-        4:  556:	rbimpl->stack_pointer = 0;
-        4:  557:	rbimpl->cur = impl->root;
-        4:  558:	rbimpl->send = impl->send;
-        4:  559:	rbimpl->key_size = impl->key_size;
-        4:  560:	return 0;
-        -:  561:}
-        -:  562:
-  1002015:  563:bool validate_rbtree(const RBTree *ptr, const RBTreeNode *node, int *black_count,
-        -:  564:					 int current_black_count) {
-  1002015:  565:	RBTreeImpl *impl = $Ref(&ptr->impl);
-  1002015:  566:	u64 key_size = impl->key_size;
-  1002015:  567:	u64 value_size = impl->value_size;
-        -:  568:
-        -:  569:	// Base case: when we reach a NIL node
-  1002015:  570:	if (node == NULL) {
-        -:  571:		// If this is the first NIL node reached, set the black count
-   501509:  572:		if (*black_count == 0) {
-     1003:  573:			*black_count = current_black_count; // Set the black count for the first path
-        -:  574:		} else {
-        -:  575:			// Check for black count consistency
-   500506:  576:			if (current_black_count != *black_count) {
-    #####:  577:				printf("NIL node reached: current_black_count = %d, expected_black_count = %d\n",
-        -:  578:					   current_black_count, *black_count);
-    #####:  579:				return false; // If counts do not match, return false
-        -:  580:			}
-        -:  581:		}
-   501509:  582:		return true; // Return true for NIL nodes
-        -:  583:	}
-        -:  584:
-        -:  585:	// Increment black count if the current node is black
-   500506:  586:	if (!RED(node, key_size, value_size)) {
-   256710:  587:		current_black_count++;
-        -:  588:	} else {
-        -:  589:		//  Check if the node is red
-        -:  590:		//  If the parent is red, return false (Red property violation)
-   243796:  591:		if (node->parent != NULL && RED(node->parent, key_size, value_size)) {
-    #####:  592:			printf("Red property violation at node with key\n");
-    #####:  593:			return false;
-        -:  594:		}
-        -:  595:	}
-        -:  596:
-        -:  597:	// Recursive calls for left and right children
-   500506:  598:	bool left_valid = validate_rbtree(ptr, node->left, black_count, current_black_count);
-        -:  599:
-   500506:  600:	bool right_valid = validate_rbtree(ptr, node->right, black_count, current_black_count);
-        -:  601:
-  500506*:  602:	return left_valid && right_valid;
+    11002:  480:	RBTreeNode *y = node_to_delete;
+    11002:  481:	RBTreeNode *yp = node_to_delete->parent;
+    11002:  482:	RBTreeNode *x = NULL;
+    11002:  483:	bool y_is_red = IS_RED(impl, y);
+        -:  484:
+    11002:  485:	if (node_to_delete->left == NIL) {
+    10387:  486:		x = node_to_delete->right;
+    10387:  487:		rbtree_transplant(impl, node_to_delete, node_to_delete->right);
+      615:  488:	} else if (node_to_delete->right == NIL) {
+      115:  489:		x = node_to_delete->left;
+      115:  490:		rbtree_transplant(impl, node_to_delete, node_to_delete->left);
+        -:  491:	} else {
+        -:  492:		// Find the in-order successor (smallest node in the right subtree)
+      500:  493:		RBTreeNode *successor = node_to_delete->right;
+     1256:  494:		while (successor->left != NIL) {
+      756:  495:			successor = successor->left;
+        -:  496:		}
+      500:  497:		x = successor->right;
+        -:  498:
+      500:  499:		if (successor->parent == node_to_delete) {
+      149:  500:			if (x != NIL)
+       58:  501:				x->parent = successor;
+        -:  502:		} else {
+      351:  503:			rbtree_transplant(impl, successor, successor->right);
+      351:  504:			successor->right = node_to_delete->right;
+      351:  505:			successor->right->parent = successor;
+        -:  506:		}
+      500:  507:		rbtree_transplant(impl, node_to_delete, successor);
+      500:  508:		successor->left = node_to_delete->left;
+      500:  509:		successor->left->parent = successor;
+      500:  510:		if (IS_RED(impl, node_to_delete))
+     195*:  511:			SET_RED(impl, successor);
+        -:  512:		else
+     305*:  513:			SET_BLACK(impl, successor);
+        -:  514:	}
+        -:  515:
+    11002:  516:	if (!y_is_red) {
+    10688:  517:		if (x != NIL)
+     5279:  518:			rbtree_delete_fixup(impl, x);
+        -:  519:	}
+        -:  520:
+        -:  521:	// Free the node which has been transplanted
+        -:  522:	{
+    22004:  523:		ChainGuard _ = ChainSend(impl->send);
+    11002:  524:		chain_free(&y->self);
+        -:  525:	}
+        -:  526:
+    11002:  527:	impl->size--;
+    11002:  528:	return 0;
+        -:  529:}
+        -:  530:
+    11011:  531:const void *rbtree_get(const RBTree *ptr, const void *key) {
+    11011:  532:	if (ptr == NULL || nil(ptr->impl)) {
+    #####:  533:		errno = EINVAL;
+    #####:  534:		return NULL;
+        -:  535:	}
+    11011:  536:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        -:  537:
+    11011:  538:	RBTreeNode *check = impl->root;
+   101945:  539:	loop {
+   112956:  540:		if (check == NIL)
+        4:  541:			return NULL;
+   112952:  542:		int v = impl->compare(check->data + KEY_PAD, key);
+   112952:  543:		if (v == 0) {
+    11007:  544:			return check->data + KEY_PAD + impl->key_size + VALUE_PAD(impl->key_size);
+   101945:  545:		} else if (v < 0) {
+     4381:  546:			check = check->right;
+        -:  547:		} else {
+    97564:  548:			check = check->left;
+        -:  549:		}
+        -:  550:	}
+        -:  551:
+        -:  552:	return NULL;
+        -:  553:}
+        -:  554:
+    11008:  555:i64 rbtree_size(const RBTree *ptr) {
+    11008:  556:	if (ptr == NULL || nil(ptr->impl)) {
+    #####:  557:		errno = EINVAL;
+    #####:  558:		return -1;
+        -:  559:	}
+    11008:  560:	RBTreeImpl *impl = $Ref(&ptr->impl);
+    11008:  561:	return impl->size;
+        -:  562:}
+        -:  563:
+        4:  564:int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
+        4:  565:	if (ptr == NULL || nil(ptr->impl)) {
+    #####:  566:		errno = EINVAL;
+    #####:  567:		return -1;
+        -:  568:	}
+        -:  569:
+        4:  570:	RBTreeImpl *impl = $Ref(&ptr->impl);
+        4:  571:	ChainGuard _ = ChainSend(impl->send);
+        -:  572:
+        4:  573:	chain_malloc(&iter->impl, sizeof(RBTreeIteratorImpl));
+        4:  574:	RBTreeIteratorImpl *rbimpl = $Ref(&iter->impl);
+        4:  575:	rbimpl->stack_pointer = 0;
+        4:  576:	rbimpl->cur = impl->root;
+        4:  577:	rbimpl->send = impl->send;
+        4:  578:	rbimpl->key_size = impl->key_size;
+        4:  579:	return 0;
+        -:  580:}
+        -:  581:
+        -:  582:#ifdef TEST
+        -:  583:// Function to print a single node with its color
+    #####:  584:void rbtree_print_node_debug(const RBTree *ptr, const RBTreeNode *node, int depth) {
+    #####:  585:	RBTreeImpl *impl = $Ref(&ptr->impl);
+    #####:  586:	if (node == NULL) {
+    #####:  587:		return;
+        -:  588:	}
+        -:  589:
+        -:  590:	// Print the right child first (for visual representation)
+    #####:  591:	rbtree_print_node_debug(ptr, node->right, depth + 1);
+        -:  592:
+        -:  593:	// Indent according to depth
+    #####:  594:	for (int i = 0; i < depth; i++) {
+    #####:  595:		printf("    ");
+        -:  596:	}
+        -:  597:
+        -:  598:	// Print the current node with a clearer representation
+    #####:  599:	printf("%llu (%s)\n", node->node_id, (IS_BLACK(impl, node)) ? "B" : "R");
+        -:  600:
+        -:  601:	// Print the left child
+    #####:  602:	rbtree_print_node_debug(ptr, node->left, depth + 1);
         -:  603:}
         -:  604:
-     1003:  605:bool rbtree_validate(const RBTree *ptr) {
-     1003:  606:	RBTreeImpl *impl = $Ref(&ptr->impl);
-     1003:  607:	int black_count = 0;
-        -:  608:	// Validate from the root and check if the root is black
-     1003:  609:	if (impl->root != NULL) {
-     1003:  610:		if (!RED(impl->root, impl->key_size, impl->value_size)) {
-     1003:  611:			bool ret = validate_rbtree(ptr, impl->root, &black_count, 0);
-     1003:  612:			return ret;
-        -:  613:		}
-    #####:  614:		printf("root is not black\n");
-    #####:  615:		return false; // Root should be black
-        -:  616:	}
-    #####:  617:	return true;
-        -:  618:}
+        -:  605:// Function to print the entire tree
+    #####:  606:void rbtree_print_debug(const RBTree *ptr) {
+    #####:  607:	RBTreeImpl *impl = $Ref(&ptr->impl);
+    #####:  608:	if (ptr == NULL || impl->root == NULL) {
+    #####:  609:		printf("Tree is empty.\n");
+    #####:  610:		return;
+        -:  611:	}
+        -:  612:
+    #####:  613:	printf("Red-Black Tree (root = %llu)\n", impl->root->node_id);
+    #####:  614:	printf("===================================\n"); // Separator for better clarity
+    #####:  615:	rbtree_print_node_debug(ptr, impl->root, 0);
+    #####:  616:	printf("===================================\n"); // Separator for better clarity
+        -:  617:}
+        -:  618:#endif // TEST
+        -:  619:
+202055000:  620:bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_count,
+        -:  621:						  int current_black_count, int *max_depth, int cur_depth) {
+202055000:  622:	if (cur_depth > *max_depth)
+   232964:  623:		*max_depth = cur_depth;
+202055000:  624:	RBTreeImpl *impl = $Ref(&ptr->impl);
+202055000:  625:	u64 key_size = impl->key_size;
+202055000:  626:	u64 value_size = impl->value_size;
+        -:  627:
+        -:  628:	// Base case: when we reach a NIL node's pointer to actual NULL
+202055000:  629:	if (node == NULL) {
+        -:  630:		// If this is the first NIL node reached, set the black count
+101033000:  631:		if (*black_count == 0) {
+    11000:  632:			*black_count = current_black_count; // Set the black count for the first path
+        -:  633:		} else {
+        -:  634:			// Check for black count consistency
+        -:  635:			int diff;
+101022000:  636:			if (current_black_count > *black_count)
+    #####:  637:				diff = current_black_count - *black_count;
+        -:  638:			else
+101022000:  639:				diff = *black_count - current_black_count;
+101022000:  640:			if (diff != 0) {
+    #####:  641:				printf("NIL node reached: current_black_count = %d, "
+        -:  642:					   "expected_black_count = %d\n",
+        -:  643:					   current_black_count, *black_count);
+    #####:  644:				return false;
+        -:  645:			}
+        -:  646:		}
+101033000:  647:		return true; // Return true for NIL nodes
+        -:  648:	}
+        -:  649:
+        -:  650:	// Increment black count if the current node is black
+101022000:  651:	if (IS_BLACK(impl, node)) {
+100623960:  652:		current_black_count++;
+        -:  653:	} else {
+        -:  654:		//  Check if the node is red
+        -:  655:		//  If the parent is red, return false (Red property violation)
+  398040*:  656:		if (node->parent != NONE && IS_RED(impl, node->parent)) {
+    #####:  657:			printf("Red property violation at node with key\n");
+    #####:  658:			return false;
+        -:  659:		}
+        -:  660:	}
+        -:  661:
+        -:  662:	// Recursive calls for left and right children
+101022000:  663:	bool left_valid = rbtree_validate_node(ptr, node->left, black_count, current_black_count,
+        -:  664:										   max_depth, cur_depth + 1);
+101022000:  665:	bool right_valid = rbtree_validate_node(ptr, node->right, black_count, current_black_count,
+        -:  666:											max_depth, cur_depth + 1);
+        -:  667:
+101022000*:  668:	return left_valid && right_valid;
+        -:  669:}
+        -:  670:
+    #####:  671:void rbtree_node_depth(RBTreeImpl *impl, RBTreeNode *node, int *max_depth, int cur_depth) {
+    #####:  672:	if (cur_depth > *max_depth)
+    #####:  673:		*max_depth = cur_depth;
+    #####:  674:	if (node->right)
+    #####:  675:		rbtree_node_depth(impl, node->right, max_depth, cur_depth + 1);
+    #####:  676:	if (node->left)
+    #####:  677:		rbtree_node_depth(impl, node->left, max_depth, cur_depth + 1);
+    #####:  678:}
+        -:  679:
+    #####:  680:int rbtree_max_depth(const RBTree *ptr) {
+    #####:  681:	RBTreeImpl *impl = $Ref(&ptr->impl);
+    #####:  682:	int max_depth = 0;
+    #####:  683:	rbtree_node_depth(impl, impl->root, &max_depth, 0);
+    #####:  684:	return max_depth;
+        -:  685:}
+        -:  686:
+    11000:  687:bool rbtree_validate(const RBTree *ptr) {
+    11000:  688:	RBTreeImpl *impl = $Ref(&ptr->impl);
+    11000:  689:	int black_count = 0;
+    11000:  690:	int max_depth = 0;
+        -:  691:	// Validate from the root and check if the root is black
+    11000:  692:	if (impl->root != NULL) {
+   11000*:  693:		if (IS_BLACK(impl, impl->root)) {
+    11000:  694:			bool ret = rbtree_validate_node(ptr, impl->root, &black_count, 0, &max_depth, 0);
+    11000:  695:			return ret;
+        -:  696:		}
+    #####:  697:		printf("root is not black\n");
+    #####:  698:		return false; // Root should be black
+        -:  699:	}
+    #####:  700:	return true;
+        -:  701:}
