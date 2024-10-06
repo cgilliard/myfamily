@@ -148,7 +148,6 @@ bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 
 // Utility function to perform left rotation
 void leftRotate(RBTreeImpl *impl, RBTreeNode *x) {
-	assert(x->node_id != 0);
 	RBTreeNode *y = x->right;
 	if (y->left) {
 		x->right = y->left;
@@ -168,7 +167,6 @@ void leftRotate(RBTreeImpl *impl, RBTreeNode *x) {
 
 // Utility function to perform right rotation
 void rightRotate(RBTreeImpl *impl, RBTreeNode *x) {
-	assert(x->node_id != 0);
 	RBTreeNode *y = x->left;
 	if (y->right) {
 		x->left = y->right;
