@@ -153,7 +153,8 @@ bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 void leftRotate(RBTreeImpl *impl, RBTreeNode *x) {
 	RBTreeNode *y = x->right;
 	x->right = y->left;
-	y->left->parent = x;
+	if (y->left)
+		y->left->parent = x;
 	y->parent = x->parent;
 	if (x->parent == NONE) {
 		impl->root = y;
@@ -170,7 +171,8 @@ void leftRotate(RBTreeImpl *impl, RBTreeNode *x) {
 void rightRotate(RBTreeImpl *impl, RBTreeNode *x) {
 	RBTreeNode *y = x->left;
 	x->left = y->right;
-	y->right->parent = x;
+	if (y->right)
+		y->right->parent = x;
 	y->parent = x->parent;
 	if (x->parent == NONE) {
 		impl->root = y;
@@ -373,15 +375,8 @@ void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
 }
 
 void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
-#ifdef TEST
-	// printf("delete with node_id = %llu\n", x->node_id);
-#endif
-	int i = 0;
 	while (x != impl->root && IS_BLACK(impl, x)) {
-		i++;
-		// printf("loop %i, x_is_black=%i\n", i++, IS_BLACK(impl, x));
 		if (x == x->parent->left) {
-			// printf("caseA\n");
 			RBTreeNode *w = x->parent->right; // Sibling of x
 
 			// Case 1: Sibling is red
@@ -396,26 +391,20 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 
 			// Case 2: Sibling's children are both black
 			if (IS_BLACK(impl, w->left) && IS_BLACK(impl, w->right)) {
-				// printf("calling set_red 2\n");
 				SET_RED(impl, w);
-				// printf("set red 2 complete\n");
 				x = x->parent;
 			} else {
 				// Case 3: Sibling's right child is black, left child is red
 				if (IS_BLACK(impl, w->right)) {
 					SET_BLACK(impl, w->left);
-					// printf("calling set_red 3\n");
 					SET_RED(impl, w);
-					// printf("set red 3 complete\n");
 					rightRotate(impl, w);
 					w = x->parent->right;
 				}
 
 				// Case 4: Sibling's right child is red
 				if (IS_RED(impl, x->parent)) {
-					// printf("Calling set_red 4\n");
 					SET_RED(impl, w);
-					// printf("set_red 4 complete\n");
 				} else {
 					SET_BLACK(impl, w);
 				}
@@ -425,38 +414,18 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 				x = impl->root;
 			}
 		} else { // Symmetric case: x is the right child
-			// printf("caseB\n");
 			RBTreeNode *w = x->parent->left;
-
-			/*
-						if (w == NULL) {
-							x = x->parent;
-							if (x->node_id == 0)
-								break;
-							printf("continue %i\n", x->node_id);
-							return;
-						}
-			*/
-
+			if (w == NULL)
+				return;
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
-				// printf("calling set red 5\n");
 				SET_RED(impl, x->parent);
-				// printf("set red 5 complete\n");
 				rightRotate(impl, x->parent);
 				w = x->parent->left;
 			}
 
-			if (w == NULL) {
-				printf("WARN: W IS NULL\n");
-				printf("x=NIL=%i,i=%i\n", x == NIL, i);
-			} else if (w == NIL)
-				printf("WARN: W IS NIL\n");
-
 			if (IS_BLACK(impl, w->right) && IS_BLACK(impl, w->left)) {
-				// printf("calling set red 6\n");
 				SET_RED(impl, w);
-				// printf("set red 6 complete\n");
 				x = x->parent;
 			} else {
 				if (IS_BLACK(impl, w->left)) {
@@ -478,7 +447,7 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 			}
 		}
 	}
-	if (impl->root != NIL && x != NIL && x != NONE)
+	if (impl->root != NIL && impl->root != NONE)
 		SET_BLACK(impl, x);
 }
 
@@ -545,10 +514,8 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	}
 
 	if (!y_is_red) {
-		if (x == NIL) {
-			x->parent = yp;
-		}
-		rbtree_delete_fixup(impl, x);
+		if (x != NIL)
+			rbtree_delete_fixup(impl, x);
 	}
 
 	// Free the node which has been transplanted
@@ -614,14 +581,14 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
 
 #ifdef TEST
 // Function to print a single node with its color
-void brtree_print_node_debug(const RBTree *ptr, const RBTreeNode *node, int depth) {
+void rbtree_print_node_debug(const RBTree *ptr, const RBTreeNode *node, int depth) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	if (node == NULL) {
 		return;
 	}
 
 	// Print the right child first (for visual representation)
-	brtree_print_node_debug(ptr, node->right, depth + 1);
+	rbtree_print_node_debug(ptr, node->right, depth + 1);
 
 	// Indent according to depth
 	for (int i = 0; i < depth; i++) {
@@ -632,11 +599,11 @@ void brtree_print_node_debug(const RBTree *ptr, const RBTreeNode *node, int dept
 	printf("%llu (%s)\n", node->node_id, (IS_BLACK(impl, node)) ? "B" : "R");
 
 	// Print the left child
-	brtree_print_node_debug(ptr, node->left, depth + 1);
+	rbtree_print_node_debug(ptr, node->left, depth + 1);
 }
 
 // Function to print the entire tree
-void brtree_print_debug(const RBTree *ptr) {
+void rbtree_print_debug(const RBTree *ptr) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	if (ptr == NULL || impl->root == NULL) {
 		printf("Tree is empty.\n");
@@ -645,7 +612,7 @@ void brtree_print_debug(const RBTree *ptr) {
 
 	printf("Red-Black Tree (root = %llu)\n", impl->root->node_id);
 	printf("===================================\n"); // Separator for better clarity
-	brtree_print_node_debug(ptr, impl->root, 0);
+	rbtree_print_node_debug(ptr, impl->root, 0);
 	printf("===================================\n"); // Separator for better clarity
 }
 #endif // TEST
@@ -670,16 +637,12 @@ bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 				diff = current_black_count - *black_count;
 			else
 				diff = *black_count - current_black_count;
-			if (diff > 1) {
+			if (diff != 0) {
 				printf("NIL node reached: current_black_count = %d, "
 					   "expected_black_count = %d\n",
 					   current_black_count, *black_count);
 				return false;
 			}
-			if (diff != 0)
-				printf("WARN: diff of 1 in heights\n");
-			if (diff != 0)
-				return false;
 		}
 		return true; // Return true for NIL nodes
 	}
@@ -703,6 +666,22 @@ bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 											max_depth, cur_depth + 1);
 
 	return left_valid && right_valid;
+}
+
+void rbtree_node_depth(RBTreeImpl *impl, RBTreeNode *node, int *max_depth, int cur_depth) {
+	if (cur_depth > *max_depth)
+		*max_depth = cur_depth;
+	if (node->right)
+		rbtree_node_depth(impl, node->right, max_depth, cur_depth + 1);
+	if (node->left)
+		rbtree_node_depth(impl, node->left, max_depth, cur_depth + 1);
+}
+
+int rbtree_max_depth(const RBTree *ptr) {
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	int max_depth = 0;
+	rbtree_node_depth(impl, impl->root, &max_depth, 0);
+	return max_depth;
 }
 
 bool rbtree_validate(const RBTree *ptr) {
