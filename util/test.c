@@ -98,8 +98,8 @@ MyTest(util, test_rbtree) {
 
 	int i = 0;
 	u64 last = 0;
+	RbTreeKeyValue kv;
 	loop {
-		RbTreeKeyValue kv;
 		bool has_next = rbtree_iterator_next(&itt, &kv);
 		if (!has_next)
 			break;
@@ -113,6 +113,8 @@ MyTest(util, test_rbtree) {
 		snprintf(buf, 100, "value%llu", k1->v);
 		cr_assert(!strcmp(buf, v1->buf));
 	}
+
+	cr_assert(!rbtree_iterator_next(&itt, &kv));
 	cr_assert_eq(i, 4);
 
 	RBTree tree2;
@@ -245,4 +247,36 @@ MyTest(util, validate_tree) {
 		// rbtree_print_debug(&valid1);
 		// cr_assert(rbtree_validate(&valid1));
 	}
+}
+
+MyTest(util, test_validation_and_other) {
+	RBTree test1;
+	cr_assert(rbtree_build(NULL, 10, 10, u64_compare, false));
+	__is_debug_malloc = true;
+	cr_assert(rbtree_build(&test1, sizeof(u64), sizeof(u64), u64_compare, false));
+	__is_debug_malloc = false;
+	test1.impl = null;
+
+	cr_assert(!rbtree_build(&test1, sizeof(u64), sizeof(u64), u64_compare, false));
+	__is_debug_malloc = true;
+	u64 k1 = 0;
+	u64 v1 = 0;
+	cr_assert(rbtree_insert(&test1, &k1, &v1));
+	__is_debug_malloc = false;
+
+	cr_assert(rbtree_insert(NULL, &k1, &v1));
+	cr_assert(rbtree_size(NULL));
+	cr_assert(!rbtree_insert(&test1, &k1, &v1));
+	k1 = 1;
+	v1 = 0;
+	cr_assert(!rbtree_insert(&test1, &k1, &v1));
+	cr_assert(rbtree_insert(&test1, &k1, &v1));
+	k1 = 10;
+	v1 = 0;
+	cr_assert(rbtree_delete(&test1, &k1));
+	cr_assert(!rbtree_get(NULL, NULL));
+	cr_assert_eq(rbtree_max_depth(&test1), 2);
+	rbtree_print_debug(&test1);
+	cr_assert(rbtree_iterator(NULL, NULL));
+	rbtree_delete(NULL, NULL);
 }

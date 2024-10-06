@@ -113,7 +113,7 @@ bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 	RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
 
 	// If the iterator is empty, we're done
-	if (!impl->cur && impl->stack_pointer == 0) {
+	if (impl->cur == NIL && impl->stack_pointer == 0) {
 		return false; // No more nodes to traverse
 	}
 
@@ -605,10 +605,6 @@ void rbtree_print_node_debug(const RBTree *ptr, const RBTreeNode *node, int dept
 // Function to print the entire tree
 void rbtree_print_debug(const RBTree *ptr) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
-	if (ptr == NULL || impl->root == NULL) {
-		printf("Tree is empty.\n");
-		return;
-	}
 
 	printf("Red-Black Tree (root = %llu)\n", impl->root->node_id);
 	printf("===================================\n"); // Separator for better clarity

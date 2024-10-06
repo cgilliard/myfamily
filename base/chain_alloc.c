@@ -20,28 +20,32 @@
 #include <stdio.h>
 #include <string.h>
 
+#define MAX_CHAIN_GUARDS 128
+
 typedef struct ChainGuardEntry {
-	struct ChainGuardEntry *next;
-	struct ChainGuardEntry *prev;
 	SlabAllocator *sa;
 	bool sync;
 	pthread_mutex_t lock;
 	bool is_locked; // used in case of a panic on cleanup to determine if we're locked
 } ChainGuardEntry;
 
-_Thread_local ChainGuardEntry *chain_guard_entry_root = NULL;
-_Thread_local ChainGuardEntry *chain_guard_entry_cur = NULL;
+_Thread_local static ChainGuardEntry chain_guard_entries[MAX_CHAIN_GUARDS];
+_Thread_local static u8 chain_guard_sp = 0;
+_Thread_local static bool chain_guard_is_init = false;
+
 SlabAllocator *global_sync_allocator = NULL;
 
 SlabAllocator *init_default_slab_allocator() {
 	SlabAllocatorNc *sa = mymalloc(sizeof(SlabAllocator));
 	if (sa == NULL)
-		panic("Could not initialize default slab allocator");
+		return NULL;
 	SlabAllocatorConfig sac;
 
 	// default slab allocator no_malloc = false, zeroed = false, is_64_bit = false
-	if (slab_allocator_config_build(&sac, false, false, false))
-		panic("Could not initialize config for default slab allocator");
+	if (slab_allocator_config_build(&sac, false, false, false)) {
+		myfree(sa);
+		return NULL;
+	}
 
 	u64 max_slabs = (INT32_MAX / 100) * 100;
 	for (i32 i = 0; i < 128; i++) {
@@ -49,22 +53,35 @@ SlabAllocator *init_default_slab_allocator() {
 					   .slabs_per_resize = 100,
 					   .initial_chunks = 0,
 					   .max_slabs = max_slabs};
-		if (slab_allocator_config_add_type(&sac, &st))
-			panic("Could not add slab type to default slab allocator");
+		if (slab_allocator_config_add_type(&sac, &st)) {
+			myfree(sa);
+			return NULL;
+		}
 	}
 	for (i32 i = 0; i < 128; i++) {
 		SlabType st = {.slab_size = (128 + 3) * 8 + (i + 1) * 1024,
 					   .slabs_per_resize = 100,
 					   .initial_chunks = 0,
 					   .max_slabs = max_slabs};
-		if (slab_allocator_config_add_type(&sac, &st))
-			panic("Could not add config to default slab allocator");
+		if (slab_allocator_config_add_type(&sac, &st)) {
+			myfree(sa);
+			return NULL;
+		}
 	}
 
-	if (slab_allocator_build(sa, &sac))
-		panic("Could not initialize default slab allocator");
+	if (slab_allocator_build(sa, &sac)) {
+		myfree(sa);
+		return NULL;
+	}
 
 	return sa;
+}
+
+static void __attribute__((constructor)) __init_chain_guard_array() {
+	for (int i = 0; i < MAX_CHAIN_GUARDS; i++) {
+		if (pthread_mutex_init(&chain_guard_entries[i].lock, NULL))
+			panic("Could not init pthread_mutex");
+	}
 }
 
 SlabAllocator *get_global_sync_allocator() {
@@ -80,17 +97,15 @@ u64 alloc_count_global_sync_allocator() {
 }
 
 u64 alloc_count_default_slab_allocator() {
-	if (chain_guard_entry_root == NULL)
+	if (!chain_guard_is_init || chain_guard_entries[chain_guard_sp].sa == NULL)
 		return 0;
-	return slab_allocator_cur_slabs_allocated(chain_guard_entry_root->sa);
+	return slab_allocator_cur_slabs_allocated(chain_guard_entries[chain_guard_sp].sa);
 }
 
 void cleanup_default_slab_allocator() {
-	if (chain_guard_entry_root) {
-		slab_allocator_cleanup(chain_guard_entry_root->sa);
-		myfree(chain_guard_entry_root->sa);
-		myfree(chain_guard_entry_root);
-		chain_guard_entry_root = NULL;
+	if (chain_guard_entries[chain_guard_sp].sa != NULL) {
+		slab_allocator_cleanup(chain_guard_entries[chain_guard_sp].sa);
+		myfree(chain_guard_entries[chain_guard_sp].sa);
 	}
 	if (global_sync_allocator) {
 		slab_allocator_cleanup(global_sync_allocator);
@@ -99,71 +114,59 @@ void cleanup_default_slab_allocator() {
 	}
 }
 
-void chain_guard_init_root() {
-	chain_guard_entry_root = mymalloc(sizeof(ChainGuardEntry));
-	chain_guard_entry_cur = chain_guard_entry_root;
-	chain_guard_entry_root->next = NULL;
-	chain_guard_entry_root->prev = NULL;
-	chain_guard_entry_root->sync = false;
-	chain_guard_entry_root->sa = init_default_slab_allocator();
-}
-
 void chain_guard_cleanup(ChainGuardNc *ptr) {
 	if (ptr->impl) {
-		ChainGuardEntry *entry = ptr->impl;
-		chain_guard_entry_cur = entry->prev;
-		chain_guard_entry_cur->next = NULL;
-		if (chain_guard_entry_cur->sync) {
-			pthread_mutex_destroy(&chain_guard_entry_cur->lock);
-		}
-		myfree(entry);
+		chain_guard_sp--;
 	}
 }
 
 ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {
-	if (chain_guard_entry_root == NULL) {
-		chain_guard_init_root();
+	if (!chain_guard_is_init) {
+		chain_guard_entries[chain_guard_sp].sa = init_default_slab_allocator();
+		if (chain_guard_entries[chain_guard_sp].sa == NULL)
+			panic("Could not init default slab allocator");
+		chain_guard_is_init = true;
 	}
-	ChainGuardEntry *entry = mymalloc(sizeof(ChainGuardEntry));
+	chain_guard_sp++;
+	ChainGuardEntry *entry = &chain_guard_entries[chain_guard_sp];
 	entry->sa = sa;
 	entry->sync = sync;
-	if (entry->sync) {
-		pthread_mutex_init(&entry->lock, NULL);
-	}
 	entry->is_locked = false;
-	entry->next = NULL;
-	entry->prev = chain_guard_entry_cur;
-	chain_guard_entry_cur->next = entry;
-	chain_guard_entry_cur = entry;
 	ChainGuardNc ret = {entry};
 	return ret;
 }
 
 int chain_malloc(FatPtr *ptr, u64 size) {
+	if (!chain_guard_is_init) {
+		chain_guard_entries[chain_guard_sp].sa = init_default_slab_allocator();
+		if (chain_guard_entries[chain_guard_sp].sa == NULL)
+			return -1;
+		chain_guard_is_init = true;
+	}
+
 	if (ptr == NULL || size == 0) {
 		errno = EINVAL;
 		return -1;
 	}
-	if (chain_guard_entry_root == NULL) {
-		chain_guard_init_root();
-	}
-	if (chain_guard_entry_cur->sync) {
-	}
 	int ret;
-	if (chain_guard_entry_cur->sync) {
-		pthread_mutex_lock(&chain_guard_entry_cur->lock);
-		chain_guard_entry_cur->is_locked = true;
-		ret = slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
-		chain_guard_entry_cur->is_locked = false;
-		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
+	if (chain_guard_entries[chain_guard_sp].sync) {
+		pthread_mutex_lock(&chain_guard_entries[chain_guard_sp].lock);
+		chain_guard_entries[chain_guard_sp].is_locked = true;
+		ret = slab_allocator_allocate(chain_guard_entries[chain_guard_sp].sa, size, ptr);
+		chain_guard_entries[chain_guard_sp].is_locked = false;
+		pthread_mutex_unlock(&chain_guard_entries[chain_guard_sp].lock);
 	} else {
-		ret = slab_allocator_allocate(chain_guard_entry_cur->sa, size, ptr);
+		ret = slab_allocator_allocate(chain_guard_entries[chain_guard_sp].sa, size, ptr);
 	}
 	return ret;
 }
 int chain_realloc(FatPtr *ptr, u64 size) {
-	if (chain_guard_entry_root == NULL)
-		panic("Reallocating a FatPtr when it was never allocated!");
+	if (!chain_guard_is_init) {
+		chain_guard_entries[chain_guard_sp].sa = init_default_slab_allocator();
+		if (chain_guard_entries[chain_guard_sp].sa == NULL)
+			return -1;
+		chain_guard_is_init = true;
+	}
 
 	if (ptr == NULL || nil(*ptr) || size == 0) {
 		errno = EINVAL;
@@ -172,9 +175,9 @@ int chain_realloc(FatPtr *ptr, u64 size) {
 
 	int ret = 0;
 
-	if (chain_guard_entry_cur->sync) {
-		pthread_mutex_lock(&chain_guard_entry_cur->lock);
-		chain_guard_entry_cur->is_locked = true;
+	if (chain_guard_entries[chain_guard_sp].sync) {
+		pthread_mutex_lock(&chain_guard_entries[chain_guard_sp].lock);
+		chain_guard_entries[chain_guard_sp].is_locked = true;
 	}
 
 	FatPtr tmp = null;
@@ -194,26 +197,28 @@ int chain_realloc(FatPtr *ptr, u64 size) {
 		chain_free(ptr);
 		*ptr = tmp;
 	}
-	if (chain_guard_entry_cur->sync) {
-		chain_guard_entry_cur->is_locked = false;
-		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
+	if (chain_guard_entries[chain_guard_sp].sync) {
+		chain_guard_entries[chain_guard_sp].is_locked = false;
+		pthread_mutex_unlock(&chain_guard_entries[chain_guard_sp].lock);
 	}
 	return 0;
 }
+
 void chain_free(FatPtr *ptr) {
+	if (!chain_guard_is_init) {
+		panic("free called when default slab allocator has not been initialized");
+	}
 	if (ptr == NULL) {
 		panic("attempt to free a NULL FatPtr");
 	}
-	if (chain_guard_entry_root == NULL)
-		panic("Freeing a FatPtr when it was never allocated!");
 
-	if (chain_guard_entry_cur->sync) {
-		pthread_mutex_lock(&chain_guard_entry_cur->lock);
-		chain_guard_entry_cur->is_locked = true;
-		slab_allocator_free(chain_guard_entry_cur->sa, ptr);
-		chain_guard_entry_cur->is_locked = false;
-		pthread_mutex_unlock(&chain_guard_entry_cur->lock);
+	if (chain_guard_entries[chain_guard_sp].sync) {
+		pthread_mutex_lock(&chain_guard_entries[chain_guard_sp].lock);
+		chain_guard_entries[chain_guard_sp].is_locked = true;
+		slab_allocator_free(chain_guard_entries[chain_guard_sp].sa, ptr);
+		chain_guard_entries[chain_guard_sp].is_locked = false;
+		pthread_mutex_unlock(&chain_guard_entries[chain_guard_sp].lock);
 	} else {
-		slab_allocator_free(chain_guard_entry_cur->sa, ptr);
+		slab_allocator_free(chain_guard_entries[chain_guard_sp].sa, ptr);
 	}
 }
