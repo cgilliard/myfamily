@@ -25,8 +25,10 @@ var searchData=
   ['int8_5fmin_321',['INT8_MIN',['../mylimits_8h.html#aadcf2a81af243df333b31efa6461ab8e',1,'mylimits.h']]],
   ['internal_322',['internal',['../structFatPtrZeroImpl.html#adc391823a64b91867df2fead9c076e7a',1,'FatPtrZeroImpl']]],
   ['is_5f64_5fbit_323',['is_64_bit',['../structSlabAllocatorImpl.html#aa7a18b3ba39a784ceba1e7d4f33e8c9a',1,'SlabAllocatorImpl::is_64_bit()'],['../structSlabAllocatorConfigNc.html#a806def4806f64cee5038567f70c8b3ce',1,'SlabAllocatorConfigNc::is_64_bit()']]],
-  ['is_5flocked_324',['is_locked',['../structChainGuardEntry.html#a7753c564d71facba471775530f3de5a8',1,'ChainGuardEntry']]],
-  ['is_5fsecond_5fpunct_325',['is_second_punct',['../tokenizer_8c.html#ac9d320b89ce6b4caa6cd393b4ea94403',1,'tokenizer.c']]],
-  ['is_5fspecified_326',['is_specified',['../structSubCommandImpl.html#af078ca6b638684d48d2ace35e0b01226',1,'SubCommandImpl']]],
-  ['is_5fthird_5fpunct_327',['is_third_punct',['../tokenizer_8c.html#ac1e82ce4d7d0f26899273c8b21cbf675',1,'tokenizer.c']]]
+  ['is_5fblack_324',['IS_BLACK',['../rbtree_8c.html#a5dd6c7f649949af085ad82eb3c3e29ed',1,'rbtree.c']]],
+  ['is_5flocked_325',['is_locked',['../structChainGuardEntry.html#a7753c564d71facba471775530f3de5a8',1,'ChainGuardEntry']]],
+  ['is_5fred_326',['IS_RED',['../rbtree_8c.html#a96fb614c17a6aad192a034f51d78a994',1,'rbtree.c']]],
+  ['is_5fsecond_5fpunct_327',['is_second_punct',['../tokenizer_8c.html#ac9d320b89ce6b4caa6cd393b4ea94403',1,'tokenizer.c']]],
+  ['is_5fspecified_328',['is_specified',['../structSubCommandImpl.html#af078ca6b638684d48d2ace35e0b01226',1,'SubCommandImpl']]],
+  ['is_5fthird_5fpunct_329',['is_third_punct',['../tokenizer_8c.html#ac1e82ce4d7d0f26899273c8b21cbf675',1,'tokenizer.c']]]
 ];
