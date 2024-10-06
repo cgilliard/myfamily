@@ -33,7 +33,7 @@
 			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
 			*(bool *)(node->data + offset) = true;                                                 \
 		} else                                                                                     \
-			printf("WARN: SET_RED on invalid node\n");                                             \
+			printf("WARN: SET_RED on invalid node. node is NIL.\n");                               \
 	})
 #define SET_BLACK(impl, node)                                                                      \
 	({                                                                                             \
@@ -41,7 +41,7 @@
 			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
 			*(bool *)(node->data + offset) = false;                                                \
 		} else                                                                                     \
-			printf("WARN: SET_BLACK on invalid node\n");                                           \
+			printf("WARN: SET_BLACK on invalid node. node is NIL.\n");                             \
 	})
 
 #define IS_RED(impl, node)                                                                         \
@@ -373,36 +373,49 @@ void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
 }
 
 void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
-	printf("delete fixup\n");
+#ifdef TEST
+	// printf("delete with node_id = %llu\n", x->node_id);
+#endif
 	int i = 0;
 	while (x != impl->root && IS_BLACK(impl, x)) {
+		i++;
+		// printf("loop %i, x_is_black=%i\n", i++, IS_BLACK(impl, x));
 		if (x == x->parent->left) {
+			// printf("caseA\n");
 			RBTreeNode *w = x->parent->right; // Sibling of x
 
 			// Case 1: Sibling is red
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
+				// printf("calling set red 1\n");
 				SET_RED(impl, x->parent);
+				// printf("set red 1 complete\n");
 				leftRotate(impl, x->parent);
 				w = x->parent->right;
 			}
 
 			// Case 2: Sibling's children are both black
 			if (IS_BLACK(impl, w->left) && IS_BLACK(impl, w->right)) {
+				// printf("calling set_red 2\n");
 				SET_RED(impl, w);
+				// printf("set red 2 complete\n");
 				x = x->parent;
 			} else {
 				// Case 3: Sibling's right child is black, left child is red
 				if (IS_BLACK(impl, w->right)) {
 					SET_BLACK(impl, w->left);
+					// printf("calling set_red 3\n");
 					SET_RED(impl, w);
+					// printf("set red 3 complete\n");
 					rightRotate(impl, w);
 					w = x->parent->right;
 				}
 
 				// Case 4: Sibling's right child is red
 				if (IS_RED(impl, x->parent)) {
+					// printf("Calling set_red 4\n");
 					SET_RED(impl, w);
+					// printf("set_red 4 complete\n");
 				} else {
 					SET_BLACK(impl, w);
 				}
@@ -412,17 +425,36 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 				x = impl->root;
 			}
 		} else { // Symmetric case: x is the right child
+			// printf("caseB\n");
 			RBTreeNode *w = x->parent->left;
+
+			if (w == NULL) {
+				x = x->parent;
+				if (x->node_id == 0)
+					break;
+				printf("continue %i\n", x->node_id);
+				return;
+			}
 
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
+				// printf("calling set red 5\n");
 				SET_RED(impl, x->parent);
+				// printf("set red 5 complete\n");
 				rightRotate(impl, x->parent);
 				w = x->parent->left;
 			}
 
+			if (w == NULL) {
+				printf("WARN: W IS NULL\n");
+				printf("x=NIL=%i,i=%i\n", x == NIL, i);
+			} else if (w == NIL)
+				printf("WARN: W IS NIL\n");
+
 			if (IS_BLACK(impl, w->right) && IS_BLACK(impl, w->left)) {
+				// printf("calling set red 6\n");
 				SET_RED(impl, w);
+				// printf("set red 6 complete\n");
 				x = x->parent;
 			} else {
 				if (IS_BLACK(impl, w->left)) {
@@ -444,7 +476,7 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 			}
 		}
 	}
-	if (impl->root != NIL)
+	if (impl->root != NIL && x != NIL && x != NONE)
 		SET_BLACK(impl, x);
 }
 
@@ -475,6 +507,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	}
 
 	RBTreeNode *y = node_to_delete;
+	RBTreeNode *yp = node_to_delete->parent;
 	RBTreeNode *x = NULL;
 	bool y_is_red = IS_RED(impl, y);
 
@@ -510,6 +543,9 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	}
 
 	if (!y_is_red) {
+		if (x == NIL) {
+			x->parent = yp;
+		}
 		rbtree_delete_fixup(impl, x);
 	}
 
@@ -574,6 +610,44 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
 	return 0;
 }
 
+#ifdef TEST
+// Function to print a single node with its color
+void brtree_print_node_debug(const RBTree *ptr, const RBTreeNode *node, int depth) {
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	if (node == NULL) {
+		return;
+	}
+
+	// Print the right child first (for visual representation)
+	brtree_print_node_debug(ptr, node->right, depth + 1);
+
+	// Indent according to depth
+	for (int i = 0; i < depth; i++) {
+		printf("    ");
+	}
+
+	// Print the current node with a clearer representation
+	printf("%llu (%s)\n", node->node_id, (IS_BLACK(impl, node)) ? "B" : "R");
+
+	// Print the left child
+	brtree_print_node_debug(ptr, node->left, depth + 1);
+}
+
+// Function to print the entire tree
+void brtree_print_debug(const RBTree *ptr) {
+	RBTreeImpl *impl = $Ref(&ptr->impl);
+	if (ptr == NULL || impl->root == NULL) {
+		printf("Tree is empty.\n");
+		return;
+	}
+
+	printf("Red-Black Tree (root = %llu)\n", impl->root->node_id);
+	printf("===================================\n"); // Separator for better clarity
+	brtree_print_node_debug(ptr, impl->root, 0);
+	printf("===================================\n"); // Separator for better clarity
+}
+#endif // TEST
+
 bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_count,
 						  int current_black_count, int *max_depth, int cur_depth) {
 	if (cur_depth > *max_depth)
@@ -602,6 +676,8 @@ bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 			}
 			if (diff != 0)
 				printf("WARN: diff of 1 in heights\n");
+			if (diff != 0)
+				return false;
 		}
 		return true; // Return true for NIL nodes
 	}

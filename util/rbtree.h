@@ -52,6 +52,7 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter);
 
 #ifdef TEST
 bool rbtree_validate(const RBTree *ptr);
+void brtree_print_debug(const RBTree *ptr);
 #endif // TEST
 
 #endif // _UTIL_RBTREE__
