@@ -428,13 +428,15 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 			// printf("caseB\n");
 			RBTreeNode *w = x->parent->left;
 
-			if (w == NULL) {
-				x = x->parent;
-				if (x->node_id == 0)
-					break;
-				printf("continue %i\n", x->node_id);
-				return;
-			}
+			/*
+						if (w == NULL) {
+							x = x->parent;
+							if (x->node_id == 0)
+								break;
+							printf("continue %i\n", x->node_id);
+							return;
+						}
+			*/
 
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
