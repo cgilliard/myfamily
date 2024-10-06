@@ -121,12 +121,10 @@ bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 	while (impl->cur != NIL || impl->stack_pointer > 0) {
 		// Traverse left subtree
 		if (impl->cur != NIL) {
-			if (impl->stack_pointer < 128) {
-				// Push the current node pointer onto the stack
-				impl->stack[impl->stack_pointer++] = impl->cur;
-			} else {
-				panic("Iterator stack overflow");
-			}
+			// based on worst case log(n) * 2 + 1 this should not be possible
+			assert(impl->stack_pointer < 128);
+			// Push the current node pointer onto the stack
+			impl->stack[impl->stack_pointer++] = impl->cur;
 
 			// Move to the left child
 			impl->cur = impl->cur->left;
@@ -142,11 +140,10 @@ bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 
 			kv->key = ret + KEY_PAD;
 			kv->value = ret + KEY_PAD + VALUE_PAD(impl->key_size) + impl->key_size;
-			return true; // Return the node's data
+			break;
 		}
 	}
-
-	return false; // Traversal complete
+	return true;
 }
 
 // Utility function to perform left rotation
@@ -415,8 +412,6 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 			}
 		} else { // Symmetric case: x is the right child
 			RBTreeNode *w = x->parent->left;
-			if (w == NULL)
-				return;
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
 				SET_RED(impl, x->parent);
@@ -613,10 +608,8 @@ void rbtree_print_debug(const RBTree *ptr) {
 }
 #endif // TEST
 
-bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_count,
-						  int current_black_count, int *max_depth, int cur_depth) {
-	if (cur_depth > *max_depth)
-		*max_depth = cur_depth;
+void rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_count,
+						  int current_black_count) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	u64 key_size = impl->key_size;
 	u64 value_size = impl->value_size;
@@ -628,40 +621,23 @@ bool rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 			*black_count = current_black_count; // Set the black count for the first path
 		} else {
 			// Check for black count consistency
-			int diff;
-			if (current_black_count > *black_count)
-				diff = current_black_count - *black_count;
-			else
-				diff = *black_count - current_black_count;
-			if (diff != 0) {
-				printf("NIL node reached: current_black_count = %d, "
-					   "expected_black_count = %d\n",
-					   current_black_count, *black_count);
-				return false;
-			}
+			assert(current_black_count == *black_count);
 		}
-		return true; // Return true for NIL nodes
+		return; // Return for NIL nodes
 	}
 
 	// Increment black count if the current node is black
 	if (IS_BLACK(impl, node)) {
 		current_black_count++;
 	} else {
-		//  Check if the node is red
-		//  If the parent is red, return false (Red property violation)
-		if (node->parent != NONE && IS_RED(impl, node->parent)) {
-			printf("Red property violation at node with key\n");
-			return false;
-		}
+		//   Check if the node is red
+		//   If the parent is red, return false (Red property violation)
+		assert(!(node->parent != NONE && IS_RED(impl, node->parent)));
 	}
 
 	// Recursive calls for left and right children
-	bool left_valid = rbtree_validate_node(ptr, node->left, black_count, current_black_count,
-										   max_depth, cur_depth + 1);
-	bool right_valid = rbtree_validate_node(ptr, node->right, black_count, current_black_count,
-											max_depth, cur_depth + 1);
-
-	return left_valid && right_valid;
+	rbtree_validate_node(ptr, node->left, black_count, current_black_count);
+	rbtree_validate_node(ptr, node->right, black_count, current_black_count);
 }
 
 void rbtree_node_depth(RBTreeImpl *impl, RBTreeNode *node, int *max_depth, int cur_depth) {
@@ -680,18 +656,12 @@ int rbtree_max_depth(const RBTree *ptr) {
 	return max_depth;
 }
 
-bool rbtree_validate(const RBTree *ptr) {
+void rbtree_validate(const RBTree *ptr) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	int black_count = 0;
-	int max_depth = 0;
 	// Validate from the root and check if the root is black
 	if (impl->root != NULL) {
-		if (IS_BLACK(impl, impl->root)) {
-			bool ret = rbtree_validate_node(ptr, impl->root, &black_count, 0, &max_depth, 0);
-			return ret;
-		}
-		printf("root is not black\n");
-		return false; // Root should be black
+		assert(IS_BLACK(impl, impl->root));
+		rbtree_validate_node(ptr, impl->root, &black_count, 0);
 	}
-	return true;
 }

@@ -173,7 +173,7 @@ MyTest(util, test_random_rbtree) {
 		u64 k = arr[i];
 		u64 v = k + 100;
 		cr_assert(!rbtree_insert(&rand1, &k, &v));
-		cr_assert(rbtree_validate(&rand1));
+		rbtree_validate(&rand1);
 	}
 
 	for (u64 i = 0; i < size; i++) {
@@ -235,7 +235,7 @@ MyTest(util, validate_tree) {
 		k = i;
 		v = i + 10;
 		cr_assert(!rbtree_insert(&valid1, &k, &v));
-		cr_assert(rbtree_validate(&valid1));
+		rbtree_validate(&valid1);
 	}
 	// rbtree_print_debug(&valid1);
 	for (u64 i = 0; i < max; i++) {
