@@ -14,6 +14,8 @@
 
 #include <assert.h>
 #include <base/chain_alloc.h>
+#include <base/macro_utils.h>
+#include <base/panic.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
@@ -469,6 +471,7 @@ void set_color_based_on_parent(RBTreeImpl *impl, RBTreeNode *child, RBTreeNode *
 }
 
 void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
+	// printf("do fixup %llu\n", x->node_id);
 	while (x != impl->root && IS_BLACK(impl, x)) {
 		if (x == x->parent->left) {
 			RBTreeNode *w = x->parent->right; // Sibling of x
@@ -533,13 +536,90 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *x) {
 		}
 	}
 	// Ensure x is black at the end of fixup
-	if (x != NIL) {
-		SET_BLACK(impl, x);
+	SET_BLACK(impl, x);
+}
+
+void rbtree_delete_fixup_nil(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RBTreeNode *x) {
+	// printf("rbtree_delete_fixup_nil\n");
+	int i = 0;
+	while (x != impl->root && IS_BLACK(impl, x)) {
+		// printf("i=%i,x=%llu,w=%llu,p=%llu\n", i++, x->node_id, w->node_id, parent->node_id);
+		if (w == parent->right) {
+			// Case 1: Sibling is red
+			if (IS_RED(impl, w)) {
+				SET_BLACK(impl, w);
+				SET_RED(impl, parent);
+				rbtree_left_rotate(impl, parent);
+				w = parent->right;
+			}
+
+			// Case 2: Sibling's children are both black
+			if (IS_BLACK(impl, w->left) && IS_BLACK(impl, w->right)) {
+				SET_RED(impl, w);
+				x = parent;
+				parent = parent->parent;
+				if (x == x->parent->left) {
+					w = x->parent->right;
+				} else {
+					w = x->parent->left;
+				}
+			} else {
+				// Case 3: Sibling's right child is black, left child is red
+				if (IS_BLACK(impl, w->right)) {
+					SET_BLACK(impl, w->left);
+					SET_RED(impl, w);
+					rbtree_right_rotate(impl, w);
+					w = parent->right;
+				}
+
+				// Case 4: Sibling's right child is red
+				set_color_based_on_parent(impl, w, parent);
+				SET_BLACK(impl, parent);
+				SET_BLACK(impl, w->right);
+				rbtree_left_rotate(impl, parent);
+				x = impl->root; // Set x to root at the end, only once
+			}
+		} else {
+			// Case 1: Sibling is red
+			if (IS_RED(impl, w)) {
+				SET_BLACK(impl, w);
+				SET_RED(impl, parent);
+				rbtree_right_rotate(impl, parent);
+				w = parent->left;
+			}
+			// Case 2: Sibling's children are both black
+			if (IS_BLACK(impl, w->right) && IS_BLACK(impl, w->left)) {
+				SET_RED(impl, w);
+				x = parent;
+				parent = parent->parent;
+				if (x == x->parent->left) {
+					w = x->parent->right;
+				} else {
+					w = x->parent->left;
+				}
+			} else {
+				// Case 3: Sibling's left child is black, right child is red
+				if (IS_BLACK(impl, w->left)) {
+					SET_BLACK(impl, w->right);
+					SET_RED(impl, w);
+					rbtree_left_rotate(impl, w);
+					w = parent->left;
+				}
+				// Case 4: Sibling's left child is red
+				set_color_based_on_parent(impl, w, parent);
+				SET_BLACK(impl, parent);
+				SET_BLACK(impl, w->left);
+				rbtree_right_rotate(impl, parent);
+				x = impl->root; // Set x to root at the end, only once
+			}
+		}
 	}
+
+	// Ensure x is black at the end of fixup
+	SET_BLACK(impl, x);
 }
 
 int rbtree_delete(RBTree *ptr, const void *key) {
-	RBTreeNode mock;
 	if (ptr == NULL || nil(ptr->impl) || key == NULL) {
 		errno = EINVAL;
 		return -1;
@@ -553,14 +633,14 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	if (pair.self == NIL)
 		return -1;
 
+	// printf("deleting node %llu\n", pair.self->node_id);
+
 	RBTreeNode *node_to_delete = pair.self;
 	RBTreeNode *x;
 	bool do_fixup = IS_BLACK(impl, node_to_delete);
 
 	if (node_to_delete->left == NIL) {
 		x = node_to_delete->right;
-		if (x == NIL) {
-		}
 		rbtree_transplant(impl, node_to_delete, node_to_delete->right);
 	} else if (node_to_delete->right == NIL) {
 		x = node_to_delete->left;
@@ -584,8 +664,20 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		set_color_based_on_parent(impl, successor, node_to_delete);
 	}
 
-	if (do_fixup && x != NIL)
-		rbtree_delete_fixup(impl, x);
+	if (do_fixup) {
+		if (x != NIL) {
+			rbtree_delete_fixup(impl, x);
+		} else {
+			RBTreeNode *sibling;
+			if (node_to_delete->parent->left == NIL)
+				sibling = node_to_delete->parent->right;
+			else
+				sibling = node_to_delete->parent->left;
+			// rbtree_print(ptr);
+			if (sibling != NIL && node_to_delete->parent != NIL)
+				rbtree_delete_fixup_nil(impl, node_to_delete->parent, sibling, x);
+		}
+	}
 
 	// Free the node which has been transplanted
 	{
@@ -641,8 +733,10 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
 	return 0;
 }
 
+#ifdef TEST
 void rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_count,
-						  int current_black_count) {
+						  int current_black_count, u64 ids[100]) {
+	ids[current_black_count] = node->node_id;
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	u64 key_size = impl->key_size;
 	u64 value_size = impl->value_size;
@@ -654,6 +748,12 @@ void rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 			*black_count = current_black_count; // Set the black count for the first path
 		} else {
 			// Check for black count consistency
+			if (current_black_count != *black_count) {
+				for (int i = 0; i < current_black_count; i++) {
+					printf("%llu -> ", ids[i]);
+				}
+				printf("NIL (%d) (expected=%d)\n", current_black_count, *black_count);
+			}
 			assert(current_black_count == *black_count);
 		}
 		return; // Return for NIL nodes
@@ -669,17 +769,18 @@ void rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 	}
 
 	// Recursive calls for left and right children
-	rbtree_validate_node(ptr, node->left, black_count, current_black_count);
-	rbtree_validate_node(ptr, node->right, black_count, current_black_count);
+	rbtree_validate_node(ptr, node->left, black_count, current_black_count, ids);
+	rbtree_validate_node(ptr, node->right, black_count, current_black_count, ids);
 }
 
 void rbtree_validate(const RBTree *ptr) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	int black_count = 0;
+	u64 ids[100];
 	// Validate from the root and check if the root is black
 	if (impl->root != NIL) {
 		assert(IS_BLACK(impl, impl->root));
-		rbtree_validate_node(ptr, impl->root, &black_count, 0);
+		rbtree_validate_node(ptr, impl->root, &black_count, 0, ids);
 	}
 }
 
@@ -700,10 +801,13 @@ int rbtree_max_depth(const RBTree *ptr) {
 }
 
 // Function to print a single node with its color
-#ifdef TEST
 void rbtree_print_node(const RBTree *ptr, const RBTreeNode *node, int depth) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	if (node == NIL) {
+		for (int i = 0; i < depth; i++) {
+			printf("    ");
+		}
+		printf("%llu (%s)\n", node->node_id, (IS_BLACK(impl, node)) ? "B" : "R");
 		return;
 	}
 

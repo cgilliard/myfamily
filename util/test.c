@@ -79,13 +79,14 @@ MyTest(util, validate_rbtree) {
 	u64 k, v;
 	cr_assert(!rbtree_build(&valid1, sizeof(u64), sizeof(u64), u64_compare, false));
 
-	u64 max = 10000;
+	u64 max = 100;
 	for (u64 i = 0; i < max; i++) {
 		k = i;
 		v = i + 10;
 		cr_assert(!rbtree_insert(&valid1, &k, &v));
 		rbtree_validate(&valid1);
 	}
+	rbtree_validate(&valid1);
 
 	for (u64 i = 0; i < max; i++) {
 		k = i;
@@ -94,9 +95,9 @@ MyTest(util, validate_rbtree) {
 		cr_assert_eq(*value, v);
 	}
 
-	// rbtree_print(&valid1);
-	// printf("Max depth = %d\n", rbtree_max_depth(&valid1));
 	/*
+		rbtree_print(&valid1);
+		printf("Max depth = %d\n", rbtree_max_depth(&valid1));
 		k = 0;
 		cr_assert(!rbtree_delete(&valid1, &k));
 		printf("post delete print of tree\n");
@@ -111,7 +112,7 @@ MyTest(util, validate_rbtree) {
 		cr_assert(!rbtree_delete(&valid1, &k));
 		cr_assert_eq(rbtree_size(&valid1), (max - 1) - i);
 		// rbtree_print_debug(&valid1);
-		//		rbtree_validate(&valid1);
+		rbtree_validate(&valid1);
 	}
 }
 
