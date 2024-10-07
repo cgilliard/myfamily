@@ -700,6 +700,7 @@ int rbtree_max_depth(const RBTree *ptr) {
 }
 
 // Function to print a single node with its color
+#ifdef TEST
 void rbtree_print_node(const RBTree *ptr, const RBTreeNode *node, int depth) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	if (node == NIL) {
@@ -730,3 +731,5 @@ void rbtree_print(const RBTree *ptr) {
 	rbtree_print_node(ptr, impl->root, 0);
 	printf("===================================\n"); // Separator for better clarity
 }
+
+#endif // TEST
