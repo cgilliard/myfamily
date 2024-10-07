@@ -471,8 +471,9 @@ void set_color_based_on_parent(RBTreeImpl *impl, RBTreeNode *child, RBTreeNode *
 }
 
 void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RBTreeNode *x) {
-	// printf("rbtree_delete_fixup\n");
+	// printf("deletefixup\n");
 	int i = 0;
+	// printf("i=%i(pre),x=%llu,w=%llu,p=%llu\n", i++, x->node_id, w->node_id, parent->node_id);
 	while (x != impl->root && IS_BLACK(impl, x)) {
 		// printf("i=%i,x=%llu,w=%llu,p=%llu\n", i++, x->node_id, w->node_id, parent->node_id);
 		if (w == parent->right) {
@@ -567,26 +568,32 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	// printf("deleting node %llu\n", pair.self->node_id);
 
 	RBTreeNode *node_to_delete = pair.self;
-	RBTreeNode *x;
+	RBTreeNode *x = NIL;
+	RBTreeNode *w = NIL;
 	bool do_fixup = IS_BLACK(impl, node_to_delete);
 
 	if (node_to_delete->left == NIL) {
 		// printf("caseA\n");
 		x = node_to_delete->right;
 		rbtree_transplant(impl, node_to_delete, node_to_delete->right);
+		if (node_to_delete->parent->left == NIL)
+			w = node_to_delete->parent->right;
+		else
+			w = node_to_delete->parent->left;
 	} else if (node_to_delete->right == NIL) {
 		// printf("caseB\n");
 		x = node_to_delete->left;
 		rbtree_transplant(impl, node_to_delete, node_to_delete->left);
+		if (node_to_delete->parent->left == NIL)
+			w = node_to_delete->parent->right;
+		else
+			w = node_to_delete->parent->left;
 	} else {
 		// printf("caseC\n");
 		RBTreeNode *successor = rbtree_find_successor(impl, node_to_delete);
-		x = successor->right;
+		do_fixup = IS_BLACK(impl, successor);
 
-		if (successor->parent == node_to_delete) {
-			if (x != NIL)
-				x->parent = successor;
-		} else {
+		if (successor->parent != node_to_delete) {
 			rbtree_transplant(impl, successor, successor->right);
 			successor->right = node_to_delete->right;
 			successor->right->parent = successor;
@@ -596,26 +603,19 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		successor->left = node_to_delete->left;
 		successor->left->parent = successor;
 		set_color_based_on_parent(impl, successor, node_to_delete);
+		x = successor->right;
+		w = successor->left;
 	}
 
 	if (do_fixup) {
-		if (x != NIL) {
-			RBTreeNode *sibling;
-			if (x->parent->left == x)
-				sibling = x->parent->right;
-			else
-				sibling = x->parent->left;
-			rbtree_delete_fixup(impl, x->parent, sibling, x);
-		} else {
-			RBTreeNode *sibling;
-			if (node_to_delete->parent->left == NIL)
-				sibling = node_to_delete->parent->right;
-			else
-				sibling = node_to_delete->parent->left;
-			// rbtree_print(ptr);
-			if (sibling != NIL && node_to_delete->parent != NIL)
-				rbtree_delete_fixup(impl, node_to_delete->parent, sibling, x);
-		}
+		// rbtree_print(ptr);
+		RBTreeNode *parent = w->parent;
+		if (parent == NIL)
+			parent = x->parent;
+		if (w != NIL && parent != NIL)
+			rbtree_delete_fixup(impl, parent, w, x);
+		else if (impl->size > 1)
+			SET_BLACK(impl, impl->root);
 	}
 
 	// Free the node which has been transplanted
