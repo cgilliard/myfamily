@@ -98,7 +98,7 @@ MyTest(util, validate_rbtree) {
 	/*
 		rbtree_print(&valid1);
 		printf("Max depth = %d\n", rbtree_max_depth(&valid1));
-		k = 0;
+		k = 9;
 		cr_assert(!rbtree_delete(&valid1, &k));
 		printf("post delete print of tree\n");
 		rbtree_print(&valid1);
