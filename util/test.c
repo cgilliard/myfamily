@@ -79,7 +79,7 @@ MyTest(util, validate_rbtree) {
 	u64 k, v;
 	cr_assert(!rbtree_build(&valid1, sizeof(u64), sizeof(u64), u64_compare, false));
 
-	u64 max = 10;
+	u64 max = 1000;
 	for (u64 i = 0; i < max; i++) {
 		k = i;
 		v = i + 10;
@@ -123,7 +123,7 @@ MyTest(util, test_random_rbtree) {
 	psrng_test_seed(iv, key);
 	RBTree rand1;
 	cr_assert(!rbtree_build(&rand1, sizeof(u64), sizeof(u64), u64_compare, false));
-	u64 size = 10;
+	u64 size = 12;
 	u64 arr[size];
 	for (u64 i = 0; i < size; i++) {
 		arr[i] = 0; // ensure zeroed before calling rng for reproducibility.
