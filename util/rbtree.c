@@ -162,7 +162,8 @@ void leftRotate(RBTreeImpl *impl, RBTreeNode *x) {
 		}
 		y->left = x;
 		x->parent = y;
-	}
+	} else
+		printf("WARN: Attempt to rotate when y-left doesn't exist\n");
 }
 
 // Utility function to perform right rotation
@@ -181,7 +182,8 @@ void rightRotate(RBTreeImpl *impl, RBTreeNode *x) {
 		}
 		y->right = x;
 		x->parent = y;
-	}
+	} else
+		printf("WARN: Attempt to rotate when y-right doesn't exist\n");
 }
 
 void rbtree_fix_up(RBTree *ptr, RBTreeNode *k) {
@@ -374,10 +376,12 @@ void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
 }
 
 void set_color_based_on_parent(RBTreeImpl *impl, RBTreeNode *child, RBTreeNode *parent) {
-	if (IS_RED(impl, parent)) {
-		SET_RED(impl, child);
-	} else {
-		SET_BLACK(impl, child);
+	if (child != NIL) {
+		if (IS_RED(impl, parent)) {
+			SET_RED(impl, child);
+		} else {
+			SET_BLACK(impl, child);
+		}
 	}
 }
 
@@ -516,12 +520,10 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		rbtree_transplant(impl, node_to_delete, successor);
 		successor->left = node_to_delete->left;
 		successor->left->parent = successor;
-		if (IS_RED(impl, node_to_delete))
-			SET_RED(impl, successor);
-		else
-			SET_BLACK(impl, successor);
+		set_color_based_on_parent(impl, successor, node_to_delete);
 	}
 
+	// rbtree_print_debug(ptr);
 	if (call_fixup)
 		rbtree_delete_fixup(impl, x);
 

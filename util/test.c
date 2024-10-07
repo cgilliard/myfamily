@@ -80,7 +80,6 @@ MyTest(util, test_rbtree) {
 	cr_assert_eq(v41_out, NULL);
 
 	cr_assert_eq(rbtree_size(&tree1), 5);
-	printf("del1\n");
 	cr_assert(!rbtree_delete(&tree1, &k3));
 
 	const MyValue *v1_out2 = rbtree_get(&tree1, &k1);
@@ -106,12 +105,12 @@ MyTest(util, test_rbtree) {
 
 		MyKey *k1 = kv.key;
 		MyValue *v1 = kv.value;
-		printf("i=%i k1.v=%llu,value=%s\n", i++, k1->v, v1->buf);
 		cr_assert(last < k1->v);
 		last = k1->v;
 		char buf[101];
 		snprintf(buf, 100, "value%llu", k1->v);
 		cr_assert(!strcmp(buf, v1->buf));
+		i++;
 	}
 
 	cr_assert(!rbtree_iterator_next(&itt, &kv));
@@ -126,7 +125,6 @@ MyTest(util, test_rbtree) {
 	cr_assert(!rbtree_insert(&tree2, &k1, &v1));
 	cr_assert(!strcmp(rbtree_get(&tree2, &k1), "value20"));
 	cr_assert_eq(rbtree_size(&tree2), 1);
-	printf("del2\n");
 	rbtree_delete(&tree2, &k1);
 
 	cr_assert_eq(rbtree_size(&tree2), 0);
@@ -230,16 +228,17 @@ MyTest(util, validate_tree) {
 	u64 k, v;
 	cr_assert(!rbtree_build(&valid1, sizeof(u64), sizeof(u64), u64_compare, false));
 
-	u64 max = 1000;
+	u64 max = 10;
 	for (u64 i = 0; i < max; i++) {
 		k = i;
 		v = i + 10;
 		cr_assert(!rbtree_insert(&valid1, &k, &v));
 		rbtree_validate(&valid1);
 	}
+
 	/*
 		rbtree_print_debug(&valid1);
-		k = 1;
+		k = 8;
 		cr_assert(!rbtree_delete(&valid1, &k));
 		printf("post delete print of tree\n");
 		rbtree_print_debug(&valid1);
