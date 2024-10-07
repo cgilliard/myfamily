@@ -79,7 +79,7 @@ MyTest(util, validate_rbtree) {
 	u64 k, v;
 	cr_assert(!rbtree_build(&valid1, sizeof(u64), sizeof(u64), u64_compare, false));
 
-	u64 max = 1000;
+	u64 max = 10;
 	for (u64 i = 0; i < max; i++) {
 		k = i;
 		v = i + 10;

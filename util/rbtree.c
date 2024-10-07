@@ -570,6 +570,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	RBTreeNode *node_to_delete = pair.self;
 	RBTreeNode *x = NIL;
 	RBTreeNode *w = NIL;
+	RBTreeNode *parent = NIL;
 	bool do_fixup = IS_BLACK(impl, node_to_delete);
 
 	if (node_to_delete->left == NIL) {
@@ -580,6 +581,10 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 			w = node_to_delete->parent->right;
 		else
 			w = node_to_delete->parent->left;
+		if (x != NIL)
+			parent = x->parent;
+		else if (w != NIL)
+			parent = w->parent;
 	} else if (node_to_delete->right == NIL) {
 		// printf("caseB\n");
 		x = node_to_delete->left;
@@ -588,6 +593,10 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 			w = node_to_delete->parent->right;
 		else
 			w = node_to_delete->parent->left;
+		if (x != NIL)
+			parent = x->parent;
+		else if (w != NIL)
+			parent = w->parent;
 	} else {
 		// printf("caseC\n");
 		RBTreeNode *successor = rbtree_find_successor(impl, node_to_delete);
@@ -603,19 +612,29 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		successor->left = node_to_delete->left;
 		successor->left->parent = successor;
 		set_color_based_on_parent(impl, successor, node_to_delete);
-		x = successor->right;
-		w = successor->left;
+		if (successor->right->right != NIL || successor->right->left != NIL) {
+			w = successor->right->right;
+			x = successor->right->left;
+		} else {
+			w = successor->left;
+			x = successor->right;
+		}
+		if (x != NIL)
+			parent = x->parent;
+		else if (w != NIL)
+			parent = w->parent;
+		// printf("x=%llu w=%llu\n", x->node_id, w->node_id);
 	}
 
 	if (do_fixup) {
 		// rbtree_print(ptr);
-		RBTreeNode *parent = w->parent;
-		if (parent == NIL)
-			parent = x->parent;
-		if (w != NIL && parent != NIL)
+		if (w != NIL && parent != NIL) {
 			rbtree_delete_fixup(impl, parent, w, x);
-		else if (impl->size > 1)
-			SET_BLACK(impl, impl->root);
+		} else {
+			// printf("w or p are nil w=%llu,p=%llu\n", w->node_id, parent->node_id);
+			if (impl->size > 1)
+				SET_BLACK(impl, impl->root);
+		}
 	}
 
 	// Free the node which has been transplanted
