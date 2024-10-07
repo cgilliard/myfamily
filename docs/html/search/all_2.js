@@ -5,7 +5,7 @@ var searchData=
   ['boolean_5fsize_47',['BOOLEAN_SIZE',['../rbtree_8c.html#aa8345c0d546bd02cd74763e0f3267bdd',1,'rbtree.c']]],
   ['both_48',['BOTH',['../macro__utils_8h.html#a699feff54e3c87657391e9334ab507dd',1,'macro_utils.h']]],
   ['bright_5fred_49',['BRIGHT_RED',['../colors_8h.html#a458d388b2fc60518af3517f52f9e7e2a',1,'colors.h']]],
-  ['buf_50',['buf',['../structTestData.html#ad79b40b417a16e14811c986ef9b59804',1,'TestData::buf()'],['../structMyValue.html#a7b3d380f4ce72499fb5651030158483b',1,'MyValue::buf()']]],
+  ['buf_50',['buf',['../structTestData.html#ad79b40b417a16e14811c986ef9b59804',1,'TestData']]],
   ['build_2ec_51',['build.c',['../build_2build_8c.html',1,'(Global Namespace)'],['../faml_2build_8c.html',1,'(Global Namespace)']]],
   ['build_2eh_52',['build.h',['../build_8h.html',1,'']]],
   ['build_5fargs_53',['build_args',['../real__main_8c.html#a9b51243bbc81f0329a7cb22a38c32790',1,'real_main.c']]],

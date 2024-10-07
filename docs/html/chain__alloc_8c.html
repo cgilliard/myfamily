@@ -68,6 +68,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
@@ -88,6 +89,11 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a2ec964befa29aad18ab7ec7b427f8f00"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8c.html#a2ec964befa29aad18ab7ec7b427f8f00">MAX_CHAIN_GUARDS</a>&#160;&#160;&#160;128</td></tr>
+<tr class="separator:a2ec964befa29aad18ab7ec7b427f8f00"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a75e50a043100b00eed7fa9dc3ceb661d"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8c.html#a75e50a043100b00eed7fa9dc3ceb661d">ChainGuardEntry</a></td></tr>
@@ -105,8 +111,6 @@ Functions</h2></td></tr>
 <tr class="separator:a1e072480fb4dea3aec21f7e2a99f44c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2216333c8ff16cccfb94553da88513d9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8c.html#a2216333c8ff16cccfb94553da88513d9">cleanup_default_slab_allocator</a> ()</td></tr>
 <tr class="separator:a2216333c8ff16cccfb94553da88513d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7144d283d19dd7a6a0d54b8483a29b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8c.html#ad7144d283d19dd7a6a0d54b8483a29b8">chain_guard_init_root</a> ()</td></tr>
-<tr class="separator:ad7144d283d19dd7a6a0d54b8483a29b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a849afb2f6a8c5640494bf4965c5ab07c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8c.html#a849afb2f6a8c5640494bf4965c5ab07c">chain_guard_cleanup</a> (<a class="el" href="structChainGuardNc.html">ChainGuardNc</a> *ptr)</td></tr>
 <tr class="separator:a849afb2f6a8c5640494bf4965c5ab07c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a692f3402f6b01d936b97a668f1b6a14b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="chain__alloc_8h.html#a9a8623cb74a147abf95752a87e262c09">ChainGuard</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8c.html#a692f3402f6b01d936b97a668f1b6a14b">set_slab_allocator</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> *sa, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> sync)</td></tr>
@@ -120,13 +124,24 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a694d5617a8fe9d99db70f2f95b4595c6"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8c.html#a694d5617a8fe9d99db70f2f95b4595c6">chain_guard_entry_root</a> = <a class="el" href="resources_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></td></tr>
-<tr class="separator:a694d5617a8fe9d99db70f2f95b4595c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1a36f4044e174122fd2d0b073b0123c"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8c.html#aa1a36f4044e174122fd2d0b073b0123c">chain_guard_entry_cur</a> = <a class="el" href="resources_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></td></tr>
-<tr class="separator:aa1a36f4044e174122fd2d0b073b0123c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4750844c481f57cb023980c5e2773ecb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8c.html#a4750844c481f57cb023980c5e2773ecb">global_sync_allocator</a> = <a class="el" href="resources_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></td></tr>
 <tr class="separator:a4750844c481f57cb023980c5e2773ecb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a2ec964befa29aad18ab7ec7b427f8f00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ec964befa29aad18ab7ec7b427f8f00">&#9670;&nbsp;</a></span>MAX_CHAIN_GUARDS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MAX_CHAIN_GUARDS&#160;&#160;&#160;128</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="a75e50a043100b00eed7fa9dc3ceb661d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a75e50a043100b00eed7fa9dc3ceb661d">&#9670;&nbsp;</a></span>ChainGuardEntry</h2>
@@ -206,23 +221,6 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structChainGuardNc.html">ChainGuardNc</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad7144d283d19dd7a6a0d54b8483a29b8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad7144d283d19dd7a6a0d54b8483a29b8">&#9670;&nbsp;</a></span>chain_guard_init_root()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void chain_guard_init_root </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -366,34 +364,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="aa1a36f4044e174122fd2d0b073b0123c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa1a36f4044e174122fd2d0b073b0123c">&#9670;&nbsp;</a></span>chain_guard_entry_cur</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">_Thread_local <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a>* chain_guard_entry_cur = <a class="el" href="resources_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a694d5617a8fe9d99db70f2f95b4595c6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a694d5617a8fe9d99db70f2f95b4595c6">&#9670;&nbsp;</a></span>chain_guard_entry_root</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">_Thread_local <a class="el" href="structChainGuardEntry.html">ChainGuardEntry</a>* chain_guard_entry_root = <a class="el" href="resources_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a4750844c481f57cb023980c5e2773ecb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4750844c481f57cb023980c5e2773ecb">&#9670;&nbsp;</a></span>global_sync_allocator</h2>
 
