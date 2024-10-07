@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/rand.h>
 #include <base/types.h>
+#include <crypto/rand.h>
 #include <sys/random.h>
 
 int rand_i8(i8 *v) {

@@ -18,8 +18,8 @@
 #include <base/macro_utils.h>
 #include <base/misc.h>
 #include <base/resources.h>
-#include <base/sha3.h>
 #include <base/types.h>
+#include <crypto/sha3.h>
 
 #include <main/resources.h>
 

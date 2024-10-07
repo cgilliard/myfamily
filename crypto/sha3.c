@@ -34,7 +34,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <base/sha3.h>
+#include <crypto/sha3.h>
 
 #define SHA3_ASSERT(x)
 #define SHA3_TRACE(format, ...)

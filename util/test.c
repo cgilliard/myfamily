@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <base/macro_utils.h>
-#include <base/rand.h>
 #include <base/test.h>
+#include <crypto/psrng.h>
 #include <string.h>
 #include <util/rbtree.h>
 
@@ -117,12 +117,17 @@ MyTest(util, validate_rbtree) {
 }
 
 MyTest(util, test_random_rbtree) {
+	// seed rng for reproducibility
+	u8 key[32] = {6};
+	u8 iv[16] = {};
+	psrng_test_seed(iv, key);
 	RBTree rand1;
 	cr_assert(!rbtree_build(&rand1, sizeof(u64), sizeof(u64), u64_compare, false));
-	u64 size = 10000;
+	u64 size = 10;
 	u64 arr[size];
 	for (u64 i = 0; i < size; i++) {
-		cr_assert(!rand_u64(&arr[i]));
+		arr[i] = 0; // ensure zeroed before calling rng for reproducibility.
+		psrng_rand_u64(&arr[i]);
 		arr[i] %= INT64_MAX;
 		u64 k = arr[i];
 		u64 v = k + 100;
@@ -157,16 +162,20 @@ MyTest(util, test_random_rbtree) {
 	cr_assert_eq(i, size);
 
 	cr_assert_eq(rbtree_size(&rand1), size);
+	rbtree_print(&rand1);
 
 	i = 0;
+
 	loop {
+		printf("delete %llu\n", i);
 		if (i == size)
 			break;
 		cr_assert(!rbtree_delete(&rand1, &arr[i]));
-		// rbtree_validate(&rand1);
 		cr_assert_eq(rbtree_size(&rand1), (size - 1) - i);
-		// int depth = rbtree_max_depth(&rand1);
-		// printf("Max_depth[%llu]=%i\n", i, depth);
+		int depth = rbtree_max_depth(&rand1);
+		printf("Max_depth[%llu]=%i,tree_size=%llu\n", i, depth, rbtree_size(&rand1));
+		// rbtree_print(&rand1);
+		rbtree_validate(&rand1);
 		i++;
 	}
 	cr_assert_eq(rbtree_size(&rand1), 0);

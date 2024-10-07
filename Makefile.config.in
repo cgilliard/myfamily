@@ -29,13 +29,14 @@ COVERAGE_FLAGS=--coverage -DTEST
 INSTALL_DIR=/usr/local/bin
 
 # Object directories
-ALL_OBJS=main/*.o args/*.o base/*.o lexer/*.o faml/*.o util/*.o
-SUBDIRS := main args base lexer faml util
+ALL_OBJS=main/*.o args/*.o base/*.o lexer/*.o faml/*.o util/*.o crypto/*.o
+SUBDIRS := main args base lexer faml util crypto
 SUBDIRS_RELEASE := $(SUBDIRS)
 HEADERS := $(wildcard main/*.h) \
            $(wildcard base/*.h) \
            $(wildcard args/*.h) \
            $(wildcard lexer/*.h) \
            $(wildcard faml/*.h) \
-           $(wildcard util/*.h)
+           $(wildcard util/*.h) \
+           $(wildcard crypto/*.h)
 

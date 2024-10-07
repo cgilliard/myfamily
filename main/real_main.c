@@ -16,7 +16,7 @@
 #include <assert.h>
 #include <base/misc.h>
 #include <base/path.h>
-#include <base/sha3.h>
+#include <crypto/sha3.h>
 #include <limits.h>
 #include <main/main.h>
 #include <stdio.h>
