@@ -15,6 +15,7 @@
 #include <assert.h>
 #include <stdio.h>
 
+#include <base/types.h>
 #include <util/rbtree.h>
 
 int u64_compare(const void *v1, const void *v2) {
@@ -37,8 +38,6 @@ int u64_compare(const void *v1, const void *v2) {
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
-
-typedef uint64_t u64; // Assuming u64 is defined as uint64_t
 
 // Your RBTree, rbtree_build, rbtree_insert, rbtree_get functions here...
 
