@@ -21,8 +21,14 @@
 #include <string.h>
 #include <util/rbtree.h>
 
+// Node id counter
 static u64 node_id_counter = 10;
 
+// RBTreeNode (overhead on 64 bit system is: four pointers * 8 = 32 bytes + Fat pointer's slab has a
+// next pointer (8 bytes) and the FatPointer impl (with 32 bit slabs, which is default) has 16 bytes
+// overhead. So, total overhead is 56 bytes. With 64 bit slabs there's an additional 8 bytes.
+// It's also important to note that key/values are padded to 16 bytes. So that may introduce
+// additional overhead. The 'data' section holds both key/value and 1 byte for node color.
 typedef struct RBTreeNode {
 	FatPtr self;
 	struct RBTreeNode *right;
@@ -35,15 +41,17 @@ typedef struct RBTreeNode {
 	char data[];
 } RBTreeNode;
 
+// The internal RBTreeImpl storage data structure
 typedef struct RBTreeImpl {
-	u64 key_size;
-	u64 value_size;
-	int (*compare)(const void *, const void *);
-	RBTreeNode *root;
-	u64 size;
-	bool send;
+	u64 key_size;								// size of the keys
+	u64 value_size;								// size of the values
+	int (*compare)(const void *, const void *); // a comparion function (like qsort)
+	RBTreeNode *root;							// pointer to the root node.
+	u64 size;									// current size of the tree.
+	bool send; // whether this RBTree can be sent to other threads (using global chain_malloc)
 } RBTreeImpl;
 
+// Iterator impl
 typedef struct RBTreeIteratorImpl {
 	RBTreeNode *cur;
 	RBTreeNode *stack[128];
@@ -52,12 +60,14 @@ typedef struct RBTreeIteratorImpl {
 	bool send;
 } RBTreeIteratorImpl;
 
+// Data structure used for searching RBTrees.
 typedef struct RBTreeNodePair {
 	RBTreeNode *parent;
 	RBTreeNode *self;
 	bool is_right;
 } RBTreeNodePair;
 
+// utility macros
 #define BOOLEAN_SIZE 1
 #define VALUE_PAD(key_size) (16 - (key_size % 16))
 #define DATA_SIZE(impl)                                                                            \
@@ -112,6 +122,7 @@ const static RBTreeNode NIL_DEFN = {
 static RBTreeNode *NIL = &NIL_DEFN;
 #pragma GCC diagnostic pop
 
+// cleanup function for iterators
 void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
 	if (!nil(ptr->impl)) {
 		// obtain referent to internal RBTreeImpl structure
@@ -124,6 +135,7 @@ void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
 	}
 }
 
+// returns the next item in the iterator
 bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 	RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
 
@@ -188,6 +200,7 @@ void rbtree_free_node(RBTreeNode *ptr) {
 	}
 }
 
+// internal search function used by get/insert/delete.
 void rbtree_search(RBTreeImpl *impl, const void *key, RBTreeNodePair *nodes) {
 	nodes->parent = NIL;
 	nodes->self = impl->root;
@@ -215,6 +228,7 @@ void rbtree_search(RBTreeImpl *impl, const void *key, RBTreeNodePair *nodes) {
 	}
 }
 
+// do a left rotation
 void rbtree_left_rotate(RBTreeImpl *impl, RBTreeNode *x) {
 
 #ifdef TEST
@@ -250,6 +264,7 @@ void rbtree_left_rotate(RBTreeImpl *impl, RBTreeNode *x) {
 	x->parent = y;
 }
 
+// do a right rotation
 void rbtree_right_rotate(RBTreeImpl *impl, RBTreeNode *x) {
 
 #ifdef TEST
@@ -285,6 +300,7 @@ void rbtree_right_rotate(RBTreeImpl *impl, RBTreeNode *x) {
 	x->parent = y;
 }
 
+// insert fixup operation
 void rbtree_insert_fixup(RBTreeImpl *impl, RBTreeNode *k) {
 	int i = 0;
 	while (k != impl->root && IS_RED(impl, k->parent)) {
@@ -297,6 +313,7 @@ void rbtree_insert_fixup(RBTreeImpl *impl, RBTreeNode *k) {
 #endif // TEST
 
 		if (k->parent == k->parent->parent->left) {
+			// uncle is on the right
 			RBTreeNode *u = k->parent->parent->right;
 
 			if (IS_RED(impl, u)) {
@@ -314,6 +331,7 @@ void rbtree_insert_fixup(RBTreeImpl *impl, RBTreeNode *k) {
 				rbtree_right_rotate(impl, k->parent->parent);
 			}
 		} else {
+			// uncle is on the left
 			RBTreeNode *u = k->parent->parent->left;
 
 			if (IS_RED(impl, u)) {
@@ -332,6 +350,7 @@ void rbtree_insert_fixup(RBTreeImpl *impl, RBTreeNode *k) {
 			}
 		}
 	}
+	// always set black at the end
 	SET_BLACK(impl, impl->root);
 }
 
@@ -384,30 +403,40 @@ int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 	return 0;
 }
 
+// insert function
 int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
+	// validate input
 	if (ptr == NULL || key == NULL || value == NULL) {
 		errno = EINVAL;
 		return -1;
 	}
 
+	// obtain the impl from the fat ptr
 	RBTreeImpl *impl = $Ref(&ptr->impl);
+	// this pair is used to search
 	RBTreeNodePair pair;
+	// pointer for our node
 	RBTreeNode *node;
 
+	// perform search for the key
 	rbtree_search(impl, key, &pair);
 
+	// if it's already in the tree this is an error
 	if (pair.self != NIL)
 		return -1;
 
+	// retreive the data size
 	u64 size = DATA_SIZE(impl);
 	FatPtr self;
 
+	// using chain_malloc allocate memory for this node
 	{
 		ChainGuard _ = ChainSend(impl->send);
 		if (chain_malloc(&self, size))
 			return -1;
 	}
 
+	// using the allocated memory set node properties
 	node = $Ref(&self);
 	node->self = self;
 	if (impl->root == NIL) {
@@ -417,25 +446,31 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	} else {
 		pair.parent->left = node;
 	}
-	node->right = NIL;
-	node->left = NIL;
-	node->parent = pair.parent;
+	node->right = NIL;			// always must be set to NIL at first.
+	node->left = NIL;			// always must be set to NIL at first.
+	node->parent = pair.parent; // set our parent pointer.
 
+	// copy data
 	memcpy(node->data, key, impl->key_size);
+	// copy value
 	memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
+	// nodes are initially red
 	SET_RED(impl, node);
 
 #ifdef TEST
 	node->node_id = node_id_counter++;
 #endif // TEST
 
+	// increment the size counter
 	impl->size++;
 
+	// insert_fixup
 	rbtree_insert_fixup(impl, node);
 
 	return 0;
 }
 
+// find the successor node
 RBTreeNode *rbtree_find_successor(RBTreeImpl *impl, RBTreeNode *x) {
 	RBTreeNode *successor = x->right;
 	while (successor->left != NIL) {
@@ -444,6 +479,7 @@ RBTreeNode *rbtree_find_successor(RBTreeImpl *impl, RBTreeNode *x) {
 	return successor;
 }
 
+// perform transplant operation
 void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
 	if (dst->parent == NIL)
 		impl->root = src;
@@ -456,6 +492,7 @@ void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
 	}
 }
 
+// set child's color to parent's
 void set_color_based_on_parent(RBTreeImpl *impl, RBTreeNode *child, RBTreeNode *parent) {
 	if (child != NIL) {
 		if (IS_RED(impl, parent)) {
@@ -466,6 +503,7 @@ void set_color_based_on_parent(RBTreeImpl *impl, RBTreeNode *child, RBTreeNode *
 	}
 }
 
+// delete fixup
 void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RBTreeNode *x) {
 	int i = 0;
 	while (x != impl->root && IS_BLACK(impl, x)) {
@@ -544,27 +582,36 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RB
 	SET_BLACK(impl, x);
 }
 
+// delete function
 int rbtree_delete(RBTree *ptr, const void *key) {
+	// validate input
 	if (ptr == NULL || nil(ptr->impl) || key == NULL) {
 		errno = EINVAL;
 		return -1;
 	}
 
+	// obtain impl from our opaque pointer
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 
+	// search for the node based on this key.
 	RBTreeNodePair pair;
 	rbtree_search(impl, key, &pair);
 
+	// this node doesn't exist, return -1
 	if (pair.self == NIL)
 		return -1;
 
+	// node exists, initialize variables
 	RBTreeNode *node_to_delete = pair.self;
 	RBTreeNode *x = NIL;
 	RBTreeNode *w = NIL;
 	RBTreeNode *parent = NIL;
+
+	// only do fixups if the node_to_delete is black.
 	bool do_fixup = IS_BLACK(impl, node_to_delete);
 
 	if (node_to_delete->left == NIL) {
+		// set variables for fixup and transplant
 		x = node_to_delete->right;
 		rbtree_transplant(impl, node_to_delete, node_to_delete->right);
 		if (node_to_delete->parent->left == NIL)
@@ -576,38 +623,49 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		else if (w != NIL)
 			parent = w->parent;
 	} else if (node_to_delete->right == NIL) {
+		// set variables for fixup and transplant
 		x = node_to_delete->left;
 		rbtree_transplant(impl, node_to_delete, node_to_delete->left);
 		w = node_to_delete->parent->left;
 		parent = x->parent;
 	} else {
+		// two children case
+		// find successor
 		RBTreeNode *successor = rbtree_find_successor(impl, node_to_delete);
+		// if it's black we need to do a fixup.
 		do_fixup = IS_BLACK(impl, successor);
-		x = successor->right;
-		w = successor->parent->right;
-		parent = w->parent;
-		if (parent == node_to_delete) {
+
+		// set x/w/parent based on the node configuration
+		if (parent != node_to_delete) {
+			x = successor->right;
+			w = successor->parent->right;
+			parent = w->parent;
+		} else if (parent == node_to_delete) {
 			w = node_to_delete->left;
 			x = successor->right;
 			parent = successor;
 		}
 
+		// if parent is not node_to_delete, do transplant and update children of successor
 		if (successor->parent != node_to_delete) {
 			rbtree_transplant(impl, successor, successor->right);
 			successor->right = node_to_delete->right;
 			successor->right->parent = successor;
 		}
 
+		// do final transpalnnnt and update including color match
 		rbtree_transplant(impl, node_to_delete, successor);
 		successor->left = node_to_delete->left;
 		successor->left->parent = successor;
 		set_color_based_on_parent(impl, successor, node_to_delete);
 	}
 
+	// if do_fixup, do fixup.
 	if (do_fixup) {
 		if (w != NIL && parent != NIL) {
 			rbtree_delete_fixup(impl, parent, w, x);
 		} else {
+			// in these cases SET_BLACK only
 			if (impl->size > 1)
 				SET_BLACK(impl, impl->root);
 		}
@@ -623,23 +681,31 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 
 	return 0;
 }
+
+// get operation
 const void *rbtree_get(const RBTree *ptr, const void *key) {
+	// validate input
 	if (ptr == NULL || key == NULL) {
 		errno = EINVAL;
 		return NULL;
 	}
 
+	// set impl
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	RBTreeNodePair pair;
 
+	// search for the pair.
 	rbtree_search(impl, key, &pair);
 
+	// if found return value, otherwise NULL.
 	if (pair.self != NIL)
 		return pair.self->data + impl->key_size + VALUE_PAD(impl->key_size);
 	else {
 		return NULL;
 	}
 }
+
+// size in terms of number of nodes
 i64 rbtree_size(const RBTree *ptr) {
 	if (ptr == NULL) {
 		errno = EINVAL;
@@ -649,6 +715,8 @@ i64 rbtree_size(const RBTree *ptr) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
 	return impl->size;
 }
+
+// return iterator object
 int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
 	if (ptr == NULL || nil(ptr->impl)) {
 		errno = EINVAL;
