@@ -101,6 +101,7 @@ void chain_free(FatPtr *ptr);
 	})
 
 #ifdef TEST
+void cleanup_thread_local_slab_allocator();
 void cleanup_default_slab_allocator();
 u64 alloc_count_default_slab_allocator();
 u64 alloc_count_global_sync_allocator();

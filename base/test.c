@@ -1051,7 +1051,6 @@ MyTest(base, test_sync_allocator) {
 	cr_assert(nil(ptr));
 }
 
-/*
 // create some shared variables to demonstrate the sync_allocator
 FatPtr shared_ptr = null; // shared FatPtr
 // Initialize a condition/lock
@@ -1075,6 +1074,9 @@ void *start_thread_sync_test() {
 	flag = true;
 	pthread_cond_signal(&cond);
 	pthread_mutex_unlock(&lock);
+
+	// cleanup default slab allocator for this thread
+	cleanup_thread_local_slab_allocator();
 
 	return NULL;
 }
@@ -1105,7 +1107,6 @@ MyTest(base, test_threaded_sync) {
 
 	cr_assert(!pthread_join(thread, NULL)); // Wait for thread to finish
 }
-*/
 
 // Note: address sanitizer and criterion seem to have problems with this test on certain
 // platforms/configurations. I tested both on linux/mac in the actual binary and it works

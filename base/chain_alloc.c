@@ -37,7 +37,6 @@ SlabAllocator *global_sync_allocator = NULL;
 
 SlabAllocator *init_default_slab_allocator() {
 	SlabAllocatorNc *sa = mymalloc(sizeof(SlabAllocator));
-	printf("mymalloc slab allocator\n");
 	if (sa == NULL)
 		return NULL;
 	SlabAllocatorConfig sac;
@@ -103,15 +102,20 @@ u64 alloc_count_default_slab_allocator() {
 	return slab_allocator_cur_slabs_allocated(chain_guard_entries[chain_guard_sp].sa);
 }
 
+void cleanup_thread_local_slab_allocator() {
+	if (chain_guard_entries[chain_guard_sp].sa != NULL) {
+		slab_allocator_cleanup(chain_guard_entries[chain_guard_sp].sa);
+		myfree(chain_guard_entries[chain_guard_sp].sa);
+	}
+}
+
 void cleanup_default_slab_allocator() {
 	if (chain_guard_entries[chain_guard_sp].sa != NULL) {
 		slab_allocator_cleanup(chain_guard_entries[chain_guard_sp].sa);
-		printf("my free slab allocator\n");
 		myfree(chain_guard_entries[chain_guard_sp].sa);
 	}
 	if (global_sync_allocator) {
 		slab_allocator_cleanup(global_sync_allocator);
-		printf("my free global sync  allocator\n");
 		myfree(global_sync_allocator);
 		global_sync_allocator = NULL;
 	}
