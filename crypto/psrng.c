@@ -23,7 +23,6 @@ static struct AES_ctx ctx;
 void psrng_reseed() {
 	u8 iv[16];
 	u8 key[32];
-	printf("reseed with key[0]=%u\n", key[0]);
 	if (rand_bytes(key, 32)) {
 		perror("Could not generate entropy for AES key generation");
 		exit(-1);

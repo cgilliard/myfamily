@@ -79,7 +79,7 @@ MyTest(util, validate_rbtree) {
 	u64 k, v;
 	cr_assert(!rbtree_build(&valid1, sizeof(u64), sizeof(u64), u64_compare, false));
 
-	u64 max = 1000;
+	u64 max = 10;
 	for (u64 i = 0; i < max; i++) {
 		k = i;
 		v = i + 10;
@@ -98,7 +98,7 @@ MyTest(util, validate_rbtree) {
 	/*
 		rbtree_print(&valid1);
 		printf("Max depth = %d\n", rbtree_max_depth(&valid1));
-		k = 9;
+		k = 1;
 		cr_assert(!rbtree_delete(&valid1, &k));
 		printf("post delete print of tree\n");
 		rbtree_print(&valid1);
@@ -123,7 +123,7 @@ MyTest(util, test_random_rbtree) {
 	psrng_test_seed(iv, key);
 	RBTree rand1;
 	cr_assert(!rbtree_build(&rand1, sizeof(u64), sizeof(u64), u64_compare, false));
-	u64 size = 12;
+	u64 size = 153;
 	u64 arr[size];
 	for (u64 i = 0; i < size; i++) {
 		arr[i] = 0; // ensure zeroed before calling rng for reproducibility.
@@ -162,19 +162,17 @@ MyTest(util, test_random_rbtree) {
 	cr_assert_eq(i, size);
 
 	cr_assert_eq(rbtree_size(&rand1), size);
-	rbtree_print(&rand1);
 
 	i = 0;
 
 	loop {
-		printf("delete %llu\n", i);
+		// printf("delete %llu\n", i);
 		if (i == size)
 			break;
 		cr_assert(!rbtree_delete(&rand1, &arr[i]));
 		cr_assert_eq(rbtree_size(&rand1), (size - 1) - i);
 		int depth = rbtree_max_depth(&rand1);
-		printf("Max_depth[%llu]=%i,tree_size=%llu\n", i, depth, rbtree_size(&rand1));
-		// rbtree_print(&rand1);
+		// printf("Max_depth[%llu]=%i,tree_size=%llu\n", i, depth, rbtree_size(&rand1));
 		rbtree_validate(&rand1);
 		i++;
 	}

@@ -601,6 +601,14 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		// printf("caseC\n");
 		RBTreeNode *successor = rbtree_find_successor(impl, node_to_delete);
 		do_fixup = IS_BLACK(impl, successor);
+		x = successor->right;
+		w = successor->parent->right;
+		parent = w->parent;
+		if (parent == node_to_delete) {
+			w = node_to_delete->left;
+			x = successor->right;
+			parent = successor;
+		}
 
 		if (successor->parent != node_to_delete) {
 			rbtree_transplant(impl, successor, successor->right);
@@ -612,18 +620,10 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		successor->left = node_to_delete->left;
 		successor->left->parent = successor;
 		set_color_based_on_parent(impl, successor, node_to_delete);
-		if (successor->right->right != NIL || successor->right->left != NIL) {
-			w = successor->right->right;
-			x = successor->right->left;
-		} else {
-			w = successor->left;
-			x = successor->right;
-		}
-		if (x != NIL)
-			parent = x->parent;
-		else if (w != NIL)
-			parent = w->parent;
-		// printf("x=%llu w=%llu\n", x->node_id, w->node_id);
+
+		// printf("do_fixup=%i, x=%llu w=%llu p=%llu, succ=%llu\n", do_fixup, x->node_id,
+		// w->node_id,
+		// parent->node_id, successor->node_id);
 	}
 
 	if (do_fixup) {
