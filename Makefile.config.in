@@ -7,7 +7,7 @@ MAKE=make
 CC_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -Werror=incompatible-pointer-types
 CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
 CRITERION_LIB=-LREPLACE_CRITERION_LIB
-CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -Werror=incompatible-pointer-types -lcriterion $(CRITERION_INCLUDE) $(CRITERION_LIB)
+CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -Werror=incompatible-pointer-types -lcriterion -lm $(CRITERION_INCLUDE) $(CRITERION_LIB)
 
 ifeq ($(shell $(CC) -dM -E - < /dev/null | grep '__clang__'),)
     # If GCC is detected
