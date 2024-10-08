@@ -300,57 +300,74 @@ void rbtree_right_rotate(RBTreeImpl *impl, RBTreeNode *x) {
 	x->parent = y;
 }
 
-// insert fixup operation
+// Fixup operation after insertion to maintain Red-Black Tree properties
 void rbtree_insert_fixup(RBTreeImpl *impl, RBTreeNode *k) {
 	int i = 0;
+	// Loop until the node is the root or its parent's color is black
 	while (k != impl->root && IS_RED(impl, k->parent)) {
 #ifdef TEST
-		// should never have a case where this is not true
-		// only NIL accepted
+		// Ensure that the parent, left, and right children are not NULL
+		// The only exception is NIL nodes, which can be accepted
 		assert(k->parent);
 		assert(k->left);
 		assert(k->right);
 #endif // TEST
 
 		if (k->parent == k->parent->parent->left) {
-			// uncle is on the right
+			// Case 1: Uncle is on the right
 			RBTreeNode *u = k->parent->parent->right;
 
 			if (IS_RED(impl, u)) {
+				// Case 1a: Uncle is red
+				// Recolor the parent and uncle to black
 				SET_BLACK(impl, k->parent);
 				SET_BLACK(impl, u);
+				// Recolor the grandparent to red
 				SET_RED(impl, k->parent->parent);
+				// Move up the tree
 				k = k->parent->parent;
 			} else {
+				// Case 1b: Uncle is black
 				if (k == k->parent->right) {
+					// Case 1b1: Node is a right child
+					// Rotate left to make the node the left child
 					k = k->parent;
 					rbtree_left_rotate(impl, k);
 				}
+				// Recolor and rotate
 				SET_BLACK(impl, k->parent);
 				SET_RED(impl, k->parent->parent);
 				rbtree_right_rotate(impl, k->parent->parent);
 			}
 		} else {
-			// uncle is on the left
+			// Case 2: Uncle is on the left
 			RBTreeNode *u = k->parent->parent->left;
 
 			if (IS_RED(impl, u)) {
+				// Case 2a: Uncle is red
+				// Recolor the parent and uncle to black
 				SET_BLACK(impl, k->parent);
 				SET_BLACK(impl, u);
+				// Recolor the grandparent to red
 				SET_RED(impl, k->parent->parent);
+				// Move up the tree
 				k = k->parent->parent;
 			} else {
+				// Case 2b: Uncle is black
 				if (k == k->parent->left) {
+					// Case 2b1: Node is a left child
+					// Rotate right to make the node the right child
 					k = k->parent;
 					rbtree_right_rotate(impl, k);
 				}
+				// Recolor and rotate
 				SET_BLACK(impl, k->parent);
 				SET_RED(impl, k->parent->parent);
 				rbtree_left_rotate(impl, k->parent->parent);
 			}
 		}
 	}
-	// always set black at the end
+	// Ensure the root is always black
 	SET_BLACK(impl, impl->root);
 }
 
@@ -635,15 +652,14 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		// if it's black we need to do a fixup.
 		do_fixup = IS_BLACK(impl, successor);
 
-		// set x/w/parent based on the node configuration
-		if (parent != node_to_delete) {
-			x = successor->right;
-			w = successor->parent->right;
-			parent = w->parent;
-		} else if (parent == node_to_delete) {
+		x = successor->right;
+		w = successor->parent->right;
+
+		if (w->parent == node_to_delete) {
 			w = node_to_delete->left;
-			x = successor->right;
 			parent = successor;
+		} else {
+			parent = w->parent;
 		}
 
 		// if parent is not node_to_delete, do transplant and update children of successor
