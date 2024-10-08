@@ -15,6 +15,7 @@
 #include <base/macro_utils.h>
 #include <base/test.h>
 #include <crypto/psrng.h>
+#include <math.h>
 #include <string.h>
 #include <util/rbtree.h>
 
@@ -95,15 +96,7 @@ MyTest(util, validate_rbtree) {
 		cr_assert_eq(*value, v);
 	}
 
-	/*
-		rbtree_print(&valid1);
-		printf("Max depth = %d\n", rbtree_max_depth(&valid1));
-		k = 1;
-		cr_assert(!rbtree_delete(&valid1, &k));
-		printf("post delete print of tree\n");
-		rbtree_print(&valid1);
-		rbtree_validate(&valid1);
-	*/
+	rbtree_print(&valid1);
 
 	for (u64 i = 0; i < max; i++) {
 		k = i;
@@ -111,7 +104,6 @@ MyTest(util, validate_rbtree) {
 		cr_assert_eq(v, k + 10);
 		cr_assert(!rbtree_delete(&valid1, &k));
 		cr_assert_eq(rbtree_size(&valid1), (max - 1) - i);
-		// rbtree_print_debug(&valid1);
 		rbtree_validate(&valid1);
 	}
 }
@@ -207,4 +199,46 @@ MyTest(util, test_validation_and_other) {
 	rbtree_print(&test1);
 	cr_assert(rbtree_iterator(NULL, NULL));
 	rbtree_delete(NULL, NULL);
+}
+
+MyTest(util, test_rbtree_random_ordered_insert_delete) {
+	// seed rng for reproducibility
+	u8 key[32] = {1};
+	u8 iv[16] = {};
+	psrng_test_seed(iv, key);
+
+	RBTree rand1;
+	cr_assert(!rbtree_build(&rand1, sizeof(u64), sizeof(u64), u64_compare, false));
+	u64 size = 10000;
+	u64 arr[size];
+	u64 arr_index = 0;
+	u64 delete_index = 0;
+	u64 i = 0;
+
+	u8 opcode = 0;
+	loop {
+		if (++i == size)
+			break;
+		psrng_rand_u8(&opcode);
+		if (opcode % 3 == 0 || opcode % 3 == 1 || delete_index >= arr_index) {
+			arr[arr_index] = 0;
+			psrng_rand_u64(&arr[arr_index]);
+			u64 v = arr[arr_index] + 123;
+			cr_assert(!rbtree_insert(&rand1, &arr[arr_index], &v));
+			arr_index++;
+		} else {
+			cr_assert(!rbtree_delete(&rand1, &arr[delete_index]));
+
+			delete_index++;
+		}
+		u64 cur_size = rbtree_size(&rand1);
+		u64 max_depth = rbtree_max_depth(&rand1);
+		u64 max_valid_depth = 1;
+		if (cur_size)
+			max_valid_depth = (log2(cur_size) * 2) + 1;
+		// max theoretical size of a valid rbtree is 2 log(n) + 1. Ensure we're no worse than that.
+		cr_assert(max_valid_depth >= max_depth);
+		cr_assert_eq(cur_size, arr_index - delete_index);
+		rbtree_validate(&rand1);
+	}
 }

@@ -69,18 +69,14 @@ typedef struct RBTreeNodePair {
 		if (node && node != NIL) {                                                                 \
 			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
 			*(bool *)(node->data + offset) = true;                                                 \
-		} else                                                                                     \
-			;                                                                                      \
-		/*printf("WARN: SET_RED on invalid node. node is NIL.\n");*/                               \
+		}                                                                                          \
 	})
 #define SET_BLACK(impl, node)                                                                      \
 	({                                                                                             \
 		if (node && node != NIL) {                                                                 \
 			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
 			*(bool *)(node->data + offset) = false;                                                \
-		} else                                                                                     \
-			;                                                                                      \
-		/*printf("WARN: SET_BLACK on invalid node. node is NIL.\n");*/                             \
+		}                                                                                          \
 	})
 
 #define IS_RED(impl, node)                                                                         \
@@ -471,11 +467,8 @@ void set_color_based_on_parent(RBTreeImpl *impl, RBTreeNode *child, RBTreeNode *
 }
 
 void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RBTreeNode *x) {
-	// printf("deletefixup\n");
 	int i = 0;
-	// printf("i=%i(pre),x=%llu,w=%llu,p=%llu\n", i++, x->node_id, w->node_id, parent->node_id);
 	while (x != impl->root && IS_BLACK(impl, x)) {
-		// printf("i=%i,x=%llu,w=%llu,p=%llu\n", i++, x->node_id, w->node_id, parent->node_id);
 		if (w == parent->right) {
 			// Case 1: Sibling is red
 			if (IS_RED(impl, w)) {
@@ -565,8 +558,6 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	if (pair.self == NIL)
 		return -1;
 
-	// printf("deleting node %llu\n", pair.self->node_id);
-
 	RBTreeNode *node_to_delete = pair.self;
 	RBTreeNode *x = NIL;
 	RBTreeNode *w = NIL;
@@ -574,7 +565,6 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	bool do_fixup = IS_BLACK(impl, node_to_delete);
 
 	if (node_to_delete->left == NIL) {
-		// printf("caseA\n");
 		x = node_to_delete->right;
 		rbtree_transplant(impl, node_to_delete, node_to_delete->right);
 		if (node_to_delete->parent->left == NIL)
@@ -586,19 +576,11 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		else if (w != NIL)
 			parent = w->parent;
 	} else if (node_to_delete->right == NIL) {
-		// printf("caseB\n");
 		x = node_to_delete->left;
 		rbtree_transplant(impl, node_to_delete, node_to_delete->left);
-		if (node_to_delete->parent->left == NIL)
-			w = node_to_delete->parent->right;
-		else
-			w = node_to_delete->parent->left;
-		if (x != NIL)
-			parent = x->parent;
-		else if (w != NIL)
-			parent = w->parent;
+		w = node_to_delete->parent->left;
+		parent = x->parent;
 	} else {
-		// printf("caseC\n");
 		RBTreeNode *successor = rbtree_find_successor(impl, node_to_delete);
 		do_fixup = IS_BLACK(impl, successor);
 		x = successor->right;
@@ -620,18 +602,12 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 		successor->left = node_to_delete->left;
 		successor->left->parent = successor;
 		set_color_based_on_parent(impl, successor, node_to_delete);
-
-		// printf("do_fixup=%i, x=%llu w=%llu p=%llu, succ=%llu\n", do_fixup, x->node_id,
-		// w->node_id,
-		// parent->node_id, successor->node_id);
 	}
 
 	if (do_fixup) {
-		// rbtree_print(ptr);
 		if (w != NIL && parent != NIL) {
 			rbtree_delete_fixup(impl, parent, w, x);
 		} else {
-			// printf("w or p are nil w=%llu,p=%llu\n", w->node_id, parent->node_id);
 			if (impl->size > 1)
 				SET_BLACK(impl, impl->root);
 		}
@@ -706,12 +682,6 @@ void rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 			*black_count = current_black_count; // Set the black count for the first path
 		} else {
 			// Check for black count consistency
-			if (current_black_count != *black_count) {
-				for (int i = 0; i < current_black_count; i++) {
-					printf("%llu -> ", ids[i]);
-				}
-				printf("NIL (%d) (expected=%d)\n", current_black_count, *black_count);
-			}
 			assert(current_black_count == *black_count);
 		}
 		return; // Return for NIL nodes
@@ -742,7 +712,7 @@ void rbtree_validate(const RBTree *ptr) {
 	}
 }
 
-void rbtree_node_depth(RBTreeImpl *impl, RBTreeNode *node, int *max_depth, int cur_depth) {
+void rbtree_node_depth(RBTreeImpl *impl, RBTreeNode *node, u64 *max_depth, u64 cur_depth) {
 	if (cur_depth > *max_depth)
 		*max_depth = cur_depth;
 	if (node->right != NIL)
@@ -751,9 +721,9 @@ void rbtree_node_depth(RBTreeImpl *impl, RBTreeNode *node, int *max_depth, int c
 		rbtree_node_depth(impl, node->left, max_depth, cur_depth + 1);
 }
 
-int rbtree_max_depth(const RBTree *ptr) {
+u64 rbtree_max_depth(const RBTree *ptr) {
 	RBTreeImpl *impl = $Ref(&ptr->impl);
-	int max_depth = 0;
+	u64 max_depth = 0;
 	rbtree_node_depth(impl, impl->root, &max_depth, 1);
 	return max_depth;
 }
