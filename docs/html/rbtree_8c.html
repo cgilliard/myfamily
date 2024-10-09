@@ -77,6 +77,8 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;assert.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="chain__alloc_8h_source.html">base/chain_alloc.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="macro__utils_8h_source.html">base/macro_utils.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="panic_8h_source.html">base/panic.h</a>&gt;</code><br />
 <code>#include &lt;errno.h&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
@@ -151,8 +153,8 @@ Functions</h2></td></tr>
 <tr class="separator:a615bf7630ddcff0f7b55195545af9ffa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac695c61bfe9d4f9bf5ce793101d2e87"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#aac695c61bfe9d4f9bf5ce793101d2e87">set_color_based_on_parent</a> (<a class="el" href="structRBTreeImpl.html">RBTreeImpl</a> *impl, <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *child, <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *parent)</td></tr>
 <tr class="separator:aac695c61bfe9d4f9bf5ce793101d2e87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae0c4f62d2c8607d8026e4eccd6e469e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#aae0c4f62d2c8607d8026e4eccd6e469e">rbtree_delete_fixup</a> (<a class="el" href="structRBTreeImpl.html">RBTreeImpl</a> *impl, <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *x)</td></tr>
-<tr class="separator:aae0c4f62d2c8607d8026e4eccd6e469e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a929b6e421621e53ef2fe7c1668249815"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a929b6e421621e53ef2fe7c1668249815">rbtree_delete_fixup</a> (<a class="el" href="structRBTreeImpl.html">RBTreeImpl</a> *impl, <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *parent, <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *w, <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *x)</td></tr>
+<tr class="separator:a929b6e421621e53ef2fe7c1668249815"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f2febac551af938e5345f5b0e30ca0a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a6f2febac551af938e5345f5b0e30ca0a">rbtree_delete</a> (<a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const void *key)</td></tr>
 <tr class="separator:a6f2febac551af938e5345f5b0e30ca0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb0622d260fa94b7cc066f774fbc4cb4"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#abb0622d260fa94b7cc066f774fbc4cb4">rbtree_get</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const void *key)</td></tr>
@@ -161,14 +163,6 @@ Functions</h2></td></tr>
 <tr class="separator:a8154979db8af8731ed7d4831ac1bf8c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46699bbeb46d3521b3ae3f208a04cffa"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a46699bbeb46d3521b3ae3f208a04cffa">rbtree_iterator</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, <a class="el" href="rbtree_8h.html#a78371e96afb8791aa6d4e7819a948dd1">RBTreeIterator</a> *iter)</td></tr>
 <tr class="separator:a46699bbeb46d3521b3ae3f208a04cffa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6ae01468e2a03586c8e4614cc5f4f31"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#ad6ae01468e2a03586c8e4614cc5f4f31">rbtree_validate_node</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *node, int *black_count, int current_black_count)</td></tr>
-<tr class="separator:ad6ae01468e2a03586c8e4614cc5f4f31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a930919d807c8161b3db3b83f9b47c97d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a930919d807c8161b3db3b83f9b47c97d">rbtree_validate</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr)</td></tr>
-<tr class="separator:a930919d807c8161b3db3b83f9b47c97d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94cb8fb1b900ed3ff91893511e7c5d32"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a94cb8fb1b900ed3ff91893511e7c5d32">rbtree_node_depth</a> (<a class="el" href="structRBTreeImpl.html">RBTreeImpl</a> *impl, <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *node, int *max_depth, int cur_depth)</td></tr>
-<tr class="separator:a94cb8fb1b900ed3ff91893511e7c5d32"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51a4c603badc22f124b45e018e97c1c6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a51a4c603badc22f124b45e018e97c1c6">rbtree_max_depth</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr)</td></tr>
-<tr class="separator:a51a4c603badc22f124b45e018e97c1c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="aa8345c0d546bd02cd74763e0f3267bdd"></a>
@@ -202,9 +196,9 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    (<span class="keyword">sizeof</span>(<a class="code" href="rbtree_8c.html#a503c6fbe388e4f6e0381e94890d829a2">RBTreeNode</a>) + (impl-&gt;key_size + impl-&gt;value_size) * <span class="keyword">sizeof</span>(char) +                     \</div>
 <div class="line">     <a class="code" href="rbtree_8c.html#a14dea2f27cfefce402a1153c06813cf3">VALUE_PAD</a>(impl-&gt;key_size) + <a class="code" href="rbtree_8c.html#aa8345c0d546bd02cd74763e0f3267bdd">BOOLEAN_SIZE</a>)</div>
-<div class="ttc" id="arbtree_8c_html_a14dea2f27cfefce402a1153c06813cf3"><div class="ttname"><a href="rbtree_8c.html#a14dea2f27cfefce402a1153c06813cf3">VALUE_PAD</a></div><div class="ttdeci">#define VALUE_PAD(key_size)</div><div class="ttdef"><b>Definition:</b> rbtree.c:60</div></div>
+<div class="ttc" id="arbtree_8c_html_a14dea2f27cfefce402a1153c06813cf3"><div class="ttname"><a href="rbtree_8c.html#a14dea2f27cfefce402a1153c06813cf3">VALUE_PAD</a></div><div class="ttdeci">#define VALUE_PAD(key_size)</div><div class="ttdef"><b>Definition:</b> rbtree.c:72</div></div>
 <div class="ttc" id="arbtree_8c_html_a503c6fbe388e4f6e0381e94890d829a2"><div class="ttname"><a href="rbtree_8c.html#a503c6fbe388e4f6e0381e94890d829a2">RBTreeNode</a></div><div class="ttdeci">struct RBTreeNode RBTreeNode</div></div>
-<div class="ttc" id="arbtree_8c_html_aa8345c0d546bd02cd74763e0f3267bdd"><div class="ttname"><a href="rbtree_8c.html#aa8345c0d546bd02cd74763e0f3267bdd">BOOLEAN_SIZE</a></div><div class="ttdeci">#define BOOLEAN_SIZE</div><div class="ttdef"><b>Definition:</b> rbtree.c:59</div></div>
+<div class="ttc" id="arbtree_8c_html_aa8345c0d546bd02cd74763e0f3267bdd"><div class="ttname"><a href="rbtree_8c.html#aa8345c0d546bd02cd74763e0f3267bdd">BOOLEAN_SIZE</a></div><div class="ttdeci">#define BOOLEAN_SIZE</div><div class="ttdef"><b>Definition:</b> rbtree.c:71</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -240,7 +234,7 @@ Functions</h2></td></tr>
 <div class="line">            ret = <span class="keyword">false</span>;                                                                           \</div>
 <div class="line">        ret;                                                                                       \</div>
 <div class="line">    })</div>
-<div class="ttc" id="arbtree_8c_html_ac4b9ba5c133a528e3674cae7d9341557"><div class="ttname"><a href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a></div><div class="ttdeci">#define RED_OFFSET(key_size, value_size)</div><div class="ttdef"><b>Definition:</b> rbtree.c:64</div></div>
+<div class="ttc" id="arbtree_8c_html_ac4b9ba5c133a528e3674cae7d9341557"><div class="ttname"><a href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a></div><div class="ttdeci">#define RED_OFFSET(key_size, value_size)</div><div class="ttdef"><b>Definition:</b> rbtree.c:76</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -336,9 +330,7 @@ Functions</h2></td></tr>
 <div class="line">        if (node &amp;&amp; node != NIL) {                                                                 \</div>
 <div class="line">            u64 offset = <a class="code" href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a>(impl-&gt;key_size, impl-&gt;value_size);                             \</div>
 <div class="line">            *(<span class="keywordtype">bool</span> *)(node-&gt;data + offset) = <span class="keyword">false</span>;                                                \</div>
-<div class="line">        } <span class="keywordflow">else</span>                                                                                     \</div>
-<div class="line">            ;                                                                                      \</div>
-<div class="line">        <span class="comment">/*printf(&quot;WARN: SET_BLACK on invalid node. node is NIL.\n&quot;);*/</span>                             \</div>
+<div class="line">        }                                                                                          \</div>
 <div class="line">    })</div>
 </div><!-- fragment -->
 </div>
@@ -372,9 +364,7 @@ Functions</h2></td></tr>
 <div class="line">        if (node &amp;&amp; node != NIL) {                                                                 \</div>
 <div class="line">            u64 offset = <a class="code" href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a>(impl-&gt;key_size, impl-&gt;value_size);                             \</div>
 <div class="line">            *(<span class="keywordtype">bool</span> *)(node-&gt;data + offset) = <span class="keyword">true</span>;                                                 \</div>
-<div class="line">        } <span class="keywordflow">else</span>                                                                                     \</div>
-<div class="line">            ;                                                                                      \</div>
-<div class="line">        <span class="comment">/*printf(&quot;WARN: SET_RED on invalid node. node is NIL.\n&quot;);*/</span>                               \</div>
+<div class="line">        }                                                                                          \</div>
 <div class="line">    })</div>
 </div><!-- fragment -->
 </div>
@@ -547,8 +537,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aae0c4f62d2c8607d8026e4eccd6e469e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aae0c4f62d2c8607d8026e4eccd6e469e">&#9670;&nbsp;</a></span>rbtree_delete_fixup()</h2>
+<a id="a929b6e421621e53ef2fe7c1668249815"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a929b6e421621e53ef2fe7c1668249815">&#9670;&nbsp;</a></span>rbtree_delete_fixup()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -558,6 +548,18 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structRBTreeImpl.html">RBTreeImpl</a> *&#160;</td>
           <td class="paramname"><em>impl</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structRBTreeNode.html">RBTreeNode</a> *&#160;</td>
+          <td class="paramname"><em>parent</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structRBTreeNode.html">RBTreeNode</a> *&#160;</td>
+          <td class="paramname"><em>w</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -813,64 +815,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a51a4c603badc22f124b45e018e97c1c6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a51a4c603badc22f124b45e018e97c1c6">&#9670;&nbsp;</a></span>rbtree_max_depth()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int rbtree_max_depth </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a94cb8fb1b900ed3ff91893511e7c5d32"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94cb8fb1b900ed3ff91893511e7c5d32">&#9670;&nbsp;</a></span>rbtree_node_depth()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void rbtree_node_depth </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structRBTreeImpl.html">RBTreeImpl</a> *&#160;</td>
-          <td class="paramname"><em>impl</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structRBTreeNode.html">RBTreeNode</a> *&#160;</td>
-          <td class="paramname"><em>node</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>max_depth</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>cur_depth</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="acf73938b99f1c155d4dec853c5e1c28d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#acf73938b99f1c155d4dec853c5e1c28d">&#9670;&nbsp;</a></span>rbtree_right_rotate()</h2>
 
@@ -974,64 +918,6 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype"><a class="el" href="structRBTreeNode.html">RBTreeNode</a> *&#160;</td>
           <td class="paramname"><em>src</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a930919d807c8161b3db3b83f9b47c97d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a930919d807c8161b3db3b83f9b47c97d">&#9670;&nbsp;</a></span>rbtree_validate()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void rbtree_validate </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad6ae01468e2a03586c8e4614cc5f4f31"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad6ae01468e2a03586c8e4614cc5f4f31">&#9670;&nbsp;</a></span>rbtree_validate_node()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void rbtree_validate_node </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *&#160;</td>
-          <td class="paramname"><em>node</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>black_count</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>current_black_count</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
