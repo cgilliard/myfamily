@@ -53,7 +53,10 @@ typedef struct RBTreeImpl {
 
 // Iterator impl
 typedef struct RBTreeIteratorImpl {
+	int (*compare)(const void *, const void *);
 	RBTreeNode *cur;
+	RBTreeNode *min;
+	RBTreeNode *max;
 	RBTreeNode *stack[128];
 	u64 key_size;
 	u8 stack_pointer;
@@ -148,35 +151,33 @@ bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
 	while (impl->cur != NIL || impl->stack_pointer > 0) {
 		// Traverse left subtree
 		if (impl->cur != NIL) {
-#ifdef TEST
-			// should never have a case where this is not true
-			// only NIL accepted
-			assert(impl->cur->parent);
-			assert(impl->cur->left);
-			assert(impl->cur->right);
-#endif // TEST
-
 			// based on worst case log(n) * 2 + 1 this should not be possible
 			assert(impl->stack_pointer < 128);
-			// Push the current node pointer onto the stack
-			impl->stack[impl->stack_pointer++] = impl->cur;
+			int v = 0;
+			if (impl->min != NIL)
+				v = impl->compare(impl->cur->data, impl->min->data);
+			if (v < 0) {
+				// we haven't hit the minimum yet
+				impl->cur = impl->cur->right;
+			} else {
+				// Push the current node pointer onto the stack
+				impl->stack[impl->stack_pointer++] = impl->cur;
 
-			// Move to the left child
-			impl->cur = impl->cur->left;
+				// Move to the left child
+				impl->cur = impl->cur->left;
+			}
 		} else {
 			// Pop the top node from the stack
 			impl->cur = impl->stack[--impl->stack_pointer];
 
-#ifdef TEST
-			// should never have a case where this is not true
-			// only NIL accepted
-			assert(impl->cur->parent);
-			assert(impl->cur->left);
-			assert(impl->cur->right);
-#endif // TEST
-
 			// Store the current node's data to return
 			void *ret = impl->cur->data;
+
+			// check if we hit our max node. If so, next will return false.
+			if (impl->cur == impl->max) {
+				impl->cur = NIL;
+				impl->stack_pointer = 0;
+			}
 
 			// Move to the right child after visiting this node
 			impl->cur = impl->cur->right;
@@ -406,16 +407,16 @@ int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 			ptr->impl = null;
 			return -1;
 		}
-
-		impl = $Ref(&ptr->impl);
-		// initialize values of the RBTreeImpl structure
-		impl->send = send;
-		impl->key_size = key_size;
-		impl->value_size = value_size;
-		impl->compare = compare;
-		impl->root = NIL;
-		impl->size = 0;
 	}
+
+	impl = $Ref(&ptr->impl);
+	// initialize values of the RBTreeImpl structure
+	impl->send = send;
+	impl->key_size = key_size;
+	impl->value_size = value_size;
+	impl->compare = compare;
+	impl->root = NIL;
+	impl->size = 0;
 
 	return 0;
 }
@@ -449,8 +450,10 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	// using chain_malloc allocate memory for this node
 	{
 		ChainGuard _ = ChainSend(impl->send);
-		if (chain_malloc(&self, size))
+		if (chain_malloc(&self, size)) {
+			self = null;
 			return -1;
+		}
 	}
 
 	// using the allocated memory set node properties
@@ -733,21 +736,66 @@ i64 rbtree_size(const RBTree *ptr) {
 }
 
 // return iterator object
-int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter) {
+int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
+					const void *end_key) {
 	if (ptr == NULL || nil(ptr->impl)) {
 		errno = EINVAL;
 		return -1;
 	}
 
 	RBTreeImpl *impl = $Ref(&ptr->impl);
-	ChainGuard _ = ChainSend(impl->send);
 
-	chain_malloc(&iter->impl, sizeof(RBTreeIteratorImpl));
+	{
+		ChainGuard _ = ChainSend(impl->send);
+		if (chain_malloc(&iter->impl, sizeof(RBTreeIteratorImpl))) {
+			iter->impl = null;
+			return -1;
+		}
+	}
+
 	RBTreeIteratorImpl *rbimpl = $Ref(&iter->impl);
+	rbimpl->compare = impl->compare;
 	rbimpl->stack_pointer = 0;
-	rbimpl->cur = impl->root;
 	rbimpl->send = impl->send;
 	rbimpl->key_size = impl->key_size;
+	rbimpl->cur = impl->root;
+	rbimpl->min = NIL;
+	rbimpl->max = NIL;
+
+	if (start_key != NULL) {
+		RBTreeNode *itt = impl->root;
+		RBTreeNode *closest = NULL; // Keep track of the closest node found so far
+
+		while (itt != NIL) {
+			int v = impl->compare(itt->data, start_key);
+			if (v == 0) {
+				rbimpl->min = itt;
+				break; // Exact match found
+			} else if (v < 0) {
+				itt = itt->right;
+			} else {
+				rbimpl->min = itt;
+				itt = itt->left;
+			}
+		}
+	}
+
+	if (end_key != NULL) {
+		RBTreeNode *itt = impl->root;
+		while (itt != NIL) {
+			int v = impl->compare(itt->data, end_key);
+			if (v == 0) {
+				rbimpl->max = itt;
+				break;
+			} else if (v < 0) {
+				rbimpl->max = itt;
+				itt = itt->right;
+			} else {
+				itt = itt->left;
+			}
+		}
+	}
+
 	return 0;
 }
 

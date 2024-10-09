@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <base/chain_alloc.h>
+#include <base/fam_err.h>
 #include <base/panic.h>
 #include <base/resources.h>
-#include <errno.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
@@ -146,13 +146,15 @@ ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {
 int chain_malloc(FatPtr *ptr, u64 size) {
 	if (!chain_guard_is_init) {
 		chain_guard_entries[chain_guard_sp].sa = init_default_slab_allocator();
-		if (chain_guard_entries[chain_guard_sp].sa == NULL)
+		if (chain_guard_entries[chain_guard_sp].sa == NULL) {
+			fam_err = AllocErr;
 			return -1;
+		}
 		chain_guard_is_init = true;
 	}
 
 	if (ptr == NULL || size == 0) {
-		errno = EINVAL;
+		fam_err = IllegalArgument;
 		return -1;
 	}
 	int ret;
@@ -170,13 +172,15 @@ int chain_malloc(FatPtr *ptr, u64 size) {
 int chain_realloc(FatPtr *ptr, u64 size) {
 	if (!chain_guard_is_init) {
 		chain_guard_entries[chain_guard_sp].sa = init_default_slab_allocator();
-		if (chain_guard_entries[chain_guard_sp].sa == NULL)
+		if (chain_guard_entries[chain_guard_sp].sa == NULL) {
+			fam_err = AllocErr;
 			return -1;
+		}
 		chain_guard_is_init = true;
 	}
 
 	if (ptr == NULL || nil(*ptr) || size == 0) {
-		errno = EINVAL;
+		fam_err = IllegalArgument;
 		return -1;
 	}
 
@@ -190,6 +194,7 @@ int chain_realloc(FatPtr *ptr, u64 size) {
 	FatPtr tmp = null;
 	chain_malloc(&tmp, size);
 	if (nil(tmp)) {
+		fam_err = AllocErr;
 		ret = -1;
 	} else {
 

@@ -96,8 +96,6 @@ MyTest(util, validate_rbtree) {
 		cr_assert_eq(*value, v);
 	}
 
-	rbtree_print(&valid1);
-
 	for (u64 i = 0; i < max; i++) {
 		k = i;
 		v = *(u64 *)rbtree_get(&valid1, &k);
@@ -134,7 +132,7 @@ MyTest(util, test_random_rbtree) {
 	}
 
 	RBTreeIterator itt1;
-	cr_assert(!rbtree_iterator(&rand1, &itt1));
+	cr_assert(!rbtree_iterator(&rand1, &itt1, NULL, NULL));
 
 	u64 i = 0;
 	u64 last = 0;
@@ -156,7 +154,6 @@ MyTest(util, test_random_rbtree) {
 	cr_assert_eq(rbtree_size(&rand1), size);
 
 	int depth = rbtree_max_depth(&rand1);
-	printf("Max_depth[%llu]=%i,tree_size=%llu\n", i, depth, rbtree_size(&rand1));
 	i = 0;
 
 	loop {
@@ -197,7 +194,7 @@ MyTest(util, test_validation_and_other) {
 	cr_assert(!rbtree_get(NULL, NULL));
 	cr_assert_eq(rbtree_max_depth(&test1), 2);
 	rbtree_print(&test1);
-	cr_assert(rbtree_iterator(NULL, NULL));
+	cr_assert(rbtree_iterator(NULL, NULL, NULL, NULL));
 	rbtree_delete(NULL, NULL);
 }
 
@@ -241,4 +238,50 @@ MyTest(util, test_rbtree_random_ordered_insert_delete) {
 		cr_assert_eq(cur_size, arr_index - delete_index);
 		rbtree_validate(&rand1);
 	}
+}
+
+MyTest(util, test_rbtree_range_itt) {
+	RBTree tree1;
+	cr_assert(!rbtree_build(&tree1, sizeof(u64), sizeof(u64), u64_compare, false));
+	u64 size = 10;
+	u64 arr[size];
+	for (u64 i = 0; i < size; i++) {
+		arr[i] = (i * 3) + 1;
+		u64 k = arr[i];
+		u64 v = k + 100;
+		cr_assert(!rbtree_insert(&tree1, &k, &v));
+		rbtree_validate(&tree1);
+		rbtree_max_depth(&tree1);
+	}
+
+	for (u64 i = 0; i < size; i++) {
+		const u64 *value = rbtree_get(&tree1, &arr[i]);
+		cr_assert_eq(*value, arr[i] + 100);
+	}
+
+	RBTreeIterator itt1;
+	u64 start = 14;
+	u64 end = 20;
+	cr_assert(!rbtree_iterator(&tree1, &itt1, &start, &end));
+
+	u64 i = 0;
+	u64 last = 15;
+	loop {
+		RbTreeKeyValue kv;
+		bool has_next = rbtree_iterator_next(&itt1, &kv);
+		if (!has_next)
+			break;
+		i++;
+
+		u64 *k1 = kv.key;
+		u64 *v1 = kv.value;
+		cr_assert(last < *k1);
+		last = *k1;
+		cr_assert_eq(*k1 + 100, *v1);
+	}
+	cr_assert_eq(last, 19);
+	// we find 16 and 19
+	cr_assert_eq(i, 2);
+
+	cr_assert_eq(rbtree_size(&tree1), size);
 }

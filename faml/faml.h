@@ -15,38 +15,125 @@
 #ifndef _FAML_FAML__
 #define _FAML_FAML__
 
+#include <base/slabs.h>
 #include <base/types.h>
 
-// FAML Array type
-typedef struct FamlArrayNc {
-	void *opaque;
-} FamlArrayNc;
+typedef enum FamlType {
+	FamlTypeObj,
+	FamlTypeArray,
+	FamlTypeTuple,
+	FamlTypeEnum,
+	FamlTypeU8,
+	FamlTypeU64,
+} FamlType;
 
-void famlarray_cleanup(FamlArrayNc *ptr);
+typedef enum FamlObjVisibility {
+	FamlObjVisibilityPublic,
+	FamlObjVisibilityPrivate
+} FamlObjVisibility;
 
-#define FamlArray FamlArrayNc __attribute__((warn_unused_result, cleanup(famlarray_cleanup)))
+typedef struct FamlPrototypeNc {
+	FatPtr impl;
+} FamlPrototypeNc;
 
-// FAML Tuple type
-typedef struct FamlTupleNc {
-	void *opaque;
-} FamlTupleNc;
+void famlproto_cleanup(FamlPrototypeNc *ptr);
 
-void famltuple_cleanup(FamlTupleNc *ptr);
-
-#define FamlTuple FamlTupleNc __attribute__((warn_unused_result, cleanup(famltuple_cleanup)))
+#define FamlPrototype                                                                              \
+	FamlPrototypeNc __attribute__((warn_unused_result, cleanup(famlproto_cleanup)))
 
 // FAML Object type
 typedef struct FamlObjNc {
-	void *opaque;
+	FatPtr impl;
 } FamlObjNc;
 
 void famlobj_cleanup(FamlObjNc *ptr);
 
 #define FamlObj FamlObjNc __attribute__((warn_unused_result, cleanup(famlobj_cleanup)))
 
+// create a FAML prototype object
+int faml_prototype_create(FamlPrototype *proto, const char *name);
+
+// set functions allow setting to a primitive type
+
+// set the underlying type of this prototype to u8 with a default value of 'value'
+int faml_prototype_set_u8(FamlPrototype *proto, u8 value);
+// set the underlying type of this prototype to u64 with a default value of 'value'
+int faml_prototype_set_u64(FamlPrototype *proto, u64 value);
+// set the underlying type of this prototype to i32 with a default value of 'value'
+int faml_prototype_set_i32(FamlPrototype *proto, i32 value);
+// set the underlying type of this prototype to i64 with a default value of 'value'
+int faml_prototype_set_i64(FamlPrototype *proto, i64 value);
+#define faml_prototype_set(obj, name, value)                                                       \
+	_Generic((value),                                                                              \
+		u8: faml_prototype_set_u8,                                                                 \
+		u64: faml_prototype_set_u64,                                                               \
+		i32: faml_prototype_set_i32,                                                               \
+		i64: faml_prototype_set_i64,                                                               \
+		default: faml_prototype_set_i32)(obj, name, value)
+// note: continue for additional primitive types
+
+// set the underlying type of this prototype to a tuple
+int faml_prototype_set_tuple(FamlPrototype *proto);
+// set the underlying type of this prototype to a fixed size array of the specified type
+int faml_prototype_set_fixed_array(FamlPrototype *proto, const FamlPrototype *array_type, u64 len);
+// set the underlying type of this prototype to a dynamic array of the specified type
+int faml_prototype_set_dynamic_array(FamlPrototype *proto, const FamlPrototype *array_type);
+
+// add a type to the tuple's list of elements
+int faml_prototype_add_to_tuple_type(FamlPrototype *proto, const FamlPrototype *element);
+// set the default value of a fixed array for the specified index
+int faml_prototype_set_array_default(FamlPrototype *proto, u64 index, const FamlPrototype *element);
+
+// add to the key/value for this type
+int faml_prototype_put_u8(FamlPrototype *proto, const char *key, u8 value,
+						  FamlObjVisibility visibility);
+int faml_prototype_put_u64(FamlPrototype *proto, const char *key, u64 value,
+						   FamlObjVisibility visibility);
+int faml_prototype_put_i32(FamlPrototype *proto, const char *key, i32 value,
+						   FamlObjVisibility visibility);
+int faml_prototype_put_i64(FamlPrototype *proto, const char *key, i64 value,
+						   FamlObjVisibility visibility);
+// note: continue for additional primitive types
+int faml_prototype_put_obj(FamlPrototype *proto, const char *key, const FamlPrototype *value);
+#define faml_prototype_put(obj, name, value)                                                       \
+	_Generic((value),                                                                              \
+		u8: faml_prototype_put_u8,                                                                 \
+		u64: faml_prototype_put_u64,                                                               \
+		i32: faml_prototype_put_i32,                                                               \
+		i64: faml_prototype_put_i64,                                                               \
+		FamlObj *: faml_put_obj,                                                                   \
+		default: faml_prototype_put_i32)(obj, name, value)
+
+// build a faml object based on specified prototype. If proto is NULL a default prototype is used
+// for the object.
+int faml_build_obj(FamlObj *obj, FamlPrototype *proto, bool send, bool sync);
+
+int faml_build_u8(FamlObj *obj, u8 value);
+int faml_build_u64(FamlObj *obj, u64 value);
+int faml_build_i32(FamlObj *obj, i32 value);
+int faml_build_164(FamlObj *obj, i64 value);
+
+// set value of the specified k/v pair using RBTree implementation. If the object was created using
+// a prototype, 'strict' policies are in place allowing only key/value pairs that are public members
+// of the prototype to be set.
+int faml_put_u8(FamlObj *obj, const char *name, const u8 value);
+int faml_put_u64(FamlObj *obj, const char *name, const u64 value);
+int faml_put_i32(FamlObj *obj, const char *name, const i32 value);
+int faml_put_i64(FamlObj *obj, const char *name, const i64 v);
+int faml_put_obj(FamlObj *obj, const char *name, const FamlObj *value);
+#define faml_put(obj, name, value)                                                                 \
+	_Generic((value),                                                                              \
+		u8: faml_put_u8,                                                                           \
+		u64: faml_put_u64,                                                                         \
+		i32: faml_put_i32,                                                                         \
+		i64: faml_put_i64,                                                                         \
+		FamlObj *: faml_put_obj,                                                                   \
+		default: faml_put_i32)(obj, name, value)
+
+/*
 // Implementation notes: When adding a type via the 'push' mechanism, type must be checked. Once
 // the first type is set, if another type is pushed, the result will be an error.
-int famlarray_init(FamlArray *arr);
+int famlarray_build(FamlArray *arr, bool send);
 int famlarray_push_obj(FamlArray *arr, const FamlObj *value);
 int famlarray_push_array(FamlArray *arr, const FamlArray *value);
 int famlarray_push_tuple(FamlArray *arr, const FamlTuple *value);
@@ -93,7 +180,7 @@ int famlarray_with_defaults_bool(FamlArray *arr, bool default_value, u64 len);
 int famlarray_with_defaults_string(FamlArray *arr, char *default_value, u64 len);
 
 // Implementation notes: Tuples can have any type so no type checking is necessary here.
-int famltuple_init(FamlArray *arr);
+int famltuple_build(FamlArray *arr, bool send);
 int famltuple_push_obj(FamlArray *arr, const FamlObj *value);
 int famltuple_push_array(FamlArray *arr, const FamlArray *value);
 int famltuple_push_tuple(FamlArray *arr, const FamlTuple *value);
@@ -113,7 +200,6 @@ int famltuple_push_bool(FamlArray *arr, const bool value);
 int famltuple_push_string(FamlArray *arr, const char *value);
 
 // When adding to an object, it acts as an associative array. So you have key/values.
-int famlobj_init(FamlObj *obj);
 int famlobj_add_obj(FamlObj *obj, const char *key, const FamlObj *value);
 int famlobj_add_array(FamlObj *obj, const char *key, const FamlArray *value);
 int famlobj_add_tuple(FamlObj *obj, const char *key, const FamlTuple *value);
@@ -185,5 +271,6 @@ int famltuple_as_f32(const FamlTuple *tuple, u64 index, f32 *value);
 int famltuple_as_f64(const FamlTuple *tuple, u64 index, f64 *value);
 int famltuple_as_bool(const FamlTuple *tuple, u64 index, bool *value);
 int famltuple_as_string(const FamlTuple *tuple, u64 index, char *value, u64 limit);
+*/
 
 #endif // _FAML_FAML__

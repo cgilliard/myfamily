@@ -12,38 +12,164 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/chain_alloc.h>
+#include <base/fam_err.h>
 #include <base/resources.h>
 #include <faml/parser.h>
+#include <stdio.h>
+#include <string.h>
+#include <util/rbtree.h>
 
-typedef enum FamlType {
-	FamlTypeObj,
-	FamlTypeArray,
-	FamlTypeTuple,
-	FamlTypeI8,
-	FamlTypeI16,
-} FamlType;
+typedef struct LookupTableEntry {
+	FamlObjVisibility visibility;
+	FatPtr name;
+	FatPtr sub_table;
+} LookupTableEntry;
+
+typedef struct FamlPrototypeImpl {
+	bool is_dynamic;
+	FatPtr lookup_table;
+	u32 size;
+	u32 capacity;
+} FamlPrototypeImpl;
+
+void famlproto_cleanup(FamlPrototype *ptr) {
+}
+
+int faml_prototype_create(FamlPrototype *proto, const char *name) {
+	return 0;
+}
 
 typedef struct FamlObjImpl {
-	FamlType *types;
-	void *data;
+	FamlPrototype *proto;
+	FamlType type;
+	bool send;
+	bool sync;
+	FatPtr data;
 } FamlObjImpl;
 
+typedef struct FamlObjKey {
+	u32 variant_id;
+	FatPtr name;
+} FamlObjKey;
+
+typedef struct FamlObjValueObj {
+	RBTree names;
+	RBTree indices;
+	u32 insertion_index;
+} FamlObjValueObj;
+
+typedef struct FamlObjValueU64 {
+	u64 value;
+} FamlObjValueU64;
+
+typedef struct FamlObjValueU8 {
+	u8 value;
+} FamlObjValueU8;
+
+int faml_obj_key_compare(const void *v1, const void *v2) {
+	const u64 *k1 = v1;
+	const u64 *k2 = v2;
+	if (*k1 < *k2)
+		return -1;
+	else if (*k1 > *k2)
+		return 1;
+	return 0;
+}
+
 void famlobj_cleanup(FamlObj *obj) {
-	if (obj->opaque) {
-		myfree(obj->opaque);
-		obj->opaque = NULL;
+	if (!nil(obj->impl)) {
+		FamlObjImpl *impl = $Ref(&obj->impl);
+		ChainGuard _ = ChainSend(impl->send);
+		if (!nil(impl->data)) {
+			chain_free(&impl->data);
+		}
+
+		chain_free(&obj->impl);
 	}
 }
 
-int famlobj_init(FamlObj *obj) {
-	obj->opaque = mymalloc(sizeof(FamlObjImpl));
-	if (obj->opaque == NULL)
+int faml_build_obj(FamlObj *obj, FamlPrototype *proto, bool send, bool sync) {
+	printf("sz(famlobjimpl)=%lu key=%lu\n", sizeof(FamlObjImpl), sizeof(FamlObjKey));
+	printf("sz(FamlObjValueObj)=%lu,FamlObjValueU64=%lu,u8=%lu\n", sizeof(FamlObjValueObj),
+		   sizeof(FamlObjValueU64), sizeof(FamlObjValueU8));
+	FamlObjImpl *impl;
+	FamlObjValueObj *data;
+	{
+		ChainGuard _ = ChainSend(send);
+		if (chain_malloc(&obj->impl, sizeof(FamlObjImpl))) {
+			obj->impl = null;
+			return -1;
+		}
+		impl = $Ref(&obj->impl);
+		if (chain_malloc(&impl->data, sizeof(FamlObjValueObj))) {
+			chain_free(&obj->impl);
+			obj->impl = null;
+			impl->data = null;
+			return -1;
+		}
+		data = $Ref(&impl->data);
+	}
+	impl->send = send;
+	impl->proto = proto;
+	data->insertion_index = 0;
+
+	return 0;
+}
+
+int famlobj_put_u8(FamlObj *obj, const char *name, const u8 v) {
+	if (obj == NULL || name == NULL) {
+		fam_err = IllegalArgument;
 		return -1;
+	}
+	FamlObjImpl *impl = $Ref(&obj->impl);
+
 	return 0;
 }
-int famlobj_add_i8(FamlObj *obj, const char *key, const i8 value) {
+
+int famlobj_put_u64(FamlObj *obj, const char *name, const u64 v) {
+	if (obj == NULL || name == NULL) {
+		fam_err = IllegalArgument;
+		return -1;
+	}
+
+	FamlObjImpl *impl = $Ref(&obj->impl);
+
 	return 0;
 }
-int famlobj_add_i16(FamlObj *obj, const char *key, const i16 value) {
+
+int faml_put_i32(FamlObj *obj, const char *name, const i32 v) {
+	if (obj == NULL || name == NULL) {
+		fam_err = IllegalArgument;
+		return -1;
+	}
+	if (nil(obj->impl)) {
+		fam_err = InitErr;
+		return -1;
+	}
+
+	FamlObjImpl *impl = $Ref(&obj->impl);
+	if (impl == NULL) {
+		fam_err = InitErr;
+		return -1;
+	}
+
+	FamlObjValueObj *data = $Ref(&impl->data);
+	u32 insertion_index = data->insertion_index;
+
+	data->insertion_index++;
+
+	printf("faml put i32 ii=%u\n", insertion_index);
+
+	return 0;
+}
+
+int faml_put_i64(FamlObj *obj, const char *name, const i64 v) {
+	printf("faml put i64\n");
+	return 0;
+}
+
+int faml_put_obj(FamlObj *obj, const char *name, const FamlObj *v) {
+	printf("faml put obj\n");
 	return 0;
 }

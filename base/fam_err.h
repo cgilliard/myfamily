@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
-#include <faml/faml.h>
+#ifndef _BASE_FAM_ERR__
+#define _BASE_FAM_ERR__
 
-MySuite(faml);
+typedef enum FamErr {
+	Ok,
+	IllegalArgument,
+	AllocErr,
+	InitErr,
+} FamErr;
 
-MyTest(faml, test_parser) {
-	FamlObj obj1, obj2;
-	cr_assert(!faml_build_obj(&obj1, NULL, false, false));
-	cr_assert(!faml_build_obj(&obj2, NULL, false, false));
+extern int fam_err;
 
-	faml_put(&obj1, "myval", 100);
-	faml_put(&obj1, "myval2", 101);
-	faml_put(&obj1, "test", 100LL);
-	faml_put(&obj1, "obj", &obj2);
-}
+#endif // _BASE_FAM_ERR__

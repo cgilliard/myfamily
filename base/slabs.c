@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/fam_err.h>
 #include <base/macro_utils.h>
 #include <base/panic.h>
 #include <base/resources.h>
 #include <base/slabs.h>
-#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -282,32 +282,32 @@ int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
 	u32 last_slab_size = 0;
 	for (u64 i = 0; i < impl->sd_size; i++) {
 		if (last_slab_size >= impl->sd_arr[i].type.slab_size) {
-			errno = EINVAL;
+			fam_err = IllegalArgument;
 			return -1;
 		}
 		// for alignment, must be divisible by 8
 		if (impl->sd_arr[i].type.slab_size % 8 != 0) {
-			errno = EINVAL;
+			fam_err = IllegalArgument;
 			return -1;
 		}
 		// can't have higher max slabs than initial
 		if (impl->sd_arr[i].type.slabs_per_resize * impl->sd_arr[i].type.initial_chunks >
 			impl->sd_arr[i].type.max_slabs) {
-			errno = EINVAL;
+			fam_err = IllegalArgument;
 			return -1;
 		}
 		// max slabs for 32 bit and 64 bit
 		if (impl->sd_arr[i].type.max_slabs > (INT32_MAX - 10) && !impl->is_64_bit) {
-			errno = EINVAL;
+			fam_err = IllegalArgument;
 			return -1;
 		} else if (impl->sd_arr[i].type.max_slabs > (INT64_MAX - 10) && impl->is_64_bit) {
-			errno = EINVAL;
+			fam_err = IllegalArgument;
 			return -1;
 		}
 
 		// max slabs must be dividisble by slabs_per_resize
 		if (impl->sd_arr[i].type.max_slabs % impl->sd_arr[i].type.slabs_per_resize) {
-			errno = EINVAL;
+			fam_err = IllegalArgument;
 			return -1;
 		}
 		last_slab_size = impl->sd_arr[i].type.slab_size;
@@ -521,7 +521,7 @@ void slab_data_free(SlabData *sd, const FatPtr *fptr, bool is_64_bit, bool zeroe
 
 int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 	if (size == 0) {
-		errno = EINVAL;
+		fam_err = IllegalArgument;
 		return -1;
 	}
 
@@ -536,6 +536,7 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 	int index = slab_allocator_index(ptr, needed);
 	int ret;
 	if (impl->no_malloc && index < 0) {
+		fam_err = AllocErr;
 		return -1;
 	} else if (index < 0) {
 		ret = -1;
@@ -558,8 +559,10 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 		}
 
 		// malloc error
-		if (!val)
+		if (!val) {
+			fam_err = AllocErr;
 			return -1;
+		}
 
 		if (zeroed) {
 			for (u64 i = 0; i < data_len; i++) {
@@ -583,6 +586,9 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 			fptr32->data = fptr->data + 2 * sizeof(u32) + sizeof(u64);
 		}
 	}
+	if (ret < 0)
+		fam_err = AllocErr;
+
 	return ret;
 }
 void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
