@@ -764,16 +764,17 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_k
 
 	if (start_key != NULL) {
 		RBTreeNode *itt = impl->root;
-		RBTreeNode *closest = NULL; // Keep track of the closest node found so far
-
 		while (itt != NIL) {
 			int v = impl->compare(itt->data, start_key);
 			if (v == 0) {
+				// exact match
 				rbimpl->min = itt;
-				break; // Exact match found
+				break;
 			} else if (v < 0) {
+				// continue down the chain to look for more
 				itt = itt->right;
 			} else {
+				// higher value found update min
 				rbimpl->min = itt;
 				itt = itt->left;
 			}
@@ -785,12 +786,15 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_k
 		while (itt != NIL) {
 			int v = impl->compare(itt->data, end_key);
 			if (v == 0) {
+				// exact match
 				rbimpl->max = itt;
 				break;
 			} else if (v < 0) {
+				// lower value found update max
 				rbimpl->max = itt;
 				itt = itt->right;
 			} else {
+				// continue down the chain to look for more
 				itt = itt->left;
 			}
 		}
