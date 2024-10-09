@@ -285,3 +285,47 @@ MyTest(util, test_rbtree_range_itt) {
 
 	cr_assert_eq(rbtree_size(&tree1), size);
 }
+
+typedef struct MyRecord {
+	char name[100];
+	u64 value;
+} MyRecord;
+
+int my_record_compare(const void *v1, const void *v2) {
+	const MyRecord *k1 = v1;
+	const MyRecord *k2 = v2;
+	return strcmp(k1->name, k2->name);
+}
+
+MyTest(util, test_string_compare_fn) {
+	RBTree tree1;
+	cr_assert(!rbtree_build(&tree1, sizeof(MyRecord), sizeof(u64), my_record_compare, false));
+	u64 size = 10;
+	for (u64 i = 0; i < size; i++) {
+		char s[101];
+		snprintf(s, 100, "test%llu", i);
+		MyRecord k;
+		strcpy(k.name, s);
+		k.value = i;
+		u64 v = k.value + 100;
+		cr_assert(!rbtree_insert(&tree1, &k, &v));
+		rbtree_validate(&tree1);
+		rbtree_max_depth(&tree1);
+	}
+
+	RBTreeIterator itt1;
+	cr_assert(!rbtree_iterator(&tree1, &itt1, NULL, NULL));
+	int i = 0;
+	loop {
+		RbTreeKeyValue kv;
+		bool has_next = rbtree_iterator_next(&itt1, &kv);
+		if (!has_next)
+			break;
+
+		MyRecord *k1 = kv.key;
+		u64 *v1 = kv.value;
+		cr_assert_eq(*v1, i + 100);
+		i++;
+	}
+	cr_assert_eq(i, size);
+}
