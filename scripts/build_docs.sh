@@ -9,7 +9,7 @@ rm -rf docs/html/*
 cp -rp ../doc/html/* docs/html
 
 
-./configure --with-cc=clang
+./configure --with-cc=gcc
 make clean coverage
 # append code cov numbers to our running totals
 cat /tmp/codecov >> docs/cc.txt
