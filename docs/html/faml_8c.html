@@ -69,50 +69,75 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">faml.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="chain__alloc_8h_source.html">base/chain_alloc.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="fam__err_8h_source.html">base/fam_err.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="parser_8h_source.html">faml/parser.h</a>&gt;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;<a class="el" href="rbtree_8h_source.html">util/rbtree.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structLookupTableEntry.html">LookupTableEntry</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFamlPrototypeImpl.html">FamlPrototypeImpl</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFamlObjImpl.html">FamlObjImpl</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFamlObjKey.html">FamlObjKey</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFamlObjValueObj.html">FamlObjValueObj</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFamlObjValueU64.html">FamlObjValueU64</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structFamlObjValueU8.html">FamlObjValueU8</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a466efd2c938e742eb0a7ff764106f547"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="faml_8c.html#a1d3c2513094ca689f45815479be95243">FamlType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a466efd2c938e742eb0a7ff764106f547">FamlType</a></td></tr>
-<tr class="separator:a466efd2c938e742eb0a7ff764106f547"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a1a4cb8d93d5cc60a2de7e21132e98b"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structLookupTableEntry.html">LookupTableEntry</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a5a1a4cb8d93d5cc60a2de7e21132e98b">LookupTableEntry</a></td></tr>
+<tr class="separator:a5a1a4cb8d93d5cc60a2de7e21132e98b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2010a4c69559a494e8ed5c7193f3656e"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structFamlPrototypeImpl.html">FamlPrototypeImpl</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a2010a4c69559a494e8ed5c7193f3656e">FamlPrototypeImpl</a></td></tr>
+<tr class="separator:a2010a4c69559a494e8ed5c7193f3656e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a718f7b5de1d5a17abd27f5c3a151902a"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structFamlObjImpl.html">FamlObjImpl</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a718f7b5de1d5a17abd27f5c3a151902a">FamlObjImpl</a></td></tr>
 <tr class="separator:a718f7b5de1d5a17abd27f5c3a151902a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
-Enumerations</h2></td></tr>
-<tr class="memitem:a1d3c2513094ca689f45815479be95243"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a1d3c2513094ca689f45815479be95243">FamlType</a> { <br />
-&#160;&#160;<a class="el" href="faml_8c.html#a1d3c2513094ca689f45815479be95243a1f25d2cbb5bd5d4e88a400fafbcc9ce2">FamlTypeObj</a>
-, <a class="el" href="faml_8c.html#a1d3c2513094ca689f45815479be95243a0ed234a3687314ca83936142edbd1042">FamlTypeArray</a>
-, <a class="el" href="faml_8c.html#a1d3c2513094ca689f45815479be95243a564f2afd094587d9ca77c51d4daa17bc">FamlTypeTuple</a>
-, <a class="el" href="faml_8c.html#a1d3c2513094ca689f45815479be95243a7c4a9f90dc729a013c6df882c5e24f9c">FamlTypeI8</a>
-, <br />
-&#160;&#160;<a class="el" href="faml_8c.html#a1d3c2513094ca689f45815479be95243aff01afabf89284eb58d82359384bbacb">FamlTypeI16</a>
-<br />
- }</td></tr>
-<tr class="separator:a1d3c2513094ca689f45815479be95243"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48acd17b6d6c7b6a086cbc0fec5a34ae"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structFamlObjKey.html">FamlObjKey</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a48acd17b6d6c7b6a086cbc0fec5a34ae">FamlObjKey</a></td></tr>
+<tr class="separator:a48acd17b6d6c7b6a086cbc0fec5a34ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96ac87e5615608b3bbb0695d90ddfd5c"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structFamlObjValueObj.html">FamlObjValueObj</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a96ac87e5615608b3bbb0695d90ddfd5c">FamlObjValueObj</a></td></tr>
+<tr class="separator:a96ac87e5615608b3bbb0695d90ddfd5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dcd28c5f2c29795115bbaf36db65b4b"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structFamlObjValueU64.html">FamlObjValueU64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a0dcd28c5f2c29795115bbaf36db65b4b">FamlObjValueU64</a></td></tr>
+<tr class="separator:a0dcd28c5f2c29795115bbaf36db65b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a791ff2d2614af43c4f7816ae2a1fbb2c"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structFamlObjValueU8.html">FamlObjValueU8</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a791ff2d2614af43c4f7816ae2a1fbb2c">FamlObjValueU8</a></td></tr>
+<tr class="separator:a791ff2d2614af43c4f7816ae2a1fbb2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:afb351d3b62566fea43ea68142229893a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#afb351d3b62566fea43ea68142229893a">famlproto_cleanup</a> (<a class="el" href="faml_8h.html#a000774b115875113de11412cb38c4dad">FamlPrototype</a> *ptr)</td></tr>
+<tr class="separator:afb351d3b62566fea43ea68142229893a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a662188390997c421836bc0014aed2759"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a662188390997c421836bc0014aed2759">faml_prototype_create</a> (<a class="el" href="faml_8h.html#a000774b115875113de11412cb38c4dad">FamlPrototype</a> *proto, const char *name)</td></tr>
+<tr class="separator:a662188390997c421836bc0014aed2759"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d8f6321ac8cb39c665488e6bbb98ce0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a1d8f6321ac8cb39c665488e6bbb98ce0">faml_obj_key_compare</a> (const void *v1, const void *v2)</td></tr>
+<tr class="separator:a1d8f6321ac8cb39c665488e6bbb98ce0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64824d5cb31ff438cf3305f2373254f1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a64824d5cb31ff438cf3305f2373254f1">famlobj_cleanup</a> (<a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *obj)</td></tr>
 <tr class="separator:a64824d5cb31ff438cf3305f2373254f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedde0937f0b0393395d7703386c1b1a8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#aedde0937f0b0393395d7703386c1b1a8">famlobj_init</a> (<a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *obj)</td></tr>
-<tr class="separator:aedde0937f0b0393395d7703386c1b1a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e0e4c87943f84c22f213ed15cd42b63"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a0e0e4c87943f84c22f213ed15cd42b63">famlobj_add_i8</a> (<a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *obj, const char *key, const <a class="el" href="types_8h.html#a2d0b2d48b0784ffa5f75c39f46562729">i8</a> value)</td></tr>
-<tr class="separator:a0e0e4c87943f84c22f213ed15cd42b63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b5c7ce0d47fd04de35072d8413032d8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a0b5c7ce0d47fd04de35072d8413032d8">famlobj_add_i16</a> (<a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *obj, const char *key, const <a class="el" href="types_8h.html#ac12585a6def54773148d7fb2c72a59c5">i16</a> value)</td></tr>
-<tr class="separator:a0b5c7ce0d47fd04de35072d8413032d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74a1f8b4920683827bcdeae7d0542147"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a74a1f8b4920683827bcdeae7d0542147">faml_build_obj</a> (<a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *obj, <a class="el" href="faml_8h.html#a000774b115875113de11412cb38c4dad">FamlPrototype</a> *proto, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> send, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> sync)</td></tr>
+<tr class="separator:a74a1f8b4920683827bcdeae7d0542147"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a223f5ce4c7533dd09aa435fe3453494d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a223f5ce4c7533dd09aa435fe3453494d">famlobj_put_u8</a> (<a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *obj, const char *name, const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> v)</td></tr>
+<tr class="separator:a223f5ce4c7533dd09aa435fe3453494d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa134c9f7b1d2c119385304672f0e82b6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#aa134c9f7b1d2c119385304672f0e82b6">famlobj_put_u64</a> (<a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *obj, const char *name, const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> v)</td></tr>
+<tr class="separator:aa134c9f7b1d2c119385304672f0e82b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af40383da18b0e538e30906cf909f230b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#af40383da18b0e538e30906cf909f230b">faml_put_i32</a> (<a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *obj, const char *name, const <a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> v)</td></tr>
+<tr class="separator:af40383da18b0e538e30906cf909f230b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6526ada284faff373ea1208cbc551c4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#af6526ada284faff373ea1208cbc551c4">faml_put_i64</a> (<a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *obj, const char *name, const <a class="el" href="types_8h.html#ada59a0de67c44384c6faa924ca63c2aa">i64</a> v)</td></tr>
+<tr class="separator:af6526ada284faff373ea1208cbc551c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0af5268e526b2308aa9a105bacc9da05"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8c.html#a0af5268e526b2308aa9a105bacc9da05">faml_put_obj</a> (<a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *obj, const char *name, const <a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *v)</td></tr>
+<tr class="separator:a0af5268e526b2308aa9a105bacc9da05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="a718f7b5de1d5a17abd27f5c3a151902a"></a>
@@ -129,51 +154,99 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a466efd2c938e742eb0a7ff764106f547"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a466efd2c938e742eb0a7ff764106f547">&#9670;&nbsp;</a></span>FamlType</h2>
+<a id="a48acd17b6d6c7b6a086cbc0fec5a34ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48acd17b6d6c7b6a086cbc0fec5a34ae">&#9670;&nbsp;</a></span>FamlObjKey</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef enum <a class="el" href="faml_8c.html#a1d3c2513094ca689f45815479be95243">FamlType</a> <a class="el" href="faml_8c.html#a1d3c2513094ca689f45815479be95243">FamlType</a></td>
+          <td class="memname">typedef struct <a class="el" href="structFamlObjKey.html">FamlObjKey</a> <a class="el" href="structFamlObjKey.html">FamlObjKey</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="a1d3c2513094ca689f45815479be95243"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d3c2513094ca689f45815479be95243">&#9670;&nbsp;</a></span>FamlType</h2>
+<a id="a96ac87e5615608b3bbb0695d90ddfd5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96ac87e5615608b3bbb0695d90ddfd5c">&#9670;&nbsp;</a></span>FamlObjValueObj</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="faml_8c.html#a1d3c2513094ca689f45815479be95243">FamlType</a></td>
+          <td class="memname">typedef struct <a class="el" href="structFamlObjValueObj.html">FamlObjValueObj</a> <a class="el" href="structFamlObjValueObj.html">FamlObjValueObj</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a1f25d2cbb5bd5d4e88a400fafbcc9ce2"></a>FamlTypeObj&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a0ed234a3687314ca83936142edbd1042"></a>FamlTypeArray&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a564f2afd094587d9ca77c51d4daa17bc"></a>FamlTypeTuple&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a7c4a9f90dc729a013c6df882c5e24f9c"></a>FamlTypeI8&#160;</td><td class="fielddoc"></td></tr>
-<tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243aff01afabf89284eb58d82359384bbacb"></a>FamlTypeI16&#160;</td><td class="fielddoc"></td></tr>
-</table>
+
+</div>
+</div>
+<a id="a0dcd28c5f2c29795115bbaf36db65b4b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0dcd28c5f2c29795115bbaf36db65b4b">&#9670;&nbsp;</a></span>FamlObjValueU64</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structFamlObjValueU64.html">FamlObjValueU64</a> <a class="el" href="structFamlObjValueU64.html">FamlObjValueU64</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a791ff2d2614af43c4f7816ae2a1fbb2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a791ff2d2614af43c4f7816ae2a1fbb2c">&#9670;&nbsp;</a></span>FamlObjValueU8</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structFamlObjValueU8.html">FamlObjValueU8</a> <a class="el" href="structFamlObjValueU8.html">FamlObjValueU8</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2010a4c69559a494e8ed5c7193f3656e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2010a4c69559a494e8ed5c7193f3656e">&#9670;&nbsp;</a></span>FamlPrototypeImpl</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structFamlPrototypeImpl.html">FamlPrototypeImpl</a> <a class="el" href="structFamlPrototypeImpl.html">FamlPrototypeImpl</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5a1a4cb8d93d5cc60a2de7e21132e98b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a1a4cb8d93d5cc60a2de7e21132e98b">&#9670;&nbsp;</a></span>LookupTableEntry</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structLookupTableEntry.html">LookupTableEntry</a> <a class="el" href="structLookupTableEntry.html">LookupTableEntry</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a0b5c7ce0d47fd04de35072d8413032d8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0b5c7ce0d47fd04de35072d8413032d8">&#9670;&nbsp;</a></span>famlobj_add_i16()</h2>
+<a id="a74a1f8b4920683827bcdeae7d0542147"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74a1f8b4920683827bcdeae7d0542147">&#9670;&nbsp;</a></span>faml_build_obj()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int famlobj_add_i16 </td>
+          <td class="memname">int faml_build_obj </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *&#160;</td>
           <td class="paramname"><em>obj</em>, </td>
@@ -181,14 +254,20 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>key</em>, </td>
+          <td class="paramtype"><a class="el" href="faml_8h.html#a000774b115875113de11412cb38c4dad">FamlPrototype</a> *&#160;</td>
+          <td class="paramname"><em>proto</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="types_8h.html#ac12585a6def54773148d7fb2c72a59c5">i16</a>&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>send</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>sync</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -200,14 +279,70 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0e0e4c87943f84c22f213ed15cd42b63"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0e0e4c87943f84c22f213ed15cd42b63">&#9670;&nbsp;</a></span>famlobj_add_i8()</h2>
+<a id="a1d8f6321ac8cb39c665488e6bbb98ce0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d8f6321ac8cb39c665488e6bbb98ce0">&#9670;&nbsp;</a></span>faml_obj_key_compare()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int famlobj_add_i8 </td>
+          <td class="memname">int faml_obj_key_compare </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>v1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>v2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a662188390997c421836bc0014aed2759"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a662188390997c421836bc0014aed2759">&#9670;&nbsp;</a></span>faml_prototype_create()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int faml_prototype_create </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="faml_8h.html#a000774b115875113de11412cb38c4dad">FamlPrototype</a> *&#160;</td>
+          <td class="paramname"><em>proto</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af40383da18b0e538e30906cf909f230b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af40383da18b0e538e30906cf909f230b">&#9670;&nbsp;</a></span>faml_put_i32()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int faml_put_i32 </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *&#160;</td>
           <td class="paramname"><em>obj</em>, </td>
@@ -216,13 +351,81 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>key</em>, </td>
+          <td class="paramname"><em>name</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="types_8h.html#a2d0b2d48b0784ffa5f75c39f46562729">i8</a>&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td>
+          <td class="paramname"><em>v</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af6526ada284faff373ea1208cbc551c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6526ada284faff373ea1208cbc551c4">&#9670;&nbsp;</a></span>faml_put_i64()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int faml_put_i64 </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#ada59a0de67c44384c6faa924ca63c2aa">i64</a>&#160;</td>
+          <td class="paramname"><em>v</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0af5268e526b2308aa9a105bacc9da05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0af5268e526b2308aa9a105bacc9da05">&#9670;&nbsp;</a></span>faml_put_obj()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int faml_put_obj </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *&#160;</td>
+          <td class="paramname"><em>v</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -252,17 +455,85 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aedde0937f0b0393395d7703386c1b1a8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aedde0937f0b0393395d7703386c1b1a8">&#9670;&nbsp;</a></span>famlobj_init()</h2>
+<a id="aa134c9f7b1d2c119385304672f0e82b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa134c9f7b1d2c119385304672f0e82b6">&#9670;&nbsp;</a></span>famlobj_put_u64()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int famlobj_init </td>
+          <td class="memname">int famlobj_put_u64 </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *&#160;</td>
-          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>v</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a223f5ce4c7533dd09aa435fe3453494d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a223f5ce4c7533dd09aa435fe3453494d">&#9670;&nbsp;</a></span>famlobj_put_u8()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int famlobj_put_u8 </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>v</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afb351d3b62566fea43ea68142229893a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb351d3b62566fea43ea68142229893a">&#9670;&nbsp;</a></span>famlproto_cleanup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void famlproto_cleanup </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="faml_8h.html#a000774b115875113de11412cb38c4dad">FamlPrototype</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
         </tr>
       </table>

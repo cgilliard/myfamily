@@ -93,8 +93,12 @@ Classes</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:a78371e96afb8791aa6d4e7819a948dd1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#a78371e96afb8791aa6d4e7819a948dd1">RBTreeIterator</a>&#160;&#160;&#160;	<a class="el" href="structRBTreeIteratorNc.html">RBTreeIteratorNc</a> <a class="el" href="psrng_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="rbtree_8h.html#a159636545fda721edb3fb250a877d4de">rbtree_iterator_cleanup</a>)))</td></tr>
 <tr class="separator:a78371e96afb8791aa6d4e7819a948dd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c2977708be182713d8c6b0192cb93bf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#a6c2977708be182713d8c6b0192cb93bf">RBTREE_INITIALIZE</a>&#160;&#160;&#160;_nil_rbtree__</td></tr>
+<tr class="separator:a6c2977708be182713d8c6b0192cb93bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6663a5b2e56649ebec406303af3e6213"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a>&#160;&#160;&#160;<a class="el" href="structRBTreeNc.html">RBTreeNc</a> <a class="el" href="psrng_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="rbtree_8h.html#ade19eed118d206e58c9836543cd4122a">rbtree_cleanup</a>)))</td></tr>
 <tr class="separator:a6663a5b2e56649ebec406303af3e6213"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d37a4404c24c7dbe18d55f3b2f7abc7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#a8d37a4404c24c7dbe18d55f3b2f7abc7">RBTreeIsInit</a>(tree)&#160;&#160;&#160;(&amp;tree != &amp;<a class="el" href="rbtree_8h.html#a6c2977708be182713d8c6b0192cb93bf">RBTREE_INITIALIZE</a>)</td></tr>
+<tr class="separator:a8d37a4404c24c7dbe18d55f3b2f7abc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -123,8 +127,8 @@ Functions</h2></td></tr>
 <tr class="separator:abb0622d260fa94b7cc066f774fbc4cb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8154979db8af8731ed7d4831ac1bf8c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ada59a0de67c44384c6faa924ca63c2aa">i64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#a8154979db8af8731ed7d4831ac1bf8c3">rbtree_size</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr)</td></tr>
 <tr class="separator:a8154979db8af8731ed7d4831ac1bf8c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46699bbeb46d3521b3ae3f208a04cffa"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#a46699bbeb46d3521b3ae3f208a04cffa">rbtree_iterator</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, <a class="el" href="rbtree_8h.html#a78371e96afb8791aa6d4e7819a948dd1">RBTreeIterator</a> *iter)</td></tr>
-<tr class="separator:a46699bbeb46d3521b3ae3f208a04cffa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a322991a66a48b328e2ed028b2965cb4c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8h.html#a322991a66a48b328e2ed028b2965cb4c">rbtree_iterator</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, <a class="el" href="rbtree_8h.html#a78371e96afb8791aa6d4e7819a948dd1">RBTreeIterator</a> *iter, const void *start_key, const void *end_key)</td></tr>
+<tr class="separator:a322991a66a48b328e2ed028b2965cb4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a6663a5b2e56649ebec406303af3e6213"></a>
@@ -135,6 +139,38 @@ Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define RBTree&#160;&#160;&#160;<a class="el" href="structRBTreeNc.html">RBTreeNc</a> <a class="el" href="psrng_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="rbtree_8h.html#ade19eed118d206e58c9836543cd4122a">rbtree_cleanup</a>)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6c2977708be182713d8c6b0192cb93bf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c2977708be182713d8c6b0192cb93bf">&#9670;&nbsp;</a></span>RBTREE_INITIALIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RBTREE_INITIALIZE&#160;&#160;&#160;_nil_rbtree__</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8d37a4404c24c7dbe18d55f3b2f7abc7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d37a4404c24c7dbe18d55f3b2f7abc7">&#9670;&nbsp;</a></span>RBTreeIsInit</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RBTreeIsInit</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">tree</td><td>)</td>
+          <td>&#160;&#160;&#160;(&amp;tree != &amp;<a class="el" href="rbtree_8h.html#a6c2977708be182713d8c6b0192cb93bf">RBTREE_INITIALIZE</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -353,8 +389,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a46699bbeb46d3521b3ae3f208a04cffa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46699bbeb46d3521b3ae3f208a04cffa">&#9670;&nbsp;</a></span>rbtree_iterator()</h2>
+<a id="a322991a66a48b328e2ed028b2965cb4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a322991a66a48b328e2ed028b2965cb4c">&#9670;&nbsp;</a></span>rbtree_iterator()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -369,7 +405,19 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="rbtree_8h.html#a78371e96afb8791aa6d4e7819a948dd1">RBTreeIterator</a> *&#160;</td>
-          <td class="paramname"><em>iter</em>&#160;</td>
+          <td class="paramname"><em>iter</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>start_key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>end_key</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
