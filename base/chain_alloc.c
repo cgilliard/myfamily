@@ -127,6 +127,16 @@ void chain_guard_cleanup(ChainGuardNc *ptr) {
 	}
 }
 
+ChainGuard set_thread_local_slab_allocator() {
+	if (!chain_guard_is_init) {
+		chain_guard_entries[chain_guard_sp].sa = init_default_slab_allocator();
+		if (chain_guard_entries[chain_guard_sp].sa == NULL)
+			panic("Could not init default slab allocator");
+		chain_guard_is_init = true;
+	}
+	return set_slab_allocator(chain_guard_entries[0].sa, false);
+}
+
 ChainGuard set_slab_allocator(SlabAllocator *sa, bool sync) {
 	if (!chain_guard_is_init) {
 		chain_guard_entries[chain_guard_sp].sa = init_default_slab_allocator();

@@ -43,7 +43,7 @@ void rbtree_cleanup(RBTreeNc *ptr);
 static const RBTreeNc _nil_rbtree__ = {.impl = null};
 #define RBTREE_INITIALIZE _nil_rbtree__
 #define RBTree RBTreeNc __attribute__((warn_unused_result, cleanup(rbtree_cleanup)))
-#define RBTreeIsInit(tree) (&tree != &RBTREE_INITIALIZE)
+#define RBTreeIsInit(tree) (!nil(tree.impl))
 
 int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 				 int (*compare)(const void *, const void *), bool send);
@@ -52,7 +52,7 @@ int rbtree_delete(RBTree *ptr, const void *key);
 const void *rbtree_get(const RBTree *ptr, const void *key);
 i64 rbtree_size(const RBTree *ptr);
 int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
-					const void *end_key);
+					bool start_inclusive, const void *end_key, bool end_inclusive);
 
 #ifdef TEST
 void rbtree_validate(const RBTree *ptr);

@@ -83,6 +83,8 @@ void chain_guard_cleanup(ChainGuardNc *ptr);
 // }
 ChainGuard set_slab_allocator(SlabAllocator *sa, bool is_sync);
 
+ChainGuard set_thread_local_slab_allocator();
+
 // Get a slab allocator that is used as a global sync allocator.
 SlabAllocator *get_global_sync_allocator();
 

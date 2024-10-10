@@ -20,6 +20,7 @@ typedef enum FamErr {
 	IllegalArgument,
 	AllocErr,
 	InitErr,
+	AlreadyInitialized,
 } FamErr;
 
 extern int fam_err;

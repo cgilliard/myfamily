@@ -32,9 +32,12 @@ int u64_compare(const void *v1, const void *v2) {
 }
 
 MyTest(util, test_rbtree) {
-	RBTree test1;
+	RBTree test1 = RBTREE_INITIALIZE;
+	cr_assert(!RBTreeIsInit(test1));
 	u64 k, v;
 	rbtree_build(&test1, sizeof(u64), sizeof(u64), &u64_compare, false);
+
+	cr_assert(RBTreeIsInit(test1));
 
 	k = 0;
 	v = 10;
@@ -132,7 +135,7 @@ MyTest(util, test_random_rbtree) {
 	}
 
 	RBTreeIterator itt1;
-	cr_assert(!rbtree_iterator(&rand1, &itt1, NULL, NULL));
+	cr_assert(!rbtree_iterator(&rand1, &itt1, NULL, false, NULL, false));
 
 	u64 i = 0;
 	u64 last = 0;
@@ -194,7 +197,7 @@ MyTest(util, test_validation_and_other) {
 	cr_assert(!rbtree_get(NULL, NULL));
 	cr_assert_eq(rbtree_max_depth(&test1), 2);
 	rbtree_print(&test1);
-	cr_assert(rbtree_iterator(NULL, NULL, NULL, NULL));
+	cr_assert(rbtree_iterator(NULL, NULL, NULL, false, NULL, false));
 	rbtree_delete(NULL, NULL);
 }
 
@@ -262,7 +265,7 @@ MyTest(util, test_rbtree_range_itt) {
 	RBTreeIterator itt1;
 	u64 start = 14;
 	u64 end = 20;
-	cr_assert(!rbtree_iterator(&tree1, &itt1, &start, &end));
+	cr_assert(!rbtree_iterator(&tree1, &itt1, &start, true, &end, true));
 
 	u64 i = 0;
 	u64 last = 15;
@@ -314,7 +317,7 @@ MyTest(util, test_string_compare_fn) {
 	}
 
 	RBTreeIterator itt1;
-	cr_assert(!rbtree_iterator(&tree1, &itt1, NULL, NULL));
+	cr_assert(!rbtree_iterator(&tree1, &itt1, NULL, false, NULL, false));
 	int i = 0;
 	loop {
 		RbTreeKeyValue kv;

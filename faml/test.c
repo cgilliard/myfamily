@@ -17,8 +17,14 @@
 
 MySuite(faml);
 
-MyTest(faml, test_parser) {
+MyTest(faml, test_faml_objs) {
 	FamlObj obj1, obj2;
+	FamlPrototype proto1, proto2;
+	cr_assert(!faml_prototype_create(&proto1, false, false, true));
+	cr_assert(!faml_prototype_create(&proto2, false, false, true));
+
+	faml_prototype_set_u8(&proto1, 21);
+
 	cr_assert(!faml_build_obj(&obj1, NULL, false, false));
 	cr_assert(!faml_build_obj(&obj2, NULL, false, false));
 
@@ -26,4 +32,9 @@ MyTest(faml, test_parser) {
 	faml_put(&obj1, "myval2", 101);
 	faml_put(&obj1, "test", 100LL);
 	faml_put(&obj1, "obj", &obj2);
+
+	cleanup_faml_data();
+}
+
+MyTest(faml, test_faml_objs2) {
 }

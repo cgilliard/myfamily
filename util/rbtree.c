@@ -737,7 +737,7 @@ i64 rbtree_size(const RBTree *ptr) {
 
 // return iterator object
 int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
-					const void *end_key) {
+					bool start_inclusive, const void *end_key, bool end_inclusive) {
 	if (ptr == NULL || nil(ptr->impl)) {
 		errno = EINVAL;
 		return -1;
@@ -768,8 +768,10 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_k
 			int v = impl->compare(itt->data, start_key);
 			if (v == 0) {
 				// exact match
-				rbimpl->min = itt;
-				break;
+				if (start_inclusive) {
+					rbimpl->min = itt;
+					break;
+				}
 			} else if (v < 0) {
 				// continue down the chain to look for more
 				itt = itt->right;
@@ -787,8 +789,10 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_k
 			int v = impl->compare(itt->data, end_key);
 			if (v == 0) {
 				// exact match
-				rbimpl->max = itt;
-				break;
+				if (end_inclusive) {
+					rbimpl->max = itt;
+					break;
+				}
 			} else if (v < 0) {
 				// lower value found update max
 				rbimpl->max = itt;

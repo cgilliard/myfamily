@@ -19,12 +19,15 @@
 #include <base/types.h>
 
 typedef enum FamlType {
+	FamlTypeUnknown,
 	FamlTypeObj,
 	FamlTypeArray,
 	FamlTypeTuple,
 	FamlTypeEnum,
 	FamlTypeU8,
 	FamlTypeU64,
+	FamlTypeI32,
+	FamlTypeI64,
 } FamlType;
 
 typedef enum FamlObjVisibility {
@@ -35,6 +38,10 @@ typedef enum FamlObjVisibility {
 typedef struct FamlPrototypeNc {
 	FatPtr impl;
 } FamlPrototypeNc;
+
+#ifdef TEST // cleanup function for tests
+void cleanup_faml_data();
+#endif // TEST
 
 void famlproto_cleanup(FamlPrototypeNc *ptr);
 
@@ -51,7 +58,7 @@ void famlobj_cleanup(FamlObjNc *ptr);
 #define FamlObj FamlObjNc __attribute__((warn_unused_result, cleanup(famlobj_cleanup)))
 
 // create a FAML prototype object
-int faml_prototype_create(FamlPrototype *proto, const char *name);
+int faml_prototype_create(FamlPrototype *proto, bool send, bool sync, bool is_dynamic);
 
 // set functions allow setting to a primitive type
 
