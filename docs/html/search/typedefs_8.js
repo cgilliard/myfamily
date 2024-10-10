@@ -1,11 +1,4 @@
 var searchData=
 [
-  ['rbtreeimpl_1140',['RBTreeImpl',['../rbtree_8c.html#a885d296f8ee234e24d8e50cd5e788c3e',1,'rbtree.c']]],
-  ['rbtreeiteratorimpl_1141',['RBTreeIteratorImpl',['../rbtree_8c.html#a8351e3ba1724a7c3d6339b3b437cfc77',1,'rbtree.c']]],
-  ['rbtreeiteratornc_1142',['RBTreeIteratorNc',['../rbtree_8h.html#ac7340e20662f4979941228268f7f6506',1,'rbtree.h']]],
-  ['rbtreekeyvalue_1143',['RbTreeKeyValue',['../rbtree_8h.html#a872efc1622c1f26822f4936c44230719',1,'rbtree.h']]],
-  ['rbtreenc_1144',['RBTreeNc',['../rbtree_8h.html#a8a834f6e9dba853fd94273eac297c460',1,'rbtree.h']]],
-  ['rbtreenode_1145',['RBTreeNode',['../rbtree_8c.html#a503c6fbe388e4f6e0381e94890d829a2',1,'rbtree.c']]],
-  ['rbtreenodepair_1146',['RBTreeNodePair',['../rbtree_8c.html#ad03a1c13ee008a3f01a89f86eedb6872',1,'rbtree.c']]],
-  ['resourcestats_1147',['ResourceStats',['../resources_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'resources.h']]]
+  ['pathimpl_1179',['PathImpl',['../path_8h.html#a10c4728e0d825b7a52e8a9939d4f93ff',1,'path.h']]]
 ];

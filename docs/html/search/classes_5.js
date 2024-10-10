@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['pathimpl_676',['PathImpl',['../structPathImpl.html',1,'']]]
+  ['myrecord_700',['MyRecord',['../structMyRecord.html',1,'']]]
 ];

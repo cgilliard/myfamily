@@ -115,13 +115,17 @@ Typedefs</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr class="memitem:a1d3c2513094ca689f45815479be95243"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243">FamlType</a> { <br />
-&#160;&#160;<a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243a1f25d2cbb5bd5d4e88a400fafbcc9ce2">FamlTypeObj</a>
+&#160;&#160;<a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243a59a43b5230a7d3c75bff0aeecbfe56ab">FamlTypeUnknown</a>
+, <a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243a1f25d2cbb5bd5d4e88a400fafbcc9ce2">FamlTypeObj</a>
 , <a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243a0ed234a3687314ca83936142edbd1042">FamlTypeArray</a>
 , <a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243a564f2afd094587d9ca77c51d4daa17bc">FamlTypeTuple</a>
-, <a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243a53fcc6f3971c9eaa11916f983c368c21">FamlTypeEnum</a>
 , <br />
-&#160;&#160;<a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243a2bd18a8c01c1fee445c553d73e0da8b5">FamlTypeU8</a>
+&#160;&#160;<a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243a53fcc6f3971c9eaa11916f983c368c21">FamlTypeEnum</a>
+, <a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243a2bd18a8c01c1fee445c553d73e0da8b5">FamlTypeU8</a>
 , <a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243aebb2e78bfe980f36c2a15eaadc455b89">FamlTypeU64</a>
+, <a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243afeb30f1ae578ecaa5b23ba76c5461423">FamlTypeI32</a>
+, <br />
+&#160;&#160;<a class="el" href="faml_8h.html#a1d3c2513094ca689f45815479be95243aff2f397089d7b784d7bd1dad72049253">FamlTypeI64</a>
 <br />
  }</td></tr>
 <tr class="separator:a1d3c2513094ca689f45815479be95243"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -136,8 +140,8 @@ Functions</h2></td></tr>
 <tr class="separator:a039069295ba0c572dd0aaa138cc89069"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e15dd9ac5f611837ece761bcf09f7ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8h.html#a1e15dd9ac5f611837ece761bcf09f7ac">famlobj_cleanup</a> (<a class="el" href="structFamlObjNc.html">FamlObjNc</a> *ptr)</td></tr>
 <tr class="separator:a1e15dd9ac5f611837ece761bcf09f7ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a662188390997c421836bc0014aed2759"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8h.html#a662188390997c421836bc0014aed2759">faml_prototype_create</a> (<a class="el" href="faml_8h.html#a000774b115875113de11412cb38c4dad">FamlPrototype</a> *proto, const char *name)</td></tr>
-<tr class="separator:a662188390997c421836bc0014aed2759"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0efc679cc50c351f28e005d8747601c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8h.html#af0efc679cc50c351f28e005d8747601c">faml_prototype_create</a> (<a class="el" href="faml_8h.html#a000774b115875113de11412cb38c4dad">FamlPrototype</a> *proto, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> send, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> sync, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> is_dynamic)</td></tr>
+<tr class="separator:af0efc679cc50c351f28e005d8747601c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a250e1ad266a326ed50972ed8331bf2a2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8h.html#a250e1ad266a326ed50972ed8331bf2a2">faml_prototype_set_u8</a> (<a class="el" href="faml_8h.html#a000774b115875113de11412cb38c4dad">FamlPrototype</a> *proto, <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> value)</td></tr>
 <tr class="separator:a250e1ad266a326ed50972ed8331bf2a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fd5b94c3afbfdf25d3da1516ea3df0f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="faml_8h.html#a2fd5b94c3afbfdf25d3da1516ea3df0f">faml_prototype_set_u64</a> (<a class="el" href="faml_8h.html#a000774b115875113de11412cb38c4dad">FamlPrototype</a> *proto, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> value)</td></tr>
@@ -228,9 +232,9 @@ Functions</h2></td></tr>
 <div class="line">        <span class="keywordflow">default</span>: <a class="code" href="faml_8h.html#a0906020d214f0cd1fd636491f85af2ba">faml_prototype_put_i32</a>)(obj, name, value)</div>
 <div class="ttc" id="afaml_8h_html_a0906020d214f0cd1fd636491f85af2ba"><div class="ttname"><a href="faml_8h.html#a0906020d214f0cd1fd636491f85af2ba">faml_prototype_put_i32</a></div><div class="ttdeci">int faml_prototype_put_i32(FamlPrototype *proto, const char *key, i32 value, FamlObjVisibility visibility)</div></div>
 <div class="ttc" id="afaml_8h_html_a45214dc8e0c4f85aa34dc199e34196ef"><div class="ttname"><a href="faml_8h.html#a45214dc8e0c4f85aa34dc199e34196ef">faml_prototype_put_i64</a></div><div class="ttdeci">int faml_prototype_put_i64(FamlPrototype *proto, const char *key, i64 value, FamlObjVisibility visibility)</div></div>
-<div class="ttc" id="afaml_8h_html_adaba34a3d4b3e15734946a512a7acfb1"><div class="ttname"><a href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a></div><div class="ttdeci">#define FamlObj</div><div class="ttdef"><b>Definition:</b> faml.h:51</div></div>
+<div class="ttc" id="afaml_8h_html_adaba34a3d4b3e15734946a512a7acfb1"><div class="ttname"><a href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a></div><div class="ttdeci">#define FamlObj</div><div class="ttdef"><b>Definition:</b> faml.h:58</div></div>
 <div class="ttc" id="afaml_8h_html_ade72511a5c7b7c433681d125363bd86f"><div class="ttname"><a href="faml_8h.html#ade72511a5c7b7c433681d125363bd86f">faml_prototype_put_u8</a></div><div class="ttdeci">int faml_prototype_put_u8(FamlPrototype *proto, const char *key, u8 value, FamlObjVisibility visibility)</div></div>
-<div class="ttc" id="afaml_8h_html_ae1d60fcba4154711112adcb37e4f7427"><div class="ttname"><a href="faml_8h.html#ae1d60fcba4154711112adcb37e4f7427">faml_put_obj</a></div><div class="ttdeci">int faml_put_obj(FamlObj *obj, const char *name, const FamlObj *value)</div><div class="ttdef"><b>Definition:</b> faml.c:172</div></div>
+<div class="ttc" id="afaml_8h_html_ae1d60fcba4154711112adcb37e4f7427"><div class="ttname"><a href="faml_8h.html#ae1d60fcba4154711112adcb37e4f7427">faml_put_obj</a></div><div class="ttdeci">int faml_put_obj(FamlObj *obj, const char *name, const FamlObj *value)</div><div class="ttdef"><b>Definition:</b> faml.c:309</div></div>
 <div class="ttc" id="afaml_8h_html_af05a0e58dcf6fec9e115e74572407550"><div class="ttname"><a href="faml_8h.html#af05a0e58dcf6fec9e115e74572407550">faml_prototype_put_u64</a></div><div class="ttdeci">int faml_prototype_put_u64(FamlPrototype *proto, const char *key, u64 value, FamlObjVisibility visibility)</div></div>
 <div class="ttc" id="atypes_8h_html_a9e3ad5f8e752f01d926ce122d5a5285e"><div class="ttname"><a href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a></div><div class="ttdeci">signed int i32</div><div class="ttdef"><b>Definition:</b> types.h:26</div></div>
 <div class="ttc" id="atypes_8h_html_ad758b7a5c3f18ed79d2fcd23d9f16357"><div class="ttname"><a href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a></div><div class="ttdeci">unsigned long long u64</div><div class="ttdef"><b>Definition:</b> types.h:23</div></div>
@@ -276,10 +280,10 @@ Functions</h2></td></tr>
 <div class="line">        <a class="code" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>: <a class="code" href="faml_8h.html#a6c179399b65a14e3ee37949170dda2a7">faml_prototype_set_i32</a>,                                                               \</div>
 <div class="line">        <a class="code" href="types_8h.html#ada59a0de67c44384c6faa924ca63c2aa">i64</a>: <a class="code" href="faml_8h.html#ac13b8beed75c3f9286f7660019bc2935">faml_prototype_set_i64</a>,                                                               \</div>
 <div class="line">        <span class="keywordflow">default</span>: <a class="code" href="faml_8h.html#a6c179399b65a14e3ee37949170dda2a7">faml_prototype_set_i32</a>)(obj, name, value)</div>
-<div class="ttc" id="afaml_8h_html_a250e1ad266a326ed50972ed8331bf2a2"><div class="ttname"><a href="faml_8h.html#a250e1ad266a326ed50972ed8331bf2a2">faml_prototype_set_u8</a></div><div class="ttdeci">int faml_prototype_set_u8(FamlPrototype *proto, u8 value)</div></div>
-<div class="ttc" id="afaml_8h_html_a2fd5b94c3afbfdf25d3da1516ea3df0f"><div class="ttname"><a href="faml_8h.html#a2fd5b94c3afbfdf25d3da1516ea3df0f">faml_prototype_set_u64</a></div><div class="ttdeci">int faml_prototype_set_u64(FamlPrototype *proto, u64 value)</div></div>
-<div class="ttc" id="afaml_8h_html_a6c179399b65a14e3ee37949170dda2a7"><div class="ttname"><a href="faml_8h.html#a6c179399b65a14e3ee37949170dda2a7">faml_prototype_set_i32</a></div><div class="ttdeci">int faml_prototype_set_i32(FamlPrototype *proto, i32 value)</div></div>
-<div class="ttc" id="afaml_8h_html_ac13b8beed75c3f9286f7660019bc2935"><div class="ttname"><a href="faml_8h.html#ac13b8beed75c3f9286f7660019bc2935">faml_prototype_set_i64</a></div><div class="ttdeci">int faml_prototype_set_i64(FamlPrototype *proto, i64 value)</div></div>
+<div class="ttc" id="afaml_8h_html_a250e1ad266a326ed50972ed8331bf2a2"><div class="ttname"><a href="faml_8h.html#a250e1ad266a326ed50972ed8331bf2a2">faml_prototype_set_u8</a></div><div class="ttdeci">int faml_prototype_set_u8(FamlPrototype *proto, u8 value)</div><div class="ttdef"><b>Definition:</b> faml.c:157</div></div>
+<div class="ttc" id="afaml_8h_html_a2fd5b94c3afbfdf25d3da1516ea3df0f"><div class="ttname"><a href="faml_8h.html#a2fd5b94c3afbfdf25d3da1516ea3df0f">faml_prototype_set_u64</a></div><div class="ttdeci">int faml_prototype_set_u64(FamlPrototype *proto, u64 value)</div><div class="ttdef"><b>Definition:</b> faml.c:175</div></div>
+<div class="ttc" id="afaml_8h_html_a6c179399b65a14e3ee37949170dda2a7"><div class="ttname"><a href="faml_8h.html#a6c179399b65a14e3ee37949170dda2a7">faml_prototype_set_i32</a></div><div class="ttdeci">int faml_prototype_set_i32(FamlPrototype *proto, i32 value)</div><div class="ttdef"><b>Definition:</b> faml.c:212</div></div>
+<div class="ttc" id="afaml_8h_html_ac13b8beed75c3f9286f7660019bc2935"><div class="ttname"><a href="faml_8h.html#ac13b8beed75c3f9286f7660019bc2935">faml_prototype_set_i64</a></div><div class="ttdeci">int faml_prototype_set_i64(FamlPrototype *proto, i64 value)</div><div class="ttdef"><b>Definition:</b> faml.c:194</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -322,9 +326,9 @@ Functions</h2></td></tr>
 <div class="line">        <a class="code" href="faml_8h.html#adaba34a3d4b3e15734946a512a7acfb1">FamlObj</a> *: <a class="code" href="faml_8h.html#ae1d60fcba4154711112adcb37e4f7427">faml_put_obj</a>,                                                                   \</div>
 <div class="line">        <span class="keywordflow">default</span>: <a class="code" href="faml_8h.html#ab0ee8b86a10918a744fa12c81815759c">faml_put_i32</a>)(obj, name, value)</div>
 <div class="ttc" id="afaml_8h_html_a33db04df3a684132e7b3e11a583f9f22"><div class="ttname"><a href="faml_8h.html#a33db04df3a684132e7b3e11a583f9f22">faml_put_u64</a></div><div class="ttdeci">int faml_put_u64(FamlObj *obj, const char *name, const u64 value)</div></div>
-<div class="ttc" id="afaml_8h_html_ab0ee8b86a10918a744fa12c81815759c"><div class="ttname"><a href="faml_8h.html#ab0ee8b86a10918a744fa12c81815759c">faml_put_i32</a></div><div class="ttdeci">int faml_put_i32(FamlObj *obj, const char *name, const i32 value)</div><div class="ttdef"><b>Definition:</b> faml.c:141</div></div>
+<div class="ttc" id="afaml_8h_html_ab0ee8b86a10918a744fa12c81815759c"><div class="ttname"><a href="faml_8h.html#ab0ee8b86a10918a744fa12c81815759c">faml_put_i32</a></div><div class="ttdeci">int faml_put_i32(FamlObj *obj, const char *name, const i32 value)</div><div class="ttdef"><b>Definition:</b> faml.c:284</div></div>
 <div class="ttc" id="afaml_8h_html_acc16f186b36759a6dd39501eb70854c1"><div class="ttname"><a href="faml_8h.html#acc16f186b36759a6dd39501eb70854c1">faml_put_u8</a></div><div class="ttdeci">int faml_put_u8(FamlObj *obj, const char *name, const u8 value)</div></div>
-<div class="ttc" id="afaml_8h_html_af6526ada284faff373ea1208cbc551c4"><div class="ttname"><a href="faml_8h.html#af6526ada284faff373ea1208cbc551c4">faml_put_i64</a></div><div class="ttdeci">int faml_put_i64(FamlObj *obj, const char *name, const i64 v)</div><div class="ttdef"><b>Definition:</b> faml.c:167</div></div>
+<div class="ttc" id="afaml_8h_html_af6526ada284faff373ea1208cbc551c4"><div class="ttname"><a href="faml_8h.html#af6526ada284faff373ea1208cbc551c4">faml_put_i64</a></div><div class="ttdeci">int faml_put_i64(FamlObj *obj, const char *name, const i64 v)</div><div class="ttdef"><b>Definition:</b> faml.c:304</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -444,12 +448,15 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a1f25d2cbb5bd5d4e88a400fafbcc9ce2"></a>FamlTypeObj&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a59a43b5230a7d3c75bff0aeecbfe56ab"></a>FamlTypeUnknown&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a1f25d2cbb5bd5d4e88a400fafbcc9ce2"></a>FamlTypeObj&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a0ed234a3687314ca83936142edbd1042"></a>FamlTypeArray&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a564f2afd094587d9ca77c51d4daa17bc"></a>FamlTypeTuple&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a53fcc6f3971c9eaa11916f983c368c21"></a>FamlTypeEnum&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243a2bd18a8c01c1fee445c553d73e0da8b5"></a>FamlTypeU8&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243aebb2e78bfe980f36c2a15eaadc455b89"></a>FamlTypeU64&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243afeb30f1ae578ecaa5b23ba76c5461423"></a>FamlTypeI32&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a1d3c2513094ca689f45815479be95243aff2f397089d7b784d7bd1dad72049253"></a>FamlTypeI64&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -635,8 +642,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a662188390997c421836bc0014aed2759"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a662188390997c421836bc0014aed2759">&#9670;&nbsp;</a></span>faml_prototype_create()</h2>
+<a id="af0efc679cc50c351f28e005d8747601c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af0efc679cc50c351f28e005d8747601c">&#9670;&nbsp;</a></span>faml_prototype_create()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -650,8 +657,20 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>name</em>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>send</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>sync</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>is_dynamic</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

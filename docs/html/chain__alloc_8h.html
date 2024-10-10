@@ -110,6 +110,8 @@ Functions</h2></td></tr>
 <tr class="separator:a849afb2f6a8c5640494bf4965c5ab07c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aabfc2c8286d9abaf9668fb459e9516ea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="chain__alloc_8h.html#a9a8623cb74a147abf95752a87e262c09">ChainGuard</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8h.html#aabfc2c8286d9abaf9668fb459e9516ea">set_slab_allocator</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> *sa, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> is_sync)</td></tr>
 <tr class="separator:aabfc2c8286d9abaf9668fb459e9516ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab24aa3a70802c0bf1100f4738666e933"><td class="memItemLeft" align="right" valign="top"><a class="el" href="chain__alloc_8h.html#a9a8623cb74a147abf95752a87e262c09">ChainGuard</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8h.html#ab24aa3a70802c0bf1100f4738666e933">set_thread_local_slab_allocator</a> ()</td></tr>
+<tr class="separator:ab24aa3a70802c0bf1100f4738666e933"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a337698d87c79c3c56f2e8d9f5db24214"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8h.html#a337698d87c79c3c56f2e8d9f5db24214">get_global_sync_allocator</a> ()</td></tr>
 <tr class="separator:a337698d87c79c3c56f2e8d9f5db24214"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b4433e7d057a87fdf1fa33006dc6d43"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="chain__alloc_8h.html#a6b4433e7d057a87fdf1fa33006dc6d43">chain_malloc</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size)</td></tr>
@@ -176,7 +178,7 @@ Overview</h1>
 <div class="line">        }                                                                                          \</div>
 <div class="line">        _cg__;                                                                                     \</div>
 <div class="line">    })</div>
-<div class="ttc" id="achain__alloc_8h_html_a396e07a139256b7a3968b20e04f83537"><div class="ttname"><a href="chain__alloc_8h.html#a396e07a139256b7a3968b20e04f83537">sync_allocator</a></div><div class="ttdeci">#define sync_allocator()</div><div class="ttdef"><b>Definition:</b> chain_alloc.h:96</div></div>
+<div class="ttc" id="achain__alloc_8h_html_a396e07a139256b7a3968b20e04f83537"><div class="ttname"><a href="chain__alloc_8h.html#a396e07a139256b7a3968b20e04f83537">sync_allocator</a></div><div class="ttdeci">#define sync_allocator()</div><div class="ttdef"><b>Definition:</b> chain_alloc.h:98</div></div>
 <div class="ttc" id="achain__alloc_8h_html_afab15376bc4702c1aef06131b69f0bef"><div class="ttname"><a href="chain__alloc_8h.html#afab15376bc4702c1aef06131b69f0bef">CHAIN_GUARD_INIT</a></div><div class="ttdeci">#define CHAIN_GUARD_INIT</div><div class="ttdef"><b>Definition:</b> chain_alloc.h:52</div></div>
 </div><!-- fragment -->
 </div>
@@ -201,7 +203,7 @@ Overview</h1>
 <div class="line">        __ret_;                                                                                    \</div>
 <div class="line">    })</div>
 <div class="ttc" id="achain__alloc_8h_html_a337698d87c79c3c56f2e8d9f5db24214"><div class="ttname"><a href="chain__alloc_8h.html#a337698d87c79c3c56f2e8d9f5db24214">get_global_sync_allocator</a></div><div class="ttdeci">SlabAllocator * get_global_sync_allocator()</div><div class="ttdef"><b>Definition:</b> chain_alloc.c:87</div></div>
-<div class="ttc" id="achain__alloc_8h_html_aabfc2c8286d9abaf9668fb459e9516ea"><div class="ttname"><a href="chain__alloc_8h.html#aabfc2c8286d9abaf9668fb459e9516ea">set_slab_allocator</a></div><div class="ttdeci">ChainGuard set_slab_allocator(SlabAllocator *sa, bool is_sync)</div><div class="ttdef"><b>Definition:</b> chain_alloc.c:130</div></div>
+<div class="ttc" id="achain__alloc_8h_html_aabfc2c8286d9abaf9668fb459e9516ea"><div class="ttname"><a href="chain__alloc_8h.html#aabfc2c8286d9abaf9668fb459e9516ea">set_slab_allocator</a></div><div class="ttdeci">ChainGuard set_slab_allocator(SlabAllocator *sa, bool is_sync)</div><div class="ttdef"><b>Definition:</b> chain_alloc.c:140</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -352,6 +354,23 @@ Overview</h1>
           <td></td>
           <td>)</td>
           <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab24aa3a70802c0bf1100f4738666e933"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab24aa3a70802c0bf1100f4738666e933">&#9670;&nbsp;</a></span>set_thread_local_slab_allocator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="chain__alloc_8h.html#a9a8623cb74a147abf95752a87e262c09">ChainGuard</a> set_thread_local_slab_allocator </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
