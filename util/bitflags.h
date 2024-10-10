@@ -12,18 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_FAM_ERR__
-#define _BASE_FAM_ERR__
+#ifndef _UTIL_BITFLAGS__
+#define _UTIL_BITFLAGS__
 
-typedef enum FamErr {
-	Ok,
-	IllegalArgument,
-	AllocErr,
-	InitErr,
-	AlreadyInitialized,
-	IndexOutOfBounds,
-} FamErr;
+#include <base/types.h>
 
-extern int fam_err;
+typedef struct BitFlags {
+	u8 *flags;
+	u64 capacity;
+} BitFlags;
 
-#endif // _BASE_FAM_ERR__
+int bitflags_set(BitFlags *ptr, u32 index, bool value);
+bool bitflags_check(BitFlags *ptr, u32 index);
+
+#endif // _UTIL_BITFLAGS__

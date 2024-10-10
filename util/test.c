@@ -17,6 +17,7 @@
 #include <crypto/psrng.h>
 #include <math.h>
 #include <string.h>
+#include <util/bitflags.h>
 #include <util/rbtree.h>
 
 MySuite(util);
@@ -331,4 +332,39 @@ MyTest(util, test_string_compare_fn) {
 		i++;
 	}
 	cr_assert_eq(i, size);
+}
+
+MyTest(util, test_bitflags) {
+	u8 flags[3] = {};
+	BitFlags bf1 = {.flags = flags, .capacity = 3};
+	bitflags_set(&bf1, 3, true);
+
+	cr_assert(bitflags_check(&bf1, 3));
+	bitflags_set(&bf1, 3, false);
+	cr_assert(!bitflags_check(&bf1, 3));
+
+	for (u32 i = 0; i < 3 * 8; i++)
+		bitflags_set(&bf1, 3, false);
+
+	for (u32 i = 0; i < 3 * 8; i++)
+		cr_assert(!bitflags_check(&bf1, i));
+
+	cr_assert(!bitflags_set(&bf1, 0, true));
+	cr_assert(!bitflags_set(&bf1, 4, true));
+	cr_assert(!bitflags_set(&bf1, 7, true));
+	cr_assert(!bitflags_set(&bf1, 19, true));
+	cr_assert(!bitflags_set(&bf1, 20, true));
+
+	for (u32 i = 0; i < 3 * 8; i++) {
+		if (i == 0 || i == 4 || i == 7 || i == 19 || i == 20)
+			cr_assert(bitflags_check(&bf1, i));
+		else
+			cr_assert(!bitflags_check(&bf1, i));
+	}
+
+	// test out of range
+	cr_assert(bitflags_set(&bf1, 24, true));
+
+	// test out of range
+	cr_assert(!bitflags_check(&bf1, 24));
 }
