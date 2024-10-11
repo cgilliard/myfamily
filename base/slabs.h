@@ -60,6 +60,8 @@ int fat_ptr_pin(FatPtr *ptr);
 
 // Slab Allocator
 
+#define MAX_SLABS 4000000000
+
 // Slab Type definition
 typedef struct SlabType {
 	u32 slab_size;

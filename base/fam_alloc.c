@@ -48,7 +48,7 @@ SlabAllocator *initialize_default_slab_allocator(bool global) {
 		return NULL;
 	}
 
-	u32 max_slabs = (UINT32_MAX / 100) * 100;
+	u32 max_slabs = MAX_SLABS;
 	for (i32 i = 0; i < 128; i++) {
 		SlabType st = {.slab_size = (i + 3) * 8,
 					   .slabs_per_resize = 100,

@@ -276,7 +276,6 @@ int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 ind
 	}
 
 	for (u64 i = 0; i < st->initial_chunks; i++) {
-		printf("sz=%llu\n", (u64)impl->sd_arr[index].type.slab_size * (u64)st->slabs_per_resize);
 		impl->sd_arr[index].data[i] =
 			mymalloc((u64)impl->sd_arr[index].type.slab_size * (u64)st->slabs_per_resize);
 
@@ -330,7 +329,7 @@ int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
 			return -1;
 		}
 		// max slabs
-		if (impl->sd_arr[i].type.max_slabs > (UINT32_MAX - 10)) {
+		if (impl->sd_arr[i].type.max_slabs > MAX_SLABS) {
 			fam_err = IllegalArgument;
 			return -1;
 		}
@@ -445,7 +444,6 @@ int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
 }
 
 int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
-	printf("try resize\n");
 	int ret = -1;
 	if (sd->cur_slabs < sd->type.max_slabs) {
 		// we can try to resize
@@ -473,8 +471,6 @@ int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
 			if (ndata != NULL) {
 
 				sd->data = ndata;
-				printf("my malloc sd->type.slab_size * sd->type.slabs_per_resize = %u\n",
-					   sd->type.slab_size * sd->type.slabs_per_resize);
 				sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
 				if (sd->data[sd->cur_chunks] != NULL) {
 

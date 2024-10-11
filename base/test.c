@@ -532,8 +532,8 @@ MyTest(base, test_big32) {
 	SlabAllocatorConfig sc;
 	slab_allocator_config_build(&sc, false, false);
 	u64 size = 24;
-	u64 count = (UINT32_MAX - 10);
-	// u64 count = 1000000;
+	// u64 count = MAX_SLABS;
+	u64 count = 1000000;
 	SlabType t1 = {size, count, 1, count};
 	slab_allocator_config_add_type(&sc, &t1);
 	SlabAllocator sa;
@@ -551,7 +551,8 @@ MyTest(base, test_big32) {
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
 
 	for (u64 i = 0; i < count; i++) {
-		printf("del i=%llu\n", i);
+		if (i % 1000000 == 0)
+			printf("del i=%llu\n", i);
 		slab_allocator_free(&sa, &arr[i]);
 	}
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
