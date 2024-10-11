@@ -35,7 +35,7 @@
 	static char *cur_name = "";                                                                    \
 	static u64 log_fd = -1;                                                                        \
 	void tear_down() {                                                                             \
-		u64 slabs = alloc_count_default_slab_allocator();                                          \
+		u64 slabs = fam_alloc_count_tl_slab_allocator();                                           \
 		if (slabs != 0) {                                                                          \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
 				   "'%s%s%s'.\n[%s====%s] Number of slab allocations [%lli] not "                  \
@@ -45,7 +45,7 @@
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
 		}                                                                                          \
-		slabs = alloc_count_global_sync_allocator();                                               \
+		slabs = fam_alloc_count_global_allocator();                                                \
 		if (slabs != 0) {                                                                          \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
 				   "'%s%s%s'.\n[%s====%s] Number of slab global allocations [%lli] not "           \
@@ -55,7 +55,7 @@
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
 		}                                                                                          \
-		cleanup_default_slab_allocator();                                                          \
+		fam_alloc_cleanup();                                                                       \
 		u64 cur_alloc_count = mymalloc_sum();                                                      \
 		u64 cur_free_count = myfree_sum();                                                         \
 		u64 diff = cur_alloc_count - cur_free_count;                                               \

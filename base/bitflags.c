@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/bitflags.h>
 #include <base/fam_err.h>
 #include <string.h>
-#include <util/bitflags.h>
 
 int bitflags_set(BitFlags *ptr, u32 index, bool value) {
 	u32 offset = index >> 3;

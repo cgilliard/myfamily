@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/chain_alloc.h>
+#include <base/bitflags.h>
 #include <base/colors.h>
+#include <base/fam_alloc.h>
 #include <base/misc.h>
 #include <base/panic.h>
 #include <base/slabs.h>
@@ -412,45 +413,25 @@ typedef struct TestData {
 } TestData;
 
 MyTest(base, test_fat_ptr) {
-	cr_assert_eq(fat_ptr_len(&null), 0);
-	cr_assert_eq(fat_ptr_data(&null), NULL);
+	cr_assert_eq($size(null), 0);
+	cr_assert_eq($(null), NULL);
 	FatPtr ptr = null;
-	cr_assert_eq(fat_ptr_data(&ptr), NULL);
-	cr_assert_eq(fat_ptr_len(&ptr), 0);
+	cr_assert_eq($(ptr), NULL);
+	cr_assert_eq($size(ptr), 0);
 	cr_assert(nil(ptr));
 
 	for (u64 i = 0; i < 100; i++) {
-		u64 id = (i * 2) + 1;
-		FatPtr ptr1;
-		// create a 64 bit test obj (the appropriate bit is set for this ID to be valid as 64 bit)
-		fat_ptr_test_obj64(&ptr1, id, sizeof(TestData));
-		// do assertions and use allocated data
-		cr_assert(!nil(ptr1));
-		cr_assert_eq(fat_ptr_len(&ptr1), sizeof(TestData));
-		cr_assert_eq(fat_ptr_id(&ptr1), id);
-		TestData *td = fat_ptr_data(&ptr1);
-		td->v1 = 1234;
-		td->v2 = 5678;
-		td->v3 = 9999;
-		strcpy(td->buf, "hi");
-		cr_assert_eq(td->v1, 1234);
-		cr_assert_eq(td->v2, 5678);
-		cr_assert_eq(td->v3, 9999);
-		cr_assert(!strcmp(td->buf, "hi"));
-		fat_ptr_free_test_obj64(&ptr1);
-	}
-
-	for (u64 i = 0; i < 100; i++) {
 		u32 id = i * 2;
-		// try a 32 bit
 		FatPtr ptr2;
-		// create a 32 bit test obj (the appropriate bit is NOT set for this ID to be valid as 32
-		// bit, it is less than 2^31)
-		fat_ptr_test_obj32(&ptr2, id, sizeof(TestData));
+		// create a 32 bit test obj
+		fat_ptr_test_obj32(&ptr2, id, sizeof(TestData), false, true, false);
 		// do assertions and use allocated data
-		cr_assert_eq(fat_ptr_len(&ptr2), sizeof(TestData));
+		cr_assert_eq($size(ptr2), sizeof(TestData));
 		cr_assert_eq(fat_ptr_id(&ptr2), id);
-		TestData *td2 = fat_ptr_data(&ptr2);
+		cr_assert(!$global(ptr2));
+		cr_assert($pin(ptr2));
+		cr_assert(!$copy(ptr2));
+		TestData *td2 = $(ptr2);
 		td2->v1 = 1234;
 		td2->v2 = 5678;
 		td2->v3 = 9999;
@@ -461,29 +442,32 @@ MyTest(base, test_fat_ptr) {
 		cr_assert(!strcmp(td2->buf, "hi"));
 		fat_ptr_free_test_obj32(&ptr2);
 	}
+
+	for (u32 i = 16777216 - 1000; i < 16777216; i++) {
+		FatPtr ptr2;
+		u32 id = i;
+		fat_ptr_test_obj32(&ptr2, id, i, false, false, true);
+		cr_assert_eq($size(ptr2), i);
+		cr_assert(!$global(ptr2));
+		cr_assert(!$pin(ptr2));
+		cr_assert($copy(ptr2));
+		fat_ptr_free_test_obj32(&ptr2);
+	}
 }
 
 MyTest(base, test_slab_config) {
 	SlabAllocatorConfig sc1;
-	slab_allocator_config_build(&sc1, true, true, true);
-	cr_assert_eq(sc1.no_malloc, true);
+	slab_allocator_config_build(&sc1, true, false);
 	cr_assert_eq(sc1.zeroed, true);
-	cr_assert_eq(sc1.is_64_bit, true);
 
-	slab_allocator_config_build(&sc1, true, true, false);
-	cr_assert_eq(sc1.no_malloc, true);
+	slab_allocator_config_build(&sc1, true, false);
 	cr_assert_eq(sc1.zeroed, true);
-	cr_assert_eq(sc1.is_64_bit, false);
 
-	slab_allocator_config_build(&sc1, true, false, true);
-	cr_assert_eq(sc1.no_malloc, false);
+	slab_allocator_config_build(&sc1, true, false);
 	cr_assert_eq(sc1.zeroed, true);
-	cr_assert_eq(sc1.is_64_bit, true);
 
-	slab_allocator_config_build(&sc1, false, true, true);
-	cr_assert_eq(sc1.no_malloc, true);
+	slab_allocator_config_build(&sc1, false, false);
 	cr_assert_eq(sc1.zeroed, false);
-	cr_assert_eq(sc1.is_64_bit, true);
 
 	SlabType t1 = {1, 2, 3, 4};
 	slab_allocator_config_add_type(&sc1, &t1);
@@ -496,55 +480,9 @@ MyTest(base, test_slab_config) {
 	cr_assert_eq(sc1.slab_types_count, 2);
 }
 
-MyTest(base, test_slab_allocator) {
-	SlabAllocatorConfig sc;
-	slab_allocator_config_build(&sc, false, true, true);
-	SlabType t1 = {40, 10, 1, 10};
-	slab_allocator_config_add_type(&sc, &t1);
-	SlabAllocator sa;
-	cr_assert(!slab_allocator_build(&sa, &sc));
-
-	for (u64 i = 0; i < 10; i++) {
-		FatPtr fptr;
-		int ret = slab_allocator_allocate(&sa, 13, &fptr);
-		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&fptr), 40);
-		slab_allocator_free(&sa, &fptr);
-	}
-
-	FatPtr fptr;
-	int ret = slab_allocator_allocate(&sa, 13, &fptr);
-	cr_assert_eq(ret, 0);
-	u64 x = 101;
-	u64 *ptr = fat_ptr_data(&fptr);
-	memcpy(ptr, &x, sizeof(u64));
-	cr_assert_eq(*ptr, 101);
-	slab_allocator_free(&sa, &fptr);
-
-	FatPtr arr[10];
-	for (u64 i = 0; i < 10; i++) {
-		int ret = slab_allocator_allocate(&sa, 10, &arr[i]);
-		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), 40);
-	}
-
-	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 10);
-
-	// no more slabs
-	ret = slab_allocator_allocate(&sa, 10, &fptr);
-	// returns error neq(0)
-	cr_assert_neq(ret, 0);
-
-	for (u64 i = 0; i < 10; i++) {
-		slab_allocator_free(&sa, &arr[i]);
-	}
-
-	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
-}
-
 MyTest(base, test_slab_allocator32) {
 	SlabAllocatorConfig sc;
-	slab_allocator_config_build(&sc, false, true, false);
+	slab_allocator_config_build(&sc, false, false);
 	SlabType t1 = {32, 10, 1, 10};
 	slab_allocator_config_add_type(&sc, &t1);
 	SlabAllocator sa;
@@ -556,7 +494,7 @@ MyTest(base, test_slab_allocator32) {
 		cr_assert_eq(ret, 0);
 		// it's rounded up to our nearest slab size
 
-		cr_assert_eq(fat_ptr_len(&fptr), 32);
+		cr_assert_eq($size(fptr), 32);
 		slab_allocator_free(&sa, &fptr);
 	}
 
@@ -573,7 +511,7 @@ MyTest(base, test_slab_allocator32) {
 	for (u64 i = 0; i < 10; i++) {
 		int ret = slab_allocator_allocate(&sa, 10, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), 32);
+		cr_assert_eq($size(arr[i]), 32);
 	}
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 10);
@@ -592,10 +530,10 @@ MyTest(base, test_slab_allocator32) {
 
 MyTest(base, test_big32) {
 	SlabAllocatorConfig sc;
-	slab_allocator_config_build(&sc, false, true, false);
+	slab_allocator_config_build(&sc, false, false);
 	u64 size = 24;
-	// u64 count = (INT32_MAX - 10);
-	u64 count = 1000000;
+	u64 count = (UINT32_MAX - 10);
+	// u64 count = 1000000;
 	SlabType t1 = {size, count, 1, count};
 	slab_allocator_config_add_type(&sc, &t1);
 	SlabAllocator sa;
@@ -604,49 +542,16 @@ MyTest(base, test_big32) {
 	arr = malloc(sizeof(FatPtr) * count);
 
 	for (u64 i = 0; i < count; i++) {
+		if (i % 1000000 == 0)
+			printf("i=%llu\n", i);
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size);
+		cr_assert_eq($size(arr[i]), size);
 	}
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
 
 	for (u64 i = 0; i < count; i++) {
-		slab_allocator_free(&sa, &arr[i]);
-	}
-	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
-
-	free(arr);
-}
-
-MyTest(base, test_malloc) {
-	SlabAllocatorConfig sc;
-	slab_allocator_config_build(&sc, false, false, false);
-	u64 size = 24;
-	u64 count = 10;
-	SlabType t1 = {size, count, 1, count};
-	slab_allocator_config_add_type(&sc, &t1);
-	SlabAllocator sa;
-	cr_assert(!slab_allocator_build(&sa, &sc));
-
-	FatPtr *arr;
-	arr = malloc(sizeof(FatPtr) * count);
-
-	for (u64 i = 0; i < count; i++) {
-		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
-		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size);
-	}
-
-	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
-
-	// works with malloc
-	FatPtr fptr;
-	int ret = slab_allocator_allocate(&sa, 8, &fptr);
-	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count + 1);
-	cr_assert_eq(ret, 0);
-	slab_allocator_free(&sa, &fptr);
-
-	for (u64 i = 0; i < count; i++) {
+		printf("del i=%llu\n", i);
 		slab_allocator_free(&sa, &arr[i]);
 	}
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
@@ -656,7 +561,7 @@ MyTest(base, test_malloc) {
 
 MyTest(base, test_overwrite32) {
 	SlabAllocatorConfig sc;
-	slab_allocator_config_build(&sc, false, false, false);
+	slab_allocator_config_build(&sc, false, false);
 	u64 size = 24;
 	u64 count = 100;
 	SlabType t1 = {size, count, 1, count};
@@ -677,32 +582,9 @@ MyTest(base, test_overwrite32) {
 	slab_allocator_free(&sa, &fptr);
 }
 
-MyTest(base, test_overwrite64) {
-	SlabAllocatorConfig sc;
-	slab_allocator_config_build(&sc, false, false, true);
-	u64 size = 32;
-	u64 count = 100;
-	SlabType t1 = {size, count, 1, count};
-	slab_allocator_config_add_type(&sc, &t1);
-	SlabAllocator sa;
-	cr_assert(!slab_allocator_build(&sa, &sc));
-
-	FatPtr fptr;
-	int ret = slab_allocator_allocate(&sa, sizeof(u64), &fptr);
-	void *data = fat_ptr_data(&fptr);
-	cr_assert_eq(data, fat_ptr_data(&fptr));
-	cr_assert_eq(ret, 0);
-	u64 x = 109;
-	u64 *ptr = fat_ptr_data(&fptr);
-	memcpy(ptr, &x, sizeof(u64));
-	cr_assert_eq(*ptr, 109);
-	cr_assert_eq(data, fat_ptr_data(&fptr));
-	slab_allocator_free(&sa, &fptr);
-}
-
 MyTest(base, test_resize) {
 	SlabAllocatorConfig sc;
-	slab_allocator_config_build(&sc, false, false, false);
+	slab_allocator_config_build(&sc, false, false);
 	u64 size = 24;
 	u64 count = 10;
 	SlabType t1 = {size, count, 1, count * 3};
@@ -716,7 +598,7 @@ MyTest(base, test_resize) {
 	for (u64 i = 0; i < count; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size);
+		cr_assert_eq($size(arr[i]), size);
 	}
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
@@ -738,7 +620,7 @@ MyTest(base, test_resize) {
 
 MyTest(base, test_multi_resize) {
 	SlabAllocatorConfig sc;
-	slab_allocator_config_build(&sc, false, false, false);
+	slab_allocator_config_build(&sc, false, false);
 	u64 size = 40;
 	u64 count = 10;
 	SlabType t1 = {size, count, 1, 15};
@@ -751,7 +633,7 @@ MyTest(base, test_multi_resize) {
 	arr = malloc(sizeof(FatPtr) * count * 3);
 
 	SlabAllocatorConfig sc2;
-	slab_allocator_config_build(&sc2, false, true, false);
+	slab_allocator_config_build(&sc2, false, false);
 	SlabType t2 = {size, count, 1, 30};
 
 	slab_allocator_config_add_type(&sc2, &t2);
@@ -761,7 +643,7 @@ MyTest(base, test_multi_resize) {
 	for (u64 i = 0; i < itt; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size);
+		cr_assert_eq($size(arr[i]), size);
 	}
 
 	FatPtr tmp;
@@ -780,7 +662,7 @@ MyTest(base, test_multi_resize) {
 
 MyTest(base, test_zeroed) {
 	SlabAllocatorConfig sc;
-	slab_allocator_config_build(&sc, true, false, false);
+	slab_allocator_config_build(&sc, true, false);
 	u64 size = 24;
 	u64 count = 10;
 	SlabType t1 = {size, count, 1, count};
@@ -797,7 +679,7 @@ MyTest(base, test_zeroed) {
 		FatPtr ptr1;
 		int ret = slab_allocator_allocate(&sa, 8, &ptr1);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&ptr1), size);
+		cr_assert_eq($size(ptr1), size);
 
 		char *dataptr = fat_ptr_data(&ptr1);
 		// memory is zeroed so even though we should have the same id as last time
@@ -807,27 +689,24 @@ MyTest(base, test_zeroed) {
 		cr_assert_eq(dataptr[2], 0);
 		cr_assert_eq(dataptr[3], 0);
 		strcpy(dataptr, "1234");
-
 		slab_allocator_free(&sa, &ptr1);
 	}
 
 	for (u64 i = 0; i < itt; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size);
+		cr_assert_eq($size(arr[i]), size);
 	}
 
 	FatPtr tmp;
-	// This is ok because we will use malloc
-	cr_assert(!slab_allocator_allocate(&sa, 8, &tmp));
+	// full
+	cr_assert(slab_allocator_allocate(&sa, 8, &tmp));
 
-	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), itt + 1);
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), itt);
 
 	for (u64 i = 0; i < itt; i++) {
 		slab_allocator_free(&sa, &arr[i]);
 	}
-
-	slab_allocator_free(&sa, &tmp);
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);
 
@@ -835,7 +714,7 @@ MyTest(base, test_zeroed) {
 
 	// simple test of non-zeroed case to see data is still there
 	SlabAllocatorConfig sc2;
-	slab_allocator_config_build(&sc2, false, false, false);
+	slab_allocator_config_build(&sc2, false, false);
 	slab_allocator_config_add_type(&sc2, &t1);
 	SlabAllocator sa2;
 	cr_assert(!slab_allocator_build(&sa2, &sc2));
@@ -854,7 +733,7 @@ MyTest(base, test_zeroed) {
 
 MyTest(base, test_zero_size_initial) {
 	SlabAllocatorConfig sc;
-	slab_allocator_config_build(&sc, false, true, false);
+	slab_allocator_config_build(&sc, false, false);
 	u64 size = 24;
 	u64 count = 10;
 	SlabType t1 = {
@@ -870,7 +749,7 @@ MyTest(base, test_zero_size_initial) {
 	for (u64 i = 0; i < itt; i++) {
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
-		cr_assert_eq(fat_ptr_len(&arr[i]), size);
+		cr_assert_eq($size(arr[i]), size);
 		char *test = fat_ptr_data(&arr[i]);
 		strcpy(test, "test");
 	}
@@ -892,165 +771,51 @@ MyTest(base, test_zero_size_initial) {
 	free(arr);
 }
 
-MyTest(base, test_chain_allocator) {
-	FatPtr fptr;
-	cr_assert(!chain_malloc(&fptr, 10));
-	chain_free(&fptr);
-
-	{
-		SlabAllocatorConfig sc;
-		slab_allocator_config_build(&sc, false, true, false);
-		u64 size = 24;
-		u64 count = 10;
-		SlabType t1 = {
-			.slab_size = size, .slabs_per_resize = 1, .initial_chunks = 0, .max_slabs = 3 * count};
-		slab_allocator_config_add_type(&sc, &t1);
-		SlabAllocator sa;
-		cr_assert(!slab_allocator_build(&sa, &sc));
-		ChainGuard cg = set_slab_allocator(&sa, false);
-	}
-}
-
-MyTest(base, test_chain_allocator_multi_scope) {
-
-	{
-		SlabAllocatorConfig sc;
-		slab_allocator_config_build(&sc, false, true, false);
-		SlabType t = {.slab_size = 8, .slabs_per_resize = 1, .initial_chunks = 0, .max_slabs = 1};
-		cr_assert(!slab_allocator_config_add_type(&sc, &t));
-		SlabAllocator sa;
-		cr_assert(!slab_allocator_build(&sa, &sc));
-		ChainGuard cg = set_slab_allocator(&sa, false);
-
-		FatPtr fptr;
-
-		cr_assert(chain_malloc(&fptr, 9));
-		cr_assert(!chain_malloc(&fptr, 8));
-		cr_assert(chain_malloc(&fptr, 8));
-
-		{
-			SlabAllocatorConfig sc;
-			slab_allocator_config_build(&sc, false, true, false);
-			SlabType t = {
-				.slab_size = 16, .slabs_per_resize = 1, .initial_chunks = 0, .max_slabs = 1};
-			cr_assert(!slab_allocator_config_add_type(&sc, &t));
-			SlabAllocator sa;
-			cr_assert(!slab_allocator_build(&sa, &sc));
-			ChainGuard cg = set_slab_allocator(&sa, false);
-
-			FatPtr fptr;
-
-			cr_assert(chain_malloc(&fptr, 17));
-			cr_assert(!chain_malloc(&fptr, 16));
-			cr_assert(chain_malloc(&fptr, 16));
-
-			{
-				SlabAllocatorConfig sc;
-				slab_allocator_config_build(&sc, false, true, false);
-				SlabType t = {
-					.slab_size = 24, .slabs_per_resize = 1, .initial_chunks = 0, .max_slabs = 1};
-				cr_assert(!slab_allocator_config_add_type(&sc, &t));
-				SlabAllocator sa;
-				cr_assert(!slab_allocator_build(&sa, &sc));
-				ChainGuard cg = set_slab_allocator(&sa, false);
-
-				FatPtr fptr;
-
-				cr_assert(chain_malloc(&fptr, 25));
-				cr_assert(!chain_malloc(&fptr, 24));
-				cr_assert(chain_malloc(&fptr, 24));
-
-				{
-					SlabAllocatorConfig sc;
-					slab_allocator_config_build(&sc, false, true, false);
-					SlabType t = {.slab_size = 32,
-								  .slabs_per_resize = 1,
-								  .initial_chunks = 0,
-								  .max_slabs = 1};
-					cr_assert(!slab_allocator_config_add_type(&sc, &t));
-					SlabAllocator sa;
-					cr_assert(!slab_allocator_build(&sa, &sc));
-					ChainGuard cg = set_slab_allocator(&sa, false);
-
-					FatPtr fptr;
-
-					cr_assert(chain_malloc(&fptr, 33));
-					cr_assert(!chain_malloc(&fptr, 32));
-					cr_assert(chain_malloc(&fptr, 32));
-
-					chain_free(&fptr);
-				}
-
-				cr_assert(chain_malloc(&fptr, 24));
-				chain_free(&fptr);
-				cr_assert(chain_malloc(&fptr, 25));
-				cr_assert(!chain_malloc(&fptr, 24));
-				chain_free(&fptr);
-			}
-
-			cr_assert(chain_malloc(&fptr, 16));
-			chain_free(&fptr);
-			cr_assert(chain_malloc(&fptr, 17));
-			cr_assert(!chain_malloc(&fptr, 16));
-			chain_free(&fptr);
-		}
-
-		cr_assert(chain_malloc(&fptr, 8));
-		chain_free(&fptr);
-		cr_assert(chain_malloc(&fptr, 9));
-		cr_assert(!chain_malloc(&fptr, 8));
-		chain_free(&fptr);
-	}
-
-	FatPtr fptr;
-	cr_assert(!chain_malloc(&fptr, 1000));
-	chain_free(&fptr);
-}
-
 MyTest(base, test_nil) {
-	// 'null' and 'nil' macros may be used with the FatPtr type to simulate NULL/null/nil conditions
-	// in other languages. 'null' is a macro which is a FatPtr type and has a length of 0 and data
-	// == NULL. It is not possible to have a FatPtr with these values without the use of the 'null'
-	// macro or by calling one of the free functions because attempting to allocate a length of 0
-	// through the slab allocator will result in an error. The 'nil' macro just tests this property
-	// and returns a boolean. After calling free (either directly from a slab allocator or through
-	// chain_free as seen below), The value of the freed FatPtr will be 'null' and will return true
-	// when passed to the 'nil' macro.
+	// 'null' and 'nil' macros may be used with the FatPtr type to simulate NULL/null/nil
+	// conditions in other languages. 'null' is a macro which is a FatPtr type and has a length
+	// of 0 and data
+	// == NULL. It is not possible to have a FatPtr with these values without the use of the
+	// 'null' macro or by calling one of the free functions because attempting to allocate a
+	// length of 0 through the slab allocator will result in an error. The 'nil' macro just
+	// tests this property and returns a boolean. After calling free (either directly from a
+	// slab allocator or through chain_free as seen below), The value of the freed FatPtr will
+	// be 'null' and will return true when passed to the 'nil' macro.
 
 	// initialize a FatPtr to 'null'.
 	FatPtr ptr = null;
 	// assert that this ptr is 'nil'.
 	cr_assert(nil(ptr));
 	// call chain_malloc to allocate 1000 bytes to this FatPtr.
-	cr_assert(!chain_malloc(&ptr, 1000));
+	cr_assert(!fam_alloc(&ptr, 1000));
 	// assert that it is no longer 'nil'.
 	cr_assert(!nil(ptr));
 	// free the FatPtr via chain_free.
-	chain_free(&ptr);
+	fam_free(&ptr);
 	// assert that the FatPtr is now 'nil'.
 	cr_assert(nil(ptr));
 }
 
 MyTest(base, test_realloc) {
 	FatPtr ptr = null;
-	cr_assert(!chain_malloc(&ptr, 1000));
-	strcpy(fat_ptr_data(&ptr), "testing123");
+	cr_assert(!fam_alloc(&ptr, 1000));
+	strcpy($(ptr), "testing123");
 	cr_assert(!strcmp(fat_ptr_data(&ptr), "testing123"));
-	cr_assert(fat_ptr_len(&ptr) < 2000);
-	cr_assert(!chain_realloc(&ptr, 2000));
-	cr_assert(fat_ptr_len(&ptr) >= 2000);
+	cr_assert($size(ptr) < 2000);
+	cr_assert(!fam_realloc(&ptr, 2000));
+	cr_assert($size(ptr) >= 2000);
 	cr_assert(!strcmp(fat_ptr_data(&ptr), "testing123"));
 
-	chain_free(&ptr);
+	fam_free(&ptr);
 }
 
 MyTest(base, test_sync_allocator) {
-	ChainGuard cg = sync_allocator();
+	SendStateGuard sg = SetSend(true);
 	FatPtr ptr = null;
 	cr_assert(nil(ptr));
-	chain_malloc(&ptr, 100);
+	fam_alloc(&ptr, 100);
 	cr_assert(!nil(ptr));
-	chain_free(&ptr);
+	fam_free(&ptr);
 	cr_assert(nil(ptr));
 }
 
@@ -1064,22 +829,19 @@ bool flag = false;
 
 // thread function
 void *start_thread_sync_test() {
-	// create scope to free our allocated FatPtr from the other thread
-	// if we did not use the global sync_allocator, it would result in
+	// if we did not use the global allocator, it would result in
 	// a panic
-	{
-		ChainGuard cg = sync_allocator();
-		chain_free(&shared_ptr);
-	}
+	fam_free(&shared_ptr);
+
+	FatPtr ptr;
+	fam_alloc(&ptr, 10);
+	fam_free(&ptr);
 
 	// set flag and notify the main thread that we're done
 	pthread_mutex_lock(&lock);
 	flag = true;
 	pthread_cond_signal(&cond);
 	pthread_mutex_unlock(&lock);
-
-	// cleanup default slab allocator for this thread
-	cleanup_thread_local_slab_allocator();
 
 	return NULL;
 }
@@ -1090,10 +852,10 @@ MyTest(base, test_threaded_sync) {
 
 	// create scope to get sync_allocator
 	{
-		ChainGuard cg = sync_allocator();
-		// allocate shared_ptr from the global sync allocator
+		SendStateGuard cg = SetSend(true);
+		//  allocate shared_ptr from the global sync allocator
 		cr_assert(nil(shared_ptr));
-		cr_assert(!chain_malloc(&shared_ptr, 100));
+		cr_assert(!fam_alloc(&shared_ptr, 100));
 		cr_assert(!nil(shared_ptr));
 	}
 
@@ -1109,6 +871,103 @@ MyTest(base, test_threaded_sync) {
 	pthread_mutex_unlock(&lock);
 
 	cr_assert(!pthread_join(thread, NULL)); // Wait for thread to finish
+}
+
+MyTest(base, test_fam_alloc) {
+	FatPtr ptr1;
+	cr_assert(!fam_alloc(&ptr1, 100));
+
+	fam_free(&ptr1);
+
+	// try something bigger than our slabs
+	FatPtr ptr2;
+	cr_assert(!fam_alloc(&ptr2, 17000000));
+
+	((u8 *)$(ptr2))[0] = '1';
+	((u8 *)$(ptr2))[1] = '2';
+	((u8 *)$(ptr2))[2] = '3';
+
+	cr_assert(!fam_realloc(&ptr2, 100));
+	cr_assert_eq(((u8 *)$(ptr2))[0], '1');
+	cr_assert_eq(((u8 *)$(ptr2))[1], '2');
+	cr_assert_eq(((u8 *)$(ptr2))[2], '3');
+	fat_ptr_pin(&ptr2);
+
+	// fails due to pin.
+	cr_assert(fam_realloc(&ptr2, 200));
+
+	fam_free(&ptr2);
+
+	FatPtr ptr3;
+	{
+		SendStateGuard _ = SetSend(true);
+		cr_assert(!fam_alloc(&ptr3, 100));
+		cr_assert(fat_ptr_is_global(&ptr3));
+	}
+
+	fam_free(&ptr3);
+}
+
+MyTest(base, test_multi_scope) {
+	{
+		FatPtr ptr0 = null;
+		fam_alloc(&ptr0, 100);
+		cr_assert(!fat_ptr_is_global(&ptr0));
+		fam_free(&ptr0);
+
+		SendStateGuard sg = SetSend(true);
+		FatPtr ptr = null;
+		cr_assert(nil(ptr));
+		fam_alloc(&ptr, 100);
+		cr_assert(fat_ptr_is_global(&ptr));
+		cr_assert(!nil(ptr));
+		fam_free(&ptr);
+		cr_assert(nil(ptr));
+
+		{
+			FatPtr ptr0 = null;
+			fam_alloc(&ptr0, 100);
+			cr_assert(fat_ptr_is_global(&ptr0));
+			fam_free(&ptr0);
+			SendStateGuard sg2 = SetSend(false);
+			FatPtr ptr = null;
+			cr_assert(nil(ptr));
+			fam_alloc(&ptr, 100);
+			cr_assert(!fat_ptr_is_global(&ptr));
+			cr_assert(!nil(ptr));
+			fam_free(&ptr);
+			cr_assert(nil(ptr));
+
+			{
+				FatPtr ptr0 = null;
+				fam_alloc(&ptr0, 100);
+				cr_assert(!fat_ptr_is_global(&ptr0));
+				fam_free(&ptr0);
+				SendStateGuard sg2 = SetSend(false);
+				FatPtr ptr = null;
+				cr_assert(nil(ptr));
+				fam_alloc(&ptr, 100);
+				cr_assert(!fat_ptr_is_global(&ptr));
+				cr_assert(!nil(ptr));
+				fam_free(&ptr);
+				cr_assert(nil(ptr));
+			}
+
+			FatPtr ptr2;
+			fam_alloc(&ptr2, 100);
+			cr_assert(!fat_ptr_is_global(&ptr2));
+			fam_free(&ptr2);
+		}
+		FatPtr ptr2;
+		fam_alloc(&ptr2, 100);
+		cr_assert(fat_ptr_is_global(&ptr2));
+		fam_free(&ptr2);
+	}
+
+	FatPtr ptr2;
+	fam_alloc(&ptr2, 100);
+	cr_assert(!fat_ptr_is_global(&ptr2));
+	fam_free(&ptr2);
 }
 
 // Note: address sanitizer and criterion seem to have problems with this test on certain
@@ -1127,4 +986,39 @@ MyTest(base, test_panic) {
 	// panic("test7");
 	//    ensure we never get here
 	// cr_assert(false);
+}
+
+MyTest(util, test_bitflags) {
+	u8 flags[3] = {};
+	BitFlags bf1 = {.flags = flags, .capacity = 3};
+	bitflags_set(&bf1, 3, true);
+
+	cr_assert(bitflags_check(&bf1, 3));
+	bitflags_set(&bf1, 3, false);
+	cr_assert(!bitflags_check(&bf1, 3));
+
+	for (u32 i = 0; i < 3 * 8; i++)
+		bitflags_set(&bf1, 3, false);
+
+	for (u32 i = 0; i < 3 * 8; i++)
+		cr_assert(!bitflags_check(&bf1, i));
+
+	cr_assert(!bitflags_set(&bf1, 0, true));
+	cr_assert(!bitflags_set(&bf1, 4, true));
+	cr_assert(!bitflags_set(&bf1, 7, true));
+	cr_assert(!bitflags_set(&bf1, 19, true));
+	cr_assert(!bitflags_set(&bf1, 20, true));
+
+	for (u32 i = 0; i < 3 * 8; i++) {
+		if (i == 0 || i == 4 || i == 7 || i == 19 || i == 20)
+			cr_assert(bitflags_check(&bf1, i));
+		else
+			cr_assert(!bitflags_check(&bf1, i));
+	}
+
+	// test out of range
+	cr_assert(bitflags_set(&bf1, 24, true));
+
+	// test out of range
+	cr_assert(!bitflags_check(&bf1, 24));
 }

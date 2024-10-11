@@ -1,0 +1,29 @@
+
+
+// create task or future
+mut x = task((
+	let value = 1;
+	sleep(1);
+	// do something
+	Ok(value);
+});
+
+// execute it.
+let handle = execute(x);
+// assert that it's not complete (since we have 1 second sleep)
+assert(!is_complete(handle));
+match(poll, (PollComplete, {
+	assert(false);
+}), (PollBusy, {
+	assert(true);
+}));
+
+// await result
+let result = await(handle);
+
+match(result, (Ok, {
+	assert(true);
+}), (Err, {
+	assert(false);
+}));
+

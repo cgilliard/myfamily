@@ -23,43 +23,56 @@ typedef struct FatPtr {
 } FatPtr;
 
 // Internal representation for null
-typedef struct FatPtrZeroImpl {
+typedef struct FatPtrNilImpl {
 	u128 internal;
-} FatPtrZeroImpl;
+} FatPtrNilImpl;
 
-// Global constant that points to a zeroed-out implementation of FatPtrImpl
-static const FatPtrZeroImpl fatptr_impl_null = {0};
+// Global constant that points to a all ones implementation of FatPtrImpl (so all bit flags are set)
+static const FatPtrNilImpl fatptr_impl_null = {UINT128_MAX};
 #define null                                                                                       \
 	(const FatPtr) {                                                                               \
 		.data = (void *)&fatptr_impl_null                                                          \
 	}
 
-#define nil(v) (fat_ptr_len(&v) == 0)
+#define nil(v) (fat_ptr_is_nil(&v))
 
-// A slab allocator will always allocate these, so the user only needs to
+int fat_ptr_mallocate(FatPtr *ptr, u64 size);
+void fat_ptr_malloc_free(FatPtr *ptr);
+
+// A slab allocator will always allocate these (exception mallocate), so the user only needs to
 // be able to read the length and the data pointer.
-u64 fat_ptr_len(const FatPtr *ptr);
+u32 fat_ptr_size(const FatPtr *ptr);
 void *fat_ptr_data(const FatPtr *ptr);
+bool fat_ptr_is_global(const FatPtr *ptr);
+bool fat_ptr_is_pin(const FatPtr *ptr);
+bool fat_ptr_is_copy(const FatPtr *ptr);
+bool fat_ptr_is_malloc(const FatPtr *ptr);
+bool fat_ptr_is_nil(const FatPtr *ptr);
 
-#define $Ref(v) (fat_ptr_data(v))
-#define $Len(v) (fat_ptr_len(v))
+int fat_ptr_set_copy(FatPtr *ptr);
+int fat_ptr_pin(FatPtr *ptr);
+
+#define $(v) (fat_ptr_data(&v))
+#define $size(v) (fat_ptr_size(&v))
+#define $global(v) (fat_ptr_is_global(&v))
+#define $pin(v) (fat_ptr_is_pin(&v))
+#define $copy(v) (fat_ptr_is_copy(&v))
 
 // Slab Allocator
 
 // Slab Type definition
 typedef struct SlabType {
-	u64 slab_size;
+	u32 slab_size;
 	u32 slabs_per_resize;
 	u32 initial_chunks;
-	u64 max_slabs;
+	u32 max_slabs;
 } SlabType;
 
 // Slab Allocator configuration
 typedef struct SlabAllocatorConfigNc {
 	bool zeroed;
-	bool no_malloc;
-	bool is_64_bit;
-	u64 slab_types_count;
+	bool global;
+	u32 slab_types_count;
 	SlabType *slab_types;
 } SlabAllocatorConfigNc;
 
@@ -69,8 +82,7 @@ void slab_allocator_config_cleanup(SlabAllocatorConfigNc *ptr);
 	SlabAllocatorConfigNc                                                                          \
 		__attribute__((warn_unused_result, cleanup(slab_allocator_config_cleanup)))
 
-int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeored, bool no_malloc,
-								bool is_64_bit);
+int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeroed, bool global);
 int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st);
 
 typedef struct SlabAllocatorNc {
@@ -89,10 +101,8 @@ u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr);
 
 // These are test helper functions
 #ifdef TEST
-u64 fat_ptr_id(const FatPtr *ptr);
-void fat_ptr_test_obj64(FatPtr *ptr, u64 id, u64 len);
-void fat_ptr_free_test_obj64(FatPtr *ptr);
-void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len);
+u32 fat_ptr_id(const FatPtr *ptr);
+void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len, bool global, bool pin, bool copy);
 void fat_ptr_free_test_obj32(FatPtr *ptr);
 #endif // TEST
 

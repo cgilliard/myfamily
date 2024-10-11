@@ -42,7 +42,7 @@ SlabAllocator *init_default_slab_allocator() {
 	SlabAllocatorConfig sac;
 
 	// default slab allocator no_malloc = false, zeroed = false, is_64_bit = false
-	if (slab_allocator_config_build(&sac, false, false, false)) {
+	if (slab_allocator_config_build(&sac, false, false)) {
 		myfree(sa);
 		return NULL;
 	}
@@ -208,8 +208,8 @@ int chain_realloc(FatPtr *ptr, u64 size) {
 		ret = -1;
 	} else {
 
-		u64 len = fat_ptr_len(ptr);
-		u64 nlen = fat_ptr_len(&tmp);
+		u64 len = $size(*ptr);
+		u64 nlen = $size(tmp);
 		if (nlen < len) {
 			len = nlen;
 		}

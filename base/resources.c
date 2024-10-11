@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/fam_err.h>
 #include <base/resources.h>
 #include <base/types.h>
 #include <stdio.h>
@@ -38,7 +39,8 @@ void *mymalloc(u64 size) {
 
 	if (ret) {
 		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
-	}
+	} else
+		fam_err = AllocErr;
 	return ret;
 }
 void *myrealloc(void *ptr, u64 size) {
@@ -54,7 +56,8 @@ void *myrealloc(void *ptr, u64 size) {
 
 	if (ret) {
 		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
-	}
+	} else
+		fam_err = AllocErr;
 	return ret;
 }
 void myfree(void *ptr) {
