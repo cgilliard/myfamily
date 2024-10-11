@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['myrecord_700',['MyRecord',['../structMyRecord.html',1,'']]]
+  ['myrecord_732',['MyRecord',['../structMyRecord.html',1,'']]]
 ];
