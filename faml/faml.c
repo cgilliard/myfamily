@@ -16,6 +16,7 @@
 #include <base/fam_err.h>
 #include <base/resources.h>
 #include <faml/parser.h>
+#include <pthread.h>
 #include <stdatomic.h>
 #include <stdio.h>
 #include <string.h>
@@ -23,7 +24,8 @@
 
 _Thread_local RBTree tl_faml_rbtree = {.impl = null};
 _Thread_local u64 next_local_id = 0;
-atomic_ullong next_global_id = 0;
+volatile atomic_ullong next_global_id = 0;
+pthread_mutex_t global_id_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 typedef struct LookupTableEntry {
 	FamlObjVisibility visibility;
@@ -43,6 +45,7 @@ typedef struct FamlPrototypeImpl {
 	bool sync;
 	FamlType type;
 	FatPtr data;
+	RBTree tree;
 } FamlPrototypeImpl;
 
 typedef struct FamlObjImpl {
@@ -54,6 +57,9 @@ typedef struct FamlObjKey {
 	u64 namespace_id;
 	FatPtr name;
 } FamlObjKey;
+
+// u128 is the largest type
+#define FAML_OBJ_VALUE_SIZE sizeof(u128)
 
 typedef struct FamlObjValueObj {
 	u32 insertion_index;
@@ -102,10 +108,24 @@ int tl_faml_rbtree_init() {
 
 int global_faml_init() {
 	if (atomic_load(&next_global_id) == 0) {
-		printf("global_faml_init\n");
-		atomic_store(&next_global_id, 1);
+		pthread_mutex_lock(&global_id_mutex);
+		if (atomic_load(&next_global_id) == 0) {
+			printf("global_faml_init\n");
+			atomic_store(&next_global_id, 1);
+		}
+		pthread_mutex_unlock(&global_id_mutex);
 	}
 	return 0;
+}
+
+u64 faml_get_next_global_id() {
+	return atomic_fetch_add(&next_global_id, 2);
+}
+
+u64 faml_get_next_local_id() {
+	u64 ret = next_local_id;
+	next_local_id += 2;
+	return ret;
 }
 
 int faml_check_init() {
@@ -125,8 +145,7 @@ void famlproto_cleanup(FamlPrototype *ptr) {
 	if (!nil(ptr->impl)) {
 
 		FamlPrototypeImpl *impl = $Ref(&ptr->impl);
-		bool send = impl->send;
-		ChainGuard _ = ChainSend(send);
+		ChainGuard _ = ChainSend(true);
 		if (!nil(impl->data))
 			chain_free(&impl->data);
 		chain_free(&ptr->impl);
@@ -137,9 +156,14 @@ int faml_prototype_create(FamlPrototype *proto, bool send, bool sync, bool is_dy
 	if (faml_check_init())
 		return -1;
 
+	if (sync && !send) {
+		fam_err = IllegalState;
+		return -1;
+	}
+
 	FamlPrototypeImpl *impl;
 	{
-		ChainGuard _ = ChainSend(send);
+		ChainGuard _ = ChainSend(true);
 		if (chain_malloc(&proto->impl, sizeof(FamlPrototypeImpl))) {
 			proto->impl = null;
 			return -1;
@@ -147,9 +171,11 @@ int faml_prototype_create(FamlPrototype *proto, bool send, bool sync, bool is_dy
 		impl = $Ref(&proto->impl);
 	}
 	impl->send = send;
+	impl->sync = sync;
 	impl->is_dynamic = is_dynamic;
 	impl->type = FamlTypeUnknown;
 	impl->data = null;
+	impl->tree = RBTREE_INITIALIZE;
 
 	return 0;
 }
@@ -162,7 +188,7 @@ int faml_prototype_set_u8(FamlPrototype *proto, u8 value) {
 	}
 	impl->type = FamlTypeU8;
 	{
-		ChainGuard _ = ChainSend(impl->send);
+		ChainGuard _ = ChainSend(true); // so we can pass to threads
 		if (chain_malloc(&impl->data, sizeof(FamlObjValueU8)))
 			return -1;
 	}
@@ -181,7 +207,7 @@ int faml_prototype_set_u64(FamlPrototype *proto, u64 value) {
 	impl->type = FamlTypeU64;
 
 	{
-		ChainGuard _ = ChainSend(impl->send);
+		ChainGuard _ = ChainSend(true); // so we can pass to threads
 		if (chain_malloc(&impl->data, sizeof(FamlObjValueU64)))
 			return -1;
 	}
@@ -200,7 +226,7 @@ int faml_prototype_set_i64(FamlPrototype *proto, i64 value) {
 	impl->type = FamlTypeI32;
 
 	{
-		ChainGuard _ = ChainSend(impl->send);
+		ChainGuard _ = ChainSend(true); // so we can pass to threads
 		if (chain_malloc(&impl->data, sizeof(FamlObjValueI64)))
 			return -1;
 	}
@@ -218,13 +244,53 @@ int faml_prototype_set_i32(FamlPrototype *proto, i32 value) {
 	impl->type = FamlTypeI32;
 
 	{
-		ChainGuard _ = ChainSend(impl->send);
+		ChainGuard _ = ChainSend(true); // so we can pass to threads
 		if (chain_malloc(&impl->data, sizeof(FamlObjValueI32)))
 			return -1;
 	}
 
 	FamlObjValueU8 *vi32 = $Ref(&impl->data);
 	vi32->value = value;
+	return 0;
+}
+
+int faml_prototype_put_u8(FamlPrototype *proto, const char *key, u8 value,
+						  FamlObjVisibility visibility) {
+	FamlPrototypeImpl *impl = $Ref(&proto->impl);
+	if (impl->type != FamlTypeUnknown || impl->type != FamlTypeObj) {
+		fam_err = AlreadyInitialized;
+		return -1;
+	}
+
+	impl->type = FamlTypeObj;
+
+	if (!RBTreeIsInit(impl->tree)) {
+		if (rbtree_build(&impl->tree, sizeof(FamlObjKey), FAML_OBJ_VALUE_SIZE, faml_obj_key_compare,
+						 impl->send))
+			return -1;
+	}
+
+	FamlObjKey ku8;
+	ku8.namespace_id = 0;
+	{
+		ChainGuard _ =
+			ChainSend(true); // always use a 'send' for this so we can deallocate in a new thread.
+	}
+
+	//	rbtree_insert(&impl->tree, ku8, vu8);
+
+	return 0;
+}
+int faml_prototype_put_u64(FamlPrototype *proto, const char *key, u64 value,
+						   FamlObjVisibility visibility) {
+	return 0;
+}
+int faml_prototype_put_i32(FamlPrototype *proto, const char *key, i32 value,
+						   FamlObjVisibility visibility) {
+	return 0;
+}
+int faml_prototype_put_i64(FamlPrototype *proto, const char *key, i64 value,
+						   FamlObjVisibility visibility) {
 	return 0;
 }
 

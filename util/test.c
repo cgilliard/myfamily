@@ -19,6 +19,7 @@
 #include <string.h>
 #include <util/bitflags.h>
 #include <util/rbtree.h>
+#include <util/rc.h>
 
 MySuite(util);
 
@@ -370,4 +371,118 @@ MyTest(util, test_bitflags) {
 
 	// test out of range
 	cr_assert(!bitflags_check(&bf1, 24));
+}
+
+int cleanup_u64_count = 0;
+
+void cleanup_u64(void *value) {
+	cr_assert_eq(*(u64 *)value, 101);
+	cleanup_u64_count++;
+}
+
+MyTest(util, test_rc) {
+	{
+		Weak weak1;
+		{
+
+			// outer reference
+			Rc outer1;
+			{
+				// data
+				u64 my_data = 101;
+				// inner reference
+				Rc rc1;
+				// build rc
+				rc_build(&rc1, &my_data, sizeof(u64), false, cleanup_u64);
+				// clone to outer reference
+				rc_clone(&outer1, &rc1);
+				rc_weak(&weak1, &outer1);
+			}
+			// even though rc1 has been cleaned up, outer still lives on
+			u64 *outer_value = rc_access(&outer1);
+			cr_assert_eq(*outer_value, 101);
+
+			// no cleanup occurred yet
+			cr_assert_eq(cleanup_u64_count, 0);
+		}
+		// cleanup occurs here as all strongs gone
+		cr_assert_eq(cleanup_u64_count, 1);
+		// cleanup occurs here (for weak)
+	}
+	// verify incrememented count not higher after weak exits
+	cr_assert_eq(cleanup_u64_count, 1);
+}
+
+int cleanup2_count = 0;
+void cleanup_u642(void *value) {
+	cr_assert_eq(*(u64 *)value, 202);
+	cleanup2_count++;
+}
+
+MyTest(util, test_rc_upgrade) {
+	Weak weak1;
+	{
+		Rc rc1;
+		Rc rc2;
+		Rc rc3;
+
+		u64 my_data = 202;
+		rc_build(&rc1, &my_data, sizeof(u64), false, cleanup_u642);
+		rc_clone(&rc2, &rc1);
+		rc_weak(&weak1, &rc2);
+
+		rc_upgrade(&rc3, &weak1);
+		u64 *upgrade_value = rc_access(&rc3);
+		cr_assert_eq(*upgrade_value, 202);
+
+		cr_assert_eq(cleanup2_count, 0);
+	}
+	cr_assert_eq(cleanup2_count, 1);
+}
+
+MyTest(util, test_atomic_rc_upgrade) {
+	Weak weak1;
+	{
+		Rc rc1;
+		Rc rc2;
+		Rc rc3;
+
+		u64 my_data = 202;
+		rc_build(&rc1, &my_data, sizeof(u64), true, cleanup_u642);
+		rc_clone(&rc2, &rc1);
+		rc_weak(&weak1, &rc2);
+
+		rc_upgrade(&rc3, &weak1);
+		u64 *upgrade_value = rc_access(&rc3);
+		cr_assert_eq(*upgrade_value, 202);
+
+		cr_assert_eq(cleanup2_count, 0);
+	}
+	cr_assert_eq(cleanup2_count, 1);
+}
+
+MyTest(util, test_weak_cleanup) {
+	{
+		Weak weak1;
+		{
+			Rc rc1;
+			Rc rc2;
+			u64 my_data = 202;
+			rc_build(&rc1, &my_data, sizeof(u64), true, cleanup_u642);
+			rc_clone(&rc2, &rc1);
+			rc_weak(&weak1, &rc2);
+
+			u64 *upgrade_value = rc_access(&rc2);
+			cr_assert_eq(*upgrade_value, 202);
+
+			cr_assert_eq(cleanup2_count, 0);
+		}
+		// last ref is a weak so cleanup should be called by now
+		cr_assert_eq(cleanup2_count, 1);
+		Rc rc;
+		cr_assert(rc_upgrade(&rc, &weak1));
+		rc.impl = null;
+	}
+	// assert still 1
+	cr_assert_eq(cleanup2_count, 1);
 }

@@ -22,6 +22,7 @@ typedef enum FamErr {
 	InitErr,
 	AlreadyInitialized,
 	IndexOutOfBounds,
+	IllegalState,
 } FamErr;
 
 extern int fam_err;

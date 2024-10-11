@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/types.h>
+#include <stdatomic.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,6 +39,13 @@ void __attribute__((constructor)) __check_64bit_arch__() {
 
 	if (!__is_little_endian()) {
 		fprintf(stderr, "Big endian systems not supported");
+		exit(EXIT_FAILURE);
+	}
+
+	if (sizeof(atomic_ullong) != 8) {
+		fprintf(
+			stderr,
+			"Error: Unexpected size for atomic_ullong. Check your compiler and architecture.\n");
 		exit(EXIT_FAILURE);
 	}
 }
