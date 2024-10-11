@@ -42,12 +42,12 @@ jobs:
       - name: Run Linux Tests (gcc)
         run: |
           ./configure --with-cc=gcc
-          make clean testsan
+          make clean testsan -s
       
       - name: Run Linux Tests (clang)
         run: |
           ./configure --with-cc=clang
-          make clean testsan
+          make clean testsan -s
 
       - name: Build Docs
         run: |
@@ -88,9 +88,9 @@ jobs:
       - name: Run MacOS Tests (gcc)
         run: |
           ./scripts/configure_homebrew.sh --with-cc=gcc
-          make clean testsan
+          make clean testsan -s
       
       - name: Run MacOS Tests (clang)
         run: |
           ./scripts/configure_homebrew.sh --with-cc=clang
-          make clean testsan 
+          make clean testsan -s
