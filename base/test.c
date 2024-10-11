@@ -47,6 +47,9 @@ MyTest(base, test_colors) {
 	MYFILE *ptr2 = myfopen(&file, "r");
 	char buf[1024];
 	u64 v = read_all(buf, 1, 1024, ptr2);
+	if (v < 1024) {
+		buf[v] = '\0';
+	}
 	int brackets = 0;
 	for (int i = 0; i < strlen(buf); i++) {
 		if (buf[i] == '[')
