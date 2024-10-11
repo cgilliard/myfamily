@@ -32,7 +32,7 @@ define run_tests
         fi; \
         if test -z $(TARGET); then \
             echo "[====] Running $$dir test suite..."; \
-            $(MAKE) -C $$dir $(2) FLAG_OPTIONS="$(1)" || exit 1; \
+            $(MAKE) -C $$dir $(2) FLAG_OPTIONS="$(1)" -s || exit 1; \
         else \
             if [ "$$dir" = "$(TARGET)" ]; then \
                 if test -z $(FILTER); then \
@@ -40,7 +40,7 @@ define run_tests
                 else \
                     echo "[====] Running $$dir test suite... (FILTER=$$FILTER)"; \
                 fi; \
-                $(MAKE) -C $$dir $(2) FLAG_OPTIONS="$(1)" || exit 1; \
+                $(MAKE) -C $$dir $(2) FLAG_OPTIONS="$(1)" -s || exit 1; \
             fi; \
         fi; \
         if [ $$? -ne "0" ]; then \

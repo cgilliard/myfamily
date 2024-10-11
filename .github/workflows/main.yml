@@ -29,7 +29,7 @@ jobs:
       - name: Test Linux Build
         run: |
           ./configure --minimal
-          make clean all
+          make clean all -s
           ./bin/fam init test1
           test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
 
