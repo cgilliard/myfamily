@@ -29,7 +29,10 @@ COVERAGE_FLAGS=--coverage -DTEST
 INSTALL_DIR=/usr/local/bin
 
 # Object directories
-ALL_OBJS=base/*.o
-SUBDIRS := base
+ALL_OBJS=base/*.o main/*.o args/*.o crypto/*.o
+SUBDIRS := base main args crypto
 SUBDIRS_RELEASE := $(SUBDIRS)
 HEADERS := $(wildcard base/*.h) \
+	$(wildcard args/*.h) \
+	$(wildcard crypto/*.h) \
+	$(wildcard main/*.h)
