@@ -172,6 +172,9 @@ MyTest(util, test_random_rbtree) {
 }
 
 MyTest(util, test_validation_and_other) {
+	FatPtr p;
+	fam_alloc(&p, 1);
+	fam_free(&p);
 	RBTree test1;
 	cr_assert(rbtree_build(NULL, 10, 10, u64_compare, false));
 	__is_debug_malloc = true;

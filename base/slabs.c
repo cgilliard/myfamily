@@ -350,7 +350,6 @@ int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) 
 	if (ptr->impl == NULL)
 		return -1;
 	SlabAllocatorImpl *impl = ptr->impl;
-
 	impl->zeroed = config->zeroed;
 	impl->global = config->global;
 	impl->sd_size = config->slab_types_count;

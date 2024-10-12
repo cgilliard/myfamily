@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <assert.h>
-#include <base/chain_alloc.h>
+#include <base/fam_alloc.h>
 #include <base/macro_utils.h>
 #include <base/panic.h>
 #include <errno.h>
@@ -48,7 +48,7 @@ typedef struct RBTreeImpl {
 	int (*compare)(const void *, const void *); // a comparion function (like qsort)
 	RBTreeNode *root;							// pointer to the root node.
 	u64 size;									// current size of the tree.
-	bool send; // whether this RBTree can be sent to other threads (using global chain_malloc)
+	bool send; // whether this RBTree can be sent to other threads (using global fam_alloc)
 } RBTreeImpl;
 
 // Iterator impl
@@ -129,18 +129,18 @@ static RBTreeNode *NIL = &NIL_DEFN;
 void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
 	if (!nil(ptr->impl)) {
 		// obtain referent to internal RBTreeImpl structure
-		RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
+		RBTreeIteratorImpl *impl = $(ptr->impl);
 		// set appropriate chainguard status
-		ChainGuard _ = ChainSend(impl->send);
+		SendStateGuard _ = SetSend(impl->send);
 
 		// free RBTreeImpl structure
-		chain_free(&ptr->impl);
+		fam_free(&ptr->impl);
 	}
 }
 
 // returns the next item in the iterator
 bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
-	RBTreeIteratorImpl *impl = $Ref(&ptr->impl);
+	RBTreeIteratorImpl *impl = $(ptr->impl);
 
 	// If the iterator is empty, we're done
 	if (impl->cur == NIL && impl->stack_pointer == 0) {
@@ -197,7 +197,7 @@ void rbtree_free_node(RBTreeNode *ptr) {
 		// recursively free left node
 		rbtree_free_node(ptr->left);
 		// chain free current node
-		chain_free(&ptr->self);
+		fam_free(&ptr->self);
 	}
 }
 
@@ -372,20 +372,20 @@ void rbtree_insert_fixup(RBTreeImpl *impl, RBTreeNode *k) {
 	SET_BLACK(impl, impl->root);
 }
 
-// cleanup function selects appropriate ChainGuard based on configuration and
+// cleanup function selects appropriate SendStateGuard based on configuration and
 // deallocates memory
 void rbtree_cleanup(RBTreeNc *ptr) {
 	// check non-initialized conditions
 	if (!nil(ptr->impl)) {
 		// obtain referent to internal RBTree structure
-		RBTreeImpl *impl = $Ref(&ptr->impl);
+		RBTreeImpl *impl = $(ptr->impl);
 		// set appropriate chainguard status
-		ChainGuard _ = ChainSend(impl->send);
+		SendStateGuard _ = SetSend(impl->send);
 
 		rbtree_free_node(impl->root);
 
 		// free RBTreeImpl structure
-		chain_free(&ptr->impl);
+		fam_free(&ptr->impl);
 	}
 }
 
@@ -400,16 +400,16 @@ int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 	RBTreeImpl *impl;
 
 	{
-		ChainGuard _ = ChainSend(send);
+		SendStateGuard _ = SetSend(send);
 		// try to allocate required size for RBTreeImpl
-		if (chain_malloc(&ptr->impl, sizeof(RBTreeImpl))) {
+		if (fam_alloc(&ptr->impl, sizeof(RBTreeImpl))) {
 			// set the fatptr to null so it's not cleaned up in cleanup function
 			ptr->impl = null;
 			return -1;
 		}
 	}
 
-	impl = $Ref(&ptr->impl);
+	impl = $(ptr->impl);
 	// initialize values of the RBTreeImpl structure
 	impl->send = send;
 	impl->key_size = key_size;
@@ -430,7 +430,7 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	}
 
 	// obtain the impl from the fat ptr
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeImpl *impl = $(ptr->impl);
 	// this pair is used to search
 	RBTreeNodePair pair;
 	// pointer for our node
@@ -447,17 +447,17 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	u64 size = DATA_SIZE(impl);
 	FatPtr self;
 
-	// using chain_malloc allocate memory for this node
+	// using fam_alloc allocate memory for this node
 	{
-		ChainGuard _ = ChainSend(impl->send);
-		if (chain_malloc(&self, size)) {
+		SendStateGuard _ = SetSend(impl->send);
+		if (fam_alloc(&self, size)) {
 			self = null;
 			return -1;
 		}
 	}
 
 	// using the allocated memory set node properties
-	node = $Ref(&self);
+	node = $(self);
 	node->self = self;
 	if (impl->root == NIL) {
 		impl->root = node;
@@ -611,7 +611,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	}
 
 	// obtain impl from our opaque pointer
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeImpl *impl = $(ptr->impl);
 
 	// search for the node based on this key.
 	RBTreeNodePair pair;
@@ -692,8 +692,8 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 
 	// Free the node which has been transplanted
 	{
-		ChainGuard _ = ChainSend(impl->send);
-		chain_free(&node_to_delete->self);
+		SendStateGuard _ = SetSend(impl->send);
+		fam_free(&node_to_delete->self);
 	}
 
 	impl->size--;
@@ -710,7 +710,7 @@ const void *rbtree_get(const RBTree *ptr, const void *key) {
 	}
 
 	// set impl
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeImpl *impl = $(ptr->impl);
 	RBTreeNodePair pair;
 
 	// search for the pair.
@@ -731,7 +731,7 @@ i64 rbtree_size(const RBTree *ptr) {
 		return -1;
 	}
 
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeImpl *impl = $(ptr->impl);
 	return impl->size;
 }
 
@@ -743,17 +743,17 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_k
 		return -1;
 	}
 
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeImpl *impl = $(ptr->impl);
 
 	{
-		ChainGuard _ = ChainSend(impl->send);
-		if (chain_malloc(&iter->impl, sizeof(RBTreeIteratorImpl))) {
+		SendStateGuard _ = SetSend(impl->send);
+		if (fam_alloc(&iter->impl, sizeof(RBTreeIteratorImpl))) {
 			iter->impl = null;
 			return -1;
 		}
 	}
 
-	RBTreeIteratorImpl *rbimpl = $Ref(&iter->impl);
+	RBTreeIteratorImpl *rbimpl = $(iter->impl);
 	rbimpl->compare = impl->compare;
 	rbimpl->stack_pointer = 0;
 	rbimpl->send = impl->send;
@@ -811,7 +811,7 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_k
 void rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_count,
 						  int current_black_count, u64 ids[100]) {
 	ids[current_black_count] = node->node_id;
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeImpl *impl = $(ptr->impl);
 	u64 key_size = impl->key_size;
 	u64 value_size = impl->value_size;
 
@@ -842,7 +842,7 @@ void rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_
 }
 
 void rbtree_validate(const RBTree *ptr) {
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeImpl *impl = $(ptr->impl);
 	int black_count = 0;
 	u64 ids[100];
 	// Validate from the root and check if the root is black
@@ -862,7 +862,7 @@ void rbtree_node_depth(RBTreeImpl *impl, RBTreeNode *node, u64 *max_depth, u64 c
 }
 
 u64 rbtree_max_depth(const RBTree *ptr) {
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeImpl *impl = $(ptr->impl);
 	u64 max_depth = 0;
 	rbtree_node_depth(impl, impl->root, &max_depth, 1);
 	return max_depth;
@@ -870,7 +870,7 @@ u64 rbtree_max_depth(const RBTree *ptr) {
 
 // Function to print a single node with its color
 void rbtree_print_node(const RBTree *ptr, const RBTreeNode *node, int depth) {
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeImpl *impl = $(ptr->impl);
 	if (node == NIL) {
 		for (int i = 0; i < depth; i++) {
 			printf("    ");
@@ -896,7 +896,7 @@ void rbtree_print_node(const RBTree *ptr, const RBTreeNode *node, int depth) {
 
 // Function to print the entire tree
 void rbtree_print(const RBTree *ptr) {
-	RBTreeImpl *impl = $Ref(&ptr->impl);
+	RBTreeImpl *impl = $(ptr->impl);
 
 	printf("Red-Black Tree (root = %llu)\n", impl->root->node_id);
 	printf("===================================\n"); // Separator for better clarity

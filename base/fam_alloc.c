@@ -41,13 +41,11 @@ SlabAllocator *initialize_default_slab_allocator(bool global) {
 	if (sa == NULL)
 		return NULL;
 	SlabAllocatorConfig sac;
-
 	// default slab allocator zeroed = false
 	if (slab_allocator_config_build(&sac, false, global)) {
 		myfree(sa);
 		return NULL;
 	}
-
 	u32 max_slabs = MAX_SLABS;
 	for (i32 i = 0; i < 128; i++) {
 		SlabType st = {.slab_size = (i + 3) * 8,
@@ -69,7 +67,6 @@ SlabAllocator *initialize_default_slab_allocator(bool global) {
 			return NULL;
 		}
 	}
-
 	if (slab_allocator_build(sa, &sac)) {
 		myfree(sa);
 		return NULL;
@@ -84,8 +81,12 @@ void init_fam_guards() {
 		fam_guard_entries[0].send = false;
 		if (thread_local_slab_allocator == NULL)
 			thread_local_slab_allocator = initialize_default_slab_allocator(false);
+		if (thread_local_slab_allocator == NULL)
+			panic("Could not initialize the default slab allocator");
 		if (global_allocator == NULL)
 			global_allocator = initialize_default_slab_allocator(true);
+		if (global_allocator == NULL)
+			panic("Could not initialize the global slab allocator");
 		if (pthread_mutex_init(&global_allocator_lock, NULL))
 			panic("Could not init pthread_mutex");
 	}
@@ -103,8 +104,9 @@ int fam_alloc(FatPtr *ptr, u64 size) {
 
 	if (send)
 		sa = global_allocator;
-	else
+	else {
 		sa = thread_local_slab_allocator;
+	}
 
 	int ret;
 	if (send)

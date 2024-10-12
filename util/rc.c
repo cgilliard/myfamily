@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/chain_alloc.h>
+#include <base/fam_alloc.h>
 #include <base/fam_err.h>
 #include <stdatomic.h>
 #include <stdio.h>
@@ -53,7 +53,7 @@ typedef struct RcImpl {
 void rc_cleanup(RcNc *ptr) {
 	if (nil(ptr->impl))
 		return;
-	RcImpl *impl = $Ref(&ptr->impl);
+	RcImpl *impl = $(ptr->impl);
 
 	u32 strong_count, weak_count;
 
@@ -74,13 +74,13 @@ void rc_cleanup(RcNc *ptr) {
 	// if strong count is 0, do cleanup tasks
 	if (strong_count == 0) {
 		// first get chain guard
-		ChainGuard _ = ChainSend(impl->meta.atomic);
+		SendStateGuard _ = SetSend(impl->meta.atomic);
 		// call user defined cleanup function
 		impl->meta.cleanup(impl->data);
 
 		// if there's no weak references left, also free pointer
 		if (weak_count == 0) {
-			chain_free(&ptr->impl);
+			fam_free(&ptr->impl);
 		}
 	}
 	ptr->impl = null;
@@ -90,7 +90,7 @@ void rc_cleanup(RcNc *ptr) {
 void weak_cleanup(WeakNc *ptr) {
 	if (nil(ptr->impl))
 		return;
-	RcImpl *impl = $Ref(&ptr->impl);
+	RcImpl *impl = $(ptr->impl);
 
 	u32 strong_count, weak_count;
 
@@ -110,8 +110,8 @@ void weak_cleanup(WeakNc *ptr) {
 
 	// if both weak and strong counts are 0, we free the data here.
 	if (strong_count == 0 && weak_count == 0) {
-		ChainGuard _ = ChainSend(impl->meta.atomic);
-		chain_free(&ptr->impl);
+		SendStateGuard _ = SetSend(impl->meta.atomic);
+		fam_free(&ptr->impl);
 	}
 	ptr->impl = null;
 }
@@ -125,15 +125,15 @@ int rc_build(Rc *ptr, void *data, u64 size, bool atomic, void (*cleanup)(void *)
 
 	{
 		// allocate for both meta data and user data
-		ChainGuard _ = ChainSend(atomic);
-		if (chain_malloc(&ptr->impl, size + sizeof(RcMeta))) {
+		SendStateGuard _ = SetSend(atomic);
+		if (fam_alloc(&ptr->impl, size + sizeof(RcMeta))) {
 			fam_err = AllocErr;
 			return -1;
 		}
 	}
 
 	// set initial values
-	RcImpl *impl = $Ref(&ptr->impl);
+	RcImpl *impl = $(ptr->impl);
 	impl->meta.atomic = atomic;
 
 	if (atomic) {
@@ -159,7 +159,7 @@ int rc_clone(Rc *dst, const Rc *src) {
 		return -1;
 	}
 
-	RcImpl *impl = $Ref(&src->impl);
+	RcImpl *impl = $(src->impl);
 	if (impl->meta.atomic) {
 		RcMetaAtomic *atomic = ((RcMetaAtomic *)&impl->meta);
 		atomic_fetch_add(&atomic->counts, 1ULL);
@@ -174,7 +174,7 @@ int rc_clone(Rc *dst, const Rc *src) {
 void *rc_access(Rc *ptr) {
 	if (ptr == NULL)
 		return NULL;
-	RcImpl *impl = $Ref(&ptr->impl);
+	RcImpl *impl = $(ptr->impl);
 	return impl->data;
 }
 
@@ -183,7 +183,7 @@ int rc_weak(Weak *dst, const Rc *src) {
 		fam_err = IllegalArgument;
 		return -1;
 	}
-	RcImpl *impl = $Ref(&src->impl);
+	RcImpl *impl = $(src->impl);
 	if (impl->meta.atomic) {
 		RcMetaAtomic *atomic = ((RcMetaAtomic *)&impl->meta);
 		atomic_fetch_add(&atomic->counts, 1ULL << 32);
@@ -197,7 +197,7 @@ int rc_weak(Weak *dst, const Rc *src) {
 }
 
 int rc_upgrade(Rc *upgraded, Weak *ptr) {
-	RcImpl *impl = $Ref(&ptr->impl);
+	RcImpl *impl = $(ptr->impl);
 
 	if (impl->meta.atomic) {
 		RcMetaAtomic *atomic = ((RcMetaAtomic *)&impl->meta);
