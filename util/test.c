@@ -17,6 +17,7 @@
 #include <crypto/psrng.h>
 #include <math.h>
 #include <string.h>
+#include <util/object.h>
 #include <util/rbtree.h>
 #include <util/rc.h>
 
@@ -33,7 +34,7 @@ int u64_compare(const void *v1, const void *v2) {
 }
 
 MyTest(util, test_rbtree) {
-	RBTree test1 = RBTREE_INITIALIZE;
+	RBTree test1 = INIT_RBTREE;
 	cr_assert(!RBTreeIsInit(test1));
 	u64 k, v;
 	rbtree_build(&test1, sizeof(u64), sizeof(u64), &u64_compare, false);
@@ -452,4 +453,62 @@ MyTest(util, test_weak_cleanup) {
 	}
 	// assert still 1
 	cr_assert_eq(cleanup2_count, 1);
+}
+
+int drop_count = 0;
+
+void my_cleanup(u64 *obj) {
+	printf("my cleanup obj v=%llu\n", *obj);
+	cr_assert_eq(*obj, 8);
+	drop_count++;
+}
+
+MyTest(util, test_object) {
+	{
+		Object test2 = INIT_OBJECT;
+		{
+			Object test;
+			FatPtr fptr;
+			fam_alloc(&fptr, sizeof(u64));
+			u64 v = 8;
+			memcpy($(fptr), &v, sizeof(u64));
+			cr_assert(!object_create(&test, fptr, (void (*)(void *))my_cleanup, false));
+
+			cr_assert(!object_move(&test2, &test));
+		}
+		cr_assert(!drop_count);
+		printf("no drop\n");
+	}
+	cr_assert(drop_count);
+}
+
+int drop_count2 = 0;
+
+void my_cleanup2(u64 *obj) {
+	printf("my cleanup 2 v=%llu\n", *obj);
+	drop_count2++;
+}
+
+MyTest(util, test_ref) {
+	{
+		Object test1 = INIT_OBJECT;
+		Object test3 = INIT_OBJECT;
+		FatPtr fptr;
+		fam_alloc(&fptr, sizeof(u64));
+		u64 v = 10;
+		*(u64 *)$(fptr) = v;
+
+		{
+			Object test2 = INIT_OBJECT;
+			cr_assert(!object_create(&test2, fptr, (void (*)(void *))my_cleanup2, false));
+			cr_assert(!object_ref(&test1, &test2));
+			cr_assert(object_mut_ref(&test3, &test1));
+			cr_assert(!object_mut_ref(&test3, &test2));
+			cr_assert_eq(drop_count2, 0);
+		}
+		// still not dropped because there is a remaining reference (test1).
+		cr_assert_eq(drop_count2, 0);
+	}
+	// now test1 dropped and the rc is dropped.
+	cr_assert_eq(drop_count2, 1);
 }

@@ -542,8 +542,6 @@ MyTest(base, test_big32) {
 	arr = malloc(sizeof(FatPtr) * count);
 
 	for (u64 i = 0; i < count; i++) {
-		if (i % 1000000 == 0)
-			printf("i=%llu\n", i);
 		int ret = slab_allocator_allocate(&sa, 8, &arr[i]);
 		cr_assert_eq(ret, 0);
 		cr_assert_eq($size(arr[i]), size);
@@ -551,8 +549,6 @@ MyTest(base, test_big32) {
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), count);
 
 	for (u64 i = 0; i < count; i++) {
-		if (i % 1000000 == 0)
-			printf("del i=%llu\n", i);
 		slab_allocator_free(&sa, &arr[i]);
 	}
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(&sa), 0);

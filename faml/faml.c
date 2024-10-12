@@ -175,7 +175,7 @@ int faml_prototype_create(FamlPrototype *proto, bool send, bool sync, bool is_dy
 	impl->is_dynamic = is_dynamic;
 	impl->type = FamlTypeUnknown;
 	impl->data = null;
-	impl->tree = RBTREE_INITIALIZE;
+	impl->tree = INIT_RBTREE;
 
 	return 0;
 }

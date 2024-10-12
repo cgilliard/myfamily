@@ -17,6 +17,13 @@
 
 #include <base/slabs.h>
 
+#undef $
+#define $(v) _Generic((v), FatPtr: fat_ptr_data((FatPtr *)&v), Rc: rc_access((Rc *)&v))
+
+#undef nil
+#define nil(v)                                                                                     \
+	_Generic((v), FatPtr: fat_ptr_is_nil((FatPtr *)&v), Rc: fat_ptr_is_nil(&((Rc *)&v)->impl))
+
 // Reference counter type
 typedef struct RcNc {
 	FatPtr impl;
@@ -26,6 +33,28 @@ typedef struct RcNc {
 typedef struct WeakNc {
 	FatPtr impl;
 } WeakNc;
+
+// meta data associated with the Rc.
+typedef struct RcMetaV {
+	u32 weak_count;			 // number of weak references
+	u32 strong_count;		 // number of strong references
+	bool atomic;			 // whether or not this is an atomic reference counter
+	void (*cleanup)(void *); // cleanup function to call when last Rc goes out of scope
+	u64 size;				 // size of data
+} RcMetaV;
+
+typedef struct RcNilImpl {
+	RcMetaV meta; // meta data for this Rc
+	u8 data[];	  // data held in the Rc
+} RcNilImpl;
+
+// Global constant that points to a all ones implementation of FatPtrImpl (so all bit flags are set)
+static const RcNilImpl rc_impl_null = {};
+
+#define rc_null                                                                                    \
+	(const Rc) {                                                                                   \
+		.impl = null                                                                               \
+	}
 
 // internal cleanup function for Rcs
 void rc_cleanup(RcNc *ptr);

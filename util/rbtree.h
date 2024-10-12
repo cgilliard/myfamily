@@ -41,7 +41,7 @@ typedef struct RBTreeNc {
 void rbtree_cleanup(RBTreeNc *ptr);
 
 static const RBTreeNc _nil_rbtree__ = {.impl = null};
-#define RBTREE_INITIALIZE _nil_rbtree__
+#define INIT_RBTREE _nil_rbtree__
 #define RBTree RBTreeNc __attribute__((warn_unused_result, cleanup(rbtree_cleanup)))
 #define RBTreeIsInit(tree) (!nil(tree.impl))
 

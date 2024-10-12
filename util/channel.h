@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_FAM_ERR__
-#define _BASE_FAM_ERR__
+#ifndef _UTIL_CHANNEL__
+#define _UTIL_CHANNEL__
 
-typedef enum FamErr {
-	Ok,
-	IllegalArgument,
-	AllocErr,
-	InitErr,
-	AlreadyInitialized,
-	IndexOutOfBounds,
-	IllegalState,
-	TooBig,
-	ResourceNotAvailable,
-	Permission,
-} FamErr;
+#include <util/rc.h>
 
-extern int fam_err;
+typedef struct ChannelNc {
+	Rc impl;
+} ChannelNc;
 
-#endif // _BASE_FAM_ERR__
+void channel_cleanup(ChannelNc *ptr);
+
+#define Channel ChannelNc __attribute__((warn_unused_result, cleanup(channel_cleanup)))
+
+#endif // _UTIL_CHANNEL__
