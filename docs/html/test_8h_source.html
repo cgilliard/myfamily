@@ -84,8 +84,8 @@ $(function() {
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// See the License for the specific language governing permissions and</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// limitations under the License.</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="chain__alloc_8h.html">base/chain_alloc.h</a>&gt;</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="colors_8h.html">base/colors.h</a>&gt;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="colors_8h.html">base/colors.h</a>&gt;</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="fam__alloc_8h.html">base/fam_alloc.h</a>&gt;</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="misc_8h.html">base/misc.h</a>&gt;</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="path_8h.html">base/path.h</a>&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="resources_8h.html">base/resources.h</a>&gt;</span></div>
@@ -107,7 +107,7 @@ $(function() {
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    static char *cur_name = &quot;&quot;;                                                                    \</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    static u64 log_fd = -1;                                                                        \</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    void tear_down() {                                                                             \</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        u64 slabs = alloc_count_default_slab_allocator();                                          \</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        u64 slabs = fam_alloc_count_tl_slab_allocator();                                           \</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        if (slabs != 0) {                                                                          \</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;            printf(&quot;[%s====%s] %sError in tear_down of test%s &quot;                                    \</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;                   &quot;&#39;%s%s%s&#39;.\n[%s====%s] Number of slab allocations [%lli] not &quot;                  \</div>
@@ -117,7 +117,7 @@ $(function() {
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            pid_t iPid = getpid();                                                                 \</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;            kill(iPid, SIGINT); <span class="comment">/* trigger failure */</span><span class="preprocessor">                                              \</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">        }                                                                                          \</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">        slabs = alloc_count_global_sync_allocator();                                               \</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">        slabs = fam_alloc_count_global_allocator();                                                \</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">        if (slabs != 0) {                                                                          \</span></div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">            printf(&quot;[%s====%s] %sError in tear_down of test%s &quot;</span>                                    \</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                   &quot;&#39;%s%s%s&#39;.\n[%s====%s] Number of slab global allocations [%lli] not &quot;           \</div>
@@ -127,7 +127,7 @@ $(function() {
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            pid_t iPid = getpid();                                                                 \</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            kill(iPid, SIGINT); <span class="comment">/* trigger failure */</span><span class="preprocessor">                                              \</span></div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">        }                                                                                          \</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">        cleanup_default_slab_allocator();                                                          \</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">        fam_alloc_cleanup();                                                                       \</span></div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">        u64 cur_alloc_count = mymalloc_sum();                                                      \</span></div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="preprocessor">        u64 cur_free_count = myfree_sum();                                                         \</span></div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">        u64 diff = cur_alloc_count - cur_free_count;                                               \</span></div>
@@ -199,8 +199,8 @@ $(function() {
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        }                                                                                          \</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    }                                                                                              \</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    void test_##suite##_##test(const Path *test_dir, const Path *resources_dir)</div>
-<div class="ttc" id="achain__alloc_8h_html"><div class="ttname"><a href="chain__alloc_8h.html">chain_alloc.h</a></div><div class="ttdoc">This file contains definitions for the chain_allocator.</div></div>
 <div class="ttc" id="acolors_8h_html"><div class="ttname"><a href="colors_8h.html">colors.h</a></div></div>
+<div class="ttc" id="afam__alloc_8h_html"><div class="ttname"><a href="fam__alloc_8h.html">fam_alloc.h</a></div></div>
 <div class="ttc" id="amisc_8h_html"><div class="ttname"><a href="misc_8h.html">misc.h</a></div></div>
 <div class="ttc" id="apath_8h_html"><div class="ttname"><a href="path_8h.html">path.h</a></div></div>
 <div class="ttc" id="aresources_8h_html"><div class="ttname"><a href="resources_8h.html">resources.h</a></div></div>
