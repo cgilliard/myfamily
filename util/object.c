@@ -33,10 +33,44 @@ RBTree *global_rbtree = NULL;
 _Thread_local u64 thread_local_namespace_next = 0;
 atomic_ullong global_namespace_next = 0;
 
-typedef struct ObjectKey {
+#define INIT_OBJECT_KEY {.key = null}
+
+typedef struct ObjectImpl {
+	FatPtr self;
+	u64 namespace;
+	ObjectType type;
+	bool send;
+} ObjectImpl;
+
+typedef struct ObjectFlags {
+	u8 flags;
+} ObjectFlags;
+
+typedef struct ObjectKeyNc {
 	FatPtr key;
 	u64 namespace;
-} ObjectKey;
+} ObjectKeyNc;
+
+void object_key_cleanup(ObjectKeyNc *ptr) {
+	if (ptr && !nil(ptr->key)) {
+		fam_free(&ptr->key);
+		ptr->key = null;
+	}
+}
+
+#define ObjectKey ObjectKeyNc __attribute__((warn_unused_result, cleanup(object_key_cleanup)))
+
+int object_key_for(ObjectKey *objkey, const Object *obj, const char *key) {
+	ObjectImpl *impl = $(obj->impl);
+	int ret = fam_alloc(&objkey->key, sizeof(char) * (1 + strlen(key)));
+	if (ret != 0)
+		return -1;
+
+	strcpy($(objkey->key), key);
+	objkey->namespace = impl->namespace;
+
+	return ret;
+}
 
 typedef struct ObjectValue {
 	ObjectType type;
@@ -44,8 +78,8 @@ typedef struct ObjectValue {
 } ObjectValue;
 
 int object_property_name_compare(const void *v1, const void *v2) {
-	const ObjectKey *k1 = v1;
-	const ObjectKey *k2 = v2;
+	const ObjectKeyNc *k1 = v1;
+	const ObjectKeyNc *k2 = v2;
 	if (k1->namespace != k2->namespace) {
 		if (k1->namespace < k2->namespace)
 			return -1;
@@ -106,18 +140,40 @@ int object_init_rbtrees() {
 #define OBJECT_FLAG_SEND 3
 #define OBJECT_FLAG_IMUT 4
 
-typedef struct ObjectImpl {
-	FatPtr self;
-	u64 namespace;
-
-} ObjectImpl;
-
-typedef struct ObjectFlags {
-	u8 flags;
-} ObjectFlags;
-
 void object_cleanup_rc(ObjectImpl *impl) {
 	printf("rc obj cleanup\n");
+
+	RBTreeNc *tree;
+	if (impl->send)
+		tree = global_rbtree;
+	else
+		tree = thread_local_rbtree;
+
+	RBTreeIterator itt;
+
+	ObjectKey start = INIT_OBJECT_KEY;
+	start.namespace = impl->namespace;
+	fam_alloc(&start.key, 1);
+	strcpy($(start.key), "");
+
+	ObjectKey end = INIT_OBJECT_KEY;
+	end.namespace = impl->namespace + 1;
+	fam_alloc(&end.key, 1);
+	strcpy($(end.key), "");
+
+	rbtree_iterator(tree, &itt, &start, true, &end, false);
+
+	loop {
+		RbTreeKeyValue kv;
+		if (!rbtree_iterator_next(&itt, &kv))
+			break;
+		ObjectKeyNc *k1 = kv.key;
+		ObjectValue *v1 = kv.value;
+		const char *v = $(k1->key);
+		rbtree_delete(tree, k1);
+		object_key_cleanup(k1);
+		fam_free(&v1->value);
+	}
 
 	if (!nil(impl->self)) {
 		fam_free(&impl->self);
@@ -188,7 +244,36 @@ int object_ref(Object *dst, Object *src) {
 int object_mut_ref(Object *dst, Object *src) {
 	return object_ref_impl(dst, src, false);
 }
-int object_create(Object *obj, bool send, ObjectType type, void *primitive) {
+
+RBTreeNc *object_tree_for(const Object *obj) {
+	ObjectFlags *flags = $(obj->flags);
+	BitFlags bf = {.flags = &flags->flags, .capacity = 1};
+	bool send = bitflags_check(&bf, OBJECT_FLAG_SEND);
+
+	RBTreeNc *tree;
+	if (send)
+		tree = global_rbtree;
+	else
+		tree = thread_local_rbtree;
+	return tree;
+}
+
+int object_set_property_string(Object *obj, const char *key, const char *value) {
+	ObjectImpl *impl = $(obj->impl);
+	RBTreeNc *tree = object_tree_for(obj);
+
+	ObjectKeyNc objkey = INIT_OBJECT_KEY;
+	object_key_for(&objkey, obj, key);
+
+	ObjectValue objvalue;
+	objvalue.type = ObjectTypeString;
+	fam_alloc(&objvalue.value, sizeof(char) * (1 + strlen(value)));
+	strcpy($(objvalue.value), value);
+
+	return rbtree_insert(tree, &objkey, &objvalue);
+}
+
+int object_create(Object *obj, bool send, ObjectType type, const void *primitive) {
 	if (object_init_rbtrees())
 		return -1;
 	if (obj == NULL) {
@@ -218,51 +303,59 @@ int object_create(Object *obj, bool send, ObjectType type, void *primitive) {
 	obj->flags = flags;
 
 	obj_flags->flags = 0;
+	impl->type = type;
+	impl->send = send;
 	BitFlags bf = {.flags = &obj_flags->flags, .capacity = 1};
 	bitflags_set(&bf, OBJECT_FLAG_SEND, send);
 
 	if (rc_build(&obj->impl, impl, sizeof(ObjectImpl), false, (void (*)(void *))object_cleanup_rc))
 		return -1;
 
+	if (type == ObjectTypeString) {
+		object_set_property_string(obj, "value", primitive);
+	}
+
 	return 0;
+}
+
+const char *object_as_string(const Object *obj) {
+	ObjectImpl *impl = $(obj->impl);
+	RBTreeNc *tree = object_tree_for(obj);
+
+	ObjectKey objkey = INIT_OBJECT_KEY;
+	object_key_for(&objkey, obj, "value");
+
+	const ObjectValue *valueret = rbtree_get(tree, &objkey);
+
+	if (valueret == NULL || valueret->type != ObjectTypeString)
+		return NULL;
+
+	return $(valueret->value);
 }
 
 int object_set_property(Object *obj, const char *key, const Object *value) {
-	return 0;
-}
+	ObjectKeyNc objkey = INIT_OBJECT_KEY;
+	object_key_for(&objkey, obj, key);
 
-int object_set_property_obj(Object *obj, const char *key, const Object *value) {
-	return 0;
-}
-
-int object_set_property_string(Object *obj, const char *key, const char *value) {
-	ObjectFlags *flags = $(obj->flags);
-	ObjectImpl *impl = $(obj->impl);
-	BitFlags bf = {.flags = &flags->flags, .capacity = 1};
-	bool send = bitflags_check(&bf, OBJECT_FLAG_SEND);
-
-	RBTreeNc *tree;
-	if (send)
-		tree = global_rbtree;
-	else
-		tree = thread_local_rbtree;
-
-	ObjectKey objkey;
 	ObjectValue objvalue;
+	objvalue.type = ObjectTypeObject;
 
-	fam_alloc(&objkey.key, sizeof(char) * (1 + strlen(key)));
-	strcpy($(objkey.key), key);
-	objkey.namespace = impl->namespace;
+	fam_alloc(&objvalue.value, sizeof(Object));
 
-	objvalue.type = ObjectTypeString;
-	fam_alloc(&objvalue.value, sizeof(char) * (1 + strlen(value)));
-	strcpy($(objvalue.value), value);
-
+	RBTreeNc *tree = object_tree_for(obj);
 	return rbtree_insert(tree, &objkey, &objvalue);
-}
 
-int object_set_property_u64(Object *obj, const char *key, const u64 value) {
-	return 0;
+	/*
+			ObjectKeyNc objkey = INIT_OBJECT_KEY;
+			object_key_for(&objkey, obj, key);
+
+			ObjectValue objvalue;
+			objvalue.type = ObjectTypeString;
+			fam_alloc(&objvalue.value, sizeof(char) * (1 + strlen(value)));
+			strcpy($(objvalue.value), value);
+
+			return rbtree_insert(tree, &objkey, &objvalue);
+	*/
 }
 
 const Object *object_get_property(const Object *obj, const char *key) {
@@ -281,7 +374,7 @@ void object_cleanup_rbtree(RBTree *ptr) {
 		RbTreeKeyValue kv;
 		if (!rbtree_iterator_next(&itt, &kv))
 			break;
-		ObjectKey *key = kv.key;
+		ObjectKeyNc *key = kv.key;
 		fam_free(&key->key);
 
 		ObjectValue *value = kv.value;

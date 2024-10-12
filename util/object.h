@@ -38,7 +38,7 @@ void object_cleanup(ObjectNc *ptr);
 int object_move(Object *dst, Object *src);
 int object_ref(Object *dst, Object *src);
 int object_mut_ref(Object *dst, Object *src);
-int object_create(Object *obj, bool send, ObjectType type, void *primitive);
+int object_create(Object *obj, bool send, ObjectType type, const void *primitive);
 int object_send(Object *obj, Channel *channel);
 int object_set_property(Object *obj, const char *key, const Object *value);
 const Object *object_get_property(const Object *obj, const char *key);

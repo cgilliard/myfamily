@@ -475,11 +475,12 @@ MyTest(util, test_object) {
 			memcpy($(fptr), &v, sizeof(u64));
 			fam_free(&fptr);
 			cr_assert(!object_create(&test, false, ObjectTypeObject, NULL));
-			u64 x = 19;
-			cr_assert(!object_create(&test3, false, ObjectTypeU64, &x));
+			cr_assert(!object_create(&test3, false, ObjectTypeString, "test123"));
 
 			cr_assert(!object_move(&test2, &test));
 			cr_assert(!object_set_property(&test2, "test", &test3));
+			const char *teststr = object_as_string(&test3);
+			printf("Test=%s\n", teststr);
 		}
 		cr_assert(!drop_count);
 		printf("no drop\n");
@@ -487,6 +488,14 @@ MyTest(util, test_object) {
 	// cr_assert(drop_count);
 	object_cleanup_global();
 }
+
+/*
+	var x = $();
+	$(x, "test", 1);
+	$(x, "test2", 10ULL);
+	$(x, "test3", "123");
+	debug("x.test={}", $(x, "test"));
+*/
 
 int drop_count2 = 0;
 
