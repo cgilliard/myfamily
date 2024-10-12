@@ -19,6 +19,7 @@
 #include <base/resources.h>
 #include <base/slabs.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // 2^24 -1 (3 bytes)
@@ -488,7 +489,7 @@ int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
 }
 
 void slab_data_free(SlabData *sd, const FatPtr *fptr, bool zeroed) {
-	u64 data_len;
+	u64 data_len = 0;
 	u8 *data_ptr;
 	if (sd->free_list == NULL) {
 		panic("free list not initialized (wrong slab allocator?)");
