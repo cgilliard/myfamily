@@ -25,6 +25,12 @@ typedef struct ObjectNc {
 	FatPtr flags;
 } ObjectNc;
 
+typedef enum ObjectType {
+	ObjectTypeString,
+	ObjectTypeU64,
+	ObjectTypeObject,
+} ObjectType;
+
 void object_cleanup(ObjectNc *ptr);
 
 #define Object ObjectNc __attribute__((warn_unused_result, cleanup(object_cleanup)))
@@ -32,7 +38,15 @@ void object_cleanup(ObjectNc *ptr);
 int object_move(Object *dst, Object *src);
 int object_ref(Object *dst, Object *src);
 int object_mut_ref(Object *dst, Object *src);
-int object_create(Object *obj, FatPtr data, void (*cleanup)(void *), bool send);
+int object_create(Object *obj, bool send, ObjectType type, void *primitive);
 int object_send(Object *obj, Channel *channel);
+int object_set_property(Object *obj, const char *key, const Object *value);
+const Object *object_get_property(const Object *obj, const char *key);
+const char *object_as_string(const Object *obj);
+u64 object_as_u64(const Object *obj);
+
+#ifdef TEST
+void object_cleanup_global();
+#endif // TEST
 
 #endif // _UTIL_OBJECT__

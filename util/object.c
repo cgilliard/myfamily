@@ -15,10 +15,91 @@
 #include <base/bitflags.h>
 #include <base/fam_alloc.h>
 #include <base/fam_err.h>
+#include <base/macro_utils.h>
+#include <base/panic.h>
 #include <base/resources.h>
+#include <pthread.h>
+#include <stdatomic.h>
 #include <stdio.h>
+#include <string.h>
 #include <util/object.h>
+#include <util/rbtree.h>
 #include <util/rc.h>
+
+pthread_mutex_t global_init_lock = PTHREAD_MUTEX_INITIALIZER;
+_Thread_local RBTree *thread_local_rbtree = NULL;
+RBTree *global_rbtree = NULL;
+
+_Thread_local u64 thread_local_namespace_next = 0;
+atomic_ullong global_namespace_next = 0;
+
+typedef struct ObjectKey {
+	FatPtr key;
+	u64 namespace;
+} ObjectKey;
+
+typedef struct ObjectValue {
+	ObjectType type;
+	FatPtr value;
+} ObjectValue;
+
+int object_property_name_compare(const void *v1, const void *v2) {
+	const ObjectKey *k1 = v1;
+	const ObjectKey *k2 = v2;
+	if (k1->namespace != k2->namespace) {
+		if (k1->namespace < k2->namespace)
+			return -1;
+		else
+			return 1;
+	} else
+		return strcmp($(k1->key), $(k2->key));
+}
+
+RBTree *init_default_rbtree(bool global) {
+	RBTreeNc *ret = mymalloc(sizeof(RBTree));
+	if (ret) {
+		if (rbtree_build(ret, sizeof(ObjectKey), sizeof(ObjectValue), object_property_name_compare,
+						 global))
+			return NULL;
+	}
+	return ret;
+}
+
+u64 object_namespace_id_next_local() {
+	u64 ret = thread_local_namespace_next;
+	thread_local_namespace_next++;
+	return ret;
+}
+
+u64 object_namespace_id_next_global() {
+	u64 ret = atomic_fetch_add(&global_namespace_next, 1);
+	return ret;
+}
+
+int object_init_rbtrees() {
+	int ret = 0;
+	if (global_rbtree == NULL) {
+		if (atomic_load(&global_namespace_next) == 0) {
+			pthread_mutex_lock(&global_init_lock);
+			if (atomic_load(&global_namespace_next) == 0) {
+				global_rbtree = init_default_rbtree(true);
+				if (global_rbtree == NULL) {
+					ret = -1;
+				} else
+					atomic_store(&global_namespace_next, 1);
+			}
+			pthread_mutex_unlock(&global_init_lock);
+		}
+	}
+
+	if (thread_local_rbtree == NULL) {
+		thread_local_rbtree = init_default_rbtree(false);
+		if (thread_local_rbtree == NULL)
+			ret = -1;
+	}
+
+	return ret;
+}
 
 #define OBJECT_FLAG_CONSUMED 1
 #define OBJECT_FLAG_NO_CLEANUP 2
@@ -27,9 +108,8 @@
 
 typedef struct ObjectImpl {
 	FatPtr self;
-	FatPtr data;
-	void (*cleanup)(void *);
-	u8 flags;
+	u64 namespace;
+
 } ObjectImpl;
 
 typedef struct ObjectFlags {
@@ -38,15 +118,10 @@ typedef struct ObjectFlags {
 
 void object_cleanup_rc(ObjectImpl *impl) {
 	printf("rc obj cleanup\n");
-	impl->cleanup($(impl->data));
 
 	if (!nil(impl->self)) {
 		fam_free(&impl->self);
 		impl->self = null;
-	}
-	if (!nil(impl->data)) {
-		fam_free(&impl->data);
-		impl->data = null;
 	}
 }
 
@@ -113,8 +188,10 @@ int object_ref(Object *dst, Object *src) {
 int object_mut_ref(Object *dst, Object *src) {
 	return object_ref_impl(dst, src, false);
 }
-int object_create(Object *obj, FatPtr data, void (*cleanup)(void *), bool send) {
-	if (obj == NULL || nil(data)) {
+int object_create(Object *obj, bool send, ObjectType type, void *primitive) {
+	if (object_init_rbtrees())
+		return -1;
+	if (obj == NULL) {
 		fam_err = IllegalArgument;
 		return -1;
 	}
@@ -133,9 +210,11 @@ int object_create(Object *obj, FatPtr data, void (*cleanup)(void *), bool send) 
 	}
 	ObjectImpl *impl = $(ptr);
 	ObjectFlags *obj_flags = $(flags);
-	impl->cleanup = cleanup;
 	impl->self = ptr;
-	impl->data = data;
+	if (send)
+		impl->namespace = object_namespace_id_next_global();
+	else
+		impl->namespace = object_namespace_id_next_local();
 	obj->flags = flags;
 
 	obj_flags->flags = 0;
@@ -147,6 +226,78 @@ int object_create(Object *obj, FatPtr data, void (*cleanup)(void *), bool send) 
 
 	return 0;
 }
+
+int object_set_property(Object *obj, const char *key, const Object *value) {
+	return 0;
+}
+
+int object_set_property_obj(Object *obj, const char *key, const Object *value) {
+	return 0;
+}
+
+int object_set_property_string(Object *obj, const char *key, const char *value) {
+	ObjectFlags *flags = $(obj->flags);
+	ObjectImpl *impl = $(obj->impl);
+	BitFlags bf = {.flags = &flags->flags, .capacity = 1};
+	bool send = bitflags_check(&bf, OBJECT_FLAG_SEND);
+
+	RBTreeNc *tree;
+	if (send)
+		tree = global_rbtree;
+	else
+		tree = thread_local_rbtree;
+
+	ObjectKey objkey;
+	ObjectValue objvalue;
+
+	fam_alloc(&objkey.key, sizeof(char) * (1 + strlen(key)));
+	strcpy($(objkey.key), key);
+	objkey.namespace = impl->namespace;
+
+	objvalue.type = ObjectTypeString;
+	fam_alloc(&objvalue.value, sizeof(char) * (1 + strlen(value)));
+	strcpy($(objvalue.value), value);
+
+	return rbtree_insert(tree, &objkey, &objvalue);
+}
+
+int object_set_property_u64(Object *obj, const char *key, const u64 value) {
+	return 0;
+}
+
+const Object *object_get_property(const Object *obj, const char *key) {
+	return NULL;
+}
+
 int object_send(Object *obj, Channel *channel) {
 	return 0;
 }
+
+#ifdef TEST
+void object_cleanup_rbtree(RBTree *ptr) {
+	RBTreeIterator itt;
+	rbtree_iterator(ptr, &itt, NULL, false, NULL, false);
+	loop {
+		RbTreeKeyValue kv;
+		if (!rbtree_iterator_next(&itt, &kv))
+			break;
+		ObjectKey *key = kv.key;
+		fam_free(&key->key);
+
+		ObjectValue *value = kv.value;
+		if (value->type == ObjectTypeString) {
+			fam_free(&value->value);
+		}
+	}
+	rbtree_cleanup(ptr);
+	myfree(ptr);
+}
+
+void object_cleanup_global() {
+	object_cleanup_rbtree(thread_local_rbtree);
+	object_cleanup_rbtree(global_rbtree);
+
+	thread_local_rbtree = NULL;
+	global_rbtree = NULL;
+}
+#endif // TEST
