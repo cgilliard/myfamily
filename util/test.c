@@ -467,10 +467,11 @@ void my_cleanup(u64 *obj) {
 
 MyTest(util, test_object) {
 	{
-		var test = INIT_OBJECT;
-		var test2 = INIT_OBJECT;
-		var test3 = INIT_OBJECT;
-		var test4 = INIT_OBJECT;
+		var test = NIL;
+		var test2 = NIL;
+		var test3 = NIL;
+		var test4 = NIL;
+		let aaaa = NIL;
 
 		// create an empty object
 		cr_assert(!object_create(&test, true, ObjectTypeObject, NULL));
@@ -499,7 +500,10 @@ MyTest(util, test_object) {
 		u64 test4_out;
 		cr_assert(!object_as_u64(&test4, &test4_out));
 		cr_assert_eq(test4_out, 101);
-		$(test3_out);
+		let test_out = $(test3_out);
+		cr_assert(!$objnil(test_out));
+		let test_nil = NIL;
+		cr_assert($objnil(test_nil));
 	}
 
 	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed

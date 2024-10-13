@@ -25,9 +25,11 @@
 #define $(v) $rc_impl(v)
 #endif // $object_impl
 
+// #ifndef obj_nil
 #undef nil
 #define nil(v)                                                                                     \
 	_Generic((v), FatPtr: fat_ptr_is_nil((FatPtr *)&v), Rc: fat_ptr_is_nil(&((Rc *)&v)->impl))
+// #endif // obj_nil
 
 // Reference counter type
 typedef struct RcNc {

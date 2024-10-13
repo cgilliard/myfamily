@@ -15,10 +15,9 @@
 #ifndef _UTIL_OBJECT__
 #define _UTIL_OBJECT__
 
+#include <base/panic.h>
 #include <util/channel.h>
 #include <util/rc.h>
-
-#define INIT_OBJECT {.impl = rc_null}
 
 typedef struct ObjectNc {
 	Rc impl;
@@ -48,9 +47,33 @@ int object_as_u64(const Object *obj, u64 *value);
 #define let const Object
 #define var Object
 
-#define $object_impl(v) _Generic((v), Object: ({ printf("hi\n"); }), default: $rc_impl(v))
+#define NIL {.impl = rc_null, .flags = null}
+
+#define $objnil(v)                                                                                 \
+	({                                                                                             \
+		const ObjectNc *ptr = (ObjectNc *)&(v);                                                    \
+		const RcNc *rc = &ptr->impl;                                                               \
+		fat_ptr_is_nil(&rc->impl);                                                                 \
+	})
+#define obj_nil(v)                                                                                 \
+	_Generic((v),                                                                                  \
+		Object: $objnil(v),                                                                        \
+		FatPtr: fat_ptr_is_nil((FatPtr *)&v),                                                      \
+		Rc: fat_ptr_is_nil(&((Rc *)&v)->impl),                                                     \
+		default: ({}))
+#undef nil
+#define nil(v) obj_nil(v)
+
+#define $object_impl(v)                                                                            \
+	_Generic((v),                                                                                  \
+		Object: ({                                                                                 \
+				 ObjectNc _ret__ = NIL;                                                            \
+				 object_create(&_ret__, false, ObjectTypeObject, NULL);                            \
+				 _ret__;                                                                           \
+			 }),                                                                                   \
+		default: $rc_impl(v))
 #undef $
-#define $(v) $object_impl(v)
+#define $(...) $object_impl(__VA_ARGS__)
 
 #ifdef TEST
 void object_cleanup_global();
