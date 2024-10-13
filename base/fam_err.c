@@ -14,7 +14,12 @@
 
 #include <base/fam_err.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+#ifdef __linux__
+#define getenv(x) secure_getenv(x)
+#endif // __linux__
 
 char *FamErrText[FamErrCount] = {"NoErrors",
 								 "IllegalArgument",
@@ -30,6 +35,7 @@ char *FamErrText[FamErrCount] = {"NoErrors",
 
 int fam_err = NoErrors;
 _Thread_local char fam_err_last[ERR_LEN] = {""};
+_Thread_local Backtrace thread_local_bt__;
 
 const char *get_err() {
 	strcpy(fam_err_last, FamErrText[fam_err]);
@@ -38,4 +44,9 @@ const char *get_err() {
 
 void print_err(const char *text) {
 	fprintf(stderr, "%s: %s\n", FamErrText[fam_err], text);
+	if (getenv("CBACKTRACE") != NULL) {
+		backtrace_print(&thread_local_bt__);
+	} else {
+		printf("Backtrace currently disabled set env variable CBACKTRACE to enable\n");
+	}
 }

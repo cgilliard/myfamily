@@ -15,6 +15,8 @@
 #ifndef _BASE_FAM_ERR__
 #define _BASE_FAM_ERR__
 
+#include <base/backtrace.h>
+
 #define ERR_LEN 1024
 
 extern _Thread_local char fam_err_last[ERR_LEN];
@@ -37,8 +39,17 @@ typedef enum FamErr {
 extern char *FamErrText[FamErrCount];
 
 extern int fam_err;
+extern _Thread_local Backtrace thread_local_bt__;
 
 void print_err(const char *text);
 const char *get_err();
+
+#define SetErr(err)                                                                                \
+	({                                                                                             \
+		fam_err = err;                                                                             \
+		if (getenv("CBACKTRACE") != NULL) {                                                        \
+			backtrace_generate(&thread_local_bt__);                                                \
+		}                                                                                          \
+	})
 
 #endif // _BASE_FAM_ERR__

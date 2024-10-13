@@ -564,7 +564,7 @@ MyTest(util, test_print_err) {
 
 		// cycle through and print all errors
 		for (int i = 0; i < FamErrCount; i++) {
-			fam_err = i;
+			SetErr(i);
 			print_err("generated error");
 		}
 		// reset fam_err to indicate no error
