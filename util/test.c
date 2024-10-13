@@ -500,12 +500,52 @@ MyTest(util, test_object) {
 		u64 test4_out;
 		cr_assert(!object_as_u64(&test4, &test4_out));
 		cr_assert_eq(test4_out, 101);
-		let test_out = $(test3_out);
-		cr_assert(!$objnil(test_out));
+		u64 x1 = 123ULL;
+		$(test4, "test", x1);
+		$(test4, "ax1", "ok");
+		let vvv = $();
+		$(test4, "ddd", vvv);
+		let q = $(test4, "ddd");
+
 		let test_nil = NIL;
-		cr_assert($objnil(test_nil));
+		cr_assert(nil(test_nil));
+		let v = $();
+		cr_assert(!nil(v));
 	}
 
+	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
+	object_cleanup_global();
+}
+
+MyTest(util, test_object2) {
+	{
+		// declare a mutable empty object
+		var a = $();
+		// set the 'abc' property of object a to a string value 'test'
+		$(a, "abc", "test");
+		// set the 'def' property of object a to a string value 'test2'
+		$(a, "def", "test2");
+		// get property 'abc' of the object a and store in an immutable object b
+		let b = $(a, "abc");
+
+		// assert that object b as a string is 'test'
+		cr_assert(!strcmp("test", $string(b)));
+
+		// get property 'def' of object a and store in an immutable object c
+		let c = $(a, "def");
+
+		// assert that object c as a string is 'test2'
+		cr_assert(!strcmp("test2", $string(c)));
+
+		// create a u64 value of 99
+		u64 v = 99;
+		// set the property 'ghi' of object a to the value of v (99)
+		$(a, "ghi", v);
+		// get property 'ghi' of object a and store in an immutable object d
+		let d = $(a, "ghi");
+		// assert that object d as a u64 is 99
+		cr_assert_eq($u64(d), 99);
+	}
 	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
 	object_cleanup_global();
 }
