@@ -40,6 +40,7 @@ typedef struct ObjectImpl {
 	u64 namespace;
 	ObjectType type;
 	bool send;
+	u32 property_count;
 } ObjectImpl;
 
 typedef struct ObjectFlags {
@@ -163,6 +164,13 @@ void object_cleanup_rc(ObjectImpl *impl) {
 
 	rbtree_iterator(tree, &itt, &start, true, &end, false);
 
+	printf("property count= %u\n", impl->property_count);
+	u64 pc = 1;
+	if (impl->property_count > pc)
+		pc = impl->property_count;
+	FatPtr *properties[pc];
+	u64 i = 0;
+
 	loop {
 		RbTreeKeyValue kv;
 		if (!rbtree_iterator_next(&itt, &kv))
@@ -170,9 +178,23 @@ void object_cleanup_rc(ObjectImpl *impl) {
 		ObjectKeyNc *k1 = kv.key;
 		ObjectValue *v1 = kv.value;
 		const char *v = $(k1->key);
-		rbtree_delete(tree, k1);
-		object_key_cleanup(k1);
-		fam_free(&v1->value);
+		properties[i] = &k1->key;
+		i++;
+	}
+
+	for (u64 j = 0; j < impl->property_count; j++) {
+		const char *v = $(*properties[j]);
+		ObjectKey k;
+		k.namespace = impl->namespace;
+		k.key = *properties[j];
+		ObjectValue *value = rbtree_get_mut(tree, &k);
+		if (value->type == ObjectTypeObject) {
+			object_cleanup($(value->value));
+		} else if (value->type == ObjectTypeString) {
+			printf("found a string\n");
+		}
+		fam_free(&value->value);
+		rbtree_delete(tree, &k);
 	}
 
 	if (!nil(impl->self)) {
@@ -199,11 +221,26 @@ void object_cleanup(ObjectNc *ptr) {
 	}
 }
 
-int object_move(Object *dst, Object *src) {
+int object_move(Object *dst, const Object *src) {
 	dst->flags = src->flags;
 	dst->impl = src->impl;
-	src->impl = rc_null;
-	src->flags = null;
+// note: we want to allow immutable objects to be moved. We therefore need to update their
+// flags which require this override.
+#if defined(__clang__)
+// Clang-specific pragma
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+#elif defined(__GNUC__) && !defined(__clang__)
+// GCC-specific pragma
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+#else
+#warning "Unknown compiler or platform. No specific warning pragmas applied."
+#endif
+	ObjectNc *src_mut = src;
+#pragma GCC diagnostic pop
+	src_mut->impl = rc_null;
+	src_mut->flags = null;
 	return 0;
 }
 
@@ -269,6 +306,7 @@ int object_set_property_string(Object *obj, const char *key, const char *value) 
 	objvalue.type = ObjectTypeString;
 	fam_alloc(&objvalue.value, sizeof(char) * (1 + strlen(value)));
 	strcpy($(objvalue.value), value);
+	impl->property_count++;
 
 	return rbtree_insert(tree, &objkey, &objvalue);
 }
@@ -304,6 +342,7 @@ int object_create(Object *obj, bool send, ObjectType type, const void *primitive
 
 	obj_flags->flags = 0;
 	impl->type = type;
+	impl->property_count = 0;
 	impl->send = send;
 	BitFlags bf = {.flags = &obj_flags->flags, .capacity = 1};
 	bitflags_set(&bf, OBJECT_FLAG_SEND, send);
@@ -334,6 +373,7 @@ const char *object_as_string(const Object *obj) {
 }
 
 int object_set_property(Object *obj, const char *key, const Object *value) {
+	ObjectImpl *impl = $(obj->impl);
 	ObjectKeyNc objkey = INIT_OBJECT_KEY;
 	object_key_for(&objkey, obj, key);
 
@@ -341,21 +381,12 @@ int object_set_property(Object *obj, const char *key, const Object *value) {
 	objvalue.type = ObjectTypeObject;
 
 	fam_alloc(&objvalue.value, sizeof(Object));
+	object_move($(objvalue.value), value);
 
 	RBTreeNc *tree = object_tree_for(obj);
+	impl->property_count++;
+	printf("set property\n");
 	return rbtree_insert(tree, &objkey, &objvalue);
-
-	/*
-			ObjectKeyNc objkey = INIT_OBJECT_KEY;
-			object_key_for(&objkey, obj, key);
-
-			ObjectValue objvalue;
-			objvalue.type = ObjectTypeString;
-			fam_alloc(&objvalue.value, sizeof(char) * (1 + strlen(value)));
-			strcpy($(objvalue.value), value);
-
-			return rbtree_insert(tree, &objkey, &objvalue);
-	*/
 }
 
 const Object *object_get_property(const Object *obj, const char *key) {
@@ -387,8 +418,14 @@ void object_cleanup_rbtree(RBTree *ptr) {
 }
 
 void object_cleanup_global() {
-	object_cleanup_rbtree(thread_local_rbtree);
-	object_cleanup_rbtree(global_rbtree);
+	if (thread_local_rbtree)
+		printf("size=%llu\n", rbtree_size(thread_local_rbtree));
+	if (global_rbtree)
+		printf("size=%llu\n", rbtree_size(global_rbtree));
+	if (thread_local_rbtree)
+		object_cleanup_rbtree(thread_local_rbtree);
+	if (global_rbtree)
+		object_cleanup_rbtree(global_rbtree);
 
 	thread_local_rbtree = NULL;
 	global_rbtree = NULL;

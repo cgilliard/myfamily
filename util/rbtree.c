@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <assert.h>
+#include <base/bitflags.h>
 #include <base/fam_alloc.h>
 #include <base/macro_utils.h>
 #include <base/panic.h>
@@ -72,41 +73,42 @@ typedef struct RBTreeNodePair {
 
 // utility macros
 #define BOOLEAN_SIZE 1
-#define VALUE_PAD(key_size) (16 - (key_size % 16))
+#define VALUE_PAD(key_size) (key_size % 16)
 #define DATA_SIZE(impl)                                                                            \
 	(sizeof(RBTreeNode) + (impl->key_size + impl->value_size) * sizeof(char) +                     \
 	 VALUE_PAD(impl->key_size) + BOOLEAN_SIZE)
 #define RED_OFFSET(key_size, value_size) (key_size + value_size + VALUE_PAD(key_size))
+#define RBTREE_FLAGS_RED 0
+#define INIT_FLAGS(impl, node)                                                                     \
+	({                                                                                             \
+		u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                                 \
+		node->data[offset] = 0;                                                                    \
+	})
+
 #define SET_RED(impl, node)                                                                        \
 	({                                                                                             \
-		if (node && node != NIL) {                                                                 \
-			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
-			*(bool *)(node->data + offset) = true;                                                 \
-		}                                                                                          \
+		u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                                 \
+		BitFlags bf = {.flags = (u8 *)(node->data + offset), .capacity = 1};                       \
+		bitflags_set(&bf, RBTREE_FLAGS_RED, true);                                                 \
 	})
 #define SET_BLACK(impl, node)                                                                      \
 	({                                                                                             \
-		if (node && node != NIL) {                                                                 \
-			u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                             \
-			*(bool *)(node->data + offset) = false;                                                \
-		}                                                                                          \
+		u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                                 \
+		BitFlags bf = {.flags = (u8 *)(node->data + offset), .capacity = 1};                       \
+		bitflags_set(&bf, RBTREE_FLAGS_RED, false);                                                \
 	})
 
 #define IS_RED(impl, node)                                                                         \
 	({                                                                                             \
-		bool ret = false;                                                                          \
 		u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                                 \
-		if (node && node != NIL && node->data && *(bool *)(node->data + offset))                   \
-			ret = true;                                                                            \
-		ret;                                                                                       \
+		BitFlags bf = {.flags = (u8 *)(node->data + offset), .capacity = 1};                       \
+		node != NIL &&bitflags_check(&bf, RBTREE_FLAGS_RED);                                       \
 	})
 #define IS_BLACK(impl, node)                                                                       \
 	({                                                                                             \
-		bool ret = true;                                                                           \
 		u64 offset = RED_OFFSET(impl->key_size, impl->value_size);                                 \
-		if (node && node != NIL && node->data && *(bool *)(node->data + offset))                   \
-			ret = false;                                                                           \
-		ret;                                                                                       \
+		BitFlags bf = {.flags = (u8 *)(node->data + offset), .capacity = 1};                       \
+		node == NIL || !bitflags_check(&bf, RBTREE_FLAGS_RED);                                     \
 	})
 
 #if defined(__clang__)
@@ -475,6 +477,7 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	// copy value
 	memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
 	// nodes are initially red
+	INIT_FLAGS(impl, node);
 	SET_RED(impl, node);
 
 #ifdef TEST
@@ -703,6 +706,28 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 
 // get operation
 const void *rbtree_get(const RBTree *ptr, const void *key) {
+	// validate input
+	if (ptr == NULL || key == NULL) {
+		errno = EINVAL;
+		return NULL;
+	}
+
+	// set impl
+	RBTreeImpl *impl = $(ptr->impl);
+	RBTreeNodePair pair;
+
+	// search for the pair.
+	rbtree_search(impl, key, &pair);
+
+	// if found return value, otherwise NULL.
+	if (pair.self != NIL)
+		return pair.self->data + impl->key_size + VALUE_PAD(impl->key_size);
+	else {
+		return NULL;
+	}
+}
+
+void *rbtree_get_mut(const RBTree *ptr, const void *key) {
 	// validate input
 	if (ptr == NULL || key == NULL) {
 		errno = EINVAL;

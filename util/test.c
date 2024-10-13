@@ -467,9 +467,9 @@ MyTest(util, test_object) {
 	{
 		Object test2 = INIT_OBJECT;
 		{
-			Object test;
-			Object test3;
-			FatPtr fptr;
+			Object test = INIT_OBJECT;
+			Object test3 = INIT_OBJECT;
+			FatPtr fptr = null;
 			fam_alloc(&fptr, sizeof(u64));
 			u64 v = 8;
 			memcpy($(fptr), &v, sizeof(u64));
@@ -478,9 +478,9 @@ MyTest(util, test_object) {
 			cr_assert(!object_create(&test3, false, ObjectTypeString, "test123"));
 
 			cr_assert(!object_move(&test2, &test));
-			cr_assert(!object_set_property(&test2, "test", &test3));
 			const char *teststr = object_as_string(&test3);
 			printf("Test=%s\n", teststr);
+			cr_assert(!object_set_property(&test2, "test", &test3));
 		}
 		cr_assert(!drop_count);
 		printf("no drop\n");
