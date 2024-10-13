@@ -85,9 +85,17 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structWeakNc.html">WeakNc</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRcMetaV.html">RcMetaV</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structRcNilImpl.html">RcNilImpl</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:ab217809047b5e19d1d0355c21f79f76d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rc_8h.html#ab217809047b5e19d1d0355c21f79f76d">nil</a>(<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>)&#160;&#160;&#160;	_Generic((<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), FatPtr: <a class="el" href="slabs_8h.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a>((<a class="el" href="structFatPtr.html">FatPtr</a> *)&amp;<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), Rc: <a class="el" href="slabs_8h.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a>(&amp;((<a class="el" href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a> *)&amp;<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>)-&gt;impl))</td></tr>
+<tr class="separator:ab217809047b5e19d1d0355c21f79f76d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d2815ad9048149013375578530283a8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rc_8h.html#a5d2815ad9048149013375578530283a8">rc_null</a></td></tr>
+<tr class="separator:a5d2815ad9048149013375578530283a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a23e583efdf471a92b947f0501d05cd2b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a>&#160;&#160;&#160;<a class="el" href="structRcNc.html">RcNc</a> <a class="el" href="rc_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="rc_8h.html#acca7aea424586190c240c659b9f8427f">rc_cleanup</a>)))</td></tr>
 <tr class="separator:a23e583efdf471a92b947f0501d05cd2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a105e8c786b647023e80909c81b8ee435"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rc_8h.html#a105e8c786b647023e80909c81b8ee435">Weak</a>&#160;&#160;&#160;<a class="el" href="structWeakNc.html">WeakNc</a> <a class="el" href="rc_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="rc_8h.html#a6f0f362baab05bcdd03bc8994558a99f">weak_cleanup</a>)))</td></tr>
@@ -99,6 +107,10 @@ Typedefs</h2></td></tr>
 <tr class="separator:a397ea7edebd4f5bd4db2cf8cca945aea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea3deec61394863eb8db33586659211c"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structWeakNc.html">WeakNc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rc_8h.html#aea3deec61394863eb8db33586659211c">WeakNc</a></td></tr>
 <tr class="separator:aea3deec61394863eb8db33586659211c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8db9227016c36b257dab11e6ee3068c"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structRcMetaV.html">RcMetaV</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rc_8h.html#af8db9227016c36b257dab11e6ee3068c">RcMetaV</a></td></tr>
+<tr class="separator:af8db9227016c36b257dab11e6ee3068c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8fccbdf9bd8988f5ed1316f75c3f49f"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structRcNilImpl.html">RcNilImpl</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rc_8h.html#ae8fccbdf9bd8988f5ed1316f75c3f49f">RcNilImpl</a></td></tr>
+<tr class="separator:ae8fccbdf9bd8988f5ed1316f75c3f49f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -118,6 +130,24 @@ Functions</h2></td></tr>
 <tr class="separator:adf1016d8baca3018e28acf790c3eff90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ab217809047b5e19d1d0355c21f79f76d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab217809047b5e19d1d0355c21f79f76d">&#9670;&nbsp;</a></span>nil</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define nil</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a></td><td>)</td>
+          <td>&#160;&#160;&#160;	_Generic((<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), FatPtr: <a class="el" href="slabs_8h.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a>((<a class="el" href="structFatPtr.html">FatPtr</a> *)&amp;<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), Rc: <a class="el" href="slabs_8h.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a>(&amp;((<a class="el" href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a> *)&amp;<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>)-&gt;impl))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a23e583efdf471a92b947f0501d05cd2b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a23e583efdf471a92b947f0501d05cd2b">&#9670;&nbsp;</a></span>Rc</h2>
 
@@ -130,6 +160,24 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+</div>
+</div>
+<a id="a5d2815ad9048149013375578530283a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d2815ad9048149013375578530283a8">&#9670;&nbsp;</a></span>rc_null</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define rc_null</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    (<span class="keyword">const</span> <a class="code" href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a>) {                                                                                   \</div>
+<div class="line">        .impl = <span class="keyword">null</span>                                                                               \</div>
+<div class="line">    }</div>
+<div class="ttc" id="arc_8h_html_a23e583efdf471a92b947f0501d05cd2b"><div class="ttname"><a href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a></div><div class="ttdeci">#define Rc</div><div class="ttdef"><b>Definition:</b> rc.h:62</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a105e8c786b647023e80909c81b8ee435"></a>
@@ -147,6 +195,20 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
+<a id="af8db9227016c36b257dab11e6ee3068c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8db9227016c36b257dab11e6ee3068c">&#9670;&nbsp;</a></span>RcMetaV</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structRcMetaV.html">RcMetaV</a> <a class="el" href="structRcMetaV.html">RcMetaV</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a397ea7edebd4f5bd4db2cf8cca945aea"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a397ea7edebd4f5bd4db2cf8cca945aea">&#9670;&nbsp;</a></span>RcNc</h2>
 
@@ -155,6 +217,20 @@ Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">typedef struct <a class="el" href="structRcNc.html">RcNc</a> <a class="el" href="structRcNc.html">RcNc</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae8fccbdf9bd8988f5ed1316f75c3f49f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8fccbdf9bd8988f5ed1316f75c3f49f">&#9670;&nbsp;</a></span>RcNilImpl</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structRcNilImpl.html">RcNilImpl</a> <a class="el" href="structRcNilImpl.html">RcNilImpl</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
