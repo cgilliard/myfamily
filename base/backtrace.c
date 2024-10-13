@@ -104,6 +104,8 @@ void backtrace_set_entry_values(BacktraceEntry *ptr, const char *name, const cha
 	ptr->start_bin = MAX_ENTRY_SIZE;
 	ptr->start_addr = MAX_ENTRY_SIZE;
 	ptr->start_file_path = MAX_ENTRY_SIZE;
+	for (int i = 0; i <= MAX_ENTRY_SIZE; i++)
+		ptr->data[i] = 0;
 
 	strncpy((char *)(ptr->data + offset), name, MAX_ENTRY_SIZE - offset);
 	offset += strlen(name) + 1;
@@ -128,10 +130,6 @@ void backtrace_set_entry_values(BacktraceEntry *ptr, const char *name, const cha
 	ptr->start_file_path = offset;
 	strncpy((char *)(ptr->data + offset), file_path, MAX_ENTRY_SIZE - offset);
 	offset += strlen(address) + 1;
-	if (offset > 0)
-		ptr->data[offset - 1] = 0;
-	else
-		ptr->data[0] = 0;
 }
 
 bool backtrace_add_entry(Backtrace *ptr, const char *name, const char *bin_name,
