@@ -150,63 +150,62 @@ int object_init_rbtrees() {
 #define OBJECT_FLAG_IMUT 4
 
 void object_cleanup_rc(ObjectImpl *impl) {
-
 	RBTreeNc *tree;
 	if (impl->send)
 		tree = global_rbtree;
 	else
 		tree = thread_local_rbtree;
 
-	RBTreeIterator itt;
+	if (impl->property_count) {
+		RBTreeIterator itt;
+		ObjectKey start = INIT_OBJECT_KEY;
+		start.namespace = impl->namespace;
+		fam_alloc(&start.key, 1);
+		strcpy($(start.key), "");
 
-	ObjectKey start = INIT_OBJECT_KEY;
-	start.namespace = impl->namespace;
-	fam_alloc(&start.key, 1);
-	strcpy($(start.key), "");
+		ObjectKey end = INIT_OBJECT_KEY;
+		end.namespace = impl->namespace + 1;
+		fam_alloc(&end.key, 1);
+		strcpy($(end.key), "");
 
-	ObjectKey end = INIT_OBJECT_KEY;
-	end.namespace = impl->namespace + 1;
-	fam_alloc(&end.key, 1);
-	strcpy($(end.key), "");
+		if (impl->send)
+			pthread_rwlock_wrlock(&global_rbtree_lock);
 
-	if (impl->send)
-		pthread_rwlock_wrlock(&global_rbtree_lock);
+		rbtree_iterator(tree, &itt, &start, true, &end, false);
 
-	rbtree_iterator(tree, &itt, &start, true, &end, false);
+		u64 pc = 1;
+		if (impl->property_count > pc)
+			pc = impl->property_count;
+		FatPtr *properties[pc];
+		u64 i = 0;
 
-	u64 pc = 1;
-	if (impl->property_count > pc)
-		pc = impl->property_count;
-	FatPtr *properties[pc];
-	u64 i = 0;
-
-	loop {
-		RbTreeKeyValue kv;
-		if (!rbtree_iterator_next(&itt, &kv))
-			break;
-		ObjectKeyNc *k1 = kv.key;
-		ObjectValue *v1 = kv.value;
-		const char *v = $(k1->key);
-		properties[i] = &k1->key;
-		i++;
-	}
-
-	for (u64 j = 0; j < impl->property_count; j++) {
-		const char *v = $(*properties[j]);
-		ObjectKey k;
-		k.namespace = impl->namespace;
-		k.key = *properties[j];
-		ObjectValue *value = rbtree_get_mut(tree, &k);
-		ObjectValueData *obj_data = $(value->ptr);
-		if (obj_data->type == ObjectTypeObject) {
-			object_cleanup((ObjectNc *)obj_data->value);
+		loop {
+			RbTreeKeyValue kv;
+			if (!rbtree_iterator_next(&itt, &kv))
+				break;
+			ObjectKeyNc *k1 = kv.key;
+			ObjectValue *v1 = kv.value;
+			const char *v = $(k1->key);
+			properties[i] = &k1->key;
+			i++;
 		}
-		fam_free(&value->ptr);
-		rbtree_remove(tree, &k);
-	}
+		for (u64 j = 0; j < impl->property_count; j++) {
+			const char *v = $(*properties[j]);
+			ObjectKey k;
+			k.namespace = impl->namespace;
+			k.key = *properties[j];
+			ObjectValue *value = rbtree_get_mut(tree, &k);
+			ObjectValueData *obj_data = $(value->ptr);
+			if (obj_data->type == ObjectTypeObject) {
+				object_cleanup((ObjectNc *)obj_data->value);
+			}
+			fam_free(&value->ptr);
+			rbtree_remove(tree, &k);
+		}
 
-	if (impl->send)
-		pthread_rwlock_unlock(&global_rbtree_lock);
+		if (impl->send)
+			pthread_rwlock_unlock(&global_rbtree_lock);
+	}
 
 	if (!nil(impl->self)) {
 		fam_free(&impl->self);
@@ -230,15 +229,17 @@ void object_cleanup(const ObjectNc *ptr) {
 #endif
 	ObjectNc *ptr_mut = ptr;
 #pragma GCC diagnostic pop
-	if (ptr_mut == NULL)
+	if (ptr_mut == NULL) {
 		return;
+	}
 	if (!nil(ptr_mut->flags)) {
 		fam_free(&ptr_mut->flags);
 		ptr_mut->flags = null;
 	}
 
-	if (nil(ptr_mut->impl))
+	if (nil(ptr_mut->impl)) {
 		return;
+	}
 	ObjectImpl *impl = $(ptr_mut->impl);
 	if (!nil(ptr_mut->impl)) {
 		rc_cleanup(&ptr_mut->impl);
