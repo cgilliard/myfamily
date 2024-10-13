@@ -36,25 +36,25 @@ MyTest(util, test_rbtree) {
 	RBTree test1 = INIT_RBTREE;
 	cr_assert(!RBTreeIsInit(test1));
 	u64 k, v;
-	rbtree_build(&test1, sizeof(u64), sizeof(u64), &u64_compare, false);
+	rbtree_create(&test1, sizeof(u64), sizeof(u64), &u64_compare, false);
 
 	cr_assert(RBTreeIsInit(test1));
 
 	k = 0;
 	v = 10;
-	rbtree_insert(&test1, &k, &v);
+	rbtree_put(&test1, &k, &v);
 
 	k = 1;
 	v = 11;
-	rbtree_insert(&test1, &k, &v);
+	rbtree_put(&test1, &k, &v);
 
 	k = 2;
 	v = 12;
-	rbtree_insert(&test1, &k, &v);
+	rbtree_put(&test1, &k, &v);
 
 	k = 3;
 	v = 13;
-	rbtree_insert(&test1, &k, &v);
+	rbtree_put(&test1, &k, &v);
 
 	k = 0;
 	const u64 *value1 = rbtree_get(&test1, &k);
@@ -82,13 +82,13 @@ MyTest(util, test_rbtree) {
 MyTest(util, validate_rbtree) {
 	RBTree valid1;
 	u64 k, v;
-	cr_assert(!rbtree_build(&valid1, sizeof(u64), sizeof(u64), u64_compare, false));
+	cr_assert(!rbtree_create(&valid1, sizeof(u64), sizeof(u64), u64_compare, false));
 
 	u64 max = 10;
 	for (u64 i = 0; i < max; i++) {
 		k = i;
 		v = i + 10;
-		cr_assert(!rbtree_insert(&valid1, &k, &v));
+		cr_assert(!rbtree_put(&valid1, &k, &v));
 		rbtree_validate(&valid1);
 	}
 	rbtree_validate(&valid1);
@@ -104,7 +104,7 @@ MyTest(util, validate_rbtree) {
 		k = i;
 		v = *(u64 *)rbtree_get(&valid1, &k);
 		cr_assert_eq(v, k + 10);
-		cr_assert(!rbtree_delete(&valid1, &k));
+		cr_assert(!rbtree_remove(&valid1, &k));
 		cr_assert_eq(rbtree_size(&valid1), (max - 1) - i);
 		rbtree_validate(&valid1);
 	}
@@ -116,7 +116,7 @@ MyTest(util, test_random_rbtree) {
 	u8 iv[16] = {};
 	psrng_test_seed(iv, key);
 	RBTree rand1;
-	cr_assert(!rbtree_build(&rand1, sizeof(u64), sizeof(u64), u64_compare, false));
+	cr_assert(!rbtree_create(&rand1, sizeof(u64), sizeof(u64), u64_compare, false));
 	u64 size = 4096;
 	u64 arr[size];
 	for (u64 i = 0; i < size; i++) {
@@ -125,7 +125,7 @@ MyTest(util, test_random_rbtree) {
 		arr[i] %= INT64_MAX;
 		u64 k = arr[i];
 		u64 v = k + 100;
-		cr_assert(!rbtree_insert(&rand1, &k, &v));
+		cr_assert(!rbtree_put(&rand1, &k, &v));
 		rbtree_validate(&rand1);
 		rbtree_max_depth(&rand1);
 	}
@@ -163,7 +163,7 @@ MyTest(util, test_random_rbtree) {
 	loop {
 		if (i == size)
 			break;
-		cr_assert(!rbtree_delete(&rand1, &arr[i]));
+		cr_assert(!rbtree_remove(&rand1, &arr[i]));
 		cr_assert_eq(rbtree_size(&rand1), (size - 1) - i);
 		rbtree_validate(&rand1);
 		i++;
@@ -176,33 +176,36 @@ MyTest(util, test_validation_and_other) {
 	fam_alloc(&p, 1);
 	fam_free(&p);
 	RBTree test1;
-	cr_assert(rbtree_build(NULL, 10, 10, u64_compare, false));
+	cr_assert(rbtree_create(NULL, 10, 10, u64_compare, false));
 	__is_debug_malloc = true;
-	cr_assert(rbtree_build(&test1, sizeof(u64), sizeof(u64), u64_compare, false));
+	cr_assert(rbtree_create(&test1, sizeof(u64), sizeof(u64), u64_compare, false));
 	__is_debug_malloc = false;
 	test1.impl = null;
 
-	cr_assert(!rbtree_build(&test1, sizeof(u64), sizeof(u64), u64_compare, false));
+	cr_assert(!rbtree_create(&test1, sizeof(u64), sizeof(u64), u64_compare, false));
 	__is_debug_malloc = true;
 	u64 k1 = 0;
 	u64 v1 = 0;
-	cr_assert(rbtree_insert(&test1, &k1, &v1));
+	cr_assert(rbtree_put(&test1, &k1, &v1));
 	__is_debug_malloc = false;
-	cr_assert(rbtree_insert(NULL, &k1, &v1));
+	cr_assert(rbtree_put(NULL, &k1, &v1));
 	cr_assert(rbtree_size(NULL));
-	cr_assert(!rbtree_insert(&test1, &k1, &v1));
+	cr_assert(!rbtree_put(&test1, &k1, &v1));
 	k1 = 1;
 	v1 = 0;
-	cr_assert(!rbtree_insert(&test1, &k1, &v1));
-	cr_assert(rbtree_insert(&test1, &k1, &v1));
+	cr_assert(!rbtree_put(&test1, &k1, &v1));
+	cr_assert_eq(*(u64 *)rbtree_get(&test1, &k1), 0);
+	v1 = 123;
+	cr_assert(!rbtree_put(&test1, &k1, &v1));
+	cr_assert_eq(*(u64 *)rbtree_get(&test1, &k1), 123);
 	k1 = 10;
 	v1 = 0;
-	cr_assert(rbtree_delete(&test1, &k1));
+	cr_assert(rbtree_remove(&test1, &k1));
 	cr_assert(!rbtree_get(NULL, NULL));
 	cr_assert_eq(rbtree_max_depth(&test1), 2);
 	rbtree_print(&test1);
 	cr_assert(rbtree_iterator(NULL, NULL, NULL, false, NULL, false));
-	rbtree_delete(NULL, NULL);
+	rbtree_remove(NULL, NULL);
 }
 
 MyTest(util, test_rbtree_random_ordered_insert_delete) {
@@ -212,7 +215,7 @@ MyTest(util, test_rbtree_random_ordered_insert_delete) {
 	psrng_test_seed(iv, key);
 
 	RBTree rand1;
-	cr_assert(!rbtree_build(&rand1, sizeof(u64), sizeof(u64), u64_compare, false));
+	cr_assert(!rbtree_create(&rand1, sizeof(u64), sizeof(u64), u64_compare, false));
 	u64 size = 10000;
 	u64 arr[size];
 	u64 arr_index = 0;
@@ -228,10 +231,10 @@ MyTest(util, test_rbtree_random_ordered_insert_delete) {
 			arr[arr_index] = 0;
 			psrng_rand_u64(&arr[arr_index]);
 			u64 v = arr[arr_index] + 123;
-			cr_assert(!rbtree_insert(&rand1, &arr[arr_index], &v));
+			cr_assert(!rbtree_put(&rand1, &arr[arr_index], &v));
 			arr_index++;
 		} else {
-			cr_assert(!rbtree_delete(&rand1, &arr[delete_index]));
+			cr_assert(!rbtree_remove(&rand1, &arr[delete_index]));
 
 			delete_index++;
 		}
@@ -252,14 +255,14 @@ MyTest(util, test_rbtree_random_ordered_insert_delete) {
 
 MyTest(util, test_rbtree_range_itt) {
 	RBTree tree1;
-	cr_assert(!rbtree_build(&tree1, sizeof(u64), sizeof(u64), u64_compare, false));
+	cr_assert(!rbtree_create(&tree1, sizeof(u64), sizeof(u64), u64_compare, false));
 	u64 size = 10;
 	u64 arr[size];
 	for (u64 i = 0; i < size; i++) {
 		arr[i] = (i * 3) + 1;
 		u64 k = arr[i];
 		u64 v = k + 100;
-		cr_assert(!rbtree_insert(&tree1, &k, &v));
+		cr_assert(!rbtree_put(&tree1, &k, &v));
 		rbtree_validate(&tree1);
 		rbtree_max_depth(&tree1);
 	}
@@ -309,7 +312,7 @@ int my_record_compare(const void *v1, const void *v2) {
 
 MyTest(util, test_string_compare_fn) {
 	RBTree tree1;
-	cr_assert(!rbtree_build(&tree1, sizeof(MyRecord), sizeof(u64), my_record_compare, false));
+	cr_assert(!rbtree_create(&tree1, sizeof(MyRecord), sizeof(u64), my_record_compare, false));
 	u64 size = 10;
 	for (u64 i = 0; i < size; i++) {
 		char s[101];
@@ -318,7 +321,7 @@ MyTest(util, test_string_compare_fn) {
 		strcpy(k.name, s);
 		k.value = i;
 		u64 v = k.value + 100;
-		cr_assert(!rbtree_insert(&tree1, &k, &v));
+		cr_assert(!rbtree_put(&tree1, &k, &v));
 		rbtree_validate(&tree1);
 		rbtree_max_depth(&tree1);
 	}

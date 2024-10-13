@@ -98,8 +98,8 @@ int object_property_name_compare(const void *v1, const void *v2) {
 RBTree *init_default_rbtree(bool global) {
 	RBTreeNc *ret = mymalloc(sizeof(RBTree));
 	if (ret) {
-		if (rbtree_build(ret, sizeof(ObjectKey), sizeof(ObjectValue), object_property_name_compare,
-						 global))
+		if (rbtree_create(ret, sizeof(ObjectKey), sizeof(ObjectValue), object_property_name_compare,
+						  global))
 			return NULL;
 	}
 	return ret;
@@ -196,7 +196,7 @@ void object_cleanup_rc(ObjectImpl *impl) {
 			object_cleanup((ObjectNc *)obj_data->value);
 		}
 		fam_free(&value->ptr);
-		rbtree_delete(tree, &k);
+		rbtree_remove(tree, &k);
 	}
 
 	if (!nil(impl->self)) {
@@ -325,7 +325,7 @@ int object_set_property_string(Object *obj, const char *key, const char *value) 
 	strcpy(objdata->value, value);
 	impl->property_count++;
 
-	return rbtree_insert(tree, &objkey, &objvalue);
+	return rbtree_put(tree, &objkey, &objvalue);
 }
 
 int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
@@ -342,7 +342,7 @@ int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
 	memcpy(objdata->value, value, sizeof(u64));
 	impl->property_count++;
 
-	return rbtree_insert(tree, &objkey, &objvalue);
+	return rbtree_put(tree, &objkey, &objvalue);
 }
 
 int object_create(Object *obj, bool send, ObjectType type, const void *primitive) {
@@ -444,7 +444,7 @@ int object_set_property(Object *obj, const char *key, const Object *value) {
 
 	RBTreeNc *tree = object_tree_for(obj);
 	impl->property_count++;
-	return rbtree_insert(tree, &objkey, &objvalue);
+	return rbtree_put(tree, &objkey, &objvalue);
 }
 
 Object object_get_property(const Object *obj, const char *key) {

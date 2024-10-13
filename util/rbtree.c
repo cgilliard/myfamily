@@ -304,7 +304,7 @@ void rbtree_right_rotate(RBTreeImpl *impl, RBTreeNode *x) {
 }
 
 // Fixup operation after insertion to maintain Red-Black Tree properties
-void rbtree_insert_fixup(RBTreeImpl *impl, RBTreeNode *k) {
+void rbtree_put_fixup(RBTreeImpl *impl, RBTreeNode *k) {
 	int i = 0;
 	// Loop until the node is the root or its parent's color is black
 	while (k != impl->root && IS_RED(impl, k->parent)) {
@@ -391,8 +391,8 @@ void rbtree_cleanup(RBTreeNc *ptr) {
 	}
 }
 
-int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
-				 int (*compare)(const void *, const void *), bool send) {
+int rbtree_create(RBTree *ptr, const u64 key_size, const u64 value_size,
+				  int (*compare)(const void *, const void *), bool send) {
 	// validate input
 	if (ptr == NULL || key_size == 0 || value_size == 0 || compare == NULL) {
 		errno = EINVAL;
@@ -424,7 +424,7 @@ int rbtree_build(RBTree *ptr, const u64 key_size, const u64 value_size,
 }
 
 // insert function
-int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
+int rbtree_put(RBTree *ptr, const void *key, const void *value) {
 	// validate input
 	if (ptr == NULL || key == NULL || value == NULL) {
 		errno = EINVAL;
@@ -441,12 +441,14 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	// perform search for the key
 	rbtree_search(impl, key, &pair);
 
-	// if it's already in the tree this is an error
-	if (pair.self != NIL)
-		return -1;
-
 	// retreive the data size
 	u64 size = DATA_SIZE(impl);
+	if (pair.self != NIL) {
+		node = $(pair.self->self);
+		memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
+		return 0;
+	}
+
 	FatPtr self;
 
 	// using fam_alloc allocate memory for this node
@@ -488,7 +490,7 @@ int rbtree_insert(RBTree *ptr, const void *key, const void *value) {
 	impl->size++;
 
 	// insert_fixup
-	rbtree_insert_fixup(impl, node);
+	rbtree_put_fixup(impl, node);
 
 	return 0;
 }
@@ -527,7 +529,7 @@ void set_color_based_on_parent(RBTreeImpl *impl, RBTreeNode *child, RBTreeNode *
 }
 
 // delete fixup
-void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RBTreeNode *x) {
+void rbtree_remove_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RBTreeNode *x) {
 	int i = 0;
 	while (x != impl->root && IS_BLACK(impl, x)) {
 		if (w == parent->right) {
@@ -606,7 +608,7 @@ void rbtree_delete_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RB
 }
 
 // delete function
-int rbtree_delete(RBTree *ptr, const void *key) {
+int rbtree_remove(RBTree *ptr, const void *key) {
 	// validate input
 	if (ptr == NULL || nil(ptr->impl) || key == NULL) {
 		errno = EINVAL;
@@ -685,7 +687,7 @@ int rbtree_delete(RBTree *ptr, const void *key) {
 	// if do_fixup, do fixup.
 	if (do_fixup) {
 		if (w != NIL && parent != NIL) {
-			rbtree_delete_fixup(impl, parent, w, x);
+			rbtree_remove_fixup(impl, parent, w, x);
 		} else {
 			// in these cases SET_BLACK only
 			if (impl->size > 1)

@@ -100,8 +100,8 @@ int faml_obj_key_compare(const void *v1, const void *v2) {
 int tl_faml_rbtree_init() {
 	{
 		ChainGuard _ = set_thread_local_slab_allocator();
-		rbtree_build(&tl_faml_rbtree, sizeof(FamlObjKey), sizeof(u64), &faml_obj_key_compare,
-					 false);
+		rbtree_create(&tl_faml_rbtree, sizeof(FamlObjKey), sizeof(u64), &faml_obj_key_compare,
+					  false);
 	}
 	return 0;
 }
@@ -265,8 +265,8 @@ int faml_prototype_put_u8(FamlPrototype *proto, const char *key, u8 value,
 	impl->type = FamlTypeObj;
 
 	if (!RBTreeIsInit(impl->tree)) {
-		if (rbtree_build(&impl->tree, sizeof(FamlObjKey), FAML_OBJ_VALUE_SIZE, faml_obj_key_compare,
-						 impl->send))
+		if (rbtree_create(&impl->tree, sizeof(FamlObjKey), FAML_OBJ_VALUE_SIZE,
+						  faml_obj_key_compare, impl->send))
 			return -1;
 	}
 
