@@ -53,8 +53,7 @@ typedef struct ObjectKeyNc {
 } ObjectKeyNc;
 
 void object_key_cleanup(ObjectKeyNc *ptr) {
-	FatPtr key = ptr->key;
-	if (ptr && !nil(key)) {
+	if (ptr && !nil(ptr->key)) {
 		fam_free(&ptr->key);
 		ptr->key = null;
 	}

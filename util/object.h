@@ -51,9 +51,9 @@ int object_as_u64(const Object *obj, u64 *value);
 
 #define $objnil(v)                                                                                 \
 	({                                                                                             \
-		const ObjectNc *ptr = (ObjectNc *)&(v);                                                    \
-		const RcNc *rc = &ptr->impl;                                                               \
-		fat_ptr_is_nil(&rc->impl);                                                                 \
+		/*const ObjectNc *_ptr__ = (ObjectNc *)&(v);  */                                           \
+		const RcNc *_rc__ = &((ObjectNc *)&(v))->impl;                                             \
+		fat_ptr_is_nil(&_rc__->impl);                                                              \
 	})
 #define obj_nil(v)                                                                                 \
 	_Generic((v),                                                                                  \
