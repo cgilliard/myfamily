@@ -65,7 +65,6 @@ void rc_cleanup(RcNc *ptr) {
 		weak_count = ((combined_counts & 0xFFFFFFFF00000000ULL) >> 32);
 		strong_count = (u32)(combined_counts & 0xFFFFFFFFULL);
 		strong_count--;
-		printf("rc cleanup with counts = %u, %u\n", weak_count, strong_count);
 	} else {
 		strong_count = --impl->meta.strong_count;
 		weak_count = impl->meta.weak_count;
