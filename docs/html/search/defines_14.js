@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['yellow_1479',['YELLOW',['../colors_8h.html#abf681265909adf3d3e8116c93c0ba179',1,'colors.h']]]
+  ['weak_1609',['Weak',['../rc_8h.html#a105e8c786b647023e80909c81b8ee435',1,'rc.h']]],
+  ['write_5fbuild_5fid_1610',['WRITE_BUILD_ID',['../main_8h.html#a191664d4632d30202b7cac784e969530',1,'main.h']]],
+  ['write_5fresource_5fto_5fdisk_1611',['WRITE_RESOURCE_TO_DISK',['../main_8h.html#a2aac8abe3f147c537d075c60f15c0342',1,'main.h']]]
 ];

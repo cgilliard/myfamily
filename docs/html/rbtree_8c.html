@@ -76,6 +76,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;assert.h&gt;</code><br />
+<code>#include &lt;<a class="el" href="bitflags_8h_source.html">base/bitflags.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="fam__alloc_8h_source.html">base/fam_alloc.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="macro__utils_8h_source.html">base/macro_utils.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="panic_8h_source.html">base/panic.h</a>&gt;</code><br />
@@ -99,12 +100,16 @@ Classes</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:aa8345c0d546bd02cd74763e0f3267bdd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#aa8345c0d546bd02cd74763e0f3267bdd">BOOLEAN_SIZE</a>&#160;&#160;&#160;1</td></tr>
 <tr class="separator:aa8345c0d546bd02cd74763e0f3267bdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14dea2f27cfefce402a1153c06813cf3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a14dea2f27cfefce402a1153c06813cf3">VALUE_PAD</a>(key_size)&#160;&#160;&#160;(16 - (key_size % 16))</td></tr>
+<tr class="memitem:a14dea2f27cfefce402a1153c06813cf3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a14dea2f27cfefce402a1153c06813cf3">VALUE_PAD</a>(key_size)&#160;&#160;&#160;(key_size % 16)</td></tr>
 <tr class="separator:a14dea2f27cfefce402a1153c06813cf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b05e591454d8c23bdb0ef018406e976"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a4b05e591454d8c23bdb0ef018406e976">DATA_SIZE</a>(impl)</td></tr>
 <tr class="separator:a4b05e591454d8c23bdb0ef018406e976"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4b9ba5c133a528e3674cae7d9341557"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a>(key_size,  value_size)&#160;&#160;&#160;(key_size + value_size + <a class="el" href="rbtree_8c.html#a14dea2f27cfefce402a1153c06813cf3">VALUE_PAD</a>(key_size))</td></tr>
 <tr class="separator:ac4b9ba5c133a528e3674cae7d9341557"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2eeca895e32ae3dcfb96629f51cefb7d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a2eeca895e32ae3dcfb96629f51cefb7d">RBTREE_FLAGS_RED</a>&#160;&#160;&#160;0</td></tr>
+<tr class="separator:a2eeca895e32ae3dcfb96629f51cefb7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab56131410ad1be23d82fb763327499c7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#ab56131410ad1be23d82fb763327499c7">INIT_FLAGS</a>(impl,  node)</td></tr>
+<tr class="separator:ab56131410ad1be23d82fb763327499c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bdc8566607a77af82b89087da780446"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a8bdc8566607a77af82b89087da780446">SET_RED</a>(impl,  node)</td></tr>
 <tr class="separator:a8bdc8566607a77af82b89087da780446"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e9ca2b6e2e707d00011caa99483ee81"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a1e9ca2b6e2e707d00011caa99483ee81">SET_BLACK</a>(impl,  node)</td></tr>
@@ -159,6 +164,8 @@ Functions</h2></td></tr>
 <tr class="separator:a6f2febac551af938e5345f5b0e30ca0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb0622d260fa94b7cc066f774fbc4cb4"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#abb0622d260fa94b7cc066f774fbc4cb4">rbtree_get</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const void *key)</td></tr>
 <tr class="separator:abb0622d260fa94b7cc066f774fbc4cb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a577911fcefd2f1bd68a639272de0ea99"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a577911fcefd2f1bd68a639272de0ea99">rbtree_get_mut</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const void *key)</td></tr>
+<tr class="separator:a577911fcefd2f1bd68a639272de0ea99"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8154979db8af8731ed7d4831ac1bf8c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ada59a0de67c44384c6faa924ca63c2aa">i64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a8154979db8af8731ed7d4831ac1bf8c3">rbtree_size</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr)</td></tr>
 <tr class="separator:a8154979db8af8731ed7d4831ac1bf8c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bdbe9fa0431ddf3d6b1e28cb5ecb466"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a8bdbe9fa0431ddf3d6b1e28cb5ecb466">rbtree_iterator</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, <a class="el" href="rbtree_8h.html#a78371e96afb8791aa6d4e7819a948dd1">RBTreeIterator</a> *iter, const void *start_key, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> start_inclusive, const void *end_key, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> end_inclusive)</td></tr>
@@ -196,9 +203,42 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    (<span class="keyword">sizeof</span>(<a class="code" href="rbtree_8c.html#a503c6fbe388e4f6e0381e94890d829a2">RBTreeNode</a>) + (impl-&gt;key_size + impl-&gt;value_size) * <span class="keyword">sizeof</span>(char) +                     \</div>
 <div class="line">     <a class="code" href="rbtree_8c.html#a14dea2f27cfefce402a1153c06813cf3">VALUE_PAD</a>(impl-&gt;key_size) + <a class="code" href="rbtree_8c.html#aa8345c0d546bd02cd74763e0f3267bdd">BOOLEAN_SIZE</a>)</div>
-<div class="ttc" id="arbtree_8c_html_a14dea2f27cfefce402a1153c06813cf3"><div class="ttname"><a href="rbtree_8c.html#a14dea2f27cfefce402a1153c06813cf3">VALUE_PAD</a></div><div class="ttdeci">#define VALUE_PAD(key_size)</div><div class="ttdef"><b>Definition:</b> rbtree.c:75</div></div>
+<div class="ttc" id="arbtree_8c_html_a14dea2f27cfefce402a1153c06813cf3"><div class="ttname"><a href="rbtree_8c.html#a14dea2f27cfefce402a1153c06813cf3">VALUE_PAD</a></div><div class="ttdeci">#define VALUE_PAD(key_size)</div><div class="ttdef"><b>Definition:</b> rbtree.c:76</div></div>
 <div class="ttc" id="arbtree_8c_html_a503c6fbe388e4f6e0381e94890d829a2"><div class="ttname"><a href="rbtree_8c.html#a503c6fbe388e4f6e0381e94890d829a2">RBTreeNode</a></div><div class="ttdeci">struct RBTreeNode RBTreeNode</div></div>
-<div class="ttc" id="arbtree_8c_html_aa8345c0d546bd02cd74763e0f3267bdd"><div class="ttname"><a href="rbtree_8c.html#aa8345c0d546bd02cd74763e0f3267bdd">BOOLEAN_SIZE</a></div><div class="ttdeci">#define BOOLEAN_SIZE</div><div class="ttdef"><b>Definition:</b> rbtree.c:74</div></div>
+<div class="ttc" id="arbtree_8c_html_aa8345c0d546bd02cd74763e0f3267bdd"><div class="ttname"><a href="rbtree_8c.html#aa8345c0d546bd02cd74763e0f3267bdd">BOOLEAN_SIZE</a></div><div class="ttdeci">#define BOOLEAN_SIZE</div><div class="ttdef"><b>Definition:</b> rbtree.c:75</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="ab56131410ad1be23d82fb763327499c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab56131410ad1be23d82fb763327499c7">&#9670;&nbsp;</a></span>INIT_FLAGS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define INIT_FLAGS</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">impl, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">node&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
+<div class="line">        u64 offset = <a class="code" href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a>(impl-&gt;key_size, impl-&gt;value_size);                                 \</div>
+<div class="line">        node-&gt;data[offset] = 0;                                                                    \</div>
+<div class="line">    })</div>
+<div class="ttc" id="arbtree_8c_html_ac4b9ba5c133a528e3674cae7d9341557"><div class="ttname"><a href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a></div><div class="ttdeci">#define RED_OFFSET(key_size, value_size)</div><div class="ttdef"><b>Definition:</b> rbtree.c:80</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -228,13 +268,13 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
-<div class="line">        bool ret = <span class="keyword">true</span>;                                                                           \</div>
 <div class="line">        u64 offset = <a class="code" href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a>(impl-&gt;key_size, impl-&gt;value_size);                                 \</div>
-<div class="line">        if (node &amp;&amp; node != NIL &amp;&amp; node-&gt;data &amp;&amp; *(<span class="keywordtype">bool</span> *)(node-&gt;data + offset))                   \</div>
-<div class="line">            ret = <span class="keyword">false</span>;                                                                           \</div>
-<div class="line">        ret;                                                                                       \</div>
+<div class="line">        BitFlags bf = {.flags = (<a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *)(node-&gt;data + offset), .capacity = 1};                       \</div>
+<div class="line">        node == NIL || !<a class="code" href="bitflags_8c.html#af953aa50ffdff7cb7877e51b519c6e02">bitflags_check</a>(&amp;bf, <a class="code" href="rbtree_8c.html#a2eeca895e32ae3dcfb96629f51cefb7d">RBTREE_FLAGS_RED</a>);                                     \</div>
 <div class="line">    })</div>
-<div class="ttc" id="arbtree_8c_html_ac4b9ba5c133a528e3674cae7d9341557"><div class="ttname"><a href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a></div><div class="ttdeci">#define RED_OFFSET(key_size, value_size)</div><div class="ttdef"><b>Definition:</b> rbtree.c:79</div></div>
+<div class="ttc" id="abitflags_8c_html_af953aa50ffdff7cb7877e51b519c6e02"><div class="ttname"><a href="bitflags_8c.html#af953aa50ffdff7cb7877e51b519c6e02">bitflags_check</a></div><div class="ttdeci">bool bitflags_check(BitFlags *ptr, u32 index)</div><div class="ttdef"><b>Definition:</b> bitflags.c:40</div></div>
+<div class="ttc" id="arbtree_8c_html_a2eeca895e32ae3dcfb96629f51cefb7d"><div class="ttname"><a href="rbtree_8c.html#a2eeca895e32ae3dcfb96629f51cefb7d">RBTREE_FLAGS_RED</a></div><div class="ttdeci">#define RBTREE_FLAGS_RED</div><div class="ttdef"><b>Definition:</b> rbtree.c:81</div></div>
+<div class="ttc" id="atypes_8h_html_aed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdef"><b>Definition:</b> types.h:20</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -264,13 +304,25 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
-<div class="line">        bool ret = <span class="keyword">false</span>;                                                                          \</div>
 <div class="line">        u64 offset = <a class="code" href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a>(impl-&gt;key_size, impl-&gt;value_size);                                 \</div>
-<div class="line">        if (node &amp;&amp; node != NIL &amp;&amp; node-&gt;data &amp;&amp; *(<span class="keywordtype">bool</span> *)(node-&gt;data + offset))                   \</div>
-<div class="line">            ret = <span class="keyword">true</span>;                                                                            \</div>
-<div class="line">        ret;                                                                                       \</div>
+<div class="line">        BitFlags bf = {.flags = (<a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *)(node-&gt;data + offset), .capacity = 1};                       \</div>
+<div class="line">        node != NIL &amp;&amp;<a class="code" href="bitflags_8c.html#af953aa50ffdff7cb7877e51b519c6e02">bitflags_check</a>(&amp;bf, <a class="code" href="rbtree_8c.html#a2eeca895e32ae3dcfb96629f51cefb7d">RBTREE_FLAGS_RED</a>);                                       \</div>
 <div class="line">    })</div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a2eeca895e32ae3dcfb96629f51cefb7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2eeca895e32ae3dcfb96629f51cefb7d">&#9670;&nbsp;</a></span>RBTREE_FLAGS_RED</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RBTREE_FLAGS_RED&#160;&#160;&#160;0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
 </div>
 </div>
 <a id="ac4b9ba5c133a528e3674cae7d9341557"></a>
@@ -327,10 +379,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
-<div class="line">        if (node &amp;&amp; node != NIL) {                                                                 \</div>
-<div class="line">            u64 offset = <a class="code" href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a>(impl-&gt;key_size, impl-&gt;value_size);                             \</div>
-<div class="line">            *(<span class="keywordtype">bool</span> *)(node-&gt;data + offset) = <span class="keyword">false</span>;                                                \</div>
-<div class="line">        }                                                                                          \</div>
+<div class="line">        u64 offset = <a class="code" href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a>(impl-&gt;key_size, impl-&gt;value_size);                                 \</div>
+<div class="line">        BitFlags bf = {.flags = (<a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *)(node-&gt;data + offset), .capacity = 1};                       \</div>
+<div class="line">        bitflags_set(&amp;bf, <a class="code" href="rbtree_8c.html#a2eeca895e32ae3dcfb96629f51cefb7d">RBTREE_FLAGS_RED</a>, <span class="keyword">false</span>);                                                \</div>
 <div class="line">    })</div>
 </div><!-- fragment -->
 </div>
@@ -361,10 +412,9 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
-<div class="line">        if (node &amp;&amp; node != NIL) {                                                                 \</div>
-<div class="line">            u64 offset = <a class="code" href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a>(impl-&gt;key_size, impl-&gt;value_size);                             \</div>
-<div class="line">            *(<span class="keywordtype">bool</span> *)(node-&gt;data + offset) = <span class="keyword">true</span>;                                                 \</div>
-<div class="line">        }                                                                                          \</div>
+<div class="line">        u64 offset = <a class="code" href="rbtree_8c.html#ac4b9ba5c133a528e3674cae7d9341557">RED_OFFSET</a>(impl-&gt;key_size, impl-&gt;value_size);                                 \</div>
+<div class="line">        BitFlags bf = {.flags = (<a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *)(node-&gt;data + offset), .capacity = 1};                       \</div>
+<div class="line">        bitflags_set(&amp;bf, <a class="code" href="rbtree_8c.html#a2eeca895e32ae3dcfb96629f51cefb7d">RBTREE_FLAGS_RED</a>, <span class="keyword">true</span>);                                                 \</div>
 <div class="line">    })</div>
 </div><!-- fragment -->
 </div>
@@ -380,7 +430,7 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">key_size</td><td>)</td>
-          <td>&#160;&#160;&#160;(16 - (key_size % 16))</td>
+          <td>&#160;&#160;&#160;(key_size % 16)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -631,6 +681,34 @@ Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">const void* rbtree_get </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>key</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a577911fcefd2f1bd68a639272de0ea99"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a577911fcefd2f1bd68a639272de0ea99">&#9670;&nbsp;</a></span>rbtree_get_mut()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* rbtree_get_mut </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *&#160;</td>
           <td class="paramname"><em>ptr</em>, </td>
