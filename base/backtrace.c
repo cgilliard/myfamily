@@ -19,6 +19,7 @@
 #include <base/types.h>
 #include <dlfcn.h>
 #include <execinfo.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -166,7 +167,7 @@ int backtrace_generate(Backtrace *ptr) {
 		Dl_info info;
 		dladdr(array[i], &info);
 		u64 addr = 0x0000000100000000 + info.dli_saddr - info.dli_fbase;
-		snprintf(address, 30, "0x%llu", addr);
+		snprintf(address, 30, "0x%" PRIx64 "", addr);
 		char function_name[strlen(info.dli_sname) + 1];
 		char bin_name[strlen(info.dli_fname) + 1];
 		strcpy(function_name, info.dli_sname);
