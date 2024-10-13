@@ -74,9 +74,14 @@ int object_key_for(ObjectKey *objkey, const Object *obj, const char *key) {
 }
 
 typedef struct ObjectValue {
-	ObjectType type;
-	FatPtr value;
+	FatPtr ptr;
 } ObjectValue;
+
+typedef struct ObjectValueData {
+	ObjectType type;
+	u32 pad;
+	char value[];
+} ObjectValueData;
 
 int object_property_name_compare(const void *v1, const void *v2) {
 	const ObjectKeyNc *k1 = v1;
@@ -142,7 +147,6 @@ int object_init_rbtrees() {
 #define OBJECT_FLAG_IMUT 4
 
 void object_cleanup_rc(ObjectImpl *impl) {
-	printf("rc obj cleanup\n");
 
 	RBTreeNc *tree;
 	if (impl->send)
@@ -164,7 +168,6 @@ void object_cleanup_rc(ObjectImpl *impl) {
 
 	rbtree_iterator(tree, &itt, &start, true, &end, false);
 
-	printf("property count= %u\n", impl->property_count);
 	u64 pc = 1;
 	if (impl->property_count > pc)
 		pc = impl->property_count;
@@ -188,12 +191,11 @@ void object_cleanup_rc(ObjectImpl *impl) {
 		k.namespace = impl->namespace;
 		k.key = *properties[j];
 		ObjectValue *value = rbtree_get_mut(tree, &k);
-		if (value->type == ObjectTypeObject) {
-			object_cleanup($(value->value));
-		} else if (value->type == ObjectTypeString) {
-			printf("found a string\n");
+		ObjectValueData *obj_data = $(value->ptr);
+		if (obj_data->type == ObjectTypeObject) {
+			object_cleanup((ObjectNc *)obj_data->value);
 		}
-		fam_free(&value->value);
+		fam_free(&value->ptr);
 		rbtree_delete(tree, &k);
 	}
 
@@ -203,21 +205,35 @@ void object_cleanup_rc(ObjectImpl *impl) {
 	}
 }
 
-void object_cleanup(ObjectNc *ptr) {
-	if (ptr == NULL)
+void object_cleanup(const ObjectNc *ptr) {
+	// note: we want to allow immutable objects to be moved. We therefore need to update their
+	// flags which require this override.
+#if defined(__clang__)
+	// Clang - specific pragma
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+#elif defined(__GNUC__) && !defined(__clang__)
+	// GCC - specific pragma
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+#else
+#warning "Unknown compiler or platform. No specific warning pragmas applied."
+#endif
+	ObjectNc *ptr_mut = ptr;
+#pragma GCC diagnostic pop
+	if (ptr_mut == NULL)
 		return;
-	printf("obj cleanup\n");
-	if (!nil(ptr->flags)) {
-		fam_free(&ptr->flags);
-		ptr->flags = null;
+	if (!nil(ptr_mut->flags)) {
+		fam_free(&ptr_mut->flags);
+		ptr_mut->flags = null;
 	}
 
-	if (nil(ptr->impl))
+	if (nil(ptr_mut->impl))
 		return;
-	ObjectImpl *impl = $(ptr->impl);
-	if (!nil(ptr->impl)) {
-		rc_cleanup(&ptr->impl);
-		ptr->impl.impl = null;
+	ObjectImpl *impl = $(ptr_mut->impl);
+	if (!nil(ptr_mut->impl)) {
+		rc_cleanup(&ptr_mut->impl);
+		ptr_mut->impl.impl = null;
 	}
 }
 
@@ -303,9 +319,27 @@ int object_set_property_string(Object *obj, const char *key, const char *value) 
 	object_key_for(&objkey, obj, key);
 
 	ObjectValue objvalue;
-	objvalue.type = ObjectTypeString;
-	fam_alloc(&objvalue.value, sizeof(char) * (1 + strlen(value)));
-	strcpy($(objvalue.value), value);
+	fam_alloc(&objvalue.ptr, sizeof(ObjectValueData));
+	ObjectValueData *objdata = $(objvalue.ptr);
+	objdata->type = ObjectTypeString;
+	strcpy(objdata->value, value);
+	impl->property_count++;
+
+	return rbtree_insert(tree, &objkey, &objvalue);
+}
+
+int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
+	ObjectImpl *impl = $(obj->impl);
+	RBTreeNc *tree = object_tree_for(obj);
+
+	ObjectKeyNc objkey = INIT_OBJECT_KEY;
+	object_key_for(&objkey, obj, key);
+
+	ObjectValue objvalue;
+	fam_alloc(&objvalue.ptr, sizeof(ObjectValueData));
+	ObjectValueData *objdata = $(objvalue.ptr);
+	objdata->type = ObjectTypeU64;
+	memcpy(objdata->value, value, sizeof(u64));
 	impl->property_count++;
 
 	return rbtree_insert(tree, &objkey, &objvalue);
@@ -352,6 +386,8 @@ int object_create(Object *obj, bool send, ObjectType type, const void *primitive
 
 	if (type == ObjectTypeString) {
 		object_set_property_string(obj, "value", primitive);
+	} else if (type == ObjectTypeU64) {
+		object_set_property_u64(obj, "value", primitive);
 	}
 
 	return 0;
@@ -365,11 +401,33 @@ const char *object_as_string(const Object *obj) {
 	object_key_for(&objkey, obj, "value");
 
 	const ObjectValue *valueret = rbtree_get(tree, &objkey);
+	const ObjectValueData *valueretdata = $(valueret->ptr);
 
-	if (valueret == NULL || valueret->type != ObjectTypeString)
+	if (valueret == NULL || valueretdata->type != ObjectTypeString)
 		return NULL;
 
-	return $(valueret->value);
+	return valueretdata->value;
+}
+
+int object_as_u64(const Object *obj, u64 *value) {
+	int ret = 0;
+
+	ObjectImpl *impl = $(obj->impl);
+	RBTreeNc *tree = object_tree_for(obj);
+
+	ObjectKey objkey = INIT_OBJECT_KEY;
+	object_key_for(&objkey, obj, "value");
+
+	const ObjectValue *valueret = rbtree_get(tree, &objkey);
+	const ObjectValueData *valueretdata = $(valueret->ptr);
+
+	if (valueret == NULL || valueretdata->type != ObjectTypeU64)
+		ret = -1;
+	else {
+		memcpy(value, valueretdata->value, sizeof(u64));
+	}
+
+	return ret;
 }
 
 int object_set_property(Object *obj, const char *key, const Object *value) {
@@ -378,19 +436,50 @@ int object_set_property(Object *obj, const char *key, const Object *value) {
 	object_key_for(&objkey, obj, key);
 
 	ObjectValue objvalue;
-	objvalue.type = ObjectTypeObject;
-
-	fam_alloc(&objvalue.value, sizeof(Object));
-	object_move($(objvalue.value), value);
+	fam_alloc(&objvalue.ptr, sizeof(ObjectValueData) + sizeof(Object));
+	ObjectValueData *ovd = $(objvalue.ptr);
+	ovd->type = ObjectTypeObject;
+	ObjectNc *obj_ptr = (Object *)ovd->value;
+	object_move(obj_ptr, value);
 
 	RBTreeNc *tree = object_tree_for(obj);
 	impl->property_count++;
-	printf("set property\n");
 	return rbtree_insert(tree, &objkey, &objvalue);
 }
 
-const Object *object_get_property(const Object *obj, const char *key) {
-	return NULL;
+Object object_get_property(const Object *obj, const char *key) {
+	ObjectImpl *impl = $(obj->impl);
+	ObjectKey objkey = INIT_OBJECT_KEY;
+	object_key_for(&objkey, obj, key);
+
+	RBTreeNc *tree = object_tree_for(obj);
+
+	const ObjectValue *value = rbtree_get(tree, &objkey);
+
+	// TODO: when we have option, use it here
+	if (value == NULL)
+		panic("Object property not found!");
+
+	const ObjectValueData *value_data = $(value->ptr);
+	// const ObjectNc *ret = (ObjectNc *)value_data->value;
+	const ObjectNc ref;
+
+// note: we want to return a ref here. flags which require this override.
+#if defined(__clang__)
+// Clang-specific pragma
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+#elif defined(__GNUC__) && !defined(__clang__)
+// GCC-specific pragma
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+#else
+#warning "Unknown compiler or platform. No specific warning pragmas applied."
+#endif
+	object_ref(&ref, (ObjectNc *)value_data->value);
+#pragma GCC diagnostic pop
+
+	return ref;
 }
 
 int object_send(Object *obj, Channel *channel) {
@@ -409,8 +498,9 @@ void object_cleanup_rbtree(RBTree *ptr) {
 		fam_free(&key->key);
 
 		ObjectValue *value = kv.value;
-		if (value->type == ObjectTypeString) {
-			fam_free(&value->value);
+		ObjectValueData *ovd = $(value->ptr);
+		if (ovd->type == ObjectTypeString || ovd->type == ObjectTypeU64) {
+			fam_free(&value->ptr);
 		}
 	}
 	rbtree_cleanup(ptr);

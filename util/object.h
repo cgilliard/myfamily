@@ -31,7 +31,7 @@ typedef enum ObjectType {
 	ObjectTypeObject,
 } ObjectType;
 
-void object_cleanup(ObjectNc *ptr);
+void object_cleanup(const ObjectNc *ptr);
 
 #define Object ObjectNc __attribute__((warn_unused_result, cleanup(object_cleanup)))
 
@@ -41,9 +41,16 @@ int object_mut_ref(Object *dst, Object *src);
 int object_create(Object *obj, bool send, ObjectType type, const void *primitive);
 int object_send(Object *obj, Channel *channel);
 int object_set_property(Object *obj, const char *key, const Object *value);
-const Object *object_get_property(const Object *obj, const char *key);
+Object object_get_property(const Object *obj, const char *key);
 const char *object_as_string(const Object *obj);
-u64 object_as_u64(const Object *obj);
+int object_as_u64(const Object *obj, u64 *value);
+
+#define let const Object
+#define var Object
+
+#define $object_impl(v) _Generic((v), Object: ({ printf("hi\n"); }), default: $rc_impl(v))
+#undef $
+#define $(v) $object_impl(v)
 
 #ifdef TEST
 void object_cleanup_global();

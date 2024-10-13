@@ -17,8 +17,13 @@
 
 #include <base/slabs.h>
 
+#define $rc_impl(v)                                                                                \
+	_Generic((v), FatPtr: fat_ptr_data((FatPtr *)&v), Rc: rc_access((Rc *)&v), default: ({}))
+
+#ifndef $object_impl
 #undef $
-#define $(v) _Generic((v), FatPtr: fat_ptr_data((FatPtr *)&v), Rc: rc_access((Rc *)&v))
+#define $(v) $rc_impl(v)
+#endif // $object_impl
 
 #undef nil
 #define nil(v)                                                                                     \

@@ -19,7 +19,6 @@
 #include <string.h>
 #include <util/object.h>
 #include <util/rbtree.h>
-#include <util/rc.h>
 
 MySuite(util);
 
@@ -465,36 +464,62 @@ void my_cleanup(u64 *obj) {
 
 MyTest(util, test_object) {
 	{
-		Object test2 = INIT_OBJECT;
-		{
-			Object test = INIT_OBJECT;
-			Object test3 = INIT_OBJECT;
-			FatPtr fptr = null;
-			fam_alloc(&fptr, sizeof(u64));
-			u64 v = 8;
-			memcpy($(fptr), &v, sizeof(u64));
-			fam_free(&fptr);
-			cr_assert(!object_create(&test, false, ObjectTypeObject, NULL));
-			cr_assert(!object_create(&test3, false, ObjectTypeString, "test123"));
+		var test = INIT_OBJECT;
+		var test2 = INIT_OBJECT;
+		var test3 = INIT_OBJECT;
+		var test4 = INIT_OBJECT;
 
-			cr_assert(!object_move(&test2, &test));
-			const char *teststr = object_as_string(&test3);
-			printf("Test=%s\n", teststr);
-			cr_assert(!object_set_property(&test2, "test", &test3));
-		}
-		cr_assert(!drop_count);
-		printf("no drop\n");
+		// create an empty object
+		cr_assert(!object_create(&test, true, ObjectTypeObject, NULL));
+
+		// create a string object
+		cr_assert(!object_create(&test3, true, ObjectTypeString, "test123"));
+
+		// create a u64 object
+		u64 v2 = 101;
+		cr_assert(!object_create(&test4, false, ObjectTypeU64, &v2));
+
+		// move test to test2
+		cr_assert(!object_move(&test2, &test));
+
+		// compare test3 to expected value
+		cr_assert(!strcmp("test123", object_as_string(&test3)));
+
+		// set proprerty 'test' to test3 object.
+		cr_assert(!object_set_property(&test2, "test", &test3));
+
+		// confirm that the property is set by calling object_get_property and object_as_string
+		let test3_out = object_get_property(&test2, "test");
+		cr_assert(!strcmp(object_as_string(&test3_out), "test123"));
+
+		// confirm the u64 object through object_as_u64
+		u64 test4_out;
+		cr_assert(!object_as_u64(&test4, &test4_out));
+		cr_assert_eq(test4_out, 101);
+		$(test3_out);
 	}
-	// cr_assert(drop_count);
+
+	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
 	object_cleanup_global();
 }
 
 /*
-	var x = $();
-	$(x, "test", 1);
-	$(x, "test2", 10ULL);
-	$(x, "test3", "123");
-	debug("x.test={}", $(x, "test"));
+	var test = $();
+	var test3 = $("test123");
+	var test4 = $(101ULL);
+	move(&test2, &test);
+	cr_assert(!strcmp("test123", $(test2)));
+	$(test2, "test", test3);
+	let test3_out = $(test2, "test");
+	cr_assert(!strcmp($(test3_out), "test123"));
+	cr_assert_eq($(test4), 101ULL);
+*/
+/*
+var x = $();
+$(x, "test", 1);
+$(x, "test2", 10ULL);
+$(x, "test3", "123");
+debug("x.test={}", $(x, "test"));
 */
 
 int drop_count2 = 0;
