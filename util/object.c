@@ -27,6 +27,7 @@
 #include <util/rc.h>
 
 pthread_mutex_t global_init_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_rwlock_t global_rbtree_lock = PTHREAD_MUTEX_INITIALIZER;
 _Thread_local RBTree *thread_local_rbtree = NULL;
 RBTree *global_rbtree = NULL;
 
@@ -120,6 +121,7 @@ int object_init_rbtrees() {
 	int ret = 0;
 	if (global_rbtree == NULL) {
 		if (atomic_load(&global_namespace_next) == 0) {
+			pthread_rwlock_wrlock(&global_rbtree_lock);
 			pthread_mutex_lock(&global_init_lock);
 			if (atomic_load(&global_namespace_next) == 0) {
 				global_rbtree = init_default_rbtree(true);
@@ -129,6 +131,7 @@ int object_init_rbtrees() {
 					atomic_store(&global_namespace_next, 1);
 			}
 			pthread_mutex_unlock(&global_init_lock);
+			pthread_rwlock_unlock(&global_rbtree_lock);
 		}
 	}
 
@@ -166,6 +169,9 @@ void object_cleanup_rc(ObjectImpl *impl) {
 	fam_alloc(&end.key, 1);
 	strcpy($(end.key), "");
 
+	if (impl->send)
+		pthread_rwlock_wrlock(&global_rbtree_lock);
+
 	rbtree_iterator(tree, &itt, &start, true, &end, false);
 
 	u64 pc = 1;
@@ -198,6 +204,9 @@ void object_cleanup_rc(ObjectImpl *impl) {
 		fam_free(&value->ptr);
 		rbtree_remove(tree, &k);
 	}
+
+	if (impl->send)
+		pthread_rwlock_unlock(&global_rbtree_lock);
 
 	if (!nil(impl->self)) {
 		fam_free(&impl->self);
@@ -325,7 +334,12 @@ int object_set_property_string(Object *obj, const char *key, const char *value) 
 	strcpy(objdata->value, value);
 	impl->property_count++;
 
-	return rbtree_put(tree, &objkey, &objvalue);
+	if (impl->send)
+		pthread_rwlock_wrlock(&global_rbtree_lock);
+	int ret = rbtree_put(tree, &objkey, &objvalue);
+	if (impl->send)
+		pthread_rwlock_unlock(&global_rbtree_lock);
+	return ret;
 }
 
 int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
@@ -342,7 +356,12 @@ int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
 	memcpy(objdata->value, value, sizeof(u64));
 	impl->property_count++;
 
-	return rbtree_put(tree, &objkey, &objvalue);
+	if (impl->send)
+		pthread_rwlock_wrlock(&global_rbtree_lock);
+	int ret = rbtree_put(tree, &objkey, &objvalue);
+	if (impl->send)
+		pthread_rwlock_unlock(&global_rbtree_lock);
+	return ret;
 }
 
 int object_create(Object *obj, bool send, ObjectType type, const void *primitive) {
@@ -400,7 +419,11 @@ const char *object_as_string(const Object *obj) {
 	ObjectKey objkey = INIT_OBJECT_KEY;
 	object_key_for(&objkey, obj, "value");
 
+	if (impl->send)
+		pthread_rwlock_rdlock(&global_rbtree_lock);
 	const ObjectValue *valueret = rbtree_get(tree, &objkey);
+	if (impl->send)
+		pthread_rwlock_unlock(&global_rbtree_lock);
 	const ObjectValueData *valueretdata = $(valueret->ptr);
 
 	if (valueret == NULL || valueretdata->type != ObjectTypeString)
@@ -418,7 +441,11 @@ int object_as_u64(const Object *obj, u64 *value) {
 	ObjectKey objkey = INIT_OBJECT_KEY;
 	object_key_for(&objkey, obj, "value");
 
+	if (impl->send)
+		pthread_rwlock_rdlock(&global_rbtree_lock);
 	const ObjectValue *valueret = rbtree_get(tree, &objkey);
+	if (impl->send)
+		pthread_rwlock_unlock(&global_rbtree_lock);
 	const ObjectValueData *valueretdata = $(valueret->ptr);
 
 	if (valueret == NULL || valueretdata->type != ObjectTypeU64)
@@ -436,7 +463,10 @@ int object_set_property(Object *obj, const char *key, const Object *value) {
 	object_key_for(&objkey, obj, key);
 
 	ObjectValue objvalue;
-	fam_alloc(&objvalue.ptr, sizeof(ObjectValueData) + sizeof(Object));
+	if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData) + sizeof(Object))) {
+		return -1;
+	}
+
 	ObjectValueData *ovd = $(objvalue.ptr);
 	ovd->type = ObjectTypeObject;
 	ObjectNc *obj_ptr = (Object *)ovd->value;
@@ -444,7 +474,13 @@ int object_set_property(Object *obj, const char *key, const Object *value) {
 
 	RBTreeNc *tree = object_tree_for(obj);
 	impl->property_count++;
-	return rbtree_put(tree, &objkey, &objvalue);
+
+	if (impl->send)
+		pthread_rwlock_wrlock(&global_rbtree_lock);
+	int ret = rbtree_put(tree, &objkey, &objvalue);
+	if (impl->send)
+		pthread_rwlock_unlock(&global_rbtree_lock);
+	return ret;
 }
 
 Object object_get_property(const Object *obj, const char *key) {
@@ -454,11 +490,16 @@ Object object_get_property(const Object *obj, const char *key) {
 
 	RBTreeNc *tree = object_tree_for(obj);
 
+	if (impl->send)
+		pthread_rwlock_rdlock(&global_rbtree_lock);
 	const ObjectValue *value = rbtree_get(tree, &objkey);
+	if (impl->send)
+		pthread_rwlock_unlock(&global_rbtree_lock);
 
-	// TODO: when we have option, use it here
-	if (value == NULL)
-		panic("Object property not found!");
+	if (value == NULL) {
+		ObjectNc ret = NIL;
+		return ret;
+	}
 
 	const ObjectValueData *value_data = $(value->ptr);
 	// const ObjectNc *ret = (ObjectNc *)value_data->value;
