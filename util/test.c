@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/fam_err.h>
 #include <base/macro_utils.h>
 #include <base/test.h>
 #include <crypto/psrng.h>
@@ -550,24 +551,40 @@ MyTest(util, test_object2) {
 	object_cleanup_global();
 }
 
-/*
-	var test = $();
-	var test3 = $("test123");
-	var test4 = $(101ULL);
-	move(&test2, &test);
-	cr_assert(!strcmp("test123", $(test2)));
-	$(test2, "test", test3);
-	let test3_out = $(test2, "test");
-	cr_assert(!strcmp($(test3_out), "test123"));
-	cr_assert_eq($(test4), 101ULL);
-*/
-/*
-var x = $();
-$(x, "test", 1);
-$(x, "test2", 10ULL);
-$(x, "test3", "123");
-debug("x.test={}", $(x, "test"));
-*/
+MyTest(util, test_print_err) {
+	{
+		// instnatiate an object
+		let x = $();
+		// check for errors if x is 'nil' an error occured.
+		if (nil(x)) {
+			// print_err prints the associated 'fam_err' and a message.
+			print_err("object creation error");
+			exit(-1);
+		}
+
+		// cycle through and print all errors
+		for (int i = 0; i < FamErrCount; i++) {
+			fam_err = i;
+			print_err("generated error");
+		}
+		// reset fam_err to indicate no error
+		fam_err = NoErrors;
+
+		// output of test:
+		// NoErrors: generated error
+		// IllegalArgument: generated error
+		// AllocError: generated error
+		// InitErr: generated error
+		// AlreadyInitialized: generated error
+		// IndexOutOfBounds: generated error
+		// IllegalState: generated error
+		// TooBig: generated error
+		// ResourceNotAvailable: generated error
+		// Permission: generated error
+	}
+	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
+	object_cleanup_global();
+}
 
 int drop_count2 = 0;
 

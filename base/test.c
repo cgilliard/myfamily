@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/backtrace.h>
 #include <base/bitflags.h>
 #include <base/colors.h>
 #include <base/fam_alloc.h>
@@ -985,7 +986,7 @@ MyTest(base, test_panic) {
 	// cr_assert(false);
 }
 
-MyTest(util, test_bitflags) {
+MyTest(base, test_bitflags) {
 	u8 flags[3] = {};
 	BitFlags bf1 = {.flags = flags, .capacity = 3};
 	bitflags_set(&bf1, 3, true);
@@ -1018,4 +1019,10 @@ MyTest(util, test_bitflags) {
 
 	// test out of range
 	cr_assert(!bitflags_check(&bf1, 24));
+}
+
+MyTest(base, test_backtrace) {
+	Backtrace bt;
+	backtrace_generate(&bt);
+	backtrace_print(&bt);
 }

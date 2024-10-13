@@ -13,5 +13,29 @@
 // limitations under the License.
 
 #include <base/fam_err.h>
+#include <stdio.h>
+#include <string.h>
 
-int fam_err = Ok;
+char *FamErrText[FamErrCount] = {"NoErrors",
+								 "IllegalArgument",
+								 "AllocError",
+								 "InitErr",
+								 "AlreadyInitialized",
+								 "IndexOutOfBounds",
+								 "IllegalState",
+								 "TooBig",
+								 "ResourceNotAvailable",
+								 "Permission",
+								 "BackTraceErr"};
+
+int fam_err = NoErrors;
+_Thread_local char fam_err_last[ERR_LEN] = {""};
+
+const char *get_err() {
+	strcpy(fam_err_last, FamErrText[fam_err]);
+	return fam_err_last;
+}
+
+void print_err(const char *text) {
+	fprintf(stderr, "%s: %s\n", FamErrText[fam_err], text);
+}
