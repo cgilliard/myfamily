@@ -53,12 +53,7 @@
 				 if (!nil(_v__))                                                                   \
 					 object_set_property(&obj, k, &_v__);                                          \
 			 }),                                                                                   \
-		Object: ({                                                                                 \
-				 ObjectNc _v__ = NIL;                                                              \
-				 object_create(&_v__, false, ObjectTypeObject, &v);                                \
-				 if (!nil(_v__))                                                                   \
-					 object_set_property(&obj, k, &_v__);                                          \
-			 }),                                                                                   \
+		Object: ({ object_set_property(&obj, k, (Object *)&v); }),                                 \
 		default: ({                                                                                \
 				 ObjectNc _v__ = NIL;                                                              \
 				 const char *_vin__ = _Generic((v), char *: v, default: NULL);                     \
@@ -83,8 +78,8 @@
 	_Generic((v),                                                                                  \
 		u64: ({                                                                                    \
 				 ObjectNc _ret__;                                                                  \
-				 u64 *_prim__ = (u64 *)&v;                                                         \
-				 object_create(&_ret__, false, ObjectTypeU64, _prim__);                            \
+				 u64 _prim__ = _Generic((v), u64: v, default: 0);                                  \
+				 object_create(&_ret__, false, ObjectTypeU64, &_prim__);                           \
 				 _ret__;                                                                           \
 			 }),                                                                                   \
 		char *: ({                                                                                 \

@@ -551,6 +551,25 @@ MyTest(util, test_object3) {
 	cr_assert_eq(111, $u64(b));
 	var c = $("test");
 	cr_assert(!strcmp("test", $string(c)));
+	var d = $();
+	$(d, "string", c);
+	$(d, "num", b);
+	$(d, "other", "hi");
+	var e = $(d, "num");
+	var f = $(d, "string");
+	var g = $(d, "other");
+	cr_assert(!strcmp($string(f), "test"));
+	cr_assert(!strcmp($string(g), "hi"));
+	cr_assert_eq($u64(e), 111);
+
+	$(a, "ok", "ok");
+	let h = $(a, "ok");
+	cr_assert(!strcmp($string(h), "ok"));
+	/*
+		$(a, "ok", "ok2");
+				let i = $(a, "ok");
+				cr_assert(!strcmp($string(i), "ok2"));
+			*/
 }
 
 MyTest(util, test_print_err) {
