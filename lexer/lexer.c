@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <base/colors.h>
+#include <base/fam_err.h>
 #include <base/misc.h>
-#include <errno.h>
 #include <lexer/lexer.h>
 #include <lexer/lexer_state.h>
 #include <lexer/tokenizer_state.h>
@@ -55,7 +55,7 @@ char *lexer_read_line(Lexer *l) {
 int lexer_init(Lexer *l, const Path *file) {
 	// file/lexer cannot be null
 	if (file == NULL || l == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return LexerStateErr;
 	}
 
@@ -64,7 +64,7 @@ int lexer_init(Lexer *l, const Path *file) {
 	l->line_num = 1;
 
 	if (path_copy(&l->file, file)) {
-		errno = ENOMEM;
+		SetErr(AllocError);
 		return LexerStateErr;
 	}
 

@@ -14,9 +14,9 @@
 
 #include <args/args.h>
 #include <base/colors.h>
+#include <base/fam_err.h>
 #include <base/misc.h>
 #include <base/resources.h>
-#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,14 +63,14 @@ int args_param_build(ArgsParam *ptr, const char *name, const char *help, const c
 					 const bool takes_value, const bool multiple, const char *default_value) {
 	if (ptr == NULL || name == NULL || help == NULL || short_name == NULL) {
 		print_error("Input may not be NULL");
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
 	if (strlen(name) > ARGS_MAX_ARGUMENT_NAME_LENGTH ||
 		strlen(short_name) > ARGS_MAX_ARGUMENT_NAME_LENGTH) {
 		print_error("Input too long");
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -182,7 +182,7 @@ void sub_command_cleanup(SubCommandImpl *sc) {
 int sub_command_build(SubCommand *sc, const char *name, const char *help, const u32 min_args,
 					  const u32 max_args, const char *arg_doc) {
 	if (sc == NULL || name == NULL || help == NULL || min_args > max_args) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		print_error("Invalid input");
 		return -1;
 	}
@@ -194,7 +194,7 @@ int sub_command_build(SubCommand *sc, const char *name, const char *help, const 
 
 	if (strlen(name) > ARGS_MAX_SUBCOMMAND_LENGTH || min_args > max_args) {
 		print_error("Invalid input");
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -291,14 +291,14 @@ int args_build(Args *args, const char *prog, const char *version, const char *au
 			   const u32 min_args, const u32 max_args, const char *arch) {
 	if (prog == NULL || version == NULL || author == NULL) {
 		print_error("Input may not be NULL");
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
 	if (strlen(prog) > ARGS_MAX_DETAIL_LENGTH || strlen(version) > ARGS_MAX_DETAIL_LENGTH ||
 		strlen(author) > ARGS_MAX_DETAIL_LENGTH) {
 		print_error("Input too long");
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -714,14 +714,14 @@ void args_init(Args *args, const int argc, const char **argv) {
 	args_check_validity(args, argc, argv);
 }
 
-// Returns -2 if an error occurs and sets errno.
+// Returns -2 if an error occurs and sets fam_err.
 // Returns -1 if the value is not present.
 // Returns 0 if the value is found (flags or max_value_len == 0)
 // Returns the length of the value (takes_value true and max_value_len > 0)
 int args_value_of(const Args *args, const char *param_name, char *value_buf,
 				  const u64 max_value_len, const u32 index) {
 	if (args == NULL || param_name == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		print_error("Input may not be NULL");
 		return -2;
 	}
@@ -751,7 +751,7 @@ int args_value_of(const Args *args, const char *param_name, char *value_buf,
 
 	if (!found) {
 		print_error("Unknown parameter tested");
-		errno = ENOENT;
+		SetErr(ResourceNotAvailable);
 		return -2;
 	}
 	u64 itt_index = 0;
@@ -760,14 +760,14 @@ int args_value_of(const Args *args, const char *param_name, char *value_buf,
 			if (itt_index == index) {
 				if (takes_value && i + 1 < args->argc) {
 					if (value_buf == NULL) {
-						errno = EINVAL;
+						SetErr(IllegalArgument);
 						print_error("Input may not be NULL");
 						return -2;
 					}
 					return snprintf(value_buf, max_value_len, "%s", args->argv[i + 1]);
 				} else if (takes_value && max_value_len > 0) {
 					if (value_buf == NULL) {
-						errno = EINVAL;
+						SetErr(IllegalArgument);
 						print_error("Input may not be NULL");
 						return -2;
 					}
@@ -784,7 +784,7 @@ int args_value_of(const Args *args, const char *param_name, char *value_buf,
 
 	if (default_value != NULL && index == 0) {
 		if (value_buf == NULL && max_value_len > 0) {
-			errno = EINVAL;
+			SetErr(IllegalArgument);
 			print_error("Input may not be NULL");
 			return -2;
 		}
@@ -797,7 +797,7 @@ int args_value_of(const Args *args, const char *param_name, char *value_buf,
 int args_get_argument(const Args *args, const u32 index, char *value_buf, const u64 max_value_len) {
 	if (args == NULL) {
 		print_error("Input may not be NULL");
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -2;
 	}
 	u64 index_itt = 0;
@@ -837,7 +837,7 @@ int args_get_argument(const Args *args, const u32 index, char *value_buf, const 
 			if (index_itt == index) {
 				if (value_buf == NULL && max_value_len != 0) {
 					print_error("Input may not be NULL");
-					errno = EINVAL;
+					SetErr(IllegalArgument);
 					return -2;
 				}
 				return snprintf(value_buf, max_value_len, "%s", args->argv[i]);

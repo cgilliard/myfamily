@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <base/colors.h>
+#include <base/fam_err.h>
 #include <base/resources.h>
-#include <errno.h>
 #include <lexer/tokenizer.h>
 #include <lexer/tokenizer_state.h>
 #include <stdarg.h>
@@ -24,7 +24,7 @@
 int tokenizer_init(Tokenizer *t, const char *line) {
 	// check input
 	if (line == NULL || t == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return TokenizerStateErr;
 	}
 

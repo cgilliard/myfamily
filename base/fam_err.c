@@ -21,17 +21,11 @@
 #define getenv(x) secure_getenv(x)
 #endif // __linux__
 
-char *FamErrText[FamErrCount] = {"NoErrors",
-								 "IllegalArgument",
-								 "AllocError",
-								 "InitErr",
-								 "AlreadyInitialized",
-								 "IndexOutOfBounds",
-								 "IllegalState",
-								 "TooBig",
-								 "ResourceNotAvailable",
-								 "Permission",
-								 "BackTraceErr"};
+char *FamErrText[FamErrCount] = {
+	"NoErrors",			  "IllegalArgument",  "AllocError", "InitErr",
+	"AlreadyInitialized", "IndexOutOfBounds", "IO",			"FileNotFound",
+	"NotADirectory",	  "IllegalState",	  "TooBig",		"ResourceNotAvailable",
+	"Permission",		  "BackTraceErr"};
 
 int fam_err = NoErrors;
 _Thread_local char fam_err_last[ERR_LEN] = {""};

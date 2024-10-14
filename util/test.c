@@ -513,86 +513,66 @@ MyTest(util, test_object) {
 		let v = $();
 		cr_assert(!nil(v));
 	}
-
-	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
-	printf("tl_size=%llu,global_size=%llu\n", get_thread_local_rbtree_size(),
-		   get_global_rbtree_size());
-	// object_cleanup_global();
-	// object_cleanup_thread_local();
 }
 
 MyTest(util, test_object2) {
-	{
-		// declare a mutable empty object
-		var a = $();
-		// set the 'abc' property of object a to a string value 'test'
-		$(a, "abc", "test");
-		// set the 'def' property of object a to a string value 'test2'
-		$(a, "def", "test2");
-		// get property 'abc' of the object a and store in an immutable object b
-		let b = $(a, "abc");
+	// declare a mutable empty object
+	var a = $();
+	// set the 'abc' property of object a to a string value 'test'
+	$(a, "abc", "test");
+	// set the 'def' property of object a to a string value 'test2'
+	$(a, "def", "test2");
+	// get property 'abc' of the object a and store in an immutable object b
+	let b = $(a, "abc");
 
-		// assert that object b as a string is 'test'
-		cr_assert(!strcmp("test", $string(b)));
+	// assert that object b as a string is 'test'
+	cr_assert(!strcmp("test", $string(b)));
 
-		// get property 'def' of object a and store in an immutable object c
-		let c = $(a, "def");
+	// get property 'def' of object a and store in an immutable object c
+	let c = $(a, "def");
 
-		// assert that object c as a string is 'test2'
-		cr_assert(!strcmp("test2", $string(c)));
+	// assert that object c as a string is 'test2'
+	cr_assert(!strcmp("test2", $string(c)));
 
-		// create a u64 value of 99
-		u64 v = 99;
-		// set the property 'ghi' of object a to the value of v (99)
-		$(a, "ghi", v);
-		// get property 'ghi' of object a and store in an immutable object d
-		let d = $(a, "ghi");
-		// assert that object d as a u64 is 99
-		cr_assert_eq($u64(d), 99);
-	}
-	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
-	printf("tl_size=%llu,global_size=%llu\n", get_thread_local_rbtree_size(),
-		   get_global_rbtree_size());
-	// object_cleanup_global();
-	// object_cleanup_thread_local();
+	// create a u64 value of 99
+	u64 v = 99;
+	// set the property 'ghi' of object a to the value of v (99)
+	$(a, "ghi", v);
+	// get property 'ghi' of object a and store in an immutable object d
+	let d = $(a, "ghi");
+	// assert that object d as a u64 is 99
+	cr_assert_eq($u64(d), 99);
 }
 
 MyTest(util, test_print_err) {
-	{
-		// instnatiate an object
-		let x = $();
-		// check for errors if x is 'nil' an error occured.
-		if (nil(x)) {
-			// print_err prints the associated 'fam_err' and a message.
-			print_err("object creation error");
-			exit(-1);
-		}
-
-		// cycle through and print all errors
-		for (int i = 0; i < FamErrCount; i++) {
-			SetErr(i);
-			print_err("generated error");
-		}
-		// reset fam_err to indicate no error
-		fam_err = NoErrors;
-
-		// output of test:
-		// NoErrors: generated error
-		// IllegalArgument: generated error
-		// AllocError: generated error
-		// InitErr: generated error
-		// AlreadyInitialized: generated error
-		// IndexOutOfBounds: generated error
-		// IllegalState: generated error
-		// TooBig: generated error
-		// ResourceNotAvailable: generated error
-		// Permission: generated error
+	// instnatiate an object
+	let x = $();
+	// check for errors if x is 'nil' an error occured.
+	if (nil(x)) {
+		// print_err prints the associated 'fam_err' and a message.
+		print_err("object creation error");
+		exit(-1);
 	}
-	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
-	printf("tl_size=%llu,global_size=%llu\n", get_thread_local_rbtree_size(),
-		   get_global_rbtree_size());
-	// object_cleanup_global();
-	// object_cleanup_thread_local();
+
+	// cycle through and print all errors
+	for (int i = 0; i < FamErrCount; i++) {
+		SetErr(i);
+		print_err("generated error");
+	}
+	// reset fam_err to indicate no error
+	fam_err = NoErrors;
+
+	// output of test:
+	// NoErrors: generated error
+	// IllegalArgument: generated error
+	// AllocError: generated error
+	// InitErr: generated error
+	// AlreadyInitialized: generated error
+	// IndexOutOfBounds: generated error
+	// IllegalState: generated error
+	// TooBig: generated error
+	// ResourceNotAvailable: generated error
+	// Permission: generated error
 }
 
 int drop_count2 = 0;

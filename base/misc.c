@@ -13,13 +13,13 @@
 // limitations under the License.
 
 #include <base/colors.h>
+#include <base/fam_err.h>
 #include <base/macro_utils.h>
 #include <base/misc.h>
 #include <base/resources.h>
 #include <base/types.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <errno.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -104,7 +104,7 @@ u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream) {
 		if (bytes_read == 0 || __is_debug_misc_ferror) {
 			// Check for EOF or error
 			if (myferror(stream) || __is_debug_misc_ferror) {
-				errno = EIO;
+				SetErr(IO);
 				break; // Error occurred
 			}
 		}
@@ -118,7 +118,7 @@ u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream) {
 
 int copy_file(const Path *dst_path, const Path *src_path) {
 	if (dst_path == NULL || src_path == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 	MYFILE *source_file, *dest_file;
@@ -127,7 +127,7 @@ int copy_file(const Path *dst_path, const Path *src_path) {
 	// Open the source file in binary read mode
 	source_file = myfopen(src_path, "rb");
 	if (source_file == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -140,7 +140,7 @@ int copy_file(const Path *dst_path, const Path *src_path) {
 	// Open the destination file in binary write mode
 	dest_file = myfopen(dst_path, "wb");
 	if (dest_file == NULL) {
-		errno = ENOENT;
+		SetErr(FileNotFound);
 		myfclose(source_file);
 		return -1;
 	}
@@ -149,7 +149,7 @@ int copy_file(const Path *dst_path, const Path *src_path) {
 	while ((bytes = myfread(buffer, 1, file_size, source_file)) > 0) {
 		if (myferror(source_file) || myfwrite(buffer, 1, bytes, dest_file) != bytes ||
 			__is_debug_misc_fwrite) {
-			errno = EIO;
+			SetErr(IO);
 			myfclose(source_file);
 			myfclose(dest_file);
 			return -1;
@@ -186,7 +186,7 @@ int remove_directory(const Path *p, bool preserve_dir) {
 
 		struct stat statbuf;
 		if (stat(full_path, &statbuf) == -1 || __is_debug_misc_stat) {
-			errno = EIO;
+			SetErr(IO);
 			closedir(dir);
 			return -1;
 		}
@@ -202,7 +202,7 @@ int remove_directory(const Path *p, bool preserve_dir) {
 		} else {
 			// It's a file, unlink (delete) it
 			if (unlink(full_path) == -1 || __is_debug_misc_unlink) {
-				errno = EIO;
+				SetErr(IO);
 				closedir(dir);
 				return -1;
 			}
@@ -214,7 +214,7 @@ int remove_directory(const Path *p, bool preserve_dir) {
 	// Now the directory is empty, so we can remove it
 	if (!preserve_dir) {
 		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
-			errno = EIO;
+			SetErr(IO);
 			return -1;
 		}
 	}

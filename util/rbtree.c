@@ -18,7 +18,6 @@
 #include <base/fam_err.h>
 #include <base/macro_utils.h>
 #include <base/panic.h>
-#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <util/rbtree.h>
@@ -397,7 +396,7 @@ int rbtree_create(RBTree *ptr, const u64 key_size, const u64 value_size,
 				  int (*compare)(const void *, const void *), bool send) {
 	// validate input
 	if (ptr == NULL || key_size == 0 || value_size == 0 || compare == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -429,7 +428,7 @@ int rbtree_create(RBTree *ptr, const u64 key_size, const u64 value_size,
 int rbtree_put(RBTree *ptr, const void *key, const void *value) {
 	// validate input
 	if (ptr == NULL || key == NULL || value == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -613,7 +612,7 @@ void rbtree_remove_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RB
 int rbtree_remove(RBTree *ptr, const void *key) {
 	// validate input
 	if (ptr == NULL || nil(ptr->impl) || key == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -712,7 +711,7 @@ int rbtree_remove(RBTree *ptr, const void *key) {
 const void *rbtree_get(const RBTree *ptr, const void *key) {
 	// validate input
 	if (ptr == NULL || key == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return NULL;
 	}
 
@@ -734,7 +733,7 @@ const void *rbtree_get(const RBTree *ptr, const void *key) {
 void *rbtree_get_mut(const RBTree *ptr, const void *key) {
 	// validate input
 	if (ptr == NULL || key == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return NULL;
 	}
 
@@ -756,7 +755,7 @@ void *rbtree_get_mut(const RBTree *ptr, const void *key) {
 // size in terms of number of nodes
 i64 rbtree_size(const RBTree *ptr) {
 	if (ptr == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 

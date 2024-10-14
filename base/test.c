@@ -16,11 +16,11 @@
 #include <base/bitflags.h>
 #include <base/colors.h>
 #include <base/fam_alloc.h>
+#include <base/fam_err.h>
 #include <base/misc.h>
 #include <base/panic.h>
 #include <base/slabs.h>
 #include <base/test.h>
-#include <errno.h>
 #include <limits.h>
 #include <pthread.h>
 #ifdef __linux__
@@ -308,9 +308,9 @@ MyTest(base, test_other_misc_situations) {
 
 	MYFILE *stream = myfopen(&test, "r");
 	__is_debug_misc_ferror = true;
-	errno = 0;
+	fam_err = NoErrors;
 	read_all(buf, 1, 1, stream);
-	cr_assert_eq(errno, EIO);
+	cr_assert_eq(fam_err, IO);
 	__is_debug_misc_ferror = false;
 	myfclose(stream);
 
@@ -366,9 +366,9 @@ MyTest(base, test_path_other_situations) {
 	char buf[10];
 	path_file_stem(&test1, buf, 10);
 	cr_assert(!strcmp(buf, "stemless"));
-	errno = 0;
+	fam_err = NoErrors;
 	cr_assert(!path_file_size(&test1));
-	cr_assert_eq(errno, EIO);
+	cr_assert_eq(fam_err, IO);
 
 	Path test2;
 	path_for(&test2, ".");

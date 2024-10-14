@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/fam_err.h>
 #include <base/misc.h>
 #include <base/path.h>
 #include <base/resources.h>
-#include <errno.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,17 +34,17 @@ void path_cleanup(PathImpl *ptr) {
 
 int path_for(Path *p, const char *path) {
 	if (p == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 	if (path == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		p->ptr = NULL;
 		return -1;
 	}
 	int len = strlen(path);
 	if (len == 0) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		p->ptr = NULL;
 		return -1;
 	}
@@ -59,13 +59,13 @@ int path_for(Path *p, const char *path) {
 int path_replace_home(Path *p) {
 	const char *home_dir = getenv("HOME");
 	if (home_dir == NULL || __is_debug_path_homedir_null) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 	if (((char *)(p->ptr))[0] == '~') {
 		int nlen = strlen(home_dir) + strlen(PATH_SEPARATOR) + strlen(p->ptr);
 		if (nlen >= PATH_MAX) {
-			errno = E2BIG;
+			SetErr(TooBig);
 			return -1;
 		}
 		if (nlen >= p->len) {
@@ -88,7 +88,7 @@ int path_replace_home(Path *p) {
 u64 path_file_size(Path *p) {
 	MYFILE *fp = myfopen(p, "r");
 	if (!fp) {
-		errno = EIO;
+		SetErr(IO);
 		return 0;
 	}
 	myfseek(fp, 0L, SEEK_END);
@@ -101,10 +101,10 @@ int path_canonicalize(Path *p) {
 	char buf[PATH_MAX];
 	int nlen;
 	if (path_replace_home(p) || realpath(p->ptr, buf) == NULL || (nlen = strlen(buf)) == 0) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
-	errno = 0;
+	SetErr(NoErrors);
 	if (nlen >= p->len) {
 		void *nptr = myrealloc(p->ptr, nlen + 1);
 		if (nptr == NULL)
@@ -117,16 +117,16 @@ int path_canonicalize(Path *p) {
 }
 int path_push(Path *p, const char *next) {
 	if (p == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 	if (next == NULL) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 	int slen = strlen(p->ptr);
 	if (slen <= 0 || strlen(next) == 0) {
-		errno = EFAULT;
+		SetErr(IllegalState);
 		return -1;
 	}
 	bool need_sep = false;
@@ -177,14 +177,14 @@ const char *path_file_name(const Path *p) {
 
 bool path_exists(const Path *p) {
 	if (p->ptr == NULL || p->len == 0) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return false;
 	}
 	return access(p->ptr, F_OK) == 0;
 }
 bool path_is_dir(const Path *p) {
 	if (p->ptr == NULL || p->len == 0) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return false;
 	}
 	struct stat s;
@@ -196,7 +196,7 @@ bool path_is_dir(const Path *p) {
 
 bool path_mkdir(Path *p, u64 mode, bool parent) {
 	if (p->ptr == NULL || p->len == 0) {
-		errno = EINVAL;
+		SetErr(IllegalArgument);
 		return false;
 	}
 
@@ -209,7 +209,7 @@ bool path_mkdir(Path *p, u64 mode, bool parent) {
 			return true;
 		} else {
 			// Path exists but it's not a directory
-			errno = ENOTDIR;
+			SetErr(NotADirectory);
 			return false;
 		}
 	}

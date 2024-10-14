@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <args/args.h>
+#include <base/fam_err.h>
 #include <base/resources.h>
 #include <base/test.h>
-#include <errno.h>
 
 MySuite(args);
 
@@ -171,11 +171,11 @@ MyTest(args, test_args_value_of) {
 	cr_assert_eq(ret, -1);
 
 	// This is distinct from the error of -2 return when we pass in a NULL pointer
-	// in place our args pointer. (einval also set to errno in this case)
-	errno = 0;
+	// in place our args pointer. (IllegalArgument also set to fam_err in this case)
+	fam_err = 0;
 	ret = args_get_argument(NULL, 0, buf, 1024);
 	cr_assert_eq(ret, -2);
-	cr_assert_eq(errno, EINVAL);
+	cr_assert_eq(fam_err, IllegalArgument);
 
 	const char *argv2[2] = {"myprog", "@./resources/test.txt"};
 	Args args2;
