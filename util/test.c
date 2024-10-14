@@ -14,12 +14,12 @@
 
 #include <base/fam_err.h>
 #include <base/macro_utils.h>
-#include <base/test.h>
 #include <crypto/psrng.h>
 #include <math.h>
 #include <string.h>
 #include <util/object.h>
 #include <util/rbtree.h>
+#include <util/test.h>
 
 MySuite(util);
 
@@ -517,8 +517,8 @@ MyTest(util, test_object) {
 	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
 	printf("tl_size=%llu,global_size=%llu\n", get_thread_local_rbtree_size(),
 		   get_global_rbtree_size());
-	object_cleanup_global();
-	object_cleanup_thread_local();
+	// object_cleanup_global();
+	// object_cleanup_thread_local();
 }
 
 MyTest(util, test_object2) {
@@ -553,8 +553,8 @@ MyTest(util, test_object2) {
 	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
 	printf("tl_size=%llu,global_size=%llu\n", get_thread_local_rbtree_size(),
 		   get_global_rbtree_size());
-	object_cleanup_global();
-	object_cleanup_thread_local();
+	// object_cleanup_global();
+	// object_cleanup_thread_local();
 }
 
 MyTest(util, test_print_err) {
@@ -591,8 +591,8 @@ MyTest(util, test_print_err) {
 	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
 	printf("tl_size=%llu,global_size=%llu\n", get_thread_local_rbtree_size(),
 		   get_global_rbtree_size());
-	object_cleanup_global();
-	object_cleanup_thread_local();
+	// object_cleanup_global();
+	// object_cleanup_thread_local();
 }
 
 int drop_count2 = 0;

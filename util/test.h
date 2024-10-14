@@ -22,7 +22,9 @@
 #include <signal.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <util/object.h>
 
+#undef MySuite
 #define MySuite(name)                                                                              \
 	void setup_suite(void) {                                                                       \
 		printf("[%s====%s] Running %s%s%s test suite...\n", BLUE, RESET, GREEN, #name, RESET);     \
@@ -35,6 +37,27 @@
 	static char *cur_name = "";                                                                    \
 	static u64 log_fd = -1;                                                                        \
 	void tear_down() {                                                                             \
+		u64 tl_rbtree_size = get_thread_local_rbtree_size();                                       \
+		if (tl_rbtree_size != 0) {                                                                 \
+			printf("[%s====%s] %sError in tear_down of test%s "                                    \
+				   "'%s%s%s'.\n[%s====%s] Thread Local RBTree in Object items not deleted [%lli] " \
+				   "Memory leak?\n",                                                               \
+				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET, tl_rbtree_size);  \
+			pid_t iPid = getpid();                                                                 \
+			kill(iPid, SIGINT); /* trigger failure */                                              \
+		}                                                                                          \
+		u64 global_rbtree_size = get_global_rbtree_size();                                         \
+		if (global_rbtree_size != 0) {                                                             \
+			printf("[%s====%s] %sError in tear_down of test%s "                                    \
+				   "'%s%s%s'.\n[%s====%s] Global RBTree in Object items not deleted [%lli] "       \
+				   "Memory leak?\n",                                                               \
+				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET,                   \
+				   global_rbtree_size);                                                            \
+			pid_t iPid = getpid();                                                                 \
+			kill(iPid, SIGINT); /* trigger failure */                                              \
+		}                                                                                          \
+		object_cleanup_global();                                                                   \
+		object_cleanup_thread_local();                                                             \
 		u64 slabs = fam_alloc_count_tl_slab_allocator();                                           \
 		if (slabs != 0) {                                                                          \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
@@ -87,6 +110,7 @@
 			close(log_fd);                                                                         \
 	}
 
+#undef MyTest
 #define MyTest(suite, test)                                                                        \
 	void setup_##test(void) {                                                                      \
 		u64 cur_alloc_count = mymalloc_sum();                                                      \

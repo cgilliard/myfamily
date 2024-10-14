@@ -572,41 +572,47 @@ int object_send(Object *obj, Channel *channel) {
 }
 
 void object_cleanup_thread_local() {
-	rbtree_iterator_reset(thread_local_rbtree, thread_local_rbtree_iterator, NULL, false, NULL,
-						  false);
-	loop {
-		RbTreeKeyValue kv;
-		if (!rbtree_iterator_next(thread_local_rbtree_iterator, &kv))
-			break;
-		ObjectKeyNc *key = kv.key;
-		fam_free(&key->key);
+	if (thread_local_rbtree) {
+		rbtree_iterator_reset(thread_local_rbtree, thread_local_rbtree_iterator, NULL, false, NULL,
+							  false);
+		loop {
+			RbTreeKeyValue kv;
+			if (!rbtree_iterator_next(thread_local_rbtree_iterator, &kv))
+				break;
+			ObjectKeyNc *key = kv.key;
+			fam_free(&key->key);
 
-		ObjectValue *value = kv.value;
-		ObjectValueData *ovd = $(value->ptr);
-		if (ovd->type == ObjectTypeString || ovd->type == ObjectTypeU64) {
-			fam_free(&value->ptr);
+			ObjectValue *value = kv.value;
+			ObjectValueData *ovd = $(value->ptr);
+			if (ovd->type == ObjectTypeString || ovd->type == ObjectTypeU64) {
+				fam_free(&value->ptr);
+			}
 		}
-	}
-	rbtree_cleanup(thread_local_rbtree);
-	myfree(thread_local_rbtree);
+		rbtree_cleanup(thread_local_rbtree);
+		myfree(thread_local_rbtree);
 
-	if (!nil(tl_start_range_key.key))
-		fam_free(&tl_start_range_key.key);
-	if (!nil(tl_end_range_key.key))
-		fam_free(&tl_end_range_key.key);
-	if (thread_local_rbtree_iterator) {
-		rbtree_iterator_cleanup(thread_local_rbtree_iterator);
-		myfree(thread_local_rbtree_iterator);
-		thread_local_rbtree_iterator = NULL;
+		if (!nil(tl_start_range_key.key))
+			fam_free(&tl_start_range_key.key);
+		if (!nil(tl_end_range_key.key))
+			fam_free(&tl_end_range_key.key);
+		if (thread_local_rbtree_iterator) {
+			rbtree_iterator_cleanup(thread_local_rbtree_iterator);
+			myfree(thread_local_rbtree_iterator);
+			thread_local_rbtree_iterator = NULL;
+		}
+		thread_local_rbtree = NULL;
 	}
-	thread_local_rbtree = NULL;
 }
 
 #ifdef TEST
 u64 get_thread_local_rbtree_size() {
+	if (!thread_local_rbtree)
+		return 0;
 	return rbtree_size(thread_local_rbtree);
 }
 u64 get_global_rbtree_size() {
+	if (!global_rbtree)
+		return 0;
 	return rbtree_size(global_rbtree);
 }
 void object_cleanup_global() {
