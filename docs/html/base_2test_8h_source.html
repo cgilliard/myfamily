@@ -70,7 +70,7 @@ $(function() {
 <div class="title">test.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="test_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (c) 2024, The MyFamily Developers</span></div>
+<a href="base_2test_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (c) 2024, The MyFamily Developers</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// you may not use this file except in compliance with the License.</span></div>
@@ -95,7 +95,7 @@ $(function() {
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;stdio.h&gt;</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;unistd.h&gt;</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="test_8h.html#ac491bfaf0b292ca81ada9f3b82af5245">   26</a></span>&#160;<span class="preprocessor">#define MySuite(name)                                                                              \</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="base_2test_8h.html#ac491bfaf0b292ca81ada9f3b82af5245">   26</a></span>&#160;<span class="preprocessor">#define MySuite(name)                                                                              \</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">    void setup_suite(void) {                                                                       \</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">        printf(&quot;[%s====%s] Running %s%s%s test suite...\n&quot;</span>, BLUE, RESET, GREEN, #name, RESET);     \</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    }                                                                                              \</div>
@@ -159,7 +159,7 @@ $(function() {
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">            close(log_fd);                                                                         \</span></div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">    }</span></div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="test_8h.html#a2e6f1698baf6614fafee5b7ffd575cd2">   90</a></span>&#160;<span class="preprocessor">#define MyTest(suite, test)                                                                        \</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="base_2test_8h.html#a2e6f1698baf6614fafee5b7ffd575cd2">   90</a></span>&#160;<span class="preprocessor">#define MyTest(suite, test)                                                                        \</span></div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">    void setup_##test(void) {                                                                      \</span></div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">        u64 cur_alloc_count = mymalloc_sum();                                                      \</span></div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">        u64 cur_free_count = myfree_sum();                                                         \</span></div>

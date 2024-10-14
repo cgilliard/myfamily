@@ -67,16 +67,26 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
+<a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">fam_err.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
+<div class="textblock"><code>#include &lt;<a class="el" href="backtrace_8h_source.html">base/backtrace.h</a>&gt;</code><br />
+</div>
 <p><a href="fam__err_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a0c8bbd905db6b23f4b0b89f82885ef23"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#a0c8bbd905db6b23f4b0b89f82885ef23">ERR_LEN</a>&#160;&#160;&#160;1024</td></tr>
+<tr class="separator:a0c8bbd905db6b23f4b0b89f82885ef23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a60a6e927e1a7b648ea4062d4ad5887"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#a4a60a6e927e1a7b648ea4062d4ad5887">SetErr</a>(err)</td></tr>
+<tr class="separator:a4a60a6e927e1a7b648ea4062d4ad5887"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:aacb06799cb77238f846623f8d483a3f1"><td class="memItemLeft" align="right" valign="top">typedef enum <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748ac">FamErr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#aacb06799cb77238f846623f8d483a3f1">FamErr</a></td></tr>
@@ -85,27 +95,86 @@ Typedefs</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr class="memitem:a314d11eafb91af52b8b344055d7748ac"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748ac">FamErr</a> { <br />
-&#160;&#160;<a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca06d32f047358de4e6a30c28046f4688e">Ok</a>
+&#160;&#160;<a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca500a74530b3abdb5d4ebe91cb5711b5a">NoErrors</a>
 , <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748acaa42bd89548de19560a2662f9505f13a8">IllegalArgument</a>
 , <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca8b37e4ee29b79d0221af417dafc00aa8">AllocErr</a>
 , <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca40985f68ec32639000631140829be47e">InitErr</a>
 , <br />
 &#160;&#160;<a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca10026bcbf30980e51ab3c5c43816bc4a">AlreadyInitialized</a>
 , <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca4e252e6f5e0c6f339e0685480cfb93aa">IndexOutOfBounds</a>
+, <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748acaedd9974ef2207e0a03e0717dcb9e2269">IO</a>
+, <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca3afeda292861a07cfd08eea542bc18da">FileNotFound</a>
+, <br />
+&#160;&#160;<a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748acaa283f0751acb6d782f9f8d6992f07893">NotADirectory</a>
 , <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca54830b49aab667f580bb359e673a8018">IllegalState</a>
 , <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748acaccb17e505d8a761805a3ebecc9ad1b5e">TooBig</a>
+, <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca82d1ceb6fba70456f1a210b61f71c453">ResourceNotAvailable</a>
 , <br />
-&#160;&#160;<a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca82d1ceb6fba70456f1a210b61f71c453">ResourceNotAvailable</a>
-, <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca196bfaf70be7cd8996ee78d2b27cd586">Permission</a>
+&#160;&#160;<a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca196bfaf70be7cd8996ee78d2b27cd586">Permission</a>
+, <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca34171c30d24e0dc8048b914895a7e831">BackTraceErr</a>
+, <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca0a88d6469b4390cbca8e3a1ed823bb21">FamErrCount</a>
 <br />
  }</td></tr>
 <tr class="separator:a314d11eafb91af52b8b344055d7748ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:a744805e918acc28280f8b60251eefebc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#a744805e918acc28280f8b60251eefebc">print_err</a> (const char *text)</td></tr>
+<tr class="separator:a744805e918acc28280f8b60251eefebc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2187f85357d783d2467916e26ceb518"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#ad2187f85357d783d2467916e26ceb518">get_err</a> ()</td></tr>
+<tr class="separator:ad2187f85357d783d2467916e26ceb518"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a173b6927bac70ae42204e204e765eab3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#a173b6927bac70ae42204e204e765eab3">do_backtrace_generate</a> (<a class="el" href="structBacktrace.html">Backtrace</a> *bt)</td></tr>
+<tr class="separator:a173b6927bac70ae42204e204e765eab3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:ab30531e83b23bdfdd6466c549583e08a"><td class="memItemLeft" align="right" valign="top">_Thread_local char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#ab30531e83b23bdfdd6466c549583e08a">fam_err_last</a> [<a class="el" href="fam__err_8h.html#a0c8bbd905db6b23f4b0b89f82885ef23">ERR_LEN</a>]</td></tr>
+<tr class="separator:ab30531e83b23bdfdd6466c549583e08a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad05ca0fb9e1c5fa2f627f5a78bcc912f"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#ad05ca0fb9e1c5fa2f627f5a78bcc912f">FamErrText</a> [<a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca0a88d6469b4390cbca8e3a1ed823bb21">FamErrCount</a>]</td></tr>
+<tr class="separator:ad05ca0fb9e1c5fa2f627f5a78bcc912f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3614dce47244f368f45b5a6eda73cba0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#a3614dce47244f368f45b5a6eda73cba0">fam_err</a></td></tr>
 <tr class="separator:a3614dce47244f368f45b5a6eda73cba0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21db30f72ef75d8135224182f843a45e"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structBacktrace.html">Backtrace</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8h.html#a21db30f72ef75d8135224182f843a45e">thread_local_bt__</a></td></tr>
+<tr class="separator:a21db30f72ef75d8135224182f843a45e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a0c8bbd905db6b23f4b0b89f82885ef23"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c8bbd905db6b23f4b0b89f82885ef23">&#9670;&nbsp;</a></span>ERR_LEN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ERR_LEN&#160;&#160;&#160;1024</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4a60a6e927e1a7b648ea4062d4ad5887"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a60a6e927e1a7b648ea4062d4ad5887">&#9670;&nbsp;</a></span>SetErr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SetErr</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">err</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
+<div class="line">        fam_err = err;                                                                             \</div>
+<div class="line">        do_backtrace_generate(&amp;<a class="code" href="fam__err_8h.html#a21db30f72ef75d8135224182f843a45e">thread_local_bt__</a>);                                                 \</div>
+<div class="line">    })</div>
+<div class="ttc" id="afam__err_8h_html_a21db30f72ef75d8135224182f843a45e"><div class="ttname"><a href="fam__err_8h.html#a21db30f72ef75d8135224182f843a45e">thread_local_bt__</a></div><div class="ttdeci">_Thread_local Backtrace thread_local_bt__</div><div class="ttdef"><b>Definition:</b> fam_err.c:32</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <h2 class="groupheader">Typedef Documentation</h2>
 <a id="aacb06799cb77238f846623f8d483a3f1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aacb06799cb77238f846623f8d483a3f1">&#9670;&nbsp;</a></span>FamErr</h2>
@@ -134,17 +203,76 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca06d32f047358de4e6a30c28046f4688e"></a>Ok&#160;</td><td class="fielddoc"></td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca500a74530b3abdb5d4ebe91cb5711b5a"></a>NoErrors&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748acaa42bd89548de19560a2662f9505f13a8"></a>IllegalArgument&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca8b37e4ee29b79d0221af417dafc00aa8"></a>AllocErr&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca40985f68ec32639000631140829be47e"></a>InitErr&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca10026bcbf30980e51ab3c5c43816bc4a"></a>AlreadyInitialized&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca4e252e6f5e0c6f339e0685480cfb93aa"></a>IndexOutOfBounds&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748acaedd9974ef2207e0a03e0717dcb9e2269"></a>IO&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca3afeda292861a07cfd08eea542bc18da"></a>FileNotFound&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748acaa283f0751acb6d782f9f8d6992f07893"></a>NotADirectory&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca54830b49aab667f580bb359e673a8018"></a>IllegalState&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748acaccb17e505d8a761805a3ebecc9ad1b5e"></a>TooBig&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca82d1ceb6fba70456f1a210b61f71c453"></a>ResourceNotAvailable&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca196bfaf70be7cd8996ee78d2b27cd586"></a>Permission&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca34171c30d24e0dc8048b914895a7e831"></a>BackTraceErr&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a314d11eafb91af52b8b344055d7748aca0a88d6469b4390cbca8e3a1ed823bb21"></a>FamErrCount&#160;</td><td class="fielddoc"></td></tr>
 </table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a173b6927bac70ae42204e204e765eab3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a173b6927bac70ae42204e204e765eab3">&#9670;&nbsp;</a></span>do_backtrace_generate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void do_backtrace_generate </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structBacktrace.html">Backtrace</a> *&#160;</td>
+          <td class="paramname"><em>bt</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad2187f85357d783d2467916e26ceb518"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2187f85357d783d2467916e26ceb518">&#9670;&nbsp;</a></span>get_err()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* get_err </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a744805e918acc28280f8b60251eefebc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a744805e918acc28280f8b60251eefebc">&#9670;&nbsp;</a></span>print_err()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void print_err </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>text</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -160,6 +288,72 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">int fam_err</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab30531e83b23bdfdd6466c549583e08a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab30531e83b23bdfdd6466c549583e08a">&#9670;&nbsp;</a></span>fam_err_last</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">_Thread_local char fam_err_last[<a class="el" href="fam__err_8h.html#a0c8bbd905db6b23f4b0b89f82885ef23">ERR_LEN</a>]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad05ca0fb9e1c5fa2f627f5a78bcc912f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad05ca0fb9e1c5fa2f627f5a78bcc912f">&#9670;&nbsp;</a></span>FamErrText</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* FamErrText[<a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca0a88d6469b4390cbca8e3a1ed823bb21">FamErrCount</a>]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a21db30f72ef75d8135224182f843a45e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21db30f72ef75d8135224182f843a45e">&#9670;&nbsp;</a></span>thread_local_bt__</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">_Thread_local <a class="el" href="structBacktrace.html">Backtrace</a> thread_local_bt__</td>
         </tr>
       </table>
   </td>

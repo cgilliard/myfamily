@@ -76,7 +76,9 @@ $(function() {
 <div class="title">object.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="channel_8h_source.html">util/channel.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="panic_8h_source.html">base/panic.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="channel_8h_source.html">util/channel.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="object__macros_8h_source.html">util/object_macros.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="rc_8h_source.html">util/rc.h</a>&gt;</code><br />
 </div>
 <p><a href="object_8h_source.html">Go to the source code of this file.</a></p>
@@ -88,9 +90,7 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a899e04629f2530cba8a7667431025fc5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a899e04629f2530cba8a7667431025fc5">INIT_OBJECT</a>&#160;&#160;&#160;{.impl = <a class="el" href="rc_8h.html#a5d2815ad9048149013375578530283a8">rc_null</a>}</td></tr>
-<tr class="separator:a899e04629f2530cba8a7667431025fc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9857328827ae1957544a254406d6c557"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;&#160;&#160;<a class="el" href="structObjectNc.html">ObjectNc</a> <a class="el" href="rc_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="object_8h.html#a2fe4ffac017e043925cdab588324bfb2">object_cleanup</a>)))</td></tr>
+<tr class="memitem:a9857328827ae1957544a254406d6c557"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;&#160;&#160;<a class="el" href="structObjectNc.html">ObjectNc</a> <a class="el" href="rc_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="object_8h.html#a4687779886a64d063d6a6356a8cae9c4">object_cleanup</a>)))</td></tr>
 <tr class="separator:a9857328827ae1957544a254406d6c557"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
@@ -110,42 +110,28 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a2fe4ffac017e043925cdab588324bfb2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a2fe4ffac017e043925cdab588324bfb2">object_cleanup</a> (<a class="el" href="structObjectNc.html">ObjectNc</a> *ptr)</td></tr>
-<tr class="separator:a2fe4ffac017e043925cdab588324bfb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4687779886a64d063d6a6356a8cae9c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a4687779886a64d063d6a6356a8cae9c4">object_cleanup</a> (const <a class="el" href="structObjectNc.html">ObjectNc</a> *ptr)</td></tr>
+<tr class="separator:a4687779886a64d063d6a6356a8cae9c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa89b58e381692623ed46e1166ab952a8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#aa89b58e381692623ed46e1166ab952a8">object_move</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *dst, const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *src)</td></tr>
 <tr class="separator:aa89b58e381692623ed46e1166ab952a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72b48d8c23eb0b6f56a7a0b84e25869a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a72b48d8c23eb0b6f56a7a0b84e25869a">object_ref</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *dst, <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *src)</td></tr>
 <tr class="separator:a72b48d8c23eb0b6f56a7a0b84e25869a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a205f58a739605a46a21466b010739497"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a205f58a739605a46a21466b010739497">object_mut_ref</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *dst, <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *src)</td></tr>
-<tr class="separator:a205f58a739605a46a21466b010739497"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad46e905ce03f2683514cd6637d38a6fd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#ad46e905ce03f2683514cd6637d38a6fd">object_create</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> send, <a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a> type, const void *primitive)</td></tr>
 <tr class="separator:ad46e905ce03f2683514cd6637d38a6fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6059b93aa2f1e47b594b85c5b47ce64"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#ae6059b93aa2f1e47b594b85c5b47ce64">object_send</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj, <a class="el" href="channel_8h.html#a285df6b28afdbef520c5f63ce46d01b8">Channel</a> *channel)</td></tr>
 <tr class="separator:ae6059b93aa2f1e47b594b85c5b47ce64"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02c0427d5094a00cde35c9c33e73b0e9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a02c0427d5094a00cde35c9c33e73b0e9">object_set_property</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj, const char *key, const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *value)</td></tr>
 <tr class="separator:a02c0427d5094a00cde35c9c33e73b0e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a745123a38b931ed1bb27f438a74be1a5"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a745123a38b931ed1bb27f438a74be1a5">object_get_property</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj, const char *key)</td></tr>
-<tr class="separator:a745123a38b931ed1bb27f438a74be1a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae719ad828d168e5faa47cd48afeca53f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#ae719ad828d168e5faa47cd48afeca53f">object_get_property</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj, const char *key)</td></tr>
+<tr class="separator:ae719ad828d168e5faa47cd48afeca53f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a736b44166b1a5240e0a6e256fd788f3a"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a736b44166b1a5240e0a6e256fd788f3a">object_as_string</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj)</td></tr>
 <tr class="separator:a736b44166b1a5240e0a6e256fd788f3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a08ced73d0662433b8fd2b580296b9743"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a08ced73d0662433b8fd2b580296b9743">object_as_u64</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj)</td></tr>
-<tr class="separator:a08ced73d0662433b8fd2b580296b9743"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25ccfab3419eac1334438dea708568d3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a25ccfab3419eac1334438dea708568d3">object_as_u64</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> *value)</td></tr>
+<tr class="separator:a25ccfab3419eac1334438dea708568d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bb9afdd646ccd5fd9da13f8872bba77"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a4bb9afdd646ccd5fd9da13f8872bba77">object_cleanup_thread_local</a> ()</td></tr>
+<tr class="separator:a4bb9afdd646ccd5fd9da13f8872bba77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a899e04629f2530cba8a7667431025fc5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a899e04629f2530cba8a7667431025fc5">&#9670;&nbsp;</a></span>INIT_OBJECT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define INIT_OBJECT&#160;&#160;&#160;{.impl = <a class="el" href="rc_8h.html#a5d2815ad9048149013375578530283a8">rc_null</a>}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a9857328827ae1957544a254406d6c557"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9857328827ae1957544a254406d6c557">&#9670;&nbsp;</a></span>Object</h2>
 
@@ -153,7 +139,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define Object&#160;&#160;&#160;<a class="el" href="structObjectNc.html">ObjectNc</a> <a class="el" href="rc_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="object_8h.html#a2fe4ffac017e043925cdab588324bfb2">object_cleanup</a>)))</td>
+          <td class="memname">#define Object&#160;&#160;&#160;<a class="el" href="structObjectNc.html">ObjectNc</a> <a class="el" href="rc_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="object_8h.html#a4687779886a64d063d6a6356a8cae9c4">object_cleanup</a>)))</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -228,26 +214,36 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a08ced73d0662433b8fd2b580296b9743"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a08ced73d0662433b8fd2b580296b9743">&#9670;&nbsp;</a></span>object_as_u64()</h2>
+<a id="a25ccfab3419eac1334438dea708568d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25ccfab3419eac1334438dea708568d3">&#9670;&nbsp;</a></span>object_as_u64()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> object_as_u64 </td>
+          <td class="memname">int object_as_u64 </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
-          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> *&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a2fe4ffac017e043925cdab588324bfb2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2fe4ffac017e043925cdab588324bfb2">&#9670;&nbsp;</a></span>object_cleanup()</h2>
+<a id="a4687779886a64d063d6a6356a8cae9c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4687779886a64d063d6a6356a8cae9c4">&#9670;&nbsp;</a></span>object_cleanup()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -255,8 +251,25 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void object_cleanup </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="structObjectNc.html">ObjectNc</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="structObjectNc.html">ObjectNc</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4bb9afdd646ccd5fd9da13f8872bba77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4bb9afdd646ccd5fd9da13f8872bba77">&#9670;&nbsp;</a></span>object_cleanup_thread_local()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void object_cleanup_thread_local </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -304,14 +317,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a745123a38b931ed1bb27f438a74be1a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a745123a38b931ed1bb27f438a74be1a5">&#9670;&nbsp;</a></span>object_get_property()</h2>
+<a id="ae719ad828d168e5faa47cd48afeca53f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae719ad828d168e5faa47cd48afeca53f">&#9670;&nbsp;</a></span>object_get_property()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>* object_get_property </td>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_get_property </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
           <td class="paramname"><em>obj</em>, </td>
@@ -348,34 +361,6 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
-          <td class="paramname"><em>src</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a205f58a739605a46a21466b010739497"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a205f58a739605a46a21466b010739497">&#9670;&nbsp;</a></span>object_mut_ref()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int object_mut_ref </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
-          <td class="paramname"><em>dst</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
           <td class="paramname"><em>src</em>&#160;</td>
         </tr>
         <tr>
