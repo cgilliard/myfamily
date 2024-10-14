@@ -145,7 +145,7 @@ bool backtrace_add_entry(Backtrace *ptr, const char *name, const char *bin_name,
 
 int backtrace_generate(Backtrace *ptr) {
 	if (ptr == NULL) {
-		fam_err = IllegalArgument;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -153,7 +153,7 @@ int backtrace_generate(Backtrace *ptr) {
 	void *array[MAX_ENTRIES];
 	int size = backtrace(array, MAX_ENTRIES);
 	if (size < 0) {
-		fam_err = BackTraceErr;
+		SetErr(BackTraceErr);
 		return -1;
 	}
 	char **strings = backtrace_symbols(array, size);

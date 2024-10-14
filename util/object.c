@@ -279,7 +279,7 @@ int object_ref_impl(Object *dst, Object *src, bool imut) {
 	send = bitflags_check(&bfsrc, OBJECT_FLAG_SEND);
 	src_imut = bitflags_check(&bfsrc, OBJECT_FLAG_IMUT);
 	if (src_imut && !imut) {
-		fam_err = Permission;
+		SetErr(Permission);
 		return -1;
 	}
 	{
@@ -369,7 +369,7 @@ int object_create(Object *obj, bool send, ObjectType type, const void *primitive
 	if (object_init_rbtrees())
 		return -1;
 	if (obj == NULL) {
-		fam_err = IllegalArgument;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 

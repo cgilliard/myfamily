@@ -43,13 +43,12 @@ extern _Thread_local Backtrace thread_local_bt__;
 
 void print_err(const char *text);
 const char *get_err();
+void do_backtrace_generate(Backtrace *bt);
 
 #define SetErr(err)                                                                                \
 	({                                                                                             \
 		fam_err = err;                                                                             \
-		if (getenv("CBACKTRACE") != NULL) {                                                        \
-			backtrace_generate(&thread_local_bt__);                                                \
-		}                                                                                          \
+		do_backtrace_generate(&thread_local_bt__);                                                 \
 	})
 
 #endif // _BASE_FAM_ERR__

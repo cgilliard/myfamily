@@ -14,6 +14,7 @@
 
 #include <base/types.h>
 #include <crypto/rand.h>
+#include <stdlib.h>
 #include <sys/random.h>
 
 int rand_i8(i8 *v) {

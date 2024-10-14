@@ -50,3 +50,9 @@ void print_err(const char *text) {
 		printf("Backtrace currently disabled set env variable CBACKTRACE to enable\n");
 	}
 }
+
+void do_backtrace_generate(Backtrace *bt) {
+	if (getenv("CBACKTRACE") != NULL) {
+		backtrace_generate(bt);
+	}
+}

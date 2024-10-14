@@ -71,7 +71,7 @@ int fat_ptr_pin(FatPtr *ptr) {
 		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
 		ret = bitflags_set(&bf, BIT_FLAG_PIN, true);
 	} else
-		fam_err = IllegalArgument;
+		SetErr(IllegalArgument);
 	return ret;
 }
 
@@ -82,7 +82,7 @@ int fat_ptr_set_copy(FatPtr *ptr) {
 		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
 		ret = bitflags_set(&bf, BIT_FLAG_COPY, true);
 	} else
-		fam_err = IllegalArgument;
+		SetErr(IllegalArgument);
 	return ret;
 }
 
@@ -93,7 +93,7 @@ u32 fat_ptr_size(const FatPtr *ptr) {
 		if (!nil(*ptr))
 			memcpy(&ret, tmp->size_flags, 3);
 	} else
-		fam_err = IllegalArgument;
+		SetErr(IllegalArgument);
 	return ret;
 }
 
@@ -104,7 +104,7 @@ void *fat_ptr_data(const FatPtr *ptr) {
 		if (!nil(*ptr) && ptr->data != NULL)
 			ret = ((FatPtr32Impl *)ptr->data)->data;
 	} else
-		fam_err = IllegalArgument;
+		SetErr(IllegalArgument);
 	return ret;
 }
 
@@ -310,34 +310,34 @@ int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
 	u32 last_slab_size = 0;
 	for (u64 i = 0; i < impl->sd_size; i++) {
 		if (impl->sd_arr[i].type.slab_size >= MAX_SLAB_SIZE) { // 2^24 - 1
-			fam_err = TooBig;
+			SetErr(TooBig);
 			return -1;
 		}
 
 		if (last_slab_size >= impl->sd_arr[i].type.slab_size) {
-			fam_err = IllegalArgument;
+			SetErr(IllegalArgument);
 			return -1;
 		}
 		// for alignment, must be divisible by 8
 		if (impl->sd_arr[i].type.slab_size % 8 != 0) {
-			fam_err = IllegalArgument;
+			SetErr(IllegalArgument);
 			return -1;
 		}
 		// can't have higher max slabs than initial
 		if (impl->sd_arr[i].type.slabs_per_resize * impl->sd_arr[i].type.initial_chunks >
 			impl->sd_arr[i].type.max_slabs) {
-			fam_err = IllegalArgument;
+			SetErr(IllegalArgument);
 			return -1;
 		}
 		// max slabs
 		if (impl->sd_arr[i].type.max_slabs > MAX_SLABS) {
-			fam_err = IllegalArgument;
+			SetErr(IllegalArgument);
 			return -1;
 		}
 
 		// max slabs must be dividisble by slabs_per_resize
 		if (impl->sd_arr[i].type.max_slabs % impl->sd_arr[i].type.slabs_per_resize) {
-			fam_err = IllegalArgument;
+			SetErr(IllegalArgument);
 			return -1;
 		}
 		last_slab_size = impl->sd_arr[i].type.slab_size;
@@ -516,7 +516,7 @@ void slab_data_free(SlabData *sd, const FatPtr *fptr, bool zeroed) {
 
 int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 	if (ptr == NULL || size == 0) {
-		fam_err = IllegalArgument;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -530,7 +530,7 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
 		SlabData *sd = &impl->sd_arr[index];
 		ret = slab_data_allocate(sd, fptr, zeroed, global);
 	} else
-		fam_err = ResourceNotAvailable;
+		SetErr(ResourceNotAvailable);
 	return ret;
 }
 void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {

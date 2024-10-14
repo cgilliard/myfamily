@@ -40,7 +40,7 @@ void *mymalloc(u64 size) {
 	if (ret) {
 		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
 	} else
-		fam_err = AllocErr;
+		SetErr(AllocErr);
 	return ret;
 }
 void *myrealloc(void *ptr, u64 size) {
@@ -57,7 +57,7 @@ void *myrealloc(void *ptr, u64 size) {
 	if (ret) {
 		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
 	} else
-		fam_err = AllocErr;
+		SetErr(AllocErr);
 	return ret;
 }
 void myfree(void *ptr) {

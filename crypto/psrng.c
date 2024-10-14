@@ -16,6 +16,7 @@
 #include <crypto/psrng.h>
 #include <crypto/rand.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static struct AES_ctx ctx;

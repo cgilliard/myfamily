@@ -117,7 +117,7 @@ void weak_cleanup(WeakNc *ptr) {
 // build an rc
 int rc_build(Rc *ptr, void *data, u64 size, bool atomic, void (*cleanup)(void *)) {
 	if (ptr == NULL || size == 0) {
-		fam_err = IllegalArgument;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -125,7 +125,7 @@ int rc_build(Rc *ptr, void *data, u64 size, bool atomic, void (*cleanup)(void *)
 		// allocate for both meta data and user data
 		SendStateGuard _ = SetSend(atomic);
 		if (fam_alloc(&ptr->impl, size + sizeof(RcMeta))) {
-			fam_err = AllocErr;
+			SetErr(AllocErr);
 			return -1;
 		}
 	}
@@ -153,7 +153,7 @@ int rc_build(Rc *ptr, void *data, u64 size, bool atomic, void (*cleanup)(void *)
 // clone the reference counter incrementing the count
 int rc_clone(Rc *dst, const Rc *src) {
 	if (dst == NULL || src == NULL) {
-		fam_err = IllegalArgument;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 
@@ -178,7 +178,7 @@ void *rc_access(Rc *ptr) {
 
 int rc_weak(Weak *dst, const Rc *src) {
 	if (dst == NULL || src == NULL) {
-		fam_err = IllegalArgument;
+		SetErr(IllegalArgument);
 		return -1;
 	}
 	RcImpl *impl = $(src->impl);

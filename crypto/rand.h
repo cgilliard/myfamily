@@ -16,7 +16,6 @@
 #define _CRYPTO_RAND__
 
 #include <base/types.h>
-#include <stdlib.h>
 
 /**
  * Returns a random i8 value using the operating systems' getentropy function.
