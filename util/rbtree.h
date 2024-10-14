@@ -54,6 +54,8 @@ void *rbtree_get_mut(const RBTree *ptr, const void *key);
 i64 rbtree_size(const RBTree *ptr);
 int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
 					bool start_inclusive, const void *end_key, bool end_inclusive);
+int rbtree_iterator_reset(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
+						  bool start_inclusive, const void *end_key, bool end_inclusive);
 
 #ifdef TEST
 void rbtree_validate(const RBTree *ptr);

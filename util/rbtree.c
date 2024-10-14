@@ -15,6 +15,7 @@
 #include <assert.h>
 #include <base/bitflags.h>
 #include <base/fam_alloc.h>
+#include <base/fam_err.h>
 #include <base/macro_utils.h>
 #include <base/panic.h>
 #include <errno.h>
@@ -62,6 +63,7 @@ typedef struct RBTreeIteratorImpl {
 	u64 key_size;
 	u8 stack_pointer;
 	bool send;
+	RBTreeImpl *impl;
 } RBTreeIteratorImpl;
 
 // Data structure used for searching RBTrees.
@@ -762,25 +764,11 @@ i64 rbtree_size(const RBTree *ptr) {
 	return impl->size;
 }
 
-// return iterator object
-int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
-					bool start_inclusive, const void *end_key, bool end_inclusive) {
-	if (ptr == NULL || nil(ptr->impl)) {
-		errno = EINVAL;
-		return -1;
-	}
-
-	RBTreeImpl *impl = $(ptr->impl);
-
-	{
-		SendStateGuard _ = SetSend(impl->send);
-		if (fam_alloc(&iter->impl, sizeof(RBTreeIteratorImpl))) {
-			iter->impl = null;
-			return -1;
-		}
-	}
+int rbtree_iterator_impl(RBTreeImpl *impl, RBTreeIterator *iter, const void *start_key,
+						 bool start_inclusive, const void *end_key, bool end_inclusive) {
 
 	RBTreeIteratorImpl *rbimpl = $(iter->impl);
+	rbimpl->impl = impl;
 	rbimpl->compare = impl->compare;
 	rbimpl->stack_pointer = 0;
 	rbimpl->send = impl->send;
@@ -832,6 +820,38 @@ int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_k
 	}
 
 	return 0;
+}
+
+// reset the iterator (for reuse)
+int rbtree_iterator_reset(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
+						  bool start_inclusive, const void *end_key, bool end_inclusive) {
+	if (iter == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+
+	RBTreeImpl *impl = $(ptr->impl);
+	return rbtree_iterator_impl(impl, iter, start_key, start_inclusive, end_key, end_inclusive);
+}
+
+// return iterator object
+int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
+					bool start_inclusive, const void *end_key, bool end_inclusive) {
+	if (ptr == NULL || nil(ptr->impl)) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+
+	RBTreeImpl *impl = $(ptr->impl);
+
+	{
+		SendStateGuard _ = SetSend(impl->send);
+		if (fam_alloc(&iter->impl, sizeof(RBTreeIteratorImpl))) {
+			iter->impl = null;
+			return -1;
+		}
+	}
+	return rbtree_iterator_impl(impl, iter, start_key, start_inclusive, end_key, end_inclusive);
 }
 
 #ifdef TEST
