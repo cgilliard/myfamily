@@ -571,29 +571,12 @@ int object_send(Object *obj, Channel *channel) {
 	return 0;
 }
 
-#ifdef TEST
-void object_cleanup_rbtree(RBTree *ptr) {
-	if (!nil(tl_start_range_key.key))
-		fam_free(&tl_start_range_key.key);
-	if (!nil(tl_end_range_key.key))
-		fam_free(&tl_end_range_key.key);
-
-	if (thread_local_rbtree_iterator) {
-		rbtree_iterator_cleanup(thread_local_rbtree_iterator);
-		myfree(thread_local_rbtree_iterator);
-		thread_local_rbtree_iterator = NULL;
-	}
-	if (global_rbtree_iterator) {
-		rbtree_iterator_cleanup(global_rbtree_iterator);
-		myfree(global_rbtree_iterator);
-		global_rbtree_iterator = NULL;
-	}
-
-	RBTreeIterator itt;
-	rbtree_iterator(ptr, &itt, NULL, false, NULL, false);
+void object_cleanup_thread_local() {
+	rbtree_iterator_reset(thread_local_rbtree, thread_local_rbtree_iterator, NULL, false, NULL,
+						  false);
 	loop {
 		RbTreeKeyValue kv;
-		if (!rbtree_iterator_next(&itt, &kv))
+		if (!rbtree_iterator_next(thread_local_rbtree_iterator, &kv))
 			break;
 		ObjectKeyNc *key = kv.key;
 		fam_free(&key->key);
@@ -604,21 +587,53 @@ void object_cleanup_rbtree(RBTree *ptr) {
 			fam_free(&value->ptr);
 		}
 	}
-	rbtree_cleanup(ptr);
-	myfree(ptr);
+	rbtree_cleanup(thread_local_rbtree);
+	myfree(thread_local_rbtree);
+
+	if (!nil(tl_start_range_key.key))
+		fam_free(&tl_start_range_key.key);
+	if (!nil(tl_end_range_key.key))
+		fam_free(&tl_end_range_key.key);
+	if (thread_local_rbtree_iterator) {
+		rbtree_iterator_cleanup(thread_local_rbtree_iterator);
+		myfree(thread_local_rbtree_iterator);
+		thread_local_rbtree_iterator = NULL;
+	}
+	thread_local_rbtree = NULL;
 }
 
+#ifdef TEST
+u64 get_thread_local_rbtree_size() {
+	return rbtree_size(thread_local_rbtree);
+}
+u64 get_global_rbtree_size() {
+	return rbtree_size(global_rbtree);
+}
 void object_cleanup_global() {
-	if (thread_local_rbtree)
-		printf("size=%llu\n", rbtree_size(thread_local_rbtree));
-	if (global_rbtree)
-		printf("size=%llu\n", rbtree_size(global_rbtree));
-	if (thread_local_rbtree)
-		object_cleanup_rbtree(thread_local_rbtree);
-	if (global_rbtree)
-		object_cleanup_rbtree(global_rbtree);
+	if (global_rbtree) {
+		rbtree_iterator_reset(global_rbtree, global_rbtree_iterator, NULL, false, NULL, false);
+		loop {
+			RbTreeKeyValue kv;
+			if (!rbtree_iterator_next(global_rbtree_iterator, &kv))
+				break;
+			ObjectKeyNc *key = kv.key;
+			fam_free(&key->key);
 
-	thread_local_rbtree = NULL;
-	global_rbtree = NULL;
+			ObjectValue *value = kv.value;
+			ObjectValueData *ovd = $(value->ptr);
+			if (ovd->type == ObjectTypeString || ovd->type == ObjectTypeU64) {
+				fam_free(&value->ptr);
+			}
+		}
+		rbtree_cleanup(global_rbtree);
+		myfree(global_rbtree);
+		global_rbtree = NULL;
+	}
+
+	if (global_rbtree_iterator) {
+		rbtree_iterator_cleanup(global_rbtree_iterator);
+		myfree(global_rbtree_iterator);
+		global_rbtree_iterator = NULL;
+	}
 }
 #endif // TEST

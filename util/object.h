@@ -44,8 +44,11 @@ int object_set_property(Object *obj, const char *key, const Object *value);
 Object object_get_property(const Object *obj, const char *key);
 const char *object_as_string(const Object *obj);
 int object_as_u64(const Object *obj, u64 *value);
+void object_cleanup_thread_local();
 
 #ifdef TEST
+u64 get_thread_local_rbtree_size();
+u64 get_global_rbtree_size();
 void object_cleanup_global();
 #endif // TEST
 

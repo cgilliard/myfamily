@@ -515,7 +515,10 @@ MyTest(util, test_object) {
 	}
 
 	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
+	printf("tl_size=%llu,global_size=%llu\n", get_thread_local_rbtree_size(),
+		   get_global_rbtree_size());
 	object_cleanup_global();
+	object_cleanup_thread_local();
 }
 
 MyTest(util, test_object2) {
@@ -548,7 +551,10 @@ MyTest(util, test_object2) {
 		cr_assert_eq($u64(d), 99);
 	}
 	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
+	printf("tl_size=%llu,global_size=%llu\n", get_thread_local_rbtree_size(),
+		   get_global_rbtree_size());
 	object_cleanup_global();
+	object_cleanup_thread_local();
 }
 
 MyTest(util, test_print_err) {
@@ -583,7 +589,10 @@ MyTest(util, test_print_err) {
 		// Permission: generated error
 	}
 	// for testing purposes we cleanup the global RBTrees to ensure all memory is freed
+	printf("tl_size=%llu,global_size=%llu\n", get_thread_local_rbtree_size(),
+		   get_global_rbtree_size());
 	object_cleanup_global();
+	object_cleanup_thread_local();
 }
 
 int drop_count2 = 0;
