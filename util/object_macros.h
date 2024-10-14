@@ -80,6 +80,20 @@
 	__VA_OPT__($set_property(obj, k, __VA_ARGS__)) __VA_OPT__(NONE)($get_property(obj, k))
 
 #define $object_impl(v, ...)                                                                       \
-	_Generic((v), Object: $object_impl_(v, __VA_ARGS__), default: $rc_impl(v))
+	_Generic((v),                                                                                  \
+		u64: ({                                                                                    \
+				 ObjectNc _ret__;                                                                  \
+				 u64 *_prim__ = (u64 *)&v;                                                         \
+				 object_create(&_ret__, false, ObjectTypeU64, _prim__);                            \
+				 _ret__;                                                                           \
+			 }),                                                                                   \
+		char *: ({                                                                                 \
+				 ObjectNc _ret__;                                                                  \
+				 const char *_vin__ = _Generic((v), char *: v, default: NULL);                     \
+				 object_create(&_ret__, false, ObjectTypeString, _vin__);                          \
+				 _ret__;                                                                           \
+			 }),                                                                                   \
+		Object: $object_impl_(v, __VA_ARGS__),                                                     \
+		default: $rc_impl(v))
 #undef $
 #define $(...) __VA_OPT__($object_impl(__VA_ARGS__)) __VA_OPT__(NONE)($create_empty())

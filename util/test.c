@@ -544,6 +544,15 @@ MyTest(util, test_object2) {
 	cr_assert_eq($u64(d), 99);
 }
 
+MyTest(util, test_object3) {
+	var a = $();
+	u64 v = 111;
+	var b = $(v);
+	cr_assert_eq(111, $u64(b));
+	var c = $("test");
+	cr_assert(!strcmp("test", $string(c)));
+}
+
 MyTest(util, test_print_err) {
 	// instnatiate an object
 	let x = $();
