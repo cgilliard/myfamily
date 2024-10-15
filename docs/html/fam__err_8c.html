@@ -67,18 +67,91 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">fam_err.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="fam__err_8h_source.html">base/fam_err.h</a>&gt;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;stdlib.h&gt;</code><br />
+<code>#include &lt;string.h&gt;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ad2187f85357d783d2467916e26ceb518"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8c.html#ad2187f85357d783d2467916e26ceb518">get_err</a> ()</td></tr>
+<tr class="separator:ad2187f85357d783d2467916e26ceb518"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a744805e918acc28280f8b60251eefebc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8c.html#a744805e918acc28280f8b60251eefebc">print_err</a> (const char *text)</td></tr>
+<tr class="separator:a744805e918acc28280f8b60251eefebc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a173b6927bac70ae42204e204e765eab3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8c.html#a173b6927bac70ae42204e204e765eab3">do_backtrace_generate</a> (<a class="el" href="structBacktrace.html">Backtrace</a> *bt)</td></tr>
+<tr class="separator:a173b6927bac70ae42204e204e765eab3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a3614dce47244f368f45b5a6eda73cba0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8c.html#a3614dce47244f368f45b5a6eda73cba0">fam_err</a> = <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca06d32f047358de4e6a30c28046f4688e">Ok</a></td></tr>
+<tr class="memitem:ad05ca0fb9e1c5fa2f627f5a78bcc912f"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8c.html#ad05ca0fb9e1c5fa2f627f5a78bcc912f">FamErrText</a> [<a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca0a88d6469b4390cbca8e3a1ed823bb21">FamErrCount</a>]</td></tr>
+<tr class="separator:ad05ca0fb9e1c5fa2f627f5a78bcc912f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3614dce47244f368f45b5a6eda73cba0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8c.html#a3614dce47244f368f45b5a6eda73cba0">fam_err</a> = <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca500a74530b3abdb5d4ebe91cb5711b5a">NoErrors</a></td></tr>
 <tr class="separator:a3614dce47244f368f45b5a6eda73cba0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab30531e83b23bdfdd6466c549583e08a"><td class="memItemLeft" align="right" valign="top">_Thread_local char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8c.html#ab30531e83b23bdfdd6466c549583e08a">fam_err_last</a> [<a class="el" href="fam__err_8h.html#a0c8bbd905db6b23f4b0b89f82885ef23">ERR_LEN</a>] = {&quot;&quot;}</td></tr>
+<tr class="separator:ab30531e83b23bdfdd6466c549583e08a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21db30f72ef75d8135224182f843a45e"><td class="memItemLeft" align="right" valign="top">_Thread_local <a class="el" href="structBacktrace.html">Backtrace</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__err_8c.html#a21db30f72ef75d8135224182f843a45e">thread_local_bt__</a></td></tr>
+<tr class="separator:a21db30f72ef75d8135224182f843a45e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a173b6927bac70ae42204e204e765eab3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a173b6927bac70ae42204e204e765eab3">&#9670;&nbsp;</a></span>do_backtrace_generate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void do_backtrace_generate </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structBacktrace.html">Backtrace</a> *&#160;</td>
+          <td class="paramname"><em>bt</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad2187f85357d783d2467916e26ceb518"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2187f85357d783d2467916e26ceb518">&#9670;&nbsp;</a></span>get_err()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* get_err </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a744805e918acc28280f8b60251eefebc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a744805e918acc28280f8b60251eefebc">&#9670;&nbsp;</a></span>print_err()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void print_err </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>text</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Variable Documentation</h2>
 <a id="a3614dce47244f368f45b5a6eda73cba0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3614dce47244f368f45b5a6eda73cba0">&#9670;&nbsp;</a></span>fam_err</h2>
@@ -87,7 +160,54 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int fam_err = <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca06d32f047358de4e6a30c28046f4688e">Ok</a></td>
+          <td class="memname">int fam_err = <a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca500a74530b3abdb5d4ebe91cb5711b5a">NoErrors</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab30531e83b23bdfdd6466c549583e08a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab30531e83b23bdfdd6466c549583e08a">&#9670;&nbsp;</a></span>fam_err_last</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">_Thread_local char fam_err_last[<a class="el" href="fam__err_8h.html#a0c8bbd905db6b23f4b0b89f82885ef23">ERR_LEN</a>] = {&quot;&quot;}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad05ca0fb9e1c5fa2f627f5a78bcc912f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad05ca0fb9e1c5fa2f627f5a78bcc912f">&#9670;&nbsp;</a></span>FamErrText</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* FamErrText[<a class="el" href="fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca0a88d6469b4390cbca8e3a1ed823bb21">FamErrCount</a>]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div>
+<div class="line">    <span class="stringliteral">&quot;NoErrors&quot;</span>,           <span class="stringliteral">&quot;IllegalArgument&quot;</span>,  <span class="stringliteral">&quot;AllocError&quot;</span>, <span class="stringliteral">&quot;InitErr&quot;</span>,</div>
+<div class="line">    <span class="stringliteral">&quot;AlreadyInitialized&quot;</span>, <span class="stringliteral">&quot;IndexOutOfBounds&quot;</span>, <span class="stringliteral">&quot;IO&quot;</span>,         <span class="stringliteral">&quot;FileNotFound&quot;</span>,</div>
+<div class="line">    <span class="stringliteral">&quot;NotADirectory&quot;</span>,      <span class="stringliteral">&quot;IllegalState&quot;</span>,     <span class="stringliteral">&quot;TooBig&quot;</span>,     <span class="stringliteral">&quot;ResourceNotAvailable&quot;</span>,</div>
+<div class="line">    <span class="stringliteral">&quot;Permission&quot;</span>,         <span class="stringliteral">&quot;BackTraceErr&quot;</span>}</div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a21db30f72ef75d8135224182f843a45e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21db30f72ef75d8135224182f843a45e">&#9670;&nbsp;</a></span>thread_local_bt__</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">_Thread_local <a class="el" href="structBacktrace.html">Backtrace</a> thread_local_bt__</td>
         </tr>
       </table>
 </div><div class="memdoc">

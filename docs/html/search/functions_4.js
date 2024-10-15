@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['exit_933',['exit',['../panic_8c.html#a3809f7c3c89e9350a245949c2438a3ad',1,'panic.c']]],
-  ['exit_5ferror_934',['exit_error',['../misc_8c.html#a04d2c2dc4f9a32fccb11ff65d07bf171',1,'exit_error(char *format,...):&#160;misc.c'],['../misc_8h.html#a04d2c2dc4f9a32fccb11ff65d07bf171',1,'exit_error(char *format,...):&#160;misc.c']]]
+  ['do_5fbacktrace_5fgenerate_996',['do_backtrace_generate',['../fam__err_8c.html#a173b6927bac70ae42204e204e765eab3',1,'do_backtrace_generate(Backtrace *bt):&#160;fam_err.c'],['../fam__err_8h.html#a173b6927bac70ae42204e204e765eab3',1,'do_backtrace_generate(Backtrace *bt):&#160;fam_err.c']]]
 ];

@@ -92,6 +92,8 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a22da44ad7e82b3b042761e29ff859645"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rc_8h.html#a22da44ad7e82b3b042761e29ff859645">rc_impl</a>(<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>)&#160;&#160;&#160;	_Generic((<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), FatPtr: <a class="el" href="slabs_8h.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a>((<a class="el" href="structFatPtr.html">FatPtr</a> *)&amp;<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), Rc: <a class="el" href="rc_8h.html#a5cb03da781821a6f04af07c70cd3e6f7">rc_access</a>((<a class="el" href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a> *)&amp;<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), default: ({}))</td></tr>
+<tr class="separator:a22da44ad7e82b3b042761e29ff859645"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab217809047b5e19d1d0355c21f79f76d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rc_8h.html#ab217809047b5e19d1d0355c21f79f76d">nil</a>(<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>)&#160;&#160;&#160;	_Generic((<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), FatPtr: <a class="el" href="slabs_8h.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a>((<a class="el" href="structFatPtr.html">FatPtr</a> *)&amp;<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), Rc: <a class="el" href="slabs_8h.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a>(&amp;((<a class="el" href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a> *)&amp;<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>)-&gt;impl))</td></tr>
 <tr class="separator:ab217809047b5e19d1d0355c21f79f76d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d2815ad9048149013375578530283a8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rc_8h.html#a5d2815ad9048149013375578530283a8">rc_null</a></td></tr>
@@ -162,6 +164,24 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a22da44ad7e82b3b042761e29ff859645"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22da44ad7e82b3b042761e29ff859645">&#9670;&nbsp;</a></span>rc_impl</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define rc_impl</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a></td><td>)</td>
+          <td>&#160;&#160;&#160;	_Generic((<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), FatPtr: <a class="el" href="slabs_8h.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a>((<a class="el" href="structFatPtr.html">FatPtr</a> *)&amp;<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), Rc: <a class="el" href="rc_8h.html#a5cb03da781821a6f04af07c70cd3e6f7">rc_access</a>((<a class="el" href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a> *)&amp;<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), default: ({}))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a5d2815ad9048149013375578530283a8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5d2815ad9048149013375578530283a8">&#9670;&nbsp;</a></span>rc_null</h2>
 
@@ -176,7 +196,7 @@ Functions</h2></td></tr>
 <b>Value:</b><div class="fragment"><div class="line">    (<span class="keyword">const</span> <a class="code" href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a>) {                                                                                   \</div>
 <div class="line">        .impl = <span class="keyword">null</span>                                                                               \</div>
 <div class="line">    }</div>
-<div class="ttc" id="arc_8h_html_a23e583efdf471a92b947f0501d05cd2b"><div class="ttname"><a href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a></div><div class="ttdeci">#define Rc</div><div class="ttdef"><b>Definition:</b> rc.h:62</div></div>
+<div class="ttc" id="arc_8h_html_a23e583efdf471a92b947f0501d05cd2b"><div class="ttname"><a href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a></div><div class="ttdeci">#define Rc</div><div class="ttdef"><b>Definition:</b> rc.h:69</div></div>
 </div><!-- fragment -->
 </div>
 </div>

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['weak_5fcleanup_1167',['weak_cleanup',['../rc_8c.html#a6f0f362baab05bcdd03bc8994558a99f',1,'weak_cleanup(WeakNc *ptr):&#160;rc.c'],['../rc_8h.html#a6f0f362baab05bcdd03bc8994558a99f',1,'weak_cleanup(WeakNc *ptr):&#160;rc.c']]],
-  ['write_5fto_5fdisk_1168',['write_to_disk',['../main_8h.html#add780f582425ce6db96ba74b6f83f88b',1,'write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size):&#160;real_main.c'],['../real__main_8c.html#add780f582425ce6db96ba74b6f83f88b',1,'write_to_disk(const char *dir, const char *file_name, const unsigned char *data, u64 size):&#160;real_main.c']]]
+  ['u64_5fcompare_1237',['u64_compare',['../rbtree__perf_8c.html#a146d06dae3702da4363a1626e2e4d003',1,'u64_compare(const void *v1, const void *v2):&#160;rbtree_perf.c'],['../util_2test_8c.html#a146d06dae3702da4363a1626e2e4d003',1,'u64_compare(const void *v1, const void *v2):&#160;test.c']]]
 ];
