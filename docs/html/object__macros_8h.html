@@ -90,8 +90,8 @@ Macros</h2></td></tr>
 <tr class="separator:a051c3a385f7ded5dd7651b9bb313fa7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab217809047b5e19d1d0355c21f79f76d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object__macros_8h.html#ab217809047b5e19d1d0355c21f79f76d">nil</a>(<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>)&#160;&#160;&#160;<a class="el" href="object__macros_8h.html#a051c3a385f7ded5dd7651b9bb313fa7c">obj_nil</a>(<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>)</td></tr>
 <tr class="separator:ab217809047b5e19d1d0355c21f79f76d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8faa792e97e26633b157790c2ccd3fa9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object__macros_8h.html#a8faa792e97e26633b157790c2ccd3fa9">u64</a>(obj)</td></tr>
-<tr class="separator:a8faa792e97e26633b157790c2ccd3fa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c600e4f6b09bb177ce0c43e445b15fd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object__macros_8h.html#a8c600e4f6b09bb177ce0c43e445b15fd">u64</a>(<a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>)</td></tr>
+<tr class="separator:a8c600e4f6b09bb177ce0c43e445b15fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc61ec5421efdf995153ffd584a497c3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object__macros_8h.html#adc61ec5421efdf995153ffd584a497c3">string</a>(obj)&#160;&#160;&#160;<a class="el" href="object_8h.html#a736b44166b1a5240e0a6e256fd788f3a">object_as_string</a>(&amp;obj)</td></tr>
 <tr class="separator:adc61ec5421efdf995153ffd584a497c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84affe82f1ae71e01def5b72d17fcd8a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object__macros_8h.html#a84affe82f1ae71e01def5b72d17fcd8a">create_empty</a>()</td></tr>
@@ -190,7 +190,7 @@ Macros</h2></td></tr>
 <div class="line">        ObjectNc _ret__ = <a class="code" href="object_8c.html#ae719ad828d168e5faa47cd48afeca53f">object_get_property</a>(&amp;obj, k);                                            \</div>
 <div class="line">        _ret__;                                                                                    \</div>
 <div class="line">    })</div>
-<div class="ttc" id="aobject_8c_html_ae719ad828d168e5faa47cd48afeca53f"><div class="ttname"><a href="object_8c.html#ae719ad828d168e5faa47cd48afeca53f">object_get_property</a></div><div class="ttdeci">Object object_get_property(const Object *obj, const char *key)</div><div class="ttdef"><b>Definition:</b> object.c:530</div></div>
+<div class="ttc" id="aobject_8c_html_ae719ad828d168e5faa47cd48afeca53f"><div class="ttname"><a href="object_8c.html#ae719ad828d168e5faa47cd48afeca53f">object_get_property</a></div><div class="ttdeci">Object object_get_property(const Object *obj, const char *key)</div><div class="ttdef"><b>Definition:</b> object.c:586</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -399,20 +399,20 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    _Generic((<a class="code" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>),                                                                                  \</div>
 <div class="line">        <a class="code" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>: ({                                                                                    \</div>
-<div class="line">                 ObjectNc _v__ = <a class="code" href="object__macros_8h.html#a263efce0e5cda1d387a1a43f94715445">NIL</a>;                                                              \</div>
+<div class="line">                 Object _v__ = <a class="code" href="object__macros_8h.html#a263efce0e5cda1d387a1a43f94715445">NIL</a>;                                                                \</div>
 <div class="line">                 object_create(&amp;_v__, <span class="keyword">false</span>, <a class="code" href="object_8h.html#a842c5e2e69277690b064bf363c017980ac29f44ec98c6db08e750e668d3c6a84b">ObjectTypeU64</a>, &amp;<a class="code" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>);                                   \</div>
 <div class="line">                 if (!<a class="code" href="object__macros_8h.html#ab217809047b5e19d1d0355c21f79f76d">nil</a>(_v__))                                                                   \</div>
 <div class="line">                     object_set_property(&amp;obj, k, &amp;_v__);                                          \</div>
 <div class="line">             }),                                                                                   \</div>
 <div class="line">        <a class="code" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>: ({ <a class="code" href="object_8c.html#a02c0427d5094a00cde35c9c33e73b0e9">object_set_property</a>(&amp;obj, k, (<a class="code" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *)&amp;<a class="code" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>); }),                                 \</div>
 <div class="line">        <span class="keywordflow">default</span>: ({                                                                                \</div>
-<div class="line">                 ObjectNc _v__ = <a class="code" href="object__macros_8h.html#a263efce0e5cda1d387a1a43f94715445">NIL</a>;                                                              \</div>
+<div class="line">                 Object _v__ = <a class="code" href="object__macros_8h.html#a263efce0e5cda1d387a1a43f94715445">NIL</a>;                                                                \</div>
 <div class="line">                 const <span class="keywordtype">char</span> *_vin__ = _Generic((<a class="code" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>), <span class="keywordtype">char</span> *: <a class="code" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>, <span class="keywordflow">default</span>: <a class="code" href="resources_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>);                     \</div>
 <div class="line">                 object_create(&amp;_v__, <span class="keyword">false</span>, <a class="code" href="object_8h.html#a842c5e2e69277690b064bf363c017980a621936586cc352d53b89a56387b3afdc">ObjectTypeString</a>, _vin__);                            \</div>
 <div class="line">                 if (!<a class="code" href="object__macros_8h.html#ab217809047b5e19d1d0355c21f79f76d">nil</a>(_v__))                                                                   \</div>
 <div class="line">                     object_set_property(&amp;obj, k, &amp;_v__);                                          \</div>
 <div class="line">             }))</div>
-<div class="ttc" id="aobject_8c_html_a02c0427d5094a00cde35c9c33e73b0e9"><div class="ttname"><a href="object_8c.html#a02c0427d5094a00cde35c9c33e73b0e9">object_set_property</a></div><div class="ttdeci">int object_set_property(Object *obj, const char *key, const Object *value)</div><div class="ttdef"><b>Definition:</b> object.c:496</div></div>
+<div class="ttc" id="aobject_8c_html_a02c0427d5094a00cde35c9c33e73b0e9"><div class="ttname"><a href="object_8c.html#a02c0427d5094a00cde35c9c33e73b0e9">object_set_property</a></div><div class="ttdeci">int object_set_property(Object *obj, const char *key, const Object *value)</div><div class="ttdef"><b>Definition:</b> object.c:529</div></div>
 <div class="ttc" id="aobject__macros_8h_html_ab217809047b5e19d1d0355c21f79f76d"><div class="ttname"><a href="object__macros_8h.html#ab217809047b5e19d1d0355c21f79f76d">nil</a></div><div class="ttdeci">#define nil(v)</div><div class="ttdef"><b>Definition:</b> object_macros.h:30</div></div>
 </div><!-- fragment -->
 </div>
@@ -435,8 +435,8 @@ Macros</h2></td></tr>
 
 </div>
 </div>
-<a id="a8faa792e97e26633b157790c2ccd3fa9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8faa792e97e26633b157790c2ccd3fa9">&#9670;&nbsp;</a></span>u64</h2>
+<a id="a8c600e4f6b09bb177ce0c43e445b15fd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c600e4f6b09bb177ce0c43e445b15fd">&#9670;&nbsp;</a></span>u64</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -445,14 +445,14 @@ Macros</h2></td></tr>
           <td class="memname">#define <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a></td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">obj</td><td>)</td>
+          <td class="paramname"><a class="el" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
 <div class="line">        u64 _ret__;                                                                                \</div>
-<div class="line">        object_as_u64(&amp;obj, &amp;_ret__);                                                              \</div>
+<div class="line">        object_as_u64(&amp;<a class="code" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>, &amp;_ret__);                                                                \</div>
 <div class="line">        _ret__;                                                                                    \</div>
 <div class="line">    })</div>
 </div><!-- fragment -->
