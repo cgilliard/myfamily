@@ -48,14 +48,14 @@
 #define $set_property(obj, k, v)                                                                   \
 	_Generic((v),                                                                                  \
 		u64: ({                                                                                    \
-				 ObjectNc _v__ = NIL;                                                              \
+				 Object _v__ = NIL;                                                                \
 				 object_create(&_v__, false, ObjectTypeU64, &v);                                   \
 				 if (!nil(_v__))                                                                   \
 					 object_set_property(&obj, k, &_v__);                                          \
 			 }),                                                                                   \
 		Object: ({ object_set_property(&obj, k, (Object *)&v); }),                                 \
 		default: ({                                                                                \
-				 ObjectNc _v__ = NIL;                                                              \
+				 Object _v__ = NIL;                                                                \
 				 const char *_vin__ = _Generic((v), char *: v, default: NULL);                     \
 				 object_create(&_v__, false, ObjectTypeString, _vin__);                            \
 				 if (!nil(_v__))                                                                   \

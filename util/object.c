@@ -194,6 +194,18 @@ int object_init_local() {
 	return 0;
 }
 
+void object_check_consumed(const Object *ptr) {
+	if (ptr == NULL)
+		panic("Object pointer NULL!");
+	ObjectFlags *flags = $(ptr->flags);
+	BitFlags bf = {.flags = &flags->flags, .capacity = 1};
+	bool consumed = bitflags_check(&bf, OBJECT_FLAG_CONSUMED);
+	if (consumed)
+		panic("Object has been consumed!");
+	if (nil(ptr->impl))
+		panic("Object is nil!");
+}
+
 void object_cleanup(const ObjectNc *ptr) {
 #if defined(__clang__)
 // Clang-specific pragma
@@ -211,6 +223,7 @@ void object_cleanup(const ObjectNc *ptr) {
 	if (ptr_mut == NULL) {
 		return;
 	}
+
 	if (!nil(ptr_mut->flags)) {
 		fam_free(&ptr_mut->flags);
 		ptr_mut->flags = null;
@@ -227,6 +240,7 @@ void object_cleanup(const ObjectNc *ptr) {
 }
 
 int object_move(const Object *dst, const Object *src) {
+	object_check_consumed(src);
 // note: we want to allow immutable objects to be moved. We therefore need to update their
 // flags which require this override.
 #if defined(__clang__)
@@ -243,15 +257,37 @@ int object_move(const Object *dst, const Object *src) {
 	ObjectNc *src_mut = src;
 	ObjectNc *dst_mut = dst;
 #pragma GCC diagnostic pop
-	dst_mut->flags = src->flags;
+
+	// dst_mut->flags = src->flags;
+	//  src_mut->flags = null;
+
+	ObjectFlags *src_flags = $(src_mut->flags);
+	BitFlags bfsrc = {.flags = &src_flags->flags, .capacity = 1};
+	bool src_send = bitflags_check(&bfsrc, OBJECT_FLAG_SEND);
+	bool src_imut = bitflags_check(&bfsrc, OBJECT_FLAG_IMUT);
+
+	{
+		SendStateGuard _ = SetSend(src_send);
+		if (fam_alloc(&dst_mut->flags, sizeof(ObjectFlags)))
+			return -1;
+	}
+
+	ObjectFlags *dst_flags = $(dst_mut->flags);
+	BitFlags bfdst = {.flags = &dst_flags->flags, .capacity = 1};
+
 	dst_mut->impl = src->impl;
 	src_mut->impl = rc_null;
-	src_mut->flags = null;
+
+	dst_flags->flags = 0;
+	bitflags_set(&bfdst, OBJECT_FLAG_SEND, src_send);
+	bitflags_set(&bfdst, OBJECT_FLAG_IMUT, src_imut);
+	bitflags_set(&bfsrc, OBJECT_FLAG_CONSUMED, true);
 
 	return 0;
 }
 
 int object_ref(const Object *dst, const Object *src) {
+	object_check_consumed(src);
 	FatPtr flags;
 	bool send;
 	bool src_imut;
@@ -364,6 +400,7 @@ void object_cleanup_rc(ObjectImpl *impl) {
 }
 
 int object_set_property_string(Object *obj, const char *key, const char *value) {
+	object_check_consumed(obj);
 	ObjectImpl *impl = $(obj->impl);
 	RBTreeNc *tree = object_tree_for(obj);
 
@@ -392,6 +429,7 @@ int object_set_property_string(Object *obj, const char *key, const char *value) 
 }
 
 int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
+	object_check_consumed(obj);
 	ObjectImpl *impl = $(obj->impl);
 	RBTreeNc *tree = object_tree_for(obj);
 
@@ -417,8 +455,9 @@ int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
 	return ret;
 }
 
-ObjectType object_type(const Object *ptr) {
-	ObjectImpl *impl = $(ptr->impl);
+ObjectType object_type(const Object *obj) {
+	object_check_consumed(obj);
+	ObjectImpl *impl = $(obj->impl);
 	return impl->type;
 }
 
@@ -484,9 +523,11 @@ int object_create(Object *obj, bool send, ObjectType type, const void *primitive
 	return 0;
 }
 int object_send(Object *obj, Channel *channel) {
+	object_check_consumed(obj);
 	return 0;
 }
 int object_set_property(Object *obj, const char *key, const Object *value) {
+	object_check_consumed(obj);
 	ObjectImpl *impl = $(obj->impl);
 	ObjectKeyNc objkey = INIT_OBJECT_KEY;
 	object_key_for(&objkey, obj, key);
@@ -543,6 +584,7 @@ int object_set_property(Object *obj, const char *key, const Object *value) {
 }
 
 Object object_get_property(const Object *obj, const char *key) {
+	object_check_consumed(obj);
 	ObjectImpl *impl = $(obj->impl);
 	ObjectKey objkey = INIT_OBJECT_KEY;
 	object_key_for(&objkey, obj, key);
@@ -567,6 +609,7 @@ Object object_get_property(const Object *obj, const char *key) {
 }
 
 const char *object_as_string(const Object *obj) {
+	object_check_consumed(obj);
 	ObjectImpl *impl = $(obj->impl);
 	RBTreeNc *tree = object_tree_for(obj);
 
@@ -590,6 +633,7 @@ const char *object_as_string(const Object *obj) {
 }
 
 int object_as_u64(const Object *obj, u64 *value) {
+	object_check_consumed(obj);
 	int ret = 0;
 
 	ObjectImpl *impl = $(obj->impl);

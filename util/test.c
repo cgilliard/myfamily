@@ -656,18 +656,42 @@ MyTest(util, test_object_macros) {
 	// assert that out2 as u64 is 1234
 	cr_assert_eq($u64(out2), 1234);
 
-	let v = $(x, "aadf");
+	var v = $(x, "aadf");
 	cr_assert(nil(v));
 
-	/*
-		// look for a property
-		let v = $(x, "undefined");
-		// determine if it's not found with the 'nil' macro.
-		if (nil(v)) {
-			// set error code and generate backtrace
-			SetErr(ResourceNotAvailable);
-			return -1; // return -1
-		}
-		// process....
-	*/
+	let x0 = $("testing123");
+	var x1 = $();
+	var x2 = $();
+	var x3 = $();
+	var x4 = $();
+
+	$(x1, "x0", x0);
+	$(x2, "x1", x1);
+	$(x3, "x2", x2);
+	$(x4, "x3", x3);
+	// x3 has been consumed. If uncommented, this will generate a runtime error
+	// $(x3, "test", "test");
+
+	let x3_out = $(x4, "x3");
+	let x2_out = $(x3_out, "x2");
+	let x1_out = $(x2_out, "x1");
+	let x0_out = $(x1_out, "x0");
+	cr_assert(!strcmp($string(x0_out), "testing123"));
+}
+
+MyTest(util, test_move_ref) {
+	let y;
+	{
+		let x = $("test");
+		object_ref(&y, &x);
+		cr_assert(!strcmp($string(x), "test"));
+	}
+	cr_assert(!strcmp($string(y), "test"));
+
+	let a;
+	{
+		let b = $("abc");
+		object_move(&a, &b);
+	}
+	cr_assert(!strcmp($string(a), "abc"));
 }
