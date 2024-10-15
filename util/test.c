@@ -713,6 +713,65 @@ MyTest(util, test_remove_property) {
 	cr_assert(nil(xtest));
 	let x2test = $(x1, "test2");
 	cr_assert(!nil(x2test));
+
+	/*
+
+		var x1 = $();
+		$(x1, "key1", "value1");	// set property key1 -> value1 (index 0)
+		$(x1, "key2", "value2");	// set property key2 -> value2 (index 1)
+		$(x1, 0, "replacedvalue1"); // set the first value (based on insertion order) to
+	   replacedvalue1. That would mean key1 -> replacedvalue1.
+		$(x1, 1, "replacedvalue2"); // set the first value (based on insertion order) to
+	   replacedvalue2. That would mean key2 -> replacedvalue2.
+		$(x1, "key3", "value3");	// set property key3 -> value3 (index 2)
+		$insert_after(x1, 1, "key2.5", "value2.5"); // inserts the k/v pair after index 1 key2.5 ->
+	   value 2.5, shifting all other entries by 1. $insert_before(x1, 0, "key0", "value0"); //
+	   inserts the k/v pair before index 0, shifting all other entries by 1.
+
+		var x1 = $();
+			x1.key1 = "value1";        // set property key1 -> value1 (index 0)
+			x1.key2 = "value2";        // set property key2 -> value2 (index 1)
+			x1[0] = "replacedvalue1"; // set the first value (based on insertion order) to
+	   replacedvalue1. That would mean key1 -> replacedvalue1. x1[1] = "replacedvalue2"; // set the
+	   first value (based on insertion order) to replacedvalue2. That would mean key2 ->
+	   replacedvalue2. x1.key3 = "value3";        // set property key3 -> value3 (index 2) x1[1] >=
+	   ("key2.5", "value2.5"); // inserts the k/v pair after index 1 key2.5 -> value 2.5, shifting
+	   all other entries by 1. x1[0] <= ("key0", "value0"); // inserts the k/v pair before index 0,
+	   shifting all other entries by 1.
+
+		typedef struct Property {
+			void *key;
+			ObjectNc value;
+		} Property;
+
+		// a regular (simple) version with string properties
+		var x2 = $();
+		$(x1, "key1", "value1");
+		$(x2, "key2", "value2");
+
+		// with a custom sort function (my_sort) compares the void *key data in SortableKey (like
+	   qsort) var x3 = $(with(sort, my_sort)); Property p1, p2; p1.key = &some_key; p1.value =
+	   &some_value; p2.key = &some_key2; p2.value = &some_value2;
+
+		// insert kv/pairs.
+		$(x1, p1);
+		$(x2, p2);
+
+		// for each
+		foreach (k, v, x1) {
+			debug("k={},v={}", k, v);
+		}
+
+		var x = $();
+		x1["testa"] = 123;
+		x1.push("test");
+		x1.push(64ULL);
+		x1.pop();
+		x1[0] = "hi";
+		foreach (x, x1) {
+			debug("x={}", x);
+		}
+	*/
 }
 
 /*

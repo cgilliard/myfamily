@@ -145,12 +145,12 @@ RBTreeIttPair *init_rbtree_pair(bool global) {
 
 u64 object_namespace_id_next_local() {
 	u64 ret = thread_local_namespace_next;
-	thread_local_namespace_next++;
+	thread_local_namespace_next += 2;
 	return ret;
 }
 
 u64 object_namespace_id_next_global() {
-	u64 ret = atomic_fetch_add(&global_namespace_next, 1);
+	u64 ret = atomic_fetch_add(&global_namespace_next, 2);
 	return ret;
 }
 
