@@ -79,7 +79,6 @@ typedef struct ObjectValueData {
 #define OBJECT_FLAG_CONSUMED 1
 #define OBJECT_FLAG_NO_CLEANUP 2
 #define OBJECT_FLAG_SEND 3
-#define OBJECT_FLAG_IMUT 4
 
 int object_property_name_compare(const void *v1, const void *v2) {
 	const ObjectKeyNc *k1 = v1;
@@ -246,8 +245,9 @@ void object_cleanup(const ObjectNc *ptr) {
 	}
 }
 
-int object_move(const Object *dst, const Object *src) {
+Object object_move(const Object *src) {
 	object_check_consumed(src);
+	ObjectNc dst;
 // note: we want to allow immutable objects to be moved. We therefore need to update their
 // flags which require this override.
 #if defined(__clang__)
@@ -262,76 +262,63 @@ int object_move(const Object *dst, const Object *src) {
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
 	ObjectNc *src_mut = src;
-	ObjectNc *dst_mut = dst;
 #pragma GCC diagnostic pop
 
 	ObjectFlags *src_flags = $(src_mut->flags);
 	BitFlags bfsrc = {.flags = &src_flags->flags, .capacity = 1};
 	bool src_send = bitflags_check(&bfsrc, OBJECT_FLAG_SEND);
-	bool src_imut = bitflags_check(&bfsrc, OBJECT_FLAG_IMUT);
 
 	{
 		SendStateGuard _ = SetSend(src_send);
-		if (fam_alloc(&dst_mut->flags, sizeof(ObjectFlags)))
-			return -1;
+		if (fam_alloc(&dst.flags, sizeof(ObjectFlags)))
+			return NIL;
 	}
 
-	ObjectFlags *dst_flags = $(dst_mut->flags);
+	ObjectFlags *dst_flags = $(dst.flags);
 	BitFlags bfdst = {.flags = &dst_flags->flags, .capacity = 1};
 
-	dst_mut->impl = src->impl;
+	dst.impl = src->impl;
 	src_mut->impl = rc_null;
 
 	dst_flags->flags = 0;
 	bitflags_set(&bfdst, OBJECT_FLAG_SEND, src_send);
-	bitflags_set(&bfdst, OBJECT_FLAG_IMUT, src_imut);
 	bitflags_set(&bfsrc, OBJECT_FLAG_CONSUMED, true);
 
+	return dst;
+}
+
+int object_weak(const Object *dst, const Object *src) {
 	return 0;
 }
 
-int object_ref(const Object *dst, const Object *src) {
+Object object_ref(const Object *src) {
 	object_check_consumed(src);
 	FatPtr flags;
 	bool send;
-	bool src_imut;
 	ObjectFlags *src_flags = $(src->flags);
 	BitFlags bfsrc = {.flags = &src_flags->flags, .capacity = 1};
 	send = bitflags_check(&bfsrc, OBJECT_FLAG_SEND);
-	src_imut = bitflags_check(&bfsrc, OBJECT_FLAG_IMUT);
 	{
 		SendStateGuard _ = SetSend(send);
 		if (fam_alloc(&flags, sizeof(ObjectFlags))) {
-			return -1;
+			return NIL;
 		}
 	}
 	ObjectFlags *ff = $(flags);
 	ff->flags = 0;
 	BitFlags bfdst = {.flags = &ff->flags, .capacity = 1};
 	bitflags_set(&bfdst, OBJECT_FLAG_SEND, send);
-	bitflags_set(&bfdst, OBJECT_FLAG_IMUT, true);
 
-#if defined(__clang__)
-// Clang-specific pragma
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
-#elif defined(__GNUC__) && !defined(__clang__)
-// GCC-specific pragma
-#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
-#else
-#warning "Unknown compiler or platform. No specific warning pragmas applied."
-#endif
-	ObjectNc *unconstdst = dst;
-#pragma GCC diagnostic pop
-	unconstdst->flags = flags;
+	ObjectNc dst;
+	dst.flags = flags;
 
-	int ret = rc_clone(&unconstdst->impl, &src->impl);
+	int ret = rc_clone(&dst.impl, &src->impl);
 
 	if (ret) {
 		fam_free(&flags);
+		return NIL;
 	}
-	return ret;
+	return dst;
 }
 
 int object_key_for(ObjectKey *objkey, const Object *obj, const char *key) {
@@ -545,7 +532,8 @@ int object_set_property(Object *obj, const char *key, const Object *value) {
 	ObjectValueData *ovd = $(objvalue.ptr);
 	ovd->type = ObjectTypeObject;
 	ObjectNc *obj_ptr = (Object *)ovd->value;
-	if (object_move(obj_ptr, value)) {
+	*obj_ptr = $move(*value);
+	if (nil(*obj_ptr)) {
 		object_key_cleanup(&objkey);
 		return -1;
 	}
@@ -605,9 +593,7 @@ Object object_get_property(const Object *obj, const char *key) {
 	}
 
 	const ObjectValueData *value_data = $(value->ptr);
-	const ObjectNc ref;
-
-	object_ref(&ref, (ObjectNc *)value_data->value);
+	const ObjectNc ref = object_ref((ObjectNc *)value_data->value);
 
 	return ref;
 }

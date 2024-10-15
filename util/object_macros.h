@@ -45,8 +45,8 @@ extern void *no_cleanup;
 		_ret__;                                                                                    \
 	})
 
-#define $ref(x, y) object_ref(&x, &y)
-#define $move(x, y) object_ref(&x, &y)
+#define $ref(x) object_ref(&x)
+#define $move(x) object_move(&x)
 
 #define $string(obj) object_as_string(&obj)
 

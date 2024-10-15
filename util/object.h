@@ -35,8 +35,8 @@ void object_cleanup(const ObjectNc *ptr);
 
 #define Object ObjectNc __attribute__((warn_unused_result, cleanup(object_cleanup)))
 
-int object_move(const Object *dst, const Object *src);
-int object_ref(const Object *dst, const Object *src);
+Object object_move(const Object *src);
+Object object_ref(const Object *src);
 int object_create(Object *obj, bool send, ObjectType type, const void *primitive);
 ObjectType object_type(const Object *obj);
 int object_send(Object *obj, Channel *channel);
