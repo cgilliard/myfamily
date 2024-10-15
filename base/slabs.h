@@ -15,26 +15,23 @@
 #ifndef _BASE_SLABS__
 #define _BASE_SLABS__
 
+#include <base/macro_utils.h>
 #include <base/types.h>
+
+// FatPtr flags
+#define FAT_PTR_FLAG_GLOBAL 0
+#define FAT_PTR_FLAG_MALLOC 1
+#define FAT_PTR_FLAG_PIN 2
+#define FAT_PTR_FLAG_USR1 3
+#define FAT_PTR_FLAG_USR2 4
+#define FAT_PTR_FLAG_USR3 5
+#define FAT_PTR_FLAG_NIL 6
+#define MAX_SLABS 4000000000
 
 // FatPtr data type
 typedef struct FatPtr {
 	void *data;
 } FatPtr;
-
-// Internal representation for null
-typedef struct FatPtrNilImpl {
-	u128 internal;
-} FatPtrNilImpl;
-
-// Global constant that points to a all ones implementation of FatPtrImpl (so all bit flags are set)
-static const FatPtrNilImpl fatptr_impl_null = {UINT128_MAX};
-#define null                                                                                       \
-	(const FatPtr) {                                                                               \
-		.data = (void *)&fatptr_impl_null                                                          \
-	}
-
-#define nil(v) (fat_ptr_is_nil(&v))
 
 int fat_ptr_mallocate(FatPtr *ptr, u64 size);
 void fat_ptr_malloc_free(FatPtr *ptr);
@@ -43,24 +40,11 @@ void fat_ptr_malloc_free(FatPtr *ptr);
 // be able to read the length and the data pointer.
 u32 fat_ptr_size(const FatPtr *ptr);
 void *fat_ptr_data(const FatPtr *ptr);
-bool fat_ptr_is_global(const FatPtr *ptr);
-bool fat_ptr_is_pin(const FatPtr *ptr);
-bool fat_ptr_is_copy(const FatPtr *ptr);
-bool fat_ptr_is_malloc(const FatPtr *ptr);
+bool fat_ptr_flag_get(const FatPtr *ptr, u8 flag);
+void fat_ptr_flag_set(const FatPtr *ptr, u8 flag, bool value);
 bool fat_ptr_is_nil(const FatPtr *ptr);
 
-int fat_ptr_set_copy(FatPtr *ptr);
-int fat_ptr_pin(FatPtr *ptr);
-
-#define $(v) (fat_ptr_data(&v))
-#define $size(v) (fat_ptr_size(&v))
-#define $global(v) (fat_ptr_is_global(&v))
-#define $pin(v) (fat_ptr_is_pin(&v))
-#define $copy(v) (fat_ptr_is_copy(&v))
-
 // Slab Allocator
-
-#define MAX_SLABS 4000000000
 
 // Slab Type definition
 typedef struct SlabType {
@@ -101,10 +85,56 @@ int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr);
 void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr);
 u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr);
 
+typedef struct FatPtrMask {
+	u8 v0;
+	u8 v1;
+	u8 v2;
+	u8 v3;
+	u8 v4;
+	u8 v5;
+	u8 v6;
+	u8 v7;
+	void *data;
+} FatPtrMask;
+
+#if defined(__clang__)
+// Clang-specific pragma
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+#elif defined(__GNUC__) && !defined(__clang__)
+// GCC-specific pragma
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+#else
+#warning "Unknown compiler or platform. No specific warning pragmas applied."
+#endif
+static const FatPtrMask fat_ptr_not_null = {.data = &fat_ptr_not_null, .v7 = 0};
+static const FatPtrMask fat_ptr_null = {.data = &fat_ptr_not_null, .v7 = UINT8_MAX};
+#pragma GCC diagnostic pop
+
+#define not_null                                                                                   \
+	(const FatPtr) {                                                                               \
+		.data = (void *)&fat_ptr_not_null                                                          \
+	}
+#define null                                                                                       \
+	(const FatPtr) {                                                                               \
+		.data = (void *)&fat_ptr_null                                                              \
+	}
+#define nil(v) (fat_ptr_flag_get(&v, FAT_PTR_FLAG_NIL))
+
+#define $(v) (fat_ptr_data(&v))
+#define $size(v) (fat_ptr_size(&v))
+#define $flag(v, flag, ...)                                                                        \
+	__VA_OPT__((fat_ptr_flag_set(&v, flag, __VA_ARGS__)))                                          \
+	__VA_OPT__(NONE)(fat_ptr_flag_get(&v, flag))
+#define $global(v) $flag(v, FAT_PTR_FLAG_GLOBAL)
+#define $pin(v) $flag(v, FAT_PTR_FLAG_PIN, true)
+#define $is_pin(v) $flag(v, FAT_PTR_FLAG_PIN)
+
 // These are test helper functions
 #ifdef TEST
 u32 fat_ptr_id(const FatPtr *ptr);
-void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len, bool global, bool pin, bool copy);
+void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len, bool global, bool pin);
 void fat_ptr_free_test_obj32(FatPtr *ptr);
 #endif // TEST
 

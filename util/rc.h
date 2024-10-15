@@ -28,7 +28,9 @@
 #ifndef obj_nil
 #undef nil
 #define nil(v)                                                                                     \
-	_Generic((v), FatPtr: fat_ptr_is_nil((FatPtr *)&v), Rc: fat_ptr_is_nil(&((Rc *)&v)->impl))
+	_Generic((v),                                                                                  \
+		FatPtr: fat_ptr_flag_get((FatPtr *)&v, FAT_PTR_FLAG_NIL),                                  \
+		Rc: fat_ptr_flag_get(&((Rc *)&v)->impl, FAT_PTR_FLAG_NIL))
 #endif // obj_nil
 
 // Reference counter type

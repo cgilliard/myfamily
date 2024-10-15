@@ -122,7 +122,7 @@ int fam_alloc(FatPtr *ptr, u64 size) {
 	return ret;
 }
 int fam_realloc(FatPtr *ptr, u64 size) {
-	if (fat_ptr_is_pin(ptr)) {
+	if ($is_pin(*ptr)) {
 		fam_err = IllegalState;
 		return -1;
 	}
@@ -157,12 +157,12 @@ int fam_realloc(FatPtr *ptr, u64 size) {
 	return ret;
 }
 void fam_free(FatPtr *ptr) {
-	if (fat_ptr_is_malloc(ptr)) {
+	if ($flag(*ptr, FAT_PTR_FLAG_MALLOC)) {
 		fat_ptr_malloc_free(ptr);
 	} else {
 		init_fam_guards();
 
-		bool global = fat_ptr_is_global(ptr);
+		bool global = $flag(*ptr, FAT_PTR_FLAG_GLOBAL);
 
 		SlabAllocatorNc *sa;
 

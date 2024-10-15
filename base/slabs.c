@@ -28,17 +28,21 @@
 #define SIZE_OVERHEAD (2 * sizeof(u32) + sizeof(u64))
 #define SIZE_WITH_OVERHEAD(size) (size + SIZE_OVERHEAD)
 
-#define BIT_FLAG_GLOBAL 0
-#define BIT_FLAG_PIN 1
-#define BIT_FLAG_COPY 2
-#define BIT_FLAG_MALLOC 3
-#define BIT_FLAG_NIL 6
-
 typedef struct FatPtr32Impl {
 	u32 id;
 	u8 size_flags[4];
 	void *data;
 } FatPtr32Impl;
+
+bool fat_ptr_is_nil(const FatPtr *ptr) {
+	bool ret = false;
+	if (ptr && ptr->data) {
+		FatPtr32Impl *fptr = ptr->data;
+		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
+		ret = bitflags_check(&bf, FAT_PTR_FLAG_NIL);
+	}
+	return ret;
+}
 
 int fat_ptr_mallocate(FatPtr *ptr, u64 size) {
 	void *tmp = mymalloc(SIZE_WITH_OVERHEAD(size));
@@ -51,7 +55,7 @@ int fat_ptr_mallocate(FatPtr *ptr, u64 size) {
 	memcpy(&fptr32->size_flags, &size, 3);
 	fptr32->size_flags[3] = 0;
 	BitFlags bf = {.flags = (fptr32->size_flags + 3), .capacity = 1};
-	bitflags_set(&bf, BIT_FLAG_MALLOC, true);
+	bitflags_set(&bf, FAT_PTR_FLAG_MALLOC, true);
 	fptr32->data = tmp + SIZE_OVERHEAD;
 
 	return 0;
@@ -62,28 +66,6 @@ void fat_ptr_malloc_free(FatPtr *ptr) {
 		myfree(ptr->data);
 		ptr->data = NULL;
 	}
-}
-
-int fat_ptr_pin(FatPtr *ptr) {
-	int ret = -1;
-	if (ptr && ptr->data) {
-		FatPtr32Impl *fptr = ptr->data;
-		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
-		ret = bitflags_set(&bf, BIT_FLAG_PIN, true);
-	} else
-		SetErr(IllegalArgument);
-	return ret;
-}
-
-int fat_ptr_set_copy(FatPtr *ptr) {
-	int ret = -1;
-	if (ptr && ptr->data) {
-		FatPtr32Impl *fptr = ptr->data;
-		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
-		ret = bitflags_set(&bf, BIT_FLAG_COPY, true);
-	} else
-		SetErr(IllegalArgument);
-	return ret;
 }
 
 u32 fat_ptr_size(const FatPtr *ptr) {
@@ -108,51 +90,20 @@ void *fat_ptr_data(const FatPtr *ptr) {
 	return ret;
 }
 
-bool fat_ptr_is_global(const FatPtr *ptr) {
-	bool ret = false;
+void fat_ptr_flag_set(const FatPtr *ptr, u8 flag, bool value) {
 	if (ptr && ptr->data) {
 		FatPtr32Impl *fptr = ptr->data;
 		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
-		ret = bitflags_check(&bf, BIT_FLAG_GLOBAL);
+		bitflags_set(&bf, flag, value);
 	}
-	return ret;
 }
 
-bool fat_ptr_is_pin(const FatPtr *ptr) {
+bool fat_ptr_flag_get(const FatPtr *ptr, u8 flag) {
 	bool ret = false;
 	if (ptr && ptr->data) {
 		FatPtr32Impl *fptr = ptr->data;
 		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
-		ret = bitflags_check(&bf, BIT_FLAG_PIN);
-	}
-	return ret;
-}
-bool fat_ptr_is_copy(const FatPtr *ptr) {
-	bool ret = false;
-	if (ptr && ptr->data) {
-		FatPtr32Impl *fptr = ptr->data;
-		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
-		ret = bitflags_check(&bf, BIT_FLAG_COPY);
-	}
-	return ret;
-}
-
-bool fat_ptr_is_malloc(const FatPtr *ptr) {
-	bool ret = false;
-	if (ptr && ptr->data) {
-		FatPtr32Impl *fptr = ptr->data;
-		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
-		ret = bitflags_check(&bf, BIT_FLAG_MALLOC);
-	}
-	return ret;
-}
-
-bool fat_ptr_is_nil(const FatPtr *ptr) {
-	bool ret = false;
-	if (ptr && ptr->data) {
-		FatPtr32Impl *fptr = ptr->data;
-		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
-		ret = bitflags_check(&bf, BIT_FLAG_NIL);
+		ret = bitflags_check(&bf, flag);
 	}
 	return ret;
 }
@@ -430,7 +381,7 @@ int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
 	u8 *data_ptr = fptr32->data;
 	if (global) {
 		BitFlags bf = {.flags = (fptr32->size_flags + 3), .capacity = 1};
-		bitflags_set(&bf, BIT_FLAG_GLOBAL, true);
+		bitflags_set(&bf, FAT_PTR_FLAG_GLOBAL, true);
 	}
 
 	sd->cur_slabs += 1;
@@ -566,15 +517,14 @@ u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
 u32 fat_ptr_id(const FatPtr *ptr) {
 	return ((FatPtr32Impl *)ptr->data)->id;
 }
-void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len, bool global, bool pin, bool copy) {
+void fat_ptr_test_obj32(FatPtr *ptr, u32 id, u32 len, bool global, bool pin) {
 	ptr->data = mymalloc(SIZE_OVERHEAD + len);
 	FatPtr32Impl *fptr = ptr->data;
 	fptr->id = id;
 	fptr->size_flags[3] = 0;
 	BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
-	bitflags_set(&bf, BIT_FLAG_GLOBAL, global);
-	bitflags_set(&bf, BIT_FLAG_PIN, pin);
-	bitflags_set(&bf, BIT_FLAG_COPY, copy);
+	bitflags_set(&bf, FAT_PTR_FLAG_GLOBAL, global);
+	bitflags_set(&bf, FAT_PTR_FLAG_PIN, pin);
 
 	memcpy(&fptr->size_flags, &len, 3);
 	fptr->data = ptr->data + SIZE_OVERHEAD;

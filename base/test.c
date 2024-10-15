@@ -425,13 +425,12 @@ MyTest(base, test_fat_ptr) {
 		u32 id = i * 2;
 		FatPtr ptr2;
 		// create a 32 bit test obj
-		fat_ptr_test_obj32(&ptr2, id, sizeof(TestData), false, true, false);
+		fat_ptr_test_obj32(&ptr2, id, sizeof(TestData), false, true);
 		// do assertions and use allocated data
 		cr_assert_eq($size(ptr2), sizeof(TestData));
 		cr_assert_eq(fat_ptr_id(&ptr2), id);
 		cr_assert(!$global(ptr2));
-		cr_assert($pin(ptr2));
-		cr_assert(!$copy(ptr2));
+		cr_assert($is_pin(ptr2));
 		TestData *td2 = $(ptr2);
 		td2->v1 = 1234;
 		td2->v2 = 5678;
@@ -447,11 +446,10 @@ MyTest(base, test_fat_ptr) {
 	for (u32 i = 16777216 - 1000; i < 16777216; i++) {
 		FatPtr ptr2;
 		u32 id = i;
-		fat_ptr_test_obj32(&ptr2, id, i, false, false, true);
+		fat_ptr_test_obj32(&ptr2, id, i, false, false);
 		cr_assert_eq($size(ptr2), i);
 		cr_assert(!$global(ptr2));
-		cr_assert(!$pin(ptr2));
-		cr_assert($copy(ptr2));
+		cr_assert(!$is_pin(ptr2));
 		fat_ptr_free_test_obj32(&ptr2);
 	}
 }
@@ -792,6 +790,9 @@ MyTest(base, test_nil) {
 	fam_free(&ptr);
 	// assert that the FatPtr is now 'nil'.
 	cr_assert(nil(ptr));
+
+	FatPtr ptr2 = not_null;
+	cr_assert(!nil(ptr2));
 }
 
 MyTest(base, test_realloc) {
@@ -889,7 +890,7 @@ MyTest(base, test_fam_alloc) {
 	cr_assert_eq(((u8 *)$(ptr2))[0], '1');
 	cr_assert_eq(((u8 *)$(ptr2))[1], '2');
 	cr_assert_eq(((u8 *)$(ptr2))[2], '3');
-	fat_ptr_pin(&ptr2);
+	$pin(ptr2);
 
 	// fails due to pin.
 	cr_assert(fam_realloc(&ptr2, 200));
@@ -900,7 +901,7 @@ MyTest(base, test_fam_alloc) {
 	{
 		SendStateGuard _ = SetSend(true);
 		cr_assert(!fam_alloc(&ptr3, 100));
-		cr_assert(fat_ptr_is_global(&ptr3));
+		cr_assert($global(ptr3));
 	}
 
 	fam_free(&ptr3);
@@ -910,14 +911,14 @@ MyTest(base, test_multi_scope) {
 	{
 		FatPtr ptr0 = null;
 		fam_alloc(&ptr0, 100);
-		cr_assert(!fat_ptr_is_global(&ptr0));
+		cr_assert(!$global(ptr0));
 		fam_free(&ptr0);
 
 		SendStateGuard sg = SetSend(true);
 		FatPtr ptr = null;
 		cr_assert(nil(ptr));
 		fam_alloc(&ptr, 100);
-		cr_assert(fat_ptr_is_global(&ptr));
+		cr_assert($global(ptr));
 		cr_assert(!nil(ptr));
 		fam_free(&ptr);
 		cr_assert(nil(ptr));
@@ -925,13 +926,13 @@ MyTest(base, test_multi_scope) {
 		{
 			FatPtr ptr0 = null;
 			fam_alloc(&ptr0, 100);
-			cr_assert(fat_ptr_is_global(&ptr0));
+			cr_assert($global(ptr0));
 			fam_free(&ptr0);
 			SendStateGuard sg2 = SetSend(false);
 			FatPtr ptr = null;
 			cr_assert(nil(ptr));
 			fam_alloc(&ptr, 100);
-			cr_assert(!fat_ptr_is_global(&ptr));
+			cr_assert(!$global(ptr));
 			cr_assert(!nil(ptr));
 			fam_free(&ptr);
 			cr_assert(nil(ptr));
@@ -939,13 +940,13 @@ MyTest(base, test_multi_scope) {
 			{
 				FatPtr ptr0 = null;
 				fam_alloc(&ptr0, 100);
-				cr_assert(!fat_ptr_is_global(&ptr0));
+				cr_assert(!$global(ptr0));
 				fam_free(&ptr0);
 				SendStateGuard sg2 = SetSend(false);
 				FatPtr ptr = null;
 				cr_assert(nil(ptr));
 				fam_alloc(&ptr, 100);
-				cr_assert(!fat_ptr_is_global(&ptr));
+				cr_assert(!$global(ptr));
 				cr_assert(!nil(ptr));
 				fam_free(&ptr);
 				cr_assert(nil(ptr));
@@ -953,18 +954,18 @@ MyTest(base, test_multi_scope) {
 
 			FatPtr ptr2;
 			fam_alloc(&ptr2, 100);
-			cr_assert(!fat_ptr_is_global(&ptr2));
+			cr_assert(!$global(ptr2));
 			fam_free(&ptr2);
 		}
 		FatPtr ptr2;
 		fam_alloc(&ptr2, 100);
-		cr_assert(fat_ptr_is_global(&ptr2));
+		cr_assert($global(ptr2));
 		fam_free(&ptr2);
 	}
 
 	FatPtr ptr2;
 	fam_alloc(&ptr2, 100);
-	cr_assert(!fat_ptr_is_global(&ptr2));
+	cr_assert(!$global(ptr2));
 	fam_free(&ptr2);
 }
 
