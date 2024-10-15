@@ -17,7 +17,16 @@
 #define let const Object
 #define var Object
 
-#define NIL {.impl = rc_null, .flags = null}
+extern void *no_cleanup;
+
+#define NIL                                                                                        \
+	(const ObjectNc) {                                                                             \
+		.impl = rc_null, .flags = null                                                             \
+	}
+#define Ok                                                                                         \
+	(const ObjectNc) {                                                                             \
+		.impl = 0, .flags = { no_cleanup }                                                         \
+	}
 
 #define $objnil(v) fat_ptr_is_nil(&(&((ObjectNc *)&(v))->impl)->impl)
 #define obj_nil(v)                                                                                 \

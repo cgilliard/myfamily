@@ -148,7 +148,7 @@ bool fat_ptr_is_malloc(const FatPtr *ptr) {
 }
 
 bool fat_ptr_is_nil(const FatPtr *ptr) {
-	bool ret = true;
+	bool ret = false;
 	if (ptr && ptr->data) {
 		FatPtr32Impl *fptr = ptr->data;
 		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};

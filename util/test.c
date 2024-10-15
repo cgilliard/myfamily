@@ -696,6 +696,13 @@ MyTest(util, test_move_ref) {
 	cr_assert(!strcmp($string(a), "abc"));
 }
 
+MyTest(util, test_ok_nil) {
+	let a = Ok;
+	let b = NIL;
+	cr_assert(!nil(a));
+	cr_assert(nil(b));
+}
+
 /*
 let x, y;
 x = $();

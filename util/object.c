@@ -23,6 +23,7 @@
 #include <util/object.h>
 #include <util/rbtree.h>
 
+void *no_cleanup = NULL;
 pthread_rwlock_t global_rbtree_lock = PTHREAD_MUTEX_INITIALIZER;
 _Thread_local u64 thread_local_namespace_next = 0;
 atomic_ullong global_namespace_next = 0;
@@ -224,7 +225,11 @@ void object_cleanup(const ObjectNc *ptr) {
 		return;
 	}
 
+	// no cleanup
+	if (ptr_mut->flags.data == no_cleanup)
+		return;
 	if (!nil(ptr_mut->flags)) {
+		ObjectFlags *flags = $(ptr_mut->flags);
 		fam_free(&ptr_mut->flags);
 		ptr_mut->flags = null;
 	}
@@ -257,9 +262,6 @@ int object_move(const Object *dst, const Object *src) {
 	ObjectNc *src_mut = src;
 	ObjectNc *dst_mut = dst;
 #pragma GCC diagnostic pop
-
-	// dst_mut->flags = src->flags;
-	//  src_mut->flags = null;
 
 	ObjectFlags *src_flags = $(src_mut->flags);
 	BitFlags bfsrc = {.flags = &src_flags->flags, .capacity = 1};
