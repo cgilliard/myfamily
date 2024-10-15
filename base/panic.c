@@ -32,7 +32,7 @@ _Thread_local char panic_buf[MAX_PANIC_MSG];
 void panic(const char *fmt, ...) {
 	va_list args;
 
-	fprintf(stderr, "thread panicked: ");
+	fprintf(stderr, "application panicked: ");
 	va_start(args, fmt);
 	vfprintf(stderr, fmt, args);
 	vsnprintf(panic_buf, MAX_PANIC_MSG, fmt, args);
