@@ -36,6 +36,9 @@
 		_ret__;                                                                                    \
 	})
 
+#define $ref(x, y) object_ref(&x, &y)
+#define $move(x, y) object_ref(&x, &y)
+
 #define $string(obj) object_as_string(&obj)
 
 #define $create_empty()                                                                            \

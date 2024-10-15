@@ -683,7 +683,7 @@ MyTest(util, test_move_ref) {
 	let y;
 	{
 		let x = $("test");
-		object_ref(&y, &x);
+		$ref(y, x);
 		cr_assert(!strcmp($string(x), "test"));
 	}
 	cr_assert(!strcmp($string(y), "test"));
@@ -691,7 +691,19 @@ MyTest(util, test_move_ref) {
 	let a;
 	{
 		let b = $("abc");
-		object_move(&a, &b);
+		$move(a, b);
 	}
 	cr_assert(!strcmp($string(a), "abc"));
 }
+
+/*
+let x, y;
+x = $();
+object_weak(&y, &x); // I will probably have a macro as well $weak(y, x);
+let z = object_upgrade($y); // likewise $upgrade(y);
+if(!nil(z)) {
+	// use z
+} else {
+	// handle non-upgrade case
+}
+*/
