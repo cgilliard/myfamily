@@ -199,6 +199,8 @@ void object_check_consumed(const Object *ptr) {
 	if (ptr == NULL)
 		panic("Object pointer NULL!");
 	ObjectFlags *flags = $(ptr->flags);
+	if (flags == no_cleanup)
+		panic("Attempting to operate on a special no_cleanup object!");
 	BitFlags bf = {.flags = &flags->flags, .capacity = 1};
 	bool consumed = bitflags_check(&bf, OBJECT_FLAG_CONSUMED);
 	if (consumed)
