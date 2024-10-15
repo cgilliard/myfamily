@@ -29,10 +29,10 @@
 #undef nil
 #define nil(v) obj_nil(v)
 
-#define $u64(obj)                                                                                  \
+#define $u64(v)                                                                                    \
 	({                                                                                             \
 		u64 _ret__;                                                                                \
-		object_as_u64(&obj, &_ret__);                                                              \
+		object_as_u64(&v, &_ret__);                                                                \
 		_ret__;                                                                                    \
 	})
 

@@ -596,4 +596,78 @@ MyTest(util, test_overwrite) {
 	object_set_property(&test1, "aaa", &test4);
 	const Object x4_out = object_get_property(&test1, "aaa");
 	cr_assert(!strcmp(object_as_string(&x4_out), "another test2"));
+
+	Object x1 = NIL;
+	cr_assert(!object_create(&x1, false, ObjectTypeObject, NULL));
+
+	Object x2 = NIL;
+	u64 x2_val = 10;
+	cr_assert(!object_create(&x2, false, ObjectTypeU64, &x2_val));
+	Object x3 = NIL;
+	u64 x3_val = 20;
+	cr_assert(!object_create(&x3, false, ObjectTypeU64, &x3_val));
+	Object x4 = NIL;
+	u64 x4_val = 30;
+	cr_assert(!object_create(&x4, false, ObjectTypeU64, &x4_val));
+
+	object_set_property(&x1, "aaa", &x2);
+	const Object xx2_out = object_get_property(&x1, "aaa");
+	u64 xx2_out_val = 0;
+	object_as_u64(&xx2_out, &xx2_out_val);
+	cr_assert_eq(xx2_out_val, 10);
+
+	object_set_property(&x1, "aaa", &x3);
+	const Object xx3_out = object_get_property(&x1, "aaa");
+	u64 xx3_out_val = 0;
+	object_as_u64(&xx3_out, &xx3_out_val);
+	cr_assert_eq(xx3_out_val, 20);
+
+	object_set_property(&x1, "aaa", &x4);
+	const Object xx4_out = object_get_property(&x1, "aaa");
+	u64 xx4_out_val = 0;
+	object_as_u64(&xx4_out, &xx4_out_val);
+	cr_assert_eq(xx4_out_val, 30);
+}
+
+MyTest(util, test_object_macros) {
+	// create an empty object
+	var x = $();
+
+	// create a string object
+	let y = $("abc");
+
+	// set the 'test' property of x to object y
+	$(x, "test", y);
+	$(x, "test9", "ok");
+
+	// retrieve the 'test' property of x, store in object out
+	let out = $(x, "test");
+	// compare out (as a string) to "abc", assert equal
+	cr_assert(!strcmp($string(out), "abc"));
+
+	// create a u64 value
+	u64 v1 = 1234;
+
+	// set the 'test2' property of x to v1
+	$(x, "test2", v1);
+	// retrieve the 'test2' property of x, store in object out2
+	let out2 = $(x, "test2");
+	cr_assert(!nil(out2));
+	// assert that out2 as u64 is 1234
+	cr_assert_eq($u64(out2), 1234);
+
+	let v = $(x, "aadf");
+	cr_assert(nil(v));
+
+	/*
+		// look for a property
+		let v = $(x, "undefined");
+		// determine if it's not found with the 'nil' macro.
+		if (nil(v)) {
+			// set error code and generate backtrace
+			SetErr(ResourceNotAvailable);
+			return -1; // return -1
+		}
+		// process....
+	*/
 }

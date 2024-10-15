@@ -417,6 +417,11 @@ int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
 	return ret;
 }
 
+ObjectType object_type(const Object *ptr) {
+	ObjectImpl *impl = $(ptr->impl);
+	return impl->type;
+}
+
 int object_create(Object *obj, bool send, ObjectType type, const void *primitive) {
 	if (send) {
 		if (object_init_global()) {
@@ -523,7 +528,6 @@ int object_set_property(Object *obj, const char *key, const Object *value) {
 		ObjectValueData *obj_data = $(value->ptr);
 		if (obj_data->type == ObjectTypeObject) {
 			object_cleanup((ObjectNc *)obj_data->value);
-		} else if (obj_data->type == ObjectTypeString) {
 		}
 
 		fam_free(&value->ptr);
