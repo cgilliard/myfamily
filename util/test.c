@@ -105,7 +105,7 @@ MyTest(util, validate_rbtree) {
 		k = i;
 		v = *(u64 *)rbtree_get(&valid1, &k);
 		cr_assert_eq(v, k + 10);
-		cr_assert(!rbtree_remove(&valid1, &k));
+		cr_assert(!rbtree_remove(&valid1, &k, NULL));
 		cr_assert_eq(rbtree_size(&valid1), (max - 1) - i);
 		rbtree_validate(&valid1);
 	}
@@ -164,7 +164,7 @@ MyTest(util, test_random_rbtree) {
 	loop {
 		if (i == size)
 			break;
-		cr_assert(!rbtree_remove(&rand1, &arr[i]));
+		cr_assert(!rbtree_remove(&rand1, &arr[i], NULL));
 		cr_assert_eq(rbtree_size(&rand1), (size - 1) - i);
 		rbtree_validate(&rand1);
 		i++;
@@ -201,12 +201,12 @@ MyTest(util, test_validation_and_other) {
 	cr_assert_eq(*(u64 *)rbtree_get(&test1, &k1), 123);
 	k1 = 10;
 	v1 = 0;
-	cr_assert(rbtree_remove(&test1, &k1));
+	cr_assert(rbtree_remove(&test1, &k1, NULL));
 	cr_assert(!rbtree_get(NULL, NULL));
 	cr_assert_eq(rbtree_max_depth(&test1), 2);
 	rbtree_print(&test1);
 	cr_assert(rbtree_iterator(NULL, NULL, NULL, false, NULL, false));
-	rbtree_remove(NULL, NULL);
+	rbtree_remove(NULL, NULL, NULL);
 }
 
 MyTest(util, test_rbtree_random_ordered_insert_delete) {
@@ -235,7 +235,7 @@ MyTest(util, test_rbtree_random_ordered_insert_delete) {
 			cr_assert(!rbtree_put(&rand1, &arr[arr_index], &v));
 			arr_index++;
 		} else {
-			cr_assert(!rbtree_remove(&rand1, &arr[delete_index]));
+			cr_assert(!rbtree_remove(&rand1, &arr[delete_index], NULL));
 
 			delete_index++;
 		}
@@ -703,6 +703,18 @@ MyTest(util, test_ok_nil) {
 	cr_assert(nil(b));
 }
 
+MyTest(util, test_remove_property) {
+	var x1 = $();
+	$(x1, "test", "test");
+	$(x1, "test2", "test2");
+	$remove(x1, "ajsdl");
+	$remove(x1, "test");
+	let xtest = $(x1, "test");
+	cr_assert(nil(xtest));
+	let x2test = $(x1, "test2");
+	cr_assert(!nil(x2test));
+}
+
 /*
 let x, y;
 x = $();
@@ -714,3 +726,5 @@ if(!nil(z)) {
 	// handle non-upgrade case
 }
 */
+
+// weak, iterator, and index

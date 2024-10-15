@@ -44,6 +44,7 @@ int object_set_property(Object *obj, const char *key, const Object *value);
 Object object_get_property(const Object *obj, const char *key);
 const char *object_as_string(const Object *obj);
 int object_as_u64(const Object *obj, u64 *value);
+int object_remove_property(Object *obj, const char *key);
 void object_cleanup_thread_local();
 
 #ifdef TEST

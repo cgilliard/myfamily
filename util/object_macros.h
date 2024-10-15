@@ -47,6 +47,7 @@ extern void *no_cleanup;
 
 #define $ref(x) object_ref(&x)
 #define $move(x) object_move(&x)
+#define $remove(x, y) object_remove_property(&x, y)
 
 #define $string(obj) object_as_string(&obj)
 

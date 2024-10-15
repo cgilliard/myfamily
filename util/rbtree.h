@@ -50,7 +50,7 @@ int rbtree_create(RBTree *ptr, const u64 key_size, const u64 value_size,
 				  int (*compare)(const void *, const void *), bool send);
 int rbtree_put(RBTree *ptr, const void *key, const void *value);
 int rbtree_put_swap(RBTree *ptr, const void *key, const void *value, RbTreeKeyValue *swap);
-int rbtree_remove(RBTree *ptr, const void *key);
+int rbtree_remove(RBTree *ptr, const void *key, RbTreeKeyValue *swap);
 const void *rbtree_get(const RBTree *ptr, const void *key);
 void *rbtree_get_mut(const RBTree *ptr, const void *key);
 i64 rbtree_size(const RBTree *ptr);

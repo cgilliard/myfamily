@@ -689,7 +689,7 @@ void rbtree_remove_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RB
 }
 
 // delete function
-int rbtree_remove(RBTree *ptr, const void *key) {
+int rbtree_remove(RBTree *ptr, const void *key, RbTreeKeyValue *swap) {
 	// validate input
 	if (ptr == NULL || nil(ptr->impl) || key == NULL) {
 		SetErr(IllegalArgument);
@@ -706,6 +706,15 @@ int rbtree_remove(RBTree *ptr, const void *key) {
 	// this node doesn't exist, return -1
 	if (pair.self == NIL)
 		return -1;
+
+	if (swap) {
+		if (swap->key)
+			memcpy(swap->key, pair.self->data, impl->key_size);
+		if (swap->value)
+			memcpy(swap->value, pair.self->data + VALUE_PAD(impl->key_size) + impl->key_size,
+				   impl->value_size);
+		swap->update = true;
+	}
 
 	// node exists, initialize variables
 	RBTreeNode *node_to_delete = pair.self;

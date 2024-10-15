@@ -377,7 +377,7 @@ void object_cleanup_rc(ObjectImpl *impl) {
 				object_cleanup((ObjectNc *)obj_data->value);
 			}
 			fam_free(&value->ptr);
-			rbtree_remove(pair->tree, &k);
+			rbtree_remove(pair->tree, &k, NULL);
 		}
 
 		if (impl->send)
@@ -517,6 +517,49 @@ int object_send(Object *obj, Channel *channel) {
 	object_check_consumed(obj);
 	return 0;
 }
+
+int object_remove_property(Object *obj, const char *key) {
+	object_check_consumed(obj);
+	ObjectImpl *impl = $(obj->impl);
+	ObjectKey objkey = INIT_OBJECT_KEY;
+	object_key_for(&objkey, obj, key);
+
+	RBTreeNc *tree = object_tree_for(obj);
+
+	ObjectKeyNc objkeyswap;
+	ObjectValue objvalueswap;
+	RbTreeKeyValue rbtreekv;
+	rbtreekv.key = &objkeyswap;
+	rbtreekv.value = &objvalueswap;
+	rbtreekv.update = false;
+
+	if (impl->send)
+		pthread_rwlock_wrlock(&global_rbtree_lock);
+	int ret = rbtree_remove(tree, &objkey, &rbtreekv);
+	if (impl->send)
+		pthread_rwlock_unlock(&global_rbtree_lock);
+
+	if (ret)
+		object_key_cleanup(&objkey);
+
+	if (rbtreekv.update) {
+		ObjectValue *value = rbtreekv.value;
+		ObjectValueData *obj_data = $(value->ptr);
+		if (obj_data->type == ObjectTypeObject) {
+			object_cleanup((ObjectNc *)obj_data->value);
+		}
+
+		fam_free(&value->ptr);
+
+		ObjectKeyNc *key = rbtreekv.key;
+		object_key_cleanup(key);
+		impl->property_count--;
+	} else {
+	}
+
+	return ret;
+}
+
 int object_set_property(Object *obj, const char *key, const Object *value) {
 	object_check_consumed(obj);
 	ObjectImpl *impl = $(obj->impl);
@@ -568,7 +611,7 @@ int object_set_property(Object *obj, const char *key, const Object *value) {
 		ObjectKeyNc *key = rbtreekv.key;
 		object_key_cleanup(key);
 
-	} else {
+	} else if (!ret) {
 		impl->property_count++;
 	}
 
