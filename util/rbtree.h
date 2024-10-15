@@ -25,6 +25,7 @@ typedef struct RBTreeIteratorNc {
 typedef struct RbTreeKeyValue {
 	void *key;
 	void *value;
+	bool update;
 } RbTreeKeyValue;
 
 void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr);
@@ -48,6 +49,7 @@ static const RBTreeNc _nil_rbtree__ = {.impl = null};
 int rbtree_create(RBTree *ptr, const u64 key_size, const u64 value_size,
 				  int (*compare)(const void *, const void *), bool send);
 int rbtree_put(RBTree *ptr, const void *key, const void *value);
+int rbtree_put_swap(RBTree *ptr, const void *key, const void *value, RbTreeKeyValue *swap);
 int rbtree_remove(RBTree *ptr, const void *key);
 const void *rbtree_get(const RBTree *ptr, const void *key);
 void *rbtree_get_mut(const RBTree *ptr, const void *key);

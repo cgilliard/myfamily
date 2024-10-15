@@ -424,6 +424,86 @@ int rbtree_create(RBTree *ptr, const u64 key_size, const u64 value_size,
 	return 0;
 }
 
+int rbtree_put_swap(RBTree *ptr, const void *key, const void *value, RbTreeKeyValue *swap) {
+	// validate input
+	if (ptr == NULL || key == NULL || value == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+
+	// obtain the impl from the fat ptr
+	RBTreeImpl *impl = $(ptr->impl);
+	// this pair is used to search
+	RBTreeNodePair pair;
+	// pointer for our node
+	RBTreeNode *node;
+
+	// perform search for the key
+	rbtree_search(impl, key, &pair);
+
+	// retreive the data size
+	u64 size = DATA_SIZE(impl);
+	if (pair.self != NIL) {
+		node = $(pair.self->self);
+		if (swap) {
+			if (swap->key)
+				memcpy(swap->key, node->data, impl->key_size);
+			if (swap->value)
+				memcpy(swap->value, node->data + VALUE_PAD(impl->key_size) + impl->key_size,
+					   impl->value_size);
+			swap->update = true;
+		}
+		memcpy(node->data, key, impl->key_size);
+		memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
+		return 0;
+	}
+
+	FatPtr self;
+
+	// using fam_alloc allocate memory for this node
+	{
+		SendStateGuard _ = SetSend(impl->send);
+		if (fam_alloc(&self, size)) {
+			self = null;
+			return -1;
+		}
+	}
+
+	// using the allocated memory set node properties
+	node = $(self);
+	node->self = self;
+	if (impl->root == NIL) {
+		impl->root = node;
+	} else if (pair.is_right) {
+		pair.parent->right = node;
+	} else {
+		pair.parent->left = node;
+	}
+	node->right = NIL;			// always must be set to NIL at first.
+	node->left = NIL;			// always must be set to NIL at first.
+	node->parent = pair.parent; // set our parent pointer.
+
+	// copy data
+	memcpy(node->data, key, impl->key_size);
+	// copy value
+	memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
+	// nodes are initially red
+	INIT_FLAGS(impl, node);
+	SET_RED(impl, node);
+
+#ifdef TEST
+	node->node_id = node_id_counter++;
+#endif // TEST
+
+	// increment the size counter
+	impl->size++;
+
+	// insert_fixup
+	rbtree_put_fixup(impl, node);
+
+	return 0;
+}
+
 // insert function
 int rbtree_put(RBTree *ptr, const void *key, const void *value) {
 	// validate input

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/backtrace.h>
 #include <base/panic.h>
 #include <setjmp.h>
 #include <signal.h>
@@ -37,6 +38,10 @@ void panic(const char *fmt, ...) {
 	vsnprintf(panic_buf, MAX_PANIC_MSG, fmt, args);
 	va_end(args);
 	fprintf(stderr, "\n");
+
+	Backtrace bt;
+	backtrace_generate(&bt);
+	backtrace_print(&bt);
 
 	// If jump return has not been set, we resort to an exit with an error
 	// status.

@@ -466,122 +466,7 @@ void my_cleanup(u64 *obj) {
 	drop_count++;
 }
 
-MyTest(util, test_object) {
-	{
-		var test = NIL;
-		var test2 = NIL;
-		var test3 = NIL;
-		var test4 = NIL;
-		let aaaa = NIL;
-
-		// create an empty object
-		cr_assert(!object_create(&test, true, ObjectTypeObject, NULL));
-
-		// create a string object
-		cr_assert(!object_create(&test3, true, ObjectTypeString, "test123"));
-
-		// create a u64 object
-		u64 v2 = 101;
-		cr_assert(!object_create(&test4, false, ObjectTypeU64, &v2));
-
-		// move test to test2
-		cr_assert(!object_move(&test2, &test));
-
-		// compare test3 to expected value
-		cr_assert(!strcmp("test123", object_as_string(&test3)));
-
-		// set proprerty 'test' to test3 object.
-		cr_assert(!object_set_property(&test2, "test", &test3));
-
-		// confirm that the property is set by calling object_get_property and object_as_string
-		let test3_out = object_get_property(&test2, "test");
-		cr_assert(!strcmp(object_as_string(&test3_out), "test123"));
-
-		// confirm the u64 object through object_as_u64
-		u64 test4_out;
-		cr_assert(!object_as_u64(&test4, &test4_out));
-		cr_assert_eq(test4_out, 101);
-		u64 x1 = 123ULL;
-		$(test4, "test", x1);
-		$(test4, "ax1", "ok");
-		let vvv = $();
-		$(test4, "ddd", vvv);
-		let q = $(test4, "ddd");
-
-		let test_nil = NIL;
-		cr_assert(nil(test_nil));
-		let v = $();
-		cr_assert(!nil(v));
-	}
-}
-
-MyTest(util, test_object2) {
-	// declare a mutable empty object
-	var a = $();
-	// set the 'abc' property of object a to a string value 'test'
-	$(a, "abc", "test");
-	// set the 'def' property of object a to a string value 'test2'
-	$(a, "def", "test2");
-	// get property 'abc' of the object a and store in an immutable object b
-	let b = $(a, "abc");
-
-	// assert that object b as a string is 'test'
-	cr_assert(!strcmp("test", $string(b)));
-
-	// get property 'def' of object a and store in an immutable object c
-	let c = $(a, "def");
-
-	// assert that object c as a string is 'test2'
-	cr_assert(!strcmp("test2", $string(c)));
-
-	// create a u64 value of 99
-	u64 v = 99;
-	// set the property 'ghi' of object a to the value of v (99)
-	$(a, "ghi", v);
-	// get property 'ghi' of object a and store in an immutable object d
-	let d = $(a, "ghi");
-	// assert that object d as a u64 is 99
-	cr_assert_eq($u64(d), 99);
-}
-
-MyTest(util, test_object3) {
-	var a = $();
-	u64 v = 111;
-	var b = $(v);
-	cr_assert_eq(111, $u64(b));
-	var c = $("test");
-	cr_assert(!strcmp("test", $string(c)));
-	var d = $();
-	$(d, "string", c);
-	$(d, "num", b);
-	$(d, "other", "hi");
-	var e = $(d, "num");
-	var f = $(d, "string");
-	var g = $(d, "other");
-	cr_assert(!strcmp($string(f), "test"));
-	cr_assert(!strcmp($string(g), "hi"));
-	cr_assert_eq($u64(e), 111);
-
-	$(a, "ok", "ok");
-	let h = $(a, "ok");
-	cr_assert(!strcmp($string(h), "ok"));
-	/*
-		$(a, "ok", "ok2");
-				let i = $(a, "ok");
-				cr_assert(!strcmp($string(i), "ok2"));
-			*/
-}
-
 MyTest(util, test_print_err) {
-	// instnatiate an object
-	let x = $();
-	// check for errors if x is 'nil' an error occured.
-	if (nil(x)) {
-		// print_err prints the associated 'fam_err' and a message.
-		print_err("object creation error");
-		exit(-1);
-	}
-
 	// cycle through and print all errors
 	for (int i = 0; i < FamErrCount; i++) {
 		SetErr(i);
@@ -635,3 +520,80 @@ MyTest(util, test_ref) {
 	cr_assert_eq(drop_count2, 1);
 }
 */
+
+MyTest(util, test_object) {
+	Object test1 = NIL;
+	cr_assert(!object_create(&test1, false, ObjectTypeObject, NULL));
+	Object test2 = NIL;
+	cr_assert(!object_create(&test2, false, ObjectTypeString, "this is a test"));
+	Object test3 = NIL;
+	u64 v = 1234;
+	cr_assert(!object_create(&test3, true, ObjectTypeU64, &v));
+	Object test4 = NIL;
+	cr_assert(!object_create(&test4, false, ObjectTypeString, "another test"));
+
+	cr_assert(!strcmp(object_as_string(&test2), "this is a test"));
+	u64 test3_out = 0;
+	cr_assert(!object_as_u64(&test3, &test3_out));
+	cr_assert_eq(test3_out, 1234);
+	cr_assert_eq(object_as_string(&test1), NULL);
+	cr_assert_eq(object_as_string(&test3), NULL);
+
+	cr_assert(object_as_u64(&test1, &test3_out));
+	cr_assert(object_as_u64(&test2, &test3_out));
+
+	object_set_property(&test1, "aaa", &test2);
+	object_set_property(&test1, "bbb", &test3);
+
+	const Object test1_out = object_get_property(&test1, "aaa");
+	const Object test1_out2 = object_get_property(&test1, "bbb");
+	u64 test1_out2_u64 = 0;
+	object_as_u64(&test1_out2, &test1_out2_u64);
+	cr_assert_eq(test1_out2_u64, 1234);
+	cr_assert(!strcmp(object_as_string(&test1_out), "this is a test"));
+
+	object_set_property(&test1, "aaa", &test4);
+	const Object test1_out3 = object_get_property(&test1, "aaa");
+	cr_assert(!strcmp(object_as_string(&test1_out3), "another test"));
+
+	Object x1 = NIL;
+	cr_assert(!object_create(&x1, false, ObjectTypeObject, NULL));
+	Object x2 = NIL;
+	cr_assert(!object_create(&x2, false, ObjectTypeObject, NULL));
+	Object x3 = NIL;
+	cr_assert(!object_create(&x3, false, ObjectTypeObject, NULL));
+	Object text1 = NIL;
+	cr_assert(!object_create(&text1, false, ObjectTypeString, "text1"));
+
+	object_set_property(&x3, "text", &text1);
+	object_set_property(&x2, "x3", &x3);
+	object_set_property(&x1, "x2", &x2);
+
+	const Object x2_out = object_get_property(&x1, "x2");
+	const Object x3_out = object_get_property(&x2_out, "x3");
+	const Object text_out = object_get_property(&x3_out, "text");
+	cr_assert(!strcmp(object_as_string(&text_out), "text1"));
+}
+
+MyTest(util, test_overwrite) {
+	Object test1 = NIL;
+	cr_assert(!object_create(&test1, false, ObjectTypeObject, NULL));
+	Object test2 = NIL;
+	cr_assert(!object_create(&test2, false, ObjectTypeString, "this is a test"));
+	Object test3 = NIL;
+	cr_assert(!object_create(&test3, false, ObjectTypeString, "another test"));
+	Object test4 = NIL;
+	cr_assert(!object_create(&test4, false, ObjectTypeString, "another test2"));
+
+	object_set_property(&test1, "aaa", &test2);
+	const Object x2_out = object_get_property(&test1, "aaa");
+	cr_assert(!strcmp(object_as_string(&x2_out), "this is a test"));
+
+	object_set_property(&test1, "aaa", &test3);
+	const Object x3_out = object_get_property(&test1, "aaa");
+	cr_assert(!strcmp(object_as_string(&x3_out), "another test"));
+
+	object_set_property(&test1, "aaa", &test4);
+	const Object x4_out = object_get_property(&test1, "aaa");
+	cr_assert(!strcmp(object_as_string(&x4_out), "another test2"));
+}

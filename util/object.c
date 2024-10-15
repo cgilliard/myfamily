@@ -15,8 +15,6 @@
 #include <base/bitflags.h>
 #include <base/fam_alloc.h>
 #include <base/fam_err.h>
-#include <base/macro_utils.h>
-#include <base/panic.h>
 #include <base/resources.h>
 #include <pthread.h>
 #include <stdatomic.h>
@@ -24,19 +22,20 @@
 #include <string.h>
 #include <util/object.h>
 #include <util/rbtree.h>
-#include <util/rc.h>
 
-pthread_mutex_t global_init_lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_rwlock_t global_rbtree_lock = PTHREAD_MUTEX_INITIALIZER;
-_Thread_local RBTree *thread_local_rbtree = NULL;
-_Thread_local RBTreeIterator *thread_local_rbtree_iterator = NULL;
-RBTreeIterator *global_rbtree_iterator = NULL;
-RBTree *global_rbtree = NULL;
-
 _Thread_local u64 thread_local_namespace_next = 0;
 atomic_ullong global_namespace_next = 0;
 
 #define INIT_OBJECT_KEY {.key = null}
+
+typedef struct RBTreeIttPair {
+	RBTree *tree;
+	RBTreeIterator *itt;
+} RBTreeIttPair;
+
+_Thread_local RBTreeIttPair *thread_local_rbtree;
+RBTreeIttPair *global_rbtree;
 
 typedef struct ObjectImpl {
 	FatPtr self;
@@ -47,6 +46,7 @@ typedef struct ObjectImpl {
 } ObjectImpl;
 
 typedef struct ObjectFlags {
+	FatPtr self;
 	u8 flags;
 } ObjectFlags;
 
@@ -55,29 +55,15 @@ typedef struct ObjectKeyNc {
 	u64 namespace;
 } ObjectKeyNc;
 
-_Thread_local ObjectKeyNc tl_start_range_key = INIT_OBJECT_KEY;
-_Thread_local ObjectKeyNc tl_end_range_key = INIT_OBJECT_KEY;
-
 void object_key_cleanup(ObjectKeyNc *ptr) {
-	if (ptr && !nil(ptr->key)) {
+	if (!nil(ptr->key))
 		fam_free(&ptr->key);
-		ptr->key = null;
-	}
 }
 
 #define ObjectKey ObjectKeyNc __attribute__((warn_unused_result, cleanup(object_key_cleanup)))
 
-int object_key_for(ObjectKey *objkey, const Object *obj, const char *key) {
-	ObjectImpl *impl = $(obj->impl);
-	int ret = fam_alloc(&objkey->key, sizeof(char) * (1 + strlen(key)));
-	if (ret != 0)
-		return -1;
-
-	strcpy($(objkey->key), key);
-	objkey->namespace = impl->namespace;
-
-	return ret;
-}
+_Thread_local ObjectKeyNc tl_start_range_key = INIT_OBJECT_KEY;
+_Thread_local ObjectKeyNc tl_end_range_key = INIT_OBJECT_KEY;
 
 typedef struct ObjectValue {
 	FatPtr ptr;
@@ -88,6 +74,11 @@ typedef struct ObjectValueData {
 	u32 pad;
 	char value[];
 } ObjectValueData;
+
+#define OBJECT_FLAG_CONSUMED 1
+#define OBJECT_FLAG_NO_CLEANUP 2
+#define OBJECT_FLAG_SEND 3
+#define OBJECT_FLAG_IMUT 4
 
 int object_property_name_compare(const void *v1, const void *v2) {
 	const ObjectKeyNc *k1 = v1;
@@ -101,12 +92,53 @@ int object_property_name_compare(const void *v1, const void *v2) {
 		return strcmp($(k1->key), $(k2->key));
 }
 
-RBTree *init_default_rbtree(bool global) {
-	RBTreeNc *ret = mymalloc(sizeof(RBTree));
-	if (ret) {
-		if (rbtree_create(ret, sizeof(ObjectKey), sizeof(ObjectValue), object_property_name_compare,
-						  global))
+RBTreeNc *object_tree_for(const Object *obj) {
+	ObjectFlags *flags = $(obj->flags);
+	BitFlags bf = {.flags = &flags->flags, .capacity = 1};
+	bool send = bitflags_check(&bf, OBJECT_FLAG_SEND);
+
+	RBTreeNc *tree;
+	if (send)
+		tree = global_rbtree->tree;
+	else
+		tree = thread_local_rbtree->tree;
+	return tree;
+}
+
+RBTreeIttPair *init_rbtree_pair(bool global) {
+	RBTreeIttPair *ret = mymalloc(sizeof(RBTreeIttPair));
+	RBTreeNc *tree = mymalloc(sizeof(RBTree));
+	RBTreeIteratorNc *itt = mymalloc(sizeof(RBTreeIterator));
+	if (tree && ret && itt) {
+		ret->tree = tree;
+		ret->itt = itt;
+		if (rbtree_create(tree, sizeof(ObjectKey), sizeof(ObjectValue),
+						  object_property_name_compare, global)) {
+			if (tree)
+				myfree(tree);
+			if (ret)
+				myfree(ret);
+			if (itt)
+				myfree(itt);
 			return NULL;
+		}
+
+		if (rbtree_iterator(tree, itt, NULL, false, NULL, false)) {
+			if (tree)
+				myfree(tree);
+			if (ret)
+				myfree(ret);
+			if (itt)
+				myfree(itt);
+			return NULL;
+		}
+	} else {
+		if (tree)
+			myfree(tree);
+		if (ret)
+			myfree(ret);
+		if (itt)
+			myfree(itt);
 	}
 	return ret;
 }
@@ -122,129 +154,53 @@ u64 object_namespace_id_next_global() {
 	return ret;
 }
 
-int object_init_rbtrees() {
-	int ret = 0;
+int object_init_global() {
+	if (nil(tl_start_range_key.key)) {
+		fam_alloc(&tl_start_range_key.key, 1);
+		strcpy($(tl_start_range_key.key), "");
+	}
+	if (nil(tl_end_range_key.key)) {
+		fam_alloc(&tl_end_range_key.key, 1);
+		strcpy($(tl_end_range_key.key), "");
+	}
+
 	if (global_rbtree == NULL) {
-		if (atomic_load(&global_namespace_next) == 0) {
-			pthread_rwlock_wrlock(&global_rbtree_lock);
-			pthread_mutex_lock(&global_init_lock);
-			if (atomic_load(&global_namespace_next) == 0) {
-				global_rbtree = init_default_rbtree(true);
-				global_rbtree_iterator = mymalloc(sizeof(RBTreeIterator));
-				if (rbtree_iterator(global_rbtree, global_rbtree_iterator, NULL, false, NULL,
-									false))
-					ret = -1;
-
-				if (ret == -1 || global_rbtree == NULL || global_rbtree_iterator == NULL) {
-					ret = -1;
-				} else {
-
-					atomic_store(&global_namespace_next, 1);
-				}
-			}
-			pthread_mutex_unlock(&global_init_lock);
-			pthread_rwlock_unlock(&global_rbtree_lock);
+		pthread_rwlock_wrlock(&global_rbtree_lock);
+		if (global_rbtree == NULL) {
+			global_rbtree = init_rbtree_pair(true);
 		}
+		pthread_rwlock_unlock(&global_rbtree_lock);
+		if (global_rbtree == NULL)
+			return -1;
+	}
+	return 0;
+}
+
+int object_init_local() {
+	if (nil(tl_start_range_key.key)) {
+		fam_alloc(&tl_start_range_key.key, 1);
+		strcpy($(tl_start_range_key.key), "");
+	}
+	if (nil(tl_end_range_key.key)) {
+		fam_alloc(&tl_end_range_key.key, 1);
+		strcpy($(tl_end_range_key.key), "");
 	}
 
 	if (thread_local_rbtree == NULL) {
-		fam_alloc(&tl_start_range_key.key, 1);
-		strcpy($(tl_start_range_key.key), "");
-		fam_alloc(&tl_end_range_key.key, 1);
-		strcpy($(tl_end_range_key.key), "");
-
-		thread_local_rbtree = init_default_rbtree(false);
+		thread_local_rbtree = init_rbtree_pair(false);
 		if (thread_local_rbtree == NULL)
-			ret = -1;
-
-		thread_local_rbtree_iterator = mymalloc(sizeof(RBTreeIterator));
-
-		if (thread_local_rbtree_iterator == NULL) {
 			return -1;
-		}
-		if (rbtree_iterator(thread_local_rbtree, thread_local_rbtree_iterator, NULL, false, NULL,
-							false)) {
-			return -1;
-		}
 	}
-
-	return ret;
-}
-
-#define OBJECT_FLAG_CONSUMED 1
-#define OBJECT_FLAG_NO_CLEANUP 2
-#define OBJECT_FLAG_SEND 3
-#define OBJECT_FLAG_IMUT 4
-
-void object_cleanup_rc(ObjectImpl *impl) {
-	RBTreeNc *tree;
-	RBTreeIteratorNc *iter;
-	if (impl->send) {
-		tree = global_rbtree;
-		iter = global_rbtree_iterator;
-	} else {
-		tree = thread_local_rbtree;
-		iter = thread_local_rbtree_iterator;
-	}
-
-	if (impl->property_count) {
-		tl_start_range_key.namespace = impl->namespace;
-		tl_end_range_key.namespace = impl->namespace + 1;
-
-		if (impl->send)
-			pthread_rwlock_wrlock(&global_rbtree_lock);
-
-		rbtree_iterator_reset(tree, iter, &tl_start_range_key, true, &tl_end_range_key, false);
-
-		u64 pc = 1;
-		if (impl->property_count > pc)
-			pc = impl->property_count;
-		FatPtr *properties[pc];
-		u64 i = 0;
-
-		loop {
-			RbTreeKeyValue kv;
-			if (!rbtree_iterator_next(iter, &kv))
-				break;
-			ObjectKeyNc *k1 = kv.key;
-			ObjectValue *v1 = kv.value;
-			const char *v = $(k1->key);
-			properties[i] = &k1->key;
-			i++;
-		}
-		for (u64 j = 0; j < impl->property_count; j++) {
-			const char *v = $(*properties[j]);
-			ObjectKey k;
-			k.namespace = impl->namespace;
-			k.key = *properties[j];
-			ObjectValue *value = rbtree_get_mut(tree, &k);
-			ObjectValueData *obj_data = $(value->ptr);
-			if (obj_data->type == ObjectTypeObject) {
-				object_cleanup((ObjectNc *)obj_data->value);
-			}
-			fam_free(&value->ptr);
-			rbtree_remove(tree, &k);
-		}
-
-		if (impl->send)
-			pthread_rwlock_unlock(&global_rbtree_lock);
-	}
-
-	if (!nil(impl->self)) {
-		fam_free(&impl->self);
-		impl->self = null;
-	}
+	return 0;
 }
 
 void object_cleanup(const ObjectNc *ptr) {
-	// note: we want to allow immutable objects to be moved. We therefore need to update their
-	// flags which require this override.
 #if defined(__clang__)
-	// Clang - specific pragma
+// Clang-specific pragma
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
 #elif defined(__GNUC__) && !defined(__clang__)
-	// GCC - specific pragma
+// GCC-specific pragma
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 #pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
 #else
@@ -270,9 +226,7 @@ void object_cleanup(const ObjectNc *ptr) {
 	}
 }
 
-int object_move(Object *dst, const Object *src) {
-	dst->flags = src->flags;
-	dst->impl = src->impl;
+int object_move(const Object *dst, const Object *src) {
 // note: we want to allow immutable objects to be moved. We therefore need to update their
 // flags which require this override.
 #if defined(__clang__)
@@ -287,13 +241,17 @@ int object_move(Object *dst, const Object *src) {
 #warning "Unknown compiler or platform. No specific warning pragmas applied."
 #endif
 	ObjectNc *src_mut = src;
+	ObjectNc *dst_mut = dst;
 #pragma GCC diagnostic pop
+	dst_mut->flags = src->flags;
+	dst_mut->impl = src->impl;
 	src_mut->impl = rc_null;
 	src_mut->flags = null;
+
 	return 0;
 }
 
-int object_ref_impl(Object *dst, Object *src, bool imut) {
+int object_ref(const Object *dst, const Object *src) {
 	FatPtr flags;
 	bool send;
 	bool src_imut;
@@ -301,10 +259,6 @@ int object_ref_impl(Object *dst, Object *src, bool imut) {
 	BitFlags bfsrc = {.flags = &src_flags->flags, .capacity = 1};
 	send = bitflags_check(&bfsrc, OBJECT_FLAG_SEND);
 	src_imut = bitflags_check(&bfsrc, OBJECT_FLAG_IMUT);
-	if (src_imut && !imut) {
-		SetErr(Permission);
-		return -1;
-	}
 	{
 		SendStateGuard _ = SetSend(send);
 		if (fam_alloc(&flags, sizeof(ObjectFlags))) {
@@ -315,33 +269,98 @@ int object_ref_impl(Object *dst, Object *src, bool imut) {
 	ff->flags = 0;
 	BitFlags bfdst = {.flags = &ff->flags, .capacity = 1};
 	bitflags_set(&bfdst, OBJECT_FLAG_SEND, send);
-	bitflags_set(&bfdst, OBJECT_FLAG_IMUT, imut);
+	bitflags_set(&bfdst, OBJECT_FLAG_IMUT, true);
 
-	dst->flags = flags;
-	int ret = rc_clone(&dst->impl, &src->impl);
+#if defined(__clang__)
+// Clang-specific pragma
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+#elif defined(__GNUC__) && !defined(__clang__)
+// GCC-specific pragma
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+#else
+#warning "Unknown compiler or platform. No specific warning pragmas applied."
+#endif
+	ObjectNc *unconstdst = dst;
+#pragma GCC diagnostic pop
+	unconstdst->flags = flags;
+
+	int ret = rc_clone(&unconstdst->impl, &src->impl);
+
 	if (ret) {
 		fam_free(&flags);
 	}
 	return ret;
 }
-int object_ref(Object *dst, Object *src) {
-	return object_ref_impl(dst, src, true);
-}
-int object_mut_ref(Object *dst, Object *src) {
-	return object_ref_impl(dst, src, false);
+
+int object_key_for(ObjectKey *objkey, const Object *obj, const char *key) {
+	ObjectImpl *impl = $(obj->impl);
+	int ret;
+	{
+		SendStateGuard _ = SetSend(impl->send);
+		ret = fam_alloc(&objkey->key, sizeof(char) * (1 + strlen(key)));
+	}
+	if (ret != 0)
+		return -1;
+
+	strcpy($(objkey->key), key);
+	objkey->namespace = impl->namespace;
+
+	return ret;
 }
 
-RBTreeNc *object_tree_for(const Object *obj) {
-	ObjectFlags *flags = $(obj->flags);
-	BitFlags bf = {.flags = &flags->flags, .capacity = 1};
-	bool send = bitflags_check(&bf, OBJECT_FLAG_SEND);
-
-	RBTreeNc *tree;
-	if (send)
-		tree = global_rbtree;
+void object_cleanup_rc(ObjectImpl *impl) {
+	RBTreeIttPair *pair;
+	if (impl->send)
+		pair = global_rbtree;
 	else
-		tree = thread_local_rbtree;
-	return tree;
+		pair = thread_local_rbtree;
+
+	if (impl->property_count) {
+		tl_start_range_key.namespace = impl->namespace;
+		tl_end_range_key.namespace = impl->namespace + 1;
+
+		if (impl->send)
+			pthread_rwlock_wrlock(&global_rbtree_lock);
+
+		rbtree_iterator_reset(pair->tree, pair->itt, &tl_start_range_key, true, &tl_end_range_key,
+							  false);
+
+		FatPtr *properties[impl->property_count];
+		u64 i = 0;
+
+		loop {
+			RbTreeKeyValue kv;
+			if (!rbtree_iterator_next(pair->itt, &kv))
+				break;
+			ObjectKeyNc *k1 = kv.key;
+			ObjectValue *v1 = kv.value;
+			const char *v = $(k1->key);
+			properties[i] = &k1->key;
+			i++;
+		}
+		for (u64 j = 0; j < impl->property_count; j++) {
+			ObjectKey k;
+			k.namespace = impl->namespace;
+			k.key = *properties[j];
+			ObjectValue *value = rbtree_get_mut(pair->tree, &k);
+			ObjectValueData *obj_data = $(value->ptr);
+			if (obj_data->type == ObjectTypeObject) {
+				object_cleanup((ObjectNc *)obj_data->value);
+			}
+			fam_free(&value->ptr);
+			rbtree_remove(pair->tree, &k);
+		}
+
+		if (impl->send)
+			pthread_rwlock_unlock(&global_rbtree_lock);
+	}
+
+	if (!nil(impl->self)) {
+		fam_free(&impl->self);
+		impl->self = null;
+	}
 }
 
 int object_set_property_string(Object *obj, const char *key, const char *value) {
@@ -352,9 +371,13 @@ int object_set_property_string(Object *obj, const char *key, const char *value) 
 	object_key_for(&objkey, obj, key);
 
 	ObjectValue objvalue;
-	if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData))) {
-		return -1;
+	{
+		SendStateGuard _ = SetSend(impl->send);
+		if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData))) {
+			return -1;
+		}
 	}
+
 	ObjectValueData *objdata = $(objvalue.ptr);
 	objdata->type = ObjectTypeString;
 	strcpy(objdata->value, value);
@@ -376,8 +399,11 @@ int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
 	object_key_for(&objkey, obj, key);
 
 	ObjectValue objvalue;
-	if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData)))
-		return -1;
+	{
+		SendStateGuard _ = SetSend(impl->send);
+		if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData)))
+			return -1;
+	}
 	ObjectValueData *objdata = $(objvalue.ptr);
 	objdata->type = ObjectTypeU64;
 	memcpy(objdata->value, value, sizeof(u64));
@@ -392,11 +418,15 @@ int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
 }
 
 int object_create(Object *obj, bool send, ObjectType type, const void *primitive) {
-	if (object_init_rbtrees())
-		return -1;
-	if (obj == NULL) {
-		SetErr(IllegalArgument);
-		return -1;
+	if (send) {
+		if (object_init_global()) {
+			return -1;
+		}
+
+	} else {
+		if (object_init_local()) {
+			return -1;
+		}
 	}
 
 	FatPtr ptr;
@@ -411,6 +441,7 @@ int object_create(Object *obj, bool send, ObjectType type, const void *primitive
 			return -1;
 		}
 	}
+
 	ObjectImpl *impl = $(ptr);
 
 	ObjectFlags *obj_flags = $(flags);
@@ -447,52 +478,9 @@ int object_create(Object *obj, bool send, ObjectType type, const void *primitive
 
 	return 0;
 }
-
-const char *object_as_string(const Object *obj) {
-	ObjectImpl *impl = $(obj->impl);
-	RBTreeNc *tree = object_tree_for(obj);
-
-	ObjectKey objkey = INIT_OBJECT_KEY;
-	object_key_for(&objkey, obj, "value");
-
-	if (impl->send)
-		pthread_rwlock_rdlock(&global_rbtree_lock);
-	const ObjectValue *valueret = rbtree_get(tree, &objkey);
-	if (impl->send)
-		pthread_rwlock_unlock(&global_rbtree_lock);
-	const ObjectValueData *valueretdata = $(valueret->ptr);
-
-	if (valueret == NULL || valueretdata->type != ObjectTypeString)
-		return NULL;
-
-	return valueretdata->value;
+int object_send(Object *obj, Channel *channel) {
+	return 0;
 }
-
-int object_as_u64(const Object *obj, u64 *value) {
-	int ret = 0;
-
-	ObjectImpl *impl = $(obj->impl);
-	RBTreeNc *tree = object_tree_for(obj);
-
-	ObjectKey objkey = INIT_OBJECT_KEY;
-	object_key_for(&objkey, obj, "value");
-
-	if (impl->send)
-		pthread_rwlock_rdlock(&global_rbtree_lock);
-	const ObjectValue *valueret = rbtree_get(tree, &objkey);
-	if (impl->send)
-		pthread_rwlock_unlock(&global_rbtree_lock);
-	const ObjectValueData *valueretdata = $(valueret->ptr);
-
-	if (valueret == NULL || valueretdata->type != ObjectTypeU64)
-		ret = -1;
-	else {
-		memcpy(value, valueretdata->value, sizeof(u64));
-	}
-
-	return ret;
-}
-
 int object_set_property(Object *obj, const char *key, const Object *value) {
 	ObjectImpl *impl = $(obj->impl);
 	ObjectKeyNc objkey = INIT_OBJECT_KEY;
@@ -513,16 +501,39 @@ int object_set_property(Object *obj, const char *key, const Object *value) {
 	}
 
 	RBTreeNc *tree = object_tree_for(obj);
-	impl->property_count++;
+
+	ObjectKeyNc objkeyswap;
+	ObjectValue objvalueswap;
+	RbTreeKeyValue rbtreekv;
+	rbtreekv.key = &objkeyswap;
+	rbtreekv.value = &objvalueswap;
+	rbtreekv.update = false;
 
 	if (impl->send)
 		pthread_rwlock_wrlock(&global_rbtree_lock);
-	int ret = rbtree_put(tree, &objkey, &objvalue);
+	int ret = rbtree_put_swap(tree, &objkey, &objvalue, &rbtreekv);
 	if (impl->send)
 		pthread_rwlock_unlock(&global_rbtree_lock);
 
 	if (ret)
 		object_key_cleanup(&objkey);
+
+	if (rbtreekv.update) {
+		ObjectValue *value = rbtreekv.value;
+		ObjectValueData *obj_data = $(value->ptr);
+		if (obj_data->type == ObjectTypeObject) {
+			object_cleanup((ObjectNc *)obj_data->value);
+		} else if (obj_data->type == ObjectTypeString) {
+		}
+
+		fam_free(&value->ptr);
+
+		ObjectKeyNc *key = rbtreekv.key;
+		object_key_cleanup(key);
+
+	} else {
+		impl->property_count++;
+	}
 
 	return ret;
 }
@@ -531,7 +542,6 @@ Object object_get_property(const Object *obj, const char *key) {
 	ObjectImpl *impl = $(obj->impl);
 	ObjectKey objkey = INIT_OBJECT_KEY;
 	object_key_for(&objkey, obj, key);
-
 	RBTreeNc *tree = object_tree_for(obj);
 
 	if (impl->send)
@@ -539,45 +549,79 @@ Object object_get_property(const Object *obj, const char *key) {
 	const ObjectValue *value = rbtree_get(tree, &objkey);
 	if (impl->send)
 		pthread_rwlock_unlock(&global_rbtree_lock);
-
 	if (value == NULL) {
 		ObjectNc ret = NIL;
 		return ret;
 	}
 
 	const ObjectValueData *value_data = $(value->ptr);
-	// const ObjectNc *ret = (ObjectNc *)value_data->value;
 	const ObjectNc ref;
 
-// note: we want to return a ref here. flags which require this override.
-#if defined(__clang__)
-// Clang-specific pragma
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
-#elif defined(__GNUC__) && !defined(__clang__)
-// GCC-specific pragma
-#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
-#else
-#warning "Unknown compiler or platform. No specific warning pragmas applied."
-#endif
 	object_ref(&ref, (ObjectNc *)value_data->value);
-#pragma GCC diagnostic pop
 
 	return ref;
 }
 
-int object_send(Object *obj, Channel *channel) {
-	return 0;
+const char *object_as_string(const Object *obj) {
+	ObjectImpl *impl = $(obj->impl);
+	RBTreeNc *tree = object_tree_for(obj);
+
+	ObjectKey objkey = INIT_OBJECT_KEY;
+	object_key_for(&objkey, obj, "value");
+
+	if (impl->send)
+		pthread_rwlock_rdlock(&global_rbtree_lock);
+	const ObjectValue *valueret = rbtree_get(tree, &objkey);
+	if (impl->send)
+		pthread_rwlock_unlock(&global_rbtree_lock);
+
+	if (valueret == NULL)
+		return NULL;
+	const ObjectValueData *valueretdata = $(valueret->ptr);
+
+	if (valueretdata->type != ObjectTypeString)
+		return NULL;
+
+	return valueretdata->value;
+}
+
+int object_as_u64(const Object *obj, u64 *value) {
+	int ret = 0;
+
+	ObjectImpl *impl = $(obj->impl);
+	RBTreeNc *tree = object_tree_for(obj);
+
+	ObjectKey objkey = INIT_OBJECT_KEY;
+	object_key_for(&objkey, obj, "value");
+
+	if (impl->send)
+		pthread_rwlock_rdlock(&global_rbtree_lock);
+	const ObjectValue *valueret = rbtree_get(tree, &objkey);
+	if (impl->send)
+		pthread_rwlock_unlock(&global_rbtree_lock);
+
+	if (valueret == NULL) {
+		ret = -1;
+	} else {
+		const ObjectValueData *valueretdata = $(valueret->ptr);
+
+		if (valueretdata->type != ObjectTypeU64)
+			ret = -1;
+		else {
+			memcpy(value, valueretdata->value, sizeof(u64));
+		}
+	}
+
+	return ret;
 }
 
 void object_cleanup_thread_local() {
 	if (thread_local_rbtree) {
-		rbtree_iterator_reset(thread_local_rbtree, thread_local_rbtree_iterator, NULL, false, NULL,
-							  false);
+		rbtree_iterator_reset(thread_local_rbtree->tree, thread_local_rbtree->itt, NULL, false,
+							  NULL, false);
 		loop {
 			RbTreeKeyValue kv;
-			if (!rbtree_iterator_next(thread_local_rbtree_iterator, &kv))
+			if (!rbtree_iterator_next(thread_local_rbtree->itt, &kv))
 				break;
 			ObjectKeyNc *key = kv.key;
 			fam_free(&key->key);
@@ -588,18 +632,21 @@ void object_cleanup_thread_local() {
 				fam_free(&value->ptr);
 			}
 		}
-		rbtree_cleanup(thread_local_rbtree);
-		myfree(thread_local_rbtree);
 
 		if (!nil(tl_start_range_key.key))
 			fam_free(&tl_start_range_key.key);
 		if (!nil(tl_end_range_key.key))
 			fam_free(&tl_end_range_key.key);
-		if (thread_local_rbtree_iterator) {
-			rbtree_iterator_cleanup(thread_local_rbtree_iterator);
-			myfree(thread_local_rbtree_iterator);
-			thread_local_rbtree_iterator = NULL;
+		if (thread_local_rbtree->itt) {
+			rbtree_iterator_cleanup(thread_local_rbtree->itt);
+			myfree(thread_local_rbtree->itt);
+			thread_local_rbtree->itt = NULL;
 		}
+
+		rbtree_cleanup(thread_local_rbtree->tree);
+		myfree(thread_local_rbtree->tree);
+
+		myfree(thread_local_rbtree);
 		thread_local_rbtree = NULL;
 	}
 }
@@ -608,19 +655,19 @@ void object_cleanup_thread_local() {
 u64 get_thread_local_rbtree_size() {
 	if (!thread_local_rbtree)
 		return 0;
-	return rbtree_size(thread_local_rbtree);
+	return rbtree_size(thread_local_rbtree->tree);
 }
 u64 get_global_rbtree_size() {
 	if (!global_rbtree)
 		return 0;
-	return rbtree_size(global_rbtree);
+	return rbtree_size(global_rbtree->tree);
 }
 void object_cleanup_global() {
 	if (global_rbtree) {
-		rbtree_iterator_reset(global_rbtree, global_rbtree_iterator, NULL, false, NULL, false);
+		rbtree_iterator_reset(global_rbtree->tree, global_rbtree->itt, NULL, false, NULL, false);
 		loop {
 			RbTreeKeyValue kv;
-			if (!rbtree_iterator_next(global_rbtree_iterator, &kv))
+			if (!rbtree_iterator_next(global_rbtree->itt, &kv))
 				break;
 			ObjectKeyNc *key = kv.key;
 			fam_free(&key->key);
@@ -631,15 +678,13 @@ void object_cleanup_global() {
 				fam_free(&value->ptr);
 			}
 		}
-		rbtree_cleanup(global_rbtree);
+
+		rbtree_iterator_cleanup(global_rbtree->itt);
+		myfree(global_rbtree->itt);
+		rbtree_cleanup(global_rbtree->tree);
+		myfree(global_rbtree->tree);
 		myfree(global_rbtree);
 		global_rbtree = NULL;
-	}
-
-	if (global_rbtree_iterator) {
-		rbtree_iterator_cleanup(global_rbtree_iterator);
-		myfree(global_rbtree_iterator);
-		global_rbtree_iterator = NULL;
 	}
 }
 #endif // TEST
