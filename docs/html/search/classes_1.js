@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['backtrace_831',['Backtrace',['../structBacktrace.html',1,'']]],
-  ['backtraceentry_832',['BacktraceEntry',['../structBacktraceEntry.html',1,'']]],
-  ['bitflags_833',['BitFlags',['../structBitFlags.html',1,'']]]
+  ['backtrace_833',['Backtrace',['../structBacktrace.html',1,'']]],
+  ['backtraceentry_834',['BacktraceEntry',['../structBacktraceEntry.html',1,'']]],
+  ['bitflags_835',['BitFlags',['../structBitFlags.html',1,'']]]
 ];

@@ -1,7 +1,7 @@
         -:    0:Source:backtrace.c
         -:    0:Graph:backtrace.gcno
         -:    0:Data:backtrace.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -288,7 +288,7 @@
         -:    0:Source:bitflags.c
         -:    0:Graph:bitflags.gcno
         -:    0:Data:bitflags.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -307,44 +307,44 @@
         -:   16:#include <base/fam_err.h>
         -:   17:#include <string.h>
         -:   18:
-    67522:   19:int bitflags_set(BitFlags *ptr, u32 index, bool value) {
-    67522:   20:	u32 offset = index >> 3;
+    67677:   19:int bitflags_set(BitFlags *ptr, u32 index, bool value) {
+    67677:   20:	u32 offset = index >> 3;
         -:   21:
         -:   22:	// Out of range check
-    67522:   23:	if (offset >= ptr->capacity) {
+    67677:   23:	if (offset >= ptr->capacity) {
         1:   24:		fam_err = IndexOutOfBounds;
         1:   25:		return -1;
         -:   26:	}
         -:   27:
         -:   28:	// Calculate mask directly
-    67521:   29:	u32 mask = 1 << (index & 0x7);
+    67676:   29:	u32 mask = 1 << (index & 0x7);
         -:   30:
-    67521:   31:	if (value) {
-    27269:   32:		ptr->flags[offset] |= mask;
+    67676:   31:	if (value) {
+    27323:   32:		ptr->flags[offset] |= mask;
         -:   33:	} else {
-    40252:   34:		ptr->flags[offset] &= ~mask;
+    40353:   34:		ptr->flags[offset] &= ~mask;
         -:   35:	}
         -:   36:
-    67521:   37:	return 0;
+    67676:   37:	return 0;
         -:   38:}
         -:   39:
-118688554:   40:bool bitflags_check(BitFlags *ptr, u32 index) {
-118688554:   41:	u32 offset = index >> 3;
+118690110:   40:bool bitflags_check(BitFlags *ptr, u32 index) {
+118690110:   41:	u32 offset = index >> 3;
         -:   42:
         -:   43:	// Out of range check
-118688554:   44:	if (offset >= ptr->capacity) {
+118690110:   44:	if (offset >= ptr->capacity) {
         1:   45:		return false;
         -:   46:	}
         -:   47:
         -:   48:	// Calculate mask directly
-118688553:   49:	u32 mask = 1 << (index & 0x7);
+118690109:   49:	u32 mask = 1 << (index & 0x7);
         -:   50:
-118688553:   51:	return ptr->flags[offset] & mask;
+118690109:   51:	return ptr->flags[offset] & mask;
         -:   52:}
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -440,7 +440,7 @@
         -:    0:Source:fam_alloc.c
         -:    0:Graph:fam_alloc.gcno
         -:    0:Data:fam_alloc.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -518,8 +518,8 @@
        43:   75:	return sa;
         -:   76:}
         -:   77:
-    40405:   78:void init_fam_guards() {
-    40405:   79:	if (!fam_guard_is_init) {
+    40768:   78:void init_fam_guards() {
+    40768:   79:	if (!fam_guard_is_init) {
        22:   80:		fam_guard_is_init = true;
        22:   81:		fam_guard_entries[0].send = false;
        22:   82:		if (thread_local_slab_allocator == NULL)
@@ -533,36 +533,36 @@
        22:   90:		if (pthread_mutex_init(&global_allocator_lock, NULL))
     #####:   91:			panic("Could not init pthread_mutex");
         -:   92:	}
-    40405:   93:}
+    40768:   93:}
         -:   94:
-    18414:   95:void send_guard_cleanup(SendStateGuardNc *ptr) {
-    18414:   96:	fam_guard_sp--;
-    18414:   97:}
+    18567:   95:void send_guard_cleanup(SendStateGuardNc *ptr) {
+    18567:   96:	fam_guard_sp--;
+    18567:   97:}
         -:   98:
-    10996:   99:int fam_alloc(FatPtr *ptr, u64 size) {
-    10996:  100:	init_fam_guards();
-    10996:  101:	bool send = fam_guard_entries[fam_guard_sp].send;
+    11101:   99:int fam_alloc(FatPtr *ptr, u64 size) {
+    11101:  100:	init_fam_guards();
+    11101:  101:	bool send = fam_guard_entries[fam_guard_sp].send;
         -:  102:
         -:  103:	SlabAllocatorNc *sa;
         -:  104:
-    10996:  105:	if (send)
-       23:  106:		sa = global_allocator;
+    11101:  105:	if (send)
+       20:  106:		sa = global_allocator;
         -:  107:	else {
-    10973:  108:		sa = thread_local_slab_allocator;
+    11081:  108:		sa = thread_local_slab_allocator;
         -:  109:	}
         -:  110:
         -:  111:	int ret;
-    10996:  112:	if (send)
-       23:  113:		pthread_mutex_lock(&global_allocator_lock);
-    10996:  114:	ret = slab_allocator_allocate(sa, size, ptr);
-    10996:  115:	if (send)
-       23:  116:		pthread_mutex_unlock(&global_allocator_lock);
+    11101:  112:	if (send)
+       20:  113:		pthread_mutex_lock(&global_allocator_lock);
+    11101:  114:	ret = slab_allocator_allocate(sa, size, ptr);
+    11101:  115:	if (send)
+       20:  116:		pthread_mutex_unlock(&global_allocator_lock);
         -:  117:
-    10996:  118:	if (ret) { // try malloc
+    11101:  118:	if (ret) { // try malloc
         3:  119:		ret = fat_ptr_mallocate(ptr, size);
         -:  120:	}
         -:  121:
-    10996:  122:	return ret;
+    11101:  122:	return ret;
         -:  123:}
         3:  124:int fam_realloc(FatPtr *ptr, u64 size) {
         3:  125:	if (fat_ptr_is_pin(ptr)) {
@@ -599,37 +599,37 @@
         -:  156:
         2:  157:	return ret;
         -:  158:}
-    10994:  159:void fam_free(FatPtr *ptr) {
-    10994:  160:	if (fat_ptr_is_malloc(ptr)) {
+    11099:  159:void fam_free(FatPtr *ptr) {
+    11099:  160:	if (fat_ptr_is_malloc(ptr)) {
         1:  161:		fat_ptr_malloc_free(ptr);
         -:  162:	} else {
-    10993:  163:		init_fam_guards();
+    11098:  163:		init_fam_guards();
         -:  164:
-    10993:  165:		bool global = fat_ptr_is_global(ptr);
+    11098:  165:		bool global = fat_ptr_is_global(ptr);
         -:  166:
         -:  167:		SlabAllocatorNc *sa;
         -:  168:
-    10993:  169:		if (global)
-       23:  170:			sa = global_allocator;
+    11098:  169:		if (global)
+       20:  170:			sa = global_allocator;
         -:  171:		else
-    10970:  172:			sa = thread_local_slab_allocator;
+    11078:  172:			sa = thread_local_slab_allocator;
         -:  173:
-    10993:  174:		if (global)
-       23:  175:			pthread_mutex_lock(&global_allocator_lock);
-    10993:  176:		slab_allocator_free(sa, ptr);
-    10993:  177:		if (global)
-       23:  178:			pthread_mutex_unlock(&global_allocator_lock);
+    11098:  174:		if (global)
+       20:  175:			pthread_mutex_lock(&global_allocator_lock);
+    11098:  176:		slab_allocator_free(sa, ptr);
+    11098:  177:		if (global)
+       20:  178:			pthread_mutex_unlock(&global_allocator_lock);
         -:  179:	}
-    10994:  180:}
-    18414:  181:void fam_alloc_increment_state(bool send) {
-    18414:  182:	init_fam_guards();
-    18414:  183:	fam_guard_sp++;
-    18414:  184:	fam_guard_entries[fam_guard_sp].send = send;
-    18414:  185:}
+    11099:  180:}
+    18567:  181:void fam_alloc_increment_state(bool send) {
+    18567:  182:	init_fam_guards();
+    18567:  183:	fam_guard_sp++;
+    18567:  184:	fam_guard_entries[fam_guard_sp].send = send;
+    18567:  185:}
         -:  186:
         -:  187:#ifdef TEST
-       56:  188:void fam_alloc_cleanup() {
-       56:  189:	if (fam_guard_is_init) {
+       57:  188:void fam_alloc_cleanup() {
+       57:  189:	if (fam_guard_is_init) {
        21:  190:		slab_allocator_cleanup(thread_local_slab_allocator);
        21:  191:		pthread_mutex_lock(&global_allocator_lock);
        21:  192:		slab_allocator_cleanup(global_allocator);
@@ -637,16 +637,16 @@
        21:  194:		myfree(global_allocator);
        21:  195:		myfree(thread_local_slab_allocator);
         -:  196:	}
-       56:  197:}
+       57:  197:}
         -:  198:
-       56:  199:u64 fam_alloc_count_tl_slab_allocator() {
-       56:  200:	if (!fam_guard_is_init)
-       35:  201:		return 0;
+       57:  199:u64 fam_alloc_count_tl_slab_allocator() {
+       57:  200:	if (!fam_guard_is_init)
+       36:  201:		return 0;
        21:  202:	return slab_allocator_cur_slabs_allocated(thread_local_slab_allocator);
         -:  203:}
-       56:  204:u64 fam_alloc_count_global_allocator() {
-       56:  205:	if (!fam_guard_is_init)
-       35:  206:		return 0;
+       57:  204:u64 fam_alloc_count_global_allocator() {
+       57:  205:	if (!fam_guard_is_init)
+       36:  206:		return 0;
        21:  207:	pthread_mutex_lock(&global_allocator_lock);
        21:  208:	u64 ret = slab_allocator_cur_slabs_allocated(global_allocator);
        21:  209:	pthread_mutex_unlock(&global_allocator_lock);
@@ -657,7 +657,7 @@
         -:    0:Source:fam_err.c
         -:    0:Graph:fam_err.gcno
         -:    0:Data:fam_err.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -713,7 +713,7 @@
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -880,21 +880,21 @@
         -:  164:}
         -:  165:
         -:  166:// Function to recursively remove a directory and its contents
-      147:  167:int remove_directory(const Path *p, bool preserve_dir) {
-      147:  168:	const char *path = path_to_string(p);
+      149:  167:int remove_directory(const Path *p, bool preserve_dir) {
+      149:  168:	const char *path = path_to_string(p);
         -:  169:	struct dirent *entry;
-      147:  170:	DIR *dir = opendir(path);
+      149:  170:	DIR *dir = opendir(path);
         -:  171:
-      147:  172:	if (dir == NULL) {
-       59:  173:		return -1;
+      149:  172:	if (dir == NULL) {
+       60:  173:		return -1;
         -:  174:	}
         -:  175:
-      300:  176:	while ((entry = readdir(dir)) != NULL) {
+      303:  176:	while ((entry = readdir(dir)) != NULL) {
         -:  177:		char full_path[PATH_MAX];
         -:  178:
         -:  179:		// Skip the special entries "." and ".."
-      217:  180:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-      168:  181:			continue;
+      219:  180:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+      170:  181:			continue;
         -:  182:		}
         -:  183:
         -:  184:		// Construct the full path to the file/directory
@@ -925,17 +925,17 @@
         -:  209:		}
         -:  210:	}
         -:  211:
-       83:  212:	closedir(dir);
+       84:  212:	closedir(dir);
         -:  213:
         -:  214:	// Now the directory is empty, so we can remove it
-       83:  215:	if (!preserve_dir) {
-       82:  216:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
+       84:  215:	if (!preserve_dir) {
+       83:  216:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
         1:  217:			SetErr(IO);
         1:  218:			return -1;
         -:  219:		}
         -:  220:	}
         -:  221:
-       82:  222:	return 0;
+       83:  222:	return 0;
         -:  223:}
         -:  224:
         5:  225:void exit_error(char *format, ...) {
@@ -972,7 +972,7 @@
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -987,65 +987,70 @@
         -:   12:// See the License for the specific language governing permissions and
         -:   13:// limitations under the License.
         -:   14:
-        -:   15:#include <base/panic.h>
-        -:   16:#include <setjmp.h>
-        -:   17:#include <signal.h>
-        -:   18:#include <stdarg.h>
-        -:   19:#include <stdio.h>
-        -:   20:#include <stdlib.h>
-        -:   21:#include <string.h>
-        -:   22:
-        -:   23:void exit(int value);
-        -:   24:
-        -:   25:#define MAX_PANIC_MSG 1024
-        -:   26:
-        -:   27:_Thread_local jmp_buf return_jmp;
-        -:   28:_Thread_local bool jmp_return_set = false;
-        -:   29:_Thread_local char panic_buf[MAX_PANIC_MSG];
-        -:   30:
-    #####:   31:void panic(const char *fmt, ...) {
-        -:   32:	va_list args;
-        -:   33:
-    #####:   34:	fprintf(stderr, "thread panicked: ");
-    #####:   35:	va_start(args, fmt);
-    #####:   36:	vfprintf(stderr, fmt, args);
-    #####:   37:	vsnprintf(panic_buf, MAX_PANIC_MSG, fmt, args);
-    #####:   38:	va_end(args);
-    #####:   39:	fprintf(stderr, "\n");
-        -:   40:
-        -:   41:	// If jump return has not been set, we resort to an exit with an error
-        -:   42:	// status.
-    #####:   43:	if (!jmp_return_set)
-    #####:   44:		exit(-1);
-    #####:   45:	longjmp(return_jmp, THREAD_PANIC);
-        -:   46:}
-        -:   47:
-    #####:   48:void signal_handler(int signal) {
-        -:   49:	// Handle the signal and call the _on_panic function
-    #####:   50:	panic("Caught signal: %d", signal);
-    #####:   51:}
+        -:   15:#include <base/backtrace.h>
+        -:   16:#include <base/panic.h>
+        -:   17:#include <setjmp.h>
+        -:   18:#include <signal.h>
+        -:   19:#include <stdarg.h>
+        -:   20:#include <stdio.h>
+        -:   21:#include <stdlib.h>
+        -:   22:#include <string.h>
+        -:   23:
+        -:   24:void exit(int value);
+        -:   25:
+        -:   26:#define MAX_PANIC_MSG 1024
+        -:   27:
+        -:   28:_Thread_local jmp_buf return_jmp;
+        -:   29:_Thread_local bool jmp_return_set = false;
+        -:   30:_Thread_local char panic_buf[MAX_PANIC_MSG];
+        -:   31:
+    #####:   32:void panic(const char *fmt, ...) {
+        -:   33:	va_list args;
+        -:   34:
+    #####:   35:	fprintf(stderr, "thread panicked: ");
+    #####:   36:	va_start(args, fmt);
+    #####:   37:	vfprintf(stderr, fmt, args);
+    #####:   38:	vsnprintf(panic_buf, MAX_PANIC_MSG, fmt, args);
+    #####:   39:	va_end(args);
+    #####:   40:	fprintf(stderr, "\n");
+        -:   41:
+        -:   42:	Backtrace bt;
+    #####:   43:	backtrace_generate(&bt);
+    #####:   44:	backtrace_print(&bt);
+        -:   45:
+        -:   46:	// If jump return has not been set, we resort to an exit with an error
+        -:   47:	// status.
+    #####:   48:	if (!jmp_return_set)
+    #####:   49:		exit(-1);
+    #####:   50:	longjmp(return_jmp, THREAD_PANIC);
+        -:   51:}
         -:   52:
-    #####:   53:void set_on_panic(panic_handler_t on_panic) {
-        -:   54:	struct sigaction sa;
-    #####:   55:	memset(&sa, 0, sizeof(sa));
-    #####:   56:	sa.sa_handler = signal_handler;
-        -:   57:	// Catching only error signals
-    #####:   58:	sigaction(SIGSEGV, &sa, NULL); // Segmentation fault
-    #####:   59:	sigaction(SIGABRT, &sa, NULL); // Abort signal
-    #####:   60:	sigaction(SIGTRAP, &sa, NULL); // Signal trap
-    #####:   61:	sigaction(SIGILL, &sa, NULL);  // Illegal instruction
-    #####:   62:	sigaction(SIGFPE, &sa, NULL);  // Arithmetic error
-    #####:   63:	sigaction(SIGBUS, &sa, NULL);  // Bus error
-        -:   64:
-    #####:   65:	jmp_return_set = true;
-    #####:   66:	int value = setjmp(return_jmp);
-    #####:   67:	if (value)
-    #####:   68:		on_panic(panic_buf);
-    #####:   69:}
+    #####:   53:void signal_handler(int signal) {
+        -:   54:	// Handle the signal and call the _on_panic function
+    #####:   55:	panic("Caught signal: %d", signal);
+    #####:   56:}
+        -:   57:
+    #####:   58:void set_on_panic(panic_handler_t on_panic) {
+        -:   59:	struct sigaction sa;
+    #####:   60:	memset(&sa, 0, sizeof(sa));
+    #####:   61:	sa.sa_handler = signal_handler;
+        -:   62:	// Catching only error signals
+    #####:   63:	sigaction(SIGSEGV, &sa, NULL); // Segmentation fault
+    #####:   64:	sigaction(SIGABRT, &sa, NULL); // Abort signal
+    #####:   65:	sigaction(SIGTRAP, &sa, NULL); // Signal trap
+    #####:   66:	sigaction(SIGILL, &sa, NULL);  // Illegal instruction
+    #####:   67:	sigaction(SIGFPE, &sa, NULL);  // Arithmetic error
+    #####:   68:	sigaction(SIGBUS, &sa, NULL);  // Bus error
+        -:   69:
+    #####:   70:	jmp_return_set = true;
+    #####:   71:	int value = setjmp(return_jmp);
+    #####:   72:	if (value)
+    #####:   73:		on_panic(panic_buf);
+    #####:   74:}
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1073,35 +1078,35 @@
         -:   25:
         -:   26:bool __is_debug_path_homedir_null = false;
         -:   27:
-      231:   28:void path_cleanup(PathImpl *ptr) {
-      231:   29:	if (ptr->ptr) {
-      228:   30:		myfree(ptr->ptr);
-      228:   31:		ptr->ptr = NULL;
+      233:   28:void path_cleanup(PathImpl *ptr) {
+      233:   29:	if (ptr->ptr) {
+      230:   30:		myfree(ptr->ptr);
+      230:   31:		ptr->ptr = NULL;
         -:   32:	}
-      231:   33:}
+      233:   33:}
         -:   34:
-      239:   35:int path_for(Path *p, const char *path) {
-      239:   36:	if (p == NULL) {
+      241:   35:int path_for(Path *p, const char *path) {
+      241:   36:	if (p == NULL) {
         1:   37:		SetErr(IllegalArgument);
         1:   38:		return -1;
         -:   39:	}
-      238:   40:	if (path == NULL) {
+      240:   40:	if (path == NULL) {
         1:   41:		SetErr(IllegalArgument);
         1:   42:		p->ptr = NULL;
         1:   43:		return -1;
         -:   44:	}
-      237:   45:	int len = strlen(path);
-      237:   46:	if (len == 0) {
+      239:   45:	int len = strlen(path);
+      239:   46:	if (len == 0) {
         1:   47:		SetErr(IllegalArgument);
         1:   48:		p->ptr = NULL;
         1:   49:		return -1;
         -:   50:	}
-      236:   51:	p->ptr = mymalloc(len + 1);
-      236:   52:	if (!p->ptr)
+      238:   51:	p->ptr = mymalloc(len + 1);
+      238:   52:	if (!p->ptr)
         2:   53:		return -1;
-      234:   54:	p->len = len;
-      234:   55:	strcpy(p->ptr, path);
-      234:   56:	return 0;
+      236:   54:	p->len = len;
+      236:   55:	strcpy(p->ptr, path);
+      236:   56:	return 0;
         -:   57:}
         -:   58:
        33:   59:int path_replace_home(Path *p) {
@@ -1163,41 +1168,41 @@
        13:  115:	strcpy(p->ptr, buf);
        13:  116:	return 0;
         -:  117:}
-      168:  118:int path_push(Path *p, const char *next) {
-      168:  119:	if (p == NULL) {
+      169:  118:int path_push(Path *p, const char *next) {
+      169:  119:	if (p == NULL) {
         1:  120:		SetErr(IllegalArgument);
         1:  121:		return -1;
         -:  122:	}
-      167:  123:	if (next == NULL) {
+      168:  123:	if (next == NULL) {
         1:  124:		SetErr(IllegalArgument);
         1:  125:		return -1;
         -:  126:	}
-      166:  127:	int slen = strlen(p->ptr);
-      166:  128:	if (slen <= 0 || strlen(next) == 0) {
+      167:  127:	int slen = strlen(p->ptr);
+      167:  128:	if (slen <= 0 || strlen(next) == 0) {
         1:  129:		SetErr(IllegalState);
         1:  130:		return -1;
         -:  131:	}
-      165:  132:	bool need_sep = false;
-      165:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
-      165:  134:		need_sep = true;
+      166:  132:	bool need_sep = false;
+      166:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
+      166:  134:		need_sep = true;
         -:  135:	}
         -:  136:
-      165:  137:	int nlen = slen + strlen(next);
-      165:  138:	if (need_sep)
-      165:  139:		nlen += strlen(PATH_SEPARATOR);
+      166:  137:	int nlen = slen + strlen(next);
+      166:  138:	if (need_sep)
+      166:  139:		nlen += strlen(PATH_SEPARATOR);
         -:  140:
-      165:  141:	if (nlen >= p->len) {
-      161:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
-      161:  143:		if (nptr == NULL)
+      166:  141:	if (nlen >= p->len) {
+      162:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
+      162:  143:		if (nptr == NULL)
         1:  144:			return -1;
-      160:  145:		p->ptr = nptr;
-      160:  146:		p->len = nlen;
+      161:  145:		p->ptr = nptr;
+      161:  146:		p->len = nlen;
         -:  147:	}
         -:  148:
-      164:  149:	if (need_sep)
-      164:  150:		strcat(p->ptr, PATH_SEPARATOR);
-      164:  151:	strcat(p->ptr, next);
-      164:  152:	return 0;
+      165:  149:	if (need_sep)
+      165:  150:		strcat(p->ptr, PATH_SEPARATOR);
+      165:  151:	strcat(p->ptr, next);
+      165:  152:	return 0;
         -:  153:}
        48:  154:int path_pop(Path *p) {
        48:  155:	const char *res = rstrstr(p->ptr, PATH_SEPARATOR);
@@ -1211,8 +1216,8 @@
        48:  163:	return 0;
         -:  164:}
         -:  165:
-      274:  166:char *path_to_string(const Path *p) {
-      274:  167:	return p->ptr;
+      276:  166:char *path_to_string(const Path *p) {
+      276:  167:	return p->ptr;
         -:  168:}
         -:  169:
        88:  170:const char *path_file_name(const Path *p) {
@@ -1242,8 +1247,8 @@
         3:  194:	return false;
         -:  195:}
         -:  196:
-      140:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
-      140:  198:	if (p->ptr == NULL || p->len == 0) {
+      141:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
+      141:  198:	if (p->ptr == NULL || p->len == 0) {
         1:  199:		SetErr(IllegalArgument);
         1:  200:		return false;
         -:  201:	}
@@ -1251,7 +1256,7 @@
         -:  203:	struct stat s;
         -:  204:
         -:  205:	// Check if the path exists
-      139:  206:	if (stat(p->ptr, &s) == 0) {
+      140:  206:	if (stat(p->ptr, &s) == 0) {
         -:  207:		// If the path exists and it's a directory, return success
         8:  208:		if (s.st_mode & S_IFDIR) {
         7:  209:			return true;
@@ -1263,11 +1268,11 @@
         -:  215:	}
         -:  216:
         -:  217:	// If parent is false, attempt to create only the target directory
-      131:  218:	if (!parent) {
-      113:  219:		if (mkdir(p->ptr, mode) != 0) {
+      132:  218:	if (!parent) {
+      114:  219:		if (mkdir(p->ptr, mode) != 0) {
        28:  220:			return false;
         -:  221:		}
-       85:  222:		return true;
+       86:  222:		return true;
         -:  223:	}
         -:  224:
         -:  225:	// Create the directory structure (parent is true)
@@ -1316,7 +1321,7 @@
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1345,44 +1350,44 @@
         -:   26:u64 __is_debug_realloc_counter_ = UINT64_MAX;
         -:   27:#endif // TEST
         -:   28:
-     2402:   29:void *mymalloc(u64 size) {
+     2388:   29:void *mymalloc(u64 size) {
         -:   30:#ifdef TEST
-     2402:   31:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
+     2388:   31:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
        24:   32:		__is_debug_malloc_counter_ = UINT64_MAX;
        24:   33:		return NULL;
         -:   34:	}
-     2378:   35:	__is_debug_malloc_counter_--;
+     2364:   35:	__is_debug_malloc_counter_--;
         -:   36:#endif // TEST
         -:   37:	void *ret;
-     2378:   38:	ret = malloc(size);
+     2364:   38:	ret = malloc(size);
         -:   39:
-     2378:   40:	if (ret) {
-     2378:   41:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+     2364:   40:	if (ret) {
+     2364:   41:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   42:	} else
     #####:   43:		SetErr(AllocErr);
-     2378:   44:	return ret;
+     2364:   44:	return ret;
         -:   45:}
-    11347:   46:void *myrealloc(void *ptr, u64 size) {
+    11348:   46:void *myrealloc(void *ptr, u64 size) {
         -:   47:#ifdef TEST
-    11347:   48:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
+    11348:   48:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
         7:   49:		__is_debug_realloc_counter_ = UINT64_MAX;
         7:   50:		return NULL;
         -:   51:	}
-    11340:   52:	__is_debug_realloc_counter_--;
+    11341:   52:	__is_debug_realloc_counter_--;
         -:   53:#endif // TEST
         -:   54:	void *ret;
-    11340:   55:	ret = realloc(ptr, size);
+    11341:   55:	ret = realloc(ptr, size);
         -:   56:
-    11340:   57:	if (ret) {
-    11340:   58:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+    11341:   57:	if (ret) {
+    11341:   58:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   59:	} else
     #####:   60:		SetErr(AllocErr);
-    11340:   61:	return ret;
+    11341:   61:	return ret;
         -:   62:}
-     2316:   63:void myfree(void *ptr) {
-     2316:   64:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-     2316:   65:	free(ptr);
-     2316:   66:}
+     2302:   63:void myfree(void *ptr) {
+     2302:   64:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+     2302:   65:	free(ptr);
+     2302:   66:}
        53:   67:MYFILE *myfopen(const Path *path, const char *mode) {
        53:   68:	const char *path_str = path_to_string(path);
        53:   69:	FILE *ret = fopen(path_str, mode);
@@ -1400,25 +1405,25 @@
        48:   81:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
        48:   82:	fclose((FILE *)ptr);
        48:   83:}
-      117:   84:u64 mymalloc_sum() {
-      117:   85:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
+      119:   84:u64 mymalloc_sum() {
+      119:   85:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
         -:   86:}
         2:   87:u64 myrealloc_sum() {
         2:   88:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
         -:   89:}
-      117:   90:u64 myfree_sum() {
-      117:   91:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+      119:   90:u64 myfree_sum() {
+      119:   91:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
         -:   92:}
-      174:   93:u64 myfopen_sum() {
-      174:   94:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+      177:   93:u64 myfopen_sum() {
+      177:   94:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
         -:   95:}
-      174:   96:u64 myfclose_sum() {
-      174:   97:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+      177:   96:u64 myfclose_sum() {
+      177:   97:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
         -:   98:}
         -:    0:Source:slabs.c
         -:    0:Graph:slabs.gcno
         -:    0:Data:slabs.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1507,36 +1512,36 @@
     #####:   86:	return ret;
         -:   87:}
         -:   88:
-  2012325:   89:u32 fat_ptr_size(const FatPtr *ptr) {
-  2012325:   90:	u32 ret = 0;
-  2012325:   91:	if (ptr != NULL) {
-  2012325:   92:		FatPtr32Impl *tmp = ptr->data;
-  2012325:   93:		if (!nil(*ptr))
-  2012323:   94:			memcpy(&ret, tmp->size_flags, 3);
+  2012430:   89:u32 fat_ptr_size(const FatPtr *ptr) {
+  2012430:   90:	u32 ret = 0;
+  2012430:   91:	if (ptr != NULL) {
+  2012430:   92:		FatPtr32Impl *tmp = ptr->data;
+  2012430:   93:		if (!nil(*ptr))
+  2012428:   94:			memcpy(&ret, tmp->size_flags, 3);
         -:   95:	} else
     #####:   96:		SetErr(IllegalArgument);
-  2012325:   97:	return ret;
+  2012430:   97:	return ret;
         -:   98:}
         -:   99:
- 67394953:  100:void *fat_ptr_data(const FatPtr *ptr) {
- 67394953:  101:	void *ret = NULL;
- 67394953:  102:	if (ptr != NULL) {
- 67394953:  103:		FatPtr32Impl *tmp = ptr->data;
- 67394953:  104:		if (!nil(*ptr) && ptr->data != NULL)
- 67394951:  105:			ret = ((FatPtr32Impl *)ptr->data)->data;
+ 67395519:  100:void *fat_ptr_data(const FatPtr *ptr) {
+ 67395519:  101:	void *ret = NULL;
+ 67395519:  102:	if (ptr != NULL) {
+ 67395519:  103:		FatPtr32Impl *tmp = ptr->data;
+ 67395519:  104:		if (!nil(*ptr) && ptr->data != NULL)
+ 67395517:  105:			ret = ((FatPtr32Impl *)ptr->data)->data;
         -:  106:	} else
     #####:  107:		SetErr(IllegalArgument);
- 67394953:  108:	return ret;
+ 67395519:  108:	return ret;
         -:  109:}
         -:  110:
-    12103:  111:bool fat_ptr_is_global(const FatPtr *ptr) {
-    12103:  112:	bool ret = false;
-    12103:  113:	if (ptr && ptr->data) {
-    12103:  114:		FatPtr32Impl *fptr = ptr->data;
-    12103:  115:		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
-    12103:  116:		ret = bitflags_check(&bf, BIT_FLAG_GLOBAL);
+    12208:  111:bool fat_ptr_is_global(const FatPtr *ptr) {
+    12208:  112:	bool ret = false;
+    12208:  113:	if (ptr && ptr->data) {
+    12208:  114:		FatPtr32Impl *fptr = ptr->data;
+    12208:  115:		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
+    12208:  116:		ret = bitflags_check(&bf, BIT_FLAG_GLOBAL);
         -:  117:	}
-    12103:  118:	return ret;
+    12208:  118:	return ret;
         -:  119:}
         -:  120:
      1103:  121:bool fat_ptr_is_pin(const FatPtr *ptr) {
@@ -1558,24 +1563,24 @@
      1100:  137:	return ret;
         -:  138:}
         -:  139:
-    10994:  140:bool fat_ptr_is_malloc(const FatPtr *ptr) {
-    10994:  141:	bool ret = false;
-    10994:  142:	if (ptr && ptr->data) {
-    10994:  143:		FatPtr32Impl *fptr = ptr->data;
-    10994:  144:		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
-    10994:  145:		ret = bitflags_check(&bf, BIT_FLAG_MALLOC);
+    11099:  140:bool fat_ptr_is_malloc(const FatPtr *ptr) {
+    11099:  141:	bool ret = false;
+    11099:  142:	if (ptr && ptr->data) {
+    11099:  143:		FatPtr32Impl *fptr = ptr->data;
+    11099:  144:		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
+    11099:  145:		ret = bitflags_check(&bf, BIT_FLAG_MALLOC);
         -:  146:	}
-    10994:  147:	return ret;
+    11099:  147:	return ret;
         -:  148:}
         -:  149:
- 70426134:  150:bool fat_ptr_is_nil(const FatPtr *ptr) {
- 70426134:  151:	bool ret = true;
- 70426134:  152:	if (ptr && ptr->data) {
- 70426134:  153:		FatPtr32Impl *fptr = ptr->data;
- 70426134:  154:		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
- 70426134:  155:		ret = bitflags_check(&bf, BIT_FLAG_NIL);
+ 70427218:  150:bool fat_ptr_is_nil(const FatPtr *ptr) {
+ 70427218:  151:	bool ret = true;
+ 70427218:  152:	if (ptr && ptr->data) {
+ 70427218:  153:		FatPtr32Impl *fptr = ptr->data;
+ 70427218:  154:		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
+ 70427218:  155:		ret = bitflags_check(&bf, BIT_FLAG_NIL);
         -:  156:	}
- 70426134:  157:	return ret;
+ 70427218:  157:	return ret;
         -:  158:}
         -:  159:
        53:  160:void slab_allocator_config_cleanup(SlabAllocatorConfigNc *sc) {
@@ -1634,19 +1639,19 @@
        51:  213:		SlabAllocatorImpl *impl = ptr->impl;
        51:  214:		if (impl->sd_arr) {
     10812:  215:			for (u64 i = 0; i < impl->sd_size; i++) {
-    10913:  216:				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
-      152:  217:					if (impl->sd_arr[i].data[j]) {
-      152:  218:						myfree(impl->sd_arr[i].data[j]);
-      152:  219:						impl->sd_arr[i].data[j] = NULL;
+    10908:  216:				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
+      147:  217:					if (impl->sd_arr[i].data[j]) {
+      147:  218:						myfree(impl->sd_arr[i].data[j]);
+      147:  219:						impl->sd_arr[i].data[j] = NULL;
         -:  220:					}
         -:  221:				}
     10761:  222:				if (impl->sd_arr[i].data) {
-       74:  223:					myfree(impl->sd_arr[i].data);
-       74:  224:					impl->sd_arr[i].data = NULL;
+       69:  223:					myfree(impl->sd_arr[i].data);
+       69:  224:					impl->sd_arr[i].data = NULL;
         -:  225:				}
     10761:  226:				if (impl->sd_arr[i].free_list) {
-       74:  227:					myfree(impl->sd_arr[i].free_list);
-       74:  228:					impl->sd_arr[i].free_list = NULL;
+       69:  227:					myfree(impl->sd_arr[i].free_list);
+       69:  228:					impl->sd_arr[i].free_list = NULL;
         -:  229:				}
         -:  230:			}
         -:  231:
@@ -1658,17 +1663,17 @@
         -:  237:	}
        51:  238:}
         -:  239:
-    11162:  240:int slab_allocator_init_free_list(SlabData *sd, u32 slabs, u32 offset) {
+    11157:  240:int slab_allocator_init_free_list(SlabData *sd, u32 slabs, u32 offset) {
         -:  241:	//  initialize the values of the free list.
-  1025282:  242:	for (u32 i = 0; i < slabs; i++) {
-  1014120:  243:		if (i == (slabs - 1)) {
-      153:  244:			((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
+  1024777:  242:	for (u32 i = 0; i < slabs; i++) {
+  1013620:  243:		if (i == (slabs - 1)) {
+      148:  244:			((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
         -:  245:		} else {
-  1013967:  246:			((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
+  1013472:  246:			((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
         -:  247:		}
         -:  248:	}
         -:  249:
-    11162:  250:	return 0;
+    11157:  250:	return 0;
         -:  251:}
         -:  252:
     11017:  253:int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
@@ -1794,113 +1799,113 @@
        52:  373:	return ret;
         -:  374:}
         -:  375:
-  2022222:  376:int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
-  2022222:  377:	SlabAllocatorImpl *impl = ptr->impl;
-  2022222:  378:	int ret = -1;
-  2022222:  379:	if (impl->sd_size > 0) {
+  2022432:  376:int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
+  2022432:  377:	SlabAllocatorImpl *impl = ptr->impl;
+  2022432:  378:	int ret = -1;
+  2022432:  379:	if (impl->sd_size > 0) {
         -:  380:
-  2022222:  381:		int left = 0;
-  2022222:  382:		int right = impl->sd_size - 1;
+  2022432:  381:		int left = 0;
+  2022432:  382:		int right = impl->sd_size - 1;
         -:  383:
-  3154644:  384:		while (left <= right) {
-  2143598:  385:			int mid = left + (right - left) / 2;
-  2143598:  386:			u32 slab_size = impl->sd_arr[mid].type.slab_size;
-  2143598:  387:			if (slab_size == size) {
-  1011176:  388:				ret = mid;
-  1011176:  389:				break;
-  1132422:  390:			} else if (slab_size > size)
-  1099832:  391:				right = mid - 1;
+  3156358:  384:		while (left <= right) {
+  2145230:  385:			int mid = left + (right - left) / 2;
+  2145230:  386:			u32 slab_size = impl->sd_arr[mid].type.slab_size;
+  2145230:  387:			if (slab_size == size) {
+  1011304:  388:				ret = mid;
+  1011304:  389:				break;
+  1133926:  390:			} else if (slab_size > size)
+  1101300:  391:				right = mid - 1;
         -:  392:			else
-    32590:  393:				left = mid + 1;
+    32626:  393:				left = mid + 1;
         -:  394:		}
         -:  395:
-  2022222:  396:		if (ret == -1 && right + 1 <= impl->sd_size - 1) {
-  1011045:  397:			ret = right + 1;
+  2022432:  396:		if (ret == -1 && right + 1 <= impl->sd_size - 1) {
+  1011127:  397:			ret = right + 1;
         -:  398:		}
         -:  399:	}
         -:  400:
-  2022222:  401:	return ret;
+  2022432:  401:	return ret;
         -:  402:}
         -:  403:
         -:  404:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool zeroed, bool global);
         -:  405:
-  1011259:  406:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
-  1011259:  407:	u32 id = sd->free_list_head;
-  1011259:  408:	if (id == UINT32_MAX) {
-      151:  409:		return slab_data_try_resize(sd, fptr, zeroed, global);
+  1011359:  406:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
+  1011359:  407:	u32 id = sd->free_list_head;
+  1011359:  408:	if (id == UINT32_MAX) {
+      146:  409:		return slab_data_try_resize(sd, fptr, zeroed, global);
         -:  410:	}
         -:  411:
-  1011108:  412:	sd->free_list_head = ((u32 *)sd->free_list)[id];
+  1011213:  412:	sd->free_list_head = ((u32 *)sd->free_list)[id];
         -:  413:
         -:  414:	// set to MAX-1 as a marker that this is allocated
         -:  415:	// if any freed without this value, it's an error
-  1011108:  416:	((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
+  1011213:  416:	((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
         -:  417:
-  1011108:  418:	u32 len = sd->type.slab_size;
-  1011108:  419:	u64 slab_data_index = id / sd->type.slabs_per_resize;
-  1011108:  420:	u64 offset_mod = id % sd->type.slabs_per_resize;
+  1011213:  418:	u32 len = sd->type.slab_size;
+  1011213:  419:	u64 slab_data_index = id / sd->type.slabs_per_resize;
+  1011213:  420:	u64 offset_mod = id % sd->type.slabs_per_resize;
         -:  421:
-  1011108:  422:	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
+  1011213:  422:	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
         -:  423:
-  1011108:  424:	FatPtr32Impl *fptr32 = fptr->data;
-  1011108:  425:	fptr32->id = id;
-  1011108:  426:	u64 data_len = len - SIZE_OVERHEAD;
-  1011108:  427:	memcpy(&fptr32->size_flags, &data_len, 3);
-  1011108:  428:	fptr32->size_flags[3] = 0;
-  1011108:  429:	fptr32->data = fptr->data + SIZE_OVERHEAD;
-  1011108:  430:	u8 *data_ptr = fptr32->data;
-  1011108:  431:	if (global) {
-       23:  432:		BitFlags bf = {.flags = (fptr32->size_flags + 3), .capacity = 1};
-       23:  433:		bitflags_set(&bf, BIT_FLAG_GLOBAL, true);
+  1011213:  424:	FatPtr32Impl *fptr32 = fptr->data;
+  1011213:  425:	fptr32->id = id;
+  1011213:  426:	u64 data_len = len - SIZE_OVERHEAD;
+  1011213:  427:	memcpy(&fptr32->size_flags, &data_len, 3);
+  1011213:  428:	fptr32->size_flags[3] = 0;
+  1011213:  429:	fptr32->data = fptr->data + SIZE_OVERHEAD;
+  1011213:  430:	u8 *data_ptr = fptr32->data;
+  1011213:  431:	if (global) {
+       20:  432:		BitFlags bf = {.flags = (fptr32->size_flags + 3), .capacity = 1};
+       20:  433:		bitflags_set(&bf, BIT_FLAG_GLOBAL, true);
         -:  434:	}
         -:  435:
-  1011108:  436:	sd->cur_slabs += 1;
-  1011108:  437:	if (zeroed) {
+  1011213:  436:	sd->cur_slabs += 1;
+  1011213:  437:	if (zeroed) {
       500:  438:		for (u64 i = 0; i < data_len; i++) {
       480:  439:			data_ptr[i] = 0;
         -:  440:		}
         -:  441:	}
         -:  442:
-  1011108:  443:	return 0;
+  1011213:  443:	return 0;
         -:  444:}
         -:  445:
-      151:  446:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
-      151:  447:	int ret = -1;
-      151:  448:	if (sd->cur_slabs < sd->type.max_slabs) {
+      146:  446:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
+      146:  447:	int ret = -1;
+      146:  448:	if (sd->cur_slabs < sd->type.max_slabs) {
         -:  449:		// we can try to resize
         -:  450:		// first try to reallocate the free list
-      147:  451:		void *nfree_list = NULL;
-      147:  452:		u64 factor = sizeof(u32);
-      147:  453:		if (sd->free_list) {
+      142:  451:		void *nfree_list = NULL;
+      142:  452:		u64 factor = sizeof(u32);
+      142:  453:		if (sd->free_list) {
         -:  454:			nfree_list =
        78:  455:				myrealloc(sd->free_list, (1 + sd->cur_chunks) * sd->type.slabs_per_resize * factor);
         -:  456:		} else {
         -:  457:
-       69:  458:			nfree_list = mymalloc((u64)sd->type.slabs_per_resize * (u64)factor);
+       64:  458:			nfree_list = mymalloc((u64)sd->type.slabs_per_resize * (u64)factor);
         -:  459:		}
-      147:  460:		if (nfree_list != NULL) {
+      142:  460:		if (nfree_list != NULL) {
         -:  461:
-      145:  462:			sd->free_list = nfree_list;
+      140:  462:			sd->free_list = nfree_list;
         -:  463:
         -:  464:			// now try to allocate more slab chunks
         -:  465:			void *ndata;
-      145:  466:			if (sd->data == NULL) {
-       67:  467:				ndata = mymalloc(sizeof(void *));
+      140:  466:			if (sd->data == NULL) {
+       62:  467:				ndata = mymalloc(sizeof(void *));
         -:  468:			} else {
        78:  469:				ndata = myrealloc(sd->data, sizeof(void *) * (1 + sd->cur_chunks));
         -:  470:			}
-      145:  471:			if (ndata != NULL) {
+      140:  471:			if (ndata != NULL) {
         -:  472:
-      145:  473:				sd->data = ndata;
-      145:  474:				sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
-      145:  475:				if (sd->data[sd->cur_chunks] != NULL) {
+      140:  473:				sd->data = ndata;
+      140:  474:				sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
+      140:  475:				if (sd->data[sd->cur_chunks] != NULL) {
         -:  476:
         -:  477:					// data was successfully allocated, make updates.
-      145:  478:					slab_allocator_init_free_list(sd, sd->type.slabs_per_resize, sd->cur_slabs);
-      145:  479:					sd->free_list_head = sd->cur_slabs;
-      145:  480:					sd->cur_chunks += 1;
+      140:  478:					slab_allocator_init_free_list(sd, sd->type.slabs_per_resize, sd->cur_slabs);
+      140:  479:					sd->free_list_head = sd->cur_slabs;
+      140:  480:					sd->cur_chunks += 1;
         -:  481:
-      145:  482:					return slab_data_allocate(sd, fptr, zeroed, global);
+      140:  482:					return slab_data_allocate(sd, fptr, zeroed, global);
         -:  483:				}
         -:  484:			}
         -:  485:		}
@@ -1908,70 +1913,70 @@
         6:  487:	return ret;
         -:  488:}
         -:  489:
-  1011107:  490:void slab_data_free(SlabData *sd, const FatPtr *fptr, bool zeroed) {
-  1011107:  491:	u64 data_len = 0;
+  1011212:  490:void slab_data_free(SlabData *sd, const FatPtr *fptr, bool zeroed) {
+  1011212:  491:	u64 data_len = 0;
         -:  492:	u8 *data_ptr;
-  1011107:  493:	if (sd->free_list == NULL) {
+  1011212:  493:	if (sd->free_list == NULL) {
     #####:  494:		panic("free list not initialized (wrong slab allocator?)");
         -:  495:	}
         -:  496:
-  1011107:  497:	FatPtr32Impl *fptr32 = fptr->data;
-  1011107:  498:	memcpy(&data_len, &fptr32->size_flags, 3);
-  1011107:  499:	data_ptr = fptr32->data;
-  1011107:  500:	u32 id = fptr32->id;
-  1011107:  501:	if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
+  1011212:  497:	FatPtr32Impl *fptr32 = fptr->data;
+  1011212:  498:	memcpy(&data_len, &fptr32->size_flags, 3);
+  1011212:  499:	data_ptr = fptr32->data;
+  1011212:  500:	u32 id = fptr32->id;
+  1011212:  501:	if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
     #####:  502:		panic("Potential double free. Id = %llu.\n", id);
         -:  503:	}
-  1011107:  504:	((u32 *)sd->free_list)[id] = sd->free_list_head;
-  1011107:  505:	sd->free_list_head = id;
-  1011107:  506:	if (sd->cur_slabs == 0)
+  1011212:  504:	((u32 *)sd->free_list)[id] = sd->free_list_head;
+  1011212:  505:	sd->free_list_head = id;
+  1011212:  506:	if (sd->cur_slabs == 0)
     #####:  507:		panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
-  1011107:  508:	sd->cur_slabs -= 1;
+  1011212:  508:	sd->cur_slabs -= 1;
         -:  509:
-  1011107:  510:	if (zeroed) {
+  1011212:  510:	if (zeroed) {
       500:  511:		for (u64 i = 0; i < data_len; i++) {
       480:  512:			data_ptr[i] = 0;
         -:  513:		}
         -:  514:	}
-  1011107:  515:}
+  1011212:  515:}
         -:  516:
-  1011115:  517:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
-  1011115:  518:	if (ptr == NULL || size == 0) {
+  1011220:  517:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
+  1011220:  518:	if (ptr == NULL || size == 0) {
     #####:  519:		SetErr(IllegalArgument);
     #####:  520:		return -1;
         -:  521:	}
         -:  522:
-  1011115:  523:	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
-  1011115:  524:	bool zeroed = impl->zeroed;
-  1011115:  525:	bool global = impl->global;
-  1011115:  526:	u32 needed = size + SIZE_OVERHEAD;
-  1011115:  527:	int index = slab_allocator_index(ptr, needed);
-  1011115:  528:	int ret = -1;
-  1011115:  529:	if (index >= 0) {
-  1011114:  530:		SlabData *sd = &impl->sd_arr[index];
-  1011114:  531:		ret = slab_data_allocate(sd, fptr, zeroed, global);
+  1011220:  523:	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
+  1011220:  524:	bool zeroed = impl->zeroed;
+  1011220:  525:	bool global = impl->global;
+  1011220:  526:	u32 needed = size + SIZE_OVERHEAD;
+  1011220:  527:	int index = slab_allocator_index(ptr, needed);
+  1011220:  528:	int ret = -1;
+  1011220:  529:	if (index >= 0) {
+  1011219:  530:		SlabData *sd = &impl->sd_arr[index];
+  1011219:  531:		ret = slab_data_allocate(sd, fptr, zeroed, global);
         -:  532:	} else
         1:  533:		SetErr(ResourceNotAvailable);
-  1011115:  534:	return ret;
+  1011220:  534:	return ret;
         -:  535:}
-  1011107:  536:void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
-  1011107:  537:	if (fptr == NULL || nil(*fptr)) {
+  1011212:  536:void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
+  1011212:  537:	if (fptr == NULL || nil(*fptr)) {
     #####:  538:		panic("Freeing a slab that's already nil. Double free?");
         -:  539:	}
-  1011107:  540:	SlabAllocatorImpl *impl = ptr->impl;
+  1011212:  540:	SlabAllocatorImpl *impl = ptr->impl;
         -:  541:
-  1011107:  542:	FatPtr32Impl *fptr32 = fptr->data;
+  1011212:  542:	FatPtr32Impl *fptr32 = fptr->data;
         -:  543:
-  1011107:  544:	u32 needed = fat_ptr_size(fptr) + SIZE_OVERHEAD;
-  1011107:  545:	int index = slab_allocator_index(ptr, needed);
-  1011107:  546:	if (index < 0)
+  1011212:  544:	u32 needed = fat_ptr_size(fptr) + SIZE_OVERHEAD;
+  1011212:  545:	int index = slab_allocator_index(ptr, needed);
+  1011212:  546:	if (index < 0)
     #####:  547:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-  1011107:  548:	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
-  1011107:  549:	if (needed != sd->type.slab_size)
+  1011212:  548:	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
+  1011212:  549:	if (needed != sd->type.slab_size)
     #####:  550:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-  1011107:  551:	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->zeroed);
-  1011107:  552:	*fptr = null;
-  1011107:  553:}
+  1011212:  551:	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->zeroed);
+  1011212:  552:	*fptr = null;
+  1011212:  553:}
        56:  554:u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
        56:  555:	SlabAllocatorImpl *impl = ptr->impl;
        56:  556:	u64 ret = 0;
@@ -2010,7 +2015,7 @@
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:64
+        -:    0:Runs:65
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2031,12 +2036,12 @@
         -:   18:#include <stdio.h>
         -:   19:#include <stdlib.h>
         -:   20:
-       64:   21:bool __is_little_endian() {
-       64:   22:	u16 test = 0x1;
-       64:   23:	return (*(u8 *)&test == 0x1);
+       65:   21:bool __is_little_endian() {
+       65:   22:	u16 test = 0x1;
+       65:   23:	return (*(u8 *)&test == 0x1);
         -:   24:}
         -:   25:
-       64:   26:void __attribute__((constructor)) __check_64bit_arch__() {
+       65:   26:void __attribute__((constructor)) __check_64bit_arch__() {
         -:   27:	if (sizeof(size_t) != 8) {
         -:   28:		fprintf(stderr, "Error: This program requires a 64-bit architecture to run.\n");
         -:   29:		exit(EXIT_FAILURE);
@@ -2050,7 +2055,7 @@
         -:   37:		exit(EXIT_FAILURE);
         -:   38:	}
         -:   39:
-       64:   40:	if (!__is_little_endian()) {
+       65:   40:	if (!__is_little_endian()) {
     #####:   41:		fprintf(stderr, "Big endian systems not supported");
     #####:   42:		exit(EXIT_FAILURE);
         -:   43:	}
@@ -2061,7 +2066,7 @@
         -:   48:			"Error: Unexpected size for atomic_ullong. Check your compiler and architecture.\n");
         -:   49:		exit(EXIT_FAILURE);
         -:   50:	}
-       64:   51:}
+       65:   51:}
         -:    0:Source:real_main.c
         -:    0:Graph:real_main.gcno
         -:    0:Data:real_main.gcda
@@ -2186,7 +2191,7 @@
         -:    0:Source:aes.c
         -:    0:Graph:aes.gcno
         -:    0:Data:aes.gcda
-        -:    0:Runs:21
+        -:    0:Runs:22
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2345,39 +2350,39 @@
         -:  156:
         -:  157:// This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the
         -:  158:// states.
-       24:  159:static void KeyExpansion(u8 *RoundKey, const u8 *Key) {
+       25:  159:static void KeyExpansion(u8 *RoundKey, const u8 *Key) {
         -:  160:	unsigned i, j, k;
         -:  161:	u8 tempa[4]; // Used for the column/row operations
         -:  162:
         -:  163:	// The first round key is the key itself.
-      216:  164:	for (i = 0; i < Nk; ++i) {
-      192:  165:		RoundKey[(i * 4) + 0] = Key[(i * 4) + 0];
-      192:  166:		RoundKey[(i * 4) + 1] = Key[(i * 4) + 1];
-      192:  167:		RoundKey[(i * 4) + 2] = Key[(i * 4) + 2];
-      192:  168:		RoundKey[(i * 4) + 3] = Key[(i * 4) + 3];
+      225:  164:	for (i = 0; i < Nk; ++i) {
+      200:  165:		RoundKey[(i * 4) + 0] = Key[(i * 4) + 0];
+      200:  166:		RoundKey[(i * 4) + 1] = Key[(i * 4) + 1];
+      200:  167:		RoundKey[(i * 4) + 2] = Key[(i * 4) + 2];
+      200:  168:		RoundKey[(i * 4) + 3] = Key[(i * 4) + 3];
         -:  169:	}
         -:  170:
         -:  171:	// All other round keys are found from the previous round keys.
-     1272:  172:	for (i = Nk; i < Nb * (Nr + 1); ++i) {
+     1325:  172:	for (i = Nk; i < Nb * (Nr + 1); ++i) {
         -:  173:		{
-     1248:  174:			k = (i - 1) * 4;
-     1248:  175:			tempa[0] = RoundKey[k + 0];
-     1248:  176:			tempa[1] = RoundKey[k + 1];
-     1248:  177:			tempa[2] = RoundKey[k + 2];
-     1248:  178:			tempa[3] = RoundKey[k + 3];
+     1300:  174:			k = (i - 1) * 4;
+     1300:  175:			tempa[0] = RoundKey[k + 0];
+     1300:  176:			tempa[1] = RoundKey[k + 1];
+     1300:  177:			tempa[2] = RoundKey[k + 2];
+     1300:  178:			tempa[3] = RoundKey[k + 3];
         -:  179:		}
         -:  180:
-     1248:  181:		if (i % Nk == 0) {
+     1300:  181:		if (i % Nk == 0) {
         -:  182:			// This function shifts the 4 bytes in a word to the left once.
         -:  183:			// [a0,a1,a2,a3] becomes [a1,a2,a3,a0]
         -:  184:
         -:  185:			// Function RotWord()
         -:  186:			{
-      168:  187:				const u8 u8tmp = tempa[0];
-      168:  188:				tempa[0] = tempa[1];
-      168:  189:				tempa[1] = tempa[2];
-      168:  190:				tempa[2] = tempa[3];
-      168:  191:				tempa[3] = u8tmp;
+      175:  187:				const u8 u8tmp = tempa[0];
+      175:  188:				tempa[0] = tempa[1];
+      175:  189:				tempa[1] = tempa[2];
+      175:  190:				tempa[2] = tempa[3];
+      175:  191:				tempa[3] = u8tmp;
         -:  192:			}
         -:  193:
         -:  194:			// SubWord() is a function that takes a four-byte input word and
@@ -2385,42 +2390,42 @@
         -:  196:
         -:  197:			// Function Subword()
         -:  198:			{
-      168:  199:				tempa[0] = getSBoxValue(tempa[0]);
-      168:  200:				tempa[1] = getSBoxValue(tempa[1]);
-      168:  201:				tempa[2] = getSBoxValue(tempa[2]);
-      168:  202:				tempa[3] = getSBoxValue(tempa[3]);
+      175:  199:				tempa[0] = getSBoxValue(tempa[0]);
+      175:  200:				tempa[1] = getSBoxValue(tempa[1]);
+      175:  201:				tempa[2] = getSBoxValue(tempa[2]);
+      175:  202:				tempa[3] = getSBoxValue(tempa[3]);
         -:  203:			}
         -:  204:
-      168:  205:			tempa[0] = tempa[0] ^ Rcon[i / Nk];
+      175:  205:			tempa[0] = tempa[0] ^ Rcon[i / Nk];
         -:  206:		}
         -:  207:#if defined(AES256) && (AES256 == 1)
-     1248:  208:		if (i % Nk == 4) {
+     1300:  208:		if (i % Nk == 4) {
         -:  209:			// Function Subword()
         -:  210:			{
-      144:  211:				tempa[0] = getSBoxValue(tempa[0]);
-      144:  212:				tempa[1] = getSBoxValue(tempa[1]);
-      144:  213:				tempa[2] = getSBoxValue(tempa[2]);
-      144:  214:				tempa[3] = getSBoxValue(tempa[3]);
+      150:  211:				tempa[0] = getSBoxValue(tempa[0]);
+      150:  212:				tempa[1] = getSBoxValue(tempa[1]);
+      150:  213:				tempa[2] = getSBoxValue(tempa[2]);
+      150:  214:				tempa[3] = getSBoxValue(tempa[3]);
         -:  215:			}
         -:  216:		}
         -:  217:#endif
-     1248:  218:		j = i * 4;
-     1248:  219:		k = (i - Nk) * 4;
-     1248:  220:		RoundKey[j + 0] = RoundKey[k + 0] ^ tempa[0];
-     1248:  221:		RoundKey[j + 1] = RoundKey[k + 1] ^ tempa[1];
-     1248:  222:		RoundKey[j + 2] = RoundKey[k + 2] ^ tempa[2];
-     1248:  223:		RoundKey[j + 3] = RoundKey[k + 3] ^ tempa[3];
+     1300:  218:		j = i * 4;
+     1300:  219:		k = (i - Nk) * 4;
+     1300:  220:		RoundKey[j + 0] = RoundKey[k + 0] ^ tempa[0];
+     1300:  221:		RoundKey[j + 1] = RoundKey[k + 1] ^ tempa[1];
+     1300:  222:		RoundKey[j + 2] = RoundKey[k + 2] ^ tempa[2];
+     1300:  223:		RoundKey[j + 3] = RoundKey[k + 3] ^ tempa[3];
         -:  224:	}
-       24:  225:}
+       25:  225:}
         -:  226:
     #####:  227:void AES_init_ctx(struct AES_ctx *ctx, const u8 *key) {
     #####:  228:	KeyExpansion(ctx->RoundKey, key);
     #####:  229:}
         -:  230:#if (defined(CBC) && (CBC == 1)) || (defined(CTR) && (CTR == 1))
-       24:  231:void AES_init_ctx_iv(struct AES_ctx *ctx, const u8 *key, const u8 *iv) {
-       24:  232:	KeyExpansion(ctx->RoundKey, key);
-       24:  233:	memcpy(ctx->Iv, iv, AES_BLOCKLEN);
-       24:  234:}
+       25:  231:void AES_init_ctx_iv(struct AES_ctx *ctx, const u8 *key, const u8 *iv) {
+       25:  232:	KeyExpansion(ctx->RoundKey, key);
+       25:  233:	memcpy(ctx->Iv, iv, AES_BLOCKLEN);
+       25:  234:}
     #####:  235:void AES_ctx_set_iv(struct AES_ctx *ctx, const u8 *iv) {
     #####:  236:	memcpy(ctx->Iv, iv, AES_BLOCKLEN);
     #####:  237:}
@@ -2731,7 +2736,7 @@
         -:    0:Source:psrng.c
         -:    0:Graph:psrng.gcno
         -:    0:Data:psrng.gcda
-        -:    0:Runs:21
+        -:    0:Runs:22
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2755,26 +2760,26 @@
         -:   21:
         -:   22:static struct AES_ctx ctx;
         -:   23:
-       21:   24:void psrng_reseed() {
+       22:   24:void psrng_reseed() {
         -:   25:	u8 iv[16];
         -:   26:	u8 key[32];
-       21:   27:	if (rand_bytes(key, 32)) {
+       22:   27:	if (rand_bytes(key, 32)) {
     #####:   28:		perror("Could not generate entropy for AES key generation");
     #####:   29:		exit(-1);
         -:   30:	}
-       21:   31:	if (rand_bytes(iv, 16)) {
+       22:   31:	if (rand_bytes(iv, 16)) {
     #####:   32:		perror("Could not generate entropy for AES iv generation");
     #####:   33:		exit(-1);
         -:   34:	}
         -:   35:
-       21:   36:	AES_init_ctx_iv(&ctx, key, iv);
-       21:   37:}
+       22:   36:	AES_init_ctx_iv(&ctx, key, iv);
+       22:   37:}
         -:   38:
         -:   39:// __attribute__ ((constructor)) guaranteed to be called before main.
         -:   40:// This will either succeed or exit before main is called.
-       21:   41:void __attribute__((constructor)) __init_psrng() {
-       21:   42:	psrng_reseed();
-       21:   43:}
+       22:   41:void __attribute__((constructor)) __init_psrng() {
+       22:   42:	psrng_reseed();
+       22:   43:}
         -:   44:
         -:   45:// note: not thread safe as user must ensure thread safety. This allows for flexible usage
         -:   46:// in a single thread, no locking is needed. In multi-threaded environments, locking may be used.
@@ -2811,7 +2816,7 @@
         -:    0:Source:rand.c
         -:    0:Graph:rand.gcno
         -:    0:Data:rand.gcda
-        -:    0:Runs:21
+        -:    0:Runs:22
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2871,13 +2876,13 @@
     #####:   57:	return getentropy(v, sizeof(u128));
         -:   58:}
         -:   59:
-       42:   60:int rand_bytes(void *buf, u64 length) {
-       42:   61:	return getentropy(buf, length);
+       44:   60:int rand_bytes(void *buf, u64 length) {
+       44:   61:	return getentropy(buf, length);
         -:   62:}
         -:    0:Source:sha3.c
         -:    0:Graph:sha3.gcno
         -:    0:Data:sha3.gcda
-        -:    0:Runs:21
+        -:    0:Runs:22
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3188,7 +3193,7 @@
         -:    0:Source:object.c
         -:    0:Graph:object.gcno
         -:    0:Data:object.gcda
-        -:    0:Runs:16
+        -:    0:Runs:17
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3206,38 +3211,38 @@
         -:   15:#include <base/bitflags.h>
         -:   16:#include <base/fam_alloc.h>
         -:   17:#include <base/fam_err.h>
-        -:   18:#include <base/macro_utils.h>
-        -:   19:#include <base/panic.h>
-        -:   20:#include <base/resources.h>
-        -:   21:#include <pthread.h>
-        -:   22:#include <stdatomic.h>
-        -:   23:#include <stdio.h>
-        -:   24:#include <string.h>
-        -:   25:#include <util/object.h>
-        -:   26:#include <util/rbtree.h>
-        -:   27:#include <util/rc.h>
-        -:   28:
-        -:   29:pthread_mutex_t global_init_lock = PTHREAD_MUTEX_INITIALIZER;
-        -:   30:pthread_rwlock_t global_rbtree_lock = PTHREAD_MUTEX_INITIALIZER;
-        -:   31:_Thread_local RBTree *thread_local_rbtree = NULL;
-        -:   32:_Thread_local RBTreeIterator *thread_local_rbtree_iterator = NULL;
-        -:   33:RBTreeIterator *global_rbtree_iterator = NULL;
-        -:   34:RBTree *global_rbtree = NULL;
-        -:   35:
-        -:   36:_Thread_local u64 thread_local_namespace_next = 0;
-        -:   37:atomic_ullong global_namespace_next = 0;
-        -:   38:
-        -:   39:#define INIT_OBJECT_KEY {.key = null}
-        -:   40:
-        -:   41:typedef struct ObjectImpl {
-        -:   42:	FatPtr self;
-        -:   43:	u64 namespace;
-        -:   44:	ObjectType type;
-        -:   45:	bool send;
-        -:   46:	u32 property_count;
-        -:   47:} ObjectImpl;
-        -:   48:
-        -:   49:typedef struct ObjectFlags {
+        -:   18:#include <base/resources.h>
+        -:   19:#include <pthread.h>
+        -:   20:#include <stdatomic.h>
+        -:   21:#include <stdio.h>
+        -:   22:#include <string.h>
+        -:   23:#include <util/object.h>
+        -:   24:#include <util/rbtree.h>
+        -:   25:
+        -:   26:pthread_rwlock_t global_rbtree_lock = PTHREAD_MUTEX_INITIALIZER;
+        -:   27:_Thread_local u64 thread_local_namespace_next = 0;
+        -:   28:atomic_ullong global_namespace_next = 0;
+        -:   29:
+        -:   30:#define INIT_OBJECT_KEY {.key = null}
+        -:   31:
+        -:   32:typedef struct RBTreeIttPair {
+        -:   33:	RBTree *tree;
+        -:   34:	RBTreeIterator *itt;
+        -:   35:} RBTreeIttPair;
+        -:   36:
+        -:   37:_Thread_local RBTreeIttPair *thread_local_rbtree;
+        -:   38:RBTreeIttPair *global_rbtree;
+        -:   39:
+        -:   40:typedef struct ObjectImpl {
+        -:   41:	FatPtr self;
+        -:   42:	u64 namespace;
+        -:   43:	ObjectType type;
+        -:   44:	bool send;
+        -:   45:	u32 property_count;
+        -:   46:} ObjectImpl;
+        -:   47:
+        -:   48:typedef struct ObjectFlags {
+        -:   49:	FatPtr self;
         -:   50:	u8 flags;
         -:   51:} ObjectFlags;
         -:   52:
@@ -3246,598 +3251,691 @@
         -:   55:	u64 namespace;
         -:   56:} ObjectKeyNc;
         -:   57:
-        -:   58:_Thread_local ObjectKeyNc tl_start_range_key = INIT_OBJECT_KEY;
-        -:   59:_Thread_local ObjectKeyNc tl_end_range_key = INIT_OBJECT_KEY;
-        -:   60:
-       43:   61:void object_key_cleanup(ObjectKeyNc *ptr) {
-       43:   62:	if (ptr && !nil(ptr->key)) {
-       43:   63:		fam_free(&ptr->key);
-       43:   64:		ptr->key = null;
-        -:   65:	}
-       43:   66:}
+       76:   58:void object_key_cleanup(ObjectKeyNc *ptr) {
+       76:   59:	if (!nil(ptr->key))
+       76:   60:		fam_free(&ptr->key);
+       76:   61:}
+        -:   62:
+        -:   63:#define ObjectKey ObjectKeyNc __attribute__((warn_unused_result, cleanup(object_key_cleanup)))
+        -:   64:
+        -:   65:_Thread_local ObjectKeyNc tl_start_range_key = INIT_OBJECT_KEY;
+        -:   66:_Thread_local ObjectKeyNc tl_end_range_key = INIT_OBJECT_KEY;
         -:   67:
-        -:   68:#define ObjectKey ObjectKeyNc __attribute__((warn_unused_result, cleanup(object_key_cleanup)))
-        -:   69:
-       43:   70:int object_key_for(ObjectKey *objkey, const Object *obj, const char *key) {
-       43:   71:	ObjectImpl *impl = $(obj->impl);
-       43:   72:	int ret = fam_alloc(&objkey->key, sizeof(char) * (1 + strlen(key)));
-       43:   73:	if (ret != 0)
-    #####:   74:		return -1;
-        -:   75:
-       43:   76:	strcpy($(objkey->key), key);
-       43:   77:	objkey->namespace = impl->namespace;
-        -:   78:
-       43:   79:	return ret;
-        -:   80:}
-        -:   81:
-        -:   82:typedef struct ObjectValue {
-        -:   83:	FatPtr ptr;
-        -:   84:} ObjectValue;
-        -:   85:
-        -:   86:typedef struct ObjectValueData {
-        -:   87:	ObjectType type;
-        -:   88:	u32 pad;
-        -:   89:	char value[];
-        -:   90:} ObjectValueData;
-        -:   91:
-      275:   92:int object_property_name_compare(const void *v1, const void *v2) {
-      275:   93:	const ObjectKeyNc *k1 = v1;
-      275:   94:	const ObjectKeyNc *k2 = v2;
-      275:   95:	if (k1->namespace != k2->namespace) {
-      127:   96:		if (k1->namespace < k2->namespace)
-       98:   97:			return -1;
-        -:   98:		else
-       29:   99:			return 1;
-        -:  100:	} else
-      148:  101:		return strcmp($(k1->key), $(k2->key));
-        -:  102:}
-        -:  103:
-        8:  104:RBTree *init_default_rbtree(bool global) {
-        8:  105:	RBTreeNc *ret = mymalloc(sizeof(RBTree));
-        8:  106:	if (ret) {
-        8:  107:		if (rbtree_create(ret, sizeof(ObjectKey), sizeof(ObjectValue), object_property_name_compare,
-        -:  108:						  global))
-    #####:  109:			return NULL;
-        -:  110:	}
-        8:  111:	return ret;
-        -:  112:}
-        -:  113:
-       16:  114:u64 object_namespace_id_next_local() {
-       16:  115:	u64 ret = thread_local_namespace_next;
-       16:  116:	thread_local_namespace_next++;
-       16:  117:	return ret;
-        -:  118:}
-        -:  119:
-        2:  120:u64 object_namespace_id_next_global() {
-        2:  121:	u64 ret = atomic_fetch_add(&global_namespace_next, 1);
-        2:  122:	return ret;
-        -:  123:}
-        -:  124:
-       18:  125:int object_init_rbtrees() {
-       18:  126:	int ret = 0;
-       18:  127:	if (global_rbtree == NULL) {
-        4:  128:		if (atomic_load(&global_namespace_next) == 0) {
-        4:  129:			pthread_rwlock_wrlock(&global_rbtree_lock);
-        4:  130:			pthread_mutex_lock(&global_init_lock);
-        4:  131:			if (atomic_load(&global_namespace_next) == 0) {
-        4:  132:				global_rbtree = init_default_rbtree(true);
-        4:  133:				global_rbtree_iterator = mymalloc(sizeof(RBTreeIterator));
-        4:  134:				if (rbtree_iterator(global_rbtree, global_rbtree_iterator, NULL, false, NULL,
-        -:  135:									false))
-    #####:  136:					ret = -1;
-        -:  137:
-        4:  138:				if (ret == -1 || global_rbtree == NULL || global_rbtree_iterator == NULL) {
-    #####:  139:					ret = -1;
-        -:  140:				} else {
-        -:  141:
-        4:  142:					atomic_store(&global_namespace_next, 1);
-        -:  143:				}
-        -:  144:			}
-        4:  145:			pthread_mutex_unlock(&global_init_lock);
-        4:  146:			pthread_rwlock_unlock(&global_rbtree_lock);
-        -:  147:		}
-        -:  148:	}
-        -:  149:
-       18:  150:	if (thread_local_rbtree == NULL) {
-        4:  151:		fam_alloc(&tl_start_range_key.key, 1);
-        4:  152:		strcpy($(tl_start_range_key.key), "");
-        4:  153:		fam_alloc(&tl_end_range_key.key, 1);
-        4:  154:		strcpy($(tl_end_range_key.key), "");
-        -:  155:
-        4:  156:		thread_local_rbtree = init_default_rbtree(false);
-        4:  157:		if (thread_local_rbtree == NULL)
-    #####:  158:			ret = -1;
-        -:  159:
-        4:  160:		thread_local_rbtree_iterator = mymalloc(sizeof(RBTreeIterator));
-        -:  161:
-        4:  162:		if (thread_local_rbtree_iterator == NULL) {
-    #####:  163:			return -1;
-        -:  164:		}
-        4:  165:		if (rbtree_iterator(thread_local_rbtree, thread_local_rbtree_iterator, NULL, false, NULL,
-        -:  166:							false)) {
-    #####:  167:			return -1;
-        -:  168:		}
-        -:  169:	}
-        -:  170:
-       18:  171:	return ret;
-        -:  172:}
-        -:  173:
-        -:  174:#define OBJECT_FLAG_CONSUMED 1
-        -:  175:#define OBJECT_FLAG_NO_CLEANUP 2
-        -:  176:#define OBJECT_FLAG_SEND 3
-        -:  177:#define OBJECT_FLAG_IMUT 4
+        -:   68:typedef struct ObjectValue {
+        -:   69:	FatPtr ptr;
+        -:   70:} ObjectValue;
+        -:   71:
+        -:   72:typedef struct ObjectValueData {
+        -:   73:	ObjectType type;
+        -:   74:	u32 pad;
+        -:   75:	char value[];
+        -:   76:} ObjectValueData;
+        -:   77:
+        -:   78:#define OBJECT_FLAG_CONSUMED 1
+        -:   79:#define OBJECT_FLAG_NO_CLEANUP 2
+        -:   80:#define OBJECT_FLAG_SEND 3
+        -:   81:#define OBJECT_FLAG_IMUT 4
+        -:   82:
+      518:   83:int object_property_name_compare(const void *v1, const void *v2) {
+      518:   84:	const ObjectKeyNc *k1 = v1;
+      518:   85:	const ObjectKeyNc *k2 = v2;
+      518:   86:	if (k1->namespace != k2->namespace) {
+      332:   87:		if (k1->namespace < k2->namespace)
+      260:   88:			return -1;
+        -:   89:		else
+       72:   90:			return 1;
+        -:   91:	} else
+      186:   92:		return strcmp($(k1->key), $(k2->key));
+        -:   93:}
+        -:   94:
+       76:   95:RBTreeNc *object_tree_for(const Object *obj) {
+       76:   96:	ObjectFlags *flags = $(obj->flags);
+       76:   97:	BitFlags bf = {.flags = &flags->flags, .capacity = 1};
+       76:   98:	bool send = bitflags_check(&bf, OBJECT_FLAG_SEND);
+        -:   99:
+        -:  100:	RBTreeNc *tree;
+       76:  101:	if (send)
+        4:  102:		tree = global_rbtree->tree;
+        -:  103:	else
+       72:  104:		tree = thread_local_rbtree->tree;
+       76:  105:	return tree;
+        -:  106:}
+        -:  107:
+        5:  108:RBTreeIttPair *init_rbtree_pair(bool global) {
+        5:  109:	RBTreeIttPair *ret = mymalloc(sizeof(RBTreeIttPair));
+        5:  110:	RBTreeNc *tree = mymalloc(sizeof(RBTree));
+        5:  111:	RBTreeIteratorNc *itt = mymalloc(sizeof(RBTreeIterator));
+        5:  112:	if (tree && ret && itt) {
+        5:  113:		ret->tree = tree;
+        5:  114:		ret->itt = itt;
+        5:  115:		if (rbtree_create(tree, sizeof(ObjectKey), sizeof(ObjectValue),
+        -:  116:						  object_property_name_compare, global)) {
+    #####:  117:			if (tree)
+    #####:  118:				myfree(tree);
+    #####:  119:			if (ret)
+    #####:  120:				myfree(ret);
+    #####:  121:			if (itt)
+    #####:  122:				myfree(itt);
+    #####:  123:			return NULL;
+        -:  124:		}
+        -:  125:
+        5:  126:		if (rbtree_iterator(tree, itt, NULL, false, NULL, false)) {
+    #####:  127:			if (tree)
+    #####:  128:				myfree(tree);
+    #####:  129:			if (ret)
+    #####:  130:				myfree(ret);
+    #####:  131:			if (itt)
+    #####:  132:				myfree(itt);
+    #####:  133:			return NULL;
+        -:  134:		}
+        -:  135:	} else {
+    #####:  136:		if (tree)
+    #####:  137:			myfree(tree);
+    #####:  138:		if (ret)
+    #####:  139:			myfree(ret);
+    #####:  140:		if (itt)
+    #####:  141:			myfree(itt);
+        -:  142:	}
+        5:  143:	return ret;
+        -:  144:}
+        -:  145:
+       26:  146:u64 object_namespace_id_next_local() {
+       26:  147:	u64 ret = thread_local_namespace_next;
+       26:  148:	thread_local_namespace_next++;
+       26:  149:	return ret;
+        -:  150:}
+        -:  151:
+        1:  152:u64 object_namespace_id_next_global() {
+        1:  153:	u64 ret = atomic_fetch_add(&global_namespace_next, 1);
+        1:  154:	return ret;
+        -:  155:}
+        -:  156:
+        1:  157:int object_init_global() {
+        1:  158:	if (nil(tl_start_range_key.key)) {
+    #####:  159:		fam_alloc(&tl_start_range_key.key, 1);
+    #####:  160:		strcpy($(tl_start_range_key.key), "");
+        -:  161:	}
+        1:  162:	if (nil(tl_end_range_key.key)) {
+    #####:  163:		fam_alloc(&tl_end_range_key.key, 1);
+    #####:  164:		strcpy($(tl_end_range_key.key), "");
+        -:  165:	}
+        -:  166:
+        1:  167:	if (global_rbtree == NULL) {
+        1:  168:		pthread_rwlock_wrlock(&global_rbtree_lock);
+        1:  169:		if (global_rbtree == NULL) {
+        1:  170:			global_rbtree = init_rbtree_pair(true);
+        -:  171:		}
+        1:  172:		pthread_rwlock_unlock(&global_rbtree_lock);
+        1:  173:		if (global_rbtree == NULL)
+    #####:  174:			return -1;
+        -:  175:	}
+        1:  176:	return 0;
+        -:  177:}
         -:  178:
-       18:  179:void object_cleanup_rc(ObjectImpl *impl) {
-        -:  180:	RBTreeNc *tree;
-        -:  181:	RBTreeIteratorNc *iter;
-       18:  182:	if (impl->send) {
-        2:  183:		tree = global_rbtree;
-        2:  184:		iter = global_rbtree_iterator;
-        -:  185:	} else {
-       16:  186:		tree = thread_local_rbtree;
-       16:  187:		iter = thread_local_rbtree_iterator;
-        -:  188:	}
-        -:  189:
-       18:  190:	if (impl->property_count) {
-       15:  191:		tl_start_range_key.namespace = impl->namespace;
-       15:  192:		tl_end_range_key.namespace = impl->namespace + 1;
-        -:  193:
-       15:  194:		if (impl->send)
-        2:  195:			pthread_rwlock_wrlock(&global_rbtree_lock);
+       26:  179:int object_init_local() {
+       26:  180:	if (nil(tl_start_range_key.key)) {
+        4:  181:		fam_alloc(&tl_start_range_key.key, 1);
+        4:  182:		strcpy($(tl_start_range_key.key), "");
+        -:  183:	}
+       26:  184:	if (nil(tl_end_range_key.key)) {
+        4:  185:		fam_alloc(&tl_end_range_key.key, 1);
+        4:  186:		strcpy($(tl_end_range_key.key), "");
+        -:  187:	}
+        -:  188:
+       26:  189:	if (thread_local_rbtree == NULL) {
+        4:  190:		thread_local_rbtree = init_rbtree_pair(false);
+        4:  191:		if (thread_local_rbtree == NULL)
+    #####:  192:			return -1;
+        -:  193:	}
+       26:  194:	return 0;
+        -:  195:}
         -:  196:
-       15:  197:		rbtree_iterator_reset(tree, iter, &tl_start_range_key, true, &tl_end_range_key, false);
-        -:  198:
-       15:  199:		u64 pc = 1;
-       15:  200:		if (impl->property_count > pc)
-        3:  201:			pc = impl->property_count;
-       15:  202:		FatPtr *properties[pc];
-       15:  203:		u64 i = 0;
-        -:  204:
-       22:  205:		loop {
-        -:  206:			RbTreeKeyValue kv;
-       37:  207:			if (!rbtree_iterator_next(iter, &kv))
-       15:  208:				break;
-       22:  209:			ObjectKeyNc *k1 = kv.key;
-       22:  210:			ObjectValue *v1 = kv.value;
-       22:  211:			const char *v = $(k1->key);
-       22:  212:			properties[i] = &k1->key;
-       22:  213:			i++;
-        -:  214:		}
-       37:  215:		for (u64 j = 0; j < impl->property_count; j++) {
-       22:  216:			const char *v = $(*properties[j]);
-       22:  217:			ObjectKey k;
-       22:  218:			k.namespace = impl->namespace;
-       22:  219:			k.key = *properties[j];
-       22:  220:			ObjectValue *value = rbtree_get_mut(tree, &k);
-       22:  221:			ObjectValueData *obj_data = $(value->ptr);
-       22:  222:			if (obj_data->type == ObjectTypeObject) {
-       11:  223:				object_cleanup((ObjectNc *)obj_data->value);
-        -:  224:			}
-       22:  225:			fam_free(&value->ptr);
-       22:  226:			rbtree_remove(tree, &k);
-        -:  227:		}
-        -:  228:
-       15:  229:		if (impl->send)
-        2:  230:			pthread_rwlock_unlock(&global_rbtree_lock);
-        -:  231:	}
-        -:  232:
-       18:  233:	if (!nil(impl->self)) {
-       18:  234:		fam_free(&impl->self);
-       18:  235:		impl->self = null;
-        -:  236:	}
-       18:  237:}
-        -:  238:
-       34:  239:void object_cleanup(const ObjectNc *ptr) {
-        -:  240:	// note: we want to allow immutable objects to be moved. We therefore need to update their
-        -:  241:	// flags which require this override.
-        -:  242:#if defined(__clang__)
-        -:  243:	// Clang - specific pragma
-        -:  244:#pragma GCC diagnostic push
-        -:  245:#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
-        -:  246:#elif defined(__GNUC__) && !defined(__clang__)
-        -:  247:	// GCC - specific pragma
-        -:  248:#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-        -:  249:#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
-        -:  250:#else
-        -:  251:#warning "Unknown compiler or platform. No specific warning pragmas applied."
-        -:  252:#endif
-       34:  253:	ObjectNc *ptr_mut = ptr;
-        -:  254:#pragma GCC diagnostic pop
-       34:  255:	if (ptr_mut == NULL) {
-    #####:  256:		return;
-        -:  257:	}
-       34:  258:	if (!nil(ptr_mut->flags)) {
-       27:  259:		fam_free(&ptr_mut->flags);
-       27:  260:		ptr_mut->flags = null;
-        -:  261:	}
-        -:  262:
-       34:  263:	if (nil(ptr_mut->impl)) {
-        7:  264:		return;
-        -:  265:	}
-       27:  266:	ObjectImpl *impl = $(ptr_mut->impl);
-       27:  267:	if (!nil(ptr_mut->impl)) {
-       27:  268:		rc_cleanup(&ptr_mut->impl);
-       27:  269:		ptr_mut->impl.impl = null;
-        -:  270:	}
-        -:  271:}
-        -:  272:
-       12:  273:int object_move(Object *dst, const Object *src) {
-       12:  274:	dst->flags = src->flags;
-       12:  275:	dst->impl = src->impl;
-        -:  276:// note: we want to allow immutable objects to be moved. We therefore need to update their
-        -:  277:// flags which require this override.
-        -:  278:#if defined(__clang__)
-        -:  279:// Clang-specific pragma
-        -:  280:#pragma GCC diagnostic push
-        -:  281:#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
-        -:  282:#elif defined(__GNUC__) && !defined(__clang__)
-        -:  283:// GCC-specific pragma
-        -:  284:#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-        -:  285:#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
-        -:  286:#else
-        -:  287:#warning "Unknown compiler or platform. No specific warning pragmas applied."
-        -:  288:#endif
-       12:  289:	ObjectNc *src_mut = src;
-        -:  290:#pragma GCC diagnostic pop
-       12:  291:	src_mut->impl = rc_null;
-       12:  292:	src_mut->flags = null;
-       12:  293:	return 0;
-        -:  294:}
-        -:  295:
-        9:  296:int object_ref_impl(Object *dst, Object *src, bool imut) {
-        -:  297:	FatPtr flags;
-        -:  298:	bool send;
-        -:  299:	bool src_imut;
-        9:  300:	ObjectFlags *src_flags = $(src->flags);
-        9:  301:	BitFlags bfsrc = {.flags = &src_flags->flags, .capacity = 1};
-        9:  302:	send = bitflags_check(&bfsrc, OBJECT_FLAG_SEND);
-        9:  303:	src_imut = bitflags_check(&bfsrc, OBJECT_FLAG_IMUT);
-       9*:  304:	if (src_imut && !imut) {
-    #####:  305:		SetErr(Permission);
-    #####:  306:		return -1;
-        -:  307:	}
-        -:  308:	{
-       18:  309:		SendStateGuard _ = SetSend(send);
-        9:  310:		if (fam_alloc(&flags, sizeof(ObjectFlags))) {
-    #####:  311:			return -1;
-        -:  312:		}
-        -:  313:	}
-        9:  314:	ObjectFlags *ff = $(flags);
-        9:  315:	ff->flags = 0;
-        9:  316:	BitFlags bfdst = {.flags = &ff->flags, .capacity = 1};
-        9:  317:	bitflags_set(&bfdst, OBJECT_FLAG_SEND, send);
-        9:  318:	bitflags_set(&bfdst, OBJECT_FLAG_IMUT, imut);
-        -:  319:
-        9:  320:	dst->flags = flags;
-        9:  321:	int ret = rc_clone(&dst->impl, &src->impl);
-        9:  322:	if (ret) {
-    #####:  323:		fam_free(&flags);
-        -:  324:	}
-        9:  325:	return ret;
-        -:  326:}
-        9:  327:int object_ref(Object *dst, Object *src) {
-        9:  328:	return object_ref_impl(dst, src, true);
-        -:  329:}
-    #####:  330:int object_mut_ref(Object *dst, Object *src) {
-    #####:  331:	return object_ref_impl(dst, src, false);
-        -:  332:}
-        -:  333:
-       43:  334:RBTreeNc *object_tree_for(const Object *obj) {
-       43:  335:	ObjectFlags *flags = $(obj->flags);
-       43:  336:	BitFlags bf = {.flags = &flags->flags, .capacity = 1};
-       43:  337:	bool send = bitflags_check(&bf, OBJECT_FLAG_SEND);
-        -:  338:
-        -:  339:	RBTreeNc *tree;
-       43:  340:	if (send)
-        5:  341:		tree = global_rbtree;
-        -:  342:	else
-       38:  343:		tree = thread_local_rbtree;
-       43:  344:	return tree;
-        -:  345:}
-        -:  346:
-        7:  347:int object_set_property_string(Object *obj, const char *key, const char *value) {
-        7:  348:	ObjectImpl *impl = $(obj->impl);
-        7:  349:	RBTreeNc *tree = object_tree_for(obj);
-        -:  350:
-        7:  351:	ObjectKeyNc objkey = INIT_OBJECT_KEY;
-        7:  352:	object_key_for(&objkey, obj, key);
-        -:  353:
-        -:  354:	ObjectValue objvalue;
-        7:  355:	if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData))) {
-    #####:  356:		return -1;
-        -:  357:	}
-        7:  358:	ObjectValueData *objdata = $(objvalue.ptr);
-        7:  359:	objdata->type = ObjectTypeString;
-        7:  360:	strcpy(objdata->value, value);
-        7:  361:	impl->property_count++;
+      115:  197:void object_check_consumed(const Object *ptr) {
+      115:  198:	if (ptr == NULL)
+    #####:  199:		panic("Object pointer NULL!");
+      115:  200:	ObjectFlags *flags = $(ptr->flags);
+      115:  201:	BitFlags bf = {.flags = &flags->flags, .capacity = 1};
+      115:  202:	bool consumed = bitflags_check(&bf, OBJECT_FLAG_CONSUMED);
+      115:  203:	if (consumed)
+    #####:  204:		panic("Object has been consumed!");
+      115:  205:	if (nil(ptr->impl))
+    #####:  206:		panic("Object is nil!");
+      115:  207:}
+        -:  208:
+       67:  209:void object_cleanup(const ObjectNc *ptr) {
+        -:  210:#if defined(__clang__)
+        -:  211:// Clang-specific pragma
+        -:  212:#pragma GCC diagnostic push
+        -:  213:#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+        -:  214:#elif defined(__GNUC__) && !defined(__clang__)
+        -:  215:// GCC-specific pragma
+        -:  216:#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+        -:  217:#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+        -:  218:#else
+        -:  219:#warning "Unknown compiler or platform. No specific warning pragmas applied."
+        -:  220:#endif
+       67:  221:	ObjectNc *ptr_mut = ptr;
+        -:  222:#pragma GCC diagnostic pop
+       67:  223:	if (ptr_mut == NULL) {
+    #####:  224:		return;
+        -:  225:	}
+        -:  226:
+       67:  227:	if (!nil(ptr_mut->flags)) {
+       66:  228:		fam_free(&ptr_mut->flags);
+       66:  229:		ptr_mut->flags = null;
+        -:  230:	}
+        -:  231:
+       67:  232:	if (nil(ptr_mut->impl)) {
+       21:  233:		return;
+        -:  234:	}
+       46:  235:	ObjectImpl *impl = $(ptr_mut->impl);
+       46:  236:	if (!nil(ptr_mut->impl)) {
+       46:  237:		rc_cleanup(&ptr_mut->impl);
+       46:  238:		ptr_mut->impl.impl = null;
+        -:  239:	}
+        -:  240:}
+        -:  241:
+       20:  242:int object_move(const Object *dst, const Object *src) {
+       20:  243:	object_check_consumed(src);
+        -:  244:// note: we want to allow immutable objects to be moved. We therefore need to update their
+        -:  245:// flags which require this override.
+        -:  246:#if defined(__clang__)
+        -:  247:// Clang-specific pragma
+        -:  248:#pragma GCC diagnostic push
+        -:  249:#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+        -:  250:#elif defined(__GNUC__) && !defined(__clang__)
+        -:  251:// GCC-specific pragma
+        -:  252:#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+        -:  253:#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+        -:  254:#else
+        -:  255:#warning "Unknown compiler or platform. No specific warning pragmas applied."
+        -:  256:#endif
+       20:  257:	ObjectNc *src_mut = src;
+       20:  258:	ObjectNc *dst_mut = dst;
+        -:  259:#pragma GCC diagnostic pop
+        -:  260:
+        -:  261:	// dst_mut->flags = src->flags;
+        -:  262:	//  src_mut->flags = null;
+        -:  263:
+       20:  264:	ObjectFlags *src_flags = $(src_mut->flags);
+       20:  265:	BitFlags bfsrc = {.flags = &src_flags->flags, .capacity = 1};
+       20:  266:	bool src_send = bitflags_check(&bfsrc, OBJECT_FLAG_SEND);
+       20:  267:	bool src_imut = bitflags_check(&bfsrc, OBJECT_FLAG_IMUT);
+        -:  268:
+        -:  269:	{
+       40:  270:		SendStateGuard _ = SetSend(src_send);
+       20:  271:		if (fam_alloc(&dst_mut->flags, sizeof(ObjectFlags)))
+    #####:  272:			return -1;
+        -:  273:	}
+        -:  274:
+       20:  275:	ObjectFlags *dst_flags = $(dst_mut->flags);
+       20:  276:	BitFlags bfdst = {.flags = &dst_flags->flags, .capacity = 1};
+        -:  277:
+       20:  278:	dst_mut->impl = src->impl;
+       20:  279:	src_mut->impl = rc_null;
+        -:  280:
+       20:  281:	dst_flags->flags = 0;
+       20:  282:	bitflags_set(&bfdst, OBJECT_FLAG_SEND, src_send);
+       20:  283:	bitflags_set(&bfdst, OBJECT_FLAG_IMUT, src_imut);
+       20:  284:	bitflags_set(&bfsrc, OBJECT_FLAG_CONSUMED, true);
+        -:  285:
+       20:  286:	return 0;
+        -:  287:}
+        -:  288:
+       19:  289:int object_ref(const Object *dst, const Object *src) {
+       19:  290:	object_check_consumed(src);
+        -:  291:	FatPtr flags;
+        -:  292:	bool send;
+        -:  293:	bool src_imut;
+       19:  294:	ObjectFlags *src_flags = $(src->flags);
+       19:  295:	BitFlags bfsrc = {.flags = &src_flags->flags, .capacity = 1};
+       19:  296:	send = bitflags_check(&bfsrc, OBJECT_FLAG_SEND);
+       19:  297:	src_imut = bitflags_check(&bfsrc, OBJECT_FLAG_IMUT);
+        -:  298:	{
+       38:  299:		SendStateGuard _ = SetSend(send);
+       19:  300:		if (fam_alloc(&flags, sizeof(ObjectFlags))) {
+    #####:  301:			return -1;
+        -:  302:		}
+        -:  303:	}
+       19:  304:	ObjectFlags *ff = $(flags);
+       19:  305:	ff->flags = 0;
+       19:  306:	BitFlags bfdst = {.flags = &ff->flags, .capacity = 1};
+       19:  307:	bitflags_set(&bfdst, OBJECT_FLAG_SEND, send);
+       19:  308:	bitflags_set(&bfdst, OBJECT_FLAG_IMUT, true);
+        -:  309:
+        -:  310:#if defined(__clang__)
+        -:  311:// Clang-specific pragma
+        -:  312:#pragma GCC diagnostic push
+        -:  313:#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+        -:  314:#elif defined(__GNUC__) && !defined(__clang__)
+        -:  315:// GCC-specific pragma
+        -:  316:#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+        -:  317:#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+        -:  318:#else
+        -:  319:#warning "Unknown compiler or platform. No specific warning pragmas applied."
+        -:  320:#endif
+       19:  321:	ObjectNc *unconstdst = dst;
+        -:  322:#pragma GCC diagnostic pop
+       19:  323:	unconstdst->flags = flags;
+        -:  324:
+       19:  325:	int ret = rc_clone(&unconstdst->impl, &src->impl);
+        -:  326:
+       19:  327:	if (ret) {
+    #####:  328:		fam_free(&flags);
+        -:  329:	}
+       19:  330:	return ret;
+        -:  331:}
+        -:  332:
+       76:  333:int object_key_for(ObjectKey *objkey, const Object *obj, const char *key) {
+       76:  334:	ObjectImpl *impl = $(obj->impl);
+        -:  335:	int ret;
+        -:  336:	{
+      152:  337:		SendStateGuard _ = SetSend(impl->send);
+       76:  338:		ret = fam_alloc(&objkey->key, sizeof(char) * (1 + strlen(key)));
+        -:  339:	}
+       76:  340:	if (ret != 0)
+    #####:  341:		return -1;
+        -:  342:
+       76:  343:	strcpy($(objkey->key), key);
+       76:  344:	objkey->namespace = impl->namespace;
+        -:  345:
+       76:  346:	return ret;
+        -:  347:}
+        -:  348:
+       27:  349:void object_cleanup_rc(ObjectImpl *impl) {
+        -:  350:	RBTreeIttPair *pair;
+       27:  351:	if (impl->send)
+        1:  352:		pair = global_rbtree;
+        -:  353:	else
+       26:  354:		pair = thread_local_rbtree;
+        -:  355:
+       27:  356:	if (impl->property_count) {
+       27:  357:		tl_start_range_key.namespace = impl->namespace;
+       27:  358:		tl_end_range_key.namespace = impl->namespace + 1;
+        -:  359:
+       27:  360:		if (impl->send)
+        1:  361:			pthread_rwlock_wrlock(&global_rbtree_lock);
         -:  362:
-        7:  363:	if (impl->send)
-        1:  364:		pthread_rwlock_wrlock(&global_rbtree_lock);
-        7:  365:	int ret = rbtree_put(tree, &objkey, &objvalue);
-        7:  366:	if (impl->send)
-        1:  367:		pthread_rwlock_unlock(&global_rbtree_lock);
-        7:  368:	return ret;
-        -:  369:}
-        -:  370:
-        4:  371:int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
-        4:  372:	ObjectImpl *impl = $(obj->impl);
-        4:  373:	RBTreeNc *tree = object_tree_for(obj);
-        -:  374:
-        4:  375:	ObjectKeyNc objkey = INIT_OBJECT_KEY;
-        4:  376:	object_key_for(&objkey, obj, key);
-        -:  377:
-        -:  378:	ObjectValue objvalue;
-        4:  379:	if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData)))
-    #####:  380:		return -1;
-        4:  381:	ObjectValueData *objdata = $(objvalue.ptr);
-        4:  382:	objdata->type = ObjectTypeU64;
-        4:  383:	memcpy(objdata->value, value, sizeof(u64));
-        4:  384:	impl->property_count++;
-        -:  385:
-        4:  386:	if (impl->send)
-    #####:  387:		pthread_rwlock_wrlock(&global_rbtree_lock);
-        4:  388:	int ret = rbtree_put(tree, &objkey, &objvalue);
-        4:  389:	if (impl->send)
-    #####:  390:		pthread_rwlock_unlock(&global_rbtree_lock);
-        4:  391:	return ret;
-        -:  392:}
-        -:  393:
-       18:  394:int object_create(Object *obj, bool send, ObjectType type, const void *primitive) {
-       18:  395:	if (object_init_rbtrees())
-    #####:  396:		return -1;
-       18:  397:	if (obj == NULL) {
-    #####:  398:		SetErr(IllegalArgument);
-    #####:  399:		return -1;
-        -:  400:	}
+       27:  363:		rbtree_iterator_reset(pair->tree, pair->itt, &tl_start_range_key, true, &tl_end_range_key,
+        -:  364:							  false);
+        -:  365:
+       27:  366:		FatPtr *properties[impl->property_count];
+       27:  367:		u64 i = 0;
+        -:  368:
+       30:  369:		loop {
+        -:  370:			RbTreeKeyValue kv;
+       57:  371:			if (!rbtree_iterator_next(pair->itt, &kv))
+       27:  372:				break;
+       30:  373:			ObjectKeyNc *k1 = kv.key;
+       30:  374:			ObjectValue *v1 = kv.value;
+       30:  375:			const char *v = $(k1->key);
+       30:  376:			properties[i] = &k1->key;
+       30:  377:			i++;
+        -:  378:		}
+       57:  379:		for (u64 j = 0; j < impl->property_count; j++) {
+       30:  380:			ObjectKey k;
+       30:  381:			k.namespace = impl->namespace;
+       30:  382:			k.key = *properties[j];
+       30:  383:			ObjectValue *value = rbtree_get_mut(pair->tree, &k);
+       30:  384:			ObjectValueData *obj_data = $(value->ptr);
+       30:  385:			if (obj_data->type == ObjectTypeObject) {
+       14:  386:				object_cleanup((ObjectNc *)obj_data->value);
+        -:  387:			}
+       30:  388:			fam_free(&value->ptr);
+       30:  389:			rbtree_remove(pair->tree, &k);
+        -:  390:		}
+        -:  391:
+       27:  392:		if (impl->send)
+        1:  393:			pthread_rwlock_unlock(&global_rbtree_lock);
+        -:  394:	}
+        -:  395:
+       27:  396:	if (!nil(impl->self)) {
+       27:  397:		fam_free(&impl->self);
+       27:  398:		impl->self = null;
+        -:  399:	}
+       27:  400:}
         -:  401:
-        -:  402:	FatPtr ptr;
-        -:  403:	FatPtr flags;
-        -:  404:	{
-       36:  405:		SendStateGuard _ = SetSend(send);
-       18:  406:		if (fam_alloc(&ptr, sizeof(ObjectImpl))) {
-    #####:  407:			return -1;
-        -:  408:		}
-       18:  409:		if (fam_alloc(&flags, sizeof(ObjectFlags))) {
-    #####:  410:			fam_free(&ptr);
-    #####:  411:			return -1;
-        -:  412:		}
-        -:  413:	}
-       18:  414:	ObjectImpl *impl = $(ptr);
-        -:  415:
-       18:  416:	ObjectFlags *obj_flags = $(flags);
-       18:  417:	impl->self = ptr;
-       18:  418:	if (send)
-        2:  419:		impl->namespace = object_namespace_id_next_global();
-        -:  420:	else
-       16:  421:		impl->namespace = object_namespace_id_next_local();
-       18:  422:	obj->flags = flags;
-        -:  423:
-       18:  424:	obj_flags->flags = 0;
-       18:  425:	impl->type = type;
-       18:  426:	impl->property_count = 0;
-       18:  427:	impl->send = send;
-       18:  428:	BitFlags bf = {.flags = &obj_flags->flags, .capacity = 1};
-       18:  429:	bitflags_set(&bf, OBJECT_FLAG_SEND, send);
+       11:  402:int object_set_property_string(Object *obj, const char *key, const char *value) {
+       11:  403:	object_check_consumed(obj);
+       11:  404:	ObjectImpl *impl = $(obj->impl);
+       11:  405:	RBTreeNc *tree = object_tree_for(obj);
+        -:  406:
+       11:  407:	ObjectKeyNc objkey = INIT_OBJECT_KEY;
+       11:  408:	object_key_for(&objkey, obj, key);
+        -:  409:
+        -:  410:	ObjectValue objvalue;
+        -:  411:	{
+       22:  412:		SendStateGuard _ = SetSend(impl->send);
+       11:  413:		if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData))) {
+    #####:  414:			return -1;
+        -:  415:		}
+        -:  416:	}
+        -:  417:
+       11:  418:	ObjectValueData *objdata = $(objvalue.ptr);
+       11:  419:	objdata->type = ObjectTypeString;
+       11:  420:	strcpy(objdata->value, value);
+       11:  421:	impl->property_count++;
+        -:  422:
+       11:  423:	if (impl->send)
+    #####:  424:		pthread_rwlock_wrlock(&global_rbtree_lock);
+       11:  425:	int ret = rbtree_put(tree, &objkey, &objvalue);
+       11:  426:	if (impl->send)
+    #####:  427:		pthread_rwlock_unlock(&global_rbtree_lock);
+       11:  428:	return ret;
+        -:  429:}
         -:  430:
-       18:  431:	if (rc_build(&obj->impl, impl, sizeof(ObjectImpl), false,
-        -:  432:				 (void (*)(void *))object_cleanup_rc)) {
-    #####:  433:		fam_free(&ptr);
-    #####:  434:		fam_free(&flags);
-    #####:  435:		return -1;
-        -:  436:	}
-        -:  437:
-       18:  438:	if (type == ObjectTypeString) {
-        7:  439:		if (object_set_property_string(obj, "value", primitive)) {
-    #####:  440:			object_cleanup(obj);
-        -:  441:		}
-       11:  442:	} else if (type == ObjectTypeU64) {
-        4:  443:		if (object_set_property_u64(obj, "value", primitive)) {
-    #####:  444:			object_cleanup(obj);
-        -:  445:		}
-        -:  446:	}
-        -:  447:
-       18:  448:	return 0;
-        -:  449:}
-        -:  450:
-        8:  451:const char *object_as_string(const Object *obj) {
-        8:  452:	ObjectImpl *impl = $(obj->impl);
-        8:  453:	RBTreeNc *tree = object_tree_for(obj);
-        -:  454:
-        8:  455:	ObjectKey objkey = INIT_OBJECT_KEY;
-        8:  456:	object_key_for(&objkey, obj, "value");
+        5:  431:int object_set_property_u64(Object *obj, const char *key, const u64 *value) {
+        5:  432:	object_check_consumed(obj);
+        5:  433:	ObjectImpl *impl = $(obj->impl);
+        5:  434:	RBTreeNc *tree = object_tree_for(obj);
+        -:  435:
+        5:  436:	ObjectKeyNc objkey = INIT_OBJECT_KEY;
+        5:  437:	object_key_for(&objkey, obj, key);
+        -:  438:
+        -:  439:	ObjectValue objvalue;
+        -:  440:	{
+       10:  441:		SendStateGuard _ = SetSend(impl->send);
+        5:  442:		if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData)))
+    #####:  443:			return -1;
+        -:  444:	}
+        5:  445:	ObjectValueData *objdata = $(objvalue.ptr);
+        5:  446:	objdata->type = ObjectTypeU64;
+        5:  447:	memcpy(objdata->value, value, sizeof(u64));
+        5:  448:	impl->property_count++;
+        -:  449:
+        5:  450:	if (impl->send)
+        1:  451:		pthread_rwlock_wrlock(&global_rbtree_lock);
+        5:  452:	int ret = rbtree_put(tree, &objkey, &objvalue);
+        5:  453:	if (impl->send)
+        1:  454:		pthread_rwlock_unlock(&global_rbtree_lock);
+        5:  455:	return ret;
+        -:  456:}
         -:  457:
-        8:  458:	if (impl->send)
-        2:  459:		pthread_rwlock_rdlock(&global_rbtree_lock);
-        8:  460:	const ObjectValue *valueret = rbtree_get(tree, &objkey);
-        8:  461:	if (impl->send)
-        2:  462:		pthread_rwlock_unlock(&global_rbtree_lock);
-        8:  463:	const ObjectValueData *valueretdata = $(valueret->ptr);
-        -:  464:
-        8:  465:	if (valueret == NULL || valueretdata->type != ObjectTypeString)
-    #####:  466:		return NULL;
-        -:  467:
-        8:  468:	return valueretdata->value;
-        -:  469:}
-        -:  470:
-        4:  471:int object_as_u64(const Object *obj, u64 *value) {
-        4:  472:	int ret = 0;
-        -:  473:
-        4:  474:	ObjectImpl *impl = $(obj->impl);
-        4:  475:	RBTreeNc *tree = object_tree_for(obj);
-        -:  476:
-        8:  477:	ObjectKey objkey = INIT_OBJECT_KEY;
-        4:  478:	object_key_for(&objkey, obj, "value");
-        -:  479:
-        4:  480:	if (impl->send)
-    #####:  481:		pthread_rwlock_rdlock(&global_rbtree_lock);
-        4:  482:	const ObjectValue *valueret = rbtree_get(tree, &objkey);
-        4:  483:	if (impl->send)
-    #####:  484:		pthread_rwlock_unlock(&global_rbtree_lock);
-        4:  485:	const ObjectValueData *valueretdata = $(valueret->ptr);
-        -:  486:
-        4:  487:	if (valueret == NULL || valueretdata->type != ObjectTypeU64)
-    #####:  488:		ret = -1;
-        -:  489:	else {
-        4:  490:		memcpy(value, valueretdata->value, sizeof(u64));
-        -:  491:	}
-        -:  492:
-        4:  493:	return ret;
-        -:  494:}
-        -:  495:
-       11:  496:int object_set_property(Object *obj, const char *key, const Object *value) {
-       11:  497:	ObjectImpl *impl = $(obj->impl);
-       11:  498:	ObjectKeyNc objkey = INIT_OBJECT_KEY;
-       11:  499:	object_key_for(&objkey, obj, key);
-        -:  500:
-        -:  501:	ObjectValue objvalue;
-       11:  502:	if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData) + sizeof(Object))) {
-    #####:  503:		object_key_cleanup(&objkey);
-    #####:  504:		return -1;
-        -:  505:	}
-        -:  506:
-       11:  507:	ObjectValueData *ovd = $(objvalue.ptr);
-       11:  508:	ovd->type = ObjectTypeObject;
-       11:  509:	ObjectNc *obj_ptr = (Object *)ovd->value;
-       11:  510:	if (object_move(obj_ptr, value)) {
-    #####:  511:		object_key_cleanup(&objkey);
-    #####:  512:		return -1;
-        -:  513:	}
-        -:  514:
-       11:  515:	RBTreeNc *tree = object_tree_for(obj);
-       11:  516:	impl->property_count++;
-        -:  517:
-       11:  518:	if (impl->send)
-        1:  519:		pthread_rwlock_wrlock(&global_rbtree_lock);
-       11:  520:	int ret = rbtree_put(tree, &objkey, &objvalue);
-       11:  521:	if (impl->send)
-        1:  522:		pthread_rwlock_unlock(&global_rbtree_lock);
-        -:  523:
-       11:  524:	if (ret)
-    #####:  525:		object_key_cleanup(&objkey);
-        -:  526:
-       11:  527:	return ret;
+    #####:  458:ObjectType object_type(const Object *obj) {
+    #####:  459:	object_check_consumed(obj);
+    #####:  460:	ObjectImpl *impl = $(obj->impl);
+    #####:  461:	return impl->type;
+        -:  462:}
+        -:  463:
+       27:  464:int object_create(Object *obj, bool send, ObjectType type, const void *primitive) {
+       27:  465:	if (send) {
+        1:  466:		if (object_init_global()) {
+    #####:  467:			return -1;
+        -:  468:		}
+        -:  469:
+        -:  470:	} else {
+       26:  471:		if (object_init_local()) {
+    #####:  472:			return -1;
+        -:  473:		}
+        -:  474:	}
+        -:  475:
+        -:  476:	FatPtr ptr;
+        -:  477:	FatPtr flags;
+        -:  478:	{
+       54:  479:		SendStateGuard _ = SetSend(send);
+       27:  480:		if (fam_alloc(&ptr, sizeof(ObjectImpl))) {
+    #####:  481:			return -1;
+        -:  482:		}
+       27:  483:		if (fam_alloc(&flags, sizeof(ObjectFlags))) {
+    #####:  484:			fam_free(&ptr);
+    #####:  485:			return -1;
+        -:  486:		}
+        -:  487:	}
+        -:  488:
+       27:  489:	ObjectImpl *impl = $(ptr);
+        -:  490:
+       27:  491:	ObjectFlags *obj_flags = $(flags);
+       27:  492:	impl->self = ptr;
+       27:  493:	if (send)
+        1:  494:		impl->namespace = object_namespace_id_next_global();
+        -:  495:	else
+       26:  496:		impl->namespace = object_namespace_id_next_local();
+       27:  497:	obj->flags = flags;
+        -:  498:
+       27:  499:	obj_flags->flags = 0;
+       27:  500:	impl->type = type;
+       27:  501:	impl->property_count = 0;
+       27:  502:	impl->send = send;
+       27:  503:	BitFlags bf = {.flags = &obj_flags->flags, .capacity = 1};
+       27:  504:	bitflags_set(&bf, OBJECT_FLAG_SEND, send);
+        -:  505:
+       27:  506:	if (rc_build(&obj->impl, impl, sizeof(ObjectImpl), false,
+        -:  507:				 (void (*)(void *))object_cleanup_rc)) {
+    #####:  508:		fam_free(&ptr);
+    #####:  509:		fam_free(&flags);
+    #####:  510:		return -1;
+        -:  511:	}
+        -:  512:
+       27:  513:	if (type == ObjectTypeString) {
+       11:  514:		if (object_set_property_string(obj, "value", primitive)) {
+    #####:  515:			object_cleanup(obj);
+        -:  516:		}
+       16:  517:	} else if (type == ObjectTypeU64) {
+        5:  518:		if (object_set_property_u64(obj, "value", primitive)) {
+    #####:  519:			object_cleanup(obj);
+        -:  520:		}
+        -:  521:	}
+        -:  522:
+       27:  523:	return 0;
+        -:  524:}
+    #####:  525:int object_send(Object *obj, Channel *channel) {
+    #####:  526:	object_check_consumed(obj);
+    #####:  527:	return 0;
         -:  528:}
-        -:  529:
-        9:  530:Object object_get_property(const Object *obj, const char *key) {
-        9:  531:	ObjectImpl *impl = $(obj->impl);
-        9:  532:	ObjectKey objkey = INIT_OBJECT_KEY;
-        9:  533:	object_key_for(&objkey, obj, key);
+       19:  529:int object_set_property(Object *obj, const char *key, const Object *value) {
+       19:  530:	object_check_consumed(obj);
+       19:  531:	ObjectImpl *impl = $(obj->impl);
+       19:  532:	ObjectKeyNc objkey = INIT_OBJECT_KEY;
+       19:  533:	object_key_for(&objkey, obj, key);
         -:  534:
-        9:  535:	RBTreeNc *tree = object_tree_for(obj);
-        -:  536:
-        9:  537:	if (impl->send)
-        1:  538:		pthread_rwlock_rdlock(&global_rbtree_lock);
-        9:  539:	const ObjectValue *value = rbtree_get(tree, &objkey);
-        9:  540:	if (impl->send)
-        1:  541:		pthread_rwlock_unlock(&global_rbtree_lock);
-        -:  542:
-        9:  543:	if (value == NULL) {
-    #####:  544:		ObjectNc ret = NIL;
-    #####:  545:		return ret;
-        -:  546:	}
-        -:  547:
-        9:  548:	const ObjectValueData *value_data = $(value->ptr);
-        -:  549:	// const ObjectNc *ret = (ObjectNc *)value_data->value;
-        -:  550:	const ObjectNc ref;
-        -:  551:
-        -:  552:// note: we want to return a ref here. flags which require this override.
-        -:  553:#if defined(__clang__)
-        -:  554:// Clang-specific pragma
-        -:  555:#pragma GCC diagnostic push
-        -:  556:#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
-        -:  557:#elif defined(__GNUC__) && !defined(__clang__)
-        -:  558:// GCC-specific pragma
-        -:  559:#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-        -:  560:#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
-        -:  561:#else
-        -:  562:#warning "Unknown compiler or platform. No specific warning pragmas applied."
-        -:  563:#endif
-        9:  564:	object_ref(&ref, (ObjectNc *)value_data->value);
-        -:  565:#pragma GCC diagnostic pop
+        -:  535:	ObjectValue objvalue;
+       19:  536:	if (fam_alloc(&objvalue.ptr, sizeof(ObjectValueData) + sizeof(Object))) {
+    #####:  537:		object_key_cleanup(&objkey);
+    #####:  538:		return -1;
+        -:  539:	}
+        -:  540:
+       19:  541:	ObjectValueData *ovd = $(objvalue.ptr);
+       19:  542:	ovd->type = ObjectTypeObject;
+       19:  543:	ObjectNc *obj_ptr = (Object *)ovd->value;
+       19:  544:	if (object_move(obj_ptr, value)) {
+    #####:  545:		object_key_cleanup(&objkey);
+    #####:  546:		return -1;
+        -:  547:	}
+        -:  548:
+       19:  549:	RBTreeNc *tree = object_tree_for(obj);
+        -:  550:
+        -:  551:	ObjectKeyNc objkeyswap;
+        -:  552:	ObjectValue objvalueswap;
+        -:  553:	RbTreeKeyValue rbtreekv;
+       19:  554:	rbtreekv.key = &objkeyswap;
+       19:  555:	rbtreekv.value = &objvalueswap;
+       19:  556:	rbtreekv.update = false;
+        -:  557:
+       19:  558:	if (impl->send)
+    #####:  559:		pthread_rwlock_wrlock(&global_rbtree_lock);
+       19:  560:	int ret = rbtree_put_swap(tree, &objkey, &objvalue, &rbtreekv);
+       19:  561:	if (impl->send)
+    #####:  562:		pthread_rwlock_unlock(&global_rbtree_lock);
+        -:  563:
+       19:  564:	if (ret)
+    #####:  565:		object_key_cleanup(&objkey);
         -:  566:
-        9:  567:	return ref;
-        -:  568:}
-        -:  569:
-    #####:  570:int object_send(Object *obj, Channel *channel) {
-    #####:  571:	return 0;
-        -:  572:}
+       19:  567:	if (rbtreekv.update) {
+        5:  568:		ObjectValue *value = rbtreekv.value;
+        5:  569:		ObjectValueData *obj_data = $(value->ptr);
+        5:  570:		if (obj_data->type == ObjectTypeObject) {
+        5:  571:			object_cleanup((ObjectNc *)obj_data->value);
+        -:  572:		}
         -:  573:
-       15:  574:void object_cleanup_thread_local() {
-       15:  575:	if (thread_local_rbtree) {
-        4:  576:		rbtree_iterator_reset(thread_local_rbtree, thread_local_rbtree_iterator, NULL, false, NULL,
-        -:  577:							  false);
-    #####:  578:		loop {
-        -:  579:			RbTreeKeyValue kv;
-        4:  580:			if (!rbtree_iterator_next(thread_local_rbtree_iterator, &kv))
-        4:  581:				break;
-    #####:  582:			ObjectKeyNc *key = kv.key;
-    #####:  583:			fam_free(&key->key);
-        -:  584:
-    #####:  585:			ObjectValue *value = kv.value;
-    #####:  586:			ObjectValueData *ovd = $(value->ptr);
-    #####:  587:			if (ovd->type == ObjectTypeString || ovd->type == ObjectTypeU64) {
-    #####:  588:				fam_free(&value->ptr);
-        -:  589:			}
-        -:  590:		}
-        4:  591:		rbtree_cleanup(thread_local_rbtree);
-        4:  592:		myfree(thread_local_rbtree);
-        -:  593:
-        4:  594:		if (!nil(tl_start_range_key.key))
-        4:  595:			fam_free(&tl_start_range_key.key);
-        4:  596:		if (!nil(tl_end_range_key.key))
-        4:  597:			fam_free(&tl_end_range_key.key);
-        4:  598:		if (thread_local_rbtree_iterator) {
-        4:  599:			rbtree_iterator_cleanup(thread_local_rbtree_iterator);
-        4:  600:			myfree(thread_local_rbtree_iterator);
-        4:  601:			thread_local_rbtree_iterator = NULL;
-        -:  602:		}
-        4:  603:		thread_local_rbtree = NULL;
-        -:  604:	}
-       15:  605:}
-        -:  606:
-        -:  607:#ifdef TEST
-       15:  608:u64 get_thread_local_rbtree_size() {
-       15:  609:	if (!thread_local_rbtree)
-       11:  610:		return 0;
-        4:  611:	return rbtree_size(thread_local_rbtree);
-        -:  612:}
-       15:  613:u64 get_global_rbtree_size() {
-       15:  614:	if (!global_rbtree)
-       11:  615:		return 0;
-        4:  616:	return rbtree_size(global_rbtree);
-        -:  617:}
-       15:  618:void object_cleanup_global() {
-       15:  619:	if (global_rbtree) {
-        4:  620:		rbtree_iterator_reset(global_rbtree, global_rbtree_iterator, NULL, false, NULL, false);
-    #####:  621:		loop {
-        -:  622:			RbTreeKeyValue kv;
-        4:  623:			if (!rbtree_iterator_next(global_rbtree_iterator, &kv))
-        4:  624:				break;
-    #####:  625:			ObjectKeyNc *key = kv.key;
-    #####:  626:			fam_free(&key->key);
-        -:  627:
-    #####:  628:			ObjectValue *value = kv.value;
-    #####:  629:			ObjectValueData *ovd = $(value->ptr);
-    #####:  630:			if (ovd->type == ObjectTypeString || ovd->type == ObjectTypeU64) {
-    #####:  631:				fam_free(&value->ptr);
-        -:  632:			}
-        -:  633:		}
-        4:  634:		rbtree_cleanup(global_rbtree);
-        4:  635:		myfree(global_rbtree);
-        4:  636:		global_rbtree = NULL;
-        -:  637:	}
+        5:  574:		fam_free(&value->ptr);
+        -:  575:
+        5:  576:		ObjectKeyNc *key = rbtreekv.key;
+        5:  577:		object_key_cleanup(key);
+        -:  578:
+        -:  579:	} else {
+       14:  580:		impl->property_count++;
+        -:  581:	}
+        -:  582:
+       19:  583:	return ret;
+        -:  584:}
+        -:  585:
+       19:  586:Object object_get_property(const Object *obj, const char *key) {
+       19:  587:	object_check_consumed(obj);
+       19:  588:	ObjectImpl *impl = $(obj->impl);
+       19:  589:	ObjectKey objkey = INIT_OBJECT_KEY;
+       19:  590:	object_key_for(&objkey, obj, key);
+       19:  591:	RBTreeNc *tree = object_tree_for(obj);
+        -:  592:
+       19:  593:	if (impl->send)
+    #####:  594:		pthread_rwlock_rdlock(&global_rbtree_lock);
+       19:  595:	const ObjectValue *value = rbtree_get(tree, &objkey);
+       19:  596:	if (impl->send)
+    #####:  597:		pthread_rwlock_unlock(&global_rbtree_lock);
+       19:  598:	if (value == NULL) {
+        1:  599:		ObjectNc ret = NIL;
+        1:  600:		return ret;
+        -:  601:	}
+        -:  602:
+       18:  603:	const ObjectValueData *value_data = $(value->ptr);
+        -:  604:	const ObjectNc ref;
+        -:  605:
+       18:  606:	object_ref(&ref, (ObjectNc *)value_data->value);
+        -:  607:
+       18:  608:	return ref;
+        -:  609:}
+        -:  610:
+       14:  611:const char *object_as_string(const Object *obj) {
+       14:  612:	object_check_consumed(obj);
+       14:  613:	ObjectImpl *impl = $(obj->impl);
+       14:  614:	RBTreeNc *tree = object_tree_for(obj);
+        -:  615:
+       14:  616:	ObjectKey objkey = INIT_OBJECT_KEY;
+       14:  617:	object_key_for(&objkey, obj, "value");
+        -:  618:
+       14:  619:	if (impl->send)
+        1:  620:		pthread_rwlock_rdlock(&global_rbtree_lock);
+       14:  621:	const ObjectValue *valueret = rbtree_get(tree, &objkey);
+       14:  622:	if (impl->send)
+        1:  623:		pthread_rwlock_unlock(&global_rbtree_lock);
+        -:  624:
+       14:  625:	if (valueret == NULL)
+        1:  626:		return NULL;
+       13:  627:	const ObjectValueData *valueretdata = $(valueret->ptr);
+        -:  628:
+       13:  629:	if (valueretdata->type != ObjectTypeString)
+        1:  630:		return NULL;
+        -:  631:
+       12:  632:	return valueretdata->value;
+        -:  633:}
+        -:  634:
+        8:  635:int object_as_u64(const Object *obj, u64 *value) {
+        8:  636:	object_check_consumed(obj);
+        8:  637:	int ret = 0;
         -:  638:
-       15:  639:	if (global_rbtree_iterator) {
-        4:  640:		rbtree_iterator_cleanup(global_rbtree_iterator);
-        4:  641:		myfree(global_rbtree_iterator);
-        4:  642:		global_rbtree_iterator = NULL;
-        -:  643:	}
-       15:  644:}
-        -:  645:#endif // TEST
+        8:  639:	ObjectImpl *impl = $(obj->impl);
+        8:  640:	RBTreeNc *tree = object_tree_for(obj);
+        -:  641:
+       16:  642:	ObjectKey objkey = INIT_OBJECT_KEY;
+        8:  643:	object_key_for(&objkey, obj, "value");
+        -:  644:
+        8:  645:	if (impl->send)
+        2:  646:		pthread_rwlock_rdlock(&global_rbtree_lock);
+        8:  647:	const ObjectValue *valueret = rbtree_get(tree, &objkey);
+        8:  648:	if (impl->send)
+        2:  649:		pthread_rwlock_unlock(&global_rbtree_lock);
+        -:  650:
+        8:  651:	if (valueret == NULL) {
+        1:  652:		ret = -1;
+        -:  653:	} else {
+        7:  654:		const ObjectValueData *valueretdata = $(valueret->ptr);
+        -:  655:
+        7:  656:		if (valueretdata->type != ObjectTypeU64)
+        1:  657:			ret = -1;
+        -:  658:		else {
+        6:  659:			memcpy(value, valueretdata->value, sizeof(u64));
+        -:  660:		}
+        -:  661:	}
+        -:  662:
+        8:  663:	return ret;
+        -:  664:}
+        -:  665:
+       16:  666:void object_cleanup_thread_local() {
+       16:  667:	if (thread_local_rbtree) {
+        4:  668:		rbtree_iterator_reset(thread_local_rbtree->tree, thread_local_rbtree->itt, NULL, false,
+        -:  669:							  NULL, false);
+    #####:  670:		loop {
+        -:  671:			RbTreeKeyValue kv;
+        4:  672:			if (!rbtree_iterator_next(thread_local_rbtree->itt, &kv))
+        4:  673:				break;
+    #####:  674:			ObjectKeyNc *key = kv.key;
+    #####:  675:			fam_free(&key->key);
+        -:  676:
+    #####:  677:			ObjectValue *value = kv.value;
+    #####:  678:			ObjectValueData *ovd = $(value->ptr);
+    #####:  679:			if (ovd->type == ObjectTypeString || ovd->type == ObjectTypeU64) {
+    #####:  680:				fam_free(&value->ptr);
+        -:  681:			}
+        -:  682:		}
+        -:  683:
+        4:  684:		if (!nil(tl_start_range_key.key))
+        4:  685:			fam_free(&tl_start_range_key.key);
+        4:  686:		if (!nil(tl_end_range_key.key))
+        4:  687:			fam_free(&tl_end_range_key.key);
+        4:  688:		if (thread_local_rbtree->itt) {
+        4:  689:			rbtree_iterator_cleanup(thread_local_rbtree->itt);
+        4:  690:			myfree(thread_local_rbtree->itt);
+        4:  691:			thread_local_rbtree->itt = NULL;
+        -:  692:		}
+        -:  693:
+        4:  694:		rbtree_cleanup(thread_local_rbtree->tree);
+        4:  695:		myfree(thread_local_rbtree->tree);
+        -:  696:
+        4:  697:		myfree(thread_local_rbtree);
+        4:  698:		thread_local_rbtree = NULL;
+        -:  699:	}
+       16:  700:}
+        -:  701:
+        -:  702:#ifdef TEST
+       16:  703:u64 get_thread_local_rbtree_size() {
+       16:  704:	if (!thread_local_rbtree)
+       12:  705:		return 0;
+        4:  706:	return rbtree_size(thread_local_rbtree->tree);
+        -:  707:}
+       16:  708:u64 get_global_rbtree_size() {
+       16:  709:	if (!global_rbtree)
+       15:  710:		return 0;
+        1:  711:	return rbtree_size(global_rbtree->tree);
+        -:  712:}
+       16:  713:void object_cleanup_global() {
+       16:  714:	if (global_rbtree) {
+        1:  715:		rbtree_iterator_reset(global_rbtree->tree, global_rbtree->itt, NULL, false, NULL, false);
+    #####:  716:		loop {
+        -:  717:			RbTreeKeyValue kv;
+        1:  718:			if (!rbtree_iterator_next(global_rbtree->itt, &kv))
+        1:  719:				break;
+    #####:  720:			ObjectKeyNc *key = kv.key;
+    #####:  721:			fam_free(&key->key);
+        -:  722:
+    #####:  723:			ObjectValue *value = kv.value;
+    #####:  724:			ObjectValueData *ovd = $(value->ptr);
+    #####:  725:			if (ovd->type == ObjectTypeString || ovd->type == ObjectTypeU64) {
+    #####:  726:				fam_free(&value->ptr);
+        -:  727:			}
+        -:  728:		}
+        -:  729:
+        1:  730:		rbtree_iterator_cleanup(global_rbtree->itt);
+        1:  731:		myfree(global_rbtree->itt);
+        1:  732:		rbtree_cleanup(global_rbtree->tree);
+        1:  733:		myfree(global_rbtree->tree);
+        1:  734:		myfree(global_rbtree);
+        1:  735:		global_rbtree = NULL;
+        -:  736:	}
+       16:  737:}
+        -:  738:#endif // TEST
         -:    0:Source:rbtree.c
         -:    0:Graph:rbtree.gcno
         -:    0:Data:rbtree.gcda
-        -:    0:Runs:16
+        -:    0:Runs:17
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3969,72 +4067,72 @@
         -:  129:#pragma GCC diagnostic pop
         -:  130:
         -:  131:// cleanup function for iterators
-       11:  132:void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
-       11:  133:	if (!nil(ptr->impl)) {
+        8:  132:void rbtree_iterator_cleanup(RBTreeIteratorNc *ptr) {
+        8:  133:	if (!nil(ptr->impl)) {
         -:  134:		// obtain referent to internal RBTreeImpl structure
-       11:  135:		RBTreeIteratorImpl *impl = $(ptr->impl);
+        8:  135:		RBTreeIteratorImpl *impl = $(ptr->impl);
         -:  136:		// set appropriate chainguard status
-       22:  137:		SendStateGuard _ = SetSend(impl->send);
+       16:  137:		SendStateGuard _ = SetSend(impl->send);
         -:  138:
         -:  139:		// free RBTreeImpl structure
-       11:  140:		fam_free(&ptr->impl);
+        8:  140:		fam_free(&ptr->impl);
         -:  141:	}
-       11:  142:}
+        8:  142:}
         -:  143:
         -:  144:// returns the next item in the iterator
-     4156:  145:bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
-     4156:  146:	RBTreeIteratorImpl *impl = $(ptr->impl);
+     4173:  145:bool rbtree_iterator_next(RBTreeIterator *ptr, RbTreeKeyValue *kv) {
+     4173:  146:	RBTreeIteratorImpl *impl = $(ptr->impl);
         -:  147:
         -:  148:	// If the iterator is empty, we're done
-     4156:  149:	if (impl->cur == NIL && impl->stack_pointer == 0) {
-       26:  150:		return false; // No more nodes to traverse
+     4173:  149:	if (impl->cur == NIL && impl->stack_pointer == 0) {
+       35:  150:		return false; // No more nodes to traverse
         -:  151:	}
         -:  152:
         -:  153:	// Traverse the tree
-     8282:  154:	while (impl->cur != NIL || impl->stack_pointer > 0) {
+     8325:  154:	while (impl->cur != NIL || impl->stack_pointer > 0) {
         -:  155:		// Traverse left subtree
-     8282:  156:		if (impl->cur != NIL) {
+     8325:  156:		if (impl->cur != NIL) {
         -:  157:			// based on worst case log(n) * 2 + 1 this should not be possible
-    4152*:  158:			assert(impl->stack_pointer < 128);
-     4152:  159:			int v = 0;
-     4152:  160:			if (impl->min != NIL)
-       46:  161:				v = impl->compare(impl->cur->data, impl->min->data);
-     4152:  162:			if (v < 0) {
+    4187*:  158:			assert(impl->stack_pointer < 128);
+     4187:  159:			int v = 0;
+     4187:  160:			if (impl->min != NIL)
+       81:  161:				v = impl->compare(impl->cur->data, impl->min->data);
+     4187:  162:			if (v < 0) {
         -:  163:				// we haven't hit the minimum yet
-       17:  164:				impl->cur = impl->cur->right;
+       42:  164:				impl->cur = impl->cur->right;
         -:  165:			} else {
         -:  166:				// Push the current node pointer onto the stack
-     4135:  167:				impl->stack[impl->stack_pointer++] = impl->cur;
+     4145:  167:				impl->stack[impl->stack_pointer++] = impl->cur;
         -:  168:
         -:  169:				// Move to the left child
-     4135:  170:				impl->cur = impl->cur->left;
+     4145:  170:				impl->cur = impl->cur->left;
         -:  171:			}
         -:  172:		} else {
         -:  173:			// Pop the top node from the stack
-     4130:  174:			impl->cur = impl->stack[--impl->stack_pointer];
+     4138:  174:			impl->cur = impl->stack[--impl->stack_pointer];
         -:  175:
         -:  176:			// Store the current node's data to return
-     4130:  177:			void *ret = impl->cur->data;
+     4138:  177:			void *ret = impl->cur->data;
         -:  178:
         -:  179:			// check if we hit our max node. If so, next will return false.
-     4130:  180:			if (impl->cur == impl->max) {
-       16:  181:				impl->cur = NIL;
-       16:  182:				impl->stack_pointer = 0;
+     4138:  180:			if (impl->cur == impl->max) {
+       28:  181:				impl->cur = NIL;
+       28:  182:				impl->stack_pointer = 0;
         -:  183:			}
         -:  184:
         -:  185:			// Move to the right child after visiting this node
-     4130:  186:			impl->cur = impl->cur->right;
+     4138:  186:			impl->cur = impl->cur->right;
         -:  187:
-     4130:  188:			kv->key = ret;
-     4130:  189:			kv->value = ret + VALUE_PAD(impl->key_size) + impl->key_size;
-     4130:  190:			break;
+     4138:  188:			kv->key = ret;
+     4138:  189:			kv->value = ret + VALUE_PAD(impl->key_size) + impl->key_size;
+     4138:  190:			break;
         -:  191:		}
         -:  192:	}
-     4130:  193:	return true;
+     4138:  193:	return true;
         -:  194:}
         -:  195:
-     6685:  196:void rbtree_free_node(RBTreeNode *ptr) {
-     6685:  197:	if (ptr != NIL) {
+     6682:  196:void rbtree_free_node(RBTreeNode *ptr) {
+     6682:  197:	if (ptr != NIL) {
         -:  198:		// recursively free right node
      3335:  199:		rbtree_free_node(ptr->right);
         -:  200:		// recursively free left node
@@ -4042,200 +4140,200 @@
         -:  202:		// chain free current node
      3335:  203:		fam_free(&ptr->self);
         -:  204:	}
-     6685:  205:}
+     6682:  205:}
         -:  206:
         -:  207:// internal search function used by get/insert/delete.
-    22460:  208:void rbtree_search(RBTreeImpl *impl, const void *key, RBTreeNodePair *nodes) {
-    22460:  209:	nodes->parent = NIL;
-    22460:  210:	nodes->self = impl->root;
+    22509:  208:void rbtree_search(RBTreeImpl *impl, const void *key, RBTreeNodePair *nodes) {
+    22509:  209:	nodes->parent = NIL;
+    22509:  210:	nodes->self = impl->root;
         -:  211:
-    22460:  212:	int i = 0;
-   239503:  213:	while (nodes->self != NIL) {
+    22509:  212:	int i = 0;
+   239645:  213:	while (nodes->self != NIL) {
         -:  214:#ifdef TEST
         -:  215:		// should never have a case where this is not true
         -:  216:		// only NIL accepted
-  228692*:  217:		assert(nodes->self->parent);
-  228692*:  218:		assert(nodes->self->left);
-  228692*:  219:		assert(nodes->self->right);
+  228823*:  217:		assert(nodes->self->parent);
+  228823*:  218:		assert(nodes->self->left);
+  228823*:  219:		assert(nodes->self->right);
         -:  220:#endif // TEST
-   228692:  221:		nodes->parent = nodes->self;
-   228692:  222:		int v = impl->compare(nodes->self->data, key);
-   228692:  223:		if (v == 0) {
-    11649:  224:			break;
-   217043:  225:		} else if (v < 0) {
-   110471:  226:			nodes->self = nodes->self->right;
-   110471:  227:			nodes->is_right = true;
+   228823:  221:		nodes->parent = nodes->self;
+   228823:  222:		int v = impl->compare(nodes->self->data, key);
+   228823:  223:		if (v == 0) {
+    11687:  224:			break;
+   217136:  225:		} else if (v < 0) {
+   110549:  226:			nodes->self = nodes->self->right;
+   110549:  227:			nodes->is_right = true;
         -:  228:		} else {
-   106572:  229:			nodes->self = nodes->self->left;
-   106572:  230:			nodes->is_right = false;
+   106587:  229:			nodes->self = nodes->self->left;
+   106587:  230:			nodes->is_right = false;
         -:  231:		}
         -:  232:	}
-    22460:  233:}
+    22509:  233:}
         -:  234:
         -:  235:// do a left rotation
-     5110:  236:void rbtree_left_rotate(RBTreeImpl *impl, RBTreeNode *x) {
+     5119:  236:void rbtree_left_rotate(RBTreeImpl *impl, RBTreeNode *x) {
         -:  237:
         -:  238:#ifdef TEST
         -:  239:	// should never have a case where this is not true
         -:  240:	// only NIL accepted
-    5110*:  241:	assert(x->parent);
-    5110*:  242:	assert(x->left);
-    5110*:  243:	assert(x->right);
+    5119*:  241:	assert(x->parent);
+    5119*:  242:	assert(x->left);
+    5119*:  243:	assert(x->right);
         -:  244:#endif // TEST
         -:  245:
-     5110:  246:	RBTreeNode *y = x->right;
+     5119:  246:	RBTreeNode *y = x->right;
         -:  247:
         -:  248:	// Move y's left subtree to x's right subtree
-     5110:  249:	x->right = y->left;
-     5110:  250:	if (y->left != NIL) {
-     1564:  251:		y->left->parent = x;
+     5119:  249:	x->right = y->left;
+     5119:  250:	if (y->left != NIL) {
+     1566:  251:		y->left->parent = x;
         -:  252:	}
         -:  253:
         -:  254:	// Update y's parent to x's parent
-     5110:  255:	y->parent = x->parent;
+     5119:  255:	y->parent = x->parent;
         -:  256:
         -:  257:	// If x was the root, now y becomes the root
-     5110:  258:	if (x->parent == NIL) {
-       17:  259:		impl->root = y;
-     5093:  260:	} else if (x == x->parent->left) {
-     3183:  261:		x->parent->left = y;
+     5119:  258:	if (x->parent == NIL) {
+       18:  259:		impl->root = y;
+     5101:  260:	} else if (x == x->parent->left) {
+     3185:  261:		x->parent->left = y;
         -:  262:	} else {
-     1910:  263:		x->parent->right = y;
+     1916:  263:		x->parent->right = y;
         -:  264:	}
         -:  265:
         -:  266:	// Place x as y's left child
-     5110:  267:	y->left = x;
-     5110:  268:	x->parent = y;
-     5110:  269:}
+     5119:  267:	y->left = x;
+     5119:  268:	x->parent = y;
+     5119:  269:}
         -:  270:
         -:  271:// do a right rotation
-     4258:  272:void rbtree_right_rotate(RBTreeImpl *impl, RBTreeNode *x) {
+     4265:  272:void rbtree_right_rotate(RBTreeImpl *impl, RBTreeNode *x) {
         -:  273:
         -:  274:#ifdef TEST
         -:  275:	// should never have a case where this is not true
         -:  276:	// only NIL accepted
-    4258*:  277:	assert(x->parent);
-    4258*:  278:	assert(x->left);
-    4258*:  279:	assert(x->right);
+    4265*:  277:	assert(x->parent);
+    4265*:  278:	assert(x->left);
+    4265*:  279:	assert(x->right);
         -:  280:#endif // TEST
         -:  281:
-     4258:  282:	RBTreeNode *y = x->left;
+     4265:  282:	RBTreeNode *y = x->left;
         -:  283:
         -:  284:	// Move y's right subtree to x's left subtree
-     4258:  285:	x->left = y->right;
-     4258:  286:	if (y->right != NIL) {
-     1242:  287:		y->right->parent = x;
+     4265:  285:	x->left = y->right;
+     4265:  286:	if (y->right != NIL) {
+     1244:  287:		y->right->parent = x;
         -:  288:	}
         -:  289:
         -:  290:	// Update y's parent to x's parent
-     4258:  291:	y->parent = x->parent;
+     4265:  291:	y->parent = x->parent;
         -:  292:
         -:  293:	// If x was the root, now y becomes the root
-     4258:  294:	if (x->parent == NIL) {
-        4:  295:		impl->root = y;
-     4254:  296:	} else if (x == x->parent->right) {
-     2938:  297:		x->parent->right = y;
+     4265:  294:	if (x->parent == NIL) {
+        7:  295:		impl->root = y;
+     4258:  296:	} else if (x == x->parent->right) {
+     2943:  297:		x->parent->right = y;
         -:  298:	} else {
-     1316:  299:		x->parent->left = y;
+     1315:  299:		x->parent->left = y;
         -:  300:	}
         -:  301:
         -:  302:	// Place x as y's right child
-     4258:  303:	y->right = x;
-     4258:  304:	x->parent = y;
-     4258:  305:}
+     4265:  303:	y->right = x;
+     4265:  304:	x->parent = y;
+     4265:  305:}
         -:  306:
         -:  307:// Fixup operation after insertion to maintain Red-Black Tree properties
-    10808:  308:void rbtree_put_fixup(RBTreeImpl *impl, RBTreeNode *k) {
-    10808:  309:	int i = 0;
+    10816:  308:void rbtree_put_fixup(RBTreeImpl *impl, RBTreeNode *k) {
+    10816:  309:	int i = 0;
         -:  310:	// Loop until the node is the root or its parent's color is black
-    19398:  311:	while (k != impl->root && IS_RED(impl, k->parent)) {
+    19415:  311:	while (k != impl->root && IS_RED(impl, k->parent)) {
         -:  312:#ifdef TEST
         -:  313:		// Ensure that the parent, left, and right children are not NULL
         -:  314:		// The only exception is NIL nodes, which can be accepted
-    8590*:  315:		assert(k->parent);
-    8590*:  316:		assert(k->left);
-    8590*:  317:		assert(k->right);
+    8599*:  315:		assert(k->parent);
+    8599*:  316:		assert(k->left);
+    8599*:  317:		assert(k->right);
         -:  318:#endif // TEST
         -:  319:
-     8590:  320:		if (k->parent == k->parent->parent->left) {
+     8599:  320:		if (k->parent == k->parent->parent->left) {
         -:  321:			// Case 1: Uncle is on the right
-     3797:  322:			RBTreeNode *u = k->parent->parent->right;
+     3798:  322:			RBTreeNode *u = k->parent->parent->right;
         -:  323:
-     3797:  324:			if (IS_RED(impl, u)) {
+     3798:  324:			if (IS_RED(impl, u)) {
         -:  325:				// Case 1a: Uncle is red
         -:  326:				// Recolor the parent and uncle to black
-     2069:  327:				SET_BLACK(impl, k->parent);
-     2069:  328:				SET_BLACK(impl, u);
+     2071:  327:				SET_BLACK(impl, k->parent);
+     2071:  328:				SET_BLACK(impl, u);
         -:  329:				// Recolor the grandparent to red
-     2069:  330:				SET_RED(impl, k->parent->parent);
+     2071:  330:				SET_RED(impl, k->parent->parent);
         -:  331:				// Move up the tree
-     2069:  332:				k = k->parent->parent;
+     2071:  332:				k = k->parent->parent;
         -:  333:			} else {
         -:  334:				// Case 1b: Uncle is black
-     1728:  335:				if (k == k->parent->right) {
+     1727:  335:				if (k == k->parent->right) {
         -:  336:					// Case 1b1: Node is a right child
         -:  337:					// Rotate left to make the node the left child
-      891:  338:					k = k->parent;
-      891:  339:					rbtree_left_rotate(impl, k);
+      890:  338:					k = k->parent;
+      890:  339:					rbtree_left_rotate(impl, k);
         -:  340:				}
         -:  341:				// Recolor and rotate
-     1728:  342:				SET_BLACK(impl, k->parent);
-     1728:  343:				SET_RED(impl, k->parent->parent);
-     1728:  344:				rbtree_right_rotate(impl, k->parent->parent);
+     1727:  342:				SET_BLACK(impl, k->parent);
+     1727:  343:				SET_RED(impl, k->parent->parent);
+     1727:  344:				rbtree_right_rotate(impl, k->parent->parent);
         -:  345:			}
         -:  346:		} else {
         -:  347:			// Case 2: Uncle is on the left
-     4793:  348:			RBTreeNode *u = k->parent->parent->left;
+     4801:  348:			RBTreeNode *u = k->parent->parent->left;
         -:  349:
-     4793:  350:			if (IS_RED(impl, u)) {
+     4801:  350:			if (IS_RED(impl, u)) {
         -:  351:				// Case 2a: Uncle is red
         -:  352:				// Recolor the parent and uncle to black
-     2432:  353:				SET_BLACK(impl, k->parent);
-     2432:  354:				SET_BLACK(impl, u);
+     2433:  353:				SET_BLACK(impl, k->parent);
+     2433:  354:				SET_BLACK(impl, u);
         -:  355:				// Recolor the grandparent to red
-     2432:  356:				SET_RED(impl, k->parent->parent);
+     2433:  356:				SET_RED(impl, k->parent->parent);
         -:  357:				// Move up the tree
-     2432:  358:				k = k->parent->parent;
+     2433:  358:				k = k->parent->parent;
         -:  359:			} else {
         -:  360:				// Case 2b: Uncle is black
-     2361:  361:				if (k == k->parent->left) {
+     2368:  361:				if (k == k->parent->left) {
         -:  362:					// Case 2b1: Node is a left child
         -:  363:					// Rotate right to make the node the right child
-     1095:  364:					k = k->parent;
-     1095:  365:					rbtree_right_rotate(impl, k);
+     1098:  364:					k = k->parent;
+     1098:  365:					rbtree_right_rotate(impl, k);
         -:  366:				}
         -:  367:				// Recolor and rotate
-     2361:  368:				SET_BLACK(impl, k->parent);
-     2361:  369:				SET_RED(impl, k->parent->parent);
-     2361:  370:				rbtree_left_rotate(impl, k->parent->parent);
+     2368:  368:				SET_BLACK(impl, k->parent);
+     2368:  369:				SET_RED(impl, k->parent->parent);
+     2368:  370:				rbtree_left_rotate(impl, k->parent->parent);
         -:  371:			}
         -:  372:		}
         -:  373:	}
         -:  374:	// Ensure the root is always black
-    10808:  375:	SET_BLACK(impl, impl->root);
-    10808:  376:}
+    10816:  375:	SET_BLACK(impl, impl->root);
+    10816:  376:}
         -:  377:
         -:  378:// cleanup function selects appropriate SendStateGuard based on configuration and
         -:  379:// deallocates memory
-       15:  380:void rbtree_cleanup(RBTreeNc *ptr) {
+       12:  380:void rbtree_cleanup(RBTreeNc *ptr) {
         -:  381:	// check non-initialized conditions
-       15:  382:	if (!nil(ptr->impl)) {
+       12:  382:	if (!nil(ptr->impl)) {
         -:  383:		// obtain referent to internal RBTree structure
-       15:  384:		RBTreeImpl *impl = $(ptr->impl);
+       12:  384:		RBTreeImpl *impl = $(ptr->impl);
         -:  385:		// set appropriate chainguard status
-       30:  386:		SendStateGuard _ = SetSend(impl->send);
+       24:  386:		SendStateGuard _ = SetSend(impl->send);
         -:  387:
-       15:  388:		rbtree_free_node(impl->root);
+       12:  388:		rbtree_free_node(impl->root);
         -:  389:
         -:  390:		// free RBTreeImpl structure
-       15:  391:		fam_free(&ptr->impl);
+       12:  391:		fam_free(&ptr->impl);
         -:  392:	}
-       15:  393:}
+       12:  393:}
         -:  394:
-       17:  395:int rbtree_create(RBTree *ptr, const u64 key_size, const u64 value_size,
+       14:  395:int rbtree_create(RBTree *ptr, const u64 key_size, const u64 value_size,
         -:  396:				  int (*compare)(const void *, const void *), bool send) {
         -:  397:	// validate input
-       17:  398:	if (ptr == NULL || key_size == 0 || value_size == 0 || compare == NULL) {
+       14:  398:	if (ptr == NULL || key_size == 0 || value_size == 0 || compare == NULL) {
         1:  399:		SetErr(IllegalArgument);
         1:  400:		return -1;
         -:  401:	}
@@ -4243,558 +4341,638 @@
         -:  403:	RBTreeImpl *impl;
         -:  404:
         -:  405:	{
-       32:  406:		SendStateGuard _ = SetSend(send);
+       26:  406:		SendStateGuard _ = SetSend(send);
         -:  407:		// try to allocate required size for RBTreeImpl
-       16:  408:		if (fam_alloc(&ptr->impl, sizeof(RBTreeImpl))) {
+       13:  408:		if (fam_alloc(&ptr->impl, sizeof(RBTreeImpl))) {
         -:  409:			// set the fatptr to null so it's not cleaned up in cleanup function
         1:  410:			ptr->impl = null;
         1:  411:			return -1;
         -:  412:		}
         -:  413:	}
         -:  414:
-       15:  415:	impl = $(ptr->impl);
+       12:  415:	impl = $(ptr->impl);
         -:  416:	// initialize values of the RBTreeImpl structure
-       15:  417:	impl->send = send;
-       15:  418:	impl->key_size = key_size;
-       15:  419:	impl->value_size = value_size;
-       15:  420:	impl->compare = compare;
-       15:  421:	impl->root = NIL;
-       15:  422:	impl->size = 0;
+       12:  417:	impl->send = send;
+       12:  418:	impl->key_size = key_size;
+       12:  419:	impl->value_size = value_size;
+       12:  420:	impl->compare = compare;
+       12:  421:	impl->root = NIL;
+       12:  422:	impl->size = 0;
         -:  423:
-       15:  424:	return 0;
+       12:  424:	return 0;
         -:  425:}
         -:  426:
-        -:  427:// insert function
-    10811:  428:int rbtree_put(RBTree *ptr, const void *key, const void *value) {
-        -:  429:	// validate input
-    10811:  430:	if (ptr == NULL || key == NULL || value == NULL) {
-        1:  431:		SetErr(IllegalArgument);
-        1:  432:		return -1;
-        -:  433:	}
-        -:  434:
-        -:  435:	// obtain the impl from the fat ptr
-    10810:  436:	RBTreeImpl *impl = $(ptr->impl);
-        -:  437:	// this pair is used to search
-        -:  438:	RBTreeNodePair pair;
-        -:  439:	// pointer for our node
-        -:  440:	RBTreeNode *node;
-        -:  441:
-        -:  442:	// perform search for the key
-    10810:  443:	rbtree_search(impl, key, &pair);
-        -:  444:
-        -:  445:	// retreive the data size
-    10810:  446:	u64 size = DATA_SIZE(impl);
-    10810:  447:	if (pair.self != NIL) {
-        1:  448:		node = $(pair.self->self);
-        1:  449:		memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
-        1:  450:		return 0;
-        -:  451:	}
-        -:  452:
-        -:  453:	FatPtr self;
-        -:  454:
-        -:  455:	// using fam_alloc allocate memory for this node
-        -:  456:	{
-    21618:  457:		SendStateGuard _ = SetSend(impl->send);
-    10809:  458:		if (fam_alloc(&self, size)) {
-        1:  459:			self = null;
-        1:  460:			return -1;
-        -:  461:		}
-        -:  462:	}
-        -:  463:
-        -:  464:	// using the allocated memory set node properties
-    10808:  465:	node = $(self);
-    10808:  466:	node->self = self;
-    10808:  467:	if (impl->root == NIL) {
-       13:  468:		impl->root = node;
-    10795:  469:	} else if (pair.is_right) {
-     5632:  470:		pair.parent->right = node;
-        -:  471:	} else {
-     5163:  472:		pair.parent->left = node;
-        -:  473:	}
-    10808:  474:	node->right = NIL;			// always must be set to NIL at first.
-    10808:  475:	node->left = NIL;			// always must be set to NIL at first.
-    10808:  476:	node->parent = pair.parent; // set our parent pointer.
-        -:  477:
-        -:  478:	// copy data
-    10808:  479:	memcpy(node->data, key, impl->key_size);
-        -:  480:	// copy value
-    10808:  481:	memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
-        -:  482:	// nodes are initially red
-    10808:  483:	INIT_FLAGS(impl, node);
-    10808:  484:	SET_RED(impl, node);
+       19:  427:int rbtree_put_swap(RBTree *ptr, const void *key, const void *value, RbTreeKeyValue *swap) {
+        -:  428:	// validate input
+       19:  429:	if (ptr == NULL || key == NULL || value == NULL) {
+    #####:  430:		SetErr(IllegalArgument);
+    #####:  431:		return -1;
+        -:  432:	}
+        -:  433:
+        -:  434:	// obtain the impl from the fat ptr
+       19:  435:	RBTreeImpl *impl = $(ptr->impl);
+        -:  436:	// this pair is used to search
+        -:  437:	RBTreeNodePair pair;
+        -:  438:	// pointer for our node
+        -:  439:	RBTreeNode *node;
+        -:  440:
+        -:  441:	// perform search for the key
+       19:  442:	rbtree_search(impl, key, &pair);
+        -:  443:
+        -:  444:	// retreive the data size
+       19:  445:	u64 size = DATA_SIZE(impl);
+       19:  446:	if (pair.self != NIL) {
+        5:  447:		node = $(pair.self->self);
+        5:  448:		if (swap) {
+        5:  449:			if (swap->key)
+        5:  450:				memcpy(swap->key, node->data, impl->key_size);
+        5:  451:			if (swap->value)
+        5:  452:				memcpy(swap->value, node->data + VALUE_PAD(impl->key_size) + impl->key_size,
+        5:  453:					   impl->value_size);
+        5:  454:			swap->update = true;
+        -:  455:		}
+        5:  456:		memcpy(node->data, key, impl->key_size);
+        5:  457:		memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
+        5:  458:		return 0;
+        -:  459:	}
+        -:  460:
+        -:  461:	FatPtr self;
+        -:  462:
+        -:  463:	// using fam_alloc allocate memory for this node
+        -:  464:	{
+       28:  465:		SendStateGuard _ = SetSend(impl->send);
+       14:  466:		if (fam_alloc(&self, size)) {
+    #####:  467:			self = null;
+    #####:  468:			return -1;
+        -:  469:		}
+        -:  470:	}
+        -:  471:
+        -:  472:	// using the allocated memory set node properties
+       14:  473:	node = $(self);
+       14:  474:	node->self = self;
+       14:  475:	if (impl->root == NIL) {
+    #####:  476:		impl->root = node;
+       14:  477:	} else if (pair.is_right) {
+        8:  478:		pair.parent->right = node;
+        -:  479:	} else {
+        6:  480:		pair.parent->left = node;
+        -:  481:	}
+       14:  482:	node->right = NIL;			// always must be set to NIL at first.
+       14:  483:	node->left = NIL;			// always must be set to NIL at first.
+       14:  484:	node->parent = pair.parent; // set our parent pointer.
         -:  485:
-        -:  486:#ifdef TEST
-    10808:  487:	node->node_id = node_id_counter++;
-        -:  488:#endif // TEST
-        -:  489:
-        -:  490:	// increment the size counter
-    10808:  491:	impl->size++;
-        -:  492:
-        -:  493:	// insert_fixup
-    10808:  494:	rbtree_put_fixup(impl, node);
-        -:  495:
-    10808:  496:	return 0;
-        -:  497:}
-        -:  498:
-        -:  499:// find the successor node
-     4416:  500:RBTreeNode *rbtree_find_successor(RBTreeImpl *impl, RBTreeNode *x) {
-     4416:  501:	RBTreeNode *successor = x->right;
-    11292:  502:	while (successor->left != NIL) {
-     6876:  503:		successor = successor->left;
-        -:  504:	}
-     4416:  505:	return successor;
-        -:  506:}
-        -:  507:
-        -:  508:// perform transplant operation
-    10678:  509:void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
-    10678:  510:	if (dst->parent == NIL)
-       41:  511:		impl->root = src;
-    10637:  512:	else if (dst == dst->parent->left)
-     6975:  513:		dst->parent->left = src;
-        -:  514:	else
-     3662:  515:		dst->parent->right = src;
-    10678:  516:	if (src != NIL) {
-     5963:  517:		src->parent = dst->parent;
-        -:  518:	}
-    10678:  519:}
-        -:  520:
-        -:  521:// set child's color to parent's
-     6299:  522:void set_color_based_on_parent(RBTreeImpl *impl, RBTreeNode *child, RBTreeNode *parent) {
-     6299:  523:	if (child != NIL) {
-     6299:  524:		if (IS_RED(impl, parent)) {
-     2651:  525:			SET_RED(impl, child);
-        -:  526:		} else {
-     3648:  527:			SET_BLACK(impl, child);
-        -:  528:		}
-        -:  529:	}
-     6299:  530:}
-        -:  531:
-        -:  532:// delete fixup
-     5274:  533:void rbtree_remove_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RBTreeNode *x) {
-     5274:  534:	int i = 0;
-     9824:  535:	while (x != impl->root && IS_BLACK(impl, x)) {
-     4550:  536:		if (w == parent->right) {
-        -:  537:			// Case 1: Sibling is red
-     2590:  538:			if (IS_RED(impl, w)) {
-      330:  539:				SET_BLACK(impl, w);
-      330:  540:				SET_RED(impl, parent);
-      330:  541:				rbtree_left_rotate(impl, parent);
-      330:  542:				w = parent->right;
-        -:  543:			}
-        -:  544:
-        -:  545:			// Case 2: Sibling's children are both black
-     2590:  546:			if (IS_BLACK(impl, w->left) && IS_BLACK(impl, w->right)) {
-     1447:  547:				SET_RED(impl, w);
-     1447:  548:				x = parent;
-     1447:  549:				parent = parent->parent;
-     1447:  550:				if (x == x->parent->left) {
-      902:  551:					w = x->parent->right;
-        -:  552:				} else {
-      545:  553:					w = x->parent->left;
-        -:  554:				}
-        -:  555:			} else {
-        -:  556:				// Case 3: Sibling's right child is black, left child is red
-     1143:  557:				if (IS_BLACK(impl, w->right)) {
-      462:  558:					SET_BLACK(impl, w->left);
-      462:  559:					SET_RED(impl, w);
-      462:  560:					rbtree_right_rotate(impl, w);
-      462:  561:					w = parent->right;
-        -:  562:				}
-        -:  563:
-        -:  564:				// Case 4: Sibling's right child is red
-     1143:  565:				set_color_based_on_parent(impl, w, parent);
-     1143:  566:				SET_BLACK(impl, parent);
-     1143:  567:				SET_BLACK(impl, w->right);
-     1143:  568:				rbtree_left_rotate(impl, parent);
-     1143:  569:				x = impl->root; // Set x to root at the end, only once
-        -:  570:			}
-        -:  571:		} else {
-        -:  572:			// Case 1: Sibling is red
-     1960:  573:			if (IS_RED(impl, w)) {
-      233:  574:				SET_BLACK(impl, w);
-      233:  575:				SET_RED(impl, parent);
-      233:  576:				rbtree_right_rotate(impl, parent);
-      233:  577:				w = parent->left;
-        -:  578:			}
-        -:  579:			// Case 2: Sibling's children are both black
-     1960:  580:			if (IS_BLACK(impl, w->right) && IS_BLACK(impl, w->left)) {
-     1220:  581:				SET_RED(impl, w);
-     1220:  582:				x = parent;
-     1220:  583:				parent = parent->parent;
-     1220:  584:				if (x == x->parent->left) {
-      512:  585:					w = x->parent->right;
-        -:  586:				} else {
-      708:  587:					w = x->parent->left;
-        -:  588:				}
-        -:  589:			} else {
-        -:  590:				// Case 3: Sibling's left child is black, right child is red
-      740:  591:				if (IS_BLACK(impl, w->left)) {
-      385:  592:					SET_BLACK(impl, w->right);
-      385:  593:					SET_RED(impl, w);
-      385:  594:					rbtree_left_rotate(impl, w);
-      385:  595:					w = parent->left;
-        -:  596:				}
-        -:  597:				// Case 4: Sibling's left child is red
-      740:  598:				set_color_based_on_parent(impl, w, parent);
-      740:  599:				SET_BLACK(impl, parent);
-      740:  600:				SET_BLACK(impl, w->left);
-      740:  601:				rbtree_right_rotate(impl, parent);
-      740:  602:				x = impl->root; // Set x to root at the end, only once
-        -:  603:			}
-        -:  604:		}
-        -:  605:	}
-        -:  606:
-        -:  607:	// Ensure x is black at the end of fixup
-     5274:  608:	SET_BLACK(impl, x);
-     5274:  609:}
-        -:  610:
-        -:  611:// delete function
-     7475:  612:int rbtree_remove(RBTree *ptr, const void *key) {
-        -:  613:	// validate input
-     7475:  614:	if (ptr == NULL || nil(ptr->impl) || key == NULL) {
-        1:  615:		SetErr(IllegalArgument);
-        1:  616:		return -1;
-        -:  617:	}
-        -:  618:
-        -:  619:	// obtain impl from our opaque pointer
-     7474:  620:	RBTreeImpl *impl = $(ptr->impl);
-        -:  621:
-        -:  622:	// search for the node based on this key.
-        -:  623:	RBTreeNodePair pair;
-     7474:  624:	rbtree_search(impl, key, &pair);
-        -:  625:
-        -:  626:	// this node doesn't exist, return -1
-     7474:  627:	if (pair.self == NIL)
-        1:  628:		return -1;
-        -:  629:
-        -:  630:	// node exists, initialize variables
-     7473:  631:	RBTreeNode *node_to_delete = pair.self;
-     7473:  632:	RBTreeNode *x = NIL;
-     7473:  633:	RBTreeNode *w = NIL;
-     7473:  634:	RBTreeNode *parent = NIL;
-        -:  635:
-        -:  636:	// only do fixups if the node_to_delete is black.
-     7473:  637:	bool do_fixup = IS_BLACK(impl, node_to_delete);
-        -:  638:
-     7473:  639:	if (node_to_delete->left == NIL) {
-        -:  640:		// set variables for fixup and transplant
-     2680:  641:		x = node_to_delete->right;
-     2680:  642:		rbtree_transplant(impl, node_to_delete, node_to_delete->right);
-     2680:  643:		if (node_to_delete->parent->left == NIL)
-     1349:  644:			w = node_to_delete->parent->right;
-        -:  645:		else
-     1331:  646:			w = node_to_delete->parent->left;
-     2680:  647:		if (x != NIL)
-      604:  648:			parent = x->parent;
-     2076:  649:		else if (w != NIL)
-     1590:  650:			parent = w->parent;
-     4793:  651:	} else if (node_to_delete->right == NIL) {
-        -:  652:		// set variables for fixup and transplant
-      377:  653:		x = node_to_delete->left;
-      377:  654:		rbtree_transplant(impl, node_to_delete, node_to_delete->left);
-      377:  655:		w = node_to_delete->parent->left;
-      377:  656:		parent = x->parent;
-        -:  657:	} else {
-        -:  658:		// two children case
-        -:  659:		// find successor
-     4416:  660:		RBTreeNode *successor = rbtree_find_successor(impl, node_to_delete);
-        -:  661:		// if it's black we need to do a fixup.
-     4416:  662:		do_fixup = IS_BLACK(impl, successor);
-        -:  663:
-     4416:  664:		x = successor->right;
-     4416:  665:		w = successor->parent->right;
-        -:  666:
-     4416:  667:		if (w->parent == node_to_delete) {
-     1211:  668:			w = node_to_delete->left;
-     1211:  669:			parent = successor;
-        -:  670:		} else {
-     3205:  671:			parent = w->parent;
-        -:  672:		}
-        -:  673:
-        -:  674:		// if parent is not node_to_delete, do transplant and update children of successor
-     4416:  675:		if (successor->parent != node_to_delete) {
-     3205:  676:			rbtree_transplant(impl, successor, successor->right);
-     3205:  677:			successor->right = node_to_delete->right;
-     3205:  678:			successor->right->parent = successor;
-        -:  679:		}
-        -:  680:
-        -:  681:		// do final transpalnnnt and update including color match
-     4416:  682:		rbtree_transplant(impl, node_to_delete, successor);
-     4416:  683:		successor->left = node_to_delete->left;
-     4416:  684:		successor->left->parent = successor;
-     4416:  685:		set_color_based_on_parent(impl, successor, node_to_delete);
-        -:  686:	}
-        -:  687:
-        -:  688:	// if do_fixup, do fixup.
-     7473:  689:	if (do_fixup) {
-     5288:  690:		if (w != NIL && parent != NIL) {
-     5274:  691:			rbtree_remove_fixup(impl, parent, w, x);
-        -:  692:		} else {
-        -:  693:			// in these cases SET_BLACK only
-       14:  694:			if (impl->size > 1)
-        6:  695:				SET_BLACK(impl, impl->root);
-        -:  696:		}
+        -:  486:	// copy data
+       14:  487:	memcpy(node->data, key, impl->key_size);
+        -:  488:	// copy value
+       14:  489:	memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
+        -:  490:	// nodes are initially red
+       14:  491:	INIT_FLAGS(impl, node);
+       14:  492:	SET_RED(impl, node);
+        -:  493:
+        -:  494:#ifdef TEST
+       14:  495:	node->node_id = node_id_counter++;
+        -:  496:#endif // TEST
+        -:  497:
+        -:  498:	// increment the size counter
+       14:  499:	impl->size++;
+        -:  500:
+        -:  501:	// insert_fixup
+       14:  502:	rbtree_put_fixup(impl, node);
+        -:  503:
+       14:  504:	return 0;
+        -:  505:}
+        -:  506:
+        -:  507:// insert function
+    10805:  508:int rbtree_put(RBTree *ptr, const void *key, const void *value) {
+        -:  509:	// validate input
+    10805:  510:	if (ptr == NULL || key == NULL || value == NULL) {
+        1:  511:		SetErr(IllegalArgument);
+        1:  512:		return -1;
+        -:  513:	}
+        -:  514:
+        -:  515:	// obtain the impl from the fat ptr
+    10804:  516:	RBTreeImpl *impl = $(ptr->impl);
+        -:  517:	// this pair is used to search
+        -:  518:	RBTreeNodePair pair;
+        -:  519:	// pointer for our node
+        -:  520:	RBTreeNode *node;
+        -:  521:
+        -:  522:	// perform search for the key
+    10804:  523:	rbtree_search(impl, key, &pair);
+        -:  524:
+        -:  525:	// retreive the data size
+    10804:  526:	u64 size = DATA_SIZE(impl);
+    10804:  527:	if (pair.self != NIL) {
+        1:  528:		node = $(pair.self->self);
+        1:  529:		memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
+        1:  530:		return 0;
+        -:  531:	}
+        -:  532:
+        -:  533:	FatPtr self;
+        -:  534:
+        -:  535:	// using fam_alloc allocate memory for this node
+        -:  536:	{
+    21606:  537:		SendStateGuard _ = SetSend(impl->send);
+    10803:  538:		if (fam_alloc(&self, size)) {
+        1:  539:			self = null;
+        1:  540:			return -1;
+        -:  541:		}
+        -:  542:	}
+        -:  543:
+        -:  544:	// using the allocated memory set node properties
+    10802:  545:	node = $(self);
+    10802:  546:	node->self = self;
+    10802:  547:	if (impl->root == NIL) {
+       14:  548:		impl->root = node;
+    10788:  549:	} else if (pair.is_right) {
+     5631:  550:		pair.parent->right = node;
+        -:  551:	} else {
+     5157:  552:		pair.parent->left = node;
+        -:  553:	}
+    10802:  554:	node->right = NIL;			// always must be set to NIL at first.
+    10802:  555:	node->left = NIL;			// always must be set to NIL at first.
+    10802:  556:	node->parent = pair.parent; // set our parent pointer.
+        -:  557:
+        -:  558:	// copy data
+    10802:  559:	memcpy(node->data, key, impl->key_size);
+        -:  560:	// copy value
+    10802:  561:	memcpy(node->data + VALUE_PAD(impl->key_size) + impl->key_size, value, impl->value_size);
+        -:  562:	// nodes are initially red
+    10802:  563:	INIT_FLAGS(impl, node);
+    10802:  564:	SET_RED(impl, node);
+        -:  565:
+        -:  566:#ifdef TEST
+    10802:  567:	node->node_id = node_id_counter++;
+        -:  568:#endif // TEST
+        -:  569:
+        -:  570:	// increment the size counter
+    10802:  571:	impl->size++;
+        -:  572:
+        -:  573:	// insert_fixup
+    10802:  574:	rbtree_put_fixup(impl, node);
+        -:  575:
+    10802:  576:	return 0;
+        -:  577:}
+        -:  578:
+        -:  579:// find the successor node
+     4417:  580:RBTreeNode *rbtree_find_successor(RBTreeImpl *impl, RBTreeNode *x) {
+     4417:  581:	RBTreeNode *successor = x->right;
+    11294:  582:	while (successor->left != NIL) {
+     6877:  583:		successor = successor->left;
+        -:  584:	}
+     4417:  585:	return successor;
+        -:  586:}
+        -:  587:
+        -:  588:// perform transplant operation
+    10687:  589:void rbtree_transplant(RBTreeImpl *impl, RBTreeNode *dst, RBTreeNode *src) {
+    10687:  590:	if (dst->parent == NIL)
+       41:  591:		impl->root = src;
+    10646:  592:	else if (dst == dst->parent->left)
+     6974:  593:		dst->parent->left = src;
+        -:  594:	else
+     3672:  595:		dst->parent->right = src;
+    10687:  596:	if (src != NIL) {
+     5965:  597:		src->parent = dst->parent;
+        -:  598:	}
+    10687:  599:}
+        -:  600:
+        -:  601:// set child's color to parent's
+     6305:  602:void set_color_based_on_parent(RBTreeImpl *impl, RBTreeNode *child, RBTreeNode *parent) {
+     6305:  603:	if (child != NIL) {
+     6305:  604:		if (IS_RED(impl, parent)) {
+     2655:  605:			SET_RED(impl, child);
+        -:  606:		} else {
+     3650:  607:			SET_BLACK(impl, child);
+        -:  608:		}
+        -:  609:	}
+     6305:  610:}
+        -:  611:
+        -:  612:// delete fixup
+     5282:  613:void rbtree_remove_fixup(RBTreeImpl *impl, RBTreeNode *parent, RBTreeNode *w, RBTreeNode *x) {
+     5282:  614:	int i = 0;
+     9840:  615:	while (x != impl->root && IS_BLACK(impl, x)) {
+     4558:  616:		if (w == parent->right) {
+        -:  617:			// Case 1: Sibling is red
+     2591:  618:			if (IS_RED(impl, w)) {
+      330:  619:				SET_BLACK(impl, w);
+      330:  620:				SET_RED(impl, parent);
+      330:  621:				rbtree_left_rotate(impl, parent);
+      330:  622:				w = parent->right;
+        -:  623:			}
+        -:  624:
+        -:  625:			// Case 2: Sibling's children are both black
+     2591:  626:			if (IS_BLACK(impl, w->left) && IS_BLACK(impl, w->right)) {
+     1447:  627:				SET_RED(impl, w);
+     1447:  628:				x = parent;
+     1447:  629:				parent = parent->parent;
+     1447:  630:				if (x == x->parent->left) {
+      902:  631:					w = x->parent->right;
+        -:  632:				} else {
+      545:  633:					w = x->parent->left;
+        -:  634:				}
+        -:  635:			} else {
+        -:  636:				// Case 3: Sibling's right child is black, left child is red
+     1144:  637:				if (IS_BLACK(impl, w->right)) {
+      462:  638:					SET_BLACK(impl, w->left);
+      462:  639:					SET_RED(impl, w);
+      462:  640:					rbtree_right_rotate(impl, w);
+      462:  641:					w = parent->right;
+        -:  642:				}
+        -:  643:
+        -:  644:				// Case 4: Sibling's right child is red
+     1144:  645:				set_color_based_on_parent(impl, w, parent);
+     1144:  646:				SET_BLACK(impl, parent);
+     1144:  647:				SET_BLACK(impl, w->right);
+     1144:  648:				rbtree_left_rotate(impl, parent);
+     1144:  649:				x = impl->root; // Set x to root at the end, only once
+        -:  650:			}
+        -:  651:		} else {
+        -:  652:			// Case 1: Sibling is red
+     1967:  653:			if (IS_RED(impl, w)) {
+      234:  654:				SET_BLACK(impl, w);
+      234:  655:				SET_RED(impl, parent);
+      234:  656:				rbtree_right_rotate(impl, parent);
+      234:  657:				w = parent->left;
+        -:  658:			}
+        -:  659:			// Case 2: Sibling's children are both black
+     1967:  660:			if (IS_BLACK(impl, w->right) && IS_BLACK(impl, w->left)) {
+     1223:  661:				SET_RED(impl, w);
+     1223:  662:				x = parent;
+     1223:  663:				parent = parent->parent;
+     1223:  664:				if (x == x->parent->left) {
+      512:  665:					w = x->parent->right;
+        -:  666:				} else {
+      711:  667:					w = x->parent->left;
+        -:  668:				}
+        -:  669:			} else {
+        -:  670:				// Case 3: Sibling's left child is black, right child is red
+      744:  671:				if (IS_BLACK(impl, w->left)) {
+      387:  672:					SET_BLACK(impl, w->right);
+      387:  673:					SET_RED(impl, w);
+      387:  674:					rbtree_left_rotate(impl, w);
+      387:  675:					w = parent->left;
+        -:  676:				}
+        -:  677:				// Case 4: Sibling's left child is red
+      744:  678:				set_color_based_on_parent(impl, w, parent);
+      744:  679:				SET_BLACK(impl, parent);
+      744:  680:				SET_BLACK(impl, w->left);
+      744:  681:				rbtree_right_rotate(impl, parent);
+      744:  682:				x = impl->root; // Set x to root at the end, only once
+        -:  683:			}
+        -:  684:		}
+        -:  685:	}
+        -:  686:
+        -:  687:	// Ensure x is black at the end of fixup
+     5282:  688:	SET_BLACK(impl, x);
+     5282:  689:}
+        -:  690:
+        -:  691:// delete function
+     7483:  692:int rbtree_remove(RBTree *ptr, const void *key) {
+        -:  693:	// validate input
+     7483:  694:	if (ptr == NULL || nil(ptr->impl) || key == NULL) {
+        1:  695:		SetErr(IllegalArgument);
+        1:  696:		return -1;
         -:  697:	}
         -:  698:
-        -:  699:	// Free the node which has been transplanted
-        -:  700:	{
-    14946:  701:		SendStateGuard _ = SetSend(impl->send);
-     7473:  702:		fam_free(&node_to_delete->self);
-        -:  703:	}
-        -:  704:
-     7473:  705:	impl->size--;
-        -:  706:
-     7473:  707:	return 0;
-        -:  708:}
+        -:  699:	// obtain impl from our opaque pointer
+     7482:  700:	RBTreeImpl *impl = $(ptr->impl);
+        -:  701:
+        -:  702:	// search for the node based on this key.
+        -:  703:	RBTreeNodePair pair;
+     7482:  704:	rbtree_search(impl, key, &pair);
+        -:  705:
+        -:  706:	// this node doesn't exist, return -1
+     7482:  707:	if (pair.self == NIL)
+        1:  708:		return -1;
         -:  709:
-        -:  710:// get operation
-     4155:  711:const void *rbtree_get(const RBTree *ptr, const void *key) {
-        -:  712:	// validate input
-     4155:  713:	if (ptr == NULL || key == NULL) {
-        1:  714:		SetErr(IllegalArgument);
-        1:  715:		return NULL;
-        -:  716:	}
-        -:  717:
-        -:  718:	// set impl
-     4154:  719:	RBTreeImpl *impl = $(ptr->impl);
-        -:  720:	RBTreeNodePair pair;
-        -:  721:
-        -:  722:	// search for the pair.
-     4154:  723:	rbtree_search(impl, key, &pair);
-        -:  724:
-        -:  725:	// if found return value, otherwise NULL.
-     4154:  726:	if (pair.self != NIL)
-     4153:  727:		return pair.self->data + impl->key_size + VALUE_PAD(impl->key_size);
-        -:  728:	else {
-        1:  729:		return NULL;
-        -:  730:	}
-        -:  731:}
-        -:  732:
-       22:  733:void *rbtree_get_mut(const RBTree *ptr, const void *key) {
-        -:  734:	// validate input
-       22:  735:	if (ptr == NULL || key == NULL) {
-    #####:  736:		SetErr(IllegalArgument);
-    #####:  737:		return NULL;
-        -:  738:	}
-        -:  739:
-        -:  740:	// set impl
-       22:  741:	RBTreeImpl *impl = $(ptr->impl);
-        -:  742:	RBTreeNodePair pair;
+        -:  710:	// node exists, initialize variables
+     7481:  711:	RBTreeNode *node_to_delete = pair.self;
+     7481:  712:	RBTreeNode *x = NIL;
+     7481:  713:	RBTreeNode *w = NIL;
+     7481:  714:	RBTreeNode *parent = NIL;
+        -:  715:
+        -:  716:	// only do fixups if the node_to_delete is black.
+     7481:  717:	bool do_fixup = IS_BLACK(impl, node_to_delete);
+        -:  718:
+     7481:  719:	if (node_to_delete->left == NIL) {
+        -:  720:		// set variables for fixup and transplant
+     2686:  721:		x = node_to_delete->right;
+     2686:  722:		rbtree_transplant(impl, node_to_delete, node_to_delete->right);
+     2686:  723:		if (node_to_delete->parent->left == NIL)
+     1350:  724:			w = node_to_delete->parent->right;
+        -:  725:		else
+     1336:  726:			w = node_to_delete->parent->left;
+     2686:  727:		if (x != NIL)
+      604:  728:			parent = x->parent;
+     2082:  729:		else if (w != NIL)
+     1595:  730:			parent = w->parent;
+     4795:  731:	} else if (node_to_delete->right == NIL) {
+        -:  732:		// set variables for fixup and transplant
+      378:  733:		x = node_to_delete->left;
+      378:  734:		rbtree_transplant(impl, node_to_delete, node_to_delete->left);
+      378:  735:		w = node_to_delete->parent->left;
+      378:  736:		parent = x->parent;
+        -:  737:	} else {
+        -:  738:		// two children case
+        -:  739:		// find successor
+     4417:  740:		RBTreeNode *successor = rbtree_find_successor(impl, node_to_delete);
+        -:  741:		// if it's black we need to do a fixup.
+     4417:  742:		do_fixup = IS_BLACK(impl, successor);
         -:  743:
-        -:  744:	// search for the pair.
-       22:  745:	rbtree_search(impl, key, &pair);
+     4417:  744:		x = successor->right;
+     4417:  745:		w = successor->parent->right;
         -:  746:
-        -:  747:	// if found return value, otherwise NULL.
-       22:  748:	if (pair.self != NIL)
-       22:  749:		return pair.self->data + impl->key_size + VALUE_PAD(impl->key_size);
-        -:  750:	else {
-    #####:  751:		return NULL;
-        -:  752:	}
-        -:  753:}
-        -:  754:
-        -:  755:// size in terms of number of nodes
-    14118:  756:i64 rbtree_size(const RBTree *ptr) {
-    14118:  757:	if (ptr == NULL) {
-        1:  758:		SetErr(IllegalArgument);
-        1:  759:		return -1;
-        -:  760:	}
-        -:  761:
-    14117:  762:	RBTreeImpl *impl = $(ptr->impl);
-    14117:  763:	return impl->size;
-        -:  764:}
-        -:  765:
-       34:  766:int rbtree_iterator_impl(RBTreeImpl *impl, RBTreeIterator *iter, const void *start_key,
-        -:  767:						 bool start_inclusive, const void *end_key, bool end_inclusive) {
-        -:  768:
-       34:  769:	RBTreeIteratorImpl *rbimpl = $(iter->impl);
-       34:  770:	rbimpl->impl = impl;
-       34:  771:	rbimpl->compare = impl->compare;
-       34:  772:	rbimpl->stack_pointer = 0;
-       34:  773:	rbimpl->send = impl->send;
-       34:  774:	rbimpl->key_size = impl->key_size;
-       34:  775:	rbimpl->cur = impl->root;
-       34:  776:	rbimpl->min = NIL;
-       34:  777:	rbimpl->max = NIL;
+     4417:  747:		if (w->parent == node_to_delete) {
+     1211:  748:			w = node_to_delete->left;
+     1211:  749:			parent = successor;
+        -:  750:		} else {
+     3206:  751:			parent = w->parent;
+        -:  752:		}
+        -:  753:
+        -:  754:		// if parent is not node_to_delete, do transplant and update children of successor
+     4417:  755:		if (successor->parent != node_to_delete) {
+     3206:  756:			rbtree_transplant(impl, successor, successor->right);
+     3206:  757:			successor->right = node_to_delete->right;
+     3206:  758:			successor->right->parent = successor;
+        -:  759:		}
+        -:  760:
+        -:  761:		// do final transpalnnnt and update including color match
+     4417:  762:		rbtree_transplant(impl, node_to_delete, successor);
+     4417:  763:		successor->left = node_to_delete->left;
+     4417:  764:		successor->left->parent = successor;
+     4417:  765:		set_color_based_on_parent(impl, successor, node_to_delete);
+        -:  766:	}
+        -:  767:
+        -:  768:	// if do_fixup, do fixup.
+     7481:  769:	if (do_fixup) {
+     5296:  770:		if (w != NIL && parent != NIL) {
+     5282:  771:			rbtree_remove_fixup(impl, parent, w, x);
+        -:  772:		} else {
+        -:  773:			// in these cases SET_BLACK only
+       14:  774:			if (impl->size > 1)
+        5:  775:				SET_BLACK(impl, impl->root);
+        -:  776:		}
+        -:  777:	}
         -:  778:
-       34:  779:	if (start_key != NULL) {
-       16:  780:		RBTreeNode *itt = impl->root;
-       57:  781:		while (itt != NIL) {
-       41:  782:			int v = impl->compare(itt->data, start_key);
-       41:  783:			if (v == 0) {
-        -:  784:				// exact match
-    #####:  785:				if (start_inclusive) {
-    #####:  786:					rbimpl->min = itt;
-    #####:  787:					break;
-        -:  788:				}
-       41:  789:			} else if (v < 0) {
-        -:  790:				// continue down the chain to look for more
-       17:  791:				itt = itt->right;
-        -:  792:			} else {
-        -:  793:				// higher value found update min
-       24:  794:				rbimpl->min = itt;
-       24:  795:				itt = itt->left;
-        -:  796:			}
-        -:  797:		}
-        -:  798:	}
-        -:  799:
-       34:  800:	if (end_key != NULL) {
-       16:  801:		RBTreeNode *itt = impl->root;
-       53:  802:		while (itt != NIL) {
-       37:  803:			int v = impl->compare(itt->data, end_key);
-       37:  804:			if (v == 0) {
-        -:  805:				// exact match
-    #####:  806:				if (end_inclusive) {
-    #####:  807:					rbimpl->max = itt;
-    #####:  808:					break;
-        -:  809:				}
-       37:  810:			} else if (v < 0) {
-        -:  811:				// lower value found update max
-       26:  812:				rbimpl->max = itt;
-       26:  813:				itt = itt->right;
-        -:  814:			} else {
-        -:  815:				// continue down the chain to look for more
-       11:  816:				itt = itt->left;
-        -:  817:			}
-        -:  818:		}
-        -:  819:	}
-        -:  820:
-       34:  821:	return 0;
-        -:  822:}
+        -:  779:	// Free the node which has been transplanted
+        -:  780:	{
+    14962:  781:		SendStateGuard _ = SetSend(impl->send);
+     7481:  782:		fam_free(&node_to_delete->self);
+        -:  783:	}
+        -:  784:
+     7481:  785:	impl->size--;
+        -:  786:
+     7481:  787:	return 0;
+        -:  788:}
+        -:  789:
+        -:  790:// get operation
+     4175:  791:const void *rbtree_get(const RBTree *ptr, const void *key) {
+        -:  792:	// validate input
+     4175:  793:	if (ptr == NULL || key == NULL) {
+        1:  794:		SetErr(IllegalArgument);
+        1:  795:		return NULL;
+        -:  796:	}
+        -:  797:
+        -:  798:	// set impl
+     4174:  799:	RBTreeImpl *impl = $(ptr->impl);
+        -:  800:	RBTreeNodePair pair;
+        -:  801:
+        -:  802:	// search for the pair.
+     4174:  803:	rbtree_search(impl, key, &pair);
+        -:  804:
+        -:  805:	// if found return value, otherwise NULL.
+     4174:  806:	if (pair.self != NIL)
+     4170:  807:		return pair.self->data + impl->key_size + VALUE_PAD(impl->key_size);
+        -:  808:	else {
+        4:  809:		return NULL;
+        -:  810:	}
+        -:  811:}
+        -:  812:
+       30:  813:void *rbtree_get_mut(const RBTree *ptr, const void *key) {
+        -:  814:	// validate input
+       30:  815:	if (ptr == NULL || key == NULL) {
+    #####:  816:		SetErr(IllegalArgument);
+    #####:  817:		return NULL;
+        -:  818:	}
+        -:  819:
+        -:  820:	// set impl
+       30:  821:	RBTreeImpl *impl = $(ptr->impl);
+        -:  822:	RBTreeNodePair pair;
         -:  823:
-        -:  824:// reset the iterator (for reuse)
-       23:  825:int rbtree_iterator_reset(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
-        -:  826:						  bool start_inclusive, const void *end_key, bool end_inclusive) {
-       23:  827:	if (iter == NULL) {
-    #####:  828:		SetErr(IllegalArgument);
-    #####:  829:		return -1;
-        -:  830:	}
-        -:  831:
-       23:  832:	RBTreeImpl *impl = $(ptr->impl);
-       23:  833:	return rbtree_iterator_impl(impl, iter, start_key, start_inclusive, end_key, end_inclusive);
-        -:  834:}
-        -:  835:
-        -:  836:// return iterator object
-       12:  837:int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
-        -:  838:					bool start_inclusive, const void *end_key, bool end_inclusive) {
-       12:  839:	if (ptr == NULL || nil(ptr->impl)) {
-        1:  840:		SetErr(IllegalArgument);
-        1:  841:		return -1;
-        -:  842:	}
-        -:  843:
-       11:  844:	RBTreeImpl *impl = $(ptr->impl);
+        -:  824:	// search for the pair.
+       30:  825:	rbtree_search(impl, key, &pair);
+        -:  826:
+        -:  827:	// if found return value, otherwise NULL.
+       30:  828:	if (pair.self != NIL)
+       30:  829:		return pair.self->data + impl->key_size + VALUE_PAD(impl->key_size);
+        -:  830:	else {
+    #####:  831:		return NULL;
+        -:  832:	}
+        -:  833:}
+        -:  834:
+        -:  835:// size in terms of number of nodes
+    14115:  836:i64 rbtree_size(const RBTree *ptr) {
+    14115:  837:	if (ptr == NULL) {
+        1:  838:		SetErr(IllegalArgument);
+        1:  839:		return -1;
+        -:  840:	}
+        -:  841:
+    14114:  842:	RBTreeImpl *impl = $(ptr->impl);
+    14114:  843:	return impl->size;
+        -:  844:}
         -:  845:
-        -:  846:	{
-       22:  847:		SendStateGuard _ = SetSend(impl->send);
-       11:  848:		if (fam_alloc(&iter->impl, sizeof(RBTreeIteratorImpl))) {
-    #####:  849:			iter->impl = null;
-    #####:  850:			return -1;
-        -:  851:		}
-        -:  852:	}
-       11:  853:	return rbtree_iterator_impl(impl, iter, start_key, start_inclusive, end_key, end_inclusive);
-        -:  854:}
-        -:  855:
-        -:  856:#ifdef TEST
- 67310004:  857:void rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_count,
-        -:  858:						  int current_black_count, u64 ids[100]) {
- 67310004:  859:	ids[current_black_count] = node->node_id;
- 67310004:  860:	RBTreeImpl *impl = $(ptr->impl);
- 67310004:  861:	u64 key_size = impl->key_size;
- 67310004:  862:	u64 value_size = impl->value_size;
-        -:  863:
-        -:  864:	// Base case: when we reach a NIL
- 67310004:  865:	if (node == NIL) {
-        -:  866:		// If this is the first NIL node reached, set the black count
- 33664116:  867:		if (*black_count == 0) {
-    18228:  868:			*black_count = current_black_count; // Set the black count for the first path
-        -:  869:		} else {
-        -:  870:			// Check for black count consistency
-33645888*:  871:			assert(current_black_count == *black_count);
-        -:  872:		}
- 33664116:  873:		return; // Return for NIL nodes
-        -:  874:	}
-        -:  875:
-        -:  876:	// Increment black count if the current node is black
- 33645888:  877:	if (IS_BLACK(impl, node)) {
- 19129797:  878:		current_black_count++;
-        -:  879:	} else {
-        -:  880:		//   Check if the node is red
-        -:  881:		//   If the parent is red, return false (Red property violation)
-14516091*:  882:		assert(!(node->parent != NIL && IS_RED(impl, node->parent)));
-        -:  883:	}
-        -:  884:
-        -:  885:	// Recursive calls for left and right children
- 33645888:  886:	rbtree_validate_node(ptr, node->left, black_count, current_black_count, ids);
- 33645888:  887:	rbtree_validate_node(ptr, node->right, black_count, current_black_count, ids);
-        -:  888:}
-        -:  889:
-    18232:  890:void rbtree_validate(const RBTree *ptr) {
-    18232:  891:	RBTreeImpl *impl = $(ptr->impl);
-    18232:  892:	int black_count = 0;
-        -:  893:	u64 ids[100];
-        -:  894:	// Validate from the root and check if the root is black
-    18232:  895:	if (impl->root != NIL) {
-   18228*:  896:		assert(IS_BLACK(impl, impl->root));
-    18228:  897:		rbtree_validate_node(ptr, impl->root, &black_count, 0, ids);
-        -:  898:	}
-    18232:  899:}
+       40:  846:int rbtree_iterator_impl(RBTreeImpl *impl, RBTreeIterator *iter, const void *start_key,
+        -:  847:						 bool start_inclusive, const void *end_key, bool end_inclusive) {
+        -:  848:
+       40:  849:	RBTreeIteratorImpl *rbimpl = $(iter->impl);
+       40:  850:	rbimpl->impl = impl;
+       40:  851:	rbimpl->compare = impl->compare;
+       40:  852:	rbimpl->stack_pointer = 0;
+       40:  853:	rbimpl->send = impl->send;
+       40:  854:	rbimpl->key_size = impl->key_size;
+       40:  855:	rbimpl->cur = impl->root;
+       40:  856:	rbimpl->min = NIL;
+       40:  857:	rbimpl->max = NIL;
+        -:  858:
+       40:  859:	if (start_key != NULL) {
+       28:  860:		RBTreeNode *itt = impl->root;
+      106:  861:		while (itt != NIL) {
+       78:  862:			int v = impl->compare(itt->data, start_key);
+       78:  863:			if (v == 0) {
+        -:  864:				// exact match
+    #####:  865:				if (start_inclusive) {
+    #####:  866:					rbimpl->min = itt;
+    #####:  867:					break;
+        -:  868:				}
+       78:  869:			} else if (v < 0) {
+        -:  870:				// continue down the chain to look for more
+       42:  871:				itt = itt->right;
+        -:  872:			} else {
+        -:  873:				// higher value found update min
+       36:  874:				rbimpl->min = itt;
+       36:  875:				itt = itt->left;
+        -:  876:			}
+        -:  877:		}
+        -:  878:	}
+        -:  879:
+       40:  880:	if (end_key != NULL) {
+       28:  881:		RBTreeNode *itt = impl->root;
+      105:  882:		while (itt != NIL) {
+       77:  883:			int v = impl->compare(itt->data, end_key);
+       77:  884:			if (v == 0) {
+        -:  885:				// exact match
+    #####:  886:				if (end_inclusive) {
+    #####:  887:					rbimpl->max = itt;
+    #####:  888:					break;
+        -:  889:				}
+       77:  890:			} else if (v < 0) {
+        -:  891:				// lower value found update max
+       56:  892:				rbimpl->max = itt;
+       56:  893:				itt = itt->right;
+        -:  894:			} else {
+        -:  895:				// continue down the chain to look for more
+       21:  896:				itt = itt->left;
+        -:  897:			}
+        -:  898:		}
+        -:  899:	}
         -:  900:
- 25263318:  901:void rbtree_node_depth(RBTreeImpl *impl, RBTreeNode *node, u64 *max_depth, u64 cur_depth) {
- 25263318:  902:	if (cur_depth > *max_depth)
-   185476:  903:		*max_depth = cur_depth;
- 25263318:  904:	if (node->right != NIL)
- 12833391:  905:		rbtree_node_depth(impl, node->right, max_depth, cur_depth + 1);
- 25263318:  906:	if (node->left != NIL)
- 12415810:  907:		rbtree_node_depth(impl, node->left, max_depth, cur_depth + 1);
- 25263318:  908:}
-        -:  909:
-    14117:  910:u64 rbtree_max_depth(const RBTree *ptr) {
-    14117:  911:	RBTreeImpl *impl = $(ptr->impl);
-    14117:  912:	u64 max_depth = 0;
-    14117:  913:	rbtree_node_depth(impl, impl->root, &max_depth, 1);
-    14117:  914:	return max_depth;
-        -:  915:}
-        -:  916:
-        -:  917:// Function to print a single node with its color
-        5:  918:void rbtree_print_node(const RBTree *ptr, const RBTreeNode *node, int depth) {
-        5:  919:	RBTreeImpl *impl = $(ptr->impl);
-        5:  920:	if (node == NIL) {
-        8:  921:		for (int i = 0; i < depth; i++) {
-        5:  922:			printf("    ");
-        -:  923:		}
-       3*:  924:		printf("%llu (%s)\n", node->node_id, (IS_BLACK(impl, node)) ? "B" : "R");
-        3:  925:		return;
-        -:  926:	}
-        -:  927:
-        -:  928:	// Print the right child first (for visual representation)
-        2:  929:	rbtree_print_node(ptr, node->right, depth + 1);
-        -:  930:
-        -:  931:	// Indent according to depth
-        3:  932:	for (int i = 0; i < depth; i++) {
-        1:  933:		printf("    ");
-        -:  934:	}
+       40:  901:	return 0;
+        -:  902:}
+        -:  903:
+        -:  904:// reset the iterator (for reuse)
+       32:  905:int rbtree_iterator_reset(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
+        -:  906:						  bool start_inclusive, const void *end_key, bool end_inclusive) {
+       32:  907:	if (iter == NULL) {
+    #####:  908:		SetErr(IllegalArgument);
+    #####:  909:		return -1;
+        -:  910:	}
+        -:  911:
+       32:  912:	RBTreeImpl *impl = $(ptr->impl);
+       32:  913:	return rbtree_iterator_impl(impl, iter, start_key, start_inclusive, end_key, end_inclusive);
+        -:  914:}
+        -:  915:
+        -:  916:// return iterator object
+        9:  917:int rbtree_iterator(const RBTree *ptr, RBTreeIterator *iter, const void *start_key,
+        -:  918:					bool start_inclusive, const void *end_key, bool end_inclusive) {
+        9:  919:	if (ptr == NULL || nil(ptr->impl)) {
+        1:  920:		SetErr(IllegalArgument);
+        1:  921:		return -1;
+        -:  922:	}
+        -:  923:
+        8:  924:	RBTreeImpl *impl = $(ptr->impl);
+        -:  925:
+        -:  926:	{
+       16:  927:		SendStateGuard _ = SetSend(impl->send);
+        8:  928:		if (fam_alloc(&iter->impl, sizeof(RBTreeIteratorImpl))) {
+    #####:  929:			iter->impl = null;
+    #####:  930:			return -1;
+        -:  931:		}
+        -:  932:	}
+        8:  933:	return rbtree_iterator_impl(impl, iter, start_key, start_inclusive, end_key, end_inclusive);
+        -:  934:}
         -:  935:
-        -:  936:	// Print the current node with a clearer representation
-        2:  937:	printf("%llu (%s)\n", node->node_id, (IS_BLACK(impl, node)) ? "B" : "R");
-        -:  938:
-        -:  939:	// Print the left child
-        2:  940:	rbtree_print_node(ptr, node->left, depth + 1);
-        -:  941:}
-        -:  942:
-        -:  943:// Function to print the entire tree
-        1:  944:void rbtree_print(const RBTree *ptr) {
-        1:  945:	RBTreeImpl *impl = $(ptr->impl);
-        -:  946:
-        1:  947:	printf("Red-Black Tree (root = %llu)\n", impl->root->node_id);
-        1:  948:	printf("===================================\n"); // Separator for better clarity
-        1:  949:	rbtree_print_node(ptr, impl->root, 0);
-        1:  950:	printf("===================================\n"); // Separator for better clarity
-        1:  951:}
-        -:  952:
-        -:  953:#endif // TEST
+        -:  936:#ifdef TEST
+ 67310004:  937:void rbtree_validate_node(const RBTree *ptr, const RBTreeNode *node, int *black_count,
+        -:  938:						  int current_black_count, u64 ids[100]) {
+ 67310004:  939:	ids[current_black_count] = node->node_id;
+ 67310004:  940:	RBTreeImpl *impl = $(ptr->impl);
+ 67310004:  941:	u64 key_size = impl->key_size;
+ 67310004:  942:	u64 value_size = impl->value_size;
+        -:  943:
+        -:  944:	// Base case: when we reach a NIL
+ 67310004:  945:	if (node == NIL) {
+        -:  946:		// If this is the first NIL node reached, set the black count
+ 33664116:  947:		if (*black_count == 0) {
+    18228:  948:			*black_count = current_black_count; // Set the black count for the first path
+        -:  949:		} else {
+        -:  950:			// Check for black count consistency
+33645888*:  951:			assert(current_black_count == *black_count);
+        -:  952:		}
+ 33664116:  953:		return; // Return for NIL nodes
+        -:  954:	}
+        -:  955:
+        -:  956:	// Increment black count if the current node is black
+ 33645888:  957:	if (IS_BLACK(impl, node)) {
+ 19129797:  958:		current_black_count++;
+        -:  959:	} else {
+        -:  960:		//   Check if the node is red
+        -:  961:		//   If the parent is red, return false (Red property violation)
+14516091*:  962:		assert(!(node->parent != NIL && IS_RED(impl, node->parent)));
+        -:  963:	}
+        -:  964:
+        -:  965:	// Recursive calls for left and right children
+ 33645888:  966:	rbtree_validate_node(ptr, node->left, black_count, current_black_count, ids);
+ 33645888:  967:	rbtree_validate_node(ptr, node->right, black_count, current_black_count, ids);
+        -:  968:}
+        -:  969:
+    18232:  970:void rbtree_validate(const RBTree *ptr) {
+    18232:  971:	RBTreeImpl *impl = $(ptr->impl);
+    18232:  972:	int black_count = 0;
+        -:  973:	u64 ids[100];
+        -:  974:	// Validate from the root and check if the root is black
+    18232:  975:	if (impl->root != NIL) {
+   18228*:  976:		assert(IS_BLACK(impl, impl->root));
+    18228:  977:		rbtree_validate_node(ptr, impl->root, &black_count, 0, ids);
+        -:  978:	}
+    18232:  979:}
+        -:  980:
+ 25263318:  981:void rbtree_node_depth(RBTreeImpl *impl, RBTreeNode *node, u64 *max_depth, u64 cur_depth) {
+ 25263318:  982:	if (cur_depth > *max_depth)
+   185476:  983:		*max_depth = cur_depth;
+ 25263318:  984:	if (node->right != NIL)
+ 12833391:  985:		rbtree_node_depth(impl, node->right, max_depth, cur_depth + 1);
+ 25263318:  986:	if (node->left != NIL)
+ 12415810:  987:		rbtree_node_depth(impl, node->left, max_depth, cur_depth + 1);
+ 25263318:  988:}
+        -:  989:
+    14117:  990:u64 rbtree_max_depth(const RBTree *ptr) {
+    14117:  991:	RBTreeImpl *impl = $(ptr->impl);
+    14117:  992:	u64 max_depth = 0;
+    14117:  993:	rbtree_node_depth(impl, impl->root, &max_depth, 1);
+    14117:  994:	return max_depth;
+        -:  995:}
+        -:  996:
+        -:  997:// Function to print a single node with its color
+        5:  998:void rbtree_print_node(const RBTree *ptr, const RBTreeNode *node, int depth) {
+        5:  999:	RBTreeImpl *impl = $(ptr->impl);
+        5: 1000:	if (node == NIL) {
+        8: 1001:		for (int i = 0; i < depth; i++) {
+        5: 1002:			printf("    ");
+        -: 1003:		}
+       3*: 1004:		printf("%llu (%s)\n", node->node_id, (IS_BLACK(impl, node)) ? "B" : "R");
+        3: 1005:		return;
+        -: 1006:	}
+        -: 1007:
+        -: 1008:	// Print the right child first (for visual representation)
+        2: 1009:	rbtree_print_node(ptr, node->right, depth + 1);
+        -: 1010:
+        -: 1011:	// Indent according to depth
+        3: 1012:	for (int i = 0; i < depth; i++) {
+        1: 1013:		printf("    ");
+        -: 1014:	}
+        -: 1015:
+        -: 1016:	// Print the current node with a clearer representation
+        2: 1017:	printf("%llu (%s)\n", node->node_id, (IS_BLACK(impl, node)) ? "B" : "R");
+        -: 1018:
+        -: 1019:	// Print the left child
+        2: 1020:	rbtree_print_node(ptr, node->left, depth + 1);
+        -: 1021:}
+        -: 1022:
+        -: 1023:// Function to print the entire tree
+        1: 1024:void rbtree_print(const RBTree *ptr) {
+        1: 1025:	RBTreeImpl *impl = $(ptr->impl);
+        -: 1026:
+        1: 1027:	printf("Red-Black Tree (root = %llu)\n", impl->root->node_id);
+        1: 1028:	printf("===================================\n"); // Separator for better clarity
+        1: 1029:	rbtree_print_node(ptr, impl->root, 0);
+        1: 1030:	printf("===================================\n"); // Separator for better clarity
+        1: 1031:}
+        -: 1032:
+        -: 1033:#endif // TEST
         -:    0:Source:rc.c
         -:    0:Graph:rc.gcno
         -:    0:Data:rc.gcda
-        -:    0:Runs:16
+        -:    0:Runs:17
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -4833,13 +5011,13 @@
         -:   36:	u64 size;				 // size of data
         -:   37:} RcMeta;
         -:   38:
-       16:   39:void __attribute__((constructor)) __check_atomic_size__() {
+       17:   39:void __attribute__((constructor)) __check_atomic_size__() {
         -:   40:	if (sizeof(RcMetaAtomic) != sizeof(RcMeta)) {
         -:   41:		fprintf(stderr, "Error: sizes of RcMetaAtomic and RcMeta are not equal on this platform. "
         -:   42:						"Cannnot continue\n");
         -:   43:		exit(EXIT_FAILURE);
         -:   44:	}
-       16:   45:}
+       17:   45:}
         -:   46:
         -:   47:typedef struct RcImpl {
         -:   48:	RcMeta meta; // meta data for this Rc
@@ -4847,14 +5025,14 @@
         -:   50:} RcImpl;
         -:   51:
         -:   52:// cleanup function automatically called when the Rc goes out of scope
-       38:   53:void rc_cleanup(RcNc *ptr) {
-       38:   54:	if (nil(ptr->impl))
+       57:   53:void rc_cleanup(RcNc *ptr) {
+       57:   54:	if (nil(ptr->impl))
         1:   55:		return;
-       37:   56:	RcImpl *impl = $(ptr->impl);
+       56:   56:	RcImpl *impl = $(ptr->impl);
         -:   57:
         -:   58:	u32 strong_count, weak_count;
         -:   59:
-       37:   60:	if (impl->meta.atomic) {
+       56:   60:	if (impl->meta.atomic) {
         5:   61:		RcMetaAtomic *atomic = ((RcMetaAtomic *)&impl->meta);
         -:   62:
         -:   63:		// Decrement strong count
@@ -4863,23 +5041,23 @@
         5:   66:		strong_count = (u32)(combined_counts & 0xFFFFFFFFULL);
         5:   67:		strong_count--;
         -:   68:	} else {
-       32:   69:		strong_count = --impl->meta.strong_count;
-       32:   70:		weak_count = impl->meta.weak_count;
+       51:   69:		strong_count = --impl->meta.strong_count;
+       51:   70:		weak_count = impl->meta.weak_count;
         -:   71:	}
         -:   72:
         -:   73:	// if strong count is 0, do cleanup tasks
-       37:   74:	if (strong_count == 0) {
+       56:   74:	if (strong_count == 0) {
         -:   75:		// first get chain guard
-       44:   76:		SendStateGuard _ = SetSend(impl->meta.atomic);
+       62:   76:		SendStateGuard _ = SetSend(impl->meta.atomic);
         -:   77:		// call user defined cleanup function
-       22:   78:		impl->meta.cleanup(impl->data);
+       31:   78:		impl->meta.cleanup(impl->data);
         -:   79:
         -:   80:		// if there's no weak references left, also free pointer
-       22:   81:		if (weak_count == 0) {
-       20:   82:			fam_free(&ptr->impl);
+       31:   81:		if (weak_count == 0) {
+       29:   82:			fam_free(&ptr->impl);
         -:   83:		}
         -:   84:	}
-       37:   85:	ptr->impl = null;
+       56:   85:	ptr->impl = null;
         -:   86:}
         -:   87:
         -:   88:// cleanup function for the weak ref
@@ -4912,65 +5090,65 @@
         -:  115:}
         -:  116:
         -:  117:// build an rc
-       22:  118:int rc_build(Rc *ptr, void *data, u64 size, bool atomic, void (*cleanup)(void *)) {
-       22:  119:	if (ptr == NULL || size == 0) {
+       31:  118:int rc_build(Rc *ptr, void *data, u64 size, bool atomic, void (*cleanup)(void *)) {
+       31:  119:	if (ptr == NULL || size == 0) {
     #####:  120:		SetErr(IllegalArgument);
     #####:  121:		return -1;
         -:  122:	}
         -:  123:
         -:  124:	{
         -:  125:		// allocate for both meta data and user data
-       44:  126:		SendStateGuard _ = SetSend(atomic);
-       22:  127:		if (fam_alloc(&ptr->impl, size + sizeof(RcMeta))) {
+       62:  126:		SendStateGuard _ = SetSend(atomic);
+       31:  127:		if (fam_alloc(&ptr->impl, size + sizeof(RcMeta))) {
     #####:  128:			SetErr(AllocErr);
     #####:  129:			return -1;
         -:  130:		}
         -:  131:	}
         -:  132:
         -:  133:	// set initial values
-       22:  134:	RcImpl *impl = $(ptr->impl);
-       22:  135:	impl->meta.atomic = atomic;
+       31:  134:	RcImpl *impl = $(ptr->impl);
+       31:  135:	impl->meta.atomic = atomic;
         -:  136:
-       22:  137:	if (atomic) {
+       31:  137:	if (atomic) {
         2:  138:		RcMetaAtomic *atomic = ((RcMetaAtomic *)&impl->meta);
         2:  139:		atomic_store(&atomic->counts, 1ULL);
         -:  140:	} else {
-       20:  141:		impl->meta.weak_count = 0;
-       20:  142:		impl->meta.strong_count = 1;
+       29:  141:		impl->meta.weak_count = 0;
+       29:  142:		impl->meta.strong_count = 1;
         -:  143:	}
-       22:  144:	impl->meta.cleanup = cleanup;
-       22:  145:	impl->meta.size = size;
+       31:  144:	impl->meta.cleanup = cleanup;
+       31:  145:	impl->meta.size = size;
         -:  146:
         -:  147:	// copy data
-       22:  148:	memcpy(impl->data, data, size);
+       31:  148:	memcpy(impl->data, data, size);
         -:  149:
-       22:  150:	return 0;
+       31:  150:	return 0;
         -:  151:}
         -:  152:
         -:  153:// clone the reference counter incrementing the count
-       13:  154:int rc_clone(Rc *dst, const Rc *src) {
-       13:  155:	if (dst == NULL || src == NULL) {
+       23:  154:int rc_clone(Rc *dst, const Rc *src) {
+       23:  155:	if (dst == NULL || src == NULL) {
     #####:  156:		SetErr(IllegalArgument);
     #####:  157:		return -1;
         -:  158:	}
         -:  159:
-       13:  160:	RcImpl *impl = $(src->impl);
-       13:  161:	if (impl->meta.atomic) {
+       23:  160:	RcImpl *impl = $(src->impl);
+       23:  161:	if (impl->meta.atomic) {
         2:  162:		RcMetaAtomic *atomic = ((RcMetaAtomic *)&impl->meta);
         2:  163:		atomic_fetch_add(&atomic->counts, 1ULL);
         -:  164:	} else {
-       11:  165:		impl->meta.strong_count++;
+       21:  165:		impl->meta.strong_count++;
         -:  166:	}
-       13:  167:	dst->impl = src->impl;
+       23:  167:	dst->impl = src->impl;
         -:  168:
-       13:  169:	return 0;
+       23:  169:	return 0;
         -:  170:}
         -:  171:
-      117:  172:void *rc_access(Rc *ptr) {
-      117:  173:	if (ptr == NULL)
+      202:  172:void *rc_access(Rc *ptr) {
+      202:  173:	if (ptr == NULL)
     #####:  174:		return NULL;
-      117:  175:	RcImpl *impl = $(ptr->impl);
-      117:  176:	return impl->data;
+      202:  175:	RcImpl *impl = $(ptr->impl);
+      202:  176:	return impl->data;
         -:  177:}
         -:  178:
         4:  179:int rc_weak(Weak *dst, const Rc *src) {
