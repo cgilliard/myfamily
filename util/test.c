@@ -18,6 +18,7 @@
 #include <math.h>
 #include <string.h>
 #include <util/object.h>
+#include <util/orbtree.h>
 #include <util/rbtree.h>
 #include <util/test.h>
 
@@ -772,6 +773,68 @@ MyTest(util, test_remove_property) {
 			debug("x={}", x);
 		}
 	*/
+}
+
+typedef struct OrbTreeData {
+	u64 key;
+	u64 value;
+} OrbTreeData;
+
+int compare_orbs(const void *k1, const void *k2) {
+	const OrbTreeData *k1o = k1;
+	const OrbTreeData *k2o = k2;
+	if (k1o->key < k2o->key)
+		return -1;
+	else if (k1o->key > k2o->key)
+		return 1;
+	return 0;
+}
+
+MyTest(util, test_orbtree) {
+	ORBTree tree1;
+	orbtree_create(&tree1, sizeof(OrbTreeData), compare_orbs);
+	ORBTreeTray tray;
+	for (int i = 0; i < 1500; i++)
+		orbtree_allocate_tray(&tree1, &tray);
+
+	orbtree_allocate_tray(&tree1, &tray);
+
+	orbtree_deallocate_tray(&tree1, &tray);
+	tray.id = 1300;
+	orbtree_deallocate_tray(&tree1, &tray);
+
+	tray.id = 0;
+	orbtree_allocate_tray(&tree1, &tray);
+	cr_assert_eq(tray.id, 1300);
+	orbtree_allocate_tray(&tree1, &tray);
+	cr_assert_eq(tray.id, 1500);
+	orbtree_allocate_tray(&tree1, &tray);
+	cr_assert_eq(tray.id, 1501);
+
+	tray.id = 1200;
+	orbtree_deallocate_tray(&tree1, &tray);
+	tray.id = 1204;
+	orbtree_deallocate_tray(&tree1, &tray);
+	tray.id = 1208;
+	orbtree_deallocate_tray(&tree1, &tray);
+	tray.id = 16;
+	orbtree_deallocate_tray(&tree1, &tray);
+
+	tray.id = 0;
+	orbtree_allocate_tray(&tree1, &tray);
+	cr_assert_eq(tray.id, 16);
+
+	orbtree_allocate_tray(&tree1, &tray);
+	cr_assert_eq(tray.id, 1208);
+
+	orbtree_allocate_tray(&tree1, &tray);
+	cr_assert_eq(tray.id, 1204);
+
+	orbtree_allocate_tray(&tree1, &tray);
+	cr_assert_eq(tray.id, 1200);
+
+	orbtree_allocate_tray(&tree1, &tray);
+	cr_assert_eq(tray.id, 1502);
 }
 
 /*
