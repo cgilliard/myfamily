@@ -606,6 +606,19 @@ int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
 		x = orbtree_node(impl, x_id);
 		w = orbtree_node(impl, w_id);
 
+		if (w == NULL) {
+			parent_id = NIL;
+			parent = NULL;
+		} else if (w->parent == pair.self) {
+			w_id = node_to_delete->left;
+			w = orbtree_node(impl, w_id);
+			parent_id = successor_id;
+			parent = successor;
+		} else {
+			parent_id = w->parent;
+			parent = orbtree_node(impl, w_id);
+		}
+
 		if (successor->parent != pair.self) {
 			orbtree_transplant(impl, successor_id, successor->right);
 			successor->right = node_to_delete->right;
