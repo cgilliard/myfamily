@@ -784,6 +784,8 @@ int compare_orbs(const void *k1, const void *k2) {
 	const OrbTreeData *k1o = k1;
 	const OrbTreeData *k2o = k2;
 
+	// printf("k1=%llu,k2=%llu\n", k1o->key, k2o->key);
+
 	if (k1o->key < k2o->key)
 		return -1;
 	else if (k1o->key > k2o->key)
@@ -892,18 +894,26 @@ MyTest(util, test_orbtree) {
 
 MyTest(util, test_orbtree_loop) {
 
+	// seed rng for reproducibility
+	u8 key[32] = {7};
+	u8 iv[16] = {};
+	psrng_test_seed(iv, key);
+
 	ORBTree tree1;
 	orbtree_create(&tree1, sizeof(OrbTreeData), compare_orbs);
 	int size = 10;
 	ORBTreeTray tray;
 	ORBTreeTray ret;
 	OrbTreeData *otd;
+	u64 arr[size];
 
 	for (int i = 0; i < size; i++) {
 		cr_assert(!orbtree_allocate_tray(&tree1, &tray));
 		otd = tray.value;
-		otd->key = size - i;
-		otd->value = otd->key * 3 + 7;
+		arr[i] = 0;
+		psrng_rand_u64(&arr[i]);
+		otd->key = arr[i];
+		otd->value = otd->key + 7;
 		cr_assert(!orbtree_put(&tree1, &tray, &ret));
 		// orbtree_print(&tree1);
 		orbtree_validate(&tree1);
@@ -911,36 +921,35 @@ MyTest(util, test_orbtree_loop) {
 
 	OrbTreeData search;
 	for (int i = 0; i < size; i++) {
-		search.key = size - i;
+		search.key = arr[i];
 		ret.updated = false;
 		cr_assert(!orbtree_get(&tree1, &search, &ret));
 		cr_assert(ret.updated);
 		otd = ret.value;
-		cr_assert_eq(otd->key, (size - i));
-		cr_assert_eq(otd->value, (size - i) * 3 + 7);
+		cr_assert_eq(otd->key, arr[i]);
+		cr_assert_eq(otd->value, arr[i] + 7);
 	}
-
 	cr_assert_eq(orbtree_size(&tree1), size);
 	orbtree_validate(&tree1);
 
-	/*
-		for (int i = 0; i < size; i++) {
-			printf("delete validation %i\n", i);
-			orbtree_print(&tree1);
-			search.key = size - i;
-			ret.updated = false;
-			cr_assert(!orbtree_remove(&tree1, &search, &ret));
-			orbtree_deallocate_tray(&tree1, &ret);
-			cr_assert(orbtree_remove(&tree1, &search, &ret));
-			printf("post delete\n");
-			orbtree_print(&tree1);
-			// orbtree_validate(&tree1);
-		}
-		search.key = UINT64_MAX;
+	printf("insert validation complete\n");
+	for (int i = 0; i < size; i++) {
+		printf("delete validation %i\n", i);
+		orbtree_print(&tree1);
+		search.key = arr[i];
+		ret.updated = false;
+		cr_assert(!orbtree_remove(&tree1, &search, &ret));
+		orbtree_deallocate_tray(&tree1, &ret);
 		cr_assert(orbtree_remove(&tree1, &search, &ret));
+		printf("post delete\n");
+		orbtree_print(&tree1);
+		// orbtree_validate(&tree1);
+		// printf("Validate success!\n");
+	}
+	search.key = UINT64_MAX;
+	cr_assert(orbtree_remove(&tree1, &search, &ret));
 
-		cr_assert_eq(orbtree_size(&tree1), 0);
-	*/
+	cr_assert_eq(orbtree_size(&tree1), 0);
 }
 
 /*
