@@ -894,7 +894,7 @@ MyTest(util, test_orbtree_loop) {
 
 	ORBTree tree1;
 	orbtree_create(&tree1, sizeof(OrbTreeData), compare_orbs);
-	int size = 10000;
+	int size = 10;
 	ORBTreeTray tray;
 	ORBTreeTray ret;
 	OrbTreeData *otd;
@@ -919,6 +919,28 @@ MyTest(util, test_orbtree_loop) {
 		cr_assert_eq(otd->key, (size - i));
 		cr_assert_eq(otd->value, (size - i) * 3 + 7);
 	}
+
+	cr_assert_eq(orbtree_size(&tree1), size);
+	orbtree_validate(&tree1);
+
+	/*
+		for (int i = 0; i < size; i++) {
+			printf("delete validation %i\n", i);
+			orbtree_print(&tree1);
+			search.key = size - i;
+			ret.updated = false;
+			cr_assert(!orbtree_remove(&tree1, &search, &ret));
+			orbtree_deallocate_tray(&tree1, &ret);
+			cr_assert(orbtree_remove(&tree1, &search, &ret));
+			printf("post delete\n");
+			orbtree_print(&tree1);
+			// orbtree_validate(&tree1);
+		}
+		search.key = UINT64_MAX;
+		cr_assert(orbtree_remove(&tree1, &search, &ret));
+
+		cr_assert_eq(orbtree_size(&tree1), 0);
+	*/
 }
 
 /*

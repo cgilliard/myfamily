@@ -240,6 +240,34 @@ void orbtree_right_rotate(ORBTreeImpl *impl, u32 x_id) {
 	x->parent = y_id;
 }
 
+// find the successor node
+u32 orbtree_find_successor(ORBTreeImpl *impl, u32 x_id) {
+	ORBTreeNode *x = orbtree_node(impl, x_id);
+	u32 successor_id = x->right;
+	ORBTreeNode *successor = orbtree_node(impl, x->right);
+	while (successor && successor->left != NIL) {
+		successor_id = successor->left;
+		successor = orbtree_node(impl, successor->left);
+	}
+	return successor_id;
+}
+
+// perform transplant operation
+void orbtree_transplant(ORBTreeImpl *impl, u32 dst, u32 src) {
+	ORBTreeNode *dst_node = orbtree_node(impl, dst);
+	ORBTreeNode *dst_parent = orbtree_node(impl, dst_node->parent);
+	if (dst_node->parent == NIL)
+		impl->root = src;
+	else if (dst == dst_parent->left)
+		dst_parent->left = src;
+	else
+		dst_parent->right = src;
+	if (src != NIL) {
+		ORBTreeNode *src_node = orbtree_node(impl, src);
+		src_node->parent = dst_node->parent;
+	}
+}
+
 void orbtree_put_fixup(ORBTreeImpl *impl, u32 k_id) {
 	ORBTreeNode *k = orbtree_node(impl, k_id);
 
@@ -322,6 +350,11 @@ int orbtree_put(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced) {
 	// this pair is used to search
 	ORBTreeNodePair pair;
 
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
 	// perform search for the key
 	orbtree_search(impl, value->value, &pair);
 	if (pair.self != NIL) {
@@ -357,7 +390,247 @@ int orbtree_put(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced) {
 
 	return 0;
 }
+
+// set child's color to parent's
+void orbtree_set_color_based_on_parent(ORBTreeImpl *impl, u32 child, u32 parent) {
+	if (child != NIL) {
+		if (IS_RED(impl, parent)) {
+			SET_RED(impl, child);
+		} else {
+			SET_BLACK(impl, child);
+		}
+	}
+}
+
+void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
+	printf("remove_fixup\n");
+	while (x != impl->root && IS_BLACK(impl, x)) {
+		ORBTreeNode *parent_node = orbtree_node(impl, parent);
+		ORBTreeNode *w_node = orbtree_node(impl, w);
+		ORBTreeNode *x_node = orbtree_node(impl, x);
+		u64 w_nid;
+		if (w_node)
+			w_nid = w_node->node_id;
+		else
+			w_nid = 0;
+		u64 x_nid;
+		if (x_node)
+			x_nid = x_node->node_id;
+		else
+			x_nid = 0;
+		u64 p_nid;
+		if (parent_node)
+			p_nid = parent_node->node_id;
+		else
+			p_nid = 0;
+		printf("remove fixup loop. x = %llu, w = %llu, parent = %llu\n", x_nid, w_nid, p_nid);
+		if (w == parent_node->right) {
+			// Case 1: Sibling is red
+			if (IS_RED(impl, w)) {
+				SET_BLACK(impl, w);
+				SET_RED(impl, parent);
+				orbtree_left_rotate(impl, parent);
+				w = parent_node->right;
+				w_node = orbtree_node(impl, w);
+			}
+
+			// Case 2: Sibling's children are both black
+			if (IS_BLACK(impl, w_node->left) && IS_BLACK(impl, w_node->right)) {
+				SET_RED(impl, w);
+				x = parent;
+				x_node = orbtree_node(impl, x);
+				parent = parent_node->parent;
+				parent_node = orbtree_node(impl, parent);
+				ORBTreeNode *x_parent = orbtree_node(impl, x_node->parent);
+				if (x == x_parent->left) {
+					w = x_parent->right;
+					w_node = orbtree_node(impl, w);
+				} else {
+					w = x_parent->left;
+					w_node = orbtree_node(impl, w);
+				}
+			} else {
+				// Case 3: Sibling's right child is black, left child is red
+				if (IS_BLACK(impl, w_node->right)) {
+					SET_BLACK(impl, w_node->left);
+					SET_RED(impl, w);
+					orbtree_right_rotate(impl, w);
+					w = parent_node->right;
+					w_node = orbtree_node(impl, w);
+				}
+
+				// Case 4: Sibling's right child is red
+				orbtree_set_color_based_on_parent(impl, w, parent);
+				SET_BLACK(impl, parent);
+				SET_BLACK(impl, w_node->right);
+				orbtree_left_rotate(impl, parent);
+				x = impl->root; // Set x to root at the end, only once
+				x_node = orbtree_node(impl, x);
+			}
+		} else {
+			// Case 1: Sibling is red
+			if (IS_RED(impl, w)) {
+				SET_BLACK(impl, w);
+				SET_RED(impl, parent);
+				orbtree_right_rotate(impl, parent);
+				w = parent_node->left;
+				w_node = orbtree_node(impl, w);
+			}
+
+			// Case 2: Sibling's children are both black
+			if (IS_BLACK(impl, w_node->right) && IS_BLACK(impl, w_node->left)) {
+				SET_RED(impl, w);
+				x = parent;
+				x_node = orbtree_node(impl, x);
+				parent = parent_node->parent;
+				parent_node = orbtree_node(impl, parent);
+				ORBTreeNode *x_parent = orbtree_node(impl, x_node->parent);
+				if (x == x_parent->left) {
+					w = x_parent->right;
+					w_node = orbtree_node(impl, w);
+				} else {
+					w = x_parent->left;
+					w_node = orbtree_node(impl, w);
+				}
+			} else {
+				// Case 3: Sibling's right child is black, left child is red
+				if (IS_BLACK(impl, w_node->left)) {
+					SET_BLACK(impl, w_node->right);
+					SET_RED(impl, w);
+					orbtree_left_rotate(impl, w);
+					w = parent_node->left;
+					w_node = orbtree_node(impl, w);
+				}
+
+				// Case 4: Sibling's right child is red
+				orbtree_set_color_based_on_parent(impl, w, parent);
+				SET_BLACK(impl, parent);
+				SET_BLACK(impl, w_node->left);
+				orbtree_right_rotate(impl, parent);
+				x = impl->root; // Set x to root at the end, only once
+				x_node = orbtree_node(impl, x);
+			}
+		}
+	}
+
+	// Ensure x is black at the end of fixup
+	SET_BLACK(impl, x);
+}
+
 int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
+	// validate input
+	if (ptr == NULL || value == NULL || removed == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+
+	// obtain impl from the pointer
+	ORBTreeImpl *impl = ptr->impl;
+
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	// search for the node based on this key.
+	ORBTreeNodePair pair;
+	orbtree_search(impl, value, &pair);
+
+	// this node doesn't exist, return -1
+	if (pair.self == NIL) {
+		removed->updated = false;
+		return -1;
+	}
+
+	removed->value = orbtree_value(impl, pair.self);
+	removed->updated = true;
+	removed->id = pair.self;
+
+	ORBTreeNode *node_to_delete = orbtree_node(impl, pair.self);
+	ORBTreeNode *x = NULL;
+	ORBTreeNode *w = NULL;
+	ORBTreeNode *parent = NULL;
+	u32 x_id = NIL;
+	u32 w_id = NIL;
+	u32 parent_id = NIL;
+	bool do_fixup = IS_BLACK(impl, pair.self);
+
+	printf("node to delete = %llu\n", node_to_delete->node_id);
+
+	if (node_to_delete->left == NIL) {
+		printf("case1\n");
+		x_id = node_to_delete->right;
+		x = orbtree_node(impl, x_id);
+		orbtree_transplant(impl, pair.self, node_to_delete->right);
+		ORBTreeNode *node_to_delete_parent = orbtree_node(impl, node_to_delete->parent);
+		if (node_to_delete_parent->left == NIL) {
+			w_id = node_to_delete_parent->right;
+			w = orbtree_node(impl, w_id);
+		} else if (node_to_delete_parent) {
+			w_id = node_to_delete_parent->left;
+			w = orbtree_node(impl, w_id);
+		}
+		if (x_id != NIL) {
+			x = orbtree_node(impl, x_id);
+			parent_id = x->parent;
+			parent = orbtree_node(impl, parent_id);
+		} else if (w_id != NIL) {
+			parent_id = w->parent;
+			parent = orbtree_node(impl, parent_id);
+		}
+	} else if (node_to_delete->right == NIL) {
+		printf("case2\n");
+		x_id = node_to_delete->left;
+		x = orbtree_node(impl, x_id);
+		orbtree_transplant(impl, pair.self, node_to_delete->left);
+		ORBTreeNode *node_to_delete_parent = orbtree_node(impl, node_to_delete->parent);
+		if (node_to_delete_parent) {
+			w_id = node_to_delete_parent->left;
+			w = orbtree_node(impl, w_id);
+		}
+		parent_id = x->parent;
+		parent = orbtree_node(impl, parent_id);
+	} else {
+		printf("case3\n");
+		u32 successor_id = orbtree_find_successor(impl, pair.self);
+		ORBTreeNode *successor = orbtree_node(impl, successor_id);
+		do_fixup = IS_BLACK(impl, successor_id);
+
+		x_id = successor->right;
+		ORBTreeNode *successor_parent = orbtree_node(impl, successor->parent);
+		w_id = successor_parent->right;
+		x = orbtree_node(impl, x_id);
+		w = orbtree_node(impl, w_id);
+
+		if (successor->parent != pair.self) {
+			orbtree_transplant(impl, successor_id, successor->right);
+			successor->right = node_to_delete->right;
+			ORBTreeNode *successor_right = orbtree_node(impl, successor->right);
+			successor_right->parent = successor_id;
+		}
+
+		// do final transpalnnnt and update including color match
+		orbtree_transplant(impl, pair.self, successor_id);
+		successor->left = node_to_delete->left;
+		ORBTreeNode *successor_left = orbtree_node(impl, successor->left);
+		successor_left->parent = successor_id;
+		orbtree_set_color_based_on_parent(impl, successor_id, pair.self);
+	}
+
+	printf("do_fixup = %i\n", do_fixup);
+	if (do_fixup) {
+		printf("w_id = %u, parent_id = %u\n", w_id, parent_id);
+		if (w_id != NIL && parent_id != NIL) {
+			orbtree_remove_fixup(impl, parent_id, w_id, x_id);
+		} else {
+			// in these cases SET_BLACK only
+			if (impl->size > 1)
+				SET_BLACK(impl, impl->root);
+		}
+	}
+
+	impl->elements--;
+
 	return 0;
 }
 int orbtree_get(const ORBTree *ptr, const void *searched, ORBTreeTray *found) {
@@ -372,6 +645,11 @@ int orbtree_get(const ORBTree *ptr, const void *searched, ORBTreeTray *found) {
 	// this pair is used to search
 	ORBTreeNodePair pair;
 
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
 	// perform search for the key
 	orbtree_search(impl, searched, &pair);
 
@@ -385,7 +663,18 @@ int orbtree_get(const ORBTree *ptr, const void *searched, ORBTreeTray *found) {
 	return 0;
 }
 i64 orbtree_size(const ORBTree *ptr) {
-	return 0;
+	if (ptr == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+	ORBTreeImpl *impl = ptr->impl;
+
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	return impl->elements;
 }
 int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
 					 bool start_inclusive, const void *end_value, bool end_inclusive) {
