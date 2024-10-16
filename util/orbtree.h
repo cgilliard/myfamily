@@ -18,8 +18,6 @@
 #include <base/fam_err.h>
 #include <base/slabs.h>
 
-#define ORBTREE_NODE_RESERVED_SIZE (sizeof(u32) * 8 + sizeof(u64))
-
 typedef struct ORBTreeIteratorNc {
 	FatPtr impl;
 } ORBTreeIteratorNc;
@@ -44,11 +42,6 @@ typedef struct ORBTreeNc {
 	void *impl;
 } ORBTreeNc;
 
-typedef struct ORBTreePubNode {
-	u8 reserved[ORBTREE_NODE_RESERVED_SIZE];
-	u8 data[];
-} ORBTreePubNode;
-
 void orbtree_cleanup(ORBTreeNc *ptr);
 
 #define ORBTree ORBTreeNc __attribute__((warn_unused_result, cleanup(orbtree_cleanup)))
@@ -72,6 +65,11 @@ int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *star
 					 bool start_inclusive, const void *end_value, bool end_inclusive);
 int orbtree_iterator_reset(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
 						   bool start_inclusive, const void *end_value, bool end_inclusive);
+
+#ifdef TEST
+void orbtree_print(const ORBTree *ptr);
+void orbtree_validate(const ORBTree *ptr);
+#endif // TEST
 
 static const ORBTreeNc _nil_orbtree__ = {.impl = NULL};
 

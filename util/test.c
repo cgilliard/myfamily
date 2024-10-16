@@ -783,6 +783,7 @@ typedef struct OrbTreeData {
 int compare_orbs(const void *k1, const void *k2) {
 	const OrbTreeData *k1o = k1;
 	const OrbTreeData *k2o = k2;
+
 	if (k1o->key < k2o->key)
 		return -1;
 	else if (k1o->key > k2o->key)
@@ -835,6 +836,89 @@ MyTest(util, test_orbtree) {
 
 	orbtree_allocate_tray(&tree1, &tray);
 	cr_assert_eq(tray.id, 1502);
+
+	ORBTreeTray rep;
+	OrbTreeData *otd = tray.value;
+	otd->key = 1;
+	otd->value = 2;
+	orbtree_put(&tree1, &tray, &rep);
+	orbtree_allocate_tray(&tree1, &tray);
+	otd = tray.value;
+	otd->key = 3;
+	otd->value = 4;
+	orbtree_put(&tree1, &tray, &rep);
+	orbtree_allocate_tray(&tree1, &tray);
+	otd = tray.value;
+	otd->key = 0;
+	otd->value = 5;
+	orbtree_put(&tree1, &tray, &rep);
+
+	orbtree_allocate_tray(&tree1, &tray);
+	otd = tray.value;
+	otd->key = 10;
+	otd->value = 50;
+	orbtree_put(&tree1, &tray, &rep);
+
+	orbtree_print(&tree1);
+	orbtree_validate(&tree1);
+
+	orbtree_allocate_tray(&tree1, &tray);
+	otd = tray.value;
+	otd->key = 30;
+	otd->value = 50;
+	orbtree_put(&tree1, &tray, &rep);
+
+	orbtree_print(&tree1);
+	orbtree_validate(&tree1);
+
+	orbtree_allocate_tray(&tree1, &tray);
+	otd = tray.value;
+	otd->key = 40;
+	otd->value = 50;
+	orbtree_put(&tree1, &tray, &rep);
+
+	orbtree_print(&tree1);
+	orbtree_validate(&tree1);
+
+	ORBTreeTray find;
+	find.value = &otd;
+	otd->key = 40;
+	rep.updated = false;
+	cr_assert(!orbtree_get(&tree1, otd, &rep));
+	cr_assert_eq(rep.updated, true);
+	OrbTreeData x = *(OrbTreeData *)rep.value;
+	cr_assert_eq(x.value, 50);
+}
+
+MyTest(util, test_orbtree_loop) {
+
+	ORBTree tree1;
+	orbtree_create(&tree1, sizeof(OrbTreeData), compare_orbs);
+	int size = 10000;
+	ORBTreeTray tray;
+	ORBTreeTray ret;
+	OrbTreeData *otd;
+
+	for (int i = 0; i < size; i++) {
+		cr_assert(!orbtree_allocate_tray(&tree1, &tray));
+		otd = tray.value;
+		otd->key = size - i;
+		otd->value = otd->key * 3 + 7;
+		cr_assert(!orbtree_put(&tree1, &tray, &ret));
+		// orbtree_print(&tree1);
+		orbtree_validate(&tree1);
+	}
+
+	OrbTreeData search;
+	for (int i = 0; i < size; i++) {
+		search.key = size - i;
+		ret.updated = false;
+		cr_assert(!orbtree_get(&tree1, &search, &ret));
+		cr_assert(ret.updated);
+		otd = ret.value;
+		cr_assert_eq(otd->key, (size - i));
+		cr_assert_eq(otd->value, (size - i) * 3 + 7);
+	}
 }
 
 /*
