@@ -162,8 +162,8 @@ Functions</h2></td></tr>
 <tr class="separator:aac695c61bfe9d4f9bf5ce793101d2e87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b5577c954ff9f00ed6efe466beab924"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a2b5577c954ff9f00ed6efe466beab924">rbtree_remove_fixup</a> (<a class="el" href="structRBTreeImpl.html">RBTreeImpl</a> *impl, <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *parent, <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *w, <a class="el" href="structRBTreeNode.html">RBTreeNode</a> *x)</td></tr>
 <tr class="separator:a2b5577c954ff9f00ed6efe466beab924"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24e5810ceda82f95d14cdeed5b9f4645"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a24e5810ceda82f95d14cdeed5b9f4645">rbtree_remove</a> (<a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const void *key)</td></tr>
-<tr class="separator:a24e5810ceda82f95d14cdeed5b9f4645"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d5e303bca61902f0500bba23873ffbd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a4d5e303bca61902f0500bba23873ffbd">rbtree_remove</a> (<a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const void *key, <a class="el" href="structRbTreeKeyValue.html">RbTreeKeyValue</a> *swap)</td></tr>
+<tr class="separator:a4d5e303bca61902f0500bba23873ffbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb0622d260fa94b7cc066f774fbc4cb4"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#abb0622d260fa94b7cc066f774fbc4cb4">rbtree_get</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const void *key)</td></tr>
 <tr class="separator:abb0622d260fa94b7cc066f774fbc4cb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a577911fcefd2f1bd68a639272de0ea99"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rbtree_8c.html#a577911fcefd2f1bd68a639272de0ea99">rbtree_get_mut</a> (const <a class="el" href="rbtree_8h.html#a6663a5b2e56649ebec406303af3e6213">RBTree</a> *ptr, const void *key)</td></tr>
@@ -279,7 +279,7 @@ Functions</h2></td></tr>
 <div class="line">        node == <a class="code" href="object__macros_8h.html#a263efce0e5cda1d387a1a43f94715445">NIL</a> || !<a class="code" href="bitflags_8c.html#af953aa50ffdff7cb7877e51b519c6e02">bitflags_check</a>(&amp;bf, <a class="code" href="rbtree_8c.html#a2eeca895e32ae3dcfb96629f51cefb7d">RBTREE_FLAGS_RED</a>);                                     \</div>
 <div class="line">    })</div>
 <div class="ttc" id="abitflags_8c_html_af953aa50ffdff7cb7877e51b519c6e02"><div class="ttname"><a href="bitflags_8c.html#af953aa50ffdff7cb7877e51b519c6e02">bitflags_check</a></div><div class="ttdeci">bool bitflags_check(BitFlags *ptr, u32 index)</div><div class="ttdef"><b>Definition:</b> bitflags.c:40</div></div>
-<div class="ttc" id="aobject__macros_8h_html_a263efce0e5cda1d387a1a43f94715445"><div class="ttname"><a href="object__macros_8h.html#a263efce0e5cda1d387a1a43f94715445">NIL</a></div><div class="ttdeci">#define NIL</div><div class="ttdef"><b>Definition:</b> object_macros.h:20</div></div>
+<div class="ttc" id="aobject__macros_8h_html_a263efce0e5cda1d387a1a43f94715445"><div class="ttname"><a href="object__macros_8h.html#a263efce0e5cda1d387a1a43f94715445">NIL</a></div><div class="ttdeci">#define NIL</div><div class="ttdef"><b>Definition:</b> object_macros.h:22</div></div>
 <div class="ttc" id="arbtree_8c_html_a2eeca895e32ae3dcfb96629f51cefb7d"><div class="ttname"><a href="rbtree_8c.html#a2eeca895e32ae3dcfb96629f51cefb7d">RBTREE_FLAGS_RED</a></div><div class="ttdeci">#define RBTREE_FLAGS_RED</div><div class="ttdef"><b>Definition:</b> rbtree.c:82</div></div>
 <div class="ttc" id="atypes_8h_html_aed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdef"><b>Definition:</b> types.h:20</div></div>
 </div><!-- fragment -->
@@ -1000,8 +1000,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a24e5810ceda82f95d14cdeed5b9f4645"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24e5810ceda82f95d14cdeed5b9f4645">&#9670;&nbsp;</a></span>rbtree_remove()</h2>
+<a id="a4d5e303bca61902f0500bba23873ffbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d5e303bca61902f0500bba23873ffbd">&#9670;&nbsp;</a></span>rbtree_remove()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1016,7 +1016,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>key</em>&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structRbTreeKeyValue.html">RbTreeKeyValue</a> *&#160;</td>
+          <td class="paramname"><em>swap</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

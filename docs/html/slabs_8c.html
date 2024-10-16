@@ -102,16 +102,6 @@ Macros</h2></td></tr>
 <tr class="separator:a169a732f694b3481141402fc88cfb9e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a86b9aad5b20cc457cc2a517868ed50"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a4a86b9aad5b20cc457cc2a517868ed50">SIZE_WITH_OVERHEAD</a>(<a class="el" href="slabs_8h.html#a48d27d1c6db0d99ebbeaefa68a8c9033">size</a>)&#160;&#160;&#160;(<a class="el" href="slabs_8h.html#a48d27d1c6db0d99ebbeaefa68a8c9033">size</a> + <a class="el" href="slabs_8c.html#a169a732f694b3481141402fc88cfb9e0">SIZE_OVERHEAD</a>)</td></tr>
 <tr class="separator:a4a86b9aad5b20cc457cc2a517868ed50"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92ae535f477c06f3a7301cf283285b83"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a92ae535f477c06f3a7301cf283285b83">BIT_FLAG_GLOBAL</a>&#160;&#160;&#160;0</td></tr>
-<tr class="separator:a92ae535f477c06f3a7301cf283285b83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a98818dc30f8e970b6af6f2983f36a7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a7a98818dc30f8e970b6af6f2983f36a7">BIT_FLAG_PIN</a>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:a7a98818dc30f8e970b6af6f2983f36a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa27f431ea4817e3c34f2183e7c2c8aa6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#aa27f431ea4817e3c34f2183e7c2c8aa6">BIT_FLAG_COPY</a>&#160;&#160;&#160;2</td></tr>
-<tr class="separator:aa27f431ea4817e3c34f2183e7c2c8aa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaac197968269c008d15a7e4508571f9a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#aaac197968269c008d15a7e4508571f9a">BIT_FLAG_MALLOC</a>&#160;&#160;&#160;3</td></tr>
-<tr class="separator:aaac197968269c008d15a7e4508571f9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae883242ad0e2ded01e3198427e11a2ff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#ae883242ad0e2ded01e3198427e11a2ff">BIT_FLAG_NIL</a>&#160;&#160;&#160;6</td></tr>
-<tr class="separator:ae883242ad0e2ded01e3198427e11a2ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -124,28 +114,20 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a7d32fa9b5ae6ac35e7934ea214fac5f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
+<tr class="separator:a7d32fa9b5ae6ac35e7934ea214fac5f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a148ab883efb6f6e8a237d6f529414edb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a148ab883efb6f6e8a237d6f529414edb">fat_ptr_mallocate</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> <a class="el" href="slabs_8h.html#a48d27d1c6db0d99ebbeaefa68a8c9033">size</a>)</td></tr>
 <tr class="separator:a148ab883efb6f6e8a237d6f529414edb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:accdd6db084bcf4387d28c79ac931988d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#accdd6db084bcf4387d28c79ac931988d">fat_ptr_malloc_free</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
 <tr class="separator:accdd6db084bcf4387d28c79ac931988d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba9f21615ba272cb9c13e23fd9cd6644"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#aba9f21615ba272cb9c13e23fd9cd6644">fat_ptr_pin</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:aba9f21615ba272cb9c13e23fd9cd6644"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ddb58f574858aa3282b1d32a08bd976"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a5ddb58f574858aa3282b1d32a08bd976">fat_ptr_set_copy</a> (<a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:a5ddb58f574858aa3282b1d32a08bd976"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5005d4fd077fbb615a7579a07a1298b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#aa5005d4fd077fbb615a7579a07a1298b">fat_ptr_size</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
 <tr class="separator:aa5005d4fd077fbb615a7579a07a1298b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2beb14eedce3e8fbcff7b86df3209e91"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a2beb14eedce3e8fbcff7b86df3209e91">fat_ptr_data</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
 <tr class="separator:a2beb14eedce3e8fbcff7b86df3209e91"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae083fc27990e152eafd57a0f3f7d1899"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#ae083fc27990e152eafd57a0f3f7d1899">fat_ptr_is_global</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:ae083fc27990e152eafd57a0f3f7d1899"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44aa89fc141475ae4adce78691ee0193"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a44aa89fc141475ae4adce78691ee0193">fat_ptr_is_pin</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:a44aa89fc141475ae4adce78691ee0193"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a41a39b0b95d04ab30d0fc3d51248f3b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a41a39b0b95d04ab30d0fc3d51248f3b1">fat_ptr_is_copy</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:a41a39b0b95d04ab30d0fc3d51248f3b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76e307cd4405c0e4470dffa2e6de4cbd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a76e307cd4405c0e4470dffa2e6de4cbd">fat_ptr_is_malloc</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:a76e307cd4405c0e4470dffa2e6de4cbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d32fa9b5ae6ac35e7934ea214fac5f9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr)</td></tr>
-<tr class="separator:a7d32fa9b5ae6ac35e7934ea214fac5f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bb54a7ab40111839177b86c6f0b6c2b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a9bb54a7ab40111839177b86c6f0b6c2b">fat_ptr_flag_set</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr, <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="base_2test_8c.html#a8b3ab54ed3e81c69863d65e4e6c424a0">flag</a>, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> value)</td></tr>
+<tr class="separator:a9bb54a7ab40111839177b86c6f0b6c2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3507ab0a7a54c0e265bb75234640523"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#ab3507ab0a7a54c0e265bb75234640523">fat_ptr_flag_get</a> (const <a class="el" href="structFatPtr.html">FatPtr</a> *ptr, <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> <a class="el" href="base_2test_8c.html#a8b3ab54ed3e81c69863d65e4e6c424a0">flag</a>)</td></tr>
+<tr class="separator:ab3507ab0a7a54c0e265bb75234640523"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf3ec7ef5151621ee01948a917be6b2d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#acf3ec7ef5151621ee01948a917be6b2d">slab_allocator_config_cleanup</a> (<a class="el" href="structSlabAllocatorConfigNc.html">SlabAllocatorConfigNc</a> *sc)</td></tr>
 <tr class="separator:acf3ec7ef5151621ee01948a917be6b2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeeb24a4968f6ab2cb5cb91ddfa4f577c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#aeeb24a4968f6ab2cb5cb91ddfa4f577c">slab_allocator_config_build</a> (<a class="el" href="slabs_8h.html#af6b9aa6efec284497402d6b13451d8a8">SlabAllocatorConfig</a> *sc, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> zeroed, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> <a class="el" href="slabs_8h.html#a0fc650b5470e50a01b4fe4ae4260d781">global</a>)</td></tr>
@@ -180,76 +162,6 @@ Functions</h2></td></tr>
 <tr class="separator:a4815f4c98ee9b72ffb5127ec385934cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="aa27f431ea4817e3c34f2183e7c2c8aa6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa27f431ea4817e3c34f2183e7c2c8aa6">&#9670;&nbsp;</a></span>BIT_FLAG_COPY</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BIT_FLAG_COPY&#160;&#160;&#160;2</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a92ae535f477c06f3a7301cf283285b83"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a92ae535f477c06f3a7301cf283285b83">&#9670;&nbsp;</a></span>BIT_FLAG_GLOBAL</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BIT_FLAG_GLOBAL&#160;&#160;&#160;0</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aaac197968269c008d15a7e4508571f9a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaac197968269c008d15a7e4508571f9a">&#9670;&nbsp;</a></span>BIT_FLAG_MALLOC</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BIT_FLAG_MALLOC&#160;&#160;&#160;3</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ae883242ad0e2ded01e3198427e11a2ff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae883242ad0e2ded01e3198427e11a2ff">&#9670;&nbsp;</a></span>BIT_FLAG_NIL</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BIT_FLAG_NIL&#160;&#160;&#160;6</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a7a98818dc30f8e970b6af6f2983f36a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7a98818dc30f8e970b6af6f2983f36a7">&#9670;&nbsp;</a></span>BIT_FLAG_PIN</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define BIT_FLAG_PIN&#160;&#160;&#160;1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="ae6f702dbf218f022c4074282675e000c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae6f702dbf218f022c4074282675e000c">&#9670;&nbsp;</a></span>MAX_SLAB_SIZE</h2>
 
@@ -386,54 +298,62 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a41a39b0b95d04ab30d0fc3d51248f3b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a41a39b0b95d04ab30d0fc3d51248f3b1">&#9670;&nbsp;</a></span>fat_ptr_is_copy()</h2>
+<a id="ab3507ab0a7a54c0e265bb75234640523"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab3507ab0a7a54c0e265bb75234640523">&#9670;&nbsp;</a></span>fat_ptr_flag_get()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> fat_ptr_is_copy </td>
+          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> fat_ptr_flag_get </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>flag</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="ae083fc27990e152eafd57a0f3f7d1899"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae083fc27990e152eafd57a0f3f7d1899">&#9670;&nbsp;</a></span>fat_ptr_is_global()</h2>
+<a id="a9bb54a7ab40111839177b86c6f0b6c2b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9bb54a7ab40111839177b86c6f0b6c2b">&#9670;&nbsp;</a></span>fat_ptr_flag_set()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> fat_ptr_is_global </td>
+          <td class="memname">void fat_ptr_flag_set </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
+          <td class="paramname"><em>ptr</em>, </td>
         </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a76e307cd4405c0e4470dffa2e6de4cbd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76e307cd4405c0e4470dffa2e6de4cbd">&#9670;&nbsp;</a></span>fat_ptr_is_malloc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> fat_ptr_is_malloc </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a>&#160;</td>
+          <td class="paramname"><em>flag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -448,24 +368,6 @@ Functions</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> fat_ptr_is_nil </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a44aa89fc141475ae4adce78691ee0193"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44aa89fc141475ae4adce78691ee0193">&#9670;&nbsp;</a></span>fat_ptr_is_pin()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> fat_ptr_is_pin </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
@@ -516,42 +418,6 @@ Functions</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aba9f21615ba272cb9c13e23fd9cd6644"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba9f21615ba272cb9c13e23fd9cd6644">&#9670;&nbsp;</a></span>fat_ptr_pin()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int fat_ptr_pin </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a5ddb58f574858aa3282b1d32a08bd976"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5ddb58f574858aa3282b1d32a08bd976">&#9670;&nbsp;</a></span>fat_ptr_set_copy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int fat_ptr_set_copy </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structFatPtr.html">FatPtr</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
