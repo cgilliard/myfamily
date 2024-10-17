@@ -886,16 +886,15 @@ MyTest(util, test_orbtree) {
 	find.value = &otd;
 	otd->key = 40;
 	rep.updated = false;
-	cr_assert(!orbtree_get(&tree1, otd, &rep));
+	cr_assert(!orbtree_get(&tree1, otd, &rep, ORBTreeSearchTypeSorted));
 	cr_assert_eq(rep.updated, true);
 	OrbTreeData x = *(OrbTreeData *)rep.value;
 	cr_assert_eq(x.value, 50);
 }
 
 MyTest(util, test_orbtree_loop) {
-
 	// seed rng for reproducibility
-	u8 key[32] = {7};
+	u8 key[32] = {9};
 	u8 iv[16] = {};
 	psrng_test_seed(iv, key);
 
@@ -923,7 +922,7 @@ MyTest(util, test_orbtree_loop) {
 	for (int i = 0; i < size; i++) {
 		search.key = arr[i];
 		ret.updated = false;
-		cr_assert(!orbtree_get(&tree1, &search, &ret));
+		cr_assert(!orbtree_get(&tree1, &search, &ret, ORBTreeSearchTypeSorted));
 		cr_assert(ret.updated);
 		otd = ret.value;
 		cr_assert_eq(otd->key, arr[i]);
@@ -955,6 +954,41 @@ if(!nil(z)) {
 	// use z
 } else {
 	// handle non-upgrade case
+}
+*/
+
+/*
+int my_compare(Object *a, Object *b) {
+	let au64 = $(a, "u64_val");
+	let bu64 = $(b, "u64_val");
+	if (!nil(au64) & !nil(bu64)) {
+		if ($u64(au64) > $u64(bu64))
+			return 1;
+		else if ($u64(au64) < $u64(bu64)) {
+			return -1;
+		} else
+			return 0;
+	} else
+		return strcmp($(a, "str"), $(b, "str"));
+}
+
+int main() {
+var x = $();
+let y = $();
+$(x, "test", y);
+
+var a = $(with(commpare, my_compare));
+var b = $();
+$(b, "str", "test");
+var c = $();
+$(c, "str", "test2");
+$(a, b);
+$(a, c);
+
+foreach(v , a) {
+	info("k={}", v);
+}
+
 }
 */
 

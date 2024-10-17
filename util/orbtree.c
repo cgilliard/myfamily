@@ -85,7 +85,16 @@ typedef struct ORBTreeImpl {
 	u8 **data_chunks;
 	u32 cur_chunks;
 	u32 *free_list;
+	u64 seqno_next;
+	u32 seqno_root;
 } ORBTreeImpl;
+
+typedef enum ORBTreeNodeType {
+	ORBTreeNodeTypeRoot,
+	ORBTreeNodeTypeRight,
+	ORBTreeNodeTypeLeft,
+	ORBTreeNodeTypeParent
+} ORBTreeNodeType;
 
 void orbtree_print_impl(ORBTreeImpl *impl);
 void orbtree_validate_impl(const ORBTreeImpl *impl);
@@ -132,6 +141,7 @@ int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void
 	impl->value_size = value_size;
 	impl->compare = compare;
 	impl->root = NIL;
+	impl->seqno_root = NIL;
 	impl->size = 0;
 	impl->capacity = 0;
 	impl->free_list_head = UINT32_MAX;
@@ -139,6 +149,7 @@ int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void
 	impl->cur_chunks = 0;
 	impl->elements = 0;
 	impl->free_list = NULL;
+	impl->seqno_next = 0x8000000;
 
 	return 0;
 }
@@ -157,10 +168,35 @@ void *orbtree_value(const ORBTreeImpl *impl, u32 node) {
 	return orbtree_node(impl, node)->data;
 }
 
+u32 orbtree_node_for(const ORBTreeImpl *impl, const ORBTreeNode *node, ORBTreeSearchType stype,
+					 ORBTreeNodeType ntype) {
+	if (stype == ORBTreeSearchTypeSorted) {
+		if (ntype == ORBTreeNodeTypeRoot)
+			return impl->root;
+		else if (ntype == ORBTreeNodeTypeRight)
+			return node->right;
+		else if (ntype == ORBTreeNodeTypeLeft)
+			return node->left;
+		else if (ntype == ORBTreeNodeTypeParent)
+			return node->parent;
+	} else {
+		if (ntype == ORBTreeNodeTypeRoot)
+			return impl->seqno_root;
+		else if (ntype == ORBTreeNodeTypeRight)
+			return node->right_seqno;
+		else if (ntype == ORBTreeNodeTypeLeft)
+			return node->left_seqno;
+		else if (ntype == ORBTreeNodeTypeParent)
+			return node->parent_seqno;
+	}
+	return 0;
+}
+
 // internal search function used by get/insert/delete.
-void orbtree_search(const ORBTreeImpl *impl, const void *value, ORBTreeNodePair *nodes) {
+void orbtree_search(const ORBTreeImpl *impl, const void *value, ORBTreeNodePair *nodes,
+					ORBTreeSearchType stype) {
 	nodes->parent = NIL;
-	nodes->self = impl->root;
+	nodes->self = orbtree_node_for(impl, NULL, stype, ORBTreeNodeTypeRoot);
 
 	int i = 0;
 	while (nodes->self != NIL) {
@@ -170,11 +206,11 @@ void orbtree_search(const ORBTreeImpl *impl, const void *value, ORBTreeNodePair 
 			break;
 		} else if (v < 0) {
 			ORBTreeNode *self = orbtree_node(impl, nodes->self);
-			nodes->self = self->right;
+			nodes->self = orbtree_node_for(impl, self, stype, ORBTreeNodeTypeRight);
 			nodes->is_right = true;
 		} else {
 			ORBTreeNode *self = orbtree_node(impl, nodes->self);
-			nodes->self = self->left;
+			nodes->self = orbtree_node_for(impl, self, stype, ORBTreeNodeTypeLeft);
 			nodes->is_right = false;
 		}
 	}
@@ -360,7 +396,7 @@ int orbtree_put(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced) {
 	}
 
 	// perform search for the key
-	orbtree_search(impl, value->value, &pair);
+	orbtree_search(impl, value->value, &pair, ORBTreeSearchTypeSorted);
 	if (pair.self != NIL) {
 		replaced->value = orbtree_value(impl, pair.self);
 		replaced->updated = true;
@@ -542,7 +578,7 @@ int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
 
 	// search for the node based on this key.
 	ORBTreeNodePair pair;
-	orbtree_search(impl, value, &pair);
+	orbtree_search(impl, value, &pair, ORBTreeSearchTypeSorted);
 
 	// this node doesn't exist, return -1
 	if (pair.self == NIL) {
@@ -648,7 +684,8 @@ int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
 
 	return 0;
 }
-int orbtree_get(const ORBTree *ptr, const void *searched, ORBTreeTray *found) {
+int orbtree_get(const ORBTree *ptr, const void *searched, ORBTreeTray *found,
+				ORBTreeSearchType type) {
 	// validate input
 	if (ptr == NULL || searched == NULL || found == NULL) {
 		SetErr(IllegalArgument);
@@ -666,7 +703,7 @@ int orbtree_get(const ORBTree *ptr, const void *searched, ORBTreeTray *found) {
 	}
 
 	// perform search for the key
-	orbtree_search(impl, searched, &pair);
+	orbtree_search(impl, searched, &pair, type);
 
 	if (pair.self != NIL) {
 		found->updated = true;
@@ -677,6 +714,37 @@ int orbtree_get(const ORBTree *ptr, const void *searched, ORBTreeTray *found) {
 
 	return 0;
 }
+
+int orbtree_put_index(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced, u32 index) {
+	return 0;
+}
+int orbtree_put_before(ORBTree *ptr, const ORBTreeTray *before, ORBTreeTray *value,
+					   ORBTreeTray *replaced) {
+	return 0;
+}
+int orbtree_put_after(ORBTree *ptr, const ORBTreeTray *after, ORBTreeTray *value,
+					  ORBTreeTray *replaced) {
+	return 0;
+}
+int orbtree_push(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced) {
+	return 0;
+}
+int orbtree_push_front(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced) {
+	return 0;
+}
+int orbtree_remove_index(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
+	return 0;
+}
+int orbtree_remove_last(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
+	return 0;
+}
+int orbtree_get_index(const ORBTree *ptr, const void *value, u32 index, ORBTreeTray *tray) {
+	return 0;
+}
+int orbtree_get_last(const ORBTree *ptr, const void *value, ORBTreeTray *tray) {
+	return 0;
+}
+
 i64 orbtree_size(const ORBTree *ptr) {
 	if (ptr == NULL) {
 		SetErr(IllegalArgument);
