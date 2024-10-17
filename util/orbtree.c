@@ -23,37 +23,34 @@
 
 u64 orbtree_next_node_id = 10;
 
-#define RED_MASK 0x8000000000000ULL
+#define RED_MASK 0x80000000ULL
 
 #define SET_RED(impl, id)                                                                          \
 	({                                                                                             \
 		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
-		_orb_node__->seqno_and_color |= RED_MASK;                                                  \
+		_orb_node__->color |= RED_MASK;                                                            \
 	})
 #define SET_BLACK(impl, id)                                                                        \
 	({                                                                                             \
 		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
-		_orb_node__->seqno_and_color &= ~RED_MASK;                                                 \
+		_orb_node__->color &= ~RED_MASK;                                                           \
 	})
 #define IS_RED(impl, id)                                                                           \
 	({                                                                                             \
 		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
-		_orb_node__ != NULL && (_orb_node__->seqno_and_color & RED_MASK) != 0;                     \
+		_orb_node__ != NULL && (_orb_node__->color & RED_MASK) != 0;                               \
 	})
 #define IS_BLACK(impl, id)                                                                         \
 	({                                                                                             \
 		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
-		_orb_node__ == NULL || (_orb_node__->seqno_and_color & RED_MASK) == 0;                     \
+		_orb_node__ == NULL || (_orb_node__->color & RED_MASK) == 0;                               \
 	})
 
 typedef struct ORBTreeNode {
-	u64 seqno_and_color;
+	u32 color;
 	u32 right;
 	u32 left;
 	u32 parent;
-	u32 right_seqno;
-	u32 left_seqno;
-	u32 parent_seqno;
 	u32 right_subtree_size;
 	u32 left_subtree_size;
 #ifdef TEST
