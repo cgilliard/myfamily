@@ -24,6 +24,7 @@
 u64 orbtree_next_node_id = 10;
 
 #define RED_MASK 0x8000000000000ULL
+#define RED_MASK_SEQNO 0x4000000000000ULL
 
 #define SET_RED(impl, id)                                                                          \
 	({                                                                                             \
@@ -44,6 +45,47 @@ u64 orbtree_next_node_id = 10;
 	({                                                                                             \
 		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
 		_orb_node__ == NULL || (_orb_node__->seqno_and_color & RED_MASK) == 0;                     \
+	})
+
+#define SET_RED_MULTI(impl, id, searchtype)                                                        \
+	({                                                                                             \
+		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
+		u64 _mask__;                                                                               \
+		if (searchtype == ORBTreeSearchTypeSorted)                                                 \
+			_mask__ = RED_MASK;                                                                    \
+		else                                                                                       \
+			_mask__ = RED_MASK_SEQNO;                                                              \
+		_orb_node__->seqno_and_color |= _mask__;                                                   \
+	})
+#define SET_BLACK_MULTI(impl, id, searchtype)                                                      \
+	({                                                                                             \
+		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
+		u64 _mask__;                                                                               \
+		if (searchtype == ORBTreeSearchTypeSorted)                                                 \
+			_mask__ = RED_MASK;                                                                    \
+		else                                                                                       \
+			_mask__ = RED_MASK_SEQNO;                                                              \
+		_orb_node__->seqno_and_color &= ~_mask__;                                                  \
+	})
+#define IS_RED_MUTLI(impl, id, searchtype)                                                         \
+	({                                                                                             \
+		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
+		u64 _mask__;                                                                               \
+		if (searchtype == ORBTreeSearchTypeSorted)                                                 \
+			_mask__ = RED_MASK;                                                                    \
+		else                                                                                       \
+			_mask__ = RED_MASK_SEQNO;                                                              \
+		_orb_node__ != NULL && (_orb_node__->seqno_and_color & _mask__) != 0;                      \
+	})
+#define IS_BLACK_MULTI(impl, id, searchtype)                                                       \
+	({                                                                                             \
+		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
+		u64 _mask__;                                                                               \
+		if (searchtype == ORBTreeSearchTypeSorted)                                                 \
+			_mask__ = RED_MASK;                                                                    \
+		else                                                                                       \
+			_mask__ = RED_MASK_SEQNO;                                                              \
+		_orb_node__ == NULL || (_orb_node__->seqno_and_color & _mask__) == 0;                      \
 	})
 
 typedef struct ORBTreeNode {
@@ -192,6 +234,16 @@ u32 orbtree_node_for(const ORBTreeImpl *impl, const ORBTreeNode *node, ORBTreeSe
 	return 0;
 }
 
+int orbtree_seqno_compare(const void *v1, const void *v2) {
+	const u64 *v1u64 = v1;
+	const u64 *v2u64 = v2;
+	if (*v1u64 < *v2u64)
+		return -1;
+	if (*v1u64 > *v2u64)
+		return 1;
+	return 0;
+}
+
 // internal search function used by get/insert/delete.
 void orbtree_search(const ORBTreeImpl *impl, const void *value, ORBTreeNodePair *nodes,
 					ORBTreeSearchType stype) {
@@ -201,7 +253,14 @@ void orbtree_search(const ORBTreeImpl *impl, const void *value, ORBTreeNodePair 
 	int i = 0;
 	while (nodes->self != NIL) {
 		nodes->parent = nodes->self;
-		int v = impl->compare(orbtree_value(impl, nodes->self), value);
+		int v;
+		if (stype == ORBTreeSearchTypeSorted)
+			v = impl->compare(orbtree_value(impl, nodes->self), value);
+		else {
+			ORBTreeNode *n = orbtree_node(impl, nodes->self);
+			u64 seqno = n->seqno_and_color & ~(RED_MASK | RED_MASK_SEQNO);
+			v = orbtree_seqno_compare(&seqno, value);
+		}
 		if (v == 0) {
 			break;
 		} else if (v < 0) {
@@ -216,63 +275,121 @@ void orbtree_search(const ORBTreeImpl *impl, const void *value, ORBTreeNodePair 
 	}
 }
 
-void orbtree_left_rotate(ORBTreeImpl *impl, u32 x_id) {
+void orbtree_left_rotate(ORBTreeImpl *impl, u32 x_id, ORBTreeSearchType stype) {
 	ORBTreeNode *x = orbtree_node(impl, x_id);
-	u32 y_id = x->right;
+	u32 y_id = orbtree_node_for(impl, x, stype, ORBTreeNodeTypeRight);
 	ORBTreeNode *y = orbtree_node(impl, y_id);
 
 	// Move y's left subtree to x's right subtree
-	x->right = y->left;
-	if (y->left != NIL) {
-		ORBTreeNode *yleft = orbtree_node(impl, y->left);
-		yleft->parent = x_id;
+	if (stype == ORBTreeSearchTypeSorted)
+		x->right = y->left;
+	else
+		x->right_seqno = y->left_seqno;
+
+	if (stype == ORBTreeSearchTypeSorted) {
+		if (y->left != NIL) {
+			ORBTreeNode *yleft = orbtree_node(impl, y->left);
+			yleft->parent = x_id;
+		}
+	} else {
+		if (y->left_seqno != NIL) {
+			ORBTreeNode *yleft = orbtree_node(impl, y->left_seqno);
+			yleft->parent_seqno = x_id;
+		}
 	}
 
 	// Update y's parent to x's parent
-	y->parent = x->parent;
+	if (stype == ORBTreeSearchTypeSorted)
+		y->parent = x->parent;
+	else
+		y->parent_seqno = x->parent_seqno;
 
 	// If x was the root, now y becomes the root
-	ORBTreeNode *xparent = orbtree_node(impl, x->parent);
-	if (x->parent == NIL) {
-		impl->root = y_id;
+	u32 xparent_id = orbtree_node_for(impl, x, stype, ORBTreeNodeTypeParent);
+	ORBTreeNode *xparent = orbtree_node(impl, xparent_id);
+	if (xparent_id == NIL) {
+		if (stype == ORBTreeSearchTypeSorted)
+			impl->root = y_id;
+		else
+			impl->seqno_root = y_id;
 	} else if (x_id == xparent->left) {
-		xparent->left = y_id;
+		if (stype == ORBTreeSearchTypeSorted)
+			xparent->left = y_id;
+		else
+			xparent->left_seqno = y_id;
 	} else {
-		xparent->right = y_id;
+		if (stype == ORBTreeSearchTypeSorted)
+			xparent->right = y_id;
+		else
+			xparent->right_seqno = y_id;
 	}
 
 	// Place x as y's left child
-	y->left = x_id;
-	x->parent = y_id;
+	if (stype == ORBTreeSearchTypeSorted) {
+		y->left = x_id;
+		x->parent = y_id;
+	} else {
+		y->left_seqno = x_id;
+		x->parent_seqno = y_id;
+	}
 }
 
-void orbtree_right_rotate(ORBTreeImpl *impl, u32 x_id) {
+void orbtree_right_rotate(ORBTreeImpl *impl, u32 x_id, ORBTreeSearchType stype) {
 	ORBTreeNode *x = orbtree_node(impl, x_id);
-	u32 y_id = x->left;
+	u32 y_id = orbtree_node_for(impl, x, stype, ORBTreeNodeTypeLeft);
 	ORBTreeNode *y = orbtree_node(impl, y_id);
 	// Move y's right subtree to x's right subtree
-	x->left = y->right;
-	if (y->right != NIL) {
-		ORBTreeNode *yright = orbtree_node(impl, y->right);
-		yright->parent = x_id;
+	if (stype == ORBTreeSearchTypeSorted)
+		x->left = y->right;
+	else
+		x->left_seqno = y->right_seqno;
+
+	if (stype == ORBTreeSearchTypeSorted) {
+		if (y->right != NIL) {
+			ORBTreeNode *yright = orbtree_node(impl, y->right);
+			yright->parent = x_id;
+		}
+	} else {
+		if (y->right_seqno != NIL) {
+			ORBTreeNode *yright = orbtree_node(impl, y->right_seqno);
+			yright->parent_seqno = x_id;
+		}
 	}
 
 	// Update y's parent to x's parent
-	y->parent = x->parent;
+	if (stype == ORBTreeSearchTypeSorted)
+		y->parent = x->parent;
+	else
+		y->parent_seqno = x->parent_seqno;
 
 	// If x was the root, now y becomes the root
-	ORBTreeNode *xparent = orbtree_node(impl, x->parent);
+	u32 xparent_id = orbtree_node_for(impl, x, stype, ORBTreeNodeTypeParent);
+	ORBTreeNode *xparent = orbtree_node(impl, xparent_id);
 	if (x->parent == NIL) {
-		impl->root = y_id;
+		if (stype == ORBTreeSearchTypeSorted)
+			impl->root = y_id;
+		else
+			impl->seqno_root = y_id;
 	} else if (x_id == xparent->right) {
-		xparent->right = y_id;
+		if (stype == ORBTreeSearchTypeSorted)
+			xparent->right = y_id;
+		else
+			xparent->right_seqno = y_id;
 	} else {
-		xparent->left = y_id;
+		if (stype == ORBTreeSearchTypeSorted)
+			xparent->left = y_id;
+		else
+			xparent->left_seqno = y_id;
 	}
 
-	// Place x as y's left child
-	y->right = x_id;
-	x->parent = y_id;
+	// Place x as y's right child
+	if (stype == ORBTreeSearchTypeSorted) {
+		y->right = x_id;
+		x->parent = y_id;
+	} else {
+		y->right_seqno = x_id;
+		x->parent_seqno = y_id;
+	}
 }
 
 // find the successor node
@@ -333,14 +450,14 @@ void orbtree_put_fixup(ORBTreeImpl *impl, u32 k_id) {
 					// Rotate left to make the node the left child
 					k_id = k->parent;
 					k = orbtree_node(impl, k_id);
-					orbtree_left_rotate(impl, k_id);
+					orbtree_left_rotate(impl, k_id, ORBTreeSearchTypeSorted);
 				}
 				// Recolor and rotate
 				ORBTreeNode *kparent = orbtree_node(impl, k->parent);
 				SET_BLACK(impl, k->parent);
 				SET_RED(impl, kparent->parent);
 
-				orbtree_right_rotate(impl, kparent->parent);
+				orbtree_right_rotate(impl, kparent->parent, ORBTreeSearchTypeSorted);
 			}
 		} else {
 			// Case 2: Uncle is on the left
@@ -364,13 +481,13 @@ void orbtree_put_fixup(ORBTreeImpl *impl, u32 k_id) {
 					// Rotate left to make the node the left child
 					k_id = k->parent;
 					k = orbtree_node(impl, k_id);
-					orbtree_right_rotate(impl, k_id);
+					orbtree_right_rotate(impl, k_id, ORBTreeSearchTypeSorted);
 				}
 				// Recolor and rotate
 				SET_BLACK(impl, k->parent);
 				ORBTreeNode *kparent = orbtree_node(impl, k->parent);
 				SET_RED(impl, kparent->parent);
-				orbtree_left_rotate(impl, kparent->parent);
+				orbtree_left_rotate(impl, kparent->parent, ORBTreeSearchTypeSorted);
 			}
 		}
 	}
@@ -405,7 +522,6 @@ int orbtree_put(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced) {
 
 	if (impl->root == NIL) {
 		impl->root = value->id;
-
 	} else if (pair.is_right) {
 		ORBTreeNode *parent = orbtree_node(impl, pair.parent);
 		parent->right = value->id;
@@ -417,15 +533,37 @@ int orbtree_put(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced) {
 	ORBTreeNode *node = orbtree_node(impl, value->id);
 	node->right = NIL;
 	node->left = NIL;
+	node->right_seqno = NIL;
+	node->left_seqno = NIL;
+
 	node->parent = pair.parent;
+
+	// search for seqno
+	node->seqno_and_color = impl->seqno_next;
+	orbtree_search(impl, &node->seqno_and_color, &pair, ORBTreeSearchTypeSequenced);
+	impl->seqno_next += 0x8000000;
+
+	if (impl->seqno_root) {
+		impl->seqno_root = value->id;
+	} else if (pair.is_right) {
+		ORBTreeNode *parent = orbtree_node(impl, pair.parent);
+		parent->right_seqno = value->id;
+	} else {
+		ORBTreeNode *parent = orbtree_node(impl, pair.parent);
+		parent->left_seqno = value->id;
+	}
+
+	node->parent_seqno = pair.parent;
 
 #ifdef TEST
 	node->node_id = orbtree_next_node_id++;
 #endif // TEST
 
 	SET_RED(impl, value->id);
+	SET_RED_MULTI(impl, value->id, ORBTreeSearchTypeSequenced);
 	impl->elements++;
 
+	// TODO: need to modify fixup to take into consideration seqno and call it too.
 	orbtree_put_fixup(impl, value->id);
 
 	return 0;
@@ -467,7 +605,7 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
 				SET_RED(impl, parent);
-				orbtree_left_rotate(impl, parent);
+				orbtree_left_rotate(impl, parent, ORBTreeSearchTypeSorted);
 				w = parent_node->right;
 				w_node = orbtree_node(impl, w);
 			}
@@ -495,7 +633,7 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 				if (IS_BLACK(impl, w_node->right)) {
 					SET_BLACK(impl, w_node->left);
 					SET_RED(impl, w);
-					orbtree_right_rotate(impl, w);
+					orbtree_right_rotate(impl, w, ORBTreeSearchTypeSorted);
 					w = parent_node->right;
 					w_node = orbtree_node(impl, w);
 				}
@@ -504,7 +642,7 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 				orbtree_set_color_based_on_parent(impl, w, parent);
 				SET_BLACK(impl, parent);
 				SET_BLACK(impl, w_node->right);
-				orbtree_left_rotate(impl, parent);
+				orbtree_left_rotate(impl, parent, ORBTreeSearchTypeSorted);
 				x = impl->root; // Set x to root at the end, only once
 				x_node = orbtree_node(impl, x);
 			}
@@ -513,7 +651,7 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
 				SET_RED(impl, parent);
-				orbtree_right_rotate(impl, parent);
+				orbtree_right_rotate(impl, parent, ORBTreeSearchTypeSorted);
 				w = parent_node->left;
 				w_node = orbtree_node(impl, w);
 			}
@@ -541,7 +679,7 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 				if (IS_BLACK(impl, w_node->left)) {
 					SET_BLACK(impl, w_node->right);
 					SET_RED(impl, w);
-					orbtree_left_rotate(impl, w);
+					orbtree_left_rotate(impl, w, ORBTreeSearchTypeSorted);
 					w = parent_node->left;
 					w_node = orbtree_node(impl, w);
 				}
@@ -550,7 +688,7 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 				orbtree_set_color_based_on_parent(impl, w, parent);
 				SET_BLACK(impl, parent);
 				SET_BLACK(impl, w_node->left);
-				orbtree_right_rotate(impl, parent);
+				orbtree_right_rotate(impl, parent, ORBTreeSearchTypeSorted);
 				x = impl->root; // Set x to root at the end, only once
 				x_node = orbtree_node(impl, x);
 			}
