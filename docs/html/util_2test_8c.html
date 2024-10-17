@@ -81,6 +81,7 @@ $(function() {
 <code>#include &lt;math.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="object_8h_source.html">util/object.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="orbtree_8h_source.html">util/orbtree.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="rbtree_8h_source.html">util/rbtree.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="util_2test_8h_source.html">util/test.h</a>&gt;</code><br />
 </div><table class="memberdecls">
@@ -88,11 +89,15 @@ $(function() {
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structMyRecord.html">MyRecord</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structOrbTreeData.html">OrbTreeData</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a55ecbbdeff32e78ab08447dd42ef168f"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structMyRecord.html">MyRecord</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#a55ecbbdeff32e78ab08447dd42ef168f">MyRecord</a></td></tr>
 <tr class="separator:a55ecbbdeff32e78ab08447dd42ef168f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee6d2c35aa0c19ef5692614502a4f2cc"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structOrbTreeData.html">OrbTreeData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#aee6d2c35aa0c19ef5692614502a4f2cc">OrbTreeData</a></td></tr>
+<tr class="separator:aee6d2c35aa0c19ef5692614502a4f2cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -146,6 +151,12 @@ Functions</h2></td></tr>
 <tr class="separator:a5fc47278c850b2f7e1a44f32af5429ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abdb992ff772644b65bb438c28702acd1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#abdb992ff772644b65bb438c28702acd1">MyTest</a> (util, test_remove_property)</td></tr>
 <tr class="separator:abdb992ff772644b65bb438c28702acd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a933f6b6e09be4a5c8b95b5bb26f2e1ae"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#a933f6b6e09be4a5c8b95b5bb26f2e1ae">compare_orbs</a> (const void *k1, const void *k2)</td></tr>
+<tr class="separator:a933f6b6e09be4a5c8b95b5bb26f2e1ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5433255c14674627feee04a110023e55"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#a5433255c14674627feee04a110023e55">MyTest</a> (util, test_orbtree)</td></tr>
+<tr class="separator:a5433255c14674627feee04a110023e55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07f8b111f70fc54529309a6cfa9fa2d7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_2test_8c.html#a07f8b111f70fc54529309a6cfa9fa2d7">MyTest</a> (util, test_orbtree_loop)</td></tr>
+<tr class="separator:a07f8b111f70fc54529309a6cfa9fa2d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -167,6 +178,20 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">typedef struct <a class="el" href="structMyRecord.html">MyRecord</a> <a class="el" href="structMyRecord.html">MyRecord</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aee6d2c35aa0c19ef5692614502a4f2cc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aee6d2c35aa0c19ef5692614502a4f2cc">&#9670;&nbsp;</a></span>OrbTreeData</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structOrbTreeData.html">OrbTreeData</a> <a class="el" href="structOrbTreeData.html">OrbTreeData</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -204,6 +229,34 @@ Variables</h2></td></tr>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
           <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a933f6b6e09be4a5c8b95b5bb26f2e1ae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a933f6b6e09be4a5c8b95b5bb26f2e1ae">&#9670;&nbsp;</a></span>compare_orbs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int compare_orbs </td>
+          <td>(</td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>k1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>k2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -293,7 +346,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a9bb380956354fb4d9c9602b934413b6d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9bb380956354fb4d9c9602b934413b6d">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[1/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a9bb380956354fb4d9c9602b934413b6d">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[1/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -321,7 +374,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a97d312c6c2e29eb780f1248baf6fb2b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97d312c6c2e29eb780f1248baf6fb2b2">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[2/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a97d312c6c2e29eb780f1248baf6fb2b2">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[2/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -349,7 +402,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a37fc1e9b407e771a34ad4348a2e54288"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a37fc1e9b407e771a34ad4348a2e54288">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[3/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a37fc1e9b407e771a34ad4348a2e54288">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[3/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -377,7 +430,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="add08acccae9ec540ef042b0e6a265e7e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add08acccae9ec540ef042b0e6a265e7e">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[4/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#add08acccae9ec540ef042b0e6a265e7e">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[4/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -405,7 +458,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a5fc47278c850b2f7e1a44f32af5429ff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5fc47278c850b2f7e1a44f32af5429ff">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[5/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5fc47278c850b2f7e1a44f32af5429ff">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[5/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -432,8 +485,64 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a5433255c14674627feee04a110023e55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5433255c14674627feee04a110023e55">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[6/20]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MyTest </td>
+          <td>(</td>
+          <td class="paramtype">util&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_orbtree&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a07f8b111f70fc54529309a6cfa9fa2d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07f8b111f70fc54529309a6cfa9fa2d7">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[7/20]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MyTest </td>
+          <td>(</td>
+          <td class="paramtype">util&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_orbtree_loop&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ad765bea80b1a71c4f5f0a2868c4e736f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad765bea80b1a71c4f5f0a2868c4e736f">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[6/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad765bea80b1a71c4f5f0a2868c4e736f">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[8/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -461,7 +570,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a780013812b3d5cb4654bf3575f42cc1b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a780013812b3d5cb4654bf3575f42cc1b">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[7/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a780013812b3d5cb4654bf3575f42cc1b">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[9/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -489,7 +598,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="af098b914ac674665a3d48197955579f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af098b914ac674665a3d48197955579f7">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[8/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af098b914ac674665a3d48197955579f7">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[10/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -517,7 +626,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="abf8a1f5851e22a18b37990ed22d6b850"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf8a1f5851e22a18b37990ed22d6b850">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[9/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abf8a1f5851e22a18b37990ed22d6b850">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[11/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -545,7 +654,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="aa65e0f7e731f470a5e58ed6532f3ce0b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa65e0f7e731f470a5e58ed6532f3ce0b">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[10/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa65e0f7e731f470a5e58ed6532f3ce0b">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[12/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -573,7 +682,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a992e912dd5795ed48afd94f1a6410b7f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a992e912dd5795ed48afd94f1a6410b7f">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[11/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a992e912dd5795ed48afd94f1a6410b7f">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[13/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -601,7 +710,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ae8745916a37db3236218544eb2e51485"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae8745916a37db3236218544eb2e51485">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[12/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8745916a37db3236218544eb2e51485">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[14/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -629,7 +738,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="ad9cd63fcc9f5a5e9aca684080c02b0d9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad9cd63fcc9f5a5e9aca684080c02b0d9">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[13/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9cd63fcc9f5a5e9aca684080c02b0d9">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[15/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -657,7 +766,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="abdb992ff772644b65bb438c28702acd1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abdb992ff772644b65bb438c28702acd1">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[14/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#abdb992ff772644b65bb438c28702acd1">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[16/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -685,7 +794,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a061a8d31668dee97d948c820c9d4ca04"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a061a8d31668dee97d948c820c9d4ca04">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[15/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a061a8d31668dee97d948c820c9d4ca04">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[17/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -713,7 +822,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a02b6732b73d4a6d9d5d5424f6e6bad8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02b6732b73d4a6d9d5d5424f6e6bad8a">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[16/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a02b6732b73d4a6d9d5d5424f6e6bad8a">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[18/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -741,7 +850,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="a2d3780b41e93160ad4b841c480883968"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2d3780b41e93160ad4b841c480883968">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[17/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a2d3780b41e93160ad4b841c480883968">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[19/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -769,7 +878,7 @@ Variables</h2></td></tr>
 </div>
 </div>
 <a id="af615c4d737d0f82562d514c5795176c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af615c4d737d0f82562d514c5795176c9">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[18/18]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af615c4d737d0f82562d514c5795176c9">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[20/20]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
