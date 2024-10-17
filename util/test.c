@@ -886,7 +886,7 @@ MyTest(util, test_orbtree) {
 	find.value = &otd;
 	otd->key = 40;
 	rep.updated = false;
-	cr_assert(!orbtree_get(&tree1, otd, &rep, ORBTreeSearchTypeSorted));
+	cr_assert(!orbtree_get(&tree1, otd, &rep));
 	cr_assert_eq(rep.updated, true);
 	OrbTreeData x = *(OrbTreeData *)rep.value;
 	cr_assert_eq(x.value, 50);
@@ -922,7 +922,7 @@ MyTest(util, test_orbtree_loop) {
 	for (int i = 0; i < size; i++) {
 		search.key = arr[i];
 		ret.updated = false;
-		cr_assert(!orbtree_get(&tree1, &search, &ret, ORBTreeSearchTypeSorted));
+		cr_assert(!orbtree_get(&tree1, &search, &ret));
 		cr_assert(ret.updated);
 		otd = ret.value;
 		cr_assert_eq(otd->key, arr[i]);
@@ -943,6 +943,45 @@ MyTest(util, test_orbtree_loop) {
 	cr_assert(orbtree_remove(&tree1, &search, &ret));
 
 	cr_assert_eq(orbtree_size(&tree1), 0);
+}
+
+MyTest(util, test_dual_trees) {
+	// seed rng for reproducibility
+	u8 key[32] = {9};
+	u8 iv[16] = {};
+	psrng_test_seed(iv, key);
+
+	ORBTree tree1;
+	orbtree_create(&tree1, sizeof(OrbTreeData), compare_orbs);
+	// orbtree_create(&tree2, sizeof(OrbTreeData), compare_sequence);
+	int size = 10;
+	ORBTreeTray tray;
+	ORBTreeTray ret;
+	OrbTreeData *otd;
+	u64 arr[size];
+
+	for (int i = 0; i < size; i++) {
+		cr_assert(!orbtree_allocate_tray(&tree1, &tray));
+		otd = tray.value;
+		arr[i] = 0;
+		psrng_rand_u64(&arr[i]);
+		otd->key = arr[i];
+		otd->value = otd->key + 7;
+		cr_assert(!orbtree_put(&tree1, &tray, &ret));
+		// orbtree_print(&tree1);
+		orbtree_validate(&tree1);
+	}
+
+	OrbTreeData search;
+	for (int i = 0; i < size; i++) {
+		search.key = arr[i];
+		ret.updated = false;
+		cr_assert(!orbtree_get(&tree1, &search, &ret));
+		cr_assert(ret.updated);
+		otd = ret.value;
+		cr_assert_eq(otd->key, arr[i]);
+		cr_assert_eq(otd->value, arr[i] + 7);
+	}
 }
 
 /*

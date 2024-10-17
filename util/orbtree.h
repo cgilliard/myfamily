@@ -31,11 +31,6 @@ typedef struct ORBTreeTray {
 	u32 id;
 } ORBTreeTray;
 
-typedef enum ORBTreeSearchType {
-	ORBTreeSearchTypeSequenced,
-	ORBTreeSearchTypeSorted,
-} ORBTreeSearchType;
-
 void orbtree_iterator_cleanup(ORBTreeIteratorNc *ptr);
 
 #define ORBTreeIterator                                                                            \
@@ -53,37 +48,27 @@ void orbtree_cleanup(ORBTreeNc *ptr);
 
 int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void *, const void *));
 
+// get the value that matches 'value' and return it in 'tray'.
+int orbtree_get(const ORBTree *ptr, const void *value, ORBTreeTray *tray);
 // Put the tray into the tree. If this value replaces an existing value return the
 int orbtree_put(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced);
 // Remove the specified value. If removed, the removed tray will be populated with the previous
 // value.
 int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed);
-// get the value that matches 'value' and return it in 'tray'.
-int orbtree_get(const ORBTree *ptr, const void *value, ORBTreeTray *tray, ORBTreeSearchType type);
 
-// allocate a tray for insertion. This tray may be used for insertion. If not needed it may also be
-// freed with orbtree_deallocate.
-int orbtree_allocate_tray(ORBTree *ptr, ORBTreeTray *tray);
 // deallocate a tray. To be called after a deletion so the caller can do its own deallocations
 // before finally deallocating the tray itself.
 int orbtree_deallocate_tray(ORBTree *ptr, ORBTreeTray *tray);
+// allocate a tray for insertion. This tray may be used for insertion. If not needed it may also be
+// freed with orbtree_deallocate.
+int orbtree_allocate_tray(ORBTree *ptr, ORBTreeTray *tray);
 
 i64 orbtree_size(const ORBTree *ptr);
+
 int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
 					 bool start_inclusive, const void *end_value, bool end_inclusive);
 int orbtree_iterator_reset(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
 						   bool start_inclusive, const void *end_value, bool end_inclusive);
-
-int orbtree_put_index(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced, u32 index);
-int orbtree_put_before(ORBTree *ptr, const ORBTreeTray *before, ORBTreeTray *value,
-					   ORBTreeTray *replaced);
-int orbtree_put_after(ORBTree *ptr, const ORBTreeTray *after, ORBTreeTray *value,
-					  ORBTreeTray *replaced);
-int orbtree_push_front(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced);
-int orbtree_remove_index(ORBTree *ptr, const void *value, ORBTreeTray *removed);
-int orbtree_remove_last(ORBTree *ptr, const void *value, ORBTreeTray *removed);
-int orbtree_get_index(const ORBTree *ptr, const void *value, u32 index, ORBTreeTray *tray);
-int orbtree_get_last(const ORBTree *ptr, const void *value, ORBTreeTray *tray);
 
 #ifdef TEST
 void orbtree_print(const ORBTree *ptr);
