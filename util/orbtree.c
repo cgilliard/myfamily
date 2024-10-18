@@ -306,8 +306,6 @@ void orbtree_transplant(ORBTreeImpl *impl, u32 dst, u32 src) {
 			dst_parent->left_subtree_size = 0;
 		else {
 			ORBTreeNode *src_node = orbtree_node(impl, src);
-			dst_parent->left_subtree_size =
-				1 + src_node->right_subtree_size + src_node->left_subtree_size;
 		}
 	} else {
 		dst_parent->right = src;
@@ -315,14 +313,23 @@ void orbtree_transplant(ORBTreeImpl *impl, u32 dst, u32 src) {
 			dst_parent->right_subtree_size = 0;
 		else {
 			ORBTreeNode *src_node = orbtree_node(impl, src);
-			dst_parent->right_subtree_size =
-				1 + src_node->right_subtree_size + src_node->left_subtree_size;
 		}
 	}
 	if (src != NIL) {
 		ORBTreeNode *src_node = orbtree_node(impl, src);
 		src_node->parent = dst_node->parent;
+		ORBTreeNode *src_node_p = orbtree_node(impl, src_node->parent);
+		if (src_node_p) {
+			if (src_node_p->right == src)
+				src_node_p->right_subtree_size =
+					1 + src_node->right_subtree_size + src_node->left_subtree_size;
+			else
+				src_node_p->left_subtree_size =
+					1 + src_node->right_subtree_size + src_node->left_subtree_size;
+		}
 	}
+
+	orbtree_update_heights(impl, dst_node->parent);
 }
 
 void orbtree_put_fixup(ORBTreeImpl *impl, u32 k_id) {
@@ -697,7 +704,6 @@ int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
 
 		// do final transpalnt and update including color match
 		orbtree_transplant(impl, pair.self, successor_id);
-		// orbtree_validate_impl(impl);
 		successor->left = node_to_delete->left;
 		ORBTreeNode *successor_left = orbtree_node(impl, successor->left);
 		successor->left_subtree_size = 0;
@@ -708,6 +714,9 @@ int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
 
 		successor_left->parent = successor_id;
 		orbtree_set_color_based_on_parent(impl, successor_id, pair.self);
+
+		// go up the tree
+		orbtree_update_heights(impl, successor_id);
 	}
 
 	if (do_fixup) {
@@ -924,8 +933,8 @@ void orbtree_validate_node(const ORBTreeImpl *impl, u32 node, int *black_count,
 	if (left_subtree_sum != n->left_subtree_size || right_subtree_sum != n->right_subtree_size) {
 		printf("invalid subtree counts at node = %llu\n", n->node_id);
 	}
-	// assert(left_subtree_sum == n->left_subtree_size);
-	// assert(right_subtree_sum == n->right_subtree_size);
+	assert(left_subtree_sum == n->left_subtree_size);
+	assert(right_subtree_sum == n->right_subtree_size);
 
 	// Increment black count if the current node is black
 	if (IS_BLACK(impl, node)) {
