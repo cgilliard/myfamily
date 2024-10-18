@@ -51,7 +51,7 @@ int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void
 // get the value that matches 'value' and return it in 'tray'.
 int orbtree_get(const ORBTree *ptr, const void *value, ORBTreeTray *tray);
 // Put the tray into the tree. If this value replaces an existing value return the
-int orbtree_put(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced);
+int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced);
 // Remove the specified value. If removed, the removed tray will be populated with the previous
 // value.
 int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed);

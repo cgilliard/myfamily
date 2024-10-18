@@ -784,8 +784,6 @@ int compare_orbs(const void *k1, const void *k2) {
 	const OrbTreeData *k1o = k1;
 	const OrbTreeData *k2o = k2;
 
-	// printf("k1=%llu,k2=%llu\n", k1o->key, k2o->key);
-
 	if (k1o->key < k2o->key)
 		return -1;
 	else if (k1o->key > k2o->key)
@@ -945,19 +943,54 @@ MyTest(util, test_orbtree_loop) {
 	cr_assert_eq(orbtree_size(&tree1), 0);
 }
 
+typedef struct ObjTreeData {
+	u64 namespace;
+	u64 seqno;
+	u64 key;
+	u64 value;
+} ObjTreeData;
+
+int compare_objs(const void *k1, const void *k2) {
+	const ObjTreeData *o1 = k1;
+	const ObjTreeData *o2 = k2;
+	if (o1->namespace > o2->namespace)
+		return 1;
+	if (o1->namespace < o2->namespace)
+		return -1;
+	if (o1->key > o2->key)
+		return 1;
+	if (o1->key < o2->key)
+		return -1;
+	return 0;
+}
+
+int compare_seq_objs(const void *k1, const void *k2) {
+	const ObjTreeData *o1 = k1;
+	const ObjTreeData *o2 = k2;
+	if (o1->namespace > o2->namespace)
+		return 1;
+	if (o1->namespace < o2->namespace)
+		return -1;
+	if (o1->seqno > o2->seqno)
+		return 1;
+	if (o1->seqno < o2->seqno)
+		return -1;
+	return 0;
+}
+
 MyTest(util, test_dual_trees) {
 	// seed rng for reproducibility
 	u8 key[32] = {9};
 	u8 iv[16] = {};
 	psrng_test_seed(iv, key);
 
-	ORBTree tree1;
-	orbtree_create(&tree1, sizeof(OrbTreeData), compare_orbs);
-	// orbtree_create(&tree2, sizeof(OrbTreeData), compare_sequence);
-	int size = 10;
+	ORBTree tree1, tree2;
+	orbtree_create(&tree1, sizeof(ObjTreeData), compare_seq_objs);
+	orbtree_create(&tree2, sizeof(OrbTreeData), compare_objs);
+	int size = 100;
 	ORBTreeTray tray;
 	ORBTreeTray ret;
-	OrbTreeData *otd;
+	ObjTreeData *otd;
 	u64 arr[size];
 
 	for (int i = 0; i < size; i++) {
@@ -965,23 +998,54 @@ MyTest(util, test_dual_trees) {
 		otd = tray.value;
 		arr[i] = 0;
 		psrng_rand_u64(&arr[i]);
-		otd->key = arr[i];
-		otd->value = otd->key + 7;
+		otd->namespace = arr[i];
+		otd->value = otd->namespace + 7;
+		otd->seqno = 0;
 		cr_assert(!orbtree_put(&tree1, &tray, &ret));
-		// orbtree_print(&tree1);
+
+		// cr_assert(!orbtree_allocate_tray(&tree2, &tray));
+		otd = tray.value;
+		otd->namespace = arr[i];
+		otd->seqno = 0;
+		otd->value = otd->namespace + 7;
+
+		// cr_assert(!orbtree_put(&tree2, &tray, &ret));
 		orbtree_validate(&tree1);
+		//  orbtree_validate(&tree2);
 	}
 
-	OrbTreeData search;
+	orbtree_print(&tree1);
+	orbtree_validate(&tree1);
+	printf("insertion validated\n");
+
+	ObjTreeData search;
 	for (int i = 0; i < size; i++) {
-		search.key = arr[i];
+		search.namespace = arr[i];
+		search.seqno = 0;
 		ret.updated = false;
 		cr_assert(!orbtree_get(&tree1, &search, &ret));
 		cr_assert(ret.updated);
 		otd = ret.value;
-		cr_assert_eq(otd->key, arr[i]);
+		cr_assert_eq(otd->namespace, arr[i]);
 		cr_assert_eq(otd->value, arr[i] + 7);
 	}
+
+	for (int i = 0; i < size; i++) {
+		printf("delete %i\n", i);
+		search.namespace = arr[i];
+		search.seqno = 0;
+		ret.updated = false;
+		cr_assert(!orbtree_remove(&tree1, &search, &ret));
+		orbtree_deallocate_tray(&tree1, &ret);
+		cr_assert(orbtree_remove(&tree1, &search, &ret));
+		// printf("post delete validation\n");
+		// orbtree_print(&tree1);
+		// orbtree_validate(&tree1);
+	}
+	search.key = UINT64_MAX;
+	cr_assert(orbtree_remove(&tree1, &search, &ret));
+
+	cr_assert_eq(orbtree_size(&tree1), 0);
 }
 
 /*

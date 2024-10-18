@@ -23,7 +23,7 @@
 
 u64 orbtree_next_node_id = 10;
 
-#define RED_MASK 0x80000000ULL
+#define RED_MASK 0x80000000
 
 #define SET_RED(impl, id)                                                                          \
 	({                                                                                             \
@@ -68,6 +68,15 @@ typedef struct ORBTreeNodePair {
 
 static u32 NIL = (UINT32_MAX - 2);
 
+typedef struct ORBAllocator {
+	u8 **data_chunks;
+	u32 size;	  // current number of slabs allocated for the tree.
+	u32 capacity; // current capacity in terms of number of slabs for the tree.
+	u32 free_list_head;
+	u32 cur_chunks;
+	u32 *free_list;
+} ORBAllocator;
+
 // The internal ORBTreeImpl storage data structure
 typedef struct ORBTreeImpl {
 	u64 value_size; // size of the values
@@ -75,13 +84,8 @@ typedef struct ORBTreeImpl {
 	// a comparion function (like qsort)
 	int (*compare)(const void *, const void *);
 	u32 root;	  // offset to the root node.
-	u32 size;	  // current number of slabs allocated for the tree.
-	u32 capacity; // current capacity in terms of number of slabs for the tree.
 	u32 elements; // number of elements in the tree.
-	u32 free_list_head;
-	u8 **data_chunks;
-	u32 cur_chunks;
-	u32 *free_list;
+	ORBAllocator *alloc;
 } ORBTreeImpl;
 
 void orbtree_print_impl(ORBTreeImpl *impl);
@@ -97,18 +101,24 @@ bool orbtree_iterator_next(ORBTreeIterator *ptr, ORBTreeTray *value) {
 void orbtree_cleanup(ORBTreeNc *ptr) {
 	if (ptr->impl) {
 		ORBTreeImpl *impl = ptr->impl;
-		if (impl->data_chunks) {
-			for (u32 i = 0; i < impl->capacity; i += NODES_PER_CHUNK) {
-				myfree(impl->data_chunks[i / NODES_PER_CHUNK]);
+		if (impl->alloc->data_chunks != NULL) {
+			for (u32 i = 0; i < impl->alloc->capacity; i += NODES_PER_CHUNK) {
+				myfree(impl->alloc->data_chunks[i / NODES_PER_CHUNK]);
 			}
-			myfree(impl->data_chunks);
-			impl->data_chunks = NULL;
+			myfree(impl->alloc->data_chunks);
+			impl->alloc->data_chunks = NULL;
 		}
 
-		if (impl->free_list) {
-			myfree(impl->free_list);
-			impl->free_list = NULL;
+		if (impl->alloc->free_list) {
+			myfree(impl->alloc->free_list);
+			impl->alloc->free_list = NULL;
 		}
+
+		if (impl->alloc) {
+			myfree(impl->alloc);
+			impl->alloc = NULL;
+		}
+
 		myfree(ptr->impl);
 		ptr->impl = NULL;
 	}
@@ -129,13 +139,16 @@ int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void
 	impl->value_size = value_size;
 	impl->compare = compare;
 	impl->root = NIL;
-	impl->size = 0;
-	impl->capacity = 0;
-	impl->free_list_head = UINT32_MAX;
-	impl->data_chunks = NULL;
-	impl->cur_chunks = 0;
+
+	impl->alloc = mymalloc(sizeof(ORBAllocator));
+
+	impl->alloc->size = 0;
+	impl->alloc->capacity = 0;
+	impl->alloc->free_list_head = UINT32_MAX;
+	impl->alloc->data_chunks = NULL;
+	impl->alloc->cur_chunks = 0;
 	impl->elements = 0;
-	impl->free_list = NULL;
+	impl->alloc->free_list = NULL;
 
 	return 0;
 }
@@ -147,7 +160,23 @@ ORBTreeNode *orbtree_node(const ORBTreeImpl *impl, u32 node) {
 	u64 index = node / NODES_PER_CHUNK;
 	u64 offset = node % NODES_PER_CHUNK;
 	u64 offset_sum = (offset * (sizeof(ORBTreeNode) + impl->value_size));
-	return (ORBTreeNode *)(impl->data_chunks[index] + offset_sum);
+	return (ORBTreeNode *)(impl->alloc->data_chunks[index] + offset_sum);
+}
+
+void orbtree_update_heights(const ORBTreeImpl *impl, u32 node) {
+	ORBTreeNode *last = orbtree_node(impl, node);
+	if (last == NULL)
+		return;
+	ORBTreeNode *parent;
+	while (last->parent != NIL) {
+		parent = orbtree_node(impl, last->parent);
+		if (orbtree_node(impl, parent->right) == last) {
+			parent->right_subtree_size = 1 + last->right_subtree_size + last->left_subtree_size;
+		} else {
+			parent->left_subtree_size = 1 + last->right_subtree_size + last->left_subtree_size;
+		}
+		last = parent;
+	}
 }
 
 void *orbtree_value(const ORBTreeImpl *impl, u32 node) {
@@ -158,7 +187,6 @@ void *orbtree_value(const ORBTreeImpl *impl, u32 node) {
 void orbtree_search(const ORBTreeImpl *impl, const void *value, ORBTreeNodePair *nodes) {
 	nodes->parent = NIL;
 	nodes->self = impl->root;
-
 	int i = 0;
 	while (nodes->self != NIL) {
 		nodes->parent = nodes->self;
@@ -182,8 +210,15 @@ void orbtree_left_rotate(ORBTreeImpl *impl, u32 x_id) {
 	u32 y_id = x->right;
 	ORBTreeNode *y = orbtree_node(impl, y_id);
 
+	u32 y_right_subtree_size = y->right_subtree_size;
+	u32 y_left_subtree_size = y->left_subtree_size;
+	u32 x_right_subtree_size = x->right_subtree_size;
+	u32 x_left_subtree_size = x->left_subtree_size;
+
 	// Move y's left subtree to x's right subtree
 	x->right = y->left;
+	x->right_subtree_size = y_left_subtree_size;
+
 	if (y->left != NIL) {
 		ORBTreeNode *yleft = orbtree_node(impl, y->left);
 		yleft->parent = x_id;
@@ -204,6 +239,7 @@ void orbtree_left_rotate(ORBTreeImpl *impl, u32 x_id) {
 
 	// Place x as y's left child
 	y->left = x_id;
+	y->left_subtree_size = x->right_subtree_size + x->left_subtree_size + 1;
 	x->parent = y_id;
 }
 
@@ -211,8 +247,16 @@ void orbtree_right_rotate(ORBTreeImpl *impl, u32 x_id) {
 	ORBTreeNode *x = orbtree_node(impl, x_id);
 	u32 y_id = x->left;
 	ORBTreeNode *y = orbtree_node(impl, y_id);
+
+	u32 y_right_subtree_size = y->right_subtree_size;
+	u32 y_left_subtree_size = y->left_subtree_size;
+	u32 x_right_subtree_size = x->right_subtree_size;
+	u32 x_left_subtree_size = x->left_subtree_size;
+
 	// Move y's right subtree to x's right subtree
 	x->left = y->right;
+	x->left_subtree_size = y_right_subtree_size;
+
 	if (y->right != NIL) {
 		ORBTreeNode *yright = orbtree_node(impl, y->right);
 		yright->parent = x_id;
@@ -233,6 +277,7 @@ void orbtree_right_rotate(ORBTreeImpl *impl, u32 x_id) {
 
 	// Place x as y's left child
 	y->right = x_id;
+	y->right_subtree_size = x->right_subtree_size + x->left_subtree_size + 1;
 	x->parent = y_id;
 }
 
@@ -252,12 +297,28 @@ u32 orbtree_find_successor(ORBTreeImpl *impl, u32 x_id) {
 void orbtree_transplant(ORBTreeImpl *impl, u32 dst, u32 src) {
 	ORBTreeNode *dst_node = orbtree_node(impl, dst);
 	ORBTreeNode *dst_parent = orbtree_node(impl, dst_node->parent);
+
 	if (dst_node->parent == NIL)
 		impl->root = src;
-	else if (dst == dst_parent->left)
+	else if (dst == dst_parent->left) {
 		dst_parent->left = src;
-	else
+		if (src == NIL)
+			dst_parent->left_subtree_size = 0;
+		else {
+			ORBTreeNode *src_node = orbtree_node(impl, src);
+			dst_parent->left_subtree_size =
+				1 + src_node->right_subtree_size + src_node->left_subtree_size;
+		}
+	} else {
 		dst_parent->right = src;
+		if (src == NIL)
+			dst_parent->right_subtree_size = 0;
+		else {
+			ORBTreeNode *src_node = orbtree_node(impl, src);
+			dst_parent->right_subtree_size =
+				1 + src_node->right_subtree_size + src_node->left_subtree_size;
+		}
+	}
 	if (src != NIL) {
 		ORBTreeNode *src_node = orbtree_node(impl, src);
 		src_node->parent = dst_node->parent;
@@ -339,7 +400,7 @@ void orbtree_put_fixup(ORBTreeImpl *impl, u32 k_id) {
 	SET_BLACK(impl, impl->root);
 }
 
-int orbtree_put(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced) {
+int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced) {
 	// validate input
 	if (ptr == NULL || value == NULL || replaced == NULL) {
 		SetErr(IllegalArgument);
@@ -369,15 +430,21 @@ int orbtree_put(ORBTree *ptr, ORBTreeTray *value, ORBTreeTray *replaced) {
 
 	} else if (pair.is_right) {
 		ORBTreeNode *parent = orbtree_node(impl, pair.parent);
+		parent->right_subtree_size++;
 		parent->right = value->id;
 	} else {
 		ORBTreeNode *parent = orbtree_node(impl, pair.parent);
+		parent->left_subtree_size++;
 		parent->left = value->id;
 	}
+
+	orbtree_update_heights(impl, pair.parent);
 
 	ORBTreeNode *node = orbtree_node(impl, value->id);
 	node->right = NIL;
 	node->left = NIL;
+	node->right_subtree_size = 0;
+	node->left_subtree_size = 0;
 	node->parent = pair.parent;
 
 #ifdef TEST
@@ -619,14 +686,26 @@ int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
 		if (successor->parent != pair.self) {
 			orbtree_transplant(impl, successor_id, successor->right);
 			successor->right = node_to_delete->right;
+			successor->right_subtree_size = 0;
 			ORBTreeNode *successor_right = orbtree_node(impl, successor->right);
-			successor_right->parent = successor_id;
+			if (successor_right) {
+				successor->right_subtree_size =
+					1 + successor_right->right_subtree_size + successor_right->left_subtree_size;
+				successor_right->parent = successor_id;
+			}
 		}
 
-		// do final transpalnnnt and update including color match
+		// do final transpalnt and update including color match
 		orbtree_transplant(impl, pair.self, successor_id);
+		// orbtree_validate_impl(impl);
 		successor->left = node_to_delete->left;
 		ORBTreeNode *successor_left = orbtree_node(impl, successor->left);
+		successor->left_subtree_size = 0;
+		if (node_to_delete->left != NIL) {
+			ORBTreeNode *ntdl = orbtree_node(impl, node_to_delete->left);
+			successor->left_subtree_size = 1 + ntdl->right_subtree_size + ntdl->left_subtree_size;
+		}
+
 		successor_left->parent = successor_id;
 		orbtree_set_color_based_on_parent(impl, successor_id, pair.self);
 	}
@@ -701,9 +780,9 @@ int orbtree_init_free_list(ORBTreeImpl *impl, u8 *data, u32 offset) {
 	u64 cur_index = offset / NODES_PER_CHUNK;
 	for (int i = 0; i < NODES_PER_CHUNK; i++) {
 		if (i < NODES_PER_CHUNK - 1)
-			impl->free_list[i + offset] = offset + i + 1;
+			impl->alloc->free_list[i + offset] = offset + i + 1;
 		else
-			impl->free_list[i + offset] = UINT32_MAX;
+			impl->alloc->free_list[i + offset] = UINT32_MAX;
 	}
 	return 0;
 }
@@ -718,67 +797,67 @@ int orbtree_allocate_tray(ORBTree *ptr, ORBTreeTray *tray) {
 		SetErr(IllegalState);
 		return -1;
 	}
-	if (impl->free_list_head == UINT32_MAX) {
+	if (impl->alloc->free_list_head == UINT32_MAX) {
 		void *tmp;
-		if (((impl->capacity / 100) % CHUNKS_PER_RESIZE) == 0) {
-			if (impl->capacity == 0) {
+		if (((impl->alloc->capacity / 100) % CHUNKS_PER_RESIZE) == 0) {
+			if (impl->alloc->capacity == 0) {
 				tmp = mymalloc(sizeof(void *) * CHUNKS_PER_RESIZE);
 			} else {
-				u64 size = (impl->cur_chunks + CHUNKS_PER_RESIZE) * sizeof(void *);
-				tmp = myrealloc(impl->data_chunks, size);
+				u64 size = (impl->alloc->cur_chunks + CHUNKS_PER_RESIZE) * sizeof(void *);
+				tmp = myrealloc(impl->alloc->data_chunks, size);
 			}
 
 			if (tmp == NULL) {
 				return -1;
 			}
-			impl->cur_chunks += CHUNKS_PER_RESIZE;
-			impl->data_chunks = tmp;
+			impl->alloc->cur_chunks += CHUNKS_PER_RESIZE;
+			impl->alloc->data_chunks = tmp;
 		}
-		u64 index = impl->size / NODES_PER_CHUNK;
-		impl->data_chunks[index] =
+		u64 index = impl->alloc->size / NODES_PER_CHUNK;
+		impl->alloc->data_chunks[index] =
 			mymalloc(sizeof(u8) * NODES_PER_CHUNK * (impl->value_size + sizeof(ORBTreeNode)));
 
-		if (impl->data_chunks[index] == NULL) {
-			if (impl->capacity == 0) {
-				impl->cur_chunks = 0;
-				impl->data_chunks = NULL;
+		if (impl->alloc->data_chunks[index] == NULL) {
+			if (impl->alloc->capacity == 0) {
+				impl->alloc->cur_chunks = 0;
+				impl->alloc->data_chunks = NULL;
 				myfree(tmp);
 			}
 			return -1;
 		}
 
 		void *free_list = NULL;
-		if (impl->capacity == 0) {
-			free_list = mymalloc(sizeof(u32) * (impl->cur_chunks + 1) * NODES_PER_CHUNK);
+		if (impl->alloc->capacity == 0) {
+			free_list = mymalloc(sizeof(u32) * (impl->alloc->cur_chunks + 1) * NODES_PER_CHUNK);
 		} else {
-			free_list =
-				myrealloc(impl->free_list, sizeof(u32) * (impl->cur_chunks + 1) * NODES_PER_CHUNK);
+			free_list = myrealloc(impl->alloc->free_list,
+								  sizeof(u32) * (impl->alloc->cur_chunks + 1) * NODES_PER_CHUNK);
 		}
 		if (free_list == NULL) {
-			if (impl->capacity == 0) {
-				impl->cur_chunks = 0;
-				impl->data_chunks = NULL;
+			if (impl->alloc->capacity == 0) {
+				impl->alloc->cur_chunks = 0;
+				impl->alloc->data_chunks = NULL;
 				myfree(tmp);
 				myfree(free_list);
 				return -1;
 			}
 		}
 
-		impl->free_list = free_list;
-		orbtree_init_free_list(impl, impl->data_chunks[index], impl->size);
-		impl->free_list_head = impl->size;
-		impl->capacity = (index + 1) * NODES_PER_CHUNK;
+		impl->alloc->free_list = free_list;
+		orbtree_init_free_list(impl, impl->alloc->data_chunks[index], impl->alloc->size);
+		impl->alloc->free_list_head = impl->alloc->size;
+		impl->alloc->capacity = (index + 1) * NODES_PER_CHUNK;
 	}
 
-	u32 next = impl->free_list_head;
+	u32 next = impl->alloc->free_list_head;
 	if (next == NIL)
 		return -1;
 	tray->value = orbtree_value(impl, next);
-	impl->free_list_head = impl->free_list[next];
+	impl->alloc->free_list_head = impl->alloc->free_list[next];
 	tray->updated = true;
 	tray->id = next;
-	impl->free_list[next] = UINT32_MAX - 1;
-	impl->size++;
+	impl->alloc->free_list[next] = UINT32_MAX - 1;
+	impl->alloc->size++;
 	return 0;
 }
 
@@ -793,17 +872,17 @@ int orbtree_deallocate_tray(ORBTree *ptr, ORBTreeTray *tray) {
 		return -1;
 	}
 
-	if (impl->free_list == NULL) {
+	if (impl->alloc->free_list == NULL) {
 		panic("free list not initialized!");
 	}
 
-	if ((impl->free_list)[tray->id] != (UINT32_MAX - 1)) {
+	if ((impl->alloc->free_list)[tray->id] != (UINT32_MAX - 1)) {
 		panic("Potential double free. Id = %llu.", tray->id);
 	}
 
-	impl->free_list[tray->id] = impl->free_list_head;
-	impl->free_list_head = tray->id;
-	impl->size--;
+	impl->alloc->free_list[tray->id] = impl->alloc->free_list_head;
+	impl->alloc->free_list_head = tray->id;
+	impl->alloc->size--;
 
 	return 0;
 }
@@ -827,6 +906,26 @@ void orbtree_validate_node(const ORBTreeImpl *impl, u32 node, int *black_count,
 	}
 
 	ORBTreeNode *n = orbtree_node(impl, node);
+
+	// check subtree heights
+	u32 right_subtree_sum = 0;
+	if (n->right != NIL) {
+		ORBTreeNode *nr = orbtree_node(impl, n->right);
+		if (nr)
+			right_subtree_sum = 1 + nr->right_subtree_size + nr->left_subtree_size;
+	}
+	u32 left_subtree_sum = 0;
+	if (n->left != NIL) {
+		ORBTreeNode *nl = orbtree_node(impl, n->left);
+		if (n)
+			left_subtree_sum = 1 + nl->right_subtree_size + nl->left_subtree_size;
+	}
+
+	if (left_subtree_sum != n->left_subtree_size || right_subtree_sum != n->right_subtree_size) {
+		printf("invalid subtree counts at node = %llu\n", n->node_id);
+	}
+	// assert(left_subtree_sum == n->left_subtree_size);
+	// assert(right_subtree_sum == n->right_subtree_size);
 
 	// Increment black count if the current node is black
 	if (IS_BLACK(impl, node)) {
@@ -877,7 +976,8 @@ void orbtree_print_node(const ORBTreeImpl *impl, u32 node_id, int depth) {
 	}
 
 	// Print the current node with a clearer representation
-	printf("%llu (%s)\n", node->node_id, (IS_BLACK(impl, node_id)) ? "B" : "R");
+	printf("%llu (%s,r=%u,l=%u)\n", node->node_id, (IS_BLACK(impl, node_id)) ? "B" : "R",
+		   node->right_subtree_size, node->left_subtree_size);
 
 	// Print the left child
 	orbtree_print_node(impl, node->left, depth + 1);
