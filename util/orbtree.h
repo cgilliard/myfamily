@@ -72,8 +72,8 @@ i64 orbtree_size(const ORBTree *ptr);
 
 int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
 					 bool start_inclusive, const void *end_value, bool end_inclusive, bool send);
-int orbtree_iterator_reset(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
-						   bool start_inclusive, const void *end_value, bool end_inclusive);
+int orbtree_iterator_reset(ORBTreeIterator *iter, const void *start_value, bool start_inclusive,
+						   const void *end_value, bool end_inclusive);
 
 #ifdef TEST
 void orbtree_print(const ORBTree *ptr);

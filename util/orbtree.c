@@ -976,20 +976,21 @@ int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *star
 	return orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value,
 								 end_inclusive);
 }
-int orbtree_iterator_reset(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
-						   bool start_inclusive, const void *end_value, bool end_inclusive) {
-	if (ptr == NULL || iter == NULL) {
+int orbtree_iterator_reset(ORBTreeIterator *iter, const void *start_value, bool start_inclusive,
+						   const void *end_value, bool end_inclusive) {
+	if (iter == NULL) {
 		SetErr(IllegalArgument);
 		return -1;
 	}
 
-	ORBTreeImpl *impl = ptr->impl;
-	if (impl == NULL) {
+	ORBTreeIteratorImpl *impl = $(iter->impl);
+	ORBTreeImpl *impl2 = impl->impl;
+	if (impl2 == NULL) {
 		SetErr(IllegalState);
 		return -1;
 	}
 
-	return orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value,
+	return orbtree_iterator_impl(impl2, iter, start_value, start_inclusive, end_value,
 								 end_inclusive);
 }
 

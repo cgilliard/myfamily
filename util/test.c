@@ -1100,7 +1100,7 @@ MyTest(util, test_orbtree_iterator) {
 	for (u64 i = 0; i < 100; i++) {
 		u64 start = 200 + i;
 		u64 end = 500 + i;
-		cr_assert(!orbtree_iterator_reset(&tree1, &itt1, &start, true, &end, true));
+		cr_assert(!orbtree_iterator_reset(&itt1, &start, true, &end, true));
 
 		count = start;
 		while (orbtree_iterator_next(&itt1, &tray)) {
@@ -1108,7 +1108,7 @@ MyTest(util, test_orbtree_iterator) {
 		}
 		cr_assert_eq(count, end + 1);
 
-		cr_assert(!orbtree_iterator_reset(&tree1, &itt1, &start, true, &end, false));
+		cr_assert(!orbtree_iterator_reset(&itt1, &start, true, &end, false));
 
 		count = start;
 		while (orbtree_iterator_next(&itt1, &tray)) {
@@ -1117,7 +1117,7 @@ MyTest(util, test_orbtree_iterator) {
 
 		cr_assert_eq(count, end);
 
-		cr_assert(!orbtree_iterator_reset(&tree1, &itt1, &start, false, &end, false));
+		cr_assert(!orbtree_iterator_reset(&itt1, &start, false, &end, false));
 		count = start + 1;
 		while (orbtree_iterator_next(&itt1, &tray)) {
 			if (count != *(u64 *)tray.value) {
@@ -1128,7 +1128,7 @@ MyTest(util, test_orbtree_iterator) {
 
 		cr_assert_eq(count, end);
 
-		cr_assert(!orbtree_iterator_reset(&tree1, &itt1, &start, false, &end, true));
+		cr_assert(!orbtree_iterator_reset(&itt1, &start, false, &end, true));
 		count = start + 1;
 		while (orbtree_iterator_next(&itt1, &tray)) {
 			cr_assert_eq(count++, *(u64 *)tray.value);
