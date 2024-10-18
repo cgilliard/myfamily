@@ -209,11 +209,7 @@ void orbtree_left_rotate(ORBTreeImpl *impl, u32 x_id) {
 	ORBTreeNode *x = orbtree_node(impl, x_id);
 	u32 y_id = x->right;
 	ORBTreeNode *y = orbtree_node(impl, y_id);
-
-	u32 y_right_subtree_size = y->right_subtree_size;
 	u32 y_left_subtree_size = y->left_subtree_size;
-	u32 x_right_subtree_size = x->right_subtree_size;
-	u32 x_left_subtree_size = x->left_subtree_size;
 
 	// Move y's left subtree to x's right subtree
 	x->right = y->left;
@@ -249,9 +245,6 @@ void orbtree_right_rotate(ORBTreeImpl *impl, u32 x_id) {
 	ORBTreeNode *y = orbtree_node(impl, y_id);
 
 	u32 y_right_subtree_size = y->right_subtree_size;
-	u32 y_left_subtree_size = y->left_subtree_size;
-	u32 x_right_subtree_size = x->right_subtree_size;
-	u32 x_left_subtree_size = x->left_subtree_size;
 
 	// Move y's right subtree to x's right subtree
 	x->left = y->right;
@@ -466,6 +459,70 @@ int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced) {
 	return 0;
 }
 
+int orbtree_get_index(const ORBTree *ptr, u32 index, ORBTreeTray *tray) {
+	if (ptr == NULL || tray == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+
+	tray->updated = false;
+
+	// obtain the impl from the ptr
+	ORBTreeImpl *impl = ptr->impl;
+
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	i64 size = orbtree_size(ptr);
+	if (index >= size) {
+		SetErr(IndexOutOfBounds);
+		return -1;
+	}
+
+	u32 itt = impl->root;
+	u32 left_cur = 0;
+
+	while (itt != NIL) {
+		ORBTreeNode *n = orbtree_node(impl, itt);
+		left_cur += n->left_subtree_size;
+		if (left_cur > index) {
+			left_cur -= n->left_subtree_size;
+			itt = n->left;
+		} else if (left_cur < index) {
+			left_cur += 1;
+			itt = n->right;
+		} else {
+			break;
+		}
+	}
+	if (itt == NIL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	tray->value = orbtree_value(impl, itt);
+	tray->updated = true;
+
+	return 0;
+}
+
+int orbtree_remove_index(ORBTree *ptr, u32 index, ORBTreeTray *removed) {
+	ORBTreeTray search;
+	search.updated = false;
+	int ret = orbtree_get_index(ptr, index, &search);
+	if (ret)
+		return ret;
+
+	if (!search.updated) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	return orbtree_remove(ptr, search.value, removed);
+}
+
 // set child's color to parent's
 void orbtree_set_color_based_on_parent(ORBTreeImpl *impl, u32 child, u32 parent) {
 	if (child != NIL) {
@@ -482,21 +539,6 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 		ORBTreeNode *parent_node = orbtree_node(impl, parent);
 		ORBTreeNode *w_node = orbtree_node(impl, w);
 		ORBTreeNode *x_node = orbtree_node(impl, x);
-		u64 w_nid;
-		if (w_node)
-			w_nid = w_node->node_id;
-		else
-			w_nid = 0;
-		u64 x_nid;
-		if (x_node)
-			x_nid = x_node->node_id;
-		else
-			x_nid = 0;
-		u64 p_nid;
-		if (parent_node)
-			p_nid = parent_node->node_id;
-		else
-			p_nid = 0;
 		if (w == parent_node->right) {
 			// Case 1: Sibling is red
 			if (IS_RED(impl, w)) {

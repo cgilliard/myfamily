@@ -56,6 +56,11 @@ int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced);
 // value.
 int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed);
 
+// search for the value at the specified index, storing the value in 'tray' if found.
+int orbtree_get_index(const ORBTree *ptr, u32 index, ORBTreeTray *tray);
+// remove the value at the specified index, storing the value in 'removed' if removed.
+int orbtree_remove_index(ORBTree *ptr, u32 index, ORBTreeTray *removed);
+
 // deallocate a tray. To be called after a deletion so the caller can do its own deallocations
 // before finally deallocating the tray itself.
 int orbtree_deallocate_tray(ORBTree *ptr, ORBTreeTray *tray);

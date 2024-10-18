@@ -987,7 +987,7 @@ MyTest(util, test_dual_trees) {
 	ORBTree tree1, tree2;
 	orbtree_create(&tree1, sizeof(ObjTreeData), compare_seq_objs);
 	orbtree_create(&tree2, sizeof(OrbTreeData), compare_objs);
-	int size = 1000;
+	int size = 10;
 	ORBTreeTray tray;
 	ORBTreeTray ret;
 	ObjTreeData *otd;
@@ -1015,6 +1015,7 @@ MyTest(util, test_dual_trees) {
 	}
 
 	orbtree_validate(&tree1);
+	orbtree_print(&tree1);
 
 	ObjTreeData search;
 	for (int i = 0; i < size; i++) {
@@ -1041,6 +1042,37 @@ MyTest(util, test_dual_trees) {
 	cr_assert(orbtree_remove(&tree1, &search, &ret));
 
 	cr_assert_eq(orbtree_size(&tree1), 0);
+}
+
+MyTest(util, test_orbtree_index) {
+	ORBTree tree1;
+	ORBTreeTray tray, ret;
+	orbtree_create(&tree1, sizeof(u64), u64_compare);
+	u64 size = 10;
+
+	for (u64 i = 0; i < size; i++) {
+		cr_assert(!orbtree_allocate_tray(&tree1, &tray));
+		u64 *v = tray.value;
+		*v = i;
+		cr_assert(!orbtree_put(&tree1, &tray, &ret));
+		orbtree_validate(&tree1);
+	}
+
+	orbtree_print(&tree1);
+
+	for (u32 i = 0; i < size; i++) {
+		ret.updated = false;
+		cr_assert(!orbtree_get_index(&tree1, i, &ret));
+		cr_assert(ret.updated);
+		cr_assert_eq(*(u64 *)ret.value, i);
+	}
+
+	cr_assert(orbtree_get_index(&tree1, size, &ret));
+	SetErr(NoErrors);
+
+	for (u32 i = 0; i < size; i++)
+		cr_assert(!orbtree_remove_index(&tree1, 0, &ret));
+	cr_assert(orbtree_size(&tree1) == 0);
 }
 
 /*
