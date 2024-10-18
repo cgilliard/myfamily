@@ -906,8 +906,11 @@ int orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *
 				if (start_inclusive) {
 					rbimpl->min = itt;
 					break;
+				} else {
+					if (node->right != NIL)
+						rbimpl->min = node->right;
+					itt = node->right;
 				}
-				itt = node->left;
 			} else if (v < 0) {
 				// continue down the chain to look for more
 				itt = node->right;
