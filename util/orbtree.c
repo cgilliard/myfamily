@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <assert.h>
+#include <base/fam_alloc.h>
 #include <base/panic.h>
 #include <base/resources.h>
 #include <stdio.h>
@@ -20,6 +21,7 @@
 
 #define NODES_PER_CHUNK 100
 #define CHUNKS_PER_RESIZE 10
+#define ITERATOR_STACK_SIZE 128
 
 u64 orbtree_next_node_id = 10;
 
@@ -66,7 +68,7 @@ typedef struct ORBTreeNodePair {
 	bool is_right;
 } ORBTreeNodePair;
 
-static u32 NIL = (UINT32_MAX - 2);
+const static u32 NIL = (UINT32_MAX - 2);
 
 typedef struct ORBAllocator {
 	u8 **data_chunks;
@@ -88,14 +90,91 @@ typedef struct ORBTreeImpl {
 	ORBAllocator *alloc;
 } ORBTreeImpl;
 
-void orbtree_print_impl(ORBTreeImpl *impl);
-void orbtree_validate_impl(const ORBTreeImpl *impl);
+// Iterator impl
+typedef struct ORBTreeIteratorImpl {
+	u32 cur;
+	u32 min;
+	u32 max;
+	u32 stack[ITERATOR_STACK_SIZE];
+	u64 value_size;
+	u8 stack_pointer;
+	ORBTreeImpl *impl;
+} ORBTreeIteratorImpl;
+
+ORBTreeNode *orbtree_node(const ORBTreeImpl *impl, u32 node) {
+	if (node == NIL) {
+		return NULL;
+	}
+	u64 index = node / NODES_PER_CHUNK;
+	u64 offset = node % NODES_PER_CHUNK;
+	u64 offset_sum = (offset * (sizeof(ORBTreeNode) + impl->value_size));
+	return (ORBTreeNode *)(impl->alloc->data_chunks[index] + offset_sum);
+}
+
+void *orbtree_value(const ORBTreeImpl *impl, u32 node) {
+	return orbtree_node(impl, node)->data;
+}
 
 void orbtree_iterator_cleanup(ORBTreeIteratorNc *ptr) {
+	if (!nil(ptr->impl)) {
+		fam_free(&ptr->impl);
+		ptr->impl = null;
+	}
 }
 
 bool orbtree_iterator_next(ORBTreeIterator *ptr, ORBTreeTray *value) {
-	return false;
+	ORBTreeIteratorImpl *impl = $(ptr->impl);
+
+	// If the iterator is empty, we're done
+	if (impl->cur == NIL && impl->stack_pointer == 0) {
+		return false; // No more nodes to traverse
+	}
+
+	ORBTreeNode *min = NULL;
+	if (impl->min != NIL)
+		min = orbtree_node(impl->impl, impl->min);
+
+	// Traverse the tree
+	while (impl->cur != NIL || impl->stack_pointer > 0) {
+		ORBTreeNode *cur = orbtree_node(impl->impl, impl->cur);
+		// Traverse left subtree
+		if (impl->cur != NIL) {
+			// based on worst case log(n) * 2 + 1 this should not be possible
+			assert(impl->stack_pointer < 128);
+			int v = 0;
+			if (impl->min != NIL)
+				v = impl->impl->compare(cur->data, min->data);
+			if (v < 0) {
+				// we haven't hit the minimum yet
+				impl->cur = cur->right;
+			} else {
+				// Push the current node pointer onto the stack
+				impl->stack[impl->stack_pointer++] = impl->cur;
+
+				// Move to the left child
+				impl->cur = cur->left;
+			}
+		} else {
+			// Pop the top node from the stack
+			impl->cur = impl->stack[--impl->stack_pointer];
+
+			// Store the current node's data to return
+			value->value = orbtree_value(impl->impl, impl->cur);
+
+			// check if we hit our max node. If so, next will return false.
+			if (impl->cur == impl->max) {
+				impl->cur = NIL;
+				impl->stack_pointer = 0;
+			} else {
+				// Move to the right child after visiting this node
+				cur = orbtree_node(impl->impl, impl->cur);
+				impl->cur = cur->right;
+			}
+
+			break;
+		}
+	}
+	return true;
 }
 
 void orbtree_cleanup(ORBTreeNc *ptr) {
@@ -153,16 +232,6 @@ int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void
 	return 0;
 }
 
-ORBTreeNode *orbtree_node(const ORBTreeImpl *impl, u32 node) {
-	if (node == NIL) {
-		return NULL;
-	}
-	u64 index = node / NODES_PER_CHUNK;
-	u64 offset = node % NODES_PER_CHUNK;
-	u64 offset_sum = (offset * (sizeof(ORBTreeNode) + impl->value_size));
-	return (ORBTreeNode *)(impl->alloc->data_chunks[index] + offset_sum);
-}
-
 void orbtree_update_heights(const ORBTreeImpl *impl, u32 node) {
 	ORBTreeNode *last = orbtree_node(impl, node);
 	if (last == NULL)
@@ -177,10 +246,6 @@ void orbtree_update_heights(const ORBTreeImpl *impl, u32 node) {
 		}
 		last = parent;
 	}
-}
-
-void *orbtree_value(const ORBTreeImpl *impl, u32 node) {
-	return orbtree_node(impl, node)->data;
 }
 
 // internal search function used by get/insert/delete.
@@ -818,13 +883,111 @@ i64 orbtree_size(const ORBTree *ptr) {
 
 	return impl->elements;
 }
-int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
-					 bool start_inclusive, const void *end_value, bool end_inclusive) {
+
+int orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *start_value,
+						  bool start_inclusive, const void *end_value, bool end_inclusive) {
+
+	ORBTreeIteratorImpl *rbimpl = $(iter->impl);
+	rbimpl->impl = impl;
+	rbimpl->stack_pointer = 0;
+	rbimpl->value_size = impl->value_size;
+	rbimpl->cur = impl->root;
+	rbimpl->min = NIL;
+	rbimpl->max = NIL;
+
+	if (start_value != NULL) {
+		u32 itt = impl->root;
+		int i = 0;
+		while (itt != NIL) {
+			ORBTreeNode *node = orbtree_node(impl, itt);
+			int v = impl->compare(node->data, start_value);
+			if (v == 0) {
+				// exact match
+				if (start_inclusive) {
+					rbimpl->min = itt;
+					break;
+				}
+				itt = node->left;
+			} else if (v < 0) {
+				// continue down the chain to look for more
+				itt = node->right;
+			} else {
+				// higher value found update min
+				rbimpl->min = itt;
+				itt = node->left;
+			}
+			if (++i >= 100)
+				return -1;
+		}
+	}
+	if (end_value != NULL) {
+		u32 itt = impl->root;
+		int i = 0;
+		while (itt != NIL) {
+			ORBTreeNode *node = orbtree_node(impl, itt);
+			int v = impl->compare(node->data, end_value);
+			if (v == 0) {
+				// exact match
+				if (end_inclusive) {
+					rbimpl->max = itt;
+					break;
+				}
+				itt = node->left;
+			} else if (v < 0) {
+				// lower value found update max
+				rbimpl->max = itt;
+				itt = node->right;
+			} else {
+				// continue down the chain to look for more
+				itt = node->left;
+			}
+			if (++i >= 100)
+				return -1;
+		}
+	}
+
 	return 0;
+}
+
+int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
+					 bool start_inclusive, const void *end_value, bool end_inclusive, bool send) {
+	if (ptr == NULL || iter == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+
+	ORBTreeImpl *impl = ptr->impl;
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	{
+		SendStateGuard _ = SetSend(send);
+		if (fam_alloc(&iter->impl, sizeof(ORBTreeIteratorImpl))) {
+			iter->impl = null;
+			return -1;
+		}
+	}
+
+	return orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value,
+								 end_inclusive);
 }
 int orbtree_iterator_reset(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
 						   bool start_inclusive, const void *end_value, bool end_inclusive) {
-	return 0;
+	if (ptr == NULL || iter == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+
+	ORBTreeImpl *impl = ptr->impl;
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	return orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value,
+								 end_inclusive);
 }
 
 int orbtree_init_free_list(ORBTreeImpl *impl, u8 *data, u32 offset) {

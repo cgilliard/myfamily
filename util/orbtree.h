@@ -71,7 +71,7 @@ int orbtree_allocate_tray(ORBTree *ptr, ORBTreeTray *tray);
 i64 orbtree_size(const ORBTree *ptr);
 
 int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
-					 bool start_inclusive, const void *end_value, bool end_inclusive);
+					 bool start_inclusive, const void *end_value, bool end_inclusive, bool send);
 int orbtree_iterator_reset(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
 						   bool start_inclusive, const void *end_value, bool end_inclusive);
 
