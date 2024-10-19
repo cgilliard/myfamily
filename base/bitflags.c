@@ -37,7 +37,7 @@ int bitflags_set(BitFlags *ptr, u32 index, bool value) {
 	return 0;
 }
 
-bool bitflags_check(BitFlags *ptr, u32 index) {
+bool bitflags_check(const BitFlags *ptr, u32 index) {
 	u32 offset = index >> 3;
 
 	// Out of range check

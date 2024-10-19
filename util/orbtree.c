@@ -492,7 +492,6 @@ int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced) {
 
 	if (impl->root == NIL) {
 		impl->root = value->id;
-
 	} else if (pair.is_right) {
 		ORBTreeNode *parent = orbtree_node(impl, pair.parent);
 		parent->right_subtree_size++;
@@ -976,6 +975,7 @@ int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *star
 	return orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value,
 								 end_inclusive);
 }
+
 int orbtree_iterator_reset(ORBTreeIterator *iter, const void *start_value, bool start_inclusive,
 						   const void *end_value, bool end_inclusive) {
 	if (iter == NULL) {
@@ -983,14 +983,14 @@ int orbtree_iterator_reset(ORBTreeIterator *iter, const void *start_value, bool 
 		return -1;
 	}
 
-	ORBTreeIteratorImpl *impl = $(iter->impl);
-	ORBTreeImpl *impl2 = impl->impl;
-	if (impl2 == NULL) {
+	ORBTreeIteratorImpl *ittimpl = $(iter->impl);
+	ORBTreeImpl *impl = ittimpl->impl;
+	if (impl == NULL) {
 		SetErr(IllegalState);
 		return -1;
 	}
 
-	return orbtree_iterator_impl(impl2, iter, start_value, start_inclusive, end_value,
+	return orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value,
 								 end_inclusive);
 }
 

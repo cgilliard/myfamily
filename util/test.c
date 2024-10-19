@@ -522,259 +522,6 @@ MyTest(util, test_ref) {
 }
 */
 
-MyTest(util, test_object) {
-	Object test1 = NIL;
-	cr_assert(!object_create(&test1, false, ObjectTypeObject, NULL));
-	Object test2 = NIL;
-	cr_assert(!object_create(&test2, false, ObjectTypeString, "this is a test"));
-	Object test3 = NIL;
-	u64 v = 1234;
-	cr_assert(!object_create(&test3, true, ObjectTypeU64, &v));
-	Object test4 = NIL;
-	cr_assert(!object_create(&test4, false, ObjectTypeString, "another test"));
-
-	cr_assert(!strcmp(object_as_string(&test2), "this is a test"));
-	u64 test3_out = 0;
-	cr_assert(!object_as_u64(&test3, &test3_out));
-	cr_assert_eq(test3_out, 1234);
-	cr_assert_eq(object_as_string(&test1), NULL);
-	cr_assert_eq(object_as_string(&test3), NULL);
-
-	cr_assert(object_as_u64(&test1, &test3_out));
-	cr_assert(object_as_u64(&test2, &test3_out));
-
-	object_set_property(&test1, "aaa", &test2);
-	object_set_property(&test1, "bbb", &test3);
-
-	const Object test1_out = object_get_property(&test1, "aaa");
-	const Object test1_out2 = object_get_property(&test1, "bbb");
-	u64 test1_out2_u64 = 0;
-	object_as_u64(&test1_out2, &test1_out2_u64);
-	cr_assert_eq(test1_out2_u64, 1234);
-	cr_assert(!strcmp(object_as_string(&test1_out), "this is a test"));
-
-	object_set_property(&test1, "aaa", &test4);
-	const Object test1_out3 = object_get_property(&test1, "aaa");
-	cr_assert(!strcmp(object_as_string(&test1_out3), "another test"));
-
-	Object x1 = NIL;
-	cr_assert(!object_create(&x1, false, ObjectTypeObject, NULL));
-	Object x2 = NIL;
-	cr_assert(!object_create(&x2, false, ObjectTypeObject, NULL));
-	Object x3 = NIL;
-	cr_assert(!object_create(&x3, false, ObjectTypeObject, NULL));
-	Object text1 = NIL;
-	cr_assert(!object_create(&text1, false, ObjectTypeString, "text1"));
-
-	object_set_property(&x3, "text", &text1);
-	object_set_property(&x2, "x3", &x3);
-	object_set_property(&x1, "x2", &x2);
-
-	const Object x2_out = object_get_property(&x1, "x2");
-	const Object x3_out = object_get_property(&x2_out, "x3");
-	const Object text_out = object_get_property(&x3_out, "text");
-	cr_assert(!strcmp(object_as_string(&text_out), "text1"));
-}
-
-MyTest(util, test_overwrite) {
-	Object test1 = NIL;
-	cr_assert(!object_create(&test1, false, ObjectTypeObject, NULL));
-	Object test2 = NIL;
-	cr_assert(!object_create(&test2, false, ObjectTypeString, "this is a test"));
-	Object test3 = NIL;
-	cr_assert(!object_create(&test3, false, ObjectTypeString, "another test"));
-	Object test4 = NIL;
-	cr_assert(!object_create(&test4, false, ObjectTypeString, "another test2"));
-
-	object_set_property(&test1, "aaa", &test2);
-	const Object x2_out = object_get_property(&test1, "aaa");
-	cr_assert(!strcmp(object_as_string(&x2_out), "this is a test"));
-
-	object_set_property(&test1, "aaa", &test3);
-	const Object x3_out = object_get_property(&test1, "aaa");
-	cr_assert(!strcmp(object_as_string(&x3_out), "another test"));
-
-	object_set_property(&test1, "aaa", &test4);
-	const Object x4_out = object_get_property(&test1, "aaa");
-	cr_assert(!strcmp(object_as_string(&x4_out), "another test2"));
-
-	Object x1 = NIL;
-	cr_assert(!object_create(&x1, false, ObjectTypeObject, NULL));
-
-	Object x2 = NIL;
-	u64 x2_val = 10;
-	cr_assert(!object_create(&x2, false, ObjectTypeU64, &x2_val));
-	Object x3 = NIL;
-	u64 x3_val = 20;
-	cr_assert(!object_create(&x3, false, ObjectTypeU64, &x3_val));
-	Object x4 = NIL;
-	u64 x4_val = 30;
-	cr_assert(!object_create(&x4, false, ObjectTypeU64, &x4_val));
-
-	object_set_property(&x1, "aaa", &x2);
-	const Object xx2_out = object_get_property(&x1, "aaa");
-	u64 xx2_out_val = 0;
-	object_as_u64(&xx2_out, &xx2_out_val);
-	cr_assert_eq(xx2_out_val, 10);
-
-	object_set_property(&x1, "aaa", &x3);
-	const Object xx3_out = object_get_property(&x1, "aaa");
-	u64 xx3_out_val = 0;
-	object_as_u64(&xx3_out, &xx3_out_val);
-	cr_assert_eq(xx3_out_val, 20);
-
-	object_set_property(&x1, "aaa", &x4);
-	const Object xx4_out = object_get_property(&x1, "aaa");
-	u64 xx4_out_val = 0;
-	object_as_u64(&xx4_out, &xx4_out_val);
-	cr_assert_eq(xx4_out_val, 30);
-}
-
-MyTest(util, test_object_macros) {
-	// create an empty object
-	var x = $();
-
-	// create a string object
-	let y = $("abc");
-
-	// set the 'test' property of x to object y
-	$(x, "test", y);
-	$(x, "test9", "ok");
-
-	// retrieve the 'test' property of x, store in object out
-	let out = $(x, "test");
-	// compare out (as a string) to "abc", assert equal
-	cr_assert(!strcmp($string(out), "abc"));
-
-	// create a u64 value
-	u64 v1 = 1234;
-
-	// set the 'test2' property of x to v1
-	$(x, "test2", v1);
-	// retrieve the 'test2' property of x, store in object out2
-	let out2 = $(x, "test2");
-	cr_assert(!nil(out2));
-	// assert that out2 as u64 is 1234
-	cr_assert_eq($u64(out2), 1234);
-
-	var v = $(x, "aadf");
-	cr_assert(nil(v));
-
-	let x0 = $("testing123");
-	var x1 = $();
-	var x2 = $();
-	var x3 = $();
-	var x4 = $();
-
-	$(x1, "x0", x0);
-	$(x2, "x1", x1);
-	$(x3, "x2", x2);
-	$(x4, "x3", x3);
-	// x3 has been consumed. If uncommented, this will generate a runtime error
-	// $(x3, "test", "test");
-
-	let x3_out = $(x4, "x3");
-	let x2_out = $(x3_out, "x2");
-	let x1_out = $(x2_out, "x1");
-	let x0_out = $(x1_out, "x0");
-	cr_assert(!strcmp($string(x0_out), "testing123"));
-}
-
-MyTest(util, test_move_ref) {
-	var y;
-	{
-		let x = $("test");
-		y = $ref(x);
-		cr_assert(!strcmp($string(x), "test"));
-	}
-	cr_assert(!strcmp($string(y), "test"));
-
-	var a;
-	{
-		let b = $("abc");
-		a = $move(b);
-	}
-	cr_assert(!strcmp($string(a), "abc"));
-}
-
-MyTest(util, test_ok_nil) {
-	let a = Ok;
-	let b = NIL;
-	cr_assert(!nil(a));
-	cr_assert(nil(b));
-}
-
-MyTest(util, test_remove_property) {
-	var x1 = $();
-	$(x1, "test", "test");
-	$(x1, "test2", "test2");
-	$remove(x1, "ajsdl");
-	$remove(x1, "test");
-	let xtest = $(x1, "test");
-	cr_assert(nil(xtest));
-	let x2test = $(x1, "test2");
-	cr_assert(!nil(x2test));
-
-	/*
-
-		var x1 = $();
-		$(x1, "key1", "value1");	// set property key1 -> value1 (index 0)
-		$(x1, "key2", "value2");	// set property key2 -> value2 (index 1)
-		$(x1, 0, "replacedvalue1"); // set the first value (based on insertion order) to
-	   replacedvalue1. That would mean key1 -> replacedvalue1.
-		$(x1, 1, "replacedvalue2"); // set the first value (based on insertion order) to
-	   replacedvalue2. That would mean key2 -> replacedvalue2.
-		$(x1, "key3", "value3");	// set property key3 -> value3 (index 2)
-		$insert_after(x1, 1, "key2.5", "value2.5"); // inserts the k/v pair after index 1 key2.5 ->
-	   value 2.5, shifting all other entries by 1. $insert_before(x1, 0, "key0", "value0"); //
-	   inserts the k/v pair before index 0, shifting all other entries by 1.
-
-		var x1 = $();
-			x1.key1 = "value1";        // set property key1 -> value1 (index 0)
-			x1.key2 = "value2";        // set property key2 -> value2 (index 1)
-			x1[0] = "replacedvalue1"; // set the first value (based on insertion order) to
-	   replacedvalue1. That would mean key1 -> replacedvalue1. x1[1] = "replacedvalue2"; // set the
-	   first value (based on insertion order) to replacedvalue2. That would mean key2 ->
-	   replacedvalue2. x1.key3 = "value3";        // set property key3 -> value3 (index 2) x1[1] >=
-	   ("key2.5", "value2.5"); // inserts the k/v pair after index 1 key2.5 -> value 2.5, shifting
-	   all other entries by 1. x1[0] <= ("key0", "value0"); // inserts the k/v pair before index 0,
-	   shifting all other entries by 1.
-
-		typedef struct Property {
-			void *key;
-			ObjectNc value;
-		} Property;
-
-		// a regular (simple) version with string properties
-		var x2 = $();
-		$(x1, "key1", "value1");
-		$(x2, "key2", "value2");
-
-		// with a custom sort function (my_sort) compares the void *key data in SortableKey (like
-	   qsort) var x3 = $(with(sort, my_sort)); Property p1, p2; p1.key = &some_key; p1.value =
-	   &some_value; p2.key = &some_key2; p2.value = &some_value2;
-
-		// insert kv/pairs.
-		$(x1, p1);
-		$(x2, p2);
-
-		// for each
-		foreach (k, v, x1) {
-			debug("k={},v={}", k, v);
-		}
-
-		var x = $();
-		x1["testa"] = 123;
-		x1.push("test");
-		x1.push(64ULL);
-		x1.pop();
-		x1[0] = "hi";
-		foreach (x, x1) {
-			debug("x={}", x);
-		}
-	*/
-}
-
 typedef struct OrbTreeData {
 	u64 key;
 	u64 value;
@@ -1186,3 +933,36 @@ foreach(v , a) {
 */
 
 // weak, iterator, and index
+
+MyTest(util, test_object) {
+	var x = object_create(false, ObjectTypeString, "my string");
+	cr_assert(!nil(x));
+	cr_assert(!strcmp(object_as_string(&x), "my string"));
+	u64 v = 1234;
+	var y = object_create(false, ObjectTypeU64, &v);
+	cr_assert(!nil(y));
+	cr_assert_eq(object_as_u64(&y), 1234);
+
+	let z = object_set_property(&x, "yval", &y);
+	cr_assert(!nil(z));
+	var y_out = object_get_property(&x, "yval");
+	let m = object_create(false, ObjectTypeString, "other str");
+	let r = object_set_property(&y_out, "v2", &m);
+	cr_assert(!nil(y_out));
+	cr_assert_eq(object_as_u64(&y_out), 1234);
+	let not_found = object_get_property(&x, "notfound");
+	cr_assert(nil(not_found));
+}
+
+MyTest(util, test_object_ref) {
+	var n2;
+	{
+		let n1 = object_create(false, ObjectTypeString, "n1");
+		n2 = object_ref(&n1);
+		cr_assert(!nil(n1));
+		cr_assert(!nil(n2));
+		cr_assert(!strcmp(object_as_string(&n1), "n1"));
+		cr_assert(!strcmp(object_as_string(&n2), "n1"));
+	}
+	cr_assert(!strcmp(object_as_string(&n2), "n1"));
+}

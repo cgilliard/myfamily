@@ -23,6 +23,6 @@ typedef struct BitFlags {
 } BitFlags;
 
 int bitflags_set(BitFlags *ptr, u32 index, bool value);
-bool bitflags_check(BitFlags *ptr, u32 index);
+bool bitflags_check(const BitFlags *ptr, u32 index);
 
 #endif // _UTIL_BITFLAGS__

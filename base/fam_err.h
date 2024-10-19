@@ -36,6 +36,7 @@ typedef enum FamErr {
 	ResourceNotAvailable,
 	Permission,
 	BackTraceErr,
+	ExpectedTypeMismatch,
 	FamErrCount,
 } FamErr;
 
