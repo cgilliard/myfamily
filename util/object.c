@@ -487,7 +487,8 @@ Object object_set_property(Object *obj, const char *name, const Object *value) {
 	return UNIT;
 }
 
-const ObjectValueData *object_get_property_data(const Object *obj, const char *name) {
+const ObjectValueData *object_get_property_data(const Object *obj, const char *name, bool remove,
+												ORBTreeTray *tray) {
 	bool send = object_is_send(obj);
 	ObjectImpl *impl = $(obj->impl);
 	if (impl == NULL) {
@@ -507,16 +508,26 @@ const ObjectValueData *object_get_property_data(const Object *obj, const char *n
 	object_value_for(&objvalue, obj, name);
 	if (send)
 		pthread_rwlock_rdlock(&global_rbtree_lock);
-	ORBTreeTray tray;
-	tray.updated = false;
-	int v = orbtree_get(tree, &objvalue, &tray);
+	tray->updated = false;
+	int v;
+	if (remove) {
+		v = orbtree_remove(tree, &objvalue, tray);
+		if (v == 0) {
+			ObjectValueNc *rem = tray->value;
+			ObjectValueData *obj_data = $(rem->value);
+			fam_free(&rem->name);
+			orbtree_deallocate_tray(tree, tray);
+		}
+	} else {
+		v = orbtree_get(tree, &objvalue, tray);
+	}
 	if (send)
 		pthread_rwlock_unlock(&global_rbtree_lock);
 
-	if (!tray.updated) {
+	if (!tray->updated) {
 		return NULL;
 	}
-	const ObjectValueNc *valueret = tray.value;
+	const ObjectValueNc *valueret = tray->value;
 	const ObjectValueData *valueretdata = $(valueret->value);
 
 	return valueretdata;
@@ -536,7 +547,8 @@ Object object_get_property(const Object *obj, const char *name) {
 		return NIL;
 	}
 
-	const ObjectValueData *vd = object_get_property_data(obj, name);
+	ORBTreeTray tray;
+	const ObjectValueData *vd = object_get_property_data(obj, name, false, &tray);
 	if (vd == NULL)
 		return NIL;
 	ObjectNc ret = *(Object *)vd->value;
@@ -545,8 +557,32 @@ Object object_get_property(const Object *obj, const char *name) {
 }
 
 Object object_remove_property(Object *obj, const char *name) {
+	if (obj == NULL || name == NULL) {
+		SetErr(IllegalArgument);
+		return NIL;
+	}
 	object_check_consumed(obj);
-	return NIL;
+
+	bool send = object_is_send(obj);
+	ObjectImpl *impl = $(obj->impl);
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return NIL;
+	}
+
+	ORBTreeTray tray;
+	const ObjectValueData *vd = object_get_property_data(obj, name, true, &tray);
+	if (vd == NULL)
+		return NIL;
+
+	impl->property_count--;
+	ObjectNc *ret = (Object *)vd->value;
+
+	ObjectNc ref_ret = object_move(ret);
+	ObjectValueNc *rem = tray.value;
+	fam_free(&rem->value);
+
+	return ref_ret;
 }
 
 Object object_get_property_index(const Object *obj, u32 index) {
@@ -586,7 +622,8 @@ int object_send(Object *obj, Channel *channel) {
 
 const char *object_as_string(const Object *obj) {
 	object_check_consumed(obj);
-	const ObjectValueData *v = object_get_property_data(obj, "value");
+	ORBTreeTray tray;
+	const ObjectValueData *v = object_get_property_data(obj, "value", false, &tray);
 	if (v == NULL || v->type != ObjectTypeString) {
 		SetErr(ExpectedTypeMismatch);
 		return NULL;
@@ -596,7 +633,8 @@ const char *object_as_string(const Object *obj) {
 }
 u64 object_as_u64(const Object *obj) {
 	object_check_consumed(obj);
-	const ObjectValueData *v = object_get_property_data(obj, "value");
+	ORBTreeTray tray;
+	const ObjectValueData *v = object_get_property_data(obj, "value", false, &tray);
 	if (v == NULL || v->type != ObjectTypeU64) {
 		SetErr(ExpectedTypeMismatch);
 		return 0;

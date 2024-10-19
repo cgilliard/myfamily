@@ -1038,3 +1038,25 @@ MyTest(util, test_object_nested) {
 	// rbtree and internally their memory is deallocated.
 	cr_assert_eq(get_thread_local_rbtree_size(), 0);
 }
+
+MyTest(util, test_object_remove) {
+	var x1 = object_create(false, ObjectTypeObject, NULL);
+	let x2 = object_create(false, ObjectTypeString, "testx2");
+	let ret1 = object_get_property(&x1, "x2");
+	cr_assert(nil(ret1));
+	let ret2 = object_set_property(&x1, "x2", &x2);
+	cr_assert(!nil(ret2));
+	let ret3 = object_get_property(&x1, "x2");
+	cr_assert(!nil(ret3));
+	cr_assert(!strcmp(object_as_string(&ret3), "testx2"));
+
+	let ret4 = object_remove_property(&x1, "x2");
+	cr_assert(!nil(ret4));
+	cr_assert(!strcmp(object_as_string(&ret4), "testx2"));
+
+	let ret5 = object_get_property(&x1, "x2");
+	cr_assert(nil(ret5));
+
+	let ret6 = object_remove_property(&x1, "blah");
+	cr_assert(nil(ret6));
+}
