@@ -297,8 +297,20 @@ void object_cleanup_rc(ObjectImpl *impl) {
 	}
 }
 
+void object_check_consumed(const Object *ptr) {
+	if (ptr == NULL)
+		panic("Object pointer NULL!");
+	u8 flags = ptr->flags;
+	bool consumed = flags & OBJECT_FLAG_CONSUMED;
+	if (consumed)
+		panic("Object has been consumed!");
+	if (nil(ptr->impl))
+		panic("Object is nil!");
+}
+
 // move the object to a new memory location
 Object object_move(const Object *src) {
+	object_check_consumed(src);
 	ObjectNc dst = NIL;
 	dst.flags = src->flags;
 	dst.impl = src->impl;
@@ -321,6 +333,7 @@ Object object_move(const Object *src) {
 }
 // create a reference counted reference of the object
 Object object_ref(const Object *src) {
+	object_check_consumed(src);
 	ObjectNc dst = NIL;
 	dst.flags = src->flags;
 	rc_clone(&dst.impl, &src->impl);
@@ -466,6 +479,8 @@ Object object_create(bool send, ObjectType type, const void *primitive) {
 }
 
 Object object_set_property(Object *obj, const char *name, const Object *value) {
+	object_check_consumed(obj);
+	object_check_consumed(value);
 	ObjectNc vmove = object_move(value);
 	if (object_set_property_value(obj, name, &vmove, sizeof(Object), ObjectTypeObject))
 		return NIL;
@@ -512,6 +527,7 @@ Object object_get_property(const Object *obj, const char *name) {
 		SetErr(IllegalArgument);
 		return NIL;
 	}
+	object_check_consumed(obj);
 
 	bool send = object_is_send(obj);
 	ObjectImpl *impl = $(obj->impl);
@@ -529,36 +545,38 @@ Object object_get_property(const Object *obj, const char *name) {
 }
 
 Object object_remove_property(Object *obj, const char *name) {
-
+	object_check_consumed(obj);
 	return NIL;
 }
 
 Object object_get_property_index(const Object *obj, u32 index) {
-
+	object_check_consumed(obj);
 	return NIL;
 }
 
 Object object_remove_property_index(Object *obj, u32 index) {
-
+	object_check_consumed(obj);
 	return NIL;
 }
 
 Object object_set_property_index(Object *obj, const Object *value, u64 index) {
-
+	object_check_consumed(obj);
 	return NIL;
 }
 
 Object object_insert_property_before_index(Object *obj, const char *name, const Object *value,
 										   u64 index) {
-
+	object_check_consumed(obj);
 	return NIL;
 }
 Object object_insert_property_after_index(Object *obj, const char *name, const Object *value,
 										  u64 index) {
+	object_check_consumed(obj);
 	return NIL;
 }
 
 ObjectType object_type(const Object *obj) {
+	object_check_consumed(obj);
 	ObjectImpl *impl = $(obj->impl);
 	return impl->type;
 }
@@ -567,6 +585,7 @@ int object_send(Object *obj, Channel *channel) {
 }
 
 const char *object_as_string(const Object *obj) {
+	object_check_consumed(obj);
 	const ObjectValueData *v = object_get_property_data(obj, "value");
 	if (v == NULL || v->type != ObjectTypeString) {
 		SetErr(ExpectedTypeMismatch);
@@ -576,6 +595,7 @@ const char *object_as_string(const Object *obj) {
 	return (char *)v->value;
 }
 u64 object_as_u64(const Object *obj) {
+	object_check_consumed(obj);
 	const ObjectValueData *v = object_get_property_data(obj, "value");
 	if (v == NULL || v->type != ObjectTypeU64) {
 		SetErr(ExpectedTypeMismatch);
