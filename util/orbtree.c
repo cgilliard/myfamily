@@ -17,6 +17,7 @@
 #include <base/panic.h>
 #include <base/resources.h>
 #include <stdio.h>
+#include <string.h>
 #include <util/orbtree.h>
 
 #define NODES_PER_CHUNK 100
@@ -485,9 +486,12 @@ int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced) {
 	// perform search for the key
 	orbtree_search(impl, value->value, &pair);
 	if (pair.self != NIL) {
-		replaced->value = orbtree_value(impl, pair.self);
+		void *val = orbtree_value(impl, pair.self);
+		memcpy(replaced->value, val, impl->value_size);
 		replaced->updated = true;
 		replaced->id = pair.self;
+		memcpy(val, value->value, impl->value_size);
+		return 0;
 	}
 
 	if (impl->root == NIL) {
@@ -881,6 +885,26 @@ i64 orbtree_size(const ORBTree *ptr) {
 	}
 
 	return impl->elements;
+}
+
+i64 orbtree_slabs(const ORBTree *ptr) {
+	if (ptr == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+	ORBTreeImpl *impl = ptr->impl;
+
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	if (impl->alloc == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	return impl->alloc->size;
 }
 
 int orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *start_value,

@@ -37,7 +37,7 @@
 	static char *cur_name = "";                                                                    \
 	static u64 log_fd = -1;                                                                        \
 	void tear_down() {                                                                             \
-		u64 tl_rbtree_size = get_thread_local_rbtree_size();                                       \
+		u64 tl_rbtree_size = get_thread_local_orbtree_size();                                      \
 		if (tl_rbtree_size != 0) {                                                                 \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
 				   "'%s%s%s'.\n[%s====%s] Thread Local RBTree in Object items not deleted [%lli] " \
@@ -46,10 +46,30 @@
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
 		}                                                                                          \
-		u64 global_rbtree_size = get_global_rbtree_size();                                         \
+		u64 global_rbtree_size = get_global_orbtree_size();                                        \
 		if (global_rbtree_size != 0) {                                                             \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
 				   "'%s%s%s'.\n[%s====%s] Global RBTree in Object items not deleted [%lli] "       \
+				   "Memory leak?\n",                                                               \
+				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET,                   \
+				   global_rbtree_size);                                                            \
+			pid_t iPid = getpid();                                                                 \
+			kill(iPid, SIGINT); /* trigger failure */                                              \
+		}                                                                                          \
+		u64 tl_rbtree_slab_size = get_thread_local_orbtree_alloc_count();                          \
+		if (tl_rbtree_slab_size != 0) {                                                            \
+			printf("[%s====%s] %sError in tear_down of test%s "                                    \
+				   "'%s%s%s'.\n[%s====%s] Thread Local RBTree slabs in Object items not deleted "  \
+				   "[%lli] "                                                                       \
+				   "Memory leak?\n",                                                               \
+				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET, tl_rbtree_size);  \
+			pid_t iPid = getpid();                                                                 \
+			kill(iPid, SIGINT); /* trigger failure */                                              \
+		}                                                                                          \
+		u64 global_rbtree_slab_size = get_global_orbtree_alloc_count();                            \
+		if (global_rbtree_size != 0) {                                                             \
+			printf("[%s====%s] %sError in tear_down of test%s "                                    \
+				   "'%s%s%s'.\n[%s====%s] Global RBTree slabs in Object items not deleted [%lli] " \
 				   "Memory leak?\n",                                                               \
 				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET,                   \
 				   global_rbtree_size);                                                            \

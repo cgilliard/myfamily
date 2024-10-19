@@ -83,8 +83,10 @@ void object_cleanup_thread_local();
 // TODO: ObjectTypeArray (this type will expose the indexing capabilities of objects)
 
 #ifdef TEST
-u64 get_thread_local_rbtree_size();
-u64 get_global_rbtree_size();
+i64 get_global_orbtree_alloc_count();
+i64 get_thread_local_orbtree_alloc_count();
+u64 get_thread_local_orbtree_size();
+u64 get_global_orbtree_size();
 void object_cleanup_global();
 #endif // TEST
 

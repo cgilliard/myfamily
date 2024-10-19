@@ -275,7 +275,6 @@ void object_cleanup_rc(ObjectImpl *impl) {
 			properties[i] = &v->name;
 			i++;
 		}
-
 		for (i = 0; i < impl->property_count; i++) {
 			ObjectValueNc value;
 			value.namespace = impl->namespace;
@@ -369,17 +368,29 @@ int object_put_trees(ObjectImpl *impl, bool send, ObjectValue *val) {
 	} else
 		tree = tl_orb_context->sorted_tree;
 	ORBTreeTray tray, retval;
+	ObjectValueNc obv;
+	retval.value = &obv;
 	if (orbtree_allocate_tray(tree, &tray))
 		ret = -1;
 	else {
 		memcpy(tray.value, val, sizeof(ObjectValue));
+		retval.updated = false;
 		ret = orbtree_put(tree, &tray, &retval);
+		if (retval.updated) {
+			ObjectValueData *obj_data = $(obv.value);
+			if (obj_data->type == ObjectTypeObject) {
+				object_cleanup((ObjectNc *)obj_data->value);
+			}
+
+			object_value_cleanup(&obv);
+			orbtree_deallocate_tray(tree, &tray);
+		}
 	}
 	if (send)
 		if (pthread_rwlock_unlock(&global_rbtree_lock))
 			panic("rwlock error!");
 
-	if (ret == 0)
+	if (ret == 0 && !retval.updated)
 		impl->property_count++;
 	return ret;
 }
@@ -659,12 +670,22 @@ void object_cleanup_thread_local() {
 }
 
 #ifdef TEST
-u64 get_thread_local_rbtree_size() {
+i64 get_thread_local_orbtree_alloc_count() {
+	if (tl_orb_context == NULL)
+		return 0;
+	return orbtree_slabs(tl_orb_context->sorted_tree);
+}
+i64 get_global_orbtree_alloc_count() {
+	if (global_orb_context == NULL)
+		return 0;
+	return orbtree_slabs(global_orb_context->sorted_tree);
+}
+u64 get_thread_local_orbtree_size() {
 	if (tl_orb_context == NULL)
 		return 0;
 	return orbtree_size(tl_orb_context->sorted_tree);
 }
-u64 get_global_rbtree_size() {
+u64 get_global_orbtree_size() {
 	if (global_orb_context == NULL)
 		return 0;
 	return orbtree_size(global_orb_context->sorted_tree);

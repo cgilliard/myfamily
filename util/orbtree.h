@@ -76,6 +76,7 @@ int orbtree_iterator_reset(ORBTreeIterator *iter, const void *start_value, bool 
 						   const void *end_value, bool end_inclusive);
 
 #ifdef TEST
+i64 orbtree_slabs(const ORBTree *ptr);
 void orbtree_print(const ORBTree *ptr);
 void orbtree_validate(const ORBTree *ptr);
 #endif // TEST
