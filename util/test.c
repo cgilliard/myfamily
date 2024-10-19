@@ -952,6 +952,14 @@ MyTest(util, test_object) {
 	cr_assert_eq(object_as_u64(&y_out), 1234);
 	let not_found = object_get_property(&x, "notfound");
 	cr_assert(nil(not_found));
+
+	var a = object_create(false, ObjectTypeObject, NULL);
+	var b = object_create(false, ObjectTypeString, "bval");
+	var res = object_set_property(&a, "b", &b);
+	cr_assert(!nil(res));
+	let b_out = object_get_property(&a, "b");
+	cr_assert(!nil(b_out));
+	cr_assert(!strcmp(object_as_string(&b_out), "bval"));
 }
 
 MyTest(util, test_object_ref) {
