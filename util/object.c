@@ -32,6 +32,7 @@ typedef struct ORBContext {
 } ORBContext;
 
 pthread_rwlock_t global_rbtree_lock = PTHREAD_RWLOCK_INITIALIZER;
+volatile bool global_rbtree_lock_has_lock = false;
 _Thread_local ORBContext *tl_orb_context = NULL;
 ORBContext *global_orb_context = NULL;
 
@@ -170,12 +171,14 @@ int object_init_global() {
 	if (init_tl_range_values())
 		return -1;
 	if (global_orb_context == NULL) {
-		if (pthread_rwlock_wrlock(&global_rbtree_lock))
+		if (!global_rbtree_lock_has_lock && pthread_rwlock_wrlock(&global_rbtree_lock))
 			panic("rwlock error!");
+		global_rbtree_lock_has_lock = true;
 		if (global_orb_context == NULL) {
 			global_orb_context = init_orb_context(true);
 		}
 
+		global_rbtree_lock_has_lock = false;
 		if (pthread_rwlock_unlock(&global_rbtree_lock))
 			panic("rwlock error!");
 		if (global_orb_context == NULL)
@@ -257,8 +260,9 @@ void object_cleanup_rc(ObjectImpl *impl) {
 		ORBTreeIteratorNc *itt;
 		ORBTreeNc *tree;
 		if (send) {
-			if (pthread_rwlock_wrlock(&global_rbtree_lock))
+			if (!global_rbtree_lock_has_lock && pthread_rwlock_wrlock(&global_rbtree_lock))
 				panic("rwlock error!");
+			global_rbtree_lock_has_lock = true;
 			itt = global_orb_context->sorted_itt;
 			tree = global_orb_context->sorted_tree;
 		} else {
@@ -290,9 +294,11 @@ void object_cleanup_rc(ObjectImpl *impl) {
 			orbtree_deallocate_tray(tree, &tray);
 		}
 
-		if (send)
+		if (send) {
+			global_rbtree_lock_has_lock = false;
 			if (pthread_rwlock_unlock(&global_rbtree_lock))
 				panic("rwlock error!");
+		}
 	}
 }
 
@@ -363,8 +369,9 @@ int object_put_trees(ObjectImpl *impl, bool send, ObjectValue *val) {
 	ORBTreeNc *tree;
 	if (send) {
 		tree = global_orb_context->sorted_tree;
-		if (pthread_rwlock_wrlock(&global_rbtree_lock))
+		if (!global_rbtree_lock_has_lock && pthread_rwlock_wrlock(&global_rbtree_lock))
 			panic("rwlock error!");
+		global_rbtree_lock_has_lock = true;
 	} else
 		tree = tl_orb_context->sorted_tree;
 	ORBTreeTray tray, retval;
@@ -386,9 +393,11 @@ int object_put_trees(ObjectImpl *impl, bool send, ObjectValue *val) {
 			orbtree_deallocate_tray(tree, &tray);
 		}
 	}
-	if (send)
+	if (send) {
+		global_rbtree_lock_has_lock = false;
 		if (pthread_rwlock_unlock(&global_rbtree_lock))
 			panic("rwlock error!");
+	}
 
 	if (ret == 0 && !retval.updated)
 		impl->property_count++;
@@ -510,15 +519,14 @@ const ObjectValueData *object_get_property_data(const Object *obj, const char *n
 	ORBTreeNc *tree;
 	if (send) {
 		tree = global_orb_context->sorted_tree;
-		if (pthread_rwlock_wrlock(&global_rbtree_lock))
+		if (!global_rbtree_lock_has_lock && pthread_rwlock_wrlock(&global_rbtree_lock))
 			panic("rwlock error!");
+		global_rbtree_lock_has_lock = true;
 	} else
 		tree = tl_orb_context->sorted_tree;
 
 	ObjectValue objvalue = INIT_OBJECT_VALUE;
 	object_value_for(&objvalue, obj, name);
-	if (send)
-		pthread_rwlock_rdlock(&global_rbtree_lock);
 	tray->updated = false;
 	int v;
 	if (remove) {
@@ -532,8 +540,10 @@ const ObjectValueData *object_get_property_data(const Object *obj, const char *n
 	} else {
 		v = orbtree_get(tree, &objvalue, tray);
 	}
-	if (send)
+	if (send) {
+		global_rbtree_lock_has_lock = false;
 		pthread_rwlock_unlock(&global_rbtree_lock);
+	}
 
 	if (!tray->updated) {
 		return NULL;
@@ -598,6 +608,7 @@ Object object_remove_property(Object *obj, const char *name) {
 
 Object object_get_property_index(const Object *obj, u32 index) {
 	object_check_consumed(obj);
+
 	return NIL;
 }
 
@@ -691,5 +702,16 @@ u64 get_global_orbtree_size() {
 	return orbtree_size(global_orb_context->sorted_tree);
 }
 void object_cleanup_global() {
+	if (global_orb_context != NULL) {
+		orbtree_iterator_cleanup(global_orb_context->sorted_itt);
+		orbtree_iterator_cleanup(global_orb_context->sequence_itt);
+		orbtree_cleanup(global_orb_context->sorted_tree);
+		orbtree_cleanup(global_orb_context->sequence_tree);
+		myfree(global_orb_context->sequence_itt);
+		myfree(global_orb_context->sequence_tree);
+		myfree(global_orb_context->sorted_itt);
+		myfree(global_orb_context->sorted_tree);
+		myfree(global_orb_context);
+	}
 }
 #endif // TEST

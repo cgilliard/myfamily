@@ -988,11 +988,56 @@ MyTest(util, test_object) {
 	}
 }
 
+MyTest(util, test_object_mix_send) {
+	{
+		var x = object_create(true, ObjectTypeString, "my string");
+		cr_assert(!nil(x));
+		cr_assert(!strcmp(object_as_string(&x), "my string"));
+		u64 v = 1234;
+		var y = object_create(false, ObjectTypeU64, &v);
+		cr_assert(!nil(y));
+		cr_assert_eq(object_as_u64(&y), 1234);
+
+		let z = object_set_property(&x, "yval", &y);
+		cr_assert(!nil(z));
+		var y_out = object_get_property(&x, "yval");
+		let m = object_create(false, ObjectTypeString, "other str");
+		let r = object_set_property(&y_out, "v2", &m);
+		cr_assert(!nil(y_out));
+		cr_assert_eq(object_as_u64(&y_out), 1234);
+		let not_found = object_get_property(&x, "notfound");
+		cr_assert(nil(not_found));
+
+		var a = object_create(false, ObjectTypeObject, NULL);
+		var b = object_create(true, ObjectTypeString, "bval");
+		var res = object_set_property(&a, "b", &b);
+		cr_assert(!nil(res));
+		let b_out = object_get_property(&a, "b");
+		cr_assert(!nil(b_out));
+		cr_assert(!strcmp(object_as_string(&b_out), "bval"));
+	}
+}
+
 MyTest(util, test_object_ref) {
 	{
 		var n2;
 		{
 			let n1 = object_create(false, ObjectTypeString, "n1");
+			n2 = object_ref(&n1);
+			cr_assert(!nil(n1));
+			cr_assert(!nil(n2));
+			cr_assert(!strcmp(object_as_string(&n1), "n1"));
+			cr_assert(!strcmp(object_as_string(&n2), "n1"));
+		}
+		cr_assert(!strcmp(object_as_string(&n2), "n1"));
+	}
+}
+
+MyTest(util, test_object_ref_send) {
+	{
+		var n2;
+		{
+			let n1 = object_create(true, ObjectTypeString, "n1");
 			n2 = object_ref(&n1);
 			cr_assert(!nil(n1));
 			cr_assert(!nil(n2));
@@ -1067,10 +1112,98 @@ MyTest(util, test_object_nested) {
 	cr_assert_eq(get_thread_local_orbtree_size(), 0);
 }
 
+MyTest(util, test_object_nested_send) {
+	{
+		// create object x1 in the outer most scope
+		var x1 = object_create(true, ObjectTypeObject, NULL);
+		{
+			// create three objects in the inner scope
+			var x2 = object_create(true, ObjectTypeObject, NULL);
+			var x3 = object_create(true, ObjectTypeObject, NULL);
+			// this is a string so we can ensure that the data is correct
+			var x4 = object_create(true, ObjectTypeString, "testx4");
+
+			// set x3's "x4" property to the x4 object
+			let ret3 = object_set_property(&x3, "x4", &x4);
+			cr_assert(!nil(ret3));
+			// set x2's "x3" property to the x3 object
+			let ret2 = object_set_property(&x2, "x3", &x3);
+			cr_assert(!nil(ret2));
+			// set x1's "x2" property to the x2 object
+			let ret1 = object_set_property(&x1, "x2", &x2);
+			cr_assert(!nil(ret1));
+
+			// assert that we can get the inner most property in the chain
+			let y2 = object_get_property(&x1, "x2");
+			cr_assert(!nil(y2));
+			let y3 = object_get_property(&y2, "x3");
+			cr_assert(!nil(y3));
+			let y4 = object_get_property(&y3, "x4");
+			cr_assert(!nil(y4));
+			// make sure the returned value matches expectations
+			cr_assert(!strcmp(object_as_string(&y4), "testx4"));
+
+			// at this point x2, x3, and x4 go out of scope, but they
+			// have all been consumed and so they do not deallocate memory
+			// the ownership of this data has been transfered to x1.
+			// in addition, y2, y3, and y4 also go out of scope here,
+			// but they are references only to the data which is still owned by x1.
+			// the reference counter for each of these values as stored by x1, is decremented
+			// so it goes fromm 2 -> 1, so the memory is not deallocated.
+
+			// we assert that there are still 4 items in our thread local rbtree (x1-x4)
+			// before the scope ends
+			cr_assert_eq(get_global_orbtree_size(), 4);
+		}
+
+		// we confirm that the properties are still accessible.
+		let y2 = object_get_property(&x1, "x2");
+		cr_assert(!nil(y2));
+		let y3 = object_get_property(&y2, "x3");
+		cr_assert(!nil(y3));
+		let y4 = object_get_property(&y3, "x4");
+		cr_assert(!nil(y4));
+		cr_assert(!strcmp(object_as_string(&y4), "testx4"));
+
+		// we assert that there are still 4 items in our thread local rbtree (x1-x4)
+		// before the scope ends
+		cr_assert_eq(get_global_orbtree_size(), 4);
+	}
+
+	// now that x1 has gone out of scope the final cleanup is called and that recursively
+	// calls cleanup on our other owned objects. All of them are deleted from the thread local
+	// rbtree and internally their memory is deallocated.
+	cr_assert_eq(get_global_orbtree_size(), 0);
+}
+
 MyTest(util, test_object_remove) {
 	{
 		var x1 = object_create(false, ObjectTypeObject, NULL);
 		let x2 = object_create(false, ObjectTypeString, "testx2");
+		let ret1 = object_get_property(&x1, "x2");
+		cr_assert(nil(ret1));
+		let ret2 = object_set_property(&x1, "x2", &x2);
+		cr_assert(!nil(ret2));
+		let ret3 = object_get_property(&x1, "x2");
+		cr_assert(!nil(ret3));
+		cr_assert(!strcmp(object_as_string(&ret3), "testx2"));
+
+		let ret4 = object_remove_property(&x1, "x2");
+		cr_assert(!nil(ret4));
+		cr_assert(!strcmp(object_as_string(&ret4), "testx2"));
+
+		let ret5 = object_get_property(&x1, "x2");
+		cr_assert(nil(ret5));
+
+		let ret6 = object_remove_property(&x1, "blah");
+		cr_assert(nil(ret6));
+	}
+}
+
+MyTest(util, test_object_remove_send) {
+	{
+		var x1 = object_create(true, ObjectTypeObject, NULL);
+		let x2 = object_create(true, ObjectTypeString, "testx2");
 		let ret1 = object_get_property(&x1, "x2");
 		cr_assert(nil(ret1));
 		let ret2 = object_set_property(&x1, "x2", &x2);
@@ -1096,6 +1229,27 @@ MyTest(util, test_object_overwrite) {
 		var x1 = object_create(false, ObjectTypeObject, NULL);
 		let x2 = object_create(false, ObjectTypeString, "testx2");
 		let x3 = object_create(false, ObjectTypeString, "testx3");
+
+		let res1 = object_set_property(&x1, "v", &x2);
+		cr_assert(!nil(res1));
+
+		let res2 = object_get_property(&x1, "v");
+		cr_assert(!nil(res2));
+		cr_assert(!strcmp(object_as_string(&res2), "testx2"));
+		let res3 = object_set_property(&x1, "v", &x3);
+		cr_assert(!nil(res3));
+
+		let res4 = object_get_property(&x1, "v");
+		cr_assert(!nil(res4));
+		cr_assert(!strcmp(object_as_string(&res4), "testx3"));
+	}
+}
+
+MyTest(util, test_object_overwrite_send) {
+	{
+		var x1 = object_create(true, ObjectTypeObject, NULL);
+		let x2 = object_create(true, ObjectTypeString, "testx2");
+		let x3 = object_create(true, ObjectTypeString, "testx3");
 
 		let res1 = object_set_property(&x1, "v", &x2);
 		cr_assert(!nil(res1));
