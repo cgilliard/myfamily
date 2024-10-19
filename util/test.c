@@ -974,3 +974,67 @@ MyTest(util, test_object_ref) {
 	}
 	cr_assert(!strcmp(object_as_string(&n2), "n1"));
 }
+
+MyTest(util, test_object_nested) {
+	{
+		// create object x1 in the outer most scope
+		var x1 = object_create(false, ObjectTypeObject, NULL);
+		{
+			// create three objects in the inner scope
+			var x2 = object_create(false, ObjectTypeObject, NULL);
+			var x3 = object_create(false, ObjectTypeObject, NULL);
+			// this is a string so we can ensure that the data is correct
+			var x4 = object_create(false, ObjectTypeString, "testx4");
+
+			// set x3's "x4" property to the x4 object
+			let ret3 = object_set_property(&x3, "x4", &x4);
+			cr_assert(!nil(ret3));
+			// set x2's "x3" property to the x3 object
+			let ret2 = object_set_property(&x2, "x3", &x3);
+			cr_assert(!nil(ret2));
+			// set x1's "x2" property to the x2 object
+			let ret1 = object_set_property(&x1, "x2", &x2);
+			cr_assert(!nil(ret1));
+
+			// assert that we can get the inner most property in the chain
+			let y2 = object_get_property(&x1, "x2");
+			cr_assert(!nil(y2));
+			let y3 = object_get_property(&y2, "x3");
+			cr_assert(!nil(y3));
+			let y4 = object_get_property(&y3, "x4");
+			cr_assert(!nil(y4));
+			// make sure the returned value matches expectations
+			cr_assert(!strcmp(object_as_string(&y4), "testx4"));
+
+			// at this point x2, x3, and x4 go out of scope, but they
+			// have all been consumed and so they do not deallocate memory
+			// the ownership of this data has been transfered to x1.
+			// in addition, y2, y3, and y4 also go out of scope here,
+			// but they are references only to the data which is still owned by x1.
+			// the reference counter for each of these values as stored by x1, is decremented
+			// so it goes fromm 2 -> 1, so the memory is not deallocated.
+
+			// we assert that there are still 4 items in our thread local rbtree (x1-x4)
+			// before the scope ends
+			cr_assert_eq(get_thread_local_rbtree_size(), 4);
+		}
+
+		// we confirm that the properties are still accessible.
+		let y2 = object_get_property(&x1, "x2");
+		cr_assert(!nil(y2));
+		let y3 = object_get_property(&y2, "x3");
+		cr_assert(!nil(y3));
+		let y4 = object_get_property(&y3, "x4");
+		cr_assert(!nil(y4));
+		cr_assert(!strcmp(object_as_string(&y4), "testx4"));
+
+		// we assert that there are still 4 items in our thread local rbtree (x1-x4)
+		// before the scope ends
+		cr_assert_eq(get_thread_local_rbtree_size(), 4);
+	}
+
+	// now that x1 has gone out of scope the final cleanup is called and that recursively
+	// calls cleanup on our other owned objects. All of them are deleted from the thread local
+	// rbtree and internally their memory is deallocated.
+	cr_assert_eq(get_thread_local_rbtree_size(), 0);
+}

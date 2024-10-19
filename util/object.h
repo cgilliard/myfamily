@@ -17,6 +17,7 @@
 
 #define OBJECT_FLAGS_SEND 0x1
 #define OBJECT_FLAG_NO_CLEANUP (0x1 << 1)
+#define OBJECT_FLAG_CONSUMED (0x1 << 2)
 
 #include <util/channel.h>
 #include <util/object_macros.h>

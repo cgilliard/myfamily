@@ -217,8 +217,9 @@ typedef struct ObjectImpl {
 void object_cleanup(const Object *ptr) {
 	if (ptr == NULL)
 		return;
-	if (ptr->flags & OBJECT_FLAG_NO_CLEANUP)
+	if (ptr->flags & OBJECT_FLAG_NO_CLEANUP) {
 		return;
+	}
 #if defined(__clang__)
 // Clang-specific pragma
 #pragma GCC diagnostic push
@@ -281,6 +282,10 @@ void object_cleanup_rc(ObjectImpl *impl) {
 			value.name = *properties[i];
 			orbtree_remove(tree, &value, &tray);
 			ObjectValueNc *rem = tray.value;
+			ObjectValueData *obj_data = $(rem->value);
+			if (obj_data->type == ObjectTypeObject) {
+				object_cleanup((ObjectNc *)obj_data->value);
+			}
 			fam_free(&rem->value);
 			fam_free(&rem->name);
 			orbtree_deallocate_tray(tree, &tray);
@@ -294,7 +299,25 @@ void object_cleanup_rc(ObjectImpl *impl) {
 
 // move the object to a new memory location
 Object object_move(const Object *src) {
-	return NIL;
+	ObjectNc dst = NIL;
+	dst.flags = src->flags;
+	dst.impl = src->impl;
+#if defined(__clang__)
+// Clang-specific pragma
+#pragma GCC diagnostic push
+#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+#elif defined(__GNUC__) && !defined(__clang__)
+// GCC-specific pragma
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
+#else
+#warning "Unknown compiler or platform. No specific warning pragmas applied."
+#endif
+	ObjectNc *src_mut = src;
+#pragma GCC diagnostic pop
+	src_mut->flags |= OBJECT_FLAG_NO_CLEANUP | OBJECT_FLAG_CONSUMED;
+
+	return dst;
 }
 // create a reference counted reference of the object
 Object object_ref(const Object *src) {
@@ -443,7 +466,8 @@ Object object_create(bool send, ObjectType type, const void *primitive) {
 }
 
 Object object_set_property(Object *obj, const char *name, const Object *value) {
-	if (object_set_property_value(obj, name, value, sizeof(Object), ObjectTypeObject))
+	ObjectNc vmove = object_move(value);
+	if (object_set_property_value(obj, name, &vmove, sizeof(Object), ObjectTypeObject))
 		return NIL;
 	return UNIT;
 }
@@ -500,7 +524,8 @@ Object object_get_property(const Object *obj, const char *name) {
 	if (vd == NULL)
 		return NIL;
 	ObjectNc ret = *(Object *)vd->value;
-	return ret;
+
+	return object_ref(&ret);
 }
 
 Object object_remove_property(Object *obj, const char *name) {
@@ -577,10 +602,14 @@ void object_cleanup_thread_local() {
 
 #ifdef TEST
 u64 get_thread_local_rbtree_size() {
-	return 0;
+	if (tl_orb_context == NULL)
+		return 0;
+	return orbtree_size(tl_orb_context->sorted_tree);
 }
 u64 get_global_rbtree_size() {
-	return 0;
+	if (global_orb_context == NULL)
+		return 0;
+	return orbtree_size(global_orb_context->sorted_tree);
 }
 void object_cleanup_global() {
 }
