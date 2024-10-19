@@ -1,7 +1,7 @@
         -:    0:Source:backtrace.c
         -:    0:Graph:backtrace.gcno
         -:    0:Data:backtrace.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -288,7 +288,7 @@
         -:    0:Source:bitflags.c
         -:    0:Graph:bitflags.gcno
         -:    0:Data:bitflags.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -328,23 +328,23 @@
     66561:   37:	return 0;
         -:   38:}
         -:   39:
-118689425:   40:bool bitflags_check(BitFlags *ptr, u32 index) {
-118689425:   41:	u32 offset = index >> 3;
+118811632:   40:bool bitflags_check(BitFlags *ptr, u32 index) {
+118811632:   41:	u32 offset = index >> 3;
         -:   42:
         -:   43:	// Out of range check
-118689425:   44:	if (offset >= ptr->capacity) {
+118811632:   44:	if (offset >= ptr->capacity) {
         1:   45:		return false;
         -:   46:	}
         -:   47:
         -:   48:	// Calculate mask directly
-118689424:   49:	u32 mask = 1 << (index & 0x7);
+118811631:   49:	u32 mask = 1 << (index & 0x7);
         -:   50:
-118689424:   51:	return ptr->flags[offset] & mask;
+118811631:   51:	return ptr->flags[offset] & mask;
         -:   52:}
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -440,7 +440,7 @@
         -:    0:Source:fam_alloc.c
         -:    0:Graph:fam_alloc.gcno
         -:    0:Data:fam_alloc.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -479,90 +479,90 @@
         -:   36:_Thread_local static u8 fam_guard_sp = 0;
         -:   37:_Thread_local static bool fam_guard_is_init = false;
         -:   38:
-       45:   39:SlabAllocator *initialize_default_slab_allocator(bool global) {
-       45:   40:	SlabAllocatorNc *sa = mymalloc(sizeof(SlabAllocator));
-       45:   41:	if (sa == NULL)
+       47:   39:SlabAllocator *initialize_default_slab_allocator(bool global) {
+       47:   40:	SlabAllocatorNc *sa = mymalloc(sizeof(SlabAllocator));
+       47:   41:	if (sa == NULL)
     #####:   42:		return NULL;
-       45:   43:	SlabAllocatorConfig sac;
+       47:   43:	SlabAllocatorConfig sac;
         -:   44:	// default slab allocator zeroed = false
-       45:   45:	if (slab_allocator_config_build(&sac, false, global)) {
+       47:   45:	if (slab_allocator_config_build(&sac, false, global)) {
     #####:   46:		myfree(sa);
     #####:   47:		return NULL;
         -:   48:	}
-       45:   49:	u32 max_slabs = MAX_SLABS;
-     5805:   50:	for (i32 i = 0; i < 128; i++) {
-     5760:   51:		SlabType st = {.slab_size = (i + 3) * 8,
+       47:   49:	u32 max_slabs = MAX_SLABS;
+     6063:   50:	for (i32 i = 0; i < 128; i++) {
+     6016:   51:		SlabType st = {.slab_size = (i + 3) * 8,
         -:   52:					   .slabs_per_resize = 100,
         -:   53:					   .initial_chunks = 0,
         -:   54:					   .max_slabs = max_slabs};
-     5760:   55:		if (slab_allocator_config_add_type(&sac, &st)) {
+     6016:   55:		if (slab_allocator_config_add_type(&sac, &st)) {
     #####:   56:			myfree(sa);
     #####:   57:			return NULL;
         -:   58:		}
         -:   59:	}
-     5805:   60:	for (i32 i = 0; i < 128; i++) {
-     5760:   61:		SlabType st = {.slab_size = (128 + 3) * 8 + (i + 1) * 1024,
+     6063:   60:	for (i32 i = 0; i < 128; i++) {
+     6016:   61:		SlabType st = {.slab_size = (128 + 3) * 8 + (i + 1) * 1024,
         -:   62:					   .slabs_per_resize = 100,
         -:   63:					   .initial_chunks = 0,
         -:   64:					   .max_slabs = max_slabs};
-     5760:   65:		if (slab_allocator_config_add_type(&sac, &st)) {
+     6016:   65:		if (slab_allocator_config_add_type(&sac, &st)) {
     #####:   66:			myfree(sa);
     #####:   67:			return NULL;
         -:   68:		}
         -:   69:	}
-       45:   70:	if (slab_allocator_build(sa, &sac)) {
+       47:   70:	if (slab_allocator_build(sa, &sac)) {
     #####:   71:		myfree(sa);
     #####:   72:		return NULL;
         -:   73:	}
         -:   74:
-       45:   75:	return sa;
+       47:   75:	return sa;
         -:   76:}
         -:   77:
-    40866:   78:void init_fam_guards() {
-    40866:   79:	if (!fam_guard_is_init) {
-       23:   80:		fam_guard_is_init = true;
-       23:   81:		fam_guard_entries[0].send = false;
-       23:   82:		if (thread_local_slab_allocator == NULL)
-       23:   83:			thread_local_slab_allocator = initialize_default_slab_allocator(false);
-       23:   84:		if (thread_local_slab_allocator == NULL)
+    40869:   78:void init_fam_guards() {
+    40869:   79:	if (!fam_guard_is_init) {
+       24:   80:		fam_guard_is_init = true;
+       24:   81:		fam_guard_entries[0].send = false;
+       24:   82:		if (thread_local_slab_allocator == NULL)
+       24:   83:			thread_local_slab_allocator = initialize_default_slab_allocator(false);
+       24:   84:		if (thread_local_slab_allocator == NULL)
     #####:   85:			panic("Could not initialize the default slab allocator");
-       23:   86:		if (global_allocator == NULL)
-       22:   87:			global_allocator = initialize_default_slab_allocator(true);
-       23:   88:		if (global_allocator == NULL)
+       24:   86:		if (global_allocator == NULL)
+       23:   87:			global_allocator = initialize_default_slab_allocator(true);
+       24:   88:		if (global_allocator == NULL)
     #####:   89:			panic("Could not initialize the global slab allocator");
-       23:   90:		if (pthread_mutex_init(&global_allocator_lock, NULL))
+       24:   90:		if (pthread_mutex_init(&global_allocator_lock, NULL))
     #####:   91:			panic("Could not init pthread_mutex");
         -:   92:	}
-    40866:   93:}
+    40869:   93:}
         -:   94:
-    18601:   95:void send_guard_cleanup(SendStateGuardNc *ptr) {
-    18601:   96:	fam_guard_sp--;
-    18601:   97:}
+    18602:   95:void send_guard_cleanup(SendStateGuardNc *ptr) {
+    18602:   96:	fam_guard_sp--;
+    18602:   97:}
         -:   98:
-    11133:   99:int fam_alloc(FatPtr *ptr, u64 size) {
-    11133:  100:	init_fam_guards();
-    11133:  101:	bool send = fam_guard_entries[fam_guard_sp].send;
+    11134:   99:int fam_alloc(FatPtr *ptr, u64 size) {
+    11134:  100:	init_fam_guards();
+    11134:  101:	bool send = fam_guard_entries[fam_guard_sp].send;
         -:  102:
         -:  103:	SlabAllocatorNc *sa;
         -:  104:
-    11133:  105:	if (send)
+    11134:  105:	if (send)
        20:  106:		sa = global_allocator;
         -:  107:	else {
-    11113:  108:		sa = thread_local_slab_allocator;
+    11114:  108:		sa = thread_local_slab_allocator;
         -:  109:	}
         -:  110:
         -:  111:	int ret;
-    11133:  112:	if (send)
+    11134:  112:	if (send)
        20:  113:		pthread_mutex_lock(&global_allocator_lock);
-    11133:  114:	ret = slab_allocator_allocate(sa, size, ptr);
-    11133:  115:	if (send)
+    11134:  114:	ret = slab_allocator_allocate(sa, size, ptr);
+    11134:  115:	if (send)
        20:  116:		pthread_mutex_unlock(&global_allocator_lock);
         -:  117:
-    11133:  118:	if (ret) { // try malloc
+    11134:  118:	if (ret) { // try malloc
         3:  119:		ret = fat_ptr_mallocate(ptr, size);
         -:  120:	}
         -:  121:
-    11133:  122:	return ret;
+    11134:  122:	return ret;
         -:  123:}
         3:  124:int fam_realloc(FatPtr *ptr, u64 size) {
         3:  125:	if ($is_pin(*ptr)) {
@@ -599,65 +599,65 @@
         -:  156:
         2:  157:	return ret;
         -:  158:}
-    11131:  159:void fam_free(FatPtr *ptr) {
-    11131:  160:	if ($flag(*ptr, FAT_PTR_FLAG_MALLOC)) {
+    11132:  159:void fam_free(FatPtr *ptr) {
+    11132:  160:	if ($flag(*ptr, FAT_PTR_FLAG_MALLOC)) {
         1:  161:		fat_ptr_malloc_free(ptr);
         -:  162:	} else {
-    11130:  163:		init_fam_guards();
+    11131:  163:		init_fam_guards();
         -:  164:
-    11130:  165:		bool global = $flag(*ptr, FAT_PTR_FLAG_GLOBAL);
+    11131:  165:		bool global = $flag(*ptr, FAT_PTR_FLAG_GLOBAL);
         -:  166:
         -:  167:		SlabAllocatorNc *sa;
         -:  168:
-    11130:  169:		if (global)
+    11131:  169:		if (global)
        20:  170:			sa = global_allocator;
         -:  171:		else
-    11110:  172:			sa = thread_local_slab_allocator;
+    11111:  172:			sa = thread_local_slab_allocator;
         -:  173:
-    11130:  174:		if (global)
+    11131:  174:		if (global)
        20:  175:			pthread_mutex_lock(&global_allocator_lock);
-    11130:  176:		slab_allocator_free(sa, ptr);
-    11130:  177:		if (global)
+    11131:  176:		slab_allocator_free(sa, ptr);
+    11131:  177:		if (global)
        20:  178:			pthread_mutex_unlock(&global_allocator_lock);
         -:  179:	}
-    11131:  180:}
-    18601:  181:void fam_alloc_increment_state(bool send) {
-    18601:  182:	init_fam_guards();
-    18601:  183:	fam_guard_sp++;
-    18601:  184:	fam_guard_entries[fam_guard_sp].send = send;
-    18601:  185:}
+    11132:  180:}
+    18602:  181:void fam_alloc_increment_state(bool send) {
+    18602:  182:	init_fam_guards();
+    18602:  183:	fam_guard_sp++;
+    18602:  184:	fam_guard_entries[fam_guard_sp].send = send;
+    18602:  185:}
         -:  186:
         -:  187:#ifdef TEST
-       63:  188:void fam_alloc_cleanup() {
-       63:  189:	if (fam_guard_is_init) {
-       22:  190:		slab_allocator_cleanup(thread_local_slab_allocator);
-       22:  191:		pthread_mutex_lock(&global_allocator_lock);
-       22:  192:		slab_allocator_cleanup(global_allocator);
-       22:  193:		pthread_mutex_unlock(&global_allocator_lock);
-       22:  194:		myfree(global_allocator);
-       22:  195:		myfree(thread_local_slab_allocator);
+       64:  188:void fam_alloc_cleanup() {
+       64:  189:	if (fam_guard_is_init) {
+       23:  190:		slab_allocator_cleanup(thread_local_slab_allocator);
+       23:  191:		pthread_mutex_lock(&global_allocator_lock);
+       23:  192:		slab_allocator_cleanup(global_allocator);
+       23:  193:		pthread_mutex_unlock(&global_allocator_lock);
+       23:  194:		myfree(global_allocator);
+       23:  195:		myfree(thread_local_slab_allocator);
         -:  196:	}
-       63:  197:}
+       64:  197:}
         -:  198:
-       63:  199:u64 fam_alloc_count_tl_slab_allocator() {
-       63:  200:	if (!fam_guard_is_init)
+       64:  199:u64 fam_alloc_count_tl_slab_allocator() {
+       64:  200:	if (!fam_guard_is_init)
        41:  201:		return 0;
-       22:  202:	return slab_allocator_cur_slabs_allocated(thread_local_slab_allocator);
+       23:  202:	return slab_allocator_cur_slabs_allocated(thread_local_slab_allocator);
         -:  203:}
-       63:  204:u64 fam_alloc_count_global_allocator() {
-       63:  205:	if (!fam_guard_is_init)
+       64:  204:u64 fam_alloc_count_global_allocator() {
+       64:  205:	if (!fam_guard_is_init)
        41:  206:		return 0;
-       22:  207:	pthread_mutex_lock(&global_allocator_lock);
-       22:  208:	u64 ret = slab_allocator_cur_slabs_allocated(global_allocator);
-       22:  209:	pthread_mutex_unlock(&global_allocator_lock);
+       23:  207:	pthread_mutex_lock(&global_allocator_lock);
+       23:  208:	u64 ret = slab_allocator_cur_slabs_allocated(global_allocator);
+       23:  209:	pthread_mutex_unlock(&global_allocator_lock);
         -:  210:
-       22:  211:	return ret;
+       23:  211:	return ret;
         -:  212:}
         -:  213:#endif // TEST
         -:    0:Source:fam_err.c
         -:    0:Graph:fam_err.gcno
         -:    0:Data:fam_err.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -713,7 +713,7 @@
         -:    0:Source:misc.c
         -:    0:Graph:misc.gcno
         -:    0:Data:misc.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -880,21 +880,21 @@
         -:  164:}
         -:  165:
         -:  166:// Function to recursively remove a directory and its contents
-      161:  167:int remove_directory(const Path *p, bool preserve_dir) {
-      161:  168:	const char *path = path_to_string(p);
+      163:  167:int remove_directory(const Path *p, bool preserve_dir) {
+      163:  168:	const char *path = path_to_string(p);
         -:  169:	struct dirent *entry;
-      161:  170:	DIR *dir = opendir(path);
+      163:  170:	DIR *dir = opendir(path);
         -:  171:
-      161:  172:	if (dir == NULL) {
-       66:  173:		return -1;
+      163:  172:	if (dir == NULL) {
+       67:  173:		return -1;
         -:  174:	}
         -:  175:
-      321:  176:	while ((entry = readdir(dir)) != NULL) {
+      324:  176:	while ((entry = readdir(dir)) != NULL) {
         -:  177:		char full_path[PATH_MAX];
         -:  178:
         -:  179:		// Skip the special entries "." and ".."
-      231:  180:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-      182:  181:			continue;
+      233:  180:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+      184:  181:			continue;
         -:  182:		}
         -:  183:
         -:  184:		// Construct the full path to the file/directory
@@ -925,17 +925,17 @@
         -:  209:		}
         -:  210:	}
         -:  211:
-       90:  212:	closedir(dir);
+       91:  212:	closedir(dir);
         -:  213:
         -:  214:	// Now the directory is empty, so we can remove it
-       90:  215:	if (!preserve_dir) {
-       89:  216:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
+       91:  215:	if (!preserve_dir) {
+       90:  216:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
         1:  217:			SetErr(IO);
         1:  218:			return -1;
         -:  219:		}
         -:  220:	}
         -:  221:
-       89:  222:	return 0;
+       90:  222:	return 0;
         -:  223:}
         -:  224:
         5:  225:void exit_error(char *format, ...) {
@@ -972,7 +972,7 @@
         -:    0:Source:panic.c
         -:    0:Graph:panic.gcno
         -:    0:Data:panic.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1050,7 +1050,7 @@
         -:    0:Source:path.c
         -:    0:Graph:path.gcno
         -:    0:Data:path.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1078,35 +1078,35 @@
         -:   25:
         -:   26:bool __is_debug_path_homedir_null = false;
         -:   27:
-      245:   28:void path_cleanup(PathImpl *ptr) {
-      245:   29:	if (ptr->ptr) {
-      242:   30:		myfree(ptr->ptr);
-      242:   31:		ptr->ptr = NULL;
+      247:   28:void path_cleanup(PathImpl *ptr) {
+      247:   29:	if (ptr->ptr) {
+      244:   30:		myfree(ptr->ptr);
+      244:   31:		ptr->ptr = NULL;
         -:   32:	}
-      245:   33:}
+      247:   33:}
         -:   34:
-      253:   35:int path_for(Path *p, const char *path) {
-      253:   36:	if (p == NULL) {
+      255:   35:int path_for(Path *p, const char *path) {
+      255:   36:	if (p == NULL) {
         1:   37:		SetErr(IllegalArgument);
         1:   38:		return -1;
         -:   39:	}
-      252:   40:	if (path == NULL) {
+      254:   40:	if (path == NULL) {
         1:   41:		SetErr(IllegalArgument);
         1:   42:		p->ptr = NULL;
         1:   43:		return -1;
         -:   44:	}
-      251:   45:	int len = strlen(path);
-      251:   46:	if (len == 0) {
+      253:   45:	int len = strlen(path);
+      253:   46:	if (len == 0) {
         1:   47:		SetErr(IllegalArgument);
         1:   48:		p->ptr = NULL;
         1:   49:		return -1;
         -:   50:	}
-      250:   51:	p->ptr = mymalloc(len + 1);
-      250:   52:	if (!p->ptr)
+      252:   51:	p->ptr = mymalloc(len + 1);
+      252:   52:	if (!p->ptr)
         2:   53:		return -1;
-      248:   54:	p->len = len;
-      248:   55:	strcpy(p->ptr, path);
-      248:   56:	return 0;
+      250:   54:	p->len = len;
+      250:   55:	strcpy(p->ptr, path);
+      250:   56:	return 0;
         -:   57:}
         -:   58:
        33:   59:int path_replace_home(Path *p) {
@@ -1168,41 +1168,41 @@
        13:  115:	strcpy(p->ptr, buf);
        13:  116:	return 0;
         -:  117:}
-      175:  118:int path_push(Path *p, const char *next) {
-      175:  119:	if (p == NULL) {
+      176:  118:int path_push(Path *p, const char *next) {
+      176:  119:	if (p == NULL) {
         1:  120:		SetErr(IllegalArgument);
         1:  121:		return -1;
         -:  122:	}
-      174:  123:	if (next == NULL) {
+      175:  123:	if (next == NULL) {
         1:  124:		SetErr(IllegalArgument);
         1:  125:		return -1;
         -:  126:	}
-      173:  127:	int slen = strlen(p->ptr);
-      173:  128:	if (slen <= 0 || strlen(next) == 0) {
+      174:  127:	int slen = strlen(p->ptr);
+      174:  128:	if (slen <= 0 || strlen(next) == 0) {
         1:  129:		SetErr(IllegalState);
         1:  130:		return -1;
         -:  131:	}
-      172:  132:	bool need_sep = false;
-      172:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
-      172:  134:		need_sep = true;
+      173:  132:	bool need_sep = false;
+      173:  133:	if (((char *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
+      173:  134:		need_sep = true;
         -:  135:	}
         -:  136:
-      172:  137:	int nlen = slen + strlen(next);
-      172:  138:	if (need_sep)
-      172:  139:		nlen += strlen(PATH_SEPARATOR);
+      173:  137:	int nlen = slen + strlen(next);
+      173:  138:	if (need_sep)
+      173:  139:		nlen += strlen(PATH_SEPARATOR);
         -:  140:
-      172:  141:	if (nlen >= p->len) {
-      168:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
-      168:  143:		if (nptr == NULL)
+      173:  141:	if (nlen >= p->len) {
+      169:  142:		void *nptr = myrealloc(p->ptr, nlen + 1);
+      169:  143:		if (nptr == NULL)
         1:  144:			return -1;
-      167:  145:		p->ptr = nptr;
-      167:  146:		p->len = nlen;
+      168:  145:		p->ptr = nptr;
+      168:  146:		p->len = nlen;
         -:  147:	}
         -:  148:
-      171:  149:	if (need_sep)
-      171:  150:		strcat(p->ptr, PATH_SEPARATOR);
-      171:  151:	strcat(p->ptr, next);
-      171:  152:	return 0;
+      172:  149:	if (need_sep)
+      172:  150:		strcat(p->ptr, PATH_SEPARATOR);
+      172:  151:	strcat(p->ptr, next);
+      172:  152:	return 0;
         -:  153:}
        48:  154:int path_pop(Path *p) {
        48:  155:	const char *res = rstrstr(p->ptr, PATH_SEPARATOR);
@@ -1216,8 +1216,8 @@
        48:  163:	return 0;
         -:  164:}
         -:  165:
-      288:  166:char *path_to_string(const Path *p) {
-      288:  167:	return p->ptr;
+      290:  166:char *path_to_string(const Path *p) {
+      290:  167:	return p->ptr;
         -:  168:}
         -:  169:
        88:  170:const char *path_file_name(const Path *p) {
@@ -1247,8 +1247,8 @@
         3:  194:	return false;
         -:  195:}
         -:  196:
-      147:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
-      147:  198:	if (p->ptr == NULL || p->len == 0) {
+      148:  197:bool path_mkdir(Path *p, u64 mode, bool parent) {
+      148:  198:	if (p->ptr == NULL || p->len == 0) {
         1:  199:		SetErr(IllegalArgument);
         1:  200:		return false;
         -:  201:	}
@@ -1256,7 +1256,7 @@
         -:  203:	struct stat s;
         -:  204:
         -:  205:	// Check if the path exists
-      146:  206:	if (stat(p->ptr, &s) == 0) {
+      147:  206:	if (stat(p->ptr, &s) == 0) {
         -:  207:		// If the path exists and it's a directory, return success
         8:  208:		if (s.st_mode & S_IFDIR) {
         7:  209:			return true;
@@ -1268,11 +1268,11 @@
         -:  215:	}
         -:  216:
         -:  217:	// If parent is false, attempt to create only the target directory
-      138:  218:	if (!parent) {
-      120:  219:		if (mkdir(p->ptr, mode) != 0) {
+      139:  218:	if (!parent) {
+      121:  219:		if (mkdir(p->ptr, mode) != 0) {
        28:  220:			return false;
         -:  221:		}
-       92:  222:		return true;
+       93:  222:		return true;
         -:  223:	}
         -:  224:
         -:  225:	// Create the directory structure (parent is true)
@@ -1321,7 +1321,7 @@
         -:    0:Source:resources.c
         -:    0:Graph:resources.gcno
         -:    0:Data:resources.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1350,44 +1350,44 @@
         -:   26:u64 __is_debug_realloc_counter_ = UINT64_MAX;
         -:   27:#endif // TEST
         -:   28:
-     2475:   29:void *mymalloc(u64 size) {
+     2502:   29:void *mymalloc(u64 size) {
         -:   30:#ifdef TEST
-     2475:   31:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
+     2502:   31:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
        24:   32:		__is_debug_malloc_counter_ = UINT64_MAX;
        24:   33:		return NULL;
         -:   34:	}
-     2451:   35:	__is_debug_malloc_counter_--;
+     2478:   35:	__is_debug_malloc_counter_--;
         -:   36:#endif // TEST
         -:   37:	void *ret;
-     2451:   38:	ret = malloc(size);
+     2478:   38:	ret = malloc(size);
         -:   39:
-     2451:   40:	if (ret) {
-     2451:   41:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
+     2478:   40:	if (ret) {
+     2478:   41:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
         -:   42:	} else
     #####:   43:		SetErr(AllocErr);
-     2451:   44:	return ret;
+     2478:   44:	return ret;
         -:   45:}
-    11889:   46:void *myrealloc(void *ptr, u64 size) {
+    12409:   46:void *myrealloc(void *ptr, u64 size) {
         -:   47:#ifdef TEST
-    11889:   48:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
+    12409:   48:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
         7:   49:		__is_debug_realloc_counter_ = UINT64_MAX;
         7:   50:		return NULL;
         -:   51:	}
-    11882:   52:	__is_debug_realloc_counter_--;
+    12402:   52:	__is_debug_realloc_counter_--;
         -:   53:#endif // TEST
         -:   54:	void *ret;
-    11882:   55:	ret = realloc(ptr, size);
+    12402:   55:	ret = realloc(ptr, size);
         -:   56:
-    11882:   57:	if (ret) {
-    11882:   58:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
+    12402:   57:	if (ret) {
+    12402:   58:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
         -:   59:	} else
     #####:   60:		SetErr(AllocErr);
-    11882:   61:	return ret;
+    12402:   61:	return ret;
         -:   62:}
-     2389:   63:void myfree(void *ptr) {
-     2389:   64:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-     2389:   65:	free(ptr);
-     2389:   66:}
+     2416:   63:void myfree(void *ptr) {
+     2416:   64:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
+     2416:   65:	free(ptr);
+     2416:   66:}
        53:   67:MYFILE *myfopen(const Path *path, const char *mode) {
        53:   68:	const char *path_str = path_to_string(path);
        53:   69:	FILE *ret = fopen(path_str, mode);
@@ -1405,25 +1405,25 @@
        48:   81:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
        48:   82:	fclose((FILE *)ptr);
        48:   83:}
-      131:   84:u64 mymalloc_sum() {
-      131:   85:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
+      133:   84:u64 mymalloc_sum() {
+      133:   85:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
         -:   86:}
         2:   87:u64 myrealloc_sum() {
         2:   88:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
         -:   89:}
-      131:   90:u64 myfree_sum() {
-      131:   91:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
+      133:   90:u64 myfree_sum() {
+      133:   91:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
         -:   92:}
-      195:   93:u64 myfopen_sum() {
-      195:   94:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
+      198:   93:u64 myfopen_sum() {
+      198:   94:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
         -:   95:}
-      195:   96:u64 myfclose_sum() {
-      195:   97:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+      198:   96:u64 myfclose_sum() {
+      198:   97:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
         -:   98:}
         -:    0:Source:slabs.c
         -:    0:Graph:slabs.gcno
         -:    0:Data:slabs.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1494,26 +1494,26 @@
         -:   68:	}
         1:   69:}
         -:   70:
-  2012462:   71:u32 fat_ptr_size(const FatPtr *ptr) {
-  2012462:   72:	u32 ret = 0;
-  2012462:   73:	if (ptr != NULL) {
-  2012462:   74:		FatPtr32Impl *tmp = ptr->data;
-  2012462:   75:		if (!nil(*ptr))
-  2012460:   76:			memcpy(&ret, tmp->size_flags, 3);
+  2012463:   71:u32 fat_ptr_size(const FatPtr *ptr) {
+  2012463:   72:	u32 ret = 0;
+  2012463:   73:	if (ptr != NULL) {
+  2012463:   74:		FatPtr32Impl *tmp = ptr->data;
+  2012463:   75:		if (!nil(*ptr))
+  2012461:   76:			memcpy(&ret, tmp->size_flags, 3);
         -:   77:	} else
     #####:   78:		SetErr(IllegalArgument);
-  2012462:   79:	return ret;
+  2012463:   79:	return ret;
         -:   80:}
         -:   81:
- 67395721:   82:void *fat_ptr_data(const FatPtr *ptr) {
- 67395721:   83:	void *ret = NULL;
- 67395721:   84:	if (ptr != NULL) {
- 67395721:   85:		FatPtr32Impl *tmp = ptr->data;
- 67395721:   86:		if (!nil(*ptr) && ptr->data != NULL)
- 67395719:   87:			ret = ((FatPtr32Impl *)ptr->data)->data;
+ 67517923:   82:void *fat_ptr_data(const FatPtr *ptr) {
+ 67517923:   83:	void *ret = NULL;
+ 67517923:   84:	if (ptr != NULL) {
+ 67517923:   85:		FatPtr32Impl *tmp = ptr->data;
+ 67517923:   86:		if (!nil(*ptr) && ptr->data != NULL)
+ 67517921:   87:			ret = ((FatPtr32Impl *)ptr->data)->data;
         -:   88:	} else
     #####:   89:		SetErr(IllegalArgument);
- 67395721:   90:	return ret;
+ 67517923:   90:	return ret;
         -:   91:}
         -:   92:
         1:   93:void fat_ptr_flag_set(const FatPtr *ptr, u8 flag, bool value) {
@@ -1524,47 +1524,47 @@
         -:   98:	}
         1:   99:}
         -:  100:
- 70451505:  101:bool fat_ptr_flag_get(const FatPtr *ptr, u8 flag) {
- 70451505:  102:	bool ret = false;
- 70451505:  103:	if (ptr && ptr->data) {
- 70451505:  104:		FatPtr32Impl *fptr = ptr->data;
- 70451505:  105:		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
- 70451505:  106:		ret = bitflags_check(&bf, flag);
+ 70573712:  101:bool fat_ptr_flag_get(const FatPtr *ptr, u8 flag) {
+ 70573712:  102:	bool ret = false;
+ 70573712:  103:	if (ptr && ptr->data) {
+ 70573712:  104:		FatPtr32Impl *fptr = ptr->data;
+ 70573712:  105:		BitFlags bf = {.flags = (fptr->size_flags + 3), .capacity = 1};
+ 70573712:  106:		ret = bitflags_check(&bf, flag);
         -:  107:	}
- 70451505:  108:	return ret;
+ 70573712:  108:	return ret;
         -:  109:}
         -:  110:
-       55:  111:void slab_allocator_config_cleanup(SlabAllocatorConfigNc *sc) {
-       55:  112:	if (sc->slab_types) {
-       55:  113:		myfree(sc->slab_types);
-       55:  114:		sc->slab_types = NULL;
+       57:  111:void slab_allocator_config_cleanup(SlabAllocatorConfigNc *sc) {
+       57:  112:	if (sc->slab_types) {
+       57:  113:		myfree(sc->slab_types);
+       57:  114:		sc->slab_types = NULL;
         -:  115:	}
-       55:  116:}
+       57:  116:}
         -:  117:
-       58:  118:int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeroed, bool global) {
-       58:  119:	sc->zeroed = zeroed;
-       58:  120:	sc->global = global;
-       58:  121:	sc->slab_types_count = 0;
-       58:  122:	sc->slab_types = NULL;
-       58:  123:	return 0;
+       60:  118:int slab_allocator_config_build(SlabAllocatorConfig *sc, bool zeroed, bool global) {
+       60:  119:	sc->zeroed = zeroed;
+       60:  120:	sc->global = global;
+       60:  121:	sc->slab_types_count = 0;
+       60:  122:	sc->slab_types = NULL;
+       60:  123:	return 0;
         -:  124:}
         -:  125:
-    11531:  126:int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st) {
-    11531:  127:	if (sc->slab_types) {
-    11476:  128:		void *tmp = myrealloc(sc->slab_types, sizeof(SlabType) * (1 + sc->slab_types_count));
-    11476:  129:		if (tmp == NULL)
+    12043:  126:int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st) {
+    12043:  127:	if (sc->slab_types) {
+    11986:  128:		void *tmp = myrealloc(sc->slab_types, sizeof(SlabType) * (1 + sc->slab_types_count));
+    11986:  129:		if (tmp == NULL)
     #####:  130:			return -1;
-    11476:  131:		sc->slab_types = tmp;
+    11986:  131:		sc->slab_types = tmp;
         -:  132:	} else {
-       55:  133:		sc->slab_types = mymalloc(sizeof(SlabType));
-       55:  134:		if (sc->slab_types == NULL)
+       57:  133:		sc->slab_types = mymalloc(sizeof(SlabType));
+       57:  134:		if (sc->slab_types == NULL)
     #####:  135:			return -1;
         -:  136:	}
         -:  137:
-    11531:  138:	sc->slab_types[sc->slab_types_count] = *st;
-    11531:  139:	sc->slab_types_count++;
+    12043:  138:	sc->slab_types[sc->slab_types_count] = *st;
+    12043:  139:	sc->slab_types_count++;
         -:  140:
-    11531:  141:	return 0;
+    12043:  141:	return 0;
         -:  142:}
         -:  143:
         -:  144:// Slab Allocator
@@ -1585,64 +1585,64 @@
         -:  159:	bool global;	  // whether this slab allocator is considered 'global'
         -:  160:} SlabAllocatorImpl;
         -:  161:
-       53:  162:void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
-       53:  163:	if (ptr->impl) {
-       53:  164:		SlabAllocatorImpl *impl = ptr->impl;
-       53:  165:		if (impl->sd_arr) {
-    11326:  166:			for (u64 i = 0; i < impl->sd_size; i++) {
-    11426:  167:				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
-      153:  168:					if (impl->sd_arr[i].data[j]) {
-      153:  169:						myfree(impl->sd_arr[i].data[j]);
-      153:  170:						impl->sd_arr[i].data[j] = NULL;
+       55:  162:void slab_allocator_cleanup(SlabAllocatorNc *ptr) {
+       55:  163:	if (ptr->impl) {
+       55:  164:		SlabAllocatorImpl *impl = ptr->impl;
+       55:  165:		if (impl->sd_arr) {
+    11840:  166:			for (u64 i = 0; i < impl->sd_size; i++) {
+    11939:  167:				for (int j = 0; j < impl->sd_arr[i].cur_chunks; j++) {
+      154:  168:					if (impl->sd_arr[i].data[j]) {
+      154:  169:						myfree(impl->sd_arr[i].data[j]);
+      154:  170:						impl->sd_arr[i].data[j] = NULL;
         -:  171:					}
         -:  172:				}
-    11273:  173:				if (impl->sd_arr[i].data) {
-       75:  174:					myfree(impl->sd_arr[i].data);
-       75:  175:					impl->sd_arr[i].data = NULL;
+    11785:  173:				if (impl->sd_arr[i].data) {
+       76:  174:					myfree(impl->sd_arr[i].data);
+       76:  175:					impl->sd_arr[i].data = NULL;
         -:  176:				}
-    11273:  177:				if (impl->sd_arr[i].free_list) {
-       75:  178:					myfree(impl->sd_arr[i].free_list);
-       75:  179:					impl->sd_arr[i].free_list = NULL;
+    11785:  177:				if (impl->sd_arr[i].free_list) {
+       76:  178:					myfree(impl->sd_arr[i].free_list);
+       76:  179:					impl->sd_arr[i].free_list = NULL;
         -:  180:				}
         -:  181:			}
         -:  182:
-       53:  183:			myfree(impl->sd_arr);
-       53:  184:			impl->sd_arr = NULL;
+       55:  183:			myfree(impl->sd_arr);
+       55:  184:			impl->sd_arr = NULL;
         -:  185:		}
-       53:  186:		myfree(ptr->impl);
-       53:  187:		ptr->impl = NULL;
+       55:  186:		myfree(ptr->impl);
+       55:  187:		ptr->impl = NULL;
         -:  188:	}
-       53:  189:}
+       55:  189:}
         -:  190:
-    11675:  191:int slab_allocator_init_free_list(SlabData *sd, u32 slabs, u32 offset) {
+    12188:  191:int slab_allocator_init_free_list(SlabData *sd, u32 slabs, u32 offset) {
         -:  192:	//  initialize the values of the free list.
-  1025895:  193:	for (u32 i = 0; i < slabs; i++) {
-  1014220:  194:		if (i == (slabs - 1)) {
-      154:  195:			((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
+  1026508:  193:	for (u32 i = 0; i < slabs; i++) {
+  1014320:  194:		if (i == (slabs - 1)) {
+      155:  195:			((u32 *)(sd->free_list))[i + offset] = UINT32_MAX;
         -:  196:		} else {
-  1014066:  197:			((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
+  1014165:  197:			((u32 *)(sd->free_list))[i + offset] = offset + i + 1;
         -:  198:		}
         -:  199:	}
         -:  200:
-    11675:  201:	return 0;
+    12188:  201:	return 0;
         -:  202:}
         -:  203:
-    11529:  204:int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
-    11529:  205:	impl->sd_arr[index].type = *st;
-    11529:  206:	impl->sd_arr[index].type.slab_size += SIZE_OVERHEAD;
-    11529:  207:	impl->sd_arr[index].cur_slabs = 0;
-    11529:  208:	impl->sd_arr[index].cur_chunks = st->initial_chunks;
-    11529:  209:	if (st->initial_chunks > 0) {
+    12041:  204:int slab_allocator_init_slab_data(SlabAllocatorImpl *impl, SlabType *st, u64 index) {
+    12041:  205:	impl->sd_arr[index].type = *st;
+    12041:  206:	impl->sd_arr[index].type.slab_size += SIZE_OVERHEAD;
+    12041:  207:	impl->sd_arr[index].cur_slabs = 0;
+    12041:  208:	impl->sd_arr[index].cur_chunks = st->initial_chunks;
+    12041:  209:	if (st->initial_chunks > 0) {
         8:  210:		impl->sd_arr[index].free_list_head = 0;
         8:  211:		impl->sd_arr[index].data = mymalloc(sizeof(void *) * st->initial_chunks);
         8:  212:		if (impl->sd_arr[index].data == NULL)
     #####:  213:			return -1;
         -:  214:	} else {
-    11521:  215:		impl->sd_arr[index].data = NULL;
-    11521:  216:		impl->sd_arr[index].free_list_head = UINT32_MAX;
+    12033:  215:		impl->sd_arr[index].data = NULL;
+    12033:  216:		impl->sd_arr[index].free_list_head = UINT32_MAX;
         -:  217:	}
         -:  218:
-    11529:  219:	if (st->initial_chunks > 0) {
+    12041:  219:	if (st->initial_chunks > 0) {
        16:  220:		impl->sd_arr[index].free_list =
         8:  221:			mymalloc(sizeof(u32) * (u64)st->slabs_per_resize * (u64)st->initial_chunks);
         8:  222:		if (impl->sd_arr[index].free_list == NULL) {
@@ -1650,10 +1650,10 @@
     #####:  224:			return -1;
         -:  225:		}
         -:  226:	} else {
-    11521:  227:		impl->sd_arr[index].free_list = NULL;
+    12033:  227:		impl->sd_arr[index].free_list = NULL;
         -:  228:	}
         -:  229:
-    11537:  230:	for (u64 i = 0; i < st->initial_chunks; i++) {
+    12049:  230:	for (u64 i = 0; i < st->initial_chunks; i++) {
        16:  231:		impl->sd_arr[index].data[i] =
         8:  232:			mymalloc((u64)impl->sd_arr[index].type.slab_size * (u64)st->slabs_per_resize);
         -:  233:
@@ -1666,197 +1666,197 @@
         -:  240:		}
         -:  241:	}
         -:  242:
-    11529:  243:	slab_allocator_init_free_list(&impl->sd_arr[index], st->initial_chunks * st->slabs_per_resize,
+    12041:  243:	slab_allocator_init_free_list(&impl->sd_arr[index], st->initial_chunks * st->slabs_per_resize,
         -:  244:								  0);
-    11529:  245:	return 0;
+    12041:  245:	return 0;
         -:  246:}
         -:  247:
-    46080:  248:int compare_sd(const void *a, const void *b) {
-    46080:  249:	const SlabData *sda = a;
-    46080:  250:	const SlabData *sdb = b;
-    46080:  251:	if (sda->type.slab_size < sdb->type.slab_size)
-    46080:  252:		return -1;
+    48128:  248:int compare_sd(const void *a, const void *b) {
+    48128:  249:	const SlabData *sda = a;
+    48128:  250:	const SlabData *sdb = b;
+    48128:  251:	if (sda->type.slab_size < sdb->type.slab_size)
+    48128:  252:		return -1;
     #####:  253:	else if (sda->type.slab_size > sdb->type.slab_size)
     #####:  254:		return 1;
     #####:  255:	return 0;
         -:  256:}
         -:  257:
-       54:  258:int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
-       54:  259:	SlabAllocatorImpl *impl = ptr->impl;
-       54:  260:	qsort(impl->sd_arr, impl->sd_size, sizeof(SlabData), compare_sd);
-       54:  261:	u32 last_slab_size = 0;
-    11582:  262:	for (u64 i = 0; i < impl->sd_size; i++) {
-    11529:  263:		if (impl->sd_arr[i].type.slab_size >= MAX_SLAB_SIZE) { // 2^24 - 1
+       56:  258:int slab_allocator_sort_slab_data(SlabAllocator *ptr) {
+       56:  259:	SlabAllocatorImpl *impl = ptr->impl;
+       56:  260:	qsort(impl->sd_arr, impl->sd_size, sizeof(SlabData), compare_sd);
+       56:  261:	u32 last_slab_size = 0;
+    12096:  262:	for (u64 i = 0; i < impl->sd_size; i++) {
+    12041:  263:		if (impl->sd_arr[i].type.slab_size >= MAX_SLAB_SIZE) { // 2^24 - 1
     #####:  264:			SetErr(TooBig);
     #####:  265:			return -1;
         -:  266:		}
         -:  267:
-    11529:  268:		if (last_slab_size >= impl->sd_arr[i].type.slab_size) {
+    12041:  268:		if (last_slab_size >= impl->sd_arr[i].type.slab_size) {
     #####:  269:			SetErr(IllegalArgument);
     #####:  270:			return -1;
         -:  271:		}
         -:  272:		// for alignment, must be divisible by 8
-    11529:  273:		if (impl->sd_arr[i].type.slab_size % 8 != 0) {
+    12041:  273:		if (impl->sd_arr[i].type.slab_size % 8 != 0) {
     #####:  274:			SetErr(IllegalArgument);
     #####:  275:			return -1;
         -:  276:		}
         -:  277:		// can't have higher max slabs than initial
-    11529:  278:		if (impl->sd_arr[i].type.slabs_per_resize * impl->sd_arr[i].type.initial_chunks >
-    11529:  279:			impl->sd_arr[i].type.max_slabs) {
+    12041:  278:		if (impl->sd_arr[i].type.slabs_per_resize * impl->sd_arr[i].type.initial_chunks >
+    12041:  279:			impl->sd_arr[i].type.max_slabs) {
     #####:  280:			SetErr(IllegalArgument);
     #####:  281:			return -1;
         -:  282:		}
         -:  283:		// max slabs
-    11529:  284:		if (impl->sd_arr[i].type.max_slabs > MAX_SLABS) {
+    12041:  284:		if (impl->sd_arr[i].type.max_slabs > MAX_SLABS) {
     #####:  285:			SetErr(IllegalArgument);
     #####:  286:			return -1;
         -:  287:		}
         -:  288:
         -:  289:		// max slabs must be dividisble by slabs_per_resize
-    11529:  290:		if (impl->sd_arr[i].type.max_slabs % impl->sd_arr[i].type.slabs_per_resize) {
+    12041:  290:		if (impl->sd_arr[i].type.max_slabs % impl->sd_arr[i].type.slabs_per_resize) {
         1:  291:			SetErr(IllegalArgument);
         1:  292:			return -1;
         -:  293:		}
-    11528:  294:		last_slab_size = impl->sd_arr[i].type.slab_size;
+    12040:  294:		last_slab_size = impl->sd_arr[i].type.slab_size;
         -:  295:	}
-       53:  296:	return 0;
+       55:  296:	return 0;
         -:  297:}
         -:  298:
-       54:  299:int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) {
-       54:  300:	ptr->impl = mymalloc(sizeof(SlabAllocatorImpl));
-       54:  301:	if (ptr->impl == NULL)
+       56:  299:int slab_allocator_build(SlabAllocator *ptr, const SlabAllocatorConfig *config) {
+       56:  300:	ptr->impl = mymalloc(sizeof(SlabAllocatorImpl));
+       56:  301:	if (ptr->impl == NULL)
     #####:  302:		return -1;
-       54:  303:	SlabAllocatorImpl *impl = ptr->impl;
-       54:  304:	impl->zeroed = config->zeroed;
-       54:  305:	impl->global = config->global;
-       54:  306:	impl->sd_size = config->slab_types_count;
-       54:  307:	impl->sd_arr = mymalloc(sizeof(SlabData) * impl->sd_size);
-       54:  308:	if (impl->sd_arr == NULL) {
+       56:  303:	SlabAllocatorImpl *impl = ptr->impl;
+       56:  304:	impl->zeroed = config->zeroed;
+       56:  305:	impl->global = config->global;
+       56:  306:	impl->sd_size = config->slab_types_count;
+       56:  307:	impl->sd_arr = mymalloc(sizeof(SlabData) * impl->sd_size);
+       56:  308:	if (impl->sd_arr == NULL) {
     #####:  309:		myfree(ptr->impl);
     #####:  310:		return -1;
         -:  311:	}
         -:  312:
-    11583:  313:	for (u64 i = 0; i < config->slab_types_count; i++) {
-    11529:  314:		if (slab_allocator_init_slab_data(impl, &config->slab_types[i], i)) {
+    12097:  313:	for (u64 i = 0; i < config->slab_types_count; i++) {
+    12041:  314:		if (slab_allocator_init_slab_data(impl, &config->slab_types[i], i)) {
         -:  315:			// cleanup previously allocated slabs
     #####:  316:			impl->sd_size = i;
     #####:  317:			slab_allocator_cleanup(ptr);
     #####:  318:			return -1;
         -:  319:		}
         -:  320:	}
-       54:  321:	int ret = slab_allocator_sort_slab_data(ptr);
-       54:  322:	if (ret)
+       56:  321:	int ret = slab_allocator_sort_slab_data(ptr);
+       56:  322:	if (ret)
         1:  323:		slab_allocator_cleanup(ptr);
-       54:  324:	return ret;
+       56:  324:	return ret;
         -:  325:}
         -:  326:
-  2022496:  327:int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
-  2022496:  328:	SlabAllocatorImpl *impl = ptr->impl;
-  2022496:  329:	int ret = -1;
-  2022496:  330:	if (impl->sd_size > 0) {
+  2022498:  327:int slab_allocator_index(const SlabAllocator *ptr, u32 size) {
+  2022498:  328:	SlabAllocatorImpl *impl = ptr->impl;
+  2022498:  329:	int ret = -1;
+  2022498:  330:	if (impl->sd_size > 0) {
         -:  331:
-  2022496:  332:		int left = 0;
-  2022496:  333:		int right = impl->sd_size - 1;
+  2022498:  332:		int left = 0;
+  2022498:  333:		int right = impl->sd_size - 1;
         -:  334:
-  3156865:  335:		while (left <= right) {
-  2145714:  336:			int mid = left + (right - left) / 2;
-  2145714:  337:			u32 slab_size = impl->sd_arr[mid].type.slab_size;
-  2145714:  338:			if (slab_size == size) {
-  1011345:  339:				ret = mid;
-  1011345:  340:				break;
-  1134369:  341:			} else if (slab_size > size)
-  1101723:  342:				right = mid - 1;
+  3156881:  335:		while (left <= right) {
+  2145730:  336:			int mid = left + (right - left) / 2;
+  2145730:  337:			u32 slab_size = impl->sd_arr[mid].type.slab_size;
+  2145730:  338:			if (slab_size == size) {
+  1011347:  339:				ret = mid;
+  1011347:  340:				break;
+  1134383:  341:			} else if (slab_size > size)
+  1101733:  342:				right = mid - 1;
         -:  343:			else
-    32646:  344:				left = mid + 1;
+    32650:  344:				left = mid + 1;
         -:  345:		}
         -:  346:
-  2022496:  347:		if (ret == -1 && right + 1 <= impl->sd_size - 1) {
+  2022498:  347:		if (ret == -1 && right + 1 <= impl->sd_size - 1) {
   1011150:  348:			ret = right + 1;
         -:  349:		}
         -:  350:	}
         -:  351:
-  2022496:  352:	return ret;
+  2022498:  352:	return ret;
         -:  353:}
         -:  354:
         -:  355:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool zeroed, bool global);
         -:  356:
-  1011397:  357:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
-  1011397:  358:	u32 id = sd->free_list_head;
-  1011397:  359:	if (id == UINT32_MAX) {
-      152:  360:		return slab_data_try_resize(sd, fptr, zeroed, global);
+  1011399:  357:int slab_data_allocate(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
+  1011399:  358:	u32 id = sd->free_list_head;
+  1011399:  359:	if (id == UINT32_MAX) {
+      153:  360:		return slab_data_try_resize(sd, fptr, zeroed, global);
         -:  361:	}
         -:  362:
-  1011245:  363:	sd->free_list_head = ((u32 *)sd->free_list)[id];
+  1011246:  363:	sd->free_list_head = ((u32 *)sd->free_list)[id];
         -:  364:
         -:  365:	// set to MAX-1 as a marker that this is allocated
         -:  366:	// if any freed without this value, it's an error
-  1011245:  367:	((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
+  1011246:  367:	((u32 *)sd->free_list)[id] = (UINT32_MAX - 1);
         -:  368:
-  1011245:  369:	u32 len = sd->type.slab_size;
-  1011245:  370:	u64 slab_data_index = id / sd->type.slabs_per_resize;
-  1011245:  371:	u64 offset_mod = id % sd->type.slabs_per_resize;
+  1011246:  369:	u32 len = sd->type.slab_size;
+  1011246:  370:	u64 slab_data_index = id / sd->type.slabs_per_resize;
+  1011246:  371:	u64 offset_mod = id % sd->type.slabs_per_resize;
         -:  372:
-  1011245:  373:	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
+  1011246:  373:	fptr->data = sd->data[slab_data_index] + offset_mod * sd->type.slab_size;
         -:  374:
-  1011245:  375:	FatPtr32Impl *fptr32 = fptr->data;
-  1011245:  376:	fptr32->id = id;
-  1011245:  377:	u64 data_len = len - SIZE_OVERHEAD;
-  1011245:  378:	memcpy(&fptr32->size_flags, &data_len, 3);
-  1011245:  379:	fptr32->size_flags[3] = 0;
-  1011245:  380:	fptr32->data = fptr->data + SIZE_OVERHEAD;
-  1011245:  381:	u8 *data_ptr = fptr32->data;
-  1011245:  382:	if (global) {
+  1011246:  375:	FatPtr32Impl *fptr32 = fptr->data;
+  1011246:  376:	fptr32->id = id;
+  1011246:  377:	u64 data_len = len - SIZE_OVERHEAD;
+  1011246:  378:	memcpy(&fptr32->size_flags, &data_len, 3);
+  1011246:  379:	fptr32->size_flags[3] = 0;
+  1011246:  380:	fptr32->data = fptr->data + SIZE_OVERHEAD;
+  1011246:  381:	u8 *data_ptr = fptr32->data;
+  1011246:  382:	if (global) {
        20:  383:		BitFlags bf = {.flags = (fptr32->size_flags + 3), .capacity = 1};
        20:  384:		bitflags_set(&bf, FAT_PTR_FLAG_GLOBAL, true);
         -:  385:	}
         -:  386:
-  1011245:  387:	sd->cur_slabs += 1;
-  1011245:  388:	if (zeroed) {
+  1011246:  387:	sd->cur_slabs += 1;
+  1011246:  388:	if (zeroed) {
       500:  389:		for (u64 i = 0; i < data_len; i++) {
       480:  390:			data_ptr[i] = 0;
         -:  391:		}
         -:  392:	}
         -:  393:
-  1011245:  394:	return 0;
+  1011246:  394:	return 0;
         -:  395:}
         -:  396:
-      152:  397:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
-      152:  398:	int ret = -1;
-      152:  399:	if (sd->cur_slabs < sd->type.max_slabs) {
+      153:  397:int slab_data_try_resize(SlabData *sd, FatPtr *fptr, bool zeroed, bool global) {
+      153:  398:	int ret = -1;
+      153:  399:	if (sd->cur_slabs < sd->type.max_slabs) {
         -:  400:		// we can try to resize
         -:  401:		// first try to reallocate the free list
-      148:  402:		void *nfree_list = NULL;
-      148:  403:		u64 factor = sizeof(u32);
-      148:  404:		if (sd->free_list) {
+      149:  402:		void *nfree_list = NULL;
+      149:  403:		u64 factor = sizeof(u32);
+      149:  404:		if (sd->free_list) {
         -:  405:			nfree_list =
        78:  406:				myrealloc(sd->free_list, (1 + sd->cur_chunks) * sd->type.slabs_per_resize * factor);
         -:  407:		} else {
         -:  408:
-       70:  409:			nfree_list = mymalloc((u64)sd->type.slabs_per_resize * (u64)factor);
+       71:  409:			nfree_list = mymalloc((u64)sd->type.slabs_per_resize * (u64)factor);
         -:  410:		}
-      148:  411:		if (nfree_list != NULL) {
+      149:  411:		if (nfree_list != NULL) {
         -:  412:
-      146:  413:			sd->free_list = nfree_list;
+      147:  413:			sd->free_list = nfree_list;
         -:  414:
         -:  415:			// now try to allocate more slab chunks
         -:  416:			void *ndata;
-      146:  417:			if (sd->data == NULL) {
-       68:  418:				ndata = mymalloc(sizeof(void *));
+      147:  417:			if (sd->data == NULL) {
+       69:  418:				ndata = mymalloc(sizeof(void *));
         -:  419:			} else {
        78:  420:				ndata = myrealloc(sd->data, sizeof(void *) * (1 + sd->cur_chunks));
         -:  421:			}
-      146:  422:			if (ndata != NULL) {
+      147:  422:			if (ndata != NULL) {
         -:  423:
-      146:  424:				sd->data = ndata;
-      146:  425:				sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
-      146:  426:				if (sd->data[sd->cur_chunks] != NULL) {
+      147:  424:				sd->data = ndata;
+      147:  425:				sd->data[sd->cur_chunks] = mymalloc(sd->type.slab_size * sd->type.slabs_per_resize);
+      147:  426:				if (sd->data[sd->cur_chunks] != NULL) {
         -:  427:
         -:  428:					// data was successfully allocated, make updates.
-      146:  429:					slab_allocator_init_free_list(sd, sd->type.slabs_per_resize, sd->cur_slabs);
-      146:  430:					sd->free_list_head = sd->cur_slabs;
-      146:  431:					sd->cur_chunks += 1;
+      147:  429:					slab_allocator_init_free_list(sd, sd->type.slabs_per_resize, sd->cur_slabs);
+      147:  430:					sd->free_list_head = sd->cur_slabs;
+      147:  431:					sd->cur_chunks += 1;
         -:  432:
-      146:  433:					return slab_data_allocate(sd, fptr, zeroed, global);
+      147:  433:					return slab_data_allocate(sd, fptr, zeroed, global);
         -:  434:				}
         -:  435:			}
         -:  436:		}
@@ -1864,78 +1864,78 @@
         6:  438:	return ret;
         -:  439:}
         -:  440:
-  1011244:  441:void slab_data_free(SlabData *sd, const FatPtr *fptr, bool zeroed) {
-  1011244:  442:	u64 data_len = 0;
+  1011245:  441:void slab_data_free(SlabData *sd, const FatPtr *fptr, bool zeroed) {
+  1011245:  442:	u64 data_len = 0;
         -:  443:	u8 *data_ptr;
-  1011244:  444:	if (sd->free_list == NULL) {
+  1011245:  444:	if (sd->free_list == NULL) {
     #####:  445:		panic("free list not initialized (wrong slab allocator?)");
         -:  446:	}
         -:  447:
-  1011244:  448:	FatPtr32Impl *fptr32 = fptr->data;
-  1011244:  449:	memcpy(&data_len, &fptr32->size_flags, 3);
-  1011244:  450:	data_ptr = fptr32->data;
-  1011244:  451:	u32 id = fptr32->id;
-  1011244:  452:	if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
+  1011245:  448:	FatPtr32Impl *fptr32 = fptr->data;
+  1011245:  449:	memcpy(&data_len, &fptr32->size_flags, 3);
+  1011245:  450:	data_ptr = fptr32->data;
+  1011245:  451:	u32 id = fptr32->id;
+  1011245:  452:	if (((u32 *)sd->free_list)[id] != (UINT32_MAX - 1)) {
     #####:  453:		panic("Potential double free. Id = %llu.\n", id);
         -:  454:	}
-  1011244:  455:	((u32 *)sd->free_list)[id] = sd->free_list_head;
-  1011244:  456:	sd->free_list_head = id;
-  1011244:  457:	if (sd->cur_slabs == 0)
+  1011245:  455:	((u32 *)sd->free_list)[id] = sd->free_list_head;
+  1011245:  456:	sd->free_list_head = id;
+  1011245:  457:	if (sd->cur_slabs == 0)
     #####:  458:		panic("Potential double free. Id = %llu. Freeing slabs when none are allocated.\n", id);
-  1011244:  459:	sd->cur_slabs -= 1;
+  1011245:  459:	sd->cur_slabs -= 1;
         -:  460:
-  1011244:  461:	if (zeroed) {
+  1011245:  461:	if (zeroed) {
       500:  462:		for (u64 i = 0; i < data_len; i++) {
       480:  463:			data_ptr[i] = 0;
         -:  464:		}
         -:  465:	}
-  1011244:  466:}
+  1011245:  466:}
         -:  467:
-  1011252:  468:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
-  1011252:  469:	if (ptr == NULL || size == 0) {
+  1011253:  468:int slab_allocator_allocate(SlabAllocator *ptr, u32 size, FatPtr *fptr) {
+  1011253:  469:	if (ptr == NULL || size == 0) {
     #####:  470:		SetErr(IllegalArgument);
     #####:  471:		return -1;
         -:  472:	}
         -:  473:
-  1011252:  474:	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
-  1011252:  475:	bool zeroed = impl->zeroed;
-  1011252:  476:	bool global = impl->global;
-  1011252:  477:	u32 needed = size + SIZE_OVERHEAD;
-  1011252:  478:	int index = slab_allocator_index(ptr, needed);
-  1011252:  479:	int ret = -1;
-  1011252:  480:	if (index >= 0) {
-  1011251:  481:		SlabData *sd = &impl->sd_arr[index];
-  1011251:  482:		ret = slab_data_allocate(sd, fptr, zeroed, global);
+  1011253:  474:	SlabAllocatorImpl *impl = ((SlabAllocatorImpl *)ptr->impl);
+  1011253:  475:	bool zeroed = impl->zeroed;
+  1011253:  476:	bool global = impl->global;
+  1011253:  477:	u32 needed = size + SIZE_OVERHEAD;
+  1011253:  478:	int index = slab_allocator_index(ptr, needed);
+  1011253:  479:	int ret = -1;
+  1011253:  480:	if (index >= 0) {
+  1011252:  481:		SlabData *sd = &impl->sd_arr[index];
+  1011252:  482:		ret = slab_data_allocate(sd, fptr, zeroed, global);
         -:  483:	} else
         1:  484:		SetErr(ResourceNotAvailable);
-  1011252:  485:	return ret;
+  1011253:  485:	return ret;
         -:  486:}
-  1011244:  487:void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
-  1011244:  488:	if (fptr == NULL || nil(*fptr)) {
+  1011245:  487:void slab_allocator_free(SlabAllocator *ptr, FatPtr *fptr) {
+  1011245:  488:	if (fptr == NULL || nil(*fptr)) {
     #####:  489:		panic("Freeing a slab that's already nil. Double free?");
         -:  490:	}
-  1011244:  491:	SlabAllocatorImpl *impl = ptr->impl;
+  1011245:  491:	SlabAllocatorImpl *impl = ptr->impl;
         -:  492:
-  1011244:  493:	FatPtr32Impl *fptr32 = fptr->data;
+  1011245:  493:	FatPtr32Impl *fptr32 = fptr->data;
         -:  494:
-  1011244:  495:	u32 needed = fat_ptr_size(fptr) + SIZE_OVERHEAD;
-  1011244:  496:	int index = slab_allocator_index(ptr, needed);
-  1011244:  497:	if (index < 0)
+  1011245:  495:	u32 needed = fat_ptr_size(fptr) + SIZE_OVERHEAD;
+  1011245:  496:	int index = slab_allocator_index(ptr, needed);
+  1011245:  497:	if (index < 0)
     #####:  498:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-  1011244:  499:	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
-  1011244:  500:	if (needed != sd->type.slab_size)
+  1011245:  499:	SlabData *sd = &((SlabAllocatorImpl *)ptr->impl)->sd_arr[index];
+  1011245:  500:	if (needed != sd->type.slab_size)
     #####:  501:		panic("Freeing a slab with an unknown slab size %llu.\n", needed);
-  1011244:  502:	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->zeroed);
-  1011244:  503:	*fptr = null;
-  1011244:  504:}
-       58:  505:u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
-       58:  506:	SlabAllocatorImpl *impl = ptr->impl;
-       58:  507:	u64 ret = 0;
+  1011245:  502:	slab_data_free(sd, fptr, ((SlabAllocatorImpl *)ptr->impl)->zeroed);
+  1011245:  503:	*fptr = null;
+  1011245:  504:}
+       60:  505:u64 slab_allocator_cur_slabs_allocated(const SlabAllocator *ptr) {
+       60:  506:	SlabAllocatorImpl *impl = ptr->impl;
+       60:  507:	u64 ret = 0;
         -:  508:
-    11336:  509:	for (u64 i = 0; i < impl->sd_size; i++) {
-    11278:  510:		ret += impl->sd_arr[i].cur_slabs;
+    11850:  509:	for (u64 i = 0; i < impl->sd_size; i++) {
+    11790:  510:		ret += impl->sd_arr[i].cur_slabs;
         -:  511:	}
-       58:  512:	return ret;
+       60:  512:	return ret;
         -:  513:}
         -:  514:
         -:  515:// These are test helper functions
@@ -1965,7 +1965,7 @@
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:71
+        -:    0:Runs:72
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1986,12 +1986,12 @@
         -:   18:#include <stdio.h>
         -:   19:#include <stdlib.h>
         -:   20:
-       71:   21:bool __is_little_endian() {
-       71:   22:	u16 test = 0x1;
-       71:   23:	return (*(u8 *)&test == 0x1);
+       72:   21:bool __is_little_endian() {
+       72:   22:	u16 test = 0x1;
+       72:   23:	return (*(u8 *)&test == 0x1);
         -:   24:}
         -:   25:
-       71:   26:void __attribute__((constructor)) __check_64bit_arch__() {
+       72:   26:void __attribute__((constructor)) __check_64bit_arch__() {
         -:   27:	if (sizeof(size_t) != 8) {
         -:   28:		fprintf(stderr, "Error: This program requires a 64-bit architecture to run.\n");
         -:   29:		exit(EXIT_FAILURE);
@@ -2005,7 +2005,7 @@
         -:   37:		exit(EXIT_FAILURE);
         -:   38:	}
         -:   39:
-       71:   40:	if (!__is_little_endian()) {
+       72:   40:	if (!__is_little_endian()) {
     #####:   41:		fprintf(stderr, "Big endian systems not supported");
     #####:   42:		exit(EXIT_FAILURE);
         -:   43:	}
@@ -2016,7 +2016,7 @@
         -:   48:			"Error: Unexpected size for atomic_ullong. Check your compiler and architecture.\n");
         -:   49:		exit(EXIT_FAILURE);
         -:   50:	}
-       71:   51:}
+       72:   51:}
         -:    0:Source:real_main.c
         -:    0:Graph:real_main.gcno
         -:    0:Data:real_main.gcda
@@ -2141,7 +2141,7 @@
         -:    0:Source:aes.c
         -:    0:Graph:aes.gcno
         -:    0:Data:aes.gcda
-        -:    0:Runs:28
+        -:    0:Runs:29
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2300,39 +2300,39 @@
         -:  156:
         -:  157:// This function produces Nb(Nr+1) round keys. The round keys are used in each round to decrypt the
         -:  158:// states.
-       33:  159:static void KeyExpansion(u8 *RoundKey, const u8 *Key) {
+       34:  159:static void KeyExpansion(u8 *RoundKey, const u8 *Key) {
         -:  160:	unsigned i, j, k;
         -:  161:	u8 tempa[4]; // Used for the column/row operations
         -:  162:
         -:  163:	// The first round key is the key itself.
-      297:  164:	for (i = 0; i < Nk; ++i) {
-      264:  165:		RoundKey[(i * 4) + 0] = Key[(i * 4) + 0];
-      264:  166:		RoundKey[(i * 4) + 1] = Key[(i * 4) + 1];
-      264:  167:		RoundKey[(i * 4) + 2] = Key[(i * 4) + 2];
-      264:  168:		RoundKey[(i * 4) + 3] = Key[(i * 4) + 3];
+      306:  164:	for (i = 0; i < Nk; ++i) {
+      272:  165:		RoundKey[(i * 4) + 0] = Key[(i * 4) + 0];
+      272:  166:		RoundKey[(i * 4) + 1] = Key[(i * 4) + 1];
+      272:  167:		RoundKey[(i * 4) + 2] = Key[(i * 4) + 2];
+      272:  168:		RoundKey[(i * 4) + 3] = Key[(i * 4) + 3];
         -:  169:	}
         -:  170:
         -:  171:	// All other round keys are found from the previous round keys.
-     1749:  172:	for (i = Nk; i < Nb * (Nr + 1); ++i) {
+     1802:  172:	for (i = Nk; i < Nb * (Nr + 1); ++i) {
         -:  173:		{
-     1716:  174:			k = (i - 1) * 4;
-     1716:  175:			tempa[0] = RoundKey[k + 0];
-     1716:  176:			tempa[1] = RoundKey[k + 1];
-     1716:  177:			tempa[2] = RoundKey[k + 2];
-     1716:  178:			tempa[3] = RoundKey[k + 3];
+     1768:  174:			k = (i - 1) * 4;
+     1768:  175:			tempa[0] = RoundKey[k + 0];
+     1768:  176:			tempa[1] = RoundKey[k + 1];
+     1768:  177:			tempa[2] = RoundKey[k + 2];
+     1768:  178:			tempa[3] = RoundKey[k + 3];
         -:  179:		}
         -:  180:
-     1716:  181:		if (i % Nk == 0) {
+     1768:  181:		if (i % Nk == 0) {
         -:  182:			// This function shifts the 4 bytes in a word to the left once.
         -:  183:			// [a0,a1,a2,a3] becomes [a1,a2,a3,a0]
         -:  184:
         -:  185:			// Function RotWord()
         -:  186:			{
-      231:  187:				const u8 u8tmp = tempa[0];
-      231:  188:				tempa[0] = tempa[1];
-      231:  189:				tempa[1] = tempa[2];
-      231:  190:				tempa[2] = tempa[3];
-      231:  191:				tempa[3] = u8tmp;
+      238:  187:				const u8 u8tmp = tempa[0];
+      238:  188:				tempa[0] = tempa[1];
+      238:  189:				tempa[1] = tempa[2];
+      238:  190:				tempa[2] = tempa[3];
+      238:  191:				tempa[3] = u8tmp;
         -:  192:			}
         -:  193:
         -:  194:			// SubWord() is a function that takes a four-byte input word and
@@ -2340,42 +2340,42 @@
         -:  196:
         -:  197:			// Function Subword()
         -:  198:			{
-      231:  199:				tempa[0] = getSBoxValue(tempa[0]);
-      231:  200:				tempa[1] = getSBoxValue(tempa[1]);
-      231:  201:				tempa[2] = getSBoxValue(tempa[2]);
-      231:  202:				tempa[3] = getSBoxValue(tempa[3]);
+      238:  199:				tempa[0] = getSBoxValue(tempa[0]);
+      238:  200:				tempa[1] = getSBoxValue(tempa[1]);
+      238:  201:				tempa[2] = getSBoxValue(tempa[2]);
+      238:  202:				tempa[3] = getSBoxValue(tempa[3]);
         -:  203:			}
         -:  204:
-      231:  205:			tempa[0] = tempa[0] ^ Rcon[i / Nk];
+      238:  205:			tempa[0] = tempa[0] ^ Rcon[i / Nk];
         -:  206:		}
         -:  207:#if defined(AES256) && (AES256 == 1)
-     1716:  208:		if (i % Nk == 4) {
+     1768:  208:		if (i % Nk == 4) {
         -:  209:			// Function Subword()
         -:  210:			{
-      198:  211:				tempa[0] = getSBoxValue(tempa[0]);
-      198:  212:				tempa[1] = getSBoxValue(tempa[1]);
-      198:  213:				tempa[2] = getSBoxValue(tempa[2]);
-      198:  214:				tempa[3] = getSBoxValue(tempa[3]);
+      204:  211:				tempa[0] = getSBoxValue(tempa[0]);
+      204:  212:				tempa[1] = getSBoxValue(tempa[1]);
+      204:  213:				tempa[2] = getSBoxValue(tempa[2]);
+      204:  214:				tempa[3] = getSBoxValue(tempa[3]);
         -:  215:			}
         -:  216:		}
         -:  217:#endif
-     1716:  218:		j = i * 4;
-     1716:  219:		k = (i - Nk) * 4;
-     1716:  220:		RoundKey[j + 0] = RoundKey[k + 0] ^ tempa[0];
-     1716:  221:		RoundKey[j + 1] = RoundKey[k + 1] ^ tempa[1];
-     1716:  222:		RoundKey[j + 2] = RoundKey[k + 2] ^ tempa[2];
-     1716:  223:		RoundKey[j + 3] = RoundKey[k + 3] ^ tempa[3];
+     1768:  218:		j = i * 4;
+     1768:  219:		k = (i - Nk) * 4;
+     1768:  220:		RoundKey[j + 0] = RoundKey[k + 0] ^ tempa[0];
+     1768:  221:		RoundKey[j + 1] = RoundKey[k + 1] ^ tempa[1];
+     1768:  222:		RoundKey[j + 2] = RoundKey[k + 2] ^ tempa[2];
+     1768:  223:		RoundKey[j + 3] = RoundKey[k + 3] ^ tempa[3];
         -:  224:	}
-       33:  225:}
+       34:  225:}
         -:  226:
     #####:  227:void AES_init_ctx(struct AES_ctx *ctx, const u8 *key) {
     #####:  228:	KeyExpansion(ctx->RoundKey, key);
     #####:  229:}
         -:  230:#if (defined(CBC) && (CBC == 1)) || (defined(CTR) && (CTR == 1))
-       33:  231:void AES_init_ctx_iv(struct AES_ctx *ctx, const u8 *key, const u8 *iv) {
-       33:  232:	KeyExpansion(ctx->RoundKey, key);
-       33:  233:	memcpy(ctx->Iv, iv, AES_BLOCKLEN);
-       33:  234:}
+       34:  231:void AES_init_ctx_iv(struct AES_ctx *ctx, const u8 *key, const u8 *iv) {
+       34:  232:	KeyExpansion(ctx->RoundKey, key);
+       34:  233:	memcpy(ctx->Iv, iv, AES_BLOCKLEN);
+       34:  234:}
     #####:  235:void AES_ctx_set_iv(struct AES_ctx *ctx, const u8 *iv) {
     #####:  236:	memcpy(ctx->Iv, iv, AES_BLOCKLEN);
     #####:  237:}
@@ -2686,7 +2686,7 @@
         -:    0:Source:psrng.c
         -:    0:Graph:psrng.gcno
         -:    0:Data:psrng.gcda
-        -:    0:Runs:28
+        -:    0:Runs:29
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2710,26 +2710,26 @@
         -:   21:
         -:   22:static struct AES_ctx ctx;
         -:   23:
-       28:   24:void psrng_reseed() {
+       29:   24:void psrng_reseed() {
         -:   25:	u8 iv[16];
         -:   26:	u8 key[32];
-       28:   27:	if (rand_bytes(key, 32)) {
+       29:   27:	if (rand_bytes(key, 32)) {
     #####:   28:		perror("Could not generate entropy for AES key generation");
     #####:   29:		exit(-1);
         -:   30:	}
-       28:   31:	if (rand_bytes(iv, 16)) {
+       29:   31:	if (rand_bytes(iv, 16)) {
     #####:   32:		perror("Could not generate entropy for AES iv generation");
     #####:   33:		exit(-1);
         -:   34:	}
         -:   35:
-       28:   36:	AES_init_ctx_iv(&ctx, key, iv);
-       28:   37:}
+       29:   36:	AES_init_ctx_iv(&ctx, key, iv);
+       29:   37:}
         -:   38:
         -:   39:// __attribute__ ((constructor)) guaranteed to be called before main.
         -:   40:// This will either succeed or exit before main is called.
-       28:   41:void __attribute__((constructor)) __init_psrng() {
-       28:   42:	psrng_reseed();
-       28:   43:}
+       29:   41:void __attribute__((constructor)) __init_psrng() {
+       29:   42:	psrng_reseed();
+       29:   43:}
         -:   44:
         -:   45:// note: not thread safe as user must ensure thread safety. This allows for flexible usage
         -:   46:// in a single thread, no locking is needed. In multi-threaded environments, locking may be used.
@@ -2766,7 +2766,7 @@
         -:    0:Source:rand.c
         -:    0:Graph:rand.gcno
         -:    0:Data:rand.gcda
-        -:    0:Runs:28
+        -:    0:Runs:29
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -2826,13 +2826,13 @@
     #####:   57:	return getentropy(v, sizeof(u128));
         -:   58:}
         -:   59:
-       56:   60:int rand_bytes(void *buf, u64 length) {
-       56:   61:	return getentropy(buf, length);
+       58:   60:int rand_bytes(void *buf, u64 length) {
+       58:   61:	return getentropy(buf, length);
         -:   62:}
         -:    0:Source:sha3.c
         -:    0:Graph:sha3.gcno
         -:    0:Data:sha3.gcda
-        -:    0:Runs:28
+        -:    0:Runs:29
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3143,7 +3143,7 @@
         -:    0:Source:object.c
         -:    0:Graph:object.gcno
         -:    0:Data:object.gcda
-        -:    0:Runs:23
+        -:    0:Runs:24
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3842,8 +3842,8 @@
         8:  696:	return ret;
         -:  697:}
         -:  698:
-       22:  699:void object_cleanup_thread_local() {
-       22:  700:	if (thread_local_rbtree) {
+       23:  699:void object_cleanup_thread_local() {
+       23:  700:	if (thread_local_rbtree) {
         5:  701:		rbtree_iterator_reset(thread_local_rbtree->tree, thread_local_rbtree->itt, NULL, false,
         -:  702:							  NULL, false);
     #####:  703:		loop {
@@ -3876,21 +3876,21 @@
         5:  730:		myfree(thread_local_rbtree);
         5:  731:		thread_local_rbtree = NULL;
         -:  732:	}
-       22:  733:}
+       23:  733:}
         -:  734:
         -:  735:#ifdef TEST
-       22:  736:u64 get_thread_local_rbtree_size() {
-       22:  737:	if (!thread_local_rbtree)
-       17:  738:		return 0;
+       23:  736:u64 get_thread_local_rbtree_size() {
+       23:  737:	if (!thread_local_rbtree)
+       18:  738:		return 0;
         5:  739:	return rbtree_size(thread_local_rbtree->tree);
         -:  740:}
-       22:  741:u64 get_global_rbtree_size() {
-       22:  742:	if (!global_rbtree)
-       21:  743:		return 0;
+       23:  741:u64 get_global_rbtree_size() {
+       23:  742:	if (!global_rbtree)
+       22:  743:		return 0;
         1:  744:	return rbtree_size(global_rbtree->tree);
         -:  745:}
-       22:  746:void object_cleanup_global() {
-       22:  747:	if (global_rbtree) {
+       23:  746:void object_cleanup_global() {
+       23:  747:	if (global_rbtree) {
         1:  748:		rbtree_iterator_reset(global_rbtree->tree, global_rbtree->itt, NULL, false, NULL, false);
     #####:  749:		loop {
         -:  750:			RbTreeKeyValue kv;
@@ -3913,12 +3913,12 @@
         1:  767:		myfree(global_rbtree);
         1:  768:		global_rbtree = NULL;
         -:  769:	}
-       22:  770:}
+       23:  770:}
         -:  771:#endif // TEST
         -:    0:Source:orbtree.c
         -:    0:Graph:orbtree.gcno
         -:    0:Data:orbtree.gcda
-        -:    0:Runs:23
+        -:    0:Runs:24
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -3934,1049 +3934,1216 @@
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <assert.h>
-        -:   16:#include <base/panic.h>
-        -:   17:#include <base/resources.h>
-        -:   18:#include <stdio.h>
-        -:   19:#include <util/orbtree.h>
-        -:   20:
-        -:   21:#define NODES_PER_CHUNK 100
-        -:   22:#define CHUNKS_PER_RESIZE 10
-        -:   23:
-        -:   24:u64 orbtree_next_node_id = 10;
+        -:   16:#include <base/fam_alloc.h>
+        -:   17:#include <base/panic.h>
+        -:   18:#include <base/resources.h>
+        -:   19:#include <stdio.h>
+        -:   20:#include <util/orbtree.h>
+        -:   21:
+        -:   22:#define NODES_PER_CHUNK 100
+        -:   23:#define CHUNKS_PER_RESIZE 10
+        -:   24:#define ITERATOR_STACK_SIZE 128
         -:   25:
-        -:   26:#define RED_MASK 0x80000000
+        -:   26:u64 orbtree_next_node_id = 10;
         -:   27:
-        -:   28:#define SET_RED(impl, id)                                                                          \
-        -:   29:	({                                                                                             \
-        -:   30:		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
-        -:   31:		_orb_node__->color |= RED_MASK;                                                            \
-        -:   32:	})
-        -:   33:#define SET_BLACK(impl, id)                                                                        \
-        -:   34:	({                                                                                             \
-        -:   35:		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
-        -:   36:		_orb_node__->color &= ~RED_MASK;                                                           \
-        -:   37:	})
-        -:   38:#define IS_RED(impl, id)                                                                           \
-        -:   39:	({                                                                                             \
-        -:   40:		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
-        -:   41:		_orb_node__ != NULL && (_orb_node__->color & RED_MASK) != 0;                               \
-        -:   42:	})
-        -:   43:#define IS_BLACK(impl, id)                                                                         \
-        -:   44:	({                                                                                             \
-        -:   45:		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
-        -:   46:		_orb_node__ == NULL || (_orb_node__->color & RED_MASK) == 0;                               \
-        -:   47:	})
-        -:   48:
-        -:   49:typedef struct ORBTreeNode {
-        -:   50:	u32 color;
-        -:   51:	u32 right;
-        -:   52:	u32 left;
-        -:   53:	u32 parent;
-        -:   54:	u32 right_subtree_size;
-        -:   55:	u32 left_subtree_size;
-        -:   56:#ifdef TEST
-        -:   57:	u64 node_id;
-        -:   58:#endif // TEST
-        -:   59:	char data[];
-        -:   60:} ORBTreeNode;
-        -:   61:
-        -:   62:// Data structure used for searching ORBTrees.
-        -:   63:typedef struct ORBTreeNodePair {
-        -:   64:	u32 parent;
-        -:   65:	u32 self;
-        -:   66:	bool is_right;
-        -:   67:} ORBTreeNodePair;
-        -:   68:
-        -:   69:static u32 NIL = (UINT32_MAX - 2);
+        -:   28:#define RED_MASK 0x80000000
+        -:   29:
+        -:   30:#define SET_RED(impl, id)                                                                          \
+        -:   31:	({                                                                                             \
+        -:   32:		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
+        -:   33:		_orb_node__->color |= RED_MASK;                                                            \
+        -:   34:	})
+        -:   35:#define SET_BLACK(impl, id)                                                                        \
+        -:   36:	({                                                                                             \
+        -:   37:		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
+        -:   38:		_orb_node__->color &= ~RED_MASK;                                                           \
+        -:   39:	})
+        -:   40:#define IS_RED(impl, id)                                                                           \
+        -:   41:	({                                                                                             \
+        -:   42:		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
+        -:   43:		_orb_node__ != NULL && (_orb_node__->color & RED_MASK) != 0;                               \
+        -:   44:	})
+        -:   45:#define IS_BLACK(impl, id)                                                                         \
+        -:   46:	({                                                                                             \
+        -:   47:		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
+        -:   48:		_orb_node__ == NULL || (_orb_node__->color & RED_MASK) == 0;                               \
+        -:   49:	})
+        -:   50:
+        -:   51:typedef struct ORBTreeNode {
+        -:   52:	u32 color;
+        -:   53:	u32 right;
+        -:   54:	u32 left;
+        -:   55:	u32 parent;
+        -:   56:	u32 right_subtree_size;
+        -:   57:	u32 left_subtree_size;
+        -:   58:#ifdef TEST
+        -:   59:	u64 node_id;
+        -:   60:#endif // TEST
+        -:   61:	char data[];
+        -:   62:} ORBTreeNode;
+        -:   63:
+        -:   64:// Data structure used for searching ORBTrees.
+        -:   65:typedef struct ORBTreeNodePair {
+        -:   66:	u32 parent;
+        -:   67:	u32 self;
+        -:   68:	bool is_right;
+        -:   69:} ORBTreeNodePair;
         -:   70:
-        -:   71:typedef struct ORBAllocator {
-        -:   72:	u8 **data_chunks;
-        -:   73:	u32 size;	  // current number of slabs allocated for the tree.
-        -:   74:	u32 capacity; // current capacity in terms of number of slabs for the tree.
-        -:   75:	u32 free_list_head;
-        -:   76:	u32 cur_chunks;
-        -:   77:	u32 *free_list;
-        -:   78:} ORBAllocator;
-        -:   79:
-        -:   80:// The internal ORBTreeImpl storage data structure
-        -:   81:typedef struct ORBTreeImpl {
-        -:   82:	u64 value_size; // size of the values
-        -:   83:
-        -:   84:	// a comparion function (like qsort)
-        -:   85:	int (*compare)(const void *, const void *);
-        -:   86:	u32 root;	  // offset to the root node.
-        -:   87:	u32 elements; // number of elements in the tree.
-        -:   88:	ORBAllocator *alloc;
-        -:   89:} ORBTreeImpl;
-        -:   90:
-        -:   91:void orbtree_print_impl(ORBTreeImpl *impl);
-        -:   92:void orbtree_validate_impl(const ORBTreeImpl *impl);
-        -:   93:
-    #####:   94:void orbtree_iterator_cleanup(ORBTreeIteratorNc *ptr) {
-    #####:   95:}
-        -:   96:
-    #####:   97:bool orbtree_iterator_next(ORBTreeIterator *ptr, ORBTreeTray *value) {
-    #####:   98:	return false;
-        -:   99:}
-        -:  100:
-        5:  101:void orbtree_cleanup(ORBTreeNc *ptr) {
-        5:  102:	if (ptr->impl) {
-        5:  103:		ORBTreeImpl *impl = ptr->impl;
-        5:  104:		if (impl->alloc->data_chunks != NULL) {
-       32:  105:			for (u32 i = 0; i < impl->alloc->capacity; i += NODES_PER_CHUNK) {
-       28:  106:				myfree(impl->alloc->data_chunks[i / NODES_PER_CHUNK]);
-        -:  107:			}
-        4:  108:			myfree(impl->alloc->data_chunks);
-        4:  109:			impl->alloc->data_chunks = NULL;
-        -:  110:		}
-        -:  111:
-        5:  112:		if (impl->alloc->free_list) {
-        4:  113:			myfree(impl->alloc->free_list);
-        4:  114:			impl->alloc->free_list = NULL;
-        -:  115:		}
-        -:  116:
-        5:  117:		if (impl->alloc) {
-        5:  118:			myfree(impl->alloc);
-        5:  119:			impl->alloc = NULL;
-        -:  120:		}
-        -:  121:
-        5:  122:		myfree(ptr->impl);
-        5:  123:		ptr->impl = NULL;
-        -:  124:	}
-        5:  125:}
-        -:  126:
-        5:  127:int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void *, const void *)) {
-        -:  128:	// validate input
-        5:  129:	if (ptr == NULL || value_size == 0 || compare == NULL) {
-    #####:  130:		SetErr(IllegalArgument);
-    #####:  131:		return -1;
-        -:  132:	}
-        -:  133:
-        5:  134:	ptr->impl = mymalloc(sizeof(ORBTreeImpl));
-        5:  135:	if (ptr->impl == NULL) {
-    #####:  136:		return -1;
-        -:  137:	}
-        5:  138:	ORBTreeImpl *impl = ptr->impl;
-        5:  139:	impl->value_size = value_size;
-        5:  140:	impl->compare = compare;
-        5:  141:	impl->root = NIL;
-        -:  142:
-        5:  143:	impl->alloc = mymalloc(sizeof(ORBAllocator));
-        -:  144:
-        5:  145:	impl->alloc->size = 0;
-        5:  146:	impl->alloc->capacity = 0;
-        5:  147:	impl->alloc->free_list_head = UINT32_MAX;
-        5:  148:	impl->alloc->data_chunks = NULL;
-        5:  149:	impl->alloc->cur_chunks = 0;
-        5:  150:	impl->elements = 0;
-        5:  151:	impl->alloc->free_list = NULL;
-        -:  152:
-        5:  153:	return 0;
-        -:  154:}
-        -:  155:
-  3580793:  156:ORBTreeNode *orbtree_node(const ORBTreeImpl *impl, u32 node) {
-  3580793:  157:	if (node == NIL) {
-     3688:  158:		return NULL;
-        -:  159:	}
-  3577105:  160:	u64 index = node / NODES_PER_CHUNK;
-  3577105:  161:	u64 offset = node % NODES_PER_CHUNK;
-  3577105:  162:	u64 offset_sum = (offset * (sizeof(ORBTreeNode) + impl->value_size));
-  3577105:  163:	return (ORBTreeNode *)(impl->alloc->data_chunks[index] + offset_sum);
-        -:  164:}
-        -:  165:
-     2938:  166:void orbtree_update_heights(const ORBTreeImpl *impl, u32 node) {
-     2938:  167:	ORBTreeNode *last = orbtree_node(impl, node);
-     2938:  168:	if (last == NULL)
-       17:  169:		return;
-        -:  170:	ORBTreeNode *parent;
-    21534:  171:	while (last->parent != NIL) {
-    18613:  172:		parent = orbtree_node(impl, last->parent);
-    18613:  173:		if (orbtree_node(impl, parent->right) == last) {
-     9620:  174:			parent->right_subtree_size = 1 + last->right_subtree_size + last->left_subtree_size;
-        -:  175:		} else {
-     8993:  176:			parent->left_subtree_size = 1 + last->right_subtree_size + last->left_subtree_size;
-        -:  177:		}
-    18613:  178:		last = parent;
-        -:  179:	}
-        -:  180:}
-        -:  181:
-    38465:  182:void *orbtree_value(const ORBTreeImpl *impl, u32 node) {
-    38465:  183:	return orbtree_node(impl, node)->data;
-        -:  184:}
-        -:  185:
-        -:  186:// internal search function used by get/insert/delete.
-     4069:  187:void orbtree_search(const ORBTreeImpl *impl, const void *value, ORBTreeNodePair *nodes) {
-     4069:  188:	nodes->parent = NIL;
-     4069:  189:	nodes->self = impl->root;
-     4069:  190:	int i = 0;
-    35918:  191:	while (nodes->self != NIL) {
-    33880:  192:		nodes->parent = nodes->self;
-    33880:  193:		int v = impl->compare(orbtree_value(impl, nodes->self), value);
-    33880:  194:		if (v == 0) {
-     2031:  195:			break;
-    31849:  196:		} else if (v < 0) {
-    16631:  197:			ORBTreeNode *self = orbtree_node(impl, nodes->self);
-    16631:  198:			nodes->self = self->right;
-    16631:  199:			nodes->is_right = true;
-        -:  200:		} else {
-    15218:  201:			ORBTreeNode *self = orbtree_node(impl, nodes->self);
-    15218:  202:			nodes->self = self->left;
-    15218:  203:			nodes->is_right = false;
-        -:  204:		}
-        -:  205:	}
-     4069:  206:}
-        -:  207:
-      527:  208:void orbtree_left_rotate(ORBTreeImpl *impl, u32 x_id) {
-      527:  209:	ORBTreeNode *x = orbtree_node(impl, x_id);
-      527:  210:	u32 y_id = x->right;
-      527:  211:	ORBTreeNode *y = orbtree_node(impl, y_id);
-      527:  212:	u32 y_left_subtree_size = y->left_subtree_size;
-        -:  213:
-        -:  214:	// Move y's left subtree to x's right subtree
-      527:  215:	x->right = y->left;
-      527:  216:	x->right_subtree_size = y_left_subtree_size;
-        -:  217:
-      527:  218:	if (y->left != NIL) {
-      181:  219:		ORBTreeNode *yleft = orbtree_node(impl, y->left);
-      181:  220:		yleft->parent = x_id;
-        -:  221:	}
-        -:  222:
-        -:  223:	// Update y's parent to x's parent
-      527:  224:	y->parent = x->parent;
-        -:  225:
-        -:  226:	// If x was the root, now y becomes the root
-      527:  227:	ORBTreeNode *xparent = orbtree_node(impl, x->parent);
-      527:  228:	if (x->parent == NIL) {
-        9:  229:		impl->root = y_id;
-      518:  230:	} else if (x_id == xparent->left) {
-      356:  231:		xparent->left = y_id;
-        -:  232:	} else {
-      162:  233:		xparent->right = y_id;
-        -:  234:	}
-        -:  235:
-        -:  236:	// Place x as y's left child
-      527:  237:	y->left = x_id;
-      527:  238:	y->left_subtree_size = x->right_subtree_size + x->left_subtree_size + 1;
-      527:  239:	x->parent = y_id;
-      527:  240:}
-        -:  241:
-      508:  242:void orbtree_right_rotate(ORBTreeImpl *impl, u32 x_id) {
-      508:  243:	ORBTreeNode *x = orbtree_node(impl, x_id);
-      508:  244:	u32 y_id = x->left;
-      508:  245:	ORBTreeNode *y = orbtree_node(impl, y_id);
-        -:  246:
-      508:  247:	u32 y_right_subtree_size = y->right_subtree_size;
-        -:  248:
-        -:  249:	// Move y's right subtree to x's right subtree
-      508:  250:	x->left = y->right;
-      508:  251:	x->left_subtree_size = y_right_subtree_size;
-        -:  252:
-      508:  253:	if (y->right != NIL) {
-      160:  254:		ORBTreeNode *yright = orbtree_node(impl, y->right);
-      160:  255:		yright->parent = x_id;
-        -:  256:	}
-        -:  257:
-        -:  258:	// Update y's parent to x's parent
-      508:  259:	y->parent = x->parent;
-        -:  260:
-        -:  261:	// If x was the root, now y becomes the root
-      508:  262:	ORBTreeNode *xparent = orbtree_node(impl, x->parent);
-      508:  263:	if (x->parent == NIL) {
-        6:  264:		impl->root = y_id;
-      502:  265:	} else if (x_id == xparent->right) {
-      331:  266:		xparent->right = y_id;
-        -:  267:	} else {
-      171:  268:		xparent->left = y_id;
-        -:  269:	}
-        -:  270:
-        -:  271:	// Place x as y's left child
-      508:  272:	y->right = x_id;
-      508:  273:	y->right_subtree_size = x->right_subtree_size + x->left_subtree_size + 1;
-      508:  274:	x->parent = y_id;
-      508:  275:}
-        -:  276:
-        -:  277:// find the successor node
-      540:  278:u32 orbtree_find_successor(ORBTreeImpl *impl, u32 x_id) {
-      540:  279:	ORBTreeNode *x = orbtree_node(impl, x_id);
-      540:  280:	u32 successor_id = x->right;
-      540:  281:	ORBTreeNode *successor = orbtree_node(impl, x->right);
-     1272:  282:	while (successor && successor->left != NIL) {
-      732:  283:		successor_id = successor->left;
-      732:  284:		successor = orbtree_node(impl, successor->left);
-        -:  285:	}
-      540:  286:	return successor_id;
-        -:  287:}
-        -:  288:
-        -:  289:// perform transplant operation
-     1372:  290:void orbtree_transplant(ORBTreeImpl *impl, u32 dst, u32 src) {
-     1372:  291:	ORBTreeNode *dst_node = orbtree_node(impl, dst);
-     1372:  292:	ORBTreeNode *dst_parent = orbtree_node(impl, dst_node->parent);
-        -:  293:
-     1372:  294:	if (dst_node->parent == NIL)
-       13:  295:		impl->root = src;
-     1359:  296:	else if (dst == dst_parent->left) {
-      859:  297:		dst_parent->left = src;
-      859:  298:		if (src == NIL)
-      469:  299:			dst_parent->left_subtree_size = 0;
-        -:  300:		else {
-      390:  301:			ORBTreeNode *src_node = orbtree_node(impl, src);
-        -:  302:		}
-        -:  303:	} else {
-      500:  304:		dst_parent->right = src;
-      500:  305:		if (src == NIL)
-      157:  306:			dst_parent->right_subtree_size = 0;
-        -:  307:		else {
-      343:  308:			ORBTreeNode *src_node = orbtree_node(impl, src);
-        -:  309:		}
-        -:  310:	}
-     1372:  311:	if (src != NIL) {
-      743:  312:		ORBTreeNode *src_node = orbtree_node(impl, src);
-      743:  313:		src_node->parent = dst_node->parent;
-      743:  314:		ORBTreeNode *src_node_p = orbtree_node(impl, src_node->parent);
-      743:  315:		if (src_node_p) {
-      733:  316:			if (src_node_p->right == src)
-      343:  317:				src_node_p->right_subtree_size =
-      343:  318:					1 + src_node->right_subtree_size + src_node->left_subtree_size;
-        -:  319:			else
-      390:  320:				src_node_p->left_subtree_size =
-      390:  321:					1 + src_node->right_subtree_size + src_node->left_subtree_size;
-        -:  322:		}
-        -:  323:	}
-        -:  324:
-     1372:  325:	orbtree_update_heights(impl, dst_node->parent);
-     1372:  326:}
-        -:  327:
-     1026:  328:void orbtree_put_fixup(ORBTreeImpl *impl, u32 k_id) {
-     1026:  329:	ORBTreeNode *k = orbtree_node(impl, k_id);
-        -:  330:
-     1948:  331:	while (k_id != impl->root && IS_RED(impl, k->parent)) {
-      922:  332:		k = orbtree_node(impl, k_id);
-      922:  333:		ORBTreeNode *parent = orbtree_node(impl, k->parent);
-      922:  334:		ORBTreeNode *gparent = orbtree_node(impl, parent->parent);
+        -:   71:const static u32 NIL = (UINT32_MAX - 2);
+        -:   72:
+        -:   73:typedef struct ORBAllocator {
+        -:   74:	u8 **data_chunks;
+        -:   75:	u32 size;	  // current number of slabs allocated for the tree.
+        -:   76:	u32 capacity; // current capacity in terms of number of slabs for the tree.
+        -:   77:	u32 free_list_head;
+        -:   78:	u32 cur_chunks;
+        -:   79:	u32 *free_list;
+        -:   80:} ORBAllocator;
+        -:   81:
+        -:   82:// The internal ORBTreeImpl storage data structure
+        -:   83:typedef struct ORBTreeImpl {
+        -:   84:	u64 value_size; // size of the values
+        -:   85:
+        -:   86:	// a comparion function (like qsort)
+        -:   87:	int (*compare)(const void *, const void *);
+        -:   88:	u32 root;	  // offset to the root node.
+        -:   89:	u32 elements; // number of elements in the tree.
+        -:   90:	ORBAllocator *alloc;
+        -:   91:} ORBTreeImpl;
+        -:   92:
+        -:   93:// Iterator impl
+        -:   94:typedef struct ORBTreeIteratorImpl {
+        -:   95:	u32 cur;
+        -:   96:	u32 min;
+        -:   97:	u32 max;
+        -:   98:	u32 stack[ITERATOR_STACK_SIZE];
+        -:   99:	u64 value_size;
+        -:  100:	u8 stack_pointer;
+        -:  101:	ORBTreeImpl *impl;
+        -:  102:} ORBTreeIteratorImpl;
+        -:  103:
+  5792977:  104:ORBTreeNode *orbtree_node(const ORBTreeImpl *impl, u32 node) {
+  5792977:  105:	if (node == NIL) {
+   125695:  106:		return NULL;
+        -:  107:	}
+  5667282:  108:	u64 index = node / NODES_PER_CHUNK;
+  5667282:  109:	u64 offset = node % NODES_PER_CHUNK;
+  5667282:  110:	u64 offset_sum = (offset * (sizeof(ORBTreeNode) + impl->value_size));
+  5667282:  111:	return (ORBTreeNode *)(impl->alloc->data_chunks[index] + offset_sum);
+        -:  112:}
+        -:  113:
+   174946:  114:void *orbtree_value(const ORBTreeImpl *impl, u32 node) {
+   174946:  115:	return orbtree_node(impl, node)->data;
+        -:  116:}
+        -:  117:
+        1:  118:void orbtree_iterator_cleanup(ORBTreeIteratorNc *ptr) {
+        1:  119:	if (!nil(ptr->impl)) {
+        1:  120:		fam_free(&ptr->impl);
+        1:  121:		ptr->impl = null;
+        -:  122:	}
+        1:  123:}
+        -:  124:
+   121401:  125:bool orbtree_iterator_next(ORBTreeIterator *ptr, ORBTreeTray *value) {
+   121401:  126:	ORBTreeIteratorImpl *impl = $(ptr->impl);
+        -:  127:
+        -:  128:	// If the iterator is empty, we're done
+   121401:  129:	if (impl->cur == NIL && impl->stack_pointer == 0) {
+      401:  130:		return false; // No more nodes to traverse
+        -:  131:	}
+        -:  132:
+   121000:  133:	ORBTreeNode *min = NULL;
+   121000:  134:	if (impl->min != NIL)
+   120000:  135:		min = orbtree_node(impl->impl, impl->min);
+        -:  136:
+        -:  137:	// Traverse the tree
+   245266:  138:	while (impl->cur != NIL || impl->stack_pointer > 0) {
+   245266:  139:		ORBTreeNode *cur = orbtree_node(impl->impl, impl->cur);
+        -:  140:		// Traverse left subtree
+   245266:  141:		if (impl->cur != NIL) {
+        -:  142:			// based on worst case log(n) * 2 + 1 this should not be possible
+  124266*:  143:			assert(impl->stack_pointer < 128);
+   124266:  144:			int v = 0;
+   124266:  145:			if (impl->min != NIL)
+   123266:  146:				v = impl->impl->compare(cur->data, min->data);
+   124266:  147:			if (v < 0) {
+        -:  148:				// we haven't hit the minimum yet
+     1794:  149:				impl->cur = cur->right;
+        -:  150:			} else {
+        -:  151:				// Push the current node pointer onto the stack
+   122472:  152:				impl->stack[impl->stack_pointer++] = impl->cur;
+        -:  153:
+        -:  154:				// Move to the left child
+   122472:  155:				impl->cur = cur->left;
+        -:  156:			}
+        -:  157:		} else {
+        -:  158:			// Pop the top node from the stack
+   121000:  159:			impl->cur = impl->stack[--impl->stack_pointer];
+        -:  160:
+        -:  161:			// Store the current node's data to return
+   121000:  162:			value->value = orbtree_value(impl->impl, impl->cur);
+        -:  163:
+        -:  164:			// check if we hit our max node. If so, next will return false.
+   121000:  165:			if (impl->cur == impl->max) {
+      400:  166:				impl->cur = NIL;
+      400:  167:				impl->stack_pointer = 0;
+        -:  168:			} else {
+        -:  169:				// Move to the right child after visiting this node
+   120600:  170:				cur = orbtree_node(impl->impl, impl->cur);
+   120600:  171:				impl->cur = cur->right;
+        -:  172:			}
+        -:  173:
+   121000:  174:			break;
+        -:  175:		}
+        -:  176:	}
+   121000:  177:	return true;
+        -:  178:}
+        -:  179:
+        6:  180:void orbtree_cleanup(ORBTreeNc *ptr) {
+        6:  181:	if (ptr->impl) {
+        6:  182:		ORBTreeImpl *impl = ptr->impl;
+        6:  183:		if (impl->alloc->data_chunks != NULL) {
+       43:  184:			for (u32 i = 0; i < impl->alloc->capacity; i += NODES_PER_CHUNK) {
+       38:  185:				myfree(impl->alloc->data_chunks[i / NODES_PER_CHUNK]);
+        -:  186:			}
+        5:  187:			myfree(impl->alloc->data_chunks);
+        5:  188:			impl->alloc->data_chunks = NULL;
+        -:  189:		}
+        -:  190:
+        6:  191:		if (impl->alloc->free_list) {
+        5:  192:			myfree(impl->alloc->free_list);
+        5:  193:			impl->alloc->free_list = NULL;
+        -:  194:		}
+        -:  195:
+        6:  196:		if (impl->alloc) {
+        6:  197:			myfree(impl->alloc);
+        6:  198:			impl->alloc = NULL;
+        -:  199:		}
+        -:  200:
+        6:  201:		myfree(ptr->impl);
+        6:  202:		ptr->impl = NULL;
+        -:  203:	}
+        6:  204:}
+        -:  205:
+        6:  206:int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void *, const void *)) {
+        -:  207:	// validate input
+        6:  208:	if (ptr == NULL || value_size == 0 || compare == NULL) {
+    #####:  209:		SetErr(IllegalArgument);
+    #####:  210:		return -1;
+        -:  211:	}
+        -:  212:
+        6:  213:	ptr->impl = mymalloc(sizeof(ORBTreeImpl));
+        6:  214:	if (ptr->impl == NULL) {
+    #####:  215:		return -1;
+        -:  216:	}
+        6:  217:	ORBTreeImpl *impl = ptr->impl;
+        6:  218:	impl->value_size = value_size;
+        6:  219:	impl->compare = compare;
+        6:  220:	impl->root = NIL;
+        -:  221:
+        6:  222:	impl->alloc = mymalloc(sizeof(ORBAllocator));
+        -:  223:
+        6:  224:	impl->alloc->size = 0;
+        6:  225:	impl->alloc->capacity = 0;
+        6:  226:	impl->alloc->free_list_head = UINT32_MAX;
+        6:  227:	impl->alloc->data_chunks = NULL;
+        6:  228:	impl->alloc->cur_chunks = 0;
+        6:  229:	impl->elements = 0;
+        6:  230:	impl->alloc->free_list = NULL;
+        -:  231:
+        6:  232:	return 0;
+        -:  233:}
+        -:  234:
+     3938:  235:void orbtree_update_heights(const ORBTreeImpl *impl, u32 node) {
+     3938:  236:	ORBTreeNode *last = orbtree_node(impl, node);
+     3938:  237:	if (last == NULL)
+       18:  238:		return;
+        -:  239:	ORBTreeNode *parent;
+    36015:  240:	while (last->parent != NIL) {
+    32095:  241:		parent = orbtree_node(impl, last->parent);
+    32095:  242:		if (orbtree_node(impl, parent->right) == last) {
+    23102:  243:			parent->right_subtree_size = 1 + last->right_subtree_size + last->left_subtree_size;
+        -:  244:		} else {
+     8993:  245:			parent->left_subtree_size = 1 + last->right_subtree_size + last->left_subtree_size;
+        -:  246:		}
+    32095:  247:		last = parent;
+        -:  248:	}
+        -:  249:}
+        -:  250:
+        -:  251:// internal search function used by get/insert/delete.
+     5069:  252:void orbtree_search(const ORBTreeImpl *impl, const void *value, ORBTreeNodePair *nodes) {
+     5069:  253:	nodes->parent = NIL;
+     5069:  254:	nodes->self = impl->root;
+     5069:  255:	int i = 0;
+    51399:  256:	while (nodes->self != NIL) {
+    48361:  257:		nodes->parent = nodes->self;
+    48361:  258:		int v = impl->compare(orbtree_value(impl, nodes->self), value);
+    48361:  259:		if (v == 0) {
+     2031:  260:			break;
+    46330:  261:		} else if (v < 0) {
+    31112:  262:			ORBTreeNode *self = orbtree_node(impl, nodes->self);
+    31112:  263:			nodes->self = self->right;
+    31112:  264:			nodes->is_right = true;
+        -:  265:		} else {
+    15218:  266:			ORBTreeNode *self = orbtree_node(impl, nodes->self);
+    15218:  267:			nodes->self = self->left;
+    15218:  268:			nodes->is_right = false;
+        -:  269:		}
+        -:  270:	}
+     5069:  271:}
+        -:  272:
+     1510:  273:void orbtree_left_rotate(ORBTreeImpl *impl, u32 x_id) {
+     1510:  274:	ORBTreeNode *x = orbtree_node(impl, x_id);
+     1510:  275:	u32 y_id = x->right;
+     1510:  276:	ORBTreeNode *y = orbtree_node(impl, y_id);
+     1510:  277:	u32 y_left_subtree_size = y->left_subtree_size;
+        -:  278:
+        -:  279:	// Move y's left subtree to x's right subtree
+     1510:  280:	x->right = y->left;
+     1510:  281:	x->right_subtree_size = y_left_subtree_size;
+        -:  282:
+     1510:  283:	if (y->left != NIL) {
+      665:  284:		ORBTreeNode *yleft = orbtree_node(impl, y->left);
+      665:  285:		yleft->parent = x_id;
+        -:  286:	}
+        -:  287:
+        -:  288:	// Update y's parent to x's parent
+     1510:  289:	y->parent = x->parent;
+        -:  290:
+        -:  291:	// If x was the root, now y becomes the root
+     1510:  292:	ORBTreeNode *xparent = orbtree_node(impl, x->parent);
+     1510:  293:	if (x->parent == NIL) {
+       17:  294:		impl->root = y_id;
+     1493:  295:	} else if (x_id == xparent->left) {
+      356:  296:		xparent->left = y_id;
+        -:  297:	} else {
+     1137:  298:		xparent->right = y_id;
+        -:  299:	}
+        -:  300:
+        -:  301:	// Place x as y's left child
+     1510:  302:	y->left = x_id;
+     1510:  303:	y->left_subtree_size = x->right_subtree_size + x->left_subtree_size + 1;
+     1510:  304:	x->parent = y_id;
+     1510:  305:}
+        -:  306:
+      508:  307:void orbtree_right_rotate(ORBTreeImpl *impl, u32 x_id) {
+      508:  308:	ORBTreeNode *x = orbtree_node(impl, x_id);
+      508:  309:	u32 y_id = x->left;
+      508:  310:	ORBTreeNode *y = orbtree_node(impl, y_id);
+        -:  311:
+      508:  312:	u32 y_right_subtree_size = y->right_subtree_size;
+        -:  313:
+        -:  314:	// Move y's right subtree to x's right subtree
+      508:  315:	x->left = y->right;
+      508:  316:	x->left_subtree_size = y_right_subtree_size;
+        -:  317:
+      508:  318:	if (y->right != NIL) {
+      160:  319:		ORBTreeNode *yright = orbtree_node(impl, y->right);
+      160:  320:		yright->parent = x_id;
+        -:  321:	}
+        -:  322:
+        -:  323:	// Update y's parent to x's parent
+      508:  324:	y->parent = x->parent;
+        -:  325:
+        -:  326:	// If x was the root, now y becomes the root
+      508:  327:	ORBTreeNode *xparent = orbtree_node(impl, x->parent);
+      508:  328:	if (x->parent == NIL) {
+        6:  329:		impl->root = y_id;
+      502:  330:	} else if (x_id == xparent->right) {
+      331:  331:		xparent->right = y_id;
+        -:  332:	} else {
+      171:  333:		xparent->left = y_id;
+        -:  334:	}
         -:  335:
-      922:  336:		if (k->parent == gparent->left) {
-        -:  337:			// Case 1: Uncle is on the right
-      459:  338:			ORBTreeNode *u = orbtree_node(impl, gparent->right);
-      459:  339:			u32 u_id = gparent->right;
-      459:  340:			if (IS_RED(impl, u_id)) {
-        -:  341:				// Case 1a: Uncle is red
-        -:  342:				// Recolor the parent and uncle to black
-      250:  343:				SET_BLACK(impl, k->parent);
-      250:  344:				SET_BLACK(impl, u_id);
-        -:  345:				// Recolor the grandparent to red
-      250:  346:				SET_RED(impl, parent->parent);
-        -:  347:
-        -:  348:				// Move up the tree
-      250:  349:				k_id = parent->parent;
-      250:  350:				k = orbtree_node(impl, k_id);
-        -:  351:			} else {
-        -:  352:				// Case 1b: Uncle is black
-      209:  353:				if (k_id == parent->right) {
-        -:  354:					// Case 1b1: Node is a right child
-        -:  355:					// Rotate left to make the node the left child
-      108:  356:					k_id = k->parent;
-      108:  357:					k = orbtree_node(impl, k_id);
-      108:  358:					orbtree_left_rotate(impl, k_id);
-        -:  359:				}
-        -:  360:				// Recolor and rotate
-      209:  361:				ORBTreeNode *kparent = orbtree_node(impl, k->parent);
-      209:  362:				SET_BLACK(impl, k->parent);
-      209:  363:				SET_RED(impl, kparent->parent);
-        -:  364:
-      209:  365:				orbtree_right_rotate(impl, kparent->parent);
-        -:  366:			}
-        -:  367:		} else {
-        -:  368:			// Case 2: Uncle is on the left
-      463:  369:			ORBTreeNode *u = orbtree_node(impl, gparent->left);
-      463:  370:			u32 u_id = gparent->left;
-      463:  371:			if (IS_RED(impl, u_id)) {
-        -:  372:				// Case 2a: Uncle is red
-        -:  373:				// Recolor the parent and uncle to black
-      272:  374:				SET_BLACK(impl, k->parent);
-      272:  375:				SET_BLACK(impl, u_id);
-        -:  376:				// Recolor the grandparent to red
-      272:  377:				SET_RED(impl, parent->parent);
-        -:  378:
-        -:  379:				// Move up the tree
-      272:  380:				k_id = parent->parent;
-      272:  381:				k = orbtree_node(impl, k_id);
-        -:  382:			} else {
-        -:  383:				// Case 2b: Uncle is black
-      191:  384:				if (k_id == parent->left) {
-        -:  385:					// Case 2b1: Node is a right child
-        -:  386:					// Rotate left to make the node the left child
-      107:  387:					k_id = k->parent;
-      107:  388:					k = orbtree_node(impl, k_id);
-      107:  389:					orbtree_right_rotate(impl, k_id);
-        -:  390:				}
-        -:  391:				// Recolor and rotate
-      191:  392:				SET_BLACK(impl, k->parent);
-      191:  393:				ORBTreeNode *kparent = orbtree_node(impl, k->parent);
-      191:  394:				SET_RED(impl, kparent->parent);
-      191:  395:				orbtree_left_rotate(impl, kparent->parent);
-        -:  396:			}
-        -:  397:		}
-        -:  398:	}
-        -:  399:	// Ensure the root is always black
-     1026:  400:	SET_BLACK(impl, impl->root);
-     1026:  401:}
-        -:  402:
-     1026:  403:int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced) {
-        -:  404:	// validate input
-     1026:  405:	if (ptr == NULL || value == NULL || replaced == NULL) {
-    #####:  406:		SetErr(IllegalArgument);
-    #####:  407:		return -1;
-        -:  408:	}
-        -:  409:
-        -:  410:	// obtain the impl from the ptr
-     1026:  411:	ORBTreeImpl *impl = ptr->impl;
-        -:  412:	// this pair is used to search
-        -:  413:	ORBTreeNodePair pair;
-        -:  414:
-     1026:  415:	if (impl == NULL) {
-    #####:  416:		SetErr(IllegalState);
-    #####:  417:		return -1;
-        -:  418:	}
-        -:  419:
-        -:  420:	// perform search for the key
-     1026:  421:	orbtree_search(impl, value->value, &pair);
-     1026:  422:	if (pair.self != NIL) {
-    #####:  423:		replaced->value = orbtree_value(impl, pair.self);
-    #####:  424:		replaced->updated = true;
-    #####:  425:		replaced->id = pair.self;
-        -:  426:	}
-        -:  427:
-     1026:  428:	if (impl->root == NIL) {
-        4:  429:		impl->root = value->id;
-        -:  430:
-     1022:  431:	} else if (pair.is_right) {
-      493:  432:		ORBTreeNode *parent = orbtree_node(impl, pair.parent);
-      493:  433:		parent->right_subtree_size++;
-      493:  434:		parent->right = value->id;
-        -:  435:	} else {
-      529:  436:		ORBTreeNode *parent = orbtree_node(impl, pair.parent);
-      529:  437:		parent->left_subtree_size++;
-      529:  438:		parent->left = value->id;
-        -:  439:	}
-        -:  440:
-     1026:  441:	orbtree_update_heights(impl, pair.parent);
-        -:  442:
-     1026:  443:	ORBTreeNode *node = orbtree_node(impl, value->id);
-     1026:  444:	node->right = NIL;
-     1026:  445:	node->left = NIL;
-     1026:  446:	node->right_subtree_size = 0;
-     1026:  447:	node->left_subtree_size = 0;
-     1026:  448:	node->parent = pair.parent;
-        -:  449:
-        -:  450:#ifdef TEST
-     1026:  451:	node->node_id = orbtree_next_node_id++;
-        -:  452:#endif // TEST
-        -:  453:
-     1026:  454:	SET_RED(impl, value->id);
-     1026:  455:	impl->elements++;
-        -:  456:
-     1026:  457:	orbtree_put_fixup(impl, value->id);
-        -:  458:
-     1026:  459:	return 0;
-        -:  460:}
-        -:  461:
-       21:  462:int orbtree_get_index(const ORBTree *ptr, u32 index, ORBTreeTray *tray) {
-       21:  463:	if (ptr == NULL || tray == NULL) {
-    #####:  464:		SetErr(IllegalArgument);
-    #####:  465:		return -1;
-        -:  466:	}
+        -:  336:	// Place x as y's left child
+      508:  337:	y->right = x_id;
+      508:  338:	y->right_subtree_size = x->right_subtree_size + x->left_subtree_size + 1;
+      508:  339:	x->parent = y_id;
+      508:  340:}
+        -:  341:
+        -:  342:// find the successor node
+      540:  343:u32 orbtree_find_successor(ORBTreeImpl *impl, u32 x_id) {
+      540:  344:	ORBTreeNode *x = orbtree_node(impl, x_id);
+      540:  345:	u32 successor_id = x->right;
+      540:  346:	ORBTreeNode *successor = orbtree_node(impl, x->right);
+     1272:  347:	while (successor && successor->left != NIL) {
+      732:  348:		successor_id = successor->left;
+      732:  349:		successor = orbtree_node(impl, successor->left);
+        -:  350:	}
+      540:  351:	return successor_id;
+        -:  352:}
+        -:  353:
+        -:  354:// perform transplant operation
+     1372:  355:void orbtree_transplant(ORBTreeImpl *impl, u32 dst, u32 src) {
+     1372:  356:	ORBTreeNode *dst_node = orbtree_node(impl, dst);
+     1372:  357:	ORBTreeNode *dst_parent = orbtree_node(impl, dst_node->parent);
+        -:  358:
+     1372:  359:	if (dst_node->parent == NIL)
+       13:  360:		impl->root = src;
+     1359:  361:	else if (dst == dst_parent->left) {
+      859:  362:		dst_parent->left = src;
+      859:  363:		if (src == NIL)
+      469:  364:			dst_parent->left_subtree_size = 0;
+        -:  365:		else {
+      390:  366:			ORBTreeNode *src_node = orbtree_node(impl, src);
+        -:  367:		}
+        -:  368:	} else {
+      500:  369:		dst_parent->right = src;
+      500:  370:		if (src == NIL)
+      157:  371:			dst_parent->right_subtree_size = 0;
+        -:  372:		else {
+      343:  373:			ORBTreeNode *src_node = orbtree_node(impl, src);
+        -:  374:		}
+        -:  375:	}
+     1372:  376:	if (src != NIL) {
+      743:  377:		ORBTreeNode *src_node = orbtree_node(impl, src);
+      743:  378:		src_node->parent = dst_node->parent;
+      743:  379:		ORBTreeNode *src_node_p = orbtree_node(impl, src_node->parent);
+      743:  380:		if (src_node_p) {
+      733:  381:			if (src_node_p->right == src)
+      343:  382:				src_node_p->right_subtree_size =
+      343:  383:					1 + src_node->right_subtree_size + src_node->left_subtree_size;
+        -:  384:			else
+      390:  385:				src_node_p->left_subtree_size =
+      390:  386:					1 + src_node->right_subtree_size + src_node->left_subtree_size;
+        -:  387:		}
+        -:  388:	}
+        -:  389:
+     1372:  390:	orbtree_update_heights(impl, dst_node->parent);
+     1372:  391:}
+        -:  392:
+     2026:  393:void orbtree_put_fixup(ORBTreeImpl *impl, u32 k_id) {
+     2026:  394:	ORBTreeNode *k = orbtree_node(impl, k_id);
+        -:  395:
+     4909:  396:	while (k_id != impl->root && IS_RED(impl, k->parent)) {
+     2883:  397:		k = orbtree_node(impl, k_id);
+     2883:  398:		ORBTreeNode *parent = orbtree_node(impl, k->parent);
+     2883:  399:		ORBTreeNode *gparent = orbtree_node(impl, parent->parent);
+        -:  400:
+     2883:  401:		if (k->parent == gparent->left) {
+        -:  402:			// Case 1: Uncle is on the right
+      459:  403:			ORBTreeNode *u = orbtree_node(impl, gparent->right);
+      459:  404:			u32 u_id = gparent->right;
+      459:  405:			if (IS_RED(impl, u_id)) {
+        -:  406:				// Case 1a: Uncle is red
+        -:  407:				// Recolor the parent and uncle to black
+      250:  408:				SET_BLACK(impl, k->parent);
+      250:  409:				SET_BLACK(impl, u_id);
+        -:  410:				// Recolor the grandparent to red
+      250:  411:				SET_RED(impl, parent->parent);
+        -:  412:
+        -:  413:				// Move up the tree
+      250:  414:				k_id = parent->parent;
+      250:  415:				k = orbtree_node(impl, k_id);
+        -:  416:			} else {
+        -:  417:				// Case 1b: Uncle is black
+      209:  418:				if (k_id == parent->right) {
+        -:  419:					// Case 1b1: Node is a right child
+        -:  420:					// Rotate left to make the node the left child
+      108:  421:					k_id = k->parent;
+      108:  422:					k = orbtree_node(impl, k_id);
+      108:  423:					orbtree_left_rotate(impl, k_id);
+        -:  424:				}
+        -:  425:				// Recolor and rotate
+      209:  426:				ORBTreeNode *kparent = orbtree_node(impl, k->parent);
+      209:  427:				SET_BLACK(impl, k->parent);
+      209:  428:				SET_RED(impl, kparent->parent);
+        -:  429:
+      209:  430:				orbtree_right_rotate(impl, kparent->parent);
+        -:  431:			}
+        -:  432:		} else {
+        -:  433:			// Case 2: Uncle is on the left
+     2424:  434:			ORBTreeNode *u = orbtree_node(impl, gparent->left);
+     2424:  435:			u32 u_id = gparent->left;
+     2424:  436:			if (IS_RED(impl, u_id)) {
+        -:  437:				// Case 2a: Uncle is red
+        -:  438:				// Recolor the parent and uncle to black
+     1250:  439:				SET_BLACK(impl, k->parent);
+     1250:  440:				SET_BLACK(impl, u_id);
+        -:  441:				// Recolor the grandparent to red
+     1250:  442:				SET_RED(impl, parent->parent);
+        -:  443:
+        -:  444:				// Move up the tree
+     1250:  445:				k_id = parent->parent;
+     1250:  446:				k = orbtree_node(impl, k_id);
+        -:  447:			} else {
+        -:  448:				// Case 2b: Uncle is black
+     1174:  449:				if (k_id == parent->left) {
+        -:  450:					// Case 2b1: Node is a right child
+        -:  451:					// Rotate left to make the node the left child
+      107:  452:					k_id = k->parent;
+      107:  453:					k = orbtree_node(impl, k_id);
+      107:  454:					orbtree_right_rotate(impl, k_id);
+        -:  455:				}
+        -:  456:				// Recolor and rotate
+     1174:  457:				SET_BLACK(impl, k->parent);
+     1174:  458:				ORBTreeNode *kparent = orbtree_node(impl, k->parent);
+     1174:  459:				SET_RED(impl, kparent->parent);
+     1174:  460:				orbtree_left_rotate(impl, kparent->parent);
+        -:  461:			}
+        -:  462:		}
+        -:  463:	}
+        -:  464:	// Ensure the root is always black
+     2026:  465:	SET_BLACK(impl, impl->root);
+     2026:  466:}
         -:  467:
-       21:  468:	tray->updated = false;
-        -:  469:
-        -:  470:	// obtain the impl from the ptr
-       21:  471:	ORBTreeImpl *impl = ptr->impl;
-        -:  472:
-       21:  473:	if (impl == NULL) {
-    #####:  474:		SetErr(IllegalState);
-    #####:  475:		return -1;
-        -:  476:	}
-        -:  477:
-       21:  478:	i64 size = orbtree_size(ptr);
-       21:  479:	if (index >= size) {
-        1:  480:		SetErr(IndexOutOfBounds);
-        1:  481:		return -1;
-        -:  482:	}
-        -:  483:
-       20:  484:	u32 itt = impl->root;
-       20:  485:	u32 left_cur = 0;
-        -:  486:
-       51:  487:	while (itt != NIL) {
-       51:  488:		ORBTreeNode *n = orbtree_node(impl, itt);
-       51:  489:		left_cur += n->left_subtree_size;
-       51:  490:		if (left_cur > index) {
-       17:  491:			left_cur -= n->left_subtree_size;
-       17:  492:			itt = n->left;
-       34:  493:		} else if (left_cur < index) {
-       14:  494:			left_cur += 1;
-       14:  495:			itt = n->right;
-        -:  496:		} else {
-       20:  497:			break;
-        -:  498:		}
-        -:  499:	}
-       20:  500:	if (itt == NIL) {
-    #####:  501:		SetErr(IllegalState);
-    #####:  502:		return -1;
-        -:  503:	}
-        -:  504:
-       20:  505:	tray->value = orbtree_value(impl, itt);
-       20:  506:	tray->updated = true;
+     2026:  468:int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced) {
+        -:  469:	// validate input
+     2026:  470:	if (ptr == NULL || value == NULL || replaced == NULL) {
+    #####:  471:		SetErr(IllegalArgument);
+    #####:  472:		return -1;
+        -:  473:	}
+        -:  474:
+        -:  475:	// obtain the impl from the ptr
+     2026:  476:	ORBTreeImpl *impl = ptr->impl;
+        -:  477:	// this pair is used to search
+        -:  478:	ORBTreeNodePair pair;
+        -:  479:
+     2026:  480:	if (impl == NULL) {
+    #####:  481:		SetErr(IllegalState);
+    #####:  482:		return -1;
+        -:  483:	}
+        -:  484:
+        -:  485:	// perform search for the key
+     2026:  486:	orbtree_search(impl, value->value, &pair);
+     2026:  487:	if (pair.self != NIL) {
+    #####:  488:		replaced->value = orbtree_value(impl, pair.self);
+    #####:  489:		replaced->updated = true;
+    #####:  490:		replaced->id = pair.self;
+        -:  491:	}
+        -:  492:
+     2026:  493:	if (impl->root == NIL) {
+        5:  494:		impl->root = value->id;
+        -:  495:
+     2021:  496:	} else if (pair.is_right) {
+     1492:  497:		ORBTreeNode *parent = orbtree_node(impl, pair.parent);
+     1492:  498:		parent->right_subtree_size++;
+     1492:  499:		parent->right = value->id;
+        -:  500:	} else {
+      529:  501:		ORBTreeNode *parent = orbtree_node(impl, pair.parent);
+      529:  502:		parent->left_subtree_size++;
+      529:  503:		parent->left = value->id;
+        -:  504:	}
+        -:  505:
+     2026:  506:	orbtree_update_heights(impl, pair.parent);
         -:  507:
-       20:  508:	return 0;
-        -:  509:}
-        -:  510:
-       10:  511:int orbtree_remove_index(ORBTree *ptr, u32 index, ORBTreeTray *removed) {
-        -:  512:	ORBTreeTray search;
-       10:  513:	search.updated = false;
-       10:  514:	int ret = orbtree_get_index(ptr, index, &search);
-       10:  515:	if (ret)
-    #####:  516:		return ret;
-        -:  517:
-       10:  518:	if (!search.updated) {
-    #####:  519:		SetErr(IllegalState);
-    #####:  520:		return -1;
-        -:  521:	}
-        -:  522:
-       10:  523:	return orbtree_remove(ptr, search.value, removed);
-        -:  524:}
-        -:  525:
-        -:  526:// set child's color to parent's
-      780:  527:void orbtree_set_color_based_on_parent(ORBTreeImpl *impl, u32 child, u32 parent) {
-      780:  528:	if (child != NIL) {
-      780:  529:		if (IS_RED(impl, parent)) {
-      289:  530:			SET_RED(impl, child);
-        -:  531:		} else {
-      491:  532:			SET_BLACK(impl, child);
-        -:  533:		}
-        -:  534:	}
-      780:  535:}
-        -:  536:
-      768:  537:void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
-     1528:  538:	while (x != impl->root && IS_BLACK(impl, x)) {
-      760:  539:		ORBTreeNode *parent_node = orbtree_node(impl, parent);
-      760:  540:		ORBTreeNode *w_node = orbtree_node(impl, w);
-      760:  541:		ORBTreeNode *x_node = orbtree_node(impl, x);
-      760:  542:		if (w == parent_node->right) {
-        -:  543:			// Case 1: Sibling is red
-      409:  544:			if (IS_RED(impl, w)) {
-       28:  545:				SET_BLACK(impl, w);
-       28:  546:				SET_RED(impl, parent);
-       28:  547:				orbtree_left_rotate(impl, parent);
-       28:  548:				w = parent_node->right;
-       28:  549:				w_node = orbtree_node(impl, w);
-        -:  550:			}
+     2026:  508:	ORBTreeNode *node = orbtree_node(impl, value->id);
+     2026:  509:	node->right = NIL;
+     2026:  510:	node->left = NIL;
+     2026:  511:	node->right_subtree_size = 0;
+     2026:  512:	node->left_subtree_size = 0;
+     2026:  513:	node->parent = pair.parent;
+        -:  514:
+        -:  515:#ifdef TEST
+     2026:  516:	node->node_id = orbtree_next_node_id++;
+        -:  517:#endif // TEST
+        -:  518:
+     2026:  519:	SET_RED(impl, value->id);
+     2026:  520:	impl->elements++;
+        -:  521:
+     2026:  522:	orbtree_put_fixup(impl, value->id);
+        -:  523:
+     2026:  524:	return 0;
+        -:  525:}
+        -:  526:
+       21:  527:int orbtree_get_index(const ORBTree *ptr, u32 index, ORBTreeTray *tray) {
+       21:  528:	if (ptr == NULL || tray == NULL) {
+    #####:  529:		SetErr(IllegalArgument);
+    #####:  530:		return -1;
+        -:  531:	}
+        -:  532:
+       21:  533:	tray->updated = false;
+        -:  534:
+        -:  535:	// obtain the impl from the ptr
+       21:  536:	ORBTreeImpl *impl = ptr->impl;
+        -:  537:
+       21:  538:	if (impl == NULL) {
+    #####:  539:		SetErr(IllegalState);
+    #####:  540:		return -1;
+        -:  541:	}
+        -:  542:
+       21:  543:	i64 size = orbtree_size(ptr);
+       21:  544:	if (index >= size) {
+        1:  545:		SetErr(IndexOutOfBounds);
+        1:  546:		return -1;
+        -:  547:	}
+        -:  548:
+       20:  549:	u32 itt = impl->root;
+       20:  550:	u32 left_cur = 0;
         -:  551:
-        -:  552:			// Case 2: Sibling's children are both black
-      679:  553:			if (IS_BLACK(impl, w_node->left) && IS_BLACK(impl, w_node->right)) {
-      270:  554:				SET_RED(impl, w);
-      270:  555:				x = parent;
-      270:  556:				x_node = orbtree_node(impl, x);
-      270:  557:				parent = parent_node->parent;
-      270:  558:				parent_node = orbtree_node(impl, parent);
-      270:  559:				ORBTreeNode *x_parent = orbtree_node(impl, x_node->parent);
-      270:  560:				if (x_parent == NULL) {
-        5:  561:					w = NIL;
-        5:  562:					w_node = NULL;
-      265:  563:				} else if (x == x_parent->left) {
-      146:  564:					w = x_parent->right;
-      146:  565:					w_node = orbtree_node(impl, w);
-        -:  566:				} else {
-      119:  567:					w = x_parent->left;
-      119:  568:					w_node = orbtree_node(impl, w);
-        -:  569:				}
-        -:  570:			} else {
-        -:  571:				// Case 3: Sibling's right child is black, left child is red
-      139:  572:				if (IS_BLACK(impl, w_node->right)) {
-       53:  573:					SET_BLACK(impl, w_node->left);
-       53:  574:					SET_RED(impl, w);
-       53:  575:					orbtree_right_rotate(impl, w);
-       53:  576:					w = parent_node->right;
-       53:  577:					w_node = orbtree_node(impl, w);
-        -:  578:				}
-        -:  579:
-        -:  580:				// Case 4: Sibling's right child is red
-      139:  581:				orbtree_set_color_based_on_parent(impl, w, parent);
-      139:  582:				SET_BLACK(impl, parent);
-      139:  583:				SET_BLACK(impl, w_node->right);
-      139:  584:				orbtree_left_rotate(impl, parent);
-      139:  585:				x = impl->root; // Set x to root at the end, only once
-      139:  586:				x_node = orbtree_node(impl, x);
-        -:  587:			}
-        -:  588:		} else {
-        -:  589:			// Case 1: Sibling is red
-      351:  590:			if (IS_RED(impl, w)) {
-       38:  591:				SET_BLACK(impl, w);
-       38:  592:				SET_RED(impl, parent);
-       38:  593:				orbtree_right_rotate(impl, parent);
-       38:  594:				w = parent_node->left;
-       38:  595:				w_node = orbtree_node(impl, w);
-        -:  596:			}
-        -:  597:
-        -:  598:			// Case 2: Sibling's children are both black
-      601:  599:			if (IS_BLACK(impl, w_node->right) && IS_BLACK(impl, w_node->left)) {
-      250:  600:				SET_RED(impl, w);
-      250:  601:				x = parent;
-      250:  602:				x_node = orbtree_node(impl, x);
-      250:  603:				parent = parent_node->parent;
-      250:  604:				parent_node = orbtree_node(impl, parent);
-      250:  605:				ORBTreeNode *x_parent = orbtree_node(impl, x_node->parent);
-      250:  606:				if (x_parent == NULL) {
-        3:  607:					w = NIL;
-        3:  608:					w_node = NULL;
-      247:  609:				} else if (x == x_parent->left) {
-      116:  610:					w = x_parent->right;
-      116:  611:					w_node = orbtree_node(impl, w);
-        -:  612:				} else {
-      131:  613:					w = x_parent->left;
-      131:  614:					w_node = orbtree_node(impl, w);
-        -:  615:				}
-        -:  616:			} else {
-        -:  617:				// Case 3: Sibling's right child is black, left child is red
-      101:  618:				if (IS_BLACK(impl, w_node->left)) {
-       61:  619:					SET_BLACK(impl, w_node->right);
-       61:  620:					SET_RED(impl, w);
-       61:  621:					orbtree_left_rotate(impl, w);
-       61:  622:					w = parent_node->left;
-       61:  623:					w_node = orbtree_node(impl, w);
-        -:  624:				}
-        -:  625:
-        -:  626:				// Case 4: Sibling's right child is red
-      101:  627:				orbtree_set_color_based_on_parent(impl, w, parent);
-      101:  628:				SET_BLACK(impl, parent);
-      101:  629:				SET_BLACK(impl, w_node->left);
-      101:  630:				orbtree_right_rotate(impl, parent);
-      101:  631:				x = impl->root; // Set x to root at the end, only once
-      101:  632:				x_node = orbtree_node(impl, x);
-        -:  633:			}
-        -:  634:		}
-        -:  635:	}
-        -:  636:
-        -:  637:	// Ensure x is black at the end of fixup
-      768:  638:	SET_BLACK(impl, x);
-      768:  639:}
-        -:  640:
-     2032:  641:int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
-        -:  642:	// validate input
-     2032:  643:	if (ptr == NULL || value == NULL || removed == NULL) {
-    #####:  644:		SetErr(IllegalArgument);
-    #####:  645:		return -1;
-        -:  646:	}
-        -:  647:
-        -:  648:	// obtain impl from the pointer
-     2032:  649:	ORBTreeImpl *impl = ptr->impl;
-        -:  650:
-     2032:  651:	if (impl == NULL) {
-    #####:  652:		SetErr(IllegalState);
-    #####:  653:		return -1;
-        -:  654:	}
-        -:  655:
-        -:  656:	// search for the node based on this key.
-        -:  657:	ORBTreeNodePair pair;
-     2032:  658:	orbtree_search(impl, value, &pair);
-        -:  659:
-        -:  660:	// this node doesn't exist, return -1
-     2032:  661:	if (pair.self == NIL) {
-     1012:  662:		removed->updated = false;
-     1012:  663:		return -1;
-        -:  664:	}
-        -:  665:
-     1020:  666:	removed->value = orbtree_value(impl, pair.self);
-     1020:  667:	removed->updated = true;
-     1020:  668:	removed->id = pair.self;
-        -:  669:
-     1020:  670:	ORBTreeNode *node_to_delete = orbtree_node(impl, pair.self);
-     1020:  671:	ORBTreeNode *x = NULL;
-     1020:  672:	ORBTreeNode *w = NULL;
-     1020:  673:	ORBTreeNode *parent = NULL;
-     1020:  674:	u32 x_id = NIL;
-     1020:  675:	u32 w_id = NIL;
-     1020:  676:	u32 parent_id = NIL;
-     1020:  677:	bool do_fixup = IS_BLACK(impl, pair.self);
-        -:  678:
-     1020:  679:	if (node_to_delete->left == NIL) {
-      424:  680:		x_id = node_to_delete->right;
-      424:  681:		x = orbtree_node(impl, x_id);
-      424:  682:		orbtree_transplant(impl, pair.self, node_to_delete->right);
-      424:  683:		ORBTreeNode *node_to_delete_parent = orbtree_node(impl, node_to_delete->parent);
-      424:  684:		if (node_to_delete_parent == NULL) {
-      420:  685:		} else if (node_to_delete_parent->left == NIL) {
-      230:  686:			w_id = node_to_delete_parent->right;
-      230:  687:			w = orbtree_node(impl, w_id);
-      190:  688:		} else if (node_to_delete_parent) {
-      190:  689:			w_id = node_to_delete_parent->left;
-      190:  690:			w = orbtree_node(impl, w_id);
-        -:  691:		}
-      424:  692:		if (x_id != NIL) {
-       84:  693:			x = orbtree_node(impl, x_id);
-       84:  694:			parent_id = x->parent;
-       84:  695:			parent = orbtree_node(impl, parent_id);
-      340:  696:		} else if (w_id != NIL) {
-      244:  697:			parent_id = w->parent;
-      244:  698:			parent = orbtree_node(impl, parent_id);
+       51:  552:	while (itt != NIL) {
+       51:  553:		ORBTreeNode *n = orbtree_node(impl, itt);
+       51:  554:		left_cur += n->left_subtree_size;
+       51:  555:		if (left_cur > index) {
+       17:  556:			left_cur -= n->left_subtree_size;
+       17:  557:			itt = n->left;
+       34:  558:		} else if (left_cur < index) {
+       14:  559:			left_cur += 1;
+       14:  560:			itt = n->right;
+        -:  561:		} else {
+       20:  562:			break;
+        -:  563:		}
+        -:  564:	}
+       20:  565:	if (itt == NIL) {
+    #####:  566:		SetErr(IllegalState);
+    #####:  567:		return -1;
+        -:  568:	}
+        -:  569:
+       20:  570:	tray->value = orbtree_value(impl, itt);
+       20:  571:	tray->updated = true;
+        -:  572:
+       20:  573:	return 0;
+        -:  574:}
+        -:  575:
+       10:  576:int orbtree_remove_index(ORBTree *ptr, u32 index, ORBTreeTray *removed) {
+        -:  577:	ORBTreeTray search;
+       10:  578:	search.updated = false;
+       10:  579:	int ret = orbtree_get_index(ptr, index, &search);
+       10:  580:	if (ret)
+    #####:  581:		return ret;
+        -:  582:
+       10:  583:	if (!search.updated) {
+    #####:  584:		SetErr(IllegalState);
+    #####:  585:		return -1;
+        -:  586:	}
+        -:  587:
+       10:  588:	return orbtree_remove(ptr, search.value, removed);
+        -:  589:}
+        -:  590:
+        -:  591:// set child's color to parent's
+      780:  592:void orbtree_set_color_based_on_parent(ORBTreeImpl *impl, u32 child, u32 parent) {
+      780:  593:	if (child != NIL) {
+      780:  594:		if (IS_RED(impl, parent)) {
+      289:  595:			SET_RED(impl, child);
+        -:  596:		} else {
+      491:  597:			SET_BLACK(impl, child);
+        -:  598:		}
+        -:  599:	}
+      780:  600:}
+        -:  601:
+      768:  602:void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
+     1528:  603:	while (x != impl->root && IS_BLACK(impl, x)) {
+      760:  604:		ORBTreeNode *parent_node = orbtree_node(impl, parent);
+      760:  605:		ORBTreeNode *w_node = orbtree_node(impl, w);
+      760:  606:		ORBTreeNode *x_node = orbtree_node(impl, x);
+      760:  607:		if (w == parent_node->right) {
+        -:  608:			// Case 1: Sibling is red
+      409:  609:			if (IS_RED(impl, w)) {
+       28:  610:				SET_BLACK(impl, w);
+       28:  611:				SET_RED(impl, parent);
+       28:  612:				orbtree_left_rotate(impl, parent);
+       28:  613:				w = parent_node->right;
+       28:  614:				w_node = orbtree_node(impl, w);
+        -:  615:			}
+        -:  616:
+        -:  617:			// Case 2: Sibling's children are both black
+      679:  618:			if (IS_BLACK(impl, w_node->left) && IS_BLACK(impl, w_node->right)) {
+      270:  619:				SET_RED(impl, w);
+      270:  620:				x = parent;
+      270:  621:				x_node = orbtree_node(impl, x);
+      270:  622:				parent = parent_node->parent;
+      270:  623:				parent_node = orbtree_node(impl, parent);
+      270:  624:				ORBTreeNode *x_parent = orbtree_node(impl, x_node->parent);
+      270:  625:				if (x_parent == NULL) {
+        5:  626:					w = NIL;
+        5:  627:					w_node = NULL;
+      265:  628:				} else if (x == x_parent->left) {
+      146:  629:					w = x_parent->right;
+      146:  630:					w_node = orbtree_node(impl, w);
+        -:  631:				} else {
+      119:  632:					w = x_parent->left;
+      119:  633:					w_node = orbtree_node(impl, w);
+        -:  634:				}
+        -:  635:			} else {
+        -:  636:				// Case 3: Sibling's right child is black, left child is red
+      139:  637:				if (IS_BLACK(impl, w_node->right)) {
+       53:  638:					SET_BLACK(impl, w_node->left);
+       53:  639:					SET_RED(impl, w);
+       53:  640:					orbtree_right_rotate(impl, w);
+       53:  641:					w = parent_node->right;
+       53:  642:					w_node = orbtree_node(impl, w);
+        -:  643:				}
+        -:  644:
+        -:  645:				// Case 4: Sibling's right child is red
+      139:  646:				orbtree_set_color_based_on_parent(impl, w, parent);
+      139:  647:				SET_BLACK(impl, parent);
+      139:  648:				SET_BLACK(impl, w_node->right);
+      139:  649:				orbtree_left_rotate(impl, parent);
+      139:  650:				x = impl->root; // Set x to root at the end, only once
+      139:  651:				x_node = orbtree_node(impl, x);
+        -:  652:			}
+        -:  653:		} else {
+        -:  654:			// Case 1: Sibling is red
+      351:  655:			if (IS_RED(impl, w)) {
+       38:  656:				SET_BLACK(impl, w);
+       38:  657:				SET_RED(impl, parent);
+       38:  658:				orbtree_right_rotate(impl, parent);
+       38:  659:				w = parent_node->left;
+       38:  660:				w_node = orbtree_node(impl, w);
+        -:  661:			}
+        -:  662:
+        -:  663:			// Case 2: Sibling's children are both black
+      601:  664:			if (IS_BLACK(impl, w_node->right) && IS_BLACK(impl, w_node->left)) {
+      250:  665:				SET_RED(impl, w);
+      250:  666:				x = parent;
+      250:  667:				x_node = orbtree_node(impl, x);
+      250:  668:				parent = parent_node->parent;
+      250:  669:				parent_node = orbtree_node(impl, parent);
+      250:  670:				ORBTreeNode *x_parent = orbtree_node(impl, x_node->parent);
+      250:  671:				if (x_parent == NULL) {
+        3:  672:					w = NIL;
+        3:  673:					w_node = NULL;
+      247:  674:				} else if (x == x_parent->left) {
+      116:  675:					w = x_parent->right;
+      116:  676:					w_node = orbtree_node(impl, w);
+        -:  677:				} else {
+      131:  678:					w = x_parent->left;
+      131:  679:					w_node = orbtree_node(impl, w);
+        -:  680:				}
+        -:  681:			} else {
+        -:  682:				// Case 3: Sibling's right child is black, left child is red
+      101:  683:				if (IS_BLACK(impl, w_node->left)) {
+       61:  684:					SET_BLACK(impl, w_node->right);
+       61:  685:					SET_RED(impl, w);
+       61:  686:					orbtree_left_rotate(impl, w);
+       61:  687:					w = parent_node->left;
+       61:  688:					w_node = orbtree_node(impl, w);
+        -:  689:				}
+        -:  690:
+        -:  691:				// Case 4: Sibling's right child is red
+      101:  692:				orbtree_set_color_based_on_parent(impl, w, parent);
+      101:  693:				SET_BLACK(impl, parent);
+      101:  694:				SET_BLACK(impl, w_node->left);
+      101:  695:				orbtree_right_rotate(impl, parent);
+      101:  696:				x = impl->root; // Set x to root at the end, only once
+      101:  697:				x_node = orbtree_node(impl, x);
+        -:  698:			}
         -:  699:		}
-      596:  700:	} else if (node_to_delete->right == NIL) {
-       56:  701:		x_id = node_to_delete->left;
-       56:  702:		x = orbtree_node(impl, x_id);
-       56:  703:		orbtree_transplant(impl, pair.self, node_to_delete->left);
-       56:  704:		ORBTreeNode *node_to_delete_parent = orbtree_node(impl, node_to_delete->parent);
-       56:  705:		if (node_to_delete_parent) {
-       55:  706:			w_id = node_to_delete_parent->left;
-       55:  707:			w = orbtree_node(impl, w_id);
-        -:  708:		}
-       56:  709:		parent_id = x->parent;
-       56:  710:		parent = orbtree_node(impl, parent_id);
-        -:  711:	} else {
-      540:  712:		u32 successor_id = orbtree_find_successor(impl, pair.self);
-      540:  713:		ORBTreeNode *successor = orbtree_node(impl, successor_id);
-      540:  714:		do_fixup = IS_BLACK(impl, successor_id);
+        -:  700:	}
+        -:  701:
+        -:  702:	// Ensure x is black at the end of fixup
+      768:  703:	SET_BLACK(impl, x);
+      768:  704:}
+        -:  705:
+     2032:  706:int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
+        -:  707:	// validate input
+     2032:  708:	if (ptr == NULL || value == NULL || removed == NULL) {
+    #####:  709:		SetErr(IllegalArgument);
+    #####:  710:		return -1;
+        -:  711:	}
+        -:  712:
+        -:  713:	// obtain impl from the pointer
+     2032:  714:	ORBTreeImpl *impl = ptr->impl;
         -:  715:
-      540:  716:		x_id = successor->right;
-      540:  717:		ORBTreeNode *successor_parent = orbtree_node(impl, successor->parent);
-      540:  718:		w_id = successor_parent->right;
-      540:  719:		x = orbtree_node(impl, x_id);
-      540:  720:		w = orbtree_node(impl, w_id);
-        -:  721:
-      540:  722:		if (w == NULL) {
-       90:  723:			parent_id = NIL;
-       90:  724:			parent = NULL;
-      450:  725:		} else if (w->parent == pair.self) {
-      188:  726:			w_id = node_to_delete->left;
-      188:  727:			w = orbtree_node(impl, w_id);
-      188:  728:			parent_id = successor_id;
-      188:  729:			parent = successor;
-        -:  730:		} else {
-      262:  731:			parent_id = w->parent;
-      262:  732:			parent = orbtree_node(impl, w_id);
-        -:  733:		}
+     2032:  716:	if (impl == NULL) {
+    #####:  717:		SetErr(IllegalState);
+    #####:  718:		return -1;
+        -:  719:	}
+        -:  720:
+        -:  721:	// search for the node based on this key.
+        -:  722:	ORBTreeNodePair pair;
+     2032:  723:	orbtree_search(impl, value, &pair);
+        -:  724:
+        -:  725:	// this node doesn't exist, return -1
+     2032:  726:	if (pair.self == NIL) {
+     1012:  727:		removed->updated = false;
+     1012:  728:		return -1;
+        -:  729:	}
+        -:  730:
+     1020:  731:	removed->value = orbtree_value(impl, pair.self);
+     1020:  732:	removed->updated = true;
+     1020:  733:	removed->id = pair.self;
         -:  734:
-      540:  735:		if (successor->parent != pair.self) {
-      352:  736:			orbtree_transplant(impl, successor_id, successor->right);
-      352:  737:			successor->right = node_to_delete->right;
-      352:  738:			successor->right_subtree_size = 0;
-      352:  739:			ORBTreeNode *successor_right = orbtree_node(impl, successor->right);
-      352:  740:			if (successor_right) {
-      352:  741:				successor->right_subtree_size =
-      352:  742:					1 + successor_right->right_subtree_size + successor_right->left_subtree_size;
-      352:  743:				successor_right->parent = successor_id;
-        -:  744:			}
-        -:  745:		}
-        -:  746:
-        -:  747:		// do final transpalnt and update including color match
-      540:  748:		orbtree_transplant(impl, pair.self, successor_id);
-      540:  749:		successor->left = node_to_delete->left;
-      540:  750:		ORBTreeNode *successor_left = orbtree_node(impl, successor->left);
-      540:  751:		successor->left_subtree_size = 0;
-      540:  752:		if (node_to_delete->left != NIL) {
-      540:  753:			ORBTreeNode *ntdl = orbtree_node(impl, node_to_delete->left);
-      540:  754:			successor->left_subtree_size = 1 + ntdl->right_subtree_size + ntdl->left_subtree_size;
-        -:  755:		}
-        -:  756:
-      540:  757:		successor_left->parent = successor_id;
-      540:  758:		orbtree_set_color_based_on_parent(impl, successor_id, pair.self);
-        -:  759:
-        -:  760:		// go up the tree
-      540:  761:		orbtree_update_heights(impl, successor_id);
-        -:  762:	}
-        -:  763:
-     1020:  764:	if (do_fixup) {
-      773:  765:		if (w_id != NIL && parent_id != NIL) {
-      768:  766:			orbtree_remove_fixup(impl, parent_id, w_id, x_id);
-        -:  767:		} else {
-        -:  768:			// in these cases SET_BLACK only
-        5:  769:			if (impl->elements > 1)
-        2:  770:				SET_BLACK(impl, impl->root);
-        -:  771:		}
-        -:  772:	}
-        -:  773:
-     1020:  774:	impl->elements--;
-        -:  775:
-     1020:  776:	return 0;
-        -:  777:}
-     1011:  778:int orbtree_get(const ORBTree *ptr, const void *searched, ORBTreeTray *found) {
-        -:  779:	// validate input
-     1011:  780:	if (ptr == NULL || searched == NULL || found == NULL) {
-    #####:  781:		SetErr(IllegalArgument);
-    #####:  782:		return -1;
-        -:  783:	}
-        -:  784:
-        -:  785:	// obtain the impl from the ptr
-     1011:  786:	ORBTreeImpl *impl = ptr->impl;
-        -:  787:	// this pair is used to search
-        -:  788:	ORBTreeNodePair pair;
-        -:  789:
-     1011:  790:	if (impl == NULL) {
-    #####:  791:		SetErr(IllegalState);
-    #####:  792:		return -1;
-        -:  793:	}
-        -:  794:
-        -:  795:	// perform search for the key
-     1011:  796:	orbtree_search(impl, searched, &pair);
-        -:  797:
-     1011:  798:	if (pair.self != NIL) {
-     1011:  799:		found->updated = true;
-     1011:  800:		found->value = orbtree_value(impl, pair.self);
-        -:  801:	} else {
-    #####:  802:		found->updated = false;
-        -:  803:	}
-        -:  804:
-     1011:  805:	return 0;
-        -:  806:}
-       25:  807:i64 orbtree_size(const ORBTree *ptr) {
-       25:  808:	if (ptr == NULL) {
-    #####:  809:		SetErr(IllegalArgument);
-    #####:  810:		return -1;
-        -:  811:	}
-       25:  812:	ORBTreeImpl *impl = ptr->impl;
-        -:  813:
-       25:  814:	if (impl == NULL) {
-    #####:  815:		SetErr(IllegalState);
-    #####:  816:		return -1;
-        -:  817:	}
-        -:  818:
-       25:  819:	return impl->elements;
-        -:  820:}
-    #####:  821:int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
-        -:  822:					 bool start_inclusive, const void *end_value, bool end_inclusive) {
-    #####:  823:	return 0;
-        -:  824:}
-    #####:  825:int orbtree_iterator_reset(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
-        -:  826:						   bool start_inclusive, const void *end_value, bool end_inclusive) {
-    #####:  827:	return 0;
-        -:  828:}
-        -:  829:
-       28:  830:int orbtree_init_free_list(ORBTreeImpl *impl, u8 *data, u32 offset) {
-       28:  831:	u64 cur_index = offset / NODES_PER_CHUNK;
-     2828:  832:	for (int i = 0; i < NODES_PER_CHUNK; i++) {
-     2800:  833:		if (i < NODES_PER_CHUNK - 1)
-     2772:  834:			impl->alloc->free_list[i + offset] = offset + i + 1;
-        -:  835:		else
-       28:  836:			impl->alloc->free_list[i + offset] = UINT32_MAX;
+     1020:  735:	ORBTreeNode *node_to_delete = orbtree_node(impl, pair.self);
+     1020:  736:	ORBTreeNode *x = NULL;
+     1020:  737:	ORBTreeNode *w = NULL;
+     1020:  738:	ORBTreeNode *parent = NULL;
+     1020:  739:	u32 x_id = NIL;
+     1020:  740:	u32 w_id = NIL;
+     1020:  741:	u32 parent_id = NIL;
+     1020:  742:	bool do_fixup = IS_BLACK(impl, pair.self);
+        -:  743:
+     1020:  744:	if (node_to_delete->left == NIL) {
+      424:  745:		x_id = node_to_delete->right;
+      424:  746:		x = orbtree_node(impl, x_id);
+      424:  747:		orbtree_transplant(impl, pair.self, node_to_delete->right);
+      424:  748:		ORBTreeNode *node_to_delete_parent = orbtree_node(impl, node_to_delete->parent);
+      424:  749:		if (node_to_delete_parent == NULL) {
+      420:  750:		} else if (node_to_delete_parent->left == NIL) {
+      230:  751:			w_id = node_to_delete_parent->right;
+      230:  752:			w = orbtree_node(impl, w_id);
+      190:  753:		} else if (node_to_delete_parent) {
+      190:  754:			w_id = node_to_delete_parent->left;
+      190:  755:			w = orbtree_node(impl, w_id);
+        -:  756:		}
+      424:  757:		if (x_id != NIL) {
+       84:  758:			x = orbtree_node(impl, x_id);
+       84:  759:			parent_id = x->parent;
+       84:  760:			parent = orbtree_node(impl, parent_id);
+      340:  761:		} else if (w_id != NIL) {
+      244:  762:			parent_id = w->parent;
+      244:  763:			parent = orbtree_node(impl, parent_id);
+        -:  764:		}
+      596:  765:	} else if (node_to_delete->right == NIL) {
+       56:  766:		x_id = node_to_delete->left;
+       56:  767:		x = orbtree_node(impl, x_id);
+       56:  768:		orbtree_transplant(impl, pair.self, node_to_delete->left);
+       56:  769:		ORBTreeNode *node_to_delete_parent = orbtree_node(impl, node_to_delete->parent);
+       56:  770:		if (node_to_delete_parent) {
+       55:  771:			w_id = node_to_delete_parent->left;
+       55:  772:			w = orbtree_node(impl, w_id);
+        -:  773:		}
+       56:  774:		parent_id = x->parent;
+       56:  775:		parent = orbtree_node(impl, parent_id);
+        -:  776:	} else {
+      540:  777:		u32 successor_id = orbtree_find_successor(impl, pair.self);
+      540:  778:		ORBTreeNode *successor = orbtree_node(impl, successor_id);
+      540:  779:		do_fixup = IS_BLACK(impl, successor_id);
+        -:  780:
+      540:  781:		x_id = successor->right;
+      540:  782:		ORBTreeNode *successor_parent = orbtree_node(impl, successor->parent);
+      540:  783:		w_id = successor_parent->right;
+      540:  784:		x = orbtree_node(impl, x_id);
+      540:  785:		w = orbtree_node(impl, w_id);
+        -:  786:
+      540:  787:		if (w == NULL) {
+       90:  788:			parent_id = NIL;
+       90:  789:			parent = NULL;
+      450:  790:		} else if (w->parent == pair.self) {
+      188:  791:			w_id = node_to_delete->left;
+      188:  792:			w = orbtree_node(impl, w_id);
+      188:  793:			parent_id = successor_id;
+      188:  794:			parent = successor;
+        -:  795:		} else {
+      262:  796:			parent_id = w->parent;
+      262:  797:			parent = orbtree_node(impl, w_id);
+        -:  798:		}
+        -:  799:
+      540:  800:		if (successor->parent != pair.self) {
+      352:  801:			orbtree_transplant(impl, successor_id, successor->right);
+      352:  802:			successor->right = node_to_delete->right;
+      352:  803:			successor->right_subtree_size = 0;
+      352:  804:			ORBTreeNode *successor_right = orbtree_node(impl, successor->right);
+      352:  805:			if (successor_right) {
+      352:  806:				successor->right_subtree_size =
+      352:  807:					1 + successor_right->right_subtree_size + successor_right->left_subtree_size;
+      352:  808:				successor_right->parent = successor_id;
+        -:  809:			}
+        -:  810:		}
+        -:  811:
+        -:  812:		// do final transpalnt and update including color match
+      540:  813:		orbtree_transplant(impl, pair.self, successor_id);
+      540:  814:		successor->left = node_to_delete->left;
+      540:  815:		ORBTreeNode *successor_left = orbtree_node(impl, successor->left);
+      540:  816:		successor->left_subtree_size = 0;
+      540:  817:		if (node_to_delete->left != NIL) {
+      540:  818:			ORBTreeNode *ntdl = orbtree_node(impl, node_to_delete->left);
+      540:  819:			successor->left_subtree_size = 1 + ntdl->right_subtree_size + ntdl->left_subtree_size;
+        -:  820:		}
+        -:  821:
+      540:  822:		successor_left->parent = successor_id;
+      540:  823:		orbtree_set_color_based_on_parent(impl, successor_id, pair.self);
+        -:  824:
+        -:  825:		// go up the tree
+      540:  826:		orbtree_update_heights(impl, successor_id);
+        -:  827:	}
+        -:  828:
+     1020:  829:	if (do_fixup) {
+      773:  830:		if (w_id != NIL && parent_id != NIL) {
+      768:  831:			orbtree_remove_fixup(impl, parent_id, w_id, x_id);
+        -:  832:		} else {
+        -:  833:			// in these cases SET_BLACK only
+        5:  834:			if (impl->elements > 1)
+        2:  835:				SET_BLACK(impl, impl->root);
+        -:  836:		}
         -:  837:	}
-       28:  838:	return 0;
-        -:  839:}
+        -:  838:
+     1020:  839:	impl->elements--;
         -:  840:
-     2534:  841:int orbtree_allocate_tray(ORBTree *ptr, ORBTreeTray *tray) {
-     2534:  842:	if (ptr == NULL || tray == NULL) {
-    #####:  843:		SetErr(IllegalArgument);
-    #####:  844:		return -1;
-        -:  845:	}
-     2534:  846:	ORBTreeImpl *impl = ptr->impl;
-     2534:  847:	if (impl == NULL) {
-    #####:  848:		SetErr(IllegalState);
-    #####:  849:		return -1;
-        -:  850:	}
-     2534:  851:	if (impl->alloc->free_list_head == UINT32_MAX) {
-        -:  852:		void *tmp;
-       28:  853:		if (((impl->alloc->capacity / 100) % CHUNKS_PER_RESIZE) == 0) {
-        5:  854:			if (impl->alloc->capacity == 0) {
-        4:  855:				tmp = mymalloc(sizeof(void *) * CHUNKS_PER_RESIZE);
-        -:  856:			} else {
-        1:  857:				u64 size = (impl->alloc->cur_chunks + CHUNKS_PER_RESIZE) * sizeof(void *);
-        1:  858:				tmp = myrealloc(impl->alloc->data_chunks, size);
-        -:  859:			}
-        -:  860:
-        5:  861:			if (tmp == NULL) {
-    #####:  862:				return -1;
-        -:  863:			}
-        5:  864:			impl->alloc->cur_chunks += CHUNKS_PER_RESIZE;
-        5:  865:			impl->alloc->data_chunks = tmp;
-        -:  866:		}
-       28:  867:		u64 index = impl->alloc->size / NODES_PER_CHUNK;
-       56:  868:		impl->alloc->data_chunks[index] =
-       28:  869:			mymalloc(sizeof(u8) * NODES_PER_CHUNK * (impl->value_size + sizeof(ORBTreeNode)));
-        -:  870:
-       28:  871:		if (impl->alloc->data_chunks[index] == NULL) {
-    #####:  872:			if (impl->alloc->capacity == 0) {
-    #####:  873:				impl->alloc->cur_chunks = 0;
-    #####:  874:				impl->alloc->data_chunks = NULL;
-    #####:  875:				myfree(tmp);
-        -:  876:			}
-    #####:  877:			return -1;
-        -:  878:		}
-        -:  879:
-       28:  880:		void *free_list = NULL;
-       28:  881:		if (impl->alloc->capacity == 0) {
-        4:  882:			free_list = mymalloc(sizeof(u32) * (impl->alloc->cur_chunks + 1) * NODES_PER_CHUNK);
-        -:  883:		} else {
-       24:  884:			free_list = myrealloc(impl->alloc->free_list,
-       24:  885:								  sizeof(u32) * (impl->alloc->cur_chunks + 1) * NODES_PER_CHUNK);
-        -:  886:		}
-       28:  887:		if (free_list == NULL) {
-    #####:  888:			if (impl->alloc->capacity == 0) {
-    #####:  889:				impl->alloc->cur_chunks = 0;
-    #####:  890:				impl->alloc->data_chunks = NULL;
-    #####:  891:				myfree(tmp);
-    #####:  892:				myfree(free_list);
-    #####:  893:				return -1;
-        -:  894:			}
-        -:  895:		}
-        -:  896:
-       28:  897:		impl->alloc->free_list = free_list;
-       28:  898:		orbtree_init_free_list(impl, impl->alloc->data_chunks[index], impl->alloc->size);
-       28:  899:		impl->alloc->free_list_head = impl->alloc->size;
-       28:  900:		impl->alloc->capacity = (index + 1) * NODES_PER_CHUNK;
-        -:  901:	}
-        -:  902:
-     2534:  903:	u32 next = impl->alloc->free_list_head;
-     2534:  904:	if (next == NIL)
-    #####:  905:		return -1;
-     2534:  906:	tray->value = orbtree_value(impl, next);
-     2534:  907:	impl->alloc->free_list_head = impl->alloc->free_list[next];
-     2534:  908:	tray->updated = true;
-     2534:  909:	tray->id = next;
-     2534:  910:	impl->alloc->free_list[next] = UINT32_MAX - 1;
-     2534:  911:	impl->alloc->size++;
-     2534:  912:	return 0;
-        -:  913:}
-        -:  914:
-     1016:  915:int orbtree_deallocate_tray(ORBTree *ptr, ORBTreeTray *tray) {
-     1016:  916:	if (ptr == NULL || tray == NULL) {
-    #####:  917:		SetErr(IllegalArgument);
-    #####:  918:		return -1;
-        -:  919:	}
-     1016:  920:	ORBTreeImpl *impl = ptr->impl;
-     1016:  921:	if (impl == NULL) {
-    #####:  922:		SetErr(IllegalState);
-    #####:  923:		return -1;
-        -:  924:	}
-        -:  925:
-     1016:  926:	if (impl->alloc->free_list == NULL) {
-    #####:  927:		panic("free list not initialized!");
-        -:  928:	}
-        -:  929:
-     1016:  930:	if ((impl->alloc->free_list)[tray->id] != (UINT32_MAX - 1)) {
-    #####:  931:		panic("Potential double free. Id = %llu.", tray->id);
-        -:  932:	}
-        -:  933:
-     1016:  934:	impl->alloc->free_list[tray->id] = impl->alloc->free_list_head;
-     1016:  935:	impl->alloc->free_list_head = tray->id;
-     1016:  936:	impl->alloc->size--;
-        -:  937:
-     1016:  938:	return 0;
-        -:  939:}
-        -:  940:
-        -:  941:#ifdef TEST
-        -:  942:
-  2004393:  943:void orbtree_validate_node(const ORBTreeImpl *impl, u32 node, int *black_count,
-        -:  944:						   int current_black_count) {
-  2004393:  945:	u64 value_size = impl->value_size;
-        -:  946:
-        -:  947:	// Base case: when we reach a NIL
-  2004393:  948:	if (node == NIL) {
-        -:  949:		// If this is the first NIL node reached, set the black count
-  1003213:  950:		if (*black_count == 0) {
-     2033:  951:			*black_count = current_black_count; // Set the black count for the first path
-        -:  952:		} else {
-        -:  953:			// Check for black count consistency
- 1001180*:  954:			assert(current_black_count == *black_count);
-        -:  955:		}
-  1003213:  956:		return; // Return for NIL nodes
-        -:  957:	}
-        -:  958:
-  1001180:  959:	ORBTreeNode *n = orbtree_node(impl, node);
-        -:  960:
-        -:  961:	// check subtree heights
-  1001180:  962:	u32 right_subtree_sum = 0;
-  1001180:  963:	if (n->right != NIL) {
-   502520:  964:		ORBTreeNode *nr = orbtree_node(impl, n->right);
-   502520:  965:		if (nr)
-   502520:  966:			right_subtree_sum = 1 + nr->right_subtree_size + nr->left_subtree_size;
-        -:  967:	}
-  1001180:  968:	u32 left_subtree_sum = 0;
-  1001180:  969:	if (n->left != NIL) {
-   496627:  970:		ORBTreeNode *nl = orbtree_node(impl, n->left);
-   496627:  971:		if (n)
-   496627:  972:			left_subtree_sum = 1 + nl->right_subtree_size + nl->left_subtree_size;
-        -:  973:	}
-        -:  974:
-  1001180:  975:	if (left_subtree_sum != n->left_subtree_size || right_subtree_sum != n->right_subtree_size) {
-    #####:  976:		printf("invalid subtree counts at node = %llu\n", n->node_id);
-        -:  977:	}
- 1001180*:  978:	assert(left_subtree_sum == n->left_subtree_size);
- 1001180*:  979:	assert(right_subtree_sum == n->right_subtree_size);
-        -:  980:
-        -:  981:	// Increment black count if the current node is black
-  1001180:  982:	if (IS_BLACK(impl, node)) {
-   580567:  983:		current_black_count++;
-        -:  984:	} else {
-        -:  985:		//   Check if the node is red
-        -:  986:		//   If the parent is red, return false (Red property violation)
-  420613*:  987:		assert(!(n->parent != NIL && IS_RED(impl, n->parent)));
-        -:  988:	}
-        -:  989:
-        -:  990:	// Recursive calls for left and right children
-  1001180:  991:	orbtree_validate_node(impl, n->left, black_count, current_black_count);
-  1001180:  992:	orbtree_validate_node(impl, n->right, black_count, current_black_count);
-        -:  993:}
-        -:  994:
-     2035:  995:void orbtree_validate_impl(const ORBTreeImpl *impl) {
-     2035:  996:	int black_count = 0;
-        -:  997:	// Validate from the root and check if the root is black
-     2035:  998:	if (impl->root != NIL) {
-    2033*:  999:		assert(IS_BLACK(impl, impl->root));
-     2033: 1000:		orbtree_validate_node(impl, impl->root, &black_count, 0);
-        -: 1001:	}
-     2035: 1002:}
-        -: 1003:
-     2035: 1004:void orbtree_validate(const ORBTree *ptr) {
-     2035: 1005:	ORBTreeImpl *impl = ptr->impl;
-     2035: 1006:	orbtree_validate_impl(impl);
-     2035: 1007:}
-        -: 1008:
-        -: 1009:// Function to print a single node with its color
-       75: 1010:void orbtree_print_node(const ORBTreeImpl *impl, u32 node_id, int depth) {
-       75: 1011:	if (node_id == NIL) {
-      168: 1012:		for (int i = 0; i < depth; i++) {
-      128: 1013:			printf("    ");
-        -: 1014:		}
-       40: 1015:		printf("0 (B)\n");
-       40: 1016:		return;
+     1020:  841:	return 0;
+        -:  842:}
+     1011:  843:int orbtree_get(const ORBTree *ptr, const void *searched, ORBTreeTray *found) {
+        -:  844:	// validate input
+     1011:  845:	if (ptr == NULL || searched == NULL || found == NULL) {
+    #####:  846:		SetErr(IllegalArgument);
+    #####:  847:		return -1;
+        -:  848:	}
+        -:  849:
+        -:  850:	// obtain the impl from the ptr
+     1011:  851:	ORBTreeImpl *impl = ptr->impl;
+        -:  852:	// this pair is used to search
+        -:  853:	ORBTreeNodePair pair;
+        -:  854:
+     1011:  855:	if (impl == NULL) {
+    #####:  856:		SetErr(IllegalState);
+    #####:  857:		return -1;
+        -:  858:	}
+        -:  859:
+        -:  860:	// perform search for the key
+     1011:  861:	orbtree_search(impl, searched, &pair);
+        -:  862:
+     1011:  863:	if (pair.self != NIL) {
+     1011:  864:		found->updated = true;
+     1011:  865:		found->value = orbtree_value(impl, pair.self);
+        -:  866:	} else {
+    #####:  867:		found->updated = false;
+        -:  868:	}
+        -:  869:
+     1011:  870:	return 0;
+        -:  871:}
+       25:  872:i64 orbtree_size(const ORBTree *ptr) {
+       25:  873:	if (ptr == NULL) {
+    #####:  874:		SetErr(IllegalArgument);
+    #####:  875:		return -1;
+        -:  876:	}
+       25:  877:	ORBTreeImpl *impl = ptr->impl;
+        -:  878:
+       25:  879:	if (impl == NULL) {
+    #####:  880:		SetErr(IllegalState);
+    #####:  881:		return -1;
+        -:  882:	}
+        -:  883:
+       25:  884:	return impl->elements;
+        -:  885:}
+        -:  886:
+      401:  887:int orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *start_value,
+        -:  888:						  bool start_inclusive, const void *end_value, bool end_inclusive) {
+        -:  889:
+      401:  890:	ORBTreeIteratorImpl *rbimpl = $(iter->impl);
+      401:  891:	rbimpl->impl = impl;
+      401:  892:	rbimpl->stack_pointer = 0;
+      401:  893:	rbimpl->value_size = impl->value_size;
+      401:  894:	rbimpl->cur = impl->root;
+      401:  895:	rbimpl->min = NIL;
+      401:  896:	rbimpl->max = NIL;
+        -:  897:
+      401:  898:	if (start_value != NULL) {
+      400:  899:		u32 itt = impl->root;
+      400:  900:		int i = 0;
+     3780:  901:		while (itt != NIL) {
+     3580:  902:			ORBTreeNode *node = orbtree_node(impl, itt);
+     3580:  903:			int v = impl->compare(node->data, start_value);
+     3580:  904:			if (v == 0) {
+        -:  905:				// exact match
+      400:  906:				if (start_inclusive) {
+      200:  907:					rbimpl->min = itt;
+      200:  908:					break;
+        -:  909:				} else {
+      200:  910:					if (node->right != NIL)
+      100:  911:						rbimpl->min = node->right;
+      200:  912:					itt = node->right;
+        -:  913:				}
+     3180:  914:			} else if (v < 0) {
+        -:  915:				// continue down the chain to look for more
+     1396:  916:				itt = node->right;
+        -:  917:			} else {
+        -:  918:				// higher value found update min
+     1784:  919:				rbimpl->min = itt;
+     1784:  920:				itt = node->left;
+        -:  921:			}
+     3380:  922:			if (++i >= 100)
+    #####:  923:				return -1;
+        -:  924:		}
+        -:  925:	}
+      401:  926:	if (end_value != NULL) {
+      400:  927:		u32 itt = impl->root;
+      400:  928:		int i = 0;
+     3998:  929:		while (itt != NIL) {
+     3798:  930:			ORBTreeNode *node = orbtree_node(impl, itt);
+     3798:  931:			int v = impl->compare(node->data, end_value);
+     3798:  932:			if (v == 0) {
+        -:  933:				// exact match
+      400:  934:				if (end_inclusive) {
+      200:  935:					rbimpl->max = itt;
+      200:  936:					break;
+        -:  937:				}
+      200:  938:				itt = node->left;
+     3398:  939:			} else if (v < 0) {
+        -:  940:				// lower value found update max
+     1926:  941:				rbimpl->max = itt;
+     1926:  942:				itt = node->right;
+        -:  943:			} else {
+        -:  944:				// continue down the chain to look for more
+     1472:  945:				itt = node->left;
+        -:  946:			}
+     3598:  947:			if (++i >= 100)
+    #####:  948:				return -1;
+        -:  949:		}
+        -:  950:	}
+        -:  951:
+      401:  952:	return 0;
+        -:  953:}
+        -:  954:
+        1:  955:int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
+        -:  956:					 bool start_inclusive, const void *end_value, bool end_inclusive, bool send) {
+        1:  957:	if (ptr == NULL || iter == NULL) {
+    #####:  958:		SetErr(IllegalArgument);
+    #####:  959:		return -1;
+        -:  960:	}
+        -:  961:
+        1:  962:	ORBTreeImpl *impl = ptr->impl;
+        1:  963:	if (impl == NULL) {
+    #####:  964:		SetErr(IllegalState);
+    #####:  965:		return -1;
+        -:  966:	}
+        -:  967:
+        -:  968:	{
+        2:  969:		SendStateGuard _ = SetSend(send);
+        1:  970:		if (fam_alloc(&iter->impl, sizeof(ORBTreeIteratorImpl))) {
+    #####:  971:			iter->impl = null;
+    #####:  972:			return -1;
+        -:  973:		}
+        -:  974:	}
+        -:  975:
+        1:  976:	return orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value,
+        -:  977:								 end_inclusive);
+        -:  978:}
+      400:  979:int orbtree_iterator_reset(ORBTreeIterator *iter, const void *start_value, bool start_inclusive,
+        -:  980:						   const void *end_value, bool end_inclusive) {
+      400:  981:	if (iter == NULL) {
+    #####:  982:		SetErr(IllegalArgument);
+    #####:  983:		return -1;
+        -:  984:	}
+        -:  985:
+      400:  986:	ORBTreeIteratorImpl *impl = $(iter->impl);
+      400:  987:	ORBTreeImpl *impl2 = impl->impl;
+      400:  988:	if (impl2 == NULL) {
+    #####:  989:		SetErr(IllegalState);
+    #####:  990:		return -1;
+        -:  991:	}
+        -:  992:
+      400:  993:	return orbtree_iterator_impl(impl2, iter, start_value, start_inclusive, end_value,
+        -:  994:								 end_inclusive);
+        -:  995:}
+        -:  996:
+       38:  997:int orbtree_init_free_list(ORBTreeImpl *impl, u8 *data, u32 offset) {
+       38:  998:	u64 cur_index = offset / NODES_PER_CHUNK;
+     3838:  999:	for (int i = 0; i < NODES_PER_CHUNK; i++) {
+     3800: 1000:		if (i < NODES_PER_CHUNK - 1)
+     3762: 1001:			impl->alloc->free_list[i + offset] = offset + i + 1;
+        -: 1002:		else
+       38: 1003:			impl->alloc->free_list[i + offset] = UINT32_MAX;
+        -: 1004:	}
+       38: 1005:	return 0;
+        -: 1006:}
+        -: 1007:
+     3534: 1008:int orbtree_allocate_tray(ORBTree *ptr, ORBTreeTray *tray) {
+     3534: 1009:	if (ptr == NULL || tray == NULL) {
+    #####: 1010:		SetErr(IllegalArgument);
+    #####: 1011:		return -1;
+        -: 1012:	}
+     3534: 1013:	ORBTreeImpl *impl = ptr->impl;
+     3534: 1014:	if (impl == NULL) {
+    #####: 1015:		SetErr(IllegalState);
+    #####: 1016:		return -1;
         -: 1017:	}
-        -: 1018:
-       35: 1019:	ORBTreeNode *node = orbtree_node(impl, node_id);
-        -: 1020:
-        -: 1021:	// Print the right child first (for visual representation)
-       35: 1022:	orbtree_print_node(impl, node->right, depth + 1);
-        -: 1023:
-        -: 1024:	// Indent according to depth
-       93: 1025:	for (int i = 0; i < depth; i++) {
-       58: 1026:		printf("    ");
-        -: 1027:	}
-        -: 1028:
-        -: 1029:	// Print the current node with a clearer representation
-       35: 1030:	printf("%llu (%s,r=%u,l=%u)\n", node->node_id, (IS_BLACK(impl, node_id)) ? "B" : "R",
-        -: 1031:		   node->right_subtree_size, node->left_subtree_size);
-        -: 1032:
-        -: 1033:	// Print the left child
-       35: 1034:	orbtree_print_node(impl, node->left, depth + 1);
-        -: 1035:}
-        -: 1036:
-        5: 1037:void orbtree_print_impl(ORBTreeImpl *impl) {
-        5: 1038:	ORBTreeNode *root = orbtree_node(impl, impl->root);
-        5: 1039:	if (!root)
-    #####: 1040:		printf("Red-Black Tree (root = 0) Empty Tree!\n");
-        -: 1041:	else {
-        5: 1042:		printf("Red-Black Tree (root = %llu)\n", root->node_id);
-        5: 1043:		printf("===================================\n"); // Separator for better clarity
-        5: 1044:		orbtree_print_node(impl, impl->root, 0);
-        5: 1045:		printf("===================================\n"); // Separator for better clarity
-        -: 1046:	}
-        5: 1047:}
-        -: 1048:
-        -: 1049:// Function to print the entire tree
-        5: 1050:void orbtree_print(const ORBTree *ptr) {
-        5: 1051:	ORBTreeImpl *impl = ptr->impl;
-        5: 1052:	orbtree_print_impl(impl);
-        5: 1053:}
-        -: 1054:#endif // TEST
+     3534: 1018:	if (impl->alloc->free_list_head == UINT32_MAX) {
+        -: 1019:		void *tmp;
+       38: 1020:		if (((impl->alloc->capacity / 100) % CHUNKS_PER_RESIZE) == 0) {
+        6: 1021:			if (impl->alloc->capacity == 0) {
+        5: 1022:				tmp = mymalloc(sizeof(void *) * CHUNKS_PER_RESIZE);
+        -: 1023:			} else {
+        1: 1024:				u64 size = (impl->alloc->cur_chunks + CHUNKS_PER_RESIZE) * sizeof(void *);
+        1: 1025:				tmp = myrealloc(impl->alloc->data_chunks, size);
+        -: 1026:			}
+        -: 1027:
+        6: 1028:			if (tmp == NULL) {
+    #####: 1029:				return -1;
+        -: 1030:			}
+        6: 1031:			impl->alloc->cur_chunks += CHUNKS_PER_RESIZE;
+        6: 1032:			impl->alloc->data_chunks = tmp;
+        -: 1033:		}
+       38: 1034:		u64 index = impl->alloc->size / NODES_PER_CHUNK;
+       76: 1035:		impl->alloc->data_chunks[index] =
+       38: 1036:			mymalloc(sizeof(u8) * NODES_PER_CHUNK * (impl->value_size + sizeof(ORBTreeNode)));
+        -: 1037:
+       38: 1038:		if (impl->alloc->data_chunks[index] == NULL) {
+    #####: 1039:			if (impl->alloc->capacity == 0) {
+    #####: 1040:				impl->alloc->cur_chunks = 0;
+    #####: 1041:				impl->alloc->data_chunks = NULL;
+    #####: 1042:				myfree(tmp);
+        -: 1043:			}
+    #####: 1044:			return -1;
+        -: 1045:		}
+        -: 1046:
+       38: 1047:		void *free_list = NULL;
+       38: 1048:		if (impl->alloc->capacity == 0) {
+        5: 1049:			free_list = mymalloc(sizeof(u32) * (impl->alloc->cur_chunks + 1) * NODES_PER_CHUNK);
+        -: 1050:		} else {
+       33: 1051:			free_list = myrealloc(impl->alloc->free_list,
+       33: 1052:								  sizeof(u32) * (impl->alloc->cur_chunks + 1) * NODES_PER_CHUNK);
+        -: 1053:		}
+       38: 1054:		if (free_list == NULL) {
+    #####: 1055:			if (impl->alloc->capacity == 0) {
+    #####: 1056:				impl->alloc->cur_chunks = 0;
+    #####: 1057:				impl->alloc->data_chunks = NULL;
+    #####: 1058:				myfree(tmp);
+    #####: 1059:				myfree(free_list);
+    #####: 1060:				return -1;
+        -: 1061:			}
+        -: 1062:		}
+        -: 1063:
+       38: 1064:		impl->alloc->free_list = free_list;
+       38: 1065:		orbtree_init_free_list(impl, impl->alloc->data_chunks[index], impl->alloc->size);
+       38: 1066:		impl->alloc->free_list_head = impl->alloc->size;
+       38: 1067:		impl->alloc->capacity = (index + 1) * NODES_PER_CHUNK;
+        -: 1068:	}
+        -: 1069:
+     3534: 1070:	u32 next = impl->alloc->free_list_head;
+     3534: 1071:	if (next == NIL)
+    #####: 1072:		return -1;
+     3534: 1073:	tray->value = orbtree_value(impl, next);
+     3534: 1074:	impl->alloc->free_list_head = impl->alloc->free_list[next];
+     3534: 1075:	tray->updated = true;
+     3534: 1076:	tray->id = next;
+     3534: 1077:	impl->alloc->free_list[next] = UINT32_MAX - 1;
+     3534: 1078:	impl->alloc->size++;
+     3534: 1079:	return 0;
+        -: 1080:}
+        -: 1081:
+     1016: 1082:int orbtree_deallocate_tray(ORBTree *ptr, ORBTreeTray *tray) {
+     1016: 1083:	if (ptr == NULL || tray == NULL) {
+    #####: 1084:		SetErr(IllegalArgument);
+    #####: 1085:		return -1;
+        -: 1086:	}
+     1016: 1087:	ORBTreeImpl *impl = ptr->impl;
+     1016: 1088:	if (impl == NULL) {
+    #####: 1089:		SetErr(IllegalState);
+    #####: 1090:		return -1;
+        -: 1091:	}
+        -: 1092:
+     1016: 1093:	if (impl->alloc->free_list == NULL) {
+    #####: 1094:		panic("free list not initialized!");
+        -: 1095:	}
+        -: 1096:
+     1016: 1097:	if ((impl->alloc->free_list)[tray->id] != (UINT32_MAX - 1)) {
+    #####: 1098:		panic("Potential double free. Id = %llu.", tray->id);
+        -: 1099:	}
+        -: 1100:
+     1016: 1101:	impl->alloc->free_list[tray->id] = impl->alloc->free_list_head;
+     1016: 1102:	impl->alloc->free_list_head = tray->id;
+     1016: 1103:	impl->alloc->size--;
+        -: 1104:
+     1016: 1105:	return 0;
+        -: 1106:}
+        -: 1107:
+        -: 1108:#ifdef TEST
+        -: 1109:
+  3006393: 1110:void orbtree_validate_node(const ORBTreeImpl *impl, u32 node, int *black_count,
+        -: 1111:						   int current_black_count) {
+  3006393: 1112:	u64 value_size = impl->value_size;
+        -: 1113:
+        -: 1114:	// Base case: when we reach a NIL
+  3006393: 1115:	if (node == NIL) {
+        -: 1116:		// If this is the first NIL node reached, set the black count
+  1504713: 1117:		if (*black_count == 0) {
+     3033: 1118:			*black_count = current_black_count; // Set the black count for the first path
+        -: 1119:		} else {
+        -: 1120:			// Check for black count consistency
+ 1501680*: 1121:			assert(current_black_count == *black_count);
+        -: 1122:		}
+  1504713: 1123:		return; // Return for NIL nodes
+        -: 1124:	}
+        -: 1125:
+  1501680: 1126:	ORBTreeNode *n = orbtree_node(impl, node);
+        -: 1127:
+        -: 1128:	// check subtree heights
+  1501680: 1129:	u32 right_subtree_sum = 0;
+  1501680: 1130:	if (n->right != NIL) {
+   752520: 1131:		ORBTreeNode *nr = orbtree_node(impl, n->right);
+   752520: 1132:		if (nr)
+   752520: 1133:			right_subtree_sum = 1 + nr->right_subtree_size + nr->left_subtree_size;
+        -: 1134:	}
+  1501680: 1135:	u32 left_subtree_sum = 0;
+  1501680: 1136:	if (n->left != NIL) {
+   746127: 1137:		ORBTreeNode *nl = orbtree_node(impl, n->left);
+   746127: 1138:		if (n)
+   746127: 1139:			left_subtree_sum = 1 + nl->right_subtree_size + nl->left_subtree_size;
+        -: 1140:	}
+        -: 1141:
+  1501680: 1142:	if (left_subtree_sum != n->left_subtree_size || right_subtree_sum != n->right_subtree_size) {
+    #####: 1143:		printf("invalid subtree counts at node = %llu\n", n->node_id);
+        -: 1144:	}
+ 1501680*: 1145:	assert(left_subtree_sum == n->left_subtree_size);
+ 1501680*: 1146:	assert(right_subtree_sum == n->right_subtree_size);
+        -: 1147:
+        -: 1148:	// Increment black count if the current node is black
+  1501680: 1149:	if (IS_BLACK(impl, node)) {
+  1070603: 1150:		current_black_count++;
+        -: 1151:	} else {
+        -: 1152:		//   Check if the node is red
+        -: 1153:		//   If the parent is red, return false (Red property violation)
+  431077*: 1154:		assert(!(n->parent != NIL && IS_RED(impl, n->parent)));
+        -: 1155:	}
+        -: 1156:
+        -: 1157:	// Recursive calls for left and right children
+  1501680: 1158:	orbtree_validate_node(impl, n->left, black_count, current_black_count);
+  1501680: 1159:	orbtree_validate_node(impl, n->right, black_count, current_black_count);
+        -: 1160:}
+        -: 1161:
+     3035: 1162:void orbtree_validate_impl(const ORBTreeImpl *impl) {
+     3035: 1163:	int black_count = 0;
+        -: 1164:	// Validate from the root and check if the root is black
+     3035: 1165:	if (impl->root != NIL) {
+    3033*: 1166:		assert(IS_BLACK(impl, impl->root));
+     3033: 1167:		orbtree_validate_node(impl, impl->root, &black_count, 0);
+        -: 1168:	}
+     3035: 1169:}
+        -: 1170:
+     3035: 1171:void orbtree_validate(const ORBTree *ptr) {
+     3035: 1172:	ORBTreeImpl *impl = ptr->impl;
+     3035: 1173:	orbtree_validate_impl(impl);
+     3035: 1174:}
+        -: 1175:
+        -: 1176:// Function to print a single node with its color
+       75: 1177:void orbtree_print_node(const ORBTreeImpl *impl, u32 node_id, int depth) {
+       75: 1178:	if (node_id == NIL) {
+      168: 1179:		for (int i = 0; i < depth; i++) {
+      128: 1180:			printf("    ");
+        -: 1181:		}
+       40: 1182:		printf("0 (B)\n");
+       40: 1183:		return;
+        -: 1184:	}
+        -: 1185:
+       35: 1186:	ORBTreeNode *node = orbtree_node(impl, node_id);
+        -: 1187:
+        -: 1188:	// Print the right child first (for visual representation)
+       35: 1189:	orbtree_print_node(impl, node->right, depth + 1);
+        -: 1190:
+        -: 1191:	// Indent according to depth
+       93: 1192:	for (int i = 0; i < depth; i++) {
+       58: 1193:		printf("    ");
+        -: 1194:	}
+        -: 1195:
+        -: 1196:	// Print the current node with a clearer representation
+       35: 1197:	printf("%llu (%s,r=%u,l=%u)\n", node->node_id, (IS_BLACK(impl, node_id)) ? "B" : "R",
+        -: 1198:		   node->right_subtree_size, node->left_subtree_size);
+        -: 1199:
+        -: 1200:	// Print the left child
+       35: 1201:	orbtree_print_node(impl, node->left, depth + 1);
+        -: 1202:}
+        -: 1203:
+        5: 1204:void orbtree_print_impl(ORBTreeImpl *impl) {
+        5: 1205:	ORBTreeNode *root = orbtree_node(impl, impl->root);
+        5: 1206:	if (!root)
+    #####: 1207:		printf("Red-Black Tree (root = 0) Empty Tree!\n");
+        -: 1208:	else {
+        5: 1209:		printf("Red-Black Tree (root = %llu)\n", root->node_id);
+        5: 1210:		printf("===================================\n"); // Separator for better clarity
+        5: 1211:		orbtree_print_node(impl, impl->root, 0);
+        5: 1212:		printf("===================================\n"); // Separator for better clarity
+        -: 1213:	}
+        5: 1214:}
+        -: 1215:
+        -: 1216:// Function to print the entire tree
+        5: 1217:void orbtree_print(const ORBTree *ptr) {
+        5: 1218:	ORBTreeImpl *impl = ptr->impl;
+        5: 1219:	orbtree_print_impl(impl);
+        5: 1220:}
+        -: 1221:#endif // TEST
         -:    0:Source:rbtree.c
         -:    0:Graph:rbtree.gcno
         -:    0:Data:rbtree.gcda
-        -:    0:Runs:23
+        -:    0:Runs:24
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -6022,7 +6189,7 @@
         -:    0:Source:rc.c
         -:    0:Graph:rc.gcno
         -:    0:Data:rc.gcda
-        -:    0:Runs:23
+        -:    0:Runs:24
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -6061,13 +6228,13 @@
         -:   36:	u64 size;				 // size of data
         -:   37:} RcMeta;
         -:   38:
-       23:   39:void __attribute__((constructor)) __check_atomic_size__() {
+       24:   39:void __attribute__((constructor)) __check_atomic_size__() {
         -:   40:	if (sizeof(RcMetaAtomic) != sizeof(RcMeta)) {
         -:   41:		fprintf(stderr, "Error: sizes of RcMetaAtomic and RcMeta are not equal on this platform. "
         -:   42:						"Cannnot continue\n");
         -:   43:		exit(EXIT_FAILURE);
         -:   44:	}
-       23:   45:}
+       24:   45:}
         -:   46:
         -:   47:typedef struct RcImpl {
         -:   48:	RcMeta meta; // meta data for this Rc
