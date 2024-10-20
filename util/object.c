@@ -33,7 +33,6 @@ typedef struct ORBContext {
 } ORBContext;
 
 pthread_rwlock_t global_rbtree_lock = PTHREAD_RWLOCK_INITIALIZER;
-volatile bool global_rbtree_lock_has_lock = false;
 _Thread_local ORBContext *tl_orb_context = NULL;
 ORBContext *global_orb_context = NULL;
 
@@ -190,14 +189,12 @@ int object_init_global() {
 	if (init_tl_range_values())
 		return -1;
 	if (global_orb_context == NULL) {
-		if (!global_rbtree_lock_has_lock && pthread_rwlock_wrlock(&global_rbtree_lock))
+		if (pthread_rwlock_wrlock(&global_rbtree_lock))
 			panic("rwlock error!");
-		global_rbtree_lock_has_lock = true;
 		if (global_orb_context == NULL) {
 			global_orb_context = init_orb_context(true);
 		}
 
-		global_rbtree_lock_has_lock = false;
 		if (pthread_rwlock_unlock(&global_rbtree_lock))
 			panic("rwlock error!");
 		if (global_orb_context == NULL)
@@ -289,9 +286,8 @@ void object_cleanup_rc(ObjectImpl *impl) {
 		ORBTreeIteratorNc *sequence_itt;
 		ORBTreeNc *sequence_tree;
 		if (send) {
-			if (!global_rbtree_lock_has_lock && pthread_rwlock_wrlock(&global_rbtree_lock))
+			if (pthread_rwlock_wrlock(&global_rbtree_lock))
 				panic("rwlock error!");
-			global_rbtree_lock_has_lock = true;
 			itt = global_orb_context->sorted_itt;
 			tree = global_orb_context->sorted_tree;
 			sequence_tree = global_orb_context->sequence_tree;
@@ -351,7 +347,6 @@ void object_cleanup_rc(ObjectImpl *impl) {
 		}
 
 		if (send) {
-			global_rbtree_lock_has_lock = false;
 			if (pthread_rwlock_unlock(&global_rbtree_lock))
 				panic("rwlock error!");
 		}
@@ -435,9 +430,8 @@ int object_put_trees(ObjectImpl *impl, bool send, ObjectValue *val) {
 	ORBTreeNc *tree;
 	ORBTreeNc *sequence_tree;
 	if (send) {
-		if (!global_rbtree_lock_has_lock && pthread_rwlock_wrlock(&global_rbtree_lock))
+		if (pthread_rwlock_wrlock(&global_rbtree_lock))
 			panic("rwlock error!");
-		global_rbtree_lock_has_lock = true;
 		tree = global_orb_context->sorted_tree;
 		sequence_tree = global_orb_context->sequence_tree;
 	} else {
@@ -469,7 +463,6 @@ int object_put_trees(ObjectImpl *impl, bool send, ObjectValue *val) {
 		}
 	}
 	if (send) {
-		global_rbtree_lock_has_lock = false;
 		if (pthread_rwlock_unlock(&global_rbtree_lock))
 			panic("rwlock error!");
 	}
@@ -594,9 +587,8 @@ const ObjectValueData *object_get_property_data(const Object *obj, const char *n
 	ORBTreeNc *tree;
 	if (send) {
 		tree = global_orb_context->sorted_tree;
-		if (!global_rbtree_lock_has_lock && pthread_rwlock_wrlock(&global_rbtree_lock))
+		if (pthread_rwlock_wrlock(&global_rbtree_lock))
 			panic("rwlock error!");
-		global_rbtree_lock_has_lock = true;
 	} else
 		tree = tl_orb_context->sorted_tree;
 
@@ -616,7 +608,6 @@ const ObjectValueData *object_get_property_data(const Object *obj, const char *n
 		v = orbtree_get(tree, &objvalue, tray);
 	}
 	if (send) {
-		global_rbtree_lock_has_lock = false;
 		pthread_rwlock_unlock(&global_rbtree_lock);
 	}
 
@@ -694,7 +685,7 @@ Object object_get_property_index(const Object *obj, u32 index) {
 	ORBTreeNc *tree;
 	if (send) {
 		tree = global_orb_context->sequence_tree;
-		if (!global_rbtree_lock_has_lock && pthread_rwlock_wrlock(&global_rbtree_lock))
+		if (pthread_rwlock_wrlock(&global_rbtree_lock))
 			panic("rwlock error!");
 	} else
 		tree = tl_orb_context->sequence_tree;
@@ -705,7 +696,6 @@ Object object_get_property_index(const Object *obj, u32 index) {
 	tray.updated = false;
 	int v = orbtree_get(tree, &objvalue, &tray);
 	if (send) {
-		global_rbtree_lock_has_lock = false;
 		pthread_rwlock_unlock(&global_rbtree_lock);
 	}
 
