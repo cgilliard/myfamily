@@ -946,6 +946,7 @@ int orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *
 				return -1;
 		}
 	}
+
 	if (end_value != NULL) {
 		u32 itt = impl->root;
 		int i = 0;

@@ -986,6 +986,15 @@ MyTest(util, test_object) {
 		cr_assert(!nil(b_out));
 		cr_assert(!strcmp(object_as_string(&b_out), "bval"));
 	}
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
 }
 
 MyTest(util, test_object_mix_send) {
@@ -1016,6 +1025,14 @@ MyTest(util, test_object_mix_send) {
 		cr_assert(!nil(b_out));
 		cr_assert(!strcmp(object_as_string(&b_out), "bval"));
 	}
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
 }
 
 MyTest(util, test_object_ref) {
@@ -1031,6 +1048,14 @@ MyTest(util, test_object_ref) {
 		}
 		cr_assert(!strcmp(object_as_string(&n2), "n1"));
 	}
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
 }
 
 MyTest(util, test_object_ref_send) {
@@ -1046,6 +1071,14 @@ MyTest(util, test_object_ref_send) {
 		}
 		cr_assert(!strcmp(object_as_string(&n2), "n1"));
 	}
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
 }
 
 MyTest(util, test_object_nested) {
@@ -1110,6 +1143,15 @@ MyTest(util, test_object_nested) {
 	// calls cleanup on our other owned objects. All of them are deleted from the thread local
 	// rbtree and internally their memory is deallocated.
 	cr_assert_eq(get_thread_local_orbtree_size(), 0);
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
 }
 
 MyTest(util, test_object_nested_send) {
@@ -1174,6 +1216,15 @@ MyTest(util, test_object_nested_send) {
 	// calls cleanup on our other owned objects. All of them are deleted from the thread local
 	// rbtree and internally their memory is deallocated.
 	cr_assert_eq(get_global_orbtree_size(), 0);
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
 }
 
 MyTest(util, test_object_remove) {
@@ -1198,6 +1249,15 @@ MyTest(util, test_object_remove) {
 		let ret6 = object_remove_property(&x1, "blah");
 		cr_assert(nil(ret6));
 	}
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
 }
 
 MyTest(util, test_object_remove_send) {
@@ -1222,6 +1282,14 @@ MyTest(util, test_object_remove_send) {
 		let ret6 = object_remove_property(&x1, "blah");
 		cr_assert(nil(ret6));
 	}
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
 }
 
 MyTest(util, test_object_overwrite) {
@@ -1243,6 +1311,15 @@ MyTest(util, test_object_overwrite) {
 		cr_assert(!nil(res4));
 		cr_assert(!strcmp(object_as_string(&res4), "testx3"));
 	}
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
 }
 
 MyTest(util, test_object_overwrite_send) {
@@ -1263,5 +1340,81 @@ MyTest(util, test_object_overwrite_send) {
 		let res4 = object_get_property(&x1, "v");
 		cr_assert(!nil(res4));
 		cr_assert(!strcmp(object_as_string(&res4), "testx3"));
+	}
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
+}
+
+MyTest(util, test_object_get_index) {
+	{
+		var x1 = object_create(false, ObjectTypeObject, NULL);
+		let x2 = object_create(false, ObjectTypeString, "testx2");
+		let x3 = object_create(false, ObjectTypeString, "testx3");
+		let x4 = object_create(false, ObjectTypeString, "testx4");
+		let x5 = object_create(false, ObjectTypeString, "testx5");
+
+		let res1 = object_set_property(&x1, "x2", &x2);
+		cr_assert(!nil(res1));
+
+		let res2 = object_set_property(&x1, "x3", &x3);
+		cr_assert(!nil(res2));
+
+		let res3 = object_set_property(&x1, "x4", &x4);
+		cr_assert(!nil(res2));
+
+		let res4 = object_set_property(&x1, "x5", &x5);
+		cr_assert(!nil(res2));
+
+		printf("=======================get prop-------------------------------\n");
+		let res5 = object_get_property_index(&x1, 1);
+		cr_assert(!nil(res5));
+		cr_assert(!strcmp(object_as_string(&res5), "testx3"));
+	}
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_size(), get_global_orbtree_size());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),
+		   get_global_orbtree_seq_size());
+
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),
+		   get_global_orbtree_alloc_count());
+	printf("tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_alloc_count(),
+		   get_global_orbtree_seq_alloc_count());
+}
+
+typedef struct TestSeqComp {
+	u64 namespace;
+	u64 seqno;
+} TestSeqComp;
+
+int object_test_sequence_compare(const void *v1, const void *v2) {
+	printf("object_sequence_compare\n");
+	const TestSeqComp *k1 = v1;
+	const TestSeqComp *k2 = v2;
+	printf("seq compare k1 ns=%llu seq=%llu , k2 ns=%llu seqno=%llu\n", k1->namespace, k1->seqno,
+		   k2->namespace, k2->seqno);
+	if (k1->namespace != k2->namespace) {
+		if (k1->namespace < k2->namespace) {
+			printf("k1<k2\n");
+			return -1;
+		} else {
+			printf("k1>k2\n");
+			return 1;
+		}
+	} else {
+		if (k1->seqno < k2->seqno) {
+			printf("k1_seqno<k2_seqno\n");
+			return -1;
+		} else if (k1->seqno > k2->seqno) {
+			printf("k1_seqno>k2_seqno\n");
+			return 1;
+		}
+		printf("found a match!\n");
+		return 0;
 	}
 }
