@@ -12,7 +12,7 @@ var searchData=
   ['bitflags_71',['BitFlags',['../structBitFlags.html',1,'BitFlags'],['../bitflags_8h.html#a8eb92e9b6350d8df57f94e3c6fa892dc',1,'BitFlags():&#160;bitflags.h']]],
   ['bitflags_2ec_72',['bitflags.c',['../bitflags_8c.html',1,'']]],
   ['bitflags_2eh_73',['bitflags.h',['../bitflags_8h.html',1,'']]],
-  ['bitflags_5fcheck_74',['bitflags_check',['../bitflags_8c.html#af953aa50ffdff7cb7877e51b519c6e02',1,'bitflags_check(BitFlags *ptr, u32 index):&#160;bitflags.c'],['../bitflags_8h.html#af953aa50ffdff7cb7877e51b519c6e02',1,'bitflags_check(BitFlags *ptr, u32 index):&#160;bitflags.c']]],
+  ['bitflags_5fcheck_74',['bitflags_check',['../bitflags_8c.html#a6d99c6943b7dec9ea73927ecc378c5e5',1,'bitflags_check(const BitFlags *ptr, u32 index):&#160;bitflags.c'],['../bitflags_8h.html#a6d99c6943b7dec9ea73927ecc378c5e5',1,'bitflags_check(const BitFlags *ptr, u32 index):&#160;bitflags.c']]],
   ['bitflags_5fset_75',['bitflags_set',['../bitflags_8c.html#a0a0d54a86af67f8250d466bfa6cf957f',1,'bitflags_set(BitFlags *ptr, u32 index, bool value):&#160;bitflags.c'],['../bitflags_8h.html#a0a0d54a86af67f8250d466bfa6cf957f',1,'bitflags_set(BitFlags *ptr, u32 index, bool value):&#160;bitflags.c']]],
   ['blue_76',['BLUE',['../colors_8h.html#a79d10e672abb49ad63eeaa8aaef57c38',1,'colors.h']]],
   ['bool_77',['bool',['../types_8h.html#abb452686968e48b67397da5f97445f5b',1,'types.h']]],
