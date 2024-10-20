@@ -16,7 +16,7 @@ var searchData=
   ['path_2ec_558',['path.c',['../path_8c.html',1,'']]],
   ['path_2eh_559',['path.h',['../path_8h.html',1,'']]],
   ['path_5fcanonicalize_560',['path_canonicalize',['../path_8h.html#a7c8217dbbe751d9ece0cd155afc672e7',1,'path_canonicalize(Path *p):&#160;path.c'],['../path_8c.html#a7c8217dbbe751d9ece0cd155afc672e7',1,'path_canonicalize(Path *p):&#160;path.c']]],
-  ['path_5fcleanup_561',['path_cleanup',['../path_8c.html#af2abcd42f8ea2c07c2333f60d578f1a0',1,'path_cleanup(PathImpl *ptr):&#160;path.c'],['../path_8h.html#af2abcd42f8ea2c07c2333f60d578f1a0',1,'path_cleanup(PathImpl *ptr):&#160;path.c']]],
+  ['path_5fcleanup_561',['path_cleanup',['../path_8h.html#af2abcd42f8ea2c07c2333f60d578f1a0',1,'path_cleanup(PathImpl *ptr):&#160;path.c'],['../path_8c.html#af2abcd42f8ea2c07c2333f60d578f1a0',1,'path_cleanup(PathImpl *ptr):&#160;path.c']]],
   ['path_5fcopy_562',['path_copy',['../path_8c.html#aa74390413dcff75de2298054879f7ab6',1,'path_copy(Path *dst, const Path *src):&#160;path.c'],['../path_8h.html#aa74390413dcff75de2298054879f7ab6',1,'path_copy(Path *dst, const Path *src):&#160;path.c']]],
   ['path_5fexists_563',['path_exists',['../path_8c.html#a668e7b18d0178b35a818d3f3f302981c',1,'path_exists(const Path *p):&#160;path.c'],['../path_8h.html#a668e7b18d0178b35a818d3f3f302981c',1,'path_exists(const Path *p):&#160;path.c']]],
   ['path_5ffile_5fname_564',['path_file_name',['../path_8c.html#a02bcc34b38eb83baffcacd38ab76591c',1,'path_file_name(const Path *p):&#160;path.c'],['../path_8h.html#a02bcc34b38eb83baffcacd38ab76591c',1,'path_file_name(const Path *p):&#160;path.c']]],
@@ -26,12 +26,12 @@ var searchData=
   ['path_5fis_5fdir_568',['path_is_dir',['../path_8h.html#a90b6a2154ce88049f2620729fe258aa0',1,'path_is_dir(const Path *p):&#160;path.c'],['../path_8c.html#a90b6a2154ce88049f2620729fe258aa0',1,'path_is_dir(const Path *p):&#160;path.c']]],
   ['path_5fmkdir_569',['path_mkdir',['../path_8h.html#af458685a462418befcec814730830591',1,'path_mkdir(Path *p, u64 mode, bool parent):&#160;path.c'],['../path_8c.html#af458685a462418befcec814730830591',1,'path_mkdir(Path *p, u64 mode, bool parent):&#160;path.c']]],
   ['path_5fpop_570',['path_pop',['../path_8h.html#ab89335465f835076656cffe70adcc697',1,'path_pop(Path *p):&#160;path.c'],['../path_8c.html#ab89335465f835076656cffe70adcc697',1,'path_pop(Path *p):&#160;path.c']]],
-  ['path_5fpush_571',['path_push',['../path_8h.html#aa1f3796e0c4b638b3f9d6cae8610f775',1,'path_push(Path *p, const char *next):&#160;path.c'],['../path_8c.html#aa1f3796e0c4b638b3f9d6cae8610f775',1,'path_push(Path *p, const char *next):&#160;path.c']]],
+  ['path_5fpush_571',['path_push',['../path_8c.html#aa1f3796e0c4b638b3f9d6cae8610f775',1,'path_push(Path *p, const char *next):&#160;path.c'],['../path_8h.html#aa1f3796e0c4b638b3f9d6cae8610f775',1,'path_push(Path *p, const char *next):&#160;path.c']]],
   ['path_5freplace_5fhome_572',['path_replace_home',['../path_8c.html#a68220aefa3e453991b743ae05c8229f7',1,'path.c']]],
   ['path_5fseparator_573',['PATH_SEPARATOR',['../path_8h.html#a256a5721249aa3309437212cc21a9fe4',1,'path.h']]],
   ['path_5fseparator_5fchar_574',['PATH_SEPARATOR_CHAR',['../path_8h.html#a581727c17b559af16969b4073417701d',1,'path.h']]],
   ['path_5fto_5fstring_575',['path_to_string',['../path_8c.html#aca543d50b7beb40ebb9584fec3e2eb6f',1,'path_to_string(const Path *p):&#160;path.c'],['../path_8h.html#aca543d50b7beb40ebb9584fec3e2eb6f',1,'path_to_string(const Path *p):&#160;path.c']]],
-  ['pathimpl_576',['PathImpl',['../structPathImpl.html',1,'PathImpl'],['../path_8h.html#a10c4728e0d825b7a52e8a9939d4f93ff',1,'PathImpl():&#160;path.h']]],
+  ['pathimpl_576',['PathImpl',['../path_8h.html#a10c4728e0d825b7a52e8a9939d4f93ff',1,'PathImpl():&#160;path.h'],['../structPathImpl.html',1,'PathImpl']]],
   ['permission_577',['Permission',['../fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca196bfaf70be7cd8996ee78d2b27cd586',1,'fam_err.h']]],
   ['pin_578',['pin',['../slabs_8h.html#a99496865f85e74500244d760eb9340f6',1,'slabs.h']]],
   ['pos_579',['pos',['../structTokenizerIml.html#a7acd1cc2f185e212b7751ac74543fa72',1,'TokenizerIml']]],
@@ -50,5 +50,5 @@ var searchData=
   ['psrng_5frand_5fu64_592',['psrng_rand_u64',['../psrng_8c.html#ae5c65abcad995b64c742d6910bfc4965',1,'psrng_rand_u64(u64 *v):&#160;psrng.c'],['../psrng_8h.html#ae5c65abcad995b64c742d6910bfc4965',1,'psrng_rand_u64(u64 *v):&#160;psrng.c']]],
   ['psrng_5frand_5fu8_593',['psrng_rand_u8',['../psrng_8c.html#aa17ce4758dc77f176695046ca1ba760d',1,'psrng_rand_u8(u8 *v):&#160;psrng.c'],['../psrng_8h.html#aa17ce4758dc77f176695046ca1ba760d',1,'psrng_rand_u8(u8 *v):&#160;psrng.c']]],
   ['psrng_5freseed_594',['psrng_reseed',['../psrng_8c.html#a9cf19cf3c23e84e90c8bccc6837e8632',1,'psrng_reseed():&#160;psrng.c'],['../psrng_8h.html#a9cf19cf3c23e84e90c8bccc6837e8632',1,'psrng_reseed():&#160;psrng.c']]],
-  ['ptr_595',['ptr',['../structPathImpl.html#a38ef32862a839b839545d2a664deb315',1,'PathImpl::ptr()'],['../structObjectValue.html#af722882ac360954d75b4b684c570e6f0',1,'ObjectValue::ptr()']]]
+  ['ptr_595',['ptr',['../structPathImpl.html#a38ef32862a839b839545d2a664deb315',1,'PathImpl']]]
 ];

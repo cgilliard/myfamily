@@ -30,11 +30,10 @@ var searchData=
   ['cond_114',['cond',['../base_2test_8c.html#a0a1433271fddfed84bc959ae6c202e5a',1,'test.c']]],
   ['copy_5ffile_115',['copy_file',['../misc_8h.html#aa5a851f57e7a29d68e705f0a04826f50',1,'copy_file(const Path *dst, const Path *src):&#160;misc.c'],['../misc_8c.html#afd350a7f7e18c0019216191cd029f61d',1,'copy_file(const Path *dst_path, const Path *src_path):&#160;misc.c']]],
   ['counts_116',['counts',['../structRcMetaAtomic.html#a46882e4558aa9e96c5d2ef306e741910',1,'RcMetaAtomic']]],
-  ['create_5fempty_117',['create_empty',['../object__macros_8h.html#a84affe82f1ae71e01def5b72d17fcd8a',1,'object_macros.h']]],
-  ['ctr_118',['CTR',['../aes_8h.html#aa445a79fc0f7373036c72d198e51f19a',1,'aes.h']]],
-  ['cur_119',['cur',['../structORBTreeIteratorImpl.html#ae5c4640788ac67ce0bdf145addc00fe3',1,'ORBTreeIteratorImpl::cur()'],['../structRBTreeIteratorImpl.html#ad65c62f45269033ab1bfc423c8f65048',1,'RBTreeIteratorImpl::cur()']]],
-  ['cur_5fchunks_120',['cur_chunks',['../structSlabData.html#ac095f43a290f29f0cef6fcb7b676f266',1,'SlabData::cur_chunks()'],['../structORBAllocator.html#aabcb0b8bf4ef8b8ee0f0c490979bfbfb',1,'ORBAllocator::cur_chunks()']]],
-  ['cur_5fentries_121',['cur_entries',['../structBacktrace.html#a8488e57eea86a8f768dc71789027a4fa',1,'Backtrace']]],
-  ['cur_5fslabs_122',['cur_slabs',['../structSlabData.html#a4a4db7dd892f566ce1a645a21d94ebc2',1,'SlabData']]],
-  ['cyan_123',['CYAN',['../colors_8h.html#ad243f93c16bc4c1d3e0a13b84421d760',1,'colors.h']]]
+  ['ctr_117',['CTR',['../aes_8h.html#aa445a79fc0f7373036c72d198e51f19a',1,'aes.h']]],
+  ['cur_118',['cur',['../structORBTreeIteratorImpl.html#ae5c4640788ac67ce0bdf145addc00fe3',1,'ORBTreeIteratorImpl::cur()'],['../structRBTreeIteratorImpl.html#ad65c62f45269033ab1bfc423c8f65048',1,'RBTreeIteratorImpl::cur()']]],
+  ['cur_5fchunks_119',['cur_chunks',['../structSlabData.html#ac095f43a290f29f0cef6fcb7b676f266',1,'SlabData::cur_chunks()'],['../structORBAllocator.html#aabcb0b8bf4ef8b8ee0f0c490979bfbfb',1,'ORBAllocator::cur_chunks()']]],
+  ['cur_5fentries_120',['cur_entries',['../structBacktrace.html#a8488e57eea86a8f768dc71789027a4fa',1,'Backtrace']]],
+  ['cur_5fslabs_121',['cur_slabs',['../structSlabData.html#a4a4db7dd892f566ce1a645a21d94ebc2',1,'SlabData']]],
+  ['cyan_122',['CYAN',['../colors_8h.html#ad243f93c16bc4c1d3e0a13b84421d760',1,'colors.h']]]
 ];

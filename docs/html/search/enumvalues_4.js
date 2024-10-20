@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['lexerstatecomplete_1642',['LexerStateComplete',['../lexer__state_8h.html#a676da06e4f68dabdd8f4d7a9bf2dc416a795613f5fa73a132c5f4ef67e12e3db2',1,'lexer_state.h']]],
-  ['lexerstateerr_1643',['LexerStateErr',['../lexer__state_8h.html#a676da06e4f68dabdd8f4d7a9bf2dc416a9a9b2f13849215bd8340d265dd220168',1,'lexer_state.h']]],
-  ['lexerstateok_1644',['LexerStateOk',['../lexer__state_8h.html#a676da06e4f68dabdd8f4d7a9bf2dc416aff7cee601091c7114fdfd8eb5d369da8',1,'lexer_state.h']]]
+  ['illegalargument_1643',['IllegalArgument',['../fam__err_8h.html#a314d11eafb91af52b8b344055d7748acaa42bd89548de19560a2662f9505f13a8',1,'fam_err.h']]],
+  ['illegalstate_1644',['IllegalState',['../fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca54830b49aab667f580bb359e673a8018',1,'fam_err.h']]],
+  ['indexoutofbounds_1645',['IndexOutOfBounds',['../fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca4e252e6f5e0c6f339e0685480cfb93aa',1,'fam_err.h']]],
+  ['initerr_1646',['InitErr',['../fam__err_8h.html#a314d11eafb91af52b8b344055d7748aca40985f68ec32639000631140829be47e',1,'fam_err.h']]],
+  ['io_1647',['IO',['../fam__err_8h.html#a314d11eafb91af52b8b344055d7748acaedd9974ef2207e0a03e0717dcb9e2269',1,'fam_err.h']]]
 ];
