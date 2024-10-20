@@ -315,6 +315,7 @@ void object_cleanup_rc(ObjectImpl *impl) {
 			value.name = *properties[i];
 			orbtree_remove(tree, &value, &tray);
 			ObjectValueNc *rem = tray.value;
+			u64 seqno = rem->seqno;
 			ObjectValueData *obj_data = $(rem->value);
 			if (obj_data->type == ObjectTypeObject) {
 				to_cleanup[cleanup_count++] = (ObjectNc *)obj_data->value;
@@ -323,25 +324,8 @@ void object_cleanup_rc(ObjectImpl *impl) {
 			fam_free(&rem->value);
 			fam_free(&rem->name);
 			orbtree_deallocate_tray(tree, &tray);
-		}
 
-		orbtree_iterator_reset(sequence_itt, &tl_start_range_value, true, &tl_end_range_value,
-							   false);
-
-		i = 0;
-		u64 seqnos[impl->property_count];
-		while (orbtree_iterator_next(sequence_itt, &tray)) {
-			assert(i < impl->property_count);
-			ObjectValueNc *v = tray.value;
-			seqnos[i] = v->seqno;
-			i++;
-		}
-		assert(i == impl->property_count);
-
-		for (i = 0; i < impl->property_count; i++) {
-			ObjectValueNc value;
-			value.namespace = impl->namespace;
-			value.seqno = seqnos[i];
+			value.seqno = seqno;
 			int res = orbtree_remove(sequence_tree, &value, &tray);
 			orbtree_deallocate_tray(sequence_tree, &tray);
 		}
@@ -457,6 +441,11 @@ int object_put_trees(ObjectImpl *impl, bool send, ObjectValue *val) {
 			object_value_cleanup(&obv);
 			orbtree_deallocate_tray(tree, &tray);
 			orbtree_deallocate_tray(sequence_tree, &sequence_tray);
+
+			// reset seqno to previous value
+			orbtree_get(tree, tray.value, &retval);
+			ObjectValueNc *v = retval.value;
+			v->seqno = obv.seqno;
 		} else {
 			memcpy(sequence_tray.value, val, sizeof(ObjectValue));
 			orbtree_put(sequence_tree, &sequence_tray, &sequence_retval);
@@ -585,12 +574,16 @@ const ObjectValueData *object_get_property_data(const Object *obj, const char *n
 	}
 
 	ORBTreeNc *tree;
+	ORBTreeNc *sequence_tree;
 	if (send) {
-		tree = global_orb_context->sorted_tree;
 		if (pthread_rwlock_wrlock(&global_rbtree_lock))
 			panic("rwlock error!");
-	} else
+		tree = global_orb_context->sorted_tree;
+		sequence_tree = global_orb_context->sequence_tree;
+	} else {
 		tree = tl_orb_context->sorted_tree;
+		sequence_tree = tl_orb_context->sequence_tree;
+	}
 
 	ObjectValue objvalue = INIT_OBJECT_VALUE;
 	object_value_for(&objvalue, obj, name, -1);
@@ -600,9 +593,13 @@ const ObjectValueData *object_get_property_data(const Object *obj, const char *n
 		v = orbtree_remove(tree, &objvalue, tray);
 		if (v == 0) {
 			ObjectValueNc *rem = tray->value;
+			u64 seqno = rem->seqno;
 			ObjectValueData *obj_data = $(rem->value);
 			fam_free(&rem->name);
 			orbtree_deallocate_tray(tree, tray);
+			objvalue.seqno = seqno;
+			orbtree_remove(sequence_tree, &objvalue, tray);
+			orbtree_deallocate_tray(sequence_tree, tray);
 		}
 	} else {
 		v = orbtree_get(tree, &objvalue, tray);

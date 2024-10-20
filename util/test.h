@@ -76,6 +76,26 @@
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
 		}                                                                                          \
+		if (get_thread_local_orbtree_size() || get_global_orbtree_size() ||                        \
+			get_thread_local_orbtree_seq_size() || get_global_orbtree_seq_size() ||                \
+			get_thread_local_orbtree_alloc_count() || get_global_orbtree_alloc_count() ||          \
+			get_thread_local_orbtree_seq_alloc_count() || get_global_orbtree_seq_alloc_count()) {  \
+			printf("[%s====%s] %sError in tear_down of test%s "                                    \
+				   "'%s%s%s'.\n[%s====%s] MISC RBTree in Object items not deleted. See below. "    \
+				   "Memory leak?\n",                                                               \
+				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
+			printf("orbtree_size tl=%llu,global=%llu\n", get_thread_local_orbtree_size(),          \
+				   get_global_orbtree_size());                                                     \
+			printf("orbtree_seq_size tl=%llu,global=%llu\n", get_thread_local_orbtree_seq_size(),  \
+				   get_global_orbtree_seq_size());                                                 \
+			printf("orbtree_alloc tl=%llu,global=%llu\n", get_thread_local_orbtree_alloc_count(),  \
+				   get_global_orbtree_alloc_count());                                              \
+			printf("orbtree_seq_alloc tl=%llu,global=%llu\n",                                      \
+				   get_thread_local_orbtree_seq_alloc_count(),                                     \
+				   get_global_orbtree_seq_alloc_count());                                          \
+			pid_t iPid = getpid();                                                                 \
+			kill(iPid, SIGINT); /* trigger failure */                                              \
+		}                                                                                          \
 		object_cleanup_global();                                                                   \
 		object_cleanup_thread_local();                                                             \
 		u64 slabs = fam_alloc_count_tl_slab_allocator();                                           \
