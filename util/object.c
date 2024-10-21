@@ -24,6 +24,8 @@
 #include <util/object_macros.h>
 #include <util/orbtree.h>
 
+#define MAX_CLEANUP_STACK_SIZE 100
+
 typedef struct ORBContext {
 	ORBTreeTray tray;
 	ORBTreeTray sequence_tray;
@@ -275,13 +277,32 @@ void object_cleanup_rc(ObjectImpl *impl) {
 		impl->self = null;
 	}
 	if (impl->property_count) {
-		ObjectNc *to_cleanup[impl->property_count];
+		u64 size = impl->property_count;
+		if (size > MAX_CLEANUP_STACK_SIZE)
+			size = 1;
+		ObjectNc *to_cleanup_stack[size];
+		ObjectNc **to_cleanup;
+		if (impl->property_count > MAX_CLEANUP_STACK_SIZE) {
+			to_cleanup = mymalloc(impl->property_count * sizeof(Object *));
+			if (to_cleanup == NULL)
+				panic("Could not allocate enoough memory to cleanup!");
+		} else
+			to_cleanup = (ObjectNc **)to_cleanup_stack;
 		u64 cleanup_count = 0;
 		tl_start_range_value.namespace = impl->namespace;
 		tl_end_range_value.namespace = impl->namespace + 1;
 
 		bool send = impl->send;
-		FatPtr *properties[impl->property_count];
+
+		FatPtr *properties_stack[size];
+		FatPtr **properties;
+
+		if (impl->property_count > MAX_CLEANUP_STACK_SIZE) {
+			properties = mymalloc(impl->property_count * sizeof(FatPtr *));
+			if (properties == NULL)
+				panic("Could not allocate enoough memory to cleanup!");
+		} else
+			properties = properties_stack;
 
 		ORBContext *ctx = object_get_context_and_lock(impl);
 		ORBTreeIteratorNc *itt = ctx->itt;
@@ -334,6 +355,11 @@ void object_cleanup_rc(ObjectImpl *impl) {
 
 		for (i = 0; i < cleanup_count; i++) {
 			object_cleanup(to_cleanup[i]);
+		}
+
+		if (impl->property_count > MAX_CLEANUP_STACK_SIZE) {
+			myfree(to_cleanup);
+			myfree(properties);
 		}
 	}
 }
