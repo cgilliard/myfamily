@@ -125,6 +125,10 @@ Functions</h2></td></tr>
 <tr class="separator:a099746bea5f54362b0dead7d703938aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2afdb080b008111929dff04c5f42757b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8h.html#a2afdb080b008111929dff04c5f42757b">orbtree_remove</a> (<a class="el" href="orbtree_8h.html#a62c34b888a30a290d4c587f642e3ae7f">ORBTree</a> *ptr, const void *value, <a class="el" href="structORBTreeTray.html">ORBTreeTray</a> *removed)</td></tr>
 <tr class="separator:a2afdb080b008111929dff04c5f42757b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23827eb8dea41ad837a4bfb1b15b4c02"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8h.html#a23827eb8dea41ad837a4bfb1b15b4c02">orbtree_get_index_ranged</a> (const <a class="el" href="orbtree_8h.html#a62c34b888a30a290d4c587f642e3ae7f">ORBTree</a> *ptr, <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> index, <a class="el" href="structORBTreeTray.html">ORBTreeTray</a> *tray, const void *start_value, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> start_inclusive)</td></tr>
+<tr class="separator:a23827eb8dea41ad837a4bfb1b15b4c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a844bc952c6460603872053a64ec86c83"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8h.html#a844bc952c6460603872053a64ec86c83">orbtree_remove_index_ranged</a> (<a class="el" href="orbtree_8h.html#a62c34b888a30a290d4c587f642e3ae7f">ORBTree</a> *ptr, <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> index, <a class="el" href="structORBTreeTray.html">ORBTreeTray</a> *removed, const void *start_value, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> start_inclusive)</td></tr>
+<tr class="separator:a844bc952c6460603872053a64ec86c83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad16595ceaea27cfc2d08f67b7dd545b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8h.html#ad16595ceaea27cfc2d08f67b7dd545b9">orbtree_get_index</a> (const <a class="el" href="orbtree_8h.html#a62c34b888a30a290d4c587f642e3ae7f">ORBTree</a> *ptr, <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> index, <a class="el" href="structORBTreeTray.html">ORBTreeTray</a> *tray)</td></tr>
 <tr class="separator:ad16595ceaea27cfc2d08f67b7dd545b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a32f210f517982cd5305f855f8bd5f446"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8h.html#a32f210f517982cd5305f855f8bd5f446">orbtree_remove_index</a> (<a class="el" href="orbtree_8h.html#a62c34b888a30a290d4c587f642e3ae7f">ORBTree</a> *ptr, <a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a> index, <a class="el" href="structORBTreeTray.html">ORBTreeTray</a> *removed)</td></tr>
@@ -421,6 +425,52 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a23827eb8dea41ad837a4bfb1b15b4c02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23827eb8dea41ad837a4bfb1b15b4c02">&#9670;&nbsp;</a></span>orbtree_get_index_ranged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int orbtree_get_index_ranged </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="orbtree_8h.html#a62c34b888a30a290d4c587f642e3ae7f">ORBTree</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a>&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structORBTreeTray.html">ORBTreeTray</a> *&#160;</td>
+          <td class="paramname"><em>tray</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>start_value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>start_inclusive</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a0e4bb67a6b737b740097f19e3e312ef8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0e4bb67a6b737b740097f19e3e312ef8">&#9670;&nbsp;</a></span>orbtree_iterator()</h2>
 
@@ -662,6 +712,52 @@ Functions</h2></td></tr>
           <td></td>
           <td class="paramtype"><a class="el" href="structORBTreeTray.html">ORBTreeTray</a> *&#160;</td>
           <td class="paramname"><em>removed</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a844bc952c6460603872053a64ec86c83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a844bc952c6460603872053a64ec86c83">&#9670;&nbsp;</a></span>orbtree_remove_index_ranged()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int orbtree_remove_index_ranged </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="orbtree_8h.html#a62c34b888a30a290d4c587f642e3ae7f">ORBTree</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a10e94b422ef0c20dcdec20d31a1f5049">u32</a>&#160;</td>
+          <td class="paramname"><em>index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="structORBTreeTray.html">ORBTreeTray</a> *&#160;</td>
+          <td class="paramname"><em>removed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>start_value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>start_inclusive</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

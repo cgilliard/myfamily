@@ -21,6 +21,5 @@ var searchData=
   ['global_5fnamespace_5fnext_297',['global_namespace_next',['../structORBContext.html#a97e2b1092a49180a514868bcd1ecf669',1,'ORBContext']]],
   ['global_5forb_5fcontext_298',['global_orb_context',['../object_8c.html#a9bec288feb8429be17263e74377b0b51',1,'object.c']]],
   ['global_5frbtree_5flock_299',['global_rbtree_lock',['../object_8c.html#a0ead2b5face2a2c2c4b258fc37d1d503',1,'object.c']]],
-  ['global_5frbtree_5flock_5fhas_5flock_300',['global_rbtree_lock_has_lock',['../object_8c.html#ab37ff8f133d1d00b9a65b2cbc654ff78',1,'object.c']]],
-  ['green_301',['GREEN',['../colors_8h.html#acfbc006ea433ad708fdee3e82996e721',1,'colors.h']]]
+  ['green_300',['GREEN',['../colors_8h.html#acfbc006ea433ad708fdee3e82996e721',1,'colors.h']]]
 ];
