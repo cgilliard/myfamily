@@ -34,6 +34,11 @@ typedef enum ObjectType {
 	ObjectTypeObject,
 } ObjectType;
 
+typedef enum ObjectIndexType {
+	ObjectIndexTypeSorted,
+	ObjectIndexTypeSequential,
+} ObjectIndexType;
+
 void object_cleanup(const ObjectNc *ptr);
 
 #define Object ObjectNc __attribute__((warn_unused_result, cleanup(object_cleanup)))
@@ -62,14 +67,15 @@ Object object_get_property(const Object *obj, const char *name);
 Object object_remove_property(Object *obj, const char *name);
 
 // array-like functions
-Object object_get_property_index(const Object *obj, u32 index);
-Object object_remove_property_index(Object *obj, u32 index);
+Object object_get_property_index(const Object *obj, u32 index, ObjectIndexType itype);
+Object object_remove_property_index(Object *obj, u32 index, ObjectIndexType itype);
 // insert at the specified index
-Object object_set_property_index(Object *obj, u32 index, const Object *value);
+Object object_set_property_index(Object *obj, u32 index, const Object *value,
+								 ObjectIndexType itype);
 Object object_insert_property_before_index(Object *obj, u32 index, const char *name,
-										   const Object *value);
+										   const Object *value, ObjectIndexType itype);
 Object object_insert_property_after_index(Object *obj, u32 index, const char *name,
-										  const Object *value);
+										  const Object *value, ObjectIndexType itype);
 
 // from these primitive functions, we can introduce multiple easier to use macros:
 // $(x, "myprop", z); -> object_set_property(&x, "myprop", &z);

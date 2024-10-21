@@ -1242,23 +1242,23 @@ MyTest(util, test_object_get_index) {
 	i64 properties = object_properties(&x1);
 	cr_assert_eq(properties, 4);
 	for (u64 i = 0; i < properties; i++) {
-		let v = object_get_property_index(&x1, i);
+		let v = object_get_property_index(&x1, i, ObjectIndexTypeSequential);
 		cr_assert(!nil(v));
 		cr_assert_eq(object_as_u64(&v), i);
 	}
 
 	// the 4th index is nil
-	let v = object_get_property_index(&x1, 4);
+	let v = object_get_property_index(&x1, 4, ObjectIndexTypeSequential);
 	cr_assert(nil(v));
 
-	let rem = object_remove_property_index(&x1, 1);
+	let rem = object_remove_property_index(&x1, 1, ObjectIndexTypeSequential);
 	cr_assert(!nil(rem));
 
 	properties = object_properties(&x1);
 	cr_assert_eq(properties, 3);
 	u64 j = 0;
 	for (u64 i = 0; i < properties; i++) {
-		let v = object_get_property_index(&x1, i);
+		let v = object_get_property_index(&x1, i, ObjectIndexTypeSequential);
 		cr_assert(!nil(v));
 		if (i == 1)
 			j++;
@@ -1300,19 +1300,19 @@ MyTest(util, test_property_updates_index) {
 	i64 properties = object_properties(&x1);
 	cr_assert_eq(properties, 4);
 	for (u64 i = 0; i < properties; i++) {
-		let v = object_get_property_index(&x1, i);
+		let v = object_get_property_index(&x1, i, ObjectIndexTypeSequential);
 		cr_assert(!nil(v));
 		cr_assert_eq(object_as_u64(&v), i);
 	}
 
-	let res5 = object_set_property_index(&x1, 1, &x6);
+	let res5 = object_set_property_index(&x1, 1, &x6, ObjectIndexTypeSequential);
 	cr_assert(!nil(res5));
 
 	properties = object_properties(&x1);
 	cr_assert_eq(properties, 4);
 
 	for (u64 i = 0; i < properties; i++) {
-		let v = object_get_property_index(&x1, i);
+		let v = object_get_property_index(&x1, i, ObjectIndexTypeSequential);
 
 		cr_assert(!nil(v));
 		if (i == 1)
@@ -1353,7 +1353,7 @@ MyTest(util, test_big_obj) {
 
 	clock_gettime(CLOCK_MONOTONIC, &start_iter);
 	for (u64 i = 0; i < properties; i++) {
-		let v = object_get_property_index(&x1, i);
+		let v = object_get_property_index(&x1, i, ObjectIndexTypeSequential);
 		cr_assert(!nil(v));
 		cr_assert_eq(object_as_u64(&v), i);
 	}
@@ -1364,4 +1364,27 @@ MyTest(util, test_big_obj) {
 	printf("Total time taken for iteration: %f seconds\n", iter_time_ns / 1e9);
 	printf("Average time per index: %f nanoseconds\n", iter_time_ns / count);
 	printf("Total indices: %llu\n", count);
+}
+
+MyTest(util, test_object_iterator) {
+	u64 count = 9;
+	u64 val = 0;
+
+	var x1 = object_create(false, ObjectTypeObject, NULL);
+	for (i64 i = count; i >= 0; i--) {
+		let x2 = object_create(false, ObjectTypeU64, &val);
+		val++;
+		char name[101];
+		snprintf(name, 100, "x%lld", i);
+		let res1 = object_set_property(&x1, name, &x2);
+		cr_assert(!nil(res1));
+	}
+
+	i64 properties = object_properties(&x1);
+	cr_assert_eq(properties, 10);
+	for (u64 i = 0; i < properties; i++) {
+		let v = object_get_property_index(&x1, i, ObjectIndexTypeSorted);
+		cr_assert(!nil(v));
+		cr_assert_eq(object_as_u64(&v), (properties - 1) - i);
+	}
 }

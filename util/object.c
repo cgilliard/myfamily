@@ -726,7 +726,8 @@ Object object_remove_property(Object *obj, const char *name) {
 	return NIL;
 }
 
-ObjectValue *object_get_property_index_impl(ORBContext *ctx, const Object *obj, u32 index) {
+ObjectValue *object_get_property_index_impl(ORBContext *ctx, const Object *obj, u32 index,
+											ObjectIndexType itype) {
 	object_check_consumed(obj);
 
 	ObjectImpl *impl = $(obj->impl);
@@ -736,7 +737,11 @@ ObjectValue *object_get_property_index_impl(ORBContext *ctx, const Object *obj, 
 		return NULL;
 	}
 
-	ORBTreeNc *tree = ctx->sequence_tree;
+	ORBTreeNc *tree;
+	if (itype == ObjectIndexTypeSequential)
+		tree = ctx->sequence_tree;
+	else
+		tree = ctx->sorted_tree;
 
 	ctx->tray.updated = false;
 	tl_start_range_value.namespace = impl->namespace;
@@ -754,7 +759,7 @@ ObjectValue *object_get_property_index_impl(ORBContext *ctx, const Object *obj, 
 	return valueret;
 }
 
-Object object_get_property_index(const Object *obj, u32 index) {
+Object object_get_property_index(const Object *obj, u32 index, ObjectIndexType itype) {
 	ObjectImpl *impl = $(obj->impl);
 
 	if (impl == NULL) {
@@ -762,7 +767,7 @@ Object object_get_property_index(const Object *obj, u32 index) {
 		return NIL;
 	}
 	ORBContext *ctx = object_get_context_and_lock(impl);
-	const ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index);
+	const ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index, itype);
 	object_unlock(impl);
 	if (valueret == NULL) {
 		return NIL;
@@ -775,7 +780,7 @@ Object object_get_property_index(const Object *obj, u32 index) {
 	return object_ref(&ret);
 }
 
-Object object_remove_property_index(Object *obj, u32 index) {
+Object object_remove_property_index(Object *obj, u32 index, ObjectIndexType itype) {
 	ObjectImpl *impl = $(obj->impl);
 
 	if (impl == NULL) {
@@ -785,7 +790,7 @@ Object object_remove_property_index(Object *obj, u32 index) {
 
 	ORBContext *ctx = object_get_context_and_lock(impl);
 
-	ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index);
+	ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index, itype);
 	ObjectValueData *vd = $(valueret->value);
 	if (vd == NULL) {
 
@@ -801,7 +806,8 @@ Object object_remove_property_index(Object *obj, u32 index) {
 	return object_ref(&res);
 }
 
-Object object_set_property_index(Object *obj, u32 index, const Object *value) {
+Object object_set_property_index(Object *obj, u32 index, const Object *value,
+								 ObjectIndexType itype) {
 	ObjectImpl *impl = $(obj->impl);
 
 	if (impl == NULL) {
@@ -810,7 +816,7 @@ Object object_set_property_index(Object *obj, u32 index, const Object *value) {
 	}
 
 	ORBContext *ctx = object_get_context_and_lock(impl);
-	const ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index);
+	const ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index, itype);
 
 	ObjectValueData *vd;
 	if (valueret == NULL || valueret->namespace != impl->namespace ||
@@ -842,7 +848,7 @@ Object object_set_property_index(Object *obj, u32 index, const Object *value) {
 }
 
 Object object_insert_property_before_index(Object *obj, u32 index, const char *name,
-										   const Object *value) {
+										   const Object *value, ObjectIndexType itype) {
 	return NIL;
 }
 
