@@ -20,8 +20,8 @@
 #include <string.h>
 #include <util/orbtree.h>
 
-#define NODES_PER_CHUNK 128
-#define CHUNKS_PER_RESIZE 16
+#define NODES_PER_CHUNK 1024
+#define CHUNKS_PER_RESIZE 64
 #define ITERATOR_STACK_SIZE 128
 
 u64 orbtree_next_node_id = 10;
