@@ -709,14 +709,14 @@ Object object_remove_property(Object *obj, const char *name) {
 	return ref_ret;
 }
 
-Object object_get_property_index(const Object *obj, u32 index) {
+ObjectValue *object_get_property_index_impl(const Object *obj, u32 index) {
 	object_check_consumed(obj);
 
 	bool send = object_is_send(obj);
 	ObjectImpl *impl = $(obj->impl);
 	if (impl == NULL) {
 		SetErr(IllegalState);
-		return NIL;
+		return NULL;
 	}
 
 	ORBTreeNc *tree;
@@ -731,72 +731,72 @@ Object object_get_property_index(const Object *obj, u32 index) {
 	object_value_for(&objvalue, obj, NULL, index);
 	ORBTreeTray tray;
 	tray.updated = false;
-	int v = orbtree_get_index(tree, index, &tray);
+
+	tl_start_range_value.namespace = impl->namespace;
+	printf("impl.ns=%llu\n", impl->namespace);
+
+	int v = orbtree_get_index_ranged(tree, index, &tray, &tl_start_range_value, true);
+	printf("v=%i\n", v);
 	if (send) {
 		pthread_rwlock_unlock(&global_rbtree_lock);
 	}
 
 	if (!tray.updated) {
+		printf("tray not updated\n");
+		return NULL;
+	}
+
+	ObjectValueNc *valueret = tray.value;
+	if (valueret->namespace != impl->namespace) {
+		printf("ns !!!!\n");
+		return NULL;
+	}
+	return valueret;
+}
+
+Object object_get_property_index(const Object *obj, u32 index) {
+	const ObjectValueNc *valueret = object_get_property_index_impl(obj, index);
+	if (valueret == NULL) {
+		printf("valueret == NULL\n");
 		return NIL;
 	}
-	const ObjectValueNc *valueret = tray.value;
-	const ObjectValueData *vd = $(valueret->value);
-
+	ObjectValueData *vd = $(valueret->value);
 	ObjectNc ret = *(Object *)vd->value;
-	if (nil(ret))
+	if (nil(ret)) {
+		printf("vd->value nil\n");
 		return NIL;
-
+	}
 	return object_ref(&ret);
 }
 
 Object object_remove_property_index(Object *obj, u32 index) {
-	object_check_consumed(obj);
-	bool send = object_is_send(obj);
-	ObjectImpl *impl = $(obj->impl);
-	if (impl == NULL) {
-		SetErr(IllegalState);
+	ObjectValueNc *valueret = object_get_property_index_impl(obj, index);
+	ObjectValueData *vd = $(valueret->value);
+	if (vd == NULL) {
+
 		return NIL;
 	}
-
-	ORBTreeNc *tree;
-	if (send) {
-		tree = global_orb_context->sequence_tree;
-		if (pthread_rwlock_wrlock(&global_rbtree_lock))
-			panic("rwlock error!");
-	} else
-		tree = tl_orb_context->sequence_tree;
-
-	ObjectValueNc objvalue = INIT_OBJECT_VALUE;
-	object_value_for(&objvalue, obj, NULL, index);
-	ORBTreeTray tray;
-	tray.updated = false;
-	int v = orbtree_get_index(tree, index, &tray);
-	if (send) {
-		pthread_rwlock_unlock(&global_rbtree_lock);
-	}
-
-	if (!tray.updated) {
-		return NIL;
-	}
-	const ObjectValueNc *valueret = tray.value;
-	const ObjectValueData *vd = $(valueret->value);
-
-	ObjectNc ret = *(Object *)vd->value;
 
 	const char *name = $(valueret->name);
-
 	let res = object_remove_property(obj, name);
 	// an unexpected error occured removing the property
 	if (nil(res)) {
 		return NIL;
 	}
 
-	return object_ref(&ret);
+	return object_ref(&res);
 }
 
 Object object_set_property_index(Object *obj, const Object *value, u64 index) {
-	object_check_consumed(obj);
-	return NIL;
+	ObjectValueNc *valueret = object_get_property_index_impl(obj, index);
+	ObjectValueData *vd = $(valueret->value);
+	if (vd == NULL) {
+		printf("vd == NULL\n");
+		return NIL;
+	}
+
+	const char *name = $(valueret->name);
+	return object_set_property(obj, name, value);
 }
 
 Object object_insert_property_before_index(Object *obj, const char *name, const Object *value,

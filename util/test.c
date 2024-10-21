@@ -1272,10 +1272,10 @@ MyTest(util, test_object_get_index) {
 	cr_assert(!nil(res2));
 
 	let res3 = object_set_property(&x1, "x4", &x4);
-	cr_assert(!nil(res2));
+	cr_assert(!nil(res3));
 
 	let res4 = object_set_property(&x1, "x5", &x5);
-	cr_assert(!nil(res2));
+	cr_assert(!nil(res4));
 
 	// iterate through the object and get the property at each index. Assert its value.
 	i64 properties = object_properties(&x1);
@@ -1285,32 +1285,24 @@ MyTest(util, test_object_get_index) {
 		cr_assert(!nil(v));
 		cr_assert_eq(object_as_u64(&v), i);
 	}
+	// the 4th index is nil
+	let v = object_get_property_index(&x1, 4);
+	cr_assert(nil(v));
 
-	/*
-		// the 4th index is nil
-		let v = object_get_property_index(&x1, 4);
-		printf("v\n");
-		cr_assert(nil(v));
-		printf("y\n");
+	let rem = object_remove_property_index(&x1, 1);
+	cr_assert(!nil(rem));
 
-			let rem = object_remove_property_index(&x1, 1);
-			cr_assert(!nil(rem));
-			printf("z\n");
-
-			properties = object_properties(&x1);
-			cr_assert_eq(properties, 3);
-			u64 j = 0;
-			printf("here\n");
-			for (u64 i = 0; i < properties; i++) {
-				let v = object_get_property_index(&x1, i);
-				cr_assert(!nil(v));
-				printf("expect %llu %llu\n", object_as_u64(&v), j);
-				// cr_assert_eq(object_as_u64(&v), j);
-				if (i == 1)
-					j++;
-				j++;
-			}
-		*/
+	properties = object_properties(&x1);
+	cr_assert_eq(properties, 3);
+	u64 j = 0;
+	for (u64 i = 0; i < properties; i++) {
+		let v = object_get_property_index(&x1, i);
+		cr_assert(!nil(v));
+		if (i == 1)
+			j++;
+		cr_assert_eq(object_as_u64(&v), j);
+		j++;
+	}
 }
 
 MyTest(util, test_orbtree_get_index) {
@@ -1326,7 +1318,6 @@ MyTest(util, test_orbtree_get_index) {
 		cr_assert(!orbtree_put(&tree1, &tray, &ret));
 		orbtree_validate(&tree1);
 	}
-
 	for (u64 i = 0; i < size; i++) {
 		for (u64 j = 0; j < size - i; j++) {
 			u64 start = 10 + i;
@@ -1335,5 +1326,64 @@ MyTest(util, test_orbtree_get_index) {
 			cr_assert_eq(res, 0);
 			cr_assert_eq(*v, j + 10 + i);
 		}
+	}
+
+	u64 start = 10;
+	int res = orbtree_get_index_ranged(&tree1, size, &tray, &start, true);
+	u64 *v = tray.value;
+	cr_assert(res);
+}
+
+MyTest(util, test_proeprty_updates_index) {
+	// create x1 to hold properties
+	var x1 = object_create(false, ObjectTypeObject, NULL);
+
+	// create 4 properties with values 0,1,2,3.
+	u64 val = 0;
+	let x2 = object_create(false, ObjectTypeU64, &val);
+	val++;
+	let x3 = object_create(false, ObjectTypeU64, &val);
+	val++;
+	let x4 = object_create(false, ObjectTypeU64, &val);
+	val++;
+	let x5 = object_create(false, ObjectTypeU64, &val);
+	val++;
+	let x6 = object_create(false, ObjectTypeU64, &val);
+
+	// set x1's properties to the corresponding values
+	let res1 = object_set_property(&x1, "x2", &x2);
+	cr_assert(!nil(res1));
+
+	let res2 = object_set_property(&x1, "x3", &x3);
+	cr_assert(!nil(res2));
+
+	let res3 = object_set_property(&x1, "x4", &x4);
+	cr_assert(!nil(res3));
+
+	let res4 = object_set_property(&x1, "x5", &x5);
+	cr_assert(!nil(res4));
+
+	// iterate through the object and get the property at each index. Assert its value.
+	i64 properties = object_properties(&x1);
+	cr_assert_eq(properties, 4);
+	for (u64 i = 0; i < properties; i++) {
+		let v = object_get_property_index(&x1, i);
+		cr_assert(!nil(v));
+		cr_assert_eq(object_as_u64(&v), i);
+	}
+
+	/*
+		let res5 = object_set_property_index(&x1, &x6, 1);
+		cr_assert(!nil(res5));
+	*/
+
+	properties = object_properties(&x1);
+	cr_assert_eq(properties, 4);
+
+	for (u64 i = 0; i < properties; i++) {
+		printf("======i=%llu\n", i);
+		let v = object_get_property_index(&x1, i);
+		cr_assert(!nil(v));
+		cr_assert_eq(object_as_u64(&v), i);
 	}
 }
