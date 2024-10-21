@@ -50,6 +50,8 @@ int object_send(Object *obj, Channel *channel);
 // map-like function use inserts it into the index based tree in the last position.
 // map-like functions
 
+// return -1 on error otherwise, number of properties
+i64 object_properties(const Object *obj);
 // returns Ok on success, nil on error. Error type is set with the fam_err functionality.
 Object object_set_property(Object *obj, const char *name, const Object *value);
 // returns object or nil if not found or there is an error. Error type is set with the fam_err

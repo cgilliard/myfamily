@@ -1251,12 +1251,20 @@ MyTest(util, test_object_overwrite_send) {
 }
 
 MyTest(util, test_object_get_index) {
+	// create x1 to hold properties
 	var x1 = object_create(false, ObjectTypeObject, NULL);
-	let x2 = object_create(false, ObjectTypeString, "testx2");
-	let x3 = object_create(false, ObjectTypeString, "testx3");
-	let x4 = object_create(false, ObjectTypeString, "testx4");
-	let x5 = object_create(false, ObjectTypeString, "testx5");
 
+	// create 4 properties with values 0,1,2,3.
+	u64 val = 0;
+	let x2 = object_create(false, ObjectTypeU64, &val);
+	val++;
+	let x3 = object_create(false, ObjectTypeU64, &val);
+	val++;
+	let x4 = object_create(false, ObjectTypeU64, &val);
+	val++;
+	let x5 = object_create(false, ObjectTypeU64, &val);
+
+	// set x1's properties to the corresponding values
 	let res1 = object_set_property(&x1, "x2", &x2);
 	cr_assert(!nil(res1));
 
@@ -1269,8 +1277,38 @@ MyTest(util, test_object_get_index) {
 	let res4 = object_set_property(&x1, "x5", &x5);
 	cr_assert(!nil(res2));
 
-	printf("=======================get prop-------------------------------\n");
-	let res5 = object_get_property_index(&x1, 1);
-	cr_assert(!nil(res5));
-	cr_assert(!strcmp(object_as_string(&res5), "testx3"));
+	// iterate through the object and get the property at each index. Assert its value.
+	i64 properties = object_properties(&x1);
+	cr_assert_eq(properties, 4);
+	for (u64 i = 0; i < properties; i++) {
+		let v = object_get_property_index(&x1, i);
+		cr_assert(!nil(v));
+		cr_assert_eq(object_as_u64(&v), i);
+	}
+
+	/*
+		// the 4th index is nil
+		let v = object_get_property_index(&x1, 4);
+		printf("v\n");
+		cr_assert(nil(v));
+		printf("y\n");
+
+			let rem = object_remove_property_index(&x1, 1);
+			cr_assert(!nil(rem));
+			printf("z\n");
+
+			properties = object_properties(&x1);
+			cr_assert_eq(properties, 3);
+			u64 j = 0;
+			printf("here\n");
+			for (u64 i = 0; i < properties; i++) {
+				let v = object_get_property_index(&x1, i);
+				cr_assert(!nil(v));
+				printf("expect %llu %llu\n", object_as_u64(&v), j);
+				// cr_assert_eq(object_as_u64(&v), j);
+				if (i == 1)
+					j++;
+				j++;
+			}
+		*/
 }

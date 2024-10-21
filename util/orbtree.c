@@ -49,6 +49,10 @@ u64 orbtree_next_node_id = 10;
 		_orb_node__ == NULL || (_orb_node__->color & RED_MASK) == 0;                               \
 	})
 
+#ifdef TEST
+#define NODE_ID
+#endif // TEST
+
 typedef struct ORBTreeNode {
 	u32 color;
 	u32 right;
@@ -56,9 +60,9 @@ typedef struct ORBTreeNode {
 	u32 parent;
 	u32 right_subtree_size;
 	u32 left_subtree_size;
-#ifdef TEST
+#ifdef NODE_ID
 	u64 node_id;
-#endif // TEST
+#endif // NODE_ID
 	char data[];
 } ORBTreeNode;
 
@@ -515,9 +519,9 @@ int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced) {
 	node->left_subtree_size = 0;
 	node->parent = pair.parent;
 
-#ifdef TEST
+#ifdef NODE_ID
 	node->node_id = orbtree_next_node_id++;
-#endif // TEST
+#endif // NODE_ID
 
 	SET_RED(impl, value->id);
 	impl->elements++;
@@ -1130,7 +1134,7 @@ int orbtree_deallocate_tray(ORBTree *ptr, ORBTreeTray *tray) {
 	return 0;
 }
 
-#ifdef TEST
+#ifdef NODE_ID
 
 void orbtree_validate_node(const ORBTreeImpl *impl, u32 node, int *black_count,
 						   int current_black_count) {
@@ -1243,4 +1247,9 @@ void orbtree_print(const ORBTree *ptr) {
 	ORBTreeImpl *impl = ptr->impl;
 	orbtree_print_impl(impl);
 }
-#endif // TEST
+#else
+void orbtree_print(const ORBTree *ptr) {
+}
+void orbtree_validate(const ORBTree *ptr) {
+}
+#endif // NODE_ID
