@@ -219,7 +219,6 @@ typedef struct ObjectImpl {
 } ObjectImpl;
 
 void object_cleanup(const Object *ptr) {
-	printf("----->start cleanup\n");
 	if (ptr == NULL || nil(ptr->impl) || ptr->flags & OBJECT_FLAG_NO_CLEANUP)
 		return;
 #if defined(__clang__)
@@ -244,7 +243,6 @@ void object_cleanup(const Object *ptr) {
 		rc_cleanup(&ptr_mut->impl);
 		ptr_mut->impl.impl = null;
 	}
-	printf("====>end cleanup\n");
 }
 
 ORBContext *object_get_context_and_lock(const ObjectImpl *impl) {
@@ -276,7 +274,6 @@ void object_cleanup_rc(ObjectImpl *impl) {
 		fam_free(&impl->self);
 		impl->self = null;
 	}
-	printf("pc=%u\n", impl->property_count);
 	if (impl->property_count) {
 		ObjectNc *to_cleanup[impl->property_count];
 		u64 cleanup_count = 0;
@@ -299,8 +296,6 @@ void object_cleanup_rc(ObjectImpl *impl) {
 			ObjectValueNc *v = ctx->tray.value;
 			char *nx = $(v->name);
 			u64 seqno = v->seqno;
-			printf("nx=%s,s=%llu,ns=%llu,impl->ns=%llu\n", nx, seqno, v->namespace,
-				   impl->namespace);
 			properties[i] = &v->name;
 			i++;
 		}
@@ -331,7 +326,6 @@ void object_cleanup_rc(ObjectImpl *impl) {
 			rem = ctx->tray.value;
 			fam_free(&rem->value);
 			fam_free(&rem->name);
-			printf("fam free seq\n");
 
 			assert(!orbtree_deallocate_tray(sequence_tree, &ctx->tray));
 		}
@@ -460,53 +454,12 @@ ObjectValueNc *object_get_property_value(ORBContext *ctx, const Object *obj, con
 
 ObjectValueData *object_get_property_data(ORBContext *ctx, const Object *obj, const char *name,
 										  bool remove) {
-	ORBTreeNc *sorted_tree = ctx->sorted_tree;
-	ORBTreeNc *sequence_tree = ctx->sequence_tree;
-	ctx->tray.updated = false;
-
-	ObjectImpl *impl = $(obj->impl);
-	if (impl == NULL) {
-		SetErr(IllegalState);
+	ObjectValueNc *valueret = object_get_property_value(ctx, obj, name, remove);
+	if (valueret != NULL) {
+		ObjectValueData *valueretdata = $(valueret->value);
+		return valueretdata;
+	} else
 		return NULL;
-	}
-
-	ObjectValue objvalue = INIT_OBJECT_VALUE;
-	if (object_value_for(&objvalue, obj, name, -1, 0))
-		return NULL;
-	int v;
-	if (remove) {
-		v = orbtree_remove(sorted_tree, &objvalue, &ctx->tray);
-		if (v == 0 && ctx->tray.updated) {
-			ObjectValueNc *rem = ctx->tray.value;
-			u64 seqno = rem->seqno;
-			u32 precision = rem->seqno_precision;
-			ObjectValueData *obj_data = $(rem->value);
-			assert(obj_data);
-			fam_free(&rem->name);
-			assert(!orbtree_deallocate_tray(sorted_tree, &ctx->tray));
-			objvalue.seqno = seqno;
-			objvalue.seqno_precision = precision;
-			ctx->sequence_tray.updated = false;
-			assert(!orbtree_remove(sequence_tree, &objvalue, &ctx->sequence_tray));
-			assert(ctx->sequence_tray.updated);
-
-			ObjectValueNc *sequence_rem = ctx->sequence_tray.value;
-			fam_free(&sequence_rem->name);
-			fam_free(&sequence_rem->value);
-
-			assert(!orbtree_deallocate_tray(sequence_tree, &ctx->sequence_tray));
-		}
-	} else {
-		v = orbtree_get(sorted_tree, &objvalue, &ctx->tray);
-	}
-
-	if (v || !ctx->tray.updated)
-		return NULL;
-
-	ObjectValueNc *valueret = ctx->tray.value;
-	ObjectValueData *valueretdata = $(valueret->value);
-
-	return valueretdata;
 }
 
 int object_set_property_value(Object *obj, const char *name, const void *value, u64 size,
@@ -532,15 +485,10 @@ int object_set_property_value(Object *obj, const char *name, const void *value, 
 
 	if (vd) {
 		if (vd->type == ObjectTypeObject) {
-			printf("----======================obj cleanup\n");
-			// object_cleanup((Object *)vd->value);
 			to_cleanup = *(Object *)vd->value;
-			printf("end cleanup\n");
 		}
 
 		ObjectValueNc *valueret = object_get_property_value(ctx, obj, name, false);
-		printf("valueret.seqno==================================================%llu\n",
-			   valueret->seqno);
 
 		// it exists, overwrite it
 		memcpy(vd->value, value, size);
@@ -752,7 +700,7 @@ Object object_remove_property(Object *obj, const char *name) {
 	return NIL;
 }
 
-ObjectValue *object_get_property_index_impl(const Object *obj, u32 index) {
+ObjectValue *object_get_property_index_impl(ORBContext *ctx, const Object *obj, u32 index) {
 	object_check_consumed(obj);
 
 	ObjectImpl *impl = $(obj->impl);
@@ -762,7 +710,6 @@ ObjectValue *object_get_property_index_impl(const Object *obj, u32 index) {
 		return NULL;
 	}
 
-	ORBContext *ctx = object_get_context_and_lock(impl);
 	ORBTreeNc *tree = ctx->sequence_tree;
 
 	ctx->tray.updated = false;
@@ -770,12 +717,10 @@ ObjectValue *object_get_property_index_impl(const Object *obj, u32 index) {
 	int v = orbtree_get_index_ranged(tree, index, &ctx->tray, &tl_start_range_value, true);
 
 	if (v || !ctx->tray.updated) {
-		object_unlock(impl);
 		return NULL;
 	}
 
 	ObjectValueNc *valueret = ctx->tray.value;
-	object_unlock(impl);
 
 	if (valueret->namespace != impl->namespace) {
 		return NULL;
@@ -784,41 +729,27 @@ ObjectValue *object_get_property_index_impl(const Object *obj, u32 index) {
 }
 
 Object object_get_property_index(const Object *obj, u32 index) {
-	const ObjectValueNc *valueret = object_get_property_index_impl(obj, index);
+	ObjectImpl *impl = $(obj->impl);
+
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return NIL;
+	}
+	ORBContext *ctx = object_get_context_and_lock(impl);
+	const ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index);
+	object_unlock(impl);
 	if (valueret == NULL) {
-		printf("valueret == NULL\n");
 		return NIL;
 	}
 	ObjectValueData *vd = $(valueret->value);
 	ObjectNc ret = *(Object *)vd->value;
 	if (nil(ret)) {
-		printf("vd->value nil\n");
 		return NIL;
 	}
 	return object_ref(&ret);
 }
 
 Object object_remove_property_index(Object *obj, u32 index) {
-	ObjectValueNc *valueret = object_get_property_index_impl(obj, index);
-	ObjectValueData *vd = $(valueret->value);
-	if (vd == NULL) {
-
-		return NIL;
-	}
-
-	const char *name = $(valueret->name);
-	let res = object_remove_property(obj, name);
-	// an unexpected error occured removing the property
-	if (nil(res)) {
-		return NIL;
-	}
-
-	return object_ref(&res);
-}
-
-Object object_set_property_index(Object *obj, u32 index, const Object *value) {
-	object_check_consumed(obj);
-
 	ObjectImpl *impl = $(obj->impl);
 
 	if (impl == NULL) {
@@ -827,42 +758,47 @@ Object object_set_property_index(Object *obj, u32 index, const Object *value) {
 	}
 
 	ORBContext *ctx = object_get_context_and_lock(impl);
-	ORBTreeNc *tree = ctx->sequence_tree;
 
-	ctx->tray.updated = false;
-	tl_start_range_value.namespace = impl->namespace;
-	int v = orbtree_get_index_ranged(tree, index, &ctx->tray, &tl_start_range_value, true);
-
-	if (v || !ctx->tray.updated) {
-		object_unlock(impl);
-		return NIL;
-	}
-
-	ObjectValueNc *valueret = ctx->tray.value;
-
-	if (valueret->namespace != impl->namespace) {
-		object_unlock(impl);
-		return NIL;
-	}
-
+	ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index);
 	ObjectValueData *vd = $(valueret->value);
 	if (vd == NULL) {
-		object_unlock(impl);
-		printf("vd == NULL\n");
+
 		return NIL;
 	}
 
 	const char *name = $(valueret->name);
-	printf("=======================================name=%s\n", name);
+	let res = object_remove_property(obj, name);
+	if (nil(res)) {
+		return NIL;
+	}
+
+	return object_ref(&res);
+}
+
+Object object_set_property_index(Object *obj, u32 index, const Object *value) {
+	ObjectImpl *impl = $(obj->impl);
+
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return NIL;
+	}
+
+	ORBContext *ctx = object_get_context_and_lock(impl);
+	const ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index);
+
+	ObjectValueData *vd;
+	if (valueret == NULL || valueret->namespace != impl->namespace ||
+		(vd = $(valueret->value)) == NULL) {
+		object_unlock(impl);
+		return NIL;
+	}
+
+	const char *name = $(valueret->name);
 	ObjectValueNc *obj_val = ctx->tray.value;
-	printf("obj.seqno=%llu\n", obj_val->seqno);
 	ObjectValueData *obj_data = $(obj_val->value);
-	ObjectNc nv = object_move(value);
-	ObjectNc to_cleanup;
+	Object to_cleanup;
 	memcpy(&to_cleanup, obj_data->value, sizeof(Object));
-	memcpy(obj_data->value, &nv, sizeof(Object));
-	// obj_data->value = object_move(value);
-	//*obj_out = object_move(value);
+	memcpy(obj_data->value, value, sizeof(Object));
 
 	ctx->tray.updated = false;
 	ObjectValue objvalue = INIT_OBJECT_VALUE;
@@ -872,11 +808,9 @@ Object object_set_property_index(Object *obj, u32 index, const Object *value) {
 	assert(ctx->tray.updated);
 	obj_val = ctx->tray.value;
 	obj_data = $(obj_val->value);
-	memcpy(obj_data->value, &nv, sizeof(Object));
+	memcpy(obj_data->value, value, sizeof(Object));
 
 	object_unlock(impl);
-
-	object_cleanup(&to_cleanup);
 
 	return UNIT;
 }

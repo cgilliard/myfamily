@@ -16,6 +16,7 @@
 #include <base/macro_utils.h>
 #include <crypto/psrng.h>
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 #include <util/object.h>
 #include <util/orbtree.h>
@@ -891,9 +892,6 @@ MyTest(util, test_orbtree_iterator) {
 		cr_assert(!orbtree_iterator_reset(&itt1, &start, false, &end, false));
 		count = start + 1;
 		while (orbtree_iterator_next(&itt1, &tray)) {
-			if (count != *(u64 *)tray.value) {
-				printf("count=%llu,v=%llu\n", count, *(u64 *)tray.value);
-			}
 			cr_assert_eq(count++, *(u64 *)tray.value);
 		}
 
@@ -1313,15 +1311,56 @@ MyTest(util, test_property_updates_index) {
 	cr_assert_eq(properties, 4);
 
 	for (u64 i = 0; i < properties; i++) {
-		printf("======i=%llu\n", i);
 		let v = object_get_property_index(&x1, i);
 
 		cr_assert(!nil(v));
-		printf("i=%llu,v=%llu\n", i, object_as_u64(&v));
 		if (i == 1)
 			cr_assert_eq(object_as_u64(&v), 4);
 		else
 			cr_assert_eq(object_as_u64(&v), i);
 	}
-	printf("complete\n");
+}
+
+MyTest(util, test_big_obj) {
+	// create x1 to hold properties
+	var x1 = object_create(false, ObjectTypeObject, NULL);
+
+	u64 val = 0;
+	u64 count = 1000;
+
+	struct timespec start_insert, end_insert, start_iter, end_iter;
+	clock_gettime(CLOCK_MONOTONIC, &start_insert);
+
+	for (u64 i = 0; i < count; i++) {
+		let x2 = object_create(false, ObjectTypeU64, &val);
+		val++;
+		char name[101];
+		snprintf(name, 100, "x%lld", i);
+		let res1 = object_set_property(&x1, name, &x2);
+		cr_assert(!nil(res1));
+	}
+
+	clock_gettime(CLOCK_MONOTONIC, &end_insert);
+	double insertion_time_ns = (end_insert.tv_sec - start_insert.tv_sec) * 1e9 +
+							   (end_insert.tv_nsec - start_insert.tv_nsec);
+	printf("Total time taken for object creation: %f seconds\n", insertion_time_ns / 1e9);
+	printf("Average time per object: %f nanoseconds\n", insertion_time_ns / count);
+	printf("Total objects: %llu\n", count);
+
+	i64 properties = object_properties(&x1);
+	cr_assert_eq(count, properties);
+
+	clock_gettime(CLOCK_MONOTONIC, &start_iter);
+	for (u64 i = 0; i < properties; i++) {
+		let v = object_get_property_index(&x1, i);
+		cr_assert(!nil(v));
+		cr_assert_eq(object_as_u64(&v), i);
+	}
+
+	clock_gettime(CLOCK_MONOTONIC, &end_iter);
+	double iter_time_ns =
+		(end_iter.tv_sec - start_iter.tv_sec) * 1e9 + (end_iter.tv_nsec - start_iter.tv_nsec);
+	printf("Total time taken for iteration: %f seconds\n", iter_time_ns / 1e9);
+	printf("Average time per index: %f nanoseconds\n", iter_time_ns / count);
+	printf("Total indices: %llu\n", count);
 }

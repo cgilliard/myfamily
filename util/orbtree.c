@@ -50,7 +50,7 @@ u64 orbtree_next_node_id = 10;
 	})
 
 #ifdef TEST
-#define NODE_ID
+#define NODE_ID2
 #endif // TEST
 
 typedef struct ORBTreeNode {
