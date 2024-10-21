@@ -24,7 +24,7 @@
 
 #define UNIT                                                                                       \
 	(const ObjectNc) {                                                                             \
-		.impl = 0, .flags = OBJECT_FLAG_NO_CLEANUP                                                 \
+		.impl = 0, .flags = OBJECT_FLAG_NO_CLEANUP | OBJECT_FLAG_CONSUMED                          \
 	}
 
 #define $objnil(v) fat_ptr_is_nil(&(&((ObjectNc *)&(v))->impl)->impl)

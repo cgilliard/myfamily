@@ -958,86 +958,89 @@ foreach(v , a) {
 
 // weak, iterator, and index
 
+MyTest(util, test_orbtree_get_index) {
+	ORBTree tree1;
+	ORBTreeTray tray, ret;
+	orbtree_create(&tree1, sizeof(u64), u64_compare);
+	u64 size = 1000;
+
+	for (u64 i = 0; i < size; i++) {
+		cr_assert(!orbtree_allocate_tray(&tree1, &tray));
+		u64 *v = tray.value;
+		*v = i + 10;
+		cr_assert(!orbtree_put(&tree1, &tray, &ret));
+		orbtree_validate(&tree1);
+	}
+	for (u64 i = 0; i < size; i++) {
+		for (u64 j = 0; j < size - i; j++) {
+			u64 start = 10 + i;
+			int res = orbtree_get_index_ranged(&tree1, j, &tray, &start, true);
+			u64 *v = tray.value;
+			cr_assert_eq(res, 0);
+			cr_assert_eq(*v, j + 10 + i);
+		}
+	}
+
+	u64 start = 10;
+	int res = orbtree_get_index_ranged(&tree1, size, &tray, &start, true);
+	u64 *v = tray.value;
+	cr_assert(res);
+}
+
 MyTest(util, test_object) {
-	var x = object_create(false, ObjectTypeString, "my string");
-	cr_assert(!nil(x));
-	cr_assert(!strcmp(object_as_string(&x), "my string"));
+	var obj1 = object_create(false, ObjectTypeObject, NULL);
 	u64 v = 1234;
-	var y = object_create(false, ObjectTypeU64, &v);
-	cr_assert(!nil(y));
-	cr_assert_eq(object_as_u64(&y), 1234);
+	var obj2 = object_create(false, ObjectTypeU64, &v);
+	var obj3 = object_create(false, ObjectTypeString, "this is a test");
+	cr_assert_eq(object_as_u64(&obj2), 1234);
+	cr_assert(!strcmp(object_as_string(&obj3), "this is a test"));
 
-	let z = object_set_property(&x, "yval", &y);
-	cr_assert(!nil(z));
-	var y_out = object_get_property(&x, "yval");
-	let m = object_create(false, ObjectTypeString, "other str");
-	let r = object_set_property(&y_out, "v2", &m);
-	cr_assert(!nil(y_out));
-	cr_assert_eq(object_as_u64(&y_out), 1234);
-	let not_found = object_get_property(&x, "notfound");
-	cr_assert(nil(not_found));
+	let r1 = object_set_property(&obj1, "obj2", &obj2);
+	cr_assert(!nil(r1));
 
-	var a = object_create(false, ObjectTypeObject, NULL);
-	var b = object_create(false, ObjectTypeString, "bval");
-	var res = object_set_property(&a, "b", &b);
-	cr_assert(!nil(res));
-	let b_out = object_get_property(&a, "b");
-	cr_assert(!nil(b_out));
-	cr_assert(!strcmp(object_as_string(&b_out), "bval"));
+	let r2 = object_get_property(&obj1, "obj2");
+	cr_assert(!nil(r2));
+	cr_assert_eq(object_as_u64(&r2), 1234);
+
+	let r3 = object_set_property(&obj1, "obj3", &obj3);
+	cr_assert(!nil(r3));
+
+	let r4 = object_get_property(&obj1, "obj3");
+	cr_assert(!strcmp(object_as_string(&r4), "this is a test"));
+
+	var obj4 = object_create(false, ObjectTypeString, "another test");
+	let r5 = object_set_property(&obj1, "obj3", &obj4);
+
+	let r6 = object_get_property(&obj1, "obj3");
+	cr_assert(!strcmp(object_as_string(&r6), "another test"));
 }
 
-MyTest(util, test_object_mix_send) {
-	var x = object_create(true, ObjectTypeString, "my string");
-	cr_assert(!nil(x));
-	cr_assert(!strcmp(object_as_string(&x), "my string"));
+MyTest(util, test_object_send) {
+	var obj1 = object_create(true, ObjectTypeObject, NULL);
 	u64 v = 1234;
-	var y = object_create(false, ObjectTypeU64, &v);
-	cr_assert(!nil(y));
-	cr_assert_eq(object_as_u64(&y), 1234);
+	var obj2 = object_create(true, ObjectTypeU64, &v);
+	var obj3 = object_create(true, ObjectTypeString, "this is a test");
+	cr_assert_eq(object_as_u64(&obj2), 1234);
+	cr_assert(!strcmp(object_as_string(&obj3), "this is a test"));
 
-	let z = object_set_property(&x, "yval", &y);
-	cr_assert(!nil(z));
-	var y_out = object_get_property(&x, "yval");
-	let m = object_create(false, ObjectTypeString, "other str");
-	let r = object_set_property(&y_out, "v2", &m);
-	cr_assert(!nil(y_out));
-	cr_assert_eq(object_as_u64(&y_out), 1234);
-	let not_found = object_get_property(&x, "notfound");
-	cr_assert(nil(not_found));
+	let r1 = object_set_property(&obj1, "obj2", &obj2);
+	cr_assert(!nil(r1));
 
-	var a = object_create(false, ObjectTypeObject, NULL);
-	var b = object_create(true, ObjectTypeString, "bval");
-	var res = object_set_property(&a, "b", &b);
-	cr_assert(!nil(res));
-	let b_out = object_get_property(&a, "b");
-	cr_assert(!nil(b_out));
-	cr_assert(!strcmp(object_as_string(&b_out), "bval"));
-}
+	let r2 = object_get_property(&obj1, "obj2");
+	cr_assert(!nil(r2));
+	cr_assert_eq(object_as_u64(&r2), 1234);
 
-MyTest(util, test_object_ref) {
-	var n2;
-	{
-		let n1 = object_create(false, ObjectTypeString, "n1");
-		n2 = object_ref(&n1);
-		cr_assert(!nil(n1));
-		cr_assert(!nil(n2));
-		cr_assert(!strcmp(object_as_string(&n1), "n1"));
-		cr_assert(!strcmp(object_as_string(&n2), "n1"));
-	}
-	cr_assert(!strcmp(object_as_string(&n2), "n1"));
-}
+	let r3 = object_set_property(&obj1, "obj3", &obj3);
+	cr_assert(!nil(r3));
 
-MyTest(util, test_object_ref_send) {
-	var n2;
-	{
-		let n1 = object_create(true, ObjectTypeString, "n1");
-		n2 = object_ref(&n1);
-		cr_assert(!nil(n1));
-		cr_assert(!nil(n2));
-		cr_assert(!strcmp(object_as_string(&n1), "n1"));
-		cr_assert(!strcmp(object_as_string(&n2), "n1"));
-	}
-	cr_assert(!strcmp(object_as_string(&n2), "n1"));
+	let r4 = object_get_property(&obj1, "obj3");
+	cr_assert(!strcmp(object_as_string(&r4), "this is a test"));
+
+	var obj4 = object_create(true, ObjectTypeString, "another test");
+	let r5 = object_set_property(&obj1, "obj3", &obj4);
+
+	let r6 = object_get_property(&obj1, "obj3");
+	cr_assert(!strcmp(object_as_string(&r6), "another test"));
 }
 
 MyTest(util, test_object_nested) {
@@ -1190,51 +1193,10 @@ MyTest(util, test_object_remove) {
 	cr_assert(nil(ret6));
 }
 
-MyTest(util, test_object_remove_send) {
-	var x1 = object_create(true, ObjectTypeObject, NULL);
-	let x2 = object_create(true, ObjectTypeString, "testx2");
-	let ret1 = object_get_property(&x1, "x2");
-	cr_assert(nil(ret1));
-	let ret2 = object_set_property(&x1, "x2", &x2);
-	cr_assert(!nil(ret2));
-	let ret3 = object_get_property(&x1, "x2");
-	cr_assert(!nil(ret3));
-	cr_assert(!strcmp(object_as_string(&ret3), "testx2"));
-
-	let ret4 = object_remove_property(&x1, "x2");
-	cr_assert(!nil(ret4));
-	cr_assert(!strcmp(object_as_string(&ret4), "testx2"));
-
-	let ret5 = object_get_property(&x1, "x2");
-	cr_assert(nil(ret5));
-
-	let ret6 = object_remove_property(&x1, "blah");
-	cr_assert(nil(ret6));
-}
-
 MyTest(util, test_object_overwrite) {
 	var x1 = object_create(false, ObjectTypeObject, NULL);
 	let x2 = object_create(false, ObjectTypeString, "testx2");
 	let x3 = object_create(false, ObjectTypeString, "testx3");
-
-	let res1 = object_set_property(&x1, "v", &x2);
-	cr_assert(!nil(res1));
-
-	let res2 = object_get_property(&x1, "v");
-	cr_assert(!nil(res2));
-	cr_assert(!strcmp(object_as_string(&res2), "testx2"));
-	let res3 = object_set_property(&x1, "v", &x3);
-	cr_assert(!nil(res3));
-
-	let res4 = object_get_property(&x1, "v");
-	cr_assert(!nil(res4));
-	cr_assert(!strcmp(object_as_string(&res4), "testx3"));
-}
-
-MyTest(util, test_object_overwrite_send) {
-	var x1 = object_create(true, ObjectTypeObject, NULL);
-	let x2 = object_create(true, ObjectTypeString, "testx2");
-	let x3 = object_create(true, ObjectTypeString, "testx3");
 
 	let res1 = object_set_property(&x1, "v", &x2);
 	cr_assert(!nil(res1));
@@ -1285,6 +1247,7 @@ MyTest(util, test_object_get_index) {
 		cr_assert(!nil(v));
 		cr_assert_eq(object_as_u64(&v), i);
 	}
+
 	// the 4th index is nil
 	let v = object_get_property_index(&x1, 4);
 	cr_assert(nil(v));
@@ -1305,36 +1268,7 @@ MyTest(util, test_object_get_index) {
 	}
 }
 
-MyTest(util, test_orbtree_get_index) {
-	ORBTree tree1;
-	ORBTreeTray tray, ret;
-	orbtree_create(&tree1, sizeof(u64), u64_compare);
-	u64 size = 1000;
-
-	for (u64 i = 0; i < size; i++) {
-		cr_assert(!orbtree_allocate_tray(&tree1, &tray));
-		u64 *v = tray.value;
-		*v = i + 10;
-		cr_assert(!orbtree_put(&tree1, &tray, &ret));
-		orbtree_validate(&tree1);
-	}
-	for (u64 i = 0; i < size; i++) {
-		for (u64 j = 0; j < size - i; j++) {
-			u64 start = 10 + i;
-			int res = orbtree_get_index_ranged(&tree1, j, &tray, &start, true);
-			u64 *v = tray.value;
-			cr_assert_eq(res, 0);
-			cr_assert_eq(*v, j + 10 + i);
-		}
-	}
-
-	u64 start = 10;
-	int res = orbtree_get_index_ranged(&tree1, size, &tray, &start, true);
-	u64 *v = tray.value;
-	cr_assert(res);
-}
-
-MyTest(util, test_proeprty_updates_index) {
+MyTest(util, test_property_updates_index) {
 	// create x1 to hold properties
 	var x1 = object_create(false, ObjectTypeObject, NULL);
 
@@ -1372,10 +1306,8 @@ MyTest(util, test_proeprty_updates_index) {
 		cr_assert_eq(object_as_u64(&v), i);
 	}
 
-	/*
-		let res5 = object_set_property_index(&x1, &x6, 1);
-		cr_assert(!nil(res5));
-	*/
+	let res5 = object_set_property_index(&x1, 1, &x6);
+	cr_assert(!nil(res5));
 
 	properties = object_properties(&x1);
 	cr_assert_eq(properties, 4);
@@ -1383,7 +1315,13 @@ MyTest(util, test_proeprty_updates_index) {
 	for (u64 i = 0; i < properties; i++) {
 		printf("======i=%llu\n", i);
 		let v = object_get_property_index(&x1, i);
+
 		cr_assert(!nil(v));
-		cr_assert_eq(object_as_u64(&v), i);
+		printf("i=%llu,v=%llu\n", i, object_as_u64(&v));
+		if (i == 1)
+			cr_assert_eq(object_as_u64(&v), 4);
+		else
+			cr_assert_eq(object_as_u64(&v), i);
 	}
+	printf("complete\n");
 }

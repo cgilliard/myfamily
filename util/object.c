@@ -21,19 +21,22 @@
 #include <stdio.h>
 #include <string.h>
 #include <util/object.h>
+#include <util/object_macros.h>
 #include <util/orbtree.h>
 
 typedef struct ORBContext {
+	ORBTreeTray tray;
+	ORBTreeTray sequence_tray;
 	ORBTree *sequence_tree;
-	ORBTreeIterator *sequence_itt;
 	ORBTree *sorted_tree;
-	ORBTreeIterator *sorted_itt;
+	ORBTreeIterator *itt;
 	u64 namespace_next;
 	atomic_ullong global_namespace_next;
 } ORBContext;
 
 pthread_rwlock_t global_rbtree_lock = PTHREAD_RWLOCK_INITIALIZER;
 _Thread_local ORBContext *tl_orb_context = NULL;
+_Thread_local u32 has_global_lock = 0;
 ORBContext *global_orb_context = NULL;
 
 typedef struct ObjectValueNc {
@@ -61,11 +64,15 @@ int init_tl_range_values() {
 		if (fam_alloc(&tl_start_range_value.name, 1))
 			return -1;
 		strcpy($(tl_start_range_value.name), "");
+		tl_start_range_value.seqno = 0;
+		tl_start_range_value.seqno_precision = 0;
 	}
 	if (nil(tl_end_range_value.name)) {
 		if (fam_alloc(&tl_end_range_value.name, 1))
 			return -1;
 		strcpy($(tl_end_range_value.name), "");
+		tl_end_range_value.seqno = 0;
+		tl_end_range_value.seqno_precision = 0;
 	}
 	return 0;
 }
@@ -109,40 +116,22 @@ int object_sequence_compare(const void *v1, const void *v2) {
 ORBContext *init_orb_context(bool send) {
 	ORBContext *ret = mymalloc(sizeof(ORBContext));
 	ORBTreeNc *sequence_tree = mymalloc(sizeof(ORBTree));
-	ORBTreeIteratorNc *sequence_itt = mymalloc(sizeof(ORBTreeIterator));
 	ORBTreeNc *sorted_tree = mymalloc(sizeof(ORBTree));
-	ORBTreeIteratorNc *sorted_itt = mymalloc(sizeof(ORBTreeIterator));
+	ORBTreeIteratorNc *itt = mymalloc(sizeof(ORBTreeIterator));
 
-	if (ret && sequence_tree && sequence_itt && sorted_tree && sorted_itt) {
+	if (ret && sequence_tree && sorted_tree && itt) {
 		ret->sequence_tree = sequence_tree;
-		ret->sequence_itt = sequence_itt;
 		ret->sorted_tree = sorted_tree;
-		ret->sorted_itt = sorted_itt;
+		ret->itt = itt;
 		if (orbtree_create(sequence_tree, sizeof(ObjectValue), object_sequence_compare)) {
 			if (sequence_tree)
 				myfree(sequence_tree);
 			if (ret)
 				myfree(ret);
-			if (sequence_itt)
-				myfree(sequence_itt);
 			if (sorted_tree)
 				myfree(sorted_tree);
-			if (sorted_itt)
-				myfree(sorted_itt);
-			return NULL;
-		}
-
-		if (orbtree_iterator(sequence_tree, sequence_itt, NULL, false, NULL, false, send)) {
-			if (sequence_tree)
-				myfree(sequence_tree);
-			if (ret)
-				myfree(ret);
-			if (sequence_itt)
-				myfree(sequence_itt);
-			if (sorted_tree)
-				myfree(sorted_tree);
-			if (sorted_itt)
-				myfree(sorted_itt);
+			if (itt)
+				myfree(itt);
 			return NULL;
 		}
 
@@ -151,26 +140,22 @@ ORBContext *init_orb_context(bool send) {
 				myfree(sequence_tree);
 			if (ret)
 				myfree(ret);
-			if (sequence_itt)
-				myfree(sequence_itt);
 			if (sorted_tree)
 				myfree(sorted_tree);
-			if (sorted_itt)
-				myfree(sorted_itt);
+			if (itt)
+				myfree(itt);
 			return NULL;
 		}
 
-		if (orbtree_iterator(sorted_tree, sorted_itt, NULL, false, NULL, false, send)) {
+		if (orbtree_iterator(sorted_tree, itt, NULL, false, NULL, false, send)) {
 			if (sequence_tree)
 				myfree(sequence_tree);
 			if (ret)
 				myfree(ret);
-			if (sequence_itt)
-				myfree(sequence_itt);
 			if (sorted_tree)
 				myfree(sorted_tree);
-			if (sorted_itt)
-				myfree(sorted_itt);
+			if (itt)
+				myfree(itt);
 			return NULL;
 		}
 	} else {
@@ -178,12 +163,10 @@ ORBContext *init_orb_context(bool send) {
 			myfree(sequence_tree);
 		if (ret)
 			myfree(ret);
-		if (sequence_itt)
-			myfree(sequence_itt);
 		if (sorted_tree)
 			myfree(sorted_tree);
-		if (sorted_itt)
-			myfree(sorted_itt);
+		if (itt)
+			myfree(itt);
 	}
 	ret->namespace_next = 1;
 	ret->global_namespace_next = 1;
@@ -236,11 +219,9 @@ typedef struct ObjectImpl {
 } ObjectImpl;
 
 void object_cleanup(const Object *ptr) {
-	if (ptr == NULL)
+	printf("----->start cleanup\n");
+	if (ptr == NULL || nil(ptr->impl) || ptr->flags & OBJECT_FLAG_NO_CLEANUP)
 		return;
-	if (ptr->flags & OBJECT_FLAG_NO_CLEANUP) {
-		return;
-	}
 #if defined(__clang__)
 // Clang-specific pragma
 #pragma GCC diagnostic push
@@ -263,83 +244,99 @@ void object_cleanup(const Object *ptr) {
 		rc_cleanup(&ptr_mut->impl);
 		ptr_mut->impl.impl = null;
 	}
+	printf("====>end cleanup\n");
+}
+
+ORBContext *object_get_context_and_lock(const ObjectImpl *impl) {
+	assert(impl);
+	bool send = impl->send;
+	if (send) {
+		if (!has_global_lock && pthread_rwlock_wrlock(&global_rbtree_lock))
+			panic("rwlock error!");
+		has_global_lock++;
+		return global_orb_context;
+	} else {
+		return tl_orb_context;
+	}
+}
+
+void object_unlock(const ObjectImpl *impl) {
+	assert(impl);
+	bool send = impl->send;
+	if (send) {
+		if (--has_global_lock == 0)
+			if (pthread_rwlock_unlock(&global_rbtree_lock))
+				panic("rwlock error!");
+	}
 }
 
 void object_cleanup_rc(ObjectImpl *impl) {
+	assert(impl);
 	if (!nil(impl->self)) {
 		fam_free(&impl->self);
 		impl->self = null;
 	}
-
+	printf("pc=%u\n", impl->property_count);
 	if (impl->property_count) {
-
 		ObjectNc *to_cleanup[impl->property_count];
 		u64 cleanup_count = 0;
 		tl_start_range_value.namespace = impl->namespace;
 		tl_end_range_value.namespace = impl->namespace + 1;
-		tl_start_range_value.seqno = 0;
-		tl_start_range_value.seqno_precision = 0;
-		tl_end_range_value.seqno = 0;
-		tl_end_range_value.seqno_precision = 0;
 
 		bool send = impl->send;
-		ORBTreeTray tray;
 		FatPtr *properties[impl->property_count];
-		ORBTreeIteratorNc *itt;
-		ORBTreeNc *tree;
-		ORBTreeIteratorNc *sequence_itt;
-		ORBTreeNc *sequence_tree;
-		if (send) {
-			if (pthread_rwlock_wrlock(&global_rbtree_lock))
-				panic("rwlock error!");
-			itt = global_orb_context->sorted_itt;
-			tree = global_orb_context->sorted_tree;
-			sequence_tree = global_orb_context->sequence_tree;
-			sequence_itt = global_orb_context->sequence_itt;
-		} else {
-			itt = tl_orb_context->sorted_itt;
-			tree = tl_orb_context->sorted_tree;
-			sequence_tree = tl_orb_context->sequence_tree;
-			sequence_itt = tl_orb_context->sequence_itt;
-		}
 
-		orbtree_iterator_reset(itt, &tl_start_range_value, true, &tl_end_range_value, false);
+		ORBContext *ctx = object_get_context_and_lock(impl);
+		ORBTreeIteratorNc *itt = ctx->itt;
+		ORBTreeNc *tree = ctx->sorted_tree;
+		ORBTreeNc *sequence_tree = ctx->sequence_tree;
+
+		assert(
+			!orbtree_iterator_reset(itt, &tl_start_range_value, true, &tl_end_range_value, false));
 
 		u64 i = 0;
-		while (orbtree_iterator_next(itt, &tray)) {
-			ObjectValueNc *v = tray.value;
+		while (orbtree_iterator_next(itt, &ctx->tray)) {
+			ObjectValueNc *v = ctx->tray.value;
+			char *nx = $(v->name);
+			u64 seqno = v->seqno;
+			printf("nx=%s,s=%llu,ns=%llu,impl->ns=%llu\n", nx, seqno, v->namespace,
+				   impl->namespace);
 			properties[i] = &v->name;
 			i++;
 		}
 		assert(i == impl->property_count);
 
 		for (i = 0; i < impl->property_count; i++) {
-			ObjectValueNc value;
+			ObjectValueNc value = INIT_OBJECT_VALUE;
 			value.namespace = impl->namespace;
 			value.name = *properties[i];
-			orbtree_remove(tree, &value, &tray);
-			ObjectValueNc *rem = tray.value;
+			assert(!orbtree_remove(tree, &value, &ctx->tray));
+			ObjectValueNc *rem = ctx->tray.value;
+			assert(rem);
 			u64 seqno = rem->seqno;
 			u32 precision = rem->seqno_precision;
 			ObjectValueData *obj_data = $(rem->value);
+			assert(obj_data);
 			if (obj_data->type == ObjectTypeObject) {
 				to_cleanup[cleanup_count++] = (ObjectNc *)obj_data->value;
 			}
 
 			fam_free(&rem->value);
 			fam_free(&rem->name);
-			orbtree_deallocate_tray(tree, &tray);
+			assert(!orbtree_deallocate_tray(tree, &ctx->tray));
 
 			value.seqno = seqno;
 			value.seqno_precision = precision;
-			int res = orbtree_remove(sequence_tree, &value, &tray);
-			orbtree_deallocate_tray(sequence_tree, &tray);
+			assert(!orbtree_remove(sequence_tree, &value, &ctx->tray));
+			rem = ctx->tray.value;
+			fam_free(&rem->value);
+			fam_free(&rem->name);
+			printf("fam free seq\n");
+
+			assert(!orbtree_deallocate_tray(sequence_tree, &ctx->tray));
 		}
 
-		if (send) {
-			if (pthread_rwlock_unlock(&global_rbtree_lock))
-				panic("rwlock error!");
-		}
+		object_unlock(impl);
 
 		for (i = 0; i < cleanup_count; i++) {
 			object_cleanup(to_cleanup[i]);
@@ -361,9 +358,7 @@ void object_check_consumed(const Object *ptr) {
 // move the object to a new memory location
 Object object_move(const Object *src) {
 	object_check_consumed(src);
-	ObjectNc dst = NIL;
-	dst.flags = src->flags;
-	dst.impl = src->impl;
+	ObjectNc dst = {.flags = src->flags, .impl = src->impl};
 #if defined(__clang__)
 // Clang-specific pragma
 #pragma GCC diagnostic push
@@ -381,20 +376,21 @@ Object object_move(const Object *src) {
 
 	return dst;
 }
+
 // create a reference counted reference of the object
 Object object_ref(const Object *src) {
 	object_check_consumed(src);
-	ObjectNc dst = NIL;
-	dst.flags = src->flags;
+	ObjectNc dst = {.flags = src->flags, .impl = rc_null};
 	rc_clone(&dst.impl, &src->impl);
 	return dst;
 }
 
 bool object_is_send(const Object *obj) {
-	return (obj->flags & OBJECT_FLAGS_SEND) != 0;
+	return (obj->flags & OBJECT_FLAG_SEND) != 0;
 }
 
-int object_value_for(ObjectValue *value, const Object *obj, const char *name, i64 seqno) {
+int object_value_for(ObjectValue *value, const Object *obj, const char *name, u64 seqno,
+					 u32 seqno_precision) {
 	const ObjectImpl *impl = $(obj->impl);
 	if (name) {
 		bool send = object_is_send(obj);
@@ -407,86 +403,115 @@ int object_value_for(ObjectValue *value, const Object *obj, const char *name, i6
 		strcpy($(value->name), name);
 	}
 	value->namespace = impl->namespace;
-	if (seqno < 0) {
-		value->seqno = impl->property_seqno_next;
-#if defined(__clang__)
-// Clang-specific pragma
-#pragma GCC diagnostic push
-#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
-#elif defined(__GNUC__) && !defined(__clang__)
-// GCC-specific pragma
-#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-#pragma GCC diagnostic ignored "-Wincompatible-pointer-types"
-#else
-#warning "Unknown compiler or platform. No specific warning pragmas applied."
-#endif
-		ObjectImpl *impl_mut = impl;
-#pragma GCC diagnostic pop
-		impl_mut->property_seqno_next++;
-	} else
-		value->seqno = seqno;
-	value->seqno_precision = 0;
+	value->seqno = seqno;
+	value->seqno_precision = seqno_precision;
 
 	return 0;
 }
 
-int object_put_trees(ObjectImpl *impl, bool send, ObjectValue *val) {
-	int ret = 0;
-	ORBTreeNc *tree;
-	ORBTreeNc *sequence_tree;
-	if (send) {
-		if (pthread_rwlock_wrlock(&global_rbtree_lock))
-			panic("rwlock error!");
-		tree = global_orb_context->sorted_tree;
-		sequence_tree = global_orb_context->sequence_tree;
-	} else {
-		tree = tl_orb_context->sorted_tree;
-		sequence_tree = tl_orb_context->sequence_tree;
-	}
-	ORBTreeTray tray, retval;
-	ORBTreeTray sequence_tray, sequence_retval;
-	ObjectValueNc obv, sequence_obv;
-	retval.value = &obv;
-	sequence_retval.value = &sequence_obv;
-	if (orbtree_allocate_tray(tree, &tray) || orbtree_allocate_tray(sequence_tree, &sequence_tray))
-		ret = -1;
-	else {
-		memcpy(tray.value, val, sizeof(ObjectValue));
-		retval.updated = false;
-		ret = orbtree_put(tree, &tray, &retval);
-		if (retval.updated) {
-			ObjectValueData *obj_data = $(obv.value);
-			u64 seqno = obv.seqno;
-			u32 precision = obv.seqno_precision;
-			if (obj_data->type == ObjectTypeObject) {
-				object_cleanup((ObjectNc *)obj_data->value);
-			}
-			object_value_cleanup(&obv);
-			orbtree_deallocate_tray(tree, &tray);
-			orbtree_deallocate_tray(sequence_tree, &sequence_tray);
+ObjectValueNc *object_get_property_value(ORBContext *ctx, const Object *obj, const char *name,
+										 bool remove) {
+	ORBTreeNc *sorted_tree = ctx->sorted_tree;
+	ORBTreeNc *sequence_tree = ctx->sequence_tree;
+	ctx->tray.updated = false;
 
-			// reset seqno to previous value
-			orbtree_get(tree, tray.value, &retval);
-			ObjectValueNc *v = retval.value;
-			v->seqno = seqno;
-			v->seqno_precision = precision;
-		} else {
-			memcpy(sequence_tray.value, val, sizeof(ObjectValue));
-			orbtree_put(sequence_tree, &sequence_tray, &sequence_retval);
+	ObjectImpl *impl = $(obj->impl);
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return NULL;
+	}
+
+	ObjectValue objvalue = INIT_OBJECT_VALUE;
+	if (object_value_for(&objvalue, obj, name, -1, 0))
+		return NULL;
+	int v;
+	if (remove) {
+		v = orbtree_remove(sorted_tree, &objvalue, &ctx->tray);
+		if (v == 0 && ctx->tray.updated) {
+			ObjectValueNc *rem = ctx->tray.value;
+			u64 seqno = rem->seqno;
+			u32 precision = rem->seqno_precision;
+			ObjectValueData *obj_data = $(rem->value);
+			assert(obj_data);
+			fam_free(&rem->name);
+			assert(!orbtree_deallocate_tray(sorted_tree, &ctx->tray));
+			objvalue.seqno = seqno;
+			objvalue.seqno_precision = precision;
+			ctx->sequence_tray.updated = false;
+			assert(!orbtree_remove(sequence_tree, &objvalue, &ctx->sequence_tray));
+			assert(ctx->sequence_tray.updated);
+
+			ObjectValueNc *sequence_rem = ctx->sequence_tray.value;
+			fam_free(&sequence_rem->name);
+			fam_free(&sequence_rem->value);
+
+			assert(!orbtree_deallocate_tray(sequence_tree, &ctx->sequence_tray));
 		}
-	}
-	if (send) {
-		if (pthread_rwlock_unlock(&global_rbtree_lock))
-			panic("rwlock error!");
+	} else {
+		v = orbtree_get(sorted_tree, &objvalue, &ctx->tray);
 	}
 
-	if (ret == 0 && !retval.updated)
-		impl->property_count++;
-	return ret;
+	if (v || !ctx->tray.updated)
+		return NULL;
+
+	ObjectValueNc *valueret = ctx->tray.value;
+	return valueret;
+}
+
+ObjectValueData *object_get_property_data(ORBContext *ctx, const Object *obj, const char *name,
+										  bool remove) {
+	ORBTreeNc *sorted_tree = ctx->sorted_tree;
+	ORBTreeNc *sequence_tree = ctx->sequence_tree;
+	ctx->tray.updated = false;
+
+	ObjectImpl *impl = $(obj->impl);
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return NULL;
+	}
+
+	ObjectValue objvalue = INIT_OBJECT_VALUE;
+	if (object_value_for(&objvalue, obj, name, -1, 0))
+		return NULL;
+	int v;
+	if (remove) {
+		v = orbtree_remove(sorted_tree, &objvalue, &ctx->tray);
+		if (v == 0 && ctx->tray.updated) {
+			ObjectValueNc *rem = ctx->tray.value;
+			u64 seqno = rem->seqno;
+			u32 precision = rem->seqno_precision;
+			ObjectValueData *obj_data = $(rem->value);
+			assert(obj_data);
+			fam_free(&rem->name);
+			assert(!orbtree_deallocate_tray(sorted_tree, &ctx->tray));
+			objvalue.seqno = seqno;
+			objvalue.seqno_precision = precision;
+			ctx->sequence_tray.updated = false;
+			assert(!orbtree_remove(sequence_tree, &objvalue, &ctx->sequence_tray));
+			assert(ctx->sequence_tray.updated);
+
+			ObjectValueNc *sequence_rem = ctx->sequence_tray.value;
+			fam_free(&sequence_rem->name);
+			fam_free(&sequence_rem->value);
+
+			assert(!orbtree_deallocate_tray(sequence_tree, &ctx->sequence_tray));
+		}
+	} else {
+		v = orbtree_get(sorted_tree, &objvalue, &ctx->tray);
+	}
+
+	if (v || !ctx->tray.updated)
+		return NULL;
+
+	ObjectValueNc *valueret = ctx->tray.value;
+	ObjectValueData *valueretdata = $(valueret->value);
+
+	return valueretdata;
 }
 
 int object_set_property_value(Object *obj, const char *name, const void *value, u64 size,
 							  ObjectType type) {
+	Object to_cleanup = NIL;
 	if (obj == NULL || name == NULL || value == NULL) {
 		SetErr(IllegalArgument);
 		return -1;
@@ -499,23 +524,91 @@ int object_set_property_value(Object *obj, const char *name, const void *value, 
 		return -1;
 	}
 
-	ObjectValueNc val;
-	if (object_value_for(&val, obj, name, -1))
-		return -1;
+	int ret = 0;
+	ORBContext *ctx = object_get_context_and_lock(impl);
 
-	if (fam_alloc(&val.value, sizeof(ObjectValueData) + size))
-		return -1;
+	// first check if it is in the object
+	ObjectValueData *vd = object_get_property_data(ctx, obj, name, false);
 
-	ObjectValueData *objdata = $(val.value);
-	objdata->type = type;
+	if (vd) {
+		if (vd->type == ObjectTypeObject) {
+			printf("----======================obj cleanup\n");
+			// object_cleanup((Object *)vd->value);
+			to_cleanup = *(Object *)vd->value;
+			printf("end cleanup\n");
+		}
 
-	memcpy(objdata->value, value, size);
+		ObjectValueNc *valueret = object_get_property_value(ctx, obj, name, false);
+		printf("valueret.seqno==================================================%llu\n",
+			   valueret->seqno);
 
-	return object_put_trees(impl, send, &val);
+		// it exists, overwrite it
+		memcpy(vd->value, value, size);
+
+	} else {
+		// it doesn't exist, insert it
+		int res1 = orbtree_allocate_tray(ctx->sorted_tree, &ctx->tray);
+		int res2 = orbtree_allocate_tray(ctx->sequence_tree, &ctx->sequence_tray);
+
+		if (res1 || res2) {
+			orbtree_deallocate_tray(ctx->sorted_tree, &ctx->tray);
+			orbtree_deallocate_tray(ctx->sequence_tree, &ctx->sequence_tray);
+		}
+
+		if (res1 == 0 && res2 == 0) {
+
+			ObjectValueNc val = INIT_OBJECT_VALUE;
+			ObjectValueNc val2 = INIT_OBJECT_VALUE;
+			int res3 = object_value_for(&val, obj, name, impl->property_seqno_next, 0);
+			int res4 = object_value_for(&val2, obj, name, impl->property_seqno_next, 0);
+			impl->property_seqno_next++;
+
+			int fres1 = fam_alloc(&val.value, sizeof(ObjectValueData) + size);
+			int fres2 = fam_alloc(&val2.value, sizeof(ObjectValueData) + size);
+
+			if (fres1 || fres2) {
+				fam_free(&val.value);
+				fam_free(&val2.value);
+				orbtree_deallocate_tray(ctx->sorted_tree, &ctx->tray);
+				orbtree_deallocate_tray(ctx->sequence_tree, &ctx->sequence_tray);
+				ret = -1;
+			} else {
+
+				ObjectValueData *objdata = $(val.value);
+				objdata->type = type;
+				ObjectValueData *objdata2 = $(val2.value);
+				objdata2->type = type;
+
+				memcpy(objdata->value, value, size);
+				memcpy(objdata2->value, value, size);
+
+				if (res3 == 0) {
+					memcpy(ctx->tray.value, &val, sizeof(ObjectValue));
+					memcpy(ctx->sequence_tray.value, &val2, sizeof(ObjectValue));
+					ORBTreeTray retval = {.updated = false};
+					int res5 = orbtree_put(ctx->sorted_tree, &ctx->tray, &retval);
+					assert(!retval.updated);
+					assert(!res5);
+					int res6 = orbtree_put(ctx->sequence_tree, &ctx->sequence_tray, &retval);
+					assert(!retval.updated);
+					assert(!res6);
+					impl->property_count++;
+				} else {
+					ret = -1;
+				}
+			}
+
+		} else {
+			ret = -1;
+		}
+	}
+
+	object_unlock(impl);
+
+	return ret;
 }
 
 Object object_create(bool send, ObjectType type, const void *primitive) {
-	ObjectNc obj = NIL;
 	if (send) {
 		if (object_init_global()) {
 			return NIL;
@@ -537,9 +630,7 @@ Object object_create(bool send, ObjectType type, const void *primitive) {
 
 	ObjectImpl *impl = $(ptr);
 	impl->send = send;
-
 	impl->self = ptr;
-
 	ORBContext *ctx;
 
 	if (send) {
@@ -550,9 +641,9 @@ Object object_create(bool send, ObjectType type, const void *primitive) {
 		impl->namespace = ctx->namespace_next;
 		ctx->namespace_next++;
 	}
-	obj.flags = 0;
+	ObjectNc obj = {.flags = 0};
 	if (send)
-		obj.flags |= OBJECT_FLAGS_SEND;
+		obj.flags |= OBJECT_FLAG_SEND;
 
 	impl->type = type;
 	impl->property_count = 0;
@@ -580,6 +671,21 @@ Object object_create(bool send, ObjectType type, const void *primitive) {
 	return obj;
 }
 
+ObjectType object_type(const Object *obj) {
+	object_check_consumed(obj);
+	ObjectImpl *impl = $(obj->impl);
+	return impl->type;
+}
+
+int object_send(Object *obj, Channel *channel) {
+	return 0;
+}
+
+i64 object_properties(const Object *obj) {
+	object_check_consumed(obj);
+	ObjectImpl *impl = $(obj->impl);
+	return impl->property_count;
+}
 Object object_set_property(Object *obj, const char *name, const Object *value) {
 	object_check_consumed(obj);
 	object_check_consumed(value);
@@ -587,74 +693,6 @@ Object object_set_property(Object *obj, const char *name, const Object *value) {
 	if (object_set_property_value(obj, name, &vmove, sizeof(Object), ObjectTypeObject))
 		return NIL;
 	return UNIT;
-}
-
-const ObjectValueData *object_get_property_data(const Object *obj, const char *name, bool remove,
-												ORBTreeTray *tray) {
-	bool send = object_is_send(obj);
-	ObjectImpl *impl = $(obj->impl);
-	if (impl == NULL) {
-		SetErr(IllegalState);
-		return NULL;
-	}
-
-	ORBTreeNc *tree;
-	ORBTreeNc *sequence_tree;
-	if (send) {
-		if (pthread_rwlock_wrlock(&global_rbtree_lock))
-			panic("rwlock error!");
-		tree = global_orb_context->sorted_tree;
-		sequence_tree = global_orb_context->sequence_tree;
-	} else {
-		tree = tl_orb_context->sorted_tree;
-		sequence_tree = tl_orb_context->sequence_tree;
-	}
-
-	ObjectValue objvalue = INIT_OBJECT_VALUE;
-	object_value_for(&objvalue, obj, name, -1);
-	tray->updated = false;
-	int v;
-	if (remove) {
-		v = orbtree_remove(tree, &objvalue, tray);
-		if (v == 0) {
-			ObjectValueNc *rem = tray->value;
-			u64 seqno = rem->seqno;
-			u32 precision = rem->seqno_precision;
-			ObjectValueData *obj_data = $(rem->value);
-			fam_free(&rem->name);
-			orbtree_deallocate_tray(tree, tray);
-			objvalue.seqno = seqno;
-			objvalue.seqno_precision = precision;
-			orbtree_remove(sequence_tree, &objvalue, tray);
-			orbtree_deallocate_tray(sequence_tree, tray);
-		}
-	} else {
-		v = orbtree_get(tree, &objvalue, tray);
-	}
-	if (send) {
-		pthread_rwlock_unlock(&global_rbtree_lock);
-	}
-
-	if (!tray->updated) {
-		return NULL;
-	}
-	const ObjectValueNc *valueret = tray->value;
-	const ObjectValueData *valueretdata = $(valueret->value);
-
-	return valueretdata;
-}
-
-i64 object_properties(const Object *obj) {
-	if (obj == NULL) {
-		SetErr(IllegalArgument);
-		return -1;
-	}
-	ObjectImpl *impl = $(obj->impl);
-	if (impl == NULL) {
-		SetErr(IllegalState);
-		return -1;
-	}
-	return impl->property_count;
 }
 
 Object object_get_property(const Object *obj, const char *name) {
@@ -671,8 +709,10 @@ Object object_get_property(const Object *obj, const char *name) {
 		return NIL;
 	}
 
-	ORBTreeTray tray;
-	const ObjectValueData *vd = object_get_property_data(obj, name, false, &tray);
+	ORBContext *ctx = object_get_context_and_lock(impl);
+	const ObjectValueData *vd = object_get_property_data(ctx, obj, name, false);
+	object_unlock(impl);
+
 	if (vd == NULL)
 		return NIL;
 	ObjectNc ret = *(Object *)vd->value;
@@ -694,61 +734,50 @@ Object object_remove_property(Object *obj, const char *name) {
 		return NIL;
 	}
 
-	ORBTreeTray tray;
-	const ObjectValueData *vd = object_get_property_data(obj, name, true, &tray);
-	if (vd == NULL)
-		return NIL;
+	ORBContext *ctx = object_get_context_and_lock(impl);
+	const ObjectValueData *vd = object_get_property_data(ctx, obj, name, true);
+	if (vd != NULL) {
+		impl->property_count--;
 
-	impl->property_count--;
-	ObjectNc *ret = (Object *)vd->value;
+		ObjectNc *ret = (Object *)vd->value;
 
-	ObjectNc ref_ret = object_move(ret);
-	ObjectValueNc *rem = tray.value;
-	fam_free(&rem->value);
+		ObjectNc ref_ret = object_move(ret);
+		ObjectValueNc *rem = ctx->tray.value;
+		fam_free(&rem->value);
+		object_unlock(impl);
+		return ref_ret;
+	}
+	object_unlock(impl);
 
-	return ref_ret;
+	return NIL;
 }
 
 ObjectValue *object_get_property_index_impl(const Object *obj, u32 index) {
 	object_check_consumed(obj);
 
-	bool send = object_is_send(obj);
 	ObjectImpl *impl = $(obj->impl);
+
 	if (impl == NULL) {
 		SetErr(IllegalState);
 		return NULL;
 	}
 
-	ORBTreeNc *tree;
-	if (send) {
-		tree = global_orb_context->sequence_tree;
-		if (pthread_rwlock_wrlock(&global_rbtree_lock))
-			panic("rwlock error!");
-	} else
-		tree = tl_orb_context->sequence_tree;
+	ORBContext *ctx = object_get_context_and_lock(impl);
+	ORBTreeNc *tree = ctx->sequence_tree;
 
-	ObjectValueNc objvalue = INIT_OBJECT_VALUE;
-	object_value_for(&objvalue, obj, NULL, index);
-	ORBTreeTray tray;
-	tray.updated = false;
-
+	ctx->tray.updated = false;
 	tl_start_range_value.namespace = impl->namespace;
-	printf("impl.ns=%llu\n", impl->namespace);
+	int v = orbtree_get_index_ranged(tree, index, &ctx->tray, &tl_start_range_value, true);
 
-	int v = orbtree_get_index_ranged(tree, index, &tray, &tl_start_range_value, true);
-	printf("v=%i\n", v);
-	if (send) {
-		pthread_rwlock_unlock(&global_rbtree_lock);
-	}
-
-	if (!tray.updated) {
-		printf("tray not updated\n");
+	if (v || !ctx->tray.updated) {
+		object_unlock(impl);
 		return NULL;
 	}
 
-	ObjectValueNc *valueret = tray.value;
+	ObjectValueNc *valueret = ctx->tray.value;
+	object_unlock(impl);
+
 	if (valueret->namespace != impl->namespace) {
-		printf("ns !!!!\n");
 		return NULL;
 	}
 	return valueret;
@@ -787,42 +816,82 @@ Object object_remove_property_index(Object *obj, u32 index) {
 	return object_ref(&res);
 }
 
-Object object_set_property_index(Object *obj, const Object *value, u64 index) {
-	ObjectValueNc *valueret = object_get_property_index_impl(obj, index);
+Object object_set_property_index(Object *obj, u32 index, const Object *value) {
+	object_check_consumed(obj);
+
+	ObjectImpl *impl = $(obj->impl);
+
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return NIL;
+	}
+
+	ORBContext *ctx = object_get_context_and_lock(impl);
+	ORBTreeNc *tree = ctx->sequence_tree;
+
+	ctx->tray.updated = false;
+	tl_start_range_value.namespace = impl->namespace;
+	int v = orbtree_get_index_ranged(tree, index, &ctx->tray, &tl_start_range_value, true);
+
+	if (v || !ctx->tray.updated) {
+		object_unlock(impl);
+		return NIL;
+	}
+
+	ObjectValueNc *valueret = ctx->tray.value;
+
+	if (valueret->namespace != impl->namespace) {
+		object_unlock(impl);
+		return NIL;
+	}
+
 	ObjectValueData *vd = $(valueret->value);
 	if (vd == NULL) {
+		object_unlock(impl);
 		printf("vd == NULL\n");
 		return NIL;
 	}
 
 	const char *name = $(valueret->name);
-	return object_set_property(obj, name, value);
+	printf("=======================================name=%s\n", name);
+	ObjectValueNc *obj_val = ctx->tray.value;
+	printf("obj.seqno=%llu\n", obj_val->seqno);
+	ObjectValueData *obj_data = $(obj_val->value);
+	ObjectNc nv = object_move(value);
+	ObjectNc to_cleanup;
+	memcpy(&to_cleanup, obj_data->value, sizeof(Object));
+	memcpy(obj_data->value, &nv, sizeof(Object));
+	// obj_data->value = object_move(value);
+	//*obj_out = object_move(value);
+
+	ctx->tray.updated = false;
+	ObjectValue objvalue = INIT_OBJECT_VALUE;
+	object_value_for(&objvalue, obj, name, -1, 0);
+
+	orbtree_get(ctx->sorted_tree, &objvalue, &ctx->tray);
+	assert(ctx->tray.updated);
+	obj_val = ctx->tray.value;
+	obj_data = $(obj_val->value);
+	memcpy(obj_data->value, &nv, sizeof(Object));
+
+	object_unlock(impl);
+
+	object_cleanup(&to_cleanup);
+
+	return UNIT;
 }
 
-Object object_insert_property_before_index(Object *obj, const char *name, const Object *value,
-										   u64 index) {
-	object_check_consumed(obj);
+Object object_insert_property_before_index(Object *obj, u32 index, const char *name,
+										   const Object *value) {
 	return NIL;
-}
-Object object_insert_property_after_index(Object *obj, const char *name, const Object *value,
-										  u64 index) {
-	object_check_consumed(obj);
-	return NIL;
-}
-
-ObjectType object_type(const Object *obj) {
-	object_check_consumed(obj);
-	ObjectImpl *impl = $(obj->impl);
-	return impl->type;
-}
-int object_send(Object *obj, Channel *channel) {
-	return 0;
 }
 
 const char *object_as_string(const Object *obj) {
 	object_check_consumed(obj);
-	ORBTreeTray tray;
-	const ObjectValueData *v = object_get_property_data(obj, "value", false, &tray);
+	ObjectImpl *impl = $(obj->impl);
+	ORBContext *ctx = object_get_context_and_lock(impl);
+	const ObjectValueData *v = object_get_property_data(ctx, obj, "value", false);
+	object_unlock(impl);
 	if (v == NULL || v->type != ObjectTypeString) {
 		SetErr(ExpectedTypeMismatch);
 		return NULL;
@@ -832,8 +901,10 @@ const char *object_as_string(const Object *obj) {
 }
 u64 object_as_u64(const Object *obj) {
 	object_check_consumed(obj);
-	ORBTreeTray tray;
-	const ObjectValueData *v = object_get_property_data(obj, "value", false, &tray);
+	ObjectImpl *impl = $(obj->impl);
+	ORBContext *ctx = object_get_context_and_lock(impl);
+	const ObjectValueData *v = object_get_property_data(ctx, obj, "value", false);
+	object_unlock(impl);
 	if (v == NULL || v->type != ObjectTypeU64) {
 		SetErr(ExpectedTypeMismatch);
 		return 0;
@@ -845,13 +916,11 @@ void object_cleanup_thread_local() {
 	object_value_cleanup(&tl_start_range_value);
 	object_value_cleanup(&tl_end_range_value);
 	if (tl_orb_context != NULL) {
-		orbtree_iterator_cleanup(tl_orb_context->sorted_itt);
-		orbtree_iterator_cleanup(tl_orb_context->sequence_itt);
+		orbtree_iterator_cleanup(tl_orb_context->itt);
 		orbtree_cleanup(tl_orb_context->sorted_tree);
 		orbtree_cleanup(tl_orb_context->sequence_tree);
-		myfree(tl_orb_context->sequence_itt);
 		myfree(tl_orb_context->sequence_tree);
-		myfree(tl_orb_context->sorted_itt);
+		myfree(tl_orb_context->itt);
 		myfree(tl_orb_context->sorted_tree);
 		myfree(tl_orb_context);
 	}
@@ -899,15 +968,14 @@ u64 get_global_orbtree_seq_size() {
 		return 0;
 	return orbtree_size(global_orb_context->sequence_tree);
 }
+
 void object_cleanup_global() {
 	if (global_orb_context != NULL) {
-		orbtree_iterator_cleanup(global_orb_context->sorted_itt);
-		orbtree_iterator_cleanup(global_orb_context->sequence_itt);
+		orbtree_iterator_cleanup(global_orb_context->itt);
 		orbtree_cleanup(global_orb_context->sorted_tree);
 		orbtree_cleanup(global_orb_context->sequence_tree);
-		myfree(global_orb_context->sequence_itt);
 		myfree(global_orb_context->sequence_tree);
-		myfree(global_orb_context->sorted_itt);
+		myfree(global_orb_context->itt);
 		myfree(global_orb_context->sorted_tree);
 		myfree(global_orb_context);
 	}

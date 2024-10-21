@@ -572,13 +572,10 @@ int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 		}
 	}
 
-	printf("cur=%u\n", cur);
-
 	while (cur != NIL) {
 		ORBTreeNode *cur_node = orbtree_node(impl, cur);
 		//  index found
 		if (index == 0) {
-			printf("found at cur = %u\n", cur);
 			tray->value = orbtree_value(impl, cur);
 			tray->updated = true;
 			return 0;
@@ -614,8 +611,6 @@ int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 			}
 		}
 	}
-
-	printf("not found\n");
 
 	// not found
 	return -1;
@@ -1027,8 +1022,8 @@ i64 orbtree_slabs(const ORBTree *ptr) {
 	return impl->alloc->size;
 }
 
-int orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *start_value,
-						  bool start_inclusive, const void *end_value, bool end_inclusive) {
+void orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *start_value,
+						   bool start_inclusive, const void *end_value, bool end_inclusive) {
 
 	ORBTreeIteratorImpl *rbimpl = $(iter->impl);
 	rbimpl->impl = impl;
@@ -1065,8 +1060,6 @@ int orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *
 				rbimpl->min = itt;
 				itt = node->left;
 			}
-			if (++i >= 100)
-				return -1;
 		}
 	}
 
@@ -1094,12 +1087,8 @@ int orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *
 				// more
 				itt = node->left;
 			}
-			if (++i >= 100)
-				return -1;
 		}
 	}
-
-	return 0;
 }
 
 int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *start_value,
@@ -1123,8 +1112,8 @@ int orbtree_iterator(const ORBTree *ptr, ORBTreeIterator *iter, const void *star
 		}
 	}
 
-	return orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value,
-								 end_inclusive);
+	orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value, end_inclusive);
+	return 0;
 }
 
 int orbtree_iterator_reset(ORBTreeIterator *iter, const void *start_value, bool start_inclusive,
@@ -1141,8 +1130,8 @@ int orbtree_iterator_reset(ORBTreeIterator *iter, const void *start_value, bool 
 		return -1;
 	}
 
-	return orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value,
-								 end_inclusive);
+	orbtree_iterator_impl(impl, iter, start_value, start_inclusive, end_value, end_inclusive);
+	return 0;
 }
 
 int orbtree_init_free_list(ORBTreeImpl *impl, u8 *data, u32 offset) {

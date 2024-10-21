@@ -15,7 +15,7 @@
 #ifndef _UTIL_OBJECT__
 #define _UTIL_OBJECT__
 
-#define OBJECT_FLAGS_SEND 0x1
+#define OBJECT_FLAG_SEND 0x1
 #define OBJECT_FLAG_NO_CLEANUP (0x1 << 1)
 #define OBJECT_FLAG_CONSUMED (0x1 << 2)
 
@@ -65,11 +65,11 @@ Object object_remove_property(Object *obj, const char *name);
 Object object_get_property_index(const Object *obj, u32 index);
 Object object_remove_property_index(Object *obj, u32 index);
 // insert at the specified index
-Object object_set_property_index(Object *obj, const Object *value, u64 index);
-Object object_insert_property_before_index(Object *obj, const char *name, const Object *value,
-										   u64 index);
-Object object_insert_property_after_index(Object *obj, const char *name, const Object *value,
-										  u64 index);
+Object object_set_property_index(Object *obj, u32 index, const Object *value);
+Object object_insert_property_before_index(Object *obj, u32 index, const char *name,
+										   const Object *value);
+Object object_insert_property_after_index(Object *obj, u32 index, const char *name,
+										  const Object *value);
 
 // from these primitive functions, we can introduce multiple easier to use macros:
 // $(x, "myprop", z); -> object_set_property(&x, "myprop", &z);
