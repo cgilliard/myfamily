@@ -18,6 +18,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <util/object.h>
 #include <util/orbtree.h>
 #include <util/rbtree.h>
