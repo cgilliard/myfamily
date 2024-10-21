@@ -1317,7 +1317,7 @@ MyTest(util, test_orbtree_get_index) {
 	ORBTree tree1;
 	ORBTreeTray tray, ret;
 	orbtree_create(&tree1, sizeof(u64), u64_compare);
-	u64 size = 100;
+	u64 size = 1000;
 
 	for (u64 i = 0; i < size; i++) {
 		cr_assert(!orbtree_allocate_tray(&tree1, &tray));
@@ -1326,8 +1326,6 @@ MyTest(util, test_orbtree_get_index) {
 		cr_assert(!orbtree_put(&tree1, &tray, &ret));
 		orbtree_validate(&tree1);
 	}
-
-	orbtree_print(&tree1);
 
 	for (u64 i = 0; i < size; i++) {
 		for (u64 j = 0; j < size - i; j++) {

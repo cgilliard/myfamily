@@ -574,11 +574,8 @@ int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 
 	while (cur != NIL) {
 		ORBTreeNode *cur_node = orbtree_node(impl, cur);
-		printf("node=%llu,index=%u,rsub=%u\n", cur_node->node_id, index,
-			   cur_node->right_subtree_size);
 		// index found
 		if (index == 0) {
-			printf("match found\n");
 			tray->value = orbtree_value(impl, cur);
 			tray->updated = true;
 			return 0;
@@ -600,8 +597,14 @@ int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 			cur_node = orbtree_node(impl, cur);
 
 			while (cur_node->left != NIL) {
-				cur = cur_node->left;
-				cur_node = orbtree_node(impl, cur);
+				if (cur_node->left_subtree_size < index) {
+					index -= cur_node->left_subtree_size + 1;
+					cur = cur_node->right;
+					cur_node = orbtree_node(impl, cur);
+				} else {
+					cur = cur_node->left;
+					cur_node = orbtree_node(impl, cur);
+				}
 			}
 		}
 	}
