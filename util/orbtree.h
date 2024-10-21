@@ -56,6 +56,15 @@ int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced);
 // value.
 int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed);
 
+// search for the value at the specified index, storing the value in 'tray' if found. (ranged
+// version)
+int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
+							 const void *start_value, bool start_inclusive);
+// remove the value at the specified index, storing the value in 'removed' if removed. (ranged
+// version)
+int orbtree_remove_index_ranged(ORBTree *ptr, u32 index, ORBTreeTray *removed,
+								const void *start_value, bool start_inclusive);
+
 // search for the value at the specified index, storing the value in 'tray' if found.
 int orbtree_get_index(const ORBTree *ptr, u32 index, ORBTreeTray *tray);
 // remove the value at the specified index, storing the value in 'removed' if removed.

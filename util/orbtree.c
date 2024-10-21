@@ -531,6 +531,89 @@ int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced) {
 	return 0;
 }
 
+int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
+							 const void *start_value, bool start_inclusive) {
+	if (ptr == NULL || tray == NULL || start_value == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+
+	ORBTreeImpl *impl = ptr->impl;
+	if (impl == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	u32 cur = NIL;
+	u32 itt = impl->root;
+	while (itt != NIL) {
+		ORBTreeNode *node = orbtree_node(impl, itt);
+		int v = impl->compare(node->data, start_value);
+		if (v == 0) {
+			// exact match
+			if (start_inclusive) {
+				cur = itt;
+				break;
+			} else {
+				if (node->right != NIL)
+					cur = node->right;
+				itt = node->right;
+			}
+		} else if (v < 0) {
+			// continue down the
+			// chain to look for
+			// more
+			itt = node->right;
+		} else {
+			// higher value
+			// found update cur
+			cur = itt;
+			itt = node->left;
+		}
+	}
+
+	while (cur != NIL) {
+		ORBTreeNode *cur_node = orbtree_node(impl, cur);
+		printf("node=%llu,index=%u,rsub=%u\n", cur_node->node_id, index,
+			   cur_node->right_subtree_size);
+		// index found
+		if (index == 0) {
+			printf("match found\n");
+			tray->value = orbtree_value(impl, cur);
+			tray->updated = true;
+			return 0;
+		}
+		if (cur_node->right_subtree_size < index) {
+			index -= cur_node->right_subtree_size + 1;
+			u32 last = cur;
+			while (cur_node->parent != NIL) {
+				cur = cur_node->parent;
+				cur_node = orbtree_node(impl, cur);
+
+				if (cur_node->left == last)
+					break;
+				last = cur;
+			}
+		} else {
+			index -= 1;
+			cur = cur_node->right;
+			cur_node = orbtree_node(impl, cur);
+
+			while (cur_node->left != NIL) {
+				cur = cur_node->left;
+				cur_node = orbtree_node(impl, cur);
+			}
+		}
+	}
+
+	// not found
+	return -1;
+}
+int orbtree_remove_index_ranged(ORBTree *ptr, u32 index, ORBTreeTray *tray, const void *start_value,
+								bool start_inclusive) {
+	return 0;
+}
+
 int orbtree_get_index(const ORBTree *ptr, u32 index, ORBTreeTray *tray) {
 	if (ptr == NULL || tray == NULL) {
 		SetErr(IllegalArgument);
@@ -612,7 +695,8 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 		ORBTreeNode *w_node = orbtree_node(impl, w);
 		ORBTreeNode *x_node = orbtree_node(impl, x);
 		if (w == parent_node->right) {
-			// Case 1: Sibling is red
+			// Case 1: Sibling is
+			// red
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
 				SET_RED(impl, parent);
@@ -621,7 +705,9 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 				w_node = orbtree_node(impl, w);
 			}
 
-			// Case 2: Sibling's children are both black
+			// Case 2: Sibling's
+			// children are both
+			// black
 			if (IS_BLACK(impl, w_node->left) && IS_BLACK(impl, w_node->right)) {
 				SET_RED(impl, w);
 				x = parent;
@@ -640,7 +726,10 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 					w_node = orbtree_node(impl, w);
 				}
 			} else {
-				// Case 3: Sibling's right child is black, left child is red
+				// Case 3: Sibling's
+				// right child is
+				// black, left child
+				// is red
 				if (IS_BLACK(impl, w_node->right)) {
 					SET_BLACK(impl, w_node->left);
 					SET_RED(impl, w);
@@ -649,7 +738,9 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 					w_node = orbtree_node(impl, w);
 				}
 
-				// Case 4: Sibling's right child is red
+				// Case 4: Sibling's
+				// right child is
+				// red
 				orbtree_set_color_based_on_parent(impl, w, parent);
 				SET_BLACK(impl, parent);
 				SET_BLACK(impl, w_node->right);
@@ -658,7 +749,8 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 				x_node = orbtree_node(impl, x);
 			}
 		} else {
-			// Case 1: Sibling is red
+			// Case 1: Sibling is
+			// red
 			if (IS_RED(impl, w)) {
 				SET_BLACK(impl, w);
 				SET_RED(impl, parent);
@@ -667,7 +759,9 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 				w_node = orbtree_node(impl, w);
 			}
 
-			// Case 2: Sibling's children are both black
+			// Case 2: Sibling's
+			// children are both
+			// black
 			if (IS_BLACK(impl, w_node->right) && IS_BLACK(impl, w_node->left)) {
 				SET_RED(impl, w);
 				x = parent;
@@ -686,7 +780,10 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 					w_node = orbtree_node(impl, w);
 				}
 			} else {
-				// Case 3: Sibling's right child is black, left child is red
+				// Case 3: Sibling's
+				// right child is
+				// black, left child
+				// is red
 				if (IS_BLACK(impl, w_node->left)) {
 					SET_BLACK(impl, w_node->right);
 					SET_RED(impl, w);
@@ -695,7 +792,9 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 					w_node = orbtree_node(impl, w);
 				}
 
-				// Case 4: Sibling's right child is red
+				// Case 4: Sibling's
+				// right child is
+				// red
 				orbtree_set_color_based_on_parent(impl, w, parent);
 				SET_BLACK(impl, parent);
 				SET_BLACK(impl, w_node->left);
@@ -706,7 +805,8 @@ void orbtree_remove_fixup(ORBTreeImpl *impl, u32 parent, u32 w, u32 x) {
 		}
 	}
 
-	// Ensure x is black at the end of fixup
+	// Ensure x is black at the end
+	// of fixup
 	SET_BLACK(impl, x);
 }
 
@@ -725,11 +825,13 @@ int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
 		return -1;
 	}
 
-	// search for the node based on this key.
+	// search for the node based on
+	// this key.
 	ORBTreeNodePair pair;
 	orbtree_search(impl, value, &pair);
 
-	// this node doesn't exist, return -1
+	// this node doesn't exist,
+	// return -1
 	if (pair.self == NIL) {
 		removed->updated = false;
 		return -1;
@@ -816,7 +918,9 @@ int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
 			}
 		}
 
-		// do final transpalnt and update including color match
+		// do final transpalnt and
+		// update including color
+		// match
 		orbtree_transplant(impl, pair.self, successor_id);
 		successor->left = node_to_delete->left;
 		ORBTreeNode *successor_left = orbtree_node(impl, successor->left);
@@ -837,7 +941,8 @@ int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
 		if (w_id != NIL && parent_id != NIL) {
 			orbtree_remove_fixup(impl, parent_id, w_id, x_id);
 		} else {
-			// in these cases SET_BLACK only
+			// in these cases
+			// SET_BLACK only
 			if (impl->elements > 1)
 				SET_BLACK(impl, impl->root);
 		}
@@ -939,10 +1044,13 @@ int orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *
 					itt = node->right;
 				}
 			} else if (v < 0) {
-				// continue down the chain to look for more
+				// continue down the
+				// chain to look for
+				// more
 				itt = node->right;
 			} else {
-				// higher value found update min
+				// higher value
+				// found update min
 				rbimpl->min = itt;
 				itt = node->left;
 			}
@@ -965,11 +1073,14 @@ int orbtree_iterator_impl(ORBTreeImpl *impl, ORBTreeIterator *iter, const void *
 				}
 				itt = node->left;
 			} else if (v < 0) {
-				// lower value found update max
+				// lower value found
+				// update max
 				rbimpl->max = itt;
 				itt = node->right;
 			} else {
-				// continue down the chain to look for more
+				// continue down the
+				// chain to look for
+				// more
 				itt = node->left;
 			}
 			if (++i >= 100)
@@ -1120,11 +1231,14 @@ int orbtree_deallocate_tray(ORBTree *ptr, ORBTreeTray *tray) {
 	}
 
 	if (impl->alloc->free_list == NULL) {
-		panic("free list not initialized!");
+		panic("free list not "
+			  "initialized!");
 	}
 
 	if ((impl->alloc->free_list)[tray->id] != (UINT32_MAX - 1)) {
-		panic("Potential double free. Id = %llu.", tray->id);
+		panic("Potential double "
+			  "free. Id = %llu.",
+			  tray->id);
 	}
 
 	impl->alloc->free_list[tray->id] = impl->alloc->free_list_head;
@@ -1140,16 +1254,21 @@ void orbtree_validate_node(const ORBTreeImpl *impl, u32 node, int *black_count,
 						   int current_black_count) {
 	u64 value_size = impl->value_size;
 
-	// Base case: when we reach a NIL
+	// Base case: when we reach a
+	// NIL
 	if (node == NIL) {
-		// If this is the first NIL node reached, set the black count
+		// If this is the first NIL
+		// node reached, set the
+		// black count
 		if (*black_count == 0) {
 			*black_count = current_black_count; // Set the black count for the first path
 		} else {
-			// Check for black count consistency
+			// Check for black count
+			// consistency
 			assert(current_black_count == *black_count);
 		}
-		return; // Return for NIL nodes
+		return; // Return for NIL
+				// nodes
 	}
 
 	ORBTreeNode *n = orbtree_node(impl, node);
@@ -1169,28 +1288,36 @@ void orbtree_validate_node(const ORBTreeImpl *impl, u32 node, int *black_count,
 	}
 
 	if (left_subtree_sum != n->left_subtree_size || right_subtree_sum != n->right_subtree_size) {
-		printf("invalid subtree counts at node = %llu\n", n->node_id);
+		printf("invalid subtree "
+			   "counts at node = "
+			   "%llu\n",
+			   n->node_id);
 	}
 	assert(left_subtree_sum == n->left_subtree_size);
 	assert(right_subtree_sum == n->right_subtree_size);
 
-	// Increment black count if the current node is black
+	// Increment black count if the
+	// current node is black
 	if (IS_BLACK(impl, node)) {
 		current_black_count++;
 	} else {
-		//   Check if the node is red
-		//   If the parent is red, return false (Red property violation)
+		//   Check if the node is
+		//   red If the parent is
+		//   red, return false (Red
+		//   property violation)
 		assert(!(n->parent != NIL && IS_RED(impl, n->parent)));
 	}
 
-	// Recursive calls for left and right children
+	// Recursive calls for left and
+	// right children
 	orbtree_validate_node(impl, n->left, black_count, current_black_count);
 	orbtree_validate_node(impl, n->right, black_count, current_black_count);
 }
 
 void orbtree_validate_impl(const ORBTreeImpl *impl) {
 	int black_count = 0;
-	// Validate from the root and check if the root is black
+	// Validate from the root and
+	// check if the root is black
 	if (impl->root != NIL) {
 		assert(IS_BLACK(impl, impl->root));
 		orbtree_validate_node(impl, impl->root, &black_count, 0);
@@ -1202,7 +1329,8 @@ void orbtree_validate(const ORBTree *ptr) {
 	orbtree_validate_impl(impl);
 }
 
-// Function to print a single node with its color
+// Function to print a single node
+// with its color
 void orbtree_print_node(const ORBTreeImpl *impl, u32 node_id, int depth) {
 	if (node_id == NIL) {
 		for (int i = 0; i < depth; i++) {
@@ -1214,7 +1342,8 @@ void orbtree_print_node(const ORBTreeImpl *impl, u32 node_id, int depth) {
 
 	ORBTreeNode *node = orbtree_node(impl, node_id);
 
-	// Print the right child first (for visual representation)
+	// Print the right child first
+	// (for visual representation)
 	orbtree_print_node(impl, node->right, depth + 1);
 
 	// Indent according to depth
@@ -1222,7 +1351,8 @@ void orbtree_print_node(const ORBTreeImpl *impl, u32 node_id, int depth) {
 		printf("    ");
 	}
 
-	// Print the current node with a clearer representation
+	// Print the current node with a
+	// clearer representation
 	printf("%llu (%s,r=%u,l=%u)\n", node->node_id, (IS_BLACK(impl, node_id)) ? "B" : "R",
 		   node->right_subtree_size, node->left_subtree_size);
 
@@ -1233,12 +1363,23 @@ void orbtree_print_node(const ORBTreeImpl *impl, u32 node_id, int depth) {
 void orbtree_print_impl(ORBTreeImpl *impl) {
 	ORBTreeNode *root = orbtree_node(impl, impl->root);
 	if (!root)
-		printf("Red-Black Tree (root = 0) Empty Tree!\n");
+		printf("Red-Black Tree (root "
+			   "= 0) Empty Tree!\n");
 	else {
-		printf("Red-Black Tree (root = %llu)\n", root->node_id);
-		printf("===================================\n"); // Separator for better clarity
+		printf("Red-Black Tree "
+			   "(root = %llu)\n",
+			   root->node_id);
+		printf("==================="
+			   "================"
+			   "\n"); // Separator
+					  // for better
+					  // clarity
 		orbtree_print_node(impl, impl->root, 0);
-		printf("===================================\n"); // Separator for better clarity
+		printf("==================="
+			   "================"
+			   "\n"); // Separator
+					  // for better
+					  // clarity
 	}
 }
 

@@ -1312,3 +1312,30 @@ MyTest(util, test_object_get_index) {
 			}
 		*/
 }
+
+MyTest(util, test_orbtree_get_index) {
+	ORBTree tree1;
+	ORBTreeTray tray, ret;
+	orbtree_create(&tree1, sizeof(u64), u64_compare);
+	u64 size = 100;
+
+	for (u64 i = 0; i < size; i++) {
+		cr_assert(!orbtree_allocate_tray(&tree1, &tray));
+		u64 *v = tray.value;
+		*v = i + 10;
+		cr_assert(!orbtree_put(&tree1, &tray, &ret));
+		orbtree_validate(&tree1);
+	}
+
+	orbtree_print(&tree1);
+
+	for (u64 i = 0; i < size; i++) {
+		for (u64 j = 0; j < size - i; j++) {
+			u64 start = 10 + i;
+			int res = orbtree_get_index_ranged(&tree1, j, &tray, &start, true);
+			u64 *v = tray.value;
+			cr_assert_eq(res, 0);
+			cr_assert_eq(*v, j + 10 + i);
+		}
+	}
+}
