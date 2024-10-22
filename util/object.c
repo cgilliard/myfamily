@@ -218,6 +218,7 @@ typedef struct ObjectImpl {
 	u32 property_count;
 	u64 property_seqno_next;
 	bool send;
+	u8 data[];
 } ObjectImpl;
 
 void object_cleanup(const Object *ptr) {
@@ -594,10 +595,15 @@ Object object_create(bool send, ObjectType type, const void *primitive) {
 		}
 	}
 
+	u64 data_size = 0;
+	if (type == ObjectTypeU64) {
+		data_size = sizeof(u64);
+	}
+
 	FatPtr ptr = null;
 	{
 		SendStateGuard _ = SetSend(send);
-		if (fam_alloc(&ptr, sizeof(ObjectImpl))) {
+		if (fam_alloc(&ptr, sizeof(ObjectImpl) + data_size)) {
 			return NIL;
 		}
 	}
@@ -623,7 +629,12 @@ Object object_create(bool send, ObjectType type, const void *primitive) {
 	impl->property_count = 0;
 	impl->property_seqno_next = 0;
 
-	if (rc_build(&obj.impl, impl, sizeof(ObjectImpl), false, (void (*)(void *))object_cleanup_rc)) {
+	if (type == ObjectTypeU64) {
+		memcpy(impl->data, primitive, sizeof(u64));
+	}
+
+	if (rc_build(&obj.impl, impl, sizeof(ObjectImpl) + data_size, false,
+				 (void (*)(void *))object_cleanup_rc)) {
 		fam_free(&ptr);
 		return NIL;
 	}
@@ -632,7 +643,6 @@ Object object_create(bool send, ObjectType type, const void *primitive) {
 	if (type == ObjectTypeString) {
 		size = sizeof(char) * (1 + strlen((char *)primitive));
 	} else if (type == ObjectTypeU64) {
-		size = sizeof(u64);
 	}
 
 	if (size) {
@@ -760,22 +770,25 @@ ObjectValue *object_get_property_index_impl(ORBContext *ctx, const Object *obj, 
 }
 
 Object object_get_property_index(const Object *obj, u32 index, ObjectIndexType itype) {
-	ObjectImpl *impl = $(obj->impl);
+	ObjectNc ret;
+	{
+		ObjectImpl *impl = $(obj->impl);
 
-	if (impl == NULL) {
-		SetErr(IllegalState);
-		return NIL;
-	}
-	ORBContext *ctx = object_get_context_and_lock(impl);
-	const ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index, itype);
-	object_unlock(impl);
-	if (valueret == NULL) {
-		return NIL;
-	}
-	ObjectValueData *vd = $(valueret->value);
-	ObjectNc ret = *(Object *)vd->value;
-	if (nil(ret)) {
-		return NIL;
+		if (impl == NULL) {
+			SetErr(IllegalState);
+			return NIL;
+		}
+		ORBContext *ctx = object_get_context_and_lock(impl);
+		const ObjectValueNc *valueret = object_get_property_index_impl(ctx, obj, index, itype);
+		object_unlock(impl);
+		if (valueret == NULL) {
+			return NIL;
+		}
+		ObjectValueData *vd = $(valueret->value);
+		ret = *(Object *)vd->value;
+		if (nil(ret)) {
+			return NIL;
+		}
 	}
 	return object_ref(&ret);
 }
@@ -868,14 +881,9 @@ const char *object_as_string(const Object *obj) {
 u64 object_as_u64(const Object *obj) {
 	object_check_consumed(obj);
 	ObjectImpl *impl = $(obj->impl);
-	ORBContext *ctx = object_get_context_and_lock(impl);
-	const ObjectValueData *v = object_get_property_data(ctx, obj, "value", false);
-	object_unlock(impl);
-	if (v == NULL || v->type != ObjectTypeU64) {
-		SetErr(ExpectedTypeMismatch);
-		return 0;
-	}
-	return *(u64 *)v->value;
+	u64 value;
+	memcpy(&value, impl->data, sizeof(u64));
+	return value;
 }
 
 void object_cleanup_thread_local() {
