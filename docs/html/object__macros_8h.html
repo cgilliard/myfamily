@@ -165,7 +165,7 @@ Macros</h2></td></tr>
 <div class="line">        <a class="code" href="structFatPtr.html">FatPtr</a>: <a class="code" href="slabs_8c.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a>((<a class="code" href="structFatPtr.html">FatPtr</a> *)&amp;<a class="code" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>),                                                      \</div>
 <div class="line">        <a class="code" href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a>: <a class="code" href="slabs_8c.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a>(&amp;((<a class="code" href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a> *)&amp;<a class="code" href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a>)-&gt;impl),                                                     \</div>
 <div class="line">        <span class="keywordflow">default</span>: ({}))</div>
-<div class="ttc" id="aobject_8h_html_a9857328827ae1957544a254406d6c557"><div class="ttname"><a href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a></div><div class="ttdeci">#define Object</div><div class="ttdef"><b>Definition:</b> object.h:39</div></div>
+<div class="ttc" id="aobject_8h_html_a9857328827ae1957544a254406d6c557"><div class="ttname"><a href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a></div><div class="ttdeci">#define Object</div><div class="ttdef"><b>Definition:</b> object.h:44</div></div>
 <div class="ttc" id="arc_8h_html_a23e583efdf471a92b947f0501d05cd2b"><div class="ttname"><a href="rc_8h.html#a23e583efdf471a92b947f0501d05cd2b">Rc</a></div><div class="ttdeci">#define Rc</div><div class="ttdef"><b>Definition:</b> rc.h:71</div></div>
 <div class="ttc" id="aslabs_8c_html_a7d32fa9b5ae6ac35e7934ea214fac5f9"><div class="ttname"><a href="slabs_8c.html#a7d32fa9b5ae6ac35e7934ea214fac5f9">fat_ptr_is_nil</a></div><div class="ttdeci">bool fat_ptr_is_nil(const FatPtr *ptr)</div><div class="ttdef"><b>Definition:</b> slabs.c:37</div></div>
 <div class="ttc" id="aslabs_8h_html_a38bf1e5e0427bdeba2b469eea9befc23"><div class="ttname"><a href="slabs_8h.html#a38bf1e5e0427bdeba2b469eea9befc23">v</a></div><div class="ttdeci">#define v</div><div class="ttdef"><b>Definition:</b> slabs.h:125</div></div>
@@ -203,8 +203,9 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    (<span class="keyword">const</span> <a class="code" href="object_8h.html#a1d5cec1c941d76fa18b3c4860dc5cede">ObjectNc</a>) {                                                                             \</div>
-<div class="line">        .impl = 0, .flags = <a class="code" href="object_8h.html#ac9369bcead6a4e9def09ae1885da2b24">OBJECT_FLAG_NO_CLEANUP</a>                                                 \</div>
+<div class="line">        .impl = 0, .flags = <a class="code" href="object_8h.html#ac9369bcead6a4e9def09ae1885da2b24">OBJECT_FLAG_NO_CLEANUP</a> | <a class="code" href="object_8h.html#a207534246e49b6a67889b7444692a8f1">OBJECT_FLAG_CONSUMED</a>                          \</div>
 <div class="line">    }</div>
+<div class="ttc" id="aobject_8h_html_a207534246e49b6a67889b7444692a8f1"><div class="ttname"><a href="object_8h.html#a207534246e49b6a67889b7444692a8f1">OBJECT_FLAG_CONSUMED</a></div><div class="ttdeci">#define OBJECT_FLAG_CONSUMED</div><div class="ttdef"><b>Definition:</b> object.h:20</div></div>
 <div class="ttc" id="aobject_8h_html_ac9369bcead6a4e9def09ae1885da2b24"><div class="ttname"><a href="object_8h.html#ac9369bcead6a4e9def09ae1885da2b24">OBJECT_FLAG_NO_CLEANUP</a></div><div class="ttdeci">#define OBJECT_FLAG_NO_CLEANUP</div><div class="ttdef"><b>Definition:</b> object.h:19</div></div>
 </div><!-- fragment -->
 </div>

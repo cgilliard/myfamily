@@ -96,7 +96,7 @@ $(function() {
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
 <div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="object__macros_8h.html#a0079cc4909964ed0d782c06b1753ce14">   25</a></span>&#160;<span class="preprocessor">#define UNIT                                                                                       \</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">    (const ObjectNc) {                                                                             \</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">        .impl = 0, .flags = OBJECT_FLAG_NO_CLEANUP                                                 \</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">        .impl = 0, .flags = OBJECT_FLAG_NO_CLEANUP | OBJECT_FLAG_CONSUMED                          \</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">    }</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="object__macros_8h.html#aa5928ace8d7704b6f315514c2592d4c3">   30</a></span>&#160;<span class="preprocessor">#define $objnil(v) fat_ptr_is_nil(&amp;(&amp;((ObjectNc *)&amp;(v))-&gt;impl)-&gt;impl)</span></div>
