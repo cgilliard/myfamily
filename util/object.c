@@ -79,7 +79,11 @@ int init_tl_range_values() {
 	return 0;
 }
 
+u64 obj_name_count = 0;
+u64 obj_seq_count = 0;
+
 int object_property_name_compare(const void *v1, const void *v2) {
+	// printf("(name count) = %llu,  seq count  = %llu\n", ++obj_name_count, obj_seq_count);
 	const ObjectValueNc *k1 = v1;
 	const ObjectValueNc *k2 = v2;
 	if (k1->namespace != k2->namespace) {
@@ -94,6 +98,7 @@ int object_property_name_compare(const void *v1, const void *v2) {
 }
 
 int object_sequence_compare(const void *v1, const void *v2) {
+	// printf(" name count  = %llu, (seq count) = %llu\n", obj_name_count, ++obj_seq_count);
 	const ObjectValueNc *k1 = v1;
 	const ObjectValueNc *k2 = v2;
 	if (k1->namespace != k2->namespace) {

@@ -92,6 +92,9 @@ typedef struct ORBAllocator {
 typedef struct ORBTreeCacheEntry {
 	u32 hash;
 	u32 node;
+	u32 last;
+	u32 index;
+	u64 mutation_id;
 } ORBTreeCacheEntry;
 
 // The internal ORBTreeImpl storage data structure
@@ -103,6 +106,7 @@ typedef struct ORBTreeImpl {
 	u32 root;	  // offset to the root node.
 	u32 elements; // number of elements in the tree.
 	ORBAllocator *alloc;
+	u64 mutation_id;
 	u32 cache_entries;
 	ORBTreeCacheEntry cache[];
 } ORBTreeImpl;
@@ -227,7 +231,7 @@ int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void
 		return -1;
 	}
 
-	ptr->impl = mymalloc(sizeof(ORBTreeImpl) + CACHE_ENTRIES * 8);
+	ptr->impl = mymalloc(sizeof(ORBTreeImpl) + CACHE_ENTRIES * sizeof(ORBTreeCacheEntry));
 	if (ptr->impl == NULL) {
 		return -1;
 	}
@@ -246,6 +250,7 @@ int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void
 	impl->elements = 0;
 	impl->alloc->free_list = NULL;
 	impl->cache_entries = CACHE_ENTRIES;
+	impl->mutation_id = 0;
 
 	return 0;
 }
@@ -500,6 +505,9 @@ int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced) {
 		return -1;
 	}
 
+	// we are assured a mutation at this point
+	impl->mutation_id++;
+
 	// perform search for the key
 	orbtree_search(impl, value->value, &pair);
 	if (pair.self != NIL) {
@@ -546,6 +554,7 @@ int orbtree_put(ORBTree *ptr, const ORBTreeTray *value, ORBTreeTray *replaced) {
 
 int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 							 const void *start_value, bool start_inclusive) {
+	u32 index_orig = index;
 	if (ptr == NULL || tray == NULL || start_value == NULL) {
 		SetErr(IllegalArgument);
 		return -1;
@@ -559,16 +568,24 @@ int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 
 	u32 cur = NIL;
 	u32 itt = impl->root;
+	u32 hash;
+	u32 offset;
 
 	if (CACHE_ENTRIES) {
-		u32 hash = murmurhash(start_value, impl->value_size, MURMUR_SEED);
-		u32 offset = hash % CACHE_ENTRIES;
+		hash = murmurhash(start_value, impl->value_size, MURMUR_SEED);
+		offset = hash % CACHE_ENTRIES;
 		if (impl->cache[offset].hash == hash) {
 			ORBTreeNode *node = orbtree_node(impl, impl->cache[offset].node);
 			if (node && impl->compare(node->data, start_value) == 0) {
 				itt = NIL;
 				cur = impl->cache[offset].node;
-			} else {
+				ORBTreeNode *last = orbtree_node(impl, impl->cache[offset].last);
+				if (impl->cache[offset].mutation_id == impl->mutation_id) {
+					if (index >= impl->cache[offset].index) {
+						index -= impl->cache[offset].index;
+						cur = impl->cache[offset].last;
+					}
+				}
 			}
 		}
 	}
@@ -582,8 +599,6 @@ int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 				cur = itt;
 				if (CACHE_ENTRIES) {
 					// update cache
-					u32 hash = murmurhash(start_value, impl->value_size, MURMUR_SEED);
-					u32 offset = hash % CACHE_ENTRIES;
 					impl->cache[offset].hash = hash;
 					impl->cache[offset].node = itt;
 				}
@@ -612,6 +627,13 @@ int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 		if (index == 0) {
 			tray->value = orbtree_value(impl, cur);
 			tray->updated = true;
+			if (CACHE_ENTRIES) {
+				// update cache
+				impl->cache[offset].last = cur;
+				impl->cache[offset].index = index_orig;
+				impl->cache[offset].mutation_id = impl->mutation_id;
+			}
+
 			return 0;
 		}
 		if (cur_node->right_subtree_size < index && cur_node->parent == NIL) {
@@ -627,7 +649,13 @@ int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 				if (cur_node->left == last)
 					break;
 				last = cur;
+
+				if (cur_node->parent == NIL) {
+					// no more nodes to look at, not found
+					return -1;
+				}
 			}
+
 		} else {
 			index -= 1;
 			cur = cur_node->right;
@@ -876,6 +904,9 @@ int orbtree_remove(ORBTree *ptr, const void *value, ORBTreeTray *removed) {
 		removed->updated = false;
 		return -1;
 	}
+
+	// we are assured a mutation at this point
+	impl->mutation_id++;
 
 	removed->value = orbtree_value(impl, pair.self);
 	removed->updated = true;
