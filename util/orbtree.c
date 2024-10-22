@@ -16,6 +16,7 @@
 #include <base/fam_alloc.h>
 #include <base/panic.h>
 #include <base/resources.h>
+#include <crypto/murmurhash.h>
 #include <stdio.h>
 #include <string.h>
 #include <util/orbtree.h>
@@ -23,6 +24,8 @@
 #define NODES_PER_CHUNK 1024
 #define CHUNKS_PER_RESIZE 64
 #define ITERATOR_STACK_SIZE 128
+#define CACHE_ENTRIES 128
+#define MURMUR_SEED 0xF9
 
 u64 orbtree_next_node_id = 10;
 
@@ -48,10 +51,6 @@ u64 orbtree_next_node_id = 10;
 		ORBTreeNode *_orb_node__ = orbtree_node(impl, id);                                         \
 		_orb_node__ == NULL || (_orb_node__->color & RED_MASK) == 0;                               \
 	})
-
-#ifdef TEST
-#define NODE_ID2
-#endif // TEST
 
 typedef struct ORBTreeNode {
 	u32 color;
@@ -84,6 +83,17 @@ typedef struct ORBAllocator {
 	u32 *free_list;
 } ORBAllocator;
 
+// Format for cache data:
+// [entry1]
+// [entry2]
+// ....
+// entry = [4 byte murmurhash][4 byte node id]
+
+typedef struct ORBTreeCacheEntry {
+	u32 hash;
+	u32 node;
+} ORBTreeCacheEntry;
+
 // The internal ORBTreeImpl storage data structure
 typedef struct ORBTreeImpl {
 	u64 value_size; // size of the values
@@ -93,6 +103,8 @@ typedef struct ORBTreeImpl {
 	u32 root;	  // offset to the root node.
 	u32 elements; // number of elements in the tree.
 	ORBAllocator *alloc;
+	u32 cache_entries;
+	ORBTreeCacheEntry cache[];
 } ORBTreeImpl;
 
 // Iterator impl
@@ -215,7 +227,7 @@ int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void
 		return -1;
 	}
 
-	ptr->impl = mymalloc(sizeof(ORBTreeImpl));
+	ptr->impl = mymalloc(sizeof(ORBTreeImpl) + CACHE_ENTRIES * 8);
 	if (ptr->impl == NULL) {
 		return -1;
 	}
@@ -233,6 +245,7 @@ int orbtree_create(ORBTree *ptr, const u64 value_size, int (*compare)(const void
 	impl->alloc->cur_chunks = 0;
 	impl->elements = 0;
 	impl->alloc->free_list = NULL;
+	impl->cache_entries = CACHE_ENTRIES;
 
 	return 0;
 }
@@ -546,6 +559,20 @@ int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 
 	u32 cur = NIL;
 	u32 itt = impl->root;
+
+	if (CACHE_ENTRIES) {
+		u32 hash = murmurhash(start_value, impl->value_size, MURMUR_SEED);
+		u32 offset = hash % CACHE_ENTRIES;
+		if (impl->cache[offset].hash == hash) {
+			ORBTreeNode *node = orbtree_node(impl, impl->cache[offset].node);
+			if (node && impl->compare(node->data, start_value) == 0) {
+				itt = NIL;
+				cur = impl->cache[offset].node;
+			} else {
+			}
+		}
+	}
+
 	while (itt != NIL) {
 		ORBTreeNode *node = orbtree_node(impl, itt);
 		int v = impl->compare(node->data, start_value);
@@ -553,6 +580,13 @@ int orbtree_get_index_ranged(const ORBTree *ptr, u32 index, ORBTreeTray *tray,
 			// exact match
 			if (start_inclusive) {
 				cur = itt;
+				if (CACHE_ENTRIES) {
+					// update cache
+					u32 hash = murmurhash(start_value, impl->value_size, MURMUR_SEED);
+					u32 offset = hash % CACHE_ENTRIES;
+					impl->cache[offset].hash = hash;
+					impl->cache[offset].node = itt;
+				}
 				break;
 			} else {
 				if (node->right != NIL)
