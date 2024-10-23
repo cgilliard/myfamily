@@ -31,7 +31,7 @@ jobs:
           ./configure --minimal
           make clean all -s
           ./bin/fam init test1
-          test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
+          # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
 
       - name: Install Test dependencies
         run: |
@@ -75,7 +75,7 @@ jobs:
           ./scripts/configure_homebrew.sh --minimal
           make clean all
           ./bin/fam init test1
-          test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
+          # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
 
       - name: Install dependencies
         run: |

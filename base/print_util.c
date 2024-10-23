@@ -21,6 +21,8 @@
 
 #define BUF_LEN 64
 
+void exit(int status);
+
 i32 write_loop(const Stream *strm, const u8 *buf, u64 len) {
 	while (len > 0) {
 		i64 w = write(strm->handle, buf, len);
@@ -34,8 +36,8 @@ i32 write_loop(const Stream *strm, const u8 *buf, u64 len) {
 	return 0;
 }
 
-i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool exit, i32 code, const u8 *fmt,
-			   ...) {
+i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code,
+			   const u8 *fmt, ...) {
 	i32 ret = 0;
 	va_list args;
 	va_start(args, fmt);
@@ -116,6 +118,10 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool exit, i32 
 	}
 
 	va_end(args);
+
+	if (do_exit) {
+		exit(code);
+	}
 
 	return ret;
 }
