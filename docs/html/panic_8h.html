@@ -72,14 +72,15 @@ $(function() {
 <div class="title">panic.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="print__util_8h_source.html">base/print_util.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="print__util_8h_source.html">base/print_util.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 </div>
 <p><a href="panic_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a7f2052adde8f3e80bac53bb89502628c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#a7f2052adde8f3e80bac53bb89502628c">panic</a>(fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#a119a169a1e18a14191df511e179c7a35">__do_print_impl_</a>(out_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, -1, fmt, __VA_ARGS__)</td></tr>
+<tr class="memitem:a7f2052adde8f3e80bac53bb89502628c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#a7f2052adde8f3e80bac53bb89502628c">panic</a>(fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(err_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, -1, &quot;Panic: &quot;, fmt, __VA_ARGS__)</td></tr>
 <tr class="separator:a7f2052adde8f3e80bac53bb89502628c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -104,7 +105,7 @@ Macros</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#a119a169a1e18a14191df511e179c7a35">__do_print_impl_</a>(out_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, -1, fmt, __VA_ARGS__)</td>
+          <td></td><td>&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(err_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, -1, &quot;Panic: &quot;, fmt, __VA_ARGS__)</td>
         </tr>
       </table>
 </div><div class="memdoc">

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['stream_259',['Stream',['../stream_8h.html#a9e76c504c13a7baa62d7ea29c4af657b',1,'stream.h']]]
+  ['resourcestats_338',['ResourceStats',['../resources_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'resources.h']]]
 ];
