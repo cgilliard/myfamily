@@ -15,8 +15,10 @@
 #ifndef _BASE_PANIC__
 #define _BASE_PANIC__
 
+#include <base/print_util.h>
 #include <base/types.h>
 
-void panic(const u8 *format, ...);
+#define panic(fmt, ...)                                                                            \
+	__do_print_impl_(out_strm, NULL, UINT32_MAX, true, true, -1, fmt, __VA_ARGS__)
 
 #endif // _BASE_PANIC__

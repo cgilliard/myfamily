@@ -16,11 +16,7 @@
 #include <base/fam_err.h>
 #include <base/macro_util.h>
 #include <base/misc.h>
-#include <stdio.h>
-
-#ifdef __linux__
-#define getenv(x) secure_getenv(x)
-#endif // __linux__
+#include <base/print_util.h>
 
 _Thread_local u8 fam_err_last[ERR_LEN + 1] = {""};
 
@@ -32,11 +28,11 @@ const u8 *get_err() {
 }
 
 void print_err(const u8 *text) {
-	fprintf(stderr, "%s: %s\n", FamErrText[fam_err], text);
+	println("%s: %s", FamErrText[fam_err], text);
 	if (getenv("CBACKTRACE") != NULL) {
 		// backtrace_print(&thread_local_bt__);
 	} else {
-		fprintf(stderr, "Backtrace currently disabled set env variable CBACKTRACE to enable\n");
+		println("Backtrace currently disabled set env variable CBACKTRACE to enable");
 	}
 }
 

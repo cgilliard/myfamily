@@ -12,11 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/fam_err.h>
 #include <base/mem_util.h>
 #include <base/types.h>
-#include <string.h>
 
 // set memory at memory location 'ptr' of size 'size' to 0.
 void memzero(void *ptr, u64 size) {
-	memset(ptr, 0, size);
+	if (!ptr) {
+		SetErr(IllegalArgument);
+		return;
+	}
+	if (size == 0)
+		return;
+	while (size--)
+		*(u8 *)ptr = '\0';
 }

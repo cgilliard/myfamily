@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef _BASE_PRINT_UTIL__
+#define _BASE_PRINT_UTIL__
+
 #include <base/macro_util.h>
 #include <base/stream.h>
 #include <base/types.h>
@@ -78,3 +81,5 @@ static const PrintPair __termination_print_pair__ = {.type = PrintTypeTerm};
 
 i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool exit, i32 code, const u8 *fmt,
 			   ...);
+
+#endif // _BASE_PRINT_UTIL__

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/deps.h>
 #include <base/fam_err.h>
 #include <base/macro_util.h>
 #include <base/misc.h>
 #include <base/print_util.h>
 #include <stdarg.h>
-#include <unistd.h>
 
 #define BUF_LEN 64
 

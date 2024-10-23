@@ -17,10 +17,16 @@
 
 #include <base/types.h>
 
+#ifdef __linux__
+#define getenv(x) secure_getenv(x)
+#endif // __linux__
+
 u8 *getenv(const u8 *name);
 
 #ifdef __linux__
 u8 *secure_getenv(const u8 *name);
 #endif // __linux__
+
+i64 write(i32 fd, const void *buf, u64 count);
 
 #endif // _BASE_DEPS__
