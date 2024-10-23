@@ -17,11 +17,6 @@
 
 #include <base/types.h>
 
-typedef void __attribute__((noreturn)) (*panic_handler_t)(const char *msg);
-
-#define THREAD_PANIC 1
-
-void panic(const char *format, ...);
-void set_on_panic(panic_handler_t on_panic);
+void panic(const u8 *format, ...);
 
 #endif // _BASE_PANIC__

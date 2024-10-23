@@ -4,10 +4,10 @@ CC=REPLACE_CC
 MAKE=make
 
 # Flags
-CC_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -Werror=incompatible-pointer-types
+CC_FLAGS=-D_GNU_SOURCE -Wno-pointer-sign -Wno-attributes -Wno-ignored-attributes -Werror=incompatible-pointer-types
 CRITERION_INCLUDE=-IREPLACE_CRITERION_INCLUDE
 CRITERION_LIB=-LREPLACE_CRITERION_LIB
-CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-attributes -Wno-ignored-attributes -Werror=incompatible-pointer-types -lcriterion -lm $(CRITERION_INCLUDE) $(CRITERION_LIB)
+CC_TEST_FLAGS=-D_GNU_SOURCE -Wno-pointer-sign -Wno-attributes -Wno-ignored-attributes -Werror=incompatible-pointer-types -lcriterion -lm $(CRITERION_INCLUDE) $(CRITERION_LIB)
 
 ifeq ($(shell $(CC) -dM -E - < /dev/null | grep '__clang__'),)
     # If GCC is detected
@@ -29,11 +29,8 @@ COVERAGE_FLAGS=--coverage -DTEST
 INSTALL_DIR=/usr/local/bin
 
 # Object directories
-ALL_OBJS=base/*.o main/*.o  crypto/*.o util/*.o args/*.o
-SUBDIRS := base main crypto util args
+ALL_OBJS=base/*.o main/*.o
+SUBDIRS := base main
 SUBDIRS_RELEASE := $(SUBDIRS)
 HEADERS := $(wildcard base/*.h) \
-	$(wildcard crypto/*.h) \
-	$(wildcard util/*.h) \
-	$(wildcard args/*.h) \
 	$(wildcard main/*.h)

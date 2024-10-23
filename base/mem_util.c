@@ -12,19 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _CRYPTO_PSRNG__
-#define _CRYPTO_PSRNG__
-
+#include <base/mem_util.h>
 #include <base/types.h>
+#include <string.h>
 
-void psrng_reseed();
-void psrng_rand_u8(u8 *v);
-void psrng_rand_u64(u64 *v);
-void psrng_rand_u128(u128 *v);
-void psrng_rand_bytes(void *v, u64 size);
-
-#ifdef TEST
-void psrng_test_seed(u8 iv[16], u8 key[32]);
-#endif // TEST
-
-#endif // _CRYPTO_PSRNG__
+// set memory at memory location 'ptr' of size 'size' to 0.
+void memzero(void *ptr, u64 size) {
+	memset(ptr, 0, size);
+}

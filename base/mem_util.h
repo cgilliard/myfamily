@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-typedef enum TokenizerState {
-	TokenizerStateOk = 0,
-	TokenizerStateErr = 1,
-	TokenizerStateComplete = 2,
-	TokenizerStateCompleteInComment = 3,
+#include <base/types.h>
 
-} TokenizerState;
+void memzero(void *ptr, u64 size);

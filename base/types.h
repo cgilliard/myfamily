@@ -15,7 +15,7 @@
 #ifndef _BASE_TYPES__
 #define _BASE_TYPES__
 
-#include <base/mylimits.h>
+#include <base/limits.h>
 
 typedef unsigned char u8;		// 8 bits
 typedef unsigned short u16;		// 16 bits
@@ -33,5 +33,13 @@ typedef signed long long i64;	// 64 bits
 #define bool _Bool
 #define false 0
 #define true 1
+
+// atomics
+typedef _Atomic unsigned long long au64;
+typedef _Atomic unsigned int au32;
+typedef _Atomic _Bool abool;
+
+// NULL
+#define NULL ((void *)0)
 
 #endif // _BASE_TYPES__

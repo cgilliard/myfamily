@@ -15,9 +15,9 @@
 #ifndef _BASE_BACKTRACE__
 #define _BASE_BACKTRACE__
 
-#include <base/slabs.h>
+#include <base/types.h>
 
-#define MAX_ENTRIES 100
+#define MAX_ENTRIES 128
 #define MAX_ENTRY_SIZE 1024
 
 typedef struct BacktraceEntry {
@@ -32,7 +32,7 @@ typedef struct Backtrace {
 	BacktraceEntry entries[MAX_ENTRIES];
 } Backtrace;
 
-int backtrace_generate(Backtrace *ptr);
+i32 backtrace_generate(Backtrace *ptr);
 void backtrace_print(const Backtrace *ptr);
 
 #endif // _BASE_BACKTRACE__

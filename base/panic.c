@@ -12,52 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/backtrace.h>
+// #include <base/backtrace.h>
+#include <base/mem_util.h>
 #include <base/panic.h>
-#include <setjmp.h>
+#include <base/print_util.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 void exit(int value);
 
-#define MAX_PANIC_MSG 1024
-
-_Thread_local jmp_buf return_jmp;
-_Thread_local bool jmp_return_set = false;
-_Thread_local char panic_buf[MAX_PANIC_MSG];
-
-void panic(const char *fmt, ...) {
+void panic(const u8 *fmt, ...) {
 	va_list args;
+	va_list args_copy;
+	va_copy(args_copy, args);
 
-	fprintf(stderr, "application panicked: ");
 	va_start(args, fmt);
-	vfprintf(stderr, fmt, args);
-	vsnprintf(panic_buf, MAX_PANIC_MSG, fmt, args);
+	int len = vsnprintf(NULL, 0, fmt, args);
 	va_end(args);
-	fprintf(stderr, "\n");
 
-	Backtrace bt;
-	backtrace_generate(&bt);
-	backtrace_print(&bt);
+	u8 buf[len + 1];
+	va_start(args_copy, fmt);
+	vsnprintf(buf, len + 1, fmt, args);
+	va_end(args_copy);
+	printf("Panic: %s\n", buf);
 
-	// If jump return has not been set, we resort to an exit with an error
-	// status.
-	if (!jmp_return_set)
-		exit(-1);
-	longjmp(return_jmp, THREAD_PANIC);
+	/*
+		Backtrace bt;
+		backtrace_generate(&bt);
+		backtrace_print(&bt);
+	*/
+
+	exit(-1);
 }
 
 void signal_handler(int signal) {
-	// Handle the signal and call the _on_panic function
+	// Handle the signal and call the panic function
 	panic("Caught signal: %d", signal);
 }
 
-void set_on_panic(panic_handler_t on_panic) {
+void __attribute__((constructor)) __set_on_panic__() {
 	struct sigaction sa;
-	memset(&sa, 0, sizeof(sa));
+	memzero(&sa, sizeof(sa));
 	sa.sa_handler = signal_handler;
 	// Catching only error signals
 	sigaction(SIGSEGV, &sa, NULL); // Segmentation fault
@@ -66,9 +62,4 @@ void set_on_panic(panic_handler_t on_panic) {
 	sigaction(SIGILL, &sa, NULL);  // Illegal instruction
 	sigaction(SIGFPE, &sa, NULL);  // Arithmetic error
 	sigaction(SIGBUS, &sa, NULL);  // Bus error
-
-	jmp_return_set = true;
-	int value = setjmp(return_jmp);
-	if (value)
-		on_panic(panic_buf);
 }

@@ -15,43 +15,16 @@
 #ifndef _BASE_MISC__
 #define _BASE_MISC__
 
-#include <base/path.h>
-#include <base/resources.h>
 #include <base/types.h>
 
-const char *rstrstr(const char *s1, const char *s2);
-int copy_file(const Path *dst, const Path *src);
-int remove_directory(const Path *path, bool preserve_dir);
-u64 read_all(void *buffer, u64 size, u64 count, MYFILE *stream);
-void exit_error(char *format, ...);
-void print_error(char *format, ...);
-u64 myfread(void *buffer, u64 size, u64 count, MYFILE *stream);
-u64 myfwrite(const void *buffer, u64 size, u64 count, MYFILE *stream);
-int myfeof(MYFILE *stream);
-int myferror(MYFILE *stream);
-long myftell(MYFILE *stream);
-int myfseek(MYFILE *stream, long pos, int type);
-char *myfgets(char *str, int n, MYFILE *stream);
-int myfprintf(MYFILE *fptr, const char *str, ...);
-u64 mystrlen(const char *s);
-char *trim_whitespace(char *str);
-
-#ifdef TEST
-#define EXIT_ERR_IF_NO_DEBUG(num)                                                                  \
-	if (!__is_debug_misc_no_exit)                                                                  \
-		exit(num);
-#else
-#define EXIT_ERR_IF_NO_DEBUG(num) exit(num)
-#endif // TEST
-
-#ifdef TEST
-extern bool __is_debug_misc_ferror;
-extern bool __is_debug_misc_fwrite;
-extern bool __is_debug_misc_stat;
-extern bool __is_debug_misc_remove_dir;
-extern bool __is_debug_misc_unlink;
-extern bool __is_debug_misc_no_exit;
-extern bool __is_debug_misc_preserve;
-#endif // TEST
+i32 mymemcmp(const u8 *s1, const u8 *s2, u64 len);
+i32 mystrcmp(const u8 *s1, const u8 *s2);
+i32 mystrlen(const u8 *s);
+const u8 *mystrstr(const u8 *str1, const u8 *str2);
+u8 *mystrcpy(u8 *destination, const u8 *source, u64 limit);
+void *mymemcpy(void *destination, const void *source, u64 limit);
+void reverse(u8 str[], u64 length);
+u8 *citoau64(u64 num, u8 *str, u64 base);
+u8 *citoai64(i64 num, u8 *str, u64 base);
 
 #endif // _BASE_MISC__

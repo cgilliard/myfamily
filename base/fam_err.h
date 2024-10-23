@@ -16,37 +16,46 @@
 #define _BASE_FAM_ERR__
 
 #include <base/backtrace.h>
+#include <base/macro_util.h>
 
-#define ERR_LEN 1024
+#define ERR_LEN 64
 
-extern _Thread_local char fam_err_last[ERR_LEN];
+#define ENUM_TEXT(none, x) x
+#define SECOND_STRINGIFY(x, y) #y
 
-typedef enum FamErr {
-	NoErrors,
-	IllegalArgument,
-	AllocErr,
-	InitErr,
-	AlreadyInitialized,
-	IndexOutOfBounds,
-	IO,
-	FileNotFound,
-	NotADirectory,
-	IllegalState,
-	TooBig,
-	ResourceNotAvailable,
-	Permission,
-	BackTraceErr,
-	ExpectedTypeMismatch,
-	FamErrCount,
-} FamErr;
+#define DEFINE_FAMERR(e)                                                                           \
+	typedef enum FamErr { FOR_EACH(ENUM_TEXT, none, (, ), e) } FamErr;                             \
+	static const u8 *FamErrText[] = {FOR_EACH(SECOND_STRINGIFY, none, (, ), e)};
 
-extern char *FamErrText[FamErrCount];
+// Define FamErr enum values
+// clang-format off
+#define FAMERR_VALUES                                                                              \
+	NoErrors, \
+	IllegalArgument, \
+	Overflow, \
+	llocErr, \
+	InitErr, \
+	AlreadyInitialized, \
+	IndexOutOfBounds, \
+	IO, \
+	FileNotFound, \
+	NotADirectory, \
+	IllegalState, \
+	TooBig, \
+	ResourceNotAvailable, \
+	Permission, \
+	BackTraceErr, \
+	ExpectedTypeMismatch
+// clang-format on
 
-extern int fam_err;
+DEFINE_FAMERR(FAMERR_VALUES);
+
+extern _Thread_local u8 fam_err_last[ERR_LEN + 1];
+extern _Thread_local i32 fam_err;
 extern _Thread_local Backtrace thread_local_bt__;
 
-void print_err(const char *text);
-const char *get_err();
+void print_err(const u8 *text);
+const u8 *get_err();
 void do_backtrace_generate(Backtrace *bt);
 
 #define SetErr(err)                                                                                \

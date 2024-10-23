@@ -12,51 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/deps.h>
 #include <base/fam_err.h>
+#include <base/macro_util.h>
+#include <base/misc.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #ifdef __linux__
 #define getenv(x) secure_getenv(x)
 #endif // __linux__
 
-char *FamErrText[FamErrCount] = {"NoErrors",
-								 "IllegalArgument",
-								 "AllocError",
-								 "InitErr",
-								 "AlreadyInitialized",
-								 "IndexOutOfBounds",
-								 "IO",
-								 "FileNotFound",
-								 "NotADirectory",
-								 "IllegalState",
-								 "TooBig",
-								 "ResourceNotAvailable",
-								 "Permission",
-								 "BackTraceErr",
-								 "ExpectedTypeMismatch"};
+_Thread_local u8 fam_err_last[ERR_LEN + 1] = {""};
 
-int fam_err = NoErrors;
-_Thread_local char fam_err_last[ERR_LEN] = {""};
+_Thread_local i32 fam_err = NoErrors;
 _Thread_local Backtrace thread_local_bt__;
 
-const char *get_err() {
-	strcpy(fam_err_last, FamErrText[fam_err]);
-	return fam_err_last;
+const u8 *get_err() {
+	return mystrcpy(fam_err_last, FamErrText[fam_err], ERR_LEN);
 }
 
-void print_err(const char *text) {
+void print_err(const u8 *text) {
 	fprintf(stderr, "%s: %s\n", FamErrText[fam_err], text);
 	if (getenv("CBACKTRACE") != NULL) {
-		backtrace_print(&thread_local_bt__);
+		// backtrace_print(&thread_local_bt__);
 	} else {
-		printf("Backtrace currently disabled set env variable CBACKTRACE to enable\n");
+		fprintf(stderr, "Backtrace currently disabled set env variable CBACKTRACE to enable\n");
 	}
 }
 
 void do_backtrace_generate(Backtrace *bt) {
 	if (getenv("CBACKTRACE") != NULL) {
-		backtrace_generate(bt);
+		// backtrace_generate(bt);
 	}
 }

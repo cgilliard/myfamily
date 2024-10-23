@@ -12,85 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#include <criterion/criterion.h>
 #include <main/main.h>
 
-MySuite(main);
-
-MyTest(main, test_main) {
-	Path fam_test;
-	path_copy(&fam_test, test_dir);
-	path_push(&fam_test, "fam");
-	setup_config_dir(path_to_string(&fam_test));
-	Path build_id_file;
-	path_copy(&build_id_file, test_dir);
-	path_push(&build_id_file, "fam");
-	path_push(&build_id_file, "build_id");
-	cr_assert(path_exists(&build_id_file));
-	cr_assert(check_build_id(path_to_string(&fam_test)));
-
-	// setup again should be ok since we have the same build id
-	setup_config_dir(path_to_string(&fam_test));
-	cr_assert(path_exists(&build_id_file));
-
-	// modify the build id
-	MYFILE *fp = myfopen(&build_id_file, "a");
-	myfprintf(fp, "add data");
-	myfclose(fp);
-	u64 fsize = path_file_size(&build_id_file);
-
-	// now setup again
-	setup_config_dir(path_to_string(&fam_test));
-
-	cr_assert(fsize != path_file_size(&build_id_file));
-
-	path_push(&fam_test, "1");
-	path_push(&fam_test, "1");
-	path_push(&fam_test, "1");
-
-	// create should fail because we cannot create this directory with standard mkdir
-	__is_debug_misc_no_exit = true;
-	setup_config_dir(path_to_string(&fam_test));
-	__is_debug_misc_no_exit = false;
-
-	// should not exist
-	cr_assert(!path_exists(&fam_test));
-
-	Path fam_test2;
-	path_copy(&fam_test2, test_dir);
-	path_push(&fam_test2, "fam2");
-
-	__is_debug_misc_no_exit = true;
-	__is_debug_real_main_res_mkdir = true;
-	setup_config_dir(path_to_string(&fam_test2));
-	__is_debug_real_main_res_mkdir = false;
-	__is_debug_misc_no_exit = false;
-
-	// this one should be created
-	cr_assert(path_exists(&fam_test2));
-	path_push(&fam_test2, "resources");
-	// but resources does not exist
-	cr_assert(!path_exists(&fam_test2));
-}
-
-MyTest(main, test_real_main) {
-	char *rmain[2] = {"fam", NULL};
-	real_main(1, rmain);
-	Path rmtestdir;
-	path_for(&rmtestdir, ".fam");
-	remove_directory(&rmtestdir, false);
-
-	__is_debug_misc_no_exit = true;
-	write_to_disk("abc123", "test", NULL, 0);
-	__is_debug_misc_no_exit = false;
-	Path test;
-	path_for(&test, "abc123");
-	cr_assert(!path_exists(&test));
-
-	__is_debug_misc_no_exit = true;
-	check_build_id("abc123");
-	__is_debug_misc_no_exit = false;
-	Path test2;
-	path_for(&test2, "abc123");
-	cr_assert(!path_exists(&test2));
+Test(main, test_main) {
 }
