@@ -17,6 +17,8 @@
 
 #include <base/types.h>
 
+void exit(int status);
+
 #ifdef __linux__
 #define getenv(x) secure_getenv(x)
 #endif // __linux__

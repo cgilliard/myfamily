@@ -15,10 +15,11 @@
 #ifndef _BASE_PANIC__
 #define _BASE_PANIC__
 
+#include <base/misc.h>
 #include <base/print_util.h>
 #include <base/types.h>
 
 #define panic(fmt, ...)                                                                            \
-	__do_print_impl_(out_strm, NULL, UINT32_MAX, true, true, -1, fmt, __VA_ARGS__)
+	__do_print_impl_(err_strm, NULL, UINT32_MAX, true, true, -1, "Panic: ", fmt, __VA_ARGS__)
 
 #endif // _BASE_PANIC__

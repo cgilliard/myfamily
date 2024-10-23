@@ -63,23 +63,22 @@ static const PrintPair __termination_print_pair__ = {.type = PrintTypeTerm};
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
 #pragma clang diagnostic ignored "-Wint-to-pointer-cast"
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
-#define __do_print_impl_(strm, s, capacity, nl, exit, code, fmt, ...)                              \
-	print_impl(strm, s, capacity, nl, exit, code,                                                  \
+#define __do_print_impl_(strm, s, capacity, nl, exit, code, prefix, fmt, ...)                      \
+	print_impl(strm, s, capacity, nl, exit, code, prefix,                                          \
 			   fmt __VA_OPT__(, ) FOR_EACH(BUILD_PRINT_PAIR, ignore, (, ), __VA_ARGS__),           \
 			   __termination_print_pair__)
 
 #define print(fmt, ...)                                                                            \
-	__do_print_impl_(out_strm, NULL, UINT32_MAX, false, false, 0, fmt, __VA_ARGS__)
+	__do_print_impl_(out_strm, NULL, UINT32_MAX, false, false, 0, NULL, fmt, __VA_ARGS__)
 #define println(fmt, ...)                                                                          \
-	__do_print_impl_(out_strm, NULL, UINT32_MAX, true, false, 0, fmt, __VA_ARGS__)
-/*
-#define fprint(stream, fmt, ...)                                                                   \
-	print_impl(stream, NULL, UINT32_MAX, false, false, 0, fmt, __VA_ARGS__)
-#define fprintln(stream, fmt, ...)                                                                 \
-	print_impl(stream, NULL, UINT32_MAX, true, false, 0, fmt, __VA_ARGS__)
-*/
+	__do_print_impl_(out_strm, NULL, UINT32_MAX, true, false, 0, NULL, fmt, __VA_ARGS__)
 
-i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool exit, i32 code, const u8 *fmt,
-			   ...);
+#define fprint(stream, fmt, ...)                                                                   \
+	__do_print_impl_(stream, NULL, UINT32_MAX, false, false, 0, NULL, fmt, __VA_ARGS__)
+#define fprintln(stream, fmt, ...)                                                                 \
+	__do_print_impl_(stream, NULL, UINT32_MAX, true, false, 0, NULL, fmt, __VA_ARGS__)
+
+i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool exit, i32 code,
+			   const u8 *prefix, const u8 *fmt, ...);
 
 #endif // _BASE_PRINT_UTIL__
