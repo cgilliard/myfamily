@@ -15,12 +15,9 @@
 #ifndef _BASE_RESOURCES__
 #define _BASE_RESOURCES__
 
-// #include <base/path.h>
+#include <base/path.h>
+#include <base/stream.h>
 #include <base/types.h>
-
-#ifndef NULL
-#define NULL ((void *)0)
-#endif // NULL
 
 typedef struct MYFILE MYFILE;
 
@@ -35,9 +32,8 @@ typedef struct ResourceStats {
 void *mymalloc(u64 size);
 void *myrealloc(void *ptr, u64 size);
 void myfree(void *ptr);
-void *mymalloc_no_stat(u64 size);
-// MYFILE *myfopen(const Path *path, const char *mode);
-void myfclose(MYFILE *ptr);
+Stream myfopen(const Path *path, i32 flags);
+void myfclose(Stream *ptr);
 u64 mymalloc_sum();
 u64 myrealloc_sum();
 u64 myfree_sum();

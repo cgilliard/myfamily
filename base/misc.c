@@ -64,6 +64,32 @@ i32 mystrcmp(const u8 *X, const u8 *Y) {
 		return 0;
 }
 
+i32 mystrncmp(const u8 *X, const u8 *Y, u64 limit) {
+	if (!X || !Y) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+	if (limit == 0)
+		return 0;
+	while (*X && *Y && limit--) {
+		if (*X > *Y)
+			return 1;
+		else if (*X < *Y)
+			return -1;
+
+		X++;
+		Y++;
+	}
+
+	if (*X != '\0')
+		return 1;
+
+	else if (*Y != '\0')
+		return -1;
+	else
+		return 0;
+}
+
 i32 mystrlen(const u8 *Y) {
 	if (!Y) {
 		SetErr(IllegalArgument);
@@ -99,17 +125,23 @@ const u8 *mystrstr(const u8 *X, const u8 *Y) {
 	return NULL;
 }
 
+u8 *mystrcat(u8 *X, const u8 *Y, u64 limit) {
+	if (limit == 0)
+		return X;
+	while (*X && limit--) {
+		X++;
+	}
+	return mystrcpy(X, Y, limit);
+}
+
 u8 *mystrcpy(u8 *X, const u8 *Y, u64 limit) {
 	if (!X || !Y) {
 		SetErr(IllegalArgument);
 		return NULL;
 	}
-	u8 *ret = X;
-
 	if (limit == 0)
-		return ret;
+		return X;
 	limit--;
-
 	while (*Y != '\0' && limit) {
 		*X = *Y;
 		X++;
@@ -117,7 +149,7 @@ u8 *mystrcpy(u8 *X, const u8 *Y, u64 limit) {
 		limit--;
 	}
 	*X = '\0';
-	return ret;
+	return X;
 }
 
 void *mymemcpy(void *X, const void *Y, u64 limit) {
@@ -203,4 +235,17 @@ u8 *citoai64(i64 num, u8 *str, u64 base) {
 	reverse(str, i);
 
 	return str;
+}
+
+const u8 *rstrstr(const u8 *s1, const u8 *s2) {
+	u64 s1len = mystrlen(s1);
+	u64 s2len = mystrlen(s2);
+	const u8 *s;
+
+	if (s2len > s1len)
+		return NULL;
+	for (s = s1 + s1len - s2len; s >= s1; --s)
+		if (mystrncmp(s, s2, s2len) == 0)
+			return s;
+	return NULL;
 }

@@ -64,27 +64,20 @@ void myfree(void *ptr) {
 	free(ptr);
 }
 
-/*
-MYFILE *myfopen(const Path *path, const char *mode) {
+Stream myfopen(const Path *path, i32 flags) {
 	const char *path_str = path_to_string(path);
-	FILE *ret = fopen(path_str, mode);
-	if (ret) {
+	i32 ret = open(path_str, flags);
+	if (ret > 0) {
 		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
 	}
-	return (MYFILE *)ret;
-}
-*/
-
-void *mymalloc_no_stat(u64 size) {
-	return malloc(size);
+	return (Stream) {ret};
 }
 
-/*
-void myfclose(MYFILE *ptr) {
+void myfclose(Stream *ptr) {
 	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
-	fclose((FILE *)ptr);
+	close(ptr->handle);
 }
-*/
+
 u64 mymalloc_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
 }

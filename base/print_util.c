@@ -30,16 +30,31 @@ typedef __builtin_va_list va_list;
 
 #define BUF_LEN 64
 
-i32 write_loop(const Stream *strm, const u8 *buf, u64 len) {
-	while (len > 0) {
-		i64 w = write(strm->handle, buf, len);
-		if (w < 0) {
-			SetErr(IO);
-			return w;
+i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u64 len) {
+	if (s) {
+		if (*cur < limit) {
+			u8 *res;
+			if (*cur == 0) {
+				res = mystrcpy(s, buf, limit);
+				if (res == NULL)
+					return -1;
+			} else {
+				res = mystrcat(s, buf, limit);
+				if (res == NULL)
+					return -1;
+			}
+			*cur += res - s;
 		}
+	} else
+		while (len > 0) {
+			i64 w = write(strm->handle, buf, len);
+			if (w < 0) {
+				SetErr(IO);
+				return w;
+			}
 
-		len -= w;
-	}
+			len -= w;
+		}
 	return 0;
 }
 
@@ -48,9 +63,11 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 	i32 ret = 0;
 	va_list args;
 	va_start(args, fmt);
+	i32 max = capacity;
+	capacity = 0;
 
 	if (prefix) {
-		if (write_loop(strm, prefix, mystrlen(prefix)))
+		if (write_loop(strm, s, &capacity, max, prefix, mystrlen(prefix)))
 			ret = -1;
 	}
 
@@ -58,12 +75,12 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 		const u8 *next = mystrstr(fmt, "{}");
 
 		if (next == NULL) {
-			if (write_loop(strm, fmt, mystrlen(fmt))) {
+			if (write_loop(strm, s, &capacity, max, fmt, mystrlen(fmt))) {
 				ret = -1;
 				break;
 			}
 			if (nl)
-				if (write_loop(strm, "\n", 1)) {
+				if (write_loop(strm, s, &capacity, max, "\n", 1)) {
 					ret = -1;
 					break;
 				}
@@ -72,7 +89,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			u64 diff = next - fmt;
 			u8 buf[1 + diff];
 			mystrcpy(buf, fmt, 1 + diff);
-			if (write_loop(strm, buf, diff)) {
+			if (write_loop(strm, s, &capacity, max, buf, diff)) {
 				ret = -1;
 				break;
 			}
@@ -82,12 +99,12 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 
 		if (arg.type == PrintTypeTerm) {
 			if (next) {
-				if (write_loop(strm, next, mystrlen(next))) {
+				if (write_loop(strm, s, &capacity, max, next, mystrlen(next))) {
 					ret = -1;
 					break;
 				}
 				if (nl)
-					if (write_loop(strm, "\n", 1)) {
+					if (write_loop(strm, s, &capacity, max, "\n", 1)) {
 						ret = -1;
 						break;
 					}
@@ -98,7 +115,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			mymemcpy(&value, arg.buf, sizeof(u64));
 			u8 buf[BUF_LEN];
 			citoau64(value, buf, 10);
-			if (write_loop(strm, buf, mystrlen(buf))) {
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
 				ret = -1;
 				break;
 			}
@@ -107,7 +124,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			mymemcpy(&value, arg.buf, sizeof(i32));
 			u8 buf[BUF_LEN];
 			citoai64(value, buf, 10);
-			if (write_loop(strm, buf, mystrlen(buf))) {
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
 				ret = -1;
 				break;
 			}
@@ -116,12 +133,12 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			mymemcpy(&value, arg.buf, sizeof(i16));
 			u8 buf[BUF_LEN];
 			citoai64(value, buf, 10);
-			if (write_loop(strm, buf, mystrlen(buf))) {
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeString) {
-			if (write_loop(strm, arg.data, mystrlen(arg.data))) {
+			if (write_loop(strm, s, &capacity, max, arg.data, mystrlen(arg.data))) {
 				ret = -1;
 				break;
 			}

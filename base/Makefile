@@ -5,7 +5,8 @@ OBJS := types.o \
 	fam_err.o \
 	print_util.o \
 	colors.o \
-	resources.o
+	resources.o \
+	path.o
 
 TEST_OBJS := $(OBJS)
 

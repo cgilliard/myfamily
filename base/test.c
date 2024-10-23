@@ -72,4 +72,13 @@ Test(base, test_print_utils) {
 	println("no args!");
 	print("start: u64value={},i16value={},i32value={},", 999ULL, vi16, -111);
 	println("str='{}'", "this is a test");
+	u8 tmp[101];
+	for (int i = 0; i < 101; i++)
+		tmp[i] = 0;
+	sprint(tmp, 100, "test123 {}", 5);
+	cr_assert(!mystrcmp(tmp, "test123 5"));
+	sprintln(tmp, 100, "testabc {} {}", -4, "ok");
+	cr_assert(!mystrcmp(tmp, "testabc -4 ok\n"));
+	sprint(tmp, 100, "abc {}", 100000000000ULL);
+	cr_assert(!mystrcmp(tmp, "abc 100000000000"));
 }

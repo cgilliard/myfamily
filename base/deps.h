@@ -16,8 +16,16 @@
 #define _BASE_DEPS__
 
 #include <base/types.h>
+// needed for error number definitions
+#include <errno.h>
+// needed for O_ flags
+#include <fcntl.h>
+// needed for PATH_MAX
+#include <limits.h>
 
 void exit(int status);
+
+extern i32 errno;
 
 #ifdef __linux__
 #define getenv(x) secure_getenv(x)
@@ -30,11 +38,16 @@ u8 *secure_getenv(const u8 *name);
 #endif // __linux__
 
 i64 write(i32 fd, const void *buf, u64 count);
+i32 close(i32 fd);
+u64 lseek(i32 fd, u64 offset, i32 whence);
+i32 mkdir(const u8 *name, i32 mode);
 
 #pragma clang diagnostic ignored "-Wincompatible-library-redeclaration"
 #pragma GCC diagnostic ignored "-Wincompatible-library-redeclaration"
 void *malloc(u64 size);
 void free(void *ptr);
 void *realloc(void *ptr, u64 size);
+
+char *realpath(const char *restrict path, char *restrict resolved_path);
 
 #endif // _BASE_DEPS__
