@@ -25,12 +25,12 @@ Test(base, test_strcmp) {
 	const u8 *abc = "abc2";
 	const u8 *def = "def1";
 	cr_assert(!mystrcmp(test1, test1));
-	cr_assert(mystrcmp(test1, test2) == strcmp(test1, test2));
-	cr_assert(mystrcmp(test2, test1) == strcmp(test2, test1));
+	cr_assert(mystrcmp(test1, test2) < 0 && strcmp(test1, test2) < 0);
+	cr_assert(mystrcmp(test2, test1) > 0 && strcmp(test2, test1) > 0);
 	cr_assert(mystrcmp(test3, test2) == strcmp(test3, test2));
 	cr_assert(mystrcmp(test2, test3) == strcmp(test2, test3));
-	cr_assert(mystrcmp(abc, def) == strcmp(abc, def));
-	cr_assert(mystrcmp(def, abc) == strcmp(def, abc));
+	cr_assert(mystrcmp(abc, def) < 0 && strcmp(abc, def) < 0);
+	cr_assert(mystrcmp(def, abc) > 0 && strcmp(def, abc) > 0);
 }
 
 Test(base, test_strlen) {

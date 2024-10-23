@@ -45,7 +45,8 @@
 	ResourceNotAvailable, \
 	Permission, \
 	BackTraceErr, \
-	ExpectedTypeMismatch
+	ExpectedTypeMismatch, \
+	AllocErr
 // clang-format on
 
 DEFINE_FAMERR(FAMERR_VALUES);

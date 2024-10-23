@@ -17,7 +17,16 @@
 #include <base/macro_util.h>
 #include <base/misc.h>
 #include <base/print_util.h>
+
+// get the va functionality (with GCC/Clang use the builtin version, otherwise use stdarg)
+#if defined(__GNUC__) || defined(__clang__)
+typedef __builtin_va_list va_list;
+#define va_start(ap, param) __builtin_va_start(ap, param)
+#define va_end(ap) __builtin_va_end(ap)
+#define va_arg(ap, type) __builtin_va_arg(ap, type)
+#else // __GNUC__ or __clang__
 #include <stdarg.h>
+#endif // __GNUC__ or __clang__
 
 #define BUF_LEN 64
 

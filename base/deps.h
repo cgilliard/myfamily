@@ -31,4 +31,10 @@ u8 *secure_getenv(const u8 *name);
 
 i64 write(i32 fd, const void *buf, u64 count);
 
+#pragma clang diagnostic ignored "-Wincompatible-library-redeclaration"
+#pragma GCC diagnostic ignored "-Wincompatible-library-redeclaration"
+void *malloc(u64 size);
+void free(void *ptr);
+void *realloc(void *ptr, u64 size);
+
 #endif // _BASE_DEPS__
