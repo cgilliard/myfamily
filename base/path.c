@@ -15,10 +15,10 @@
 #include <base/deps.h>
 #include <base/fam_err.h>
 #include <base/limits.h>
-#include <base/misc.h>
 #include <base/path.h>
 #include <base/print_util.h>
 #include <base/resources.h>
+#include <base/string.h>
 
 bool __is_debug_path_homedir_null = false;
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/panic.h>
+#include <base/print_util.h>
 #include <base/types.h>
 
 bool __is_little_endian() {

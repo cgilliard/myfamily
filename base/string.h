@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_MISC__
-#define _BASE_MISC__
+#ifndef _BASE_STRING__
+#define _BASE_STRING__
 
 #include <base/types.h>
 
@@ -29,5 +29,10 @@ void reverse(u8 str[], u64 length);
 u8 *citoau64(u64 num, u8 *str, u64 base);
 u8 *citoai64(i64 num, u8 *str, u64 base);
 const u8 *rstrstr(const u8 *s1, const u8 *s2);
+void memzero(void *ptr, u64 size);
 
-#endif // _BASE_MISC__
+#ifdef TEST
+extern bool __is_debug_mystrlen_overflow;
+#endif // TEST
+
+#endif // _BASE_STRING__

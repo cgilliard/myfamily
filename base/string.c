@@ -13,8 +13,13 @@
 // limitations under the License.
 
 #include <base/fam_err.h>
-#include <base/misc.h>
+#include <base/print_util.h>
+#include <base/string.h>
 #include <base/types.h>
+
+#ifdef TEST
+bool __is_debug_mystrlen_overflow = false;
+#endif // TEST
 
 i32 mymemcmp(const u8 *X, const u8 *Y, u64 len) {
 	if (!X || !Y) {
@@ -23,7 +28,7 @@ i32 mymemcmp(const u8 *X, const u8 *Y, u64 len) {
 	}
 	if (len == 0)
 		return 0;
-	while (*X && *Y && len--) {
+	while (len--) {
 		if (*X > *Y)
 			return 1;
 		else if (*X < *Y)
@@ -31,13 +36,8 @@ i32 mymemcmp(const u8 *X, const u8 *Y, u64 len) {
 
 		X++;
 		Y++;
-		if (len == 0)
-			return 0;
 	}
-	if (*X != '\0')
-		return -1;
-	else
-		return 1;
+	return 0;
 }
 
 i32 mystrcmp(const u8 *X, const u8 *Y) {
@@ -71,7 +71,7 @@ i32 mystrncmp(const u8 *X, const u8 *Y, u64 limit) {
 	}
 	if (limit == 0)
 		return 0;
-	while (*X && *Y && limit--) {
+	while (*X && *Y && limit) {
 		if (*X > *Y)
 			return 1;
 		else if (*X < *Y)
@@ -79,12 +79,12 @@ i32 mystrncmp(const u8 *X, const u8 *Y, u64 limit) {
 
 		X++;
 		Y++;
+		limit--;
 	}
 
-	if (*X != '\0')
+	if (limit && *X != '\0')
 		return 1;
-
-	else if (*Y != '\0')
+	else if (limit && *Y != '\0')
 		return -1;
 	else
 		return 0;
@@ -99,7 +99,7 @@ i32 mystrlen(const u8 *Y) {
 	while (*Y) {
 		ret++;
 		Y++;
-		if (ret == INT32_MAX) {
+		if (ret == INT32_MAX || __is_debug_mystrlen_overflow) {
 			SetErr(Overflow);
 			return -1;
 		}
@@ -126,23 +126,29 @@ const u8 *mystrstr(const u8 *X, const u8 *Y) {
 }
 
 u8 *mystrcat(u8 *X, const u8 *Y, u64 limit) {
-	if (limit == 0)
-		return X;
-	while (*X && limit--) {
-		X++;
-	}
-	return mystrcpy(X, Y, limit);
-}
-
-u8 *mystrcpy(u8 *X, const u8 *Y, u64 limit) {
 	if (!X || !Y) {
 		SetErr(IllegalArgument);
 		return NULL;
 	}
 	if (limit == 0)
 		return X;
-	limit--;
-	while (*Y != '\0' && limit) {
+	while (*X) {
+		X++;
+	}
+	return mystrcpy(X, Y, limit);
+}
+
+#include <stdio.h>
+
+u8 *mystrcpy(u8 *X, const u8 *Y, u64 limit) {
+	if (!X || !Y) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
+
+	if (limit == 0)
+		return X;
+	while (*Y != '\0' && (limit - 1)) {
 		*X = *Y;
 		X++;
 		Y++;
@@ -248,4 +254,16 @@ const u8 *rstrstr(const u8 *s1, const u8 *s2) {
 		if (mystrncmp(s, s2, s2len) == 0)
 			return s;
 	return NULL;
+}
+
+// set memory at memory location 'ptr' of size 'size' to 0.
+void memzero(void *ptr, u64 size) {
+	if (!ptr) {
+		SetErr(IllegalArgument);
+		return;
+	}
+	if (size == 0)
+		return;
+	while (size--)
+		*(u8 *)ptr = '\0';
 }

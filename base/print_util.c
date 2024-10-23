@@ -15,8 +15,8 @@
 #include <base/deps.h>
 #include <base/fam_err.h>
 #include <base/macro_util.h>
-#include <base/misc.h>
 #include <base/print_util.h>
+#include <base/string.h>
 
 // get the va functionality (with GCC/Clang use the builtin version, otherwise use stdarg)
 #if defined(__GNUC__) || defined(__clang__)
@@ -65,7 +65,6 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 	va_start(args, fmt);
 	i32 max = capacity;
 	capacity = 0;
-
 	if (prefix) {
 		if (write_loop(strm, s, &capacity, max, prefix, mystrlen(prefix)))
 			ret = -1;

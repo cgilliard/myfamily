@@ -15,8 +15,8 @@
 #include <base/deps.h>
 #include <base/fam_err.h>
 #include <base/macro_util.h>
-#include <base/misc.h>
 #include <base/print_util.h>
+#include <base/string.h>
 
 _Thread_local u8 fam_err_last[ERR_LEN + 1] = {""};
 

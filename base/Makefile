@@ -1,7 +1,6 @@
 OBJS := types.o \
-	mem_util.o \
 	backtrace.o \
-	misc.o \
+	string.o \
 	fam_err.o \
 	print_util.o \
 	colors.o \
