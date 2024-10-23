@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['exit_1111',['exit',['../panic_8c.html#a3809f7c3c89e9350a245949c2438a3ad',1,'panic.c']]],
-  ['exit_5ferror_1112',['exit_error',['../misc_8c.html#a04d2c2dc4f9a32fccb11ff65d07bf171',1,'exit_error(char *format,...):&#160;misc.c'],['../misc_8h.html#a04d2c2dc4f9a32fccb11ff65d07bf171',1,'exit_error(char *format,...):&#160;misc.c']]]
+  ['get_5ferr_211',['get_err',['../fam__err_8c.html#a464d1580b8189c7cf9d315b4d9f001aa',1,'get_err():&#160;fam_err.c'],['../fam__err_8h.html#a464d1580b8189c7cf9d315b4d9f001aa',1,'get_err():&#160;fam_err.c']]],
+  ['getenv_212',['getenv',['../deps_8h.html#a181ad9f024306cdea8d96082859b61f0',1,'deps.h']]]
 ];

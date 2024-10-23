@@ -67,76 +67,33 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#define-members">Macros</a>  </div>
   <div class="headertitle">
 <div class="title">panic.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="print__util_8h_source.html">base/print_util.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 </div>
 <p><a href="panic_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:aabbd74f602cfcf4c8af724a7249b5fc0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#aabbd74f602cfcf4c8af724a7249b5fc0">THREAD_PANIC</a>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:aabbd74f602cfcf4c8af724a7249b5fc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
-Typedefs</h2></td></tr>
-<tr class="memitem:aa310f6b48458ce563bda41b5d3e9db89"><td class="memItemLeft" align="right" valign="top">typedef void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#aa310f6b48458ce563bda41b5d3e9db89">__attribute__</a>((noreturn)) (*panic_handler_t) (const char *msg)</td></tr>
-<tr class="separator:aa310f6b48458ce563bda41b5d3e9db89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a138d8879e47c08e2265c41d75e539f9b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#a138d8879e47c08e2265c41d75e539f9b">panic</a> (const char *format,...)</td></tr>
-<tr class="separator:a138d8879e47c08e2265c41d75e539f9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1826b67757260434696b1e54d2e2363"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#ad1826b67757260434696b1e54d2e2363">set_on_panic</a> (panic_handler_t on_panic)</td></tr>
-<tr class="separator:ad1826b67757260434696b1e54d2e2363"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f2052adde8f3e80bac53bb89502628c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#a7f2052adde8f3e80bac53bb89502628c">panic</a>(fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#a119a169a1e18a14191df511e179c7a35">__do_print_impl_</a>(out_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, -1, fmt, __VA_ARGS__)</td></tr>
+<tr class="separator:a7f2052adde8f3e80bac53bb89502628c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="aabbd74f602cfcf4c8af724a7249b5fc0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aabbd74f602cfcf4c8af724a7249b5fc0">&#9670;&nbsp;</a></span>THREAD_PANIC</h2>
+<a id="a7f2052adde8f3e80bac53bb89502628c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f2052adde8f3e80bac53bb89502628c">&#9670;&nbsp;</a></span>panic</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define THREAD_PANIC&#160;&#160;&#160;1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a id="aa310f6b48458ce563bda41b5d3e9db89"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa310f6b48458ce563bda41b5d3e9db89">&#9670;&nbsp;</a></span>__attribute__</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef void __attribute__((noreturn))(*panic_handler_t)(const char *msg)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="a138d8879e47c08e2265c41d75e539f9b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a138d8879e47c08e2265c41d75e539f9b">&#9670;&nbsp;</a></span>panic()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void panic </td>
+          <td class="memname">#define panic</td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>format</em>, </td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fmt, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -147,25 +104,7 @@ Functions</h2></td></tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ad1826b67757260434696b1e54d2e2363"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad1826b67757260434696b1e54d2e2363">&#9670;&nbsp;</a></span>set_on_panic()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void set_on_panic </td>
-          <td>(</td>
-          <td class="paramtype">panic_handler_t&#160;</td>
-          <td class="paramname"><em>on_panic</em></td><td>)</td>
-          <td></td>
+          <td></td><td>&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#a119a169a1e18a14191df511e179c7a35">__do_print_impl_</a>(out_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, -1, fmt, __VA_ARGS__)</td>
         </tr>
       </table>
 </div><div class="memdoc">

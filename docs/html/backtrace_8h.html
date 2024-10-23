@@ -75,7 +75,7 @@ $(function() {
 <div class="title">backtrace.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="slabs_8h_source.html">base/slabs.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 </div>
 <p><a href="backtrace_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -88,7 +88,7 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ad30c77daca10f0c2b941969c01beedee"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="backtrace_8h.html#ad30c77daca10f0c2b941969c01beedee">MAX_ENTRIES</a>&#160;&#160;&#160;100</td></tr>
+<tr class="memitem:ad30c77daca10f0c2b941969c01beedee"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="backtrace_8h.html#ad30c77daca10f0c2b941969c01beedee">MAX_ENTRIES</a>&#160;&#160;&#160;128</td></tr>
 <tr class="separator:ad30c77daca10f0c2b941969c01beedee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab98e64df0049cc6c7282602f0a8c1b4a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="backtrace_8h.html#ab98e64df0049cc6c7282602f0a8c1b4a">MAX_ENTRY_SIZE</a>&#160;&#160;&#160;1024</td></tr>
 <tr class="separator:ab98e64df0049cc6c7282602f0a8c1b4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -102,8 +102,8 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a576ca2586996f7d3199a3b4547e19402"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="backtrace_8h.html#a576ca2586996f7d3199a3b4547e19402">backtrace_generate</a> (<a class="el" href="structBacktrace.html">Backtrace</a> *ptr)</td></tr>
-<tr class="separator:a576ca2586996f7d3199a3b4547e19402"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b9d4a6849ee9455af35cdce29e8c7d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="backtrace_8h.html#a3b9d4a6849ee9455af35cdce29e8c7d1">backtrace_generate</a> (<a class="el" href="structBacktrace.html">Backtrace</a> *ptr)</td></tr>
+<tr class="separator:a3b9d4a6849ee9455af35cdce29e8c7d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06de946e39e01eeb9080841cb9e1d766"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="backtrace_8h.html#a06de946e39e01eeb9080841cb9e1d766">backtrace_print</a> (const <a class="el" href="structBacktrace.html">Backtrace</a> *ptr)</td></tr>
 <tr class="separator:a06de946e39e01eeb9080841cb9e1d766"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -115,7 +115,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MAX_ENTRIES&#160;&#160;&#160;100</td>
+          <td class="memname">#define MAX_ENTRIES&#160;&#160;&#160;128</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -166,14 +166,14 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a576ca2586996f7d3199a3b4547e19402"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a576ca2586996f7d3199a3b4547e19402">&#9670;&nbsp;</a></span>backtrace_generate()</h2>
+<a id="a3b9d4a6849ee9455af35cdce29e8c7d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b9d4a6849ee9455af35cdce29e8c7d1">&#9670;&nbsp;</a></span>backtrace_generate()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int backtrace_generate </td>
+          <td class="memname"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> backtrace_generate </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structBacktrace.html">Backtrace</a> *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>

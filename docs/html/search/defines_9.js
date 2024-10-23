@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['keccak_5frounds_1827',['KECCAK_ROUNDS',['../sha3_8c.html#aaf66c2daa0f1fe906b80b79969f67424',1,'sha3.c']]]
+  ['none_323',['NONE',['../macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29',1,'macro_util.h']]],
+  ['null_324',['NULL',['../types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4',1,'types.h']]]
 ];

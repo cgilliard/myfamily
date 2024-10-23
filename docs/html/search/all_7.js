@@ -1,25 +1,5 @@
 var searchData=
 [
-  ['get_5fblue_282',['get_blue',['../colors_8c.html#af2177401c986d357c238151d4a2d88c9',1,'get_blue():&#160;colors.c'],['../colors_8h.html#af2177401c986d357c238151d4a2d88c9',1,'get_blue():&#160;colors.c']]],
-  ['get_5fbright_5fred_283',['get_bright_red',['../colors_8c.html#af4050e1645d57e5b4747d640921bdd40',1,'get_bright_red():&#160;colors.c'],['../colors_8h.html#af4050e1645d57e5b4747d640921bdd40',1,'get_bright_red():&#160;colors.c']]],
-  ['get_5fcyan_284',['get_cyan',['../colors_8c.html#aa94e77be0345202999d85fbb9ff08d66',1,'get_cyan():&#160;colors.c'],['../colors_8h.html#aa94e77be0345202999d85fbb9ff08d66',1,'get_cyan():&#160;colors.c']]],
-  ['get_5fdimmed_285',['get_dimmed',['../colors_8c.html#a8352ca2c4def591153d1ef0dfeccd33a',1,'get_dimmed():&#160;colors.c'],['../colors_8h.html#a8352ca2c4def591153d1ef0dfeccd33a',1,'get_dimmed():&#160;colors.c']]],
-  ['get_5ferr_286',['get_err',['../fam__err_8c.html#ad2187f85357d783d2467916e26ceb518',1,'get_err():&#160;fam_err.c'],['../fam__err_8h.html#ad2187f85357d783d2467916e26ceb518',1,'get_err():&#160;fam_err.c']]],
-  ['get_5ffile_5fline_287',['get_file_line',['../backtrace_8c.html#abf3461586a7fc5b2643f2c99386f3101',1,'backtrace.c']]],
-  ['get_5fgreen_288',['get_green',['../colors_8c.html#ae6970a174f281327799a59817ecbb08b',1,'get_green():&#160;colors.c'],['../colors_8h.html#ae6970a174f281327799a59817ecbb08b',1,'get_green():&#160;colors.c']]],
-  ['get_5fmagenta_289',['get_magenta',['../colors_8h.html#a7d1a2b7df538201e5c6580b1c61e281a',1,'get_magenta():&#160;colors.c'],['../colors_8c.html#a7d1a2b7df538201e5c6580b1c61e281a',1,'get_magenta():&#160;colors.c']]],
-  ['get_5fred_290',['get_red',['../colors_8c.html#a7de89b09310f0019151eef52d36bcba1',1,'get_red():&#160;colors.c'],['../colors_8h.html#a7de89b09310f0019151eef52d36bcba1',1,'get_red():&#160;colors.c']]],
-  ['get_5freset_291',['get_reset',['../colors_8c.html#a30d13b098fb3242212fbaf097c671aba',1,'get_reset():&#160;colors.c'],['../colors_8h.html#a30d13b098fb3242212fbaf097c671aba',1,'get_reset():&#160;colors.c']]],
-  ['get_5fyellow_292',['get_yellow',['../colors_8c.html#a096f44e2a7d8adac10a86d8afcf500e8',1,'get_yellow():&#160;colors.c'],['../colors_8h.html#a096f44e2a7d8adac10a86d8afcf500e8',1,'get_yellow():&#160;colors.c']]],
-  ['getsboxinvert_293',['getSBoxInvert',['../aes_8c.html#a4223d41bc5587f9c0b6e499004403967',1,'aes.c']]],
-  ['getsboxvalue_294',['getSBoxValue',['../aes_8c.html#a5e1678341a98f95d48365ed9ccaa3586',1,'aes.c']]],
-  ['global_295',['global',['../slabs_8h.html#a0fc650b5470e50a01b4fe4ae4260d781',1,'global():&#160;slabs.h'],['../structSlabAllocatorConfigNc.html#a2e30b7448e23f217f6b1b78bf2736c2c',1,'SlabAllocatorConfigNc::global()'],['../structSlabAllocatorImpl.html#afdb080a3ae6e50ce3075d7ccf1254c0c',1,'SlabAllocatorImpl::global()']]],
-  ['global_5fallocator_296',['global_allocator',['../fam__alloc_8c.html#acadbcb759543d77f832530595dbd53ef',1,'fam_alloc.c']]],
-  ['global_5fallocator_5flock_297',['global_allocator_lock',['../fam__alloc_8c.html#a5341db93eb24741b6a9e73611bff8ad3',1,'fam_alloc.c']]],
-  ['global_5ffaml_5finit_298',['global_faml_init',['../faml_8c.html#a25ae1ae0471ce7290dacdfaaba3b45eb',1,'faml.c']]],
-  ['global_5fid_5fmutex_299',['global_id_mutex',['../faml_8c.html#ab839469098f5197b77f949e2c564c136',1,'faml.c']]],
-  ['global_5fnamespace_5fnext_300',['global_namespace_next',['../structORBContext.html#a97e2b1092a49180a514868bcd1ecf669',1,'ORBContext']]],
-  ['global_5forb_5fcontext_301',['global_orb_context',['../object_8c.html#a9bec288feb8429be17263e74377b0b51',1,'object.c']]],
-  ['global_5frbtree_5flock_302',['global_rbtree_lock',['../object_8c.html#a0ead2b5face2a2c2c4b258fc37d1d503',1,'object.c']]],
-  ['green_303',['GREEN',['../colors_8h.html#acfbc006ea433ad708fdee3e82996e721',1,'colors.h']]]
+  ['get_5ferr_61',['get_err',['../fam__err_8c.html#a464d1580b8189c7cf9d315b4d9f001aa',1,'get_err():&#160;fam_err.c'],['../fam__err_8h.html#a464d1580b8189c7cf9d315b4d9f001aa',1,'get_err():&#160;fam_err.c']]],
+  ['getenv_62',['getenv',['../deps_8h.html#a181ad9f024306cdea8d96082859b61f0',1,'deps.h']]]
 ];

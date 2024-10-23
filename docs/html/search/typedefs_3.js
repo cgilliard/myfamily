@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['channelnc_1584',['ChannelNc',['../channel_8h.html#add9f5eefee9d2e6af980f7c86f67dee3',1,'channel.h']]]
+  ['myint128_5ft_255',['myint128_t',['../limits_8h.html#a7727546c86d862a27de76df207298c2d',1,'limits.h']]],
+  ['myuint128_5ft_256',['myuint128_t',['../limits_8h.html#a82afb785c502191702e541d7418863a3',1,'limits.h']]]
 ];

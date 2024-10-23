@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['lexer_5fcleanup_1179',['lexer_cleanup',['../lexer_8c.html#aa133e0201c6abd6227e5bdc5a9f54cbb',1,'lexer_cleanup(Lexer *l):&#160;lexer.c'],['../lexer_8h.html#ae88ffc836fd5657e340bb3d1739991ca',1,'lexer_cleanup(LexerImpl *l):&#160;lexer.h']]],
-  ['lexer_5finit_1180',['lexer_init',['../lexer_8c.html#a5cd0eff68e68fd1d097c763093371a8f',1,'lexer_init(Lexer *l, const Path *file):&#160;lexer.c'],['../lexer_8h.html#a5cd0eff68e68fd1d097c763093371a8f',1,'lexer_init(Lexer *l, const Path *file):&#160;lexer.c']]],
-  ['lexer_5fnext_5ftoken_1181',['lexer_next_token',['../lexer_8c.html#aa7a697a91b20cd4fe53402e660e652d4',1,'lexer_next_token(Lexer *l, Token *token):&#160;lexer.c'],['../lexer_8h.html#aa7a697a91b20cd4fe53402e660e652d4',1,'lexer_next_token(Lexer *l, Token *token):&#160;lexer.c']]],
-  ['lexer_5fread_5fline_1182',['lexer_read_line',['../lexer_8c.html#ab83e0650a92ccd62dc65edc9a248086f',1,'lexer.c']]]
+  ['real_5fmain_226',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]],
+  ['reverse_227',['reverse',['../misc_8c.html#a77ae4e8f21159428f5c0ba204fe97bc6',1,'reverse(u8 str[], u64 length):&#160;misc.c'],['../misc_8h.html#a77ae4e8f21159428f5c0ba204fe97bc6',1,'reverse(u8 str[], u64 length):&#160;misc.c']]]
 ];

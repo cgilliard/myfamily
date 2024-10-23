@@ -67,93 +67,19 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">real_main.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="args_8h_source.html">args/args.h</a>&gt;</code><br />
-<code>#include &lt;assert.h&gt;</code><br />
-<code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="path_8h_source.html">base/path.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="sha3_8h_source.html">crypto/sha3.h</a>&gt;</code><br />
-<code>#include &lt;limits.h&gt;</code><br />
-<code>#include &lt;<a class="el" href="main_8h_source.html">main/main.h</a>&gt;</code><br />
-<code>#include &lt;stdio.h&gt;</code><br />
-<code>#include &lt;string.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="main_8h_source.html">main/main.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:add780f582425ce6db96ba74b6f83f88b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#add780f582425ce6db96ba74b6f83f88b">write_to_disk</a> (const char *dir, const char *file_name, const unsigned char *data, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> <a class="el" href="slabs_8h.html#a48d27d1c6db0d99ebbeaefa68a8c9033">size</a>)</td></tr>
-<tr class="separator:add780f582425ce6db96ba74b6f83f88b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af43092959d8b9ac00da999ee1d16e152"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#af43092959d8b9ac00da999ee1d16e152">check_build_id</a> (const char *config_dir)</td></tr>
-<tr class="separator:af43092959d8b9ac00da999ee1d16e152"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadd7ec11c1873b232827eddb9a17c911"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#aadd7ec11c1873b232827eddb9a17c911">setup_config_dir</a> (const char *config_dir)</td></tr>
-<tr class="separator:aadd7ec11c1873b232827eddb9a17c911"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b51243bbc81f0329a7cb22a38c32790"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#a9b51243bbc81f0329a7cb22a38c32790">build_args</a> (<a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *args, int argc, char **argv)</td></tr>
-<tr class="separator:a9b51243bbc81f0329a7cb22a38c32790"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a813033ab922b78183e69871180bdc9cf"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#a813033ab922b78183e69871180bdc9cf">real_main</a> (int argc, char **argv)</td></tr>
 <tr class="separator:a813033ab922b78183e69871180bdc9cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:a66e95d5efa5afec8af0ba8eefdb08b4b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="real__main_8c.html#a66e95d5efa5afec8af0ba8eefdb08b4b">__is_debug_real_main_res_mkdir</a> = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td></tr>
-<tr class="separator:a66e95d5efa5afec8af0ba8eefdb08b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a9b51243bbc81f0329a7cb22a38c32790"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b51243bbc81f0329a7cb22a38c32790">&#9670;&nbsp;</a></span>build_args()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void build_args </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="args_8h.html#aade2f2c283bbf4709360d3a4711ae0af">Args</a> *&#160;</td>
-          <td class="paramname"><em>args</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>argc</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">char **&#160;</td>
-          <td class="paramname"><em>argv</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="af43092959d8b9ac00da999ee1d16e152"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af43092959d8b9ac00da999ee1d16e152">&#9670;&nbsp;</a></span>check_build_id()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> check_build_id </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>config_dir</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a813033ab922b78183e69871180bdc9cf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a813033ab922b78183e69871180bdc9cf">&#9670;&nbsp;</a></span>real_main()</h2>
 
@@ -176,79 +102,6 @@ Variables</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aadd7ec11c1873b232827eddb9a17c911"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aadd7ec11c1873b232827eddb9a17c911">&#9670;&nbsp;</a></span>setup_config_dir()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void setup_config_dir </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>config_dir</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="add780f582425ce6db96ba74b6f83f88b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#add780f582425ce6db96ba74b6f83f88b">&#9670;&nbsp;</a></span>write_to_disk()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void write_to_disk </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>dir</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>file_name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const unsigned char *&#160;</td>
-          <td class="paramname"><em>data</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
-          <td class="paramname"><em>size</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="a66e95d5efa5afec8af0ba8eefdb08b4b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a66e95d5efa5afec8af0ba8eefdb08b4b">&#9670;&nbsp;</a></span>__is_debug_real_main_res_mkdir</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> __is_debug_real_main_res_mkdir = <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a></td>
         </tr>
       </table>
 </div><div class="memdoc">

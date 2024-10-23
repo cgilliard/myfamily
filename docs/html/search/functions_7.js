@@ -1,15 +1,11 @@
 var searchData=
 [
-  ['get_5fblue_1160',['get_blue',['../colors_8h.html#af2177401c986d357c238151d4a2d88c9',1,'get_blue():&#160;colors.c'],['../colors_8c.html#af2177401c986d357c238151d4a2d88c9',1,'get_blue():&#160;colors.c']]],
-  ['get_5fbright_5fred_1161',['get_bright_red',['../colors_8c.html#af4050e1645d57e5b4747d640921bdd40',1,'get_bright_red():&#160;colors.c'],['../colors_8h.html#af4050e1645d57e5b4747d640921bdd40',1,'get_bright_red():&#160;colors.c']]],
-  ['get_5fcyan_1162',['get_cyan',['../colors_8c.html#aa94e77be0345202999d85fbb9ff08d66',1,'get_cyan():&#160;colors.c'],['../colors_8h.html#aa94e77be0345202999d85fbb9ff08d66',1,'get_cyan():&#160;colors.c']]],
-  ['get_5fdimmed_1163',['get_dimmed',['../colors_8c.html#a8352ca2c4def591153d1ef0dfeccd33a',1,'get_dimmed():&#160;colors.c'],['../colors_8h.html#a8352ca2c4def591153d1ef0dfeccd33a',1,'get_dimmed():&#160;colors.c']]],
-  ['get_5ferr_1164',['get_err',['../fam__err_8c.html#ad2187f85357d783d2467916e26ceb518',1,'get_err():&#160;fam_err.c'],['../fam__err_8h.html#ad2187f85357d783d2467916e26ceb518',1,'get_err():&#160;fam_err.c']]],
-  ['get_5ffile_5fline_1165',['get_file_line',['../backtrace_8c.html#abf3461586a7fc5b2643f2c99386f3101',1,'backtrace.c']]],
-  ['get_5fgreen_1166',['get_green',['../colors_8c.html#ae6970a174f281327799a59817ecbb08b',1,'get_green():&#160;colors.c'],['../colors_8h.html#ae6970a174f281327799a59817ecbb08b',1,'get_green():&#160;colors.c']]],
-  ['get_5fmagenta_1167',['get_magenta',['../colors_8c.html#a7d1a2b7df538201e5c6580b1c61e281a',1,'get_magenta():&#160;colors.c'],['../colors_8h.html#a7d1a2b7df538201e5c6580b1c61e281a',1,'get_magenta():&#160;colors.c']]],
-  ['get_5fred_1168',['get_red',['../colors_8c.html#a7de89b09310f0019151eef52d36bcba1',1,'get_red():&#160;colors.c'],['../colors_8h.html#a7de89b09310f0019151eef52d36bcba1',1,'get_red():&#160;colors.c']]],
-  ['get_5freset_1169',['get_reset',['../colors_8c.html#a30d13b098fb3242212fbaf097c671aba',1,'get_reset():&#160;colors.c'],['../colors_8h.html#a30d13b098fb3242212fbaf097c671aba',1,'get_reset():&#160;colors.c']]],
-  ['get_5fyellow_1170',['get_yellow',['../colors_8c.html#a096f44e2a7d8adac10a86d8afcf500e8',1,'get_yellow():&#160;colors.c'],['../colors_8h.html#a096f44e2a7d8adac10a86d8afcf500e8',1,'get_yellow():&#160;colors.c']]],
-  ['global_5ffaml_5finit_1171',['global_faml_init',['../faml_8c.html#a25ae1ae0471ce7290dacdfaaba3b45eb',1,'faml.c']]]
+  ['main_214',['main',['../xxdir_8c.html#a3c04138a5bfe5d72780bb7e82a18e627',1,'main(int argc, char **argv):&#160;xxdir.c'],['../rbtree__perf_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;rbtree_perf.c']]],
+  ['memzero_215',['memzero',['../mem__util_8c.html#a1668e42c69a9d776f32ce1fc8e2cd9ee',1,'memzero(void *ptr, u64 size):&#160;mem_util.c'],['../mem__util_8h.html#a1668e42c69a9d776f32ce1fc8e2cd9ee',1,'memzero(void *ptr, u64 size):&#160;mem_util.c']]],
+  ['mymemcmp_216',['mymemcmp',['../misc_8c.html#a6b70f723dd9c938c2fd80bea0f170bb3',1,'mymemcmp(const u8 *X, const u8 *Y, u64 len):&#160;misc.c'],['../misc_8h.html#a52f2951ff3950c0e72319d1e6d28d937',1,'mymemcmp(const u8 *s1, const u8 *s2, u64 len):&#160;misc.c']]],
+  ['mymemcpy_217',['mymemcpy',['../misc_8c.html#a174030ae98b65306bec22ea15b646a68',1,'mymemcpy(void *X, const void *Y, u64 limit):&#160;misc.c'],['../misc_8h.html#a15e16aeb28d6b2ebf1e724d756100998',1,'mymemcpy(void *destination, const void *source, u64 limit):&#160;misc.c']]],
+  ['mystrcmp_218',['mystrcmp',['../misc_8c.html#a1706884953e714c936cc393cc9433b84',1,'mystrcmp(const u8 *X, const u8 *Y):&#160;misc.c'],['../misc_8h.html#a36da66d5da86cb9161eef5669d5ad756',1,'mystrcmp(const u8 *s1, const u8 *s2):&#160;misc.c']]],
+  ['mystrcpy_219',['mystrcpy',['../misc_8c.html#a149126403a5ec12a5bd720f826c2c130',1,'mystrcpy(u8 *X, const u8 *Y, u64 limit):&#160;misc.c'],['../misc_8h.html#acac56093048847026ce6ef3b8e70ea27',1,'mystrcpy(u8 *destination, const u8 *source, u64 limit):&#160;misc.c']]],
+  ['mystrlen_220',['mystrlen',['../misc_8c.html#a202948d1fe66deb3db349f4f940a7533',1,'mystrlen(const u8 *Y):&#160;misc.c'],['../misc_8h.html#a0388b3f2950189db48dfeccfd18942fb',1,'mystrlen(const u8 *s):&#160;misc.c']]],
+  ['mystrstr_221',['mystrstr',['../misc_8c.html#a4f64f9a91a021f0960f716eb97f8d5c3',1,'mystrstr(const u8 *X, const u8 *Y):&#160;misc.c'],['../misc_8h.html#a4aac309b685bb559d2cc6a3eabeca836',1,'mystrstr(const u8 *str1, const u8 *str2):&#160;misc.c']]]
 ];
