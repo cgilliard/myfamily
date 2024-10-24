@@ -46,6 +46,7 @@
 	Permission, \
 	BackTraceErr, \
 	ExpectedTypeMismatch, \
+	MaxPathErr, \
 	AllocErr
 // clang-format on
 

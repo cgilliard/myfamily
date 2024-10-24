@@ -13,11 +13,7 @@
 // limitations under the License.
 
 #include <base/colors.h>
-#include <base/deps.h>
-
-#ifdef __linux__
-#define getenv(x) secure_getenv(x)
-#endif // __linux__
+#include <base/os.h>
 
 char *get_dimmed() {
 	if (getenv("NO_COLOR") != NULL) {

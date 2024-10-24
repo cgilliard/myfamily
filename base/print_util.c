@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/deps.h>
 #include <base/fam_err.h>
 #include <base/macro_util.h>
+#include <base/os.h>
 #include <base/print_util.h>
 #include <base/string.h>
 
@@ -144,6 +144,14 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 				ret = -1;
 				break;
 			}
+		} else if (arg.type == PrintTypePath) {
+			PathImpl *path = arg.data;
+			const char *path_str = path_to_string(path);
+			if (write_loop(strm, s, &capacity, max, path_str, mystrlen(path_str))) {
+				ret = -1;
+				break;
+			}
+
 		} else if (arg.type == PrintTypeString) {
 			if (write_loop(strm, s, &capacity, max, arg.data, mystrlen(arg.data))) {
 				ret = -1;

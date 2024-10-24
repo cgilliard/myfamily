@@ -16,7 +16,9 @@
 #define _BASE_PRINT_UTIL__
 
 #include <base/macro_util.h>
+#include <base/path.h>
 #include <base/stream.h>
+#include <base/string.h>
 #include <base/types.h>
 
 typedef enum PrintType {
@@ -26,6 +28,7 @@ typedef enum PrintType {
 	PrintTypeI32,
 	PrintTypeI16,
 	PrintTypeString,
+	PrintTypePath,
 	PrintTypeTerm,
 } PrintType;
 
@@ -54,9 +57,14 @@ static const PrintPair __termination_print_pair__ = {.type = PrintTypeTerm};
 				 mymemcpy(pair.buf, &(i16) {(i16)v}, sizeof(i16));                                 \
 				 pair;                                                                             \
 			 }),                                                                                   \
+		Path *: ({                                                                                 \
+			PrintPair pair = {.type = PrintTypePath, .data = (Path *)v};                           \
+			pair;                                                                                  \
+		}),                                                                                        \
 		u8 *: (const PrintPair) {.type = PrintTypeString, .data = (char *)v},                      \
 		i8 *: (const PrintPair) {.type = PrintTypeString, .data = (char *)v},                      \
 		char *: (const PrintPair) {.type = PrintTypeString, .data = (char *)v},                    \
+		const char *: (const PrintPair) {.type = PrintTypeString, .data = (char *)v},              \
 		default: (const PrintPair) {.type = PrintTypeU64, .buf = 0})
 
 const static Stream __slen__impl__ = {-1};

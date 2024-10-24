@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/deps.h>
 #include <base/fam_err.h>
 #include <base/limits.h>
+#include <base/os.h>
 #include <base/path.h>
 #include <base/print_util.h>
 #include <base/resources.h>
@@ -54,37 +54,46 @@ i32 path_for(Path *p, const u8 *path) {
 }
 
 i32 path_replace_home(Path *p) {
-	const u8 *home_dir = getenv("HOME");
+	const char *home_dir = getenv("HOME");
 	if (home_dir == NULL || __is_debug_path_homedir_null) {
 		SetErr(IllegalArgument);
 		return -1;
 	}
 	if (((u8 *)(p->ptr))[0] == '~') {
+		i32 max_path = pathconf(p->ptr, _PC_PATH_MAX);
+		if (max_path <= 0) {
+			max_path = pathconf("/", _PC_PATH_MAX);
+		}
+		if (max_path <= 0) {
+			SetErr(MaxPathErr);
+			return -1;
+		}
 		i32 nlen = mystrlen(home_dir) + mystrlen(PATH_SEPARATOR) + mystrlen(p->ptr);
-		if (nlen >= PATH_MAX) {
+		if (nlen >= max_path) {
 			SetErr(TooBig);
 			return -1;
 		}
 		if (nlen >= p->len) {
 			void *nptr = myrealloc(p->ptr, nlen + 1);
-			if (nptr == NULL)
+			if (nptr == NULL) {
 				return -1;
+			}
 			p->ptr = nptr;
 			p->len = nlen;
 		}
-		u8 buf[PATH_MAX + 1];
+		u8 buf[max_path + 1];
 		u64 buf_len;
 		if (mystrlen(p->ptr) > 1 && ((u8 *)(p->ptr))[1] == PATH_SEPARATOR_CHAR)
-			buf_len = sprint(buf, PATH_MAX, "{}{}", home_dir, (u8 *)(p->ptr + 1));
+			buf_len = sprint(buf, max_path, "{}{}", home_dir, (u8 *)(p->ptr + 1));
 		else
-			buf_len = sprint(buf, PATH_MAX, "{}{}{}", home_dir, PATH_SEPARATOR, (u8 *)(p->ptr + 1));
-		mystrcpy(p->ptr, buf, buf_len);
+			buf_len = sprint(buf, max_path, "{}{}{}", home_dir, PATH_SEPARATOR, (u8 *)(p->ptr + 1));
+		mystrcpy(p->ptr, buf, buf_len + 1);
 	}
 	return 0;
 }
 
 u64 path_file_size(Path *p) {
-	Stream strm = myfopen(p, O_RDONLY);
+	Stream strm = myfopen(p, O_RDONLY, 0700);
 	if (strm.handle < 0) {
 		SetErr(IO);
 		return 0;
@@ -95,7 +104,15 @@ u64 path_file_size(Path *p) {
 }
 
 i32 path_canonicalize(Path *p) {
-	u8 buf[PATH_MAX];
+	i32 max_path = pathconf(p->ptr, _PC_PATH_MAX);
+	if (max_path <= 0) {
+		max_path = pathconf("/", _PC_PATH_MAX);
+	}
+	if (max_path <= 0) {
+		SetErr(MaxPathErr);
+		return -1;
+	}
+	u8 buf[max_path];
 	i32 nlen;
 	if (path_replace_home(p) || realpath(p->ptr, buf) == NULL || (nlen = mystrlen(buf)) == 0) {
 		SetErr(IllegalArgument);
@@ -109,7 +126,7 @@ i32 path_canonicalize(Path *p) {
 		p->ptr = nptr;
 		p->len = nlen;
 	}
-	mystrcpy(p->ptr, buf, nlen);
+	mystrcpy(p->ptr, buf, nlen + 1);
 	return 0;
 }
 i32 path_push(Path *p, const u8 *next) {
@@ -143,9 +160,18 @@ i32 path_push(Path *p, const u8 *next) {
 		p->len = nlen;
 	}
 
+	i32 max_path = pathconf(p->ptr, _PC_PATH_MAX);
+	if (max_path <= 0) {
+		max_path = pathconf("/", _PC_PATH_MAX);
+	}
+	if (max_path <= 0) {
+		SetErr(MaxPathErr);
+		return -1;
+	}
 	if (need_sep)
-		mystrcat(p->ptr, PATH_SEPARATOR, PATH_MAX);
-	mystrcat(p->ptr, next, PATH_MAX);
+		mystrcat(p->ptr, PATH_SEPARATOR, max_path - mystrlen(p->ptr));
+
+	mystrcat(p->ptr, next, max_path - mystrlen(p->ptr));
 	return 0;
 }
 i32 path_pop(Path *p) {
@@ -232,7 +258,11 @@ bool path_mkdir(Path *p, u64 mode, bool parent) {
 	}
 
 	i32 i = 0;
-	u8 path_bufs[20][PATH_MAX];
+	i32 max_file_name = pathconf(p->ptr, _PC_NAME_MAX);
+	if (max_file_name < 0) {
+		max_file_name = pathconf("/", _PC_NAME_MAX);
+	}
+	u8 path_bufs[20][max_file_name];
 	while (i < 20 && path_file_name(&temp_path) != NULL) {
 		if (path_mkdir(&temp_path, mode, false)) {
 			bool ret = true;
@@ -244,7 +274,7 @@ bool path_mkdir(Path *p, u64 mode, bool parent) {
 		}
 		const u8 *dir_part = path_file_name(&temp_path);
 		path_pop(&temp_path);
-		mystrcpy(path_bufs[i], dir_part, PATH_MAX);
+		mystrcpy(path_bufs[i], dir_part, max_file_name);
 		i++;
 	}
 	return false;

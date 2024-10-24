@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/deps.h>
 #include <base/fam_err.h>
+#include <base/os.h>
 #include <base/path.h>
+#include <base/print_util.h>
 #include <base/resources.h>
+#include <base/string.h>
 #include <base/types.h>
-#include <dirent.h>
-#include <stdio.h>
-#include <string.h>
-// #include <sys/stat.h>
-//  #include <unistd.h>
 
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 #ifdef TEST
@@ -77,10 +74,12 @@ void myfree(void *ptr) {
 	free(ptr);
 }
 
-Stream myfopen(const Path *path, i32 flags) {
+Stream myfopen(const Path *path, i32 flags, i32 mode) {
 	const char *path_str = path_to_string(path);
 	i32 ret = open(path_str, flags);
 	if (ret > 0) {
+		errno = 0;
+		chmod(path_str, 0700);
 		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
 	}
 	return (Stream) {ret};
@@ -116,16 +115,17 @@ i32 remove_directory(const Path *p, bool preserve_dir) {
 		return -1;
 	}
 
+	u64 max_path = pathconf(path, _PC_PATH_MAX);
 	while ((entry = readdir(dir)) != NULL) {
-		char full_path[PATH_MAX];
+		char full_path[max_path];
 
 		// Skip the special entries "." and ".."
-		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+		if (mystrcmp(entry->d_name, ".") == 0 || mystrcmp(entry->d_name, "..") == 0) {
 			continue;
 		}
 
 		// Construct the full path to the file/directory
-		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
+		sprint(full_path, sizeof(full_path), "{}{}{}", path, PATH_SEPARATOR, entry->d_name);
 
 		Path full_path_p;
 		path_for(&full_path_p, full_path);
@@ -162,6 +162,5 @@ i32 remove_directory(const Path *p, bool preserve_dir) {
 			return -1;
 		}
 	}
-
 	return 0;
 }

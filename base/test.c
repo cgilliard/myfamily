@@ -297,4 +297,61 @@ MyTest(base, test_path) {
 	path_push(&file_stem_test1, "file.txt");
 	path_file_stem(&file_stem_test1, buf, PATH_MAX);
 	cr_assert(!strcmp(buf, "file"));
+
+	sprint(buf, PATH_MAX, "Path={}", &file_stem_test1);
+	cr_assert(!strcmp(buf, "Path=.base_test_path.fam/file.txt"));
+}
+
+MyTest(base, test_colors) {
+	Path file;
+	path_copy(&file, test_dir);
+	path_push(&file, "file.txt");
+
+	Path file2;
+	path_copy(&file2, test_dir);
+	path_push(&file2, "file2.txt");
+
+	Stream ptr = myfopen(&file, O_WRONLY | O_CREAT, 0700);
+
+	fprint(&ptr, "{}{}{}{}{}{}{}{}{}", DIMMED, MAGENTA, BRIGHT_RED, RED, BLUE, CYAN, YELLOW, GREEN,
+		   RESET);
+
+	myfclose(&ptr);
+
+	/*
+		Stream ptr2 = myfopen(&file, O_RDONLY, 0700);
+
+		char buf[1024];
+		u64 v = read_all(buf, 1, 1024, ptr2);
+		if (v < 1024) {
+			buf[v] = '\0';
+		}
+		int brackets = 0;
+		for (int i = 0; i < strlen(buf); i++) {
+			if (buf[i] == '[')
+				brackets++;
+		}
+		cr_assert_eq(brackets, 9);
+		myfclose(ptr2);
+
+		// set no color
+		setenv("NO_COLOR", "true", 1);
+		MYFILE *ptr3 = myfopen(&file2, "w");
+		myfprintf(ptr3, "%s%s%s%s%s%s%s%s%s", DIMMED, MAGENTA, BRIGHT_RED, RED, BLUE, CYAN, YELLOW,
+				  GREEN, RESET);
+
+		myfclose(ptr3);
+
+		MYFILE *ptr4 = myfopen(&file2, "r");
+		char buf2[1024];
+		strcpy(buf2, "");
+		v = read_all(buf2, 1, 1024, ptr4);
+		brackets = 0;
+		for (int i = 0; i < strlen(buf2); i++) {
+			if (buf2[i] == '[')
+				brackets++;
+		}
+		cr_assert_eq(brackets, 0);
+		myfclose(ptr4);
+		*/
 }

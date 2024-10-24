@@ -19,8 +19,6 @@
 #include <base/stream.h>
 #include <base/types.h>
 
-typedef struct MYFILE MYFILE;
-
 typedef struct ResourceStats {
 	u64 malloc_sum;
 	u64 realloc_sum;
@@ -32,7 +30,7 @@ typedef struct ResourceStats {
 void *mymalloc(u64 size);
 void *myrealloc(void *ptr, u64 size);
 void myfree(void *ptr);
-Stream myfopen(const Path *path, i32 flags);
+Stream myfopen(const Path *path, i32 flags, i32 mode);
 void myfclose(Stream *ptr);
 u64 mymalloc_sum();
 u64 myrealloc_sum();
