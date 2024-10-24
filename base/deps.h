@@ -41,6 +41,8 @@ i64 write(i32 fd, const void *buf, u64 count);
 i32 close(i32 fd);
 u64 lseek(i32 fd, u64 offset, i32 whence);
 i32 mkdir(const u8 *name, i32 mode);
+i32 rmdir(const u8 *path);
+i32 unlink(const u8 *pathname);
 
 #pragma clang diagnostic ignored "-Wincompatible-library-redeclaration"
 #pragma GCC diagnostic ignored "-Wincompatible-library-redeclaration"

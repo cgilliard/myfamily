@@ -40,6 +40,8 @@ u64 myfree_sum();
 u64 myfopen_sum();
 u64 myfclose_sum();
 
+i32 remove_directory(const Path *p, bool preserve_dir);
+
 #ifdef TEST
 extern bool __is_debug_malloc;
 extern bool __is_debug_realloc;

@@ -49,7 +49,7 @@ i32 path_for(Path *p, const u8 *path) {
 	if (!p->ptr)
 		return -1;
 	p->len = len;
-	mystrcpy(p->ptr, path, len);
+	mystrcpy(p->ptr, path, len + 1);
 	return 0;
 }
 
@@ -168,7 +168,6 @@ const u8 *path_file_name(const Path *p) {
 	const u8 *ret = rstrstr(p->ptr, PATH_SEPARATOR);
 	if (ret != NULL && mystrlen(ret) > 0)
 		return ret + 1;
-
 	return ret;
 }
 

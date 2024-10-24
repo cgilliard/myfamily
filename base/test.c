@@ -16,10 +16,14 @@
 #include <base/print_util.h>
 #include <base/resources.h>
 #include <base/string.h>
-#include <criterion/criterion.h>
+#include <base/test.h>
+// #include <criterion/criterion.h>
+#include <limits.h>
 #include <string.h>
 
-Test(base, test_strcmp) {
+MySuite(base);
+
+MyTest(base, test_strcmp) {
 	const u8 *test1 = "test";
 	const u8 *test2 = "test2";
 	const u8 *test3 = "test3";
@@ -34,14 +38,14 @@ Test(base, test_strcmp) {
 	cr_assert(mystrcmp(def, abc) > 0 && strcmp(def, abc) > 0);
 }
 
-Test(base, test_strlen) {
+MyTest(base, test_strlen) {
 	u8 *test1 = "alsdfkjl";
 	cr_assert_eq(strlen(test1), mystrlen(test1));
 	u8 *test2 = "";
 	cr_assert_eq(strlen(test2), mystrlen(test2));
 }
 
-Test(base, test_strstr) {
+MyTest(base, test_strstr) {
 	const u8 *s1 = "abc123a";
 	const u8 *s2 = "123";
 	cr_assert_eq(mystrstr(s1, s2), s1 + 3);
@@ -56,7 +60,7 @@ Test(base, test_strstr) {
 	cr_assert(!mystrstr(t1, "xyz"));
 }
 
-Test(base, test_strcpy) {
+MyTest(base, test_strcpy) {
 	const u8 *test1 = "cpytext";
 	u8 buf1[10];
 	for (u8 i = 0; i < 10; i++)
@@ -69,7 +73,7 @@ Test(base, test_strcpy) {
 	cr_assert(!mystrcmp(buf1, ""));
 }
 
-Test(base, test_string) {
+MyTest(base, test_string) {
 	fam_err = NoErrors;
 	cr_assert(mymemcmp("abc", NULL, 1));
 	cr_assert_eq(fam_err, IllegalArgument);
@@ -158,7 +162,7 @@ Test(base, test_string) {
 	cr_assert_eq(fam_err, IllegalArgument);
 }
 
-Test(base, test_print_util) {
+MyTest(base, test_print_util) {
 	u8 tmp[101];
 	i16 vi16 = 32000;
 	println("no args!");
@@ -187,4 +191,110 @@ Test(base, test_print_util) {
 	int ret3 = sprint(tmp, 100, "abc {} {}", "ok");
 	cr_assert(!mystrcmp(tmp, "abc ok {}"));
 	cr_assert_eq(ret3, mystrlen("abc ok {}"));
+}
+
+MyTest(base, test_path) {
+	char buf[PATH_MAX];
+	Path home_test;
+	path_for(&home_test, "~");
+	path_canonicalize(&home_test);
+
+	cr_assert(path_for(NULL, NULL));
+
+	Path len0;
+	cr_assert(path_for(&len0, ""));
+
+	cr_assert(path_for(&len0, NULL));
+
+	Path file;
+	__is_debug_malloc = true;
+	cr_assert(path_for(&file, "test.txt"));
+	__is_debug_malloc = false;
+
+	Path home_realloc_err;
+	cr_assert(!path_for(&home_realloc_err, "~"));
+	__is_debug_realloc = true;
+	cr_assert(path_push(&home_realloc_err, "test"));
+	cr_assert(path_canonicalize(&home_realloc_err));
+	__is_debug_realloc = false;
+
+	cr_assert(path_push(NULL, NULL));
+	Path test, test2;
+	path_for(&test, "~");
+	path_for(&test2, "~");
+	cr_assert(path_push(&test, NULL));
+	cr_assert(path_push(&test2, ""));
+	Path pop_test1;
+	path_copy(&pop_test1, test_dir);
+	path_push(&pop_test1, "test1");
+	strcpy(buf, path_to_string(&pop_test1));
+	path_push(&pop_test1, "test2");
+	cr_assert(!path_is_dir(&pop_test1));
+	path_pop(&pop_test1);
+	cr_assert(!strcmp(buf, path_to_string(&pop_test1)));
+	path_pop(&pop_test1);
+	path_pop(&pop_test1);
+	cr_assert(!path_file_name(&pop_test1));
+
+	// all these fail due to invalid input
+	Path test_name = {.ptr = NULL, .len = 0};
+	cr_assert(!path_exists(&test_name));
+	cr_assert(!path_is_dir(&test_name));
+	cr_assert(!path_mkdir(&test_name, 0700, false));
+	path_copy(&test_name, test_dir);
+	// succeed because it already exists
+	cr_assert(path_mkdir(&test_name, 0700, false));
+	path_push(&test_name, "test.txt");
+	cr_assert(!strcmp("test.txt", path_file_name(&test_name)));
+
+	// try to make a directory
+	Path mkdir_test1;
+	path_copy(&mkdir_test1, test_dir);
+	path_push(&mkdir_test1, "ndir1");
+	cr_assert(path_mkdir(&mkdir_test1, 0700, false));
+
+	// this will fail because parent is false
+	Path mkdir_test2;
+	path_copy(&mkdir_test2, test_dir);
+	path_push(&mkdir_test2, "ndir2");
+	path_push(&mkdir_test2, "2");
+	cr_assert(!path_mkdir(&mkdir_test2, 0700, false));
+
+	Path mkdir_test3;
+	path_copy(&mkdir_test3, test_dir);
+	path_push(&mkdir_test3, "ndir3");
+	path_push(&mkdir_test3, "3");
+	path_push(&mkdir_test3, "4");
+	path_push(&mkdir_test3, "5");
+	cr_assert(!path_exists(&mkdir_test3));
+	cr_assert(!path_is_dir(&mkdir_test3));
+	cr_assert(path_mkdir(&mkdir_test3, 0700, true));
+	cr_assert(path_exists(&mkdir_test3));
+	cr_assert(path_is_dir(&mkdir_test3));
+
+	Path mkdir_test4;
+	path_copy(&mkdir_test4, test_dir);
+	path_push(&mkdir_test4, "ndir4");
+	path_push(&mkdir_test4, "3");
+	path_push(&mkdir_test4, "4");
+	path_push(&mkdir_test4, "5");
+	cr_assert(!path_exists(&mkdir_test4));
+	cr_assert(!path_is_dir(&mkdir_test4));
+
+	__is_debug_malloc = true;
+	cr_assert(!path_mkdir(&mkdir_test4, 0700, true));
+	__is_debug_malloc = false;
+
+	// make 20+ depth which fails
+	Path mkdir_test5;
+	path_copy(&mkdir_test5, test_dir);
+	for (int i = 0; i < 25; i++)
+		path_push(&mkdir_test5, "a1");
+	cr_assert(!path_mkdir(&mkdir_test5, 0700, true));
+
+	Path file_stem_test1;
+	path_copy(&file_stem_test1, test_dir);
+	path_push(&file_stem_test1, "file.txt");
+	path_file_stem(&file_stem_test1, buf, PATH_MAX);
+	cr_assert(!strcmp(buf, "file"));
 }

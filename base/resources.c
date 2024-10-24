@@ -14,8 +14,14 @@
 
 #include <base/deps.h>
 #include <base/fam_err.h>
+#include <base/path.h>
 #include <base/resources.h>
 #include <base/types.h>
+#include <dirent.h>
+#include <stdio.h>
+#include <string.h>
+// #include <sys/stat.h>
+//  #include <unistd.h>
 
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 #ifdef TEST
@@ -23,6 +29,13 @@ bool __is_debug_malloc = false;
 bool __is_debug_realloc = false;
 u64 __is_debug_malloc_counter_ = UINT64_MAX;
 u64 __is_debug_realloc_counter_ = UINT64_MAX;
+bool __is_debug_misc_ferror = false;
+bool __is_debug_misc_fwrite = false;
+bool __is_debug_misc_stat = false;
+bool __is_debug_misc_remove_dir = false;
+bool __is_debug_misc_unlink = false;
+bool __is_debug_misc_no_exit = false;
+bool __is_debug_misc_preserve = false;
 #endif // TEST
 
 void *mymalloc(u64 size) {
@@ -92,4 +105,63 @@ u64 myfopen_sum() {
 }
 u64 myfclose_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
+}
+
+i32 remove_directory(const Path *p, bool preserve_dir) {
+	const char *path = path_to_string(p);
+	struct dirent *entry;
+	DIR *dir = opendir(path);
+
+	if (dir == NULL) {
+		return -1;
+	}
+
+	while ((entry = readdir(dir)) != NULL) {
+		char full_path[PATH_MAX];
+
+		// Skip the special entries "." and ".."
+		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+			continue;
+		}
+
+		// Construct the full path to the file/directory
+		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
+
+		Path full_path_p;
+		path_for(&full_path_p, full_path);
+		if (!path_exists(&full_path_p)) {
+			SetErr(FileNotFound);
+			closedir(dir);
+			return -1;
+		}
+
+		if (path_is_dir(&full_path_p)) {
+			// It's a directory, recurse into it
+			Path full_path_p;
+			path_for(&full_path_p, full_path);
+			if (remove_directory(&full_path_p, false) == -1 || __is_debug_misc_remove_dir) {
+				closedir(dir);
+				return -1;
+			}
+		} else {
+			// It's a file, unlink (delete) it
+			if (unlink(full_path) == -1 || __is_debug_misc_unlink) {
+				SetErr(IO);
+				closedir(dir);
+				return -1;
+			}
+		}
+	}
+
+	closedir(dir);
+
+	// Now the directory is empty, so we can remove it
+	if (!preserve_dir) {
+		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
+			SetErr(IO);
+			return -1;
+		}
+	}
+
+	return 0;
 }
