@@ -1,11 +1,4 @@
-OBJS := types.o \
-	backtrace.o \
-	string.o \
-	fam_err.o \
-	print_util.o \
-	colors.o \
-	resources.o \
-	path.o
+OBJS := types.o
 
 TEST_OBJS := $(OBJS)
 
