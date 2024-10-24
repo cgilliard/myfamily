@@ -75,8 +75,12 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="deps_8h_source.html">base/deps.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="fam__err_8h_source.html">base/fam_err.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="path_8h_source.html">base/path.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
+<code>#include &lt;dirent.h&gt;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;<a class="el" href="string_8h_source.html">string.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -86,8 +90,10 @@ Functions</h2></td></tr>
 <tr class="separator:a7ab0f6f2acf22ec0573ccf566fc5bb15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7baeff92dbc77e87e5ebe617db46bd06"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="resources_8c.html#a7baeff92dbc77e87e5ebe617db46bd06">myfree</a> (void *ptr)</td></tr>
 <tr class="separator:a7baeff92dbc77e87e5ebe617db46bd06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d9f84f4d1a673a98f848011151f43fd"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="resources_8c.html#a9d9f84f4d1a673a98f848011151f43fd">mymalloc_no_stat</a> (<a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size)</td></tr>
-<tr class="separator:a9d9f84f4d1a673a98f848011151f43fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afeac8e5f3737b9d12d3c3f34158bf2a6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structStream.html">Stream</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="resources_8c.html#afeac8e5f3737b9d12d3c3f34158bf2a6">myfopen</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *path, <a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> flags)</td></tr>
+<tr class="separator:afeac8e5f3737b9d12d3c3f34158bf2a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bd83d973b9d27a09e1a2a2b53b5e451"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="resources_8c.html#a7bd83d973b9d27a09e1a2a2b53b5e451">myfclose</a> (<a class="el" href="structStream.html">Stream</a> *ptr)</td></tr>
+<tr class="separator:a7bd83d973b9d27a09e1a2a2b53b5e451"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53b7591c92f2b5fede4be13fffafa06f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="resources_8c.html#a53b7591c92f2b5fede4be13fffafa06f">mymalloc_sum</a> ()</td></tr>
 <tr class="separator:a53b7591c92f2b5fede4be13fffafa06f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbd4931db936aa47aa5428e9eb207c36"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="resources_8c.html#afbd4931db936aa47aa5428e9eb207c36">myrealloc_sum</a> ()</td></tr>
@@ -98,6 +104,8 @@ Functions</h2></td></tr>
 <tr class="separator:aa7957c38f9bfd6b25748cb16ff615fca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b809890b8c686fb2e74bc782d0fc28a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="resources_8c.html#a0b809890b8c686fb2e74bc782d0fc28a">myfclose_sum</a> ()</td></tr>
 <tr class="separator:a0b809890b8c686fb2e74bc782d0fc28a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c44f8d5c900afdeed4c47498917ba63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="resources_8c.html#a3c44f8d5c900afdeed4c47498917ba63">remove_directory</a> (const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *p, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> preserve_dir)</td></tr>
+<tr class="separator:a3c44f8d5c900afdeed4c47498917ba63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -105,6 +113,24 @@ Variables</h2></td></tr>
 <tr class="separator:a5b30cb95c593a4c72b37fc7a807c5643"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a7bd83d973b9d27a09e1a2a2b53b5e451"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bd83d973b9d27a09e1a2a2b53b5e451">&#9670;&nbsp;</a></span>myfclose()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void myfclose </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structStream.html">Stream</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a0b809890b8c686fb2e74bc782d0fc28a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0b809890b8c686fb2e74bc782d0fc28a">&#9670;&nbsp;</a></span>myfclose_sum()</h2>
 
@@ -116,6 +142,34 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afeac8e5f3737b9d12d3c3f34158bf2a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afeac8e5f3737b9d12d3c3f34158bf2a6">&#9670;&nbsp;</a></span>myfopen()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structStream.html">Stream</a> myfopen </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td>
+          <td class="paramname"><em>flags</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -192,24 +246,6 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a9d9f84f4d1a673a98f848011151f43fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d9f84f4d1a673a98f848011151f43fd">&#9670;&nbsp;</a></span>mymalloc_no_stat()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void* mymalloc_no_stat </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
-          <td class="paramname"><em>size</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a53b7591c92f2b5fede4be13fffafa06f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a53b7591c92f2b5fede4be13fffafa06f">&#9670;&nbsp;</a></span>mymalloc_sum()</h2>
 
@@ -266,6 +302,34 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3c44f8d5c900afdeed4c47498917ba63"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c44f8d5c900afdeed4c47498917ba63">&#9670;&nbsp;</a></span>remove_directory()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> remove_directory </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="path_8h.html#a9a4b261ee74f577bbd57315cb754f607">Path</a> *&#160;</td>
+          <td class="paramname"><em>p</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>preserve_dir</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

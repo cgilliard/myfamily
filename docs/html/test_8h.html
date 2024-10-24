@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Family: base/panic.h File Reference</title>
+<title>My Family: base/test.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -69,43 +69,69 @@ $(function() {
   <div class="summary">
 <a href="#define-members">Macros</a>  </div>
   <div class="headertitle">
-<div class="title">panic.h File Reference</div>  </div>
+<div class="title">test.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="misc_8h_source.html">base/misc.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="print__util_8h_source.html">base/print_util.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="colors_8h_source.html">base/colors.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="path_8h_source.html">base/path.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="string_8h_source.html">base/string.h</a>&gt;</code><br />
+<code>#include &lt;criterion/criterion.h&gt;</code><br />
+<code>#include &lt;fcntl.h&gt;</code><br />
+<code>#include &lt;signal.h&gt;</code><br />
+<code>#include &lt;stdio.h&gt;</code><br />
+<code>#include &lt;unistd.h&gt;</code><br />
 </div>
-<p><a href="panic_8h_source.html">Go to the source code of this file.</a></p>
+<p><a href="test_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a7f2052adde8f3e80bac53bb89502628c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="panic_8h.html#a7f2052adde8f3e80bac53bb89502628c">panic</a>(fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(err_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, -1, &quot;Panic: &quot;, fmt, __VA_ARGS__)</td></tr>
-<tr class="separator:a7f2052adde8f3e80bac53bb89502628c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac491bfaf0b292ca81ada9f3b82af5245"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test_8h.html#ac491bfaf0b292ca81ada9f3b82af5245">MySuite</a>(name)</td></tr>
+<tr class="separator:ac491bfaf0b292ca81ada9f3b82af5245"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e6f1698baf6614fafee5b7ffd575cd2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test_8h.html#a2e6f1698baf6614fafee5b7ffd575cd2">MyTest</a>(suite,  test)</td></tr>
+<tr class="separator:a2e6f1698baf6614fafee5b7ffd575cd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a7f2052adde8f3e80bac53bb89502628c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7f2052adde8f3e80bac53bb89502628c">&#9670;&nbsp;</a></span>panic</h2>
+<a id="ac491bfaf0b292ca81ada9f3b82af5245"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac491bfaf0b292ca81ada9f3b82af5245">&#9670;&nbsp;</a></span>MySuite</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define panic</td>
+          <td class="memname">#define MySuite</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">fmt, </td>
+          <td class="paramname">name</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2e6f1698baf6614fafee5b7ffd575cd2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2e6f1698baf6614fafee5b7ffd575cd2">&#9670;&nbsp;</a></span>MyTest</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MyTest</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">suite, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em>&#160;</td>
+          <td class="paramname">test&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(err_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, -1, &quot;Panic: &quot;, fmt, __VA_ARGS__)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

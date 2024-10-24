@@ -1,6 +1,21 @@
 var searchData=
 [
-  ['real_5fmain_297',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]],
-  ['realloc_298',['realloc',['../deps_8h.html#aab0e0e65c73922e457d66ea308c7d453',1,'deps.h']]],
-  ['reverse_299',['reverse',['../misc_8c.html#a77ae4e8f21159428f5c0ba204fe97bc6',1,'reverse(u8 str[], u64 length):&#160;misc.c'],['../misc_8h.html#a77ae4e8f21159428f5c0ba204fe97bc6',1,'reverse(u8 str[], u64 length):&#160;misc.c']]]
+  ['path_5fcanonicalize_338',['path_canonicalize',['../path_8h.html#a43778c2ebe35a2575d8484057a1868c4',1,'path_canonicalize(Path *p):&#160;path.c'],['../path_8c.html#a43778c2ebe35a2575d8484057a1868c4',1,'path_canonicalize(Path *p):&#160;path.c']]],
+  ['path_5fcleanup_339',['path_cleanup',['../path_8c.html#af2abcd42f8ea2c07c2333f60d578f1a0',1,'path_cleanup(PathImpl *ptr):&#160;path.c'],['../path_8h.html#af2abcd42f8ea2c07c2333f60d578f1a0',1,'path_cleanup(PathImpl *ptr):&#160;path.c']]],
+  ['path_5fcopy_340',['path_copy',['../path_8c.html#acc7a27cb85da57ae22e220e7b66f49eb',1,'path_copy(Path *dst, const Path *src):&#160;path.c'],['../path_8h.html#acc7a27cb85da57ae22e220e7b66f49eb',1,'path_copy(Path *dst, const Path *src):&#160;path.c']]],
+  ['path_5fexists_341',['path_exists',['../path_8c.html#a668e7b18d0178b35a818d3f3f302981c',1,'path_exists(const Path *p):&#160;path.c'],['../path_8h.html#a668e7b18d0178b35a818d3f3f302981c',1,'path_exists(const Path *p):&#160;path.c']]],
+  ['path_5ffile_5fname_342',['path_file_name',['../path_8c.html#a243980e546f7b504e0bafc7150445e9f',1,'path_file_name(const Path *p):&#160;path.c'],['../path_8h.html#a243980e546f7b504e0bafc7150445e9f',1,'path_file_name(const Path *p):&#160;path.c']]],
+  ['path_5ffile_5fsize_343',['path_file_size',['../path_8c.html#a688bfc7f2a979489ffe58ec96d804193',1,'path_file_size(Path *p):&#160;path.c'],['../path_8h.html#a688bfc7f2a979489ffe58ec96d804193',1,'path_file_size(Path *p):&#160;path.c']]],
+  ['path_5ffile_5fstem_344',['path_file_stem',['../path_8c.html#a95cbd3d1a048849d2f366d6b875ea01e',1,'path_file_stem(const Path *p, u8 *buf, u64 limit):&#160;path.c'],['../path_8h.html#a95cbd3d1a048849d2f366d6b875ea01e',1,'path_file_stem(const Path *p, u8 *buf, u64 limit):&#160;path.c']]],
+  ['path_5ffor_345',['path_for',['../path_8c.html#a271afbf90e9174107f517613b55fc47f',1,'path_for(Path *p, const u8 *path):&#160;path.c'],['../path_8h.html#a1f103948b7c85aec0edc5dc3bb7e4719',1,'path_for(Path *dst, const u8 *path):&#160;path.c']]],
+  ['path_5fis_5fdir_346',['path_is_dir',['../path_8c.html#a90b6a2154ce88049f2620729fe258aa0',1,'path_is_dir(const Path *p):&#160;path.c'],['../path_8h.html#a90b6a2154ce88049f2620729fe258aa0',1,'path_is_dir(const Path *p):&#160;path.c']]],
+  ['path_5fmkdir_347',['path_mkdir',['../path_8c.html#af458685a462418befcec814730830591',1,'path_mkdir(Path *p, u64 mode, bool parent):&#160;path.c'],['../path_8h.html#af458685a462418befcec814730830591',1,'path_mkdir(Path *p, u64 mode, bool parent):&#160;path.c']]],
+  ['path_5fpop_348',['path_pop',['../path_8c.html#afc44cba9c233c58dfdb9015ba8dfa32f',1,'path_pop(Path *p):&#160;path.c'],['../path_8h.html#afc44cba9c233c58dfdb9015ba8dfa32f',1,'path_pop(Path *p):&#160;path.c']]],
+  ['path_5fpush_349',['path_push',['../path_8c.html#a64a978c15977c59d8e554e5cbfd30779',1,'path_push(Path *p, const u8 *next):&#160;path.c'],['../path_8h.html#a64a978c15977c59d8e554e5cbfd30779',1,'path_push(Path *p, const u8 *next):&#160;path.c']]],
+  ['path_5freplace_5fhome_350',['path_replace_home',['../path_8c.html#a27ae01a1b227407ba9178ebfe8e63f1e',1,'path.c']]],
+  ['path_5fto_5fstring_351',['path_to_string',['../path_8c.html#a57875af46cd3c29cef74d57b254e0038',1,'path_to_string(const Path *p):&#160;path.c'],['../path_8h.html#a57875af46cd3c29cef74d57b254e0038',1,'path_to_string(const Path *p):&#160;path.c']]],
+  ['print_5ferr_352',['print_err',['../fam__err_8c.html#a72677d73648dde6edb51ce909bd4c941',1,'print_err(const u8 *text):&#160;fam_err.c'],['../fam__err_8h.html#a72677d73648dde6edb51ce909bd4c941',1,'print_err(const u8 *text):&#160;fam_err.c']]],
+  ['print_5fhex_353',['print_hex',['../xxdir_8c.html#af45e49d375ec15a3ad54c524c0fb7855',1,'xxdir.c']]],
+  ['print_5fimpl_354',['print_impl',['../print__util_8c.html#ad1a98da77ae78f3412eae46199c45732',1,'print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code, const u8 *prefix, const u8 *fmt,...):&#160;print_util.c'],['../print__util_8h.html#aab7346edbded8672bc5d3a767a680213',1,'print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool exit, i32 code, const u8 *prefix, const u8 *fmt,...):&#160;print_util.c']]],
+  ['proc_5ffile_355',['proc_file',['../xxdir_8c.html#ad8071c588b0037587224a40257b7040e',1,'xxdir.c']]]
 ];

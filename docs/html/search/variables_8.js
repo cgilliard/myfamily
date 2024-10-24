@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['start_5faddr_318',['start_addr',['../structBacktraceEntry.html#a85cf0af52d9f6614f0e8ab3a15c103f8',1,'BacktraceEntry']]],
-  ['start_5fbin_319',['start_bin',['../structBacktraceEntry.html#a885afbcad0d4fcfd09950b0654f81c2d',1,'BacktraceEntry']]],
-  ['start_5ffile_5fpath_320',['start_file_path',['../structBacktraceEntry.html#a96967a00d2a78c386a5c0bb0ffdfad0a',1,'BacktraceEntry']]]
+  ['malloc_5fsum_383',['malloc_sum',['../structResourceStats.html#ae9eb0fbcddc4ae13b289b50f89cd0750',1,'ResourceStats']]]
 ];

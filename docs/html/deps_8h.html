@@ -67,12 +67,16 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">deps.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
+<code>#include &lt;errno.h&gt;</code><br />
+<code>#include &lt;fcntl.h&gt;</code><br />
+<code>#include &lt;<a class="el" href="limits_8h_source.html">limits.h</a>&gt;</code><br />
 </div>
 <p><a href="deps_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -84,14 +88,49 @@ Functions</h2></td></tr>
 <tr class="separator:a181ad9f024306cdea8d96082859b61f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75da31a7c0a34681cb7be47d77ffa18f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ada59a0de67c44384c6faa924ca63c2aa">i64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#a75da31a7c0a34681cb7be47d77ffa18f">write</a> (<a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> fd, const void *buf, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> count)</td></tr>
 <tr class="separator:a75da31a7c0a34681cb7be47d77ffa18f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeac3a0e54563deb85b8865101c4a7c17"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#aeac3a0e54563deb85b8865101c4a7c17">close</a> (<a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> fd)</td></tr>
+<tr class="separator:aeac3a0e54563deb85b8865101c4a7c17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91692d17c9cd55958e92af3971d97bcb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#a91692d17c9cd55958e92af3971d97bcb">lseek</a> (<a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> fd, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> offset, <a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> whence)</td></tr>
+<tr class="separator:a91692d17c9cd55958e92af3971d97bcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaaa4d9a51d7df81225e1e81d1503a56a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#aaaa4d9a51d7df81225e1e81d1503a56a">mkdir</a> (const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *name, <a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> mode)</td></tr>
+<tr class="separator:aaaa4d9a51d7df81225e1e81d1503a56a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11565fa39b8c963b3c0903f0272463e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#a11565fa39b8c963b3c0903f0272463e2">rmdir</a> (const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *path)</td></tr>
+<tr class="separator:a11565fa39b8c963b3c0903f0272463e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a232e315d8dcfab536214ab88dfff3646"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#a232e315d8dcfab536214ab88dfff3646">unlink</a> (const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *pathname)</td></tr>
+<tr class="separator:a232e315d8dcfab536214ab88dfff3646"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6e2f62ec9bc3e8505f7d4c8702fb42c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#ac6e2f62ec9bc3e8505f7d4c8702fb42c">malloc</a> (<a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size)</td></tr>
 <tr class="separator:ac6e2f62ec9bc3e8505f7d4c8702fb42c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbedc913aa4651b3c3b4b3aecd9b4711"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#afbedc913aa4651b3c3b4b3aecd9b4711">free</a> (void *ptr)</td></tr>
 <tr class="separator:afbedc913aa4651b3c3b4b3aecd9b4711"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab0e0e65c73922e457d66ea308c7d453"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#aab0e0e65c73922e457d66ea308c7d453">realloc</a> (void *ptr, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> size)</td></tr>
 <tr class="separator:aab0e0e65c73922e457d66ea308c7d453"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6646e3960f1c015c86c3b45f6e5db53e"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#a6646e3960f1c015c86c3b45f6e5db53e">realpath</a> (const char *restrict path, char *restrict resolved_path)</td></tr>
+<tr class="separator:a6646e3960f1c015c86c3b45f6e5db53e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:a6cfa0b6785cb63becde0284c9a8f6bea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="deps_8h.html#a6cfa0b6785cb63becde0284c9a8f6bea">errno</a></td></tr>
+<tr class="separator:a6cfa0b6785cb63becde0284c9a8f6bea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="aeac3a0e54563deb85b8865101c4a7c17"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeac3a0e54563deb85b8865101c4a7c17">&#9670;&nbsp;</a></span>close()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> close </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td>
+          <td class="paramname"><em>fd</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a55e99c539cf7723ec15e856b7e0a8cee"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a55e99c539cf7723ec15e856b7e0a8cee">&#9670;&nbsp;</a></span>exit()</h2>
 
@@ -146,6 +185,40 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a91692d17c9cd55958e92af3971d97bcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91692d17c9cd55958e92af3971d97bcb">&#9670;&nbsp;</a></span>lseek()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> lseek </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td>
+          <td class="paramname"><em>fd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
+          <td class="paramname"><em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td>
+          <td class="paramname"><em>whence</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ac6e2f62ec9bc3e8505f7d4c8702fb42c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac6e2f62ec9bc3e8505f7d4c8702fb42c">&#9670;&nbsp;</a></span>malloc()</h2>
 
@@ -158,6 +231,34 @@ Functions</h2></td></tr>
           <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
           <td class="paramname"><em>size</em></td><td>)</td>
           <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aaaa4d9a51d7df81225e1e81d1503a56a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaaa4d9a51d7df81225e1e81d1503a56a">&#9670;&nbsp;</a></span>mkdir()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> mkdir </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td>
+          <td class="paramname"><em>mode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -186,6 +287,70 @@ Functions</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6646e3960f1c015c86c3b45f6e5db53e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6646e3960f1c015c86c3b45f6e5db53e">&#9670;&nbsp;</a></span>realpath()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* realpath </td>
+          <td>(</td>
+          <td class="paramtype">const char *restrict&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char *restrict&#160;</td>
+          <td class="paramname"><em>resolved_path</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a11565fa39b8c963b3c0903f0272463e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11565fa39b8c963b3c0903f0272463e2">&#9670;&nbsp;</a></span>rmdir()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> rmdir </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a232e315d8dcfab536214ab88dfff3646"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a232e315d8dcfab536214ab88dfff3646">&#9670;&nbsp;</a></span>unlink()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> unlink </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td>
+          <td class="paramname"><em>pathname</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -222,6 +387,29 @@ Functions</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="a6cfa0b6785cb63becde0284c9a8f6bea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6cfa0b6785cb63becde0284c9a8f6bea">&#9670;&nbsp;</a></span>errno</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> errno</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 </div>
