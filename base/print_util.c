@@ -32,7 +32,10 @@ typedef __builtin_va_list va_list;
 
 i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u64 len) {
 	if (s) {
-		if (*cur < limit) {
+		if (strm->handle == -1) {
+			// length only
+			*cur += len;
+		} else if (*cur < limit) {
 			u8 *res;
 			if (*cur == 0) {
 				res = mystrcpy(s, buf, limit);
@@ -43,7 +46,7 @@ i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u6
 				if (res == NULL)
 					return -1;
 			}
-			*cur += res - s;
+			*cur = res - s;
 		}
 	} else
 		while (len > 0) {
@@ -60,17 +63,22 @@ i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u6
 
 i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code,
 			   const u8 *prefix, const u8 *fmt, ...) {
-	i32 ret = 0;
+	int ret = 0;
+	if (capacity < 0 && s) {
+		SetErr(IllegalArgument);
+		ret = -1;
+	}
 	va_list args;
 	va_start(args, fmt);
 	i32 max = capacity;
 	capacity = 0;
-	if (prefix) {
+
+	if (prefix && ret != -1) {
 		if (write_loop(strm, s, &capacity, max, prefix, mystrlen(prefix)))
 			ret = -1;
 	}
 
-	loop {
+	while (ret != -1) {
 		const u8 *next = mystrstr(fmt, "{}");
 
 		if (next == NULL) {
@@ -151,5 +159,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 		exit(code);
 	}
 
-	return ret;
+	if (ret == -1)
+		return ret;
+	return capacity;
 }

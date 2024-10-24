@@ -59,6 +59,9 @@ static const PrintPair __termination_print_pair__ = {.type = PrintTypeTerm};
 		char *: (const PrintPair) {.type = PrintTypeString, .data = (char *)v},                    \
 		default: (const PrintPair) {.type = PrintTypeU64, .buf = 0})
 
+const static Stream __slen__impl__ = {-1};
+const static Stream *__slen__ = &__slen__impl__;
+
 #pragma clang diagnostic ignored "-Wpointer-to-int-cast"
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
 #pragma clang diagnostic ignored "-Wint-to-pointer-cast"
@@ -83,8 +86,10 @@ static const PrintPair __termination_print_pair__ = {.type = PrintTypeTerm};
 #define sprintln(s, len, fmt, ...)                                                                 \
 	__do_print_impl_(out_strm, s, len, true, false, 0, NULL, fmt, __VA_ARGS__)
 
+#define slen(fmt, ...) __do_print_impl_(__slen__, " ", 2, false, false, 0, NULL, fmt, __VA_ARGS__)
+
 #define panic(fmt, ...)                                                                            \
-	__do_print_impl_(err_strm, NULL, UINT32_MAX, true, true, -1, "Panic: ", fmt, __VA_ARGS__)
+	__do_print_impl_(err_strm, "", UINT32_MAX, true, true, -1, "Panic: ", fmt, __VA_ARGS__)
 
 i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool exit, i32 code,
 			   const u8 *prefix, const u8 *fmt, ...);

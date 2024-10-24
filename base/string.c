@@ -138,8 +138,6 @@ u8 *mystrcat(u8 *X, const u8 *Y, u64 limit) {
 	return mystrcpy(X, Y, limit);
 }
 
-#include <stdio.h>
-
 u8 *mystrcpy(u8 *X, const u8 *Y, u64 limit) {
 	if (!X || !Y) {
 		SetErr(IllegalArgument);

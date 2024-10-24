@@ -69,23 +69,6 @@ Test(base, test_strcpy) {
 	cr_assert(!mystrcmp(buf1, ""));
 }
 
-Test(base, test_print_utils) {
-	i16 vi16 = 32000;
-	println("no args!");
-	print("start: u64value={},i16value={},i32value={},", 999ULL, vi16, -111);
-	println("str='{}'", "this is a test");
-	u8 tmp[101];
-	for (int i = 0; i < 101; i++)
-		tmp[i] = 0;
-	sprint(tmp, 100, "test123 {}", 5);
-	println("tmp={}", tmp);
-	cr_assert(!mystrcmp(tmp, "test123 5"));
-	sprintln(tmp, 100, "testabc {} {}", -4, "ok");
-	cr_assert(!mystrcmp(tmp, "testabc -4 ok\n"));
-	sprint(tmp, 100, "abc {}", 100000000000ULL);
-	cr_assert(!mystrcmp(tmp, "abc 100000000000"));
-}
-
 Test(base, test_string) {
 	fam_err = NoErrors;
 	cr_assert(mymemcmp("abc", NULL, 1));
@@ -129,10 +112,8 @@ Test(base, test_string) {
 
 	u8 buf[100];
 	mystrcpy(buf, "abc", 4);
-	println("buf={}", buf);
 	cr_assert(!mystrcmp(buf, "abc"));
 	mystrcat(buf, "def", 4);
-	println("buf={}", buf);
 	cr_assert(!mystrcmp(buf, "abcdef"));
 
 	fam_err = NoErrors;
@@ -175,4 +156,35 @@ Test(base, test_string) {
 	fam_err = NoErrors;
 	memzero(NULL, 10);
 	cr_assert_eq(fam_err, IllegalArgument);
+}
+
+Test(base, test_print_util) {
+	u8 tmp[101];
+	i16 vi16 = 32000;
+	println("no args!");
+	print("start: u64value={},i16value={},i32value={},", 999ULL, vi16, -111);
+	println("str='{}'", "this is a test");
+	for (int i = 0; i < 101; i++)
+		tmp[i] = 0;
+	sprint(tmp, 100, "test123 {}", 5);
+	cr_assert(!mystrcmp(tmp, "test123 5"));
+	sprintln(tmp, 100, "testabc {} {}", -4, "ok");
+	cr_assert(!mystrcmp(tmp, "testabc -4 ok\n"));
+	i32 ret = sprint(tmp, 100, "abc {}", 100000000000ULL);
+	cr_assert(!mystrcmp(tmp, "abc 100000000000"));
+	cr_assert_eq(ret, mystrlen("abc 100000000000"));
+	SetErr(NoErrors);
+	cr_assert_eq(sprint(tmp, -1, "abc"), -1);
+	cr_assert_eq(fam_err, IllegalArgument);
+	int ret2 = slen("abc {} {} {}", 1000ULL, -80, "test");
+	cr_assert_eq(ret2, mystrlen("abc 1000 -80 test"));
+
+	mystrcpy(tmp, "", 1);
+	cr_assert_eq(mystrlen(tmp), 0);
+	print_impl(out_strm, tmp, 100, false, false, 0, "prefix", "test");
+	cr_assert(!mystrcmp(tmp, "prefixtest"));
+
+	int ret3 = sprint(tmp, 100, "abc {} {}", "ok");
+	cr_assert(!mystrcmp(tmp, "abc ok {}"));
+	cr_assert_eq(ret3, mystrlen("abc ok {}"));
 }
