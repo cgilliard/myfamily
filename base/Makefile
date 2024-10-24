@@ -1,4 +1,4 @@
-OBJS := types.o
+OBJS := types.o os.o
 
 TEST_OBJS := $(OBJS)
 

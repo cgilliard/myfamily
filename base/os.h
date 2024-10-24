@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/os_impl.h>
 #include <base/types.h>
-/*
+
 // Memory Management
-void *mymalloc(u64 size, bool zeroed);
-void myfree(void *ptr);
-void *myrealloc(void *ptr, u64 size);
+void *alloc(u64 size, bool zeroed);
+void release(void *ptr);
+void *resize(void *ptr, u64 size);
 
 typedef enum Whence {
 	WhenceStart,
 	WhenceCur,
+	WhenceEnd,
 } Whence;
 
 typedef struct DirectoryEntry {
@@ -31,17 +31,23 @@ typedef struct DirectoryEntry {
 
 typedef struct Directory {
 	const u64 count;
-	DirectoryEntry *entries;
+	const DirectoryEntry *entries;
 } Directory;
 
+typedef struct Path {
+	const u8 *name;
+} Path;
+
+typedef struct FileInfo {
+	const u8 *full_path;
+} FileInfo;
+
 // File System
-i64 create_file(const u8 *path);
-i64 create_directory(const u8 *path);
-i64 remove(const u8 *path);
+i64 create(const u8 *path, bool directory);
+i64 rem(const u8 *path);
 i64 open(const u8 *path, u64 flags);
 i64 close(i64 handle);
 i64 seek(i64 handle, i64 offset, Whence whence);
-i64
+i64 finfo(const u8 *path, FileInfo *finfo);
 
-	// Process Management
-*/
+// Process Management
