@@ -17,9 +17,7 @@
 #include <base/string.h>
 #include <base/types.h>
 
-#ifdef TEST
 bool __is_debug_mystrlen_overflow = false;
-#endif // TEST
 
 i32 mymemcmp(const u8 *X, const u8 *Y, u64 len) {
 	if (!X || !Y) {

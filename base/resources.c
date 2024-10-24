@@ -21,7 +21,6 @@
 #include <base/types.h>
 
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
-#ifdef TEST
 bool __is_debug_malloc = false;
 bool __is_debug_realloc = false;
 u64 __is_debug_malloc_counter_ = UINT64_MAX;
@@ -33,7 +32,6 @@ bool __is_debug_misc_remove_dir = false;
 bool __is_debug_misc_unlink = false;
 bool __is_debug_misc_no_exit = false;
 bool __is_debug_misc_preserve = false;
-#endif // TEST
 
 void *mymalloc(u64 size) {
 #ifdef TEST
