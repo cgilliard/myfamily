@@ -106,7 +106,8 @@ void *persistent_alloc(const u8 *name, u64 size, bool zeroed) {
 	mystrcpy(path, persistent_base, PATH_MAX);
 	mystrcat(path, "/", PATH_MAX - mystrlen(path));
 	mystrcat(path, name, PATH_MAX - mystrlen(path));
-	i32 fd = open(path, O_CREAT | O_RDWR);
+
+	i32 fd = open(path, O_CREAT | O_RDWR | O_TRUNC, 0700);
 	fchmod(fd, 0700);
 
 	if (ftruncate(fd, size) == -1) {
@@ -117,19 +118,25 @@ void *persistent_alloc(const u8 *name, u64 size, bool zeroed) {
 	char buf[size];
 	for (int i = 0; i < size; i++)
 		buf[i] = 'x';
-	write(fd, buf, size);
+	i32 res = write(fd, buf, size);
+	if (res < 0) {
+		perror("write");
+		exit(-1);
+	}
 	fsync(fd);
+	lseek(fd, 0, SEEK_SET);
 	void *ret = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
 	if (ret == NULL) {
 		perror("mmap");
 		exit(-1);
 	}
-	((char *)ret)[0] = 'a';
-	((char *)ret)[1] = 'b';
+	for (int i = 0; i < size * 2; i++)
+		((char *)ret)[i] = 'a';
 	if (msync(ret, size, MS_SYNC)) {
 		perror("msync");
 		exit(-1);
 	}
+	munmap(ret, 0);
 	close(fd);
 	return ret;
 }
