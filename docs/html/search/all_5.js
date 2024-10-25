@@ -3,8 +3,8 @@ var searchData=
   ['empty_37',['EMPTY',['../macro__util_8h.html#a4ddebc5712d39b71767e3dceb9bfb74b',1,'macro_util.h']]],
   ['entries_38',['entries',['../structBacktrace.html#af1c0a5c3e1739b70e88c16b576213e4e',1,'Backtrace']]],
   ['enum_5ftext_39',['ENUM_TEXT',['../fam__err_8h.html#a00bf3c25370794374e72d291b5e04445',1,'fam_err.h']]],
-  ['err_5flen_40',['ERR_LEN',['../fam__err_8h.html#a0c8bbd905db6b23f4b0b89f82885ef23',1,'fam_err.h']]],
-  ['errno_41',['errno',['../deps_8h.html#a6cfa0b6785cb63becde0284c9a8f6bea',1,'deps.h']]],
+  ['env_40',['env',['../os_8c.html#a8db93315ef019db22f0d35281f1f0eda',1,'env(const u8 *name):&#160;os.c'],['../os_8h.html#a8db93315ef019db22f0d35281f1f0eda',1,'env(const u8 *name):&#160;os.c']]],
+  ['err_5flen_41',['ERR_LEN',['../fam__err_8h.html#a0c8bbd905db6b23f4b0b89f82885ef23',1,'fam_err.h']]],
   ['eval_42',['EVAL',['../macro__util_8h.html#aa0f8200acd4827bc9d2df09270b66c38',1,'macro_util.h']]],
   ['eval1_43',['EVAL1',['../macro__util_8h.html#aad4f105758560e2d030fb28e39acea6f',1,'macro_util.h']]],
   ['eval1024_44',['EVAL1024',['../macro__util_8h.html#aaad3972dddbceed6c8ab1e28703ff6f8',1,'macro_util.h']]],
@@ -17,7 +17,7 @@ var searchData=
   ['eval512_51',['EVAL512',['../macro__util_8h.html#a3e6a61326961e8e999f8bb968eda3f67',1,'macro_util.h']]],
   ['eval64_52',['EVAL64',['../macro__util_8h.html#ad6795aac7c4cc246ce4cc021d542eb18',1,'macro_util.h']]],
   ['eval8_53',['EVAL8',['../macro__util_8h.html#a696db09f5d24016710ed370ee42627c8',1,'macro_util.h']]],
-  ['exit_54',['exit',['../deps_8h.html#a55e99c539cf7723ec15e856b7e0a8cee',1,'deps.h']]],
+  ['exit_54',['exit',['../os_8h.html#a9f2b9ae06f804f34da2168b8d08c1db5',1,'os.h']]],
   ['expand_55',['EXPAND',['../macro__util_8h.html#ae4b532a93c757194ec73b6790a3e6b1f',1,'macro_util.h']]],
   ['expand_5fall_56',['EXPAND_ALL',['../macro__util_8h.html#a800c6a1a2abcb460825c03b17f67ec29',1,'macro_util.h']]]
 ];

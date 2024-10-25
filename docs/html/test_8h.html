@@ -67,17 +67,19 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a>  </div>
+<a href="#define-members">Macros</a> &#124;
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">test.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="colors_8h_source.html">base/colors.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="path_8h_source.html">base/path.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="resources_8h_source.html">base/resources.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="os_8h_source.html">base/os.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="string_8h_source.html">base/string.h</a>&gt;</code><br />
 <code>#include &lt;criterion/criterion.h&gt;</code><br />
 <code>#include &lt;fcntl.h&gt;</code><br />
+<code>#include &lt;ftw.h&gt;</code><br />
+<code>#include &lt;<a class="el" href="limits_8h_source.html">limits.h</a>&gt;</code><br />
 <code>#include &lt;signal.h&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;unistd.h&gt;</code><br />
@@ -90,6 +92,13 @@ Macros</h2></td></tr>
 <tr class="separator:ac491bfaf0b292ca81ada9f3b82af5245"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e6f1698baf6614fafee5b7ffd575cd2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test_8h.html#a2e6f1698baf6614fafee5b7ffd575cd2">MyTest</a>(suite,  test)</td></tr>
 <tr class="separator:a2e6f1698baf6614fafee5b7ffd575cd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ab08d76004de1e54c0d18e143bfd50947"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test_8h.html#ab08d76004de1e54c0d18e143bfd50947">unlink_cb</a> (const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf)</td></tr>
+<tr class="separator:ab08d76004de1e54c0d18e143bfd50947"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5816a6b27040ac0d2cda8305b9f82f9b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test_8h.html#a5816a6b27040ac0d2cda8305b9f82f9b">rmrf</a> (char *path)</td></tr>
+<tr class="separator:a5816a6b27040ac0d2cda8305b9f82f9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ac491bfaf0b292ca81ada9f3b82af5245"></a>
@@ -107,7 +116,43 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordtype">void</span> setup_suite(<span class="keywordtype">void</span>) {                                                                       \</div>
+<div class="line">        printf(<span class="stringliteral">&quot;[%s====%s] Running %s%s%s test suite...\n&quot;</span>, <a class="code" href="colors_8h.html#a79d10e672abb49ad63eeaa8aaef57c38">BLUE</a>, <a class="code" href="colors_8h.html#ab702106cf3b3e96750b6845ded4e0299">RESET</a>, <a class="code" href="colors_8h.html#acfbc006ea433ad708fdee3e82996e721">GREEN</a>, #name, <a class="code" href="colors_8h.html#ab702106cf3b3e96750b6845ded4e0299">RESET</a>);     \</div>
+<div class="line">    }                                                                                              \</div>
+<div class="line">    Test(init, init, .init = setup_suite) {                                                        \</div>
+<div class="line">    }                                                                                              \</div>
+<div class="line">    static <a class="code" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> test_count = 0;                                                                     \</div>
+<div class="line">    static <a class="code" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> initial_alloc_diff;                                                                 \</div>
+<div class="line">    static <a class="code" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> initial_file_diff;                                                                  \</div>
+<div class="line">    static <span class="keywordtype">char</span> *cur_name = <span class="stringliteral">&quot;&quot;</span>;                                                                    \</div>
+<div class="line">    static <a class="code" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> log_fd = -1;                                                                        \</div>
+<div class="line">    void tear_down() {                                                                             \</div>
+<div class="line">        u64 cur_alloc_count = <a class="code" href="os_8c.html#a2f3acdd9a9e962c425bb0b42131a3562">alloc_sum</a>();                                                         \</div>
+<div class="line">        u64 cur_free_count = <a class="code" href="os_8c.html#ae0b8e7a1c98f344ffbbbc239fde62c23">release_sum</a>();                                                        \</div>
+<div class="line">        u64 diff = cur_alloc_count - cur_free_count;                                               \</div>
+<div class="line">        if (diff != initial_alloc_diff) {                                                          \</div>
+<div class="line">            printf(<span class="stringliteral">&quot;[%s====%s] %sError in tear_down of test%s &quot;</span>                                    \</div>
+<div class="line">                   <span class="stringliteral">&quot;&#39;%s%s%s&#39;.\n[%s====%s] Number of allocations not &quot;</span>                              \</div>
+<div class="line">                   <span class="stringliteral">&quot;equal to number &quot;</span>                                                              \</div>
+<div class="line">                   <span class="stringliteral">&quot;of frees. Memory leak?\n&quot;</span>,                                                     \</div>
+<div class="line">                   <a class="code" href="colors_8h.html#a79d10e672abb49ad63eeaa8aaef57c38">BLUE</a>, <a class="code" href="colors_8h.html#ab702106cf3b3e96750b6845ded4e0299">RESET</a>, <a class="code" href="colors_8h.html#a8d23feea868a983c8c2b661e1e16972f">RED</a>, <a class="code" href="colors_8h.html#ab702106cf3b3e96750b6845ded4e0299">RESET</a>, <a class="code" href="colors_8h.html#acfbc006ea433ad708fdee3e82996e721">GREEN</a>, cur_name, <a class="code" href="colors_8h.html#ab702106cf3b3e96750b6845ded4e0299">RESET</a>, <a class="code" href="colors_8h.html#a79d10e672abb49ad63eeaa8aaef57c38">BLUE</a>, <a class="code" href="colors_8h.html#ab702106cf3b3e96750b6845ded4e0299">RESET</a>);                  \</div>
+<div class="line">            printf(<span class="stringliteral">&quot;[%s====%s] &quot;</span>                                                                   \</div>
+<div class="line">                   <span class="stringliteral">&quot;initial_alloc_diff=%llu,diff=%llu\n&quot;</span>,                                          \</div>
+<div class="line">                   <a class="code" href="colors_8h.html#a79d10e672abb49ad63eeaa8aaef57c38">BLUE</a>, <a class="code" href="colors_8h.html#ab702106cf3b3e96750b6845ded4e0299">RESET</a>, initial_alloc_diff, diff);                                         \</div>
+<div class="line">            pid_t iPid = getpid();                                                                 \</div>
+<div class="line">            kill(iPid, SIGINT); <span class="comment">/* trigger failure */</span>                                              \</div>
+<div class="line">        }                                                                                          \</div>
+<div class="line">        if (log_fd &gt; 0)                                                                            \</div>
+<div class="line">            close(log_fd);                                                                         \</div>
+<div class="line">    }</div>
+<div class="ttc" id="acolors_8h_html_a79d10e672abb49ad63eeaa8aaef57c38"><div class="ttname"><a href="colors_8h.html#a79d10e672abb49ad63eeaa8aaef57c38">BLUE</a></div><div class="ttdeci">#define BLUE</div><div class="ttdef"><b>Definition:</b> colors.h:40</div></div>
+<div class="ttc" id="acolors_8h_html_a8d23feea868a983c8c2b661e1e16972f"><div class="ttname"><a href="colors_8h.html#a8d23feea868a983c8c2b661e1e16972f">RED</a></div><div class="ttdeci">#define RED</div><div class="ttdef"><b>Definition:</b> colors.h:22</div></div>
+<div class="ttc" id="acolors_8h_html_ab702106cf3b3e96750b6845ded4e0299"><div class="ttname"><a href="colors_8h.html#ab702106cf3b3e96750b6845ded4e0299">RESET</a></div><div class="ttdeci">#define RESET</div><div class="ttdef"><b>Definition:</b> colors.h:43</div></div>
+<div class="ttc" id="acolors_8h_html_acfbc006ea433ad708fdee3e82996e721"><div class="ttname"><a href="colors_8h.html#acfbc006ea433ad708fdee3e82996e721">GREEN</a></div><div class="ttdeci">#define GREEN</div><div class="ttdef"><b>Definition:</b> colors.h:28</div></div>
+<div class="ttc" id="aos_8c_html_a2f3acdd9a9e962c425bb0b42131a3562"><div class="ttname"><a href="os_8c.html#a2f3acdd9a9e962c425bb0b42131a3562">alloc_sum</a></div><div class="ttdeci">u64 alloc_sum()</div><div class="ttdef"><b>Definition:</b> os.c:77</div></div>
+<div class="ttc" id="aos_8c_html_ae0b8e7a1c98f344ffbbbc239fde62c23"><div class="ttname"><a href="os_8c.html#ae0b8e7a1c98f344ffbbbc239fde62c23">release_sum</a></div><div class="ttdeci">u64 release_sum()</div><div class="ttdef"><b>Definition:</b> os.c:83</div></div>
+<div class="ttc" id="atypes_8h_html_ad758b7a5c3f18ed79d2fcd23d9f16357"><div class="ttname"><a href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a></div><div class="ttdeci">unsigned long long u64</div><div class="ttdef"><b>Definition:</b> types.h:23</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a2e6f1698baf6614fafee5b7ffd575cd2"></a>
@@ -127,6 +172,65 @@ Macros</h2></td></tr>
           <td></td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">test&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a5816a6b27040ac0d2cda8305b9f82f9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5816a6b27040ac0d2cda8305b9f82f9b">&#9670;&nbsp;</a></span>rmrf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int rmrf </td>
+          <td>(</td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab08d76004de1e54c0d18e143bfd50947"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab08d76004de1e54c0d18e143bfd50947">&#9670;&nbsp;</a></span>unlink_cb()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int unlink_cb </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>fpath</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const struct stat *&#160;</td>
+          <td class="paramname"><em>sb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>typeflag</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">struct FTW *&#160;</td>
+          <td class="paramname"><em>ftwbuf</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
