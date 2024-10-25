@@ -18,6 +18,8 @@
 #include <base/print_util.h>
 #include <base/string.h>
 
+#define BUF_LEN 64
+
 // get the va functionality (with GCC/Clang use the builtin version, otherwise use stdarg)
 #if defined(__GNUC__) || defined(__clang__)
 typedef __builtin_va_list va_list;
@@ -27,8 +29,6 @@ typedef __builtin_va_list va_list;
 #else // __GNUC__ or __clang__
 #include <stdarg.h>
 #endif // __GNUC__ or __clang__
-
-#define BUF_LEN 64
 
 i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u64 len) {
 	if (s) {
@@ -60,8 +60,6 @@ i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u6
 		}
 	return 0;
 }
-
-#include <stdio.h>
 
 i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code,
 			   const u8 *prefix, const u8 *fmt, ...) {
@@ -182,6 +180,10 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 	va_end(args);
 
 	if (do_exit) {
+		Backtrace bt;
+		backtrace_generate(&bt);
+		backtrace_print(&bt);
+
 		exit(code);
 	}
 

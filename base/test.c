@@ -30,3 +30,7 @@ MyTest(base, test_backtrace) {
 
 MyTest(base, test_persist) {
 }
+
+MyTest(base, test_string) {
+	cr_assert(mystrlen(NULL));
+}

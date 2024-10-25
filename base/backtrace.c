@@ -22,8 +22,8 @@
 
 #ifdef __APPLE__
 #include <dlfcn.h>
-#include <limits.h>
 #endif // __APPLE__
+#include <unistd.h>
 
 i32 get_file_line(const u8 *bin, const u8 *addr, u8 *line_num, u8 *file_path, i32 max_len) {
 	u64 cmd_max_len = mystrlen(bin) + mystrlen(addr) + 100;
@@ -143,6 +143,7 @@ i32 backtrace_generate(Backtrace *ptr) {
 
 	for (i32 i = 0; i < size; i++) {
 #ifdef __APPLE__
+		u64 path_max = pathconf("/", _PC_PATH_MAX);
 		u8 address[30];
 		Dl_info info;
 		dladdr(array[i], &info);
@@ -155,19 +156,19 @@ i32 backtrace_generate(Backtrace *ptr) {
 		mystrcpy(fn_name, info.dli_sname, snamelen);
 		mystrcpy(bin_name, info.dli_fname, fnamelen);
 
-		u8 file_path[PATH_MAX + 101];
-		u8 line_num[PATH_MAX + 101];
-		mystrcpy(file_path, "", PATH_MAX);
+		u8 file_path[path_max + 101];
+		u8 line_num[path_max + 101];
+		mystrcpy(file_path, "", path_max);
 
-		get_file_line(bin_name, address, line_num, file_path, PATH_MAX + 100);
+		get_file_line(bin_name, address, line_num, file_path, path_max + 100);
 
-		u8 real_bin_name[PATH_MAX + 1];
+		u8 real_bin_name[path_max + 1];
 		if (mystrlen(bin_name) > 0) {
 			realpath(bin_name, real_bin_name);
 		} else
 			mystrcpy(real_bin_name, bin_name, 1 + mystrlen(bin_name));
 
-		u8 real_file_path[PATH_MAX + 1];
+		u8 real_file_path[path_max + 1];
 		bool has_file = true;
 		bool has_line_no = true;
 		if (!mystrcmp(file_path, "")) {
@@ -202,36 +203,41 @@ i32 backtrace_generate(Backtrace *ptr) {
 }
 
 void backtrace_print(const Backtrace *ptr) {
-	const BacktraceEntry *rows = ptr->entries;
-	u64 count = ptr->cur_entries;
-	if (count == 0) {
-		println("-------------Backtrace not available-------------");
-	} else {
-		println("Backtrace:");
-		for (i32 i = 0; i < count; i++) {
-			const u8 *function_name = rows[i].data;
-			const u8 *bin_name;
-			if (rows[i].start_bin < MAX_ENTRY_SIZE)
-				bin_name = rows[i].data + rows[i].start_bin;
-			else
-				bin_name = (u8 *)"";
-			const u8 *address;
-			if (rows[i].start_bin < MAX_ENTRY_SIZE)
-				address = rows[i].data + rows[i].start_addr;
-			else
-				address = (u8 *)"";
+	if (env("CBACKTRACE") != NULL) {
+		const BacktraceEntry *rows = ptr->entries;
+		u64 count = ptr->cur_entries;
+		if (count == 0) {
+			println("-------------Backtrace not available-------------");
+		} else {
+			println("Backtrace:");
+			for (i32 i = 0; i < count; i++) {
+				const u8 *function_name = rows[i].data;
+				const u8 *bin_name;
+				if (rows[i].start_bin < MAX_ENTRY_SIZE)
+					bin_name = rows[i].data + rows[i].start_bin;
+				else
+					bin_name = (u8 *)"";
+				const u8 *address;
+				if (rows[i].start_bin < MAX_ENTRY_SIZE)
+					address = rows[i].data + rows[i].start_addr;
+				else
+					address = (u8 *)"";
 
-			const u8 *file_path;
-			if (rows[i].start_file_path < MAX_ENTRY_SIZE)
-				file_path = rows[i].data + rows[i].start_file_path;
-			else
-				file_path = (u8 *)"";
-			println("#{}:\n\
+				const u8 *file_path;
+				if (rows[i].start_file_path < MAX_ENTRY_SIZE)
+					file_path = rows[i].data + rows[i].start_file_path;
+				else
+					file_path = (u8 *)"";
+				println("#{}:\n\
 	[{}fn={}{}{}{}']\n\
 	[{}binary={}'{}{}{}'] [{}address={}{}]\n\
 	[{}code={}'{}{}{}']\n",
-					i, DIMMED, RESET, GREEN, function_name, RESET, DIMMED, RESET, CYAN, bin_name,
-					RESET, DIMMED, RESET, address, DIMMED, RESET, YELLOW, file_path, RESET);
+						i, DIMMED, RESET, GREEN, function_name, RESET, DIMMED, RESET, CYAN,
+						bin_name, RESET, DIMMED, RESET, address, DIMMED, RESET, YELLOW, file_path,
+						RESET);
+			}
 		}
+	} else {
+		println("Backtrace currently disabled set env variable CBACKTRACE to enable");
 	}
 }

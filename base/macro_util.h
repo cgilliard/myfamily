@@ -24,6 +24,7 @@
 #define NONE(...)
 #define FIRST(x, y) x
 #define FIRST_STRINGIFY(x, y) #x
+#define SECOND_STRINGIFY(x, y) #y
 #define SECOND(x, y) y
 #define BOTH(x, y) x y
 

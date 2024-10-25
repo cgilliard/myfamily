@@ -28,16 +28,12 @@ const u8 *get_err() {
 }
 
 void print_err(const u8 *text) {
-	println("%s: %s", FamErrText[fam_err], text);
-	if (env("CBACKTRACE") != NULL) {
-		// backtrace_print(&thread_local_bt__);
-	} else {
-		println("Backtrace currently disabled set env variable CBACKTRACE to enable");
-	}
+	println("{}: {}", FamErrText[fam_err], text);
+	backtrace_print(&thread_local_bt__);
 }
 
 void do_backtrace_generate(Backtrace *bt) {
 	if (env("CBACKTRACE") != NULL) {
-		// backtrace_generate(bt);
+		backtrace_generate(bt);
 	}
 }

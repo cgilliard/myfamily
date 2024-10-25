@@ -21,11 +21,8 @@
 
 #define ERR_LEN 64
 
-#define ENUM_TEXT(none, x) x
-#define SECOND_STRINGIFY(x, y) #y
-
 #define DEFINE_FAMERR(e)                                                                           \
-	typedef enum FamErr { FOR_EACH(ENUM_TEXT, none, (, ), e) } FamErr;                             \
+	typedef enum FamErr { FOR_EACH(SECOND, none, (, ), e) } FamErr;                                \
 	static const u8 *FamErrText[] = {FOR_EACH(SECOND_STRINGIFY, none, (, ), e)};
 
 // Define FamErr enum values
