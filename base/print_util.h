@@ -93,7 +93,7 @@ const static Stream *__slen__ = &__slen__impl__;
 #define slen(fmt, ...) __do_print_impl_(__slen__, " ", 2, false, false, 0, NULL, fmt, __VA_ARGS__)
 
 #define panic(fmt, ...)                                                                            \
-	__do_print_impl_(err_strm, "", UINT32_MAX, true, true, -1, "Panic: ", fmt, __VA_ARGS__)
+	__do_print_impl_(err_strm, NULL, UINT32_MAX, true, true, -1, "Panic: ", fmt, __VA_ARGS__)
 
 i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool exit, i32 code,
 			   const u8 *prefix, const u8 *fmt, ...);
