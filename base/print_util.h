@@ -15,6 +15,7 @@
 #ifndef _BASE_PRINT_UTIL__
 #define _BASE_PRINT_UTIL__
 
+#include <base/backtrace.h>
 #include <base/macro_util.h>
 #include <base/stream.h>
 #include <base/string.h>
@@ -23,6 +24,7 @@
 typedef enum PrintType {
 	PrintTypeU128,
 	PrintTypeU64,
+	PrintTypeI64,
 	PrintTypeU32,
 	PrintTypeI32,
 	PrintTypeI16,
@@ -40,6 +42,11 @@ static const PrintPair __termination_print_pair__ = {.type = PrintTypeTerm};
 
 #define BUILD_PRINT_PAIR(ignore, v)                                                                \
 	_Generic((v),                                                                                  \
+		i64: ({                                                                                    \
+				 PrintPair pair = {.type = PrintTypeI64};                                          \
+				 mymemcpy(pair.buf, &(i64) {(i64)v}, sizeof(i64));                                 \
+				 pair;                                                                             \
+			 }),                                                                                   \
 		u64: ({                                                                                    \
 				 PrintPair pair = {.type = PrintTypeU64};                                          \
 				 mymemcpy(pair.buf, &(u64) {(u64)v}, sizeof(u64));                                 \

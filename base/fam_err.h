@@ -38,6 +38,7 @@
 	InitErr, \
 	AlreadyInitialized, \
 	IndexOutOfBounds, \
+	POpenErr, \
 	IO, \
 	FileNotFound, \
 	NotADirectory, \
@@ -45,7 +46,7 @@
 	TooBig, \
 	ResourceNotAvailable, \
 	Permission, \
-	BackTraceErr, \
+	BacktraceErr, \
 	ExpectedTypeMismatch, \
 	MaxPathErr, \
 	AllocErr

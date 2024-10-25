@@ -12,24 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_STREAM__
-#define _BASE_STREAM__
-
+#include <base/fam_err.h>
+#include <base/os.h>
+#include <base/print_util.h>
+#include <base/stream.h>
 #include <base/types.h>
 
-typedef struct Stream {
-	i32 handle;
-	void *strm;
-} Stream;
+u8 *sgets(u8 *buf, u64 limit, Stream *strm) {
+	if (!buf || limit == 0 || strm == NULL) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
+	i64 len = strm_read(strm, buf, limit - 1);
+	if (len <= 0) {
+		return NULL;
+	}
 
-const static Stream ERR_STRM = {-1};
-const static Stream in_strm_impl = {0};
-const static Stream out_strm_impl = {1};
-const static Stream err_strm_impl = {2};
-const static Stream *out_strm = &out_strm_impl;
-const static Stream *in_strm = &in_strm_impl;
-const static Stream *err_strm = &err_strm_impl;
-
-u8 *sgets(u8 *buf, u64 limit, Stream *strm);
-
-#endif // _BASE_STREAM__
+	i64 i;
+	for (i = 0; i < len; i++) {
+		if (buf[len] == '\n') {
+			i++;
+			break;
+		}
+	}
+	buf[i] = '\0';
+	return buf;
+}

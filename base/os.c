@@ -14,6 +14,7 @@
 
 #include <base/fam_err.h>
 #include <base/os.h>
+#include <base/print_util.h>
 #include <base/string.h>
 
 #include <errno.h>
@@ -74,6 +75,14 @@ void release(void *ptr) {
 	free(ptr);
 }
 
+void release_no_stat(void *ptr) {
+	if (!ptr) {
+		SetErr(IllegalArgument);
+		return;
+	}
+	free(ptr);
+}
+
 u64 alloc_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
 }
@@ -105,6 +114,37 @@ u8 *env(const u8 *name) {
 	return getenv(name);
 }
 
-i32 write_impl(i32 fd, const void *buf, u64 len) {
-	return write(fd, buf, len);
+i64 strm_write(const Stream *strm, const void *buf, u64 len) {
+	if (!strm || strm->handle < 0 || buf == NULL || len == 0) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+	return write(strm->handle, buf, len);
+}
+
+i64 strm_read(const Stream *strm, void *buf, u64 len) {
+	if (!strm || strm->handle < 0 || buf == NULL || len == 0) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+	return read(strm->handle, buf, len);
+}
+
+i64 strm_open(Stream *strm, const u8 *command, const u8 *type) {
+	FILE *fp = popen(command, type);
+	if (fp == NULL) {
+		SetErr(POpenErr);
+		return -1;
+	}
+	i32 fd = fileno(fp);
+	strm->handle = fd;
+	strm->strm = fp;
+	return 0;
+}
+
+void strm_close(const Stream *strm) {
+	if (strm->strm != NULL)
+		pclose(strm->strm);
+	else
+		close(strm->handle);
 }

@@ -50,7 +50,7 @@ i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u6
 		}
 	} else
 		while (len > 0) {
-			i64 w = write_impl(strm->handle, buf, len);
+			i64 w = strm_write(strm, buf, len);
 			if (w < 0) {
 				SetErr(IO);
 				return w;
@@ -60,6 +60,8 @@ i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u6
 		}
 	return 0;
 }
+
+#include <stdio.h>
 
 i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code,
 			   const u8 *prefix, const u8 *fmt, ...) {
@@ -79,7 +81,13 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 	}
 
 	while (ret != -1) {
+		bool is_hex = false;
 		const u8 *next = mystrstr(fmt, "{}");
+		const u8 *next_hex = mystrstr(fmt, "{hex}");
+		if ((next_hex && !next) || (next_hex && next_hex < next)) {
+			next = next_hex;
+			is_hex = true;
+		}
 
 		if (next == NULL) {
 			if (write_loop(strm, s, &capacity, max, fmt, mystrlen(fmt))) {
@@ -117,11 +125,26 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 					}
 			}
 			break;
+		} else if (arg.type == PrintTypeI64) {
+			i64 value;
+			mymemcpy(&value, arg.buf, sizeof(i64));
+			u8 buf[BUF_LEN];
+			if (is_hex)
+				citoai64(value, buf, 16);
+			else
+				citoai64(value, buf, 10);
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				ret = -1;
+				break;
+			}
 		} else if (arg.type == PrintTypeU64) {
 			u64 value;
 			mymemcpy(&value, arg.buf, sizeof(u64));
 			u8 buf[BUF_LEN];
-			citoau64(value, buf, 10);
+			if (is_hex)
+				citoau64(value, buf, 16);
+			else
+				citoau64(value, buf, 10);
 			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
 				ret = -1;
 				break;
@@ -150,7 +173,10 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 				break;
 			}
 		}
-		fmt = next + 2;
+		if (is_hex)
+			fmt = next + 5;
+		else
+			fmt = next + 2;
 	}
 
 	va_end(args);

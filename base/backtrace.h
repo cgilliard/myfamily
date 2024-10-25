@@ -24,6 +24,7 @@ typedef struct BacktraceEntry {
 	u16 start_bin;
 	u16 start_addr;
 	u16 start_file_path;
+	u16 start_line_num;
 	u8 data[MAX_ENTRY_SIZE + 1];
 } BacktraceEntry;
 

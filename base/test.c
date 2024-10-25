@@ -22,5 +22,11 @@ MyTest(base, test_init) {
 	println("test {}", 1);
 }
 
+MyTest(base, test_backtrace) {
+	Backtrace bt;
+	backtrace_generate(&bt);
+	backtrace_print(&bt);
+}
+
 MyTest(base, test_persist) {
 }
