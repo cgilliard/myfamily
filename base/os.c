@@ -125,7 +125,7 @@ void *persistent_alloc(const u8 *name, u64 size, bool zeroed) {
 	}
 	fsync(fd);
 	lseek(fd, 0, SEEK_SET);
-	void *ret = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHAARED, fd, 0);
+	void *ret = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	if (ret == NULL) {
 		perror("mmap");
 		exit(-1);
