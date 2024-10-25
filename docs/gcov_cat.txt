@@ -1,7 +1,7 @@
         -:    0:Source:backtrace.c
         -:    0:Graph:backtrace.gcno
         -:    0:Data:backtrace.gcda
-        -:    0:Runs:10
+        -:    0:Runs:5
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:10
+        -:    0:Runs:5
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,87 +46,83 @@
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <base/colors.h>
-        -:   16:#include <base/deps.h>
+        -:   16:#include <base/os.h>
         -:   17:
-        -:   18:#ifdef __linux__
-        -:   19:#define getenv(x) secure_getenv(x)
-        -:   20:#endif // __linux__
-        -:   21:
-    #####:   22:char *get_dimmed() {
-    #####:   23:	if (getenv("NO_COLOR") != NULL) {
-    #####:   24:		return "";
-        -:   25:	} else {
-    #####:   26:		return "\x1b[2m";
-        -:   27:	}
-        -:   28:}
-        -:   29:
-    #####:   30:char *get_red() {
-    #####:   31:	if (getenv("NO_COLOR") != NULL) {
-    #####:   32:		return "";
-        -:   33:	} else {
-    #####:   34:		return "\x1b[31m";
-        -:   35:	}
-        -:   36:}
-        -:   37:
-    #####:   38:char *get_bright_red() {
-    #####:   39:	if (getenv("NO_COLOR") != NULL) {
-    #####:   40:		return "";
-        -:   41:	} else {
-    #####:   42:		return "\x1b[91m";
-        -:   43:	}
-        -:   44:}
-        -:   45:
-    #####:   46:char *get_green() {
-    #####:   47:	if (getenv("NO_COLOR") != NULL) {
-    #####:   48:		return "";
-        -:   49:	} else {
-    #####:   50:		return "\x1b[32m";
-        -:   51:	}
-        -:   52:}
-        -:   53:
-    #####:   54:char *get_yellow() {
-    #####:   55:	if (getenv("NO_COLOR") != NULL) {
-    #####:   56:		return "";
-        -:   57:	} else {
-    #####:   58:		return "\x1b[33m";
-        -:   59:	}
-        -:   60:}
-        -:   61:
-    #####:   62:char *get_cyan() {
-    #####:   63:	if (getenv("NO_COLOR") != NULL) {
-    #####:   64:		return "";
-        -:   65:	} else {
-    #####:   66:		return "\x1b[36m";
-        -:   67:	}
-        -:   68:}
-        -:   69:
-    #####:   70:char *get_magenta() {
-    #####:   71:	if (getenv("NO_COLOR") != NULL) {
-    #####:   72:		return "";
-        -:   73:	} else {
-    #####:   74:		return "\x1b[35m";
-        -:   75:	}
-        -:   76:}
-        -:   77:
-    #####:   78:char *get_blue() {
-    #####:   79:	if (getenv("NO_COLOR") != NULL) {
-    #####:   80:		return "";
-        -:   81:	} else {
-    #####:   82:		return "\x1b[34m";
-        -:   83:	}
-        -:   84:}
-        -:   85:
-    #####:   86:char *get_reset() {
-    #####:   87:	if (getenv("NO_COLOR") != NULL) {
-    #####:   88:		return "";
-        -:   89:	} else {
-    #####:   90:		return "\x1b[0m";
-        -:   91:	}
-        -:   92:}
+    #####:   18:char *get_dimmed() {
+    #####:   19:	if (env("NO_COLOR") != NULL) {
+    #####:   20:		return "";
+        -:   21:	} else {
+    #####:   22:		return "\x1b[2m";
+        -:   23:	}
+        -:   24:}
+        -:   25:
+    #####:   26:char *get_red() {
+    #####:   27:	if (env("NO_COLOR") != NULL) {
+    #####:   28:		return "";
+        -:   29:	} else {
+    #####:   30:		return "\x1b[31m";
+        -:   31:	}
+        -:   32:}
+        -:   33:
+    #####:   34:char *get_bright_red() {
+    #####:   35:	if (env("NO_COLOR") != NULL) {
+    #####:   36:		return "";
+        -:   37:	} else {
+    #####:   38:		return "\x1b[91m";
+        -:   39:	}
+        -:   40:}
+        -:   41:
+    #####:   42:char *get_green() {
+    #####:   43:	if (env("NO_COLOR") != NULL) {
+    #####:   44:		return "";
+        -:   45:	} else {
+    #####:   46:		return "\x1b[32m";
+        -:   47:	}
+        -:   48:}
+        -:   49:
+    #####:   50:char *get_yellow() {
+    #####:   51:	if (env("NO_COLOR") != NULL) {
+    #####:   52:		return "";
+        -:   53:	} else {
+    #####:   54:		return "\x1b[33m";
+        -:   55:	}
+        -:   56:}
+        -:   57:
+    #####:   58:char *get_cyan() {
+    #####:   59:	if (env("NO_COLOR") != NULL) {
+    #####:   60:		return "";
+        -:   61:	} else {
+    #####:   62:		return "\x1b[36m";
+        -:   63:	}
+        -:   64:}
+        -:   65:
+    #####:   66:char *get_magenta() {
+    #####:   67:	if (env("NO_COLOR") != NULL) {
+    #####:   68:		return "";
+        -:   69:	} else {
+    #####:   70:		return "\x1b[35m";
+        -:   71:	}
+        -:   72:}
+        -:   73:
+    #####:   74:char *get_blue() {
+    #####:   75:	if (env("NO_COLOR") != NULL) {
+    #####:   76:		return "";
+        -:   77:	} else {
+    #####:   78:		return "\x1b[34m";
+        -:   79:	}
+        -:   80:}
+        -:   81:
+    #####:   82:char *get_reset() {
+    #####:   83:	if (env("NO_COLOR") != NULL) {
+    #####:   84:		return "";
+        -:   85:	} else {
+    #####:   86:		return "\x1b[0m";
+        -:   87:	}
+        -:   88:}
         -:    0:Source:fam_err.c
         -:    0:Graph:fam_err.gcno
         -:    0:Data:fam_err.gcda
-        -:    0:Runs:10
+        -:    0:Runs:5
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -141,9 +137,9 @@
         -:   12:// See the License for the specific language governing permissions and
         -:   13:// limitations under the License.
         -:   14:
-        -:   15:#include <base/deps.h>
-        -:   16:#include <base/fam_err.h>
-        -:   17:#include <base/macro_util.h>
+        -:   15:#include <base/fam_err.h>
+        -:   16:#include <base/macro_util.h>
+        -:   17:#include <base/os.h>
         -:   18:#include <base/print_util.h>
         -:   19:#include <base/string.h>
         -:   20:
@@ -158,22 +154,22 @@
         -:   29:
     #####:   30:void print_err(const u8 *text) {
     #####:   31:	println("%s: %s", FamErrText[fam_err], text);
-    #####:   32:	if (getenv("CBACKTRACE") != NULL) {
+    #####:   32:	if (env("CBACKTRACE") != NULL) {
         -:   33:		// backtrace_print(&thread_local_bt__);
         -:   34:	} else {
     #####:   35:		println("Backtrace currently disabled set env variable CBACKTRACE to enable");
         -:   36:	}
     #####:   37:}
         -:   38:
-       23:   39:void do_backtrace_generate(Backtrace *bt) {
-       23:   40:	if (getenv("CBACKTRACE") != NULL) {
+    #####:   39:void do_backtrace_generate(Backtrace *bt) {
+    #####:   40:	if (env("CBACKTRACE") != NULL) {
         -:   41:		// backtrace_generate(bt);
         -:   42:	}
-       23:   43:}
-        -:    0:Source:path.c
-        -:    0:Graph:path.gcno
-        -:    0:Data:path.gcda
-        -:    0:Runs:10
+    #####:   43:}
+        -:    0:Source:os.c
+        -:    0:Graph:os.gcno
+        -:    0:Data:os.gcda
+        -:    0:Runs:5
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -188,270 +184,106 @@
         -:   12:// See the License for the specific language governing permissions and
         -:   13:// limitations under the License.
         -:   14:
-        -:   15:#include <base/deps.h>
-        -:   16:#include <base/fam_err.h>
-        -:   17:#include <base/limits.h>
-        -:   18:#include <base/path.h>
-        -:   19:#include <base/print_util.h>
-        -:   20:#include <base/resources.h>
-        -:   21:#include <base/string.h>
-        -:   22:
-        -:   23:bool __is_debug_path_homedir_null = false;
-        -:   24:
-       41:   25:void path_cleanup(PathImpl *ptr) {
-       41:   26:	if (ptr->ptr) {
-       38:   27:		myfree(ptr->ptr);
-       38:   28:		ptr->ptr = NULL;
-        -:   29:	}
-       41:   30:}
-        -:   31:
-       43:   32:i32 path_for(Path *p, const u8 *path) {
-       43:   33:	if (p == NULL) {
-        1:   34:		SetErr(IllegalArgument);
-        1:   35:		return -1;
-        -:   36:	}
-       42:   37:	if (path == NULL) {
-        1:   38:		SetErr(IllegalArgument);
-        1:   39:		p->ptr = NULL;
-        1:   40:		return -1;
-        -:   41:	}
-       41:   42:	i32 len = mystrlen(path);
-       41:   43:	if (len == 0) {
-        1:   44:		SetErr(IllegalArgument);
-        1:   45:		p->ptr = NULL;
-        1:   46:		return -1;
-        -:   47:	}
-       40:   48:	p->ptr = mymalloc(len + 1);
-       40:   49:	if (!p->ptr)
-        2:   50:		return -1;
-       38:   51:	p->len = len;
-       38:   52:	mystrcpy(p->ptr, path, len + 1);
-       38:   53:	return 0;
-        -:   54:}
-        -:   55:
-        2:   56:i32 path_replace_home(Path *p) {
-        2:   57:	const u8 *home_dir = getenv("HOME");
-        2:   58:	if (home_dir == NULL || __is_debug_path_homedir_null) {
-    #####:   59:		SetErr(IllegalArgument);
-    #####:   60:		return -1;
-        -:   61:	}
-        2:   62:	if (((u8 *)(p->ptr))[0] == '~') {
-        2:   63:		i32 nlen = mystrlen(home_dir) + mystrlen(PATH_SEPARATOR) + mystrlen(p->ptr);
-        2:   64:		if (nlen >= PATH_MAX) {
-    #####:   65:			SetErr(TooBig);
-       1*:   66:			return -1;
-        -:   67:		}
-        2:   68:		if (nlen >= p->len) {
-        2:   69:			void *nptr = myrealloc(p->ptr, nlen + 1);
-        2:   70:			if (nptr == NULL)
-        1:   71:				return -1;
-        1:   72:			p->ptr = nptr;
-        1:   73:			p->len = nlen;
-        -:   74:		}
-        -:   75:		u8 buf[PATH_MAX + 1];
-        -:   76:		u64 buf_len;
-       1*:   77:		if (mystrlen(p->ptr) > 1 && ((u8 *)(p->ptr))[1] == PATH_SEPARATOR_CHAR)
-    #####:   78:			buf_len = sprint(buf, PATH_MAX, "{}{}", home_dir, (u8 *)(p->ptr + 1));
-        -:   79:		else
-        1:   80:			buf_len = sprint(buf, PATH_MAX, "{}{}{}", home_dir, PATH_SEPARATOR, (u8 *)(p->ptr + 1));
-        1:   81:		mystrcpy(p->ptr, buf, buf_len);
-        -:   82:	}
-        1:   83:	return 0;
-        -:   84:}
-        -:   85:
-    #####:   86:u64 path_file_size(Path *p) {
-    #####:   87:	Stream strm = myfopen(p, O_RDONLY);
-    #####:   88:	if (strm.handle < 0) {
-    #####:   89:		SetErr(IO);
-    #####:   90:		return 0;
-        -:   91:	}
-    #####:   92:	u64 ret = lseek(strm.handle, 0, SEEK_END);
-    #####:   93:	myfclose(&strm);
-    #####:   94:	return ret;
-        -:   95:}
-        -:   96:
-        2:   97:i32 path_canonicalize(Path *p) {
-        -:   98:	u8 buf[PATH_MAX];
-        -:   99:	i32 nlen;
-       2*:  100:	if (path_replace_home(p) || realpath(p->ptr, buf) == NULL || (nlen = mystrlen(buf)) == 0) {
-        2:  101:		SetErr(IllegalArgument);
-        2:  102:		return -1;
-        -:  103:	}
-    #####:  104:	SetErr(NoErrors);
-    #####:  105:	if (nlen >= p->len) {
-    #####:  106:		void *nptr = myrealloc(p->ptr, nlen + 1);
-    #####:  107:		if (nptr == NULL)
-    #####:  108:			return -1;
-    #####:  109:		p->ptr = nptr;
-    #####:  110:		p->len = nlen;
-        -:  111:	}
-    #####:  112:	mystrcpy(p->ptr, buf, nlen);
-    #####:  113:	return 0;
-        -:  114:}
-       54:  115:i32 path_push(Path *p, const u8 *next) {
-       54:  116:	if (p == NULL) {
-        1:  117:		SetErr(IllegalArgument);
-        1:  118:		return -1;
-        -:  119:	}
-       53:  120:	if (next == NULL) {
-        1:  121:		SetErr(IllegalArgument);
-        1:  122:		return -1;
-        -:  123:	}
-       52:  124:	i32 slen = mystrlen(p->ptr);
-       52:  125:	if (slen <= 0 || mystrlen(next) == 0) {
-        1:  126:		SetErr(IllegalState);
-        1:  127:		return -1;
-        -:  128:	}
-       51:  129:	bool need_sep = false;
-       51:  130:	if (((u8 *)p->ptr)[slen - 1] != PATH_SEPARATOR_CHAR) {
-       51:  131:		need_sep = true;
-        -:  132:	}
-        -:  133:
-       51:  134:	i32 nlen = slen + mystrlen(next);
-       51:  135:	if (need_sep)
-       51:  136:		nlen += mystrlen(PATH_SEPARATOR);
-        -:  137:
-       51:  138:	if (nlen >= p->len) {
-       49:  139:		void *nptr = myrealloc(p->ptr, nlen + 1);
-       49:  140:		if (nptr == NULL)
-        1:  141:			return -1;
-       48:  142:		p->ptr = nptr;
-       48:  143:		p->len = nlen;
-        -:  144:	}
-        -:  145:
-       50:  146:	if (need_sep)
-       50:  147:		mystrcat(p->ptr, PATH_SEPARATOR, PATH_MAX);
-       50:  148:	mystrcat(p->ptr, next, PATH_MAX);
-       50:  149:	return 0;
-        -:  150:}
-       26:  151:i32 path_pop(Path *p) {
-       26:  152:	const u8 *res = rstrstr(p->ptr, PATH_SEPARATOR);
-       26:  153:	if (res) {
-       25:  154:		i32 index = res - (u8 *)p->ptr;
-       25:  155:		((u8 *)(p->ptr))[index] = 0;
-        -:  156:	} else {
-        1:  157:		((u8 *)(p->ptr))[0] = '.';
-        1:  158:		((u8 *)(p->ptr))[1] = 0;
-        -:  159:	}
-       26:  160:	return 0;
-        -:  161:}
-        -:  162:
-       32:  163:u8 *path_to_string(const Path *p) {
-       32:  164:	return p->ptr;
-        -:  165:}
-        -:  166:
-       50:  167:const u8 *path_file_name(const Path *p) {
-       50:  168:	const u8 *ret = rstrstr(p->ptr, PATH_SEPARATOR);
-       50:  169:	if (ret != NULL && mystrlen(ret) > 0)
-       49:  170:		return ret + 1;
-        1:  171:	return ret;
-        -:  172:}
-        -:  173:
-       49:  174:bool path_exists(const Path *p) {
-       49:  175:	if (p->ptr == NULL || p->len == 0) {
-        1:  176:		SetErr(IllegalArgument);
-        1:  177:		return false;
-        -:  178:	}
-        -:  179:
-       48:  180:	i32 fd = open(p->ptr, O_RDONLY);
-       48:  181:	if (fd == -1) {
-       41:  182:		if (errno == ENOENT) {
-       41:  183:			return false; // File doesn't exist
-        -:  184:		} else {
-        -:  185:			// Some other error occurred
-    #####:  186:			fam_err = IO;
-    #####:  187:			return false;
-        -:  188:		}
-        -:  189:	} else {
-        7:  190:		close(fd);
-        7:  191:		return true; // File exists
-        -:  192:	}
-        -:  193:}
-       11:  194:bool path_is_dir(const Path *p) {
-       11:  195:	if (p->ptr == NULL || p->len == 0) {
-        1:  196:		SetErr(IllegalArgument);
-        1:  197:		return false;
-        -:  198:	}
-        -:  199:
-       10:  200:	i32 fd = open(p->ptr, O_RDONLY | O_DIRECTORY);
-       10:  201:	if (fd == -1) {
-        3:  202:		return false; // Not a directory
-        -:  203:	} else {
-        7:  204:		close(fd);
-        7:  205:		return true; // It's a directory
-        -:  206:	}
-        -:  207:}
-        -:  208:
-       41:  209:bool path_mkdir(Path *p, u64 mode, bool parent) {
-       41:  210:	if (p->ptr == NULL || p->len == 0) {
-        1:  211:		SetErr(IllegalArgument);
-        1:  212:		return false;
-        -:  213:	}
-       40:  214:	if (path_exists(p)) {
-        1:  215:		if (path_is_dir(p))
-        1:  216:			return true;
-    #####:  217:		return false;
-        -:  218:	}
-        -:  219:
-        -:  220:	// If parent is false, attempt to create only the target directory
-       39:  221:	if (!parent) {
-       36:  222:		if (mkdir(p->ptr, mode) != 0) {
-       24:  223:			return false;
-        -:  224:		}
-       12:  225:		return true;
-        -:  226:	}
-        -:  227:
-        -:  228:	// Create the directory structure (parent is true)
-        3:  229:	Path temp_path;
-        3:  230:	if (path_copy(&temp_path, p) != 0) {
-        1:  231:		return false;
-        -:  232:	}
-        -:  233:
-        2:  234:	i32 i = 0;
-        -:  235:	u8 path_bufs[20][PATH_MAX];
-       25:  236:	while (i < 20 && path_file_name(&temp_path) != NULL) {
-       24:  237:		if (path_mkdir(&temp_path, mode, false)) {
-        1:  238:			bool ret = true;
-        4:  239:			for (i32 j = i - 1; ret && j >= 0; j--) {
-        3:  240:				path_push(&temp_path, path_bufs[j]);
-        3:  241:				ret = path_mkdir(&temp_path, mode, false);
-        -:  242:			}
-        1:  243:			return true;
-        -:  244:		}
-       23:  245:		const u8 *dir_part = path_file_name(&temp_path);
-       23:  246:		path_pop(&temp_path);
-       23:  247:		mystrcpy(path_bufs[i], dir_part, PATH_MAX);
-       23:  248:		i++;
-        -:  249:	}
-        1:  250:	return false;
-        -:  251:}
-        -:  252:
-       11:  253:i32 path_copy(Path *dst, const Path *src) {
-       11:  254:	return path_for(dst, path_to_string(src));
-        -:  255:}
-        -:  256:
-        1:  257:i32 path_file_stem(const Path *p, u8 *buf, u64 limit) {
-        1:  258:	if (limit == 0 || !p) {
-    #####:  259:		SetErr(IllegalArgument);
-    #####:  260:		return -1;
-        -:  261:	}
-        -:  262:	// Copy the file name i32o the buffer, ensuring proper null termination
-        1:  263:	mystrcpy(buf, path_file_name(p), limit - 1);
-        1:  264:	buf[limit - 1] = '\0'; // Manually ensure null-termination
-        -:  265:
-        1:  266:	u64 buflen = mystrlen(buf); // Compute length once
-        4:  267:	for (u64 i = buflen - 1; i > 0; i--) {
-        4:  268:		if (buf[i] == '.') {
-        1:  269:			buf[i] = '\0'; // Null-terminate at the dot
-        1:  270:			break;
-        -:  271:		}
-        -:  272:	}
-        1:  273:	return 0;
-        -:  274:}
+        -:   15:#include <base/fam_err.h>
+        -:   16:#include <base/os.h>
+        -:   17:#include <base/string.h>
+        -:   18:
+        -:   19:#include <errno.h>
+        -:   20:#include <fcntl.h>
+        -:   21:#include <limits.h>
+        -:   22:#include <stdio.h>
+        -:   23:#include <sys/mman.h>
+        -:   24:#include <sys/stat.h>
+        -:   25:#include <unistd.h>
+        -:   26:
+        -:   27:u8 *getenv(const u8 *name);
+        -:   28:void *malloc(size_t size);
+        -:   29:void *realloc(void *ptr, size_t size);
+        -:   30:void free(void *ptr);
+        -:   31:void *memset(void *ptr, i32 x, size_t n);
+        -:   32:
+        -:   33:_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
+        -:   34:
+    #####:   35:void *alloc(u64 size, bool zeroed) {
+    #####:   36:	if (!size) {
+    #####:   37:		SetErr(IllegalArgument);
+    #####:   38:		return NULL;
+        -:   39:	}
+        -:   40:	void *ret;
+    #####:   41:	ret = malloc(size);
+        -:   42:
+    #####:   43:	if (ret) {
+    #####:   44:		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
+    #####:   45:		if (zeroed)
+    #####:   46:			memset(ret, 0, size);
+        -:   47:	} else
+    #####:   48:		SetErr(AllocErr);
+    #####:   49:	return ret;
+        -:   50:}
+    #####:   51:void *resize(void *ptr, u64 size, bool zeroed) {
+    #####:   52:	if (!ptr || !size) {
+    #####:   53:		SetErr(IllegalArgument);
+    #####:   54:		return NULL;
+        -:   55:	}
+        -:   56:	void *ret;
+    #####:   57:	ret = realloc(ptr, size);
+        -:   58:
+    #####:   59:	if (ret) {
+    #####:   60:		THREAD_LOCAL_RESOURCE_STATS.resize_sum += 1;
+    #####:   61:		if (zeroed)
+    #####:   62:			memset(ret, 0, size);
+        -:   63:	} else
+    #####:   64:		SetErr(AllocErr);
+    #####:   65:	return ret;
+        -:   66:}
+        -:   67:
+    #####:   68:void release(void *ptr) {
+    #####:   69:	if (!ptr) {
+    #####:   70:		SetErr(IllegalArgument);
+    #####:   71:		return;
+        -:   72:	}
+    #####:   73:	THREAD_LOCAL_RESOURCE_STATS.release_sum += 1;
+    #####:   74:	free(ptr);
+        -:   75:}
+        -:   76:
+        4:   77:u64 alloc_sum() {
+        4:   78:	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
+        -:   79:}
+    #####:   80:u64 resize_sum() {
+    #####:   81:	return THREAD_LOCAL_RESOURCE_STATS.resize_sum;
+        -:   82:}
+        4:   83:u64 release_sum() {
+        4:   84:	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
+        -:   85:}
+        -:   86:
+        -:   87:// Persistence
+    #####:   88:void *persistent_alloc(const u8 *path, u64 size, bool zeroed) {
+    #####:   89:	return NULL;
+        -:   90:}
+        -:   91:
+    #####:   92:void *persistent_resize(const u8 *name, u64 size) {
+    #####:   93:	return NULL;
+        -:   94:}
+        -:   95:
+    #####:   96:i32 persistent_sync(void *ptr) {
+    #####:   97:	return 0;
+        -:   98:}
+        -:   99:
+    #####:  100:i32 persistent_delete(const u8 *name) {
+    #####:  101:	return 0;
+        -:  102:}
+        -:  103:
+    #####:  104:u8 *env(const u8 *name) {
+    #####:  105:	return getenv(name);
+        -:  106:}
+        -:  107:
+        8:  108:i32 write_impl(i32 fd, const void *buf, u64 len) {
+        8:  109:	return write(fd, buf, len);
+        -:  110:}
         -:    0:Source:print_util.c
         -:    0:Graph:print_util.gcno
         -:    0:Data:print_util.gcda
-        -:    0:Runs:10
+        -:    0:Runs:5
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -466,9 +298,9 @@
         -:   12:// See the License for the specific language governing permissions and
         -:   13:// limitations under the License.
         -:   14:
-        -:   15:#include <base/deps.h>
-        -:   16:#include <base/fam_err.h>
-        -:   17:#include <base/macro_util.h>
+        -:   15:#include <base/fam_err.h>
+        -:   16:#include <base/macro_util.h>
+        -:   17:#include <base/os.h>
         -:   18:#include <base/print_util.h>
         -:   19:#include <base/string.h>
         -:   20:
@@ -484,314 +316,143 @@
         -:   30:
         -:   31:#define BUF_LEN 64
         -:   32:
-       45:   33:i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u64 len) {
-       45:   34:	if (s) {
-       32:   35:		if (strm->handle == -1) {
+       10:   33:i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u64 len) {
+       10:   34:	if (s) {
+    #####:   35:		if (strm->handle == -1) {
         -:   36:			// length only
-        7:   37:			*cur += len;
-       25:   38:		} else if (*cur < limit) {
+    #####:   37:			*cur += len;
+    #####:   38:		} else if (*cur < limit) {
         -:   39:			u8 *res;
-       25:   40:			if (*cur == 0) {
-        7:   41:				res = mystrcpy(s, buf, limit);
-        7:   42:				if (res == NULL)
+    #####:   40:			if (*cur == 0) {
+    #####:   41:				res = mystrcpy(s, buf, limit);
+    #####:   42:				if (res == NULL)
     #####:   43:					return -1;
         -:   44:			} else {
-       18:   45:				res = mystrcat(s, buf, limit);
-       18:   46:				if (res == NULL)
+    #####:   45:				res = mystrcat(s, buf, limit);
+    #####:   46:				if (res == NULL)
     #####:   47:					return -1;
         -:   48:			}
-       25:   49:			*cur = res - s;
+    #####:   49:			*cur = res - s;
         -:   50:		}
         -:   51:	} else
-       26:   52:		while (len > 0) {
-       13:   53:			i64 w = write(strm->handle, buf, len);
-       13:   54:			if (w < 0) {
+       18:   52:		while (len > 0) {
+        8:   53:			i64 w = write_impl(strm->handle, buf, len);
+        8:   54:			if (w < 0) {
     #####:   55:				SetErr(IO);
     #####:   56:				return w;
         -:   57:			}
         -:   58:
-       13:   59:			len -= w;
+        8:   59:			len -= w;
         -:   60:		}
-       45:   61:	return 0;
+       10:   61:	return 0;
         -:   62:}
         -:   63:
-       11:   64:i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code,
+        2:   64:i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code,
         -:   65:			   const u8 *prefix, const u8 *fmt, ...) {
-       11:   66:	int ret = 0;
-       11:   67:	if (capacity < 0 && s) {
-        1:   68:		SetErr(IllegalArgument);
-        1:   69:		ret = -1;
+        2:   66:	int ret = 0;
+        2:   67:	if (capacity < 0 && s) {
+    #####:   68:		SetErr(IllegalArgument);
+    #####:   69:		ret = -1;
         -:   70:	}
         -:   71:	va_list args;
-       11:   72:	va_start(args, fmt);
-       11:   73:	i32 max = capacity;
-       11:   74:	capacity = 0;
+        2:   72:	va_start(args, fmt);
+        2:   73:	i32 max = capacity;
+        2:   74:	capacity = 0;
         -:   75:
-       11:   76:	if (prefix && ret != -1) {
-        1:   77:		if (write_loop(strm, s, &capacity, max, prefix, mystrlen(prefix)))
+       2*:   76:	if (prefix && ret != -1) {
+    #####:   77:		if (write_loop(strm, s, &capacity, max, prefix, mystrlen(prefix)))
     #####:   78:			ret = -1;
         -:   79:	}
         -:   80:
-       26:   81:	while (ret != -1) {
-       25:   82:		const u8 *next = mystrstr(fmt, "{}");
+        5:   81:	while (ret != -1) {
+        5:   82:		const u8 *next = mystrstr(fmt, "{}");
         -:   83:
-       25:   84:		if (next == NULL) {
-        9:   85:			if (write_loop(strm, s, &capacity, max, fmt, mystrlen(fmt))) {
+        5:   84:		if (next == NULL) {
+        2:   85:			if (write_loop(strm, s, &capacity, max, fmt, mystrlen(fmt))) {
     #####:   86:				ret = -1;
-      10*:   87:				break;
+       2*:   87:				break;
         -:   88:			}
-        9:   89:			if (nl)
-        3:   90:				if (write_loop(strm, s, &capacity, max, "\n", 1)) {
+        2:   89:			if (nl)
+        2:   90:				if (write_loop(strm, s, &capacity, max, "\n", 1)) {
     #####:   91:					ret = -1;
     #####:   92:					break;
         -:   93:				}
-        9:   94:			break;
-       16:   95:		} else {
-       16:   96:			u64 diff = next - fmt;
-       16:   97:			u8 buf[1 + diff];
-       16:   98:			mystrcpy(buf, fmt, 1 + diff);
-       16:   99:			if (write_loop(strm, s, &capacity, max, buf, diff)) {
+        2:   94:			break;
+        3:   95:		} else {
+        3:   96:			u64 diff = next - fmt;
+        3:   97:			u8 buf[1 + diff];
+        3:   98:			mystrcpy(buf, fmt, 1 + diff);
+        3:   99:			if (write_loop(strm, s, &capacity, max, buf, diff)) {
     #####:  100:				ret = -1;
     #####:  101:				break;
         -:  102:			}
         -:  103:		}
         -:  104:
-       16:  105:		PrintPair arg = va_arg(args, PrintPair);
+        3:  105:		PrintPair arg = va_arg(args, PrintPair);
         -:  106:
-       16:  107:		if (arg.type == PrintTypeTerm) {
-        1:  108:			if (next) {
-        1:  109:				if (write_loop(strm, s, &capacity, max, next, mystrlen(next))) {
+        3:  107:		if (arg.type == PrintTypeTerm) {
+    #####:  108:			if (next) {
+    #####:  109:				if (write_loop(strm, s, &capacity, max, next, mystrlen(next))) {
     #####:  110:					ret = -1;
     #####:  111:					break;
         -:  112:				}
-        1:  113:				if (nl)
+    #####:  113:				if (nl)
     #####:  114:					if (write_loop(strm, s, &capacity, max, "\n", 1)) {
     #####:  115:						ret = -1;
     #####:  116:						break;
         -:  117:					}
         -:  118:			}
-        1:  119:			break;
-       15:  120:		} else if (arg.type == PrintTypeU64) {
+    #####:  119:			break;
+        3:  120:		} else if (arg.type == PrintTypeU64) {
         -:  121:			u64 value;
-        4:  122:			mymemcpy(&value, arg.buf, sizeof(u64));
+    #####:  122:			mymemcpy(&value, arg.buf, sizeof(u64));
         -:  123:			u8 buf[BUF_LEN];
-        4:  124:			citoau64(value, buf, 10);
-        4:  125:			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+    #####:  124:			citoau64(value, buf, 10);
+    #####:  125:			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
     #####:  126:				ret = -1;
     #####:  127:				break;
         -:  128:			}
-       11:  129:		} else if (arg.type == PrintTypeI32) {
+        3:  129:		} else if (arg.type == PrintTypeI32) {
         -:  130:			i32 value;
-        4:  131:			mymemcpy(&value, arg.buf, sizeof(i32));
+        1:  131:			mymemcpy(&value, arg.buf, sizeof(i32));
         -:  132:			u8 buf[BUF_LEN];
-        4:  133:			citoai64(value, buf, 10);
-        4:  134:			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+        1:  133:			citoai64(value, buf, 10);
+        1:  134:			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
     #####:  135:				ret = -1;
     #####:  136:				break;
         -:  137:			}
-        7:  138:		} else if (arg.type == PrintTypeI16) {
+        2:  138:		} else if (arg.type == PrintTypeI16) {
         -:  139:			i16 value;
-        1:  140:			mymemcpy(&value, arg.buf, sizeof(i16));
+    #####:  140:			mymemcpy(&value, arg.buf, sizeof(i16));
         -:  141:			u8 buf[BUF_LEN];
-        1:  142:			citoai64(value, buf, 10);
-        1:  143:			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+    #####:  142:			citoai64(value, buf, 10);
+    #####:  143:			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
     #####:  144:				ret = -1;
     #####:  145:				break;
         -:  146:			}
-        6:  147:		} else if (arg.type == PrintTypeString) {
-        6:  148:			if (write_loop(strm, s, &capacity, max, arg.data, mystrlen(arg.data))) {
+        2:  147:		} else if (arg.type == PrintTypeString) {
+        2:  148:			if (write_loop(strm, s, &capacity, max, arg.data, mystrlen(arg.data))) {
     #####:  149:				ret = -1;
     #####:  150:				break;
         -:  151:			}
         -:  152:		}
-       15:  153:		fmt = next + 2;
+        3:  153:		fmt = next + 2;
         -:  154:	}
         -:  155:
-       11:  156:	va_end(args);
+        2:  156:	va_end(args);
         -:  157:
-       11:  158:	if (do_exit) {
+        2:  158:	if (do_exit) {
     #####:  159:		exit(code);
         -:  160:	}
         -:  161:
-       11:  162:	if (ret == -1)
-        1:  163:		return ret;
-       10:  164:	return capacity;
+        2:  162:	if (ret == -1)
+    #####:  163:		return ret;
+        2:  164:	return capacity;
         -:  165:}
-        -:    0:Source:resources.c
-        -:    0:Graph:resources.gcno
-        -:    0:Data:resources.gcda
-        -:    0:Runs:10
-        -:    1:// Copyright (c) 2024, The MyFamily Developers
-        -:    2://
-        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
-        -:    4:// you may not use this file except in compliance with the License.
-        -:    5:// You may obtain a copy of the License at
-        -:    6://
-        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
-        -:    8://
-        -:    9:// Unless required by applicable law or agreed to in writing, software
-        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
-        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        -:   12:// See the License for the specific language governing permissions and
-        -:   13:// limitations under the License.
-        -:   14:
-        -:   15:#include <base/deps.h>
-        -:   16:#include <base/fam_err.h>
-        -:   17:#include <base/path.h>
-        -:   18:#include <base/resources.h>
-        -:   19:#include <base/types.h>
-        -:   20:#include <dirent.h>
-        -:   21:#include <stdio.h>
-        -:   22:#include <string.h>
-        -:   23:// #include <sys/stat.h>
-        -:   24://  #include <unistd.h>
-        -:   25:
-        -:   26:_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
-        -:   27:#ifdef TEST
-        -:   28:bool __is_debug_malloc = false;
-        -:   29:bool __is_debug_realloc = false;
-        -:   30:u64 __is_debug_malloc_counter_ = UINT64_MAX;
-        -:   31:u64 __is_debug_realloc_counter_ = UINT64_MAX;
-        -:   32:bool __is_debug_misc_ferror = false;
-        -:   33:bool __is_debug_misc_fwrite = false;
-        -:   34:bool __is_debug_misc_stat = false;
-        -:   35:bool __is_debug_misc_remove_dir = false;
-        -:   36:bool __is_debug_misc_unlink = false;
-        -:   37:bool __is_debug_misc_no_exit = false;
-        -:   38:bool __is_debug_misc_preserve = false;
-        -:   39:#endif // TEST
-        -:   40:
-       40:   41:void *mymalloc(u64 size) {
-        -:   42:#ifdef TEST
-       40:   43:	if (__is_debug_malloc || __is_debug_malloc_counter_ == 0) {
-        2:   44:		__is_debug_malloc_counter_ = UINT64_MAX;
-        2:   45:		return NULL;
-        -:   46:	}
-       38:   47:	__is_debug_malloc_counter_--;
-        -:   48:#endif // TEST
-        -:   49:	void *ret;
-       38:   50:	ret = malloc(size);
-        -:   51:
-       38:   52:	if (ret) {
-       38:   53:		THREAD_LOCAL_RESOURCE_STATS.malloc_sum += 1;
-        -:   54:	} else
-    #####:   55:		SetErr(AllocErr);
-       38:   56:	return ret;
-        -:   57:}
-       51:   58:void *myrealloc(void *ptr, u64 size) {
-        -:   59:#ifdef TEST
-       51:   60:	if (__is_debug_realloc || __is_debug_realloc_counter_ == 0) {
-        2:   61:		__is_debug_realloc_counter_ = UINT64_MAX;
-        2:   62:		return NULL;
-        -:   63:	}
-       49:   64:	__is_debug_realloc_counter_--;
-        -:   65:#endif // TEST
-        -:   66:	void *ret;
-       49:   67:	ret = realloc(ptr, size);
-        -:   68:
-       49:   69:	if (ret) {
-       49:   70:		THREAD_LOCAL_RESOURCE_STATS.realloc_sum += 1;
-        -:   71:	} else
-    #####:   72:		SetErr(AllocErr);
-       49:   73:	return ret;
-        -:   74:}
-       38:   75:void myfree(void *ptr) {
-       38:   76:	THREAD_LOCAL_RESOURCE_STATS.free_sum += 1;
-       38:   77:	free(ptr);
-       38:   78:}
-        -:   79:
-    #####:   80:Stream myfopen(const Path *path, i32 flags) {
-    #####:   81:	const char *path_str = path_to_string(path);
-    #####:   82:	i32 ret = open(path_str, flags);
-    #####:   83:	if (ret > 0) {
-    #####:   84:		THREAD_LOCAL_RESOURCE_STATS.fopen_sum += 1;
-        -:   85:	}
-    #####:   86:	return (Stream) {ret};
-        -:   87:}
-        -:   88:
-    #####:   89:void myfclose(Stream *ptr) {
-    #####:   90:	THREAD_LOCAL_RESOURCE_STATS.fclose_sum += 1;
-    #####:   91:	close(ptr->handle);
-    #####:   92:}
-        -:   93:
-       14:   94:u64 mymalloc_sum() {
-       14:   95:	return THREAD_LOCAL_RESOURCE_STATS.malloc_sum;
-        -:   96:}
-    #####:   97:u64 myrealloc_sum() {
-    #####:   98:	return THREAD_LOCAL_RESOURCE_STATS.realloc_sum;
-        -:   99:}
-       14:  100:u64 myfree_sum() {
-       14:  101:	return THREAD_LOCAL_RESOURCE_STATS.free_sum;
-        -:  102:}
-       21:  103:u64 myfopen_sum() {
-       21:  104:	return THREAD_LOCAL_RESOURCE_STATS.fopen_sum;
-        -:  105:}
-       21:  106:u64 myfclose_sum() {
-       21:  107:	return THREAD_LOCAL_RESOURCE_STATS.fclose_sum;
-        -:  108:}
-        -:  109:
-       19:  110:i32 remove_directory(const Path *p, bool preserve_dir) {
-       19:  111:	const char *path = path_to_string(p);
-        -:  112:	struct dirent *entry;
-       19:  113:	DIR *dir = opendir(path);
-        -:  114:
-       19:  115:	if (dir == NULL) {
-        7:  116:		return -1;
-        -:  117:	}
-        -:  118:
-       41:  119:	while ((entry = readdir(dir)) != NULL) {
-        -:  120:		char full_path[PATH_MAX];
-        -:  121:
-        -:  122:		// Skip the special entries "." and ".."
-       29:  123:		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
-       24:  124:			continue;
-        -:  125:		}
-        -:  126:
-        -:  127:		// Construct the full path to the file/directory
-        5:  128:		snprintf(full_path, sizeof(full_path), "%s/%s", path, entry->d_name);
-        -:  129:
-        5:  130:		Path full_path_p;
-        5:  131:		path_for(&full_path_p, full_path);
-        5:  132:		if (!path_exists(&full_path_p)) {
-    #####:  133:			SetErr(FileNotFound);
-    #####:  134:			closedir(dir);
-    #####:  135:			return -1;
-        -:  136:		}
-        -:  137:
-        5:  138:		if (path_is_dir(&full_path_p)) {
-        -:  139:			// It's a directory, recurse into it
-        5:  140:			Path full_path_p;
-        5:  141:			path_for(&full_path_p, full_path);
-        5:  142:			if (remove_directory(&full_path_p, false) == -1 || __is_debug_misc_remove_dir) {
-    #####:  143:				closedir(dir);
-    #####:  144:				return -1;
-        -:  145:			}
-        -:  146:		} else {
-        -:  147:			// It's a file, unlink (delete) it
-    #####:  148:			if (unlink(full_path) == -1 || __is_debug_misc_unlink) {
-    #####:  149:				SetErr(IO);
-    #####:  150:				closedir(dir);
-    #####:  151:				return -1;
-        -:  152:			}
-        -:  153:		}
-        -:  154:	}
-        -:  155:
-       12:  156:	closedir(dir);
-        -:  157:
-        -:  158:	// Now the directory is empty, so we can remove it
-       12:  159:	if (!preserve_dir) {
-       12:  160:		if (rmdir(path) == -1 || __is_debug_misc_preserve) {
-    #####:  161:			SetErr(IO);
-    #####:  162:			return -1;
-        -:  163:		}
-        -:  164:	}
-        -:  165:
-       12:  166:	return 0;
-        -:  167:}
         -:    0:Source:string.c
         -:    0:Graph:string.gcno
         -:    0:Data:string.gcda
-        -:    0:Runs:10
+        -:    0:Runs:5
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -811,258 +472,256 @@
         -:   17:#include <base/string.h>
         -:   18:#include <base/types.h>
         -:   19:
-        -:   20:#ifdef TEST
-        -:   21:bool __is_debug_mystrlen_overflow = false;
-        -:   22:#endif // TEST
-        -:   23:
-       25:   24:i32 mymemcmp(const u8 *X, const u8 *Y, u64 len) {
-       25:   25:	if (!X || !Y) {
-        1:   26:		SetErr(IllegalArgument);
-        1:   27:		return -1;
-        -:   28:	}
-       24:   29:	if (len == 0)
-        1:   30:		return 0;
-       71:   31:	while (len--) {
-       50:   32:		if (*X > *Y)
-        1:   33:			return 1;
-       49:   34:		else if (*X < *Y)
-        1:   35:			return -1;
-        -:   36:
-       48:   37:		X++;
-       48:   38:		Y++;
-        -:   39:	}
-       21:   40:	return 0;
-        -:   41:}
-        -:   42:
-       25:   43:i32 mystrcmp(const u8 *X, const u8 *Y) {
-       25:   44:	if (!X || !Y) {
-        1:   45:		SetErr(IllegalArgument);
-        1:   46:		return -1;
-        -:   47:	}
-      137:   48:	while (*X && *Y) {
-      117:   49:		if (*X > *Y)
-        2:   50:			return 1;
-      115:   51:		else if (*X < *Y)
-        2:   52:			return -1;
-        -:   53:
-      113:   54:		X++;
-      113:   55:		Y++;
-        -:   56:	}
-        -:   57:
-       20:   58:	if (*X != '\0')
-        1:   59:		return 1;
-        -:   60:
-       19:   61:	else if (*Y != '\0')
-        1:   62:		return -1;
-        -:   63:	else
-       18:   64:		return 0;
-        -:   65:}
-        -:   66:
-      274:   67:i32 mystrncmp(const u8 *X, const u8 *Y, u64 limit) {
-      274:   68:	if (!X || !Y) {
-        1:   69:		SetErr(IllegalArgument);
-        1:   70:		return -1;
-        -:   71:	}
-      273:   72:	if (limit == 0)
-        1:   73:		return 0;
-      365:   74:	while (*X && *Y && limit) {
-      285:   75:		if (*X > *Y)
-      183:   76:			return 1;
-      102:   77:		else if (*X < *Y)
-        9:   78:			return -1;
-        -:   79:
-       93:   80:		X++;
-       93:   81:		Y++;
-       93:   82:		limit--;
-        -:   83:	}
-        -:   84:
-       80:   85:	if (limit && *X != '\0')
-        1:   86:		return 1;
-       79:   87:	else if (limit && *Y != '\0')
-        1:   88:		return -1;
-        -:   89:	else
-       78:   90:		return 0;
-        -:   91:}
-        -:   92:
-      529:   93:i32 mystrlen(const u8 *Y) {
-      529:   94:	if (!Y) {
-        1:   95:		SetErr(IllegalArgument);
-        1:   96:		return -1;
-        -:   97:	}
-      528:   98:	u64 ret = 0;
-     8356:   99:	while (*Y) {
-     7829:  100:		ret++;
-     7829:  101:		Y++;
-     7829:  102:		if (ret == INT32_MAX || __is_debug_mystrlen_overflow) {
-        1:  103:			SetErr(Overflow);
-        1:  104:			return -1;
-        -:  105:		}
-        -:  106:	}
-      527:  107:	return ret;
-        -:  108:}
-        -:  109:
-       31:  110:const u8 *mystrstr(const u8 *X, const u8 *Y) {
-       31:  111:	if (!X || !Y) {
-        1:  112:		SetErr(IllegalArgument);
-        1:  113:		return NULL;
-        -:  114:	}
-       30:  115:	u64 len = mystrlen(Y);
-      138:  116:	while (*X != '\0') {
-        -:  117:
-      128:  118:		if ((*X == *Y) && !mymemcmp(X, Y, len)) {
-       20:  119:			return X;
-        -:  120:		}
-        -:  121:
-      108:  122:		X++;
-        -:  123:	}
-        -:  124:
-       10:  125:	return NULL;
-        -:  126:}
-        -:  127:
-      121:  128:u8 *mystrcat(u8 *X, const u8 *Y, u64 limit) {
-      121:  129:	if (!X || !Y) {
-        1:  130:		SetErr(IllegalArgument);
-        1:  131:		return NULL;
-        -:  132:	}
-      120:  133:	if (limit == 0)
-        1:  134:		return X;
-     3911:  135:	while (*X) {
-     3792:  136:		X++;
-        -:  137:	}
-      119:  138:	return mystrcpy(X, Y, limit);
-        -:  139:}
-        -:  140:
-      212:  141:u8 *mystrcpy(u8 *X, const u8 *Y, u64 limit) {
-      212:  142:	if (!X || !Y) {
-        1:  143:		SetErr(IllegalArgument);
-        1:  144:		return NULL;
-        -:  145:	}
-        -:  146:
-      211:  147:	if (limit == 0)
-        1:  148:		return X;
-     1340:  149:	while (*Y != '\0' && (limit - 1)) {
-     1130:  150:		*X = *Y;
-     1130:  151:		X++;
-     1130:  152:		Y++;
-     1130:  153:		limit--;
-        -:  154:	}
-      210:  155:	*X = '\0';
-      210:  156:	return X;
-        -:  157:}
-        -:  158:
-       20:  159:void *mymemcpy(void *X, const void *Y, u64 limit) {
-       20:  160:	if (!X || !Y) {
-        1:  161:		SetErr(IllegalArgument);
-        1:  162:		return NULL;
-        -:  163:	}
-       19:  164:	u8 *ret = X;
-       19:  165:	if (limit == 0)
-        1:  166:		return ret;
-        -:  167:
-      114:  168:	while (limit) {
-       96:  169:		*(u8 *)X = *(u8 *)Y;
-       96:  170:		X++;
-       96:  171:		Y++;
-       96:  172:		limit--;
-        -:  173:	}
-        -:  174:
-       18:  175:	return ret;
-        -:  176:}
-        -:  177:
-        -:  178:// A utility function to reverse a string
-        8:  179:void reverse(u8 str[], u64 length) {
-        8:  180:	int start = 0;
-        8:  181:	int end = length - 1;
-       23:  182:	while (start < end) {
-       15:  183:		char temp = str[start];
-       15:  184:		str[start] = str[end];
-       15:  185:		str[end] = temp;
-       15:  186:		end--;
-       15:  187:		start++;
-        -:  188:	}
-        8:  189:}
-        -:  190:
-        5:  191:u8 *citoau64(u64 num, u8 *str, u64 base) {
-        5:  192:	u64 i = 0;
-        -:  193:
-        5:  194:	if (num == 0) {
-        2:  195:		str[i++] = '0';
-        2:  196:		str[i] = '\0';
-        2:  197:		return str;
-        -:  198:	}
-        -:  199:
-       22:  200:	while (num != 0) {
-       19:  201:		u64 rem = num % base;
-      19*:  202:		str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
-       19:  203:		num = num / base;
-        -:  204:	}
+        -:   20:bool __is_debug_mystrlen_overflow = false;
+        -:   21:
+        3:   22:i32 mymemcmp(const u8 *X, const u8 *Y, u64 len) {
+        3:   23:	if (!X || !Y) {
+    #####:   24:		SetErr(IllegalArgument);
+    #####:   25:		return -1;
+        -:   26:	}
+        3:   27:	if (len == 0)
+    #####:   28:		return 0;
+        9:   29:	while (len--) {
+        6:   30:		if (*X > *Y)
+    #####:   31:			return 1;
+        6:   32:		else if (*X < *Y)
+    #####:   33:			return -1;
+        -:   34:
+        6:   35:		X++;
+        6:   36:		Y++;
+        -:   37:	}
+        3:   38:	return 0;
+        -:   39:}
+        -:   40:
+    #####:   41:i32 mystrcmp(const u8 *X, const u8 *Y) {
+    #####:   42:	if (!X || !Y) {
+    #####:   43:		SetErr(IllegalArgument);
+    #####:   44:		return -1;
+        -:   45:	}
+    #####:   46:	while (*X && *Y) {
+    #####:   47:		if (*X > *Y)
+    #####:   48:			return 1;
+    #####:   49:		else if (*X < *Y)
+    #####:   50:			return -1;
+        -:   51:
+    #####:   52:		X++;
+    #####:   53:		Y++;
+        -:   54:	}
+        -:   55:
+    #####:   56:	if (*X != '\0')
+    #####:   57:		return 1;
+        -:   58:
+    #####:   59:	else if (*Y != '\0')
+    #####:   60:		return -1;
+        -:   61:	else
+    #####:   62:		return 0;
+        -:   63:}
+        -:   64:
+    #####:   65:i32 mystrncmp(const u8 *X, const u8 *Y, u64 limit) {
+    #####:   66:	if (!X || !Y) {
+    #####:   67:		SetErr(IllegalArgument);
+    #####:   68:		return -1;
+        -:   69:	}
+    #####:   70:	if (limit == 0)
+    #####:   71:		return 0;
+    #####:   72:	while (*X && *Y && limit) {
+    #####:   73:		if (*X > *Y)
+    #####:   74:			return 1;
+    #####:   75:		else if (*X < *Y)
+    #####:   76:			return -1;
+        -:   77:
+    #####:   78:		X++;
+    #####:   79:		Y++;
+    #####:   80:		limit--;
+        -:   81:	}
+        -:   82:
+    #####:   83:	if (limit && *X != '\0')
+    #####:   84:		return 1;
+    #####:   85:	else if (limit && *Y != '\0')
+    #####:   86:		return -1;
+        -:   87:	else
+    #####:   88:		return 0;
+        -:   89:}
+        -:   90:
+       10:   91:i32 mystrlen(const u8 *Y) {
+       10:   92:	if (!Y) {
+    #####:   93:		SetErr(IllegalArgument);
+    #####:   94:		return -1;
+        -:   95:	}
+       10:   96:	u64 ret = 0;
+       53:   97:	while (*Y) {
+       43:   98:		ret++;
+       43:   99:		Y++;
+       43:  100:		if (ret == INT32_MAX || __is_debug_mystrlen_overflow) {
+    #####:  101:			SetErr(Overflow);
+    #####:  102:			return -1;
+        -:  103:		}
+        -:  104:	}
+       10:  105:	return ret;
+        -:  106:}
+        -:  107:
+        5:  108:const u8 *mystrstr(const u8 *X, const u8 *Y) {
+        5:  109:	if (!X || !Y) {
+    #####:  110:		SetErr(IllegalArgument);
+    #####:  111:		return NULL;
+        -:  112:	}
+        5:  113:	u64 len = mystrlen(Y);
+       20:  114:	while (*X != '\0') {
+        -:  115:
+       18:  116:		if ((*X == *Y) && !mymemcmp(X, Y, len)) {
+        3:  117:			return X;
+        -:  118:		}
+        -:  119:
+       15:  120:		X++;
+        -:  121:	}
+        -:  122:
+        2:  123:	return NULL;
+        -:  124:}
+        -:  125:
+    #####:  126:u8 *mystrcat(u8 *X, const u8 *Y, u64 limit) {
+    #####:  127:	if (!X || !Y) {
+    #####:  128:		SetErr(IllegalArgument);
+    #####:  129:		return NULL;
+        -:  130:	}
+    #####:  131:	if (limit == 0)
+    #####:  132:		return X;
+    #####:  133:	while (*X) {
+    #####:  134:		X++;
+        -:  135:	}
+    #####:  136:	return mystrcpy(X, Y, limit);
+        -:  137:}
+        -:  138:
+        3:  139:u8 *mystrcpy(u8 *X, const u8 *Y, u64 limit) {
+        3:  140:	if (!X || !Y) {
+    #####:  141:		SetErr(IllegalArgument);
+    #####:  142:		return NULL;
+        -:  143:	}
+        -:  144:
+        3:  145:	if (limit == 0)
+    #####:  146:		return X;
+       18:  147:	while (*Y != '\0' && (limit - 1)) {
+       15:  148:		*X = *Y;
+       15:  149:		X++;
+       15:  150:		Y++;
+       15:  151:		limit--;
+        -:  152:	}
+        3:  153:	*X = '\0';
+        3:  154:	return X;
+        -:  155:}
+        -:  156:
+        2:  157:void *mymemcpy(void *X, const void *Y, u64 limit) {
+        2:  158:	if (!X || !Y) {
+    #####:  159:		SetErr(IllegalArgument);
+    #####:  160:		return NULL;
+        -:  161:	}
+        2:  162:	u8 *ret = X;
+        2:  163:	if (limit == 0)
+    #####:  164:		return ret;
+        -:  165:
+       10:  166:	while (limit) {
+        8:  167:		*(u8 *)X = *(u8 *)Y;
+        8:  168:		X++;
+        8:  169:		Y++;
+        8:  170:		limit--;
+        -:  171:	}
+        -:  172:
+        2:  173:	return ret;
+        -:  174:}
+        -:  175:
+        -:  176:// A utility function to reverse a string
+        1:  177:void reverse(u8 str[], u64 length) {
+        1:  178:	int start = 0;
+        1:  179:	int end = length - 1;
+        1:  180:	while (start < end) {
+    #####:  181:		char temp = str[start];
+    #####:  182:		str[start] = str[end];
+    #####:  183:		str[end] = temp;
+    #####:  184:		end--;
+    #####:  185:		start++;
+        -:  186:	}
+        1:  187:}
+        -:  188:
+    #####:  189:u8 *citoau64(u64 num, u8 *str, u64 base) {
+    #####:  190:	u64 i = 0;
+        -:  191:
+    #####:  192:	if (num == 0) {
+    #####:  193:		str[i++] = '0';
+    #####:  194:		str[i] = '\0';
+    #####:  195:		return str;
+        -:  196:	}
+        -:  197:
+    #####:  198:	while (num != 0) {
+    #####:  199:		u64 rem = num % base;
+    #####:  200:		str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+    #####:  201:		num = num / base;
+        -:  202:	}
+        -:  203:
+    #####:  204:	str[i] = '\0';
         -:  205:
-        3:  206:	str[i] = '\0';
+    #####:  206:	reverse(str, i);
         -:  207:
-        3:  208:	reverse(str, i);
-        -:  209:
-        3:  210:	return str;
-        -:  211:}
-        -:  212:
-        6:  213:u8 *citoai64(i64 num, u8 *str, u64 base) {
-        6:  214:	u64 i = 0;
-        6:  215:	bool isNegative = false;
-        -:  216:
-        6:  217:	if (num == 0) {
-        1:  218:		str[i++] = '0';
-        1:  219:		str[i] = '\0';
-        1:  220:		return str;
-        -:  221:	}
-        -:  222:
-        5:  223:	if (num < 0 && base == 10) {
-        3:  224:		isNegative = true;
-        3:  225:		num = -num;
-        -:  226:	}
-        -:  227:
-       17:  228:	while (num != 0) {
-       12:  229:		u64 rem = num % base;
-      12*:  230:		str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
-       12:  231:		num = num / base;
-        -:  232:	}
-        -:  233:
-        5:  234:	if (isNegative)
-        3:  235:		str[i++] = '-';
+    #####:  208:	return str;
+        -:  209:}
+        -:  210:
+        1:  211:u8 *citoai64(i64 num, u8 *str, u64 base) {
+        1:  212:	u64 i = 0;
+        1:  213:	bool isNegative = false;
+        -:  214:
+        1:  215:	if (num == 0) {
+    #####:  216:		str[i++] = '0';
+    #####:  217:		str[i] = '\0';
+    #####:  218:		return str;
+        -:  219:	}
+        -:  220:
+       1*:  221:	if (num < 0 && base == 10) {
+    #####:  222:		isNegative = true;
+    #####:  223:		num = -num;
+        -:  224:	}
+        -:  225:
+        2:  226:	while (num != 0) {
+        1:  227:		u64 rem = num % base;
+       1*:  228:		str[i++] = (rem > 9) ? (rem - 10) + 'a' : rem + '0';
+        1:  229:		num = num / base;
+        -:  230:	}
+        -:  231:
+        1:  232:	if (isNegative)
+    #####:  233:		str[i++] = '-';
+        -:  234:
+        1:  235:	str[i] = '\0';
         -:  236:
-        5:  237:	str[i] = '\0';
+        1:  237:	reverse(str, i);
         -:  238:
-        5:  239:	reverse(str, i);
-        -:  240:
-        5:  241:	return str;
-        -:  242:}
-        -:  243:
-       80:  244:const u8 *rstrstr(const u8 *s1, const u8 *s2) {
-       80:  245:	u64 s1len = mystrlen(s1);
-       80:  246:	u64 s2len = mystrlen(s2);
-        -:  247:	const u8 *s;
-        -:  248:
-       80:  249:	if (s2len > s1len)
-        1:  250:		return NULL;
-      269:  251:	for (s = s1 + s1len - s2len; s >= s1; --s)
-      266:  252:		if (mystrncmp(s, s2, s2len) == 0)
-       76:  253:			return s;
-        3:  254:	return NULL;
-        -:  255:}
-        -:  256:
-        -:  257:// set memory at memory location 'ptr' of size 'size' to 0.
-        2:  258:void memzero(void *ptr, u64 size) {
-        2:  259:	if (!ptr) {
-        1:  260:		SetErr(IllegalArgument);
-        1:  261:		return;
-        -:  262:	}
-        1:  263:	if (size == 0)
-    #####:  264:		return;
-      101:  265:	while (size--)
-      100:  266:		*(u8 *)ptr = '\0';
-        -:  267:}
+        1:  239:	return str;
+        -:  240:}
+        -:  241:
+    #####:  242:const u8 *rstrstr(const u8 *s1, const u8 *s2) {
+    #####:  243:	u64 s1len = mystrlen(s1);
+    #####:  244:	u64 s2len = mystrlen(s2);
+        -:  245:	const u8 *s;
+        -:  246:
+    #####:  247:	if (s2len > s1len)
+    #####:  248:		return NULL;
+    #####:  249:	for (s = s1 + s1len - s2len; s >= s1; --s)
+    #####:  250:		if (mystrncmp(s, s2, s2len) == 0)
+    #####:  251:			return s;
+    #####:  252:	return NULL;
+        -:  253:}
+        -:  254:
+        -:  255:// set memory at memory location 'ptr' of size 'size' to 0.
+    #####:  256:void memzero(void *ptr, u64 size) {
+    #####:  257:	if (!ptr) {
+    #####:  258:		SetErr(IllegalArgument);
+    #####:  259:		return;
+        -:  260:	}
+    #####:  261:	if (size == 0)
+    #####:  262:		return;
+    #####:  263:	while (size--)
+    #####:  264:		*(u8 *)ptr = '\0';
+        -:  265:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:10
+        -:    0:Runs:5
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -1077,39 +736,42 @@
         -:   12:// See the License for the specific language governing permissions and
         -:   13:// limitations under the License.
         -:   14:
-        -:   15:#include <base/print_util.h>
+        -:   15:// #include <base/print_util.h>
         -:   16:#include <base/types.h>
         -:   17:
-       10:   18:bool __is_little_endian() {
-       10:   19:	u16 test = 0x1;
-       10:   20:	return (*(u8 *)&test == 0x1);
+    #####:   18:bool __is_little_endian() {
+    #####:   19:	u16 test = 0x1;
+    #####:   20:	return (*(u8 *)&test == 0x1);
         -:   21:}
         -:   22:
-       10:   23:void __attribute__((constructor)) __check_64bit_arch__() {
-        -:   24:#if !defined(__x86_64__) && !defined(_M_X64) && !defined(__aarch64__)
-        -:   25:	panic("Error: This program requires a 64-bit architecture to run.");
-        -:   26:#endif // arch
-        -:   27:
-        -:   28:	if (__SIZEOF_SIZE_T__ != 8)
-        -:   29:		panic("Error: This program requires a 64-bit architecture to run.");
-        -:   30:	if (sizeof(u8) != 1 || sizeof(u16) != 2 || sizeof(u32) != 4 || sizeof(u64) != 8 ||
-        -:   31:		sizeof(u128) != 16 || sizeof(i8) != 1 || sizeof(i16) != 2 || sizeof(i32) != 4 ||
-        -:   32:		sizeof(i64) != 8 || sizeof(i128) != 16 || sizeof(f32) != 4 || sizeof(f64) != 8 ||
-        -:   33:		sizeof(bool) != 1) {
-        -:   34:		panic("Invalid data type size! Check your c compiler configuration options.");
-        -:   35:	}
-        -:   36:
-       10:   37:	if (!__is_little_endian()) {
-    #####:   38:		panic("Big endian systems not supported");
-        -:   39:	}
-        -:   40:
-        -:   41:	if (sizeof(au64) != 8) {
-        -:   42:		panic("Error: Unexpected size for atomic_ullong. Check your compiler and architecture.");
-        -:   43:	}
-        -:   44:	if (sizeof(au32) != 4) {
-        -:   45:		panic("Error: Unexpected size for atomic_uint. Check your compiler and architecture.");
-        -:   46:	}
-       10:   47:}
+        5:   23:void __attribute__((constructor)) __check_64bit_arch__() {
+        -:   24:	/*
+        -:   25:	#if !defined(__x86_64__) && !defined(_M_X64) && !defined(__aarch64__)
+        -:   26:		panic("Error: This program requires a 64-bit architecture to run.");
+        -:   27:	#endif // arch
+        -:   28:
+        -:   29:		if (__SIZEOF_SIZE_T__ != 8)
+        -:   30:			panic("Error: This program requires a 64-bit architecture to run.");
+        -:   31:		if (sizeof(u8) != 1 || sizeof(u16) != 2 || sizeof(u32) != 4 || sizeof(u64) != 8 ||
+        -:   32:			sizeof(u128) != 16 || sizeof(i8) != 1 || sizeof(i16) != 2 || sizeof(i32) != 4 ||
+        -:   33:			sizeof(i64) != 8 || sizeof(i128) != 16 || sizeof(f32) != 4 || sizeof(f64) != 8 ||
+        -:   34:			sizeof(bool) != 1) {
+        -:   35:			panic("Invalid data type size! Check your c compiler configuration options.");
+        -:   36:		}
+        -:   37:
+        -:   38:		if (!__is_little_endian()) {
+        -:   39:			panic("Big endian systems not supported");
+        -:   40:		}
+        -:   41:
+        -:   42:		if (sizeof(au64) != 8) {
+        -:   43:			panic("Error: Unexpected size for atomic_ullong. Check your compiler and
+        -:   44:	architecture.");
+        -:   45:		}
+        -:   46:		if (sizeof(au32) != 4) {
+        -:   47:			panic("Error: Unexpected size for atomic_uint. Check your compiler and architecture.");
+        -:   48:		}
+        -:   49:	*/
+        5:   50:}
         -:    0:Source:real_main.c
         -:    0:Graph:real_main.gcno
         -:    0:Data:real_main.gcda

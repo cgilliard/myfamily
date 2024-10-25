@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['buf_369',['buf',['../structPrintPair.html#a57bd9e4279d43e267b46f28eeaabf328',1,'PrintPair']]]
+  ['alloc_5fsum_321',['alloc_sum',['../structResourceStats.html#a71dadbeae64ba8c6fb423c99e605ba58',1,'ResourceStats']]]
 ];

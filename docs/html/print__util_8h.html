@@ -78,6 +78,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="macro__util_8h_source.html">base/macro_util.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="stream_8h_source.html">base/stream.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="string_8h_source.html">base/string.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 </div>
 <p><a href="print__util_8h_source.html">Go to the source code of this file.</a></p>
@@ -91,16 +92,16 @@ Classes</h2></td></tr>
 Macros</h2></td></tr>
 <tr class="memitem:ae2da3ae810c241a0dedde8546d460c18"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#ae2da3ae810c241a0dedde8546d460c18">BUILD_PRINT_PAIR</a>(ignore,  v)</td></tr>
 <tr class="separator:ae2da3ae810c241a0dedde8546d460c18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7fbabb41e2214cbac28aba37f411643"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(strm,  s,  capacity,  nl,  <a class="el" href="deps_8h.html#a55e99c539cf7723ec15e856b7e0a8cee">exit</a>,  code,  prefix,  fmt, ...)</td></tr>
+<tr class="memitem:ab7fbabb41e2214cbac28aba37f411643"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(strm,  s,  capacity,  nl,  <a class="el" href="os_8h.html#a9f2b9ae06f804f34da2168b8d08c1db5">exit</a>,  code,  prefix,  fmt, ...)</td></tr>
 <tr class="separator:ab7fbabb41e2214cbac28aba37f411643"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe134f6394c1a010cbc4d5ba3ec42f59"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#afe134f6394c1a010cbc4d5ba3ec42f59">print</a>(fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(out_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td></tr>
 <tr class="separator:afe134f6394c1a010cbc4d5ba3ec42f59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f518114afc89711cbebdbb5564675f7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#a9f518114afc89711cbebdbb5564675f7">println</a>(fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(out_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td></tr>
 <tr class="separator:a9f518114afc89711cbebdbb5564675f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ea2b965b134b2a5c872f3c347fc4085"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#a5ea2b965b134b2a5c872f3c347fc4085">fprint</a>(stream,  fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(stream, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td></tr>
-<tr class="separator:a5ea2b965b134b2a5c872f3c347fc4085"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53d3ff466062aefc7ce28f97b99c5af3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#a53d3ff466062aefc7ce28f97b99c5af3">fprintln</a>(stream,  fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(stream, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td></tr>
-<tr class="separator:a53d3ff466062aefc7ce28f97b99c5af3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c72c61734e62921d47375984ffb807c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#a1c72c61734e62921d47375984ffb807c">printerr</a>(fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(err_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td></tr>
+<tr class="separator:a1c72c61734e62921d47375984ffb807c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1dac076a9c91153935f3325c39b5f0e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#ac1dac076a9c91153935f3325c39b5f0e">printerrln</a>(fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(err_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td></tr>
+<tr class="separator:ac1dac076a9c91153935f3325c39b5f0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5667fcbbaeaf0ab925e5533d0624e92"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#ab5667fcbbaeaf0ab925e5533d0624e92">sprint</a>(s,  len,  fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(out_strm, s, len, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td></tr>
 <tr class="separator:ab5667fcbbaeaf0ab925e5533d0624e92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac705dd580ff5bcbfec668ad271ef3f52"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#ac705dd580ff5bcbfec668ad271ef3f52">sprintln</a>(s,  len,  fmt, ...)&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(out_strm, s, len, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td></tr>
@@ -134,7 +135,7 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aab7346edbded8672bc5d3a767a680213"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#aab7346edbded8672bc5d3a767a680213">print_impl</a> (const <a class="el" href="structStream.html">Stream</a> *strm, <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *s, <a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> capacity, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> nl, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> <a class="el" href="deps_8h.html#a55e99c539cf7723ec15e856b7e0a8cee">exit</a>, <a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> code, const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *prefix, const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *fmt,...)</td></tr>
+<tr class="memitem:aab7346edbded8672bc5d3a767a680213"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="print__util_8h.html#aab7346edbded8672bc5d3a767a680213">print_impl</a> (const <a class="el" href="structStream.html">Stream</a> *strm, <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *s, <a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> capacity, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> nl, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> <a class="el" href="os_8h.html#a9f2b9ae06f804f34da2168b8d08c1db5">exit</a>, <a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> code, const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *prefix, const <a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *fmt,...)</td></tr>
 <tr class="separator:aab7346edbded8672bc5d3a767a680213"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -172,7 +173,7 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><a class="el" href="deps_8h.html#a55e99c539cf7723ec15e856b7e0a8cee">exit</a>, </td>
+          <td class="paramname"><a class="el" href="os_8h.html#a9f2b9ae06f804f34da2168b8d08c1db5">exit</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -205,13 +206,13 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="print__util_8h.html#aab7346edbded8672bc5d3a767a680213">print_impl</a>(strm, s, capacity, nl, <a class="code" href="deps_8h.html#a55e99c539cf7723ec15e856b7e0a8cee">exit</a>, code, prefix,                                          \</div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="print__util_8h.html#aab7346edbded8672bc5d3a767a680213">print_impl</a>(strm, s, capacity, nl, <a class="code" href="os_8h.html#a9f2b9ae06f804f34da2168b8d08c1db5">exit</a>, code, prefix,                                          \</div>
 <div class="line">               fmt __VA_OPT__(, ) <a class="code" href="macro__util_8h.html#a57f29b9285b9beab8c788f98b08e3e5e">FOR_EACH</a>(<a class="code" href="print__util_8h.html#ae2da3ae810c241a0dedde8546d460c18">BUILD_PRINT_PAIR</a>, ignore, (, ), __VA_ARGS__),           \</div>
 <div class="line">               __termination_print_pair__)</div>
-<div class="ttc" id="adeps_8h_html_a55e99c539cf7723ec15e856b7e0a8cee"><div class="ttname"><a href="deps_8h.html#a55e99c539cf7723ec15e856b7e0a8cee">exit</a></div><div class="ttdeci">void exit(int status)</div></div>
 <div class="ttc" id="amacro__util_8h_html_a57f29b9285b9beab8c788f98b08e3e5e"><div class="ttname"><a href="macro__util_8h.html#a57f29b9285b9beab8c788f98b08e3e5e">FOR_EACH</a></div><div class="ttdeci">#define FOR_EACH(m, arg, delim,...)</div><div class="ttdef"><b>Definition:</b> macro_util.h:55</div></div>
+<div class="ttc" id="aos_8h_html_a9f2b9ae06f804f34da2168b8d08c1db5"><div class="ttname"><a href="os_8h.html#a9f2b9ae06f804f34da2168b8d08c1db5">exit</a></div><div class="ttdeci">void exit(i32 code)</div></div>
 <div class="ttc" id="aprint__util_8h_html_aab7346edbded8672bc5d3a767a680213"><div class="ttname"><a href="print__util_8h.html#aab7346edbded8672bc5d3a767a680213">print_impl</a></div><div class="ttdeci">i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool exit, i32 code, const u8 *prefix, const u8 *fmt,...)</div><div class="ttdef"><b>Definition:</b> print_util.c:64</div></div>
-<div class="ttc" id="aprint__util_8h_html_ae2da3ae810c241a0dedde8546d460c18"><div class="ttname"><a href="print__util_8h.html#ae2da3ae810c241a0dedde8546d460c18">BUILD_PRINT_PAIR</a></div><div class="ttdeci">#define BUILD_PRINT_PAIR(ignore, v)</div><div class="ttdef"><b>Definition:</b> print_util.h:40</div></div>
+<div class="ttc" id="aprint__util_8h_html_ae2da3ae810c241a0dedde8546d460c18"><div class="ttname"><a href="print__util_8h.html#ae2da3ae810c241a0dedde8546d460c18">BUILD_PRINT_PAIR</a></div><div class="ttdeci">#define BUILD_PRINT_PAIR(ignore, v)</div><div class="ttdef"><b>Definition:</b> print_util.h:41</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -256,89 +257,25 @@ Functions</h2></td></tr>
 <div class="line">                 mymemcpy(pair.buf, &amp;(<a class="code" href="types_8h.html#ac12585a6def54773148d7fb2c72a59c5">i16</a>) {(i16)v}, <span class="keyword">sizeof</span>(<a class="code" href="types_8h.html#ac12585a6def54773148d7fb2c72a59c5">i16</a>));                                 \</div>
 <div class="line">                 pair;                                                                             \</div>
 <div class="line">             }),                                                                                   \</div>
-<div class="line">        <a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *: (<span class="keyword">const</span> <a class="code" href="structPrintPair.html">PrintPair</a>) {.type = <a class="code" href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a>, .data = (<span class="keywordtype">char</span> *)v},                      \</div>
-<div class="line">        i8 *: (<span class="keyword">const</span> <a class="code" href="print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3">PrintPair</a>) {.type = <a class="code" href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a>, .data = (<span class="keywordtype">char</span> *)v},                      \</div>
-<div class="line">        char *: (<span class="keyword">const</span> <a class="code" href="print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3">PrintPair</a>) {.type = <a class="code" href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a>, .data = (<span class="keywordtype">char</span> *)v},                    \</div>
+<div class="line">        <a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *: (<span class="keyword">const</span> <a class="code" href="structPrintPair.html">PrintPair</a>) {.type = <a class="code" href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a>, .data = (<a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *)v},                        \</div>
+<div class="line">        const <a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *: (<span class="keyword">const</span> <a class="code" href="print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3">PrintPair</a>) {.type = <a class="code" href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a>, .data = (<a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *)v},                  \</div>
+<div class="line">        i8 *: (<span class="keyword">const</span> <a class="code" href="print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3">PrintPair</a>) {.type = <a class="code" href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a>, .data = (<a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *)v},                        \</div>
+<div class="line">        const <a class="code" href="types_8h.html#a2d0b2d48b0784ffa5f75c39f46562729">i8</a> *: (<span class="keyword">const</span> <a class="code" href="print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3">PrintPair</a>) {.type = <a class="code" href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a>, .data = (<a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *)v},                  \</div>
+<div class="line">        char *: (<span class="keyword">const</span> <a class="code" href="print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3">PrintPair</a>) {.type = <a class="code" href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a>, .data = (<a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *)v},                      \</div>
+<div class="line">        const <span class="keywordtype">char</span> *: (<span class="keyword">const</span> <a class="code" href="print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3">PrintPair</a>) {.type = <a class="code" href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a>, .data = (<a class="code" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *)v},                \</div>
 <div class="line">        default: (<span class="keyword">const</span> <a class="code" href="print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3">PrintPair</a>) {.type = <a class="code" href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafad66f5958c79a8ef8d7bafe143c2b251d">PrintTypeU64</a>, .buf = 0})</div>
 <div class="ttc" id="aprint__util_8h_html_a3c85670d81cc52b60884fc8c3a88e2a3"><div class="ttname"><a href="print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3">PrintPair</a></div><div class="ttdeci">struct PrintPair PrintPair</div></div>
-<div class="ttc" id="aprint__util_8h_html_a8c203a5227e8ee8ef5b42881a6e10dafa77d78fed34da6140d7d629463b15e404"><div class="ttname"><a href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa77d78fed34da6140d7d629463b15e404">PrintTypeI32</a></div><div class="ttdeci">@ PrintTypeI32</div><div class="ttdef"><b>Definition:</b> print_util.h:26</div></div>
-<div class="ttc" id="aprint__util_8h_html_a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5"><div class="ttname"><a href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a></div><div class="ttdeci">@ PrintTypeString</div><div class="ttdef"><b>Definition:</b> print_util.h:28</div></div>
-<div class="ttc" id="aprint__util_8h_html_a8c203a5227e8ee8ef5b42881a6e10dafa98c13e148ef1662ddeb0572a648b6286"><div class="ttname"><a href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa98c13e148ef1662ddeb0572a648b6286">PrintTypeI16</a></div><div class="ttdeci">@ PrintTypeI16</div><div class="ttdef"><b>Definition:</b> print_util.h:27</div></div>
-<div class="ttc" id="aprint__util_8h_html_a8c203a5227e8ee8ef5b42881a6e10dafad66f5958c79a8ef8d7bafe143c2b251d"><div class="ttname"><a href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafad66f5958c79a8ef8d7bafe143c2b251d">PrintTypeU64</a></div><div class="ttdeci">@ PrintTypeU64</div><div class="ttdef"><b>Definition:</b> print_util.h:24</div></div>
-<div class="ttc" id="astructPrintPair_html"><div class="ttname"><a href="structPrintPair.html">PrintPair</a></div><div class="ttdef"><b>Definition:</b> print_util.h:32</div></div>
+<div class="ttc" id="aprint__util_8h_html_a8c203a5227e8ee8ef5b42881a6e10dafa77d78fed34da6140d7d629463b15e404"><div class="ttname"><a href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa77d78fed34da6140d7d629463b15e404">PrintTypeI32</a></div><div class="ttdeci">@ PrintTypeI32</div><div class="ttdef"><b>Definition:</b> print_util.h:27</div></div>
+<div class="ttc" id="aprint__util_8h_html_a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5"><div class="ttname"><a href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa890e64515f1c9677cc665649009103f5">PrintTypeString</a></div><div class="ttdeci">@ PrintTypeString</div><div class="ttdef"><b>Definition:</b> print_util.h:29</div></div>
+<div class="ttc" id="aprint__util_8h_html_a8c203a5227e8ee8ef5b42881a6e10dafa98c13e148ef1662ddeb0572a648b6286"><div class="ttname"><a href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafa98c13e148ef1662ddeb0572a648b6286">PrintTypeI16</a></div><div class="ttdeci">@ PrintTypeI16</div><div class="ttdef"><b>Definition:</b> print_util.h:28</div></div>
+<div class="ttc" id="aprint__util_8h_html_a8c203a5227e8ee8ef5b42881a6e10dafad66f5958c79a8ef8d7bafe143c2b251d"><div class="ttname"><a href="print__util_8h.html#a8c203a5227e8ee8ef5b42881a6e10dafad66f5958c79a8ef8d7bafe143c2b251d">PrintTypeU64</a></div><div class="ttdeci">@ PrintTypeU64</div><div class="ttdef"><b>Definition:</b> print_util.h:25</div></div>
+<div class="ttc" id="astructPrintPair_html"><div class="ttname"><a href="structPrintPair.html">PrintPair</a></div><div class="ttdef"><b>Definition:</b> print_util.h:33</div></div>
+<div class="ttc" id="atypes_8h_html_a2d0b2d48b0784ffa5f75c39f46562729"><div class="ttname"><a href="types_8h.html#a2d0b2d48b0784ffa5f75c39f46562729">i8</a></div><div class="ttdeci">signed char i8</div><div class="ttdef"><b>Definition:</b> types.h:24</div></div>
 <div class="ttc" id="atypes_8h_html_a9e3ad5f8e752f01d926ce122d5a5285e"><div class="ttname"><a href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a></div><div class="ttdeci">signed int i32</div><div class="ttdef"><b>Definition:</b> types.h:26</div></div>
 <div class="ttc" id="atypes_8h_html_ac12585a6def54773148d7fb2c72a59c5"><div class="ttname"><a href="types_8h.html#ac12585a6def54773148d7fb2c72a59c5">i16</a></div><div class="ttdeci">signed short i16</div><div class="ttdef"><b>Definition:</b> types.h:25</div></div>
 <div class="ttc" id="atypes_8h_html_ad758b7a5c3f18ed79d2fcd23d9f16357"><div class="ttname"><a href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a></div><div class="ttdeci">unsigned long long u64</div><div class="ttdef"><b>Definition:</b> types.h:23</div></div>
 <div class="ttc" id="atypes_8h_html_aed742c436da53c1080638ce6ef7d13de"><div class="ttname"><a href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a></div><div class="ttdeci">unsigned char u8</div><div class="ttdef"><b>Definition:</b> types.h:20</div></div>
 </div><!-- fragment -->
-</div>
-</div>
-<a id="a5ea2b965b134b2a5c872f3c347fc4085"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5ea2b965b134b2a5c872f3c347fc4085">&#9670;&nbsp;</a></span>fprint</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define fprint</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">stream, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">fmt, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(stream, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a53d3ff466062aefc7ce28f97b99c5af3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a53d3ff466062aefc7ce28f97b99c5af3">&#9670;&nbsp;</a></span>fprintln</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define fprintln</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">stream, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">fmt, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>...</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(stream, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
 </div>
 </div>
 <a id="a7f2052adde8f3e80bac53bb89502628c"></a>
@@ -391,6 +328,62 @@ Functions</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td>&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(out_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1c72c61734e62921d47375984ffb807c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c72c61734e62921d47375984ffb807c">&#9670;&nbsp;</a></span>printerr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define printerr</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fmt, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(err_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac1dac076a9c91153935f3325c39b5f0e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1dac076a9c91153935f3325c39b5f0e">&#9670;&nbsp;</a></span>printerrln</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define printerrln</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fmt, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;	<a class="el" href="print__util_8h.html#ab7fbabb41e2214cbac28aba37f411643">__do_print_impl_</a>(err_strm, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>, <a class="el" href="types_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>, <a class="el" href="types_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>, 0, <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, fmt, __VA_ARGS__)</td>
         </tr>
       </table>
 </div><div class="memdoc">

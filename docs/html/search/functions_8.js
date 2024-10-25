@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['lseek_313',['lseek',['../deps_8h.html#a91692d17c9cd55958e92af3971d97bcb',1,'deps.h']]]
+  ['include_5fdir_283',['include_dir',['../xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029',1,'xxdir.c']]]
 ];

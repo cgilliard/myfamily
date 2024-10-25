@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['malloc_5fsum_383',['malloc_sum',['../structResourceStats.html#ae9eb0fbcddc4ae13b289b50f89cd0750',1,'ResourceStats']]]
+  ['release_5fsum_333',['release_sum',['../structResourceStats.html#a20ea0ac3808abb4c9033d030598185e6',1,'ResourceStats']]],
+  ['resize_5fsum_334',['resize_sum',['../structResourceStats.html#ab94e5b7436f617d71f4da22077ef286d',1,'ResourceStats']]]
 ];

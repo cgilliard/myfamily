@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['citoai64_294',['citoai64',['../string_8c.html#a404a8cdbf55e9abdd520e9d311846f34',1,'citoai64(i64 num, u8 *str, u64 base):&#160;string.c'],['../string_8h.html#a404a8cdbf55e9abdd520e9d311846f34',1,'citoai64(i64 num, u8 *str, u64 base):&#160;string.c']]],
-  ['citoau64_295',['citoau64',['../string_8c.html#a4b15b5983f24f09f6b8f66058f8a2e3b',1,'citoau64(u64 num, u8 *str, u64 base):&#160;string.c'],['../string_8h.html#a4b15b5983f24f09f6b8f66058f8a2e3b',1,'citoau64(u64 num, u8 *str, u64 base):&#160;string.c']]],
-  ['close_296',['close',['../deps_8h.html#aeac3a0e54563deb85b8865101c4a7c17',1,'deps.h']]]
+  ['backtrace_5fgenerate_263',['backtrace_generate',['../backtrace_8c.html#a3b9d4a6849ee9455af35cdce29e8c7d1',1,'backtrace_generate(Backtrace *ptr):&#160;backtrace.c'],['../backtrace_8h.html#a3b9d4a6849ee9455af35cdce29e8c7d1',1,'backtrace_generate(Backtrace *ptr):&#160;backtrace.c']]],
+  ['backtrace_5fprint_264',['backtrace_print',['../backtrace_8c.html#a06de946e39e01eeb9080841cb9e1d766',1,'backtrace_print(const Backtrace *ptr):&#160;backtrace.c'],['../backtrace_8h.html#a06de946e39e01eeb9080841cb9e1d766',1,'backtrace_print(const Backtrace *ptr):&#160;backtrace.c']]]
 ];
