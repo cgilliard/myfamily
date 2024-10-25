@@ -12,18 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#ifndef _BASE_BACKTRACE__
+#define _BASE_BACKTRACE__
 
-MySuite(base);
+#include <base/types.h>
 
-MyTest(base, test_init) {
-	u64 as = alloc_sum();
-	u64 rs = release_sum();
-	u64 diff = as - rs;
-	u8 *name = alloc(10, false);
-	name[0] = 'a';
-	name[1] = 0;
-	DirectoryEntry *x = alloc(sizeof(DirectoryEntry), false);
-	x[0].name = name;
-	Directory d = {.count = 1, .entries = x};
-}
+#define MAX_ENTRIES 128
+#define MAX_ENTRY_SIZE 1024
+
+typedef struct BacktraceEntry {
+	u16 start_bin;
+	u16 start_addr;
+	u16 start_file_path;
+	u8 data[MAX_ENTRY_SIZE + 1];
+} BacktraceEntry;
+
+typedef struct Backtrace {
+	u8 cur_entries;
+	BacktraceEntry entries[MAX_ENTRIES];
+} Backtrace;
+
+i32 backtrace_generate(Backtrace *ptr);
+void backtrace_print(const Backtrace *ptr);
+
+#endif // _BASE_BACKTRACE__
