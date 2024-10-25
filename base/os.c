@@ -12,26 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/fam_err.h>
 #include <base/os.h>
 
+#include <unistd.h>
+
+u8 *getenv(const u8 *name);
+void *malloc(size_t size);
+void *realloc(void *ptr, size_t size);
+void free(void *ptr);
+
+_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
+
 void *alloc(u64 size, bool zeroed) {
-	return NULL;
+	void *ret;
+	ret = malloc(size);
+
+	if (ret) {
+		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
+	} else
+		SetErr(AllocErr);
+	return ret;
 }
-void *resize(void *, u64 size) {
-	return NULL;
+void *resize(void *ptr, u64 size, bool zeroed) {
+	void *ret;
+	ret = realloc(ptr, size);
+
+	if (ret) {
+		THREAD_LOCAL_RESOURCE_STATS.resize_sum += 1;
+	} else
+		SetErr(AllocErr);
+	return ret;
 }
 
-void release(void *) {
+void release(void *ptr) {
+	THREAD_LOCAL_RESOURCE_STATS.release_sum += 1;
+	free(ptr);
 }
 
 u64 alloc_sum() {
-	return 0;
+	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
 }
 u64 resize_sum() {
-	return 0;
+	return THREAD_LOCAL_RESOURCE_STATS.resize_sum;
 }
 u64 release_sum() {
-	return 0;
+	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
 }
 
 // Persistence
@@ -49,5 +75,9 @@ void persistent_delete(const u8 *name) {
 }
 
 u8 *env(const u8 *name) {
-	return NULL;
+	return getenv(name);
+}
+
+i32 write_impl(i32 fd, const void *buf, u64 len) {
+	return write(fd, buf, len);
 }

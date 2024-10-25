@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/lib.h>
-#include <base/test.h>
+#include <base/backtrace.h>
+#include <base/colors.h>
+#include <base/fam_err.h>
+#include <base/types.h>
 
-MySuite(base);
+i32 backtrace_generate(Backtrace *ptr) {
+	return 0;
+}
 
-MyTest(base, test_init) {
-	println("res={},test={}", resources_dir, test_dir);
-	println("test {}", 1);
+void backtrace_print(const Backtrace *ptr) {
 }

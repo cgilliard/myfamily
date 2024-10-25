@@ -19,9 +19,17 @@
 
 #include <base/types.h>
 
+typedef struct ResourceStats {
+	u64 alloc_sum;
+	u64 resize_sum;
+	u64 release_sum;
+	u64 fopen_sum;
+	u64 fclose_sum;
+} ResourceStats;
+
 // Memory Management
 void *alloc(u64 size, bool zeroed);
-void *resize(void *, u64 size);
+void *resize(void *, u64 size, bool zeroed);
 void release(void *);
 
 u64 alloc_sum();
@@ -43,5 +51,8 @@ void persistent_delete(const u8 *name);
 
 // Misc
 u8 *env(const u8 *name);
+void exit(i32 code);
+// for println/print
+i32 write_impl(i32 fd, const void *buf, u64 len);
 
 #endif // _BASE_OS__

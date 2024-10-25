@@ -12,12 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/lib.h>
-#include <base/test.h>
+#ifndef _BASE_STREAM__
+#define _BASE_STREAM__
 
-MySuite(base);
+#include <base/types.h>
 
-MyTest(base, test_init) {
-	println("res={},test={}", resources_dir, test_dir);
-	println("test {}", 1);
-}
+typedef struct Stream {
+	i32 handle;
+} Stream;
+
+const static Stream in_strm_impl = {0};
+const static Stream out_strm_impl = {1};
+const static Stream err_strm_impl = {2};
+const static Stream *out_strm = &out_strm_impl;
+const static Stream *in_strm = &in_strm_impl;
+const static Stream *err_strm = &err_strm_impl;
+
+#endif // _BASE_STREAM__

@@ -12,12 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/lib.h>
-#include <base/test.h>
+#ifndef _BASE_COLORS__
+#define _BASE_COLORS__
 
-MySuite(base);
+char *get_dimmed();
+#define DIMMED get_dimmed()
 
-MyTest(base, test_init) {
-	println("res={},test={}", resources_dir, test_dir);
-	println("test {}", 1);
-}
+char *get_red();
+#define RED get_red()
+
+char *get_bright_red();
+#define BRIGHT_RED get_bright_red()
+
+char *get_green();
+#define GREEN get_green()
+
+char *get_yellow();
+#define YELLOW get_yellow()
+
+char *get_cyan();
+#define CYAN get_cyan()
+
+char *get_magenta();
+#define MAGENTA get_magenta()
+
+char *get_blue();
+#define BLUE get_blue()
+
+char *get_reset();
+#define RESET get_reset()
+
+#endif // _BASE_COLORS__

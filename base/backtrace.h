@@ -12,12 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/lib.h>
-#include <base/test.h>
+#ifndef _BASE_BACKTRACE__
+#define _BASE_BACKTRACE__
 
-MySuite(base);
+#include <base/types.h>
 
-MyTest(base, test_init) {
-	println("res={},test={}", resources_dir, test_dir);
-	println("test {}", 1);
-}
+#define MAX_ENTRIES 128
+#define MAX_ENTRY_SIZE 1024
+
+typedef struct BacktraceEntry {
+	u16 start_bin;
+	u16 start_addr;
+	u16 start_file_path;
+	u8 data[MAX_ENTRY_SIZE + 1];
+} BacktraceEntry;
+
+typedef struct Backtrace {
+	u8 cur_entries;
+	BacktraceEntry entries[MAX_ENTRIES];
+} Backtrace;
+
+i32 backtrace_generate(Backtrace *ptr);
+void backtrace_print(const Backtrace *ptr);
+
+#endif // _BASE_BACKTRACE__
