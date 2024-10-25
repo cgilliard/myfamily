@@ -37,11 +37,11 @@ u64 resize_sum();
 u64 release_sum();
 
 // Persistence
-void persistent_set_root(const u8 *path);
+i32 persistent_set_root(const u8 *path);
 void *persistent_alloc(const u8 *name, u64 size, bool zeroed);
 void *persistent_resize(const u8 *name, u64 size);
-void persistent_sync(void *ptr);
-void persistent_delete(const u8 *name);
+i32 persistent_sync(void *ptr);
+i32 persistent_delete(const u8 *name);
 
 // Process Management
 // TBD

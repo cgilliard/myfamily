@@ -14,38 +14,62 @@
 
 #include <base/fam_err.h>
 #include <base/os.h>
+#include <base/string.h>
 
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stdio.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 u8 *getenv(const u8 *name);
 void *malloc(size_t size);
 void *realloc(void *ptr, size_t size);
 void free(void *ptr);
+void *memset(void *ptr, i32 x, size_t n);
 
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 
 void *alloc(u64 size, bool zeroed) {
+	if (!size) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
 	void *ret;
 	ret = malloc(size);
 
 	if (ret) {
 		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
+		if (zeroed)
+			memset(ret, 0, size);
 	} else
 		SetErr(AllocErr);
 	return ret;
 }
 void *resize(void *ptr, u64 size, bool zeroed) {
+	if (!ptr || !size) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
 	void *ret;
 	ret = realloc(ptr, size);
 
 	if (ret) {
 		THREAD_LOCAL_RESOURCE_STATS.resize_sum += 1;
+		if (zeroed)
+			memset(ret, 0, size);
 	} else
 		SetErr(AllocErr);
 	return ret;
 }
 
 void release(void *ptr) {
+	if (!ptr) {
+		SetErr(IllegalArgument);
+		return;
+	}
 	THREAD_LOCAL_RESOURCE_STATS.release_sum += 1;
 	free(ptr);
 }
@@ -61,17 +85,65 @@ u64 release_sum() {
 }
 
 // Persistence
-void persistent_set_root(const u8 *path) {
+u8 persistent_base[PATH_MAX + 1] = {"."};
+
+i32 persistent_set_root(const u8 *path) {
+	if (!path || mystrlen(path) >= PATH_MAX) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+	mystrcpy(persistent_base, path, PATH_MAX);
+	return 0;
 }
+
 void *persistent_alloc(const u8 *name, u64 size, bool zeroed) {
-	return NULL;
+	if (!name || !size || mystrlen(name) > NAME_MAX ||
+		mystrlen(name) + mystrlen(persistent_base) + 1 > PATH_MAX) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
+	char path[PATH_MAX + 1];
+	mystrcpy(path, persistent_base, PATH_MAX);
+	mystrcat(path, "/", PATH_MAX - mystrlen(path));
+	mystrcat(path, name, PATH_MAX - mystrlen(path));
+	i32 fd = open(path, O_CREAT | O_RDWR);
+	fchmod(fd, 0700);
+
+	if (ftruncate(fd, size) == -1) {
+		perror("ftruncate");
+		exit(-1);
+	}
+
+	char buf[size];
+	for (int i = 0; i < size; i++)
+		buf[i] = 'x';
+	write(fd, buf, size);
+	fsync(fd);
+	void *ret = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+	if (ret == NULL) {
+		perror("mmap");
+		exit(-1);
+	}
+	((char *)ret)[0] = 'a';
+	((char *)ret)[1] = 'b';
+	if (msync(ret, size, MS_SYNC)) {
+		perror("msync");
+		exit(-1);
+	}
+	close(fd);
+	return ret;
 }
+
 void *persistent_resize(const u8 *name, u64 size) {
 	return NULL;
 }
-void persistent_sync(void *ptr) {
+
+i32 persistent_sync(void *ptr) {
+	return 0;
 }
-void persistent_delete(const u8 *name) {
+
+i32 persistent_delete(const u8 *name) {
+	return 0;
 }
 
 u8 *env(const u8 *name) {
