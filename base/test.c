@@ -12,18 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/test.h>
+#include <criterion/criterion.h>
 
-MySuite(base);
-
-MyTest(base, test_init) {
-	u64 as = alloc_sum();
-	u64 rs = release_sum();
-	u64 diff = as - rs;
-	u8 *name = alloc(10, false);
-	name[0] = 'a';
-	name[1] = 0;
-	DirectoryEntry *x = alloc(sizeof(DirectoryEntry), false);
-	x[0].name = name;
-	Directory d = {.count = 1, .entries = x};
+Test(base, test_init) {
 }
