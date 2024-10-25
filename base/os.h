@@ -37,7 +37,6 @@ u64 resize_sum();
 u64 release_sum();
 
 // Persistence
-i32 persistent_set_root(const u8 *path);
 void *persistent_alloc(const u8 *name, u64 size, bool zeroed);
 void *persistent_resize(const u8 *name, u64 size);
 i32 persistent_sync(void *ptr);
