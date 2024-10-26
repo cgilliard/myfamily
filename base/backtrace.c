@@ -31,13 +31,16 @@ i32 get_file_line(const u8 *bin, const u8 *addr, u8 *line_num, u8 *file_path, i3
 	u8 cmd[cmd_max_len];
 	strcpy(cmd, "");
 	sprint(cmd, cmd_max_len, "atos --fullPath -o {} {}", bin, addr);
+	println("cmd={}", cmd);
 	Stream strm = {};
 	if (strm_open(&strm, cmd, "r")) {
 		SetErr(POpenErr);
 		return -1;
 	}
 	u8 buffer[MAX_ENTRY_SIZE + 1];
+	strcpy(buffer, "");
 	while (sgets(buffer, MAX_ENTRY_SIZE + 1, &strm)) {
+		println("buffer={},len={}", buffer, strlen(buffer));
 		bool found_first_paren = false;
 		bool found_second_paren = false;
 		bool found_colon = false;
@@ -47,6 +50,7 @@ i32 get_file_line(const u8 *bin, const u8 *addr, u8 *line_num, u8 *file_path, i3
 		for (i32 i = 0; i < len; i++) {
 			if (!found_first_paren && buffer[i] == '(') {
 				found_first_paren = true;
+				println("ffp");
 			} else if (!found_second_paren && buffer[i] == '(') {
 				found_second_paren = true;
 			} else if (found_second_paren && found_first_paren) {
@@ -155,8 +159,8 @@ i32 backtrace_generate(Backtrace *ptr) {
 		u64 fnamelen = strlen(info.dli_fname) + 1;
 		u8 fn_name[snamelen];
 		u8 bin_name[fnamelen];
-		strncpy(fn_name, info.dli_sname, snamelen);
-		strncpy(bin_name, info.dli_fname, fnamelen);
+		strcpy(fn_name, info.dli_sname);
+		strcpy(bin_name, info.dli_fname);
 
 		u8 file_path[path_max + 101];
 		u8 line_num[path_max + 101];
@@ -164,6 +168,7 @@ i32 backtrace_generate(Backtrace *ptr) {
 		strcpy(line_num, "");
 
 		get_file_line(bin_name, address, line_num, file_path, path_max + 100);
+		println("fp={}", file_path);
 
 		u8 real_bin_name[path_max + 1];
 		if (strlen(bin_name) > 0) {

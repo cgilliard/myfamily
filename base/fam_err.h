@@ -42,6 +42,7 @@
 	IllegalState, \
 	TooBig, \
 	ResourceNotAvailable, \
+	NoStream, \
 	Permission, \
 	BacktraceErr, \
 	ExpectedTypeMismatch, \

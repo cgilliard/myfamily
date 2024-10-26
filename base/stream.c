@@ -17,24 +17,12 @@
 #include <base/print_util.h>
 #include <base/stream.h>
 #include <base/types.h>
+#include <stdio.h>
 
 u8 *sgets(u8 *buf, u64 limit, Stream *strm) {
-	if (!buf || limit == 0 || strm == NULL) {
-		SetErr(IllegalArgument);
+	if (strm == NULL) {
+		SetErr(NoStream);
 		return NULL;
 	}
-	i64 len = strm_read(strm, buf, limit - 1);
-	if (len <= 0) {
-		return NULL;
-	}
-
-	i64 i;
-	for (i = 0; i < len; i++) {
-		if (buf[len] == '\n') {
-			i++;
-			break;
-		}
-	}
-	buf[i] = '\0';
-	return buf;
+	return fgets(buf, limit, strm->strm);
 }
