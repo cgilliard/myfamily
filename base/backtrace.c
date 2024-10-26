@@ -85,8 +85,7 @@ void backtrace_set_entry_values(BacktraceEntry *ptr, const u8 *name, const u8 *b
 	ptr->start_bin = MAX_ENTRY_SIZE;
 	ptr->start_addr = MAX_ENTRY_SIZE;
 	ptr->start_file_path = MAX_ENTRY_SIZE;
-	for (i32 i = 0; i <= MAX_ENTRY_SIZE; i++)
-		ptr->data[i] = 0;
+	memset(ptr->data, '\0', MAX_ENTRY_SIZE);
 
 	strncpy((u8 *)(ptr->data + offset), name, MAX_ENTRY_SIZE - offset);
 	offset += strlen(name) + 1;
