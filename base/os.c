@@ -19,11 +19,11 @@
 void *malloc(size_t size);
 void *realloc(void *ptr, size_t size);
 void free(void *ptr);
-void *memset(void *ptr, i32 x, size_t n);
+void *memset(void *ptr, int x, size_t n);
 
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 
-void *alloc(u64 size, bool zeroed) {
+void *alloc(num size, num zeroed) {
 	if (!size) {
 		SetErr(IllegalArgument);
 		return NULL;
@@ -39,7 +39,7 @@ void *alloc(u64 size, bool zeroed) {
 		SetErr(AllocErr);
 	return ret;
 }
-void *resize(void *ptr, u64 size) {
+void *resize(void *ptr, num size) {
 	if (!ptr || !size) {
 		SetErr(IllegalArgument);
 		return NULL;
@@ -63,18 +63,18 @@ void release(void *ptr) {
 	free(ptr);
 }
 
-u64 alloc_sum() {
+num alloc_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
 }
-u64 resize_sum() {
+num resize_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.resize_sum;
 }
-u64 release_sum() {
+num release_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
 }
 
-u8 *getenv(const u8 *name);
+char *getenv(const char *name);
 
-u8 *env(const u8 *name) {
+ch *env(const ch *name) {
 	return getenv(name);
 }

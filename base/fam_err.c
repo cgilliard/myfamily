@@ -18,17 +18,17 @@
 // #include <base/print_util.h>
 #include <base/string.h>
 
-_Thread_local u8 fam_err_last[ERR_LEN + 1] = {""};
+_Thread_local ch fam_err_last[ERR_LEN + 1] = {""};
 
-_Thread_local i32 fam_err = NoErrors;
+_Thread_local num fam_err = NoErrors;
 //_Thread_local Backtrace thread_local_bt__;
 
-const u8 *get_err() {
+const ch *get_err() {
 	// return strncpy(fam_err_last, FamErrText[fam_err], ERR_LEN);
 	return NULL;
 }
 
-void print_err(const u8 *text) {
+void print_err(const ch *text) {
 	// println("{}: {}", FamErrText[fam_err], text);
 	// backtrace_print(&thread_local_bt__);
 }

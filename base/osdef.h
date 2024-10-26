@@ -16,4 +16,4 @@
 #include <stddef.h>
 
 void *memcpy(void *dest_str, const void *src_str, size_t n);
-i32 memcmp(const void *str1, const void *str2, size_t n);
+int memcmp(const void *str1, const void *str2, size_t n);

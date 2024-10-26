@@ -1,4 +1,8 @@
-OBJS := types.o colors.o os.o string.o fam_err.o
+OBJS := types.o \
+	fam_err.o \
+	string.o \
+	os.o \
+	colors.o
 
 TEST_OBJS := $(OBJS)
 

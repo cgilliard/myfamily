@@ -17,31 +17,31 @@
 
 #include <base/types.h>
 
-u8 *get_dimmed();
+ch *get_dimmed();
 #define DIMMED get_dimmed()
 
-u8 *get_red();
+ch *get_red();
 #define RED get_red()
 
-u8 *get_bright_red();
+ch *get_bright_red();
 #define BRIGHT_RED get_bright_red()
 
-u8 *get_green();
+ch *get_green();
 #define GREEN get_green()
 
-u8 *get_yellow();
+ch *get_yellow();
 #define YELLOW get_yellow()
 
-u8 *get_cyan();
+ch *get_cyan();
 #define CYAN get_cyan()
 
-u8 *get_magenta();
+ch *get_magenta();
 #define MAGENTA get_magenta()
 
-u8 *get_blue();
+ch *get_blue();
 #define BLUE get_blue()
 
-u8 *get_reset();
+ch *get_reset();
 #define RESET get_reset()
 
 #endif // _BASE_COLORS__

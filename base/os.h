@@ -20,24 +20,24 @@
 #include <base/types.h>
 
 typedef struct ResourceStats {
-	u64 alloc_sum;
-	u64 resize_sum;
-	u64 release_sum;
-	u64 fopen_sum;
-	u64 fclose_sum;
+	num alloc_sum;
+	num resize_sum;
+	num release_sum;
+	num fopen_sum;
+	num fclose_sum;
 } ResourceStats;
 
 // Memory Management
-void *alloc(u64 size, bool zeroed);
-void *resize(void *, u64 size);
+void *alloc(num size, num zeroed);
+void *resize(void *, num size);
 void release(void *);
 void release_no_stat(void *);
 
-u64 alloc_sum();
-u64 resize_sum();
-u64 release_sum();
+num alloc_sum();
+num resize_sum();
+num release_sum();
 
 // Misc
-u8 *env(const u8 *name);
+ch *env(const ch *name);
 
 #endif // _BASE_OS__

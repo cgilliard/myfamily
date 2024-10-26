@@ -47,15 +47,15 @@ int rmrf(char *path) {
 	}                                                                                              \
 	Test(init, init, .init = setup_suite) {                                                        \
 	}                                                                                              \
-	static u64 test_count = 0;                                                                     \
-	static u64 initial_alloc_diff;                                                                 \
-	static u64 initial_file_diff;                                                                  \
+	static num test_count = 0;                                                                     \
+	static num initial_alloc_diff;                                                                 \
+	static num initial_file_diff;                                                                  \
 	static char *cur_name = "";                                                                    \
-	static u64 log_fd = -1;                                                                        \
+	static num log_fd = -1;                                                                        \
 	void tear_down() {                                                                             \
-		u64 cur_alloc_count = alloc_sum();                                                         \
-		u64 cur_free_count = release_sum();                                                        \
-		u64 diff = cur_alloc_count - cur_free_count;                                               \
+		num cur_alloc_count = alloc_sum();                                                         \
+		num cur_free_count = release_sum();                                                        \
+		num diff = cur_alloc_count - cur_free_count;                                               \
 		if (diff != initial_alloc_diff) {                                                          \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
 				   "'%s%s%s'.\n[%s====%s] Number of allocations not "                              \
@@ -74,9 +74,9 @@ int rmrf(char *path) {
 
 #define MyTest(suite, test)                                                                        \
 	void setup_##test(void) {                                                                      \
-		u64 cur_alloc_count = alloc_sum();                                                         \
-		u64 cur_free_count = release_sum();                                                        \
-		u64 diff = cur_alloc_count - cur_free_count;                                               \
+		num cur_alloc_count = alloc_sum();                                                         \
+		num cur_free_count = release_sum();                                                        \
+		num diff = cur_alloc_count - cur_free_count;                                               \
 		initial_alloc_diff = diff;                                                                 \
 		cur_name = #test;                                                                          \
 		if (access("bin/nocapture", F_OK) != 0) {                                                  \
@@ -89,7 +89,7 @@ int rmrf(char *path) {
 			log_fd = -1;                                                                           \
 		}                                                                                          \
 	}                                                                                              \
-	void test_##suite##_##test(const u8 *test_dir, const u8 *resources_dir);                       \
+	void test_##suite##_##test(const ch *test_dir, const ch *resources_dir);                       \
 	Test(suite, test, .init = setup_##test, .fini = tear_down) {                                   \
 		{                                                                                          \
 			char path[PATH_MAX];                                                                   \
@@ -107,4 +107,4 @@ int rmrf(char *path) {
 			rmrf(path);                                                                            \
 		}                                                                                          \
 	}                                                                                              \
-	void test_##suite##_##test(const u8 *test_dir, const u8 *resources_dir)
+	void test_##suite##_##test(const ch *test_dir, const ch *resources_dir)

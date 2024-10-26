@@ -14,8 +14,8 @@
 
 // #include <base/print_util.h>
 #include <base/types.h>
-#include <stdio.h>
-#include <stdlib.h>
+// #include <stdio.h>
+// #include <stdlib.h>
 
 /*
 void panic(const u8 *s) {

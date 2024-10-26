@@ -48,24 +48,24 @@ void string_cleanup(CStringNc *ptr);
 	})
 #define String(...) String_(__VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(0ULL))
 
-#define nil_string(s) (s.impl == NULL)
-#define nil(s) nil_string(s)
+#define nil_CString(s) (s.impl == NULL)
+#define nil(s) nil_CString(s)
 
-i32 string_create(CString *s);
-i32 string_create_cs(CString *s, const char *s2);
-i32 string_create_u8(CString *s, const u8 *s2, u64 len);
-i32 string_create_s(CString *s, const CString *s2);
-i32 string_append_cs(CString *s, const char *s2);
-i32 string_append_u8(CString *s, const u8 *s2, u64 len);
-i32 string_append_s(CString *s, const CString *s2);
-u64 string_len(const CString *s);
-i64 string_index_of(const CString *s1, const CString *s2);
-i64 string_last_index_of(const CString *s1, const CString *s2);
-i32 string_substring(CString *dst, const CString *src, u64 begin);
-i32 string_substring_s(CString *dst, const CString *src, u64 begin, u64 end);
-u8 string_char_at(const CString *s, u64 index);
-bool string_equal(const CString *s1, const CString *s2);
+num string_create(CString *s);
+num string_create_cs(CString *s, const char *s2);
+num string_create_ch(CString *s, const ch *s2, num len);
+num string_create_s(CString *s, const CString *s2);
+num string_append_cs(CString *s, const char *s2);
+num string_append_ch(CString *s, const ch *s2, num len);
+num string_append_s(CString *s, const CString *s2);
+num string_len(const CString *s);
+num string_index_of(const CString *s1, const CString *s2);
+num string_last_index_of(const CString *s1, const CString *s2);
+num string_subCString(CString *dst, const CString *src, num begin);
+num string_subCString_s(CString *dst, const CString *src, num begin, num end);
+ch string_char_at(const CString *s, num index);
+num string_equal(const CString *s1, const CString *s2);
 
-u8 *cstring(const CString *s);
+ch *cstring(const CString *s);
 
 #endif // _BASE_STRING__

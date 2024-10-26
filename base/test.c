@@ -58,3 +58,13 @@ MyTest(base, test_string) {
 	cr_assert_eq(string_last_index_of(&s6, &s3), 4);
 	cr_assert_eq(string_last_index_of(&s3, &s5), -1);
 }
+
+Test(base, test_limits) {
+	cr_assert_eq(NUM_MAX, 9223372036854775807LL);
+	cr_assert_eq(INT_MAX, 2147483647);
+	cr_assert_eq(CH_MAX, 255);
+	cr_assert_eq(INT_MIN, -2147483648);
+
+#pragma clang diagnostic ignored "-Wimplicitly-unsigned-literal"
+	cr_assert_eq(NUM_MIN, (-9223372036854775808LL));
+}
