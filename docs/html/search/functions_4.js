@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['define_5ffamerr_267',['DEFINE_FAMERR',['../fam__err_8h.html#aa007f036865fc870fe13a6b780bca16e',1,'fam_err.h']]],
-  ['do_5fbacktrace_5fgenerate_268',['do_backtrace_generate',['../fam__err_8c.html#a173b6927bac70ae42204e204e765eab3',1,'do_backtrace_generate(Backtrace *bt):&#160;fam_err.c'],['../fam__err_8h.html#a173b6927bac70ae42204e204e765eab3',1,'do_backtrace_generate(Backtrace *bt):&#160;fam_err.c']]]
+  ['env_291',['env',['../os_8c.html#a8db93315ef019db22f0d35281f1f0eda',1,'env(const u8 *name):&#160;os.c'],['../os_8h.html#a8db93315ef019db22f0d35281f1f0eda',1,'env(const u8 *name):&#160;os.c']]],
+  ['exit_292',['exit',['../os_8h.html#a9f2b9ae06f804f34da2168b8d08c1db5',1,'os.h']]]
 ];

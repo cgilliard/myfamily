@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['empty_37',['EMPTY',['../macro__util_8h.html#a4ddebc5712d39b71767e3dceb9bfb74b',1,'macro_util.h']]],
-  ['entries_38',['entries',['../structBacktrace.html#af1c0a5c3e1739b70e88c16b576213e4e',1,'Backtrace']]],
-  ['enum_5ftext_39',['ENUM_TEXT',['../fam__err_8h.html#a00bf3c25370794374e72d291b5e04445',1,'fam_err.h']]],
+  ['empty_38',['EMPTY',['../macro__util_8h.html#a4ddebc5712d39b71767e3dceb9bfb74b',1,'macro_util.h']]],
+  ['entries_39',['entries',['../structBacktrace.html#af1c0a5c3e1739b70e88c16b576213e4e',1,'Backtrace']]],
   ['env_40',['env',['../os_8c.html#a8db93315ef019db22f0d35281f1f0eda',1,'env(const u8 *name):&#160;os.c'],['../os_8h.html#a8db93315ef019db22f0d35281f1f0eda',1,'env(const u8 *name):&#160;os.c']]],
   ['err_5flen_41',['ERR_LEN',['../fam__err_8h.html#a0c8bbd905db6b23f4b0b89f82885ef23',1,'fam_err.h']]],
   ['eval_42',['EVAL',['../macro__util_8h.html#aa0f8200acd4827bc9d2df09270b66c38',1,'macro_util.h']]],

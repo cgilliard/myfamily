@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['myint128_5ft_350',['myint128_t',['../limits_8h.html#a7727546c86d862a27de76df207298c2d',1,'limits.h']]],
-  ['myuint128_5ft_351',['myuint128_t',['../limits_8h.html#a82afb785c502191702e541d7418863a3',1,'limits.h']]]
+  ['i16_377',['i16',['../types_8h.html#ac12585a6def54773148d7fb2c72a59c5',1,'types.h']]],
+  ['i32_378',['i32',['../types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e',1,'types.h']]],
+  ['i64_379',['i64',['../types_8h.html#ada59a0de67c44384c6faa924ca63c2aa',1,'types.h']]],
+  ['i8_380',['i8',['../types_8h.html#a2d0b2d48b0784ffa5f75c39f46562729',1,'types.h']]]
 ];

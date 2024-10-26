@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['printpair_225',['PrintPair',['../structPrintPair.html',1,'']]]
+  ['f64wrap_244',['F64Wrap',['../structF64Wrap.html',1,'']]]
 ];
