@@ -26,8 +26,6 @@
 #endif // __APPLE__
 #include <unistd.h>
 
-#include <stdio.h>
-
 i32 get_file_line(const u8 *bin, const u8 *addr, u8 *line_num, u8 *file_path, i32 max_len) {
 	u64 cmd_max_len = strlen(bin) + strlen(addr) + 100;
 	u8 cmd[cmd_max_len];
@@ -235,7 +233,7 @@ void backtrace_print(const Backtrace *ptr) {
 				println("#{}:\n\
 	[{}fn={}{}{}{}']\n\
 	[{}binary={}'{}{}{}'] [{}address={}{}]\n\
-	[{}code={}'{}{}{}']\n",
+	[{}code={}'{}{}{}']",
 						i, DIMMED, RESET, GREEN, function_name, RESET, DIMMED, RESET, CYAN,
 						bin_name, RESET, DIMMED, RESET, address, DIMMED, RESET, YELLOW, file_path,
 						RESET);

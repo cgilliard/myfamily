@@ -30,7 +30,6 @@ typedef __builtin_va_list va_list;
 #else // __GNUC__ or __clang__
 #include <stdarg.h>
 #endif // __GNUC__ or __clang__
-#include <stdio.h>
 
 i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u64 len) {
 	if (s) {
