@@ -48,7 +48,9 @@ i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u6
 				if (res == NULL)
 					return -1;
 			}
-			*cur = (i32)strlen(buf);
+
+			i32 l = strlen(buf);
+			*cur = l;
 		}
 	} else {
 		while (len > 0) {
@@ -108,7 +110,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			u64 diff = next - fmt;
 			u8 buf[1 + diff];
 			memset(buf, '\0', 1 + diff);
-			strncpy(buf, fmt, 1 + diff);
+			strncpy(buf, fmt, diff);
 			if (write_loop(strm, s, &capacity, max, buf, diff)) {
 				ret = -1;
 				break;
