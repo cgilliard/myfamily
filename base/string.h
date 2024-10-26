@@ -24,6 +24,7 @@ i32 strncmp(const char *lhs, const char *rhs, size_t n);
 unsigned long strnlen(const char *s, size_t n);
 char *strncat(char *s1, const char *s2, size_t n);
 char *strncpy(char *s1, const char *s2, size_t n);
+char *strcpy(char *s1, const char *s2);
 i32 snprintf(char *__restrict __str, size_t __size, const char *__restrict __format, ...);
 void *memset(void *str, i32 c, size_t n);
 unsigned long strlen(const char *);

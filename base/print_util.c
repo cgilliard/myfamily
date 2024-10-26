@@ -147,7 +147,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			f64 value;
 			memcpy(&value, arg.buf, sizeof(f64));
 			u8 buf[BUF_LEN];
-			strncpy(buf, "", 1);
+			strcpy(buf, "");
 			snprintf(buf, BUF_LEN - 1, "%lf", value);
 			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
@@ -157,7 +157,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			f32 value;
 			memcpy(&value, arg.buf, sizeof(f32));
 			u8 buf[BUF_LEN];
-			strncpy(buf, "", 1);
+			strcpy(buf, "");
 			snprintf(buf, BUF_LEN - 1, "%f", value);
 			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
@@ -167,7 +167,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			i64 value;
 			memcpy(&value, arg.buf, sizeof(i64));
 			u8 buf[BUF_LEN];
-			strncpy(buf, "", 1);
+			strcpy(buf, "");
 			if (is_hex)
 				snprintf(buf, BUF_LEN - 1, "%llX", value);
 			else
@@ -180,7 +180,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			u64 value;
 			memcpy(&value, arg.buf, sizeof(u64));
 			u8 buf[BUF_LEN];
-			strncpy(buf, "", 1);
+			strcpy(buf, "");
 			if (is_hex)
 				snprintf(buf, BUF_LEN - 1, "%llx", value);
 			else
@@ -194,7 +194,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			i32 value;
 			memcpy(&value, arg.buf, sizeof(i32));
 			u8 buf[BUF_LEN];
-			strncpy(buf, "", 1);
+			strcpy(buf, "");
 			snprintf(buf, BUF_LEN - 1, "%i", value);
 			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
@@ -204,7 +204,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			u32 value;
 			memcpy(&value, arg.buf, sizeof(u32));
 			u8 buf[BUF_LEN];
-			strncpy(buf, "", 1);
+			strcpy(buf, "");
 			snprintf(buf, BUF_LEN - 1, "%u", value);
 			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
@@ -214,7 +214,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			i16 value;
 			memcpy(&value, arg.buf, sizeof(i16));
 			u8 buf[BUF_LEN];
-			strncpy(buf, "", 1);
+			strcpy(buf, "");
 			snprintf(buf, BUF_LEN - 1, "%i", value);
 			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
@@ -224,7 +224,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			u16 value;
 			memcpy(&value, arg.buf, sizeof(u16));
 			u8 buf[BUF_LEN];
-			strncpy(buf, "", 1);
+			strcpy(buf, "");
 			snprintf(buf, BUF_LEN - 1, "%u", value);
 			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
@@ -234,7 +234,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			i8 value;
 			memcpy(&value, arg.buf, sizeof(i8));
 			u8 buf[BUF_LEN];
-			strncpy(buf, "", 1);
+			strcpy(buf, "");
 			snprintf(buf, BUF_LEN - 1, "%i", value);
 			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
@@ -244,7 +244,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			u8 value;
 			memcpy(&value, arg.buf, sizeof(u8));
 			u8 buf[BUF_LEN];
-			strncpy(buf, "", 1);
+			strcpy(buf, "");
 			snprintf(buf, BUF_LEN - 1, "%u", value);
 			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;

@@ -29,7 +29,7 @@
 i32 get_file_line(const u8 *bin, const u8 *addr, u8 *line_num, u8 *file_path, i32 max_len) {
 	u64 cmd_max_len = strlen(bin) + strlen(addr) + 100;
 	u8 cmd[cmd_max_len];
-	strncpy(cmd, "", 1);
+	strcpy(cmd, "");
 	sprint(cmd, cmd_max_len, "atos --fullPath -o {} {}", bin, addr);
 	Stream strm = {};
 	if (strm_open(&strm, cmd, "r")) {
@@ -113,8 +113,6 @@ void backtrace_set_entry_values(BacktraceEntry *ptr, const u8 *name, const u8 *b
 	offset += strlen(address) + 1;
 }
 
-#include <string.h>
-
 bool backtrace_add_entry(Backtrace *ptr, const u8 *name, const u8 *bin_name, const u8 *address,
 						 const u8 *file_path) {
 	u64 count = ptr->cur_entries;
@@ -163,8 +161,8 @@ i32 backtrace_generate(Backtrace *ptr) {
 
 		u8 file_path[path_max + 101];
 		u8 line_num[path_max + 101];
-		strncpy(file_path, "", path_max);
-		strncpy(line_num, "", 1);
+		strcpy(file_path, "");
+		strcpy(line_num, "");
 
 		get_file_line(bin_name, address, line_num, file_path, path_max + 100);
 
@@ -178,13 +176,13 @@ i32 backtrace_generate(Backtrace *ptr) {
 		bool has_file = true;
 		bool has_line_no = true;
 		if (!strncmp(file_path, "", 1)) {
-			strncpy(real_file_path, "Unknown", 1 + strlen("Unknown"));
+			strcpy(real_file_path, "Unknown");
 			has_file = false;
 		} else
 			realpath(file_path, real_file_path);
 		if (!strncmp(line_num, "", 1)) {
 			has_line_no = false;
-			strncpy(line_num, "Unknown", 1 + strlen("Unknown"));
+			strcpy(line_num, "Unknown");
 		}
 
 		if (has_line_no && has_file) {
