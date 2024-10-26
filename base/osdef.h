@@ -12,24 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_STREAM__
-#define _BASE_STREAM__
-
 #include <base/types.h>
+#include <stddef.h>
 
-typedef struct Stream {
-	i32 handle;
-	void *strm;
-} Stream;
-
-const static Stream ERR_STRM = {-1};
-const static Stream in_strm_impl = {0};
-const static Stream out_strm_impl = {1};
-const static Stream err_strm_impl = {2};
-const static Stream *out_strm = &out_strm_impl;
-const static Stream *in_strm = &in_strm_impl;
-const static Stream *err_strm = &err_strm_impl;
-
-u8 *sgets(u8 *buf, u64 limit, Stream *strm);
-
-#endif // _BASE_STREAM__
+void *memcpy(void *dest_str, const void *src_str, size_t n);
+i32 memcmp(const void *str1, const void *str2, size_t n);

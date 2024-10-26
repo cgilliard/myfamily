@@ -15,7 +15,7 @@
 #include <base/colors.h>
 #include <base/os.h>
 
-char *get_dimmed() {
+u8 *get_dimmed() {
 	if (env("NO_COLOR") != NULL) {
 		return "";
 	} else {
@@ -23,7 +23,7 @@ char *get_dimmed() {
 	}
 }
 
-char *get_red() {
+u8 *get_red() {
 	if (env("NO_COLOR") != NULL) {
 		return "";
 	} else {
@@ -31,7 +31,7 @@ char *get_red() {
 	}
 }
 
-char *get_bright_red() {
+u8 *get_bright_red() {
 	if (env("NO_COLOR") != NULL) {
 		return "";
 	} else {
@@ -39,7 +39,7 @@ char *get_bright_red() {
 	}
 }
 
-char *get_green() {
+u8 *get_green() {
 	if (env("NO_COLOR") != NULL) {
 		return "";
 	} else {
@@ -47,7 +47,7 @@ char *get_green() {
 	}
 }
 
-char *get_yellow() {
+u8 *get_yellow() {
 	if (env("NO_COLOR") != NULL) {
 		return "";
 	} else {
@@ -55,7 +55,7 @@ char *get_yellow() {
 	}
 }
 
-char *get_cyan() {
+u8 *get_cyan() {
 	if (env("NO_COLOR") != NULL) {
 		return "";
 	} else {
@@ -63,7 +63,7 @@ char *get_cyan() {
 	}
 }
 
-char *get_magenta() {
+u8 *get_magenta() {
 	if (env("NO_COLOR") != NULL) {
 		return "";
 	} else {
@@ -71,7 +71,7 @@ char *get_magenta() {
 	}
 }
 
-char *get_blue() {
+u8 *get_blue() {
 	if (env("NO_COLOR") != NULL) {
 		return "";
 	} else {
@@ -79,7 +79,7 @@ char *get_blue() {
 	}
 }
 
-char *get_reset() {
+u8 *get_reset() {
 	if (env("NO_COLOR") != NULL) {
 		return "";
 	} else {

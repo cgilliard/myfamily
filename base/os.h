@@ -17,7 +17,6 @@
 #ifndef _BASE_OS__
 #define _BASE_OS__
 
-#include <base/stream.h>
 #include <base/types.h>
 
 typedef struct ResourceStats {
@@ -30,7 +29,7 @@ typedef struct ResourceStats {
 
 // Memory Management
 void *alloc(u64 size, bool zeroed);
-void *resize(void *, u64 size, bool zeroed);
+void *resize(void *, u64 size);
 void release(void *);
 void release_no_stat(void *);
 
@@ -38,23 +37,7 @@ u64 alloc_sum();
 u64 resize_sum();
 u64 release_sum();
 
-// Persistence
-void *persistent_alloc(const u8 *name, u64 size, bool zeroed);
-void *persistent_resize(const u8 *name, u64 size);
-i32 persistent_sync(void *ptr);
-i32 persistent_delete(const u8 *name);
-
-// Process Management
-i64 strm_open(Stream *strm, const u8 *command, const u8 *type);
-i64 strm_write(const Stream *strm, const void *buf, u64 len);
-i64 strm_read(const Stream *strm, void *buf, u64 len);
-void strm_close(const Stream *strm);
-
 // Misc
 u8 *env(const u8 *name);
-void exit(i32 code);
-i32 backtrace(void *buffer, i32 size);
-u8 **backtrace_symbols(void *const buffer, i32 size);
-char *realpath(const char *restrict path, char *restrict resolved_path);
 
 #endif // _BASE_OS__

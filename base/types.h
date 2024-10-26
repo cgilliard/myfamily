@@ -34,6 +34,10 @@ typedef signed long long i64;	// 64 bits
 #define true (_Bool)1
 #define false (_Bool)0
 
+#define num __int128_t
+#define ch unsigned char
+#define dec double
+
 // atomics
 typedef _Atomic unsigned long long au64;
 typedef _Atomic unsigned int au32;

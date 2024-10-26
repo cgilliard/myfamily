@@ -12,8 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/print_util.h>
+// #include <base/print_util.h>
 #include <base/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+/*
+void panic(const u8 *s) {
+	printf("Panic: %s\n", s);
+	exit(-1);
+}
 
 bool __is_little_endian() {
 	u16 test = 0x1;
@@ -44,3 +52,4 @@ void __attribute__((constructor)) __check_64bit_arch__() {
 		panic("Unexpected size for atomic_uint. Check your compiler and architecture.");
 	}
 }
+*/

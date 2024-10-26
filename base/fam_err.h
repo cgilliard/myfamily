@@ -15,7 +15,7 @@
 #ifndef _BASE_FAM_ERR__
 #define _BASE_FAM_ERR__
 
-#include <base/backtrace.h>
+// #include <base/backtrace.h>
 #include <base/macro_util.h>
 #include <base/types.h>
 
@@ -54,16 +54,16 @@ DEFINE_FAMERR(FAMERR_VALUES);
 
 extern _Thread_local u8 fam_err_last[ERR_LEN + 1];
 extern _Thread_local i32 fam_err;
-extern _Thread_local Backtrace thread_local_bt__;
+// extern _Thread_local Backtrace thread_local_bt__;
 
 void print_err(const u8 *text);
 const u8 *get_err();
-void do_backtrace_generate(Backtrace *bt);
+// void do_backtrace_generate(Backtrace *bt);
 
 #define SetErr(err)                                                                                \
 	({                                                                                             \
 		fam_err = err;                                                                             \
-		do_backtrace_generate(&thread_local_bt__);                                                 \
+		/*do_backtrace_generate(&thread_local_bt__);*/                                             \
 	})
 
 #endif // _BASE_FAM_ERR__

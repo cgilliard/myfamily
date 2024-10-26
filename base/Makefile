@@ -1,4 +1,4 @@
-OBJS := types.o os.o backtrace.o fam_err.o colors.o print_util.o stream.o
+OBJS := types.o colors.o os.o string.o fam_err.o
 
 TEST_OBJS := $(OBJS)
 

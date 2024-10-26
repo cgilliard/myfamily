@@ -17,65 +17,44 @@
 
 MySuite(base);
 
-MyTest(base, test_init) {
-	println("res={},test={}", resources_dir, test_dir);
-	println("test {}", 1);
-}
-
-MyTest(base, test_backtrace) {
-	Backtrace bt;
-	backtrace_generate(&bt);
-	backtrace_print(&bt);
-}
-
-MyTest(base, test_persist) {
-}
-
 MyTest(base, test_string) {
-}
+	CString s = String("test");
+	cr_assert(!nil(s));
+	cr_assert(!strcmp(cstring(&s), "test"));
+	CString s2 = INIT_STRING;
+	cr_assert(nil(s2));
+	CString s3 = String(s);
+	cr_assert(!strcmp(cstring(&s3), "test"));
 
-MyTest(base, test_convert_float) {
-	float x = -1.2;
-	println("x={}", x);
-}
+	CString s4 = String();
+	cr_assert(!nil(s4));
+	cr_assert(!strcmp(cstring(&s4), ""));
 
-MyTest(base, test_print) {
-	f64 x = 1.1;
-	bool y = true;
-	f32 z = 2.34;
-	u8 *v1 = "okz";
-	println("{} {} {} {} {} {} ", true, false, 1.32, z, 3, "zzz");
-	println("ok2 {} {}", "abc", v1);
+	cr_assert(string_equal(&s, &s3));
+	cr_assert(!string_equal(&s, &s2));
+	cr_assert(!string_equal(&s, &s4));
 
-	u64 a = 1;
-	i64 b = -1;
-	u32 c = 2;
-	i32 d = -2;
-	u16 e = 3;
-	i16 f = -3;
-	u8 g = 4;
-	i8 h = -4;
-	bool i = false;
-	bool j = true;
-	f64 k = 123.456;
-	f32 l = 567.888;
-	char *m = "m1";
-	char *n = "n1";
-	u8 *o = "o1";
-	u8 *p = "p1";
-	i8 *q = "q1";
-	const i8 *r = "r1";
+	cr_assert_eq(string_len(&s), 4);
+	cr_assert_eq(string_len(&s2), 0);
+	cr_assert_eq(string_len(&s3), 4);
+	cr_assert_eq(string_len(&s4), 0);
+	string_append_s(&s, &s3);
+	cr_assert_eq(string_len(&s), 8);
 
-	println("{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}", a, b, c, d, e, f, g, h, i, j,
-			k, l, m, n, o, p, q, r);
+	CString s7 = String("testtest");
+	cr_assert(string_equal(&s, &s7));
 
-	char buf[1024 + 1];
-	sprint(buf, 1024, "{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}", a, b, c, d, e, f, g,
-		   h, i, j, k, l, m, n, o, p, q, r);
-	printf("buf='%s'\n", buf);
-	printf("cmp='%s'\n", "1 -1 2 -2 3 -3 4 -4 false true 123.456000 567.888000 m1 n1 o1 p1 q1 r1");
+	CString s5 = String("abc");
+	string_append_s(&s, &s5);
+	cr_assert_eq(string_len(&s), 11);
+	CString s6 = String("testtestabc");
+	cr_assert(string_equal(&s, &s6));
 
-	const char *cmp = "1 -1 2 -2 3 -3 4 -4 false true 123.456000 567.888000 m1 n1 o1 p1 q1 r1";
+	cr_assert_eq(string_index_of(&s, &s5), 8);
+	cr_assert_eq(string_index_of(&s6, &s3), 0);
+	cr_assert_eq(string_index_of(&s3, &s5), -1);
 
-	cr_assert(!strcmp(buf, cmp));
+	cr_assert_eq(string_last_index_of(&s, &s5), 8);
+	cr_assert_eq(string_last_index_of(&s6, &s3), 4);
+	cr_assert_eq(string_last_index_of(&s3, &s5), -1);
 }
