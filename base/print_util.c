@@ -17,6 +17,7 @@
 #include <base/os.h>
 #include <base/print_util.h>
 #include <base/string.h>
+#include <inttypes.h>
 
 #define BUF_LEN 64
 
@@ -29,6 +30,7 @@ typedef __builtin_va_list va_list;
 #else // __GNUC__ or __clang__
 #include <stdarg.h>
 #endif // __GNUC__ or __clang__
+#include <stdio.h>
 
 i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u64 len) {
 	if (s) {
@@ -38,17 +40,17 @@ i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u6
 		} else if (*cur < limit) {
 			u8 *res;
 			if (*cur == 0) {
-				res = mystrcpy(s, buf, limit);
+				res = strncpy(s, buf, len);
 				if (res == NULL)
 					return -1;
 			} else {
-				res = mystrcat(s, buf, limit);
+				res = strncat(s, buf, len);
 				if (res == NULL)
 					return -1;
 			}
-			*cur = res - s;
+			*cur = (i32)strlen(buf);
 		}
-	} else
+	} else {
 		while (len > 0) {
 			i64 w = strm_write(strm, buf, len);
 			if (w < 0) {
@@ -58,10 +60,9 @@ i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u6
 
 			len -= w;
 		}
+	}
 	return 0;
 }
-
-#include <stdio.h>
 
 i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code,
 			   const u8 *prefix, const u8 *fmt, ...) {
@@ -70,27 +71,30 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 		SetErr(IllegalArgument);
 		ret = -1;
 	}
+	if (s) {
+		memset(s, '\0', capacity);
+	}
 	va_list args;
 	va_start(args, fmt);
 	i32 max = capacity;
 	capacity = 0;
 
 	if (prefix && ret != -1) {
-		if (write_loop(strm, s, &capacity, max, prefix, mystrlen(prefix)))
+		if (write_loop(strm, s, &capacity, max, prefix, strlen(prefix)))
 			ret = -1;
 	}
 
 	while (ret != -1) {
 		bool is_hex = false;
-		const u8 *next = mystrstr(fmt, "{}");
-		const u8 *next_hex = mystrstr(fmt, "{hex}");
+		const u8 *next = strstr(fmt, "{}");
+		const u8 *next_hex = strstr(fmt, "{hex}");
 		if ((next_hex && !next) || (next_hex && next_hex < next)) {
 			next = next_hex;
 			is_hex = true;
 		}
 
 		if (next == NULL) {
-			if (write_loop(strm, s, &capacity, max, fmt, mystrlen(fmt))) {
+			if (write_loop(strm, s, &capacity, max, fmt, strlen(fmt))) {
 				ret = -1;
 				break;
 			}
@@ -103,7 +107,8 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 		} else {
 			u64 diff = next - fmt;
 			u8 buf[1 + diff];
-			mystrcpy(buf, fmt, 1 + diff);
+			memset(buf, '\0', 1 + diff);
+			strncpy(buf, fmt, 1 + diff);
 			if (write_loop(strm, s, &capacity, max, buf, diff)) {
 				ret = -1;
 				break;
@@ -114,7 +119,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 
 		if (arg.type == PrintTypeTerm) {
 			if (next) {
-				if (write_loop(strm, s, &capacity, max, next, mystrlen(next))) {
+				if (write_loop(strm, s, &capacity, max, next, strlen(next))) {
 					ret = -1;
 					break;
 				}
@@ -127,114 +132,125 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			break;
 		} else if (arg.type == PrintTypeBool) {
 			bool value;
-			mymemcpy(&value, arg.buf, sizeof(bool));
+			memcpy(&value, arg.buf, sizeof(bool));
 			u8 buf[BUF_LEN];
 			if (value)
-				mystrcpy(buf, "true", 5);
+				strncpy(buf, "true", 5);
 			else
-				mystrcpy(buf, "false", 6);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				strncpy(buf, "false", 6);
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeF64) {
 			f64 value;
-			mymemcpy(&value, arg.buf, sizeof(f64));
+			memcpy(&value, arg.buf, sizeof(f64));
 			u8 buf[BUF_LEN];
+			strncpy(buf, "", 1);
 			snprintf(buf, BUF_LEN - 1, "%lf", value);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeF32) {
 			f32 value;
-			mymemcpy(&value, arg.buf, sizeof(f32));
+			memcpy(&value, arg.buf, sizeof(f32));
 			u8 buf[BUF_LEN];
+			strncpy(buf, "", 1);
 			snprintf(buf, BUF_LEN - 1, "%f", value);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeI64) {
 			i64 value;
-			mymemcpy(&value, arg.buf, sizeof(i64));
+			memcpy(&value, arg.buf, sizeof(i64));
 			u8 buf[BUF_LEN];
+			strncpy(buf, "", 1);
 			if (is_hex)
-				citoai64(value, buf, 16);
+				snprintf(buf, BUF_LEN - 1, "%" PRIx64, value);
 			else
-				citoai64(value, buf, 10);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				snprintf(buf, BUF_LEN - 1, "%lli", value);
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeU64) {
 			u64 value;
-			mymemcpy(&value, arg.buf, sizeof(u64));
+			memcpy(&value, arg.buf, sizeof(u64));
 			u8 buf[BUF_LEN];
+			strncpy(buf, "", 1);
 			if (is_hex)
-				citoau64(value, buf, 16);
+				snprintf(buf, BUF_LEN - 1, "%" PRIx64, value);
 			else
-				citoau64(value, buf, 10);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				snprintf(buf, BUF_LEN - 1, "%llu", value);
+
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeI32) {
 			i32 value;
-			mymemcpy(&value, arg.buf, sizeof(i32));
+			memcpy(&value, arg.buf, sizeof(i32));
 			u8 buf[BUF_LEN];
-			citoai64(value, buf, 10);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+			strncpy(buf, "", 1);
+			snprintf(buf, BUF_LEN - 1, "%i", value);
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeU32) {
 			u32 value;
-			mymemcpy(&value, arg.buf, sizeof(u32));
+			memcpy(&value, arg.buf, sizeof(u32));
 			u8 buf[BUF_LEN];
-			citoau64(value, buf, 10);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+			strncpy(buf, "", 1);
+			snprintf(buf, BUF_LEN - 1, "%u", value);
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeI16) {
 			i16 value;
-			mymemcpy(&value, arg.buf, sizeof(i16));
+			memcpy(&value, arg.buf, sizeof(i16));
 			u8 buf[BUF_LEN];
-			citoai64(value, buf, 10);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+			strncpy(buf, "", 1);
+			snprintf(buf, BUF_LEN - 1, "%i", value);
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeU16) {
 			u16 value;
-			mymemcpy(&value, arg.buf, sizeof(u16));
+			memcpy(&value, arg.buf, sizeof(u16));
 			u8 buf[BUF_LEN];
-			citoau64(value, buf, 10);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+			strncpy(buf, "", 1);
+			snprintf(buf, BUF_LEN - 1, "%u", value);
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeI8) {
 			i8 value;
-			mymemcpy(&value, arg.buf, sizeof(i8));
+			memcpy(&value, arg.buf, sizeof(i8));
 			u8 buf[BUF_LEN];
-			citoai64(value, buf, 10);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+			strncpy(buf, "", 1);
+			snprintf(buf, BUF_LEN - 1, "%i", value);
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeU8) {
 			u8 value;
-			mymemcpy(&value, arg.buf, sizeof(u8));
+			memcpy(&value, arg.buf, sizeof(u8));
 			u8 buf[BUF_LEN];
-			citoau64(value, buf, 10);
-			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+			strncpy(buf, "", 1);
+			snprintf(buf, BUF_LEN - 1, "%u", value);
+			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
 				ret = -1;
 				break;
 			}
 		} else if (arg.type == PrintTypeString) {
-			if (write_loop(strm, s, &capacity, max, arg.data, mystrlen(arg.data))) {
+			if (write_loop(strm, s, &capacity, max, arg.data, strlen(arg.data))) {
 				ret = -1;
 				break;
 			}

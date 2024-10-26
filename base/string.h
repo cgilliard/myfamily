@@ -16,7 +16,20 @@
 #define _BASE_STRING__
 
 #include <base/types.h>
+#include <stddef.h>
 
+void *memcpy(void *dest_str, const void *src_str, size_t n);
+i32 memcmp(const void *str1, const void *str2, size_t n);
+i32 strncmp(const char *lhs, const char *rhs, size_t n);
+unsigned long strnlen(const char *s, size_t n);
+char *strncat(char *s1, const char *s2, size_t n);
+char *strncpy(char *s1, const char *s2, size_t n);
+i32 snprintf(char *__restrict __str, size_t __size, const char *__restrict __format, ...);
+void *memset(void *str, i32 c, size_t n);
+unsigned long strlen(const char *);
+char *strstr(const char *s1, const char *s2);
+
+/*
 i32 mymemcmp(const u8 *s1, const u8 *s2, u64 len);
 i32 mystrcmp(const u8 *s1, const u8 *s2);
 u8 *mystrcat(u8 *dest, const u8 *src, u64 limit);
@@ -28,11 +41,14 @@ void *mymemcpy(void *destination, const void *source, u64 limit);
 void reverse(u8 str[], u64 length);
 u8 *citoau64(u64 num, u8 *str, u64 base);
 u8 *citoai64(i64 num, u8 *str, u64 base);
+void convert_float(float n, char *buf, u64 decimals);
+void convert_double(double n, char *buf, u64 decimals);
 const u8 *rstrstr(const u8 *s1, const u8 *s2);
 void memzero(void *ptr, u64 size);
 
 #ifdef TEST
 extern bool __is_debug_mystrlen_overflow;
 #endif // TEST
+*/
 
 #endif // _BASE_STRING__

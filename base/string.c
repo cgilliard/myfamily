@@ -17,6 +17,7 @@
 #include <base/string.h>
 #include <base/types.h>
 
+/*
 bool __is_debug_mystrlen_overflow = false;
 
 i32 mymemcmp(const u8 *X, const u8 *Y, u64 len) {
@@ -173,7 +174,6 @@ void *mymemcpy(void *X, const void *Y, u64 limit) {
 	return ret;
 }
 
-// A utility function to reverse a string
 void reverse(u8 str[], u64 length) {
 	int start = 0;
 	int end = length - 1;
@@ -239,6 +239,40 @@ u8 *citoai64(i64 num, u8 *str, u64 base) {
 	return str;
 }
 
+void convert_float(float n, char *buf, u64 decimals) {
+	i64 ival = (i64)n;
+	float fval = n - (float)ival;
+	if (fval < 0)
+		fval *= -1;
+
+	citoai64(ival, buf, 10);
+	i32 i = mystrlen(buf);
+	if (decimals) {
+		buf[i] = '.';
+		for (u64 i = 0; i < decimals; i++)
+			fval *= 10;
+		i64 decval = (i64)fval;
+		citoai64(decval, buf + i + 1, 10);
+	}
+}
+
+void convert_double(double n, char *buf, u64 decimals) {
+	i64 ival = (i64)n;
+	double fval = n - (double)ival;
+	if (fval < 0)
+		fval *= -1;
+
+	citoai64(ival, buf, 10);
+	i32 i = mystrlen(buf);
+	if (decimals) {
+		buf[i] = '.';
+		for (u64 i = 0; i < decimals; i++)
+			fval *= 10;
+		i64 decval = (i64)fval;
+		citoai64(decval, buf + i + 1, 10);
+	}
+}
+
 const u8 *rstrstr(const u8 *s1, const u8 *s2) {
 	u64 s1len = mystrlen(s1);
 	u64 s2len = mystrlen(s2);
@@ -263,3 +297,4 @@ void memzero(void *ptr, u64 size) {
 	while (size--)
 		*(u8 *)ptr = '\0';
 }
+*/

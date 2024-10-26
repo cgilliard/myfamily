@@ -61,59 +61,59 @@ typedef struct F64Wrap {
 	_Generic((v),                                                                                  \
 		u64: ({                                                                                    \
 				 PrintPair pair = {.type = PrintTypeU64};                                          \
-				 mymemcpy(pair.buf, &(u64) {(u64)v}, sizeof(u64));                                 \
+				 memcpy(pair.buf, &(u64) {(u64)v}, sizeof(u64));                                   \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		u32: ({                                                                                    \
 				 PrintPair pair = {.type = PrintTypeU32};                                          \
-				 mymemcpy(pair.buf, &(u32) {(u32)v}, sizeof(u32));                                 \
+				 memcpy(pair.buf, &(u32) {(u32)v}, sizeof(u32));                                   \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		u16: ({                                                                                    \
 				 PrintPair pair = {.type = PrintTypeU16};                                          \
-				 mymemcpy(pair.buf, &(u16) {(u16)v}, sizeof(u16));                                 \
+				 memcpy(pair.buf, &(u16) {(u16)v}, sizeof(u16));                                   \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		u8: ({                                                                                     \
 				 PrintPair pair = {.type = PrintTypeU8};                                           \
-				 mymemcpy(pair.buf, &(u8) {(u8)v}, sizeof(u8));                                    \
+				 memcpy(pair.buf, &(u8) {(u8)v}, sizeof(u8));                                      \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		i64: ({                                                                                    \
 				 PrintPair pair = {.type = PrintTypeI64};                                          \
-				 mymemcpy(pair.buf, &(i64) {(i64)v}, sizeof(i64));                                 \
+				 memcpy(pair.buf, &(i64) {(i64)v}, sizeof(i64));                                   \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		i32: ({                                                                                    \
 				 PrintPair pair = {.type = PrintTypeI32};                                          \
-				 mymemcpy(pair.buf, &(i32) {(i32)v}, sizeof(i32));                                 \
+				 memcpy(pair.buf, &(i32) {(i32)v}, sizeof(i32));                                   \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		i16: ({                                                                                    \
 				 PrintPair pair = {.type = PrintTypeI16};                                          \
-				 mymemcpy(pair.buf, &(i16) {(i16)v}, sizeof(i16));                                 \
+				 memcpy(pair.buf, &(i16) {(i16)v}, sizeof(i16));                                   \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		i8: ({                                                                                     \
 				 PrintPair pair = {.type = PrintTypeI8};                                           \
-				 mymemcpy(pair.buf, &(i8) {(i8)v}, sizeof(i8));                                    \
+				 memcpy(pair.buf, &(i8) {(i8)v}, sizeof(i8));                                      \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		bool: ({                                                                                   \
 				 PrintPair pair = {.type = PrintTypeBool};                                         \
-				 mymemcpy(pair.buf, &(bool) {(bool)v}, sizeof(bool));                              \
+				 memcpy(pair.buf, &(bool) {(bool)v}, sizeof(bool));                                \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		f64: ({                                                                                    \
 				 PrintPair pair = {.type = PrintTypeF64};                                          \
 				 f64 val = _Generic((v), f64: v, default: 0.0);                                    \
-				 mymemcpy(pair.buf, &(f64) {val}, sizeof(f64));                                    \
+				 memcpy(pair.buf, &(f64) {val}, sizeof(f64));                                      \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		f32: ({                                                                                    \
 				 PrintPair pair = {.type = PrintTypeF32};                                          \
 				 f32 val = _Generic((v), f32: v, default: 0.0);                                    \
-				 mymemcpy(pair.buf, &(f32) {val}, sizeof(f32));                                    \
+				 memcpy(pair.buf, &(f32) {val}, sizeof(f32));                                      \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		u8 *: ({                                                                                   \

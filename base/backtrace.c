@@ -18,6 +18,7 @@
 #include <base/os.h>
 #include <base/print_util.h>
 #include <base/stream.h>
+#include <base/string.h>
 #include <base/types.h>
 
 #ifdef __APPLE__
@@ -25,9 +26,12 @@
 #endif // __APPLE__
 #include <unistd.h>
 
+#include <stdio.h>
+
 i32 get_file_line(const u8 *bin, const u8 *addr, u8 *line_num, u8 *file_path, i32 max_len) {
-	u64 cmd_max_len = mystrlen(bin) + mystrlen(addr) + 100;
+	u64 cmd_max_len = strlen(bin) + strlen(addr) + 100;
 	u8 cmd[cmd_max_len];
+	strncpy(cmd, "", 1);
 	sprint(cmd, cmd_max_len, "atos --fullPath -o {} {}", bin, addr);
 	Stream strm = {};
 	if (strm_open(&strm, cmd, "r")) {
@@ -39,7 +43,7 @@ i32 get_file_line(const u8 *bin, const u8 *addr, u8 *line_num, u8 *file_path, i3
 		bool found_first_paren = false;
 		bool found_second_paren = false;
 		bool found_colon = false;
-		u64 len = mystrlen(buffer);
+		u64 len = strlen(buffer);
 		i32 line_num_itt = 0;
 		i32 line_count_itt = 0;
 		for (i32 i = 0; i < len; i++) {
@@ -86,30 +90,32 @@ void backtrace_set_entry_values(BacktraceEntry *ptr, const u8 *name, const u8 *b
 	for (i32 i = 0; i <= MAX_ENTRY_SIZE; i++)
 		ptr->data[i] = 0;
 
-	mystrcpy((u8 *)(ptr->data + offset), name, MAX_ENTRY_SIZE - offset);
-	offset += mystrlen(name) + 1;
+	strncpy((u8 *)(ptr->data + offset), name, MAX_ENTRY_SIZE - offset);
+	offset += strlen(name) + 1;
 
 	if (offset >= MAX_ENTRY_SIZE)
 		return;
 
 	ptr->start_bin = offset;
-	mystrcpy((u8 *)(ptr->data + offset), bin_name, MAX_ENTRY_SIZE - offset);
-	offset += mystrlen(bin_name) + 1;
+	strncpy((u8 *)(ptr->data + offset), bin_name, MAX_ENTRY_SIZE - offset);
+	offset += strlen(bin_name) + 1;
 
 	if (offset >= MAX_ENTRY_SIZE)
 		return;
 
 	ptr->start_addr = offset;
-	mystrcpy((u8 *)(ptr->data + offset), address, MAX_ENTRY_SIZE - offset);
-	offset += mystrlen(address) + 1;
+	strncpy((u8 *)(ptr->data + offset), address, MAX_ENTRY_SIZE - offset);
+	offset += strlen(address) + 1;
 
 	if (offset >= MAX_ENTRY_SIZE)
 		return;
 
 	ptr->start_file_path = offset;
-	mystrcpy((u8 *)(ptr->data + offset), file_path, MAX_ENTRY_SIZE - offset);
-	offset += mystrlen(address) + 1;
+	strncpy((u8 *)(ptr->data + offset), file_path, MAX_ENTRY_SIZE - offset);
+	offset += strlen(address) + 1;
 }
+
+#include <string.h>
 
 bool backtrace_add_entry(Backtrace *ptr, const u8 *name, const u8 *bin_name, const u8 *address,
 						 const u8 *file_path) {
@@ -145,51 +151,49 @@ i32 backtrace_generate(Backtrace *ptr) {
 #ifdef __APPLE__
 		u64 path_max = pathconf("/", _PC_PATH_MAX);
 		u8 address[30];
+		strcpy(address, "");
 		Dl_info info;
 		dladdr(array[i], &info);
 		u64 addr = 0x0000000100000000 + info.dli_saddr - info.dli_fbase;
 		sprint(address, 30, "0x{hex}", addr);
-		u64 snamelen = mystrlen(info.dli_sname) + 1;
-		u64 fnamelen = mystrlen(info.dli_fname) + 1;
+		u64 snamelen = strlen(info.dli_sname) + 1;
+		u64 fnamelen = strlen(info.dli_fname) + 1;
 		u8 fn_name[snamelen];
 		u8 bin_name[fnamelen];
-		mystrcpy(fn_name, info.dli_sname, snamelen);
-		mystrcpy(bin_name, info.dli_fname, fnamelen);
+		strncpy(fn_name, info.dli_sname, snamelen);
+		strncpy(bin_name, info.dli_fname, fnamelen);
 
 		u8 file_path[path_max + 101];
 		u8 line_num[path_max + 101];
-		mystrcpy(file_path, "", path_max);
+		strncpy(file_path, "", path_max);
+		strncpy(line_num, "", 1);
 
 		get_file_line(bin_name, address, line_num, file_path, path_max + 100);
 
 		u8 real_bin_name[path_max + 1];
-		if (mystrlen(bin_name) > 0) {
+		if (strlen(bin_name) > 0) {
 			realpath(bin_name, real_bin_name);
 		} else
-			mystrcpy(real_bin_name, bin_name, 1 + mystrlen(bin_name));
+			strncpy(real_bin_name, bin_name, 1 + strlen(bin_name));
 
 		u8 real_file_path[path_max + 1];
 		bool has_file = true;
 		bool has_line_no = true;
-		if (!mystrcmp(file_path, "")) {
-			mystrcpy(real_file_path, "Unknown", 1 + mystrlen("Unknown"));
+		if (!strncmp(file_path, "", 1)) {
+			strncpy(real_file_path, "Unknown", 1 + strlen("Unknown"));
 			has_file = false;
 		} else
 			realpath(file_path, real_file_path);
-		if (!mystrcmp(line_num, "")) {
+		if (!strncmp(line_num, "", 1)) {
 			has_line_no = false;
-			mystrcpy(line_num, "Unknown", 1 + mystrlen("Unknown"));
+			strncpy(line_num, "Unknown", 1 + strlen("Unknown"));
 		}
 
 		if (has_line_no && has_file) {
-			mystrcat(file_path, ":", 2);
-			mystrcat(file_path, line_num, 1 + mystrlen(line_num));
+			strncat(file_path, ":", 2);
+			strncat(file_path, line_num, 1 + strlen(line_num));
 		}
 
-		/*
-				println("address={},fn_name={},bin_name={},file_path={},lineno='{}'", address,
-		   fn_name, bin_name, real_file_path, line_num);
-		*/
 		if (!backtrace_add_entry(ptr, fn_name, real_bin_name, address, file_path))
 			break;
 #else  // Linux

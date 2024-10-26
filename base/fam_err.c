@@ -24,7 +24,7 @@ _Thread_local i32 fam_err = NoErrors;
 _Thread_local Backtrace thread_local_bt__;
 
 const u8 *get_err() {
-	return mystrcpy(fam_err_last, FamErrText[fam_err], ERR_LEN);
+	return strncpy(fam_err_last, FamErrText[fam_err], ERR_LEN);
 }
 
 void print_err(const u8 *text) {

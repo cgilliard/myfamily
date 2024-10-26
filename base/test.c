@@ -32,7 +32,11 @@ MyTest(base, test_persist) {
 }
 
 MyTest(base, test_string) {
-	cr_assert(mystrlen(NULL));
+}
+
+MyTest(base, test_convert_float) {
+	float x = -1.2;
+	println("x={}", x);
 }
 
 MyTest(base, test_print) {
@@ -68,6 +72,10 @@ MyTest(base, test_print) {
 	char buf[1024 + 1];
 	sprint(buf, 1024, "{} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {} {}", a, b, c, d, e, f, g,
 		   h, i, j, k, l, m, n, o, p, q, r);
-	cr_assert(
-		!mystrcmp(buf, "1 -1 2 -2 3 -3 4 -4 false true 123.456000 567.888000 m1 n1 o1 p1 q1 r1"));
+	printf("buf='%s'\n", buf);
+	printf("cmp='%s'\n", "1 -1 2 -2 3 -3 4 -4 false true 123.456000 567.888000 m1 n1 o1 p1 q1 r1");
+
+	const char *cmp = "1 -1 2 -2 3 -3 4 -4 false true 123.456000 567.888000 m1 n1 o1 p1 q1 r1";
+
+	cr_assert(!strcmp(buf, cmp));
 }
