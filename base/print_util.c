@@ -168,7 +168,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			u8 buf[BUF_LEN];
 			strncpy(buf, "", 1);
 			if (is_hex)
-				snprintf(buf, BUF_LEN - 1, "%" PRIx64, value);
+				snprintf(buf, BUF_LEN - 1, "%llX", value);
 			else
 				snprintf(buf, BUF_LEN - 1, "%lli", value);
 			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
@@ -181,7 +181,7 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 			u8 buf[BUF_LEN];
 			strncpy(buf, "", 1);
 			if (is_hex)
-				snprintf(buf, BUF_LEN - 1, "%" PRIx64, value);
+				snprintf(buf, BUF_LEN - 1, "%llx", value);
 			else
 				snprintf(buf, BUF_LEN - 1, "%llu", value);
 
