@@ -151,6 +151,9 @@ const static Stream *__slen__ = &__slen__impl__;
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
 #pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#endif
 #define __do_print_impl_(strm, s, capacity, nl, exit, code, prefix, fmt, ...)                      \
 	print_impl(strm, s, capacity, nl, exit, code, prefix,                                          \
 			   fmt __VA_OPT__(, ) FOR_EACH(BUILD_PRINT_PAIR, ignore, (, ), __VA_ARGS__),           \
