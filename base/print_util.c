@@ -61,6 +61,8 @@ i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u6
 	return 0;
 }
 
+#include <stdio.h>
+
 i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code,
 			   const u8 *prefix, const u8 *fmt, ...) {
 	int ret = 0;
@@ -123,6 +125,36 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 					}
 			}
 			break;
+		} else if (arg.type == PrintTypeBool) {
+			bool value;
+			mymemcpy(&value, arg.buf, sizeof(bool));
+			u8 buf[BUF_LEN];
+			if (value)
+				mystrcpy(buf, "true", 5);
+			else
+				mystrcpy(buf, "false", 6);
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				ret = -1;
+				break;
+			}
+		} else if (arg.type == PrintTypeF64) {
+			f64 value;
+			mymemcpy(&value, arg.buf, sizeof(f64));
+			u8 buf[BUF_LEN];
+			snprintf(buf, BUF_LEN - 1, "%lf", value);
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				ret = -1;
+				break;
+			}
+		} else if (arg.type == PrintTypeF32) {
+			f32 value;
+			mymemcpy(&value, arg.buf, sizeof(f32));
+			u8 buf[BUF_LEN];
+			snprintf(buf, BUF_LEN - 1, "%f", value);
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				ret = -1;
+				break;
+			}
 		} else if (arg.type == PrintTypeI64) {
 			i64 value;
 			mymemcpy(&value, arg.buf, sizeof(i64));
@@ -156,11 +188,47 @@ i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i
 				ret = -1;
 				break;
 			}
+		} else if (arg.type == PrintTypeU32) {
+			u32 value;
+			mymemcpy(&value, arg.buf, sizeof(u32));
+			u8 buf[BUF_LEN];
+			citoau64(value, buf, 10);
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				ret = -1;
+				break;
+			}
 		} else if (arg.type == PrintTypeI16) {
 			i16 value;
 			mymemcpy(&value, arg.buf, sizeof(i16));
 			u8 buf[BUF_LEN];
 			citoai64(value, buf, 10);
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				ret = -1;
+				break;
+			}
+		} else if (arg.type == PrintTypeU16) {
+			u16 value;
+			mymemcpy(&value, arg.buf, sizeof(u16));
+			u8 buf[BUF_LEN];
+			citoau64(value, buf, 10);
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				ret = -1;
+				break;
+			}
+		} else if (arg.type == PrintTypeI8) {
+			i8 value;
+			mymemcpy(&value, arg.buf, sizeof(i8));
+			u8 buf[BUF_LEN];
+			citoai64(value, buf, 10);
+			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
+				ret = -1;
+				break;
+			}
+		} else if (arg.type == PrintTypeU8) {
+			u8 value;
+			mymemcpy(&value, arg.buf, sizeof(u8));
+			u8 buf[BUF_LEN];
+			citoau64(value, buf, 10);
 			if (write_loop(strm, s, &capacity, max, buf, mystrlen(buf))) {
 				ret = -1;
 				break;

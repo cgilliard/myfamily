@@ -31,8 +31,8 @@ typedef signed long long i64;	// 64 bits
 #define f64 double
 #define f32 float
 #define bool _Bool
-#define false 0
-#define true 1
+#define true (_Bool)1
+#define false (_Bool)0
 
 // atomics
 typedef _Atomic unsigned long long au64;
