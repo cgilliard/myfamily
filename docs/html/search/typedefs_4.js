@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['printpair_352',['PrintPair',['../print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3',1,'print_util.h']]],
-  ['printtype_353',['PrintType',['../print__util_8h.html#ab0be4c3ea59ed61612dfec8979dcb2e9',1,'print_util.h']]]
+  ['myint128_5ft_381',['myint128_t',['../limits_8h.html#a7727546c86d862a27de76df207298c2d',1,'limits.h']]],
+  ['myuint128_5ft_382',['myuint128_t',['../limits_8h.html#a82afb785c502191702e541d7418863a3',1,'limits.h']]]
 ];

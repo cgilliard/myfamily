@@ -1,11 +1,12 @@
 var searchData=
 [
-  ['persistent_5falloc_298',['persistent_alloc',['../os_8c.html#a2c364fd5782c0d53fa3985708a1f43b3',1,'persistent_alloc(const u8 *path, u64 size, bool zeroed):&#160;os.c'],['../os_8h.html#a36019a63c9457d1292985bf90ee196f5',1,'persistent_alloc(const u8 *name, u64 size, bool zeroed):&#160;os.c']]],
-  ['persistent_5fdelete_299',['persistent_delete',['../os_8c.html#a596a49717d71396a724e3f7e71126301',1,'persistent_delete(const u8 *name):&#160;os.c'],['../os_8h.html#a596a49717d71396a724e3f7e71126301',1,'persistent_delete(const u8 *name):&#160;os.c']]],
-  ['persistent_5fresize_300',['persistent_resize',['../os_8c.html#a4dae1af7bdd207838bc289510e1edb86',1,'persistent_resize(const u8 *name, u64 size):&#160;os.c'],['../os_8h.html#a4dae1af7bdd207838bc289510e1edb86',1,'persistent_resize(const u8 *name, u64 size):&#160;os.c']]],
-  ['persistent_5fsync_301',['persistent_sync',['../os_8c.html#ab3d057941c14984879b6f718e7d3f4cc',1,'persistent_sync(void *ptr):&#160;os.c'],['../os_8h.html#ab3d057941c14984879b6f718e7d3f4cc',1,'persistent_sync(void *ptr):&#160;os.c']]],
-  ['print_5ferr_302',['print_err',['../fam__err_8c.html#a72677d73648dde6edb51ce909bd4c941',1,'print_err(const u8 *text):&#160;fam_err.c'],['../fam__err_8h.html#a72677d73648dde6edb51ce909bd4c941',1,'print_err(const u8 *text):&#160;fam_err.c']]],
-  ['print_5fhex_303',['print_hex',['../xxdir_8c.html#af45e49d375ec15a3ad54c524c0fb7855',1,'xxdir.c']]],
-  ['print_5fimpl_304',['print_impl',['../print__util_8c.html#ad1a98da77ae78f3412eae46199c45732',1,'print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code, const u8 *prefix, const u8 *fmt,...):&#160;print_util.c'],['../print__util_8h.html#aab7346edbded8672bc5d3a767a680213',1,'print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool exit, i32 code, const u8 *prefix, const u8 *fmt,...):&#160;print_util.c']]],
-  ['proc_5ffile_305',['proc_file',['../xxdir_8c.html#ad8071c588b0037587224a40257b7040e',1,'xxdir.c']]]
+  ['real_5fmain_322',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]],
+  ['realloc_323',['realloc',['../os_8c.html#a1a6b5e8d2f1c37e5b43e4345586075be',1,'os.c']]],
+  ['realpath_324',['realpath',['../os_8h.html#a6646e3960f1c015c86c3b45f6e5db53e',1,'os.h']]],
+  ['release_325',['release',['../os_8c.html#afa8b307410bb2a5d42a7ac9072466c58',1,'release(void *ptr):&#160;os.c'],['../os_8h.html#a706d4ee908f1fa07284fe733d2ece0f9',1,'release(void *):&#160;os.c']]],
+  ['release_5fno_5fstat_326',['release_no_stat',['../os_8c.html#aeb8dea4e449873e0b37c1cd0e04d1cac',1,'release_no_stat(void *ptr):&#160;os.c'],['../os_8h.html#a27f792afd69af32e5267ab5520a63657',1,'release_no_stat(void *):&#160;os.c']]],
+  ['release_5fsum_327',['release_sum',['../os_8c.html#ae0b8e7a1c98f344ffbbbc239fde62c23',1,'release_sum():&#160;os.c'],['../os_8h.html#ae0b8e7a1c98f344ffbbbc239fde62c23',1,'release_sum():&#160;os.c']]],
+  ['resize_328',['resize',['../os_8c.html#aebd2ba9a84da4b15ac14e5ff47a16ca9',1,'resize(void *ptr, u64 size, bool zeroed):&#160;os.c'],['../os_8h.html#accfd960e8b2bc5666ccf32c8f5bae550',1,'resize(void *, u64 size, bool zeroed):&#160;os.c']]],
+  ['resize_5fsum_329',['resize_sum',['../os_8c.html#affbad4141d42e42e1302ef9780499fe0',1,'resize_sum():&#160;os.c'],['../os_8h.html#affbad4141d42e42e1302ef9780499fe0',1,'resize_sum():&#160;os.c']]],
+  ['rmrf_330',['rmrf',['../test_8h.html#a5816a6b27040ac0d2cda8305b9f82f9b',1,'test.h']]]
 ];
