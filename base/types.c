@@ -13,13 +13,9 @@
 // limitations under the License.
 
 #include <base/osdef.h>
+#include <base/print_util.h>
 #include <base/types.h>
 #include <stdio.h>
-
-void __attribute__((no_return)) panic(const char *message) {
-	fprintf(stderr, "%s\n", message);
-	exit(-1);
-}
 
 void __attribute__((constructor)) __check_64bit_arch__() {
 #if !defined(__x86_64__) && !defined(_M_X64) && !defined(__aarch64__)

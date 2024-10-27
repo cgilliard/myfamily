@@ -116,10 +116,14 @@ static const PrintPair __termination_print_pair__ = {.type = PrintTypeTerm};
 
 #define slen(fmt, ...) __do_print_impl_(__slen__, " ", 2, false, false, 0, NULL, fmt, __VA_ARGS__)
 
+/*
 #define panic(fmt, ...)                                                                            \
 	__do_print_impl_(err_strm, NULL, UINT32_MAX, true, true, -1, "Panic: ", fmt, __VA_ARGS__)
+*/
 
 int64 print_impl(const Stream *strm, byte *s, int capacity, bool nl, bool exit, int code,
 				 const byte *prefix, const byte *fmt, ...);
+
+void panic(const char *fmt, ...);
 
 #endif // _BASE_PRINT_UTIL__

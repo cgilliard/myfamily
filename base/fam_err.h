@@ -47,7 +47,8 @@
 	BacktraceErr, \
 	ExpectedTypeMismatch, \
 	MaxPathErr, \
-	AllocErr
+	AllocErr, \
+	DuplicateSizes
 // clang-format on
 
 DEFINE_FAMERR(FAMERR_VALUES);

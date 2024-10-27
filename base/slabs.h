@@ -21,43 +21,56 @@
 // Ptr data type
 
 typedef struct PtrImpl *Ptr;
+extern const struct PtrImpl null;
+
+typedef struct Object {
+	Ptr data;	// Pointer to slab-allocated data
+	byte flags; // Object-specific flags
+} Object;
 
 int ptr_len(const Ptr ptr);
-int64 ptr_id(const Ptr ptr);
+int ptr_id(const Ptr ptr);
 void *ptr_data(const Ptr ptr);
 bool ptr_flag_check(const Ptr ptr, byte flag);
-void ptr_flag_set(const Ptr ptr, byte flag, bool value);
+void ptr_flag_set(Ptr ptr, byte flag, bool value);
 bool ptr_is_nil(const Ptr ptr);
+void ptr_count1_set(Ptr ptr, int value);
+void ptr_count2_set(Ptr ptr, int value);
+void ptr_count1_incr(Ptr ptr, int value);
+void ptr_count2_incr(Ptr ptr, int value);
+void ptr_count1_decr(Ptr ptr, int value);
+void ptr_count2_decr(Ptr ptr, int value);
+int ptr_count1_get(Ptr ptr);
+int ptr_count2_get(Ptr ptr);
 
 #ifdef TEST
-Ptr ptr_test_obj(int id, int len, byte flags);
+Ptr ptr_test_obj(int64 id, int64 len, byte flags);
 void ptr_free_test_obj(Ptr ptr);
 #endif // TEST
 
-// Slab Allocator
+// Slab Allocator Config
 
 // Slab Type definition
 typedef struct SlabType {
-	int64 slab_size;
+	int slab_size;
 	int64 slabs_per_resize;
 	int64 initial_chunks;
-	int64 max_slabs;
+	unsigned int max_slabs;
 } SlabType;
 
-// Slab Allocator configuration
-typedef struct SlabAllocatorConfigNc {
-	int64 slab_types_count;
-	SlabType *slab_types;
-} SlabAllocatorConfigNc;
+typedef struct SlabAllocatorConfigImpl *SlabAllocatorConfigNc;
 
 void slab_allocator_config_cleanup(SlabAllocatorConfigNc *ptr);
 
+#define INIT_SLAB_ALLOCAOTR_CONFIG {NULL}
 #define SlabAllocatorConfig                                                                        \
 	SlabAllocatorConfigNc                                                                          \
 		__attribute__((warn_unused_result, cleanup(slab_allocator_config_cleanup)))
 
-int slab_allocator_config_build(SlabAllocatorConfig *sc);
-int slab_allocator_config_add_type(SlabAllocatorConfig *sc, const SlabType *st);
+SlabAllocatorConfig slab_allocator_config_create();
+int64 slab_allocator_config_add_type(SlabAllocatorConfig sc, const SlabType *st);
+
+// Slab Allocator
 
 typedef struct SlabAllocatorImpl *SlabAllocatorNc;
 
@@ -66,7 +79,9 @@ void slab_allocator_cleanup(SlabAllocatorNc *ptr);
 #define SlabAllocator                                                                              \
 	SlabAllocatorNc __attribute__((warn_unused_result, cleanup(slab_allocator_cleanup)))
 
-SlabAllocator slab_allocator_create(SlabAllocatorConfig *sc);
-void slab_allocator_print(SlabAllocator ptr);
+SlabAllocator slab_allocator_create();
+Ptr slab_allocator_allocate(SlabAllocator sa, int64 size);
+void slab_allocator_free(SlabAllocator sa, Ptr ptr);
+int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa);
 
 #endif // _BASE_SLABS__

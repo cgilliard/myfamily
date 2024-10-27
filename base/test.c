@@ -108,13 +108,13 @@ MyTest(base, test_string) {
 	string test_str = String("line1\nline2\nline3\nline4\n");
 	int64 i;
 	int64 count = 0;
-	char compare[10];
+	char compare[11];
 
 	while ((i = index_of(test_str, "\n")) >= 0) {
 		string line = substring(test_str, 0, i);
 		string s = substring(test_str, i + 1);
 		move(test_str, s);
-		sprintf(compare, "line%lli", ++count);
+		snprintf(compare, 10, "line%lli", ++count);
 		cr_assert(!strcmp(compare, cstring(&line)));
 	}
 	cr_assert_eq(count, 4);
@@ -155,20 +155,69 @@ Test(base, test_ptr) {
 	cr_assert_eq(release_sum_post - release_sum_pre, 1);
 }
 
+Test(base, test_slab_allocator_config) {
+	SlabAllocatorConfig sc1 = slab_allocator_config_create();
+}
+
 Test(base, test_slab_allocator) {
-	{
-		SlabAllocatorConfig sc;
-		SlabAllocator sa = slab_allocator_create(&sc);
-		slab_allocator_print(sa);
-	}
+	SlabAllocatorConfig sc = slab_allocator_config_create();
+	SlabAllocator sa = slab_allocator_create();
+	/*
+		cr_assert_eq(sa, NULL);
+		cr_assert_eq(fam_err, IllegalArgument);
+	*/
+	SlabType st = (const SlabType) {
+		.slab_size = 32, .slabs_per_resize = 128, .initial_chunks = 1, .max_slabs = UINT32_MAX};
+	cr_assert(!slab_allocator_config_add_type(sc, &st));
+	st.slab_size = 64;
+	cr_assert(!slab_allocator_config_add_type(sc, &st));
+
+	fam_err = NoErrors;
+	SlabAllocator sa2 = slab_allocator_create();
+	cr_assert_neq(sa2, NULL);
+	cr_assert_eq(fam_err, NoErrors);
+
+	Ptr ptr1, ptr2, ptr3;
+	ptr1 = slab_allocator_allocate(sa2, 32);
+	ptr2 = slab_allocator_allocate(sa2, 33);
+	ptr3 = slab_allocator_allocate(sa2, 394133);
+	cr_assert(!ptr3);
+	cr_assert(ptr1);
+	cr_assert(ptr2);
+	cr_assert_eq(ptr_len(ptr1), 32);
+	cr_assert_eq(ptr_len(ptr2), 48);
+	printf("ptr1.id=%i\n", ptr_id(ptr1));
+	printf("ptr2.id=%i\n", ptr_id(ptr2));
+	ptr3 = slab_allocator_allocate(sa2, 33);
+	cr_assert_eq(ptr_len(ptr3), 48);
+	printf("ptr3.id=%i\n", ptr_id(ptr3));
+	printf("ptr3.id=%i\n", ptr_id(ptr3));
+	printf("ptr3.id=%i\n", ptr_id(ptr3));
+
+	cr_assert(!ptr_is_nil(ptr3));
+	slab_allocator_free(sa2, ptr3);
+	cr_assert(ptr_is_nil(ptr3));
+	Ptr ptr4 = slab_allocator_allocate(sa2, 33);
+	printf("ptr4.id=%i\n", ptr_id(ptr4));
+	Ptr ptr5 = slab_allocator_allocate(sa2, 33);
+	printf("ptr5.id=%i\n", ptr_id(ptr5));
+	printf("sz of obj=%lu\n", sizeof(Object));
 }
 
 Test(base, test_limits) {
-	cr_assert_eq(NUM_MAX, 9223372036854775807LL);
+	cr_assert_eq(INT64_MAX, 9223372036854775807LL);
+	cr_assert_eq(INT64_MAX_IMPL, 9223372036854775807LL);
 	cr_assert_eq(INT_MAX, 2147483647);
-	cr_assert_eq(CH_MAX, 255);
+	cr_assert_eq(INT_MAX_IMPL, 2147483647);
+	cr_assert_eq(BYTE_MAX, 255);
+	cr_assert_eq(BYTE_MAX_IMPL, 255);
+	cr_assert_eq(INT_MAX, 2147483647);
 	cr_assert_eq(INT_MIN, -2147483648);
+	cr_assert_eq(INT_MIN_IMPL, -2147483648);
+	cr_assert_eq(UINT32_MAX, 4294967295);
+	cr_assert_eq(UINT32_MAX_IMPL, 4294967295);
 
 #pragma clang diagnostic ignored "-Wimplicitly-unsigned-literal"
-	cr_assert_eq(NUM_MIN, (-9223372036854775808LL));
+	cr_assert_eq(INT64_MIN, (-9223372036854775808LL));
+	cr_assert_eq(INT64_MIN_IMPL, (-9223372036854775808LL));
 }
