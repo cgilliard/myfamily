@@ -16,6 +16,8 @@
 #include <base/os.h>
 #include <base/osdef.h>
 
+#include <stdio.h>
+
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 
 void *alloc(number size, number zeroed) {
@@ -32,6 +34,7 @@ void *alloc(number size, number zeroed) {
 			memset(ret, 0, size);
 	} else
 		SetErr(AllocErr);
+
 	return ret;
 }
 void *resize(void *ptr, number size) {

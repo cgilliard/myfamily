@@ -16,5 +16,6 @@
 #include <base/fam_err.h>
 #include <base/macro_util.h>
 #include <base/print_util.h>
+#include <base/slabs.h>
 #include <base/string.h>
 #include <base/types.h>

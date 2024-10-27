@@ -120,6 +120,49 @@ MyTest(base, test_string) {
 	cr_assert_eq(count, 4);
 }
 
+Test(base, test_ptr) {
+	number alloc_sum_pre = alloc_sum();
+	Ptr ptr = ptr_test_obj(123, 100, 0xF);
+	cr_assert(ptr_flag_check(ptr, 0));
+	cr_assert(ptr_flag_check(ptr, 1));
+	cr_assert(ptr_flag_check(ptr, 2));
+	cr_assert(ptr_flag_check(ptr, 3));
+	for (int i = 4; i < 100; i++) {
+		cr_assert(!ptr_flag_check(ptr, i));
+	}
+	for (int i = -1; i > -10; i--) {
+		cr_assert(!ptr_flag_check(ptr, i));
+	}
+	cr_assert_eq(ptr_id(ptr), 123);
+	cr_assert_eq(ptr_len(ptr), 100);
+
+	ptr_flag_set(ptr, 4, true);
+	cr_assert(ptr_flag_check(ptr, 0));
+	cr_assert(ptr_flag_check(ptr, 1));
+	cr_assert(ptr_flag_check(ptr, 2));
+	cr_assert(ptr_flag_check(ptr, 3));
+	cr_assert(ptr_flag_check(ptr, 4));
+	cr_assert(!ptr_flag_check(ptr, 5));
+
+	cr_assert_eq(ptr_id(ptr), 123);
+	cr_assert_eq(ptr_len(ptr), 100);
+
+	number alloc_sum_post = alloc_sum();
+	cr_assert_eq(alloc_sum_post - alloc_sum_pre, 1);
+	number release_sum_pre = release_sum();
+	ptr_free_test_obj(ptr);
+	number release_sum_post = release_sum();
+	cr_assert_eq(release_sum_post - release_sum_pre, 1);
+}
+
+Test(base, test_slab_allocator) {
+	{
+		SlabAllocatorConfig sc;
+		SlabAllocator sa = slab_allocator_create(&sc);
+		slab_allocator_print(sa);
+	}
+}
+
 Test(base, test_limits) {
 	cr_assert_eq(NUM_MAX, 9223372036854775807LL);
 	cr_assert_eq(INT_MAX, 2147483647);
