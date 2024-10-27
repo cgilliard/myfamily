@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['abool_4',['abool',['../types_8h.html#abe660412f8dbc54cfa427d751a5635eb',1,'types.h']]],
-  ['alloc_5',['alloc',['../os_8c.html#a8d5f84d4c1fcee1171862b5cf1d885c7',1,'alloc(u64 size, bool zeroed):&#160;os.c'],['../os_8h.html#a8d5f84d4c1fcee1171862b5cf1d885c7',1,'alloc(u64 size, bool zeroed):&#160;os.c']]],
-  ['alloc_5fsum_6',['alloc_sum',['../structResourceStats.html#a71dadbeae64ba8c6fb423c99e605ba58',1,'ResourceStats::alloc_sum()'],['../os_8c.html#a2f3acdd9a9e962c425bb0b42131a3562',1,'alloc_sum():&#160;os.c'],['../os_8h.html#a2f3acdd9a9e962c425bb0b42131a3562',1,'alloc_sum():&#160;os.c']]],
-  ['au32_7',['au32',['../types_8h.html#a62c2887fbe387d100932a18356d7dc5e',1,'types.h']]],
-  ['au64_8',['au64',['../types_8h.html#a0b0ee520935fc7fbebb99897205c49c3',1,'types.h']]]
+  ['abool_3',['abool',['../types_8h.html#abe660412f8dbc54cfa427d751a5635eb',1,'types.h']]],
+  ['aint64_4',['aint64',['../types_8h.html#a10210152327150a8e8e1f071795f7afb',1,'types.h']]],
+  ['alloc_5',['alloc',['../os_8c.html#a86595896543fdb83f777bdf1d2142d54',1,'alloc(int64 size, int64 zeroed):&#160;os.c'],['../os_8h.html#a86595896543fdb83f777bdf1d2142d54',1,'alloc(int64 size, int64 zeroed):&#160;os.c']]],
+  ['alloc_5fsum_6',['alloc_sum',['../structResourceStats.html#a00c602f951b8103cc46e4b9b0715f8a0',1,'ResourceStats::alloc_sum()'],['../os_8c.html#a70b05a036d4bd3162742f130ae43500a',1,'alloc_sum():&#160;os.c'],['../os_8h.html#a70b05a036d4bd3162742f130ae43500a',1,'alloc_sum():&#160;os.c']]],
+  ['append_7',['append',['../string_8h.html#a31f7c5ba28f3536f500bb1e76b4884d5',1,'string.h']]]
 ];

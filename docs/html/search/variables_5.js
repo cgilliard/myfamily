@@ -1,9 +1,6 @@
 var searchData=
 [
-  ['fam_5ferr_353',['fam_err',['../fam__err_8c.html#ac0e19b88ca84ad6881b63f94d4d1c4eb',1,'fam_err():&#160;fam_err.c'],['../fam__err_8h.html#ac0e19b88ca84ad6881b63f94d4d1c4eb',1,'fam_err():&#160;fam_err.c']]],
-  ['fam_5ferr_5flast_354',['fam_err_last',['../fam__err_8c.html#ac9f8c53b0e10f314c78a1e40d75f4ad2',1,'fam_err_last():&#160;fam_err.c'],['../fam__err_8h.html#ac9f8c53b0e10f314c78a1e40d75f4ad2',1,'fam_err_last():&#160;fam_err.c']]],
-  ['fclose_5fsum_355',['fclose_sum',['../structResourceStats.html#ac0d083893a67bb29d7a6f91bbc817b94',1,'ResourceStats']]],
-  ['file_5fcount_356',['file_count',['../xxdir_8c.html#abd3633577cf354ae9e2c69a018cfe999',1,'xxdir.c']]],
-  ['file_5fsizes_357',['file_sizes',['../xxdir_8c.html#aab1026987f4e2b9d406e52e915a4cc2b',1,'xxdir.c']]],
-  ['fopen_5fsum_358',['fopen_sum',['../structResourceStats.html#a219fe4bda1b0a3dda0c08c617756dc83',1,'ResourceStats']]]
+  ['id_358',['id',['../structPtrImpl.html#a550e5dd9a2c989f6d0ebf3f548db5df8',1,'PtrImpl']]],
+  ['impl_359',['impl',['../structstringNc.html#a01c312f3696cf1efed28b4723d96d17f',1,'stringNc']]],
+  ['initial_5fchunks_360',['initial_chunks',['../structSlabType.html#aea5fb9f838c6a8e57eca1db566aab88b',1,'SlabType']]]
 ];

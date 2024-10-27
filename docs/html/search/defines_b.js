@@ -1,10 +1,9 @@
 var searchData=
 [
-  ['panic_468',['panic',['../print__util_8h.html#a7f2052adde8f3e80bac53bb89502628c',1,'print_util.h']]],
-  ['paren_469',['PAREN',['../macro__util_8h.html#a1c38cb40632dca8c8385d3cecea4b787',1,'macro_util.h']]],
-  ['paren_5fend_470',['PAREN_END',['../macro__util_8h.html#a555e810f9d9a0f66c86e0ea873beda21',1,'macro_util.h']]],
-  ['print_471',['print',['../print__util_8h.html#afe134f6394c1a010cbc4d5ba3ec42f59',1,'print_util.h']]],
-  ['printerr_472',['printerr',['../print__util_8h.html#a1c72c61734e62921d47375984ffb807c',1,'print_util.h']]],
-  ['printerrln_473',['printerrln',['../print__util_8h.html#ac1dac076a9c91153935f3325c39b5f0e',1,'print_util.h']]],
-  ['println_474',['println',['../print__util_8h.html#a9f518114afc89711cbebdbb5564675f7',1,'print_util.h']]]
+  ['nil_455',['nil',['../string_8h.html#aed13d8bde4d13ff8d0da4813962dbe9e',1,'string.h']]],
+  ['nil_5fstring_456',['nil_string',['../string_8h.html#a94450f03aadd627d7b6503e9ce996b5c',1,'string.h']]],
+  ['none_457',['NONE',['../macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29',1,'macro_util.h']]],
+  ['null_458',['NULL',['../types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4',1,'types.h']]],
+  ['num_5fmax_459',['NUM_MAX',['../limits_8h.html#a3254f9a888d289df53941af0e9ca2d96',1,'limits.h']]],
+  ['num_5fmin_460',['NUM_MIN',['../limits_8h.html#ae654cf653e6cd033304a2377747f6877',1,'limits.h']]]
 ];
