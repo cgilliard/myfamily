@@ -106,8 +106,8 @@ MyTest(base, test_string) {
 	cr_assert_eq(index_of(s18, "ok"), 0);
 
 	string test_str = String("line1\nline2\nline3\nline4\n");
-	number i;
-	number count = 0;
+	int64 i;
+	int64 count = 0;
 	char compare[10];
 
 	while ((i = index_of(test_str, "\n")) >= 0) {
@@ -121,7 +121,7 @@ MyTest(base, test_string) {
 }
 
 Test(base, test_ptr) {
-	number alloc_sum_pre = alloc_sum();
+	int64 alloc_sum_pre = alloc_sum();
 	Ptr ptr = ptr_test_obj(123, 100, 0xF);
 	cr_assert(ptr_flag_check(ptr, 0));
 	cr_assert(ptr_flag_check(ptr, 1));
@@ -147,11 +147,11 @@ Test(base, test_ptr) {
 	cr_assert_eq(ptr_id(ptr), 123);
 	cr_assert_eq(ptr_len(ptr), 100);
 
-	number alloc_sum_post = alloc_sum();
+	int64 alloc_sum_post = alloc_sum();
 	cr_assert_eq(alloc_sum_post - alloc_sum_pre, 1);
-	number release_sum_pre = release_sum();
+	int64 release_sum_pre = release_sum();
 	ptr_free_test_obj(ptr);
-	number release_sum_post = release_sum();
+	int64 release_sum_post = release_sum();
 	cr_assert_eq(release_sum_post - release_sum_pre, 1);
 }
 

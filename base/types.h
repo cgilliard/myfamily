@@ -18,7 +18,7 @@
 #include <base/limits.h>
 
 // primitives
-#define number long long
+#define int64 long long
 #define byte unsigned char
 #define dec double
 

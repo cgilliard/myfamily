@@ -23,7 +23,7 @@
 typedef struct PtrImpl *Ptr;
 
 int ptr_len(const Ptr ptr);
-number ptr_id(const Ptr ptr);
+int64 ptr_id(const Ptr ptr);
 void *ptr_data(const Ptr ptr);
 bool ptr_flag_check(const Ptr ptr, byte flag);
 void ptr_flag_set(const Ptr ptr, byte flag, bool value);
@@ -38,15 +38,15 @@ void ptr_free_test_obj(Ptr ptr);
 
 // Slab Type definition
 typedef struct SlabType {
-	number slab_size;
-	number slabs_per_resize;
-	number initial_chunks;
-	number max_slabs;
+	int64 slab_size;
+	int64 slabs_per_resize;
+	int64 initial_chunks;
+	int64 max_slabs;
 } SlabType;
 
 // Slab Allocator configuration
 typedef struct SlabAllocatorConfigNc {
-	number slab_types_count;
+	int64 slab_types_count;
 	SlabType *slab_types;
 } SlabAllocatorConfigNc;
 

@@ -18,12 +18,12 @@
 #include <base/string.h>
 
 typedef struct stringImpl {
-	number len;
+	int64 len;
 	byte data[];
 } stringImpl;
 
-number cstring_len(const byte *S) {
-	number ret = 0;
+int64 cstring_len(const byte *S) {
+	int64 ret = 0;
 	while (*S != '\0') {
 		S++;
 		ret++;
@@ -38,11 +38,11 @@ void string_cleanup(stringNc *ptr) {
 	ptr->impl = NULL;
 }
 
-number string_create(string *s) {
+int64 string_create(string *s) {
 	return string_create_cs(s, "");
 }
 
-number string_create_cs(string *s, const char *s2) {
+int64 string_create_cs(string *s, const char *s2) {
 	if (s2 == NULL) {
 		SetErr(IllegalArgument);
 		return -1;
@@ -50,7 +50,7 @@ number string_create_cs(string *s, const char *s2) {
 	return string_create_ch(s, s2, cstring_len(s2));
 }
 
-number string_create_ch(string *s, const byte *s2, number len) {
+int64 string_create_ch(string *s, const byte *s2, int64 len) {
 	if (s == NULL || s2 == NULL || len < 0) {
 		SetErr(IllegalArgument);
 		return -1;
@@ -67,16 +67,16 @@ number string_create_ch(string *s, const byte *s2, number len) {
 	return 0;
 }
 
-number string_create_s(string *s, const string *s2) {
+int64 string_create_s(string *s, const string *s2) {
 	return string_create_cs(s, cstring(s2));
 }
 
-number string_append_s(string *s, const string *s2) {
+int64 string_append_s(string *s, const string *s2) {
 	stringImpl *si2 = s2->impl;
 	return string_append_ch(s, si2->data, si2->len);
 }
 
-number string_append_ch(string *s, const byte *s2, number len) {
+int64 string_append_ch(string *s, const byte *s2, int64 len) {
 	if (s == NULL || s2 == NULL || len < 0) {
 		SetErr(IllegalArgument);
 		return -1;
@@ -87,7 +87,7 @@ number string_append_ch(string *s, const byte *s2, number len) {
 		SetErr(IllegalState);
 		return -1;
 	}
-	number len_sum = si->len + len;
+	int64 len_sum = si->len + len;
 	void *tmp = resize(si, 1 + len_sum + sizeof(stringImpl));
 
 	if (tmp == NULL) {
@@ -104,7 +104,7 @@ number string_append_ch(string *s, const byte *s2, number len) {
 	return 0;
 }
 
-number string_len(const string *s) {
+int64 string_len(const string *s) {
 	if (s == NULL)
 		return 0;
 	stringImpl *si = s->impl;
@@ -113,7 +113,7 @@ number string_len(const string *s) {
 	return si->len;
 }
 
-number string_index_of(const string *s1, const string *s2) {
+int64 string_index_of(const string *s1, const string *s2) {
 	if (s1 == NULL || s2 == NULL) {
 		SetErr(IllegalArgument);
 		return -1;
@@ -126,8 +126,8 @@ number string_index_of(const string *s1, const string *s2) {
 		return -1;
 	}
 
-	number s1len = si1->len;
-	number s2len = si2->len;
+	int64 s1len = si1->len;
+	int64 s2len = si2->len;
 
 	if (s2len > s1len)
 		return -1;
@@ -135,8 +135,8 @@ number string_index_of(const string *s1, const string *s2) {
 	if (s2len == 0)
 		return 0;
 
-	number max = 1 + (s1len - s2len);
-	for (number i = 0; i < max; i++) {
+	int64 max = 1 + (s1len - s2len);
+	for (int64 i = 0; i < max; i++) {
 		if (!memcmp(si1->data + i, si2->data, s2len))
 			return i;
 	}
@@ -144,7 +144,7 @@ number string_index_of(const string *s1, const string *s2) {
 	return -1;
 }
 
-number string_last_index_of(const string *s1, const string *s2) {
+int64 string_last_index_of(const string *s1, const string *s2) {
 	if (s1 == NULL || s2 == NULL) {
 		SetErr(IllegalArgument);
 		return -1;
@@ -157,8 +157,8 @@ number string_last_index_of(const string *s1, const string *s2) {
 		return -1;
 	}
 
-	number s1len = si1->len;
-	number s2len = si2->len;
+	int64 s1len = si1->len;
+	int64 s2len = si2->len;
 
 	if (s2len > s1len)
 		return -1;
@@ -166,8 +166,8 @@ number string_last_index_of(const string *s1, const string *s2) {
 	if (s2len == 0)
 		return s1len;
 
-	number max = s1len - s2len;
-	for (number i = max; i >= 0; i--) {
+	int64 max = s1len - s2len;
+	for (int64 i = max; i >= 0; i--) {
 		if (!memcmp(si1->data + i, si2->data, s2len))
 			return i;
 	}
@@ -175,11 +175,11 @@ number string_last_index_of(const string *s1, const string *s2) {
 	return -1;
 }
 
-number string_substring(string *dst, const string *src, number begin) {
+int64 string_substring(string *dst, const string *src, int64 begin) {
 	return string_substring_s(dst, src, begin, string_len(src));
 }
 
-number string_substring_s(string *dst, const string *src, number begin, number end) {
+int64 string_substring_s(string *dst, const string *src, int64 begin, int64 end) {
 	byte ret = '\0';
 	if (src == NULL || end < begin) {
 		SetErr(IllegalArgument);
@@ -199,7 +199,7 @@ number string_substring_s(string *dst, const string *src, number begin, number e
 
 	return string_create_ch(dst, si->data + begin, end - begin);
 }
-byte string_char_at(const string *s, number index) {
+byte string_char_at(const string *s, int64 index) {
 	byte ret = '\0';
 	if (s == NULL) {
 		SetErr(IllegalArgument);
@@ -221,7 +221,7 @@ byte string_char_at(const string *s, number index) {
 	return ret;
 }
 
-number string_equal(const string *s1, const string *s2) {
+int64 string_equal(const string *s1, const string *s2) {
 	if (s1 == NULL && s2 == NULL)
 		return true;
 	if (s1 == NULL || s2 == NULL)
@@ -236,7 +236,7 @@ number string_equal(const string *s1, const string *s2) {
 	if (si1->len != si2->len)
 		return false;
 
-	for (number i = 0; i < si1->len; i++) {
+	for (int64 i = 0; i < si1->len; i++) {
 		if (si1->data[i] != si2->data[i])
 			return false;
 	}

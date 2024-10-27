@@ -16,8 +16,8 @@
 #include <base/slabs.h>
 
 typedef struct PtrImpl {
-	number id;	 // slab id
-	number len;	 // length of data in this slab
+	int64 id;	 // slab id
+	int64 len;	 // length of data in this slab
 	byte data[]; // user data
 } PtrImpl;
 
@@ -27,7 +27,7 @@ int ptr_len(const Ptr ptr) {
 }
 
 // returns the slabs id
-number ptr_id(const Ptr ptr) {
+int64 ptr_id(const Ptr ptr) {
 	// mask off flag byte (top byte)
 	return ptr->id & 0x00FFFFFFFFFFFFFFULL;
 }
@@ -39,7 +39,7 @@ void *ptr_data(const Ptr ptr) {
 
 // check whether a flag is set (0-7 are possible values)
 bool ptr_flag_check(const Ptr ptr, byte flag) {
-	return flag < 8 && ((number)(ptr->id >> 56)) & (1ULL << flag);
+	return flag < 8 && ((int64)(ptr->id >> 56)) & (1ULL << flag);
 }
 
 // set/unset a flag
@@ -47,9 +47,9 @@ void ptr_flag_set(const Ptr ptr, byte flag, bool value) {
 	if (flag >= 8)
 		return;
 	if (value)
-		ptr->id |= (number)(1ULL << (number)flag) << 56;
+		ptr->id |= (int64)(1ULL << (int64)flag) << 56;
 	else
-		ptr->id &= ~((number)(1ULL << (number)flag) << 56);
+		ptr->id &= ~((int64)(1ULL << (int64)flag) << 56);
 }
 
 // return true if this Ptr is nil (unallocated)
@@ -92,7 +92,7 @@ Ptr ptr_test_obj(int id, int len, byte flags) {
 	Ptr ptr = (PtrImpl *)alloc(sizeof(PtrImpl) + len, false);
 	ptr->id = id;
 	ptr->len = len;
-	ptr->id |= ((number)flags) << 56;
+	ptr->id |= ((int64)flags) << 56;
 	return ptr;
 }
 

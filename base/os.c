@@ -20,7 +20,7 @@
 
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 
-void *alloc(number size, number zeroed) {
+void *alloc(int64 size, int64 zeroed) {
 	if (!size) {
 		SetErr(IllegalArgument);
 		return NULL;
@@ -37,7 +37,7 @@ void *alloc(number size, number zeroed) {
 
 	return ret;
 }
-void *resize(void *ptr, number size) {
+void *resize(void *ptr, int64 size) {
 	if (!ptr || !size) {
 		SetErr(IllegalArgument);
 		return NULL;
@@ -61,13 +61,13 @@ void release(void *ptr) {
 	free(ptr);
 }
 
-number alloc_sum() {
+int64 alloc_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
 }
-number resize_sum() {
+int64 resize_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.resize_sum;
 }
-number release_sum() {
+int64 release_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
 }
 

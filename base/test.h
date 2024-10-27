@@ -47,19 +47,19 @@ int rmrf(char *path) {
 	}                                                                                              \
 	Test(init, init, .init = setup_suite) {                                                        \
 	}                                                                                              \
-	static number test_count = 0;                                                                  \
-	static number initial_alloc_diff;                                                              \
-	static number initial_file_diff;                                                               \
+	static int64 test_count = 0;                                                                   \
+	static int64 initial_alloc_diff;                                                               \
+	static int64 initial_file_diff;                                                                \
 	static char *cur_name = "";                                                                    \
-	static number log_fd = -1;                                                                     \
+	static int64 log_fd = -1;                                                                      \
 	void tear_down() {                                                                             \
-		number cur_alloc_count = alloc_sum();                                                      \
-		number cur_free_count = release_sum();                                                     \
-		number diff = cur_alloc_count - cur_free_count;                                            \
+		int64 cur_alloc_count = alloc_sum();                                                       \
+		int64 cur_free_count = release_sum();                                                      \
+		int64 diff = cur_alloc_count - cur_free_count;                                             \
 		if (diff != initial_alloc_diff) {                                                          \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
 				   "'%s%s%s'.\n[%s====%s] Number of allocations not "                              \
-				   "equal to number "                                                              \
+				   "equal to int64 "                                                               \
 				   "of frees. Memory leak?\n",                                                     \
 				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
 			printf("[%s====%s] "                                                                   \
@@ -74,9 +74,9 @@ int rmrf(char *path) {
 
 #define MyTest(suite, test)                                                                        \
 	void setup_##test(void) {                                                                      \
-		number cur_alloc_count = alloc_sum();                                                      \
-		number cur_free_count = release_sum();                                                     \
-		number diff = cur_alloc_count - cur_free_count;                                            \
+		int64 cur_alloc_count = alloc_sum();                                                       \
+		int64 cur_free_count = release_sum();                                                      \
+		int64 diff = cur_alloc_count - cur_free_count;                                             \
 		initial_alloc_diff = diff;                                                                 \
 		cur_name = #test;                                                                          \
 		if (access("bin/nocapture", F_OK) != 0) {                                                  \

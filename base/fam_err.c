@@ -20,7 +20,7 @@
 
 _Thread_local byte fam_err_last[ERR_LEN + 1] = {""};
 
-_Thread_local number fam_err = NoErrors;
+_Thread_local int64 fam_err = NoErrors;
 //_Thread_local Backtrace thread_local_bt__;
 
 const byte *get_err() {

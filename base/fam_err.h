@@ -53,7 +53,7 @@
 DEFINE_FAMERR(FAMERR_VALUES);
 
 extern _Thread_local byte fam_err_last[ERR_LEN + 1];
-extern _Thread_local number fam_err;
+extern _Thread_local int64 fam_err;
 // extern _Thread_local Backtrace thread_local_bt__;
 
 void print_err(const byte *text);
