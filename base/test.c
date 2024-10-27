@@ -106,8 +106,8 @@ MyTest(base, test_string) {
 	cr_assert_eq(index_of(s18, "ok"), 0);
 
 	string test_str = String("line1\nline2\nline3\nline4\n");
-	num i;
-	num count = 0;
+	number i;
+	number count = 0;
 	char compare[10];
 
 	while ((i = index_of(test_str, "\n")) >= 0) {

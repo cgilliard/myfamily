@@ -23,7 +23,7 @@ typedef struct FatPtr {
 	void *impl;
 } FatPtr;
 
-num fat_ptr_size(const FatPtr *ptr);
+number fat_ptr_size(const FatPtr *ptr);
 void *fat_ptr_data(const FatPtr *ptr);
 bool fat_ptr_flag_get(const FatPtr *ptr, u8 flag);
 void fat_ptr_flag_set(const FatPtr *ptr, u8 flag, bool value);

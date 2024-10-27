@@ -33,7 +33,7 @@ typedef enum PrintType {
 
 typedef struct PrintPair {
 	PrintType type;
-	ch buf[8];
+	byte buf[8];
 	void *data;
 } PrintPair;
 
@@ -67,12 +67,12 @@ static const PrintPair __termination_print_pair__ = {.type = PrintTypeTerm};
 				 memcpy(pair.buf, &(dec) {val}, sizeof(dec));                                      \
 				 pair;                                                                             \
 			 }),                                                                                   \
-		ch *: ({                                                                                   \
-				 u8 *val = _Generic((v), ch *: v, default: NULL);                                  \
+		byte *: ({                                                                                 \
+				 u8 *val = _Generic((v), byte *: v, default: NULL);                                \
 				 (const PrintPair) {.type = PrintTypeString, .data = val};                         \
 			 }),                                                                                   \
-		const ch *: ({                                                                             \
-				 u8 *val = _Generic((v), const ch *: v, default: NULL);                            \
+		const byte *: ({                                                                           \
+				 u8 *val = _Generic((v), const byte *: v, default: NULL);                          \
 				 (const PrintPair) {.type = PrintTypeString, .data = val};                         \
 			 }),                                                                                   \
 		char *: ({                                                                                 \
@@ -119,7 +119,7 @@ static const PrintPair __termination_print_pair__ = {.type = PrintTypeTerm};
 #define panic(fmt, ...)                                                                            \
 	__do_print_impl_(err_strm, NULL, UINT32_MAX, true, true, -1, "Panic: ", fmt, __VA_ARGS__)
 
-num print_impl(const Stream *strm, ch *s, int capacity, bool nl, bool exit, int code,
-			   const ch *prefix, const ch *fmt, ...);
+number print_impl(const Stream *strm, byte *s, int capacity, bool nl, bool exit, int code,
+				  const byte *prefix, const byte *fmt, ...);
 
 #endif // _BASE_PRINT_UTIL__

@@ -53,8 +53,9 @@ void string_cleanup(stringNc *ptr);
 
 #define string_append(s, v, ...)                                                                   \
 	_Generic((v), string: ({ string_append_s(&s, (string *)&v); }), default: ({                    \
-				 num _len__ = __VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(cstring_len((ch *)&v));     \
-				 string_append_ch(&s, (ch *)&v, _len__);                                           \
+				 number _len__ =                                                                   \
+					 __VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(cstring_len((byte *)&v));            \
+				 string_append_ch(&s, (byte *)&v, _len__);                                         \
 			 }))
 #define append(...) string_append(__VA_ARGS__)
 
@@ -71,7 +72,7 @@ void string_cleanup(stringNc *ptr);
 #define substring(src, begin, ...)                                                                 \
 	({                                                                                             \
 		stringNc _ret__ = INIT_STRING;                                                             \
-		num _len__ = __VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(string_len(&src));                   \
+		number _len__ = __VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(string_len(&src));                \
 		string_substring_s(&_ret__, &src, begin, _len__);                                          \
 		_ret__;                                                                                    \
 	})
@@ -92,22 +93,22 @@ void string_cleanup(stringNc *ptr);
 
 #define move(x, y) string_move(&x, &y)
 
-num string_create(string *s);
-num string_create_cs(string *s, const char *s2);
-num string_create_ch(string *s, const ch *s2, num len);
-num string_create_s(string *s, const string *s2);
-num string_append_ch(string *s, const ch *s2, num len);
-num string_append_s(string *s, const string *s2);
-num string_len(const string *s);
-num string_index_of(const string *s1, const string *s2);
-num string_last_index_of(const string *s1, const string *s2);
-num string_substring(string *dst, const string *src, num begin);
-num string_substring_s(string *dst, const string *src, num begin, num end);
-ch string_char_at(const string *s, num index);
-num string_equal(const string *s1, const string *s2);
+number string_create(string *s);
+number string_create_cs(string *s, const char *s2);
+number string_create_ch(string *s, const byte *s2, number len);
+number string_create_s(string *s, const string *s2);
+number string_append_ch(string *s, const byte *s2, number len);
+number string_append_s(string *s, const string *s2);
+number string_len(const string *s);
+number string_index_of(const string *s1, const string *s2);
+number string_last_index_of(const string *s1, const string *s2);
+number string_substring(string *dst, const string *src, number begin);
+number string_substring_s(string *dst, const string *src, number begin, number end);
+byte string_char_at(const string *s, number index);
+number string_equal(const string *s1, const string *s2);
 void string_move(string *s1, string *s2);
-num cstring_len(const ch *S);
+number cstring_len(const byte *S);
 
-ch *cstring(const string *s);
+byte *cstring(const string *s);
 
 #endif // _BASE_STRING__

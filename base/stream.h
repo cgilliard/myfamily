@@ -29,6 +29,6 @@ const static Stream *out_strm = &out_strm_impl;
 const static Stream *in_strm = &in_strm_impl;
 const static Stream *err_strm = &err_strm_impl;
 
-ch *sgets(ch *buf, num limit, Stream *strm);
+byte *sgets(byte *buf, number limit, Stream *strm);
 
 #endif // _BASE_STREAM__

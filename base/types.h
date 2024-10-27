@@ -18,8 +18,8 @@
 #include <base/limits.h>
 
 // primitives
-#define num long long
-#define ch unsigned char
+#define number long long
+#define byte unsigned char
 #define dec double
 
 // booleans

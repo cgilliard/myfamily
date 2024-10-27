@@ -23,7 +23,7 @@
 
 #define DEFINE_FAMERR(e)                                                                           \
 	typedef enum FamErr { FOR_EACH(SECOND, none, (, ), e) } FamErr;                                \
-	static const ch *FamErrText[] = {FOR_EACH(SECOND_STRINGIFY, none, (, ), e)};
+	static const byte *FamErrText[] = {FOR_EACH(SECOND_STRINGIFY, none, (, ), e)};
 
 // Define FamErr enum values
 // clang-format off
@@ -52,12 +52,12 @@
 
 DEFINE_FAMERR(FAMERR_VALUES);
 
-extern _Thread_local ch fam_err_last[ERR_LEN + 1];
-extern _Thread_local num fam_err;
+extern _Thread_local byte fam_err_last[ERR_LEN + 1];
+extern _Thread_local number fam_err;
 // extern _Thread_local Backtrace thread_local_bt__;
 
-void print_err(const ch *text);
-const ch *get_err();
+void print_err(const byte *text);
+const byte *get_err();
 // void do_backtrace_generate(Backtrace *bt);
 
 #define SetErr(err)                                                                                \

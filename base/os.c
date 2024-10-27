@@ -18,7 +18,7 @@
 
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 
-void *alloc(num size, num zeroed) {
+void *alloc(number size, number zeroed) {
 	if (!size) {
 		SetErr(IllegalArgument);
 		return NULL;
@@ -34,7 +34,7 @@ void *alloc(num size, num zeroed) {
 		SetErr(AllocErr);
 	return ret;
 }
-void *resize(void *ptr, num size) {
+void *resize(void *ptr, number size) {
 	if (!ptr || !size) {
 		SetErr(IllegalArgument);
 		return NULL;
@@ -58,18 +58,18 @@ void release(void *ptr) {
 	free(ptr);
 }
 
-num alloc_sum() {
+number alloc_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
 }
-num resize_sum() {
+number resize_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.resize_sum;
 }
-num release_sum() {
+number release_sum() {
 	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
 }
 
 char *getenv(const char *name);
 
-ch *env(const ch *name) {
+byte *env(const byte *name) {
 	return getenv(name);
 }
