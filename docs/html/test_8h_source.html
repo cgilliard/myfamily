@@ -119,19 +119,19 @@ $(function() {
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    }                                                                                              \</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    Test(init, init, .init = setup_suite) {                                                        \</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    }                                                                                              \</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    static u64 test_count = 0;                                                                     \</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    static u64 initial_alloc_diff;                                                                 \</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    static u64 initial_file_diff;                                                                  \</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    static int64 test_count = 0;                                                                   \</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    static int64 initial_alloc_diff;                                                               \</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    static int64 initial_file_diff;                                                                \</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    static char *cur_name = &quot;&quot;;                                                                    \</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    static u64 log_fd = -1;                                                                        \</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    static int64 log_fd = -1;                                                                      \</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    void tear_down() {                                                                             \</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        u64 cur_alloc_count = alloc_sum();                                                         \</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        u64 cur_free_count = release_sum();                                                        \</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        u64 diff = cur_alloc_count - cur_free_count;                                               \</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        int64 cur_alloc_count = alloc_sum();                                                       \</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        int64 cur_free_count = release_sum();                                                      \</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        int64 diff = cur_alloc_count - cur_free_count;                                             \</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        if (diff != initial_alloc_diff) {                                                          \</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;            printf(&quot;[%s====%s] %sError in tear_down of test%s &quot;                                    \</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                   &quot;&#39;%s%s%s&#39;.\n[%s====%s] Number of allocations not &quot;                              \</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                   &quot;equal to number &quot;                                                              \</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;                   &quot;equal to int64 &quot;                                                               \</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;                   &quot;of frees. Memory leak?\n&quot;,                                                     \</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;                   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            printf(&quot;[%s====%s] &quot;                                                                   \</div>
@@ -146,9 +146,9 @@ $(function() {
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
 <div class="line"><a name="l00075"></a><span class="lineno"><a class="line" href="test_8h.html#a2e6f1698baf6614fafee5b7ffd575cd2">   75</a></span>&#160;<span class="preprocessor">#define MyTest(suite, test)                                                                        \</span></div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">    void setup_##test(void) {                                                                      \</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">        u64 cur_alloc_count = alloc_sum();                                                         \</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">        u64 cur_free_count = release_sum();                                                        \</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">        u64 diff = cur_alloc_count - cur_free_count;                                               \</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">        int64 cur_alloc_count = alloc_sum();                                                       \</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">        int64 cur_free_count = release_sum();                                                      \</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">        int64 diff = cur_alloc_count - cur_free_count;                                             \</span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">        initial_alloc_diff = diff;                                                                 \</span></div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">        cur_name = #test;                                                                          \</span></div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">        if (access(&quot;bin/nocapture&quot;</span>, F_OK) != 0) {                                                  \</div>
@@ -161,7 +161,7 @@ $(function() {
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;            log_fd = -1;                                                                           \</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        }                                                                                          \</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    }                                                                                              \</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    void test_##suite##_##test(const u8 *test_dir, const u8 *resources_dir);                       \</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    void test_##suite##_##test(const byte *test_dir, const byte *resources_dir);                   \</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    Test(suite, test, .init = setup_##test, .fini = tear_down) {                                   \</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;        {                                                                                          \</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            char path[PATH_MAX];                                                                   \</div>
@@ -179,7 +179,7 @@ $(function() {
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            rmrf(path);                                                                            \</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        }                                                                                          \</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    }                                                                                              \</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    void test_##suite##_##test(const u8 *test_dir, const u8 *resources_dir)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    void test_##suite##_##test(const byte *test_dir, const byte *resources_dir)</div>
 <div class="ttc" id="acolors_8h_html"><div class="ttname"><a href="colors_8h.html">colors.h</a></div></div>
 <div class="ttc" id="alimits_8h_html"><div class="ttname"><a href="limits_8h.html">limits.h</a></div></div>
 <div class="ttc" id="aos_8h_html"><div class="ttname"><a href="os_8h.html">os.h</a></div></div>

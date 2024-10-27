@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['value_370',['value',['../structF64Wrap.html#ab09b4458fb15f30c780b41079298ba55',1,'F64Wrap']]]
+  ['thread_5flocal_5fresource_5fstats_371',['THREAD_LOCAL_RESOURCE_STATS',['../os_8c.html#a5b30cb95c593a4c72b37fc7a807c5643',1,'os.c']]],
+  ['type_372',['type',['../structPrintPair.html#a70b3768e234cab7ffd2b6bf89ae6eb1b',1,'PrintPair']]]
 ];

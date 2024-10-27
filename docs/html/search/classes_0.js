@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['backtrace_242',['Backtrace',['../structBacktrace.html',1,'']]],
-  ['backtraceentry_243',['BacktraceEntry',['../structBacktraceEntry.html',1,'']]]
+  ['printpair_237',['PrintPair',['../structPrintPair.html',1,'']]],
+  ['ptrimpl_238',['PtrImpl',['../structPtrImpl.html',1,'']]]
 ];

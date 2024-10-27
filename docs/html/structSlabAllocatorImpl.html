@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Family: base/stream.c File Reference</title>
+<title>My Family: SlabAllocatorImpl Struct Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -60,64 +60,71 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_e914ee4d4a44400f1fdb170cb4ead18a.html">base</a></li>  </ul>
-</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#func-members">Functions</a>  </div>
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="structSlabAllocatorImpl-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">stream.c File Reference</div>  </div>
+<div class="title">SlabAllocatorImpl Struct Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="fam__err_8h_source.html">base/fam_err.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="os_8h_source.html">base/os.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="print__util_8h_source.html">base/print_util.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="stream_8h_source.html">base/stream.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
-</div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a02e149a0b10ee9b0d5ef5d1d69342784"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stream_8c.html#a02e149a0b10ee9b0d5ef5d1d69342784">sgets</a> (<a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *buf, <a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a> limit, <a class="el" href="structStream.html">Stream</a> *strm)</td></tr>
-<tr class="separator:a02e149a0b10ee9b0d5ef5d1d69342784"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:ab197e0c798bdf51f15ad804d96ddce8b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSlabAllocatorImpl.html#ab197e0c798bdf51f15ad804d96ddce8b">x</a></td></tr>
+<tr class="separator:ab197e0c798bdf51f15ad804d96ddce8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05c4383b2423958e5be3f26a80ad7cbd"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSlabAllocatorImpl.html#a05c4383b2423958e5be3f26a80ad7cbd">y</a></td></tr>
+<tr class="separator:a05c4383b2423958e5be3f26a80ad7cbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd727d2047838331f64986d8f2005cd3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structSlabAllocatorImpl.html#acd727d2047838331f64986d8f2005cd3">slabs</a> []</td></tr>
+<tr class="separator:acd727d2047838331f64986d8f2005cd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="a02e149a0b10ee9b0d5ef5d1d69342784"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02e149a0b10ee9b0d5ef5d1d69342784">&#9670;&nbsp;</a></span>sgets()</h2>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="acd727d2047838331f64986d8f2005cd3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd727d2047838331f64986d8f2005cd3">&#9670;&nbsp;</a></span>slabs</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a>* sgets </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="types_8h.html#aed742c436da53c1080638ce6ef7d13de">u8</a> *&#160;</td>
-          <td class="paramname"><em>buf</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#ad758b7a5c3f18ed79d2fcd23d9f16357">u64</a>&#160;</td>
-          <td class="paramname"><em>limit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="structStream.html">Stream</a> *&#160;</td>
-          <td class="paramname"><em>strm</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="memname"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> SlabAllocatorImpl::slabs[]</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
+<a id="ab197e0c798bdf51f15ad804d96ddce8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab197e0c798bdf51f15ad804d96ddce8b">&#9670;&nbsp;</a></span>x</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SlabAllocatorImpl::x</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a05c4383b2423958e5be3f26a80ad7cbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05c4383b2423958e5be3f26a80ad7cbd">&#9670;&nbsp;</a></span>y</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SlabAllocatorImpl::y</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>The documentation for this struct was generated from the following file:<ul>
+<li>base/<a class="el" href="slabs_8c.html">slabs.c</a></li>
+</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

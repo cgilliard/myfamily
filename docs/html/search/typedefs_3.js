@@ -1,7 +1,10 @@
 var searchData=
 [
-  ['i16_377',['i16',['../types_8h.html#ac12585a6def54773148d7fb2c72a59c5',1,'types.h']]],
-  ['i32_378',['i32',['../types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e',1,'types.h']]],
-  ['i64_379',['i64',['../types_8h.html#ada59a0de67c44384c6faa924ca63c2aa',1,'types.h']]],
-  ['i8_380',['i8',['../types_8h.html#a2d0b2d48b0784ffa5f75c39f46562729',1,'types.h']]]
+  ['slaballocatorconfignc_382',['SlabAllocatorConfigNc',['../slabs_8h.html#af73e1f5e9b22787839ae7fc8aaadb2af',1,'slabs.h']]],
+  ['slaballocatorimpl_383',['SlabAllocatorImpl',['../slabs_8c.html#ad6ffa373a6a31ed10a76d362881de351',1,'slabs.c']]],
+  ['slaballocatornc_384',['SlabAllocatorNc',['../slabs_8h.html#a0251654f379b88990eae97c1e9b96090',1,'slabs.h']]],
+  ['slabtype_385',['SlabType',['../slabs_8h.html#a164345ca17595ac22b14e665fcf4df71',1,'slabs.h']]],
+  ['stream_386',['Stream',['../stream_8h.html#a9e76c504c13a7baa62d7ea29c4af657b',1,'stream.h']]],
+  ['stringimpl_387',['stringImpl',['../string_8c.html#a32ed79fd5dd0e8aea89c44e0759d50b7',1,'string.c']]],
+  ['stringnc_388',['stringNc',['../string_8h.html#abf1fa133c9d183d517211d23ea3d44d1',1,'string.h']]]
 ];

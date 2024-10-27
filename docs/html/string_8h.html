@@ -67,65 +67,214 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#define-members">Macros</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">string.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
-<code>#include &lt;stddef.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="macro__util_8h_source.html">base/macro_util.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 </div>
 <p><a href="string_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structstringNc.html">stringNc</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:a7c25a3fc160b7b9eff79abfdb7845dd6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a7c25a3fc160b7b9eff79abfdb7845dd6">INIT_STRING</a>&#160;&#160;&#160;{.impl = <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>}</td></tr>
+<tr class="separator:a7c25a3fc160b7b9eff79abfdb7845dd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cc630b5a4ac206fbcb8794c4fcd8529"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a4cc630b5a4ac206fbcb8794c4fcd8529">EMPTY_STRING</a></td></tr>
+<tr class="separator:a4cc630b5a4ac206fbcb8794c4fcd8529"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25093e36e9fb377b246945a84745823f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a>&#160;&#160;&#160;<a class="el" href="structstringNc.html">stringNc</a> <a class="el" href="types_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="string_8h.html#a00af9cc7334f62bb26bf5ca736dbf1d1">string_cleanup</a>)))</td></tr>
+<tr class="separator:a25093e36e9fb377b246945a84745823f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8fda9883b2bfed39bb68544ad116285"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ac8fda9883b2bfed39bb68544ad116285">String_</a>(v)</td></tr>
+<tr class="separator:ac8fda9883b2bfed39bb68544ad116285"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39bd2df933b74f2947009e0d3a857983"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a39bd2df933b74f2947009e0d3a857983">String</a>(...)&#160;&#160;&#160;<a class="el" href="string_8h.html#ac8fda9883b2bfed39bb68544ad116285">String_</a>(__VA_OPT__(__VA_ARGS__) __VA_OPT__(<a class="el" href="macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(0ULL))</td></tr>
+<tr class="separator:a39bd2df933b74f2947009e0d3a857983"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94450f03aadd627d7b6503e9ce996b5c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a94450f03aadd627d7b6503e9ce996b5c">nil_string</a>(s)&#160;&#160;&#160;(s.impl == <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>)</td></tr>
+<tr class="separator:a94450f03aadd627d7b6503e9ce996b5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed13d8bde4d13ff8d0da4813962dbe9e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#aed13d8bde4d13ff8d0da4813962dbe9e">nil</a>(s)&#160;&#160;&#160;<a class="el" href="string_8h.html#a94450f03aadd627d7b6503e9ce996b5c">nil_string</a>(s)</td></tr>
+<tr class="separator:aed13d8bde4d13ff8d0da4813962dbe9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a020a20794207b03acea14779bd5e4f6e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a020a20794207b03acea14779bd5e4f6e">string_append</a>(s,  v, ...)</td></tr>
+<tr class="separator:a020a20794207b03acea14779bd5e4f6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31f7c5ba28f3536f500bb1e76b4884d5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a31f7c5ba28f3536f500bb1e76b4884d5">append</a>(...)&#160;&#160;&#160;<a class="el" href="string_8h.html#a020a20794207b03acea14779bd5e4f6e">string_append</a>(__VA_ARGS__)</td></tr>
+<tr class="separator:a31f7c5ba28f3536f500bb1e76b4884d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7481247da0b5fdf3d163479fef798305"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a7481247da0b5fdf3d163479fef798305">string_equal_</a>(s1,  s2)</td></tr>
+<tr class="separator:a7481247da0b5fdf3d163479fef798305"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d6ed04e968999c40fd319dbc537b9db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a4d6ed04e968999c40fd319dbc537b9db">equal</a>(s1,  s2)&#160;&#160;&#160;<a class="el" href="string_8h.html#a7481247da0b5fdf3d163479fef798305">string_equal_</a>(s1, s2)</td></tr>
+<tr class="separator:a4d6ed04e968999c40fd319dbc537b9db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89e36eed93508d170069a65b583a6147"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a89e36eed93508d170069a65b583a6147">len</a>(s)&#160;&#160;&#160;<a class="el" href="string_8h.html#a2291de2ac64d74d597ba1c970fdc92c1">string_len</a>(&amp;s)</td></tr>
+<tr class="separator:a89e36eed93508d170069a65b583a6147"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a458b860f2c8397fff086be0bf4d91566"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a458b860f2c8397fff086be0bf4d91566">substring</a>(src,  begin, ...)</td></tr>
+<tr class="separator:a458b860f2c8397fff086be0bf4d91566"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae83ac05b06c5a06d1ddf95f7e9cbf13c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ae83ac05b06c5a06d1ddf95f7e9cbf13c">char_at</a>(s,  index)&#160;&#160;&#160;<a class="el" href="string_8h.html#a8a388b14e9e3399b7400a5a1433468f8">string_char_at</a>(s, index)</td></tr>
+<tr class="separator:ae83ac05b06c5a06d1ddf95f7e9cbf13c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0619272e2562d7bb8c596d76ba165c18"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a0619272e2562d7bb8c596d76ba165c18">index_of</a>(s1,  s2)</td></tr>
+<tr class="separator:a0619272e2562d7bb8c596d76ba165c18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6cc53df02bccf704fead286d95befe2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ac6cc53df02bccf704fead286d95befe2">last_index_of</a>(s1,  s2)</td></tr>
+<tr class="separator:ac6cc53df02bccf704fead286d95befe2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07d8b30adc93efa838fc88bdd8bbc638"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a07d8b30adc93efa838fc88bdd8bbc638">move</a>(x,  y)&#160;&#160;&#160;<a class="el" href="string_8h.html#ad368b011863ec560e8772bc498fde298">string_move</a>(&amp;x, &amp;y)</td></tr>
+<tr class="separator:a07d8b30adc93efa838fc88bdd8bbc638"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:abf1fa133c9d183d517211d23ea3d44d1"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structstringNc.html">stringNc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#abf1fa133c9d183d517211d23ea3d44d1">stringNc</a></td></tr>
+<tr class="separator:abf1fa133c9d183d517211d23ea3d44d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a6ebbb3e5407b95e93a3859b51fff26b7"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a6ebbb3e5407b95e93a3859b51fff26b7">memcpy</a> (void *dest_str, const void *src_str, size_t n)</td></tr>
-<tr class="separator:a6ebbb3e5407b95e93a3859b51fff26b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd3d965fd7cbd3474bbac6cfaed8bd46"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#abd3d965fd7cbd3474bbac6cfaed8bd46">memcmp</a> (const void *str1, const void *str2, size_t n)</td></tr>
-<tr class="separator:abd3d965fd7cbd3474bbac6cfaed8bd46"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9d2945f3287c77eed5129b32004d12b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ab9d2945f3287c77eed5129b32004d12b">strncmp</a> (const char *lhs, const char *rhs, size_t n)</td></tr>
-<tr class="separator:ab9d2945f3287c77eed5129b32004d12b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a950253f740adc3445276841d3e4a11d5"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a950253f740adc3445276841d3e4a11d5">strnlen</a> (const char *s, size_t n)</td></tr>
-<tr class="separator:a950253f740adc3445276841d3e4a11d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c10a214b02eed3dafc48c59ad71abbd"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a4c10a214b02eed3dafc48c59ad71abbd">strncat</a> (char *s1, const char *s2, size_t n)</td></tr>
-<tr class="separator:a4c10a214b02eed3dafc48c59ad71abbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7982e2515766b25c1157ac30f8bac394"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a7982e2515766b25c1157ac30f8bac394">strncpy</a> (char *s1, const char *s2, size_t n)</td></tr>
-<tr class="separator:a7982e2515766b25c1157ac30f8bac394"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1eb9cae61e6a6282c28dbc298ef7297e"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a1eb9cae61e6a6282c28dbc298ef7297e">strcpy</a> (char *s1, const char *s2)</td></tr>
-<tr class="separator:a1eb9cae61e6a6282c28dbc298ef7297e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a250ad4738d1db2c1097567fb6559deb1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a250ad4738d1db2c1097567fb6559deb1">snprintf</a> (char *__restrict __str, size_t __size, const char *__restrict __format,...)</td></tr>
-<tr class="separator:a250ad4738d1db2c1097567fb6559deb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fe7aeda0be4b5e4e506d27a2179ed1c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a9fe7aeda0be4b5e4e506d27a2179ed1c">memset</a> (void *str, <a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> c, size_t n)</td></tr>
-<tr class="separator:a9fe7aeda0be4b5e4e506d27a2179ed1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a49528e0f41fbe58c77917f612cf733d4"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a49528e0f41fbe58c77917f612cf733d4">strlen</a> (const char *)</td></tr>
-<tr class="separator:a49528e0f41fbe58c77917f612cf733d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb923ee2a7a01f82eb1e2f8ae188c6d4"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#aeb923ee2a7a01f82eb1e2f8ae188c6d4">strstr</a> (const char *s1, const char *s2)</td></tr>
-<tr class="separator:aeb923ee2a7a01f82eb1e2f8ae188c6d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00af9cc7334f62bb26bf5ca736dbf1d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a00af9cc7334f62bb26bf5ca736dbf1d1">string_cleanup</a> (<a class="el" href="structstringNc.html">stringNc</a> *ptr)</td></tr>
+<tr class="separator:a00af9cc7334f62bb26bf5ca736dbf1d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6a1861b62cb78878c694b4d66730a2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ae6a1861b62cb78878c694b4d66730a2c">string_create</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s)</td></tr>
+<tr class="separator:ae6a1861b62cb78878c694b4d66730a2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d61f6d7c12bf87eac137bdc27e08a10"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a9d61f6d7c12bf87eac137bdc27e08a10">string_create_cs</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const char *s2)</td></tr>
+<tr class="separator:a9d61f6d7c12bf87eac137bdc27e08a10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8fb3ab0f82a14c8df1dc080d0663a6f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#af8fb3ab0f82a14c8df1dc080d0663a6f">string_create_ch</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *s2, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> <a class="el" href="string_8h.html#a89e36eed93508d170069a65b583a6147">len</a>)</td></tr>
+<tr class="separator:af8fb3ab0f82a14c8df1dc080d0663a6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a840bf913db3cea16364f77df2eea28fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a840bf913db3cea16364f77df2eea28fb">string_create_s</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="separator:a840bf913db3cea16364f77df2eea28fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60b03cf6411be3aea9ad3d42970f610d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a60b03cf6411be3aea9ad3d42970f610d">string_append_ch</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *s2, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> <a class="el" href="string_8h.html#a89e36eed93508d170069a65b583a6147">len</a>)</td></tr>
+<tr class="separator:a60b03cf6411be3aea9ad3d42970f610d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e26524559e9d4ca9f400a74f0d72adc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a8e26524559e9d4ca9f400a74f0d72adc">string_append_s</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="separator:a8e26524559e9d4ca9f400a74f0d72adc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2291de2ac64d74d597ba1c970fdc92c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a2291de2ac64d74d597ba1c970fdc92c1">string_len</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s)</td></tr>
+<tr class="separator:a2291de2ac64d74d597ba1c970fdc92c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a943cac39392a0608d434b03ac77c9c0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a943cac39392a0608d434b03ac77c9c0b">string_index_of</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="separator:a943cac39392a0608d434b03ac77c9c0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dfb4e5fb124165d8495a6601ca74845"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a3dfb4e5fb124165d8495a6601ca74845">string_last_index_of</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="separator:a3dfb4e5fb124165d8495a6601ca74845"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae18fd42681f94f64d1b1201d1fa4bde5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ae18fd42681f94f64d1b1201d1fa4bde5">string_substring</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *dst, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *src, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> begin)</td></tr>
+<tr class="separator:ae18fd42681f94f64d1b1201d1fa4bde5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7c1bf9c65373ce6b27d76a39c0a1a32"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ab7c1bf9c65373ce6b27d76a39c0a1a32">string_substring_s</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *dst, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *src, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> begin, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> end)</td></tr>
+<tr class="separator:ab7c1bf9c65373ce6b27d76a39c0a1a32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a388b14e9e3399b7400a5a1433468f8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a8a388b14e9e3399b7400a5a1433468f8">string_char_at</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> index)</td></tr>
+<tr class="separator:a8a388b14e9e3399b7400a5a1433468f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80336ad6119dedd8d87c5bc0175592cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a80336ad6119dedd8d87c5bc0175592cd">string_equal</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="separator:a80336ad6119dedd8d87c5bc0175592cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad368b011863ec560e8772bc498fde298"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ad368b011863ec560e8772bc498fde298">string_move</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="separator:ad368b011863ec560e8772bc498fde298"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7cb8b253727a70b68b5d45b9b80923c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a7cb8b253727a70b68b5d45b9b80923c3">cstring_len</a> (const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *S)</td></tr>
+<tr class="separator:a7cb8b253727a70b68b5d45b9b80923c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8dbdcdbb139284c38740c84a8ff74265"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a8dbdcdbb139284c38740c84a8ff74265">cstring</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s)</td></tr>
+<tr class="separator:a8dbdcdbb139284c38740c84a8ff74265"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="abd3d965fd7cbd3474bbac6cfaed8bd46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd3d965fd7cbd3474bbac6cfaed8bd46">&#9670;&nbsp;</a></span>memcmp()</h2>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="a31f7c5ba28f3536f500bb1e76b4884d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31f7c5ba28f3536f500bb1e76b4884d5">&#9670;&nbsp;</a></span>append</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> memcmp </td>
+          <td class="memname">#define append</td>
           <td>(</td>
-          <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>str1</em>, </td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="string_8h.html#a020a20794207b03acea14779bd5e4f6e">string_append</a>(__VA_ARGS__)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae83ac05b06c5a06d1ddf95f7e9cbf13c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae83ac05b06c5a06d1ddf95f7e9cbf13c">&#9670;&nbsp;</a></span>char_at</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define char_at</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>str2</em>, </td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">index&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="string_8h.html#a8a388b14e9e3399b7400a5a1433468f8">string_char_at</a>(s, index)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4cc630b5a4ac206fbcb8794c4fcd8529"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4cc630b5a4ac206fbcb8794c4fcd8529">&#9670;&nbsp;</a></span>EMPTY_STRING</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define EMPTY_STRING</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
+<div class="line">        stringNc _empty__ = <a class="code" href="string_8h.html#a7c25a3fc160b7b9eff79abfdb7845dd6">INIT_STRING</a>;                                                           \</div>
+<div class="line">        _empty__;                                                                                  \</div>
+<div class="line">    })</div>
+<div class="ttc" id="astring_8h_html_a7c25a3fc160b7b9eff79abfdb7845dd6"><div class="ttname"><a href="string_8h.html#a7c25a3fc160b7b9eff79abfdb7845dd6">INIT_STRING</a></div><div class="ttdeci">#define INIT_STRING</div><div class="ttdef"><b>Definition:</b> string.h:27</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a4d6ed04e968999c40fd319dbc537b9db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d6ed04e968999c40fd319dbc537b9db">&#9670;&nbsp;</a></span>equal</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define equal</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s1, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em>&#160;</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s2&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="string_8h.html#a7481247da0b5fdf3d163479fef798305">string_equal_</a>(s1, s2)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0619272e2562d7bb8c596d76ba165c18"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0619272e2562d7bb8c596d76ba165c18">&#9670;&nbsp;</a></span>index_of</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define index_of</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s1, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s2&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -134,32 +283,46 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    _Generic((s2), <span class="keywordtype">string</span>: ({ <a class="code" href="string_8h.html#a943cac39392a0608d434b03ac77c9c0b">string_index_of</a>(&amp;s1, (<span class="keywordtype">string</span> *)&amp;s2); }), <span class="keywordflow">default</span>: ({                 \</div>
+<div class="line">                 string _tmp__ = <a class="code" href="string_8h.html#a39bd2df933b74f2947009e0d3a857983">String</a>(s2);                                                       \</div>
+<div class="line">                 string_index_of(&amp;s1, (<span class="keywordtype">string</span> *)&amp;_tmp__);                                          \</div>
+<div class="line">             }))</div>
+<div class="ttc" id="astring_8h_html_a39bd2df933b74f2947009e0d3a857983"><div class="ttname"><a href="string_8h.html#a39bd2df933b74f2947009e0d3a857983">String</a></div><div class="ttdeci">#define String(...)</div><div class="ttdef"><b>Definition:</b> string.h:49</div></div>
+<div class="ttc" id="astring_8h_html_a943cac39392a0608d434b03ac77c9c0b"><div class="ttname"><a href="string_8h.html#a943cac39392a0608d434b03ac77c9c0b">string_index_of</a></div><div class="ttdeci">int64 string_index_of(const string *s1, const string *s2)</div><div class="ttdef"><b>Definition:</b> string.c:116</div></div>
+</div><!-- fragment -->
 </div>
 </div>
-<a id="a6ebbb3e5407b95e93a3859b51fff26b7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6ebbb3e5407b95e93a3859b51fff26b7">&#9670;&nbsp;</a></span>memcpy()</h2>
+<a id="a7c25a3fc160b7b9eff79abfdb7845dd6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c25a3fc160b7b9eff79abfdb7845dd6">&#9670;&nbsp;</a></span>INIT_STRING</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* memcpy </td>
+          <td class="memname">#define INIT_STRING&#160;&#160;&#160;{.impl = <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>}</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac6cc53df02bccf704fead286d95befe2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6cc53df02bccf704fead286d95befe2">&#9670;&nbsp;</a></span>last_index_of</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define last_index_of</td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>dest_str</em>, </td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s1, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>src_str</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em>&#160;</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s2&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -168,66 +331,180 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    _Generic((s2), <span class="keywordtype">string</span>: ({ <a class="code" href="string_8h.html#a3dfb4e5fb124165d8495a6601ca74845">string_last_index_of</a>(&amp;s1, (<span class="keywordtype">string</span> *)&amp;s2); }), <span class="keywordflow">default</span>: ({            \</div>
+<div class="line">                 string _tmp__ = <a class="code" href="string_8h.html#a39bd2df933b74f2947009e0d3a857983">String</a>(s2);                                                       \</div>
+<div class="line">                 string_last_index_of(&amp;s1, (<span class="keywordtype">string</span> *)&amp;_tmp__);                                     \</div>
+<div class="line">             }))</div>
+<div class="ttc" id="astring_8h_html_a3dfb4e5fb124165d8495a6601ca74845"><div class="ttname"><a href="string_8h.html#a3dfb4e5fb124165d8495a6601ca74845">string_last_index_of</a></div><div class="ttdeci">int64 string_last_index_of(const string *s1, const string *s2)</div><div class="ttdef"><b>Definition:</b> string.c:147</div></div>
+</div><!-- fragment -->
 </div>
 </div>
-<a id="a9fe7aeda0be4b5e4e506d27a2179ed1c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9fe7aeda0be4b5e4e506d27a2179ed1c">&#9670;&nbsp;</a></span>memset()</h2>
+<a id="a89e36eed93508d170069a65b583a6147"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89e36eed93508d170069a65b583a6147">&#9670;&nbsp;</a></span>len</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* memset </td>
+          <td class="memname">#define len</td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>str</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a>&#160;</td>
-          <td class="paramname"><em>c</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="string_8h.html#a2291de2ac64d74d597ba1c970fdc92c1">string_len</a>(&amp;s)</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a250ad4738d1db2c1097567fb6559deb1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a250ad4738d1db2c1097567fb6559deb1">&#9670;&nbsp;</a></span>snprintf()</h2>
+<a id="a07d8b30adc93efa838fc88bdd8bbc638"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07d8b30adc93efa838fc88bdd8bbc638">&#9670;&nbsp;</a></span>move</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> snprintf </td>
+          <td class="memname">#define move</td>
           <td>(</td>
-          <td class="paramtype">char *__restrict&#160;</td>
-          <td class="paramname"><em>__str</em>, </td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>__size</em>, </td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">y&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="string_8h.html#ad368b011863ec560e8772bc498fde298">string_move</a>(&amp;x, &amp;y)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aed13d8bde4d13ff8d0da4813962dbe9e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed13d8bde4d13ff8d0da4813962dbe9e">&#9670;&nbsp;</a></span>nil</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define nil</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="string_8h.html#a94450f03aadd627d7b6503e9ce996b5c">nil_string</a>(s)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a94450f03aadd627d7b6503e9ce996b5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94450f03aadd627d7b6503e9ce996b5c">&#9670;&nbsp;</a></span>nil_string</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define nil_string</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s</td><td>)</td>
+          <td>&#160;&#160;&#160;(s.impl == <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a25093e36e9fb377b246945a84745823f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25093e36e9fb377b246945a84745823f">&#9670;&nbsp;</a></span>string</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define string&#160;&#160;&#160;<a class="el" href="structstringNc.html">stringNc</a> <a class="el" href="types_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a>((warn_unused_result, cleanup(<a class="el" href="string_8h.html#a00af9cc7334f62bb26bf5ca736dbf1d1">string_cleanup</a>)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a39bd2df933b74f2947009e0d3a857983"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39bd2df933b74f2947009e0d3a857983">&#9670;&nbsp;</a></span>String</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define String</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em></td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="string_8h.html#ac8fda9883b2bfed39bb68544ad116285">String_</a>(__VA_OPT__(__VA_ARGS__) __VA_OPT__(<a class="el" href="macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(0ULL))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac8fda9883b2bfed39bb68544ad116285"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8fda9883b2bfed39bb68544ad116285">&#9670;&nbsp;</a></span>String_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define String_</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
+<div class="line">        stringNc _ret__ = <a class="code" href="string_8h.html#a7c25a3fc160b7b9eff79abfdb7845dd6">INIT_STRING</a>;                                                             \</div>
+<div class="line">        _Generic((v),                                                                              \</div>
+<div class="line">            <span class="keywordtype">char</span> *: ({                                                                             \</div>
+<div class="line">                     char *val = _Generic((v), <span class="keywordtype">char</span> *: v, <span class="keywordflow">default</span>: <a class="code" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>);                          \</div>
+<div class="line">                     string_create_cs(&amp;_ret__, (<span class="keywordtype">char</span> *)val);                                       \</div>
+<div class="line">                 }),                                                                               \</div>
+<div class="line">            <span class="keywordtype">string</span>: ({                                                                             \</div>
+<div class="line">                     stringNc val = _Generic((v), <span class="keywordtype">string</span>: v, <span class="keywordflow">default</span>: <a class="code" href="string_8h.html#a4cc630b5a4ac206fbcb8794c4fcd8529">EMPTY_STRING</a>);               \</div>
+<div class="line">                     string_create_s(&amp;_ret__, &amp;val);                                               \</div>
+<div class="line">                 }),                                                                               \</div>
+<div class="line">            <span class="keywordflow">default</span>: <a class="code" href="string_8h.html#ae6a1861b62cb78878c694b4d66730a2c">string_create</a>(&amp;_ret__));                                                      \</div>
+<div class="line">        _ret__;                                                                                    \</div>
+<div class="line">    })</div>
+<div class="ttc" id="astring_8h_html_a4cc630b5a4ac206fbcb8794c4fcd8529"><div class="ttname"><a href="string_8h.html#a4cc630b5a4ac206fbcb8794c4fcd8529">EMPTY_STRING</a></div><div class="ttdeci">#define EMPTY_STRING</div><div class="ttdef"><b>Definition:</b> string.h:28</div></div>
+<div class="ttc" id="astring_8h_html_ae6a1861b62cb78878c694b4d66730a2c"><div class="ttname"><a href="string_8h.html#ae6a1861b62cb78878c694b4d66730a2c">string_create</a></div><div class="ttdeci">int64 string_create(string *s)</div><div class="ttdef"><b>Definition:</b> string.c:41</div></div>
+<div class="ttc" id="atypes_8h_html_a070d2ce7b6bb7e5c05602aa8c308d0c4"><div class="ttname"><a href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></div><div class="ttdeci">#define NULL</div><div class="ttdef"><b>Definition:</b> types.h:35</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a020a20794207b03acea14779bd5e4f6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a020a20794207b03acea14779bd5e4f6e">&#9670;&nbsp;</a></span>string_append</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define string_append</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *__restrict&#160;</td>
-          <td class="paramname"><em>__format</em>, </td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -242,26 +519,33 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    _Generic((v), <span class="keywordtype">string</span>: ({ <a class="code" href="string_8h.html#a8e26524559e9d4ca9f400a74f0d72adc">string_append_s</a>(&amp;s, (<span class="keywordtype">string</span> *)&amp;v); }), <span class="keywordflow">default</span>: ({                    \</div>
+<div class="line">                 int64 _len__ = __VA_OPT__(__VA_ARGS__) __VA_OPT__(<a class="code" href="macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="code" href="string_8h.html#a7cb8b253727a70b68b5d45b9b80923c3">cstring_len</a>((<span class="keywordtype">byte</span> *)&amp;v)); \</div>
+<div class="line">                 string_append_ch(&amp;s, (<span class="keywordtype">byte</span> *)&amp;v, _len__);                                         \</div>
+<div class="line">             }))</div>
+<div class="ttc" id="amacro__util_8h_html_ae2a0fdb2b3c3ae31c3fef23f8286af29"><div class="ttname"><a href="macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a></div><div class="ttdeci">#define NONE(...)</div><div class="ttdef"><b>Definition:</b> macro_util.h:26</div></div>
+<div class="ttc" id="astring_8h_html_a7cb8b253727a70b68b5d45b9b80923c3"><div class="ttname"><a href="string_8h.html#a7cb8b253727a70b68b5d45b9b80923c3">cstring_len</a></div><div class="ttdeci">int64 cstring_len(const byte *S)</div><div class="ttdef"><b>Definition:</b> string.c:25</div></div>
+<div class="ttc" id="astring_8h_html_a8e26524559e9d4ca9f400a74f0d72adc"><div class="ttname"><a href="string_8h.html#a8e26524559e9d4ca9f400a74f0d72adc">string_append_s</a></div><div class="ttdeci">int64 string_append_s(string *s, const string *s2)</div><div class="ttdef"><b>Definition:</b> string.c:74</div></div>
+</div><!-- fragment -->
 </div>
 </div>
-<a id="a1eb9cae61e6a6282c28dbc298ef7297e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1eb9cae61e6a6282c28dbc298ef7297e">&#9670;&nbsp;</a></span>strcpy()</h2>
+<a id="a7481247da0b5fdf3d163479fef798305"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7481247da0b5fdf3d163479fef798305">&#9670;&nbsp;</a></span>string_equal_</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* strcpy </td>
+          <td class="memname">#define string_equal_</td>
           <td>(</td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>s1</em>, </td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s1, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>s2</em>&#160;</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">s2&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -270,50 +554,37 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    _Generic((s2), <span class="keywordtype">string</span>: ({ <a class="code" href="string_8h.html#a80336ad6119dedd8d87c5bc0175592cd">string_equal</a>(&amp;s1, (<span class="keywordtype">string</span> *)&amp;s2); }), <span class="keywordflow">default</span>: ({                    \</div>
+<div class="line">                 string _tmp__ = <a class="code" href="string_8h.html#a39bd2df933b74f2947009e0d3a857983">String</a>(s2);                                                       \</div>
+<div class="line">                 string_equal(&amp;s1, &amp;_tmp__);                                                       \</div>
+<div class="line">             }))</div>
+<div class="ttc" id="astring_8h_html_a80336ad6119dedd8d87c5bc0175592cd"><div class="ttname"><a href="string_8h.html#a80336ad6119dedd8d87c5bc0175592cd">string_equal</a></div><div class="ttdeci">int64 string_equal(const string *s1, const string *s2)</div><div class="ttdef"><b>Definition:</b> string.c:224</div></div>
+</div><!-- fragment -->
 </div>
 </div>
-<a id="a49528e0f41fbe58c77917f612cf733d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a49528e0f41fbe58c77917f612cf733d4">&#9670;&nbsp;</a></span>strlen()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned long strlen </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a4c10a214b02eed3dafc48c59ad71abbd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c10a214b02eed3dafc48c59ad71abbd">&#9670;&nbsp;</a></span>strncat()</h2>
+<a id="a458b860f2c8397fff086be0bf4d91566"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a458b860f2c8397fff086be0bf4d91566">&#9670;&nbsp;</a></span>substring</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* strncat </td>
+          <td class="memname">#define substring</td>
           <td>(</td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>s1</em>, </td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">src, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>s2</em>, </td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">begin, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em>&#160;</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -322,94 +593,91 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
+<div class="line">        stringNc _ret__ = <a class="code" href="string_8h.html#a7c25a3fc160b7b9eff79abfdb7845dd6">INIT_STRING</a>;                                                             \</div>
+<div class="line">        int64 _len__ = __VA_OPT__(__VA_ARGS__) __VA_OPT__(<a class="code" href="macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="code" href="string_8h.html#a2291de2ac64d74d597ba1c970fdc92c1">string_len</a>(&amp;src));                 \</div>
+<div class="line">        string_substring_s(&amp;_ret__, &amp;src, begin, _len__);                                          \</div>
+<div class="line">        _ret__;                                                                                    \</div>
+<div class="line">    })</div>
+<div class="ttc" id="astring_8h_html_a2291de2ac64d74d597ba1c970fdc92c1"><div class="ttname"><a href="string_8h.html#a2291de2ac64d74d597ba1c970fdc92c1">string_len</a></div><div class="ttdeci">int64 string_len(const string *s)</div><div class="ttdef"><b>Definition:</b> string.c:107</div></div>
+</div><!-- fragment -->
 </div>
 </div>
-<a id="ab9d2945f3287c77eed5129b32004d12b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab9d2945f3287c77eed5129b32004d12b">&#9670;&nbsp;</a></span>strncmp()</h2>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="abf1fa133c9d183d517211d23ea3d44d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf1fa133c9d183d517211d23ea3d44d1">&#9670;&nbsp;</a></span>stringNc</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a9e3ad5f8e752f01d926ce122d5a5285e">i32</a> strncmp </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>lhs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>rhs</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="memname">typedef struct <a class="el" href="structstringNc.html">stringNc</a> <a class="el" href="structstringNc.html">stringNc</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a7982e2515766b25c1157ac30f8bac394"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7982e2515766b25c1157ac30f8bac394">&#9670;&nbsp;</a></span>strncpy()</h2>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a8dbdcdbb139284c38740c84a8ff74265"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8dbdcdbb139284c38740c84a8ff74265">&#9670;&nbsp;</a></span>cstring()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* strncpy </td>
+          <td class="memname"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a>* cstring </td>
           <td>(</td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>s1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>s2</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<a id="a950253f740adc3445276841d3e4a11d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a950253f740adc3445276841d3e4a11d5">&#9670;&nbsp;</a></span>strnlen()</h2>
+<a id="a7cb8b253727a70b68b5d45b9b80923c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7cb8b253727a70b68b5d45b9b80923c3">&#9670;&nbsp;</a></span>cstring_len()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">unsigned long strnlen </td>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> cstring_len </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *&#160;</td>
+          <td class="paramname"><em>S</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a60b03cf6411be3aea9ad3d42970f610d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60b03cf6411be3aea9ad3d42970f610d">&#9670;&nbsp;</a></span>string_append_ch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_append_ch </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>n</em>&#160;</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *&#160;</td>
+          <td class="paramname"><em>s2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramname"><em>len</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -421,23 +689,381 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aeb923ee2a7a01f82eb1e2f8ae188c6d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb923ee2a7a01f82eb1e2f8ae188c6d4">&#9670;&nbsp;</a></span>strstr()</h2>
+<a id="a8e26524559e9d4ca9f400a74f0d72adc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8e26524559e9d4ca9f400a74f0d72adc">&#9670;&nbsp;</a></span>string_append_s()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">char* strstr </td>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_append_s </td>
           <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>s1</em>, </td>
+          <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8a388b14e9e3399b7400a5a1433468f8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a388b14e9e3399b7400a5a1433468f8">&#9670;&nbsp;</a></span>string_char_at()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> string_char_at </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramname"><em>index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a00af9cc7334f62bb26bf5ca736dbf1d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00af9cc7334f62bb26bf5ca736dbf1d1">&#9670;&nbsp;</a></span>string_cleanup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void string_cleanup </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structstringNc.html">stringNc</a> *&#160;</td>
+          <td class="paramname"><em>ptr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae6a1861b62cb78878c694b4d66730a2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae6a1861b62cb78878c694b4d66730a2c">&#9670;&nbsp;</a></span>string_create()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_create </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af8fb3ab0f82a14c8df1dc080d0663a6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8fb3ab0f82a14c8df1dc080d0663a6f">&#9670;&nbsp;</a></span>string_create_ch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_create_ch </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *&#160;</td>
+          <td class="paramname"><em>s2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramname"><em>len</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9d61f6d7c12bf87eac137bdc27e08a10"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9d61f6d7c12bf87eac137bdc27e08a10">&#9670;&nbsp;</a></span>string_create_cs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_create_cs </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const char *&#160;</td>
           <td class="paramname"><em>s2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a840bf913db3cea16364f77df2eea28fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a840bf913db3cea16364f77df2eea28fb">&#9670;&nbsp;</a></span>string_create_s()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_create_s </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a80336ad6119dedd8d87c5bc0175592cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80336ad6119dedd8d87c5bc0175592cd">&#9670;&nbsp;</a></span>string_equal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_equal </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a943cac39392a0608d434b03ac77c9c0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a943cac39392a0608d434b03ac77c9c0b">&#9670;&nbsp;</a></span>string_index_of()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_index_of </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3dfb4e5fb124165d8495a6601ca74845"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3dfb4e5fb124165d8495a6601ca74845">&#9670;&nbsp;</a></span>string_last_index_of()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_last_index_of </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2291de2ac64d74d597ba1c970fdc92c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2291de2ac64d74d597ba1c970fdc92c1">&#9670;&nbsp;</a></span>string_len()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_len </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad368b011863ec560e8772bc498fde298"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad368b011863ec560e8772bc498fde298">&#9670;&nbsp;</a></span>string_move()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void string_move </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>s2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae18fd42681f94f64d1b1201d1fa4bde5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae18fd42681f94f64d1b1201d1fa4bde5">&#9670;&nbsp;</a></span>string_substring()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_substring </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramname"><em>begin</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab7c1bf9c65373ce6b27d76a39c0a1a32"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7c1bf9c65373ce6b27d76a39c0a1a32">&#9670;&nbsp;</a></span>string_substring_s()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_substring_s </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>dst</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramname"><em>begin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramname"><em>end</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

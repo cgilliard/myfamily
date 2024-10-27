@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['value_237',['value',['../structF64Wrap.html#ab09b4458fb15f30c780b41079298ba55',1,'F64Wrap']]]
+  ['x_232',['x',['../structSlabAllocatorImpl.html#ab197e0c798bdf51f15ad804d96ddce8b',1,'SlabAllocatorImpl']]],
+  ['xxdir_2ec_233',['xxdir.c',['../xxdir_8c.html',1,'']]]
 ];
