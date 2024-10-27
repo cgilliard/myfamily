@@ -66,25 +66,16 @@ typedef struct SlabAllocatorImpl {
 	byte slabs[];
 } SlabAllocatorImpl;
 
-#include <stdio.h>
-#include <string.h>
-
 void slab_allocator_cleanup(SlabAllocator *ptr) {
 	SlabAllocatorNc sa = *ptr;
-	printf("cleanup sa %i %i %s\n", sa->x, sa->y, sa->slabs);
-	printf("cleanup sa\n");
 }
 
 SlabAllocator slab_allocator_create(SlabAllocatorConfig *sc) {
 	SlabAllocatorNc ret = (SlabAllocatorImpl *)alloc(sizeof(SlabAllocatorImpl) + 3, false);
-	ret->x = 1;
-	ret->y = 2;
-	strcpy(ret->slabs, "ok");
 	return ret;
 }
 
 void slab_allocator_print(SlabAllocator ptr) {
-	printf("x=%i\n", ptr->x);
 }
 
 #ifdef TEST

@@ -61,10 +61,10 @@ static const PrintPair __termination_print_pair__ = {.type = PrintTypeTerm};
 				 memcpy(pair.buf, &(bool) {(bool)v}, sizeof(bool));                                \
 				 pair;                                                                             \
 			 }),                                                                                   \
-		dec: ({                                                                                    \
+		float64: ({                                                                                \
 				 PrintPair pair = {.type = PrintTypeF64};                                          \
-				 dec val = _Generic((v), dec: v, default: 0.0);                                    \
-				 memcpy(pair.buf, &(dec) {val}, sizeof(dec));                                      \
+				 float64 val = _Generic((v), float64: v, default: 0.0);                            \
+				 memcpy(pair.buf, &(float64) {val}, sizeof(float64));                              \
 				 pair;                                                                             \
 			 }),                                                                                   \
 		byte *: ({                                                                                 \

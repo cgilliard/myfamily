@@ -18,7 +18,6 @@
 #include <base/os.h>
 #include <base/print_util.h>
 #include <base/string.h>
-#include <inttypes.h>
 
 #define BUF_LEN 64
 

@@ -12,44 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// #include <base/print_util.h>
+#include <base/osdef.h>
 #include <base/types.h>
-// #include <stdio.h>
-// #include <stdlib.h>
+#include <stdio.h>
 
-/*
-void panic(const u8 *s) {
-	printf("Panic: %s\n", s);
+void __attribute__((no_return)) panic(const char *message) {
+	fprintf(stderr, "%s\n", message);
 	exit(-1);
-}
-
-bool __is_little_endian() {
-	u16 test = 0x1;
-	return (*(u8 *)&test == 0x1);
 }
 
 void __attribute__((constructor)) __check_64bit_arch__() {
 #if !defined(__x86_64__) && !defined(_M_X64) && !defined(__aarch64__)
-	panic("This program requires a 64-bit architecture to run.");
+	panic("Supported architectures: __x86_64__, _M_X64, and __aarch64__");
 #endif // arch
+
+	// check size_t
 	if (__SIZEOF_SIZE_T__ != 8)
-		panic("This program requires a 64-bit architecture to run.");
-	if (sizeof(u8) != 1 || sizeof(u16) != 2 || sizeof(u32) != 4 || sizeof(u64) != 8 ||
-		sizeof(u128) != 16 || sizeof(i8) != 1 || sizeof(i16) != 2 || sizeof(i32) != 4 ||
-		sizeof(i64) != 8 || sizeof(i128) != 16 || sizeof(f32) != 4 || sizeof(f64) != 8 ||
-		sizeof(bool) != 1) {
-		panic("Invalid data type size! Check your c compiler configuration options.");
-	}
+		panic("size_t must be 8 bytes. Invalid arch!");
+	// check primitive types
+	if (sizeof(byte) != 1)
+		panic("byte must be 1 byte. Invalid arch!");
 
-	if (!__is_little_endian()) {
-		panic("Big endian systems not supported");
-	}
+	if (sizeof(int64) != 8)
+		panic("must be 8 bytes. Invalid arch!");
 
-	if (sizeof(au64) != 8) {
-		panic("Unexpected size for atomic_ullong. Check your compiler and architecture.");
-	}
-	if (sizeof(au32) != 4) {
-		panic("Unexpected size for atomic_uint. Check your compiler and architecture.");
+	if (sizeof(int) != 4)
+		panic("int must be 4 bytes. Invalid arch!");
+
+	if (sizeof(float64) != 8)
+		panic("float64 must be 8 bytes. Invalid arch!");
+
+	if (sizeof(bool) != 1)
+		panic("bool must be 1 byte. Invalid arch!");
+
+	if (sizeof(aint64) != 8)
+		panic("aint64 must be 8 bytes. Invalid arch!");
+
+	if (sizeof(abool) != 1)
+		panic("abool must be 1 byte. Invalid arch!");
+
+	// little endian check
+	int test = 0x1;
+	if (*(byte *)&test != 0x1) {
+		panic("Big endian is not supported!");
 	}
 }
-*/

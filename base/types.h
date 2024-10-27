@@ -20,7 +20,7 @@
 // primitives
 #define int64 long long
 #define byte unsigned char
-#define dec double
+#define float64 double
 
 // booleans
 #define bool _Bool
@@ -28,7 +28,7 @@
 #define false (_Bool)0
 
 // atomics
-typedef _Atomic long long anum;
+typedef _Atomic long long aint64;
 typedef _Atomic _Bool abool;
 
 // NULL
