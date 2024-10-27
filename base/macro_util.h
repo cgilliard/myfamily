@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/limits.h>
+
 #define UNIQUE_ID __COUNTER__
 #define STRINGIFY(x) #x
 #define EXPAND(x) x
@@ -23,15 +25,15 @@
 
 #define NONE(...)
 #define FIRST(x, y) x
+#define SECOND(x, y) y
 #define FIRST_STRINGIFY(x, y) #x
 #define SECOND_STRINGIFY(x, y) #y
-#define SECOND(x, y) y
 #define BOTH(x, y) x y
 
 #define loop while (true)
 #define π(...)                                                                                     \
 	while (true)                                                                                   \
-	sleep(UINT_MAX)
+	sleep(INT_MAX)
 
 #define EMPTY()
 #define DEFER1(m) m EMPTY()

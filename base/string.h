@@ -96,7 +96,6 @@ num string_create(string *s);
 num string_create_cs(string *s, const char *s2);
 num string_create_ch(string *s, const ch *s2, num len);
 num string_create_s(string *s, const string *s2);
-num string_append_cs(string *s, const char *s2);
 num string_append_ch(string *s, const ch *s2, num len);
 num string_append_s(string *s, const string *s2);
 num string_len(const string *s);

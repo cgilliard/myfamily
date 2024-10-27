@@ -16,11 +16,6 @@
 #include <base/os.h>
 #include <base/osdef.h>
 
-void *malloc(size_t size);
-void *realloc(void *ptr, size_t size);
-void free(void *ptr);
-void *memset(void *ptr, int x, size_t n);
-
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 
 void *alloc(num size, num zeroed) {

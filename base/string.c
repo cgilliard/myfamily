@@ -104,10 +104,6 @@ num string_append_ch(string *s, const ch *s2, num len) {
 	return 0;
 }
 
-num string_append_cs(string *s, const char *s2) {
-	return string_append_ch(s, s2, cstring_len(s2));
-}
-
 num string_len(const string *s) {
 	if (s == NULL)
 		return 0;

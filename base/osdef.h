@@ -17,3 +17,8 @@
 
 void *memcpy(void *dest_str, const void *src_str, size_t n);
 int memcmp(const void *str1, const void *str2, size_t n);
+
+void *malloc(size_t size);
+void *realloc(void *ptr, size_t size);
+void free(void *ptr);
+void *memset(void *ptr, int x, size_t n);
