@@ -3,7 +3,8 @@ OBJS := types.o \
 	string.o \
 	os.o \
 	colors.o \
-	slabs.o
+	slabs.o \
+	print_util.o
 
 TEST_OBJS := $(OBJS)
 

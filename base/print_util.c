@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 void __attribute__((no_return)) panic(const char *fmt, ...) {
-
+	char buf[1024];
+	va_list args;
 	fprintf(stderr, "Panic: ");
 	va_start(args, fmt);
 	vfprintf(stderr, fmt, args);
-	vsnprintf(panic_buf, MAX_PANIC_MSG, fmt, args);
+	vsnprintf(buf, 1024, fmt, args);
 	va_end(args);
 	fprintf(stderr, "\n");
 

@@ -17,7 +17,7 @@
 
 #include <base/macro_util.h>
 
-#define SHIFT(ignore, v) ((int64)0x1 << v)
+#define SHIFT(ignore, v) (1ULL << v)
 #define BIT_SHIFT_OR(...) FOR_EACH(SHIFT, ignore, (|), __VA_ARGS__)
 
 #define BYTE_MAX_IMPL (BIT_SHIFT_OR(0, 1, 2, 3, 4, 5, 6, 7))
@@ -52,10 +52,5 @@
 #ifndef INT_MIN
 #define INT_MIN INT_MIN_IMPL
 #endif // INT_MIN
-
-#define INT64_MIN_IMPL (-INT64_MAX_IMPL - 1)
-#ifndef INT64_MIN
-#define INT64_MIN INT64_MIN_IMPL
-#endif // INT64_MIN
 
 #endif // _BASE_LIMITS__

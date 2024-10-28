@@ -108,13 +108,14 @@ MyTest(base, test_string) {
 	string test_str = String("line1\nline2\nline3\nline4\n");
 	int64 i;
 	int64 count = 0;
-	char compare[11];
+	char compare[101];
 
 	while ((i = index_of(test_str, "\n")) >= 0) {
 		string line = substring(test_str, 0, i);
 		string s = substring(test_str, i + 1);
 		move(test_str, s);
-		snprintf(compare, 10, "line%lli", ++count);
+		count++;
+		snprintf(compare, 100, "line%lli", count);
 		cr_assert(!strcmp(compare, cstring(&line)));
 	}
 	cr_assert_eq(count, 4);
@@ -247,8 +248,4 @@ Test(base, test_limits) {
 	cr_assert_eq(INT_MIN_IMPL, -2147483648);
 	cr_assert_eq(UINT32_MAX, 4294967295);
 	cr_assert_eq(UINT32_MAX_IMPL, 4294967295);
-
-#pragma clang diagnostic ignored "-Wimplicitly-unsigned-literal"
-	cr_assert_eq(INT64_MIN, (-9223372036854775808LL));
-	cr_assert_eq(INT64_MIN_IMPL, (-9223372036854775808LL));
 }
