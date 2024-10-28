@@ -24,7 +24,7 @@ typedef struct PtrImpl *Ptr;
 extern const struct PtrImpl null;
 
 int ptr_len(const Ptr ptr);
-int ptr_id(const Ptr ptr);
+unsigned int ptr_id(const Ptr ptr);
 void *ptr_data(const Ptr ptr);
 bool ptr_flag_check(const Ptr ptr, byte flag);
 void ptr_flag_set(Ptr ptr, byte flag, bool value);

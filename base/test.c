@@ -239,9 +239,9 @@ MyTest(base, test_big) {
 	int64 size = 1024LL * 1024LL;
 	int ss = 16;
 	Ptr *arr = alloc(sizeof(Ptr) * size, false);
-	for (int i = 0; i < size; i++) {
-		if (i % (1024 * 1024) == 0 || i > 2055208960)
-			printf("i=%i\n", i);
+	for (int64 i = 0; i < size; i++) {
+		if (i % (1024 * 1024) == 0)
+			printf("i=%lli\n", i);
 		arr[i] = slab_allocator_allocate(sa, ss);
 		cr_assert(!nil(arr[i]));
 		cr_assert_eq(ptr_id(arr[i]), i);
@@ -255,7 +255,7 @@ MyTest(base, test_big) {
 
 	for (int64 i = 0; i < size; i++) {
 		if (i % (1024 * 1024) == 0)
-			printf("free i=%i\n", i);
+			printf("free i=%lli\n", i);
 		cr_assert_eq(ptr_id(arr[i]), i);
 		cr_assert_eq($len(arr[i]), ss);
 		byte *data = $(arr[i]);

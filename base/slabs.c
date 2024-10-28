@@ -24,11 +24,11 @@
 #define INITIAL_CHUNKS 0
 
 typedef struct PtrImpl {
-	int id;		  // slab id
-	int len;	  // length of data in this slab (up to 3 bytes, 1 byte reserved for user flags)
-	int counter1; // user counter1 (potentially for rc strong count)
-	int counter2; // user counter2 (potentially for rc weak count)
-	byte data[];  // user data
+	unsigned int id; // slab id
+	int len;		 // length of data in this slab (up to 3 bytes, 1 byte reserved for user flags)
+	int counter1;	 // user counter1 (potentially for rc strong count)
+	int counter2;	 // user counter2 (potentially for rc weak count)
+	byte data[];	 // user data
 } PtrImpl;
 
 #define SLAB_OVERHEAD sizeof(PtrImpl)
@@ -41,7 +41,7 @@ int ptr_len(const Ptr ptr) {
 }
 
 // returns the slabs id
-int ptr_id(const Ptr ptr) {
+unsigned int ptr_id(const Ptr ptr) {
 	// mask off flag byte (top byte)
 	return ptr->id;
 }
@@ -106,7 +106,7 @@ bool ptr_is_nil(const Ptr ptr) {
 
 // Slab Type definition
 typedef struct SlabType {
-	int slab_size;
+	unsigned int slab_size;
 	unsigned int slabs_per_resize;
 	unsigned int initial_chunks;
 	unsigned int max_slabs;
@@ -168,7 +168,6 @@ void slab_allocator_init_free_list(SlabData *sd, int64 chunks) {
 
 int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
 	if (sd->cur_chunks == 0) {
-		printf("alloc initial %lli\n", chunks * sd->type.slabs_per_resize * sizeof(unsigned int));
 		sd->free_list = alloc(chunks * sd->type.slabs_per_resize * sizeof(unsigned int), false);
 		if (sd->free_list == NULL)
 			return -1;
@@ -190,17 +189,12 @@ int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
 			}
 		}
 	} else {
-		printf("resize %lli\n", (chunks + sd->cur_chunks) * sd->type.slabs_per_resize);
 		if ((chunks + sd->cur_chunks) * sd->type.slabs_per_resize > sd->type.max_slabs) {
-			printf("x\n");
 			SetErr(Overflow);
 			return -1;
 		}
-		printf("ok %lli\n",
-			   (chunks + sd->cur_chunks) * sd->type.slabs_per_resize * sizeof(unsigned int));
 		void *tmp = resize(sd->free_list, (chunks + sd->cur_chunks) * sd->type.slabs_per_resize *
 											  sizeof(unsigned int));
-		printf("y\n");
 		if (tmp == NULL)
 			return -1;
 		sd->free_list = tmp;
@@ -222,7 +216,6 @@ int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
 				return -1;
 			}
 		}
-		printf("success\n");
 	}
 
 	slab_allocator_init_free_list(sd, chunks);
