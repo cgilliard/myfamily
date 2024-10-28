@@ -37,6 +37,7 @@
 	IndexOutOfBounds, \
 	POpenErr, \
 	IO, \
+	CapacityExceeded, \
 	FileNotFound, \
 	NotADirectory, \
 	IllegalState, \

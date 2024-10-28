@@ -19,6 +19,9 @@
 #include <stdio.h>
 
 #define MAX_SLAB_TYPES 256
+#define SLAB_SIZES 256
+#define SLABS_PER_RESIZE 128
+#define INITIAL_CHUNKS 0
 
 typedef struct PtrImpl {
 	int id;		  // slab id
@@ -157,53 +160,10 @@ void slab_allocator_cleanup(SlabAllocator *ptr) {
 	SlabAllocatorNc sa = *ptr;
 	if (sa) {
 		if (sa->sd_count) {
-			for (int64 i = 0; i < sa->sd_count; i++) {
+			for (int i = 0; i < sa->sd_count; i++) {
 			}
 		}
 	}
-}
-
-int compare_sd(const void *a, const void *b) {
-	const SlabData *sda = a;
-	const SlabData *sdb = b;
-	if (sda->type.slab_size < sdb->type.slab_size)
-		return -1;
-	else if (sda->type.slab_size > sdb->type.slab_size)
-		return 1;
-	return 0;
-}
-
-void slab_allocator_sort_sd_arr(SlabAllocator sa) {
-	qsort(sa->sd_arr, sa->sd_count, sizeof(SlabData), compare_sd);
-}
-
-int slab_allocator_check_config(SlabAllocator sa) {
-	int64 last_size = 0;
-	for (int i = 0; i < sa->sd_count; i++) {
-		if (sa->sd_arr[i].type.slab_size <= last_size) {
-			SetErr(DuplicateSizes);
-			return -1;
-		}
-		if (sa->sd_arr[i].type.slabs_per_resize < 1) {
-			SetErr(IllegalArgument);
-			return -1;
-		}
-		if (sa->sd_arr[i].type.initial_chunks < 0) {
-			SetErr(IllegalArgument);
-			return -1;
-		}
-		if (sa->sd_arr[i].type.max_slabs <
-			sa->sd_arr[i].type.initial_chunks * sa->sd_arr[i].type.slabs_per_resize) {
-			SetErr(IllegalArgument);
-			return -1;
-		}
-		if (sa->sd_arr[i].type.slab_size < 16 || sa->sd_arr[i].type.slab_size % 16) {
-			SetErr(IllegalArgument);
-			return -1;
-		}
-		last_size = sa->sd_arr[i].type.slab_size;
-	}
-	return 0;
 }
 
 int64 slab_allocator_slab_data_index(SlabData *sd, int64 id) {
@@ -216,7 +176,7 @@ int64 slab_allocator_slab_data_offset(SlabData *sd, int64 id) {
 
 void slab_allocator_init_free_list(SlabData *sd, int64 chunks) {
 	sd->free_list_head = sd->cur_chunks * sd->type.slabs_per_resize;
-	int64 count = chunks * sd->type.slabs_per_resize;
+	int64 count = chunks * (int64)sd->type.slabs_per_resize;
 	for (int64 i = 0; i < count; i++) {
 		if (i == count - 1) {
 			sd->free_list[i + sd->free_list_head] = UINT32_MAX;
@@ -234,9 +194,21 @@ int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
 			sd->data[i] = alloc(sd->type.slabs_per_resize * sd->type.slab_size, false);
 		}
 	} else {
+		void *tmp = resize(sd->free_list, (chunks + sd->cur_chunks) * sd->type.slabs_per_resize *
+											  sizeof(unsigned int));
+		if (tmp == NULL)
+			return -1;
+		sd->free_list = tmp;
+		tmp = resize(sd->data, (chunks + sd->cur_chunks) * sizeof(byte *));
+		sd->data = tmp;
+		for (int64 i = 0; i < chunks; i++) {
+			sd->data[i + sd->cur_chunks] =
+				alloc(sd->type.slabs_per_resize * sd->type.slab_size, false);
+		}
 	}
 
 	slab_allocator_init_free_list(sd, chunks);
+	sd->cur_chunks += chunks;
 	return 0;
 }
 
@@ -263,8 +235,6 @@ int slab_allocator_init_state(SlabAllocator sa) {
 	return 0;
 }
 
-#define SLAB_SIZES 256
-
 SlabAllocator slab_allocator_create() {
 	SlabAllocatorNc ret = (SlabAllocatorImpl *)alloc(
 		sizeof(SlabAllocatorImpl) + SLAB_SIZES * sizeof(SlabData), false);
@@ -273,8 +243,8 @@ SlabAllocator slab_allocator_create() {
 	ret->sd_count = SLAB_SIZES;
 	for (int i = 0; i < ret->sd_count; i++) {
 		ret->sd_arr[i].type = (const SlabType) {.slab_size = (1 + i) * 16,
-												.slabs_per_resize = 128,
-												.initial_chunks = 1,
+												.slabs_per_resize = SLABS_PER_RESIZE,
+												.initial_chunks = INITIAL_CHUNKS,
 												.max_slabs = UINT32_MAX};
 	}
 
@@ -283,46 +253,29 @@ SlabAllocator slab_allocator_create() {
 	return ret;
 }
 
-int slab_allocator_index(SlabAllocator sa, int64 size) {
-	int ret = -1;
-
-	if (sa->sd_count) {
-
-		int left = 0;
-		int right = sa->sd_count - 1;
-
-		while (left <= right) {
-			int mid = left + (right - left) / 2;
-			int64 slab_size = sa->sd_arr[mid].type.slab_size;
-			if (slab_size == size) {
-				ret = mid;
-				break;
-			} else if (slab_size > size)
-				right = mid - 1;
-			else
-				left = mid + 1;
-		}
-
-		if (ret == -1 && right + 1 < sa->sd_count) {
-			ret = right + 1;
-		}
-	}
-
+int slab_allocator_index(SlabAllocator sa, int size) {
+	int ret = (size - 1) / 16;
+	if (ret >= SLAB_SIZES)
+		return -1;
 	return ret;
 }
 
 Ptr slab_allocator_allocate_sd(SlabData *sd) {
 	if (sd->free_list_head == UINT32_MAX) {
-		// TODO: resize
-		return NULL;
+		if (slab_allocator_increase_chunks(sd, 1))
+			return NULL;
+		if (sd->free_list_head == UINT32_MAX) {
+			SetErr(CapacityExceeded);
+			return NULL;
+		}
 	}
 	int64 index = slab_allocator_slab_data_index(sd, sd->free_list_head);
 	int64 offset = slab_allocator_slab_data_offset(sd, sd->free_list_head);
-	printf("index=%lli,offset=%lli\n", index, offset);
 	Ptr ptr = (PtrImpl *)(sd->data[index] + offset);
 	ptr->id = sd->free_list_head;
 	ptr->len = sd->type.slab_size;
 	sd->free_list_head = sd->free_list[ptr->id];
+	sd->cur_slabs++;
 
 	return ptr;
 }
@@ -330,6 +283,7 @@ Ptr slab_allocator_allocate_sd(SlabData *sd) {
 void slab_allocator_data_free(SlabData *sd, int64 id) {
 	sd->free_list[id] = sd->free_list_head;
 	sd->free_list_head = id;
+	sd->cur_slabs--;
 }
 
 Ptr slab_allocator_allocate(SlabAllocator sa, int64 size) {
@@ -359,7 +313,12 @@ void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
 	*ptr = null;
 }
 int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
-	return 0;
+	int64 slabs = 0;
+	for (int i = 0; i < sa->sd_count; i++) {
+		SlabData *sd = &sa->sd_arr[i];
+		slabs += sd->cur_slabs;
+	}
+	return slabs;
 }
 
 #ifdef TEST

@@ -53,8 +53,8 @@ void ptr_free_test_obj(Ptr ptr);
 // Slab Type definition
 typedef struct SlabType {
 	int slab_size;
-	int64 slabs_per_resize;
-	int64 initial_chunks;
+	int slabs_per_resize;
+	int initial_chunks;
 	unsigned int max_slabs;
 } SlabType;
 
