@@ -1,14 +1,19 @@
 var searchData=
 [
-  ['id_77',['id',['../structPtrImpl.html#a550e5dd9a2c989f6d0ebf3f548db5df8',1,'PtrImpl']]],
-  ['impl_78',['impl',['../structstringNc.html#a01c312f3696cf1efed28b4723d96d17f',1,'stringNc']]],
-  ['include_5fdir_79',['include_dir',['../xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029',1,'xxdir.c']]],
-  ['index_80',['index',['../md_docs_index.html',1,'']]],
-  ['index_2emd_81',['index.md',['../index_8md.html',1,'']]],
-  ['index_5fof_82',['index_of',['../string_8h.html#a0619272e2562d7bb8c596d76ba165c18',1,'string.h']]],
-  ['init_5fstring_83',['INIT_STRING',['../string_8h.html#a7c25a3fc160b7b9eff79abfdb7845dd6',1,'string.h']]],
-  ['initial_5fchunks_84',['initial_chunks',['../structSlabType.html#aea5fb9f838c6a8e57eca1db566aab88b',1,'SlabType']]],
-  ['int64_85',['int64',['../types_8h.html#a09fc63bce67d19142460e915d94f732f',1,'types.h']]],
-  ['int_5fmax_86',['INT_MAX',['../limits_8h.html#a9ec306f36d50c7375e74f0d1c55a3a67',1,'limits.h']]],
-  ['int_5fmin_87',['INT_MIN',['../limits_8h.html#a21658776274b3d146c674318b635a334',1,'limits.h']]]
+  ['id_85',['id',['../structPtrImpl.html#a171cd0179392da3e279c879e317fb677',1,'PtrImpl']]],
+  ['impl_86',['impl',['../structstringNc.html#a01c312f3696cf1efed28b4723d96d17f',1,'stringNc']]],
+  ['include_5fdir_87',['include_dir',['../xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029',1,'xxdir.c']]],
+  ['index_88',['index',['../md_docs_index.html',1,'']]],
+  ['index_2emd_89',['index.md',['../index_8md.html',1,'']]],
+  ['index_5fof_90',['index_of',['../string_8h.html#a0619272e2562d7bb8c596d76ba165c18',1,'string.h']]],
+  ['init_5fstring_91',['INIT_STRING',['../string_8h.html#a7c25a3fc160b7b9eff79abfdb7845dd6',1,'string.h']]],
+  ['initial_5fchunks_92',['initial_chunks',['../structSlabType.html#a1d466297e21ede3754d698f991762bf4',1,'SlabType']]],
+  ['initial_5fchunks_93',['INITIAL_CHUNKS',['../slabs_8c.html#ac3931d59f12d01b3107fc3de679ee6c9',1,'slabs.c']]],
+  ['int64_94',['int64',['../types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632',1,'types.h']]],
+  ['int64_5fmax_95',['INT64_MAX',['../limits_8h.html#ad0d744f05898e32d01f73f8af3cd2071',1,'limits.h']]],
+  ['int64_5fmax_5fimpl_96',['INT64_MAX_IMPL',['../limits_8h.html#a12f22962dc1007de7133803c54b24ede',1,'limits.h']]],
+  ['int_5fmax_97',['INT_MAX',['../limits_8h.html#a9ec306f36d50c7375e74f0d1c55a3a67',1,'limits.h']]],
+  ['int_5fmax_5fimpl_98',['INT_MAX_IMPL',['../limits_8h.html#a098185cb80aadd078acfb3783a17ce8f',1,'limits.h']]],
+  ['int_5fmin_99',['INT_MIN',['../limits_8h.html#a21658776274b3d146c674318b635a334',1,'limits.h']]],
+  ['int_5fmin_5fimpl_100',['INT_MIN_IMPL',['../limits_8h.html#a93fc804a8f3af6968cdc515a8cbb8235',1,'limits.h']]]
 ];

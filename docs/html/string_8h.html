@@ -99,8 +99,6 @@ Macros</h2></td></tr>
 <tr class="separator:a39bd2df933b74f2947009e0d3a857983"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a94450f03aadd627d7b6503e9ce996b5c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a94450f03aadd627d7b6503e9ce996b5c">nil_string</a>(s)&#160;&#160;&#160;(s.impl == <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>)</td></tr>
 <tr class="separator:a94450f03aadd627d7b6503e9ce996b5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed13d8bde4d13ff8d0da4813962dbe9e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#aed13d8bde4d13ff8d0da4813962dbe9e">nil</a>(s)&#160;&#160;&#160;<a class="el" href="string_8h.html#a94450f03aadd627d7b6503e9ce996b5c">nil_string</a>(s)</td></tr>
-<tr class="separator:aed13d8bde4d13ff8d0da4813962dbe9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a020a20794207b03acea14779bd5e4f6e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a020a20794207b03acea14779bd5e4f6e">string_append</a>(s,  v, ...)</td></tr>
 <tr class="separator:a020a20794207b03acea14779bd5e4f6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31f7c5ba28f3536f500bb1e76b4884d5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a31f7c5ba28f3536f500bb1e76b4884d5">append</a>(...)&#160;&#160;&#160;<a class="el" href="string_8h.html#a020a20794207b03acea14779bd5e4f6e">string_append</a>(__VA_ARGS__)</td></tr>
@@ -129,39 +127,39 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a00af9cc7334f62bb26bf5ca736dbf1d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a00af9cc7334f62bb26bf5ca736dbf1d1">string_cleanup</a> (<a class="el" href="structstringNc.html">stringNc</a> *ptr)</td></tr>
+<tr class="memitem:a00af9cc7334f62bb26bf5ca736dbf1d1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a00af9cc7334f62bb26bf5ca736dbf1d1">string_cleanup</a> (<a class="el" href="structstringNc.html">stringNc</a> *<a class="el" href="slabs_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
 <tr class="separator:a00af9cc7334f62bb26bf5ca736dbf1d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6a1861b62cb78878c694b4d66730a2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ae6a1861b62cb78878c694b4d66730a2c">string_create</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s)</td></tr>
+<tr class="memitem:ae6a1861b62cb78878c694b4d66730a2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ae6a1861b62cb78878c694b4d66730a2c">string_create</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s)</td></tr>
 <tr class="separator:ae6a1861b62cb78878c694b4d66730a2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d61f6d7c12bf87eac137bdc27e08a10"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a9d61f6d7c12bf87eac137bdc27e08a10">string_create_cs</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const char *s2)</td></tr>
+<tr class="memitem:a9d61f6d7c12bf87eac137bdc27e08a10"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a9d61f6d7c12bf87eac137bdc27e08a10">string_create_cs</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const char *s2)</td></tr>
 <tr class="separator:a9d61f6d7c12bf87eac137bdc27e08a10"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8fb3ab0f82a14c8df1dc080d0663a6f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#af8fb3ab0f82a14c8df1dc080d0663a6f">string_create_ch</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *s2, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> <a class="el" href="string_8h.html#a89e36eed93508d170069a65b583a6147">len</a>)</td></tr>
+<tr class="memitem:af8fb3ab0f82a14c8df1dc080d0663a6f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#af8fb3ab0f82a14c8df1dc080d0663a6f">string_create_ch</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *s2, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> <a class="el" href="string_8h.html#a89e36eed93508d170069a65b583a6147">len</a>)</td></tr>
 <tr class="separator:af8fb3ab0f82a14c8df1dc080d0663a6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a840bf913db3cea16364f77df2eea28fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a840bf913db3cea16364f77df2eea28fb">string_create_s</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="memitem:a840bf913db3cea16364f77df2eea28fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a840bf913db3cea16364f77df2eea28fb">string_create_s</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
 <tr class="separator:a840bf913db3cea16364f77df2eea28fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60b03cf6411be3aea9ad3d42970f610d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a60b03cf6411be3aea9ad3d42970f610d">string_append_ch</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *s2, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> <a class="el" href="string_8h.html#a89e36eed93508d170069a65b583a6147">len</a>)</td></tr>
+<tr class="memitem:a60b03cf6411be3aea9ad3d42970f610d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a60b03cf6411be3aea9ad3d42970f610d">string_append_ch</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *s2, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> <a class="el" href="string_8h.html#a89e36eed93508d170069a65b583a6147">len</a>)</td></tr>
 <tr class="separator:a60b03cf6411be3aea9ad3d42970f610d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e26524559e9d4ca9f400a74f0d72adc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a8e26524559e9d4ca9f400a74f0d72adc">string_append_s</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="memitem:a8e26524559e9d4ca9f400a74f0d72adc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a8e26524559e9d4ca9f400a74f0d72adc">string_append_s</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
 <tr class="separator:a8e26524559e9d4ca9f400a74f0d72adc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2291de2ac64d74d597ba1c970fdc92c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a2291de2ac64d74d597ba1c970fdc92c1">string_len</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s)</td></tr>
+<tr class="memitem:a2291de2ac64d74d597ba1c970fdc92c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a2291de2ac64d74d597ba1c970fdc92c1">string_len</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s)</td></tr>
 <tr class="separator:a2291de2ac64d74d597ba1c970fdc92c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a943cac39392a0608d434b03ac77c9c0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a943cac39392a0608d434b03ac77c9c0b">string_index_of</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="memitem:a943cac39392a0608d434b03ac77c9c0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a943cac39392a0608d434b03ac77c9c0b">string_index_of</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
 <tr class="separator:a943cac39392a0608d434b03ac77c9c0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3dfb4e5fb124165d8495a6601ca74845"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a3dfb4e5fb124165d8495a6601ca74845">string_last_index_of</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="memitem:a3dfb4e5fb124165d8495a6601ca74845"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a3dfb4e5fb124165d8495a6601ca74845">string_last_index_of</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
 <tr class="separator:a3dfb4e5fb124165d8495a6601ca74845"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae18fd42681f94f64d1b1201d1fa4bde5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ae18fd42681f94f64d1b1201d1fa4bde5">string_substring</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *dst, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *src, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> begin)</td></tr>
+<tr class="memitem:ae18fd42681f94f64d1b1201d1fa4bde5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ae18fd42681f94f64d1b1201d1fa4bde5">string_substring</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *dst, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *src, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> begin)</td></tr>
 <tr class="separator:ae18fd42681f94f64d1b1201d1fa4bde5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7c1bf9c65373ce6b27d76a39c0a1a32"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ab7c1bf9c65373ce6b27d76a39c0a1a32">string_substring_s</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *dst, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *src, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> begin, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> end)</td></tr>
+<tr class="memitem:ab7c1bf9c65373ce6b27d76a39c0a1a32"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ab7c1bf9c65373ce6b27d76a39c0a1a32">string_substring_s</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *dst, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *src, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> begin, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> end)</td></tr>
 <tr class="separator:ab7c1bf9c65373ce6b27d76a39c0a1a32"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a388b14e9e3399b7400a5a1433468f8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a8a388b14e9e3399b7400a5a1433468f8">string_char_at</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, <a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> index)</td></tr>
+<tr class="memitem:a8a388b14e9e3399b7400a5a1433468f8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a8a388b14e9e3399b7400a5a1433468f8">string_char_at</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> index)</td></tr>
 <tr class="separator:a8a388b14e9e3399b7400a5a1433468f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80336ad6119dedd8d87c5bc0175592cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a80336ad6119dedd8d87c5bc0175592cd">string_equal</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
+<tr class="memitem:a80336ad6119dedd8d87c5bc0175592cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a80336ad6119dedd8d87c5bc0175592cd">string_equal</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
 <tr class="separator:a80336ad6119dedd8d87c5bc0175592cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad368b011863ec560e8772bc498fde298"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#ad368b011863ec560e8772bc498fde298">string_move</a> (<a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s1, <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s2)</td></tr>
 <tr class="separator:ad368b011863ec560e8772bc498fde298"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7cb8b253727a70b68b5d45b9b80923c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a7cb8b253727a70b68b5d45b9b80923c3">cstring_len</a> (const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *S)</td></tr>
+<tr class="memitem:a7cb8b253727a70b68b5d45b9b80923c3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a7cb8b253727a70b68b5d45b9b80923c3">cstring_len</a> (const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *S)</td></tr>
 <tr class="separator:a7cb8b253727a70b68b5d45b9b80923c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8dbdcdbb139284c38740c84a8ff74265"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a8dbdcdbb139284c38740c84a8ff74265">cstring</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s)</td></tr>
+<tr class="memitem:a8dbdcdbb139284c38740c84a8ff74265"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="string_8h.html#a8dbdcdbb139284c38740c84a8ff74265">cstring</a> (const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *s)</td></tr>
 <tr class="separator:a8dbdcdbb139284c38740c84a8ff74265"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -379,24 +377,6 @@ Functions</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td>&#160;&#160;&#160;<a class="el" href="string_8h.html#ad368b011863ec560e8772bc498fde298">string_move</a>(&amp;x, &amp;y)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aed13d8bde4d13ff8d0da4813962dbe9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aed13d8bde4d13ff8d0da4813962dbe9e">&#9670;&nbsp;</a></span>nil</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define nil</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">s</td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="string_8h.html#a94450f03aadd627d7b6503e9ce996b5c">nil_string</a>(s)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -626,7 +606,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a>* cstring </td>
+          <td class="memname"><a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a>* cstring </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
@@ -644,9 +624,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> cstring_len </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> cstring_len </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *&#160;</td>
           <td class="paramname"><em>S</em></td><td>)</td>
           <td></td>
         </tr>
@@ -662,7 +642,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_append_ch </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_append_ch </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -670,13 +650,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *&#160;</td>
           <td class="paramname"><em>s2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
           <td class="paramname"><em>len</em>&#160;</td>
         </tr>
         <tr>
@@ -696,7 +676,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_append_s </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_append_s </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -724,7 +704,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> string_char_at </td>
+          <td class="memname"><a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> string_char_at </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -732,7 +712,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
           <td class="paramname"><em>index</em>&#160;</td>
         </tr>
         <tr>
@@ -770,7 +750,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_create </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_create </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
@@ -788,7 +768,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_create_ch </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_create_ch </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -796,13 +776,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const <a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a> *&#160;</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *&#160;</td>
           <td class="paramname"><em>s2</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
           <td class="paramname"><em>len</em>&#160;</td>
         </tr>
         <tr>
@@ -822,7 +802,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_create_cs </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_create_cs </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -850,7 +830,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_create_s </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_create_s </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s</em>, </td>
@@ -878,7 +858,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_equal </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_equal </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s1</em>, </td>
@@ -906,7 +886,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_index_of </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_index_of </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s1</em>, </td>
@@ -934,7 +914,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_last_index_of </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_last_index_of </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s1</em>, </td>
@@ -962,7 +942,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_len </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_len </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>s</em></td><td>)</td>
@@ -1008,7 +988,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_substring </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_substring </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
@@ -1022,7 +1002,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
           <td class="paramname"><em>begin</em>&#160;</td>
         </tr>
         <tr>
@@ -1042,7 +1022,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> string_substring_s </td>
+          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> string_substring_s </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="string_8h.html#a25093e36e9fb377b246945a84745823f">string</a> *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
@@ -1056,13 +1036,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
           <td class="paramname"><em>begin</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
           <td class="paramname"><em>end</em>&#160;</td>
         </tr>
         <tr>

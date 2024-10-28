@@ -1,7 +1,7 @@
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:7
+        -:    0:Runs:9
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -93,7 +93,7 @@
         -:    0:Source:fam_err.c
         -:    0:Graph:fam_err.gcno
         -:    0:Data:fam_err.gcda
-        -:    0:Runs:7
+        -:    0:Runs:9
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -137,7 +137,7 @@
         -:    0:Source:os.c
         -:    0:Graph:os.gcno
         -:    0:Data:os.gcda
-        -:    0:Runs:7
+        -:    0:Runs:9
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -158,55 +158,55 @@
         -:   18:
         -:   19:_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
         -:   20:
-       38:   21:void *alloc(int64 size, int64 zeroed) {
-       38:   22:	if (!size) {
+       86:   21:void *alloc(int64 size, int64 zeroed) {
+       86:   22:	if (!size) {
     #####:   23:		SetErr(IllegalArgument);
     #####:   24:		return NULL;
         -:   25:	}
         -:   26:	void *ret;
-       38:   27:	ret = malloc(size);
+       86:   27:	ret = malloc(size);
         -:   28:
-       38:   29:	if (ret) {
-       38:   30:		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
-       38:   31:		if (zeroed)
+       86:   29:	if (ret) {
+       86:   30:		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
+       86:   31:		if (zeroed)
     #####:   32:			memset(ret, 0, size);
         -:   33:	} else
     #####:   34:		SetErr(AllocErr);
         -:   35:
-       38:   36:	return ret;
+       86:   36:	return ret;
         -:   37:}
-        5:   38:void *resize(void *ptr, int64 size) {
-        5:   39:	if (!ptr || !size) {
+       69:   38:void *resize(void *ptr, int64 size) {
+       69:   39:	if (!ptr || !size) {
     #####:   40:		SetErr(IllegalArgument);
     #####:   41:		return NULL;
         -:   42:	}
         -:   43:	void *ret;
-        5:   44:	ret = realloc(ptr, size);
+       69:   44:	ret = realloc(ptr, size);
         -:   45:
-        5:   46:	if (ret) {
-        5:   47:		THREAD_LOCAL_RESOURCE_STATS.resize_sum += 1;
+       69:   46:	if (ret) {
+       69:   47:		THREAD_LOCAL_RESOURCE_STATS.resize_sum += 1;
         -:   48:	} else
     #####:   49:		SetErr(AllocErr);
-        5:   50:	return ret;
+       69:   50:	return ret;
         -:   51:}
         -:   52:
-       37:   53:void release(void *ptr) {
-       37:   54:	if (!ptr) {
+       86:   53:void release(void *ptr) {
+       86:   54:	if (!ptr) {
     #####:   55:		SetErr(IllegalArgument);
     #####:   56:		return;
         -:   57:	}
-       37:   58:	THREAD_LOCAL_RESOURCE_STATS.release_sum += 1;
-       37:   59:	free(ptr);
+       86:   58:	THREAD_LOCAL_RESOURCE_STATS.release_sum += 1;
+       86:   59:	free(ptr);
         -:   60:}
         -:   61:
-        4:   62:int64 alloc_sum() {
-        4:   63:	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
+       14:   62:int64 alloc_sum() {
+       14:   63:	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
         -:   64:}
     #####:   65:int64 resize_sum() {
     #####:   66:	return THREAD_LOCAL_RESOURCE_STATS.resize_sum;
         -:   67:}
-        4:   68:int64 release_sum() {
-        4:   69:	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
+       14:   68:int64 release_sum() {
+       14:   69:	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
         -:   70:}
         -:   71:
         -:   72:char *getenv(const char *name);
@@ -214,10 +214,10 @@
     #####:   74:byte *env(const byte *name) {
     #####:   75:	return getenv(name);
         -:   76:}
-        -:    0:Source:slabs.c
-        -:    0:Graph:slabs.gcno
-        -:    0:Data:slabs.gcda
-        -:    0:Runs:7
+        -:    0:Source:print_util.c
+        -:    0:Graph:print_util.gcno
+        -:    0:Data:print_util.gcda
+        -:    0:Runs:9
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -232,89 +232,648 @@
         -:   12:// See the License for the specific language governing permissions and
         -:   13:// limitations under the License.
         -:   14:
-        -:   15:#include <base/os.h>
-        -:   16:#include <base/slabs.h>
-        -:   17:
-        -:   18:typedef struct PtrImpl {
-        -:   19:	int64 id;	 // slab id
-        -:   20:	int64 len;	 // length of data in this slab
-        -:   21:	byte data[]; // user data
-        -:   22:} PtrImpl;
-        -:   23:
-        -:   24://  returns the slab's length
-        2:   25:int ptr_len(const Ptr ptr) {
-        2:   26:	return ptr->len;
-        -:   27:}
-        -:   28:
-        -:   29:// returns the slabs id
-        2:   30:int64 ptr_id(const Ptr ptr) {
-        -:   31:	// mask off flag byte (top byte)
-        2:   32:	return ptr->id & 0x00FFFFFFFFFFFFFFULL;
-        -:   33:}
-        -:   34:
-        -:   35:// reutrn pointer to slab data
-    #####:   36:void *ptr_data(const Ptr ptr) {
-    #####:   37:	return ptr->data;
-        -:   38:}
+        -:   15:#include <stdarg.h>
+        -:   16:#include <stdio.h>
+        -:   17:#include <stdlib.h>
+    #####:   18:void __attribute__((no_return)) panic(const char *fmt, ...) {
+        -:   19:	char buf[1024];
+        -:   20:	va_list args;
+    #####:   21:	fprintf(stderr, "Panic: ");
+    #####:   22:	va_start(args, fmt);
+    #####:   23:	vfprintf(stderr, fmt, args);
+    #####:   24:	vsnprintf(buf, 1024, fmt, args);
+    #####:   25:	va_end(args);
+    #####:   26:	fprintf(stderr, "\n");
+        -:   27:
+    #####:   28:	exit(-1);
+        -:   29:}
+        -:   30:
+        -:   31:/*
+        -:   32:#include <base/fam_err.h>
+        -:   33:#include <base/macro_util.h>
+        -:   34:#include <base/os.h>
+        -:   35:#include <base/print_util.h>
+        -:   36:#include <base/string.h>
+        -:   37:
+        -:   38:#define BUF_LEN 64
         -:   39:
-        -:   40:// check whether a flag is set (0-7 are possible values)
-      115:   41:bool ptr_flag_check(const Ptr ptr, byte flag) {
-      115:   42:	return flag < 8 && ((int64)(ptr->id >> 56)) & (1ULL << flag);
-        -:   43:}
-        -:   44:
-        -:   45:// set/unset a flag
-        1:   46:void ptr_flag_set(const Ptr ptr, byte flag, bool value) {
-        1:   47:	if (flag >= 8)
-    #####:   48:		return;
-        1:   49:	if (value)
-        1:   50:		ptr->id |= (int64)(1ULL << (int64)flag) << 56;
-        -:   51:	else
-    #####:   52:		ptr->id &= ~((int64)(1ULL << (int64)flag) << 56);
-        -:   53:}
-        -:   54:
-        -:   55:// return true if this Ptr is nil (unallocated)
-    #####:   56:bool ptr_is_nil(const Ptr ptr) {
-    #####:   57:	return ptr->len; // a nil pointer has 0 len
-        -:   58:}
-        -:   59:
-        1:   60:void slab_allocator_config_cleanup(SlabAllocatorConfigNc *ptr) {
-        1:   61:}
-        -:   62:
-        -:   63:typedef struct SlabAllocatorImpl {
-        -:   64:	int x;
-        -:   65:	int y;
-        -:   66:	byte slabs[];
-        -:   67:} SlabAllocatorImpl;
-        -:   68:
-        1:   69:void slab_allocator_cleanup(SlabAllocator *ptr) {
-        1:   70:	SlabAllocatorNc sa = *ptr;
-        1:   71:}
-        -:   72:
-        1:   73:SlabAllocator slab_allocator_create(SlabAllocatorConfig *sc) {
-        1:   74:	SlabAllocatorNc ret = (SlabAllocatorImpl *)alloc(sizeof(SlabAllocatorImpl) + 3, false);
-        1:   75:	return ret;
-        -:   76:}
+        -:   40:// get the va functionality (with GCC/Clang use the builtin version, otherwise use stdarg)
+        -:   41:#if defined(__GNUC__) || defined(__clang__)
+        -:   42:typedef __builtin_va_list va_list;
+        -:   43:#define va_start(ap, param) __builtin_va_start(ap, param)
+        -:   44:#define va_end(ap) __builtin_va_end(ap)
+        -:   45:#define va_arg(ap, type) __builtin_va_arg(ap, type)
+        -:   46:#else // __GNUC__ or __clang__
+        -:   47:#include <stdarg.h>
+        -:   48:#endif // __GNUC__ or __clang__
+        -:   49:
+        -:   50:i32 write_loop(const Stream *strm, u8 *s, i32 *cur, i32 limit, const u8 *buf, u64 len) {
+        -:   51:	if (s) {
+        -:   52:		if (strm->handle == -1) {
+        -:   53:			// length only
+        -:   54:			*cur += len;
+        -:   55:		} else if (*cur < limit) {
+        -:   56:			u8 *res;
+        -:   57:			if (*cur == 0) {
+        -:   58:				res = strncpy(s, buf, len);
+        -:   59:				if (res == NULL)
+        -:   60:					return -1;
+        -:   61:			} else {
+        -:   62:				res = strncat(s, buf, len);
+        -:   63:				if (res == NULL)
+        -:   64:					return -1;
+        -:   65:			}
+        -:   66:
+        -:   67:			i32 l = strlen(buf);
+        -:   68:			*cur = l;
+        -:   69:		}
+        -:   70:	} else {
+        -:   71:		while (len > 0) {
+        -:   72:			i64 w = strm_write(strm, buf, len);
+        -:   73:			if (w < 0) {
+        -:   74:				SetErr(IO);
+        -:   75:				return w;
+        -:   76:			}
         -:   77:
-        1:   78:void slab_allocator_print(SlabAllocator ptr) {
-        1:   79:}
+        -:   78:			len -= w;
+        -:   79:		}
+        -:   80:	}
+        -:   81:	return 0;
+        -:   82:}
+        -:   83:
+        -:   84:i32 print_impl(const Stream *strm, u8 *s, i32 capacity, bool nl, bool do_exit, i32 code,
+        -:   85:			   const u8 *prefix, const u8 *fmt, ...) {
+        -:   86:	int ret = 0;
+        -:   87:	if (capacity < 0 && s) {
+        -:   88:		SetErr(IllegalArgument);
+        -:   89:		ret = -1;
+        -:   90:	}
+        -:   91:	if (s) {
+        -:   92:		memset(s, '\0', capacity);
+        -:   93:	}
+        -:   94:	va_list args;
+        -:   95:	va_start(args, fmt);
+        -:   96:	i32 max = capacity;
+        -:   97:	capacity = 0;
+        -:   98:
+        -:   99:	if (prefix && ret != -1) {
+        -:  100:		if (write_loop(strm, s, &capacity, max, prefix, strlen(prefix)))
+        -:  101:			ret = -1;
+        -:  102:	}
+        -:  103:
+        -:  104:	while (ret != -1) {
+        -:  105:		bool is_hex = false;
+        -:  106:		const u8 *next = strstr(fmt, "{}");
+        -:  107:		const u8 *next_hex = strstr(fmt, "{hex}");
+        -:  108:		if ((next_hex && !next) || (next_hex && next_hex < next)) {
+        -:  109:			next = next_hex;
+        -:  110:			is_hex = true;
+        -:  111:		}
+        -:  112:
+        -:  113:		if (next == NULL) {
+        -:  114:			if (write_loop(strm, s, &capacity, max, fmt, strlen(fmt))) {
+        -:  115:				ret = -1;
+        -:  116:				break;
+        -:  117:			}
+        -:  118:			if (nl)
+        -:  119:				if (write_loop(strm, s, &capacity, max, "\n", 1)) {
+        -:  120:					ret = -1;
+        -:  121:					break;
+        -:  122:				}
+        -:  123:			break;
+        -:  124:		} else {
+        -:  125:			u64 diff = next - fmt;
+        -:  126:			u8 buf[1 + diff];
+        -:  127:			memset(buf, '\0', 1 + diff);
+        -:  128:			strncpy(buf, fmt, diff);
+        -:  129:			if (write_loop(strm, s, &capacity, max, buf, diff)) {
+        -:  130:				ret = -1;
+        -:  131:				break;
+        -:  132:			}
+        -:  133:		}
+        -:  134:
+        -:  135:		PrintPair arg = va_arg(args, PrintPair);
+        -:  136:
+        -:  137:		if (arg.type == PrintTypeTerm) {
+        -:  138:			if (next) {
+        -:  139:				if (write_loop(strm, s, &capacity, max, next, strlen(next))) {
+        -:  140:					ret = -1;
+        -:  141:					break;
+        -:  142:				}
+        -:  143:				if (nl)
+        -:  144:					if (write_loop(strm, s, &capacity, max, "\n", 1)) {
+        -:  145:						ret = -1;
+        -:  146:						break;
+        -:  147:					}
+        -:  148:			}
+        -:  149:			break;
+        -:  150:		} else if (arg.type == PrintTypeBool) {
+        -:  151:			bool value;
+        -:  152:			memcpy(&value, arg.buf, sizeof(bool));
+        -:  153:			u8 buf[BUF_LEN];
+        -:  154:			if (value)
+        -:  155:				strncpy(buf, "true", 5);
+        -:  156:			else
+        -:  157:				strncpy(buf, "false", 6);
+        -:  158:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  159:				ret = -1;
+        -:  160:				break;
+        -:  161:			}
+        -:  162:		} else if (arg.type == PrintTypeF64) {
+        -:  163:			f64 value;
+        -:  164:			memcpy(&value, arg.buf, sizeof(f64));
+        -:  165:			u8 buf[BUF_LEN];
+        -:  166:			strcpy(buf, "");
+        -:  167:			snprintf(buf, BUF_LEN - 1, "%lf", value);
+        -:  168:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  169:				ret = -1;
+        -:  170:				break;
+        -:  171:			}
+        -:  172:		} else if (arg.type == PrintTypeF32) {
+        -:  173:			f32 value;
+        -:  174:			memcpy(&value, arg.buf, sizeof(f32));
+        -:  175:			u8 buf[BUF_LEN];
+        -:  176:			strcpy(buf, "");
+        -:  177:			snprintf(buf, BUF_LEN - 1, "%f", value);
+        -:  178:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  179:				ret = -1;
+        -:  180:				break;
+        -:  181:			}
+        -:  182:		} else if (arg.type == PrintTypeI64) {
+        -:  183:			i64 value;
+        -:  184:			memcpy(&value, arg.buf, sizeof(i64));
+        -:  185:			u8 buf[BUF_LEN];
+        -:  186:			strcpy(buf, "");
+        -:  187:			if (is_hex)
+        -:  188:				snprintf(buf, BUF_LEN - 1, "%llX", value);
+        -:  189:			else
+        -:  190:				snprintf(buf, BUF_LEN - 1, "%lli", value);
+        -:  191:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  192:				ret = -1;
+        -:  193:				break;
+        -:  194:			}
+        -:  195:		} else if (arg.type == PrintTypeU64) {
+        -:  196:			u64 value;
+        -:  197:			memcpy(&value, arg.buf, sizeof(u64));
+        -:  198:			u8 buf[BUF_LEN];
+        -:  199:			strcpy(buf, "");
+        -:  200:			if (is_hex)
+        -:  201:				snprintf(buf, BUF_LEN - 1, "%llx", value);
+        -:  202:			else
+        -:  203:				snprintf(buf, BUF_LEN - 1, "%llu", value);
+        -:  204:
+        -:  205:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  206:				ret = -1;
+        -:  207:				break;
+        -:  208:			}
+        -:  209:		} else if (arg.type == PrintTypeI32) {
+        -:  210:			i32 value;
+        -:  211:			memcpy(&value, arg.buf, sizeof(i32));
+        -:  212:			u8 buf[BUF_LEN];
+        -:  213:			strcpy(buf, "");
+        -:  214:			snprintf(buf, BUF_LEN - 1, "%i", value);
+        -:  215:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  216:				ret = -1;
+        -:  217:				break;
+        -:  218:			}
+        -:  219:		} else if (arg.type == PrintTypeU32) {
+        -:  220:			u32 value;
+        -:  221:			memcpy(&value, arg.buf, sizeof(u32));
+        -:  222:			u8 buf[BUF_LEN];
+        -:  223:			strcpy(buf, "");
+        -:  224:			snprintf(buf, BUF_LEN - 1, "%u", value);
+        -:  225:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  226:				ret = -1;
+        -:  227:				break;
+        -:  228:			}
+        -:  229:		} else if (arg.type == PrintTypeI16) {
+        -:  230:			i16 value;
+        -:  231:			memcpy(&value, arg.buf, sizeof(i16));
+        -:  232:			u8 buf[BUF_LEN];
+        -:  233:			strcpy(buf, "");
+        -:  234:			snprintf(buf, BUF_LEN - 1, "%i", value);
+        -:  235:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  236:				ret = -1;
+        -:  237:				break;
+        -:  238:			}
+        -:  239:		} else if (arg.type == PrintTypeU16) {
+        -:  240:			u16 value;
+        -:  241:			memcpy(&value, arg.buf, sizeof(u16));
+        -:  242:			u8 buf[BUF_LEN];
+        -:  243:			strcpy(buf, "");
+        -:  244:			snprintf(buf, BUF_LEN - 1, "%u", value);
+        -:  245:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  246:				ret = -1;
+        -:  247:				break;
+        -:  248:			}
+        -:  249:		} else if (arg.type == PrintTypeI8) {
+        -:  250:			i8 value;
+        -:  251:			memcpy(&value, arg.buf, sizeof(i8));
+        -:  252:			u8 buf[BUF_LEN];
+        -:  253:			strcpy(buf, "");
+        -:  254:			snprintf(buf, BUF_LEN - 1, "%i", value);
+        -:  255:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  256:				ret = -1;
+        -:  257:				break;
+        -:  258:			}
+        -:  259:		} else if (arg.type == PrintTypeU8) {
+        -:  260:			u8 value;
+        -:  261:			memcpy(&value, arg.buf, sizeof(u8));
+        -:  262:			u8 buf[BUF_LEN];
+        -:  263:			strcpy(buf, "");
+        -:  264:			snprintf(buf, BUF_LEN - 1, "%u", value);
+        -:  265:			if (write_loop(strm, s, &capacity, max, buf, strlen(buf))) {
+        -:  266:				ret = -1;
+        -:  267:				break;
+        -:  268:			}
+        -:  269:		} else if (arg.type == PrintTypeString) {
+        -:  270:			if (write_loop(strm, s, &capacity, max, arg.data, strlen(arg.data))) {
+        -:  271:				ret = -1;
+        -:  272:				break;
+        -:  273:			}
+        -:  274:		}
+        -:  275:		if (is_hex)
+        -:  276:			fmt = next + 5;
+        -:  277:		else
+        -:  278:			fmt = next + 2;
+        -:  279:	}
+        -:  280:
+        -:  281:	va_end(args);
+        -:  282:
+        -:  283:	if (do_exit) {
+        -:  284:		Backtrace bt;
+        -:  285:		backtrace_generate(&bt);
+        -:  286:		backtrace_print(&bt);
+        -:  287:
+        -:  288:		exit(code);
+        -:  289:	}
+        -:  290:
+        -:  291:	if (ret == -1)
+        -:  292:		return ret;
+        -:  293:	return capacity;
+        -:  294:}
+        -:  295:*/
+        -:    0:Source:slabs.c
+        -:    0:Graph:slabs.gcno
+        -:    0:Data:slabs.gcda
+        -:    0:Runs:9
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/fam_err.h>
+        -:   16:#include <base/os.h>
+        -:   17:#include <base/print_util.h>
+        -:   18:#include <base/slabs.h>
+        -:   19:#include <stdio.h>
+        -:   20:
+        -:   21:#define MAX_SLAB_TYPES 256
+        -:   22:#define SLAB_SIZES 256
+        -:   23:#define SLABS_PER_RESIZE 128
+        -:   24:#define INITIAL_CHUNKS 0
+        -:   25:
+        -:   26:typedef struct PtrImpl {
+        -:   27:	unsigned int id; // slab id
+        -:   28:	int len;		 // length of data in this slab (up to 3 bytes, 1 byte reserved for user flags)
+        -:   29:	int counter1;	 // user counter1 (potentially for rc strong count)
+        -:   30:	int counter2;	 // user counter2 (potentially for rc weak count)
+        -:   31:	byte data[];	 // user data
+        -:   32:} PtrImpl;
+        -:   33:
+        -:   34:#define SLAB_OVERHEAD sizeof(PtrImpl)
+        -:   35:
+        -:   36:const PtrImpl null = {.id = 0, .len = 0};
+        -:   37:
+        -:   38://  returns the slab's length
+    13832:   39:int ptr_len(const Ptr ptr) {
+    13832:   40:	return ptr->len & 0x00FFFFFF;
+        -:   41:}
+        -:   42:
+        -:   43:// returns the slabs id
+     9226:   44:unsigned int ptr_id(const Ptr ptr) {
+        -:   45:	// mask off flag byte (top byte)
+     9226:   46:	return ptr->id;
+        -:   47:}
+        -:   48:
+        -:   49:// reutrn pointer to slab data
+     8960:   50:void *ptr_data(const Ptr ptr) {
+     8960:   51:	return ptr->data;
+        -:   52:}
+        -:   53:
+        -:   54:// check whether a flag is set (0-7 are possible values)
+      115:   55:bool ptr_flag_check(const Ptr ptr, byte flag) {
+      115:   56:	return flag < 8 && ((int)(ptr->len >> 24)) & (1 << flag);
+        -:   57:}
+        -:   58:
+        -:   59:// set/unset a flag
+        1:   60:void ptr_flag_set(Ptr ptr, byte flag, bool value) {
+        1:   61:	if (flag >= 8)
+    #####:   62:		return;
+        1:   63:	if (value)
+        1:   64:		ptr->len |= (int)(1 << (int)flag) << 24;
+        -:   65:	else
+    #####:   66:		ptr->len &= ~((int)(1 << (int)flag) << 24);
+        -:   67:}
+        -:   68:
+    #####:   69:void ptr_count1_set(Ptr ptr, int value) {
+    #####:   70:	ptr->counter1 = value;
+    #####:   71:}
+        -:   72:
+    #####:   73:void ptr_count2_set(Ptr ptr, int value) {
+    #####:   74:	ptr->counter2 = value;
+    #####:   75:}
+        -:   76:
+    #####:   77:void ptr_count1_incr(Ptr ptr, int value) {
+    #####:   78:	ptr->counter1++;
+    #####:   79:}
         -:   80:
-        -:   81:#ifdef TEST
-        1:   82:Ptr ptr_test_obj(int id, int len, byte flags) {
-        1:   83:	Ptr ptr = (PtrImpl *)alloc(sizeof(PtrImpl) + len, false);
-        1:   84:	ptr->id = id;
-        1:   85:	ptr->len = len;
-        1:   86:	ptr->id |= ((int64)flags) << 56;
-        1:   87:	return ptr;
-        -:   88:}
-        -:   89:
-        1:   90:void ptr_free_test_obj(Ptr ptr) {
-        1:   91:	release(ptr);
-        1:   92:}
-        -:   93:#endif // TEST
+    #####:   81:void ptr_count2_incr(Ptr ptr, int value) {
+    #####:   82:	ptr->counter2++;
+    #####:   83:}
+        -:   84:
+    #####:   85:void ptr_count1_decr(Ptr ptr, int value) {
+    #####:   86:	ptr->counter1--;
+    #####:   87:}
+        -:   88:
+    #####:   89:void ptr_count2_decr(Ptr ptr, int value) {
+    #####:   90:	ptr->counter2--;
+    #####:   91:}
+        -:   92:
+    #####:   93:int ptr_count1_get(Ptr ptr) {
+    #####:   94:	return ptr->counter1;
+        -:   95:}
+    #####:   96:int ptr_count2_get(Ptr ptr) {
+    #####:   97:	return ptr->counter2;
+        -:   98:}
+        -:   99:
+        -:  100:#include <stdio.h>
+        -:  101:
+        -:  102:// return true if this Ptr is nil (unallocated)
+     8194:  103:bool ptr_is_nil(const Ptr ptr) {
+     8194:  104:	return !ptr || ptr->len == 0; // a nil pointer has 0 len
+        -:  105:}
+        -:  106:
+        -:  107:// Slab Type definition
+        -:  108:typedef struct SlabType {
+        -:  109:	unsigned int slab_size;
+        -:  110:	unsigned int slabs_per_resize;
+        -:  111:	unsigned int initial_chunks;
+        -:  112:	unsigned int max_slabs;
+        -:  113:} SlabType;
+        -:  114:
+        -:  115:typedef struct SlabData {
+        -:  116:	SlabType type;
+        -:  117:	byte **data;
+        -:  118:	unsigned int *free_list;
+        -:  119:	unsigned int cur_chunks;
+        -:  120:	unsigned int cur_slabs;
+        -:  121:	unsigned int free_list_head;
+        -:  122:} SlabData;
+        -:  123:
+        -:  124:typedef struct SlabAllocatorImpl {
+        -:  125:	int64 sd_count;
+        -:  126:	SlabData sd_arr[];
+        -:  127:} SlabAllocatorImpl;
+        -:  128:
+        4:  129:void slab_allocator_cleanup(SlabAllocator *ptr) {
+        4:  130:	SlabAllocatorNc sa = *ptr;
+        4:  131:	if (sa) {
+        4:  132:		if (sa->sd_count) {
+     1028:  133:			for (int i = 0; i < sa->sd_count; i++) {
+     1024:  134:				SlabData *sd = &sa->sd_arr[i];
+     1024:  135:				if (sd->cur_chunks) {
+        4:  136:					release(sd->free_list);
+       40:  137:					for (int64 j = 0; j < sd->cur_chunks; j++)
+       36:  138:						release(sd->data[j]);
+        4:  139:					release(sd->data);
+        4:  140:					sd->cur_chunks = 0;
+        -:  141:				}
+        -:  142:			}
+        -:  143:		}
+        4:  144:		release(sa);
+        4:  145:		*ptr = NULL;
+        -:  146:	}
+        4:  147:}
+        -:  148:
+     4614:  149:int64 slab_allocator_slab_data_index(SlabData *sd, int64 id) {
+     4614:  150:	return id / sd->type.slabs_per_resize;
+        -:  151:}
+        -:  152:
+     4614:  153:int64 slab_allocator_slab_data_offset(SlabData *sd, int64 id) {
+     4614:  154:	return (id % sd->type.slabs_per_resize) * (SLAB_OVERHEAD + sd->type.slab_size);
+        -:  155:}
+        -:  156:
+       36:  157:void slab_allocator_init_free_list(SlabData *sd, int64 chunks) {
+       36:  158:	sd->free_list_head = sd->cur_chunks * sd->type.slabs_per_resize;
+       36:  159:	int64 count = chunks * (int64)sd->type.slabs_per_resize;
+     4644:  160:	for (int64 i = 0; i < count; i++) {
+     4608:  161:		if (i == count - 1) {
+       36:  162:			sd->free_list[i + sd->free_list_head] = UINT32_MAX;
+        -:  163:		} else {
+     4572:  164:			sd->free_list[i + sd->free_list_head] = 1 + i + sd->free_list_head;
+        -:  165:		}
+        -:  166:	}
+       36:  167:}
+        -:  168:
+       36:  169:int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
+       36:  170:	if (sd->cur_chunks == 0) {
+        4:  171:		sd->free_list = alloc(chunks * sd->type.slabs_per_resize * sizeof(unsigned int), false);
+        4:  172:		if (sd->free_list == NULL)
+    #####:  173:			return -1;
+        4:  174:		sd->data = alloc(chunks * sizeof(byte *), false);
+        4:  175:		if (sd->data == NULL) {
+    #####:  176:			release(sd->free_list);
+    #####:  177:			return -1;
+        -:  178:		}
+        8:  179:		for (int64 i = 0; i < chunks; i++) {
+        8:  180:			sd->data[i] =
+        4:  181:				alloc(sd->type.slabs_per_resize * (SLAB_OVERHEAD + sd->type.slab_size), false);
+        4:  182:			if (sd->data[i] == NULL) {
+    #####:  183:				release(sd->free_list);
+    #####:  184:				for (int64 j = i - 1; j >= 0; j--) {
+    #####:  185:					release(sd->data[j]);
+        -:  186:				}
+    #####:  187:				release(sd->data);
+    #####:  188:				return -1;
+        -:  189:			}
+        -:  190:		}
+        -:  191:	} else {
+       32:  192:		if ((chunks + (int64)sd->cur_chunks) * (int64)sd->type.slabs_per_resize >
+       32:  193:			sd->type.max_slabs) {
+    #####:  194:			SetErr(Overflow);
+    #####:  195:			return -1;
+        -:  196:		}
+       32:  197:		void *tmp = resize(sd->free_list, (chunks + sd->cur_chunks) * sd->type.slabs_per_resize *
+        -:  198:											  sizeof(unsigned int));
+       32:  199:		if (tmp == NULL)
+    #####:  200:			return -1;
+       32:  201:		sd->free_list = tmp;
+       32:  202:		void *tmp2 = resize(sd->data, (chunks + sd->cur_chunks) * sizeof(byte *));
+       32:  203:		if (tmp2 == NULL) {
+    #####:  204:			release(sd->free_list);
+    #####:  205:			return -1;
+        -:  206:		}
+       32:  207:		sd->data = tmp2;
+       64:  208:		for (int64 i = 0; i < chunks; i++) {
+       64:  209:			sd->data[i + sd->cur_chunks] =
+       32:  210:				alloc(sd->type.slabs_per_resize * (SLAB_OVERHEAD + sd->type.slab_size), false);
+       32:  211:			if (sd->data[i + sd->cur_chunks] == NULL) {
+    #####:  212:				release(sd->free_list);
+    #####:  213:				for (int64 j = i - 1; j >= 0; j--) {
+    #####:  214:					release(sd->data[j + sd->cur_chunks]);
+        -:  215:				}
+    #####:  216:				release(sd->data);
+    #####:  217:				return -1;
+        -:  218:			}
+        -:  219:		}
+        -:  220:	}
+        -:  221:
+       36:  222:	slab_allocator_init_free_list(sd, chunks);
+       36:  223:	sd->cur_chunks += chunks;
+       36:  224:	return 0;
+        -:  225:}
+        -:  226:
+     1024:  227:int slab_allocator_init_data(SlabData *sd) {
+     1024:  228:	sd->cur_slabs = 0;
+     1024:  229:	sd->cur_chunks = 0;
+     1024:  230:	sd->free_list_head = UINT32_MAX;
+     1024:  231:	sd->free_list = NULL;
+     1024:  232:	sd->data = NULL;
+        -:  233:
+     1024:  234:	if (sd->type.initial_chunks) {
+    #####:  235:		if (slab_allocator_increase_chunks(sd, sd->type.initial_chunks))
+    #####:  236:			return -1;
+        -:  237:	}
+     1024:  238:	return 0;
+        -:  239:}
+        -:  240:
+        4:  241:int slab_allocator_init_state(SlabAllocator sa) {
+     1028:  242:	for (int i = 0; i < sa->sd_count; i++) {
+     1024:  243:		if (slab_allocator_init_data(&sa->sd_arr[i]))
+    #####:  244:			return -1;
+        -:  245:	}
+        -:  246:
+        4:  247:	return 0;
+        -:  248:}
+        -:  249:
+        4:  250:SlabAllocator slab_allocator_create() {
+        4:  251:	SlabAllocatorNc ret = (SlabAllocatorImpl *)alloc(
+        -:  252:		sizeof(SlabAllocatorImpl) + SLAB_SIZES * sizeof(SlabData), false);
+        4:  253:	if (ret == NULL)
+    #####:  254:		return NULL;
+        4:  255:	ret->sd_count = SLAB_SIZES;
+     1028:  256:	for (int i = 0; i < ret->sd_count; i++) {
+     1024:  257:		SlabData *sd = &ret->sd_arr[i];
+     1024:  258:		sd->type = (const SlabType) {.slab_size = (1 + i) * 16,
+        -:  259:									 .slabs_per_resize = SLABS_PER_RESIZE,
+        -:  260:									 .initial_chunks = INITIAL_CHUNKS,
+        -:  261:									 .max_slabs = UINT32_MAX};
+     1024:  262:		sd->cur_chunks = 0;
+        -:  263:	}
+        -:  264:
+        4:  265:	if (slab_allocator_init_state(ret)) {
+    #####:  266:		slab_allocator_cleanup(&ret);
+    #####:  267:		return NULL;
+        -:  268:	}
+        4:  269:	return ret;
+        -:  270:}
+        -:  271:
+     9225:  272:int slab_allocator_index(SlabAllocator sa, int size) {
+     9225:  273:	int ret = (size - 1) / 16;
+     9225:  274:	if (size <= 0 || ret >= SLAB_SIZES)
+        1:  275:		return -1;
+     9224:  276:	return ret;
+        -:  277:}
+        -:  278:
+     4614:  279:Ptr slab_allocator_allocate_sd(SlabData *sd) {
+     4614:  280:	if (sd->free_list_head == UINT32_MAX) {
+       36:  281:		if (slab_allocator_increase_chunks(sd, 1)) {
+    #####:  282:			return NULL;
+        -:  283:		}
+       36:  284:		if (sd->free_list_head == UINT32_MAX) {
+    #####:  285:			SetErr(CapacityExceeded);
+    #####:  286:			return NULL;
+        -:  287:		}
+        -:  288:	}
+     4614:  289:	int64 index = slab_allocator_slab_data_index(sd, sd->free_list_head);
+     4614:  290:	int64 offset = slab_allocator_slab_data_offset(sd, sd->free_list_head);
+     4614:  291:	Ptr ptr = (PtrImpl *)(sd->data[index] + offset);
+     4614:  292:	ptr->id = sd->free_list_head;
+     4614:  293:	ptr->len = sd->type.slab_size;
+     4614:  294:	sd->free_list_head = sd->free_list[ptr->id];
+     4614:  295:	sd->cur_slabs++;
+        -:  296:
+     4614:  297:	return ptr;
+        -:  298:}
+        -:  299:
+     4610:  300:void slab_allocator_data_free(SlabData *sd, int64 id) {
+     4610:  301:	sd->free_list[id] = sd->free_list_head;
+     4610:  302:	sd->free_list_head = id;
+     4610:  303:	sd->cur_slabs--;
+     4610:  304:}
+        -:  305:
+     4615:  306:Ptr slab_allocator_allocate(SlabAllocator sa, int64 size) {
+     4615:  307:	int index = slab_allocator_index(sa, size);
+     4615:  308:	if (index < 0)
+        1:  309:		return NULL;
+        -:  310:
+     4614:  311:	return slab_allocator_allocate_sd(&sa->sd_arr[index]);
+        -:  312:}
+        -:  313:
+     4610:  314:void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
+     4610:  315:	if (ptr == NULL || sa == NULL) {
+    #####:  316:		panic("Invalid ptr sent to slab_allocator free!");
+        -:  317:	}
+     4610:  318:	int64 len = ptr_len(ptr);
+     4610:  319:	int index = slab_allocator_index(sa, len);
+     4610:  320:	if (index < 0) {
+    #####:  321:		panic("Invalid ptr sent to slab_allocator free! Unknown size %lli.", len);
+        -:  322:	}
+     4610:  323:	if (sa->sd_arr[index].type.slab_size != len) {
+    #####:  324:		panic("Invalid ptr sent to slab_allocator free! Size mismatch %lli vs. %lli.",
+        -:  325:			  sa->sd_arr[index].type.slab_size, len);
+        -:  326:	}
+        -:  327:
+     4610:  328:	slab_allocator_data_free(&sa->sd_arr[index], ptr->id);
+        -:  329:
+     4610:  330:	*ptr = null;
+     4610:  331:}
+       10:  332:int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
+       10:  333:	int64 slabs = 0;
+     2570:  334:	for (int i = 0; i < sa->sd_count; i++) {
+     2560:  335:		SlabData *sd = &sa->sd_arr[i];
+     2560:  336:		slabs += sd->cur_slabs;
+        -:  337:	}
+       10:  338:	return slabs;
+        -:  339:}
+        -:  340:
+        -:  341:#ifdef TEST
+        1:  342:Ptr ptr_test_obj(int64 id, int64 len, byte flags) {
+        1:  343:	Ptr ptr = (PtrImpl *)alloc(sizeof(PtrImpl) + len, false);
+        1:  344:	ptr->id = id;
+        1:  345:	ptr->len = len;
+        1:  346:	ptr->len |= ((int)flags) << 24;
+        1:  347:	return ptr;
+        -:  348:}
+        -:  349:
+        1:  350:void ptr_free_test_obj(Ptr ptr) {
+        1:  351:	release(ptr);
+        1:  352:}
+        -:  353:#endif // TEST
         -:    0:Source:string.c
         -:    0:Graph:string.gcno
         -:    0:Data:string.gcda
-        -:    0:Runs:7
+        -:    0:Runs:9
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -578,7 +1137,7 @@
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:7
+        -:    0:Runs:9
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -594,50 +1153,46 @@
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <base/osdef.h>
-        -:   16:#include <base/types.h>
-        -:   17:#include <stdio.h>
-        -:   18:
-    #####:   19:void __attribute__((no_return)) panic(const char *message) {
-    #####:   20:	fprintf(stderr, "%s\n", message);
-    #####:   21:	exit(-1);
-        -:   22:}
-        -:   23:
-        7:   24:void __attribute__((constructor)) __check_64bit_arch__() {
-        -:   25:#if !defined(__x86_64__) && !defined(_M_X64) && !defined(__aarch64__)
-        -:   26:	panic("Supported architectures: __x86_64__, _M_X64, and __aarch64__");
-        -:   27:#endif // arch
-        -:   28:
-        -:   29:	// check size_t
-        -:   30:	if (__SIZEOF_SIZE_T__ != 8)
-        -:   31:		panic("size_t must be 8 bytes. Invalid arch!");
-        -:   32:	// check primitive types
-        -:   33:	if (sizeof(byte) != 1)
-        -:   34:		panic("byte must be 1 byte. Invalid arch!");
-        -:   35:
-        -:   36:	if (sizeof(int64) != 8)
-        -:   37:		panic("must be 8 bytes. Invalid arch!");
-        -:   38:
-        -:   39:	if (sizeof(int) != 4)
-        -:   40:		panic("int must be 4 bytes. Invalid arch!");
-        -:   41:
-        -:   42:	if (sizeof(float64) != 8)
-        -:   43:		panic("float64 must be 8 bytes. Invalid arch!");
-        -:   44:
-        -:   45:	if (sizeof(bool) != 1)
-        -:   46:		panic("bool must be 1 byte. Invalid arch!");
-        -:   47:
-        -:   48:	if (sizeof(aint64) != 8)
-        -:   49:		panic("aint64 must be 8 bytes. Invalid arch!");
-        -:   50:
-        -:   51:	if (sizeof(abool) != 1)
-        -:   52:		panic("abool must be 1 byte. Invalid arch!");
-        -:   53:
-        -:   54:	// little endian check
-        7:   55:	int test = 0x1;
-        7:   56:	if (*(byte *)&test != 0x1) {
-    #####:   57:		panic("Big endian is not supported!");
-        -:   58:	}
-        7:   59:}
+        -:   16:#include <base/print_util.h>
+        -:   17:#include <base/types.h>
+        -:   18:#include <stdio.h>
+        -:   19:
+        9:   20:void __attribute__((constructor)) __check_64bit_arch__() {
+        -:   21:#if !defined(__x86_64__) && !defined(_M_X64) && !defined(__aarch64__)
+        -:   22:	panic("Supported architectures: __x86_64__, _M_X64, and __aarch64__");
+        -:   23:#endif // arch
+        -:   24:
+        -:   25:	// check size_t
+        -:   26:	if (__SIZEOF_SIZE_T__ != 8)
+        -:   27:		panic("size_t must be 8 bytes. Invalid arch!");
+        -:   28:	// check primitive types
+        -:   29:	if (sizeof(byte) != 1)
+        -:   30:		panic("byte must be 1 byte. Invalid arch!");
+        -:   31:
+        -:   32:	if (sizeof(int64) != 8)
+        -:   33:		panic("must be 8 bytes. Invalid arch!");
+        -:   34:
+        -:   35:	if (sizeof(int) != 4)
+        -:   36:		panic("int must be 4 bytes. Invalid arch!");
+        -:   37:
+        -:   38:	if (sizeof(float64) != 8)
+        -:   39:		panic("float64 must be 8 bytes. Invalid arch!");
+        -:   40:
+        -:   41:	if (sizeof(bool) != 1)
+        -:   42:		panic("bool must be 1 byte. Invalid arch!");
+        -:   43:
+        -:   44:	if (sizeof(aint64) != 8)
+        -:   45:		panic("aint64 must be 8 bytes. Invalid arch!");
+        -:   46:
+        -:   47:	if (sizeof(abool) != 1)
+        -:   48:		panic("abool must be 1 byte. Invalid arch!");
+        -:   49:
+        -:   50:	// little endian check
+        9:   51:	int test = 0x1;
+        9:   52:	if (*(byte *)&test != 0x1) {
+    #####:   53:		panic("Big endian is not supported!");
+        -:   54:	}
+        9:   55:}
         -:    0:Source:real_main.c
         -:    0:Graph:real_main.gcno
         -:    0:Data:real_main.gcda

@@ -69,9 +69,22 @@ $(function() {
 <li>buf
 : <a class="el" href="structPrintPair.html#a49e92447e79ea220825a90b6d3f313d1">PrintPair</a>
 </li>
+<li>counter1
+: <a class="el" href="structPtrImpl.html#a33e8165508be53d7cf3304501b5a49e3">PtrImpl</a>
+</li>
+<li>counter2
+: <a class="el" href="structPtrImpl.html#ab32f104c1e447c704a92407b6c089504">PtrImpl</a>
+</li>
+<li>cur_chunks
+: <a class="el" href="structSlabData.html#a4dbacb9ed828ba076b77fd6a664f1b44">SlabData</a>
+</li>
+<li>cur_slabs
+: <a class="el" href="structSlabData.html#a3a8797f1addd34ae741de1dc4cb511ce">SlabData</a>
+</li>
 <li>data
 : <a class="el" href="structPrintPair.html#af22ced56ff0137d763283ca7cced433b">PrintPair</a>
 , <a class="el" href="structPtrImpl.html#a022eae1eaecebcb9f21518ec37010804">PtrImpl</a>
+, <a class="el" href="structSlabData.html#a42ee13431bf3653427b61c0818fe13ca">SlabData</a>
 , <a class="el" href="structstringImpl.html#af8754da0b20619d991f55418da7e6322">stringImpl</a>
 </li>
 <li>fclose_sum
@@ -80,24 +93,30 @@ $(function() {
 <li>fopen_sum
 : <a class="el" href="structResourceStats.html#ab82a1ca32048ec7e1c15d53265de791b">ResourceStats</a>
 </li>
+<li>free_list
+: <a class="el" href="structSlabData.html#aaac8802a8f0a9091b3fb8e2e0c78762f">SlabData</a>
+</li>
+<li>free_list_head
+: <a class="el" href="structSlabData.html#a8d5ca1aef133616262b14eebe8b694e8">SlabData</a>
+</li>
 <li>handle
 : <a class="el" href="structStream.html#a4d2ba87f809835f9a961e913b2e63fd5">Stream</a>
 </li>
 <li>id
-: <a class="el" href="structPtrImpl.html#a550e5dd9a2c989f6d0ebf3f548db5df8">PtrImpl</a>
+: <a class="el" href="structPtrImpl.html#a171cd0179392da3e279c879e317fb677">PtrImpl</a>
 </li>
 <li>impl
 : <a class="el" href="structstringNc.html#a01c312f3696cf1efed28b4723d96d17f">stringNc</a>
 </li>
 <li>initial_chunks
-: <a class="el" href="structSlabType.html#aea5fb9f838c6a8e57eca1db566aab88b">SlabType</a>
+: <a class="el" href="structSlabType.html#a1d466297e21ede3754d698f991762bf4">SlabType</a>
 </li>
 <li>len
-: <a class="el" href="structPtrImpl.html#a452c55ae3ed9452a36dac315b7ff50d2">PtrImpl</a>
+: <a class="el" href="structPtrImpl.html#a840edf5552f1d3b29c09c91a07e12861">PtrImpl</a>
 , <a class="el" href="structstringImpl.html#afada7e5319673cb4c4d28daa3a84a3a5">stringImpl</a>
 </li>
 <li>max_slabs
-: <a class="el" href="structSlabType.html#ae3309e5d6d7ad23c84b1b11737ff8a19">SlabType</a>
+: <a class="el" href="structSlabType.html#a941a0772f2be94bff919a97fced6a9ba">SlabType</a>
 </li>
 <li>release_sum
 : <a class="el" href="structResourceStats.html#a734a98bf8b41c03897c0f9923af9e0a7">ResourceStats</a>
@@ -105,32 +124,24 @@ $(function() {
 <li>resize_sum
 : <a class="el" href="structResourceStats.html#a344cb94802cd377dc3ffc56ecbe987f7">ResourceStats</a>
 </li>
+<li>sd_arr
+: <a class="el" href="structSlabAllocatorImpl.html#ac7113773e73d919013661cfeda21f650">SlabAllocatorImpl</a>
+</li>
+<li>sd_count
+: <a class="el" href="structSlabAllocatorImpl.html#ae6e1616129648178605b50c051cd6ef1">SlabAllocatorImpl</a>
+</li>
 <li>slab_size
-: <a class="el" href="structSlabType.html#a24063051402b72cdda287802374dcb37">SlabType</a>
-</li>
-<li>slab_types
-: <a class="el" href="structSlabAllocatorConfigNc.html#a6dc6dd63dcfa60d360cdebf5b1746bde">SlabAllocatorConfigNc</a>
-</li>
-<li>slab_types_count
-: <a class="el" href="structSlabAllocatorConfigNc.html#a1fa4125bed3e16db5effab622ecddced">SlabAllocatorConfigNc</a>
-</li>
-<li>slabs
-: <a class="el" href="structSlabAllocatorImpl.html#acd727d2047838331f64986d8f2005cd3">SlabAllocatorImpl</a>
+: <a class="el" href="structSlabType.html#aac458f2e06b5b25134755343f34eadce">SlabType</a>
 </li>
 <li>slabs_per_resize
-: <a class="el" href="structSlabType.html#a27cb31410391e3977b6d431a0ac8d855">SlabType</a>
+: <a class="el" href="structSlabType.html#a3840962f73228dfa6ac82e53813bc007">SlabType</a>
 </li>
 <li>strm
 : <a class="el" href="structStream.html#a7ad8a221962ee490cf706ad8b9b98e66">Stream</a>
 </li>
 <li>type
 : <a class="el" href="structPrintPair.html#a70b3768e234cab7ffd2b6bf89ae6eb1b">PrintPair</a>
-</li>
-<li>x
-: <a class="el" href="structSlabAllocatorImpl.html#ab197e0c798bdf51f15ad804d96ddce8b">SlabAllocatorImpl</a>
-</li>
-<li>y
-: <a class="el" href="structSlabAllocatorImpl.html#a05c4383b2423958e5be3f26a80ad7cbd">SlabAllocatorImpl</a>
+, <a class="el" href="structSlabData.html#afd56765101a4c66714ecb49a8691cdbe">SlabData</a>
 </li>
 </ul>
 </div><!-- contents -->
