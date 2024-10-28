@@ -23,11 +23,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#undef true
-#define true (_Bool)1
-#undef false
-#define false (_Bool)0
-
 int unlink_cb(const char *fpath, const struct stat *sb, int typeflag, struct FTW *ftwbuf) {
 	int rv = remove(fpath);
 

@@ -121,7 +121,7 @@ MyTest(base, test_string) {
 	cr_assert_eq(count, 4);
 }
 
-Test(base, test_ptr) {
+MyTest(base, test_ptr) {
 	int64 alloc_sum_pre = alloc_sum();
 	Ptr ptr = ptr_test_obj(123, 100, 0xF);
 	cr_assert(ptr_flag_check(ptr, 0));
@@ -156,10 +156,7 @@ Test(base, test_ptr) {
 	cr_assert_eq(release_sum_post - release_sum_pre, 1);
 }
 
-Test(base, test_slab_allocator_config) {
-}
-
-Test(base, test_slab_allocator) {
+MyTest(base, test_slab_allocator) {
 	SlabAllocator sa = slab_allocator_create();
 
 	fam_err = NoErrors;
@@ -194,7 +191,7 @@ Test(base, test_slab_allocator) {
 	printf("ptr5.id=%i\n", ptr_id(ptr5));
 }
 
-Test(base, test_slab_allocator_resize) {
+MyTest(base, test_slab_allocator_resize) {
 	SlabAllocator sa = slab_allocator_create();
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
 	int size = 256;
@@ -236,7 +233,49 @@ Test(base, test_slab_allocator_resize) {
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
 }
 
-Test(base, test_limits) {
+MyTest(base, test_big) {
+	SlabAllocator sa = slab_allocator_create();
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
+	int64 size = 1024LL * 1024LL;
+	int ss = 16;
+	Ptr *arr = alloc(sizeof(Ptr) * size, false);
+	for (int i = 0; i < size; i++) {
+		if (i % (1024 * 1024) == 0 || i > 2055208960)
+			printf("i=%i\n", i);
+		arr[i] = slab_allocator_allocate(sa, ss);
+		cr_assert(!nil(arr[i]));
+		cr_assert_eq(ptr_id(arr[i]), i);
+		cr_assert_eq($len(arr[i]), ss);
+		byte *data = $(arr[i]);
+		for (int j = 0; j < ss; j++)
+			data[j] = (j + i * 3) % 256;
+	}
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), size);
+
+	for (int64 i = 0; i < size; i++) {
+		if (i % (1024 * 1024) == 0)
+			printf("free i=%i\n", i);
+		cr_assert_eq(ptr_id(arr[i]), i);
+		cr_assert_eq($len(arr[i]), ss);
+		byte *data = $(arr[i]);
+		for (int j = 0; j < ss; j++)
+			cr_assert_eq(data[j], (j + i * 3) % 256);
+		slab_allocator_free(sa, arr[i]);
+	}
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
+
+	Ptr p = slab_allocator_allocate(sa, ss);
+	cr_assert_eq(ptr_id(p), size - 1);
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 1);
+	slab_allocator_free(sa, p);
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
+
+	release(arr);
+}
+
+MyTest(base, test_limits) {
 	cr_assert_eq(INT64_MAX, 9223372036854775807LL);
 	cr_assert_eq(INT64_MAX_IMPL, 9223372036854775807LL);
 	cr_assert_eq(INT_MAX, 2147483647);
