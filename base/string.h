@@ -49,7 +49,6 @@ void string_cleanup(stringNc *ptr);
 #define String(...) String_(__VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(0ULL))
 
 #define nil_string(s) (s.impl == NULL)
-#define nil(s) nil_string(s)
 
 #define string_append(s, v, ...)                                                                   \
 	_Generic((v), string: ({ string_append_s(&s, (string *)&v); }), default: ({                    \

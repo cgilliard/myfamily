@@ -134,7 +134,7 @@ Test(base, test_ptr) {
 		cr_assert(!ptr_flag_check(ptr, i));
 	}
 	cr_assert_eq(ptr_id(ptr), 123);
-	cr_assert_eq(ptr_len(ptr), 100);
+	cr_assert_eq($len(ptr), 100);
 
 	ptr_flag_set(ptr, 4, true);
 	cr_assert(ptr_flag_check(ptr, 0));
@@ -145,7 +145,7 @@ Test(base, test_ptr) {
 	cr_assert(!ptr_flag_check(ptr, 5));
 
 	cr_assert_eq(ptr_id(ptr), 123);
-	cr_assert_eq(ptr_len(ptr), 100);
+	cr_assert_eq($len(ptr), 100);
 
 	int64 alloc_sum_post = alloc_sum();
 	cr_assert_eq(alloc_sum_post - alloc_sum_pre, 1);
@@ -156,21 +156,10 @@ Test(base, test_ptr) {
 }
 
 Test(base, test_slab_allocator_config) {
-	SlabAllocatorConfig sc1 = slab_allocator_config_create();
 }
 
 Test(base, test_slab_allocator) {
-	SlabAllocatorConfig sc = slab_allocator_config_create();
 	SlabAllocator sa = slab_allocator_create();
-	/*
-		cr_assert_eq(sa, NULL);
-		cr_assert_eq(fam_err, IllegalArgument);
-	*/
-	SlabType st = (const SlabType) {
-		.slab_size = 32, .slabs_per_resize = 128, .initial_chunks = 1, .max_slabs = UINT32_MAX};
-	cr_assert(!slab_allocator_config_add_type(sc, &st));
-	st.slab_size = 64;
-	cr_assert(!slab_allocator_config_add_type(sc, &st));
 
 	fam_err = NoErrors;
 	SlabAllocator sa2 = slab_allocator_create();
@@ -184,25 +173,24 @@ Test(base, test_slab_allocator) {
 	cr_assert(!ptr3);
 	cr_assert(ptr1);
 	cr_assert(ptr2);
-	printf("ptr_len%i\n", ptr_len(ptr1));
-	cr_assert_eq(ptr_len(ptr1), 32);
-	cr_assert_eq(ptr_len(ptr2), 48);
+	printf("ptr_len%i\n", $len(ptr1));
+	cr_assert_eq($len(ptr1), 32);
+	cr_assert_eq($len(ptr2), 48);
 	printf("ptr1.id=%i\n", ptr_id(ptr1));
 	printf("ptr2.id=%i\n", ptr_id(ptr2));
 	ptr3 = slab_allocator_allocate(sa2, 33);
-	cr_assert_eq(ptr_len(ptr3), 48);
+	cr_assert_eq($len(ptr3), 48);
 	printf("ptr3.id=%i\n", ptr_id(ptr3));
 	printf("ptr3.id=%i\n", ptr_id(ptr3));
 	printf("ptr3.id=%i\n", ptr_id(ptr3));
 
-	cr_assert(!ptr_is_nil(ptr3));
+	cr_assert(!nil(ptr3));
 	slab_allocator_free(sa2, ptr3);
-	cr_assert(ptr_is_nil(ptr3));
+	cr_assert(nil(ptr3));
 	Ptr ptr4 = slab_allocator_allocate(sa2, 33);
 	printf("ptr4.id=%i\n", ptr_id(ptr4));
 	Ptr ptr5 = slab_allocator_allocate(sa2, 33);
 	printf("ptr5.id=%i\n", ptr_id(ptr5));
-	printf("sz of obj=%lu\n", sizeof(Object));
 }
 
 Test(base, test_slab_allocator_resize) {
@@ -213,8 +201,8 @@ Test(base, test_slab_allocator_resize) {
 	for (int i = 0; i < size; i++) {
 		arr[i] = slab_allocator_allocate(sa, 32);
 		cr_assert_eq(ptr_id(arr[i]), i);
-		cr_assert_eq(ptr_len(arr[i]), 32);
-		byte *data = ptr_data(arr[i]);
+		cr_assert_eq($len(arr[i]), 32);
+		byte *data = $(arr[i]);
 		data[0] = (i * 3) % 256;
 	}
 
@@ -222,8 +210,8 @@ Test(base, test_slab_allocator_resize) {
 
 	for (int i = 0; i < size; i++) {
 		cr_assert_eq(ptr_id(arr[i]), i);
-		cr_assert_eq(ptr_len(arr[i]), 32);
-		byte *data = ptr_data(arr[i]);
+		cr_assert_eq($len(arr[i]), 32);
+		byte *data = $(arr[i]);
 		cr_assert_eq(data[0], (i * 3) % 256);
 		slab_allocator_free(sa, arr[i]);
 	}
@@ -233,15 +221,15 @@ Test(base, test_slab_allocator_resize) {
 	for (int i = 0; i < size; i++) {
 		arr[i] = slab_allocator_allocate(sa, 32);
 		cr_assert_eq(ptr_id(arr[i]), (size - i) - 1);
-		cr_assert_eq(ptr_len(arr[i]), 32);
+		cr_assert_eq($len(arr[i]), 32);
 	}
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), size);
 
 	for (int i = 0; i < size; i++) {
 		cr_assert_eq(ptr_id(arr[i]), (size - i) - 1);
-		cr_assert_eq(ptr_len(arr[i]), 32);
-		byte *data = ptr_data(arr[i]);
+		cr_assert_eq($len(arr[i]), 32);
+		byte *data = $(arr[i]);
 		slab_allocator_free(sa, arr[i]);
 	}
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);

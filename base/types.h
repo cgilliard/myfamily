@@ -18,8 +18,8 @@
 #include <base/limits.h>
 
 // primitives
-#define int64 long long
-#define byte unsigned char
+typedef signed long long int64;
+typedef unsigned char byte;
 #define float64 double
 
 // booleans

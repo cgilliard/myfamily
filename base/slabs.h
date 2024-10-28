@@ -23,11 +23,6 @@
 typedef struct PtrImpl *Ptr;
 extern const struct PtrImpl null;
 
-typedef struct Object {
-	Ptr data;	// Pointer to slab-allocated data
-	byte flags; // Object-specific flags
-} Object;
-
 int ptr_len(const Ptr ptr);
 int ptr_id(const Ptr ptr);
 void *ptr_data(const Ptr ptr);
@@ -43,32 +38,20 @@ void ptr_count2_decr(Ptr ptr, int value);
 int ptr_count1_get(Ptr ptr);
 int ptr_count2_get(Ptr ptr);
 
+#define $(ptr) ptr_data(ptr)
+#define $len(ptr) ptr_len(ptr)
+#define nil(ptr)                                                                                   \
+	_Generic((ptr),                                                                                \
+		Ptr: ({                                                                                    \
+				 Ptr _tmp__ = _Generic((ptr), Ptr: ptr, default: NULL);                            \
+				 ptr_is_nil(_tmp__);                                                               \
+			 }),                                                                                   \
+		default: ({ (((string *)&ptr)->impl == NULL); }))
+
 #ifdef TEST
 Ptr ptr_test_obj(int64 id, int64 len, byte flags);
 void ptr_free_test_obj(Ptr ptr);
 #endif // TEST
-
-// Slab Allocator Config
-
-// Slab Type definition
-typedef struct SlabType {
-	int slab_size;
-	int slabs_per_resize;
-	int initial_chunks;
-	unsigned int max_slabs;
-} SlabType;
-
-typedef struct SlabAllocatorConfigImpl *SlabAllocatorConfigNc;
-
-void slab_allocator_config_cleanup(SlabAllocatorConfigNc *ptr);
-
-#define INIT_SLAB_ALLOCAOTR_CONFIG {NULL}
-#define SlabAllocatorConfig                                                                        \
-	SlabAllocatorConfigNc                                                                          \
-		__attribute__((warn_unused_result, cleanup(slab_allocator_config_cleanup)))
-
-SlabAllocatorConfig slab_allocator_config_create();
-int64 slab_allocator_config_add_type(SlabAllocatorConfig sc, const SlabType *st);
 
 // Slab Allocator
 

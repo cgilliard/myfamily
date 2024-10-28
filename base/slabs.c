@@ -102,45 +102,13 @@ bool ptr_is_nil(const Ptr ptr) {
 	return ptr->len == 0; // a nil pointer has 0 len
 }
 
-typedef struct SlabAllocatorConfigImpl {
-	int slab_types_count;
-	int slab_types_capacity;
-	SlabType *slab_types;
-} SlabAllocatorConfigImpl;
-
-void slab_allocator_config_cleanup(SlabAllocatorConfig *ptr) {
-	if (ptr == NULL)
-		return;
-	SlabAllocatorConfigNc sac = *ptr;
-	if (sac == NULL)
-		return;
-	if (sac->slab_types_capacity) {
-		release(sac->slab_types);
-		sac->slab_types_capacity = 0;
-	}
-}
-
-SlabAllocatorConfig slab_allocator_config_create() {
-	SlabAllocatorConfigNc ret =
-		(SlabAllocatorConfigImpl *)alloc(sizeof(SlabAllocatorConfigImpl), false);
-	ret->slab_types_count = 0;
-	ret->slab_types_capacity = MAX_SLAB_TYPES;
-	ret->slab_types = alloc(MAX_SLAB_TYPES * sizeof(SlabType), false);
-	if (ret->slab_types == NULL) {
-		return NULL;
-	}
-	return ret;
-}
-
-int64 slab_allocator_config_add_type(SlabAllocatorConfig sc, const SlabType *st) {
-	if (sc->slab_types_count >= MAX_SLAB_TYPES) {
-		SetErr(Overflow);
-		return -1;
-	}
-	sc->slab_types[sc->slab_types_count] = *st;
-	sc->slab_types_count++;
-	return 0;
-}
+// Slab Type definition
+typedef struct SlabType {
+	int slab_size;
+	int slabs_per_resize;
+	int initial_chunks;
+	unsigned int max_slabs;
+} SlabType;
 
 typedef struct SlabData {
 	SlabType type;
@@ -161,8 +129,17 @@ void slab_allocator_cleanup(SlabAllocator *ptr) {
 	if (sa) {
 		if (sa->sd_count) {
 			for (int i = 0; i < sa->sd_count; i++) {
+				SlabData *sd = &sa->sd_arr[i];
+				if (sd->cur_chunks) {
+					release(sd->free_list);
+					for (int64 j = 0; j < sd->cur_chunks; j++)
+						release(sd->data[j]);
+					release(sd->data);
+					sd->cur_chunks = 0;
+				}
 			}
 		}
+		release(sa);
 	}
 }
 
@@ -255,7 +232,7 @@ SlabAllocator slab_allocator_create() {
 
 int slab_allocator_index(SlabAllocator sa, int size) {
 	int ret = (size - 1) / 16;
-	if (ret >= SLAB_SIZES)
+	if (size <= 0 || ret >= SLAB_SIZES)
 		return -1;
 	return ret;
 }
