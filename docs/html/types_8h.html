@@ -79,10 +79,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a09fc63bce67d19142460e915d94f732f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a>&#160;&#160;&#160;long long</td></tr>
-<tr class="separator:a09fc63bce67d19142460e915d94f732f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71809484a26cd96c6abe839a0a8a289d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a71809484a26cd96c6abe839a0a8a289d">byte</a>&#160;&#160;&#160;unsigned char</td></tr>
-<tr class="separator:a71809484a26cd96c6abe839a0a8a289d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1442831462916636639280563c682b16"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a1442831462916636639280563c682b16">float64</a>&#160;&#160;&#160;double</td></tr>
 <tr class="separator:a1442831462916636639280563c682b16"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abb452686968e48b67397da5f97445f5b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;&#160;&#160;_Bool</td></tr>
@@ -96,6 +92,10 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:a87dc1c46a17e3ee6037afdb6aef76632"><td class="memItemLeft" align="right" valign="top">typedef signed long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a></td></tr>
+<tr class="separator:a87dc1c46a17e3ee6037afdb6aef76632"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c8186d9b9b7880309c27230bbb5e69d"><td class="memItemLeft" align="right" valign="top">typedef unsigned char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a></td></tr>
+<tr class="separator:a0c8186d9b9b7880309c27230bbb5e69d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10210152327150a8e8e1f071795f7afb"><td class="memItemLeft" align="right" valign="top">typedef _Atomic long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#a10210152327150a8e8e1f071795f7afb">aint64</a></td></tr>
 <tr class="separator:a10210152327150a8e8e1f071795f7afb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe660412f8dbc54cfa427d751a5635eb"><td class="memItemLeft" align="right" valign="top">typedef _Atomic _Bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="types_8h.html#abe660412f8dbc54cfa427d751a5635eb">abool</a></td></tr>
@@ -110,20 +110,6 @@ Typedefs</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define bool&#160;&#160;&#160;_Bool</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a71809484a26cd96c6abe839a0a8a289d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a71809484a26cd96c6abe839a0a8a289d">&#9670;&nbsp;</a></span>byte</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define byte&#160;&#160;&#160;unsigned char</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -152,20 +138,6 @@ Typedefs</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">#define float64&#160;&#160;&#160;double</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a09fc63bce67d19142460e915d94f732f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09fc63bce67d19142460e915d94f732f">&#9670;&nbsp;</a></span>int64</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define int64&#160;&#160;&#160;long long</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -223,6 +195,34 @@ Typedefs</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">typedef _Atomic long long <a class="el" href="types_8h.html#a10210152327150a8e8e1f071795f7afb">aint64</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0c8186d9b9b7880309c27230bbb5e69d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c8186d9b9b7880309c27230bbb5e69d">&#9670;&nbsp;</a></span>byte</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef unsigned char <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a87dc1c46a17e3ee6037afdb6aef76632"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a87dc1c46a17e3ee6037afdb6aef76632">&#9670;&nbsp;</a></span>int64</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef signed long long <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a></td>
         </tr>
       </table>
 </div><div class="memdoc">

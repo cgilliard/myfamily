@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['len_361',['len',['../structPtrImpl.html#a452c55ae3ed9452a36dac315b7ff50d2',1,'PtrImpl::len()'],['../structstringImpl.html#afada7e5319673cb4c4d28daa3a84a3a5',1,'stringImpl::len()']]]
+  ['id_413',['id',['../structPtrImpl.html#a171cd0179392da3e279c879e317fb677',1,'PtrImpl']]],
+  ['impl_414',['impl',['../structstringNc.html#a01c312f3696cf1efed28b4723d96d17f',1,'stringNc']]],
+  ['initial_5fchunks_415',['initial_chunks',['../structSlabType.html#a1d466297e21ede3754d698f991762bf4',1,'SlabType']]]
 ];

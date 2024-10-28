@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['resourcestats_381',['ResourceStats',['../os_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'os.h']]]
+  ['int64_431',['int64',['../types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632',1,'types.h']]]
 ];

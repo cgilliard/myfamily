@@ -88,10 +88,6 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a41f9c5fb8b08eb5dc3edce4dcb37fee7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test_8h.html#a41f9c5fb8b08eb5dc3edce4dcb37fee7">true</a>&#160;&#160;&#160;(_Bool)1</td></tr>
-<tr class="separator:a41f9c5fb8b08eb5dc3edce4dcb37fee7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65e9886d74aaee76545e83dd09011727"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test_8h.html#a65e9886d74aaee76545e83dd09011727">false</a>&#160;&#160;&#160;(_Bool)0</td></tr>
-<tr class="separator:a65e9886d74aaee76545e83dd09011727"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac491bfaf0b292ca81ada9f3b82af5245"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test_8h.html#ac491bfaf0b292ca81ada9f3b82af5245">MySuite</a>(name)</td></tr>
 <tr class="separator:ac491bfaf0b292ca81ada9f3b82af5245"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e6f1698baf6614fafee5b7ffd575cd2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test_8h.html#a2e6f1698baf6614fafee5b7ffd575cd2">MyTest</a>(suite,  test)</td></tr>
@@ -105,20 +101,6 @@ Functions</h2></td></tr>
 <tr class="separator:a5816a6b27040ac0d2cda8305b9f82f9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a65e9886d74aaee76545e83dd09011727"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a65e9886d74aaee76545e83dd09011727">&#9670;&nbsp;</a></span>false</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define false&#160;&#160;&#160;(_Bool)0</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="ac491bfaf0b292ca81ada9f3b82af5245"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac491bfaf0b292ca81ada9f3b82af5245">&#9670;&nbsp;</a></span>MySuite</h2>
 
@@ -139,11 +121,11 @@ Functions</h2></td></tr>
 <div class="line">    }                                                                                              \</div>
 <div class="line">    Test(init, init, .init = setup_suite) {                                                        \</div>
 <div class="line">    }                                                                                              \</div>
-<div class="line">    static <a class="code" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> test_count = 0;                                                                   \</div>
-<div class="line">    static <a class="code" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> initial_alloc_diff;                                                               \</div>
-<div class="line">    static <a class="code" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> initial_file_diff;                                                                \</div>
+<div class="line">    static <a class="code" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> test_count = 0;                                                                   \</div>
+<div class="line">    static <a class="code" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> initial_alloc_diff;                                                               \</div>
+<div class="line">    static <a class="code" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> initial_file_diff;                                                                \</div>
 <div class="line">    static <span class="keywordtype">char</span> *cur_name = <span class="stringliteral">&quot;&quot;</span>;                                                                    \</div>
-<div class="line">    static <a class="code" href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a> log_fd = -1;                                                                      \</div>
+<div class="line">    static <a class="code" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> log_fd = -1;                                                                      \</div>
 <div class="line">    void tear_down() {                                                                             \</div>
 <div class="line">        int64 cur_alloc_count = <a class="code" href="os_8c.html#a70b05a036d4bd3162742f130ae43500a">alloc_sum</a>();                                                       \</div>
 <div class="line">        int64 cur_free_count = <a class="code" href="os_8c.html#a33010add1b9bd581ca3c86225f46cbc8">release_sum</a>();                                                      \</div>
@@ -169,7 +151,7 @@ Functions</h2></td></tr>
 <div class="ttc" id="acolors_8h_html_acfbc006ea433ad708fdee3e82996e721"><div class="ttname"><a href="colors_8h.html#acfbc006ea433ad708fdee3e82996e721">GREEN</a></div><div class="ttdeci">#define GREEN</div><div class="ttdef"><b>Definition:</b> colors.h:30</div></div>
 <div class="ttc" id="aos_8c_html_a33010add1b9bd581ca3c86225f46cbc8"><div class="ttname"><a href="os_8c.html#a33010add1b9bd581ca3c86225f46cbc8">release_sum</a></div><div class="ttdeci">int64 release_sum()</div><div class="ttdef"><b>Definition:</b> os.c:68</div></div>
 <div class="ttc" id="aos_8c_html_a70b05a036d4bd3162742f130ae43500a"><div class="ttname"><a href="os_8c.html#a70b05a036d4bd3162742f130ae43500a">alloc_sum</a></div><div class="ttdeci">int64 alloc_sum()</div><div class="ttdef"><b>Definition:</b> os.c:62</div></div>
-<div class="ttc" id="atypes_8h_html_a09fc63bce67d19142460e915d94f732f"><div class="ttname"><a href="types_8h.html#a09fc63bce67d19142460e915d94f732f">int64</a></div><div class="ttdeci">#define int64</div><div class="ttdef"><b>Definition:</b> types.h:21</div></div>
+<div class="ttc" id="atypes_8h_html_a87dc1c46a17e3ee6037afdb6aef76632"><div class="ttname"><a href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a></div><div class="ttdeci">signed long long int64</div><div class="ttdef"><b>Definition:</b> types.h:21</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -195,20 +177,6 @@ Functions</h2></td></tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a41f9c5fb8b08eb5dc3edce4dcb37fee7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a41f9c5fb8b08eb5dc3edce4dcb37fee7">&#9670;&nbsp;</a></span>true</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define true&#160;&#160;&#160;(_Bool)1</td>
         </tr>
       </table>
 </div><div class="memdoc">
