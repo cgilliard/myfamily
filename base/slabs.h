@@ -18,25 +18,21 @@
 #include <base/macro_util.h>
 #include <base/types.h>
 
+#define MAX_SLAB_SIZE 4096
+
 // Ptr data type
 
-typedef struct PtrImpl *Ptr;
-extern const struct PtrImpl null;
+typedef struct Type *Ptr;
+extern const struct Type null;
 
-int ptr_len(const Ptr ptr);
+unsigned int ptr_len(const Ptr ptr);
 unsigned int ptr_id(const Ptr ptr);
 void *ptr_data(const Ptr ptr);
 bool ptr_flag_check(const Ptr ptr, byte flag);
 void ptr_flag_set(Ptr ptr, byte flag, bool value);
 bool ptr_is_nil(const Ptr ptr);
-void ptr_count1_set(Ptr ptr, int value);
-void ptr_count2_set(Ptr ptr, int value);
-void ptr_count1_incr(Ptr ptr, int value);
-void ptr_count2_incr(Ptr ptr, int value);
-void ptr_count1_decr(Ptr ptr, int value);
-void ptr_count2_decr(Ptr ptr, int value);
-int ptr_count1_get(Ptr ptr);
-int ptr_count2_get(Ptr ptr);
+void *ptr_aux1(Ptr ptr);
+void *ptr_aux2(Ptr ptr);
 
 #define $(ptr) ptr_data(ptr)
 #define $len(ptr) ptr_len(ptr)
@@ -48,8 +44,12 @@ int ptr_count2_get(Ptr ptr);
 			 }),                                                                                   \
 		default: ({ (((string *)&ptr)->impl == NULL); }))
 
+// Direct alloc
+Ptr ptr_direct_alloc(unsigned int size);
+void ptr_direct_release(Ptr ptr);
+
 #ifdef TEST
-Ptr ptr_test_obj(int64 id, int64 len, byte flags);
+Ptr ptr_test_obj(unsigned int id, unsigned int len, byte flags);
 void ptr_free_test_obj(Ptr ptr);
 #endif // TEST
 
@@ -63,7 +63,7 @@ void slab_allocator_cleanup(SlabAllocatorNc *ptr);
 	SlabAllocatorNc __attribute__((warn_unused_result, cleanup(slab_allocator_cleanup)))
 
 SlabAllocator slab_allocator_create();
-Ptr slab_allocator_allocate(SlabAllocator sa, int64 size);
+Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size);
 void slab_allocator_free(SlabAllocator sa, Ptr ptr);
 int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa);
 

@@ -16,6 +16,8 @@
 #include <base/os.h>
 #include <base/osdef.h>
 
+#include <stdio.h>
+
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 
 void *alloc(int64 size, int64 zeroed) {
@@ -30,8 +32,9 @@ void *alloc(int64 size, int64 zeroed) {
 		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
 		if (zeroed)
 			memset(ret, 0, size);
-	} else
+	} else {
 		SetErr(AllocErr);
+	}
 
 	return ret;
 }
@@ -45,8 +48,9 @@ void *resize(void *ptr, int64 size) {
 
 	if (ret) {
 		THREAD_LOCAL_RESOURCE_STATS.resize_sum += 1;
-	} else
+	} else {
 		SetErr(AllocErr);
+	}
 	return ret;
 }
 

@@ -12,10 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/fam_alloc.h>
 #include <base/fam_err.h>
 #include <base/os.h>
 #include <base/osdef.h>
+#include <base/slabs.h>
 #include <base/string.h>
+
+#include <stdio.h>
+
+void string2_cleanup(string2 *ptr) {
+	if (ptr == NULL)
+		return;
+	fam_release(ptr);
+	*ptr = NULL;
+}
+string2 string2_create(const char *s) {
+	int64 len = cstring_len(s);
+	Ptr ret = fam_alloc(len + 1, false);
+	if (ret == NULL) {
+		return NULL;
+	}
+	unsigned int *p = ptr_aux2(ret);
+	*p = len;
+	memcpy($(ret), s, len);
+	((byte *)$(ret))[len] = 0;
+	return ret;
+}
+
+unsigned int string2_len(const string2 s) {
+	if (s == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+	return *((unsigned int *)ptr_aux2(s));
+}
 
 typedef struct stringImpl {
 	int64 len;

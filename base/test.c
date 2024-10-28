@@ -236,16 +236,16 @@ MyTest(base, test_slab_allocator_resize) {
 MyTest(base, test_big) {
 	SlabAllocator sa = slab_allocator_create();
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
-	// int64 size = ((1024LL * 1024LL * 1024LL * 4) - 256);
-	int64 size = (1024LL * 4LL);
+	// unsigned int size = ((1024LL * 1024LL * 1024LL * 4) - 128);
+	unsigned int size = (1024LL * 4LL);
 	int ss = 16;
 	Ptr *arr = alloc(sizeof(Ptr) * size, false);
-	for (int64 i = 0; i < size; i++) {
+	for (unsigned int i = 0; i < size; i++) {
 		if (i % (1024 * 1024) == 0)
-			printf("i=%lli\n", i);
+			printf("i=%u\n", i);
 		arr[i] = slab_allocator_allocate(sa, ss);
 		if (nil(arr[i]))
-			printf("nil ptr at %lli\n", i);
+			printf("nil ptr at %u\n", i);
 		cr_assert(!nil(arr[i]));
 		cr_assert_eq(ptr_id(arr[i]), i);
 		cr_assert_eq($len(arr[i]), ss);
@@ -256,14 +256,16 @@ MyTest(base, test_big) {
 
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), size);
 
-	for (int64 i = 0; i < size; i++) {
+	for (unsigned int i = 0; i < size; i++) {
 		if (i % (1024 * 1024) == 0)
-			printf("free i=%lli\n", i);
+			printf("free i=%u\n", i);
 		cr_assert_eq(ptr_id(arr[i]), i);
 		cr_assert_eq($len(arr[i]), ss);
 		byte *data = $(arr[i]);
+
 		for (int j = 0; j < ss; j++)
 			cr_assert_eq(data[j], (j + i * 3) % 256);
+
 		slab_allocator_free(sa, arr[i]);
 	}
 
@@ -276,6 +278,17 @@ MyTest(base, test_big) {
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
 
 	release(arr);
+}
+
+MyTest(base, test_string2) {
+	string2 x = string2_create("test");
+	cr_assert_eq(string2_len(x), 4);
+	Ptr y = fam_alloc(4096, true);
+	cr_assert(y != NULL);
+	Ptr z = fam_alloc(4097, true);
+	cr_assert(z != NULL);
+	fam_release(&y);
+	fam_release(&z);
 }
 
 MyTest(base, test_limits) {

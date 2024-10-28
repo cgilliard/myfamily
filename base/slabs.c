@@ -23,26 +23,27 @@
 #define SLABS_PER_RESIZE 128
 #define INITIAL_CHUNKS 0
 
-typedef struct PtrImpl {
-	unsigned int id; // slab id
-	int len;		 // length of data in this slab (up to 3 bytes, 1 byte reserved for user flags)
-	int counter1;	 // user counter1 (potentially for rc strong count)
-	int counter2;	 // user counter2 (potentially for rc weak count)
-	byte data[];	 // user data
-} PtrImpl;
+typedef struct Type {
+	// slab id used internally by sa
+	unsigned int id;
+	// len of slab
+	unsigned int len;
+	// user aux data (note: the highest byte is used for flags, so it should be used with caution)
+	unsigned int aux1;
+	unsigned int aux2;
+	// user data
+	byte data[];
+} Type;
 
-#define SLAB_OVERHEAD sizeof(PtrImpl)
+#define SLAB_OVERHEAD sizeof(Type)
 
-const PtrImpl null = {.id = 0, .len = 0};
+const Type null = {.id = 0, .len = 0};
 
-//  returns the slab's length
-int ptr_len(const Ptr ptr) {
-	return ptr->len & 0x00FFFFFF;
+unsigned int ptr_len(const Ptr ptr) {
+	return ptr->len;
 }
 
-// returns the slabs id
 unsigned int ptr_id(const Ptr ptr) {
-	// mask off flag byte (top byte)
 	return ptr->id;
 }
 
@@ -51,9 +52,17 @@ void *ptr_data(const Ptr ptr) {
 	return ptr->data;
 }
 
+void *ptr_aux1(const Ptr ptr) {
+	return &ptr->aux1;
+}
+
+void *ptr_aux2(const Ptr ptr) {
+	return &ptr->aux2;
+}
+
 // check whether a flag is set (0-7 are possible values)
 bool ptr_flag_check(const Ptr ptr, byte flag) {
-	return flag < 8 && ((int)(ptr->len >> 24)) & (1 << flag);
+	return flag < 8 && ((int)(ptr->aux1 >> 24)) & (1 << flag);
 }
 
 // set/unset a flag
@@ -61,40 +70,9 @@ void ptr_flag_set(Ptr ptr, byte flag, bool value) {
 	if (flag >= 8)
 		return;
 	if (value)
-		ptr->len |= (int)(1 << (int)flag) << 24;
+		ptr->aux1 |= (int)(1 << (int)flag) << 24;
 	else
-		ptr->len &= ~((int)(1 << (int)flag) << 24);
-}
-
-void ptr_count1_set(Ptr ptr, int value) {
-	ptr->counter1 = value;
-}
-
-void ptr_count2_set(Ptr ptr, int value) {
-	ptr->counter2 = value;
-}
-
-void ptr_count1_incr(Ptr ptr, int value) {
-	ptr->counter1++;
-}
-
-void ptr_count2_incr(Ptr ptr, int value) {
-	ptr->counter2++;
-}
-
-void ptr_count1_decr(Ptr ptr, int value) {
-	ptr->counter1--;
-}
-
-void ptr_count2_decr(Ptr ptr, int value) {
-	ptr->counter2--;
-}
-
-int ptr_count1_get(Ptr ptr) {
-	return ptr->counter1;
-}
-int ptr_count2_get(Ptr ptr) {
-	return ptr->counter2;
+		ptr->aux1 &= ~((int)(1 << (int64)flag) << 24);
 }
 
 #include <stdio.h>
@@ -102,6 +80,20 @@ int ptr_count2_get(Ptr ptr) {
 // return true if this Ptr is nil (unallocated)
 bool ptr_is_nil(const Ptr ptr) {
 	return !ptr || ptr->len == 0; // a nil pointer has 0 len
+}
+
+// Direct alloc (len not used)
+Ptr ptr_direct_alloc(unsigned int size) {
+	if (size < 0) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
+	Ptr ret = alloc(size, false);
+	ret->len = size;
+	return ret;
+}
+void ptr_direct_release(Ptr ptr) {
+	release(ptr);
 }
 
 // Slab Type definition
@@ -269,7 +261,7 @@ SlabAllocator slab_allocator_create() {
 	return ret;
 }
 
-int slab_allocator_index(SlabAllocator sa, int size) {
+int slab_allocator_index(SlabAllocator sa, unsigned int size) {
 	int ret = (size - 1) / 16;
 	if (size <= 0 || ret >= SLAB_SIZES)
 		return -1;
@@ -288,7 +280,7 @@ Ptr slab_allocator_allocate_sd(SlabData *sd) {
 	}
 	int64 index = slab_allocator_slab_data_index(sd, sd->free_list_head);
 	int64 offset = slab_allocator_slab_data_offset(sd, sd->free_list_head);
-	Ptr ptr = (PtrImpl *)(sd->data[index] + offset);
+	Ptr ptr = (Type *)(sd->data[index] + offset);
 	ptr->id = sd->free_list_head;
 	ptr->len = sd->type.slab_size;
 	sd->free_list_head = sd->free_list[ptr->id];
@@ -303,7 +295,7 @@ void slab_allocator_data_free(SlabData *sd, int64 id) {
 	sd->cur_slabs--;
 }
 
-Ptr slab_allocator_allocate(SlabAllocator sa, int64 size) {
+Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size) {
 	int index = slab_allocator_index(sa, size);
 	if (index < 0)
 		return NULL;
@@ -315,7 +307,7 @@ void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
 	if (ptr == NULL || sa == NULL) {
 		panic("Invalid ptr sent to slab_allocator free!");
 	}
-	int64 len = ptr_len(ptr);
+	unsigned int len = ptr_len(ptr);
 	int index = slab_allocator_index(sa, len);
 	if (index < 0) {
 		panic("Invalid ptr sent to slab_allocator free! Unknown size %lli.", len);
@@ -339,11 +331,11 @@ int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
 }
 
 #ifdef TEST
-Ptr ptr_test_obj(int64 id, int64 len, byte flags) {
-	Ptr ptr = (PtrImpl *)alloc(sizeof(PtrImpl) + len, false);
+Ptr ptr_test_obj(unsigned int id, unsigned int len, byte flags) {
+	Ptr ptr = (Type *)alloc(sizeof(Type) + len, false);
 	ptr->id = id;
 	ptr->len = len;
-	ptr->len |= ((int)flags) << 24;
+	ptr->aux1 |= ((int64)flags) << 24;
 	return ptr;
 }
 

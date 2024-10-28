@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/colors.h>
+#include <base/fam_alloc.h>
 #include <base/os.h>
 #include <base/string.h>
 #include <criterion/criterion.h>
@@ -48,13 +49,29 @@ int rmrf(char *path) {
 	static char *cur_name = "";                                                                    \
 	static int64 log_fd = -1;                                                                      \
 	void tear_down() {                                                                             \
+		int64 gslabs = fam_alloc_count_global_allocator();                                         \
+		int64 lslabs = fam_alloc_count_tl_slab_allocator();                                        \
+		if (gslabs || lslabs) {                                                                    \
+			printf("[%s====%s] %sError in tear_down of test%s "                                    \
+				   "'%s%s%s'.\n[%s====%s] Number of slab allocations not "                         \
+				   "equal to number "                                                              \
+				   "of frees. Memory leak?\n",                                                     \
+				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
+			printf("[%s====%s] "                                                                   \
+				   "gslabs=%llu,lslabs=%llu\n",                                                    \
+				   BLUE, RESET, gslabs, lslabs);                                                   \
+			pid_t iPid = getpid();                                                                 \
+			kill(iPid, SIGINT); /* trigger failure */                                              \
+		}                                                                                          \
+		fam_alloc_thread_local_cleanup();                                                          \
+		fam_alloc_global_cleanup();                                                                \
 		int64 cur_alloc_count = alloc_sum();                                                       \
 		int64 cur_free_count = release_sum();                                                      \
 		int64 diff = cur_alloc_count - cur_free_count;                                             \
 		if (diff != initial_alloc_diff) {                                                          \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
 				   "'%s%s%s'.\n[%s====%s] Number of allocations not "                              \
-				   "equal to int64 "                                                               \
+				   "equal to number "                                                              \
 				   "of frees. Memory leak?\n",                                                     \
 				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
 			printf("[%s====%s] "                                                                   \

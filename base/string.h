@@ -18,6 +18,12 @@
 #include <base/macro_util.h>
 #include <base/types.h>
 
+typedef struct Type *string2Nc;
+void string2_cleanup(string2Nc *ptr);
+#define string2 string2Nc __attribute((warn_unused_result, cleanup(string2_cleanup)))
+string2 string2_create(const char *s);
+unsigned int string2_len(const string2 s);
+
 typedef struct stringNc {
 	void *impl;
 } stringNc;
