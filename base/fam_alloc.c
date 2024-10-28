@@ -26,6 +26,20 @@ _Thread_local SlabAllocator tl_slab_allocator = NULL;
 SlabAllocator global_slab_allocator = NULL;
 pthread_mutex_t global_allocator_lock = PTHREAD_MUTEX_INITIALIZER;
 
+// use highest byte in aux for flags
+void ptr_flag_set(Ptr ptr, byte flag, bool value) {
+	int64 *aux = ptr_aux(ptr);
+	if (value)
+		*aux |= (0x1ULL << (unsigned long long)flag) << 56;
+	else
+		*aux &= ~((0x1ULL << (unsigned long long)flag) << 56);
+}
+
+bool ptr_flag_check(Ptr ptr, byte flag) {
+	int64 *aux = ptr_aux(ptr);
+	return (*aux) & ((0x1ULL << (unsigned long long)flag) << 56);
+}
+
 int check_initialize_default_slab_allocator() {
 	if (tl_slab_allocator == NULL)
 		tl_slab_allocator = slab_allocator_create();
@@ -52,6 +66,8 @@ Ptr fam_alloc(unsigned int size, bool send) {
 		ret = slab_allocator_allocate(tl_slab_allocator, size);
 
 	if (ret) {
+		int64 *aux = ptr_aux(ret);
+		*aux = 0;
 		ptr_flag_set(ret, PTR_FLAGS_SEND, send);
 		ptr_flag_set(ret, PTR_FLAGS_DIRECT, size > MAX_SLAB_SIZE);
 	}
@@ -80,7 +96,7 @@ Ptr fam_resize(Ptr ptr, unsigned int size) {
 }
 
 void fam_release(Ptr *ptr) {
-	if (nil(ptr)) {
+	if (nil(*ptr)) {
 		panic("fam_free on nil ptr!");
 	} else if (ptr_flag_check(*ptr, PTR_FLAGS_DIRECT)) {
 		ptr_direct_release(*ptr);

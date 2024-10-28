@@ -21,40 +21,20 @@
 #define MAX_SLAB_SIZE 4096
 
 // Ptr data type
-
 typedef struct Type *Ptr;
-extern const struct Type null;
+extern const struct Type null_impl;
+extern const struct Type *null;
 
 unsigned int ptr_len(const Ptr ptr);
 unsigned int ptr_id(const Ptr ptr);
 void *ptr_data(const Ptr ptr);
-bool ptr_flag_check(const Ptr ptr, byte flag);
-void ptr_flag_set(Ptr ptr, byte flag, bool value);
-bool ptr_is_nil(const Ptr ptr);
-void *ptr_aux1(Ptr ptr);
-void *ptr_aux2(Ptr ptr);
-
-#define $(ptr) ptr_data(ptr)
-#define $len(ptr) ptr_len(ptr)
-#define nil(ptr)                                                                                   \
-	_Generic((ptr),                                                                                \
-		Ptr: ({                                                                                    \
-				 Ptr _tmp__ = _Generic((ptr), Ptr: ptr, default: NULL);                            \
-				 ptr_is_nil(_tmp__);                                                               \
-			 }),                                                                                   \
-		default: ({ (((string *)&ptr)->impl == NULL); }))
+void *ptr_aux(const Ptr ptr);
 
 // Direct alloc
 Ptr ptr_direct_alloc(unsigned int size);
 void ptr_direct_release(Ptr ptr);
 
-#ifdef TEST
-Ptr ptr_test_obj(unsigned int id, unsigned int len, byte flags);
-void ptr_free_test_obj(Ptr ptr);
-#endif // TEST
-
 // Slab Allocator
-
 typedef struct SlabAllocatorImpl *SlabAllocatorNc;
 
 void slab_allocator_cleanup(SlabAllocatorNc *ptr);

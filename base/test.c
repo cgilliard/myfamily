@@ -17,6 +17,7 @@
 
 MySuite(base);
 
+/*
 MyTest(base, test_string) {
 	string s = String("test");
 	cr_assert(!nil(s));
@@ -120,7 +121,9 @@ MyTest(base, test_string) {
 	}
 	cr_assert_eq(count, 4);
 }
+*/
 
+/*
 MyTest(base, test_ptr) {
 	int64 alloc_sum_pre = alloc_sum();
 	Ptr ptr = ptr_test_obj(123, 100, 0xF);
@@ -155,6 +158,7 @@ MyTest(base, test_ptr) {
 	int64 release_sum_post = release_sum();
 	cr_assert_eq(release_sum_post - release_sum_pre, 1);
 }
+*/
 
 MyTest(base, test_slab_allocator) {
 	SlabAllocator sa = slab_allocator_create();
@@ -280,6 +284,83 @@ MyTest(base, test_big) {
 	release(arr);
 }
 
+Type(test_type);
+#define test_type DefineType(test_type)
+
+void test_type_cleanup(const test_type *ptr) {
+	fam_release(ptr);
+}
+
+test_type test_type_create(int64 value) {
+	Ptr ret = fam_alloc(sizeof(int64), false);
+	if (ret == NULL)
+		return ret;
+
+	int64 *val = $(ret);
+	*val = value;
+
+	return ret;
+}
+
+int64 test_type_value(test_type tt) {
+	int64 *val = $(tt);
+	return *val;
+}
+
+MyTest(base, test_test_type) {
+	test_type abc = test_type_create(1234);
+	test_type def = test_type_create(5678);
+	cr_assert_eq(test_type_value(abc), 1234);
+	cr_assert_eq(test_type_value(def), 5678);
+}
+
+MyTest(base, test_object) {
+	// create two int64 objects
+	Object obj1 = object_create_int64(111);
+	Object obj2 = object_create_int64(222);
+
+	// assert their values
+	cr_assert_eq(object_as_int64(obj1), 111);
+	cr_assert_eq(object_as_int64(obj2), 222);
+	// try to get obj1 as int (wrong type)
+	cr_assert_eq(object_as_int(obj1), -1);
+	cr_assert_eq(fam_err, TypeMismatch);
+
+	// create an int
+	Object obj3 = object_create_int(444);
+	// reset err and try to get it as an int64
+	fam_err = NoErrors;
+	cr_assert_eq(object_as_int64(obj3), -1);
+	cr_assert_eq(fam_err, TypeMismatch);
+	// get correctly as int
+	cr_assert_eq(object_as_int(obj3), 444);
+
+	// create a byte and do similar checks
+	Object obj4 = object_create_byte('a');
+	fam_err = NoErrors;
+	cr_assert_eq(object_as_int64(obj4), -1);
+	cr_assert_eq(fam_err, TypeMismatch);
+	cr_assert_eq(object_as_byte(obj4), 'a');
+
+	// create an int object
+	const Object obj5 = object_create_int(123);
+	cr_assert_eq(object_as_int(obj5), 123);
+	// move obj5 -> obj6 (const allowed)
+	const Object obj6 = object_move(obj5);
+	// assert obj6 has the correct value
+	cr_assert_eq(object_as_int(obj6), 123);
+	// assert that obj5 has been consumed
+	fam_err = NoErrors;
+	cr_assert_eq(object_as_int(obj5), -1);
+	cr_assert_eq(fam_err, ObjectConsumed);
+
+	Object obj7 = object_create_int64(567);
+	Object obj8 = object_move(obj7);
+
+	cr_assert_eq(object_as_int64(obj8), 567);
+}
+
+/*
 MyTest(base, test_string2) {
 	string2 x = string2_create("test");
 	cr_assert_eq(string2_len(x), 4);
@@ -290,6 +371,7 @@ MyTest(base, test_string2) {
 	fam_release(&y);
 	fam_release(&z);
 }
+*/
 
 MyTest(base, test_limits) {
 	cr_assert_eq(INT64_MAX, 9223372036854775807LL);

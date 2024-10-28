@@ -16,11 +16,32 @@
 #define _BASE_STRING__
 
 #include <base/macro_util.h>
+#include <base/macros.h>
 #include <base/types.h>
 
-typedef struct Type *string2Nc;
-void string2_cleanup(string2Nc *ptr);
-#define string2 string2Nc __attribute((warn_unused_result, cleanup(string2_cleanup)))
+int64 cstring_len(const byte *s);
+
+Type(string);
+#define string DefineType(string)
+
+string string_create();
+string string_create_cs(const char *s);
+string string_create_b(const byte *s, unsigned int len);
+string string_clone(string *s);
+int string_append_bytes(string *s, const byte *bytes, unsigned int len);
+int string_append_cstring(string *s, const char *bytes);
+int string_append_string(string *s1, const string *s2);
+unsigned int string_len(const string *s);
+unsigned int string_index_of(const string *s, const string *s2);
+unsigned int string_last_index_of(const string *s, const string *s2);
+unsigned int string_substring(string *dst, const string *src, unsigned int start);
+unsigned int string_substring_s(string *dst, const string *src, unsigned int start,
+								unsigned int end);
+byte string_char_at(const string *s, unsigned int index);
+int string_compare(const string *s1, const string *s2);
+bool string_equal(const string *s1, const string *s2);
+
+/*
 string2 string2_create(const char *s);
 unsigned int string2_len(const string2 s);
 
@@ -29,74 +50,6 @@ typedef struct stringNc {
 } stringNc;
 
 void string_cleanup(stringNc *ptr);
-
-#define INIT_STRING {.impl = NULL}
-#define EMPTY_STRING                                                                               \
-	({                                                                                             \
-		stringNc _empty__ = INIT_STRING;                                                           \
-		_empty__;                                                                                  \
-	})
-#define string stringNc __attribute__((warn_unused_result, cleanup(string_cleanup)))
-#define String_(v)                                                                                 \
-	({                                                                                             \
-		stringNc _ret__ = INIT_STRING;                                                             \
-		_Generic((v),                                                                              \
-			char *: ({                                                                             \
-					 char *val = _Generic((v), char *: v, default: NULL);                          \
-					 string_create_cs(&_ret__, (char *)val);                                       \
-				 }),                                                                               \
-			string: ({                                                                             \
-					 stringNc val = _Generic((v), string: v, default: EMPTY_STRING);               \
-					 string_create_s(&_ret__, &val);                                               \
-				 }),                                                                               \
-			default: string_create(&_ret__));                                                      \
-		_ret__;                                                                                    \
-	})
-#define String(...) String_(__VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(0ULL))
-
-#define nil_string(s) (s.impl == NULL)
-
-#define string_append(s, v, ...)                                                                   \
-	_Generic((v), string: ({ string_append_s(&s, (string *)&v); }), default: ({                    \
-				 int64 _len__ = __VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(cstring_len((byte *)&v)); \
-				 string_append_ch(&s, (byte *)&v, _len__);                                         \
-			 }))
-#define append(...) string_append(__VA_ARGS__)
-
-#define string_equal_(s1, s2)                                                                      \
-	_Generic((s2), string: ({ string_equal(&s1, (string *)&s2); }), default: ({                    \
-				 string _tmp__ = String(s2);                                                       \
-				 string_equal(&s1, &_tmp__);                                                       \
-			 }))
-
-#define equal(s1, s2) string_equal_(s1, s2)
-
-#define len(s) string_len(&s)
-
-#define substring(src, begin, ...)                                                                 \
-	({                                                                                             \
-		stringNc _ret__ = INIT_STRING;                                                             \
-		int64 _len__ = __VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(string_len(&src));                 \
-		string_substring_s(&_ret__, &src, begin, _len__);                                          \
-		_ret__;                                                                                    \
-	})
-
-#define char_at(s, index) string_char_at(s, index)
-
-#define index_of(s1, s2)                                                                           \
-	_Generic((s2), string: ({ string_index_of(&s1, (string *)&s2); }), default: ({                 \
-				 string _tmp__ = String(s2);                                                       \
-				 string_index_of(&s1, (string *)&_tmp__);                                          \
-			 }))
-
-#define last_index_of(s1, s2)                                                                      \
-	_Generic((s2), string: ({ string_last_index_of(&s1, (string *)&s2); }), default: ({            \
-				 string _tmp__ = String(s2);                                                       \
-				 string_last_index_of(&s1, (string *)&_tmp__);                                     \
-			 }))
-
-#define move(x, y) string_move(&x, &y)
-
 int64 string_create(string *s);
 int64 string_create_cs(string *s, const char *s2);
 int64 string_create_ch(string *s, const byte *s2, int64 len);
@@ -114,5 +67,6 @@ void string_move(string *s1, string *s2);
 int64 cstring_len(const byte *S);
 
 byte *cstring(const string *s);
+*/
 
 #endif // _BASE_STRING__

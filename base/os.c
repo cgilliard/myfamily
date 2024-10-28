@@ -16,8 +16,6 @@
 #include <base/os.h>
 #include <base/osdef.h>
 
-#include <stdio.h>
-
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 
 void *alloc(int64 size, int64 zeroed) {

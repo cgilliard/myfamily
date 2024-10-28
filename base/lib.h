@@ -15,6 +15,8 @@
 #include <base/colors.h>
 #include <base/fam_err.h>
 #include <base/macro_util.h>
+#include <base/macros.h>
+#include <base/object.h>
 #include <base/print_util.h>
 #include <base/slabs.h>
 #include <base/string.h>

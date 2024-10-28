@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 
+/*
 void string2_cleanup(string2 *ptr) {
 	if (ptr == NULL)
 		return;
@@ -289,3 +290,4 @@ byte *cstring(const string *s) {
 	stringImpl *si = s->impl;
 	return si->data;
 }
+*/

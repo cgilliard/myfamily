@@ -49,6 +49,8 @@
 	ExpectedTypeMismatch, \
 	MaxPathErr, \
 	AllocErr, \
+	TypeMismatch, \
+	ObjectConsumed, \
 	DuplicateSizes
 // clang-format on
 

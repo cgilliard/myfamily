@@ -28,16 +28,15 @@ typedef struct Type {
 	unsigned int id;
 	// len of slab
 	unsigned int len;
-	// user aux data (note: the highest byte is used for flags, so it should be used with caution)
-	unsigned int aux1;
-	unsigned int aux2;
+	int64 aux; // aux data can be used by caller as desired
 	// user data
 	byte data[];
 } Type;
 
-#define SLAB_OVERHEAD sizeof(Type)
+const Type null_impl = {.id = 0, .len = 0};
+const struct Type *null = &null_impl;
 
-const Type null = {.id = 0, .len = 0};
+#define SLAB_OVERHEAD sizeof(Type)
 
 unsigned int ptr_len(const Ptr ptr) {
 	return ptr->len;
@@ -52,34 +51,8 @@ void *ptr_data(const Ptr ptr) {
 	return ptr->data;
 }
 
-void *ptr_aux1(const Ptr ptr) {
-	return &ptr->aux1;
-}
-
-void *ptr_aux2(const Ptr ptr) {
-	return &ptr->aux2;
-}
-
-// check whether a flag is set (0-7 are possible values)
-bool ptr_flag_check(const Ptr ptr, byte flag) {
-	return flag < 8 && ((int)(ptr->aux1 >> 24)) & (1 << flag);
-}
-
-// set/unset a flag
-void ptr_flag_set(Ptr ptr, byte flag, bool value) {
-	if (flag >= 8)
-		return;
-	if (value)
-		ptr->aux1 |= (int)(1 << (int)flag) << 24;
-	else
-		ptr->aux1 &= ~((int)(1 << (int64)flag) << 24);
-}
-
-#include <stdio.h>
-
-// return true if this Ptr is nil (unallocated)
-bool ptr_is_nil(const Ptr ptr) {
-	return !ptr || ptr->len == 0; // a nil pointer has 0 len
+void *ptr_aux(const Ptr ptr) {
+	return &ptr->aux;
 }
 
 // Direct alloc (len not used)
@@ -319,7 +292,7 @@ void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
 
 	slab_allocator_data_free(&sa->sd_arr[index], ptr->id);
 
-	*ptr = null;
+	*ptr = null_impl;
 }
 int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
 	int64 slabs = 0;
@@ -329,17 +302,3 @@ int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
 	}
 	return slabs;
 }
-
-#ifdef TEST
-Ptr ptr_test_obj(unsigned int id, unsigned int len, byte flags) {
-	Ptr ptr = (Type *)alloc(sizeof(Type) + len, false);
-	ptr->id = id;
-	ptr->len = len;
-	ptr->aux1 |= ((int64)flags) << 24;
-	return ptr;
-}
-
-void ptr_free_test_obj(Ptr ptr) {
-	release(ptr);
-}
-#endif // TEST
