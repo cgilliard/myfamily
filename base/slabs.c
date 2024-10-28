@@ -101,7 +101,7 @@ int ptr_count2_get(Ptr ptr) {
 
 // return true if this Ptr is nil (unallocated)
 bool ptr_is_nil(const Ptr ptr) {
-	return ptr->len == 0; // a nil pointer has 0 len
+	return !ptr || ptr->len == 0; // a nil pointer has 0 len
 }
 
 // Slab Type definition
@@ -189,7 +189,8 @@ int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
 			}
 		}
 	} else {
-		if ((chunks + sd->cur_chunks) * sd->type.slabs_per_resize > sd->type.max_slabs) {
+		if ((chunks + (int64)sd->cur_chunks) * (int64)sd->type.slabs_per_resize >
+			sd->type.max_slabs) {
 			SetErr(Overflow);
 			return -1;
 		}
@@ -277,8 +278,9 @@ int slab_allocator_index(SlabAllocator sa, int size) {
 
 Ptr slab_allocator_allocate_sd(SlabData *sd) {
 	if (sd->free_list_head == UINT32_MAX) {
-		if (slab_allocator_increase_chunks(sd, 1))
+		if (slab_allocator_increase_chunks(sd, 1)) {
 			return NULL;
+		}
 		if (sd->free_list_head == UINT32_MAX) {
 			SetErr(CapacityExceeded);
 			return NULL;

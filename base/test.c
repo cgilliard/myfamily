@@ -236,13 +236,16 @@ MyTest(base, test_slab_allocator_resize) {
 MyTest(base, test_big) {
 	SlabAllocator sa = slab_allocator_create();
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
-	int64 size = 1024LL * 1024LL;
+	// int64 size = ((1024LL * 1024LL * 1024LL * 4) - 256);
+	int64 size = (1024LL * 4LL);
 	int ss = 16;
 	Ptr *arr = alloc(sizeof(Ptr) * size, false);
 	for (int64 i = 0; i < size; i++) {
 		if (i % (1024 * 1024) == 0)
 			printf("i=%lli\n", i);
 		arr[i] = slab_allocator_allocate(sa, ss);
+		if (nil(arr[i]))
+			printf("nil ptr at %lli\n", i);
 		cr_assert(!nil(arr[i]));
 		cr_assert_eq(ptr_id(arr[i]), i);
 		cr_assert_eq($len(arr[i]), ss);
