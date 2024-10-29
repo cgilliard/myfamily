@@ -25,6 +25,7 @@ MyTest(base, test_string) {
 	string s1 = string_create_cs("test1");
 	string s2 = string_create_cs("test2");
 	string s3 = string_append_string(s1, s2);
+
 	cr_assert(!strcmp(cstring(s3), "test1test2"));
 	cr_assert_eq(string_len(s3), strlen("test1test2"));
 	for (int i = 0; i < string_len(s3); i++) {
@@ -35,6 +36,9 @@ MyTest(base, test_string) {
 	cr_assert_eq(fam_err, IndexOutOfBounds);
 	string s4 = string_substring_s(s3, 2, 4);
 	cr_assert(!strcmp(cstring(s4), "st"));
+
+	string s5 = string_create_cs("dddd");
+	string s6 = string_ref(s5);
 }
 
 /*
@@ -388,6 +392,15 @@ MyTest(base, test_object) {
 		const Object obj12 = object_ref(obj11);
 	}
 	cr_assert_eq(object_as_int(obj11), 1112);
+
+	string s1 = string_create_cs("test111");
+	Object obj12 = object_create_string(s1);
+
+	string s2 = object_as_string(obj12);
+	cr_assert(!strcmp(cstring(s1), cstring(s2)));
+	cr_assert(!strcmp(cstring(s1), "test111"));
+
+	Object obj13 = object_move(obj12);
 }
 
 /*

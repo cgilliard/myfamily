@@ -36,37 +36,10 @@ int64 string_index_of(const string s, const string s2);
 int64 string_last_index_of(const string s, const string s2);
 string string_substring(const string src, unsigned int start);
 string string_substring_s(const string src, unsigned int start, unsigned int end);
+string string_ref(const string src);
 byte string_char_at(const string s, unsigned int index);
 int string_compare(const string s1, const string s2);
 bool string_equal(const string s1, const string s2);
 byte *cstring(const string s);
-
-/*
-string2 string2_create(const char *s);
-unsigned int string2_len(const string2 s);
-
-typedef struct stringNc {
-	void *impl;
-} stringNc;
-
-void string_cleanup(stringNc *ptr);
-int64 string_create(string *s);
-int64 string_create_cs(string *s, const char *s2);
-int64 string_create_ch(string *s, const byte *s2, int64 len);
-int64 string_create_s(string *s, const string *s2);
-int64 string_append_ch(string *s, const byte *s2, int64 len);
-int64 string_append_s(string *s, const string *s2);
-int64 string_len(const string *s);
-int64 string_index_of(const string *s1, const string *s2);
-int64 string_last_index_of(const string *s1, const string *s2);
-int64 string_substring(string *dst, const string *src, int64 begin);
-int64 string_substring_s(string *dst, const string *src, int64 begin, int64 end);
-byte string_char_at(const string *s, int64 index);
-int64 string_equal(const string *s1, const string *s2);
-void string_move(string *s1, string *s2);
-int64 cstring_len(const byte *S);
-
-byte *cstring(const string *s);
-*/
 
 #endif // _BASE_STRING__

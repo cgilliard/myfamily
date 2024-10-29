@@ -15,6 +15,7 @@
 #include <base/fam_alloc.h>
 #include <base/fam_err.h>
 #include <base/object.h>
+#include <base/string.h>
 
 #include <stdio.h>
 
@@ -30,8 +31,31 @@
 #define OBJECT_FLAG_TYPE0 2
 #define OBJECT_FLAG_TYPE1 3
 #define OBJECT_FLAG_TYPE2 4
-#define OBJECT_FLAG_HAS_CLEANUP 5
-#define OBJECT_FLAG_RC 6
+// for objects this should always be 0, we use this to ensure we're not operating on a string
+// directly
+#define OBJECT_FLAG_STRING 5
+
+typedef struct ObjectString {
+	string s;
+} ObjectString;
+
+Object object_create_string(string s) {
+
+	Ptr ret = fam_alloc(sizeof(ObjectString), false);
+	if (nil(ret))
+		return ret;
+	ObjectString os;
+	os.s = string_ref(s);
+	*(ObjectString *)$(ret) = os;
+
+	// set type flags for int64
+	int64 *aux = ptr_aux(ret);
+	*aux |= (0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE0) << 56;
+	*aux &= ~(0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE1) << 56;
+	*aux &= ~(0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE2) << 56;
+
+	return ret;
+}
 
 Object object_create_int64(int64 v) {
 	Ptr ret = fam_alloc(sizeof(int64), false);
@@ -141,6 +165,27 @@ byte object_as_byte(const Object obj) {
 	return *value;
 }
 
+string object_as_string(const Object obj) {
+	if (nil(obj)) {
+		SetErr(ObjectConsumed);
+		return NULL;
+	}
+	int64 *aux = ptr_aux(obj);
+	// check flags
+	bool type0 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE0) << 56) & *aux;
+	bool type1 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE1) << 56) & *aux;
+	bool type2 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE2) << 56) & *aux;
+
+	if (!type0 || type1 || type2) {
+		SetErr(TypeMismatch);
+		return NULL;
+	}
+
+	ObjectString *os = $(obj);
+
+	return string_ref(os->s);
+}
+
 // Functions that require override of const
 #pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
 #pragma clang diagnostic ignored "-Wunknown-warning-option"
@@ -175,9 +220,14 @@ Object object_move(Object obj) {
 		ObjectNc ret = object_create_byte(*value);
 		Object_cleanup(&obj);
 		return ret;
+	} else if (type0 && !type1 && !type2) {
+		// string type
+		ObjectString *os = $(obj);
+		ObjectNc ret = object_create_string(os->s);
+		return ret;
 	}
 
-	return null;
+	return NULL;
 }
 
 Object object_ref(Object obj) {
@@ -199,6 +249,14 @@ void Object_cleanup(const Object *ptr) {
 		int64 count = *aux & 0x00FFFFFFFFFFFFFFLL;
 		int64 flags = *aux & 0xFF00000000000000LL;
 		if (count == 0) {
+			// cleanup string
+			bool type0 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE0) << 56) & *aux;
+			bool type1 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE1) << 56) & *aux;
+			bool type2 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE2) << 56) & *aux;
+			if (type0 && !type1 && !type2) {
+				ObjectString *os = $(*ptr);
+				string_cleanup(&os->s);
+			}
 			fam_release(ptr);
 		} else {
 			count--;
