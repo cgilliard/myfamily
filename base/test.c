@@ -17,6 +17,26 @@
 
 MySuite(base);
 
+MyTest(base, test_string) {
+	string s0 = string_create_cs("abc");
+	cr_assert_eq(string_len(s0), 3);
+	cr_assert(!strcmp(cstring(s0), "abc"));
+
+	string s1 = string_create_cs("test1");
+	string s2 = string_create_cs("test2");
+	string s3 = string_append_string(s1, s2);
+	cr_assert(!strcmp(cstring(s3), "test1test2"));
+	cr_assert_eq(string_len(s3), strlen("test1test2"));
+	for (int i = 0; i < string_len(s3); i++) {
+		cr_assert_eq(string_char_at(s3, i), "test1test2"[i]);
+	}
+	cr_assert_eq(fam_err, NoErrors);
+	cr_assert_eq(string_char_at(s3, 100), 0);
+	cr_assert_eq(fam_err, IndexOutOfBounds);
+	string s4 = string_substring_s(s3, 2, 4);
+	cr_assert(!strcmp(cstring(s4), "st"));
+}
+
 /*
 MyTest(base, test_string) {
 	string s = String("test");
@@ -358,6 +378,16 @@ MyTest(base, test_object) {
 	Object obj8 = object_move(obj7);
 
 	cr_assert_eq(object_as_int64(obj8), 567);
+	Object obj9 = null;
+
+	Object obj11;
+	{
+		Object obj10 = object_create_int(1112);
+		cr_assert_eq(object_as_int(obj10), 1112);
+		obj11 = object_ref(obj10);
+		const Object obj12 = object_ref(obj11);
+	}
+	cr_assert_eq(object_as_int(obj11), 1112);
 }
 
 /*

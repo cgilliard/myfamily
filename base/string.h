@@ -27,19 +27,19 @@ Type(string);
 string string_create();
 string string_create_cs(const char *s);
 string string_create_b(const byte *s, unsigned int len);
-string string_clone(string *s);
-int string_append_bytes(string *s, const byte *bytes, unsigned int len);
-int string_append_cstring(string *s, const char *bytes);
-int string_append_string(string *s1, const string *s2);
-unsigned int string_len(const string *s);
-unsigned int string_index_of(const string *s, const string *s2);
-unsigned int string_last_index_of(const string *s, const string *s2);
-unsigned int string_substring(string *dst, const string *src, unsigned int start);
-unsigned int string_substring_s(string *dst, const string *src, unsigned int start,
-								unsigned int end);
-byte string_char_at(const string *s, unsigned int index);
-int string_compare(const string *s1, const string *s2);
-bool string_equal(const string *s1, const string *s2);
+string string_clone(string s);
+string string_append_bytes(const string s, const byte *bytes, unsigned int len);
+string string_append_cstring(const string s, const char *bytes);
+string string_append_string(const string s, const string s2);
+int64 string_len(const string s);
+int64 string_index_of(const string s, const string s2);
+int64 string_last_index_of(const string s, const string s2);
+string string_substring(const string src, unsigned int start);
+string string_substring_s(const string src, unsigned int start, unsigned int end);
+byte string_char_at(const string s, unsigned int index);
+int string_compare(const string s1, const string s2);
+bool string_equal(const string s1, const string s2);
+byte *cstring(const string s);
 
 /*
 string2 string2_create(const char *s);
