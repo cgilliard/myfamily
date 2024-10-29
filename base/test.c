@@ -192,14 +192,17 @@ MyTest(base, test_slab_allocator) {
 	cr_assert_neq(sa2, NULL);
 	cr_assert_eq(fam_err, NoErrors);
 
-	Ptr ptr1, ptr2, ptr3;
+	Ptr ptr0, ptr1, ptr2, ptr3;
+	ptr0 = slab_allocator_allocate(sa2, 1);
 	ptr1 = slab_allocator_allocate(sa2, 32);
 	ptr2 = slab_allocator_allocate(sa2, 33);
 	ptr3 = slab_allocator_allocate(sa2, 394133);
 	cr_assert(!ptr3);
 	cr_assert(ptr1);
 	cr_assert(ptr2);
-	printf("ptr_len%i\n", $len(ptr1));
+	cr_assert(ptr0);
+	printf("ptr_len%i\n", $len(ptr0));
+	cr_assert_eq($len(ptr0), 16);
 	cr_assert_eq($len(ptr1), 32);
 	cr_assert_eq($len(ptr2), 48);
 	printf("ptr1.id=%i\n", ptr_id(ptr1));
@@ -217,6 +220,11 @@ MyTest(base, test_slab_allocator) {
 	printf("ptr4.id=%i\n", ptr_id(ptr4));
 	Ptr ptr5 = slab_allocator_allocate(sa2, 33);
 	printf("ptr5.id=%i\n", ptr_id(ptr5));
+	Ptr ptr6 = slab_allocator_allocate(sa2, 0);
+	cr_assert(ptr6);
+	cr_assert(!nil(ptr0));
+	cr_assert(!nil(ptr6));
+	cr_assert_eq($len(ptr6), 0);
 }
 
 MyTest(base, test_slab_allocator_resize) {
@@ -339,68 +347,70 @@ MyTest(base, test_test_type) {
 }
 
 MyTest(base, test_object) {
-	// create two int64 objects
-	Object obj1 = object_create_int64(111);
-	Object obj2 = object_create_int64(222);
+	/*
+		// create two int64 objects
+		Object obj1 = object_create_int64(111);
+		Object obj2 = object_create_int64(222);
 
-	// assert their values
-	cr_assert_eq(object_as_int64(obj1), 111);
-	cr_assert_eq(object_as_int64(obj2), 222);
-	// try to get obj1 as int (wrong type)
-	cr_assert_eq(object_as_int(obj1), -1);
-	cr_assert_eq(fam_err, TypeMismatch);
+		// assert their values
+		cr_assert_eq(object_as_int64(obj1), 111);
+		cr_assert_eq(object_as_int64(obj2), 222);
+		// try to get obj1 as int (wrong type)
+		cr_assert_eq(object_as_int(obj1), -1);
+		cr_assert_eq(fam_err, TypeMismatch);
 
-	// create an int
-	Object obj3 = object_create_int(444);
-	// reset err and try to get it as an int64
-	fam_err = NoErrors;
-	cr_assert_eq(object_as_int64(obj3), -1);
-	cr_assert_eq(fam_err, TypeMismatch);
-	// get correctly as int
-	cr_assert_eq(object_as_int(obj3), 444);
+		// create an int
+		Object obj3 = object_create_int(444);
+		// reset err and try to get it as an int64
+		fam_err = NoErrors;
+		cr_assert_eq(object_as_int64(obj3), -1);
+		cr_assert_eq(fam_err, TypeMismatch);
+		// get correctly as int
+		cr_assert_eq(object_as_int(obj3), 444);
 
-	// create a byte and do similar checks
-	Object obj4 = object_create_byte('a');
-	fam_err = NoErrors;
-	cr_assert_eq(object_as_int64(obj4), -1);
-	cr_assert_eq(fam_err, TypeMismatch);
-	cr_assert_eq(object_as_byte(obj4), 'a');
+		// create a byte and do similar checks
+		Object obj4 = object_create_byte('a');
+		fam_err = NoErrors;
+		cr_assert_eq(object_as_int64(obj4), -1);
+		cr_assert_eq(fam_err, TypeMismatch);
+		cr_assert_eq(object_as_byte(obj4), 'a');
 
-	// create an int object
-	const Object obj5 = object_create_int(123);
-	cr_assert_eq(object_as_int(obj5), 123);
-	// move obj5 -> obj6 (const allowed)
-	const Object obj6 = object_move(obj5);
-	// assert obj6 has the correct value
-	cr_assert_eq(object_as_int(obj6), 123);
-	// assert that obj5 has been consumed
-	fam_err = NoErrors;
-	cr_assert_eq(object_as_int(obj5), -1);
-	cr_assert_eq(fam_err, ObjectConsumed);
+		// create an int object
+		const Object obj5 = object_create_int(123);
+		cr_assert_eq(object_as_int(obj5), 123);
+		// move obj5 -> obj6 (const allowed)
+		const Object obj6 = object_move(obj5);
+		// assert obj6 has the correct value
+		cr_assert_eq(object_as_int(obj6), 123);
+		// assert that obj5 has been consumed
+		fam_err = NoErrors;
+		cr_assert_eq(object_as_int(obj5), -1);
+		cr_assert_eq(fam_err, ObjectConsumed);
 
-	Object obj7 = object_create_int64(567);
-	Object obj8 = object_move(obj7);
+		Object obj7 = object_create_int64(567);
+		Object obj8 = object_move(obj7);
 
-	cr_assert_eq(object_as_int64(obj8), 567);
-	Object obj9 = null;
+		cr_assert_eq(object_as_int64(obj8), 567);
+		Object obj9 = null;
 
-	Object obj11;
-	{
-		Object obj10 = object_create_int(1112);
-		cr_assert_eq(object_as_int(obj10), 1112);
-		obj11 = object_ref(obj10);
-		const Object obj12 = object_ref(obj11);
-	}
-	cr_assert_eq(object_as_int(obj11), 1112);
+		Object obj11;
+		{
+			Object obj10 = object_create_int(1112);
+			cr_assert_eq(object_as_int(obj10), 1112);
+			obj11 = object_ref(obj10);
+			const Object obj12 = object_ref(obj11);
+		}
+		cr_assert_eq(object_as_int(obj11), 1112);
 
-	string s1 = string_create_cs("test111");
-	Object obj12 = object_create_string(s1);
+		string s1 = string_create_cs("test111");
+		Object obj12 = object_create_string(s1);
 
-	string s2 = object_as_string(obj12);
-	cr_assert(!strcmp(cstring(s1), cstring(s2)));
-	cr_assert(!strcmp(cstring(s1), "test111"));
+		string s2 = object_as_string(obj12);
+		cr_assert(!strcmp(cstring(s1), cstring(s2)));
+		cr_assert(!strcmp(cstring(s1), "test111"));
 
-	Object obj13 = object_move(obj12);
+		Object obj13 = object_move(obj12);
+	*/
 }
 
 /*

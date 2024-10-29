@@ -24,7 +24,7 @@
 // Ptr macros
 #define $(ptr) ptr_data(ptr)
 #define $len(ptr) ptr_len(ptr)
-#define nil(ptr) (ptr == NULL || ptr_len(ptr) == 0)
+#define nil(ptr) (ptr == NULL || ptr_len(ptr) == UINT32_MAX)
 #define move(dst, src)                                                                             \
 	({                                                                                             \
 		dst = src;                                                                                 \

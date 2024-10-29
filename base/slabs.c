@@ -19,7 +19,7 @@
 #include <stdio.h>
 
 #define MAX_SLAB_TYPES 256
-#define SLAB_SIZES 256
+#define SLAB_SIZES 257
 #define SLABS_PER_RESIZE 128
 #define INITIAL_CHUNKS 0
 
@@ -33,7 +33,7 @@ typedef struct Type {
 	byte data[];
 } Type;
 
-const Type null_impl = {.id = 0, .len = 0};
+const Type null_impl = {.id = 0, .len = UINT32_MAX};
 const struct Type *null = &null_impl;
 
 #define SLAB_OVERHEAD sizeof(Type)
@@ -220,7 +220,7 @@ SlabAllocator slab_allocator_create() {
 	ret->sd_count = SLAB_SIZES;
 	for (int i = 0; i < ret->sd_count; i++) {
 		SlabData *sd = &ret->sd_arr[i];
-		sd->type = (const SlabType) {.slab_size = (1 + i) * 16,
+		sd->type = (const SlabType) {.slab_size = i * 16,
 									 .slabs_per_resize = SLABS_PER_RESIZE,
 									 .initial_chunks = INITIAL_CHUNKS,
 									 .max_slabs = UINT32_MAX};
@@ -235,8 +235,8 @@ SlabAllocator slab_allocator_create() {
 }
 
 int slab_allocator_index(SlabAllocator sa, unsigned int size) {
-	int ret = (size - 1) / 16;
-	if (size <= 0 || ret >= SLAB_SIZES)
+	int ret = (15 + size) / 16;
+	if (size < 0 || ret >= SLAB_SIZES)
 		return -1;
 	return ret;
 }

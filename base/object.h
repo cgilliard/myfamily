@@ -19,67 +19,47 @@
 Type(Object);
 #define Object DefineType(Object)
 
-/*
-
 typedef enum ObjectType {
-	ObjectTypeInt32,
-	ObjectTypeInt64,
-	ObjectTypeFloat,
-	ObjectTypeByte,
-	ObjectTypeBool,
-	ObjectTypeVector,
-	ObjectTypeMap,
-	ObjectTypeSlice
+	ObjectType64Bit,
+	ObjectType32Bit,
+	ObjectType8Bit,
+	ObjectTypePointer,
+	ObjectTypeObject,
 } ObjectType;
 
 // Example usage:
-// Object x = object_create(ObjectTypeInt32, 1);
-// Object x = object_create(ObjectTypeInt64, 1LL);
-// Object x = object_create(ObjectTypeBool, false);
-// Object x = object_create(ObjectTypeFloat, 1.2);
-// Object x = object_create(ObjectTypeByte, 'a');
-Object object_create(ObjectType type, const void *value);
-// allowed functions for the primitive types:
-int object_as_int(const Object obj);
-int64 object_as_int64(const Object obj);
-bool object_as_bool(const Object obj);
-byte object_as_byte(const Object obj);
-float64 object_as_float(const Object obj);
+// Object x = object_create(&(int) { 1 }, ObjectType32);
+// Object y = object_create(&(u64) {1LL}, ObjectType64);
+// a $() macro could autobox these: let x = $(1); or let y = $(1LL);
+// int x_int = *(int *)object_value_of(x);
+// int64 y_int = *(int64)object_value_of(y);
+// a $int() macro or $int64() macro could do this automatically and do a type check.
+// int x_int = $int(x); or int64 y_int = $int64(y); int z_int = $int64(x); would be an error,
+// possibly print a warning, or maybe panic
+Object object_create(const void *value, ObjectType type);
+const void *object_value_of(const Object obj);
+ObjectType object_type(const Object obj);
+unsigned int object_size(const Object obj);
 
-// Example usage:
-// unsigned char buf[100];
-// // populate buf with data...
-// Object x = object_create_vector(buf, ObjectTypeByte, 100);
-Object object_create_vector(const void *value, ObjectType element_type, int64 len);
-// allowed functions
-int object_append(Object vec, const Object element);
-int object_append_raw(Object vec, const byte *value);
-int object_resize(Object vec, int64 nlen);
-int object_set(Object vec, int64 element, Object value);
-int object_set_raw(Object vec, int64 element, const byte *value);
-int object_set_raw_range(Object vec, int64 start, int64 len, const byte *value);
-int object_delete_element(Object vec, int64 index);
-int object_delete_range(Object vec, int64 start, int64 len);
-// Object y = object_create_slice(x, 10, 10); // slice of x[10..20].
-Object object_create_slice(Object vector, int64 offset, int64 len);
-// allowed functions:
-const void *object_slice_ref(Object slice);
-// Creates a map. To create an immutable map, you can
-Object object_create_map();
-int object_set_property(Object obj, const Object key, const Object value);
-Object object_delete_property(Object obj, const Object key);
-Object object_get_property(const Object obj, const Object key);
-Object object_move(Object src);
-Object object_ref(Object src);
-*/
+int object_mutate(Object obj, const void *value);
 
-Object object_create_int64(int64 value);
-Object object_create_int(int value);
-Object object_create_byte(byte value);
-Object object_create_string(string s);
-Object object_move(Object src);
-Object object_ref(Object src);
-int64 object_as_int64(const Object obj);
-int object_as_int(const Object obj);
-byte object_as_byte(const Object obj);
-string object_as_string(const Object obj);
+// A vector is created like this:
+// Ptr x = fam_alloc(100, false);
+// let v = object_create(x, sizeof(Ptr), ObjectTypePointer);
+// // resize
+// Ptr vptr = object_value_of(x);
+// Ptr nvptr = fam_resize(vptr, 200);
+// // check if nvptr is NULL (error condition)
+// int res = object_mutate(v, nvptr);
+// // check for errors
+// // if successful, v now has 200 bytes allocated.
+// higher level types can use this functionality to build Vectors, Slices, Strings, etc.
+
+// property functions
+int object_set_property(Object obj, const char *key, const Object value);
+Object object_delete_property(Object obj, const char *key);
+Object object_get_property(const Object obj, const char *key);
+
+// moving/referencing functions
+Object object_move(const Object src);
+Object object_ref(const Object src);
