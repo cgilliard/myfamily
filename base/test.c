@@ -201,25 +201,17 @@ MyTest(base, test_slab_allocator) {
 	cr_assert(ptr1);
 	cr_assert(ptr2);
 	cr_assert(ptr0);
-	printf("ptr_len%i\n", $len(ptr0));
 	cr_assert_eq($len(ptr0), 16);
 	cr_assert_eq($len(ptr1), 32);
 	cr_assert_eq($len(ptr2), 48);
-	printf("ptr1.id=%i\n", ptr_id(ptr1));
-	printf("ptr2.id=%i\n", ptr_id(ptr2));
 	ptr3 = slab_allocator_allocate(sa2, 33);
 	cr_assert_eq($len(ptr3), 48);
-	printf("ptr3.id=%i\n", ptr_id(ptr3));
-	printf("ptr3.id=%i\n", ptr_id(ptr3));
-	printf("ptr3.id=%i\n", ptr_id(ptr3));
 
 	cr_assert(!nil(ptr3));
 	slab_allocator_free(sa2, ptr3);
 	cr_assert(nil(ptr3));
 	Ptr ptr4 = slab_allocator_allocate(sa2, 33);
-	printf("ptr4.id=%i\n", ptr_id(ptr4));
 	Ptr ptr5 = slab_allocator_allocate(sa2, 33);
-	printf("ptr5.id=%i\n", ptr_id(ptr5));
 	Ptr ptr6 = slab_allocator_allocate(sa2, 0);
 	cr_assert(ptr6);
 	cr_assert(!nil(ptr0));
@@ -277,8 +269,6 @@ MyTest(base, test_big) {
 	int ss = 16;
 	Ptr *arr = alloc(sizeof(Ptr) * size, false);
 	for (unsigned int i = 0; i < size; i++) {
-		if (i % (1024 * 1024) == 0)
-			printf("i=%u\n", i);
 		arr[i] = slab_allocator_allocate(sa, ss);
 		if (nil(arr[i]))
 			printf("nil ptr at %u\n", i);
@@ -293,8 +283,6 @@ MyTest(base, test_big) {
 	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), size);
 
 	for (unsigned int i = 0; i < size; i++) {
-		if (i % (1024 * 1024) == 0)
-			printf("free i=%u\n", i);
 		cr_assert_eq(ptr_id(arr[i]), i);
 		cr_assert_eq($len(arr[i]), ss);
 		byte *data = $(arr[i]);
@@ -347,6 +335,54 @@ MyTest(base, test_test_type) {
 }
 
 MyTest(base, test_object) {
+	int64 v = 123;
+	Object obj = object_create(&v, ObjectTypeInt64);
+	int64 v_out = *(int64 *)object_value_of(obj);
+	cr_assert_eq(v_out, 123);
+	v = 456;
+	object_mutate(obj, &v);
+	v_out = *(int64 *)object_value_of(obj);
+	cr_assert_eq(v_out, 456);
+
+	Object obj2 = object_move(obj);
+
+	v_out = *(int64 *)object_value_of(obj2);
+	cr_assert_eq(v_out, 456);
+
+	int v32_out = 0;
+	Object obj3;
+	{
+		int v32 = 777;
+		Object obj4 = object_create(&v32, ObjectTypeInt32);
+		obj3 = object_ref(obj4);
+		v32_out = *(int *)object_value_of(obj4);
+		cr_assert_eq(v32_out, 777);
+	}
+	v32_out = *(int *)object_value_of(obj3);
+	cr_assert_eq(v32_out, 777);
+
+	int objval = 2024;
+	Object obj5 = object_create(&objval, ObjectTypeInt32);
+	Object weak5 = object_weak(obj5);
+	Object upgraded = object_upgrade(weak5);
+	cr_assert(!nil(upgraded));
+	int objval_out = *(int *)object_value_of(upgraded);
+	cr_assert_eq(objval_out, 2024);
+
+	Object outer_weak;
+
+	{
+		int vw = 2025;
+		Object inner_strong = object_create(&vw, ObjectTypeInt32);
+		outer_weak = object_weak(inner_strong);
+		Object upgrade1 = object_upgrade(outer_weak);
+		int vw_out = $int(upgrade1);
+		cr_assert_eq(vw_out, 2025);
+	}
+
+	// now try to upgrade after all strong references are gone (result is NULL)
+	cr_assert(!object_upgrade(outer_weak));
+
 	/*
 		// create two int64 objects
 		Object obj1 = object_create_int64(111);

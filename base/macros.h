@@ -31,6 +31,9 @@
 		src = null;                                                                                \
 	})
 
+// Object macros
+#define $int(obj) *(int *)object_value_of(obj)
+
 // String macros
 
 /*

@@ -53,6 +53,11 @@ int check_initialize_default_slab_allocator() {
 }
 
 Ptr fam_alloc(unsigned int size, bool send) {
+	// this size is reserved for 'null'
+	if (size == UINT32_MAX) {
+		SetErr(Overflow);
+		return NULL;
+	}
 	if (!check_initialize_default_slab_allocator())
 		return NULL;
 	Ptr ret;
