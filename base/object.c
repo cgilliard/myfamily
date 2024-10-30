@@ -17,6 +17,8 @@
 #include <base/object.h>
 #include <base/osdef.h>
 
+#include <stdio.h>
+
 #define OBJECT_FLAG_FAM_ALLOC_RESERVED1 0
 #define OBJECT_FLAG_FAM_ALLOC_RESERVED2 1
 #define OBJECT_FLAG_TYPE0 2
@@ -99,10 +101,11 @@ Object object_create(ObjectType type, const void *value, bool send) {
 		return ret;
 
 	memcpy($(ret), value, size);
-	object_set_ptr_type(ret, type);
 	int64 *aux = ptr_aux(ret);
+	*aux |= 0xF000000000000000ULL;
+	object_set_ptr_type(ret, type);
 	// set strong count to 1
-	(*aux)++;
+	(*aux) |= 0x0000000000000001L;
 
 	return ret;
 }
@@ -118,11 +121,12 @@ Object object_create_box(unsigned int size, bool send) {
 		return NULL;
 	}
 	memcpy($(ret), &ptr, box_size);
-	object_set_ptr_type(ret, ObjectTypeBox);
 	int64 *aux = ptr_aux(ret);
+	*aux |= 0xF000000000000000ULL;
+	object_set_ptr_type(ret, ObjectTypeBox);
 
 	// set strong count to 1
-	(*aux)++;
+	(*aux) |= 0x0000000000000001L;
 
 	return ret;
 }
