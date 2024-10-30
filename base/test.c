@@ -336,7 +336,7 @@ MyTest(base, test_test_type) {
 
 MyTest(base, test_object) {
 	int64 v = 123;
-	Object obj = object_create(&v, ObjectTypeInt64);
+	Object obj = object_create(ObjectTypeInt64, &v);
 	int64 v_out = *(int64 *)object_value_of(obj);
 	cr_assert_eq(v_out, 123);
 	v = 456;
@@ -353,7 +353,7 @@ MyTest(base, test_object) {
 	Object obj3;
 	{
 		int v32 = 777;
-		Object obj4 = object_create(&v32, ObjectTypeInt32);
+		Object obj4 = object_create(ObjectTypeInt32, &v32);
 		obj3 = object_ref(obj4);
 		v32_out = *(int *)object_value_of(obj4);
 		cr_assert_eq(v32_out, 777);
@@ -362,7 +362,7 @@ MyTest(base, test_object) {
 	cr_assert_eq(v32_out, 777);
 
 	int objval = 2024;
-	Object obj5 = object_create(&objval, ObjectTypeInt32);
+	Object obj5 = object_create(ObjectTypeInt32, &objval);
 	Object weak5 = object_weak(obj5);
 	Object upgraded = object_upgrade(weak5);
 	cr_assert(!nil(upgraded));
@@ -373,7 +373,7 @@ MyTest(base, test_object) {
 
 	{
 		int vw = 2025;
-		Object inner_strong = object_create(&vw, ObjectTypeInt32);
+		Object inner_strong = object_create(ObjectTypeInt32, &vw);
 		outer_weak = object_weak(inner_strong);
 		Object upgrade1 = object_upgrade(outer_weak);
 		int vw_out = $int(upgrade1);
@@ -387,8 +387,8 @@ MyTest(base, test_object) {
 	Ptr inner = fam_alloc(100, true);
 	// set first byte
 	((char *)$(inner))[0] = 1;
-	// create an Object of type ObjectTypePointer
-	Object obj6 = object_create(&inner, ObjectTypePointer);
+	// create an Object of type ObjectTypeBox
+	Object obj6 = object_create(ObjectTypeBox, &inner);
 	// retreive the pointer
 	Ptr inner_out = *(Ptr *)object_value_of(obj6);
 

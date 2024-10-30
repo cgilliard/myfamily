@@ -24,13 +24,14 @@ typedef enum ObjectType {
 	ObjectTypeInt32,
 	ObjectTypeFloat,
 	ObjectTypeByte,
-	ObjectTypePointer,
+	ObjectTypeBox,
 	ObjectTypeBool,
 	ObjectTypeWeak,
 	__ObjectTypeCount__,
 } ObjectType;
 
-Object object_create(const void *value, ObjectType type);
+// Object object_create_box(unsigned int size, ObjectType type);
+Object object_create(ObjectType type, const void *value);
 const void *object_value_of(const Object obj);
 ObjectType object_type(const Object obj);
 unsigned int object_size(const Object obj);

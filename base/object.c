@@ -39,7 +39,7 @@ unsigned int object_get_size(ObjectType type) {
 		return sizeof(int);
 	else if (type == ObjectTypeWeak)
 		return sizeof(int64);
-	else if (type == ObjectTypePointer)
+	else if (type == ObjectTypeBox)
 		return sizeof(int64);
 
 	return 0;
@@ -71,7 +71,7 @@ void object_set_ptr_type(Ptr ptr, ObjectType type) {
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
-	} else if (type == ObjectTypePointer) {
+	} else if (type == ObjectTypeBox) {
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, false);
@@ -90,7 +90,7 @@ void object_set_ptr_type(Ptr ptr, ObjectType type) {
 	}
 }
 
-Object object_create(const void *value, ObjectType type) {
+Object object_create(ObjectType type, const void *value) {
 	if (value == NULL || type < 0 || type >= __ObjectTypeCount__) {
 		SetErr(IllegalArgument);
 		return NULL;
@@ -131,7 +131,7 @@ ObjectType object_type(const Object obj) {
 			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
 				return ObjectTypeWeak;
 			else
-				return ObjectTypePointer;
+				return ObjectTypeBox;
 		}
 	} else {
 		if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE1)) {
@@ -255,7 +255,7 @@ Object object_move(const Object src) {
 		return NULL;
 	}
 
-	ObjectNc ret = object_create($(src), object_type(src));
+	ObjectNc ret = object_create(object_type(src), $(src));
 	Object_cleanup(&src);
 	return ret;
 }
@@ -286,7 +286,7 @@ Object object_weak(const Object src) {
 		return NULL;
 	}
 	unsigned long long v = (unsigned long long)src;
-	ObjectNc weak = object_create(&v, ObjectTypeWeak);
+	ObjectNc weak = object_create(ObjectTypeWeak, &v);
 	if (object_increment_weak(src))
 		return NULL;
 
@@ -316,7 +316,7 @@ Object object_upgrade(const Object src) {
 void Object_cleanup(const Object *obj) {
 	if (!nil(*obj)) {
 		// deallocate the pointer
-		if (object_type(*obj) == ObjectTypePointer) {
+		if (object_type(*obj) == ObjectTypeBox) {
 			Ptr inner = *(Ptr *)object_value_of(*obj);
 			fam_release(&inner);
 		}
