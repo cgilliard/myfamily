@@ -382,18 +382,13 @@ MyTest(base, test_object) {
 
 	// now try to upgrade after all strong references are gone (result is NULL)
 	cr_assert(!object_upgrade(outer_weak));
-
-	// create a pointer by allocating 100 bytes
-	Ptr inner = fam_alloc(100, true);
-	// set first byte
-	((char *)$(inner))[0] = 1;
-	// create an Object of type ObjectTypeBox
-	Object obj6 = object_create(ObjectTypeBox, &inner);
+	Object obj6 = object_create_box(100);
 	// retreive the pointer
 	Ptr inner_out = *(Ptr *)object_value_of(obj6);
 
+	((char *)$(inner_out))[0] = 1;
+
 	// do assertions
-	cr_assert_eq(inner, inner_out);
 	cr_assert_eq(((char *)$(inner_out))[0], 1);
 
 	/*

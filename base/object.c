@@ -109,6 +109,27 @@ Object object_create(ObjectType type, const void *value) {
 
 	return ret;
 }
+
+Object object_create_box(unsigned int size) {
+	unsigned int box_size = object_get_size(ObjectTypeBox);
+	Ptr ret = fam_alloc(box_size, false);
+	if (ret == NULL)
+		return ret;
+	Ptr ptr = fam_alloc(size, false);
+	if (ptr == NULL) {
+		fam_release(&ret);
+		return NULL;
+	}
+	memcpy($(ret), &ptr, box_size);
+	object_set_ptr_type(ret, ObjectTypeBox);
+	int64 *aux = ptr_aux(ret);
+
+	// set strong count to 1
+	(*aux)++;
+
+	return ret;
+}
+
 const void *object_value_of(const Object obj) {
 	if (nil(obj)) {
 		SetErr(ObjectConsumed);
