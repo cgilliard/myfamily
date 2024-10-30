@@ -21,6 +21,7 @@ Type(Object);
 typedef enum ObjectType {
 	ObjectTypeInt64,
 	ObjectTypeInt32,
+	ObjectTypeInt,
 	ObjectTypeFloat,
 	ObjectTypeByte,
 	ObjectTypeBox,
@@ -32,6 +33,7 @@ typedef enum ObjectType {
 Object object_create_box(unsigned int size, bool send);
 Object object_create(ObjectType type, const void *value, bool send);
 const void *object_value_of(const Object obj);
+int object_value_of_buf(const Object obj, void *buffer, int limit);
 ObjectType object_type(const Object obj);
 unsigned int object_size(const Object obj);
 

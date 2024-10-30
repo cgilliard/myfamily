@@ -28,6 +28,8 @@
 unsigned int object_get_size(ObjectType type) {
 	if (type == ObjectTypeInt64)
 		return sizeof(int64);
+	else if (type == ObjectTypeInt)
+		return 0;
 	else if (type == ObjectTypeByte)
 		return sizeof(byte);
 	else if (type == ObjectTypeBool)
@@ -86,6 +88,10 @@ void object_set_ptr_type(Ptr ptr, ObjectType type) {
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, false);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
+	} else if (type == ObjectTypeInt) {
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, false);
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, false);
 	}
 }
 
@@ -100,12 +106,21 @@ Object object_create(ObjectType type, const void *value, bool send) {
 	if (ret == NULL)
 		return ret;
 
-	memcpy($(ret), value, size);
+	if (size)
+		memcpy($(ret), value, size);
 	int64 *aux = ptr_aux(ret);
 	*aux |= 0xF000000000000000ULL;
 	object_set_ptr_type(ret, type);
 	// set strong count to 1
 	(*aux) |= 0x0000000000000001L;
+
+	if (type == ObjectTypeInt) {
+		int v;
+		memcpy(&v, value, 4);
+		int64 flags = *aux & 0xFFFF000000FFFFFFLL;
+		int64 count = ((int64)v << 24);
+		*aux = count | flags;
+	}
 
 	return ret;
 }
@@ -139,6 +154,24 @@ const void *object_value_of(const Object obj) {
 	return $(obj);
 }
 
+int object_value_of_buf(const Object obj, void *buffer, int limit) {
+	int max = limit;
+	ObjectType type = object_type(obj);
+	if (type == ObjectTypeInt) {
+		if (limit > 4)
+			max = 4;
+	}
+
+	int ret = 0;
+	if (type == ObjectTypeInt) {
+		int64 *aux = ptr_aux(obj);
+		ret = max;
+		int count = ((*aux) & 0xFFFFFF000000LL) >> 24;
+		memcpy((byte *)buffer, &count, ret);
+	}
+	return ret;
+}
+
 ObjectType object_type(const Object obj) {
 	if (nil(obj)) {
 		SetErr(ObjectConsumed);
@@ -164,6 +197,8 @@ ObjectType object_type(const Object obj) {
 		} else {
 			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
 				return ObjectTypeByte;
+			else
+				return ObjectTypeInt;
 		}
 	}
 	return ObjectTypeBool;
@@ -200,6 +235,7 @@ Object object_get_property(const Object obj, const char *key) {
 
 int object_decrement_strong(Object obj) {
 	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
+	ObjectType type = object_type(obj);
 	if (send) {
 		int64 *aux = ptr_aux(obj);
 		int64 aux_val = __sync_fetch_and_sub(aux, 1);
@@ -208,7 +244,10 @@ int object_decrement_strong(Object obj) {
 			return aux_val - 1;
 		} else {
 			// return weak count
-			return (aux_val & 0xFFFFFF000000LL) >> 24;
+			if (type == ObjectTypeInt)
+				return 0;
+			else
+				return (aux_val & 0xFFFFFF000000LL) >> 24;
 		}
 	} else {
 		int64 *aux = ptr_aux(obj);
@@ -221,7 +260,10 @@ int object_decrement_strong(Object obj) {
 			return count;
 		} else {
 			// return the weak count
-			return (*aux & 0xFFFFFF000000LL) >> 24;
+			if (type == ObjectTypeInt)
+				return 0;
+			else
+				return (*aux & 0xFFFFFF000000LL) >> 24;
 		}
 	}
 }

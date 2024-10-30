@@ -225,6 +225,15 @@ void test_obj(bool send) {
 	cr_assert_eq(((char *)$(inner_out))[0], 1);
 }
 
+MyTest(base, test_obj2) {
+	int x1 = 1117;
+	Object obj1 = object_create(ObjectTypeInt, &x1, false);
+
+	int x1_out;
+	object_value_of_buf(obj1, &x1_out, sizeof(int));
+	cr_assert_eq(x1_out, 1117);
+}
+
 MyTest(base, test_object) {
 	test_obj(true);
 	test_obj(false);
