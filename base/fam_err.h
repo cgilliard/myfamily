@@ -31,6 +31,7 @@
 	NoErrors, \
 	IllegalArgument, \
 	Overflow, \
+	Underflow, \
 	llocErr, \
 	InitErr, \
 	AlreadyInitialized, \
