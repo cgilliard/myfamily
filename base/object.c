@@ -109,7 +109,7 @@ Object object_create(ObjectType type, const void *value, bool send) {
 	if (size)
 		memcpy($(ret), value, size);
 	int64 *aux = ptr_aux(ret);
-	*aux |= 0xF000000000000000ULL;
+	*aux &= 0xFF00000000000000ULL;
 	object_set_ptr_type(ret, type);
 	// set strong count to 1
 	(*aux) |= 0x0000000000000001L;
@@ -137,7 +137,7 @@ Object object_create_box(unsigned int size, bool send) {
 	}
 	memcpy($(ret), &ptr, box_size);
 	int64 *aux = ptr_aux(ret);
-	*aux |= 0xF000000000000000ULL;
+	*aux &= 0xFF00000000000000ULL;
 	object_set_ptr_type(ret, ObjectTypeBox);
 
 	// set strong count to 1
