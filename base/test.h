@@ -15,7 +15,6 @@
 #include <base/colors.h>
 #include <base/fam_alloc.h>
 #include <base/os.h>
-#include <base/string.h>
 #include <criterion/criterion.h>
 #include <fcntl.h>
 #include <ftw.h>

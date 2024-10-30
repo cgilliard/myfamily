@@ -16,7 +16,7 @@
 #include <base/macro_util.h>
 #include <base/os.h>
 // #include <base/print_util.h>
-#include <base/string.h>
+// #include <base/string.h>
 
 _Thread_local byte fam_err_last[ERR_LEN + 1] = {""};
 

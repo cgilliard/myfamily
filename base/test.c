@@ -17,173 +17,6 @@
 
 MySuite(base);
 
-MyTest(base, test_string) {
-	string s0 = string_create_cs("abc");
-	cr_assert_eq(string_len(s0), 3);
-	cr_assert(!strcmp(cstring(s0), "abc"));
-
-	string s1 = string_create_cs("test1");
-	string s2 = string_create_cs("test2");
-	string s3 = string_append_string(s1, s2);
-
-	cr_assert(!strcmp(cstring(s3), "test1test2"));
-	cr_assert_eq(string_len(s3), strlen("test1test2"));
-	for (int i = 0; i < string_len(s3); i++) {
-		cr_assert_eq(string_char_at(s3, i), "test1test2"[i]);
-	}
-	cr_assert_eq(fam_err, NoErrors);
-	cr_assert_eq(string_char_at(s3, 100), 0);
-	cr_assert_eq(fam_err, IndexOutOfBounds);
-	string s4 = string_substring_s(s3, 2, 4);
-	cr_assert(!strcmp(cstring(s4), "st"));
-
-	string s5 = string_create_cs("dddd");
-	string s6 = string_ref(s5);
-}
-
-/*
-MyTest(base, test_string) {
-	string s = String("test");
-	cr_assert(!nil(s));
-	cr_assert(!strcmp(cstring(&s), "test"));
-	string s2 = INIT_STRING;
-	cr_assert(nil(s2));
-	string s3 = String(s);
-	cr_assert(!strcmp(cstring(&s3), "test"));
-
-	string s4 = String();
-	cr_assert(!nil(s4));
-	cr_assert(!strcmp(cstring(&s4), ""));
-
-	cr_assert(string_equal(&s, &s3));
-	cr_assert(!string_equal(&s, &s2));
-	cr_assert(!string_equal(&s, &s4));
-
-	cr_assert_eq(len(s), 4);
-	cr_assert_eq(len(s2), 0);
-	cr_assert_eq(string_len(&s3), 4);
-	cr_assert_eq(string_len(&s4), 0);
-	string_append_s(&s, &s3);
-	cr_assert_eq(string_len(&s), 8);
-
-	string s7 = String("testtest");
-	cr_assert(string_equal(&s, &s7));
-
-	string s5 = String("abc");
-	string_append_s(&s, &s5);
-	cr_assert_eq(len(s), 11);
-	string s6 = String("testtestabc");
-	cr_assert(string_equal(&s, &s6));
-
-	cr_assert_eq(string_index_of(&s, &s5), 8);
-	cr_assert_eq(string_index_of(&s6, &s3), 0);
-	cr_assert_eq(string_index_of(&s3, &s5), -1);
-
-	cr_assert_eq(string_last_index_of(&s, &s5), 8);
-	cr_assert_eq(string_last_index_of(&s6, &s3), 4);
-	cr_assert_eq(string_last_index_of(&s3, &s5), -1);
-
-	cr_assert_eq(string_char_at(&s5, 0), 'a');
-	cr_assert_eq(string_char_at(&s5, 1), 'b');
-	cr_assert_eq(string_char_at(&s5, 2), 'c');
-	fam_err = NoErrors;
-	cr_assert_eq(string_char_at(&s5, 3), '\0');
-	cr_assert_eq(fam_err, IndexOutOfBounds);
-	fam_err = NoErrors;
-	cr_assert_eq(string_char_at(&s5, 4), '\0');
-	cr_assert_eq(fam_err, IndexOutOfBounds);
-	fam_err = NoErrors;
-	cr_assert_eq(string_char_at(&s5, -1), '\0');
-	cr_assert_eq(fam_err, IndexOutOfBounds);
-
-	string s8;
-	string_substring_s(&s8, &s6, 2, 4);
-	string s9 = String("st");
-	cr_assert(string_equal(&s8, &s9));
-
-	append(s8, s6);
-	// st + testtestabc
-	string s10 = String("sttesttestabc");
-	cr_assert(string_equal(&s8, &s10));
-	append(s8, "ok");
-	string s11 = String("sttesttestabcok");
-	cr_assert(string_equal(&s8, &s11));
-
-	append(s8, "0123456789", 5);
-	string s12 = String("sttesttestabcok01234");
-	cr_assert(string_equal(&s8, &s12));
-
-	cr_assert(equal(s8, s12));
-	cr_assert(!equal(s8, "abc"));
-	cr_assert(equal(s8, "sttesttestabcok01234"));
-	string s13 = substring(s8, 3, 5);
-	string s14 = String("es");
-	cr_assert(equal(s13, s14));
-	string s15 = substring(s8, 6);
-	string s16 = String("testabcok01234");
-	cr_assert(equal(s15, s16));
-	string s17 = String("abc");
-	cr_assert_eq(index_of(s16, s17), 4);
-	cr_assert_eq(index_of(s16, "abc"), 4);
-
-	string s18 = String("okokok");
-	cr_assert_eq(last_index_of(s18, "ok"), 4);
-	cr_assert_eq(index_of(s18, "ok"), 0);
-
-	string test_str = String("line1\nline2\nline3\nline4\n");
-	int64 i;
-	int64 count = 0;
-	char compare[101];
-
-	while ((i = index_of(test_str, "\n")) >= 0) {
-		string line = substring(test_str, 0, i);
-		string s = substring(test_str, i + 1);
-		move(test_str, s);
-		count++;
-		snprintf(compare, 100, "line%lli", count);
-		cr_assert(!strcmp(compare, cstring(&line)));
-	}
-	cr_assert_eq(count, 4);
-}
-*/
-
-/*
-MyTest(base, test_ptr) {
-	int64 alloc_sum_pre = alloc_sum();
-	Ptr ptr = ptr_test_obj(123, 100, 0xF);
-	cr_assert(ptr_flag_check(ptr, 0));
-	cr_assert(ptr_flag_check(ptr, 1));
-	cr_assert(ptr_flag_check(ptr, 2));
-	cr_assert(ptr_flag_check(ptr, 3));
-	for (int i = 4; i < 100; i++) {
-		cr_assert(!ptr_flag_check(ptr, i));
-	}
-	for (int i = -1; i > -10; i--) {
-		cr_assert(!ptr_flag_check(ptr, i));
-	}
-	cr_assert_eq(ptr_id(ptr), 123);
-	cr_assert_eq($len(ptr), 100);
-
-	ptr_flag_set(ptr, 4, true);
-	cr_assert(ptr_flag_check(ptr, 0));
-	cr_assert(ptr_flag_check(ptr, 1));
-	cr_assert(ptr_flag_check(ptr, 2));
-	cr_assert(ptr_flag_check(ptr, 3));
-	cr_assert(ptr_flag_check(ptr, 4));
-	cr_assert(!ptr_flag_check(ptr, 5));
-
-	cr_assert_eq(ptr_id(ptr), 123);
-	cr_assert_eq($len(ptr), 100);
-
-	int64 alloc_sum_post = alloc_sum();
-	cr_assert_eq(alloc_sum_post - alloc_sum_pre, 1);
-	int64 release_sum_pre = release_sum();
-	ptr_free_test_obj(ptr);
-	int64 release_sum_post = release_sum();
-	cr_assert_eq(release_sum_post - release_sum_pre, 1);
-}
-*/
-
 MyTest(base, test_slab_allocator) {
 	SlabAllocator sa = slab_allocator_create();
 
@@ -334,9 +167,8 @@ MyTest(base, test_test_type) {
 	cr_assert_eq(test_type_value(def), 5678);
 }
 
-MyTest(base, test_object) {
+void test_obj(bool send) {
 	int64 v = 123;
-	bool send = true;
 	Object obj = object_create(ObjectTypeInt64, &v, send);
 	int64 v_out = *(int64 *)object_value_of(obj);
 	cr_assert_eq(v_out, 123);
@@ -369,7 +201,6 @@ MyTest(base, test_object) {
 	cr_assert(!nil(upgraded));
 	int objval_out = *(int *)object_value_of(upgraded);
 	cr_assert_eq(objval_out, 2024);
-
 	Object outer_weak;
 
 	{
@@ -392,85 +223,12 @@ MyTest(base, test_object) {
 
 	// do assertions
 	cr_assert_eq(((char *)$(inner_out))[0], 1);
-
-	/*
-		// create two int64 objects
-		Object obj1 = object_create_int64(111);
-		Object obj2 = object_create_int64(222);
-
-		// assert their values
-		cr_assert_eq(object_as_int64(obj1), 111);
-		cr_assert_eq(object_as_int64(obj2), 222);
-		// try to get obj1 as int (wrong type)
-		cr_assert_eq(object_as_int(obj1), -1);
-		cr_assert_eq(fam_err, TypeMismatch);
-
-		// create an int
-		Object obj3 = object_create_int(444);
-		// reset err and try to get it as an int64
-		fam_err = NoErrors;
-		cr_assert_eq(object_as_int64(obj3), -1);
-		cr_assert_eq(fam_err, TypeMismatch);
-		// get correctly as int
-		cr_assert_eq(object_as_int(obj3), 444);
-
-		// create a byte and do similar checks
-		Object obj4 = object_create_byte('a');
-		fam_err = NoErrors;
-		cr_assert_eq(object_as_int64(obj4), -1);
-		cr_assert_eq(fam_err, TypeMismatch);
-		cr_assert_eq(object_as_byte(obj4), 'a');
-
-		// create an int object
-		const Object obj5 = object_create_int(123);
-		cr_assert_eq(object_as_int(obj5), 123);
-		// move obj5 -> obj6 (const allowed)
-		const Object obj6 = object_move(obj5);
-		// assert obj6 has the correct value
-		cr_assert_eq(object_as_int(obj6), 123);
-		// assert that obj5 has been consumed
-		fam_err = NoErrors;
-		cr_assert_eq(object_as_int(obj5), -1);
-		cr_assert_eq(fam_err, ObjectConsumed);
-
-		Object obj7 = object_create_int64(567);
-		Object obj8 = object_move(obj7);
-
-		cr_assert_eq(object_as_int64(obj8), 567);
-		Object obj9 = null;
-
-		Object obj11;
-		{
-			Object obj10 = object_create_int(1112);
-			cr_assert_eq(object_as_int(obj10), 1112);
-			obj11 = object_ref(obj10);
-			const Object obj12 = object_ref(obj11);
-		}
-		cr_assert_eq(object_as_int(obj11), 1112);
-
-		string s1 = string_create_cs("test111");
-		Object obj12 = object_create_string(s1);
-
-		string s2 = object_as_string(obj12);
-		cr_assert(!strcmp(cstring(s1), cstring(s2)));
-		cr_assert(!strcmp(cstring(s1), "test111"));
-
-		Object obj13 = object_move(obj12);
-	*/
 }
 
-/*
-MyTest(base, test_string2) {
-	string2 x = string2_create("test");
-	cr_assert_eq(string2_len(x), 4);
-	Ptr y = fam_alloc(4096, true);
-	cr_assert(y != NULL);
-	Ptr z = fam_alloc(4097, true);
-	cr_assert(z != NULL);
-	fam_release(&y);
-	fam_release(&z);
+MyTest(base, test_object) {
+	test_obj(true);
+	test_obj(false);
 }
-*/
 
 MyTest(base, test_limits) {
 	cr_assert_eq(INT64_MAX, 9223372036854775807LL);

@@ -1,6 +1,5 @@
 OBJS := types.o \
 	fam_err.o \
-	string.o \
 	os.o \
 	colors.o \
 	slabs.o \

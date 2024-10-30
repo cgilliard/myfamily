@@ -14,14 +14,17 @@
 
 #include <base/fam_alloc.h>
 #include <base/fam_err.h>
+#include <base/macros.h>
 #include <base/osdef.h>
 #include <base/print_util.h>
-#include <base/string.h>
-#include <pthread.h>
 
 _Thread_local SlabAllocator tl_slab_allocator = NULL;
 SlabAllocator global_slab_allocator = NULL;
-pthread_mutex_t global_allocator_lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t global_allocator_lock;
+
+void __attribute__((constructor)) __init_pthread_lock() {
+	pthread_mutex_init(&global_allocator_lock, NULL);
+}
 
 // use highest byte in aux for flags
 void ptr_flag_set(Ptr ptr, byte flag, bool value) {

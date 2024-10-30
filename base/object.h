@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <base/macros.h>
-#include <base/string.h>
 #include <base/types.h>
 
 Type(Object);

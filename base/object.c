@@ -16,7 +16,6 @@
 #include <base/fam_err.h>
 #include <base/object.h>
 #include <base/osdef.h>
-#include <base/string.h>
 #include <stdatomic.h>
 
 #include <stdio.h>
@@ -285,24 +284,6 @@ int object_decrement_weak(Object obj) {
 		}
 	}
 }
-
-/*
-int object_decrement_weak(Object obj) {
-	int64 *aux = ptr_aux(obj);
-	int64 count = *aux & 0xFFFFFF000000LL;
-	int64 flags = *aux & 0xFFFF000000FFFFFFLL;
-	count -= (0x1 << 24);
-	if (count) {
-		*aux = count | flags;
-		return count;
-
-	} else {
-		*aux = flags;
-		// return the strong count
-		return *aux & 0xFFFFFF;
-	}
-}
-*/
 
 int object_increment_weak(Object obj) {
 	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);

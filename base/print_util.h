@@ -18,7 +18,6 @@
 // #include <base/backtrace.h>
 #include <base/macro_util.h>
 #include <base/stream.h>
-#include <base/string.h>
 #include <base/types.h>
 
 typedef enum PrintType {

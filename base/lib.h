@@ -19,5 +19,4 @@
 #include <base/object.h>
 #include <base/print_util.h>
 #include <base/slabs.h>
-#include <base/string.h>
 #include <base/types.h>

@@ -16,7 +16,6 @@
 #include <base/os.h>
 #include <base/print_util.h>
 #include <base/slabs.h>
-#include <stdio.h>
 
 #define MAX_SLAB_TYPES 256
 #define SLAB_SIZES 257
