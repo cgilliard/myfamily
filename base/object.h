@@ -27,6 +27,7 @@ typedef enum ObjectType {
 	ObjectTypePointer,
 	ObjectTypeBool,
 	ObjectTypeWeak,
+	__ObjectTypeCount__,
 } ObjectType;
 
 Object object_create(const void *value, ObjectType type);

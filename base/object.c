@@ -73,6 +73,11 @@ void object_set_ptr_type(Ptr ptr, ObjectType type) {
 }
 
 Object object_create(const void *value, ObjectType type) {
+	if (value == NULL || type < 0 || type >= __ObjectTypeCount__) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
+
 	unsigned int size = object_get_size(type);
 	Ptr ret = fam_alloc(size, false);
 	if (ret == NULL)
@@ -87,10 +92,18 @@ Object object_create(const void *value, ObjectType type) {
 	return ret;
 }
 const void *object_value_of(const Object obj) {
+	if (nil(obj)) {
+		SetErr(ObjectConsumed);
+		return NULL;
+	}
 	return $(obj);
 }
 
 ObjectType object_type(const Object obj) {
+	if (nil(obj)) {
+		SetErr(ObjectConsumed);
+		return -1;
+	}
 	if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE0)) {
 		if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE1)) {
 			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
@@ -110,6 +123,15 @@ unsigned int object_size(const Object obj) {
 }
 
 int object_mutate(Object obj, const void *value) {
+	if (nil(obj)) {
+		SetErr(ObjectConsumed);
+		return -1;
+	}
+	if (object_type(obj) == ObjectTypeWeak) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+
 	unsigned int size = object_size(obj);
 	if (size)
 		memcpy($(obj), value, size);
@@ -196,12 +218,29 @@ Object object_move(const Object src) {
 		SetErr(ObjectConsumed);
 		return NULL;
 	}
+	if (object_type(src) == ObjectTypeWeak) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
+	if (nil(src)) {
+		SetErr(ObjectConsumed);
+		return NULL;
+	}
 
 	ObjectNc ret = object_create($(src), object_type(src));
 	Object_cleanup(&src);
 	return ret;
 }
 Object object_ref(const Object src) {
+	if (nil(src)) {
+		SetErr(ObjectConsumed);
+		return NULL;
+	}
+	if (object_type(src) == ObjectTypeWeak) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
+
 	if (object_increment_strong(src))
 		return NULL;
 
@@ -210,6 +249,14 @@ Object object_ref(const Object src) {
 }
 
 Object object_weak(const Object src) {
+	if (nil(src)) {
+		SetErr(ObjectConsumed);
+		return NULL;
+	}
+	if (object_type(src) == ObjectTypeWeak) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
 	unsigned long long v = (unsigned long long)src;
 	ObjectNc weak = object_create(&v, ObjectTypeWeak);
 	if (object_increment_weak(src))
@@ -219,6 +266,10 @@ Object object_weak(const Object src) {
 }
 
 Object object_upgrade(const Object src) {
+	if (nil(src)) {
+		SetErr(ObjectConsumed);
+		return NULL;
+	}
 	if (object_type(src) != ObjectTypeWeak) {
 		SetErr(IllegalArgument);
 		return NULL;
