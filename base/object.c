@@ -29,6 +29,12 @@
 unsigned int object_get_size(ObjectType type) {
 	if (type == ObjectTypeInt64)
 		return sizeof(int64);
+	else if (type == ObjectTypeByte)
+		return sizeof(byte);
+	else if (type == ObjectTypeBool)
+		return sizeof(bool);
+	else if (type == ObjectTypeFloat)
+		return sizeof(float64);
 	else if (type == ObjectTypeInt32)
 		return sizeof(int);
 	else if (type == ObjectTypeWeak)
@@ -69,6 +75,18 @@ void object_set_ptr_type(Ptr ptr, ObjectType type) {
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, false);
+	} else if (type == ObjectTypeFloat) {
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, false);
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, true);
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
+	} else if (type == ObjectTypeBool) {
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, false);
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, true);
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, false);
+	} else if (type == ObjectTypeByte) {
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, false);
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
 	}
 }
 
@@ -114,6 +132,16 @@ ObjectType object_type(const Object obj) {
 				return ObjectTypeWeak;
 			else
 				return ObjectTypePointer;
+		}
+	} else {
+		if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE1)) {
+			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
+				return ObjectTypeFloat;
+			else
+				return ObjectTypeBool;
+		} else {
+			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
+				return ObjectTypeByte;
 		}
 	}
 	return ObjectTypeBool;
