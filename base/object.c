@@ -230,8 +230,8 @@ int object_increment_strong(Object obj) {
 	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
 	if (send) {
 		_Atomic int64 *aux = (_Atomic int64 *)ptr_aux(obj);
-		int64_t old_count;
-		int64_t new_count;
+		int64 old_count;
+		int64 new_count;
 		do {
 			old_count = atomic_load(aux); // Atomically load the current count
 			new_count = old_count + 1;
@@ -254,13 +254,13 @@ int object_increment_strong(Object obj) {
 
 	return 0;
 }
-/*
+
 int object_decrement_weak(Object obj) {
 	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
 
 	if (send) {
 		_Atomic int64 *aux = (_Atomic int64 *)ptr_aux(obj);
-		int64 aux_val = atomic_fetch_sub(aux, 1);
+		int64 aux_val = atomic_fetch_sub(aux, 0x1 << 24);
 		int64 weak_count = (aux_val & 0xFFFFFF000000LL) >> 24;
 		if (weak_count > 1) {
 			// return weak count
@@ -285,7 +285,8 @@ int object_decrement_weak(Object obj) {
 		}
 	}
 }
-*/
+
+/*
 int object_decrement_weak(Object obj) {
 	int64 *aux = ptr_aux(obj);
 	int64 count = *aux & 0xFFFFFF000000LL;
@@ -301,6 +302,7 @@ int object_decrement_weak(Object obj) {
 		return *aux & 0xFFFFFF;
 	}
 }
+*/
 
 int object_increment_weak(Object obj) {
 	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
