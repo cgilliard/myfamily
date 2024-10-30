@@ -236,6 +236,11 @@ Object object_upgrade(const Object src) {
 
 void Object_cleanup(const Object *obj) {
 	if (!nil(*obj)) {
+		// deallocate the pointer
+		if (object_type(*obj) == ObjectTypePointer) {
+			Ptr inner = *(Ptr *)object_value_of(*obj);
+			fam_release(&inner);
+		}
 		if (object_type(*obj) == ObjectTypeWeak) {
 			unsigned long long *target = object_value_of(*obj);
 			ObjectNc w = (ObjectNc)*target;

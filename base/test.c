@@ -396,11 +396,6 @@ MyTest(base, test_object) {
 	cr_assert_eq(inner, inner_out);
 	cr_assert_eq(((char *)$(inner_out))[0], 1);
 
-	// potentially resize
-
-	// release memory
-	fam_release(&inner);
-
 	/*
 		// create two int64 objects
 		Object obj1 = object_create_int64(111);
