@@ -30,8 +30,8 @@ typedef enum ObjectType {
 	__ObjectTypeCount__,
 } ObjectType;
 
-Object object_create_box(unsigned int size);
-Object object_create(ObjectType type, const void *value);
+Object object_create_box(unsigned int size, bool send);
+Object object_create(ObjectType type, const void *value, bool send);
 const void *object_value_of(const Object obj);
 ObjectType object_type(const Object obj);
 unsigned int object_size(const Object obj);

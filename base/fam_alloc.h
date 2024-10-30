@@ -15,6 +15,9 @@
 #ifndef _BASE_FAM_ALLOC__
 #define _BASE_FAM_ALLOC__
 
+#define PTR_FLAGS_SEND 0
+#define PTR_FLAGS_DIRECT 1
+
 #include <base/slabs.h>
 
 Ptr fam_alloc(unsigned int size, bool send);

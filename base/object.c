@@ -17,6 +17,7 @@
 #include <base/object.h>
 #include <base/osdef.h>
 #include <base/string.h>
+#include <stdatomic.h>
 
 #include <stdio.h>
 
@@ -90,14 +91,14 @@ void object_set_ptr_type(Ptr ptr, ObjectType type) {
 	}
 }
 
-Object object_create(ObjectType type, const void *value) {
+Object object_create(ObjectType type, const void *value, bool send) {
 	if (value == NULL || type < 0 || type >= __ObjectTypeCount__) {
 		SetErr(IllegalArgument);
 		return NULL;
 	}
 
 	unsigned int size = object_get_size(type);
-	Ptr ret = fam_alloc(size, false);
+	Ptr ret = fam_alloc(size, send);
 	if (ret == NULL)
 		return ret;
 
@@ -110,12 +111,12 @@ Object object_create(ObjectType type, const void *value) {
 	return ret;
 }
 
-Object object_create_box(unsigned int size) {
+Object object_create_box(unsigned int size, bool send) {
 	unsigned int box_size = object_get_size(ObjectTypeBox);
-	Ptr ret = fam_alloc(box_size, false);
+	Ptr ret = fam_alloc(box_size, send);
 	if (ret == NULL)
 		return ret;
-	Ptr ptr = fam_alloc(size, false);
+	Ptr ptr = fam_alloc(size, send);
 	if (ptr == NULL) {
 		fam_release(&ret);
 		return NULL;
@@ -276,7 +277,8 @@ Object object_move(const Object src) {
 		return NULL;
 	}
 
-	ObjectNc ret = object_create(object_type(src), $(src));
+	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
+	ObjectNc ret = object_create(object_type(src), $(src), send);
 	Object_cleanup(&src);
 	return ret;
 }
@@ -307,7 +309,8 @@ Object object_weak(const Object src) {
 		return NULL;
 	}
 	unsigned long long v = (unsigned long long)src;
-	ObjectNc weak = object_create(ObjectTypeWeak, &v);
+	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
+	ObjectNc weak = object_create(ObjectTypeWeak, &v, send);
 	if (object_increment_weak(src))
 		return NULL;
 
@@ -325,12 +328,20 @@ Object object_upgrade(const Object src) {
 	}
 	unsigned long long *target = object_value_of(src);
 	ObjectNc w = (ObjectNc)*target;
-	int64 *aux = ptr_aux(w);
-	int64 strong_count = *aux & 0xFFFFFF;
+	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
+	int64 strong_count;
+	if (send) {
+		_Atomic int64 *aux = ptr_aux(w);
+		strong_count = atomic_fetch_add(aux, 0) & 0xFFFFFF;
+	} else {
+		int64 *aux = ptr_aux(w);
+		strong_count = *aux & 0xFFFFFF;
+		//(*aux)++;
+	}
 	if (!strong_count)
 		return NULL;
 
-	// there are remaining strong references we can upgrade
+	// ObjectNc ret = w;
 	return object_ref(w);
 }
 

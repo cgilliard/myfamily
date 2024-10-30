@@ -19,9 +19,6 @@
 #include <base/string.h>
 #include <pthread.h>
 
-#define PTR_FLAGS_SEND 0
-#define PTR_FLAGS_DIRECT 1
-
 _Thread_local SlabAllocator tl_slab_allocator = NULL;
 SlabAllocator global_slab_allocator = NULL;
 pthread_mutex_t global_allocator_lock = PTHREAD_MUTEX_INITIALIZER;
