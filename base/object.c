@@ -16,9 +16,6 @@
 #include <base/fam_err.h>
 #include <base/object.h>
 #include <base/osdef.h>
-#include <stdatomic.h>
-
-#include <stdio.h>
 
 #define OBJECT_FLAG_FAM_ALLOC_RESERVED1 0
 #define OBJECT_FLAG_FAM_ALLOC_RESERVED2 1
@@ -200,8 +197,8 @@ Object object_get_property(const Object obj, const char *key) {
 int object_decrement_strong(Object obj) {
 	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
 	if (send) {
-		_Atomic int64 *aux = (_Atomic int64 *)ptr_aux(obj);
-		int64 aux_val = atomic_fetch_sub(aux, 1);
+		int64 *aux = ptr_aux(obj);
+		int64 aux_val = __sync_fetch_and_sub(aux, 1);
 		if ((aux_val & 0xFFFFFF) > 1) {
 			// return strong count
 			return aux_val - 1;
@@ -228,17 +225,17 @@ int object_decrement_strong(Object obj) {
 int object_increment_strong(Object obj) {
 	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
 	if (send) {
-		_Atomic int64 *aux = (_Atomic int64 *)ptr_aux(obj);
+		int64 *aux = ptr_aux(obj);
 		int64 old_count;
 		int64 new_count;
 		do {
-			old_count = atomic_load(aux); // Atomically load the current count
+			old_count = __sync_fetch_and_add(aux, 0); // Atomically load the current count
 			new_count = old_count + 1;
 			if ((new_count & 0xFFFFFF) == 0xFFFFFF) { // Check for overflow
 				SetErr(Overflow);
 				return -1;
 			}
-		} while (!atomic_compare_exchange_weak(aux, &old_count, new_count));
+		} while (!__sync_val_compare_and_swap(aux, old_count, new_count));
 		// Try to atomically increment the count if it hasn't changed
 
 	} else {
@@ -258,8 +255,8 @@ int object_decrement_weak(Object obj) {
 	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
 
 	if (send) {
-		_Atomic int64 *aux = (_Atomic int64 *)ptr_aux(obj);
-		int64 aux_val = atomic_fetch_sub(aux, 0x1 << 24);
+		int64 *aux = ptr_aux(obj);
+		int64 aux_val = __sync_fetch_and_sub(aux, 0x1 << 24);
 		int64 weak_count = (aux_val & 0xFFFFFF000000LL) >> 24;
 		if (weak_count > 1) {
 			// return weak count
@@ -288,17 +285,17 @@ int object_decrement_weak(Object obj) {
 int object_increment_weak(Object obj) {
 	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
 	if (send) {
-		_Atomic int64 *aux = (_Atomic int64 *)ptr_aux(obj);
+		int64 *aux = ptr_aux(obj);
 		int64 old_count;
 		int64 new_count;
 		do {
-			old_count = atomic_load(aux); // Atomically load the current count
+			old_count = __sync_fetch_and_add(aux, 0); // Atomically load the current count
 			new_count = old_count + (0x1 << 24);
 			if ((new_count & 0xFFFFFF000000LL) == 0xFFFFFF000000LL) { // Check for overflow
 				SetErr(Overflow);
 				return -1;
 			}
-		} while (!atomic_compare_exchange_weak(aux, &old_count, new_count));
+		} while (!__sync_val_compare_and_swap(aux, old_count, new_count));
 		// Try to atomically increment the count if it hasn't changed
 
 	} else {
@@ -392,14 +389,14 @@ Object object_upgrade(const Object src) {
 	ObjectNc w = (ObjectNc)*target;
 	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
 	if (send) {
-		_Atomic int64 *aux = ptr_aux(w);
+		int64 *aux = ptr_aux(w);
 		int64 old_count;
 		do {
-			old_count = atomic_load(aux);
+			old_count = __sync_fetch_and_add(aux, 0);
 			if ((old_count & 0xFFFFFF) == 0) {
 				return NULL; // Object is already deallocated
 			}
-		} while (!atomic_compare_exchange_weak(aux, &old_count, old_count + 1));
+		} while (!__sync_val_compare_and_swap(aux, old_count, old_count + 1));
 
 	} else {
 		int64 *aux = ptr_aux(w);
