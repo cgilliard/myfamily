@@ -109,7 +109,6 @@ Object object_create(ObjectType type, const void *value, bool send) {
 	if (size)
 		memcpy($(ret), value, size);
 	int64 *aux = ptr_aux(ret);
-	*aux &= 0xFF00000000000000ULL;
 	object_set_ptr_type(ret, type);
 	// set strong count to 1
 	(*aux) |= 0x0000000000000001L;
@@ -117,9 +116,8 @@ Object object_create(ObjectType type, const void *value, bool send) {
 	if (type == ObjectTypeInt) {
 		int v;
 		memcpy(&v, value, 4);
-		int64 flags = *aux & 0xFFFF000000FFFFFFLL;
 		int64 count = ((int64)v << 24);
-		*aux = count | flags;
+		*aux |= count;
 	}
 
 	return ret;
@@ -137,7 +135,6 @@ Object object_create_box(unsigned int size, bool send) {
 	}
 	memcpy($(ret), &ptr, box_size);
 	int64 *aux = ptr_aux(ret);
-	*aux &= 0xFF00000000000000ULL;
 	object_set_ptr_type(ret, ObjectTypeBox);
 
 	// set strong count to 1
