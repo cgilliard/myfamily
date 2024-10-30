@@ -5,9 +5,9 @@ var indexSectionsWithContent =
   2: "cdfilmoprstx",
   3: "_acdefgimoprstu",
   4: "abcdfghilmnrst",
-  5: "abiprstu",
-  6: "p",
-  7: "p",
+  5: "abioprstu",
+  6: "op",
+  7: "_op",
   8: "_bcdefgilmnoprstuyπ",
   9: "ir"
 };

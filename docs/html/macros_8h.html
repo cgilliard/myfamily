@@ -85,10 +85,12 @@ Macros</h2></td></tr>
 <tr class="separator:a62e445f378c3862b78618beec533f338"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86659537194f22ae1712c49e584bf1c8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a86659537194f22ae1712c49e584bf1c8">len</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)&#160;&#160;&#160;<a class="el" href="slabs_8h.html#aa6145cf21b3ae9e2170dbe048baec361">ptr_len</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
 <tr class="separator:a86659537194f22ae1712c49e584bf1c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada23c0615668591b7a50c3c068555fb4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)&#160;&#160;&#160;(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a> == <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a> || <a class="el" href="slabs_8h.html#aa6145cf21b3ae9e2170dbe048baec361">ptr_len</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>) == 0)</td></tr>
+<tr class="memitem:ada23c0615668591b7a50c3c068555fb4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)&#160;&#160;&#160;(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a> == <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a> || <a class="el" href="slabs_8h.html#aa6145cf21b3ae9e2170dbe048baec361">ptr_len</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>) == <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>)</td></tr>
 <tr class="separator:ada23c0615668591b7a50c3c068555fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c1ce69fc9e1c732540e8c415ea3f6d8"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a2c1ce69fc9e1c732540e8c415ea3f6d8">move</a>(dst,  src)</td></tr>
 <tr class="separator:a2c1ce69fc9e1c732540e8c415ea3f6d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a053bae64b5948d2a53250937433fa399"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>(obj)&#160;&#160;&#160;*(int *)<a class="el" href="object_8h.html#a43cb4f8b156edb6b19ea9578929a99d3">object_value_of</a>(obj)</td></tr>
+<tr class="separator:a053bae64b5948d2a53250937433fa399"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a1414db03b38a685defc808526be96786"></a>
@@ -103,6 +105,24 @@ Macros</h2></td></tr>
           <td class="paramtype">&#160;</td>
           <td class="paramname">type</td><td>)</td>
           <td>&#160;&#160;&#160;type##Nc __attribute((warn_unused_result, cleanup(type##_cleanup)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a053bae64b5948d2a53250937433fa399"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a053bae64b5948d2a53250937433fa399">&#9670;&nbsp;</a></span>int</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define int</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">obj</td><td>)</td>
+          <td>&#160;&#160;&#160;*(int *)<a class="el" href="object_8h.html#a43cb4f8b156edb6b19ea9578929a99d3">object_value_of</a>(obj)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -170,7 +190,7 @@ Macros</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a></td><td>)</td>
-          <td>&#160;&#160;&#160;(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a> == <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a> || <a class="el" href="slabs_8h.html#aa6145cf21b3ae9e2170dbe048baec361">ptr_len</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>) == 0)</td>
+          <td>&#160;&#160;&#160;(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a> == <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a> || <a class="el" href="slabs_8h.html#aa6145cf21b3ae9e2170dbe048baec361">ptr_len</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>) == <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">

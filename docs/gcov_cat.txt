@@ -123,107 +123,112 @@
         -:   27:pthread_mutex_t global_allocator_lock = PTHREAD_MUTEX_INITIALIZER;
         -:   28:
         -:   29:// use highest byte in aux for flags
-       32:   30:void ptr_flag_set(Ptr ptr, byte flag, bool value) {
-       32:   31:	int64 *aux = ptr_aux(ptr);
-       32:   32:	if (value)
+       34:   30:void ptr_flag_set(Ptr ptr, byte flag, bool value) {
+       34:   31:	int64 *aux = ptr_aux(ptr);
+       34:   32:	if (value)
     #####:   33:		*aux |= (0x1ULL << (unsigned long long)flag) << 56;
         -:   34:	else
-       32:   35:		*aux &= ~((0x1ULL << (unsigned long long)flag) << 56);
-       32:   36:}
+       34:   35:		*aux &= ~((0x1ULL << (unsigned long long)flag) << 56);
+       34:   36:}
         -:   37:
-       32:   38:bool ptr_flag_check(Ptr ptr, byte flag) {
-       32:   39:	int64 *aux = ptr_aux(ptr);
-       32:   40:	return (*aux) & ((0x1ULL << (unsigned long long)flag) << 56);
+       34:   38:bool ptr_flag_check(Ptr ptr, byte flag) {
+       34:   39:	int64 *aux = ptr_aux(ptr);
+       34:   40:	return (*aux) & ((0x1ULL << (unsigned long long)flag) << 56);
         -:   41:}
         -:   42:
-       16:   43:int check_initialize_default_slab_allocator() {
-       16:   44:	if (tl_slab_allocator == NULL)
+       17:   43:int check_initialize_default_slab_allocator() {
+       17:   44:	if (tl_slab_allocator == NULL)
         3:   45:		tl_slab_allocator = slab_allocator_create();
-       16:   46:	if (global_slab_allocator == NULL) {
+       17:   46:	if (global_slab_allocator == NULL) {
         3:   47:		pthread_mutex_lock(&global_allocator_lock);
         3:   48:		if (global_slab_allocator == NULL)
         3:   49:			global_slab_allocator = slab_allocator_create();
         3:   50:		pthread_mutex_unlock(&global_allocator_lock);
         -:   51:	}
-      16*:   52:	return tl_slab_allocator && global_slab_allocator;
+      17*:   52:	return tl_slab_allocator && global_slab_allocator;
         -:   53:}
         -:   54:
-       16:   55:Ptr fam_alloc(unsigned int size, bool send) {
-       16:   56:	if (!check_initialize_default_slab_allocator())
-    #####:   57:		return NULL;
-        -:   58:	Ptr ret;
-       16:   59:	if (size > MAX_SLAB_SIZE)
-    #####:   60:		ret = ptr_direct_alloc(size);
-       16:   61:	else if (send) {
-    #####:   62:		pthread_mutex_lock(&global_allocator_lock);
-    #####:   63:		ret = slab_allocator_allocate(global_slab_allocator, size);
-    #####:   64:		pthread_mutex_unlock(&global_allocator_lock);
-        -:   65:	} else
-       16:   66:		ret = slab_allocator_allocate(tl_slab_allocator, size);
-        -:   67:
-       16:   68:	if (ret) {
-       16:   69:		int64 *aux = ptr_aux(ret);
-       16:   70:		*aux = 0;
-       16:   71:		ptr_flag_set(ret, PTR_FLAGS_SEND, send);
-       16:   72:		ptr_flag_set(ret, PTR_FLAGS_DIRECT, size > MAX_SLAB_SIZE);
-        -:   73:	}
-        -:   74:
-       16:   75:	return ret;
-        -:   76:}
-    #####:   77:Ptr fam_resize(Ptr ptr, unsigned int size) {
-    #####:   78:	if (!check_initialize_default_slab_allocator())
-    #####:   79:		return NULL;
-        -:   80:
-    #####:   81:	if (ptr == NULL) {
-    #####:   82:		SetErr(IllegalArgument);
-    #####:   83:		return NULL;
-        -:   84:	}
+       17:   55:Ptr fam_alloc(unsigned int size, bool send) {
+        -:   56:	// this size is reserved for 'null'
+       17:   57:	if (size == UINT32_MAX) {
+    #####:   58:		SetErr(Overflow);
+    #####:   59:		return NULL;
+        -:   60:	}
+       17:   61:	if (!check_initialize_default_slab_allocator())
+    #####:   62:		return NULL;
+        -:   63:	Ptr ret;
+       17:   64:	if (size > MAX_SLAB_SIZE)
+    #####:   65:		ret = ptr_direct_alloc(size);
+       17:   66:	else if (send) {
+    #####:   67:		pthread_mutex_lock(&global_allocator_lock);
+    #####:   68:		ret = slab_allocator_allocate(global_slab_allocator, size);
+    #####:   69:		pthread_mutex_unlock(&global_allocator_lock);
+        -:   70:	} else
+       17:   71:		ret = slab_allocator_allocate(tl_slab_allocator, size);
+        -:   72:
+       17:   73:	if (ret) {
+       17:   74:		int64 *aux = ptr_aux(ret);
+       17:   75:		*aux = 0;
+       17:   76:		ptr_flag_set(ret, PTR_FLAGS_SEND, send);
+       17:   77:		ptr_flag_set(ret, PTR_FLAGS_DIRECT, size > MAX_SLAB_SIZE);
+        -:   78:	}
+        -:   79:
+       17:   80:	return ret;
+        -:   81:}
+    #####:   82:Ptr fam_resize(Ptr ptr, unsigned int size) {
+    #####:   83:	if (!check_initialize_default_slab_allocator())
+    #####:   84:		return NULL;
         -:   85:
-    #####:   86:	bool send = ptr_flag_check(ptr, PTR_FLAGS_SEND);
-    #####:   87:	Ptr ret = fam_alloc(size, send);
-    #####:   88:	if (ret) {
-    #####:   89:		unsigned int len = $len(ptr);
-    #####:   90:		if (len > size)
-    #####:   91:			len = size;
-    #####:   92:		memcpy($(ret), $(ptr), len);
-        -:   93:	}
-        -:   94:
-    #####:   95:	return ret;
-        -:   96:}
-        -:   97:
-       16:   98:void fam_release(Ptr *ptr) {
-       16:   99:	if (nil(*ptr)) {
-    #####:  100:		panic("fam_free on nil ptr!");
-       16:  101:	} else if (ptr_flag_check(*ptr, PTR_FLAGS_DIRECT)) {
-    #####:  102:		ptr_direct_release(*ptr);
-       16:  103:	} else if (ptr_flag_check(*ptr, PTR_FLAGS_SEND)) {
-    #####:  104:		pthread_mutex_lock(&global_allocator_lock);
-    #####:  105:		slab_allocator_free(global_slab_allocator, *ptr);
-    #####:  106:		pthread_mutex_unlock(&global_allocator_lock);
-        -:  107:	} else
-       16:  108:		slab_allocator_free(tl_slab_allocator, *ptr);
-       16:  109:}
-        -:  110:
-        7:  111:void fam_alloc_thread_local_cleanup() {
-        7:  112:	slab_allocator_cleanup(&tl_slab_allocator);
-        7:  113:}
-        -:  114:
-        -:  115:#ifdef TEST
-        7:  116:void fam_alloc_global_cleanup() {
-        7:  117:	slab_allocator_cleanup(&global_slab_allocator);
+    #####:   86:	if (ptr == NULL) {
+    #####:   87:		SetErr(IllegalArgument);
+    #####:   88:		return NULL;
+        -:   89:	}
+        -:   90:
+    #####:   91:	bool send = ptr_flag_check(ptr, PTR_FLAGS_SEND);
+    #####:   92:	Ptr ret = fam_alloc(size, send);
+    #####:   93:	if (ret) {
+    #####:   94:		unsigned int len = $len(ptr);
+    #####:   95:		if (len > size)
+    #####:   96:			len = size;
+    #####:   97:		memcpy($(ret), $(ptr), len);
+        -:   98:	}
+        -:   99:
+    #####:  100:	return ret;
+        -:  101:}
+        -:  102:
+       17:  103:void fam_release(Ptr *ptr) {
+       17:  104:	if (nil(*ptr)) {
+    #####:  105:		panic("fam_free on nil ptr!");
+       17:  106:	} else if (ptr_flag_check(*ptr, PTR_FLAGS_DIRECT)) {
+    #####:  107:		ptr_direct_release(*ptr);
+       17:  108:	} else if (ptr_flag_check(*ptr, PTR_FLAGS_SEND)) {
+    #####:  109:		pthread_mutex_lock(&global_allocator_lock);
+    #####:  110:		slab_allocator_free(global_slab_allocator, *ptr);
+    #####:  111:		pthread_mutex_unlock(&global_allocator_lock);
+        -:  112:	} else
+       17:  113:		slab_allocator_free(tl_slab_allocator, *ptr);
+       17:  114:}
+        -:  115:
+        7:  116:void fam_alloc_thread_local_cleanup() {
+        7:  117:	slab_allocator_cleanup(&tl_slab_allocator);
         7:  118:}
         -:  119:
-        7:  120:int64 fam_alloc_count_tl_slab_allocator() {
-        7:  121:	if (tl_slab_allocator == NULL)
-        4:  122:		return 0;
-        3:  123:	return slab_allocator_cur_slabs_allocated(tl_slab_allocator);
-        -:  124:}
-        7:  125:int64 fam_alloc_count_global_allocator() {
-        7:  126:	if (global_slab_allocator == NULL)
+        -:  120:#ifdef TEST
+        7:  121:void fam_alloc_global_cleanup() {
+        7:  122:	slab_allocator_cleanup(&global_slab_allocator);
+        7:  123:}
+        -:  124:
+        7:  125:int64 fam_alloc_count_tl_slab_allocator() {
+        7:  126:	if (tl_slab_allocator == NULL)
         4:  127:		return 0;
-        3:  128:	return slab_allocator_cur_slabs_allocated(global_slab_allocator);
+        3:  128:	return slab_allocator_cur_slabs_allocated(tl_slab_allocator);
         -:  129:}
-        -:  130:#endif // TEST
+        7:  130:int64 fam_alloc_count_global_allocator() {
+        7:  131:	if (global_slab_allocator == NULL)
+        4:  132:		return 0;
+        3:  133:	return slab_allocator_cur_slabs_allocated(global_slab_allocator);
+        -:  134:}
+        -:  135:#endif // TEST
         -:    0:Source:fam_err.c
         -:    0:Graph:fam_err.gcno
         -:    0:Data:fam_err.gcda
@@ -289,197 +294,349 @@
         -:   15:#include <base/fam_alloc.h>
         -:   16:#include <base/fam_err.h>
         -:   17:#include <base/object.h>
-        -:   18:
-        -:   19:#include <stdio.h>
+        -:   18:#include <base/osdef.h>
+        -:   19:#include <base/string.h>
         -:   20:
-        -:   21:// types:
-        -:   22:// int64: 64 bit signed
-        -:   23:// int: 32 bit signed
-        -:   24:// string: string (binary string)
-        -:   25:// byte: unsigned 8 bit byte
-        -:   26:// object: contains other primitives and objects as properties
-        -:   27:
-        -:   28:#define OBJECT_FLAG_FAM_ALLOC_RESERVED1 0
-        -:   29:#define OBJECT_FLAG_FAM_ALLOC_RESERVED2 1
-        -:   30:#define OBJECT_FLAG_TYPE0 2
-        -:   31:#define OBJECT_FLAG_TYPE1 3
-        -:   32:#define OBJECT_FLAG_TYPE2 4
-        -:   33:#define OBJECT_FLAG_HAS_CLEANUP 5
-        -:   34:#define OBJECT_FLAG_RC 6
-        -:   35:
-        4:   36:Object object_create_int64(int64 v) {
-        4:   37:	Ptr ret = fam_alloc(sizeof(int64), false);
-        4:   38:	if (nil(ret))
-    #####:   39:		return NULL;
-        -:   40:
-        4:   41:	int64 *value = $(ret);
-        4:   42:	*value = v;
-        -:   43:
-        -:   44:	// set type flags for int64
-        4:   45:	int64 *aux = ptr_aux(ret);
-        4:   46:	*aux |= (0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE0) << 56;
-        4:   47:	*aux |= (0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE1) << 56;
-        4:   48:	*aux |= (0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE2) << 56;
-        -:   49:
-        4:   50:	return ret;
-        -:   51:}
-        -:   52:
-        4:   53:Object object_create_int(int v) {
-        4:   54:	Ptr ret = fam_alloc(sizeof(int), false);
-        4:   55:	if (nil(ret))
-    #####:   56:		return NULL;
-        -:   57:
-        4:   58:	int *value = $(ret);
-        4:   59:	*value = v;
+        -:   21:#include <stdio.h>
+        -:   22:
+        -:   23:#define OBJECT_FLAG_FAM_ALLOC_RESERVED1 0
+        -:   24:#define OBJECT_FLAG_FAM_ALLOC_RESERVED2 1
+        -:   25:#define OBJECT_FLAG_TYPE0 2
+        -:   26:#define OBJECT_FLAG_TYPE1 3
+        -:   27:#define OBJECT_FLAG_TYPE2 4
+        -:   28:
+        9:   29:unsigned int object_get_size(ObjectType type) {
+        9:   30:	if (type == ObjectTypeInt64)
+        3:   31:		return sizeof(int64);
+        6:   32:	else if (type == ObjectTypeByte)
+    #####:   33:		return sizeof(byte);
+        6:   34:	else if (type == ObjectTypeBool)
+    #####:   35:		return sizeof(bool);
+        6:   36:	else if (type == ObjectTypeFloat)
+    #####:   37:		return sizeof(float64);
+        6:   38:	else if (type == ObjectTypeInt32)
+        3:   39:		return sizeof(int);
+        3:   40:	else if (type == ObjectTypeWeak)
+        2:   41:		return sizeof(int64);
+        1:   42:	else if (type == ObjectTypeBox)
+        1:   43:		return sizeof(int64);
+        -:   44:
+    #####:   45:	return 0;
+        -:   46:}
+        -:   47:
+       24:   48:void object_set_ptr_flag(Ptr ptr, unsigned long long flag, bool value) {
+       24:   49:	int64 *aux = ptr_aux(ptr);
+       24:   50:	if (value)
+       17:   51:		*aux |= (0x1ULL << (unsigned long long)flag) << 56;
+        -:   52:	else
+        7:   53:		*aux &= ~((0x1ULL << (unsigned long long)flag) << 56);
+       24:   54:}
+        -:   55:
+      102:   56:bool object_get_ptr_flag(Ptr ptr, unsigned long long flag) {
+      102:   57:	int64 *aux = ptr_aux(ptr);
+      102:   58:	return ((0x1ULL << (unsigned long long)flag) << 56) & *aux;
+        -:   59:}
         -:   60:
-        -:   61:	// set type flags for int
-        4:   62:	int64 *aux = ptr_aux(ret);
-        4:   63:	*aux |= (0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE0) << 56;
-        4:   64:	*aux |= (0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE1) << 56;
-        4:   65:	*aux &= ~((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE2) << 56);
-        -:   66:
-        4:   67:	return ret;
-        -:   68:}
-        -:   69:
-        1:   70:Object object_create_byte(byte v) {
-        1:   71:	Ptr ret = fam_alloc(sizeof(byte), false);
-        1:   72:	if (nil(ret))
-    #####:   73:		return NULL;
-        -:   74:
-        1:   75:	byte *value = $(ret);
-        1:   76:	*value = v;
-        -:   77:
-        -:   78:	// set type flags for byte
-        1:   79:	int64 *aux = ptr_aux(ret);
-        1:   80:	*aux |= (0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE0) << 56;
-        1:   81:	*aux &= ~((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE1) << 56);
-        1:   82:	*aux |= (0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE2) << 56;
-        -:   83:
-        1:   84:	return ret;
-        -:   85:}
-        -:   86:
-        5:   87:int64 object_as_int64(const Object obj) {
-        5:   88:	if (nil(obj)) {
-    #####:   89:		SetErr(ObjectConsumed);
-    #####:   90:		return -1;
-        -:   91:	}
-        -:   92:	// check flags
-        5:   93:	int64 *aux = ptr_aux(obj);
-        5:   94:	bool type0 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE0) << 56) & *aux;
-        5:   95:	bool type1 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE1) << 56) & *aux;
-        5:   96:	bool type2 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE2) << 56) & *aux;
-        5:   97:	if (!type0 || !type1 || !type2) {
-        2:   98:		SetErr(TypeMismatch);
-        2:   99:		return -1;
-        -:  100:	}
-        -:  101:
-        3:  102:	int64 *value = $(obj);
-        3:  103:	return *value;
-        -:  104:}
-        -:  105:
-        7:  106:int object_as_int(const Object obj) {
-        7:  107:	if (nil(obj)) {
-        1:  108:		SetErr(ObjectConsumed);
-        1:  109:		return -1;
-        -:  110:	}
-        -:  111:	// check flags
-        6:  112:	int64 *aux = ptr_aux(obj);
-        6:  113:	bool type0 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE0) << 56) & *aux;
-        6:  114:	bool type1 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE1) << 56) & *aux;
-        6:  115:	bool type2 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE2) << 56) & *aux;
-        6:  116:	if (!type0 || !type1 || type2) {
-        1:  117:		SetErr(TypeMismatch);
-        1:  118:		return -1;
-        -:  119:	}
-        -:  120:
-        5:  121:	int *value = $(obj);
-        5:  122:	return *value;
-        -:  123:}
-        -:  124:
-        1:  125:byte object_as_byte(const Object obj) {
-        1:  126:	if (nil(obj)) {
-    #####:  127:		SetErr(ObjectConsumed);
-    #####:  128:		return -1;
-        -:  129:	}
-        -:  130:	// check flags
-        1:  131:	int64 *aux = ptr_aux(obj);
-        1:  132:	bool type0 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE0) << 56) & *aux;
-        1:  133:	bool type1 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE1) << 56) & *aux;
-        1:  134:	bool type2 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE2) << 56) & *aux;
-        1:  135:	if (!type0 || type1 || !type2) {
-    #####:  136:		SetErr(TypeMismatch);
-    #####:  137:		return BYTE_MAX;
-        -:  138:	}
-        -:  139:
-        1:  140:	int *value = $(obj);
-        1:  141:	return *value;
-        -:  142:}
-        -:  143:
-        -:  144:// Functions that require override of const
-        -:  145:#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
-        -:  146:#pragma clang diagnostic ignored "-Wunknown-warning-option"
-        -:  147:#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-        -:  148:
-        2:  149:Object object_move(Object obj) {
-        2:  150:	if (nil(obj)) {
-    #####:  151:		SetErr(ObjectConsumed);
-    #####:  152:		return NULL;
-        -:  153:	}
-        -:  154:	// check flags
-        2:  155:	int64 *aux = ptr_aux(obj);
-        2:  156:	bool type0 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE0) << 56) & *aux;
-        2:  157:	bool type1 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE1) << 56) & *aux;
-        2:  158:	bool type2 = ((0x1ULL << (unsigned long long)OBJECT_FLAG_TYPE2) << 56) & *aux;
-        -:  159:
-        2:  160:	if (type0 && type1 && type2) {
-        -:  161:		// int64 type
-        1:  162:		int *value = $(obj);
-        1:  163:		ObjectNc ret = object_create_int64(*value);
-        1:  164:		Object_cleanup(&obj);
-        1:  165:		return ret;
-        1:  166:	} else if (type0 && type1 && !type2) {
-        -:  167:		// int type
-        1:  168:		int *value = $(obj);
-        1:  169:		ObjectNc ret = object_create_int(*value);
-        1:  170:		Object_cleanup(&obj);
-        1:  171:		return ret;
-    #####:  172:	} else if (type0 && !type1 && type2) {
-        -:  173:		// byte type
-    #####:  174:		byte *value = $(obj);
-    #####:  175:		ObjectNc ret = object_create_byte(*value);
-    #####:  176:		Object_cleanup(&obj);
-    #####:  177:		return ret;
+        8:   61:void object_set_ptr_type(Ptr ptr, ObjectType type) {
+        8:   62:	if (type == ObjectTypeInt64) {
+        2:   63:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
+        2:   64:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, true);
+        2:   65:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
+        6:   66:	} else if (type == ObjectTypeInt32) {
+        3:   67:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
+        3:   68:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, true);
+        3:   69:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, false);
+        3:   70:	} else if (type == ObjectTypeWeak) {
+        2:   71:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
+        2:   72:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
+        2:   73:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
+        1:   74:	} else if (type == ObjectTypeBox) {
+        1:   75:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
+        1:   76:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
+        1:   77:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, false);
+    #####:   78:	} else if (type == ObjectTypeFloat) {
+    #####:   79:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, false);
+    #####:   80:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, true);
+    #####:   81:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
+    #####:   82:	} else if (type == ObjectTypeBool) {
+    #####:   83:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, false);
+    #####:   84:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, true);
+    #####:   85:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, false);
+    #####:   86:	} else if (type == ObjectTypeByte) {
+    #####:   87:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, false);
+    #####:   88:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
+    #####:   89:		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
+        -:   90:	}
+        8:   91:}
+        -:   92:
+        7:   93:Object object_create(ObjectType type, const void *value) {
+        7:   94:	if (value == NULL || type < 0 || type >= __ObjectTypeCount__) {
+    #####:   95:		SetErr(IllegalArgument);
+    #####:   96:		return NULL;
+        -:   97:	}
+        -:   98:
+        7:   99:	unsigned int size = object_get_size(type);
+        7:  100:	Ptr ret = fam_alloc(size, false);
+        7:  101:	if (ret == NULL)
+    #####:  102:		return ret;
+        -:  103:
+        7:  104:	memcpy($(ret), value, size);
+        7:  105:	object_set_ptr_type(ret, type);
+        7:  106:	int64 *aux = ptr_aux(ret);
+        -:  107:	// set strong count to 1
+        7:  108:	(*aux)++;
+        -:  109:
+        7:  110:	return ret;
+        -:  111:}
+        -:  112:
+        1:  113:Object object_create_box(unsigned int size) {
+        1:  114:	unsigned int box_size = object_get_size(ObjectTypeBox);
+        1:  115:	Ptr ret = fam_alloc(box_size, false);
+        1:  116:	if (ret == NULL)
+    #####:  117:		return ret;
+        1:  118:	Ptr ptr = fam_alloc(size, false);
+        1:  119:	if (ptr == NULL) {
+    #####:  120:		fam_release(&ret);
+    #####:  121:		return NULL;
+        -:  122:	}
+        1:  123:	memcpy($(ret), &ptr, box_size);
+        1:  124:	object_set_ptr_type(ret, ObjectTypeBox);
+        1:  125:	int64 *aux = ptr_aux(ret);
+        -:  126:
+        -:  127:	// set strong count to 1
+        1:  128:	(*aux)++;
+        -:  129:
+        1:  130:	return ret;
+        -:  131:}
+        -:  132:
+       14:  133:const void *object_value_of(const Object obj) {
+       14:  134:	if (nil(obj)) {
+    #####:  135:		SetErr(ObjectConsumed);
+    #####:  136:		return NULL;
+        -:  137:	}
+       14:  138:	return $(obj);
+        -:  139:}
+        -:  140:
+       34:  141:ObjectType object_type(const Object obj) {
+       34:  142:	if (nil(obj)) {
+    #####:  143:		SetErr(ObjectConsumed);
+    #####:  144:		return -1;
+        -:  145:	}
+       34:  146:	if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE0)) {
+       34:  147:		if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE1)) {
+       25:  148:			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
+        8:  149:				return ObjectTypeInt64;
+       17:  150:			return ObjectTypeInt32;
+        -:  151:		} else {
+        9:  152:			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
+        7:  153:				return ObjectTypeWeak;
+        -:  154:			else
+        2:  155:				return ObjectTypeBox;
+        -:  156:		}
+        -:  157:	} else {
+    #####:  158:		if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE1)) {
+    #####:  159:			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
+    #####:  160:				return ObjectTypeFloat;
+        -:  161:			else
+    #####:  162:				return ObjectTypeBool;
+        -:  163:		} else {
+    #####:  164:			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
+    #####:  165:				return ObjectTypeByte;
+        -:  166:		}
+        -:  167:	}
+    #####:  168:	return ObjectTypeBool;
+        -:  169:}
+        1:  170:unsigned int object_size(const Object obj) {
+        1:  171:	return object_get_size(object_type(obj));
+        -:  172:}
+        -:  173:
+        1:  174:int object_mutate(Object obj, const void *value) {
+        1:  175:	if (nil(obj)) {
+    #####:  176:		SetErr(ObjectConsumed);
+    #####:  177:		return -1;
         -:  178:	}
-        -:  179:
-    #####:  180:	return null;
-        -:  181:}
-        -:  182:
-        2:  183:Object object_ref(Object obj) {
-        2:  184:	if (nil(obj)) {
-    #####:  185:		SetErr(ObjectConsumed);
-    #####:  186:		return NULL;
-        -:  187:	}
-        -:  188:
-        2:  189:	int64 *aux = ptr_aux(obj);
-        2:  190:	(*aux)++;
-        2:  191:	ObjectNc ret = obj;
-        -:  192:
-        2:  193:	return ret;
-        -:  194:}
-        -:  195:
-       14:  196:void Object_cleanup(const Object *ptr) {
-       14:  197:	if (!nil(*ptr)) {
-       11:  198:		int64 *aux = ptr_aux(*ptr);
-       11:  199:		int64 count = *aux & 0x00FFFFFFFFFFFFFFLL;
-       11:  200:		int64 flags = *aux & 0xFF00000000000000LL;
-       11:  201:		if (count == 0) {
-        9:  202:			fam_release(ptr);
-        -:  203:		} else {
-        2:  204:			count--;
-        2:  205:			*aux = count | flags;
-        -:  206:		}
-        -:  207:	}
-       14:  208:}
+        1:  179:	if (object_type(obj) == ObjectTypeWeak) {
+    #####:  180:		SetErr(IllegalArgument);
+    #####:  181:		return -1;
+        -:  182:	}
+        -:  183:
+        1:  184:	unsigned int size = object_size(obj);
+        1:  185:	if (size)
+        1:  186:		memcpy($(obj), value, size);
+        1:  187:	return 0;
+        -:  188:}
+        -:  189:
+    #####:  190:int object_set_property(Object obj, const char *key, const Object value) {
+    #####:  191:	return 0;
+        -:  192:}
+    #####:  193:Object object_delete_property(Object obj, const char *key) {
+    #####:  194:	return NULL;
+        -:  195:}
+    #####:  196:Object object_get_property(const Object obj, const char *key) {
+    #####:  197:	return NULL;
+        -:  198:}
+        -:  199:
+        9:  200:int object_decrement_strong(Object obj) {
+        9:  201:	int64 *aux = ptr_aux(obj);
+        9:  202:	int64 count = *aux & 0xFFFFFF;
+        9:  203:	int64 flags = *aux & 0xFFFFFFFFFF000000LL;
+        9:  204:	count--;
+        -:  205:
+        9:  206:	if (count) {
+        3:  207:		*aux = count | flags;
+        3:  208:		return count;
+        -:  209:
+        -:  210:	} else {
+        -:  211:		// set strong count to 0
+        6:  212:		*aux = flags;
+        -:  213:
+        -:  214:		// return the weak count
+        6:  215:		return *aux & 0xFFFFFF000000LL;
+        -:  216:	}
+        -:  217:}
+        -:  218:
+        3:  219:int object_increment_strong(Object obj) {
+        -:  220:	// strong count is first three bytes. Mask it and ensure we're not overflowing
+        3:  221:	int64 *aux = ptr_aux(obj);
+        3:  222:	if ((*aux & 0xFFFFFF) == 0xFFFFFF) {
+    #####:  223:		SetErr(Overflow);
+    #####:  224:		return -1;
+        -:  225:	}
+        -:  226:
+        3:  227:	(*aux)++;
+        3:  228:	return 0;
+        -:  229:}
+        -:  230:
+        2:  231:int object_decrement_weak(Object obj) {
+        2:  232:	int64 *aux = ptr_aux(obj);
+        2:  233:	int64 count = *aux & 0xFFFFFF000000LL;
+        2:  234:	int64 flags = *aux & 0xFFFF000000FFFFFFLL;
+        2:  235:	count -= (0x1 << 24);
+        2:  236:	if (count) {
+    #####:  237:		*aux = count | flags;
+    #####:  238:		return count;
+        -:  239:
+        -:  240:	} else {
+        2:  241:		*aux = flags;
+        -:  242:		// return the strong count
+        2:  243:		return *aux & 0xFFFFFF;
+        -:  244:	}
+        -:  245:}
+        -:  246:
+        2:  247:int object_increment_weak(Object obj) {
+        -:  248:	// weak count is second three bytes. Mask it and ensure we're not overflowing
+        2:  249:	int64 *aux = ptr_aux(obj);
+        2:  250:	if ((*aux & 0xFFFFFF000000LL) == 0xFFFFFF000000LL) {
+    #####:  251:		SetErr(Overflow);
+    #####:  252:		return -1;
+        -:  253:	}
+        -:  254:
+        2:  255:	(*aux) += (0x1 << 24);
+        -:  256:
+        2:  257:	return 0;
+        -:  258:}
+        -:  259:
+        -:  260:// Functions that require override of const
+        -:  261:#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+        -:  262:#pragma clang diagnostic ignored "-Wunknown-warning-option"
+        -:  263:#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+        -:  264:
+        1:  265:Object object_move(const Object src) {
+        1:  266:	if (nil(src)) {
+    #####:  267:		SetErr(ObjectConsumed);
+    #####:  268:		return NULL;
+        -:  269:	}
+        1:  270:	if (object_type(src) == ObjectTypeWeak) {
+    #####:  271:		SetErr(IllegalArgument);
+    #####:  272:		return NULL;
+        -:  273:	}
+        1:  274:	if (nil(src)) {
+    #####:  275:		SetErr(ObjectConsumed);
+    #####:  276:		return NULL;
+        -:  277:	}
+        -:  278:
+        1:  279:	ObjectNc ret = object_create(object_type(src), $(src));
+        1:  280:	Object_cleanup(&src);
+        1:  281:	return ret;
+        -:  282:}
+        3:  283:Object object_ref(const Object src) {
+        3:  284:	if (nil(src)) {
+    #####:  285:		SetErr(ObjectConsumed);
+    #####:  286:		return NULL;
+        -:  287:	}
+        3:  288:	if (object_type(src) == ObjectTypeWeak) {
+    #####:  289:		SetErr(IllegalArgument);
+    #####:  290:		return NULL;
+        -:  291:	}
+        -:  292:
+        3:  293:	if (object_increment_strong(src))
+    #####:  294:		return NULL;
+        -:  295:
+        3:  296:	ObjectNc ret = src;
+        3:  297:	return ret;
+        -:  298:}
+        -:  299:
+        2:  300:Object object_weak(const Object src) {
+        2:  301:	if (nil(src)) {
+    #####:  302:		SetErr(ObjectConsumed);
+    #####:  303:		return NULL;
+        -:  304:	}
+        2:  305:	if (object_type(src) == ObjectTypeWeak) {
+    #####:  306:		SetErr(IllegalArgument);
+    #####:  307:		return NULL;
+        -:  308:	}
+        2:  309:	unsigned long long v = (unsigned long long)src;
+        2:  310:	ObjectNc weak = object_create(ObjectTypeWeak, &v);
+        2:  311:	if (object_increment_weak(src))
+    #####:  312:		return NULL;
+        -:  313:
+        2:  314:	return weak;
+        -:  315:}
+        -:  316:
+        3:  317:Object object_upgrade(const Object src) {
+        3:  318:	if (nil(src)) {
+    #####:  319:		SetErr(ObjectConsumed);
+    #####:  320:		return NULL;
+        -:  321:	}
+        3:  322:	if (object_type(src) != ObjectTypeWeak) {
+    #####:  323:		SetErr(IllegalArgument);
+    #####:  324:		return NULL;
+        -:  325:	}
+        3:  326:	unsigned long long *target = object_value_of(src);
+        3:  327:	ObjectNc w = (ObjectNc)*target;
+        3:  328:	int64 *aux = ptr_aux(w);
+        3:  329:	int64 strong_count = *aux & 0xFFFFFF;
+        3:  330:	if (!strong_count)
+        1:  331:		return NULL;
+        -:  332:
+        -:  333:	// there are remaining strong references we can upgrade
+        2:  334:	return object_ref(w);
+        -:  335:}
+        -:  336:
+       12:  337:void Object_cleanup(const Object *obj) {
+       12:  338:	if (!nil(*obj)) {
+        -:  339:		// deallocate the pointer
+       11:  340:		if (object_type(*obj) == ObjectTypeBox) {
+        1:  341:			Ptr inner = *(Ptr *)object_value_of(*obj);
+        1:  342:			fam_release(&inner);
+        -:  343:		}
+       11:  344:		if (object_type(*obj) == ObjectTypeWeak) {
+        2:  345:			unsigned long long *target = object_value_of(*obj);
+        2:  346:			ObjectNc w = (ObjectNc)*target;
+        -:  347:
+        2:  348:			int odwval = object_decrement_weak(w);
+        2:  349:			if (!odwval) {
+        1:  350:				fam_release(&w);
+        -:  351:			}
+        2:  352:			fam_release(obj);
+        -:  353:		} else {
+        9:  354:			int odsval = object_decrement_strong(*obj);
+        9:  355:			if (!odsval) {
+        5:  356:				fam_release(obj);
+        -:  357:			}
+        -:  358:		}
+        -:  359:	}
+       12:  360:}
         -:    0:Source:os.c
         -:    0:Graph:os.gcno
         -:    0:Data:os.gcda
@@ -504,23 +661,23 @@
         -:   18:
         -:   19:_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
         -:   20:
-       64:   21:void *alloc(int64 size, int64 zeroed) {
-       64:   22:	if (!size) {
+       73:   21:void *alloc(int64 size, int64 zeroed) {
+       73:   22:	if (!size) {
     #####:   23:		SetErr(IllegalArgument);
     #####:   24:		return NULL;
         -:   25:	}
         -:   26:	void *ret;
-       64:   27:	ret = malloc(size);
+       73:   27:	ret = malloc(size);
         -:   28:
-       64:   29:	if (ret) {
-       64:   30:		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
-       64:   31:		if (zeroed)
+       73:   29:	if (ret) {
+       73:   30:		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
+       73:   31:		if (zeroed)
     #####:   32:			memset(ret, 0, size);
         -:   33:	} else {
     #####:   34:		SetErr(AllocErr);
         -:   35:	}
         -:   36:
-       64:   37:	return ret;
+       73:   37:	return ret;
         -:   38:}
        64:   39:void *resize(void *ptr, int64 size) {
        64:   40:	if (!ptr || !size) {
@@ -538,13 +695,13 @@
        64:   52:	return ret;
         -:   53:}
         -:   54:
-       64:   55:void release(void *ptr) {
-       64:   56:	if (!ptr) {
+       73:   55:void release(void *ptr) {
+       73:   56:	if (!ptr) {
     #####:   57:		SetErr(IllegalArgument);
     #####:   58:		return;
         -:   59:	}
-       64:   60:	THREAD_LOCAL_RESOURCE_STATS.release_sum += 1;
-       64:   61:	free(ptr);
+       73:   60:	THREAD_LOCAL_RESOURCE_STATS.release_sum += 1;
+       73:   61:	free(ptr);
         -:   62:}
         -:   63:
        14:   64:int64 alloc_sum() {
@@ -886,7 +1043,7 @@
         -:   19:#include <stdio.h>
         -:   20:
         -:   21:#define MAX_SLAB_TYPES 256
-        -:   22:#define SLAB_SIZES 256
+        -:   22:#define SLAB_SIZES 257
         -:   23:#define SLABS_PER_RESIZE 128
         -:   24:#define INITIAL_CHUNKS 0
         -:   25:
@@ -900,26 +1057,26 @@
         -:   33:	byte data[];
         -:   34:} Type;
         -:   35:
-        -:   36:const Type null_impl = {.id = 0, .len = 0};
+        -:   36:const Type null_impl = {.id = 0, .len = UINT32_MAX};
         -:   37:const struct Type *null = &null_impl;
         -:   38:
         -:   39:#define SLAB_OVERHEAD sizeof(Type)
         -:   40:
-    22141:   41:unsigned int ptr_len(const Ptr ptr) {
-    22141:   42:	return ptr->len;
+    22181:   41:unsigned int ptr_len(const Ptr ptr) {
+    22181:   42:	return ptr->len;
         -:   43:}
         -:   44:
-     9224:   45:unsigned int ptr_id(const Ptr ptr) {
-     9224:   46:	return ptr->id;
+     9217:   45:unsigned int ptr_id(const Ptr ptr) {
+     9217:   46:	return ptr->id;
         -:   47:}
         -:   48:
         -:   49:// reutrn pointer to slab data
-     9011:   50:void *ptr_data(const Ptr ptr) {
-     9011:   51:	return ptr->data;
+     9019:   50:void *ptr_data(const Ptr ptr) {
+     9019:   51:	return ptr->data;
         -:   52:}
         -:   53:
-      148:   54:void *ptr_aux(const Ptr ptr) {
-      148:   55:	return &ptr->aux;
+      279:   54:void *ptr_aux(const Ptr ptr) {
+      279:   55:	return &ptr->aux;
         -:   56:}
         -:   57:
         -:   58:// Direct alloc (len not used)
@@ -962,14 +1119,14 @@
        18:   95:	SlabAllocatorNc sa = *ptr;
        18:   96:	if (sa) {
        10:   97:		if (sa->sd_count) {
-     2570:   98:			for (int i = 0; i < sa->sd_count; i++) {
-     2560:   99:				SlabData *sd = &sa->sd_arr[i];
-     2560:  100:				if (sd->cur_chunks) {
-        7:  101:					release(sd->free_list);
-       46:  102:					for (int64 j = 0; j < sd->cur_chunks; j++)
-       39:  103:						release(sd->data[j]);
-        7:  104:					release(sd->data);
-        7:  105:					sd->cur_chunks = 0;
+     2580:   98:			for (int i = 0; i < sa->sd_count; i++) {
+     2570:   99:				SlabData *sd = &sa->sd_arr[i];
+     2570:  100:				if (sd->cur_chunks) {
+       10:  101:					release(sd->free_list);
+       52:  102:					for (int64 j = 0; j < sd->cur_chunks; j++)
+       42:  103:						release(sd->data[j]);
+       10:  104:					release(sd->data);
+       10:  105:					sd->cur_chunks = 0;
         -:  106:				}
         -:  107:			}
         -:  108:		}
@@ -978,40 +1135,40 @@
         -:  111:	}
        18:  112:}
         -:  113:
-     4630:  114:int64 slab_allocator_slab_data_index(SlabData *sd, int64 id) {
-     4630:  115:	return id / sd->type.slabs_per_resize;
+     4633:  114:int64 slab_allocator_slab_data_index(SlabData *sd, int64 id) {
+     4633:  115:	return id / sd->type.slabs_per_resize;
         -:  116:}
         -:  117:
-     4630:  118:int64 slab_allocator_slab_data_offset(SlabData *sd, int64 id) {
-     4630:  119:	return (id % sd->type.slabs_per_resize) * (SLAB_OVERHEAD + sd->type.slab_size);
+     4633:  118:int64 slab_allocator_slab_data_offset(SlabData *sd, int64 id) {
+     4633:  119:	return (id % sd->type.slabs_per_resize) * (SLAB_OVERHEAD + sd->type.slab_size);
         -:  120:}
         -:  121:
-       39:  122:void slab_allocator_init_free_list(SlabData *sd, int64 chunks) {
-       39:  123:	sd->free_list_head = sd->cur_chunks * sd->type.slabs_per_resize;
-       39:  124:	int64 count = chunks * (int64)sd->type.slabs_per_resize;
-     5031:  125:	for (int64 i = 0; i < count; i++) {
-     4992:  126:		if (i == count - 1) {
-       39:  127:			sd->free_list[i + sd->free_list_head] = UINT32_MAX;
+       42:  122:void slab_allocator_init_free_list(SlabData *sd, int64 chunks) {
+       42:  123:	sd->free_list_head = sd->cur_chunks * sd->type.slabs_per_resize;
+       42:  124:	int64 count = chunks * (int64)sd->type.slabs_per_resize;
+     5418:  125:	for (int64 i = 0; i < count; i++) {
+     5376:  126:		if (i == count - 1) {
+       42:  127:			sd->free_list[i + sd->free_list_head] = UINT32_MAX;
         -:  128:		} else {
-     4953:  129:			sd->free_list[i + sd->free_list_head] = 1 + i + sd->free_list_head;
+     5334:  129:			sd->free_list[i + sd->free_list_head] = 1 + i + sd->free_list_head;
         -:  130:		}
         -:  131:	}
-       39:  132:}
+       42:  132:}
         -:  133:
-       39:  134:int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
-       39:  135:	if (sd->cur_chunks == 0) {
-        7:  136:		sd->free_list = alloc(chunks * sd->type.slabs_per_resize * sizeof(unsigned int), false);
-        7:  137:		if (sd->free_list == NULL)
+       42:  134:int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
+       42:  135:	if (sd->cur_chunks == 0) {
+       10:  136:		sd->free_list = alloc(chunks * sd->type.slabs_per_resize * sizeof(unsigned int), false);
+       10:  137:		if (sd->free_list == NULL)
     #####:  138:			return -1;
-        7:  139:		sd->data = alloc(chunks * sizeof(byte *), false);
-        7:  140:		if (sd->data == NULL) {
+       10:  139:		sd->data = alloc(chunks * sizeof(byte *), false);
+       10:  140:		if (sd->data == NULL) {
     #####:  141:			release(sd->free_list);
     #####:  142:			return -1;
         -:  143:		}
-       14:  144:		for (int64 i = 0; i < chunks; i++) {
-       14:  145:			sd->data[i] =
-        7:  146:				alloc(sd->type.slabs_per_resize * (SLAB_OVERHEAD + sd->type.slab_size), false);
-        7:  147:			if (sd->data[i] == NULL) {
+       20:  144:		for (int64 i = 0; i < chunks; i++) {
+       20:  145:			sd->data[i] =
+       10:  146:				alloc(sd->type.slabs_per_resize * (SLAB_OVERHEAD + sd->type.slab_size), false);
+       10:  147:			if (sd->data[i] == NULL) {
     #####:  148:				release(sd->free_list);
     #####:  149:				for (int64 j = i - 1; j >= 0; j--) {
     #####:  150:					release(sd->data[j]);
@@ -1051,28 +1208,28 @@
         -:  184:		}
         -:  185:	}
         -:  186:
-       39:  187:	slab_allocator_init_free_list(sd, chunks);
-       39:  188:	sd->cur_chunks += chunks;
-       39:  189:	return 0;
+       42:  187:	slab_allocator_init_free_list(sd, chunks);
+       42:  188:	sd->cur_chunks += chunks;
+       42:  189:	return 0;
         -:  190:}
         -:  191:
-     2560:  192:int slab_allocator_init_data(SlabData *sd) {
-     2560:  193:	sd->cur_slabs = 0;
-     2560:  194:	sd->cur_chunks = 0;
-     2560:  195:	sd->free_list_head = UINT32_MAX;
-     2560:  196:	sd->free_list = NULL;
-     2560:  197:	sd->data = NULL;
+     2570:  192:int slab_allocator_init_data(SlabData *sd) {
+     2570:  193:	sd->cur_slabs = 0;
+     2570:  194:	sd->cur_chunks = 0;
+     2570:  195:	sd->free_list_head = UINT32_MAX;
+     2570:  196:	sd->free_list = NULL;
+     2570:  197:	sd->data = NULL;
         -:  198:
-     2560:  199:	if (sd->type.initial_chunks) {
+     2570:  199:	if (sd->type.initial_chunks) {
     #####:  200:		if (slab_allocator_increase_chunks(sd, sd->type.initial_chunks))
     #####:  201:			return -1;
         -:  202:	}
-     2560:  203:	return 0;
+     2570:  203:	return 0;
         -:  204:}
         -:  205:
        10:  206:int slab_allocator_init_state(SlabAllocator sa) {
-     2570:  207:	for (int i = 0; i < sa->sd_count; i++) {
-     2560:  208:		if (slab_allocator_init_data(&sa->sd_arr[i]))
+     2580:  207:	for (int i = 0; i < sa->sd_count; i++) {
+     2570:  208:		if (slab_allocator_init_data(&sa->sd_arr[i]))
     #####:  209:			return -1;
         -:  210:	}
         -:  211:
@@ -1085,13 +1242,13 @@
        10:  218:	if (ret == NULL)
     #####:  219:		return NULL;
        10:  220:	ret->sd_count = SLAB_SIZES;
-     2570:  221:	for (int i = 0; i < ret->sd_count; i++) {
-     2560:  222:		SlabData *sd = &ret->sd_arr[i];
-     2560:  223:		sd->type = (const SlabType) {.slab_size = (1 + i) * 16,
+     2580:  221:	for (int i = 0; i < ret->sd_count; i++) {
+     2570:  222:		SlabData *sd = &ret->sd_arr[i];
+     2570:  223:		sd->type = (const SlabType) {.slab_size = i * 16,
         -:  224:									 .slabs_per_resize = SLABS_PER_RESIZE,
         -:  225:									 .initial_chunks = INITIAL_CHUNKS,
         -:  226:									 .max_slabs = UINT32_MAX};
-     2560:  227:		sd->cur_chunks = 0;
+     2570:  227:		sd->cur_chunks = 0;
         -:  228:	}
         -:  229:
        10:  230:	if (slab_allocator_init_state(ret)) {
@@ -1101,71 +1258,71 @@
        10:  234:	return ret;
         -:  235:}
         -:  236:
-     9257:  237:int slab_allocator_index(SlabAllocator sa, unsigned int size) {
-     9257:  238:	int ret = (size - 1) / 16;
-     9257:  239:	if (size <= 0 || ret >= SLAB_SIZES)
+     9261:  237:int slab_allocator_index(SlabAllocator sa, unsigned int size) {
+     9261:  238:	int ret = (15 + size) / 16;
+     9261:  239:	if (size < 0 || ret >= SLAB_SIZES)
         1:  240:		return -1;
-     9256:  241:	return ret;
+     9260:  241:	return ret;
         -:  242:}
         -:  243:
-     4630:  244:Ptr slab_allocator_allocate_sd(SlabData *sd) {
-     4630:  245:	if (sd->free_list_head == UINT32_MAX) {
-       39:  246:		if (slab_allocator_increase_chunks(sd, 1)) {
+     4633:  244:Ptr slab_allocator_allocate_sd(SlabData *sd) {
+     4633:  245:	if (sd->free_list_head == UINT32_MAX) {
+       42:  246:		if (slab_allocator_increase_chunks(sd, 1)) {
     #####:  247:			return NULL;
         -:  248:		}
-       39:  249:		if (sd->free_list_head == UINT32_MAX) {
+       42:  249:		if (sd->free_list_head == UINT32_MAX) {
     #####:  250:			SetErr(CapacityExceeded);
     #####:  251:			return NULL;
         -:  252:		}
         -:  253:	}
-     4630:  254:	int64 index = slab_allocator_slab_data_index(sd, sd->free_list_head);
-     4630:  255:	int64 offset = slab_allocator_slab_data_offset(sd, sd->free_list_head);
-     4630:  256:	Ptr ptr = (Type *)(sd->data[index] + offset);
-     4630:  257:	ptr->id = sd->free_list_head;
-     4630:  258:	ptr->len = sd->type.slab_size;
-     4630:  259:	sd->free_list_head = sd->free_list[ptr->id];
-     4630:  260:	sd->cur_slabs++;
+     4633:  254:	int64 index = slab_allocator_slab_data_index(sd, sd->free_list_head);
+     4633:  255:	int64 offset = slab_allocator_slab_data_offset(sd, sd->free_list_head);
+     4633:  256:	Ptr ptr = (Type *)(sd->data[index] + offset);
+     4633:  257:	ptr->id = sd->free_list_head;
+     4633:  258:	ptr->len = sd->type.slab_size;
+     4633:  259:	sd->free_list_head = sd->free_list[ptr->id];
+     4633:  260:	sd->cur_slabs++;
         -:  261:
-     4630:  262:	return ptr;
+     4633:  262:	return ptr;
         -:  263:}
         -:  264:
-     4626:  265:void slab_allocator_data_free(SlabData *sd, int64 id) {
-     4626:  266:	sd->free_list[id] = sd->free_list_head;
-     4626:  267:	sd->free_list_head = id;
-     4626:  268:	sd->cur_slabs--;
-     4626:  269:}
+     4627:  265:void slab_allocator_data_free(SlabData *sd, int64 id) {
+     4627:  266:	sd->free_list[id] = sd->free_list_head;
+     4627:  267:	sd->free_list_head = id;
+     4627:  268:	sd->cur_slabs--;
+     4627:  269:}
         -:  270:
-     4631:  271:Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size) {
-     4631:  272:	int index = slab_allocator_index(sa, size);
-     4631:  273:	if (index < 0)
+     4634:  271:Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size) {
+     4634:  272:	int index = slab_allocator_index(sa, size);
+     4634:  273:	if (index < 0)
         1:  274:		return NULL;
         -:  275:
-     4630:  276:	return slab_allocator_allocate_sd(&sa->sd_arr[index]);
+     4633:  276:	return slab_allocator_allocate_sd(&sa->sd_arr[index]);
         -:  277:}
         -:  278:
-     4626:  279:void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
-     4626:  280:	if (ptr == NULL || sa == NULL) {
+     4627:  279:void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
+     4627:  280:	if (ptr == NULL || sa == NULL) {
     #####:  281:		panic("Invalid ptr sent to slab_allocator free!");
         -:  282:	}
-     4626:  283:	unsigned int len = ptr_len(ptr);
-     4626:  284:	int index = slab_allocator_index(sa, len);
-     4626:  285:	if (index < 0) {
+     4627:  283:	unsigned int len = ptr_len(ptr);
+     4627:  284:	int index = slab_allocator_index(sa, len);
+     4627:  285:	if (index < 0) {
     #####:  286:		panic("Invalid ptr sent to slab_allocator free! Unknown size %lli.", len);
         -:  287:	}
-     4626:  288:	if (sa->sd_arr[index].type.slab_size != len) {
+     4627:  288:	if (sa->sd_arr[index].type.slab_size != len) {
     #####:  289:		panic("Invalid ptr sent to slab_allocator free! Size mismatch %lli vs. %lli.",
         -:  290:			  sa->sd_arr[index].type.slab_size, len);
         -:  291:	}
         -:  292:
-     4626:  293:	slab_allocator_data_free(&sa->sd_arr[index], ptr->id);
+     4627:  293:	slab_allocator_data_free(&sa->sd_arr[index], ptr->id);
         -:  294:
-     4626:  295:	*ptr = null_impl;
-     4626:  296:}
+     4627:  295:	*ptr = null_impl;
+     4627:  296:}
        16:  297:int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
        16:  298:	int64 slabs = 0;
-     4112:  299:	for (int i = 0; i < sa->sd_count; i++) {
-     4096:  300:		SlabData *sd = &sa->sd_arr[i];
-     4096:  301:		slabs += sd->cur_slabs;
+     4128:  299:	for (int i = 0; i < sa->sd_count; i++) {
+     4112:  300:		SlabData *sd = &sa->sd_arr[i];
+     4112:  301:		slabs += sd->cur_slabs;
         -:  302:	}
        16:  303:	return slabs;
         -:  304:}
@@ -1196,513 +1353,267 @@
         -:   21:
         -:   22:#include <stdio.h>
         -:   23:
-        3:   24:int64 cstring_len(const byte *S) {
-        3:   25:	if (S == NULL) {
+        4:   24:int64 cstring_len(const byte *S) {
+        4:   25:	if (S == NULL) {
     #####:   26:		SetErr(IllegalArgument);
     #####:   27:		return -1;
         -:   28:	}
-        3:   29:	int64 ret = 0;
-       16:   30:	while (*S != '\0') {
-       13:   31:		S++;
-       13:   32:		ret++;
+        4:   29:	int64 ret = 0;
+       21:   30:	while (*S != '\0') {
+       17:   31:		S++;
+       17:   32:		ret++;
         -:   33:	}
-        3:   34:	return ret;
+        4:   34:	return ret;
         -:   35:}
         -:   36:
-        4:   37:byte *cstring(const string s) {
-        4:   38:	return $(s);
-        -:   39:}
-        -:   40:
-    #####:   41:string string_create() {
-    #####:   42:	return string_create_b("", 0);
-        -:   43:}
-        3:   44:string string_create_cs(const char *s) {
-        3:   45:	if (s == NULL) {
-    #####:   46:		SetErr(IllegalArgument);
-    #####:   47:		return NULL;
-        -:   48:	}
-        3:   49:	return string_create_b(s, cstring_len(s));
+        1:   37:string string_ref(const string src) {
+        1:   38:	if (nil(src)) {
+    #####:   39:		SetErr(IllegalArgument);
+    #####:   40:		return NULL;
+        -:   41:	}
+        -:   42:
+        1:   43:	int64 *aux = ptr_aux(src);
+        1:   44:	int64 refc = (*aux & 0x00FFFFFF00000000) >> 32;
+        1:   45:	refc++;
+        1:   46:	*aux = (*aux & 0xFF000000FFFFFFFF) | (refc << 32);
+        1:   47:	stringNc ret = src;
+        -:   48:
+        1:   49:	return ret;
         -:   50:}
-        4:   51:string string_create_b(const byte *s, unsigned int len) {
-        4:   52:	if (s == NULL) {
-    #####:   53:		SetErr(IllegalArgument);
-    #####:   54:		return NULL;
-        -:   55:	}
-        -:   56:	if (len > UINT32_MAX) {
-        -:   57:		SetErr(Overflow);
-        -:   58:		return NULL;
-        -:   59:	}
-        4:   60:	Ptr ret = fam_alloc(len + 1, false);
-        4:   61:	if (ret == NULL) {
+        -:   51:
+        4:   52:byte *cstring(const string s) {
+        4:   53:	return $(s);
+        -:   54:}
+        -:   55:
+    #####:   56:string string_create() {
+    #####:   57:	return string_create_b("", 0);
+        -:   58:}
+        4:   59:string string_create_cs(const char *s) {
+        4:   60:	if (s == NULL) {
+    #####:   61:		SetErr(IllegalArgument);
     #####:   62:		return NULL;
         -:   63:	}
-        4:   64:	int64 *aux = ptr_aux(ret);
-        4:   65:	int64 flags = *aux & 0xFF00000000000000LL;
-        4:   66:	*aux = flags | len;
-        4:   67:	memcpy($(ret), s, len);
-        4:   68:	((byte *)$(ret))[len] = '\0';
-        4:   69:	return ret;
-        -:   70:}
-    #####:   71:string string_clone(string s) {
-    #####:   72:	if (nil(s)) {
-    #####:   73:		SetErr(IllegalArgument);
-    #####:   74:		return NULL;
-        -:   75:	}
-    #####:   76:	return string_create_b(cstring(s), string_len(s));
-        -:   77:}
-        1:   78:string string_append_bytes(const string s, const byte *bytes, unsigned int len) {
-        1:   79:	if (nil(s) || bytes == NULL) {
-    #####:   80:		SetErr(IllegalArgument);
-    #####:   81:		return NULL;
-        -:   82:	}
-        1:   83:	unsigned int slen = string_len(s);
-        1:   84:	int64 nlen = (int64)len + (int64)slen;
-        1:   85:	if (nlen > UINT32_MAX) {
-    #####:   86:		SetErr(Overflow);
-    #####:   87:		return NULL;
-        -:   88:	}
-        1:   89:	Ptr ret = fam_alloc(nlen + 1, false);
-        1:   90:	if (ret == NULL)
-    #####:   91:		return ret;
-        -:   92:
-        1:   93:	int64 *aux = ptr_aux(ret);
-        1:   94:	int64 flags = *aux & 0xFF00000000000000LL;
-        1:   95:	*aux = flags | nlen;
-        1:   96:	memcpy($(ret), $(s), slen);
-        1:   97:	memcpy($(ret) + slen, bytes, len);
-        1:   98:	((byte *)$(ret))[nlen] = '\0';
-        -:   99:
-        1:  100:	return ret;
-        -:  101:}
-    #####:  102:string string_append_cstring(const string s, const char *bytes) {
-    #####:  103:	return string_append_bytes(s, bytes, cstring_len(bytes));
-        -:  104:}
-        1:  105:string string_append_string(const string s, const string s2) {
-        1:  106:	return string_append_bytes(s, cstring(s2), string_len(s2));
-        -:  107:}
-       27:  108:int64 string_len(const string s) {
-       27:  109:	if (nil(s)) {
-    #####:  110:		SetErr(IllegalArgument);
-    #####:  111:		return -1;
-        -:  112:	}
-       27:  113:	int64 *aux = ptr_aux(s);
-       27:  114:	return (*aux & 0x00FFFFFFFFFFFFFFLL);
-        -:  115:}
-    #####:  116:int64 string_index_of(const string s1, const string s2) {
-        -:  117:	// TODO: look into optimization with Boyer-Moore or KMP
-    #####:  118:	if (nil(s1) || nil(s2)) {
-    #####:  119:		SetErr(IllegalArgument);
-    #####:  120:		return -1;
-        -:  121:	}
-    #####:  122:	const char *si1 = $(s1);
-    #####:  123:	const char *si2 = $(s2);
-        -:  124:
-    #####:  125:	unsigned int s1len = string_len(s1);
-    #####:  126:	unsigned int s2len = string_len(s2);
-        -:  127:
-    #####:  128:	if (s2len > s1len)
+        4:   64:	return string_create_b(s, cstring_len(s));
+        -:   65:}
+        5:   66:string string_create_b(const byte *s, unsigned int len) {
+        5:   67:	if (s == NULL) {
+    #####:   68:		SetErr(IllegalArgument);
+    #####:   69:		return NULL;
+        -:   70:	}
+        -:   71:	if (len > UINT32_MAX) {
+        -:   72:		SetErr(Overflow);
+        -:   73:		return NULL;
+        -:   74:	}
+        5:   75:	Ptr ret = fam_alloc(len + 1, false);
+        5:   76:	if (ret == NULL) {
+    #####:   77:		return NULL;
+        -:   78:	}
+        5:   79:	int64 *aux = ptr_aux(ret);
+        5:   80:	int64 flags = *aux & 0xFF00000000000000LL;
+        5:   81:	int64 refc = 0x1LL << 32; // set reference counter to 1
+        5:   82:	*aux = flags | len | refc;
+        5:   83:	refc = (*aux & 0x00FFFFFF00000000) >> 32;
+        5:   84:	memcpy($(ret), s, len);
+        5:   85:	((byte *)$(ret))[len] = '\0';
+        5:   86:	return ret;
+        -:   87:}
+        -:   88:
+    #####:   89:string string_clone(string s) {
+    #####:   90:	if (nil(s)) {
+    #####:   91:		SetErr(IllegalArgument);
+    #####:   92:		return NULL;
+        -:   93:	}
+    #####:   94:	return string_create_b(cstring(s), string_len(s));
+        -:   95:}
+        1:   96:string string_append_bytes(const string s, const byte *bytes, unsigned int len) {
+        1:   97:	if (nil(s) || bytes == NULL) {
+    #####:   98:		SetErr(IllegalArgument);
+    #####:   99:		return NULL;
+        -:  100:	}
+        1:  101:	unsigned int slen = string_len(s);
+        1:  102:	int64 nlen = (int64)len + (int64)slen;
+        1:  103:	if (nlen > UINT32_MAX) {
+    #####:  104:		SetErr(Overflow);
+    #####:  105:		return NULL;
+        -:  106:	}
+        1:  107:	Ptr ret = fam_alloc(nlen + 1, false);
+        1:  108:	if (ret == NULL)
+    #####:  109:		return ret;
+        1:  110:	int64 *aux = ptr_aux(ret);
+        1:  111:	int64 refc = 0x1LL << 32; // set reference counter to 1
+        1:  112:	int64 flags = *aux & 0xFFFFFFFF00000000LL;
+        1:  113:	*aux = flags | nlen | refc;
+        1:  114:	memcpy($(ret), $(s), slen);
+        1:  115:	memcpy($(ret) + slen, bytes, len);
+        1:  116:	((byte *)$(ret))[nlen] = '\0';
+        -:  117:
+        1:  118:	return ret;
+        -:  119:}
+    #####:  120:string string_append_cstring(const string s, const char *bytes) {
+    #####:  121:	return string_append_bytes(s, bytes, cstring_len(bytes));
+        -:  122:}
+        1:  123:string string_append_string(const string s, const string s2) {
+        1:  124:	return string_append_bytes(s, cstring(s2), string_len(s2));
+        -:  125:}
+       27:  126:int64 string_len(const string s) {
+       27:  127:	if (nil(s)) {
+    #####:  128:		SetErr(IllegalArgument);
     #####:  129:		return -1;
-        -:  130:
-    #####:  131:	if (s2len == 0)
-    #####:  132:		return 0;
-        -:  133:
-    #####:  134:	unsigned int max = 1 + (s1len - s2len);
-    #####:  135:	for (unsigned int i = 0; i < max; i++) {
-    #####:  136:		if (!memcmp(si1 + i, si2, s2len))
-    #####:  137:			return i;
-        -:  138:	}
-        -:  139:
-    #####:  140:	return -1;
-        -:  141:}
-    #####:  142:int64 string_last_index_of(const string s1, const string s2) {
-        -:  143:	// TODO: look into optimization with Boyer-Moore or KMP
-    #####:  144:	if (nil(s1) || nil(s2)) {
-    #####:  145:		SetErr(IllegalArgument);
-    #####:  146:		return -1;
-        -:  147:	}
-    #####:  148:	const char *si1 = $(s1);
-    #####:  149:	const char *si2 = $(s2);
-        -:  150:
-    #####:  151:	unsigned int s1len = string_len(s1);
-    #####:  152:	unsigned int s2len = string_len(s2);
-        -:  153:
-    #####:  154:	if (s2len > s1len)
-    #####:  155:		return -1;
-        -:  156:
-    #####:  157:	if (s2len == 0)
-    #####:  158:		return 0;
-        -:  159:
-    #####:  160:	int64 max = s1len - s2len;
-    #####:  161:	for (unsigned int i = max; i >= 0; i--) {
-    #####:  162:		if (!memcmp(si1 + i, si2, s2len))
-    #####:  163:			return i;
-        -:  164:	}
-        -:  165:	return -1;
-        -:  166:}
-    #####:  167:string string_substring(const string src, unsigned int start) {
-    #####:  168:	return string_substring_s(src, start, string_len(src));
-        -:  169:}
-        1:  170:string string_substring_s(const string src, unsigned int start, unsigned int end) {
-        1:  171:	if (nil(src) || end < start) {
-    #####:  172:		SetErr(IllegalArgument);
-    #####:  173:		return NULL;
-        -:  174:	}
-        -:  175:
-        1:  176:	if (end > string_len(src)) {
-    #####:  177:		SetErr(IndexOutOfBounds);
-    #####:  178:		return NULL;
-        -:  179:	}
-        -:  180:
-        1:  181:	return string_create_b($(src) + start, end - start);
-        -:  182:}
-       11:  183:byte string_char_at(const string s, unsigned int index) {
-       11:  184:	if (nil(s)) {
-    #####:  185:		SetErr(IllegalArgument);
-    #####:  186:		return '\0';
-        -:  187:	}
-        -:  188:
-       11:  189:	if (index >= string_len(s)) {
-        1:  190:		SetErr(IndexOutOfBounds);
-        1:  191:		return '\0';
+        -:  130:	}
+       27:  131:	int64 *aux = ptr_aux(s);
+       27:  132:	return (*aux & 0xFFFFFFFF);
+        -:  133:}
+    #####:  134:int64 string_index_of(const string s1, const string s2) {
+        -:  135:	// TODO: look into optimization with Boyer-Moore or KMP
+    #####:  136:	if (nil(s1) || nil(s2)) {
+    #####:  137:		SetErr(IllegalArgument);
+    #####:  138:		return -1;
+        -:  139:	}
+    #####:  140:	const char *si1 = $(s1);
+    #####:  141:	const char *si2 = $(s2);
+        -:  142:
+    #####:  143:	unsigned int s1len = string_len(s1);
+    #####:  144:	unsigned int s2len = string_len(s2);
+        -:  145:
+    #####:  146:	if (s2len > s1len)
+    #####:  147:		return -1;
+        -:  148:
+    #####:  149:	if (s2len == 0)
+    #####:  150:		return 0;
+        -:  151:
+    #####:  152:	unsigned int max = 1 + (s1len - s2len);
+    #####:  153:	for (unsigned int i = 0; i < max; i++) {
+    #####:  154:		if (!memcmp(si1 + i, si2, s2len))
+    #####:  155:			return i;
+        -:  156:	}
+        -:  157:
+    #####:  158:	return -1;
+        -:  159:}
+    #####:  160:int64 string_last_index_of(const string s1, const string s2) {
+        -:  161:	// TODO: look into optimization with Boyer-Moore or KMP
+    #####:  162:	if (nil(s1) || nil(s2)) {
+    #####:  163:		SetErr(IllegalArgument);
+    #####:  164:		return -1;
+        -:  165:	}
+    #####:  166:	const char *si1 = $(s1);
+    #####:  167:	const char *si2 = $(s2);
+        -:  168:
+    #####:  169:	unsigned int s1len = string_len(s1);
+    #####:  170:	unsigned int s2len = string_len(s2);
+        -:  171:
+    #####:  172:	if (s2len > s1len)
+    #####:  173:		return -1;
+        -:  174:
+    #####:  175:	if (s2len == 0)
+    #####:  176:		return 0;
+        -:  177:
+    #####:  178:	int64 max = s1len - s2len;
+    #####:  179:	for (unsigned int i = max; i >= 0; i--) {
+    #####:  180:		if (!memcmp(si1 + i, si2, s2len))
+    #####:  181:			return i;
+        -:  182:	}
+        -:  183:	return -1;
+        -:  184:}
+    #####:  185:string string_substring(const string src, unsigned int start) {
+    #####:  186:	return string_substring_s(src, start, string_len(src));
+        -:  187:}
+        1:  188:string string_substring_s(const string src, unsigned int start, unsigned int end) {
+        1:  189:	if (nil(src) || end < start) {
+    #####:  190:		SetErr(IllegalArgument);
+    #####:  191:		return NULL;
         -:  192:	}
         -:  193:
-       10:  194:	return ((char *)$(s))[index];
-        -:  195:}
-    #####:  196:bool string_equal(const string s1, const string s2) {
-    #####:  197:	if (nil(s1) && nil(s2))
-    #####:  198:		return true;
-    #####:  199:	if (nil(s1) || nil(s2))
-    #####:  200:		return false;
-        -:  201:
-    #####:  202:	int64 len = string_len(s1);
-    #####:  203:	if (len != string_len(s2))
-    #####:  204:		return false;
-        -:  205:
-    #####:  206:	const char *si1 = $(s1);
-    #####:  207:	const char *si2 = $(s2);
-        -:  208:
-    #####:  209:	for (int64 i = 0; i < len; i++) {
-    #####:  210:		if (si1[i] != si2[i])
-    #####:  211:			return false;
-        -:  212:	}
-        -:  213:
-    #####:  214:	return true;
-        -:  215:}
-        -:  216:
-    #####:  217:int string_compare(const string s1, const string s2) {
-    #####:  218:	if (nil(s1) && nil(s2))
-    #####:  219:		return 0;
-    #####:  220:	if (nil(s1))
-    #####:  221:		return -1;
-    #####:  222:	if (nil(s2))
-    #####:  223:		return 1;
-    #####:  224:	const char *s1c = $(s1);
-    #####:  225:	const char *s2c = $(s2);
-    #####:  226:	unsigned int s1len = string_len(s1);
-    #####:  227:	unsigned int s2len = string_len(s2);
-        -:  228:	unsigned int len;
-    #####:  229:	if (s1len < s2len)
-    #####:  230:		len = s1len;
-        -:  231:	else
-    #####:  232:		len = s2len;
-    #####:  233:	unsigned int i = 0;
+        1:  194:	if (end > string_len(src)) {
+    #####:  195:		SetErr(IndexOutOfBounds);
+    #####:  196:		return NULL;
+        -:  197:	}
+        -:  198:
+        1:  199:	return string_create_b($(src) + start, end - start);
+        -:  200:}
+       11:  201:byte string_char_at(const string s, unsigned int index) {
+       11:  202:	if (nil(s)) {
+    #####:  203:		SetErr(IllegalArgument);
+    #####:  204:		return '\0';
+        -:  205:	}
+        -:  206:
+       11:  207:	if (index >= string_len(s)) {
+        1:  208:		SetErr(IndexOutOfBounds);
+        1:  209:		return '\0';
+        -:  210:	}
+        -:  211:
+       10:  212:	return ((char *)$(s))[index];
+        -:  213:}
+    #####:  214:bool string_equal(const string s1, const string s2) {
+    #####:  215:	if (nil(s1) && nil(s2))
+    #####:  216:		return true;
+    #####:  217:	if (nil(s1) || nil(s2))
+    #####:  218:		return false;
+        -:  219:
+    #####:  220:	int64 len = string_len(s1);
+    #####:  221:	if (len != string_len(s2))
+    #####:  222:		return false;
+        -:  223:
+    #####:  224:	const char *si1 = $(s1);
+    #####:  225:	const char *si2 = $(s2);
+        -:  226:
+    #####:  227:	for (int64 i = 0; i < len; i++) {
+    #####:  228:		if (si1[i] != si2[i])
+    #####:  229:			return false;
+        -:  230:	}
+        -:  231:
+    #####:  232:	return true;
+        -:  233:}
         -:  234:
-    #####:  235:	while (i < len) {
-    #####:  236:		if (s1c[i] != s2c[i]) {
-    #####:  237:			if (s1c[i] < s2c[i])
-    #####:  238:				return -1;
-        -:  239:			else
-    #####:  240:				return 1;
-        -:  241:		}
-    #####:  242:		i++;
-        -:  243:	}
-    #####:  244:	if (s2len > s1len)
-    #####:  245:		return 1;
-    #####:  246:	else if (s2len < s1len)
-    #####:  247:		return -1;
-    #####:  248:	return 0;
-        -:  249:}
-        -:  250:
-        -:  251:// Functions that require override of const
-        -:  252:#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
-        -:  253:#pragma clang diagnostic ignored "-Wunknown-warning-option"
-        -:  254:#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-        5:  255:void string_cleanup(const string *ptr) {
-        5:  256:	if (!nil(*ptr)) {
-        5:  257:		fam_release(ptr);
-        -:  258:	}
-        5:  259:}
-        -:  260:
-        -:  261:/*
-        -:  262:void string2_cleanup(string2 *ptr) {
-        -:  263:	if (ptr == NULL)
-        -:  264:		return;
-        -:  265:	fam_release(ptr);
-        -:  266:	*ptr = NULL;
+    #####:  235:int string_compare(const string s1, const string s2) {
+    #####:  236:	if (nil(s1) && nil(s2))
+    #####:  237:		return 0;
+    #####:  238:	if (nil(s1))
+    #####:  239:		return -1;
+    #####:  240:	if (nil(s2))
+    #####:  241:		return 1;
+    #####:  242:	const char *s1c = $(s1);
+    #####:  243:	const char *s2c = $(s2);
+    #####:  244:	unsigned int s1len = string_len(s1);
+    #####:  245:	unsigned int s2len = string_len(s2);
+        -:  246:	unsigned int len;
+    #####:  247:	if (s1len < s2len)
+    #####:  248:		len = s1len;
+        -:  249:	else
+    #####:  250:		len = s2len;
+    #####:  251:	unsigned int i = 0;
+        -:  252:
+    #####:  253:	while (i < len) {
+    #####:  254:		if (s1c[i] != s2c[i]) {
+    #####:  255:			if (s1c[i] < s2c[i])
+    #####:  256:				return -1;
+        -:  257:			else
+    #####:  258:				return 1;
+        -:  259:		}
+    #####:  260:		i++;
+        -:  261:	}
+    #####:  262:	if (s2len > s1len)
+    #####:  263:		return 1;
+    #####:  264:	else if (s2len < s1len)
+    #####:  265:		return -1;
+    #####:  266:	return 0;
         -:  267:}
-        -:  268:string2 string2_create(const char *s) {
-        -:  269:	int64 len = cstring_len(s);
-        -:  270:	Ptr ret = fam_alloc(len + 1, false);
-        -:  271:	if (ret == NULL) {
-        -:  272:		return NULL;
-        -:  273:	}
-        -:  274:	unsigned int *p = ptr_aux2(ret);
-        -:  275:	*p = len;
-        -:  276:	memcpy($(ret), s, len);
-        -:  277:	((byte *)$(ret))[len] = 0;
-        -:  278:	return ret;
-        -:  279:}
-        -:  280:
-        -:  281:unsigned int string2_len(const string2 s) {
-        -:  282:	if (s == NULL) {
-        -:  283:		SetErr(IllegalArgument);
-        -:  284:		return -1;
-        -:  285:	}
-        -:  286:	return *((unsigned int *)ptr_aux2(s));
-        -:  287:}
-        -:  288:
-        -:  289:typedef struct stringImpl {
-        -:  290:	int64 len;
-        -:  291:	byte data[];
-        -:  292:} stringImpl;
-        -:  293:
-        -:  294:int64 cstring_len(const byte *S) {
-        -:  295:	int64 ret = 0;
-        -:  296:	while (*S != '\0') {
-        -:  297:		S++;
-        -:  298:		ret++;
-        -:  299:	}
-        -:  300:	return ret;
-        -:  301:}
-        -:  302:
-        -:  303:void string_cleanup(stringNc *ptr) {
-        -:  304:	if (ptr == NULL || ptr->impl == NULL)
-        -:  305:		return;
-        -:  306:	release(ptr->impl);
-        -:  307:	ptr->impl = NULL;
-        -:  308:}
-        -:  309:
-        -:  310:int64 string_create(string *s) {
-        -:  311:	return string_create_cs(s, "");
-        -:  312:}
-        -:  313:
-        -:  314:int64 string_create_cs(string *s, const char *s2) {
-        -:  315:	if (s2 == NULL) {
-        -:  316:		SetErr(IllegalArgument);
-        -:  317:		return -1;
-        -:  318:	}
-        -:  319:	return string_create_ch(s, s2, cstring_len(s2));
-        -:  320:}
-        -:  321:
-        -:  322:int64 string_create_ch(string *s, const byte *s2, int64 len) {
-        -:  323:	if (s == NULL || s2 == NULL || len < 0) {
-        -:  324:		SetErr(IllegalArgument);
-        -:  325:		return -1;
-        -:  326:	}
-        -:  327:
-        -:  328:	s->impl = alloc(1 + len + sizeof(stringImpl), false);
-        -:  329:	if (s->impl == NULL)
-        -:  330:		return -1;
-        -:  331:	stringImpl *si = s->impl;
-        -:  332:	si->len = len;
-        -:  333:	memcpy(si->data, s2, len);
-        -:  334:	si->data[len] = 0;
-        -:  335:
-        -:  336:	return 0;
-        -:  337:}
-        -:  338:
-        -:  339:int64 string_create_s(string *s, const string *s2) {
-        -:  340:	return string_create_cs(s, cstring(s2));
-        -:  341:}
-        -:  342:
-        -:  343:int64 string_append_s(string *s, const string *s2) {
-        -:  344:	stringImpl *si2 = s2->impl;
-        -:  345:	return string_append_ch(s, si2->data, si2->len);
-        -:  346:}
-        -:  347:
-        -:  348:int64 string_append_ch(string *s, const byte *s2, int64 len) {
-        -:  349:	if (s == NULL || s2 == NULL || len < 0) {
-        -:  350:		SetErr(IllegalArgument);
-        -:  351:		return -1;
-        -:  352:	}
-        -:  353:
-        -:  354:	stringImpl *si = s->impl;
-        -:  355:	if (si == NULL) {
-        -:  356:		SetErr(IllegalState);
-        -:  357:		return -1;
-        -:  358:	}
-        -:  359:	int64 len_sum = si->len + len;
-        -:  360:	void *tmp = resize(si, 1 + len_sum + sizeof(stringImpl));
-        -:  361:
-        -:  362:	if (tmp == NULL) {
-        -:  363:		return -1;
-        -:  364:	}
-        -:  365:
-        -:  366:	s->impl = si = tmp;
-        -:  367:
-        -:  368:	memcpy(si->data + si->len, s2, len);
-        -:  369:	si->data[len_sum] = 0;
-        -:  370:
-        -:  371:	si->len = len_sum;
-        -:  372:
-        -:  373:	return 0;
-        -:  374:}
-        -:  375:
-        -:  376:int64 string_len(const string *s) {
-        -:  377:	if (s == NULL)
-        -:  378:		return 0;
-        -:  379:	stringImpl *si = s->impl;
-        -:  380:	if (si == NULL)
-        -:  381:		return 0;
-        -:  382:	return si->len;
-        -:  383:}
-        -:  384:
-        -:  385:int64 string_index_of(const string *s1, const string *s2) {
-        -:  386:	if (s1 == NULL || s2 == NULL) {
-        -:  387:		SetErr(IllegalArgument);
-        -:  388:		return -1;
-        -:  389:	}
-        -:  390:	stringImpl *si1 = s1->impl;
-        -:  391:	stringImpl *si2 = s2->impl;
-        -:  392:
-        -:  393:	if (si1 == NULL || si2 == NULL) {
-        -:  394:		SetErr(IllegalState);
-        -:  395:		return -1;
-        -:  396:	}
-        -:  397:
-        -:  398:	int64 s1len = si1->len;
-        -:  399:	int64 s2len = si2->len;
-        -:  400:
-        -:  401:	if (s2len > s1len)
-        -:  402:		return -1;
-        -:  403:
-        -:  404:	if (s2len == 0)
-        -:  405:		return 0;
-        -:  406:
-        -:  407:	int64 max = 1 + (s1len - s2len);
-        -:  408:	for (int64 i = 0; i < max; i++) {
-        -:  409:		if (!memcmp(si1->data + i, si2->data, s2len))
-        -:  410:			return i;
-        -:  411:	}
-        -:  412:
-        -:  413:	return -1;
-        -:  414:}
-        -:  415:
-        -:  416:int64 string_last_index_of(const string *s1, const string *s2) {
-        -:  417:	if (s1 == NULL || s2 == NULL) {
-        -:  418:		SetErr(IllegalArgument);
-        -:  419:		return -1;
-        -:  420:	}
-        -:  421:	stringImpl *si1 = s1->impl;
-        -:  422:	stringImpl *si2 = s2->impl;
-        -:  423:
-        -:  424:	if (si1 == NULL || si2 == NULL) {
-        -:  425:		SetErr(IllegalState);
-        -:  426:		return -1;
-        -:  427:	}
-        -:  428:
-        -:  429:	int64 s1len = si1->len;
-        -:  430:	int64 s2len = si2->len;
-        -:  431:
-        -:  432:	if (s2len > s1len)
-        -:  433:		return -1;
-        -:  434:
-        -:  435:	if (s2len == 0)
-        -:  436:		return s1len;
-        -:  437:
-        -:  438:	int64 max = s1len - s2len;
-        -:  439:	for (int64 i = max; i >= 0; i--) {
-        -:  440:		if (!memcmp(si1->data + i, si2->data, s2len))
-        -:  441:			return i;
-        -:  442:	}
-        -:  443:
-        -:  444:	return -1;
-        -:  445:}
-        -:  446:
-        -:  447:int64 string_substring(string *dst, const string *src, int64 begin) {
-        -:  448:	return string_substring_s(dst, src, begin, string_len(src));
-        -:  449:}
-        -:  450:
-        -:  451:int64 string_substring_s(string *dst, const string *src, int64 begin, int64 end) {
-        -:  452:	byte ret = '\0';
-        -:  453:	if (src == NULL || end < begin) {
-        -:  454:		SetErr(IllegalArgument);
-        -:  455:		return ret;
-        -:  456:	}
-        -:  457:
-        -:  458:	stringImpl *si = src->impl;
-        -:  459:	if (si == NULL) {
-        -:  460:		SetErr(IllegalState);
-        -:  461:		return ret;
-        -:  462:	}
-        -:  463:
-        -:  464:	if (end > si->len || begin < 0) {
-        -:  465:		SetErr(IndexOutOfBounds);
-        -:  466:		return ret;
-        -:  467:	}
-        -:  468:
-        -:  469:	return string_create_ch(dst, si->data + begin, end - begin);
-        -:  470:}
-        -:  471:byte string_char_at(const string *s, int64 index) {
-        -:  472:	byte ret = '\0';
-        -:  473:	if (s == NULL) {
-        -:  474:		SetErr(IllegalArgument);
-        -:  475:		return ret;
-        -:  476:	}
-        -:  477:
-        -:  478:	stringImpl *si = s->impl;
-        -:  479:	if (si == NULL) {
-        -:  480:		SetErr(IllegalState);
-        -:  481:		return ret;
-        -:  482:	}
-        -:  483:
-        -:  484:	if (index >= si->len || index < 0) {
-        -:  485:		SetErr(IndexOutOfBounds);
-        -:  486:		return ret;
-        -:  487:	}
-        -:  488:
-        -:  489:	ret = si->data[index];
-        -:  490:	return ret;
-        -:  491:}
-        -:  492:
-        -:  493:int64 string_equal(const string *s1, const string *s2) {
-        -:  494:	if (s1 == NULL && s2 == NULL)
-        -:  495:		return true;
-        -:  496:	if (s1 == NULL || s2 == NULL)
-        -:  497:		return false;
-        -:  498:
-        -:  499:	stringImpl *si1 = s1->impl;
-        -:  500:	stringImpl *si2 = s2->impl;
-        -:  501:	if (si1 == NULL && si2 == NULL)
-        -:  502:		return true;
-        -:  503:	if (si1 == NULL || si2 == NULL)
-        -:  504:		return false;
-        -:  505:	if (si1->len != si2->len)
-        -:  506:		return false;
-        -:  507:
-        -:  508:	for (int64 i = 0; i < si1->len; i++) {
-        -:  509:		if (si1->data[i] != si2->data[i])
-        -:  510:			return false;
-        -:  511:	}
-        -:  512:
-        -:  513:	return true;
-        -:  514:}
-        -:  515:
-        -:  516:void string_move(string *dst, string *src) {
-        -:  517:	string_cleanup(dst);
-        -:  518:	dst->impl = src->impl;
-        -:  519:	src->impl = NULL;
-        -:  520:}
-        -:  521:
-        -:  522:byte *cstring(const string *s) {
-        -:  523:	if (s == NULL || s->impl == NULL) {
-        -:  524:		SetErr(IllegalArgument);
-        -:  525:		return NULL;
-        -:  526:	}
-        -:  527:	stringImpl *si = s->impl;
-        -:  528:	return si->data;
-        -:  529:}
-        -:  530:*/
+        -:  268:
+        -:  269:// Functions that require override of const
+        -:  270:#pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
+        -:  271:#pragma clang diagnostic ignored "-Wunknown-warning-option"
+        -:  272:#pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+        7:  273:void string_cleanup(const string *ptr) {
+        7:  274:	if (!nil(*ptr)) {
+        7:  275:		int64 *aux = ptr_aux(*ptr);
+        7:  276:		int64 refc = (*aux & 0x00FFFFFF00000000) >> 32;
+        7:  277:		refc--;
+        7:  278:		*aux = (*aux & 0xFF000000FFFFFFFF) | (refc << 32);
+        -:  279:
+        7:  280:		if (refc == 0) {
+        6:  281:			fam_release(ptr);
+        -:  282:		}
+        -:  283:	}
+        7:  284:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda

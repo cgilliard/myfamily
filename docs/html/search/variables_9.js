@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['max_5fslabs_450',['max_slabs',['../structSlabType.html#a941a0772f2be94bff919a97fced6a9ba',1,'SlabType']]]
+  ['max_5fslabs_486',['max_slabs',['../structSlabType.html#a941a0772f2be94bff919a97fced6a9ba',1,'SlabType']]]
 ];
