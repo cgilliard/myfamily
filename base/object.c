@@ -33,6 +33,8 @@ unsigned int object_get_size(ObjectType type) {
 		return sizeof(int);
 	else if (type == ObjectTypeWeak)
 		return sizeof(int64);
+	else if (type == ObjectTypePointer)
+		return sizeof(int64);
 
 	return 0;
 }
@@ -63,6 +65,10 @@ void object_set_ptr_type(Ptr ptr, ObjectType type) {
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
+	} else if (type == ObjectTypePointer) {
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
+		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, false);
 	}
 }
 
@@ -93,6 +99,8 @@ ObjectType object_type(const Object obj) {
 		} else {
 			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
 				return ObjectTypeWeak;
+			else
+				return ObjectTypePointer;
 		}
 	}
 	return ObjectTypeBool;
