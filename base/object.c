@@ -113,7 +113,7 @@ Object object_create_impl(ObjectType type, const void *value, bool send) {
 		int64 count = ((unsigned long long)v << 24) & 0x00FFFFFFFFFFFFFFULL;
 		*aux |= count;
 	} else if (type == ObjectTypeBool || type == ObjectTypeByte) {
-		int v;
+		int v = 0;
 		memcpy(&v, value, 1);
 		int64 count = ((int64)v << 24);
 		*aux |= count;
