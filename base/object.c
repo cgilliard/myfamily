@@ -45,7 +45,7 @@ unsigned int object_get_size(ObjectType type) {
 	else if (type == ObjectTypeBox)
 		return sizeof(int64);
 
-	return 0;
+	return -1;
 }
 
 void object_set_ptr_flag(Ptr ptr, unsigned long long flag, bool value) {
@@ -163,7 +163,15 @@ const void *object_value_of(const Object obj) {
 	return $(obj);
 }
 
-int object_value_of_buf(const Object obj, void *buffer, int limit) {
+int object_value_of_buf(const Object obj, void *buffer, unsigned int limit) {
+	if (nil(obj)) {
+		SetErr(ObjectConsumed);
+		return -1;
+	}
+	if (buffer == NULL) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
 	int max = limit;
 	ObjectType type = object_type(obj);
 	if (type == ObjectTypeInt) {
@@ -215,7 +223,10 @@ ObjectType object_type(const Object obj) {
 	return ObjectTypeBool;
 }
 unsigned int object_size(const Object obj) {
-	return object_get_size(object_type(obj)) + PTR_SIZE;
+	ObjectType type = object_type(obj);
+	if (type < 0)
+		return 0;
+	return object_get_size(type) + PTR_SIZE;
 }
 
 int object_mutate(Object obj, const void *value) {
@@ -402,10 +413,6 @@ Object object_move(const Object src) {
 		SetErr(IllegalArgument);
 		return NULL;
 	}
-	if (nil(src)) {
-		SetErr(ObjectConsumed);
-		return NULL;
-	}
 
 	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
 	ObjectNc ret;
@@ -420,6 +427,11 @@ Object object_move(const Object src) {
 	return ret;
 }
 Object object_ref(const Object src) {
+	ObjectType type = object_type(src);
+	if (type == ObjectTypeWeak) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
 	return object_ref_impl(src, true);
 }
 
