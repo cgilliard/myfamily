@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['release_5fsum_489',['release_sum',['../structResourceStats.html#a734a98bf8b41c03897c0f9923af9e0a7',1,'ResourceStats']]],
-  ['resize_5fsum_490',['resize_sum',['../structResourceStats.html#a344cb94802cd377dc3ffc56ecbe987f7',1,'ResourceStats']]]
+  ['ok_459',['Ok',['../slabs_8c.html#a348a1b38600859e4e7a1026364ffe57a',1,'Ok():&#160;slabs.c'],['../slabs_8h.html#a348a1b38600859e4e7a1026364ffe57a',1,'Ok():&#160;slabs.c']]]
 ];

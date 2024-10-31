@@ -77,7 +77,6 @@ $(function() {
 <code>#include &lt;<a class="el" href="fam__err_8h_source.html">base/fam_err.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="object_8h_source.html">base/object.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="osdef_8h_source.html">base/osdef.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="string_8h_source.html">base/string.h</a>&gt;</code><br />
 <code>#include &lt;stdio.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -92,9 +91,13 @@ Macros</h2></td></tr>
 <tr class="separator:af7d89f209ff45f9c14d629964b479028"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a62cf2f09822b05f5520c341acabe5e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a4a62cf2f09822b05f5520c341acabe5e">OBJECT_FLAG_TYPE2</a>&#160;&#160;&#160;4</td></tr>
 <tr class="separator:a4a62cf2f09822b05f5520c341acabe5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9139e35b6a7857baf24808da65eb9573"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a9139e35b6a7857baf24808da65eb9573">PTR_SIZE</a>&#160;&#160;&#160;16</td></tr>
+<tr class="separator:a9139e35b6a7857baf24808da65eb9573"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a40c97a63a3359efe26d4edc3b25c1263"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a40c97a63a3359efe26d4edc3b25c1263">object_box_value_of</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj)</td></tr>
+<tr class="separator:a40c97a63a3359efe26d4edc3b25c1263"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f08513cd76f45db579254195999e41b"><td class="memItemLeft" align="right" valign="top">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a0f08513cd76f45db579254195999e41b">object_get_size</a> (<a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a> type)</td></tr>
 <tr class="separator:a0f08513cd76f45db579254195999e41b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac23a9799e8f44442fe7350b8f4ab93ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#ac23a9799e8f44442fe7350b8f4ab93ca">object_set_ptr_flag</a> (<a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, unsigned long long flag, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> value)</td></tr>
@@ -103,18 +106,20 @@ Functions</h2></td></tr>
 <tr class="separator:a63a21d5b1b4231f278981803cb1cd732"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e0f9639495712fc37770d3aec14d7cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a2e0f9639495712fc37770d3aec14d7cc">object_set_ptr_type</a> (<a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, <a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a> type)</td></tr>
 <tr class="separator:a2e0f9639495712fc37770d3aec14d7cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ce5dfc7ed35c23da835076a76fa20fd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a3ce5dfc7ed35c23da835076a76fa20fd">object_create</a> (<a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a> type, const void *value)</td></tr>
-<tr class="separator:a3ce5dfc7ed35c23da835076a76fa20fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd86dc4ce41305f9b137e9f4a157582f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#acd86dc4ce41305f9b137e9f4a157582f">object_create_box</a> (unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> size)</td></tr>
-<tr class="separator:acd86dc4ce41305f9b137e9f4a157582f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43cb4f8b156edb6b19ea9578929a99d3"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a43cb4f8b156edb6b19ea9578929a99d3">object_value_of</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj)</td></tr>
-<tr class="separator:a43cb4f8b156edb6b19ea9578929a99d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc861c7d6e97e8f6ce3afe649384ad83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#afc861c7d6e97e8f6ce3afe649384ad83">object_type</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj)</td></tr>
-<tr class="separator:afc861c7d6e97e8f6ce3afe649384ad83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a79d3488005808b6f7095205fb6e505"><td class="memItemLeft" align="right" valign="top">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a1a79d3488005808b6f7095205fb6e505">object_size</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj)</td></tr>
-<tr class="separator:a1a79d3488005808b6f7095205fb6e505"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96d055968c3ea433b974949162e39139"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a96d055968c3ea433b974949162e39139">object_create_impl</a> (<a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a> type, const void *value, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> send)</td></tr>
+<tr class="separator:a96d055968c3ea433b974949162e39139"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52b4be8150fc10e6cedc6d1b548e1590"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a52b4be8150fc10e6cedc6d1b548e1590">object_create</a> (<a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a> type, const void *value, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> send)</td></tr>
+<tr class="separator:a52b4be8150fc10e6cedc6d1b548e1590"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32d39917a208a171802052f22c3b0b85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a32d39917a208a171802052f22c3b0b85">object_create_box</a> (unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> size, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> send)</td></tr>
+<tr class="separator:a32d39917a208a171802052f22c3b0b85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b3a9943ec9fbb92f91f2a81cc7e8e7e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a0b3a9943ec9fbb92f91f2a81cc7e8e7e">object_mutate</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj, const void *value)</td></tr>
 <tr class="separator:a0b3a9943ec9fbb92f91f2a81cc7e8e7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3e412048ba0dfd188182e48a71b1500"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#ad3e412048ba0dfd188182e48a71b1500">object_resize</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj, unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> size)</td></tr>
+<tr class="separator:ad3e412048ba0dfd188182e48a71b1500"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f14d37208707aa2df3d2d19a7cdd961"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a0f14d37208707aa2df3d2d19a7cdd961">object_value_of</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj, void *buffer, unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> limit)</td></tr>
+<tr class="separator:a0f14d37208707aa2df3d2d19a7cdd961"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc861c7d6e97e8f6ce3afe649384ad83"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#afc861c7d6e97e8f6ce3afe649384ad83">object_type</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj)</td></tr>
+<tr class="separator:afc861c7d6e97e8f6ce3afe649384ad83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae48ca63da990f77ee97a2d625f112da1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#ae48ca63da990f77ee97a2d625f112da1">object_set_property</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj, const char *key, const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> value)</td></tr>
 <tr class="separator:ae48ca63da990f77ee97a2d625f112da1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06d31cc75c78d9a2a73342721fc027ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a06d31cc75c78d9a2a73342721fc027ff">object_delete_property</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj, const char *key)</td></tr>
@@ -129,6 +134,8 @@ Functions</h2></td></tr>
 <tr class="separator:a9c7cad202e1f5f4d4a0aba12c4260c79"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac742d6837ad0d8a9bed43ec34228292d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#ac742d6837ad0d8a9bed43ec34228292d">object_increment_weak</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> obj)</td></tr>
 <tr class="separator:ac742d6837ad0d8a9bed43ec34228292d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7841f7ba4163224b6204fb67bb720f05"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a7841f7ba4163224b6204fb67bb720f05">object_ref_impl</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> src, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> incr)</td></tr>
+<tr class="separator:a7841f7ba4163224b6204fb67bb720f05"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3eab117a2742a86816569f2fd0d7c015"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a3eab117a2742a86816569f2fd0d7c015">object_move</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> src)</td></tr>
 <tr class="separator:a3eab117a2742a86816569f2fd0d7c015"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9dedc96916ca2a6eb6954049296fb603"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a9dedc96916ca2a6eb6954049296fb603">object_ref</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> src)</td></tr>
@@ -211,7 +218,39 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a9139e35b6a7857baf24808da65eb9573"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9139e35b6a7857baf24808da65eb9573">&#9670;&nbsp;</a></span>PTR_SIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define PTR_SIZE&#160;&#160;&#160;16</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a40c97a63a3359efe26d4edc3b25c1263"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40c97a63a3359efe26d4edc3b25c1263">&#9670;&nbsp;</a></span>object_box_value_of()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const void* object_box_value_of </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ae5879972057c0f258c5967ebd48eae6a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae5879972057c0f258c5967ebd48eae6a">&#9670;&nbsp;</a></span>Object_cleanup()</h2>
 
@@ -230,8 +269,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a3ce5dfc7ed35c23da835076a76fa20fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3ce5dfc7ed35c23da835076a76fa20fd">&#9670;&nbsp;</a></span>object_create()</h2>
+<a id="a52b4be8150fc10e6cedc6d1b548e1590"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52b4be8150fc10e6cedc6d1b548e1590">&#9670;&nbsp;</a></span>object_create()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -246,7 +285,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>send</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -258,8 +303,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="acd86dc4ce41305f9b137e9f4a157582f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acd86dc4ce41305f9b137e9f4a157582f">&#9670;&nbsp;</a></span>object_create_box()</h2>
+<a id="a32d39917a208a171802052f22c3b0b85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32d39917a208a171802052f22c3b0b85">&#9670;&nbsp;</a></span>object_create_box()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -268,8 +313,52 @@ Functions</h2></td></tr>
           <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_create_box </td>
           <td>(</td>
           <td class="paramtype">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
-          <td class="paramname"><em>size</em></td><td>)</td>
+          <td class="paramname"><em>size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>send</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a96d055968c3ea433b974949162e39139"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a96d055968c3ea433b974949162e39139">&#9670;&nbsp;</a></span>object_create_impl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_create_impl </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a>&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>send</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -514,6 +603,62 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a7841f7ba4163224b6204fb67bb720f05"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7841f7ba4163224b6204fb67bb720f05">&#9670;&nbsp;</a></span>object_ref_impl()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_ref_impl </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td>
+          <td class="paramname"><em>src</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>incr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad3e412048ba0dfd188182e48a71b1500"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3e412048ba0dfd188182e48a71b1500">&#9670;&nbsp;</a></span>object_resize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> object_resize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="ae48ca63da990f77ee97a2d625f112da1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae48ca63da990f77ee97a2d625f112da1">&#9670;&nbsp;</a></span>object_set_property()</h2>
 
@@ -610,24 +755,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a1a79d3488005808b6f7095205fb6e505"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a79d3488005808b6f7095205fb6e505">&#9670;&nbsp;</a></span>object_size()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> object_size </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td>
-          <td class="paramname"><em>obj</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="afc861c7d6e97e8f6ce3afe649384ad83"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afc861c7d6e97e8f6ce3afe649384ad83">&#9670;&nbsp;</a></span>object_type()</h2>
 
@@ -664,18 +791,34 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a43cb4f8b156edb6b19ea9578929a99d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a43cb4f8b156edb6b19ea9578929a99d3">&#9670;&nbsp;</a></span>object_value_of()</h2>
+<a id="a0f14d37208707aa2df3d2d19a7cdd961"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f14d37208707aa2df3d2d19a7cdd961">&#9670;&nbsp;</a></span>object_value_of()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const void* object_value_of </td>
+          <td class="memname"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> object_value_of </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td>
-          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
+          <td class="paramname"><em>limit</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">

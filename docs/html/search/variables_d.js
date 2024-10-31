@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['thread_5flocal_5fresource_5fstats_496',['THREAD_LOCAL_RESOURCE_STATS',['../os_8c.html#a5b30cb95c593a4c72b37fc7a807c5643',1,'os.c']]],
-  ['tl_5fslab_5fallocator_497',['tl_slab_allocator',['../fam__alloc_8c.html#a020fc1c85a04897b36e59af3286d25a6',1,'fam_alloc.c']]],
-  ['type_498',['type',['../structPrintPair.html#a70b3768e234cab7ffd2b6bf89ae6eb1b',1,'PrintPair::type()'],['../structSlabData.html#afd56765101a4c66714ecb49a8691cdbe',1,'SlabData::type()']]]
+  ['sd_5farr_462',['sd_arr',['../structSlabAllocatorImpl.html#ac7113773e73d919013661cfeda21f650',1,'SlabAllocatorImpl']]],
+  ['sd_5fcount_463',['sd_count',['../structSlabAllocatorImpl.html#ae6e1616129648178605b50c051cd6ef1',1,'SlabAllocatorImpl']]],
+  ['slab_5fsize_464',['slab_size',['../structSlabType.html#aac458f2e06b5b25134755343f34eadce',1,'SlabType']]],
+  ['slabs_5fper_5fresize_465',['slabs_per_resize',['../structSlabType.html#a3840962f73228dfa6ac82e53813bc007',1,'SlabType']]],
+  ['strm_466',['strm',['../structStream.html#a7ad8a221962ee490cf706ad8b9b98e66',1,'Stream']]]
 ];

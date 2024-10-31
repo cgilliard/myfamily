@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['type_314',['Type',['../structType.html',1,'']]]
+  ['type_301',['Type',['../structType.html',1,'']]]
 ];

@@ -67,7 +67,6 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -76,20 +75,14 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="fam__alloc_8h_source.html">base/fam_alloc.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="fam__err_8h_source.html">base/fam_err.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="macros_8h_source.html">base/macros.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="osdef_8h_source.html">base/osdef.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="print__util_8h_source.html">base/print_util.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="string_8h_source.html">base/string.h</a>&gt;</code><br />
-<code>#include &lt;pthread.h&gt;</code><br />
 </div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:afc2fe14fa24777540023f99e9f91b284"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__alloc_8c.html#afc2fe14fa24777540023f99e9f91b284">PTR_FLAGS_SEND</a>&#160;&#160;&#160;0</td></tr>
-<tr class="separator:afc2fe14fa24777540023f99e9f91b284"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae282bce41876bdfab0c199c192cc3d12"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__alloc_8c.html#ae282bce41876bdfab0c199c192cc3d12">PTR_FLAGS_DIRECT</a>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:ae282bce41876bdfab0c199c192cc3d12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:afd02bb0f6a745c39d5e3417493995c71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__alloc_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a> ((constructor))</td></tr>
+<tr class="separator:afd02bb0f6a745c39d5e3417493995c71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d7d62e765eabb8c1d817d36c85786b9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__alloc_8c.html#a6d7d62e765eabb8c1d817d36c85786b9">ptr_flag_set</a> (<a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> flag, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> value)</td></tr>
 <tr class="separator:a6d7d62e765eabb8c1d817d36c85786b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5b1608377e67441b499210990a79b5f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__alloc_8c.html#af5b1608377e67441b499210990a79b5f">ptr_flag_check</a> (<a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> flag)</td></tr>
@@ -111,39 +104,28 @@ Variables</h2></td></tr>
 <tr class="separator:a020fc1c85a04897b36e59af3286d25a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7dfb2c9f3d2031657cbb30370f172ced"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__alloc_8c.html#a7dfb2c9f3d2031657cbb30370f172ced">global_slab_allocator</a> = <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></td></tr>
 <tr class="separator:a7dfb2c9f3d2031657cbb30370f172ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5341db93eb24741b6a9e73611bff8ad3"><td class="memItemLeft" align="right" valign="top">pthread_mutex_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__alloc_8c.html#a5341db93eb24741b6a9e73611bff8ad3">global_allocator_lock</a> = PTHREAD_MUTEX_INITIALIZER</td></tr>
+<tr class="memitem:a5341db93eb24741b6a9e73611bff8ad3"><td class="memItemLeft" align="right" valign="top">pthread_mutex_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="fam__alloc_8c.html#a5341db93eb24741b6a9e73611bff8ad3">global_allocator_lock</a></td></tr>
 <tr class="separator:a5341db93eb24741b6a9e73611bff8ad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="ae282bce41876bdfab0c199c192cc3d12"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae282bce41876bdfab0c199c192cc3d12">&#9670;&nbsp;</a></span>PTR_FLAGS_DIRECT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define PTR_FLAGS_DIRECT&#160;&#160;&#160;1</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afc2fe14fa24777540023f99e9f91b284"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afc2fe14fa24777540023f99e9f91b284">&#9670;&nbsp;</a></span>PTR_FLAGS_SEND</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define PTR_FLAGS_SEND&#160;&#160;&#160;0</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="afd02bb0f6a745c39d5e3417493995c71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd02bb0f6a745c39d5e3417493995c71">&#9670;&nbsp;</a></span>__attribute__()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void __attribute__ </td>
+          <td>(</td>
+          <td class="paramtype">(constructor)&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aa913294f0ee9adc53dc8f7480fe44b82"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa913294f0ee9adc53dc8f7480fe44b82">&#9670;&nbsp;</a></span>check_initialize_default_slab_allocator()</h2>
 
@@ -322,7 +304,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pthread_mutex_t global_allocator_lock = PTHREAD_MUTEX_INITIALIZER</td>
+          <td class="memname">pthread_mutex_t global_allocator_lock</td>
         </tr>
       </table>
 </div><div class="memdoc">

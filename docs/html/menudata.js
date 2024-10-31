@@ -53,6 +53,7 @@ var menudata={children:[
 {text:"s",url:"globals_s.html#index_s"},
 {text:"t",url:"globals_t.html#index_t"},
 {text:"u",url:"globals_u.html#index_u"},
+{text:"w",url:"globals_w.html#index_w"},
 {text:"y",url:"globals_y.html#index_y"},
 {text:"π",url:"globals_0xcf80.html#index_a0xcf80"}]},
 {text:"Functions",url:"globals_func.html",children:[
@@ -93,5 +94,6 @@ var menudata={children:[
 {text:"s",url:"globals_defs.html#index_s"},
 {text:"t",url:"globals_defs.html#index_t"},
 {text:"u",url:"globals_defs.html#index_u"},
+{text:"w",url:"globals_defs.html#index_w"},
 {text:"y",url:"globals_defs.html#index_y"},
 {text:"π",url:"globals_defs.html#index_a0xcf80"}]}]}]}]}
