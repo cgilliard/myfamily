@@ -27,6 +27,14 @@
 
 #define PTR_SIZE 16
 
+const void *object_box_value_of(const Object obj) {
+	if (nil(obj)) {
+		SetErr(ObjectConsumed);
+		return NULL;
+	}
+	return $(obj);
+}
+
 unsigned int object_get_size(ObjectType type) {
 	if (type == ObjectTypeInt)
 		return 0;
@@ -148,15 +156,50 @@ Object object_create_box(unsigned int size, bool send) {
 	return ret;
 }
 
-const void *object_value_of(const Object obj) {
+int object_mutate(Object obj, const void *value) {
 	if (nil(obj)) {
 		SetErr(ObjectConsumed);
-		return NULL;
+		return -1;
 	}
-	return $(obj);
+	ObjectType type = object_type(obj);
+	if (type == ObjectTypeWeak) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
+
+	unsigned int size = object_get_size(type);
+	if (size)
+		memcpy($(obj), value, size);
+	return 0;
 }
 
-int object_value_of_buf(const Object obj, void *buffer, unsigned int limit) {
+int object_resize(Object obj, unsigned int size) {
+	if (nil(obj)) {
+		SetErr(ObjectConsumed);
+		return -1;
+	}
+	ObjectType type = object_type(obj);
+	if (type != ObjectTypeBox) {
+		SetErr(UnsupportedOperation);
+		return -1;
+	}
+
+	Ptr ptr = NULL;
+	object_value_of(obj, &ptr, 8);
+	if (nil(ptr)) {
+		SetErr(IllegalState);
+		return -1;
+	}
+
+	Ptr updated = fam_resize(ptr, size);
+	if (nil(updated)) {
+		SetErr(AllocErr);
+		return -1;
+	}
+	return object_mutate(obj, &updated);
+}
+
+int object_value_of(const Object obj, void *buffer, unsigned int limit) {
 	if (nil(obj)) {
 		SetErr(ObjectConsumed);
 		return -1;
@@ -220,29 +263,6 @@ ObjectType object_type(const Object obj) {
 		}
 	}
 	return ObjectTypeBool;
-}
-unsigned int object_size(const Object obj) {
-	ObjectType type = object_type(obj);
-	if (type < 0)
-		return 0;
-	return object_get_size(type) + PTR_SIZE;
-}
-
-int object_mutate(Object obj, const void *value) {
-	if (nil(obj)) {
-		SetErr(ObjectConsumed);
-		return -1;
-	}
-	ObjectType type = object_type(obj);
-	if (type == ObjectTypeWeak) {
-		SetErr(IllegalArgument);
-		return -1;
-	}
-
-	unsigned int size = object_get_size(type);
-	if (size)
-		memcpy($(obj), value, size);
-	return 0;
 }
 
 int object_set_property(Object obj, const char *key, const Object value) {
@@ -469,7 +489,7 @@ Object object_upgrade(const Object src) {
 		return NULL;
 	}
 
-	unsigned long long *target = object_value_of(src);
+	unsigned long long *target = object_box_value_of(src);
 	ObjectNc w = (ObjectNc)*target;
 	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
 	if (send) {
@@ -496,16 +516,16 @@ Object object_upgrade(const Object src) {
 }
 
 void Object_cleanup(const Object *obj) {
-	if (!nil(*obj)) {
+	if (!nil(*obj) && ptr_len(*obj) != UINT32_MAX) {
 		if (object_type(*obj) == ObjectTypeWeak) {
-			unsigned long long *target = object_value_of(*obj);
+			unsigned long long *target = object_box_value_of(*obj);
 			ObjectNc w = (ObjectNc)*target;
 
 			int odwval = object_decrement_weak(w);
 			if (!odwval) {
 				// deallocate the pointer
 				if (object_type(w) == ObjectTypeBox) {
-					Ptr inner = *(Ptr *)object_value_of(w);
+					Ptr inner = *(Ptr *)object_box_value_of(w);
 					fam_release(&inner);
 				}
 				fam_release(&w);
@@ -516,7 +536,7 @@ void Object_cleanup(const Object *obj) {
 			if (!odsval) {
 				// deallocate the pointer
 				if (object_type(*obj) == ObjectTypeBox) {
-					Ptr inner = *(Ptr *)object_value_of(*obj);
+					Ptr inner = *(Ptr *)object_box_value_of(*obj);
 					fam_release(&inner);
 				}
 				fam_release(obj);

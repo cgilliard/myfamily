@@ -41,6 +41,7 @@
 	CapacityExceeded, \
 	FileNotFound, \
 	NotADirectory, \
+	UnsupportedOperation, \
 	IllegalState, \
 	TooBig, \
 	ResourceNotAvailable, \

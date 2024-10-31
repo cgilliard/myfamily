@@ -34,6 +34,8 @@ typedef struct Type {
 
 const Type null_impl = {.id = 0, .len = UINT32_MAX};
 const struct Type *null = &null_impl;
+const struct Type not_null_impl = {.id = 1, .len = UINT32_MAX};
+const struct Type *Ok = &not_null_impl;
 
 #define SLAB_OVERHEAD sizeof(Type)
 

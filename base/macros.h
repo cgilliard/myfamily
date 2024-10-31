@@ -24,7 +24,8 @@
 // Ptr macros
 #define $(ptr) ptr_data(ptr)
 #define $len(ptr) ptr_len(ptr)
-#define nil(ptr) (ptr == NULL || ptr_len(ptr) == UINT32_MAX)
+#define nil(ptr) (ptr == NULL || (ptr_len(ptr) == UINT32_MAX && ptr_id(ptr) == 0))
+#define ok(ptr) (ptr != NULL && ptr_id(ptr) != 0)
 
 // Object macros
 #define $int(obj) *(int *)object_value_of(obj)
@@ -34,6 +35,7 @@
 		src = null;                                                                                \
 		_ret__;                                                                                    \
 	})
+#define ref(src) object_ref(src)
 
 // String macros
 
