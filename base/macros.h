@@ -25,14 +25,15 @@
 #define $(ptr) ptr_data(ptr)
 #define $len(ptr) ptr_len(ptr)
 #define nil(ptr) (ptr == NULL || ptr_len(ptr) == UINT32_MAX)
-#define move(dst, src)                                                                             \
-	({                                                                                             \
-		dst = src;                                                                                 \
-		src = null;                                                                                \
-	})
 
 // Object macros
 #define $int(obj) *(int *)object_value_of(obj)
+#define move(src)                                                                                  \
+	({                                                                                             \
+		ObjectNc _ret__ = object_move(src);                                                        \
+		src = null;                                                                                \
+		_ret__;                                                                                    \
+	})
 
 // String macros
 

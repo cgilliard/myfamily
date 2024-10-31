@@ -232,6 +232,33 @@ MyTest(base, test_obj2) {
 	int x1_out;
 	object_value_of_buf(obj1, &x1_out, sizeof(int));
 	cr_assert_eq(x1_out, 1117);
+
+	Object obj2 = move(obj1);
+
+	int x2_out;
+	object_value_of_buf(obj2, &x2_out, sizeof(int));
+	cr_assert_eq(x2_out, 1117);
+
+	int x3 = 9999;
+	int x3_out = 0;
+	Object obj4 = null;
+
+	{
+		Object obj3 = object_create(ObjectTypeInt, &x3, false);
+		object_value_of_buf(obj3, &x3_out, sizeof(int));
+		cr_assert_eq(x3_out, 9999);
+		obj4 = object_ref(obj3);
+
+		cr_assert(object_weak(obj4) == NULL);
+	}
+
+	x3_out = 0;
+	object_value_of_buf(obj4, &x3_out, sizeof(int));
+	cr_assert_eq(x3_out, 9999);
+
+	cr_assert_eq(object_type(obj1), -1);
+	cr_assert_eq(object_type(obj2), ObjectTypeInt);
+	cr_assert_eq(object_type(obj4), ObjectTypeInt);
 }
 
 MyTest(base, test_object) {

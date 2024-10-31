@@ -25,6 +25,8 @@
 #define OBJECT_FLAG_TYPE1 3
 #define OBJECT_FLAG_TYPE2 4
 
+#define PTR_SIZE 16
+
 unsigned int object_get_size(ObjectType type) {
 	if (type == ObjectTypeInt64)
 		return sizeof(int64);
@@ -95,11 +97,7 @@ void object_set_ptr_type(Ptr ptr, ObjectType type) {
 	}
 }
 
-Object object_create(ObjectType type, const void *value, bool send) {
-	if (value == NULL || type < 0 || type >= __ObjectTypeCount__) {
-		SetErr(IllegalArgument);
-		return NULL;
-	}
+Object object_create_impl(ObjectType type, const void *value, bool send) {
 
 	unsigned int size = object_get_size(type);
 	Ptr ret = fam_alloc(size, send);
@@ -123,7 +121,21 @@ Object object_create(ObjectType type, const void *value, bool send) {
 	return ret;
 }
 
+Object object_create(ObjectType type, const void *value, bool send) {
+	if (value == NULL || type < 0 || type >= __ObjectTypeCount__ || type == ObjectTypeWeak ||
+		type == ObjectTypeBox) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
+
+	return object_create_impl(type, value, send);
+}
+
 Object object_create_box(unsigned int size, bool send) {
+	if (size == 0) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
 	unsigned int box_size = object_get_size(ObjectTypeBox);
 	Ptr ret = fam_alloc(box_size, send);
 	if (ret == NULL)
@@ -165,6 +177,8 @@ int object_value_of_buf(const Object obj, void *buffer, int limit) {
 		ret = max;
 		int count = ((*aux) & 0xFFFFFF000000LL) >> 24;
 		memcpy((byte *)buffer, &count, ret);
+	} else if (type == ObjectTypeInt32) {
+		memcpy((byte *)buffer, $(obj), 4);
 	}
 	return ret;
 }
@@ -201,7 +215,7 @@ ObjectType object_type(const Object obj) {
 	return ObjectTypeBool;
 }
 unsigned int object_size(const Object obj) {
-	return object_get_size(object_type(obj));
+	return object_get_size(object_type(obj)) + PTR_SIZE;
 }
 
 int object_mutate(Object obj, const void *value) {
@@ -209,12 +223,13 @@ int object_mutate(Object obj, const void *value) {
 		SetErr(ObjectConsumed);
 		return -1;
 	}
-	if (object_type(obj) == ObjectTypeWeak) {
+	ObjectType type = object_type(obj);
+	if (type == ObjectTypeWeak) {
 		SetErr(IllegalArgument);
 		return -1;
 	}
 
-	unsigned int size = object_size(obj);
+	unsigned int size = object_get_size(type);
 	if (size)
 		memcpy($(obj), value, size);
 	return 0;
@@ -382,7 +397,8 @@ Object object_move(const Object src) {
 		SetErr(ObjectConsumed);
 		return NULL;
 	}
-	if (object_type(src) == ObjectTypeWeak) {
+	ObjectType type = object_type(src);
+	if (type == ObjectTypeWeak) {
 		SetErr(IllegalArgument);
 		return NULL;
 	}
@@ -392,7 +408,14 @@ Object object_move(const Object src) {
 	}
 
 	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
-	ObjectNc ret = object_create(object_type(src), $(src), send);
+	ObjectNc ret;
+	if (type == ObjectTypeInt) {
+		int64 *aux = ptr_aux(src);
+		int value = ((*aux) & 0xFFFFFF000000LL) >> 24;
+		ret = object_create_impl(type, &value, send);
+	} else {
+		ret = object_create_impl(type, $(src), send);
+	}
 	Object_cleanup(&src);
 	return ret;
 }
@@ -405,13 +428,14 @@ Object object_weak(const Object src) {
 		SetErr(ObjectConsumed);
 		return NULL;
 	}
-	if (object_type(src) == ObjectTypeWeak) {
+	ObjectType type = object_type(src);
+	if (type == ObjectTypeWeak || type == ObjectTypeInt) {
 		SetErr(IllegalArgument);
 		return NULL;
 	}
 	unsigned long long v = (unsigned long long)src;
 	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
-	ObjectNc weak = object_create(ObjectTypeWeak, &v, send);
+	ObjectNc weak = object_create_impl(ObjectTypeWeak, &v, send);
 	if (object_increment_weak(src))
 		return NULL;
 
