@@ -42,12 +42,12 @@ jobs:
       - name: Run Linux Tests (gcc)
         run: |
           ./configure --with-cc=gcc
-          make clean testsan -s
+          make clean testsannc -s
       
       - name: Run Linux Tests (clang)
         run: |
           ./configure --with-cc=clang
-          make clean testsan -s
+          make clean testsannc -s
 
       - name: Build Docs
         run: |
