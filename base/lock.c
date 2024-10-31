@@ -18,6 +18,7 @@
 #include <base/osdef.h>
 #include <base/print_util.h>
 
+#include <errno.h>
 #include <pthread.h>
 
 #include <stdio.h>
