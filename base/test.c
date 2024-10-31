@@ -368,7 +368,7 @@ static void *test_wait_thread(void *arg) {
 }
 
 MyTest(base, test_wait) {
-	l2 = lock(true);
+	l2 = lock();
 	cr_assert(ok(l2));
 	pthread_t cThread;
 	cr_assert(!pthread_create(&cThread, NULL, test_wait_thread, NULL));
@@ -381,7 +381,7 @@ MyTest(base, test_wait) {
 }
 
 MyTest(base, test_lock_guard) {
-	Lock l3 = lock(true);
+	Lock l3 = lock(false);
 	{ LockGuard lg = lock_guard_write(l3); }
 
 	lockr(l3);
@@ -389,7 +389,7 @@ MyTest(base, test_lock_guard) {
 }
 
 MyTest(base, test_rsync_wsync) {
-	Lock l1 = lock(false);
+	Lock l1 = lock();
 	int state = 1;
 	cr_assert_eq(state, 1);
 

@@ -43,7 +43,7 @@
 #define upgrade(src) object_upgrade(src)
 
 // Lock macros
-#define lock(s) lock_create(s)
+#define lock(...) __VA_OPT__(lock_create(__VA_ARGS__) NONE)(lock_create(true))
 #define lockr(l) lock_read(l)
 #define lockw(l) lock_write(l)
 #define unlock(l) lock_unlock(l)
