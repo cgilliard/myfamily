@@ -380,6 +380,29 @@ MyTest(base, test_wait) {
 	Lock_cleanup(&l2);
 }
 
+MyTest(base, test_lock_guard) {
+	Lock l3 = lock(true);
+	{ LockGuard lg = lock_guard_write(l3); }
+
+	lockr(l3);
+	unlock(l3);
+}
+
+MyTest(base, test_rsync_wsync) {
+	Lock l1 = lock(false);
+	int state = 1;
+	cr_assert_eq(state, 1);
+
+	for (int i = 0; i < 10; i++) {
+		rsync(l1, { state = 2; });
+		cr_assert_eq(state, 2);
+
+		wsync(l1, { state = 3; });
+		cr_assert_eq(state, 3);
+	}
+	cr_assert_eq(state, 3);
+}
+
 MyTest(base, test_limits) {
 	cr_assert_eq(INT64_MAX, 9223372036854775807LL);
 	cr_assert_eq(INT64_MAX_IMPL, 9223372036854775807LL);

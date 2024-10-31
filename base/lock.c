@@ -20,11 +20,14 @@
 
 #include <pthread.h>
 
+#include <stdio.h>
+
 typedef struct LockImpl {
 	pthread_rwlock_t rw_lock;
 	pthread_mutex_t mutex_lock;
 	pthread_cond_t cond;
 	bool condition;
+	bool send;
 } LockImpl;
 
 Lock lock_create(bool send) {
@@ -53,6 +56,7 @@ Lock lock_create(bool send) {
 		return NULL;
 	}
 	l->condition = false;
+	l->send = send;
 
 	return ret;
 }
@@ -147,13 +151,31 @@ void lock_wait_timeout(Lock lock, unsigned int milliseconds) {
 		panic("pthread_mutex_unlock: returned error: %i (%i)", code, errno);
 }
 
+typedef struct LockGuardImpl {
+	Lock lock;
+} LockGuardImpl;
+
+LockGuard lock_guard_read(Lock l) {
+	LockImpl *li = $(l);
+	Ptr ret = fam_alloc(sizeof(LockGuardImpl), li->send);
+	LockGuardImpl *lgi = $(ret);
+	lgi->lock = l;
+	lock_read(lgi->lock);
+	return ret;
+}
+LockGuard lock_guard_write(Lock l) {
+	LockImpl *li = $(l);
+	Ptr ret = fam_alloc(sizeof(LockGuardImpl), li->send);
+	LockGuardImpl *lgi = $(ret);
+	lgi->lock = l;
+	lock_write(lgi->lock);
+	return ret;
+}
+
 // Functions that require override of const
 #pragma clang diagnostic ignored "-Wincompatible-pointer-types-discards-qualifiers"
 #pragma clang diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
-
-#include <errno.h>
-#include <stdio.h>
 
 void Lock_cleanup(const Lock *lock) {
 	errno = 0;
@@ -167,5 +189,13 @@ void Lock_cleanup(const Lock *lock) {
 		if ((code = pthread_cond_destroy(&l->cond)))
 			panic("pthread_cond_destroy: returned error: %i (%i)", code, errno);
 		fam_release(lock);
+	}
+}
+
+void LockGuard_cleanup(const LockGuard *lg) {
+	if (initialized(*lg)) {
+		LockGuardImpl *lgi = $(*lg);
+		lock_unlock(lgi->lock);
+		fam_release(lg);
 	}
 }

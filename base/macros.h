@@ -49,5 +49,15 @@
 #define unlock(l) lock_unlock(l)
 #define notify(l) lock_notify(l)
 #define lwait(l, ...) __VA_OPT__(lock_wait_timeout(l, __VA_ARGS__) NONE)(lock_wait(l))
+#define rsync(l, exe)                                                                              \
+	({                                                                                             \
+		LockGuard l##_lg = lock_guard_read(l);                                                     \
+		{ exe }                                                                                    \
+	})
+#define wsync(l, exe)                                                                              \
+	({                                                                                             \
+		LockGuard l##_lg = lock_guard_write(l);                                                    \
+		{ exe }                                                                                    \
+	})
 
 #endif // _BASE_MACROS__

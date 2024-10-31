@@ -30,4 +30,10 @@ void lock_wait(Lock lock);
 void lock_wait_timeout(Lock lock, unsigned int millis);
 void lock_condtion_reset(Lock lock);
 
+Type(LockGuard);
+#define LockGuard DefineType(LockGuard)
+
+LockGuard lock_guard_read(Lock l);
+LockGuard lock_guard_write(Lock l);
+
 #endif // _BASE_LOCK__
