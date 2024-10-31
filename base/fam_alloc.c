@@ -95,6 +95,7 @@ Ptr fam_resize(Ptr ptr, unsigned int size) {
 		if (len > size)
 			len = size;
 		memcpy($(ret), $(ptr), len);
+		fam_release(&ptr);
 	}
 
 	return ret;

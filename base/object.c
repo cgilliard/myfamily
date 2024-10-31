@@ -33,11 +33,11 @@ unsigned int object_get_size(ObjectType type) {
 	else if (type == ObjectTypeInt)
 		return 0;
 	else if (type == ObjectTypeByte)
-		return sizeof(byte);
+		return 0;
 	else if (type == ObjectTypeBool)
-		return sizeof(bool);
+		return 0;
 	else if (type == ObjectTypeFloat)
-		return sizeof(float64);
+		return 0;
 	else if (type == ObjectTypeInt32)
 		return sizeof(int);
 	else if (type == ObjectTypeWeak)
@@ -111,9 +111,14 @@ Object object_create_impl(ObjectType type, const void *value, bool send) {
 	// set strong count to 1
 	(*aux) |= 0x0000000000000001L;
 
-	if (type == ObjectTypeInt) {
+	if (type == ObjectTypeInt || type == ObjectTypeFloat) {
 		int v;
 		memcpy(&v, value, 4);
+		int64 count = ((unsigned long long)v << 24) & 0x00FFFFFFFFFFFFFFULL;
+		*aux |= count;
+	} else if (type == ObjectTypeBool || type == ObjectTypeByte) {
+		int v;
+		memcpy(&v, value, 1);
 		int64 count = ((int64)v << 24);
 		*aux |= count;
 	}
@@ -174,19 +179,30 @@ int object_value_of_buf(const Object obj, void *buffer, unsigned int limit) {
 	}
 	int max = limit;
 	ObjectType type = object_type(obj);
-	if (type == ObjectTypeInt) {
+	if (type == ObjectTypeInt || type == ObjectTypeFloat) {
+
 		if (limit > 4)
 			max = 4;
+	} else if (type == ObjectTypeByte || type == ObjectTypeBool) {
+		if (limit > 1)
+			max = 1;
+	} else if (type == ObjectTypeBox) {
+		if (limit > 8)
+			max = 8;
 	}
 
 	int ret = 0;
-	if (type == ObjectTypeInt) {
+	if (type == ObjectTypeInt || type == ObjectTypeFloat || type == ObjectTypeByte ||
+		type == ObjectTypeBool) {
 		int64 *aux = ptr_aux(obj);
 		ret = max;
-		int count = ((*aux) & 0xFFFFFF000000LL) >> 24;
+		int count = ((*aux) & 0xFFFFFFFF000000LL) >> 24;
 		memcpy((byte *)buffer, &count, ret);
 	} else if (type == ObjectTypeInt32) {
 		memcpy((byte *)buffer, $(obj), 4);
+	} else if (type == ObjectTypeBox) {
+		ret = max;
+		memcpy((byte *)buffer, $(obj), ret);
 	}
 	return ret;
 }
@@ -267,7 +283,8 @@ int object_decrement_strong(Object obj) {
 			return aux_val - 1;
 		} else {
 			// return weak count
-			if (type == ObjectTypeInt)
+			if (type == ObjectTypeInt || type == ObjectTypeFloat || type == ObjectTypeByte ||
+				type == ObjectTypeBool)
 				return 0;
 			else
 				return (aux_val & 0xFFFFFF000000LL) >> 24;
@@ -283,7 +300,8 @@ int object_decrement_strong(Object obj) {
 			return count;
 		} else {
 			// return the weak count
-			if (type == ObjectTypeInt)
+			if (type == ObjectTypeInt || type == ObjectTypeFloat || type == ObjectTypeByte ||
+				type == ObjectTypeBool)
 				return 0;
 			else
 				return (*aux & 0xFFFFFF000000LL) >> 24;
@@ -346,7 +364,7 @@ int object_decrement_weak(Object obj) {
 			return count;
 		} else {
 			// return the strong count
-			return *aux & 0xFFFFFF;
+			return ((*aux) & 0xFFFFFF);
 		}
 	}
 }
@@ -416,12 +434,15 @@ Object object_move(const Object src) {
 
 	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
 	ObjectNc ret;
-	if (type == ObjectTypeInt) {
+	if (type == ObjectTypeInt || type == ObjectTypeFloat || type == ObjectTypeByte ||
+		type == ObjectTypeBool) {
 		int64 *aux = ptr_aux(src);
-		int value = ((*aux) & 0xFFFFFF000000LL) >> 24;
+		int value = ((*aux) & 0xFFFFFFFF000000LL) >> 24;
 		ret = object_create_impl(type, &value, send);
+
 	} else {
-		ret = object_create_impl(type, $(src), send);
+		ret = object_ref(src);
+		// ret = object_create_impl(type, $(src), send);
 	}
 	Object_cleanup(&src);
 	return ret;
@@ -441,7 +462,8 @@ Object object_weak(const Object src) {
 		return NULL;
 	}
 	ObjectType type = object_type(src);
-	if (type == ObjectTypeWeak || type == ObjectTypeInt) {
+	if (type == ObjectTypeInt || type == ObjectTypeFloat || type == ObjectTypeByte ||
+		type == ObjectTypeBool || type == ObjectTypeWeak) {
 		SetErr(IllegalArgument);
 		return NULL;
 	}
@@ -492,23 +514,28 @@ Object object_upgrade(const Object src) {
 
 void Object_cleanup(const Object *obj) {
 	if (!nil(*obj)) {
-		// deallocate the pointer
-		if (object_type(*obj) == ObjectTypeBox) {
-			Ptr inner = *(Ptr *)object_value_of(*obj);
-			fam_release(&inner);
-		}
 		if (object_type(*obj) == ObjectTypeWeak) {
 			unsigned long long *target = object_value_of(*obj);
 			ObjectNc w = (ObjectNc)*target;
 
 			int odwval = object_decrement_weak(w);
 			if (!odwval) {
+				// deallocate the pointer
+				if (object_type(w) == ObjectTypeBox) {
+					Ptr inner = *(Ptr *)object_value_of(w);
+					fam_release(&inner);
+				}
 				fam_release(&w);
 			}
 			fam_release(obj);
 		} else {
 			int odsval = object_decrement_strong(*obj);
 			if (!odsval) {
+				// deallocate the pointer
+				if (object_type(*obj) == ObjectTypeBox) {
+					Ptr inner = *(Ptr *)object_value_of(*obj);
+					fam_release(&inner);
+				}
 				fam_release(obj);
 			}
 		}

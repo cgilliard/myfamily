@@ -226,18 +226,18 @@ void test_obj(bool send) {
 }
 
 MyTest(base, test_obj2) {
-	int x1 = 1117;
+	int x1 = -1234;
 	Object obj1 = object_create(ObjectTypeInt, &x1, false);
 
 	int x1_out;
 	object_value_of_buf(obj1, &x1_out, sizeof(int));
-	cr_assert_eq(x1_out, 1117);
+	cr_assert_eq(x1_out, -1234);
 
 	Object obj2 = move(obj1);
 
 	int x2_out;
 	object_value_of_buf(obj2, &x2_out, sizeof(int));
-	cr_assert_eq(x2_out, 1117);
+	cr_assert_eq(x2_out, -1234);
 
 	int x3 = 9999;
 	int x3_out = 0;
@@ -259,6 +259,131 @@ MyTest(base, test_obj2) {
 	cr_assert_eq(object_type(obj1), -1);
 	cr_assert_eq(object_type(obj2), ObjectTypeInt);
 	cr_assert_eq(object_type(obj4), ObjectTypeInt);
+
+	Object obj5 = null;
+	float x5 = 1.2;
+	float x5_out = 0.0;
+	{
+		Object obj6 = object_create(ObjectTypeFloat, &x5, false);
+		cr_assert(4 == object_value_of_buf(obj6, &x5_out, sizeof(float)));
+		cr_assert_eq(x5_out, 1.2f);
+		obj5 = object_ref(obj6);
+
+		cr_assert(object_weak(obj5) == NULL);
+	}
+
+	x5_out = 0.0;
+	object_value_of_buf(obj5, &x5_out, sizeof(float));
+	cr_assert_eq(x5_out, 1.2f);
+
+	for (int i = -100000; i < 100000; i++) {
+		Object obj = object_create(ObjectTypeInt, &i, true);
+		int x_out;
+		object_value_of_buf(obj, &x_out, sizeof(int));
+		cr_assert_eq(x_out, i);
+	}
+
+	int v = INT_MAX;
+	Object obj = object_create(ObjectTypeInt, &v, false);
+	int v_out = 0;
+	object_value_of_buf(obj, &v_out, sizeof(int));
+	cr_assert_eq(v_out, INT_MAX);
+
+	v = INT_MIN;
+	Object objmin = object_create(ObjectTypeInt, &v, true);
+	object_value_of_buf(objmin, &v_out, sizeof(int));
+	cr_assert_eq(v_out, v);
+
+	byte b1 = 'y';
+	Object obj7 = object_create(ObjectTypeByte, &b1, true);
+	byte b1_out = 0;
+	object_value_of_buf(obj7, &b1_out, sizeof(byte));
+	cr_assert_eq(b1, b1_out);
+
+	bool bool1 = true;
+	Object obj8 = object_create(ObjectTypeBool, &bool1, true);
+	byte bool1_out = false;
+	object_value_of_buf(obj8, &bool1_out, sizeof(bool));
+	cr_assert_eq(bool1, bool1_out);
+
+	bool bool2 = false;
+	Object obj9 = object_create(ObjectTypeBool, &bool2, true);
+	byte bool2_out = true;
+	object_value_of_buf(obj9, &bool2_out, sizeof(bool));
+	cr_assert_eq(bool2, bool2_out);
+
+	Object obj10 = object_create_box(100, true);
+	Ptr ptr;
+	object_value_of_buf(obj10, &ptr, 8);
+	for (int i = 0; i < 100; i++)
+		((byte *)$(ptr))[i] = i;
+	for (int i = 0; i < 100; i++)
+		cr_assert_eq(((byte *)$(ptr))[i], i);
+
+	Object obj11 = move(obj10);
+
+	Ptr ptr2;
+	object_value_of_buf(obj11, &ptr2, 8);
+
+	for (int i = 0; i < 100; i++)
+		cr_assert_eq(((byte *)$(ptr2))[i], i);
+
+	// consumed
+	Ptr ptr3 = null;
+	object_value_of_buf(obj10, &ptr3, 8);
+	cr_assert(nil(ptr3));
+
+	cr_assert_eq(object_type(obj11), ObjectTypeBox);
+
+	Ptr ptr4 = fam_resize(ptr2, 200);
+	object_mutate(obj11, &ptr4);
+}
+
+MyTest(base, test_box) {
+	// create a weak reference for later use
+	Object weak;
+	{
+		// create a box of size 100 bytes send = false (using thread local allocation
+		// and no atomic operations on reference counting
+		Object test_box = object_create_box(100, false);
+
+		// access the box's data via Ptr structure
+		Ptr box_ptr;
+		object_value_of_buf(test_box, &box_ptr, 8);
+
+		// set data in the box to specified values
+		for (int i = 0; i < 100; i++)
+			((byte *)$(box_ptr))[i] = i;
+
+		// resize the box
+		Ptr resized_box = fam_resize(box_ptr, 200);
+		cr_assert(!nil(resized_box));
+
+		// update the data on the heap
+		for (int i = 100; i < 200; i++)
+			((byte *)$(resized_box))[i] = i;
+
+		// update the box with the new pointer
+		object_mutate(test_box, &resized_box);
+
+		// create a weak reference
+		weak = object_weak(test_box);
+
+		// upgrade our weak reference and assert it's not nil
+		Object upgrade = object_upgrade(weak);
+		cr_assert(!nil(upgrade));
+
+		// iterate through the upgraded box's data and assert values match up
+		Ptr upgrade_ptr;
+		object_value_of_buf(upgrade, &upgrade_ptr, 8);
+		for (int i = 0; i < 200; i++)
+			cr_assert_eq(((byte *)$(upgrade_ptr))[i], i);
+	}
+	// Cleanup occurs as strong references go out of scope
+
+	// upgrade returns nil now
+	Object upgrade = object_upgrade(weak);
+	cr_assert(nil(upgrade));
 }
 
 MyTest(base, test_object) {
