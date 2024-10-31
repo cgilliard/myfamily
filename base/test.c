@@ -167,64 +167,6 @@ MyTest(base, test_test_type) {
 	cr_assert_eq(test_type_value(def), 5678);
 }
 
-void test_obj(bool send) {
-	int64 v = 123;
-	Object obj = object_create(ObjectTypeInt64, &v, send);
-	int64 v_out = *(int64 *)object_value_of(obj);
-	cr_assert_eq(v_out, 123);
-	v = 456;
-	object_mutate(obj, &v);
-	v_out = *(int64 *)object_value_of(obj);
-	cr_assert_eq(v_out, 456);
-
-	Object obj2 = object_move(obj);
-
-	v_out = *(int64 *)object_value_of(obj2);
-	cr_assert_eq(v_out, 456);
-
-	int v32_out = 0;
-	Object obj3;
-	{
-		int v32 = 777;
-		Object obj4 = object_create(ObjectTypeInt32, &v32, send);
-		obj3 = object_ref(obj4);
-		v32_out = *(int *)object_value_of(obj4);
-		cr_assert_eq(v32_out, 777);
-	}
-	v32_out = *(int *)object_value_of(obj3);
-	cr_assert_eq(v32_out, 777);
-
-	int objval = 2024;
-	Object obj5 = object_create(ObjectTypeInt32, &objval, send);
-	Object weak5 = object_weak(obj5);
-	Object upgraded = object_upgrade(weak5);
-	cr_assert(!nil(upgraded));
-	int objval_out = *(int *)object_value_of(upgraded);
-	cr_assert_eq(objval_out, 2024);
-	Object outer_weak;
-
-	{
-		int vw = 2025;
-		Object inner_strong = object_create(ObjectTypeInt32, &vw, send);
-		outer_weak = object_weak(inner_strong);
-		Object upgrade1 = object_upgrade(outer_weak);
-		int vw_out = $int(upgrade1);
-		cr_assert_eq(vw_out, 2025);
-	}
-
-	// now try to upgrade after all strong references are gone (result is NULL)
-	cr_assert(!object_upgrade(outer_weak));
-
-	Object obj6 = object_create_box(100, send);
-	// retreive the pointer
-	Ptr inner_out = *(Ptr *)object_value_of(obj6);
-
-	((char *)$(inner_out))[0] = 1;
-
-	// do assertions
-	cr_assert_eq(((char *)$(inner_out))[0], 1);
-}
-
 MyTest(base, test_obj2) {
 	int x1 = -1234;
 	Object obj1 = object_create(ObjectTypeInt, &x1, false);
@@ -384,11 +326,6 @@ MyTest(base, test_box) {
 	// upgrade returns nil now
 	Object upgrade = object_upgrade(weak);
 	cr_assert(nil(upgrade));
-}
-
-MyTest(base, test_object) {
-	test_obj(true);
-	test_obj(false);
 }
 
 MyTest(base, test_limits) {

@@ -19,8 +19,6 @@ Type(Object);
 #define Object DefineType(Object)
 
 typedef enum ObjectType {
-	ObjectTypeInt64,
-	ObjectTypeInt32,
 	ObjectTypeInt,
 	ObjectTypeFloat,
 	ObjectTypeByte,

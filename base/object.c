@@ -28,9 +28,7 @@
 #define PTR_SIZE 16
 
 unsigned int object_get_size(ObjectType type) {
-	if (type == ObjectTypeInt64)
-		return sizeof(int64);
-	else if (type == ObjectTypeInt)
+	if (type == ObjectTypeInt)
 		return 0;
 	else if (type == ObjectTypeByte)
 		return 0;
@@ -38,8 +36,6 @@ unsigned int object_get_size(ObjectType type) {
 		return 0;
 	else if (type == ObjectTypeFloat)
 		return 0;
-	else if (type == ObjectTypeInt32)
-		return sizeof(int);
 	else if (type == ObjectTypeWeak)
 		return sizeof(int64);
 	else if (type == ObjectTypeBox)
@@ -62,15 +58,7 @@ bool object_get_ptr_flag(Ptr ptr, unsigned long long flag) {
 }
 
 void object_set_ptr_type(Ptr ptr, ObjectType type) {
-	if (type == ObjectTypeInt64) {
-		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
-		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, true);
-		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
-	} else if (type == ObjectTypeInt32) {
-		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
-		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, true);
-		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, false);
-	} else if (type == ObjectTypeWeak) {
+	if (type == ObjectTypeWeak) {
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE0, true);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE1, false);
 		object_set_ptr_flag(ptr, OBJECT_FLAG_TYPE2, true);
@@ -198,8 +186,6 @@ int object_value_of_buf(const Object obj, void *buffer, unsigned int limit) {
 		ret = max;
 		int count = ((*aux) & 0xFFFFFFFF000000LL) >> 24;
 		memcpy((byte *)buffer, &count, ret);
-	} else if (type == ObjectTypeInt32) {
-		memcpy((byte *)buffer, $(obj), 4);
 	} else if (type == ObjectTypeBox) {
 		ret = max;
 		memcpy((byte *)buffer, $(obj), ret);
@@ -214,9 +200,6 @@ ObjectType object_type(const Object obj) {
 	}
 	if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE0)) {
 		if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE1)) {
-			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
-				return ObjectTypeInt64;
-			return ObjectTypeInt32;
 		} else {
 			if (object_get_ptr_flag(obj, OBJECT_FLAG_TYPE2))
 				return ObjectTypeWeak;
