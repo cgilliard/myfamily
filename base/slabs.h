@@ -22,9 +22,7 @@
 
 // Ptr data type
 typedef struct Type *Ptr;
-extern const struct Type null_impl;
 extern const struct Type *null;
-extern const struct Type not_null_impl;
 extern const struct Type *Ok;
 
 unsigned int ptr_len(const Ptr ptr);

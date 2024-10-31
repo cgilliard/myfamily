@@ -17,6 +17,9 @@
 #include <base/print_util.h>
 #include <base/slabs.h>
 
+#include <errno.h>
+#include <pthread.h>
+
 #define MAX_SLAB_TYPES 256
 #define SLAB_SIZES 257
 #define SLABS_PER_RESIZE 128
@@ -56,7 +59,7 @@ void *ptr_aux(const Ptr ptr) {
 	return &ptr->aux;
 }
 
-// Direct alloc (len not used)
+// Direct alloc
 Ptr ptr_direct_alloc(unsigned int size) {
 	if (size < 0) {
 		SetErr(IllegalArgument);
@@ -68,6 +71,7 @@ Ptr ptr_direct_alloc(unsigned int size) {
 }
 void ptr_direct_release(Ptr ptr) {
 	release(ptr);
+	*ptr = null_impl;
 }
 
 // Slab Type definition
@@ -89,6 +93,7 @@ typedef struct SlabData {
 
 typedef struct SlabAllocatorImpl {
 	int64 sd_count;
+	pthread_rwlock_t lock;
 	SlabData sd_arr[];
 } SlabAllocatorImpl;
 
@@ -107,7 +112,12 @@ void slab_allocator_cleanup(SlabAllocator *ptr) {
 				}
 			}
 		}
+
+		int code;
+		if ((code = pthread_rwlock_destroy(&sa->lock)))
+			panic("pthread_rwlock_destroy: %i (%i)", code, errno);
 		release(sa);
+
 		*ptr = NULL;
 	}
 }
@@ -218,6 +228,11 @@ SlabAllocator slab_allocator_create() {
 		sizeof(SlabAllocatorImpl) + SLAB_SIZES * sizeof(SlabData), false);
 	if (ret == NULL)
 		return NULL;
+	if (pthread_rwlock_init(&ret->lock, NULL)) {
+		SetErr(LockInitErr);
+		release(ret);
+		return NULL;
+	}
 	ret->sd_count = SLAB_SIZES;
 	for (int i = 0; i < ret->sd_count; i++) {
 		SlabData *sd = &ret->sd_arr[i];
@@ -242,42 +257,85 @@ int slab_allocator_index(SlabAllocator sa, unsigned int size) {
 	return ret;
 }
 
-Ptr slab_allocator_allocate_sd(SlabData *sd) {
+Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
+	int code;
+	errno = 0;
 	if (sd->free_list_head == UINT32_MAX) {
-		if (slab_allocator_increase_chunks(sd, 1)) {
-			return NULL;
-		}
+		if ((code = pthread_rwlock_unlock(&sa->lock)))
+			panic("pthread_rwlock_unlock: failed due to %i (%i)", code, errno);
+		if ((code = pthread_rwlock_wrlock(&sa->lock)))
+			panic("pthread_rwlock_wrlock: failed due to %i (%i)", code, errno);
 		if (sd->free_list_head == UINT32_MAX) {
-			SetErr(CapacityExceeded);
-			return NULL;
+			if (slab_allocator_increase_chunks(sd, 1)) {
+				return NULL;
+			}
+			if (sd->free_list_head == UINT32_MAX) {
+				SetErr(CapacityExceeded);
+				return NULL;
+			}
 		}
+		if ((code = pthread_rwlock_unlock(&sa->lock)))
+			panic("pthread_rwlock_unlock: failed due to %i (%i)", code, errno);
+		if ((code = pthread_rwlock_rdlock(&sa->lock)))
+			panic("pthread_rwlock_rdlock: failed due to %i (%i)", code, errno);
 	}
-	int64 index = slab_allocator_slab_data_index(sd, sd->free_list_head);
-	int64 offset = slab_allocator_slab_data_offset(sd, sd->free_list_head);
-	Ptr ptr = (Type *)(sd->data[index] + offset);
-	ptr->id = sd->free_list_head;
-	ptr->len = sd->type.slab_size;
-	sd->free_list_head = sd->free_list[ptr->id];
-	sd->cur_slabs++;
+
+	unsigned int old_free_list_head;
+	unsigned int new_free_list_head;
+	Ptr ptr;
+
+	do {
+		old_free_list_head = sd->free_list_head;
+		int64 index = slab_allocator_slab_data_index(sd, old_free_list_head);
+		int64 offset = slab_allocator_slab_data_offset(sd, old_free_list_head);
+
+		ptr = (Type *)(sd->data[index] + offset);
+		ptr->id = old_free_list_head;
+		ptr->len = sd->type.slab_size;
+		new_free_list_head = sd->free_list[ptr->id];
+
+	} while (!__atomic_compare_exchange_n(&sd->free_list_head, &old_free_list_head,
+										  new_free_list_head, false, __ATOMIC_RELAXED,
+										  __ATOMIC_RELAXED));
+
+	__atomic_fetch_add(&sd->cur_slabs, 1, __ATOMIC_RELAXED);
 
 	return ptr;
 }
 
-void slab_allocator_data_free(SlabData *sd, int64 id) {
-	sd->free_list[id] = sd->free_list_head;
-	sd->free_list_head = id;
-	sd->cur_slabs--;
+void slab_allocator_data_free(SlabData *sd, unsigned int id) {
+	unsigned int old_free_list_head;
+	unsigned int new_free_list_head;
+	do {
+		old_free_list_head = sd->free_list_head;
+		new_free_list_head = id;				// Calculate new_free_list_head here
+		sd->free_list[id] = old_free_list_head; // Update sd->free_list[id] here
+	} while (!__atomic_compare_exchange_n(&sd->free_list_head, &old_free_list_head,
+										  new_free_list_head, false, __ATOMIC_RELAXED,
+										  __ATOMIC_RELAXED));
+	__atomic_fetch_sub(&sd->cur_slabs, 1, __ATOMIC_RELAXED);
 }
 
 Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size) {
+	int code;
+	errno = 0;
 	int index = slab_allocator_index(sa, size);
 	if (index < 0)
 		return NULL;
 
-	return slab_allocator_allocate_sd(&sa->sd_arr[index]);
+	if ((code = pthread_rwlock_rdlock(&sa->lock)))
+		panic("pthread_rwlock_rdlock: failed due to %i (%i)", code, errno);
+	Ptr ret = slab_allocator_allocate_sd(&sa->sd_arr[index], sa);
+
+	if ((code = pthread_rwlock_unlock(&sa->lock)))
+		panic("pthread_rwlock_unlock: failed due to %i (%i)", code, errno);
+
+	return ret;
 }
 
 void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
+	int code;
+	errno = 0;
 	if (ptr == NULL || sa == NULL) {
 		panic("Invalid ptr sent to slab_allocator free!");
 	}
@@ -291,7 +349,12 @@ void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
 			  sa->sd_arr[index].type.slab_size, len);
 	}
 
+	if ((code = pthread_rwlock_rdlock(&sa->lock)))
+		panic("pthread_rwlock_rdlock: failed due to %i (%i)", code, errno);
 	slab_allocator_data_free(&sa->sd_arr[index], ptr->id);
+
+	if ((code = pthread_rwlock_unlock(&sa->lock)))
+		panic("pthread_rwlock_unlock: failed due to %i (%i)", code, errno);
 
 	*ptr = null_impl;
 }
@@ -299,7 +362,7 @@ int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
 	int64 slabs = 0;
 	for (int i = 0; i < sa->sd_count; i++) {
 		SlabData *sd = &sa->sd_arr[i];
-		slabs += sd->cur_slabs;
+		slabs += __atomic_fetch_add(&sd->cur_slabs, 0, __ATOMIC_RELAXED);
 	}
 	return slabs;
 }
