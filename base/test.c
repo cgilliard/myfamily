@@ -191,7 +191,7 @@ MyTest(base, test_obj2) {
 		cr_assert_eq(x3_out, 9999);
 		obj4 = ref(obj3);
 
-		cr_assert(object_weak(obj4) == NULL);
+		cr_assert(weak(obj4) == NULL);
 	}
 
 	x3_out = 0;
@@ -211,7 +211,7 @@ MyTest(base, test_obj2) {
 		cr_assert_eq(x5_out, 1.2f);
 		obj5 = ref(obj6);
 
-		cr_assert(object_weak(obj5) == NULL);
+		cr_assert(weak(obj5) == NULL);
 	}
 
 	x5_out = 0.0;
@@ -286,7 +286,7 @@ MyTest(base, test_obj2) {
 
 MyTest(base, test_box) {
 	// create a weak reference for later use
-	Object weak;
+	Object weak_ref;
 	{
 		// create a box of size 100 bytes send = false (using thread local allocation
 		// and no atomic operations on reference counting
@@ -308,23 +308,23 @@ MyTest(base, test_box) {
 			((byte *)$(box_ptr))[i] = i;
 
 		// create a weak reference
-		weak = object_weak(test_box);
+		weak_ref = weak(test_box);
 
 		// upgrade our weak reference and assert it's not nil
-		Object upgrade = object_upgrade(weak);
-		cr_assert(!nil(upgrade));
+		Object upgrade_ref = upgrade(weak_ref);
+		cr_assert(!nil(upgrade_ref));
 
 		// iterate through the upgraded box's data and assert values match up
 		Ptr upgrade_ptr;
-		object_value_of(upgrade, &upgrade_ptr, 8);
+		object_value_of(upgrade_ref, &upgrade_ptr, 8);
 		for (int i = 0; i < 200; i++)
 			cr_assert_eq(((byte *)$(upgrade_ptr))[i], i);
 	}
 	// Cleanup occurs as strong references go out of scope
 
 	// upgrade returns nil now
-	Object upgrade = object_upgrade(weak);
-	cr_assert(nil(upgrade));
+	Object upgrade_ref = upgrade(weak_ref);
+	cr_assert(nil(upgrade_ref));
 }
 
 MyTest(base, test_limits) {

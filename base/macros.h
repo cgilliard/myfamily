@@ -36,6 +36,8 @@
 		_ret__;                                                                                    \
 	})
 #define ref(src) object_ref(src)
+#define weak(src) object_weak(src)
+#define upgrade(src) object_upgrade(src)
 
 // String macros
 
