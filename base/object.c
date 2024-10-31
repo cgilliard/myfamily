@@ -516,7 +516,7 @@ Object object_upgrade(const Object src) {
 }
 
 void Object_cleanup(const Object *obj) {
-	if (!nil(*obj) && ptr_len(*obj) != UINT32_MAX) {
+	if (initialized(*obj)) {
 		if (object_type(*obj) == ObjectTypeWeak) {
 			unsigned long long *target = object_box_value_of(*obj);
 			ObjectNc w = (ObjectNc)*target;

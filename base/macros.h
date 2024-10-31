@@ -15,6 +15,8 @@
 #ifndef _BASE_MACROS__
 #define _BASE_MACROS__
 
+#include <base/macro_util.h>
+
 // Type macros
 #define Type(type)                                                                                 \
 	typedef struct Type *type##Nc;                                                                 \
@@ -25,7 +27,8 @@
 #define $(ptr) ptr_data(ptr)
 #define $len(ptr) ptr_len(ptr)
 #define nil(ptr) (ptr == NULL || (ptr_len(ptr) == UINT32_MAX && ptr_id(ptr) == 0))
-#define ok(ptr) (ptr != NULL && ptr_id(ptr) != 0)
+#define ok(ptr) !nil(ptr)
+#define initialized(ptr) (ptr != NULL && ptr_len(ptr) != UINT32_MAX)
 
 // Object macros
 #define $int(obj) *(int *)object_value_of(obj)
@@ -39,75 +42,12 @@
 #define weak(src) object_weak(src)
 #define upgrade(src) object_upgrade(src)
 
-// String macros
-
-/*
-#define INIT_STRING {.impl = NULL}
-#define EMPTY_STRING                                                                               \
-	({                                                                                             \
-		stringNc _empty__ = INIT_STRING;                                                           \
-		_empty__;                                                                                  \
-	})
-#define string stringNc __attribute__((warn_unused_result, cleanup(string_cleanup)))
-#define String_(v)                                                                                 \
-	({                                                                                             \
-		stringNc _ret__ = INIT_STRING;                                                             \
-		_Generic((v),                                                                              \
-			char *: ({                                                                             \
-					 char *val = _Generic((v), char *: v, default: NULL);                          \
-					 string_create_cs(&_ret__, (char *)val);                                       \
-				 }),                                                                               \
-			string: ({                                                                             \
-					 stringNc val = _Generic((v), string: v, default: EMPTY_STRING);               \
-					 string_create_s(&_ret__, &val);                                               \
-				 }),                                                                               \
-			default: string_create(&_ret__));                                                      \
-		_ret__;                                                                                    \
-	})
-#define String(...) String_(__VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(0ULL))
-
-#define nil_string(s) (s.impl == NULL)
-
-#define string_append(s, v, ...)                                                                   \
-	_Generic((v), string: ({ string_append_s(&s, (string *)&v); }), default: ({                    \
-				 int64 _len__ = __VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(cstring_len((byte *)&v)); \
-				 string_append_ch(&s, (byte *)&v, _len__);                                         \
-			 }))
-#define append(...) string_append(__VA_ARGS__)
-
-#define string_equal_(s1, s2)                                                                      \
-	_Generic((s2), string: ({ string_equal(&s1, (string *)&s2); }), default: ({                    \
-				 string _tmp__ = String(s2);                                                       \
-				 string_equal(&s1, &_tmp__);                                                       \
-			 }))
-
-#define equal(s1, s2) string_equal_(s1, s2)
-
-#define len(s) string_len(&s)
-
-#define substring(src, begin, ...)                                                                 \
-	({                                                                                             \
-		stringNc _ret__ = INIT_STRING;                                                             \
-		int64 _len__ = __VA_OPT__(__VA_ARGS__) __VA_OPT__(NONE)(string_len(&src));                 \
-		string_substring_s(&_ret__, &src, begin, _len__);                                          \
-		_ret__;                                                                                    \
-	})
-
-#define char_at(s, index) string_char_at(s, index)
-
-#define index_of(s1, s2)                                                                           \
-	_Generic((s2), string: ({ string_index_of(&s1, (string *)&s2); }), default: ({                 \
-				 string _tmp__ = String(s2);                                                       \
-				 string_index_of(&s1, (string *)&_tmp__);                                          \
-			 }))
-
-#define last_index_of(s1, s2)                                                                      \
-	_Generic((s2), string: ({ string_last_index_of(&s1, (string *)&s2); }), default: ({            \
-				 string _tmp__ = String(s2);                                                       \
-				 string_last_index_of(&s1, (string *)&_tmp__);                                     \
-			 }))
-
-#define move(x, y) string_move(&x, &y)
-*/
+// Lock macros
+#define lock(s) lock_create(s)
+#define lockr(l) lock_read(l)
+#define lockw(l) lock_write(l)
+#define unlock(l) lock_unlock(l)
+#define notify(l) lock_notify(l)
+#define lwait(l, ...) __VA_OPT__(lock_wait_timeout(l, __VA_ARGS__) NONE)(lock_wait(l))
 
 #endif // _BASE_MACROS__

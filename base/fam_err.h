@@ -32,7 +32,7 @@
 	IllegalArgument, \
 	Overflow, \
 	Underflow, \
-	llocErr, \
+	LockInitErr, \
 	InitErr, \
 	AlreadyInitialized, \
 	IndexOutOfBounds, \

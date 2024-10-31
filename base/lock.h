@@ -12,12 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/colors.h>
-#include <base/fam_err.h>
-#include <base/lock.h>
-#include <base/macro_util.h>
+#ifndef _BASE_LOCK__
+#define _BASE_LOCK__
+
 #include <base/macros.h>
-#include <base/object.h>
-#include <base/print_util.h>
-#include <base/slabs.h>
 #include <base/types.h>
+
+Type(Lock);
+#define Lock DefineType(Lock)
+
+Lock lock_create(bool send);
+void lock_read(Lock lock);
+void lock_write(Lock lock);
+void lock_unlock(Lock lock);
+void lock_notify(Lock lock);
+void lock_wait(Lock lock);
+void lock_wait_timeout(Lock lock, unsigned int millis);
+void lock_condtion_reset(Lock lock);
+
+#endif // _BASE_LOCK__

@@ -14,6 +14,7 @@
 
 #include <base/lib.h>
 #include <base/test.h>
+#include <pthread.h>
 
 MySuite(base);
 
@@ -325,6 +326,58 @@ MyTest(base, test_box) {
 	// upgrade returns nil now
 	Object upgrade_ref = upgrade(weak_ref);
 	cr_assert(nil(upgrade_ref));
+}
+
+Lock l1;
+volatile int state = 0;
+volatile int state2 = 0;
+
+static void *test_thread_start(void *arg) {
+	while (true) {
+		lockw(l1);
+		if (state != 0) {
+			state2 = 1;
+			unlock(l1);
+			break;
+		}
+		unlock(l1);
+	}
+	return NULL;
+}
+
+MyTest(base, test_lock) {
+	l1 = lock_create(true);
+	pthread_t cThread;
+	cr_assert(!pthread_create(&cThread, NULL, test_thread_start, NULL));
+	lockw(l1);
+	state = 1;
+	unlock(l1);
+
+	pthread_join(cThread, NULL);
+	cr_assert_eq(state2, 1);
+	Lock_cleanup(&l1);
+}
+
+Lock l2;
+int wait_state = 0;
+
+static void *test_wait_thread(void *arg) {
+	lwait(l2);
+	wait_state = 1;
+	return NULL;
+}
+
+MyTest(base, test_wait) {
+	l2 = lock(true);
+	cr_assert(ok(l2));
+	pthread_t cThread;
+	cr_assert(!pthread_create(&cThread, NULL, test_wait_thread, NULL));
+	sleep(1);
+	cr_assert_eq(wait_state, 0);
+	notify(l2);
+	pthread_join(cThread, NULL);
+	cr_assert_eq(wait_state, 1);
+	Lock_cleanup(&l2);
 }
 
 MyTest(base, test_limits) {

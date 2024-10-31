@@ -80,6 +80,11 @@ Ptr fam_alloc(unsigned int size, bool send) {
 	return ret;
 }
 Ptr fam_resize(Ptr ptr, unsigned int size) {
+	// this size is reserved for 'null'
+	if (size == UINT32_MAX) {
+		SetErr(Overflow);
+		return NULL;
+	}
 	if (!check_initialize_default_slab_allocator())
 		return NULL;
 
@@ -102,8 +107,8 @@ Ptr fam_resize(Ptr ptr, unsigned int size) {
 }
 
 void fam_release(Ptr *ptr) {
-	if (nil(*ptr)) {
-		panic("fam_free on nil ptr!");
+	if (nil(*ptr) || ptr_len(*ptr) == UINT32_MAX) {
+		panic("fam_free on nil or special ptr!");
 	} else if (ptr_flag_check(*ptr, PTR_FLAGS_DIRECT)) {
 		ptr_direct_release(*ptr);
 	} else if (ptr_flag_check(*ptr, PTR_FLAGS_SEND)) {

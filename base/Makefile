@@ -5,7 +5,8 @@ OBJS := types.o \
 	slabs.o \
 	print_util.o \
 	fam_alloc.o \
-	object.o
+	object.o \
+	lock.o
 
 TEST_OBJS := $(OBJS)
 

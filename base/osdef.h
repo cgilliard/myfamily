@@ -25,9 +25,4 @@ void *realloc(void *ptr, size_t size);
 void free(void *ptr);
 void *memset(void *ptr, int x, size_t n);
 
-/*
-typedef void *pthread_mutex_t;
-int pthread_mutex_lock(pthread_mutex_t *);
-int pthread_mutex_unlock(pthread_mutex_t *);
-int pthread_mutex_init(pthread_mutex_t *mutex, const void *attr);
-*/
+extern int errno;
