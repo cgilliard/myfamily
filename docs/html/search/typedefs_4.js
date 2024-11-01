@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['printpair_475',['PrintPair',['../print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3',1,'print_util.h']]],
-  ['printtype_476',['PrintType',['../print__util_8h.html#ab0be4c3ea59ed61612dfec8979dcb2e9',1,'print_util.h']]],
-  ['ptr_477',['Ptr',['../slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9',1,'slabs.h']]]
+  ['objecttype_529',['ObjectType',['../object_8h.html#a06ae4e2ed34533f72218e1207aa28f18',1,'object.h']]]
 ];

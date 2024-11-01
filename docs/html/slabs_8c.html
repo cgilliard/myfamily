@@ -80,6 +80,8 @@ $(function() {
 <code>#include &lt;<a class="el" href="os_8h_source.html">base/os.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="print__util_8h_source.html">base/print_util.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="slabs_8h_source.html">base/slabs.h</a>&gt;</code><br />
+<code>#include &lt;errno.h&gt;</code><br />
+<code>#include &lt;pthread.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -148,10 +150,10 @@ Functions</h2></td></tr>
 <tr class="separator:a11efcdb3d7283ac731a0fe34db0f025c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a406d53101803802ec6c0d9f488f268"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a0a406d53101803802ec6c0d9f488f268">slab_allocator_index</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa, unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> size)</td></tr>
 <tr class="separator:a0a406d53101803802ec6c0d9f488f268"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28bd2cda4c56cbc64965a87140dd0731"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a28bd2cda4c56cbc64965a87140dd0731">slab_allocator_allocate_sd</a> (<a class="el" href="structSlabData.html">SlabData</a> *sd)</td></tr>
-<tr class="separator:a28bd2cda4c56cbc64965a87140dd0731"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2dde5a389408e1a5c2e7a30c7543ce0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#ae2dde5a389408e1a5c2e7a30c7543ce0">slab_allocator_data_free</a> (<a class="el" href="structSlabData.html">SlabData</a> *sd, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> id)</td></tr>
-<tr class="separator:ae2dde5a389408e1a5c2e7a30c7543ce0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40bbee08bb24deef68f5c4811f35eff6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a40bbee08bb24deef68f5c4811f35eff6">slab_allocator_allocate_sd</a> (<a class="el" href="structSlabData.html">SlabData</a> *sd, <a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa)</td></tr>
+<tr class="separator:a40bbee08bb24deef68f5c4811f35eff6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36cc06c2f7a59f2d6351cecd6795e826"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a36cc06c2f7a59f2d6351cecd6795e826">slab_allocator_data_free</a> (<a class="el" href="structSlabData.html">SlabData</a> *sd, unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> id)</td></tr>
+<tr class="separator:a36cc06c2f7a59f2d6351cecd6795e826"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a509818f78b180ab1c0cbfd2ae9611e62"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a509818f78b180ab1c0cbfd2ae9611e62">slab_allocator_allocate</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa, unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> size)</td></tr>
 <tr class="separator:a509818f78b180ab1c0cbfd2ae9611e62"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4345c1b1cc58977cbf1cd8225f63b7eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a4345c1b1cc58977cbf1cd8225f63b7eb">slab_allocator_free</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa, <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
@@ -163,11 +165,11 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a649fa4e167ed6516456352dc032a0abe"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="structType.html">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a649fa4e167ed6516456352dc032a0abe">null_impl</a> = {.id = 0, .<a class="el" href="macros_8h.html#a86659537194f22ae1712c49e584bf1c8">len</a> = <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>}</td></tr>
 <tr class="separator:a649fa4e167ed6516456352dc032a0abe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ff12917e9f185ac16d922768198a844"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structType.html">Type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a2ff12917e9f185ac16d922768198a844">null</a> = &amp;<a class="el" href="slabs_8h.html#a37a1083f1c208b337ce4517d54014bb0">null_impl</a></td></tr>
+<tr class="memitem:a2ff12917e9f185ac16d922768198a844"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structType.html">Type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a2ff12917e9f185ac16d922768198a844">null</a> = &amp;<a class="el" href="slabs_8c.html#a649fa4e167ed6516456352dc032a0abe">null_impl</a></td></tr>
 <tr class="separator:a2ff12917e9f185ac16d922768198a844"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84fd96d67129f3414699563e14329d54"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structType.html">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a84fd96d67129f3414699563e14329d54">not_null_impl</a> = {.id = 1, .<a class="el" href="macros_8h.html#a86659537194f22ae1712c49e584bf1c8">len</a> = <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>}</td></tr>
 <tr class="separator:a84fd96d67129f3414699563e14329d54"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a348a1b38600859e4e7a1026364ffe57a"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structType.html">Type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a348a1b38600859e4e7a1026364ffe57a">Ok</a> = &amp;<a class="el" href="slabs_8h.html#a84fd96d67129f3414699563e14329d54">not_null_impl</a></td></tr>
+<tr class="memitem:a348a1b38600859e4e7a1026364ffe57a"><td class="memItemLeft" align="right" valign="top">const struct <a class="el" href="structType.html">Type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a348a1b38600859e4e7a1026364ffe57a">Ok</a> = &amp;<a class="el" href="slabs_8c.html#a84fd96d67129f3414699563e14329d54">not_null_impl</a></td></tr>
 <tr class="separator:a348a1b38600859e4e7a1026364ffe57a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -435,8 +437,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a28bd2cda4c56cbc64965a87140dd0731"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a28bd2cda4c56cbc64965a87140dd0731">&#9670;&nbsp;</a></span>slab_allocator_allocate_sd()</h2>
+<a id="a40bbee08bb24deef68f5c4811f35eff6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40bbee08bb24deef68f5c4811f35eff6">&#9670;&nbsp;</a></span>slab_allocator_allocate_sd()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -445,8 +447,18 @@ Variables</h2></td></tr>
           <td class="memname"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> slab_allocator_allocate_sd </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structSlabData.html">SlabData</a> *&#160;</td>
-          <td class="paramname"><em>sd</em></td><td>)</td>
+          <td class="paramname"><em>sd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype"><a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a>&#160;</td>
+          <td class="paramname"><em>sa</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -506,8 +518,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="ae2dde5a389408e1a5c2e7a30c7543ce0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae2dde5a389408e1a5c2e7a30c7543ce0">&#9670;&nbsp;</a></span>slab_allocator_data_free()</h2>
+<a id="a36cc06c2f7a59f2d6351cecd6795e826"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36cc06c2f7a59f2d6351cecd6795e826">&#9670;&nbsp;</a></span>slab_allocator_data_free()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -521,7 +533,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
+          <td class="paramtype">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
           <td class="paramname"><em>id</em>&#160;</td>
         </tr>
         <tr>
@@ -760,7 +772,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const struct <a class="el" href="structType.html">Type</a>* null = &amp;<a class="el" href="slabs_8h.html#a37a1083f1c208b337ce4517d54014bb0">null_impl</a></td>
+          <td class="memname">const struct <a class="el" href="structType.html">Type</a>* null = &amp;<a class="el" href="slabs_8c.html#a649fa4e167ed6516456352dc032a0abe">null_impl</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -788,7 +800,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const struct <a class="el" href="structType.html">Type</a>* Ok = &amp;<a class="el" href="slabs_8h.html#a84fd96d67129f3414699563e14329d54">not_null_impl</a></td>
+          <td class="memname">const struct <a class="el" href="structType.html">Type</a>* Ok = &amp;<a class="el" href="slabs_8c.html#a84fd96d67129f3414699563e14329d54">not_null_impl</a></td>
         </tr>
       </table>
 </div><div class="memdoc">

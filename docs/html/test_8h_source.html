@@ -121,76 +121,75 @@ $(function() {
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    static int64 log_fd = -1;                                                                      \</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    void tear_down() {                                                                             \</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        int64 gslabs = fam_alloc_count_global_allocator();                                         \</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        int64 lslabs = fam_alloc_count_tl_slab_allocator();                                        \</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        if (gslabs || lslabs) {                                                                    \</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            printf(&quot;[%s====%s] %sError in tear_down of test%s &quot;                                    \</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                   &quot;&#39;%s%s%s&#39;.\n[%s====%s] Number of slab allocations not &quot;                         \</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                   &quot;equal to number &quot;                                                              \</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                   &quot;of frees. Memory leak?\n&quot;,                                                     \</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;                   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;            printf(&quot;[%s====%s] &quot;                                                                   \</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                   &quot;gslabs=%llu,lslabs=%llu\n&quot;,                                                    \</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;                   BLUE, RESET, gslabs, lslabs);                                                   \</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            pid_t iPid = getpid();                                                                 \</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            kill(iPid, SIGINT); <span class="comment">/* trigger failure */</span><span class="preprocessor">                                              \</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">        }                                                                                          \</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">        fam_alloc_thread_local_cleanup();                                                          \</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">        fam_alloc_global_cleanup();                                                                \</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">        int64 cur_alloc_count = alloc_sum();                                                       \</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">        int64 cur_free_count = release_sum();                                                      \</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">        int64 diff = cur_alloc_count - cur_free_count;                                             \</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">        if (diff != initial_alloc_diff) {                                                          \</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">            printf(&quot;[%s====%s] %sError in tear_down of test%s &quot;</span>                                    \</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;                   &quot;&#39;%s%s%s&#39;.\n[%s====%s] Number of allocations not &quot;                              \</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                   &quot;equal to number &quot;                                                              \</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;                   &quot;of frees. Memory leak?\n&quot;,                                                     \</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;            printf(&quot;[%s====%s] &quot;                                                                   \</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;                   &quot;initial_alloc_diff=%llu,diff=%llu\n&quot;,                                          \</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;                   BLUE, RESET, initial_alloc_diff, diff);                                         \</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;            pid_t iPid = getpid();                                                                 \</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            kill(iPid, SIGINT); <span class="comment">/* trigger failure */</span><span class="preprocessor">                                              \</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">        }                                                                                          \</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">        if (log_fd &gt; 0)                                                                            \</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">            close(log_fd);                                                                         \</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">    }</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="test_8h.html#a2e6f1698baf6614fafee5b7ffd575cd2">   86</a></span>&#160;<span class="preprocessor">#define MyTest(suite, test)                                                                        \</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">    void setup_##test(void) {                                                                      \</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">        int64 cur_alloc_count = alloc_sum();                                                       \</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">        int64 cur_free_count = release_sum();                                                      \</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">        int64 diff = cur_alloc_count - cur_free_count;                                             \</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">        initial_alloc_diff = diff;                                                                 \</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">        cur_name = #test;                                                                          \</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">        if (access(&quot;bin/nocapture&quot;</span>, F_OK) != 0) {                                                  \</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            char s[100];                                                                           \</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            snprintf(s, 100, &quot;bin/output_%s.log&quot;, #test);                                          \</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            log_fd = open(s, O_WRONLY | O_CREAT | O_TRUNC, 0644);                                  \</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            dup2(log_fd, STDOUT_FILENO);                                                           \</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;            dup2(log_fd, STDERR_FILENO);                                                           \</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        } else {                                                                                   \</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;            log_fd = -1;                                                                           \</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        }                                                                                          \</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    }                                                                                              \</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    void test_##suite##_##test(const byte *test_dir, const byte *resources_dir);                   \</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    Test(suite, test, .init = setup_##test, .fini = tear_down) {                                   \</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        {                                                                                          \</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            char path[PATH_MAX];                                                                   \</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            strcpy(path, &quot;./.&quot;);                                                                   \</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            strcat(path, #suite);                                                                  \</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            strcat(path, &quot;_&quot;);                                                                     \</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            strcat(path, #test);                                                                   \</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            strcat(path, &quot;.fam&quot;);                                                                  \</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            char resources[PATH_MAX];                                                              \</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            strcpy(resources, &quot;.&quot;);                                                                \</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            strcat(resources, &quot;/resources&quot;);                                                       \</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            rmrf(path);                                                                            \</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            mkdir(path, 0700);                                                                     \</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            test_##suite##_##test(path, resources);                                                \</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;            rmrf(path);                                                                            \</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        }                                                                                          \</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    }                                                                                              \</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    void test_##suite##_##test(const byte *test_dir, const byte *resources_dir)</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        if (gslabs) {                                                                              \</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            printf(&quot;[%s====%s] %sError in tear_down of test%s &quot;                                    \</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;                   &quot;&#39;%s%s%s&#39;.\n[%s====%s] Number of slab allocations not &quot;                         \</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;                   &quot;equal to number &quot;                                                              \</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;                   &quot;of frees. Memory leak?\n&quot;,                                                     \</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;                   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            printf(&quot;[%s====%s] &quot;                                                                   \</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                   &quot;gslabs=%llu\n&quot;,                                                                \</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                   BLUE, RESET, gslabs);                                                           \</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;            pid_t iPid = getpid();                                                                 \</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;            kill(iPid, SIGINT); <span class="comment">/* trigger failure */</span><span class="preprocessor">                                              \</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">        }                                                                                          \</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">        fam_alloc_cleanup();                                                                       \</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">        int64 cur_alloc_count = alloc_sum();                                                       \</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">        int64 cur_free_count = release_sum();                                                      \</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">        int64 diff = cur_alloc_count - cur_free_count;                                             \</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">        if (diff != initial_alloc_diff) {                                                          \</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="preprocessor">            printf(&quot;[%s====%s] %sError in tear_down of test%s &quot;</span>                                    \</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                   &quot;&#39;%s%s%s&#39;.\n[%s====%s] Number of allocations not &quot;                              \</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;                   &quot;equal to number &quot;                                                              \</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;                   &quot;of frees. Memory leak?\n&quot;,                                                     \</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;                   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            printf(&quot;[%s====%s] &quot;                                                                   \</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                   &quot;initial_alloc_diff=%llu,diff=%llu\n&quot;,                                          \</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;                   BLUE, RESET, initial_alloc_diff, diff);                                         \</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            pid_t iPid = getpid();                                                                 \</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;            kill(iPid, SIGINT); <span class="comment">/* trigger failure */</span><span class="preprocessor">                                              \</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">        }                                                                                          \</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">        if (log_fd &gt; 0)                                                                            \</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">            close(log_fd);                                                                         \</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">    }</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="test_8h.html#a2e6f1698baf6614fafee5b7ffd575cd2">   84</a></span>&#160;<span class="preprocessor">#define MyTest(suite, test)                                                                        \</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">    void setup_##test(void) {                                                                      \</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">        int64 cur_alloc_count = alloc_sum();                                                       \</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">        int64 cur_free_count = release_sum();                                                      \</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">        int64 diff = cur_alloc_count - cur_free_count;                                             \</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">        initial_alloc_diff =                                                                       \</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">            diff - 1; </span><span class="comment">/* subtract 1 for the global slab allocator (double init) */</span><span class="preprocessor">                 \</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">        cur_name = #test;                                                                          \</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">        if (access(&quot;bin/nocapture&quot;</span>, F_OK) != 0) {                                                  \</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;            char s[100];                                                                           \</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            snprintf(s, 100, &quot;bin/output_%s.log&quot;, #test);                                          \</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;            log_fd = open(s, O_WRONLY | O_CREAT | O_TRUNC, 0644);                                  \</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;            dup2(log_fd, STDOUT_FILENO);                                                           \</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;            dup2(log_fd, STDERR_FILENO);                                                           \</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        } else {                                                                                   \</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;            log_fd = -1;                                                                           \</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        }                                                                                          \</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    }                                                                                              \</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    void test_##suite##_##test(const byte *test_dir, const byte *resources_dir);                   \</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    Test(suite, test, .init = setup_##test, .fini = tear_down) {                                   \</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        {                                                                                          \</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            char path[PATH_MAX];                                                                   \</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            strcpy(path, &quot;./.&quot;);                                                                   \</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            strcat(path, #suite);                                                                  \</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;            strcat(path, &quot;_&quot;);                                                                     \</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;            strcat(path, #test);                                                                   \</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            strcat(path, &quot;.fam&quot;);                                                                  \</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;            char resources[PATH_MAX];                                                              \</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;            strcpy(resources, &quot;.&quot;);                                                                \</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;            strcat(resources, &quot;/resources&quot;);                                                       \</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            rmrf(path);                                                                            \</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;            mkdir(path, 0700);                                                                     \</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;            test_##suite##_##test(path, resources);                                                \</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;            rmrf(path);                                                                            \</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        }                                                                                          \</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    }                                                                                              \</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    void test_##suite##_##test(const byte *test_dir, const byte *resources_dir)</div>
 <div class="ttc" id="acolors_8h_html"><div class="ttname"><a href="colors_8h.html">colors.h</a></div></div>
 <div class="ttc" id="afam__alloc_8h_html"><div class="ttname"><a href="fam__alloc_8h.html">fam_alloc.h</a></div></div>
 <div class="ttc" id="alimits_8h_html"><div class="ttname"><a href="limits_8h.html">limits.h</a></div></div>

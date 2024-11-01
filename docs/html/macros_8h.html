@@ -72,7 +72,8 @@ $(function() {
 <div class="title">macros.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
+<div class="textblock"><code>#include &lt;<a class="el" href="macro__util_8h_source.html">base/macro_util.h</a>&gt;</code><br />
+</div>
 <p><a href="macros_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -87,8 +88,10 @@ Macros</h2></td></tr>
 <tr class="separator:a86659537194f22ae1712c49e584bf1c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ada23c0615668591b7a50c3c068555fb4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)&#160;&#160;&#160;(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a> == <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a> || (<a class="el" href="slabs_8h.html#aa6145cf21b3ae9e2170dbe048baec361">ptr_len</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>) == <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a> &amp;&amp; <a class="el" href="slabs_8h.html#afa8f233da5669c989f2d0f3aca60f2b2">ptr_id</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>) == 0))</td></tr>
 <tr class="separator:ada23c0615668591b7a50c3c068555fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb7c4a60d54632531b77aa3a0f792b24"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#afb7c4a60d54632531b77aa3a0f792b24">ok</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)&#160;&#160;&#160;(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a> != <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a> &amp;&amp; <a class="el" href="slabs_8h.html#afa8f233da5669c989f2d0f3aca60f2b2">ptr_id</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>) != 0)</td></tr>
+<tr class="memitem:afb7c4a60d54632531b77aa3a0f792b24"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#afb7c4a60d54632531b77aa3a0f792b24">ok</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)&#160;&#160;&#160;!<a class="el" href="macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
 <tr class="separator:afb7c4a60d54632531b77aa3a0f792b24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a992279eb769788f08cc7b778db886744"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a992279eb769788f08cc7b778db886744">initialized</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)&#160;&#160;&#160;(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a> != <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a> &amp;&amp; <a class="el" href="slabs_8h.html#aa6145cf21b3ae9e2170dbe048baec361">ptr_len</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>) != <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>)</td></tr>
+<tr class="separator:a992279eb769788f08cc7b778db886744"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a053bae64b5948d2a53250937433fa399"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>(obj)&#160;&#160;&#160;*(int *)<a class="el" href="object_8h.html#a0f14d37208707aa2df3d2d19a7cdd961">object_value_of</a>(obj)</td></tr>
 <tr class="separator:a053bae64b5948d2a53250937433fa399"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48ac624dbd360fab12ed916cd7c2cfac"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a48ac624dbd360fab12ed916cd7c2cfac">move</a>(src)</td></tr>
@@ -99,6 +102,22 @@ Macros</h2></td></tr>
 <tr class="separator:a5334e126ea8c685adf6fee794b206e90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a730dde095de06845c9a0896794c22047"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a730dde095de06845c9a0896794c22047">upgrade</a>(src)&#160;&#160;&#160;<a class="el" href="object_8h.html#af471237e5a9dc589274efeeda0b4e7cc">object_upgrade</a>(src)</td></tr>
 <tr class="separator:a730dde095de06845c9a0896794c22047"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea28b4c44db4f0f1d0f222d6382c04c0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#aea28b4c44db4f0f1d0f222d6382c04c0">lock</a>()&#160;&#160;&#160;(<a class="el" href="lock_8h.html#af15a0ab951e1c8d64690b44d8bc37995">lock_create</a>())</td></tr>
+<tr class="separator:aea28b4c44db4f0f1d0f222d6382c04c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9126c72611296fccf7e4e14547fcb327"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a9126c72611296fccf7e4e14547fcb327">lockr</a>(l)&#160;&#160;&#160;<a class="el" href="lock_8h.html#a925c741943a0db958a33909f2a56c0d8">lock_read</a>(l)</td></tr>
+<tr class="separator:a9126c72611296fccf7e4e14547fcb327"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52580553c6dd4a78a10142881e7338df"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a52580553c6dd4a78a10142881e7338df">lockw</a>(l)&#160;&#160;&#160;<a class="el" href="lock_8h.html#aa1944cc63f1155413258569b0811b907">lock_write</a>(l)</td></tr>
+<tr class="separator:a52580553c6dd4a78a10142881e7338df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67f7c01dd129fc3e1af1feafd0cc357f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a67f7c01dd129fc3e1af1feafd0cc357f">unlock</a>(l)&#160;&#160;&#160;<a class="el" href="lock_8h.html#a700f00b967fea60750a2871ea9800ad6">lock_unlock</a>(l)</td></tr>
+<tr class="separator:a67f7c01dd129fc3e1af1feafd0cc357f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afef8d1ded85eb6e7cab1ad4f9978724e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#afef8d1ded85eb6e7cab1ad4f9978724e">notify</a>(l)&#160;&#160;&#160;<a class="el" href="lock_8h.html#a16a1f8d34495edda7c92ab1a9243b253">lock_notify</a>(l)</td></tr>
+<tr class="separator:afef8d1ded85eb6e7cab1ad4f9978724e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adac20693c8b8ac4001e9ae61cf485372"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#adac20693c8b8ac4001e9ae61cf485372">lwait</a>(l, ...)&#160;&#160;&#160;__VA_OPT__(<a class="el" href="lock_8h.html#a1b046b9de17e830af03461a7b655ad56">lock_wait_timeout</a>(l, __VA_ARGS__) <a class="el" href="macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="el" href="lock_8h.html#a45f8280e494b5d2f55bdb2f15404b1fa">lock_wait</a>(l))</td></tr>
+<tr class="separator:adac20693c8b8ac4001e9ae61cf485372"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d3913c5879046bace071d3b1bb1707b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a5d3913c5879046bace071d3b1bb1707b">rsync</a>(l,  exe)</td></tr>
+<tr class="separator:a5d3913c5879046bace071d3b1bb1707b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91c40aa1bb119a79cec137bde3082bea"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a91c40aa1bb119a79cec137bde3082bea">wsync</a>(l,  exe)</td></tr>
+<tr class="separator:a91c40aa1bb119a79cec137bde3082bea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a1414db03b38a685defc808526be96786"></a>
@@ -113,6 +132,24 @@ Macros</h2></td></tr>
           <td class="paramtype">&#160;</td>
           <td class="paramname">type</td><td>)</td>
           <td>&#160;&#160;&#160;type##Nc __attribute((warn_unused_result, cleanup(type##_cleanup)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a992279eb769788f08cc7b778db886744"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a992279eb769788f08cc7b778db886744">&#9670;&nbsp;</a></span>initialized</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define initialized</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a></td><td>)</td>
+          <td>&#160;&#160;&#160;(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a> != <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a> &amp;&amp; <a class="el" href="slabs_8h.html#aa6145cf21b3ae9e2170dbe048baec361">ptr_len</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>) != <a class="el" href="limits_8h.html#ab5eb23180f7cc12b7d6c04a8ec067fdd">UINT32_MAX</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -155,6 +192,87 @@ Macros</h2></td></tr>
 
 </div>
 </div>
+<a id="aea28b4c44db4f0f1d0f222d6382c04c0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea28b4c44db4f0f1d0f222d6382c04c0">&#9670;&nbsp;</a></span>lock</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define lock</td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td>&#160;&#160;&#160;(<a class="el" href="lock_8h.html#af15a0ab951e1c8d64690b44d8bc37995">lock_create</a>())</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a9126c72611296fccf7e4e14547fcb327"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9126c72611296fccf7e4e14547fcb327">&#9670;&nbsp;</a></span>lockr</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define lockr</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">l</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="lock_8h.html#a925c741943a0db958a33909f2a56c0d8">lock_read</a>(l)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a52580553c6dd4a78a10142881e7338df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a52580553c6dd4a78a10142881e7338df">&#9670;&nbsp;</a></span>lockw</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define lockw</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">l</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="lock_8h.html#aa1944cc63f1155413258569b0811b907">lock_write</a>(l)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adac20693c8b8ac4001e9ae61cf485372"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adac20693c8b8ac4001e9ae61cf485372">&#9670;&nbsp;</a></span>lwait</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define lwait</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">l, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;__VA_OPT__(<a class="el" href="lock_8h.html#a1b046b9de17e830af03461a7b655ad56">lock_wait_timeout</a>(l, __VA_ARGS__) <a class="el" href="macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29">NONE</a>)(<a class="el" href="lock_8h.html#a45f8280e494b5d2f55bdb2f15404b1fa">lock_wait</a>(l))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a48ac624dbd360fab12ed916cd7c2cfac"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a48ac624dbd360fab12ed916cd7c2cfac">&#9670;&nbsp;</a></span>move</h2>
 
@@ -175,7 +293,7 @@ Macros</h2></td></tr>
 <div class="line">        src = <span class="keyword">null</span>;                                                                                \</div>
 <div class="line">        _ret__;                                                                                    \</div>
 <div class="line">    })</div>
-<div class="ttc" id="aobject_8c_html_a3eab117a2742a86816569f2fd0d7c015"><div class="ttname"><a href="object_8c.html#a3eab117a2742a86816569f2fd0d7c015">object_move</a></div><div class="ttdeci">Object object_move(const Object src)</div><div class="ttdef"><b>Definition:</b> object.c:427</div></div>
+<div class="ttc" id="aobject_8c_html_a3eab117a2742a86816569f2fd0d7c015"><div class="ttname"><a href="object_8c.html#a3eab117a2742a86816569f2fd0d7c015">object_move</a></div><div class="ttdeci">Object object_move(const Object src)</div><div class="ttdef"><b>Definition:</b> object.c:428</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -197,6 +315,24 @@ Macros</h2></td></tr>
 
 </div>
 </div>
+<a id="afef8d1ded85eb6e7cab1ad4f9978724e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afef8d1ded85eb6e7cab1ad4f9978724e">&#9670;&nbsp;</a></span>notify</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define notify</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">l</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="lock_8h.html#a16a1f8d34495edda7c92ab1a9243b253">lock_notify</a>(l)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="afb7c4a60d54632531b77aa3a0f792b24"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afb7c4a60d54632531b77aa3a0f792b24">&#9670;&nbsp;</a></span>ok</h2>
 
@@ -208,7 +344,7 @@ Macros</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a></td><td>)</td>
-          <td>&#160;&#160;&#160;(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a> != <a class="el" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a> &amp;&amp; <a class="el" href="slabs_8h.html#afa8f233da5669c989f2d0f3aca60f2b2">ptr_id</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>) != 0)</td>
+          <td>&#160;&#160;&#160;!<a class="el" href="macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -247,6 +383,39 @@ Macros</h2></td></tr>
 
 </div>
 </div>
+<a id="a5d3913c5879046bace071d3b1bb1707b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d3913c5879046bace071d3b1bb1707b">&#9670;&nbsp;</a></span>rsync</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define rsync</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">l, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">exe&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
+<div class="line">        LockGuard l##_lg = <a class="code" href="lock_8c.html#a4b3afccc0cd11d45e63381b1cff3ca20">lock_guard_read</a>(l);                                                     \</div>
+<div class="line">        { exe }                                                                                    \</div>
+<div class="line">    })</div>
+<div class="ttc" id="alock_8c_html_a4b3afccc0cd11d45e63381b1cff3ca20"><div class="ttname"><a href="lock_8c.html#a4b3afccc0cd11d45e63381b1cff3ca20">lock_guard_read</a></div><div class="ttdeci">LockGuard lock_guard_read(Lock l)</div><div class="ttdef"><b>Definition:</b> lock.c:157</div></div>
+</div><!-- fragment -->
+</div>
+</div>
 <a id="a0a6c403907ca907211fd600e019985ed"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0a6c403907ca907211fd600e019985ed">&#9670;&nbsp;</a></span>Type</h2>
 
@@ -264,9 +433,27 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="structType.html">Type</a> *type##Nc;                                                                 \</div>
 <div class="line">    void type##_cleanup(<span class="keyword">const</span> type##Nc *<a class="code" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>);</div>
-<div class="ttc" id="amacros_8h_html_a62e445f378c3862b78618beec533f338"><div class="ttname"><a href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a></div><div class="ttdeci">#define ptr</div><div class="ttdef"><b>Definition:</b> macros.h:25</div></div>
-<div class="ttc" id="astructType_html"><div class="ttname"><a href="structType.html">Type</a></div><div class="ttdef"><b>Definition:</b> slabs.c:25</div></div>
+<div class="ttc" id="amacros_8h_html_a62e445f378c3862b78618beec533f338"><div class="ttname"><a href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a></div><div class="ttdeci">#define ptr</div><div class="ttdef"><b>Definition:</b> macros.h:27</div></div>
+<div class="ttc" id="astructType_html"><div class="ttname"><a href="structType.html">Type</a></div><div class="ttdef"><b>Definition:</b> slabs.c:28</div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a67f7c01dd129fc3e1af1feafd0cc357f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67f7c01dd129fc3e1af1feafd0cc357f">&#9670;&nbsp;</a></span>unlock</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define unlock</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">l</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="lock_8h.html#a700f00b967fea60750a2871ea9800ad6">lock_unlock</a>(l)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
 </div>
 </div>
 <a id="a730dde095de06845c9a0896794c22047"></a>
@@ -303,6 +490,39 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+</div>
+</div>
+<a id="a91c40aa1bb119a79cec137bde3082bea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91c40aa1bb119a79cec137bde3082bea">&#9670;&nbsp;</a></span>wsync</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define wsync</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">l, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">exe&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                                                             \</div>
+<div class="line">        LockGuard l##_lg = <a class="code" href="lock_8c.html#a3baedc559ffa97449bf7fd7505b45d2e">lock_guard_write</a>(l);                                                    \</div>
+<div class="line">        { exe }                                                                                    \</div>
+<div class="line">    })</div>
+<div class="ttc" id="alock_8c_html_a3baedc559ffa97449bf7fd7505b45d2e"><div class="ttname"><a href="lock_8c.html#a3baedc559ffa97449bf7fd7505b45d2e">lock_guard_write</a></div><div class="ttdeci">LockGuard lock_guard_write(Lock l)</div><div class="ttdef"><b>Definition:</b> lock.c:165</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

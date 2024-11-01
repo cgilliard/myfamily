@@ -1,11 +1,12 @@
 var searchData=
 [
-  ['id_89',['id',['../structType.html#af50b4c33ae20d67d6103e65fa460eb3a',1,'Type']]],
-  ['include_5fdir_90',['include_dir',['../xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029',1,'xxdir.c']]],
-  ['index_91',['index',['../md_docs_index.html',1,'']]],
-  ['index_2emd_92',['index.md',['../index_8md.html',1,'']]],
-  ['initial_5fchunks_93',['initial_chunks',['../structSlabType.html#a1d466297e21ede3754d698f991762bf4',1,'SlabType']]],
-  ['initial_5fchunks_94',['INITIAL_CHUNKS',['../slabs_8c.html#ac3931d59f12d01b3107fc3de679ee6c9',1,'slabs.c']]],
+  ['id_88',['id',['../structType.html#af50b4c33ae20d67d6103e65fa460eb3a',1,'Type']]],
+  ['include_5fdir_89',['include_dir',['../xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029',1,'xxdir.c']]],
+  ['index_90',['index',['../md_docs_index.html',1,'']]],
+  ['index_2emd_91',['index.md',['../index_8md.html',1,'']]],
+  ['initial_5fchunks_92',['initial_chunks',['../structSlabType.html#a1d466297e21ede3754d698f991762bf4',1,'SlabType']]],
+  ['initial_5fchunks_93',['INITIAL_CHUNKS',['../slabs_8c.html#ac3931d59f12d01b3107fc3de679ee6c9',1,'slabs.c']]],
+  ['initialized_94',['initialized',['../macros_8h.html#a992279eb769788f08cc7b778db886744',1,'macros.h']]],
   ['int_95',['int',['../macros_8h.html#a053bae64b5948d2a53250937433fa399',1,'macros.h']]],
   ['int64_96',['int64',['../types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632',1,'types.h']]],
   ['int64_5fmax_97',['INT64_MAX',['../limits_8h.html#ad0d744f05898e32d01f73f8af3cd2071',1,'limits.h']]],

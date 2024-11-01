@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['resourcestats_478',['ResourceStats',['../os_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'os.h']]]
+  ['printpair_530',['PrintPair',['../print__util_8h.html#a3c85670d81cc52b60884fc8c3a88e2a3',1,'print_util.h']]],
+  ['printtype_531',['PrintType',['../print__util_8h.html#ab0be4c3ea59ed61612dfec8979dcb2e9',1,'print_util.h']]],
+  ['ptr_532',['Ptr',['../slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9',1,'slabs.h']]]
 ];
