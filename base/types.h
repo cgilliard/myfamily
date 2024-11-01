@@ -36,4 +36,6 @@ typedef _Atomic _Bool abool;
 #define NULL ((void *)0)
 #endif // NULL
 
+typedef unsigned long long size_t;
+
 #endif // _BASE_TYPES__

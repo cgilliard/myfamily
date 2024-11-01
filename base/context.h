@@ -15,6 +15,7 @@
 #ifndef _BASE_CONTEXT__
 #define _BASE_CONTEXT__
 
-void init();
+void init(void (*main)());
+void spawn(void (*fn)());
 
 #endif // _BASE_CONTEXT__

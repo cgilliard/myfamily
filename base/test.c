@@ -15,6 +15,23 @@
 #include <base/lib.h>
 #include <criterion/criterion.h>
 
+void test_spawn() {
+	printf("test spawn\n");
+}
+
+void test_spawn2() {
+	printf("test spawn2\n");
+}
+
+void test_main() {
+	printf("test_main\n");
+
+	spawn(test_spawn);
+	spawn(test_spawn2);
+
+	printf("ret from spawn\n");
+}
+
 Test(base, test_base) {
-	init();
+	init(test_main);
 }

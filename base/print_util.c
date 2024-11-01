@@ -13,16 +13,37 @@
 // limitations under the License.
 
 #include <base/osdef.h>
+#include <base/print_util.h>
 
 void __attribute__((no_return)) panic(const char *fmt, ...) {
 	char buf[1024];
 	__builtin_va_list args;
-	fprintf(stderr, "Panic: ");
+	print("Panic: ");
 	__builtin_va_start(args, fmt);
-	vfprintf(stderr, fmt, args);
-	vsnprintf(buf, 1024, fmt, args);
+	// vfprintf(stderr, fmt, args);
+	// vsnprintf(buf, 1024, fmt, args);
 	__builtin_va_end(args);
-	fprintf(stderr, "\n");
+	print("\n");
 
 	exit(-1);
+}
+
+int println(const char *text) {
+	int size = 0;
+	while (text && text[size])
+		size++;
+	if (write(1, text, size) < 0)
+		return -1;
+	if (write(1, "\n", 1) < 0)
+		return -1;
+	return 0;
+}
+
+int print(const char *text) {
+	int size = 0;
+	while (text && text[size])
+		size++;
+	if (write(1, text, size) < 0)
+		return -1;
+	return 0;
 }

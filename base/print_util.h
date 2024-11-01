@@ -15,6 +15,9 @@
 #ifndef _BASE_PRINT_UTIL__
 #define _BASE_PRINT_UTIL__
 
+int println(const char *text);
+int print(const char *text);
+
 void panic(const char *fmt, ...);
 
 #endif // _BASE_PRINT_UTIL__

@@ -15,9 +15,12 @@
 #ifndef _BASE_OSDEF__
 #define _BASE_OSDEF__
 
-// include for now
-#include <stdio.h>
+#include <base/types.h>
 
 void exit(int);
+size_t getpagesize();
+void *mmap(void *addr, size_t length, int prot, int flags, int fd, size_t offset);
+int munmap(void *addr, size_t length);
+int write(int fd, const char *buf, size_t len);
 
 #endif // _BASE_OSDEF__
