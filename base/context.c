@@ -28,7 +28,7 @@ void (*context_fn_array[10])();
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
-void init(void (*main)()) {
+int init(void (*main)()) {
 	char main_stack[16384];
 
 	println("init");
@@ -62,11 +62,13 @@ void init(void (*main)()) {
 		println("exe complete");
 		context_next++;
 	}
+	return 0;
 }
 
 ucontext_t uctx_spawn, uctx_spawn_return, uctx_spawn_finalize;
 
-void spawn(void (*fn)()) {
+int spawn(void (*fn)()) {
 	context_fn_array[context_execution_count] = fn;
 	context_execution_count++;
+	return 0;
 }

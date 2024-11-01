@@ -18,9 +18,9 @@
 #include <base/types.h>
 
 void exit(int);
-size_t getpagesize();
-void *mmap(void *addr, size_t length, int prot, int flags, int fd, size_t offset);
-int munmap(void *addr, size_t length);
-int write(int fd, const char *buf, size_t len);
+int64 getpagesize();
+void *mmap(void *addr, int64 length, int prot, int flags, int fd, int64 offset);
+int munmap(void *addr, int64 length);
+int write(int fd, const char *buf, int64 len);
 
 #endif // _BASE_OSDEF__
