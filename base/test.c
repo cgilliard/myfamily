@@ -14,6 +14,7 @@
 
 #include <base/lib.h>
 #include <criterion/criterion.h>
+#include <stdio.h>
 
 void test_spawn() {
 	printf("test spawn\n");
