@@ -22,6 +22,12 @@
 
 SlabAllocator global_slab_allocator = NULL;
 
+Ptr fam_ptr_for(unsigned int id, unsigned int len) {
+	if (len > MAX_SLAB_SIZE)
+		return NULL;
+	return ptr_for(global_slab_allocator, id, len);
+}
+
 void __attribute__((constructor)) __init_sa() {
 	if (global_slab_allocator == NULL) {
 		global_slab_allocator = slab_allocator_create();

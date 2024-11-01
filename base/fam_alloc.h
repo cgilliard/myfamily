@@ -22,6 +22,7 @@
 Ptr fam_alloc(unsigned int size);
 Ptr fam_resize(Ptr ptr, unsigned int size);
 void fam_release(Ptr *ptr);
+Ptr fam_ptr_for(unsigned int id, unsigned int len);
 
 #ifdef TEST
 void fam_alloc_cleanup();

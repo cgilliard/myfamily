@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef _BASE_ORBTREE__
+#define _BASE_ORBTREE__
+
+#include <base/macros.h>
+#include <base/slabs.h>
 #include <base/types.h>
-#include <pthread.h>
 
-void *memcpy(void *dest_str, const void *src_str, size_t n);
-int memcmp(const void *str1, const void *str2, size_t n);
-int strcmp(const char *str1, const char *str2);
+Type(OrbTree);
+#define OrbTree DefineType(OrbTree)
 
-void exit(int);
-void *malloc(size_t size);
-void *realloc(void *ptr, size_t size);
-void free(void *ptr);
-void *memset(void *ptr, int x, size_t n);
+OrbTree orbtree_create();
+const void *orbtree_get(const OrbTree tree, int64 namespace, int64 seqno, const char *name,
+						int offset);
+unsigned int orbtree_range_size(const OrbTree tree, int64 namespace);
+int orbtree_remove(OrbTree tree, int64 namespace, int64 seqno, const char *name, int offset);
+int orbtree_put(OrbTree tree, const char *name, int64 namespace, int64 seqno, Ptr value);
+
+#endif // _BASE_ORBTREE__

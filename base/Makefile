@@ -6,7 +6,8 @@ OBJS := types.o \
 	print_util.o \
 	fam_alloc.o \
 	object.o \
-	lock.o
+	lock.o \
+	orbtree.o
 
 TEST_OBJS := $(OBJS)
 

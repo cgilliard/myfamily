@@ -41,6 +41,9 @@ const struct Type not_null_impl = {.id = 1, .len = UINT32_MAX};
 const struct Type *Ok = &not_null_impl;
 
 #define SLAB_OVERHEAD sizeof(Type)
+unsigned int slab_overhead() {
+	return SLAB_OVERHEAD;
+}
 
 unsigned int ptr_len(const Ptr ptr) {
 	return ptr->len;
@@ -358,6 +361,18 @@ void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
 
 	*ptr = null_impl;
 }
+
+Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len) {
+	int index = slab_allocator_index(sa, len);
+	if (index < 0) {
+		panic("Invalid ptr sent to slab_allocator ptr_for! Unknown id=%u,len=%u.", id, len);
+	}
+	SlabData sd = sa->sd_arr[index];
+	int64 offset = slab_allocator_slab_data_offset(&sd, id);
+	Ptr ret = (Type *)(sd.data[index] + offset);
+	return ret;
+}
+
 int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
 	int64 slabs = 0;
 	for (int i = 0; i < sa->sd_count; i++) {

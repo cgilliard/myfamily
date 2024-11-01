@@ -403,6 +403,10 @@ MyTest(base, test_rsync_wsync) {
 	cr_assert_eq(state, 3);
 }
 
+MyTest(base, test_orbtree) {
+	OrbTree tree1 = orbtree_create();
+}
+
 MyTest(base, test_limits) {
 	cr_assert_eq(INT64_MAX, 9223372036854775807LL);
 	cr_assert_eq(INT64_MAX_IMPL, 9223372036854775807LL);

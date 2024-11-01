@@ -46,5 +46,7 @@ SlabAllocator slab_allocator_create();
 Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size);
 void slab_allocator_free(SlabAllocator sa, Ptr ptr);
 int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa);
+Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len);
+unsigned int slab_overhead();
 
 #endif // _BASE_SLABS__
