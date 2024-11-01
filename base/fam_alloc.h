@@ -15,20 +15,16 @@
 #ifndef _BASE_FAM_ALLOC__
 #define _BASE_FAM_ALLOC__
 
-#define PTR_FLAGS_SEND 0
-#define PTR_FLAGS_DIRECT 1
+#define PTR_FLAGS_DIRECT 0
 
 #include <base/slabs.h>
 
-Ptr fam_alloc(unsigned int size, bool send);
+Ptr fam_alloc(unsigned int size);
 Ptr fam_resize(Ptr ptr, unsigned int size);
 void fam_release(Ptr *ptr);
 
-void fam_alloc_thread_local_cleanup();
-
 #ifdef TEST
-void fam_alloc_global_cleanup();
-int64 fam_alloc_count_tl_slab_allocator();
+void fam_alloc_cleanup();
 int64 fam_alloc_count_global_allocator();
 #endif // TEST
 

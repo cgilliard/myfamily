@@ -146,7 +146,7 @@ void test_type_cleanup(const test_type *ptr) {
 }
 
 test_type test_type_create(int64 value) {
-	Ptr ret = fam_alloc(sizeof(int64), false);
+	Ptr ret = fam_alloc(sizeof(int64));
 	if (ret == NULL)
 		return ret;
 
@@ -346,7 +346,7 @@ static void *test_thread_start(void *arg) {
 }
 
 MyTest(base, test_lock) {
-	l1 = lock_create(true);
+	l1 = lock();
 	pthread_t cThread;
 	cr_assert(!pthread_create(&cThread, NULL, test_thread_start, NULL));
 	lockw(l1);
@@ -381,7 +381,7 @@ MyTest(base, test_wait) {
 }
 
 MyTest(base, test_lock_guard) {
-	Lock l3 = lock(false);
+	Lock l3 = lock();
 	{ LockGuard lg = lock_guard_write(l3); }
 
 	lockr(l3);

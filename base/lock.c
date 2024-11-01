@@ -28,11 +28,10 @@ typedef struct LockImpl {
 	pthread_mutex_t mutex_lock;
 	pthread_cond_t cond;
 	bool condition;
-	bool send;
 } LockImpl;
 
-Lock lock_create(bool send) {
-	Ptr ret = fam_alloc(sizeof(LockImpl), send);
+Lock lock_create() {
+	Ptr ret = fam_alloc(sizeof(LockImpl));
 	errno = 0;
 	if (nil(ret))
 		return ret;
@@ -57,7 +56,6 @@ Lock lock_create(bool send) {
 		return NULL;
 	}
 	l->condition = false;
-	l->send = send;
 
 	return ret;
 }
@@ -158,7 +156,7 @@ typedef struct LockGuardImpl {
 
 LockGuard lock_guard_read(Lock l) {
 	LockImpl *li = $(l);
-	Ptr ret = fam_alloc(sizeof(LockGuardImpl), li->send);
+	Ptr ret = fam_alloc(sizeof(LockGuardImpl));
 	LockGuardImpl *lgi = $(ret);
 	lgi->lock = l;
 	lock_read(lgi->lock);
@@ -166,7 +164,7 @@ LockGuard lock_guard_read(Lock l) {
 }
 LockGuard lock_guard_write(Lock l) {
 	LockImpl *li = $(l);
-	Ptr ret = fam_alloc(sizeof(LockGuardImpl), li->send);
+	Ptr ret = fam_alloc(sizeof(LockGuardImpl));
 	LockGuardImpl *lgi = $(ret);
 	lgi->lock = l;
 	lock_write(lgi->lock);

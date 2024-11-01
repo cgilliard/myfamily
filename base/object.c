@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #define OBJECT_FLAG_FAM_ALLOC_RESERVED1 0
-#define OBJECT_FLAG_FAM_ALLOC_RESERVED2 1
+#define OBJECT_FLAG_SEND 1
 #define OBJECT_FLAG_TYPE0 2
 #define OBJECT_FLAG_TYPE1 3
 #define OBJECT_FLAG_TYPE2 4
@@ -94,9 +94,8 @@ void object_set_ptr_type(Ptr ptr, ObjectType type) {
 }
 
 Object object_create_impl(ObjectType type, const void *value, bool send) {
-
 	unsigned int size = object_get_size(type);
-	Ptr ret = fam_alloc(size, send);
+	Ptr ret = fam_alloc(size);
 	if (ret == NULL)
 		return ret;
 
@@ -104,6 +103,7 @@ Object object_create_impl(ObjectType type, const void *value, bool send) {
 		memcpy($(ret), value, size);
 	int64 *aux = ptr_aux(ret);
 	object_set_ptr_type(ret, type);
+	object_set_ptr_flag(ret, OBJECT_FLAG_SEND, send);
 	// set strong count to 1
 	(*aux) |= 0x0000000000000001L;
 
@@ -138,10 +138,10 @@ Object object_create_box(unsigned int size, bool send) {
 		return NULL;
 	}
 	unsigned int box_size = object_get_size(ObjectTypeBox);
-	Ptr ret = fam_alloc(box_size, send);
+	Ptr ret = fam_alloc(box_size);
 	if (ret == NULL)
 		return ret;
-	Ptr ptr = fam_alloc(size, send);
+	Ptr ptr = fam_alloc(size);
 	if (ptr == NULL) {
 		fam_release(&ret);
 		return NULL;
@@ -149,6 +149,7 @@ Object object_create_box(unsigned int size, bool send) {
 	memcpy($(ret), &ptr, box_size);
 	int64 *aux = ptr_aux(ret);
 	object_set_ptr_type(ret, ObjectTypeBox);
+	object_set_ptr_flag(ret, OBJECT_FLAG_SEND, send);
 
 	// set strong count to 1
 	(*aux) |= 0x0000000000000001L;
@@ -276,7 +277,7 @@ Object object_get_property(const Object obj, const char *key) {
 }
 
 int object_decrement_strong(Object obj) {
-	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
+	bool send = object_get_ptr_flag(obj, OBJECT_FLAG_SEND);
 	ObjectType type = object_type(obj);
 	if (send) {
 		int64 *aux = ptr_aux(obj);
@@ -313,7 +314,7 @@ int object_decrement_strong(Object obj) {
 }
 
 int object_increment_strong(Object obj) {
-	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
+	bool send = object_get_ptr_flag(obj, OBJECT_FLAG_SEND);
 	if (send) {
 		int64 *aux = ptr_aux(obj);
 		int64 old_count;
@@ -342,7 +343,7 @@ int object_increment_strong(Object obj) {
 }
 
 int object_decrement_weak(Object obj) {
-	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
+	bool send = object_get_ptr_flag(obj, OBJECT_FLAG_SEND);
 
 	if (send) {
 		int64 *aux = ptr_aux(obj);
@@ -373,7 +374,7 @@ int object_decrement_weak(Object obj) {
 }
 
 int object_increment_weak(Object obj) {
-	bool send = object_get_ptr_flag(obj, PTR_FLAGS_SEND);
+	bool send = object_get_ptr_flag(obj, OBJECT_FLAG_SEND);
 	if (send) {
 		int64 *aux = ptr_aux(obj);
 		int64 old_count;
@@ -435,7 +436,7 @@ Object object_move(const Object src) {
 		return NULL;
 	}
 
-	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
+	bool send = object_get_ptr_flag(src, OBJECT_FLAG_SEND);
 	ObjectNc ret;
 	if (type == ObjectTypeInt || type == ObjectTypeFloat || type == ObjectTypeByte ||
 		type == ObjectTypeBool) {
@@ -471,7 +472,7 @@ Object object_weak(const Object src) {
 		return NULL;
 	}
 	unsigned long long v = (unsigned long long)src;
-	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
+	bool send = object_get_ptr_flag(src, OBJECT_FLAG_SEND);
 	ObjectNc weak = object_create_impl(ObjectTypeWeak, &v, send);
 	if (object_increment_weak(src))
 		return NULL;
@@ -491,7 +492,7 @@ Object object_upgrade(const Object src) {
 
 	unsigned long long *target = object_box_value_of(src);
 	ObjectNc w = (ObjectNc)*target;
-	bool send = object_get_ptr_flag(src, PTR_FLAGS_SEND);
+	bool send = object_get_ptr_flag(src, OBJECT_FLAG_SEND);
 	if (send) {
 		int64 *aux = ptr_aux(w);
 		int64 old_count;

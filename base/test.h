@@ -49,21 +49,19 @@ int rmrf(char *path) {
 	static int64 log_fd = -1;                                                                      \
 	void tear_down() {                                                                             \
 		int64 gslabs = fam_alloc_count_global_allocator();                                         \
-		int64 lslabs = fam_alloc_count_tl_slab_allocator();                                        \
-		if (gslabs || lslabs) {                                                                    \
+		if (gslabs) {                                                                              \
 			printf("[%s====%s] %sError in tear_down of test%s "                                    \
 				   "'%s%s%s'.\n[%s====%s] Number of slab allocations not "                         \
 				   "equal to number "                                                              \
 				   "of frees. Memory leak?\n",                                                     \
 				   BLUE, RESET, RED, RESET, GREEN, cur_name, RESET, BLUE, RESET);                  \
 			printf("[%s====%s] "                                                                   \
-				   "gslabs=%llu,lslabs=%llu\n",                                                    \
-				   BLUE, RESET, gslabs, lslabs);                                                   \
+				   "gslabs=%llu\n",                                                                \
+				   BLUE, RESET, gslabs);                                                           \
 			pid_t iPid = getpid();                                                                 \
 			kill(iPid, SIGINT); /* trigger failure */                                              \
 		}                                                                                          \
-		fam_alloc_thread_local_cleanup();                                                          \
-		fam_alloc_global_cleanup();                                                                \
+		fam_alloc_cleanup();                                                                       \
 		int64 cur_alloc_count = alloc_sum();                                                       \
 		int64 cur_free_count = release_sum();                                                      \
 		int64 diff = cur_alloc_count - cur_free_count;                                             \
@@ -88,7 +86,8 @@ int rmrf(char *path) {
 		int64 cur_alloc_count = alloc_sum();                                                       \
 		int64 cur_free_count = release_sum();                                                      \
 		int64 diff = cur_alloc_count - cur_free_count;                                             \
-		initial_alloc_diff = diff;                                                                 \
+		initial_alloc_diff =                                                                       \
+			diff - 1; /* subtract 1 for the global slab allocator (double init) */                 \
 		cur_name = #test;                                                                          \
 		if (access("bin/nocapture", F_OK) != 0) {                                                  \
 			char s[100];                                                                           \

@@ -18,12 +18,23 @@
 #include <base/osdef.h>
 #include <base/print_util.h>
 
-_Thread_local SlabAllocator tl_slab_allocator = NULL;
-SlabAllocator global_slab_allocator = NULL;
-pthread_mutex_t global_allocator_lock;
+#include <stdio.h>
 
-void __attribute__((constructor)) __init_pthread_lock() {
-	pthread_mutex_init(&global_allocator_lock, NULL);
+SlabAllocator global_slab_allocator = NULL;
+
+void __attribute__((constructor)) __init_sa() {
+	if (global_slab_allocator == NULL) {
+		global_slab_allocator = slab_allocator_create();
+		if (global_slab_allocator == NULL) {
+			panic("Could not initialize global slab allocator!");
+		}
+	}
+}
+
+void __attribute__((destuctor)) __init_sa_tear_down() {
+	if (global_slab_allocator)
+		slab_allocator_cleanup(&global_slab_allocator);
+	global_slab_allocator = NULL;
 }
 
 // use highest byte in aux for flags
@@ -40,40 +51,23 @@ bool ptr_flag_check(Ptr ptr, byte flag) {
 	return (*aux) & ((0x1ULL << (unsigned long long)flag) << 56);
 }
 
-int check_initialize_default_slab_allocator() {
-	if (tl_slab_allocator == NULL)
-		tl_slab_allocator = slab_allocator_create();
-	if (global_slab_allocator == NULL) {
-		pthread_mutex_lock(&global_allocator_lock);
-		if (global_slab_allocator == NULL)
-			global_slab_allocator = slab_allocator_create();
-		pthread_mutex_unlock(&global_allocator_lock);
-	}
-	return tl_slab_allocator && global_slab_allocator;
-}
-
-Ptr fam_alloc(unsigned int size, bool send) {
+Ptr fam_alloc(unsigned int size) {
 	// this size is reserved for 'null'
 	if (size == UINT32_MAX) {
 		SetErr(Overflow);
 		return NULL;
 	}
-	if (!check_initialize_default_slab_allocator())
-		return NULL;
+
 	Ptr ret;
 	if (size > MAX_SLAB_SIZE)
 		ret = ptr_direct_alloc(size);
-	else if (send) {
-		pthread_mutex_lock(&global_allocator_lock);
+	else {
 		ret = slab_allocator_allocate(global_slab_allocator, size);
-		pthread_mutex_unlock(&global_allocator_lock);
-	} else
-		ret = slab_allocator_allocate(tl_slab_allocator, size);
+	}
 
 	if (ret) {
 		int64 *aux = ptr_aux(ret);
 		*aux = 0;
-		ptr_flag_set(ret, PTR_FLAGS_SEND, send);
 		ptr_flag_set(ret, PTR_FLAGS_DIRECT, size > MAX_SLAB_SIZE);
 	}
 
@@ -85,16 +79,13 @@ Ptr fam_resize(Ptr ptr, unsigned int size) {
 		SetErr(Overflow);
 		return NULL;
 	}
-	if (!check_initialize_default_slab_allocator())
-		return NULL;
 
 	if (ptr == NULL) {
 		SetErr(IllegalArgument);
 		return NULL;
 	}
 
-	bool send = ptr_flag_check(ptr, PTR_FLAGS_SEND);
-	Ptr ret = fam_alloc(size, send);
+	Ptr ret = fam_alloc(size);
 	if (ret) {
 		unsigned int len = $len(ptr);
 		if (len > size)
@@ -111,31 +102,18 @@ void fam_release(Ptr *ptr) {
 		panic("fam_free on nil or special ptr!");
 	} else if (ptr_flag_check(*ptr, PTR_FLAGS_DIRECT)) {
 		ptr_direct_release(*ptr);
-	} else if (ptr_flag_check(*ptr, PTR_FLAGS_SEND)) {
-		pthread_mutex_lock(&global_allocator_lock);
+	} else {
 		slab_allocator_free(global_slab_allocator, *ptr);
-		pthread_mutex_unlock(&global_allocator_lock);
-	} else
-		slab_allocator_free(tl_slab_allocator, *ptr);
-}
-
-void fam_alloc_thread_local_cleanup() {
-	slab_allocator_cleanup(&tl_slab_allocator);
+	}
 }
 
 #ifdef TEST
-void fam_alloc_global_cleanup() {
-	slab_allocator_cleanup(&global_slab_allocator);
-}
-
-int64 fam_alloc_count_tl_slab_allocator() {
-	if (tl_slab_allocator == NULL)
-		return 0;
-	return slab_allocator_cur_slabs_allocated(tl_slab_allocator);
+void fam_alloc_cleanup() {
+	if (global_slab_allocator)
+		slab_allocator_cleanup(&global_slab_allocator);
+	global_slab_allocator = NULL;
 }
 int64 fam_alloc_count_global_allocator() {
-	if (global_slab_allocator == NULL)
-		return 0;
 	return slab_allocator_cur_slabs_allocated(global_slab_allocator);
 }
 #endif // TEST

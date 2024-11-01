@@ -21,7 +21,7 @@
 Type(Lock);
 #define Lock DefineType(Lock)
 
-Lock lock_create(bool send);
+Lock lock_create();
 void lock_read(Lock lock);
 void lock_write(Lock lock);
 void lock_unlock(Lock lock);
