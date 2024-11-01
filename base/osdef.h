@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/types.h>
-#include <pthread.h>
+#ifndef _BASE_OSDEF__
+#define _BASE_OSDEF__
 
-void *memcpy(void *dest_str, const void *src_str, size_t n);
-int memcmp(const void *str1, const void *str2, size_t n);
-int strcmp(const char *str1, const char *str2);
+// include for now
+#include <stdio.h>
 
 void exit(int);
-void *malloc(size_t size);
-void *realloc(void *ptr, size_t size);
-void free(void *ptr);
-void *memset(void *ptr, int x, size_t n);
+
+#endif // _BASE_OSDEF__
