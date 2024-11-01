@@ -12,28 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_TYPES__
-#define _BASE_TYPES__
+#ifndef _BASE_CONTEXT__
+#define _BASE_CONTEXT__
 
-#include <base/limits.h>
+void init();
 
-// primitives
-typedef signed long long int64;
-typedef unsigned char byte;
-#define float64 double
-
-// booleans
-#define bool _Bool
-#define true (_Bool)1
-#define false (_Bool)0
-
-// atomics
-typedef _Atomic long long aint64;
-typedef _Atomic _Bool abool;
-
-// NULL
-#ifndef NULL
-#define NULL ((void *)0)
-#endif // NULL
-
-#endif // _BASE_TYPES__
+#endif // _BASE_CONTEXT__

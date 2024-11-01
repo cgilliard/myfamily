@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/lib.h>
 #include <criterion/criterion.h>
 
 Test(base, test_base) {
+	init();
 }

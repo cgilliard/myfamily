@@ -12,28 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_TYPES__
-#define _BASE_TYPES__
+#define _XOPEN_SOURCE
 
-#include <base/limits.h>
+#include <base/context.h>
+#include <base/osdef.h>
+#include <base/print_util.h>
+#include <ucontext.h>
 
-// primitives
-typedef signed long long int64;
-typedef unsigned char byte;
-#define float64 double
+ucontext_t uctx_func1;
 
-// booleans
-#define bool _Bool
-#define true (_Bool)1
-#define false (_Bool)0
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
-// atomics
-typedef _Atomic long long aint64;
-typedef _Atomic _Bool abool;
-
-// NULL
-#ifndef NULL
-#define NULL ((void *)0)
-#endif // NULL
-
-#endif // _BASE_TYPES__
+void init() {
+	printf("init\n");
+	if (getcontext(&uctx_func1)) {
+		panic("getcontext");
+	}
+}
