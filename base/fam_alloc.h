@@ -12,7 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/context.h>
-#include <base/fam_alloc.h>
-#include <base/macros.h>
+#ifndef _BASE_FAM_ALLOC__
+#define _BASE_FAM_ALLOC__
+
+#define PTR_FLAGS_DIRECT 0
+
 #include <base/slabs.h>
+
+Ptr fam_alloc(unsigned int size);
+Ptr fam_resize(Ptr ptr, unsigned int size);
+void fam_release(Ptr ptr);
+Ptr fam_ptr_for(unsigned int id, unsigned int len);
+
+#ifdef TEST
+void fam_alloc_cleanup();
+int64 fam_alloc_count_global_allocator();
+#endif	// TEST
+
+#endif	// _BASE_FAM_ALLOC__

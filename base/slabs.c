@@ -437,7 +437,7 @@ void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
 }
 
 Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len) {
-	int index = slab_allocator_get_index(len);
+	int index = slab_allocator_get_index(len + slab_overhead());
 	if (index < 0) {
 		panic(
 			"Invalid ptr sent to slab_allocator ptr_for! Unknown id=%u,len=%u.",
@@ -445,7 +445,12 @@ Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len) {
 	}
 	SlabData sd = sa->sd_arr[index];
 	int64 offset = slab_allocator_slab_data_offset(&sd, id);
+	index = slab_allocator_slab_data_index(&sd, id);
+	if (index >= sd.cur_chunks) {
+		return NULL;
+	}
 	Ptr *ptrs = $(sd.data);
+
 	Ptr ptr = ptrs[index];
 	Ptr ret = (Type *)($(ptr) + offset);
 	return ret;

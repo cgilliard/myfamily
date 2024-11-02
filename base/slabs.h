@@ -18,6 +18,8 @@
 #include <base/macro_util.h>
 #include <base/types.h>
 
+#define MAX_SLAB_SIZE 65536
+
 extern int slabs_page_size;
 
 typedef struct ResourceStats {
@@ -59,8 +61,9 @@ typedef struct SlabAllocatorImpl *SlabAllocatorNc;
 
 void slab_allocator_cleanup(SlabAllocatorNc *ptr);
 
-#define SlabAllocator                                                                              \
-	SlabAllocatorNc __attribute__((warn_unused_result, cleanup(slab_allocator_cleanup)))
+#define SlabAllocator \
+	SlabAllocatorNc   \
+		__attribute__((warn_unused_result, cleanup(slab_allocator_cleanup)))
 
 SlabAllocator slab_allocator_create();
 Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size);
@@ -71,6 +74,6 @@ Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len);
 #ifdef TEST
 int slab_allocator_get_size(unsigned int index);
 int slab_allocator_get_index(unsigned int size);
-#endif // TEST
+#endif	// TEST
 
-#endif // _BASE_SLABS__
+#endif	// _BASE_SLABS__
