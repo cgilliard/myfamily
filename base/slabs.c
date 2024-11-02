@@ -33,7 +33,8 @@ void __attribute__((constructor)) __get_page_size__() {
 _Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
 
 unsigned int slabs_aligned_size(unsigned int size) {
-	size_t aligned_size = ((size_t)size + slabs_page_size - 1) & ~(slabs_page_size - 1);
+	size_t aligned_size =
+		((size_t)size + slabs_page_size - 1) & ~(slabs_page_size - 1);
 	if (aligned_size >= UINT32_MAX) {
 		SetErr(Overflow);
 		return UINT32_MAX;
@@ -48,8 +49,8 @@ Alloc alloc(unsigned int size) {
 		Alloc ret = {};
 		return ret;
 	}
-	void *ret =
-		mmap(NULL, aligned_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	void *ret = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
+					 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (ret) {
 		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
 	} else {
@@ -111,8 +112,7 @@ void *ptr_aux(const Ptr ptr) {
 Ptr ptr_direct_alloc(unsigned int size) {
 	Alloc a = alloc(size + sizeof(Type));
 	Ptr ret = a.ptr;
-	if (a.ptr == NULL)
-		return NULL;
+	if (a.ptr == NULL) return NULL;
 	ret->len = a.size;
 	ret->id = 0;
 	ret->aux = 0;
@@ -121,8 +121,7 @@ Ptr ptr_direct_alloc(unsigned int size) {
 
 Ptr ptr_direct_resize(Ptr ptr, unsigned int size) {
 	Alloc a = alloc(size + sizeof(Type));
-	if (a.ptr == NULL)
-		return NULL;
+	if (a.ptr == NULL) return NULL;
 	Ptr nptr = a.ptr;
 	nptr->len = a.size;
 	nptr->id = ptr->id;
@@ -156,6 +155,7 @@ typedef struct SlabData {
 	unsigned int cur_chunks;
 	unsigned int cur_slabs;
 	unsigned int free_list_head;
+	int spin_lock;
 } SlabData;
 
 typedef struct SlabAllocatorImpl {
@@ -164,8 +164,7 @@ typedef struct SlabAllocatorImpl {
 } SlabAllocatorImpl;
 
 void slab_allocator_cleanup(SlabAllocator *ptr) {
-	if (ptr == NULL)
-		return;
+	if (ptr == NULL) return;
 	SlabAllocatorNc sa = *ptr;
 	if (sa) {
 		if (sa->sd_count) {
@@ -183,9 +182,9 @@ void slab_allocator_cleanup(SlabAllocator *ptr) {
 			}
 		}
 
-		Alloc saa = {
-			.ptr = sa,
-			.size = slabs_aligned_size(sizeof(SlabAllocatorImpl) + SLAB_SIZES * sizeof(SlabData))};
+		int size = sizeof(SlabAllocatorImpl) + SLAB_SIZES * sizeof(SlabData);
+		unsigned int aligned = slabs_aligned_size(size);
+		Alloc saa = {.ptr = sa, .size = aligned};
 		release(saa);
 		*ptr = NULL;
 	}
@@ -196,18 +195,20 @@ void slab_allocator_init_free_list(SlabData *sd, int64 chunks) {
 	int64 count = chunks * (int64)sd->type.slabs_per_resize;
 	for (int64 i = 0; i < count; i++) {
 		if (i == count - 1) {
-			*(unsigned int *)$(&sd->free_list[i + sd->free_list_head]) = UINT32_MAX;
+			*(unsigned int *)$(&sd->free_list[i + sd->free_list_head]) =
+				UINT32_MAX;
 		} else {
-			*(unsigned int *)$(&sd->free_list[i + sd->free_list_head]) = 1 + i + sd->free_list_head;
+			*(unsigned int *)$(&sd->free_list[i + sd->free_list_head]) =
+				1 + i + sd->free_list_head;
 		}
 	}
 }
 
 int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
 	if (sd->cur_chunks == 0) {
-		sd->free_list = ptr_direct_alloc(chunks * sd->type.slabs_per_resize * sizeof(unsigned int));
-		if (sd->free_list == NULL)
-			return -1;
+		sd->free_list = ptr_direct_alloc(chunks * sd->type.slabs_per_resize *
+										 sizeof(unsigned int));
+		if (sd->free_list == NULL) return -1;
 		sd->data = ptr_direct_alloc(chunks * sizeof(Ptr));
 		if (sd->data == NULL) {
 			ptr_direct_release(sd->free_list);
@@ -215,8 +216,9 @@ int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
 		}
 		Ptr *datalist = ptr_data(sd->data);
 		for (int i = 0; i < chunks; i++) {
-			datalist[i] = ptr_direct_alloc((chunks * sd->type.slabs_per_resize) *
-										   (slab_overhead() + sd->type.slab_size));
+			datalist[i] =
+				ptr_direct_alloc((chunks * sd->type.slabs_per_resize) *
+								 (slab_overhead() + sd->type.slab_size));
 			if (datalist[i] == NULL) {
 				ptr_direct_release(sd->free_list);
 				for (int64 j = i - 1; j >= 0; j--) {
@@ -227,27 +229,28 @@ int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
 			}
 		}
 	} else {
-		if (((int64)chunks + (int64)sd->cur_chunks) * (int64)sd->type.slabs_per_resize >
+		if (((int64)chunks + (int64)sd->cur_chunks) *
+				(int64)sd->type.slabs_per_resize >
 			sd->type.max_slabs) {
 			SetErr(Overflow);
 			return -1;
 		}
 
-		Ptr tmp =
-			ptr_direct_resize(sd->free_list, (chunks + sd->cur_chunks) * sd->type.slabs_per_resize *
-												 sizeof(unsigned int));
-		if (nil(tmp))
-			return -1;
+		int nsize = (chunks + sd->cur_chunks) * sd->type.slabs_per_resize *
+					sizeof(unsigned int);
+		Ptr tmp = ptr_direct_resize(sd->free_list, nsize);
+		if (nil(tmp)) return -1;
 		sd->free_list = tmp;
 
-		Ptr tmp2 = ptr_direct_resize(sd->data, (chunks + sd->cur_chunks) * sizeof(byte *));
-		if (nil(tmp2))
-			return -1;
+		Ptr tmp2 = ptr_direct_resize(
+			sd->data, (chunks + sd->cur_chunks) * sizeof(byte *));
+		if (nil(tmp2)) return -1;
 		sd->data = tmp2;
 		Ptr *data = $(sd->data);
 		for (int64 i = 0; i < chunks; i++) {
-			data[i + sd->cur_chunks] = ptr_direct_alloc(sd->type.slabs_per_resize *
-														(slab_overhead() + sd->type.slab_size));
+			data[i + sd->cur_chunks] =
+				ptr_direct_alloc(sd->type.slabs_per_resize *
+								 (slab_overhead() + sd->type.slab_size));
 			if (data[i + sd->cur_chunks] == NULL) {
 				for (int64 j = i - 1; j >= 0; j--) {
 					ptr_direct_release(data[j + sd->cur_chunks]);
@@ -267,6 +270,7 @@ int slab_allocator_init_data(SlabData *sd) {
 	sd->free_list_head = UINT32_MAX;
 	sd->free_list = NULL;
 	sd->data = NULL;
+	sd->spin_lock = 0;
 
 	if (sd->type.initial_chunks) {
 		if (slab_allocator_increase_chunks(sd, sd->type.initial_chunks))
@@ -277,53 +281,45 @@ int slab_allocator_init_data(SlabData *sd) {
 
 int slab_allocator_init_state(SlabAllocator sa) {
 	for (int i = 0; i < sa->sd_count; i++) {
-		if (slab_allocator_init_data(&sa->sd_arr[i]))
-			return -1;
+		if (slab_allocator_init_data(&sa->sd_arr[i])) return -1;
 	}
 
 	return 0;
 }
 
 int slab_allocator_get_size(unsigned int index) {
-	if (index <= 256)
-		return index * 16;
-	if (index <= 496)
-		return (index - 240) * 256;
+	if (index <= 256) return index * 16;
+	if (index <= 496) return (index - 240) * 256;
 	return -1;
 }
 
 int slab_allocator_get_index(unsigned int size) {
-	if (size <= 4096)
-		return (15 + size) / 16;
-	if (size <= 65536)
-		return 240 + (255 + size) / 256;
+	if (size <= 4096) return (15 + size) / 16;
+	if (size <= 65536) return 240 + (255 + size) / 256;
 	return -1;
 }
 
 SlabAllocator slab_allocator_create() {
 	SlabAllocatorNc ret;
-	ret->sd_count = 0;
-	while (slab_allocator_get_size(1 + ret->sd_count) >= 0)
-		ret->sd_count++;
-	Alloc a = alloc(sizeof(SlabAllocatorImpl) + ret->sd_count * sizeof(SlabData));
-	if (a.ptr == NULL)
-		return NULL;
+	Alloc a = alloc(sizeof(SlabAllocatorImpl) + SLAB_SIZES * sizeof(SlabData));
+	if (a.ptr == NULL) return NULL;
 	ret = a.ptr;
 	ret->sd_count = 0;
 
 	int size;
 	while ((size = slab_allocator_get_size(ret->sd_count)) >= 0) {
 		SlabData *sd = &ret->sd_arr[ret->sd_count];
-		sd->type = (const SlabType) {.slab_size = size,
-									 .slabs_per_resize = SLABS_PER_RESIZE,
-									 .initial_chunks = INITIAL_CHUNKS,
-									 .max_slabs = UINT32_MAX};
+		sd->type = (const SlabType){.slab_size = size,
+									.slabs_per_resize = SLABS_PER_RESIZE,
+									.initial_chunks = INITIAL_CHUNKS,
+									.max_slabs = UINT32_MAX};
 		ret->sd_count++;
 	}
 	ret->sd_count--;
 
 	if (ret->sd_count != SLAB_SIZES)
-		panic("sd_count mismatch. Expected %i, Found %i!", SLAB_SIZES, ret->sd_count);
+		panic("sd_count mismatch. Expected %i, Found %i!", SLAB_SIZES,
+			  ret->sd_count);
 
 	if (slab_allocator_init_state(ret)) {
 		slab_allocator_cleanup(&ret);
@@ -332,14 +328,130 @@ SlabAllocator slab_allocator_create() {
 
 	return ret;
 }
+
+int64 slab_allocator_slab_data_index(SlabData *sd, int64 id) {
+	return id / sd->type.slabs_per_resize;
+}
+
+int64 slab_allocator_slab_data_offset(SlabData *sd, int64 id) {
+	return (id % sd->type.slabs_per_resize) *
+		   (slab_overhead() + sd->type.slab_size);
+}
+
+Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
+	if (sd->free_list_head == UINT32_MAX) {
+		bool err_cond = false;
+		// spinlock only allowing one thread to enter critical section
+		int expected_spin_lock = 0;
+		int desired_spin_lock = 1;
+		// spin while the spin_lock value is not equal to 0 then set it to 1
+		do {
+		} while (!__atomic_compare_exchange_n(
+					 &sd->spin_lock, &expected_spin_lock, desired_spin_lock,
+					 false, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED) &&
+				 __atomic_load_n(&sd->spin_lock, __ATOMIC_RELAXED) != 0);
+		if (sd->free_list_head == UINT32_MAX) {
+			if (slab_allocator_increase_chunks(sd, 1)) {
+				err_cond = true;
+			}
+			if (!err_cond && sd->free_list_head == UINT32_MAX) {
+				SetErr(CapacityExceeded);
+			}
+		}
+
+		// set the spin_lock back to 0
+		__atomic_store(&sd->spin_lock, &expected_spin_lock, __ATOMIC_RELEASE);
+
+		if (err_cond) return NULL;
+	}
+
+	unsigned int old_free_list_head;
+	unsigned int new_free_list_head;
+	Ptr ptr;
+
+	do {
+		old_free_list_head = sd->free_list_head;
+		int64 index = slab_allocator_slab_data_index(sd, old_free_list_head);
+		int64 offset = slab_allocator_slab_data_offset(sd, old_free_list_head);
+
+		Ptr *ptrs = $(sd->data);
+		ptr = (Type *)($(ptrs[index]) + offset);
+		ptr->id = old_free_list_head;
+		ptr->len = sd->type.slab_size;
+		new_free_list_head = ((unsigned int *)$(sd->free_list))[ptr->id];
+
+	} while (!__atomic_compare_exchange_n(
+		&sd->free_list_head, &old_free_list_head, new_free_list_head, false,
+		__ATOMIC_RELAXED, __ATOMIC_RELAXED));
+
+	__atomic_fetch_add(&sd->cur_slabs, 1, __ATOMIC_RELAXED);
+
+	return ptr;
+}
+
 Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size) {
-	return NULL;
+	int index = slab_allocator_get_index(size + slab_overhead());
+	if (index < 0) return NULL;
+
+	Ptr ret = slab_allocator_allocate_sd(&sa->sd_arr[index], sa);
+
+	return ret;
 }
+
+void slab_allocator_data_free(SlabData *sd, unsigned int id) {
+	unsigned int old_free_list_head;
+	unsigned int new_free_list_head;
+	do {
+		old_free_list_head = sd->free_list_head;
+		new_free_list_head = id;  // Calculate new_free_list_head here
+		((unsigned int *)$(sd->free_list))[id] =
+			old_free_list_head;	 // Update sd->free_list[id] here
+	} while (!__atomic_compare_exchange_n(
+		&sd->free_list_head, &old_free_list_head, new_free_list_head, false,
+		__ATOMIC_RELAXED, __ATOMIC_RELAXED));
+	__atomic_fetch_sub(&sd->cur_slabs, 1, __ATOMIC_RELAXED);
+}
+
 void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
+	if (ptr == NULL || sa == NULL) {
+		panic("Invalid ptr sent to slab_allocator free!");
+	}
+	unsigned int len = ptr_len(ptr) + slab_overhead();
+	int index = slab_allocator_get_index(len);
+	if (index < 0) {
+		panic("Invalid ptr sent to slab_allocator free! Unknown size %lli.",
+			  len);
+	}
+	if (sa->sd_arr[index].type.slab_size != len) {
+		panic(
+			"Invalid ptr sent to slab_allocator free! Size mismatch %lli vs. "
+			"%lli.",
+			sa->sd_arr[index].type.slab_size, len);
+	}
+
+	slab_allocator_data_free(&sa->sd_arr[index], ptr->id);
 }
-int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
-	return 0;
-}
+
 Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len) {
-	return NULL;
+	int index = slab_allocator_get_index(len);
+	if (index < 0) {
+		panic(
+			"Invalid ptr sent to slab_allocator ptr_for! Unknown id=%u,len=%u.",
+			id, len);
+	}
+	SlabData sd = sa->sd_arr[index];
+	int64 offset = slab_allocator_slab_data_offset(&sd, id);
+	Ptr *ptrs = $(sd.data);
+	Ptr ptr = ptrs[index];
+	Ptr ret = (Type *)($(ptr) + offset);
+	return ret;
+}
+
+int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
+	int64 slabs = 0;
+	for (int i = 0; i < sa->sd_count; i++) {
+		SlabData *sd = &sa->sd_arr[i];
+		slabs += __atomic_fetch_add(&sd->cur_slabs, 0, __ATOMIC_RELAXED);
+	}
+	return slabs;
 }

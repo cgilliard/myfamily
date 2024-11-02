@@ -71,15 +71,13 @@ Test(base, test_ptr) {
 	unsigned int initial_size = ptr_len(next);
 
 	char *buf = ptr_data(next);
-	for (int i = 0; i < 1000; i++)
-		buf[i] = 'a' + (i % 26);
+	for (int i = 0; i < 1000; i++) buf[i] = 'a' + (i % 26);
 
 	Ptr nptr = ptr_direct_resize(next, 100000);
 	cr_assert(nptr);
 	cr_assert(ptr_len(nptr) > initial_size);
 	char *buf2 = ptr_data(nptr);
-	for (int i = 0; i < 1000; i++)
-		cr_assert_eq(buf2[i], 'a' + (i % 26));
+	for (int i = 0; i < 1000; i++) cr_assert_eq(buf2[i], 'a' + (i % 26));
 
 	$release(nptr);
 	cr_assert_eq(alloc_sum(), release_sum());
@@ -112,8 +110,38 @@ Test(base, test_slab_sizes) {
 }
 
 Test(base, test_slab_allocator) {
+	{
+		SlabAllocator sa = slab_allocator_create();
+		Ptr ptr = slab_allocator_allocate(sa, 100);
+		cr_assert($len(ptr) >= 100);
+		byte *arr = $(ptr);
+		for (int i = 0; i < 100; i++) {
+			arr[i] = i;
+		}
+		for (int i = 0; i < 100; i++) {
+			cr_assert_eq(arr[i], i);
+		}
+		cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 1);
+		slab_allocator_free(sa, ptr);
+		cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
+	}
+	cr_assert(alloc_sum() > 0);
+	cr_assert_eq(alloc_sum(), release_sum());
 
-	{ SlabAllocator sa = slab_allocator_create(); }
+	{
+		SlabAllocator sa = slab_allocator_create();
+		for (int i = 0; i < 1000; i++) {
+			Ptr ptr = slab_allocator_allocate(sa, i);
+			cr_assert($len(ptr) >= i);
+			byte *arr = $(ptr);
+			for (int j = 0; j < 100; j++) {
+				arr[j] = j;
+			}
+			cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 1);
+			slab_allocator_free(sa, ptr);
+			cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
+		}
+	}
 	cr_assert(alloc_sum() > 0);
 	cr_assert_eq(alloc_sum(), release_sum());
 }
