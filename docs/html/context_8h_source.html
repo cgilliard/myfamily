@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Family: base/fam_alloc.h Source File</title>
+<title>My Family: base/context.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -67,10 +67,10 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">fam_alloc.h</div>  </div>
+<div class="title">context.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<a href="fam__alloc_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (c) 2024, The MyFamily Developers</span></div>
+<a href="context_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (c) 2024, The MyFamily Developers</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// you may not use this file except in compliance with the License.</span></div>
@@ -84,30 +84,16 @@ $(function() {
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// See the License for the specific language governing permissions and</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// limitations under the License.</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _BASE_FAM_ALLOC__</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _BASE_FAM_ALLOC__</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _BASE_CONTEXT__</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _BASE_CONTEXT__</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="fam__alloc_8h.html#ae282bce41876bdfab0c199c192cc3d12">   18</a></span>&#160;<span class="preprocessor">#define PTR_FLAGS_DIRECT 0</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="slabs_8h.html">base/slabs.h</a>&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<a class="code" href="structType.html">Ptr</a> <a class="code" href="fam__alloc_8h.html#abb096f96545b75a695c622158f96d2c4">fam_alloc</a>(<span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> size);</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<a class="code" href="structType.html">Ptr</a> <a class="code" href="fam__alloc_8h.html#a945cece8f10f1fe5955e813e17c69149">fam_resize</a>(<a class="code" href="structType.html">Ptr</a> <a class="code" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> size);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keywordtype">void</span> <a class="code" href="fam__alloc_8h.html#abe92993e943faafab950ad0d3b9abea5">fam_release</a>(<a class="code" href="structType.html">Ptr</a> *<a class="code" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#ifdef TEST</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keywordtype">void</span> fam_alloc_cleanup();</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<a class="code" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> fam_alloc_count_global_allocator();</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// TEST</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _BASE_FAM_ALLOC__</span></div>
-<div class="ttc" id="afam__alloc_8h_html_a945cece8f10f1fe5955e813e17c69149"><div class="ttname"><a href="fam__alloc_8h.html#a945cece8f10f1fe5955e813e17c69149">fam_resize</a></div><div class="ttdeci">Ptr fam_resize(Ptr ptr, unsigned int size)</div><div class="ttdef"><b>Definition:</b> fam_alloc.c:76</div></div>
-<div class="ttc" id="afam__alloc_8h_html_abb096f96545b75a695c622158f96d2c4"><div class="ttname"><a href="fam__alloc_8h.html#abb096f96545b75a695c622158f96d2c4">fam_alloc</a></div><div class="ttdeci">Ptr fam_alloc(unsigned int size)</div><div class="ttdef"><b>Definition:</b> fam_alloc.c:54</div></div>
-<div class="ttc" id="afam__alloc_8h_html_abe92993e943faafab950ad0d3b9abea5"><div class="ttname"><a href="fam__alloc_8h.html#abe92993e943faafab950ad0d3b9abea5">fam_release</a></div><div class="ttdeci">void fam_release(Ptr *ptr)</div><div class="ttdef"><b>Definition:</b> fam_alloc.c:100</div></div>
-<div class="ttc" id="amacros_8h_html_a62e445f378c3862b78618beec533f338"><div class="ttname"><a href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a></div><div class="ttdeci">#define ptr</div><div class="ttdef"><b>Definition:</b> macros.h:27</div></div>
-<div class="ttc" id="aslabs_8h_html"><div class="ttname"><a href="slabs_8h.html">slabs.h</a></div></div>
-<div class="ttc" id="astructType_html"><div class="ttname"><a href="structType.html">Type</a></div><div class="ttdef"><b>Definition:</b> slabs.c:28</div></div>
-<div class="ttc" id="atypes_8h_html_a87dc1c46a17e3ee6037afdb6aef76632"><div class="ttname"><a href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a></div><div class="ttdeci">signed long long int64</div><div class="ttdef"><b>Definition:</b> types.h:21</div></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keywordtype">int</span> <a class="code" href="context_8h.html#abde79b090a5cbda9d15a927bc609cd19">init</a>(<span class="keywordtype">void</span> (*<a class="code" href="xxdir_8c.html#a3c04138a5bfe5d72780bb7e82a18e627">main</a>)());</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keywordtype">int</span> <a class="code" href="context_8h.html#ad87adf5d4d5557201685a2224f02e0a3">spawn</a>(<span class="keywordtype">void</span> (*fn)());</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160; </div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#endif </span><span class="comment">// _BASE_CONTEXT__</span></div>
+<div class="ttc" id="acontext_8h_html_abde79b090a5cbda9d15a927bc609cd19"><div class="ttname"><a href="context_8h.html#abde79b090a5cbda9d15a927bc609cd19">init</a></div><div class="ttdeci">int init(void(*main)())</div><div class="ttdef"><b>Definition:</b> context.c:31</div></div>
+<div class="ttc" id="acontext_8h_html_ad87adf5d4d5557201685a2224f02e0a3"><div class="ttname"><a href="context_8h.html#ad87adf5d4d5557201685a2224f02e0a3">spawn</a></div><div class="ttdeci">int spawn(void(*fn)())</div><div class="ttdef"><b>Definition:</b> context.c:70</div></div>
+<div class="ttc" id="axxdir_8c_html_a3c04138a5bfe5d72780bb7e82a18e627"><div class="ttname"><a href="xxdir_8c.html#a3c04138a5bfe5d72780bb7e82a18e627">main</a></div><div class="ttdeci">int main(int argc, char **argv)</div><div class="ttdef"><b>Definition:</b> xxdir.c:126</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

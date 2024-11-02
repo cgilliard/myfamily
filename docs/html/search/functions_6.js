@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['include_5fdir_392',['include_dir',['../xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029',1,'xxdir.c']]]
+  ['real_5fmain_146',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]]
 ];

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['env_375',['env',['../os_8c.html#ab1029554223128593b38fc1418758cb8',1,'env(const byte *name):&#160;os.c'],['../os_8h.html#ab1029554223128593b38fc1418758cb8',1,'env(const byte *name):&#160;os.c']]],
-  ['exit_376',['exit',['../osdef_8h.html#a6f255d924f7a6bb2c4be0c8c2f2d9ce3',1,'osdef.h']]]
+  ['include_5fdir_136',['include_dir',['../xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029',1,'xxdir.c']]],
+  ['init_137',['init',['../context_8c.html#abde79b090a5cbda9d15a927bc609cd19',1,'init(void(*main)()):&#160;context.c'],['../context_8h.html#abde79b090a5cbda9d15a927bc609cd19',1,'init(void(*main)()):&#160;context.c']]]
 ];

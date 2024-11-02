@@ -1,12 +1,10 @@
 var searchData=
 [
-  ['cat_19',['CAT',['../macro__util_8h.html#ac2c0beae88659357798c2fddb38a6518',1,'macro_util.h']]],
-  ['cati_20',['CATI',['../macro__util_8h.html#a5cc8b4a50caacab5cbfb24c7e9e44431',1,'macro_util.h']]],
-  ['colors_2ec_21',['colors.c',['../colors_8c.html',1,'']]],
-  ['colors_2eh_22',['colors.h',['../colors_8h.html',1,'']]],
-  ['cond_23',['cond',['../structLockImpl.html#adfc6ca048189f14f849e3a24c24f106d',1,'LockImpl']]],
-  ['condition_24',['condition',['../structLockImpl.html#a5e4d0efb8c151bd7935e78b713cd5b11',1,'LockImpl']]],
-  ['cur_5fchunks_25',['cur_chunks',['../structSlabData.html#a4dbacb9ed828ba076b77fd6a664f1b44',1,'SlabData']]],
-  ['cur_5fslabs_26',['cur_slabs',['../structSlabData.html#a3a8797f1addd34ae741de1dc4cb511ce',1,'SlabData']]],
-  ['cyan_27',['CYAN',['../colors_8h.html#ad243f93c16bc4c1d3e0a13b84421d760',1,'colors.h']]]
+  ['cat_11',['CAT',['../macro__util_8h.html#ac2c0beae88659357798c2fddb38a6518',1,'macro_util.h']]],
+  ['cati_12',['CATI',['../macro__util_8h.html#a5cc8b4a50caacab5cbfb24c7e9e44431',1,'macro_util.h']]],
+  ['context_2ec_13',['context.c',['../context_8c.html',1,'']]],
+  ['context_2eh_14',['context.h',['../context_8h.html',1,'']]],
+  ['context_5fexecution_5fcount_15',['context_execution_count',['../context_8c.html#a9e87b3b25801e71620c84fea3d8d45cb',1,'context.c']]],
+  ['context_5ffn_5farray_16',['context_fn_array',['../context_8c.html#ada6eea96e7ac2daeb643ea41b487308a',1,'context.c']]],
+  ['context_5fnext_17',['context_next',['../context_8c.html#af51331f565409be4f926fe58a296f6f0',1,'context.c']]]
 ];

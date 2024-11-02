@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['fam_5falloc_377',['fam_alloc',['../fam__alloc_8c.html#abb096f96545b75a695c622158f96d2c4',1,'fam_alloc(unsigned int size):&#160;fam_alloc.c'],['../fam__alloc_8h.html#abb096f96545b75a695c622158f96d2c4',1,'fam_alloc(unsigned int size):&#160;fam_alloc.c']]],
-  ['fam_5frelease_378',['fam_release',['../fam__alloc_8c.html#abe92993e943faafab950ad0d3b9abea5',1,'fam_release(Ptr *ptr):&#160;fam_alloc.c'],['../fam__alloc_8h.html#abe92993e943faafab950ad0d3b9abea5',1,'fam_release(Ptr *ptr):&#160;fam_alloc.c']]],
-  ['fam_5fresize_379',['fam_resize',['../fam__alloc_8c.html#a945cece8f10f1fe5955e813e17c69149',1,'fam_resize(Ptr ptr, unsigned int size):&#160;fam_alloc.c'],['../fam__alloc_8h.html#a945cece8f10f1fe5955e813e17c69149',1,'fam_resize(Ptr ptr, unsigned int size):&#160;fam_alloc.c']]],
-  ['free_380',['free',['../osdef_8h.html#afbedc913aa4651b3c3b4b3aecd9b4711',1,'osdef.h']]]
+  ['main_138',['main',['../xxdir_8c.html#a3c04138a5bfe5d72780bb7e82a18e627',1,'main(int argc, char **argv):&#160;xxdir.c'],['../rbtree__perf_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;rbtree_perf.c']]],
+  ['mmap_139',['mmap',['../osdef_8h.html#aa08854e989818265b10d635a27d4eaf1',1,'osdef.h']]],
+  ['munmap_140',['munmap',['../osdef_8h.html#acccc7b33cc69e0ae8fc68031ea8128a2',1,'osdef.h']]]
 ];
