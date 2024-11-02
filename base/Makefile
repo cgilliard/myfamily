@@ -1,4 +1,8 @@
-OBJS := types.o print_util.o context.o
+OBJS := types.o \
+	print_util.o \
+	context.o \
+	fam_err.o \
+	slabs.o
 
 TEST_OBJS := $(OBJS)
 

@@ -46,6 +46,11 @@ void __attribute__((constructor)) __check_64bit_arch__() {
 	if (sizeof(abool) != 1)
 		panic("abool must be 1 byte. Invalid arch!");
 
+	/*
+		if (getpagesize() != 4096)
+			panic("pagesize must be 4096 bytes. Invalid arch!");
+	*/
+
 	// little endian check
 	int test = 0x1;
 	if (*(byte *)&test != 0x1) {

@@ -13,3 +13,5 @@
 // limitations under the License.
 
 #include <base/context.h>
+#include <base/macros.h>
+#include <base/slabs.h>

@@ -67,8 +67,9 @@ int init(void (*main)()) {
 
 ucontext_t uctx_spawn, uctx_spawn_return, uctx_spawn_finalize;
 
-int spawn(void (*fn)()) {
+Topic spawn(void (*fn)()) {
 	context_fn_array[context_execution_count] = fn;
 	context_execution_count++;
-	return 0;
+	Topic t = {};
+	return t;
 }

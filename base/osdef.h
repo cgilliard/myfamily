@@ -16,11 +16,12 @@
 #define _BASE_OSDEF__
 
 #include <base/types.h>
+#include <sys/mman.h>
 
 void exit(int);
 int64 getpagesize();
-void *mmap(void *addr, int64 length, int prot, int flags, int fd, int64 offset);
-int munmap(void *addr, int64 length);
 int write(int fd, const char *buf, int64 len);
+char *getenv(const char *name);
+void *memcpy(void *, const void *, size_t);
 
 #endif // _BASE_OSDEF__
