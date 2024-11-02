@@ -300,6 +300,9 @@ int slab_allocator_get_index(unsigned int size) {
 }
 
 SlabAllocator slab_allocator_create() {
+	if (slabs_page_size == 0) {
+		panic("slabs_page_size == 0");
+	}
 	SlabAllocatorNc ret;
 	Alloc a = alloc(sizeof(SlabAllocatorImpl) + SLAB_SIZES * sizeof(SlabData));
 	if (a.ptr == NULL) return NULL;
@@ -309,8 +312,10 @@ SlabAllocator slab_allocator_create() {
 	int size;
 	while ((size = slab_allocator_get_size(ret->sd_count)) >= 0) {
 		SlabData *sd = &ret->sd_arr[ret->sd_count];
+		int slabs_per_resize = slabs_page_size / (slab_overhead() + size);
+		if (slabs_per_resize == 0) slabs_per_resize = 1;
 		sd->type = (const SlabType){.slab_size = size,
-									.slabs_per_resize = SLABS_PER_RESIZE,
+									.slabs_per_resize = slabs_per_resize,
 									.initial_chunks = INITIAL_CHUNKS,
 									.max_slabs = UINT32_MAX};
 		ret->sd_count++;
