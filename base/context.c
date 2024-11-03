@@ -28,10 +28,13 @@ void (*context_fn_array[10])();
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
+void Topic_cleanup(const Topic *ptr) {
+}
+
 int init(void (*main)()) {
 	char main_stack[16384];
 
-	println("init");
+	println("init %i", 3);
 	if (getcontext(&uctx_main)) {
 		panic("getcontext");
 	}
@@ -70,6 +73,6 @@ ucontext_t uctx_spawn, uctx_spawn_return, uctx_spawn_finalize;
 Topic spawn(void (*fn)()) {
 	context_fn_array[context_execution_count] = fn;
 	context_execution_count++;
-	Topic t = {};
+	Topic t;
 	return t;
 }

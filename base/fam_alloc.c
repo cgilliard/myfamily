@@ -17,7 +17,6 @@
 #include <base/macros.h>
 #include <base/osdef.h>
 #include <base/print_util.h>
-#include <stdio.h>
 
 SlabAllocator global_slab_allocator = NULL;
 

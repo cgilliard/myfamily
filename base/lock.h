@@ -12,12 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_PRINT_UTIL__
-#define _BASE_PRINT_UTIL__
+#ifndef _BASE_LOCK__
+#define _BASE_LOCK__
 
-int println(const char *text, ...);
-int print(const char *fmt, ...);
+#include <base/macros.h>
+#include <base/slabs.h>
 
-void panic(const char *fmt, ...);
+Type(Lock);
+#define Lock DefineType(Lock)
 
-#endif	// _BASE_PRINT_UTIL__
+Lock lock_create();
+void lock_read(Lock lock);
+void lock_write(Lock lock);
+void lock_unlock(Lock lock);
+
+Type(LockGuard);
+#define LockGuard DefineType(LockGuard)
+
+LockGuard lock_guard_read(Lock l);
+LockGuard lock_guard_write(Lock l);
+
+#ifdef TEST
+unsigned long long lock_get_state(Lock lock);
+#endif	// TEST
+
+#endif	// _BASE_LOCK__

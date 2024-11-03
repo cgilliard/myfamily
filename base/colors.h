@@ -12,12 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_PRINT_UTIL__
-#define _BASE_PRINT_UTIL__
+#ifndef _BASE_COLORS__
+#define _BASE_COLORS__
 
-int println(const char *text, ...);
-int print(const char *fmt, ...);
+#include <base/types.h>
 
-void panic(const char *fmt, ...);
+byte *get_dimmed();
+#define DIMMED get_dimmed()
 
-#endif	// _BASE_PRINT_UTIL__
+byte *get_red();
+#define RED get_red()
+
+byte *get_bright_red();
+#define BRIGHT_RED get_bright_red()
+
+byte *get_green();
+#define GREEN get_green()
+
+byte *get_yellow();
+#define YELLOW get_yellow()
+
+byte *get_cyan();
+#define CYAN get_cyan()
+
+byte *get_magenta();
+#define MAGENTA get_magenta()
+
+byte *get_blue();
+#define BLUE get_blue()
+
+byte *get_reset();
+#define RESET get_reset()
+
+#endif	// _BASE_COLORS__

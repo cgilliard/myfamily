@@ -107,8 +107,6 @@ void *ptr_aux(const Ptr ptr) {
 	return &ptr->aux;
 }
 
-#include <stdio.h>
-
 Ptr ptr_direct_alloc(unsigned int size) {
 	Alloc a = alloc(size + sizeof(Type));
 	Ptr ret = a.ptr;

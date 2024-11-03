@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_PRINT_UTIL__
-#define _BASE_PRINT_UTIL__
+#ifndef _BASE_QUEUE__
+#define _BASE_QUEUE__
 
-int println(const char *text, ...);
-int print(const char *fmt, ...);
+#include <base/macros.h>
+#include <base/slabs.h>
 
-void panic(const char *fmt, ...);
+Type(Queue);
+#define Queue DefineType(Queue)
 
-#endif	// _BASE_PRINT_UTIL__
+Queue queue_create();
+int queue_enqueue(Ptr data);
+Ptr queue_dequeue();
+
+#endif	// _BASE_QUEUE__

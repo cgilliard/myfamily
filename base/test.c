@@ -14,8 +14,11 @@
 
 #include <base/lib.h>
 #include <base/osdef.h>
-#include <criterion/criterion.h>
+// #include <criterion/criterion.h>
+#include <base/test.h>
 #include <stdio.h>
+
+MySuite(base);
 
 void test_spawn() {
 	printf("test spawn\n");
@@ -28,8 +31,8 @@ void test_spawn2() {
 void test_main() {
 	printf("test_main\n");
 
-	spawn(test_spawn);
-	spawn(test_spawn2);
+	Topic t = spawn(test_spawn);
+	Topic t2 = spawn(test_spawn2);
 
 	printf("ret from spawn\n");
 }
@@ -206,4 +209,88 @@ Test(base, test_fam_alloc) {
 		cr_assert_eq(arr[i], i % 100);
 	}
 	cr_assert(nil(direct3));
+}
+
+MyTest(base, test_queue) {
+	Queue queue = queue_create();
+}
+
+MyTest(base, test_lock) {
+	Lock l1 = lock_create();
+	cr_assert_eq(lock_get_state(l1), 0);
+	lock_read(l1);
+	unsigned long long state = lock_get_state(l1);
+	// upper bits incremented by 1.
+	cr_assert_eq(state >> 32, 1);
+	// lower bits also incremeneted by 1.
+	cr_assert_eq(state & 0xFFFFFFFF, 1);
+
+	lock_unlock(l1);
+	state = lock_get_state(l1);
+	// upper bits incremented by 1.
+	cr_assert_eq(state >> 32, 2);
+	// lower bits also decremented by 1.
+	cr_assert_eq(state & 0xFFFFFFFF, 0);
+
+	lock_write(l1);
+	state = lock_get_state(l1);
+	// upper bits incremented by 1.
+	cr_assert_eq(state >> 32, 3);
+	// lower bits high bit set
+	cr_assert_eq(state & 0xFFFFFFFF, 0x80000000);
+
+	lock_unlock(l1);
+
+	state = lock_get_state(l1);
+	// upper bits incremented by 1.
+	cr_assert_eq(state >> 32, 4);
+	// lower bits are set to 0 now
+	cr_assert_eq(state & 0xFFFFFFFF, 0x00000000);
+}
+
+Lock l1;
+volatile int state = 0;
+volatile int state2 = 0;
+
+static void *test_thread_start(void *arg) {
+	while (true) {
+		lockw(l1);
+		if (state != 0) {
+			state2 += 1;
+			unlock(l1);
+			break;
+		}
+		unlock(l1);
+	}
+	return NULL;
+}
+
+MyTest(base, test_lock2) {
+	l1 = lock();
+	pthread_t cThread;
+	cr_assert(!pthread_create(&cThread, NULL, test_thread_start, NULL));
+	sleep(1);
+
+	lockw(l1);
+	state = 1;
+	unlock(l1);
+
+	pthread_join(cThread, NULL);
+	cr_assert_eq(state2, 1);
+	Lock_cleanup(&l1);
+}
+
+MyTest(base, test_rsync_wsync) {
+	Lock l1 = lock();
+	int state = 1;
+	cr_assert_eq(state, 1);
+
+	for (int i = 0; i < 10; i++) {
+		rsync(l1, { state = 2; });
+		cr_assert_eq(state, 2);
+
+		wsync(l1, { state = 3; });
+		cr_assert_eq(state, 3);
+	}
+	cr_assert_eq(state, 3);
 }

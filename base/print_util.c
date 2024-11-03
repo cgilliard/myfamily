@@ -14,13 +14,14 @@
 
 #include <base/osdef.h>
 #include <base/print_util.h>
+#include <stdio.h>
 
 void __attribute__((no_return)) panic(const char *fmt, ...) {
 	char buf[1024];
 	__builtin_va_list args;
 	print("Panic: ");
 	__builtin_va_start(args, fmt);
-	// vfprintf(stderr, fmt, args);
+	vfprintf(stderr, fmt, args);
 	// vsnprintf(buf, 1024, fmt, args);
 	__builtin_va_end(args);
 	print("\n");
@@ -28,22 +29,19 @@ void __attribute__((no_return)) panic(const char *fmt, ...) {
 	exit(-1);
 }
 
-int println(const char *text) {
-	int size = 0;
-	while (text && text[size])
-		size++;
-	if (write(1, text, size) < 0)
-		return -1;
-	if (write(1, "\n", 1) < 0)
-		return -1;
+int println(const char *fmt, ...) {
+	__builtin_va_list args;
+	__builtin_va_start(args, fmt);
+	vfprintf(stderr, fmt, args);
+	__builtin_va_end(args);
+	printf("\n");
 	return 0;
 }
 
-int print(const char *text) {
-	int size = 0;
-	while (text && text[size])
-		size++;
-	if (write(1, text, size) < 0)
-		return -1;
+int print(const char *fmt, ...) {
+	__builtin_va_list args;
+	__builtin_va_start(args, fmt);
+	vfprintf(stderr, fmt, args);
+	__builtin_va_end(args);
 	return 0;
 }

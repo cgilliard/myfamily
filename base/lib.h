@@ -14,5 +14,7 @@
 
 #include <base/context.h>
 #include <base/fam_alloc.h>
+#include <base/lock.h>
 #include <base/macros.h>
+#include <base/queue.h>
 #include <base/slabs.h>

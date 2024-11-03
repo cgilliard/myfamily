@@ -61,9 +61,6 @@
 #define lockr(l) lock_read(l)
 #define lockw(l) lock_write(l)
 #define unlock(l) lock_unlock(l)
-#define notify(l) lock_notify(l)
-#define lwait(l, ...) \
-	__VA_OPT__(lock_wait_timeout(l, __VA_ARGS__) NONE)(lock_wait(l))
 #define rsync(l, exe)                          \
 	({                                         \
 		LockGuard l##_lg = lock_guard_read(l); \
