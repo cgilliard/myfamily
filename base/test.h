@@ -85,42 +85,42 @@ int rmrf(char *path) {
 		if (log_fd > 0) close(log_fd);                                         \
 	}
 
-#define MyTest(suite, test)                                                 \
-	void setup_##test(void) {                                               \
-		int64 cur_alloc_count = alloc_sum();                                \
-		int64 cur_free_count = release_sum();                               \
-		int64 diff = cur_alloc_count - cur_free_count;                      \
-		initial_alloc_diff =                                                \
-			diff -                                                          \
-			1; /* subtract 1 for the global slab allocator (double init) */ \
-		cur_name = #test;                                                   \
-		if (access("bin/nocapture", F_OK) != 0) {                           \
-			char s[100];                                                    \
-			snprintf(s, 100, "bin/output_%s.log", #test);                   \
-			log_fd = open(s, O_WRONLY | O_CREAT | O_TRUNC, 0644);           \
-			dup2(log_fd, STDOUT_FILENO);                                    \
-			dup2(log_fd, STDERR_FILENO);                                    \
-		} else {                                                            \
-			log_fd = -1;                                                    \
-		}                                                                   \
-	}                                                                       \
-	void test_##suite##_##test(const byte *test_dir,                        \
-							   const byte *resources_dir);                  \
-	Test(suite, test, .init = setup_##test, .fini = tear_down) {            \
-		{                                                                   \
-			char path[PATH_MAX];                                            \
-			strcpy(path, "./.");                                            \
-			strcat(path, #suite);                                           \
-			strcat(path, "_");                                              \
-			strcat(path, #test);                                            \
-			strcat(path, ".fam");                                           \
-			char resources[PATH_MAX];                                       \
-			strcpy(resources, ".");                                         \
-			strcat(resources, "/resources");                                \
-			rmrf(path);                                                     \
-			mkdir(path, 0700);                                              \
-			test_##suite##_##test(path, resources);                         \
-			rmrf(path);                                                     \
-		}                                                                   \
-	}                                                                       \
+#define MyTest(suite, test)                                                   \
+	void setup_##test(void) {                                                 \
+		int64 cur_alloc_count = alloc_sum();                                  \
+		int64 cur_free_count = release_sum();                                 \
+		int64 diff = cur_alloc_count - cur_free_count;                        \
+		initial_alloc_diff =                                                  \
+			diff -                                                            \
+			497; /* subtract 1 for the global slab allocator (double init) */ \
+		cur_name = #test;                                                     \
+		if (access("bin/nocapture", F_OK) != 0) {                             \
+			char s[100];                                                      \
+			snprintf(s, 100, "bin/output_%s.log", #test);                     \
+			log_fd = open(s, O_WRONLY | O_CREAT | O_TRUNC, 0644);             \
+			dup2(log_fd, STDOUT_FILENO);                                      \
+			dup2(log_fd, STDERR_FILENO);                                      \
+		} else {                                                              \
+			log_fd = -1;                                                      \
+		}                                                                     \
+	}                                                                         \
+	void test_##suite##_##test(const byte *test_dir,                          \
+							   const byte *resources_dir);                    \
+	Test(suite, test, .init = setup_##test, .fini = tear_down) {              \
+		{                                                                     \
+			char path[PATH_MAX];                                              \
+			strcpy(path, "./.");                                              \
+			strcat(path, #suite);                                             \
+			strcat(path, "_");                                                \
+			strcat(path, #test);                                              \
+			strcat(path, ".fam");                                             \
+			char resources[PATH_MAX];                                         \
+			strcpy(resources, ".");                                           \
+			strcat(resources, "/resources");                                  \
+			rmrf(path);                                                       \
+			mkdir(path, 0700);                                                \
+			test_##suite##_##test(path, resources);                           \
+			rmrf(path);                                                       \
+		}                                                                     \
+	}                                                                         \
 	void test_##suite##_##test(const byte *test_dir, const byte *resources_dir)

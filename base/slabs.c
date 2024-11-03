@@ -178,6 +178,7 @@ void slab_allocator_cleanup(SlabAllocator *ptr) {
 					ptr_direct_release(sd->data);
 					sd->cur_chunks = 0;
 				}
+				Lock_cleanup(&sd->lock);
 			}
 		}
 
@@ -379,7 +380,6 @@ Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 	} while (!__atomic_compare_exchange_n(
 		&sd->free_list_head, &old_free_list_head, new_free_list_head, false,
 		__ATOMIC_RELAXED, __ATOMIC_RELAXED));
-
 	__atomic_fetch_add(&sd->cur_slabs, 1, __ATOMIC_RELAXED);
 
 	return ptr;
@@ -456,7 +456,7 @@ int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
 	int64 slabs = 0;
 	for (int i = 0; i < sa->sd_count; i++) {
 		SlabData *sd = &sa->sd_arr[i];
-		slabs += __atomic_fetch_add(&sd->cur_slabs, 0, __ATOMIC_RELAXED);
+		slabs += __atomic_load_n(&sd->cur_slabs, __ATOMIC_RELAXED);
 	}
 	return slabs;
 }

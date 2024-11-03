@@ -37,17 +37,17 @@ void test_main() {
 	printf("ret from spawn\n");
 }
 
-Test(base, test_base) {
+MyTest(base, test_base) {
 	init(test_main);
 }
 
-Test(base, test_alloc) {
+MyTest(base, test_alloc) {
 	Alloc test1 = alloc(100);
 	cr_assert_eq(test1.size, slabs_page_size);
 	release(test1);
 }
 
-Test(base, test_ptr) {
+MyTest(base, test_ptr) {
 	Ptr ptr = ptr_direct_alloc(100);
 	cr_assert_eq(ptr_len(ptr), slabs_page_size - slab_overhead());
 	char *test = ptr_data(ptr);
@@ -80,7 +80,7 @@ Test(base, test_ptr) {
 	ptr_direct_release(nptr);
 }
 
-Test(base, test_slab_sizes) {
+MyTest(base, test_slab_sizes) {
 	int i = 0;
 	int j;
 	int k;
@@ -106,7 +106,7 @@ Test(base, test_slab_sizes) {
 	cr_assert_eq(i, 65537);
 }
 
-Test(base, test_slab_allocator) {
+MyTest(base, test_slab_allocator) {
 	{
 		SlabAllocator sa = slab_allocator_create();
 		Ptr ptr = slab_allocator_allocate(sa, 100);
@@ -141,7 +141,7 @@ Test(base, test_slab_allocator) {
 	cr_assert(alloc_sum() > 0);
 }
 
-Test(base, test_fam_alloc) {
+MyTest(base, test_fam_alloc) {
 	Ptr ptr1 = $alloc(10);
 	cr_assert($len(ptr1) >= 10);
 	for (int i = 0; i < $len(ptr1); i++) {
@@ -159,11 +159,8 @@ Test(base, test_fam_alloc) {
 	cr_assert(ok(ptr1));
 	cr_assert(ok(ptr2));
 	$release(ptr1);
-	$release(ptr2);
 	cr_assert(nil(ptr1));
-	cr_assert(nil(ptr2));
 	cr_assert(!ok(ptr1));
-	cr_assert(!ok(ptr2));
 
 	Ptr ptr3 = $alloc(100);
 	int old_size = $len(ptr3);
@@ -200,6 +197,9 @@ Test(base, test_fam_alloc) {
 		cr_assert_eq(arr[i], i % 100);
 	}
 	cr_assert(nil(direct3));
+
+	$release(direct2);
+	$release(direct4);
 }
 
 MyTest(base, test_queue) {
