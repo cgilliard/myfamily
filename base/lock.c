@@ -27,8 +27,8 @@ typedef struct LockImpl {
 } LockImpl;
 
 Lock lock_create() {
-	Ptr ret = fam_alloc(sizeof(LockImpl));
-	if (!ret) return NULL;
+	Ptr ret = ptr_direct_alloc(sizeof(LockImpl));
+	if (nil(ret)) return NULL;
 	LockImpl *impl = $(ret);
 	impl->state = 0;
 	return ret;
@@ -102,7 +102,7 @@ void lock_unlock(Lock lock) {
 
 void Lock_cleanup(const Lock *ptr) {
 	if (!nil(*ptr)) {
-		fam_release(*ptr);
+		ptr_direct_release(*ptr);
 	}
 }
 

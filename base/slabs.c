@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/fam_err.h>
+#include <base/lock.h>
 #include <base/macros.h>
 #include <base/osdef.h>
 #include <base/print_util.h>
@@ -153,7 +154,7 @@ typedef struct SlabData {
 	unsigned int cur_chunks;
 	unsigned int cur_slabs;
 	unsigned int free_list_head;
-	int spin_lock;
+	Ptr lock;
 } SlabData;
 
 typedef struct SlabAllocatorImpl {
@@ -268,7 +269,7 @@ int slab_allocator_init_data(SlabData *sd) {
 	sd->free_list_head = UINT32_MAX;
 	sd->free_list = NULL;
 	sd->data = NULL;
-	sd->spin_lock = 0;
+	sd->lock = lock();
 
 	if (sd->type.initial_chunks) {
 		if (slab_allocator_increase_chunks(sd, sd->type.initial_chunks))
@@ -344,6 +345,8 @@ int64 slab_allocator_slab_data_offset(SlabData *sd, int64 id) {
 Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 	bool err_cond = false;
 
+	lockw(sd->lock);
+
 	if (sd->free_list_head == UINT32_MAX) {
 		if (slab_allocator_increase_chunks(sd, 1)) {
 			err_cond = true;
@@ -352,6 +355,7 @@ Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 			SetErr(CapacityExceeded);
 		}
 	}
+	unlock(sd->lock);
 
 	if (err_cond) return NULL;
 
@@ -364,11 +368,13 @@ Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 		int64 index = slab_allocator_slab_data_index(sd, old_free_list_head);
 		int64 offset = slab_allocator_slab_data_offset(sd, old_free_list_head);
 
+		lockr(sd->lock);
 		Ptr *ptrs = $(sd->data);
 		ptr = (Type *)($(ptrs[index]) + offset);
 		ptr->id = old_free_list_head;
 		ptr->len = sd->type.slab_size;
 		new_free_list_head = ((unsigned int *)$(sd->free_list))[ptr->id];
+		unlock(sd->lock);
 
 	} while (!__atomic_compare_exchange_n(
 		&sd->free_list_head, &old_free_list_head, new_free_list_head, false,
@@ -394,8 +400,10 @@ void slab_allocator_data_free(SlabData *sd, unsigned int id) {
 	do {
 		old_free_list_head = sd->free_list_head;
 		new_free_list_head = id;  // Calculate new_free_list_head here
+		lockr(sd->lock);
 		((unsigned int *)$(sd->free_list))[id] =
 			old_free_list_head;	 // Update sd->free_list[id] here
+		unlock(sd->lock);
 	} while (!__atomic_compare_exchange_n(
 		&sd->free_list_head, &old_free_list_head, new_free_list_head, false,
 		__ATOMIC_RELAXED, __ATOMIC_RELAXED));
@@ -435,10 +443,12 @@ Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len) {
 	if (index >= sd.cur_chunks) {
 		return NULL;
 	}
-	Ptr *ptrs = $(sd.data);
 
+	lockr(sd.lock);
+	Ptr *ptrs = $(sd.data);
 	Ptr ptr = ptrs[index];
 	Ptr ret = (Type *)($(ptr) + offset);
+	unlock(sd.lock);
 	return ret;
 }
 

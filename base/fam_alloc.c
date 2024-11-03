@@ -62,7 +62,6 @@ Ptr fam_alloc(unsigned int size) {
 		SetErr(Overflow);
 		return NULL;
 	}
-
 	Ptr ret;
 	if (size > MAX_SLAB_SIZE)
 		ret = ptr_direct_alloc(size);

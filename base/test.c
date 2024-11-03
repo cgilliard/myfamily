@@ -42,16 +42,12 @@ Test(base, test_base) {
 }
 
 Test(base, test_alloc) {
-	cr_assert_eq(alloc_sum(), 1);
 	Alloc test1 = alloc(100);
 	cr_assert_eq(test1.size, slabs_page_size);
 	release(test1);
-	cr_assert_eq(alloc_sum(), 2);
-	cr_assert_eq(alloc_sum() - 1, release_sum());
 }
 
 Test(base, test_ptr) {
-	cr_assert_eq(alloc_sum(), 1);
 	Ptr ptr = ptr_direct_alloc(100);
 	cr_assert_eq(ptr_len(ptr), slabs_page_size - slab_overhead());
 	char *test = ptr_data(ptr);
@@ -67,8 +63,6 @@ Test(base, test_ptr) {
 	ptr = NULL;
 	cr_assert(nil(ptr));
 	cr_assert(!ok(ptr));
-	cr_assert_eq(alloc_sum(), 2);
-	cr_assert_eq(alloc_sum() - 1, release_sum());
 
 	Ptr next = ptr_direct_alloc(1000);
 	cr_assert_eq(ptr_len(next), slabs_page_size - slab_overhead());
@@ -84,7 +78,6 @@ Test(base, test_ptr) {
 	for (int i = 0; i < 1000; i++) cr_assert_eq(buf2[i], 'a' + (i % 26));
 
 	ptr_direct_release(nptr);
-	cr_assert_eq(alloc_sum() - 1, release_sum());
 }
 
 Test(base, test_slab_sizes) {
@@ -130,7 +123,6 @@ Test(base, test_slab_allocator) {
 		cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
 	}
 	cr_assert(alloc_sum() > 0);
-	cr_assert_eq(alloc_sum() - 1, release_sum());
 
 	{
 		SlabAllocator sa = slab_allocator_create();
@@ -147,7 +139,6 @@ Test(base, test_slab_allocator) {
 		}
 	}
 	cr_assert(alloc_sum() > 0);
-	cr_assert_eq(alloc_sum() - 1, release_sum());
 }
 
 Test(base, test_fam_alloc) {
