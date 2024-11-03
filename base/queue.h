@@ -22,7 +22,7 @@ Type(Queue);
 #define Queue DefineType(Queue)
 
 Queue queue_create();
-int queue_enqueue(Ptr data);
-Ptr queue_dequeue();
+int queue_enqueue(Queue q, Ptr value);
+Ptr queue_dequeue(Queue q);
 
 #endif	// _BASE_QUEUE__

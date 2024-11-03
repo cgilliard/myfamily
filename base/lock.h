@@ -32,6 +32,9 @@ Type(LockGuard);
 LockGuard lock_guard_read(Lock l);
 LockGuard lock_guard_write(Lock l);
 
+// create a lock using direct allocation (as opposed to slab allocator)
+Lock lock_create_direct();
+
 #ifdef TEST
 unsigned long long lock_get_state(Lock lock);
 #endif	// TEST

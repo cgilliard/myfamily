@@ -18,6 +18,7 @@
 typedef struct QueueNode {
 	byte b;
 	Ptr next;
+	Ptr value;
 } QueueNode;
 
 typedef struct QueueImpl {
@@ -39,10 +40,36 @@ Queue queue_create() {
 	impl->head = impl->tail = node;
 	return ret;
 }
-int queue_enqueue(Ptr data) {
+
+int queue_enqueue(Queue queue, Ptr value) {
+	QueueImpl *q = $(queue);
+	Ptr node = $alloc(sizeof(QueueNode));
+	if (node == NULL) return -1;
+	QueueNode *qnode = $(node);
+	qnode->value = value;
+	qnode->next = NULL;
+
+	Ptr tail;
+	Ptr next;
+	loop {
+		tail = q->tail;
+		next = ((QueueNode *)$(tail))->next;
+		if (tail == q->tail) {
+			if (((QueueNode *)$(next)) == NULL) {
+				if (CAS(&((QueueNode *)$(tail))->next, &next, node)) {
+					CAS(&q->tail, &tail, node);
+					break;
+				}
+			} else {
+				CAS(&q->tail, &tail, next);
+			}
+		}
+	}
+
 	return 0;
 }
-Ptr queue_dequeue() {
+
+Ptr queue_dequeue(Queue q) {
 	return NULL;
 }
 

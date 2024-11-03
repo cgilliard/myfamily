@@ -72,4 +72,10 @@
 		{ exe }                                 \
 	})
 
+// CAS
+#define CAS(...)                                                      \
+	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_RELAXED, \
+								__ATOMIC_RELAXED)
+#define CAS_SEQ(...) __atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
+
 #endif	// _BASE_MACROS__

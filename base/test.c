@@ -204,6 +204,7 @@ MyTest(base, test_fam_alloc) {
 
 MyTest(base, test_queue) {
 	Queue queue = queue_create();
+	// queue_enqueue(NULL);
 }
 
 MyTest(base, test_lock) {

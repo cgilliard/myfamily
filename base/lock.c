@@ -24,13 +24,24 @@ typedef struct LockImpl {
 	// indicates 'write pending' - a writer would like to write the lower 31
 	// bits are used as a counter for active readers.
 	unsigned long long state;
+	bool direct;
 } LockImpl;
 
-Lock lock_create() {
+Lock lock_create_direct() {
 	Ptr ret = ptr_direct_alloc(sizeof(LockImpl));
 	if (nil(ret)) return NULL;
 	LockImpl *impl = $(ret);
 	impl->state = 0;
+	impl->direct = true;
+	return ret;
+}
+
+Lock lock_create() {
+	Ptr ret = fam_alloc(sizeof(LockImpl));
+	if (nil(ret)) return NULL;
+	LockImpl *impl = $(ret);
+	impl->state = 0;
+	impl->direct = false;
 	return ret;
 }
 void lock_read(Lock lock) {
@@ -102,7 +113,11 @@ void lock_unlock(Lock lock) {
 
 void Lock_cleanup(const Lock *ptr) {
 	if (!nil(*ptr)) {
-		ptr_direct_release(*ptr);
+		LockImpl *impl = $(*ptr);
+		if (impl->direct)
+			ptr_direct_release(*ptr);
+		else
+			fam_release(*ptr);
 	}
 }
 

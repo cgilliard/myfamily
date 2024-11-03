@@ -270,7 +270,7 @@ int slab_allocator_init_data(SlabData *sd) {
 	sd->free_list_head = UINT32_MAX;
 	sd->free_list = NULL;
 	sd->data = NULL;
-	sd->lock = lock();
+	sd->lock = lock_create_direct();
 
 	if (sd->type.initial_chunks) {
 		if (slab_allocator_increase_chunks(sd, sd->type.initial_chunks))
