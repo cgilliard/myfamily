@@ -52,16 +52,13 @@ void lock_read(Lock lock) {
 	unsigned long long state_update;
 	do {
 		// get current state set the write_pending bit to false
-		state =
-			__atomic_load_n(&impl->state, __ATOMIC_SEQ_CST) & ~0x80000000ULL;
+		state = ALOAD(&impl->state) & ~0x80000000ULL;
 		// increment the read counter and add 1 to the sequence number (upper 32
 		// bits)
 		state_update = (state + 0x100000000ULL) + 1ULL;
 		// while our target state (no change including sequence number and
-		// write_pending = false, we spin)
-	} while (!__atomic_compare_exchange_n(&impl->state, &state, state_update,
-										  false, __ATOMIC_SEQ_CST,
-										  __ATOMIC_SEQ_CST));
+		// write_pending != false, we spin)
+	} while (!CAS_ACQUIRE(&impl->state, &state, state_update));
 }
 void lock_write(Lock lock) {
 	_lock_is_write__ = true;
@@ -69,18 +66,24 @@ void lock_write(Lock lock) {
 
 	unsigned long long state;
 	unsigned long long state_update;
+
+	// first step, set write bit true indicating a writer is waiting
+	// this lock should be obtained soon after the previous writer
+	// is complete indicating to readers our desire to write
+	// this avoids write starvation
 	do {
-		// get current state set the write_pending bit to false (we can't write
-		// until it's false) also set the read counter to 0, we can't write
-		// until both conditions are met
-		state = __atomic_load_n(&impl->state, __ATOMIC_SEQ_CST) &
-				0xFFFFFFFF00000000ULL;
+		state = ALOAD(&impl->state) & ~0x80000000ULL;
+		state_update = (state + 0x100000000ULL) | 0x80000000ULL;
+	} while (!CAS(&impl->state, &state, state_update));
+
+	// second step, obtain total lock before proceeding
+	do {
+		// get current state. We will wait for the read count to go to 0.
+		state = ALOAD(&impl->state) & 0xFFFFFFFF80000000ULL;
 		// set the updated value to set the write bit true and read count to 0,
-		// incremenet the sequence number
-		state_update = (state + 0x180000000ULL) & 0xFFFFFFFF80000000ULL;
-	} while (!__atomic_compare_exchange_n(&impl->state, &state, state_update,
-										  false, __ATOMIC_SEQ_CST,
-										  __ATOMIC_SEQ_CST));
+		// increment the sequence number
+		state_update = (state + 0x100000000ULL) & 0xFFFFFFFF80000000ULL;
+	} while (!CAS_ACQUIRE(&impl->state, &state, state_update));
 }
 void lock_unlock(Lock lock) {
 	LockImpl *impl = $(lock);
@@ -91,23 +94,19 @@ void lock_unlock(Lock lock) {
 		// writer
 		do {
 			// get current state
-			state = __atomic_load_n(&impl->state, __ATOMIC_SEQ_CST);
+			state = ALOAD(&impl->state);
 			// unset the write bit and increment the sequence number
 			state_update = (state + 0x100000000ULL) & ~0x80000000ULL;
-		} while (!__atomic_compare_exchange_n(
-			&impl->state, &state, state_update, false, __ATOMIC_SEQ_CST,
-			__ATOMIC_SEQ_CST));
+		} while (!CAS_RELEASE(&impl->state, &state, state_update));
 	} else {
 		// reader
 		do {
 			// get current state
-			state = __atomic_load_n(&impl->state, __ATOMIC_SEQ_CST);
+			state = ALOAD(&impl->state);
 			if ((state & 0x7FFFFFFF) == 0) panic("underflow!");
 			// subtract 1 from the read count and increment the sequence number
 			state_update = (state + 0x100000000ULL) - 1ULL;
-		} while (!__atomic_compare_exchange_n(
-			&impl->state, &state, state_update, false, __ATOMIC_SEQ_CST,
-			__ATOMIC_SEQ_CST));
+		} while (!CAS_RELEASE(&impl->state, &state, state_update));
 	}
 }
 

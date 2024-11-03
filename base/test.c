@@ -226,8 +226,8 @@ MyTest(base, test_lock) {
 
 	lock_write(l1);
 	state = lock_get_state(l1);
-	// upper bits incremented by 1.
-	cr_assert_eq(state >> 32, 3);
+	// upper bits incremented by 2.
+	cr_assert_eq(state >> 32, 4);
 	// lower bits high bit set
 	cr_assert_eq(state & 0xFFFFFFFF, 0x80000000);
 
@@ -235,7 +235,7 @@ MyTest(base, test_lock) {
 
 	state = lock_get_state(l1);
 	// upper bits incremented by 1.
-	cr_assert_eq(state >> 32, 4);
+	cr_assert_eq(state >> 32, 5);
 	// lower bits are set to 0 now
 	cr_assert_eq(state & 0xFFFFFFFF, 0x00000000);
 }

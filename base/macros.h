@@ -76,6 +76,15 @@
 #define CAS(...)                                                      \
 	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_RELAXED, \
 								__ATOMIC_RELAXED)
-#define CAS_SEQ(...) __atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
+#define CAS_SEQ(...)                                                  \
+	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_SEQ_CST, \
+								__ATOMIC_RELAXED)
+#define CAS_ACQUIRE(...)                                              \
+	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_ACQUIRE, \
+								__ATOMIC_RELAXED)
+#define CAS_RELEASE(...)                                              \
+	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_RELEASE, \
+								__ATOMIC_RELAXED)
+#define ALOAD(ptr) __atomic_load_n(ptr, __ATOMIC_RELAXED)
 
 #endif	// _BASE_MACROS__
