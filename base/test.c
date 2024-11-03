@@ -14,7 +14,7 @@
 
 #include <base/lib.h>
 #include <base/osdef.h>
-// #include <criterion/criterion.h>
+#include <base/print_util.h>
 #include <base/test.h>
 #include <stdio.h>
 
@@ -203,8 +203,62 @@ MyTest(base, test_fam_alloc) {
 }
 
 MyTest(base, test_queue) {
-	Queue queue = queue_create();
-	// queue_enqueue(NULL);
+	/*
+		Queue q1 = queue_create();
+		println("1");
+		cr_assert(queue_enqueue(q1, NULL));
+		println("2");
+		cr_assert(queue_dequeue(q1) == NULL);
+		Ptr p1 = $alloc(sizeof(int));
+		int v1 = 123;
+		memcpy($(p1), &v1, sizeof(int));
+		Ptr p2 = $alloc(sizeof(int));
+		int v2 = 456;
+		memcpy($(p1), &v2, sizeof(int));
+
+		println("start enq1");
+		cr_assert(!queue_enqueue(q1, p1));
+		println("enq1 done");
+		cr_assert(!queue_enqueue(q1, p2));
+
+		println("=================begin deq1");
+		Ptr p2_out = queue_dequeue(q1);
+		cr_assert(!nil(p2_out));
+		int v2_out;
+		memcpy(&v2_out, $(p2_out), sizeof(int));
+		cr_assert_eq(v2_out, 456);
+
+		println("3");
+		Ptr p1_out = queue_dequeue(q1);
+		println("4");
+		int v1_out;
+		memcpy(&v1_out, $(p1_out), sizeof(int));
+		cr_assert_eq(v1_out, 123);
+
+		println("=======================start dequeue
+	   empty===================="); cr_assert(queue_dequeue(q1) == NULL);
+		cr_assert(queue_dequeue(q1) == NULL);
+		cr_assert(queue_dequeue(q1) == NULL);
+		cr_assert(queue_dequeue(q1) == NULL);
+
+		printf("complete\n");
+	*/
+
+	/*
+		 cr_assert(!queue_enqueue(q1, p1));
+		cr_assert(!queue_enqueue(q1, p2));
+		println("enqueues done");
+
+		Ptr tmp;
+		int tmp_out;
+		tmp = queue_dequeue(q1);
+		cr_assert(!nil(tmp));
+		memcpy(&tmp_out, $(tmp), sizeof(int));
+		cr_assert_eq(tmp_out, 456);
+	*/
+
+	//$release(p1);
+	//$release(p2);
 }
 
 MyTest(base, test_lock) {
