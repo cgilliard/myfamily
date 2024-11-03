@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['second_213',['SECOND',['../macro__util_8h.html#a8cf792fb70b4f3de790edeb87b0665a3',1,'macro_util.h']]],
-  ['second_5fstringify_214',['SECOND_STRINGIFY',['../macro__util_8h.html#afd45d303f61ced573281a3051c18b996',1,'macro_util.h']]],
-  ['shift_215',['SHIFT',['../limits_8h.html#a560592885e4210f68e3c9088bc47c1cc',1,'limits.h']]],
-  ['stringify_216',['STRINGIFY',['../macro__util_8h.html#a6df1d22fb5f09eccc23b9f399670cfd7',1,'macro_util.h']]]
+  ['nil_547',['nil',['../macros_8h.html#ada23c0615668591b7a50c3c068555fb4',1,'macros.h']]],
+  ['none_548',['NONE',['../macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29',1,'macro_util.h']]],
+  ['null_549',['NULL',['../types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4',1,'types.h']]]
 ];

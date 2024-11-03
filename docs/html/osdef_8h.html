@@ -73,21 +73,23 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
+<code>#include &lt;sys/mman.h&gt;</code><br />
+<code>#include &lt;sys/types.h&gt;</code><br />
 </div>
 <p><a href="osdef_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a6f255d924f7a6bb2c4be0c8c2f2d9ce3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="osdef_8h.html#a6f255d924f7a6bb2c4be0c8c2f2d9ce3">exit</a> (int)</td></tr>
+<tr class="memitem:a6f255d924f7a6bb2c4be0c8c2f2d9ce3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="osdef_8h.html#a6f255d924f7a6bb2c4be0c8c2f2d9ce3">exit</a> (<a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>)</td></tr>
 <tr class="separator:a6f255d924f7a6bb2c4be0c8c2f2d9ce3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a541ca3dbaa4e563bc51cf60f644c844f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="osdef_8h.html#a541ca3dbaa4e563bc51cf60f644c844f">getpagesize</a> ()</td></tr>
-<tr class="separator:a541ca3dbaa4e563bc51cf60f644c844f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa08854e989818265b10d635a27d4eaf1"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="osdef_8h.html#aa08854e989818265b10d635a27d4eaf1">mmap</a> (void *addr, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> length, int prot, int flags, int fd, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> offset)</td></tr>
-<tr class="separator:aa08854e989818265b10d635a27d4eaf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acccc7b33cc69e0ae8fc68031ea8128a2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="osdef_8h.html#acccc7b33cc69e0ae8fc68031ea8128a2">munmap</a> (void *addr, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> length)</td></tr>
-<tr class="separator:acccc7b33cc69e0ae8fc68031ea8128a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2cf8be6bd68ca32fb7d81cf180a75c9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="osdef_8h.html#aa2cf8be6bd68ca32fb7d81cf180a75c9">write</a> (int fd, const char *buf, <a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> len)</td></tr>
-<tr class="separator:aa2cf8be6bd68ca32fb7d81cf180a75c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9a7722a0bcd12d8b5621a3264a11e76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="osdef_8h.html#ab9a7722a0bcd12d8b5621a3264a11e76">getpagesize</a> ()</td></tr>
+<tr class="separator:ab9a7722a0bcd12d8b5621a3264a11e76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a002bcdf1c8657ced6227e79db68f883d"><td class="memItemLeft" align="right" valign="top">ssize_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="osdef_8h.html#a002bcdf1c8657ced6227e79db68f883d">write</a> (<a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> fd, const void *buf, size_t <a class="el" href="macros_8h.html#a86659537194f22ae1712c49e584bf1c8">len</a>)</td></tr>
+<tr class="separator:a002bcdf1c8657ced6227e79db68f883d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc6595dbf6880c71628fecf0dbb23d66"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="osdef_8h.html#abc6595dbf6880c71628fecf0dbb23d66">getenv</a> (const char *name)</td></tr>
+<tr class="separator:abc6595dbf6880c71628fecf0dbb23d66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a3e682eff8f0c6e8adc371f54cc9f3f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="osdef_8h.html#a0a3e682eff8f0c6e8adc371f54cc9f3f">memcpy</a> (void *, const void *, size_t)</td></tr>
+<tr class="separator:a0a3e682eff8f0c6e8adc371f54cc9f3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a6f255d924f7a6bb2c4be0c8c2f2d9ce3"></a>
@@ -99,7 +101,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">void exit </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -108,125 +110,97 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a541ca3dbaa4e563bc51cf60f644c844f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a541ca3dbaa4e563bc51cf60f644c844f">&#9670;&nbsp;</a></span>getpagesize()</h2>
+<a id="abc6595dbf6880c71628fecf0dbb23d66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc6595dbf6880c71628fecf0dbb23d66">&#9670;&nbsp;</a></span>getenv()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> getpagesize </td>
+          <td class="memname">char* getenv </td>
           <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa08854e989818265b10d635a27d4eaf1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa08854e989818265b10d635a27d4eaf1">&#9670;&nbsp;</a></span>mmap()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void* mmap </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>addr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
-          <td class="paramname"><em>length</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>prot</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>flags</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>fd</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
-          <td class="paramname"><em>offset</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="acccc7b33cc69e0ae8fc68031ea8128a2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acccc7b33cc69e0ae8fc68031ea8128a2">&#9670;&nbsp;</a></span>munmap()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int munmap </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>addr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
-          <td class="paramname"><em>length</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa2cf8be6bd68ca32fb7d81cf180a75c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa2cf8be6bd68ca32fb7d81cf180a75c9">&#9670;&nbsp;</a></span>write()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int write </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>fd</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab9a7722a0bcd12d8b5621a3264a11e76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab9a7722a0bcd12d8b5621a3264a11e76">&#9670;&nbsp;</a></span>getpagesize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> getpagesize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a0a3e682eff8f0c6e8adc371f54cc9f3f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a3e682eff8f0c6e8adc371f54cc9f3f">&#9670;&nbsp;</a></span>memcpy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* memcpy </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a002bcdf1c8657ced6227e79db68f883d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a002bcdf1c8657ced6227e79db68f883d">&#9670;&nbsp;</a></span>write()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ssize_t write </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
+          <td class="paramname"><em>fd</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *&#160;</td>
           <td class="paramname"><em>buf</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td>
+          <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>len</em>&#160;</td>
         </tr>
         <tr>

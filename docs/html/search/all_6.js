@@ -1,10 +1,25 @@
 var searchData=
 [
-  ['false_36',['false',['../types_8h.html#a65e9886d74aaee76545e83dd09011727',1,'types.h']]],
-  ['file_5fcount_37',['file_count',['../xxdir_8c.html#abd3633577cf354ae9e2c69a018cfe999',1,'xxdir.c']]],
-  ['file_5fsizes_38',['file_sizes',['../xxdir_8c.html#aab1026987f4e2b9d406e52e915a4cc2b',1,'xxdir.c']]],
-  ['first_39',['FIRST',['../macro__util_8h.html#a83420260ae1d2a06201582dd1c4ce0a5',1,'macro_util.h']]],
-  ['first_5fstringify_40',['FIRST_STRINGIFY',['../macro__util_8h.html#adb026bec933528ea3438a8530fda0896',1,'macro_util.h']]],
-  ['float64_41',['float64',['../types_8h.html#a1442831462916636639280563c682b16',1,'types.h']]],
-  ['for_5feach_42',['FOR_EACH',['../macro__util_8h.html#a57f29b9285b9beab8c788f98b08e3e5e',1,'macro_util.h']]]
+  ['false_57',['false',['../types_8h.html#a65e9886d74aaee76545e83dd09011727',1,'types.h']]],
+  ['fam_5falloc_58',['fam_alloc',['../fam__alloc_8c.html#abb096f96545b75a695c622158f96d2c4',1,'fam_alloc(unsigned int size):&#160;fam_alloc.c'],['../fam__alloc_8h.html#abb096f96545b75a695c622158f96d2c4',1,'fam_alloc(unsigned int size):&#160;fam_alloc.c']]],
+  ['fam_5falloc_2ec_59',['fam_alloc.c',['../fam__alloc_8c.html',1,'']]],
+  ['fam_5falloc_2eh_60',['fam_alloc.h',['../fam__alloc_8h.html',1,'']]],
+  ['fam_5ferr_61',['fam_err',['../fam__err_8h.html#a445caa137b1d2986716f46e3faad439d',1,'fam_err():&#160;fam_err.c'],['../fam__err_8c.html#a445caa137b1d2986716f46e3faad439d',1,'fam_err():&#160;fam_err.c']]],
+  ['fam_5ferr_2ec_62',['fam_err.c',['../fam__err_8c.html',1,'']]],
+  ['fam_5ferr_2eh_63',['fam_err.h',['../fam__err_8h.html',1,'']]],
+  ['fam_5ferr_5flast_64',['fam_err_last',['../fam__err_8h.html#ad77a4350811747417268e4dfb64194db',1,'fam_err_last():&#160;fam_err.c'],['../fam__err_8c.html#ad77a4350811747417268e4dfb64194db',1,'fam_err_last():&#160;fam_err.c']]],
+  ['fam_5fptr_5ffor_65',['fam_ptr_for',['../fam__alloc_8c.html#ad73c06de57bd6938766e275cc6d8a77e',1,'fam_ptr_for(unsigned int id, unsigned int len):&#160;fam_alloc.c'],['../fam__alloc_8h.html#ad73c06de57bd6938766e275cc6d8a77e',1,'fam_ptr_for(unsigned int id, unsigned int len):&#160;fam_alloc.c']]],
+  ['fam_5frelease_66',['fam_release',['../fam__alloc_8c.html#a321e77b680716b7cef97536d80951e8b',1,'fam_release(Ptr ptr):&#160;fam_alloc.c'],['../fam__alloc_8h.html#a321e77b680716b7cef97536d80951e8b',1,'fam_release(Ptr ptr):&#160;fam_alloc.c']]],
+  ['fam_5fresize_67',['fam_resize',['../fam__alloc_8c.html#a945cece8f10f1fe5955e813e17c69149',1,'fam_resize(Ptr ptr, unsigned int size):&#160;fam_alloc.c'],['../fam__alloc_8h.html#a945cece8f10f1fe5955e813e17c69149',1,'fam_resize(Ptr ptr, unsigned int size):&#160;fam_alloc.c']]],
+  ['famerr_5fvalues_68',['FAMERR_VALUES',['../fam__err_8h.html#af32ddc3f45c37388331257232616d739',1,'fam_err.h']]],
+  ['fclose_5fsum_69',['fclose_sum',['../structResourceStats.html#ac23ea4be0104fde3b9efdc0f91f5acdf',1,'ResourceStats']]],
+  ['file_5fcount_70',['file_count',['../xxdir_8c.html#abd3633577cf354ae9e2c69a018cfe999',1,'xxdir.c']]],
+  ['file_5fsizes_71',['file_sizes',['../xxdir_8c.html#aab1026987f4e2b9d406e52e915a4cc2b',1,'xxdir.c']]],
+  ['first_72',['FIRST',['../macro__util_8h.html#a83420260ae1d2a06201582dd1c4ce0a5',1,'macro_util.h']]],
+  ['first_5fstringify_73',['FIRST_STRINGIFY',['../macro__util_8h.html#adb026bec933528ea3438a8530fda0896',1,'macro_util.h']]],
+  ['float64_74',['float64',['../types_8h.html#a1442831462916636639280563c682b16',1,'types.h']]],
+  ['fopen_5fsum_75',['fopen_sum',['../structResourceStats.html#ab82a1ca32048ec7e1c15d53265de791b',1,'ResourceStats']]],
+  ['for_5feach_76',['FOR_EACH',['../macro__util_8h.html#a57f29b9285b9beab8c788f98b08e3e5e',1,'macro_util.h']]],
+  ['free_5flist_77',['free_list',['../structSlabData.html#af2aec12222f0b11bf1959721830fed53',1,'SlabData']]],
+  ['free_5flist_5fhead_78',['free_list_head',['../structSlabData.html#a8d5ca1aef133616262b14eebe8b694e8',1,'SlabData']]]
 ];

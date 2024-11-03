@@ -1,18 +1,7 @@
 var searchData=
 [
-  ['empty_179',['EMPTY',['../macro__util_8h.html#a4ddebc5712d39b71767e3dceb9bfb74b',1,'macro_util.h']]],
-  ['eval_180',['EVAL',['../macro__util_8h.html#aa0f8200acd4827bc9d2df09270b66c38',1,'macro_util.h']]],
-  ['eval1_181',['EVAL1',['../macro__util_8h.html#aad4f105758560e2d030fb28e39acea6f',1,'macro_util.h']]],
-  ['eval1024_182',['EVAL1024',['../macro__util_8h.html#aaad3972dddbceed6c8ab1e28703ff6f8',1,'macro_util.h']]],
-  ['eval128_183',['EVAL128',['../macro__util_8h.html#aac10e394d5740bd77dfaa194215ed047',1,'macro_util.h']]],
-  ['eval16_184',['EVAL16',['../macro__util_8h.html#a699fe8045b6b8bc6461248f4a5290974',1,'macro_util.h']]],
-  ['eval2_185',['EVAL2',['../macro__util_8h.html#a1da5ee0b8ba77ab31d29e01e5dd4d9aa',1,'macro_util.h']]],
-  ['eval256_186',['EVAL256',['../macro__util_8h.html#af6d520b16c61d51ff3dec6a46da56a8b',1,'macro_util.h']]],
-  ['eval32_187',['EVAL32',['../macro__util_8h.html#a8da9fa5825ab3afcfd6437b42063f702',1,'macro_util.h']]],
-  ['eval4_188',['EVAL4',['../macro__util_8h.html#a5d9eb883e12b6ce5401726db89588f81',1,'macro_util.h']]],
-  ['eval512_189',['EVAL512',['../macro__util_8h.html#a3e6a61326961e8e999f8bb968eda3f67',1,'macro_util.h']]],
-  ['eval64_190',['EVAL64',['../macro__util_8h.html#ad6795aac7c4cc246ce4cc021d542eb18',1,'macro_util.h']]],
-  ['eval8_191',['EVAL8',['../macro__util_8h.html#a696db09f5d24016710ed370ee42627c8',1,'macro_util.h']]],
-  ['expand_192',['EXPAND',['../macro__util_8h.html#ae4b532a93c757194ec73b6790a3e6b1f',1,'macro_util.h']]],
-  ['expand_5fall_193',['EXPAND_ALL',['../macro__util_8h.html#a800c6a1a2abcb460825c03b17f67ec29',1,'macro_util.h']]]
+  ['defer1_495',['DEFER1',['../macro__util_8h.html#ab076327c62d116fed42cc989fffc1171',1,'macro_util.h']]],
+  ['define_5ffamerr_496',['DEFINE_FAMERR',['../fam__err_8h.html#a9fe4ffb9588fe6cfa56fb55763deb285',1,'fam_err.h']]],
+  ['definetype_497',['DefineType',['../macros_8h.html#a1414db03b38a685defc808526be96786',1,'macros.h']]],
+  ['dimmed_498',['DIMMED',['../colors_8h.html#a3e288bbc66ee9a6658a68db03109e644',1,'colors.h']]]
 ];

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['file_5fcount_157',['file_count',['../xxdir_8c.html#abd3633577cf354ae9e2c69a018cfe999',1,'xxdir.c']]],
-  ['file_5fsizes_158',['file_sizes',['../xxdir_8c.html#aab1026987f4e2b9d406e52e915a4cc2b',1,'xxdir.c']]]
+  ['alloc_5fsum_420',['alloc_sum',['../structResourceStats.html#a00c602f951b8103cc46e4b9b0715f8a0',1,'ResourceStats']]],
+  ['aux_421',['aux',['../structType.html#abcd5dd525accf46f95b25b6b1f0ebdb9',1,'Type']]]
 ];

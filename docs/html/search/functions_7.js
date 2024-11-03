@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['spawn_147',['spawn',['../context_8c.html#ad87adf5d4d5557201685a2224f02e0a3',1,'spawn(void(*fn)()):&#160;context.c'],['../context_8h.html#ad87adf5d4d5557201685a2224f02e0a3',1,'spawn(void(*fn)()):&#160;context.c']]]
+  ['include_5fdir_350',['include_dir',['../xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029',1,'xxdir.c']]],
+  ['init_351',['init',['../context_8c.html#abde79b090a5cbda9d15a927bc609cd19',1,'init(void(*main)()):&#160;context.c'],['../context_8h.html#abde79b090a5cbda9d15a927bc609cd19',1,'init(void(*main)()):&#160;context.c']]]
 ];
