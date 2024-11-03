@@ -15,28 +15,19 @@
 #ifndef _BASE_LOCK__
 #define _BASE_LOCK__
 
-#include <base/macros.h>
-#include <base/slabs.h>
-
-Type(Lock);
-#define Lock DefineType(Lock)
+typedef unsigned long long Lock;
 
 Lock lock_create();
-void lock_read(Lock lock);
-void lock_write(Lock lock);
-void lock_unlock(Lock lock);
+void lock_read(Lock *lock);
+void lock_write(Lock *lock);
+void lock_unlock(Lock *lock);
 
-Type(LockGuard);
-#define LockGuard DefineType(LockGuard)
+void lock_guard_cleanup(Lock *lg);
+
+#define LockGuard \
+	Lock __attribute__((warn_unused_result, cleanup(lock_guard_cleanup)))
 
 LockGuard lock_guard_read(Lock l);
 LockGuard lock_guard_write(Lock l);
-
-// create a lock using direct allocation (as opposed to slab allocator)
-Lock lock_create_direct();
-
-#ifdef TEST
-unsigned long long lock_get_state(Lock lock);
-#endif	// TEST
 
 #endif	// _BASE_LOCK__

@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_QUEUE__
-#define _BASE_QUEUE__
+#ifndef _BASE_TEST_IMPL__
+#define _BASE_TEST_IMPL__
 
-#include <base/macros.h>
-#include <base/slabs.h>
+#include <base/types.h>
 
-Type(Queue);
-#define Queue DefineType(Queue)
+void test_init_dev_resources();
+void test_confirm_dev_resources();
+void test_cleanup_dev_resources();
+void test_init_test_resources(byte *suite, byte *test, byte *path,
+							  byte *resources);
+void test_cleanup_test_resources(byte *path);
 
-Queue queue_create();
-int queue_enqueue(Queue q, Ptr value);
-Ptr queue_dequeue(Queue q);
-
-#endif	// _BASE_QUEUE__
+#endif	// _BASE_TEST_IMPL__

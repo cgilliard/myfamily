@@ -31,15 +31,9 @@ define run_tests
             export CRITERION_TEST_PATTERN=$$dir/$$FILTER; \
         fi; \
         if test -z $(TARGET); then \
-            echo "[====] Running $$dir test suite..."; \
             $(MAKE) -C $$dir $(2) FLAG_OPTIONS="$(1)" -s || exit 1; \
         else \
             if [ "$$dir" = "$(TARGET)" ]; then \
-                if test -z $(FILTER); then \
-                    echo "[====] Running $$dir test suite..."; \
-                else \
-                    echo "[====] Running $$dir test suite... (FILTER=$$FILTER)"; \
-                fi; \
                 $(MAKE) -C $$dir $(2) FLAG_OPTIONS="$(1)" -s || exit 1; \
             fi; \
         fi; \

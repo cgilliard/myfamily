@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/test.h>
 #include <criterion/criterion.h>
 #include <main/main.h>
 
-Test(main, test_main) {
+Suite(main);
+
+MyTest(main, test_main) {
 }

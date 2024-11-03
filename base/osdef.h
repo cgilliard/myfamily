@@ -17,11 +17,9 @@
 
 #include <base/types.h>
 #include <sys/mman.h>
-#include <sys/types.h>
 
 void exit(int);
 int getpagesize();
-ssize_t write(int fd, const void *buf, size_t len);
 char *getenv(const char *name);
 void *memcpy(void *, const void *, size_t);
 

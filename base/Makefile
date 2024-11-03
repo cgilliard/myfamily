@@ -1,13 +1,8 @@
 OBJS := types.o \
-	print_util.o \
-	context.o \
-	fam_err.o \
-	slabs.o \
-	fam_alloc.o \
-	queue.o \
 	colors.o \
+	print_util.o \
 	lock.o
 
-TEST_OBJS := $(OBJS)
+TEST_OBJS := $(OBJS) test_impl.o
 
 include ../Makefile.template

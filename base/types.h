@@ -27,13 +27,9 @@ typedef unsigned char byte;
 #define true (_Bool)1
 #define false (_Bool)0
 
-// atomics
-typedef _Atomic long long aint64;
-typedef _Atomic _Bool abool;
-
 // NULL
 #ifndef NULL
 #define NULL ((void *)0)
-#endif // NULL
+#endif	// NULL
 
-#endif // _BASE_TYPES__
+#endif	// _BASE_TYPES__

@@ -14,6 +14,8 @@
 
 #include <base/osdef.h>
 #include <base/print_util.h>
+
+// currently using stdio, will move to write
 #include <stdio.h>
 
 void __attribute__((no_return)) panic(const char *fmt, ...) {

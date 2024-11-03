@@ -15,46 +15,7 @@
 #ifndef _BASE_MACROS__
 #define _BASE_MACROS__
 
-#include <base/macro_util.h>
-
-// Type macros
-#define Type(type)                 \
-	typedef struct Type *type##Nc; \
-	void type##_cleanup(const type##Nc *ptr);
-#define DefineType(type) \
-	type##Nc __attribute((warn_unused_result, cleanup(type##_cleanup)))
-
-// Ptr macros
-#define $(ptr) ptr_data(ptr)
-#define $len(ptr) ptr_len(ptr)
-#define $alloc(size) ({ fam_alloc(size); })
-#define $resize(ptr, size)                  \
-	({                                      \
-		Ptr _ptr__ = fam_resize(ptr, size); \
-		if (!nil(_ptr__)) ptr = NULL;       \
-		_ptr__;                             \
-	})
-#define $release(ptr)     \
-	({                    \
-		fam_release(ptr); \
-		ptr = NULL;       \
-	})
-#define nil(ptr) \
-	(ptr == NULL || (ptr_len(ptr) == UINT32_MAX && ptr_id(ptr) == 0))
-#define ok(ptr) !nil(ptr)
-#define initialized(ptr) (ptr != NULL && ptr_len(ptr) != UINT32_MAX)
-
-// Object macros
-#define $int(obj) *(int *)object_value_of(obj)
-#define move(src)                           \
-	({                                      \
-		ObjectNc _ret__ = object_move(src); \
-		src = null;                         \
-		_ret__;                             \
-	})
-#define ref(src) object_ref(src)
-#define weak(src) object_weak(src)
-#define upgrade(src) object_upgrade(src)
+#include <base/types.h>
 
 // Lock macros
 #define lock() (lock_create())

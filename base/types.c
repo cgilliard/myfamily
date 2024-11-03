@@ -19,37 +19,20 @@
 void __attribute__((constructor)) __check_64bit_arch__() {
 #if !defined(__x86_64__) && !defined(_M_X64) && !defined(__aarch64__)
 	panic("Supported architectures: __x86_64__, _M_X64, and __aarch64__");
-#endif // arch
+#endif	// arch
 
 	// check size_t
-	if (__SIZEOF_SIZE_T__ != 8)
-		panic("size_t must be 8 bytes. Invalid arch!");
+	if (__SIZEOF_SIZE_T__ != 8) panic("size_t must be 8 bytes. Invalid arch!");
 	// check primitive types
-	if (sizeof(byte) != 1)
-		panic("byte must be 1 byte. Invalid arch!");
+	if (sizeof(byte) != 1) panic("byte must be 1 byte. Invalid arch!");
 
-	if (sizeof(int64) != 8)
-		panic("must be 8 bytes. Invalid arch!");
+	if (sizeof(int64) != 8) panic("must be 8 bytes. Invalid arch!");
 
-	if (sizeof(int) != 4)
-		panic("int must be 4 bytes. Invalid arch!");
+	if (sizeof(int) != 4) panic("int must be 4 bytes. Invalid arch!");
 
-	if (sizeof(float64) != 8)
-		panic("float64 must be 8 bytes. Invalid arch!");
+	if (sizeof(float64) != 8) panic("float64 must be 8 bytes. Invalid arch!");
 
-	if (sizeof(bool) != 1)
-		panic("bool must be 1 byte. Invalid arch!");
-
-	if (sizeof(aint64) != 8)
-		panic("aint64 must be 8 bytes. Invalid arch!");
-
-	if (sizeof(abool) != 1)
-		panic("abool must be 1 byte. Invalid arch!");
-
-	/*
-		if (getpagesize() != 4096)
-			panic("pagesize must be 4096 bytes. Invalid arch!");
-	*/
+	if (sizeof(bool) != 1) panic("bool must be 1 byte. Invalid arch!");
 
 	// little endian check
 	int test = 0x1;
