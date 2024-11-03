@@ -343,15 +343,6 @@ int64 slab_allocator_slab_data_offset(SlabData *sd, int64 id) {
 
 Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 	bool err_cond = false;
-	// spinlock only allowing one thread to enter critical section
-	int expected_spin_lock = 0;
-	int desired_spin_lock = 1;
-	// spin while the spin_lock value is not equal to 0 then set it to 1
-	do {
-	} while (!__atomic_compare_exchange_n(&sd->spin_lock, &expected_spin_lock,
-										  desired_spin_lock, false,
-										  __ATOMIC_ACQUIRE, __ATOMIC_RELAXED) &&
-			 __atomic_load_n(&sd->spin_lock, __ATOMIC_RELAXED) != 0);
 
 	if (sd->free_list_head == UINT32_MAX) {
 		if (slab_allocator_increase_chunks(sd, 1)) {
@@ -361,9 +352,6 @@ Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 			SetErr(CapacityExceeded);
 		}
 	}
-
-	// set the spin_lock back to 0
-	__atomic_store(&sd->spin_lock, &expected_spin_lock, __ATOMIC_RELEASE);
 
 	if (err_cond) return NULL;
 
