@@ -14,7 +14,6 @@
 
 #include <base/alloc.h>
 #include <base/colors.h>
-#include <base/fam_alloc.h>
 #include <base/print_util.h>
 #include <base/test_impl.h>
 #include <criterion/criterion.h>
@@ -40,7 +39,7 @@ int rmrf(char *path) {
 }
 
 void test_init_dev_resources() {
-	fam_alloc_init();
+	// fam_alloc_init();
 }
 void test_confirm_dev_resources() {
 	int64 final_alloc_sum = alloc_sum();
@@ -55,15 +54,17 @@ void test_confirm_dev_resources() {
 }
 void test_cleanup_dev_resources() {
 	// before cleanup verify that fam_alloc does not have any remaining slabs.
-	int64 slabs = fam_alloc_count_global_allocator();
-	if (slabs != 0) {
-		println(
-			"[%s----%s] dev resource check: %lli slab(s) remain. "
-			"Memory leak?",
-			BLUE, RESET, slabs);
-		cr_assert_eq(slabs, 0);
-	}
-	fam_alloc_cleanup();
+	/*
+		int64 slabs = fam_alloc_count_global_allocator();
+		if (slabs != 0) {
+			println(
+				"[%s----%s] dev resource check: %lli slab(s) remain. "
+				"Memory leak?",
+				BLUE, RESET, slabs);
+			cr_assert_eq(slabs, 0);
+		}
+		fam_alloc_cleanup();
+	*/
 }
 
 void test_init_test_resources(byte *suite, byte *test, byte *path,

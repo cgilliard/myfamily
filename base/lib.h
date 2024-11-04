@@ -14,14 +14,10 @@
 
 #include <base/alloc.h>
 #include <base/colors.h>
-#include <base/fam_alloc.h>
 #include <base/fam_err.h>
 #include <base/limits.h>
 #include <base/lock.h>
 #include <base/macro_util.h>
 #include <base/macros.h>
 #include <base/print_util.h>
-#include <base/ptr.h>
-#include <base/queue.h>
-#include <base/slabs.h>
 #include <base/types.h>
