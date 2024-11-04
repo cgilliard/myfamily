@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['lockguardimpl_470',['LockGuardImpl',['../lock_8c.html#af9058992a2e879765ffe81e0b5c09e3e',1,'lock.c']]],
-  ['lockimpl_471',['LockImpl',['../lock_8c.html#aa4e493f4d186e76599a04ef329d08bcf',1,'lock.c']]]
+  ['lock_402',['Lock',['../lock_8h.html#abd86361254c6e8bfd35d3c0f63af3d4a',1,'lock.h']]]
 ];

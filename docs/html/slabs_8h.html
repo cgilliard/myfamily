@@ -67,27 +67,19 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">slabs.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="macro__util_8h_source.html">base/macro_util.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="ptr_8h_source.html">base/ptr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 </div>
 <p><a href="slabs_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structResourceStats.html">ResourceStats</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structAlloc.html">Alloc</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ae6f702dbf218f022c4074282675e000c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#ae6f702dbf218f022c4074282675e000c">MAX_SLAB_SIZE</a>&#160;&#160;&#160;65536</td></tr>
@@ -97,60 +89,23 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:afa692e6fd803fdc6ce5546ee973e153b"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structResourceStats.html">ResourceStats</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#afa692e6fd803fdc6ce5546ee973e153b">ResourceStats</a></td></tr>
-<tr class="separator:afa692e6fd803fdc6ce5546ee973e153b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02ea2c2e783c73f814b74dab12bd61f9"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structAlloc.html">Alloc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a02ea2c2e783c73f814b74dab12bd61f9">Alloc</a></td></tr>
-<tr class="separator:a02ea2c2e783c73f814b74dab12bd61f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1edcebf2f9fda90333f32f85bef2ca9"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structType.html">Type</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a></td></tr>
-<tr class="separator:ac1edcebf2f9fda90333f32f85bef2ca9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0251654f379b88990eae97c1e9b96090"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structSlabAllocatorImpl.html">SlabAllocatorImpl</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a0251654f379b88990eae97c1e9b96090">SlabAllocatorNc</a></td></tr>
 <tr class="separator:a0251654f379b88990eae97c1e9b96090"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a4ef662ec7fb312a278488fa2d204d4f1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structAlloc.html">Alloc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a4ef662ec7fb312a278488fa2d204d4f1">alloc</a> (unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> size)</td></tr>
-<tr class="separator:a4ef662ec7fb312a278488fa2d204d4f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2166d20f275373b0e4a613d2b3c7e2a7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a2166d20f275373b0e4a613d2b3c7e2a7">release</a> (<a class="el" href="structAlloc.html">Alloc</a> <a class="el" href="slabs_8h.html#a4ef662ec7fb312a278488fa2d204d4f1">alloc</a>)</td></tr>
-<tr class="separator:a2166d20f275373b0e4a613d2b3c7e2a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70b05a036d4bd3162742f130ae43500a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a70b05a036d4bd3162742f130ae43500a">alloc_sum</a> ()</td></tr>
-<tr class="separator:a70b05a036d4bd3162742f130ae43500a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac51b06a1a439241da94504883c482028"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#ac51b06a1a439241da94504883c482028">resize_sum</a> ()</td></tr>
-<tr class="separator:ac51b06a1a439241da94504883c482028"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a33010add1b9bd581ca3c86225f46cbc8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a33010add1b9bd581ca3c86225f46cbc8">release_sum</a> ()</td></tr>
-<tr class="separator:a33010add1b9bd581ca3c86225f46cbc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac08c8ee2b82eb9dce8c01cd07897662"><td class="memItemLeft" align="right" valign="top">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#aac08c8ee2b82eb9dce8c01cd07897662">slab_overhead</a> ()</td></tr>
-<tr class="separator:aac08c8ee2b82eb9dce8c01cd07897662"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6145cf21b3ae9e2170dbe048baec361"><td class="memItemLeft" align="right" valign="top">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#aa6145cf21b3ae9e2170dbe048baec361">ptr_len</a> (const <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
-<tr class="separator:aa6145cf21b3ae9e2170dbe048baec361"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa8f233da5669c989f2d0f3aca60f2b2"><td class="memItemLeft" align="right" valign="top">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#afa8f233da5669c989f2d0f3aca60f2b2">ptr_id</a> (const <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
-<tr class="separator:afa8f233da5669c989f2d0f3aca60f2b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e66cd9611c0676955cf648329361b56"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a5e66cd9611c0676955cf648329361b56">ptr_data</a> (const <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
-<tr class="separator:a5e66cd9611c0676955cf648329361b56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a657e5363c2dfbf6dea97592a2b6e43d0"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a657e5363c2dfbf6dea97592a2b6e43d0">ptr_aux</a> (const <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
-<tr class="separator:a657e5363c2dfbf6dea97592a2b6e43d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a1304c5f6b6a7b4150d601dd507e50c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a1a1304c5f6b6a7b4150d601dd507e50c">ptr_direct_alloc</a> (unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> size)</td></tr>
-<tr class="separator:a1a1304c5f6b6a7b4150d601dd507e50c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab04f0fb5b01497eef6fee4d28b4c04cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#ab04f0fb5b01497eef6fee4d28b4c04cd">ptr_direct_resize</a> (<a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> size)</td></tr>
-<tr class="separator:ab04f0fb5b01497eef6fee4d28b4c04cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af53ee9eef0ec94717c6f8767a0d1a5b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#af53ee9eef0ec94717c6f8767a0d1a5b0">ptr_direct_release</a> (<a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
-<tr class="separator:af53ee9eef0ec94717c6f8767a0d1a5b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a178f98d18b5cf3a5f10087d839588d7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a178f98d18b5cf3a5f10087d839588d7e">slab_allocator_cleanup</a> (<a class="el" href="slabs_8h.html#a0251654f379b88990eae97c1e9b96090">SlabAllocatorNc</a> *<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
 <tr class="separator:a178f98d18b5cf3a5f10087d839588d7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11efcdb3d7283ac731a0fe34db0f025c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a11efcdb3d7283ac731a0fe34db0f025c">slab_allocator_create</a> ()</td></tr>
 <tr class="separator:a11efcdb3d7283ac731a0fe34db0f025c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a509818f78b180ab1c0cbfd2ae9611e62"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a509818f78b180ab1c0cbfd2ae9611e62">slab_allocator_allocate</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa, unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> size)</td></tr>
+<tr class="memitem:a509818f78b180ab1c0cbfd2ae9611e62"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ptr_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a509818f78b180ab1c0cbfd2ae9611e62">slab_allocator_allocate</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa, unsigned int size)</td></tr>
 <tr class="separator:a509818f78b180ab1c0cbfd2ae9611e62"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4345c1b1cc58977cbf1cd8225f63b7eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a4345c1b1cc58977cbf1cd8225f63b7eb">slab_allocator_free</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa, <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
+<tr class="memitem:a4345c1b1cc58977cbf1cd8225f63b7eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a4345c1b1cc58977cbf1cd8225f63b7eb">slab_allocator_free</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa, <a class="el" href="ptr_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> <a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)</td></tr>
 <tr class="separator:a4345c1b1cc58977cbf1cd8225f63b7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0b0040281213d9238407ddcd27b022d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#ac0b0040281213d9238407ddcd27b022d">slab_allocator_cur_slabs_allocated</a> (const <a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa)</td></tr>
 <tr class="separator:ac0b0040281213d9238407ddcd27b022d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4cec442d9bd642c6a9bb74fef3eca9b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a4cec442d9bd642c6a9bb74fef3eca9b6">ptr_for</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa, unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> id, unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> <a class="el" href="macros_8h.html#a86659537194f22ae1712c49e584bf1c8">len</a>)</td></tr>
+<tr class="memitem:a4cec442d9bd642c6a9bb74fef3eca9b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="ptr_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a4cec442d9bd642c6a9bb74fef3eca9b6">ptr_for</a> (<a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a> sa, unsigned int id, unsigned int <a class="el" href="macros_8h.html#a86659537194f22ae1712c49e584bf1c8">len</a>)</td></tr>
 <tr class="separator:a4cec442d9bd642c6a9bb74fef3eca9b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:a3c57ae90c2e9548a4dd6df6f91820586"><td class="memItemLeft" align="right" valign="top"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8h.html#a3c57ae90c2e9548a4dd6df6f91820586">slabs_page_size</a></td></tr>
-<tr class="separator:a3c57ae90c2e9548a4dd6df6f91820586"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ae6f702dbf218f022c4074282675e000c"></a>
@@ -178,56 +133,14 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="fam__alloc_8c.html#afd02bb0f6a745c39d5e3417493995c71">SlabAllocatorNc   \</a></div>
-<div class="line"><a class="code" href="fam__alloc_8c.html#afd02bb0f6a745c39d5e3417493995c71">		__attribute__</a>((warn_unused_result, cleanup(<a class="code" href="slabs_8h.html#a178f98d18b5cf3a5f10087d839588d7e">slab_allocator_cleanup</a>)))</div>
-<div class="ttc" id="afam__alloc_8c_html_afd02bb0f6a745c39d5e3417493995c71"><div class="ttname"><a href="fam__alloc_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a></div><div class="ttdeci">void __attribute__((constructor))</div><div class="ttdef"><b>Definition:</b> fam_alloc.c:29</div></div>
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="fam__alloc_8c.html#a752990f8df8b9fffa1ed88df81da3291">SlabAllocatorNc   \</a></div>
+<div class="line"><a class="code" href="fam__alloc_8c.html#a752990f8df8b9fffa1ed88df81da3291">		__attribute__</a>((warn_unused_result, cleanup(<a class="code" href="slabs_8h.html#a178f98d18b5cf3a5f10087d839588d7e">slab_allocator_cleanup</a>)))</div>
+<div class="ttc" id="afam__alloc_8c_html_a752990f8df8b9fffa1ed88df81da3291"><div class="ttname"><a href="fam__alloc_8c.html#a752990f8df8b9fffa1ed88df81da3291">__attribute__</a></div><div class="ttdeci">void __attribute__((destuctor))</div><div class="ttdef"><b>Definition:</b> fam_alloc.c:37</div></div>
 <div class="ttc" id="aslabs_8h_html_a178f98d18b5cf3a5f10087d839588d7e"><div class="ttname"><a href="slabs_8h.html#a178f98d18b5cf3a5f10087d839588d7e">slab_allocator_cleanup</a></div><div class="ttdeci">void slab_allocator_cleanup(SlabAllocatorNc *ptr)</div></div>
 </div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
-<a id="a02ea2c2e783c73f814b74dab12bd61f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a02ea2c2e783c73f814b74dab12bd61f9">&#9670;&nbsp;</a></span>Alloc</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="structAlloc.html">Alloc</a> <a class="el" href="structAlloc.html">Alloc</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ac1edcebf2f9fda90333f32f85bef2ca9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac1edcebf2f9fda90333f32f85bef2ca9">&#9670;&nbsp;</a></span>Ptr</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="structType.html">Type</a>* <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afa692e6fd803fdc6ce5546ee973e153b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa692e6fd803fdc6ce5546ee973e153b">&#9670;&nbsp;</a></span>ResourceStats</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef struct <a class="el" href="structResourceStats.html">ResourceStats</a> <a class="el" href="structResourceStats.html">ResourceStats</a></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a0251654f379b88990eae97c1e9b96090"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0251654f379b88990eae97c1e9b96090">&#9670;&nbsp;</a></span>SlabAllocatorNc</h2>
 
@@ -243,141 +156,6 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a4ef662ec7fb312a278488fa2d204d4f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4ef662ec7fb312a278488fa2d204d4f1">&#9670;&nbsp;</a></span>alloc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structAlloc.html">Alloc</a> alloc </td>
-          <td>(</td>
-          <td class="paramtype">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
-          <td class="paramname"><em>size</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a70b05a036d4bd3162742f130ae43500a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a70b05a036d4bd3162742f130ae43500a">&#9670;&nbsp;</a></span>alloc_sum()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> alloc_sum </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a657e5363c2dfbf6dea97592a2b6e43d0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a657e5363c2dfbf6dea97592a2b6e43d0">&#9670;&nbsp;</a></span>ptr_aux()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void* ptr_aux </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a5e66cd9611c0676955cf648329361b56"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5e66cd9611c0676955cf648329361b56">&#9670;&nbsp;</a></span>ptr_data()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void* ptr_data </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a1a1304c5f6b6a7b4150d601dd507e50c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a1304c5f6b6a7b4150d601dd507e50c">&#9670;&nbsp;</a></span>ptr_direct_alloc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> ptr_direct_alloc </td>
-          <td>(</td>
-          <td class="paramtype">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
-          <td class="paramname"><em>size</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="af53ee9eef0ec94717c6f8767a0d1a5b0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af53ee9eef0ec94717c6f8767a0d1a5b0">&#9670;&nbsp;</a></span>ptr_direct_release()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ptr_direct_release </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ab04f0fb5b01497eef6fee4d28b4c04cd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab04f0fb5b01497eef6fee4d28b4c04cd">&#9670;&nbsp;</a></span>ptr_direct_resize()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> ptr_direct_resize </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td>
-          <td class="paramname"><em>ptr</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
-          <td class="paramname"><em>size</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a4cec442d9bd642c6a9bb74fef3eca9b6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4cec442d9bd642c6a9bb74fef3eca9b6">&#9670;&nbsp;</a></span>ptr_for()</h2>
 
@@ -385,7 +163,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> ptr_for </td>
+          <td class="memname"><a class="el" href="ptr_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> ptr_for </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a>&#160;</td>
           <td class="paramname"><em>sa</em>, </td>
@@ -393,107 +171,19 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
+          <td class="paramtype">unsigned int&#160;</td>
           <td class="paramname"><em>id</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
+          <td class="paramtype">unsigned int&#160;</td>
           <td class="paramname"><em>len</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
           <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="afa8f233da5669c989f2d0f3aca60f2b2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa8f233da5669c989f2d0f3aca60f2b2">&#9670;&nbsp;</a></span>ptr_id()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> ptr_id </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aa6145cf21b3ae9e2170dbe048baec361"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa6145cf21b3ae9e2170dbe048baec361">&#9670;&nbsp;</a></span>ptr_len()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> ptr_len </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td>
-          <td class="paramname"><em>ptr</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a2166d20f275373b0e4a613d2b3c7e2a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2166d20f275373b0e4a613d2b3c7e2a7">&#9670;&nbsp;</a></span>release()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void release </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="structAlloc.html">Alloc</a>&#160;</td>
-          <td class="paramname"><em>alloc</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="a33010add1b9bd581ca3c86225f46cbc8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a33010add1b9bd581ca3c86225f46cbc8">&#9670;&nbsp;</a></span>release_sum()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> release_sum </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="ac51b06a1a439241da94504883c482028"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac51b06a1a439241da94504883c482028">&#9670;&nbsp;</a></span>resize_sum()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="types_8h.html#a87dc1c46a17e3ee6037afdb6aef76632">int64</a> resize_sum </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -507,7 +197,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> slab_allocator_allocate </td>
+          <td class="memname"><a class="el" href="ptr_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a> slab_allocator_allocate </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="slabs_8h.html#a2cd1abc2fc8e5589968a3d0b5e41252d">SlabAllocator</a>&#160;</td>
           <td class="paramname"><em>sa</em>, </td>
@@ -515,7 +205,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a>&#160;</td>
+          <td class="paramtype">unsigned int&#160;</td>
           <td class="paramname"><em>size</em>&#160;</td>
         </tr>
         <tr>
@@ -596,7 +286,7 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="slabs_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="ptr_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9">Ptr</a>&#160;</td>
           <td class="paramname"><em>ptr</em>&#160;</td>
         </tr>
         <tr>
@@ -605,46 +295,6 @@ Variables</h2></td></tr>
           <td></td><td></td>
         </tr>
       </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a id="aac08c8ee2b82eb9dce8c01cd07897662"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac08c8ee2b82eb9dce8c01cd07897662">&#9670;&nbsp;</a></span>slab_overhead()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">unsigned <a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> slab_overhead </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Variable Documentation</h2>
-<a id="a3c57ae90c2e9548a4dd6df6f91820586"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3c57ae90c2e9548a4dd6df6f91820586">&#9670;&nbsp;</a></span>slabs_page_size</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">int</a> slabs_page_size</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">extern</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 </div>
