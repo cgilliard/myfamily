@@ -45,6 +45,7 @@ pre-commit install -f
 
 cc=cc
 
+include=.
 for var in "$@"
 do
 
