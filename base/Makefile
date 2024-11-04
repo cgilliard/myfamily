@@ -5,6 +5,6 @@ OBJS := types.o \
 	fam_err.o \
 	alloc.o
 
-TEST_OBJS := $(OBJS) test_impl.o
+TEST_OBJS := $(OBJS)
 
 include ../Makefile.template
