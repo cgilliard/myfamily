@@ -60,3 +60,17 @@ MyTest(base, test_alloc) {
 	cr_assert(test1.ptr != NULL);
 	release(test1);
 }
+
+MyTest(base, test_slab_allocator) {
+	SlabAllocator sa1;
+	cr_assert(!slab_allocator_init(&sa1, 16));
+	Slab s1 = slab_allocator_allocate(&sa1);
+	cr_assert(s1 != NULL);
+	Slab s2 = slab_allocator_allocate(&sa1);
+	cr_assert(s2 != NULL);
+
+	slab_allocator_free(&sa1, s1);
+
+	Slab s3 = slab_allocator_allocate(&sa1);
+	Slab s4 = slab_allocator_allocate(&sa1);
+}

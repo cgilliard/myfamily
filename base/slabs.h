@@ -12,17 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_OSDEF__
-#define _BASE_OSDEF__
+#ifndef _BASE_SLABS__
+#define _BASE_SLABS__
 
+#include <base/lock.h>
 #include <base/types.h>
-#include <sys/mman.h>
 
-void *malloc(size_t size);
-void free(void *ptr);
-void exit(int);
-int getpagesize();
-char *getenv(const char *name);
-void *memcpy(void *, const void *, size_t);
+// Slab Allocator
+typedef struct SlabImpl *Slab;
+typedef struct SlabAllocator {
+	Slab head;
+	Slab tail;
+	unsigned long long free_size;
+	unsigned int slab_size;
+} SlabAllocator;
 
-#endif	// _BASE_OSDEF__
+void slab_allocator_cleanup(SlabAllocator *ptr);
+
+int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size);
+void slab_allocator_cleanup(SlabAllocator *sa);
+Slab slab_allocator_allocate(SlabAllocator *sa);
+void slab_allocator_free(SlabAllocator *sa, Slab slab);
+
+#endif	// _BASE_SLABS__
