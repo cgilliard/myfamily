@@ -73,10 +73,10 @@ Ptr ptr_direct_resize(Ptr ptr, unsigned int size) {
 	nptr->id = ptr->id;
 	nptr->aux = ptr->aux;
 	unsigned int copy_sz;
-	if (a.size < ptr->len)
-		copy_sz = a.size;
+	if (a.size < ptr_len(ptr))
+		copy_sz = a.size - slab_overhead();
 	else
-		copy_sz = ptr->len;
+		copy_sz = ptr_len(ptr);
 	memcpy($(nptr), $(ptr), copy_sz);
 	ptr_direct_release(ptr);
 	return nptr;
