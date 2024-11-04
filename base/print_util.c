@@ -26,7 +26,7 @@ void __attribute__((no_return)) panic(const char *fmt, ...) {
 	vfprintf(stderr, fmt, args);
 	// vsnprintf(buf, 1024, fmt, args);
 	__builtin_va_end(args);
-	print("\n");
+	fprintf(stderr, "\n");
 
 	exit(-1);
 }
@@ -36,7 +36,7 @@ int println(const char *fmt, ...) {
 	__builtin_va_start(args, fmt);
 	vfprintf(stderr, fmt, args);
 	__builtin_va_end(args);
-	printf("\n");
+	fprintf(stderr, "\n");
 	return 0;
 }
 
