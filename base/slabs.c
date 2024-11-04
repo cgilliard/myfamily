@@ -105,6 +105,7 @@ typedef struct SlabData {
 } SlabData;
 
 typedef struct SlabAllocatorImpl {
+	bool atomic;
 	int64 sd_count;
 	SlabData sd_arr[];
 } SlabAllocatorImpl;
@@ -138,14 +139,13 @@ void slab_allocator_cleanup(SlabAllocator *ptr) {
 
 void slab_allocator_init_free_list(SlabData *sd, int64 chunks) {
 	sd->free_list_head = sd->cur_chunks * sd->type.slabs_per_resize;
+	unsigned int *free_list = $(sd->free_list);
 	int64 count = chunks * (int64)sd->type.slabs_per_resize;
 	for (int64 i = 0; i < count; i++) {
 		if (i == count - 1) {
-			*(unsigned int *)$(&sd->free_list[i + sd->free_list_head]) =
-				UINT32_MAX;
+			free_list[i + sd->free_list_head] = UINT32_MAX;
 		} else {
-			*(unsigned int *)$(&sd->free_list[i + sd->free_list_head]) =
-				1 + i + sd->free_list_head;
+			free_list[i + sd->free_list_head] = 1 + i + sd->free_list_head;
 		}
 	}
 }
@@ -245,12 +245,13 @@ int slab_allocator_get_index(unsigned int size) {
 	return -1;
 }
 
-SlabAllocator slab_allocator_create() {
+SlabAllocator slab_allocator_create(bool atomic) {
 	SlabAllocatorNc ret;
 	Alloc a = alloc(sizeof(SlabAllocatorImpl) + SLAB_SIZES * sizeof(SlabData));
 	if (a.ptr == NULL) return NULL;
 	ret = a.ptr;
 	ret->sd_count = 0;
+	ret->atomic = atomic;
 
 	int size;
 	while ((size = slab_allocator_get_size(ret->sd_count)) >= 0) {
@@ -288,8 +289,7 @@ int64 slab_allocator_slab_data_offset(SlabData *sd, int64 id) {
 
 Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 	bool err_cond = false;
-
-	lockw(&sd->lock);
+	if (sa->atomic) lockw(&sd->lock);
 
 	if (sd->free_list_head == UINT32_MAX) {
 		if (slab_allocator_increase_chunks(sd, 1)) {
@@ -300,7 +300,7 @@ Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 		}
 	}
 
-	unlock(&sd->lock);
+	if (sa->atomic) unlock(&sd->lock);
 
 	if (err_cond) return NULL;
 
@@ -309,7 +309,7 @@ Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 	Ptr ptr;
 
 	do {
-		lockr(&sd->lock);
+		if (sa->atomic) lockr(&sd->lock);
 
 		old_free_list_head = sd->free_list_head;
 		int64 index = slab_allocator_slab_data_index(sd, old_free_list_head);
@@ -319,13 +319,22 @@ Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 		ptr = (Type *)($(ptrs[index]) + offset);
 		ptr->id = old_free_list_head;
 		ptr->len = sd->type.slab_size;
-		new_free_list_head = *(unsigned int *)$(&sd->free_list[ptr->id]);
-		unlock(&sd->lock);
+		unsigned int *free_list = $(sd->free_list);
+		new_free_list_head = free_list[ptr->id];
+		if (sa->atomic)
+			unlock(&sd->lock);
+		else {
+			sd->free_list_head = new_free_list_head;
+			break;
+		}
 
 	} while (!__atomic_compare_exchange_n(
 		&sd->free_list_head, &old_free_list_head, new_free_list_head, false,
 		__ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
-	__atomic_fetch_add(&sd->cur_slabs, 1, __ATOMIC_SEQ_CST);
+	if (sa->atomic)
+		__atomic_fetch_add(&sd->cur_slabs, 1, __ATOMIC_SEQ_CST);
+	else
+		sd->cur_slabs++;
 
 	return ptr;
 }
@@ -339,20 +348,29 @@ Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size) {
 	return ret;
 }
 
-void slab_allocator_data_free(SlabData *sd, unsigned int id) {
+void slab_allocator_data_free(SlabData *sd, unsigned int id, bool atomic) {
 	unsigned int old_free_list_head;
 	unsigned int new_free_list_head;
 	do {
-		lockr(&sd->lock);
+		if (atomic) lockr(&sd->lock);
 		old_free_list_head = sd->free_list_head;
-		new_free_list_head = id;  // Calculate new_free_list_head here
-		((unsigned int *)$(sd->free_list))[id] =
-			old_free_list_head;	 // Update sd->free_list[id] here
-		unlock(&sd->lock);
+		new_free_list_head = id;
+		unsigned int *free_list = $(sd->free_list);
+		free_list[id] = old_free_list_head;
+		if (atomic)
+			unlock(&sd->lock);
+		else {
+			sd->free_list_head = new_free_list_head;
+			break;
+		}
 	} while (!__atomic_compare_exchange_n(
 		&sd->free_list_head, &old_free_list_head, new_free_list_head, false,
 		__ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
-	__atomic_fetch_sub(&sd->cur_slabs, 1, __ATOMIC_SEQ_CST);
+
+	if (atomic)
+		__atomic_fetch_sub(&sd->cur_slabs, 1, __ATOMIC_SEQ_CST);
+	else
+		sd->cur_slabs--;
 }
 
 void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
@@ -372,7 +390,7 @@ void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
 			sa->sd_arr[index].type.slab_size, len);
 	}
 
-	slab_allocator_data_free(&sa->sd_arr[index], ptr->id);
+	slab_allocator_data_free(&sa->sd_arr[index], ptr->id, sa->atomic);
 }
 
 Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len) {
@@ -387,7 +405,7 @@ Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len) {
 	index = slab_allocator_slab_data_index(&sd, id);
 
 	Ptr ret;
-	lockr(&sd.lock);
+	if (sa->atomic) lockr(&sd.lock);
 
 	if (index >= sd.cur_chunks) {
 		ret = NULL;
@@ -397,7 +415,7 @@ Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len) {
 		ret = (Type *)($(ptr) + offset);
 	}
 
-	unlock(&sd.lock);
+	if (sa->atomic) unlock(&sd.lock);
 	return ret;
 }
 

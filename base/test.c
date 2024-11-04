@@ -167,7 +167,7 @@ MyTest(base, test_limits) {
 
 MyTest(base, test_slab_allocator) {
 	{
-		SlabAllocator sa = slab_allocator_create();
+		SlabAllocator sa = slab_allocator_create(true);
 		Ptr ptr = slab_allocator_allocate(sa, 100);
 		cr_assert($len(ptr) >= 100);
 		byte *arr = $(ptr);
@@ -184,7 +184,7 @@ MyTest(base, test_slab_allocator) {
 	cr_assert(alloc_sum() > 0);
 
 	{
-		SlabAllocator sa = slab_allocator_create();
+		SlabAllocator sa = slab_allocator_create(true);
 		for (int i = 0; i < 1000; i++) {
 			Ptr ptr = slab_allocator_allocate(sa, i);
 			cr_assert($len(ptr) >= i);
@@ -200,13 +200,57 @@ MyTest(base, test_slab_allocator) {
 	cr_assert(alloc_sum() > 0);
 }
 
-MyTest(base, test_slab_allocator2) {
-	{
-		SlabAllocator sa = slab_allocator_create();
-		for (int i = 0; i < 10; i++) {
-			Ptr ptr = slab_allocator_allocate(sa, 100);
-		}
+MyTest(base, test_big) {
+	SlabAllocator sa = slab_allocator_create(false);
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
+	// unsigned int size = ((1024LL * 1024LL * 1024LL * 4) - 128);
+	unsigned int size = (10LL * 1024LL * 1LL);
+	int ss = 16;
+	Ptr *arr = malloc(sizeof(Ptr) * (long long)size);
+	for (unsigned int i = 0; i < size; i++) {
+		if (i % 10000 == 0) println("i=%u", i);
+		arr[i] = slab_allocator_allocate(sa, ss);
+		if (nil(arr[i])) printf("nil ptr at %u\n", i);
+		cr_assert(!nil(arr[i]));
+		cr_assert_eq(ptr_id(arr[i]), i);
+		cr_assert_eq($len(arr[i]), ss);
+		byte *data = $(arr[i]);
+		for (int j = 0; j < ss; j++) data[j] = (j + i * 3) % 256;
 	}
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), size);
+
+	for (unsigned int i = 0; i < size; i++) {
+		if (i % 10000 == 0) println("check i=%u", i);
+		if (nil(arr[i])) printf("nil ptr at %u\n", i);
+		cr_assert(!nil(arr[i]));
+		cr_assert_eq(ptr_id(arr[i]), i);
+		cr_assert_eq($len(arr[i]), ss);
+		byte *data = $(arr[i]);
+		for (int j = 0; j < ss; j++) data[j] = (j + i * 3) % 256;
+	}
+
+	for (unsigned int i = 0; i < size; i++) {
+		if (i % 10000 == 0) println("free i=%u", i);
+		cr_assert_eq(ptr_id(arr[i]), i);
+		cr_assert_eq($len(arr[i]), ss);
+		byte *data = $(arr[i]);
+
+		for (int j = 0; j < ss; j++) cr_assert_eq(data[j], (j + i * 3) % 256);
+
+		slab_allocator_free(sa, arr[i]);
+	}
+
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
+
+	Ptr p = slab_allocator_allocate(sa, ss);
+	cr_assert_eq(ptr_id(p), size - 1);
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 1);
+	slab_allocator_free(sa, p);
+	cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
+
+	/////	release(alloc_res);
+	free(arr);
 }
 
 MyTest(base, test_slab_sizes) {

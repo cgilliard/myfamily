@@ -31,7 +31,7 @@ Ptr fam_ptr_copy(Ptr ptr) {
 
 void fam_alloc_init() {
 	if (global_slab_allocator == NULL) {
-		global_slab_allocator = slab_allocator_create();
+		global_slab_allocator = slab_allocator_create(true);
 		if (global_slab_allocator == NULL) {
 			panic("Could not initialize global slab allocator!");
 		}

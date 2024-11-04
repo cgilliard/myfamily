@@ -30,7 +30,7 @@ void slab_allocator_cleanup(SlabAllocatorNc *ptr);
 	SlabAllocatorNc   \
 		__attribute__((warn_unused_result, cleanup(slab_allocator_cleanup)))
 
-SlabAllocator slab_allocator_create();
+SlabAllocator slab_allocator_create(bool atomic);
 Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size);
 void slab_allocator_free(SlabAllocator sa, Ptr ptr);
 int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa);
