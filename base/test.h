@@ -40,8 +40,8 @@
 		test_init_test_resources(#suite, #test_name, path, resources); \
 		test_##suite##_##test_name(path, resources);                   \
 		test_cleanup_test_resources(path);                             \
-		test_confirm_dev_resources();                                  \
 		test_cleanup_dev_resources();                                  \
+		test_confirm_dev_resources();                                  \
 	}                                                                  \
 	void test_##suite##_##test_name(const byte *test_dir,              \
 									const byte *resources_dir)

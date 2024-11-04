@@ -225,3 +225,40 @@ MyTest(base, test_slab_sizes) {
 	// largest slabs size is this - 1 (65536)
 	cr_assert_eq(i, 65537);
 }
+
+MyTest(base, test_fam_alloc) {
+	Ptr test = NULL;
+	cr_assert(nil(test));
+	cr_assert(!initialized(test));
+	test = $alloc(100);
+	cr_assert(!nil(test));
+	cr_assert(ok(test));
+	$release(test);
+	cr_assert(nil(test));
+	cr_assert(!ok(test));
+
+	Ptr resize = NULL;
+	cr_assert(nil(resize));
+	resize = $alloc(200);
+	cr_assert($len(resize) >= 200);
+	int initial_size = $len(resize);
+	Ptr resize2 = $resize(resize, 300);
+	cr_assert($len(resize2) > initial_size);
+
+	Ptr resize3 = $resize(resize2, 100000);
+	cr_assert($len(resize3) > 100000);
+	for (int i = 0; i < 100000; i++) ((byte *)$(resize3))[i] = 'a' + (i % 26);
+
+	for (int i = 0; i < 100000; i++)
+		cr_assert_eq(((byte *)$(resize3))[i], 'a' + (i % 26));
+
+	Ptr resize4 = $resize(resize3, 200000);
+	for (int i = 0; i < 100000; i++)
+		cr_assert_eq(((byte *)$(resize4))[i], 'a' + (i % 26));
+
+	Ptr resize5 = $resize(resize4, 500);
+	for (int i = 0; i < 500; i++)
+		cr_assert_eq(((byte *)$(resize5))[i], 'a' + (i % 26));
+
+	$release(resize5);
+}
