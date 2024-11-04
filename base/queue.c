@@ -12,56 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/fam_alloc.h>
-#include <base/macros.h>
 #include <base/print_util.h>
 #include <base/queue.h>
 
 // Michael-Scott lock free queue implementation
 
-unsigned long long queue_global_seqno;
-
 typedef struct QueueNode {
-	Ptr next;
-	Ptr value;
-	unsigned long long seqno;
+	struct QueueNode *next;
+	byte value[];
 } QueueNode;
 
 typedef struct QueueImpl {
-	Ptr head;
-	Ptr tail;
+	QueueNode *head;
+	QueueNode *tail;
 } QueueImpl;
 
 Queue queue_create() {
-	Ptr ret = $alloc(sizeof(QueueImpl));
-	println("ret.id=%u,%u\n", ptr_id(ret), ptr_len(ret));
-	if (ret == NULL) return NULL;
-	Ptr node = $alloc(sizeof(QueueNode));
-	println("head=%p", $(node));
-	if (node == NULL) {
-		$release(ret);
-		return NULL;
-	}
-	QueueNode *qnode = $(node);
-	qnode->next = NULL;
-	QueueImpl *impl = $(ret);
-	impl->head = fam_ptr_copy(node);
-	impl->tail = fam_ptr_copy(node);
-
-	println("create q->head=%p,q->tail=%p,impl->head=%p", $(impl->head),
-			$(impl->tail), impl->head);
-
-	return ret;
-}
-
-bool queue_node_equal(Ptr n1, Ptr n2) {
-	println("eq %p %p", n1, n2);
-	if (n1 != n2) return false;
-	if (nil(n1) && nil(n2)) return true;
-	if (nil(n1) || nil(n2)) return false;
-	QueueNode *qnode1 = $(n1);
-	QueueNode *qnode2 = $(n2);
-	return qnode1->seqno == qnode2->seqno;
+	return NULL;
 }
 
 // clang-format off
@@ -87,50 +54,7 @@ E17: CAS(&Q–>Tail, tail, <node, tail.count+1>)
 */
 // clang-format on
 
-int queue_enqueue(Queue queue, Ptr value) {
-	if (nil(value)) return -1;
-	QueueImpl *q = $(queue);
-
-	println("pre enqueue q->head=%p,q->tail=%p,q->head=%p", $(q->head),
-			$(q->tail), q->head);
-
-	Ptr node = $alloc(sizeof(QueueNode));
-	println("node=%p", node);
-	if (node == NULL) return -1;
-	QueueNode *qnode = $(node);
-	qnode->value = value;
-	qnode->next = NULL;
-	qnode->seqno = __atomic_fetch_add(&queue_global_seqno, 1, __ATOMIC_RELAXED);
-
-	Ptr tail;
-	Ptr next;
-
-	println("pre enqueue q->head=%p,q->tail=%p", $(q->head), $(q->tail));
-
-	loop {
-		tail = q->tail;
-		next = ((QueueNode *)$(tail))->next;
-
-		if ($(tail) == $(q->tail)) {
-			println("equal");
-		}
-
-		if (next == NULL) {
-			println("next null");
-			if (CAS_SEQ(&((QueueNode *)$(tail))->next, &next, node)) {
-				println("cas seq cond true");
-				CAS_SEQ(&q->tail, &tail, node);
-				println("break");
-				break;
-			} else {
-				println("next not null");
-				CAS_SEQ(&q->tail, &tail, next);
-			}
-		}
-	}
-
-	println("post enqueue q->head=%p,q->tail=%p", $(q->head), $(q->tail));
-
+int queue_enqueue(Queue queue, void *value) {
 	return 0;
 }
 
@@ -161,7 +85,7 @@ D20: return TRUE
 */
 // clang-format on
 
-Ptr queue_dequeue(Queue queue) {
+void *queue_dequeue(Queue queue) {
 	return NULL;
 }
 
@@ -172,10 +96,4 @@ Ptr queue_dequeue(Queue queue) {
 #pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
 
 void Queue_cleanup(const Queue *queue) {
-	println("q cleanup");
-	if (!nil(*queue)) {
-		QueueImpl *impl = $(*queue);
-		//$release(impl->head);
-		fam_release(*queue);
-	}
 }
