@@ -16,12 +16,12 @@ bin/test: test.c $(TEST_OBJS)
 test: test_bin
 	rm -rf bin/nocapture
 	export TIMEFORMAT="Execution time: %R seconds"
-	time -h ./bin/test --timeout 60 -f
+	time ./bin/test --timeout 60 -f
 
 
 testnc: test_bin
 	touch bin/nocapture
-	time -h ./bin/test --timeout 60 -f
+	time ./bin/test --timeout 60 -f
 
 clean:
 	rm -rf *.o
