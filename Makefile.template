@@ -10,7 +10,7 @@ test_bin: bin/test
 
 bin/test: test.c $(TEST_OBJS)
 	mkdir -p bin
-	$(CC) $(FLAG_OPTIONS) $(CC_TEST_FLAGS) -I.. -c ../base/test_impl.c -o bin/test_impl.o
+	$(CC) $(FLAG_OPTIONS) $(CC_FLAGS) $(CRITERION_INCLUDE) -I.. -c ../base/test_impl.c -o bin/test_impl.o
 	$(CC) $(FLAG_OPTIONS) $(CC_TEST_FLAGS) $(TEST_OBJS) bin/test_impl.o -I.. -o bin/test test.c
 
 test: test_bin
