@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/alloc.h>
 #include <base/colors.h>
 #include <base/fam_err.h>
 #include <base/limits.h>
@@ -19,5 +20,4 @@
 #include <base/macro_util.h>
 #include <base/macros.h>
 #include <base/print_util.h>
-#include <base/slabs.h>
 #include <base/types.h>

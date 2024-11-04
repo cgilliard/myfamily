@@ -17,7 +17,7 @@
 Suite(base);
 
 MyTest(base, test_lock) {
-	Lock l1 = lock_create();
+	Lock l1 = INIT_LOCK;
 	lock_read(&l1);
 	// upper bits incremented by 1.
 	cr_assert_eq(l1 >> 32, 1);
@@ -46,12 +46,19 @@ MyTest(base, test_lock) {
 
 MyTest(base, test_lock_macros) {
 	int x = 0;
-	Lock l = lock();
+	Lock l = INIT_LOCK;
 	wsync(l, { x++; });
 	cr_assert(x == 1);
 	int y;
 	rsync(l, { y = x; });
 	cr_assert(y == 1);
+}
+
+MyTest(base, test_alloc) {
+	Alloc test1 = alloc(100);
+	cr_assert_eq(test1.size, page_aligned_size(100));
+	cr_assert(test1.ptr != NULL);
+	release(test1);
 }
 
 MyTest(base, test_limits) {

@@ -13,17 +13,18 @@
 // limitations under the License.
 
 #include <base/lib.h>
+#include <base/print_util.h>
 #include <base/test_impl.h>
 #include <criterion/criterion.h>
 
 #define PATH_MAX 1024
 
-#define Suite(name)                                                      \
-	void setup_suite(void) {                                             \
-		printf("[%s====%s] Running %s%s%s test suite...\n", BLUE, RESET, \
-			   GREEN, #name, RESET);                                     \
-	}                                                                    \
-	Test(name, name##_init, .init = setup_suite) {                       \
+#define Suite(name)                                                            \
+	void setup_suite(void) {                                                   \
+		println("[%s====%s] Running %s%s%s test suite...", BLUE, RESET, GREEN, \
+				#name, RESET);                                                 \
+	}                                                                          \
+	Test(name, name##_init, .init = setup_suite) {                             \
 	}
 
 #define MyTest(suite, test_name)                                       \

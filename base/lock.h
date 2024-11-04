@@ -15,6 +15,8 @@
 #ifndef _BASE_LOCK__
 #define _BASE_LOCK__
 
+#define INIT_LOCK 0
+
 typedef unsigned long long Lock;
 
 Lock lock_create();
