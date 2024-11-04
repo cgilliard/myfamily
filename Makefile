@@ -23,6 +23,7 @@ clean:
 
 define run_tests
     ERROR="0"; \
+    echo "[===================================================================]"; \
     for dir in $(SUBDIRS); do \
         if test -z $(CRITERION_TEST_PATTERN); then \
             if test -z $(FILTER); then \
@@ -31,22 +32,18 @@ define run_tests
             export CRITERION_TEST_PATTERN=$$dir/$$FILTER; \
         fi; \
         if test -z $(TARGET); then \
-            if test -z $(FILTER); then \
-                echo "[===================================================================]"; \
-            else \
-                echo "[===================================================================]"; \
+            if test ! -z $(FILTER); then \
                 echo "[====] Running $$dir test suite... (FILTER=$$FILTER)"; \
             fi; \
             $(MAKE) -C $$dir $(2) FLAG_OPTIONS="$(1)" -s || exit 1; \
+            echo "[===================================================================]"; \
         else \
             if [ "$$dir" = "$(TARGET)" ]; then \
-                if test -z $(FILTER); then \
-                    echo "[===================================================================]"; \
-                else \
-                    echo "[===================================================================]"; \
+                if test ! -z $(FILTER); then \
                     echo "[====] Running $$dir test suite... (FILTER=$$FILTER)"; \
                 fi; \
                 $(MAKE) -C $$dir $(2) FLAG_OPTIONS="$(1)" -s || exit 1; \
+                echo "[===================================================================]"; \
             fi; \
         fi; \
         if [ $$? -ne "0" ]; then \
