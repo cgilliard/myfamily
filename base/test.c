@@ -53,3 +53,17 @@ MyTest(base, test_lock_macros) {
 	rsync(l, { y = x; });
 	cr_assert(y == 1);
 }
+
+MyTest(base, test_limits) {
+	cr_assert_eq(INT64_MAX, 9223372036854775807LL);
+	cr_assert_eq(INT64_MAX_IMPL, 9223372036854775807LL);
+	cr_assert_eq(INT_MAX, 2147483647);
+	cr_assert_eq(INT_MAX_IMPL, 2147483647);
+	cr_assert_eq(BYTE_MAX, 255);
+	cr_assert_eq(BYTE_MAX_IMPL, 255);
+	cr_assert_eq(INT_MAX, 2147483647);
+	cr_assert_eq(INT_MIN, -2147483648);
+	cr_assert_eq(INT_MIN_IMPL, -2147483648);
+	cr_assert_eq(UINT32_MAX, 4294967295);
+	cr_assert_eq(UINT32_MAX_IMPL, 4294967295);
+}
