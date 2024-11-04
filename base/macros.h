@@ -17,6 +17,13 @@
 
 #include <base/types.h>
 
+// Type macros
+#define Type(type)                 \
+	typedef struct Type *type##Nc; \
+	void type##_cleanup(const type##Nc *ptr);
+#define DefineType(type) \
+	type##Nc __attribute((warn_unused_result, cleanup(type##_cleanup)))
+
 // Ptr macros
 #define $(ptr) ptr_data(ptr)
 #define $len(ptr) ptr_len(ptr)

@@ -22,5 +22,6 @@
 #include <base/macros.h>
 #include <base/print_util.h>
 #include <base/ptr.h>
+#include <base/queue.h>
 #include <base/slabs.h>
 #include <base/types.h>

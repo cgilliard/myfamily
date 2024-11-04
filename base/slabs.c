@@ -319,7 +319,7 @@ Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
 		ptr = (Type *)($(ptrs[index]) + offset);
 		ptr->id = old_free_list_head;
 		ptr->len = sd->type.slab_size;
-		new_free_list_head = ((unsigned int *)$(sd->free_list))[ptr->id];
+		new_free_list_head = *(unsigned int *)$(&sd->free_list[ptr->id]);
 		unlock(&sd->lock);
 
 	} while (!__atomic_compare_exchange_n(

@@ -25,6 +25,10 @@ Ptr fam_ptr_for(unsigned int id, unsigned int len) {
 	return ptr_for(global_slab_allocator, id, len);
 }
 
+Ptr fam_ptr_copy(Ptr ptr) {
+	return fam_ptr_for(ptr_id(ptr), ptr_len(ptr));
+}
+
 void fam_alloc_init() {
 	if (global_slab_allocator == NULL) {
 		global_slab_allocator = slab_allocator_create();

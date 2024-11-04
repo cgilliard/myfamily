@@ -200,6 +200,15 @@ MyTest(base, test_slab_allocator) {
 	cr_assert(alloc_sum() > 0);
 }
 
+MyTest(base, test_slab_allocator2) {
+	{
+		SlabAllocator sa = slab_allocator_create();
+		for (int i = 0; i < 10; i++) {
+			Ptr ptr = slab_allocator_allocate(sa, 100);
+		}
+	}
+}
+
 MyTest(base, test_slab_sizes) {
 	int i = 0;
 	int j;
@@ -261,4 +270,28 @@ MyTest(base, test_fam_alloc) {
 		cr_assert_eq(((byte *)$(resize5))[i], 'a' + (i % 26));
 
 	$release(resize5);
+}
+
+MyTest(base, test_queue) {
+	/*
+		Queue q = queue_create();
+
+		Ptr v1 = $alloc(sizeof(int64));
+		println("v1.id=%u, %u\n", ptr_id(v1), ptr_len(v1));
+		*(int64 *)$(v1) = 3;
+
+		Ptr v2 = $alloc(sizeof(int64));
+		println("v2.id=%u,%u\n", ptr_id(v2), ptr_len(v2));
+		println("1");
+		*(int64 *)$(v2) = 4;
+		println("2");
+
+		println("3");
+		queue_enqueue(q, v1);
+		println("4");
+		// queue_enqueue(q, v2);
+
+		$release(v1);
+		$release(v2);
+	*/
 }
