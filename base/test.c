@@ -68,11 +68,35 @@ MyTest(base, test_slab_allocator) {
 	cr_assert(s1 != NULL);
 	Slab s2 = slab_allocator_allocate(&sa1);
 	cr_assert(s2 != NULL);
+	Slab s3 = slab_allocator_allocate(&sa1);
+	cr_assert(s3 != NULL);
 
+	slab_allocator_free(&sa1, s3);
+	slab_allocator_free(&sa1, s2);
 	slab_allocator_free(&sa1, s1);
 
-	Slab s3 = slab_allocator_allocate(&sa1);
+	s2 = slab_allocator_allocate(&sa1);
+	cr_assert(s2 != NULL);
+	s1 = slab_allocator_allocate(&sa1);
+	cr_assert(s1 != NULL);
+	s3 = slab_allocator_allocate(&sa1);
+	cr_assert(s3 != NULL);
+
 	Slab s4 = slab_allocator_allocate(&sa1);
-	// slab_allocator_free(&sa1, s3);
-	//   slab_allocator_free(&sa1, s4);
+	cr_assert(s4 != NULL);
+
+	slab_allocator_free(&sa1, s4);
+
+	/*
+		slab_allocator_free(&sa1, s1);
+
+		Slab s3 = slab_allocator_allocate(&sa1);
+		println("second alloc");
+		Slab s4 = slab_allocator_allocate(&sa1);
+		println("second alloc end");
+		slab_allocator_free(&sa1, s3);
+
+		Slab s5 = slab_allocator_allocate(&sa1);
+		// slab_allocator_free(&sa1, s4);
+	*/
 }
