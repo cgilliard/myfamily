@@ -87,65 +87,61 @@ $(function() {
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef _BASE_MACROS__</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define _BASE_MACROS__</span></div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="macro__util_8h.html">base/macro_util.h</a>&gt;</span></div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="types_8h.html">base/types.h</a>&gt;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">// Type macros</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="macros_8h.html#a0a6c403907ca907211fd600e019985ed">   21</a></span>&#160;<span class="preprocessor">#define Type(type)                 \</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">    typedef struct Type *type##Nc; \</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">    void type##_cleanup(const type##Nc *ptr);</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="macros_8h.html#a1414db03b38a685defc808526be96786">   24</a></span>&#160;<span class="preprocessor">#define DefineType(type) \</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">    type##Nc __attribute((warn_unused_result, cleanup(type##_cleanup)))</span></div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">// Ptr macros</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="macros_8h.html#a62e445f378c3862b78618beec533f338">   28</a></span>&#160;<span class="preprocessor">#define $(ptr) ptr_data(ptr)</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="macros_8h.html#a86659537194f22ae1712c49e584bf1c8">   29</a></span>&#160;<span class="preprocessor">#define $len(ptr) ptr_len(ptr)</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="macros_8h.html#a758c0393e9565cecf267043eca9e1105">   30</a></span>&#160;<span class="preprocessor">#define $alloc(size) ({ fam_alloc(size); })</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="macros_8h.html#a46092034899185e5592fb52573b8e5e5">   31</a></span>&#160;<span class="preprocessor">#define $resize(ptr, size)                  \</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">    ({                                      \</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">        Ptr _ptr__ = fam_resize(ptr, size); \</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">        if (!nil(_ptr__)) ptr = NULL;       \</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">        _ptr__;                             \</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">    })</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="macros_8h.html#a5af3e33e078602f154cba53f58df716c">   37</a></span>&#160;<span class="preprocessor">#define $release(ptr)     \</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">    ({                    \</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">        fam_release(ptr); \</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor">        ptr = NULL;       \</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor">    })</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="macros_8h.html#ada23c0615668591b7a50c3c068555fb4">   42</a></span>&#160;<span class="preprocessor">#define nil(ptr) \</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">    (ptr == NULL || (ptr_len(ptr) == UINT32_MAX &amp;&amp; ptr_id(ptr) == 0))</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="macros_8h.html#afb7c4a60d54632531b77aa3a0f792b24">   44</a></span>&#160;<span class="preprocessor">#define ok(ptr) !nil(ptr)</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="macros_8h.html#a992279eb769788f08cc7b778db886744">   45</a></span>&#160;<span class="preprocessor">#define initialized(ptr) (ptr != NULL &amp;&amp; ptr_len(ptr) != UINT32_MAX)</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment">// Object macros</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno"><a class="line" href="macros_8h.html#a053bae64b5948d2a53250937433fa399">   48</a></span>&#160;<span class="preprocessor">#define $int(obj) *(int *)object_value_of(obj)</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="macros_8h.html#a48ac624dbd360fab12ed916cd7c2cfac">   49</a></span>&#160;<span class="preprocessor">#define move(src)                           \</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">    ({                                      \</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">        ObjectNc _ret__ = object_move(src); \</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">        src = null;                         \</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">        _ret__;                             \</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">// Ptr macros</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno"><a class="line" href="macros_8h.html#a62e445f378c3862b78618beec533f338">   21</a></span>&#160;<span class="preprocessor">#define $(ptr) ptr_data(ptr)</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="macros_8h.html#a86659537194f22ae1712c49e584bf1c8">   22</a></span>&#160;<span class="preprocessor">#define $len(ptr) ptr_len(ptr)</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="macros_8h.html#a758c0393e9565cecf267043eca9e1105">   23</a></span>&#160;<span class="preprocessor">#define $alloc(size) ({ fam_alloc(size); })</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="macros_8h.html#a46092034899185e5592fb52573b8e5e5">   24</a></span>&#160;<span class="preprocessor">#define $resize(ptr, size)                  \</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">    ({                                      \</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">        Ptr _ptr__ = fam_resize(ptr, size); \</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">        if (!nil(_ptr__)) ptr = NULL;       \</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">        _ptr__;                             \</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">    })</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="macros_8h.html#a5af3e33e078602f154cba53f58df716c">   30</a></span>&#160;<span class="preprocessor">#define $release(ptr)     \</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">    ({                    \</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">        fam_release(ptr); \</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">        ptr = NULL;       \</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">    })</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="macros_8h.html#ada23c0615668591b7a50c3c068555fb4">   35</a></span>&#160;<span class="preprocessor">#define nil(ptr) \</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">    (ptr == NULL || (ptr_len(ptr) == UINT32_MAX &amp;&amp; ptr_id(ptr) == 0))</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="macros_8h.html#afb7c4a60d54632531b77aa3a0f792b24">   37</a></span>&#160;<span class="preprocessor">#define ok(ptr) !nil(ptr)</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="macros_8h.html#a992279eb769788f08cc7b778db886744">   38</a></span>&#160;<span class="preprocessor">#define initialized(ptr) (ptr != NULL &amp;&amp; ptr_len(ptr) != UINT32_MAX)</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">// Lock macros</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno"><a class="line" href="macros_8h.html#aea28b4c44db4f0f1d0f222d6382c04c0">   41</a></span>&#160;<span class="preprocessor">#define lock() (lock_create())</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="macros_8h.html#a9126c72611296fccf7e4e14547fcb327">   42</a></span>&#160;<span class="preprocessor">#define lockr(l) lock_read(l)</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="macros_8h.html#a52580553c6dd4a78a10142881e7338df">   43</a></span>&#160;<span class="preprocessor">#define lockw(l) lock_write(l)</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="macros_8h.html#a67f7c01dd129fc3e1af1feafd0cc357f">   44</a></span>&#160;<span class="preprocessor">#define unlock(l) lock_unlock(l)</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="line" href="macros_8h.html#a5d3913c5879046bace071d3b1bb1707b">   45</a></span>&#160;<span class="preprocessor">#define rsync(l, exe)                          \</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">    ({                                         \</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">        LockGuard l##_lg = lock_guard_read(l); \</span></div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">        { exe }                                \</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">    })</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="line" href="macros_8h.html#a91c40aa1bb119a79cec137bde3082bea">   50</a></span>&#160;<span class="preprocessor">#define wsync(l, exe)                           \</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor">    ({                                          \</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">        LockGuard l##_lg = lock_guard_write(l); \</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">        { exe }                                 \</span></div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">    })</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="macros_8h.html#a1e542223ecb9e9bd1810762a6c19f996">   55</a></span>&#160;<span class="preprocessor">#define ref(src) object_ref(src)</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="macros_8h.html#a5334e126ea8c685adf6fee794b206e90">   56</a></span>&#160;<span class="preprocessor">#define weak(src) object_weak(src)</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="macros_8h.html#a730dde095de06845c9a0896794c22047">   57</a></span>&#160;<span class="preprocessor">#define upgrade(src) object_upgrade(src)</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">// Lock macros</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="macros_8h.html#aea28b4c44db4f0f1d0f222d6382c04c0">   60</a></span>&#160;<span class="preprocessor">#define lock() (lock_create())</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="macros_8h.html#a9126c72611296fccf7e4e14547fcb327">   61</a></span>&#160;<span class="preprocessor">#define lockr(l) lock_read(l)</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="macros_8h.html#a52580553c6dd4a78a10142881e7338df">   62</a></span>&#160;<span class="preprocessor">#define lockw(l) lock_write(l)</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="macros_8h.html#a67f7c01dd129fc3e1af1feafd0cc357f">   63</a></span>&#160;<span class="preprocessor">#define unlock(l) lock_unlock(l)</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="macros_8h.html#a5d3913c5879046bace071d3b1bb1707b">   64</a></span>&#160;<span class="preprocessor">#define rsync(l, exe)                          \</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">    ({                                         \</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">        LockGuard l##_lg = lock_guard_read(l); \</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">        { exe }                                \</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">    })</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="macros_8h.html#a91c40aa1bb119a79cec137bde3082bea">   69</a></span>&#160;<span class="preprocessor">#define wsync(l, exe)                           \</span></div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="preprocessor">    ({                                          \</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">        LockGuard l##_lg = lock_guard_write(l); \</span></div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">        { exe }                                 \</span></div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="preprocessor">    })</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#endif  </span><span class="comment">// _BASE_MACROS__</span></div>
-<div class="ttc" id="amacro__util_8h_html"><div class="ttname"><a href="macro__util_8h.html">macro_util.h</a></div></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">// CAS</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="macros_8h.html#afbb2bb469890fe8f626d7a00e11eed2b">   57</a></span>&#160;<span class="preprocessor">#define CAS(...)                                                      \</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">    __atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_RELAXED, \</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="preprocessor">                                __ATOMIC_RELAXED)</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="macros_8h.html#ae193c0ddf6475b50ad201e2be60ad624">   60</a></span>&#160;<span class="preprocessor">#define CAS_SEQ(...)                                                  \</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">    __atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_SEQ_CST, \</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">                                __ATOMIC_RELAXED)</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="macros_8h.html#aa00b9ed38622b7a726e18bec6b186311">   63</a></span>&#160;<span class="preprocessor">#define CAS_ACQUIRE(...)                                              \</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="preprocessor">    __atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_ACQUIRE, \</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">                                __ATOMIC_RELAXED)</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="macros_8h.html#a86bdd0183eb419a61f48cc003d4d3480">   66</a></span>&#160;<span class="preprocessor">#define CAS_RELEASE(...)                                              \</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">    __atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_RELEASE, \</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">                                __ATOMIC_RELAXED)</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="macros_8h.html#a4c3cb86c3ed12273c4fab32dcd8cafc5">   69</a></span>&#160;<span class="preprocessor">#define ALOAD(ptr) __atomic_load_n(ptr, __ATOMIC_RELAXED)</span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#endif  </span><span class="comment">// _BASE_MACROS__</span></div>
+<div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

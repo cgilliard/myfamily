@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['global_5fslab_5fallocator_437',['global_slab_allocator',['../fam__alloc_8c.html#a7dfb2c9f3d2031657cbb30370f172ced',1,'fam_alloc.c']]]
+  ['id_383',['id',['../structType.html#af50b4c33ae20d67d6103e65fa460eb3a',1,'Type']]],
+  ['initial_5fchunks_384',['initial_chunks',['../structSlabType.html#a1d466297e21ede3754d698f991762bf4',1,'SlabType']]]
 ];
