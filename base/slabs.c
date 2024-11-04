@@ -25,14 +25,14 @@ typedef struct SlabImpl {
 	byte data[];
 } SlabImpl;
 
-SlabImpl slab_s = {.next = (void *)37};
-SlabImpl *slab_special_location = &slab_s;	// for double free prevention
-#define SPECIAL ((SlabImpl *)slab_special_location)
-
-Slab global_allocated = NULL;
+SlabImpl slab_allocated_impl = {.next = NULL};
+Slab slab_allocated_reqd = &slab_allocated_impl;
+#define SLAB_ALLOCATED slab_allocated_reqd
 
 Slab slab_allocator_grow(SlabAllocator *sa) {
-	return malloc(sizeof(SlabImpl) + sa->slab_size);
+	Slab ret = malloc(sizeof(SlabImpl) + sa->slab_size);
+	ret->next = SLAB_ALLOCATED;
+	return ret;
 }
 
 void slab_allocator_cleanup(SlabAllocator *ptr) {
@@ -71,6 +71,7 @@ Slab slab_allocator_allocate(SlabAllocator *sa) {
 			}
 		}
 	}
+	next->next = SLAB_ALLOCATED;
 	return next;
 }
 
@@ -79,8 +80,11 @@ Slab slab_allocator_allocate(SlabAllocator *sa) {
 // with a maximum queue size, we can then simply 'free' the excess
 // slabs as they are freed.
 void slab_allocator_free(SlabAllocator *sa, Slab slab) {
+	if (!CAS(&slab->next, &SLAB_ALLOCATED, NULL))
+		panic("Double free attempt! %p %p", &slab->next, &slab_allocated_reqd);
 	Slab tail, next;
-	slab->next = NULL;
+
+	int count = 0;
 	loop {
 		tail = sa->tail;
 		next = tail->next;
@@ -93,6 +97,7 @@ void slab_allocator_free(SlabAllocator *sa, Slab slab) {
 				CAS_SEQ(&sa->tail, &tail, next);
 			}
 		}
+		if (++count > 100) panic("too many loops");
 	}
 	CAS_SEQ(&sa->tail, &tail, slab);
 }

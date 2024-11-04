@@ -73,4 +73,6 @@ MyTest(base, test_slab_allocator) {
 
 	Slab s3 = slab_allocator_allocate(&sa1);
 	Slab s4 = slab_allocator_allocate(&sa1);
+	// slab_allocator_free(&sa1, s3);
+	//   slab_allocator_free(&sa1, s4);
 }
