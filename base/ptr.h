@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef _BASE_PTR__
+#define _BASE_PTR__
+
 // Ptr data type
 typedef struct Type *Ptr;
 
@@ -24,3 +27,5 @@ void *ptr_aux(const Ptr ptr);
 Ptr ptr_direct_alloc(unsigned int size);
 Ptr ptr_direct_resize(Ptr ptr, unsigned int size);
 void ptr_direct_release(Ptr ptr);
+
+#endif	// _BASE_PTR__

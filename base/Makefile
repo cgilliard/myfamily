@@ -3,7 +3,8 @@ OBJS := types.o \
 	print_util.o \
 	lock.o \
 	fam_err.o \
-	alloc.o
+	alloc.o \
+	slabs.o
 
 TEST_OBJS := $(OBJS)
 

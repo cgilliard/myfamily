@@ -61,6 +61,96 @@ MyTest(base, test_alloc) {
 	release(test1);
 }
 
+MyTest(base, test_ptr) {
+	Ptr ptr = ptr_direct_alloc(100);
+	cr_assert_eq(ptr_len(ptr), slab_getpagesize() - slab_overhead());
+	char *test = ptr_data(ptr);
+	for (int i = 0; i < ptr_len(ptr); i++) {
+		test[i] = i % 128;
+	}
+	for (int i = 0; i < ptr_len(ptr); i++) {
+		cr_assert_eq(test[i], i % 128);
+	}
+	cr_assert(!nil(ptr));
+	cr_assert(ok(ptr));
+	ptr_direct_release(ptr);
+	ptr = NULL;
+	cr_assert(nil(ptr));
+	cr_assert(!ok(ptr));
+
+	Ptr next = ptr_direct_alloc(1000);
+	cr_assert_eq(ptr_len(next), slab_getpagesize() - slab_overhead());
+	unsigned int initial_size = ptr_len(next);
+
+	char *buf = ptr_data(next);
+	for (int i = 0; i < 1000; i++) buf[i] = 'a' + (i % 26);
+
+	Ptr nptr = ptr_direct_resize(next, 100000);
+	cr_assert(nptr);
+	cr_assert(ptr_len(nptr) > initial_size);
+	int max_len = ptr_len(nptr);
+	char *buf2 = ptr_data(nptr);
+	for (int i = 0; i < 1000; i++) cr_assert_eq(buf2[i], 'a' + (i % 26));
+
+	Ptr nptr2 = ptr_direct_resize(nptr, 500);
+	cr_assert(nptr2);
+	cr_assert(ptr_len(nptr2) >= 500);
+	cr_assert(ptr_len(nptr2) < max_len);
+	char *buf3 = ptr_data(nptr2);
+	for (int i = 0; i < 500; i++) cr_assert_eq(buf3[i], 'a' + (i % 26));
+
+	ptr_direct_release(nptr2);
+}
+
+MyTest(base, test_ptr_macros) {
+	Ptr ptr = ptr_direct_alloc(100);
+	cr_assert(ok(ptr));
+	cr_assert(!nil(ptr));
+	cr_assert_eq($len(ptr), slab_getpagesize() - slab_overhead());
+	char *test = $(ptr);
+	for (int i = 0; i < $len(ptr); i++) {
+		test[i] = i % 128;
+	}
+	for (int i = 0; i < $len(ptr); i++) {
+		cr_assert_eq(test[i], i % 128);
+	}
+	cr_assert(!nil(ptr));
+	cr_assert(ok(ptr));
+	ptr_direct_release(ptr);
+	ptr = NULL;
+	cr_assert(nil(ptr));
+	cr_assert(!ok(ptr));
+
+	Ptr next = ptr_direct_alloc(1000);
+	cr_assert_eq($len(next), slab_getpagesize() - slab_overhead());
+	unsigned int initial_size = $len(next);
+
+	char *buf = $(next);
+	for (int i = 0; i < 1000; i++) buf[i] = 'a' + (i % 26);
+
+	Ptr nptr = ptr_direct_resize(next, 100000);
+	cr_assert(nptr);
+	cr_assert($len(nptr) > initial_size);
+	int max_len = $len(nptr);
+	char *buf2 = $(nptr);
+	for (int i = 0; i < 1000; i++) cr_assert_eq(buf2[i], 'a' + (i % 26));
+
+	Ptr nptr2 = ptr_direct_resize(nptr, 500);
+	cr_assert(nptr2);
+	cr_assert($len(nptr2) >= 500);
+	cr_assert($len(nptr2) < max_len);
+	char *buf3 = $(nptr2);
+	for (int i = 0; i < 500; i++) cr_assert_eq(buf3[i], 'a' + (i % 26));
+
+	cr_assert(initialized(nptr2));
+	ptr_direct_release(nptr2);
+
+	Ptr test_null = NULL;
+	cr_assert(!initialized(test_null));
+	cr_assert(nil(test_null));
+	cr_assert(!ok(test_null));
+}
+
 MyTest(base, test_limits) {
 	cr_assert_eq(INT64_MAX, 9223372036854775807LL);
 	cr_assert_eq(INT64_MAX_IMPL, 9223372036854775807LL);
@@ -73,4 +163,65 @@ MyTest(base, test_limits) {
 	cr_assert_eq(INT_MIN_IMPL, -2147483648);
 	cr_assert_eq(UINT32_MAX, 4294967295);
 	cr_assert_eq(UINT32_MAX_IMPL, 4294967295);
+}
+
+MyTest(base, test_slab_allocator) {
+	{
+		SlabAllocator sa = slab_allocator_create();
+		Ptr ptr = slab_allocator_allocate(sa, 100);
+		cr_assert($len(ptr) >= 100);
+		byte *arr = $(ptr);
+		for (int i = 0; i < 100; i++) {
+			arr[i] = i;
+		}
+		for (int i = 0; i < 100; i++) {
+			cr_assert_eq(arr[i], i);
+		}
+		cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 1);
+		slab_allocator_free(sa, ptr);
+		cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
+	}
+	cr_assert(alloc_sum() > 0);
+
+	{
+		SlabAllocator sa = slab_allocator_create();
+		for (int i = 0; i < 1000; i++) {
+			Ptr ptr = slab_allocator_allocate(sa, i);
+			cr_assert($len(ptr) >= i);
+			byte *arr = $(ptr);
+			for (int j = 0; j < 100; j++) {
+				arr[j] = j;
+			}
+			cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 1);
+			slab_allocator_free(sa, ptr);
+			cr_assert_eq(slab_allocator_cur_slabs_allocated(sa), 0);
+		}
+	}
+	cr_assert(alloc_sum() > 0);
+}
+
+MyTest(base, test_slab_sizes) {
+	int i = 0;
+	int j;
+	int k;
+	int i_last = 0;
+	int j_last = 0;
+	int k_last = 0;
+	while ((j = slab_allocator_get_index(i)) >= 0) {
+		k = slab_allocator_get_size(j);
+		// assert slab size is greater than or equal to needed bytes
+		cr_assert(k >= i);
+
+		cr_assert(i >= i_last);
+		cr_assert(j >= j_last);
+		cr_assert(k >= k_last);
+
+		i_last = i;
+		j_last = j;
+		k_last = k;
+		i++;
+	}
+
+	// largest slabs size is this - 1 (65536)
+	cr_assert_eq(i, 65537);
 }
