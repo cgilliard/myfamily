@@ -212,3 +212,24 @@ MyTest(base, test_aux) {
 
 	slab_allocator_free(&sa1, s2);
 }
+
+MyTest(base, test_memmap) {
+	MemMap mm1;
+	memmap_init(&mm1, 16);
+
+	for (int i = 0; i < 1000; i++) {
+		Ptr p = memmap_allocate(&mm1);
+		cr_assert_eq(p, i + 1);
+	}
+
+	memmap_free(&mm1, 7);
+	memmap_free(&mm1, 8);
+	memmap_free(&mm1, 167);
+
+	Ptr p = memmap_allocate(&mm1);
+	cr_assert_eq(p, 7);
+	p = memmap_allocate(&mm1);
+	cr_assert_eq(p, 8);
+	p = memmap_allocate(&mm1);
+	cr_assert_eq(p, 167);
+}

@@ -19,6 +19,8 @@
 #include <base/lock.h>
 #include <base/macro_util.h>
 #include <base/macros.h>
+#include <base/memmap.h>
+#include <base/orbtree.h>
 #include <base/print_util.h>
 #include <base/slabs.h>
 #include <base/types.h>
