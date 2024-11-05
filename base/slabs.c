@@ -38,19 +38,18 @@ Slab slab_allocated_reqd = &slab_allocated_impl;
 #define SLAB_ALLOCATED slab_allocated_reqd
 
 Slab slab_allocator_grow(SlabAllocator *sa) {
-	if (__atomic_fetch_add(&sa->total_slabs, 1, __ATOMIC_RELAXED) >
-		sa->max_total_slabs) {
-		__atomic_fetch_sub(&sa->total_slabs, 1, __ATOMIC_RELAXED);
+	if (AADD(&sa->total_slabs, 1) > sa->max_total_slabs) {
+		ASUB(&sa->total_slabs, 1);
 		SetErr(CapacityExceeded);
 		return NULL;
 	}
 	Slab ret = malloc(sizeof(SlabImpl) + sa->slab_size);
 	if (ret == NULL) {
 		SetErr(AllocErr);
-		__atomic_fetch_sub(&sa->total_slabs, 1, __ATOMIC_RELAXED);
+		ASUB(&sa->total_slabs, 1);
 		return NULL;
 	}
-	ret->next = SLAB_ALLOCATED;
+	if (sa->free_check) ret->next = SLAB_ALLOCATED;
 	return ret;
 }
 
@@ -72,8 +71,8 @@ int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 		SetErr(AllocErr);
 		return -1;
 	}
-	__atomic_store_n(&sa->free_size, 1, __ATOMIC_SEQ_CST);
-	__atomic_store_n(&sa->total_slabs, 1, __ATOMIC_SEQ_CST);
+	ASTORE(&sa->free_size, 1);
+	ASTORE(&sa->total_slabs, 1);
 	sa->slab_size = slab_size;
 	sa->max_free_slabs = max_free_slabs;
 	sa->max_total_slabs = max_total_slabs;
@@ -104,8 +103,8 @@ Slab slab_allocator_allocate(SlabAllocator *sa) {
 		}
 	}
 
-	__atomic_fetch_sub(&sa->free_size, 1, __ATOMIC_RELAXED);
-	__atomic_store_n(&ret->next, SLAB_ALLOCATED, __ATOMIC_RELAXED);
+	ASUB(&sa->free_size, 1);
+	if (sa->free_check) ASTORE(&ret->next, SLAB_ALLOCATED);
 	return ret;
 }
 
@@ -115,10 +114,9 @@ void slab_allocator_free(SlabAllocator *sa, Slab slab) {
 		panic("Double free attempt! %p %p", &slab->next, &SLAB_ALLOCATED);
 	else if (!sa->free_check)
 		slab->next = NULL;
-	if (__atomic_fetch_add(&sa->free_size, 1, __ATOMIC_RELAXED) >
-		sa->max_free_slabs) {
+	if (AADD(&sa->free_size, 1) > sa->max_free_slabs) {
 		free(slab);
-		__atomic_fetch_sub(&sa->total_slabs, 1, __ATOMIC_RELAXED);
+		ASUB(&sa->total_slabs, 1);
 		return;
 	}
 

@@ -74,5 +74,8 @@
 	__atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_RELEASE, \
 								__ATOMIC_RELAXED)
 #define ALOAD(ptr) __atomic_load_n(ptr, __ATOMIC_RELAXED)
+#define ASTORE(ptr, value) __atomic_store_n(ptr, value, __ATOMIC_RELAXED)
+#define AADD(ptr, value) __atomic_fetch_add(ptr, value, __ATOMIC_RELAXED)
+#define ASUB(ptr, value) __atomic_fetch_sub(ptr, value, __ATOMIC_RELAXED)
 
 #endif	// _BASE_MACROS__
