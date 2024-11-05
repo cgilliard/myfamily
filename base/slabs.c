@@ -46,8 +46,13 @@ Slab slab_allocator_grow(SlabAllocator *sa) {
 	return ret;
 }
 
-void slab_allocator_cleanup(SlabAllocator *ptr) {
-	// TODO: empty queue and deallocate slabs
+void slab_allocator_cleanup(SlabAllocator *sa) {
+	Slab itt = sa->head;
+	while (itt) {
+		Slab to_delete = itt;
+		itt = itt->next;
+		free(to_delete);
+	}
 }
 
 // initialize slab allocator as a michael-scott queue with specified slab_size
@@ -72,7 +77,6 @@ int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 // allocate is dequeue. If null "grow" by mallocing a slab.
 Slab slab_allocator_allocate(SlabAllocator *sa) {
 	Slab head, tail, next, ret;
-	int count = 0;
 	loop {
 		head = sa->head;
 		tail = sa->tail;
@@ -89,7 +93,6 @@ Slab slab_allocator_allocate(SlabAllocator *sa) {
 				if (CAS_SEQ(&sa->head, &head, next)) break;
 			}
 		}
-		if (++count > 10) panic("too many loops");
 	}
 
 	__atomic_fetch_sub(&sa->free_size, 1, __ATOMIC_RELAXED);
@@ -110,7 +113,6 @@ void slab_allocator_free(SlabAllocator *sa, Slab slab) {
 
 	Slab tail, next;
 
-	int count = 0;
 	loop {
 		tail = sa->tail;
 		next = tail->next;
@@ -124,41 +126,5 @@ void slab_allocator_free(SlabAllocator *sa, Slab slab) {
 				CAS_SEQ(&sa->tail, &tail, next);
 			}
 		}
-		if (++count > 100) panic("too many loops2");
 	}
 }
-
-/*
-
-// free is enqueue.
-void slab_allocator_free(SlabAllocator *sa, Slab slab) {
-	println("free");
-	if (!CAS(&slab->next, &SLAB_ALLOCATED, NULL))
-		panic("Double free attempt! %p %p", &slab->next, &SLAB_ALLOCATED);
-	if (__atomic_fetch_add(&sa->free_size, 1, __ATOMIC_RELAXED) >
-		sa->max_free_slabs) {
-		free(slab);
-		__atomic_fetch_sub(&sa->total_slabs, 1, __ATOMIC_RELAXED);
-		return;
-	}
-
-	Slab tail, next;
-
-	int count = 0;
-	loop {
-		tail = sa->tail;
-		next = tail->next;
-		if (tail == sa->tail) {
-			if (next == NULL) {
-				if (CAS_SEQ(&tail->next, &next, slab)) {
-					break;
-				}
-			} else {
-				CAS_SEQ(&sa->tail, &tail, next);
-			}
-		}
-		if (++count > 100) panic("too many loops2");
-	}
-	CAS_SEQ(&sa->tail, &tail, slab);
-}
-*/
