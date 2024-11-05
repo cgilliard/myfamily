@@ -30,6 +30,8 @@ typedef struct SlabAllocator {
 	unsigned int slab_size;
 } SlabAllocator;
 
+byte *slab_get(Slab s);
+
 void slab_allocator_cleanup(SlabAllocator *ptr);
 
 int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
@@ -38,5 +40,10 @@ int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 void slab_allocator_cleanup(SlabAllocator *sa);
 Slab slab_allocator_allocate(SlabAllocator *sa);
 void slab_allocator_free(SlabAllocator *sa, Slab slab);
+
+#ifdef TEST
+unsigned long long slab_allocator_free_size(SlabAllocator *sa);
+unsigned long long slab_allocator_total_slabs(SlabAllocator *sa);
+#endif	// TEST
 
 #endif	// _BASE_SLABS__

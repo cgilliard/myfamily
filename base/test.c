@@ -112,16 +112,63 @@ MyTest(base, test_slab_allocator_perf) {
 }
 
 MyTest(base, test_slab_allocator_recycle) {
-	long long size = 1024LL * 1024LL * 1LL;
+	long long size = 10000000;
+	int count = 5;
+	int alloc_size = 8;
+
 	SlabAllocator sa1;
-	cr_assert(!slab_allocator_init(&sa1, 8, size, size));
+	cr_assert(!slab_allocator_init(&sa1, alloc_size, count + 5, count + 5));
+
 	Slab s1 = slab_allocator_allocate(&sa1);
+	Slab slabs[count];
 
 	for (long long i = 0; i < size; i++) {
-		// if (i % 100000000 == 0) println("i=%lli", i);
-		Slab s2 = slab_allocator_allocate(&sa1);
-		slab_allocator_free(&sa1, s2);
+		for (int j = 0; j < count; j++) {
+			slabs[j] = slab_allocator_allocate(&sa1);
+			cr_assert(slabs[j] != NULL);
+			byte *test = slab_get(slabs[j]);
+			for (int j = 0; j < alloc_size; j++) test[j] = j;
+		}
+		for (int j = 0; j < count; j++) {
+			byte *test = slab_get(slabs[j]);
+			for (int j = 0; j < alloc_size; j++) cr_assert(test[j] == j);
+			slab_allocator_free(&sa1, slabs[j]);
+		}
+
+		// there is one slab allocated in init (required) then s1 + count
+		// while these slabs are released to the slab allocator, they are not
+		// 'freed' because our max_free_slabs is count + 5.
+		// at the end of the loop, all of these are in the free list except s1.
+		cr_assert_eq(slab_allocator_total_slabs(&sa1), count + 2);
+		cr_assert_eq(slab_allocator_free_size(&sa1), count + 1);
 	}
 
+	cr_assert_eq(slab_allocator_total_slabs(&sa1), count + 2);
+	cr_assert_eq(slab_allocator_free_size(&sa1), count + 1);
+	slab_allocator_free(&sa1, s1);
+	cr_assert_eq(slab_allocator_total_slabs(&sa1), count + 2);
+	cr_assert_eq(slab_allocator_free_size(&sa1), count + 2);
+
 	slab_allocator_cleanup(&sa1);
+}
+
+MyTest(base, test_malloc_recycle) {
+	long long size = 10000000;
+	int count = 5;
+	int alloc_size = 8;
+
+	byte *slabs[count];
+
+	for (long long i = 0; i < size; i++) {
+		for (int j = 0; j < count; j++) {
+			slabs[j] = malloc(alloc_size);
+			cr_assert(slabs[j] != NULL);
+			for (int k = 0; k < alloc_size; k++) slabs[j][k] = j;
+		}
+
+		for (int j = 0; j < count; j++) {
+			for (int k = 0; k < alloc_size; k++) cr_assert(slabs[j][k] == j);
+			free(slabs[j]);
+		}
+	}
 }

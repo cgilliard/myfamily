@@ -25,6 +25,10 @@ typedef struct SlabImpl {
 	byte data[];
 } SlabImpl;
 
+byte *slab_get(Slab s) {
+	return s->data;
+}
+
 SlabImpl slab_allocated_impl = {.next = NULL};
 Slab slab_allocated_reqd = &slab_allocated_impl;
 #define SLAB_ALLOCATED slab_allocated_reqd
@@ -102,7 +106,7 @@ Slab slab_allocator_allocate(SlabAllocator *sa) {
 
 // free is enqueue.
 void slab_allocator_free(SlabAllocator *sa, Slab slab) {
-	if (!CAS(&slab->next, &SLAB_ALLOCATED, NULL))
+	if (!CAS_SEQ(&slab->next, &SLAB_ALLOCATED, NULL))
 		panic("Double free attempt! %p %p", &slab->next, &SLAB_ALLOCATED);
 	if (__atomic_fetch_add(&sa->free_size, 1, __ATOMIC_RELAXED) >
 		sa->max_free_slabs) {
@@ -127,4 +131,11 @@ void slab_allocator_free(SlabAllocator *sa, Slab slab) {
 			}
 		}
 	}
+}
+
+unsigned long long slab_allocator_free_size(SlabAllocator *sa) {
+	return ALOAD(&sa->free_size);
+}
+unsigned long long slab_allocator_total_slabs(SlabAllocator *sa) {
+	return ALOAD(&sa->total_slabs);
 }
