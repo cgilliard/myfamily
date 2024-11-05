@@ -63,7 +63,7 @@ MyTest(base, test_alloc) {
 
 MyTest(base, test_slab_allocator) {
 	SlabAllocator sa1;
-	cr_assert(!slab_allocator_init(&sa1, 16, 100, 200));
+	cr_assert(!slab_allocator_init(&sa1, 16, 100, 200, true));
 	Slab s1 = slab_allocator_allocate(&sa1);
 	cr_assert(s1 != NULL);
 	Slab s2 = slab_allocator_allocate(&sa1);
@@ -93,7 +93,7 @@ MyTest(base, test_slab_allocator_perf) {
 	SlabAllocator sa1;
 	// long long size = 4 * 1024L * 1024L * 1024L;
 	long long size = 100;
-	cr_assert(!slab_allocator_init(&sa1, 8, size, size));
+	cr_assert(!slab_allocator_init(&sa1, 8, size, size, true));
 	Slab *arr = malloc(sizeof(Slab *) * size);
 
 	for (long long i = 0; i < size; i++) {
@@ -112,17 +112,19 @@ MyTest(base, test_slab_allocator_perf) {
 }
 
 MyTest(base, test_slab_allocator_recycle) {
-	long long size = 10000;
-	int count = 5;
+	long long size = 1024 * 1024 * 10;
+	int count = 4;
 	int alloc_size = 8;
 
 	SlabAllocator sa1;
-	cr_assert(!slab_allocator_init(&sa1, alloc_size, count + 5, count + 5));
+	cr_assert(
+		!slab_allocator_init(&sa1, alloc_size, count + 5, count + 5, true));
 
 	Slab s1 = slab_allocator_allocate(&sa1);
 	Slab slabs[count];
 
 	for (long long i = 0; i < size; i++) {
+		// if (i % 1000000 == 0) println("i=%lli", i);
 		for (int j = 0; j < count; j++) {
 			slabs[j] = slab_allocator_allocate(&sa1);
 			cr_assert(slabs[j] != NULL);
@@ -149,12 +151,22 @@ MyTest(base, test_slab_allocator_recycle) {
 	cr_assert_eq(slab_allocator_total_slabs(&sa1), count + 2);
 	cr_assert_eq(slab_allocator_free_size(&sa1), count + 2);
 
+	Slab s2 = slab_allocator_allocate(&sa1);
+	cr_assert(s2 != NULL);
+	byte *test = slab_get(s2);
+	for (int j = 0; j < alloc_size; j++) test[j] = j;
+	cr_assert_eq(slab_allocator_total_slabs(&sa1), count + 2);
+	cr_assert_eq(slab_allocator_free_size(&sa1), count + 1);
+	slab_allocator_free(&sa1, s2);
+	cr_assert_eq(slab_allocator_total_slabs(&sa1), count + 2);
+	cr_assert_eq(slab_allocator_free_size(&sa1), count + 2);
+
 	slab_allocator_cleanup(&sa1);
 }
 
 MyTest(base, test_malloc_recycle) {
-	long long size = 1000;
-	int count = 5;
+	long long size = 1024 * 1024;
+	int count = 4;
 	int alloc_size = 8;
 
 	byte *slabs[count];
@@ -171,4 +183,32 @@ MyTest(base, test_malloc_recycle) {
 			free(slabs[j]);
 		}
 	}
+}
+
+MyTest(base, test_aux) {
+	long long size = 1024 * 1024 * 10;
+	int count = 4;
+	int alloc_size = 8;
+
+	SlabAllocator sa1;
+	cr_assert(
+		!slab_allocator_init(&sa1, alloc_size, count + 5, count + 5, false));
+
+	Slab s1 = slab_allocator_allocate(&sa1);
+	cr_assert(s1 != NULL);
+
+	unsigned long long *ptr = slab_aux(s1);
+	cr_assert(*ptr != 123);
+	*ptr = 123;
+	cr_assert(*ptr == 123);
+
+	slab_allocator_free(&sa1, s1);
+
+	Slab s2 = slab_allocator_allocate(&sa1);
+	cr_assert(s2 != NULL);
+
+	unsigned long long *ptr2 = slab_aux(s2);
+	cr_assert(*ptr2 != 123);
+
+	slab_allocator_free(&sa1, s2);
 }

@@ -29,6 +29,10 @@ byte *slab_get(Slab s) {
 	return s->data;
 }
 
+unsigned long long *slab_aux(Slab s) {
+	return (unsigned long long *)&s->next;
+}
+
 SlabImpl slab_allocated_impl = {.next = NULL};
 Slab slab_allocated_reqd = &slab_allocated_impl;
 #define SLAB_ALLOCATED slab_allocated_reqd
@@ -62,7 +66,7 @@ void slab_allocator_cleanup(SlabAllocator *sa) {
 // initialize slab allocator as a michael-scott queue with specified slab_size
 int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 						unsigned long long max_free_slabs,
-						unsigned long long max_total_slabs) {
+						unsigned long long max_total_slabs, bool free_check) {
 	Slab s = malloc(sizeof(SlabImpl) + slab_size);
 	if (s == NULL) {
 		SetErr(AllocErr);
@@ -73,6 +77,7 @@ int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 	sa->slab_size = slab_size;
 	sa->max_free_slabs = max_free_slabs;
 	sa->max_total_slabs = max_total_slabs;
+	sa->free_check = free_check;
 	s->next = NULL;
 	sa->head = sa->tail = s;
 	return 0;
@@ -106,8 +111,10 @@ Slab slab_allocator_allocate(SlabAllocator *sa) {
 
 // free is enqueue.
 void slab_allocator_free(SlabAllocator *sa, Slab slab) {
-	if (!CAS(&slab->next, &SLAB_ALLOCATED, NULL))
+	if (sa->free_check && !CAS(&slab->next, &SLAB_ALLOCATED, NULL))
 		panic("Double free attempt! %p %p", &slab->next, &SLAB_ALLOCATED);
+	else if (!sa->free_check)
+		slab->next = NULL;
 	if (__atomic_fetch_add(&sa->free_size, 1, __ATOMIC_RELAXED) >
 		sa->max_free_slabs) {
 		free(slab);
