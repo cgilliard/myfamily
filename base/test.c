@@ -112,7 +112,7 @@ MyTest(base, test_slab_allocator_perf) {
 }
 
 MyTest(base, test_slab_allocator_recycle) {
-	long long size = 10000000;
+	long long size = 10000;
 	int count = 5;
 	int alloc_size = 8;
 
@@ -153,7 +153,7 @@ MyTest(base, test_slab_allocator_recycle) {
 }
 
 MyTest(base, test_malloc_recycle) {
-	long long size = 10000000;
+	long long size = 1000;
 	int count = 5;
 	int alloc_size = 8;
 

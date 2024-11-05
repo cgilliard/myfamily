@@ -100,13 +100,13 @@ Slab slab_allocator_allocate(SlabAllocator *sa) {
 	}
 
 	__atomic_fetch_sub(&sa->free_size, 1, __ATOMIC_RELAXED);
-	ret->next = SLAB_ALLOCATED;
+	__atomic_store_n(&ret->next, SLAB_ALLOCATED, __ATOMIC_RELAXED);
 	return ret;
 }
 
 // free is enqueue.
 void slab_allocator_free(SlabAllocator *sa, Slab slab) {
-	if (!CAS_SEQ(&slab->next, &SLAB_ALLOCATED, NULL))
+	if (!CAS(&slab->next, &SLAB_ALLOCATED, NULL))
 		panic("Double free attempt! %p %p", &slab->next, &SLAB_ALLOCATED);
 	if (__atomic_fetch_add(&sa->free_size, 1, __ATOMIC_RELAXED) >
 		sa->max_free_slabs) {
