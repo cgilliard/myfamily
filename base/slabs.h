@@ -24,12 +24,17 @@ typedef struct SlabAllocator {
 	Slab head;
 	Slab tail;
 	unsigned long long free_size;
+	unsigned long long max_free_slabs;
+	unsigned long long total_slabs;
+	unsigned long long max_total_slabs;
 	unsigned int slab_size;
 } SlabAllocator;
 
 void slab_allocator_cleanup(SlabAllocator *ptr);
 
-int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size);
+int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
+						unsigned long long max_free_slabs,
+						unsigned long long max_total_slabs);
 void slab_allocator_cleanup(SlabAllocator *sa);
 Slab slab_allocator_allocate(SlabAllocator *sa);
 void slab_allocator_free(SlabAllocator *sa, Slab slab);

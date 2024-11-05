@@ -63,7 +63,7 @@ MyTest(base, test_alloc) {
 
 MyTest(base, test_slab_allocator) {
 	SlabAllocator sa1;
-	cr_assert(!slab_allocator_init(&sa1, 16));
+	cr_assert(!slab_allocator_init(&sa1, 16, 100, 200));
 	Slab s1 = slab_allocator_allocate(&sa1);
 	cr_assert(s1 != NULL);
 	Slab s2 = slab_allocator_allocate(&sa1);
@@ -86,17 +86,48 @@ MyTest(base, test_slab_allocator) {
 	cr_assert(s4 != NULL);
 
 	slab_allocator_free(&sa1, s4);
+}
 
-	/*
-		slab_allocator_free(&sa1, s1);
+MyTest(base, test_slab_allocator_perf) {
+	SlabAllocator sa1;
+	// long long size = 4 * 1024L * 1024L * 1024L;
+	long long size = 100;
+	cr_assert(!slab_allocator_init(&sa1, 8, size, size));
+	Slab *arr = malloc(sizeof(Slab *) * size);
 
-		Slab s3 = slab_allocator_allocate(&sa1);
-		println("second alloc");
-		Slab s4 = slab_allocator_allocate(&sa1);
-		println("second alloc end");
-		slab_allocator_free(&sa1, s3);
+	for (long long i = 0; i < size; i++) {
+		// if (i % 1000000 == 0) println("i=%lli", i);
+		arr[i] = slab_allocator_allocate(&sa1);
+		cr_assert(arr[i] != NULL);
+	}
 
-		Slab s5 = slab_allocator_allocate(&sa1);
-		// slab_allocator_free(&sa1, s4);
-	*/
+	for (long long i = 0; i < size; i++) {
+		// if (i % 1000000 == 0) println("free i=%lli", i);
+		slab_allocator_free(&sa1, arr[i]);
+	}
+
+	free(arr);
+}
+
+MyTest(base, test_slab_allocator_recycle) {
+	long long size = 100;
+	SlabAllocator sa1;
+	cr_assert(!slab_allocator_init(&sa1, 8, size, size));
+	// Slab *arr = malloc(sizeof(Slab *) * size);
+	Slab s1 = slab_allocator_allocate(&sa1);
+
+	for (long long i = 0; i < size; i++) {
+		// if (i % 1 == 0) println("i=%lli", i);
+		Slab s2 = slab_allocator_allocate(&sa1);
+		slab_allocator_free(&sa1, s2);
+		//  arr[i] = slab_allocator_allocate(&sa1);
+		//   cr_assert(arr[i] != NULL);
+	}
+
+	for (long long i = 0; i < size; i++) {
+		// if (i % 1000000 == 0) println("free i=%lli", i);
+		//     slab_allocator_free(&sa1, arr[i]);
+	}
+
+	// free(arr);
 }
