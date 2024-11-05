@@ -6,6 +6,5 @@ var searchData=
   ['alloc_2ec_6',['alloc.c',['../alloc_8c.html',1,'']]],
   ['alloc_2eh_7',['alloc.h',['../alloc_8h.html',1,'']]],
   ['alloc_5fsum_8',['alloc_sum',['../structResourceStats.html#a00c602f951b8103cc46e4b9b0715f8a0',1,'ResourceStats::alloc_sum()'],['../alloc_8c.html#a70b05a036d4bd3162742f130ae43500a',1,'alloc_sum():&#160;alloc.c'],['../alloc_8h.html#a70b05a036d4bd3162742f130ae43500a',1,'alloc_sum():&#160;alloc.c']]],
-  ['aload_9',['ALOAD',['../macros_8h.html#a4c3cb86c3ed12273c4fab32dcd8cafc5',1,'macros.h']]],
-  ['aux_10',['aux',['../structType.html#abcd5dd525accf46f95b25b6b1f0ebdb9',1,'Type']]]
+  ['aload_9',['ALOAD',['../macros_8h.html#a4c3cb86c3ed12273c4fab32dcd8cafc5',1,'macros.h']]]
 ];

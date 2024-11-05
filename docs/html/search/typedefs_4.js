@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ptr_403',['Ptr',['../ptr_8h.html#ac1edcebf2f9fda90333f32f85bef2ca9',1,'ptr.h']]]
+  ['resourcestats_335',['ResourceStats',['../alloc_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'alloc.h']]]
 ];

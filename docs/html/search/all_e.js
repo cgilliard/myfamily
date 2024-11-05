@@ -1,17 +1,16 @@
 var searchData=
 [
-  ['rbtree_5fperf_2ec_169',['rbtree_perf.c',['../rbtree__perf_8c.html',1,'']]],
-  ['readme_170',['README',['../md_README.html',1,'']]],
-  ['readme_2emd_171',['README.md',['../README_8md.html',1,'']]],
-  ['real_5fmain_172',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]],
-  ['real_5fmain_2ec_173',['real_main.c',['../real__main_8c.html',1,'']]],
-  ['red_174',['RED',['../colors_8h.html#a8d23feea868a983c8c2b661e1e16972f',1,'colors.h']]],
-  ['release_175',['release',['../macros_8h.html#a5af3e33e078602f154cba53f58df716c',1,'release():&#160;macros.h'],['../alloc_8c.html#a93d01518fbd0b18e1dfc0d3c4b0f819d',1,'release(Alloc ptr):&#160;alloc.c'],['../alloc_8h.html#a2166d20f275373b0e4a613d2b3c7e2a7',1,'release(Alloc alloc):&#160;alloc.c']]],
-  ['release_5fsum_176',['release_sum',['../alloc_8c.html#a33010add1b9bd581ca3c86225f46cbc8',1,'release_sum():&#160;alloc.c'],['../alloc_8h.html#a33010add1b9bd581ca3c86225f46cbc8',1,'release_sum():&#160;alloc.c'],['../structResourceStats.html#a734a98bf8b41c03897c0f9923af9e0a7',1,'ResourceStats::release_sum()']]],
-  ['reset_177',['RESET',['../colors_8h.html#ab702106cf3b3e96750b6845ded4e0299',1,'colors.h']]],
-  ['resize_178',['resize',['../macros_8h.html#a46092034899185e5592fb52573b8e5e5',1,'macros.h']]],
-  ['resize_5fsum_179',['resize_sum',['../structResourceStats.html#a344cb94802cd377dc3ffc56ecbe987f7',1,'ResourceStats::resize_sum()'],['../alloc_8c.html#ac51b06a1a439241da94504883c482028',1,'resize_sum():&#160;alloc.c'],['../alloc_8h.html#ac51b06a1a439241da94504883c482028',1,'resize_sum():&#160;alloc.c']]],
-  ['resourcestats_180',['ResourceStats',['../alloc_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'ResourceStats():&#160;alloc.h'],['../structResourceStats.html',1,'ResourceStats']]],
-  ['rmrf_181',['rmrf',['../test__impl_8c.html#a5816a6b27040ac0d2cda8305b9f82f9b',1,'test_impl.c']]],
-  ['rsync_182',['rsync',['../macros_8h.html#a5d3913c5879046bace071d3b1bb1707b',1,'macros.h']]]
+  ['page_5faligned_5fsize_132',['page_aligned_size',['../alloc_8c.html#a87983d758fe77176feda40859d47c04f',1,'page_aligned_size(unsigned int size):&#160;alloc.c'],['../alloc_8h.html#a87983d758fe77176feda40859d47c04f',1,'page_aligned_size(unsigned int size):&#160;alloc.c']]],
+  ['panic_133',['panic',['../print__util_8h.html#ad1f1a1dc0581a11b597453f148106393',1,'print_util.h']]],
+  ['paren_134',['PAREN',['../macro__util_8h.html#a1c38cb40632dca8c8385d3cecea4b787',1,'macro_util.h']]],
+  ['paren_5fend_135',['PAREN_END',['../macro__util_8h.html#a555e810f9d9a0f66c86e0ea873beda21',1,'macro_util.h']]],
+  ['path_5fmax_136',['PATH_MAX',['../test_8h.html#ae688d728e1acdfe5988c7db45d6f0166',1,'test.h']]],
+  ['print_137',['print',['../print__util_8c.html#af9d42affcdcfe42b0bbd77e3d3329d8f',1,'print(const char *fmt,...):&#160;print_util.c'],['../print__util_8h.html#af9d42affcdcfe42b0bbd77e3d3329d8f',1,'print(const char *fmt,...):&#160;print_util.c']]],
+  ['print_5ferr_138',['print_err',['../fam__err_8c.html#aa548de6713770c665b2870ec3e2da771',1,'print_err(const byte *text):&#160;fam_err.c'],['../fam__err_8h.html#aa548de6713770c665b2870ec3e2da771',1,'print_err(const byte *text):&#160;fam_err.c']]],
+  ['print_5fhex_139',['print_hex',['../xxdir_8c.html#af45e49d375ec15a3ad54c524c0fb7855',1,'xxdir.c']]],
+  ['print_5futil_2ec_140',['print_util.c',['../print__util_8c.html',1,'']]],
+  ['print_5futil_2eh_141',['print_util.h',['../print__util_8h.html',1,'']]],
+  ['println_142',['println',['../print__util_8c.html#a4951884f2d893a1acfbf89338351ec39',1,'println(const char *fmt,...):&#160;print_util.c'],['../print__util_8h.html#abfeec444100395bed0e079442b36007f',1,'println(const char *text,...):&#160;print_util.c']]],
+  ['proc_5ffile_143',['proc_file',['../xxdir_8c.html#ad8071c588b0037587224a40257b7040e',1,'xxdir.c']]],
+  ['ptr_144',['ptr',['../structAlloc.html#a2f30a1905bca61fdd1948752457346dd',1,'Alloc::ptr()'],['../macros_8h.html#a62e445f378c3862b78618beec533f338',1,'ptr():&#160;macros.h']]]
 ];

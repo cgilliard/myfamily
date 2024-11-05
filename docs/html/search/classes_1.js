@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['resourcestats_247',['ResourceStats',['../structResourceStats.html',1,'']]]
+  ['resourcestats_212',['ResourceStats',['../structResourceStats.html',1,'']]]
 ];

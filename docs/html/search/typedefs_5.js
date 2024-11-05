@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['resourcestats_404',['ResourceStats',['../alloc_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'alloc.h']]]
+  ['slab_336',['Slab',['../slabs_8h.html#aa955ca1abdb76bcb193cee86c92f3df5',1,'slabs.h']]],
+  ['slaballocator_337',['SlabAllocator',['../slabs_8h.html#a951e26cd6e1cebdf950e2da3f4c38ccf',1,'slabs.h']]],
+  ['slabimpl_338',['SlabImpl',['../slabs_8c.html#aa9becadccb54337a641d08f6247d505b',1,'slabs.c']]]
 ];

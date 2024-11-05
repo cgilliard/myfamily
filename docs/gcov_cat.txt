@@ -1,7 +1,7 @@
         -:    0:Source:alloc.c
         -:    0:Graph:alloc.gcno
         -:    0:Data:alloc.gcda
-        -:    0:Runs:14
+        -:    0:Runs:12
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,57 +23,57 @@
         -:   19:
         -:   20:_Thread_local ResourceStats THREAD_LOCAL_RESOURCE_STATS = {0, 0, 0, 0, 0};
         -:   21:
-      243:   22:unsigned int page_aligned_size(unsigned int size) {
-      243:   23:	size_t slabs_page_size = getpagesize();
-      243:   24:	size_t aligned_size =
-      243:   25:		((size_t)size + slabs_page_size - 1) & ~(slabs_page_size - 1);
-      243:   26:	if (aligned_size >= UINT32_MAX) {
+        2:   22:unsigned int page_aligned_size(unsigned int size) {
+        2:   23:	size_t slabs_page_size = getpagesize();
+        2:   24:	size_t aligned_size =
+        2:   25:		((size_t)size + slabs_page_size - 1) & ~(slabs_page_size - 1);
+        2:   26:	if (aligned_size >= UINT32_MAX) {
     #####:   27:		SetErr(Overflow);
     #####:   28:		return UINT32_MAX;
         -:   29:	}
-      243:   30:	return aligned_size;
+        2:   30:	return aligned_size;
         -:   31:}
         -:   32:
-      230:   33:Alloc alloc(unsigned int size) {
-      230:   34:	unsigned int aligned_size = page_aligned_size(size);
-      230:   35:	if (aligned_size >= UINT32_MAX) {
+        1:   33:Alloc alloc(unsigned int size) {
+        1:   34:	unsigned int aligned_size = page_aligned_size(size);
+        1:   35:	if (aligned_size >= UINT32_MAX) {
     #####:   36:		SetErr(Overflow);
     #####:   37:		Alloc ret = {};
     #####:   38:		return ret;
         -:   39:	}
-      230:   40:	void *ret = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
+        1:   40:	void *ret = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
         -:   41:					 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-      230:   42:	if (ret) {
-      230:   43:		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
+        1:   42:	if (ret) {
+        1:   43:		THREAD_LOCAL_RESOURCE_STATS.alloc_sum += 1;
         -:   44:	} else {
     #####:   45:		SetErr(AllocErr);
         -:   46:	}
         -:   47:
-      230:   48:	Alloc aret = {.ptr = ret, .size = aligned_size};
-      230:   49:	return aret;
+        1:   48:	Alloc aret = {.ptr = ret, .size = aligned_size};
+        1:   49:	return aret;
         -:   50:}
         -:   51:
-      230:   52:void release(Alloc ptr) {
+        1:   52:void release(Alloc ptr) {
         -:   53:	int code;
-      230:   54:	if ((code = munmap(ptr.ptr, ptr.size))) {
+        1:   54:	if ((code = munmap(ptr.ptr, ptr.size))) {
     #####:   55:		panic("munmap error = %i\n", code);
         -:   56:	}
-      230:   57:	THREAD_LOCAL_RESOURCE_STATS.release_sum += 1;
-      230:   58:}
+        1:   57:	THREAD_LOCAL_RESOURCE_STATS.release_sum += 1;
+        1:   58:}
         -:   59:
-       12:   60:int64 alloc_sum() {
-       12:   61:	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
+        8:   60:int64 alloc_sum() {
+        8:   61:	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
         -:   62:}
     #####:   63:int64 resize_sum() {
     #####:   64:	return THREAD_LOCAL_RESOURCE_STATS.resize_sum;
         -:   65:}
-       10:   66:int64 release_sum() {
-       10:   67:	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
+        8:   66:int64 release_sum() {
+        8:   67:	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
         -:   68:}
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:14
+        -:    0:Runs:12
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -162,132 +162,10 @@
         4:   86:		return "\x1b[0m";
         -:   87:	}
         -:   88:}
-        -:    0:Source:fam_alloc.c
-        -:    0:Graph:fam_alloc.gcno
-        -:    0:Data:fam_alloc.gcda
-        -:    0:Runs:14
-        -:    1:// Copyright (c) 2024, The MyFamily Developers
-        -:    2://
-        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
-        -:    4:// you may not use this file except in compliance with the License.
-        -:    5:// You may obtain a copy of the License at
-        -:    6://
-        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
-        -:    8://
-        -:    9:// Unless required by applicable law or agreed to in writing, software
-        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
-        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-        -:   12:// See the License for the specific language governing permissions and
-        -:   13:// limitations under the License.
-        -:   14:
-        -:   15:#include <base/fam_alloc.h>
-        -:   16:#include <base/fam_err.h>
-        -:   17:#include <base/macros.h>
-        -:   18:#include <base/osdef.h>
-        -:   19:#include <base/print_util.h>
-        -:   20:
-        -:   21:SlabAllocator global_slab_allocator = NULL;
-        -:   22:
-    #####:   23:Ptr fam_ptr_for(unsigned int id, unsigned int len) {
-    #####:   24:	if (len > MAX_SLAB_SIZE) return NULL;
-    #####:   25:	return ptr_for(global_slab_allocator, id, len);
-        -:   26:}
-        -:   27:
-       10:   28:void fam_alloc_init() {
-       10:   29:	if (global_slab_allocator == NULL) {
-       10:   30:		global_slab_allocator = slab_allocator_create();
-       10:   31:		if (global_slab_allocator == NULL) {
-    #####:   32:			panic("Could not initialize global slab allocator!");
-        -:   33:		}
-        -:   34:	}
-       10:   35:}
-        -:   36:
-    #####:   37:void __attribute__((destuctor)) __init_sa_tear_down() {
-    #####:   38:	if (global_slab_allocator) slab_allocator_cleanup(&global_slab_allocator);
-    #####:   39:	global_slab_allocator = NULL;
-    #####:   40:}
-        -:   41:
-        -:   42:// use highest byte in aux for flags
-        6:   43:void ptr_flag_set(Ptr ptr, byte flag, bool value) {
-        6:   44:	int64 *aux = ptr_aux(ptr);
-        6:   45:	if (value)
-        2:   46:		*aux |= (0x1ULL << (unsigned long long)flag) << 56;
-        -:   47:	else
-        4:   48:		*aux &= ~((0x1ULL << (unsigned long long)flag) << 56);
-        6:   49:}
-        -:   50:
-        6:   51:bool ptr_flag_check(Ptr ptr, byte flag) {
-        6:   52:	int64 *aux = ptr_aux(ptr);
-        6:   53:	return (*aux) & ((0x1ULL << (unsigned long long)flag) << 56);
-        -:   54:}
-        -:   55:
-        6:   56:Ptr fam_alloc(unsigned int size) {
-        -:   57:	// this size is reserved for 'null'
-        6:   58:	if (size == UINT32_MAX) {
-    #####:   59:		SetErr(Overflow);
-    #####:   60:		return NULL;
-        -:   61:	}
-        -:   62:	Ptr ret;
-        6:   63:	if (size > MAX_SLAB_SIZE)
-        2:   64:		ret = ptr_direct_alloc(size);
-        -:   65:	else {
-        4:   66:		ret = slab_allocator_allocate(global_slab_allocator, size);
-        -:   67:	}
-        -:   68:
-        6:   69:	if (ret) {
-        6:   70:		int64 *aux = ptr_aux(ret);
-        6:   71:		*aux = 0;
-        6:   72:		ptr_flag_set(ret, PTR_FLAGS_DIRECT, size > MAX_SLAB_SIZE);
-        -:   73:	}
-        -:   74:
-        6:   75:	return ret;
-        -:   76:}
-        4:   77:Ptr fam_resize(Ptr ptr, unsigned int size) {
-        -:   78:	// this size is reserved for 'null'
-        4:   79:	if (size == UINT32_MAX) {
-    #####:   80:		SetErr(Overflow);
-    #####:   81:		return NULL;
-        -:   82:	}
-        -:   83:
-        4:   84:	if (ptr == NULL) {
-    #####:   85:		SetErr(IllegalArgument);
-    #####:   86:		return NULL;
-        -:   87:	}
-        -:   88:
-        4:   89:	Ptr ret = fam_alloc(size);
-        4:   90:	if (ret) {
-        4:   91:		unsigned int len = $len(ptr);
-        4:   92:		if (len > size) len = size;
-        4:   93:		memcpy($(ret), $(ptr), len);
-        4:   94:		fam_release(ptr);
-        -:   95:	}
-        -:   96:
-        4:   97:	return ret;
-        -:   98:}
-        -:   99:
-        6:  100:void fam_release(Ptr ptr) {
-       6*:  101:	if (nil(ptr) || ptr_len(ptr) == UINT32_MAX) {
-    #####:  102:		panic("fam_free on nil or special ptr!");
-        6:  103:	} else if (ptr_flag_check(ptr, PTR_FLAGS_DIRECT)) {
-        2:  104:		ptr_direct_release(ptr);
-        -:  105:	} else {
-        4:  106:		slab_allocator_free(global_slab_allocator, ptr);
-        -:  107:	}
-        6:  108:}
-        -:  109:
-        -:  110:#ifdef TEST
-       10:  111:void fam_alloc_cleanup() {
-       10:  112:	if (global_slab_allocator) slab_allocator_cleanup(&global_slab_allocator);
-       10:  113:	global_slab_allocator = NULL;
-       10:  114:}
-       10:  115:int64 fam_alloc_count_global_allocator() {
-       10:  116:	return slab_allocator_cur_slabs_allocated(global_slab_allocator);
-        -:  117:}
-        -:  118:#endif	// TEST
         -:    0:Source:fam_err.c
         -:    0:Graph:fam_err.gcno
         -:    0:Data:fam_err.gcda
-        -:    0:Runs:14
+        -:    0:Runs:12
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -331,7 +209,7 @@
         -:    0:Source:lock.c
         -:    0:Graph:lock.gcno
         -:    0:Data:lock.gcda
-        -:    0:Runs:14
+        -:    0:Runs:12
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -355,22 +233,22 @@
     #####:   21:Lock lock_create() {
     #####:   22:	return 0;
         -:   23:}
-     2012:   24:void lock_read(Lock *lock) {
-     2012:   25:	_lock_is_write__ = false;
+        2:   24:void lock_read(Lock *lock) {
+        2:   25:	_lock_is_write__ = false;
         -:   26:	unsigned long long state;
         -:   27:	unsigned long long state_update;
         -:   28:	do {
         -:   29:		// get current state set the write_pending bit to false
-     2012:   30:		state = ALOAD(lock) & ~0x80000000ULL;
+        2:   30:		state = ALOAD(lock) & ~0x80000000ULL;
         -:   31:		// increment the read counter and add 1 to the sequence number (upper 32
         -:   32:		// bits)
-     2012:   33:		state_update = (state + 0x100000000ULL) + 1ULL;
+        2:   33:		state_update = (state + 0x100000000ULL) + 1ULL;
         -:   34:		// while our target state (no change including sequence number and
         -:   35:		// write_pending != false, we spin)
-     2012:   36:	} while (!CAS_ACQUIRE(lock, &state, state_update));
-     2012:   37:}
-     1007:   38:void lock_write(Lock *lock) {
-     1007:   39:	_lock_is_write__ = true;
+        2:   36:	} while (!CAS_ACQUIRE(lock, &state, state_update));
+        2:   37:}
+        2:   38:void lock_write(Lock *lock) {
+        2:   39:	_lock_is_write__ = true;
         -:   40:	unsigned long long state;
         -:   41:	unsigned long long state_update;
         -:   42:
@@ -379,43 +257,43 @@
         -:   45:	// is complete indicating to readers our desire to write
         -:   46:	// this avoids write starvation
         -:   47:	do {
-     1007:   48:		state = ALOAD(lock) & ~0x80000000ULL;
-     1007:   49:		state_update = (state + 0x100000000ULL) | 0x80000000ULL;
-     1007:   50:	} while (!CAS(lock, &state, state_update));
+        2:   48:		state = ALOAD(lock) & ~0x80000000ULL;
+        2:   49:		state_update = (state + 0x100000000ULL) | 0x80000000ULL;
+        2:   50:	} while (!CAS(lock, &state, state_update));
         -:   51:
         -:   52:	// second step, obtain total lock before proceeding
         -:   53:	do {
         -:   54:		// get current state. We will wait for the read count to go to 0.
-     1007:   55:		state = ALOAD(lock) & 0xFFFFFFFF80000000ULL;
+        2:   55:		state = ALOAD(lock) & 0xFFFFFFFF80000000ULL;
         -:   56:		// set the updated value to set the write bit true and read count to 0,
         -:   57:		// increment the sequence number
-     1007:   58:		state_update = (state + 0x100000000ULL) & 0xFFFFFFFF80000000ULL;
-     1007:   59:	} while (!CAS_ACQUIRE(lock, &state, state_update));
-     1007:   60:}
+        2:   58:		state_update = (state + 0x100000000ULL) & 0xFFFFFFFF80000000ULL;
+        2:   59:	} while (!CAS_ACQUIRE(lock, &state, state_update));
+        2:   60:}
         -:   61:
-     3019:   62:void lock_unlock(Lock *lock) {
+        4:   62:void lock_unlock(Lock *lock) {
         -:   63:	unsigned long long state;
         -:   64:	unsigned long long state_update;
         -:   65:	// check thread local write variable
-     3019:   66:	if (_lock_is_write__) {
+        4:   66:	if (_lock_is_write__) {
         -:   67:		// writer
         -:   68:		do {
         -:   69:			// get current state
-     1007:   70:			state = ALOAD(lock);
+        2:   70:			state = ALOAD(lock);
         -:   71:			// unset the write bit and increment the sequence number
-     1007:   72:			state_update = (state + 0x100000000ULL) & ~0x80000000ULL;
-     1007:   73:		} while (!CAS_RELEASE(lock, &state, state_update));
+        2:   72:			state_update = (state + 0x100000000ULL) & ~0x80000000ULL;
+        2:   73:		} while (!CAS_RELEASE(lock, &state, state_update));
         -:   74:	} else {
         -:   75:		// reader
         -:   76:		do {
         -:   77:			// get current state
-     2012:   78:			state = ALOAD(lock);
-    2012*:   79:			if ((state & 0x7FFFFFFF) == 0) panic("underflow!");
+        2:   78:			state = ALOAD(lock);
+       2*:   79:			if ((state & 0x7FFFFFFF) == 0) panic("underflow!");
         -:   80:			// subtract 1 from the read count and increment the sequence number
-     2012:   81:			state_update = (state + 0x100000000ULL) - 1ULL;
-     2012:   82:		} while (!CAS_RELEASE(lock, &state, state_update));
+        2:   81:			state_update = (state + 0x100000000ULL) - 1ULL;
+        2:   82:		} while (!CAS_RELEASE(lock, &state, state_update));
         -:   83:	}
-     3019:   84:}
+        4:   84:}
         -:   85:
         2:   86:void lock_guard_cleanup(LockGuard *l) {
         2:   87:	lock_unlock(l);
@@ -432,7 +310,7 @@
         -:    0:Source:print_util.c
         -:    0:Graph:print_util.gcno
         -:    0:Data:print_util.gcda
-        -:    0:Runs:14
+        -:    0:Runs:12
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -485,7 +363,7 @@
         -:    0:Source:slabs.c
         -:    0:Graph:slabs.gcno
         -:    0:Data:slabs.gcda
-        -:    0:Runs:14
+        -:    0:Runs:12
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -508,399 +386,129 @@
         -:   20:#include <base/print_util.h>
         -:   21:#include <base/slabs.h>
         -:   22:
-        -:   23:#define SLAB_SIZES 496
-        -:   24:#define INITIAL_CHUNKS 0
-        -:   25:
-        -:   26:typedef struct Type {
-        -:   27:	// slab id used internally by sa
-        -:   28:	unsigned int id;
-        -:   29:	// len of slab
-        -:   30:	unsigned int len;
-        -:   31:	// aux data can be used by caller as desired
-        -:   32:	int64 aux;
-        -:   33:	// user data
-        -:   34:	byte data[];
-        -:   35:} Type;
-        -:   36:
-     9054:   37:unsigned int slab_overhead() {
-     9054:   38:	return sizeof(Type);
-        -:   39:}
-        -:   40:
-        4:   41:int slab_getpagesize() {
-        4:   42:	return getpagesize();
-        -:   43:}
-        -:   44:
-    18600:   45:unsigned int ptr_len(const Ptr ptr) {
-    18600:   46:	return ptr->len - sizeof(Type);
-        -:   47:}
-    #####:   48:unsigned int ptr_id(const Ptr ptr) {
-    #####:   49:	return ptr->id;
-        -:   50:}
-   306711:   51:void *ptr_data(const Ptr ptr) {
-   306711:   52:	return ptr->data;
-        -:   53:}
-       18:   54:void *ptr_aux(const Ptr ptr) {
-       18:   55:	return &ptr->aux;
-        -:   56:}
-        -:   57:
-      213:   58:Ptr ptr_direct_alloc(unsigned int size) {
-      213:   59:	Alloc a = alloc(size + sizeof(Type));
-      213:   60:	Ptr ret = a.ptr;
-     213*:   61:	if (a.ptr == NULL) return NULL;
-      213:   62:	ret->len = a.size;
-      213:   63:	ret->id = 0;
-      213:   64:	ret->aux = 0;
-      213:   65:	return ret;
-        -:   66:}
-        -:   67:
-        4:   68:Ptr ptr_direct_resize(Ptr ptr, unsigned int size) {
-        4:   69:	Alloc a = alloc(size + sizeof(Type));
-       4*:   70:	if (a.ptr == NULL) return NULL;
-        4:   71:	Ptr nptr = a.ptr;
-        4:   72:	nptr->len = a.size;
-        4:   73:	nptr->id = ptr->id;
-        4:   74:	nptr->aux = ptr->aux;
-        -:   75:	unsigned int copy_sz;
-        4:   76:	if (a.size < ptr_len(ptr))
-        2:   77:		copy_sz = a.size - slab_overhead();
-        -:   78:	else
-        2:   79:		copy_sz = ptr_len(ptr);
-        4:   80:	memcpy($(nptr), $(ptr), copy_sz);
-        4:   81:	ptr_direct_release(ptr);
-        4:   82:	return nptr;
-        -:   83:}
-        -:   84:
-      217:   85:void ptr_direct_release(Ptr ptr) {
-      217:   86:	Alloc a = {.ptr = ptr, .size = ptr_len(ptr)};
-      217:   87:	release(a);
-      217:   88:}
-        -:   89:
-        -:   90:typedef struct SlabType {
-        -:   91:	unsigned int slab_size;
-        -:   92:	unsigned int slabs_per_resize;
-        -:   93:	unsigned int initial_chunks;
-        -:   94:	unsigned int max_slabs;
-        -:   95:} SlabType;
-        -:   96:
-        -:   97:typedef struct SlabData {
-        -:   98:	SlabType type;
-        -:   99:	Ptr data;
-        -:  100:	Ptr free_list;
-        -:  101:	unsigned int cur_chunks;
-        -:  102:	unsigned int cur_slabs;
-        -:  103:	unsigned int free_list_head;
-        -:  104:	Lock lock;
-        -:  105:} SlabData;
+        -:   23:typedef struct SlabImpl {
+        -:   24:	struct SlabImpl *next;
+        -:   25:	byte data[];
+        -:   26:} SlabImpl;
+        -:   27:
+   100000:   28:byte *slab_get(Slab s) {
+   100000:   29:	return s->data;
+        -:   30:}
+        -:   31:
+        -:   32:SlabImpl slab_allocated_impl = {.next = NULL};
+        -:   33:Slab slab_allocated_reqd = &slab_allocated_impl;
+        -:   34:#define SLAB_ALLOCATED slab_allocated_reqd
+        -:   35:
+      110:   36:Slab slab_allocator_grow(SlabAllocator *sa) {
+      110:   37:	if (__atomic_fetch_add(&sa->total_slabs, 1, __ATOMIC_RELAXED) >
+      110:   38:		sa->max_total_slabs) {
+    #####:   39:		__atomic_fetch_sub(&sa->total_slabs, 1, __ATOMIC_RELAXED);
+    #####:   40:		SetErr(CapacityExceeded);
+    #####:   41:		return NULL;
+        -:   42:	}
+      110:   43:	Slab ret = malloc(sizeof(SlabImpl) + sa->slab_size);
+      110:   44:	if (ret == NULL) {
+    #####:   45:		SetErr(AllocErr);
+    #####:   46:		__atomic_fetch_sub(&sa->total_slabs, 1, __ATOMIC_RELAXED);
+    #####:   47:		return NULL;
+        -:   48:	}
+      110:   49:	ret->next = SLAB_ALLOCATED;
+      110:   50:	return ret;
+        -:   51:}
+        -:   52:
+        3:   53:void slab_allocator_cleanup(SlabAllocator *sa) {
+        3:   54:	Slab itt = sa->head;
+      113:   55:	while (itt) {
+      110:   56:		Slab to_delete = itt;
+      110:   57:		itt = itt->next;
+      110:   58:		free(to_delete);
+        -:   59:	}
+        3:   60:}
+        -:   61:
+        -:   62:// initialize slab allocator as a michael-scott queue with specified slab_size
+        3:   63:int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
+        -:   64:						unsigned long long max_free_slabs,
+        -:   65:						unsigned long long max_total_slabs) {
+        3:   66:	Slab s = malloc(sizeof(SlabImpl) + slab_size);
+        3:   67:	if (s == NULL) {
+    #####:   68:		SetErr(AllocErr);
+    #####:   69:		return -1;
+        -:   70:	}
+        3:   71:	__atomic_store_n(&sa->free_size, 1, __ATOMIC_SEQ_CST);
+        3:   72:	__atomic_store_n(&sa->total_slabs, 1, __ATOMIC_SEQ_CST);
+        3:   73:	sa->slab_size = slab_size;
+        3:   74:	sa->max_free_slabs = max_free_slabs;
+        3:   75:	sa->max_total_slabs = max_total_slabs;
+        3:   76:	s->next = NULL;
+        3:   77:	sa->head = sa->tail = s;
+        3:   78:	return 0;
+        -:   79:}
+        -:   80:
+        -:   81:// allocate is dequeue. If null "grow" by mallocing a slab.
+    50108:   82:Slab slab_allocator_allocate(SlabAllocator *sa) {
+        -:   83:	Slab head, tail, next, ret;
+        -:   84:	loop {
+    50108:   85:		head = sa->head;
+    50108:   86:		tail = sa->tail;
+    50108:   87:		next = head->next;
+    50108:   88:		if (head == sa->head) {
+    50108:   89:			if (head == tail) {
+      110:   90:				if (next == NULL) {
+      110:   91:					ret = slab_allocator_grow(sa);
+      110:   92:					return ret;
+        -:   93:				}
+    #####:   94:				CAS_SEQ(&sa->tail, &tail, next);
+        -:   95:			} else {
+    49998:   96:				ret = head;
+    49998:   97:				if (CAS_SEQ(&sa->head, &head, next)) break;
+        -:   98:			}
+        -:   99:		}
+        -:  100:	}
+        -:  101:
+    49998:  102:	__atomic_fetch_sub(&sa->free_size, 1, __ATOMIC_RELAXED);
+    49998:  103:	__atomic_store_n(&ret->next, SLAB_ALLOCATED, __ATOMIC_RELAXED);
+    49998:  104:	return ret;
+        -:  105:}
         -:  106:
-        -:  107:typedef struct SlabAllocatorImpl {
-        -:  108:	int64 sd_count;
-        -:  109:	SlabData sd_arr[];
-        -:  110:} SlabAllocatorImpl;
-        -:  111:
-       12:  112:void slab_allocator_cleanup(SlabAllocator *ptr) {
-      12*:  113:	if (ptr == NULL) return;
-       12:  114:	SlabAllocatorNc sa = *ptr;
-       12:  115:	if (sa) {
-       12:  116:		if (sa->sd_count) {
-     5964:  117:			for (int i = 0; i < sa->sd_count; i++) {
-     5952:  118:				SlabData *sd = &sa->sd_arr[i];
-     5952:  119:				if (sd->cur_chunks) {
-       69:  120:					ptr_direct_release(sd->free_list);
-       69:  121:					Ptr *datalist = ptr_data(sd->data);
-      138:  122:					for (int64 j = 0; j < sd->cur_chunks; j++) {
-       69:  123:						ptr_direct_release(datalist[j]);
-        -:  124:					}
-       69:  125:					ptr_direct_release(sd->data);
-       69:  126:					sd->cur_chunks = 0;
-        -:  127:				}
-        -:  128:			}
-        -:  129:		}
-        -:  130:
-       12:  131:		int size = sizeof(SlabAllocatorImpl) + SLAB_SIZES * sizeof(SlabData);
-       12:  132:		unsigned int aligned = page_aligned_size(size);
-       12:  133:		Alloc saa = {.ptr = sa, .size = aligned};
-       12:  134:		release(saa);
-       12:  135:		*ptr = NULL;
-        -:  136:	}
-        -:  137:}
-        -:  138:
-       69:  139:void slab_allocator_init_free_list(SlabData *sd, int64 chunks) {
-       69:  140:	sd->free_list_head = sd->cur_chunks * sd->type.slabs_per_resize;
-       69:  141:	int64 count = chunks * (int64)sd->type.slabs_per_resize;
-     1097:  142:	for (int64 i = 0; i < count; i++) {
-     1028:  143:		if (i == count - 1) {
-       69:  144:			*(unsigned int *)$(&sd->free_list[i + sd->free_list_head]) =
-        -:  145:				UINT32_MAX;
-        -:  146:		} else {
-     1918:  147:			*(unsigned int *)$(&sd->free_list[i + sd->free_list_head]) =
-      959:  148:				1 + i + sd->free_list_head;
-        -:  149:		}
-        -:  150:	}
-       69:  151:}
-        -:  152:
-       69:  153:int slab_allocator_increase_chunks(SlabData *sd, int64 chunks) {
-       69:  154:	if (sd->cur_chunks == 0) {
-       69:  155:		sd->free_list = ptr_direct_alloc(chunks * sd->type.slabs_per_resize *
-        -:  156:										 sizeof(unsigned int));
-      69*:  157:		if (sd->free_list == NULL) return -1;
-       69:  158:		sd->data = ptr_direct_alloc(chunks * sizeof(Ptr));
-       69:  159:		if (sd->data == NULL) {
-    #####:  160:			ptr_direct_release(sd->free_list);
-    #####:  161:			return -1;
-        -:  162:		}
-       69:  163:		Ptr *datalist = ptr_data(sd->data);
-      138:  164:		for (int i = 0; i < chunks; i++) {
-      138:  165:			datalist[i] =
-      138:  166:				ptr_direct_alloc((chunks * sd->type.slabs_per_resize) *
-       69:  167:								 (slab_overhead() + sd->type.slab_size));
-       69:  168:			if (datalist[i] == NULL) {
-    #####:  169:				ptr_direct_release(sd->free_list);
-    #####:  170:				for (int64 j = i - 1; j >= 0; j--) {
-    #####:  171:					ptr_direct_release(&sd->data[j]);
-        -:  172:				}
-    #####:  173:				ptr_direct_release(sd->data);
-    #####:  174:				return -1;
-        -:  175:			}
-        -:  176:		}
-        -:  177:	} else {
-    #####:  178:		if (((int64)chunks + (int64)sd->cur_chunks) *
-    #####:  179:				(int64)sd->type.slabs_per_resize >
-    #####:  180:			sd->type.max_slabs) {
-    #####:  181:			SetErr(Overflow);
-    #####:  182:			return -1;
-        -:  183:		}
-        -:  184:
-    #####:  185:		int nsize = (chunks + sd->cur_chunks) * sd->type.slabs_per_resize *
-        -:  186:					sizeof(unsigned int);
-    #####:  187:		Ptr tmp = ptr_direct_resize(sd->free_list, nsize);
-    #####:  188:		if (nil(tmp)) return -1;
-    #####:  189:		sd->free_list = tmp;
-        -:  190:
-    #####:  191:		Ptr tmp2 = ptr_direct_resize(
-    #####:  192:			sd->data, (chunks + sd->cur_chunks) * sizeof(byte *));
-    #####:  193:		if (nil(tmp2)) return -1;
-    #####:  194:		sd->data = tmp2;
-    #####:  195:		Ptr *data = $(sd->data);
-    #####:  196:		for (int64 i = 0; i < chunks; i++) {
-    #####:  197:			data[i + sd->cur_chunks] =
-    #####:  198:				ptr_direct_alloc(sd->type.slabs_per_resize *
-    #####:  199:								 (slab_overhead() + sd->type.slab_size));
-    #####:  200:			if (data[i + sd->cur_chunks] == NULL) {
-    #####:  201:				for (int64 j = i - 1; j >= 0; j--) {
-    #####:  202:					ptr_direct_release(data[j + sd->cur_chunks]);
-        -:  203:				}
-        -:  204:			}
-        -:  205:		}
-        -:  206:	}
-        -:  207:
-       69:  208:	slab_allocator_init_free_list(sd, chunks);
-       69:  209:	sd->cur_chunks += chunks;
-       69:  210:	return 0;
-        -:  211:}
-        -:  212:
-     5952:  213:int slab_allocator_init_data(SlabData *sd) {
-     5952:  214:	sd->cur_slabs = 0;
-     5952:  215:	sd->cur_chunks = 0;
-     5952:  216:	sd->free_list_head = UINT32_MAX;
-     5952:  217:	sd->free_list = NULL;
-     5952:  218:	sd->data = NULL;
-     5952:  219:	sd->lock = INIT_LOCK;
-        -:  220:
-     5952:  221:	if (sd->type.initial_chunks) {
-    #####:  222:		if (slab_allocator_increase_chunks(sd, sd->type.initial_chunks))
-    #####:  223:			return -1;
-        -:  224:	}
-     5952:  225:	return 0;
-        -:  226:}
-        -:  227:
-       12:  228:int slab_allocator_init_state(SlabAllocator sa) {
-     5964:  229:	for (int i = 0; i < sa->sd_count; i++) {
-    5952*:  230:		if (slab_allocator_init_data(&sa->sd_arr[i])) return -1;
-        -:  231:	}
-        -:  232:
-       12:  233:	return 0;
-        -:  234:}
-        -:  235:
-    71513:  236:int slab_allocator_get_size(unsigned int index) {
-    71513:  237:	if (index <= 256) return index * 16;
-    64332:  238:	if (index <= 496) return (index - 240) * 256;
-       12:  239:	return -1;
-        -:  240:}
-        -:  241:
-    67548:  242:int slab_allocator_get_index(unsigned int size) {
-    67548:  243:	if (size <= 4096) return (15 + size) / 16;
-    61441:  244:	if (size <= 65536) return 240 + (255 + size) / 256;
-        1:  245:	return -1;
-        -:  246:}
-        -:  247:
-       12:  248:SlabAllocator slab_allocator_create() {
-        -:  249:	SlabAllocatorNc ret;
-       12:  250:	Alloc a = alloc(sizeof(SlabAllocatorImpl) + SLAB_SIZES * sizeof(SlabData));
-      12*:  251:	if (a.ptr == NULL) return NULL;
-       12:  252:	ret = a.ptr;
-       12:  253:	ret->sd_count = 0;
-        -:  254:
-        -:  255:	int size;
-     5976:  256:	while ((size = slab_allocator_get_size(ret->sd_count)) >= 0) {
-     5964:  257:		SlabData *sd = &ret->sd_arr[ret->sd_count];
-     5964:  258:		int slabs_per_resize = getpagesize() / (slab_overhead() + size);
-     5964:  259:		if (slabs_per_resize == 0) slabs_per_resize = 1;
-     5964:  260:		sd->type = (const SlabType){.slab_size = size,
-        -:  261:									.slabs_per_resize = slabs_per_resize,
-        -:  262:									.initial_chunks = INITIAL_CHUNKS,
-        -:  263:									.max_slabs = UINT32_MAX};
-     5964:  264:		ret->sd_count++;
-        -:  265:	}
-       12:  266:	ret->sd_count--;
-        -:  267:
-       12:  268:	if (ret->sd_count != SLAB_SIZES)
-    #####:  269:		panic("sd_count mismatch. Expected %i, Found %i!", SLAB_SIZES,
-    #####:  270:			  ret->sd_count);
-        -:  271:
-       12:  272:	if (slab_allocator_init_state(ret)) {
-    #####:  273:		slab_allocator_cleanup(&ret);
-    #####:  274:		return NULL;
-        -:  275:	}
-        -:  276:
-       12:  277:	return ret;
-        -:  278:}
-        -:  279:
-     1005:  280:int64 slab_allocator_slab_data_index(SlabData *sd, int64 id) {
-     1005:  281:	return id / sd->type.slabs_per_resize;
-        -:  282:}
-        -:  283:
-     1005:  284:int64 slab_allocator_slab_data_offset(SlabData *sd, int64 id) {
-     3015:  285:	return (id % sd->type.slabs_per_resize) *
-     1005:  286:		   (slab_overhead() + sd->type.slab_size);
-        -:  287:}
-        -:  288:
-     1005:  289:Ptr slab_allocator_allocate_sd(SlabData *sd, SlabAllocator sa) {
-     1005:  290:	bool err_cond = false;
-        -:  291:
-     1005:  292:	lockw(&sd->lock);
-        -:  293:
-     1005:  294:	if (sd->free_list_head == UINT32_MAX) {
-       69:  295:		if (slab_allocator_increase_chunks(sd, 1)) {
-    #####:  296:			err_cond = true;
-        -:  297:		}
-       69:  298:		if (!err_cond && sd->free_list_head == UINT32_MAX) {
-    #####:  299:			SetErr(CapacityExceeded);
-        -:  300:		}
-        -:  301:	}
-        -:  302:
-     1005:  303:	unlock(&sd->lock);
-        -:  304:
-    1005*:  305:	if (err_cond) return NULL;
-        -:  306:
-        -:  307:	unsigned int old_free_list_head;
-        -:  308:	unsigned int new_free_list_head;
-        -:  309:	Ptr ptr;
-        -:  310:
-        -:  311:	do {
-     1005:  312:		lockr(&sd->lock);
-        -:  313:
-     1005:  314:		old_free_list_head = sd->free_list_head;
-     1005:  315:		int64 index = slab_allocator_slab_data_index(sd, old_free_list_head);
-     1005:  316:		int64 offset = slab_allocator_slab_data_offset(sd, old_free_list_head);
-        -:  317:
-     1005:  318:		Ptr *ptrs = $(sd->data);
-     1005:  319:		ptr = (Type *)($(ptrs[index]) + offset);
-     1005:  320:		ptr->id = old_free_list_head;
-     1005:  321:		ptr->len = sd->type.slab_size;
-     1005:  322:		new_free_list_head = ((unsigned int *)$(sd->free_list))[ptr->id];
-     1005:  323:		unlock(&sd->lock);
-        -:  324:
-     1005:  325:	} while (!__atomic_compare_exchange_n(
-     1005:  326:		&sd->free_list_head, &old_free_list_head, new_free_list_head, false,
-        -:  327:		__ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
-     1005:  328:	__atomic_fetch_add(&sd->cur_slabs, 1, __ATOMIC_SEQ_CST);
-        -:  329:
-     1005:  330:	return ptr;
-        -:  331:}
-        -:  332:
-     1005:  333:Ptr slab_allocator_allocate(SlabAllocator sa, unsigned int size) {
-     1005:  334:	int index = slab_allocator_get_index(size + slab_overhead());
-    1005*:  335:	if (index < 0) return NULL;
-        -:  336:
-     1005:  337:	Ptr ret = slab_allocator_allocate_sd(&sa->sd_arr[index], sa);
-        -:  338:
-     1005:  339:	return ret;
-        -:  340:}
-        -:  341:
-     1005:  342:void slab_allocator_data_free(SlabData *sd, unsigned int id) {
-        -:  343:	unsigned int old_free_list_head;
-        -:  344:	unsigned int new_free_list_head;
-        -:  345:	do {
-     1005:  346:		lockr(&sd->lock);
-     1005:  347:		old_free_list_head = sd->free_list_head;
-     1005:  348:		new_free_list_head = id;  // Calculate new_free_list_head here
-     1005:  349:		((unsigned int *)$(sd->free_list))[id] =
-        -:  350:			old_free_list_head;	 // Update sd->free_list[id] here
-     1005:  351:		unlock(&sd->lock);
-     1005:  352:	} while (!__atomic_compare_exchange_n(
-     1005:  353:		&sd->free_list_head, &old_free_list_head, new_free_list_head, false,
-        -:  354:		__ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
-     1005:  355:	__atomic_fetch_sub(&sd->cur_slabs, 1, __ATOMIC_SEQ_CST);
-     1005:  356:}
-        -:  357:
-     1005:  358:void slab_allocator_free(SlabAllocator sa, Ptr ptr) {
-     1005:  359:	if (ptr == NULL || sa == NULL) {
-    #####:  360:		panic("Invalid ptr sent to slab_allocator free!");
-        -:  361:	}
-     1005:  362:	unsigned int len = ptr_len(ptr) + slab_overhead();
-     1005:  363:	int index = slab_allocator_get_index(len);
-     1005:  364:	if (index < 0) {
-    #####:  365:		panic("Invalid ptr sent to slab_allocator free! Unknown size %lli.",
-        -:  366:			  len);
-        -:  367:	}
-     1005:  368:	if (sa->sd_arr[index].type.slab_size != len) {
-    #####:  369:		panic(
-        -:  370:			"Invalid ptr sent to slab_allocator free! Size mismatch %lli vs. "
-        -:  371:			"%lli.",
-        -:  372:			sa->sd_arr[index].type.slab_size, len);
-        -:  373:	}
-        -:  374:
-     1005:  375:	slab_allocator_data_free(&sa->sd_arr[index], ptr->id);
-     1005:  376:}
-        -:  377:
-    #####:  378:Ptr ptr_for(SlabAllocator sa, unsigned int id, unsigned int len) {
-    #####:  379:	int index = slab_allocator_get_index(len + slab_overhead());
-    #####:  380:	if (index < 0) {
-    #####:  381:		panic(
-        -:  382:			"Invalid ptr sent to slab_allocator ptr_for! Unknown id=%u,len=%u.",
-        -:  383:			id, len);
-        -:  384:	}
-    #####:  385:	SlabData sd = sa->sd_arr[index];
-    #####:  386:	int64 offset = slab_allocator_slab_data_offset(&sd, id);
-    #####:  387:	index = slab_allocator_slab_data_index(&sd, id);
-        -:  388:
-        -:  389:	Ptr ret;
-    #####:  390:	lockr(&sd.lock);
-        -:  391:
-    #####:  392:	if (index >= sd.cur_chunks) {
-    #####:  393:		ret = NULL;
-        -:  394:	} else {
-    #####:  395:		Ptr *ptrs = $(sd.data);
-    #####:  396:		Ptr ptr = ptrs[index];
-    #####:  397:		ret = (Type *)($(ptr) + offset);
-        -:  398:	}
-        -:  399:
-    #####:  400:	unlock(&sd.lock);
-    #####:  401:	return ret;
-        -:  402:}
-        -:  403:
-     2012:  404:int64 slab_allocator_cur_slabs_allocated(const SlabAllocator sa) {
-     2012:  405:	int64 slabs = 0;
-   999964:  406:	for (int i = 0; i < sa->sd_count; i++) {
-   997952:  407:		SlabData *sd = &sa->sd_arr[i];
-   997952:  408:		slabs += __atomic_load_n(&sd->cur_slabs, __ATOMIC_SEQ_CST);
-        -:  409:	}
-     2012:  410:	return slabs;
-        -:  411:}
+        -:  107:// free is enqueue.
+    50105:  108:void slab_allocator_free(SlabAllocator *sa, Slab slab) {
+    50105:  109:	if (!CAS(&slab->next, &SLAB_ALLOCATED, NULL))
+    #####:  110:		panic("Double free attempt! %p %p", &slab->next, &SLAB_ALLOCATED);
+    50105:  111:	if (__atomic_fetch_add(&sa->free_size, 1, __ATOMIC_RELAXED) >
+    50105:  112:		sa->max_free_slabs) {
+    #####:  113:		free(slab);
+    #####:  114:		__atomic_fetch_sub(&sa->total_slabs, 1, __ATOMIC_RELAXED);
+    #####:  115:		return;
+        -:  116:	}
+        -:  117:
+        -:  118:	Slab tail, next;
+        -:  119:
+        -:  120:	loop {
+    50105:  121:		tail = sa->tail;
+    50105:  122:		next = tail->next;
+    50105:  123:		if (tail == sa->tail) {
+    50105:  124:			if (next == NULL) {
+    50105:  125:				if (CAS_SEQ(&tail->next, &next, slab)) {
+    50105:  126:					CAS_SEQ(&sa->tail, &tail, slab);
+    50105:  127:					break;
+        -:  128:				}
+        -:  129:			} else {
+    #####:  130:				CAS_SEQ(&sa->tail, &tail, next);
+        -:  131:			}
+        -:  132:		}
+        -:  133:	}
+        -:  134:}
+        -:  135:
+    10002:  136:unsigned long long slab_allocator_free_size(SlabAllocator *sa) {
+    10002:  137:	return ALOAD(&sa->free_size);
+        -:  138:}
+    10002:  139:unsigned long long slab_allocator_total_slabs(SlabAllocator *sa) {
+    10002:  140:	return ALOAD(&sa->total_slabs);
+        -:  141:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:14
+        -:    0:Runs:12
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -919,7 +527,7 @@
         -:   16:#include <base/print_util.h>
         -:   17:#include <base/types.h>
         -:   18:
-       14:   19:void __attribute__((constructor)) __check_64bit_arch__() {
+       12:   19:void __attribute__((constructor)) __check_64bit_arch__() {
         -:   20:#if !defined(__x86_64__) && !defined(_M_X64) && !defined(__aarch64__)
         -:   21:	panic("Supported architectures: __x86_64__, _M_X64, and __aarch64__");
         -:   22:#endif	// arch
@@ -938,11 +546,11 @@
         -:   35:	if (sizeof(bool) != 1) panic("bool must be 1 byte. Invalid arch!");
         -:   36:
         -:   37:	// little endian check
-       14:   38:	int test = 0x1;
-       14:   39:	if (*(byte *)&test != 0x1) {
+       12:   38:	int test = 0x1;
+       12:   39:	if (*(byte *)&test != 0x1) {
     #####:   40:		panic("Big endian is not supported!");
         -:   41:	}
-       14:   42:}
+       12:   42:}
         -:    0:Source:real_main.c
         -:    0:Graph:real_main.gcno
         -:    0:Data:real_main.gcda
