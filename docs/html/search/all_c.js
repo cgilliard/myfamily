@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['ok_141',['ok',['../macros_8h.html#afb7c4a60d54632531b77aa3a0f792b24',1,'macros.h']]],
-  ['osdef_2eh_142',['osdef.h',['../osdef_8h.html',1,'']]]
+  ['next_126',['next',['../structSlabImpl.html#a073627fc62dc345e42ee07f77719a148',1,'SlabImpl']]],
+  ['nil_127',['nil',['../macros_8h.html#ada23c0615668591b7a50c3c068555fb4',1,'macros.h']]],
+  ['none_128',['NONE',['../macro__util_8h.html#ae2a0fdb2b3c3ae31c3fef23f8286af29',1,'macro_util.h']]],
+  ['null_129',['NULL',['../types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4',1,'types.h']]]
 ];
