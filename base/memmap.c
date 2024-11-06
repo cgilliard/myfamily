@@ -79,7 +79,10 @@ int memmap_check_data(MemMapImpl *impl, int i, int j) {
 				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
 			block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
 						 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-			if (block == NULL) return -1;
+			if (block == NULL) {
+				SetErr(AllocErr);
+				return -1;
+			}
 			mallocked = true;
 		} else
 			break;
@@ -110,15 +113,19 @@ int memmap_init(MemMap *mm, unsigned int size) {
 	memset(impl->bitmap, '\0', UINT32_MAX / (size * 8));
 	// set first bit as allocated to ensure null is never returned.
 	((byte *)impl->bitmap)[0] = 0x1;
-	return null;
+	return 0;
 }
+
+// use 'last_i' to avoid iterating through long lists of fully allocated bits.
+static _Thread_local int last_i = 0;
+
 Ptr memmap_allocate(MemMap *mm) {
 	unsigned int i, j;
 	unsigned long long *itt, nitt, v;
 	MemMapImpl *impl;
 
 	impl = (MemMapImpl *)mm;
-	i = 0;
+	i = last_i;
 
 	do {
 		// create our 64 bit iterator for the bitmap
@@ -137,17 +144,21 @@ Ptr memmap_allocate(MemMap *mm) {
 			// increment i and do a bounds check. If we've gone through the list
 			// and still not found anything we have to return null '0' (which is
 			// reserved in the previous function so that it is a unique value.
-			if (++i >= UINT32_MAX / (impl->size * 8)) return null;
+			// also handle wrap-around case
+			i++;
+			if (i >= UINT32_MAX / (impl->size * 8)) {
+				i = 0;
+				itt = impl->bitmap;
+			}
+			// Break condition to prevent infinite loop if bitmap is full
+			if (i == last_i) {
+				return null;  // No free slots found
+			}
 		}
 
 		// we know at least one of these bits is not 0 so we loop through until
 		// we find it
-		loop {
-			// check for 0 bit and exit loop
-			if ((v & (0x1ULL << j)) == 0) break;
-			if (++j >= 8 * sizeof(unsigned long long))
-				continue;  // a modification must have occurred
-		}
+		while ((v & (0x1ULL << j)) != 0) j++;
 
 		// Set the value of 'nitt' (new itt) to it's current value with the jth
 		// bit set.
