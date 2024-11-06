@@ -35,8 +35,6 @@ void __attribute__((constructor)) __memmap_check_sizes() {
 
 void *memmap_data(const MemMap *mm, Ptr ptr) {
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
-	// println("ptr=%u,ptr>>22=%i,ptr>>9=%i", ptr, ptr >> 22, (ptr >> 9) &
-	// 0xFFFF);
 	byte *block = impl->data[ptr >> 22][(ptr >> 11) & 0x7FF];
 
 	return (byte *)(block + ((ptr & 0x7FF) * impl->size));
@@ -56,8 +54,12 @@ int memmap_init(MemMap *mm, unsigned int size) {
 
 int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
 	if (impl->bitmap[i] == NULL) {
-		impl->bitmap[i] = malloc(MEM_MAP_CHUNK_SIZE);
-		// println("malloc bitmap %i", MEM_MAP_CHUNK_SIZE);
+		int alloc_size = MEM_MAP_CHUNK_SIZE;
+		size_t page_size = getpagesize();
+		size_t aligned_size =
+			(((size_t)alloc_size) + page_size - 1) & ~(page_size - 1);
+		impl->bitmap[i] = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
+							   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 		if (impl->bitmap[i] == NULL) {
 			SetErr(AllocErr);
 			return -1;
@@ -73,15 +75,17 @@ int memmap_check_data(MemMapImpl *impl, Ptr ptr) {
 	bool mallocked = false;
 	byte **nulldata = NULL;
 
+	int alloc_size = 2048 * 8;
+	size_t page_size = getpagesize();
+	size_t aligned_size =
+		(((size_t)alloc_size) + page_size - 1) & ~(page_size - 1);
+
 	do {
-		if (mallocked) free(data);
+		if (mallocked) munmap(data, aligned_size);
 		data = ALOAD(&impl->data[ptr >> 22]);
 		if (data == NULL) {
-			// println("data=NULL i=%i,j=%i,k=%i", i, j, k);
-			int alloc_size = 2048 * 8;
-			data = malloc(alloc_size);
-			// println("malloc data %i,j=%i,i=%i", alloc_size,
-			//		((ptr >> 11) & 0x7FF), ptr >> 22);
+			data = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
+						MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 			if (data == NULL) {
 				SetErr(AllocErr);
 				return -1;
@@ -103,18 +107,14 @@ int memmap_check_data(MemMapImpl *impl, Ptr ptr) {
 				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
 			munmap(block, aligned_size);
 		}
-		// println("block check i=%i,j=%i,k=%i", ptr >> 22, ptr >> 9, 0);
 		block = ALOAD(impl->data[ptr >> 22] + ((ptr >> 11) & 0x7FF));
 		if (block == NULL) {
-			// println("block=NULL i=%i,j=%i,k=%i", i, j, k);
 			size_t page_size = getpagesize();
 			size_t aligned_size =
 				(((size_t)impl->size * 2048) + page_size - 1) &
 				~(page_size - 1);
 			block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
 						 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-			// println("mmap data %i,j=%i,i=%i", aligned_size,
-			//((ptr >> 11) & 0x7FF), ptr >> 22);
 			if (block == NULL) {
 				SetErr(AllocErr);
 				return -1;

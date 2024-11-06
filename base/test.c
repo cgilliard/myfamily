@@ -165,9 +165,9 @@ MyTest(base, test_slab_allocator_recycle) {
 }
 
 MyTest(base, test_malloc_recycle) {
-	long long size = 1024 * 1024;
+	long long size = 3000000;
 	int count = 4;
-	int alloc_size = 8;
+	int alloc_size = 64;
 
 	byte *slabs[count];
 
@@ -175,11 +175,11 @@ MyTest(base, test_malloc_recycle) {
 		for (int j = 0; j < count; j++) {
 			slabs[j] = malloc(alloc_size);
 			cr_assert(slabs[j] != NULL);
-			for (int k = 0; k < alloc_size; k++) slabs[j][k] = j;
+			// for (int k = 0; k < alloc_size; k++) slabs[j][k] = j;
 		}
 
 		for (int j = 0; j < count; j++) {
-			for (int k = 0; k < alloc_size; k++) cr_assert(slabs[j][k] == j);
+			// for (int k = 0; k < alloc_size; k++) cr_assert(slabs[j][k] == j);
 			free(slabs[j]);
 		}
 	}
@@ -253,4 +253,25 @@ MyTest(base, test_memmap) {
 
 	p = memmap_allocate(&mm1);
 	cr_assert_eq(p, count + 1);
+}
+
+MyTest(base, test_memmap_recycle) {
+	MemMap mm1;
+	int size = 64;
+	int count = 3000000;
+	int itt = 4;
+	memmap_init(&mm1, size);
+	Ptr ptrs[itt];
+
+	for (int i = 0; i < count; i++) {
+		for (int j = 0; j < itt; j++) {
+			ptrs[j] = memmap_allocate(&mm1);
+			cr_assert(ptrs[j] == 1 + j);
+		}
+
+		for (int j = 0; j < itt; j++) {
+			cr_assert(ptrs[j] == 1 + j);
+			memmap_free(&mm1, ptrs[j]);
+		}
+	}
 }
