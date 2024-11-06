@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['slab_336',['Slab',['../slabs_8h.html#aa955ca1abdb76bcb193cee86c92f3df5',1,'slabs.h']]],
-  ['slaballocator_337',['SlabAllocator',['../slabs_8h.html#a951e26cd6e1cebdf950e2da3f4c38ccf',1,'slabs.h']]],
-  ['slabimpl_338',['SlabImpl',['../slabs_8c.html#aa9becadccb54337a641d08f6247d505b',1,'slabs.c']]]
+  ['orbtreenode_428',['OrbTreeNode',['../orbtree_8h.html#a7f7caf93d655b82fd74a4bc05ada8009',1,'orbtree.h']]],
+  ['orbtreenodepair_429',['OrbTreeNodePair',['../orbtree_8h.html#a255bb0483690569d8fd11a0e03438271',1,'orbtree.h']]]
 ];

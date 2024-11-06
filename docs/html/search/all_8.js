@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['head_79',['head',['../structSlabAllocator.html#a779730c07b4e70639109d17e21193e71',1,'SlabAllocator']]]
+  ['head_85',['head',['../structSlabAllocator.html#a779730c07b4e70639109d17e21193e71',1,'SlabAllocator']]]
 ];

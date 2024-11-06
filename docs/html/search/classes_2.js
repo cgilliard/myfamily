@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['slaballocator_213',['SlabAllocator',['../structSlabAllocator.html',1,'']]],
-  ['slabimpl_214',['SlabImpl',['../structSlabImpl.html',1,'']]]
+  ['orbtreenode_263',['OrbTreeNode',['../structOrbTreeNode.html',1,'']]],
+  ['orbtreenodepair_264',['OrbTreeNodePair',['../structOrbTreeNodePair.html',1,'']]]
 ];

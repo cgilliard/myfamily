@@ -120,8 +120,42 @@ Macros</h2></td></tr>
 <tr class="separator:a86bdd0183eb419a61f48cc003d4d3480"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c3cb86c3ed12273c4fab32dcd8cafc5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a4c3cb86c3ed12273c4fab32dcd8cafc5">ALOAD</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>)&#160;&#160;&#160;__atomic_load_n(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, __ATOMIC_RELAXED)</td></tr>
 <tr class="separator:a4c3cb86c3ed12273c4fab32dcd8cafc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35485b4599329aa17c85c44b026d46e1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a35485b4599329aa17c85c44b026d46e1">ASTORE</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>,  value)&#160;&#160;&#160;__atomic_store_n(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, value, __ATOMIC_RELAXED)</td></tr>
+<tr class="separator:a35485b4599329aa17c85c44b026d46e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afab9832a0980ee17e74a80a0a9da994d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#afab9832a0980ee17e74a80a0a9da994d">AADD</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>,  value)&#160;&#160;&#160;__atomic_fetch_add(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, value, __ATOMIC_RELAXED)</td></tr>
+<tr class="separator:afab9832a0980ee17e74a80a0a9da994d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5f121a6e332e0847bdd2cb6d8bda588"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#ad5f121a6e332e0847bdd2cb6d8bda588">ASUB</a>(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>,  value)&#160;&#160;&#160;__atomic_fetch_sub(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, value, __ATOMIC_RELAXED)</td></tr>
+<tr class="separator:ad5f121a6e332e0847bdd2cb6d8bda588"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="afab9832a0980ee17e74a80a0a9da994d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afab9832a0980ee17e74a80a0a9da994d">&#9670;&nbsp;</a></span>AADD</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define AADD</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;__atomic_fetch_add(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, value, __ATOMIC_RELAXED)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a758c0393e9565cecf267043eca9e1105"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a758c0393e9565cecf267043eca9e1105">&#9670;&nbsp;</a></span>alloc</h2>
 
@@ -152,6 +186,62 @@ Macros</h2></td></tr>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a></td><td>)</td>
           <td>&#160;&#160;&#160;__atomic_load_n(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, __ATOMIC_RELAXED)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a35485b4599329aa17c85c44b026d46e1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a35485b4599329aa17c85c44b026d46e1">&#9670;&nbsp;</a></span>ASTORE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ASTORE</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;__atomic_store_n(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, value, __ATOMIC_RELAXED)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad5f121a6e332e0847bdd2cb6d8bda588"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5f121a6e332e0847bdd2cb6d8bda588">&#9670;&nbsp;</a></span>ASUB</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ASUB</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">value&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;__atomic_fetch_sub(<a class="el" href="macros_8h.html#a62e445f378c3862b78618beec533f338">ptr</a>, value, __ATOMIC_RELAXED)</td>
         </tr>
       </table>
 </div><div class="memdoc">

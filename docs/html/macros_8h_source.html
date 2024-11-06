@@ -146,8 +146,11 @@ $(function() {
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="preprocessor">    __atomic_compare_exchange_n(__VA_ARGS__, false, __ATOMIC_RELEASE, \</span></div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">                                __ATOMIC_RELAXED)</span></div>
 <div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="macros_8h.html#a4c3cb86c3ed12273c4fab32dcd8cafc5">   76</a></span>&#160;<span class="preprocessor">#define ALOAD(ptr) __atomic_load_n(ptr, __ATOMIC_RELAXED)</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#endif  </span><span class="comment">// _BASE_MACROS__</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="macros_8h.html#a35485b4599329aa17c85c44b026d46e1">   77</a></span>&#160;<span class="preprocessor">#define ASTORE(ptr, value) __atomic_store_n(ptr, value, __ATOMIC_RELAXED)</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno"><a class="line" href="macros_8h.html#afab9832a0980ee17e74a80a0a9da994d">   78</a></span>&#160;<span class="preprocessor">#define AADD(ptr, value) __atomic_fetch_add(ptr, value, __ATOMIC_RELAXED)</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="macros_8h.html#ad5f121a6e332e0847bdd2cb6d8bda588">   79</a></span>&#160;<span class="preprocessor">#define ASUB(ptr, value) __atomic_fetch_sub(ptr, value, __ATOMIC_RELAXED)</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor">#endif  </span><span class="comment">// _BASE_MACROS__</span></div>
 <div class="ttc" id="atypes_8h_html"><div class="ttname"><a href="types_8h.html">types.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

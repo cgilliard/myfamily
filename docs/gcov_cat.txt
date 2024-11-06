@@ -1,7 +1,7 @@
         -:    0:Source:alloc.c
         -:    0:Graph:alloc.gcno
         -:    0:Data:alloc.gcda
-        -:    0:Runs:12
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,19 +61,19 @@
         1:   57:	THREAD_LOCAL_RESOURCE_STATS.release_sum += 1;
         1:   58:}
         -:   59:
-        8:   60:int64 alloc_sum() {
-        8:   61:	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
+       10:   60:int64 alloc_sum() {
+       10:   61:	return THREAD_LOCAL_RESOURCE_STATS.alloc_sum;
         -:   62:}
     #####:   63:int64 resize_sum() {
     #####:   64:	return THREAD_LOCAL_RESOURCE_STATS.resize_sum;
         -:   65:}
-        8:   66:int64 release_sum() {
-        8:   67:	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
+       10:   66:int64 release_sum() {
+       10:   67:	return THREAD_LOCAL_RESOURCE_STATS.release_sum;
         -:   68:}
         -:    0:Source:colors.c
         -:    0:Graph:colors.gcno
         -:    0:Data:colors.gcda
-        -:    0:Runs:12
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -165,7 +165,7 @@
         -:    0:Source:fam_err.c
         -:    0:Graph:fam_err.gcno
         -:    0:Data:fam_err.gcda
-        -:    0:Runs:12
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -209,7 +209,7 @@
         -:    0:Source:lock.c
         -:    0:Graph:lock.gcno
         -:    0:Data:lock.gcda
-        -:    0:Runs:12
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -307,10 +307,213 @@
         1:   95:	lock_write(&l);
         1:   96:	return l;
         -:   97:}
+        -:    0:Source:memmap.c
+        -:    0:Graph:memmap.gcno
+        -:    0:Data:memmap.gcda
+        -:    0:Runs:14
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/fam_err.h>
+        -:   16:#include <base/lock.h>
+        -:   17:#include <base/memmap.h>
+        -:   18:#include <base/osdef.h>
+        -:   19:#include <base/print_util.h>
+        -:   20:
+        -:   21:typedef struct MemMapImpl {
+        -:   22:	byte **data[MEM_MAP_NUM_CHUNKS];
+        -:   23:	unsigned long long *bitmap[MEM_MAP_NUM_CHUNKS];
+        -:   24:	unsigned int chunks;
+        -:   25:	unsigned int size;
+        -:   26:	unsigned int chunk_size;
+        -:   27:	Lock lock;
+        -:   28:} MemMapImpl;
+        -:   29:
+       14:   30:void __attribute__((constructor)) __memmap_check_sizes() {
+        -:   31:	if (sizeof(MemMapImpl) != sizeof(MemMap))
+        -:   32:		panic("sizeof(MemMapImpl) (%i) != sizeof(MemMap) (%i)",
+        -:   33:			  sizeof(MemMapImpl), sizeof(MemMap));
+       14:   34:}
+        -:   35:
+    20000:   36:void *memmap_data(const MemMap *mm, Ptr ptr) {
+    20000:   37:	const MemMapImpl *impl = (const MemMapImpl *)mm;
+    20000:   38:	byte *block = impl->data[ptr >> 19][ptr >> 6];
+    20000:   39:	return (byte *)(block + ((ptr & 0x3F) * impl->size));
+        -:   40:}
+        1:   41:int memmap_init(MemMap *mm, unsigned int size) {
+        1:   42:	MemMapImpl *impl = (MemMapImpl *)mm;
+        1:   43:	impl->size = size;
+        1:   44:	impl->chunks = 0;
+        1:   45:	impl->chunk_size = 128;
+        1:   46:	impl->lock = INIT_LOCK;
+        -:   47:
+        1:   48:	memset(impl->bitmap, '\0',
+        -:   49:		   MEM_MAP_NUM_CHUNKS * sizeof(unsigned long long *));
+        1:   50:	memset(impl->data, '\0', MEM_MAP_NUM_CHUNKS * sizeof(byte **));
+        1:   51:	return 0;
+        -:   52:}
+        -:   53:
+   786574:   54:int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
+   786574:   55:	if (impl->bitmap[i] == NULL) {
+        1:   56:		impl->bitmap[i] = malloc(MEM_MAP_CHUNK_SIZE);
+        1:   57:		if (impl->bitmap[i] == NULL) {
+    #####:   58:			SetErr(AllocErr);
+    #####:   59:			return -1;
+        -:   60:		}
+        1:   61:		memset(impl->bitmap[i], '\0', MEM_MAP_CHUNK_SIZE);
+        -:   62:		// set null to allocated so we don't assign it
+        1:   63:		if (i == 0) impl->bitmap[i][0] = 0x1;
+        -:   64:	}
+   786574:   65:	return 0;
+        -:   66:}
+        -:   67:
+    10004:   68:int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
+        -:   69:	byte **data;
+    10004:   70:	bool mallocked = false;
+    10004:   71:	byte **nulldata = NULL;
+        -:   72:
+        -:   73:	do {
+   10004*:   74:		if (mallocked) free(data);
+    10004:   75:		data = ALOAD(&impl->data[i]);
+    10004:   76:		if (data == NULL) {
+        1:   77:			int page_size = getpagesize();
+        1:   78:			int slots_per_page = page_size / impl->size;
+       1*:   79:			if (slots_per_page == 0) slots_per_page = 1;
+        1:   80:			int alloc_size = sizeof(byte *) * (UINT32_MAX / (impl->size * 8)) /
+        -:   81:							 slots_per_page;
+        1:   82:			data = malloc(alloc_size);
+        1:   83:			if (data == NULL) {
+    #####:   84:				SetErr(AllocErr);
+    #####:   85:				return -1;
+        -:   86:			}
+        1:   87:			memset(data, '\0', alloc_size);
+        1:   88:			mallocked = true;
+        -:   89:		} else
+    10003:   90:			break;
+        1:   91:	} while (!CAS(&impl->data[i], &nulldata, data));
+        -:   92:
+        -:   93:	// now check our block
+        -:   94:	byte *block;
+    10004:   95:	byte *nullblock = NULL;
+    10004:   96:	mallocked = false;
+        -:   97:	do {
+    10004:   98:		if (mallocked) {
+    #####:   99:			size_t page_size = getpagesize();
+    #####:  100:			size_t aligned_size =
+    #####:  101:				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
+    #####:  102:			munmap(block, aligned_size);
+        -:  103:		}
+    10004:  104:		block = ALOAD(impl->data[i] + j);
+    10004:  105:		if (block == NULL) {
+      157:  106:			size_t page_size = getpagesize();
+      157:  107:			int slots_per_page = page_size / impl->size;
+     157*:  108:			if (slots_per_page == 0) slots_per_page = 1;
+      157:  109:			int alloc_size = sizeof(byte *) * (UINT32_MAX / (impl->size * 8)) /
+        -:  110:							 slots_per_page;
+        -:  111:
+      157:  112:			size_t aligned_size =
+      157:  113:				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
+      157:  114:			block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
+        -:  115:						 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+      157:  116:			if (block == NULL) {
+    #####:  117:				SetErr(AllocErr);
+    #####:  118:				return -1;
+        -:  119:			}
+      157:  120:			mallocked = true;
+        -:  121:		} else
+     9847:  122:			break;
+      157:  123:	} while (!CAS(impl->data[i] + j, &nullblock, block));
+        -:  124:
+    10004:  125:	return 0;
+        -:  126:}
+        -:  127:
+    10004:  128:Ptr memmap_allocate(MemMap *mm) {
+        -:  129:	int i, j, k;
+        -:  130:	unsigned long long *itt, nitt, v;
+        -:  131:	MemMapImpl *impl;
+        -:  132:
+    10004:  133:	i = j = k = 0;
+    10004:  134:	impl = (MemMapImpl *)mm;
+        -:  135:
+        -:  136:	do {
+        -:  137:		loop {
+  786574*:  138:			if (memmap_allocate_bitmap(impl, i)) return null;
+   786574:  139:			itt = (impl->bitmap[i] + j);
+   786574:  140:			if ((v = ALOAD(itt)) != ((unsigned long long)0) - 1) break;
+   776570:  141:			if (++j >= MEM_MAP_NUM_CHUNKS) {
+    #####:  142:				j = 0;
+    #####:  143:				i++;
+        -:  144:			}
+        -:  145:		}
+    10004:  146:		k = 0;
+   324707:  147:		while ((v & (0x1ULL << k)) != 0) k++;
+    10004:  148:		nitt = v | (0x1ULL << k);
+   10004*:  149:		if (memmap_check_data(impl, i, j, k)) return null;
+    10004:  150:	} while (!CAS(itt, &v, nitt));
+    10004:  151:	return ((i << 19) | (j << 6) | k);
+        -:  152:}
+        -:  153:
+        3:  154:void memmap_free(MemMap *mm, Ptr ptr) {
+       3*:  155:	if (ptr == null) panic("attempt to free null!");
+        3:  156:	MemMapImpl *impl = (MemMapImpl *)mm;
+        -:  157:	unsigned long long nv, *v, vo;
+        -:  158:	do {
+        3:  159:		v = impl->bitmap[ptr >> 19] + (ptr >> 6);
+        3:  160:		vo = ALOAD((unsigned long long *)(v));
+       3*:  161:		if ((vo & (0x1ULL << (ptr & 0x3F))) == 0) panic("double free attempt!");
+        3:  162:		nv = vo & ~(0x1ULL << (ptr & 0x3F));
+        3:  163:	} while (!CAS(&*v, &vo, nv));
+        3:  164:}
+        -:    0:Source:orbtree.c
+        -:    0:Graph:orbtree.gcno
+        -:    0:Data:orbtree.gcda
+        -:    0:Runs:14
+        -:    1:// Copyright (c) 2024, The MyFamily Developers
+        -:    2://
+        -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
+        -:    4:// you may not use this file except in compliance with the License.
+        -:    5:// You may obtain a copy of the License at
+        -:    6://
+        -:    7://     http://www.apache.org/licenses/LICENSE-2.0
+        -:    8://
+        -:    9:// Unless required by applicable law or agreed to in writing, software
+        -:   10:// distributed under the License is distributed on an "AS IS" BASIS,
+        -:   11:// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        -:   12:// See the License for the specific language governing permissions and
+        -:   13:// limitations under the License.
+        -:   14:
+        -:   15:#include <base/orbtree.h>
+        -:   16:
+    #####:   17:OrbTree orbtree_create(int (*search)(const OrbTreeNode *root, const void *value,
+        -:   18:									 OrbTreeNodePair *retval)) {
+    #####:   19:	return NULL;
+        -:   20:}
+        -:   21:
+    #####:   22:OrbTreeNode *orbtree_get(const OrbTree *ptr, const void *value) {
+    #####:   23:	return NULL;
+        -:   24:}
+    #####:   25:OrbTreeNode *orbtree_put(OrbTree *ptr, OrbTreeNode *value) {
+    #####:   26:	return NULL;
+        -:   27:}
+        -:   28:
+    #####:   29:OrbTreeNode *orbtree_remove(const OrbTree *ptr, const void *value) {
+    #####:   30:	return NULL;
+        -:   31:}
         -:    0:Source:print_util.c
         -:    0:Graph:print_util.gcno
         -:    0:Data:print_util.gcda
-        -:    0:Runs:12
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -363,7 +566,7 @@
         -:    0:Source:slabs.c
         -:    0:Graph:slabs.gcno
         -:    0:Data:slabs.gcda
-        -:    0:Runs:12
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -391,124 +594,129 @@
         -:   25:	byte data[];
         -:   26:} SlabImpl;
         -:   27:
-   100000:   28:byte *slab_get(Slab s) {
-   100000:   29:	return s->data;
+ 83886081:   28:byte *slab_get(Slab s) {
+ 83886081:   29:	return s->data;
         -:   30:}
         -:   31:
-        -:   32:SlabImpl slab_allocated_impl = {.next = NULL};
-        -:   33:Slab slab_allocated_reqd = &slab_allocated_impl;
-        -:   34:#define SLAB_ALLOCATED slab_allocated_reqd
+        2:   32:unsigned long long *slab_aux(Slab s) {
+        2:   33:	return (unsigned long long *)&s->next;
+        -:   34:}
         -:   35:
-      110:   36:Slab slab_allocator_grow(SlabAllocator *sa) {
-      110:   37:	if (__atomic_fetch_add(&sa->total_slabs, 1, __ATOMIC_RELAXED) >
-      110:   38:		sa->max_total_slabs) {
-    #####:   39:		__atomic_fetch_sub(&sa->total_slabs, 1, __ATOMIC_RELAXED);
-    #####:   40:		SetErr(CapacityExceeded);
-    #####:   41:		return NULL;
-        -:   42:	}
-      110:   43:	Slab ret = malloc(sizeof(SlabImpl) + sa->slab_size);
-      110:   44:	if (ret == NULL) {
-    #####:   45:		SetErr(AllocErr);
-    #####:   46:		__atomic_fetch_sub(&sa->total_slabs, 1, __ATOMIC_RELAXED);
-    #####:   47:		return NULL;
-        -:   48:	}
-      110:   49:	ret->next = SLAB_ALLOCATED;
-      110:   50:	return ret;
-        -:   51:}
-        -:   52:
-        3:   53:void slab_allocator_cleanup(SlabAllocator *sa) {
-        3:   54:	Slab itt = sa->head;
-      113:   55:	while (itt) {
-      110:   56:		Slab to_delete = itt;
-      110:   57:		itt = itt->next;
-      110:   58:		free(to_delete);
-        -:   59:	}
-        3:   60:}
-        -:   61:
-        -:   62:// initialize slab allocator as a michael-scott queue with specified slab_size
-        3:   63:int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
-        -:   64:						unsigned long long max_free_slabs,
-        -:   65:						unsigned long long max_total_slabs) {
-        3:   66:	Slab s = malloc(sizeof(SlabImpl) + slab_size);
-        3:   67:	if (s == NULL) {
-    #####:   68:		SetErr(AllocErr);
-    #####:   69:		return -1;
-        -:   70:	}
-        3:   71:	__atomic_store_n(&sa->free_size, 1, __ATOMIC_SEQ_CST);
-        3:   72:	__atomic_store_n(&sa->total_slabs, 1, __ATOMIC_SEQ_CST);
-        3:   73:	sa->slab_size = slab_size;
-        3:   74:	sa->max_free_slabs = max_free_slabs;
-        3:   75:	sa->max_total_slabs = max_total_slabs;
-        3:   76:	s->next = NULL;
-        3:   77:	sa->head = sa->tail = s;
-        3:   78:	return 0;
-        -:   79:}
-        -:   80:
-        -:   81:// allocate is dequeue. If null "grow" by mallocing a slab.
-    50108:   82:Slab slab_allocator_allocate(SlabAllocator *sa) {
-        -:   83:	Slab head, tail, next, ret;
-        -:   84:	loop {
-    50108:   85:		head = sa->head;
-    50108:   86:		tail = sa->tail;
-    50108:   87:		next = head->next;
-    50108:   88:		if (head == sa->head) {
-    50108:   89:			if (head == tail) {
-      110:   90:				if (next == NULL) {
-      110:   91:					ret = slab_allocator_grow(sa);
-      110:   92:					return ret;
-        -:   93:				}
-    #####:   94:				CAS_SEQ(&sa->tail, &tail, next);
-        -:   95:			} else {
-    49998:   96:				ret = head;
-    49998:   97:				if (CAS_SEQ(&sa->head, &head, next)) break;
-        -:   98:			}
-        -:   99:		}
-        -:  100:	}
-        -:  101:
-    49998:  102:	__atomic_fetch_sub(&sa->free_size, 1, __ATOMIC_RELAXED);
-    49998:  103:	__atomic_store_n(&ret->next, SLAB_ALLOCATED, __ATOMIC_RELAXED);
-    49998:  104:	return ret;
-        -:  105:}
-        -:  106:
-        -:  107:// free is enqueue.
-    50105:  108:void slab_allocator_free(SlabAllocator *sa, Slab slab) {
-    50105:  109:	if (!CAS(&slab->next, &SLAB_ALLOCATED, NULL))
-    #####:  110:		panic("Double free attempt! %p %p", &slab->next, &SLAB_ALLOCATED);
-    50105:  111:	if (__atomic_fetch_add(&sa->free_size, 1, __ATOMIC_RELAXED) >
-    50105:  112:		sa->max_free_slabs) {
-    #####:  113:		free(slab);
-    #####:  114:		__atomic_fetch_sub(&sa->total_slabs, 1, __ATOMIC_RELAXED);
-    #####:  115:		return;
-        -:  116:	}
-        -:  117:
-        -:  118:	Slab tail, next;
-        -:  119:
-        -:  120:	loop {
-    50105:  121:		tail = sa->tail;
-    50105:  122:		next = tail->next;
-    50105:  123:		if (tail == sa->tail) {
-    50105:  124:			if (next == NULL) {
-    50105:  125:				if (CAS_SEQ(&tail->next, &next, slab)) {
-    50105:  126:					CAS_SEQ(&sa->tail, &tail, slab);
-    50105:  127:					break;
-        -:  128:				}
-        -:  129:			} else {
-    #####:  130:				CAS_SEQ(&sa->tail, &tail, next);
-        -:  131:			}
-        -:  132:		}
-        -:  133:	}
-        -:  134:}
-        -:  135:
-    10002:  136:unsigned long long slab_allocator_free_size(SlabAllocator *sa) {
-    10002:  137:	return ALOAD(&sa->free_size);
-        -:  138:}
-    10002:  139:unsigned long long slab_allocator_total_slabs(SlabAllocator *sa) {
-    10002:  140:	return ALOAD(&sa->total_slabs);
-        -:  141:}
+        -:   36:SlabImpl slab_allocated_impl = {.next = NULL};
+        -:   37:Slab slab_allocated_reqd = &slab_allocated_impl;
+        -:   38:#define SLAB_ALLOCATED slab_allocated_reqd
+        -:   39:
+      110:   40:Slab slab_allocator_grow(SlabAllocator *sa) {
+      110:   41:	if (AADD(&sa->total_slabs, 1) > sa->max_total_slabs) {
+    #####:   42:		ASUB(&sa->total_slabs, 1);
+    #####:   43:		SetErr(CapacityExceeded);
+    #####:   44:		return NULL;
+        -:   45:	}
+      110:   46:	Slab ret = malloc(sizeof(SlabImpl) + sa->slab_size);
+      110:   47:	if (ret == NULL) {
+    #####:   48:		SetErr(AllocErr);
+    #####:   49:		ASUB(&sa->total_slabs, 1);
+    #####:   50:		return NULL;
+        -:   51:	}
+      110:   52:	if (sa->free_check) ret->next = SLAB_ALLOCATED;
+      110:   53:	return ret;
+        -:   54:}
+        -:   55:
+        3:   56:void slab_allocator_cleanup(SlabAllocator *sa) {
+        3:   57:	Slab itt = sa->head;
+      112:   58:	while (itt) {
+      109:   59:		Slab to_delete = itt;
+      109:   60:		itt = itt->next;
+      109:   61:		free(to_delete);
+        -:   62:	}
+        3:   63:}
+        -:   64:
+        -:   65:// initialize slab allocator as a michael-scott queue with specified slab_size
+        4:   66:int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
+        -:   67:						unsigned long long max_free_slabs,
+        -:   68:						unsigned long long max_total_slabs, bool free_check) {
+        4:   69:	Slab s = malloc(sizeof(SlabImpl) + slab_size);
+        4:   70:	if (s == NULL) {
+    #####:   71:		SetErr(AllocErr);
+    #####:   72:		return -1;
+        -:   73:	}
+        4:   74:	ASTORE(&sa->free_size, 1);
+        4:   75:	ASTORE(&sa->total_slabs, 1);
+        4:   76:	sa->slab_size = slab_size;
+        4:   77:	sa->max_free_slabs = max_free_slabs;
+        4:   78:	sa->max_total_slabs = max_total_slabs;
+        4:   79:	sa->free_check = free_check;
+        4:   80:	s->next = NULL;
+        4:   81:	sa->head = sa->tail = s;
+        4:   82:	return 0;
+        -:   83:}
+        -:   84:
+        -:   85:// allocate is dequeue. If null "grow" by mallocing a slab.
+ 41943151:   86:Slab slab_allocator_allocate(SlabAllocator *sa) {
+        -:   87:	Slab head, tail, next, ret;
+        -:   88:	loop {
+ 41943151:   89:		head = sa->head;
+ 41943151:   90:		tail = sa->tail;
+ 41943151:   91:		next = head->next;
+ 41943151:   92:		if (head == sa->head) {
+ 41943151:   93:			if (head == tail) {
+      110:   94:				if (next == NULL) {
+      110:   95:					ret = slab_allocator_grow(sa);
+      110:   96:					return ret;
+        -:   97:				}
+    #####:   98:				CAS_SEQ(&sa->tail, &tail, next);
+        -:   99:			} else {
+ 41943041:  100:				ret = head;
+ 41943041:  101:				if (CAS_SEQ(&sa->head, &head, next)) break;
+        -:  102:			}
+        -:  103:		}
+        -:  104:	}
+        -:  105:
+ 41943041:  106:	ASUB(&sa->free_size, 1);
+ 41943041:  107:	if (sa->free_check) ASTORE(&ret->next, SLAB_ALLOCATED);
+ 41943041:  108:	return ret;
+        -:  109:}
+        -:  110:
+        -:  111:// free is enqueue.
+ 41943148:  112:void slab_allocator_free(SlabAllocator *sa, Slab slab) {
+ 41943148:  113:	if (sa->free_check && !CAS(&slab->next, &SLAB_ALLOCATED, NULL))
+    #####:  114:		panic("Double free attempt! %p %p", &slab->next, &SLAB_ALLOCATED);
+ 41943148:  115:	else if (!sa->free_check)
+        2:  116:		slab->next = NULL;
+ 41943148:  117:	if (AADD(&sa->free_size, 1) > sa->max_free_slabs) {
+    #####:  118:		free(slab);
+    #####:  119:		ASUB(&sa->total_slabs, 1);
+    #####:  120:		return;
+        -:  121:	}
+        -:  122:
+        -:  123:	Slab tail, next;
+        -:  124:
+        -:  125:	loop {
+ 41943148:  126:		tail = sa->tail;
+ 41943148:  127:		next = tail->next;
+ 41943148:  128:		if (tail == sa->tail) {
+ 41943148:  129:			if (next == NULL) {
+ 41943148:  130:				if (CAS_SEQ(&tail->next, &next, slab)) {
+ 41943148:  131:					CAS_SEQ(&sa->tail, &tail, slab);
+ 41943148:  132:					break;
+        -:  133:				}
+        -:  134:			} else {
+    #####:  135:				CAS_SEQ(&sa->tail, &tail, next);
+        -:  136:			}
+        -:  137:		}
+        -:  138:	}
+        -:  139:}
+        -:  140:
+ 10485764:  141:unsigned long long slab_allocator_free_size(SlabAllocator *sa) {
+ 10485764:  142:	return ALOAD(&sa->free_size);
+        -:  143:}
+ 10485764:  144:unsigned long long slab_allocator_total_slabs(SlabAllocator *sa) {
+ 10485764:  145:	return ALOAD(&sa->total_slabs);
+        -:  146:}
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda
-        -:    0:Runs:12
+        -:    0:Runs:14
         -:    1:// Copyright (c) 2024, The MyFamily Developers
         -:    2://
         -:    3:// Licensed under the Apache License, Version 2.0 (the "License");
@@ -527,7 +735,7 @@
         -:   16:#include <base/print_util.h>
         -:   17:#include <base/types.h>
         -:   18:
-       12:   19:void __attribute__((constructor)) __check_64bit_arch__() {
+       14:   19:void __attribute__((constructor)) __check_64bit_arch__() {
         -:   20:#if !defined(__x86_64__) && !defined(_M_X64) && !defined(__aarch64__)
         -:   21:	panic("Supported architectures: __x86_64__, _M_X64, and __aarch64__");
         -:   22:#endif	// arch
@@ -546,11 +754,11 @@
         -:   35:	if (sizeof(bool) != 1) panic("bool must be 1 byte. Invalid arch!");
         -:   36:
         -:   37:	// little endian check
-       12:   38:	int test = 0x1;
-       12:   39:	if (*(byte *)&test != 0x1) {
+       14:   38:	int test = 0x1;
+       14:   39:	if (*(byte *)&test != 0x1) {
     #####:   40:		panic("Big endian is not supported!");
         -:   41:	}
-       12:   42:}
+       14:   42:}
         -:    0:Source:real_main.c
         -:    0:Graph:real_main.gcno
         -:    0:Data:real_main.gcda

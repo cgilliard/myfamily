@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['data_308',['data',['../structSlabImpl.html#aa20fed3338ac0a401426e48ef7b21e61',1,'SlabImpl']]]
+  ['bitmap_378',['bitmap',['../structMemMapImpl.html#a4f1ef689375a17b53a6214f4031c5367',1,'MemMapImpl']]]
 ];
