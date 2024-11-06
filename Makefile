@@ -109,7 +109,7 @@ test_build:
                 $(CC) -o bin/xxdir build_utils/xxdir.c; bin/xxdir main/resources main/resources.h fam; \
         fi; \
 	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir FLAG_OPTIONS="$(TEST_FLAGS)"; \
+		$(MAKE) -C $$dir FLAG_OPTIONS="$(TEST_FLAGS)" || exit 1; \
 	done;
 
 release_build:
@@ -117,7 +117,7 @@ release_build:
 		$(CC) -o bin/xxdir build_utils/xxdir.c; bin/xxdir main/resources main/resources.h fam; \
         fi; \
 	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir FLAG_OPTIONS="$(RELEASE_FLAGS)"; \
+		$(MAKE) -C $$dir FLAG_OPTIONS="$(RELEASE_FLAGS)" || exit 1; \
 	done;
 
 san_build:
@@ -125,7 +125,7 @@ san_build:
                 $(CC) -o bin/xxdir build_utils/xxdir.c; bin/xxdir main/resources main/resources.h fam; \
         fi; \
 	for dir in $(SUBDIRS); do \
-		 $(MAKE) -C $$dir FLAG_OPTIONS="$(SAN_FLAGS)"; \
+		 $(MAKE) -C $$dir FLAG_OPTIONS="$(SAN_FLAGS)" || exit 1; \
 	done;
 
 coverage_build:
@@ -133,7 +133,7 @@ coverage_build:
                 $(CC) -o bin/xxdir build_utils/xxdir.c; bin/xxdir main/resources main/resources.h fam; \
         fi; \
 	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir FLAG_OPTIONS="$(COVERAGE_FLAGS)"; \
+		$(MAKE) -C $$dir FLAG_OPTIONS="$(COVERAGE_FLAGS)" || exit 1; \
 	done; \
 
 test: test_build
