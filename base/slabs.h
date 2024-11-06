@@ -16,11 +16,13 @@
 #define _BASE_SLABS__
 
 #include <base/lock.h>
+#include <base/memmap.h>
 #include <base/types.h>
 
 // Slab Allocator
 typedef struct SlabImpl *Slab;
 typedef struct SlabAllocator {
+	MemMap mm;
 	Slab head;
 	Slab tail;
 	unsigned long long free_size;

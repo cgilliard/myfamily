@@ -21,12 +21,16 @@
 #include <base/slabs.h>
 
 typedef struct SlabImpl {
+	void *tmp;
 	struct SlabImpl *next;
+	Ptr ptr;
+	SlabAllocator *sa;
 	byte data[];
 } SlabImpl;
 
 byte *slab_get(Slab s) {
-	return s->data;
+	// return s->data;
+	return memmap_data(&s->sa->mm, s->ptr);
 }
 
 unsigned long long *slab_aux(Slab s) {
@@ -43,13 +47,19 @@ Slab slab_allocator_grow(SlabAllocator *sa) {
 		SetErr(CapacityExceeded);
 		return NULL;
 	}
-	Slab ret = malloc(sizeof(SlabImpl) + sa->slab_size);
+	// Slab ret = malloc(sizeof(SlabImpl) + sa->slab_size);
+	Ptr p = memmap_allocate(&sa->mm);
+	Slab ret = (SlabImpl *)memmap_data(&sa->mm, p);
+	ret->ptr = p;
+	ret->sa = sa;
+	ret->next = SLAB_ALLOCATED;
+
 	if (ret == NULL) {
 		SetErr(AllocErr);
 		ASUB(&sa->total_slabs, 1);
 		return NULL;
 	}
-	if (sa->free_check) ret->next = SLAB_ALLOCATED;
+	// if (sa->free_check) ret->next = SLAB_ALLOCATED;
 	return ret;
 }
 
@@ -58,7 +68,8 @@ void slab_allocator_cleanup(SlabAllocator *sa) {
 	while (itt) {
 		Slab to_delete = itt;
 		itt = itt->next;
-		free(to_delete);
+		// free(to_delete);
+		memmap_free(&sa->mm, to_delete->ptr);
 	}
 }
 
@@ -66,13 +77,7 @@ void slab_allocator_cleanup(SlabAllocator *sa) {
 int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 						unsigned long long max_free_slabs,
 						unsigned long long max_total_slabs, bool free_check) {
-	/*
-		Slab s = malloc(sizeof(SlabImpl) + slab_size);
-		if (s == NULL) {
-			SetErr(AllocErr);
-			return -1;
-		}
-	*/
+	memmap_init(&sa->mm, sizeof(SlabImpl) + slab_size);
 	ASTORE(&sa->free_size, 1);
 	ASTORE(&sa->total_slabs, 0);
 	sa->slab_size = slab_size;
@@ -117,11 +122,13 @@ Slab slab_allocator_allocate(SlabAllocator *sa) {
 // free is enqueue.
 void slab_allocator_free(SlabAllocator *sa, Slab slab) {
 	if (sa->free_check && !CAS(&slab->next, &SLAB_ALLOCATED, NULL))
-		panic("Double free attempt! %p %p", &slab->next, &SLAB_ALLOCATED);
+		panic("Double free attempt! %p %p %p %p %i", &slab->next,
+			  &SLAB_ALLOCATED, slab->next, SLAB_ALLOCATED, sa->free_check);
 	else if (!sa->free_check)
 		slab->next = NULL;
 	if (AADD(&sa->free_size, 1) > sa->max_free_slabs) {
-		free(slab);
+		memmap_free(&sa->mm, slab->ptr);
+		// free(slab);
 		ASUB(&sa->total_slabs, 1);
 		return;
 	}
