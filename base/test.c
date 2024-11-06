@@ -92,8 +92,6 @@ MyTest(base, test_slab_allocator) {
 	slab_allocator_cleanup(&sa1);
 }
 
-/*
-
 MyTest(base, test_slab_allocator_perf) {
 	SlabAllocator sa1;
 	// long long size = 4 * 1024L * 1024L * 1024L;
@@ -168,8 +166,6 @@ MyTest(base, test_slab_allocator_recycle) {
 
 	slab_allocator_cleanup(&sa1);
 }
-
-*/
 
 MyTest(base, test_malloc_recycle) {
 	long long size = 3000000;
