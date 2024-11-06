@@ -18,6 +18,8 @@
 #include <base/osdef.h>
 #include <base/print_util.h>
 
+#define ALLOCS_PER_BLOCK 2048
+
 typedef struct MemMapImpl {
 	byte **data[MEM_MAP_NUM_CHUNKS];
 	unsigned long long *bitmap[MEM_MAP_NUM_CHUNKS];
@@ -36,7 +38,6 @@ void __attribute__((constructor)) __memmap_check_sizes() {
 void *memmap_data(const MemMap *mm, Ptr ptr) {
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
 	byte *block = impl->data[ptr >> 22][(ptr >> 11) & 0x7FF];
-
 	return (byte *)(block + ((ptr & 0x7FF) * impl->size));
 }
 int memmap_init(MemMap *mm, unsigned int size) {
@@ -56,18 +57,13 @@ int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
 	bool mmapped = false;
 	unsigned long long *nulldata = NULL;
 	unsigned long long *bitmap;
-	int alloc_size = MEM_MAP_CHUNK_SIZE;
-	size_t page_size = getpagesize();
-	size_t aligned_size =
-		(((size_t)alloc_size) + page_size - 1) & ~(page_size - 1);
 	do {
 		if (mmapped) {
-			munmap(bitmap, aligned_size);
+			MUNMAP(bitmap, MEM_MAP_CHUNK_SIZE);
 		}
 		bitmap = ALOAD(&impl->bitmap[i]);
 		if (bitmap == NULL) {
-			bitmap = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
-						  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			bitmap = MMAP(MEM_MAP_CHUNK_SIZE);
 			mmapped = true;
 			if (bitmap == NULL) {
 				SetErr(AllocErr);
@@ -84,26 +80,22 @@ int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
 
 int memmap_check_data(MemMapImpl *impl, Ptr ptr) {
 	byte **data;
-	bool mallocked = false;
+	bool mmapped = false;
 	byte **nulldata = NULL;
 
-	int alloc_size = 2048 * 8;
-	size_t page_size = getpagesize();
-	size_t aligned_size =
-		(((size_t)alloc_size) + page_size - 1) & ~(page_size - 1);
+	int alloc_size = ALLOCS_PER_BLOCK * 8;
 
 	do {
-		if (mallocked) munmap(data, aligned_size);
+		if (mmapped) MUNMAP(data, alloc_size);
 		data = ALOAD(&impl->data[ptr >> 22]);
 		if (data == NULL) {
-			data = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
-						MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			data = MMAP(alloc_size);
 			if (data == NULL) {
 				SetErr(AllocErr);
 				return -1;
 			}
 			memset(data, '\0', alloc_size);
-			mallocked = true;
+			mmapped = true;
 		} else
 			break;
 	} while (!CAS(&impl->data[ptr >> 22], &nulldata, data));
@@ -111,27 +103,19 @@ int memmap_check_data(MemMapImpl *impl, Ptr ptr) {
 	// now check our block
 	byte *block;
 	byte *nullblock = NULL;
-	mallocked = false;
+	mmapped = false;
 	do {
-		if (mallocked) {
-			size_t page_size = getpagesize();
-			size_t aligned_size =
-				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
-			munmap(block, aligned_size);
+		if (mmapped) {
+			MUNMAP(block, impl->size * ALLOCS_PER_BLOCK);
 		}
 		block = ALOAD(impl->data[ptr >> 22] + ((ptr >> 11) & 0x7FF));
 		if (block == NULL) {
-			size_t page_size = getpagesize();
-			size_t aligned_size =
-				(((size_t)impl->size * 2048) + page_size - 1) &
-				~(page_size - 1);
-			block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
-						 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			block = MMAP(impl->size * ALLOCS_PER_BLOCK);
 			if (block == NULL) {
 				SetErr(AllocErr);
 				return -1;
 			}
-			mallocked = true;
+			mmapped = true;
 		} else
 			break;
 	} while (
