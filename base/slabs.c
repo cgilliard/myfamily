@@ -66,19 +66,25 @@ void slab_allocator_cleanup(SlabAllocator *sa) {
 int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 						unsigned long long max_free_slabs,
 						unsigned long long max_total_slabs, bool free_check) {
-	Slab s = malloc(sizeof(SlabImpl) + slab_size);
-	if (s == NULL) {
-		SetErr(AllocErr);
-		return -1;
-	}
+	/*
+		Slab s = malloc(sizeof(SlabImpl) + slab_size);
+		if (s == NULL) {
+			SetErr(AllocErr);
+			return -1;
+		}
+	*/
 	ASTORE(&sa->free_size, 1);
-	ASTORE(&sa->total_slabs, 1);
+	ASTORE(&sa->total_slabs, 0);
 	sa->slab_size = slab_size;
 	sa->max_free_slabs = max_free_slabs;
 	sa->max_total_slabs = max_total_slabs;
 	sa->free_check = free_check;
+
+	Slab s = slab_allocator_grow(sa);
+
 	s->next = NULL;
 	sa->head = sa->tail = s;
+
 	return 0;
 }
 
