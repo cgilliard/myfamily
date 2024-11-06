@@ -19,7 +19,7 @@
 #include <base/print_util.h>
 
 typedef struct MemMapImpl {
-	byte **data;
+	byte **data[MEM_MAP_NUM_CHUNKS];
 	unsigned long long *bitmap[MEM_MAP_NUM_CHUNKS];
 	unsigned int chunks;
 	unsigned int size;
@@ -35,24 +35,23 @@ void __attribute__((constructor)) __memmap_check_sizes() {
 
 void *memmap_data(const MemMap *mm, Ptr ptr) {
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
-	// get our offset and block
-	return (void *)(impl->data[ptr >> 6] + ((ptr & 0x3F) * impl->size));
+	byte *block = impl->data[ptr >> 19][ptr >> 6];
+	return (byte *)(block + ((ptr & 0x3F) * impl->size));
 }
 int memmap_init(MemMap *mm, unsigned int size) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	impl->size = size;
 	impl->chunks = 0;
 	impl->chunk_size = 128;
-	impl->data = NULL;
 	impl->lock = INIT_LOCK;
 
 	memset(impl->bitmap, '\0',
 		   MEM_MAP_NUM_CHUNKS * sizeof(unsigned long long *));
+	memset(impl->data, '\0', MEM_MAP_NUM_CHUNKS * sizeof(byte **));
 	return 0;
 }
 
 int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
-	// if (i) println("memmap_allocate_bitmap i = %i %p", i, impl->bitmap[i]);
 	if (impl->bitmap[i] == NULL) {
 		impl->bitmap[i] = malloc(MEM_MAP_CHUNK_SIZE);
 		if (impl->bitmap[i] == NULL) {
@@ -67,16 +66,13 @@ int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
 }
 
 int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
-	// before we commit, make sure the memory is allocated
 	byte **data;
 	bool mallocked = false;
 	byte **nulldata = NULL;
 
 	do {
-		// if the CAS fails, deallocate memory
 		if (mallocked) free(data);
-		data = ALOAD(&impl->data);
-		// if data is null we need to allocate it
+		data = ALOAD(&impl->data[i]);
 		if (data == NULL) {
 			int page_size = getpagesize();
 			int slots_per_page = page_size / impl->size;
@@ -92,7 +88,7 @@ int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
 			mallocked = true;
 		} else
 			break;
-	} while (!CAS(&impl->data, &nulldata, data));
+	} while (!CAS(&impl->data[i], &nulldata, data));
 
 	// now check our block
 	byte *block;
@@ -105,7 +101,7 @@ int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
 				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
 			munmap(block, aligned_size);
 		}
-		block = ALOAD(&impl->data[(i << 13) | j]);
+		block = ALOAD(impl->data[i] + j);
 		if (block == NULL) {
 			size_t page_size = getpagesize();
 			int slots_per_page = page_size / impl->size;
@@ -113,13 +109,6 @@ int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
 			int alloc_size = sizeof(byte *) * (UINT32_MAX / (impl->size * 8)) /
 							 slots_per_page;
 
-			/*
-						println(
-							"block malloc "
-							"i=%i,j=%i,sum=%i,page_size=%i,slots_per_page=%i,alloc_size=%i",
-							i, j, (i << 13) | j, page_size, slots_per_page,
-			   alloc_size);
-			*/
 			size_t aligned_size =
 				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
 			block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
@@ -131,7 +120,7 @@ int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
 			mallocked = true;
 		} else
 			break;
-	} while (!CAS(&impl->data[(i << 13) | j], &nullblock, block));
+	} while (!CAS(impl->data[i] + j, &nullblock, block));
 
 	return 0;
 }
@@ -146,41 +135,19 @@ Ptr memmap_allocate(MemMap *mm) {
 
 	do {
 		loop {
-			// first ensure bitmap allocated
 			if (memmap_allocate_bitmap(impl, i)) return null;
-
 			itt = (impl->bitmap[i] + j);
-
-			// if (i || j >= 8191) println("special i=%i,j=%i,k=%i", i, j, k);
 			if ((v = ALOAD(itt)) != ((unsigned long long)0) - 1) break;
-
-			j++;
-			// if (j > 8190) println("jloop i=%i,j=%i,k=%i", i, j, k);
-			if (j >= MEM_MAP_NUM_CHUNKS) {
-				// println("cond met");
+			if (++j >= MEM_MAP_NUM_CHUNKS) {
 				j = 0;
 				i++;
 			}
 		}
-
-		// we know at least one of these bits is not 0 so we loop through until
-		// we find it
 		k = 0;
 		while ((v & (0x1ULL << k)) != 0) k++;
-
-		// println("i=%i,j=%i,k=%i", i, j, k);
-
-		// Set the value of 'nitt' (new itt) to it's current value with the kth
-		// bit set.
 		nitt = v | (0x1ULL << k);
-
-		// before we commit, make sure the memory is allocated
 		if (memmap_check_data(impl, i, j, k)) return null;
-
 	} while (!CAS(itt, &v, nitt));
-
-	// return the bitwise shifted value of i << 6 | j. This is the bit which is
-	// assigned to us based on the 64 bit shift of 6 bytes and the value of j
 	return ((i << 19) | (j << 6) | k);
 }
 
@@ -188,18 +155,10 @@ void memmap_free(MemMap *mm, Ptr ptr) {
 	if (ptr == null) panic("attempt to free null!");
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	unsigned long long nv, *v, vo;
-
 	do {
-		// point to the appropriate unsigned long long location in the bitmap
 		v = impl->bitmap[ptr >> 19] + (ptr >> 6);
-		// atomically load it
 		vo = ALOAD((unsigned long long *)(v));
-
-		// check for double free (unallocated free)
 		if ((vo & (0x1ULL << (ptr & 0x3F))) == 0) panic("double free attempt!");
-
-		// update our value unsetting the appropriate bit
 		nv = vo & ~(0x1ULL << (ptr & 0x3F));
-		// repeate our cas loop if *v changes while we're writing
 	} while (!CAS(&*v, &vo, nv));
 }
