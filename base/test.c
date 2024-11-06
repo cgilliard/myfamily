@@ -215,11 +215,14 @@ MyTest(base, test_aux) {
 
 MyTest(base, test_memmap) {
 	MemMap mm1;
-	int size = 16;
-	int count = 100000;
+	int size = 64;
+	int count = 3000;
 	memmap_init(&mm1, size);
 
 	for (int i = 0; i < count; i++) {
+		if (i % 100000 == 0) {
+			// println("i=%i", i);
+		}
 		Ptr p = memmap_allocate(&mm1);
 		if (p != i + 1) println("p=%u,i+1=%i", p, i + 1);
 		cr_assert_eq(p, i + 1);

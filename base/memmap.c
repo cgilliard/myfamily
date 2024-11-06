@@ -37,9 +37,9 @@ void *memmap_data(const MemMap *mm, Ptr ptr) {
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
 	// println("ptr=%u,ptr>>22=%i,ptr>>9=%i", ptr, ptr >> 22, (ptr >> 9) &
 	// 0xFFFF);
-	byte *block = impl->data[ptr >> 22][(ptr >> 9) & 0xFFFF];
+	byte *block = impl->data[ptr >> 22][(ptr >> 11) & 0x7FF];
 
-	return (byte *)(block + ((ptr & 0x1FF) * impl->size));
+	return (byte *)(block + ((ptr & 0x7FF) * impl->size));
 }
 int memmap_init(MemMap *mm, unsigned int size) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
@@ -78,9 +78,10 @@ int memmap_check_data(MemMapImpl *impl, Ptr ptr) {
 		data = ALOAD(&impl->data[ptr >> 22]);
 		if (data == NULL) {
 			// println("data=NULL i=%i,j=%i,k=%i", i, j, k);
-			int alloc_size = MEM_MAP_CHUNK_SIZE;
-			data = malloc(MEM_MAP_CHUNK_SIZE);
-			// println("malloc data %i", MEM_MAP_CHUNK_SIZE);
+			int alloc_size = 2048 * 8;
+			data = malloc(alloc_size);
+			// println("malloc data %i,j=%i,i=%i", alloc_size,
+			//		((ptr >> 11) & 0x7FF), ptr >> 22);
 			if (data == NULL) {
 				SetErr(AllocErr);
 				return -1;
@@ -103,16 +104,17 @@ int memmap_check_data(MemMapImpl *impl, Ptr ptr) {
 			munmap(block, aligned_size);
 		}
 		// println("block check i=%i,j=%i,k=%i", ptr >> 22, ptr >> 9, 0);
-		block = ALOAD(impl->data[ptr >> 22] + (ptr >> 9));
+		block = ALOAD(impl->data[ptr >> 22] + ((ptr >> 11) & 0x7FF));
 		if (block == NULL) {
 			// println("block=NULL i=%i,j=%i,k=%i", i, j, k);
 			size_t page_size = getpagesize();
 			size_t aligned_size =
-				(((size_t)impl->size * 64 * 8) + page_size - 1) &
+				(((size_t)impl->size * 2048) + page_size - 1) &
 				~(page_size - 1);
 			block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
 						 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-			// println("mmap data %i", aligned_size);
+			// println("mmap data %i,j=%i,i=%i", aligned_size,
+			//((ptr >> 11) & 0x7FF), ptr >> 22);
 			if (block == NULL) {
 				SetErr(AllocErr);
 				return -1;
@@ -120,10 +122,13 @@ int memmap_check_data(MemMapImpl *impl, Ptr ptr) {
 			mallocked = true;
 		} else
 			break;
-	} while (!CAS(impl->data[ptr >> 22] + (ptr >> 9), &nullblock, block));
+	} while (
+		!CAS(impl->data[ptr >> 22] + ((ptr >> 11) & 0x7FF), &nullblock, block));
 
 	return 0;
 }
+
+_Thread_local int last_i = 0, last_j = 0;
 
 Ptr memmap_allocate(MemMap *mm) {
 	Ptr ret;
@@ -133,6 +138,8 @@ Ptr memmap_allocate(MemMap *mm) {
 
 	i = j = k = 0;
 	impl = (MemMapImpl *)mm;
+
+	i = last_i;
 
 	do {
 		loop {
@@ -150,6 +157,8 @@ Ptr memmap_allocate(MemMap *mm) {
 		ret = ((i << 19) | (j << 6) | k);
 		if (memmap_check_data(impl, ret)) return null;
 	} while (!CAS(itt, &v, nitt));
+	last_i = i;
+	last_j = j;
 	return ret;
 }
 
@@ -158,9 +167,12 @@ void memmap_free(MemMap *mm, Ptr ptr) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	unsigned long long nv, *v, vo;
 	do {
-		v = impl->bitmap[ptr >> 19] + (ptr >> 6);
+		v = impl->bitmap[ptr >> 19] + ((ptr >> 6) & 0x3F);
 		vo = ALOAD((unsigned long long *)(v));
 		if ((vo & (0x1ULL << (ptr & 0x3F))) == 0) panic("double free attempt!");
 		nv = vo & ~(0x1ULL << (ptr & 0x3F));
 	} while (!CAS(&*v, &vo, nv));
+
+	last_i = ptr >> 19;
+	last_j = ptr >> 6;
 }
