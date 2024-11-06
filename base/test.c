@@ -216,7 +216,7 @@ MyTest(base, test_aux) {
 MyTest(base, test_memmap) {
 	MemMap mm1;
 	int size = 16;
-	int count = 1000;
+	int count = 100000;
 	memmap_init(&mm1, size);
 
 	for (int i = 0; i < count; i++) {

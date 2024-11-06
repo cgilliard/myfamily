@@ -35,10 +35,11 @@ void __attribute__((constructor)) __memmap_check_sizes() {
 
 void *memmap_data(const MemMap *mm, Ptr ptr) {
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
-	// println("ptr=%u,ptr>>19=%i,ptr>>6=%i", ptr, ptr >> 19, (ptr >> 6) &
-	// 0x1FFF);
-	byte *block = impl->data[ptr >> 19][(ptr >> 6) & 0x1FFF];
-	return (byte *)(block + ((ptr & 0x3F) * impl->size));
+	// println("ptr=%u,ptr>>22=%i,ptr>>9=%i", ptr, ptr >> 22, (ptr >> 9) &
+	// 0xFFFF);
+	byte *block = impl->data[ptr >> 22][(ptr >> 9) & 0xFFFF];
+
+	return (byte *)(block + ((ptr & 0x1FF) * impl->size));
 }
 int memmap_init(MemMap *mm, unsigned int size) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
@@ -67,14 +68,14 @@ int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
 	return 0;
 }
 
-int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
+int memmap_check_data(MemMapImpl *impl, Ptr ptr) {
 	byte **data;
 	bool mallocked = false;
 	byte **nulldata = NULL;
 
 	do {
 		if (mallocked) free(data);
-		data = ALOAD(&impl->data[i]);
+		data = ALOAD(&impl->data[ptr >> 22]);
 		if (data == NULL) {
 			// println("data=NULL i=%i,j=%i,k=%i", i, j, k);
 			int alloc_size = MEM_MAP_CHUNK_SIZE;
@@ -88,7 +89,7 @@ int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
 			mallocked = true;
 		} else
 			break;
-	} while (!CAS(&impl->data[i], &nulldata, data));
+	} while (!CAS(&impl->data[ptr >> 22], &nulldata, data));
 
 	// now check our block
 	byte *block;
@@ -101,12 +102,14 @@ int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
 				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
 			munmap(block, aligned_size);
 		}
-		block = ALOAD(impl->data[i] + j);
+		// println("block check i=%i,j=%i,k=%i", ptr >> 22, ptr >> 9, 0);
+		block = ALOAD(impl->data[ptr >> 22] + (ptr >> 9));
 		if (block == NULL) {
 			// println("block=NULL i=%i,j=%i,k=%i", i, j, k);
 			size_t page_size = getpagesize();
 			size_t aligned_size =
-				(((size_t)impl->size * 64) + page_size - 1) & ~(page_size - 1);
+				(((size_t)impl->size * 64 * 8) + page_size - 1) &
+				~(page_size - 1);
 			block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
 						 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 			// println("mmap data %i", aligned_size);
@@ -117,12 +120,13 @@ int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
 			mallocked = true;
 		} else
 			break;
-	} while (!CAS(impl->data[i] + j, &nullblock, block));
+	} while (!CAS(impl->data[ptr >> 22] + (ptr >> 9), &nullblock, block));
 
 	return 0;
 }
 
 Ptr memmap_allocate(MemMap *mm) {
+	Ptr ret;
 	int i, j, k;
 	unsigned long long *itt, nitt, v;
 	MemMapImpl *impl;
@@ -143,9 +147,10 @@ Ptr memmap_allocate(MemMap *mm) {
 		k = 0;
 		while ((v & (0x1ULL << k)) != 0) k++;
 		nitt = v | (0x1ULL << k);
-		if (memmap_check_data(impl, i, j, k)) return null;
+		ret = ((i << 19) | (j << 6) | k);
+		if (memmap_check_data(impl, ret)) return null;
 	} while (!CAS(itt, &v, nitt));
-	return ((i << 19) | (j << 6) | k);
+	return ret;
 }
 
 void memmap_free(MemMap *mm, Ptr ptr) {
