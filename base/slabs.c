@@ -21,7 +21,6 @@
 #include <base/slabs.h>
 
 typedef struct SlabImpl {
-	void *tmp;
 	struct SlabImpl *next;
 	Ptr ptr;
 	SlabAllocator *sa;
@@ -30,7 +29,7 @@ typedef struct SlabImpl {
 
 byte *slab_get(Slab s) {
 	// return s->data;
-	return memmap_data(&s->sa->mm, s->ptr);
+	return memmap_data(&s->sa->mm, s->ptr) + sizeof(SlabImpl);
 }
 
 unsigned long long *slab_aux(Slab s) {
