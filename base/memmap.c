@@ -35,7 +35,9 @@ void __attribute__((constructor)) __memmap_check_sizes() {
 
 void *memmap_data(const MemMap *mm, Ptr ptr) {
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
-	byte *block = impl->data[ptr >> 19][ptr >> 6];
+	// println("ptr=%u,ptr>>19=%i,ptr>>6=%i", ptr, ptr >> 19, (ptr >> 6) &
+	// 0x1FFF);
+	byte *block = impl->data[ptr >> 19][(ptr >> 6) & 0x1FFF];
 	return (byte *)(block + ((ptr & 0x3F) * impl->size));
 }
 int memmap_init(MemMap *mm, unsigned int size) {
@@ -54,12 +56,12 @@ int memmap_init(MemMap *mm, unsigned int size) {
 int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
 	if (impl->bitmap[i] == NULL) {
 		impl->bitmap[i] = malloc(MEM_MAP_CHUNK_SIZE);
+		// println("malloc bitmap %i", MEM_MAP_CHUNK_SIZE);
 		if (impl->bitmap[i] == NULL) {
 			SetErr(AllocErr);
 			return -1;
 		}
 		memset(impl->bitmap[i], '\0', MEM_MAP_CHUNK_SIZE);
-		// set null to allocated so we don't assign it
 		if (i == 0) impl->bitmap[i][0] = 0x1;
 	}
 	return 0;
@@ -74,12 +76,10 @@ int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
 		if (mallocked) free(data);
 		data = ALOAD(&impl->data[i]);
 		if (data == NULL) {
-			int page_size = getpagesize();
-			int slots_per_page = page_size / impl->size;
-			if (slots_per_page == 0) slots_per_page = 1;
-			int alloc_size = sizeof(byte *) * (UINT32_MAX / (impl->size * 8)) /
-							 slots_per_page;
-			data = malloc(alloc_size);
+			// println("data=NULL i=%i,j=%i,k=%i", i, j, k);
+			int alloc_size = MEM_MAP_CHUNK_SIZE;
+			data = malloc(MEM_MAP_CHUNK_SIZE);
+			// println("malloc data %i", MEM_MAP_CHUNK_SIZE);
 			if (data == NULL) {
 				SetErr(AllocErr);
 				return -1;
@@ -103,16 +103,13 @@ int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
 		}
 		block = ALOAD(impl->data[i] + j);
 		if (block == NULL) {
+			// println("block=NULL i=%i,j=%i,k=%i", i, j, k);
 			size_t page_size = getpagesize();
-			int slots_per_page = page_size / impl->size;
-			if (slots_per_page == 0) slots_per_page = 1;
-			int alloc_size = sizeof(byte *) * (UINT32_MAX / (impl->size * 8)) /
-							 slots_per_page;
-
 			size_t aligned_size =
-				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
+				(((size_t)impl->size * 64) + page_size - 1) & ~(page_size - 1);
 			block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
 						 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			// println("mmap data %i", aligned_size);
 			if (block == NULL) {
 				SetErr(AllocErr);
 				return -1;
