@@ -215,11 +215,24 @@ MyTest(base, test_aux) {
 
 MyTest(base, test_memmap) {
 	MemMap mm1;
-	memmap_init(&mm1, 16);
+	int size = 16;
+	memmap_init(&mm1, size);
 
 	for (int i = 0; i < 1000; i++) {
 		Ptr p = memmap_allocate(&mm1);
 		cr_assert_eq(p, i + 1);
+		byte *data = memmap_data(&mm1, p);
+		for (int j = 0; j < size; j++) {
+			data[j] = 'a' + (j % 26);
+		}
+	}
+
+	for (int i = 0; i < 1000; i++) {
+		Ptr p = i + 1;
+		byte *data = memmap_data(&mm1, p);
+		for (int j = 0; j < size; j++) {
+			cr_assert_eq(data[j], 'a' + (j % 26));
+		}
 	}
 
 	memmap_free(&mm1, 7);
@@ -232,4 +245,7 @@ MyTest(base, test_memmap) {
 	cr_assert_eq(p, 8);
 	p = memmap_allocate(&mm1);
 	cr_assert_eq(p, 167);
+
+	p = memmap_allocate(&mm1);
+	cr_assert_eq(p, 1001);
 }

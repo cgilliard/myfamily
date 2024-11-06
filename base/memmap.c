@@ -33,9 +33,65 @@ void __attribute__((constructor)) __memmap_check_sizes() {
 			  sizeof(MemMapImpl), sizeof(MemMap));
 }
 
+int memmap_check_data(MemMapImpl *impl, int i, int j) {
+	// before we commit, make sure the memory is allocated
+	byte **data;
+	bool mallocked = false;
+	byte **nulldata = NULL;
+
+	do {
+		// if the CAS fails, deallocate memory
+		if (mallocked) free(data);
+		data = ALOAD(&impl->data);
+		// if data is null we need to allocate it
+		if (data == NULL) {
+			int page_size = getpagesize();
+			int slots_per_page = page_size / impl->size;
+			if (slots_per_page == 0) slots_per_page = 1;
+			int alloc_size = sizeof(byte *) * (UINT32_MAX / (impl->size * 8)) /
+							 slots_per_page;
+			data = malloc(alloc_size);
+			if (data == NULL) {
+				SetErr(AllocErr);
+				return -1;
+			}
+			memset(data, '\0', alloc_size);
+			mallocked = true;
+		} else
+			break;
+	} while (!CAS(&impl->data, &nulldata, data));
+
+	// now check our block
+	byte *block;
+	byte *nullblock = NULL;
+	mallocked = false;
+	do {
+		if (mallocked) {
+			size_t page_size = getpagesize();
+			size_t aligned_size =
+				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
+			munmap(block, aligned_size);
+		}
+		block = ALOAD(&impl->data[i]);
+		if (block == NULL) {
+			size_t page_size = getpagesize();
+			size_t aligned_size =
+				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
+			block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
+						 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			if (block == NULL) return -1;
+			mallocked = true;
+		} else
+			break;
+	} while (!CAS(&impl->data[i], &nullblock, block));
+
+	return 0;
+}
+
 void *memmap_data(const MemMap *mm, Ptr ptr) {
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
-	return (void *)(impl->data[(ptr >> 6)] + ((ptr & 0x3F) * impl->size));
+	// get our offset and block
+	return (void *)(impl->data[ptr >> 6] + ((ptr & 0x3F) * impl->size));
 }
 int memmap_init(MemMap *mm, unsigned int size) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
@@ -47,6 +103,10 @@ int memmap_init(MemMap *mm, unsigned int size) {
 	impl->lock = INIT_LOCK;
 
 	impl->bitmap = malloc(UINT32_MAX / (size * 8));
+	if (impl->bitmap == NULL) {
+		SetErr(AllocErr);
+		return -1;
+	}
 	memset(impl->bitmap, '\0', UINT32_MAX / (size * 8));
 	// set first bit as allocated to ensure null is never returned.
 	((byte *)impl->bitmap)[0] = 0x1;
@@ -97,46 +157,7 @@ Ptr memmap_allocate(MemMap *mm) {
 		// are reserving set.
 
 		// before we commit, make sure the memory is allocated
-		byte **data;
-		bool mallocked = false;
-		byte **nulldata = NULL;
-
-		do {
-			// if the CAS fails, deallocate memory
-			if (mallocked) free(data);
-			data = ALOAD(&impl->data);
-			// if data is null we need to allocate it
-			if (data == NULL) {
-				int page_size = getpagesize();
-				int slots_per_page = page_size / impl->size;
-				if (slots_per_page == 0) slots_per_page = 1;
-				int alloc_size = sizeof(byte *) *
-								 (UINT32_MAX / (impl->size * 8)) /
-								 slots_per_page;
-				data = malloc(alloc_size);
-				if (data == NULL) {
-					SetErr(AllocErr);
-					return null;
-				}
-				memset(data, '\0', alloc_size);
-				mallocked = true;
-			} else
-				break;
-		} while (!CAS(&impl->data, &nulldata, data));
-
-		// now check our block
-		byte *block;
-		byte *nullblock = NULL;
-		do {
-			block = ALOAD(&impl->data[i]);
-			if (block == NULL) {
-				size_t page_size = getpagesize();
-				size_t aligned_size =
-					((size_t)impl->size + page_size - 1) & ~(page_size - 1);
-				block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
-							 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-			}
-		} while (!CAS(&impl->data[i], &nullblock, block));
+		if (memmap_check_data(impl, i, j)) return null;
 
 	} while (!CAS(itt, &v, nitt));
 
