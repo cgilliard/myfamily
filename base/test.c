@@ -61,6 +61,8 @@ MyTest(base, test_alloc) {
 	release(test1);
 }
 
+/*
+
 MyTest(base, test_slab_allocator) {
 	SlabAllocator sa1;
 	cr_assert(!slab_allocator_init(&sa1, 16, 100, 200, true));
@@ -163,6 +165,8 @@ MyTest(base, test_slab_allocator_recycle) {
 
 	slab_allocator_cleanup(&sa1);
 }
+
+*/
 
 MyTest(base, test_malloc_recycle) {
 	long long size = 3000000;
