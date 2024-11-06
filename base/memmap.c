@@ -172,3 +172,22 @@ void memmap_free(MemMap *mm, Ptr ptr) {
 	last_i = ptr >> 19;
 	last_j = ptr >> 6;
 }
+
+void memmap_cleanup(MemMap *mm) {
+	MemMapImpl *impl = (MemMapImpl *)mm;
+	for (int i = 0; i < MEM_MAP_NUM_CHUNKS; i++) {
+		if (impl->bitmap[i]) MUNMAP(impl->bitmap[i], MEM_MAP_NUM_CHUNKS);
+		impl->bitmap[i] = NULL;
+
+		if (impl->data[i]) {
+			for (int j = 0; j < ALLOCS_PER_BLOCK; j++) {
+				if (impl->data[i][j]) {
+					MUNMAP(impl->data[i][j], impl->size * ALLOCS_PER_BLOCK);
+					impl->data[i][j] = NULL;
+				}
+			}
+			MUNMAP(impl->data[i], MEM_MAP_NUM_CHUNKS);
+		}
+		impl->data[i] = NULL;
+	}
+}

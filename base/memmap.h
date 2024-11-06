@@ -33,5 +33,6 @@ void *memmap_data(const MemMap *mm, Ptr ptr);
 int memmap_init(MemMap *mm, unsigned int size);
 Ptr memmap_allocate(MemMap *mm);
 void memmap_free(MemMap *mm, Ptr ptr);
+void memmap_cleanup(MemMap *mm);
 
 #endif	// _BASE_MEMMAP__

@@ -253,6 +253,8 @@ MyTest(base, test_memmap) {
 
 	p = memmap_allocate(&mm1);
 	cr_assert_eq(p, count + 1);
+
+	memmap_cleanup(&mm1);
 }
 
 MyTest(base, test_memmap_recycle) {
@@ -274,4 +276,5 @@ MyTest(base, test_memmap_recycle) {
 			memmap_free(&mm1, ptrs[j]);
 		}
 	}
+	memmap_cleanup(&mm1);
 }
