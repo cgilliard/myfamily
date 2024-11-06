@@ -53,20 +53,32 @@ int memmap_init(MemMap *mm, unsigned int size) {
 }
 
 int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
-	if (impl->bitmap[i] == NULL) {
-		int alloc_size = MEM_MAP_CHUNK_SIZE;
-		size_t page_size = getpagesize();
-		size_t aligned_size =
-			(((size_t)alloc_size) + page_size - 1) & ~(page_size - 1);
-		impl->bitmap[i] = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
-							   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-		if (impl->bitmap[i] == NULL) {
-			SetErr(AllocErr);
-			return -1;
+	bool mmapped = false;
+	unsigned long long *nulldata = NULL;
+	unsigned long long *bitmap;
+	int alloc_size = MEM_MAP_CHUNK_SIZE;
+	size_t page_size = getpagesize();
+	size_t aligned_size =
+		(((size_t)alloc_size) + page_size - 1) & ~(page_size - 1);
+	do {
+		if (mmapped) {
+			munmap(bitmap, aligned_size);
 		}
-		memset(impl->bitmap[i], '\0', MEM_MAP_CHUNK_SIZE);
-		if (i == 0) impl->bitmap[i][0] = 0x1;
-	}
+		bitmap = ALOAD(&impl->bitmap[i]);
+		if (bitmap == NULL) {
+			bitmap = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
+						  MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+			mmapped = true;
+			if (bitmap == NULL) {
+				SetErr(AllocErr);
+				return -1;
+			}
+			memset(bitmap, '\0', MEM_MAP_CHUNK_SIZE);
+			if (i == 0) bitmap[0] = 0x1;
+			impl->bitmap[i] = bitmap;
+		} else
+			break;
+	} while (CAS(&impl->bitmap[i], &nulldata, bitmap));
 	return 0;
 }
 
