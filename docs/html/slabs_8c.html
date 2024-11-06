@@ -103,12 +103,14 @@ Typedefs</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:aa569164a5bc28a4a9e02057a58c982cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#aa569164a5bc28a4a9e02057a58c982cd">slab_get</a> (<a class="el" href="slabs_8h.html#aa955ca1abdb76bcb193cee86c92f3df5">Slab</a> s)</td></tr>
 <tr class="separator:aa569164a5bc28a4a9e02057a58c982cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a619a168615e58549936c51dfa68cd905"><td class="memItemLeft" align="right" valign="top">unsigned long long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a619a168615e58549936c51dfa68cd905">slab_aux</a> (<a class="el" href="slabs_8h.html#aa955ca1abdb76bcb193cee86c92f3df5">Slab</a> s)</td></tr>
+<tr class="separator:a619a168615e58549936c51dfa68cd905"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ed43f2d0b6c39f0abaac1e7f6b7f5b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#aa955ca1abdb76bcb193cee86c92f3df5">Slab</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a9ed43f2d0b6c39f0abaac1e7f6b7f5b1">slab_allocator_grow</a> (<a class="el" href="structSlabAllocator.html">SlabAllocator</a> *sa)</td></tr>
 <tr class="separator:a9ed43f2d0b6c39f0abaac1e7f6b7f5b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed1fb06432c426bce7c2d659fca17c17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#aed1fb06432c426bce7c2d659fca17c17">slab_allocator_cleanup</a> (<a class="el" href="structSlabAllocator.html">SlabAllocator</a> *sa)</td></tr>
 <tr class="separator:aed1fb06432c426bce7c2d659fca17c17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57886e4ddaa24b57b989e0e283eb5221"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a57886e4ddaa24b57b989e0e283eb5221">slab_allocator_init</a> (<a class="el" href="structSlabAllocator.html">SlabAllocator</a> *sa, unsigned int slab_size, unsigned long long max_free_slabs, unsigned long long max_total_slabs)</td></tr>
-<tr class="separator:a57886e4ddaa24b57b989e0e283eb5221"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af21df14f8b6e6097b4f3f54ae7c81d5e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#af21df14f8b6e6097b4f3f54ae7c81d5e">slab_allocator_init</a> (<a class="el" href="structSlabAllocator.html">SlabAllocator</a> *sa, unsigned int slab_size, unsigned long long max_free_slabs, unsigned long long max_total_slabs, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> free_check)</td></tr>
+<tr class="separator:af21df14f8b6e6097b4f3f54ae7c81d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a146bc9771e9d38dad2361c15655dfbb0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="slabs_8h.html#aa955ca1abdb76bcb193cee86c92f3df5">Slab</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a146bc9771e9d38dad2361c15655dfbb0">slab_allocator_allocate</a> (<a class="el" href="structSlabAllocator.html">SlabAllocator</a> *sa)</td></tr>
 <tr class="separator:a146bc9771e9d38dad2361c15655dfbb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d950a3787ef4d4b482b086389858695"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="slabs_8c.html#a2d950a3787ef4d4b482b086389858695">slab_allocator_free</a> (<a class="el" href="structSlabAllocator.html">SlabAllocator</a> *sa, <a class="el" href="slabs_8h.html#aa955ca1abdb76bcb193cee86c92f3df5">Slab</a> slab)</td></tr>
@@ -256,8 +258,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a57886e4ddaa24b57b989e0e283eb5221"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a57886e4ddaa24b57b989e0e283eb5221">&#9670;&nbsp;</a></span>slab_allocator_init()</h2>
+<a id="af21df14f8b6e6097b4f3f54ae7c81d5e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af21df14f8b6e6097b4f3f54ae7c81d5e">&#9670;&nbsp;</a></span>slab_allocator_init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -284,7 +286,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">unsigned long long&#160;</td>
-          <td class="paramname"><em>max_total_slabs</em>&#160;</td>
+          <td class="paramname"><em>max_total_slabs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a>&#160;</td>
+          <td class="paramname"><em>free_check</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -307,6 +315,24 @@ Variables</h2></td></tr>
           <td>(</td>
           <td class="paramtype"><a class="el" href="structSlabAllocator.html">SlabAllocator</a> *&#160;</td>
           <td class="paramname"><em>sa</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a619a168615e58549936c51dfa68cd905"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a619a168615e58549936c51dfa68cd905">&#9670;&nbsp;</a></span>slab_aux()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long long* slab_aux </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="slabs_8h.html#aa955ca1abdb76bcb193cee86c92f3df5">Slab</a>&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
           <td></td>
         </tr>
       </table>

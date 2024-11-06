@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['resourcestats_335',['ResourceStats',['../alloc_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'alloc.h']]]
+  ['memmap_426',['MemMap',['../memmap_8h.html#a83dbcc7c4ac50c60da00cfdcf7d39274',1,'memmap.h']]],
+  ['memmapimpl_427',['MemMapImpl',['../memmap_8c.html#a3250781b56ddc895ab618230e5cb104a',1,'memmap.c']]]
 ];
