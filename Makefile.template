@@ -3,7 +3,7 @@ SOURCES := $(patsubst %.c,%.o,$(wildcard *.c))
 SUB_HEADERS := $(wildcard *.h)
 
 %.o : %.c $(SUB_HEADERS)
-	$(CC) -O3 -DTEST $(CC_FLAGS) -I.. -c -o $@ $<
+	$(CC) $(FLAG_OPTIONS) $(CC_FLAGS) -I.. -c -o $@ $<
 all: $(OBJS)
 
 test_bin: bin/test
@@ -11,7 +11,7 @@ test_bin: bin/test
 bin/test: test.c $(TEST_OBJS)
 	mkdir -p bin
 	$(CC) $(FLAG_OPTIONS) $(CC_FLAGS) $(CRITERION_INCLUDE) -I.. -c ../base/test_impl.c -o bin/test_impl.o
-	$(CC) -O3 -DTEST -lcriterion $(CRITERION_LIB) $(CC_FLAGS) $(TEST_OBJS) bin/test_impl.o -I.. -o bin/test test.c
+	$(CC) $(FLAG_OPTIONS) $(CC_TEST_FLAGS) $(TEST_OBJS) bin/test_impl.o -I.. -o bin/test test.c
 
 test: test_bin
 	bash -c 'rm -rf bin/nocapture; export TIMEFORMAT="Execution time: %R seconds"; time ./bin/test --timeout 60 -f'
