@@ -211,6 +211,7 @@ MyTest(base, test_aux) {
 	cr_assert(*ptr2 != 123);
 
 	slab_allocator_free(&sa1, s2);
+	slab_allocator_cleanup(&sa1);
 }
 
 MyTest(base, test_memmap) {
