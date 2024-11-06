@@ -216,10 +216,12 @@ MyTest(base, test_aux) {
 MyTest(base, test_memmap) {
 	MemMap mm1;
 	int size = 16;
+	int count = 10000;
 	memmap_init(&mm1, size);
 
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < count; i++) {
 		Ptr p = memmap_allocate(&mm1);
+		if (p != i + 1) println("p=%u,i+1=%i", p, i + 1);
 		cr_assert_eq(p, i + 1);
 		byte *data = memmap_data(&mm1, p);
 		for (int j = 0; j < size; j++) {
@@ -227,7 +229,7 @@ MyTest(base, test_memmap) {
 		}
 	}
 
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < count; i++) {
 		Ptr p = i + 1;
 		byte *data = memmap_data(&mm1, p);
 		for (int j = 0; j < size; j++) {
@@ -247,5 +249,5 @@ MyTest(base, test_memmap) {
 	cr_assert_eq(p, 167);
 
 	p = memmap_allocate(&mm1);
-	cr_assert_eq(p, 1001);
+	cr_assert_eq(p, count + 1);
 }
