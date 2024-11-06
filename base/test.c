@@ -131,11 +131,11 @@ MyTest(base, test_slab_allocator_recycle) {
 		for (int j = 0; j < count; j++) {
 			slabs[j] = slab_allocator_allocate(&sa1);
 			cr_assert(slabs[j] != NULL);
-			byte *test = slab_get(slabs[j]);
+			byte *test = slab_get(&sa1, slabs[j]);
 			for (int j = 0; j < alloc_size; j++) test[j] = j;
 		}
 		for (int j = 0; j < count; j++) {
-			byte *test = slab_get(slabs[j]);
+			byte *test = slab_get(&sa1, slabs[j]);
 			for (int j = 0; j < alloc_size; j++) cr_assert(test[j] == j);
 			slab_allocator_free(&sa1, slabs[j]);
 		}
@@ -156,7 +156,7 @@ MyTest(base, test_slab_allocator_recycle) {
 
 	Slab s2 = slab_allocator_allocate(&sa1);
 	cr_assert(s2 != NULL);
-	byte *test = slab_get(s2);
+	byte *test = slab_get(&sa1, s2);
 	for (int j = 0; j < alloc_size; j++) test[j] = j;
 	cr_assert_eq(slab_allocator_total_slabs(&sa1), count + 2);
 	cr_assert_eq(slab_allocator_free_size(&sa1), count + 1);

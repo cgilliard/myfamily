@@ -33,7 +33,7 @@ typedef struct SlabAllocator {
 	bool free_check;
 } SlabAllocator;
 
-byte *slab_get(Slab s);
+byte *slab_get(SlabAllocator *sa, Slab s);
 unsigned long long *slab_aux(Slab s);
 
 int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,

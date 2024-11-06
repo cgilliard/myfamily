@@ -23,13 +23,19 @@
 typedef struct SlabImpl {
 	struct SlabImpl *next;
 	Ptr ptr;
-	SlabAllocator *sa;
 	byte data[];
 } SlabImpl;
 
-byte *slab_get(Slab s) {
-	// return s->data;
-	return memmap_data(&s->sa->mm, s->ptr) + sizeof(SlabImpl);
+byte *slab_get(SlabAllocator *sa, Slab s) {
+	if (s == NULL || sa == NULL || s->ptr == null) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
+
+	byte *d = memmap_data(&sa->mm, s->ptr);
+	if (d == NULL) return NULL;
+
+	return d + sizeof(SlabImpl);
 }
 
 unsigned long long *slab_aux(Slab s) {
@@ -46,19 +52,18 @@ Slab slab_allocator_grow(SlabAllocator *sa) {
 		SetErr(CapacityExceeded);
 		return NULL;
 	}
-	// Slab ret = malloc(sizeof(SlabImpl) + sa->slab_size);
 	Ptr p = memmap_allocate(&sa->mm);
-	Slab ret = (SlabImpl *)memmap_data(&sa->mm, p);
-	ret->ptr = p;
-	ret->sa = sa;
-	ret->next = SLAB_ALLOCATED;
 
-	if (ret == NULL) {
+	if (p == null) {
 		SetErr(AllocErr);
 		ASUB(&sa->total_slabs, 1);
 		return NULL;
 	}
-	// if (sa->free_check) ret->next = SLAB_ALLOCATED;
+
+	Slab ret = (SlabImpl *)memmap_data(&sa->mm, p);
+	ret->ptr = p;
+
+	if (sa->free_check) ret->next = SLAB_ALLOCATED;
 	return ret;
 }
 
