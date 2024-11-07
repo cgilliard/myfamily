@@ -25,24 +25,8 @@
 	type##Nc __attribute((warn_unused_result, cleanup(type##_cleanup)))
 
 // Ptr macros
-#define $(ptr) ptr_data(ptr)
-#define $len(ptr) ptr_len(ptr)
-#define $alloc(size) ({ fam_alloc(size); })
-#define $resize(ptr, size)                  \
-	({                                      \
-		Ptr _ptr__ = fam_resize(ptr, size); \
-		if (!nil(_ptr__)) ptr = NULL;       \
-		_ptr__;                             \
-	})
-#define $release(ptr)     \
-	({                    \
-		fam_release(ptr); \
-		ptr = NULL;       \
-	})
-#define nil(ptr) \
-	(ptr == NULL || (ptr_len(ptr) == UINT32_MAX && ptr_id(ptr) == 0))
+#define nil(ptr) (ptr <= ptr_reserved)
 #define ok(ptr) !nil(ptr)
-#define initialized(ptr) (ptr != NULL && ptr_len(ptr) != UINT32_MAX)
 
 // Lock macros
 #define lock() (lock_create())

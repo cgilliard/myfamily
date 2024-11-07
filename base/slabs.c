@@ -20,6 +20,8 @@
 #include <base/print_util.h>
 #include <base/slabs.h>
 
+static Ptr RESERVED_PTR = 1;
+
 typedef struct SlabList {
 	Ptr next;
 	byte data[];
@@ -43,12 +45,17 @@ void __attribute__((constructor)) __slabs_check_sizes() {
 }
 
 byte *slab_get(SlabAllocator *sa, Ptr ptr) {
+	if (sa == NULL || nil(ptr)) {
+		SetErr(IllegalArgument);
+		return NULL;
+	}
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 	SlabList *sl = memmap_data(&impl->mm, ptr);
+	if (sl == NULL) {
+		SetErr(IllegalState);
+		return NULL;
+	}
 	return sl->data;
-}
-unsigned long long *slab_aux(SlabAllocator *sa, Ptr ptr) {
-	return NULL;
 }
 
 Ptr slab_allocator_grow(SlabAllocatorImpl *impl) {
@@ -58,7 +65,9 @@ Ptr slab_allocator_grow(SlabAllocatorImpl *impl) {
 		return null;
 	}
 	Ptr ret = memmap_allocate(&impl->mm);
+	if (nil(ret)) return null;
 	SlabList *sl = memmap_data(&impl->mm, ret);
+	if (sl == NULL) return null;
 	sl->next = ptr_reserved;
 
 	return ret;
@@ -67,9 +76,14 @@ Ptr slab_allocator_grow(SlabAllocatorImpl *impl) {
 int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 						unsigned long long max_free_slabs,
 						unsigned long long max_total_slabs) {
+	if (sa == NULL || slab_size == 0 || max_free_slabs < 5 ||
+		max_total_slabs < 5) {
+		SetErr(IllegalArgument);
+		return -1;
+	}
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 
-	memmap_init(&impl->mm, slab_size + sizeof(SlabList));
+	if (memmap_init(&impl->mm, slab_size + sizeof(SlabList))) return -1;
 	ASTORE(&impl->free_size, 1);
 	ASTORE(&impl->total_slabs, 0);
 	impl->slab_size = slab_size;
@@ -82,6 +96,10 @@ int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 	}
 
 	SlabList *sl = memmap_data(&impl->mm, ptr);
+	if (sl == NULL) {
+		SetErr(IllegalState);
+		return -1;
+	}
 	sl->next = null;
 	impl->head = impl->tail = ptr;
 
@@ -89,11 +107,14 @@ int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 }
 
 void slab_allocator_cleanup(SlabAllocator *sa) {
+	if (sa == NULL) panic("slab_allocator_cleanup with sa = NULL!");
+
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 	Ptr itt = impl->head;
 	while (itt) {
 		Ptr to_delete = itt;
 		SlabList *sl = memmap_data(&impl->mm, itt);
+		if (sl == NULL) panic("slab_allocator_cleanup: memmap_data ret NULL!");
 		itt = sl->next;
 		memmap_free(&impl->mm, to_delete);
 	}
@@ -102,12 +123,20 @@ void slab_allocator_cleanup(SlabAllocator *sa) {
 }
 
 Ptr slab_allocator_allocate(SlabAllocator *sa) {
+	if (sa == NULL) {
+		SetErr(IllegalArgument);
+		return null;
+	}
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 	Ptr head, tail, next, ret;
 	loop {
 		head = impl->head;
 		tail = impl->tail;
 		SlabList *sl = memmap_data(&impl->mm, head);
+		if (sl == NULL) {
+			SetErr(IllegalState);
+			return null;
+		}
 		next = sl->next;
 		if (head == impl->head) {
 			if (head == tail) {
@@ -124,15 +153,21 @@ Ptr slab_allocator_allocate(SlabAllocator *sa) {
 
 	ASUB(&impl->free_size, 1);
 	SlabList *sl = memmap_data(&impl->mm, ret);
+	if (sl == NULL) {
+		SetErr(IllegalState);
+		return null;
+	}
 	sl->next = ptr_reserved;
 	return ret;
 }
 void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
+	if (sa == NULL) panic("slab_allocator_free with sa = NULL!");
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 
 	SlabList *slptr = memmap_data(&impl->mm, ptr);
-	Ptr reserved = 1;
-	if (!CAS(&slptr->next, &reserved, null))
+	if (slptr == NULL) panic("cannot retrieve data for a freed ptr!");
+
+	if (!CAS(&slptr->next, &RESERVED_PTR, null))
 		panic("Double free attempt! ptr=%u", ptr);
 	if (AADD(&impl->free_size, 1) > impl->max_free_slabs) {
 		memmap_free(&impl->mm, ptr);
@@ -145,6 +180,7 @@ void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
 	loop {
 		tail = impl->tail;
 		SlabList *sltail = memmap_data(&impl->mm, tail);
+		if (sltail == NULL) panic("cannot retrieve data for tail!");
 		next = sltail->next;
 		if (tail == impl->tail) {
 			if (next == null) {
