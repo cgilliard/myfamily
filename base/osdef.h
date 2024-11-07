@@ -18,12 +18,9 @@
 #include <base/types.h>
 #include <sys/mman.h>
 
-void *malloc(size_t size);
-void free(void *ptr);
 void exit(int);
 int getpagesize();
 char *getenv(const char *name);
-void *memcpy(void *, const void *, size_t);
 void *memset(void *ptr, int x, size_t n);
 
 #endif	// _BASE_OSDEF__
