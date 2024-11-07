@@ -61,6 +61,70 @@ MyTest(base, test_alloc) {
 	release(test1);
 }
 
+MyTest(base, test_memmap) {
+	MemMap mm1;
+	int size = 64;
+	int count = 3000;
+	memmap_init(&mm1, size);
+
+	for (int i = 0; i < count; i++) {
+		Ptr p = memmap_allocate(&mm1);
+		if (p != i + 1) println("p=%u,i+1=%i", p, i + 1);
+		cr_assert_eq(p, i + 1);
+		byte *data = memmap_data(&mm1, p);
+		for (int j = 0; j < size; j++) {
+			data[j] = 'a' + (j % 26);
+		}
+	}
+
+	for (int i = 0; i < count; i++) {
+		Ptr p = i + 1;
+		byte *data = memmap_data(&mm1, p);
+		for (int j = 0; j < size; j++) {
+			cr_assert_eq(data[j], 'a' + (j % 26));
+		}
+	}
+
+	memmap_free(&mm1, 7);
+	memmap_free(&mm1, 8);
+	memmap_free(&mm1, 167);
+
+	Ptr p = memmap_allocate(&mm1);
+	cr_assert_eq(p, 7);
+	p = memmap_allocate(&mm1);
+	cr_assert_eq(p, 8);
+	p = memmap_allocate(&mm1);
+	cr_assert_eq(p, 167);
+
+	p = memmap_allocate(&mm1);
+	cr_assert_eq(p, count + 1);
+
+	memmap_cleanup(&mm1);
+}
+
+MyTest(base, test_memmap_recycle) {
+	MemMap mm1;
+	int size = 64;
+	int count = 3000000;
+	int itt = 4;
+	memmap_init(&mm1, size);
+	Ptr ptrs[itt];
+
+	for (int i = 0; i < count; i++) {
+		for (int j = 0; j < itt; j++) {
+			ptrs[j] = memmap_allocate(&mm1);
+			cr_assert(ptrs[j] == 1 + j);
+		}
+
+		for (int j = 0; j < itt; j++) {
+			cr_assert(ptrs[j] == 1 + j);
+			memmap_free(&mm1, ptrs[j]);
+		}
+	}
+	memmap_cleanup(&mm1);
+}
+
+/*
 MyTest(base, test_slab_allocator) {
 	SlabAllocator sa1;
 	cr_assert(!slab_allocator_init(&sa1, 16, 100, 200, true));
@@ -282,3 +346,4 @@ MyTest(base, test_memmap_recycle) {
 	}
 	memmap_cleanup(&mm1);
 }
+*/

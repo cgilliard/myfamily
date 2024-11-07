@@ -13,20 +13,19 @@
 // limitations under the License.
 
 #include <base/fam_err.h>
-#include <base/lock.h>
 #include <base/memmap.h>
 #include <base/osdef.h>
 #include <base/print_util.h>
 
-#define ALLOCS_PER_BLOCK 2048
+#define MEMMAP_ENTRY_PER_LEVEL 256
+#define BITMAP_SIZE 32
+#define MEMMAP_SHIFT 8
+
+_Thread_local int last_i = 0, last_j = 0, last_k = 0, last_l = 0;
 
 typedef struct MemMapImpl {
-	byte **data[MEM_MAP_NUM_CHUNKS];
-	unsigned long long *bitmap[MEM_MAP_NUM_CHUNKS];
-	unsigned int chunks;
+	byte ****data;
 	unsigned int size;
-	unsigned int chunk_size;
-	Lock lock;
 } MemMapImpl;
 
 void __attribute__((constructor)) __memmap_check_sizes() {
@@ -35,159 +34,207 @@ void __attribute__((constructor)) __memmap_check_sizes() {
 			  sizeof(MemMapImpl), sizeof(MemMap));
 }
 
+unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
+								   int l) {
+	bool mmapped = false;
+	byte ****nullvalue1 = NULL;
+	byte ****data1 = NULL;
+	// load data
+	do {
+		if (mmapped) {
+			MUNMAP(data1, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+		}
+		data1 = ALOAD(&impl->data);
+		if (data1 == NULL) {
+			data1 = MMAP(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+			if (data1 == NULL) {
+				SetErr(AllocErr);
+				return NULL;
+			}
+			mmapped = true;
+			memset(data1, '\0', MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+		} else
+			break;
+	} while (!CAS(&impl->data, &nullvalue1, data1));
+
+	// load second level
+	byte ***nullvalue2 = NULL;
+	byte ***data2;
+	mmapped = false;
+	do {
+		if (mmapped) {
+			MUNMAP(data2, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+		}
+		data2 = ALOAD(&impl->data[i]);
+		if (data2 == NULL) {
+			data2 = MMAP(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+			if (data2 == NULL) {
+				SetErr(AllocErr);
+				return NULL;
+			}
+			mmapped = true;
+			memset(data2, '\0', MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+		} else
+			break;
+	} while (!CAS(&impl->data[i], &nullvalue2, data2));
+
+	// load third level
+	byte **nullvalue3 = NULL;
+	byte **data3;
+	mmapped = false;
+	do {
+		if (mmapped) {
+			MUNMAP(data3, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+		}
+		data3 = ALOAD(&impl->data[i][j]);
+		if (data3 == NULL) {
+			data3 = MMAP(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+			if (data3 == NULL) {
+				SetErr(AllocErr);
+				return NULL;
+			}
+			mmapped = true;
+			memset(data3, '\0', MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+		} else
+			break;
+	} while (!CAS(&impl->data[i][j], &nullvalue3, data3));
+
+	// load fourth and final level
+	byte *nullvalue4 = NULL;
+	byte *data4;
+	mmapped = false;
+	// add 32 bytes for the bitmap
+	do {
+		if (mmapped) {
+			MUNMAP(data4, MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+							  BITMAP_SIZE);
+		}
+		data4 = ALOAD(&impl->data[i][j][k]);
+		if (data4 == NULL) {
+			data4 = MMAP(MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+						 BITMAP_SIZE);
+			if (data4 == NULL) {
+				SetErr(AllocErr);
+				return NULL;
+			}
+			mmapped = true;
+			memset(data4, '\0',
+				   MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+					   BITMAP_SIZE);
+			// set Ptr=0 to allocated so we never return null
+			if (i == 0 && j == 0 && k == 0) data4[0] = 0x1;
+		} else
+			break;
+	} while (!CAS(&impl->data[i][j][k], &nullvalue4, data4));
+
+	// return the lth item at the begining of the data array (32 bytes reserved)
+	// l is between 0-3.
+	unsigned long long *ret = ((unsigned long long *)impl->data[i][j][k]) + l;
+	return ret;
+}
+
 void *memmap_data(const MemMap *mm, Ptr ptr) {
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
-	byte *block = impl->data[ptr >> 22][(ptr >> 11) & 0x7FF];
-	return (byte *)(block + ((ptr & 0x7FF) * impl->size));
+	byte *block = impl->data[ptr >> (MEMMAP_SHIFT * 3)]
+							[(ptr >> (MEMMAP_SHIFT * 2)) & 0xFF]
+							[(ptr >> (MEMMAP_SHIFT)) & 0xFF];
+	return (byte *)(block + ((ptr & 0xFF) * impl->size + 32));
 }
 int memmap_init(MemMap *mm, unsigned int size) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	impl->size = size;
-	impl->chunks = 0;
-	impl->chunk_size = 128;
-	impl->lock = INIT_LOCK;
-
-	memset(impl->bitmap, '\0',
-		   MEM_MAP_NUM_CHUNKS * sizeof(unsigned long long *));
-	memset(impl->data, '\0', MEM_MAP_NUM_CHUNKS * sizeof(byte **));
+	impl->data = NULL;
 	return 0;
 }
-
-int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
-	bool mmapped = false;
-	unsigned long long *nulldata = NULL;
-	unsigned long long *bitmap;
-	do {
-		if (mmapped) {
-			MUNMAP(bitmap, MEM_MAP_CHUNK_SIZE);
-		}
-		bitmap = ALOAD(&impl->bitmap[i]);
-		if (bitmap == NULL) {
-			bitmap = MMAP(MEM_MAP_CHUNK_SIZE);
-			mmapped = true;
-			if (bitmap == NULL) {
-				SetErr(AllocErr);
-				return -1;
-			}
-			memset(bitmap, '\0', MEM_MAP_CHUNK_SIZE);
-			if (i == 0) bitmap[0] = 0x1;
-			impl->bitmap[i] = bitmap;
-		} else
-			break;
-	} while (CAS(&impl->bitmap[i], &nulldata, bitmap));
-	return 0;
-}
-
-int memmap_check_data(MemMapImpl *impl, Ptr ptr) {
-	byte **data;
-	bool mmapped = false;
-	byte **nulldata = NULL;
-
-	int alloc_size = ALLOCS_PER_BLOCK * 8;
-
-	do {
-		if (mmapped) MUNMAP(data, alloc_size);
-		data = ALOAD(&impl->data[ptr >> 22]);
-		if (data == NULL) {
-			data = MMAP(alloc_size);
-			if (data == NULL) {
-				SetErr(AllocErr);
-				return -1;
-			}
-			memset(data, '\0', alloc_size);
-			mmapped = true;
-		} else
-			break;
-	} while (!CAS(&impl->data[ptr >> 22], &nulldata, data));
-
-	// now check our block
-	byte *block;
-	byte *nullblock = NULL;
-	mmapped = false;
-	do {
-		if (mmapped) {
-			MUNMAP(block, impl->size * ALLOCS_PER_BLOCK);
-		}
-		block = ALOAD(impl->data[ptr >> 22] + ((ptr >> 11) & 0x7FF));
-		if (block == NULL) {
-			block = MMAP(impl->size * ALLOCS_PER_BLOCK);
-			if (block == NULL) {
-				SetErr(AllocErr);
-				return -1;
-			}
-			mmapped = true;
-		} else
-			break;
-	} while (
-		!CAS(impl->data[ptr >> 22] + ((ptr >> 11) & 0x7FF), &nullblock, block));
-
-	return 0;
-}
-
-_Thread_local int last_i = 0, last_j = 0;
 
 Ptr memmap_allocate(MemMap *mm) {
-	Ptr ret;
-	int i, j, k;
-	unsigned long long *itt, nitt, v;
-	MemMapImpl *impl;
-
-	i = j = k = 0;
-	impl = (MemMapImpl *)mm;
-
-	i = last_i;
+	Ptr ret = null;
+	MemMapImpl *impl = (MemMapImpl *)mm;
+	int i = last_i, j = last_j, k = last_k, l = last_l;
+	unsigned long long *current, desired, v;
 
 	do {
 		loop {
-			if (memmap_allocate_bitmap(impl, i)) return null;
-			itt = (impl->bitmap[i] + j);
-			if ((v = ALOAD(itt)) != ((unsigned long long)0) - 1) break;
-			if (++j >= MEM_MAP_NUM_CHUNKS) {
-				j = 0;
-				i++;
+			// load section of bitmap
+			current = memmap_itt_for(impl, i, j, k, l);
+			if (current == NULL) return null;
+			v = ALOAD(current);
+			if (v != ((unsigned long long)0) - 1) break;
+			// l is 4 because 64 bits are used in the atomic load
+			// the other 4 combinations cover all 256 entries
+			if (++l >= 4) {
+				l = 0;
+				if (++k >= MEMMAP_ENTRY_PER_LEVEL) {
+					k = 0;
+					if (++j >= MEMMAP_ENTRY_PER_LEVEL) {
+						j = 0;
+						i++;
+						if (i == last_i) {
+							SetErr(CapacityExceeded);
+							return null;
+						}
+					}
+				}
 			}
 		}
-		k = 0;
-		while ((v & (0x1ULL << k)) != 0) k++;
-		nitt = v | (0x1ULL << k);
-		ret = ((i << 19) | (j << 6) | k);
-		if (memmap_check_data(impl, ret)) return null;
-	} while (!CAS(itt, &v, nitt));
+
+		// find open bit
+		int x;
+		for (x = 0; (v & (0x1ULL << x)) != 0; x++);
+		ret = (i << (MEMMAP_SHIFT * 3)) | (j << (2 * MEMMAP_SHIFT)) |
+			  (k << MEMMAP_SHIFT) | (l << 6) | x;
+		// set bit
+		desired = v | (0x1ULL << x);
+	} while (!CAS(current, &v, desired));
+
 	last_i = i;
 	last_j = j;
+	last_k = k;
+	last_l = l;
+
 	return ret;
 }
 
 void memmap_free(MemMap *mm, Ptr ptr) {
 	if (ptr == null) panic("attempt to free null!");
+	if (mm == NULL) panic("invalid (null) memmap");
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	unsigned long long nv, *v, vo;
+	int i, j, k, l;
+
+	i = (ptr >> (MEMMAP_SHIFT * 3)) & 0xFF;
+	j = (ptr >> (MEMMAP_SHIFT * 2)) & 0xFF;
+	k = (ptr >> (MEMMAP_SHIFT)) & 0xFF;
+	l = (ptr >> 6) & 0x3;
+
 	do {
-		v = impl->bitmap[ptr >> 19] + ((ptr >> 6) & 0x3F);
+		v = (unsigned long long *)impl->data[i][j][k] + l;
 		vo = ALOAD((unsigned long long *)(v));
 		if ((vo & (0x1ULL << (ptr & 0x3F))) == 0) panic("double free attempt!");
 		nv = vo & ~(0x1ULL << (ptr & 0x3F));
 	} while (!CAS(&*v, &vo, nv));
 
-	last_i = ptr >> 19;
-	last_j = ptr >> 6;
+	last_i = i;
+	last_j = j;
+	last_k = k;
+	last_l = 0;
 }
 
 void memmap_cleanup(MemMap *mm) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
-	for (int i = 0; i < MEM_MAP_NUM_CHUNKS; i++) {
-		if (impl->bitmap[i]) MUNMAP(impl->bitmap[i], MEM_MAP_NUM_CHUNKS);
-		impl->bitmap[i] = NULL;
-
-		if (impl->data[i]) {
-			for (int j = 0; j < ALLOCS_PER_BLOCK; j++) {
-				if (impl->data[i][j]) {
-					MUNMAP(impl->data[i][j], impl->size * ALLOCS_PER_BLOCK);
-					impl->data[i][j] = NULL;
-				}
+	if (impl->data == NULL) return;
+	for (int i = 0; impl->data[i] && i < MEMMAP_ENTRY_PER_LEVEL; i++) {
+		for (int j = 0; impl->data[i][j] && j < MEMMAP_ENTRY_PER_LEVEL; j++) {
+			for (int k = 0; impl->data[i][j][k] && k < MEMMAP_ENTRY_PER_LEVEL;
+				 k++) {
+				MUNMAP(impl->data[i][j][k],
+					   MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+						   BITMAP_SIZE);
+				impl->data[i][j][k] = NULL;
 			}
-			MUNMAP(impl->data[i], MEM_MAP_NUM_CHUNKS);
+			MUNMAP(impl->data[i][j], MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 		}
-		impl->data[i] = NULL;
+		MUNMAP(impl->data[i], MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 	}
+	MUNMAP(impl->data, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 }

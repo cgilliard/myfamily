@@ -84,9 +84,12 @@
 		size_t page_size = getpagesize();                    \
 		(((size_t)size) + page_size - 1) & ~(page_size - 1); \
 	})
-#define MMAP(size)                                              \
-	mmap(NULL, MMAP_ALIGNED_SIZE(size), PROT_READ | PROT_WRITE, \
-		 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0)
+#define MMAP(size)                                                  \
+	({                                                              \
+		/*println("mmap size = %lli", size);*/                      \
+		mmap(NULL, MMAP_ALIGNED_SIZE(size), PROT_READ | PROT_WRITE, \
+			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);                   \
+	})
 #define MUNMAP(ptr, size) munmap(ptr, MMAP_ALIGNED_SIZE(size))
 
 #endif	// _BASE_MACROS__

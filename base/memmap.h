@@ -22,9 +22,7 @@ typedef unsigned int Ptr;
 
 #define null ((Ptr)0)
 
-#define MEM_MAP_NUM_CHUNKS 8192
-#define MEM_MAP_CHUNK_SIZE 65536
-#define MM_IMPL_SIZE (24 + 2 * MEM_MAP_NUM_CHUNKS * sizeof(byte *))
+#define MM_IMPL_SIZE 16
 typedef struct MemMap {
 	byte impl[MM_IMPL_SIZE];
 } MemMap;
