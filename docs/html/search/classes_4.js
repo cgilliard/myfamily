@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['slaballocator_266',['SlabAllocator',['../structSlabAllocator.html',1,'']]],
-  ['slabimpl_267',['SlabImpl',['../structSlabImpl.html',1,'']]]
+  ['slaballocator_262',['SlabAllocator',['../structSlabAllocator.html',1,'']]],
+  ['slaballocatorimpl_263',['SlabAllocatorImpl',['../structSlabAllocatorImpl.html',1,'']]],
+  ['slablist_264',['SlabList',['../structSlabList.html',1,'']]]
 ];

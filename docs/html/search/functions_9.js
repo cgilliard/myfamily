@@ -1,7 +1,10 @@
 var searchData=
 [
-  ['orbtree_5fcreate_342',['orbtree_create',['../orbtree_8c.html#ade1a5d481a6f4f290d558ad4c33db985',1,'orbtree_create(int(*search)(const OrbTreeNode *root, const void *value, OrbTreeNodePair *retval)):&#160;orbtree.c'],['../orbtree_8h.html#ade1a5d481a6f4f290d558ad4c33db985',1,'orbtree_create(int(*search)(const OrbTreeNode *root, const void *value, OrbTreeNodePair *retval)):&#160;orbtree.c']]],
-  ['orbtree_5fget_343',['orbtree_get',['../orbtree_8c.html#ad090224436c7cb3c535d589b4c0300e6',1,'orbtree_get(const OrbTree *ptr, const void *value):&#160;orbtree.c'],['../orbtree_8h.html#ad090224436c7cb3c535d589b4c0300e6',1,'orbtree_get(const OrbTree *ptr, const void *value):&#160;orbtree.c']]],
-  ['orbtree_5fput_344',['orbtree_put',['../orbtree_8c.html#a18bc6e8112340fb174781bcd70c2e6de',1,'orbtree_put(OrbTree *ptr, OrbTreeNode *value):&#160;orbtree.c'],['../orbtree_8h.html#a18bc6e8112340fb174781bcd70c2e6de',1,'orbtree_put(OrbTree *ptr, OrbTreeNode *value):&#160;orbtree.c']]],
-  ['orbtree_5fremove_345',['orbtree_remove',['../orbtree_8c.html#a48ff68e4acd2bc6dc324bab93e79993c',1,'orbtree_remove(const OrbTree *ptr, const void *value):&#160;orbtree.c'],['../orbtree_8h.html#a48ff68e4acd2bc6dc324bab93e79993c',1,'orbtree_remove(const OrbTree *ptr, const void *value):&#160;orbtree.c']]]
+  ['page_5faligned_5fsize_340',['page_aligned_size',['../alloc_8c.html#a87983d758fe77176feda40859d47c04f',1,'page_aligned_size(unsigned int size):&#160;alloc.c'],['../alloc_8h.html#a87983d758fe77176feda40859d47c04f',1,'page_aligned_size(unsigned int size):&#160;alloc.c']]],
+  ['panic_341',['panic',['../print__util_8h.html#ad1f1a1dc0581a11b597453f148106393',1,'print_util.h']]],
+  ['print_342',['print',['../print__util_8c.html#af9d42affcdcfe42b0bbd77e3d3329d8f',1,'print(const char *fmt,...):&#160;print_util.c'],['../print__util_8h.html#af9d42affcdcfe42b0bbd77e3d3329d8f',1,'print(const char *fmt,...):&#160;print_util.c']]],
+  ['print_5ferr_343',['print_err',['../fam__err_8c.html#aa548de6713770c665b2870ec3e2da771',1,'print_err(const byte *text):&#160;fam_err.c'],['../fam__err_8h.html#aa548de6713770c665b2870ec3e2da771',1,'print_err(const byte *text):&#160;fam_err.c']]],
+  ['print_5fhex_344',['print_hex',['../xxdir_8c.html#af45e49d375ec15a3ad54c524c0fb7855',1,'xxdir.c']]],
+  ['println_345',['println',['../print__util_8c.html#a4951884f2d893a1acfbf89338351ec39',1,'println(const char *fmt,...):&#160;print_util.c'],['../print__util_8h.html#abfeec444100395bed0e079442b36007f',1,'println(const char *text,...):&#160;print_util.c']]],
+  ['proc_5ffile_346',['proc_file',['../xxdir_8c.html#ad8071c588b0037587224a40257b7040e',1,'xxdir.c']]]
 ];

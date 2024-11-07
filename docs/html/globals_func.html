@@ -68,6 +68,7 @@ $(function() {
 <li>__attribute__()
 : <a class="el" href="memmap_8c.html#afd02bb0f6a745c39d5e3417493995c71">memmap.c</a>
 , <a class="el" href="print__util_8c.html#a348403b891f117cab71335cda1b91ab4">print_util.c</a>
+, <a class="el" href="slabs_8c.html#afd02bb0f6a745c39d5e3417493995c71">slabs.c</a>
 , <a class="el" href="types_8c.html#afd02bb0f6a745c39d5e3417493995c71">types.c</a>
 </li>
 </ul>
@@ -95,13 +96,6 @@ $(function() {
 <h3><a id="index_e"></a>- e -</h3><ul>
 <li>exit()
 : <a class="el" href="osdef_8h.html#a6f255d924f7a6bb2c4be0c8c2f2d9ce3">osdef.h</a>
-</li>
-</ul>
-
-
-<h3><a id="index_f"></a>- f -</h3><ul>
-<li>free()
-: <a class="el" href="osdef_8h.html#afbedc913aa4651b3c3b4b3aecd9b4711">osdef.h</a>
 </li>
 </ul>
 
@@ -200,21 +194,13 @@ $(function() {
 : <a class="el" href="rbtree__perf_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4">rbtree_perf.c</a>
 , <a class="el" href="xxdir_8c.html#a3c04138a5bfe5d72780bb7e82a18e627">xxdir.c</a>
 </li>
-<li>malloc()
-: <a class="el" href="osdef_8h.html#a7ac38fce3243a7dcf448301ee9ffd392">osdef.h</a>
-</li>
-<li>memcpy()
-: <a class="el" href="osdef_8h.html#a0a3e682eff8f0c6e8adc371f54cc9f3f">osdef.h</a>
-</li>
 <li>memmap_allocate()
 : <a class="el" href="memmap_8c.html#a853d1923879638d81c4297987620e62d">memmap.c</a>
 , <a class="el" href="memmap_8h.html#a853d1923879638d81c4297987620e62d">memmap.h</a>
 </li>
-<li>memmap_allocate_bitmap()
-: <a class="el" href="memmap_8c.html#a437dd899fc93f8da50116bac3d34b42a">memmap.c</a>
-</li>
-<li>memmap_check_data()
-: <a class="el" href="memmap_8c.html#af50fa3d94d20350d31b879b8162cb545">memmap.c</a>
+<li>memmap_cleanup()
+: <a class="el" href="memmap_8c.html#aa7f9879c8069f4a779367ec49075c09c">memmap.c</a>
+, <a class="el" href="memmap_8h.html#aa7f9879c8069f4a779367ec49075c09c">memmap.h</a>
 </li>
 <li>memmap_data()
 : <a class="el" href="memmap_8c.html#a443ca4b6844d6fc83081f2aa7acfe73b">memmap.c</a>
@@ -227,6 +213,9 @@ $(function() {
 <li>memmap_init()
 : <a class="el" href="memmap_8c.html#ad5da420a29bdc405494dff54688a6ad9">memmap.c</a>
 , <a class="el" href="memmap_8h.html#ad5da420a29bdc405494dff54688a6ad9">memmap.h</a>
+</li>
+<li>memmap_itt_for()
+: <a class="el" href="memmap_8c.html#a50b46a8081e67cfa8439d4c7a384a592">memmap.c</a>
 </li>
 <li>memset()
 : <a class="el" href="osdef_8h.html#a1144b39d8415e7ddc56fd9f69a2e3a12">osdef.h</a>
@@ -311,37 +300,30 @@ $(function() {
 
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>slab_allocator_allocate()
-: <a class="el" href="slabs_8h.html#a146bc9771e9d38dad2361c15655dfbb0">slabs.h</a>
-, <a class="el" href="slabs_8c.html#a146bc9771e9d38dad2361c15655dfbb0">slabs.c</a>
+: <a class="el" href="slabs_8c.html#a9c97e57a1863910ddcb639a3bbb711a0">slabs.c</a>
+, <a class="el" href="slabs_8h.html#a9c97e57a1863910ddcb639a3bbb711a0">slabs.h</a>
 </li>
 <li>slab_allocator_cleanup()
 : <a class="el" href="slabs_8c.html#aed1fb06432c426bce7c2d659fca17c17">slabs.c</a>
 , <a class="el" href="slabs_8h.html#aed1fb06432c426bce7c2d659fca17c17">slabs.h</a>
 </li>
 <li>slab_allocator_free()
-: <a class="el" href="slabs_8c.html#a2d950a3787ef4d4b482b086389858695">slabs.c</a>
-, <a class="el" href="slabs_8h.html#a2d950a3787ef4d4b482b086389858695">slabs.h</a>
-</li>
-<li>slab_allocator_free_size()
-: <a class="el" href="slabs_8c.html#ac8539af93b3cfe7776689675e6e746f7">slabs.c</a>
+: <a class="el" href="slabs_8c.html#a6919568614f431e1b0d224fa5a38f46a">slabs.c</a>
+, <a class="el" href="slabs_8h.html#a6919568614f431e1b0d224fa5a38f46a">slabs.h</a>
 </li>
 <li>slab_allocator_grow()
-: <a class="el" href="slabs_8c.html#a9ed43f2d0b6c39f0abaac1e7f6b7f5b1">slabs.c</a>
+: <a class="el" href="slabs_8c.html#aa8ae86f1b3fd9ff28fdd3315bc600bff">slabs.c</a>
 </li>
 <li>slab_allocator_init()
-: <a class="el" href="slabs_8c.html#af21df14f8b6e6097b4f3f54ae7c81d5e">slabs.c</a>
-, <a class="el" href="slabs_8h.html#af21df14f8b6e6097b4f3f54ae7c81d5e">slabs.h</a>
-</li>
-<li>slab_allocator_total_slabs()
-: <a class="el" href="slabs_8c.html#a668fc90a6c54a26dc218a378909df34c">slabs.c</a>
+: <a class="el" href="slabs_8c.html#a57886e4ddaa24b57b989e0e283eb5221">slabs.c</a>
+, <a class="el" href="slabs_8h.html#a57886e4ddaa24b57b989e0e283eb5221">slabs.h</a>
 </li>
 <li>slab_aux()
-: <a class="el" href="slabs_8c.html#a619a168615e58549936c51dfa68cd905">slabs.c</a>
-, <a class="el" href="slabs_8h.html#a619a168615e58549936c51dfa68cd905">slabs.h</a>
+: <a class="el" href="slabs_8h.html#a34390b3e1b4d08b130aa604636f05a7e">slabs.h</a>
 </li>
 <li>slab_get()
-: <a class="el" href="slabs_8c.html#aa569164a5bc28a4a9e02057a58c982cd">slabs.c</a>
-, <a class="el" href="slabs_8h.html#aa569164a5bc28a4a9e02057a58c982cd">slabs.h</a>
+: <a class="el" href="slabs_8c.html#a45a91fcf7cfb03220fd4d42674057229">slabs.c</a>
+, <a class="el" href="slabs_8h.html#a7f0493757418c1b5772c4cae8e70ddcb">slabs.h</a>
 </li>
 <li>Suite()
 : <a class="el" href="base_2test_8c.html#afee16076244696ca1bf02f4074ce4afb">test.c</a>

@@ -326,155 +326,233 @@
         -:   13:// limitations under the License.
         -:   14:
         -:   15:#include <base/fam_err.h>
-        -:   16:#include <base/lock.h>
-        -:   17:#include <base/memmap.h>
-        -:   18:#include <base/osdef.h>
-        -:   19:#include <base/print_util.h>
-        -:   20:
-        -:   21:typedef struct MemMapImpl {
-        -:   22:	byte **data[MEM_MAP_NUM_CHUNKS];
-        -:   23:	unsigned long long *bitmap[MEM_MAP_NUM_CHUNKS];
-        -:   24:	unsigned int chunks;
-        -:   25:	unsigned int size;
-        -:   26:	unsigned int chunk_size;
-        -:   27:	Lock lock;
-        -:   28:} MemMapImpl;
-        -:   29:
-       14:   30:void __attribute__((constructor)) __memmap_check_sizes() {
-        -:   31:	if (sizeof(MemMapImpl) != sizeof(MemMap))
-        -:   32:		panic("sizeof(MemMapImpl) (%i) != sizeof(MemMap) (%i)",
-        -:   33:			  sizeof(MemMapImpl), sizeof(MemMap));
-       14:   34:}
-        -:   35:
-    20000:   36:void *memmap_data(const MemMap *mm, Ptr ptr) {
-    20000:   37:	const MemMapImpl *impl = (const MemMapImpl *)mm;
-    20000:   38:	byte *block = impl->data[ptr >> 19][ptr >> 6];
-    20000:   39:	return (byte *)(block + ((ptr & 0x3F) * impl->size));
-        -:   40:}
-        1:   41:int memmap_init(MemMap *mm, unsigned int size) {
-        1:   42:	MemMapImpl *impl = (MemMapImpl *)mm;
-        1:   43:	impl->size = size;
-        1:   44:	impl->chunks = 0;
-        1:   45:	impl->chunk_size = 128;
-        1:   46:	impl->lock = INIT_LOCK;
-        -:   47:
-        1:   48:	memset(impl->bitmap, '\0',
-        -:   49:		   MEM_MAP_NUM_CHUNKS * sizeof(unsigned long long *));
-        1:   50:	memset(impl->data, '\0', MEM_MAP_NUM_CHUNKS * sizeof(byte **));
-        1:   51:	return 0;
-        -:   52:}
-        -:   53:
-   786574:   54:int memmap_allocate_bitmap(MemMapImpl *impl, int i) {
-   786574:   55:	if (impl->bitmap[i] == NULL) {
-        1:   56:		impl->bitmap[i] = malloc(MEM_MAP_CHUNK_SIZE);
-        1:   57:		if (impl->bitmap[i] == NULL) {
-    #####:   58:			SetErr(AllocErr);
-    #####:   59:			return -1;
-        -:   60:		}
-        1:   61:		memset(impl->bitmap[i], '\0', MEM_MAP_CHUNK_SIZE);
-        -:   62:		// set null to allocated so we don't assign it
-        1:   63:		if (i == 0) impl->bitmap[i][0] = 0x1;
-        -:   64:	}
-   786574:   65:	return 0;
-        -:   66:}
-        -:   67:
-    10004:   68:int memmap_check_data(MemMapImpl *impl, int i, int j, int k) {
-        -:   69:	byte **data;
-    10004:   70:	bool mallocked = false;
-    10004:   71:	byte **nulldata = NULL;
-        -:   72:
-        -:   73:	do {
-   10004*:   74:		if (mallocked) free(data);
-    10004:   75:		data = ALOAD(&impl->data[i]);
-    10004:   76:		if (data == NULL) {
-        1:   77:			int page_size = getpagesize();
-        1:   78:			int slots_per_page = page_size / impl->size;
-       1*:   79:			if (slots_per_page == 0) slots_per_page = 1;
-        1:   80:			int alloc_size = sizeof(byte *) * (UINT32_MAX / (impl->size * 8)) /
-        -:   81:							 slots_per_page;
-        1:   82:			data = malloc(alloc_size);
-        1:   83:			if (data == NULL) {
-    #####:   84:				SetErr(AllocErr);
-    #####:   85:				return -1;
-        -:   86:			}
-        1:   87:			memset(data, '\0', alloc_size);
-        1:   88:			mallocked = true;
-        -:   89:		} else
-    10003:   90:			break;
-        1:   91:	} while (!CAS(&impl->data[i], &nulldata, data));
-        -:   92:
-        -:   93:	// now check our block
-        -:   94:	byte *block;
-    10004:   95:	byte *nullblock = NULL;
-    10004:   96:	mallocked = false;
-        -:   97:	do {
-    10004:   98:		if (mallocked) {
-    #####:   99:			size_t page_size = getpagesize();
-    #####:  100:			size_t aligned_size =
-    #####:  101:				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
-    #####:  102:			munmap(block, aligned_size);
-        -:  103:		}
-    10004:  104:		block = ALOAD(impl->data[i] + j);
-    10004:  105:		if (block == NULL) {
-      157:  106:			size_t page_size = getpagesize();
-      157:  107:			int slots_per_page = page_size / impl->size;
-     157*:  108:			if (slots_per_page == 0) slots_per_page = 1;
-      157:  109:			int alloc_size = sizeof(byte *) * (UINT32_MAX / (impl->size * 8)) /
-        -:  110:							 slots_per_page;
-        -:  111:
-      157:  112:			size_t aligned_size =
-      157:  113:				((size_t)impl->size + page_size - 1) & ~(page_size - 1);
-      157:  114:			block = mmap(NULL, aligned_size, PROT_READ | PROT_WRITE,
-        -:  115:						 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-      157:  116:			if (block == NULL) {
+        -:   16:#include <base/memmap.h>
+        -:   17:#include <base/osdef.h>
+        -:   18:#include <base/print_util.h>
+        -:   19:
+        -:   20:#define MEMMAP_ENTRY_PER_LEVEL 256
+        -:   21:#define BITMAP_SIZE 32
+        -:   22:#define MEMMAP_SHIFT 8
+        -:   23:
+        -:   24:_Thread_local int last_i = 0, last_j = 0, last_k = 0, last_l = 0;
+        -:   25:
+        -:   26:typedef struct MemMapImpl {
+        -:   27:	byte ****data;
+        -:   28:	unsigned int size;
+        -:   29:} MemMapImpl;
+        -:   30:
+       14:   31:void __attribute__((constructor)) __memmap_check_sizes() {
+        -:   32:	if (sizeof(MemMapImpl) != sizeof(MemMap))
+        -:   33:		panic("sizeof(MemMapImpl) (%i) != sizeof(MemMap) (%i)",
+        -:   34:			  sizeof(MemMapImpl), sizeof(MemMap));
+       14:   35:}
+        -:   36:
+ 12053890:   37:unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
+        -:   38:								   int l) {
+ 12053890:   39:	bool mmapped = false;
+ 12053890:   40:	byte ****nullvalue1 = NULL;
+ 12053890:   41:	byte ****data1 = NULL;
+        -:   42:	// load data
+        -:   43:	do {
+ 12053890:   44:		if (mmapped) {
+    #####:   45:			MUNMAP(data1, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+        -:   46:		}
+ 12053890:   47:		data1 = ALOAD(&impl->data);
+ 12053890:   48:		if (data1 == NULL) {
+        5:   49:			data1 = MMAP(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+        5:   50:			if (data1 == NULL) {
+    #####:   51:				SetErr(AllocErr);
+    #####:   52:				return NULL;
+        -:   53:			}
+        5:   54:			mmapped = true;
+        5:   55:			memset(data1, '\0', MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+        -:   56:		} else
+ 12053885:   57:			break;
+        5:   58:	} while (!CAS(&impl->data, &nullvalue1, data1));
+        -:   59:
+        -:   60:	// load second level
+ 12053890:   61:	byte ***nullvalue2 = NULL;
+        -:   62:	byte ***data2;
+ 12053890:   63:	mmapped = false;
+        -:   64:	do {
+ 12053890:   65:		if (mmapped) {
+    #####:   66:			MUNMAP(data2, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+        -:   67:		}
+ 12053890:   68:		data2 = ALOAD(&impl->data[i]);
+ 12053890:   69:		if (data2 == NULL) {
+        5:   70:			data2 = MMAP(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+        5:   71:			if (data2 == NULL) {
+    #####:   72:				SetErr(AllocErr);
+    #####:   73:				return NULL;
+        -:   74:			}
+        5:   75:			mmapped = true;
+        5:   76:			memset(data2, '\0', MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+        -:   77:		} else
+ 12053885:   78:			break;
+        5:   79:	} while (!CAS(&impl->data[i], &nullvalue2, data2));
+        -:   80:
+        -:   81:	// load third level
+ 12053890:   82:	byte **nullvalue3 = NULL;
+        -:   83:	byte **data3;
+ 12053890:   84:	mmapped = false;
+        -:   85:	do {
+ 12053890:   86:		if (mmapped) {
+    #####:   87:			MUNMAP(data3, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+        -:   88:		}
+ 12053890:   89:		data3 = ALOAD(&impl->data[i][j]);
+ 12053890:   90:		if (data3 == NULL) {
+        5:   91:			data3 = MMAP(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+        5:   92:			if (data3 == NULL) {
+    #####:   93:				SetErr(AllocErr);
+    #####:   94:				return NULL;
+        -:   95:			}
+        5:   96:			mmapped = true;
+        5:   97:			memset(data3, '\0', MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+        -:   98:		} else
+ 12053885:   99:			break;
+        5:  100:	} while (!CAS(&impl->data[i][j], &nullvalue3, data3));
+        -:  101:
+        -:  102:	// load fourth and final level
+ 12053890:  103:	byte *nullvalue4 = NULL;
+        -:  104:	byte *data4;
+ 12053890:  105:	mmapped = false;
+        -:  106:	// add 32 bytes for the bitmap
+        -:  107:	do {
+ 12053890:  108:		if (mmapped) {
+    #####:  109:			MUNMAP(data4, MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+        -:  110:							  BITMAP_SIZE);
+        -:  111:		}
+ 12053890:  112:		data4 = ALOAD(&impl->data[i][j][k]);
+ 12053890:  113:		if (data4 == NULL) {
+      211:  114:			data4 = MMAP(MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+        -:  115:						 BITMAP_SIZE);
+      211:  116:			if (data4 == NULL) {
     #####:  117:				SetErr(AllocErr);
-    #####:  118:				return -1;
+    #####:  118:				return NULL;
         -:  119:			}
-      157:  120:			mallocked = true;
-        -:  121:		} else
-     9847:  122:			break;
-      157:  123:	} while (!CAS(impl->data[i] + j, &nullblock, block));
-        -:  124:
-    10004:  125:	return 0;
-        -:  126:}
-        -:  127:
-    10004:  128:Ptr memmap_allocate(MemMap *mm) {
-        -:  129:	int i, j, k;
-        -:  130:	unsigned long long *itt, nitt, v;
-        -:  131:	MemMapImpl *impl;
-        -:  132:
-    10004:  133:	i = j = k = 0;
-    10004:  134:	impl = (MemMapImpl *)mm;
-        -:  135:
-        -:  136:	do {
-        -:  137:		loop {
-  786574*:  138:			if (memmap_allocate_bitmap(impl, i)) return null;
-   786574:  139:			itt = (impl->bitmap[i] + j);
-   786574:  140:			if ((v = ALOAD(itt)) != ((unsigned long long)0) - 1) break;
-   776570:  141:			if (++j >= MEM_MAP_NUM_CHUNKS) {
-    #####:  142:				j = 0;
-    #####:  143:				i++;
-        -:  144:			}
-        -:  145:		}
-    10004:  146:		k = 0;
-   324707:  147:		while ((v & (0x1ULL << k)) != 0) k++;
-    10004:  148:		nitt = v | (0x1ULL << k);
-   10004*:  149:		if (memmap_check_data(impl, i, j, k)) return null;
-    10004:  150:	} while (!CAS(itt, &v, nitt));
-    10004:  151:	return ((i << 19) | (j << 6) | k);
-        -:  152:}
-        -:  153:
-        3:  154:void memmap_free(MemMap *mm, Ptr ptr) {
-       3*:  155:	if (ptr == null) panic("attempt to free null!");
-        3:  156:	MemMapImpl *impl = (MemMapImpl *)mm;
-        -:  157:	unsigned long long nv, *v, vo;
-        -:  158:	do {
-        3:  159:		v = impl->bitmap[ptr >> 19] + (ptr >> 6);
-        3:  160:		vo = ALOAD((unsigned long long *)(v));
-       3*:  161:		if ((vo & (0x1ULL << (ptr & 0x3F))) == 0) panic("double free attempt!");
-        3:  162:		nv = vo & ~(0x1ULL << (ptr & 0x3F));
-        3:  163:	} while (!CAS(&*v, &vo, nv));
-        3:  164:}
+      211:  120:			mmapped = true;
+      211:  121:			memset(data4, '\0',
+      211:  122:				   MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+        -:  123:					   BITMAP_SIZE);
+        -:  124:			// set Ptr=0 to allocated so we never return null / also reserve the
+        -:  125:			// first value for other purposes
+      211:  126:			if (i == 0 && j == 0 && k == 0) data4[0] = 0x3;
+        -:  127:		} else
+ 12053679:  128:			break;
+      211:  129:	} while (!CAS(&impl->data[i][j][k], &nullvalue4, data4));
+        -:  130:
+        -:  131:	// return the lth item at the begining of the data array (32 bytes reserved)
+        -:  132:	// l is between 0-3.
+ 12053890:  133:	unsigned long long *ret = ((unsigned long long *)impl->data[i][j][k]) + l;
+ 12053890:  134:	return ret;
+        -:  135:}
+        -:  136:
+210071249:  137:void *memmap_data(const MemMap *mm, Ptr ptr) {
+210071249:  138:	const MemMapImpl *impl = (const MemMapImpl *)mm;
+210071249:  139:	byte *block = impl->data[ptr >> (MEMMAP_SHIFT * 3)]
+210071249:  140:							[(ptr >> (MEMMAP_SHIFT * 2)) & 0xFF]
+210071249:  141:							[(ptr >> (MEMMAP_SHIFT)) & 0xFF];
+210071249:  142:	return (byte *)(block + ((ptr & 0xFF) * impl->size + 32));
+        -:  143:}
+        5:  144:int memmap_init(MemMap *mm, unsigned int size) {
+        5:  145:	MemMapImpl *impl = (MemMapImpl *)mm;
+        5:  146:	impl->size = size;
+        5:  147:	impl->data = NULL;
+        5:  148:	return 0;
+        -:  149:}
+        -:  150:
+ 12053017:  151:Ptr memmap_allocate(MemMap *mm) {
+ 12053017:  152:	Ptr ret = null;
+ 12053017:  153:	MemMapImpl *impl = (MemMapImpl *)mm;
+ 12053017:  154:	int i = last_i, j = last_j, k = last_k, l = last_l;
+        -:  155:	unsigned long long *current, desired, v;
+        -:  156:
+        -:  157:	do {
+        -:  158:		loop {
+        -:  159:			// load section of bitmap
+ 12053890:  160:			current = memmap_itt_for(impl, i, j, k, l);
+12053890*:  161:			if (current == NULL) return null;
+ 12053890:  162:			v = ALOAD(current);
+ 12053890:  163:			if (v != ((unsigned long long)0) - 1) break;
+        -:  164:			// l is 4 because 64 bits are used in the atomic load
+        -:  165:			// the other 4 combinations cover all 256 entries
+      873:  166:			if (++l >= 4) {
+      217:  167:				l = 0;
+      217:  168:				if (++k >= MEMMAP_ENTRY_PER_LEVEL) {
+    #####:  169:					k = 0;
+    #####:  170:					if (++j >= MEMMAP_ENTRY_PER_LEVEL) {
+    #####:  171:						j = 0;
+    #####:  172:						i++;
+    #####:  173:						if (i == last_i) {
+    #####:  174:							SetErr(CapacityExceeded);
+    #####:  175:							return null;
+        -:  176:						}
+        -:  177:					}
+        -:  178:				}
+        -:  179:			}
+        -:  180:		}
+        -:  181:
+        -:  182:		// find open bit
+        -:  183:		int x;
+ 55722237:  184:		for (x = 0; (v & (0x1ULL << x)) != 0; x++);
+ 12053017:  185:		ret = (i << (MEMMAP_SHIFT * 3)) | (j << (2 * MEMMAP_SHIFT)) |
+ 12053017:  186:			  (k << MEMMAP_SHIFT) | (l << 6) | x;
+        -:  187:		// set bit
+ 12053017:  188:		desired = v | (0x1ULL << x);
+ 12053017:  189:	} while (!CAS(current, &v, desired));
+        -:  190:
+ 12053017:  191:	last_i = i;
+ 12053017:  192:	last_j = j;
+ 12053017:  193:	last_k = k;
+ 12053017:  194:	last_l = l;
+        -:  195:
+ 12053017:  196:	return ret;
+        -:  197:}
+        -:  198:
+ 12050016:  199:void memmap_free(MemMap *mm, Ptr ptr) {
+12050016*:  200:	if (ptr == null) panic("attempt to free null!");
+12050016*:  201:	if (ptr == ptr_reserved) panic("attempt to free a reserved ptr = 1");
+12050016*:  202:	if (mm == NULL) panic("invalid (null) memmap");
+ 12050016:  203:	MemMapImpl *impl = (MemMapImpl *)mm;
+        -:  204:	unsigned long long nv, *v, vo;
+        -:  205:	int i, j, k, l;
+        -:  206:
+ 12050016:  207:	i = (ptr >> (MEMMAP_SHIFT * 3)) & 0xFF;
+ 12050016:  208:	j = (ptr >> (MEMMAP_SHIFT * 2)) & 0xFF;
+ 12050016:  209:	k = (ptr >> (MEMMAP_SHIFT)) & 0xFF;
+ 12050016:  210:	l = (ptr >> 6) & 0x3;
+        -:  211:
+        -:  212:	do {
+ 12050016:  213:		v = (unsigned long long *)impl->data[i][j][k] + l;
+ 12050016:  214:		vo = ALOAD((unsigned long long *)(v));
+12050016*:  215:		if ((vo & (0x1ULL << (ptr & 0x3F))) == 0) panic("double free attempt!");
+ 12050016:  216:		nv = vo & ~(0x1ULL << (ptr & 0x3F));
+ 12050016:  217:	} while (!CAS(&*v, &vo, nv));
+        -:  218:
+ 12050016:  219:	last_i = i;
+ 12050016:  220:	last_j = j;
+ 12050016:  221:	last_k = k;
+ 12050016:  222:	last_l = 0;
+ 12050016:  223:}
+        -:  224:
+        5:  225:void memmap_cleanup(MemMap *mm) {
+        5:  226:	MemMapImpl *impl = (MemMapImpl *)mm;
+       5*:  227:	if (impl->data == NULL) return;
+       10:  228:	for (int i = 0; impl->data[i] && i < MEMMAP_ENTRY_PER_LEVEL; i++) {
+       10:  229:		for (int j = 0; impl->data[i][j] && j < MEMMAP_ENTRY_PER_LEVEL; j++) {
+      216:  230:			for (int k = 0; impl->data[i][j][k] && k < MEMMAP_ENTRY_PER_LEVEL;
+      211:  231:				 k++) {
+      211:  232:				MUNMAP(impl->data[i][j][k],
+        -:  233:					   MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+        -:  234:						   BITMAP_SIZE);
+      211:  235:				impl->data[i][j][k] = NULL;
+        -:  236:			}
+        5:  237:			MUNMAP(impl->data[i][j], MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+        -:  238:		}
+        5:  239:		MUNMAP(impl->data[i], MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+        -:  240:	}
+        5:  241:	MUNMAP(impl->data, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+        -:  242:}
         -:    0:Source:orbtree.c
         -:    0:Graph:orbtree.gcno
         -:    0:Data:orbtree.gcda
@@ -589,130 +667,192 @@
         -:   20:#include <base/print_util.h>
         -:   21:#include <base/slabs.h>
         -:   22:
-        -:   23:typedef struct SlabImpl {
-        -:   24:	struct SlabImpl *next;
-        -:   25:	byte data[];
-        -:   26:} SlabImpl;
-        -:   27:
- 83886081:   28:byte *slab_get(Slab s) {
- 83886081:   29:	return s->data;
-        -:   30:}
-        -:   31:
-        2:   32:unsigned long long *slab_aux(Slab s) {
-        2:   33:	return (unsigned long long *)&s->next;
-        -:   34:}
-        -:   35:
-        -:   36:SlabImpl slab_allocated_impl = {.next = NULL};
-        -:   37:Slab slab_allocated_reqd = &slab_allocated_impl;
-        -:   38:#define SLAB_ALLOCATED slab_allocated_reqd
-        -:   39:
-      110:   40:Slab slab_allocator_grow(SlabAllocator *sa) {
-      110:   41:	if (AADD(&sa->total_slabs, 1) > sa->max_total_slabs) {
-    #####:   42:		ASUB(&sa->total_slabs, 1);
-    #####:   43:		SetErr(CapacityExceeded);
-    #####:   44:		return NULL;
-        -:   45:	}
-      110:   46:	Slab ret = malloc(sizeof(SlabImpl) + sa->slab_size);
-      110:   47:	if (ret == NULL) {
-    #####:   48:		SetErr(AllocErr);
-    #####:   49:		ASUB(&sa->total_slabs, 1);
+        -:   23:static Ptr RESERVED_PTR = 1;
+        -:   24:
+        -:   25:typedef struct SlabList {
+        -:   26:	Ptr next;
+        -:   27:	byte data[];
+        -:   28:} SlabList;
+        -:   29:
+        -:   30:typedef struct SlabAllocatorImpl {
+        -:   31:	MemMap mm;
+        -:   32:	unsigned int slab_size;
+        -:   33:	unsigned int max_free_slabs;
+        -:   34:	unsigned int max_total_slabs;
+        -:   35:	unsigned int free_size;
+        -:   36:	unsigned int total_slabs;
+        -:   37:	Ptr head;
+        -:   38:	Ptr tail;
+        -:   39:} SlabAllocatorImpl;
+        -:   40:
+       14:   41:void __attribute__((constructor)) __slabs_check_sizes() {
+        -:   42:	if (sizeof(SlabAllocatorImpl) != sizeof(SlabAllocator))
+        -:   43:		panic("sizeof(SlabAllocatorImpl) (%i) != sizeof(SlabAllocator) (%i)",
+        -:   44:			  sizeof(SlabAllocatorImpl), sizeof(SlabAllocator));
+       14:   45:}
+        -:   46:
+   100010:   47:byte *slab_get(SlabAllocator *sa, Ptr ptr) {
+   100010:   48:	if (sa == NULL || nil(ptr)) {
+    #####:   49:		SetErr(IllegalArgument);
     #####:   50:		return NULL;
         -:   51:	}
-      110:   52:	if (sa->free_check) ret->next = SLAB_ALLOCATED;
-      110:   53:	return ret;
-        -:   54:}
-        -:   55:
-        3:   56:void slab_allocator_cleanup(SlabAllocator *sa) {
-        3:   57:	Slab itt = sa->head;
-      112:   58:	while (itt) {
-      109:   59:		Slab to_delete = itt;
-      109:   60:		itt = itt->next;
-      109:   61:		free(to_delete);
-        -:   62:	}
-        3:   63:}
-        -:   64:
-        -:   65:// initialize slab allocator as a michael-scott queue with specified slab_size
-        4:   66:int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
-        -:   67:						unsigned long long max_free_slabs,
-        -:   68:						unsigned long long max_total_slabs, bool free_check) {
-        4:   69:	Slab s = malloc(sizeof(SlabImpl) + slab_size);
-        4:   70:	if (s == NULL) {
-    #####:   71:		SetErr(AllocErr);
-    #####:   72:		return -1;
-        -:   73:	}
-        4:   74:	ASTORE(&sa->free_size, 1);
-        4:   75:	ASTORE(&sa->total_slabs, 1);
-        4:   76:	sa->slab_size = slab_size;
-        4:   77:	sa->max_free_slabs = max_free_slabs;
-        4:   78:	sa->max_total_slabs = max_total_slabs;
-        4:   79:	sa->free_check = free_check;
-        4:   80:	s->next = NULL;
-        4:   81:	sa->head = sa->tail = s;
-        4:   82:	return 0;
-        -:   83:}
-        -:   84:
-        -:   85:// allocate is dequeue. If null "grow" by mallocing a slab.
- 41943151:   86:Slab slab_allocator_allocate(SlabAllocator *sa) {
-        -:   87:	Slab head, tail, next, ret;
-        -:   88:	loop {
- 41943151:   89:		head = sa->head;
- 41943151:   90:		tail = sa->tail;
- 41943151:   91:		next = head->next;
- 41943151:   92:		if (head == sa->head) {
- 41943151:   93:			if (head == tail) {
-      110:   94:				if (next == NULL) {
-      110:   95:					ret = slab_allocator_grow(sa);
-      110:   96:					return ret;
-        -:   97:				}
-    #####:   98:				CAS_SEQ(&sa->tail, &tail, next);
-        -:   99:			} else {
- 41943041:  100:				ret = head;
- 41943041:  101:				if (CAS_SEQ(&sa->head, &head, next)) break;
-        -:  102:			}
-        -:  103:		}
-        -:  104:	}
+   100010:   52:	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+   100010:   53:	SlabList *sl = memmap_data(&impl->mm, ptr);
+   100010:   54:	if (sl == NULL) {
+    #####:   55:		SetErr(IllegalState);
+    #####:   56:		return NULL;
+        -:   57:	}
+   100010:   58:	return sl->data;
+        -:   59:}
+        -:   60:
+    50013:   61:Ptr slab_allocator_grow(SlabAllocatorImpl *impl) {
+    50013:   62:	if (AADD(&impl->total_slabs, 1) > impl->max_total_slabs) {
+    #####:   63:		ASUB(&impl->total_slabs, 1);
+    #####:   64:		SetErr(CapacityExceeded);
+    #####:   65:		return null;
+        -:   66:	}
+    50013:   67:	Ptr ret = memmap_allocate(&impl->mm);
+   50013*:   68:	if (nil(ret)) return null;
+    50013:   69:	SlabList *sl = memmap_data(&impl->mm, ret);
+   50013*:   70:	if (sl == NULL) return null;
+    50013:   71:	sl->next = ptr_reserved;
+        -:   72:
+    50013:   73:	return ret;
+        -:   74:}
+        -:   75:
+        3:   76:int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
+        -:   77:						unsigned long long max_free_slabs,
+        -:   78:						unsigned long long max_total_slabs) {
+        3:   79:	if (sa == NULL || slab_size == 0 || max_free_slabs < 5 ||
+        -:   80:		max_total_slabs < 5) {
+    #####:   81:		SetErr(IllegalArgument);
+    #####:   82:		return -1;
+        -:   83:	}
+        3:   84:	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+        -:   85:
+       3*:   86:	if (memmap_init(&impl->mm, slab_size + sizeof(SlabList))) return -1;
+        3:   87:	ASTORE(&impl->free_size, 1);
+        3:   88:	ASTORE(&impl->total_slabs, 0);
+        3:   89:	impl->slab_size = slab_size;
+        3:   90:	impl->max_free_slabs = max_free_slabs;
+        3:   91:	impl->max_total_slabs = max_total_slabs;
+        -:   92:
+        3:   93:	Ptr ptr = slab_allocator_grow(impl);
+        3:   94:	if (ptr == null) {
+    #####:   95:		return -1;
+        -:   96:	}
+        -:   97:
+        3:   98:	SlabList *sl = memmap_data(&impl->mm, ptr);
+        3:   99:	if (sl == NULL) {
+    #####:  100:		SetErr(IllegalState);
+    #####:  101:		return -1;
+        -:  102:	}
+        3:  103:	sl->next = null;
+        3:  104:	impl->head = impl->tail = ptr;
         -:  105:
- 41943041:  106:	ASUB(&sa->free_size, 1);
- 41943041:  107:	if (sa->free_check) ASTORE(&ret->next, SLAB_ALLOCATED);
- 41943041:  108:	return ret;
-        -:  109:}
-        -:  110:
-        -:  111:// free is enqueue.
- 41943148:  112:void slab_allocator_free(SlabAllocator *sa, Slab slab) {
- 41943148:  113:	if (sa->free_check && !CAS(&slab->next, &SLAB_ALLOCATED, NULL))
-    #####:  114:		panic("Double free attempt! %p %p", &slab->next, &SLAB_ALLOCATED);
- 41943148:  115:	else if (!sa->free_check)
-        2:  116:		slab->next = NULL;
- 41943148:  117:	if (AADD(&sa->free_size, 1) > sa->max_free_slabs) {
-    #####:  118:		free(slab);
-    #####:  119:		ASUB(&sa->total_slabs, 1);
-    #####:  120:		return;
-        -:  121:	}
-        -:  122:
-        -:  123:	Slab tail, next;
+        3:  106:	return 0;
+        -:  107:}
+        -:  108:
+        3:  109:void slab_allocator_cleanup(SlabAllocator *sa) {
+       3*:  110:	if (sa == NULL) panic("slab_allocator_cleanup with sa = NULL!");
+        -:  111:
+        3:  112:	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+        3:  113:	Ptr itt = impl->head;
+    50016:  114:	while (itt) {
+    50013:  115:		Ptr to_delete = itt;
+    50013:  116:		SlabList *sl = memmap_data(&impl->mm, itt);
+   50013*:  117:		if (sl == NULL) panic("slab_allocator_cleanup: memmap_data ret NULL!");
+    50013:  118:		itt = sl->next;
+    50013:  119:		memmap_free(&impl->mm, to_delete);
+        -:  120:	}
+        -:  121:
+        3:  122:	memmap_cleanup(&impl->mm);
+        3:  123:}
         -:  124:
-        -:  125:	loop {
- 41943148:  126:		tail = sa->tail;
- 41943148:  127:		next = tail->next;
- 41943148:  128:		if (tail == sa->tail) {
- 41943148:  129:			if (next == NULL) {
- 41943148:  130:				if (CAS_SEQ(&tail->next, &next, slab)) {
- 41943148:  131:					CAS_SEQ(&sa->tail, &tail, slab);
- 41943148:  132:					break;
-        -:  133:				}
-        -:  134:			} else {
-    #####:  135:				CAS_SEQ(&sa->tail, &tail, next);
-        -:  136:			}
-        -:  137:		}
-        -:  138:	}
-        -:  139:}
-        -:  140:
- 10485764:  141:unsigned long long slab_allocator_free_size(SlabAllocator *sa) {
- 10485764:  142:	return ALOAD(&sa->free_size);
-        -:  143:}
- 10485764:  144:unsigned long long slab_allocator_total_slabs(SlabAllocator *sa) {
- 10485764:  145:	return ALOAD(&sa->total_slabs);
-        -:  146:}
+ 52478805:  125:Ptr slab_allocator_allocate(SlabAllocator *sa) {
+ 52478805:  126:	if (sa == NULL) {
+    #####:  127:		SetErr(IllegalArgument);
+    #####:  128:		return null;
+        -:  129:	}
+ 52478805:  130:	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+        -:  131:	Ptr head, tail, next, ret;
+    #####:  132:	loop {
+ 52478805:  133:		head = impl->head;
+ 52478805:  134:		tail = impl->tail;
+ 52478805:  135:		SlabList *sl = memmap_data(&impl->mm, head);
+ 52478805:  136:		if (sl == NULL) {
+    #####:  137:			SetErr(IllegalState);
+    #####:  138:			return null;
+        -:  139:		}
+ 52478805:  140:		next = sl->next;
+ 52478805:  141:		if (head == impl->head) {
+ 52478805:  142:			if (head == tail) {
+    50010:  143:				if (next == null) {
+    50010:  144:					return slab_allocator_grow(impl);
+        -:  145:				}
+    #####:  146:				CAS_SEQ(&impl->tail, &tail, next);
+        -:  147:			} else {
+ 52428795:  148:				ret = head;
+ 52428795:  149:				if (CAS_SEQ(&impl->head, &head, next)) break;
+        -:  150:			}
+        -:  151:		}
+        -:  152:	}
+        -:  153:
+ 52428795:  154:	ASUB(&impl->free_size, 1);
+ 52428795:  155:	SlabList *sl = memmap_data(&impl->mm, ret);
+ 52428795:  156:	if (sl == NULL) {
+    #####:  157:		SetErr(IllegalState);
+    #####:  158:		return null;
+        -:  159:	}
+ 52428795:  160:	sl->next = ptr_reserved;
+ 52428795:  161:	return ret;
+        -:  162:}
+ 52478805:  163:void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
+52478805*:  164:	if (sa == NULL) panic("slab_allocator_free with sa = NULL!");
+ 52478805:  165:	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+        -:  166:
+ 52478805:  167:	SlabList *slptr = memmap_data(&impl->mm, ptr);
+52478805*:  168:	if (slptr == NULL) panic("cannot retrieve data for a freed ptr!");
+        -:  169:
+ 52478805:  170:	if (!CAS(&slptr->next, &RESERVED_PTR, null))
+    #####:  171:		panic("Double free attempt! ptr=%u", ptr);
+ 52478805:  172:	if (AADD(&impl->free_size, 1) > impl->max_free_slabs) {
+    #####:  173:		memmap_free(&impl->mm, ptr);
+    #####:  174:		ASUB(&impl->total_slabs, 1);
+    #####:  175:		return;
+        -:  176:	}
+        -:  177:
+        -:  178:	Ptr tail, next;
+        -:  179:
+    #####:  180:	loop {
+ 52478805:  181:		tail = impl->tail;
+ 52478805:  182:		SlabList *sltail = memmap_data(&impl->mm, tail);
+52478805*:  183:		if (sltail == NULL) panic("cannot retrieve data for tail!");
+ 52478805:  184:		next = sltail->next;
+ 52478805:  185:		if (tail == impl->tail) {
+ 52478805:  186:			if (next == null) {
+ 52478805:  187:				if (CAS_SEQ(&sltail->next, &next, ptr)) {
+ 52478805:  188:					CAS_SEQ(&impl->tail, &tail, ptr);
+ 52478805:  189:					break;
+        -:  190:				}
+        -:  191:			} else {
+    #####:  192:				CAS_SEQ(&impl->tail, &tail, next);
+        -:  193:			}
+        -:  194:		}
+        -:  195:	}
+        -:  196:}
+        -:  197:
+        -:  198:#ifdef TEST
+    #####:  199:unsigned long long slab_allocator_free_size(SlabAllocator *sa) {
+    #####:  200:	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+    #####:  201:	return ALOAD(&impl->free_size);
+        -:  202:}
+        -:  203:
+    #####:  204:unsigned long long slab_allocator_total_slabs(SlabAllocator *sa) {
+    #####:  205:	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+    #####:  206:	return ALOAD(&impl->total_slabs);
+        -:  207:}
+        -:  208:#endif	// TEST
         -:    0:Source:types.c
         -:    0:Graph:types.gcno
         -:    0:Data:types.gcda

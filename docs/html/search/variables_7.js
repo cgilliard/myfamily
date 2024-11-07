@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['impl_391',['impl',['../structMemMap.html#a65ed9d5eff88c6fb48d902ee00d1fd38',1,'MemMap']]],
-  ['is_5fright_392',['is_right',['../structOrbTreeNodePair.html#a696a0f2b0f19e385bacf112d95cf6527',1,'OrbTreeNodePair']]]
+  ['max_5ffree_5fslabs_385',['max_free_slabs',['../structSlabAllocatorImpl.html#ac513216745af6e82b818b8bc66eb073a',1,'SlabAllocatorImpl']]],
+  ['max_5ftotal_5fslabs_386',['max_total_slabs',['../structSlabAllocatorImpl.html#a702c7908d3309dc7258dc32646e57487',1,'SlabAllocatorImpl']]],
+  ['mm_387',['mm',['../structSlabAllocatorImpl.html#a8bcf9b157e1da3c40658b031ef74055d',1,'SlabAllocatorImpl']]]
 ];
