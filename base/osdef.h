@@ -16,11 +16,13 @@
 #define _BASE_OSDEF__
 
 #include <base/types.h>
+/*
 #include <sys/mman.h>
 
 void exit(int);
 int getpagesize();
 char *getenv(const char *name);
 void *memset(void *ptr, int x, size_t n);
+*/
 
 #endif	// _BASE_OSDEF__
