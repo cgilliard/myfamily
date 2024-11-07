@@ -57,7 +57,11 @@ Ptr slab_allocator_grow(SlabAllocatorImpl *impl) {
 		SetErr(CapacityExceeded);
 		return null;
 	}
-	return memmap_allocate(&impl->mm);
+	Ptr ret = memmap_allocate(&impl->mm);
+	SlabList *sl = memmap_data(&impl->mm, ret);
+	sl->next = ptr_reserved;
+
+	return ret;
 }
 
 int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
@@ -119,13 +123,17 @@ Ptr slab_allocator_allocate(SlabAllocator *sa) {
 	}
 
 	ASUB(&impl->free_size, 1);
+	SlabList *sl = memmap_data(&impl->mm, ret);
+	sl->next = ptr_reserved;
 	return ret;
 }
 void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
 	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 
 	SlabList *slptr = memmap_data(&impl->mm, ptr);
-	slptr->next = null;
+	Ptr reserved = 1;
+	if (!CAS(&slptr->next, &reserved, null))
+		panic("Double free attempt! ptr=%u", ptr);
 	if (AADD(&impl->free_size, 1) > impl->max_free_slabs) {
 		memmap_free(&impl->mm, ptr);
 		ASUB(&impl->total_slabs, 1);
@@ -153,10 +161,12 @@ void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
 
 #ifdef TEST
 unsigned long long slab_allocator_free_size(SlabAllocator *sa) {
-	return 0;
+	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+	return ALOAD(&impl->free_size);
 }
 
 unsigned long long slab_allocator_total_slabs(SlabAllocator *sa) {
-	return 0;
+	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+	return ALOAD(&impl->total_slabs);
 }
 #endif	// TEST

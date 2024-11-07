@@ -69,8 +69,8 @@ MyTest(base, test_memmap) {
 
 	for (int i = 0; i < count; i++) {
 		Ptr p = memmap_allocate(&mm1);
-		if (p != i + 1) println("p=%u,i+1=%i", p, i + 1);
-		cr_assert_eq(p, i + 1);
+		if (p != i + 2) println("p=%u,i+1=%i", p, i + 2);
+		cr_assert_eq(p, i + 2);
 		byte *data = memmap_data(&mm1, p);
 		for (int j = 0; j < size; j++) {
 			data[j] = 'a' + (j % 26);
@@ -78,7 +78,7 @@ MyTest(base, test_memmap) {
 	}
 
 	for (int i = 0; i < count; i++) {
-		Ptr p = i + 1;
+		Ptr p = i + 2;
 		byte *data = memmap_data(&mm1, p);
 		for (int j = 0; j < size; j++) {
 			cr_assert_eq(data[j], 'a' + (j % 26));
@@ -97,7 +97,7 @@ MyTest(base, test_memmap) {
 	cr_assert_eq(p, 167);
 
 	p = memmap_allocate(&mm1);
-	cr_assert_eq(p, count + 1);
+	cr_assert_eq(p, count + 2);
 
 	memmap_cleanup(&mm1);
 }
@@ -113,11 +113,11 @@ MyTest(base, test_memmap_recycle) {
 	for (int i = 0; i < count; i++) {
 		for (int j = 0; j < itt; j++) {
 			ptrs[j] = memmap_allocate(&mm1);
-			cr_assert(ptrs[j] == 1 + j);
+			cr_assert(ptrs[j] == 2 + j);
 		}
 
 		for (int j = 0; j < itt; j++) {
-			cr_assert(ptrs[j] == 1 + j);
+			cr_assert(ptrs[j] == 2 + j);
 			memmap_free(&mm1, ptrs[j]);
 		}
 	}

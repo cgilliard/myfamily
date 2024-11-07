@@ -121,8 +121,9 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 			memset(data4, '\0',
 				   MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
 					   BITMAP_SIZE);
-			// set Ptr=0 to allocated so we never return null
-			if (i == 0 && j == 0 && k == 0) data4[0] = 0x1;
+			// set Ptr=0 to allocated so we never return null / also reserve the
+			// first value for other purposes
+			if (i == 0 && j == 0 && k == 0) data4[0] = 0x3;
 		} else
 			break;
 	} while (!CAS(&impl->data[i][j][k], &nullvalue4, data4));
@@ -197,6 +198,7 @@ Ptr memmap_allocate(MemMap *mm) {
 
 void memmap_free(MemMap *mm, Ptr ptr) {
 	if (ptr == null) panic("attempt to free null!");
+	if (ptr == ptr_reserved) panic("attempt to free a reserved ptr = 1");
 	if (mm == NULL) panic("invalid (null) memmap");
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	unsigned long long nv, *v, vo;
