@@ -20,144 +20,143 @@
 #include <base/print_util.h>
 #include <base/slabs.h>
 
-typedef struct SlabImpl {
-	struct SlabImpl *next;
-	Ptr ptr;
+typedef struct SlabList {
+	Ptr next;
 	byte data[];
-} SlabImpl;
+} SlabList;
 
-byte *slab_get(SlabAllocator *sa, Slab s) {
-	if (s == NULL || sa == NULL || s->ptr == null) {
-		SetErr(IllegalArgument);
-		return NULL;
-	}
+typedef struct SlabAllocatorImpl {
+	MemMap mm;
+	unsigned int slab_size;
+	unsigned int max_free_slabs;
+	unsigned int max_total_slabs;
+	unsigned int free_size;
+	unsigned int total_slabs;
+	Ptr head;
+	Ptr tail;
+} SlabAllocatorImpl;
 
-	byte *d = memmap_data(&sa->mm, s->ptr);
-	if (d == NULL) return NULL;
-
-	return d + sizeof(SlabImpl);
+void __attribute__((constructor)) __slabs_check_sizes() {
+	if (sizeof(SlabAllocatorImpl) != sizeof(SlabAllocator))
+		panic("sizeof(SlabAllocatorImpl) (%i) != sizeof(SlabAllocator) (%i)",
+			  sizeof(SlabAllocatorImpl), sizeof(SlabAllocator));
 }
 
-unsigned long long *slab_aux(Slab s) {
-	return (unsigned long long *)&s->next;
+byte *slab_get(SlabAllocator *sa, Ptr ptr) {
+	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+	SlabList *sl = memmap_data(&impl->mm, ptr);
+	return sl->data;
+}
+unsigned long long *slab_aux(SlabAllocator *sa, Ptr ptr) {
+	return NULL;
 }
 
-SlabImpl slab_allocated_impl = {.next = NULL};
-Slab slab_allocated_reqd = &slab_allocated_impl;
-#define SLAB_ALLOCATED slab_allocated_reqd
-
-Slab slab_allocator_grow(SlabAllocator *sa) {
-	if (AADD(&sa->total_slabs, 1) > sa->max_total_slabs) {
-		ASUB(&sa->total_slabs, 1);
+Ptr slab_allocator_grow(SlabAllocatorImpl *impl) {
+	if (AADD(&impl->total_slabs, 1) > impl->max_total_slabs) {
+		ASUB(&impl->total_slabs, 1);
 		SetErr(CapacityExceeded);
-		return NULL;
+		return null;
 	}
-	Ptr p = memmap_allocate(&sa->mm);
-
-	if (p == null) {
-		SetErr(AllocErr);
-		ASUB(&sa->total_slabs, 1);
-		return NULL;
-	}
-
-	Slab ret = (SlabImpl *)memmap_data(&sa->mm, p);
-	ret->ptr = p;
-
-	if (sa->free_check) ret->next = SLAB_ALLOCATED;
-	return ret;
+	return memmap_allocate(&impl->mm);
 }
 
-void slab_allocator_cleanup(SlabAllocator *sa) {
-	Slab itt = sa->head;
-	while (itt) {
-		Slab to_delete = itt;
-		itt = itt->next;
-		// free(to_delete);
-		memmap_free(&sa->mm, to_delete->ptr);
-	}
-}
-
-// initialize slab allocator as a michael-scott queue with specified slab_size
 int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,
 						unsigned long long max_free_slabs,
-						unsigned long long max_total_slabs, bool free_check) {
-	memmap_init(&sa->mm, sizeof(SlabImpl) + slab_size);
-	ASTORE(&sa->free_size, 1);
-	ASTORE(&sa->total_slabs, 0);
-	sa->slab_size = slab_size;
-	sa->max_free_slabs = max_free_slabs;
-	sa->max_total_slabs = max_total_slabs;
-	sa->free_check = free_check;
+						unsigned long long max_total_slabs) {
+	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 
-	Slab s = slab_allocator_grow(sa);
+	memmap_init(&impl->mm, slab_size + sizeof(SlabList));
+	ASTORE(&impl->free_size, 1);
+	ASTORE(&impl->total_slabs, 0);
+	impl->slab_size = slab_size;
+	impl->max_free_slabs = max_free_slabs;
+	impl->max_total_slabs = max_total_slabs;
 
-	s->next = NULL;
-	sa->head = sa->tail = s;
+	Ptr ptr = slab_allocator_grow(impl);
+	if (ptr == null) {
+		return -1;
+	}
+
+	SlabList *sl = memmap_data(&impl->mm, ptr);
+	sl->next = null;
+	impl->head = impl->tail = ptr;
 
 	return 0;
 }
 
-// allocate is dequeue. If null "grow" by mallocing a slab.
-Slab slab_allocator_allocate(SlabAllocator *sa) {
-	Slab head, tail, next, ret;
+void slab_allocator_cleanup(SlabAllocator *sa) {
+	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+	Ptr itt = impl->head;
+	while (itt) {
+		Ptr to_delete = itt;
+		SlabList *sl = memmap_data(&impl->mm, itt);
+		itt = sl->next;
+		memmap_free(&impl->mm, to_delete);
+	}
+
+	memmap_cleanup(&impl->mm);
+}
+
+Ptr slab_allocator_allocate(SlabAllocator *sa) {
+	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
+	Ptr head, tail, next, ret;
 	loop {
-		head = sa->head;
-		tail = sa->tail;
-		next = head->next;
-		if (head == sa->head) {
+		head = impl->head;
+		tail = impl->tail;
+		SlabList *sl = memmap_data(&impl->mm, head);
+		next = sl->next;
+		if (head == impl->head) {
 			if (head == tail) {
-				if (next == NULL) {
-					ret = slab_allocator_grow(sa);
-					return ret;
+				if (next == null) {
+					return slab_allocator_grow(impl);
 				}
-				CAS_SEQ(&sa->tail, &tail, next);
+				CAS_SEQ(&impl->tail, &tail, next);
 			} else {
 				ret = head;
-				if (CAS_SEQ(&sa->head, &head, next)) break;
+				if (CAS_SEQ(&impl->head, &head, next)) break;
 			}
 		}
 	}
 
-	ASUB(&sa->free_size, 1);
-	if (sa->free_check) ASTORE(&ret->next, SLAB_ALLOCATED);
+	ASUB(&impl->free_size, 1);
 	return ret;
 }
+void slab_allocator_free(SlabAllocator *sa, Ptr ptr) {
+	SlabAllocatorImpl *impl = (SlabAllocatorImpl *)sa;
 
-// free is enqueue.
-void slab_allocator_free(SlabAllocator *sa, Slab slab) {
-	if (sa->free_check && !CAS(&slab->next, &SLAB_ALLOCATED, NULL))
-		panic("Double free attempt! %p %p %p %p %i", &slab->next,
-			  &SLAB_ALLOCATED, slab->next, SLAB_ALLOCATED, sa->free_check);
-	else if (!sa->free_check)
-		slab->next = NULL;
-	if (AADD(&sa->free_size, 1) > sa->max_free_slabs) {
-		memmap_free(&sa->mm, slab->ptr);
-		// free(slab);
-		ASUB(&sa->total_slabs, 1);
+	SlabList *slptr = memmap_data(&impl->mm, ptr);
+	slptr->next = null;
+	if (AADD(&impl->free_size, 1) > impl->max_free_slabs) {
+		memmap_free(&impl->mm, ptr);
+		ASUB(&impl->total_slabs, 1);
 		return;
 	}
 
-	Slab tail, next;
+	Ptr tail, next;
 
 	loop {
-		tail = sa->tail;
-		next = tail->next;
-		if (tail == sa->tail) {
-			if (next == NULL) {
-				if (CAS_SEQ(&tail->next, &next, slab)) {
-					CAS_SEQ(&sa->tail, &tail, slab);
+		tail = impl->tail;
+		SlabList *sltail = memmap_data(&impl->mm, tail);
+		next = sltail->next;
+		if (tail == impl->tail) {
+			if (next == null) {
+				if (CAS_SEQ(&sltail->next, &next, ptr)) {
+					CAS_SEQ(&impl->tail, &tail, ptr);
 					break;
 				}
 			} else {
-				CAS_SEQ(&sa->tail, &tail, next);
+				CAS_SEQ(&impl->tail, &tail, next);
 			}
 		}
 	}
 }
 
+#ifdef TEST
 unsigned long long slab_allocator_free_size(SlabAllocator *sa) {
-	return ALOAD(&sa->free_size);
+	return 0;
 }
+
 unsigned long long slab_allocator_total_slabs(SlabAllocator *sa) {
-	return ALOAD(&sa->total_slabs);
+	return 0;
 }
+#endif	// TEST

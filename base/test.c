@@ -124,6 +124,28 @@ MyTest(base, test_memmap_recycle) {
 	memmap_cleanup(&mm1);
 }
 
+MyTest(base, test_slab_allocator) {
+	SlabAllocator sa1;
+	cr_assert(!slab_allocator_init(&sa1, 16, 100, 200));
+	int size = 5;
+	Ptr arr[size];
+
+	for (int i = 0; i < size; i++) {
+		Ptr p = slab_allocator_allocate(&sa1);
+		arr[i] = p;
+		byte *parr = slab_get(&sa1, p);
+		parr[0] = i + 2;
+	}
+
+	for (int i = 0; i < size; i++) {
+		byte *parr = slab_get(&sa1, arr[i]);
+		cr_assert_eq(parr[0], i + 2);
+		slab_allocator_free(&sa1, arr[i]);
+	}
+
+	slab_allocator_cleanup(&sa1);
+}
+
 /*
 MyTest(base, test_slab_allocator) {
 	SlabAllocator sa1;
