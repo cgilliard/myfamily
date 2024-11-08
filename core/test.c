@@ -94,7 +94,6 @@ void free_wrapper(OrbTreeNodeWrapper wrapper) {
 }
 
 void my_obj_print_node1(Ptr ptr, int depth) {
-	if (depth > 10) panic("depth > 10");
 	if (ptr == null) {
 		for (int i = 0; i < depth; i++) {
 			print("    ");
@@ -257,24 +256,31 @@ MyTest(core, test_random_tree) {
 	byte iv[16] = {};
 	cpsrng_test_seed(iv, key);
 
-	int size = 100;
+	int size = 1000;
 	Ptr arr[size];
+	int vals[size];
 
 	OrbTree t;
-	slab_allocator_init(&sa, sizeof(MyObject), 1000, 2000);
+	slab_allocator_init(&sa, sizeof(MyObject), 2000, 2000);
 
 	orbtree_init(&t, &sa);
 
 	for (int i = 0; i < size; i++) {
 		int x;
 		cpsrng_rand_int(&x);
+		vals[i] = x;
 		OrbTreeNodeWrapper obj1 = wrap_obj(x);
 		orbtree_put(&t, &obj1, my_obj_search);
 		arr[i] = obj1.ptr;
 	}
 
-	my_object_orbtree_print(&t);
 	my_obj_validate(&t);
+
+	for (int i = 0; i < size; i++) {
+		OrbTreeNodeWrapper obj = wrap_obj(vals[i]);
+		MyObject *obj_out = orbtree_get(&t, &obj, my_obj_search, 0);
+		cr_assert_eq(obj_out->ptr, arr[i]);
+	}
 
 	for (int i = 0; i < size; i++) slab_allocator_free(&sa, arr[i]);
 	slab_allocator_cleanup(&sa);

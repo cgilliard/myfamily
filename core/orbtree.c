@@ -164,7 +164,6 @@ int orbtree_put_fixup(Ptr k_ptr) {
 
 				// Move up the tree
 				k_ptr = parent->parent;
-				k = orbtree_node(k_ptr);
 			} else {
 				// Case 1b: Uncle is black
 				if (k_ptr == parent->right) {
@@ -195,7 +194,6 @@ int orbtree_put_fixup(Ptr k_ptr) {
 
 				// Move up the tree
 				k_ptr = parent->parent;
-				k = orbtree_node(k_ptr);
 			} else {
 				// Case 2b: Uncle is black
 				if (k_ptr == parent->left) {
