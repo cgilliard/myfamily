@@ -62,56 +62,33 @@ $(function() {
 </div>
 
 <div class="contents">
-&#160;
-
-<h3><a id="index_a"></a>- a -</h3><ul>
-<li>alloc_sum
-: <a class="el" href="structResourceStats.html#a00c602f951b8103cc46e4b9b0715f8a0">ResourceStats</a>
-</li>
-</ul>
-
-
-<h3><a id="index_d"></a>- d -</h3><ul>
+&#160;<ul>
 <li>data
 : <a class="el" href="structMemMapImpl.html#a0f90dd0604cb637e74fb3c81086d121c">MemMapImpl</a>
-, <a class="el" href="structOrbTreeNode.html#ae8807ba70adfbd58c9081214341e140f">OrbTreeNode</a>
 , <a class="el" href="structSlabList.html#ad4411199478d484930f97cdfbc22a8cd">SlabList</a>
-</li>
-</ul>
-
-
-<h3><a id="index_f"></a>- f -</h3><ul>
-<li>fclose_sum
-: <a class="el" href="structResourceStats.html#ac23ea4be0104fde3b9efdc0f91f5acdf">ResourceStats</a>
-</li>
-<li>fopen_sum
-: <a class="el" href="structResourceStats.html#ab82a1ca32048ec7e1c15d53265de791b">ResourceStats</a>
 </li>
 <li>free_size
 : <a class="el" href="structSlabAllocatorImpl.html#af43c07e607a936aa15db25efffa4bce7">SlabAllocatorImpl</a>
 </li>
-</ul>
-
-
-<h3><a id="index_h"></a>- h -</h3><ul>
 <li>head
 : <a class="el" href="structSlabAllocatorImpl.html#af9ba3402e4b04cefa5ffcde467dc7f4c">SlabAllocatorImpl</a>
 </li>
-</ul>
-
-
-<h3><a id="index_i"></a>- i -</h3><ul>
 <li>impl
 : <a class="el" href="structMemMap.html#a65ed9d5eff88c6fb48d902ee00d1fd38">MemMap</a>
+, <a class="el" href="structObject.html#a6525f897b9cebc78f584201292756232">Object</a>
+, <a class="el" href="structOrbTree.html#a2b8b28c5fc397d5a347eb5cd40f7f307">OrbTree</a>
+, <a class="el" href="structOrbTreeNode.html#a0c83986f2a4550a5a145a1393f149411">OrbTreeNode</a>
 , <a class="el" href="structSlabAllocator.html#ad08456a937476e0a032f545d36c0f9fa">SlabAllocator</a>
 </li>
 <li>is_right
 : <a class="el" href="structOrbTreeNodePair.html#a696a0f2b0f19e385bacf112d95cf6527">OrbTreeNodePair</a>
 </li>
-</ul>
-
-
-<h3><a id="index_m"></a>- m -</h3><ul>
+<li>left
+: <a class="el" href="structOrbTreeNodeImpl.html#ad3d34c756d55739c3e367f73dd30018e">OrbTreeNodeImpl</a>
+</li>
+<li>left_subtree_height
+: <a class="el" href="structOrbTreeNodeImpl.html#a50b2803f91662b307589186ab70524f4">OrbTreeNodeImpl</a>
+</li>
 <li>max_free_slabs
 : <a class="el" href="structSlabAllocatorImpl.html#ac513216745af6e82b818b8bc66eb073a">SlabAllocatorImpl</a>
 </li>
@@ -121,96 +98,48 @@ $(function() {
 <li>mm
 : <a class="el" href="structSlabAllocatorImpl.html#a8bcf9b157e1da3c40658b031ef74055d">SlabAllocatorImpl</a>
 </li>
-</ul>
-
-
-<h3><a id="index_n"></a>- n -</h3><ul>
-<li>name
-: <a class="el" href="structOrbTreeNode.html#a29da318dcfb0d3ca9941a82275801607">OrbTreeNode</a>
-</li>
 <li>next
 : <a class="el" href="structSlabList.html#a7cbbabbebd4bee7d6e15eb22ff43a1a2">SlabList</a>
 </li>
-</ul>
-
-
-<h3><a id="index_o"></a>- o -</h3><ul>
-<li>ord_left
-: <a class="el" href="structOrbTreeNode.html#ab538782e9ec6caa0dbf3f90634c429a7">OrbTreeNode</a>
+<li>node1
+: <a class="el" href="structMyObject.html#af96974863d7fb825290c469511477a62">MyObject</a>
 </li>
-<li>ord_left_subtree_size
-: <a class="el" href="structOrbTreeNode.html#a029c115f6d12ece5fba9ea03c35fc57f">OrbTreeNode</a>
+<li>node2
+: <a class="el" href="structMyObject.html#a7e972ea9ea39f59b7a978e6b93124e78">MyObject</a>
 </li>
-<li>ord_parent
-: <a class="el" href="structOrbTreeNode.html#a82378f53249f4d683932252f2643e7bb">OrbTreeNode</a>
+<li>offset_of_orbtree_node
+: <a class="el" href="structOrbTreeNodeWrapper.html#a719c3297ef56118d5a9afaa16778f1ce">OrbTreeNodeWrapper</a>
 </li>
-<li>ord_right
-: <a class="el" href="structOrbTreeNode.html#adc66ade41f0060e7f5caaaf2ed1dd5c5">OrbTreeNode</a>
-</li>
-<li>ord_right_subtree_size
-: <a class="el" href="structOrbTreeNode.html#a6d5ec8692055b336b853196bdd37ee5a">OrbTreeNode</a>
-</li>
-</ul>
-
-
-<h3><a id="index_p"></a>- p -</h3><ul>
 <li>parent
-: <a class="el" href="structOrbTreeNodePair.html#a575e17d3df2fd4ef2b04aa99a2f8cc67">OrbTreeNodePair</a>
+: <a class="el" href="structOrbTreeNodeImpl.html#aeeab2a88a88187676c8b4c5ef47c3a92">OrbTreeNodeImpl</a>
+, <a class="el" href="structOrbTreeNodePair.html#a575e17d3df2fd4ef2b04aa99a2f8cc67">OrbTreeNodePair</a>
 </li>
 <li>ptr
-: <a class="el" href="structAlloc.html#a2f30a1905bca61fdd1948752457346dd">Alloc</a>
+: <a class="el" href="structOrbTreeNodeWrapper.html#aa6fc98d5d828ff53b8d369b310ae8646">OrbTreeNodeWrapper</a>
 </li>
-</ul>
-
-
-<h3><a id="index_r"></a>- r -</h3><ul>
-<li>release_sum
-: <a class="el" href="structResourceStats.html#a734a98bf8b41c03897c0f9923af9e0a7">ResourceStats</a>
+<li>right
+: <a class="el" href="structOrbTreeNodeImpl.html#af81f29fedf7e73ff8ca8ff6d3be20d84">OrbTreeNodeImpl</a>
 </li>
-<li>resize_sum
-: <a class="el" href="structResourceStats.html#a344cb94802cd377dc3ffc56ecbe987f7">ResourceStats</a>
+<li>right_subtree_height_color
+: <a class="el" href="structOrbTreeNodeImpl.html#a9f43497d486fdb7cd8ea2328c7385269">OrbTreeNodeImpl</a>
 </li>
-</ul>
-
-
-<h3><a id="index_s"></a>- s -</h3><ul>
 <li>self
 : <a class="el" href="structOrbTreeNodePair.html#a84f357268e33cebf6d8953575b2e5a38">OrbTreeNodePair</a>
 </li>
-<li>seq_left
-: <a class="el" href="structOrbTreeNode.html#a79e8db507497265a84a620e9e04819f3">OrbTreeNode</a>
-</li>
-<li>seq_left_subtree_size
-: <a class="el" href="structOrbTreeNode.html#af1c7ef6cbb261c24f3b0bf68730423b7">OrbTreeNode</a>
-</li>
-<li>seq_parent
-: <a class="el" href="structOrbTreeNode.html#a6334f107d3588573bb47f6ff20e0dd38">OrbTreeNode</a>
-</li>
-<li>seq_right
-: <a class="el" href="structOrbTreeNode.html#ac3e9fbcd057de438e25ce85a84160807">OrbTreeNode</a>
-</li>
-<li>seq_right_subtree_size
-: <a class="el" href="structOrbTreeNode.html#a751cae91d5bf895ed75324c1e8b4bd44">OrbTreeNode</a>
-</li>
-<li>seqno
-: <a class="el" href="structOrbTreeNode.html#aca386d03ff2de00921ea89ff23ecfc03">OrbTreeNode</a>
-</li>
 <li>size
-: <a class="el" href="structAlloc.html#a690eb658b3117377dcbbf66c81b28a04">Alloc</a>
-, <a class="el" href="structMemMapImpl.html#a34abaecc8d512759dded7578e9f00ffc">MemMapImpl</a>
+: <a class="el" href="structMemMapImpl.html#a34abaecc8d512759dded7578e9f00ffc">MemMapImpl</a>
 </li>
 <li>slab_size
 : <a class="el" href="structSlabAllocatorImpl.html#ab57313bf3b372fea1b85ba3c0fe4cccc">SlabAllocatorImpl</a>
 </li>
-</ul>
-
-
-<h3><a id="index_t"></a>- t -</h3><ul>
 <li>tail
 : <a class="el" href="structSlabAllocatorImpl.html#ad7ae71b02c8b39ac3d389c8d18d4e8d1">SlabAllocatorImpl</a>
 </li>
 <li>total_slabs
 : <a class="el" href="structSlabAllocatorImpl.html#affabd99cc651ac68a7663eb6e3c59fa4">SlabAllocatorImpl</a>
+</li>
+<li>x
+: <a class="el" href="structMyObject.html#ae1c40a1a1f3c871df40d526541ce50af">MyObject</a>
 </li>
 </ul>
 </div><!-- contents -->

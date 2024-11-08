@@ -1,4 +1,8 @@
 var searchData=
 [
-  ['data_370',['data',['../structMemMapImpl.html#a0f90dd0604cb637e74fb3c81086d121c',1,'MemMapImpl::data()'],['../structOrbTreeNode.html#ae8807ba70adfbd58c9081214341e140f',1,'OrbTreeNode::data()'],['../structSlabList.html#ad4411199478d484930f97cdfbc22a8cd',1,'SlabList::data()']]]
+  ['fam_5ferr_401',['fam_err',['../fam__err_8c.html#a445caa137b1d2986716f46e3faad439d',1,'fam_err():&#160;fam_err.c'],['../fam__err_8h.html#a445caa137b1d2986716f46e3faad439d',1,'fam_err():&#160;fam_err.c']]],
+  ['fam_5ferr_5flast_402',['fam_err_last',['../fam__err_8c.html#ad77a4350811747417268e4dfb64194db',1,'fam_err_last():&#160;fam_err.c'],['../fam__err_8h.html#ad77a4350811747417268e4dfb64194db',1,'fam_err_last():&#160;fam_err.c']]],
+  ['file_5fcount_403',['file_count',['../xxdir_8c.html#abd3633577cf354ae9e2c69a018cfe999',1,'xxdir.c']]],
+  ['file_5fsizes_404',['file_sizes',['../xxdir_8c.html#aab1026987f4e2b9d406e52e915a4cc2b',1,'xxdir.c']]],
+  ['free_5fsize_405',['free_size',['../structSlabAllocatorImpl.html#af43c07e607a936aa15db25efffa4bce7',1,'SlabAllocatorImpl']]]
 ];

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['alloc_303',['alloc',['../alloc_8c.html#a4ef662ec7fb312a278488fa2d204d4f1',1,'alloc(unsigned int size):&#160;alloc.c'],['../alloc_8h.html#a4ef662ec7fb312a278488fa2d204d4f1',1,'alloc(unsigned int size):&#160;alloc.c']]],
-  ['alloc_5fsum_304',['alloc_sum',['../alloc_8c.html#a70b05a036d4bd3162742f130ae43500a',1,'alloc_sum():&#160;alloc.c'],['../alloc_8h.html#a70b05a036d4bd3162742f130ae43500a',1,'alloc_sum():&#160;alloc.c']]]
+  ['define_5ffamerr_324',['DEFINE_FAMERR',['../fam__err_8h.html#aa007f036865fc870fe13a6b780bca16e',1,'fam_err.h']]]
 ];

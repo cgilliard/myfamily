@@ -67,36 +67,71 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">orbtree.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="orbtree_8h_source.html">base/orbtree.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="print__util_8h_source.html">base/print_util.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="slabs_8h_source.html">base/slabs.h</a>&gt;</code><br />
 </div><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structOrbTreeNodeImpl.html">OrbTreeNodeImpl</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a3dc4158b735d052edf3fff0fb8b930a4"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structOrbTreeNodeImpl.html">OrbTreeNodeImpl</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#a3dc4158b735d052edf3fff0fb8b930a4">OrbTreeNodeImpl</a></td></tr>
+<tr class="separator:a3dc4158b735d052edf3fff0fb8b930a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ade1a5d481a6f4f290d558ad4c33db985"><td class="memItemLeft" align="right" valign="top"><a class="el" href="orbtree_8h.html#a43db467a1f7c9a28fd22e3b6bea36944">OrbTree</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#ade1a5d481a6f4f290d558ad4c33db985">orbtree_create</a> (int(*search)(const <a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *root, const void *value, <a class="el" href="structOrbTreeNodePair.html">OrbTreeNodePair</a> *retval))</td></tr>
-<tr class="separator:ade1a5d481a6f4f290d558ad4c33db985"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad090224436c7cb3c535d589b4c0300e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#ad090224436c7cb3c535d589b4c0300e6">orbtree_get</a> (const <a class="el" href="orbtree_8h.html#a43db467a1f7c9a28fd22e3b6bea36944">OrbTree</a> *ptr, const void *value)</td></tr>
-<tr class="separator:ad090224436c7cb3c535d589b4c0300e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18bc6e8112340fb174781bcd70c2e6de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#a18bc6e8112340fb174781bcd70c2e6de">orbtree_put</a> (<a class="el" href="orbtree_8h.html#a43db467a1f7c9a28fd22e3b6bea36944">OrbTree</a> *ptr, <a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *value)</td></tr>
-<tr class="separator:a18bc6e8112340fb174781bcd70c2e6de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48ff68e4acd2bc6dc324bab93e79993c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#a48ff68e4acd2bc6dc324bab93e79993c">orbtree_remove</a> (const <a class="el" href="orbtree_8h.html#a43db467a1f7c9a28fd22e3b6bea36944">OrbTree</a> *ptr, const void *value)</td></tr>
-<tr class="separator:a48ff68e4acd2bc6dc324bab93e79993c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd02bb0f6a745c39d5e3417493995c71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a> ((constructor))</td></tr>
+<tr class="separator:afd02bb0f6a745c39d5e3417493995c71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d00ba27130d7d23a072d17c79f27f13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#a5d00ba27130d7d23a072d17c79f27f13">orbtree_node_right</a> (const <a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *tree)</td></tr>
+<tr class="separator:a5d00ba27130d7d23a072d17c79f27f13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4e1984339112304d23565e07f9bd1f5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#af4e1984339112304d23565e07f9bd1f5">orbtree_node_left</a> (const <a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *tree)</td></tr>
+<tr class="separator:af4e1984339112304d23565e07f9bd1f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54f619e751504e48444a47ec3f30cd21"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOrbTree.html">OrbTree</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#a54f619e751504e48444a47ec3f30cd21">orbtree_create</a> (const <a class="el" href="structSlabAllocator.html">SlabAllocator</a> *sa)</td></tr>
+<tr class="separator:a54f619e751504e48444a47ec3f30cd21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad08dcdc37a9dc99e3769aa906bafbde3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#ad08dcdc37a9dc99e3769aa906bafbde3">orbtree_get</a> (const <a class="el" href="structOrbTree.html">OrbTree</a> *tree, const <a class="el" href="structOrbTreeNodeWrapper.html">OrbTreeNodeWrapper</a> *value, const <a class="el" href="orbtree_8h.html#a42f194d8bf063964c9849fc59ed8946a">OrbTreeSearch</a> *search, unsigned int offset)</td></tr>
+<tr class="separator:ad08dcdc37a9dc99e3769aa906bafbde3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab094a7a91dc88e89d1a65cdbbeeca1b6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOrbTreeNodeWrapper.html">OrbTreeNodeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#ab094a7a91dc88e89d1a65cdbbeeca1b6">orbtree_put</a> (<a class="el" href="structOrbTree.html">OrbTree</a> *tree, const <a class="el" href="structOrbTreeNodeWrapper.html">OrbTreeNodeWrapper</a> *value, const <a class="el" href="orbtree_8h.html#a42f194d8bf063964c9849fc59ed8946a">OrbTreeSearch</a> *search)</td></tr>
+<tr class="separator:ab094a7a91dc88e89d1a65cdbbeeca1b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50b7f24175531f390505e3abb61912d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structOrbTreeNodeWrapper.html">OrbTreeNodeWrapper</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="orbtree_8c.html#a50b7f24175531f390505e3abb61912d9">orbtree_remove</a> (<a class="el" href="structOrbTree.html">OrbTree</a> *tree, const <a class="el" href="structOrbTreeNodeWrapper.html">OrbTreeNodeWrapper</a> *value, const <a class="el" href="orbtree_8h.html#a42f194d8bf063964c9849fc59ed8946a">OrbTreeSearch</a> *search)</td></tr>
+<tr class="separator:a50b7f24175531f390505e3abb61912d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="ade1a5d481a6f4f290d558ad4c33db985"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ade1a5d481a6f4f290d558ad4c33db985">&#9670;&nbsp;</a></span>orbtree_create()</h2>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="a3dc4158b735d052edf3fff0fb8b930a4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3dc4158b735d052edf3fff0fb8b930a4">&#9670;&nbsp;</a></span>OrbTreeNodeImpl</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="orbtree_8h.html#a43db467a1f7c9a28fd22e3b6bea36944">OrbTree</a> orbtree_create </td>
+          <td class="memname">typedef struct <a class="el" href="structOrbTreeNodeImpl.html">OrbTreeNodeImpl</a> <a class="el" href="structOrbTreeNodeImpl.html">OrbTreeNodeImpl</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="afd02bb0f6a745c39d5e3417493995c71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afd02bb0f6a745c39d5e3417493995c71">&#9670;&nbsp;</a></span>__attribute__()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void __attribute__ </td>
           <td>(</td>
-          <td class="paramtype">int(*)(const <a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *root, const void *value, <a class="el" href="structOrbTreeNodePair.html">OrbTreeNodePair</a> *retval)&#160;</td>
-          <td class="paramname"><em>search</em></td><td>)</td>
+          <td class="paramtype">(constructor)&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -104,8 +139,26 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ad090224436c7cb3c535d589b4c0300e6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad090224436c7cb3c535d589b4c0300e6">&#9670;&nbsp;</a></span>orbtree_get()</h2>
+<a id="a54f619e751504e48444a47ec3f30cd21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54f619e751504e48444a47ec3f30cd21">&#9670;&nbsp;</a></span>orbtree_create()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structOrbTree.html">OrbTree</a> orbtree_create </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structSlabAllocator.html">SlabAllocator</a> *&#160;</td>
+          <td class="paramname"><em>sa</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad08dcdc37a9dc99e3769aa906bafbde3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad08dcdc37a9dc99e3769aa906bafbde3">&#9670;&nbsp;</a></span>orbtree_get()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -113,14 +166,26 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a>* orbtree_get </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="orbtree_8h.html#a43db467a1f7c9a28fd22e3b6bea36944">OrbTree</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em>, </td>
+          <td class="paramtype">const <a class="el" href="structOrbTree.html">OrbTree</a> *&#160;</td>
+          <td class="paramname"><em>tree</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramtype">const <a class="el" href="structOrbTreeNodeWrapper.html">OrbTreeNodeWrapper</a> *&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="orbtree_8h.html#a42f194d8bf063964c9849fc59ed8946a">OrbTreeSearch</a> *&#160;</td>
+          <td class="paramname"><em>search</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>offset</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -132,23 +197,65 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a18bc6e8112340fb174781bcd70c2e6de"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a18bc6e8112340fb174781bcd70c2e6de">&#9670;&nbsp;</a></span>orbtree_put()</h2>
+<a id="af4e1984339112304d23565e07f9bd1f5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4e1984339112304d23565e07f9bd1f5">&#9670;&nbsp;</a></span>orbtree_node_left()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a>* orbtree_put </td>
+          <td class="memname"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a>* orbtree_node_left </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="orbtree_8h.html#a43db467a1f7c9a28fd22e3b6bea36944">OrbTree</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em>, </td>
+          <td class="paramtype">const <a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *&#160;</td>
+          <td class="paramname"><em>tree</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5d00ba27130d7d23a072d17c79f27f13"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d00ba27130d7d23a072d17c79f27f13">&#9670;&nbsp;</a></span>orbtree_node_right()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a>* orbtree_node_right </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *&#160;</td>
+          <td class="paramname"><em>tree</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ab094a7a91dc88e89d1a65cdbbeeca1b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab094a7a91dc88e89d1a65cdbbeeca1b6">&#9670;&nbsp;</a></span>orbtree_put()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structOrbTreeNodeWrapper.html">OrbTreeNodeWrapper</a>* orbtree_put </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structOrbTree.html">OrbTree</a> *&#160;</td>
+          <td class="paramname"><em>tree</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> *&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramtype">const <a class="el" href="structOrbTreeNodeWrapper.html">OrbTreeNodeWrapper</a> *&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="orbtree_8h.html#a42f194d8bf063964c9849fc59ed8946a">OrbTreeSearch</a> *&#160;</td>
+          <td class="paramname"><em>search</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -160,23 +267,29 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a48ff68e4acd2bc6dc324bab93e79993c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a48ff68e4acd2bc6dc324bab93e79993c">&#9670;&nbsp;</a></span>orbtree_remove()</h2>
+<a id="a50b7f24175531f390505e3abb61912d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a50b7f24175531f390505e3abb61912d9">&#9670;&nbsp;</a></span>orbtree_remove()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a>* orbtree_remove </td>
+          <td class="memname"><a class="el" href="structOrbTreeNodeWrapper.html">OrbTreeNodeWrapper</a>* orbtree_remove </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="orbtree_8h.html#a43db467a1f7c9a28fd22e3b6bea36944">OrbTree</a> *&#160;</td>
-          <td class="paramname"><em>ptr</em>, </td>
+          <td class="paramtype"><a class="el" href="structOrbTree.html">OrbTree</a> *&#160;</td>
+          <td class="paramname"><em>tree</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramtype">const <a class="el" href="structOrbTreeNodeWrapper.html">OrbTreeNodeWrapper</a> *&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="orbtree_8h.html#a42f194d8bf063964c9849fc59ed8946a">OrbTreeSearch</a> *&#160;</td>
+          <td class="paramname"><em>search</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

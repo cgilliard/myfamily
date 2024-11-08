@@ -120,6 +120,8 @@ Macros</h2></td></tr>
 <tr class="separator:a839f39143bd2bfdb491e5f2e0e5ae55b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d04c05cbae3eee21cb79477c9dd1777"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a4d04c05cbae3eee21cb79477c9dd1777">MUNMAP</a>(ptr,  size)&#160;&#160;&#160;munmap(ptr, <a class="el" href="macros_8h.html#a1c4e4cd3c1f8f88bb3674cd1f3be2906">MMAP_ALIGNED_SIZE</a>(size))</td></tr>
 <tr class="separator:a4d04c05cbae3eee21cb79477c9dd1777"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cd41b4ce16f77f0dc3a97a49cf0b045"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a3cd41b4ce16f77f0dc3a97a49cf0b045">SPECTRE_PROTECT</a></td></tr>
+<tr class="separator:a3cd41b4ce16f77f0dc3a97a49cf0b045"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="afab9832a0980ee17e74a80a0a9da994d"></a>
@@ -391,7 +393,6 @@ Macros</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    ({                                                              \</div>
-<div class="line">        <span class="comment">/*println(&quot;mmap size = %lli&quot;, size);*/</span>                      \</div>
 <div class="line">        mmap(<a class="code" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="code" href="macros_8h.html#a1c4e4cd3c1f8f88bb3674cd1f3be2906">MMAP_ALIGNED_SIZE</a>(size), PROT_READ | PROT_WRITE, \</div>
 <div class="line">             MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);                   \</div>
 <div class="line">    })</div>
@@ -415,11 +416,11 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ({                                                       \</div>
-<div class="line">        size_t page_size = <a class="code" href="osdef_8h.html#ab9a7722a0bcd12d8b5621a3264a11e76">getpagesize</a>();                    \</div>
-<div class="line">        (((size_t)size) + page_size - 1) &amp; ~(page_size - 1); \</div>
+<b>Value:</b><div class="fragment"><div class="line">    ({                                                             \</div>
+<div class="line">        unsigned <span class="keywordtype">int</span> page_size = <a class="code" href="memmap_8c.html#a3aca651a6d774e77df0b2dfa253d51f7">getpagesize</a>();                    \</div>
+<div class="line">        (((<span class="keywordtype">unsigned</span> int)size) + page_size - 1) &amp; ~(page_size - 1); \</div>
 <div class="line">    })</div>
-<div class="ttc" id="aosdef_8h_html_ab9a7722a0bcd12d8b5621a3264a11e76"><div class="ttname"><a href="osdef_8h.html#ab9a7722a0bcd12d8b5621a3264a11e76">getpagesize</a></div><div class="ttdeci">int getpagesize()</div></div>
+<div class="ttc" id="amemmap_8c_html_a3aca651a6d774e77df0b2dfa253d51f7"><div class="ttname"><a href="memmap_8c.html#a3aca651a6d774e77df0b2dfa253d51f7">getpagesize</a></div><div class="ttdeci">size_t getpagesize()</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -518,6 +519,20 @@ Macros</h2></td></tr>
 <div class="line">    })</div>
 <div class="ttc" id="alock_8c_html_a4b3afccc0cd11d45e63381b1cff3ca20"><div class="ttname"><a href="lock_8c.html#a4b3afccc0cd11d45e63381b1cff3ca20">lock_guard_read</a></div><div class="ttdeci">LockGuard lock_guard_read(Lock l)</div><div class="ttdef"><b>Definition:</b> lock.c:90</div></div>
 </div><!-- fragment -->
+</div>
+</div>
+<a id="a3cd41b4ce16f77f0dc3a97a49cf0b045"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cd41b4ce16f77f0dc3a97a49cf0b045">&#9670;&nbsp;</a></span>SPECTRE_PROTECT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SPECTRE_PROTECT</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
 </div>
 </div>
 <a id="a0a6c403907ca907211fd600e019985ed"></a>

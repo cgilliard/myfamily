@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['resourcestats_421',['ResourceStats',['../alloc_8h.html#afa692e6fd803fdc6ce5546ee973e153b',1,'alloc.h']]]
+  ['u64_451',['u64',['../xxdir_8c.html#ad758b7a5c3f18ed79d2fcd23d9f16357',1,'xxdir.c']]]
 ];

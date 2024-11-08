@@ -80,6 +80,7 @@ $(function() {
 <code>#include &lt;<a class="el" href="memmap_8h_source.html">base/memmap.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="osdef_8h_source.html">base/osdef.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="print__util_8h_source.html">base/print_util.h</a>&gt;</code><br />
+<code>#include &lt;sys/mman.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -102,6 +103,10 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a1144b39d8415e7ddc56fd9f69a2e3a12"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memmap_8c.html#a1144b39d8415e7ddc56fd9f69a2e3a12">memset</a> (void *ptr, int x, size_t n)</td></tr>
+<tr class="separator:a1144b39d8415e7ddc56fd9f69a2e3a12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3aca651a6d774e77df0b2dfa253d51f7"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memmap_8c.html#a3aca651a6d774e77df0b2dfa253d51f7">getpagesize</a> ()</td></tr>
+<tr class="separator:a3aca651a6d774e77df0b2dfa253d51f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd02bb0f6a745c39d5e3417493995c71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memmap_8c.html#afd02bb0f6a745c39d5e3417493995c71">__attribute__</a> ((constructor))</td></tr>
 <tr class="separator:afd02bb0f6a745c39d5e3417493995c71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50b46a8081e67cfa8439d4c7a384a592"><td class="memItemLeft" align="right" valign="top">unsigned long long *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="memmap_8c.html#a50b46a8081e67cfa8439d4c7a384a592">memmap_itt_for</a> (<a class="el" href="structMemMapImpl.html">MemMapImpl</a> *impl, int i, int j, int k, int l)</td></tr>
@@ -197,6 +202,23 @@ Variables</h2></td></tr>
           <td class="memname">void __attribute__ </td>
           <td>(</td>
           <td class="paramtype">(constructor)&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3aca651a6d774e77df0b2dfa253d51f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3aca651a6d774e77df0b2dfa253d51f7">&#9670;&nbsp;</a></span>getpagesize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_t getpagesize </td>
+          <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
@@ -360,6 +382,40 @@ Variables</h2></td></tr>
           <td></td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>l</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a1144b39d8415e7ddc56fd9f69a2e3a12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1144b39d8415e7ddc56fd9f69a2e3a12">&#9670;&nbsp;</a></span>memset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* memset </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

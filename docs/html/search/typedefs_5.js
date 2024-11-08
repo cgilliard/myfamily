@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['orbtreenode_418',['OrbTreeNode',['../orbtree_8h.html#a7f7caf93d655b82fd74a4bc05ada8009',1,'orbtree.h']]],
-  ['orbtreenodepair_419',['OrbTreeNodePair',['../orbtree_8h.html#a255bb0483690569d8fd11a0e03438271',1,'orbtree.h']]]
+  ['ptr_447',['Ptr',['../memmap_8h.html#a7d5f969afb2ad59c79a5cd50816fc587',1,'memmap.h']]]
 ];

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['name_388',['name',['../structOrbTreeNode.html#a29da318dcfb0d3ca9941a82275801607',1,'OrbTreeNode']]],
-  ['next_389',['next',['../structSlabList.html#a7cbbabbebd4bee7d6e15eb22ff43a1a2',1,'SlabList']]]
+  ['offset_5fof_5forbtree_5fnode_421',['offset_of_orbtree_node',['../structOrbTreeNodeWrapper.html#a719c3297ef56118d5a9afaa16778f1ce',1,'OrbTreeNodeWrapper']]]
 ];

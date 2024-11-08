@@ -1,5 +1,9 @@
 var searchData=
 [
-  ['impl_379',['impl',['../structMemMap.html#a65ed9d5eff88c6fb48d902ee00d1fd38',1,'MemMap::impl()'],['../structSlabAllocator.html#ad08456a937476e0a032f545d36c0f9fa',1,'SlabAllocator::impl()']]],
-  ['is_5fright_380',['is_right',['../structOrbTreeNodePair.html#a696a0f2b0f19e385bacf112d95cf6527',1,'OrbTreeNodePair']]]
+  ['last_5fi_409',['last_i',['../memmap_8c.html#ae86e294ec7dfc3a2bc4f729077eb61a5',1,'memmap.c']]],
+  ['last_5fj_410',['last_j',['../memmap_8c.html#a1f519f74bf40c44773a9e6d98844072a',1,'memmap.c']]],
+  ['last_5fk_411',['last_k',['../memmap_8c.html#ac66f9a5a6e821b26da1503987b9c61db',1,'memmap.c']]],
+  ['last_5fl_412',['last_l',['../memmap_8c.html#ac128125a380dda0abe159c9f6aab8bac',1,'memmap.c']]],
+  ['left_413',['left',['../structOrbTreeNodeImpl.html#ad3d34c756d55739c3e367f73dd30018e',1,'OrbTreeNodeImpl']]],
+  ['left_5fsubtree_5fheight_414',['left_subtree_height',['../structOrbTreeNodeImpl.html#a50b2803f91662b307589186ab70524f4',1,'OrbTreeNodeImpl']]]
 ];

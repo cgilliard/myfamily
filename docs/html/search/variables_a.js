@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['parent_395',['parent',['../structOrbTreeNodePair.html#a575e17d3df2fd4ef2b04aa99a2f8cc67',1,'OrbTreeNodePair']]],
-  ['ptr_396',['ptr',['../structAlloc.html#a2f30a1905bca61fdd1948752457346dd',1,'Alloc']]]
+  ['right_424',['right',['../structOrbTreeNodeImpl.html#af81f29fedf7e73ff8ca8ff6d3be20d84',1,'OrbTreeNodeImpl']]],
+  ['right_5fsubtree_5fheight_5fcolor_425',['right_subtree_height_color',['../structOrbTreeNodeImpl.html#a9f43497d486fdb7cd8ea2328c7385269',1,'OrbTreeNodeImpl']]]
 ];
