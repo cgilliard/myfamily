@@ -59,10 +59,15 @@ OrbTreeNodeImpl *orbtree_node(Ptr ptr) {
 }
 
 #define RED_NODE 0x80000000
-#define IS_RED(k)                                       \
-	({                                                  \
-		OrbTreeNodeImpl *_impl__ = orbtree_node(k);     \
-		_impl__->right_subtree_height_color & RED_NODE; \
+#define IS_RED(k)                                                    \
+	({                                                               \
+		OrbTreeNodeImpl *_impl__ = orbtree_node(k);                  \
+		int _ret__;                                                  \
+		if (_impl__ == NULL)                                         \
+			_ret__ = 0;                                              \
+		else                                                         \
+			_ret__ = _impl__->right_subtree_height_color & RED_NODE; \
+		_ret__;                                                      \
 	})
 #define IS_BLACK(k) !IS_RED(k)
 #define SET_BLACK(k)                                      \

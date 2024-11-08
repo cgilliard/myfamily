@@ -40,7 +40,7 @@ int my_obj_search(const OrbTreeNode *root, const OrbTreeNode *value,
 
 		if (x1 == x2) {
 			break;
-		} else if (x1 > x2) {
+		} else if (x1 < x2) {
 			MyObject *right = orbtree_node_right(cur);
 			if (right == NULL) {
 				retval->parent = retval->self;
@@ -257,7 +257,7 @@ MyTest(core, test_random_tree) {
 	byte iv[16] = {};
 	cpsrng_test_seed(iv, key);
 
-	int size = 2;
+	int size = 100;
 	Ptr arr[size];
 
 	OrbTree t;
