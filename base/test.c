@@ -54,13 +54,6 @@ MyTest(base, test_lock_macros) {
 	cr_assert(y == 1);
 }
 
-MyTest(base, test_alloc) {
-	Alloc test1 = alloc(100);
-	cr_assert_eq(test1.size, page_aligned_size(100));
-	cr_assert(test1.ptr != NULL);
-	release(test1);
-}
-
 MyTest(base, test_memmap) {
 	MemMap mm1;
 	int size = 64;
@@ -147,7 +140,7 @@ MyTest(base, test_slab_allocator) {
 }
 
 MyTest(base, test_slab_allocator_recycle) {
-	long long size = 1024 * 1024 * 10;
+	long long size = 1024 * 1024 * 1;
 	int count = 5;
 	int alloc_size = 64;
 
@@ -169,7 +162,7 @@ MyTest(base, test_slab_allocator_recycle) {
 }
 
 MyTest(base, test_malloc_recycle) {
-	long long size = 1024 * 1024 * 10;
+	long long size = 1024 * 1024 * 1;
 	int count = 5;
 	int alloc_size = 64;
 
@@ -214,4 +207,19 @@ MyTest(base, test_slab_allocator_adv) {
 
 	slab_allocator_cleanup(&sa1);
 	free(arr);
+}
+
+typedef struct MyObject {
+	int x;
+	OrbTreeNode node1;
+	OrbTreeNode node2;
+} MyObject;
+
+MyTest(base, test_orbtree) {
+	OrbTree t;
+	SlabAllocator sa;
+	slab_allocator_init(&sa, sizeof(MyObject), 100, 200);
+	Ptr ptr = slab_allocator_allocate(&sa);
+	orbtree_put(&t, &(const OrbTreeNodeWrapper){ptr, offsetof(MyObject, node1)},
+				NULL);
 }

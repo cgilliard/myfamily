@@ -15,71 +15,60 @@
 #ifndef _BASE_ORBTREE__
 #define _BASE_ORBTREE__
 
-#include <base/macros.h>
 #include <base/slabs.h>
 #include <base/types.h>
 
+#define ORB_TREE_NODE_IMPL_SIZE 20
 typedef struct OrbTreeNode {
-	// ordered tree
-	// upper bit indicates if this is a 'box' or 'weak' type and as such data is
-	// treated as a pointer.
-	unsigned int ord_parent;
-	// if upper bit set and upper bit of parent is set, this indicates 'weak'.
-	// if upper bit not set and upper bit of parent is set, this indicates
-	// 'box'.
-	unsigned int ord_right;
-	unsigned int ord_left;
-	unsigned int ord_right_subtree_size;
-	// upper bit for left subtree size is ord_color
-	unsigned int ord_left_subtree_size;
-
-	// sequenced tree
-	unsigned int seq_parent;
-	unsigned int seq_right;
-	unsigned int seq_left;
-	unsigned int seq_right_subtree_size;
-	// upper bit for left subtree size is seq_color
-	unsigned int seq_left_subtree_size;
-
-	// namespace
-	unsigned int namespace;
-	unsigned int seqno;
-	// eventually move to our string type for this (both are pointers so 8
-	// bytes)
-	char *name;
-
-	// if this is a 'box' or 'weak' type as indicated in the upper bit of
-	// ord_parent/ord_right, we treat data as pointer. otherwise, the first byte
-	// is type indicator (int, byte, bool, float, or weak). Since all types only
-	// require 4 bytes or less the remaining 7 bytes. We use the same 'aux'
-	// reference counting for types as in the previous object model.
-	byte data[8];
+	byte impl[ORB_TREE_NODE_IMPL_SIZE];
 } OrbTreeNode;
 
-// Data structure used for searching ORBTrees.
+OrbTreeNode *orbtree_node_right(const OrbTreeNode *);
+OrbTreeNode *orbtree_node_left(const OrbTreeNode *);
+
 typedef struct OrbTreeNodePair {
+	// parent of the node
 	OrbTreeNode *parent;
+	// the node
 	OrbTreeNode *self;
+	// whether the node is the right node of its parent
 	bool is_right;
 } OrbTreeNodePair;
 
-Type(OrbTree);
-#define OrbTree DefineType(OrbTree)
+typedef struct OrbTreeNodeWrapper {
+	Ptr ptr;
+	unsigned int offset_of_orbtree_node;
+} OrbTreeNodeWrapper;
 
-OrbTree orbtree_create(int (*search)(const OrbTreeNode *root, const void *value,
-									 OrbTreeNodePair *retval));
+#define ORB_TREE_IMPL_SIZE 40
+typedef struct OrbTree {
+	byte impl[ORB_TREE_IMPL_SIZE];
+} OrbTree;
 
-// using the specified search function, find the specified value if found return
-// a pointer to its node. Otherwise return NULL.
-OrbTreeNode *orbtree_get(const OrbTree *ptr, const void *value);
-// insert the specified OrbTreeNode into the tree. If the value replaces another
-// value in the tree, the value that was replaced is returned
-// Otherwise, NULL is returned. (This is used so that the caller can handle
-// memory management operations on the node).
-OrbTreeNode *orbtree_put(OrbTree *ptr, OrbTreeNode *value);
+// OrbTree user defined search - provide a function to search from a given base
+// node to the specified value. The function is responsible for populating the
+// 'retval' field with the appropriate values for the search.
+typedef int (*OrbTreeSearch)(const OrbTreeNode *base, const OrbTreeNode *value,
+							 OrbTreeNodePair *retval);
 
-// remove the specified value from the tree. If the value is found and thus
-// removed, it is returned to the calling function. Otherwise NULL is returned.
-OrbTreeNode *orbtree_remove(const OrbTree *ptr, const void *value);
+// create an empty orbtree with the specified slab allocator (for lookup of Ptr
+// only)
+OrbTree orbtree_create(const SlabAllocator *sa);
+// get the specified value in the OrbTree. The implementation returns a void *
+// to the container of the final 'self' returned by the search function. If
+// offset is > 0, the appropriate offset will be applied by the orbtree
+// implementation.
+OrbTreeNode *orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
+						 const OrbTreeSearch *search, unsigned int offset);
+// inserts a node into the the tree overwriting an existing node with the same
+// value. if a node is overwritten it is returned by the function, otherwise
+// returns NULL.
+OrbTreeNodeWrapper *orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
+								const OrbTreeSearch *search);
+// removes a node from the tree, if it is removed, a pointer to the removed node
+// is returned.
+OrbTreeNodeWrapper *orbtree_remove(OrbTree *tree,
+								   const OrbTreeNodeWrapper *value,
+								   const OrbTreeSearch *search);
 
 #endif	// _BASE_ORBTREE__

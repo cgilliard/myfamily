@@ -63,17 +63,26 @@
 #define ASUB(ptr, value) __atomic_fetch_sub(ptr, value, __ATOMIC_RELAXED)
 
 // MMAP
-#define MMAP_ALIGNED_SIZE(size)                              \
-	({                                                       \
-		size_t page_size = getpagesize();                    \
-		(((size_t)size) + page_size - 1) & ~(page_size - 1); \
+#define MMAP_ALIGNED_SIZE(size)                                    \
+	({                                                             \
+		unsigned int page_size = getpagesize();                    \
+		(((unsigned int)size) + page_size - 1) & ~(page_size - 1); \
 	})
 #define MMAP(size)                                                  \
 	({                                                              \
-		/*println("mmap size = %lli", size);*/                      \
 		mmap(NULL, MMAP_ALIGNED_SIZE(size), PROT_READ | PROT_WRITE, \
 			 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);                   \
 	})
 #define MUNMAP(ptr, size) munmap(ptr, MMAP_ALIGNED_SIZE(size))
+
+// SPECTRE PROTECT
+#if defined(__GNUC__)
+#define SPECTRE_PROTECT __attribute__((noclone, nospeculative_load_hardening))
+#elif defined(__clang__)
+#define SPECTRE_PROTECT \
+	__attribute__((noclone))  // Clang doesn't have nospeculative_load_hardening
+#else
+#define SPECTRE_PROTECT	 // No special attribute for other compilers
+#endif
 
 #endif	// _BASE_MACROS__

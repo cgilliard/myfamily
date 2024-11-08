@@ -16,6 +16,10 @@
 #include <base/memmap.h>
 #include <base/osdef.h>
 #include <base/print_util.h>
+#include <sys/mman.h>
+
+void *memset(void *ptr, int x, size_t n);
+size_t getpagesize();
 
 #define MEMMAP_ENTRY_PER_LEVEL 256
 #define BITMAP_SIZE 32

@@ -13,19 +13,46 @@
 // limitations under the License.
 
 #include <base/orbtree.h>
+#include <base/print_util.h>
+#include <base/slabs.h>
 
-OrbTree orbtree_create(int (*search)(const OrbTreeNode *root, const void *value,
-									 OrbTreeNodePair *retval)) {
+typedef struct OrbTreeNodeImpl {
+	Ptr parent;
+	Ptr right;
+	Ptr left;
+	unsigned int right_subtree_height_color;
+	unsigned int left_subtree_height;
+} OrbTreeNodeImpl;
+
+void __attribute__((constructor)) __orbtree_check_sizes() {
+	if (sizeof(OrbTreeNodeImpl) != sizeof(OrbTreeNode))
+		panic("sizeof(OrbTreeNodeImpl) (%i) != sizeof(OrbTreeNode) (%i)",
+			  sizeof(OrbTreeNodeImpl), sizeof(OrbTreeNode));
+}
+
+OrbTreeNode *orbtree_node_right(const OrbTreeNode *tree) {
 	return NULL;
 }
 
-OrbTreeNode *orbtree_get(const OrbTree *ptr, const void *value) {
-	return NULL;
-}
-OrbTreeNode *orbtree_put(OrbTree *ptr, OrbTreeNode *value) {
+OrbTreeNode *orbtree_node_left(const OrbTreeNode *tree) {
 	return NULL;
 }
 
-OrbTreeNode *orbtree_remove(const OrbTree *ptr, const void *value) {
+OrbTree orbtree_create(const SlabAllocator *sa) {
+	OrbTree ret = {};
+	return ret;
+}
+OrbTreeNode *orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
+						 const OrbTreeSearch *search, unsigned int offset) {
+	return NULL;
+}
+OrbTreeNodeWrapper *orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
+								const OrbTreeSearch *search) {
+	return NULL;
+}
+
+OrbTreeNodeWrapper *orbtree_remove(OrbTree *tree,
+								   const OrbTreeNodeWrapper *value,
+								   const OrbTreeSearch *search) {
 	return NULL;
 }

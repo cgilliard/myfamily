@@ -12,31 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_ALLOC__
-#define _BASE_ALLOC__
+#include <base/object.h>
 
-#include <base/types.h>
-
-unsigned int page_aligned_size(unsigned int size);
-
-typedef struct ResourceStats {
-	int64 alloc_sum;
-	int64 resize_sum;
-	int64 release_sum;
-	int64 fopen_sum;
-	int64 fclose_sum;
-} ResourceStats;
-
-typedef struct Alloc {
-	void *ptr;
-	unsigned int size;
-} Alloc;
-
-Alloc alloc(unsigned int size);
-void release(Alloc alloc);
-
-int64 alloc_sum();
-int64 resize_sum();
-int64 release_sum();
-
-#endif	// _BASE_ALLOC__
+#define ORB_TREE_NODE_IMPL_SIZE 24
+typedef struct OrbTreeNode {
+	byte impl[ORB_TREE_NODE_IMPL_SIZE];
+} OrbTreeNode;

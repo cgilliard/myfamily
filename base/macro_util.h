@@ -30,10 +30,15 @@
 #define SECOND_STRINGIFY(x, y) #y
 #define BOTH(x, y) x y
 
+#define container_of(ptr, type, member)                    \
+	({                                                     \
+		const typeof(((type *)0)->member) *__mptr = (ptr); \
+		(type *)((char *)__mptr - offsetof(type, member)); \
+	})
+
 #define loop while (true)
-#define π(...)                                                                                     \
-	while (true)                                                                                   \
-	sleep(INT_MAX)
+#define π(...) \
+	while (true) sleep(INT_MAX)
 
 #define EMPTY()
 #define DEFER1(m) m EMPTY()
@@ -51,8 +56,10 @@
 #define EVAL2(...) EVAL1(EVAL1(__VA_ARGS__))
 #define EVAL1(...) __VA_ARGS__
 
-#define MAP(m, arg, delim, first, ...)                                                             \
-	m(arg, first) __VA_OPT__(EXPAND_ALL delim DEFER1(_MAP)()(m, arg, delim, __VA_ARGS__))
+#define MAP(m, arg, delim, first, ...) \
+	m(arg, first) __VA_OPT__(          \
+		EXPAND_ALL delim DEFER1(_MAP)()(m, arg, delim, __VA_ARGS__))
 #define _MAP() MAP
 
-#define FOR_EACH(m, arg, delim, ...) EVAL(__VA_OPT__(MAP(m, arg, delim, __VA_ARGS__)))
+#define FOR_EACH(m, arg, delim, ...) \
+	EVAL(__VA_OPT__(MAP(m, arg, delim, __VA_ARGS__)))

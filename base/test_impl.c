@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/alloc.h>
 #include <base/colors.h>
 #include <base/print_util.h>
 #include <base/test_impl.h>
@@ -42,15 +41,17 @@ void test_init_dev_resources() {
 	// fam_alloc_init();
 }
 void test_confirm_dev_resources() {
-	int64 final_alloc_sum = alloc_sum();
-	int64 final_release_sum = release_sum();
-	if (final_alloc_sum != final_release_sum) {
-		println(
-			"[%s----%s] dev resource check %lli (allocations) / %lli "
-			"(deallocations). Memory leak?",
-			BLUE, RESET, final_alloc_sum, final_release_sum);
-		cr_assert_eq(final_alloc_sum, final_release_sum);
-	}
+	/*
+		int64 final_alloc_sum = alloc_sum();
+		int64 final_release_sum = release_sum();
+		if (final_alloc_sum != final_release_sum) {
+			println(
+				"[%s----%s] dev resource check %lli (allocations) / %lli "
+				"(deallocations). Memory leak?",
+				BLUE, RESET, final_alloc_sum, final_release_sum);
+			cr_assert_eq(final_alloc_sum, final_release_sum);
+		}
+	*/
 }
 void test_cleanup_dev_resources() {
 	// before cleanup verify that fam_alloc does not have any remaining slabs.

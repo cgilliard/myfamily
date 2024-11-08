@@ -3,10 +3,10 @@ OBJS := types.o \
 	print_util.o \
 	lock.o \
 	fam_err.o \
-	alloc.o \
 	slabs.o \
 	orbtree.o \
-	memmap.o
+	memmap.o \
+	object.o
 
 TEST_OBJS := $(OBJS)
 
