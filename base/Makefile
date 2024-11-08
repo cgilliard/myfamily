@@ -4,9 +4,8 @@ OBJS := types.o \
 	lock.o \
 	fam_err.o \
 	slabs.o \
-	orbtree.o \
 	memmap.o \
-	object.o
+	util.o
 
 TEST_OBJS := $(OBJS)
 

@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/colors.h>
-#include <base/fam_err.h>
-#include <base/limits.h>
-#include <base/lock.h>
-#include <base/macro_util.h>
-#include <base/macros.h>
-#include <base/memmap.h>
-#include <base/print_util.h>
-#include <base/slabs.h>
+#ifndef _CRYPTO_RAND__
+#define _CRYPTO_RAND__
+
 #include <base/types.h>
-#include <base/util.h>
+
+int rand_byte(byte *v);
+int rand_int(int *v);
+int rand_int64(int64 *v);
+int rand_bytes(void *buf, int64 length);
+
+#endif	// _CRYPTO_RAND__

@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/colors.h>
-#include <base/fam_err.h>
-#include <base/limits.h>
-#include <base/lock.h>
-#include <base/macro_util.h>
-#include <base/macros.h>
-#include <base/memmap.h>
-#include <base/print_util.h>
-#include <base/slabs.h>
 #include <base/types.h>
 #include <base/util.h>
+
+void *mymemcpy(void *dst, const void *src, unsigned long long n) {
+	byte *bsrc = (byte *)src;
+	byte *bdst = (byte *)dst;
+
+	for (unsigned long long i = 0; i < n; i++) bdst[i] = bsrc[i];
+	return bdst;
+}

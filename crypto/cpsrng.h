@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/colors.h>
-#include <base/fam_err.h>
-#include <base/limits.h>
-#include <base/lock.h>
-#include <base/macro_util.h>
-#include <base/macros.h>
-#include <base/memmap.h>
-#include <base/print_util.h>
-#include <base/slabs.h>
+#ifndef _CRYPTO_PSRNG__
+#define _CRYPTO_PSRNG__
+
 #include <base/types.h>
-#include <base/util.h>
+
+void cpsrng_reseed();
+void cpsrng_rand_byte(byte *v);
+void cpsrng_rand_int64(int64 *v);
+void cpsrng_rand_int(int *v);
+void cpsrng_rand_bytes(void *v, unsigned long long size);
+
+#ifdef TEST
+void cpsrng_test_seed(byte iv[16], byte key[32]);
+#endif	// TEST
+
+#endif	// _CRYPTO_PSRNG__

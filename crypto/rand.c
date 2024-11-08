@@ -12,9 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/object.h>
+#include <base/types.h>
+#include <crypto/rand.h>
+#include <sys/random.h>
 
-#define ORB_TREE_NODE_IMPL_SIZE 24
-typedef struct OrbTreeNode {
-	byte impl[ORB_TREE_NODE_IMPL_SIZE];
-} OrbTreeNode;
+int rand_byte(byte *v) {
+	return getentropy(v, sizeof(byte));
+}
+
+int rand_int(int *v) {
+	return getentropy(v, sizeof(int));
+}
+
+int rand_int64(int64 *v) {
+	return getentropy(v, sizeof(int64));
+}
+
+int rand_bytes(void *buf, int64 length) {
+	return getentropy(buf, length);
+}

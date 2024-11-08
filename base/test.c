@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/test.h>
+#include <crypto/cpsrng.h>
 
 Suite(base);
 
@@ -209,107 +210,19 @@ MyTest(base, test_slab_allocator_adv) {
 	free(arr);
 }
 
-typedef struct MyObject {
-	int x;
-	Ptr ptr;
-	OrbTreeNode node1;
-	OrbTreeNode node2;
-} MyObject;
-
-SlabAllocator sa;
-
-int my_obj_search(const OrbTreeNode *root, const OrbTreeNode *value,
-				  OrbTreeNodePair *retval) {
-	retval->parent = null;
-	retval->is_right = true;
-	const OrbTreeNode *cur = root;
-	loop {
-		int x1 = container_of(cur, MyObject, node1)->x;
-		int x2 = container_of(value, MyObject, node1)->x;
-
-		retval->self = orbtree_node_ptr(cur, retval->is_right);
-
-		if (x1 == x2) {
-			break;
-		} else if (x1 > x2) {
-			MyObject *right = orbtree_node_right(cur);
-			if (right == NULL) {
-				retval->parent = retval->self;
-				retval->self = null;
-				retval->is_right = true;
-				break;
-			}
-			Ptr rptr = orbtree_node_ptr(&right->node1, true);
-			retval->parent = orbtree_node_ptr(cur, retval->is_right);
-			retval->is_right = true;
-			cur = (const OrbTreeNode *)(slab_get(&sa, rptr) +
-										offsetof(MyObject, node1));
-		} else {
-			MyObject *left = orbtree_node_right(cur);
-			if (left == NULL) {
-				retval->parent = retval->self;
-				retval->self = null;
-				retval->is_right = false;
-				break;
-			}
-			Ptr lptr = orbtree_node_ptr(&left->node1, false);
-			retval->parent = orbtree_node_ptr(cur, retval->is_right);
-			retval->is_right = false;
-			cur = (const OrbTreeNode *)(slab_get(&sa, lptr) +
-										offsetof(MyObject, node1));
-		}
-	}
-	return 0;
-}
-
-MyObject *create_my_object(int value) {
-	Ptr ptr = slab_allocator_allocate(&sa);
-	MyObject *ret = (MyObject *)slab_get(&sa, ptr);
-	ret->ptr = ptr;
-	ret->x = value;
-	return ret;
-}
-
-void free_my_object(MyObject *obj) {
-	slab_allocator_free(&sa, obj->ptr);
-}
-
-OrbTreeNodeWrapper wrapper_for(MyObject *obj) {
-	OrbTreeNodeWrapper ret = {.ptr = obj->ptr, offsetof(MyObject, node1)};
-	return ret;
-}
-
-OrbTreeNodeWrapper wrap_obj(int value) {
-	MyObject *obj = create_my_object(value);
-	return wrapper_for(obj);
-}
-
-void free_wrapper(OrbTreeNodeWrapper wrapper) {
-	slab_allocator_free(&sa, wrapper.ptr);
-}
-
-MyTest(base, test_orbtree) {
-	OrbTree t;
-	slab_allocator_init(&sa, sizeof(MyObject), 100, 200);
-	orbtree_init(&t, &sa);
-
-	OrbTreeNodeWrapper obj1 = wrap_obj(1);
-	orbtree_put(&t, &obj1, my_obj_search);
-
-	OrbTreeNodeWrapper obj2 = wrap_obj(0);
-
-	orbtree_put(&t, &obj2, my_obj_search);
-
-	MyObject *obj2_out = orbtree_get(&t, &obj2, my_obj_search, 0);
-	cr_assert(obj2_out);
-	cr_assert_eq(obj2_out->x, 0);
-
-	MyObject *obj_out = orbtree_get(&t, &obj1, my_obj_search, 0);
-	cr_assert(obj_out);
-	cr_assert_eq(obj_out->x, 1);
-
-	free_wrapper(obj1);
-	free_wrapper(obj2);
-
-	slab_allocator_cleanup(&sa);
+MyTest(base, test_util) {
+	char *x = "1234567";
+	char y[10];
+	for (int i = 0; i < 10; i++) y[i] = '\0';
+	mymemcpy(y, x, 3);
+	cr_assert_eq(y[0], '1');
+	cr_assert_eq(y[1], '2');
+	cr_assert_eq(y[2], '3');
+	cr_assert_eq(y[3], '\0');
+	cr_assert_eq(y[4], '\0');
+	cr_assert_eq(y[5], '\0');
+	cr_assert_eq(y[6], '\0');
+	cr_assert_eq(y[7], '\0');
+	cr_assert_eq(y[8], '\0');
+	cr_assert_eq(y[9], '\0');
 }

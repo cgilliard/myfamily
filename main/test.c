@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <base/test.h>
-#include <criterion/criterion.h>
 #include <main/main.h>
 
 Suite(main);
