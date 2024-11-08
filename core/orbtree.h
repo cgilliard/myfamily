@@ -64,10 +64,10 @@ int orbtree_init(OrbTree *tree, const SlabAllocator *sa);
 void *orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
 				  OrbTreeSearch search, unsigned int offset);
 // inserts a node into the the tree overwriting an existing node with the same
-// value. if a node is overwritten it is returned by the function, otherwise
-// returns NULL.
-void *orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
-				  const OrbTreeSearch search);
+// value. if a node is overwritten it is returned by the function in Ptr form,
+// otherwise returns null.
+Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
+				const OrbTreeSearch search);
 // removes a node from the tree, if it is removed, a pointer to the removed node
 // is returned.
 void *orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,

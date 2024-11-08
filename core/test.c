@@ -20,6 +20,7 @@ Suite(core);
 
 typedef struct MyObject {
 	int x;
+	int v;
 	Ptr ptr;
 	OrbTreeNode node1;
 	OrbTreeNode node2;
@@ -71,11 +72,12 @@ int my_obj_search(const OrbTreeNode *root, const OrbTreeNode *value,
 	return 0;
 }
 
-MyObject *create_my_object(int value) {
+MyObject *create_my_object(int value, int value2) {
 	Ptr ptr = slab_allocator_allocate(&sa);
 	MyObject *ret = (MyObject *)slab_get(&sa, ptr);
 	ret->ptr = ptr;
 	ret->x = value;
+	ret->v = value2;
 	return ret;
 }
 
@@ -84,8 +86,8 @@ OrbTreeNodeWrapper wrapper_for(MyObject *obj) {
 	return ret;
 }
 
-OrbTreeNodeWrapper wrap_obj(int value) {
-	MyObject *obj = create_my_object(value);
+OrbTreeNodeWrapper wrap_obj(int value, int value2) {
+	MyObject *obj = create_my_object(value, value2);
 	return wrapper_for(obj);
 }
 
@@ -218,10 +220,10 @@ MyTest(core, test_orbtree) {
 	slab_allocator_init(&sa, sizeof(MyObject), 100, 200);
 	orbtree_init(&t, &sa);
 
-	OrbTreeNodeWrapper obj1 = wrap_obj(1);
+	OrbTreeNodeWrapper obj1 = wrap_obj(1, 0);
 	orbtree_put(&t, &obj1, my_obj_search);
 
-	OrbTreeNodeWrapper obj2 = wrap_obj(0);
+	OrbTreeNodeWrapper obj2 = wrap_obj(0, 0);
 
 	orbtree_put(&t, &obj2, my_obj_search);
 
@@ -233,7 +235,7 @@ MyTest(core, test_orbtree) {
 	cr_assert(obj1_out);
 	cr_assert_eq(obj1_out->x, 1);
 
-	OrbTreeNodeWrapper obj3 = wrap_obj(2);
+	OrbTreeNodeWrapper obj3 = wrap_obj(2, 0);
 	orbtree_put(&t, &obj3, my_obj_search);
 
 	MyObject *obj3_out = orbtree_get(&t, &obj3, my_obj_search, 0);
@@ -252,7 +254,7 @@ MyTest(core, test_orbtree) {
 
 MyTest(core, test_random_tree) {
 	// seed rng for reproducibility
-	byte key[32] = {7};
+	byte key[32] = {8};
 	byte iv[16] = {};
 	cpsrng_test_seed(iv, key);
 
@@ -261,26 +263,51 @@ MyTest(core, test_random_tree) {
 	int vals[size];
 
 	OrbTree t;
-	slab_allocator_init(&sa, sizeof(MyObject), 2000, 2000);
+	slab_allocator_init(&sa, sizeof(MyObject), 1010, 1010);
 
 	orbtree_init(&t, &sa);
 
 	for (int i = 0; i < size; i++) {
-		int x;
+		int x = 0;
 		cpsrng_rand_int(&x);
 		vals[i] = x;
-		OrbTreeNodeWrapper obj1 = wrap_obj(x);
-		orbtree_put(&t, &obj1, my_obj_search);
+		OrbTreeNodeWrapper obj1 = wrap_obj(x, 0);
+		cr_assert(!orbtree_put(&t, &obj1, my_obj_search));
 		arr[i] = obj1.ptr;
 	}
 
 	my_obj_validate(&t);
 
 	for (int i = 0; i < size; i++) {
-		OrbTreeNodeWrapper obj = wrap_obj(vals[i]);
+		OrbTreeNodeWrapper obj = wrap_obj(vals[i], 0);
 		MyObject *obj_out = orbtree_get(&t, &obj, my_obj_search, 0);
 		cr_assert_eq(obj_out->ptr, arr[i]);
+		slab_allocator_free(&sa, obj.ptr);
 	}
+
+	// try a node not in the tree
+	OrbTreeNodeWrapper obj = wrap_obj(0, 1);
+	MyObject *obj_out = orbtree_get(&t, &obj, my_obj_search, 0);
+	cr_assert_eq(obj_out, NULL);
+	slab_allocator_free(&sa, obj.ptr);
+
+	my_obj_validate(&t);
+
+	// my_object_orbtree_print(&t);
+
+	// do transplants
+	OrbTreeNodeWrapper replace1 = wrap_obj(vals[3], 1);
+	Ptr rep_ptr = orbtree_put(&t, &replace1, my_obj_search);
+	cr_assert_eq(rep_ptr, arr[3]);
+
+	// my_object_orbtree_print(&t);
+	my_obj_validate(&t);
+
+	OrbTreeNodeWrapper replace2 = wrap_obj(vals[7], 1);
+	Ptr rep_ptr2 = orbtree_put(&t, &replace2, my_obj_search);
+	cr_assert_eq(rep_ptr2, arr[7]);
+
+	my_obj_validate(&t);
 
 	for (int i = 0; i < size; i++) slab_allocator_free(&sa, arr[i]);
 	slab_allocator_cleanup(&sa);

@@ -216,15 +216,49 @@ int orbtree_put_fixup(Ptr k_ptr) {
 	return 0;
 }
 
-int orbtree_insert(OrbTreeImpl *impl, OrbTreeNodePair *pair, Ptr ptr) {
+void orbtree_init_node(OrbTreeNodeImpl *node, bool red, Ptr parent) {
+	node->right = null;
+	node->left = null;
+	node->parent = parent;
+	if (red)
+		node->right_subtree_height_color = RED_NODE;
+	else
+		node->right_subtree_height_color = 0;
+	node->left_subtree_height = 0;
+}
+
+int orbtree_insert_transplant(OrbTreeImpl *impl, const OrbTreeNodeImpl *prev,
+							  OrbTreeNodeImpl *next, Ptr ptr, bool is_right) {
+	next->parent = prev->parent;
+	next->right = prev->right;
+	next->left = prev->left;
+	next->right_subtree_height_color = prev->right_subtree_height_color;
+	next->left_subtree_height = prev->left_subtree_height;
+
+	if (next->parent != null) {
+		OrbTreeNodeImpl *parent = orbtree_node(next->parent);
+		if (is_right) {
+			parent->right = ptr;
+		} else
+			parent->left = ptr;
+	}
+	if (next->left != null) {
+		OrbTreeNodeImpl *left = orbtree_node(next->left);
+		left->parent = ptr;
+	}
+	if (next->right != null) {
+		OrbTreeNodeImpl *right = orbtree_node(next->right);
+		right->parent = ptr;
+	}
+
+	return 0;
+}
+
+Ptr orbtree_insert(OrbTreeImpl *impl, OrbTreeNodePair *pair, Ptr ptr) {
 	if (pair->parent == null) {
 		impl->root = pair->self;
 		OrbTreeNodeImpl *self = (OrbTreeNodeImpl *)orbtree_node(pair->self);
-		self->right = null;
-		self->left = null;
-		self->parent = null;
-		self->right_subtree_height_color = 0;
-		self->left_subtree_height = 0;
+		orbtree_init_node(self, false, null);
 	} else {
 		OrbTreeNodeImpl *self = (OrbTreeNodeImpl *)orbtree_node(pair->self);
 		if (self == NULL) {
@@ -235,15 +269,16 @@ int orbtree_insert(OrbTreeImpl *impl, OrbTreeNodePair *pair, Ptr ptr) {
 			else
 				parent->left = ptr;
 			self = (OrbTreeNodeImpl *)orbtree_node(ptr);
-			self->parent = pair->parent;
-			self->right = null;
-			self->left = null;
-			self->right_subtree_height_color = RED_NODE;
-			self->left_subtree_height = 0;
+			orbtree_init_node(self, true, pair->parent);
 		} else {
+			OrbTreeNodeImpl *next = orbtree_value(ptr) + orbtree_tl_ctx.offset;
+			Ptr ret =
+				orbtree_node_ptr((const OrbTreeNode *)self, pair->is_right);
+			orbtree_insert_transplant(impl, self, next, ptr, pair->is_right);
+			return ret;
 		}
 	}
-	return 0;
+	return null;
 }
 
 void *orbtree_node_right(const OrbTreeNode *node) {
@@ -313,8 +348,8 @@ void *orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
 		return NULL;
 }
 
-void *orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
-				  OrbTreeSearch search) {
+Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
+				OrbTreeSearch search) {
 	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
 	orbtree_set_tl_context(impl, value);
 
@@ -326,10 +361,10 @@ void *orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
 		search(root, target, &pair);
 	}
 
-	orbtree_insert(impl, &pair, value->ptr);
-	orbtree_put_fixup(value->ptr);
+	Ptr ret = orbtree_insert(impl, &pair, value->ptr);
+	if (ret == null) orbtree_put_fixup(value->ptr);
 
-	return NULL;
+	return ret;
 }
 
 void *orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
