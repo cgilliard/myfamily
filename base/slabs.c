@@ -43,7 +43,7 @@ void __attribute__((constructor)) __slabs_check_sizes() {
 			  sizeof(SlabAllocatorImpl), sizeof(SlabAllocator));
 }
 
-byte *slab_get(SlabAllocator *sa, Ptr ptr) {
+byte *slab_get(const SlabAllocator *sa, Ptr ptr) {
 	if (sa == NULL || nil(ptr)) {
 		SetErr(IllegalArgument);
 		return NULL;

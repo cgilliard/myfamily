@@ -24,6 +24,7 @@ typedef enum ObjectType {
 	ObjectTypeBool,
 	ObjectTypeBox,
 	ObjectTypeErr,
+	ObjectTypeFunction,
 } ObjectType;
 
 #define OBJECT_IMPL_SIZE 64
@@ -36,6 +37,7 @@ Object object_create_float(float value);
 Object object_create_byte(byte value);
 Object object_create_bool(bool value);
 Object object_create_err(int value);
+Object object_create_function(void *fn);
 Object object_create_box(unsigned long long size);
 
 int object_value_of_primitive(const Object *obj);

@@ -25,7 +25,7 @@ typedef struct SlabAllocator {
 	byte impl[SA_IMPL_SIZE];
 } SlabAllocator;
 
-byte *slab_get(SlabAllocator *sa, Ptr p);
+byte *slab_get(const SlabAllocator *sa, Ptr p);
 unsigned long long *slab_aux(SlabAllocator *sa, Ptr p);
 
 int slab_allocator_init(SlabAllocator *sa, unsigned int slab_size,

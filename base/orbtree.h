@@ -23,14 +23,15 @@ typedef struct OrbTreeNode {
 	byte impl[ORB_TREE_NODE_IMPL_SIZE];
 } OrbTreeNode;
 
-OrbTreeNode *orbtree_node_right(const OrbTreeNode *);
-OrbTreeNode *orbtree_node_left(const OrbTreeNode *);
+void *orbtree_node_right(const OrbTreeNode *);
+void *orbtree_node_left(const OrbTreeNode *);
+Ptr orbtree_node_ptr(const OrbTreeNode *, bool is_right);
 
 typedef struct OrbTreeNodePair {
 	// parent of the node
-	OrbTreeNode *parent;
+	Ptr parent;
 	// the node
-	OrbTreeNode *self;
+	Ptr self;
 	// whether the node is the right node of its parent
 	bool is_right;
 } OrbTreeNodePair;
@@ -53,22 +54,21 @@ typedef int (*OrbTreeSearch)(const OrbTreeNode *base, const OrbTreeNode *value,
 
 // create an empty orbtree with the specified slab allocator (for lookup of Ptr
 // only)
-OrbTree orbtree_create(const SlabAllocator *sa);
+int orbtree_init(OrbTree *tree, const SlabAllocator *sa);
 // get the specified value in the OrbTree. The implementation returns a void *
 // to the container of the final 'self' returned by the search function. If
 // offset is > 0, the appropriate offset will be applied by the orbtree
 // implementation.
-OrbTreeNode *orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
-						 const OrbTreeSearch *search, unsigned int offset);
+void *orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
+				  OrbTreeSearch search, unsigned int offset);
 // inserts a node into the the tree overwriting an existing node with the same
 // value. if a node is overwritten it is returned by the function, otherwise
 // returns NULL.
-OrbTreeNodeWrapper *orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
-								const OrbTreeSearch *search);
+void *orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
+				  const OrbTreeSearch search);
 // removes a node from the tree, if it is removed, a pointer to the removed node
 // is returned.
-OrbTreeNodeWrapper *orbtree_remove(OrbTree *tree,
-								   const OrbTreeNodeWrapper *value,
-								   const OrbTreeSearch *search);
+void *orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
+					 const OrbTreeSearch search);
 
 #endif	// _BASE_ORBTREE__
