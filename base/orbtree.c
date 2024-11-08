@@ -60,7 +60,6 @@ OrbTreeNode *orbtree_node(Ptr ptr, unsigned int offset) {
 
 int orbtree_insert(OrbTreeImpl *impl, OrbTreeNodePair *pair,
 				   const OrbTreeNodeWrapper *value) {
-	println("orrbtree insert self=%u parent=%u", pair->self, pair->parent);
 	if (pair->parent == null) {
 		impl->root = pair->self;
 		OrbTreeNodeImpl *self = (OrbTreeNodeImpl *)orbtree_node(
@@ -88,7 +87,7 @@ int orbtree_insert(OrbTreeImpl *impl, OrbTreeNodePair *pair,
 			self->right_subtree_height_color = RED_NODE;
 			self->left_subtree_height = 0;
 		} else {
-			println("self not null update");
+			// println("self not null update");
 		}
 	}
 	return 0;
@@ -127,13 +126,18 @@ int orbtree_init(OrbTree *tree, const SlabAllocator *sa) {
 	return 0;
 }
 
+void orbtree_set_tl_context(OrbTreeImpl *impl,
+							const OrbTreeNodeWrapper *value) {
+	tl_slab_allocator = impl->sa;
+	tl_tree = impl;
+	tl_offset = value->offset_of_orbtree_node;
+}
+
 void *orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
 				  OrbTreeSearch search, unsigned int offset) {
 	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
 	if (impl->root == null) return NULL;
-	tl_slab_allocator = impl->sa;
-	tl_tree = impl;
-	tl_offset = value->offset_of_orbtree_node;
+	orbtree_set_tl_context(impl, value);
 	OrbTreeNode *root = orbtree_node(impl->root, value->offset_of_orbtree_node);
 	OrbTreeNode *target =
 		orbtree_node(value->ptr, value->offset_of_orbtree_node);
@@ -149,9 +153,7 @@ void *orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
 void *orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
 				  OrbTreeSearch search) {
 	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
-	tl_slab_allocator = impl->sa;
-	tl_tree = impl;
-	tl_offset = value->offset_of_orbtree_node;
+	orbtree_set_tl_context(impl, value);
 
 	OrbTreeNode *target =
 		orbtree_node(value->ptr, value->offset_of_orbtree_node);
@@ -170,5 +172,7 @@ void *orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
 
 void *orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
 					 OrbTreeSearch search) {
+	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
+	orbtree_set_tl_context(impl, value);
 	return NULL;
 }

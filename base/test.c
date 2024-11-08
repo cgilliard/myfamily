@@ -211,6 +211,7 @@ MyTest(base, test_slab_allocator_adv) {
 
 typedef struct MyObject {
 	int x;
+	Ptr ptr;
 	OrbTreeNode node1;
 	OrbTreeNode node2;
 } MyObject;
@@ -225,8 +226,6 @@ int my_obj_search(const OrbTreeNode *root, const OrbTreeNode *value,
 	loop {
 		int x1 = container_of(cur, MyObject, node1)->x;
 		int x2 = container_of(value, MyObject, node1)->x;
-		println("x1=%i,x2=%i, %p %p, cur =%p", x1, x2, orbtree_node_right(cur),
-				orbtree_node_left(cur), cur);
 
 		retval->self = orbtree_node_ptr(cur, retval->is_right);
 
@@ -263,36 +262,54 @@ int my_obj_search(const OrbTreeNode *root, const OrbTreeNode *value,
 	return 0;
 }
 
+MyObject *create_my_object(int value) {
+	Ptr ptr = slab_allocator_allocate(&sa);
+	MyObject *ret = (MyObject *)slab_get(&sa, ptr);
+	ret->ptr = ptr;
+	ret->x = value;
+	return ret;
+}
+
+void free_my_object(MyObject *obj) {
+	slab_allocator_free(&sa, obj->ptr);
+}
+
+OrbTreeNodeWrapper wrapper_for(MyObject *obj) {
+	OrbTreeNodeWrapper ret = {.ptr = obj->ptr, offsetof(MyObject, node1)};
+	return ret;
+}
+
+OrbTreeNodeWrapper wrap_obj(int value) {
+	MyObject *obj = create_my_object(value);
+	return wrapper_for(obj);
+}
+
+void free_wrapper(OrbTreeNodeWrapper wrapper) {
+	slab_allocator_free(&sa, wrapper.ptr);
+}
+
 MyTest(base, test_orbtree) {
 	OrbTree t;
 	slab_allocator_init(&sa, sizeof(MyObject), 100, 200);
-	Ptr ptr = slab_allocator_allocate(&sa);
-	MyObject *obj1 = (MyObject *)slab_get(&sa, ptr);
-	obj1->x = 1;
 	orbtree_init(&t, &sa);
-	println("orbtree_put1");
-	orbtree_put(&t, &(const OrbTreeNodeWrapper){ptr, offsetof(MyObject, node1)},
-				my_obj_search);
 
-	Ptr ptr2 = slab_allocator_allocate(&sa);
-	MyObject *obj2 = (MyObject *)slab_get(&sa, ptr2);
-	obj2->x = 0;
-	println("orbtree_put2");
-	orbtree_put(&t,
-				&(const OrbTreeNodeWrapper){ptr2, offsetof(MyObject, node1)},
-				my_obj_search);
+	OrbTreeNodeWrapper obj1 = wrap_obj(1);
+	orbtree_put(&t, &obj1, my_obj_search);
 
-	println("orbtree_get");
-	MyObject *obj2_out = orbtree_get(
-		&t, &(const OrbTreeNodeWrapper){ptr2, offsetof(MyObject, node1)},
-		my_obj_search, 0);
+	OrbTreeNodeWrapper obj2 = wrap_obj(0);
+
+	orbtree_put(&t, &obj2, my_obj_search);
+
+	MyObject *obj2_out = orbtree_get(&t, &obj2, my_obj_search, 0);
 	cr_assert(obj2_out);
 	cr_assert_eq(obj2_out->x, 0);
 
-	println("orbtree_get1");
-	MyObject *obj_out = orbtree_get(
-		&t, &(const OrbTreeNodeWrapper){ptr, offsetof(MyObject, node1)},
-		my_obj_search, 0);
+	MyObject *obj_out = orbtree_get(&t, &obj1, my_obj_search, 0);
 	cr_assert(obj_out);
 	cr_assert_eq(obj_out->x, 1);
+
+	free_wrapper(obj1);
+	free_wrapper(obj2);
+
+	slab_allocator_cleanup(&sa);
 }
