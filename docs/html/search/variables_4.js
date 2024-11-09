@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['impl_407',['impl',['../structMemMap.html#a65ed9d5eff88c6fb48d902ee00d1fd38',1,'MemMap::impl()'],['../structOrbTreeNode.html#a0c83986f2a4550a5a145a1393f149411',1,'OrbTreeNode::impl()'],['../structObject.html#a6525f897b9cebc78f584201292756232',1,'Object::impl()'],['../structOrbTree.html#a2b8b28c5fc397d5a347eb5cd40f7f307',1,'OrbTree::impl()'],['../structSlabAllocator.html#ad08456a937476e0a032f545d36c0f9fa',1,'SlabAllocator::impl()']]],
-  ['is_5fright_408',['is_right',['../structOrbTreeNodePair.html#a696a0f2b0f19e385bacf112d95cf6527',1,'OrbTreeNodePair']]]
+  ['fam_5ferr_605',['fam_err',['../fam__err_8c.html#a445caa137b1d2986716f46e3faad439d',1,'fam_err():&#160;fam_err.c'],['../fam__err_8h.html#a445caa137b1d2986716f46e3faad439d',1,'fam_err():&#160;fam_err.c']]],
+  ['fam_5ferr_5flast_606',['fam_err_last',['../fam__err_8c.html#ad77a4350811747417268e4dfb64194db',1,'fam_err_last():&#160;fam_err.c'],['../fam__err_8h.html#ad77a4350811747417268e4dfb64194db',1,'fam_err_last():&#160;fam_err.c']]],
+  ['file_5fcount_607',['file_count',['../xxdir_8c.html#abd3633577cf354ae9e2c69a018cfe999',1,'xxdir.c']]],
+  ['file_5fsizes_608',['file_sizes',['../xxdir_8c.html#aab1026987f4e2b9d406e52e915a4cc2b',1,'xxdir.c']]],
+  ['free_5fsize_609',['free_size',['../structSlabAllocatorImpl.html#af43c07e607a936aa15db25efffa4bce7',1,'SlabAllocatorImpl']]]
 ];

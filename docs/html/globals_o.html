@@ -83,6 +83,9 @@ $(function() {
 <li>object_create_float()
 : <a class="el" href="object_8h.html#a8a6a5c4c011f1bd450a6a01a29272b95">object.h</a>
 </li>
+<li>object_create_function()
+: <a class="el" href="object_8h.html#acaba70f50ff7176228d38e3dcd02736d">object.h</a>
+</li>
 <li>object_create_int()
 : <a class="el" href="object_8h.html#ac9a66f964c6a66162bb1c21dee40f900">object.h</a>
 </li>
@@ -117,7 +120,7 @@ $(function() {
 : <a class="el" href="object_8h.html#a7adb40fef7954ff4b815278da155e46f">object.h</a>
 </li>
 <li>ObjectType
-: <a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">object.h</a>
+: <a class="el" href="object_8h.html#a06ae4e2ed34533f72218e1207aa28f18">object.h</a>
 </li>
 <li>ObjectTypeBool
 : <a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980a278cdf0ce9d5956b1aa6208906cac3fc">object.h</a>
@@ -133,6 +136,9 @@ $(function() {
 </li>
 <li>ObjectTypeFloat
 : <a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980ad754a806665d9dee325ae855e835f71f">object.h</a>
+</li>
+<li>ObjectTypeFunction
+: <a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980a20dca91902d525d403d77609fbeda324">object.h</a>
 </li>
 <li>ObjectTypeInt
 : <a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980a028b35d3fa5d895cfa2cfb99d13a58e5">object.h</a>
@@ -150,29 +156,93 @@ $(function() {
 <li>OrbTree
 : <a class="el" href="orbtree_8h.html#acc07b26f904c4fb531d76249f8d26b12">orbtree.h</a>
 </li>
-<li>orbtree_create()
-: <a class="el" href="orbtree_8c.html#a54f619e751504e48444a47ec3f30cd21">orbtree.c</a>
-, <a class="el" href="orbtree_8h.html#a54f619e751504e48444a47ec3f30cd21">orbtree.h</a>
+<li>orbtree_find_successor()
+: <a class="el" href="orbtree_8c.html#a3b22562f97068cc20e21e395985586b5">orbtree.c</a>
 </li>
 <li>orbtree_get()
-: <a class="el" href="orbtree_8c.html#ad08dcdc37a9dc99e3769aa906bafbde3">orbtree.c</a>
-, <a class="el" href="orbtree_8h.html#ad08dcdc37a9dc99e3769aa906bafbde3">orbtree.h</a>
+: <a class="el" href="orbtree_8c.html#a6d0fdd73d2feb693fbe71ccac10fb90e">orbtree.c</a>
+, <a class="el" href="orbtree_8h.html#a6d0fdd73d2feb693fbe71ccac10fb90e">orbtree.h</a>
+</li>
+<li>orbtree_init()
+: <a class="el" href="orbtree_8h.html#ab42deb21b4c1d0186eb298a22365d62f">orbtree.h</a>
+, <a class="el" href="orbtree_8c.html#ab42deb21b4c1d0186eb298a22365d62f">orbtree.c</a>
+</li>
+<li>orbtree_init_node()
+: <a class="el" href="orbtree_8c.html#a9694f48ddb59ff966a3962c1995dada4">orbtree.c</a>
+</li>
+<li>orbtree_insert()
+: <a class="el" href="orbtree_8c.html#a7efb383b47305cd551438910090d334d">orbtree.c</a>
+</li>
+<li>orbtree_insert_transplant()
+: <a class="el" href="orbtree_8c.html#a927dbff12e1ca1dedd78788664254a4f">orbtree.c</a>
+</li>
+<li>orbtree_node()
+: <a class="el" href="orbtree_8c.html#af293fc5ae0181085dcca21176e0b9edb">orbtree.c</a>
+</li>
+<li>orbtree_node_is_red()
+: <a class="el" href="orbtree_8c.html#aef143a8238f274f21c63fbbe86e4a47e">orbtree.c</a>
 </li>
 <li>orbtree_node_left()
-: <a class="el" href="orbtree_8c.html#af4e1984339112304d23565e07f9bd1f5">orbtree.c</a>
-, <a class="el" href="orbtree_8h.html#ab21bd234ddfaaa4d2eb6d7f8ad7aade0">orbtree.h</a>
+: <a class="el" href="orbtree_8c.html#a0300f0b008f3fe08e0dd25d7bcfe0631">orbtree.c</a>
+, <a class="el" href="orbtree_8h.html#a286e5beeee2d2381e1f1846e7d4b99e6">orbtree.h</a>
+</li>
+<li>orbtree_node_parent()
+: <a class="el" href="orbtree_8c.html#a9052608e25bbbde498178d5a76e14c3a">orbtree.c</a>
+</li>
+<li>orbtree_node_ptr()
+: <a class="el" href="orbtree_8h.html#aa3bdf922d64e53123a481e1d3a6e6abc">orbtree.h</a>
+, <a class="el" href="orbtree_8c.html#a53ea63cdbe83f4377b2020034df4caff">orbtree.c</a>
 </li>
 <li>orbtree_node_right()
-: <a class="el" href="orbtree_8c.html#a5d00ba27130d7d23a072d17c79f27f13">orbtree.c</a>
-, <a class="el" href="orbtree_8h.html#a95483c3d7ec3e441f938cb6dad6bef3e">orbtree.h</a>
+: <a class="el" href="orbtree_8c.html#a1bc12ec47a7d52098ee16c0f12db8b81">orbtree.c</a>
+, <a class="el" href="orbtree_8h.html#a7e64a94aff6bf1bd480a81a75717f056">orbtree.h</a>
 </li>
 <li>orbtree_put()
-: <a class="el" href="orbtree_8c.html#ab094a7a91dc88e89d1a65cdbbeeca1b6">orbtree.c</a>
-, <a class="el" href="orbtree_8h.html#ab094a7a91dc88e89d1a65cdbbeeca1b6">orbtree.h</a>
+: <a class="el" href="orbtree_8c.html#a1bac675ad0544f6df775290c97145c82">orbtree.c</a>
+, <a class="el" href="orbtree_8h.html#ac726ac03e92ee74d7b436c0d27983b91">orbtree.h</a>
+</li>
+<li>orbtree_put_fixup()
+: <a class="el" href="orbtree_8c.html#a91023a6ad92900c653f339faa6c8a8a9">orbtree.c</a>
 </li>
 <li>orbtree_remove()
-: <a class="el" href="orbtree_8c.html#a50b7f24175531f390505e3abb61912d9">orbtree.c</a>
-, <a class="el" href="orbtree_8h.html#a50b7f24175531f390505e3abb61912d9">orbtree.h</a>
+: <a class="el" href="orbtree_8c.html#a4bd42e087ff029b27835ee088f8b9cfe">orbtree.c</a>
+, <a class="el" href="orbtree_8h.html#a1102e0d04f11aa0c4139f3e6153226a5">orbtree.h</a>
+</li>
+<li>orbtree_remove_fixup()
+: <a class="el" href="orbtree_8c.html#a045e48ae48f66dc2086049bd1b787af6">orbtree.c</a>
+</li>
+<li>orbtree_remove_impl()
+: <a class="el" href="orbtree_8c.html#aeef38c951ab6748633c5c5c6e9c42f5c">orbtree.c</a>
+</li>
+<li>orbtree_remove_transplant()
+: <a class="el" href="orbtree_8c.html#a16c8ff0995fbb980affeb60626a0a6d6">orbtree.c</a>
+</li>
+<li>orbtree_root()
+: <a class="el" href="orbtree_8c.html#a91d25d0b8be39e86e14fc390e39f4e7d">orbtree.c</a>
+</li>
+<li>orbtree_rotate_left()
+: <a class="el" href="orbtree_8c.html#ac36c6b878063b4acd878551d86cbb9b8">orbtree.c</a>
+</li>
+<li>orbtree_rotate_right()
+: <a class="el" href="orbtree_8c.html#a7cc86fc1db833a40659e941fb0e3d404">orbtree.c</a>
+</li>
+<li>orbtree_set_color_based_on_parent()
+: <a class="el" href="orbtree_8c.html#a14eb3a3951b1c86fb7f8a24caf02cc66">orbtree.c</a>
+</li>
+<li>orbtree_set_tl_context()
+: <a class="el" href="orbtree_8c.html#a7d35dba6f9fbadb82de9785a6973166e">orbtree.c</a>
+</li>
+<li>orbtree_tl_ctx
+: <a class="el" href="orbtree_8c.html#a576f798bf059e4eeebacdf2b8451b16a">orbtree.c</a>
+</li>
+<li>orbtree_value()
+: <a class="el" href="orbtree_8c.html#a4414d9624e93134c945837ffcdd690a0">orbtree.c</a>
+</li>
+<li>OrbTreeCtx
+: <a class="el" href="orbtree_8c.html#aee37b526419a67b875de380271a8a5ae">orbtree.c</a>
+</li>
+<li>OrbTreeImpl
+: <a class="el" href="orbtree_8c.html#af943f43b1c79b7a9481a04e2d92f1933">orbtree.c</a>
 </li>
 <li>OrbTreeNode
 : <a class="el" href="object_8c.html#a7f7caf93d655b82fd74a4bc05ada8009">object.c</a>

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['x_270',['x',['../structMyObject.html#ae1c40a1a1f3c871df40d526541ce50af',1,'MyObject']]],
-  ['xxdir_2ec_271',['xxdir.c',['../xxdir_8c.html',1,'']]]
+  ['v_394',['v',['../structMyObject.html#a7a62c188bab37af4acba8dc1d70f3d4a',1,'MyObject']]]
 ];

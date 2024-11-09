@@ -1,16 +1,17 @@
 var searchData=
 [
-  ['false_49',['false',['../types_8h.html#a65e9886d74aaee76545e83dd09011727',1,'types.h']]],
-  ['fam_5ferr_50',['fam_err',['../fam__err_8c.html#a445caa137b1d2986716f46e3faad439d',1,'fam_err():&#160;fam_err.c'],['../fam__err_8h.html#a445caa137b1d2986716f46e3faad439d',1,'fam_err():&#160;fam_err.c']]],
-  ['fam_5ferr_2ec_51',['fam_err.c',['../fam__err_8c.html',1,'']]],
-  ['fam_5ferr_2eh_52',['fam_err.h',['../fam__err_8h.html',1,'']]],
-  ['fam_5ferr_5flast_53',['fam_err_last',['../fam__err_8c.html#ad77a4350811747417268e4dfb64194db',1,'fam_err_last():&#160;fam_err.c'],['../fam__err_8h.html#ad77a4350811747417268e4dfb64194db',1,'fam_err_last():&#160;fam_err.c']]],
-  ['famerr_5fvalues_54',['FAMERR_VALUES',['../fam__err_8h.html#af32ddc3f45c37388331257232616d739',1,'fam_err.h']]],
-  ['file_5fcount_55',['file_count',['../xxdir_8c.html#abd3633577cf354ae9e2c69a018cfe999',1,'xxdir.c']]],
-  ['file_5fsizes_56',['file_sizes',['../xxdir_8c.html#aab1026987f4e2b9d406e52e915a4cc2b',1,'xxdir.c']]],
-  ['first_57',['FIRST',['../macro__util_8h.html#a83420260ae1d2a06201582dd1c4ce0a5',1,'macro_util.h']]],
-  ['first_5fstringify_58',['FIRST_STRINGIFY',['../macro__util_8h.html#adb026bec933528ea3438a8530fda0896',1,'macro_util.h']]],
-  ['float64_59',['float64',['../types_8h.html#a1442831462916636639280563c682b16',1,'types.h']]],
-  ['for_5feach_60',['FOR_EACH',['../macro__util_8h.html#a57f29b9285b9beab8c788f98b08e3e5e',1,'macro_util.h']]],
-  ['free_5fsize_61',['free_size',['../structSlabAllocatorImpl.html#af43c07e607a936aa15db25efffa4bce7',1,'SlabAllocatorImpl']]]
+  ['false_77',['false',['../types_8h.html#a65e9886d74aaee76545e83dd09011727',1,'types.h']]],
+  ['fam_5ferr_78',['fam_err',['../fam__err_8c.html#a445caa137b1d2986716f46e3faad439d',1,'fam_err():&#160;fam_err.c'],['../fam__err_8h.html#a445caa137b1d2986716f46e3faad439d',1,'fam_err():&#160;fam_err.c']]],
+  ['fam_5ferr_2ec_79',['fam_err.c',['../fam__err_8c.html',1,'']]],
+  ['fam_5ferr_2eh_80',['fam_err.h',['../fam__err_8h.html',1,'']]],
+  ['fam_5ferr_5flast_81',['fam_err_last',['../fam__err_8c.html#ad77a4350811747417268e4dfb64194db',1,'fam_err_last():&#160;fam_err.c'],['../fam__err_8h.html#ad77a4350811747417268e4dfb64194db',1,'fam_err_last():&#160;fam_err.c']]],
+  ['famerr_5fvalues_82',['FAMERR_VALUES',['../fam__err_8h.html#af32ddc3f45c37388331257232616d739',1,'fam_err.h']]],
+  ['file_5fcount_83',['file_count',['../xxdir_8c.html#abd3633577cf354ae9e2c69a018cfe999',1,'xxdir.c']]],
+  ['file_5fsizes_84',['file_sizes',['../xxdir_8c.html#aab1026987f4e2b9d406e52e915a4cc2b',1,'xxdir.c']]],
+  ['first_85',['FIRST',['../macro__util_8h.html#a83420260ae1d2a06201582dd1c4ce0a5',1,'macro_util.h']]],
+  ['first_5fstringify_86',['FIRST_STRINGIFY',['../macro__util_8h.html#adb026bec933528ea3438a8530fda0896',1,'macro_util.h']]],
+  ['float64_87',['float64',['../types_8h.html#a1442831462916636639280563c682b16',1,'types.h']]],
+  ['for_5feach_88',['FOR_EACH',['../macro__util_8h.html#a57f29b9285b9beab8c788f98b08e3e5e',1,'macro_util.h']]],
+  ['free_5fsize_89',['free_size',['../structSlabAllocatorImpl.html#af43c07e607a936aa15db25efffa4bce7',1,'SlabAllocatorImpl']]],
+  ['free_5fwrapper_90',['free_wrapper',['../core_2test_8c.html#ad2cd21309503ebcbf5e53d07b4f476f3',1,'test.c']]]
 ];
