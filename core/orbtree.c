@@ -695,7 +695,7 @@ void orbtree_set_tl_context(OrbTreeImpl *impl,
 							const OrbTreeNodeWrapper *value) {
 	orbtree_tl_ctx.sa = impl->sa;
 	orbtree_tl_ctx.tree = impl;
-	orbtree_tl_ctx.offset = value->offset_of_orbtree_node;
+	orbtree_tl_ctx.offset = value->offsetof;
 }
 
 Ptr orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,

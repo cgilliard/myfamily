@@ -82,7 +82,8 @@ MyObject *create_my_object(int value, int value2) {
 }
 
 OrbTreeNodeWrapper wrapper_for(MyObject *obj) {
-	OrbTreeNodeWrapper ret = {.ptr = obj->ptr, offsetof(MyObject, node1)};
+	OrbTreeNodeWrapper ret = {.ptr = obj->ptr,
+							  .offsetof = offsetof(MyObject, node1)};
 	return ret;
 }
 

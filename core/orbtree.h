@@ -27,13 +27,6 @@ void *orbtree_node_right(const OrbTreeNode *);
 void *orbtree_node_left(const OrbTreeNode *);
 Ptr orbtree_node_ptr(const OrbTreeNode *, bool is_right);
 
-#ifdef TEST
-void *orbtree_node_parent(const OrbTreeNode *node);
-bool orbtree_node_is_red(const OrbTreeNode *node);
-unsigned int orbtree_node_right_subtree_height(const OrbTreeNode *node);
-unsigned int orbtree_node_left_subtree_height(const OrbTreeNode *node);
-#endif	// TEST
-
 typedef struct OrbTreeNodePair {
 	// parent of the node
 	Ptr parent;
@@ -45,7 +38,7 @@ typedef struct OrbTreeNodePair {
 
 typedef struct OrbTreeNodeWrapper {
 	Ptr ptr;
-	unsigned int offset_of_orbtree_node;
+	unsigned int offsetof;
 } OrbTreeNodeWrapper;
 
 #define ORB_TREE_IMPL_SIZE 16
@@ -70,7 +63,8 @@ Ptr orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
 				OrbTreeSearch search, unsigned int offset);
 // inserts a node into the the tree overwriting an existing node with the same
 // value. if a node is overwritten it is returned by the function in Ptr form,
-// otherwise returns null.
+// otherwise returns null. If there are more than 2^31 entries inserted into a
+// tree at any given time, behaviour is undefined.
 Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
 				const OrbTreeSearch search);
 // removes a node from the tree, if it is removed, a pointer to the removed node
@@ -80,6 +74,10 @@ Ptr orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
 
 #ifdef TEST
 Ptr orbtree_root(const OrbTree *tree);
+void *orbtree_node_parent(const OrbTreeNode *node);
+bool orbtree_node_is_red(const OrbTreeNode *node);
+unsigned int orbtree_node_right_subtree_height(const OrbTreeNode *node);
+unsigned int orbtree_node_left_subtree_height(const OrbTreeNode *node);
 #endif	// TEST
 
 #endif	// _BASE_ORBTREE__
