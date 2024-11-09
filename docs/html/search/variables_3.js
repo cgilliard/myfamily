@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['head_406',['head',['../structSlabAllocatorImpl.html#af9ba3402e4b04cefa5ffcde467dc7f4c',1,'SlabAllocatorImpl']]]
+  ['data_604',['data',['../structMemMapImpl.html#a0f90dd0604cb637e74fb3c81086d121c',1,'MemMapImpl::data()'],['../structSlabList.html#ad4411199478d484930f97cdfbc22a8cd',1,'SlabList::data()']]]
 ];

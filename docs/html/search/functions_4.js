@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['include_5fdir_338',['include_dir',['../xxdir_8c.html#a2333cdf73b7a682358ac3c66b7c99029',1,'xxdir.c']]]
+  ['exit_484',['exit',['../osdef_8h.html#a6f255d924f7a6bb2c4be0c8c2f2d9ce3',1,'osdef.h']]]
 ];

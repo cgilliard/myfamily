@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.9.1"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>My Family: base/object.h File Reference</title>
+<title>My Family: core/object.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -62,7 +62,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_e914ee4d4a44400f1fdb170cb4ead18a.html">base</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_4270bfced15e0e73154b13468c7c9ad9.html">core</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -107,6 +107,7 @@ Enumerations</h2></td></tr>
 , <br />
 &#160;&#160;<a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980ab23ccc4dfaa8c645c8ff031195d96b4d">ObjectTypeBox</a>
 , <a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980a50243fe2f4024a0b485f79d92a3cee65">ObjectTypeErr</a>
+, <a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980a20dca91902d525d403d77609fbeda324">ObjectTypeFunction</a>
 <br />
  }</td></tr>
 <tr class="separator:a842c5e2e69277690b064bf363c017980"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,6 +124,8 @@ Functions</h2></td></tr>
 <tr class="separator:a32282abae90334c4f1b2f2c54fafbb8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50a899c9ca495421bfaa8dae35dcbb24"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structObject.html">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a50a899c9ca495421bfaa8dae35dcbb24">object_create_err</a> (int value)</td></tr>
 <tr class="separator:a50a899c9ca495421bfaa8dae35dcbb24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acaba70f50ff7176228d38e3dcd02736d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structObject.html">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#acaba70f50ff7176228d38e3dcd02736d">object_create_function</a> (void *fn)</td></tr>
+<tr class="separator:acaba70f50ff7176228d38e3dcd02736d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acfef4e9b814fb5d7bd89fc53ef35c1e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structObject.html">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#acfef4e9b814fb5d7bd89fc53ef35c1e6">object_create_box</a> (unsigned long long size)</td></tr>
 <tr class="separator:acfef4e9b814fb5d7bd89fc53ef35c1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89a8f6cb2a9cbece148426c747801f8e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8h.html#a89a8f6cb2a9cbece148426c747801f8e">object_value_of_primitive</a> (const <a class="el" href="structObject.html">Object</a> *obj)</td></tr>
@@ -207,6 +210,7 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="a842c5e2e69277690b064bf363c017980a278cdf0ce9d5956b1aa6208906cac3fc"></a>ObjectTypeBool&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a842c5e2e69277690b064bf363c017980ab23ccc4dfaa8c645c8ff031195d96b4d"></a>ObjectTypeBox&#160;</td><td class="fielddoc"></td></tr>
 <tr><td class="fieldname"><a id="a842c5e2e69277690b064bf363c017980a50243fe2f4024a0b485f79d92a3cee65"></a>ObjectTypeErr&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a842c5e2e69277690b064bf363c017980a20dca91902d525d403d77609fbeda324"></a>ObjectTypeFunction&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
 </div>
@@ -295,6 +299,24 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">float&#160;</td>
           <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acaba70f50ff7176228d38e3dcd02736d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acaba70f50ff7176228d38e3dcd02736d">&#9670;&nbsp;</a></span>object_create_function()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structObject.html">Object</a> object_create_function </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>fn</em></td><td>)</td>
           <td></td>
         </tr>
       </table>

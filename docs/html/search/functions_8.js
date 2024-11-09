@@ -1,9 +1,10 @@
 var searchData=
 [
-  ['panic_376',['panic',['../print__util_8h.html#ad1f1a1dc0581a11b597453f148106393',1,'print_util.h']]],
-  ['print_377',['print',['../print__util_8c.html#af9d42affcdcfe42b0bbd77e3d3329d8f',1,'print(const char *fmt,...):&#160;print_util.c'],['../print__util_8h.html#af9d42affcdcfe42b0bbd77e3d3329d8f',1,'print(const char *fmt,...):&#160;print_util.c']]],
-  ['print_5ferr_378',['print_err',['../fam__err_8c.html#aa548de6713770c665b2870ec3e2da771',1,'print_err(const byte *text):&#160;fam_err.c'],['../fam__err_8h.html#aa548de6713770c665b2870ec3e2da771',1,'print_err(const byte *text):&#160;fam_err.c']]],
-  ['print_5fhex_379',['print_hex',['../xxdir_8c.html#af45e49d375ec15a3ad54c524c0fb7855',1,'xxdir.c']]],
-  ['println_380',['println',['../print__util_8c.html#a4951884f2d893a1acfbf89338351ec39',1,'println(const char *fmt,...):&#160;print_util.c'],['../print__util_8h.html#abfeec444100395bed0e079442b36007f',1,'println(const char *text,...):&#160;print_util.c']]],
-  ['proc_5ffile_381',['proc_file',['../xxdir_8c.html#ad8071c588b0037587224a40257b7040e',1,'xxdir.c']]]
+  ['lock_5fcreate_499',['lock_create',['../lock_8c.html#af15a0ab951e1c8d64690b44d8bc37995',1,'lock_create():&#160;lock.c'],['../lock_8h.html#af15a0ab951e1c8d64690b44d8bc37995',1,'lock_create():&#160;lock.c']]],
+  ['lock_5fguard_5fcleanup_500',['lock_guard_cleanup',['../lock_8c.html#a9a442fcdc99c075d394a0b30b1aed049',1,'lock_guard_cleanup(LockGuard *l):&#160;lock.c'],['../lock_8h.html#a3aa9dbe03902bdf07be71a6c6ec83b6e',1,'lock_guard_cleanup(Lock *lg):&#160;lock.h']]],
+  ['lock_5fguard_5fread_501',['lock_guard_read',['../lock_8c.html#a4b3afccc0cd11d45e63381b1cff3ca20',1,'lock_guard_read(Lock l):&#160;lock.c'],['../lock_8h.html#a4b3afccc0cd11d45e63381b1cff3ca20',1,'lock_guard_read(Lock l):&#160;lock.c']]],
+  ['lock_5fguard_5fwrite_502',['lock_guard_write',['../lock_8c.html#a3baedc559ffa97449bf7fd7505b45d2e',1,'lock_guard_write(Lock l):&#160;lock.c'],['../lock_8h.html#a3baedc559ffa97449bf7fd7505b45d2e',1,'lock_guard_write(Lock l):&#160;lock.c']]],
+  ['lock_5fread_503',['lock_read',['../lock_8c.html#a3c7143fa94b1bbb42666a974de0f1878',1,'lock_read(Lock *lock):&#160;lock.c'],['../lock_8h.html#a3c7143fa94b1bbb42666a974de0f1878',1,'lock_read(Lock *lock):&#160;lock.c']]],
+  ['lock_5funlock_504',['lock_unlock',['../lock_8c.html#a8507ce65f74dbc037bf216bcf22bdc7e',1,'lock_unlock(Lock *lock):&#160;lock.c'],['../lock_8h.html#a8507ce65f74dbc037bf216bcf22bdc7e',1,'lock_unlock(Lock *lock):&#160;lock.c']]],
+  ['lock_5fwrite_505',['lock_write',['../lock_8c.html#a7f951bb17df0fd553d0b68ec348a2251',1,'lock_write(Lock *lock):&#160;lock.c'],['../lock_8h.html#a7f951bb17df0fd553d0b68ec348a2251',1,'lock_write(Lock *lock):&#160;lock.c']]]
 ];

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['self_426',['self',['../structOrbTreeNodePair.html#a84f357268e33cebf6d8953575b2e5a38',1,'OrbTreeNodePair']]],
-  ['size_427',['size',['../structMemMapImpl.html#a34abaecc8d512759dded7578e9f00ffc',1,'MemMapImpl']]],
-  ['slab_5fsize_428',['slab_size',['../structSlabAllocatorImpl.html#ab57313bf3b372fea1b85ba3c0fe4cccc',1,'SlabAllocatorImpl']]]
+  ['parent_629',['parent',['../structOrbTreeNodeImpl.html#aeeab2a88a88187676c8b4c5ef47c3a92',1,'OrbTreeNodeImpl::parent()'],['../structOrbTreeNodePair.html#ac0c13387cc61b702c709e22df0dd6fb5',1,'OrbTreeNodePair::parent()']]],
+  ['ptr_630',['ptr',['../structOrbTreeNodeWrapper.html#aa6fc98d5d828ff53b8d369b310ae8646',1,'OrbTreeNodeWrapper::ptr()'],['../structMyObject.html#aa15770a66c60fae566352b970b42b000',1,'MyObject::ptr()']]]
 ];
