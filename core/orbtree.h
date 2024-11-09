@@ -30,6 +30,8 @@ Ptr orbtree_node_ptr(const OrbTreeNode *, bool is_right);
 #ifdef TEST
 void *orbtree_node_parent(const OrbTreeNode *node);
 bool orbtree_node_is_red(const OrbTreeNode *node);
+unsigned int orbtree_node_right_subtree_height(const OrbTreeNode *node);
+unsigned int orbtree_node_left_subtree_height(const OrbTreeNode *node);
 #endif	// TEST
 
 typedef struct OrbTreeNodePair {

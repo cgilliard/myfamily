@@ -79,14 +79,59 @@ OrbTreeNodeImpl *orbtree_node(Ptr ptr) {
 		OrbTreeNodeImpl *_impl__ = orbtree_node(k);      \
 		_impl__->right_subtree_height_color |= RED_NODE; \
 	})
+#define RIGHT_HEIGHT(n) (n->right_subtree_height_color & ~RED_NODE)
+#define LEFT_HEIGHT(n) (n->left_subtree_height)
+#define SET_RIGHT_HEIGHT(n, v)                                \
+	({                                                        \
+		(n->right_subtree_height_color =                      \
+			 v | (n->right_subtree_height_color & RED_NODE)); \
+	})
+#define SET_LEFT_HEIGHT(n, v) ({ (n->left_subtree_height = v); })
+
+void orbtree_update_heights(Ptr node, bool is_right, bool insert) {
+	OrbTreeNodeImpl *last = orbtree_node(node);
+	if (last == NULL) return;
+	if (is_right) {
+		if (insert)
+			last->right_subtree_height_color++;
+		else {
+			// if (last->right_subtree_height_color == 0) panic("rheight == 0");
+			// last->right_subtree_height_color--;
+		}
+
+	} else {
+		if (insert)
+			last->left_subtree_height++;
+		else {
+			// if (last->left_subtree_height == 0) panic("lheight == 0");
+			// last->left_subtree_height--;
+		}
+	}
+	OrbTreeNodeImpl *parent;
+	while (last->parent != null) {
+		parent = orbtree_node(last->parent);
+		if (orbtree_node(parent->right) == last) {
+			unsigned int h = 1 + RIGHT_HEIGHT(last) + LEFT_HEIGHT(last);
+			SET_RIGHT_HEIGHT(parent, h);
+		} else {
+			unsigned int h = 1 + RIGHT_HEIGHT(last) + LEFT_HEIGHT(last);
+			SET_LEFT_HEIGHT(parent, h);
+		}
+		last = parent;
+	}
+}
 
 void orbtree_rotate_right(Ptr x_ptr) {
 	OrbTreeNodeImpl *x = orbtree_node(x_ptr);
 	Ptr y_ptr = x->left;
 	OrbTreeNodeImpl *y = orbtree_node(y_ptr);
 
+	unsigned int y_right_height = RIGHT_HEIGHT(y);
+
 	// Move subtree
 	x->left = y->right;
+	SET_LEFT_HEIGHT(x, y_right_height);
+	// x->left_subtree_size = y_right_subtree_size;
 
 	if (y->right != null) {
 		OrbTreeNodeImpl *yright = orbtree_node(y->right);
@@ -108,6 +153,8 @@ void orbtree_rotate_right(Ptr x_ptr) {
 
 	// Place x as y's left child
 	y->right = x_ptr;
+	unsigned int h = 1 + RIGHT_HEIGHT(x) + LEFT_HEIGHT(x);
+	SET_RIGHT_HEIGHT(y, h);
 	x->parent = y_ptr;
 }
 
@@ -116,8 +163,11 @@ void orbtree_rotate_left(Ptr x_ptr) {
 	Ptr y_ptr = x->right;
 	OrbTreeNodeImpl *y = orbtree_node(y_ptr);
 
+	unsigned int y_left_height = LEFT_HEIGHT(y);
+
 	// Move subtree
 	x->right = y->left;
+	SET_RIGHT_HEIGHT(x, y_left_height);
 
 	if (y->left != null) {
 		OrbTreeNodeImpl *yleft = orbtree_node(y->left);
@@ -139,6 +189,8 @@ void orbtree_rotate_left(Ptr x_ptr) {
 
 	// Place x as y's left child
 	y->left = x_ptr;
+	unsigned int h = 1 + RIGHT_HEIGHT(x) + LEFT_HEIGHT(x);
+	SET_LEFT_HEIGHT(y, h);
 	x->parent = y_ptr;
 }
 
@@ -288,13 +340,27 @@ void orbtree_remove_transplant(Ptr dst, Ptr src) {
 		orbtree_tl_ctx.tree->root = src;
 	else if (dst == dst_parent->left) {
 		dst_parent->left = src;
+		if (src == null) SET_LEFT_HEIGHT(dst_parent, 0);
+
 	} else {
 		dst_parent->right = src;
+		if (src == null) SET_RIGHT_HEIGHT(dst_parent, 0);
 	}
 	if (src != null) {
 		OrbTreeNodeImpl *src_node = orbtree_node(src);
 		src_node->parent = dst_node->parent;
+
+		OrbTreeNodeImpl *src_node_p = orbtree_node(src_node->parent);
+		if (src_node_p) {
+			unsigned int h = 1 + RIGHT_HEIGHT(src_node) + LEFT_HEIGHT(src_node);
+			if (src_node_p->right == src)
+				SET_RIGHT_HEIGHT(src_node_p, h);
+			else
+				SET_LEFT_HEIGHT(src_node_p, h);
+		}
 	}
+
+	orbtree_update_heights(dst_node->parent, false, false);
 }
 
 Ptr orbtree_find_successor(Ptr x_ptr) {
@@ -440,7 +506,7 @@ void orbtree_remove_fixup(Ptr p_ptr, Ptr w_ptr, Ptr x_ptr) {
 	SET_BLACK(x_ptr);
 }
 
-void orbtree_remove_impl(Ptr ptr) {
+void orbtree_remove_impl(Ptr ptr, bool is_right) {
 	bool do_fixup = IS_BLACK(ptr);
 	OrbTreeNodeImpl *node_to_delete = orbtree_node(ptr);
 
@@ -509,8 +575,12 @@ void orbtree_remove_impl(Ptr ptr) {
 		if (successor->parent != ptr) {
 			orbtree_remove_transplant(successor_ptr, successor->right);
 			successor->right = node_to_delete->right;
+			SET_RIGHT_HEIGHT(successor, 0);
 			OrbTreeNodeImpl *successor_right = orbtree_node(successor->right);
 			if (successor_right) {
+				unsigned int h = 1 + RIGHT_HEIGHT(successor_right) +
+								 LEFT_HEIGHT(successor_right);
+				SET_RIGHT_HEIGHT(successor, h);
 				successor_right->parent = successor_ptr;
 			}
 		}
@@ -519,8 +589,16 @@ void orbtree_remove_impl(Ptr ptr) {
 		successor->left = node_to_delete->left;
 
 		OrbTreeNodeImpl *successor_left = orbtree_node(successor->left);
+		SET_LEFT_HEIGHT(successor, 0);
+		if (node_to_delete->left != null) {
+			OrbTreeNodeImpl *ntdl = orbtree_node(node_to_delete->left);
+			unsigned int h = 1 + LEFT_HEIGHT(ntdl) + RIGHT_HEIGHT(ntdl);
+			SET_LEFT_HEIGHT(successor, h);
+		}
 		successor_left->parent = successor_ptr;
 		orbtree_set_color_based_on_parent(successor_ptr, ptr);
+
+		orbtree_update_heights(successor_ptr, false, false);
 	}
 
 	if (do_fixup) {
@@ -548,6 +626,16 @@ void *orbtree_node_parent(const OrbTreeNode *node) {
 	const OrbTreeNodeImpl *impl = (const OrbTreeNodeImpl *)node;
 	if (impl->parent == null) return NULL;
 	return orbtree_value(impl->parent);
+}
+
+unsigned int orbtree_node_right_subtree_height(const OrbTreeNode *node) {
+	if (node == NULL) return 0;
+	return RIGHT_HEIGHT(((OrbTreeNodeImpl *)node));
+}
+
+unsigned int orbtree_node_left_subtree_height(const OrbTreeNode *node) {
+	if (node == NULL) return 0;
+	return LEFT_HEIGHT(((OrbTreeNodeImpl *)node));
 }
 
 bool orbtree_node_is_red(const OrbTreeNode *node) {
@@ -613,7 +701,10 @@ Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
 	}
 
 	Ptr ret = orbtree_insert(impl, &pair, value->ptr);
-	if (ret == null) orbtree_put_fixup(value->ptr);
+	if (ret == null) {
+		orbtree_update_heights(pair.parent, pair.is_right, true);
+		orbtree_put_fixup(value->ptr);
+	}
 
 	return ret;
 }
@@ -635,7 +726,7 @@ Ptr orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
 		return null;
 	}
 
-	orbtree_remove_impl(pair.self);
+	orbtree_remove_impl(pair.self, pair.is_right);
 
 	return pair.self;
 }

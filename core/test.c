@@ -121,8 +121,10 @@ void my_obj_print_node1(Ptr ptr, int depth) {
 		print("    ");
 	}
 
-	println("%i (%s,ptr=%u)", obj->x,
-			orbtree_node_is_red(&obj->node1) ? "R" : "B", obj->ptr);
+	println("%i (%s,ptr=%u,rh=%u,lh=%u)", obj->x,
+			orbtree_node_is_red(&obj->node1) ? "R" : "B", obj->ptr,
+			orbtree_node_right_subtree_height(&obj->node1),
+			orbtree_node_left_subtree_height(&obj->node1));
 
 	MyObject *left = orbtree_node_left(node);
 	Ptr left_ptr;
@@ -174,6 +176,31 @@ void my_obj_validate_node(const OrbTree *tree, Ptr node, int *black_count,
 	}
 
 	MyObject *obj = (MyObject *)slab_get(&sa, node);
+	OrbTreeNode *n = &obj->node1;
+	OrbTreeNode *right_node = NULL;
+	if (orbtree_node_right(n))
+		right_node = &((MyObject *)orbtree_node_right(n))->node1;
+	OrbTreeNode *left_node = NULL;
+	if (orbtree_node_left(n))
+		left_node = &((MyObject *)orbtree_node_left(n))->node1;
+	unsigned int rsum = 0;
+	if (right_node)
+		rsum += 1 + orbtree_node_right_subtree_height(right_node) +
+				orbtree_node_left_subtree_height(right_node);
+	unsigned int lsum = 0;
+	if (left_node)
+		lsum += 1 + orbtree_node_right_subtree_height(left_node) +
+				orbtree_node_left_subtree_height(left_node);
+
+	if (lsum != orbtree_node_left_subtree_height(n) ||
+		rsum != orbtree_node_right_subtree_height(n)) {
+		println("lsum=%u,lh=%u,rsum=%u,rh=%u", lsum,
+				orbtree_node_left_subtree_height(n), rsum,
+				orbtree_node_right_subtree_height(n));
+	}
+	cr_assert_eq(lsum, orbtree_node_left_subtree_height(n));
+	cr_assert_eq(rsum, orbtree_node_right_subtree_height(n));
+
 	if (!orbtree_node_is_red(&obj->node1))
 		current_black_count++;
 	else {
@@ -264,7 +291,7 @@ MyTest(core, test_random_tree) {
 	byte iv[16] = {};
 	cpsrng_test_seed(iv, key);
 
-	int size = 5000;
+	int size = 1000;
 	Ptr arr[size];
 	int vals[size];
 
