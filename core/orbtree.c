@@ -164,6 +164,7 @@ int orbtree_put_fixup(Ptr k_ptr) {
 
 				// Move up the tree
 				k_ptr = parent->parent;
+				k = orbtree_node(k_ptr);
 			} else {
 				// Case 1b: Uncle is black
 				if (k_ptr == parent->right) {
@@ -194,6 +195,7 @@ int orbtree_put_fixup(Ptr k_ptr) {
 
 				// Move up the tree
 				k_ptr = parent->parent;
+				k = orbtree_node(k_ptr);
 			} else {
 				// Case 2b: Uncle is black
 				if (k_ptr == parent->left) {
@@ -318,6 +320,127 @@ void orbtree_set_color_based_on_parent(Ptr child, Ptr parent) {
 	}
 }
 
+void orbtree_remove_fixup(Ptr p_ptr, Ptr w_ptr, Ptr x_ptr) {
+	while (x_ptr != orbtree_tl_ctx.tree->root && IS_BLACK(x_ptr)) {
+		OrbTreeNodeImpl *parent_node = orbtree_node(p_ptr);
+		OrbTreeNodeImpl *w_node = orbtree_node(w_ptr);
+		OrbTreeNodeImpl *x_node = orbtree_node(x_ptr);
+		if (w_ptr == parent_node->right) {
+			// Case 1: Sibling is
+			// red
+			if (IS_RED(w_ptr)) {
+				SET_BLACK(w_ptr);
+				SET_RED(p_ptr);
+				orbtree_rotate_left(p_ptr);
+				w_ptr = parent_node->right;
+				w_node = orbtree_node(w_ptr);
+			}
+
+			// Case 2: Sibling's
+			// children are both
+			// black
+			if (IS_BLACK(w_node->left) && IS_BLACK(w_node->right)) {
+				SET_RED(w_ptr);
+				x_ptr = p_ptr;
+				x_node = orbtree_node(x_ptr);
+				p_ptr = parent_node->parent;
+				parent_node = orbtree_node(p_ptr);
+				OrbTreeNodeImpl *x_parent = orbtree_node(x_node->parent);
+				if (x_parent == NULL) {
+					w_ptr = null;
+					w_node = NULL;
+				} else if (x_ptr == x_parent->left) {
+					w_ptr = x_parent->right;
+					w_node = orbtree_node(w_ptr);
+				} else {
+					w_ptr = x_parent->left;
+					w_node = orbtree_node(w_ptr);
+				}
+			} else {
+				// Case 3: Sibling's
+				// right child is
+				// black, left child
+				// is red
+				if (IS_BLACK(w_node->right)) {
+					SET_BLACK(w_node->left);
+					SET_RED(w_ptr);
+					orbtree_rotate_right(w_ptr);
+					w_ptr = parent_node->right;
+					w_node = orbtree_node(w_ptr);
+				}
+
+				// Case 4: Sibling's
+				// right child is
+				// red
+				orbtree_set_color_based_on_parent(w_ptr, p_ptr);
+				SET_BLACK(p_ptr);
+				SET_BLACK(w_node->right);
+				orbtree_rotate_left(p_ptr);
+				x_ptr = orbtree_tl_ctx.tree->root;
+				x_node = orbtree_node(x_ptr);
+			}
+		} else {
+			// Case 1: Sibling is
+			// red
+			if (IS_RED(w_ptr)) {
+				SET_BLACK(w_ptr);
+				SET_RED(p_ptr);
+				orbtree_rotate_right(p_ptr);
+				w_ptr = parent_node->left;
+				w_node = orbtree_node(w_ptr);
+			}
+
+			// Case 2: Sibling's
+			// children are both
+			// black
+			if (IS_BLACK(w_node->right) && IS_BLACK(w_node->left)) {
+				SET_RED(w_ptr);
+				x_ptr = p_ptr;
+				x_node = orbtree_node(x_ptr);
+				p_ptr = parent_node->parent;
+				parent_node = orbtree_node(p_ptr);
+				OrbTreeNodeImpl *x_parent = orbtree_node(x_node->parent);
+				if (x_parent == NULL) {
+					w_ptr = null;
+					w_node = NULL;
+				} else if (x_ptr == x_parent->left) {
+					w_ptr = x_parent->right;
+					w_node = orbtree_node(w_ptr);
+				} else {
+					w_ptr = x_parent->left;
+					w_node = orbtree_node(w_ptr);
+				}
+			} else {
+				// Case 3: Sibling's
+				// right child is
+				// black, left child
+				// is red
+				if (IS_BLACK(w_node->left)) {
+					SET_BLACK(w_node->right);
+					SET_RED(w_ptr);
+					orbtree_rotate_left(w_ptr);
+					w_ptr = parent_node->left;
+					w_node = orbtree_node(w_ptr);
+				}
+
+				// Case 4: Sibling's
+				// right child is
+				// red
+				orbtree_set_color_based_on_parent(w_ptr, p_ptr);
+				SET_BLACK(p_ptr);
+				SET_BLACK(w_node->left);
+				orbtree_rotate_right(p_ptr);
+				x_ptr = orbtree_tl_ctx.tree->root;
+				x_node = orbtree_node(x_ptr);
+			}
+		}
+	}
+
+	// Ensure x is black at the end
+	// of fixup
+	SET_BLACK(x_ptr);
+}
+
 void orbtree_remove_impl(Ptr ptr) {
 	bool do_fixup = IS_BLACK(ptr);
 	OrbTreeNodeImpl *node_to_delete = orbtree_node(ptr);
@@ -326,7 +449,7 @@ void orbtree_remove_impl(Ptr ptr) {
 	OrbTreeNodeImpl *x = NULL, *w = NULL, *p = NULL;
 
 	if (node_to_delete->left == null) {
-		x_ptr = node_to_delete->left;
+		x_ptr = node_to_delete->right;
 		x = orbtree_node(x_ptr);
 		orbtree_remove_transplant(ptr, node_to_delete->right);
 		OrbTreeNodeImpl *node_to_delete_parent =
@@ -334,12 +457,14 @@ void orbtree_remove_impl(Ptr ptr) {
 		if (node_to_delete->parent != null) {
 			if (node_to_delete_parent->left == null) {
 				w_ptr = node_to_delete_parent->right;
+				w = orbtree_node(w_ptr);
 			} else if (node_to_delete_parent) {
 				w_ptr = node_to_delete_parent->left;
+				w = orbtree_node(w_ptr);
 			}
-			w = orbtree_node(w_ptr);
 		}
 		if (x_ptr != null) {
+			x = orbtree_node(x_ptr);
 			p_ptr = x->parent;
 			p = orbtree_node(p_ptr);
 		} else if (w_ptr != null) {
@@ -393,10 +518,18 @@ void orbtree_remove_impl(Ptr ptr) {
 
 		orbtree_remove_transplant(ptr, successor_ptr);
 		successor->left = node_to_delete->left;
-		OrbTreeNodeImpl *successor_left = orbtree_node(successor->left);
 
+		OrbTreeNodeImpl *successor_left = orbtree_node(successor->left);
 		successor_left->parent = successor_ptr;
 		orbtree_set_color_based_on_parent(successor_ptr, ptr);
+	}
+
+	if (do_fixup) {
+		if (w_ptr != null && p_ptr != null) {
+			orbtree_remove_fixup(p_ptr, w_ptr, x_ptr);
+		} else {
+			if (orbtree_tl_ctx.tree->root) SET_BLACK(orbtree_tl_ctx.tree->root);
+		}
 	}
 }
 

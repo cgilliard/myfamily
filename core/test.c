@@ -160,7 +160,7 @@ void my_object_orbtree_print(const OrbTree *tree) {
 }
 
 void my_obj_validate_node(const OrbTree *tree, Ptr node, int *black_count,
-						  int current_black_count) {
+						  int current_black_count, bool is_right) {
 	if (node == null) {
 		if (*black_count == 0) {
 			*black_count =
@@ -178,9 +178,14 @@ void my_obj_validate_node(const OrbTree *tree, Ptr node, int *black_count,
 		current_black_count++;
 	else {
 		// check parent is not red (red property violation)
-		OrbTreeNode *parent = orbtree_node_parent(&obj->node1);
+		MyObject *parent_obj = orbtree_node_parent(&obj->node1);
+		OrbTreeNode *parent = &parent_obj->node1;
 		cr_assert(parent);
+		if (orbtree_node_is_red(parent)) {
+			println("red violation at obj->x=%i", obj->x);
+		}
 		cr_assert(!orbtree_node_is_red(parent));
+		Ptr parent_ptr = orbtree_node_ptr(parent, is_right);
 	}
 
 	// Recursive calls for left and
@@ -199,8 +204,10 @@ void my_obj_validate_node(const OrbTree *tree, Ptr node, int *black_count,
 	else
 		right_ptr = orbtree_node_ptr(&right->node1, true);
 
-	my_obj_validate_node(tree, right_ptr, black_count, current_black_count);
-	my_obj_validate_node(tree, left_ptr, black_count, current_black_count);
+	my_obj_validate_node(tree, right_ptr, black_count, current_black_count,
+						 true);
+	my_obj_validate_node(tree, left_ptr, black_count, current_black_count,
+						 false);
 }
 
 void my_obj_validate(const OrbTree *tree) {
@@ -211,7 +218,7 @@ void my_obj_validate(const OrbTree *tree) {
 	if (root != null) {
 		MyObject *obj = (MyObject *)slab_get(&sa, root);
 		cr_assert(!orbtree_node_is_red(&obj->node1));
-		my_obj_validate_node(tree, root, &black_count, 0);
+		my_obj_validate_node(tree, root, &black_count, 0, false);
 	}
 }
 
@@ -254,7 +261,7 @@ MyTest(core, test_orbtree) {
 
 MyTest(core, test_random_tree) {
 	// seed rng for reproducibility
-	byte key[32] = {8};
+	byte key[32] = {5};
 	byte iv[16] = {};
 	cpsrng_test_seed(iv, key);
 
@@ -274,6 +281,7 @@ MyTest(core, test_random_tree) {
 		OrbTreeNodeWrapper obj1 = wrap_obj(x, 0);
 		cr_assert(!orbtree_put(&t, &obj1, my_obj_search));
 		arr[i] = obj1.ptr;
+		my_obj_validate(&t);
 	}
 
 	my_obj_validate(&t);
@@ -301,7 +309,6 @@ MyTest(core, test_random_tree) {
 	slab_allocator_free(&sa, rep_ptr);
 
 	my_obj_validate(&t);
-
 	OrbTreeNodeWrapper replace2 = wrap_obj(vals[7], 1);
 	Ptr rep_ptr2 = orbtree_put(&t, &replace2, my_obj_search);
 	cr_assert_eq(rep_ptr2, arr[7]);
@@ -316,6 +323,7 @@ MyTest(core, test_random_tree) {
 		cr_assert_eq(removed_ptr, arr[i]);
 		slab_allocator_free(&sa, obj.ptr);
 		slab_allocator_free(&sa, removed_ptr);
+		my_obj_validate(&t);
 	}
 
 	cr_assert_eq(slab_allocator_free_size(&sa),
