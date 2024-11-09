@@ -22,3 +22,8 @@ void *mymemcpy(void *dst, const void *src, unsigned long long n) {
 	for (unsigned long long i = 0; i < n; i++) bdst[i] = bsrc[i];
 	return bdst;
 }
+
+void *mymemset(void *ptr, byte x, unsigned long long n) {
+	for (unsigned long long i = 0; i < n; i++) ((byte *)ptr)[i] = x;
+	return ptr;
+}

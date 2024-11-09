@@ -12,4 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/types.h>
+
 void *mymemcpy(void *dest, const void *src, unsigned long long n);
+void *mymemset(void *dst, byte b, unsigned long long n);

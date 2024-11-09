@@ -225,4 +225,18 @@ MyTest(base, test_util) {
 	cr_assert_eq(y[7], '\0');
 	cr_assert_eq(y[8], '\0');
 	cr_assert_eq(y[9], '\0');
+
+	char z[10];
+	for (int i = 0; i < 10; i++) z[i] = 'a' + i;
+	mymemset(z, 'z', 5);
+	cr_assert_eq(z[0], 'z');
+	cr_assert_eq(z[1], 'z');
+	cr_assert_eq(z[2], 'z');
+	cr_assert_eq(z[3], 'z');
+	cr_assert_eq(z[4], 'z');
+	cr_assert_eq(z[5], 'a' + 5);
+	cr_assert_eq(z[6], 'a' + 6);
+	cr_assert_eq(z[7], 'a' + 7);
+	cr_assert_eq(z[8], 'a' + 8);
+	cr_assert_eq(z[9], 'a' + 9);
 }

@@ -33,8 +33,6 @@
 #include <base/util.h>
 #include <crypto/sha3.h>
 #define memcpy(...) mymemcpy(__VA_ARGS__)
-#include <sys/mman.h>  // for size_t
-void *memset(void *ptr, int x, size_t n);
 
 #define SHA3_ASSERT(x)
 #define SHA3_TRACE(format, ...)
@@ -125,7 +123,7 @@ sha3_return_t sha3_Init(void *priv, unsigned bitSize) {
 	sha3_context *ctx = (sha3_context *)priv;
 	if (bitSize != 256 && bitSize != 384 && bitSize != 512)
 		return SHA3_RETURN_BAD_PARAMS;
-	memset(ctx, 0, sizeof(*ctx));
+	mymemset(ctx, 0, sizeof(*ctx));
 	ctx->capacityWords = 2 * bitSize / (8 * sizeof(unsigned long long));
 	return SHA3_RETURN_OK;
 }
