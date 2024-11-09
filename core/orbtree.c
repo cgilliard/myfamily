@@ -227,8 +227,8 @@ void orbtree_init_node(OrbTreeNodeImpl *node, bool red, Ptr parent) {
 	node->left_subtree_height = 0;
 }
 
-int orbtree_insert_transplant(OrbTreeImpl *impl, const OrbTreeNodeImpl *prev,
-							  OrbTreeNodeImpl *next, Ptr ptr, bool is_right) {
+void orbtree_insert_transplant(OrbTreeImpl *impl, const OrbTreeNodeImpl *prev,
+							   OrbTreeNodeImpl *next, Ptr ptr, bool is_right) {
 	next->parent = prev->parent;
 	next->right = prev->right;
 	next->left = prev->left;
@@ -250,8 +250,6 @@ int orbtree_insert_transplant(OrbTreeImpl *impl, const OrbTreeNodeImpl *prev,
 		OrbTreeNodeImpl *right = orbtree_node(next->right);
 		right->parent = ptr;
 	}
-
-	return 0;
 }
 
 Ptr orbtree_insert(OrbTreeImpl *impl, OrbTreeNodePair *pair, Ptr ptr) {
@@ -279,6 +277,127 @@ Ptr orbtree_insert(OrbTreeImpl *impl, OrbTreeNodePair *pair, Ptr ptr) {
 		}
 	}
 	return null;
+}
+
+void orbtree_remove_transplant(Ptr dst, Ptr src) {
+	OrbTreeNodeImpl *dst_node = orbtree_node(dst);
+	OrbTreeNodeImpl *dst_parent = orbtree_node(dst_node->parent);
+
+	if (dst_node->parent == null)
+		orbtree_tl_ctx.tree->root = src;
+	else if (dst == dst_parent->left) {
+		dst_parent->left = src;
+	} else {
+		dst_parent->right = src;
+	}
+	if (src != null) {
+		OrbTreeNodeImpl *src_node = orbtree_node(src);
+		src_node->parent = dst_node->parent;
+	}
+}
+
+Ptr orbtree_find_successor(Ptr x_ptr) {
+	OrbTreeNodeImpl *x = orbtree_node(x_ptr);
+	Ptr successor_ptr = x->right;
+	OrbTreeNodeImpl *successor = orbtree_node(x->right);
+	while (successor && successor->left != null) {
+		successor_ptr = successor->left;
+		successor = orbtree_node(successor->left);
+	}
+	return successor_ptr;
+}
+
+// set child's color to parent's
+void orbtree_set_color_based_on_parent(Ptr child, Ptr parent) {
+	if (child != null) {
+		if (IS_RED(parent)) {
+			SET_RED(child);
+		} else {
+			SET_BLACK(child);
+		}
+	}
+}
+
+void orbtree_remove_impl(Ptr ptr) {
+	bool do_fixup = IS_BLACK(ptr);
+	OrbTreeNodeImpl *node_to_delete = orbtree_node(ptr);
+
+	Ptr x_ptr = null, w_ptr = null, p_ptr = null;
+	OrbTreeNodeImpl *x = NULL, *w = NULL, *p = NULL;
+
+	if (node_to_delete->left == null) {
+		x_ptr = node_to_delete->left;
+		x = orbtree_node(x_ptr);
+		orbtree_remove_transplant(ptr, node_to_delete->right);
+		OrbTreeNodeImpl *node_to_delete_parent =
+			orbtree_node(node_to_delete->parent);
+		if (node_to_delete->parent != null) {
+			if (node_to_delete_parent->left == null) {
+				w_ptr = node_to_delete_parent->right;
+			} else if (node_to_delete_parent) {
+				w_ptr = node_to_delete_parent->left;
+			}
+			w = orbtree_node(w_ptr);
+		}
+		if (x_ptr != null) {
+			p_ptr = x->parent;
+			p = orbtree_node(p_ptr);
+		} else if (w_ptr != null) {
+			p_ptr = w->parent;
+			p = orbtree_node(p_ptr);
+		}
+	} else if (node_to_delete->right == null) {
+		x_ptr = node_to_delete->left;
+		x = orbtree_node(x_ptr);
+		orbtree_remove_transplant(ptr, node_to_delete->left);
+		OrbTreeNodeImpl *node_to_delete_parent =
+			orbtree_node(node_to_delete->parent);
+		if (node_to_delete_parent) {
+			w_ptr = node_to_delete_parent->left;
+			w = orbtree_node(w_ptr);
+		}
+		p_ptr = x->parent;
+		p = orbtree_node(p_ptr);
+	} else {
+		Ptr successor_ptr = orbtree_find_successor(ptr);
+		OrbTreeNodeImpl *successor = orbtree_node(successor_ptr);
+		do_fixup = IS_BLACK(successor_ptr);
+
+		x_ptr = successor->right;
+		OrbTreeNodeImpl *successor_parent = orbtree_node(successor->parent);
+		w_ptr = successor_parent->right;
+		x = orbtree_node(x_ptr);
+		w = orbtree_node(w_ptr);
+
+		if (w == NULL) {
+			p_ptr = null;
+			p = NULL;
+		} else if (w->parent == ptr) {
+			w_ptr = node_to_delete->left;
+			w = orbtree_node(w_ptr);
+			p_ptr = successor_ptr;
+			p = successor;
+		} else {
+			p_ptr = w->parent;
+			p = orbtree_node(p_ptr);
+		}
+
+		if (successor->parent != ptr) {
+			orbtree_remove_transplant(successor_ptr, successor->right);
+			successor->right = node_to_delete->right;
+			OrbTreeNodeImpl *successor_right = orbtree_node(successor->right);
+			if (successor_right) {
+				successor_right->parent = successor_ptr;
+			}
+		}
+
+		orbtree_remove_transplant(ptr, successor_ptr);
+		successor->left = node_to_delete->left;
+		OrbTreeNodeImpl *successor_left = orbtree_node(successor->left);
+
+		successor_left->parent = successor_ptr;
+		orbtree_set_color_based_on_parent(successor_ptr, ptr);
+	}
 }
 
 void *orbtree_node_right(const OrbTreeNode *node) {
@@ -367,11 +486,26 @@ Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
 	return ret;
 }
 
-void *orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
-					 OrbTreeSearch search) {
+Ptr orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
+				   OrbTreeSearch search) {
 	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
 	orbtree_set_tl_context(impl, value);
-	return NULL;
+
+	OrbTreeNode *target = (OrbTreeNode *)orbtree_node(value->ptr);
+
+	OrbTreeNodePair pair = {.parent = null, .self = value->ptr};
+	if (impl->root != null) {
+		OrbTreeNode *root = (OrbTreeNode *)orbtree_node(impl->root);
+		search(root, target, &pair);
+	}
+
+	if (pair.self == null) {
+		return null;
+	}
+
+	orbtree_remove_impl(pair.self);
+
+	return pair.self;
 }
 
 Ptr orbtree_root(const OrbTree *tree) {

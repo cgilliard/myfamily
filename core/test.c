@@ -293,22 +293,33 @@ MyTest(core, test_random_tree) {
 
 	my_obj_validate(&t);
 
-	// my_object_orbtree_print(&t);
-
 	// do transplants
 	OrbTreeNodeWrapper replace1 = wrap_obj(vals[3], 1);
 	Ptr rep_ptr = orbtree_put(&t, &replace1, my_obj_search);
 	cr_assert_eq(rep_ptr, arr[3]);
+	arr[3] = replace1.ptr;
+	slab_allocator_free(&sa, rep_ptr);
 
-	// my_object_orbtree_print(&t);
 	my_obj_validate(&t);
 
 	OrbTreeNodeWrapper replace2 = wrap_obj(vals[7], 1);
 	Ptr rep_ptr2 = orbtree_put(&t, &replace2, my_obj_search);
 	cr_assert_eq(rep_ptr2, arr[7]);
+	arr[7] = replace2.ptr;
+	slab_allocator_free(&sa, rep_ptr2);
 
 	my_obj_validate(&t);
 
-	for (int i = 0; i < size; i++) slab_allocator_free(&sa, arr[i]);
+	for (int i = 0; i < size; i++) {
+		OrbTreeNodeWrapper obj = wrap_obj(vals[i], 0);
+		Ptr removed_ptr = orbtree_remove(&t, &obj, my_obj_search);
+		cr_assert_eq(removed_ptr, arr[i]);
+		slab_allocator_free(&sa, obj.ptr);
+		slab_allocator_free(&sa, removed_ptr);
+	}
+
+	cr_assert_eq(slab_allocator_free_size(&sa),
+				 slab_allocator_total_slabs(&sa));
+
 	slab_allocator_cleanup(&sa);
 }

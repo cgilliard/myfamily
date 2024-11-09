@@ -25,9 +25,12 @@ typedef struct OrbTreeNode {
 
 void *orbtree_node_right(const OrbTreeNode *);
 void *orbtree_node_left(const OrbTreeNode *);
-void *orbtree_node_parent(const OrbTreeNode *node);
 Ptr orbtree_node_ptr(const OrbTreeNode *, bool is_right);
+
+#ifdef TEST
+void *orbtree_node_parent(const OrbTreeNode *node);
 bool orbtree_node_is_red(const OrbTreeNode *node);
+#endif	// TEST
 
 typedef struct OrbTreeNodePair {
 	// parent of the node
@@ -70,9 +73,11 @@ Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,
 				const OrbTreeSearch search);
 // removes a node from the tree, if it is removed, a pointer to the removed node
 // is returned.
-void *orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
-					 const OrbTreeSearch search);
+Ptr orbtree_remove(OrbTree *tree, const OrbTreeNodeWrapper *value,
+				   const OrbTreeSearch search);
 
+#ifdef TEST
 Ptr orbtree_root(const OrbTree *tree);
+#endif	// TEST
 
 #endif	// _BASE_ORBTREE__
