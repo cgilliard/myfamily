@@ -711,16 +711,14 @@ Ptr orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
 	OrbTreeNode *target = (OrbTreeNode *)orbtree_node(value->ptr);
 	OrbTreeNodePair retval = {};
 	orbtree_set_tl_context(impl, value);
+	Ptr ret = null;
 
 	lockr(&impl->lock);
-	if (impl->root == null) {
-		unlock(&impl->lock);
-		return null;
+	if (impl->root != null) {
+		OrbTreeNode *root = (OrbTreeNode *)orbtree_node(impl->root);
+		search(root, target, &retval);
+		ret = orbtree_adjust_offset(retval.self, offset);
 	}
-	OrbTreeNode *root = (OrbTreeNode *)orbtree_node(impl->root);
-	search(root, target, &retval);
-
-	Ptr ret = orbtree_adjust_offset(retval.self, offset);
 	unlock(&impl->lock);
 
 	return ret;
