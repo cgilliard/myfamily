@@ -66,8 +66,8 @@ int orbtree_init(OrbTree *tree, const SlabAllocator *sa);
 // to the container of the final 'self' returned by the search function. If
 // offset is > 0, the appropriate offset will be applied by the orbtree
 // implementation.
-void *orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
-				  OrbTreeSearch search, unsigned int offset);
+Ptr orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
+				OrbTreeSearch search, unsigned int offset);
 // inserts a node into the the tree overwriting an existing node with the same
 // value. if a node is overwritten it is returned by the function in Ptr form,
 // otherwise returns null.

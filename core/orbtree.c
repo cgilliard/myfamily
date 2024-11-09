@@ -91,21 +91,12 @@ OrbTreeNodeImpl *orbtree_node(Ptr ptr) {
 void orbtree_update_heights(Ptr node, bool is_right, bool insert) {
 	OrbTreeNodeImpl *last = orbtree_node(node);
 	if (last == NULL) return;
-	if (is_right) {
-		if (insert)
+	if (insert) {
+		if (is_right)
 			last->right_subtree_height_color++;
-		else {
-			// if (last->right_subtree_height_color == 0) panic("rheight == 0");
-			// last->right_subtree_height_color--;
-		}
 
-	} else {
-		if (insert)
+		else
 			last->left_subtree_height++;
-		else {
-			// if (last->left_subtree_height == 0) panic("lheight == 0");
-			// last->left_subtree_height--;
-		}
 	}
 	OrbTreeNodeImpl *parent;
 	while (last->parent != null) {
@@ -657,6 +648,38 @@ Ptr orbtree_node_ptr(const OrbTreeNode *node, bool is_right) {
 	}
 }
 
+// use subtree heights to navigate to correct offset
+Ptr orbtree_adjust_offset(Ptr first, unsigned int offset) {
+	Ptr ret = first;
+	while (offset && ret) {
+		OrbTreeNodeImpl *cur = orbtree_node(ret);
+		unsigned int rh = RIGHT_HEIGHT(cur);
+		if (rh < offset) {
+			offset -= rh + 1;
+			while (ret) {
+				OrbTreeNodeImpl *n = orbtree_node(ret);
+				if (n->parent) {
+					OrbTreeNodeImpl *parent = orbtree_node(n->parent);
+					if (parent->left == ret) {
+						ret = n->parent;
+						break;
+					}
+				}
+				ret = n->parent;
+			}
+		} else {
+			ret = cur->right;
+			OrbTreeNodeImpl *next = orbtree_node(ret);
+			offset -= 1;
+			while (next->left) {
+				ret = next->left;
+				next = orbtree_node(next->left);
+			}
+		}
+	}
+	return ret;
+}
+
 int orbtree_init(OrbTree *tree, const SlabAllocator *sa) {
 	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
 	impl->sa = sa;
@@ -671,20 +694,17 @@ void orbtree_set_tl_context(OrbTreeImpl *impl,
 	orbtree_tl_ctx.offset = value->offset_of_orbtree_node;
 }
 
-void *orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
-				  OrbTreeSearch search, unsigned int offset) {
+Ptr orbtree_get(const OrbTree *tree, const OrbTreeNodeWrapper *value,
+				OrbTreeSearch search, unsigned int offset) {
 	OrbTreeImpl *impl = (OrbTreeImpl *)tree;
-	if (impl->root == null) return NULL;
+	if (impl->root == null) return null;
 	orbtree_set_tl_context(impl, value);
 	OrbTreeNode *root = (OrbTreeNode *)orbtree_node(impl->root);
 	OrbTreeNode *target = (OrbTreeNode *)orbtree_node(value->ptr);
 	OrbTreeNodePair retval = {};
 	search(root, target, &retval);
 
-	if (retval.self != null)
-		return orbtree_value(retval.self);
-	else
-		return NULL;
+	return orbtree_adjust_offset(retval.self, offset);
 }
 
 Ptr orbtree_put(OrbTree *tree, const OrbTreeNodeWrapper *value,

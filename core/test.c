@@ -156,7 +156,7 @@ void my_obj_print_root(Ptr ptr) {
 	}
 }
 
-void my_object_orbtree_print(const OrbTree *tree) {
+void my_obj_print_tree(const OrbTree *tree) {
 	Ptr root = orbtree_root(tree);
 	my_obj_print_root(root);
 }
@@ -261,18 +261,21 @@ MyTest(core, test_orbtree) {
 
 	orbtree_put(&t, &obj2, my_obj_search);
 
-	MyObject *obj2_out = orbtree_get(&t, &obj2, my_obj_search, 0);
+	MyObject *obj2_out =
+		(MyObject *)slab_get(&sa, orbtree_get(&t, &obj2, my_obj_search, 0));
 	cr_assert(obj2_out);
 	cr_assert_eq(obj2_out->x, 0);
 
-	MyObject *obj1_out = orbtree_get(&t, &obj1, my_obj_search, 0);
+	MyObject *obj1_out =
+		(MyObject *)slab_get(&sa, orbtree_get(&t, &obj1, my_obj_search, 0));
 	cr_assert(obj1_out);
 	cr_assert_eq(obj1_out->x, 1);
 
 	OrbTreeNodeWrapper obj3 = wrap_obj(2, 0);
 	orbtree_put(&t, &obj3, my_obj_search);
 
-	MyObject *obj3_out = orbtree_get(&t, &obj3, my_obj_search, 0);
+	MyObject *obj3_out =
+		(MyObject *)slab_get(&sa, orbtree_get(&t, &obj3, my_obj_search, 0));
 	cr_assert(obj3_out);
 	cr_assert_eq(obj3_out->x, 2);
 
@@ -314,15 +317,16 @@ MyTest(core, test_random_tree) {
 
 	for (int i = 0; i < size; i++) {
 		OrbTreeNodeWrapper obj = wrap_obj(vals[i], 0);
-		MyObject *obj_out = orbtree_get(&t, &obj, my_obj_search, 0);
+		MyObject *obj_out =
+			(MyObject *)slab_get(&sa, orbtree_get(&t, &obj, my_obj_search, 0));
 		cr_assert_eq(obj_out->ptr, arr[i]);
 		slab_allocator_free(&sa, obj.ptr);
 	}
 
 	// try a node not in the tree
 	OrbTreeNodeWrapper obj = wrap_obj(0, 1);
-	MyObject *obj_out = orbtree_get(&t, &obj, my_obj_search, 0);
-	cr_assert_eq(obj_out, NULL);
+	Ptr obj_out = orbtree_get(&t, &obj, my_obj_search, 0);
+	cr_assert_eq(obj_out, null);
 	slab_allocator_free(&sa, obj.ptr);
 
 	my_obj_validate(&t);
@@ -344,17 +348,20 @@ MyTest(core, test_random_tree) {
 	my_obj_validate(&t);
 
 	OrbTreeNodeWrapper obj_updated = wrap_obj(vals[3], 0);
-	MyObject *obj_out_updated = orbtree_get(&t, &obj_updated, my_obj_search, 0);
+	MyObject *obj_out_updated = (MyObject *)slab_get(
+		&sa, orbtree_get(&t, &obj_updated, my_obj_search, 0));
 	cr_assert_eq(obj_out_updated->v, 1);
 	slab_allocator_free(&sa, obj_updated.ptr);
 
 	obj_updated = wrap_obj(vals[7], 0);
-	obj_out_updated = orbtree_get(&t, &obj_updated, my_obj_search, 0);
+	obj_out_updated = (MyObject *)slab_get(
+		&sa, orbtree_get(&t, &obj_updated, my_obj_search, 0));
 	cr_assert_eq(obj_out_updated->v, 1);
 	slab_allocator_free(&sa, obj_updated.ptr);
 
 	obj_updated = wrap_obj(vals[9], 0);
-	obj_out_updated = orbtree_get(&t, &obj_updated, my_obj_search, 0);
+	obj_out_updated = (MyObject *)slab_get(
+		&sa, orbtree_get(&t, &obj_updated, my_obj_search, 0));
 	cr_assert_eq(obj_out_updated->v, 0);
 	slab_allocator_free(&sa, obj_updated.ptr);
 
@@ -362,6 +369,47 @@ MyTest(core, test_random_tree) {
 		OrbTreeNodeWrapper obj = wrap_obj(vals[i], 0);
 		Ptr removed_ptr = orbtree_remove(&t, &obj, my_obj_search);
 		cr_assert_eq(removed_ptr, arr[i]);
+		slab_allocator_free(&sa, obj.ptr);
+		slab_allocator_free(&sa, removed_ptr);
+		my_obj_validate(&t);
+	}
+
+	cr_assert_eq(slab_allocator_free_size(&sa),
+				 slab_allocator_total_slabs(&sa));
+
+	slab_allocator_cleanup(&sa);
+}
+
+MyTest(core, test_orbtree_range) {
+	int size = 1000;
+
+	OrbTree t;
+	slab_allocator_init(&sa, sizeof(MyObject), size + 10, size + 10);
+
+	orbtree_init(&t, &sa);
+
+	for (int i = 0; i < size; i++) {
+		OrbTreeNodeWrapper obj = wrap_obj(i, 0);
+		cr_assert(!orbtree_put(&t, &obj, my_obj_search));
+		my_obj_validate(&t);
+	}
+
+	my_obj_validate(&t);
+
+	for (int j = 0; j < size; j++) {
+		OrbTreeNodeWrapper wrap = wrap_obj(j, 0);
+		for (int i = 0; i < size - j; i++) {
+			MyObject *obj = (MyObject *)slab_get(
+				&sa, orbtree_get(&t, &wrap, my_obj_search, i));
+			cr_assert_eq(obj->x, j + i);
+		}
+
+		slab_allocator_free(&sa, wrap.ptr);
+	}
+
+	for (int i = 0; i < size; i++) {
+		OrbTreeNodeWrapper obj = wrap_obj(i, 0);
+		Ptr removed_ptr = orbtree_remove(&t, &obj, my_obj_search);
 		slab_allocator_free(&sa, obj.ptr);
 		slab_allocator_free(&sa, removed_ptr);
 		my_obj_validate(&t);
