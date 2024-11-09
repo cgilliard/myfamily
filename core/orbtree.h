@@ -46,7 +46,7 @@ typedef struct OrbTreeNodeWrapper {
 	unsigned int offset_of_orbtree_node;
 } OrbTreeNodeWrapper;
 
-#define ORB_TREE_IMPL_SIZE 40
+#define ORB_TREE_IMPL_SIZE 16
 typedef struct OrbTree {
 	byte impl[ORB_TREE_IMPL_SIZE];
 } OrbTree;

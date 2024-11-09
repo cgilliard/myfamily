@@ -28,7 +28,6 @@ typedef struct OrbTreeNodeImpl {
 typedef struct OrbTreeImpl {
 	const SlabAllocator *sa;
 	Ptr root;
-	byte padding[28];
 } OrbTreeImpl;
 
 typedef struct OrbTreeCtx {

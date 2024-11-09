@@ -249,7 +249,6 @@ MyTest(core, test_orbtree) {
 	cr_assert(obj3_out);
 	cr_assert_eq(obj3_out->x, 2);
 
-	my_object_orbtree_print(&t);
 	my_obj_validate(&t);
 
 	free_wrapper(obj1);
@@ -261,16 +260,16 @@ MyTest(core, test_orbtree) {
 
 MyTest(core, test_random_tree) {
 	// seed rng for reproducibility
-	byte key[32] = {5};
+	byte key[32] = {6};
 	byte iv[16] = {};
 	cpsrng_test_seed(iv, key);
 
-	int size = 1000;
+	int size = 5000;
 	Ptr arr[size];
 	int vals[size];
 
 	OrbTree t;
-	slab_allocator_init(&sa, sizeof(MyObject), 1010, 1010);
+	slab_allocator_init(&sa, sizeof(MyObject), size + 10, size + 10);
 
 	orbtree_init(&t, &sa);
 
