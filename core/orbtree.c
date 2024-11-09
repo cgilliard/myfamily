@@ -649,8 +649,7 @@ Ptr orbtree_node_ptr(const OrbTreeNode *node, bool is_right) {
 }
 
 // use subtree heights to navigate to correct offset
-Ptr orbtree_adjust_offset(Ptr first, unsigned int offset) {
-	Ptr ret = first;
+Ptr orbtree_adjust_offset(Ptr ret, unsigned int offset) {
 	while (offset && ret) {
 		OrbTreeNodeImpl *cur = orbtree_node(ret);
 		unsigned int rh = RIGHT_HEIGHT(cur);
@@ -668,12 +667,17 @@ Ptr orbtree_adjust_offset(Ptr first, unsigned int offset) {
 				ret = n->parent;
 			}
 		} else {
-			ret = cur->right;
-			OrbTreeNodeImpl *next = orbtree_node(ret);
 			offset -= 1;
-			while (next->left) {
-				ret = next->left;
-				next = orbtree_node(next->left);
+			ret = cur->right;
+			cur = orbtree_node(ret);
+			while (cur->left) {
+				unsigned int lh = LEFT_HEIGHT(cur);
+				if (lh <= offset) {
+					offset -= lh;
+					break;
+				}
+				ret = cur->left;
+				cur = orbtree_node(cur->left);
 			}
 		}
 	}
