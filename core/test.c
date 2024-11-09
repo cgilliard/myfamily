@@ -317,6 +317,21 @@ MyTest(core, test_random_tree) {
 
 	my_obj_validate(&t);
 
+	OrbTreeNodeWrapper obj_updated = wrap_obj(vals[3], 0);
+	MyObject *obj_out_updated = orbtree_get(&t, &obj_updated, my_obj_search, 0);
+	cr_assert_eq(obj_out_updated->v, 1);
+	slab_allocator_free(&sa, obj_updated.ptr);
+
+	obj_updated = wrap_obj(vals[7], 0);
+	obj_out_updated = orbtree_get(&t, &obj_updated, my_obj_search, 0);
+	cr_assert_eq(obj_out_updated->v, 1);
+	slab_allocator_free(&sa, obj_updated.ptr);
+
+	obj_updated = wrap_obj(vals[9], 0);
+	obj_out_updated = orbtree_get(&t, &obj_updated, my_obj_search, 0);
+	cr_assert_eq(obj_out_updated->v, 0);
+	slab_allocator_free(&sa, obj_updated.ptr);
+
 	for (int i = 0; i < size; i++) {
 		OrbTreeNodeWrapper obj = wrap_obj(vals[i], 0);
 		Ptr removed_ptr = orbtree_remove(&t, &obj, my_obj_search);
