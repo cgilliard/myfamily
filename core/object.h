@@ -28,7 +28,7 @@ typedef enum ObjectType {
 	ObjectTypeFunction,
 } ObjectType;
 
-#define OBJECT_SSO_DATA_BUFFER_SIZE 48
+#define OBJECT_SSO_DATA_BUFFER_SIZE 84
 
 #define OBJECT_IMPL_SIZE 16
 typedef struct ObjectNc {

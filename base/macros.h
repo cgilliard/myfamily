@@ -63,11 +63,15 @@
 #define ASUB(ptr, value) __atomic_fetch_sub(ptr, value, __ATOMIC_RELAXED)
 
 // MMAP
-#define MMAP_ALIGNED_SIZE(size)                                    \
-	({                                                             \
-		size_t getpagesize();                                      \
-		unsigned int page_size = getpagesize();                    \
-		(((unsigned int)size) + page_size - 1) & ~(page_size - 1); \
+#define MMAP_ALIGNED_SIZE(size)                                            \
+	({                                                                     \
+		unsigned int _ret__ = 0;                                           \
+		size_t getpagesize();                                              \
+		unsigned int page_size = getpagesize();                            \
+		if (size > 0)                                                      \
+			_ret__ =                                                       \
+				(((unsigned int)size) + page_size - 1) & ~(page_size - 1); \
+		_ret__;                                                            \
 	})
 #define MMAP(size)                                                  \
 	({                                                              \

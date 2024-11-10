@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/lock.h>
 #include <base/macros.h>
 #include <base/osdef.h>
 #include <base/print_util.h>
@@ -45,22 +46,24 @@ typedef struct ObjectImpl {
 
 typedef struct __attribute__((packed)) ObjectBox {
 	unsigned int size;
-	void *extended;
+	unsigned long long namespace;
 	byte sso_data[OBJECT_SSO_DATA_BUFFER_SIZE];
+	unsigned int resize_seqno;
+	Lock lock;
+	void *extended;
+	unsigned int strong_count;
+	unsigned int weak_count;
 } ObjectBox;
 
 typedef struct __attribute__((packed)) ObjectPropertyBoxData {
 	OrbTreeNode seq;
-	unsigned long long namespace;
 	OrbTreeNode ord;
+	unsigned int seqno;
+	byte key_value_sso[OBJECT_SSO_DATA_BUFFER_SIZE -
+					   (sizeof(unsigned int) + sizeof(OrbTreeNode) * 2)];
 } ObjectPropertyBoxData;
 
-// Extended data has:
-// 1.) 4 byte strong count
-// 2.) 4 byte weak count
-// 3.) 4 byte seqno
-// 4.) 0 byte key_len (we can determine key length based on total length of
-// extended data)
+// Extended data has spill over from the key_value_sso data:
 // 5.) [n bytes of key data]
 // 6.) [16 bytes value data]
 
@@ -95,9 +98,9 @@ static __attribute__((constructor)) void object_init() {
 		panic("sizeof(ObjectImpl) (%i) != sizeof(Object) (%i)",
 			  sizeof(ObjectImpl), sizeof(Object));
 	if (sizeof(Object) != 16)
-		panic("sizeof(Object) (%i) != 60", sizeof(Object));
-	if (sizeof(ObjectBox) != 60)
-		panic("sizeof(ObjectBox) (%i) != 60", sizeof(ObjectBox));
+		panic("sizeof(Object) (%i) != 16", sizeof(Object));
+	if (sizeof(ObjectBox) != 124)
+		panic("sizeof(ObjectBox) (%i) != 124", sizeof(ObjectBox));
 	if (sizeof(ObjectPropertyBoxData) != OBJECT_SSO_DATA_BUFFER_SIZE)
 		panic("sizeof(ObjectPropertyBoxData) (%i) != %i",
 			  sizeof(ObjectPropertyBoxData), OBJECT_SSO_DATA_BUFFER_SIZE);
@@ -161,6 +164,8 @@ Object object_create_box(unsigned int size) {
 	if (ptr == null) return Err(fam_err);
 	ObjectBox *box = (ObjectBox *)slab_get(&sa, ptr);
 	box->size = size;
+	box->lock = INIT_LOCK;
+	box->resize_seqno = 0;
 
 	if (size > OBJECT_SSO_DATA_BUFFER_SIZE) {
 		box->extended = MMAP(size - OBJECT_SSO_DATA_BUFFER_SIZE);
@@ -175,6 +180,30 @@ Object object_create_box(unsigned int size) {
 	return *((Object *)&ret);
 }
 
+void *object_box_sso(const Object *obj) {
+	Ptr ptr = ((ObjectImpl *)obj)->data.ptr_value;
+	if (ptr == null) return NULL;
+	ObjectBox *box = (ObjectBox *)slab_get(&sa, ptr);
+	if (box == NULL) return NULL;
+	return box->sso_data;
+}
+
+void *object_box_extended(const Object *obj) {
+	Ptr ptr = ((ObjectImpl *)obj)->data.ptr_value;
+	if (ptr == null) return NULL;
+	ObjectBox *box = (ObjectBox *)slab_get(&sa, ptr);
+	if (box == NULL) return NULL;
+	return box->extended;
+}
+
+unsigned int object_box_size(const Object *obj) {
+	Ptr ptr = ((ObjectImpl *)obj)->data.ptr_value;
+	if (ptr == null) return 0;
+	ObjectBox *box = (ObjectBox *)slab_get(&sa, ptr);
+	if (box == NULL) return 0;
+	return box->size;
+}
+
 int object_value_of(const Object *obj) {
 	ObjectImpl *impl = (ObjectImpl *)obj;
 	return impl->data.int_value;
@@ -183,4 +212,92 @@ int object_value_of(const Object *obj) {
 void *object_value_function(const Object *obj) {
 	ObjectImpl *impl = (ObjectImpl *)obj;
 	return impl->data.function_value;
+}
+
+#pragma clang diagnostic ignored "-Waddress-of-packed-member"
+Object object_resize_box(Object *obj, unsigned int size) {
+	Ptr ptr = ((ObjectImpl *)obj)->data.ptr_value;
+	if (ptr == null) return Err(IllegalState);
+	ObjectBox *box = (ObjectBox *)slab_get(&sa, ptr);
+	if (box == NULL) return Err(IllegalState);
+	int count = 0;
+
+	loop {
+		if (++count >= 10000) {
+			return Err(Busy);
+		}
+		unsigned int resize_seqno = box->resize_seqno;
+		size_t aligned_size = 0;
+		if (size > OBJECT_SSO_DATA_BUFFER_SIZE)
+			aligned_size =
+				MMAP_ALIGNED_SIZE(size - OBJECT_SSO_DATA_BUFFER_SIZE);
+		size_t cur_aligned_size = 0;
+		if (box->size > OBJECT_SSO_DATA_BUFFER_SIZE)
+			cur_aligned_size =
+				MMAP_ALIGNED_SIZE(box->size - OBJECT_SSO_DATA_BUFFER_SIZE);
+
+		if (aligned_size == cur_aligned_size) {
+			// no resize needed
+
+			lockw(&box->lock);
+			if (box->resize_seqno != resize_seqno) {
+				unlock(&box->lock);
+				continue;
+			}
+			box->size = size;
+			unlock(&box->lock);
+			return Unit;
+		} else if (aligned_size < cur_aligned_size) {
+			// shrink memeory map
+			unsigned int diff = cur_aligned_size - aligned_size;
+			void *extended = box->extended;
+			if (extended == NULL) panic("extended must not be NULL!");
+
+			lockw(&box->lock);
+
+			if (box->resize_seqno != resize_seqno) {
+				unlock(&box->lock);
+				continue;
+			}
+
+			box->size = size;
+			if (aligned_size == 0) box->extended = NULL;
+
+			unlock(&box->lock);
+
+			if (MUNMAP((byte *)extended + aligned_size, diff))
+				panic("Unexpected error returned by munmap!");
+
+			return Unit;
+		} else {
+			void *extended = box->extended;
+			// we need more memory so call mmap
+			void *tmp = MMAP(size - OBJECT_SSO_DATA_BUFFER_SIZE);
+			if (tmp == NULL) return Err(AllocErr);
+
+			lockw(&box->lock);
+
+			if (box->resize_seqno != resize_seqno) {
+				unlock(&box->lock);
+				continue;
+			}
+
+			if (cur_aligned_size) {
+				if (extended == NULL) panic("extended must not be NULL!");
+				copy_bytes(tmp, extended, cur_aligned_size);
+			}
+
+			box->size = size;
+			box->extended = tmp;
+
+			unlock(&box->lock);
+
+			if (cur_aligned_size) {
+				if (extended == NULL) panic("extended must not be NULL!");
+				if (MUNMAP(extended, cur_aligned_size))
+					panic("Unexpected error returned by munmap!");
+			}
+			return Unit;
+		}
+	}
 }

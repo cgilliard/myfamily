@@ -426,28 +426,78 @@ int my_fun(int x, int y) {
 	return x + y;
 }
 
-Object my_obj_fn(int x, int y) {
+Object my_obj_fn(unsigned long long x, int y) {
 	return object_create_int(x * y);
 }
 
 MyTest(core, test_object) {
-	Object obj1 = object_create_int(10);
+	var obj1 = object_create_int(10);
 	cr_assert_eq(object_value_of(&obj1), 10);
 	cr_assert_eq(object_type(&obj1), ObjectTypeInt);
-	Object obj2 = object_create_byte('a');
+	var obj2 = object_create_byte('a');
 	cr_assert_eq(object_value_of(&obj2), 'a');
 	cr_assert_eq(object_type(&obj2), ObjectTypeByte);
-	Object obj3 = object_create_box(100);
+	var obj3 = object_create_box(100);
 
-	Object obj4 = object_create_function(&my_fun);
+	var obj4 = object_create_function(&my_fun);
 	cr_assert_eq(((int (*)(int, int))object_value_function(&obj4))(2, 4), 6);
 
-	const Object obj5 = object_create_function(&my_obj_fn);
-	const Object obj6 = $fn(obj5, 4, 96);
+	let obj5 = object_create_function(&my_obj_fn);
+	let obj6 = $fn(obj5, 4, 96);
 	cr_assert_eq(object_value_of(&obj6), 4 * 96);
 
-	const Object obj7 = object_create_int(4);
+	let obj7 = object_create_int(4);
 
 	void *fptr = &my_fun;
 	cr_assert_eq(((int (*)(int, int))fptr)(1, 2), 3);
+}
+
+MyTest(core, test_object_resize) {
+	var obj1 = object_create_box(10);
+	byte *sso = object_box_sso(&obj1);
+	byte *extended = object_box_extended(&obj1);
+	cr_assert_eq(extended, NULL);
+
+	for (int i = 0; i < 10; i++) {
+		sso[i] = i;
+	}
+
+	for (int i = 0; i < 10; i++) {
+		cr_assert_eq(sso[i], i);
+	}
+
+	let obj2 = object_resize_box(&obj1, 200);
+
+	sso = object_box_sso(&obj1);
+	for (int i = 0; i < 10; i++) {
+		cr_assert_eq(sso[i], i);
+	}
+
+	extended = object_box_extended(&obj1);
+	cr_assert_neq(extended, NULL);
+
+	for (int i = 0; i < 200; i++) {
+		extended[i] = 'a' + i % 26;
+	}
+
+	for (int i = 0; i < 200; i++) {
+		cr_assert_eq(extended[i], 'a' + i % 26);
+	}
+
+	let obj3 = object_resize_box(&obj1, 50000);
+
+	extended = object_box_extended(&obj1);
+	cr_assert_neq(extended, NULL);
+
+	for (int i = 0; i < 200; i++) {
+		cr_assert_eq(extended[i], 'a' + i % 26);
+	}
+
+	for (int i = 200; i < 50000; i++) {
+		extended[i] = 'a' + i % 26;
+	}
+
+	let obj4 = object_resize_box(&obj1, 5);
+	extended = object_box_extended(&obj1);
+	cr_assert_eq(extended, NULL);
 }

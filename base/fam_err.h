@@ -39,6 +39,7 @@
 	IndexOutOfBounds, \
 	POpenErr, \
 	IO, \
+	Busy, \
 	CapacityExceeded, \
 	FileNotFound, \
 	NotADirectory, \
@@ -54,7 +55,8 @@
 	AllocErr, \
 	TypeMismatch, \
 	ObjectConsumed, \
-	DuplicateSizes
+	DuplicateSizes, \
+	NotYetImplemented
 // clang-format on
 
 DEFINE_FAMERR(FAMERR_VALUES);

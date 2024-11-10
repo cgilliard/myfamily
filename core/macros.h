@@ -16,3 +16,6 @@
 #define $fn(obj, ...)                                              \
 	((Object(*)(FOR_EACH(EXTRACT_TYPE, none, (, ), __VA_ARGS__)))( \
 		object_value_function(&obj)))(__VA_ARGS__)
+
+#define let const Object
+#define var Object

@@ -18,6 +18,12 @@
 #include <base/fam_err.h>
 #include <core/object.h>
 
-#define Err(e) object_create_err(e)
+#define Err(e)                \
+	({                        \
+		SetErr(e);            \
+		object_create_err(e); \
+	})
+
+#define Unit object_create_unit()
 
 #endif	// _BASE_ERR__
