@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <base/colors.h>
-#include <base/fam_err.h>
 #include <base/limits.h>
 #include <base/lock.h>
 #include <base/macro_util.h>

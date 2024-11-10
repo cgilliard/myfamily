@@ -13,5 +13,6 @@
 // limitations under the License.
 
 #include <base/lib.h>
+#include <core/macros.h>
 #include <core/object.h>
 #include <core/orbtree.h>

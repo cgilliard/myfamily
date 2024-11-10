@@ -12,16 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/print_util.h>
-#include <base/types.h>
-#include <base/util.h>
-
-void copy_bytes(byte *dst, const byte *src, unsigned long long n) {
-	for (unsigned long long i = 0; i < n; i++) {
-		dst[i] = src[i];
-	}
-}
-
-void set_bytes(byte *ptr, byte x, unsigned long long n) {
-	for (unsigned long long i = 0; i < n; i++) ptr[i] = x;
-}
+#define EXTRACT_TYPE(ignore, v) typeof(v)
+#define $fn(obj, ...)                                              \
+	((Object(*)(FOR_EACH(EXTRACT_TYPE, none, (, ), __VA_ARGS__)))( \
+		object_value_function(&obj)))(__VA_ARGS__)

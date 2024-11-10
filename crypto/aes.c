@@ -54,7 +54,6 @@ NOTE:   String length must be evenly divisible by 16byte (str_len % 16 == 0)
 /*****************************************************************************/
 #include <base/util.h>
 #include <crypto/aes.h>
-#define memcpy(...) mymemcpy(__VA_ARGS__)
 
 /*****************************************************************************/
 /* Defines:                                                                  */
@@ -251,10 +250,10 @@ void AES_init_ctx(struct AES_ctx *ctx, const byte *key) {
 #if (defined(CBC) && (CBC == 1)) || (defined(CTR) && (CTR == 1))
 void AES_init_ctx_iv(struct AES_ctx *ctx, const byte *key, const byte *iv) {
 	KeyExpansion(ctx->RoundKey, key);
-	memcpy(ctx->Iv, iv, AES_BLOCKLEN);
+	copy_bytes(ctx->Iv, iv, AES_BLOCKLEN);
 }
 void AES_ctx_set_iv(struct AES_ctx *ctx, const byte *iv) {
-	memcpy(ctx->Iv, iv, AES_BLOCKLEN);
+	copy_bytes(ctx->Iv, iv, AES_BLOCKLEN);
 }
 #endif
 
@@ -518,7 +517,7 @@ void AES_CBC_encrypt_buffer(struct AES_ctx *ctx, byte *buf,
 		buf += AES_BLOCKLEN;
 	}
 	/* store Iv in ctx for next call */
-	memcpy(ctx->Iv, Iv, AES_BLOCKLEN);
+	copy_bytes(ctx->Iv, Iv, AES_BLOCKLEN);
 }
 
 void AES_CBC_decrypt_buffer(struct AES_ctx *ctx, byte *buf,
@@ -526,10 +525,10 @@ void AES_CBC_decrypt_buffer(struct AES_ctx *ctx, byte *buf,
 	unsigned long long i;
 	byte storeNextIv[AES_BLOCKLEN];
 	for (i = 0; i < length; i += AES_BLOCKLEN) {
-		memcpy(storeNextIv, buf, AES_BLOCKLEN);
+		copy_bytes(storeNextIv, buf, AES_BLOCKLEN);
 		InvCipher((state_t *)buf, ctx->RoundKey);
 		XorWithIv(buf, ctx->Iv);
-		memcpy(ctx->Iv, storeNextIv, AES_BLOCKLEN);
+		copy_bytes(ctx->Iv, storeNextIv, AES_BLOCKLEN);
 		buf += AES_BLOCKLEN;
 	}
 }
@@ -549,7 +548,7 @@ void AES_CTR_xcrypt_buffer(struct AES_ctx *ctx, byte *buf,
 	for (i = 0, bi = AES_BLOCKLEN; i < length; ++i, ++bi) {
 		if (bi == AES_BLOCKLEN) /* we need to regen xor compliment in buffer */
 		{
-			memcpy(buffer, ctx->Iv, AES_BLOCKLEN);
+			copy_bytes(buffer, ctx->Iv, AES_BLOCKLEN);
 			Cipher((state_t *)buffer, ctx->RoundKey);
 
 			/* Increment Iv and handle overflow */

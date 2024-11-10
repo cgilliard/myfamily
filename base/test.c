@@ -214,7 +214,7 @@ MyTest(base, test_util) {
 	char *x = "1234567";
 	char y[10];
 	for (int i = 0; i < 10; i++) y[i] = '\0';
-	mymemcpy(y, x, 3);
+	copy_bytes(y, x, 3);
 	cr_assert_eq(y[0], '1');
 	cr_assert_eq(y[1], '2');
 	cr_assert_eq(y[2], '3');
@@ -228,7 +228,7 @@ MyTest(base, test_util) {
 
 	char z[10];
 	for (int i = 0; i < 10; i++) z[i] = 'a' + i;
-	mymemset(z, 'z', 5);
+	set_bytes(z, 'z', 5);
 	cr_assert_eq(z[0], 'z');
 	cr_assert_eq(z[1], 'z');
 	cr_assert_eq(z[2], 'z');

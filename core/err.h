@@ -12,16 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/print_util.h>
-#include <base/types.h>
-#include <base/util.h>
+#ifndef _BASE_ERR__
+#define _BASE_ERR__
 
-void copy_bytes(byte *dst, const byte *src, unsigned long long n) {
-	for (unsigned long long i = 0; i < n; i++) {
-		dst[i] = src[i];
-	}
-}
+#include <base/fam_err.h>
+#include <core/object.h>
 
-void set_bytes(byte *ptr, byte x, unsigned long long n) {
-	for (unsigned long long i = 0; i < n; i++) ptr[i] = x;
-}
+#define Err(e) object_create_err(e)
+
+#endif	// _BASE_ERR__

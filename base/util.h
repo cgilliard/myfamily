@@ -14,5 +14,5 @@
 
 #include <base/types.h>
 
-void *mymemcpy(void *dest, const void *src, unsigned long long n);
-void *mymemset(void *dst, byte b, unsigned long long n);
+void copy_bytes(byte *dest, const byte *src, unsigned long long n);
+void set_bytes(byte *dst, byte b, unsigned long long n);

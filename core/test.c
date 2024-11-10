@@ -421,3 +421,33 @@ MyTest(core, test_orbtree_range) {
 
 	slab_allocator_cleanup(&sa);
 }
+
+int my_fun(int x, int y) {
+	return x + y;
+}
+
+Object my_obj_fn(int x, int y) {
+	return object_create_int(x * y);
+}
+
+MyTest(core, test_object) {
+	Object obj1 = object_create_int(10);
+	cr_assert_eq(object_value_of(&obj1), 10);
+	cr_assert_eq(object_type(&obj1), ObjectTypeInt);
+	Object obj2 = object_create_byte('a');
+	cr_assert_eq(object_value_of(&obj2), 'a');
+	cr_assert_eq(object_type(&obj2), ObjectTypeByte);
+	Object obj3 = object_create_box(100);
+
+	Object obj4 = object_create_function(&my_fun);
+	cr_assert_eq(((int (*)(int, int))object_value_function(&obj4))(2, 4), 6);
+
+	const Object obj5 = object_create_function(&my_obj_fn);
+	const Object obj6 = $fn(obj5, 4, 96);
+	cr_assert_eq(object_value_of(&obj6), 4 * 96);
+
+	const Object obj7 = object_create_int(4);
+
+	void *fptr = &my_fun;
+	cr_assert_eq(((int (*)(int, int))fptr)(1, 2), 3);
+}

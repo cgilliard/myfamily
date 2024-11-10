@@ -65,6 +65,7 @@
 // MMAP
 #define MMAP_ALIGNED_SIZE(size)                                    \
 	({                                                             \
+		size_t getpagesize();                                      \
 		unsigned int page_size = getpagesize();                    \
 		(((unsigned int)size) + page_size - 1) & ~(page_size - 1); \
 	})

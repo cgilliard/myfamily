@@ -18,6 +18,7 @@
 #include <base/types.h>
 
 typedef enum ObjectType {
+	ObjectTypeUnit,
 	ObjectTypeInt,
 	ObjectTypeFloat,
 	ObjectTypeByte,
@@ -27,10 +28,17 @@ typedef enum ObjectType {
 	ObjectTypeFunction,
 } ObjectType;
 
-#define OBJECT_IMPL_SIZE 64
-typedef struct Object {
+#define OBJECT_SSO_DATA_BUFFER_SIZE 48
+
+#define OBJECT_IMPL_SIZE 16
+typedef struct ObjectNc {
 	byte impl[OBJECT_IMPL_SIZE];
-} Object;
+} ObjectNc;
+
+void object_cleanup(const ObjectNc *obj);
+
+#define Object \
+	ObjectNc __attribute((warn_unused_result, cleanup(object_cleanup)))
 
 Object object_create_int(int value);
 Object object_create_float(float value);
@@ -38,10 +46,16 @@ Object object_create_byte(byte value);
 Object object_create_bool(bool value);
 Object object_create_err(int value);
 Object object_create_function(void *fn);
-Object object_create_box(unsigned long long size);
+Object object_create_box(unsigned int size);
+Object object_create_unit();
 
-int object_value_of_primitive(const Object *obj);
-void *object_value_of_box(const Object *obj);
+int object_value_of(const Object *obj);
+ObjectType object_type(const Object *obj);
+void *object_box_sso(const Object *obj);
+void *object_box_extended(const Object *obj);
+unsigned int object_box_size(const Object *obj);
+Object object_resize_box(Object *obj, unsigned int size);
+void *object_value_function(const Object *obj);
 
 Object object_set_property(Object obj, const char *key, const Object value);
 Object object_delete_property(Object obj, const char *key);
