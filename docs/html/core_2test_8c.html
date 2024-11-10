@@ -107,8 +107,8 @@ Functions</h2></td></tr>
 <tr class="separator:a9e6fa8d0deb507a07a72477d5b00888d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6e41904ae5af32853f3a9b13b29523f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ad6e41904ae5af32853f3a9b13b29523f">my_obj_print_root</a> (<a class="el" href="memmap_8h.html#a7d5f969afb2ad59c79a5cd50816fc587">Ptr</a> ptr)</td></tr>
 <tr class="separator:ad6e41904ae5af32853f3a9b13b29523f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc14ee4e5f29ef30ff62f8536b91a1c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#acc14ee4e5f29ef30ff62f8536b91a1c9">my_object_orbtree_print</a> (const <a class="el" href="structOrbTree.html">OrbTree</a> *tree)</td></tr>
-<tr class="separator:acc14ee4e5f29ef30ff62f8536b91a1c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af84865c41fd3c80d3a84f632a521bf15"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#af84865c41fd3c80d3a84f632a521bf15">my_obj_print_tree</a> (const <a class="el" href="structOrbTree.html">OrbTree</a> *tree)</td></tr>
+<tr class="separator:af84865c41fd3c80d3a84f632a521bf15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1dc4e475f461971a1aadd622ed7530b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#ac1dc4e475f461971a1aadd622ed7530b">my_obj_validate_node</a> (const <a class="el" href="structOrbTree.html">OrbTree</a> *tree, <a class="el" href="memmap_8h.html#a7d5f969afb2ad59c79a5cd50816fc587">Ptr</a> node, int *black_count, int current_black_count, <a class="el" href="types_8h.html#abb452686968e48b67397da5f97445f5b">bool</a> is_right)</td></tr>
 <tr class="separator:ac1dc4e475f461971a1aadd622ed7530b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0411de67f122d202f62449885e13c04f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a0411de67f122d202f62449885e13c04f">my_obj_validate</a> (const <a class="el" href="structOrbTree.html">OrbTree</a> *tree)</td></tr>
@@ -117,6 +117,8 @@ Functions</h2></td></tr>
 <tr class="separator:a0804d06aa91a5e0b46d24b515cc61577"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36c3c74a957008f288a8ad4a52d6e3d6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a36c3c74a957008f288a8ad4a52d6e3d6">MyTest</a> (core, test_random_tree)</td></tr>
 <tr class="separator:a36c3c74a957008f288a8ad4a52d6e3d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0984e75438538b68e0660e294a75c10a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="core_2test_8c.html#a0984e75438538b68e0660e294a75c10a">MyTest</a> (core, test_orbtree_range)</td></tr>
+<tr class="separator:a0984e75438538b68e0660e294a75c10a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -231,6 +233,24 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="af84865c41fd3c80d3a84f632a521bf15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af84865c41fd3c80d3a84f632a521bf15">&#9670;&nbsp;</a></span>my_obj_print_tree()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void my_obj_print_tree </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structOrbTree.html">OrbTree</a> *&#160;</td>
+          <td class="paramname"><em>tree</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="aadc4b0030efcee262c5610724b83de70"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aadc4b0030efcee262c5610724b83de70">&#9670;&nbsp;</a></span>my_obj_search()</h2>
 
@@ -329,26 +349,8 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="acc14ee4e5f29ef30ff62f8536b91a1c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc14ee4e5f29ef30ff62f8536b91a1c9">&#9670;&nbsp;</a></span>my_object_orbtree_print()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void my_object_orbtree_print </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structOrbTree.html">OrbTree</a> *&#160;</td>
-          <td class="paramname"><em>tree</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a0804d06aa91a5e0b46d24b515cc61577"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0804d06aa91a5e0b46d24b515cc61577">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0804d06aa91a5e0b46d24b515cc61577">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -375,8 +377,36 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="a0984e75438538b68e0660e294a75c10a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0984e75438538b68e0660e294a75c10a">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MyTest </td>
+          <td>(</td>
+          <td class="paramtype">core&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">test_orbtree_range&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="a36c3c74a957008f288a8ad4a52d6e3d6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a36c3c74a957008f288a8ad4a52d6e3d6">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a36c3c74a957008f288a8ad4a52d6e3d6">&#9670;&nbsp;</a></span>MyTest() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
