@@ -215,6 +215,7 @@ void *object_value_function(const Object *obj) {
 }
 
 #pragma clang diagnostic ignored "-Waddress-of-packed-member"
+#pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 Object object_resize_box(Object *obj, unsigned int size) {
 	Ptr ptr = ((ObjectImpl *)obj)->data.ptr_value;
 	if (ptr == null) return Err(IllegalState);
