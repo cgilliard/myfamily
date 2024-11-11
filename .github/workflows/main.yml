@@ -41,8 +41,7 @@ jobs:
 
       - name: Run Linux Tests (gcc)
         run: |
-          # ./configure --with-cc=gcc
-          # make clean testsannc -s
+          fam test
       
       - name: Run Linux Tests (clang)
         run: |
@@ -80,8 +79,7 @@ jobs:
      
       - name: Run MacOS Tests (gcc)
         run: |
-          # ./scripts/configure_homebrew.sh --with-cc=gcc
-          # make clean testsan -s
+          fam test
       
       - name: Run MacOS Tests (clang)
         run: |
