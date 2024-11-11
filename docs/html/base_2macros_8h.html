@@ -74,54 +74,46 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;<a class="el" href="types_8h_source.html">base/types.h</a>&gt;</code><br />
 </div>
-<p><a href="macros_8h_source.html">Go to the source code of this file.</a></p>
+<p><a href="base_2macros_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a0a6c403907ca907211fd600e019985ed"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a0a6c403907ca907211fd600e019985ed">Type</a>(type)</td></tr>
+<tr class="memitem:a0a6c403907ca907211fd600e019985ed"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#a0a6c403907ca907211fd600e019985ed">Type</a>(type)</td></tr>
 <tr class="separator:a0a6c403907ca907211fd600e019985ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1414db03b38a685defc808526be96786"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a1414db03b38a685defc808526be96786">DefineType</a>(type)&#160;&#160;&#160;	type##Nc __attribute((warn_unused_result, cleanup(type##_cleanup)))</td></tr>
+<tr class="memitem:a1414db03b38a685defc808526be96786"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#a1414db03b38a685defc808526be96786">DefineType</a>(type)&#160;&#160;&#160;	type##Nc __attribute((warn_unused_result, cleanup(type##_cleanup)))</td></tr>
 <tr class="separator:a1414db03b38a685defc808526be96786"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada23c0615668591b7a50c3c068555fb4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(ptr)&#160;&#160;&#160;(ptr &lt;= <a class="el" href="memmap_8h.html#a6b910f77af8709027dcb51435e2ee3f9">ptr_reserved</a>)</td></tr>
+<tr class="memitem:ada23c0615668591b7a50c3c068555fb4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(ptr)&#160;&#160;&#160;(ptr &lt;= <a class="el" href="memmap_8h.html#a6b910f77af8709027dcb51435e2ee3f9">ptr_reserved</a>)</td></tr>
 <tr class="separator:ada23c0615668591b7a50c3c068555fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb7c4a60d54632531b77aa3a0f792b24"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#afb7c4a60d54632531b77aa3a0f792b24">ok</a>(ptr)&#160;&#160;&#160;!<a class="el" href="macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(ptr)</td></tr>
+<tr class="memitem:afb7c4a60d54632531b77aa3a0f792b24"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#afb7c4a60d54632531b77aa3a0f792b24">ok</a>(ptr)&#160;&#160;&#160;!<a class="el" href="base_2macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(ptr)</td></tr>
 <tr class="separator:afb7c4a60d54632531b77aa3a0f792b24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aea28b4c44db4f0f1d0f222d6382c04c0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#aea28b4c44db4f0f1d0f222d6382c04c0">lock</a>()&#160;&#160;&#160;(<a class="el" href="lock_8h.html#af15a0ab951e1c8d64690b44d8bc37995">lock_create</a>())</td></tr>
+<tr class="memitem:aea28b4c44db4f0f1d0f222d6382c04c0"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#aea28b4c44db4f0f1d0f222d6382c04c0">lock</a>()&#160;&#160;&#160;(<a class="el" href="lock_8h.html#af15a0ab951e1c8d64690b44d8bc37995">lock_create</a>())</td></tr>
 <tr class="separator:aea28b4c44db4f0f1d0f222d6382c04c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9126c72611296fccf7e4e14547fcb327"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a9126c72611296fccf7e4e14547fcb327">lockr</a>(l)&#160;&#160;&#160;<a class="el" href="lock_8h.html#a3c7143fa94b1bbb42666a974de0f1878">lock_read</a>(l)</td></tr>
+<tr class="memitem:a9126c72611296fccf7e4e14547fcb327"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#a9126c72611296fccf7e4e14547fcb327">lockr</a>(l)&#160;&#160;&#160;<a class="el" href="lock_8h.html#a3c7143fa94b1bbb42666a974de0f1878">lock_read</a>(l)</td></tr>
 <tr class="separator:a9126c72611296fccf7e4e14547fcb327"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52580553c6dd4a78a10142881e7338df"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a52580553c6dd4a78a10142881e7338df">lockw</a>(l)&#160;&#160;&#160;<a class="el" href="lock_8h.html#a7f951bb17df0fd553d0b68ec348a2251">lock_write</a>(l)</td></tr>
+<tr class="memitem:a52580553c6dd4a78a10142881e7338df"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#a52580553c6dd4a78a10142881e7338df">lockw</a>(l)&#160;&#160;&#160;<a class="el" href="lock_8h.html#a7f951bb17df0fd553d0b68ec348a2251">lock_write</a>(l)</td></tr>
 <tr class="separator:a52580553c6dd4a78a10142881e7338df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67f7c01dd129fc3e1af1feafd0cc357f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a67f7c01dd129fc3e1af1feafd0cc357f">unlock</a>(l)&#160;&#160;&#160;<a class="el" href="lock_8h.html#a8507ce65f74dbc037bf216bcf22bdc7e">lock_unlock</a>(l)</td></tr>
+<tr class="memitem:a67f7c01dd129fc3e1af1feafd0cc357f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#a67f7c01dd129fc3e1af1feafd0cc357f">unlock</a>(l)&#160;&#160;&#160;<a class="el" href="lock_8h.html#a8507ce65f74dbc037bf216bcf22bdc7e">lock_unlock</a>(l)</td></tr>
 <tr class="separator:a67f7c01dd129fc3e1af1feafd0cc357f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d3913c5879046bace071d3b1bb1707b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a5d3913c5879046bace071d3b1bb1707b">rsync</a>(l,  exe)</td></tr>
+<tr class="memitem:a5d3913c5879046bace071d3b1bb1707b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#a5d3913c5879046bace071d3b1bb1707b">rsync</a>(l,  exe)</td></tr>
 <tr class="separator:a5d3913c5879046bace071d3b1bb1707b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91c40aa1bb119a79cec137bde3082bea"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a91c40aa1bb119a79cec137bde3082bea">wsync</a>(l,  exe)</td></tr>
+<tr class="memitem:a91c40aa1bb119a79cec137bde3082bea"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#a91c40aa1bb119a79cec137bde3082bea">wsync</a>(l,  exe)</td></tr>
 <tr class="separator:a91c40aa1bb119a79cec137bde3082bea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbb2bb469890fe8f626d7a00e11eed2b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#afbb2bb469890fe8f626d7a00e11eed2b">CAS</a>(...)</td></tr>
+<tr class="memitem:afbb2bb469890fe8f626d7a00e11eed2b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#afbb2bb469890fe8f626d7a00e11eed2b">CAS</a>(...)</td></tr>
 <tr class="separator:afbb2bb469890fe8f626d7a00e11eed2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae193c0ddf6475b50ad201e2be60ad624"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#ae193c0ddf6475b50ad201e2be60ad624">CAS_SEQ</a>(...)</td></tr>
+<tr class="memitem:ae193c0ddf6475b50ad201e2be60ad624"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#ae193c0ddf6475b50ad201e2be60ad624">CAS_SEQ</a>(...)</td></tr>
 <tr class="separator:ae193c0ddf6475b50ad201e2be60ad624"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa00b9ed38622b7a726e18bec6b186311"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#aa00b9ed38622b7a726e18bec6b186311">CAS_ACQUIRE</a>(...)</td></tr>
+<tr class="memitem:aa00b9ed38622b7a726e18bec6b186311"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#aa00b9ed38622b7a726e18bec6b186311">CAS_ACQUIRE</a>(...)</td></tr>
 <tr class="separator:aa00b9ed38622b7a726e18bec6b186311"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86bdd0183eb419a61f48cc003d4d3480"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a86bdd0183eb419a61f48cc003d4d3480">CAS_RELEASE</a>(...)</td></tr>
+<tr class="memitem:a86bdd0183eb419a61f48cc003d4d3480"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#a86bdd0183eb419a61f48cc003d4d3480">CAS_RELEASE</a>(...)</td></tr>
 <tr class="separator:a86bdd0183eb419a61f48cc003d4d3480"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c3cb86c3ed12273c4fab32dcd8cafc5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a4c3cb86c3ed12273c4fab32dcd8cafc5">ALOAD</a>(ptr)&#160;&#160;&#160;__atomic_load_n(ptr, __ATOMIC_RELAXED)</td></tr>
+<tr class="memitem:a4c3cb86c3ed12273c4fab32dcd8cafc5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#a4c3cb86c3ed12273c4fab32dcd8cafc5">ALOAD</a>(ptr)&#160;&#160;&#160;__atomic_load_n(ptr, __ATOMIC_RELAXED)</td></tr>
 <tr class="separator:a4c3cb86c3ed12273c4fab32dcd8cafc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a35485b4599329aa17c85c44b026d46e1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a35485b4599329aa17c85c44b026d46e1">ASTORE</a>(ptr,  value)&#160;&#160;&#160;__atomic_store_n(ptr, value, __ATOMIC_RELAXED)</td></tr>
+<tr class="memitem:a35485b4599329aa17c85c44b026d46e1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#a35485b4599329aa17c85c44b026d46e1">ASTORE</a>(ptr,  value)&#160;&#160;&#160;__atomic_store_n(ptr, value, __ATOMIC_RELAXED)</td></tr>
 <tr class="separator:a35485b4599329aa17c85c44b026d46e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afab9832a0980ee17e74a80a0a9da994d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#afab9832a0980ee17e74a80a0a9da994d">AADD</a>(ptr,  value)&#160;&#160;&#160;__atomic_fetch_add(ptr, value, __ATOMIC_RELAXED)</td></tr>
+<tr class="memitem:afab9832a0980ee17e74a80a0a9da994d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#afab9832a0980ee17e74a80a0a9da994d">AADD</a>(ptr,  value)&#160;&#160;&#160;__atomic_fetch_add(ptr, value, __ATOMIC_RELAXED)</td></tr>
 <tr class="separator:afab9832a0980ee17e74a80a0a9da994d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad5f121a6e332e0847bdd2cb6d8bda588"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#ad5f121a6e332e0847bdd2cb6d8bda588">ASUB</a>(ptr,  value)&#160;&#160;&#160;__atomic_fetch_sub(ptr, value, __ATOMIC_RELAXED)</td></tr>
+<tr class="memitem:ad5f121a6e332e0847bdd2cb6d8bda588"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base_2macros_8h.html#ad5f121a6e332e0847bdd2cb6d8bda588">ASUB</a>(ptr,  value)&#160;&#160;&#160;__atomic_fetch_sub(ptr, value, __ATOMIC_RELAXED)</td></tr>
 <tr class="separator:ad5f121a6e332e0847bdd2cb6d8bda588"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c4e4cd3c1f8f88bb3674cd1f3be2906"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a1c4e4cd3c1f8f88bb3674cd1f3be2906">MMAP_ALIGNED_SIZE</a>(size)</td></tr>
-<tr class="separator:a1c4e4cd3c1f8f88bb3674cd1f3be2906"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a839f39143bd2bfdb491e5f2e0e5ae55b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a839f39143bd2bfdb491e5f2e0e5ae55b">MMAP</a>(size)</td></tr>
-<tr class="separator:a839f39143bd2bfdb491e5f2e0e5ae55b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4d04c05cbae3eee21cb79477c9dd1777"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a4d04c05cbae3eee21cb79477c9dd1777">MUNMAP</a>(ptr,  size)&#160;&#160;&#160;munmap(ptr, <a class="el" href="macros_8h.html#a1c4e4cd3c1f8f88bb3674cd1f3be2906">MMAP_ALIGNED_SIZE</a>(size))</td></tr>
-<tr class="separator:a4d04c05cbae3eee21cb79477c9dd1777"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cd41b4ce16f77f0dc3a97a49cf0b045"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="macros_8h.html#a3cd41b4ce16f77f0dc3a97a49cf0b045">SPECTRE_PROTECT</a></td></tr>
-<tr class="separator:a3cd41b4ce16f77f0dc3a97a49cf0b045"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="afab9832a0980ee17e74a80a0a9da994d"></a>
@@ -377,81 +369,6 @@ Macros</h2></td></tr>
 
 </div>
 </div>
-<a id="a839f39143bd2bfdb491e5f2e0e5ae55b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a839f39143bd2bfdb491e5f2e0e5ae55b">&#9670;&nbsp;</a></span>MMAP</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MMAP</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">size</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ({                                                              \</div>
-<div class="line">        mmap(<a class="code" href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a>, <a class="code" href="macros_8h.html#a1c4e4cd3c1f8f88bb3674cd1f3be2906">MMAP_ALIGNED_SIZE</a>(size), PROT_READ | PROT_WRITE, \</div>
-<div class="line">             MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);                   \</div>
-<div class="line">    })</div>
-<div class="ttc" id="amacros_8h_html_a1c4e4cd3c1f8f88bb3674cd1f3be2906"><div class="ttname"><a href="macros_8h.html#a1c4e4cd3c1f8f88bb3674cd1f3be2906">MMAP_ALIGNED_SIZE</a></div><div class="ttdeci">#define MMAP_ALIGNED_SIZE(size)</div><div class="ttdef"><b>Definition:</b> macros.h:66</div></div>
-<div class="ttc" id="atypes_8h_html_a070d2ce7b6bb7e5c05602aa8c308d0c4"><div class="ttname"><a href="types_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></div><div class="ttdeci">#define NULL</div><div class="ttdef"><b>Definition:</b> types.h:32</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a1c4e4cd3c1f8f88bb3674cd1f3be2906"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1c4e4cd3c1f8f88bb3674cd1f3be2906">&#9670;&nbsp;</a></span>MMAP_ALIGNED_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MMAP_ALIGNED_SIZE</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">size</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    ({                                                             \</div>
-<div class="line">        unsigned <span class="keywordtype">int</span> page_size = <a class="code" href="memmap_8c.html#a3aca651a6d774e77df0b2dfa253d51f7">getpagesize</a>();                    \</div>
-<div class="line">        (((<span class="keywordtype">unsigned</span> int)size) + page_size - 1) &amp; ~(page_size - 1); \</div>
-<div class="line">    })</div>
-<div class="ttc" id="amemmap_8c_html_a3aca651a6d774e77df0b2dfa253d51f7"><div class="ttname"><a href="memmap_8c.html#a3aca651a6d774e77df0b2dfa253d51f7">getpagesize</a></div><div class="ttdeci">size_t getpagesize()</div></div>
-</div><!-- fragment -->
-</div>
-</div>
-<a id="a4d04c05cbae3eee21cb79477c9dd1777"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4d04c05cbae3eee21cb79477c9dd1777">&#9670;&nbsp;</a></span>MUNMAP</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define MUNMAP</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">ptr, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">size&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;munmap(ptr, <a class="el" href="macros_8h.html#a1c4e4cd3c1f8f88bb3674cd1f3be2906">MMAP_ALIGNED_SIZE</a>(size))</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="ada23c0615668591b7a50c3c068555fb4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ada23c0615668591b7a50c3c068555fb4">&#9670;&nbsp;</a></span>nil</h2>
 
@@ -481,7 +398,7 @@ Macros</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">ptr</td><td>)</td>
-          <td>&#160;&#160;&#160;!<a class="el" href="macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(ptr)</td>
+          <td>&#160;&#160;&#160;!<a class="el" href="base_2macros_8h.html#ada23c0615668591b7a50c3c068555fb4">nil</a>(ptr)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -521,20 +438,6 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 </div>
 </div>
-<a id="a3cd41b4ce16f77f0dc3a97a49cf0b045"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3cd41b4ce16f77f0dc3a97a49cf0b045">&#9670;&nbsp;</a></span>SPECTRE_PROTECT</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SPECTRE_PROTECT</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a id="a0a6c403907ca907211fd600e019985ed"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0a6c403907ca907211fd600e019985ed">&#9670;&nbsp;</a></span>Type</h2>
 
@@ -550,9 +453,9 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="macros_8h.html#a0a6c403907ca907211fd600e019985ed">Type</a> *type##Nc; \</div>
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keyword">typedef</span> <span class="keyword">struct </span><a class="code" href="base_2macros_8h.html#a0a6c403907ca907211fd600e019985ed">Type</a> *type##Nc; \</div>
 <div class="line">    void type##_cleanup(<span class="keyword">const</span> type##Nc *ptr);</div>
-<div class="ttc" id="amacros_8h_html_a0a6c403907ca907211fd600e019985ed"><div class="ttname"><a href="macros_8h.html#a0a6c403907ca907211fd600e019985ed">Type</a></div><div class="ttdeci">#define Type(type)</div><div class="ttdef"><b>Definition:</b> macros.h:21</div></div>
+<div class="ttc" id="abase_2macros_8h_html_a0a6c403907ca907211fd600e019985ed"><div class="ttname"><a href="base_2macros_8h.html#a0a6c403907ca907211fd600e019985ed">Type</a></div><div class="ttdeci">#define Type(type)</div><div class="ttdef"><b>Definition:</b> macros.h:21</div></div>
 </div><!-- fragment -->
 </div>
 </div>

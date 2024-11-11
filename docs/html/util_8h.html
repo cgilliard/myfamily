@@ -78,28 +78,34 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a49fff895b94d488e6f389f8fa3cec3ef"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_8h.html#a49fff895b94d488e6f389f8fa3cec3ef">mymemcpy</a> (void *dest, const void *src, unsigned long long n)</td></tr>
-<tr class="separator:a49fff895b94d488e6f389f8fa3cec3ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0229e05bb1704ae4639e33b59e155c3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_8h.html#aa0229e05bb1704ae4639e33b59e155c3">mymemset</a> (void *dst, <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> b, unsigned long long n)</td></tr>
-<tr class="separator:aa0229e05bb1704ae4639e33b59e155c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9db6d430e8e036136d4f121c8b03d0d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_8h.html#ae9db6d430e8e036136d4f121c8b03d0d">copy_bytes</a> (<a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *dest, const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *src, unsigned long long n)</td></tr>
+<tr class="separator:ae9db6d430e8e036136d4f121c8b03d0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c89c0a105bfbe42849c523d914c7610"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_8h.html#a5c89c0a105bfbe42849c523d914c7610">set_bytes</a> (<a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *dst, <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> b, unsigned long long n)</td></tr>
+<tr class="separator:a5c89c0a105bfbe42849c523d914c7610"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39c1ab9c00bfae1d944ea85784f23f90"><td class="memItemLeft" align="right" valign="top">unsigned long long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_8h.html#a39c1ab9c00bfae1d944ea85784f23f90">cstring_len</a> (const char *S)</td></tr>
+<tr class="separator:a39c1ab9c00bfae1d944ea85784f23f90"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d621bdb8c869602efca45c25363741c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_8h.html#a7d621bdb8c869602efca45c25363741c">cstring_compare</a> (const char *s1, const char *s2)</td></tr>
+<tr class="separator:a7d621bdb8c869602efca45c25363741c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7db0b629cfd12cee1c80e29f25c4aba0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="util_8h.html#a7db0b629cfd12cee1c80e29f25c4aba0">cstring_compare_n</a> (const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *s1, const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *s2, unsigned long long n)</td></tr>
+<tr class="separator:a7db0b629cfd12cee1c80e29f25c4aba0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a49fff895b94d488e6f389f8fa3cec3ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a49fff895b94d488e6f389f8fa3cec3ef">&#9670;&nbsp;</a></span>mymemcpy()</h2>
+<a id="ae9db6d430e8e036136d4f121c8b03d0d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9db6d430e8e036136d4f121c8b03d0d">&#9670;&nbsp;</a></span>copy_bytes()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* mymemcpy </td>
+          <td class="memname">void copy_bytes </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *&#160;</td>
           <td class="paramname"><em>dest</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const void *&#160;</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *&#160;</td>
           <td class="paramname"><em>src</em>, </td>
         </tr>
         <tr>
@@ -118,16 +124,96 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="aa0229e05bb1704ae4639e33b59e155c3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0229e05bb1704ae4639e33b59e155c3">&#9670;&nbsp;</a></span>mymemset()</h2>
+<a id="a7d621bdb8c869602efca45c25363741c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7d621bdb8c869602efca45c25363741c">&#9670;&nbsp;</a></span>cstring_compare()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* mymemset </td>
+          <td class="memname">int cstring_compare </td>
           <td>(</td>
-          <td class="paramtype">void *&#160;</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>s1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>s2</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7db0b629cfd12cee1c80e29f25c4aba0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7db0b629cfd12cee1c80e29f25c4aba0">&#9670;&nbsp;</a></span>cstring_compare_n()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int cstring_compare_n </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *&#160;</td>
+          <td class="paramname"><em>s1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *&#160;</td>
+          <td class="paramname"><em>s2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned long long&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a39c1ab9c00bfae1d944ea85784f23f90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39c1ab9c00bfae1d944ea85784f23f90">&#9670;&nbsp;</a></span>cstring_len()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned long long cstring_len </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>S</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a5c89c0a105bfbe42849c523d914c7610"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c89c0a105bfbe42849c523d914c7610">&#9670;&nbsp;</a></span>set_bytes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void set_bytes </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> *&#160;</td>
           <td class="paramname"><em>dst</em>, </td>
         </tr>
         <tr>

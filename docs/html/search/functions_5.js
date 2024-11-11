@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['free_5fwrapper_493',['free_wrapper',['../core_2test_8c.html#ad2cd21309503ebcbf5e53d07b4f476f3',1,'test.c']]]
+  ['exit_556',['exit',['../print__util_8c.html#a6f255d924f7a6bb2c4be0c8c2f2d9ce3',1,'print_util.c']]]
 ];

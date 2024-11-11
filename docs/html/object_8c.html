@@ -69,52 +69,529 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#define-members">Macros</a> &#124;
-<a href="#typedef-members">Typedefs</a>  </div>
+<a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">object.c File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;<a class="el" href="object_8h_source.html">core/object.h</a>&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="el" href="lock_8h_source.html">base/lock.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="base_2macros_8h_source.html">base/macros.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="mmap_8h_source.html">base/mmap.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="print__util_8h_source.html">base/print_util.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="slabs_8h_source.html">base/slabs.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="util_8h_source.html">base/util.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="err_8h_source.html">core/err.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="core_2macros_8h_source.html">core/macros.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="object_8h_source.html">core/object.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="orbtree_8h_source.html">core/orbtree.h</a>&gt;</code><br />
+<code>#include &lt;stddef.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structOrbTreeNode.html">OrbTreeNode</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structObjectImpl.html">ObjectImpl</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a6bc1fd422bb897874e031d54977261d9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a6bc1fd422bb897874e031d54977261d9">ORB_TREE_NODE_IMPL_SIZE</a>&#160;&#160;&#160;24</td></tr>
-<tr class="separator:a6bc1fd422bb897874e031d54977261d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ba96ea4eb73af170da69ebf2d6b55d6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a9ba96ea4eb73af170da69ebf2d6b55d6">OBJECT_MAX_FREE_LIST_SIZE</a>&#160;&#160;&#160;1024</td></tr>
+<tr class="separator:a9ba96ea4eb73af170da69ebf2d6b55d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac647b95fd8b08bd7451248b2fe6f7716"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#ac647b95fd8b08bd7451248b2fe6f7716">OBJECT_PROPERTY_KV_SSO_LEN</a></td></tr>
+<tr class="separator:ac647b95fd8b08bd7451248b2fe6f7716"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a7f7caf93d655b82fd74a4bc05ada8009"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structOrbTreeNode.html">OrbTreeNode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a7f7caf93d655b82fd74a4bc05ada8009">OrbTreeNode</a></td></tr>
-<tr class="separator:a7f7caf93d655b82fd74a4bc05ada8009"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fc0de736d974b939936dd39aedd742e"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structObjectImpl.html">ObjectImpl</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a3fc0de736d974b939936dd39aedd742e">ObjectImpl</a></td></tr>
+<tr class="separator:a3fc0de736d974b939936dd39aedd742e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ab898071398b359603a35c202e9c65f3b"><td class="memItemLeft" align="right" valign="top">struct&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#ab898071398b359603a35c202e9c65f3b">__attribute__</a> ((packed))</td></tr>
+<tr class="separator:ab898071398b359603a35c202e9c65f3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2f37c28df4d8950a687134e00bfba23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#aa2f37c28df4d8950a687134e00bfba23">object_cleanup</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj)</td></tr>
+<tr class="separator:aa2f37c28df4d8950a687134e00bfba23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb3302ab134649d4fcedab1f26253e2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#abb3302ab134649d4fcedab1f26253e2c">object_type</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj)</td></tr>
+<tr class="separator:abb3302ab134649d4fcedab1f26253e2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9a66f964c6a66162bb1c21dee40f900"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#ac9a66f964c6a66162bb1c21dee40f900">object_create_int</a> (int value)</td></tr>
+<tr class="separator:ac9a66f964c6a66162bb1c21dee40f900"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2fbbb1153c5c15d0f36d2f6524fb42c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#af2fbbb1153c5c15d0f36d2f6524fb42c">object_create_byte</a> (<a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a> b)</td></tr>
+<tr class="separator:af2fbbb1153c5c15d0f36d2f6524fb42c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a586f70dc84c1edb4f1629dc5ed35fb65"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a586f70dc84c1edb4f1629dc5ed35fb65">object_create_unit</a> ()</td></tr>
+<tr class="separator:a586f70dc84c1edb4f1629dc5ed35fb65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48bb1b07c1e22f1ab1df8903d0ca33cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a48bb1b07c1e22f1ab1df8903d0ca33cf">object_create_err</a> (int code)</td></tr>
+<tr class="separator:a48bb1b07c1e22f1ab1df8903d0ca33cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acaba70f50ff7176228d38e3dcd02736d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#acaba70f50ff7176228d38e3dcd02736d">object_create_function</a> (void *<a class="el" href="core_2macros_8h.html#a6c4e25ebfc5ec29bbfef38b5ebe4ce93">fn</a>)</td></tr>
+<tr class="separator:acaba70f50ff7176228d38e3dcd02736d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4497d620b52c6f3894e009636499ac01"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a4497d620b52c6f3894e009636499ac01">object_set_property</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj, const char *key, const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *value)</td></tr>
+<tr class="separator:a4497d620b52c6f3894e009636499ac01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2178f20297c3df905987e0d9b834b695"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a2178f20297c3df905987e0d9b834b695">object_delete_property</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj, const char *key)</td></tr>
+<tr class="separator:a2178f20297c3df905987e0d9b834b695"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae719ad828d168e5faa47cd48afeca53f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#ae719ad828d168e5faa47cd48afeca53f">object_get_property</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj, const char *key)</td></tr>
+<tr class="separator:ae719ad828d168e5faa47cd48afeca53f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd86dc4ce41305f9b137e9f4a157582f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#acd86dc4ce41305f9b137e9f4a157582f">object_create_box</a> (unsigned int size)</td></tr>
+<tr class="separator:acd86dc4ce41305f9b137e9f4a157582f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bdd19500fffea88f028d57c49fcf32a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a6bdd19500fffea88f028d57c49fcf32a">object_box_sso</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj)</td></tr>
+<tr class="separator:a6bdd19500fffea88f028d57c49fcf32a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37400f2cb9b068315c0cad90332126fb"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a37400f2cb9b068315c0cad90332126fb">object_box_extended</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj)</td></tr>
+<tr class="separator:a37400f2cb9b068315c0cad90332126fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3be9ef0be7010f49434168d6209cc4d2"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a3be9ef0be7010f49434168d6209cc4d2">object_box_size</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj)</td></tr>
+<tr class="separator:a3be9ef0be7010f49434168d6209cc4d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8db3aedab2fe382c98df29f97ab80ba3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a8db3aedab2fe382c98df29f97ab80ba3">object_value_of</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj)</td></tr>
+<tr class="separator:a8db3aedab2fe382c98df29f97ab80ba3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71a2829932ade8900d884d646df5aad3"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#a71a2829932ade8900d884d646df5aad3">object_value_function</a> (const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj)</td></tr>
+<tr class="separator:a71a2829932ade8900d884d646df5aad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4c8821883d457b1b585f4fe98c9513c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#ae4c8821883d457b1b585f4fe98c9513c">object_resize_box</a> (<a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *obj, unsigned int size)</td></tr>
+<tr class="separator:ae4c8821883d457b1b585f4fe98c9513c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:aada3fa148e28fecd78198780c6215a7b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#aada3fa148e28fecd78198780c6215a7b">ObjectBox</a></td></tr>
+<tr class="separator:aada3fa148e28fecd78198780c6215a7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3d4ad0af9cfba1a91c5af29da5a4077"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="object_8c.html#ad3d4ad0af9cfba1a91c5af29da5a4077">ObjectPropertyBoxData</a></td></tr>
+<tr class="separator:ad3d4ad0af9cfba1a91c5af29da5a4077"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a6bc1fd422bb897874e031d54977261d9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6bc1fd422bb897874e031d54977261d9">&#9670;&nbsp;</a></span>ORB_TREE_NODE_IMPL_SIZE</h2>
+<a id="a9ba96ea4eb73af170da69ebf2d6b55d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ba96ea4eb73af170da69ebf2d6b55d6">&#9670;&nbsp;</a></span>OBJECT_MAX_FREE_LIST_SIZE</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ORB_TREE_NODE_IMPL_SIZE&#160;&#160;&#160;24</td>
+          <td class="memname">#define OBJECT_MAX_FREE_LIST_SIZE&#160;&#160;&#160;1024</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 </div>
 </div>
-<h2 class="groupheader">Typedef Documentation</h2>
-<a id="a7f7caf93d655b82fd74a4bc05ada8009"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7f7caf93d655b82fd74a4bc05ada8009">&#9670;&nbsp;</a></span>OrbTreeNode</h2>
+<a id="ac647b95fd8b08bd7451248b2fe6f7716"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac647b95fd8b08bd7451248b2fe6f7716">&#9670;&nbsp;</a></span>OBJECT_PROPERTY_KV_SSO_LEN</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef struct <a class="el" href="structOrbTreeNode.html">OrbTreeNode</a> <a class="el" href="structOrbTreeNode.html">OrbTreeNode</a></td>
+          <td class="memname">#define OBJECT_PROPERTY_KV_SSO_LEN</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <a class="code" href="object_8h.html#a092107129e6ee94201447cd45bdcce21">OBJECT_SSO_DATA_BUFFER_SIZE</a> -  \</div>
+<div class="line">        (<span class="keyword">sizeof</span>(<span class="keywordtype">unsigned</span> int) + <span class="keyword">sizeof</span>(<a class="code" href="structOrbTreeNode.html">OrbTreeNode</a>) * 2)</div>
+<div class="ttc" id="aobject_8h_html_a092107129e6ee94201447cd45bdcce21"><div class="ttname"><a href="object_8h.html#a092107129e6ee94201447cd45bdcce21">OBJECT_SSO_DATA_BUFFER_SIZE</a></div><div class="ttdeci">#define OBJECT_SSO_DATA_BUFFER_SIZE</div><div class="ttdef"><b>Definition:</b> object.h:31</div></div>
+<div class="ttc" id="astructOrbTreeNode_html"><div class="ttname"><a href="structOrbTreeNode.html">OrbTreeNode</a></div><div class="ttdef"><b>Definition:</b> orbtree.h:22</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<h2 class="groupheader">Typedef Documentation</h2>
+<a id="a3fc0de736d974b939936dd39aedd742e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fc0de736d974b939936dd39aedd742e">&#9670;&nbsp;</a></span>ObjectImpl</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structObjectImpl.html">ObjectImpl</a> <a class="el" href="structObjectImpl.html">ObjectImpl</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ab898071398b359603a35c202e9c65f3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab898071398b359603a35c202e9c65f3b">&#9670;&nbsp;</a></span>__attribute__()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct __attribute__ </td>
+          <td>(</td>
+          <td class="paramtype">(packed)&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a37400f2cb9b068315c0cad90332126fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a37400f2cb9b068315c0cad90332126fb">&#9670;&nbsp;</a></span>object_box_extended()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* object_box_extended </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a3be9ef0be7010f49434168d6209cc4d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3be9ef0be7010f49434168d6209cc4d2">&#9670;&nbsp;</a></span>object_box_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">unsigned int object_box_size </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6bdd19500fffea88f028d57c49fcf32a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6bdd19500fffea88f028d57c49fcf32a">&#9670;&nbsp;</a></span>object_box_sso()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* object_box_sso </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa2f37c28df4d8950a687134e00bfba23"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2f37c28df4d8950a687134e00bfba23">&#9670;&nbsp;</a></span>object_cleanup()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void object_cleanup </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acd86dc4ce41305f9b137e9f4a157582f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acd86dc4ce41305f9b137e9f4a157582f">&#9670;&nbsp;</a></span>object_create_box()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_create_box </td>
+          <td>(</td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>size</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="af2fbbb1153c5c15d0f36d2f6524fb42c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af2fbbb1153c5c15d0f36d2f6524fb42c">&#9670;&nbsp;</a></span>object_create_byte()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_create_byte </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="types_8h.html#a0c8186d9b9b7880309c27230bbb5e69d">byte</a>&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a48bb1b07c1e22f1ab1df8903d0ca33cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48bb1b07c1e22f1ab1df8903d0ca33cf">&#9670;&nbsp;</a></span>object_create_err()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_create_err </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>code</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acaba70f50ff7176228d38e3dcd02736d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acaba70f50ff7176228d38e3dcd02736d">&#9670;&nbsp;</a></span>object_create_function()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_create_function </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>fn</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac9a66f964c6a66162bb1c21dee40f900"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9a66f964c6a66162bb1c21dee40f900">&#9670;&nbsp;</a></span>object_create_int()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_create_int </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a586f70dc84c1edb4f1629dc5ed35fb65"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a586f70dc84c1edb4f1629dc5ed35fb65">&#9670;&nbsp;</a></span>object_create_unit()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_create_unit </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a2178f20297c3df905987e0d9b834b695"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2178f20297c3df905987e0d9b834b695">&#9670;&nbsp;</a></span>object_delete_property()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_delete_property </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>key</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae719ad828d168e5faa47cd48afeca53f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae719ad828d168e5faa47cd48afeca53f">&#9670;&nbsp;</a></span>object_get_property()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_get_property </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>key</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ae4c8821883d457b1b585f4fe98c9513c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae4c8821883d457b1b585f4fe98c9513c">&#9670;&nbsp;</a></span>object_resize_box()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_resize_box </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a4497d620b52c6f3894e009636499ac01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4497d620b52c6f3894e009636499ac01">&#9670;&nbsp;</a></span>object_set_property()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> object_set_property </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="abb3302ab134649d4fcedab1f26253e2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb3302ab134649d4fcedab1f26253e2c">&#9670;&nbsp;</a></span>object_type()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="object_8h.html#a842c5e2e69277690b064bf363c017980">ObjectType</a> object_type </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a71a2829932ade8900d884d646df5aad3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a71a2829932ade8900d884d646df5aad3">&#9670;&nbsp;</a></span>object_value_function()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* object_value_function </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a8db3aedab2fe382c98df29f97ab80ba3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8db3aedab2fe382c98df29f97ab80ba3">&#9670;&nbsp;</a></span>object_value_of()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int object_value_of </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="object_8h.html#a9857328827ae1957544a254406d6c557">Object</a> *&#160;</td>
+          <td class="paramname"><em>obj</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="aada3fa148e28fecd78198780c6215a7b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aada3fa148e28fecd78198780c6215a7b">&#9670;&nbsp;</a></span>ObjectBox</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ObjectBox</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad3d4ad0af9cfba1a91c5af29da5a4077"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3d4ad0af9cfba1a91c5af29da5a4077">&#9670;&nbsp;</a></span>ObjectPropertyBoxData</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">ObjectPropertyBoxData</td>
         </tr>
       </table>
 </div><div class="memdoc">

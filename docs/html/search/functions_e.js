@@ -1,8 +1,9 @@
 var searchData=
 [
-  ['test_5fcleanup_5fdev_5fresources_604',['test_cleanup_dev_resources',['../test__impl_8c.html#ac954e207e43b820ded503b0fc720b848',1,'test_cleanup_dev_resources():&#160;test_impl.c'],['../test__impl_8h.html#ac954e207e43b820ded503b0fc720b848',1,'test_cleanup_dev_resources():&#160;test_impl.c']]],
-  ['test_5fcleanup_5ftest_5fresources_605',['test_cleanup_test_resources',['../test__impl_8c.html#aed83afe2695bbdf8b132a2b7746843b8',1,'test_cleanup_test_resources(byte *path):&#160;test_impl.c'],['../test__impl_8h.html#aed83afe2695bbdf8b132a2b7746843b8',1,'test_cleanup_test_resources(byte *path):&#160;test_impl.c']]],
-  ['test_5fconfirm_5fdev_5fresources_606',['test_confirm_dev_resources',['../test__impl_8c.html#a4b653a8efaf450d660ddf0d338b7e75e',1,'test_confirm_dev_resources():&#160;test_impl.c'],['../test__impl_8h.html#a4b653a8efaf450d660ddf0d338b7e75e',1,'test_confirm_dev_resources():&#160;test_impl.c']]],
-  ['test_5finit_5fdev_5fresources_607',['test_init_dev_resources',['../test__impl_8c.html#a294a0609af1699ba6dbfa46b3b208308',1,'test_init_dev_resources():&#160;test_impl.c'],['../test__impl_8h.html#a294a0609af1699ba6dbfa46b3b208308',1,'test_init_dev_resources():&#160;test_impl.c']]],
-  ['test_5finit_5ftest_5fresources_608',['test_init_test_resources',['../test__impl_8c.html#a5159ac1219075fadc34fc894fb1bf9e7',1,'test_init_test_resources(byte *suite, byte *test, byte *path, byte *resources):&#160;test_impl.c'],['../test__impl_8h.html#a5159ac1219075fadc34fc894fb1bf9e7',1,'test_init_test_resources(byte *suite, byte *test, byte *path, byte *resources):&#160;test_impl.c']]]
+  ['rand_5fbyte_655',['rand_byte',['../rand_8c.html#a1a4d10a7c09db9892ca7555e4bfee985',1,'rand_byte(byte *v):&#160;rand.c'],['../rand_8h.html#a1a4d10a7c09db9892ca7555e4bfee985',1,'rand_byte(byte *v):&#160;rand.c']]],
+  ['rand_5fbytes_656',['rand_bytes',['../rand_8c.html#af2ac8430c6ac3384409fd221c91d7fd4',1,'rand_bytes(void *buf, int64 length):&#160;rand.c'],['../rand_8h.html#af2ac8430c6ac3384409fd221c91d7fd4',1,'rand_bytes(void *buf, int64 length):&#160;rand.c']]],
+  ['rand_5fint_657',['rand_int',['../rand_8c.html#a8d4e53a3c7e73f587e68614b86ffa119',1,'rand_int(int *v):&#160;rand.c'],['../rand_8h.html#a8d4e53a3c7e73f587e68614b86ffa119',1,'rand_int(int *v):&#160;rand.c']]],
+  ['rand_5fint64_658',['rand_int64',['../rand_8c.html#a23bca8ff9e16533f86e54cf0d7ebf103',1,'rand_int64(int64 *v):&#160;rand.c'],['../rand_8h.html#a23bca8ff9e16533f86e54cf0d7ebf103',1,'rand_int64(int64 *v):&#160;rand.c']]],
+  ['real_5fmain_659',['real_main',['../main_8h.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c'],['../real__main_8c.html#a813033ab922b78183e69871180bdc9cf',1,'real_main(int argc, char **argv):&#160;real_main.c']]],
+  ['rmrf_660',['rmrf',['../test__impl_8c.html#a5816a6b27040ac0d2cda8305b9f82f9b',1,'test_impl.c']]]
 ];

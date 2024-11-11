@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['memmap_412',['MemMap',['../structMemMap.html',1,'']]],
-  ['memmapimpl_413',['MemMapImpl',['../structMemMapImpl.html',1,'']]],
-  ['myobject_414',['MyObject',['../structMyObject.html',1,'']]]
+  ['backtrace_462',['Backtrace',['../structBacktrace.html',1,'']]],
+  ['backtraceentry_463',['BacktraceEntry',['../structBacktraceEntry.html',1,'']]],
+  ['backtraceimpl_464',['BacktraceImpl',['../structBacktraceImpl.html',1,'']]]
 ];
