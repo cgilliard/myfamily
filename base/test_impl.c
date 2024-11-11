@@ -98,7 +98,6 @@ void fail_assert() {
 				}
 				itt++;
 			}
-			// println("addr=%s", addr);
 			char command[256];
 			snprintf(command, sizeof(command), "addr2line -f -e bin/test %s",
 					 addr);
@@ -118,7 +117,7 @@ void fail_assert() {
 			}
 			if (strstr(output, "_tfwork_"))
 				print("Assertion failure: %s", output);
-			fclose(fp);
+			pclose(fp);
 		}
 #else	// MACOS
 		Dl_info info;
@@ -137,11 +136,12 @@ void fail_assert() {
 
 			FILE *fp = popen(command, "r");
 			char buffer[128];
-			print(" Assertion failure: ");
+			print("Assertion failure: ");
 			while (fgets(buffer, sizeof(buffer), fp) != NULL) {
 				print("%s", buffer);  // Print each line from atos output
 			}
-			fclose(fp);
+
+			pclose(fp);
 			break;
 		}
 #endif	// MACOS
