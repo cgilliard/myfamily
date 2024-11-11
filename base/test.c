@@ -243,3 +243,8 @@ MyTest(base, test_util) {
 	char *test1 = "abc";
 	cr_assert_eq(cstring_len(test1), 3);
 }
+
+MyTest(base, test_backtrace) {
+	Backtrace bt;
+	backtrace_generate(&bt);
+}
