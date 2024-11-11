@@ -33,8 +33,7 @@ else
                   newer_header=1;
                fi
             done
-
-            if [ ${file} -nt ${file%.c}.o ] || [ $newer_header == 1 ]; then
+            if [ ! -e ${file%.c}.o ] || [ ${file} -nt ${file%.c}.o ] || [ $newer_header = 1 ]; then
                if [ ${file} != "test.c" ]; then
                   echo "${cc} -I.. ${cc_flags} -o ${file%.c}.o -c ${file}"
                   ${cc} -I.. ${cc_flags} -o ${file%.c}.o -c ${file} || exit 1;
