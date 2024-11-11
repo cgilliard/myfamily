@@ -36,15 +36,15 @@ bool execute_tests(byte *name) {
 		if (setjmp(test_jmp) == 0) {
 			test_arr[i]("test_dir", "resources_dir");
 		} else {
-			println(" %sFAIL:%s test '%s%s%s' failed!", BRIGHT_RED, RESET,
-					GREEN, test_names[i], RESET);
+			println("%sFAIL:%s test '%s%s%s' failed!", BRIGHT_RED, RESET, GREEN,
+					test_names[i], RESET);
 			fail_count++;
 		}
 	}
 
 	if (fail_count)
 		println(
-			" -------------------------------"
+			"--------------------------------"
 			"--------------------------------"
 			"--------------------------------"
 			"--------------------");
@@ -59,8 +59,8 @@ bool execute_tests(byte *name) {
 		BLUE, RESET);
 
 	if (fail_count != 0)
-		println(" %sFAIL:%s Test suite %s%s%s failed!", BRIGHT_RED, RESET,
-				GREEN, name, RESET);
+		println("%sFAIL:%s Test suite %s%s%s failed!", BRIGHT_RED, RESET, GREEN,
+				name, RESET);
 
 	return fail_count == 0;
 }
@@ -68,7 +68,7 @@ bool execute_tests(byte *name) {
 void fail_assert() {
 	if (fail_count == 0)
 		println(
-			" -------------------------------"
+			"--------------------------------"
 			"--------------------------------"
 			"--------------------------------"
 			"--------------------");
@@ -78,6 +78,49 @@ void fail_assert() {
 
 	for (int i = 0; i < size; i++) {
 		char address[256];
+#ifdef __linux__  // LINUX
+		int len = cstring_len(strings[i]);
+		int last_plus = -1;
+		while (len > 0) {
+			if (strings[i][len] == '+') {
+				last_plus = len;
+				break;
+			}
+			len--;
+		}
+		if (last_plus > 0) {
+			byte *addr = strings[i] + last_plus + 1;
+			int itt = 0;
+			while (addr[itt]) {
+				if (addr[itt] == ')') {
+					addr[itt] = 0;
+					break;
+				}
+				itt++;
+			}
+			// println("addr=%s", addr);
+			char command[256];
+			snprintf(command, sizeof(command), "addr2line -f -e bin/test %s",
+					 addr);
+
+			FILE *fp = popen(command, "r");
+			char buffer[128];
+			char output[1024 * 2];
+			int n = sizeof(output);
+			strcpy(output, "");
+			while (n && fgets(buffer, sizeof(buffer), fp) != NULL) {
+				strncat(output, buffer, n);
+				int buf_len = strlen(buffer);
+				if (buf_len < n)
+					n -= buf_len;
+				else
+					n = 0;
+			}
+			if (strstr(output, "_tfwork_"))
+				print("Assertion failure: %s", output);
+			fclose(fp);
+		}
+#else	// MACOS
 		Dl_info info;
 		dladdr(array[i], &info);
 		unsigned long long addr =
@@ -98,7 +141,10 @@ void fail_assert() {
 			while (fgets(buffer, sizeof(buffer), fp) != NULL) {
 				print("%s", buffer);  // Print each line from atos output
 			}
+			fclose(fp);
+			break;
 		}
+#endif	// MACOS
 	}
 
 	free(strings);
