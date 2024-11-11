@@ -1,0 +1,61 @@
+// Copyright (c) 2024, The MyFamily Developers
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <base/colors.h>
+#include <base/print_util.h>
+#include <base/types.h>
+#include <base/util.h>
+
+#define MAX_TESTS 100
+#define MAX_TEST_NAME 1024
+
+extern int test_count;
+typedef void (*test_fn_ptr)(const byte *, const byte *);
+extern test_fn_ptr test_arr[MAX_TESTS + 1];
+extern byte test_names[MAX_TESTS][MAX_TEST_NAME + 1];
+
+bool execute_tests(byte *suite_name);
+void fail_assert();
+
+#define fam_assert(v) \
+	if (!v) fail_assert();
+
+#define fam_assert_eq(v1, v2) \
+	if (v1 != v2) fail_assert();
+
+#define Suite(name)                                                            \
+	int main() {                                                               \
+		println("[%s====%s] Running %s%s%s test suite...", BLUE, RESET, GREEN, \
+				#name, RESET);                                                 \
+		bool success = execute_tests(#name);                                   \
+		if (!success) {                                                        \
+			return -1;                                                         \
+		}                                                                      \
+		return 0;                                                              \
+	}
+
+#define Test(name)                                                        \
+	void _tfwork_##name(const byte *test_dir, const byte *resources_dir); \
+	static void __attribute__((constructor)) init_##name() {              \
+		if (test_count > MAX_TESTS)                                       \
+			panic("Too many tests (MAX=%i)", MAX_TESTS);                  \
+		int name_len = cstring_len(#name);                                \
+		if (name_len > MAX_TEST_NAME)                                     \
+			panic("test name: '%s' too long!", #name);                    \
+		test_arr[test_count] = &_tfwork_##name;                           \
+		copy_bytes(test_names[test_count], #name, name_len);              \
+		test_names[test_count][name_len] = 0;                             \
+		test_count++;                                                     \
+	}                                                                     \
+	void _tfwork_##name(const byte *test_dir, const byte *resources_dir)
