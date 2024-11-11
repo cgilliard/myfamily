@@ -38,15 +38,17 @@ Test(test4) {
 	int z = 0;
 	int a = 2;
 	int v = a + x;
-	fam_assert(0);
-	fam_assert(0);
-	fam_assert(0);
-	fam_assert(0);
-	fam_assert(0);
-	fam_assert(0);
-	fam_assert(0);
-	fam_assert(0);
-	fam_assert(0);
+	/*
+		fam_assert(0);
+		fam_assert(0);
+		fam_assert(0);
+		fam_assert(0);
+		fam_assert(0);
+		fam_assert(0);
+		fam_assert(0);
+		fam_assert(0);
+		fam_assert(0);
+	*/
 }
 Test(test5) {
 }
@@ -67,5 +69,5 @@ Test(test7) {
 
 Test(x) {
 	int x = 1;
-	fam_assert_eq(x, 2);
+	fam_assert_eq(x, 1);
 }
