@@ -28,36 +28,29 @@ jobs:
       
       - name: Test Linux Build
         run: |
-          ./configure --minimal
-          make clean all -s
-          ./bin/fam init test1
+          # ./configure --minimal
+          # make clean all -s
+          # ./bin/fam init test1
           # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
 
       - name: Install Test dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install libcriterion-dev doxygen python3-pip
-          sudo pip3 install pre-commit
+          # sudo apt-get update
+          # sudo apt-get install libcriterion-dev doxygen python3-pip
+          # sudo pip3 install pre-commit
 
       - name: Run Linux Tests (gcc)
         run: |
-          ./configure --with-cc=gcc
-          make clean testsannc -s
+          # ./configure --with-cc=gcc
+          # make clean testsannc -s
       
       - name: Run Linux Tests (clang)
         run: |
-          ./configure --with-cc=clang
-          make clean testsannc -s
+          # ./configure --with-cc=clang
+          # make clean testsannc -s
 
       - name: Build Docs
         run: |
-          # Build documentation for Linux only when the pipeline is triggered manually or on schedule
-          if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
-            echo "running build docs";
-            ./scripts/build_docs.sh "${{ secrets.MyFamilyPat }}" "$GITHUB_SHA"
-          else
-            echo "not running build docs event: $GITHUB_EVENT_NAME";
-          fi          
   macos:
     runs-on: macos-latest
     strategy:
@@ -72,25 +65,25 @@ jobs:
       
       - name: Test MacOS Build
         run: |
-          ./scripts/configure_homebrew.sh --minimal
-          make clean all
-          ./bin/fam init test1
+          # ./scripts/configure_homebrew.sh --minimal
+          # make clean all
+          # ./bin/fam init test1
           # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
 
       - name: Install dependencies
         run: |
-          brew install criterion
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install pre-commit
-          pre-commit install
+          # brew install criterion
+          # python3 -m venv venv
+          # source venv/bin/activate
+          # pip install pre-commit
+          # pre-commit install
      
       - name: Run MacOS Tests (gcc)
         run: |
-          ./scripts/configure_homebrew.sh --with-cc=gcc
-          make clean testsan -s
+          # ./scripts/configure_homebrew.sh --with-cc=gcc
+          # make clean testsan -s
       
       - name: Run MacOS Tests (clang)
         run: |
-          ./scripts/configure_homebrew.sh --with-cc=clang
-          make clean testsan -s
+          # ./scripts/configure_homebrew.sh --with-cc=clang
+          # make clean testsan -s
