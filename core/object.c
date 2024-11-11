@@ -19,11 +19,18 @@
 #include <base/slabs.h>
 #include <base/util.h>
 #include <core/err.h>
+#include <core/macros.h>
 #include <core/object.h>
 #include <core/orbtree.h>
+// for mmap/munmap
+#include <stddef.h>
 #include <sys/mman.h>
+// #define offsetof(type, member) ((unsigned long long)&(((type *)0)->member))
 
 #define OBJECT_MAX_FREE_LIST_SIZE 1024
+#define OBJECT_PROPERTY_KV_SSO_LEN \
+	OBJECT_SSO_DATA_BUFFER_SIZE -  \
+		(sizeof(unsigned int) + sizeof(OrbTreeNode) * 2)
 
 static OrbTree seqtree;
 static OrbTree ordtree;
@@ -56,42 +63,116 @@ typedef struct __attribute__((packed)) ObjectBox {
 } ObjectBox;
 
 typedef struct __attribute__((packed)) ObjectPropertyBoxData {
-	OrbTreeNode seq;
 	OrbTreeNode ord;
+	OrbTreeNode seq;
 	unsigned int seqno;
-	byte key_value_sso[OBJECT_SSO_DATA_BUFFER_SIZE -
-					   (sizeof(unsigned int) + sizeof(OrbTreeNode) * 2)];
+	byte key_value_sso[OBJECT_PROPERTY_KV_SSO_LEN];
 } ObjectPropertyBoxData;
 
 // Extended data has spill over from the key_value_sso data:
 // 5.) [n bytes of key data]
 // 6.) [16 bytes value data]
 
-/*
-typedef struct __attribute__((packed)) ObjectBox {
-	unsigned int seqno;
-	OrbTreeNode seq;
-	OrbTreeNode ord;
-	unsigned long long namespace;
-	Ptr self;
-	Ptr data;
-} ObjectBox;
+static ObjectBox *object_get_box_data(ObjectImpl *impl) {
+	Ptr ptr = impl->data.ptr_value;
+	if (ptr == null) return NULL;
+	return (ObjectBox *)slab_get(&sa, ptr);
+}
 
-typedef struct __attribute__((packed)) ObjectBoxData {
-	unsigned int strong_count;
-	void *extended;
-	byte sso_data[OBJECT_SSO_DATA_BUFFER_SIZE];
-	unsigned int weak_count;
-	unsigned int len;
-} ObjectBoxData;
+static int ordtree_search(const OrbTreeNode *root, const OrbTreeNode *value,
+						  OrbTreeNodePair *retval) {
+	retval->parent = null;
+	retval->is_right = true;
+	const OrbTreeNode *cur = root;
+	unsigned int offsetof = offsetof(ObjectBox, sso_data);
 
-typedef struct __attribute__((packed)) ObjectPropertyBoxData {
-	unsigned int key_len;
-	byte sso_key[31];
-	byte value_type;
-	byte property_value[4];
-} ObjectPropertyBoxData;
-*/
+	while (cur) {
+		ObjectBox *v1 = (ObjectBox *)((byte *)cur - offsetof);
+		ObjectBox *v2 = (ObjectBox *)((byte *)value - offsetof);
+		retval->self = orbtree_node_ptr(cur, retval->is_right);
+
+		if (v1->namespace == v2->namespace) {
+			ObjectPropertyBoxData *v1prop =
+				(ObjectPropertyBoxData *)v1->sso_data;
+			ObjectPropertyBoxData *v2prop =
+				(ObjectPropertyBoxData *)v2->sso_data;
+			byte *key1 = v1prop->key_value_sso;
+			byte *key2 = v2prop->key_value_sso;
+			unsigned int len;
+			if (v2->size < v1->size)
+				len = v2->size;
+			else
+				len = v1->size;
+			unsigned int overhead =
+				sizeof(OrbTreeNode) * 2 + sizeof(unsigned int) + sizeof(Object);
+			if (len < overhead) break;
+			len -= overhead;
+			int v = cstring_compare_n(key1, key2, len);
+			if (v == 0 && v1->size == v2->size)
+				break;
+			else if ((v == 0 && v1->size > v2->size) || v > 0) {
+				ObjectBox *right = orbtree_node_right(cur);
+				if (right == NULL) {
+					retval->parent = retval->self;
+					retval->self = null;
+					retval->is_right = true;
+					break;
+				}
+				ObjectPropertyBoxData *opbd =
+					(ObjectPropertyBoxData *)right->sso_data;
+				Ptr rptr = orbtree_node_ptr(&opbd->ord, true);
+				retval->parent = orbtree_node_ptr(cur, retval->is_right);
+				retval->is_right = true;
+				cur = (const OrbTreeNode *)(slab_get(&sa, rptr) + offsetof);
+			} else {
+				ObjectBox *left = orbtree_node_left(cur);
+				if (left == NULL) {
+					retval->parent = retval->self;
+					retval->self = null;
+					retval->is_right = false;
+					break;
+				}
+				ObjectPropertyBoxData *opbd =
+					(ObjectPropertyBoxData *)left->sso_data;
+				Ptr lptr = orbtree_node_ptr(&opbd->ord, false);
+				retval->parent = orbtree_node_ptr(cur, retval->is_right);
+				retval->is_right = false;
+				cur = (const OrbTreeNode *)(slab_get(&sa, lptr) + offsetof);
+			}
+
+		} else if (v1->namespace > v2->namespace) {
+			ObjectBox *right = orbtree_node_right(cur);
+			if (right == NULL) {
+				retval->parent = retval->self;
+				retval->self = null;
+				retval->is_right = true;
+				break;
+			}
+			ObjectPropertyBoxData *opbd =
+				(ObjectPropertyBoxData *)right->sso_data;
+			Ptr rptr = orbtree_node_ptr(&opbd->ord, true);
+			retval->parent = orbtree_node_ptr(cur, retval->is_right);
+			retval->is_right = true;
+			cur = (const OrbTreeNode *)(slab_get(&sa, rptr) + offsetof);
+		} else {
+			ObjectBox *left = orbtree_node_left(cur);
+			if (left == NULL) {
+				retval->parent = retval->self;
+				retval->self = null;
+				retval->is_right = false;
+				break;
+			}
+			ObjectPropertyBoxData *opbd =
+				(ObjectPropertyBoxData *)left->sso_data;
+			Ptr lptr = orbtree_node_ptr(&opbd->ord, false);
+			retval->parent = orbtree_node_ptr(cur, retval->is_right);
+			retval->is_right = false;
+			cur = (const OrbTreeNode *)(slab_get(&sa, lptr) + offsetof);
+		}
+	}
+
+	return 0;
+}
 
 static __attribute__((constructor)) void object_init() {
 	if (sizeof(Object) != sizeof(ObjectImpl))
@@ -159,10 +240,95 @@ Object object_create_function(void *fn) {
 	return *((Object *)&ret);
 }
 
+Object object_set_property(Object *obj, const char *key, const Object *value) {
+	ObjectBox *impl = object_get_box_data((ObjectImpl *)obj);
+	unsigned long long key_len = cstring_len(key);
+	unsigned int box_size = sizeof(OrbTreeNode) * 2 + sizeof(unsigned int) +
+							sizeof(Object) + key_len;
+	Object property = object_create_box(box_size);
+	Ptr property_ptr = ((ObjectImpl *)&property)->data.ptr_value;
+	ObjectBox *property_impl = object_get_box_data((ObjectImpl *)&property);
+
+	property_impl->namespace = impl->namespace;
+	ObjectPropertyBoxData *property_data = object_box_sso(&property);
+	property_data->seqno = 0;
+	unsigned int sso_copy_len = OBJECT_PROPERTY_KV_SSO_LEN;
+	if (key_len < OBJECT_PROPERTY_KV_SSO_LEN) sso_copy_len = key_len;
+	copy_bytes(property_data->key_value_sso, key, sso_copy_len);
+	unsigned int rem = sso_copy_len - OBJECT_PROPERTY_KV_SSO_LEN;
+	if (rem) {
+		if (rem > sizeof(Object)) rem = sizeof(Object);
+		copy_bytes(property_data->key_value_sso + sso_copy_len, (byte *)value,
+				   rem);
+
+		ObjectImpl *tmp =
+			(ObjectImpl *)(property_data->key_value_sso + sso_copy_len);
+	}
+
+	if (rem != sizeof(Object)) {
+		// we have to write more data to the extended buffer
+	}
+
+	unsigned long long offsetof = offsetof(ObjectBox, sso_data);
+	OrbTreeNodeWrapper wrap = {.ptr = property_ptr, .offsetof = offsetof};
+	orbtree_put(&ordtree, &wrap, &ordtree_search);
+
+	return Unit;
+}
+
+Object object_delete_property(Object *obj, const char *key) {
+	return Err(NotYetImplemented);
+}
+
+Object object_get_property(const Object *obj, const char *key) {
+	ObjectBox *impl = object_get_box_data((ObjectImpl *)obj);
+	unsigned int key_len = cstring_len(key);
+	unsigned int box_size = sizeof(OrbTreeNode) * 2 + sizeof(unsigned int) +
+							key_len + sizeof(Object);
+	unsigned long long namespace = impl->namespace;
+
+	Object property = object_create_box(box_size);
+	Ptr property_ptr = ((ObjectImpl *)&property)->data.ptr_value;
+	ObjectBox *box = object_get_box_data((ObjectImpl *)&property);
+
+	/*
+		Ptr ptr = slab_allocator_allocate(&sa);
+		ObjectBox *box = (ObjectBox *)slab_get(&sa, ptr);
+	*/
+	box->namespace = namespace;
+	box->size = box_size;
+
+	ObjectPropertyBoxData *property_data = object_box_sso(&property);
+
+	unsigned int sso_copy_len = OBJECT_PROPERTY_KV_SSO_LEN;
+	if (key_len < OBJECT_PROPERTY_KV_SSO_LEN) sso_copy_len = key_len;
+	copy_bytes(property_data->key_value_sso, key, sso_copy_len);
+
+	unsigned long long offsetof = offsetof(ObjectBox, sso_data);
+	OrbTreeNodeWrapper wrap = {.ptr = property_ptr, .offsetof = offsetof};
+	Ptr ret = orbtree_get(&ordtree, &wrap, &ordtree_search, 0);
+
+	// for now we return an error, eventually we'll implement Option
+	if (ret == null) return Err(FileNotFound);
+
+	ObjectBox *ret_box = (ObjectBox *)slab_get(&sa, ret);
+	ObjectPropertyBoxData *property_data_out =
+		(ObjectPropertyBoxData *)ret_box->sso_data;
+	unsigned int overhead =
+		sizeof(OrbTreeNode) * 2 + sizeof(unsigned int) + sizeof(Object);
+	if (overhead > ret_box->size) return Err(FileNotFound);
+	unsigned int offset = ret_box->size - overhead;
+	ObjectNc ret_obj;
+	*(&ret_obj) = *(Object *)(property_data_out->key_value_sso + offset);
+
+	return ret_obj;
+}
+
 Object object_create_box(unsigned int size) {
 	Ptr ptr = slab_allocator_allocate(&sa);
 	if (ptr == null) return Err(fam_err);
 	ObjectBox *box = (ObjectBox *)slab_get(&sa, ptr);
+	box->namespace = AADD(&next_namespace, 1);
 	box->size = size;
 	box->lock = INIT_LOCK;
 	box->resize_seqno = 0;

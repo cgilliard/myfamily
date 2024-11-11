@@ -501,3 +501,12 @@ MyTest(core, test_object_resize) {
 	extended = object_box_extended(&obj1);
 	cr_assert_eq(extended, NULL);
 }
+
+MyTest(core, test_object_properties) {
+	var obj1 = object_create_box(10);
+	var obj2 = object_create_int(5);
+	var obj3 = object_set_property(&obj1, "test", &obj2);
+	var obj4 = object_get_property(&obj1, "test");
+	int obj4_out = object_value_of(&obj4);
+	cr_assert_eq(obj4_out, 5);
+}

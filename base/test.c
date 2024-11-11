@@ -239,4 +239,7 @@ MyTest(base, test_util) {
 	cr_assert_eq(z[7], 'a' + 7);
 	cr_assert_eq(z[8], 'a' + 8);
 	cr_assert_eq(z[9], 'a' + 9);
+
+	char *test1 = "abc";
+	cr_assert_eq(cstring_len(test1), 3);
 }

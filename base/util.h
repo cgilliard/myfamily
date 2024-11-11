@@ -16,3 +16,6 @@
 
 void copy_bytes(byte *dest, const byte *src, unsigned long long n);
 void set_bytes(byte *dst, byte b, unsigned long long n);
+unsigned long long cstring_len(const char *S);
+int cstring_compare(const char *s1, const char *s2);
+int cstring_compare_n(const byte *s1, const byte *s2, unsigned long long n);

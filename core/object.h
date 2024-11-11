@@ -57,9 +57,9 @@ unsigned int object_box_size(const Object *obj);
 Object object_resize_box(Object *obj, unsigned int size);
 void *object_value_function(const Object *obj);
 
-Object object_set_property(Object obj, const char *key, const Object value);
-Object object_delete_property(Object obj, const char *key);
-Object object_get_property(const Object obj, const char *key);
+Object object_set_property(Object *obj, const char *key, const Object *value);
+Object object_delete_property(Object *obj, const char *key);
+Object object_get_property(const Object *obj, const char *key);
 
 // moving/referencing functions
 Object object_move(const Object src);
