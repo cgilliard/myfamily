@@ -5,7 +5,9 @@ OBJS := types.o \
 	fam_err.o \
 	slabs.o \
 	memmap.o \
-	util.o
+	util.o \
+	backtrace.o \
+	mmap.o
 
 TEST_OBJS := $(OBJS)
 

@@ -12,11 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _BASE_OSDEF__
-#define _BASE_OSDEF__
-
+#include <base/mmap.h>
+#include <base/print_util.h>
 #include <base/types.h>
+#include <sys/mman.h>
 
-void exit(int);
+size_t getpagesize();
 
-#endif	// _BASE_OSDEF__
+void *mmap_allocate(unsigned int size) {
+	return mmap(NULL, mmap_aligned_size(size), PROT_READ | PROT_WRITE,
+				MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+}
+
+void mmap_free(void *ptr, unsigned int size) {
+	if (munmap(ptr, mmap_aligned_size(size))) panic("unexpected mmap error!");
+}
+
+unsigned int mmap_aligned_size(unsigned int size) {
+	unsigned int page_size = getpagesize();
+	return (size + (page_size - 1)) & ~(page_size - 1);
+}

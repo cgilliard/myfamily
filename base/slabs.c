@@ -15,7 +15,6 @@
 #include <base/fam_err.h>
 #include <base/lock.h>
 #include <base/macros.h>
-#include <base/osdef.h>
 #include <base/print_util.h>
 #include <base/slabs.h>
 

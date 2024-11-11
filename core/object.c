@@ -14,7 +14,7 @@
 
 #include <base/lock.h>
 #include <base/macros.h>
-#include <base/osdef.h>
+#include <base/mmap.h>
 #include <base/print_util.h>
 #include <base/slabs.h>
 #include <base/util.h>
@@ -22,9 +22,8 @@
 #include <core/macros.h>
 #include <core/object.h>
 #include <core/orbtree.h>
-// for mmap/munmap
 #include <stddef.h>
-#include <sys/mman.h>
+
 // #define offsetof(type, member) ((unsigned long long)&(((type *)0)->member))
 
 #define OBJECT_MAX_FREE_LIST_SIZE 1024
@@ -201,7 +200,8 @@ void object_cleanup(const Object *obj) {
 			ObjectBox *box = (ObjectBox *)slab_get(&sa, impl->data.ptr_value);
 
 			if (box->extended) {
-				MUNMAP(box->extended, box->size - OBJECT_SSO_DATA_BUFFER_SIZE);
+				mmap_free(box->extended,
+						  box->size - OBJECT_SSO_DATA_BUFFER_SIZE);
 				box->extended = NULL;
 			}
 
@@ -334,7 +334,7 @@ Object object_create_box(unsigned int size) {
 	box->resize_seqno = 0;
 
 	if (size > OBJECT_SSO_DATA_BUFFER_SIZE) {
-		box->extended = MMAP(size - OBJECT_SSO_DATA_BUFFER_SIZE);
+		box->extended = mmap_allocate(size - OBJECT_SSO_DATA_BUFFER_SIZE);
 		if (box->extended == NULL) {
 			slab_allocator_free(&sa, ptr);
 			return Err(AllocErr);
@@ -397,11 +397,11 @@ Object object_resize_box(Object *obj, unsigned int size) {
 		size_t aligned_size = 0;
 		if (size > OBJECT_SSO_DATA_BUFFER_SIZE)
 			aligned_size =
-				MMAP_ALIGNED_SIZE(size - OBJECT_SSO_DATA_BUFFER_SIZE);
+				mmap_aligned_size(size - OBJECT_SSO_DATA_BUFFER_SIZE);
 		size_t cur_aligned_size = 0;
 		if (box->size > OBJECT_SSO_DATA_BUFFER_SIZE)
 			cur_aligned_size =
-				MMAP_ALIGNED_SIZE(box->size - OBJECT_SSO_DATA_BUFFER_SIZE);
+				mmap_aligned_size(box->size - OBJECT_SSO_DATA_BUFFER_SIZE);
 
 		if (aligned_size == cur_aligned_size) {
 			// no resize needed
@@ -432,14 +432,13 @@ Object object_resize_box(Object *obj, unsigned int size) {
 
 			unlock(&box->lock);
 
-			if (MUNMAP((byte *)extended + aligned_size, diff))
-				panic("Unexpected error returned by munmap!");
+			mmap_free((byte *)extended + aligned_size, diff);
 
 			return Unit;
 		} else {
 			void *extended = box->extended;
 			// we need more memory so call mmap
-			void *tmp = MMAP(size - OBJECT_SSO_DATA_BUFFER_SIZE);
+			void *tmp = mmap_allocate(size - OBJECT_SSO_DATA_BUFFER_SIZE);
 			if (tmp == NULL) return Err(AllocErr);
 
 			lockw(&box->lock);
@@ -461,8 +460,7 @@ Object object_resize_box(Object *obj, unsigned int size) {
 
 			if (cur_aligned_size) {
 				if (extended == NULL) panic("extended must not be NULL!");
-				if (MUNMAP(extended, cur_aligned_size))
-					panic("Unexpected error returned by munmap!");
+				mmap_free(extended, cur_aligned_size);
 			}
 			return Unit;
 		}

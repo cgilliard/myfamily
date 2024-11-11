@@ -14,10 +14,9 @@
 
 #include <base/fam_err.h>
 #include <base/memmap.h>
-#include <base/osdef.h>
+#include <base/mmap.h>
 #include <base/print_util.h>
 #include <base/util.h>
-#include <sys/mman.h>
 
 #define MEMMAP_ENTRY_PER_LEVEL 256
 #define BITMAP_SIZE 32
@@ -44,11 +43,11 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 	// load data
 	do {
 		if (mmapped) {
-			MUNMAP(data1, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+			mmap_free(data1, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
 		}
 		data1 = ALOAD(&impl->data);
 		if (data1 == NULL) {
-			data1 = MMAP(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+			data1 = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
 			if (data1 == NULL) {
 				SetErr(AllocErr);
 				return NULL;
@@ -66,11 +65,11 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 	mmapped = false;
 	do {
 		if (mmapped) {
-			MUNMAP(data2, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+			mmap_free(data2, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
 		}
 		data2 = ALOAD(&impl->data[i]);
 		if (data2 == NULL) {
-			data2 = MMAP(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+			data2 = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
 			if (data2 == NULL) {
 				SetErr(AllocErr);
 				return NULL;
@@ -88,11 +87,11 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 	mmapped = false;
 	do {
 		if (mmapped) {
-			MUNMAP(data3, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+			mmap_free(data3, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 		}
 		data3 = ALOAD(&impl->data[i][j]);
 		if (data3 == NULL) {
-			data3 = MMAP(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+			data3 = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 			if (data3 == NULL) {
 				SetErr(AllocErr);
 				return NULL;
@@ -111,13 +110,15 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 	// add 32 bytes for the bitmap
 	do {
 		if (mmapped) {
-			MUNMAP(data4, MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
-							  BITMAP_SIZE);
+			mmap_free(data4,
+					  MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+						  BITMAP_SIZE);
 		}
 		data4 = ALOAD(&impl->data[i][j][k]);
 		if (data4 == NULL) {
-			data4 = MMAP(MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
-						 BITMAP_SIZE);
+			data4 = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * impl->size *
+									  sizeof(byte) +
+								  BITMAP_SIZE);
 			if (data4 == NULL) {
 				SetErr(AllocErr);
 				return NULL;
@@ -234,14 +235,15 @@ void memmap_cleanup(MemMap *mm) {
 		for (int j = 0; impl->data[i][j] && j < MEMMAP_ENTRY_PER_LEVEL; j++) {
 			for (int k = 0; impl->data[i][j][k] && k < MEMMAP_ENTRY_PER_LEVEL;
 				 k++) {
-				MUNMAP(impl->data[i][j][k],
-					   MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
-						   BITMAP_SIZE);
+				mmap_free(impl->data[i][j][k],
+						  MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+							  BITMAP_SIZE);
 				impl->data[i][j][k] = NULL;
 			}
-			MUNMAP(impl->data[i][j], MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+			mmap_free(impl->data[i][j],
+					  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 		}
-		MUNMAP(impl->data[i], MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+		mmap_free(impl->data[i], MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 	}
-	MUNMAP(impl->data, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+	mmap_free(impl->data, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 }
