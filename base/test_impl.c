@@ -98,9 +98,12 @@ void fail_assert() {
 				}
 				itt++;
 			}
+			unsigned long long address = strtoul(addr, NULL, 16);
+			address -= 8;
+
 			char command[256];
-			snprintf(command, sizeof(command), "addr2line -f -e bin/test %s",
-					 addr);
+			snprintf(command, sizeof(command), "addr2line -f -e bin/test %llx",
+					 address);
 
 			FILE *fp = popen(command, "r");
 			char buffer[128];
