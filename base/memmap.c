@@ -16,10 +16,8 @@
 #include <base/memmap.h>
 #include <base/osdef.h>
 #include <base/print_util.h>
+#include <base/util.h>
 #include <sys/mman.h>
-
-void *memset(void *ptr, int x, size_t n);
-size_t getpagesize();
 
 #define MEMMAP_ENTRY_PER_LEVEL 256
 #define BITMAP_SIZE 32
@@ -56,7 +54,8 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 				return NULL;
 			}
 			mmapped = true;
-			memset(data1, '\0', MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
+			set_bytes((byte *)data1, '\0',
+					  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
 		} else
 			break;
 	} while (!CAS(&impl->data, &nullvalue1, data1));
@@ -77,7 +76,8 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 				return NULL;
 			}
 			mmapped = true;
-			memset(data2, '\0', MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
+			set_bytes((byte *)data2, '\0',
+					  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
 		} else
 			break;
 	} while (!CAS(&impl->data[i], &nullvalue2, data2));
@@ -98,7 +98,8 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 				return NULL;
 			}
 			mmapped = true;
-			memset(data3, '\0', MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
+			set_bytes((byte *)data3, '\0',
+					  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 		} else
 			break;
 	} while (!CAS(&impl->data[i][j], &nullvalue3, data3));
@@ -122,9 +123,9 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 				return NULL;
 			}
 			mmapped = true;
-			memset(data4, '\0',
-				   MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
-					   BITMAP_SIZE);
+			set_bytes((byte *)data4, '\0',
+					  MEMMAP_ENTRY_PER_LEVEL * impl->size * sizeof(byte) +
+						  BITMAP_SIZE);
 			// set Ptr=0 to allocated so we never return null / also reserve the
 			// first value for other purposes
 			if (i == 0 && j == 0 && k == 0) data4[0] = 0x3;

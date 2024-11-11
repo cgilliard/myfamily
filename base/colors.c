@@ -13,10 +13,28 @@
 // limitations under the License.
 
 #include <base/colors.h>
-#include <base/osdef.h>
+#include <base/util.h>
+
+extern char **environ;
+static bool checked = false;
+static bool no_color_value = false;
+
+bool no_color() {
+	if (checked) return no_color_value;
+	for (int i = 0; environ[i] != NULL; i++) {
+		char *env_var = environ[i];
+		if (!cstring_compare_n("NO_COLOR=", env_var, 9)) {
+			no_color_value = true;
+			checked = true;
+			return true;
+		}
+	}
+	checked = true;
+	return false;
+}
 
 byte *get_dimmed() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (no_color()) {
 		return "";
 	} else {
 		return "\x1b[2m";
@@ -24,7 +42,7 @@ byte *get_dimmed() {
 }
 
 byte *get_red() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (no_color()) {
 		return "";
 	} else {
 		return "\x1b[31m";
@@ -32,7 +50,7 @@ byte *get_red() {
 }
 
 byte *get_bright_red() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (no_color()) {
 		return "";
 	} else {
 		return "\x1b[91m";
@@ -40,7 +58,7 @@ byte *get_bright_red() {
 }
 
 byte *get_green() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (no_color()) {
 		return "";
 	} else {
 		return "\x1b[32m";
@@ -48,7 +66,7 @@ byte *get_green() {
 }
 
 byte *get_yellow() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (no_color()) {
 		return "";
 	} else {
 		return "\x1b[33m";
@@ -56,7 +74,7 @@ byte *get_yellow() {
 }
 
 byte *get_cyan() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (no_color()) {
 		return "";
 	} else {
 		return "\x1b[36m";
@@ -64,7 +82,7 @@ byte *get_cyan() {
 }
 
 byte *get_magenta() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (no_color()) {
 		return "";
 	} else {
 		return "\x1b[35m";
@@ -72,7 +90,7 @@ byte *get_magenta() {
 }
 
 byte *get_blue() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (no_color()) {
 		return "";
 	} else {
 		return "\x1b[34m";
@@ -80,7 +98,7 @@ byte *get_blue() {
 }
 
 byte *get_reset() {
-	if (getenv("NO_COLOR") != NULL) {
+	if (no_color()) {
 		return "";
 	} else {
 		return "\x1b[0m";

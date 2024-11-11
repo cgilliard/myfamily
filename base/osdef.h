@@ -18,6 +18,5 @@
 #include <base/types.h>
 
 void exit(int);
-char *getenv(const char *name);
 
 #endif	// _BASE_OSDEF__

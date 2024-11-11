@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/osdef.h>
 #include <base/print_util.h>
 
 // currently using stdio, will move to write
 #include <stdio.h>
+
+void exit(int);
 
 void __attribute__((no_return)) panic(const char *fmt, ...) {
 	char buf[1024];
@@ -24,7 +25,6 @@ void __attribute__((no_return)) panic(const char *fmt, ...) {
 	print("Panic: ");
 	__builtin_va_start(args, fmt);
 	vfprintf(stderr, fmt, args);
-	// vsnprintf(buf, 1024, fmt, args);
 	__builtin_va_end(args);
 	fprintf(stderr, "\n");
 
