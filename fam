@@ -43,9 +43,13 @@ else
 fi
 
 if [ "$1" = "clean" ]; then
-   rm -f */*.o
-elif [ "$1" = "test" ]; then
-   extra="-g -O0 -DTEST ${asan}";
+   rm -f */*.o */*.gcda */*.gcov */*.gcno
+elif [ "$1" = "test" ] || [ "$1" = "coverage" ]; then
+   if [ "$1" = "coverage" ]; then
+      extra="-g -O0 -DTEST --coverage";
+   else
+      extra="-g -O0 -DTEST";
+   fi
    if [ $s = 1 ]; then
       ./fam --with-cc=$cc --with-extra="$extra" -s --skip-final || exit 1;
    else
@@ -63,6 +67,9 @@ elif [ "$1" = "test" ]; then
       cd ..;
    done
    echo "All tests passed!";
+   if [ "$1" = "coverage" ]; then
+      ./scripts/coverage.sh
+   fi
 elif [ -z "$1" ] || [ "${1#-}" != "$1" ] || [ "$1" = "all" ]; then
    for dir in $subdirs
    do
