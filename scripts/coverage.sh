@@ -57,7 +57,7 @@ echo "$BLUE--------------------------------"\
          covered=`awk "BEGIN {print int($ratio * $lines)}"`;
          linessum=`awk "BEGIN {print $linessum + $lines}"`;
          coveredsum=`awk "BEGIN {print $coveredsum + $covered}"`;
-         printf "$GREEN%-20s$RESET $YELLOW%-10s$RESET $CYAN%s$RESET\n" "${gcno%.gcno}.c" "$percent%" "$lines";
+         printf "$GREEN%-20s$RESET $YELLOW%-10s$RESET $CYAN%s/%s$RESET\n" "${gcno%.gcno}.c" "$percent%" "$covered" "$lines";
       fi
    done
    cd ..;
@@ -68,7 +68,7 @@ codecov=`awk "BEGIN {print 100 * $coveredsum / $linessum}"`
 codecov=`printf "%.2f" $codecov`;
 timestamp=`date +%s`
 
-printf "$GREEN%-20s$RESET $YELLOW%-10s$RESET $CYAN%i$RESET\n" "Total Coverage" "$codecov%" $linessum;
+printf "$GREEN%-20s$RESET $YELLOW%-10s$RESET $CYAN%i/%i$RESET\n" "Total Coverage" "$codecov%" $coveredsum $linessum;
 export cc_final=$codecov
 
 

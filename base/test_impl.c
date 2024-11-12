@@ -30,15 +30,38 @@ byte test_names[MAX_TESTS][MAX_TEST_NAME + 1];
 static jmp_buf test_jmp;
 static int test_itt;
 int fail_count = 0;
+static byte target_test[MAX_TEST_NAME + 1];
+extern char **environ;
+
+static void __attribute__((constructor)) get_target_test() {
+	target_test[0] = 0;
+	for (int i = 0; environ[i] != NULL; i++) {
+		byte *env_var = environ[i];
+		if (!cstring_compare_n("TEST_FILTER=", env_var, 12)) {
+			int env_var_len = cstring_len(env_var);
+			if (env_var_len > 12) {
+				int len = env_var_len + 12;
+				if (len > MAX_TEST_NAME) len = MAX_TEST_NAME;
+				copy_bytes(target_test, env_var + 12, len);
+				break;
+			}
+		}
+	}
+}
 
 bool execute_tests(byte *name) {
 	struct timespec start, end;
 	clock_gettime(CLOCK_MONOTONIC, &start);
+	int test_exe_count = 0;
 
 	for (int i = 0; i < test_count; i++) {
 		test_itt = i;
 		if (setjmp(test_jmp) == 0) {
-			test_arr[i]("test_dir", "resources_dir");
+			if (target_test[0] == 0 ||
+				!cstring_compare(target_test, test_names[i])) {
+				test_exe_count++;
+				test_arr[i]("test_dir", "resources_dir");
+			}
 		} else {
 			println("%sFAIL:%s test '%s%s%s' failed!", BRIGHT_RED, RESET, GREEN,
 					test_names[i], RESET);
@@ -59,8 +82,9 @@ bool execute_tests(byte *name) {
 	println(
 		"[%s====%s] Tested: %s%i%s | Passing: %s%i%s | Failing: %s%i%s "
 		"(Execution time: %s%f%ss)",
-		BLUE, RESET, YELLOW, test_count, RESET, GREEN, test_count - fail_count,
-		RESET, BRIGHT_RED, fail_count, RESET, CYAN, time_ns / 1e9, RESET);
+		BLUE, RESET, YELLOW, test_exe_count, RESET, GREEN,
+		test_exe_count - fail_count, RESET, BRIGHT_RED, fail_count, RESET, CYAN,
+		time_ns / 1e9, RESET);
 
 	println(
 		"[%s================================"

@@ -19,11 +19,13 @@ extern char **environ;
 static bool checked = false;
 static bool no_color_value = false;
 
+bool _debug_no_color__ = false;
+
 bool no_color() {
-	if (checked) return no_color_value;
+	if (!_debug_no_color__ && checked) return no_color_value;
 	for (int i = 0; environ[i] != NULL; i++) {
 		char *env_var = environ[i];
-		if (!cstring_compare_n("NO_COLOR=", env_var, 9)) {
+		if (_debug_no_color__ || !cstring_compare_n("NO_COLOR=", env_var, 9)) {
 			no_color_value = true;
 			checked = true;
 			return true;
@@ -104,3 +106,11 @@ byte *get_reset() {
 		return "\x1b[0m";
 	}
 }
+
+#ifdef TEST
+void test_reset_colors() {
+	_debug_no_color__ = false;
+	checked = false;
+	no_color_value = false;
+}
+#endif	// TEST

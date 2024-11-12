@@ -17,10 +17,12 @@
 // currently using stdio, will move to write
 #include <stdio.h>
 
+bool _debug_print_util_disable__ = false;
+
 void exit(int);
 
-void panic(const char *fmt, ...) {
-	char buf[1024];
+void panic(const byte *fmt, ...) {
+	byte buf[1024];
 	__builtin_va_list args;
 	print("Panic: ");
 	__builtin_va_start(args, fmt);
@@ -31,19 +33,30 @@ void panic(const char *fmt, ...) {
 	exit(-1);
 }
 
-int println(const char *fmt, ...) {
+int println(const byte *fmt, ...) {
 	__builtin_va_list args;
 	__builtin_va_start(args, fmt);
-	vfprintf(stdout, fmt, args);
+	int ret;
+	if (!_debug_print_util_disable__) ret = vfprintf(stdout, fmt, args);
 	__builtin_va_end(args);
-	fprintf(stdout, "\n");
-	return 0;
+	if (!_debug_print_util_disable__) fprintf(stdout, "\n");
+	return ret;
 }
 
-int print(const char *fmt, ...) {
+int print(const byte *fmt, ...) {
 	__builtin_va_list args;
 	__builtin_va_start(args, fmt);
-	vfprintf(stdout, fmt, args);
+	int ret = 0;
+	if (!_debug_print_util_disable__) ret = vfprintf(stdout, fmt, args);
 	__builtin_va_end(args);
-	return 0;
+	return ret;
+}
+
+int sprint(byte *str, unsigned long long capacity, const byte *fmt, ...) {
+	__builtin_va_list args;
+	__builtin_va_start(args, fmt);
+	int ret = 0;
+	if (!_debug_print_util_disable__) ret = vsnprintf(str, capacity, fmt, args);
+	__builtin_va_end(args);
+	return ret;
 }

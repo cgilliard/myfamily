@@ -12,21 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <base/colors.h>
 #include <base/fam_err.h>
+#include <base/limits.h>
+#include <base/lock.h>
+#include <base/macro_util.h>
+#include <base/macros.h>
+#include <base/memmap.h>
+#include <base/mmap.h>
 #include <base/print_util.h>
+#include <base/slabs.h>
+#include <base/types.h>
 #include <base/util.h>
-
-_Thread_local byte fam_err_last[ERR_LEN + 1] = {""};
-
-_Thread_local int64 fam_err = NoErrors;
-
-const byte *get_err() {
-	int len = cstring_len(FamErrText[fam_err]);
-	if (len > ERR_LEN) len = ERR_LEN;
-	copy_bytes(fam_err_last, FamErrText[fam_err], len);
-	return fam_err_last;
-}
-
-void print_err(const byte *text) {
-	println("%s: %s", FamErrText[fam_err], text);
-}

@@ -24,6 +24,8 @@ extra='-O3 -flto';
 s=0;
 do_final=1;
 asan='';
+filter='';
+target='';
 for var in "$@"
 do
 case "$var" in --with-cc=*)
@@ -48,6 +50,14 @@ case "$var" in --skip-final)
 esac
 case "$var" in --with-asan)
 	asan='-fsanitize=undefined -fsanitize=address';
+	;;
+esac
+case "$var" in --filter=*)
+	filter=${var#*=};
+	;;
+esac
+case "$var" in --target=*)
+	target=${var#*=};
 	;;
 esac
 done
@@ -77,7 +87,15 @@ elif [ "$1" = "test" ] || [ "$1" = "coverage" ]; then
       ./fam --with-cc=$cc --with-extra="$extra" --skip-final || exit 1;
    fi
    echo "[===================================================================================================================]";
+   if [ "$filter" != "" ]; then
+      export TEST_FILTER=$filter;
+   else
+      unset TEST_FILTER;
+   fi
    for dir in $subdirs; do
+      if [ "$target" != "$dir" ] && [ "$target" != "" ]; then
+          continue;
+      fi
       cd ${dir};
       if [ -f "test.c" ]; then
          mkdir -p ./.bin

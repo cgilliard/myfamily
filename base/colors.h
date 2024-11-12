@@ -44,4 +44,9 @@ byte *get_blue();
 byte *get_reset();
 #define RESET get_reset()
 
+#ifdef TEST
+extern bool _debug_no_color__;
+void test_reset_colors();
+#endif	// TEST
+
 #endif	// _BASE_COLORS__

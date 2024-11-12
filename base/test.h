@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <base/colors.h>
-#include <base/print_util.h>
-#include <base/types.h>
-#include <base/util.h>
+#include <base/lib.h>
 
 #define MAX_TESTS 100
 #define MAX_TEST_NAME 1024
@@ -30,10 +27,10 @@ bool execute_tests(byte *suite_name);
 void fail_assert();
 
 #define fam_assert(v) \
-	if (!v) fail_assert();
+	if (!(v)) fail_assert();
 
 #define fam_assert_eq(v1, v2)                      \
-	if (v1 != v2) {                                \
+	if ((v1) != (v2)) {                            \
 		if (fail_count == 0)                       \
 			println(                               \
 				"--------------------------------" \

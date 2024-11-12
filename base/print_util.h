@@ -15,9 +15,15 @@
 #ifndef _BASE_PRINT_UTIL__
 #define _BASE_PRINT_UTIL__
 
-int println(const char *text, ...);
-int print(const char *fmt, ...);
+#include <base/types.h>
 
-void panic(const char *fmt, ...);
+int println(const byte *fmt, ...);
+int print(const byte *fmt, ...);
+int sprint(byte *str, unsigned long long capacity, const byte *fmt, ...);
+void panic(const byte *fmt, ...);
+
+#ifdef TEST
+extern bool _debug_print_util_disable__;
+#endif	// TEST
 
 #endif	// _BASE_PRINT_UTIL__

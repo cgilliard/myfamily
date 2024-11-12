@@ -16,58 +16,73 @@
 
 Suite(base);
 
-Test(test_util) {
-	fam_assert(1);
-	// fam_assert(0);
-}
-
 Test(test_colors) {
+	byte buf[1024];
+	int len;
+
+	len = sprint(buf, 1024, "Colors: %sgreen%s %sdimmed%s %sred%s %smagenta%s",
+				 GREEN, RESET, DIMMED, RESET, RED, RESET, MAGENTA, RESET);
+	fam_assert_eq(len, 67);
+	_debug_no_color__ = true;
+	len = sprint(buf, 1024,
+				 "Colors: %sgreen%s %sdimmed%s %sred%s %smagenta%s %sbred%s "
+				 "%syellow%s %scyan%s %sblue%s",
+				 GREEN, RESET, DIMMED, RESET, RED, RESET, MAGENTA, RESET,
+				 BRIGHT_RED, RESET, YELLOW, RESET, CYAN, RESET, BLUE, RESET);
+	fam_assert_eq(len, 54);
+	test_reset_colors();
 }
 
-Test(test_2) {
-	// fam_assert(0);
+Test(test_fam_err) {
+	fam_assert_eq(fam_err, NoErrors);
+	SetErr(IllegalArgument);
+	fam_assert_eq(fam_err, IllegalArgument);
+	const byte *err = get_err();
+	fam_assert(!cstring_compare(err, "IllegalArgument"));
+	_debug_print_util_disable__ = true;
+	print_err("test");
+	_debug_print_util_disable__ = false;
 }
 
-Test(test3) {
-	fam_assert(1);
+Test(test_lock) {
+	Lock l1 = lock();
+	lock_read(&l1);
+	// upper bits incremented by 1.
+	fam_assert_eq(l1 >> 32, 1);
+	// lower bits also incremeneted by 1.
+	fam_assert_eq(l1 & 0xFFFFFFFF, 1);
+
+	lock_unlock(&l1);
+	// upper bits incremented by 1.
+	fam_assert_eq(l1 >> 32, 2);
+	// lower bits also decremented by 1.
+	fam_assert_eq(l1 & 0xFFFFFFFF, 0);
+
+	lock_write(&l1);
+	// upper bits incremented by 2.
+	fam_assert_eq(l1 >> 32, 4);
+	// lower bits high bit set
+	fam_assert_eq(l1 & 0xFFFFFFFF, 0x80000000);
+
+	lock_unlock(&l1);
+
+	// upper bits incremented by 1.
+	fam_assert_eq(l1 >> 32, 5);
+	// lower bits are set to 0 now
+	fam_assert_eq(l1 & 0xFFFFFFFF, 0x00000000);
 }
 
-Test(test4) {
+Test(test_lock_macros) {
 	int x = 0;
-	int y = 0;
-	int z = 0;
-	int a = 2;
-	int v = a + x;
-	/*
-		fam_assert(0);
-		fam_assert(0);
-		fam_assert(0);
-		fam_assert(0);
-		fam_assert(0);
-		fam_assert(0);
-		fam_assert(0);
-		fam_assert(0);
-		fam_assert(0);
-	*/
-}
-Test(test5) {
+	Lock l = INIT_LOCK;
+	wsync(l, { x++; });
+	fam_assert(x == 1);
+	int y;
+	rsync(l, { y = x; });
+	fam_assert(y == 1);
 }
 
-Test(test6) {
-}
-
-Test(test7) {
-	int x = 0;
-	int y = 0;
-	int a = 2;
-	int v = a + x;
-	fam_assert(1);
-
-	int v2 = 1;
-	int v3 = 3;
-}
-
-Test(x) {
-	int x = 1;
-	fam_assert_eq(x, 1);
+Test(test_mmap) {
+	int *test = mmap_allocate(sizeof(int *) * 100);
+	for (int i = 0; i < 100; i++) test[i] = i;
 }
