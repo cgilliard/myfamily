@@ -3,12 +3,12 @@
 . ./scripts/env.sh
 
 if [ "$NO_COLOR" = "" ]; then
-   GREEN="\x1b[32m";
-   CYAN="\x1b[36m";
-   YELLOW="\x1b[33m";
-   BRIGHT_RED="\x1b[91m";
-   RESET="\x1b[0m";
-   BLUE="\x1b[34m";
+   GREEN="\033[32m";
+   CYAN="\033[36m";
+   YELLOW="\033[33m";
+   BRIGHT_RED="\033[91m";
+   RESET="\033[0m";
+   BLUE="\033[34m";
 else
    GREEN="";
    CYAN="";
