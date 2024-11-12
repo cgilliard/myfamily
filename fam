@@ -6,6 +6,7 @@ cc=cc
 extra='-O3';
 s=0;
 do_final=1;
+asan='';
 for var in "$@"
 do
 case "$var" in --with-cc=*)
@@ -24,7 +25,12 @@ case "$var" in --skip-final)
 	do_final=0;
 	;;
 esac
+case "$var" in --with-asan)
+	asan='-fsanitize=undefined -fsanitize=address';
+	;;
+esac
 done
+extra="${extra} ${asan}";
 
 cc_flags='-Wno-attributes -Wno-pointer-sign -Wno-ignored-attributes -Werror=incompatible-pointer-types -I..';
 
@@ -39,7 +45,7 @@ fi
 if [ "$1" = "clean" ]; then
    rm -f */*.o
 elif [ "$1" = "test" ]; then
-   extra="-g -O0 -DTEST";
+   extra="-g -O0 -DTEST ${asan}";
    if [ $s = 1 ]; then
       ./fam --with-cc=$cc --with-extra="$extra" -s --skip-final || exit 1;
    else
