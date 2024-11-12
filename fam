@@ -4,6 +4,7 @@
 
 cc=cc
 extra='-O3';
+s=0;
 for var in "$@"
 do
 case "$var" in --with-cc=*)
@@ -13,6 +14,10 @@ esac
 case "$var" in --with-extra=*)
 	extra=${var#*=};
 	;;
+esac
+case "$var" in -s)
+        s=1;
+        ;;
 esac
 done
 
@@ -30,7 +35,11 @@ if [ "$1" = "clean" ]; then
    rm -f */*.o
 elif [ "$1" = "test" ]; then
    extra="-g -O0 -DTEST";
-   ./fam --with-cc=$cc --with-extra="$extra" || exit 1;
+   if [ $s = 1 ]; then
+      ./fam --with-cc=$cc --with-extra="$extra" -s || exit 1;
+   else
+      ./fam --with-cc=$cc --with-extra="$extra" || exit 1;
+   fi
    echo "[===================================================================================================================]";
    for dir in $subdirs; do
       cd ${dir};
@@ -43,7 +52,7 @@ elif [ "$1" = "test" ]; then
       cd ..;
    done
    echo "All tests passed!";
-else
+elif [ -z "$1" ] || [ "${1#-}" != "$1" ] || [ "$1" = "all" ]; then
    for dir in $subdirs
    do
       cd ${dir}
@@ -57,16 +66,20 @@ else
             done
             if [ ! -e ${file%.c}.o ] || [ ${file} -nt ${file%.c}.o ] || [ $newer_header = 1 ]; then
                if [ ${file} != "test.c" ]; then
-                  echo "C compile command: ${cc}\n\
+                  if [ $s = 0 ]; then
+                     echo "C compile command: ${cc}\n\
 	${cc_flags}\n\
 	${extra}\n\
 	${special}\n\
 	-o ${file%.c}.o\n\
 	-c ${file}"
+                  fi
                   ${cc} ${cc_flags} ${extra} ${special} -o ${file%.c}.o -c ${file} || exit 1;
                fi
             fi
          done
       cd ..
    done
+else
+   echo "Unknown command: '$1' Usage: fam [test | all] [options]";
 fi
