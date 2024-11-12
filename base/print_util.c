@@ -24,13 +24,13 @@ void exit(int);
 void panic(const byte *fmt, ...) {
 	byte buf[1024];
 	__builtin_va_list args;
-	print("Panic: ");
+	if (!_debug_print_util_disable__) print("Panic: ");
 	__builtin_va_start(args, fmt);
-	vfprintf(stderr, fmt, args);
+	if (!_debug_print_util_disable__) vfprintf(stderr, fmt, args);
 	__builtin_va_end(args);
-	fprintf(stderr, "\n");
+	if (!_debug_print_util_disable__) fprintf(stderr, "\n");
 
-	exit(-1);
+	if (!_debug_print_util_disable__) exit(-1);
 }
 
 int println(const byte *fmt, ...) {

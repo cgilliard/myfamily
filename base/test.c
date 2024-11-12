@@ -40,7 +40,9 @@ Test(test_fam_err) {
 	const byte *err = get_err();
 	fam_assert(!cstring_compare(err, "IllegalArgument"));
 	_debug_print_util_disable__ = true;
+	print("test");
 	print_err("test");
+	panic("test");
 	_debug_print_util_disable__ = false;
 }
 
@@ -85,4 +87,14 @@ Test(test_lock_macros) {
 Test(test_mmap) {
 	int *test = mmap_allocate(sizeof(int *) * 100);
 	for (int i = 0; i < 100; i++) test[i] = i;
+	for (int i = 0; i < 100; i++) fam_assert_eq(test[i], i);
+
+	mmap_free(test, sizeof(int *) * 100);
+}
+
+Test(test_misc) {
+	fam_assert(!cstring_compare_n("test1234", "test4566", 4));
+	byte buf[10] = {};
+	set_bytes(buf, 'a', 10);
+	for (int i = 0; i < 10; i++) fam_assert_eq('a', buf[i]);
 }

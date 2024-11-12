@@ -52,8 +52,10 @@ int cstring_compare_n(const byte *X, const byte *Y, unsigned long long n) {
 		X++;
 		Y++;
 	}
-	if (n == 0) return 0;
-	if (*X > *Y) return 1;
-	if (*Y > *X) return -1;
-	return 0;
+	if (n == 0)
+		return 0;
+	else if (*X > *Y)
+		return 1;
+	else
+		return -1;
 }

@@ -13,8 +13,35 @@
 // limitations under the License.
 
 #include <base/test.h>
+#include <crypto/lib.h>
 
 Suite(crypto);
 
-Test(test_util) {
+Test(test_rand) {
+	int count = 10;
+	int rand[count];
+	for (int i = 0; i < count; i++) fam_assert(!rand_int(&rand[i]));
+	bool diff = false;
+	for (int i = 1; i < count; i++)
+		if (rand[i] != rand[0]) diff = true;
+	fam_assert(diff);
+
+	byte randb[count];
+	for (int i = 0; i < count; i++) fam_assert(!rand_byte(&randb[i]));
+	diff = false;
+	for (int i = 1; i < count; i++)
+		if (randb[i] != randb[0]) diff = true;
+	fam_assert(diff);
+
+	int64 rand64[count];
+	for (int i = 0; i < count; i++) fam_assert(!rand_int64(&rand64[i]));
+	diff = false;
+	for (int i = 1; i < count; i++)
+		if (rand64[i] != rand64[0]) diff = true;
+	fam_assert(diff);
+
+	byte buf1[count], buf2[count];
+	fam_assert(!rand_bytes(buf1, count));
+	fam_assert(!rand_bytes(buf2, count));
+	fam_assert(cstring_compare_n(buf1, buf2, count));
 }

@@ -35,7 +35,5 @@ void __attribute__((constructor)) __check_64bit_arch__() {
 
 	// little endian check
 	int test = 0x1;
-	if (*(byte *)&test != 0x1) {
-		panic("Big endian is not supported!");
-	}
+	if (*(byte *)&test != 0x1) panic("Big endian is not supported!");
 }
