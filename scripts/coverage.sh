@@ -55,3 +55,7 @@ echo "$BLUE=====================================================================
 codecov=`awk "BEGIN {print 100 * $coveredsum / $linessum}"`
 codecov=`printf "%.2f" $codecov`;
 printf "$GREEN%-20s$RESET $YELLOW%-10s$RESET $CYAN%i$RESET\n" "Total Coverage" "$codecov%" $linessum;
+
+export cc_final=$codecov
+cp ./.templates/README.md README.md
+perl -pi -e 's/CODE_COVERAGE/$ENV{cc_final}/g' README.md
