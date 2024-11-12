@@ -45,7 +45,7 @@ jobs:
              ./fam clean; ./fam coverage
              git config user.email "pipelinesbot.noreply@example.com"
              git config user.name "Pipelines-Bot"
-             git commit -am "Pipelines-Bot: Updated repo codecov/docs Source Version is $GITHUB_SHA.";
+             git commit -am "Pipelines-Bot: Updated repo codecov/docs Source Version is $GITHUB_SHA";
              git push https://${{ secrets.MyFamilyPat }}@github.com/cgilliard/myfamily.git
 
           fi
