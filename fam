@@ -5,6 +5,7 @@
 cc=cc
 extra='-O3';
 s=0;
+do_final=1;
 for var in "$@"
 do
 case "$var" in --with-cc=*)
@@ -18,6 +19,10 @@ esac
 case "$var" in -s)
         s=1;
         ;;
+esac
+case "$var" in --skip-final)
+	do_final=0;
+	;;
 esac
 done
 
@@ -36,9 +41,9 @@ if [ "$1" = "clean" ]; then
 elif [ "$1" = "test" ]; then
    extra="-g -O0 -DTEST";
    if [ $s = 1 ]; then
-      ./fam --with-cc=$cc --with-extra="$extra" -s || exit 1;
+      ./fam --with-cc=$cc --with-extra="$extra" -s --skip-final || exit 1;
    else
-      ./fam --with-cc=$cc --with-extra="$extra" || exit 1;
+      ./fam --with-cc=$cc --with-extra="$extra" --skip-final || exit 1;
    fi
    echo "[===================================================================================================================]";
    for dir in $subdirs; do
@@ -80,6 +85,16 @@ elif [ -z "$1" ] || [ "${1#-}" != "$1" ] || [ "$1" = "all" ]; then
          done
       cd ..
    done
+   if [ $do_final = 1 ]; then
+      if [ $s = 0 ]; then
+         echo "C compile command: ${cc}\n\
+	${cc_flags}\n\
+	${extra}\n\
+	${special}\n\
+	-o bin/fam */*.o";
+      fi
+      ${cc} ${cc_flags} ${extra} ${special} -o bin/fam */*.o
+   fi
 else
    echo "Unknown command: '$1' Usage: fam [test | all] [options]";
 fi
