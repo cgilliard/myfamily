@@ -36,6 +36,7 @@ jobs:
         run: |
           ./fam clean; ./fam test --with-cc=clang --with-asan -s
       - name: Build Docs
+        run: |
           echo "evt=$GITHUB_EVENT_NAME";
           if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
              echo "running coverage";
