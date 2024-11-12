@@ -18,6 +18,7 @@ else
    BLUE="";
 fi
 
+update_docs=0;
 cc=cc
 extra='-O3 -flto';
 s=0;
@@ -35,6 +36,10 @@ case "$var" in --with-extra=*)
 esac
 case "$var" in -s)
         s=1;
+        ;;
+esac
+case "$var" in --update-docs)
+        update_docs=1;
         ;;
 esac
 case "$var" in --skip-final)
@@ -84,7 +89,11 @@ elif [ "$1" = "test" ] || [ "$1" = "coverage" ]; then
    done
    echo "All tests passed!";
    if [ "$1" = "coverage" ]; then
-      ./scripts/coverage.sh
+      if [ $update_docs = 1 ]; then
+         ./scripts/coverage.sh --update-docs
+      else
+         ./scripts/coverage.sh
+      fi
    fi
 elif [ -z "$1" ] || [ "${1#-}" != "$1" ] || [ "$1" = "all" ]; then
    for dir in $subdirs

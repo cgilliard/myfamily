@@ -18,6 +18,15 @@ else
    BLUE="";
 fi
 
+update_docs=0;
+for var in "$@"
+do
+case "$var" in --update-docs)
+        update_docs=1;
+        ;;
+esac
+done
+
 
 linessum=0;
 coveredsum=0;
@@ -57,10 +66,13 @@ codecov=`printf "%.2f" $codecov`;
 timestamp=`date +%s`
 
 printf "$GREEN%-20s$RESET $YELLOW%-10s$RESET $CYAN%i$RESET\n" "Total Coverage" "$codecov%" $linessum;
-
 export cc_final=$codecov
-echo "$codecov" > /tmp/cc_final;
-cp ./.templates/README.md README.md
-perl -pi -e 's/CODE_COVERAGE/$ENV{cc_final}/g' README.md
-echo "$timestamp $codecov $coveredsum $linessum" >> ./docs/cc.txt
-./scripts/update_code_coverage.sh
+
+
+if [ $update_docs = 1 ]; then
+   echo "$codecov" > /tmp/cc_final;
+   cp ./.templates/README.md README.md
+   perl -pi -e 's/CODE_COVERAGE/$ENV{cc_final}/g' README.md
+   echo "$timestamp $codecov $coveredsum $linessum" >> ./docs/cc.txt
+   ./scripts/update_code_coverage.sh
+fi
