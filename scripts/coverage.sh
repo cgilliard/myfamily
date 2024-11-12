@@ -51,7 +51,7 @@ echo "$BLUE--------------------------------"\
    cd ..;
 done
 
-echo "[$BLUE===================================================================================================================$RESET]";
+echo "$BLUE====================================================================================================================$RESET";
 codecov=`awk "BEGIN {print 100 * $coveredsum / $linessum}"`
 codecov=`printf "%.2f" $codecov`;
 printf "$GREEN%-20s$RESET $YELLOW%-10s$RESET $CYAN%i$RESET\n" "Total Coverage" "$codecov%" $linessum;
