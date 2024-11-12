@@ -34,16 +34,16 @@ void panic(const char *fmt, ...) {
 int println(const char *fmt, ...) {
 	__builtin_va_list args;
 	__builtin_va_start(args, fmt);
-	vfprintf(stderr, fmt, args);
+	vfprintf(stdout, fmt, args);
 	__builtin_va_end(args);
-	fprintf(stderr, "\n");
+	fprintf(stdout, "\n");
 	return 0;
 }
 
 int print(const char *fmt, ...) {
 	__builtin_va_list args;
 	__builtin_va_start(args, fmt);
-	vfprintf(stderr, fmt, args);
+	vfprintf(stdout, fmt, args);
 	__builtin_va_end(args);
 	return 0;
 }
