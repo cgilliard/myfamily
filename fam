@@ -64,7 +64,7 @@ else
 fi
 
 if [ "$1" = "clean" ]; then
-   rm -rf */*.o */*.gcda */*.gcov */*.gcno */.bin/*
+   rm -rf */*.o */*.gcda */*.gcov */*.gcno */.bin/* main/resources.h
 elif [ "$1" = "test" ] || [ "$1" = "coverage" ]; then
    if [ "$1" = "coverage" ]; then
       extra="-g -O0 -DTEST --coverage";
@@ -96,6 +96,10 @@ elif [ "$1" = "test" ] || [ "$1" = "coverage" ]; then
       fi
    fi
 elif [ -z "$1" ] || [ "${1#-}" != "$1" ] || [ "$1" = "all" ]; then
+   if [ ! -e main/resources.h ]; then
+      ${cc} -o bin/xxdir etc/xxdir.c
+      ./bin/xxdir etc/resources main/resources.h fam
+   fi
    for dir in $subdirs
    do
       cd ${dir}
