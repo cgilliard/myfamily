@@ -64,7 +64,7 @@ else
 fi
 
 if [ "$1" = "clean" ]; then
-   rm -f */*.o */*.gcda */*.gcov */*.gcno
+   rm -rf */*.o */*.gcda */*.gcov */*.gcno */.bin/*
 elif [ "$1" = "test" ] || [ "$1" = "coverage" ]; then
    if [ "$1" = "coverage" ]; then
       extra="-g -O0 -DTEST --coverage";
