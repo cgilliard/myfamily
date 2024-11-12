@@ -28,14 +28,14 @@ jobs:
       
       - name: Test Linux Build
         run: |
-           ./fam
+           ./fam clean; ./fam
            # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
       - name: Run Linux Tests (gcc)
         run: |
-          ./fam test --with-cc=gcc
+          ./fam clean; ./fam test --with-cc=gcc
       - name: Run Linux Tests (clang)
         run: |
-          ./fam test --with-cc=clang
+          ./fam clean;  ./fam test --with-cc=clang
       - name: Build Docs
         run: |
   macos:
@@ -52,11 +52,11 @@ jobs:
       
       - name: Test MacOS Build
         run: |
-          ./fam
+          ./fam clean; ./fam
           # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
       - name: Run MacOS Tests (gcc)
         run: |
-          ./fam test --with-cc=gcc
+          ./fam clean; ./fam test --with-cc=gcc
       - name: Run MacOS Tests (clang)
         run: |
-          ./fam test --with-cc=clang
+          ./fam clean; ./fam test --with-cc=clang
