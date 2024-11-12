@@ -1,14 +1,22 @@
 #!/bin/sh
 
-# eval "deps_base='*.o'"
-# eval "deps_crypto='*.o ../base/*.o'"
-
 . ./scripts/env.sh
+
+cc=cc
+for var in "$@"
+do
+case "$var" in --with-cc=*)
+        cc=${var#*=};
+	;;
+esac
+done
+
+cc_flags='-Wno-pointer-sign -g -O0 -DTEST'
 
 if [ "$1" = "clean" ]; then
    rm -f */*.o
 elif [ "$1" = "test" ]; then
-   ./fam || exit 1;
+   ./fam --with-cc=$cc || exit 1;
    echo "[===================================================================================================================]";
    for dir in $subdirs; do
       cd ${dir};

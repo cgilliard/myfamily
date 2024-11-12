@@ -28,26 +28,14 @@ jobs:
       
       - name: Test Linux Build
         run: |
-          # ./configure --minimal
-          # make clean all -s
-          # ./bin/fam init test1
-          # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
-
-      - name: Install Test dependencies
-        run: |
-          # sudo apt-get update
-          # sudo apt-get install libcriterion-dev doxygen python3-pip
-          # sudo pip3 install pre-commit
-
+           ./fam
+           # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
       - name: Run Linux Tests (gcc)
         run: |
-          ./fam test
-      
+          ./fam test --with-cc=gcc
       - name: Run Linux Tests (clang)
         run: |
-          # ./configure --with-cc=clang
-          # make clean testsannc -s
-
+          ./fam test --with-cc=clang
       - name: Build Docs
         run: |
   macos:
@@ -64,24 +52,11 @@ jobs:
       
       - name: Test MacOS Build
         run: |
-          # ./scripts/configure_homebrew.sh --minimal
-          # make clean all
-          # ./bin/fam init test1
+          ./fam
           # test -d ~/.fam/resources || { echo "Error: ~/.fam/resources directory does not exist"; exit 1; }
-
-      - name: Install dependencies
-        run: |
-          # brew install criterion
-          # python3 -m venv venv
-          # source venv/bin/activate
-          # pip install pre-commit
-          # pre-commit install
-     
       - name: Run MacOS Tests (gcc)
         run: |
-          ./fam test
-      
+          ./fam test --with-cc=gcc
       - name: Run MacOS Tests (clang)
         run: |
-          # ./scripts/configure_homebrew.sh --with-cc=clang
-          # make clean testsan -s
+          ./fam test --with-cc=clang
