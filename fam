@@ -3,7 +3,7 @@
 . ./scripts/env.sh
 
 cc=cc
-extra='-O3';
+extra='-O3 -flto';
 s=0;
 do_final=1;
 asan='';
