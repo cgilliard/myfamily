@@ -112,8 +112,8 @@ void fail_assert() {
 			address -= 8;
 
 			char command[256];
-			snprintf(command, sizeof(command), "addr2line -f -e bin/test %llx",
-					 address);
+			snprintf(command, sizeof(command),
+					 "addr2line -f -e ./.bin/test %llx", address);
 
 			FILE *fp = popen(command, "r");
 			char buffer[128];
@@ -145,7 +145,8 @@ void fail_assert() {
 		if (strstr(strings[i], "_tfwork_")) {
 			char command[256];
 			snprintf(command, sizeof(command),
-					 "atos -fullPath -o bin/test -l 0x100000000 %s", address);
+					 "atos -fullPath -o ./.bin/test -l 0x100000000 %s",
+					 address);
 
 			FILE *fp = popen(command, "r");
 			char buffer[128];
