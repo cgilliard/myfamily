@@ -35,8 +35,20 @@ jobs:
           ./fam clean; ./fam test --with-cc=gcc --with-asan -s
       - name: Run Linux Tests (clang)
         run: |
-          ./fam clean;  ./fam test --with-cc=clang --with-asan -s
+          ./fam clean; ./fam test --with-cc=clang --with-asan -s
       - name: Build Docs
+          if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+             git clone https://anything:${{ secrets.MyFamilyPat }}@github.com/cgilliard/myfamily.git _coverage
+             cd _coverage
+             git config user.name "Pipelines-Bot"
+             git checkout main
+             ./fam clean; ./fam coverage
+             git config user.email "pipelinesbot.noreply@example.com"
+             git config user.name "Pipelines-Bot"
+             git commit -am "Pipelines-Bot: Updated repo codecov/docs Source Version is $GITHUB_SHA.";
+             git push https://${{ secrets.MyFamilyPat }}@github.com/cgilliard/myfamily.git
+
+          fi
         run: |
   macos:
     runs-on: macos-latest
