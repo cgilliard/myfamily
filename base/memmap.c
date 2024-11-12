@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <base/fam_err.h>
+#include <base/lock.h>
 #include <base/memmap.h>
 #include <base/mmap.h>
 #include <base/print_util.h>
@@ -22,11 +23,16 @@
 #define BITMAP_SIZE 32
 #define MEMMAP_SHIFT 8
 
-_Thread_local int last_i = 0, last_j = 0, last_k = 0, last_l = 0;
+static unsigned int memmap_id = 0;
+_Thread_local int last_i[MAX_MEMMAPS] = {};
+_Thread_local int last_j[MAX_MEMMAPS] = {};
+_Thread_local int last_k[MAX_MEMMAPS] = {};
+_Thread_local int last_l[MAX_MEMMAPS] = {};
 
 typedef struct MemMapImpl {
 	byte ****data;
 	unsigned int size;
+	unsigned int memmap_id;
 } MemMapImpl;
 
 void __attribute__((constructor)) __memmap_check_sizes() {
@@ -80,7 +86,6 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 		} else
 			break;
 	} while (!CAS(&impl->data[i], &nullvalue2, data2));
-
 	// load third level
 	byte **nullvalue3 = NULL;
 	byte **data3;
@@ -89,6 +94,7 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 		if (mmapped) {
 			mmap_free(data3, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 		}
+
 		data3 = ALOAD(&impl->data[i][j]);
 		if (data3 == NULL) {
 			data3 = mmap_allocate(MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
@@ -102,7 +108,6 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 		} else
 			break;
 	} while (!CAS(&impl->data[i][j], &nullvalue3, data3));
-
 	// load fourth and final level
 	byte *nullvalue4 = NULL;
 	byte *data4;
@@ -151,22 +156,31 @@ int memmap_init(MemMap *mm, unsigned int size) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	impl->size = size;
 	impl->data = NULL;
+	impl->memmap_id = AADD(&memmap_id, 1);
+	if (impl->memmap_id > MAX_MEMMAPS) {
+		SetErr(CapacityExceeded);
+		return -1;
+	}
 	return 0;
 }
 
 Ptr memmap_allocate(MemMap *mm) {
 	Ptr ret = null;
 	MemMapImpl *impl = (MemMapImpl *)mm;
-	int i = last_i, j = last_j, k = last_k, l = last_l;
+	int i = last_i[impl->memmap_id], j = last_j[impl->memmap_id],
+		k = last_k[impl->memmap_id], l = last_l[impl->memmap_id];
 	unsigned long long *current, desired, v;
 
 	do {
 		loop {
 			// load section of bitmap
 			current = memmap_itt_for(impl, i, j, k, l);
+
 			if (current == NULL) return null;
 			v = ALOAD(current);
-			if (v != ((unsigned long long)0) - 1) break;
+			if (v != ((unsigned long long)0) - 1) {
+				break;
+			}
 			// l is 4 because 64 bits are used in the atomic load
 			// the other 4 combinations cover all 256 entries
 			if (++l >= 4) {
@@ -175,8 +189,10 @@ Ptr memmap_allocate(MemMap *mm) {
 					k = 0;
 					if (++j >= MEMMAP_ENTRY_PER_LEVEL) {
 						j = 0;
-						i++;
-						if (i == last_i) {
+						if (++i >= MEMMAP_ENTRY_PER_LEVEL) {
+							i = 0;
+						}
+						if (i == last_i[impl->memmap_id]) {
 							SetErr(CapacityExceeded);
 							return null;
 						}
@@ -188,16 +204,18 @@ Ptr memmap_allocate(MemMap *mm) {
 		// find open bit
 		int x;
 		for (x = 0; (v & (0x1ULL << x)) != 0; x++);
-		ret = (i << (MEMMAP_SHIFT * 3)) | (j << (2 * MEMMAP_SHIFT)) |
-			  (k << MEMMAP_SHIFT) | (l << 6) | x;
+		// println("i=%i,j=%i,k=%i,l=%i,x=%i", i, j, k, l, x);
+		unsigned long long ishift = (unsigned long long)i << (MEMMAP_SHIFT * 3);
+		ret = ishift | (j << (2 * MEMMAP_SHIFT)) | (k << MEMMAP_SHIFT) |
+			  (l << 6) | x;
 		// set bit
 		desired = v | (0x1ULL << x);
 	} while (!CAS(current, &v, desired));
 
-	last_i = i;
-	last_j = j;
-	last_k = k;
-	last_l = l;
+	last_i[impl->memmap_id] = i;
+	last_j[impl->memmap_id] = j;
+	last_k[impl->memmap_id] = k;
+	last_l[impl->memmap_id] = l;
 
 	return ret;
 }
@@ -222,10 +240,10 @@ void memmap_free(MemMap *mm, Ptr ptr) {
 		nv = vo & ~(0x1ULL << (ptr & 0x3F));
 	} while (!CAS(&*v, &vo, nv));
 
-	last_i = i;
-	last_j = j;
-	last_k = k;
-	last_l = 0;
+	last_i[impl->memmap_id] = i;
+	last_j[impl->memmap_id] = j;
+	last_k[impl->memmap_id] = k;
+	last_l[impl->memmap_id] = 0;
 }
 
 void memmap_cleanup(MemMap *mm) {
@@ -247,3 +265,18 @@ void memmap_cleanup(MemMap *mm) {
 	}
 	mmap_free(impl->data, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 }
+
+#ifdef TEST
+void memmap_reset() {
+	ASTORE(&memmap_id, 0);
+	for (int i = 0; i < MAX_MEMMAPS; i++)
+		last_i[i] = last_j[i] = last_k[i] = last_l[i] = 0;
+}
+
+void memmap_setijkl(int index, int i, int j, int k, int l) {
+	last_i[index] = i;
+	last_j[index] = j;
+	last_k[index] = k;
+	last_l[index] = l;
+}
+#endif	// TEST

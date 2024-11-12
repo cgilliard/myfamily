@@ -98,3 +98,134 @@ Test(test_misc) {
 	set_bytes(buf, 'a', 10);
 	for (int i = 0; i < 10; i++) fam_assert_eq('a', buf[i]);
 }
+
+Test(test_memmap) {
+	MemMap mm1;
+	int size = 64;
+	int count = 3000;
+	memmap_init(&mm1, size);
+
+	for (int i = 0; i < count; i++) {
+		Ptr p = memmap_allocate(&mm1);
+		if (p != i + 2) println("p=%u,i+1=%i", p, i + 2);
+		fam_assert_eq(p, i + 2);
+		byte *data = memmap_data(&mm1, p);
+		for (int j = 0; j < size; j++) {
+			data[j] = 'a' + (j % 26);
+		}
+	}
+
+	for (int i = 0; i < count; i++) {
+		Ptr p = i + 2;
+		byte *data = memmap_data(&mm1, p);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], 'a' + (j % 26));
+		}
+	}
+
+	memmap_free(&mm1, 7);
+	memmap_free(&mm1, 8);
+	memmap_free(&mm1, 167);
+
+	Ptr p = memmap_allocate(&mm1);
+	fam_assert_eq(p, 7);
+	p = memmap_allocate(&mm1);
+	fam_assert_eq(p, 8);
+	p = memmap_allocate(&mm1);
+	fam_assert_eq(p, 167);
+
+	p = memmap_allocate(&mm1);
+	fam_assert_eq(p, count + 2);
+
+	memmap_cleanup(&mm1);
+}
+
+Test(test_memmap_recycle) {
+	MemMap mm1;
+	int size = 64;
+	int count = 30000;
+	int itt = 4;
+	memmap_init(&mm1, size);
+	Ptr ptrs[itt];
+
+	for (int i = 0; i < count; i++) {
+		for (int j = 0; j < itt; j++) {
+			ptrs[j] = memmap_allocate(&mm1);
+			byte *data = memmap_data(&mm1, ptrs[j]);
+			data[0] = 'a' + (j % 26);
+			fam_assert((ptrs[j] == 2 + j));
+		}
+
+		for (int j = 0; j < itt; j++) {
+			byte *data = memmap_data(&mm1, ptrs[j]);
+			fam_assert_eq(data[0], 'a' + (j % 26));
+			fam_assert(ptrs[j] == 2 + j);
+			memmap_free(&mm1, ptrs[j]);
+		}
+	}
+	memmap_cleanup(&mm1);
+}
+
+Test(test_memmap_cap_exceed) {
+	int size = 64;
+	for (int i = 0; i < MAX_MEMMAPS - 1; i++) {
+		MemMap mm1;
+		fam_assert(!memmap_init(&mm1, size));
+		memmap_cleanup(&mm1);
+	}
+	MemMap mm1;
+	fam_assert(memmap_init(&mm1, size));
+	memmap_reset();
+}
+
+Test(test_large_memmap_kval) {
+	MemMap mm1;
+	int size = 64;
+	int count = 10;
+	int itt = 100;
+	Ptr ptrs[itt];
+	memmap_init(&mm1, size);
+	memmap_setijkl(0, 255, 255, 255, 3);
+	for (int i = 0; i < count; i++) {
+		for (int j = 0; j < itt; j++) {
+			ptrs[j] = memmap_allocate(&mm1);
+			byte *data = memmap_data(&mm1, ptrs[j]);
+			data[0] = 'a' + (j % 26);
+		}
+
+		for (int j = 0; j < itt; j++) {
+			byte *data = memmap_data(&mm1, ptrs[j]);
+			fam_assert_eq(data[0], 'a' + (j % 26));
+			memmap_free(&mm1, ptrs[j]);
+		}
+	}
+	memmap_cleanup(&mm1);
+}
+
+Test(test_big_memmap) {
+	MemMap mm1;
+	int size = 128;
+	// unsigned long long count = 1024ULL * 1024ULL * 1024ULL * 2ULL;
+	unsigned long long count = 10;
+	memmap_init(&mm1, size);
+	Ptr *ptrs = mmap_allocate(count * sizeof(Ptr));
+
+	for (unsigned long long i = 0; i < count; i++) {
+		ptrs[i] = memmap_allocate(&mm1);
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	for (unsigned long long i = 0; i < count; i++) {
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], ((i + j) % 26) + 'a');
+		}
+		memmap_free(&mm1, ptrs[i]);
+	}
+
+	mmap_free(ptrs, size * sizeof(Ptr));
+	memmap_cleanup(&mm1);
+}

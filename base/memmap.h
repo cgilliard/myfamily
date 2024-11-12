@@ -18,6 +18,8 @@
 #include <base/macros.h>
 #include <base/types.h>
 
+#define MAX_MEMMAPS 128
+
 typedef unsigned int Ptr;
 
 #define null ((Ptr)0)
@@ -34,5 +36,10 @@ int memmap_init(MemMap *mm, unsigned int size);
 Ptr memmap_allocate(MemMap *mm);
 void memmap_free(MemMap *mm, Ptr ptr);
 void memmap_cleanup(MemMap *mm);
+
+#ifdef TEST
+void memmap_reset();
+void memmap_setijkl(int index, int i, int j, int k, int l);
+#endif	// TEST
 
 #endif	// _BASE_MEMMAP__

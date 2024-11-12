@@ -15,8 +15,8 @@
 #ifndef _BASE_MMAP__
 #define _BASE_MMAP__
 
-unsigned int mmap_aligned_size(unsigned int size);
-void *mmap_allocate(unsigned int size);
-void mmap_free(void *, unsigned int size);
+unsigned long long mmap_aligned_size(unsigned long long size);
+void *mmap_allocate(unsigned long long size);
+void mmap_free(void *, unsigned long long size);
 
 #endif	// _BASE_MMAP__
