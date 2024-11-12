@@ -36,7 +36,9 @@ jobs:
         run: |
           ./fam clean; ./fam test --with-cc=clang --with-asan -s
       - name: Build Docs
+          echo "evt=$GITHUB_EVENT_NAME";
           if [[ "$GITHUB_EVENT_NAME" == "schedule" || "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+             echo "running coverage";
              git clone https://anything:${{ secrets.MyFamilyPat }}@github.com/cgilliard/myfamily.git _coverage
              cd _coverage
              git config user.name "Pipelines-Bot"
