@@ -12,5 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <main/main.h>
-#include <main/main_impl.h>
+#ifndef _MAIN_LOAD__
+#define _MAIN_LOAD__
+
+void load_resources(const byte *resources_dir);
+
+#endif	// _MAIN_LOAD__

@@ -30,12 +30,6 @@
 #define SECOND_STRINGIFY(x, y) #y
 #define BOTH(x, y) x y
 
-#define container_of(ptr, type, member)                    \
-	({                                                     \
-		const typeof(((type *)0)->member) *__mptr = (ptr); \
-		(type *)((char *)__mptr - offsetof(type, member)); \
-	})
-
 #define loop while (true)
 #define π(...) \
 	while (true) sleep(INT_MAX)

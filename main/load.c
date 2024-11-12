@@ -12,5 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <main/main.h>
-#include <main/main_impl.h>
+#include <base/types.h>
+
+void load_resources(const byte *resources_dir) {
+}

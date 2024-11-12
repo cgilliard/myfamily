@@ -22,14 +22,12 @@
 #include <string.h>
 #include <sys/stat.h>
 
-typedef unsigned long long u64;	 // 64 bits
-
 int file_count = 0;
 #define MAX_FILES 4096
 int file_sizes[MAX_FILES];
 
-void print_hex(const unsigned char *data, u64 size, FILE *out, const char *file,
-			   const char *namespace) {
+void print_hex(const unsigned char *data, unsigned long long size, FILE *out,
+			   const char *file, const char *namespace) {
 	char buf[strlen(namespace) + 100];
 	snprintf(buf, strlen(namespace) + 100,
 			 "static unsigned char %sxxdir_file_%i[] = {\n", namespace,
@@ -37,7 +35,7 @@ void print_hex(const unsigned char *data, u64 size, FILE *out, const char *file,
 	for (int i = 0; i < strlen(buf); i++)
 		if (buf[i] == '.') buf[i] = '_';
 	fprintf(out, "%s", buf);
-	for (u64 i = 0; i < size; i++) {
+	for (unsigned long long i = 0; i < size; i++) {
 		fprintf(out, "0x%02x, ", data[i]);
 		if ((i + 1) % 16 == 0) {
 			fprintf(out, "\n");
@@ -46,8 +44,9 @@ void print_hex(const unsigned char *data, u64 size, FILE *out, const char *file,
 		}
 	}
 	file_sizes[file_count] = size;
-	fprintf(out, "0x00};\nstatic u64 %sxxdir_file_size_%i = %llu;\n", namespace,
-			file_count, size);
+	fprintf(out,
+			"0x00};\nstatic unsigned long long %sxxdir_file_size_%i = %llu;\n",
+			namespace, file_count, size);
 }
 
 void proc_file(const char *file_path, const char *output_header, FILE *out,
@@ -173,7 +172,8 @@ int main(int argc, char **argv) {
 	for (int i = 0; i < file_count; i++)
 		fprintf(out, "%sxxdir_file_%i,", namespace, i);
 	fprintf(out, "(void*)0};\n");
-	fprintf(out, "static u64 %sxxdir_file_sizes[] = { ", namespace);
+	fprintf(out, "static unsigned long long %sxxdir_file_sizes[] = { ",
+			namespace);
 	for (int i = 0; i < file_count; i++) fprintf(out, "%i, ", file_sizes[i]);
 	fprintf(out, "0};\n");
 

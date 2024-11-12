@@ -21,6 +21,7 @@
 #define MAX_TEST_NAME 1024
 
 extern int test_count;
+extern int fail_count;
 typedef void (*test_fn_ptr)(const byte *, const byte *);
 extern test_fn_ptr test_arr[MAX_TESTS + 1];
 extern byte test_names[MAX_TESTS][MAX_TEST_NAME + 1];
@@ -31,8 +32,24 @@ void fail_assert();
 #define fam_assert(v) \
 	if (!v) fail_assert();
 
-#define fam_assert_eq(v1, v2) \
-	if (v1 != v2) fail_assert();
+#define fam_assert_eq(v1, v2)                      \
+	if (v1 != v2) {                                \
+		if (fail_count == 0)                       \
+			println(                               \
+				"--------------------------------" \
+				"--------------------------------" \
+				"--------------------------------" \
+				"--------------------");           \
+		_Generic((v1),                             \
+			int: println("%i != %i", v1, v2),      \
+			float: println("%f != %f", v1, v2),    \
+			byte: println("%i != %i", v1, v2),     \
+			bool: println("%i != %i", v1, v2),     \
+			void *: println("%p != %p", v1, v2),   \
+			int *: println("%p != %p", v1, v2),    \
+			default: ({}));                        \
+		fail_assert();                             \
+	}
 
 #define Suite(name)                                                            \
 	int main() {                                                               \

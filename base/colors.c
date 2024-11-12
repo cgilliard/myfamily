@@ -14,6 +14,7 @@
 
 #include <base/colors.h>
 #include <base/util.h>
+
 extern char **environ;
 static bool checked = false;
 static bool no_color_value = false;

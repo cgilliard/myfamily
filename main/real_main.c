@@ -12,5 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <main/main.h>
-#include <main/main_impl.h>
+#include <base/print_util.h>
+#include <base/types.h>
+#include <main/load.h>
+#include <main/resources.h>
+
+int real_main(int argc, char **argv) {
+	println("real main");
+	load_resources("~/.fam");
+	return 0;
+}

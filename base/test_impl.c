@@ -29,7 +29,7 @@ test_fn_ptr test_arr[MAX_TESTS + 1];
 byte test_names[MAX_TESTS][MAX_TEST_NAME + 1];
 static jmp_buf test_jmp;
 static int test_itt;
-static int fail_count = 0;
+int fail_count = 0;
 
 bool execute_tests(byte *name) {
 	struct timespec start, end;
@@ -76,12 +76,6 @@ bool execute_tests(byte *name) {
 }
 
 void fail_assert() {
-	if (fail_count == 0)
-		println(
-			"--------------------------------"
-			"--------------------------------"
-			"--------------------------------"
-			"--------------------");
 	void *array[MAX_BACKTRACE_ENTRIES];
 	int size = backtrace(array, MAX_BACKTRACE_ENTRIES);
 	char **strings = backtrace_symbols(array, size);

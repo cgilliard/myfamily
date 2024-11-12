@@ -13,4 +13,5 @@
 // limitations under the License.
 
 #include <main/main.h>
-#include <main/main_impl.h>
+
+MAIN
