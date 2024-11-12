@@ -7,7 +7,7 @@
 **/*.gcda
 **/*.tmp
 **/*.fam
-**/bin
+**/.bin
 /bin/*
 /doc/*
 /main/resources.h
