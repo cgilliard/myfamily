@@ -25,7 +25,7 @@ Test(test_colors) {
 }
 
 Test(test_2) {
-	//	fam_assert(0);
+	// fam_assert(0);
 }
 
 Test(test3) {
