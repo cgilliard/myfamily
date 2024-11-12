@@ -59,8 +59,7 @@ timestamp=`date +%s`
 printf "$GREEN%-20s$RESET $YELLOW%-10s$RESET $CYAN%i$RESET\n" "Total Coverage" "$codecov%" $linessum;
 
 export cc_final=$codecov
+echo "$codecov" > /tmp/cc_final;
 cp ./.templates/README.md README.md
 perl -pi -e 's/CODE_COVERAGE/$ENV{cc_final}/g' README.md
-
-
 echo "$timestamp $codecov $coveredsum $linessum" >> ./docs/cc.txt
