@@ -63,3 +63,4 @@ echo "$codecov" > /tmp/cc_final;
 cp ./.templates/README.md README.md
 perl -pi -e 's/CODE_COVERAGE/$ENV{cc_final}/g' README.md
 echo "$timestamp $codecov $coveredsum $linessum" >> ./docs/cc.txt
+./scripts/update_code_coverage.sh

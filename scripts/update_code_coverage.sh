@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "update code coverage charts";
-
 cp .templates/code_coverage.html docs/code_coverage.html
 entries=`cat docs/cc.txt`;
 rm -f /tmp/timestamps
