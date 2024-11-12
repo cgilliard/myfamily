@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_BACKTRACE_ENTRIES 128
 
@@ -31,6 +32,9 @@ static int test_itt;
 static int fail_count = 0;
 
 bool execute_tests(byte *name) {
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
+
 	for (int i = 0; i < test_count; i++) {
 		test_itt = i;
 		if (setjmp(test_jmp) == 0) {
@@ -42,15 +46,21 @@ bool execute_tests(byte *name) {
 		}
 	}
 
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	double time_ns =
+		(end.tv_sec - start.tv_sec) * 1e9 + (end.tv_nsec - start.tv_nsec);
+
 	if (fail_count)
 		println(
 			"--------------------------------"
 			"--------------------------------"
 			"--------------------------------"
 			"--------------------");
-	println("[%s====%s] Tested: %s%i%s | Passing: %s%i%s | Failing: %s%i%s",
-			BLUE, RESET, YELLOW, test_count, RESET, GREEN,
-			test_count - fail_count, RESET, BRIGHT_RED, fail_count, RESET);
+	println(
+		"[%s====%s] Tested: %s%i%s | Passing: %s%i%s | Failing: %s%i%s "
+		"(Execution time: %s%f%ss)",
+		BLUE, RESET, YELLOW, test_count, RESET, GREEN, test_count - fail_count,
+		RESET, BRIGHT_RED, fail_count, RESET, CYAN, time_ns / 1e9, RESET);
 
 	println(
 		"[%s================================"

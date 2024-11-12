@@ -3,27 +3,41 @@
 . ./scripts/env.sh
 
 cc=cc
+extra='-O3';
 for var in "$@"
 do
 case "$var" in --with-cc=*)
         cc=${var#*=};
 	;;
 esac
+case "$var" in --with-extra=*)
+	extra=${var#*=};
+	;;
+esac
 done
 
-cc_flags='-Wno-pointer-sign -g -O0 -DTEST'
+cc_flags='-Wno-attributes -Wno-pointer-sign -Wno-ignored-attributes -Werror=incompatible-pointer-types -I..';
+
+if ${cc} -dM -E - < /dev/null | grep -q '__clang__'; then
+    # If Clang is detected
+    special="-Werror=incompatible-pointer-types-discards-qualifiers"
+else
+    # If GCC is detected
+    special="-Werror=discarded-qualifiers"
+fi
 
 if [ "$1" = "clean" ]; then
    rm -f */*.o
 elif [ "$1" = "test" ]; then
-   ./fam --with-cc=$cc || exit 1;
+   extra="-g -O0 -DTEST";
+   ./fam --with-cc=$cc --with-extra="$extra" || exit 1;
    echo "[===================================================================================================================]";
    for dir in $subdirs; do
       cd ${dir};
       if [ -f "test.c" ]; then
          mkdir -p bin
          eval "deps=\$deps_${dir}"
-         ${cc} -I.. ${cc_flags} test.c -o bin/test ${deps} || exit 1;
+         ${cc} ${cc_flags} ${extra} ${special} test.c -o bin/test ${deps} || exit 1;
          ./bin/test || exit 1;
       fi
       cd ..;
@@ -43,8 +57,13 @@ else
             done
             if [ ! -e ${file%.c}.o ] || [ ${file} -nt ${file%.c}.o ] || [ $newer_header = 1 ]; then
                if [ ${file} != "test.c" ]; then
-                  echo "${cc} -I.. ${cc_flags} -o ${file%.c}.o -c ${file}"
-                  ${cc} -I.. ${cc_flags} -o ${file%.c}.o -c ${file} || exit 1;
+                  echo "C compile command: ${cc}\n\
+	${cc_flags}\n\
+	${extra}\n\
+	${special}\n\
+	-o ${file%.c}.o\n\
+	-c ${file}"
+                  ${cc} ${cc_flags} ${extra} ${special} -o ${file%.c}.o -c ${file} || exit 1;
                fi
             fi
          done
