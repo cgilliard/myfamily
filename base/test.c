@@ -230,6 +230,6 @@ Test(test_big_memmap) {
 		memmap_free(&mm1, ptrs[i]);
 	}
 
-	mmap_free(ptrs, size * sizeof(Ptr));
+	mmap_free(ptrs, count * sizeof(Ptr));
 	memmap_cleanup(&mm1);
 }
