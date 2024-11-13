@@ -15,12 +15,15 @@
 #ifndef _BASE_MMAP__
 #define _BASE_MMAP__
 
+#include <base/types.h>
+
 unsigned long long mmap_aligned_size(unsigned long long size);
 void *mmap_allocate(unsigned long long size);
 void mmap_free(void *, unsigned long long size);
 
 #ifdef TEST
-extern __int128_t _allocation_sum;
+extern int64 _allocation_sum;
+void set_mmap_fail(int count);
 #endif	// TEST
 
 #endif	// _BASE_MMAP__

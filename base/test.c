@@ -233,3 +233,251 @@ Test(test_big_memmap) {
 	mmap_free(ptrs, count * sizeof(Ptr));
 	memmap_cleanup(&mm1);
 }
+
+Test(test_mmap_fail) {
+	set_mmap_fail(0);
+	void *tmp = mmap_allocate(100);
+	fam_assert_eq(tmp, NULL);
+
+	tmp = mmap_allocate(100);
+	fam_assert(tmp != NULL);
+	mmap_free(tmp, 100);
+}
+
+Test(test_memmap_cas_fail) {
+	MemMap mm1;
+	int size = 128;
+	unsigned long long count = 1ULL;
+	memmap_init(&mm1, size);
+
+	set_debug_cas_fail_count(0);
+
+	Ptr *ptrs = mmap_allocate(count * sizeof(Ptr));
+	for (unsigned long long i = 0; i < count; i++) {
+		ptrs[i] = memmap_allocate(&mm1);
+		fam_assert(ptrs[i] == i + 2);
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	for (unsigned long long i = 0; i < count; i++) {
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], ((i + j) % 26) + 'a');
+		}
+		memmap_free(&mm1, ptrs[i]);
+	}
+
+	memmap_cleanup(&mm1);
+
+	memmap_init(&mm1, size);
+	set_debug_cas_fail_count(1);
+
+	for (unsigned long long i = 0; i < count; i++) {
+		ptrs[i] = memmap_allocate(&mm1);
+		fam_assert(ptrs[i] == i + 2);
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	for (unsigned long long i = 0; i < count; i++) {
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], ((i + j) % 26) + 'a');
+		}
+		memmap_free(&mm1, ptrs[i]);
+	}
+	memmap_cleanup(&mm1);
+
+	memmap_init(&mm1, size);
+	set_debug_cas_fail_count(2);
+
+	for (unsigned long long i = 0; i < count; i++) {
+		ptrs[i] = memmap_allocate(&mm1);
+		fam_assert(ptrs[i] == i + 2);
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	for (unsigned long long i = 0; i < count; i++) {
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], ((i + j) % 26) + 'a');
+		}
+		memmap_free(&mm1, ptrs[i]);
+	}
+	memmap_cleanup(&mm1);
+
+	memmap_init(&mm1, size);
+	set_debug_cas_fail_count(3);
+
+	for (unsigned long long i = 0; i < count; i++) {
+		ptrs[i] = memmap_allocate(&mm1);
+		fam_assert(ptrs[i] == i + 2);
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	for (unsigned long long i = 0; i < count; i++) {
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], ((i + j) % 26) + 'a');
+		}
+		memmap_free(&mm1, ptrs[i]);
+	}
+	memmap_cleanup(&mm1);
+
+	mmap_free(ptrs, count * sizeof(Ptr));
+}
+
+Test(test_memmap_alloc_fail) {
+	MemMap mm1;
+	int size = 128;
+	unsigned long long count = 100ULL;
+	memmap_init(&mm1, size);
+
+	set_mmap_fail(1);
+	fam_assert(!memmap_allocate(&mm1));
+	fam_assert_eq(fam_err, AllocErr);
+
+	Ptr *ptrs = mmap_allocate(count * sizeof(Ptr));
+	for (unsigned long long i = 0; i < count; i++) {
+		ptrs[i] = memmap_allocate(&mm1);
+		fam_assert(ptrs[i] == i + 2);
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	for (unsigned long long i = 0; i < count; i++) {
+		byte *data = memmap_data(&mm1, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], ((i + j) % 26) + 'a');
+		}
+		memmap_free(&mm1, ptrs[i]);
+	}
+
+	mmap_free(ptrs, count * sizeof(Ptr));
+	memmap_cleanup(&mm1);
+
+	fam_err = NoErrors;
+	MemMap mm2;
+	memmap_init(&mm2, size);
+	set_mmap_fail(0);
+	fam_assert(!memmap_allocate(&mm2));
+	fam_assert_eq(fam_err, AllocErr);
+
+	ptrs = mmap_allocate(count * sizeof(Ptr));
+	for (unsigned long long i = 0; i < count; i++) {
+		ptrs[i] = memmap_allocate(&mm2);
+		fam_assert(ptrs[i] == i + 2);
+		byte *data = memmap_data(&mm2, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	for (unsigned long long i = 0; i < count; i++) {
+		byte *data = memmap_data(&mm2, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], ((i + j) % 26) + 'a');
+		}
+		memmap_free(&mm2, ptrs[i]);
+	}
+
+	mmap_free(ptrs, count * sizeof(Ptr));
+	memmap_cleanup(&mm2);
+
+	fam_err = NoErrors;
+	memmap_init(&mm2, size);
+	set_mmap_fail(2);
+	fam_assert(!memmap_allocate(&mm2));
+	fam_assert_eq(fam_err, AllocErr);
+
+	ptrs = mmap_allocate(count * sizeof(Ptr));
+	for (unsigned long long i = 0; i < count; i++) {
+		ptrs[i] = memmap_allocate(&mm2);
+		fam_assert(ptrs[i] == i + 2);
+		byte *data = memmap_data(&mm2, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	for (unsigned long long i = 0; i < count; i++) {
+		byte *data = memmap_data(&mm2, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], ((i + j) % 26) + 'a');
+		}
+		memmap_free(&mm2, ptrs[i]);
+	}
+
+	mmap_free(ptrs, count * sizeof(Ptr));
+	memmap_cleanup(&mm2);
+
+	fam_err = NoErrors;
+	memmap_init(&mm2, size);
+	set_mmap_fail(3);
+	fam_assert(!memmap_allocate(&mm2));
+	fam_assert_eq(fam_err, AllocErr);
+
+	ptrs = mmap_allocate(count * sizeof(Ptr));
+	for (unsigned long long i = 0; i < count; i++) {
+		ptrs[i] = memmap_allocate(&mm2);
+		fam_assert(ptrs[i] == i + 2);
+		byte *data = memmap_data(&mm2, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	for (unsigned long long i = 0; i < count; i++) {
+		byte *data = memmap_data(&mm2, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], ((i + j) % 26) + 'a');
+		}
+		memmap_free(&mm2, ptrs[i]);
+	}
+
+	mmap_free(ptrs, count * sizeof(Ptr));
+	memmap_cleanup(&mm2);
+
+	fam_err = NoErrors;
+	memmap_init(&mm2, size);
+	ptrs = mmap_allocate(count * sizeof(Ptr));
+
+	_debug_capacity_exceeded = true;
+	fam_err = NoErrors;
+	count = 62;
+	for (unsigned long long i = 0; i < count; i++) {
+		ptrs[i] = memmap_allocate(&mm2);
+		fam_assert(ptrs[i]);
+		byte *data = memmap_data(&mm2, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			data[j] = ((i + j) % 26) + 'a';
+		}
+	}
+
+	fam_assert(!memmap_allocate(&mm2));
+	_debug_capacity_exceeded = false;
+
+	for (unsigned long long i = 0; i < count; i++) {
+		byte *data = memmap_data(&mm2, ptrs[i]);
+		for (int j = 0; j < size; j++) {
+			fam_assert_eq(data[j], ((i + j) % 26) + 'a');
+		}
+		memmap_free(&mm2, ptrs[i]);
+	}
+
+	mmap_free(ptrs, count * sizeof(Ptr));
+	memmap_cleanup(&mm2);
+}

@@ -60,7 +60,7 @@ bool execute_tests(byte *name) {
 			if (target_test[0] == 0 ||
 				!cstring_compare(target_test, test_names[i])) {
 				test_exe_count++;
-				__int128_t start_alloc = _allocation_sum;
+				int64 start_alloc = _allocation_sum;
 				test_arr[i]("test_dir", "resources_dir");
 				if (_allocation_sum != start_alloc)
 					println("%sFAIL%s: alloc_diff=%lli", BRIGHT_RED, RESET,

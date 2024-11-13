@@ -23,6 +23,9 @@
 #define BITMAP_SIZE 64
 #define IMAX 32
 
+bool _debug_capacity_exceeded = false;
+static int _debug_cas_fail_count = -1;
+
 static unsigned int memmap_id = 0;
 _Thread_local int last_i[MAX_MEMMAPS] = {};
 _Thread_local int last_j[MAX_MEMMAPS] = {};
@@ -67,11 +70,21 @@ MemMapIndexCollection memmap_ptr_to_index(Ptr ptr) {
 	return ret;
 }
 
+#define DEBUG_CAS_FAIL_COUNT              \
+	if (_debug_cas_fail_count >= 0) {     \
+		if (_debug_cas_fail_count == 0) { \
+			force_continue_loop = true;   \
+		}                                 \
+		_debug_cas_fail_count--;          \
+	} else                                \
+		force_continue_loop = false;
+
 unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 								   int l) {
 	bool mmapped = false;
 	byte ****nullvalue1 = NULL;
 	byte ****data1 = NULL;
+	bool force_continue_loop = false;
 	// load data
 	do {
 		if (mmapped) {
@@ -89,12 +102,16 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 					  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte ***));
 		} else
 			break;
-	} while (!CAS(&impl->data, &nullvalue1, data1));
+#ifdef TEST
+		DEBUG_CAS_FAIL_COUNT
+#endif	// TEST
+	} while (force_continue_loop || !CAS(&impl->data, &nullvalue1, data1));
 
 	// load second level
 	byte ***nullvalue2 = NULL;
 	byte ***data2;
 	mmapped = false;
+	force_continue_loop = false;
 	do {
 		if (mmapped) {
 			mmap_free(data2, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
@@ -111,11 +128,15 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 					  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte **));
 		} else
 			break;
-	} while (!CAS(&impl->data[i], &nullvalue2, data2));
+#ifdef TEST
+		DEBUG_CAS_FAIL_COUNT
+#endif	// TEST
+	} while (force_continue_loop || !CAS(&impl->data[i], &nullvalue2, data2));
 	// load third level
 	byte **nullvalue3 = NULL;
 	byte **data3;
 	mmapped = false;
+	force_continue_loop = false;
 	do {
 		if (mmapped) {
 			mmap_free(data3, MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
@@ -133,11 +154,16 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 					  MEMMAP_ENTRY_PER_LEVEL * sizeof(byte *));
 		} else
 			break;
-	} while (!CAS(&impl->data[i][j], &nullvalue3, data3));
+#ifdef TEST
+		DEBUG_CAS_FAIL_COUNT
+#endif	// TEST
+	} while (force_continue_loop ||
+			 !CAS(&impl->data[i][j], &nullvalue3, data3));
 	// load fourth and final level
 	byte *nullvalue4 = NULL;
 	byte *data4;
 	mmapped = false;
+	force_continue_loop = false;
 	// add 32 bytes for the bitmap
 	do {
 		if (mmapped) {
@@ -162,7 +188,11 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 			if (i == 0 && j == 0 && k == 0) data4[0] = 0x3;
 		} else
 			break;
-	} while (!CAS(&impl->data[i][j][k], &nullvalue4, data4));
+#ifdef TEST
+		DEBUG_CAS_FAIL_COUNT
+#endif	// TEST
+	} while (force_continue_loop ||
+			 !CAS(&impl->data[i][j][k], &nullvalue4, data4));
 
 	// return the lth item at the begining of the data array (32 bytes reserved)
 	// l is between 0-3.
@@ -208,16 +238,18 @@ Ptr memmap_allocate(MemMap *mm) {
 			}
 			// l is 4 because 64 bits are used in the atomic load
 			// the other 4 combinations cover all 256 entries
-			if (++l >= 8) {
+			if (_debug_capacity_exceeded || ++l >= 8) {
 				l = 0;
-				if (++k >= MEMMAP_ENTRY_PER_LEVEL) {
+				if (_debug_capacity_exceeded || ++k >= MEMMAP_ENTRY_PER_LEVEL) {
 					k = 0;
-					if (++j >= MEMMAP_ENTRY_PER_LEVEL) {
+					if (_debug_capacity_exceeded ||
+						++j >= MEMMAP_ENTRY_PER_LEVEL) {
 						j = 0;
 						if (++i >= IMAX) {	// reduced range
 							i = 0;
 						}
-						if (i == last_i[impl->memmap_id]) {
+						if (_debug_capacity_exceeded ||
+							i == last_i[impl->memmap_id]) {
 							SetErr(CapacityExceeded);
 							return null;
 						}
@@ -329,5 +361,9 @@ void memmap_setijkl(int index, int i, int j, int k, int l) {
 	last_j[index] = j;
 	last_k[index] = k;
 	last_l[index] = l;
+}
+
+void set_debug_cas_fail_count(int value) {
+	_debug_cas_fail_count = value;
 }
 #endif	// TEST
