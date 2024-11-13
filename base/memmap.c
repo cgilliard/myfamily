@@ -41,6 +41,31 @@ void __attribute__((constructor)) __memmap_check_sizes() {
 			  sizeof(MemMapImpl), sizeof(MemMap));
 }
 
+typedef struct MemMapIndexCollection {
+	unsigned int i;
+	unsigned int j;
+	unsigned int k;
+	unsigned int l;
+	unsigned int x;
+} MemMapIndexCollection;
+
+Ptr memmap_index_to_ptr(unsigned int i, unsigned int j, unsigned int k,
+						unsigned int l, unsigned int x) {
+	return ((i & 0xFF) << 24) | ((j & 0xFF) << 16) | ((k & 0xFF) << 8) |
+		   ((l << 6) & 0xC0) | (x & 0x3F);
+}
+
+MemMapIndexCollection memmap_ptr_to_index(Ptr ptr) {
+	MemMapIndexCollection ret = {
+		.i = (ptr >> 24) & 0xFF,
+		.j = (ptr >> 16) & 0xFF,
+		.k = (ptr >> 8) & 0xFF,
+		.l = ((ptr >> 6) & 0x3),
+		.x = (ptr & 0x3F),
+	};
+	return ret;
+}
+
 unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 								   int l) {
 	bool mmapped = false;
@@ -147,10 +172,9 @@ unsigned long long *memmap_itt_for(MemMapImpl *impl, int i, int j, int k,
 
 void *memmap_data(const MemMap *mm, Ptr ptr) {
 	const MemMapImpl *impl = (const MemMapImpl *)mm;
-	byte *block = impl->data[ptr >> (MEMMAP_SHIFT * 3)]
-							[(ptr >> (MEMMAP_SHIFT * 2)) & 0xFF]
-							[(ptr >> (MEMMAP_SHIFT)) & 0xFF];
-	return (byte *)(block + ((ptr & 0xFF) * impl->size + 32));
+	MemMapIndexCollection index = memmap_ptr_to_index(ptr);
+	byte *block = impl->data[index.i][index.j][index.k];
+	return (byte *)(block + (((index.l << 6) | index.x) * impl->size + 32));
 }
 int memmap_init(MemMap *mm, unsigned int size) {
 	MemMapImpl *impl = (MemMapImpl *)mm;
@@ -204,10 +228,7 @@ Ptr memmap_allocate(MemMap *mm) {
 		// find open bit
 		int x;
 		for (x = 0; (v & (0x1ULL << x)) != 0; x++);
-		// println("i=%i,j=%i,k=%i,l=%i,x=%i", i, j, k, l, x);
-		unsigned long long ishift = (unsigned long long)i << (MEMMAP_SHIFT * 3);
-		ret = ishift | (j << (2 * MEMMAP_SHIFT)) | (k << MEMMAP_SHIFT) |
-			  (l << 6) | x;
+		ret = memmap_index_to_ptr(i, j, k, l, x);
 		// set bit
 		desired = v | (0x1ULL << x);
 	} while (!CAS(current, &v, desired));
@@ -226,18 +247,21 @@ void memmap_free(MemMap *mm, Ptr ptr) {
 	if (mm == NULL) panic("invalid (null) memmap");
 	MemMapImpl *impl = (MemMapImpl *)mm;
 	unsigned long long nv, *v, vo;
-	int i, j, k, l;
+	int i, j, k, l, x;
 
-	i = (ptr >> (MEMMAP_SHIFT * 3)) & 0xFF;
-	j = (ptr >> (MEMMAP_SHIFT * 2)) & 0xFF;
-	k = (ptr >> (MEMMAP_SHIFT)) & 0xFF;
-	l = (ptr >> 6) & 0x3;
+	MemMapIndexCollection index = memmap_ptr_to_index(ptr);
+
+	i = index.i;
+	j = index.j;
+	k = index.k;
+	l = index.l;
+	x = index.x;
 
 	do {
 		v = (unsigned long long *)impl->data[i][j][k] + l;
 		vo = ALOAD((unsigned long long *)(v));
-		if ((vo & (0x1ULL << (ptr & 0x3F))) == 0) panic("double free attempt!");
-		nv = vo & ~(0x1ULL << (ptr & 0x3F));
+		if ((vo & (0x1ULL << x)) == 0) panic("double free attempt!");
+		nv = vo & ~(0x1ULL << x);
 	} while (!CAS(&*v, &vo, nv));
 
 	last_i[impl->memmap_id] = i;
