@@ -92,6 +92,9 @@ elif [ "$1" = "test" ] || [ "$1" = "coverage" ]; then
    else
       unset TEST_FILTER;
    fi
+   cd base;
+   ${cc} ${cc_flags} ${extra} ${special} -c test_impl.c || exit 1;
+   cd ..;
    for dir in $subdirs; do
       if [ "$target" != "$dir" ] && [ "$target" != "" ]; then
           continue;
@@ -130,7 +133,7 @@ elif [ -z "$1" ] || [ "${1#-}" != "$1" ] || [ "$1" = "all" ]; then
                fi
             done
             if [ ! -e ${file%.c}.o ] || [ ${file} -nt ${file%.c}.o ] || [ $newer_header = 1 ]; then
-               if [ ${file} != "test.c" ]; then
+               if [ ${file} != "test.c" ] && [ ${file} != "test_impl.c" ]; then
                   if [ $s = 0 ]; then
                      echo "${GREEN}C compile command$RESET: ${CYAN}${cc}${RESET}\n\
 	${cc_flags}\n\

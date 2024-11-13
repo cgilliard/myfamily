@@ -24,8 +24,6 @@
 
 #define MAX_BACKTRACE_ENTRIES 128
 
-#ifdef TEST
-
 int test_count = 0;
 test_fn_ptr test_arr[MAX_TESTS + 1];
 byte test_names[MAX_TESTS][MAX_TEST_NAME + 1];
@@ -190,5 +188,3 @@ void fail_assert() {
 
 	longjmp(test_jmp, 1);
 }
-
-#endif	// TEST
